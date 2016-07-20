@@ -27,3 +27,30 @@ Fixpoint normalise_list_free_elem el :=
   end.
 
 Definition normalise_string s := mkstring (normalise_list_free_elem (str s)).
+
+Definition is_S x s :=
+  match str (normalise_string s) with
+  | nil => False
+  | E l d :: el => x = (l, d)
+  end.
+
+Definition is_empty s := str (normalise_string s) = nil.
+
+Theorem decomposed_4 : ∀ s, is_empty s ∨
+  is_S (a, false) s ∨ is_S (a, true) s ∨ is_S (b, false) s ∨ is_S (b, true) s.
+Proof.
+intros s.
+unfold is_empty, is_S.
+remember (normalise_string s) as ns eqn:Hns; symmetry in Hns.
+destruct ns as (el); simpl.
+destruct el as [| e]; [ left; reflexivity | right ].
+destruct e as (x, d).
+destruct x.
+ destruct d; [ right; left; reflexivity | left; reflexivity ].
+ right; right.
+ destruct d; [ right; reflexivity | left; reflexivity ].
+Qed.
+
+Theorem decomposed_2_with_a : ∀ s,
+  is_S (a, true) ∨ is_S (a, false) s.
+ah bin non...
