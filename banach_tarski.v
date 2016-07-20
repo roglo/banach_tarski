@@ -1,6 +1,10 @@
 Require Import Utf8.
 Require Import List.
 
+(* a = E a false
+   a⁻¹ = E a true
+   b = E b false
+   b⁻¹ = E b true *)
 Inductive letter := a | b.
 Inductive free_elem := E : letter → bool → free_elem.
 Record string := mkstring { str : list free_elem }.
