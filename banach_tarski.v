@@ -1,13 +1,18 @@
 Require Import Utf8.
 Require Import List.
 
-(* a = E a false
-   a⁻¹ = E a true
-   b = E b false
-   b⁻¹ = E b true *)
-Inductive letter := a | b.
+(* a = E la false
+   a⁻¹ = E la true
+   b = E lb false
+   b⁻¹ = E lb true *)
+Inductive letter := la | lb.
 Inductive free_elem := E : letter → bool → free_elem.
 Record string := mkstring { str : list free_elem }.
+
+Notation "'a'" := (E la false).
+Notation "'a⁻¹'" := (E la true).
+Notation "'b'" := (E lb false).
+Notation "'b⁻¹'" := (E lb true).
 
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
@@ -28,19 +33,19 @@ Fixpoint normalise_list_free_elem el :=
 
 Definition normalise_string s := mkstring (normalise_list_free_elem (str s)).
 
-Definition is_S x s :=
+Definition start_with x s :=
   match str (normalise_string s) with
   | nil => False
-  | E l d :: el => x = (l, d)
+  | e :: el => x = e
   end.
 
 Definition is_empty s := str (normalise_string s) = nil.
 
 Theorem decomposed_4 : ∀ s, is_empty s ∨
-  is_S (a, false) s ∨ is_S (a, true) s ∨ is_S (b, false) s ∨ is_S (b, true) s.
+  start_with a s ∨ start_with a⁻¹ s ∨ start_with b s ∨ start_with b⁻¹ s.
 Proof.
 intros s.
-unfold is_empty, is_S.
+unfold is_empty, start_with.
 remember (normalise_string s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el); simpl.
 destruct el as [| e]; [ left; reflexivity | right ].
@@ -52,5 +57,5 @@ destruct x.
 Qed.
 
 Theorem decomposed_2_with_a : ∀ s,
-  is_S (a, true) ∨ is_S (a, false) s.
+  start_with a⁻¹ s ∨ start_with a s.
 ah bin non...
