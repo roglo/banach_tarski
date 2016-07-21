@@ -40,12 +40,8 @@ Definition start_with x s :=
   end.
 Definition is_empty s := str (F₂_normalise s) = nil.
 
-Definition SW x := { s | start_with x s }.
+Definition Sw x := { s | start_with x s }.
 Definition Empty := { s | is_empty s }.
-
-Theorem decomposed_4 : (F₂ = Empty + SW a + SW a⁻¹ + SW b + SW b⁻¹)%type.
-Proof.
-Abort.
 
 Theorem decomposed_4 : ∀ s, is_empty s ∨
   start_with a s ∨ start_with a⁻¹ s ∨ start_with b s ∨ start_with b⁻¹ s.
@@ -62,13 +58,32 @@ destruct x.
  destruct d; [ right; reflexivity | left; reflexivity ].
 Qed.
 
-(*
-Definition start_with_2 x y s :=
-  match str (F₂_normalise s) with
-  | nil => False
-  | e :: el => ...
-*)
-
 Theorem decomposed_2_with_a : ∀ s,
-  start_with_2 a a⁻¹ s ∨ start_with a s.
-ah bin non...
+  start_with a (mkF₂ (a⁻¹ :: str s)) ∨ start_with a s.
+Proof.
+intros.
+unfold start_with.
+bbb.
+
+remember (F₂_normalise (mkF₂ (a⁻¹ :: str s))) as ns' eqn:Hns'.
+remember (F₂_normalise s) as ns eqn:Hns.
+symmetry in Hns', Hns.
+destruct ns' as (el'); simpl.
+destruct el' as [| e'].
+ right.
+ injection Hns'; clear Hns'; intros H'.
+ destruct ns as (el); simpl.
+ destruct el as [| e].
+  injection Hns; clear Hns; intros H.
+  destruct (str s) as [| e el]; [ discriminate H' | ].
+  simpl in H. 
+  destruct e as (l, d).
+  destruct el; [ discriminate H | ].
+  destruct f as (l', d').
+  destruct (letter_dec l l').
+  destruct (Bool.bool_dec d d'); [ discriminate H | ].
+destruct (letter_dec la l).
+subst l l'.
+destruct d.
+discriminate H'.
+simpl in H'.
