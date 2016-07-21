@@ -38,13 +38,21 @@ Definition start_with x s :=
   | nil => False
   | e :: el => x = e
   end.
+Definition is_empty s := str (normalise_string s) = nil.
 
+Definition SW x := { s | start_with x s }.
+Definition Empty := { s | is_empty s }.
+
+(*
 Definition start_with_2 x y s :=
   match str (normalise_string s) with
   | nil => False
   | e :: el => ...
+*)
 
-Definition is_empty s := str (normalise_string s) = nil.
+Theorem decomposed_4 : (string = Empty + SW a + SW a⁻¹ + SW b + SW b⁻¹)%type.
+Proof.
+bbb.
 
 Theorem decomposed_4 : ∀ s, is_empty s ∨
   start_with a s ∨ start_with a⁻¹ s ∨ start_with b s ∨ start_with b⁻¹ s.
