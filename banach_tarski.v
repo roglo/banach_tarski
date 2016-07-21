@@ -61,7 +61,7 @@ Qed.
 Definition concat x s := (mkF₂ (x :: str s)).
 
 Theorem decomposed_2_with_a : ∀ s,
-  start_with a (concat a⁻¹s) ∨ start_with a s.
+  start_with a (concat a⁻¹ s) ∨ start_with a s.
 Proof.
 intros.
 unfold start_with.
