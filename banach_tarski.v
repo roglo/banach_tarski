@@ -43,16 +43,9 @@ Definition is_empty s := str (F₂_normalise s) = nil.
 Definition SW x := { s | start_with x s }.
 Definition Empty := { s | is_empty s }.
 
-(*
-Definition start_with_2 x y s :=
-  match str (F₂_normalise s) with
-  | nil => False
-  | e :: el => ...
-*)
-
 Theorem decomposed_4 : (F₂ = Empty + SW a + SW a⁻¹ + SW b + SW b⁻¹)%type.
 Proof.
-bbb.
+Abort.
 
 Theorem decomposed_4 : ∀ s, is_empty s ∨
   start_with a s ∨ start_with a⁻¹ s ∨ start_with b s ∨ start_with b⁻¹ s.
@@ -68,6 +61,13 @@ destruct x.
  right; right.
  destruct d; [ right; reflexivity | left; reflexivity ].
 Qed.
+
+(*
+Definition start_with_2 x y s :=
+  match str (F₂_normalise s) with
+  | nil => False
+  | e :: el => ...
+*)
 
 Theorem decomposed_2_with_a : ∀ s,
   start_with_2 a a⁻¹ s ∨ start_with a s.
