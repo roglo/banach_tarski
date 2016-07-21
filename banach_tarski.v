@@ -58,6 +58,17 @@ destruct x.
  destruct d; [ right; reflexivity | left; reflexivity ].
 Qed.
 
+Definition start_with_and_left_concat x x' s :=
+  ∃ t, start_with x' t → s = F₂_normalise (mkF₂ (x :: str t)).
+
+Print start_with_and_left_concat.
+bbb.
+
+Theorem decomposed_2_with_a : ∀ s,
+  start_with a (concat a⁻¹ s) ∨ start_with a s.
+Proof.
+bbb.
+
 Definition concat x s := (mkF₂ (x :: str s)).
 
 Theorem decomposed_2_with_a : ∀ s,
