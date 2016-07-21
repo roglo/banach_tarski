@@ -39,6 +39,11 @@ Definition start_with x s :=
   | e :: el => x = e
   end.
 
+Definition start_with_2 x y s :=
+  match str (normalise_string s) with
+  | nil => False
+  | e :: el => ...
+
 Definition is_empty s := str (normalise_string s) = nil.
 
 Theorem decomposed_4 : ∀ s, is_empty s ∨
@@ -57,5 +62,5 @@ destruct x.
 Qed.
 
 Theorem decomposed_2_with_a : ∀ s,
-  start_with a⁻¹ s ∨ start_with a s.
+  start_with_2 a a⁻¹ s ∨ start_with a s.
 ah bin non...
