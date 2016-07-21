@@ -7,7 +7,7 @@ Require Import List.
    b⁻¹ = E lb true *)
 Inductive letter := la | lb.
 Inductive free_elem := E : letter → bool → free_elem.
-Record string := mkstring { str : list free_elem }.
+Record F₂ := mkF₂ { str : list free_elem }.
 
 Notation "'a'" := (E la false).
 Notation "'a⁻¹'" := (E la true).
@@ -31,26 +31,26 @@ Fixpoint normalise_list_free_elem el :=
       else E l₁ d₁ :: normalise_list_free_elem el₁
   end.
 
-Definition normalise_string s := mkstring (normalise_list_free_elem (str s)).
+Definition F₂_normalise s := mkF₂ (normalise_list_free_elem (str s)).
 
 Definition start_with x s :=
-  match str (normalise_string s) with
+  match str (F₂_normalise s) with
   | nil => False
   | e :: el => x = e
   end.
-Definition is_empty s := str (normalise_string s) = nil.
+Definition is_empty s := str (F₂_normalise s) = nil.
 
 Definition SW x := { s | start_with x s }.
 Definition Empty := { s | is_empty s }.
 
 (*
 Definition start_with_2 x y s :=
-  match str (normalise_string s) with
+  match str (F₂_normalise s) with
   | nil => False
   | e :: el => ...
 *)
 
-Theorem decomposed_4 : (string = Empty + SW a + SW a⁻¹ + SW b + SW b⁻¹)%type.
+Theorem decomposed_4 : (F₂ = Empty + SW a + SW a⁻¹ + SW b + SW b⁻¹)%type.
 Proof.
 bbb.
 
@@ -59,7 +59,7 @@ Theorem decomposed_4 : ∀ s, is_empty s ∨
 Proof.
 intros s.
 unfold is_empty, start_with.
-remember (normalise_string s) as ns eqn:Hns; symmetry in Hns.
+remember (F₂_normalise s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el); simpl.
 destruct el as [| e]; [ left; reflexivity | right ].
 destruct e as (x, d).
