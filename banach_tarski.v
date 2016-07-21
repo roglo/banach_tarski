@@ -31,14 +31,14 @@ Fixpoint normalise_list_free_elem el :=
       else E l₁ d₁ :: normalise_list_free_elem el₁
   end.
 
-Definition F₂_normalise s := mkF₂ (normalise_list_free_elem (str s)).
+Definition norm s := mkF₂ (normalise_list_free_elem (str s)).
 
 Definition start_with x s :=
-  match str (F₂_normalise s) with
+  match str (norm s) with
   | nil => False
   | e :: el => x = e
   end.
-Definition is_empty s := str (F₂_normalise s) = nil.
+Definition is_empty s := str (norm s) = nil.
 
 Definition Sw x := { s | start_with x s }.
 Definition Empty := { s | is_empty s }.
@@ -48,7 +48,7 @@ Theorem decomposed_4 : ∀ s, is_empty s ∨
 Proof.
 intros s.
 unfold is_empty, start_with.
-remember (F₂_normalise s) as ns eqn:Hns; symmetry in Hns.
+remember (norm s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el); simpl.
 destruct el as [| e]; [ left; reflexivity | right ].
 destruct e as (x, d).
@@ -58,48 +58,22 @@ destruct x.
  destruct d; [ right; reflexivity | left; reflexivity ].
 Qed.
 
-Definition start_with_and_left_concat x x' s :=
-  ∃ t, start_with x' t ∧ s = F₂_normalise (mkF₂ (x :: str t)).
+(* s ∈ xS(y) ↔
+   ∃ t, t ∈ S(y) ∧ s ≡ norm (xt) *)
 
-Theorem decomposed_2_with_a : ∀ s,
-  start_with_and_left_concat a a⁻¹ s ∨ start_with a s.
-Proof.
+Definition glop x y s :=
+  ∃ t, start_with y t ∧ s = norm (mkF₂ (x :: str t)).
+
+Theorem decomposed_2_a : ∀ s, glop a a⁻¹ s ∨ start_with a s.
 intros s.
 destruct s as (el).
-destruct el as [| e el].
+destruct el as [| (x, d) el].
  left.
- exists (mkF₂ nil).
- simpl.
+ exists (mkF₂ (a⁻¹ :: nil)); simpl.
+ split; [ reflexivity | ].
+ unfold norm; simpl.
+ destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
+ exfalso; apply H; reflexivity.
+
+ destruct x.
 bbb.
-
-Definition concat x s := (mkF₂ (x :: str s)).
-
-Theorem decomposed_2_with_a : ∀ s,
-  start_with a (concat a⁻¹ s) ∨ start_with a s.
-Proof.
-intros.
-unfold start_with.
-bbb.
-
-remember (F₂_normalise (mkF₂ (a⁻¹ :: str s))) as ns' eqn:Hns'.
-remember (F₂_normalise s) as ns eqn:Hns.
-symmetry in Hns', Hns.
-destruct ns' as (el'); simpl.
-destruct el' as [| e'].
- right.
- injection Hns'; clear Hns'; intros H'.
- destruct ns as (el); simpl.
- destruct el as [| e].
-  injection Hns; clear Hns; intros H.
-  destruct (str s) as [| e el]; [ discriminate H' | ].
-  simpl in H. 
-  destruct e as (l, d).
-  destruct el; [ discriminate H | ].
-  destruct f as (l', d').
-  destruct (letter_dec l l').
-  destruct (Bool.bool_dec d d'); [ discriminate H | ].
-destruct (letter_dec la l).
-subst l l'.
-destruct d.
-discriminate H'.
-simpl in H'.
