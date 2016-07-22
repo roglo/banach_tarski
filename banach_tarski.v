@@ -73,9 +73,7 @@ destruct (only_letters x); subst x.
  destruct d; [ right; reflexivity | left; reflexivity ].
 Qed.
 
-(* s ∈ xS(y) ↔
-   ∃ t, t ∈ S(y) ∧ s ≡ norm (xt) *)
-
+(* s in xS(y) *)
 Definition start_with2 x y s :=
   ∃ t, s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
@@ -84,6 +82,12 @@ Proof.
 intros s H.
 unfold is_empty in H.
 destruct s as (el); simpl in H.
+unfold start_with2.
+bbb.
+
+exists (mkF₂ (a⁻¹ :: el)).
+split.
+ Focus 2.
 bbb.
 
 destruct el as [| (x1, d1)].
