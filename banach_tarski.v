@@ -84,6 +84,8 @@ Proof.
 intros s H.
 unfold is_empty in H.
 destruct s as (el); simpl in H.
+bbb.
+
 destruct el as [| (x1, d1)].
  exists (mkF₂ (a⁻¹ :: nil)); clear H; simpl.
  split; [ | reflexivity ].
