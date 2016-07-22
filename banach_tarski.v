@@ -81,6 +81,8 @@ Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
 Proof.
 intros s H.
 unfold is_empty in H.
+bbb.
+
 destruct s as (el); simpl in H.
 unfold start_with2.
 bbb.
