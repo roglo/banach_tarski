@@ -1,10 +1,13 @@
 Require Import Utf8.
 Require Import List.
 
+Section Free_Group.
+
 (* a = E la false
    a⁻¹ = E la true
    b = E lb false
    b⁻¹ = E lb true *)
+
 Inductive letter := la | lb.
 Inductive free_elem := E : letter → bool → free_elem.
 Record F₂ := mkF₂ { str : list free_elem }.
@@ -61,10 +64,10 @@ Qed.
 (* s ∈ xS(y) ↔
    ∃ t, t ∈ S(y) ∧ s ≡ norm (xt) *)
 
-Definition glop x y s :=
+Definition start_with2 x y s :=
   ∃ t, start_with y t ∧ s = norm (mkF₂ (x :: str t)).
 
-Theorem decomposed_2_a : ∀ s, glop a a⁻¹ s ∨ start_with a s.
+Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 intros s.
 destruct s as (el).
 destruct el as [| (x, d) el].
@@ -76,4 +79,40 @@ destruct el as [| (x, d) el].
  exfalso; apply H; reflexivity.
 
  destruct x.
+  destruct d.
+   left.
+   unfold start_with2; simpl.
+   destruct el as [| (x, d) el].
+    exists (mkF₂ (a⁻¹ :: a⁻¹ :: nil)).
+    unfold start_with, norm; simpl.
+    destruct (letter_dec la la) as [| H]; [ split; reflexivity | ].
+    exfalso; apply H; reflexivity.
+
+    destruct x.
+     destruct d.
+      exists (mkF₂ (a⁻¹ :: a⁻¹ :: normalise_list_free_elem (a⁻¹ :: el))).
+      unfold start_with, norm; simpl.
+      destruct (letter_dec la la) as [H| H].
+       split; [ reflexivity | f_equal; clear H ].
+       destruct el as [| (x, d) el].
+       destruct (letter_dec la la) as [| H]; [ reflexivity | ].
+       exfalso; apply H; reflexivity.
+       destruct (letter_dec la x) as [H| H].
+        subst x.
+        destruct d.
+         simpl.
+         destruct (letter_dec la la) as [H| H].
+          clear H; f_equal.
+          destruct el as [| (x, d) el].
+           destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
+           exfalso; apply H; reflexivity.
+
+           destruct (letter_dec la x) as [H| H].
+            subst x.
+            destruct d.
+            destruct (letter_dec la la) as [H| H].
+             f_equal.
+faux.
 bbb.
+
+End Free_Group.
