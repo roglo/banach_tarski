@@ -79,10 +79,25 @@ Qed.
 Definition start_with2 x y s :=
   ∃ t, start_with y t ∧ s = norm (mkF₂ (x :: str t)).
 
+Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
+Proof.
+intros s H.
+unfold is_empty in H.
+destruct s as (el); simpl in H.
+induction el as [| (x, d)].
+ exists (mkF₂ (a⁻¹ :: nil)); clear H; simpl.
+ split; [ reflexivity | ].
+ unfold norm; simpl.
+ destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
+ exfalso; apply H; reflexivity.
+bbb.
+
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
+Proof.
 intros s.
 destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
  left.
+bbb.
  exists (mkF₂ (a⁻¹ :: str s)).
  split.
   unfold start_with; simpl.
