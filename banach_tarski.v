@@ -113,9 +113,29 @@ destruct el as [| (x, d) el].
     exfalso; apply H; reflexivity.
 
 bbb.
+1 subgoal, subgoal 1 (ID 119)
+  
+  letter : Type
+  la, lb : letter
+  la_neq_lb : la ≠ lb
+  only_letters : ∀ l : letter, {l = la} + {l = lb}
+  letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}
+  x1 : letter
+  d1 : bool
+  el : list free_elem
+  IHel : ∀ (x : letter) (d : bool),
+         start_with2 a a⁻¹ {| str := E x d :: el |}
+         ∨ start_with a {| str := E x d :: el |}
+  x : letter
+  d : bool
+  ============================
+   start_with2 a a⁻¹ {| str := E x d :: E x1 d1 :: el |}
+   ∨ start_with a {| str := E x d :: E x1 d1 :: el |}
+
+bbb.
+
   destruct (only_letters x); subst x.
    destruct d.
-bbb.
 
 pose proof IHel x1 d1 as H.
 destruct H as [H| H].
