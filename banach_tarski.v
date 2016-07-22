@@ -78,40 +78,49 @@ destruct el as [| (x, d) el].
  destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
  exfalso; apply H; reflexivity.
 
- destruct x.
-  destruct d.
+ revert x d.
+ induction el as [| (x1, d1)]; intros.
+  destruct x.
+   destruct d; [ left | right; reflexivity ].
+   unfold start_with2; simpl.
+   exists (mkF₂ (a⁻¹ :: a⁻¹ :: nil)).
+   unfold start_with, norm; simpl.
+   destruct (letter_dec la la) as [| H]; [ split; reflexivity | ].
+   exfalso; apply H; reflexivity.
+
    left.
    unfold start_with2; simpl.
-   destruct el as [| (x, d) el].
-    exists (mkF₂ (a⁻¹ :: a⁻¹ :: nil)).
-    unfold start_with, norm; simpl.
-    destruct (letter_dec la la) as [| H]; [ split; reflexivity | ].
+   exists (mkF₂ (a⁻¹ :: E lb d :: nil)); simpl.
+   split.
+    unfold start_with; simpl.
+    destruct (letter_dec la lb) as [H| H]; [ discriminate H | reflexivity ].
+
+    unfold norm; simpl.
+    destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
     exfalso; apply H; reflexivity.
 
-    destruct x.
-     destruct d.
-      exists (mkF₂ (a⁻¹ :: a⁻¹ :: normalise_list_free_elem (a⁻¹ :: el))).
-      unfold start_with, norm; simpl.
-      destruct (letter_dec la la) as [H| H].
-       split; [ reflexivity | f_equal; clear H ].
-       destruct el as [| (x, d) el].
-       destruct (letter_dec la la) as [| H]; [ reflexivity | ].
-       exfalso; apply H; reflexivity.
-       destruct (letter_dec la x) as [H| H].
-        subst x.
-        destruct d.
-         simpl.
-         destruct (letter_dec la la) as [H| H].
-          clear H; f_equal.
-          destruct el as [| (x, d) el].
-           destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
-           exfalso; apply H; reflexivity.
+  destruct x.
+   destruct d.
+    left.
+    unfold start_with2; simpl.
+    exists (mkF₂ (a⁻¹ :: a⁻¹ :: E x1 d1 :: el)).
+    split.
+     unfold start_with; simpl.
+     destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
+     exfalso; apply H; reflexivity.
 
-           destruct (letter_dec la x) as [H| H].
-            subst x.
-            destruct d.
-            destruct (letter_dec la la) as [H| H].
-             f_equal.
+     unfold norm; simpl.
+     destruct (letter_dec la la) as [H| H].
+      clear H.
+      destruct (letter_dec la x1) as [H| H].
+       subst x1.
+       destruct d1.
+        f_equal; f_equal.
+        destruct el as [| (x, d)]; [ reflexivity | ].
+        destruct (letter_dec la x) as [H| H].
+         subst x.
+         destruct (Bool.bool_dec true d) as [H| H].
+          f_equal; subst d.
 faux.
 bbb.
 
