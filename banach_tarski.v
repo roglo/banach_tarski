@@ -84,12 +84,35 @@ Proof.
 intros s H.
 unfold is_empty in H.
 destruct s as (el); simpl in H.
-induction el as [| (x, d)].
+destruct el as [| (x1, d1)].
  exists (mkF₂ (a⁻¹ :: nil)); clear H; simpl.
  split; [ reflexivity | ].
  unfold norm; simpl.
  destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
  exfalso; apply H; reflexivity.
+
+ revert x1 d1 H.
+ induction el as [| (x2, d2)]; intros; [ discriminate H | ].
+ simpl in H.
+ destruct (letter_dec x1 x2) as [H₁| H₁].
+  subst x2.
+  destruct (Bool.bool_dec d1 d2) as [H₁| H₁]; [ discriminate H | ].
+  unfold start_with2; simpl.
+  exists (mkF₂ (a⁻¹ :: el)).
+  split; simpl.
+   destruct el as [| (x3, d3)]; [ reflexivity | ].
+   simpl in H; simpl.
+   destruct el as [| (x4, d4)]; [ discriminate H | ].
+   destruct (letter_dec x3 x4) as [H₂| H₂].
+    subst x4.
+    destruct (Bool.bool_dec d3 d4) as [H₂| H₂]; [ discriminate H | ].
+    destruct (letter_dec x3 la) as [H₃| H₃].
+     subst x3.
+     destruct d3.
+bbb.
+  split; [ reflexivity | simpl ].
+  destruct (letter_dec x1 la) as [H₂| H₂].
+   subst x1.
 bbb.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
