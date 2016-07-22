@@ -81,6 +81,49 @@ Definition start_with2 x y s :=
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 intros s.
+destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
+ left.
+ exists (mkF₂ (a⁻¹ :: str s)).
+ split.
+  unfold start_with; simpl.
+  destruct s as (el); simpl.
+   unfold is_empty in H; simpl in H.
+   destruct el as [| (x, d)]; [ reflexivity | ].
+   simpl in H.
+   destruct el as [| (x1, d1)]; [ discriminate H | ].
+   destruct (letter_dec x x1) as [H₁| H₁].
+    subst x1.
+    destruct (Bool.bool_dec d d1) as [H₁| H₁]; [ discriminate H | ].
+    destruct (letter_dec la x) as [H₂| H₂].
+     subst x.
+     destruct d; [ reflexivity | simpl ].
+     destruct el as [| (x2, d2)].
+      destruct d1; [ reflexivity | ].
+      exfalso; apply H₁; reflexivity.
+
+destruct (letter_dec la x2) as [H₂| H₂].
+subst x2.
+destruct (Bool.bool_dec d1 d2) as [H₂| H₂].
+subst d2.
+destruct d1; [ reflexivity | ].
+exfalso; apply H₁; reflexivity.
+simpl in H.
+destruct el as [| (x3, d3)]; [discriminate H | ].
+destruct (letter_dec la x3) as [H₃| H₃].
+subst x3.
+simpl.
+bbb.
+
+simpl in H.
+split; [ reflexivity | simpl ].
+ unfold norm; simpl.
+ destruct (letter_dec la la) as [H₁| H₁].
+  unfold is_empty in H.
+
+, norm, normalise_list_free_elem in H.
+  simpl in H.
+
+bbb.
 destruct s as (el).
 destruct el as [| (x, d) el].
  left.
