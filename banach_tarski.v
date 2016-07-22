@@ -79,10 +79,6 @@ Qed.
 Definition start_with2 x y s :=
   ∃ t, start_with y t ∧ s = norm (mkF₂ (x :: str t)).
 
-End Free_Group.
-
-bbb.
-
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 intros s.
 destruct s as (el).
@@ -94,6 +90,7 @@ destruct el as [| (x, d) el].
  destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
  exfalso; apply H; reflexivity.
 
+bbb.
  revert x d.
  induction el as [| (x1, d1)]; intros.
   destruct (only_letters x); subst x.
@@ -118,8 +115,17 @@ destruct el as [| (x, d) el].
 
   destruct (only_letters x); subst x.
    destruct d.
+bbb.
+
+pose proof IHel x1 d1 as H.
+destruct H as [H| H].
+destruct H as (s, (H₁, H₂)).
+unfold norm in H₂.
+injection H₂; clear H₂; intros H₂.
+destruct s as (el').
+simpl in H₂.
+
     left.
-    unfold start_with2; simpl.
     exists (mkF₂ (a⁻¹ :: a⁻¹ :: E x1 d1 :: el)).
     split.
      unfold start_with; simpl.
