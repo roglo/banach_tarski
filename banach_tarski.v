@@ -90,7 +90,6 @@ destruct el as [| (x, d) el].
  destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
  exfalso; apply H; reflexivity.
 
-bbb.
  revert x d.
  induction el as [| (x1, d1)]; intros.
   destruct (only_letters x); subst x.
@@ -113,6 +112,7 @@ bbb.
     destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
     exfalso; apply H; reflexivity.
 
+bbb.
   destruct (only_letters x); subst x.
    destruct d.
 bbb.
