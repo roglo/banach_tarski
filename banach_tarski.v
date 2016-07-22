@@ -34,18 +34,18 @@ destruct l1, l2; try (left; reflexivity); right; intros H; discriminate H.
 Qed.
 *)
 
-Fixpoint normalise_list_free_elem el :=
+Fixpoint norm_list el :=
   match el with
   | nil => nil
   | E l₁ d₁ :: nil => el
   | E l₁ d₁ :: (E l₂ d₂ :: el₂) as el₁ =>
       if letter_dec l₁ l₂ then
-        if Bool.bool_dec d₁ d₂ then E l₁ d₁ :: normalise_list_free_elem el₁
-        else normalise_list_free_elem el₂
-      else E l₁ d₁ :: normalise_list_free_elem el₁
+        if Bool.bool_dec d₁ d₂ then E l₁ d₁ :: norm_list el₁
+        else norm_list el₂
+      else E l₁ d₁ :: norm_list el₁
   end.
 
-Definition norm s := mkF₂ (normalise_list_free_elem (str s)).
+Definition norm s := mkF₂ (norm_list (str s)).
 
 Definition start_with x s :=
   match str (norm s) with
@@ -162,7 +162,7 @@ split; [ reflexivity | simpl ].
  destruct (letter_dec la la) as [H₁| H₁].
   unfold is_empty in H.
 
-, norm, normalise_list_free_elem in H.
+, norm, norm_list in H.
   simpl in H.
 
 bbb.
