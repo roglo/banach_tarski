@@ -77,13 +77,25 @@ Qed.
 Definition start_with2 x y s :=
   ∃ t, s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
-(*
 Theorem glop : ∀ el,
   norm_list el = nil ↔
-  el = nil ∨ ∃ x d el', el = List.app (E x d :: el') (E x (negb d) :: nil).
+  el = nil ∨
+  ∃ x d el', el = List.app (E x d :: el') (E x (negb d) :: nil) ∧
+             norm_list el' = nil ∨
+  ∃ el₁ el₂, el = List.app el₁ el₂ ∧ norm_list el₁ = nil ∧
+             norm_list el₂ = nil.
 Proof.
 intros el.
-*)
+split; intros H.
+ induction el as [| (x, d) el]; [ left; reflexivity | right ].
+ simpl in H.
+ destruct el as [| (x1, d1) el]; [ discriminate H | ].
+ destruct (letter_dec x x1) as [H₁| H₁].
+  subst x1.
+  destruct (Bool.bool_dec d d1) as [H₁| H₁]; [ discriminate H | ].
+  destruct d1.
+   apply Bool.not_true_iff_false in H₁; subst d.
+bbb.
 
 Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
 Proof.
