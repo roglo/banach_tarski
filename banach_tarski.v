@@ -8,7 +8,15 @@ Section Free_Group.
    b = E lb false
    b⁻¹ = E lb true *)
 
+(*
 Inductive letter := la | lb.
+*)
+Variable letter : Type.
+Variable la : letter.
+Variable lb : letter.
+Variable la_neq_lb : la ≠ lb.
+Variable only_letters : ∀ l, { l = la } + { l = lb }.
+
 Inductive free_elem := E : letter → bool → free_elem.
 Record F₂ := mkF₂ { str : list free_elem }.
 
@@ -17,11 +25,14 @@ Notation "'a⁻¹'" := (E la true).
 Notation "'b'" := (E lb false).
 Notation "'b⁻¹'" := (E lb true).
 
+Variable letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
+(*
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
 intros.
 destruct l1, l2; try (left; reflexivity); right; intros H; discriminate H.
 Qed.
+*)
 
 Fixpoint normalise_list_free_elem el :=
   match el with
@@ -55,8 +66,9 @@ remember (norm s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el); simpl.
 destruct el as [| e]; [ left; reflexivity | right ].
 destruct e as (x, d).
-destruct x.
+destruct (only_letters x); subst x.
  destruct d; [ right; left; reflexivity | left; reflexivity ].
+
  right; right.
  destruct d; [ right; reflexivity | left; reflexivity ].
 Qed.
@@ -66,6 +78,10 @@ Qed.
 
 Definition start_with2 x y s :=
   ∃ t, start_with y t ∧ s = norm (mkF₂ (x :: str t)).
+
+End Free_Group.
+
+bbb.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 intros s.
@@ -80,7 +96,7 @@ destruct el as [| (x, d) el].
 
  revert x d.
  induction el as [| (x1, d1)]; intros.
-  destruct x.
+  destruct (only_letters x); subst x.
    destruct d; [ left | right; reflexivity ].
    unfold start_with2; simpl.
    exists (mkF₂ (a⁻¹ :: a⁻¹ :: nil)).
@@ -93,13 +109,14 @@ destruct el as [| (x, d) el].
    exists (mkF₂ (a⁻¹ :: E lb d :: nil)); simpl.
    split.
     unfold start_with; simpl.
-    destruct (letter_dec la lb) as [H| H]; [ discriminate H | reflexivity ].
+    destruct (letter_dec la lb) as [H| H]; [ | reflexivity ].
+    exfalso; revert H; apply la_neq_lb.
 
     unfold norm; simpl.
     destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
     exfalso; apply H; reflexivity.
 
-  destruct x.
+  destruct (only_letters x); subst x.
    destruct d.
     left.
     unfold start_with2; simpl.
