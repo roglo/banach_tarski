@@ -77,7 +77,7 @@ Qed.
    ∃ t, t ∈ S(y) ∧ s ≡ norm (xt) *)
 
 Definition start_with2 x y s :=
-  ∃ t, start_with y t ∧ s = norm (mkF₂ (x :: str t)).
+  ∃ t, s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
 Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
 Proof.
@@ -86,7 +86,7 @@ unfold is_empty in H.
 destruct s as (el); simpl in H.
 destruct el as [| (x1, d1)].
  exists (mkF₂ (a⁻¹ :: nil)); clear H; simpl.
- split; [ reflexivity | ].
+ split; [ | reflexivity ].
  unfold norm; simpl.
  destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
  exfalso; apply H; reflexivity.
@@ -100,7 +100,9 @@ destruct el as [| (x1, d1)].
   unfold start_with2; simpl.
   exists (mkF₂ (a⁻¹ :: el)).
   split; simpl.
-   destruct el as [| (x3, d3)]; [ reflexivity | ].
+bbb.
+
+   destruct el as [| (x3, d3)]; [ | reflexivity ].
    simpl in H; simpl.
    destruct el as [| (x4, d4)]; [ discriminate H | ].
    destruct (letter_dec x3 x4) as [H₂| H₂].
