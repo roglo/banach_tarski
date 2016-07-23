@@ -104,6 +104,8 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
  unfold start_with2; simpl.
  remember (norm s) as ns eqn:Hns; symmetry in Hns.
  destruct ns as (el); simpl in H.
+ destruct el as [| e el]; [ contradiction | ].
+ subst e.
 bbb.
 
 End Free_Group.
