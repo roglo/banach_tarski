@@ -77,38 +77,6 @@ Qed.
 Definition start_with2 x y s :=
   ∃ t, norm s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
-(*
-Theorem glop : ∀ el,
-  norm_list el = nil ↔
-  el = nil ∨
-  ∃ x d el', el = List.app (E x d :: el') (E x (negb d) :: nil) ∧
-             norm_list el' = nil ∨
-  ∃ el₁ el₂, el = List.app el₁ el₂ ∧ norm_list el₁ = nil ∧
-             norm_list el₂ = nil.
-Proof.
-intros el.
-split; intros H.
- induction el as [| (x, d) el]; [ left; reflexivity | right ].
- simpl in H.
- destruct el as [| (x1, d1) el]; [ discriminate H | ].
- destruct (letter_dec x x1) as [H₁| H₁].
-  subst x1.
-  destruct (Bool.bool_dec d d1) as [H₁| H₁]; [ discriminate H | ].
-  destruct d1.
-   apply Bool.not_true_iff_false in H₁; subst d.
-bbb.
-*)
-
-(*\
-Theorem toto : ∀ x d el,
-  norm_list (E x d :: el) = nil
-  → ∃ el1 el2,
-    el = el1 ++ (E x (negb d) :: el2) ∧ norm_list el1 = nil ∧
-    norm_list el2 = nil.
-Proof.
-intros x d el Hel.
-*)
-
 Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
 Proof.
 intros s H.
@@ -117,188 +85,25 @@ unfold start_with2.
 remember (norm s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el).
 simpl in H; subst el.
-bbb.
-
-destruct s as (el); simpl in H.
-destruct el as [| (x1, d1)].
- exists (mkF₂ (a⁻¹ :: nil)); simpl.
- split; [ | reflexivity ].
- unfold norm; simpl.
- destruct (letter_dec la la) as [H1| H1]; [ reflexivity | ].
- exfalso; apply H1, eq_refl.
- apply toto in H.
- destruct H as (el1, (el2, (Hel, (Hel1, Hel2)))).
- subst el.
-bbb.
-
-
-exists (mkF₂ (a⁻¹ :: el)).
-split.
- Focus 2.
-destruct el as [| (x1, d1)].
- exists (mkF₂ (a⁻¹ :: nil)); clear H; simpl.
- split; [ | reflexivity ].
- unfold norm; simpl.
- destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
- exfalso; apply H; reflexivity.
-
- revert x1 d1 H.
- induction el as [| (x2, d2)]; intros; [ discriminate H | ].
- simpl in H.
- destruct (letter_dec x1 x2) as [H₁| H₁].
-  subst x2.
-  destruct (Bool.bool_dec d1 d2) as [H₁| H₁]; [ discriminate H | ].
-  unfold start_with2; simpl.
-  exists (mkF₂ (a⁻¹ :: el)).
-  split; simpl.
-bbb.
-
-   destruct el as [| (x3, d3)]; [ | reflexivity ].
-   simpl in H; simpl.
-   destruct el as [| (x4, d4)]; [ discriminate H | ].
-   destruct (letter_dec x3 x4) as [H₂| H₂].
-    subst x4.
-    destruct (Bool.bool_dec d3 d4) as [H₂| H₂]; [ discriminate H | ].
-    destruct (letter_dec x3 la) as [H₃| H₃].
-     subst x3.
-     destruct d3.
-bbb.
-  split; [ reflexivity | simpl ].
-  destruct (letter_dec x1 la) as [H₂| H₂].
-   subst x1.
-bbb.
+exists (mkF₂ (a⁻¹ :: nil)); simpl.
+unfold start_with, norm; simpl.
+split; [ | reflexivity ].
+destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
+exfalso; apply H; reflexivity.
+Qed.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 Proof.
 intros s.
 destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
- left.
-bbb.
- exists (mkF₂ (a⁻¹ :: str s)).
- split.
-  unfold start_with; simpl.
-  destruct s as (el); simpl.
-   unfold is_empty in H; simpl in H.
-   destruct el as [| (x, d)]; [ reflexivity | ].
-   simpl in H.
-   destruct el as [| (x1, d1)]; [ discriminate H | ].
-   destruct (letter_dec x x1) as [H₁| H₁].
-    subst x1.
-    destruct (Bool.bool_dec d d1) as [H₁| H₁]; [ discriminate H | ].
-    destruct (letter_dec la x) as [H₂| H₂].
-     subst x.
-     destruct d; [ reflexivity | simpl ].
-     destruct el as [| (x2, d2)].
-      destruct d1; [ reflexivity | ].
-      exfalso; apply H₁; reflexivity.
+ left; apply empty_start_with2_a_ai; assumption.
 
-destruct (letter_dec la x2) as [H₂| H₂].
-subst x2.
-destruct (Bool.bool_dec d1 d2) as [H₂| H₂].
-subst d2.
-destruct d1; [ reflexivity | ].
-exfalso; apply H₁; reflexivity.
-simpl in H.
-destruct el as [| (x3, d3)]; [discriminate H | ].
-destruct (letter_dec la x3) as [H₃| H₃].
-subst x3.
-simpl.
-bbb.
+ right; assumption.
 
-simpl in H.
-split; [ reflexivity | simpl ].
- unfold norm; simpl.
- destruct (letter_dec la la) as [H₁| H₁].
-  unfold is_empty in H.
-
-, norm, norm_list in H.
-  simpl in H.
-
-bbb.
-destruct s as (el).
-destruct el as [| (x, d) el].
- left.
- exists (mkF₂ (a⁻¹ :: nil)); simpl.
- split; [ reflexivity | ].
- unfold norm; simpl.
- destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
- exfalso; apply H; reflexivity.
-
- revert x d.
- induction el as [| (x1, d1)]; intros.
-  destruct (only_letters x); subst x.
-   destruct d; [ left | right; reflexivity ].
-   unfold start_with2; simpl.
-   exists (mkF₂ (a⁻¹ :: a⁻¹ :: nil)).
-   unfold start_with, norm; simpl.
-   destruct (letter_dec la la) as [| H]; [ split; reflexivity | ].
-   exfalso; apply H; reflexivity.
-
-   left.
-   unfold start_with2; simpl.
-   exists (mkF₂ (a⁻¹ :: E lb d :: nil)); simpl.
-   split.
-    unfold start_with; simpl.
-    destruct (letter_dec la lb) as [H| H]; [ | reflexivity ].
-    exfalso; revert H; apply la_neq_lb.
-
-    unfold norm; simpl.
-    destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
-    exfalso; apply H; reflexivity.
-
-bbb.
-1 subgoal, subgoal 1 (ID 119)
-  
-  letter : Type
-  la, lb : letter
-  la_neq_lb : la ≠ lb
-  only_letters : ∀ l : letter, {l = la} + {l = lb}
-  letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}
-  x1 : letter
-  d1 : bool
-  el : list free_elem
-  IHel : ∀ (x : letter) (d : bool),
-         start_with2 a a⁻¹ {| str := E x d :: el |}
-         ∨ start_with a {| str := E x d :: el |}
-  x : letter
-  d : bool
-  ============================
-   start_with2 a a⁻¹ {| str := E x d :: E x1 d1 :: el |}
-   ∨ start_with a {| str := E x d :: E x1 d1 :: el |}
-
-bbb.
-
-  destruct (only_letters x); subst x.
-   destruct d.
-
-pose proof IHel x1 d1 as H.
-destruct H as [H| H].
-destruct H as (s, (H₁, H₂)).
-unfold norm in H₂.
-injection H₂; clear H₂; intros H₂.
-destruct s as (el').
-simpl in H₂.
-
-    left.
-    exists (mkF₂ (a⁻¹ :: a⁻¹ :: E x1 d1 :: el)).
-    split.
-     unfold start_with; simpl.
-     destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
-     exfalso; apply H; reflexivity.
-
-     unfold norm; simpl.
-     destruct (letter_dec la la) as [H| H].
-      clear H.
-      destruct (letter_dec la x1) as [H| H].
-       subst x1.
-       destruct d1.
-        f_equal; f_equal.
-        destruct el as [| (x, d)]; [ reflexivity | ].
-        destruct (letter_dec la x) as [H| H].
-         subst x.
-         destruct (Bool.bool_dec true d) as [H| H].
-          f_equal; subst d.
-faux.
+ unfold start_with in H.
+ unfold start_with2; simpl.
+ remember (norm s) as ns eqn:Hns; symmetry in Hns.
+ destruct ns as (el); simpl in H.
 bbb.
 
 End Free_Group.
