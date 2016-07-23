@@ -99,6 +99,7 @@ split; intros H.
 bbb.
 *)
 
+(*\
 Theorem toto : ∀ x d el,
   norm_list (E x d :: el) = nil
   → ∃ el1 el2,
@@ -106,13 +107,18 @@ Theorem toto : ∀ x d el,
     norm_list el2 = nil.
 Proof.
 intros x d el Hel.
-bbb.
+*)
 
 Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
 Proof.
 intros s H.
 unfold is_empty in H.
 unfold start_with2.
+remember (norm s) as ns eqn:Hns; symmetry in Hns.
+destruct ns as (el).
+simpl in H; subst el.
+bbb.
+
 destruct s as (el); simpl in H.
 destruct el as [| (x1, d1)].
  exists (mkF₂ (a⁻¹ :: nil)); simpl.
