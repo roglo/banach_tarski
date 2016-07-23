@@ -109,10 +109,8 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
  left.
  exists (mkF₂ (a⁻¹ :: a⁻¹ :: el)).
  split.
-  simpl; unfold norm.
-  remember (a⁻¹ :: el) as el' eqn:Hel'.
   simpl.
-  destruct (letter_dec la la) as [H| H].
+  remember (a⁻¹ :: el) as el' eqn:Hel'.
 bbb.
 
   simpl; unfold norm; simpl.
