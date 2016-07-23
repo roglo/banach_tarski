@@ -75,7 +75,7 @@ Qed.
 
 (* s in xS(y) *)
 Definition start_with2 x y s :=
-  ∃ t, s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
+  ∃ t, norm s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
 (*
 Theorem glop : ∀ el,
@@ -104,17 +104,19 @@ Proof.
 intros s H.
 unfold is_empty in H.
 unfold start_with2.
+destruct s as (el); simpl in H.
+destruct el as [| (x1, d1)].
+ exists (mkF₂ (a⁻¹ :: nil)); simpl.
+ split; [ | reflexivity ].
+ unfold norm; simpl.
+ destruct (letter_dec la la) as [H1| H1]; [ reflexivity | ].
+ exfalso; apply H1, eq_refl.
 bbb.
 
-destruct s as (el); simpl in H.
-unfold start_with2.
-bbb.
 
 exists (mkF₂ (a⁻¹ :: el)).
 split.
  Focus 2.
-bbb.
-
 destruct el as [| (x1, d1)].
  exists (mkF₂ (a⁻¹ :: nil)); clear H; simpl.
  split; [ | reflexivity ].
