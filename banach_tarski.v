@@ -105,7 +105,34 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
  remember (norm s) as ns eqn:Hns; symmetry in Hns.
  destruct ns as (el); simpl in H.
  destruct el as [| e el]; [ contradiction | ].
- subst e.
+ subst e; unfold start_with; rewrite Hns; simpl.
+ left.
+ exists (mkF₂ (a⁻¹ :: a⁻¹ :: el)).
+ split.
+  simpl; unfold norm.
+  remember (a⁻¹ :: el) as el' eqn:Hel'.
+  simpl.
+  destruct (letter_dec la la) as [H| H].
+bbb.
+
+  simpl; unfold norm; simpl.
+  destruct (letter_dec la la) as [H| H].
+   f_equal; clear H.
+   destruct el as [| e el] ; [ reflexivity | ].
+   destruct e as (x, d).
+   destruct (letter_dec la x) as [H| H].
+    subst x.
+    destruct d.
+     simpl; f_equal.
+     destruct el as [| e el]; [ reflexivity | ].
+     destruct e as (x, d).
+     destruct (letter_dec la x) as [H| H].
+      subst x.
+      destruct d.
+       simpl; f_equal.
+       destruct el as [| e el]; [ reflexivity | ].
+
+
 bbb.
 
 End Free_Group.
