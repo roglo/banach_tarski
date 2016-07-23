@@ -77,6 +77,7 @@ Qed.
 Definition start_with2 x y s :=
   ∃ t, s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
+(*
 Theorem glop : ∀ el,
   norm_list el = nil ↔
   el = nil ∨
@@ -96,11 +97,13 @@ split; intros H.
   destruct d1.
    apply Bool.not_true_iff_false in H₁; subst d.
 bbb.
+*)
 
 Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
 Proof.
 intros s H.
 unfold is_empty in H.
+unfold start_with2.
 bbb.
 
 destruct s as (el); simpl in H.
