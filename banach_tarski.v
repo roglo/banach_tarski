@@ -99,6 +99,15 @@ split; intros H.
 bbb.
 *)
 
+Theorem toto : ∀ x d el,
+  norm_list (E x d :: el) = nil
+  → ∃ el1 el2,
+    el = el1 ++ (E x (negb d) :: el2) ∧ norm_list el1 = nil ∧
+    norm_list el2 = nil.
+Proof.
+intros x d el Hel.
+bbb.
+
 Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
 Proof.
 intros s H.
@@ -111,6 +120,9 @@ destruct el as [| (x1, d1)].
  unfold norm; simpl.
  destruct (letter_dec la la) as [H1| H1]; [ reflexivity | ].
  exfalso; apply H1, eq_refl.
+ apply toto in H.
+ destruct H as (el1, (el2, (Hel, (Hel1, Hel2)))).
+ subst el.
 bbb.
 
 
