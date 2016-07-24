@@ -67,7 +67,22 @@ Definition norm s := mkF₂ (norm_list (str s)).
 Theorem norm_list_impossible_start : ∀ x d el el',
   norm_list el ≠ E x d :: E x (negb d) :: el'.
 Proof.
-intros.
+intros; intros H.
+revert x d el' H.
+induction el as [| (x1, d1) el]; intros; [ discriminate H | simpl in H ].
+remember (norm_list el) as el'' eqn:Hel''; symmetry in Hel''.
+destruct el'' as [| (x2, d2) el'']; [ discriminate H | ].
+destruct (letter_opp_dec (E x1 d1) (E x2 d2)) as [H1| H1].
+ unfold letter_opp in H1.
+ destruct (letter_dec x1 x2) as [H2| H2].
+  subst x2.
+  destruct (Bool.bool_dec d1 d2) as [H2| H2]; [ contradiction | clear H1 ].
+  destruct (Bool.bool_dec d d2) as [H1| H1].
+   subst d2.
+bbb.
+pose proof IHel x1 d as H1.
+eapply H1.
+f_equal.
 bbb.
 
 Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
