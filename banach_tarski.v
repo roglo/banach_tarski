@@ -92,37 +92,68 @@ destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
 exfalso; apply H; reflexivity.
 Qed.
 
+Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
+Proof.
+intros el.
+induction el as [| (x, d) el]; [ reflexivity | simpl ].
+destruct el as [| (x1, d1) el].
+Focus 2.
+destruct (letter_dec x x1) as [H| H].
+subst x1.
+destruct (Bool.bool_dec d d1) as [H| H].
+subst d1.
+simpl.
+destruct el as [| (x1, d1) el].
+destruct (letter_dec x x) as [H| H].
+clear H.
+destruct (Bool.bool_dec d d) as [H| H]; [ reflexivity | ].
+exfalso; apply H; reflexivity.
+exfalso; apply H; reflexivity.
+destruct (letter_dec x x1) as [H| H].
+subst x1.
+destruct (Bool.bool_dec d d1) as [H| H].
+subst d1.
+destruct (letter_dec x x) as [H| H].
+clear H.
+destruct (Bool.bool_dec d d) as [H| H].
+clear H.
+f_equal.
+bbb.
+
+remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
+revert el Hel'.
+destruct el' as [| e el']; intros; [ reflexivity | simpl ].
+destruct e as (x, d).
+
+revert x d el Hel'.
+induction el' as [| e el']; intros; [ reflexivity | ].
+destruct e as (x1, d1).
+destruct (letter_dec x x1) as [H| H].
+ subst x1.
+ destruct (Bool.bool_dec d d1) as [H| H].
+  subst d1; f_equal; simpl.
+
+destruct el' as [| e el']; [ reflexivity | ].
+destruct e as (x1, d1).
+destruct (letter_dec x x1) as [H| H].
+ subst x1.
+ destruct (Bool.bool_dec d d1) as [H| H].
+  subst d1; f_equal; simpl.
+
+destruct el' as [| e el']; [ reflexivity | ].
+destruct e as (x1, d1).
+destruct (letter_dec x x1) as [H| H].
+ subst x1.
+ destruct (Bool.bool_dec d d1) as [H| H].
+  subst d1; f_equal; simpl.
+
+bbb.
+
 Theorem norm_norm : ∀ s, norm (norm s) = norm s.
 Proof.
 intros.
 destruct s as (el).
 unfold norm; simpl; f_equal.
-remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
-revert el Hel'.
-induction el' as [| e el']; intros; [ reflexivity | simpl ].
-destruct e as (x, d).
-
-destruct el' as [| e el']; [ reflexivity | ].
-destruct e as (x1, d1).
-destruct (letter_dec x x1) as [H| H].
- subst x1.
- destruct (Bool.bool_dec d d1) as [H| H].
-  subst d1; f_equal; simpl.
-
-destruct el' as [| e el']; [ reflexivity | ].
-destruct e as (x1, d1).
-destruct (letter_dec x x1) as [H| H].
- subst x1.
- destruct (Bool.bool_dec d d1) as [H| H].
-  subst d1; f_equal; simpl.
-
-destruct el' as [| e el']; [ reflexivity | ].
-destruct e as (x1, d1).
-destruct (letter_dec x x1) as [H| H].
- subst x1.
- destruct (Bool.bool_dec d d1) as [H| H].
-  subst d1; f_equal; simpl.
-
 bbb.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
