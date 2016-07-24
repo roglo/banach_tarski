@@ -34,15 +34,19 @@ destruct l1, l2; try (left; reflexivity); right; intros H; discriminate H.
 Qed.
 *)
 
+Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
+  if letter_dec l₁ l₂ then
+    if Bool.bool_dec d₁ d₂ then false else true
+  else false.
+
 Fixpoint norm_list el :=
   match el with
   | nil => nil
-  | E l₁ d₁ :: nil => el
-  | E l₁ d₁ :: (E l₂ d₂ :: el₂) as el₁ =>
-      if letter_dec l₁ l₂ then
-        if Bool.bool_dec d₁ d₂ then E l₁ d₁ :: norm_list el₁
-        else norm_list el₂
-      else E l₁ d₁ :: norm_list el₁
+  | e₁ :: el₁ =>
+      match norm_list el₁ with
+      | nil => e₁ :: nil
+      | e₂ :: el₂ => if letter_opp e₁ e₂ then el₂ else e₁ :: e₂ :: el₂
+      end
   end.
 
 Definition norm s := mkF₂ (norm_list (str s)).
@@ -95,8 +99,18 @@ Qed.
 Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
 Proof.
 intros el.
+remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
+revert el Hel'.
+induction el' as [| (x, d) el']; intros; [ reflexivity | simpl ].
+remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
+destruct el'' as [| (x1, d1) el''].
+ f_equal.
+bbb.
+
 induction el as [| (x, d) el]; [ reflexivity | simpl ].
-destruct el as [| (x1, d1) el].
+destruct el as [| (x1, d1) el]; [ reflexivity | ].
+simpl in IHel; simpl.
+
 Focus 2.
 destruct (letter_dec x x1) as [H| H].
 subst x1.
