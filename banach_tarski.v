@@ -92,6 +92,39 @@ destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
 exfalso; apply H; reflexivity.
 Qed.
 
+Theorem norm_norm : ∀ s, norm (norm s) = norm s.
+Proof.
+intros.
+destruct s as (el).
+unfold norm; simpl; f_equal.
+remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
+revert el Hel'.
+induction el' as [| e el']; intros; [ reflexivity | simpl ].
+destruct e as (x, d).
+
+destruct el' as [| e el']; [ reflexivity | ].
+destruct e as (x1, d1).
+destruct (letter_dec x x1) as [H| H].
+ subst x1.
+ destruct (Bool.bool_dec d d1) as [H| H].
+  subst d1; f_equal; simpl.
+
+destruct el' as [| e el']; [ reflexivity | ].
+destruct e as (x1, d1).
+destruct (letter_dec x x1) as [H| H].
+ subst x1.
+ destruct (Bool.bool_dec d d1) as [H| H].
+  subst d1; f_equal; simpl.
+
+destruct el' as [| e el']; [ reflexivity | ].
+destruct e as (x1, d1).
+destruct (letter_dec x x1) as [H| H].
+ subst x1.
+ destruct (Bool.bool_dec d d1) as [H| H].
+  subst d1; f_equal; simpl.
+
+bbb.
+
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 Proof.
 intros s.
@@ -111,6 +144,14 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
  split.
   simpl.
   remember (a⁻¹ :: el) as el' eqn:Hel'.
+
+Theorem toto : ∀ el, norm (mkF₂ (a :: a⁻¹ :: el)) = norm (mkF₂ el).
+Proof.
+Admitted. Show.
+
+symmetry.
+etransitivity; [ apply toto | ].
+rewrite <- Hns.
 bbb.
 
   simpl; unfold norm; simpl.
