@@ -64,6 +64,12 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
+Theorem norm_list_impossible_start : ∀ x d el el',
+  norm_list el ≠ E x d :: E x (negb d) :: el'.
+Proof.
+intros.
+bbb.
+
 Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
 Proof.
 intros el.
@@ -87,9 +93,12 @@ destruct (letter_opp_dec e e') as [H| H].
     simpl in He.
     destruct e'' as (x'', d'').
     destruct (letter_dec x x'') as [Hx| Hx].
-     subst x''.
+     exfalso; subst x''.
      destruct (Bool.bool_dec d' d'') as [Hd'| Hd']; [ contradiction | ].
      clear He.
+     destruct d''.
+      apply Bool.not_true_iff_false in Hd'; subst d'.
+      revert Hel''; apply norm_list_impossible_start.
 bbb.
 
 Theorem norm_norm : ∀ s, norm (norm s) = norm s.
