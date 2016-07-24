@@ -67,11 +67,15 @@ Definition norm s := mkF₂ (norm_list (str s)).
 Theorem norm_list_impossible_start : ∀ x d el el',
   norm_list el ≠ E x d :: E x (negb d) :: el'.
 Proof.
-intros; intros H.
-revert x d el' H.
-induction el as [| (x1, d1) el]; intros; [ discriminate H | simpl in H ].
+intros.
+Print norm_list.
+bbb.
+
+revert x d el'.
+induction el as [| (x1, d1) el]; intros; [ intros H; discriminate H | ].
+simpl.
 remember (norm_list el) as el'' eqn:Hel''; symmetry in Hel''.
-destruct el'' as [| (x2, d2) el'']; [ discriminate H | ].
+destruct el'' as [| (x2, d2) el'']; [ intros H; discriminate H | ].
 destruct (letter_opp_dec (E x1 d1) (E x2 d2)) as [H1| H1].
  unfold letter_opp in H1.
  destruct (letter_dec x1 x2) as [H2| H2].
