@@ -36,8 +36,21 @@ Qed.
 
 Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
   if letter_dec l₁ l₂ then
-    if Bool.bool_dec d₁ d₂ then false else true
-  else false.
+    if Bool.bool_dec d₁ d₂ then False else True
+  else False.
+
+Theorem letter_opp_dec : ∀ e₁ e₂,
+  {letter_opp e₁ e₂} + {not (letter_opp e₁ e₂)}.
+Proof.
+intros.
+destruct e₁ as (x₁, d₁).
+destruct e₂ as (x₂, d₂); simpl.
+destruct (letter_dec x₁ x₂) as [Hx| Hx].
+ destruct (Bool.bool_dec d₁ d₂) as [Hd| Hd]; [ | left; constructor ].
+ right; intros H; contradiction.
+
+ right; intros H; contradiction.
+Qed.
 
 Fixpoint norm_list el :=
   match el with
@@ -45,11 +58,46 @@ Fixpoint norm_list el :=
   | e₁ :: el₁ =>
       match norm_list el₁ with
       | nil => e₁ :: nil
-      | e₂ :: el₂ => if letter_opp e₁ e₂ then el₂ else e₁ :: e₂ :: el₂
+      | e₂ :: el₂ => if letter_opp_dec e₁ e₂ then el₂ else e₁ :: e₂ :: el₂
       end
   end.
 
 Definition norm s := mkF₂ (norm_list (str s)).
+
+Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
+Proof.
+intros el.
+induction el as [| e]; [ reflexivity | simpl ].
+remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
+destruct el' as [| e']; [ reflexivity | ].
+destruct (letter_opp_dec e e') as [H| H].
+ unfold letter_opp in H.
+ destruct e as (x, d).
+ destruct e' as (x', d').
+ destruct (letter_dec x x') as [Hx| Hx].
+  subst x'.
+  destruct (Bool.bool_dec d d') as [Hd| Hd]; [ contradiction | clear H ].
+  simpl in IHel.
+  remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
+  destruct el'' as [| e''].
+   injection IHel; clear IHel; intros H; assumption.
+
+   destruct (letter_opp_dec (E x d') e'') as [He| He].
+    subst el''.
+    simpl in He.
+    destruct e'' as (x'', d'').
+    destruct (letter_dec x x'') as [Hx| Hx].
+     subst x''.
+     destruct (Bool.bool_dec d' d'') as [Hd'| Hd']; [ contradiction | ].
+     clear He.
+bbb.
+
+Theorem norm_norm : ∀ s, norm (norm s) = norm s.
+Proof.
+intros.
+destruct s as (el).
+unfold norm; simpl; f_equal.
+bbb.
 
 Definition start_with x s :=
   match str (norm s) with
@@ -95,80 +143,6 @@ split; [ | reflexivity ].
 destruct (letter_dec la la) as [H| H]; [ reflexivity | ].
 exfalso; apply H; reflexivity.
 Qed.
-
-Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
-Proof.
-intros el.
-remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
-revert el Hel'.
-induction el' as [| (x, d) el']; intros; [ reflexivity | simpl ].
-remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
-destruct el'' as [| (x1, d1) el''].
- f_equal.
-bbb.
-
-induction el as [| (x, d) el]; [ reflexivity | simpl ].
-destruct el as [| (x1, d1) el]; [ reflexivity | ].
-simpl in IHel; simpl.
-
-Focus 2.
-destruct (letter_dec x x1) as [H| H].
-subst x1.
-destruct (Bool.bool_dec d d1) as [H| H].
-subst d1.
-simpl.
-destruct el as [| (x1, d1) el].
-destruct (letter_dec x x) as [H| H].
-clear H.
-destruct (Bool.bool_dec d d) as [H| H]; [ reflexivity | ].
-exfalso; apply H; reflexivity.
-exfalso; apply H; reflexivity.
-destruct (letter_dec x x1) as [H| H].
-subst x1.
-destruct (Bool.bool_dec d d1) as [H| H].
-subst d1.
-destruct (letter_dec x x) as [H| H].
-clear H.
-destruct (Bool.bool_dec d d) as [H| H].
-clear H.
-f_equal.
-bbb.
-
-remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
-revert el Hel'.
-destruct el' as [| e el']; intros; [ reflexivity | simpl ].
-destruct e as (x, d).
-
-revert x d el Hel'.
-induction el' as [| e el']; intros; [ reflexivity | ].
-destruct e as (x1, d1).
-destruct (letter_dec x x1) as [H| H].
- subst x1.
- destruct (Bool.bool_dec d d1) as [H| H].
-  subst d1; f_equal; simpl.
-
-destruct el' as [| e el']; [ reflexivity | ].
-destruct e as (x1, d1).
-destruct (letter_dec x x1) as [H| H].
- subst x1.
- destruct (Bool.bool_dec d d1) as [H| H].
-  subst d1; f_equal; simpl.
-
-destruct el' as [| e el']; [ reflexivity | ].
-destruct e as (x1, d1).
-destruct (letter_dec x x1) as [H| H].
- subst x1.
- destruct (Bool.bool_dec d d1) as [H| H].
-  subst d1; f_equal; simpl.
-
-bbb.
-
-Theorem norm_norm : ∀ s, norm (norm s) = norm s.
-Proof.
-intros.
-destruct s as (el).
-unfold norm; simpl; f_equal.
-bbb.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 Proof.
