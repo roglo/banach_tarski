@@ -64,9 +64,40 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
+(**)
 Theorem norm_list_impossible_consecutive : ∀ x d el el₁ el₂,
   norm_list el ≠ el₁ ++ E x d :: E x (negb d) :: el₂.
 Proof.
+intros.
+revert el₁.
+induction el as [| e₁]; intros; [ intros H; destruct el₁; discriminate H | ].
+simpl; remember (norm_list el) as nl eqn:Hnl in |-*; symmetry in Hnl.
+destruct nl as [| e₂].
+ clear; intros H.
+ destruct el₁ as [| e₂]; intros; [ discriminate H | simpl in H ].
+ injection H; clear H; intros; subst e₂.
+ destruct el₁; discriminate H.
+
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  intros H.
+  assert (H₂ : e₂ :: nl = e₂ :: el₁ ++ E x d :: E x (negb d) :: el₂).
+   f_equal; assumption.
+
+   rewrite <- Hnl in H₂.
+   apply IHel with (el₁ := e₂ :: el₁), H₂.
+
+  unfold letter_opp in H₁.
+  destruct e₁ as (x₁, d₁).
+  destruct e₂ as (x₂, d₂).
+  destruct (letter_dec x₁ x₂) as [H₂| H₂].
+   subst x₂.
+   destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂].
+   2: exfalso; apply H₁; constructor.
+   clear H₁; subst d₂.
+
+bbb.
+
+
 intros.
 revert x d el₁ el₂.
 induction el as [| e₁ el]; intros.
@@ -118,11 +149,32 @@ bbb.
    destruct el1 as [| e4]; [ discriminate H | ].
    destruct el1; discriminate H.
 bbb.
+*)
 
 Theorem norm_list_impossible_start : ∀ x d el el',
   norm_list el ≠ E x d :: E x (negb d) :: el'.
 Proof.
 intros.
+destruct el as [| e₁]; [ intros H; discriminate H | simpl ].
+remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
+destruct nl as [| e₂]; [ intros H; discriminate H | ].
+destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+Print norm_list.
+intros H.
+SearchAbout (_ :: _ = _ :: _).
+assert (H₂ : e₂ :: nl = e₂ :: E x d :: E x (negb d) :: el').
+ f_equal; assumption.
+
+ rewrite <- Hnl in H₂.
+
+bbb.
+
+remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
+revert x d el el' Hnl.
+induction nl as [| e₁]; intros; [ intros H; discriminate H | ].
+intros H; injection H; clear H.
+intros; subst e₁ nl.
+
 revert x d el'.
 induction el as [| e1 el]; intros; [ intros H; discriminate H | simpl ].
 destruct el as [| e2 el]; [ intros H; discriminate H | ].
