@@ -70,7 +70,7 @@ Proof.
 intros.
 revert el₁.
 induction el as [| e₁]; intros; [ intros H; destruct el₁; discriminate H | ].
-simpl; remember (norm_list el) as nl eqn:Hnl in |-*; symmetry in Hnl.
+simpl; remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
 destruct nl as [| e₂].
  clear; intros H.
  destruct el₁ as [| e₂]; intros; [ discriminate H | simpl in H ].
@@ -83,7 +83,8 @@ destruct nl as [| e₂].
    f_equal; assumption.
 
    rewrite <- Hnl in H₂.
-   apply IHel with (el₁ := e₂ :: el₁), H₂.
+   apply IHel with (el₁ := e₂ :: el₁).
+   simpl; f_equal; assumption.
 
   unfold letter_opp in H₁.
   destruct e₁ as (x₁, d₁).
@@ -100,7 +101,6 @@ destruct nl as [| e₂].
 
      simpl; intros H.
      injection H; clear H; intros H₁ H₂; subst e₁.
-     rewrite <- Hnl in H₁.
      eapply IHel, H₁.
 
     exfalso; apply H₁; constructor.
@@ -114,7 +114,6 @@ destruct nl as [| e₂].
     simpl; intros H.
     injection H; clear H; intros H₁ H₃.
     subst e₁.
-    rewrite <- Hnl in H₁.
     eapply IHel, H₁.
 Qed.
 
@@ -122,127 +121,8 @@ Theorem norm_list_impossible_start : ∀ x d el el',
   norm_list el ≠ E x d :: E x (negb d) :: el'.
 Proof.
 intros.
-destruct el as [| e₁]; [ intros H; discriminate H | simpl ].
-remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
-destruct nl as [| e₂]; [ intros H; discriminate H | ].
-destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
-Print norm_list.
-intros H.
-SearchAbout (_ :: _ = _ :: _).
-assert (H₂ : e₂ :: nl = e₂ :: E x d :: E x (negb d) :: el').
- f_equal; assumption.
-
- rewrite <- Hnl in H₂.
-
-bbb.
-
-remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
-revert x d el el' Hnl.
-induction nl as [| e₁]; intros; [ intros H; discriminate H | ].
-intros H; injection H; clear H.
-intros; subst e₁ nl.
-
-revert x d el'.
-induction el as [| e1 el]; intros; [ intros H; discriminate H | simpl ].
-destruct el as [| e2 el]; [ intros H; discriminate H | ].
-remember (norm_list (e2 :: el)) as nl eqn:Hnl; symmetry in Hnl.
-destruct nl as [| e3 nl]; [ intros H; discriminate H | ].
-destruct (letter_opp_dec e1 e3) as [H1| H1].
-bbb.
-
-
-revert x d el.
-induction el' as [| e1 el']; intros.
- destruct el as [| e1 el]; [ intros H; discriminate H | simpl ].
- destruct el as [| e2 el]; [ intros H; discriminate H | simpl ].
- destruct el as [| e3 el]; simpl.
-  destruct (letter_opp_dec e1 e2) as [H1| H1]; [ intros H; discriminate H | ].
-  intros H; injection H; clear H; intros; subst e1 e2.
-  apply H1; unfold letter_opp.
-  destruct (letter_dec x x) as [H2| H2].
-   destruct (Bool.bool_dec d (negb d)) as [H3| H3]; [  | constructor ].
-   destruct d; discriminate H3.
-
-   apply H2; reflexivity.
-bbb.
-
-
-intros.
-revert x d el'.
-induction el as [| e1 el]; intros; [ intros H; discriminate H | simpl ].
-destruct el as [| e2 el]; [ intros H; discriminate H | simpl ].
-destruct el as [| e3 el]; simpl.
- destruct (letter_opp_dec e1 e2) as [H1| H1]; [ intros H; discriminate H |  ].
- intros H; injection H; clear H.
- intros; subst e1 e2 el'; simpl in H1.
- destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
- destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | apply H1; constructor ].
- destruct d; discriminate H.
-
- destruct el as [| e4 el]; simpl.
-  destruct (letter_opp_dec e2 e3) as [H| H]; [ intros H1; discriminate H1 |  ].
-  destruct (letter_opp_dec e1 e2) as [H1| H1].
-   intros H2; discriminate H2.
-
-   intros H2; injection H2; clear H2; intros; subst e1 e2 el'.
-   apply H1; unfold letter_opp.
-   destruct (letter_dec x x) as [H2| H2].
-    destruct (Bool.bool_dec d (negb d)) as [H3| H3]; [  | constructor ].
-    destruct d; discriminate H3.
-
-    apply H2; reflexivity.
-
-  destruct el as [| e5 el]; simpl.
-   destruct (letter_opp_dec e3 e4) as [H1| H1].
-    destruct (letter_opp_dec e1 e2) as [| H2]; [ intros H; discriminate H | ].
-    intros H; injection H; clear H; intros; subst e1 e2 el'.
-    apply H2; unfold letter_opp.
-    destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
-    destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | constructor ].
-    destruct d; discriminate H.
-
-    destruct (letter_opp_dec e2 e3) as [H2| H2].
-     destruct (letter_opp_dec e1 e4) as [H3| H3].
-      intros H; discriminate H.
-
-      intros H; injection H; clear H; intros; subst e1 e4 el'.
-      apply H3; unfold letter_opp.
-      destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
-      destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | constructor ].
-      destruct d; discriminate H.
-
-     destruct (letter_opp_dec e1 e2) as [H3| H3].
-      intros H; injection H; clear H; intros; subst e3 e4 el'.
-      apply H1; unfold letter_opp.
-      destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
-      destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | constructor ].
-      destruct d; discriminate H.
-
-      simpl.
-      intros H; injection H; clear H; intros; subst e1 e2 el'.
-      apply H3; unfold letter_opp.
-      destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
-      destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | constructor ].
-      destruct d; discriminate H.
-bbb.
-
-revert x d el'.
-induction el as [| (x1, d1) el]; intros; [ intros H; discriminate H | ].
-simpl.
-remember (norm_list el) as el'' eqn:Hel''; symmetry in Hel''.
-destruct el'' as [| (x2, d2) el'']; [ intros H; discriminate H | ].
-destruct (letter_opp_dec (E x1 d1) (E x2 d2)) as [H1| H1].
- unfold letter_opp in H1.
- destruct (letter_dec x1 x2) as [H2| H2].
-  subst x2.
-  destruct (Bool.bool_dec d1 d2) as [H2| H2]; [ contradiction | clear H1 ].
-  destruct (Bool.bool_dec d d2) as [H1| H1].
-   subst d2.
-bbb.
-pose proof IHel x1 d as H1.
-eapply H1.
-f_equal.
-bbb.
+apply (norm_list_impossible_consecutive x d el nil el').
+Qed.
 
 Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
 Proof.
