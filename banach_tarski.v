@@ -292,7 +292,25 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
    remember norm_list as f; simpl; subst f.
    split.
     f_equal.
+Theorem glop : ∀ e el el',
+  norm_list el = el' → norm_list (e :: el) = norm_list (e :: el').
+Proof.
+intros e el el' Hel.
+simpl; rewrite Hel.
+destruct el' as [| e₁]; [ reflexivity | simpl ].
+destruct (letter_opp_dec e e₁) as [H₁| H₁].
+ remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
+ destruct el'' as [| e''].
+ destruct (letter_opp_dec e e₁) as [H₂| H₂]; [ clear H₂ | contradiction ].
+ destruct el' as [| e₂]; [ reflexivity | ].
+ simpl in Hel, Hel''.
+ remember (norm_list el') as el'' eqn:Hel₁; symmetry in Hel₁.
+ destruct el'' as [| e₃]; [ discriminate Hel'' | ].
+ destruct (letter_opp_dec e₂ e₃) as [H₂| H₂]; [ | discriminate Hel'' ].
+ subst el''.
 bbb.
+
+erewrite glop; [ | eassumption ].
 
  remember (norm s) as ns eqn:Hns; symmetry in Hns.
  destruct ns as (el); simpl in H.
