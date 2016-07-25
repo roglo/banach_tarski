@@ -73,12 +73,12 @@ induction el as [| e₁ el]; intros.
  intros H; destruct el₁; discriminate H.
 
  simpl.
+ rename el₂ into el₃.
  destruct el as [| e₃ el].
   simpl; intros H.
   destruct el₁ as [| e₄]; [ discriminate H | ].
   destruct el₁; discriminate H.
 
-  rename el₂ into el₃.
   remember (norm_list (e₃ :: el)) as nl eqn:Hnl.
   symmetry in Hnl.
   destruct nl as [| e₂].
