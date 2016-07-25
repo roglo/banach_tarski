@@ -163,7 +163,6 @@ Qed.
 Theorem norm_norm : ∀ s, norm (norm s) = norm s.
 Proof.
 intros.
-Inspect 1.
 unfold norm; f_equal.
 apply norm_list_norm_list.
 Qed.
