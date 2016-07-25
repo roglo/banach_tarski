@@ -68,18 +68,79 @@ Theorem norm_list_impossible_start : ∀ x d el el',
   norm_list el ≠ E x d :: E x (negb d) :: el'.
 Proof.
 intros.
-Print norm_list.
-destruct el as [| e1 el]; [ intros H; discriminate H | simpl ].
+revert x d el.
+induction el' as [| e1 el']; intros.
+ destruct el as [| e1 el]; [ intros H; discriminate H | simpl ].
+ destruct el as [| e2 el]; [ intros H; discriminate H | simpl ].
+ destruct el as [| e3 el]; simpl.
+  destruct (letter_opp_dec e1 e2) as [H1| H1]; [ intros H; discriminate H | ].
+  intros H; injection H; clear H; intros; subst e1 e2.
+  apply H1; unfold letter_opp.
+  destruct (letter_dec x x) as [H2| H2].
+   destruct (Bool.bool_dec d (negb d)) as [H3| H3]; [  | constructor ].
+   destruct d; discriminate H3.
+
+   apply H2; reflexivity.
+bbb.
+
+
+intros.
+revert x d el'.
+induction el as [| e1 el]; intros; [ intros H; discriminate H | simpl ].
 destruct el as [| e2 el]; [ intros H; discriminate H | simpl ].
-destruct el as [| e3 el].
- simpl.
- destruct (letter_opp_dec e1 e2) as [H1| H1]; [ intros H; discriminate H | ].
+destruct el as [| e3 el]; simpl.
+ destruct (letter_opp_dec e1 e2) as [H1| H1]; [ intros H; discriminate H |  ].
  intros H; injection H; clear H.
  intros; subst e1 e2 el'; simpl in H1.
  destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
- destruct (Bool.bool_dec d (negb d)) as [H| H]; [ | apply H1; constructor ].
+ destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | apply H1; constructor ].
  destruct d; discriminate H.
 
+ destruct el as [| e4 el]; simpl.
+  destruct (letter_opp_dec e2 e3) as [H| H]; [ intros H1; discriminate H1 |  ].
+  destruct (letter_opp_dec e1 e2) as [H1| H1].
+   intros H2; discriminate H2.
+
+   intros H2; injection H2; clear H2; intros; subst e1 e2 el'.
+   apply H1; unfold letter_opp.
+   destruct (letter_dec x x) as [H2| H2].
+    destruct (Bool.bool_dec d (negb d)) as [H3| H3]; [  | constructor ].
+    destruct d; discriminate H3.
+
+    apply H2; reflexivity.
+
+  destruct el as [| e5 el]; simpl.
+   destruct (letter_opp_dec e3 e4) as [H1| H1].
+    destruct (letter_opp_dec e1 e2) as [| H2]; [ intros H; discriminate H | ].
+    intros H; injection H; clear H; intros; subst e1 e2 el'.
+    apply H2; unfold letter_opp.
+    destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
+    destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | constructor ].
+    destruct d; discriminate H.
+
+    destruct (letter_opp_dec e2 e3) as [H2| H2].
+     destruct (letter_opp_dec e1 e4) as [H3| H3].
+      intros H; discriminate H.
+
+      intros H; injection H; clear H; intros; subst e1 e4 el'.
+      apply H3; unfold letter_opp.
+      destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
+      destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | constructor ].
+      destruct d; discriminate H.
+
+     destruct (letter_opp_dec e1 e2) as [H3| H3].
+      intros H; injection H; clear H; intros; subst e3 e4 el'.
+      apply H1; unfold letter_opp.
+      destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
+      destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | constructor ].
+      destruct d; discriminate H.
+
+      simpl.
+      intros H; injection H; clear H; intros; subst e1 e2 el'.
+      apply H3; unfold letter_opp.
+      destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
+      destruct (Bool.bool_dec d (negb d)) as [H| H]; [  | constructor ].
+      destruct d; discriminate H.
 bbb.
 
 revert x d el'.
