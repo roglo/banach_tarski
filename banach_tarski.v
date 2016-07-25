@@ -64,21 +64,41 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
-Theorem norm_list_impossible_consecutive : ∀ x d el el1 el2,
-  norm_list el ≠ el1 ++ E x d :: E x (negb d) :: el2.
+Theorem norm_list_impossible_consecutive : ∀ x d el el₁ el₂,
+  norm_list el ≠ el₁ ++ E x d :: E x (negb d) :: el₂.
 Proof.
 intros.
-revert x d el1 el2.
-induction el as [| e1 el]; intros.
- intros H; destruct el1; discriminate H.
+revert x d el₁ el₂.
+induction el as [| e₁ el]; intros.
+ intros H; destruct el₁; discriminate H.
 
  simpl.
- destruct el as [| e2 el].
+ destruct el as [| e₃ el].
   simpl; intros H.
-  destruct el1 as [| e3]; [ discriminate H | ].
-  injection H; clear H; intros; subst e3.
-  destruct el1; discriminate H.
+  destruct el₁ as [| e₄]; [ discriminate H | ].
+  destruct el₁; discriminate H.
 
+  rename el₂ into el₃.
+  remember (norm_list (e₃ :: el)) as nl eqn:Hnl.
+  symmetry in Hnl.
+  destruct nl as [| e₂].
+   clear; intros H.
+   destruct el₁ as [| e₂]; intros; [ discriminate H | simpl in H ].
+   injection H; clear H; intros; subst e₂.
+   revert H; clear; intros.
+   destruct el₁; discriminate H.
+
+   destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+    simpl in Hnl.
+    remember (norm_list el) as el₄ eqn:Hel₄; symmetry in Hel₄.
+    destruct el₄ as [| e₄].
+    injection Hnl; clear Hnl; intros; subst e₃ nl.
+    intros H; destruct el₁; discriminate H.
+
+    destruct (letter_opp_dec e₃ e₄) as [H₂| H₂].
+     subst el₄.
+
+bbb.
   simpl.
   destruct el as [| e3].
    simpl.
