@@ -69,6 +69,17 @@ Theorem norm_list_impossible_start : ∀ x d el el',
 Proof.
 intros.
 Print norm_list.
+destruct el as [| e1 el]; [ intros H; discriminate H | simpl ].
+destruct el as [| e2 el]; [ intros H; discriminate H | simpl ].
+destruct el as [| e3 el].
+ simpl.
+ destruct (letter_opp_dec e1 e2) as [H1| H1]; [ intros H; discriminate H | ].
+ intros H; injection H; clear H.
+ intros; subst e1 e2 el'; simpl in H1.
+ destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
+ destruct (Bool.bool_dec d (negb d)) as [H| H]; [ | apply H1; constructor ].
+ destruct d; discriminate H.
+
 bbb.
 
 revert x d el'.
