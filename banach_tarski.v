@@ -276,13 +276,22 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
  unfold start_with2; simpl.
  destruct s as (el); simpl in H.
  destruct el as [| e]; [ contradiction | simpl in H ].
-  destruct el as [| e₁].
-   simpl in H; subst e.
-   exists (mkF₂ (a⁻¹ :: a⁻¹ :: nil)); simpl.
-   split; [ rewrite norm_x_xi; reflexivity | ].
-   unfold start_with; simpl.
-   destruct (letter_opp_dec a⁻¹ a⁻¹) as [H₁| H₁]; [ | reflexivity ].
-   revert H₁; apply not_letter_opp_x_x.
+ destruct el as [| e₁].
+  simpl in H; subst e.
+  exists (mkF₂ (a⁻¹ :: a⁻¹ :: nil)); simpl.
+  split; [ rewrite norm_x_xi; reflexivity | ].
+  unfold start_with; simpl.
+  destruct (letter_opp_dec a⁻¹ a⁻¹) as [H₁| H₁]; [ | reflexivity ].
+  revert H₁; apply not_letter_opp_x_x.
+
+  remember (norm_list (e₁ :: el)) as nl eqn:Hnl; symmetry in Hnl.
+  destruct nl as [| e₂].
+   subst e.
+   unfold norm.
+   exists (mkF₂ (a⁻¹ :: a⁻¹ :: nil)).
+   remember norm_list as f; simpl; subst f.
+   split.
+    f_equal.
 bbb.
 
  remember (norm s) as ns eqn:Hns; symmetry in Hns.
