@@ -92,8 +92,21 @@ destruct nl as [| e₂].
   destruct (letter_dec x₁ x₂) as [H₂| H₂].
    subst x₂.
    destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂].
-   2: exfalso; apply H₁; constructor.
-   clear H₁; subst d₂.
+    clear H₁; subst d₂.
+    destruct el₁ as [| e₁].
+     simpl; intros H.
+     injection H; clear H; intros H₁ H₂ H₃ H₄ H₅.
+     subst d₁.
+     destruct d; discriminate H₄.
+
+     simpl; intros H.
+     injection H; clear H; intros H₁ H₂; subst e₁.
+     rewrite <- Hnl in H₁.
+     eapply IHel, H₁.
+
+    exfalso; apply H₁; constructor.
+
+   clear H₁.
 
 bbb.
 
