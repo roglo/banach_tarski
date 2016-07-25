@@ -64,7 +64,6 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
-(**)
 Theorem norm_list_impossible_consecutive : ∀ x d el el₁ el₂,
   norm_list el ≠ el₁ ++ E x d :: E x (negb d) :: el₂.
 Proof.
@@ -107,62 +106,17 @@ destruct nl as [| e₂].
     exfalso; apply H₁; constructor.
 
    clear H₁.
+   destruct el₁ as [| e₁].
+    simpl; intros H.
+    injection H; clear H; intros H₁ H₃ H₄ H₅ H₆.
+    subst x₁ x₂; apply H₂; reflexivity.
 
-bbb.
-
-
-intros.
-revert x d el₁ el₂.
-induction el as [| e₁ el]; intros.
- intros H; destruct el₁; discriminate H.
-
- simpl.
- rename el₂ into el₃.
- destruct el as [| e₃ el].
-  simpl; intros H.
-  destruct el₁ as [| e₄]; [ discriminate H | ].
-  destruct el₁; discriminate H.
-
-  remember (norm_list (e₃ :: el)) as nl eqn:Hnl.
-  symmetry in Hnl.
-  destruct nl as [| e₂].
-   clear; intros H.
-   destruct el₁ as [| e₂]; intros; [ discriminate H | simpl in H ].
-   injection H; clear H; intros; subst e₂.
-   revert H; clear; intros.
-   destruct el₁; discriminate H.
-
-   destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
-    simpl in Hnl.
-    remember (norm_list el) as el₄ eqn:Hel₄; symmetry in Hel₄.
-    destruct el₄ as [| e₄].
-    injection Hnl; clear Hnl; intros; subst e₃ nl.
-    intros H; destruct el₁; discriminate H.
-
-    destruct (letter_opp_dec e₃ e₄) as [H₂| H₂].
-     subst el₄.
-
-bbb.
-  simpl.
-  destruct el as [| e3].
-   simpl.
-   destruct (letter_opp_dec e1 e2) as [H1| H1].
-    intros H; destruct el1; discriminate H.
-
-    destruct el1 as [| e3].
-    intros H; injection H; clear H; intros; subst e1 e2 el2.
-    apply H1; unfold letter_opp.
-    destruct (letter_dec x x) as [H2| H2].
-     destruct (Bool.bool_dec d (negb d)) as [H3| H3]; [ | constructor ].
-     destruct d; discriminate H3.
-
-     apply H2; reflexivity.
-
-   intros H.
-   destruct el1 as [| e4]; [ discriminate H | ].
-   destruct el1; discriminate H.
-bbb.
-*)
+    simpl; intros H.
+    injection H; clear H; intros H₁ H₃.
+    subst e₁.
+    rewrite <- Hnl in H₁.
+    eapply IHel, H₁.
+Qed.
 
 Theorem norm_list_impossible_start : ∀ x d el el',
   norm_list el ≠ E x d :: E x (negb d) :: el'.
