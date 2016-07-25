@@ -78,13 +78,8 @@ destruct nl as [| e₂].
  destruct el₁; discriminate H.
 
  destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
-  intros H.
-  assert (H₂ : e₂ :: nl = e₂ :: el₁ ++ E x d :: E x (negb d) :: el₂).
-   f_equal; assumption.
-
-   rewrite <- Hnl in H₂.
-   apply IHel with (el₁ := e₂ :: el₁).
-   simpl; f_equal; assumption.
+  pose proof IHel (e₂ :: el₁) as H₂; simpl in H₂.
+  intros H; apply H₂; f_equal; apply H.
 
   unfold letter_opp in H₁.
   destruct e₁ as (x₁, d₁).
@@ -96,8 +91,7 @@ destruct nl as [| e₂].
     destruct el₁ as [| e₁].
      simpl; intros H.
      injection H; clear H; intros H₁ H₂ H₃ H₄ H₅.
-     subst d₁.
-     destruct d; discriminate H₄.
+     subst d₁; destruct d; discriminate H₄.
 
      simpl; intros H.
      injection H; clear H; intros H₁ H₂; subst e₁.
@@ -113,7 +107,6 @@ destruct nl as [| e₂].
 
     simpl; intros H.
     injection H; clear H; intros H₁ H₃.
-    subst e₁.
     eapply IHel, H₁.
 Qed.
 
@@ -134,32 +127,47 @@ destruct (letter_opp_dec e e') as [H| H].
  unfold letter_opp in H.
  destruct e as (x, d).
  destruct e' as (x', d').
- destruct (letter_dec x x') as [Hx| Hx].
-  subst x'.
-  destruct (Bool.bool_dec d d') as [Hd| Hd]; [ contradiction | clear H ].
-  simpl in IHel.
-  remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
-  destruct el'' as [| e''].
-   injection IHel; clear IHel; intros H; assumption.
+ destruct (letter_dec x x') as [Hx| Hx]; [ | contradiction ].
+ subst x'.
+ destruct (Bool.bool_dec d d') as [Hd| Hd]; [ contradiction | clear H ].
+ simpl in IHel.
+ remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
+ destruct el'' as [| e''].
+  injection IHel; clear IHel; intros H; assumption.
 
-   destruct (letter_opp_dec (E x d') e'') as [He| He].
-    subst el''.
-    simpl in He.
-    destruct e'' as (x'', d'').
-    destruct (letter_dec x x'') as [Hx| Hx].
-     exfalso; subst x''.
-     destruct (Bool.bool_dec d' d'') as [Hd'| Hd']; [ contradiction | ].
-     clear He.
-     destruct d''.
-      apply Bool.not_true_iff_false in Hd'; subst d'.
-      revert Hel''; apply norm_list_impossible_start.
-bbb.
+  destruct (letter_opp_dec (E x d') e'') as [He| He].
+   subst el''.
+   simpl in He.
+   destruct e'' as (x'', d'').
+   destruct (letter_dec x x'') as [Hx| Hx]; [ | contradiction ].
+   exfalso; subst x''.
+   destruct (Bool.bool_dec d' d'') as [Hd'| Hd']; [ contradiction | ].
+   clear He.
+   destruct d''.
+    apply Bool.not_true_iff_false in Hd'; subst d'.
+    revert Hel''; apply norm_list_impossible_start.
+
+    apply Bool.not_false_iff_true in Hd'; subst d'.
+    revert Hel''; apply norm_list_impossible_start.
+
+   injection IHel; intros H; apply H.
+
+ remember (e' :: el') as el'' eqn:Hel''; simpl.
+ destruct el'' as [| e'']; [ reflexivity | ].
+ rewrite IHel.
+ destruct (letter_opp_dec e e'') as [H₁| H₁]; [ | reflexivity ].
+ injection Hel''; clear Hel''; intros; subst e'' el''.
+ contradiction.
+Qed.
 
 Theorem norm_norm : ∀ s, norm (norm s) = norm s.
 Proof.
 intros.
-destruct s as (el).
-unfold norm; simpl; f_equal.
+Inspect 1.
+unfold norm; f_equal.
+apply norm_list_norm_list.
+Qed.
+
 bbb.
 
 Definition start_with x s :=
