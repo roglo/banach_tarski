@@ -349,6 +349,41 @@ induction ns as [| e]; intros.
    destruct e₁ as (x₂, d₂).
    apply letter_opp_iff in H₁.
    destruct H₁; subst x₂ d₂.
+Theorem glop : ∀ el el₁ el₂,
+  norm_list el = el₁ ++ el₂
+  → norm_list el = norm_list el₁ ++ norm_list el₂.
+Proof.
+intros el el₁ el₂ Hel.
+revert el el₁ Hel.
+induction el₂ as [| e]; intros.
+ simpl.
+ rewrite app_nil_r in Hel |-*.
+ rewrite <- norm_list_norm_list, Hel.
+ reflexivity.
+
+ simpl.
+bbb.
+ simpl in Hel; simpl.
+ destruct el₁; [ | discriminate Hel ].
+ destruct el₂; [ reflexivity | discriminate Hel ].
+
+ simpl in Hel; simpl.
+ remember (norm_list el) as ns eqn:Hns; symmetry in Hns.
+ destruct ns as [| e₁].
+
+bbb.
+
+pose proof glop el (E x true :: E x₁ d₁ :: nil) ns Hns as H.
+rewrite Hns₁ in H.
+simpl in H.
+destruct (letter_opp_dec (E x true) (E x₁ d₁)) as [H₁| H₁].
+ simpl in H.
+ apply letter_opp_iff in H₁; simpl in H₁.
+ destruct H₁; subst x₁ d₁; simpl in Hns₁, H.
+ revert Hns; apply norm_list_impossible_start.
+
+ simpl in H; revert H.
+ apply norm_list_impossible_consecutive with (el₁ := E x true :: nil).
 bbb.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
