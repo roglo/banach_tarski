@@ -273,52 +273,21 @@ destruct el' as [| e el'].
   rewrite <- Hxd in Hel'; rewrite <- Hxd.
   destruct el' as [| e']; [ reflexivity | ].
   destruct (letter_opp_dec xd e') as [H₁| H₁]; [ | reflexivity ].
-bbb.
-
+  exfalso; subst xd.
   unfold letter_opp in H₁.
-  destruct e' as (x, d).
-  destruct (letter_dec la x) as [H₂| H₂]; [ | contradiction ].
-  destruct (Bool.bool_dec false d) as [H₃| H₃]; [ contradiction | ].
-  clear H₁; apply not_eq_sym, Bool.not_false_iff_true in H₃.
-  subst x d.
-  exfalso; revert Hel'.
-  apply norm_list_impossible_start.
+  destruct e' as (x₁, d₁).
+  destruct (letter_dec x x₁) as [H₂| H₂]; [ | contradiction ].
+  destruct (Bool.bool_dec d d₁) as [H₃| H₃]; [ contradiction | clear H₁ ].
+  apply not_eq_sym, neq_negb in H₃; subst x₁ d₁.
+  revert Hel'; apply norm_list_impossible_start.
 
-  destruct (letter_opp_dec a a⁻¹) as [H₂| H₂]; [ reflexivity | ].
-  exfalso; apply H₂, letter_opp_x_xi.
+  destruct (letter_opp_dec xd xe) as [H₂| H₂]; [ reflexivity | exfalso ].
+  subst xd xe.
+  apply H₂, letter_opp_x_xi.
 Qed.
 
-Theorem norm_list_x_xi : ∀ el, norm_list (a :: a⁻¹ :: el) = norm_list el.
-Proof.
-intros; simpl.
-remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
-destruct el' as [| e el'].
- destruct (letter_opp_dec a a⁻¹) as [H₁| H₁]; [ reflexivity | ].
- exfalso; apply H₁, letter_opp_x_xi.
-
- destruct (letter_opp_dec a⁻¹ e) as [H₁| H₁].
-  unfold letter_opp in H₁.
-  destruct e as (x, d).
-  destruct (letter_dec la x) as [H₂| H₂]; [ | contradiction ].
-  destruct (Bool.bool_dec true d) as [H₃| H₃]; [ contradiction | ].
-  clear H₁; apply not_eq_sym, Bool.not_true_iff_false in H₃.
-  subst x d.
-  destruct el' as [| e']; [ reflexivity | ].
-  destruct (letter_opp_dec a e') as [H₁| H₁]; [ | reflexivity ].
-  unfold letter_opp in H₁.
-  destruct e' as (x, d).
-  destruct (letter_dec la x) as [H₂| H₂]; [ | contradiction ].
-  destruct (Bool.bool_dec false d) as [H₃| H₃]; [ contradiction | ].
-  clear H₁; apply not_eq_sym, Bool.not_false_iff_true in H₃.
-  subst x d.
-  exfalso; revert Hel'.
-  apply norm_list_impossible_start.
-
-  destruct (letter_opp_dec a a⁻¹) as [H₂| H₂]; [ reflexivity | ].
-  exfalso; apply H₂, letter_opp_x_xi.
-Qed.
-
-Theorem norm_x_xi : ∀ el, norm (mkF₂ (a :: a⁻¹ :: el)) = norm (mkF₂ el).
+Theorem norm_x_xi : ∀ x d el,
+  norm (mkF₂ (E x d :: E x (negb d) :: el)) = norm (mkF₂ el).
 Proof.
 intros.
 unfold norm; f_equal.
@@ -340,8 +309,32 @@ remember (norm_list el) as ns eqn:Hns; symmetry in Hns.
 destruct ns as [| x₁]; [ contradiction | subst x₁ ].
 exists (mkF₂ (E x true :: E x true :: ns)).
 remember norm_list as f; simpl; subst f.
-SearchAbout norm_list.
 rewrite norm_list_x_xi.
+rewrite <- Hns.
+split; [ f_equal; symmetry; apply norm_list_norm_list | ].
+unfold start_with; simpl.
+rewrite Hns; simpl.
+remember (norm_list ns) as ns₁ eqn:Hns₁; symmetry in Hns₁.
+set (xt := E x true).
+destruct ns₁ as [| e₁].
+ destruct (letter_opp_dec xt xt) as [H₁| H₁]; [ | reflexivity ].
+ revert H₁; apply not_letter_opp_x_x.
+
+ destruct (letter_opp_dec xt e₁) as [H₁| H₁].
+  destruct ns₁ as [| e₂]; [ reflexivity | ].
+  destruct (letter_opp_dec xt e₂) as [H₂| H₂].
+   exfalso; subst xt.
+   unfold letter_opp in H₁, H₂.
+   destruct e₁ as (x₁, d₁).
+   destruct e₂ as (x₂, d₂).
+   destruct (letter_dec x x₁) as [H₃| H₃].
+    destruct (Bool.bool_dec true d₁) as [H₄| H₄]; [ contradiction | ].
+    apply not_eq_sym, Bool.not_true_iff_false in H₄.
+    subst x₁ d₁; clear H₁.
+    destruct (letter_dec x x₂) as [H₁| H₁].
+     destruct (Bool.bool_dec true d₂) as [H₄| H₄]; [ contradiction | ].
+     apply not_eq_sym, Bool.not_true_iff_false in H₄.
+     subst x₂ d₂; clear H₂.
 bbb.
 
  destruct s as (el); simpl in H.
