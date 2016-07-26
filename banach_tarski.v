@@ -72,6 +72,12 @@ destruct (letter_dec x x) as [H| H]; [ clear H | ].
  exfalso; apply H; reflexivity.
 Qed.
 
+Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
+Proof.
+intros.
+destruct x, y; try reflexivity; exfalso; apply H; reflexivity.
+Qed.
+
 Fixpoint norm_list el :=
   match el with
   | nil => nil
@@ -241,6 +247,47 @@ destruct (letter_opp_dec a a⁻¹) as [H| H]; [ reflexivity | ].
 exfalso; apply H, letter_opp_x_xi.
 Qed.
 
+Theorem norm_list_x_xi : ∀ x d el,
+  norm_list (E x d :: E x (negb d) :: el) = norm_list el.
+Proof.
+intros.
+remember (E x d) as xd eqn:Hxd.
+remember (E x (negb d)) as xe eqn:Hxe.
+move xe before xd.
+simpl.
+remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
+destruct el' as [| e el'].
+ destruct (letter_opp_dec xd xe) as [H₁| H₁]; [ reflexivity | ].
+ exfalso; subst xd xe; apply H₁, letter_opp_x_xi.
+
+ destruct (letter_opp_dec xe e) as [H₁| H₁].
+  unfold letter_opp in H₁.
+  destruct xe as (x₁, d₁).
+  injection Hxe; clear Hxe; intros; subst x₁ d₁.
+  destruct e as (x₂, d₂).
+  destruct (letter_dec x x₂) as [H₂| H₂]; [ | contradiction ].
+  destruct (Bool.bool_dec (negb d) d₂) as [H₃| H₃]; [ contradiction | ].
+  clear H₁; apply not_eq_sym in H₃.
+  apply neq_negb in H₃.
+  rewrite Bool.negb_involutive in H₃; subst x₂ d₂.
+  rewrite <- Hxd in Hel'; rewrite <- Hxd.
+  destruct el' as [| e']; [ reflexivity | ].
+  destruct (letter_opp_dec xd e') as [H₁| H₁]; [ | reflexivity ].
+bbb.
+
+  unfold letter_opp in H₁.
+  destruct e' as (x, d).
+  destruct (letter_dec la x) as [H₂| H₂]; [ | contradiction ].
+  destruct (Bool.bool_dec false d) as [H₃| H₃]; [ contradiction | ].
+  clear H₁; apply not_eq_sym, Bool.not_false_iff_true in H₃.
+  subst x d.
+  exfalso; revert Hel'.
+  apply norm_list_impossible_start.
+
+  destruct (letter_opp_dec a a⁻¹) as [H₂| H₂]; [ reflexivity | ].
+  exfalso; apply H₂, letter_opp_x_xi.
+Qed.
+
 Theorem norm_list_x_xi : ∀ el, norm_list (a :: a⁻¹ :: el) = norm_list el.
 Proof.
 intros; simpl.
@@ -291,7 +338,10 @@ unfold norm.
 remember norm_list as f; simpl; subst f.
 remember (norm_list el) as ns eqn:Hns; symmetry in Hns.
 destruct ns as [| x₁]; [ contradiction | subst x₁ ].
-
+exists (mkF₂ (E x true :: E x true :: ns)).
+remember norm_list as f; simpl; subst f.
+SearchAbout norm_list.
+rewrite norm_list_x_xi.
 bbb.
 
  destruct s as (el); simpl in H.
