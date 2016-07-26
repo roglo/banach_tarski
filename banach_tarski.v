@@ -187,6 +187,15 @@ unfold norm; f_equal.
 apply norm_list_norm_list.
 Qed.
 
+Theorem norm_list_subst : ∀ e el el',
+  norm_list el = el' → norm_list (e :: el) = norm_list (e :: el').
+Proof.
+intros e el el' Hel.
+subst el'; simpl.
+rewrite norm_list_norm_list.
+reflexivity.
+Qed.
+
 Definition start_with x s :=
   match str (norm s) with
   | nil => False
@@ -232,10 +241,9 @@ destruct (letter_opp_dec a a⁻¹) as [H| H]; [ reflexivity | ].
 exfalso; apply H, letter_opp_x_xi.
 Qed.
 
-Theorem norm_x_xi : ∀ el, norm (mkF₂ (a :: a⁻¹ :: el)) = norm (mkF₂ el).
+Theorem norm_list_x_xi : ∀ el, norm_list (a :: a⁻¹ :: el) = norm_list el.
 Proof.
-intros.
-unfold norm; simpl.
+intros; simpl.
 remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
 destruct el' as [| e el'].
  destruct (letter_opp_dec a a⁻¹) as [H₁| H₁]; [ reflexivity | ].
@@ -261,6 +269,14 @@ destruct el' as [| e el'].
 
   destruct (letter_opp_dec a a⁻¹) as [H₂| H₂]; [ reflexivity | ].
   exfalso; apply H₂, letter_opp_x_xi.
+Qed.
+
+Theorem norm_x_xi : ∀ el, norm (mkF₂ (a :: a⁻¹ :: el)) = norm (mkF₂ el).
+Proof.
+intros.
+unfold norm; f_equal.
+remember norm_list as f; simpl; subst f.
+apply norm_list_x_xi.
 Qed.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
@@ -292,25 +308,17 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
    remember norm_list as f; simpl; subst f.
    split.
     f_equal.
-Theorem glop : ∀ e el el',
-  norm_list el = el' → norm_list (e :: el) = norm_list (e :: el').
-Proof.
-intros e el el' Hel.
-simpl; rewrite Hel.
-destruct el' as [| e₁]; [ reflexivity | simpl ].
-destruct (letter_opp_dec e e₁) as [H₁| H₁].
- remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
- destruct el'' as [| e''].
- destruct (letter_opp_dec e e₁) as [H₂| H₂]; [ clear H₂ | contradiction ].
- destruct el' as [| e₂]; [ reflexivity | ].
- simpl in Hel, Hel''.
- remember (norm_list el') as el'' eqn:Hel₁; symmetry in Hel₁.
- destruct el'' as [| e₃]; [ discriminate Hel'' | ].
- destruct (letter_opp_dec e₂ e₃) as [H₂| H₂]; [ | discriminate Hel'' ].
- subst el''.
-bbb.
+    erewrite norm_list_subst; [ | eassumption ].
+    symmetry; apply norm_list_x_xi.
 
-erewrite glop; [ | eassumption ].
+    unfold start_with; simpl.
+    destruct (letter_opp_dec a⁻¹ a⁻¹) as [H₁| H₁]; [ | reflexivity ].
+    revert H₁; apply not_letter_opp_x_x.
+
+   destruct (letter_opp_dec e e₂) as [H₁| H₁].
+    destruct nl as [| e₃]; [ contradiction | subst e₃ ].
+
+bbb.
 
  remember (norm s) as ns eqn:Hns; symmetry in Hns.
  destruct ns as (el); simpl in H.
@@ -334,9 +342,6 @@ erewrite glop; [ | eassumption ].
    destruct (letter_opp_dec a⁻¹ e') as [H₂| H₂].
     subst el'.
     injection Hns; clear Hns; intros.
-
-
-
 
 Theorem toto : ∀ el, norm (mkF₂ (a :: a⁻¹ :: el)) = norm (mkF₂ el).
 Proof.
