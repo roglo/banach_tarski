@@ -312,8 +312,32 @@ remember norm_list as f; simpl; subst f.
 rewrite norm_list_x_xi.
 rewrite <- Hns.
 split; [ f_equal; symmetry; apply norm_list_norm_list | ].
-(**)
+revert x el Hns.
+induction ns as [| e]; intros.
+ rewrite Hns; unfold start_with; simpl.
+ set (e := E x true).
+ destruct (letter_opp_dec e e) as [H₁| H₁]; [ | reflexivity ].
+ revert H₁; apply not_letter_opp_x_x.
 
+ rewrite Hns; unfold start_with; simpl.
+ remember (norm_list ns) as ns₁ eqn:Hns₁; symmetry in Hns₁.
+ destruct ns₁ as [| e₁].
+  set (e₁ := E x true).
+  destruct (letter_opp_dec e₁ e) as [H₁| H₁]; [ reflexivity | ].
+  destruct (letter_opp_dec e₁ e₁) as [H₂| H₂]; [ | reflexivity ].
+  exfalso; revert H₂; apply not_letter_opp_x_x.
+
+  destruct (letter_opp_dec e e₁) as [H₁| H₁].
+  set (e₂ := E x true).
+  destruct ns₁ as [| e₃].
+   destruct (letter_opp_dec e₂ e₂) as [H₂| H₂]; [ | reflexivity ].
+   revert H₂; apply not_letter_opp_x_x.
+
+   destruct (letter_opp_dec e₂ e₃) as [H₂| H₂].
+    destruct ns₁ as [| e₄]; [ reflexivity | ].
+    destruct (letter_opp_dec e₂ e₄) as [H₃| H₃].
+     destruct ns₁ as [| e₅].
+      subst e₂.
 bbb.
 unfold start_with; simpl.
 rewrite Hns; simpl.
