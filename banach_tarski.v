@@ -328,6 +328,8 @@ induction ns as [| e]; intros.
   exfalso; revert H₂; apply not_letter_opp_x_x.
 
   destruct (letter_opp_dec e e₁) as [H₁| H₁].
+exfalso.
+
   set (e₂ := E x true).
   destruct ns₁ as [| e₃].
    destruct (letter_opp_dec e₂ e₂) as [H₂| H₂]; [ | reflexivity ].
@@ -336,8 +338,25 @@ induction ns as [| e]; intros.
    destruct (letter_opp_dec e₂ e₃) as [H₂| H₂].
     destruct ns₁ as [| e₄]; [ reflexivity | ].
     destruct (letter_opp_dec e₂ e₄) as [H₃| H₃].
-     destruct ns₁ as [| e₅].
-      subst e₂.
+
+
+Theorem toto : ∀ e₁ e₂ e₃,
+  letter_opp e₁ e₂
+  → letter_opp e₁ e₃
+  → e₂ = e₃.
+Proof.
+Admitted. Show.
+
+eapply toto in H₂; [ | eassumption ].
+subst e₃.
+
+
+     unfold letter_opp in H₂, H₃.
+     destruct e₂ as (x₂, d₂).
+     destruct e₃ as (x₃, d₃).
+     destruct e₄ as (x₄, d₄).
+     destruct (letter_dec x₂ x₃)
+
 bbb.
 unfold start_with; simpl.
 rewrite Hns; simpl.
