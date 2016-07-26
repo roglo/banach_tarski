@@ -1,6 +1,12 @@
 Require Import Utf8.
 Require Import List.
 
+Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
+Proof.
+intros.
+destruct x, y; try reflexivity; exfalso; apply H; reflexivity.
+Qed.
+
 Section Free_Group.
 
 (* a = E la false
@@ -72,10 +78,20 @@ destruct (letter_dec x x) as [H| H]; [ clear H | ].
  exfalso; apply H; reflexivity.
 Qed.
 
-Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
+Theorem letter_opp_iff : ∀ x₁ d₁ x₂ d₂,
+  letter_opp (E x₁ d₁) (E x₂ d₂)
+  ↔ x₁ = x₂ ∧ d₂ = negb d₁.
 Proof.
-intros.
-destruct x, y; try reflexivity; exfalso; apply H; reflexivity.
+intros x₁ d₁ x₂ d₂.
+split; intros H.
+ unfold letter_opp in H.
+ destruct (letter_dec x₁ x₂) as [H₁| H₁]; [ | contradiction ].
+ split; [ assumption | ].
+ destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ contradiction | ].
+ apply neq_negb, not_eq_sym; assumption.
+
+ destruct H; subst x₂ d₂.
+ apply letter_opp_x_xi.
 Qed.
 
 Fixpoint norm_list el :=
@@ -328,7 +344,12 @@ induction ns as [| e]; intros.
   exfalso; revert H₂; apply not_letter_opp_x_x.
 
   destruct (letter_opp_dec e e₁) as [H₁| H₁].
-exfalso.
+   exfalso.
+   destruct e as (x₁, d₁).
+   destruct e₁ as (x₂, d₂).
+   apply letter_opp_iff in H₁.
+   destruct H₁; subst x₂ d₂.
+bbb.
 
   set (e₂ := E x true).
   destruct ns₁ as [| e₃].
@@ -345,7 +366,7 @@ Theorem toto : ∀ e₁ e₂ e₃,
   → letter_opp e₁ e₃
   → e₂ = e₃.
 Proof.
-Admitted. Show.
+Abort.
 
 eapply toto in H₂; [ | eassumption ].
 subst e₃.
@@ -428,7 +449,6 @@ bbb.
     destruct el₁ as [| e₃]; [ discriminate Hnl | ].
     destruct (letter_opp_dec e₁ e₃) as [H₂| H₂].
      subst el₁.
-Admitted.
 *)
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
@@ -467,7 +487,7 @@ bbb.
 
 Theorem toto : ∀ el, norm (mkF₂ (a :: a⁻¹ :: el)) = norm (mkF₂ el).
 Proof.
-Admitted. Show.
+bbb.
 
 symmetry.
 etransitivity; [ apply toto | ].
