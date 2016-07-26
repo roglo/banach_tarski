@@ -317,6 +317,11 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
 
    destruct (letter_opp_dec e e₂) as [H₁| H₁].
     destruct nl as [| e₃]; [ contradiction | subst e₃ ].
+    simpl in Hnl.
+    remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+    destruct el₁ as [| e₃]; [ discriminate Hnl | ].
+    destruct (letter_opp_dec e₁ e₃) as [H₂| H₂].
+     subst el₁.
 
 bbb.
 
