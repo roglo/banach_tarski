@@ -354,14 +354,24 @@ Theorem glop : ∀ el el₁ el₂,
   → norm_list el = norm_list el₁ ++ norm_list el₂.
 Proof.
 intros el el₁ el₂ Hel.
-revert el el₁ Hel.
-induction el₂ as [| e]; intros.
- simpl.
- rewrite app_nil_r in Hel |-*.
+revert el el₂ Hel.
+induction el₁ as [| e]; intros.
+ simpl in Hel; simpl.
  rewrite <- norm_list_norm_list, Hel.
  reflexivity.
 
  simpl.
+ remember (norm_list el) as el₃ eqn:Hel₃; symmetry in Hel₃.
+ destruct el₃ as [| e₁]; [ discriminate Hel | ].
+ injection Hel; clear Hel; intros; subst e₁ el₃.
+bbb.
+
+ remember (norm_list el₁) as el₃ eqn:Hel₃; symmetry in Hel₃.
+ destruct el₃ as [| e₁].
+  simpl.
+  remember (norm_list el₂) as el₄ eqn:Hel₄; symmetry in Hel₄.
+  destruct el₄ as [| e₂].
+
 bbb.
  simpl in Hel; simpl.
  destruct el₁; [ | discriminate Hel ].
