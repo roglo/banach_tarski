@@ -279,17 +279,21 @@ remember norm_list as f; simpl; subst f.
 apply norm_list_x_xi.
 Qed.
 
-Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
+Theorem start_with_xi_start_with2_x_xi : ∀ s x,
+  start_with (E x true) s
+  → start_with2 (E x false) (E x true) s.
 Proof.
-intros s.
-destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
- left; apply empty_start_with2_a_ai; assumption.
+intros s x H.
+unfold start_with in H.
+unfold start_with2; simpl.
+destruct s as (el); simpl in H.
+unfold norm.
+remember norm_list as f; simpl; subst f.
+remember (norm_list el) as ns eqn:Hns; symmetry in Hns.
+destruct ns as [| x₁]; [ contradiction | subst x₁ ].
 
- right; assumption.
+bbb.
 
- left.
- unfold start_with in H.
- unfold start_with2; simpl.
  destruct s as (el); simpl in H.
  destruct el as [| e]; [ contradiction | simpl in H ].
  destruct el as [| e₁].
@@ -322,7 +326,18 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
     destruct el₁ as [| e₃]; [ discriminate Hnl | ].
     destruct (letter_opp_dec e₁ e₃) as [H₂| H₂].
      subst el₁.
+Admitted.
+*)
 
+Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
+Proof.
+intros s.
+destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
+ left; apply empty_start_with2_a_ai; assumption.
+
+ right; assumption.
+
+ left; apply start_with_xi_start_with2_x_xi; assumption.
 bbb.
 
  remember (norm s) as ns eqn:Hns; symmetry in Hns.
