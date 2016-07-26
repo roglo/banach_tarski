@@ -312,6 +312,9 @@ remember norm_list as f; simpl; subst f.
 rewrite norm_list_x_xi.
 rewrite <- Hns.
 split; [ f_equal; symmetry; apply norm_list_norm_list | ].
+(**)
+
+bbb.
 unfold start_with; simpl.
 rewrite Hns; simpl.
 remember (norm_list ns) as ns₁ eqn:Hns₁; symmetry in Hns₁.
@@ -335,6 +338,19 @@ destruct ns₁ as [| e₁].
      destruct (Bool.bool_dec true d₂) as [H₄| H₄]; [ contradiction | ].
      apply not_eq_sym, Bool.not_true_iff_false in H₄.
      subst x₂ d₂; clear H₂.
+     destruct ns as [| e₁]; [ discriminate Hns₁ | simpl in Hns₁ ].
+     destruct ns as [| e₂]; [ discriminate Hns₁ | simpl in Hns₁ ].
+     destruct ns as [| e₃]; simpl in Hns₁.
+      destruct (letter_opp_dec e₁ e₂) as [H₁| H₁]; [ discriminate Hns₁ | ].
+      injection Hns₁; clear Hns₁; intros; subst e₁ e₂ ns₁.
+      revert Hns; apply norm_list_impossible_start.
+
+      destruct ns as [| e₄]; simpl in Hns₁.
+      destruct (letter_opp_dec e₂ e₃) as [H₁| H₁]; [ discriminate Hns₁ | ].
+      destruct (letter_opp_dec e₁ e₂) as [H₂| H₂]; [ discriminate Hns₁ | ].
+      injection Hns₁; clear Hns₁; intros; subst e₁ e₂ ns₁.
+      revert Hns; apply norm_list_impossible_start.
+
 bbb.
 
  destruct s as (el); simpl in H.
