@@ -7,6 +7,9 @@ intros.
 destruct x, y; try reflexivity; exfalso; apply H; reflexivity.
 Qed.
 
+Theorem cons_to_app : ∀ A (x : A) l, x :: l = (x :: nil) ++ l.
+Proof. reflexivity. Qed.
+
 Section Free_Group.
 
 (* a = E la false
@@ -354,11 +357,127 @@ Theorem glop : ∀ el el₁ el₂,
   → norm_list el = norm_list el₁ ++ norm_list el₂.
 Proof.
 intros el el₁ el₂ Hel.
-revert el el₂ Hel.
-induction el₁ as [| e]; intros.
- simpl in Hel; simpl.
+revert el el₁ Hel.
+induction el₂ as [| e]; intros.
+ rewrite app_nil_r in Hel; rewrite app_nil_r.
  rewrite <- norm_list_norm_list, Hel.
  reflexivity.
+
+ rewrite cons_to_app in Hel.
+ rewrite app_assoc in Hel.
+ apply IHel₂ in Hel.
+ rewrite Hel.
+Theorem pouet : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = norm_list (norm_list el₁ ++ norm_list el₂).
+Proof.
+intros.
+revert el₁.
+induction el₂ as [| e₂]; intros.
+ simpl; do 2 rewrite app_nil_r.
+ symmetry; apply norm_list_norm_list.
+
+ rewrite cons_to_app.
+ rewrite app_assoc, IHel₂.
+ clear IHel₂.
+ revert e₂ el₂.
+ induction el₁ as [| e₁]; intros.
+  simpl; rewrite norm_list_norm_list.
+  remember (norm_list el₂) as el₃ eqn:Hel₂; symmetry in Hel₂.
+  destruct el₃ as [| e₃]; [ reflexivity | ].
+  destruct (letter_opp_dec e₂ e₃) as [H₁| H₁].
+   unfold letter_opp in H₁.
+   destruct e₂ as (x₂, d₂).
+   destruct e₃ as (x₃, d₃).
+   destruct (letter_dec x₂ x₃) as [H₂| H₂].
+    destruct (Bool.bool_dec d₂ d₃) as [H₃| H₃]; [ contradiction | ].
+    apply not_eq_sym, neq_negb in H₃.
+    subst x₃ d₃; clear H₁.
+SearchAbout norm_list.
+Theorem agaga : ∀ el e el₁,
+  norm_list el = e :: el₁
+  → el₁ = norm_list el₁.
+Proof.
+intros el e el₁ Hel.
+(*
+revert e el Hel.
+induction el₁ as [| e₁]; intros; [ reflexivity | ].
+simpl.
+remember (norm_list el₁) as el₂ eqn:Hel₂; symmetry in Hel₂.
+destruct el₂ as [| e₂].
+ f_equal.
+*)
+revert e el₁ Hel.
+induction el as [| e₁]; intros; [ discriminate Hel | ].
+simpl in Hel.
+remember (norm_list el) as el₂ eqn:Hel₂ in Hel; symmetry in Hel₂.
+destruct el₂ as [| e₂].
+ injection Hel; clear Hel; intros; subst e₁ el₁; reflexivity.
+
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  subst el₂.
+  apply IHel in Hel₂.
+
+Theorem oups : ∀ e el₁ el₂,
+  norm_list (e :: el₁) = e :: el₂
+  → el₂ = norm_list el₂.
+Proof.
+intros e el₁ el₂ Hel.
+revert e el₂ Hel.
+induction el₁ as [| e₁]; intros.
+ injection Hel; intros; subst el₂; reflexivity.
+
+ simpl in Hel.
+ remember (norm_list el₁) as el₃ eqn:Hel₁; symmetry in Hel₁.
+ destruct el₃ as [| e₃].
+  destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ discriminate Hel | ].
+  injection Hel; clear Hel; intros; subst el₂.
+  reflexivity.
+
+  destruct (letter_opp_dec e₁ e₃) as [H₁| H₁].
+   destruct el₃ as [| e₂].
+    injection Hel; clear Hel; intros; subst el₂; reflexivity.
+
+    destruct (letter_opp_dec e e₂) as [H₂| H₂].
+     subst el₃.
+     unfold letter_opp in H₂.
+     destruct e as (x, d).
+     destruct e₂ as (x₂, d₂).
+     destruct (letter_dec x x₂) as [H₃| H₃]; [ | contradiction ].
+     destruct (Bool.bool_dec d d₂) as [H₄| H₄]; [ contradiction | ].
+     apply neq_negb in H₄; subst x₂ d; clear H₂.
+     exfalso; revert Hel₁.
+     rewrite cons_to_app.
+     apply norm_list_impossible_consecutive.
+
+     injection Hel; clear Hel; intros; subst el₂.
+bbb.
+
+symmetry in Hel₂.
+eapply oups; eassumption.
+
+bbb.
+
+eapply agaga; eassumption.
+contradiction.
+
+bbb.
+
+rewrite pouet.
+remember (norm_list el₁) as el₃ eqn:Hel₃; symmetry in Hel₃.
+destruct el₃ as [| e₃].
+ simpl.
+ remember (norm_list el₂) as el₄ eqn:Hel₄; symmetry in Hel₄.
+ destruct el₄ as [| e₂]; [ reflexivity | ].
+ destruct (letter_opp_dec e e₂) as [H₁| H₁]; [ | reflexivity ].
+ exfalso.
+
+simpl.
+
+
+
+bbb.
+
+ rewrite <- app_comm_cons in Hel.
 
  simpl.
  remember (norm_list el) as el₃ eqn:Hel₃; symmetry in Hel₃.
