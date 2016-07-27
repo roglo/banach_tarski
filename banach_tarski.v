@@ -61,6 +61,19 @@ destruct (letter_dec x₁ x₂) as [Hx| Hx].
  right; intros H; contradiction.
 Qed.
 
+Theorem letter_opp_comm : ∀ e₁ e₂, letter_opp e₁ e₂ → letter_opp e₂ e₁.
+Proof.
+intros e₁ e₂ H.
+unfold letter_opp in H; unfold letter_opp.
+destruct e₁ as (x₁, d₁).
+destruct e₂ as (x₂, d₂).
+destruct (letter_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | contradiction ].
+destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ contradiction | clear H ].
+destruct (letter_dec x₁ x₁) as [H₃| H₃]; [ | apply H₃; reflexivity ].
+destruct (Bool.bool_dec d₂ d₁) as [H₄| H₄]; [ | constructor ].
+symmetry in H₄; contradiction.
+Qed.
+
 Theorem letter_opp_x_xi : ∀ x d, letter_opp (E x d) (E x (negb d)).
 Proof.
 intros.
@@ -213,6 +226,14 @@ Proof.
 intros.
 unfold norm; f_equal.
 apply norm_list_norm_list.
+Qed.
+
+Theorem norm_list_eq : ∀ el el',
+  norm_list el = el' → norm_list el = norm_list el'.
+Proof.
+intros el el' H.
+rewrite <- norm_list_norm_list, H.
+reflexivity.
 Qed.
 
 Theorem norm_list_subst : ∀ e el el',
@@ -433,6 +454,16 @@ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
  destruct el₂ as [| e₃]; [ injection H₂; intros; subst el₁; reflexivity | ].
  destruct (letter_opp_dec e e₃) as [H₃| H₃].
   subst el₂; exfalso.
+  destruct e as (x₁, d₁).
+  destruct e₃ as (x₂, d₂).
+  apply letter_opp_comm in H₃.
+  apply letter_opp_iff in H₃.
+  destruct H₃; subst x₁ d₁.
+  revert Hel₃; apply norm_list_impossible_start.
+
+  injection H₂; clear H₂; intros; subst el₁; reflexivity.
+
+ injection Hel; clear Hel; intros; subst e el₁.
 bbb.
 
  destruct el as [| e₃]; [ discriminate Hel₂ | simpl in Hel₂ ].
