@@ -393,9 +393,8 @@ induction el₂ as [| e₂]; intros.
   rewrite <- IHel₂.
   remember norm_list as f; simpl; subst f.
   simpl.
-
+Abort. (*
 bbb.
-
 
   simpl; rewrite norm_list_norm_list.
   remember (norm_list el₂) as el₃ eqn:Hel₂; symmetry in Hel₂.
@@ -415,11 +414,38 @@ bbb.
 
 
 SearchAbout norm_list.
+*)
 Theorem agaga : ∀ el e el₁,
   norm_list el = e :: el₁
   → el₁ = norm_list el₁.
 Proof.
 intros el e el₁ Hel.
+revert e el₁ Hel.
+induction el as [| e₁]; intros; [ discriminate Hel | simpl in Hel ].
+remember (norm_list el) as el₂ eqn:Hel₂; symmetry in Hel₂.
+destruct el₂ as [| e₂]; [ injection Hel; intros; subst el₁; reflexivity | ].
+destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+ subst el₂.
+ pose proof IHel e₂ (e :: el₁) (eq_refl _) as H₂.
+ symmetry in H₂.
+ simpl in H₂.
+ remember (norm_list el₁) as el₂ eqn:Hel₃; symmetry in Hel₃.
+ destruct el₂ as [| e₃]; [ injection H₂; intros; subst el₁; reflexivity | ].
+ destruct (letter_opp_dec e e₃) as [H₃| H₃].
+  subst el₂; exfalso.
+bbb.
+
+ destruct el as [| e₃]; [ discriminate Hel₂ | simpl in Hel₂ ].
+ remember (norm_list el) as el₃ eqn:Hel₃; symmetry in Hel₃.
+ destruct el₃ as [| e₄]; [ discriminate Hel₂ | ].
+ destruct (letter_opp_dec e₃ e₄) as [H₂| H₂].
+  subst el₃.
+  destruct el as [| e₅]; [ discriminate Hel₃ | simpl in Hel₃ ].
+  remember (norm_list el) as el₂ eqn:Hel₄; symmetry in Hel₄.
+  destruct el₂ as [| e₆]; [ discriminate Hel₃ | ].
+  destruct (letter_opp_dec e₅ e₆) as [H₃| H₃].
+   subst el₂.
+
 (*
 revert e el Hel.
 induction el₁ as [| e₁]; intros; [ reflexivity | ].
