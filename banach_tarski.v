@@ -417,6 +417,44 @@ destruct el₂ as [| e₂].
   subst el₂.
   apply IHel in Hel₂.
 
+Theorem oups2 : ∀ e el el',
+  norm_list el = e :: el'
+  → el' = norm_list el'.
+Proof.
+intros e el el' Hel.
+remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+revert e el el' Hel₁ Hel.
+induction el₁ as [| e₁]; intros; [ discriminate Hel | ].
+injection Hel; clear Hel; intros; subst e el₁.
+bbb.
+
+revert e el' Hel.
+induction el as [| e₁]; intros; [ discriminate Hel | ].
+simpl in Hel.
+remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+destruct el₁ as [| e₂].
+ injection Hel; clear Hel; intros; subst e₁ el'.
+ reflexivity.
+
+bbb.
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  subst el₁.
+  destruct e₁ as (x₁, d₁).
+  destruct e₂ as (x₂, d₂).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst x₂ d₂.
+
+remember (norm_list el') as el₁ eqn:Hel₁; symmetry in Hel₁.
+destruct el₁ as [| e₁].
+ f_equal.
+
+bbb.
+
+symmetry in Hel₂.
+eapply oups2; eassumption.
+
+bbb.
+
 Theorem oups : ∀ e el₁ el₂,
   norm_list (e :: el₁) = e :: el₂
   → el₂ = norm_list el₂.
