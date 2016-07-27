@@ -221,6 +221,38 @@ destruct (letter_opp_dec e e') as [H| H].
  contradiction.
 Qed.
 
+Theorem norm_list_is_cons : ∀ el e el₁,
+  norm_list el = e :: el₁
+  → el₁ = norm_list el₁.
+Proof.
+intros el e el₁ Hel.
+revert e el₁ Hel.
+induction el as [| e₁]; intros; [ discriminate Hel | simpl in Hel ].
+remember (norm_list el) as el₂ eqn:Hel₂; symmetry in Hel₂.
+destruct el₂ as [| e₂]; [ injection Hel; intros; subst el₁; reflexivity | ].
+destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+ subst el₂.
+ pose proof IHel e₂ (e :: el₁) (eq_refl _) as H₂.
+ symmetry in H₂.
+ simpl in H₂.
+ remember (norm_list el₁) as el₂ eqn:Hel₃; symmetry in Hel₃.
+ destruct el₂ as [| e₃]; [ injection H₂; intros; subst el₁; reflexivity | ].
+ destruct (letter_opp_dec e e₃) as [H₃| H₃].
+  subst el₂; exfalso.
+  destruct e as (x₁, d₁).
+  destruct e₃ as (x₂, d₂).
+  apply letter_opp_comm in H₃.
+  apply letter_opp_iff in H₃.
+  destruct H₃; subst x₁ d₁.
+  revert Hel₃; apply norm_list_impossible_start.
+
+  injection H₂; clear H₂; intros; subst el₁; reflexivity.
+
+ injection Hel; clear Hel; intros; subst e el₁.
+ rewrite <- Hel₂; symmetry.
+ apply norm_list_norm_list.
+Qed.
+
 Theorem norm_norm : ∀ s, norm (norm s) = norm s.
 Proof.
 intros.
@@ -362,6 +394,7 @@ induction ns as [| e]; intros.
  destruct (letter_opp_dec e e) as [H₁| H₁]; [ | reflexivity ].
  revert H₁; apply not_letter_opp_x_x.
 
+bbb.
  rewrite Hns; unfold start_with; simpl.
  remember (norm_list ns) as ns₁ eqn:Hns₁; symmetry in Hns₁.
  destruct ns₁ as [| e₁].
@@ -376,6 +409,7 @@ induction ns as [| e]; intros.
    destruct e₁ as (x₂, d₂).
    apply letter_opp_iff in H₁.
    destruct H₁; subst x₂ d₂.
+
 Theorem glop : ∀ el el₁ el₂,
   norm_list el = el₁ ++ el₂
   → norm_list el = norm_list el₁ ++ norm_list el₂.
@@ -414,7 +448,7 @@ induction el₂ as [| e₂]; intros.
   rewrite <- IHel₂.
   remember norm_list as f; simpl; subst f.
   simpl.
-Abort. (*
+
 bbb.
 
   simpl; rewrite norm_list_norm_list.
@@ -436,36 +470,8 @@ bbb.
 
 SearchAbout norm_list.
 *)
-Theorem agaga : ∀ el e el₁,
-  norm_list el = e :: el₁
-  → el₁ = norm_list el₁.
-Proof.
-intros el e el₁ Hel.
-revert e el₁ Hel.
-induction el as [| e₁]; intros; [ discriminate Hel | simpl in Hel ].
-remember (norm_list el) as el₂ eqn:Hel₂; symmetry in Hel₂.
-destruct el₂ as [| e₂]; [ injection Hel; intros; subst el₁; reflexivity | ].
-destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
- subst el₂.
- pose proof IHel e₂ (e :: el₁) (eq_refl _) as H₂.
- symmetry in H₂.
- simpl in H₂.
- remember (norm_list el₁) as el₂ eqn:Hel₃; symmetry in Hel₃.
- destruct el₂ as [| e₃]; [ injection H₂; intros; subst el₁; reflexivity | ].
- destruct (letter_opp_dec e e₃) as [H₃| H₃].
-  subst el₂; exfalso.
-  destruct e as (x₁, d₁).
-  destruct e₃ as (x₂, d₂).
-  apply letter_opp_comm in H₃.
-  apply letter_opp_iff in H₃.
-  destruct H₃; subst x₁ d₁.
-  revert Hel₃; apply norm_list_impossible_start.
 
-  injection H₂; clear H₂; intros; subst el₁; reflexivity.
-
- injection Hel; clear Hel; intros; subst e el₁.
 bbb.
-
  destruct el as [| e₃]; [ discriminate Hel₂ | simpl in Hel₂ ].
  remember (norm_list el) as el₃ eqn:Hel₃; symmetry in Hel₃.
  destruct el₃ as [| e₄]; [ discriminate Hel₂ | ].
