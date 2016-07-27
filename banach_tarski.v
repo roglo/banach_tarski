@@ -109,6 +109,9 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
+Theorem norm_list_single : ∀ e, norm_list (e :: nil) = e :: nil.
+Proof. reflexivity. Qed.
+
 Theorem norm_list_impossible_consecutive : ∀ x d el el₁ el₂,
   norm_list el ≠ el₁ ++ E x d :: E x (negb d) :: el₂.
 Proof.
@@ -378,9 +381,22 @@ induction el₂ as [| e₂]; intros.
 
  rewrite cons_to_app.
  rewrite app_assoc, IHel₂.
- clear IHel₂.
- revert e₂ el₂.
+ revert e₂ el₂ IHel₂.
  induction el₁ as [| e₁]; intros.
+  do 2 rewrite app_nil_l.
+  remember norm_list as f; simpl; subst f.
+  rewrite norm_list_norm_list.
+  symmetry; rewrite cons_to_app.
+  apply IHel₂.
+
+  rewrite <- cons_to_app.
+  rewrite <- IHel₂.
+  remember norm_list as f; simpl; subst f.
+  simpl.
+
+bbb.
+
+
   simpl; rewrite norm_list_norm_list.
   remember (norm_list el₂) as el₃ eqn:Hel₂; symmetry in Hel₂.
   destruct el₃ as [| e₃]; [ reflexivity | ].
@@ -392,6 +408,12 @@ induction el₂ as [| e₂]; intros.
     destruct (Bool.bool_dec d₂ d₃) as [H₃| H₃]; [ contradiction | ].
     apply not_eq_sym, neq_negb in H₃.
     subst x₃ d₃; clear H₁.
+    destruct el₃ as [| e₃]; [ reflexivity | simpl ].
+    remember (norm_list el₃) as el₄ eqn:Hel₃; symmetry in Hel₃.
+    destruct el₄ as [| e₄].
+     f_equal.
+
+
 SearchAbout norm_list.
 Theorem agaga : ∀ el e el₁,
   norm_list el = e :: el₁
