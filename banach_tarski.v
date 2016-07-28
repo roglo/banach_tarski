@@ -303,22 +303,26 @@ destruct (only_letters x); subst x.
  destruct d; [ right; reflexivity | left; reflexivity ].
 Qed.
 
-(* s in xS(y) *)
+(* definition start_with2 x y s ↔ s in xS(y) *)
 Definition start_with2 x y s :=
   ∃ t, norm s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
-Theorem empty_start_with2_a_ai : ∀ s, is_empty s → start_with2 a a⁻¹ s.
+Theorem empty_start_with2 : ∀ s x d,
+  is_empty s
+  → start_with2 (E x d) (E x (negb d)) s.
 Proof.
-intros s H.
+intros s x d H.
 unfold is_empty in H.
 unfold start_with2.
 remember (norm s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el).
 simpl in H; subst el.
-exists (mkF₂ (a⁻¹ :: nil)); simpl.
+exists (mkF₂ (E x (negb d) :: nil)); simpl.
 unfold start_with, norm; simpl.
 split; [ | reflexivity ].
-destruct (letter_opp_dec a a⁻¹) as [H| H]; [ reflexivity | ].
+set (e := E x d).
+set (ei := E x (negb d)).
+destruct (letter_opp_dec e ei) as [H| H]; [ reflexivity | ].
 exfalso; apply H, letter_opp_inv.
 Qed.
 
@@ -402,18 +406,23 @@ apply not_eq_sym, neq_negb in H₄; simpl in H₄.
 apply H₁; split; assumption.
 Qed.
 
-Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
+Theorem decomposed_2 : ∀ s x,
+  start_with2 (E x false) (E x true) s ∨ start_with (E x false) s.
 Proof.
-intros s.
+intros s x.
 destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
- left; apply empty_start_with2_a_ai; assumption.
+ left; apply empty_start_with2; assumption.
 
- right; assumption.
+ destruct (only_letters x) as [H₁| H₁]; subst x; [ right; assumption | ].
+ left.
+ eapply start_with_start_with2; [ | eassumption ].
+ intros (H₁, _); revert H₁; apply not_eq_sym, la_neq_lb.
 
  left.
  eapply start_with_start_with2; [ | eassumption ].
  intros (_, H₁); discriminate H₁.
 
+ destruct (only_letters x) as [H₁| H₁]; subst x; [ | right; assumption ].
  left.
  eapply start_with_start_with2; [ | eassumption ].
  intros (H₁, _); revert H₁; apply la_neq_lb.
@@ -422,5 +431,11 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
  eapply start_with_start_with2; [ | eassumption ].
  intros (_, H₁); discriminate H₁.
 Qed.
+
+Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
+Proof. intros; apply decomposed_2. Qed.
+
+Theorem decomposed_2_b : ∀ s, start_with2 b b⁻¹ s ∨ start_with b s.
+Proof. intros; apply decomposed_2. Qed.
 
 End Free_Group.
