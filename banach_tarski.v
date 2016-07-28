@@ -382,9 +382,6 @@ remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
 destruct el₁ as [| e₁]; [ contradiction | subst e₁ ].
 unfold norm.
 remember norm_list as f; simpl; subst f.
-rewrite Hel₁.
-apply norm_list_is_cons in Hel₁.
-rewrite Hel₁; clear el Hel₁; rename el₁ into el.
 bbb.
 
 destruct el as [| e₁]; [ contradiction | simpl in H ].
