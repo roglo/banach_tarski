@@ -395,6 +395,14 @@ destruct (letter_opp_dec e e) as [H₁| H₁]; [ subst e | reflexivity ].
 exfalso; revert H₁; apply not_letter_opp_diag.
 Qed.
 
+Theorem start_with_xi_start_with2 : ∀ s x y d,
+  not (x = y ∧ d = false)
+  → start_with (E y d) s
+  → start_with2 (E x false) (E x true) s.
+Proof.
+intros s x y d H₁ H₂.
+bbb.
+
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 Proof.
 intros s.
