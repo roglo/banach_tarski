@@ -436,3 +436,13 @@ Theorem decomposed_2_b : ∀ s, start_with2 b b⁻¹ s ∨ start_with b s.
 Proof. intros; apply decomposed_2. Qed.
 
 End Free_Group.
+
+Section Rotation.
+
+Parameter ℝ : Type.
+
+Definition mat_a := (1/3, 2*√2/3).
+
+Definition a p := mat_mul mat_a p.
+
+End Rotation.
