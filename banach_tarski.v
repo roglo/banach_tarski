@@ -284,9 +284,6 @@ Definition start_with x s :=
   end.
 Definition is_empty s := str (norm s) = nil.
 
-Definition Sw x := { s | start_with x s }.
-Definition Empty := { s | is_empty s }.
-
 Theorem decomposed_4 : ∀ s, is_empty s ∨
   start_with a s ∨ start_with a⁻¹ s ∨ start_with b s ∨ start_with b⁻¹ s.
 Proof.
