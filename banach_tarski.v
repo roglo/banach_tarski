@@ -370,11 +370,12 @@ remember norm_list as f; simpl; subst f.
 apply norm_list_inv.
 Qed.
 
-Theorem start_with_xi_start_with2_inv : ∀ s x,
-  start_with (E x true) s
+Theorem start_with_start_with2 : ∀ s x y d,
+  not (x = y ∧ d = false)
+  → start_with (E y d) s
   → start_with2 (E x false) (E x true) s.
 Proof.
-intros s x H.
+intros s x y d H₁ H.
 unfold start_with in H.
 unfold start_with2; simpl.
 destruct s as (el); simpl in H.
@@ -383,25 +384,23 @@ destruct el₁ as [| e₁]; [ contradiction | subst e₁ ].
 unfold norm.
 remember norm_list as f; simpl; subst f.
 rewrite Hel₁.
-exists (mkF₂ (E x true :: E x true :: el₁)).
+exists (mkF₂ (E x true :: E y d :: el₁)).
 remember norm_list as f; simpl; subst f.
 rewrite norm_list_inv.
 rewrite <- Hel₁, norm_list_norm_list.
 split; [ reflexivity | ].
 unfold start_with; simpl.
 rewrite norm_list_norm_list, Hel₁.
-set (e := E x true).
-destruct (letter_opp_dec e e) as [H₁| H₁]; [ subst e | reflexivity ].
-exfalso; revert H₁; apply not_letter_opp_diag.
+set (e₁ := E x true).
+set (e₂ := E y d).
+destruct (letter_opp_dec e₁ e₂) as [H₂| H₂]; [ subst e₁ e₂ | reflexivity ].
+exfalso.
+unfold letter_opp in H₂.
+destruct (letter_dec x y) as [H₃| H₃]; [ | contradiction ].
+destruct (Bool.bool_dec true d) as [H₄| H₄]; [ contradiction | ].
+apply not_eq_sym, neq_negb in H₄; simpl in H₄.
+apply H₁; split; assumption.
 Qed.
-
-Theorem start_with_xi_start_with2 : ∀ s x y d,
-  not (x = y ∧ d = false)
-  → start_with (E y d) s
-  → start_with2 (E x false) (E x true) s.
-Proof.
-intros s x y d H₁ H₂.
-bbb.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
 Proof.
@@ -411,59 +410,17 @@ destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
 
  right; assumption.
 
- left; apply start_with_xi_start_with2_inv; assumption.
-bbb.
-
- remember (norm s) as ns eqn:Hns; symmetry in Hns.
- destruct ns as (el); simpl in H.
- destruct el as [| e el]; [ contradiction | ].
- subst e; unfold start_with; rewrite Hns; simpl.
  left.
- exists (mkF₂ (a⁻¹ :: a⁻¹ :: el)).
- split.
-  simpl.
-  remember (a⁻¹ :: el) as el' eqn:Hel'.
-  unfold norm; f_equal.
-  remember norm_list as f; simpl; subst f; simpl.
-  remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
-  destruct el'' as [| e'' ].
-  destruct (letter_opp_dec a a⁻¹) as [H₁| H₁].
-   destruct el' as [| e']; [ discriminate Hel' | ].
-   injection Hel'; clear Hel'; intros; subst e' el'.
-   simpl in Hel''.
-   remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
-   destruct el' as [| e']; [ discriminate Hel'' | ].
-   destruct (letter_opp_dec a⁻¹ e') as [H₂| H₂].
-    subst el'.
-    injection Hns; clear Hns; intros.
+ eapply start_with_start_with2; [ | eassumption ].
+ intros (_, H₁); discriminate H₁.
 
-Theorem toto : ∀ el, norm (mkF₂ (a :: a⁻¹ :: el)) = norm (mkF₂ el).
-Proof.
-bbb.
+ left.
+ eapply start_with_start_with2; [ | eassumption ].
+ intros (H₁, _); revert H₁; apply la_neq_lb.
 
-symmetry.
-etransitivity; [ apply toto | ].
-rewrite <- Hns.
-bbb.
-
-  simpl; unfold norm; simpl.
-  destruct (letter_dec la la) as [H| H].
-   f_equal; clear H.
-   destruct el as [| e el] ; [ reflexivity | ].
-   destruct e as (x, d).
-   destruct (letter_dec la x) as [H| H].
-    subst x.
-    destruct d.
-     simpl; f_equal.
-     destruct el as [| e el]; [ reflexivity | ].
-     destruct e as (x, d).
-     destruct (letter_dec la x) as [H| H].
-      subst x.
-      destruct d.
-       simpl; f_equal.
-       destruct el as [| e el]; [ reflexivity | ].
-
-
-bbb.
+ left.
+ eapply start_with_start_with2; [ | eassumption ].
+ intros (_, H₁); discriminate H₁.
+Qed.
 
 End Free_Group.
