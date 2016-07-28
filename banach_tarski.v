@@ -380,6 +380,19 @@ unfold start_with2; simpl.
 destruct s as (el); simpl in H.
 unfold norm.
 remember norm_list as f; simpl; subst f.
+destruct el as [| e₁]; [ contradiction | simpl in H ].
+destruct el as [| e₂].
+ simpl in H; subst e₁.
+ exists (mkF₂ (E x true :: E x true :: nil)).
+ remember norm_list as f; simpl; subst f.
+ rewrite norm_list_x_xi.
+ split; [ reflexivity | ].
+ unfold start_with; simpl.
+ set (e := E x true).
+ destruct (letter_opp_dec e e) as [H₁| H₁]; [ | reflexivity ].
+ revert H₁; apply not_letter_opp_x_x.
+bbb.
+
 remember (norm_list el) as ns eqn:Hns; symmetry in Hns.
 destruct ns as [| x₁]; [ contradiction | subst x₁ ].
 exists (mkF₂ (E x true :: E x true :: ns)).
@@ -394,21 +407,18 @@ induction ns as [| e]; intros.
  destruct (letter_opp_dec e e) as [H₁| H₁]; [ | reflexivity ].
  revert H₁; apply not_letter_opp_x_x.
 
-bbb.
- rewrite Hns; unfold start_with; simpl.
- remember (norm_list ns) as ns₁ eqn:Hns₁; symmetry in Hns₁.
- destruct ns₁ as [| e₁].
-  set (e₁ := E x true).
-  destruct (letter_opp_dec e₁ e) as [H₁| H₁]; [ reflexivity | ].
-  destruct (letter_opp_dec e₁ e₁) as [H₂| H₂]; [ | reflexivity ].
-  exfalso; revert H₂; apply not_letter_opp_x_x.
+ destruct el as [| e₁]; [ discriminate Hns | ].
+ simpl in Hns.
+ remember (norm_list el) as el₁ eqn:Hel; symmetry in Hel.
+ destruct el₁ as [| e₂]; [ discriminate Hns | ].
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  subst el₁.
+  destruct e₁ as (x₁, d₁).
+  destruct e₂ as (x₂, d₂).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst x₂ d₂.
 
-  destruct (letter_opp_dec e e₁) as [H₁| H₁].
-   exfalso.
-   destruct e as (x₁, d₁).
-   destruct e₁ as (x₂, d₂).
-   apply letter_opp_iff in H₁.
-   destruct H₁; subst x₂ d₂.
+bbb.
 
 Theorem glop : ∀ el el₁ el₂,
   norm_list el = el₁ ++ el₂
