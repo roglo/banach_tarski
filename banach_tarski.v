@@ -441,8 +441,16 @@ Section Rotation.
 
 Parameter ℝ : Type.
 
+Check decomposed_4.
+
+bbb.
+
 Definition mat_a := (1/3, 2*√2/3).
 
 Definition a p := mat_mul mat_a p.
+
+Induction glop :=
+  | AG : mat_a → glop
+  | BG : mat_b → glop.
 
 End Rotation.
