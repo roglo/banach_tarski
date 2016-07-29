@@ -450,29 +450,42 @@ Theorem decomposed_2 : ∀ s x,
   start_with2 (E x false) (E x true) s ⊕ start_with (E x false) s.
 Proof.
 intros s x.
-destruct (decomposed_4_or s) as [H| [H| [H| [H| H]]]].
+destruct (decomposed_4 s) as [(H, _)| (_, H)].
  left; split; [ apply empty_start_with2; assumption | ].
  unfold empty in H; unfold start_with.
  rewrite H; intros H'; assumption.
 
+ destruct H as [(H, _)| (_, H)].
  destruct x.
-  right; split; [ | assumption ].
-  unfold start_with in H.
-  intros (t, (H₁, H₂)).
-  unfold start_with in H₂; simpl in H₂.
-  rewrite H₁ in H; simpl in H.
+  right; split; [ intros (t, (Hn, Ht)) | assumption ].
+  unfold start_with in H, Ht; rewrite Hn in H; simpl in H.
+  unfold norm in Ht; simpl in Ht.
   remember (norm_list (str t)) as el eqn:Hel; symmetry in Hel.
   destruct el as [| e]; [ contradiction | subst e ].
-  destruct (letter_opp_dec a a⁻¹) as [H₂| H₂].
+  destruct (letter_opp_dec a a⁻¹) as [H₁| H₁].
    destruct el as [| e]; [ contradiction | subst e ].
    revert Hel; apply norm_list_impossible_start.
 
-   apply H₂, letter_opp_inv.
+   apply H₁, letter_opp_inv.
 
   left.
   split.
    eapply start_with_start_with2; [ | eassumption ].
    intros (H₁, _); discriminate H₁.
+
+   intros H₁.
+   unfold start_with in H, H₁.
+   destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
+
+  destruct H as [(H, _)| (_, H)].
+  destruct x.
+   left; split.
+    eapply start_with_start_with2; [ | eassumption ].
+    intros (_, H₁); discriminate H₁.
+
+    intros H₁.
+    unfold start_with in H, H₁.
+    destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
 bbb.
 
 Theorem decomposed_2_or : ∀ s x,
