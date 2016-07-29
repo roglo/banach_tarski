@@ -468,8 +468,7 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
 
    apply H₁, letter_opp_inv.
 
-  left.
-  split.
+  left; split.
    eapply start_with_start_with2; [ | eassumption ].
    intros (H₁, _); discriminate H₁.
 
@@ -478,14 +477,16 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
    destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
 
   destruct H as [(H, _)| (_, H)].
-  destruct x.
-   left; split.
-    eapply start_with_start_with2; [ | eassumption ].
-    intros (_, H₁); discriminate H₁.
+  left; split.
+   eapply start_with_start_with2; [ | eassumption ].
+   intros (_, H₁); discriminate H₁.
 
-    intros H₁.
-    unfold start_with in H, H₁.
-    destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
+   intros H₁.
+   unfold start_with in H, H₁.
+   destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
+
+   destruct H as [(H, _)| (_, H)].
+
 bbb.
 
 Theorem decomposed_2_or : ∀ s x,
