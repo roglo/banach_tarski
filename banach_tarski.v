@@ -277,18 +277,60 @@ rewrite norm_list_norm_list.
 reflexivity.
 Qed.
 
+Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
+Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
+Theorem xor_or : ∀ P Q, P ⊕ Q → P ∨ Q.
+Proof.
+intros.
+destruct H; [ left | right ]; destruct H; assumption.
+Qed.
+
+Definition empty s := str (norm s) = nil.
 Definition start_with x s :=
   match str (norm s) with
   | nil => False
   | e :: el => x = e
   end.
-Definition is_empty s := str (norm s) = nil.
 
-Theorem decomposed_4 : ∀ s, is_empty s ∨
+Theorem decomposed_4 : ∀ s, empty s ⊕
+  start_with a s ⊕ start_with a⁻¹ s ⊕ start_with b s ⊕ start_with b⁻¹ s.
+Proof.
+intros s.
+unfold empty, start_with.
+remember (norm s) as ns eqn:Hns; symmetry in Hns.
+destruct ns as (el); simpl.
+destruct el as [| e].
+ left; split; [ reflexivity | ].
+ intros H.
+ destruct H as [(H, _)| (_, H)]; [ contradiction | ].
+ destruct H as [(H, _)| (_, H)]; [ contradiction | ].
+ destruct H as [(H, _)| (_, H)]; contradiction.
+
+ right.
+ split; [ intros H; discriminate H | ].
+ destruct e as (x, d).
+ destruct x.
+  destruct d.
+   right; split; [ intros H; discriminate H | ].
+   left; split; [ reflexivity | ].
+   intros [(H, _)| (_, H)]; discriminate H.
+
+   left; split; [ reflexivity | ].
+   intros [(H, _)| (_, [(H, _)| (_, H)])]; discriminate H.
+
+  right; split; [ intros H; discriminate H | ].
+  right; split; [ intros H; discriminate H | ].
+  destruct d.
+   right; split; [ intros H; discriminate H | reflexivity ].
+
+   left; split; [ reflexivity | intros H; discriminate H ].
+Qed.
+
+Theorem decomposed_4_or : ∀ s, empty s ∨
   start_with a s ∨ start_with a⁻¹ s ∨ start_with b s ∨ start_with b⁻¹ s.
 Proof.
 intros s.
-unfold is_empty, start_with.
+unfold empty, start_with.
 remember (norm s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el); simpl.
 destruct el as [| e]; [ left; reflexivity | right ].
@@ -305,11 +347,11 @@ Definition start_with2 x y s :=
   ∃ t, norm s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
 Theorem empty_start_with2 : ∀ s x d,
-  is_empty s
+  empty s
   → start_with2 (E x d) (E x (negb d)) s.
 Proof.
 intros s x d H.
-unfold is_empty in H.
+unfold empty in H.
 unfold start_with2.
 remember (norm s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el).
@@ -407,7 +449,7 @@ Theorem decomposed_2 : ∀ s x,
   start_with2 (E x false) (E x true) s ∨ start_with (E x false) s.
 Proof.
 intros s x.
-destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
+destruct (decomposed_4_or s) as [H| [H| [H| [H|H]]]].
  left; apply empty_start_with2; assumption.
 
  destruct x as [H₁| H₁]; [ right; assumption | ].
