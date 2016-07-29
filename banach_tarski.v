@@ -17,14 +17,14 @@ Section Free_Group.
    b = E lb false
    b⁻¹ = E lb true *)
 
-(*
 Inductive letter := la | lb.
-*)
+(*
 Variable letter : Type.
 Variable la : letter.
 Variable lb : letter.
 Variable la_neq_lb : la ≠ lb.
 Variable only_letters : ∀ l, { l = la } + { l = lb }.
+*)
 
 Inductive free_elem := E : letter → bool → free_elem.
 Record F₂ := mkF₂ { str : list free_elem }.
@@ -34,14 +34,14 @@ Notation "'a⁻¹'" := (E la true).
 Notation "'b'" := (E lb false).
 Notation "'b⁻¹'" := (E lb true).
 
-Variable letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 (*
+Variable letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
+*)
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
 intros.
 destruct l1, l2; try (left; reflexivity); right; intros H; discriminate H.
 Qed.
-*)
 
 Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
   if letter_dec l₁ l₂ then
@@ -293,7 +293,7 @@ remember (norm s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el); simpl.
 destruct el as [| e]; [ left; reflexivity | right ].
 destruct e as (x, d).
-destruct (only_letters x); subst x.
+destruct x.
  destruct d; [ right; left; reflexivity | left; reflexivity ].
 
  right; right.
@@ -410,19 +410,19 @@ intros s x.
 destruct (decomposed_4 s) as [H| [H| [H| [H|H]]]].
  left; apply empty_start_with2; assumption.
 
- destruct (only_letters x) as [H₁| H₁]; subst x; [ right; assumption | ].
+ destruct x as [H₁| H₁]; [ right; assumption | ].
  left.
  eapply start_with_start_with2; [ | eassumption ].
- intros (H₁, _); revert H₁; apply not_eq_sym, la_neq_lb.
+ intros (H₁, _); discriminate H₁.
 
  left.
  eapply start_with_start_with2; [ | eassumption ].
  intros (_, H₁); discriminate H₁.
 
- destruct (only_letters x) as [H₁| H₁]; subst x; [ | right; assumption ].
+ destruct x as [H₁| H₁]; [ | right; assumption ].
  left.
  eapply start_with_start_with2; [ | eassumption ].
- intros (H₁, _); revert H₁; apply la_neq_lb.
+ intros (H₁, _); discriminate H₁.
 
  left.
  eapply start_with_start_with2; [ | eassumption ].
