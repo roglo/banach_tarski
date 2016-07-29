@@ -10,6 +10,15 @@ Qed.
 Theorem cons_to_app : ∀ A (x : A) l, x :: l = (x :: nil) ++ l.
 Proof. reflexivity. Qed.
 
+Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
+Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
+
+Theorem xor_or : ∀ P Q, P ⊕ Q → P ∨ Q.
+Proof.
+intros.
+destruct H; [ left | right ]; destruct H; assumption.
+Qed.
+
 Section Free_Group.
 
 (* a = E la false
@@ -277,14 +286,6 @@ rewrite norm_list_norm_list.
 reflexivity.
 Qed.
 
-Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
-Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
-Theorem xor_or : ∀ P Q, P ⊕ Q → P ∨ Q.
-Proof.
-intros.
-destruct H; [ left | right ]; destruct H; assumption.
-Qed.
-
 Definition empty s := str (norm s) = nil.
 Definition start_with x s :=
   match str (norm s) with
@@ -446,6 +447,35 @@ apply H₁; split; assumption.
 Qed.
 
 Theorem decomposed_2 : ∀ s x,
+  start_with2 (E x false) (E x true) s ⊕ start_with (E x false) s.
+Proof.
+intros s x.
+destruct (decomposed_4_or s) as [H| [H| [H| [H| H]]]].
+ left; split; [ apply empty_start_with2; assumption | ].
+ unfold empty in H; unfold start_with.
+ rewrite H; intros H'; assumption.
+
+ destruct x.
+  right; split; [ | assumption ].
+  unfold start_with in H.
+  intros (t, (H₁, H₂)).
+  unfold start_with in H₂; simpl in H₂.
+  rewrite H₁ in H; simpl in H.
+  remember (norm_list (str t)) as el eqn:Hel; symmetry in Hel.
+  destruct el as [| e]; [ contradiction | subst e ].
+  destruct (letter_opp_dec a a⁻¹) as [H₂| H₂].
+   destruct el as [| e]; [ contradiction | subst e ].
+   revert Hel; apply norm_list_impossible_start.
+
+   apply H₂, letter_opp_inv.
+
+  left.
+  split.
+   eapply start_with_start_with2; [ | eassumption ].
+   intros (H₁, _); discriminate H₁.
+bbb.
+
+Theorem decomposed_2_or : ∀ s x,
   start_with2 (E x false) (E x true) s ∨ start_with (E x false) s.
 Proof.
 intros s x.
