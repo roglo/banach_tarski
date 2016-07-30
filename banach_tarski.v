@@ -624,8 +624,8 @@ destruct s as (el).
 unfold norm; simpl.
 induction el as [| e].
  unfold map_rotate; simpl.
- exists 1%Z, 1%Z, 1%Z, 0; simpl.
- do 2 rewrite Rmult_1_r.
+ exists 3%Z, 1%Z, 0%Z, 1; simpl.
+ do 3 rewrite Rmult_1_r.
  do 4 rewrite Rmult_0_r.
  do 4 rewrite Rplus_0_r.
  unfold Rdiv.
