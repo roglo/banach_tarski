@@ -38,6 +38,8 @@ Variable only_letters : ∀ l, { l = la } + { l = lb }.
 Inductive free_elem := E : letter → bool → free_elem.
 Record F₂ := mkF₂ { str : list free_elem }.
 
+Notation "x ⁺" := (E x false) (at level 200, format "x ⁺").
+Notation "x ⁻¹" := (E x true) (at level 200, format "x ⁻¹").
 Notation "'a'" := (E la false).
 Notation "'a⁻¹'" := (E la true).
 Notation "'b'" := (E lb false).
@@ -293,12 +295,12 @@ Definition start_with x s :=
   | e :: el => x = e
   end.
 
-Notation "s = 'ø'" := (empty s) (at level 70).
-Notation "s '∈' 'S' ( x )" := (start_with x s)
-  (at level 70, format "s  '∈'  S ( x )").
+Notation "s = '∅'" := (empty s) (at level 70).
+Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
+  (at level 70, format "s  '∈'  Ṣ ( x )").
 
 Theorem decomposed_4 : ∀ s,
-  s = ø ⊕ s ∈ S(a) ⊕ s ∈ S(a⁻¹) ⊕ s ∈ S(b) ⊕ s ∈ S(b⁻¹).
+  s = ∅ ⊕ s ∈ Ṣ(a) ⊕ s ∈ Ṣ(a⁻¹) ⊕ s ∈ Ṣ(b) ⊕ s ∈ Ṣ(b⁻¹).
 Proof.
 intros s.
 unfold empty, start_with.
@@ -351,8 +353,8 @@ Qed.
 Definition start_with2 x y s :=
   ∃ t, norm s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
-Notation "s '∈' x 'S' ( y )" := (start_with2 x y s)
-  (at level 70, x at level 0, format "s  '∈'  x S ( y )").
+Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
+  (at level 70, x at level 200, format "s  '∈'  x Ṣ ( y )").
 
 Theorem empty_start_with2 : ∀ s x d,
   empty s
@@ -493,7 +495,6 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
    destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
 
    destruct H as [(H, _)| (_, H)].
-
 bbb.
 
 Theorem decomposed_2_or : ∀ s x,
