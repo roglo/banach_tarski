@@ -38,8 +38,8 @@ Variable only_letters : ∀ l, { l = la } + { l = lb }.
 Inductive free_elem := E : letter → bool → free_elem.
 Record F₂ := mkF₂ { str : list free_elem }.
 
-Notation "x ⁺" := (E x false) (at level 200, format "x ⁺").
-Notation "x ⁻¹" := (E x true) (at level 200, format "x ⁻¹").
+Notation "x '⁺'" := (E x false) (at level 200, format "x ⁺").
+Notation "x '⁻¹'" := (E x true) (at level 200, format "x ⁻¹").
 Notation "'a'" := (E la false).
 Notation "'a⁻¹'" := (E la true).
 Notation "'b'" := (E lb false).
@@ -495,7 +495,36 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
    destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
 
    destruct H as [(H, _)| (_, H)].
-bbb.
+    destruct x.
+     left; split.
+      eapply start_with_start_with2; [ | eassumption ].
+      intros (H₁, _); discriminate H₁.
+
+      intros H₁.
+      unfold start_with in H, H₁.
+      destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
+
+     right; split; [ | assumption ].
+     unfold start_with in H.
+     intros (t, (Hn, Ht)).
+     rewrite Hn in H; simpl in H.
+     unfold start_with, norm in Ht; simpl in Ht.
+     remember (norm_list (str t)) as el eqn:Hel; symmetry in Hel.
+     destruct el as [| e]; [ contradiction | subst e ].
+     destruct (letter_opp_dec b b⁻¹) as [H₁| H₁].
+      destruct el as [| e]; [ contradiction | subst e ].
+      revert Hel; apply norm_list_impossible_start.
+
+      apply H₁, letter_opp_inv.
+
+    left; split.
+     eapply start_with_start_with2; [ | eassumption ].
+     intros (_, H₁); discriminate H₁.
+
+     intros H₁.
+     unfold start_with in H, H₁.
+     destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
+Qed.
 
 Theorem decomposed_2_or : ∀ s x,
   start_with2 (E x false) (E x true) s ∨ start_with (E x false) s.
@@ -523,11 +552,11 @@ destruct (decomposed_4_or s) as [H| [H| [H| [H|H]]]].
  intros (_, H₁); discriminate H₁.
 Qed.
 
-Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
-Proof. intros; apply decomposed_2_or. Qed.
+Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ⊕ start_with a s.
+Proof. intros; apply decomposed_2. Qed.
 
-Theorem decomposed_2_b : ∀ s, start_with2 b b⁻¹ s ∨ start_with b s.
-Proof. intros; apply decomposed_2_or. Qed.
+Theorem decomposed_2_b : ∀ s, start_with2 b b⁻¹ s ⊕ start_with b s.
+Proof. intros; apply decomposed_2. Qed.
 
 End Free_Group.
 
@@ -536,6 +565,8 @@ Section Rotation.
 Parameter ℝ : Type.
 
 Check decomposed_4.
+Check decomposed_2_a.
+Check decomposed_2_b.
 
 bbb.
 
