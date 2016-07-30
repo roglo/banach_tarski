@@ -293,8 +293,12 @@ Definition start_with x s :=
   | e :: el => x = e
   end.
 
-Theorem decomposed_4 : ∀ s, empty s ⊕
-  start_with a s ⊕ start_with a⁻¹ s ⊕ start_with b s ⊕ start_with b⁻¹ s.
+Notation "s = 'ø'" := (empty s) (at level 70).
+Notation "s '∈' 'S' ( x )" := (start_with x s)
+  (at level 70, format "s  '∈'  S ( x )").
+
+Theorem decomposed_4 : ∀ s,
+  s = ø ⊕ s ∈ S(a) ⊕ s ∈ S(a⁻¹) ⊕ s ∈ S(b) ⊕ s ∈ S(b⁻¹).
 Proof.
 intros s.
 unfold empty, start_with.
@@ -346,6 +350,9 @@ Qed.
 (* definition start_with2 x y s ↔ s in xS(y) *)
 Definition start_with2 x y s :=
   ∃ t, norm s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
+
+Notation "s '∈' x 'S' ( y )" := (start_with2 x y s)
+  (at level 70, x at level 0, format "s  '∈'  x S ( y )").
 
 Theorem empty_start_with2 : ∀ s x d,
   empty s
@@ -516,10 +523,10 @@ destruct (decomposed_4_or s) as [H| [H| [H| [H|H]]]].
 Qed.
 
 Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ∨ start_with a s.
-Proof. intros; apply decomposed_2. Qed.
+Proof. intros; apply decomposed_2_or. Qed.
 
 Theorem decomposed_2_b : ∀ s, start_with2 b b⁻¹ s ∨ start_with b s.
-Proof. intros; apply decomposed_2. Qed.
+Proof. intros; apply decomposed_2_or. Qed.
 
 End Free_Group.
 
