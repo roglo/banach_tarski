@@ -578,7 +578,12 @@ Check decomposed_4.
 Check decomposed_2_a.
 Check decomposed_2_b.
 
-Definition mat_vec_mul mat pt := ...
+Inductive point := P : ℝ → ℝ → ℝ → point.
+
+Definition mat_vec_mul mat '(P x y z) :=
+  P (a₁₁ mat * x + a₂₁ mat * y + a₃₁ map * z)
+    (a₁₂ mat * x + a₂₂ mat * y + a₃₂ map * z)
+    (a₁₃ mat * x + a₂₃ mat * y + a₃₃ map * z).
 
 Definition rotate e pt :=
   match e with
