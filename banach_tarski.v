@@ -1,5 +1,6 @@
 Require Import Utf8.
 Require Import List.
+Import ListNotations.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
 Proof.
@@ -602,7 +603,7 @@ Definition rot_inv_z := mkmat
   (-2*√2/3) (1/3) 0
   0 0 1.
 
-Definition rotate e pt :=
+Definition rotate pt e :=
   match e with
   | E la false => mat_vec_mul rot_x pt
   | E la true => mat_vec_mul rot_inv_x pt
@@ -610,7 +611,7 @@ Definition rotate e pt :=
   | E lb true => mat_vec_mul rot_inv_z pt
   end.
 
-Definition map_rotate s pt := List.fold_right rotate pt (str s).
+Definition map_rotate s pt := List.fold_left rotate (str s) pt.
 
 Theorem map_1_0_0 : ∀ s,
   s ∈ Ṣ(ḅ)
@@ -620,12 +621,14 @@ Theorem map_1_0_0 : ∀ s,
 Proof.
 intros s Hs.
 destruct s as (el).
-unfold start_with in Hs.
-simpl in Hs.
+unfold norm.
+remember norm_list as f; simpl; subst f.
+induction el as [| e]; [ contradiction | ].
 bbb.
 
 unfold norm; simpl.
 induction el as [| e]; [ contradiction | ].
+
 destruct el as [| e₁].
 unfold map_rotate; simpl.
 exists 1%Z, (-2)%Z, 0%Z, 1; simpl.
