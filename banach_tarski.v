@@ -614,29 +614,21 @@ Definition rotate pt e :=
 Definition map_rotate s pt := List.fold_left rotate (str s) pt.
 
 Theorem map_1_0_0 : ∀ s,
-  s ∈ Ṣ(ḅ)
-  → ∃ (a b c : ℤ) (N : ℕ),
-    map_rotate (norm s) (P 1 0 0)
-    = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+  ∃ (a b c : ℤ) (N : ℕ),
+  map_rotate s (P 1 0 0)
+  = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
-intros s Hs.
+intros s.
 destruct s as (el).
-unfold norm.
-remember norm_list as f; simpl; subst f.
-induction el as [| e]; [ contradiction | ].
-bbb.
+induction el as [| e].
+ unfold map_rotate; simpl.
+ exists 1%Z, 0%Z, 0%Z, 0; simpl.
+ unfold Rdiv; rewrite Rinv_1.
+ do 3 rewrite Rmult_1_r.
+ rewrite Rmult_0_l; reflexivity.
 
-unfold norm; simpl.
-induction el as [| e]; [ contradiction | ].
+ destruct IHel as (a, (b, (c, (N, H)))).
 
-destruct el as [| e₁].
-unfold map_rotate; simpl.
-exists 1%Z, (-2)%Z, 0%Z, 1; simpl.
-repeat rewrite Rmult_1_r.
-repeat rewrite Rmult_0_r.
-repeat rewrite Rplus_0_r.
-unfold Rdiv; rewrite Rmult_0_l.
-reflexivity.
 bbb.
 
 End Rotation.
