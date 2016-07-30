@@ -578,26 +578,56 @@ Check decomposed_4.
 Check decomposed_2_a.
 Check decomposed_2_b.
 
+Require Import Reals.
+
+Notation "'ℝ'" := R.
+Notation "'ℤ'" := Z.
+Notation "'ℕ'" := nat.
+
 Inductive point := P : ℝ → ℝ → ℝ → point.
+Record matrix := mkmat
+  { a₁₁ : ℝ; a₁₂ : ℝ; a₁₃ : ℝ;
+    a₂₁ : ℝ; a₂₂ : ℝ; a₂₃ : ℝ;
+    a₃₁ : ℝ; a₃₂ : ℝ; a₃₃ : ℝ }.
 
 Definition mat_vec_mul mat '(P x y z) :=
-  P (a₁₁ mat * x + a₂₁ mat * y + a₃₁ map * z)
-    (a₁₂ mat * x + a₂₂ mat * y + a₃₂ map * z)
-    (a₁₃ mat * x + a₂₃ mat * y + a₃₃ map * z).
+  P (a₁₁ mat * x + a₂₁ mat * y + a₃₁ mat * z)
+    (a₁₂ mat * x + a₂₂ mat * y + a₃₂ mat * z)
+    (a₁₃ mat * x + a₂₃ mat * y + a₃₃ mat * z).
+
+Definition rot_x := mkmat
+  (1/3) (-2*sqrt 2/3) 0
+  (2*sqrt 2/3) (1/3) 0
+  0 0 1.
+Definition rot_inv_x := mkmat
+  (1/3) (2*sqrt 2/3) 0
+  (-2*sqrt 2/3) (1/3) 0
+  0 0 1.
+Definition rot_z := mkmat
+  1 0 0
+  0 (1/3) (-2*sqrt 2/3)
+  0 (2*sqrt 2/3) (1/3).
+Definition rot_inv_z := mkmat
+  1 0 0
+  0 (1/3) (2*sqrt 2/3)
+  0 (-2*sqrt 2/3) (1/3).
 
 Definition rotate e pt :=
   match e with
-  | E a false => mat_vec_mul rot_x pt
-  | E a true => mat_vec_mul rot_inv_x pt
-  | E b false => mat_vec_mul rot_z pt
-  | E b true => mat_vec_mul rot_inv_z pt
+  | E la false => mat_vec_mul rot_x pt
+  | E la true => mat_vec_mul rot_inv_x pt
+  | E lb false => mat_vec_mul rot_z pt
+  | E lb true => mat_vec_mul rot_inv_z pt
   end.
 
-Definition map_rotate s pt := List.fold_right rotate (str s) pt.
+Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
-Theorem toto : ∀ s,
-  ∃ a b c N,
-  map_rotate s (1%R, 0%R, 0%R) = (a/3^N, b * sqrt 2 / 3^N, c/3^N).
+Theorem map_1_0_0 : ∀ s,
+  ∃ (a b c : ℤ) (N : ℕ),
+  map_rotate (norm s) (P 1 0 0)
+  = P (IZR a/3^N) (IZR b*sqrt 2/3^N) (IZR c/3^N).
+Proof.
+intros.
 bbb.
 
 End Rotation.
