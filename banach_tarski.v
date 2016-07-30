@@ -586,21 +586,21 @@ Definition mat_vec_mul mat '(P x y z) :=
 Notation "'√'" := sqrt.
 
 Definition rot_x := mkmat
-  (1/3) (-2*√2/3) 0
-  (2*√2/3) (1/3) 0
-  0 0 1.
-Definition rot_inv_x := mkmat
-  (1/3) (2*√2/3) 0
-  (-2*√2/3) (1/3) 0
-  0 0 1.
-Definition rot_z := mkmat
   1 0 0
   0 (1/3) (-2*√2/3)
   0 (2*√2/3) (1/3).
-Definition rot_inv_z := mkmat
+Definition rot_inv_x := mkmat
   1 0 0
   0 (1/3) (2*√2/3)
   0 (-2*√2/3) (1/3).
+Definition rot_z := mkmat
+  (1/3) (-2*√2/3) 0
+  (2*√2/3) (1/3) 0
+  0 0 1.
+Definition rot_inv_z := mkmat
+  (1/3) (2*√2/3) 0
+  (-2*√2/3) (1/3) 0
+  0 0 1.
 
 Definition rotate e pt :=
   match e with
@@ -612,26 +612,28 @@ Definition rotate e pt :=
 
 Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
-Compute (map_rotate (mkF₂ (ạ :: Datatypes.nil)) (P 1 0 0)).
-
 Theorem map_1_0_0 : ∀ s,
-  ∃ (a b c : ℤ) (N : ℕ),
-  map_rotate (norm (mkF₂ (ḅ :: str s))) (P 1 0 0)
-  = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+  s ∈ Ṣ(ḅ)
+  → ∃ (a b c : ℤ) (N : ℕ),
+    map_rotate (norm s) (P 1 0 0)
+    = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
-intros.
+intros s Hs.
 destruct s as (el).
+unfold start_with in Hs.
+simpl in Hs.
+bbb.
+
 unfold norm; simpl.
-induction el as [| e].
- unfold map_rotate; simpl.
- exists 3%Z, 1%Z, 0%Z, 1; simpl.
- do 3 rewrite Rmult_1_r.
- do 4 rewrite Rmult_0_r.
- do 4 rewrite Rplus_0_r.
- unfold Rdiv.
- rewrite Rinv_1.
- do 2 rewrite Rmult_1_r.
- rewrite Rmult_1_l.
+induction el as [| e]; [ contradiction | ].
+destruct el as [| e₁].
+unfold map_rotate; simpl.
+exists 1%Z, (-2)%Z, 0%Z, 1; simpl.
+repeat rewrite Rmult_1_r.
+repeat rewrite Rmult_0_r.
+repeat rewrite Rplus_0_r.
+unfold Rdiv; rewrite Rmult_0_l.
+reflexivity.
 bbb.
 
 End Rotation.
