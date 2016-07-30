@@ -27,27 +27,17 @@ Section Free_Group.
    b⁻¹ = E lb true *)
 
 Inductive letter := la | lb.
-(*
-Variable letter : Type.
-Variable la : letter.
-Variable lb : letter.
-Variable la_neq_lb : la ≠ lb.
-Variable only_letters : ∀ l, { l = la } + { l = lb }.
-*)
 
 Inductive free_elem := E : letter → bool → free_elem.
 Record F₂ := mkF₂ { str : list free_elem }.
 
 Notation "x '⁺'" := (E x false) (at level 200, format "x ⁺").
 Notation "x '⁻¹'" := (E x true) (at level 200, format "x ⁻¹").
-Notation "'a'" := (E la false).
-Notation "'a⁻¹'" := (E la true).
-Notation "'b'" := (E lb false).
-Notation "'b⁻¹'" := (E lb true).
+Notation "'ạ'" := (E la false).
+Notation "'ạ⁻¹'" := (E la true).
+Notation "'ḅ'" := (E lb false).
+Notation "'ḅ⁻¹'" := (E lb true).
 
-(*
-Variable letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
-*)
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
 intros.
@@ -300,7 +290,7 @@ Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
   (at level 70, format "s  '∈'  Ṣ ( x )").
 
 Theorem decomposed_4 : ∀ s,
-  s = ∅ ⊕ s ∈ Ṣ(a) ⊕ s ∈ Ṣ(a⁻¹) ⊕ s ∈ Ṣ(b) ⊕ s ∈ Ṣ(b⁻¹).
+  s = ∅ ⊕ s ∈ Ṣ(ạ) ⊕ s ∈ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ḅ) ⊕ s ∈ Ṣ(ḅ⁻¹).
 Proof.
 intros s.
 unfold empty, start_with.
@@ -334,7 +324,7 @@ destruct el as [| e].
 Qed.
 
 Theorem decomposed_4_or : ∀ s, empty s ∨
-  start_with a s ∨ start_with a⁻¹ s ∨ start_with b s ∨ start_with b⁻¹ s.
+  start_with ạ s ∨ start_with ạ⁻¹ s ∨ start_with ḅ s ∨ start_with ḅ⁻¹ s.
 Proof.
 intros s.
 unfold empty, start_with.
@@ -354,7 +344,7 @@ Definition start_with2 x y s :=
   ∃ t, norm s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
 
 Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
-  (at level 70, x at level 200, format "s  '∈'  x Ṣ ( y )").
+  (at level 70, x at level 0, format "s  '∈'  x  Ṣ ( y )").
 
 Theorem empty_start_with2 : ∀ s x d,
   empty s
@@ -471,7 +461,7 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
   unfold norm in Ht; simpl in Ht.
   remember (norm_list (str t)) as el eqn:Hel; symmetry in Hel.
   destruct el as [| e]; [ contradiction | subst e ].
-  destruct (letter_opp_dec a a⁻¹) as [H₁| H₁].
+  destruct (letter_opp_dec ạ ạ⁻¹) as [H₁| H₁].
    destruct el as [| e]; [ contradiction | subst e ].
    revert Hel; apply norm_list_impossible_start.
 
@@ -511,7 +501,7 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
      unfold start_with, norm in Ht; simpl in Ht.
      remember (norm_list (str t)) as el eqn:Hel; symmetry in Hel.
      destruct el as [| e]; [ contradiction | subst e ].
-     destruct (letter_opp_dec b b⁻¹) as [H₁| H₁].
+     destruct (letter_opp_dec ḅ ḅ⁻¹) as [H₁| H₁].
       destruct el as [| e]; [ contradiction | subst e ].
       revert Hel; apply norm_list_impossible_start.
 
@@ -552,10 +542,10 @@ destruct (decomposed_4_or s) as [H| [H| [H| [H|H]]]].
  intros (_, H₁); discriminate H₁.
 Qed.
 
-Theorem decomposed_2_a : ∀ s, start_with2 a a⁻¹ s ⊕ start_with a s.
+Theorem decomposed_2_a : ∀ s, s ∈ ạ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ạ) .
 Proof. intros; apply decomposed_2. Qed.
 
-Theorem decomposed_2_b : ∀ s, start_with2 b b⁻¹ s ⊕ start_with b s.
+Theorem decomposed_2_b : ∀ s, s ∈ ḅ Ṣ(ḅ⁻¹) ⊕ s ∈ Ṣ(ḅ) .
 Proof. intros; apply decomposed_2. Qed.
 
 End Free_Group.
@@ -566,13 +556,11 @@ Notation "s = '∅'" := (empty s) (at level 70).
 Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
   (at level 70, format "s  '∈'  Ṣ ( x )").
 Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
-  (at level 70, x at level 200, format "s  '∈'  x Ṣ ( y )").
-(*
-Notation "'a'" := (E la false).
-Notation "'a⁻¹'" := (E la true).
-Notation "'b'" := (E lb false).
-Notation "'b⁻¹'" := (E lb true).
-*)
+  (at level 70, x at level 0, format "s  '∈'  x  Ṣ ( y )").
+Notation "'ạ'" := (E la false).
+Notation "'ạ⁻¹'" := (E la true).
+Notation "'ḅ'" := (E lb false).
+Notation "'ḅ⁻¹'" := (E lb true).
 
 Check decomposed_4.
 Check decomposed_2_a.
@@ -622,12 +610,20 @@ Definition rotate e pt :=
 
 Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
+Compute (map_rotate (mkF₂ (ạ :: Datatypes.nil)) (P 1 0 0)).
+
 Theorem map_1_0_0 : ∀ s,
   ∃ (a b c : ℤ) (N : ℕ),
   map_rotate (norm s) (P 1 0 0)
   = P (IZR a/3^N) (IZR b*sqrt 2/3^N) (IZR c/3^N).
 Proof.
 intros.
+destruct s as (el).
+unfold norm; simpl.
+induction el as [| e].
+ unfold map_rotate; simpl.
+ exists 1%Z, 0%Z, 0%Z, 0; simpl.
+
 bbb.
 
 End Rotation.
