@@ -562,7 +562,15 @@ End Free_Group.
 
 Section Rotation.
 
-Parameter ℝ : Type.
+Notation "s = '∅'" := (empty s) (at level 70).
+Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
+  (at level 70, format "s  '∈'  Ṣ ( x )").
+Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
+  (at level 70, x at level 200, format "s  '∈'  x Ṣ ( y )").
+Notation "'a'" := (E la false).
+Notation "'a⁻¹'" := (E la true).
+Notation "'b'" := (E lb false).
+Notation "'b⁻¹'" := (E lb true).
 
 Check decomposed_4.
 Check decomposed_2_a.
