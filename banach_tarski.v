@@ -551,9 +551,13 @@ Proof. intros; apply decomposed_2. Qed.
 
 End Free_Group.
 
+Require Import Reals.
+
 Section Rotation.
 
+(*
 Notation "s = '∅'" := (empty s) (at level 70).
+*)
 Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
   (at level 70, format "s  '∈'  Ṣ ( x )").
 Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
@@ -566,8 +570,6 @@ Notation "'ḅ⁻¹'" := (E lb true).
 Check decomposed_4.
 Check decomposed_2_a.
 Check decomposed_2_b.
-
-Require Import Reals.
 
 Notation "'ℝ'" := R.
 Notation "'ℤ'" := Z.
@@ -633,6 +635,54 @@ Fixpoint map_rotate_1_0_0 el :=
       end
   end.
 
+Theorem map_rotate_1_0_0_cons : ∀ e el a b c N,
+  (a, b, c, N) = map_rotate_1_0_0 el
+  → map_rotate_1_0_0 (e :: el) =
+    match e with
+    | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
+    | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
+    | ḅ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
+    | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
+    end.
+Proof.
+intros e el a b c N H.
+simpl; rewrite <- H.
+reflexivity.
+Qed.
+
+Theorem map_1_0_0 : ∀ s a b c N,
+  (a, b, c, N) = map_rotate_1_0_0 (str s)
+  → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+Proof.
+intros (el) a b c N Hr.
+simpl in Hr.
+revert a b c N Hr.
+induction el as [| (x, d)]; intros; simpl.
+ simpl in Hr; unfold map_rotate.
+ injection Hr; intros; subst; simpl.
+ unfold Rdiv; rewrite Rinv_1.
+ do 3 rewrite Rmult_1_r.
+ rewrite Rmult_0_l; reflexivity.
+
+ remember (map_rotate_1_0_0 el) as mr eqn:Hmr.
+ destruct mr as (((a₁, b₁), c₁), N₁).
+ pose proof IHel a₁ b₁ c₁ N₁ (eq_refl _) as H.
+ unfold map_rotate in H; unfold map_rotate.
+ simpl in H; simpl.
+ rewrite H; simpl.
+ unfold Rdiv.
+ do 3 rewrite Rmult_1_l.
+ do 3 rewrite Rmult_0_l.
+ do 7 rewrite Rplus_0_r.
+ do 4 rewrite Rplus_0_l.
+ erewrite map_rotate_1_0_0_cons in Hr; [ | eassumption ].
+ remember 2%Z as two.
+ remember 3%Z as three.
+ remember 4%Z as four.
+ destruct x, d.
+  injection Hr; clear Hr; intros; subst a b c N two three four.
+bbb.
+
 Theorem map_1_0_0 : ∀ s,
   ∃ (a b c : ℤ) (N : ℕ),
   map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
@@ -641,7 +691,7 @@ intros s.
 destruct s as (el).
 induction el as [| e].
  unfold map_rotate; simpl.
- exists 1%Z,0%Z,0%Z,0; simpl.
+ exists x,0%Z,0%Z,0; simpl.
  unfold Rdiv; rewrite Rinv_1.
  do 3 rewrite Rmult_1_r.
  rewrite Rmult_0_l; reflexivity.
