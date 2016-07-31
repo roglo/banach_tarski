@@ -623,42 +623,15 @@ Definition map_rotate s pt := List.fold_right rotate pt (str s).
 Fixpoint map_rotate_1_0_0 el :=
   match el with
   | [] => (1%Z, 0%Z, 0%Z, 0)
-  | E x d :: el₁ =>
-      let '(a₁, b₁, c₁, N) := map_rotate_1_0_0 el₁ in
-      let a :=
-        match x with
-        | la => (3 * a₁)%Z
-        | lb => if d then (a₁ - 4 * b₁)%Z else (a₁ + 4 * b₁)%Z
-        end
-      in
-      let b :=
-        match x with
-        | la => if d then (b₁ - 2 * c₁)%Z else (b₁ + 2 * c₁)%Z
-        | lb => if d then (2 * a₁ + b₁)%Z else (- 2 * a₁ + b₁)%Z
-        end
-      in
-      let c :=
-        match x with
-        | la => if d then (4 * b₁ + c₁)%Z else (- 4 * b₁ + c₁)%Z
-        | lb => (3 * c₁)%Z
-        end
-      in
-      (a, b, c, S N)
+  | e₁ :: el₁ =>
+      let '(a, b, c, N) := map_rotate_1_0_0 el₁ in
+      match e₁ with
+      | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
+      | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
+      | ḅ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
+      | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
+      end
   end.
-
-Theorem map_1_0_0 : ∀ s a b c N,
-  (a, b, c, N) = map_rotate_1_0_0 (str s)
-  → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
-Proof.
-intros s a b c N Hr.
-destruct s as (el); simpl in Hr.
-induction el as [| (x, d)].
- unfold map_rotate; simpl.
- simpl in Hr; injection Hr; clear Hr; intros; subst; simpl.
- unfold Rdiv; rewrite Rinv_1.
- do 3 rewrite Rmult_1_r.
- rewrite Rmult_0_l; reflexivity.
-bbb.
 
 Theorem map_1_0_0 : ∀ s,
   ∃ (a b c : ℤ) (N : ℕ),
