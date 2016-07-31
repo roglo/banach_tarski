@@ -716,9 +716,8 @@ induction el as [| e].
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
     rewrite plus_IZR, mult_IZR; simpl.
-bbb.
-    replace (-2 * √ 2 / 3 * (IZR b * √ 2 / 3 ^ N))%R with
-    (-2 * 2 / 3 * (IZR b / 3 ^ N))%R.
+    replace (2 * √ 2 / 3 * (IZR b * √ 2 / 3 ^ N))%R with
+    (2 * 2 / 3 * (IZR b / 3 ^ N))%R.
      field; apply pow_nonzero.
      apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
@@ -732,6 +731,7 @@ bbb.
      rewrite Rmult_shuffle0; f_equal.
      apply sqrt_sqrt, Rplus_le_le_0_compat; apply Rle_0_1.
 
+bbb.
    exists (a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, (S N).
    f_equal.
     rewrite plus_IZR, mult_IZR; simpl.
