@@ -646,6 +646,20 @@ Fixpoint map_rotate_1_0_0 el :=
       (a, b, c, S N)
   end.
 
+Theorem map_1_0_0 : ∀ s a b c N,
+  (a, b, c, N) = map_rotate_1_0_0 (str s)
+  → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+Proof.
+intros s a b c N Hr.
+destruct s as (el); simpl in Hr.
+induction el as [| (x, d)].
+ unfold map_rotate; simpl.
+ simpl in Hr; injection Hr; clear Hr; intros; subst; simpl.
+ unfold Rdiv; rewrite Rinv_1.
+ do 3 rewrite Rmult_1_r.
+ rewrite Rmult_0_l; reflexivity.
+bbb.
+
 Theorem map_1_0_0 : ∀ s,
   ∃ (a b c : ℤ) (N : ℕ),
   map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
