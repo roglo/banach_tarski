@@ -594,21 +594,21 @@ Definition mat_vec_mul mat '(P x y z) :=
 Notation "'√'" := sqrt.
 
 Definition rot_x := mkmat
-  1 0 0
-  0 (1/3) (-2*√2/3)
-  0 (2*√2/3) (1/3).
+  1         0         0
+  0         (1/3)     (-2*√2/3)
+  0         (2*√2/3)  (1/3).
 Definition rot_inv_x := mkmat
-  1 0 0
-  0 (1/3) (2*√2/3)
-  0 (-2*√2/3) (1/3).
+  1         0         0
+  0         (1/3)     (2*√2/3)
+  0         (-2*√2/3) (1/3).
 Definition rot_z := mkmat
-  (1/3) (-2*√2/3) 0
-  (2*√2/3) (1/3) 0
-  0 0 1.
+  (1/3)     (-2*√2/3) 0
+  (2*√2/3)  (1/3)     0
+  0         0         1.
 Definition rot_inv_z := mkmat
-  (1/3) (2*√2/3) 0
-  (-2*√2/3) (1/3) 0
-  0 0 1.
+  (1/3)     (2*√2/3)  0
+  (-2*√2/3) (1/3)     0
+  0         0         1.
 
 Definition rotate e pt :=
   match e with
@@ -620,10 +620,30 @@ Definition rotate e pt :=
 
 Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
-Definition map_rotate_1_0_0 s :=
-  match str s with
+Fixpoint map_rotate_1_0_0 (el : list (letter * bool)) :=
+  match el with
   | [] => (1%Z, 0%Z, 0%Z, 0)
-  | _ :: _ => (1%Z, 0%Z, 0%Z, 42) (* to be completed *)
+  | (x, d) :: el₁ =>
+      let '(a₁, b₁, c₁, N) := map_rotate_1_0_0 el₁ in
+      let a :=
+        match x with
+        | la => (3 * a₁)%Z
+        | lb => if d then (a₁ - 4 * b₁)%Z else (a₁ + 4 * b₁)%Z
+        end
+      in
+      let b :=
+        match x with
+        | la => if d then (b₁ - 2 * c₁)%Z else (b₁ + 2 * c₁)%Z
+        | lb => if d then (2 * a₁ + b₁)%Z else (- 2 * a₁ + b₁)%Z
+        end
+      in
+      let c :=
+        match x with
+        | la => if d then (4 * b₁ + c₁)%Z else (- 4 * b₁ + c₁)%Z
+        | lb => (3 * c₁)%Z
+        end
+      in
+      (a, b, c, S N)
   end.
 
 Theorem map_1_0_0 : ∀ s,
