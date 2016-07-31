@@ -573,6 +573,13 @@ Notation "'ℝ'" := R.
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
 
+Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
+Proof.
+intros.
+rewrite Rmult_comm, <- Rmult_assoc.
+f_equal; apply Rmult_comm.
+Qed.
+
 Inductive point := P : ℝ → ℝ → ℝ → point.
 Record matrix := mkmat
   { a₁₁ : ℝ; a₁₂ : ℝ; a₁₃ : ℝ;
@@ -633,13 +640,22 @@ induction el as [| e].
  rewrite H.
  destruct e as (x, d).
  destruct x.
+Focus 2.
   destruct d.
-  simpl.
-  rewrite Rmult_1_l.
-  do 3 rewrite Rmult_0_l.
-  do 2 rewrite Rplus_0_r.
-  do 2 rewrite Rplus_0_l.
-  exists a.
+   simpl.
+   rewrite Rmult_1_l.
+   do 3 rewrite Rmult_0_l.
+   do 2 rewrite Rplus_0_r.
+   do 2 rewrite Rplus_0_l.
+   exists (a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, (S N).
+   f_equal.
+Focus 1.
+    rewrite minus_IZR, mult_IZR; simpl.
+    replace (-2 * √ 2 / 3 * (IZR b * √ 2 / 3 ^ N))%R with
+    (-2 * 2 / 3 * (IZR b / 3 ^ N))%R.
+     field; apply pow_nonzero.
+     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
+
 bbb.
 
 End Rotation.
