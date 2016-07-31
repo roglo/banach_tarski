@@ -620,10 +620,10 @@ Definition rotate e pt :=
 
 Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
-Fixpoint map_rotate_1_0_0 (el : list (letter * bool)) :=
+Fixpoint map_rotate_1_0_0 el :=
   match el with
   | [] => (1%Z, 0%Z, 0%Z, 0)
-  | (x, d) :: el₁ =>
+  | E x d :: el₁ =>
       let '(a₁, b₁, c₁, N) := map_rotate_1_0_0 el₁ in
       let a :=
         match x with
