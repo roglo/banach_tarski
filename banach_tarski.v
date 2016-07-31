@@ -646,6 +646,7 @@ Focus 2.
   do 3 rewrite Rmult_0_l.
   do 2 rewrite Rplus_0_r.
   do 2 rewrite Rplus_0_l.
+  do 2 rewrite Rplus_0_r.
   destruct d.
    exists (a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, (S N).
    f_equal.
@@ -675,10 +676,9 @@ Focus 2.
 
    exists (a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, (S N).
    f_equal.
-bbb.
-    rewrite minus_IZR, mult_IZR; simpl.
-    replace (-2 * √ 2 / 3 * (IZR b * √ 2 / 3 ^ N))%R with
-    (-2 * 2 / 3 * (IZR b / 3 ^ N))%R.
+    rewrite plus_IZR, mult_IZR; simpl.
+    replace (2 * √ 2 / 3 * (IZR b * √ 2 / 3 ^ N))%R with
+    (2 * 2 / 3 * (IZR b / 3 ^ N))%R.
      field; apply pow_nonzero.
      apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
