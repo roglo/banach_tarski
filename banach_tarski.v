@@ -622,8 +622,7 @@ Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
 Theorem map_1_0_0 : ∀ s,
   ∃ (a b c : ℤ) (N : ℕ),
-  map_rotate s (P 1 0 0)
-  = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+  map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
 intros s.
 destruct s as (el).
