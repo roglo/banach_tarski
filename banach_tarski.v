@@ -641,12 +641,12 @@ induction el as [| e].
  destruct e as (x, d).
  destruct x.
 Focus 2.
+  simpl.
+  rewrite Rmult_1_l.
+  do 3 rewrite Rmult_0_l.
+  do 2 rewrite Rplus_0_r.
+  do 2 rewrite Rplus_0_l.
   destruct d.
-   simpl.
-   rewrite Rmult_1_l.
-   do 3 rewrite Rmult_0_l.
-   do 2 rewrite Rplus_0_r.
-   do 2 rewrite Rplus_0_l.
    exists (a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, (S N).
    f_equal.
     rewrite minus_IZR, mult_IZR; simpl.
@@ -673,7 +673,32 @@ Focus 2.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-   simpl.
+   exists (a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, (S N).
+   f_equal.
+bbb.
+    rewrite minus_IZR, mult_IZR; simpl.
+    replace (-2 * √ 2 / 3 * (IZR b * √ 2 / 3 ^ N))%R with
+    (-2 * 2 / 3 * (IZR b / 3 ^ N))%R.
+     field; apply pow_nonzero.
+     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
+
+     unfold Rdiv.
+     do 2 rewrite <- Rmult_assoc; f_equal.
+     do 4 rewrite Rmult_assoc; f_equal.
+     do 3 rewrite <- Rmult_assoc.
+     rewrite Rmult_shuffle0; symmetry.
+     rewrite Rmult_assoc, Rmult_shuffle0.
+     rewrite <- Rmult_assoc; f_equal.
+     rewrite Rmult_shuffle0; f_equal.
+     apply sqrt_sqrt, Rplus_le_le_0_compat; apply Rle_0_1.
+
+    rewrite plus_IZR, mult_IZR; simpl.
+    field; apply pow_nonzero.
+    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
+
+    rewrite mult_IZR; simpl.
+    field; apply pow_nonzero.
+    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 bbb.
 
 End Rotation.
