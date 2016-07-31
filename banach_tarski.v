@@ -693,19 +693,17 @@ induction el as [| (x, d)]; intros; simpl.
    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
    rewrite plus_IZR, mult_IZR; simpl.
-   replace (2 * √ 2 * / 3 * (IZR b * √ 2 * / 3 ^ N))%R with
-    (2 * 2 * / 3 * (IZR b * / 3 ^ N))%R.
+   do 3 rewrite <- Rmult_assoc.
+   replace (2 * √ 2 * / 3 * IZR b * √ 2)%R with (4 * / 3 * IZR b)%R.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-    do 2 rewrite <- Rmult_assoc; f_equal.
-    do 4 rewrite Rmult_assoc; f_equal.
-    do 3 rewrite <- Rmult_assoc.
-    rewrite Rmult_shuffle0; symmetry.
+    symmetry; rewrite Rmult_shuffle0.
     rewrite Rmult_assoc, Rmult_shuffle0.
-    rewrite <- Rmult_assoc; f_equal.
-    rewrite Rmult_shuffle0; f_equal.
-    apply sqrt_sqrt, Rplus_le_le_0_compat; apply Rle_0_1.
+    rewrite <- Rmult_assoc, Rmult_shuffle0.
+    do 2 f_equal.
+    rewrite Rmult_assoc, sqrt_sqrt; [ ring | ].
+    apply Rplus_le_le_0_compat; apply Rle_0_1.
 
   injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
   f_equal.
@@ -718,36 +716,32 @@ induction el as [| (x, d)]; intros; simpl.
    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
    rewrite plus_IZR, mult_IZR; simpl.
-   replace (- 2 * √ 2 * / 3 * (IZR b * √ 2 * / 3 ^ N))%R with
-    (- 2 * 2 * / 3 * (IZR b * / 3 ^ N))%R.
+   do 3 rewrite <- Rmult_assoc.
+   replace (- 2 * √ 2 * / 3 * IZR b * √ 2)%R with (- 4 * / 3 * IZR b)%R.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-    do 2 rewrite <- Rmult_assoc; f_equal.
-    do 4 rewrite Rmult_assoc; f_equal.
-    do 3 rewrite <- Rmult_assoc.
-    rewrite Rmult_shuffle0; symmetry.
+    symmetry; rewrite Rmult_shuffle0.
     rewrite Rmult_assoc, Rmult_shuffle0.
-    rewrite <- Rmult_assoc; f_equal.
-    rewrite Rmult_shuffle0; f_equal.
-    apply sqrt_sqrt, Rplus_le_le_0_compat; apply Rle_0_1.
+    rewrite <- Rmult_assoc, Rmult_shuffle0.
+    do 2 f_equal.
+    rewrite Rmult_assoc, sqrt_sqrt; [ ring | ].
+    apply Rplus_le_le_0_compat; apply Rle_0_1.
 
   injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
   f_equal.
    rewrite minus_IZR, mult_IZR; simpl.
-   replace (- 2 * √ 2 * / 3 * (IZR b * √ 2 * / 3 ^ N))%R with
-    (- 2 * 2 * / 3 * (IZR b * / 3 ^ N))%R.
+   do 3 rewrite <- Rmult_assoc.
+   replace (- 2 * √ 2 * / 3 * IZR b * √ 2)%R with (- 4 * / 3 * IZR b)%R.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-    do 2 rewrite <- Rmult_assoc; f_equal.
-    do 4 rewrite Rmult_assoc; f_equal.
-    do 3 rewrite <- Rmult_assoc.
-    rewrite Rmult_shuffle0; symmetry.
+    symmetry; rewrite Rmult_shuffle0.
     rewrite Rmult_assoc, Rmult_shuffle0.
-    rewrite <- Rmult_assoc; f_equal.
-    rewrite Rmult_shuffle0; f_equal.
-    apply sqrt_sqrt, Rplus_le_le_0_compat; apply Rle_0_1.
+    rewrite <- Rmult_assoc, Rmult_shuffle0.
+    do 2 f_equal.
+    rewrite Rmult_assoc, sqrt_sqrt; [ ring | ].
+    apply Rplus_le_le_0_compat; apply Rle_0_1.
 
    rewrite plus_IZR, mult_IZR; simpl.
    field; apply pow_nonzero.
@@ -760,19 +754,17 @@ induction el as [| (x, d)]; intros; simpl.
   injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
   f_equal.
    rewrite plus_IZR, mult_IZR; simpl.
-   replace (2 * √ 2 * / 3 * (IZR b * √ 2 * / 3 ^ N))%R with
-    (2 * 2 * / 3 * (IZR b * / 3 ^ N))%R.
+   do 3 rewrite <- Rmult_assoc.
+   replace (2 * √ 2 * / 3 * IZR b * √ 2)%R with (4 * / 3 * IZR b)%R.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-    do 2 rewrite <- Rmult_assoc; f_equal.
-    do 4 rewrite Rmult_assoc; f_equal.
-    do 3 rewrite <- Rmult_assoc.
-    rewrite Rmult_shuffle0; symmetry.
+    symmetry; rewrite Rmult_shuffle0.
     rewrite Rmult_assoc, Rmult_shuffle0.
-    rewrite <- Rmult_assoc; f_equal.
-    rewrite Rmult_shuffle0; f_equal.
-    apply sqrt_sqrt, Rplus_le_le_0_compat; apply Rle_0_1.
+    rewrite <- Rmult_assoc, Rmult_shuffle0.
+    do 2 f_equal.
+    rewrite Rmult_assoc, sqrt_sqrt; [ ring | ].
+    apply Rplus_le_le_0_compat; apply Rle_0_1.
 
    rewrite plus_IZR, mult_IZR; simpl.
    field; apply pow_nonzero.
