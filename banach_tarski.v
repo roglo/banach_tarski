@@ -603,7 +603,7 @@ Definition rot_inv_z := mkmat
   (-2*√2/3) (1/3) 0
   0 0 1.
 
-Definition rotate pt e :=
+Definition rotate e pt :=
   match e with
   | E la false => mat_vec_mul rot_x pt
   | E la true => mat_vec_mul rot_inv_x pt
@@ -611,7 +611,7 @@ Definition rotate pt e :=
   | E lb true => mat_vec_mul rot_inv_z pt
   end.
 
-Definition map_rotate s pt := List.fold_left rotate (str s) pt.
+Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
 Theorem map_1_0_0 : ∀ s,
   ∃ (a b c : ℤ) (N : ℕ),
@@ -628,7 +628,18 @@ induction el as [| e].
  rewrite Rmult_0_l; reflexivity.
 
  destruct IHel as (a, (b, (c, (N, H)))).
-
+ unfold map_rotate; simpl.
+ unfold map_rotate in H; simpl in H.
+ rewrite H.
+ destruct e as (x, d).
+ destruct x.
+  destruct d.
+  simpl.
+  rewrite Rmult_1_l.
+  do 3 rewrite Rmult_0_l.
+  do 2 rewrite Rplus_0_r.
+  do 2 rewrite Rplus_0_l.
+  exists a.
 bbb.
 
 End Rotation.
