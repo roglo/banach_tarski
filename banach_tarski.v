@@ -621,13 +621,10 @@ Definition rotate e pt :=
 Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
 Definition map_rotate_1_0_0 s :=
-  let '(a, b, c, N) :=
-    match str s with
-    | [] => (1%Z, 0%Z, 0%Z, 0)
-    | _ :: _ => (1%Z, 0%Z, 0%Z, 0) (* to be completed *)
-    end
-  in
-  P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+  match str s with
+  | [] => (1%Z, 0%Z, 0%Z, 0)
+  | _ :: _ => (1%Z, 0%Z, 0%Z, 42) (* to be completed *)
+  end.
 
 Theorem map_1_0_0 : ∀ s,
   ∃ (a b c : ℤ) (N : ℕ),
