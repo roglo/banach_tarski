@@ -555,9 +555,7 @@ Require Import Reals.
 
 Section Rotation.
 
-(*
 Notation "s = '∅'" := (empty s) (at level 70).
-*)
 Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
   (at level 70, format "s  '∈'  Ṣ ( x )").
 Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
@@ -650,6 +648,16 @@ simpl; rewrite <- H.
 reflexivity.
 Qed.
 
+Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
+  (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
+Proof.
+intros a b c d Hb.
+rewrite Rmult_comm, <- Rmult_assoc; f_equal.
+rewrite <- Rmult_assoc; f_equal.
+rewrite Rmult_comm, Rmult_assoc; f_equal.
+apply sqrt_sqrt; assumption.
+Qed.
+
 Theorem map_1_0_0 : ∀ s a b c N,
   (a, b, c, N) = map_rotate_1_0_0 (str s)
   → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
@@ -694,15 +702,10 @@ induction el as [| (x, d)]; intros; simpl.
 
    rewrite plus_IZR, mult_IZR; simpl.
    do 3 rewrite <- Rmult_assoc.
-   replace (2 * √ 2 * / 3 * IZR b * √ 2)%R with (4 * / 3 * IZR b)%R.
+   rewrite Rmult5_sqrt2_sqrt5.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-    symmetry; rewrite Rmult_shuffle0.
-    rewrite Rmult_assoc, Rmult_shuffle0.
-    rewrite <- Rmult_assoc, Rmult_shuffle0.
-    do 2 f_equal.
-    rewrite Rmult_assoc, sqrt_sqrt; [ ring | ].
     apply Rplus_le_le_0_compat; apply Rle_0_1.
 
   injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
@@ -717,30 +720,20 @@ induction el as [| (x, d)]; intros; simpl.
 
    rewrite plus_IZR, mult_IZR; simpl.
    do 3 rewrite <- Rmult_assoc.
-   replace (- 2 * √ 2 * / 3 * IZR b * √ 2)%R with (- 4 * / 3 * IZR b)%R.
+   rewrite Rmult5_sqrt2_sqrt5.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-    symmetry; rewrite Rmult_shuffle0.
-    rewrite Rmult_assoc, Rmult_shuffle0.
-    rewrite <- Rmult_assoc, Rmult_shuffle0.
-    do 2 f_equal.
-    rewrite Rmult_assoc, sqrt_sqrt; [ ring | ].
     apply Rplus_le_le_0_compat; apply Rle_0_1.
 
   injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
   f_equal.
    rewrite minus_IZR, mult_IZR; simpl.
    do 3 rewrite <- Rmult_assoc.
-   replace (- 2 * √ 2 * / 3 * IZR b * √ 2)%R with (- 4 * / 3 * IZR b)%R.
+   rewrite Rmult5_sqrt2_sqrt5.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-    symmetry; rewrite Rmult_shuffle0.
-    rewrite Rmult_assoc, Rmult_shuffle0.
-    rewrite <- Rmult_assoc, Rmult_shuffle0.
-    do 2 f_equal.
-    rewrite Rmult_assoc, sqrt_sqrt; [ ring | ].
     apply Rplus_le_le_0_compat; apply Rle_0_1.
 
    rewrite plus_IZR, mult_IZR; simpl.
@@ -755,15 +748,10 @@ induction el as [| (x, d)]; intros; simpl.
   f_equal.
    rewrite plus_IZR, mult_IZR; simpl.
    do 3 rewrite <- Rmult_assoc.
-   replace (2 * √ 2 * / 3 * IZR b * √ 2)%R with (4 * / 3 * IZR b)%R.
+   rewrite Rmult5_sqrt2_sqrt5.
     field; apply pow_nonzero.
     apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-    symmetry; rewrite Rmult_shuffle0.
-    rewrite Rmult_assoc, Rmult_shuffle0.
-    rewrite <- Rmult_assoc, Rmult_shuffle0.
-    do 2 f_equal.
-    rewrite Rmult_assoc, sqrt_sqrt; [ ring | ].
     apply Rplus_le_le_0_compat; apply Rle_0_1.
 
    rewrite plus_IZR, mult_IZR; simpl.
@@ -785,5 +773,7 @@ destruct m as (((a, b), c), N).
 exists a, b, c, N.
 apply map_1_0_0; assumption.
 Qed.
+
+Check map_1_0_0.
 
 End Rotation.
