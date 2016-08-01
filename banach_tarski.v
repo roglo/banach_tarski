@@ -620,11 +620,11 @@ Definition rotate e pt :=
 
 Definition map_rotate s pt := List.fold_right rotate pt (str s).
 
-Fixpoint map_rotate_1_0_0 el :=
+Fixpoint rotate_1_0_0_param_of_list el :=
   match el with
   | [] => (1%Z, 0%Z, 0%Z, 0)
   | e₁ :: el₁ =>
-      let '(a, b, c, N) := map_rotate_1_0_0 el₁ in
+      let '(a, b, c, N) := rotate_1_0_0_param_of_list el₁ in
       match e₁ with
       | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
       | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
@@ -633,9 +633,11 @@ Fixpoint map_rotate_1_0_0 el :=
       end
   end.
 
-Theorem map_rotate_1_0_0_cons : ∀ e el a b c N,
-  (a, b, c, N) = map_rotate_1_0_0 el
-  → map_rotate_1_0_0 (e :: el) =
+Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
+
+Theorem rotate_1_0_0_param_cons : ∀ e el a b c N,
+  (a, b, c, N) = rotate_1_0_0_param_of_list el
+  → rotate_1_0_0_param_of_list (e :: el) =
     match e with
     | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
     | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
@@ -659,11 +661,11 @@ apply sqrt_sqrt; assumption.
 Qed.
 
 Theorem map_1_0_0 : ∀ s a b c N,
-  (a, b, c, N) = map_rotate_1_0_0 (str s)
+  (a, b, c, N) = rotate_1_0_0_param s
   → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
 intros (el) a₁ b₁ c₁ N₁ Hr.
-simpl in Hr.
+unfold rotate_1_0_0_param in Hr; simpl in Hr.
 revert a₁ b₁ c₁ N₁ Hr.
 induction el as [| (x, d)]; intros; simpl.
  simpl in Hr; unfold map_rotate.
@@ -672,7 +674,7 @@ induction el as [| (x, d)]; intros; simpl.
  do 3 rewrite Rmult_1_r.
  rewrite Rmult_0_l; reflexivity.
 
- remember (map_rotate_1_0_0 el) as mr eqn:Hmr.
+ remember (rotate_1_0_0_param_of_list el) as mr eqn:Hmr.
  destruct mr as (((a, b), c), N).
  pose proof IHel a b c N (eq_refl _) as H.
  unfold map_rotate in H; unfold map_rotate.
@@ -683,7 +685,7 @@ induction el as [| (x, d)]; intros; simpl.
  do 3 rewrite Rmult_0_l.
  do 7 rewrite Rplus_0_r.
  do 4 rewrite Rplus_0_l.
- erewrite map_rotate_1_0_0_cons in Hr; [ | eassumption ].
+ erewrite rotate_1_0_0_param_cons in Hr; [ | eassumption ].
  remember 2%Z as two.
  remember 3%Z as three.
  remember 4%Z as four.
@@ -768,7 +770,7 @@ Theorem ex_map_1_0_0 : ∀ s,
   map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
 intros s.
-remember (map_rotate_1_0_0 (str s)) as m eqn:Hm.
+remember (rotate_1_0_0_param s) as m eqn:Hm.
 destruct m as (((a, b), c), N).
 exists a, b, c, N.
 apply map_1_0_0; assumption.
