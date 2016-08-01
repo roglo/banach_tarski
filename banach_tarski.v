@@ -781,6 +781,41 @@ Qed.
 
 Check map_1_0_0.
 
+Check rotate.
+
+Definition map_rotate' s pt :=
+  List.fold_left (λ pt e, rotate e pt) (str s) pt.
+
+Theorem ex_map_1_0_0' : ∀ s,
+  ∃ (a b c : ℤ) (N : ℕ),
+  map_rotate' s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+Proof.
+intros (el).
+induction el as [| (x, d)].
+ unfold map_rotate'; simpl.
+ exists 1%Z, 0%Z, 0%Z, 0; simpl.
+ unfold Rdiv; rewrite Rinv_1.
+ rewrite Rmult_1_l.
+ do 2 rewrite Rmult_0_l.
+ reflexivity.
+
+ destruct IHel as (a, (b, (c, (N, IHel)))).
+ unfold map_rotate' in IHel; simpl in IHel.
+ unfold map_rotate'; simpl.
+ unfold Rdiv.
+ do 3 rewrite Rmult_1_l.
+ do 2 rewrite Rmult_0_l.
+ do 8 rewrite Rplus_0_r.
+ do 3 rewrite Rplus_0_l.
+ do 3 rewrite Rmult_0_r.
+ do 4 rewrite Rplus_0_r.
+ do 3 rewrite Rmult_1_r.
+ destruct x, d.
+  rewrite IHel; exists a, b, c, N; reflexivity.
+
+  rewrite IHel; exists a, b, c, N; reflexivity.
+bbb.
+
 (*
 mod 3:
 0 b+2c 2b+c
