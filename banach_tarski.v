@@ -839,7 +839,23 @@ induction el as [| e]; intros.
  unfold rotate_1_0_0_param in H.
  unfold rotate_1_0_0_param in IHel.
  remember rotate_1_0_0_param_of_list as f; simpl in IHel, H; subst f.
-Check rotate_1_0_0_param_cons.
+ remember (rotate_1_0_0_param_of_list el) as rp eqn:Hrp.
+ destruct rp as (((a₁, b₁), c₁), N₁).
+ pose proof rotate_1_0_0_param_cons ḅ as H₁.
+bbb.
+ pose proof rotate_1_0_0_param_cons e el a₁ b₁ c₁ N₁ Hrp as H₁.
+ remember 2%Z as two.
+ remember 3%Z as three.
+ remember 4%Z as four.
+ remember (-2)%Z as mtwo.
+ remember (-4)%Z as mfour.
+ destruct e as (x, d).
+ destruct x, d.
+  simpl in H₁.
+  rewrite <- Hrp in H₁.
+  injection H₁; clear H₁; intros H₁ H₂ H₃.
+
+
 bbb.
 
 End Rotation.
