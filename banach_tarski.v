@@ -781,4 +781,36 @@ Qed.
 
 Check map_1_0_0.
 
+(*
+mod 3:
+0 b+2c 2b+c
+0 b+c b+c
+a+b a+b 0
+a+2b 2a+b 0
+*)
+
+(* they say... *)
+Theorem toto : ∀ s a b c N,
+  (a, b, c, N) = rotate_1_0_0_param s
+  → b ≠ 0%Z.
+Proof.
+intros (el) a b c N H.
+unfold rotate_1_0_0_param in H; simpl in H.
+revert a b c N H.
+induction el as [| (x, d)]; intros.
+ simpl in H.
+Focus 2.
+ remember (rotate_1_0_0_param_of_list el) as rp eqn:Hrp. 
+ destruct rp as (((a₁, b₁), c₁), N₁).
+ pose proof IHel a₁ b₁ c₁ N₁ (eq_refl _) as H₁.
+ erewrite rotate_1_0_0_param_cons in H; [ | eassumption ].
+ remember 2%Z as two.
+ remember 3%Z as three.
+ remember 4%Z as four.
+ remember (-2)%Z as mtwo.
+ remember (-4)%Z as mfour.
+ destruct x, d; injection H; clear H; intros; subst.
+  intros H; apply H₁; clear H₁.
+bbb.
+
 End Rotation.
