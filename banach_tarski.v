@@ -828,13 +828,14 @@ induction el as [| e]; intros.
  injection H; intros; subst b.
  intros H₁; discriminate H₁.
 
- rewrite <- app_comm_cons in H.
- simpl in H.
+ rewrite <- app_comm_cons in H; simpl in H.
  remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp.
  destruct rp as (((a₁, b₁), c₁), N₁).
+ pose proof IHel _ _ _ _ (eq_refl _) as Hb.
  destruct e as (x, d).
  destruct x, d.
   injection H; clear H; intros; subst a b c N.
+  intros H; apply Hb; clear Hb.
 bbb.
 
 Theorem toto : ∀ s a b c N,
