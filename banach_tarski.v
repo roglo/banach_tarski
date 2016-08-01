@@ -671,7 +671,7 @@ apply sqrt_sqrt; assumption.
 Qed.
 
 Theorem map_1_0_0 : ∀ s a b c N,
-  (a, b, c, N) = rotate_1_0_0_param s
+  rotate_1_0_0_param s = (a, b, c, N)
   → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
 intros (el) a₁ b₁ c₁ N₁ Hr.
@@ -774,12 +774,14 @@ intros s.
 remember (rotate_1_0_0_param s) as m eqn:Hm.
 destruct m as (((a, b), c), N).
 exists a, b, c, N.
-apply map_1_0_0; assumption.
+apply map_1_0_0; symmetry; assumption.
 Qed.
 
 Check map_1_0_0.
 
 Print rotate_1_0_0_param_of_list.
+
+Inspect 5.
 
 bbb.
 
