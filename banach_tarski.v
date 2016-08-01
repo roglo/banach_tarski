@@ -560,6 +560,9 @@ End Free_Group.
 
 Require Import Reals.
 
+Arguments Z.mul x y : simpl nomatch.
+(* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
+
 Section Rotation.
 
 Notation "s = '∅'" := (empty s) (at level 70).
@@ -693,11 +696,6 @@ induction el as [| (x, d)]; intros; simpl.
  do 7 rewrite Rplus_0_r.
  do 4 rewrite Rplus_0_l.
  erewrite rotate_1_0_0_param_cons in Hr; [ | eassumption ].
- remember 2%Z as two.
- remember 3%Z as three.
- remember 4%Z as four.
- remember (-2)%Z as mtwo.
- remember (-4)%Z as mfour.
  destruct x, d; injection Hr; intros; subst.
   f_equal.
    rewrite mult_IZR; simpl.
@@ -816,15 +814,29 @@ induction el as [| (x, d)].
   rewrite IHel; exists a, b, c, N; reflexivity.
 Abort. (* to be completed, perhaps *)
 
-(*
-mod 3:
-0 b+2c 2b+c
-0 b+c b+c
-a+b a+b 0
-a+2b 2a+b 0
-*)
-
 (* they say... *)
+Theorem toto : ∀ s a b c N,
+  (a, b, c, N) = rotate_1_0_0_param (mkF₂ (str s ++ [ḅ]))
+  → b ≠ 0%Z.
+Proof.
+intros (el) a b c N H.
+unfold rotate_1_0_0_param in H.
+simpl in H.
+revert a b c N H.
+induction el as [| e]; intros.
+ simpl in H.
+ injection H; intros; subst b.
+ intros H₁; discriminate H₁.
+
+ rewrite <- app_comm_cons in H.
+ simpl in H.
+ remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp.
+ destruct rp as (((a₁, b₁), c₁), N₁).
+ destruct e as (x, d).
+ destruct x, d.
+  injection H; clear H; intros; subst a b c N.
+bbb.
+
 Theorem toto : ∀ s a b c N,
   (a, b, c, N) = rotate_1_0_0_param (mkF₂ (ḅ :: str s))
   → b ≠ 0%Z.
@@ -841,15 +853,7 @@ induction el as [| e]; intros.
  remember rotate_1_0_0_param_of_list as f; simpl in IHel, H; subst f.
  remember (rotate_1_0_0_param_of_list el) as rp eqn:Hrp.
  destruct rp as (((a₁, b₁), c₁), N₁).
-(*
- pose proof rotate_1_0_0_param_cons ḅ el _ _ _ _ Hrp as H₁.
- remember 2%Z as two.
- remember 3%Z as three.
- remember 4%Z as four.
- remember (-2)%Z as mtwo.
- remember (-4)%Z as mfour.
- remember (ḅ :: el) as el'; simpl in H₁; subst.
-*)
+bbb.
  pose proof rotate_1_0_0_param_cons e el a₁ b₁ c₁ N₁ Hrp as H₁.
  remember 2%Z as two.
  remember 3%Z as three.
