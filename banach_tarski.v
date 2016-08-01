@@ -1,3 +1,6 @@
+(* Banach-Tarski paradox *)
+(* pen-and-paper proof borrowed at wikipedia *)
+
 Require Import Utf8.
 Require Import List.
 Import ListNotations.
@@ -19,6 +22,8 @@ Proof.
 intros.
 destruct H; [ left | right ]; destruct H; assumption.
 Qed.
+
+(* Step 1 *)
 
 Section Free_Group.
 
@@ -550,6 +555,8 @@ Theorem decomposed_2_b : ∀ s, s ∈ ḅ Ṣ(ḅ⁻¹) ⊕ s ∈ Ṣ(ḅ) .
 Proof. intros; apply decomposed_2. Qed.
 
 End Free_Group.
+
+(* Step 2 *)
 
 Require Import Reals.
 
