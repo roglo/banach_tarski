@@ -831,9 +831,15 @@ Theorem toto : ∀ s a b c N,
 Proof.
 intros (el) a b c N H; simpl in H.
 revert a b c N H.
-induction el as [| (x, d)]; intros.
+induction el as [| e]; intros.
  unfold rotate_1_0_0_param in H; simpl in H.
  injection H; intros; subst b.
+ intros H₁; discriminate H₁.
+
+ unfold rotate_1_0_0_param in H.
+ unfold rotate_1_0_0_param in IHel.
+ remember rotate_1_0_0_param_of_list as f; simpl in IHel, H; subst f.
+Check rotate_1_0_0_param_cons.
 bbb.
 
 End Rotation.
