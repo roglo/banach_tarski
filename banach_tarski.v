@@ -779,7 +779,9 @@ Qed.
 
 Check map_1_0_0.
 
-Check rotate.
+Print rotate_1_0_0_param_of_list.
+
+bbb.
 
 Definition map_rotate' s pt :=
   List.fold_left (λ pt e, rotate e pt) (str s) pt.
