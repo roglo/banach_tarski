@@ -1,5 +1,5 @@
-(* Banach-Tarski paradox *)
-(* pen-and-paper proof borrowed at wikipedia *)
+(* Banach-Tarski paradox. *)
+(* translated in coq from wikipedia pen-and-paper proof *)
 
 Require Import Utf8.
 Require Import List.
