@@ -836,6 +836,22 @@ induction el as [| e]; intros.
  destruct x, d.
   injection H; clear H; intros; subst a b c N.
   intros H; apply Hb; clear Hb.
+
+clear IHel.
+revert a₁ b₁ c₁ N₁ Hrp H.
+induction el as [| e]; intros.
+ simpl in Hrp.
+ injection Hrp; clear Hrp; intros; subst.
+ discriminate H.
+
+ simpl in Hrp.
+ remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp₁ eqn:Hrp₁.
+ destruct rp₁ as (((a₂, b₂), c₂), N₂).
+ pose proof IHel _ _ _ _ (eq_refl _) as H₁.
+ destruct e as (x, d).
+ destruct x, d.
+ injection Hrp; clear Hrp; intros; subst.
+
 bbb.
 
 Theorem toto : ∀ s a b c N,
