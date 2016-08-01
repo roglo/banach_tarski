@@ -698,8 +698,7 @@ induction el as [| (x, d)]; intros; simpl.
  remember 4%Z as four.
  remember (-2)%Z as mtwo.
  remember (-4)%Z as mfour.
- destruct x, d.
-  injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
+ destruct x, d; injection Hr; intros; subst.
   f_equal.
    rewrite mult_IZR; simpl.
    field; apply pow_nonzero.
@@ -717,7 +716,6 @@ induction el as [| (x, d)]; intros; simpl.
 
     apply Rplus_le_le_0_compat; apply Rle_0_1.
 
-  injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
   f_equal.
    rewrite mult_IZR; simpl.
    field; apply pow_nonzero.
@@ -735,7 +733,6 @@ induction el as [| (x, d)]; intros; simpl.
 
     apply Rplus_le_le_0_compat; apply Rle_0_1.
 
-  injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
   f_equal.
    rewrite minus_IZR, mult_IZR; simpl.
    do 3 rewrite <- Rmult_assoc.
@@ -753,7 +750,6 @@ induction el as [| (x, d)]; intros; simpl.
    field; apply pow_nonzero.
    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
 
-  injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ two three four mtwo mfour.
   f_equal.
    rewrite plus_IZR, mult_IZR; simpl.
    do 3 rewrite <- Rmult_assoc.
