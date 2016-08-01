@@ -814,7 +814,7 @@ induction el as [| (x, d)].
   rewrite IHel; exists a, b, c, N; reflexivity.
 
   rewrite IHel; exists a, b, c, N; reflexivity.
-bbb.
+Abort. (* to be completed, perhaps *)
 
 (*
 mod 3:
@@ -826,26 +826,14 @@ a+2b 2a+b 0
 
 (* they say... *)
 Theorem toto : ∀ s a b c N,
-  (a, b, c, N) = rotate_1_0_0_param s
+  (a, b, c, N) = rotate_1_0_0_param (mkF₂ (ḅ :: str s))
   → b ≠ 0%Z.
 Proof.
-intros (el) a b c N H.
-unfold rotate_1_0_0_param in H; simpl in H.
+intros (el) a b c N H; simpl in H.
 revert a b c N H.
 induction el as [| (x, d)]; intros.
- simpl in H.
-Focus 2.
- remember (rotate_1_0_0_param_of_list el) as rp eqn:Hrp. 
- destruct rp as (((a₁, b₁), c₁), N₁).
- pose proof IHel a₁ b₁ c₁ N₁ (eq_refl _) as H₁.
- erewrite rotate_1_0_0_param_cons in H; [ | eassumption ].
- remember 2%Z as two.
- remember 3%Z as three.
- remember 4%Z as four.
- remember (-2)%Z as mtwo.
- remember (-4)%Z as mfour.
- destruct x, d; injection H; clear H; intros; subst.
-  intros H; apply H₁; clear H₁.
+ unfold rotate_1_0_0_param in H; simpl in H.
+ injection H; intros; subst b.
 bbb.
 
 End Rotation.
