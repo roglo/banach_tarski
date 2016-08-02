@@ -655,6 +655,19 @@ Fixpoint rotate_1_0_0_param_of_list el :=
 
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
 
+Fixpoint rotate_1_0_0_param_of_list_mod_3 el :=
+  match el with
+  | [] => (1%Z, 0%Z, 0%Z, 0)
+  | e₁ :: el₁ =>
+      let '(a, b, c, N) := rotate_1_0_0_param_of_list_mod_3 el₁ in
+      match e₁ with
+      | ạ => (0%Z, (b + 2 * c)%Z, (2 * b + c)%Z, S N)
+      | ạ⁻¹ => (0%Z, (b + c)%Z, (b + c)%Z, S N)
+      | ḅ => ((a + b)%Z, (a + b)%Z, 0%Z, S N)
+      | ḅ⁻¹ => ((a + 2 * b)%Z, (2 * a + b)%Z, 0%Z, S N)
+      end
+  end.
+
 Theorem map_1_0_0 : ∀ s a b c N,
   rotate_1_0_0_param s = (a, b, c, N)
   → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
@@ -763,6 +776,52 @@ apply map_1_0_0; symmetry; assumption.
 Qed.
 
 Check map_1_0_0.
+
+Theorem b_neq_0 : ∀ el a b c N,
+  rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
+  → b ≠ 0%Z.
+Proof.
+(*
+induction el as [| e ] using rev_ind; intros; [ discriminate Hr | ].
+*)
+intros el a b c N Hr Hb; subst b.
+destruct el as [| (t₁, d₁)]; [ discriminate Hr | simpl in Hr ].
+remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp.
+symmetry in Hrp.
+destruct rp as (((a₁, b₁), c₁), N₁).
+destruct t₁, d₁.
+ injection Hr; clear Hr; intros H₁ H₂ H₃ H₄; subst.
+ apply -> Z.sub_move_0_r in H₃; subst b₁.
+ destruct el as [| e₁]; simpl in Hrp.
+  injection Hrp; clear Hrp; intros; subst; discriminate.
+
+bbb.
+
+
+revert a c N Hr.
+induction el as [| e]; intros; [ discriminate Hr | simpl in Hr ].
+remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp.
+symmetry in Hrp.
+destruct rp as (((a₁, b₁), c₁), N₁).
+destruct e as (t, d).
+destruct t, d.
+ injection Hr; clear Hr; intros H₁ H₂ H₃ H₄; subst.
+ apply -> Z.sub_move_0_r in H₃; subst b₁.
+ destruct el as [| e].
+  simpl in Hrp.
+  injection Hrp; clear Hrp; intros H₁ H₂ H₃ H₄; subst.
+  discriminate H₃.
+
+  simpl in Hrp.
+  revert Hrp; clear; intros.
+  revert e a₁ c₁ N₁ Hrp.
+  induction el as [| e₁]; intros.
+   simpl in Hrp.
+   destruct e as (t, d).
+   destruct t, d.
+    injection Hrp; clear Hrp; intros; subst; discriminate.
+    injection Hrp; clear Hrp; intros; subst; discriminate.
+    injection Hrp; clear Hrp; intros; subst.
 
 bbb.
 
