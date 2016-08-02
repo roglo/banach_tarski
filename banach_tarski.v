@@ -560,8 +560,24 @@ End Free_Group.
 
 Require Import Reals.
 
+Notation "'ℝ'" := R.
+Notation "'ℤ'" := Z.
+Notation "'ℕ'" := nat.
+
+Notation "'√'" := sqrt.
+
 Arguments Z.mul x y : simpl nomatch.
 (* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
+
+Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
+  (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
+Proof.
+intros a b c d Hb.
+rewrite Rmult_comm, <- Rmult_assoc; f_equal.
+rewrite <- Rmult_assoc; f_equal.
+rewrite Rmult_comm, Rmult_assoc; f_equal.
+apply sqrt_sqrt; assumption.
+Qed.
 
 Section Rotation.
 
@@ -578,10 +594,6 @@ Notation "'ḅ⁻¹'" := (E lb true).
 Check decomposed_4.
 Check decomposed_2_a.
 Check decomposed_2_b.
-
-Notation "'ℝ'" := R.
-Notation "'ℤ'" := Z.
-Notation "'ℕ'" := nat.
 
 Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
 Proof.
@@ -600,8 +612,6 @@ Definition mat_vec_mul mat '(P x y z) :=
   P (a₁₁ mat * x + a₂₁ mat * y + a₃₁ mat * z)
     (a₁₂ mat * x + a₂₂ mat * y + a₃₂ mat * z)
     (a₁₃ mat * x + a₂₃ mat * y + a₃₃ mat * z).
-
-Notation "'√'" := sqrt.
 
 Definition rot_x := mkmat
   1         0         0
@@ -658,16 +668,6 @@ Proof.
 intros e el a b c N H.
 simpl; rewrite <- H.
 reflexivity.
-Qed.
-
-Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
-  (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
-Proof.
-intros a b c d Hb.
-rewrite Rmult_comm, <- Rmult_assoc; f_equal.
-rewrite <- Rmult_assoc; f_equal.
-rewrite Rmult_comm, Rmult_assoc; f_equal.
-apply sqrt_sqrt; assumption.
 Qed.
 
 Theorem map_1_0_0 : ∀ s a b c N,
@@ -778,10 +778,6 @@ apply map_1_0_0; symmetry; assumption.
 Qed.
 
 Check map_1_0_0.
-
-Print rotate_1_0_0_param_of_list.
-
-Inspect 5.
 
 bbb.
 
