@@ -292,6 +292,7 @@ Definition start_with x s :=
   end.
 
 Notation "s = '∅'" := (empty s) (at level 70).
+Notation "s ≠ '∅'" := (¬ empty s) (at level 70).
 Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
   (at level 70, format "s  '∈'  Ṣ ( x )").
 
@@ -582,6 +583,7 @@ Qed.
 Section Rotation.
 
 Notation "s = '∅'" := (empty s) (at level 70).
+Notation "s ≠ '∅'" := (¬ empty s) (at level 70).
 Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
   (at level 70, format "s  '∈'  Ṣ ( x )").
 Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
@@ -654,19 +656,6 @@ Fixpoint rotate_1_0_0_param_of_list el :=
   end.
 
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
-
-Fixpoint rotate_1_0_0_param_of_list_mod_3 el :=
-  match el with
-  | [] => (1%Z, 0%Z, 0%Z, 0)
-  | e₁ :: el₁ =>
-      let '(a, b, c, N) := rotate_1_0_0_param_of_list_mod_3 el₁ in
-      match e₁ with
-      | ạ => (0%Z, (b + 2 * c)%Z, (2 * b + c)%Z, S N)
-      | ạ⁻¹ => (0%Z, (b + c)%Z, (b + c)%Z, S N)
-      | ḅ => ((a + b)%Z, (a + b)%Z, 0%Z, S N)
-      | ḅ⁻¹ => ((a + 2 * b)%Z, (2 * a + b)%Z, 0%Z, S N)
-      end
-  end.
 
 Theorem map_1_0_0 : ∀ s a b c N,
   rotate_1_0_0_param s = (a, b, c, N)
@@ -776,6 +765,19 @@ apply map_1_0_0; symmetry; assumption.
 Qed.
 
 Check map_1_0_0.
+
+Theorem toto : ∀ s, s ≠ ∅ → map_rotate s (P 1 0 0) ≠ P 1 0 0.
+Proof.
+intros s Hs Hr; apply Hs; clear Hs.
+destruct s as (el).
+unfold map_rotate in Hr; simpl in Hr.
+unfold empty; simpl.
+induction el as [| e]; [ reflexivity | ].
+simpl in Hr.
+remember (fold_right rotate (P 1 0 0) el) as r₁ eqn:Hr₁.
+symmetry in Hr₁.
+simpl.
+bbb.
 
 Theorem b_neq_0 : ∀ el a b c N,
   rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
