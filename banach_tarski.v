@@ -792,9 +792,23 @@ destruct rp as (((a₁, b₁), c₁), N₁).
 destruct t₁, d₁.
  injection Hr; clear Hr; intros H₁ H₂ H₃ H₄; subst.
  apply -> Z.sub_move_0_r in H₃; subst b₁.
- destruct el as [| e₁]; simpl in Hrp.
+ destruct el as [| (t₁, d₁)]; simpl in Hrp.
   injection Hrp; clear Hrp; intros; subst; discriminate.
 
+  remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp₁.
+  symmetry in Hrp₁.
+  destruct rp as (((a₂, b₂), c₂), N₂).
+  destruct t₁, d₁.
+   injection Hrp; clear Hrp; intros H₁ H₂ H₃ H₄; subst.
+   rewrite Z.mul_add_distr_l in H₃.
+   rewrite Z.mul_assoc in H₃; simpl in H₃.
+   apply -> Z.sub_move_r in H₃.
+   rewrite <- Z.add_assoc, Z.add_diag, Z.mul_assoc in H₃; simpl in H₃.
+   apply Z.sub_cancel_r with (p := b₂) in H₃.
+   rewrite Z.sub_diag in H₃; symmetry in H₃.
+   rewrite Z.add_sub_swap in H₃.
+   replace b₂ with (1 * b₂)%Z in H₃ at 2 by apply Z.mul_1_l.
+   rewrite <- Z.mul_sub_distr_r in H₃; simpl in H₃.
 bbb.
 
 
