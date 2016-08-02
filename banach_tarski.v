@@ -655,21 +655,6 @@ Fixpoint rotate_1_0_0_param_of_list el :=
 
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
 
-Theorem rotate_1_0_0_param_cons : ∀ e el a b c N,
-  (a, b, c, N) = rotate_1_0_0_param_of_list el
-  → rotate_1_0_0_param_of_list (e :: el) =
-    match e with
-    | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
-    | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
-    | ḅ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
-    | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
-    end.
-Proof.
-intros e el a b c N H.
-simpl; rewrite <- H.
-reflexivity.
-Qed.
-
 Theorem map_1_0_0 : ∀ s a b c N,
   rotate_1_0_0_param s = (a, b, c, N)
   → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
@@ -695,7 +680,7 @@ induction el as [| (x, d)]; intros; simpl.
  do 3 rewrite Rmult_0_l.
  do 7 rewrite Rplus_0_r.
  do 4 rewrite Rplus_0_l.
- erewrite rotate_1_0_0_param_cons in Hr; [ | eassumption ].
+ simpl in Hr; rewrite <- Hmr in Hr.
  destruct x, d; injection Hr; intros; subst.
   f_equal.
    rewrite mult_IZR; simpl.
