@@ -809,6 +809,9 @@ destruct t₁, d₁.
    rewrite Z.add_sub_swap in H₃.
    replace b₂ with (1 * b₂)%Z in H₃ at 2 by apply Z.mul_1_l.
    rewrite <- Z.mul_sub_distr_r in H₃; simpl in H₃.
+Focus 2.
+   injection Hrp; clear Hrp; intros H₁ H₂ H₃ H₄; subst.
+   assert (H : b₂ = 0%Z).
 bbb.
 
 
