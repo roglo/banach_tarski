@@ -655,6 +655,16 @@ Fixpoint rotate_1_0_0_param_of_list el :=
       end
   end.
 
+Compute (rotate_1_0_0_param_of_list [ḅ]).
+Compute (rotate_1_0_0_param_of_list [ạ; ḅ]).
+Compute (rotate_1_0_0_param_of_list [ạ⁻¹; ḅ]).
+Compute (rotate_1_0_0_param_of_list [ḅ; ḅ]).
+Compute (rotate_1_0_0_param_of_list [ạ; ạ; ḅ]).
+Compute (rotate_1_0_0_param_of_list [ḅ; ạ; ḅ]).
+Compute (rotate_1_0_0_param_of_list [ḅ⁻¹; ạ; ḅ]).
+
+bbb.
+
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
 
 Theorem map_1_0_0 : ∀ s a b c N,
