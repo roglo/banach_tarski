@@ -766,17 +766,22 @@ Qed.
 
 Check map_1_0_0.
 
-Theorem toto : ∀ s, s ≠ ∅ → map_rotate s (P 1 0 0) ≠ P 1 0 0.
+Theorem toto : ∀ s, s ≠ ∅ → map_rotate (norm s) (P 1 0 0) ≠ P 1 0 0.
 Proof.
 intros s Hs Hr; apply Hs; clear Hs.
 destruct s as (el).
+unfold norm in Hr; simpl in Hr.
 unfold map_rotate in Hr; simpl in Hr.
 unfold empty; simpl.
-induction el as [| e]; [ reflexivity | ].
-simpl in Hr.
-remember (fold_right rotate (P 1 0 0) el) as r₁ eqn:Hr₁.
+remember (norm_list el) as el₁ eqn:Hel; symmetry in Hel.
+revert el Hel.
+induction el₁ as [| e]; intros; [ reflexivity | ].
+exfalso; simpl in Hr.
+remember (fold_right rotate (P 1 0 0) el₁) as r₁ eqn:Hr₁.
 symmetry in Hr₁.
-simpl.
+destruct e as (t, d).
+destruct t, d; simpl in Hr.
+
 Abort. (* à voir... *)
 
 Theorem b_neq_0 : ∀ el a b c N,
