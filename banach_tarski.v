@@ -773,8 +773,42 @@ Theorem toto : ∀ el a b c N,
   → b ≠ 0%Z.
 Proof.
 intros el a b c N Hr Hb.
+destruct el as [| (t, d)]; [ subst b; discriminate | ].
+simpl in Hr.
+remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp.
+symmetry in Hrp.
+destruct rp as (((a₁, b₁), c₁), N₁).
+destruct t, d.
+ injection Hr; clear Hr; intros H₁ H₂ Hbc H₃; subst.
+ apply -> Z.sub_move_0_r in Hbc.
+ destruct el as [| (t, d)].
+  simpl in Hrp; subst b₁.
+  injection Hrp; clear Hrp; intros H₁ H₂ H H₄; subst.
+  rewrite Z.mul_0_r in H; discriminate H.
+
+  simpl in Hrp.
+  remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp₁.
+  symmetry in Hrp₁.
+  destruct rp as (((a, b), c), N).
+  destruct t, d.
+   subst b₁.
+   injection Hrp; clear Hrp; intros H₁ H₂ Hbc H₃; subst.
+   assert (H : (7 * b + 3 * c = 0)%Z).
+bbb.
+
+intros el a b c N Hr Hb.
 revert a b c N Hr Hb.
 induction el as [| e]; intros; [ subst b; discriminate | ].
+simpl in Hr.
+remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as el₁ eqn:Hel.
+symmetry in Hel.
+destruct el₁ as (((a₁, b₁), c₁), N₁).
+destruct e as (t, d).
+destruct t, d.
+ injection Hr; clear Hr; intros H₁ H₂ Hbc H₃; subst.
+ eapply IHel; [ reflexivity | ].
+ apply -> Z.sub_move_0_r in Hbc.
+Print rotate_1_0_0_param_of_list.
 bbb.
 
 Theorem toto : ∀ s, s ≠ ∅ → map_rotate (norm s) (P 1 0 0) ≠ P 1 0 0.
