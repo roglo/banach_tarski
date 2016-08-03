@@ -777,45 +777,32 @@ simpl in Hr.
 remember (fold_right rotate (P 1 0 0) el) as r₁ eqn:Hr₁.
 symmetry in Hr₁.
 simpl.
-bbb.
+Abort. (* à voir... *)
 
 Theorem b_neq_0 : ∀ el a b c N,
-  rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
+  norm_list el ≠ []
+  → rotate_1_0_0_param_of_list el = (a, b, c, N)
   → b ≠ 0%Z.
 Proof.
-(*
-induction el as [| e ] using rev_ind; intros; [ discriminate Hr | ].
-*)
-intros el a b c N Hr Hb; subst b.
-destruct el as [| (t₁, d₁)]; [ discriminate Hr | simpl in Hr ].
-remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp.
-symmetry in Hrp.
-destruct rp as (((a₁, b₁), c₁), N₁).
-destruct t₁, d₁.
- injection Hr; clear Hr; intros H₁ H₂ H₃ H₄; subst.
- apply -> Z.sub_move_0_r in H₃; subst b₁.
- destruct el as [| (t₁, d₁)]; simpl in Hrp.
-  injection Hrp; clear Hrp; intros; subst; discriminate.
-
-  remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp₁.
-  symmetry in Hrp₁.
-  destruct rp as (((a₂, b₂), c₂), N₂).
-  destruct t₁, d₁.
-   injection Hrp; clear Hrp; intros H₁ H₂ H₃ H₄; subst.
-   rewrite Z.mul_add_distr_l in H₃.
-   rewrite Z.mul_assoc in H₃; simpl in H₃.
-   apply -> Z.sub_move_r in H₃.
-   rewrite <- Z.add_assoc, Z.add_diag, Z.mul_assoc in H₃; simpl in H₃.
-   apply Z.sub_cancel_r with (p := b₂) in H₃.
-   rewrite Z.sub_diag in H₃; symmetry in H₃.
-   rewrite Z.add_sub_swap in H₃.
-   replace b₂ with (1 * b₂)%Z in H₃ at 2 by apply Z.mul_1_l.
-   rewrite <- Z.mul_sub_distr_r in H₃; simpl in H₃.
-Focus 2.
-   injection Hrp; clear Hrp; intros H₁ H₂ H₃ H₄; subst.
-   assert (H : b₂ = 0%Z).
-bbb.
-
+intros el a b c N Hel Hr H; subst b.
+apply Hel; clear Hel.
+revert a c N Hr.
+induction el as [| e]; intros; [ reflexivity | simpl in Hr; simpl ].
+remember (norm_list el) as el₁ eqn:Hel.
+symmetry in Hel.
+destruct el₁ as [| e₁].
+ clear IHel; exfalso.
+ remember (rotate_1_0_0_param_of_list el) as rp eqn:Hrp.
+ symmetry in Hrp.
+ destruct rp as (((a₁, b₁), c₁), N₁).
+ destruct e as (t, d).
+ destruct t, d.
+  injection Hr; clear Hr; intros H₁ H₂ H H₃; subst.
+  apply -> Z.sub_move_0_r in H; subst b₁.
+  revert a₁ c₁ N₁ Hrp.
+  induction el as [| e]; intros.
+   simpl in Hrp.
+bbb. (* this theorem is false *)
 
 revert a c N Hr.
 induction el as [| e]; intros; [ discriminate Hr | simpl in Hr ].
