@@ -801,6 +801,17 @@ destruct t, d.
    rewrite Z.add_sub_swap in Hbc.
    replace b with (1 * b)%Z in Hbc at 2 by apply Z.mul_1_l.
    rewrite <- Z.mul_sub_distr_r in Hbc; simpl in Hbc.
+   revert a b c N Hrp₁ Hbc.
+   induction el as [| (t, d)]; intros.
+    simpl in Hrp₁.
+    injection Hrp₁; clear Hrp₁; intros; subst a b c N.
+    discriminate Hbc.
+    simpl in Hrp₁.
+    remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp.
+    symmetry in Hrp.
+    destruct rp as (((a₁, b₁), c₁), N₁).
+    destruct t, d.
+     injection Hrp₁; clear Hrp₁; intros; subst.
 bbb.
 
 intros el a b c N Hr Hb.
