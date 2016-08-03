@@ -766,6 +766,17 @@ Qed.
 
 Check map_1_0_0.
 
+Compute (rotate_1_0_0_param_of_list [ḅ]).
+
+Theorem toto : ∀ el a b c N,
+  rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
+  → b ≠ 0%Z.
+Proof.
+intros el a b c N Hr Hb.
+revert a b c N Hr Hb.
+induction el as [| e]; intros; [ subst b; discriminate | ].
+bbb.
+
 Theorem toto : ∀ s, s ≠ ∅ → map_rotate (norm s) (P 1 0 0) ≠ P 1 0 0.
 Proof.
 intros s Hs Hr; apply Hs; clear Hs.
@@ -781,6 +792,7 @@ remember (fold_right rotate (P 1 0 0) el₁) as r₁ eqn:Hr₁.
 symmetry in Hr₁.
 destruct e as (t, d).
 destruct t, d; simpl in Hr.
+bbb.
 
 Abort. (* à voir... *)
 
