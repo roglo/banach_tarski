@@ -793,7 +793,14 @@ destruct t, d.
   destruct t, d.
    subst b₁.
    injection Hrp; clear Hrp; intros H₁ H₂ Hbc H₃; subst.
-   assert (H : (7 * b + 3 * c = 0)%Z).
+   apply -> Z.sub_move_r in Hbc.
+   rewrite Z.mul_add_distr_l, <- Z.add_assoc, Z.add_diag in Hbc.
+   do 2 rewrite Z.mul_assoc in Hbc; simpl in Hbc.
+   symmetry in Hbc.
+   apply Z.sub_move_0_r in Hbc.
+   rewrite Z.add_sub_swap in Hbc.
+   replace b with (1 * b)%Z in Hbc at 2 by apply Z.mul_1_l.
+   rewrite <- Z.mul_sub_distr_r in Hbc; simpl in Hbc.
 bbb.
 
 intros el a b c N Hr Hb.
