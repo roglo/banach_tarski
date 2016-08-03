@@ -766,7 +766,9 @@ Qed.
 
 Check map_1_0_0.
 
-Compute (rotate_1_0_0_param_of_list [ḅ]).
+Compute (rotate_1_0_0_param_of_list [ḅ; ạ; ḅ⁻¹; ạ]).
+
+(* norm_list ! *)
 
 Theorem toto : ∀ el a b c N,
   rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
@@ -806,6 +808,7 @@ destruct t, d.
     simpl in Hrp₁.
     injection Hrp₁; clear Hrp₁; intros; subst a b c N.
     discriminate Hbc.
+
     simpl in Hrp₁.
     remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as rp eqn:Hrp.
     symmetry in Hrp.
