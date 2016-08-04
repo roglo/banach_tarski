@@ -656,21 +656,27 @@ Fixpoint rotate_1_0_0_param_of_list el :=
   end.
 
 Theorem toto : ∀ el a b c N,
-  rotate_1_0_0_param_of_list el = (a, b, c, N)
-  → ¬ (a mod 3 = 0 ∧ b mod 3 = 0 ∧ c mod 3 = 0)%Z.
+  rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
+  → (a mod 3 ≠ 0)%Z ∨ (b mod 3 ≠ 0)%Z ∨ (c mod 3 ≠ 0)%Z.
 Proof.
-intros el a b c N Hrp (Ha, (Hb, Hc)).
-revert a b c N Hrp Ha Hb Hc.
+intros el a b c N Hrp.
+revert a b c N Hrp.
 induction el as [| e]; intros.
- simpl in Hrp; injection Hrp; intros; subst; discriminate Ha.
+ simpl in Hrp; injection Hrp; intros; subst.
+ left; intros H; discriminate H.
 
  simpl in Hrp.
- remember (rotate_1_0_0_param_of_list el) as abcN eqn:HabcN.
+ remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as abcN eqn:HabcN.
  destruct abcN as (((a₁, b₁), c₁), N₁).
  destruct e as (t, d).
  destruct t, d.
-  injection Hrp; clear Hrp; intros; subst.
-bbb. (* semble faux... *)
+  injection Hrp; clear Hrp; intros; subst; right.
+  remember (b₁ mod 3)%Z as b3 eqn:Hb3.
+  remember (c₁ mod 3)%Z as c3 eqn:Hc3.
+  symmetry in Hb3, Hc3.
+  destruct b3, c3.
+SearchAbout (Z.modulo _ _ = 0%Z → _).
+bbb.
 
 Compute (rotate_1_0_0_param_of_list [ḅ]).
 Compute (rotate_1_0_0_param_of_list [ạ; ḅ]).
