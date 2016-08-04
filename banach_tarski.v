@@ -655,37 +655,6 @@ Fixpoint rotate_1_0_0_param_of_list el :=
       end
   end.
 
-Theorem toto : ∀ el a b c N,
-  rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
-  → (b mod 3 ≠ 0)%Z.
-Proof.
-intros el a b c N Hrp.
-revert a b c N Hrp.
-induction el as [| e]; intros.
- simpl in Hrp; injection Hrp; intros; subst.
- intros H; discriminate H.
-
- simpl in Hrp.
- remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as abcN eqn:HabcN.
- destruct abcN as (((a₁, b₁), c₁), N₁).
- pose proof IHel _ _ _ _ (eq_refl _) as Hm.
- destruct e as (t, d).
- destruct t, d.
-  injection Hrp; clear Hrp; intros; subst.
-  intros H; apply Hm; clear Hm.
-
-bbb.
-
-Compute (rotate_1_0_0_param_of_list [ḅ]).
-Compute (rotate_1_0_0_param_of_list [ạ; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ạ⁻¹; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ḅ; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ạ; ạ; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ḅ; ạ; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ḅ⁻¹; ạ; ḅ]).
-
-bbb.
-
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
 
 Theorem map_1_0_0 : ∀ s a b c N,
@@ -797,9 +766,24 @@ Qed.
 
 Check map_1_0_0.
 
-Compute (rotate_1_0_0_param_of_list [ḅ; ạ; ḅ⁻¹; ạ]).
-
-(* norm_list ! *)
+Theorem toto : ∀ s,
+  map_rotate s (P 1 0 0) = P 1 0 0
+  → s = ∅.
+Proof.
+intros s Hmr.
+unfold empty.
+unfold map_rotate in Hmr.
+unfold norm; simpl.
+remember (str s) as el; clear s Heqel.
+induction el as [| e]; [ reflexivity | ].
+simpl in Hmr; simpl.
+remember (norm_list el) as el₁ eqn:Hel.
+symmetry in Hel.
+destruct el₁ as [| e₁].
+ destruct e as (t, d).
+ destruct t, d.
+  simpl in Hmr.
+bbb.
 
 Theorem toto : ∀ el a b c N,
   rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
