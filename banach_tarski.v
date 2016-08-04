@@ -668,6 +668,7 @@ induction el as [| e]; intros.
  simpl in Hrp.
  remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as abcN eqn:HabcN.
  destruct abcN as (((a₁, b₁), c₁), N₁).
+ pose proof IHel _ _ _ _ (eq_refl _) as Hm.
  destruct e as (t, d).
  destruct t, d.
   injection Hrp; clear Hrp; intros; subst; right.
@@ -675,8 +676,8 @@ induction el as [| e]; intros.
   remember (c₁ mod 3)%Z as c3 eqn:Hc3.
   symmetry in Hb3, Hc3.
   destruct b3, c3.
-SearchAbout (Z.modulo _ _ = 0%Z → _).
-bbb.
+  destruct Hm as [Hm| [Hm| Hm]].
+bbb. (* faux ! *)
 
 Compute (rotate_1_0_0_param_of_list [ḅ]).
 Compute (rotate_1_0_0_param_of_list [ạ; ḅ]).
