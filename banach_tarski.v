@@ -778,11 +778,10 @@ unfold map_rotate in Hmr.
 simpl in Hmr.
 revert s Hs.
 induction el as [| e]; intros.
- simpl in Hmr.
- repeat rewrite Rmult_1_r in Hmr.
- repeat rewrite Rmult_0_r in Hmr.
- repeat rewrite Rplus_0_r in Hmr.
  injection Hmr; clear Hmr; intros; lra.
+
+ simpl in Hmr.
+ simpl in Hs.
 bbb.
 
 Theorem toto : ∀ s,
