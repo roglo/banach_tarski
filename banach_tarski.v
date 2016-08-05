@@ -753,8 +753,10 @@ repeat rewrite Rmult_1_r in Hmr.
 repeat rewrite Rmult_0_r in Hmr.
 repeat rewrite Rplus_0_r in Hmr.
 revert s Hs.
-induction el as [| e]; intros; [ simpl in Hmr; injection Hmr; lra | ].
-simpl in Hmr.
+induction el as [| e]; intros; simpl in Hmr.
+  injection Hmr; lra.
+
+bbb.
 destruct e as (t, d); destruct t, d; simpl in Hmr.
  unfold Rdiv in Hmr.
  repeat rewrite Rmult_1_l in Hmr.
@@ -762,6 +764,17 @@ destruct e as (t, d); destruct t, d; simpl in Hmr.
  repeat rewrite Rmult_0_r in Hmr.
  repeat rewrite Rplus_0_l in Hmr.
  repeat rewrite Rplus_0_r in Hmr.
+ rewrite fold_left_app in Hmr.
+ simpl in Hmr.
+ remember (fold_left rotate el (P (/ 3) (-2 * √ 2 * / 3) 0)) as u eqn:Hu.
+ symmetry in Hu.
+ destruct u as (x, y, z).
+ simpl in Hmr.
+ repeat rewrite Rmult_1_l in Hmr.
+ repeat rewrite Rmult_0_l in Hmr.
+ repeat rewrite Rplus_0_l in Hmr.
+ repeat rewrite Rplus_0_r in Hmr.
+  injection Hmr; clear Hmr; intros H₁ H₂ H₃; subst x.
 
 bbb.
 
