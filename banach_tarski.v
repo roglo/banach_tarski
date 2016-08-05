@@ -783,11 +783,15 @@ induction el as [| e]; intros.
  repeat rewrite Rmult_0_r in Hmr.
  repeat rewrite Rplus_0_r in Hmr.
  injection Hmr; clear Hmr; intros H₁ H₂.
+ do 2 field_simplify in H₂.
 Require Import DiscrR.
+ discrR H₂.
+bbb.
  unfold Rdiv in H₂; rewrite Rmult_1_l in H₂.
  apply Rmult_eq_compat_l with (r := 3%R) in H₂.
  rewrite Rmult_1_r, Rinv_r in H₂.
-revert H₂; discrR.
+ apply Rplus_eq_compat_r with (r := (-1)%R) in H₂.
+ rewrite Rplus_opp_r in H₂; symmetry in H₂.
 bbb.
 
 Theorem toto : ∀ s,
