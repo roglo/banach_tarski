@@ -696,6 +696,32 @@ induction el as [| e] using rev_ind; simpl.
   repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
   f_equal; lra.
+
+  unfold Rdiv.
+  repeat rewrite Rmult_1_l.
+  repeat rewrite Rmult_0_l.
+  repeat rewrite Rplus_0_l.
+  repeat rewrite Rplus_0_r.
+  repeat rewrite <- Rmult_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  exists (a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, (S N); simpl.
+  rewrite minus_IZR, plus_IZR.
+  repeat rewrite mult_IZR.
+  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+  f_equal; lra.
+
+  unfold Rdiv.
+  repeat rewrite Rmult_1_l.
+  repeat rewrite Rmult_0_l.
+  repeat rewrite Rplus_0_l.
+  repeat rewrite Rplus_0_r.
+  repeat rewrite <- Rmult_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  exists (a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, (S N); simpl.
+  do 2 rewrite plus_IZR.
+  repeat rewrite mult_IZR.
+  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+  f_equal; lra.
 Qed.
 
 bbb.
