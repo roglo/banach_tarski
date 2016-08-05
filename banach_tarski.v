@@ -642,181 +642,87 @@ Definition rotate pt e :=
 
 Definition map_rotate s pt := List.fold_left rotate (str s) pt.
 
-Fixpoint rotate_1_0_0_param_of_list el :=
-  match el with
-  | [] => (1%Z, 0%Z, 0%Z, 0)
-  | e₁ :: el₁ =>
-      let '(a, b, c, N) := rotate_1_0_0_param_of_list el₁ in
-      match e₁ with
-      | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
-      | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
-      | ḅ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
-      | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
-      end
+Definition rotate_param '(a, b, c, N) e :=
+  match e with
+  | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
+  | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
+  | ḅ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
+  | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
   end.
 
+Definition rotate_1_0_0_param_of_list el :=
+  fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0).
+
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
-
-Theorem ex_map_1_0_0 : ∀ s,
-  ∃ (a b c : ℤ) (N : ℕ),
-  map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
-Proof.
-intros s.
-destruct s as (el).
-unfold map_rotate; simpl.
-induction el as [| e] using rev_ind; simpl.
- exists 1%Z, 0%Z, 0%Z, 0; simpl.
- f_equal; lra.
-
- destruct IHel as (a, (b, (c, (N, H)))).
- rewrite fold_left_app, H; simpl.
- destruct e as (t, d).
- destruct t, d; simpl.
-  unfold Rdiv.
-  repeat rewrite Rmult_1_l.
-  repeat rewrite Rmult_0_l.
-  repeat rewrite Rplus_0_l.
-  repeat rewrite Rplus_0_r.
-  repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  exists (3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, (S N); simpl.
-  rewrite plus_IZR, minus_IZR. 
-  repeat rewrite mult_IZR.
-  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
-
-  unfold Rdiv.
-  repeat rewrite Rmult_1_l.
-  repeat rewrite Rmult_0_l.
-  repeat rewrite Rplus_0_l.
-  repeat rewrite Rplus_0_r.
-  repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  exists (3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, (S N); simpl.
-  do 2 rewrite plus_IZR.
-  repeat rewrite mult_IZR.
-  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
-  f_equal; lra.
-
-  unfold Rdiv.
-  repeat rewrite Rmult_1_l.
-  repeat rewrite Rmult_0_l.
-  repeat rewrite Rplus_0_l.
-  repeat rewrite Rplus_0_r.
-  repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  exists (a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, (S N); simpl.
-  rewrite minus_IZR, plus_IZR.
-  repeat rewrite mult_IZR.
-  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
-  f_equal; lra.
-
-  unfold Rdiv.
-  repeat rewrite Rmult_1_l.
-  repeat rewrite Rmult_0_l.
-  repeat rewrite Rplus_0_l.
-  repeat rewrite Rplus_0_r.
-  repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  exists (a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, (S N); simpl.
-  do 2 rewrite plus_IZR.
-  repeat rewrite mult_IZR.
-  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
-  f_equal; lra.
-Qed.
-
-bbb.
 
 Theorem map_1_0_0 : ∀ s a b c N,
   rotate_1_0_0_param s = (a, b, c, N)
   → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
 intros (el) a₁ b₁ c₁ N₁ Hr.
+unfold map_rotate; simpl.
 unfold rotate_1_0_0_param in Hr; simpl in Hr.
+unfold rotate_1_0_0_param_of_list in Hr.
 revert a₁ b₁ c₁ N₁ Hr.
-induction el as [| (x, d)]; intros.
+induction el as [| (t, d)] using rev_ind; intros.
  simpl; simpl in Hr; unfold map_rotate.
  injection Hr; intros; subst; simpl.
  f_equal; lra.
 
- simpl in Hr.
- remember (rotate_1_0_0_param_of_list el) as mr eqn:Hmr.
- destruct mr as (((a, b), c), N).
- pose proof IHel a b c N (eq_refl _) as H.
- unfold map_rotate in H; unfold map_rotate.
- simpl in H; simpl.
- unfold Rdiv.
- repeat rewrite Rmult_1_l.
- repeat rewrite Rmult_0_l.
- repeat rewrite Rmult_0_r.
- repeat rewrite Rplus_0_r.
- destruct x, d; injection Hr; intros; subst.
-  rewrite H, mult_IZR; simpl.
-  f_equal.
-   field; apply pow_nonzero.
-   apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
+ rewrite fold_left_app in Hr; simpl in Hr.
+ rewrite fold_left_app; simpl.
+ remember (fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0)) as rp eqn:Hrp.
+ symmetry in Hrp.
+ destruct rp as (((a, b), c), N).
+ erewrite IHel; [ | reflexivity ].
+ destruct t, d; simpl in Hr; simpl.
+  injection Hr; clear Hr; intros; subst; simpl.
+  unfold Rdiv.
+  repeat rewrite Rmult_1_l.
+  repeat rewrite Rmult_0_l.
+  repeat rewrite Rplus_0_l.
+  repeat rewrite Rplus_0_r.
+  repeat rewrite <- Rmult_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  rewrite plus_IZR, minus_IZR.
+  repeat rewrite mult_IZR.
+  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-   rewrite minus_IZR, mult_IZR; simpl.
-   field; apply pow_nonzero.
-   apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
+  injection Hr; clear Hr; intros; subst; simpl.
+  unfold Rdiv.
+  repeat rewrite Rmult_1_l.
+  repeat rewrite Rmult_0_l.
+  repeat rewrite Rplus_0_l.
+  repeat rewrite Rplus_0_r.
+  repeat rewrite <- Rmult_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  do 2 rewrite plus_IZR.
+  repeat rewrite mult_IZR.
+  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-   rewrite plus_IZR, mult_IZR; simpl.
-   do 3 rewrite <- Rmult_assoc.
-   rewrite Rmult5_sqrt2_sqrt5.
-    field; apply pow_nonzero.
-    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
+  injection Hr; clear Hr; intros; subst; simpl.
+  unfold Rdiv.
+  repeat rewrite Rmult_1_l.
+  repeat rewrite Rmult_0_l.
+  repeat rewrite Rplus_0_l.
+  repeat rewrite Rplus_0_r.
+  repeat rewrite <- Rmult_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  rewrite plus_IZR, minus_IZR.
+  repeat rewrite mult_IZR.
+  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-    apply Rplus_le_le_0_compat; apply Rle_0_1.
-
-  f_equal.
-   rewrite mult_IZR; simpl.
-   field; apply pow_nonzero.
-   apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
-
-   rewrite plus_IZR, mult_IZR; simpl.
-   field; apply pow_nonzero.
-   apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
-
-   rewrite plus_IZR, mult_IZR; simpl.
-   do 3 rewrite <- Rmult_assoc.
-   rewrite Rmult5_sqrt2_sqrt5.
-    field; apply pow_nonzero.
-    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
-
-    apply Rplus_le_le_0_compat; apply Rle_0_1.
-
-  f_equal.
-   rewrite minus_IZR, mult_IZR; simpl.
-   do 3 rewrite <- Rmult_assoc.
-   rewrite Rmult5_sqrt2_sqrt5.
-    field; apply pow_nonzero.
-    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
-
-    apply Rplus_le_le_0_compat; apply Rle_0_1.
-
-   rewrite plus_IZR, mult_IZR; simpl.
-   field; apply pow_nonzero.
-   apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
-
-   rewrite mult_IZR; simpl.
-   field; apply pow_nonzero.
-   apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
-
-  f_equal.
-   rewrite plus_IZR, mult_IZR; simpl.
-   do 3 rewrite <- Rmult_assoc.
-   rewrite Rmult5_sqrt2_sqrt5.
-    field; apply pow_nonzero.
-    apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
-
-    apply Rplus_le_le_0_compat; apply Rle_0_1.
-
-   rewrite plus_IZR, mult_IZR; simpl.
-   field; apply pow_nonzero.
-   apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
-
-   rewrite mult_IZR; simpl.
-   field; apply pow_nonzero.
-   apply tech_Rplus; [ apply Rle_0_1 | apply Rlt_0_2 ].
+  injection Hr; clear Hr; intros; subst; simpl.
+  unfold Rdiv.
+  repeat rewrite Rmult_1_l.
+  repeat rewrite Rmult_0_l.
+  repeat rewrite Rplus_0_l.
+  repeat rewrite Rplus_0_r.
+  repeat rewrite <- Rmult_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  do 2 rewrite plus_IZR.
+  repeat rewrite mult_IZR.
+  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 Qed.
 
 Theorem ex_map_1_0_0 : ∀ s,
@@ -824,19 +730,21 @@ Theorem ex_map_1_0_0 : ∀ s,
   map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
 intros s.
-remember (rotate_1_0_0_param s) as m eqn:Hm.
-destruct m as (((a, b), c), N).
-exists a, b, c, N.
-apply map_1_0_0; symmetry; assumption.
+remember (rotate_1_0_0_param s) as rp eqn:Hrp; symmetry in Hrp.
+destruct rp as (((a, b), c), N).
+erewrite map_1_0_0; [ | eassumption ].
+exists a, b, c, N; reflexivity.
 Qed.
 
 Check map_1_0_0.
 
 Theorem toto : ∀ s el,
-  norm s = mkF₂ (el ++ [ḅ])
+  norm s = mkF₂ (ḅ :: el)
   → ¬ map_rotate (norm s) (P 1 0 0) = P 1 0 0.
 Proof.
 intros s el Hs Hmr.
+bbb.
+
 rewrite Hs in Hmr.
 unfold norm in Hs; simpl in Hs.
 injection Hs; clear Hs; intros Hs.
