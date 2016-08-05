@@ -752,6 +752,17 @@ repeat rewrite Rmult_1_l in Hmr.
 repeat rewrite Rmult_1_r in Hmr.
 repeat rewrite Rmult_0_r in Hmr.
 repeat rewrite Rplus_0_r in Hmr.
+revert s Hs.
+induction el as [| e]; intros; [ simpl in Hmr; injection Hmr; lra | ].
+simpl in Hmr.
+destruct e as (t, d); destruct t, d; simpl in Hmr.
+ unfold Rdiv in Hmr.
+ repeat rewrite Rmult_1_l in Hmr.
+ repeat rewrite Rmult_0_l in Hmr.
+ repeat rewrite Rmult_0_r in Hmr.
+ repeat rewrite Rplus_0_l in Hmr.
+ repeat rewrite Rplus_0_r in Hmr.
+
 bbb.
 
 
