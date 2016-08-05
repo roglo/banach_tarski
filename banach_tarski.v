@@ -655,39 +655,6 @@ Fixpoint rotate_1_0_0_param_of_list el :=
       end
   end.
 
-Theorem toto : ∀ el a b c N,
-  rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
-  → (a mod 3 ≠ 0)%Z ∨ (b mod 3 ≠ 0)%Z ∨ (c mod 3 ≠ 0)%Z.
-Proof.
-intros el a b c N Hrp.
-revert a b c N Hrp.
-induction el as [| e]; intros.
- simpl in Hrp; injection Hrp; intros; subst.
- left; intros H; discriminate H.
-
- simpl in Hrp.
- remember (rotate_1_0_0_param_of_list (el ++ [ḅ])) as abcN eqn:HabcN.
- destruct abcN as (((a₁, b₁), c₁), N₁).
- destruct e as (t, d).
- destruct t, d.
-  injection Hrp; clear Hrp; intros; subst; right.
-  remember (b₁ mod 3)%Z as b3 eqn:Hb3.
-  remember (c₁ mod 3)%Z as c3 eqn:Hc3.
-  symmetry in Hb3, Hc3.
-  destruct b3, c3.
-SearchAbout (Z.modulo _ _ = 0%Z → _).
-bbb.
-
-Compute (rotate_1_0_0_param_of_list [ḅ]).
-Compute (rotate_1_0_0_param_of_list [ạ; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ạ⁻¹; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ḅ; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ạ; ạ; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ḅ; ạ; ḅ]).
-Compute (rotate_1_0_0_param_of_list [ḅ⁻¹; ạ; ḅ]).
-
-bbb.
-
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
 
 Theorem map_1_0_0 : ∀ s a b c N,
@@ -799,9 +766,48 @@ Qed.
 
 Check map_1_0_0.
 
-Compute (rotate_1_0_0_param_of_list [ḅ; ạ; ḅ⁻¹; ạ]).
+Theorem toto : ∀ s el,
+  norm s = mkF₂ (el ++ [ḅ])
+  → ¬ map_rotate (norm s) (P 1 0 0) = P 1 0 0.
+Proof.
+intros s el Hs Hmr.
+rewrite Hs in Hmr.
+unfold norm in Hs; simpl in Hs.
+injection Hs; clear Hs; intros Hs.
+unfold map_rotate in Hmr.
+simpl in Hmr.
+revert s Hs.
+induction el as [| e]; intros.
+ simpl in Hmr.
+ repeat rewrite Rmult_1_r in Hmr.
+ repeat rewrite Rmult_0_r in Hmr.
+ repeat rewrite Rplus_0_r in Hmr.
+ injection Hmr; clear Hmr; intros H₁ H₂.
+Require Import DiscrR.
+ unfold Rdiv in H₂; rewrite Rmult_1_l in H₂.
+ apply Rmult_eq_compat_l with (r := 3%R) in H₂.
+ rewrite Rmult_1_r, Rinv_r in H₂.
+revert H₂; discrR.
+bbb.
 
-(* norm_list ! *)
+Theorem toto : ∀ s,
+  map_rotate s (P 1 0 0) = P 1 0 0
+  → s = ∅.
+Proof.
+intros s Hmr.
+unfold empty.
+unfold map_rotate in Hmr.
+unfold norm; simpl.
+remember (str s) as el; clear s Heqel.
+induction el as [| e]; [ reflexivity | ].
+simpl in Hmr; simpl.
+remember (norm_list el) as el₁ eqn:Hel.
+symmetry in Hel.
+destruct el₁ as [| e₁].
+ destruct e as (t, d).
+ destruct t, d.
+  simpl in Hmr.
+bbb.
 
 Theorem toto : ∀ el a b c N,
   rotate_1_0_0_param_of_list (el ++ [ḅ]) = (a, b, c, N)
