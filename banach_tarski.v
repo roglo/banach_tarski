@@ -766,6 +766,30 @@ Qed.
 
 Check map_1_0_0.
 
+Theorem toto : ∀ s el,
+  norm s = mkF₂ (el ++ [ḅ])
+  → ¬ map_rotate (norm s) (P 1 0 0) = P 1 0 0.
+Proof.
+intros s el Hs Hmr.
+rewrite Hs in Hmr.
+unfold norm in Hs; simpl in Hs.
+injection Hs; clear Hs; intros Hs.
+unfold map_rotate in Hmr.
+simpl in Hmr.
+revert s Hs.
+induction el as [| e]; intros.
+ simpl in Hmr.
+ repeat rewrite Rmult_1_r in Hmr.
+ repeat rewrite Rmult_0_r in Hmr.
+ repeat rewrite Rplus_0_r in Hmr.
+ injection Hmr; clear Hmr; intros H₁ H₂.
+
+bbb.
+ unfold Rdiv in H₂; rewrite Rmult_1_l in H₂.
+ apply Rmult_eq_compat_l with (r := 3%R) in H₂.
+ rewrite Rmult_1_r, Rinv_r in H₂.
+bbb.
+
 Theorem toto : ∀ s,
   map_rotate s (P 1 0 0) = P 1 0 0
   → s = ∅.
