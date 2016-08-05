@@ -743,13 +743,18 @@ Theorem toto : ∀ s el,
   → ¬ map_rotate (norm s) (P 1 0 0) = P 1 0 0.
 Proof.
 intros s el Hs Hmr.
-bbb.
-
 rewrite Hs in Hmr.
 unfold norm in Hs; simpl in Hs.
 injection Hs; clear Hs; intros Hs.
-unfold map_rotate in Hmr.
-simpl in Hmr.
+unfold map_rotate in Hmr; simpl in Hmr.
+unfold Rdiv in Hmr.
+repeat rewrite Rmult_1_l in Hmr.
+repeat rewrite Rmult_1_r in Hmr.
+repeat rewrite Rmult_0_r in Hmr.
+repeat rewrite Rplus_0_r in Hmr.
+bbb.
+
+
 revert s Hs.
 induction el as [| e] using rev_ind; intros.
  injection Hmr; clear Hmr; intros; lra.
