@@ -740,7 +740,7 @@ Check map_1_0_0.
 
 Theorem toto : ∀ s a b c N,
   s ≠ ∅
-  → List.Forall (λ e, e = ḅ) (str s)
+  → List.Forall (λ e, e = ḅ) (str (norm s))
   → rotate_1_0_0_param s = (a, b, c, N)
   → (b mod 3 = Z.of_nat N mod 2 + 1)%Z.
 Proof.
@@ -748,9 +748,35 @@ intros s a b c N Hs Ha Hrp.
 unfold empty in Hs; simpl in Hs.
 unfold rotate_1_0_0_param in Hrp.
 unfold rotate_1_0_0_param_of_list in Hrp.
+unfold norm in Ha; simpl in Ha.
 remember (str s) as el eqn:Hel.
 clear s Hel.
-bbb.
+remember (norm_list el) as el₁ eqn:Hel.
+symmetry in Hel.
+revert a b c N el Hel Hrp.
+induction el₁ as [| e]; intros; [ exfalso; apply Hs; reflexivity | ].
+clear Hs.
+pose proof Forall_inv Ha as H; simpl in H; subst e.
+destruct el₁ as [| e].
+
+Theorem toto : ∀ el e, norm_list el = [e] → el = [e].
+Proof.
+intros el e Hel.
+revert e Hel.
+induction el as [| e₁]; intros; [ discriminate Hel | ].
+simpl in Hel.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₂].
+ injection Hel; clear Hel; intros; subst e₁; f_equal.
+ clear e.
+ destruct el as [| e]; [ reflexivity | ].
+ simpl in Hel₁.
+ remember (norm_list el) as el₁ eqn:Hel; symmetry in Hel.
+ destruct el₁ as [| e₁]; [ discriminate Hel₁ | ].
+ destruct (letter_opp_dec e e₁) as [H₁| H₁].
+  subst el₁.
+bbb. (* bizarre, ça devrait être bon, pourtant *)
 
 Theorem toto : ∀ s el x y z,
   norm s = mkF₂ (ḅ :: el)
