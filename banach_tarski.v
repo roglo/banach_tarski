@@ -762,6 +762,9 @@ destruct el₁ as [| e].
 Theorem toto : ∀ el e, norm_list el = [e] → el = [e].
 Proof.
 intros el e Hel.
+(* ah bin non, c'est faux : contre-exemple el = [e; e⁻¹; e] *)
+bbb.
+
 revert e Hel.
 induction el as [| e₁]; intros; [ discriminate Hel | ].
 simpl in Hel.
@@ -776,7 +779,7 @@ destruct el₁ as [| e₂].
  destruct el₁ as [| e₁]; [ discriminate Hel₁ | ].
  destruct (letter_opp_dec e e₁) as [H₁| H₁].
   subst el₁.
-bbb. (* bizarre, ça devrait être bon, pourtant *)
+bbb.
 
 Theorem toto : ∀ s el x y z,
   norm s = mkF₂ (ḅ :: el)
