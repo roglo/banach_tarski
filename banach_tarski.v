@@ -738,6 +738,67 @@ Qed.
 
 Check map_1_0_0.
 
+Theorem toto : ∀ s el x y z,
+  norm s = mkF₂ (ḅ :: el)
+  → map_rotate (norm s) (P 1 0 0) = P x y z
+  → y ≠ 0%R.
+Proof.
+intros s el x y z Hs Hmr.
+remember (rotate_1_0_0_param (norm s)) as rp eqn:Hrp.
+symmetry in Hrp.
+destruct rp as (((a, b), c), N).
+pose proof map_1_0_0 _ _ _ _ _ Hrp as H.
+rewrite Hmr in H.
+injection H; clear H; intros H₁ H₂ H₃; subst.
+rewrite Hs in Hmr; simpl in Hmr.
+unfold map_rotate in Hmr; simpl in Hmr.
+rewrite Hs in Hrp; simpl in Hrp.
+unfold rotate_1_0_0_param in Hrp; simpl in Hrp.
+unfold rotate_1_0_0_param_of_list in Hrp; simpl in Hrp.
+unfold Rdiv in Hmr.
+progress repeat rewrite Rmult_1_l in Hmr.
+progress repeat rewrite Rmult_1_r in Hmr.
+progress repeat rewrite Rmult_0_r in Hmr.
+progress repeat rewrite Rplus_0_r in Hmr.
+intros H.
+unfold Rdiv in H.
+apply Rmult_integral in H.
+destruct H as [H| H].
+ 2: revert H; apply Rinv_neq_0_compat, pow_nonzero; lra.
+
+ apply Rmult_integral in H.
+ destruct H as [H| H]; [ | revert H; apply sqrt2_neq_0 ].
+ revert H; apply not_0_IZR.
+ revert s a b c N Hs Hmr Hrp.
+ induction el as [| e]; intros.
+  injection Hrp; clear Hrp; intros; subst.
+  intros H; discriminate H.
+
+  simpl in Hrp.
+  simpl in Hmr.
+bbb.
+
+unfold norm in Hs, Hmr.
+injection Hs; clear Hs; intros Hs.
+rewrite Hs in Hmr.
+unfold map_rotate in Hmr; simpl in Hmr.
+unfold Rdiv in Hmr.
+repeat rewrite Rmult_1_l in Hmr.
+repeat rewrite Rmult_1_r in Hmr.
+repeat rewrite Rmult_0_r in Hmr.
+repeat rewrite Rplus_0_r in Hmr.
+revert s x y z Hs Hmr.
+induction el as [| e]; intros.
+ injection Hmr; clear Hmr; intros H₁ H₂ H₃ H; subst.
+ apply Rmult_integral in H.
+ destruct H as [H| H]; [ | lra ].
+ apply Rmult_integral in H.
+ destruct H as [H| H]; [ lra | ].
+ revert H; apply sqrt2_neq_0.
+
+ simpl in Hmr.
+bbb.
+
 Theorem toto : ∀ s el,
   norm s = mkF₂ (ḅ :: el)
   → ¬ map_rotate (norm s) (P 1 0 0) = P 1 0 0.
