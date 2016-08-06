@@ -740,7 +740,7 @@ Check map_1_0_0.
 
 Theorem toto : ∀ s a b c N,
   s ≠ ∅
-  → List.Forall (λ e, e = ḅ) (str (norm s))
+  → List.Forall (λ e, e = ḅ) (str s)
   → rotate_1_0_0_param s = (a, b, c, N)
   → (b mod 3 = Z.of_nat N mod 2 + 1)%Z.
 Proof.
@@ -748,9 +748,17 @@ intros s a b c N Hs Ha Hrp.
 unfold empty in Hs; simpl in Hs.
 unfold rotate_1_0_0_param in Hrp.
 unfold rotate_1_0_0_param_of_list in Hrp.
-unfold norm in Ha; simpl in Ha.
 remember (str s) as el eqn:Hel.
 clear s Hel.
+revert a b c N Hrp.
+induction el as [| e]; intros.
+ injection Hrp; clear Hrp; intros; subst.
+ exfalso; apply Hs; reflexivity.
+
+ pose proof Forall_inv Ha as H; simpl in H; subst e.
+ simpl in Hrp.
+bbb.
+
 remember (norm_list el) as el₁ eqn:Hel.
 symmetry in Hel.
 revert a b c N el Hel Hrp.
@@ -758,6 +766,8 @@ induction el₁ as [| e]; intros; [ exfalso; apply Hs; reflexivity | ].
 clear Hs.
 pose proof Forall_inv Ha as H; simpl in H; subst e.
 destruct el₁ as [| e].
+ injection Hrp; clear Hrp; intros; subst.
+bbb.
 
 Theorem toto : ∀ el e, norm_list el = [e] → el = [e].
 Proof.
