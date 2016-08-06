@@ -14,3 +14,9 @@ value rotate_1_0_0 el =
   let (a, b, c, n) = rotate_1_0_0_param el in
   let d = 3.0 ** float n in
   (float a /. d, float b *. sqrt 2.0 /. d, float c /. d).
+
+value mymod a b = if a ≥ 0 then a mod b else (b + a mod b) mod b;
+
+value rotate_1_0_0_param_mod_3 el =
+  let (a, b, c, _) = rotate_1_0_0_param el in
+  (mymod a 3, mymod b 3, mymod c 3).

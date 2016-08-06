@@ -738,6 +738,20 @@ Qed.
 
 Check map_1_0_0.
 
+Theorem toto : ∀ s a b c N,
+  s ≠ ∅
+  → List.Forall (λ e, e = ḅ) (str s)
+  → rotate_1_0_0_param s = (a, b, c, N)
+  → (b mod 3 = Z.of_nat N mod 2 + 1)%Z.
+Proof.
+intros s a b c N Hs Ha Hrp.
+unfold empty in Hs; simpl in Hs.
+unfold rotate_1_0_0_param in Hrp.
+unfold rotate_1_0_0_param_of_list in Hrp.
+remember (str s) as el eqn:Hel.
+clear s Hel.
+bbb.
+
 Theorem toto : ∀ s el x y z,
   norm s = mkF₂ (ḅ :: el)
   → map_rotate (norm s) (P 1 0 0) = P x y z
