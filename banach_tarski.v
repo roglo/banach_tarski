@@ -738,6 +738,23 @@ Qed.
 
 Check map_1_0_0.
 
+(*
+N(a⁻¹ρ) = (3a, b-2c, 4b+c) ≡ (0, b+c, b+c)
+N(aρ) = (3a, b+2c, -4b+c) ≡ (0, b-c, c-b)
+N(b⁻¹ρ) = (a-4b, 2a+b, 3c) ≡ (a-b, b-a, 0)
+N(bρ) = (a+4b, -2a+b, 3c) ≡ (a+b, a+b, 0)
+theorem:
+  N ((a⁻¹)^n) ≡ (0, b+c, b+c) if n odd
+              ≡ (0, -b-c, -b-c) if n even
+*)
+
+Inspect 10.
+
+Compute rotate_1_0_0_param_of_list [ạ⁻¹].
+Print rotate_1_0_0_param_of_list.
+
+bbb.
+
 Theorem toto : ∀ s a b c N,
   s ≠ ∅
   → List.Forall (λ e, e = ḅ) (str s)
