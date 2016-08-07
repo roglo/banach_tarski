@@ -842,6 +842,28 @@ rewrite fold_left_app, Hrp; simpl.
 remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N))) as x.
 destruct x as ((a₁, b₁), c₁); rename Heqx into Hrp₁.
 symmetry in Hrp₁.
+(**)
+destruct (zerop (n mod 2)) as [Hn| Hn].
+ simpl in Hrp₁; simpl.
+ rewrite Z.mod_0_l; [ | intros; discriminate ].
+ apply Nat.mod_divide in Hn; [ | intros; discriminate ].
+ destruct Hn as (k, Hn); rewrite Nat.mul_comm in Hn; subst n.
+ revert el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+ induction k; intros.
+  simpl in Hrp₁.
+  injection Hrp₁; clear Hrp₁; intros; subst.
+  split; [ | split ].
+   rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+   rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
+   f_equal; ring.
+
+   rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
+   f_equal; ring.
+
+  simpl in Hrp₁.
+
+bbb.
 revert el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
 induction n; intros.
  simpl in Hrp₁; simpl.
