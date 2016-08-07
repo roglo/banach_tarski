@@ -14,6 +14,16 @@ Qed.
 Theorem cons_to_app : ∀ A (x : A) l, x :: l = (x :: nil) ++ l.
 Proof. reflexivity. Qed.
 
+Theorem cons_comm_app {A} : ∀ (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
+Proof. reflexivity. Qed.
+
+Theorem list_Forall_inv : ∀ A (P : A → Prop) a l,
+  List.Forall P (a :: l) → P a ∧ List.Forall P l.
+Proof.
+intros A P a l H.
+inversion H; split; assumption.
+Qed.
+
 Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
 Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
 
@@ -824,6 +834,20 @@ theorem:
   N ((a⁻¹)^n) ≡ (0, b+c, b+c) if n odd
               ≡ (0, -b-c, -b-c) if n even
 *)
+
+Theorem toto : ∀ el el' p a b c N,
+  Forall (λ e, e = ạ) el'
+  → fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ ạ :: el') p) ≡₃
+      (0%Z, (b - c)%Z, (c - b)%Z).
+Proof.
+intros el el' p a b c N Ha Hrp.
+revert el a b c N p Hrp.
+induction el' as [| e]; intros; [ eapply rotate_param_app_a; eassumption | ].
+destruct e as (t, d).
+destruct t, d; try (apply Forall_inv in Ha; discriminate Ha).
+rewrite cons_comm_app, app_assoc.
+eapply IHel'; [ eapply list_Forall_inv; eassumption | ].
 
 bbb.
 
