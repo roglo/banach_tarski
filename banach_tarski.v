@@ -830,26 +830,6 @@ split; [ | split ].
  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
 Qed.
 
-Theorem rotate_param_app_aa : ∀ el p a b c N,
-  fold_left rotate_param el p = (a, b, c, N)
-  → fst3 (fold_left rotate_param (el ++ [ạ; ạ]) p) ≡₃
-      (0%Z, (c - b)%Z, (b - c)%Z).
-Proof.
-intros el p a b c N Hrp.
-unfold "≡₃".
-rewrite fold_left_app, Hrp; simpl.
-split; [ | split ].
- rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
- rewrite <- Z.mod_add with (b := (2 * b)%Z); [ | intros H; discriminate ].
- rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
- f_equal; ring.
-
- rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros H; discriminate ].
- rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
- f_equal; ring.
-Qed.
-
 Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ List.repeat ạ (n + 1)) p) ≡₃
@@ -874,6 +854,38 @@ destruct n.
 
   rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
   f_equal; ring.
+
+ destruct n.
+  simpl in Hrp₁; simpl.
+  rewrite Z.mod_0_l; [ | intros; discriminate ].
+  injection Hrp₁; clear Hrp₁; intros; subst.
+  split; [ | split ].
+   rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+   rewrite <- Z.mod_add with (b := (2 * b)%Z); [ | intros H; discriminate ].
+   rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
+   f_equal; ring.
+
+   rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros H; discriminate ].
+   rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
+   f_equal; ring.
+
+  destruct n.
+   simpl in Hrp₁; simpl.
+   rewrite Z.mod_0_l; [ | intros; discriminate ].
+   injection Hrp₁; clear Hrp₁; intros; subst.
+   split; [ | split ].
+    rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+bbb.
+
+    rewrite <- Z.mod_add with (b := (2 * b)%Z); [ | intros H; discriminate ].
+    rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
+    f_equal; ring.
+
+    rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros H; discriminate ].
+    rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
+    f_equal; ring.
+
 bbb.
 
 destruct (zerop (n mod 2)) as [Hn| Hn].
