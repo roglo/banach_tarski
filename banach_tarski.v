@@ -866,6 +866,14 @@ destruct n.
  simpl in Hrp₁; simpl.
  rewrite Z.mod_0_l; [ | intros; discriminate ].
  injection Hrp₁; clear Hrp₁; intros; subst.
+ split; [ | split ].
+  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+  rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
+  f_equal; ring.
+
+  rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
+  f_equal; ring.
 bbb.
 
 destruct (zerop (n mod 2)) as [Hn| Hn].
