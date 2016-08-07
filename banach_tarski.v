@@ -859,6 +859,17 @@ Proof.
 intros el n p a b c N Hrp.
 unfold "≡₃".
 rewrite fold_left_app, Hrp; simpl.
+remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N))) as x.
+destruct x as ((a₁, b₁), c₁); rename Heqx into Hrp₁.
+symmetry in Hrp₁.
+destruct n.
+ simpl in Hrp₁; simpl.
+ rewrite Z.mod_0_l; [ | intros; discriminate ].
+ injection Hrp₁; clear Hrp₁; intros; subst.
+bbb.
+
+destruct (zerop (n mod 2)) as [Hn| Hn].
+ rewrite Z.mod_0_l; [ | intros; discriminate ].
 bbb.
 rewrite Nat.add_1_r; simpl.
 split; [ | split ].
