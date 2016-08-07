@@ -873,6 +873,7 @@ destruct (zerop (length el' mod 2)) as [Hl| Hl].
    rewrite Hb₂.
    apply rotate_param_app_a in Hrp₁.
    unfold "≡₃" in Hrp₁.
+pose proof IHel' Ha _ _ _ _ _ _ Hrp.
 
 bbb.
 
