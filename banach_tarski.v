@@ -738,16 +738,6 @@ Qed.
 
 Check map_1_0_0.
 
-(*
-N(a⁻¹ρ) = (3a, b-2c, 4b+c) ≡ (0, b+c, b+c)
-N(aρ) = (3a, b+2c, -4b+c) ≡ (0, b-c, c-b)
-N(b⁻¹ρ) = (a-4b, 2a+b, 3c) ≡ (a-b, b-a, 0)
-N(bρ) = (a+4b, -2a+b, 3c) ≡ (a+b, a+b, 0)
-theorem:
-  N ((a⁻¹)^n) ≡ (0, b+c, b+c) if n odd
-              ≡ (0, -b-c, -b-c) if n even
-*)
-
 Definition fst3 {A B C D} '((a, b, c, d) : A * B * C * D) := (a, b, c).
 
 Definition eq_mod_3 '(a₁, b₁, c₁) '(a₂, b₂, c₂) :=
@@ -756,6 +746,32 @@ Definition eq_mod_3 '(a₁, b₁, c₁) '(a₂, b₂, c₂) :=
   (c₁ mod 3 = c₂ mod 3)%Z.
 
 Notation "x ≡₃ y" := (eq_mod_3 x y) (at level 70).
+
+(*
+N(b⁻¹ρ) = (a-4b, 2a+b, 3c) ≡ (a-b, b-a, 0)
+N(bρ) = (a+4b, -2a+b, 3c) ≡ (a+b, a+b, 0)
+theorem:
+  N ((a⁻¹)^n) ≡ (0, b+c, b+c) if n odd
+              ≡ (0, -b-c, -b-c) if n even
+*)
+
+Theorem rotate_param_app_a : ∀ el p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ [ạ]) p) ≡₃
+      (0%Z, (b - c)%Z, (c - b)%Z).
+Proof.
+intros el p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+split; [ | split ].
+ rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+ rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
+ f_equal; ring.
+
+ rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
+ f_equal; ring.
+Qed.
 
 Theorem rotate_param_app_a1 : ∀ el p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
@@ -773,6 +789,42 @@ split; [ | split ].
 
  rewrite <- Z.mod_add with (b := (-b)%Z); [ | intros H; discriminate ].
  f_equal; ring.
+Qed.
+
+Theorem rotate_param_app_b : ∀ el p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ [ḅ]) p) ≡₃
+      ((a + b)%Z, (a + b)%Z, 0%Z).
+Proof.
+intros el p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+split; [ | split ].
+ rewrite <- Z.mod_add with (b := (-b)%Z); [ | intros H; discriminate ].
+ f_equal; ring.
+
+ rewrite <- Z.mod_add with (b := a%Z); [ | intros H; discriminate ].
+ f_equal; ring.
+
+ rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+Qed.
+
+Theorem rotate_param_app_b1 : ∀ el p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ [ḅ⁻¹]) p) ≡₃
+      ((a - b)%Z, (b - a)%Z, 0%Z).
+Proof.
+intros el p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+split; [ | split ].
+ rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
+ f_equal; ring.
+
+ rewrite <- Z.mod_add with (b := (-a)%Z); [ | intros H; discriminate ].
+ f_equal; ring.
+
+ rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
 Qed.
 
 bbb.
