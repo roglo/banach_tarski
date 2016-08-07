@@ -857,6 +857,11 @@ remember (fst3 (fold_left rotate_param ((el ++ [ạ]) ++ ạ :: el') p)) as x.
 rename Heqx into Hx; symmetry in Hx.
 destruct x as ((a₂, b₂), c₂).
 destruct H as (Ha₂, (Hb₂, Hc₂)).
+unfold "≡₃".
+split; [ assumption | ].
+split.
+ rewrite Hb₂.
+
 bbb.
 
 Theorem toto : ∀ s a b c N,
