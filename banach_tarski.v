@@ -832,8 +832,8 @@ Qed.
 
 (*
 theorem:
-  N ((a⁻¹)^n) ≡ (0, b+c, b+c) if n odd
-              ≡ (0, -b-c, -b-c) if n even
+  N (a^n) ≡ (0, b+c, b+c) if n odd
+          ≡ (0, -b-c, -b-c) if n even
 *)
 
 Theorem rotate_param_app_aa : ∀ el p a b c N,
