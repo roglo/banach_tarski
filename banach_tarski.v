@@ -577,7 +577,8 @@ Notation "'ℕ'" := nat.
 
 Notation "'√'" := sqrt.
 
-Arguments Z.mul x y : simpl nomatch.
+Arguments Nat.modulo _ _ : simpl nomatch.
+Arguments Z.mul _ _ : simpl nomatch.
 (* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
 
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
@@ -839,11 +840,14 @@ Theorem toto : ∀ el el' p a b c N,
   Forall (λ e, e = ạ) el'
   → fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ ạ :: el') p) ≡₃
-      (0%Z, (b - c)%Z, (c - b)%Z).
+      if zerop (List.length el' mod 2) then (0%Z, (b - c)%Z, (c - b)%Z)
+      else (0%Z, (c - b)%Z, (b - c)%Z).
 Proof.
 intros el el' p a b c N Ha Hrp.
 revert el a b c N p Hrp.
 induction el' as [| e]; intros; [ eapply rotate_param_app_a; eassumption | ].
+simpl.
+bbb.
 destruct e as (t, d).
 destruct t, d; try (apply Forall_inv in Ha; discriminate Ha).
 rewrite cons_comm_app, app_assoc.
