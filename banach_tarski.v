@@ -830,12 +830,6 @@ split; [ | split ].
  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
 Qed.
 
-(*
-theorem:
-  N (a^n) ≡ (0, b+c, b+c) if n odd
-          ≡ (0, -b-c, -b-c) if n even
-*)
-
 Theorem rotate_param_app_aa : ∀ el p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ [ạ; ạ]) p) ≡₃
@@ -844,6 +838,29 @@ Proof.
 intros el p a b c N Hrp.
 unfold "≡₃".
 rewrite fold_left_app, Hrp; simpl.
+split; [ | split ].
+ rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+ rewrite <- Z.mod_add with (b := (2 * b)%Z); [ | intros H; discriminate ].
+ rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
+ f_equal; ring.
+
+ rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros H; discriminate ].
+ rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
+ f_equal; ring.
+Qed.
+
+Theorem rotate_param_app_an : ∀ el n p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ List.repeat ạ (n + 1)) p) ≡₃
+      if zerop (n mod 2) then (0%Z, (b - c)%Z, (c -  b)%Z)
+      else (0%Z, (c - b)%Z, (b - c)%Z).
+Proof.
+intros el n p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+bbb.
+rewrite Nat.add_1_r; simpl.
 split; [ | split ].
  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
 
