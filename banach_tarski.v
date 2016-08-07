@@ -748,10 +748,15 @@ theorem:
               ≡ (0, -b-c, -b-c) if n even
 *)
 
-Inspect 10.
-
-Compute rotate_1_0_0_param_of_list [ạ⁻¹].
-Print rotate_1_0_0_param_of_list.
+Theorem rotate_param_app_a1 : ∀ el p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fold_left rotate_param (el ++ [ạ⁻¹]) p =
+      ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N).
+Proof.
+intros el p a b c N Hrp.
+rewrite fold_left_app, Hrp.
+reflexivity.
+Qed.
 
 bbb.
 
