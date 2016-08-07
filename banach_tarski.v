@@ -748,14 +748,31 @@ theorem:
               ≡ (0, -b-c, -b-c) if n even
 *)
 
+Definition fst3 {A B C D} '((a, b, c, d) : A * B * C * D) := (a, b, c).
+
+Definition eq_mod_3 '(a₁, b₁, c₁) '(a₂, b₂, c₂) :=
+  (a₁ mod 3 = a₂ mod 3)%Z ∧
+  (b₁ mod 3 = b₂ mod 3)%Z ∧
+  (c₁ mod 3 = c₂ mod 3)%Z.
+
+Notation "x ≡₃ y" := (eq_mod_3 x y) (at level 70).
+
 Theorem rotate_param_app_a1 : ∀ el p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
-  → fold_left rotate_param (el ++ [ạ⁻¹]) p =
-      ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N).
+  → fst3 (fold_left rotate_param (el ++ [ạ⁻¹]) p) ≡₃
+      (0%Z, (b + c)%Z, (b + c)%Z).
 Proof.
 intros el p a b c N Hrp.
-rewrite fold_left_app, Hrp.
-reflexivity.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+split; [ | split ].
+ rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+ rewrite <- Z.mod_add with (b := c); [ | intros H; discriminate ].
+ f_equal; ring.
+
+ rewrite <- Z.mod_add with (b := (-b)%Z); [ | intros H; discriminate ].
+ f_equal; ring.
 Qed.
 
 bbb.
