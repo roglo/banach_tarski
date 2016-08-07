@@ -861,6 +861,8 @@ unfold "≡₃".
 split; [ assumption | ].
 split.
  rewrite Hb₂.
+ apply rotate_param_app_a in Hrp₁.
+ unfold "≡₃" in Hrp₁.
 
 bbb.
 
