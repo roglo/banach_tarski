@@ -847,8 +847,16 @@ induction el' as [| e]; intros; [ eapply rotate_param_app_a; eassumption | ].
 destruct e as (t, d).
 destruct t, d; try (apply Forall_inv in Ha; discriminate Ha).
 rewrite cons_comm_app, app_assoc.
-eapply IHel'; [ eapply list_Forall_inv; eassumption | ].
-
+apply list_Forall_inv in Ha; destruct Ha as (_, Ha).
+remember (fold_left rotate_param (el ++ [ạ]) p) as rp eqn:Hrp₁.
+symmetry in Hrp₁.
+destruct rp as (((a₁, b₁), c₁), N₁).
+pose proof IHel' Ha (el ++ [ạ]) _ _ _ _ _ Hrp₁ as H.
+unfold "≡₃" in H.
+remember (fst3 (fold_left rotate_param ((el ++ [ạ]) ++ ạ :: el') p)) as x.
+rename Heqx into Hx; symmetry in Hx.
+destruct x as ((a₂, b₂), c₂).
+destruct H as (Ha₂, (Hb₂, Hc₂)).
 bbb.
 
 Theorem toto : ∀ s a b c N,
