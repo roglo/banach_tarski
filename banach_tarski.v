@@ -747,14 +747,6 @@ Definition eq_mod_3 '(a₁, b₁, c₁) '(a₂, b₂, c₂) :=
 
 Notation "x ≡₃ y" := (eq_mod_3 x y) (at level 70).
 
-(*
-N(b⁻¹ρ) = (a-4b, 2a+b, 3c) ≡ (a-b, b-a, 0)
-N(bρ) = (a+4b, -2a+b, 3c) ≡ (a+b, a+b, 0)
-theorem:
-  N ((a⁻¹)^n) ≡ (0, b+c, b+c) if n odd
-              ≡ (0, -b-c, -b-c) if n even
-*)
-
 Theorem rotate_param_app_a : ∀ el p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ [ạ]) p) ≡₃
@@ -826,6 +818,12 @@ split; [ | split ].
 
  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
 Qed.
+
+(*
+theorem:
+  N ((a⁻¹)^n) ≡ (0, b+c, b+c) if n odd
+              ≡ (0, -b-c, -b-c) if n even
+*)
 
 bbb.
 
