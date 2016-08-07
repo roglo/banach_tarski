@@ -842,7 +842,8 @@ rewrite fold_left_app, Hrp; simpl.
 remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N))) as x.
 destruct x as ((a₁, b₁), c₁); rename Heqx into Hrp₁.
 symmetry in Hrp₁.
-destruct n.
+revert el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+induction n; intros.
  simpl in Hrp₁; simpl.
  rewrite Z.mod_0_l; [ | intros; discriminate ].
  injection Hrp₁; clear Hrp₁; intros; subst.
