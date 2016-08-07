@@ -847,7 +847,6 @@ intros el el' p a b c N Ha Hrp.
 revert el a b c N p Hrp.
 induction el' as [| e]; intros; [ eapply rotate_param_app_a; eassumption | ].
 simpl.
-bbb.
 destruct e as (t, d).
 destruct t, d; try (apply Forall_inv in Ha; discriminate Ha).
 rewrite cons_comm_app, app_assoc.
@@ -860,13 +859,20 @@ unfold "≡₃" in H.
 remember (fst3 (fold_left rotate_param ((el ++ [ạ]) ++ ạ :: el') p)) as x.
 rename Heqx into Hx; symmetry in Hx.
 destruct x as ((a₂, b₂), c₂).
-destruct H as (Ha₂, (Hb₂, Hc₂)).
-unfold "≡₃".
-split; [ assumption | ].
-split.
- rewrite Hb₂.
- apply rotate_param_app_a in Hrp₁.
- unfold "≡₃" in Hrp₁.
+destruct (zerop (length el' mod 2)) as [Hl| Hl].
+ destruct (zerop (S (length el') mod 2)) as [Hl'| Hl'].
+  rewrite <- Nat.add_1_r in Hl'.
+  rewrite Nat.add_mod in Hl'; [ | intros; discriminate ].
+  rewrite Hl in Hl'; discriminate Hl'.
+
+  rewrite Z.mod_0_l in H; [ | intros; discriminate ].
+  destruct H as (Ha₂, (Hb₂, Hc₂)).
+  unfold "≡₃".
+  split; [ assumption | ].
+  split.
+   rewrite Hb₂.
+   apply rotate_param_app_a in Hrp₁.
+   unfold "≡₃" in Hrp₁.
 
 bbb.
 
