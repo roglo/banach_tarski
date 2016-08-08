@@ -830,6 +830,27 @@ split; [ | split ].
  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
 Qed.
 
+Theorem rotate_param_app_aa : ∀ el p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ [ạ; ạ]) p) ≡₃
+      (0%Z, (c - b)%Z, (b - c)%Z).
+Proof.
+intros el p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+split; [ | split ].
+ rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+ rewrite <- Z.mod_add with (b := (2 * b)%Z); [ | intros; discriminate ].
+ rewrite <- Z.mod_add with (b := (- c)%Z); [ | intros; discriminate ].
+ f_equal; ring_simplify; reflexivity.
+
+ rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros; discriminate ].
+ rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros; discriminate ].
+ f_equal; ring_simplify; reflexivity.
+Qed.
+
+
 Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ List.repeat ạ (n + 1)) p) ≡₃
@@ -852,6 +873,32 @@ rewrite Nat_mod_add_once; [ | intros; discriminate ].
 rewrite Nat.add_comm; simpl.
 do 3 rewrite cons_comm_app.
 do 2 rewrite List.app_assoc.
+pose proof rotate_param_app_aa _ _ _ _ _ _ Hrp as H₁.
+unfold "≡₃" in H₁; simpl in H₁.
+remember (fold_left rotate_param (el ++ [ạ; ạ]) p) as p₁ eqn:Hp₁.
+symmetry in Hp₁.
+destruct p₁ as (((a₁, b₁), c₁), N₁).
+simpl in H₁.
+rewrite Z.mod_0_l in H₁; [ | intros; discriminate ].
+eapply rotate_param_app_an.
+bbb.
+
+pose proof rotate_param_app_a _ _ _ _ _ _ Hrp as H₁.
+
+remember (fold_left rotate_param (el ++ [ạ]) p) as p₁ eqn:Hp₁.
+symmetry in Hp₁.
+destruct u as (((a₁, b₁), c₁), N₁).
+
+unfold "≡₃" in H₁.
+simpl in H₁.
+rewrite Z.mod_0_l in H₁; [ | intros; discriminate ].
+
+rotate_param_app_a : 
+∀ (el : list free_elem) (p : ℤ * ℤ * ℤ * ℕ) (a b c : ℤ) 
+(N : ℕ),
+fold_left rotate_param el p = (a, b, c, N)
+→ fst3 (fold_left rotate_param (el ++ [ạ]) p) ≡₃ (0%Z, (b - c)%Z, (c - b)%Z)
+
 bbb.
 
 remember (fold_left rotate_param ((el ++ [ạ]) ++ [ạ]) p) as u eqn:Hu.
