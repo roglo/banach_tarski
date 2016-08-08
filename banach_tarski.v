@@ -873,10 +873,17 @@ destruct n.
    rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
    f_equal; ring_simplify; reflexivity.
 
-  Guarded.
-  pose proof rotate_param_app_an (el ++ [ạ; ạ]) n p.
+  remember (fold_left rotate_param (el ++ [ạ; ạ]) p) as x eqn:Hx.
+  remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) x)) as y eqn:Hy.
+  symmetry in Hx, Hy.
+  destruct x as (((a₂, b₂), c₂), N₂).
+  destruct y as ((a₃, b₃), c₃).
+  pose proof rotate_param_app_an (el ++ [ạ; ạ]) n p a₂ b₂ c₂ N₂ a₃ b₃ c₃ Hx Hy.
+  destruct (zerop (n mod 2)) as [Hn| Hn].
+   destruct H as (Ha, (Hb, Hc)).
+   destruct (zerop (S (S n) mod 2)) as [Hn₁| Hn₁].
+bbb. (* ouais, bon, c'est la merde, quoi *)
 
-bbb.
 destruct (zerop (n mod 2)) as [Hn| Hn].
  simpl in Hrp₁; simpl.
  rewrite Z.mod_0_l; [ | intros; discriminate ].
