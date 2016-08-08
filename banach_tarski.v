@@ -897,6 +897,7 @@ Theorem rotate_param_app_an : ∀ el n p a b c N,
       else (0%Z, (c - b)%Z, (b - c)%Z).
 Proof.
 intros el n p a b c N Hrp.
+(*
 rewrite Nat.add_1_r; simpl.
 rewrite cons_comm_app.
 revert n el p a b c N Hrp.
@@ -954,7 +955,7 @@ destruct abcN as (((a₁, b₁), c₁), N₁).
 pose proof IHn (el ++ [ạ]) _ _ _ _ _ Habc.
 
 bbb.
-(**)
+*)
 unfold "≡₃".
 rewrite fold_left_app, Hrp; simpl.
 remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N))) as x.
