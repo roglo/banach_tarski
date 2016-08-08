@@ -842,7 +842,7 @@ rewrite fold_left_app, Hrp; simpl.
 remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N))) as x.
 destruct x as ((a₁, b₁), c₁); rename Heqx into Hrp₁.
 symmetry in Hrp₁.
-(**)
+(*
 revert el n p a b c N a₁ b₁ c₁ Hrp Hrp₁.
 fix 2; intros.
 destruct n.
@@ -921,8 +921,9 @@ destruct (zerop (n mod 2)) as [Hn| Hn].
   simpl in Hrp₁.
 
 bbb.
+*)
 revert el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
-induction n; intros.
+destruct n; intros.
  simpl in Hrp₁; simpl.
  rewrite Z.mod_0_l; [ | intros; discriminate ].
  injection Hrp₁; clear Hrp₁; intros; subst.
@@ -966,6 +967,19 @@ induction n; intros.
     f_equal; ring_simplify; reflexivity.
 
    destruct n.
+    simpl in Hrp₁; simpl.
+    rewrite Z.mod_0_l; [ | intros; discriminate ].
+    injection Hrp₁; clear Hrp₁; intros; subst.
+    split; [ | split ].
+     rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+     rewrite <- Z.mod_add with (b := (- 6 * b)%Z); [ | intros H; discriminate ].
+     rewrite <- Z.mod_add with (b := (19 * c)%Z); [ | intros H; discriminate ].
+     f_equal; ring_simplify; reflexivity.
+
+     rewrite <- Z.mod_add with (b := (- 37 * b)%Z); [ | intros H; discriminate ].
+     rewrite <- Z.mod_add with (b := (- 6 * c)%Z); [ | intros H; discriminate ].
+     f_equal; ring_simplify; reflexivity.
 bbb.
 
 End Rotation.
