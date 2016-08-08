@@ -17,13 +17,6 @@ Proof. reflexivity. Qed.
 Theorem cons_comm_app {A} : ∀ (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
 Proof. reflexivity. Qed.
 
-Theorem list_Forall_inv : ∀ A (P : A → Prop) a l,
-  List.Forall P (a :: l) → P a ∧ List.Forall P l.
-Proof.
-intros A P a l H.
-inversion H; split; assumption.
-Qed.
-
 Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
 Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
 
@@ -581,6 +574,13 @@ Arguments Nat.modulo _ _ : simpl nomatch.
 Arguments Z.mul _ _ : simpl nomatch.
 (* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
 
+Theorem Nat_mod_add_once : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
+Proof.
+intros a b Hb.
+replace b with (1 * b) at 1 by apply Nat.mul_1_l.
+apply Nat.mod_add; assumption.
+Qed.
+
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
   (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
 Proof.
@@ -872,6 +872,21 @@ destruct n.
    rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros H; discriminate ].
    rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
    f_equal; ring_simplify; reflexivity.
+
+  do 2 rewrite <- Nat.add_1_r.
+  rewrite <- Nat.add_assoc; simpl.
+  rewrite Nat_mod_add_once; [ | intros; discriminate ].
+  remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N)))
+   as x eqn:Hx; symmetry in Hx.
+  destruct x as ((a₂, b₂), c₂).
+  pose proof rotate_param_app_an el n p a b c N a₂ b₂ c₂ Hrp Hx.
+  destruct (zerop (n mod 2)) as [Hn| Hn].
+   rewrite Z.mod_0_l in H; [ | intros; discriminate ].
+   rewrite Z.mod_0_l; [ | intros; discriminate ].
+   destruct H as (Ha, (Hb, Hc)).
+
+bbb.
+  rewrite <- Nat.add_mod.
 
   remember (fold_left rotate_param (el ++ [ạ; ạ]) p) as x eqn:Hx.
   remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) x)) as y eqn:Hy.
