@@ -837,6 +837,38 @@ Theorem rotate_param_app_an : ∀ el n p a b c N,
       else (0%Z, (c - b)%Z, (b - c)%Z).
 Proof.
 intros el n p a b c N Hrp.
+(**)
+rewrite Nat.add_1_r; simpl.
+rewrite cons_comm_app.
+revert n el p a b c N Hrp.
+fix 1; intros.
+destruct n.
+Focus 2.
+destruct n.
+Focus 2.
+do 2 rewrite <- Nat.add_1_r.
+rewrite <- Nat.add_assoc; simpl.
+rewrite Nat_mod_add_once; [ | intros; discriminate ].
+rewrite Nat.add_comm; simpl.
+do 3 rewrite cons_comm_app.
+do 2 rewrite List.app_assoc.
+bbb.
+
+remember (fold_left rotate_param ((el ++ [ạ]) ++ [ạ]) p) as u eqn:Hu.
+symmetry in Hu.
+destruct u as (((a₁, b₁), c₁), N₁).
+pose proof rotate_param_app_an n el.
+
+eapply rotate_param_app_an.
+
+
+remember (fold_left rotate_param (el ++ [ạ]) p) as abcN eqn:Habc.
+symmetry in Habc.
+destruct abcN as (((a₁, b₁), c₁), N₁).
+pose proof IHn (el ++ [ạ]) _ _ _ _ _ Habc.
+
+bbb.
+(**)
 unfold "≡₃".
 rewrite fold_left_app, Hrp; simpl.
 remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N))) as x.
