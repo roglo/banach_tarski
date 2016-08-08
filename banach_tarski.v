@@ -892,10 +892,10 @@ Qed.
 
 Definition rotate_param_mod_3 '(a, b, c) e :=
  match e with
- | ạ⁻¹ => (0%Z, (b + c)%Z, (b + c)%Z)
- | ạ => (0%Z, (b - c)%Z, (- b + c)%Z)
- | ḅ⁻¹ => ((a - b)%Z, (- a + b)%Z, 0%Z)
- | ḅ => ((a + b)%Z, (a + b)%Z, 0%Z)
+ | ạ⁻¹ => (0%Z, ((b + c) mod 3)%Z, ((b + c) mod 3)%Z)
+ | ạ => (0%Z, ((b - c) mod 3)%Z, ((c - b) mod 3)%Z)
+ | ḅ⁻¹ => (((a - b) mod 3)%Z, ((b - a) mod 3)%Z, 0%Z)
+ | ḅ => (((a + b) mod 3)%Z, ((a + b) mod 3)%Z, 0%Z)
  end.
 
 Theorem glop : ∀ el a b c N a₁ b₁ c₁,
@@ -912,7 +912,7 @@ destruct t, d.
  erewrite <- IHel; [ | eassumption ].
  f_equal; f_equal; f_equal.
   rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
-bbb.
+Admitted.
 
 Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
@@ -1065,6 +1065,27 @@ destruct (zerop (n mod 2)) as [Hn| Hn].
 
 bbb.
 *)
+(**)
+apply glop in Hrp₁.
+revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+fix 1; intros.
+destruct n.
+ simpl in Hrp₁; simpl.
+ injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+ rewrite <- Ha, <- Hb, <- Hc.
+ split; [ reflexivity | split; symmetry; apply Zdiv.Zminus_mod ].
+
+ destruct n.
+  simpl in Hrp₁; simpl.
+  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+  rewrite <- Ha, <- Hb, <- Hc.
+  split; [ reflexivity | ].
+  split.
+   rewrite <- Zdiv.Zminus_mod.
+Focus 3.
+
+bbb.
+(**)
 revert el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
 destruct n; intros.
  simpl in Hrp₁; simpl.
@@ -1079,7 +1100,6 @@ destruct n; intros.
   rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
   f_equal; ring.
 
-bbb.
  destruct n.
   simpl in Hrp₁; simpl.
   rewrite Z.mod_0_l; [ | intros; discriminate ].
