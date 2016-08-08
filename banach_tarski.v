@@ -843,6 +843,40 @@ remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N))) as x.
 destruct x as ((a₁, b₁), c₁); rename Heqx into Hrp₁.
 symmetry in Hrp₁.
 (**)
+revert el n p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+fix 2; intros.
+destruct n.
+ simpl in Hrp₁; simpl.
+ rewrite Z.mod_0_l; [ | intros; discriminate ].
+ injection Hrp₁; clear Hrp₁; intros; subst.
+ split; [ | split ].
+  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+  rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
+  f_equal; ring_simplify; reflexivity.
+
+  rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
+  f_equal; ring_simplify; reflexivity.
+
+ destruct n.
+  simpl in Hrp₁; simpl.
+  rewrite Z.mod_0_l; [ | intros; discriminate ].
+  injection Hrp₁; clear Hrp₁; intros; subst.
+  split; [ | split ].
+   rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
+
+   rewrite <- Z.mod_add with (b := (2 * b)%Z); [ | intros H; discriminate ].
+   rewrite <- Z.mod_add with (b := (- c)%Z); [ | intros H; discriminate ].
+   f_equal; ring_simplify; reflexivity.
+
+   rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros H; discriminate ].
+   rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
+   f_equal; ring_simplify; reflexivity.
+
+  Guarded.
+  pose proof rotate_param_app_an (el ++ [ạ; ạ]) n p.
+
+bbb.
 destruct (zerop (n mod 2)) as [Hn| Hn].
  simpl in Hrp₁; simpl.
  rewrite Z.mod_0_l; [ | intros; discriminate ].
