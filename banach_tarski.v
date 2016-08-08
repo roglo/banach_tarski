@@ -884,6 +884,7 @@ destruct n.
    rewrite Z.mod_0_l in H; [ | intros; discriminate ].
    rewrite Z.mod_0_l; [ | intros; discriminate ].
    destruct H as (Ha, (Hb, Hc)).
+   simpl in Hrp₁.
 
 bbb.
   rewrite <- Nat.add_mod.
