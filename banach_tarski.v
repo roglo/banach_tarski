@@ -890,6 +890,30 @@ split; [ | split ].
  f_equal; ring_simplify; reflexivity.
 Qed.
 
+Definition rotate_param_mod_3 '(a, b, c) e :=
+ match e with
+ | ạ⁻¹ => (0%Z, (b + c)%Z, (b + c)%Z)
+ | ạ => (0%Z, (b - c)%Z, (- b + c)%Z)
+ | ḅ⁻¹ => ((a - b)%Z, (- a + b)%Z, 0%Z)
+ | ḅ => ((a + b)%Z, (a + b)%Z, 0%Z)
+ end.
+
+Theorem glop : ∀ el a b c N a₁ b₁ c₁,
+  fst3 (fold_left rotate_param el (a₁, b₁, c₁, N)) = (a, b, c)
+  → fold_left rotate_param_mod_3 el (a₁ mod 3, b₁ mod 3, c₁ mod 3)%Z =
+      (a mod 3, b mod 3, c mod 3)%Z.
+Proof.
+intros el a b c N a₁ b₁ c₁ Hp.
+revert a b c N a₁ b₁ c₁ Hp.
+induction el as [| e]; intros; [ injection Hp; intros; subst; reflexivity | ].
+simpl in Hp; simpl.
+destruct e as (t, d).
+destruct t, d.
+ erewrite <- IHel; [ | eassumption ].
+ f_equal; f_equal; f_equal.
+  rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
+bbb.
+
 Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ List.repeat ạ (n + 1)) p) ≡₃
@@ -1055,6 +1079,7 @@ destruct n; intros.
   rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
   f_equal; ring.
 
+bbb.
  destruct n.
   simpl in Hrp₁; simpl.
   rewrite Z.mod_0_l; [ | intros; discriminate ].
