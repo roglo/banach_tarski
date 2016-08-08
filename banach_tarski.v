@@ -897,15 +897,15 @@ Theorem rotate_param_app_an : ∀ el n p a b c N,
       else (0%Z, (c - b)%Z, (b - c)%Z).
 Proof.
 intros el n p a b c N Hrp.
-(**)
 rewrite Nat.add_1_r; simpl.
 rewrite cons_comm_app.
 revert n el p a b c N Hrp.
 fix 1; intros.
-destruct n.
-Focus 2.
-destruct n.
-Focus 2.
+destruct n; [ eapply rotate_param_app_a; eassumption | ].
+destruct n; [ eapply rotate_param_app_aa; eassumption | ].
+pose proof rotate_param_app_an n _ _ _ _ _ _ Hrp.
+bbb.
+
 do 2 rewrite <- Nat.add_1_r.
 rewrite <- Nat.add_assoc; simpl.
 rewrite Nat_mod_add_once; [ | intros; discriminate ].
