@@ -980,6 +980,11 @@ destruct n; intros.
      rewrite <- Z.mod_add with (b := (- 37 * b)%Z); [ | intros H; discriminate ].
      rewrite <- Z.mod_add with (b := (- 6 * c)%Z); [ | intros H; discriminate ].
      f_equal; ring_simplify; reflexivity.
+
+    destruct n.
+     simpl in Hrp₁; simpl.
+     rewrite Z.mod_0_l; [ | intros; discriminate ].
+     injection Hrp₁; clear Hrp₁; intros; subst.
 bbb.
 
 End Rotation.
