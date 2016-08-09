@@ -991,11 +991,21 @@ destruct n.
    rewrite <- Zdiv.Zminus_mod_idemp_r.
    rewrite <- Zdiv.Zminus_mod; subst x.
    rewrite <- Zdiv.Zminus_mod.
-   rewrite <- Z.mod_add with (b := (- b)%Z); [  | intros **; discriminate ].
-   rewrite <- Z.mod_add with (b := c%Z); [  | intros **; discriminate ].
+   rewrite <- Z.mod_add with (b := (- b)%Z); [  | intros; discriminate ].
+   rewrite <- Z.mod_add with (b := c%Z); [  | intros; discriminate ].
    f_equal; ring_simplify; reflexivity.
 
-   Focus 2.
+   rewrite <- Zdiv.Zminus_mod.
+   rewrite <- Zdiv.Zminus_mod_idemp_l.
+   rewrite <- Zdiv.Zminus_mod.
+   set (x := ((c - b) mod 3)%Z).
+   rewrite <- Zdiv.Zminus_mod_idemp_r.
+   rewrite <- Zdiv.Zminus_mod; subst x.
+   rewrite <- Zdiv.Zminus_mod.
+   rewrite <- Z.mod_add with (b := b); [  | intros; discriminate ].
+   rewrite <- Z.mod_add with (b := (-c)%Z); [  | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
+
    rewrite Nat.add_1_r in Hrp₁.
    rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
     rewrite <- Nat.add_1_r in Hrp₁.
@@ -1006,75 +1016,8 @@ destruct n.
     assumption.
 
     apply Nat.lt_0_succ.
+Qed.
 
-  simpl.
-Guarded.
-
-bbb.
-(**)
-revert el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
-destruct n; intros.
- simpl in Hrp₁; simpl.
- rewrite Z.mod_0_l; [ | intros; discriminate ].
- injection Hrp₁; clear Hrp₁; intros; subst.
- split; [ | split ].
-  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
-  rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
-  f_equal; ring.
-
-  rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
-  f_equal; ring.
-
- destruct n.
-  simpl in Hrp₁; simpl.
-  rewrite Z.mod_0_l; [ | intros; discriminate ].
-  injection Hrp₁; clear Hrp₁; intros; subst.
-  split; [ | split ].
-   rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
-   rewrite <- Z.mod_add with (b := (2 * b)%Z); [ | intros H; discriminate ].
-   rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
-   f_equal; ring.
-
-   rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros H; discriminate ].
-   rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
-   f_equal; ring.
-
-  destruct n.
-   simpl in Hrp₁; simpl.
-   rewrite Z.mod_0_l; [ | intros; discriminate ].
-   injection Hrp₁; clear Hrp₁; intros; subst.
-   split; [ | split ].
-    rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
-    rewrite <- Z.mod_add with (b := (8 * b)%Z); [ | intros H; discriminate ].
-    rewrite <- Z.mod_add with (b := (3 * c)%Z); [ | intros H; discriminate ].
-    f_equal; ring_simplify; reflexivity.
-
-    rewrite <- Z.mod_add with (b := (- 7 * b)%Z); [ | intros H; discriminate ].
-    rewrite <- Z.mod_add with (b := (8 * c)%Z); [ | intros H; discriminate ].
-    f_equal; ring_simplify; reflexivity.
-
-   destruct n.
-    simpl in Hrp₁; simpl.
-    rewrite Z.mod_0_l; [ | intros; discriminate ].
-    injection Hrp₁; clear Hrp₁; intros; subst.
-    split; [ | split ].
-     rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
-     rewrite <- Z.mod_add with (b := (- 6 * b)%Z); [ | intros H; discriminate ].
-     rewrite <- Z.mod_add with (b := (19 * c)%Z); [ | intros H; discriminate ].
-     f_equal; ring_simplify; reflexivity.
-
-     rewrite <- Z.mod_add with (b := (- 37 * b)%Z); [ | intros H; discriminate ].
-     rewrite <- Z.mod_add with (b := (- 6 * c)%Z); [ | intros H; discriminate ].
-     f_equal; ring_simplify; reflexivity.
-
-    destruct n.
-     simpl in Hrp₁; simpl.
-     rewrite Z.mod_0_l; [ | intros; discriminate ].
-     injection Hrp₁; clear Hrp₁; intros; subst.
 bbb.
 
 End Rotation.
