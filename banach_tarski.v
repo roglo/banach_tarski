@@ -830,18 +830,52 @@ destruct t, d.
 Qed.
 
 Theorem Z_mod_expr_1 : ∀ n,
-  (n mod 3)%Z = ((n mod 3 - - n mod 3 - - n mod 3 + n mod 3) mod 3)%Z.
+  (n mod 3)%Z =
+  (((n mod 3 + n mod 3) mod 3 + (n mod 3 + n mod 3) mod 3) mod 3)%Z.
 Proof.
 intros n.
-destruct (Z.eq_dec (n mod 3) 0) as [Hx| Hx].
- rewrite Hx.
- apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx; reflexivity.
+rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
+rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
+set (x := (- (n mod 3))%Z); symmetry.
+rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
+f_equal; ring_simplify; reflexivity.
+Qed.
 
- rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
- rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
- rewrite <- Z.mod_add with (b := (n mod 3)%Z); [ | intros; discriminate ].
- rewrite <- Z.mod_add with (b := (-2)%Z); [ | intros; discriminate ].
- f_equal; ring_simplify; reflexivity.
+Theorem Z_mod_expr_2 : ∀ a b,
+  ((a - b) mod 3)%Z =
+  ((((a - b) mod 3 - (b - a) mod 3) mod 3 -
+    ((b - a) mod 3 - (a - b) mod 3) mod 3) mod 3)%Z.
+Proof.
+intros.
+rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
+rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
+rewrite Z.add_sub_assoc.
+rewrite Zdiv.Zminus_mod_idemp_r.
+rewrite Z.add_sub_assoc, Z.add_comm.
+do 2 rewrite <- Z.add_sub_assoc.
+rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
+rewrite Z_sub_sub_swap.
+do 2 rewrite Z.add_sub_assoc.
+rewrite Zdiv.Zminus_mod_idemp_r.
+rewrite <- Z.mod_add with (b := (a - b)%Z); [ | intros; discriminate ].
+f_equal; ring_simplify; reflexivity.
+Qed.
+
+Theorem Z_mod_expr_3 : ∀ a b,
+  ((a - b) mod 3)%Z =
+  (((b mod 3 - a mod 3) mod 3 - (a mod 3 - b mod 3) mod 3) mod 3)%Z.
+Proof.
+intros.
+symmetry.
+rewrite <- Zdiv.Zminus_mod.
+rewrite <- Zdiv.Zminus_mod_idemp_l.
+rewrite <- Zdiv.Zminus_mod.
+set (x := ((b - a) mod 3)%Z).
+rewrite <- Zdiv.Zminus_mod_idemp_r.
+rewrite <- Zdiv.Zminus_mod; subst x.
+rewrite <- Zdiv.Zminus_mod.
+rewrite <- Z.mod_add with (b := (a - b)%Z); [  | intros; discriminate ].
+f_equal; ring_simplify; reflexivity.
 Qed.
 
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n e p,
@@ -859,90 +893,14 @@ destruct n.
  simpl; subst p'; clear.
  destruct p as ((a, b), c); simpl.
  destruct e as (t, d).
- destruct t, d.
-  simpl; f_equal.
-   f_equal.
-   rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
-   rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
-   set (x := (- ((b + c) mod 3))%Z); symmetry.
-   rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
+ destruct t, d; simpl.
+  f_equal; [ f_equal; apply Z_mod_expr_1 | apply Z_mod_expr_1 ].
 
-   rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
-   rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
-   set (x := (- ((b + c) mod 3))%Z); symmetry.
-   rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
+  f_equal; [ f_equal; apply Z_mod_expr_2 | apply Z_mod_expr_2 ].
 
-  simpl; f_equal.
-   f_equal.
-   rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
-   rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
-   rewrite Z.add_sub_assoc.
-   rewrite Zdiv.Zminus_mod_idemp_r.
-   rewrite Z.add_sub_assoc, Z.add_comm.
-   do 2 rewrite <- Z.add_sub_assoc.
-   rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
-   rewrite Z_sub_sub_swap.
-   do 2 rewrite Z.add_sub_assoc.
-   rewrite Zdiv.Zminus_mod_idemp_r.
-   rewrite <- Z.mod_add with (b := (b - c)%Z); [ | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
+  f_equal; f_equal; apply Z_mod_expr_2.
 
-   rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
-   rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
-   rewrite Z.add_sub_assoc.
-   rewrite Zdiv.Zminus_mod_idemp_r.
-   rewrite Z.add_sub_assoc, Z.add_comm.
-   do 2 rewrite <- Z.add_sub_assoc.
-   rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
-   rewrite Z_sub_sub_swap.
-   do 2 rewrite Z.add_sub_assoc.
-   rewrite Zdiv.Zminus_mod_idemp_r.
-   rewrite <- Z.mod_add with (b := (- b + c)%Z); [ | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
-
-  simpl; f_equal.
-   f_equal.
-   rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
-   rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
-   rewrite Z.add_sub_assoc.
-   rewrite Zdiv.Zminus_mod_idemp_r.
-   rewrite Z.add_sub_assoc, Z.add_comm.
-   do 2 rewrite <- Z.add_sub_assoc.
-   rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
-   rewrite Z_sub_sub_swap.
-   do 2 rewrite Z.add_sub_assoc.
-   rewrite Zdiv.Zminus_mod_idemp_r.
-   rewrite <- Z.mod_add with (b := (a - b)%Z); [ | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
-
-   rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
-   rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
-   rewrite Z.add_sub_assoc.
-   rewrite Zdiv.Zminus_mod_idemp_r.
-   rewrite Z.add_sub_assoc, Z.add_comm.
-   do 2 rewrite <- Z.add_sub_assoc.
-   rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
-   rewrite Z_sub_sub_swap.
-   do 2 rewrite Z.add_sub_assoc.
-   rewrite Zdiv.Zminus_mod_idemp_r.
-   rewrite <- Z.mod_add with (b := (b - a)%Z); [ | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
-
-  simpl; f_equal.
-   f_equal.
-   rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
-   rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
-   set (x := (- ((a + b) mod 3))%Z); symmetry.
-   rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
-
-   rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
-   rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
-   set (x := (- ((a + b) mod 3))%Z); symmetry.
-   rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
+  f_equal; f_equal; apply Z_mod_expr_1.
 
  apply IHn; [ apply Nat.lt_0_succ | subst p'; reflexivity ].
 Qed.
@@ -973,40 +931,17 @@ destruct n.
   simpl in Hrp₁; simpl.
   injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
   rewrite <- Ha, <- Hb, <- Hc.
-  split; [ reflexivity |  ].
-  split.
-   rewrite <- Zdiv.Zminus_mod.
-   rewrite <- Zdiv.Zminus_mod_idemp_l.
-   rewrite <- Zdiv.Zminus_mod.
-   set (x := ((b - c) mod 3)%Z).
-   rewrite <- Zdiv.Zminus_mod_idemp_r.
-   rewrite <- Zdiv.Zminus_mod; subst x.
-   rewrite <- Zdiv.Zminus_mod.
-   rewrite <- Z.mod_add with (b := (- b)%Z); [  | intros; discriminate ].
-   rewrite <- Z.mod_add with (b := c%Z); [  | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
+  split; [ reflexivity | split; symmetry; apply Z_mod_expr_3 ].
 
-   rewrite <- Zdiv.Zminus_mod.
-   rewrite <- Zdiv.Zminus_mod_idemp_l.
-   rewrite <- Zdiv.Zminus_mod.
-   set (x := ((c - b) mod 3)%Z).
-   rewrite <- Zdiv.Zminus_mod_idemp_r.
-   rewrite <- Zdiv.Zminus_mod; subst x.
-   rewrite <- Zdiv.Zminus_mod.
-   rewrite <- Z.mod_add with (b := b); [  | intros; discriminate ].
-   rewrite <- Z.mod_add with (b := (-c)%Z); [  | intros; discriminate ].
-   f_equal; ring_simplify; reflexivity.
+  rewrite Nat.add_1_r in Hrp₁.
+  rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
+   rewrite <- Nat.add_1_r in Hrp₁.
+   pose proof (rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
+   do 2 rewrite <- Nat.add_1_r.
+   rewrite <- Nat.add_assoc; simpl.
+   rewrite Nat_mod_add_once; [ assumption | intros; discriminate ].
 
-   rewrite Nat.add_1_r in Hrp₁.
-   rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
-    rewrite <- Nat.add_1_r in Hrp₁.
-    pose proof (rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
-    do 2 rewrite <- Nat.add_1_r.
-    rewrite <- Nat.add_assoc; simpl.
-    rewrite Nat_mod_add_once; [ | intros; discriminate ].
-    assumption.
-
-    apply Nat.lt_0_succ.
+   apply Nat.lt_0_succ.
 Qed.
 
 Theorem rotate_param_app_bn : ∀ el n p a b c N,
