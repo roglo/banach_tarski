@@ -919,16 +919,15 @@ Theorem Z_mod_expr_1 : ∀ n,
 Proof.
 intros n.
 destruct (Z.eq_dec (n mod 3) 0) as [Hx| Hx].
-rewrite Hx.
-apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx.
-reflexivity.
+ rewrite Hx.
+ apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx; reflexivity.
 
-rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
-remember (n mod 3)%Z as y eqn:Hy.
-replace (y - (3 - y) - (3 - y) + y)%Z with (y + (y - 2) * 3)%Z by ring.
-rewrite Z.mod_add; [ | intros; discriminate ].
-subst y; rewrite Z.mod_mod; [ | intros; discriminate ].
-reflexivity.
+ rewrite Zdiv.Z_mod_nz_opp_full; [ symmetry | assumption ].
+ rewrite <- Z.mod_add with (b := (- (n mod 3))%Z); [ | intros; discriminate ].
+ rewrite <- Z.mod_add with (b := 2%Z); [ | intros; discriminate ].
+ symmetry; rewrite <- Z.mod_mod; [ | intros; discriminate ].
+ f_equal; ring_simplify.
+ symmetry; rewrite Z.mod_mod; [ reflexivity | intros; discriminate ].
 Qed.
 
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n p,
@@ -964,151 +963,12 @@ Theorem rotate_param_app_an : ∀ el n p a b c N,
       else (0%Z, (c - b)%Z, (b - c)%Z).
 Proof.
 intros el n p a b c N Hrp.
-(*
-rewrite Nat.add_1_r; simpl.
-rewrite cons_comm_app.
-revert n el p a b c N Hrp.
-fix 1; intros.
-destruct n; [ eapply rotate_param_app_a; eassumption | ].
-destruct n; [ eapply rotate_param_app_aa; eassumption | ].
-pose proof rotate_param_app_an n _ _ _ _ _ _ Hrp.
-bbb.
-
-do 2 rewrite <- Nat.add_1_r.
-rewrite <- Nat.add_assoc; simpl.
-rewrite Nat_mod_add_once; [ | intros; discriminate ].
-rewrite Nat.add_comm; simpl.
-do 3 rewrite cons_comm_app.
-do 2 rewrite List.app_assoc.
-pose proof rotate_param_app_aa _ _ _ _ _ _ Hrp as H₁.
-unfold "≡₃" in H₁; simpl in H₁.
-remember (fold_left rotate_param (el ++ [ạ; ạ]) p) as p₁ eqn:Hp₁.
-symmetry in Hp₁.
-destruct p₁ as (((a₁, b₁), c₁), N₁).
-simpl in H₁.
-rewrite Z.mod_0_l in H₁; [ | intros; discriminate ].
-eapply rotate_param_app_an.
-bbb.
-
-pose proof rotate_param_app_a _ _ _ _ _ _ Hrp as H₁.
-
-remember (fold_left rotate_param (el ++ [ạ]) p) as p₁ eqn:Hp₁.
-symmetry in Hp₁.
-destruct u as (((a₁, b₁), c₁), N₁).
-
-unfold "≡₃" in H₁.
-simpl in H₁.
-rewrite Z.mod_0_l in H₁; [ | intros; discriminate ].
-
-rotate_param_app_a : 
-∀ (el : list free_elem) (p : ℤ * ℤ * ℤ * ℕ) (a b c : ℤ) 
-(N : ℕ),
-fold_left rotate_param el p = (a, b, c, N)
-→ fst3 (fold_left rotate_param (el ++ [ạ]) p) ≡₃ (0%Z, (b - c)%Z, (c - b)%Z)
-
-bbb.
-
-remember (fold_left rotate_param ((el ++ [ạ]) ++ [ạ]) p) as u eqn:Hu.
-symmetry in Hu.
-destruct u as (((a₁, b₁), c₁), N₁).
-pose proof rotate_param_app_an n el.
-
-eapply rotate_param_app_an.
-
-
-remember (fold_left rotate_param (el ++ [ạ]) p) as abcN eqn:Habc.
-symmetry in Habc.
-destruct abcN as (((a₁, b₁), c₁), N₁).
-pose proof IHn (el ++ [ạ]) _ _ _ _ _ Habc.
-
-bbb.
-*)
 unfold "≡₃".
 rewrite fold_left_app, Hrp; simpl.
-remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N))) as x.
-destruct x as ((a₁, b₁), c₁); rename Heqx into Hrp₁.
-symmetry in Hrp₁.
-(*
-revert el n p a b c N a₁ b₁ c₁ Hrp Hrp₁.
-fix 2; intros.
-destruct n.
- simpl in Hrp₁; simpl.
- rewrite Z.mod_0_l; [ | intros; discriminate ].
- injection Hrp₁; clear Hrp₁; intros; subst.
- split; [ | split ].
-  rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
-  rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
-  f_equal; ring_simplify; reflexivity.
-
-  rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
-  f_equal; ring_simplify; reflexivity.
-
- destruct n.
-  simpl in Hrp₁; simpl.
-  rewrite Z.mod_0_l; [ | intros; discriminate ].
-  injection Hrp₁; clear Hrp₁; intros; subst.
-  split; [ | split ].
-   rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
-   rewrite <- Z.mod_add with (b := (2 * b)%Z); [ | intros H; discriminate ].
-   rewrite <- Z.mod_add with (b := (- c)%Z); [ | intros H; discriminate ].
-   f_equal; ring_simplify; reflexivity.
-
-   rewrite <- Z.mod_add with (b := (3 * b)%Z); [ | intros H; discriminate ].
-   rewrite <- Z.mod_add with (b := (2 * c)%Z); [ | intros H; discriminate ].
-   f_equal; ring_simplify; reflexivity.
-
-  do 2 rewrite <- Nat.add_1_r.
-  rewrite <- Nat.add_assoc; simpl.
-  rewrite Nat_mod_add_once; [ | intros; discriminate ].
-  remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) (a, b, c, N)))
-   as x eqn:Hx; symmetry in Hx.
-  destruct x as ((a₂, b₂), c₂).
-  pose proof rotate_param_app_an el n p a b c N a₂ b₂ c₂ Hrp Hx.
-  destruct (zerop (n mod 2)) as [Hn| Hn].
-   rewrite Z.mod_0_l in H; [ | intros; discriminate ].
-   rewrite Z.mod_0_l; [ | intros; discriminate ].
-   destruct H as (Ha, (Hb, Hc)).
-   simpl in Hrp₁.
-
-bbb.
-  rewrite <- Nat.add_mod.
-
-  remember (fold_left rotate_param (el ++ [ạ; ạ]) p) as x eqn:Hx.
-  remember (fst3 (fold_left rotate_param (repeat ạ (n + 1)) x)) as y eqn:Hy.
-  symmetry in Hx, Hy.
-  destruct x as (((a₂, b₂), c₂), N₂).
-  destruct y as ((a₃, b₃), c₃).
-  pose proof rotate_param_app_an (el ++ [ạ; ạ]) n p a₂ b₂ c₂ N₂ a₃ b₃ c₃ Hx Hy.
-  destruct (zerop (n mod 2)) as [Hn| Hn].
-   destruct H as (Ha, (Hb, Hc)).
-   destruct (zerop (S (S n) mod 2)) as [Hn₁| Hn₁].
-bbb. (* ouais, bon, c'est la merde, quoi *)
-
-destruct (zerop (n mod 2)) as [Hn| Hn].
- simpl in Hrp₁; simpl.
- rewrite Z.mod_0_l; [ | intros; discriminate ].
- apply Nat.mod_divide in Hn; [ | intros; discriminate ].
- destruct Hn as (k, Hn); rewrite Nat.mul_comm in Hn; subst n.
- revert el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
- induction k; intros.
-  simpl in Hrp₁.
-  injection Hrp₁; clear Hrp₁; intros; subst.
-  split; [ | split ].
-   rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
-   rewrite <- Z.mod_add with (b := (-c)%Z); [ | intros H; discriminate ].
-   f_equal; ring.
-
-   rewrite <- Z.mod_add with (b := b); [ | intros H; discriminate ].
-   f_equal; ring.
-
-  simpl in Hrp₁.
-
-bbb.
-*)
-(**)
+remember (repeat ạ (n + 1)) as al.
+remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
+subst al; symmetry in Hrp₁.
+destruct x as ((a₁, b₁), c₁).
 apply glop in Hrp₁.
 revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
 fix 1; intros.
@@ -1122,34 +982,33 @@ destruct n.
   simpl in Hrp₁; simpl.
   injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
   rewrite <- Ha, <- Hb, <- Hc.
-  split; [ reflexivity | ].
+  split; [ reflexivity |  ].
   split.
    rewrite <- Zdiv.Zminus_mod.
-Focus 3.
+   rewrite <- Zdiv.Zminus_mod_idemp_l.
+   rewrite <- Zdiv.Zminus_mod.
+   set (x := ((b - c) mod 3)%Z).
+   rewrite <- Zdiv.Zminus_mod_idemp_r.
+   rewrite <- Zdiv.Zminus_mod; subst x.
+   rewrite <- Zdiv.Zminus_mod.
+   rewrite <- Z.mod_add with (b := (- b)%Z); [  | intros **; discriminate ].
+   rewrite <- Z.mod_add with (b := c%Z); [  | intros **; discriminate ].
+   f_equal; ring_simplify; reflexivity.
 
-rewrite Nat.add_1_r in Hrp₁.
-rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
-rewrite <- Nat.add_1_r in Hrp₁.
-pose proof rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
- do 2 rewrite <- Nat.add_1_r.
- rewrite <- Nat.add_assoc; simpl.
- rewrite Nat_mod_add_once.
-assumption.
-intros; discriminate.
-apply Nat.lt_0_succ.
+   Focus 2.
+   rewrite Nat.add_1_r in Hrp₁.
+   rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
+    rewrite <- Nat.add_1_r in Hrp₁.
+    pose proof (rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
+    do 2 rewrite <- Nat.add_1_r.
+    rewrite <- Nat.add_assoc; simpl.
+    rewrite Nat_mod_add_once; [ | intros; discriminate ].
+    assumption.
 
-rewrite <- Zdiv.Zminus_mod_idemp_l.
-rewrite <- Zdiv.Zminus_mod.
-set (x := ((b - c) mod 3)%Z).
-rewrite <- Zdiv.Zminus_mod_idemp_r.
-rewrite <- Zdiv.Zminus_mod.
-subst x.
-rewrite <- Zdiv.Zminus_mod.
-Check Z_mod_expr_1.
-Check Z.mod_add.
-rewrite <- Z.mod_add with (b := (-b)%Z); [ | intros; discriminate ].
-rewrite <- Z.mod_add with (b := c%Z); [ | intros; discriminate ].
-f_equal; ring_simplify; reflexivity.
+    apply Nat.lt_0_succ.
+
+  simpl.
+Guarded.
 
 bbb.
 (**)
