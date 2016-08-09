@@ -928,10 +928,9 @@ remember (S n) as n'; simpl; subst n'.
 destruct n.
  simpl; subst p'; clear.
  destruct p as ((a, b), c); simpl.
+ replace (c - b)%Z with (- (b - c))%Z by ring.
+ remember (b - c)%Z as x; clear a b c Heqx.
  f_equal; f_equal.
-  replace (c - b)%Z with (- (b - c))%Z by ring.
-  remember (b - c)%Z as x.
-  clear a b c Heqx.
   rewrite <- Zdiv.Zminus_mod.
   rewrite Z.sub_sub_distr, Z.add_comm.
   do 2 rewrite Z.add_sub_assoc.
