@@ -910,9 +910,30 @@ simpl in Hp; simpl.
 destruct e as (t, d).
 destruct t, d.
  erewrite <- IHel; [ | eassumption ].
- f_equal; f_equal; f_equal.
+ f_equal; f_equal; [ f_equal | ].
   rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
-Admitted.
+
+  rewrite <- Z.add_mod; [ | intros; discriminate ].
+  rewrite <- Z.mod_add with (b := (-c₁)%Z); [ | intros; discriminate ].
+  f_equal; ring_simplify; reflexivity.
+
+  rewrite <- Z.add_mod; [ | intros; discriminate ].
+  rewrite <- Z.mod_add with (b := b₁); [ | intros; discriminate ].
+  f_equal; ring_simplify; reflexivity.
+
+ erewrite <- IHel; [ | eassumption ].
+ f_equal; f_equal; [ f_equal | ].
+  rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
+
+  rewrite <- Zdiv.Zminus_mod.
+  rewrite <- Z.mod_add with (b := c₁); [ | intros; discriminate ].
+  f_equal; ring_simplify; reflexivity.
+
+  rewrite <- Zdiv.Zminus_mod.
+  rewrite <- Z.mod_add with (b := (-b₁)%Z); [ | intros; discriminate ].
+  f_equal; ring_simplify; reflexivity.
+
+bbb.
 
 Theorem Z_mod_expr_1 : ∀ n,
   (n mod 3)%Z = ((n mod 3 - - n mod 3 - - n mod 3 + n mod 3) mod 3)%Z.
