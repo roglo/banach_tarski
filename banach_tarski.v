@@ -930,10 +930,21 @@ destruct n.
  destruct p as ((a, b), c); simpl.
  replace (c - b)%Z with (- (b - c))%Z by ring.
  remember (b - c)%Z as x; clear a b c Heqx.
- f_equal; f_equal.
-  rewrite <- Zdiv.Zminus_mod.
-  rewrite Z.sub_sub_distr, Z.add_comm.
-  do 2 rewrite Z.add_sub_assoc.
+ do 2 rewrite <- Zdiv.Zminus_mod.
+ do 2 rewrite Z.sub_sub_distr, Z.add_comm.
+ f_equal; [ f_equal | ].
+  destruct (Z.eq_dec (x mod 3) 0) as [Hx| Hx].
+  rewrite Hx.
+  apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx.
+  reflexivity.
+
+  rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
+  remember (x mod 3)%Z as y eqn:Hy.
+  replace (y - (3 - y) - (3 - y) + y)%Z with (y + (y - 2) * 3)%Z by ring.
+  rewrite Z.mod_add; [ | intros; discriminate ].
+  subst y; rewrite Z.mod_mod; [ | intros; discriminate ].
+  reflexivity.
+
   destruct (Z.eq_dec (x mod 3) 0) as [Hx| Hx].
    rewrite Hx.
    apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx.
@@ -941,6 +952,11 @@ destruct n.
 
    rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
    remember (x mod 3)%Z as y eqn:Hy.
+   replace (3 - y - y - y + (3 - y))%Z with (- y + (2 - y) * 3)%Z by ring.
+   rewrite Z.mod_add; [ | intros; discriminate ].
+   subst y; rewrite Zdiv.Z_mod_nz_opp_full.
+    rewrite Z.mod_mod; [ reflexivity | intros; discriminate ].
+    rewrite Z.mod_mod; [ assumption | intros; discriminate ].
 bbb.
 
 Theorem rotate_param_app_an : ∀ el n p a b c N,
