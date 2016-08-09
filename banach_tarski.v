@@ -860,7 +860,8 @@ destruct n.
  destruct p as ((a, b), c); simpl.
  destruct e as (t, d).
  destruct t, d.
-  simpl; f_equal; [ f_equal | ].
+  simpl; f_equal.
+   f_equal.
    rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
    rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
    set (x := (- ((b + c) mod 3))%Z); symmetry.
@@ -873,7 +874,8 @@ destruct n.
    rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
    f_equal; ring_simplify; reflexivity.
 
-  simpl; f_equal; [ f_equal | ].
+  simpl; f_equal.
+   f_equal.
    rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
    rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
    rewrite Z.add_sub_assoc.
@@ -887,42 +889,60 @@ destruct n.
    rewrite <- Z.mod_add with (b := (b - c)%Z); [ | intros; discriminate ].
    f_equal; ring_simplify; reflexivity.
 
-bbb.
-  replace (c - b)%Z with (- (b - c))%Z by ring.
-  remember (b - c)%Z as x; clear a b c Heqx.
-  do 2 rewrite <- Zdiv.Zminus_mod.
-  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
-  f_equal; [ f_equal; apply Z_mod_expr_1 | ].
-  set (y := (-x)%Z).
-  replace x with (- - x)%Z by apply Z.opp_involutive.
-  unfold y; apply Z_mod_expr_1.
+   rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
+   rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
+   rewrite Z.add_sub_assoc.
+   rewrite Zdiv.Zminus_mod_idemp_r.
+   rewrite Z.add_sub_assoc, Z.add_comm.
+   do 2 rewrite <- Z.add_sub_assoc.
+   rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
+   rewrite Z_sub_sub_swap.
+   do 2 rewrite Z.add_sub_assoc.
+   rewrite Zdiv.Zminus_mod_idemp_r.
+   rewrite <- Z.mod_add with (b := (- b + c)%Z); [ | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
 
-  replace (c - b)%Z with (- (b - c))%Z by ring.
-  remember (b - c)%Z as x; clear a b c Heqx.
-  do 2 rewrite <- Zdiv.Zminus_mod.
-  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
-  f_equal; [ f_equal; apply Z_mod_expr_1 | ].
-  set (y := (-x)%Z).
-  replace x with (- - x)%Z by apply Z.opp_involutive.
-  unfold y; apply Z_mod_expr_1.
+  simpl; f_equal.
+   f_equal.
+   rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
+   rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
+   rewrite Z.add_sub_assoc.
+   rewrite Zdiv.Zminus_mod_idemp_r.
+   rewrite Z.add_sub_assoc, Z.add_comm.
+   do 2 rewrite <- Z.add_sub_assoc.
+   rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
+   rewrite Z_sub_sub_swap.
+   do 2 rewrite Z.add_sub_assoc.
+   rewrite Zdiv.Zminus_mod_idemp_r.
+   rewrite <- Z.mod_add with (b := (a - b)%Z); [ | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
 
-  replace (c - b)%Z with (- (b - c))%Z by ring.
-  remember (b - c)%Z as x; clear a b c Heqx.
-  do 2 rewrite <- Zdiv.Zminus_mod.
-  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
-  f_equal; [ f_equal; apply Z_mod_expr_1 | ].
-  set (y := (-x)%Z).
-  replace x with (- - x)%Z by apply Z.opp_involutive.
-  unfold y; apply Z_mod_expr_1.
+   rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
+   rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
+   rewrite Z.add_sub_assoc.
+   rewrite Zdiv.Zminus_mod_idemp_r.
+   rewrite Z.add_sub_assoc, Z.add_comm.
+   do 2 rewrite <- Z.add_sub_assoc.
+   rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
+   rewrite Z_sub_sub_swap.
+   do 2 rewrite Z.add_sub_assoc.
+   rewrite Zdiv.Zminus_mod_idemp_r.
+   rewrite <- Z.mod_add with (b := (b - a)%Z); [ | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
 
-  replace (c - b)%Z with (- (b - c))%Z by ring.
-  remember (b - c)%Z as x; clear a b c Heqx.
-  do 2 rewrite <- Zdiv.Zminus_mod.
-  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
-  f_equal; [ f_equal; apply Z_mod_expr_1 | ].
-  set (y := (-x)%Z).
-  replace x with (- - x)%Z by apply Z.opp_involutive.
-  unfold y; apply Z_mod_expr_1.
+  simpl; f_equal.
+   f_equal.
+   rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
+   rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
+   set (x := (- ((a + b) mod 3))%Z); symmetry.
+   rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
+
+   rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
+   rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
+   set (x := (- ((a + b) mod 3))%Z); symmetry.
+   rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
 
  apply IHn; [ apply Nat.lt_0_succ | subst p'; reflexivity ].
 Qed.
@@ -1040,10 +1060,9 @@ destruct n.
    reflexivity.
 
   rewrite Nat.add_1_r in Hrp₁.
-bbb.
   rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
    rewrite <- Nat.add_1_r in Hrp₁.
-   pose proof (rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
+   pose proof (rotate_param_app_bn n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
    do 2 rewrite <- Nat.add_1_r.
    rewrite <- Nat.add_assoc; simpl.
    rewrite Nat_mod_add_once; [ | intros; discriminate ].
@@ -1059,6 +1078,16 @@ Theorem rotate_param_app_a : ∀ el p a b c N,
 Proof.
 intros el p a b c N Hrp.
 pose proof rotate_param_app_an _ O _ _ _ _ _ Hrp as H.
+assumption.
+Qed.
+
+Theorem rotate_param_app_b : ∀ el p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ [ḅ]) p) ≡₃
+      ((a + b)%Z, (a + b)%Z, 0%Z).
+Proof.
+intros el p a b c N Hrp.
+pose proof rotate_param_app_bn _ O _ _ _ _ _ Hrp as H.
 assumption.
 Qed.
 
@@ -1078,24 +1107,6 @@ split; [ | split ].
 
  rewrite <- Z.mod_add with (b := (-b)%Z); [ | intros H; discriminate ].
  f_equal; ring.
-Qed.
-
-Theorem rotate_param_app_b : ∀ el p a b c N,
-  fold_left rotate_param el p = (a, b, c, N)
-  → fst3 (fold_left rotate_param (el ++ [ḅ]) p) ≡₃
-      ((a + b)%Z, (a + b)%Z, 0%Z).
-Proof.
-intros el p a b c N Hrp.
-unfold "≡₃".
-rewrite fold_left_app, Hrp; simpl.
-split; [ | split ].
- rewrite <- Z.mod_add with (b := (-b)%Z); [ | intros H; discriminate ].
- f_equal; ring.
-
- rewrite <- Z.mod_add with (b := a%Z); [ | intros H; discriminate ].
- f_equal; ring.
-
- rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
 Qed.
 
 Theorem rotate_param_app_b1 : ∀ el p a b c N,
