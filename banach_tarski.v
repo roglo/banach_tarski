@@ -581,6 +581,9 @@ replace b with (1 * b) at 1 by apply Nat.mul_1_l.
 apply Nat.mod_add; assumption.
 Qed.
 
+Theorem Z_sub_sub_swap : ∀ a b c, (a - b - c)%Z = (a - c - b)%Z.
+Proof. intros. ring. Qed.
+
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
   (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
 Proof.
@@ -841,28 +844,85 @@ destruct (Z.eq_dec (n mod 3) 0) as [Hx| Hx].
  f_equal; ring_simplify; reflexivity.
 Qed.
 
-Theorem fold_rotate_param_mod_3_succ_succ : ∀ n p,
+Theorem fold_rotate_param_mod_3_succ_succ : ∀ n e p,
   0 < n
-  → fold_left rotate_param_mod_3 (repeat ạ n) p =
-    fold_left rotate_param_mod_3 (repeat ạ (S (S n))) p.
+  → fold_left rotate_param_mod_3 (repeat e n) p =
+    fold_left rotate_param_mod_3 (repeat e (S (S n))) p.
 Proof.
-intros n p Hn.
+intros n e p Hn.
 remember (S n) as n'; simpl; subst n'.
-remember (rotate_param_mod_3 p ạ) as p' eqn:Hp'.
-revert p p' Hp'.
+remember (rotate_param_mod_3 p e) as p' eqn:Hp'.
+revert e p p' Hp'.
 induction n; intros; [ exfalso; revert Hn; apply Nat.lt_irrefl | ].
 remember (S n) as n'; simpl; subst n'.
 destruct n.
  simpl; subst p'; clear.
  destruct p as ((a, b), c); simpl.
- replace (c - b)%Z with (- (b - c))%Z by ring.
- remember (b - c)%Z as x; clear a b c Heqx.
- do 2 rewrite <- Zdiv.Zminus_mod.
- do 2 rewrite Z.sub_sub_distr, Z.add_comm.
- f_equal; [ f_equal; apply Z_mod_expr_1 | ].
- set (y := (-x)%Z).
- replace x with (- - x)%Z by apply Z.opp_involutive.
- unfold y; apply Z_mod_expr_1.
+ destruct e as (t, d).
+ destruct t, d.
+  simpl; f_equal; [ f_equal | ].
+   rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
+   rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
+   set (x := (- ((b + c) mod 3))%Z); symmetry.
+   rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
+
+   rewrite <- Z.add_mod; [ rewrite Z.add_assoc | intros; discriminate ].
+   rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
+   set (x := (- ((b + c) mod 3))%Z); symmetry.
+   rewrite <- Z.mod_add with (b := x); [ subst x | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
+
+  simpl; f_equal; [ f_equal | ].
+   rewrite <- Zdiv.Zminus_mod, Z.sub_sub_distr.
+   rewrite Z.add_mod_idemp_r, Z.add_comm; [ | intros; discriminate ].
+   rewrite Z.add_sub_assoc.
+   rewrite Zdiv.Zminus_mod_idemp_r.
+   rewrite Z.add_sub_assoc, Z.add_comm.
+   do 2 rewrite <- Z.add_sub_assoc.
+   rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
+   rewrite Z_sub_sub_swap.
+   do 2 rewrite Z.add_sub_assoc.
+   rewrite Zdiv.Zminus_mod_idemp_r.
+   rewrite <- Z.mod_add with (b := (b - c)%Z); [ | intros; discriminate ].
+   f_equal; ring_simplify; reflexivity.
+
+bbb.
+  replace (c - b)%Z with (- (b - c))%Z by ring.
+  remember (b - c)%Z as x; clear a b c Heqx.
+  do 2 rewrite <- Zdiv.Zminus_mod.
+  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
+  f_equal; [ f_equal; apply Z_mod_expr_1 | ].
+  set (y := (-x)%Z).
+  replace x with (- - x)%Z by apply Z.opp_involutive.
+  unfold y; apply Z_mod_expr_1.
+
+  replace (c - b)%Z with (- (b - c))%Z by ring.
+  remember (b - c)%Z as x; clear a b c Heqx.
+  do 2 rewrite <- Zdiv.Zminus_mod.
+  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
+  f_equal; [ f_equal; apply Z_mod_expr_1 | ].
+  set (y := (-x)%Z).
+  replace x with (- - x)%Z by apply Z.opp_involutive.
+  unfold y; apply Z_mod_expr_1.
+
+  replace (c - b)%Z with (- (b - c))%Z by ring.
+  remember (b - c)%Z as x; clear a b c Heqx.
+  do 2 rewrite <- Zdiv.Zminus_mod.
+  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
+  f_equal; [ f_equal; apply Z_mod_expr_1 | ].
+  set (y := (-x)%Z).
+  replace x with (- - x)%Z by apply Z.opp_involutive.
+  unfold y; apply Z_mod_expr_1.
+
+  replace (c - b)%Z with (- (b - c))%Z by ring.
+  remember (b - c)%Z as x; clear a b c Heqx.
+  do 2 rewrite <- Zdiv.Zminus_mod.
+  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
+  f_equal; [ f_equal; apply Z_mod_expr_1 | ].
+  set (y := (-x)%Z).
+  replace x with (- - x)%Z by apply Z.opp_involutive.
+  unfold y; apply Z_mod_expr_1.
 
  apply IHn; [ apply Nat.lt_0_succ | subst p'; reflexivity ].
 Qed.
