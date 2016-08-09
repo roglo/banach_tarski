@@ -929,6 +929,69 @@ destruct n.
     apply Nat.lt_0_succ.
 Qed.
 
+Theorem rotate_param_app_bn : ∀ el n p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ List.repeat ḅ (n + 1)) p) ≡₃
+      if zerop (n mod 2) then ((a + b)%Z, (a + b)%Z, 0%Z)
+      else ((- a - b)%Z, (- a - b)%Z, 0%Z).
+Proof.
+intros el n p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+remember (repeat ḅ (n + 1)) as al.
+remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
+subst al; symmetry in Hrp₁.
+destruct x as ((a₁, b₁), c₁).
+apply rotate_params_mod in Hrp₁.
+revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+fix 1; intros.
+destruct n.
+ simpl in Hrp₁; simpl.
+ injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+ rewrite <- Ha, <- Hb, <- Hc.
+ split; [ | split ].
+  symmetry; apply Z.add_mod; intros; discriminate.
+
+  symmetry; apply Z.add_mod; intros; discriminate.
+
+  reflexivity.
+
+ destruct n.
+  simpl in Hrp₁; simpl.
+  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+  rewrite <- Ha, <- Hb, <- Hc.
+  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+  rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
+  rewrite Z.add_assoc.
+  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+  rewrite Z.add_comm, Z.add_assoc.
+  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+  rewrite Z.add_comm.
+  do 2 rewrite Z.add_assoc.
+  rewrite Z.add_shuffle0.
+  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+  rewrite <- Z.mod_add with (b := (- a - b)%Z); [ | intros; discriminate ].
+  split; [ | split ].
+   f_equal; ring_simplify; reflexivity.
+
+   f_equal; ring_simplify; reflexivity.
+
+   reflexivity.
+
+  rewrite Nat.add_1_r in Hrp₁.
+bbb.
+  rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
+   rewrite <- Nat.add_1_r in Hrp₁.
+   pose proof (rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
+   do 2 rewrite <- Nat.add_1_r.
+   rewrite <- Nat.add_assoc; simpl.
+   rewrite Nat_mod_add_once; [ | intros; discriminate ].
+   assumption.
+
+    apply Nat.lt_0_succ.
+Qed.
+
 Theorem rotate_param_app_a : ∀ el p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ [ạ]) p) ≡₃
