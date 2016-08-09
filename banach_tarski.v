@@ -878,6 +878,26 @@ rewrite <- Z.mod_add with (b := (a - b)%Z); [  | intros; discriminate ].
 f_equal; ring_simplify; reflexivity.
 Qed.
 
+Theorem Z_mod_expr_4 : ∀ a b,
+  ((- a - b) mod 3)%Z =
+  (((a mod 3 + b mod 3) mod 3 + (a mod 3 + b mod 3) mod 3) mod 3)%Z.
+Proof.
+intros.
+rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
+rewrite Z.add_assoc.
+rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+rewrite Z.add_comm, Z.add_assoc.
+rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+rewrite Z.add_comm.
+do 2 rewrite Z.add_assoc.
+rewrite Z.add_shuffle0.
+rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
+rewrite <- Z.mod_add with (b := (a + b)%Z); [ | intros; discriminate ].
+f_equal; ring_simplify; reflexivity.
+Qed.
+
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n e p,
   0 < n
   → fold_left rotate_param_mod_3 (repeat e n) p =
@@ -975,24 +995,8 @@ destruct n.
   simpl in Hrp₁; simpl.
   injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
   rewrite <- Ha, <- Hb, <- Hc.
-  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
-  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
-  rewrite Z.add_mod_idemp_l; [ | intros; discriminate ].
-  rewrite Z.add_assoc.
-  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
-  rewrite Z.add_comm, Z.add_assoc.
-  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
-  rewrite Z.add_comm.
-  do 2 rewrite Z.add_assoc.
-  rewrite Z.add_shuffle0.
-  rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
-  rewrite <- Z.mod_add with (b := (- a - b)%Z); [ | intros; discriminate ].
-  split; [ | split ].
-   f_equal; ring_simplify; reflexivity.
-
-   f_equal; ring_simplify; reflexivity.
-
-   reflexivity.
+  split; [ symmetry; apply Z_mod_expr_4 | ].
+  split; [ symmetry; apply Z_mod_expr_4 | reflexivity ].
 
   rewrite Nat.add_1_r in Hrp₁.
   rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
@@ -1000,10 +1004,9 @@ destruct n.
    pose proof (rotate_param_app_bn n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
    do 2 rewrite <- Nat.add_1_r.
    rewrite <- Nat.add_assoc; simpl.
-   rewrite Nat_mod_add_once; [ | intros; discriminate ].
-   assumption.
+   rewrite Nat_mod_add_once; [ assumption | intros; discriminate ].
 
-    apply Nat.lt_0_succ.
+   apply Nat.lt_0_succ.
 Qed.
 
 Theorem rotate_param_app_a : ∀ el p a b c N,
