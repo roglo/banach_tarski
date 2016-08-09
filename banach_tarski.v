@@ -1009,6 +1009,47 @@ destruct n.
    apply Nat.lt_0_succ.
 Qed.
 
+Theorem rotate_param_app_a1n : ∀ el n p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ List.repeat ạ⁻¹ (n + 1)) p) ≡₃
+      if zerop (n mod 2) then (0%Z, (b + c)%Z, (b + c)%Z)
+      else (0%Z, (- (b + c))%Z, (- (b + c))%Z).
+Proof.
+intros el n p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+remember (repeat ạ⁻¹ (n + 1)) as al.
+remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
+subst al; symmetry in Hrp₁.
+destruct x as ((a₁, b₁), c₁).
+apply rotate_params_mod in Hrp₁.
+revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+fix 1; intros.
+destruct n.
+ simpl in Hrp₁; simpl.
+ injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+ rewrite <- Ha, <- Hb, <- Hc.
+ split; [ reflexivity | ].
+ split; symmetry; apply Z.add_mod; intros; discriminate.
+
+ destruct n.
+  simpl in Hrp₁; simpl.
+  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+  rewrite <- Ha, <- Hb, <- Hc.
+  split; [ reflexivity | ].
+  split; rewrite <- Z_mod_expr_4; f_equal; ring.
+
+  rewrite Nat.add_1_r in Hrp₁.
+  rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
+   rewrite <- Nat.add_1_r in Hrp₁.
+   pose proof (rotate_param_app_a1n n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
+   do 2 rewrite <- Nat.add_1_r.
+   rewrite <- Nat.add_assoc; simpl.
+   rewrite Nat_mod_add_once; [ assumption | intros; discriminate ].
+
+   apply Nat.lt_0_succ.
+Qed.
+
 Theorem rotate_param_app_a : ∀ el p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ [ạ]) p) ≡₃
@@ -1035,16 +1076,8 @@ Theorem rotate_param_app_a1 : ∀ el p a b c N,
       (0%Z, (b + c)%Z, (b + c)%Z).
 Proof.
 intros el p a b c N Hrp.
-unfold "≡₃".
-rewrite fold_left_app, Hrp; simpl.
-split; [ | split ].
- rewrite Z.mul_mod; [ reflexivity | intros H; discriminate ].
-
- rewrite <- Z.mod_add with (b := c); [ | intros H; discriminate ].
- f_equal; ring.
-
- rewrite <- Z.mod_add with (b := (-b)%Z); [ | intros H; discriminate ].
- f_equal; ring.
+pose proof rotate_param_app_a1n _ O _ _ _ _ _ Hrp as H.
+assumption.
 Qed.
 
 Theorem rotate_param_app_b1 : ∀ el p a b c N,
