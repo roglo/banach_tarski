@@ -912,7 +912,24 @@ destruct t, d.
  erewrite <- IHel; [ | eassumption ].
  f_equal; f_equal; f_equal.
   rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
-bbb.
+Admitted.
+
+Theorem Z_mod_expr_1 : ∀ n,
+  (n mod 3)%Z = ((n mod 3 - - n mod 3 - - n mod 3 + n mod 3) mod 3)%Z.
+Proof.
+intros n.
+destruct (Z.eq_dec (n mod 3) 0) as [Hx| Hx].
+rewrite Hx.
+apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx.
+reflexivity.
+
+rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
+remember (n mod 3)%Z as y eqn:Hy.
+replace (y - (3 - y) - (3 - y) + y)%Z with (y + (y - 2) * 3)%Z by ring.
+rewrite Z.mod_add; [ | intros; discriminate ].
+subst y; rewrite Z.mod_mod; [ | intros; discriminate ].
+reflexivity.
+Qed.
 
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n p,
   0 < n
@@ -932,31 +949,10 @@ destruct n.
  remember (b - c)%Z as x; clear a b c Heqx.
  do 2 rewrite <- Zdiv.Zminus_mod.
  do 2 rewrite Z.sub_sub_distr, Z.add_comm.
- f_equal; [ f_equal | ].
-  destruct (Z.eq_dec (x mod 3) 0) as [Hx| Hx].
-  rewrite Hx.
-  apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx.
-  reflexivity.
-
-  rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
-  remember (x mod 3)%Z as y eqn:Hy.
-  replace (y - (3 - y) - (3 - y) + y)%Z with (y + (y - 2) * 3)%Z by ring.
-  rewrite Z.mod_add; [ | intros; discriminate ].
-  subst y; rewrite Z.mod_mod; [ | intros; discriminate ].
-  reflexivity.
-
-  destruct (Z.eq_dec (x mod 3) 0) as [Hx| Hx].
-   rewrite Hx.
-   apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx.
-   reflexivity.
-
-   rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
-   remember (x mod 3)%Z as y eqn:Hy.
-   replace (3 - y - y - y + (3 - y))%Z with (- y + (2 - y) * 3)%Z by ring.
-   rewrite Z.mod_add; [ | intros; discriminate ].
-   subst y; rewrite Zdiv.Z_mod_nz_opp_full.
-    rewrite Z.mod_mod; [ reflexivity | intros; discriminate ].
-    rewrite Z.mod_mod; [ assumption | intros; discriminate ].
+ f_equal; [ f_equal; apply Z_mod_expr_1 | ].
+ set (y := (-x)%Z).
+ replace x with (- - x)%Z by apply Z.opp_involutive.
+ unfold y; apply Z_mod_expr_1.
 
  apply IHn; [ apply Nat.lt_0_succ | subst p'; reflexivity ].
 Qed.
@@ -1140,6 +1136,20 @@ pose proof rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
  rewrite Nat_mod_add_once.
 assumption.
 intros; discriminate.
+apply Nat.lt_0_succ.
+
+rewrite <- Zdiv.Zminus_mod_idemp_l.
+rewrite <- Zdiv.Zminus_mod.
+set (x := ((b - c) mod 3)%Z).
+rewrite <- Zdiv.Zminus_mod_idemp_r.
+rewrite <- Zdiv.Zminus_mod.
+subst x.
+rewrite <- Zdiv.Zminus_mod.
+Check Z_mod_expr_1.
+Check Z.mod_add.
+rewrite <- Z.mod_add with (b := (-b)%Z); [ | intros; discriminate ].
+rewrite <- Z.mod_add with (b := c%Z); [ | intros; discriminate ].
+f_equal; ring_simplify; reflexivity.
 
 bbb.
 (**)
