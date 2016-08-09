@@ -898,7 +898,7 @@ Definition rotate_param_mod_3 '(a, b, c) e :=
  | ḅ => (((a + b) mod 3)%Z, ((a + b) mod 3)%Z, 0%Z)
  end.
 
-Theorem glop : ∀ el a b c N a₁ b₁ c₁,
+Theorem rotate_params_mod : ∀ el a b c N a₁ b₁ c₁,
   fst3 (fold_left rotate_param el (a₁, b₁, c₁, N)) = (a, b, c)
   → fold_left rotate_param_mod_3 el (a₁ mod 3, b₁ mod 3, c₁ mod 3)%Z =
       (a mod 3, b mod 3, c mod 3)%Z.
@@ -1013,7 +1013,7 @@ remember (repeat ạ (n + 1)) as al.
 remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
 subst al; symmetry in Hrp₁.
 destruct x as ((a₁, b₁), c₁).
-apply glop in Hrp₁.
+apply rotate_params_mod in Hrp₁.
 revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
 fix 1; intros.
 destruct n.
@@ -1061,7 +1061,5 @@ destruct n.
 
     apply Nat.lt_0_succ.
 Qed.
-
-bbb.
 
 End Rotation.
