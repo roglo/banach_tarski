@@ -912,9 +912,9 @@ destruct t, d.
  erewrite <- IHel; [ | eassumption ].
  f_equal; f_equal; f_equal.
   rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
-Admitted.
+bbb.
 
-Theorem pouet : ∀ n p,
+Theorem fold_rotate_param_mod_3_succ_succ : ∀ n p,
   0 < n
   → fold_left rotate_param_mod_3 (repeat ạ n) p =
     fold_left rotate_param_mod_3 (repeat ạ (S (S n))) p.
@@ -957,7 +957,9 @@ destruct n.
    subst y; rewrite Zdiv.Z_mod_nz_opp_full.
     rewrite Z.mod_mod; [ reflexivity | intros; discriminate ].
     rewrite Z.mod_mod; [ assumption | intros; discriminate ].
-bbb.
+
+ apply IHn; [ apply Nat.lt_0_succ | subst p'; reflexivity ].
+Qed.
 
 Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
@@ -1130,7 +1132,7 @@ destruct n.
 Focus 3.
 
 rewrite Nat.add_1_r in Hrp₁.
-rewrite <- pouet in Hrp₁.
+rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
 rewrite <- Nat.add_1_r in Hrp₁.
 pose proof rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
  do 2 rewrite <- Nat.add_1_r.
