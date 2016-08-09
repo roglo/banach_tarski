@@ -834,12 +834,11 @@ destruct (Z.eq_dec (n mod 3) 0) as [Hx| Hx].
  rewrite Hx.
  apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx; reflexivity.
 
- rewrite Zdiv.Z_mod_nz_opp_full; [ symmetry | assumption ].
- rewrite <- Z.mod_add with (b := (- (n mod 3))%Z); [ | intros; discriminate ].
- rewrite <- Z.mod_add with (b := 2%Z); [ | intros; discriminate ].
- symmetry; rewrite <- Z.mod_mod; [ | intros; discriminate ].
- f_equal; ring_simplify.
- symmetry; rewrite Z.mod_mod; [ reflexivity | intros; discriminate ].
+ rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
+ rewrite <- Z.mod_mod at 1; [ | intros; discriminate ].
+ rewrite <- Z.mod_add with (b := (n mod 3)%Z); [ | intros; discriminate ].
+ rewrite <- Z.mod_add with (b := (-2)%Z); [ | intros; discriminate ].
+ f_equal; ring_simplify; reflexivity.
 Qed.
 
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n p,
