@@ -914,6 +914,36 @@ destruct t, d.
   rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
 Admitted.
 
+Theorem pouet : ∀ n p,
+  0 < n
+  → fold_left rotate_param_mod_3 (repeat ạ n) p =
+    fold_left rotate_param_mod_3 (repeat ạ (S (S n))) p.
+Proof.
+intros n p Hn.
+remember (S n) as n'; simpl; subst n'.
+remember (rotate_param_mod_3 p ạ) as p' eqn:Hp'.
+revert p p' Hp'.
+induction n; intros; [ exfalso; revert Hn; apply Nat.lt_irrefl | ].
+remember (S n) as n'; simpl; subst n'.
+destruct n.
+ simpl; subst p'; clear.
+ destruct p as ((a, b), c); simpl.
+ f_equal; f_equal.
+  replace (c - b)%Z with (- (b - c))%Z by ring.
+  remember (b - c)%Z as x.
+  clear a b c Heqx.
+  rewrite <- Zdiv.Zminus_mod.
+  rewrite Z.sub_sub_distr, Z.add_comm.
+  do 2 rewrite Z.add_sub_assoc.
+  destruct (Z.eq_dec (x mod 3) 0) as [Hx| Hx].
+   rewrite Hx.
+   apply Zdiv.Z_mod_zero_opp_full in Hx; rewrite Hx.
+   reflexivity.
+
+   rewrite Zdiv.Z_mod_nz_opp_full; [ | assumption ].
+   remember (x mod 3)%Z as y eqn:Hy.
+bbb.
+
 Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ List.repeat ạ (n + 1)) p) ≡₃
@@ -1083,6 +1113,16 @@ destruct n.
   split.
    rewrite <- Zdiv.Zminus_mod.
 Focus 3.
+
+rewrite Nat.add_1_r in Hrp₁.
+rewrite <- pouet in Hrp₁.
+rewrite <- Nat.add_1_r in Hrp₁.
+pose proof rotate_param_app_an n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+ do 2 rewrite <- Nat.add_1_r.
+ rewrite <- Nat.add_assoc; simpl.
+ rewrite Nat_mod_add_once.
+assumption.
+intros; discriminate.
 
 bbb.
 (**)
