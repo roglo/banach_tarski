@@ -1136,7 +1136,36 @@ Theorem toto : ∀ s a b c N,
   → b ≠ 0%Z.
 Proof.
 intros s a b c N Hs Hr.
+destruct s as (el).
+unfold empty in Hs; simpl in Hs.
+unfold rotate_1_0_0_param in Hr; simpl in Hr.
+unfold rotate_1_0_0_param_of_list in Hr.
+bbb.
 
+remember (1%Z, 0%Z, 0%Z, 0) as p eqn:Hp.
+revert a b c N Hr.
+induction el as [| e] using rev_ind; intros.
+ exfalso; apply Hs; reflexivity.
+
+ destruct e as (t, d).
+ destruct t, d.
+  pose proof rotate_param_app_a1 el p as H.
+  unfold "≡₃" in H.
+  remember (fst3 (fold_left rotate_param (el ++ [ạ⁻¹]) p)) as u eqn:Hu.
+  symmetry in Hu.
+  destruct u as ((a₁, b₁), c₁).
+  rewrite Hr in Hu.
+  simpl in Hu.
+  injection Hu; clear Hu; intros; subst a₁ b₁ c₁.
+SearchAbout (fold_left _ (_ ++ _)).
+  rewrite fold_left_app in Hr.
+  simpl in Hr.
+  remember (fold_left rotate_param el p) as u eqn:Hu.
+  destruct u as (((a₁, b₁), c₁), N₁).
+  simpl in Hr.
+  injection Hr; clear Hr; intros; subst a b c N.
+  pose proof H _ _ _ _ (eq_refl _) as H₁.
+  destruct H₁ as (H₁, (H₂, H₃)).
 bbb.
 
 End Rotation.
