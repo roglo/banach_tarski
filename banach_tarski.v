@@ -1130,11 +1130,23 @@ pose proof rotate_param_app_b1n _ O _ _ _ _ _ Hrp as H.
 assumption.
 Qed.
 
-(*
-Theorem toto : ∀ el,
-  norm_list el = [] ∨
-  ∃ n e, norm_list el = List.repeat n e.
-  ∃ el₁ n e, norm_list el = el₁ ++ List.repeat n e.
-*)
+Theorem toto : ∀ el p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  →
+bbb. oh puis zut.
+
+Theorem toto : ∀ s x y z, ¬ empty s →
+  map_rotate s (P 1 0 0) = P x y z
+  → y ≠ 0%R.
+Proof.
+bbb.
+
+Theorem toto : ∀ s pt pt', ¬ empty s → map_rotate s pt = pt' → pt ≠ pt'.
+Proof.
+intros s pt pt' He Hr H; subst pt'.
+unfold empty in He; apply He; clear He.
+unfold map_rotate in H.
+SearchAbout map_rotate.
+bbb.
 
 End Rotation.
