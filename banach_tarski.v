@@ -1010,7 +1010,7 @@ Theorem rotate_param_app_a1n : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ List.repeat ạ⁻¹ (n + 1)) p) ≡₃
       if zerop (n mod 2) then (0%Z, (b + c)%Z, (b + c)%Z)
-      else (0%Z, (- (b + c))%Z, (- (b + c))%Z).
+      else (0%Z, (- b - c)%Z, (- b - c)%Z).
 Proof.
 intros el n p a b c N Hrp.
 unfold "≡₃".
@@ -1090,44 +1090,29 @@ destruct n.
    apply Nat.lt_0_succ.
 Qed.
 
-Theorem rotate_param_app_a : ∀ el p a b c N,
-  fold_left rotate_param el p = (a, b, c, N)
-  → fst3 (fold_left rotate_param (el ++ [ạ]) p) ≡₃
-      (0%Z, (b - c)%Z, (c - b)%Z).
-Proof.
-intros el p a b c N Hrp.
-pose proof rotate_param_app_an _ O _ _ _ _ _ Hrp as H.
-assumption.
-Qed.
+Inspect 4.
 
-Theorem rotate_param_app_b : ∀ el p a b c N,
+Theorem rotate_param_app : ∀ el e n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
-  → fst3 (fold_left rotate_param (el ++ [ḅ]) p) ≡₃
-      ((a + b)%Z, (a + b)%Z, 0%Z).
+  → fst3 (fold_left rotate_param (el ++ repeat e (n + 1)) p) ≡₃
+      match e with
+      | ạ => if zerop (n mod 2) then (0, b - c, c - b)%Z
+             else (0, c - b, b - c)%Z
+      | ạ⁻¹ => if zerop (n mod 2) then (0, b + c, b + c)%Z
+               else (0, - b - c, - b - c)%Z
+      | ḅ => if zerop (n mod 2) then (a + b, a + b, 0)%Z
+             else (- a - b, - a - b, 0)%Z
+      | ḅ⁻¹ => if zerop (n mod 2) then (a - b, b - a, 0)%Z
+               else (b - a, a - b, 0)%Z
+      end.
 Proof.
-intros el p a b c N Hrp.
-pose proof rotate_param_app_bn _ O _ _ _ _ _ Hrp as H.
-assumption.
-Qed.
-
-Theorem rotate_param_app_a1 : ∀ el p a b c N,
-  fold_left rotate_param el p = (a, b, c, N)
-  → fst3 (fold_left rotate_param (el ++ [ạ⁻¹]) p) ≡₃
-      (0%Z, (b + c)%Z, (b + c)%Z).
-Proof.
-intros el p a b c N Hrp.
-pose proof rotate_param_app_a1n _ O _ _ _ _ _ Hrp as H.
-assumption.
-Qed.
-
-Theorem rotate_param_app_b1 : ∀ el p a b c N,
-  fold_left rotate_param el p = (a, b, c, N)
-  → fst3 (fold_left rotate_param (el ++ [ḅ⁻¹]) p) ≡₃
-      ((a - b)%Z, (b - a)%Z, 0%Z).
-Proof.
-intros el p a b c N Hrp.
-pose proof rotate_param_app_b1n _ O _ _ _ _ _ Hrp as H.
-assumption.
+intros el e n p a b c N Hp.
+destruct e as (t, d).
+destruct t, d.
+ eapply rotate_param_app_a1n; eassumption.
+ eapply rotate_param_app_an; eassumption.
+ eapply rotate_param_app_b1n; eassumption.
+ eapply rotate_param_app_bn; eassumption.
 Qed.
 
 Theorem toto : ∀ el a b c N,
