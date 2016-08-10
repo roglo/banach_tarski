@@ -1130,6 +1130,31 @@ pose proof rotate_param_app_b1n _ O _ _ _ _ _ Hrp as H.
 assumption.
 Qed.
 
+Theorem toto : ∀ el a b c N,
+  norm_list el ≠ []
+  → fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0) = (a, b, c, N)
+  → b ≠ 0%Z.
+Proof.
+intros el a b c N Hs Hr.
+revert a b c N Hr.
+induction el as [| e] using rev_ind; intros.
+ exfalso; apply Hs; reflexivity.
+
+ destruct e as (t, d).
+ remember (1%Z, 0%Z, 0%Z, 0) as p eqn:Hp.
+ destruct t, d.
+  remember (fold_left rotate_param el p) as u eqn:Hu.
+  symmetry in Hu.
+  destruct u as (((a₁, b₁), c₁), N₁).
+  pose proof rotate_param_app_a1 el p _ _ _ _ Hu as H.
+  unfold "≡₃" in H.
+  rewrite Hr in H; simpl in H.
+  destruct H as (Ha, (Hb, Hc)).
+  rewrite Z.mod_0_l in Ha; [ | intros; discriminate ].
+  destruct a, b, c; try reflexivity.
+
+bbb.
+
 Theorem toto : ∀ s a b c N,
   ¬ empty s
   → rotate_1_0_0_param s = (a, b, c, N)
