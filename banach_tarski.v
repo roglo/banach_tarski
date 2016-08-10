@@ -1151,8 +1151,13 @@ induction el as [| e] using rev_ind; intros.
   rewrite Hr in H; simpl in H.
   destruct H as (Ha, (Hb, Hc)).
   rewrite Z.mod_0_l in Ha; [ | intros; discriminate ].
+  destruct b₁, c₁.
+   rewrite Z.add_0_l, Z.mod_0_l in Hb; [ | intros; discriminate ].
+   rewrite Z.add_0_l, Z.mod_0_l in Hc; [ | intros; discriminate ].
+   destruct el as [| e].
+    simpl in Hr.
+bbb.
   destruct a, b, c; try reflexivity.
-
 bbb.
 
 Theorem toto : ∀ s a b c N,
