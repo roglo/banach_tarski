@@ -1130,4 +1130,11 @@ pose proof rotate_param_app_b1n _ O _ _ _ _ _ Hrp as H.
 assumption.
 Qed.
 
+(*
+Theorem toto : ∀ el,
+  norm_list el = [] ∨
+  ∃ n e, norm_list el = List.repeat n e.
+  ∃ el₁ n e, norm_list el = el₁ ++ List.repeat n e.
+*)
+
 End Rotation.
