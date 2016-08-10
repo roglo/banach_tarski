@@ -984,12 +984,9 @@ destruct n.
  simpl in Hrp₁; simpl.
  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
  rewrite <- Ha, <- Hb, <- Hc.
- split; [ | split ].
-  symmetry; apply Z.add_mod; intros; discriminate.
-
-  symmetry; apply Z.add_mod; intros; discriminate.
-
-  reflexivity.
+ split; [ symmetry; apply Z.add_mod; intros; discriminate | ].
+ split; [ symmetry; apply Z.add_mod; intros; discriminate | ].
+ reflexivity.
 
  destruct n.
   simpl in Hrp₁; simpl.
