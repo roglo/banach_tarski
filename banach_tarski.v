@@ -1123,7 +1123,6 @@ Theorem toto : ∀ el el₁ a b c N,
 Proof.
 intros el el₁ a b c N Hs Hr.
 revert el₁ a b c N Hs Hr.
-(**)
 induction el as [| e]; intros.
  symmetry in Hs; apply app_eq_nil in Hs.
  destruct Hs; discriminate.
