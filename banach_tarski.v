@@ -674,12 +674,12 @@ Definition rotate_1_0_0_param_of_list el :=
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
 *)
 
-Theorem map_1_0_0 : ∀ s a b c N,
-  fold_left rotate_param (str s) (1%Z, 0%Z, 0%Z, 0) = (a, b, c, N)
-  → fold_left rotate (str s) (P 1 0 0) =
-    P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+Theorem rotate_param_rotate : ∀ s x y z a b c N,
+  fold_left rotate_param (str s) (x, y, z, 0) = (a, b, c, N)
+  → fold_left rotate (str s) (P (IZR x) (IZR y * √2) (IZR z)) =
+      P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
-intros (el) a₁ b₁ c₁ N₁ Hr.
+intros (el) x y z a₁ b₁ c₁ N₁ Hr.
 simpl in Hr; simpl.
 revert a₁ b₁ c₁ N₁ Hr.
 induction el as [| (t, d)] using rev_ind; intros.
@@ -689,7 +689,7 @@ induction el as [| (t, d)] using rev_ind; intros.
 
  rewrite fold_left_app in Hr; simpl in Hr.
  rewrite fold_left_app; simpl.
- remember (fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0)) as rp eqn:Hrp.
+ remember (fold_left rotate_param el (x, y, z, 0)) as rp eqn:Hrp.
  symmetry in Hrp.
  destruct rp as (((a, b), c), N).
  erewrite IHel; [ | reflexivity ].
