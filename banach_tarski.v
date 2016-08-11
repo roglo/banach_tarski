@@ -1115,16 +1115,18 @@ destruct t, d.
  eapply rotate_param_app_bn; eassumption.
 Qed.
 
-Theorem toto : ∀ el a b c N,
-  norm_list el ≠ []
+Theorem toto : ∀ el el₁ a b c N,
+  norm_list el = el₁ ++ [ḅ]
   → fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0) = (a, b, c, N)
   → b ≠ 0%Z.
 Proof.
-intros el a b c N Hs Hr.
-revert a b c N Hr.
+intros el el₁ a b c N Hs Hr.
+revert el₁ a b c N Hs Hr.
 induction el as [| e] using rev_ind; intros.
- exfalso; apply Hs; reflexivity.
+ symmetry in Hs; apply app_eq_nil in Hs.
+ destruct Hs; discriminate.
 
+bbb.
  destruct e as (t, d).
  remember (1%Z, 0%Z, 0%Z, 0) as p eqn:Hp.
  destruct t, d.
