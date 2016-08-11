@@ -1141,6 +1141,13 @@ induction el as [| e] using rev_ind; intros.
    rewrite Z.add_0_l, Z.mod_0_l in Hc; [ | intros; discriminate ].
    destruct el as [| e].
     simpl in Hr.
+    unfold rotate_param in Hr.
+    simpl in Hr.
+    destruct p as (((a₂, b₂), c₂), N₂).
+    injection Hr; clear Hr; intros; subst a b c N.
+    simpl in Hu.
+    injection Hu; clear Hu; intros; subst a₂ b₂ c₂ N₂.
+    injection Hp; clear Hp; intros; subst a₁ N₁.
 bbb.
   destruct a, b, c; try reflexivity.
 bbb.
