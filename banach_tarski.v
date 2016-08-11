@@ -663,13 +663,10 @@ Definition rotate_param '(a, b, c, N) e :=
   | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
   end.
 
-(* x²+2y²+z²=1
-   a²+2b²+c²=3^n *)
-
-Theorem toto : ∀ el x y z a b c n N,
+Theorem rotate_param_keep_dist : ∀ el x y z a b c n N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
-  → ((a * a + 2 * b * b + c * c) * 3 ^ Z.of_nat n =
-     (x * x + 2 * y * y + z * z) * 3 ^ Z.of_nat N)%Z.
+  → ((a * a + 2 * b * b + c * c) * 3 ^ Z.of_nat (2 * n) =
+     (x * x + 2 * y * y + z * z) * 3 ^ Z.of_nat (2 * N))%Z.
 Proof.
 intros el x y z a b c n N Hr.
 revert x y z a b c n N Hr.
@@ -677,25 +674,16 @@ induction el as [ | (t, d)]; intros.
  injection Hr; intros; subst; reflexivity.
 
  simpl in Hr.
- destruct t, d.
-  apply IHel in Hr.
-  rewrite Nat2Z.inj_succ in Hr.
-  rewrite <- Z.add_1_r in Hr.
-  rewrite Z.pow_add_r in Hr; [ | apply Nat2Z.is_nonneg | apply Z.le_0_1 ].
-  rewrite Z.pow_1_r, Z.mul_assoc in Hr.
-  apply Z.mul_reg_r with (p := 3%Z); [ intros H; discriminate H | ].
-  rewrite Hr.
-  ring_simplify.
-Focus 2.
-  apply IHel in Hr.
-  rewrite Nat2Z.inj_succ in Hr.
-  rewrite <- Z.add_1_r in Hr.
-  rewrite Z.pow_add_r in Hr; [ | apply Nat2Z.is_nonneg | apply Z.le_0_1 ].
-  rewrite Z.pow_1_r, Z.mul_assoc in Hr.
-  apply Z.mul_reg_r with (p := 3%Z); [ intros H; discriminate H | ].
-  rewrite Hr.
-  ring_simplify.
-bbb.
+ destruct t, d;
+  (apply IHel in Hr;
+   rewrite Nat.mul_comm, <- Nat.add_1_r, Nat.mul_comm in Hr;
+   rewrite Nat.mul_add_distr_l, Nat.mul_1_r, Nat2Z.inj_add in Hr;
+   rewrite Z.pow_add_r in Hr; [ | apply Nat2Z.is_nonneg | apply Z.le_0_1 ];
+   rewrite Z.mul_assoc in Hr;
+   replace (3 ^ Z.of_nat 2)%Z with 9%Z in Hr by reflexivity;
+   apply Z.mul_reg_r with (p := 9%Z); [ intros H; discriminate H | ];
+   rewrite Hr; ring_simplify; reflexivity).
+Qed.
 
 Theorem rotate_param_rotate : ∀ el x y z a b c N,
   fold_left rotate_param el (x, y, z, 0) = (a, b, c, N)
@@ -1142,10 +1130,20 @@ induction el₁ as [| e₁] using rev_ind; intros.
  destruct t₁, d₁.
   destruct H as (Ha, (Hb, Hc)).
   rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
-(* ouais, faut trouver un truc qui conserve les distances ;
-   normalement P 1 0 0 ne doit pas retomber sur P 0 0 0.
-   le problème doit être dû au fait que rotate_param est
-   nécessaire mais pas suffisant, un truc comme ça. *)
+generalize Hu; intros Hu2.
+rewrite Hp in Hu2.
+apply rotate_param_keep_dist in Hu2.
+simpl in Hu2.
+rewrite Z.mul_1_r, Z.mul_1_l, Nat.add_0_r in Hu2.
+generalize Hv; intros Hv2.
+rewrite Hp in Hv2.
+apply rotate_param_keep_dist in Hv2.
+simpl in Hv2.
+rewrite Z.mul_1_r, Z.mul_1_l, Nat.add_0_r in Hv2.
+intros H.
+replace (-2 * a₁ + b₁)%Z with (b₁ - 2 * a₁)%Z in H by ring.
+apply -> Z.sub_move_0_r in H; subst b₁.
+
 bbb.
 (**)
 revert el a b c N Hs Hr.
