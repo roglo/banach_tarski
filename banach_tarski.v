@@ -618,6 +618,7 @@ rewrite Rmult_comm, <- Rmult_assoc.
 f_equal; apply Rmult_comm.
 Qed.
 
+(*
 Inductive point := P : ℝ → ℝ → ℝ → point.
 Record matrix := mkmat
   { a₁₁ : ℝ; a₁₂ : ℝ; a₁₃ : ℝ;
@@ -655,6 +656,7 @@ Definition rotate pt e :=
   end.
 
 Definition map_rotate s pt := List.fold_left rotate (str s) pt.
+*)
 
 Definition rotate_param '(a, b, c, N) e :=
   match e with
@@ -669,6 +671,7 @@ Definition rotate_1_0_0_param_of_list el :=
 
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
 
+(*
 Theorem map_1_0_0 : ∀ s a b c N,
   rotate_1_0_0_param s = (a, b, c, N)
   → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
@@ -751,6 +754,7 @@ exists a, b, c, N; reflexivity.
 Qed.
 
 Check map_1_0_0.
+*)
 
 Definition fst3 {A B C D} '((a, b, c, d) : A * B * C * D) := (a, b, c).
 
