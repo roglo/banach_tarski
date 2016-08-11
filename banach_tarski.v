@@ -1092,8 +1092,7 @@ Qed.
 
 Theorem toto : ∀ el el₁ a b c N,
   norm_list el = el₁ ++ [ḅ]
-  → fold_left rotate_param (norm_list el) (1%Z, 0%Z, 0%Z, 0) =
-      (a, b, c, N)
+  → fold_left rotate_param (norm_list el) (1%Z, 0%Z, 0%Z, 0) = (a, b, c, N)
   → b ≠ 0%Z.
 Proof.
 intros el el₁ a b c N Hs Hr.
