@@ -1117,14 +1117,34 @@ Qed.
 
 Theorem toto : ∀ el el₁ a b c N,
   norm_list el = el₁ ++ [ḅ]
-  → fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0) = (a, b, c, N)
+  → fold_left rotate_param (norm_list el) (1%Z, 0%Z, 0%Z, 0) =
+      (a, b, c, N)
   → b ≠ 0%Z.
 Proof.
 intros el el₁ a b c N Hs Hr.
 revert el₁ a b c N Hs Hr.
+(**)
+induction el as [| e]; intros.
+ symmetry in Hs; apply app_eq_nil in Hs.
+ destruct Hs; discriminate.
+
+ simpl in Hs, Hr.
+ remember (norm_list el) as el₂ eqn:Hel; symmetry in Hel.
+ destruct el₂ as [| e₂].
+  clear IHel.
+  simpl in Hr.
+  destruct e as (t, d).
+  destruct t.
+   destruct d; injection Hr; clear Hr; intros; subst.
+bbb.
+(**)
 induction el as [| e] using rev_ind; intros.
  symmetry in Hs; apply app_eq_nil in Hs.
  destruct Hs; discriminate.
+
+ rewrite Hs in Hr.
+ rewrite fold_left_app in Hr.
+ simpl in Hr.
 
 bbb.
  destruct e as (t, d).
