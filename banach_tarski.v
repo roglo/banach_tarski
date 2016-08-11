@@ -1122,8 +1122,68 @@ Theorem toto : ∀ el el₁ a b c N,
   → b ≠ 0%Z.
 Proof.
 intros el el₁ a b c N Hs Hr.
-revert el₁ a b c N Hs Hr.
 (**)
+rewrite Hs in Hr.
+remember (1%Z, 0%Z, 0%Z, O) as p eqn:Hp.
+remember (fold_left rotate_param el₁ p) as u eqn:Hu.
+destruct u as (((a₁, b₁), c₁), N₁).
+symmetry in Hu.
+generalize Hu; intros H.
+apply rotate_param_app_bn with (n := 0) in H.
+simpl in H.
+rewrite Hr in H; simpl in H.
+destruct H as (Ha, (Hb, Hc)).
+rewrite Z.mod_0_l in Hc; [| intros H; discriminate H ].
+rewrite fold_left_app in Hr.
+rewrite Hu in Hr; simpl in Hr.
+injection Hr; clear Hr; intros; subst a b c N.
+clear Ha Hb Hc.
+revert Hs Hp Hu; clear; intros.
+revert el a₁ b₁ c₁ N₁ Hs Hu.
+induction el₁ as [| e₁] using rev_ind; intros.
+ rewrite Hp in Hu; simpl in Hu.
+ injection Hu; clear Hu; intros; subst a₁ b₁ c₁ N₁.
+ intros H; discriminate H.
+
+ remember (fold_left rotate_param el₁ p) as v eqn:Hv.
+ destruct v as (((a₂, b₂), c₂), N₂).
+ symmetry in Hv.
+ generalize Hv; intros H.
+ apply rotate_param_app with (e := e₁) (n := 0) in H.
+ simpl in H; rewrite Hu in H; simpl in H.
+ destruct e₁ as (t₁, d₁).
+ destruct t₁, d₁.
+  destruct H as (Ha, (Hb, Hc)).
+  rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
+(* ouais, faut trouver un truc qui conserve les distances ;
+   normalement P 1 0 0 ne doit pas retomber sur P 0 0 0.
+   le problème doit être dû au fait que rotate_param est
+   nécessaire mais pas suffisant, un truc comme ça. *)
+bbb.
+(**)
+revert el a b c N Hs Hr.
+induction el₁ as [| e₁]; intros.
+ rewrite Hs in Hr; simpl in Hr.
+ injection Hr; intros; subst; intros; discriminate.
+
+ simpl in Hs.
+ destruct el as [| e]; [ discriminate Hs | ].
+ simpl in Hs, Hr.
+ remember (norm_list el) as el₂ eqn:Hel; symmetry in Hel.
+ destruct el₂ as [| e₂].
+  rewrite app_comm_cons in Hs.
+  symmetry in Hs; apply app_eq_unit in Hs.
+  destruct Hs as [(Hs, _)| (_, Hs)]; discriminate Hs.
+
+  destruct (letter_opp_dec e e₂) as [He| He].
+   subst el₂; simpl in Hr.
+   destruct e₁ as (t₁, d₁).
+   destruct t₁, d₁.
+Check rotate_param_app_bn.
+bbb.
+
+(**)
+revert el₁ a b c N Hs Hr.
 induction el as [| e]; intros.
  symmetry in Hs; apply app_eq_nil in Hs.
  destruct Hs; discriminate.
