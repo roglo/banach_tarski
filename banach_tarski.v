@@ -1131,7 +1131,8 @@ induction el as [| e] using rev_ind; intros.
   remember (fold_left rotate_param el p) as u eqn:Hu.
   symmetry in Hu.
   destruct u as (((a₁, b₁), c₁), N₁).
-  pose proof rotate_param_app_a1 el p _ _ _ _ Hu as H.
+  pose proof rotate_param_app_a1n el 0 p _ _ _ _ Hu as H.
+  simpl in H.
   unfold "≡₃" in H.
   rewrite Hr in H; simpl in H.
   destruct H as (Ha, (Hb, Hc)).
@@ -1142,12 +1143,10 @@ induction el as [| e] using rev_ind; intros.
    destruct el as [| e].
     simpl in Hr.
     unfold rotate_param in Hr.
-    simpl in Hr.
-    destruct p as (((a₂, b₂), c₂), N₂).
+    simpl in Hr; subst p.
     injection Hr; clear Hr; intros; subst a b c N.
     simpl in Hu.
-    injection Hu; clear Hu; intros; subst a₂ b₂ c₂ N₂.
-    injection Hp; clear Hp; intros; subst a₁ N₁.
+    injection Hu; clear Hu; intros; subst a₁ N₁.
 bbb.
   destruct a, b, c; try reflexivity.
 bbb.
