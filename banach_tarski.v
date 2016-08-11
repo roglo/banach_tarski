@@ -1090,12 +1090,13 @@ destruct t, d.
  eapply rotate_param_app_bn; eassumption.
 Qed.
 
-Theorem toto : ∀ el el₁ a b c N,
+Theorem toto : ∀ el el₁ a b c,
   norm_list el = el₁ ++ [ḅ]
-  → fold_left rotate_param (norm_list el) (1%Z, 0%Z, 0%Z, 0) = (a, b, c, N)
+  → fold_left rotate_param_mod_3 (norm_list el) (1%Z, 0%Z, 0%Z) = (a, b, c)
   → b ≠ 0%Z.
 Proof.
-intros el el₁ a b c N Hs Hr.
+intros el el₁ a b c Hs Hr.
+bbb.
 (**)
 generalize Hr; intros H.
 apply rotate_param_keep_dist in H.
@@ -1130,11 +1131,13 @@ replace (9 ^ Z.of_nat 1)%Z with 9%Z in Hd by reflexivity.
 apply Z.mul_reg_l in Hd.
 clear Ha Hb Hc.
 revert el a₁ b₁ c₁ N₁ Hs Hd Hu.
-induction el₁ as [| e₁] using rev_ind; intros.
+induction el₁ as [| e₁]; intros.
  subst p; simpl in Hu.
  injection Hu; clear Hu; intros; subst a₁ b₁ c₁ N₁.
  intros H; discriminate H.
 
+ simpl in Hu, Hs.
+bbb.
  remember (fold_left rotate_param el₁ p) as v eqn:Hv.
  destruct v as (((a₂, b₂), c₂), N₂).
  symmetry in Hv.
