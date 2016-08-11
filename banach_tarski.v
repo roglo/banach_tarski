@@ -681,45 +681,28 @@ induction el as [| (t, d)] using rev_ind; intros.
  remember (fold_left rotate_param el (x, y, z, 0)) as rp eqn:Hrp.
  symmetry in Hrp.
  destruct rp as (((a, b), c), N).
- erewrite IHel; [ simpl in Hr; simpl | reflexivity ].
+ erewrite IHel; [ simpl in Hr; simpl; unfold Rdiv | reflexivity ].
  progress repeat rewrite Rmult_1_l.
  progress repeat rewrite Rmult_0_l.
  progress repeat rewrite Rplus_0_l.
  progress repeat rewrite Rplus_0_r.
- destruct t, d; simpl in Hr; simpl.
-  injection Hr; clear Hr; intros; subst; simpl.
-  unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+ progress repeat rewrite <- Rmult_assoc.
+ rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+ rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+ destruct t, d; injection Hr; clear Hr; intros; subst; simpl.
   rewrite plus_IZR, minus_IZR.
   progress repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-  injection Hr; clear Hr; intros; subst; simpl.
-  unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  do 2 rewrite plus_IZR.
+  rewrite plus_IZR, plus_IZR.
   progress repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-  injection Hr; clear Hr; intros; subst; simpl.
-  unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   rewrite plus_IZR, minus_IZR.
   progress repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-  injection Hr; clear Hr; intros; subst; simpl.
-  unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  do 2 rewrite plus_IZR.
+  rewrite plus_IZR, plus_IZR.
   progress repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 Qed.
