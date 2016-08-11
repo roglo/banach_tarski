@@ -666,6 +666,37 @@ Definition rotate_param '(a, b, c, N) e :=
 (* x²+2y²+z²=1
    a²+2b²+c²=3^n *)
 
+Theorem toto : ∀ el x y z a b c n N,
+  fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
+  → ((a * a + 2 * b * b + c * c) * 3 ^ Z.of_nat n =
+     (x * x + 2 * y * y + z * z) * 3 ^ Z.of_nat N)%Z.
+Proof.
+intros el x y z a b c n N Hr.
+revert x y z a b c n N Hr.
+induction el as [ | (t, d)]; intros.
+ injection Hr; intros; subst; reflexivity.
+
+ simpl in Hr.
+ destruct t, d.
+  apply IHel in Hr.
+  rewrite Nat2Z.inj_succ in Hr.
+  rewrite <- Z.add_1_r in Hr.
+  rewrite Z.pow_add_r in Hr; [ | apply Nat2Z.is_nonneg | apply Z.le_0_1 ].
+  rewrite Z.pow_1_r, Z.mul_assoc in Hr.
+  apply Z.mul_reg_r with (p := 3%Z); [ intros H; discriminate H | ].
+  rewrite Hr.
+  ring_simplify.
+Focus 2.
+  apply IHel in Hr.
+  rewrite Nat2Z.inj_succ in Hr.
+  rewrite <- Z.add_1_r in Hr.
+  rewrite Z.pow_add_r in Hr; [ | apply Nat2Z.is_nonneg | apply Z.le_0_1 ].
+  rewrite Z.pow_1_r, Z.mul_assoc in Hr.
+  apply Z.mul_reg_r with (p := 3%Z); [ intros H; discriminate H | ].
+  rewrite Hr.
+  ring_simplify.
+bbb.
+
 Theorem rotate_param_rotate : ∀ el x y z a b c N,
   fold_left rotate_param el (x, y, z, 0) = (a, b, c, N)
   → fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
