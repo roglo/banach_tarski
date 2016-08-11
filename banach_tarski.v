@@ -618,7 +618,7 @@ rewrite Rmult_comm, <- Rmult_assoc.
 f_equal; apply Rmult_comm.
 Qed.
 
-(*
+
 Inductive point := P : ℝ → ℝ → ℝ → point.
 Record matrix := mkmat
   { a₁₁ : ℝ; a₁₂ : ℝ; a₁₃ : ℝ;
@@ -649,12 +649,13 @@ Definition rot_inv_z := mkmat
 
 Definition rotate pt e :=
   match e with
-  | E la false => mat_vec_mul rot_x pt
-  | E la true => mat_vec_mul rot_inv_x pt
-  | E lb false => mat_vec_mul rot_z pt
-  | E lb true => mat_vec_mul rot_inv_z pt
+  | ạ => mat_vec_mul rot_x pt
+  | ạ⁻¹ => mat_vec_mul rot_inv_x pt
+  | ḅ => mat_vec_mul rot_z pt
+  | ḅ⁻¹ => mat_vec_mul rot_inv_z pt
   end.
 
+(*
 Definition map_rotate s pt := List.fold_left rotate (str s) pt.
 *)
 
@@ -671,18 +672,18 @@ Definition rotate_1_0_0_param_of_list el :=
   fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0).
 
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
+*)
 
 Theorem map_1_0_0 : ∀ s a b c N,
-  rotate_1_0_0_param s = (a, b, c, N)
-  → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+  fold_left rotate_param (str s) (1%Z, 0%Z, 0%Z, 0) = (a, b, c, N)
+  → fold_left rotate (str s) (P 1 0 0) =
+    P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
 intros (el) a₁ b₁ c₁ N₁ Hr.
-unfold map_rotate; simpl.
-unfold rotate_1_0_0_param in Hr; simpl in Hr.
-unfold rotate_1_0_0_param_of_list in Hr.
+simpl in Hr; simpl.
 revert a₁ b₁ c₁ N₁ Hr.
 induction el as [| (t, d)] using rev_ind; intros.
- simpl; simpl in Hr; unfold map_rotate.
+ simpl; simpl in Hr.
  injection Hr; intros; subst; simpl.
  f_equal; lra.
 
@@ -695,53 +696,54 @@ induction el as [| (t, d)] using rev_ind; intros.
  destruct t, d; simpl in Hr; simpl.
   injection Hr; clear Hr; intros; subst; simpl.
   unfold Rdiv.
-  repeat rewrite Rmult_1_l.
-  repeat rewrite Rmult_0_l.
-  repeat rewrite Rplus_0_l.
-  repeat rewrite Rplus_0_r.
-  repeat rewrite <- Rmult_assoc.
+  progress repeat rewrite Rmult_1_l.
+  progress repeat rewrite Rmult_0_l.
+  progress repeat rewrite Rplus_0_l.
+  progress repeat rewrite Rplus_0_r.
+  progress repeat rewrite <- Rmult_assoc.
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   rewrite plus_IZR, minus_IZR.
-  repeat rewrite mult_IZR.
+  progress repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
   injection Hr; clear Hr; intros; subst; simpl.
   unfold Rdiv.
-  repeat rewrite Rmult_1_l.
-  repeat rewrite Rmult_0_l.
-  repeat rewrite Rplus_0_l.
-  repeat rewrite Rplus_0_r.
-  repeat rewrite <- Rmult_assoc.
+  progress repeat rewrite Rmult_1_l.
+  progress repeat rewrite Rmult_0_l.
+  progress repeat rewrite Rplus_0_l.
+  progress repeat rewrite Rplus_0_r.
+  progress repeat rewrite <- Rmult_assoc.
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   do 2 rewrite plus_IZR.
-  repeat rewrite mult_IZR.
+  progress repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
   injection Hr; clear Hr; intros; subst; simpl.
   unfold Rdiv.
-  repeat rewrite Rmult_1_l.
-  repeat rewrite Rmult_0_l.
-  repeat rewrite Rplus_0_l.
-  repeat rewrite Rplus_0_r.
-  repeat rewrite <- Rmult_assoc.
+  progress repeat rewrite Rmult_1_l.
+  progress repeat rewrite Rmult_0_l.
+  progress repeat rewrite Rplus_0_l.
+  progress repeat rewrite Rplus_0_r.
+  progress repeat rewrite <- Rmult_assoc.
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   rewrite plus_IZR, minus_IZR.
-  repeat rewrite mult_IZR.
+  progress repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
   injection Hr; clear Hr; intros; subst; simpl.
   unfold Rdiv.
-  repeat rewrite Rmult_1_l.
-  repeat rewrite Rmult_0_l.
-  repeat rewrite Rplus_0_l.
-  repeat rewrite Rplus_0_r.
-  repeat rewrite <- Rmult_assoc.
+  progress repeat rewrite Rmult_1_l.
+  progress repeat rewrite Rmult_0_l.
+  progress repeat rewrite Rplus_0_l.
+  progress repeat rewrite Rplus_0_r.
+  progress repeat rewrite <- Rmult_assoc.
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   do 2 rewrite plus_IZR.
-  repeat rewrite mult_IZR.
+  progress repeat rewrite mult_IZR.
   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 Qed.
 
+(*
 Theorem ex_map_1_0_0 : ∀ s,
   ∃ (a b c : ℤ) (N : ℕ),
   map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
