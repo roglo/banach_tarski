@@ -1119,6 +1119,15 @@ rewrite Z.mod_0_l in Hc; [| intros H; discriminate H ].
 rewrite fold_left_app in Hr.
 rewrite Hu in Hr; simpl in Hr.
 injection Hr; clear Hr; intros; subst a b c N.
+ring_simplify in Hd.
+replace 18%Z with (9 * 2)%Z in Hd by reflexivity.
+rewrite <- Z.mul_assoc in Hd.
+do 2 rewrite <- Z.mul_add_distr_l in Hd.
+rewrite <- Nat.add_1_r, Nat.add_comm in Hd.
+rewrite Nat2Z.inj_add in Hd.
+rewrite Z.pow_add_r in Hd.
+replace (9 ^ Z.of_nat 1)%Z with 9%Z in Hd by reflexivity.
+apply Z.mul_reg_l in Hd.
 clear Ha Hb Hc.
 revert el a₁ b₁ c₁ N₁ Hs Hd Hu.
 induction el₁ as [| e₁] using rev_ind; intros.
