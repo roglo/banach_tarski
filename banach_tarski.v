@@ -666,12 +666,12 @@ Definition rotate_param '(a, b, c, N) e :=
   | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
   end.
 
+(*
 Definition rotate_1_0_0_param_of_list el :=
   fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0).
 
 Definition rotate_1_0_0_param s := rotate_1_0_0_param_of_list (str s).
 
-(*
 Theorem map_1_0_0 : ∀ s a b c N,
   rotate_1_0_0_param s = (a, b, c, N)
   → map_rotate s (P 1 0 0) = P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
