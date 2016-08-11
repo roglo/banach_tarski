@@ -1096,8 +1096,6 @@ destruct n.
    apply Nat.lt_0_succ.
 Qed.
 
-Inspect 4.
-
 Theorem rotate_param_app : ∀ el e n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ repeat e (n + 1)) p) ≡₃
