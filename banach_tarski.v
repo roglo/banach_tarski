@@ -663,6 +663,9 @@ Definition rotate_param '(a, b, c, N) e :=
   | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
   end.
 
+(* x²+2y²+z²=1
+   a²+2b²+c²=3^n *)
+
 Theorem rotate_param_rotate : ∀ el x y z a b c N,
   fold_left rotate_param el (x, y, z, 0) = (a, b, c, N)
   → fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
