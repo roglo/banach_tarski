@@ -1123,6 +1123,7 @@ Theorem toto : ∀ el el₁ a b c N,
 Proof.
 intros el el₁ a b c N Hs Hr.
 revert el₁ a b c N Hs Hr.
+(**)
 induction el as [| e]; intros.
  symmetry in Hs; apply app_eq_nil in Hs.
  destruct Hs; discriminate.
@@ -1130,11 +1131,15 @@ induction el as [| e]; intros.
  simpl in Hs, Hr.
  remember (norm_list el) as el₂ eqn:Hel; symmetry in Hel.
  destruct el₂ as [| e₂].
-  clear IHel.
   simpl in Hr.
   destruct e as (t, d).
   destruct t.
-   destruct d; injection Hr; clear Hr; intros; subst.
+   symmetry in Hs; apply app_eq_unit in Hs.
+   destruct Hs as [(_, Hs)| (_, Hs)]; discriminate.
+
+   destruct d; injection Hr; intros; subst; intros; discriminate.
+
+  destruct (letter_opp_dec e e₂) as [He| He].
 bbb.
 (**)
 induction el as [| e] using rev_ind; intros.
