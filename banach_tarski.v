@@ -1098,6 +1098,14 @@ Theorem toto : ∀ el el₁ a b c N,
 Proof.
 intros el el₁ a b c N Hs Hr.
 (**)
+generalize Hr; intros H.
+apply rotate_param_keep_dist in H.
+do 2 rewrite Nat2Z.inj_mul in H; simpl in H.
+rewrite Z.mul_1_r, Z.mul_1_l in H.
+rewrite Z.pow_mul_r in H; [ | apply Zle_0_pos | apply Zle_0_nat ].
+replace (3 ^ 2)%Z with 9%Z in H by reflexivity.
+rename H into Hd.
+(**)
 rewrite Hs in Hr.
 remember (1%Z, 0%Z, 0%Z, O) as p eqn:Hp.
 remember (fold_left rotate_param el₁ p) as u eqn:Hu.
@@ -1113,10 +1121,9 @@ rewrite fold_left_app in Hr.
 rewrite Hu in Hr; simpl in Hr.
 injection Hr; clear Hr; intros; subst a b c N.
 clear Ha Hb Hc.
-revert Hs Hp Hu; clear; intros.
-revert el a₁ b₁ c₁ N₁ Hs Hu.
+revert el a₁ b₁ c₁ N₁ Hs Hd Hu.
 induction el₁ as [| e₁] using rev_ind; intros.
- rewrite Hp in Hu; simpl in Hu.
+ subst p; simpl in Hu.
  injection Hu; clear Hu; intros; subst a₁ b₁ c₁ N₁.
  intros H; discriminate H.
 
@@ -1130,6 +1137,8 @@ induction el₁ as [| e₁] using rev_ind; intros.
  destruct t₁, d₁.
   destruct H as (Ha, (Hb, Hc)).
   rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
+bbb.
+
 generalize Hu; intros Hu2.
 rewrite Hp in Hu2.
 apply rotate_param_keep_dist in Hu2.
