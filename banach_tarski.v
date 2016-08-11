@@ -1143,6 +1143,11 @@ rewrite Z.mul_1_r, Z.mul_1_l, Nat.add_0_r in Hv2.
 intros H.
 replace (-2 * a₁ + b₁)%Z with (b₁ - 2 * a₁)%Z in H by ring.
 apply -> Z.sub_move_0_r in H; subst b₁.
+apply Znumtheory.Zmod_divide in Ha; [ | intros H; discriminate H ].
+destruct Ha as (k, Ha); subst a₁.
+rewrite Z.mul_assoc in Hb.
+rewrite Zdiv.Z_mod_mult in Hb.
+rewrite <- Hb in Hc.
 
 bbb.
 (**)
