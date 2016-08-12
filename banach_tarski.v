@@ -51,7 +51,7 @@ Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
 intros.
 destruct l1, l2; try (left; reflexivity); right; intros H; discriminate H.
-Qed.
+Defined.
 
 Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
   if letter_dec l₁ l₂ then
@@ -1102,7 +1102,13 @@ rewrite Z.pow_mul_r in Hr; try apply Nat2Z.is_nonneg.
 rewrite Hr; ring_simplify; reflexivity.
 Qed.
 
-Record norm_path := mknp { last : free_elem; path : list (bool * nat) }.
+Record norm_path := mknp { last : letter; path : list (bool * nat) }.
+
+Definition other_elem t := match t with la => lb | lb => la end.
+
+Fixpoint path_start np :=
+  if zerop (List.length (path np) mod 2) then other_elem (last np)
+  else last np.
 
 Fixpoint group_norm el :=
   match el with
@@ -1113,12 +1119,12 @@ Fixpoint group_norm el :=
       | (d, n) :: p =>
           let t₂ := path_start np in
           if letter_dec t₁ t₂ then
-            if Bool.bool_dec d₁ d₂ then
+            if Bool.bool_dec d₁ d then
               mknp (last np) ((d, S n) :: p)
             else
               match n with
               | O => mknp (last np) p
-              | S n' => mknp (last np) ((t₂, S n) :: p)
+              | S n' => mknp (last np) ((d₁, n') :: p)
               end
           else
             mknp (last np) ((d₁, 0) :: pa)
@@ -1127,6 +1133,8 @@ Fixpoint group_norm el :=
       end
   | [] => mknp la []
   end.
+
+Compute group_norm [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
 
 bbb.
 
