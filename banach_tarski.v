@@ -1110,10 +1110,10 @@ Fixpoint path_start np :=
   if zerop (List.length (path np) mod 2) then other_elem (last np)
   else last np.
 
-Fixpoint group_norm el :=
+Fixpoint norm_combine el :=
   match el with
   | E t₁ d₁ :: el₁ =>
-      let np := group_norm el₁ in
+      let np := norm_combine el₁ in
       let pa := path np in
       match pa with
       | (d, n) :: p =>
@@ -1134,7 +1134,28 @@ Fixpoint group_norm el :=
   | [] => mknp la []
   end.
 
-Compute group_norm [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
+Compute norm_combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
+
+Theorem toto : ∀ el p a b c N a' b' c' N',
+  fold_left rotate_param el p = (a, b, c, N)
+  → fold_left rotate_param (norm_list el) p = (a', b', c', N')
+  → a = (a' * 3 ^ Z.of_nat (N - N'))%Z.
+Proof.
+intros el p a b c N a' b' c' N' Hr Hr'.
+destruct p as (((x, y), z), n).
+apply rotate_param_keep_dist in Hr.
+apply rotate_param_keep_dist in Hr'.
+Theorem glop : ∀ a b c, a = b → (a * c)%Z = (b * c)%Z.
+Proof. intros; subst; reflexivity. Qed.
+Show.
+apply glop with (c := (3 ^ Z.of_nat (2 * N'))%Z) in Hr.
+apply glop with (c := (3 ^ Z.of_nat (2 * N))%Z) in Hr'.
+symmetry in Hr'.
+rewrite Z.mul_shuffle0 in Hr'.
+rewrite Hr' in Hr.
+rewrite Z.mul_shuffle0 in Hr; symmetry in Hr.
+rewrite Z.mul_shuffle0 in Hr; symmetry in Hr.
+apply Z.mul_reg_r in Hr.
 
 bbb.
 
