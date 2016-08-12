@@ -1102,6 +1102,27 @@ rewrite Z.pow_mul_r in Hr; try apply Nat2Z.is_nonneg.
 rewrite Hr; ring_simplify; reflexivity.
 Qed.
 
+Definition ...
+
+Theorem toto : ∀ el,
+
+  norm_list el =
+Proof.
+bbb.
+
+Theorem toto : ∀ el el₁ a b c,
+  norm_list el = el₁ ++ [ḅ]
+  → fold_left rotate_param (norm_list el) (1%Z, 0%Z, 0%Z, 0) = (a, b, c)
+  → (b mod 3 ≠ 0)%Z.
+Proof.
+intros el el₁ a b c Hn Hr.
+revert el₁ a b c Hn Hr.
+induction el as [| e] using rev_ind; intros.
+ symmetry in Hn; apply app_eq_nil in Hn.
+ destruct Hn as (_, Hn); discriminate Hn.
+
+bbb.
+
 Theorem toto : ∀ el el₁ a b c,
   norm_list el = el₁ ++ [ḅ]
   → fold_left rotate_param_mod_3 (norm_list el) (1%Z, 0%Z, 0%Z) = (a, b, c)
