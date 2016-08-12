@@ -1108,38 +1108,27 @@ Fixpoint group_norm el :=
   match el with
   | E t₁ d₁ :: el₁ =>
       let np := group_norm el₁ in
-      match path np with
+      let pa := path np in
+      match pa with
       | (d, n) :: p =>
-          let (t₂, d₂) := path_start np in
+          let t₂ := path_start np in
           if letter_dec t₁ t₂ then
             if Bool.bool_dec d₁ d₂ then
               mknp (last np) ((d, S n) :: p)
             else
               match n with
-              | O => mknp (other ....
-merde faut que je réfléchisse sur mon modèle...
-
-(other_letter start, mknp (last np) p)
-              | S n' => (start, (d, n') :: p)
+              | O => mknp (last np) p
+              | S n' => mknp (last np) ((t₂, S n) :: p)
               end
           else
-            (t₁, mknP
-
-      let gl₁ := group_norm el₁ in
-      match gl₁ with
-      | (E t₂ d₂, n) :: gl₂ =>
-          if letter_dec t₁ t₂ then
-            if Bool.bool_dec d₁ d₂ then (E t₂ d₂, S n) :: gl₂
-            else
-              match n with
-              | 0 => gl₂
-              | S n' => (E t₂ d₂, n') :: gl₂
-              end
-          else (E t₁ d₁, 0) :: gl₁
-      | [] => [(E t₁ d₁, 0)]
+            mknp (last np) ((d₁, 0) :: pa)
+      | [] =>
+          mknp t₁ [(d₁, 0)]
       end
-  | [] => []
+  | [] => mknp la []
   end.
+
+bbb.
 
 Print rotate_param.
 
