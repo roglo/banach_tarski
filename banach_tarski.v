@@ -1096,6 +1096,45 @@ Theorem toto : ∀ el el₁ a b c,
   → b ≠ 0%Z.
 Proof.
 intros el el₁ a b c Hs Hr.
+(**)
+rewrite Hs in Hr.
+rewrite fold_left_app in Hr; simpl in Hr.
+remember (fold_left rotate_param_mod_3 el₁ (1, 0, 0)%Z) as r₁ eqn:Hr₁.
+symmetry in Hr₁; destruct r₁ as ((a₁, b₁), c₁).
+simpl in Hr.
+injection Hr; clear Hr; intros; subst a b c.
+revert a₁ b₁ c₁ Hr₁ el Hs.
+induction el₁ as [| e₁] using rev_ind; intros.
+ simpl in Hr₁.
+ injection Hr₁; intros; subst; intros H; discriminate H.
+
+ rewrite fold_left_app in Hr₁; simpl in Hr₁.
+ simpl in Hr₁.
+ destruct e₁ as (t₁, d₁).
+ destruct t₁, d₁.
+  remember (fold_left rotate_param_mod_3 el₁ (1, 0, 0)%Z) as r₂ eqn:Hr₂.
+  symmetry in Hr₂; destruct r₂ as ((a₂, b₂), c₂).
+  simpl in Hr₁.
+  injection Hr₁; clear Hr₁; intros; subst.
+  rewrite Z.add_0_l, Z.mod_mod; [ | intros H; discriminate H ].
+
+Inspect 1.
+bbb.
+(**)
+remember (norm_list el) as el₂ eqn:Hel.
+symmetry in Hel.
+revert el el₁ a b c Hel Hs Hr.
+induction el₂ as [| e] using rev_ind; intros.
+ symmetry in Hs; apply app_eq_nil in Hs.
+ destruct Hs as (_, Hs); discriminate Hs.
+
+ apply app_inj_tail in Hs.
+ destruct Hs as (H₁, H₂); subst el₁ e.
+ rewrite fold_left_app in Hr; simpl in Hr.
+ remember (fold_left rotate_param_mod_3 el₂ (1%Z, 0%Z, 0%Z)) as r₁ eqn:Hr₁.
+ symmetry in Hr₁; destruct r₁ as ((a₁, b₁), c₁).
+
+
 bbb.
 (**)
 generalize Hr; intros H.
