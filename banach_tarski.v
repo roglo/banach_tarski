@@ -1136,6 +1136,28 @@ Fixpoint norm_combine el :=
 
 Compute norm_combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
 
+Fixpoint rotate_norm_path_loop last path p :=
+  match path with
+  | (t, n) :: pa =>
+...
+  | [] => p
+  end.
+
+Definition rotate_norm_path nc := rotate_norm_path_loop (last nc) (path nc).
+
+  match e with
+  | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
+  | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
+  | ḅ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
+  | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
+  end.
+
+Theorem toto : ∀ el p,
+  fold_left rotate_param (norm_list el) p =
+  rotate_norm_path (norm_combine el) p.
+Proof.
+bbb.
+
 Theorem toto : ∀ el p a b c N a' b' c' N',
   fold_left rotate_param el p = (a, b, c, N)
   → fold_left rotate_param (norm_list el) p = (a', b', c', N')
