@@ -1107,16 +1107,19 @@ Record norm_path := mknp { last : free_elem; path : list (bool * nat) }.
 Fixpoint group_norm el :=
   match el with
   | E t₁ d₁ :: el₁ =>
-      let (start, np) := group_norm el₁ in
+      let np := group_norm el₁ in
       match path np with
       | (d, n) :: p =>
-          if letter_dec t₁ start then
-            if Bool.bool_dec d₁ d then
-ouais, chais pas...
-              (start, (d :: S n) :: p)
+          let (t₂, d₂) := path_start np in
+          if letter_dec t₁ t₂ then
+            if Bool.bool_dec d₁ d₂ then
+              mknp (last np) ((d, S n) :: p)
             else
               match n with
-              | O => (other_letter start, mknp (last np) p)
+              | O => mknp (other ....
+merde faut que je réfléchisse sur mon modèle...
+
+(other_letter start, mknp (last np) p)
               | S n' => (start, (d, n') :: p)
               end
           else
