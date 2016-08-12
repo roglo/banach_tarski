@@ -1102,9 +1102,26 @@ rewrite Z.pow_mul_r in Hr; try apply Nat2Z.is_nonneg.
 rewrite Hr; ring_simplify; reflexivity.
 Qed.
 
+Record norm_path := mknp { last : free_elem; path : list (bool * nat) }.
+
 Fixpoint group_norm el :=
   match el with
   | E t₁ d₁ :: el₁ =>
+      let (start, np) := group_norm el₁ in
+      match path np with
+      | (d, n) :: p =>
+          if letter_dec t₁ start then
+            if Bool.bool_dec d₁ d then
+ouais, chais pas...
+              (start, (d :: S n) :: p)
+            else
+              match n with
+              | O => (other_letter start, mknp (last np) p)
+              | S n' => (start, (d, n') :: p)
+              end
+          else
+            (t₁, mknP
+
       let gl₁ := group_norm el₁ in
       match gl₁ with
       | (E t₂ d₂, n) :: gl₂ =>
