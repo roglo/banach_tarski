@@ -1102,13 +1102,29 @@ rewrite Z.pow_mul_r in Hr; try apply Nat2Z.is_nonneg.
 rewrite Hr; ring_simplify; reflexivity.
 Qed.
 
-Definition ...
+Fixpoint group_norm el :=
+  match el with
+  | E t₁ d₁ :: el₁ =>
+      let gl₁ := group_norm el₁ in
+      match gl₁ with
+      | (E t₂ d₂, n) :: gl₂ =>
+          if letter_dec t₁ t₂ then
+            if Bool.bool_dec d₁ d₂ then (E t₂ d₂, S n) :: gl₂
+            else
+              match n with
+              | 0 => gl₂
+              | S n' => (E t₂ d₂, n') :: gl₂
+              end
+          else (E t₁ d₁, 0) :: gl₁
+      | [] => [(E t₁ d₁, 0)]
+      end
+  | [] => []
+  end.
 
-Theorem toto : ∀ el,
+Print rotate_param.
 
-  norm_list el =
-Proof.
-bbb.
+Definition rotate_param_by_group '(a b c N) (e, n) :=
+ah, fait chier...
 
 Theorem toto : ∀ el el₁ a b c,
   norm_list el = el₁ ++ [ḅ]
