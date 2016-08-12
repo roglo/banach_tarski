@@ -665,8 +665,8 @@ Definition rotate_param '(a, b, c, N) e :=
 
 Theorem rotate_param_keep_dist : ∀ el x y z a b c n N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
-  → ((a * a + 2 * b * b + c * c) * 3 ^ Z.of_nat (2 * n) =
-     (x * x + 2 * y * y + z * z) * 3 ^ Z.of_nat (2 * N))%Z.
+  → ((a ^ 2 + 2 * b ^ 2 + c ^ 2) * 3 ^ Z.of_nat (2 * n) =
+     (x ^ 2 + 2 * y ^ 2 + z ^ 2) * 3 ^ Z.of_nat (2 * N))%Z.
 Proof.
 intros el x y z a b c n N Hr.
 revert x y z a b c n N Hr.
@@ -1088,6 +1088,18 @@ destruct t, d.
  eapply rotate_param_app_an; eassumption.
  eapply rotate_param_app_b1n; eassumption.
  eapply rotate_param_app_bn; eassumption.
+Qed.
+
+Theorem rotate_param_1_0_0_expr : ∀ el a b c N,
+  fold_left rotate_param el (1%Z, 0%Z, 0%Z, 0) = (a, b, c, N)
+  → (a ^ 2 + 2 * b ^ 2 + c ^ 2 = 9 ^ Z.of_nat N)%Z.
+Proof.
+intros el a b c N Hr.
+apply rotate_param_keep_dist in Hr.
+rewrite Nat.mul_0_r, Nat2Z.inj_0, Z.pow_0_r, Z.mul_1_r in Hr.
+rewrite Nat2Z.inj_mul in Hr.
+rewrite Z.pow_mul_r in Hr; try apply Nat2Z.is_nonneg.
+rewrite Hr; ring_simplify; reflexivity.
 Qed.
 
 Theorem toto : ∀ el el₁ a b c,
