@@ -1169,6 +1169,12 @@ Theorem toto : ∀ el p,
   fold_left rotate_param_mod_3 (norm_list el) p =
   rotate_norm2_mod_3 (norm_combine el) p.
 Proof.
+intros el p.
+unfold rotate_norm2_mod_3.
+revert p.
+induction el as [| e]; intros; [ reflexivity | ].
+simpl.
+
 bbb.
 
 Theorem toto : ∀ el p a b c N a' b' c' N',
