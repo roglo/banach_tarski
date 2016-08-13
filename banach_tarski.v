@@ -1138,14 +1138,21 @@ Compute norm_combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ
 
 Inspect 8.
 
-Fixpoint rotate_norm_path_loop last path p :=
+Fixpoint rotate_norm_path_loop e path p :=
   match path with
-  | (t, n) :: pa =>
-...
+  | (d, n) :: pa =>
+      match E e d with
+      | ạ⁻¹ =>
+          if zerop ...
+      | ạ =>
+      | ḅ⁻¹ =>
+      | ḅ⁻¹ =>
+      end
   | [] => p
   end.
 
-Definition rotate_norm_path nc := rotate_norm_path_loop (last nc) (path nc).
+Definition rotate_norm_path nc :=
+  rotate_norm_path_loop (path_start nc) (path nc).
 
   match e with
   | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
