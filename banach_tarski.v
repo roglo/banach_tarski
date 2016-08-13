@@ -1170,6 +1170,14 @@ Theorem toto : ∀ el p,
   rotate_norm2_mod_3 (norm_combine el) p.
 Proof.
 intros el p.
+remember (rotate_norm2_mod_3 (norm_combine el) p) as u eqn:Hu.
+symmetry in Hu.
+destruct u as ((a, b), c).
+Inspect 10.
+pose proof rotate_param_app (norm_list el).
+remember (fold_left rotate_param (norm_list el)) as u eqn:Hv.
+bbb.
+
 unfold rotate_norm2_mod_3.
 revert p.
 induction el as [| e]; intros; [ reflexivity | ].
