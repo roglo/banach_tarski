@@ -1138,32 +1138,36 @@ Compute norm_combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ
 
 Inspect 8.
 
-Fixpoint rotate_norm_path_loop e path p :=
+Fixpoint rotate_norm2_mod_3_loop e path p :=
   match path with
   | (d, n) :: pa =>
-      match E e d with
-      | ạ⁻¹ =>
-          if zerop ...
-      | ạ =>
-      | ḅ⁻¹ =>
-      | ḅ⁻¹ =>
-      end
+      let '(a, b, c) := p in
+      let p' :=
+        match E e d with
+        | ạ⁻¹ =>
+            if zerop (n mod 2) then (0%Z, (- b - c)%Z, (- b - c)%Z)
+            else (0%Z, (b + c)%Z, (b + c)%Z)
+        | ạ =>
+            if zerop (n mod 2) then (0%Z, (c - b)%Z, (b - c)%Z)
+            else (0%Z, (b - c)%Z, (c - b)%Z)
+        | ḅ⁻¹ =>
+            if zerop (n mod 2) then ((b - a)%Z, (a - b)%Z, 0%Z)
+            else ((a - b)%Z, (b - a)%Z, 0%Z)
+        | ḅ =>
+            if zerop (n mod 2) then ((- a - b)%Z, (- a - b)%Z, 0%Z)
+            else ((a + b)%Z, (a + b)%Z, 0%Z)
+        end
+      in
+      rotate_norm2_mod_3_loop (other_elem e) pa p'
   | [] => p
   end.
 
-Definition rotate_norm_path nc :=
-  rotate_norm_path_loop (path_start nc) (path nc).
-
-  match e with
-  | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
-  | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
-  | ḅ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
-  | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
-  end.
+Definition rotate_norm2_mod_3 nc :=
+  rotate_norm2_mod_3_loop (path_start nc) (path nc).
 
 Theorem toto : ∀ el p,
-  fold_left rotate_param (norm_list el) p =
-  rotate_norm_path (norm_combine el) p.
+  fold_left rotate_param_mod_3 (norm_list el) p =
+  rotate_norm2_mod_3 (norm_combine el) p.
 Proof.
 bbb.
 
