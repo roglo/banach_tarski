@@ -1177,6 +1177,7 @@ Inspect 10.
 pose proof rotate_param_app (norm_list el).
 remember (fold_left rotate_param (norm_list el)) as u eqn:Hv.
 unfold "≡₃" in H.
+SearchAbout rotate_param_mod_3.
 bbb.
 
 unfold rotate_norm2_mod_3.
