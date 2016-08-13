@@ -1136,6 +1136,8 @@ Fixpoint norm_combine el :=
 
 Compute norm_combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
 
+Inspect 8.
+
 Fixpoint rotate_norm_path_loop last path p :=
   match path with
   | (t, n) :: pa =>
