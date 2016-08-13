@@ -1176,6 +1176,7 @@ destruct u as ((a, b), c).
 Inspect 10.
 pose proof rotate_param_app (norm_list el).
 remember (fold_left rotate_param (norm_list el)) as u eqn:Hv.
+unfold "≡₃" in H.
 bbb.
 
 unfold rotate_norm2_mod_3.
