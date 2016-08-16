@@ -1138,6 +1138,33 @@ Compute norm_combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ
 
 Inspect 8.
 
+Fixpoint rotate_step pt e n :=
+  match n with
+  | O => pt
+  | S n' => rotate (rotate_step pt e n') e
+  end.
+
+Fixpoint rotate_norm2_loop t path pt :=
+  match path with
+  | (d, n) :: pa =>
+      let pt := rotate_step pt (E t d) n in
+      rotate_norm2_loop (other_elem t) pa pt
+  | [] => pt
+  end.
+
+Definition rotate_norm2 nc := rotate_norm2_loop (path_start nc) (path nc).
+
+Theorem toto : ∀ el pt,
+  rotate_norm2 (norm_combine el) pt = fold_left rotate el pt.
+Proof.
+intros el pt.
+unfold rotate_norm2.
+revert pt.
+induction el as [| e]; intros; [ reflexivity | simpl ].
+destruct e as (t, d).
+
+bbb.
+
 Fixpoint rotate_norm2_mod_3_loop e path p :=
   match path with
   | (d, n) :: pa =>
