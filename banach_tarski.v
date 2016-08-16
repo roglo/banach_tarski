@@ -1203,6 +1203,27 @@ induction el as [| e] using rev_ind; [ reflexivity | ].
 rewrite rev_unit in H; discriminate H.
 Qed.
 
+Theorem rev_rev {A} : ∀ l₁ l₂ : list A, rev l₁ = rev l₂ → l₁ = l₂.
+Proof.
+intros l₁ l₂ H.
+revert l₂ H.
+induction l₁ as [| x]; intros.
+ destruct l₂ as [| x]; [ reflexivity | exfalso ].
+ simpl in H; symmetry in H.
+ apply app_eq_nil in H.
+ destruct H as (_, H); discriminate H.
+
+ simpl in H.
+ destruct l₂ as [| y]; [ exfalso | ].
+  simpl in H; apply app_eq_nil in H.
+  destruct H as (_, H); discriminate H.
+
+  simpl in H.
+  apply app_inj_tail in H.
+  destruct H as (H₁, H₂); subst y; f_equal.
+  apply IHl₁, H₁.
+Qed.
+
 Theorem toto : ∀ el pt,
   rotate_norm2 (norm_combine el) pt = fold_left rotate (norm_list el) pt.
 Proof.
@@ -1272,10 +1293,23 @@ destruct (letter_opp_dec e e₁) as [H₁| H₁].
  destruct rel as [| (t₁, d₁)].
   apply rev_is_nil in Hrel; subst el; discriminate Hel₁.
 
+  rewrite <- rev_involutive in Hrel.
+  apply rev_rev in Hrel; simpl in Hrel.
+  subst el.
+  remember (rev rel) as el eqn:Hel.
+  clear rel Hel.
+
+bbb.
+  simpl in H; clear IHl₁.
+  revert x H.
+  induction l₁ as [| y]; intros; [ discriminate H | ].
+  simpl in H.
+
+
   destruct (letter_dec t t₁) as [H₁| H₁].
    subst t₁.
    destruct (Bool.bool_dec d d₁) as [H₁| H₁].
-    subst d₁.
+    subst d₁; right.
 bbb.
 
 destruct el as [| e]; [ reflexivity | ].
