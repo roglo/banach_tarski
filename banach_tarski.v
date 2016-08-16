@@ -1243,7 +1243,7 @@ intros el Hel.
 Theorem toto : ∀ el,
   norm_list el = []
   → el = [] ∨
-    (∃ t d el₁, el = E t d :: el₁ ++ [E t (negb d)]) ∨
+    (∃ t d el₁, norm_list el₁ = [] ∧ el = E t d :: el₁ ++ [E t (negb d)]) ∨
     (∃ el₁ el₂,
      el₁ ≠ [] ∧ el₂ ≠ [] ∧ norm_list el₁ = [] ∧ norm_list el₂ = [] ∧
      el = el₁ ++ el₂).
@@ -1257,10 +1257,10 @@ destruct el₁ as [| e₁]; [ discriminate Hel | ].
 destruct (letter_opp_dec e e₁) as [H₁| H₁].
  subst el₁.
  destruct e as (t, d).
- left; exists t, d.
  destruct e₁ as (t₁, d₁).
  apply letter_opp_iff in H₁.
  destruct H₁; subst t₁ d₁.
+ left; exists t, d.
 bbb.
 
 destruct el as [| e]; [ reflexivity | ].
