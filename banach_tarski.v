@@ -1106,7 +1106,7 @@ Record norm_path := mknp { last : letter; path : list (bool * nat) }.
 
 Definition other_elem t := match t with la => lb | lb => la end.
 
-Fixpoint path_start np :=
+Definition path_start np :=
   if zerop (List.length (path np) mod 2) then other_elem (last np)
   else last np.
 
@@ -1196,17 +1196,92 @@ destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ | reflexivity ].
 rewrite rotate_rotate_inv; [ reflexivity | assumption ].
 Qed.
 
-Theorem toto : ∀ el, norm_combine el = norm_combine (norm_list el).
+Theorem toto : ∀ el pt,
+  rotate_norm2 (norm_combine el) pt = fold_left rotate (norm_list el) pt.
 Proof.
-intros el.
-induction el as [| (t, d)]; [ reflexivity | simpl ].
-rewrite IHel.
-remember (norm_list el) as el₁ eqn:Hel.
-symmetry in Hel.
+intros el pt.
+unfold rotate_norm2.
+remember (norm_combine el) as pa eqn:Hpa.
+symmetry in Hpa.
+destruct pa as (t, bnl).
+revert el pt t Hpa.
+induction bnl as [| (d, n)]; intros.
+ simpl.
+ destruct el as [| e]; [ reflexivity | ].
+ simpl; simpl in Hpa.
+  destruct e as (t₁, d₁).
+  remember (path (norm_combine el)) as pa eqn:Hpa₂.
+  symmetry in Hpa₂.
+  destruct pa as [| (d, n) pa]; [ discriminate Hpa | ].
+  unfold path_start in Hpa.
+  rewrite Hpa₂ in Hpa.
+  simpl in Hpa.
+  destruct (zerop (S (length pa) mod 2)) as [H₁| H₁].
+   remember (last (norm_combine el)) as lst eqn:Hlst.
+   destruct (letter_dec t₁ (other_elem lst)) as [H₂| H₂].
+    destruct (Bool.bool_dec d₁ d) as [H₃| H₃]; [ discriminate Hpa | ].
+    destruct n; [ injection Hpa; intros; subst; discriminate H₁ | ].
+    discriminate Hpa.
+
+    discriminate Hpa.
+
+   remember (last (norm_combine el)) as lst eqn:Hlst.
+   destruct (letter_dec t₁ lst) as [H₂| H₂].
+    destruct (Bool.bool_dec d₁ d) as [H₃| H₃]; [ discriminate Hpa | ].
+    destruct n.
+     injection Hpa; clear Hpa; intros; subst.
+     remember (norm_list el) as el₁ eqn:Hel.
+     symmetry in Hel.
+     destruct el₁ as [| e₁].
+      simpl.
+Theorem toto : ∀ el,
+  norm_list el = []
+  → path (norm_combine el) = [].
+Proof.
+intros el Hel.
+
+Theorem toto : ∀ el,
+  norm_list el = []
+  → el = [] ∨ ∃ e₁ e₂ el₁, el = e₁ :: el₁ ++ [e₂] ...
+bbb.
+
+destruct el as [| e]; [ reflexivity | ].
+simpl in Hel; simpl.
+bbb.
+
+induction el as [| e]; [ reflexivity | ].
+simpl in Hel; simpl.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁]; [ discriminate Hel | ].
 clear IHel.
-revert t d el Hel.
-induction el₁ as [| e₁]; intros; [ reflexivity | ].
-simpl.
+destruct (letter_opp_dec e e₁) as [H₁| H₁].
+ subst el₁.
+ destruct e as (t, d).
+ remember (path (norm_combine el)) as pa eqn:Hpa.
+ symmetry in Hpa.
+ destruct pa as [| (d₁, n₁)].
+destruct e as (t, d).
+bbb.
+
+
+  remember (path_start (norm_combine el)) as ps eqn:Hps.
+  destruct (letter_dec t₁ ps) as [H₁| H₁].
+   subst ps.
+   destruct (Bool.bool_dec d₁ d) as [H₂| H₂]; [ discriminate Hpa | ].
+   destruct n.
+    injection Hpa; clear Hpa; intros; subst.
+    remember (norm_list el) as el₁ eqn:Hel.
+    symmetry in Hel.
+    destruct el₁ as [| e₁].
+     simpl.
+     remember (path_start (norm_combine el)) as ps eqn:Hps.
+     symmetry in Hps.
+     destruct ps.
+      destruct d₁.
+      remember (norm_combine el) as el₁ eqn:Hel₁.
+      symmetry in Hel₁.
+      unfold path_start in Hps.
 
 bbb.
 
@@ -1225,6 +1300,21 @@ induction bnl as [| (d, n)]; intros.
  exfalso; revert Hpa; clear; intros.
  revert e t Hpa.
  induction el as [| e₁]; intros; [ destruct e; discriminate Hpa | ].
+
+bbb.
+
+Theorem toto : ∀ el, norm_combine el = norm_combine (norm_list el).
+Proof.
+intros el.
+
+induction el as [| (t, d)]; [ reflexivity | simpl ].
+rewrite IHel.
+remember (norm_list el) as el₁ eqn:Hel.
+symmetry in Hel.
+clear IHel.
+revert t d el Hel.
+induction el₁ as [| e₁]; intros; [ reflexivity | ].
+simpl.
 
 bbb.
 
