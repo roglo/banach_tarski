@@ -1160,8 +1160,13 @@ Proof.
 intros el pt.
 unfold rotate_norm2.
 revert pt.
-induction el as [| e]; intros; [ reflexivity | simpl ].
-destruct e as (t, d).
+induction el as [| e]; intros; [ reflexivity | ].
+Theorem toto : ∀ e₁ e₂ el,
+  path_start (norm_combine (e₁ :: e₂ :: el)) =
+  path_start (norm_combine (e₂ :: el)).
+Proof.
+intros.
+induction el.
 
 bbb.
 
