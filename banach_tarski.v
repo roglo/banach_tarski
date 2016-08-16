@@ -1158,6 +1158,14 @@ Theorem toto : ∀ el, norm_combine el = norm_combine (norm_list el).
 Proof.
 intros el.
 induction el as [| (t, d)]; [ reflexivity | simpl ].
+rewrite IHel.
+remember (norm_list el) as el₁ eqn:Hel.
+symmetry in Hel.
+clear IHel.
+revert t d el Hel.
+induction el₁ as [| e₁]; intros; [ reflexivity | ].
+simpl.
+
 bbb.
 
 Theorem toto : ∀ el pt,
