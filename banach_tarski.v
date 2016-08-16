@@ -1196,6 +1196,13 @@ destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ | reflexivity ].
 rewrite rotate_rotate_inv; [ reflexivity | assumption ].
 Qed.
 
+Theorem rev_is_nil {A} : ∀ el : list A, List.rev el = [] → el = [].
+Proof.
+intros el H.
+induction el as [| e] using rev_ind; [ reflexivity | ].
+rewrite rev_unit in H; discriminate H.
+Qed.
+
 Theorem toto : ∀ el pt,
   rotate_norm2 (norm_combine el) pt = fold_left rotate (norm_list el) pt.
 Proof.
@@ -1260,7 +1267,15 @@ destruct (letter_opp_dec e e₁) as [H₁| H₁].
  destruct e₁ as (t₁, d₁).
  apply letter_opp_iff in H₁.
  destruct H₁; subst t₁ d₁.
- left; exists t, d.
+ remember (List.rev el) as rel eqn:Hrel.
+ symmetry in Hrel.
+ destruct rel as [| (t₁, d₁)].
+  apply rev_is_nil in Hrel; subst el; discriminate Hel₁.
+
+  destruct (letter_dec t t₁) as [H₁| H₁].
+   subst t₁.
+   destruct (Bool.bool_dec d d₁) as [H₁| H₁].
+    subst d₁.
 bbb.
 
 destruct el as [| e]; [ reflexivity | ].
