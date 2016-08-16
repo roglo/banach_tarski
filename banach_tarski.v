@@ -1159,8 +1159,17 @@ Theorem toto : ∀ el pt,
 Proof.
 intros el pt.
 unfold rotate_norm2.
-revert pt.
-induction el as [| e]; intros; [ reflexivity | ].
+remember (norm_combine el) as pa eqn:Hpa.
+symmetry in Hpa.
+destruct pa as (t, bnl).
+revert el pt t Hpa.
+induction bnl as [| (d, n)]; intros.
+ simpl.
+ destruct el as [| e]; [ reflexivity | ].
+ exfalso; revert Hpa; clear; intros.
+ revert e t Hpa.
+ induction el as [| e₁]; intros; [ destruct e; discriminate Hpa | ].
+
 bbb.
 
 Fixpoint rotate_norm2_mod_3_loop e path p :=
