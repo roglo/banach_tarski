@@ -1161,30 +1161,6 @@ intros el pt.
 unfold rotate_norm2.
 revert pt.
 induction el as [| e]; intros; [ reflexivity | ].
-Theorem toto : ∀ e₁ e₂ el,
-  path_start (norm_combine (e₁ :: e₂ :: el)) =
-  path_start (norm_combine (e₂ :: el)).
-Proof.
-intros.
-induction el.
- remember [e₂] as el eqn:Hel.
- simpl.
- destruct e₁ as (t₁, d₁).
- remember (norm_combine el) as nc eqn:Hnc.
- remember (path nc) as pa eqn:Hpa; symmetry in Hpa.
- destruct pa as [| pe].
-  subst; simpl in Hpa.
-  destruct e₂ as (t₂, d₂); discriminate Hpa.
-
-  destruct pe as (d, n).
-  destruct (letter_dec t₁ (path_start nc)) as [H₁| H₁].
-   destruct (Bool.bool_dec d₁ d) as [H₂| H₂].
-    subst; simpl.
-    destruct (zerop (S (length pa) mod 2)) as [H₁| H₁].
-     destruct e₂ as (t₂, d₂).
-     simpl.
-     simpl in H₁.
-
 bbb.
 
 Fixpoint rotate_norm2_mod_3_loop e path p :=
