@@ -1154,6 +1154,12 @@ Fixpoint rotate_norm2_loop t path pt :=
 
 Definition rotate_norm2 nc := rotate_norm2_loop (path_start nc) (path nc).
 
+Theorem toto : ∀ el, norm_combine el = norm_combine (norm_list el).
+Proof.
+intros el.
+induction el as [| (t, d)]; [ reflexivity | simpl ].
+bbb.
+
 Theorem toto : ∀ el pt,
   rotate_norm2 (norm_combine el) pt = fold_left rotate el pt.
 Proof.
