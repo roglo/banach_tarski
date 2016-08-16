@@ -1154,6 +1154,31 @@ Fixpoint rotate_norm2_loop t path pt :=
 
 Definition rotate_norm2 nc := rotate_norm2_loop (path_start nc) (path nc).
 
+Theorem toto : ∀ pt el,
+  fold_left rotate el pt = fold_left rotate (norm_list el) pt.
+Proof.
+intros.
+revert pt.
+induction el as [| e]; intros; [ reflexivity | simpl ].
+rewrite IHel.
+remember (norm_list el) as el₁ eqn:Hel; symmetry in Hel.
+destruct el₁ as [| e₁]; [ reflexivity | simpl ].
+destruct (letter_opp_dec e e₁) as [H₁| H₁].
+SearchAbout rotate.
+Theorem toto : ∀ pt e₁ e₂, letter_opp e₁ e₂ → rotate (rotate pt e₁) e₂ = pt.
+Proof.
+intros pt (t₁, d) (t, d₂) Hopp.
+apply letter_opp_iff in Hopp.
+destruct Hopp; subst; simpl.
+destruct pt as (x, y, z).
+destruct t, d; simpl.
+ unfold mat_vec_mul; simpl; f_equal; [ field | | ].
+  field_simplify.
+SearchAbout (sqrt _ * sqrt _)%R.
+SearchAbout (pow _ 2)%R.
+
+bbb.
+
 Theorem toto : ∀ el, norm_combine el = norm_combine (norm_list el).
 Proof.
 intros el.
