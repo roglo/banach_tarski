@@ -1508,6 +1508,21 @@ Theorem toto : ∀ e el,
   → split_at_cancel (e :: el) ≠ None.
 Proof.
 intros e el Hel Hsc.
+simpl in Hsc.
+destruct el as [| e₁].
+ rewrite norm_list_single in Hel; discriminate Hel.
+
+ destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ discriminate Hsc | ].
+ remember (split_at_cancel (e₁ :: el)) as sc eqn:Hsc₁.
+ symmetry in Hsc₁.
+ destruct sc as [((el₁, e₂), el₂)| ]; [ discriminate Hsc | clear Hsc ].
+ assert (Hsc: split_at_cancel (e :: e₁ :: el) = None).
+  remember (e₁ :: el) as el'; simpl; subst el'.
+  destruct (letter_opp_dec e e₁) as [H₂| H₂]; [ contradiction | clear H₂ ].
+  rewrite Hsc₁; reflexivity.
+bbb.
+
+intros e el Hel Hsc.
 revert e Hel Hsc.
 induction el as [| e₁]; intros.
  rewrite norm_list_single in Hel; discriminate Hel.
