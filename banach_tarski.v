@@ -1358,9 +1358,9 @@ remember (split_at_cancel el) as sc eqn:Hsc.
 symmetry in Hsc.
 destruct el as [| e]; [ left; reflexivity | right ].
 destruct sc as [((el₁, (t, d)), el₂) |].
- simpl in Hsc.
  exists el₁, el₂, t, d.
- destruct el as [| e₁]; [ discriminate Hsc | ].
+ revert Hel Hsc; clear; intros; move el₂ before el₁.
+ destruct el as [| e₁]; [ discriminate Hsc | simpl in Hsc ].
  destruct (letter_opp_dec e e₁) as [H₁| H₁].
   injection Hsc; clear Hsc; intros; subst.
   destruct e₁ as (t₁, d₁).
@@ -1369,8 +1369,7 @@ destruct sc as [((el₁, (t, d)), el₂) |].
   rewrite norm_list_cancel_start in Hel.
   split; [ reflexivity | assumption ].
 
-  simpl in Hsc.
-  destruct el as [| e₂]; [ discriminate Hsc | ].
+  destruct el as [| e₂]; [ discriminate Hsc | simpl in Hsc ].
   destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
    injection Hsc; clear Hsc; intros; subst.
    destruct e₂ as (t₁, d₁).
@@ -1381,8 +1380,7 @@ destruct sc as [((el₁, (t, d)), el₂) |].
    rewrite norm_list_cancel_start in Hel.
    split; [ reflexivity | assumption ].
 
-   simpl in Hsc.
-   destruct el as [| e₃]; [ discriminate Hsc | ].
+   destruct el as [| e₃]; [ discriminate Hsc | simpl in Hsc ].
    destruct (letter_opp_dec e₂ e₃) as [H₃| H₃].
     injection Hsc; clear Hsc; intros; subst.
     destruct e₃ as (t₁, d₁).
