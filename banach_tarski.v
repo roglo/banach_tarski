@@ -1360,6 +1360,87 @@ destruct el as [| e]; [ left; reflexivity | right ].
 destruct sc as [((el₁, (t, d)), el₂) |].
  exists el₁, el₂, t, d.
  revert Hel Hsc; clear; intros; move el₂ before el₁.
+(*
+ revert e el el₁ t d Hel Hsc.
+ induction el₂ as [| e₁]; intros.
+  simpl in Hsc.
+  destruct el as [| e₂]; [ discriminate Hsc | ].
+  destruct (letter_opp_dec e e₂) as [H₁| H₁].
+   injection Hsc; clear Hsc; intros; subst el₁ e el.
+   simpl; split; [ f_equal; f_equal | reflexivity ].
+   destruct e₂ as (t₁, d₁).
+   apply letter_opp_iff in H₁.
+   destruct H₁; subst t₁ d₁; reflexivity.
+
+   exfalso; clear H₁.
+   revert e e₂ el₁ t d Hel Hsc.
+   induction el as [| e₁]; intros; [ discriminate Hsc | simpl in Hsc ].
+   destruct (letter_opp_dec e₂ e₁) as [H₂| H₂].
+    injection Hsc; clear Hsc; intros; subst el₁ e₂ el.
+    destruct e₁ as (t₁, d₁).
+    apply letter_opp_iff in H₂.
+    destruct H₂; subst t₁ d₁.
+    simpl in Hel; rewrite letter_dec_diag, bool_dec_negb_r in Hel.
+    discriminate Hel.
+
+    simpl in Hsc.
+    destruct el as [| e₃]; [ discriminate Hsc | ].
+    destruct (letter_opp_dec e₁ e₃) as [H₃| H₃].
+     injection Hsc; clear Hsc; intros; subst el₁ e₁ el.
+     destruct e₃ as (t₁, d₁).
+     apply letter_opp_iff in H₃.
+     destruct H₃; subst t₁ d₁.
+*)
+ revert e el el₂ t d Hel Hsc.
+ induction el₁ as [| e₁]; intros.
+  simpl in Hsc, Hel; simpl.
+  destruct el as [| e₁]; [ discriminate Hel | ].
+  destruct (letter_opp_dec e e₁) as [H₁| H₁].
+   injection Hsc; clear Hsc; intros; subst e el₂.
+   destruct e₁ as (t₁, d₁).
+   apply letter_opp_iff in H₁.
+   destruct H₁; subst t₁ d₁.
+   split; [ reflexivity | simpl in Hel ].
+   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+   destruct el₁ as [| (t₁, d₁)]; [ reflexivity | exfalso ].
+   destruct (letter_dec t t₁) as [H₁| H₁].
+    subst t₁.
+    destruct (Bool.bool_dec (negb d) d₁) as [H₁| H₁].
+     subst d₁.
+     rewrite letter_dec_diag, bool_dec_negb_r in Hel.
+     discriminate Hel.
+
+     apply negb_neq in H₁; subst d₁.
+     destruct el₁ as [| (t₂, d₂)]; [ discriminate Hel | ].
+     destruct (letter_dec t t₂) as [H₂| H₂]; [ | discriminate Hel ].
+     subst t₂.
+     destruct (Bool.bool_dec d d₂) as [H₂| H₂]; [ discriminate Hel | ].
+     apply not_eq_sym, neq_negb in H₂; subst d₂.
+     revert Hel₁; apply norm_list_impossible_start.
+
+    rewrite letter_dec_diag, bool_dec_negb_r in Hel.
+    discriminate Hel.
+
+   set (u := split_at_cancel (e₁ :: el)) in Hsc.
+   destruct u as [((el₃, e₂), el₄)| ]; discriminate Hsc.
+
+  simpl in Hsc.
+  destruct el as [| e₂]; [ discriminate Hsc | ].
+  destruct (letter_opp_dec e e₂) as [H₁| H₁]; [ discriminate Hsc | ].
+  simpl in Hsc.
+  destruct el as [| e₃]; [ discriminate Hsc | ].
+  destruct (letter_opp_dec e₂ e₃) as [H₂| H₂].
+   injection Hsc; clear Hsc; intros; subst e₁ el₁ e₂ el₂.
+   destruct e₃ as (t₃, d₃).
+   apply letter_opp_iff in H₂.
+   destruct H₂; subst t₃ d₃.
+   remember (E t d :: E t (negb d) :: el) as el₁.
+   simpl in Hel; subst el₁.
+   rewrite norm_list_cancel_start in Hel.
+   split; [ reflexivity | assumption ].
+
+bbb.
+(**)
  destruct el as [| e₁]; [ discriminate Hsc | simpl in Hsc ].
  destruct (letter_opp_dec e e₁) as [H₁| H₁].
   injection Hsc; clear Hsc; intros; subst.
