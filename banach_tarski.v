@@ -53,10 +53,57 @@ intros.
 destruct l1, l2; try (left; reflexivity); right; intros H; discriminate H.
 Defined.
 
+Theorem letter_dec_diag : ∀ t, letter_dec t t = left (eq_refl _).
+Proof.
+intros t.
+destruct (letter_dec t t) as [p| p]; [ | exfalso; apply p; reflexivity ].
+destruct t; refine (match p with eq_refl => eq_refl end).
+Qed.
+
 Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
   if letter_dec l₁ l₂ then
     if Bool.bool_dec d₁ d₂ then False else True
   else False.
+
+Theorem bool_dec_diag : ∀ b, Bool.bool_dec b b = left (eq_refl _).
+Proof.
+intros b.
+destruct (Bool.bool_dec b b) as [p| p]; [ | exfalso; apply p; reflexivity ].
+destruct b; refine (match p with eq_refl => eq_refl end).
+Qed.
+
+Check Bool.no_fixpoint_negb.
+
+Definition toto : negb true ≠ true :=
+  λ H : false = true,
+  False_ind False
+    (eq_ind false (λ e : bool, if e then False else True) I true H).
+
+Definition titi : negb false ≠ false :=
+  λ H : true = false,
+  False_ind False
+   (eq_ind true (λ e : bool, if e then True else False) I false H).
+
+Definition tutu : ∀ b, negb b ≠ b :=
+  λ b (H : negb b ≠ b),
+  False_ind False
+   (eq_ind true (λ e : bool, if e then True else False) I b H).
+bbb.
+
+Theorem bool_dec_negb : ∀ b,
+  Bool.bool_dec (negb b) b = right (Bool.no_fixpoint_negb _).
+Proof.
+intros b.
+destruct (Bool.bool_dec b b) as [p| p]; [ | exfalso; apply p; reflexivity ].
+destruct b.
+simpl.
+Focus 2.
+simpl.
+
+simpl.
+
+
+bbb.
 
 Theorem letter_opp_dec : ∀ e₁ e₂,
   {letter_opp e₁ e₂} + {not (letter_opp e₁ e₂)}.
@@ -69,7 +116,7 @@ destruct (letter_dec x₁ x₂) as [Hx| Hx].
  right; intros H; contradiction.
 
  right; intros H; contradiction.
-Qed.
+Defined.
 
 Theorem letter_opp_comm : ∀ e₁ e₂, letter_opp e₁ e₂ → letter_opp e₂ e₁.
 Proof.
@@ -88,7 +135,7 @@ Theorem letter_opp_inv : ∀ x d, letter_opp (E x d) (E x (negb d)).
 Proof.
 intros.
 unfold letter_opp.
-destruct (letter_dec x x) as [H| H]; [ clear H | apply H; reflexivity ].
+rewrite letter_dec_diag.
 destruct (Bool.bool_dec d (negb d)) as [H| H]; [ | constructor ].
 destruct d; discriminate H.
 Qed.
@@ -97,11 +144,8 @@ Theorem not_letter_opp_diag : ∀ x d, ¬ letter_opp (E x d) (E x d).
 Proof.
 intros.
 unfold letter_opp.
-destruct (letter_dec x x) as [H| H]; [ clear H | ].
- destruct (Bool.bool_dec d d) as [H| H]; [ intros H₁; assumption | ].
- exfalso; apply H; reflexivity.
-
- exfalso; apply H; reflexivity.
+rewrite letter_dec_diag, bool_dec_diag.
+intros H; assumption.
 Qed.
 
 Theorem letter_opp_iff : ∀ x₁ d₁ x₂ d₂,
@@ -194,6 +238,7 @@ intros el.
 induction el as [| e]; [ reflexivity | simpl ].
 remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
 destruct el' as [| e']; [ reflexivity | ].
+Opaque letter_opp_dec.
 destruct (letter_opp_dec e e') as [H| H].
  unfold letter_opp in H.
  destruct e as (x, d).
@@ -1224,6 +1269,19 @@ induction l₁ as [| x]; intros.
   apply IHl₁, H₁.
 Qed.
 
+Fixpoint split_at_cancel el :=
+  match el with
+  | [] => None
+  | [e₁] => None
+  | e₁ :: (e₂ :: el₂) as el₁ =>
+      if letter_opp_dec e₁ e₂ then Some ([], e₁, el₂)
+      else
+       match split_at_cancel el₁ with
+       | Some (el₃, e₃, el₄) => Some (e₁ :: el₃, e₃, el₄)
+       | None => None
+       end
+  end.
+
 Theorem toto : ∀ el pt,
   rotate_norm2 (norm_combine el) pt = fold_left rotate (norm_list el) pt.
 Proof.
@@ -1274,6 +1332,81 @@ Theorem toto : ∀ el,
     ∃ el₁ el₂ t d, el = el₁ ++ E t d :: E t (negb d) :: el₂
     ∧ norm_list (el₁ ++ el₂) = [].
 Proof.
+intros el Hel.
+remember (split_at_cancel el) as sc eqn:Hsc.
+symmetry in Hsc.
+destruct el as [| e]; [ left; reflexivity | right ].
+destruct sc as [((el₁, (t, d)), el₂) |].
+ simpl in Hsc.
+ exists el₁, el₂, t, d.
+ destruct el as [| e₁]; [ discriminate Hsc | ].
+ destruct (letter_opp_dec e e₁) as [H₁| H₁].
+  injection Hsc; clear Hsc; intros; subst.
+  destruct e₁ as (t₁, d₁).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₁ d₁; simpl.
+Theorem toto : ∀ el t d,
+  norm_list (E t d :: E t (negb d) :: el) = norm_list el.
+Proof.
+intros el t d.
+revert t d.
+induction el as [| (t₁, d₁)]; intros.
+ simpl; rewrite letter_dec_diag.
+ destruct (Bool.bool_dec d (negb d)) as [H₁| H₁]; [ | reflexivity ].
+ exfalso; symmetry in H₁; revert H₁; apply Bool.no_fixpoint_negb.
+
+ remember (E t₁ d₁ :: el) as el₁ eqn:Hel₁.
+ symmetry in Hel₁; simpl.
+ remember (norm_list el₁) as el₂ eqn:Hel₂.
+ symmetry in Hel₂; simpl.
+ destruct el₂ as [| (t₂, d₂)].
+  rewrite letter_dec_diag.
+  destruct (Bool.bool_dec d (negb d)) as [H₁| H₁]; [ | reflexivity ].
+  exfalso; symmetry in H₁; revert H₁; apply Bool.no_fixpoint_negb.
+  
+  subst el₁.
+  destruct (letter_dec t t₂) as [H₁| H₁].
+   subst t₂.
+   destruct (Bool.bool_dec (negb d) d₂) as [H₁| H₁].
+    subst d₂.
+    rewrite letter_dec_diag.
+
+bbb.
+
+
+ destruct H.
+
+  destruct (letter_dec t t) as [H₁| H₁]; [ clear H₁ | ].
+   destruct (Bool.bool_dec d (negb d)) as [H₁| H₁]; [ | reflexivity ].
+   exfalso; symmetry in H₁; revert H₁; apply Bool.no_fixpoint_negb.
+
+   exfalso; apply H₁; reflexivity.
+
+
+
+bbb.
+intros el t d; simpl.
+remember (norm_list el) as el₁ eqn:Hel.
+destruct el₁ as [| (t₁, d₁)].
+ destruct (letter_dec t t) as [H₁| H₁]; [ clear H₁ | ].
+  destruct (Bool.bool_dec d (negb d)) as [H₁| H₁]; [ | reflexivity ].
+  exfalso; symmetry in H₁; revert H₁; apply Bool.no_fixpoint_negb.
+
+  exfalso; apply H₁; reflexivity.
+
+ destruct (letter_dec t t₁) as [H₁| H₁].
+  subst t₁.
+  destruct (Bool.bool_dec (negb d) d₁) as [H₁| H₁].
+   subst d₁.
+   destruct (letter_dec t t) as [H₁| H₁]; [ clear H₁ | ].
+    destruct (Bool.bool_dec d (negb d)) as [H₁| H₁]; [ | reflexivity ].
+    exfalso; symmetry in H₁; revert H₁; apply Bool.no_fixpoint_negb.
+
+    exfalso; apply H₁; reflexivity.
+bbb.
+
+SearchAbout norm_list.
+bbb.
 intros el Hel.
 destruct el as [| e]; [ left; reflexivity | right ].
 simpl in Hel.
