@@ -1288,6 +1288,8 @@ destruct (letter_opp_dec e e₁) as [H₁| H₁].
  destruct e₁ as (t₁, d₁).
  apply letter_opp_iff in H₁.
  destruct H₁; subst t₁ d₁.
+bbb.
+
  remember (List.rev el) as rel eqn:Hrel.
  symmetry in Hrel.
  destruct rel as [| (t₁, d₁)].
@@ -1298,6 +1300,10 @@ destruct (letter_opp_dec e e₁) as [H₁| H₁].
   subst el.
   remember (rev rel) as el eqn:Hel.
   clear rel Hel.
+  destruct (letter_dec t₁ t) as [H₁| H₁].
+   subst t₁.
+   destruct (Bool.bool_dec d₁ d) as [H₂| H₂].
+    subst d₁.
 
 bbb.
   simpl in H; clear IHl₁.
