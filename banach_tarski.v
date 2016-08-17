@@ -1365,15 +1365,34 @@ destruct sc as [((el₁, (t, d)), el₂) |].
   injection Hsc; clear Hsc; intros; subst.
   destruct e₁ as (t₁, d₁).
   apply letter_opp_iff in H₁.
-  destruct H₁; subst t₁ d₁; simpl.
+  destruct H₁; subst t₁ d₁.
   rewrite norm_list_cancel_start in Hel.
   split; [ reflexivity | assumption ].
 
   simpl in Hsc.
   destruct el as [| e₂]; [ discriminate Hsc | ].
   destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
-  injection Hsc; clear Hsc; intros; subst.
-  destruct e as (t₁, d₁).
+   injection Hsc; clear Hsc; intros; subst.
+   destruct e₂ as (t₁, d₁).
+   apply letter_opp_iff in H₂.
+   destruct H₂; subst t₁ d₁.
+   remember (E t d :: E t (negb d) :: el₂) as el₃ eqn:Hel₃.
+   simpl in Hel; subst el₃.
+   rewrite norm_list_cancel_start in Hel.
+   split; [ reflexivity | assumption ].
+
+   simpl in Hsc.
+   destruct el as [| e₃]; [ discriminate Hsc | ].
+   destruct (letter_opp_dec e₂ e₃) as [H₃| H₃].
+    injection Hsc; clear Hsc; intros; subst.
+    destruct e₃ as (t₁, d₁).
+    apply letter_opp_iff in H₃.
+    destruct H₃; subst t₁ d₁.
+    remember (E t d :: E t (negb d) :: el₂) as el₃ eqn:Hel₃.
+    simpl in Hel; subst el₃.
+    rewrite norm_list_cancel_start in Hel.
+    split; [ reflexivity | assumption ].
+
 bbb.
 
 Theorem toto : ∀ el,
