@@ -1271,6 +1271,53 @@ intros el Hel.
 Theorem toto : ∀ el,
   norm_list el = []
   → el = [] ∨
+    ∃ el₁ el₂ t d, el = el₁ ++ E t d :: E t (negb d) :: el₂
+    ∧ norm_list (el₁ ++ el₂) = [].
+Proof.
+intros el Hel.
+destruct el as [| e]; [ left; reflexivity | right ].
+simpl in Hel.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁]; [ discriminate Hel | ].
+destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ | discriminate Hel ].
+subst el₁.
+destruct e as (t, d).
+destruct e₁ as (t₁, d₁).
+apply letter_opp_iff in H₁.
+destruct H₁; subst t₁ d₁.
+destruct el as [| e₁]; [ discriminate Hel₁ | ].
+simpl in Hel₁.
+remember (norm_list el) as el₁ eqn:Hel.
+symmetry in Hel.
+destruct el₁ as [| e₂].
+ injection Hel₁; clear Hel₁; intros; subst e₁.
+ exists [], el, t, d.
+ split; [ reflexivity | assumption ].
+
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  subst el₁.
+  destruct e₁ as (t₁, d₁).
+  destruct e₂ as (t₂, d₂).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₂ d₂.
+  destruct el as [| e₁]; [ discriminate Hel | ].
+   simpl in Hel.
+   remember (norm_list el) as el₁ eqn:Hel₁.
+   symmetry in Hel₁.
+   destruct el₁ as [| e₂]; [ discriminate Hel | ].
+   destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+    subst el₁.
+    destruct e₁ as (t₃, d₃).
+    destruct e₂ as (t₄, d₄).
+    apply letter_opp_iff in H₁.
+    destruct H₁; subst t₄ d₄.
+
+bbb.
+
+Theorem toto : ∀ el,
+  norm_list el = []
+  → el = [] ∨
     (∃ t d el₁, norm_list el₁ = [] ∧ el = E t d :: el₁ ++ [E t (negb d)]) ∨
     (∃ el₁ el₂,
      el₁ ≠ [] ∧ el₂ ≠ [] ∧ norm_list el₁ = [] ∧ norm_list el₂ = [] ∧
