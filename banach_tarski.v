@@ -1514,6 +1514,9 @@ induction el as [| e₁]; intros.
 
  remember (e₁ :: el) as el'; simpl in Hel, Hsc; subst el'.
  destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ discriminate Hsc | ].
+ remember (split_at_cancel (e₁ :: el)) as u eqn:Hu.
+ symmetry in Hu.
+ destruct u as [((el₁, e₂), el₂)| ]; [ discriminate Hsc | clear Hsc ].
  remember (norm_list (e₁ :: el)) as el₁ eqn:Hel₁.
  symmetry in Hel₁.
  destruct el₁ as [| e₂]; [ discriminate Hel | ].
@@ -1523,6 +1526,8 @@ induction el as [| e₁]; intros.
  destruct e₂ as (t₂, d₂).
  apply letter_opp_iff in H₂.
  destruct H₂; subst t₂ d₂.
+bbb.
+
  simpl in Hel₁.
  remember (norm_list el) as el₁ eqn:Hel₂.
  symmetry in Hel₂.
