@@ -1463,6 +1463,57 @@ induction bnl as [| (d, n)]; intros.
       destruct Hel as (el₁, (el₂, (t₂, (d₂, (Hel, Hn))))).
       subst el.
 SearchAbout norm_combine.
+Theorem toto : ∀ el₁ el₂ t d,
+  norm_combine (el₁ ++ E t d :: E t (negb d) :: el₂) =
+  norm_combine (el₁ ++ el₂).
+Proof.
+intros.
+revert el₂ t d.
+induction el₁ as [| e₁]; intros.
+ do 2 rewrite app_nil_l.
+Theorem toto : ∀ el t d,
+  path (norm_combine (E t d :: E t (negb d) :: el)) =
+  path (norm_combine el).
+Proof.
+intros.
+induction el as [| e].
+ simpl; unfold path_start; simpl.
+ rewrite letter_dec_diag, bool_dec_negb_r.
+ reflexivity.
+
+ remember (E t (negb d) :: e :: el) as el'; simpl; subst el'.
+ remember (path (norm_combine (E t (negb d) :: e :: el))) as bnl eqn:Hbnl.
+ symmetry in Hbnl.
+ destruct bnl as [| bn].
+  simpl.
+  destruct e as (t₁, d₁).
+  remember (path (norm_combine el)) as bnl₁ eqn:Hbnl₁.
+  symmetry in Hbnl₁.
+  destruct bnl₁ as [| (b₁, n₁)].
+   simpl.
+   remember (E t₁ d₁ :: el) as el'; simpl in Hbnl; subst el'.
+   remember (path (norm_combine (E t₁ d₁ :: el))) as bnl₂ eqn:Hbnl₂.
+   symmetry in Hbnl₂.
+   destruct bnl₂ as [| (b₂, n₂)]; [ discriminate Hbnl | ].
+   remember (path_start (norm_combine (E t₁ d₁ :: el))) as t₂ eqn:Ht₂.
+   symmetry in Ht₂; simpl in Ht₂.
+   rewrite Hbnl₁ in Ht₂.
+   unfold path_start in Ht₂; simpl in Ht₂; subst t₂.
+   destruct (letter_dec t t₁) as [H₁| H₁]; [ subst t₁ | discriminate Hbnl ].
+   destruct (Bool.bool_dec (negb d) b₂) as [H₁| H₁]; [ subst b₂ | ].
+    discriminate Hbnl.
+
+    destruct n₂; [ | discriminate Hbnl ].
+    simpl in Hbnl; subst bnl₂.
+    apply negb_neq in H₁; subst b₂; simpl in Hbnl₂.
+    rewrite Hbnl₁ in Hbnl₂; simpl in Hbnl₂.
+    rewrite Hbnl₂; reflexivity.
+
+   remember (path_start (norm_combine el)) as t₂ eqn:Ht₂.
+   symmetry in Ht₂.
+   destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
+    destruct (Bool.bool_dec d₁ b₁) as [H₂| H₂]; [ subst b₁; exfalso | ].
+
 bbb.
 
 Theorem toto : ∀ el,
