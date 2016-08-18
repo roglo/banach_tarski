@@ -1475,11 +1475,27 @@ Theorem toto : ∀ el t d,
   path (norm_combine (E t d :: E t (negb d) :: el)) =
   path (norm_combine el).
 Proof.
-intros.
-bbb.
-
+intros; simpl.
 remember (path (norm_combine el)) as bnl eqn:Hbnl.
 symmetry in Hbnl.
+destruct bnl as [| (b, n)].
+ simpl; unfold path_start; simpl.
+ rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+
+ remember (norm_combine el) as nc eqn:Hnc; symmetry in Hnc.
+ destruct (letter_dec t (path_start nc)) as [H₁| H₁].
+  subst t.
+  destruct (Bool.bool_dec (negb d) b) as [H₁| H₁].
+   subst b; simpl.
+   unfold path_start; simpl.
+   rewrite Hbnl; simpl.
+   rewrite letter_dec_diag, bool_dec_negb_r; simpl.
+   exfalso; subst nc.
+
+(* putain, c'est faux... c'est mon norm_combine qu'est pas bon ? *)
+bbb.
+
+
 revert el t d Hbnl.
 induction bnl as [| (b, n)]; intros.
 simpl.
