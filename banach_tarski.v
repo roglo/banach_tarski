@@ -1420,8 +1420,6 @@ destruct sc as [((el₁, (t, d)), el₂)| ].
  apply norm_nil_split_some, Hel.
 Qed.
 
-bbb.
-
 Theorem toto : ∀ el pt,
   rotate_norm2 (norm_combine el) pt = fold_left rotate (norm_list el) pt.
 Proof.
@@ -1460,11 +1458,20 @@ induction bnl as [| (d, n)]; intros.
      symmetry in Hel.
      destruct el₁ as [| e₁].
       simpl.
+      apply norm_nil_iff in Hel.
+      destruct Hel as [Hel| Hel]; [ subst el; discriminate Hpa₂ | ].
+      destruct Hel as (el₁, (el₂, (t₂, (d₂, (Hel, Hn))))).
+      subst el.
+SearchAbout norm_combine.
+bbb.
+
 Theorem toto : ∀ el,
   norm_list el = []
   → path (norm_combine el) = [].
 Proof.
 intros el Hel.
+Inspect 2.
+apply norm_nil_iff in 
 
 bbb.
 
@@ -1529,96 +1536,6 @@ bbb.
     simpl in Hel; subst el₃.
     rewrite norm_list_cancel_start in Hel.
     split; [ reflexivity | assumption ].
-
-bbb.
-
-Theorem toto : ∀ el,
-  norm_list el = []
-  → el = [] ∨
-    (∃ t d el₁, norm_list el₁ = [] ∧ el = E t d :: el₁ ++ [E t (negb d)]) ∨
-    (∃ el₁ el₂,
-     el₁ ≠ [] ∧ el₂ ≠ [] ∧ norm_list el₁ = [] ∧ norm_list el₂ = [] ∧
-     el = el₁ ++ el₂).
-Proof.
-intros el Hel.
-destruct el as [| e]; [ left; reflexivity | right ].
-simpl in Hel.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁]; [ discriminate Hel | ].
-destruct (letter_opp_dec e e₁) as [H₁| H₁].
- subst el₁.
- destruct e as (t, d).
- destruct e₁ as (t₁, d₁).
- apply letter_opp_iff in H₁.
- destruct H₁; subst t₁ d₁.
-bbb.
-
- remember (List.rev el) as rel eqn:Hrel.
- symmetry in Hrel.
- destruct rel as [| (t₁, d₁)].
-  apply rev_is_nil in Hrel; subst el; discriminate Hel₁.
-
-  rewrite <- rev_involutive in Hrel.
-  apply rev_rev in Hrel; simpl in Hrel.
-  subst el.
-  remember (rev rel) as el eqn:Hel.
-  clear rel Hel.
-  destruct (letter_dec t₁ t) as [H₁| H₁].
-   subst t₁.
-   destruct (Bool.bool_dec d₁ d) as [H₂| H₂].
-    subst d₁.
-
-bbb.
-  simpl in H; clear IHl₁.
-  revert x H.
-  induction l₁ as [| y]; intros; [ discriminate H | ].
-  simpl in H.
-
-
-  destruct (letter_dec t t₁) as [H₁| H₁].
-   subst t₁.
-   destruct (Bool.bool_dec d d₁) as [H₁| H₁].
-    subst d₁; right.
-bbb.
-
-destruct el as [| e]; [ reflexivity | ].
-simpl in Hel; simpl.
-bbb.
-
-induction el as [| e]; [ reflexivity | ].
-simpl in Hel; simpl.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁]; [ discriminate Hel | ].
-clear IHel.
-destruct (letter_opp_dec e e₁) as [H₁| H₁].
- subst el₁.
- destruct e as (t, d).
- remember (path (norm_combine el)) as pa eqn:Hpa.
- symmetry in Hpa.
- destruct pa as [| (d₁, n₁)].
-destruct e as (t, d).
-bbb.
-
-
-  remember (path_start (norm_combine el)) as ps eqn:Hps.
-  destruct (letter_dec t₁ ps) as [H₁| H₁].
-   subst ps.
-   destruct (Bool.bool_dec d₁ d) as [H₂| H₂]; [ discriminate Hpa | ].
-   destruct n.
-    injection Hpa; clear Hpa; intros; subst.
-    remember (norm_list el) as el₁ eqn:Hel.
-    symmetry in Hel.
-    destruct el₁ as [| e₁].
-     simpl.
-     remember (path_start (norm_combine el)) as ps eqn:Hps.
-     symmetry in Hps.
-     destruct ps.
-      destruct d₁.
-      remember (norm_combine el) as el₁ eqn:Hel₁.
-      symmetry in Hel₁.
-      unfold path_start in Hps.
 
 bbb.
 
