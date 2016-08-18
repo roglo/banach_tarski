@@ -1512,7 +1512,53 @@ induction el as [| e].
    remember (path_start (norm_combine el)) as t₂ eqn:Ht₂.
    symmetry in Ht₂.
    destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
+simpl in Hbnl.
+rewrite Hbnl₁ in Hbnl.
+rewrite <- H₁ in Hbnl.
+rewrite letter_dec_diag in Hbnl; simpl in Hbnl.
     destruct (Bool.bool_dec d₁ b₁) as [H₂| H₂]; [ subst b₁; exfalso | ].
+simpl in Hbnl.
+remember (mknp (last (norm_combine el)) ((d₁, S n₁) :: bnl₁)) as np eqn:Hnp.
+destruct (letter_dec t (path_start np)) as [H₂| H₂].
+destruct (Bool.bool_dec (negb d) d₁); discriminate Hbnl.
+discriminate Hbnl.
+destruct n₁.
+simpl.
+simpl in Hbnl.
+destruct bnl₁ as [| (b₂, n₂)].
+discriminate Hbnl.
+remember (mknp (last (norm_combine el)) ((b₂, n₂) :: bnl₁)) as np eqn:Hnp.
+destruct (letter_dec t (path_start np)) as [H₃| H₃].
+destruct (Bool.bool_dec (negb d) b₂) as [H₄| H₄].
+discriminate Hbnl.
+destruct n₂.
+simpl in Hbnl.
+subst bnl₁.
+apply negb_neq in H₄.
+subst b₂; reflexivity.
+apply negb_neq in H₄.
+subst b₂.
+discriminate Hbnl.
+discriminate Hbnl.
+simpl in Hbnl; simpl.
+remember (mknp (last (norm_combine el)) ((d₁, n₁) :: bnl₁)) as np eqn:Hnp.
+destruct (letter_dec t (path_start np)) as [H₃| H₃].
+destruct (Bool.bool_dec (negb d) d₁) as [H₄| H₄].
+discriminate Hbnl.
+destruct n₁; [ | discriminate Hbnl ].
+simpl in Hbnl; subst bnl₁.
+apply negb_neq in H₄; subst d₁; reflexivity.
+discriminate Hbnl.
+simpl.
+remember (E t₁ d₁ :: el) as el'; simpl in Hbnl; subst el'.
+remember (path (norm_combine (E t₁ d₁ :: el))) as bnl eqn:Hbnl₂.
+symmetry in Hbnl₂.
+destruct bnl as [| (b, n)]; [ discriminate Hbnl | ].
+bbb.
+
+subst np.
+unfold path_start in H₃.
+simpl in H₃.
 
 bbb.
 
