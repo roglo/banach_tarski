@@ -1483,6 +1483,39 @@ induction bnl as [| (d, n)]; intros.
         symmetry in Ht.
         destruct t.
          destruct d; simpl.
+          exfalso.
+          revert Hel₃ Hpa₂ Hn₁ Ht; clear; intros.
+          revert el₁ el₂ t₂ d₂ t₃ d₃ Hel₃ Hn₁.
+          induction el₃ as [| (t, d)]; intros; [ discriminate Hpa₂ | ].
+          simpl in Hpa₂, Ht.
+          remember (path (norm_combine el₃)) as bnl eqn:Hbnl.
+          symmetry in Hbnl.
+          destruct bnl as [| (b, n)].
+           simpl in Hpa₂, Ht.
+           injection Hpa₂; clear Hpa₂; intros; subst d t.
+           destruct el₃ as [| (t, d)].
+            simpl in Hel₃.
+Focus 2.
+simpl in Hbnl; clear IHel₃.
+remember (path (norm_combine el₃)) as bnl eqn:Hbnl₁.
+symmetry in Hbnl₁.
+destruct bnl as [| (b, n)]; [ discriminate Hbnl | ].
+unfold path_start in Hbnl; simpl in Hbnl.
+rewrite Hbnl₁ in Hbnl; simpl in Hbnl.
+destruct (zerop (S (length bnl) mod 2)) as [H₁| H₁].
+destruct bnl as [| (b₁, n₁)]; [ discriminate H₁ | ].
+remember (other_elem (last (norm_combine el₃))) as t₁ eqn:Ht.
+destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ | ].
+destruct (Bool.bool_dec d b) as [H₃| H₃]; [ discriminate Hbnl | ].
+destruct n; discriminate Hbnl.
+discriminate Hbnl.
+remember (last (norm_combine el₃)) as t₁ eqn:Ht₁.
+destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ | ].
+destruct (Bool.bool_dec d b) as [H₃| H₃]; [ discriminate Hbnl | ].
+destruct n; [ simpl in Hbnl | discriminate Hbnl ].
+subst bnl.
+apply neq_negb in H₃; subst d.
+
 bbb.
 
 SearchAbout norm_combine.
