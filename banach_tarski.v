@@ -1520,17 +1520,18 @@ induction el as [| e₁]; intros.
  remember (norm_list (e₁ :: el)) as el₁ eqn:Hel₁.
  symmetry in Hel₁.
  destruct el₁ as [| e₂]; [ discriminate Hel | ].
- destruct (letter_opp_dec e e₂) as [H₂| H₂].
-  subst el₁.
-  destruct e as (t, d).
-  destruct e₂ as (t₁, d₁).
-  apply letter_opp_iff in H₂.
-  destruct H₂; subst t₁ d₁.
-  destruct e₁ as (t₁, d₁).
-  unfold letter_opp in H₁.
-  destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ | ].
-   destruct (Bool.bool_dec d d₁) as [H₂| H₂]; [ subst d₁ | apply H₁, I ].
-   clear H₁.
+ destruct (letter_opp_dec e e₂) as [H₂| H₂]; [ | discriminate Hel ].
+ subst el₁.
+ destruct e as (t, d).
+ destruct e₂ as (t₁, d₁).
+ apply letter_opp_iff in H₂.
+ destruct H₂; subst t₁ d₁.
+ destruct e₁ as (t₁, d₁).
+ unfold letter_opp in H₁.
+ destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ | ].
+  destruct (Bool.bool_dec d d₁) as [H₂| H₂]; [ subst d₁ | apply H₁, I ].
+  clear H₁.
+
 Theorem toto : ∀ t d el,
   norm_list (E t d :: el) = [E t (negb d)]
   → split_at_cancel (E t d :: el) ≠ None.
