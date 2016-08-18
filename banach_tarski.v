@@ -1531,7 +1531,37 @@ induction el as [| e₁]; intros.
   destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ | ].
    destruct (Bool.bool_dec d d₁) as [H₂| H₂]; [ subst d₁ | apply H₁, I ].
    clear H₁.
+Theorem toto : ∀ t d el,
+  norm_list (E t d :: el) = [E t (negb d)]
+  → split_at_cancel (E t d :: el) ≠ None.
+Proof.
+intros t d el Hs Hsc.
+revert t d Hs Hsc.
+induction el as [| e]; intros.
+ injection Hs; clear Hs; intros H.
+ symmetry in H; revert H; apply Bool.no_fixpoint_negb.
 
+(**)
+ remember (e :: el) as el'; simpl in Hsc; subst el'.
+ destruct e as (t₁, d₁).
+ destruct (letter_dec t t₁) as [H₁| H₁]; [ subst t₁ | ].
+  destruct (Bool.bool_dec d d₁) as [H₁| H₁]; [ subst d₁ | ].
+
+(**)
+bbb.
+ remember (e :: el) as el'; simpl in Hs; subst el'.
+ destruct e as (t₁, d₁).
+ destruct (letter_dec t t₁) as [H₁| H₁]; [ subst t₁ | ].
+  remember (norm_list (E t d₁ :: el)) as el₁ eqn:Hel₁.
+  symmetry in Hel₁.
+  destruct el₁ as [| e₁].
+   injection Hs; intros H.
+   symmetry in H; revert H; apply Bool.no_fixpoint_negb.
+
+   destruct e₁ as (t₂, d₂).
+   destruct (letter_dec t t₂) as [H₁| H₁]; [ subst t₂ | ].
+    destruct (Bool.bool_dec d d₂) as [H₁| H₁]; [ discriminate Hs | ].
+    subst el₁.
 bbb.
 
   apply H₁.
