@@ -86,13 +86,18 @@ Definition true_neq_negb_true : true ≠ negb true :=
   λ p, False_ind False
    (eq_ind true (λ e : bool, if e then True else False) I false p).
 
+Definition negb_true_neq_true : negb true ≠ true := false_neq_negb_false.
+Definition negb_false_neq_false : negb false ≠ false := true_neq_negb_true.
+
 Theorem bool_dec_negb_r : ∀ b,
   Bool.bool_dec b (negb b) =
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
-Proof.
-intros b.
-destruct b; reflexivity.
-Qed.
+Proof. intros b; destruct b; reflexivity. Qed.
+
+Theorem bool_dec_negb_l : ∀ b,
+  Bool.bool_dec (negb b) b =
+  right (if b return _ then negb_true_neq_true else negb_false_neq_false).
+Proof. intros b; destruct b; reflexivity. Qed.
 
 Theorem letter_opp_dec : ∀ e₁ e₂,
   {letter_opp e₁ e₂} + {not (letter_opp e₁ e₂)}.
@@ -1526,6 +1531,49 @@ Theorem toto : ∀ t d el,
   → split_at_cancel (E t d :: el) ≠ None.
 Proof.
 intros t d el Hs Hsc.
+Theorem toto : ∀ e el,
+  norm_list el = [e]
+  → ∃ el₁ el₂, norm_list el₁ = [] ∧ norm_list el₂ = [] ∧ el = el₁ ++ e :: el₂.
+Proof.
+intros e el Hel.
+revert e Hel.
+induction el as [| e₁]; intros; [ discriminate Hel | ].
+simpl in Hel.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₂].
+ injection Hel; clear Hel; intros; subst e₁.
+ destruct e as (t, d).
+ exists [], el.
+ split; [ reflexivity | ].
+ split; [ assumption | reflexivity ].
+
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  subst el₁; clear IHel.
+  destruct e₁ as (t₁, d₁).
+  destruct e₂ as (t₂, d₂).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₂ d₂.
+vvv. (* mouais, pas sûr... *)
+
+  exists [E t₁ d₁; E t₁ (negb d₁)].
+  destruct e as (t, d).
+  exists (E t (negb d) :: E t₁ d₁ :: el).
+  split; [ apply norm_list_cancel_start | ].
+  split.
+   simpl; rewrite Hel₁.
+   rewrite letter_dec_diag, bool_dec_negb_r.
+   rewrite letter_dec_diag, bool_dec_negb_l.
+   reflexivity.
+
+   simpl; f_equal.
+
+bbb.
+
+  exists [], el.
+  split; [ reflexivity | ].
+  split; [ assumption | ].
+
 bbb.
 
 intros e el Hel Hsc.
