@@ -1510,14 +1510,24 @@ Proof.
 intros e el Hel Hsc.
 revert e Hel Hsc.
 induction el as [| e₁]; intros.
- simpl in Hsc.
  rewrite norm_list_single in Hel; discriminate Hel.
 
-bbb.
+ remember (e₁ :: el) as el'; simpl in Hel, Hsc; subst el'.
  destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ discriminate Hsc | ].
  remember (split_at_cancel (e₁ :: el)) as sc eqn:Hsc₁.
  symmetry in Hsc₁.
  destruct sc as [((el₁, e₂), el₂)| ]; [ discriminate Hsc | clear Hsc ].
+ remember (norm_list (e₁ :: el)) as el₁ eqn:Hel₁.
+ symmetry in Hel₁.
+ destruct el₁ as [| e₂]; [ discriminate Hel | ].
+ destruct (letter_opp_dec e e₂) as [H₂| H₂].
+  subst el₁.
+  destruct e as (t, d).
+  destruct e₂ as (t₁, d₁).
+  apply letter_opp_iff in H₂.
+  destruct H₂; subst t₁ d₁.
+bbb.
+
  assert (Hsc: split_at_cancel (e :: e₁ :: el) = None).
   remember (e₁ :: el) as el'; simpl; subst el'.
   destruct (letter_opp_dec e e₁) as [H₂| H₂]; [ contradiction | clear H₂ ].
