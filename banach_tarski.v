@@ -1507,6 +1507,7 @@ destruct sc as [((el₁, (t, d)), el₂) |].
    simpl in H₂; simpl; rewrite H₂.
    do 3 rewrite <- app_assoc; reflexivity.
 
+bbb.
  exfalso.
 Theorem toto : ∀ e el,
   norm_list (e :: el) = []
