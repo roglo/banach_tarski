@@ -1508,6 +1508,27 @@ Theorem toto : ∀ e el,
   → split_at_cancel (e :: el) ≠ None.
 Proof.
 intros e el Hel Hsc.
+remember (e :: el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+revert e el Hel₁.
+induction el₁ as [| e₁]; intros; [ discriminate Hel₁ | ].
+injection Hel₁; clear Hel₁; intros; subst e₁ el₁.
+simpl in Hel.
+remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+destruct el₁ as [| e₁]; [ discriminate Hel | ].
+clear IHel₁.
+destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ subst el₁ | discriminate Hel ].
+destruct e as (t, d).
+destruct e₁ as (t₁, d₁).
+apply letter_opp_iff in H₁.
+destruct H₁; subst t₁ d₁.
+Theorem toto : ∀ t d el,
+  norm_list el = [E t (negb d)]
+  → split_at_cancel (E t d :: el) ≠ None.
+Proof.
+intros t d el Hs Hsc.
+bbb.
+
+intros e el Hel Hsc.
 revert e Hel Hsc.
 induction el as [| e₁]; intros.
  rewrite norm_list_single in Hel; discriminate Hel.
