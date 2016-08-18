@@ -1526,6 +1526,22 @@ induction el as [| e₁]; intros.
   destruct e₂ as (t₁, d₁).
   apply letter_opp_iff in H₂.
   destruct H₂; subst t₁ d₁.
+  apply H₁.
+  destruct e₁ as (t₁, d₁).
+  apply letter_opp_iff.
+  revert Hsc₁ Hel₁; clear; intros.
+  revert t d t₁ d₁ Hsc₁ Hel₁.
+  induction el as [| e]; intros.
+   injection Hel₁; intros; subst; split; reflexivity.
+
+   remember (e :: el) as el'; simpl in Hsc₁; subst el'.
+   destruct e as (t₂, d₂).
+   destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
+    destruct (Bool.bool_dec d₁ d₂) as [H₁| H₁]; [ subst d₂ | ].
+     remember (split_at_cancel (E t₁ d₁ :: el)) as u eqn:Hu.
+     symmetry in Hu.
+     destruct u as [((el₁, e), el₂)| ]; [ discriminate Hsc₁ | clear Hsc₁ ].
+
 bbb.
 
  assert (Hsc: split_at_cancel (e :: e₁ :: el) = None).
