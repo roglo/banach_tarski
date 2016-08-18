@@ -1526,6 +1526,14 @@ induction el as [| e₁]; intros.
   destruct e₂ as (t₁, d₁).
   apply letter_opp_iff in H₂.
   destruct H₂; subst t₁ d₁.
+  destruct e₁ as (t₁, d₁).
+  unfold letter_opp in H₁.
+  destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ | ].
+   destruct (Bool.bool_dec d d₁) as [H₂| H₂]; [ subst d₁ | apply H₁, I ].
+   clear H₁.
+
+bbb.
+
   apply H₁.
   destruct e₁ as (t₁, d₁).
   apply letter_opp_iff.
