@@ -1537,26 +1537,56 @@ Theorem toto : ∀ e el,
 Proof.
 intros e el Hel.
 revert e Hel.
-induction el as [| e₁]; intros; [ discriminate Hel | ].
-simpl in Hel.
+destruct el as [| e₁]; intros; [ discriminate Hel | ].
 remember (norm_list el) as el₁ eqn:Hel₁.
 symmetry in Hel₁.
-destruct el₁ as [| e₂].
+revert e₁ el e Hel Hel₁.
+induction el₁ as [| e₂]; intros.
+ simpl in Hel; rewrite Hel₁ in Hel.
  injection Hel; clear Hel; intros; subst e₁.
- destruct e as (t, d).
  exists [], el.
  split; [ reflexivity | ].
  split; [ assumption | reflexivity ].
 
+ simpl in Hel; rewrite Hel₁ in Hel.
  destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
-  subst el₁; clear IHel.
+  subst el₁.
   destruct e₁ as (t₁, d₁).
   destruct e₂ as (t₂, d₂).
   apply letter_opp_iff in H₁.
   destruct H₁; subst t₂ d₂.
-vvv. (* mouais, pas sûr... *)
-
   exists [E t₁ d₁; E t₁ (negb d₁)].
+  rewrite norm_list_cancel_start; simpl.
+Theorem toto : ∀ el e₁ el₁,
+  norm_list el = e₁ :: el₁
+  → ∃ el₂ el₃,
+    norm_list el₂ = [] ∧ norm_list el₃ = [] ∧ el = el₂ ++ e₁ :: el₃.
+Proof.
+intros el e₁ el₁ Hel.
+revert e₁ el₁ Hel.
+induction el as [| e₂]; intros; [ discriminate Hel | ].
+simpl in Hel.
+remember (norm_list el) as el₂ eqn:Hel₂.
+symmetry in Hel₂.
+destruct el₂ as [| e₃].
+ injection Hel; clear Hel; intros; subst e₂ el₁.
+ exists [], el.
+ split; [ reflexivity | ].
+ split; [ assumption | reflexivity ].
+
+ pose proof IHel _ _ (eq_refl _) as H.
+ destruct H as (el₃, (el₄, (Hel₃, (Hel₄, Hel₁)))).
+ subst el.
+ destruct (letter_opp_dec e₂ e₃) as [H₁| H₁].
+  subst el₂; clear IHel.
+  exfalso; revert Hel₂ Hel₃ Hel₄; clear; intros.
+Focus 2.
+  injection Hel; clear Hel; intros; subst e₂ el₁.
+  exists [], (el₃ ++ e₃ :: el₄).
+  rewrite app_nil_l.
+(* faux ! *)
+bbb.
+
   destruct e as (t, d).
   exists (E t (negb d) :: E t₁ d₁ :: el).
   split; [ apply norm_list_cancel_start | ].
