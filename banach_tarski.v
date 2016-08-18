@@ -1452,6 +1452,7 @@ induction bnl as [| (d, n)]; intros.
    remember (last (norm_combine el)) as lst eqn:Hlst.
    destruct (letter_dec t₁ lst) as [H₂| H₂].
     destruct (Bool.bool_dec d₁ d) as [H₃| H₃]; [ discriminate Hpa | ].
+    apply neq_negb in H₃; subst d₁.
     destruct n.
      injection Hpa; clear Hpa; intros; subst.
      remember (norm_list el) as el₁ eqn:Hel.
@@ -1462,6 +1463,28 @@ induction bnl as [| (d, n)]; intros.
       destruct Hel as [Hel| Hel]; [ subst el; discriminate Hpa₂ | ].
       destruct Hel as (el₁, (el₂, (t₂, (d₂, (Hel, Hn))))).
       subst el.
+      apply norm_nil_iff in Hn.
+      destruct Hn as [Hn| Hn].
+       apply app_eq_nil in Hn.
+       destruct Hn; subst el₁ el₂.
+       rewrite app_nil_l in Hpa₂; simpl in Hpa₂.
+       unfold path_start in Hpa₂; simpl in Hpa₂.
+       rewrite letter_dec_diag, bool_dec_negb_r in Hpa₂.
+       discriminate Hpa₂.
+
+       destruct Hn as (el₃, (el₄, (t₃, (d₃, (Hn₁, Hn₂))))).
+       apply norm_nil_iff in Hn₂.
+       destruct Hn₂ as [Hn₂| Hn₂].
+        apply app_eq_nil in Hn₂.
+        destruct Hn₂; subst el₃ el₄.
+        rewrite app_nil_l in Hn₁.
+        remember (el₁ ++ E t₂ d₂ :: E t₂ (negb d₂) :: el₂) as el₃ eqn:Hel₃.
+        remember (last (norm_combine el₃)) as t eqn:Ht.
+        symmetry in Ht.
+        destruct t.
+         destruct d; simpl.
+bbb.
+
 SearchAbout norm_combine.
 Theorem toto : ∀ el₁ el₂ t d,
   norm_combine (el₁ ++ E t d :: E t (negb d) :: el₂) =
