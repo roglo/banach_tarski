@@ -1366,8 +1366,6 @@ Fixpoint norm_combine el :=
 
 Compute norm_combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
 
-Inspect 8.
-
 Fixpoint rotate_step pt e n :=
   match n with
   | O => pt
