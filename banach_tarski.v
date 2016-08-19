@@ -1425,103 +1425,146 @@ Theorem toto : ∀ el pt,
 Proof.
 intros el pt.
 unfold rotate_norm2.
-remember (norm_combine el) as pa eqn:Hpa.
+remember (norm_combine el) as pa eqn:Hpa .
 symmetry in Hpa.
 destruct pa as (t, bnl).
 revert el pt t Hpa.
 induction bnl as [| (d, n)]; intros.
  simpl.
- destruct el as [| e]; [ reflexivity | ].
+ destruct el as [| e]; [ reflexivity |  ].
  simpl; simpl in Hpa.
-  destruct e as (t₁, d₁).
-  remember (path (norm_combine el)) as pa eqn:Hpa₂.
-  symmetry in Hpa₂.
-  destruct pa as [| (d, n) pa]; [ discriminate Hpa | ].
-  unfold path_start in Hpa.
-  rewrite Hpa₂ in Hpa.
-  simpl in Hpa.
-  destruct (zerop (S (length pa) mod 2)) as [H₁| H₁].
-   remember (last (norm_combine el)) as lst eqn:Hlst.
-   destruct (letter_dec t₁ (other_elem lst)) as [H₂| H₂].
-    destruct (Bool.bool_dec d₁ d) as [H₃| H₃]; [ discriminate Hpa | ].
-    destruct n; [ injection Hpa; intros; subst; discriminate H₁ | ].
-    discriminate Hpa.
+ destruct e as (t₁, d₁).
+ remember (path (norm_combine el)) as pa eqn:Hpa₂ .
+ symmetry in Hpa₂.
+ destruct pa as [| (d, n) pa]; [ discriminate Hpa |  ].
+ unfold path_start in Hpa.
+ rewrite Hpa₂ in Hpa.
+ simpl in Hpa.
+ destruct (zerop (S (length pa) mod 2)) as [H₁| H₁].
+  remember (last (norm_combine el)) as lst eqn:Hlst .
+  destruct (letter_dec t₁ (other_elem lst)) as [H₂| H₂].
+   destruct (Bool.bool_dec d₁ d) as [H₃| H₃]; [ discriminate Hpa |  ].
+   destruct n; [ injection Hpa; intros; subst; discriminate H₁ |  ].
+   discriminate Hpa.
 
-    discriminate Hpa.
+   discriminate Hpa.
 
-   remember (last (norm_combine el)) as lst eqn:Hlst.
-   destruct (letter_dec t₁ lst) as [H₂| H₂].
-    destruct (Bool.bool_dec d₁ d) as [H₃| H₃]; [ discriminate Hpa | ].
-    apply neq_negb in H₃; subst d₁.
-    destruct n.
-     injection Hpa; clear Hpa; intros; subst.
-     remember (norm_list el) as el₁ eqn:Hel.
-     symmetry in Hel.
-     destruct el₁ as [| e₁].
-      simpl.
-      apply norm_nil_iff in Hel.
-      destruct Hel as [Hel| Hel]; [ subst el; discriminate Hpa₂ | ].
-      destruct Hel as (el₁, (el₂, (t₂, (d₂, (Hel, Hn))))).
-      subst el.
-      apply norm_nil_iff in Hn.
-      destruct Hn as [Hn| Hn].
-       apply app_eq_nil in Hn.
-       destruct Hn; subst el₁ el₂.
-       rewrite app_nil_l in Hpa₂; simpl in Hpa₂.
-       unfold path_start in Hpa₂; simpl in Hpa₂.
-       rewrite letter_dec_diag, bool_dec_negb_r in Hpa₂.
-       discriminate Hpa₂.
+  remember (last (norm_combine el)) as lst eqn:Hlst .
+  destruct (letter_dec t₁ lst) as [H₂| H₂].
+   destruct (Bool.bool_dec d₁ d) as [H₃| H₃]; [ discriminate Hpa |  ].
+   apply neq_negb in H₃; subst d₁.
+   destruct n.
+    injection Hpa; clear Hpa; intros; subst.
+    remember (norm_list el) as el₁ eqn:Hel .
+    symmetry in Hel.
+    destruct el₁ as [| e₁].
+     simpl.
+     apply norm_nil_iff in Hel.
+     destruct Hel as [Hel| Hel]; [ subst el; discriminate Hpa₂ |  ].
+     destruct Hel as (el₁, (el₂, (t₂, (d₂, (Hel, Hn))))).
+     subst el.
+     apply norm_nil_iff in Hn.
+     destruct Hn as [Hn| Hn].
+      apply app_eq_nil in Hn.
+      destruct Hn; subst el₁ el₂.
+      rewrite app_nil_l in Hpa₂; simpl in Hpa₂.
+      unfold path_start in Hpa₂; simpl in Hpa₂.
+      rewrite letter_dec_diag, bool_dec_negb_r in Hpa₂.
+      discriminate Hpa₂.
 
-       destruct Hn as (el₃, (el₄, (t₃, (d₃, (Hn₁, Hn₂))))).
-       apply norm_nil_iff in Hn₂.
-       destruct Hn₂ as [Hn₂| Hn₂].
-        apply app_eq_nil in Hn₂.
-        destruct Hn₂; subst el₃ el₄.
-        rewrite app_nil_l in Hn₁.
-        remember (el₁ ++ E t₂ d₂ :: E t₂ (negb d₂) :: el₂) as el₃ eqn:Hel₃.
-        remember (last (norm_combine el₃)) as t eqn:Ht.
-        symmetry in Ht.
-        destruct t.
-         destruct d; simpl.
-          exfalso.
-          revert Hel₃ Hpa₂ Hn₁ Ht; clear; intros.
-          revert el₁ el₂ t₂ d₂ t₃ d₃ Hel₃ Hn₁.
-          induction el₃ as [| (t, d)]; intros; [ discriminate Hpa₂ | ].
+      destruct Hn as (el₃, (el₄, (t₃, (d₃, (Hn₁, Hn₂))))).
+      apply norm_nil_iff in Hn₂.
+      destruct Hn₂ as [Hn₂| Hn₂].
+       apply app_eq_nil in Hn₂.
+       destruct Hn₂; subst el₃ el₄.
+       rewrite app_nil_l in Hn₁.
+       remember (el₁ ++ E t₂ d₂ :: E t₂ (negb d₂) :: el₂) as el₃ eqn:Hel₃ .
+       remember (last (norm_combine el₃)) as t eqn:Ht .
+       symmetry in Ht.
+       destruct t.
+        destruct d; simpl.
+         exfalso.
+         revert Hel₃ Hpa₂ Hn₁ Ht; clear; intros.
+         revert el₁ el₂ t₂ d₂ t₃ d₃ Hel₃ Hn₁.
+         induction el₃ as [| (t, d)]; intros; [ discriminate Hpa₂ |  ].
+         simpl in Hpa₂, Ht.
+         remember (path (norm_combine el₃)) as bnl eqn:Hbnl .
+         symmetry in Hbnl.
+         destruct bnl as [| (b, n)].
           simpl in Hpa₂, Ht.
-          remember (path (norm_combine el₃)) as bnl eqn:Hbnl.
-          symmetry in Hbnl.
-          destruct bnl as [| (b, n)].
-           simpl in Hpa₂, Ht.
-           injection Hpa₂; clear Hpa₂; intros; subst d t.
-           destruct el₃ as [| (t, d)].
-            simpl in Hel₃.
-Focus 2.
-simpl in Hbnl; clear IHel₃.
-remember (path (norm_combine el₃)) as bnl eqn:Hbnl₁.
-symmetry in Hbnl₁.
-destruct bnl as [| (b, n)]; [ discriminate Hbnl | ].
-unfold path_start in Hbnl; simpl in Hbnl.
-rewrite Hbnl₁ in Hbnl; simpl in Hbnl.
-destruct (zerop (S (length bnl) mod 2)) as [H₁| H₁].
-destruct bnl as [| (b₁, n₁)]; [ discriminate H₁ | ].
-remember (other_elem (last (norm_combine el₃))) as t₁ eqn:Ht.
-destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ | ].
-destruct (Bool.bool_dec d b) as [H₃| H₃]; [ discriminate Hbnl | ].
-destruct n; discriminate Hbnl.
-discriminate Hbnl.
-remember (last (norm_combine el₃)) as t₁ eqn:Ht₁.
-destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ | ].
-destruct (Bool.bool_dec d b) as [H₃| H₃]; [ discriminate Hbnl | ].
-destruct n; [ simpl in Hbnl | discriminate Hbnl ].
-subst bnl.
-apply neq_negb in H₃; subst d.
+          injection Hpa₂; clear Hpa₂; intros; subst d t.
+          destruct el₃ as [| (t, d)].
+           simpl in Hel₃.
+           Focus 2.
+           simpl in Hbnl; clear IHel₃.
+           remember (path (norm_combine el₃)) as bnl eqn:Hbnl₁ .
+           symmetry in Hbnl₁.
+           destruct bnl as [| (b, n)]; [ discriminate Hbnl |  ].
+           unfold path_start in Hbnl; simpl in Hbnl.
+           rewrite Hbnl₁ in Hbnl; simpl in Hbnl.
+           destruct (zerop (S (length bnl) mod 2)) as [H₁| H₁].
+            destruct bnl as [| (b₁, n₁)]; [ discriminate H₁ |  ].
+            remember (other_elem (last (norm_combine el₃))) as t₁ eqn:Ht .
+            destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ |  ].
+             destruct (Bool.bool_dec d b); [ discriminate Hbnl | ].
+             destruct n; discriminate Hbnl.
+
+             discriminate Hbnl.
+
+            remember (last (norm_combine el₃)) as t₁ eqn:Ht₁ .
+            destruct (letter_dec t t₁) as [H₂| H₂]; [ subst t₁ |  ].
+             destruct (Bool.bool_dec d b) as [| H₃]; [ discriminate Hbnl |  ].
+             destruct n; [ simpl in Hbnl | discriminate Hbnl ].
+             subst bnl.
+             apply neq_negb in H₃; subst d.
+             destruct el₁ as [| e₁].
+              rewrite app_nil_l in Hel₃, Hn₁; subst el₂.
+              injection Hel₃; clear Hel₃; intros; subst t₂ d₂ t el₃.
+              simpl in Hbnl₁, H3.
+              unfold path_start in Hbnl₁; simpl in Hbnl₁.
+              rewrite bool_dec_negb_r in Hbnl₁; simpl in Hbnl₁.
+              rewrite letter_dec_diag in Hbnl₁. discriminate Hbnl₁.
+
+              simpl in Hn₁.
+              injection Hn₁; clear Hn₁; intros; subst e₁.
+              simpl in Hel₃.
+              injection Hel₃; clear Hel₃; intros; subst; simpl in H.
+              destruct el₁ as [| e₁].
+               rewrite app_nil_l in H, H0; subst el₂.
+               injection H0; clear H0; intros; subst.
+               rewrite Bool.negb_involutive in Hbnl₁.
+               simpl in Hbnl₁.
+               unfold path_start in Hbnl₁; simpl in Hbnl₁.
+               destruct (letter_dec t₂ la) as [H₂| H₂]; [ subst t₂ |  ].
+                destruct (Bool.bool_dec b false); discriminate Hbnl₁.
+
+                discriminate Hbnl₁.
+
+               simpl in H.
+               injection H; clear H; intros; subst.
+               apply app_eq_nil in H; destruct H; subst.
+               simpl in H0.
+               injection H0; clear H0; intros; subst.
+               simpl in Hbnl₁.
+               unfold path_start in Hbnl₁; simpl in Hbnl₁.
+               rewrite letter_dec_diag, bool_dec_negb_r
+                 in Hbnl₁.
+               discriminate Hbnl₁.
+
+             discriminate Hbnl.
+
+           revert Hel₃; clear; intros.
+           induction el₁ as [| e₁]; [ discriminate Hel₃ |  ].
+           simpl in Hel₃.
+           injection Hel₃; clear Hel₃; intros; subst.
+           destruct el₁; discriminate H.
 
 bbb.
 
 SearchAbout norm_combine.
 Theorem toto : ∀ el₁ el₂ t d,
   norm_combine (el₁ ++ E t d :: E t (negb d) :: el₂) =
-  norm_combine (el₁ ++ el₂).
+  norm_combine (el₁ ++ el₂.
 Proof.
 intros.
 revert el₂ t d.
@@ -1529,7 +1572,7 @@ induction el₁ as [| e₁]; intros.
  do 2 rewrite app_nil_l.
 Theorem toto : ∀ el t d,
   path (norm_combine (E t d :: E t (negb d) :: el)) =
-  path (norm_combine el).
+  path (norm_combine el.
 Proof.
 intros; simpl.
 remember (path (norm_combine el)) as bnl eqn:Hbnl.
@@ -1548,7 +1591,7 @@ destruct bnl as [| (b, n)].
    rewrite letter_dec_diag, bool_dec_negb_r; simpl.
    exfalso; subst nc.
 
-(* putain, c'est faux... c'est mon norm_combine qu'est pas bon ? *)
+* putain, c'est faux... c'est mon norm_combine qu'est pas bon ? *)
 bbb.
 
 
@@ -1574,7 +1617,7 @@ clear t H₂.
 
 bbb.
 
-intros **.
+intros.
 induction el as [| e].
  simpl; unfold path_start; simpl.
  rewrite letter_dec_diag, bool_dec_negb_r.
@@ -1585,7 +1628,7 @@ induction el as [| e].
  symmetry in Hbnl.
  destruct bnl as [| bn].
   simpl.
-  destruct e as (t₁, d₁).
+  destruct e as (t₁, d₁.
   remember (path (norm_combine el)) as bnl₁ eqn:Hbnl₁ .
   symmetry in Hbnl₁.
   destruct bnl₁ as [| (b₁, n₁)].
@@ -1683,13 +1726,13 @@ induction el as [| e].
 
      discriminate Hbnl.
 
-  destruct bn as (b, n).
+  destruct bn as (b, n.
   remember (norm_combine (E t (negb d) :: e :: el)) as nc eqn:Hnc .
   destruct (letter_dec t (path_start nc)) as [H₁| H₁].
    destruct (Bool.bool_dec d b) as [H₂| H₂].
     subst b.
     simpl.
-    destruct e as (t₁, d₁).
+    destruct e as (t₁, d₁.
     remember (path (norm_combine el)) as bnl₁ eqn:Hbnl₁ .
     destruct bnl₁ as [| bn].
      symmetry in Hbnl₁.
@@ -1704,16 +1747,16 @@ induction el as [| e].
       destruct (Bool.bool_dec (negb d) d₁) as [H₃| H₃].
        simpl in Hbnl.
        subst d₁.
-       injection Hbnl; clear Hbnl; intros **.
+       injection Hbnl; clear Hbnl; intros.
        exfalso; revert H1; apply Bool.no_fixpoint_negb.
 
        discriminate Hbnl.
 
       simpl in Hbnl.
-      injection Hbnl; clear Hbnl; intros **.
+      injection Hbnl; clear Hbnl; intros.
       exfalso; revert H1; apply Bool.no_fixpoint_negb.
 
-     destruct bn as (b₁, n₁).
+     destruct bn as (b₁, n₁.
 bbb.
 
 subst np.
@@ -1770,7 +1813,7 @@ bbb.
     simpl in Hel.
 
 bbb.
-(**)
+**)
   destruct el as [| e₂]; [ discriminate Hsc | ].
   simpl in Hsc.
   destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
@@ -1925,7 +1968,7 @@ Theorem toto : ∀ el el₁ a b c,
   → b ≠ 0%Z.
 Proof.
 intros el el₁ a b c Hs Hr.
-(**)
+**)
 rewrite Hs in Hr.
 rewrite fold_left_app in Hr; simpl in Hr.
 remember (fold_left rotate_param_mod_3 el₁ (1, 0, 0)%Z) as r₁ eqn:Hr₁.
@@ -1949,7 +1992,7 @@ induction el₁ as [| e₁] using rev_ind; intros.
 
 Inspect 1.
 bbb.
-(**)
+**)
 remember (norm_list el) as el₂ eqn:Hel.
 symmetry in Hel.
 revert el el₁ a b c Hel Hs Hr.
@@ -1965,7 +2008,7 @@ induction el₂ as [| e] using rev_ind; intros.
 
 
 bbb.
-(**)
+**)
 generalize Hr; intros H.
 apply rotate_param_keep_dist in H.
 do 2 rewrite Nat2Z.inj_mul in H; simpl in H.
@@ -1973,7 +2016,7 @@ rewrite Z.mul_1_r, Z.mul_1_l in H.
 rewrite Z.pow_mul_r in H; [ | apply Zle_0_pos | apply Zle_0_nat ].
 replace (3 ^ 2)%Z with 9%Z in H by reflexivity.
 rename H into Hd.
-(**)
+**)
 rewrite Hs in Hr.
 remember (1%Z, 0%Z, 0%Z, O) as p eqn:Hp.
 remember (fold_left rotate_param el₁ p) as u eqn:Hu.
@@ -1983,7 +2026,7 @@ generalize Hu; intros H.
 apply rotate_param_app_bn with (n := 0) in H.
 simpl in H.
 rewrite Hr in H; simpl in H.
-destruct H as (Ha, (Hb, Hc).
+destruct H as (Ha, (Hb, Hc.
 rewrite Z.mod_0_l in Hc; [| intros H; discriminate H ].
 rewrite fold_left_app in Hr.
 rewrite Hu in Hr; simpl in Hr.
@@ -2014,7 +2057,7 @@ bbb.
  simpl in H; rewrite Hu in H; simpl in H.
  destruct e₁ as (t₁, d₁.
  destruct t₁, d₁.
-  destruct H as (Ha, (Hb, Hc).
+  destruct H as (Ha, (Hb, Hc.
   rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
 bbb.
 
@@ -2038,7 +2081,7 @@ rewrite Zdiv.Z_mod_mult in Hb.
 rewrite <- Hb in Hc.
 
 bbb.
-(**)
+**)
 revert el a b c N Hs Hr.
 induction el₁ as [| e₁]; intros.
  rewrite Hs in Hr; simpl in Hr.
@@ -2060,7 +2103,7 @@ induction el₁ as [| e₁]; intros.
 Check rotate_param_app_bn.
 bbb.
 
-(**)
+**)
 revert el₁ a b c N Hs Hr.
 induction el as [| e]; intros.
  symmetry in Hs; apply app_eq_nil in Hs.
@@ -2079,7 +2122,7 @@ induction el as [| e]; intros.
 
   destruct (letter_opp_dec e e₂) as [He| He].
 bbb.
-(**)
+**)
 induction el as [| e] using rev_ind; intros.
  symmetry in Hs; apply app_eq_nil in Hs.
  destruct Hs; discriminate.
@@ -2099,7 +2142,7 @@ bbb.
   simpl in H.
   unfold "≡₃" in H.
   rewrite Hr in H; simpl in H.
-  destruct H as (Ha, (Hb, Hc).
+  destruct H as (Ha, (Hb, Hc.
   rewrite Z.mod_0_l in Ha; [ | intros; discriminate ].
   destruct b₁, c₁.
    rewrite Z.add_0_l, Z.mod_0_l in Hb; [ | intros; discriminate ].
@@ -2142,7 +2185,7 @@ induction el as [| e] using rev_ind; intros.
   rewrite Hr in Hu.
   simpl in Hu.
   injection Hu; clear Hu; intros; subst a₁ b₁ c₁.
-SearchAbout (fold_left _ (_ ++ _).
+SearchAbout (fold_left _ (_ ++ _.
   rewrite fold_left_app in Hr.
   simpl in Hr.
   remember (fold_left rotate_param el p) as u eqn:Hu.
@@ -2150,7 +2193,7 @@ SearchAbout (fold_left _ (_ ++ _).
   simpl in Hr.
   injection Hr; clear Hr; intros; subst a b c N.
   pose proof H _ _ _ _ (eq_refl _) as H₁.
-  destruct H₁ as (H₁, (H₂, H₃).
+  destruct H₁ as (H₁, (H₂, H₃.
 bbb.
 
 End Rotation.
