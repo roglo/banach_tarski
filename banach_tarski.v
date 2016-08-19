@@ -1366,14 +1366,19 @@ Add Parametric Relation : _ eq_mod_3
  as eq_mod_3_equivalence.
 
 Theorem toto : ∀ n abc,
-  fst3 (fold_left rotate_param (repeat ḅ (S n)) (1%Z, 0%Z, 0%Z, 0)) ≡₃ abc
+  fst3 (fold_left rotate_param (repeat ḅ (S n)) (1, 0, 0, O)%Z) ≡₃ abc
   → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
 Proof.
 intros n ((a, b), c) H.
-pose proof rotate_param_app [] ḅ n (1, 0, 0, O)%Z 1 0 0 0 (eq_refl _) as H₁.
-rewrite app_nil_l, Nat.add_1_r in H₁.
-rewrite H₁ in H; clear H₁; symmetry in H.
-rewrite Z.add_0_r, Z.sub_0_r in H.
+rewrite <- H; clear H.
+pose proof rotate_param_app [] ḅ n (1, 0, 0, O)%Z _ _ _ _ (eq_refl _) as H.
+rewrite app_nil_l, Nat.add_1_r in H; rewrite H.
+rewrite Z.add_0_r, Z.sub_0_r; clear H.
+destruct (zerop (n mod 2)) as [H| H].
+ left; split; [ reflexivity | split; reflexivity ].
+ right; split; [ reflexivity | split; reflexivity ].
+Qed.
+
 bbb.
 
 Record norm_path := mknp { last : letter; path : list (bool * nat) }.
