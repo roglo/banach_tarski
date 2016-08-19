@@ -1404,12 +1404,43 @@ simpl in H; simpl.
 injection H; intros; subst; reflexivity.
 Qed.
 
-Theorem tata : ∀ p el a b c,
+Theorem tata : ∀ p el a c,
   norm_list el ≠ []
-  → p = P (IZR a) (IZR b * √ 2) (IZR c)
+  → p = P (IZR a) 0 (IZR c)
   → fold_left rotate el p ≠ p.
 Proof.
-intros p el a b c Hn Hp.
+intros p el a c Hn Hp.
+remember (fold_left rotate_param el (a, 0%Z, c, 0)) as r eqn:Hr.
+symmetry in Hr.
+destruct r as (((a', b'), c'), N).
+apply rotate_param_rotate in Hr.
+rewrite Rmult_0_l in Hr.
+rewrite <- Hp in Hr.
+intros H; rewrite Hr in H; symmetry in H.
+simpl in H; unfold Rdiv in H.
+assert (Hb' : b' ≠ 0%Z).
+Focus 2.
+ rewrite Hp in H.
+ injection H; clear H; intros Hc Hb Ha.
+ symmetry in Hb.
+ apply Rmult_integral in Hb.
+ destruct Hb as [Hb| Hb].
+  apply Rmult_integral in Hb.
+  destruct Hb as [Hb| Hb]; [ apply eq_IZR_R0 in Hb; contradiction | ].
+  revert Hb; apply sqrt2_neq_0.
+
+  revert Hb; apply Rinv_neq_0_compat.
+  apply pow_nonzero; lra.
+
+ intros Hb'.
+ apply Hn; clear Hn.
+ apply norm_nil_iff.
+ subst b'.
+ simpl in H, Hr.
+ unfold Rdiv at 2 in Hr.
+ do 2 rewrite Rmult_0_l in H, Hr.
+ rewrite Hp in H.
+ injection H; clear H; intros Hc Ha.
 
 bbb.
 
