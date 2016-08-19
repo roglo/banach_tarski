@@ -1379,6 +1379,31 @@ destruct (zerop (n mod 2)) as [H| H].
  right; split; [ reflexivity | split; reflexivity ].
 Qed.
 
+Theorem titi : ∀ n a b c,
+  fst3 (fold_left rotate_param (repeat ḅ (S n)) (1, 0, 0, O)%Z) ≡₃ (a, b, c)
+  → b ≠ 0%Z.
+Proof.
+intros n a b c H.
+pose proof rotate_param_app [] ḅ n (1, 0, 0, O)%Z _ _ _ _ (eq_refl _) as H₁.
+rewrite app_nil_l, Nat.add_1_r in H₁; rewrite H₁ in H; clear H₁; simpl in H.
+destruct (zerop (n mod 2)) as [H₁| H₁].
+ destruct H as (Ha, (Hb, Hc)).
+ intros H; subst b; discriminate Hb.
+
+ destruct H as (Ha, (Hb, Hc)).
+ intros H; subst b; discriminate Hb.
+Qed.
+
+Theorem tutu : ∀ x y z a b c N,
+  fold_left rotate_param [] (x, y, z, 0) = (a, b, c, N)
+  → fold_left rotate [] (P (IZR x) (IZR y * √ 2) (IZR z)) =
+    P (IZR a) (IZR b * √ 2) (IZR c).
+Proof.
+intros.
+simpl in H; simpl.
+injection H; intros; subst; reflexivity.
+Qed.
+
 bbb.
 
 Record norm_path := mknp { last : letter; path : list (bool * nat) }.
