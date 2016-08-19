@@ -917,46 +917,51 @@ Qed.
 
 Theorem rotate_param_rotate : ∀ el x y z a b c N,
   fold_left rotate_param el (x, y, z, 0) = (a, b, c, N)
-  → fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
+  ↔ fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
       P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
 Proof.
-intros el x y z a₁ b₁ c₁ N₁ Hr.
-simpl in Hr; simpl.
-revert a₁ b₁ c₁ N₁ Hr.
-induction el as [| (t, d)] using rev_ind; intros.
- simpl; simpl in Hr.
- injection Hr; intros; subst; simpl.
- f_equal; lra.
+intros el x y z a₁ b₁ c₁ N₁.
+split.
+ intros Hr.
+ simpl in Hr; simpl.
+ revert a₁ b₁ c₁ N₁ Hr.
+ induction el as [| (t, d)] using rev_ind; intros.
+  simpl; simpl in Hr.
+  injection Hr; intros; subst; simpl.
+  f_equal; lra.
 
- rewrite fold_left_app in Hr; simpl in Hr.
- rewrite fold_left_app; simpl.
- remember (fold_left rotate_param el (x, y, z, 0)) as rp eqn:Hrp.
- symmetry in Hrp.
- destruct rp as (((a, b), c), N).
- erewrite IHel; [ simpl in Hr; simpl; unfold Rdiv | reflexivity ].
- progress repeat rewrite Rmult_1_l.
- progress repeat rewrite Rmult_0_l.
- progress repeat rewrite Rplus_0_l.
- progress repeat rewrite Rplus_0_r.
- progress repeat rewrite <- Rmult_assoc.
- rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
- rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
- destruct t, d; injection Hr; clear Hr; intros; subst; simpl.
-  rewrite plus_IZR, minus_IZR.
-  progress repeat rewrite mult_IZR.
-  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+  rewrite fold_left_app in Hr; simpl in Hr.
+  rewrite fold_left_app; simpl.
+  remember (fold_left rotate_param el (x, y, z, 0)) as rp eqn:Hrp.
+  symmetry in Hrp.
+  destruct rp as (((a, b), c), N).
+  erewrite IHel; [ simpl in Hr; simpl; unfold Rdiv | reflexivity ].
+  progress repeat rewrite Rmult_1_l.
+  progress repeat rewrite Rmult_0_l.
+  progress repeat rewrite Rplus_0_l.
+  progress repeat rewrite Rplus_0_r.
+  progress repeat rewrite <- Rmult_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  destruct t, d; injection Hr; clear Hr; intros; subst; simpl.
+   rewrite plus_IZR, minus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-  rewrite plus_IZR, plus_IZR.
-  progress repeat rewrite mult_IZR.
-  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+   rewrite plus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-  rewrite plus_IZR, minus_IZR.
-  progress repeat rewrite mult_IZR.
-  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+   rewrite plus_IZR, minus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-  rewrite plus_IZR, plus_IZR.
-  progress repeat rewrite mult_IZR.
-  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+   rewrite plus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+
+ intros Hr.
+bbb.
 Qed.
 
 Definition fst3 {A B C D} '((a, b, c, d) : A * B * C * D) := (a, b, c).
@@ -1441,7 +1446,14 @@ Focus 2.
  do 2 rewrite Rmult_0_l in H, Hr.
  rewrite Hp in H.
  injection H; clear H; intros Hc Ha.
-
+ induction el as [| e] using rev_ind; [ left; reflexivity | right ].
+ clear IHel.
+Check rotate_param_app.
+SearchAbout rotate.  
+ remember (fold_left rotate_param (el ++ [e]) (a, 0%Z, c, 0)) as s eqn:Hs.
+ generalize Hs; intros Ht.
+ symmetry in Hs.
+ Check rotate_param_app.
 bbb.
 
 Record norm_path := mknp { last : letter; path : list (bool * nat) }.
