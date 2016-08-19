@@ -918,7 +918,8 @@ Qed.
 Theorem rotate_param_rotate : ∀ el x y z a b c N,
   fold_left rotate_param el (x, y, z, 0) = (a, b, c, N)
   ↔ fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
-      P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N).
+      P (IZR a/3^N) (IZR b*√2/3^N) (IZR c/3^N)
+    ∧ N = length el.
 Proof.
 intros el x y z a₁ b₁ c₁ N₁.
 split.
@@ -928,14 +929,17 @@ split.
  induction el as [| (t, d)] using rev_ind; intros.
   simpl; simpl in Hr.
   injection Hr; intros; subst; simpl.
-  f_equal; lra.
+  split; [ f_equal; lra | reflexivity ].
 
   rewrite fold_left_app in Hr; simpl in Hr.
   rewrite fold_left_app; simpl.
   remember (fold_left rotate_param el (x, y, z, 0)) as rp eqn:Hrp.
   symmetry in Hrp.
   destruct rp as (((a, b), c), N).
-  erewrite IHel; [ simpl in Hr; simpl; unfold Rdiv | reflexivity ].
+  pose proof IHel _ _ _ _ (eq_refl _) as H.
+  destruct H as (H, HN).
+  erewrite H.
+  simpl in Hr; simpl; unfold Rdiv.
   progress repeat rewrite Rmult_1_l.
   progress repeat rewrite Rmult_0_l.
   progress repeat rewrite Rplus_0_l.
@@ -944,23 +948,41 @@ split.
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   destruct t, d; injection Hr; clear Hr; intros; subst; simpl.
+   split; [ | rewrite app_length, Nat.add_comm; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
+   split; [ | rewrite app_length, Nat.add_comm; reflexivity ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
+   split; [ | rewrite app_length, Nat.add_comm; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
+   split; [ | rewrite app_length, Nat.add_comm; reflexivity ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
- intros Hr.
+ intros (Hr, HN).
+ revert x y z a₁ b₁ c₁ N₁ Hr HN.
+ induction el as [| e]; intros.
+  simpl in Hr; simpl.
+  simpl in HN; subst N₁.
+  unfold Rdiv in Hr.
+  rewrite pow_O in Hr.
+  do 3 rewrite RMicromega.Rinv_1 in Hr.
+  injection Hr; clear Hr; intros Hz Hy Hx.
+  apply Rmult_eq_reg_r in Hy; [ | apply sqrt2_neq_0 ].
+  apply eq_IZR in Hx.
+  apply eq_IZR in Hy.
+  apply eq_IZR in Hz.
+  f_equal; f_equal; f_equal; assumption.
+
 bbb.
 Qed.
 
