@@ -1357,68 +1357,75 @@ Qed.
 
 Theorem norm_nil_iff : ∀ el,
   norm_list el = []
-  → el = [] ∨
+  ↔ el = [] ∨
     ∃ el₁ el₂ t d, el = el₁ ++ E t d :: E t (negb d) :: el₂
     ∧ norm_list (el₁ ++ el₂) = [].
 Proof.
-intros el Hel.
-remember (split_at_cancel el) as sc eqn:Hsc .
-symmetry in Hsc.
-destruct el as [| e]; [ left; reflexivity | right ].
-destruct sc as [((el₁, (t, d)), el₂)| ].
- exists el₁,el₂,t,d.
- revert Hel Hsc; clear; intros; move el₂ before el₁.
- destruct el as [| e₁]; [ discriminate Hsc |  ].
- remember (e₁ :: el) as el'; simpl in Hsc; subst el'.
- destruct (letter_opp_dec e e₁) as [H₁| H₁].
-  injection Hsc; clear Hsc; intros; subst.
-  destruct e₁ as (t₁, d₁).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t₁ d₁.
-  rewrite norm_list_cancel_start in Hel.
-  split; [ reflexivity | assumption ].
-
-  remember (split_at_cancel (e₁ :: el)) as s eqn:Hs .
-  symmetry in Hs.
-  destruct s as [((el₃, e₃), el₄)| ]; [  | discriminate Hsc ].
-  injection Hsc; clear Hsc; intros; subst el₁ e₃ el₄.
-  remember (e₁ :: el) as el'.
-  clear e₁ el H₁ Heqel'.
-  rename el' into el.
-  rewrite cons_to_app in Hel.
-  rewrite cons_to_app.
-  replace (e :: el₃) with ([e] ++ el₃) by apply cons_to_app.
-  remember [e] as el₀.
-  clear e Heqel₀.
-  revert el₀ el₂ el₃ t d Hs Hel.
-  induction el as [| e]; intros; [ discriminate Hs |  ].
-  simpl in Hs.
-  destruct el as [| e₁]; [ discriminate Hs |  ].
+intros el.
+split; [ intros Hel | ].
+ remember (split_at_cancel el) as sc eqn:Hsc .
+ symmetry in Hsc.
+ destruct el as [| e]; [ left; reflexivity | right ].
+ destruct sc as [((el₁, (t, d)), el₂)| ].
+  exists el₁,el₂,t,d.
+  revert Hel Hsc; clear; intros; move el₂ before el₁.
+  destruct el as [| e₁]; [ discriminate Hsc |  ].
+  remember (e₁ :: el) as el'; simpl in Hsc; subst el'.
   destruct (letter_opp_dec e e₁) as [H₁| H₁].
-   injection Hs; clear Hs; intros; subst el e el₃.
+   injection Hsc; clear Hsc; intros; subst.
    destruct e₁ as (t₁, d₁).
    apply letter_opp_iff in H₁.
    destruct H₁; subst t₁ d₁.
-   rewrite app_nil_r.
-   split; [ reflexivity |  ].
-   rewrite norm_list_cancel_inside in Hel; assumption.
+   rewrite norm_list_cancel_start in Hel.
+   split; [ reflexivity | assumption ].
 
-   remember (split_at_cancel (e₁ :: el)) as u eqn:Hu ; symmetry in Hu.
-   destruct u as [((el₁, e₂), el₄)| ]; [  | discriminate Hs ].
-   injection Hs; clear Hs; intros; subst el₃ e₂ el₂.
-   rewrite cons_comm_app, app_assoc in Hel.
-   pose proof (IHel (el₀ ++ [e]) _ _ _ _ (eq_refl _) Hel) as H.
-   destruct H as (H₂, H₃).
-   do 2 rewrite <- app_assoc in H₃.
-   do 4 rewrite cons_comm_app.
-   split; [  | rewrite <- app_assoc, <- app_assoc; assumption ].
-   rewrite <- app_assoc in H₂.
-   simpl in H₂; simpl; rewrite H₂.
-   do 3 rewrite <- app_assoc; reflexivity.
+   remember (split_at_cancel (e₁ :: el)) as s eqn:Hs .
+   symmetry in Hs.
+   destruct s as [((el₃, e₃), el₄)| ]; [  | discriminate Hsc ].
+   injection Hsc; clear Hsc; intros; subst el₁ e₃ el₄.
+   remember (e₁ :: el) as el'.
+   clear e₁ el H₁ Heqel'.
+   rename el' into el.
+   rewrite cons_to_app in Hel.
+   rewrite cons_to_app.
+   replace (e :: el₃) with ([e] ++ el₃) by apply cons_to_app.
+   remember [e] as el₀.
+   clear e Heqel₀.
+   revert el₀ el₂ el₃ t d Hs Hel.
+   induction el as [| e]; intros; [ discriminate Hs |  ].
+   simpl in Hs.
+   destruct el as [| e₁]; [ discriminate Hs |  ].
+   destruct (letter_opp_dec e e₁) as [H₁| H₁].
+    injection Hs; clear Hs; intros; subst el e el₃.
+    destruct e₁ as (t₁, d₁).
+    apply letter_opp_iff in H₁.
+    destruct H₁; subst t₁ d₁.
+    rewrite app_nil_r.
+    split; [ reflexivity |  ].
+    rewrite norm_list_cancel_inside in Hel; assumption.
 
- exfalso; revert Hsc.
- apply norm_nil_split_some, Hel.
+    remember (split_at_cancel (e₁ :: el)) as u eqn:Hu ; symmetry in Hu.
+    destruct u as [((el₁, e₂), el₄)| ]; [  | discriminate Hs ].
+    injection Hs; clear Hs; intros; subst el₃ e₂ el₂.
+    rewrite cons_comm_app, app_assoc in Hel.
+    pose proof (IHel (el₀ ++ [e]) _ _ _ _ (eq_refl _) Hel) as H.
+    destruct H as (H₂, H₃).
+    do 2 rewrite <- app_assoc in H₃.
+    do 4 rewrite cons_comm_app.
+    split; [  | rewrite <- app_assoc, <- app_assoc; assumption ].
+    rewrite <- app_assoc in H₂.
+    simpl in H₂; simpl; rewrite H₂.
+    do 3 rewrite <- app_assoc; reflexivity.
+
+  exfalso; revert Hsc.
+  apply norm_nil_split_some, Hel.
+
+ intros [Hel | Hel]; [ subst el; reflexivity | ].
+ destruct Hel as (el₁, (el₂, (t, (d, (Hel₁, Hel₂))))).
+ subst el; rewrite norm_list_cancel_inside; assumption.
 Qed.
+
+bbb.
 
 Theorem toto : ∀ el pt,
   rotate_norm2 (norm_combine el) pt = fold_left rotate (norm_list el) pt.
