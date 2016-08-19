@@ -1404,6 +1404,13 @@ simpl in H; simpl.
 injection H; intros; subst; reflexivity.
 Qed.
 
+Theorem tata : ∀ p el a b c,
+  norm_list el ≠ []
+  → p = P (IZR a) (IZR b * √ 2) (IZR c)
+  → fold_left rotate el p ≠ p.
+Proof.
+intros p el a b c Hn Hp.
+
 bbb.
 
 Record norm_path := mknp { last : letter; path : list (bool * nat) }.
