@@ -1332,6 +1332,50 @@ rewrite Z.pow_mul_r in Hr; try apply Nat2Z.is_nonneg.
 rewrite Hr; ring_simplify; reflexivity.
 Qed.
 
+Theorem N_1_0_0 :
+  fst3 (fold_left rotate_param [] (1%Z, 0%Z, 0%Z, 0)) ≡₃ (1, 0, 0)%Z.
+Proof.
+split; [ reflexivity | split; reflexivity ].
+Qed.
+
+Require Import Relations.
+
+Definition eq_mod_3_refl : reflexive _ eq_mod_3.
+Proof.
+intros ((a, b), c).
+split; [ reflexivity | split; reflexivity ].
+Qed.
+
+Definition eq_mod_3_sym : symmetric _ eq_mod_3.
+Proof.
+intros ((a₁, b₁), c₁) ((a₂, b₂), c₂) (Ha, (Hb, Hc)).
+split; [ symmetry; assumption | split; symmetry; assumption ].
+Qed.
+
+Definition eq_mod_3_trans : transitive _ eq_mod_3.
+Proof.
+intros ((a₁, b₁), c₁) ((a₂, b₂), c₂) ((a₃, b₃), c₃).
+intros (Ha12, (Hb12, Hc12)) (Ha23, (Hb23, Hc23)).
+split; [ etransitivity; eassumption | split; etransitivity; eassumption ].
+Qed.
+
+Add Parametric Relation : _ eq_mod_3
+ reflexivity proved by eq_mod_3_refl
+ symmetry proved by eq_mod_3_sym
+ transitivity proved by eq_mod_3_trans
+ as eq_mod_3_equivalence.
+
+Theorem toto : ∀ n abc,
+  fst3 (fold_left rotate_param (repeat ḅ (S n)) (1%Z, 0%Z, 0%Z, 0)) ≡₃ abc
+  → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
+Proof.
+intros n ((a, b), c) H.
+pose proof rotate_param_app [] ḅ n (1, 0, 0, O)%Z 1 0 0 0 (eq_refl _) as H₁.
+rewrite app_nil_l, Nat.add_1_r in H₁.
+rewrite H₁ in H; clear H₁; symmetry in H.
+rewrite Z.add_0_r, Z.sub_0_r in H.
+bbb.
+
 Record norm_path := mknp { last : letter; path : list (bool * nat) }.
 
 Definition other_elem t := match t with la => lb | lb => la end.
