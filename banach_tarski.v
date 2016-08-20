@@ -1515,6 +1515,8 @@ intros p el a c Hn Hp.
 remember (fold_left rotate_param el (a, 0%Z, c, 0)) as r eqn:Hr.
 symmetry in Hr.
 destruct r as (((a', b'), c'), N).
+bbb.
+
 apply rotate_param_rotate in Hr.
 unfold Rdiv in Hr.
 rewrite Nat.add_0_l, pow_O, Rinv_1 in Hr.
