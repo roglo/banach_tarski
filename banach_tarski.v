@@ -917,6 +917,85 @@ Qed.
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
+  ↔ fold_left rotate el (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) =
+      P (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
+    ∧ N = n + length el.
+Proof.
+intros el x y z n a₁ b₁ c₁ N₁.
+split.
+ intros Hr.
+ simpl in Hr; simpl.
+ revert a₁ b₁ c₁ N₁ Hr.
+ induction el as [| (t, d)] using rev_ind; intros.
+  simpl; simpl in Hr; rewrite Nat.add_0_r.
+  injection Hr; intros; subst; simpl.
+  split; reflexivity.
+
+  rewrite fold_left_app in Hr; simpl in Hr.
+  rewrite fold_left_app; simpl.
+  remember (fold_left rotate_param el (x, y, z, n)) as rp eqn:Hrp.
+  symmetry in Hrp.
+  destruct rp as (((a, b), c), N).
+  pose proof IHel _ _ _ _ (eq_refl _) as H.
+  destruct H as (H, HN).
+  erewrite H.
+  simpl in Hr; simpl; unfold Rdiv.
+  progress repeat rewrite Rmult_1_l.
+  progress repeat rewrite Rmult_0_l.
+  progress repeat rewrite Rplus_0_l.
+  progress repeat rewrite Rplus_0_r.
+  progress repeat rewrite <- Rmult_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+  destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl.
+   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   rewrite plus_IZR, minus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+
+   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   rewrite plus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+
+   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   rewrite plus_IZR, minus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+
+   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   rewrite plus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+
+ intros Hr.
+ revert x y z n a₁ b₁ c₁ N₁ Hr.
+ induction el as [| e]; intros.
+  simpl in Hr; simpl; rewrite Nat.add_0_r in Hr.
+  destruct Hr as (Hr, Hn); subst N₁.
+  unfold Rdiv in Hr.
+  injection Hr; intros Hz Hy Hx.
+  f_equal; f_equal; f_equal.
+   apply Rmult_eq_reg_r, eq_IZR in Hx; [ assumption | ].
+   apply Rinv_neq_0_compat, pow_nonzero; lra.
+
+   apply Rmult_eq_reg_r in Hy.
+    apply Rmult_eq_reg_r in Hy; [ | apply sqrt2_neq_0 ].
+    apply eq_IZR; assumption.
+
+    apply Rinv_neq_0_compat, pow_nonzero; lra.
+
+   apply Rmult_eq_reg_r, eq_IZR in Hz; [ assumption | ].
+   apply Rinv_neq_0_compat, pow_nonzero; lra.
+
+  simpl; destruct e as (t, d).
+  destruct t, d.
+   apply IHel.
+
+bbb.
+
+Theorem rotate_param_rotate : ∀ el x y z n a b c N,
+  fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
   → fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
       P (IZR a/3^(N-n)) (IZR b*√2/3^(N-n)) (IZR c/3^(N-n))
     ∧ N = n + length el.
