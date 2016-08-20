@@ -1009,9 +1009,59 @@ split.
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
 
-bbb.
+   apply IHel; split; [ | assumption ].
+   rewrite <- Hr; simpl.
+   unfold Rdiv.
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   progress repeat rewrite mult_IZR.
+   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+   rewrite plus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   f_equal; f_equal.
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
 
-Theorem rotate_param_rotate : ∀ el x y z n a b c N,
+   apply IHel; split; [ | assumption ].
+   rewrite <- Hr; simpl.
+   unfold Rdiv.
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   progress repeat rewrite mult_IZR.
+   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+   rewrite minus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   f_equal; f_equal.
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+
+   apply IHel; split; [ | assumption ].
+   rewrite <- Hr; simpl.
+   unfold Rdiv.
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   progress repeat rewrite mult_IZR.
+   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+   rewrite plus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   f_equal; f_equal.
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+Qed.
+
+Theorem old_rotate_param_rotate : ∀ el x y z n a b c N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
   → fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
       P (IZR a/3^(N-n)) (IZR b*√2/3^(N-n)) (IZR c/3^(N-n))
@@ -1524,7 +1574,10 @@ remember (fold_left rotate_param el (a, 0%Z, c, 0)) as r eqn:Hr.
 symmetry in Hr.
 destruct r as (((a', b'), c'), N).
 apply rotate_param_rotate in Hr.
-rewrite Rmult_0_l, Nat.add_0_l, Nat.sub_0_r in Hr.
+unfold Rdiv in Hr.
+rewrite Nat.add_0_l, pow_O, Rinv_1 in Hr.
+progress repeat rewrite Rmult_0_l in Hr.
+progress repeat rewrite Rmult_1_r in Hr.
 destruct Hr as (Hr, HN).
 rewrite <- Hp in Hr.
 intros H; rewrite Hr in H; symmetry in H.
@@ -1546,9 +1599,7 @@ Focus 2.
  intros Hb'.
  apply Hn; clear Hn.
  apply norm_nil_iff.
- subst b'.
- simpl in H, Hr.
- unfold Rdiv at 2 in Hr.
+ subst b'; simpl in H, Hr.
  do 2 rewrite Rmult_0_l in H, Hr.
  rewrite Hp in H.
  injection H; clear H; intros Hc Ha.
