@@ -988,9 +988,26 @@ split.
    apply Rmult_eq_reg_r, eq_IZR in Hz; [ assumption | ].
    apply Rinv_neq_0_compat, pow_nonzero; lra.
 
+  simpl in Hr; destruct Hr as (Hr, HN).
+  rewrite <- Nat.add_succ_comm in HN.
   simpl; destruct e as (t, d).
   destruct t, d.
-   apply IHel.
+   apply IHel; split; [ | assumption ].
+   rewrite <- Hr; simpl.
+   unfold Rdiv.
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   progress repeat rewrite mult_IZR.
+   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+   rewrite minus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   f_equal; f_equal.
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
 
 bbb.
 
