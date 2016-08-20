@@ -802,7 +802,6 @@ Notation "'√'" := sqrt.
 
 Arguments Nat.modulo _ _ : simpl nomatch.
 Arguments Z.mul _ _ : simpl nomatch.
-Arguments Nat.sub _ _ : simpl nomatch.
 (* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
 
 Theorem Nat_mod_add_once : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
@@ -918,81 +917,60 @@ Qed.
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
-  ↔ fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
+  → fold_left rotate el (P (IZR x) (IZR y * √2) (IZR z)) =
       P (IZR a/3^(N-n)) (IZR b*√2/3^(N-n)) (IZR c/3^(N-n))
     ∧ N = n + length el.
 Proof.
 intros el x y z n a₁ b₁ c₁ N₁.
-split.
- intros Hr.
- simpl in Hr; simpl.
- revert a₁ b₁ c₁ N₁ Hr.
- induction el as [| (t, d)] using rev_ind; intros.
-  simpl; simpl in Hr; rewrite Nat.add_0_r.
-  injection Hr; intros; subst; simpl; rewrite Nat.sub_diag, pow_O.
-  split; [ f_equal; lra | reflexivity ].
+intros Hr.
+simpl in Hr; simpl.
+revert a₁ b₁ c₁ N₁ Hr.
+induction el as [| (t, d)] using rev_ind; intros.
+ simpl; simpl in Hr; rewrite Nat.add_0_r.
+ injection Hr; intros; subst; simpl; rewrite Nat.sub_diag, pow_O.
+ split; [ f_equal; lra | reflexivity ].
 
-  rewrite fold_left_app in Hr; simpl in Hr.
-  rewrite fold_left_app; simpl.
-  remember (fold_left rotate_param el (x, y, z, n)) as rp eqn:Hrp.
-  symmetry in Hrp.
-  destruct rp as (((a, b), c), N).
-  pose proof IHel _ _ _ _ (eq_refl _) as H.
-  destruct H as (H, HN).
-  erewrite H.
-  simpl in Hr; simpl; unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite Rmult_0_l.
-  progress repeat rewrite Rplus_0_l.
-  progress repeat rewrite Rplus_0_r.
-  progress repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  destruct t, d; injection Hr; clear Hr; intros; subst; simpl.
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
-   rewrite plus_IZR, minus_IZR, <- Nat.add_succ_r.
-   progress repeat rewrite mult_IZR.
-   progress repeat rewrite minus_plus; simpl.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+ rewrite fold_left_app in Hr; simpl in Hr.
+ rewrite fold_left_app; simpl.
+ remember (fold_left rotate_param el (x, y, z, n)) as rp eqn:Hrp.
+ symmetry in Hrp.
+ destruct rp as (((a, b), c), N).
+ pose proof IHel _ _ _ _ (eq_refl _) as H.
+ destruct H as (H, HN).
+ erewrite H.
+ simpl in Hr; simpl; unfold Rdiv.
+ progress repeat rewrite Rmult_1_l.
+ progress repeat rewrite Rmult_0_l.
+ progress repeat rewrite Rplus_0_l.
+ progress repeat rewrite Rplus_0_r.
+ progress repeat rewrite <- Rmult_assoc.
+ rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+ rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+ remember (N₁ - n)%nat as N₁n eqn:HN₁n.
+ destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl.
+  split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+  subst N₁n; rewrite plus_IZR, minus_IZR, <- Nat.add_succ_r.
+  progress repeat rewrite mult_IZR.
+  progress repeat rewrite minus_plus; simpl.
+  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
-   rewrite plus_IZR, plus_IZR, <- Nat.add_succ_r.
-   progress repeat rewrite mult_IZR.
-   progress repeat rewrite minus_plus; simpl.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+  split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+  subst N₁n; rewrite plus_IZR, plus_IZR, <- Nat.add_succ_r.
+  progress repeat rewrite mult_IZR.
+  progress repeat rewrite minus_plus; simpl.
+  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
-   rewrite plus_IZR, minus_IZR, <- Nat.add_succ_r.
-   progress repeat rewrite mult_IZR.
-   progress repeat rewrite minus_plus; simpl.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+  split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+  subst N₁n; rewrite plus_IZR, minus_IZR, <- Nat.add_succ_r.
+  progress repeat rewrite mult_IZR.
+  progress repeat rewrite minus_plus; simpl.
+  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
-   rewrite plus_IZR, plus_IZR, <- Nat.add_succ_r.
-   progress repeat rewrite mult_IZR.
-   progress repeat rewrite minus_plus; simpl.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
-
- intros (Hr, HN).
- subst N₁; rewrite minus_plus in Hr.
- revert x y z n a₁ b₁ c₁ Hr.
- induction el as [| e]; intros.
-  simpl in Hr; simpl; rewrite Nat.add_0_r.
-  unfold Rdiv in Hr.
-  do 3 rewrite RMicromega.Rinv_1 in Hr.
-  injection Hr; clear Hr; intros Hz Hy Hx.
-  apply Rmult_eq_reg_r in Hy; [ | apply sqrt2_neq_0 ].
-  apply eq_IZR in Hx.
-  apply eq_IZR in Hy.
-  apply eq_IZR in Hz.
-  f_equal; f_equal; f_equal; assumption.
-
-  simpl; rewrite <- Nat.add_succ_comm.
-  simpl in Hr.
-  destruct e as (t, d).
-  destruct t, d.
-   apply IHel.
-bbb.
+  split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+  subst N₁n; rewrite plus_IZR, plus_IZR, <- Nat.add_succ_r.
+  progress repeat rewrite mult_IZR.
+  progress repeat rewrite minus_plus; simpl.
+  rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 Qed.
 
 Definition fst3 {A B C D} '((a, b, c, d) : A * B * C * D) := (a, b, c).
@@ -1450,7 +1428,8 @@ remember (fold_left rotate_param el (a, 0%Z, c, 0)) as r eqn:Hr.
 symmetry in Hr.
 destruct r as (((a', b'), c'), N).
 apply rotate_param_rotate in Hr.
-rewrite Rmult_0_l in Hr.
+rewrite Rmult_0_l, Nat.add_0_l, Nat.sub_0_r in Hr.
+destruct Hr as (Hr, HN).
 rewrite <- Hp in Hr.
 intros H; rewrite Hr in H; symmetry in H.
 simpl in H; unfold Rdiv in H.
