@@ -1515,18 +1515,19 @@ intros p el a c Hn Hp.
 remember (fold_left rotate_param el (a, 0%Z, c, 0)) as r eqn:Hr.
 symmetry in Hr.
 destruct r as (((a', b'), c'), N).
+generalize Hr; intros Ht.
+apply rotate_param_rotate in Ht.
+unfold Rdiv in Ht.
+rewrite Nat.add_0_l, pow_O, Rinv_1 in Ht.
+progress repeat rewrite Rmult_0_l in Ht.
+progress repeat rewrite Rmult_1_r in Ht.
+destruct Ht as (Ht, HN).
+rewrite <- Hp in Ht.
+intros H; rewrite Ht in H; symmetry in H.
+assert (Hb' : b' ≠ 0%Z).
+ intros Hb'; subst b'.
 bbb.
 
-apply rotate_param_rotate in Hr.
-unfold Rdiv in Hr.
-rewrite Nat.add_0_l, pow_O, Rinv_1 in Hr.
-progress repeat rewrite Rmult_0_l in Hr.
-progress repeat rewrite Rmult_1_r in Hr.
-destruct Hr as (Hr, HN).
-rewrite <- Hp in Hr.
-intros H; rewrite Hr in H; symmetry in H.
-simpl in H; unfold Rdiv in H.
-assert (Hb' : b' ≠ 0%Z).
 Focus 2.
  rewrite Hp in H.
  injection H; clear H; intros Hc Hb Ha.
