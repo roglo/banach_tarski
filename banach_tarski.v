@@ -1511,9 +1511,10 @@ Qed.
 Theorem tata : ∀ p el a c,
   norm_list el ≠ []
   → p = P (IZR a) 0 (IZR c)
+  → (a ^ 2 + c ^ 2 = 1)%Z
   → fold_left rotate el p ≠ p.
 Proof.
-intros p el a c Hn Hp.
+intros p el a c Hn Hp Hac.
 remember (fold_left rotate_param el (a, 0%Z, c, 0)) as r eqn:Hr.
 symmetry in Hr.
 destruct r as (((a', b'), c'), N).
