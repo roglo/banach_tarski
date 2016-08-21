@@ -1528,7 +1528,22 @@ rewrite <- Hp in Ht.
 intros H; rewrite Ht in H; symmetry in H.
 assert (Hb' : b' ≠ 0%Z).
  intros Hb'; subst b'.
-SearchAbout rotate_param.
+induction el as [| e₁] using rev_ind; [ apply Hn; reflexivity | clear IHel ].
+simpl in Hr.
+destruct e₁ as (t₁, d₁); destruct t₁, d₁.
+ remember (fold_left rotate_param el (a, 0%Z, c, 0)) as abcn eqn:Habcn.
+ symmetry in Habcn.
+ destruct abcn as (((a₁, b₁), c₁), N₁).
+Check rotate_param_app_a1n.
+ apply rotate_param_app_a1n with (n := 0) in Habcn.
+ simpl in Habcn.
+ rewrite Hr in Habcn.
+ simpl in Habcn.
+ destruct Habcn as (Ha, (Hb, Hc)).
+ rewrite <- Hb in Hc.
+ rewrite Z.mod_0_l in Ha; [ | intros H1; discriminate H1 ].
+ rewrite Z.mod_0_l in Hc; [ | intros H1; discriminate H1 ].
+
 bbb.
 
 Focus 2.
