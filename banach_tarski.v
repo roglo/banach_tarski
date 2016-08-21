@@ -1544,6 +1544,8 @@ Check rotate_param_app_a1n.
  rewrite <- Hb in Hc.
  rewrite Z.mod_0_l in Ha; [ | intros H1; discriminate H1 ].
  rewrite Z.mod_0_l in Hc; [ | intros H1; discriminate H1 ].
+bbb.
+
  apply Znumtheory.Zmod_divide in Ha; [ | intros H; discriminate H ].
  apply Znumtheory.Zmod_divide in Hc; [ | intros H; discriminate H ].
  destruct Ha as (ka, Ha); subst a'.
@@ -1551,7 +1553,11 @@ Check rotate_param_app_a1n.
  simpl in Hp'; do 2 rewrite Rmult_0_l in Hp'.
  rewrite Hp in Hp'.
  injection Hp'; clear Hp'; intros Ha Hc.
- SearchAbout (IZR _ = _ → _).
+
+ apply IZR_eq in Hac.
+ rewrite plus_IZR, Z.pow_2_r, Z.pow_2_r in Hac.
+ do 2 rewrite mult_IZR in Hac.
+ rewrite Ha, Hc in Hac.
 
 bbb.
 
