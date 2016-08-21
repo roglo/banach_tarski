@@ -1526,7 +1526,7 @@ progress repeat rewrite Rmult_0_l in Ht.
 progress repeat rewrite Rmult_1_r in Ht.
 destruct Ht as (Ht, HN).
 rewrite <- Hp in Ht.
-intros H; rewrite Ht in H; symmetry in H.
+intros Hp'; rewrite Ht in Hp'; symmetry in Hp'.
 assert (Hb' : b' ≠ 0%Z).
  intros Hb'; subst b'.
 induction el as [| e₁] using rev_ind; [ apply Hn; reflexivity | clear IHel ].
@@ -1544,6 +1544,14 @@ Check rotate_param_app_a1n.
  rewrite <- Hb in Hc.
  rewrite Z.mod_0_l in Ha; [ | intros H1; discriminate H1 ].
  rewrite Z.mod_0_l in Hc; [ | intros H1; discriminate H1 ].
+ apply Znumtheory.Zmod_divide in Ha; [ | intros H; discriminate H ].
+ apply Znumtheory.Zmod_divide in Hc; [ | intros H; discriminate H ].
+ destruct Ha as (ka, Ha); subst a'.
+ destruct Hc as (kc, Hc); subst c'.
+ simpl in Hp'; do 2 rewrite Rmult_0_l in Hp'.
+ rewrite Hp in Hp'.
+ injection Hp'; clear Hp'; intros Ha Hc.
+ SearchAbout (IZR _ = _ → _).
 
 bbb.
 
