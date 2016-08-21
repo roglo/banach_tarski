@@ -1,5 +1,7 @@
 (* Banach-Tarski paradox. *)
-(* translated in coq from wikipedia pen-and-paper proof *)
+(* Inspirations:
+   - Wikipedia: Banach–Tarski paradox
+   - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
 
 Require Import Utf8.
 Require Import List.
@@ -1526,6 +1528,7 @@ rewrite <- Hp in Ht.
 intros H; rewrite Ht in H; symmetry in H.
 assert (Hb' : b' ≠ 0%Z).
  intros Hb'; subst b'.
+SearchAbout rotate_param.
 bbb.
 
 Focus 2.
