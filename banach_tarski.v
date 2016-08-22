@@ -1469,7 +1469,7 @@ Add Parametric Relation : _ eq_mod_3
  transitivity proved by eq_mod_3_trans
  as eq_mod_3_equivalence.
 
-Theorem toto : ∀ n abc,
+Theorem rotate_1_0_0_ending_repeat_b : ∀ n abc,
   fst3 (fold_left rotate_param (repeat ḅ (S n)) (1, 0, 0, O)%Z) ≡₃ abc
   → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
 Proof.
@@ -1482,6 +1482,21 @@ destruct (zerop (n mod 2)) as [H| H].
  left; split; [ reflexivity | split; reflexivity ].
  right; split; [ reflexivity | split; reflexivity ].
 Qed.
+
+Theorem rotate_1_0_0_ending_repeat_a_and_b : ∀ el n₁ n₂ abc,
+  el = repeat ạ (S n₂) ++ repeat ḅ (S n₁)
+  → fst3 (fold_left rotate_param el (1, 0, 0, O)%Z) ≡₃ abc
+  → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
+Proof.
+intros el n₁ n₂ abc Hel Hr; subst el.
+remember (1, 0, 0, O)%Z as p eqn:Hp.
+remember (fold_left rotate_param (repeat ạ (S n₂)) p) as abc₁ eqn:Habc₁.
+symmetry in Habc₁.
+destruct abc₁ as (((a₁, b₁), c₁), N₁).
+pose proof rotate_param_app_bn (repeat ạ (S n₂)) n₁ p _ _ _ _ Habc₁ as H.
+destruct (zerop (n₁ mod 2)) as [H₁| H₁].
+Check rotate_param_app_an.
+bbb.
 
 Theorem titi : ∀ n a b c,
   fst3 (fold_left rotate_param (repeat ḅ (S n)) (1, 0, 0, O)%Z) ≡₃ (a, b, c)
@@ -1543,6 +1558,7 @@ destruct e₁ as (t₁, d₁); destruct t₁, d₁.
  rewrite <- Hb in Hc.
  rewrite Z.mod_0_l in Ha; [ | intros H1; discriminate H1 ].
  rewrite Z.mod_0_l in Hc; [ | intros H1; discriminate H1 ].
+Check toto.
 bbb.
 
  apply Znumtheory.Zmod_divide in Ha; [ | intros H; discriminate H ].
