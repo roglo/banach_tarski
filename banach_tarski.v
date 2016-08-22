@@ -1493,9 +1493,28 @@ rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
 f_equal; lra.
 Qed.
 
-bbb.
+Theorem rotate_1_0_0_bbb :
+  fold_left rotate [ḅ; ḅ; ḅ] (P 1 0 0) = P (-23/27) (10*√2/27) 0.
+Proof.
+simpl.
+unfold Rdiv.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_1_r.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rmult_plus_distr_l.
+progress repeat rewrite <- Rmult_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+f_equal; [ | lra ].
+ring_simplify; simpl.
+progress repeat rewrite Rmult_1_r.
+rewrite sqrt_sqrt; lra.
+Qed.
 
-Compute fold_left rotate_param [ḅ; ḅ] (1, 0, 0, O)%Z.
+Compute fold_left rotate_param [ḅ; ḅ; ḅ] (1, 0, 0, O)%Z.
 bbb.
 
 Theorem rotate_1_0_0_ending_repeat_b : ∀ n abc,
