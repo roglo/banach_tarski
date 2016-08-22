@@ -1486,7 +1486,7 @@ Qed.
 Theorem rotate_1_0_0_ending_repeat_a_and_b : ∀ el n₁ n₂ abc,
   el = repeat ạ (S n₂) ++ repeat ḅ (S n₁)
   → fst3 (fold_left rotate_param el (1, 0, 0, O)%Z) ≡₃ abc
-  → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
+  → abc ≡₃ (0, 0, 0)%Z ∨ abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
 Proof.
 intros el n₁ n₂ abc Hel Hr; subst el.
 remember (1, 0, 0, O)%Z as p eqn:Hp.
@@ -1505,7 +1505,6 @@ destruct (zerop (n₁ mod 2)) as [H₁| H₁].
  destruct (zerop (n₂ mod 2)) as [H₂| H₂].
   destruct Ha as (Ha₁, (Hb₁, Hc₁)).
   rewrite Z.mod_0_l in Ha₁; [ | intros H; discriminate H ].
-  (* conclusion du théorème à voir *)
 bbb.
 
 Theorem titi : ∀ n a b c,
