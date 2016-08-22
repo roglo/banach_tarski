@@ -1493,9 +1493,19 @@ remember (1, 0, 0, O)%Z as p eqn:Hp.
 remember (fold_left rotate_param (repeat ạ (S n₂)) p) as abc₁ eqn:Habc₁.
 symmetry in Habc₁.
 destruct abc₁ as (((a₁, b₁), c₁), N₁).
-pose proof rotate_param_app_bn (repeat ạ (S n₂)) n₁ p _ _ _ _ Habc₁ as H.
+pose proof rotate_param_app_bn (repeat ạ (S n₂)) n₁ p _ _ _ _ Habc₁ as Hb.
+rewrite Nat.add_1_r, Hr in Hb; rewrite Hb.
+remember (fold_left rotate_param [] p) as abc₂ eqn:Habc₂.
+symmetry in Habc₂.
+destruct abc₂ as (((a₂, b₂), c₂), N₂).
+pose proof rotate_param_app_an [] n₂ p _ _ _ _ Habc₂ as Ha.
+rewrite app_nil_l, Nat.add_1_r  in Ha.
+rewrite Habc₁ in Ha; simpl in Ha.
 destruct (zerop (n₁ mod 2)) as [H₁| H₁].
-Check rotate_param_app_an.
+ destruct (zerop (n₂ mod 2)) as [H₂| H₂].
+  destruct Ha as (Ha₁, (Hb₁, Hc₁)).
+  rewrite Z.mod_0_l in Ha₁; [ | intros H; discriminate H ].
+  (* conclusion du théorème à voir *)
 bbb.
 
 Theorem titi : ∀ n a b c,
