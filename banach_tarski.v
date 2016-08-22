@@ -1512,14 +1512,15 @@ destruct (zerop (n₁ mod 2)) as [H₁| H₁].
   rewrite Zdiv.Zplus_mod, Ha₁, Z.add_0_l, Hb₁.
   split; [ reflexivity | split; reflexivity ].
 
-bbb.
-
-  rewrite Z.mod_0_l in Ha₁; [ | intros H; discriminate H ].
+  rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
+  destruct Ha as (Ha₁, (Hb₁, Hc₁)).
+  left.
   unfold "≡₃".
-  replace (0 mod 3)%Z with 0%Z by reflexivity.
-  replace (1 mod 3)%Z with 1%Z by reflexivity.
-  replace (2 mod 3)%Z with 2%Z by reflexivity.
-  rewrite Zdiv.Zplus_mod, Ha₁, Z.add_0_l.
+  rewrite Zdiv.Zplus_mod, Ha₁, Z.add_0_l, Hb₁.
+  split; [ reflexivity | split; reflexivity ].
+
+ destruct (zerop (n₂ mod 2)) as [H₂| H₂].
+  rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
 bbb.
 
 Theorem titi : ∀ n a b c,
