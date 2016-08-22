@@ -1469,6 +1469,20 @@ Add Parametric Relation : _ eq_mod_3
  transitivity proved by eq_mod_3_trans
  as eq_mod_3_equivalence.
 
+Theorem rotate_1_0_0_b : rotate (P 1 0 0) ḅ = P (1/3) (-2*√2/3) 0.
+Proof.
+simpl.
+progress repeat rewrite Rmult_1_r.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rplus_0_r.
+reflexivity.
+Qed.
+
+Check rotate_param.
+Compute rotate_param (1, 0, 0, O)%Z ḅ.
+
+bbb.
+
 Theorem rotate_1_0_0_ending_repeat_b : ∀ n abc,
   fst3 (fold_left rotate_param (repeat ḅ (S n)) (1, 0, 0, O)%Z) ≡₃ abc
   → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
