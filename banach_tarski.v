@@ -1514,7 +1514,7 @@ progress repeat rewrite Rmult_1_r.
 rewrite sqrt_sqrt; lra.
 Qed.
 
-Compute fold_left rotate_param [ḅ; ḅ; ḅ] (1, 0, 0, O)%Z.
+Compute fold_left rotate_param [ạ; ḅ; ḅ; ḅ] (1, 0, 0, O)%Z.
 bbb.
 
 Theorem rotate_1_0_0_ending_repeat_b : ∀ n abc,
