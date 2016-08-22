@@ -1499,12 +1499,27 @@ remember (fold_left rotate_param [] p) as abc₂ eqn:Habc₂.
 symmetry in Habc₂.
 destruct abc₂ as (((a₂, b₂), c₂), N₂).
 pose proof rotate_param_app_an [] n₂ p _ _ _ _ Habc₂ as Ha.
+simpl in Habc₂; rewrite Hp in Habc₂.
+injection Habc₂; clear Habc₂; intros; subst a₂ b₂ c₂ N₂.
 rewrite app_nil_l, Nat.add_1_r  in Ha.
 rewrite Habc₁ in Ha; simpl in Ha.
 destruct (zerop (n₁ mod 2)) as [H₁| H₁].
  destruct (zerop (n₂ mod 2)) as [H₂| H₂].
+  rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
   destruct Ha as (Ha₁, (Hb₁, Hc₁)).
+  left.
+  unfold "≡₃".
+  rewrite Zdiv.Zplus_mod, Ha₁, Z.add_0_l, Hb₁.
+  split; [ reflexivity | split; reflexivity ].
+
+bbb.
+
   rewrite Z.mod_0_l in Ha₁; [ | intros H; discriminate H ].
+  unfold "≡₃".
+  replace (0 mod 3)%Z with 0%Z by reflexivity.
+  replace (1 mod 3)%Z with 1%Z by reflexivity.
+  replace (2 mod 3)%Z with 2%Z by reflexivity.
+  rewrite Zdiv.Zplus_mod, Ha₁, Z.add_0_l.
 bbb.
 
 Theorem titi : ∀ n a b c,
