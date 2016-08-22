@@ -1535,7 +1535,6 @@ destruct e₁ as (t₁, d₁); destruct t₁, d₁.
  remember (fold_left rotate_param el (a, 0%Z, c, 0)) as abcn eqn:Habcn.
  symmetry in Habcn.
  destruct abcn as (((a₁, b₁), c₁), N₁).
-Check rotate_param_app_a1n.
  apply rotate_param_app_a1n with (n := 0) in Habcn.
  simpl in Habcn.
  rewrite Hr in Habcn.
