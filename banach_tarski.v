@@ -1222,6 +1222,30 @@ rewrite <- Z.mod_add with (b := (a + b)%Z); [ | intros; discriminate ].
 f_equal; ring_simplify; reflexivity.
 Qed.
 
+Theorem toto : ∀ el a b c N,
+  fold_left rotate_param (ḅ :: el) (1, 0, 0, O)%Z = (a, b, c, N)
+  → b ≠ 0%Z.
+Proof.
+intros el a b c N Hr.
+simpl in Hr.
+Theorem titi : ∀ el a b c N a' b' c' N',
+  fold_left rotate_param el (a, b, c, N) = (a', b', c', N')
+  → b ≠ 0%Z
+  → b' ≠ 0%Z.
+Proof.
+intros el a b c N a' b' c' N' Hr Hb.
+revert a b c N a' b' c' N' Hr Hb.
+induction el as [| e]; intros; [ injection Hr; intros; subst; assumption | ].
+simpl in Hr.
+destruct e as (t, d); destruct t, d.
+ apply IHel in Hr; [ assumption | ].
+
+bbb.
+eapply titi; [ eassumption | intros H; discriminate H ].
+Qed.
+
+bbb.
+
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n e p,
   0 < n
   → fold_left rotate_param_mod_3 (repeat e n) p =
