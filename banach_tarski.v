@@ -1222,8 +1222,6 @@ rewrite <- Z.mod_add with (b := (a + b)%Z); [ | intros; discriminate ].
 f_equal; ring_simplify; reflexivity.
 Qed.
 
-bbb.
-
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n e p,
   0 < n
   → fold_left rotate_param_mod_3 (repeat e n) p =
@@ -1240,16 +1238,18 @@ destruct n.
  destruct p as ((a, b), c); simpl.
  destruct e as (t, d).
  destruct t, d; simpl.
-  f_equal; [ f_equal; apply Z_mod_expr_1 | apply Z_mod_expr_1 ].
-
   f_equal; [ f_equal; apply Z_mod_expr_2 | apply Z_mod_expr_2 ].
 
-  f_equal; f_equal; apply Z_mod_expr_2.
+  f_equal; [ f_equal; apply Z_mod_expr_1 | apply Z_mod_expr_1 ].
 
   f_equal; f_equal; apply Z_mod_expr_1.
 
+  f_equal; f_equal; apply Z_mod_expr_2.
+
  apply IHn; [ apply Nat.lt_0_succ | subst p'; reflexivity ].
 Qed.
+
+bbb.
 
 Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
