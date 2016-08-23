@@ -858,9 +858,9 @@ Record matrix := mkmat
     a₃₁ : ℝ; a₃₂ : ℝ; a₃₃ : ℝ }.
 
 Definition mat_vec_mul mat '(P x y z) :=
-  P (a₁₁ mat * x + a₂₁ mat * y + a₃₁ mat * z)
-    (a₁₂ mat * x + a₂₂ mat * y + a₃₂ mat * z)
-    (a₁₃ mat * x + a₂₃ mat * y + a₃₃ mat * z).
+  P (a₁₁ mat * x + a₁₂ mat * y + a₁₃ mat * z)
+    (a₂₁ mat * x + a₂₂ mat * y + a₂₃ mat * z)
+    (a₃₁ mat * x + a₃₂ mat * y + a₃₃ mat * z).
 
 Definition rot_x := mkmat
   1         0         0
@@ -889,10 +889,10 @@ Definition rotate pt e :=
 
 Definition rotate_param '(a, b, c, N) e :=
   match e with
-  | ạ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
-  | ạ⁻¹ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
-  | ḅ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
-  | ḅ⁻¹ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
+  | ạ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
+  | ạ⁻¹ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
+  | ḅ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
+  | ḅ⁻¹ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
   end.
 
 Theorem rotate_param_keep_dist : ∀ el x y z a b c n N,
@@ -916,6 +916,13 @@ induction el as [ | (t, d)]; intros.
    apply Z.mul_reg_r with (p := 9%Z); [ intros H; discriminate H | ];
    rewrite Hr; ring_simplify; reflexivity).
 Qed.
+
+Compute (fold_left rotate_param [ḅ; ạ] (1, 0, 0, O)%Z).
+Compute (fold_left rotate_param [ḅ; ạ⁻¹] (1, 0, 0, O)%Z).
+Compute (fold_left rotate_param [ḅ⁻¹; ạ] (1, 0, 0, O)%Z).
+Compute (fold_left rotate_param [ḅ⁻¹; ạ⁻¹] (1, 0, 0, O)%Z).
+
+bbb.
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
@@ -951,11 +958,6 @@ split.
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl.
    split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
-   rewrite plus_IZR, minus_IZR.
-   progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
-
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
@@ -967,6 +969,11 @@ split.
 
    split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
    rewrite plus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+
+   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
@@ -1004,23 +1011,6 @@ split.
    progress repeat rewrite <- Rmult_assoc.
    progress repeat rewrite mult_IZR.
    rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-   rewrite minus_IZR, plus_IZR.
-   progress repeat rewrite mult_IZR.
-   f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-
-   apply IHel; split; [ | assumption ].
-   rewrite <- Hr; simpl.
-   unfold Rdiv.
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   progress repeat rewrite mult_IZR.
-   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    f_equal; f_equal.
@@ -1056,6 +1046,23 @@ split.
    progress repeat rewrite mult_IZR.
    rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
    rewrite plus_IZR, plus_IZR.
+   progress repeat rewrite mult_IZR.
+   f_equal; f_equal.
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+
+   apply IHel; split; [ | assumption ].
+   rewrite <- Hr; simpl.
+   unfold Rdiv.
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   progress repeat rewrite mult_IZR.
+   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+   rewrite minus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    f_equal; f_equal.
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
@@ -1079,6 +1086,8 @@ Definition rotate_param_mod_3 '(a, b, c) e :=
  | ḅ⁻¹ => (((a - b) mod 3)%Z, ((b - a) mod 3)%Z, 0%Z)
  | ḅ => (((a + b) mod 3)%Z, ((a + b) mod 3)%Z, 0%Z)
  end.
+
+bbb.
 
 Theorem rotate_params_mod : ∀ el a b c N a₁ b₁ c₁,
   fst3 (fold_left rotate_param el (a₁, b₁, c₁, N)) = (a, b, c)
@@ -1516,6 +1525,7 @@ Qed.
 
 Compute fold_left rotate_param [ạ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ḅ; ạ] (1, 0, 0, O)%Z.
+Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 
 Theorem rotate_0_1_0_ending_repeat_b : ∀ n abc,
