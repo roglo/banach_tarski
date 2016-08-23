@@ -1517,29 +1517,26 @@ Qed.
 Compute fold_left rotate_param [ạ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ḅ; ạ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ạ; ạ; ḅ] (1, 0, 0, O)%Z.
-bbb.
 
-Theorem rotate_1_0_0_ending_repeat_b : ∀ n abc,
-  fst3 (fold_left rotate_param (repeat ḅ (S n)) (1, 0, 0, O)%Z) ≡₃ abc
+Theorem rotate_0_1_0_ending_repeat_b : ∀ n abc,
+  fst3 (fold_left rotate_param (repeat ḅ (S n)) (0, 1, 0, O)%Z) ≡₃ abc
   → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
 Proof.
 intros n ((a, b), c) H.
 rewrite <- H; clear H.
-pose proof rotate_param_app [] ḅ n (1, 0, 0, O)%Z _ _ _ _ (eq_refl _) as H.
-rewrite app_nil_l, Nat.add_1_r in H; rewrite H.
-rewrite Z.add_0_r, Z.sub_0_r; clear H.
-destruct (zerop (n mod 2)) as [H| H].
- left; split; [ reflexivity | split; reflexivity ].
- right; split; [ reflexivity | split; reflexivity ].
+pose proof rotate_param_app [] ḅ n (0, 1, 0, O)%Z _ _ _ _ (eq_refl _) as H.
+rewrite app_nil_l, Nat.add_1_r in H; rewrite H; simpl; clear H.
+destruct (zerop (n mod 2)) as [H| H]; [ left; reflexivity | ].
+right; simpl; split; [ reflexivity | split; reflexivity ].
 Qed.
 
-Theorem rotate_1_0_0_ending_repeat_a_and_b : ∀ el n₁ n₂ abc,
+Theorem rotate_0_1_0_ending_repeat_a_and_b : ∀ el n₁ n₂ abc,
   el = repeat ạ (S n₂) ++ repeat ḅ (S n₁)
-  → fst3 (fold_left rotate_param el (1, 0, 0, O)%Z) ≡₃ abc
-  → abc ≡₃ (0, 0, 0)%Z ∨ abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
+  → fst3 (fold_left rotate_param el (0, 1, 0, O)%Z) ≡₃ abc
+  → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
 Proof.
 intros el n₁ n₂ abc Hel Hr; subst el.
-remember (1, 0, 0, O)%Z as p eqn:Hp.
+remember (0, 1, 0, O)%Z as p eqn:Hp.
 remember (fold_left rotate_param (repeat ạ (S n₂)) p) as abc₁ eqn:Habc₁.
 symmetry in Habc₁.
 destruct abc₁ as (((a₁, b₁), c₁), N₁).
@@ -1564,13 +1561,31 @@ destruct (zerop (n₁ mod 2)) as [H₁| H₁].
 
   rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
   destruct Ha as (Ha₁, (Hb₁, Hc₁)).
-  left.
+  right.
   unfold "≡₃".
   rewrite Zdiv.Zplus_mod, Ha₁, Z.add_0_l, Hb₁.
   split; [ reflexivity | split; reflexivity ].
 
  destruct (zerop (n₂ mod 2)) as [H₂| H₂].
   rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
+  destruct Ha as (Ha₁, (Hb₁, Hc₁)).
+  right.
+  unfold "≡₃".
+  rewrite Zdiv.Zminus_mod.
+  rewrite Zdiv.Z_mod_zero_opp_full; [ | assumption ].
+  rewrite Hb₁; simpl.
+  split; [ reflexivity | split; reflexivity ].
+
+  rewrite Z.mod_0_l in Ha; [ | intros H; discriminate H ].
+  destruct Ha as (Ha₁, (Hb₁, Hc₁)).
+  left.
+  unfold "≡₃".
+  rewrite Zdiv.Zminus_mod.
+  rewrite Zdiv.Z_mod_zero_opp_full; [ | assumption ].
+  rewrite Hb₁; simpl.
+  split; [ reflexivity | split; reflexivity ].
+Qed.
+
 bbb.
 
 Theorem titi : ∀ n a b c,
