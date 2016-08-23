@@ -922,8 +922,6 @@ Compute (fold_left rotate_param [ḅ; ạ⁻¹] (1, 0, 0, O)%Z).
 Compute (fold_left rotate_param [ḅ⁻¹; ạ] (1, 0, 0, O)%Z).
 Compute (fold_left rotate_param [ḅ⁻¹; ạ⁻¹] (1, 0, 0, O)%Z).
 
-bbb.
-
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
   ↔ fold_left rotate el (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) =
@@ -1081,13 +1079,11 @@ Notation "x ≡₃ y" := (eq_mod_3 x y) (at level 70).
 
 Definition rotate_param_mod_3 '(a, b, c) e :=
  match e with
- | ạ⁻¹ => (0%Z, ((b + c) mod 3)%Z, ((b + c) mod 3)%Z)
- | ạ => (0%Z, ((b - c) mod 3)%Z, ((c - b) mod 3)%Z)
- | ḅ⁻¹ => (((a - b) mod 3)%Z, ((b - a) mod 3)%Z, 0%Z)
- | ḅ => (((a + b) mod 3)%Z, ((a + b) mod 3)%Z, 0%Z)
+ | ạ⁻¹ => (0%Z, ((b - c) mod 3)%Z, ((c - b) mod 3)%Z)
+ | ạ => (0%Z, ((b + c) mod 3)%Z, ((b + c) mod 3)%Z)
+ | ḅ⁻¹ => (((a + b) mod 3)%Z, ((a + b) mod 3)%Z, 0%Z)
+ | ḅ => (((a - b) mod 3)%Z, ((b - a) mod 3)%Z, 0%Z)
  end.
-
-bbb.
 
 Theorem rotate_params_mod : ∀ el a b c N a₁ b₁ c₁,
   fst3 (fold_left rotate_param el (a₁, b₁, c₁, N)) = (a, b, c)
@@ -1100,18 +1096,7 @@ induction el as [| e]; intros; [ injection Hp; intros; subst; reflexivity | ].
 simpl in Hp; simpl.
 destruct e as (t, d).
 destruct t, d.
- erewrite <- IHel; [ | eassumption ].
- f_equal; f_equal; [ f_equal | ].
-  rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
-
-  rewrite <- Z.add_mod; [ | intros; discriminate ].
-  rewrite <- Z.mod_add with (b := (-c₁)%Z); [ | intros; discriminate ].
-  f_equal; ring_simplify; reflexivity.
-
-  rewrite <- Z.add_mod; [ | intros; discriminate ].
-  rewrite <- Z.mod_add with (b := b₁); [ | intros; discriminate ].
-  f_equal; ring_simplify; reflexivity.
-
+Focus 1.
  erewrite <- IHel; [ | eassumption ].
  f_equal; f_equal; [ f_equal | ].
   rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
@@ -1122,29 +1107,48 @@ destruct t, d.
 
   rewrite <- Zdiv.Zminus_mod.
   rewrite <- Z.mod_add with (b := (-b₁)%Z); [ | intros; discriminate ].
-  f_equal; ring_simplify; reflexivity.
+  f_equal; ring_simplify.
+  reflexivity.
 
  erewrite <- IHel; [ | eassumption ].
  f_equal; f_equal; [ f_equal | ].
-  rewrite <- Zdiv.Zminus_mod.
-  rewrite <- Z.mod_add with (b := (- b₁)%Z); [ | intros; discriminate ].
-  f_equal; ring_simplify; reflexivity.
-
-  rewrite <- Zdiv.Zminus_mod.
-  rewrite <- Z.mod_add with (b := a₁); [ | intros; discriminate ].
-  f_equal; ring_simplify; reflexivity.
-
   rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
+
+  rewrite <- Z.add_mod; [ | intros; discriminate ].
+  rewrite <- Z.mod_add with (b := (-c₁)%Z); [ | intros; discriminate ].
+  f_equal; ring_simplify.
+  reflexivity.
+
+  rewrite <- Z.add_mod; [ | intros; discriminate ].
+  rewrite <- Z.mod_add with (b := b₁); [ | intros; discriminate ].
+  f_equal; ring_simplify.
+  reflexivity.
 
  erewrite <- IHel; [ | eassumption ].
  f_equal; f_equal; [ f_equal | ].
   rewrite <- Z.add_mod; [ | intros; discriminate ].
   rewrite <- Z.mod_add with (b := b₁); [ | intros; discriminate ].
-  f_equal; ring_simplify; reflexivity.
+  f_equal; ring_simplify.
+  reflexivity.
 
   rewrite <- Z.add_mod; [ | intros; discriminate ].
-  rewrite <- Z.mod_add with (b := (- a₁)%Z); [ | intros; discriminate ].
-  f_equal; ring_simplify; reflexivity.
+  rewrite <- Z.mod_add with (b := (-a₁)%Z); [ | intros; discriminate ].
+  f_equal; ring_simplify.
+  reflexivity.
+
+  rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
+
+ erewrite <- IHel; [ | eassumption ].
+ f_equal; f_equal; [ f_equal | ].
+  rewrite <- Zdiv.Zminus_mod.
+  rewrite <- Z.mod_add with (b := (-b₁)%Z); [ | intros; discriminate ].
+  f_equal; ring_simplify.
+  reflexivity.
+
+  rewrite <- Zdiv.Zminus_mod.
+  rewrite <- Z.mod_add with (b := a₁); [ | intros; discriminate ].
+  f_equal; ring_simplify.
+  reflexivity.
 
   rewrite Z.mul_comm, Z.mod_mul; [ reflexivity | intros; discriminate ].
 Qed.
@@ -1217,6 +1221,8 @@ rewrite Z.add_mod_idemp_r; [ | intros; discriminate ].
 rewrite <- Z.mod_add with (b := (a + b)%Z); [ | intros; discriminate ].
 f_equal; ring_simplify; reflexivity.
 Qed.
+
+bbb.
 
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n e p,
   0 < n
