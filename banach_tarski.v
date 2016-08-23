@@ -1249,13 +1249,11 @@ destruct n.
  apply IHn; [ apply Nat.lt_0_succ | subst p'; reflexivity ].
 Qed.
 
-bbb.
-
 Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ List.repeat ạ (n + 1)) p) ≡₃
-      if zerop (n mod 2) then (0%Z, (b - c)%Z, (c -  b)%Z)
-      else (0%Z, (c - b)%Z, (b - c)%Z).
+      if zerop (n mod 2) then (0%Z, (b + c)%Z, (b + c)%Z)
+      else (0%Z, (2 * b + 2 * c)%Z, (2 * b + 2 * c)%Z).
 Proof.
 intros el n p a b c N Hrp.
 unfold "≡₃".
@@ -1271,13 +1269,34 @@ destruct n.
  simpl in Hrp₁; simpl.
  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
  rewrite <- Ha, <- Hb, <- Hc.
- split; [ reflexivity | split; symmetry; apply Zdiv.Zminus_mod ].
+ split; [ reflexivity | ].
+ split; symmetry; apply Z.add_mod; intros H; discriminate H.
 
  destruct n.
   simpl in Hrp₁; simpl.
   injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
   rewrite <- Ha, <- Hb, <- Hc.
-  split; [ reflexivity | split; symmetry; apply Z_mod_expr_3 ].
+  split; [ reflexivity | ].
+  split.
+   symmetry.
+   rewrite Z.add_mod; [ | intros H; discriminate H ].
+   rewrite Z.mul_mod; [ | intros H; discriminate H ].
+   rewrite Z.add_comm.
+   rewrite Z.mul_mod; [ | intros H; discriminate H ].
+   progress repeat replace (2 mod 3)%Z with 2%Z by reflexivity.
+   rewrite <- Z.add_mod; [ | intros H; discriminate H ].
+   rewrite <- Z.add_mod; [ | intros H; discriminate H ].
+   f_equal; ring.
+
+   symmetry.
+   rewrite Z.add_mod; [ | intros H; discriminate H ].
+   rewrite Z.mul_mod; [ | intros H; discriminate H ].
+   rewrite Z.add_comm.
+   rewrite Z.mul_mod; [ | intros H; discriminate H ].
+   progress repeat replace (2 mod 3)%Z with 2%Z by reflexivity.
+   rewrite <- Z.add_mod; [ | intros H; discriminate H ].
+   rewrite <- Z.add_mod; [ | intros H; discriminate H ].
+   f_equal; ring.
 
   rewrite Nat.add_1_r in Hrp₁.
   rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
@@ -1310,6 +1329,7 @@ destruct n.
  simpl in Hrp₁; simpl.
  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
  rewrite <- Ha, <- Hb, <- Hc.
+bbb.
  split; [ symmetry; apply Z.add_mod; intros; discriminate | ].
  split; [ symmetry; apply Z.add_mod; intros; discriminate | ].
  reflexivity.
@@ -1534,8 +1554,8 @@ Compute fold_left rotate_param [ḅ; ạ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 
-Theorem rotate_0_1_0_ending_repeat_b : ∀ n abc,
-  fst3 (fold_left rotate_param (repeat ḅ (S n)) (0, 1, 0, O)%Z) ≡₃ abc
+Theorem rotate_1_0_0_ending_repeat_b : ∀ n abc,
+  fst3 (fold_left rotate_param (repeat ḅ (S n)) (1, 0, 0, O)%Z) ≡₃ abc
   → abc ≡₃ (1, 1, 0)%Z ∨ abc ≡₃ (2, 2, 0)%Z.
 Proof.
 intros n ((a, b), c) H.
