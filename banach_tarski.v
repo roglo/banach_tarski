@@ -1239,6 +1239,13 @@ induction el as [| e]; intros; [ injection Hr; intros; subst; assumption | ].
 simpl in Hr.
 destruct e as (t, d); destruct t, d.
  apply IHel in Hr; [ assumption | ].
+Focus 2.
+ apply IHel in Hr; [ assumption | ].
+Unfocus. Focus 3.
+ apply IHel in Hr; [ assumption | ].
+Unfocus. Focus 4.
+ apply IHel in Hr; [ assumption | ].
+Unfocus.
 
 bbb.
 eapply titi; [ eassumption | intros H; discriminate H ].
