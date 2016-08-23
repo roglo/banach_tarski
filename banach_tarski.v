@@ -1516,6 +1516,7 @@ Qed.
 
 Compute fold_left rotate_param [ạ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ḅ; ạ] (1, 0, 0, O)%Z.
+Compute fold_left rotate_param [ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 bbb.
 
 Theorem rotate_1_0_0_ending_repeat_b : ∀ n abc,
