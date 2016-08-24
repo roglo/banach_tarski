@@ -1563,14 +1563,37 @@ Fixpoint combine el :=
 
 Compute combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
 
-Definition rotate_combined np pt :=
-  ....
+Fixpoint rotate_step pt e n :=
+  match n with
+  | O => pt
+  | S n' => rotate (rotate_step pt e n') e
+  end.
 
-Theorem rotate_rotate_combined : ∀ pt el,
-  fold_left rotate_combined (combine el) pt =
-  fold_left rotate el pt.
+Fixpoint rotate_combined_loop first path pt :=
+  match path with
+  | (d, n) :: pa =>
+      let pt := rotate_step pt (E first d) n in
+      rotate_combined_loop (other_elem first) pa pt
+  | [] => pt
+  end.
+
+Definition rotate_combined nc := rotate_combined_loop (first nc) (path nc).
+
+Theorem rotate_combined_rotate : ∀ pt el,
+  rotate_combined (combine el) pt = fold_left rotate el pt.
 Proof.
 intros.
+revert pt.
+induction el as [| e]; intros; subst; [ reflexivity | ].
+simpl; rewrite <- IHel.
+destruct e as (t, d); destruct t, d.
+ destruct (letter_dec la (first (combine el))) as [H₁| H₁].
+ remember (combine el) as nc eqn:Hnc.
+ remember (path nc) as bnl eqn:Hbnl.
+ symmetry in Hbnl.
+ destruct bnl as [| (d, n)].
+ unfold rotate_combined; simpl.
+ rewrite Hbnl; simpl.
 
 bbb.
 
