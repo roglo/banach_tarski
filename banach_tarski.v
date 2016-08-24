@@ -1572,12 +1572,60 @@ Fixpoint rotate_step pt e n :=
 Fixpoint rotate_combined_loop first path pt :=
   match path with
   | (d, n) :: pa =>
-      let pt := rotate_step pt (E first d) n in
+      let pt := rotate_step pt (E first d) (S n) in
       rotate_combined_loop (other_elem first) pa pt
   | [] => pt
   end.
 
 Definition rotate_combined nc := rotate_combined_loop (first nc) (path nc).
+
+Theorem mul_rot_x_rotate_step_comm : ∀ pt n,
+  mat_vec_mul rot_x (rotate_step pt ạ n) =
+  rotate_step (mat_vec_mul rot_x pt) ạ n.
+Proof.
+intros.
+induction n; [ reflexivity | simpl; f_equal; apply IHn ].
+Qed.
+
+Theorem mul_rot_inv_x_rotate_step_comm : ∀ pt n,
+  mat_vec_mul rot_inv_x (rotate_step pt ạ⁻¹ n) =
+  rotate_step (mat_vec_mul rot_inv_x pt) ạ⁻¹ n.
+Proof.
+intros.
+induction n; [ reflexivity | simpl; f_equal; apply IHn ].
+Qed.
+
+Theorem mul_rot_z_rotate_step_comm : ∀ pt n,
+  mat_vec_mul rot_z (rotate_step pt ḅ n) =
+  rotate_step (mat_vec_mul rot_z pt) ḅ n.
+Proof.
+intros.
+induction n; [ reflexivity | simpl; f_equal; apply IHn ].
+Qed.
+
+Theorem mul_rot_inv_z_rotate_step_comm : ∀ pt n,
+  mat_vec_mul rot_inv_z (rotate_step pt ḅ⁻¹ n) =
+  rotate_step (mat_vec_mul rot_inv_z pt) ḅ⁻¹ n.
+Proof.
+intros.
+induction n; [ reflexivity | simpl; f_equal; apply IHn ].
+Qed.
+
+Theorem rotate_combined_loop_succ : ∀ t d n bnl pt,
+  rotate_combined_loop t ((d, S n) :: bnl) pt =
+  rotate_combined_loop t ((d, n) :: bnl) (rotate pt (E t d)).
+Proof.
+intros.
+simpl.
+destruct t, d; simpl.
+ f_equal; f_equal; apply mul_rot_inv_x_rotate_step_comm.
+
+ f_equal; f_equal; apply mul_rot_x_rotate_step_comm.
+
+ f_equal; f_equal; apply mul_rot_inv_z_rotate_step_comm.
+
+ f_equal; f_equal; apply mul_rot_z_rotate_step_comm.
+Qed.
 
 Theorem rotate_combined_rotate : ∀ pt el,
   rotate_combined (combine el) pt = fold_left rotate el pt.
@@ -1588,13 +1636,28 @@ induction el as [| e]; intros; subst; [ reflexivity | ].
 simpl; rewrite <- IHel.
 destruct e as (t, d); destruct t, d.
  destruct (letter_dec la (first (combine el))) as [H₁| H₁].
- remember (combine el) as nc eqn:Hnc.
- remember (path nc) as bnl eqn:Hbnl.
- symmetry in Hbnl.
- destruct bnl as [| (d, n)].
- unfold rotate_combined; simpl.
- rewrite Hbnl; simpl.
+  remember (combine el) as nc eqn:Hnc.
+  remember (path nc) as bnl eqn:Hbnl.
+  symmetry in Hbnl.
+  destruct bnl as [| (d, n)].
+  unfold rotate_combined; simpl.
+  rewrite Hbnl; simpl.
+  reflexivity.
 
+  destruct (Bool.bool_dec true d); [ subst d | ].
+   unfold rotate_combined.
+   rewrite Hbnl, <- H₁.
+   remember rotate_combined_loop as f.
+   remember rotate as g; simpl; subst f g.
+   apply rotate_combined_loop_succ.
+bbb.
+
+revert t d bnl pt.
+induction n; intros; [ reflexivity | ].
+Opaque rotate_step.
+simpl in IHn; simpl.
+destruct t; simpl in IHn; simpl.
+destruct d.
 bbb.
 
 Theorem toto : ∀ el a b c N,
