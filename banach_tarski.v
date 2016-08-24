@@ -1544,11 +1544,54 @@ Proof.
 intros el a b c N Hr.
 simpl in Hr.
 
-Theorem titi : ∀ el p a b c N,
+Theorem titi : ∀ el p q,
   fst3 p ≡₃ (1, 2, 0)%Z ∨ fst3 p ≡₃ (2, 1, 0)%Z
-  → fold_left rotate_param el p = (a, b, c, N)
-  → (b mod 3 ≠ 0)%Z.
+  → fold_left rotate_param el p = q
+  → fst3 q ≡₃ (1, 2, 0)%Z ∨ fst3 p ≡₃ (2, 1, 0)%Z.
 Proof.
+intros el p q Hp Hr.
+Compute fold_left rotate_param [ḅ; ạ; ạ] (1, 2, 0, O)%Z.
+0 1 1
+0 1 2
+0 2 2
+
+revert p q Hp Hr.
+induction el as [| e]; intros; simpl in Hr; [ destruct Hr; assumption | ].
+apply IHel in Hr.
+ destruct Hp as [Hp| Hp].
+  left.
+  destruct Hr as [Hr| Hr]; [ assumption | ].
+  destruct p as (((a, b), c), N); simpl in Hr.
+  destruct e as (t, d); destruct t, d.
+   destruct Hr as (Ha, _).
+   rewrite Z.mul_comm, Z.mod_mul in Ha; [ | intros H; discriminate H ].
+   discriminate Ha.
+
+   destruct Hr as (Ha, _).
+   rewrite Z.mul_comm, Z.mod_mul in Ha; [ | intros H; discriminate H ].
+   discriminate Ha.
+
+   simpl in Hp, Hr.
+   destruct Hp as (Ha, (Hb, Hc)).
+   destruct Hr as (Ha', (Hb', Hc')).
+   rewrite Z.add_mod in Ha'; [ | intros H; discriminate H ].
+   rewrite Z.mul_mod in Ha'; [ | intros H; discriminate H ].
+   rewrite Ha, Hb in Ha'; discriminate Ha'.
+
+   simpl in Hp, Hr.
+   destruct Hp as (Ha, (Hb, Hc)).
+   destruct Hr as (Ha', (Hb', Hc')).
+   rewrite Zdiv.Zminus_mod in Ha'.
+   rewrite Z.mul_mod in Ha'; [ | intros H; discriminate H ].
+   rewrite Ha, Hb in Ha'; simpl in Ha'.
+
+; discriminate Ha'.
+   
+
+
+
+
+
 intros el p a b c N Hp Hr.
 revert p a b c N Hp Hr.
 induction el as [| e]; intros; simpl in Hr.
@@ -1572,8 +1615,6 @@ induction el as [| e]; intros; simpl in Hr.
 
     rewrite Hb, Hc; intros H; discriminate H.
 
-   apply IHel in Hr; [ assumption | ].
-   destruct p as (((a', b'), c'), N'); simpl.
 bbb.
 
   apply IHel in Hr; [ assumption | ].
