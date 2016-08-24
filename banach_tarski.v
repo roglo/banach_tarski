@@ -1627,6 +1627,35 @@ destruct t, d; simpl.
  f_equal; f_equal; apply mul_rot_z_rotate_step_comm.
 Qed.
 
+Theorem rot_inv_rot_x : ∀ pt,
+  mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
+Proof.
+intros.
+unfold mat_vec_mul; simpl.
+destruct pt as (x, y, z).
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rplus_0_l.
+f_equal.
+ field_simplify; simpl.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite RMicromega.Rinv_1.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+
+ unfold Rdiv.
+ field_simplify; simpl.
+ progress repeat rewrite Rmult_1_r.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+Qed.
+
 Theorem rotate_combined_rotate : ∀ pt el,
   rotate_combined (combine el) pt = fold_left rotate el pt.
 Proof.
@@ -1644,12 +1673,19 @@ destruct e as (t, d); destruct t, d.
   rewrite Hbnl; simpl.
   reflexivity.
 
-  destruct (Bool.bool_dec true d); [ subst d | ].
+  destruct (Bool.bool_dec true d) as [Hd| Hd]; [ subst d | ].
    unfold rotate_combined.
    rewrite Hbnl, <- H₁.
    remember rotate_combined_loop as f.
    remember rotate as g; simpl; subst f g.
    apply rotate_combined_loop_succ.
+
+   apply not_eq_sym, Bool.not_true_is_false in Hd; subst d.
+   destruct n.
+    unfold rotate_combined; simpl.
+    rewrite Hbnl, <- H₁; simpl.
+    rewrite rot_inv_rot_x; reflexivity.
+
 bbb.
 
 revert t d bnl pt.
