@@ -1545,91 +1545,46 @@ intros el a b c N Hr.
 simpl in Hr.
 
 Theorem titi : ∀ el p q,
-  fst3 p ≡₃ (1, 2, 0)%Z ∨ fst3 p ≡₃ (2, 1, 0)%Z
+  fst3 p ≡₃ (1, 2, 0)%Z ∨ fst3 p ≡₃ (2, 1, 0)%Z ∨
+  fst3 p ≡₃ (0, 1, 1)%Z ∨ fst3 p ≡₃ (0, 2, 2)%Z
   → fold_left rotate_param el p = q
-  → fst3 q ≡₃ (1, 2, 0)%Z ∨ fst3 p ≡₃ (2, 1, 0)%Z.
+  → fst3 q ≡₃ (1, 2, 0)%Z ∨ fst3 q ≡₃ (2, 1, 0)%Z ∨
+    fst3 q ≡₃ (0, 1, 1)%Z ∨ fst3 q ≡₃ (0, 2, 2)%Z.
 Proof.
 intros el p q Hp Hr.
-Compute fold_left rotate_param [ḅ; ạ; ạ] (1, 2, 0, O)%Z.
-0 1 1
-0 1 2
-0 2 2
-
 revert p q Hp Hr.
 induction el as [| e]; intros; simpl in Hr; [ destruct Hr; assumption | ].
 apply IHel in Hr.
- destruct Hp as [Hp| Hp].
-  left.
-  destruct Hr as [Hr| Hr]; [ assumption | ].
-  destruct p as (((a, b), c), N); simpl in Hr.
+ destruct Hr as [Hr| [Hr| [Hr| Hr]]].
+  left; assumption.
+
+  right; left; assumption.
+
+  right; right; left; assumption.
+
+  right; right; right; assumption.
+
+ destruct p as (((a, b), c), N).
+ simpl in Hp.
+ destruct Hp as [Hp| [Hp| [Hp| Hp]]].
+  destruct Hp as (Ha, (Hb, Hc)).
+  unfold Z.modulo in Ha at 2; simpl in Ha.
+  unfold Z.modulo in Hb at 2; simpl in Hb.
+  unfold Z.modulo in Hc at 2; simpl in Hc.
+  simpl in Hr; simpl.
   destruct e as (t, d); destruct t, d.
-   destruct Hr as (Ha, _).
-   rewrite Z.mul_comm, Z.mod_mul in Ha; [ | intros H; discriminate H ].
-   discriminate Ha.
-
-   destruct Hr as (Ha, _).
-   rewrite Z.mul_comm, Z.mod_mul in Ha; [ | intros H; discriminate H ].
-   discriminate Ha.
-
-   simpl in Hp, Hr.
-   destruct Hp as (Ha, (Hb, Hc)).
-   destruct Hr as (Ha', (Hb', Hc')).
-   rewrite Z.add_mod in Ha'; [ | intros H; discriminate H ].
-   rewrite Z.mul_mod in Ha'; [ | intros H; discriminate H ].
-   rewrite Ha, Hb in Ha'; discriminate Ha'.
-
-   simpl in Hp, Hr.
-   destruct Hp as (Ha, (Hb, Hc)).
-   destruct Hr as (Ha', (Hb', Hc')).
-   rewrite Zdiv.Zminus_mod in Ha'.
-   rewrite Z.mul_mod in Ha'; [ | intros H; discriminate H ].
-   rewrite Ha, Hb in Ha'; simpl in Ha'.
-
-; discriminate Ha'.
-   
-
-
-
-
-
-intros el p a b c N Hp Hr.
-revert p a b c N Hp Hr.
-induction el as [| e]; intros; simpl in Hr.
- destruct p as (((a', b'), c'), N').
- injection Hr; intros; subst; simpl in Hp.
- destruct Hp as [Hp| Hp].
-  destruct Hp as (_, (Hb, _)).
-  intros H; rewrite H in Hb; discriminate Hb.
-
-  destruct Hp as (_, (Hb, _)).
-  intros H; rewrite H in Hb; discriminate Hb.
-
- destruct e as (t, d); destruct t, d.
-  destruct el as [| e]; simpl in Hr.
-   destruct p as (((a', b'), c'), N'); simpl in Hp, Hr.
-   injection Hr; clear Hr; intros; subst.
+   simpl.
+   right; right; right.
+   rewrite Z.mul_mod; [ | intros H; discriminate H ].
+   split; [ reflexivity | ].
    rewrite Z.add_mod; [ | intros H; discriminate H ].
    rewrite Z.mul_mod; [ | intros H; discriminate H ].
-   destruct Hp as [(Ha, (Hb, Hc))| (Ha, (Hb, Hc))].
-    rewrite Hb, Hc; intros H; discriminate H.
-
-    rewrite Hb, Hc; intros H; discriminate H.
-
-bbb.
-
-  apply IHel in Hr; [ assumption | ].
-  destruct p as (((a', b'), c'), N').
-  simpl in Hp, Hr; simpl; right.
-  split.
-   rewrite Z.mul_comm, Z.mod_mul; [ | intros H; discriminate H ].
-   reflexivity.
-
-   destruct Hp as [Hp| Hp].
-    destruct Hp as (Ha, (Hb, Hc)).
-     split.
-
-
-
+   rewrite Hb, Hc; split; [ reflexivity | ].
+   rewrite Z.add_mod; [ | intros H; discriminate H ].
+   rewrite Z.mul_mod; [ | intros H; discriminate H ].
+   rewrite Hb, Hc.
+simpl.
+(* enfer et damnation ! *)
 
 bbb.
 Focus 2.
