@@ -1537,6 +1537,43 @@ Compute fold_left rotate_param [ḅ; ạ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 
+Record combined := mknp { first : letter; path : list (bool * nat) }.
+
+Definition other_elem t := match t with la => lb | lb => la end.
+
+Fixpoint combine el :=
+  match el with
+  | E t₁ d₁ :: el₁ =>
+      let np := combine el₁ in
+      if letter_dec t₁ (first np) then
+        match path np with
+        | (d, n) :: dnl =>
+            if Bool.bool_dec d₁ d then
+              {| first := t₁; path := (d, S n) :: dnl |}
+            else
+              match n with
+              | O => {| first := other_elem t₁; path := dnl |}
+              | S n' => {| first := t₁; path := (d, n') :: dnl |}
+              end
+        | [] => {| first := t₁; path := [(d₁, O)] |}
+        end
+      else {| first := t₁; path := (d₁, O) :: path np |}
+  | [] => {| first := la; path := [] |}
+  end.
+
+Compute combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
+
+Definition rotate_combined np pt :=
+  ....
+
+Theorem rotate_rotate_combined : ∀ pt el,
+  fold_left rotate_combined (combine el) pt =
+  fold_left rotate el pt.
+Proof.
+intros.
+
+bbb.
+
 Theorem toto : ∀ el a b c N,
   fold_left rotate_param (ḅ :: el) (1, 0, 0, O)%Z = (a, b, c, N)
   → b ≠ 0%Z.
