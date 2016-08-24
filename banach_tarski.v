@@ -1555,14 +1555,18 @@ induction el as [| e]; intros.
 
  simpl in Hr.
  destruct e as (t, d); destruct t, d.
- apply IHel in Hr; [ assumption | ].
+  apply IHel in Hr; [ assumption | ].
 Focus 2.
- apply IHel in Hr; [ assumption | ].
+  apply IHel in Hr; [ assumption | ].
 Unfocus. Focus 3.
- apply IHel in Hr; [ assumption | ].
+  apply IHel in Hr; [ assumption | ].
 Unfocus. Focus 4.
- apply IHel in Hr; [ assumption | ].
+  apply IHel in Hr; [ assumption | ].
 Unfocus.
+
+(* counter-example *)
+Compute fold_left rotate_param [ạ⁻¹] (0, 1, 1, O)%Z.
+
 bbb.
   Hr : fold_left rotate_param el (1%Z, 2%Z, 0%Z, 1) = (a, b, c, N)
   ============================
