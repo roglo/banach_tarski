@@ -1543,19 +1543,54 @@ Theorem toto : ∀ el a b c N,
 Proof.
 intros el a b c N Hr.
 simpl in Hr.
-Theorem titi : ∀ el a b c N a' b' c' N',
-  fold_left rotate_param el (a, b, c, N) = (a', b', c', N')
-  → (b mod 3 ≠ 0)%Z
-  → (b' mod 3 ≠ 0)%Z.
-Proof.
-intros el a b c N a' b' c' N' Hr Hb.
-revert a b c N a' b' c' N' Hr Hb.
-induction el as [| e]; intros.
- injection Hr; intros; subst; assumption.
 
- simpl in Hr.
+Theorem titi : ∀ el p a b c N,
+  fst3 p ≡₃ (1, 2, 0)%Z ∨ fst3 p ≡₃ (2, 1, 0)%Z
+  → fold_left rotate_param el p = (a, b, c, N)
+  → (b mod 3 ≠ 0)%Z.
+Proof.
+intros el p a b c N Hp Hr.
+revert p a b c N Hp Hr.
+induction el as [| e]; intros; simpl in Hr.
+ destruct p as (((a', b'), c'), N').
+ injection Hr; intros; subst; simpl in Hp.
+ destruct Hp as [Hp| Hp].
+  destruct Hp as (_, (Hb, _)).
+  intros H; rewrite H in Hb; discriminate Hb.
+
+  destruct Hp as (_, (Hb, _)).
+  intros H; rewrite H in Hb; discriminate Hb.
+
  destruct e as (t, d); destruct t, d.
+  destruct el as [| e]; simpl in Hr.
+   destruct p as (((a', b'), c'), N'); simpl in Hp, Hr.
+   injection Hr; clear Hr; intros; subst.
+   rewrite Z.add_mod; [ | intros H; discriminate H ].
+   rewrite Z.mul_mod; [ | intros H; discriminate H ].
+   destruct Hp as [(Ha, (Hb, Hc))| (Ha, (Hb, Hc))].
+    rewrite Hb, Hc; intros H; discriminate H.
+
+    rewrite Hb, Hc; intros H; discriminate H.
+
+   apply IHel in Hr; [ assumption | ].
+   destruct p as (((a', b'), c'), N'); simpl.
+bbb.
+
   apply IHel in Hr; [ assumption | ].
+  destruct p as (((a', b'), c'), N').
+  simpl in Hp, Hr; simpl; right.
+  split.
+   rewrite Z.mul_comm, Z.mod_mul; [ | intros H; discriminate H ].
+   reflexivity.
+
+   destruct Hp as [Hp| Hp].
+    destruct Hp as (Ha, (Hb, Hc)).
+     split.
+
+
+
+
+bbb.
 Focus 2.
   apply IHel in Hr; [ assumption | ].
 Unfocus. Focus 3.
