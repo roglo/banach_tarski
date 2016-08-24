@@ -1656,6 +1656,13 @@ f_equal.
  field_simplify; reflexivity.
 Qed.
 
+Theorem rotate_rotate_step_comm : ∀ pt e n,
+  rotate (rotate_step pt e n) e = rotate_step (rotate pt e) e n.
+Proof.
+intros.
+induction n; [ reflexivity | simpl; f_equal; apply IHn ].
+Qed.
+
 Theorem rotate_combined_rotate : ∀ pt el,
   rotate_combined (combine el) pt = fold_left rotate el pt.
 Proof.
@@ -1685,6 +1692,27 @@ destruct e as (t, d); destruct t, d.
     unfold rotate_combined; simpl.
     rewrite Hbnl, <- H₁; simpl.
     rewrite rot_inv_rot_x; reflexivity.
+
+    unfold rotate_combined; simpl.
+    rewrite Hbnl, <- H₁; simpl.
+bbb.
+
+Theorem toto : ∀ rot pt t n,
+  rotate_step (mat_vec_mul rot_x pt) ạ n
+  = mat_vec_mul rot_x (rotate_step pt ạ n).
+Proof.
+intros; simpl.
+revert rot pt t.
+induction n; intros; [ reflexivity | simpl ].
+do 2 rewrite rotate_rotate_step_comm.
+rewrite <- IHn; f_equal.
+SearchAbout rotate.
+
+bbb.
+Show.
+rewrite toto.
+simpl.
+rewrite rot_inv_rot_x.
 
 bbb.
 
