@@ -1551,40 +1551,10 @@ Proof.
 intros el a b c N a' b' c' N' Hr Hb.
 revert a b c N a' b' c' N' Hr Hb.
 induction el as [| e]; intros.
-  injection Hr; intros; subst; assumption.
+ injection Hr; intros; subst; assumption.
 
-  destruct e as (t, d); destruct t, d.
-   simpl in Hr.
-Check rotate_param_app_a1n.
-bbb.
-
-   rewrite fold_left_app in Hr.
-   remember (fold_left rotate_param el (a, b, c, N)) as u eqn:Hu.
-   symmetry in Hu.
-   destruct u as (((a₁, b₁), c₁), N₁).
-   simpl in Hr.
-   injection Hr; clear Hr; intros; subst.
-   apply IHel in Hu; [ | assumption ].
-
-   apply rotate_param_app_a1n with (n := 0) in Hu.
-   simpl in Hu.
-   rewrite Hr in Hu; simpl in Hu.
-
-vvv.
-
- apply rotate_param_app_a1n with (n := O) in Hr.
  simpl in Hr.
- rewrite fold_left_app in Hr.
- simpl in Hr.
-remember  (fold_left rotate_param el
-               ((3 * a)%Z, (b + 2 * c)%Z, (-4 * b + c)%Z, S N)) as u eqn:Hu.
-symmetry in Hu.
-destruct u as (((a₁, b₁), c₁), N₁).
-Focus 1.
-simpl in Hr.
-destruct Hr as (Ha₁, (Hb₁, Hc₁)).
-apply IHel in Hu.
-
+ destruct e as (t, d); destruct t, d.
  apply IHel in Hr; [ assumption | ].
 Focus 2.
  apply IHel in Hr; [ assumption | ].
@@ -1594,6 +1564,9 @@ Unfocus. Focus 4.
  apply IHel in Hr; [ assumption | ].
 Unfocus.
 bbb.
+  Hr : fold_left rotate_param el (1%Z, 2%Z, 0%Z, 1) = (a, b, c, N)
+  ============================
+  b ≠ 0%Z
 
 apply titi in Hr; [ | intros H; discriminate H ].
 intros H; subst b; apply Hr; reflexivity.
