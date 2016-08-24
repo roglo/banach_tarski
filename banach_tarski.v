@@ -1656,11 +1656,109 @@ f_equal.
  field_simplify; reflexivity.
 Qed.
 
+Theorem inv_rot_rot_x : ∀ pt,
+  mat_vec_mul rot_inv_x (mat_vec_mul rot_x pt) = pt.
+Proof.
+intros.
+unfold mat_vec_mul; simpl.
+destruct pt as (x, y, z).
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rplus_0_l.
+f_equal.
+ field_simplify; simpl.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite RMicromega.Rinv_1.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+
+ unfold Rdiv.
+ field_simplify; simpl.
+ progress repeat rewrite Rmult_1_r.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+Qed.
+
+Theorem rot_inv_rot_z : ∀ pt,
+  mat_vec_mul rot_z (mat_vec_mul rot_inv_z pt) = pt.
+Proof.
+intros.
+unfold mat_vec_mul; simpl.
+destruct pt as (x, y, z).
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rplus_0_l.
+f_equal.
+ field_simplify; simpl.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite RMicromega.Rinv_1.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+
+ unfold Rdiv.
+ field_simplify; simpl.
+ progress repeat rewrite Rmult_1_r.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+Qed.
+
+Theorem inv_rot_rot_z : ∀ pt,
+  mat_vec_mul rot_inv_z (mat_vec_mul rot_z pt) = pt.
+Proof.
+intros.
+unfold mat_vec_mul; simpl.
+destruct pt as (x, y, z).
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rplus_0_l.
+f_equal.
+ field_simplify; simpl.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite RMicromega.Rinv_1.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+
+ unfold Rdiv.
+ field_simplify; simpl.
+ progress repeat rewrite Rmult_1_r.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+Qed.
+
 Theorem rotate_rotate_step_comm : ∀ pt e n,
   rotate (rotate_step pt e n) e = rotate_step (rotate pt e) e n.
 Proof.
 intros.
 induction n; [ reflexivity | simpl; f_equal; apply IHn ].
+Qed.
+
+Theorem rot_step_rot_inv_x : ∀ pt n,
+  mat_vec_mul rot_x (rotate_step (mat_vec_mul rot_inv_x pt) ạ n) =
+  rotate_step pt ạ n.
+Proof.
+intros.
+revert pt.
+induction n; intros; [ apply rot_inv_rot_x | simpl ].
+symmetry; rewrite <- IHn.
+reflexivity.
 Qed.
 
 Theorem rotate_combined_rotate : ∀ pt el,
@@ -1670,49 +1768,59 @@ intros.
 revert pt.
 induction el as [| e]; intros; subst; [ reflexivity | ].
 simpl; rewrite <- IHel.
-destruct e as (t, d); destruct t, d.
- destruct (letter_dec la (first (combine el))) as [H₁| H₁].
-  remember (combine el) as nc eqn:Hnc.
-  remember (path nc) as bnl eqn:Hbnl.
-  symmetry in Hbnl.
-  destruct bnl as [| (d, n)].
-  unfold rotate_combined; simpl.
-  rewrite Hbnl; simpl.
-  reflexivity.
+destruct e as (t, d).
+destruct (letter_dec t (first (combine el))) as [H₁| H₁].
+ remember (combine el) as nc eqn:Hnc.
+ remember (path nc) as bnl eqn:Hbnl.
+ symmetry in Hbnl.
+ destruct bnl as [| (b, n)].
+ unfold rotate_combined; simpl.
+ rewrite Hbnl; simpl; reflexivity.
 
-  destruct (Bool.bool_dec true d) as [Hd| Hd]; [ subst d | ].
-   unfold rotate_combined.
-   rewrite Hbnl, <- H₁.
-   remember rotate_combined_loop as f.
-   remember rotate as g; simpl; subst f g.
-   apply rotate_combined_loop_succ.
+ destruct (Bool.bool_dec d b) as [Hd| Hd]; [ subst d | ].
+  unfold rotate_combined.
+  rewrite Hbnl, <- H₁.
+  remember rotate_combined_loop as f.
+  remember rotate as g; simpl; subst f g.
+  apply rotate_combined_loop_succ.
 
-   apply not_eq_sym, Bool.not_true_is_false in Hd; subst d.
-   destruct n.
-    unfold rotate_combined; simpl.
+  destruct n.
+   unfold rotate_combined; simpl.
+   destruct t, d; simpl.
     rewrite Hbnl, <- H₁; simpl.
+    apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
     rewrite rot_inv_rot_x; reflexivity.
 
-    unfold rotate_combined; simpl.
     rewrite Hbnl, <- H₁; simpl.
-bbb.
+    apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
+    rewrite inv_rot_rot_x; reflexivity.
 
-Theorem toto : ∀ rot pt t n,
-  rotate_step (mat_vec_mul rot_x pt) ạ n
-  = mat_vec_mul rot_x (rotate_step pt ạ n).
-Proof.
-intros; simpl.
-revert rot pt t.
-induction n; intros; [ reflexivity | simpl ].
-do 2 rewrite rotate_rotate_step_comm.
-rewrite <- IHn; f_equal.
-SearchAbout rotate.
+    rewrite Hbnl, <- H₁; simpl.
+    apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
+    rewrite rot_inv_rot_z; reflexivity.
 
+    rewrite Hbnl, <- H₁; simpl.
+    apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
+    rewrite inv_rot_rot_z; reflexivity.
+
+   unfold rotate_combined; simpl.
+   destruct t, d; simpl.
+    rewrite Hbnl, <- H₁; simpl.
+    apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
 bbb.
-Show.
-rewrite toto.
-simpl.
-rewrite rot_inv_rot_x.
+    rewrite rot_inv_rot_x; reflexivity.
+
+    rewrite Hbnl, <- H₁; simpl.
+    apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
+    rewrite inv_rot_rot_x; reflexivity.
+
+    rewrite Hbnl, <- H₁; simpl.
+    apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
+    rewrite rot_inv_rot_z; reflexivity.
+
+    rewrite Hbnl, <- H₁; simpl.
+    apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
+    rewrite inv_rot_rot_z; reflexivity.
 
 bbb.
 
