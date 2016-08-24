@@ -1222,37 +1222,6 @@ rewrite <- Z.mod_add with (b := (a + b)%Z); [ | intros; discriminate ].
 f_equal; ring_simplify; reflexivity.
 Qed.
 
-Theorem toto : ∀ el a b c N,
-  fold_left rotate_param (ḅ :: el) (1, 0, 0, O)%Z = (a, b, c, N)
-  → b ≠ 0%Z.
-Proof.
-intros el a b c N Hr.
-simpl in Hr.
-Theorem titi : ∀ el a b c N a' b' c' N',
-  fold_left rotate_param el (a, b, c, N) = (a', b', c', N')
-  → b ≠ 0%Z
-  → b' ≠ 0%Z.
-Proof.
-intros el a b c N a' b' c' N' Hr Hb.
-revert a b c N a' b' c' N' Hr Hb.
-induction el as [| e]; intros; [ injection Hr; intros; subst; assumption | ].
-simpl in Hr.
-destruct e as (t, d); destruct t, d.
- apply IHel in Hr; [ assumption | ].
-Focus 2.
- apply IHel in Hr; [ assumption | ].
-Unfocus. Focus 3.
- apply IHel in Hr; [ assumption | ].
-Unfocus. Focus 4.
- apply IHel in Hr; [ assumption | ].
-Unfocus.
-
-bbb.
-eapply titi; [ eassumption | intros H; discriminate H ].
-Qed.
-
-bbb.
-
 Theorem fold_rotate_param_mod_3_succ_succ : ∀ n e p,
   0 < n
   → fold_left rotate_param_mod_3 (repeat e n) p =
@@ -1284,7 +1253,7 @@ Theorem rotate_param_app_an : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ List.repeat ạ (n + 1)) p) ≡₃
       if zerop (n mod 2) then (0%Z, (b + c)%Z, (b + c)%Z)
-      else (0%Z, (2 * b + 2 * c)%Z, (2 * b + 2 * c)%Z).
+      else (0%Z, (- b - c)%Z, (- b - c)%Z).
 Proof.
 intros el n p a b c N Hrp.
 unfold "≡₃".
@@ -1308,26 +1277,7 @@ destruct n.
   injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
   rewrite <- Ha, <- Hb, <- Hc.
   split; [ reflexivity | ].
-  split.
-   symmetry.
-   rewrite Z.add_mod; [ | intros H; discriminate H ].
-   rewrite Z.mul_mod; [ | intros H; discriminate H ].
-   rewrite Z.add_comm.
-   rewrite Z.mul_mod; [ | intros H; discriminate H ].
-   progress repeat replace (2 mod 3)%Z with 2%Z by reflexivity.
-   rewrite <- Z.add_mod; [ | intros H; discriminate H ].
-   rewrite <- Z.add_mod; [ | intros H; discriminate H ].
-   f_equal; ring.
-
-   symmetry.
-   rewrite Z.add_mod; [ | intros H; discriminate H ].
-   rewrite Z.mul_mod; [ | intros H; discriminate H ].
-   rewrite Z.add_comm.
-   rewrite Z.mul_mod; [ | intros H; discriminate H ].
-   progress repeat replace (2 mod 3)%Z with 2%Z by reflexivity.
-   rewrite <- Z.add_mod; [ | intros H; discriminate H ].
-   rewrite <- Z.add_mod; [ | intros H; discriminate H ].
-   f_equal; ring.
+  split; symmetry; apply Z_mod_expr_4.
 
   rewrite Nat.add_1_r in Hrp₁.
   rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
@@ -1343,97 +1293,13 @@ Qed.
 Theorem rotate_param_app_bn : ∀ el n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ List.repeat ḅ (n + 1)) p) ≡₃
-      if zerop (n mod 2) then ((a + b)%Z, (a + b)%Z, 0%Z)
-      else ((- a - b)%Z, (- a - b)%Z, 0%Z).
-Proof.
-intros el n p a b c N Hrp.
-unfold "≡₃".
-rewrite fold_left_app, Hrp; simpl.
-remember (repeat ḅ (n + 1)) as al.
-remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
-subst al; symmetry in Hrp₁.
-destruct x as ((a₁, b₁), c₁).
-apply rotate_params_mod in Hrp₁.
-revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
-fix 1; intros.
-destruct n.
- simpl in Hrp₁; simpl.
- injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
- rewrite <- Ha, <- Hb, <- Hc.
-bbb.
- split; [ symmetry; apply Z.add_mod; intros; discriminate | ].
- split; [ symmetry; apply Z.add_mod; intros; discriminate | ].
- reflexivity.
-
- destruct n.
-  simpl in Hrp₁; simpl.
-  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
-  rewrite <- Ha, <- Hb, <- Hc.
-  split; [ symmetry; apply Z_mod_expr_4 | ].
-  split; [ symmetry; apply Z_mod_expr_4 | reflexivity ].
-
-  rewrite Nat.add_1_r in Hrp₁.
-  rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
-   rewrite <- Nat.add_1_r in Hrp₁.
-   pose proof (rotate_param_app_bn n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
-   do 2 rewrite <- Nat.add_1_r.
-   rewrite <- Nat.add_assoc; simpl.
-   rewrite Nat_mod_add_once; [ assumption | intros; discriminate ].
-
-   apply Nat.lt_0_succ.
-Qed.
-
-Theorem rotate_param_app_a1n : ∀ el n p a b c N,
-  fold_left rotate_param el p = (a, b, c, N)
-  → fst3 (fold_left rotate_param (el ++ List.repeat ạ⁻¹ (n + 1)) p) ≡₃
-      if zerop (n mod 2) then (0%Z, (b + c)%Z, (b + c)%Z)
-      else (0%Z, (- b - c)%Z, (- b - c)%Z).
-Proof.
-intros el n p a b c N Hrp.
-unfold "≡₃".
-rewrite fold_left_app, Hrp; simpl.
-remember (repeat ạ⁻¹ (n + 1)) as al.
-remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
-subst al; symmetry in Hrp₁.
-destruct x as ((a₁, b₁), c₁).
-apply rotate_params_mod in Hrp₁.
-revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
-fix 1; intros.
-destruct n.
- simpl in Hrp₁; simpl.
- injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
- rewrite <- Ha, <- Hb, <- Hc.
- split; [ reflexivity | ].
- split; symmetry; apply Z.add_mod; intros; discriminate.
-
- destruct n.
-  simpl in Hrp₁; simpl.
-  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
-  rewrite <- Ha, <- Hb, <- Hc.
-  split; [ reflexivity | ].
-  split; rewrite <- Z_mod_expr_4; f_equal; ring.
-
-  rewrite Nat.add_1_r in Hrp₁.
-  rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
-   rewrite <- Nat.add_1_r in Hrp₁.
-   pose proof (rotate_param_app_a1n n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
-   do 2 rewrite <- Nat.add_1_r.
-   rewrite <- Nat.add_assoc; simpl.
-   rewrite Nat_mod_add_once; [ assumption | intros; discriminate ].
-
-   apply Nat.lt_0_succ.
-Qed.
-
-Theorem rotate_param_app_b1n : ∀ el n p a b c N,
-  fold_left rotate_param el p = (a, b, c, N)
-  → fst3 (fold_left rotate_param (el ++ List.repeat ḅ⁻¹ (n + 1)) p) ≡₃
       if zerop (n mod 2) then ((a - b)%Z, (b - a)%Z, 0%Z)
       else ((b - a)%Z, (a - b)%Z, 0%Z).
 Proof.
 intros el n p a b c N Hrp.
 unfold "≡₃".
 rewrite fold_left_app, Hrp; simpl.
-remember (repeat ḅ⁻¹ (n + 1)) as al.
+remember (repeat ḅ (n + 1)) as al.
 remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
 subst al; symmetry in Hrp₁.
 destruct x as ((a₁, b₁), c₁).
@@ -1459,6 +1325,92 @@ destruct n.
   rewrite Nat.add_1_r in Hrp₁.
   rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
    rewrite <- Nat.add_1_r in Hrp₁.
+   pose proof (rotate_param_app_bn n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
+   do 2 rewrite <- Nat.add_1_r.
+   rewrite <- Nat.add_assoc; simpl.
+   rewrite Nat_mod_add_once; [ assumption | intros; discriminate ].
+
+   apply Nat.lt_0_succ.
+Qed.
+
+Theorem rotate_param_app_a1n : ∀ el n p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ List.repeat ạ⁻¹ (n + 1)) p) ≡₃
+      if zerop (n mod 2) then (0%Z, (b - c)%Z, (c - b)%Z)
+      else (0%Z, (c - b)%Z, (b - c)%Z).
+Proof.
+intros el n p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+remember (repeat ạ⁻¹ (n + 1)) as al.
+remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
+subst al; symmetry in Hrp₁.
+destruct x as ((a₁, b₁), c₁).
+apply rotate_params_mod in Hrp₁.
+revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+fix 1; intros.
+destruct n.
+ simpl in Hrp₁; simpl.
+ injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+ rewrite <- Ha, <- Hb, <- Hc.
+ split; [ reflexivity | ].
+ split; symmetry; apply Zdiv.Zminus_mod.
+
+ destruct n.
+  simpl in Hrp₁; simpl.
+  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+  rewrite <- Ha, <- Hb, <- Hc.
+  split; [ reflexivity | ].
+  split; symmetry; apply Z_mod_expr_3.
+
+  rewrite Nat.add_1_r in Hrp₁.
+  rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
+   rewrite <- Nat.add_1_r in Hrp₁.
+   pose proof (rotate_param_app_a1n n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
+   do 2 rewrite <- Nat.add_1_r.
+   rewrite <- Nat.add_assoc; simpl.
+   rewrite Nat_mod_add_once; [ assumption | intros; discriminate ].
+
+   apply Nat.lt_0_succ.
+Qed.
+
+Inspect 4.
+
+Theorem rotate_param_app_b1n : ∀ el n p a b c N,
+  fold_left rotate_param el p = (a, b, c, N)
+  → fst3 (fold_left rotate_param (el ++ List.repeat ḅ⁻¹ (n + 1)) p) ≡₃
+      if zerop (n mod 2) then ((a + b)%Z, (a + b)%Z, 0%Z)
+      else ((- a - b)%Z, (- a - b)%Z, 0%Z).
+Proof.
+intros el n p a b c N Hrp.
+unfold "≡₃".
+rewrite fold_left_app, Hrp; simpl.
+remember (repeat ḅ⁻¹ (n + 1)) as al.
+remember (fst3 (fold_left rotate_param al (a, b, c, N))) as x eqn:Hrp₁.
+subst al; symmetry in Hrp₁.
+destruct x as ((a₁, b₁), c₁).
+apply rotate_params_mod in Hrp₁.
+revert n el p a b c N a₁ b₁ c₁ Hrp Hrp₁.
+fix 1; intros.
+destruct n.
+ simpl in Hrp₁; simpl.
+ injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+ rewrite <- Ha, <- Hb, <- Hc.
+ split; [ symmetry; apply Z.add_mod; intros H; discriminate H | ].
+ split; [ symmetry; apply Z.add_mod; intros H; discriminate H | ].
+ reflexivity.
+
+ destruct n.
+  simpl in Hrp₁; simpl.
+  injection Hrp₁; clear Hrp₁; intros Ha Hb Hc.
+  rewrite <- Ha, <- Hb, <- Hc.
+  split; [ rewrite <- Z_mod_expr_4; reflexivity | ].
+  split; [ rewrite <- Z_mod_expr_4; reflexivity | ].
+  reflexivity.
+
+  rewrite Nat.add_1_r in Hrp₁.
+  rewrite <- fold_rotate_param_mod_3_succ_succ in Hrp₁.
+   rewrite <- Nat.add_1_r in Hrp₁.
    pose proof (rotate_param_app_b1n n el p a b c N a₁ b₁ c₁ Hrp Hrp₁).
    do 2 rewrite <- Nat.add_1_r.
    rewrite <- Nat.add_assoc; simpl.
@@ -1471,14 +1423,14 @@ Theorem rotate_param_app : ∀ el e n p a b c N,
   fold_left rotate_param el p = (a, b, c, N)
   → fst3 (fold_left rotate_param (el ++ repeat e (n + 1)) p) ≡₃
       match e with
-      | ạ => if zerop (n mod 2) then (0, b - c, c - b)%Z
-             else (0, c - b, b - c)%Z
-      | ạ⁻¹ => if zerop (n mod 2) then (0, b + c, b + c)%Z
-               else (0, - b - c, - b - c)%Z
-      | ḅ => if zerop (n mod 2) then (a + b, a + b, 0)%Z
-             else (- a - b, - a - b, 0)%Z
-      | ḅ⁻¹ => if zerop (n mod 2) then (a - b, b - a, 0)%Z
-               else (b - a, a - b, 0)%Z
+      | ạ => if zerop (n mod 2) then (0, b + c, b + c)%Z
+             else (0, - b - c, - b - c)%Z
+      | ạ⁻¹ => if zerop (n mod 2) then (0, b - c, c - b)%Z
+               else (0, c - b, b - c)%Z
+      | ḅ => if zerop (n mod 2) then (a - b, b - a, 0)%Z
+             else (b - a, a - b, 0)%Z
+      | ḅ⁻¹ => if zerop (n mod 2) then (a + b, a + b, 0)%Z
+               else (- a - b, - a - b, 0)%Z
       end.
 Proof.
 intros el e n p a b c N Hp.
@@ -1535,7 +1487,7 @@ Add Parametric Relation : _ eq_mod_3
  transitivity proved by eq_mod_3_trans
  as eq_mod_3_equivalence.
 
-Theorem rotate_1_0_0_b : rotate (P 1 0 0) ḅ = P (1/3) (-2*√2/3) 0.
+Theorem rotate_1_0_0_b : rotate (P 1 0 0) ḅ = P (1/3) (2*√2/3) 0.
 Proof.
 simpl.
 progress repeat rewrite Rmult_1_r.
@@ -1545,7 +1497,7 @@ reflexivity.
 Qed.
 
 Theorem rotate_1_0_0_bb :
-  fold_left rotate [ḅ; ḅ] (P 1 0 0) = P (-7/9) (-4*√2/9) 0.
+  fold_left rotate [ḅ; ḅ] (P 1 0 0) = P (-7/9) (4*√2/9) 0.
 Proof.
 simpl.
 unfold Rdiv.
@@ -1560,7 +1512,7 @@ f_equal; lra.
 Qed.
 
 Theorem rotate_1_0_0_bbb :
-  fold_left rotate [ḅ; ḅ; ḅ] (P 1 0 0) = P (-23/27) (10*√2/27) 0.
+  fold_left rotate [ḅ; ḅ; ḅ] (P 1 0 0) = P (-23/27) (-10*√2/27) 0.
 Proof.
 simpl.
 unfold Rdiv.
@@ -1584,6 +1536,38 @@ Compute fold_left rotate_param [ạ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ḅ; ạ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
 Compute fold_left rotate_param [ạ; ạ; ḅ] (1, 0, 0, O)%Z.
+
+Theorem toto : ∀ el a b c N,
+  fold_left rotate_param (ḅ :: el) (1, 0, 0, O)%Z = (a, b, c, N)
+  → b ≠ 0%Z.
+Proof.
+intros el a b c N Hr.
+simpl in Hr.
+Theorem titi : ∀ el a b c N a' b' c' N',
+  fold_left rotate_param el (a, b, c, N) = (a', b', c', N')
+  → (b mod 3 ≠ 0)%Z
+  → (b' mod 3 ≠ 0)%Z.
+Proof.
+intros el a b c N a' b' c' N' Hr Hb.
+revert a b c N a' b' c' N' Hr Hb.
+induction el as [| e]; intros; [ injection Hr; intros; subst; assumption | ].
+destruct e as (t, d); destruct t, d.
+ simpl in Hr.
+ apply IHel in Hr; [ assumption | ].
+Focus 2.
+ apply IHel in Hr; [ assumption | ].
+Unfocus. Focus 3.
+ apply IHel in Hr; [ assumption | ].
+Unfocus. Focus 4.
+ apply IHel in Hr; [ assumption | ].
+Unfocus.
+bbb.
+
+apply titi in Hr; [ | intros H; discriminate H ].
+intros H; subst b; apply Hr; reflexivity.
+Qed.
+
+bbb.
 
 Theorem rotate_1_0_0_ending_repeat_b : ∀ n abc,
   fst3 (fold_left rotate_param (repeat ḅ (S n)) (1, 0, 0, O)%Z) ≡₃ abc
