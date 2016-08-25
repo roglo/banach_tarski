@@ -199,6 +199,8 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
+Definition normalised_list el := norm_list el = el.
+
 Theorem norm_list_single : ∀ e, norm_list (e :: nil) = e :: nil.
 Proof. reflexivity. Qed.
 
@@ -1933,6 +1935,22 @@ destruct (letter_dec f (first (combine el))) as [Hf| Hf].
     discriminate Hbnl₁.
     destruct (Bool.bool_dec b b₁) as [H₁| H₁]; [ subst b₁ | ].
      f_equal.
+     destruct n.
+      simpl in Hel; subst el.
+      destruct bnl as [| (b₂, n₂)]; [ discriminate Hbnl₁ | ].
+      remember combine as g; simpl in Hf, Hbnl₁; subst g.
+bbb.
+
+Theorem toto : ∀ t d el,
+  normalised_list (E t d :: el)
+  → first (combine (E t d :: el)) = t.
+Proof.
+intros t d el Hn; simpl.
+destruct (letter_dec t (first (combine el))) as [H₁| H₁].
+remember (path (combine el)) as bnl eqn:Hbnl.
+destruct bnl as [| (b, n)]; [ reflexivity | ].
+destruct (Bool.bool_dec d b) as [H₂ | H₂]; [ reflexivity | ].
+destruct n; [ | reflexivity ].
 bbb.
 
 pose proof toto nc as Ht.
