@@ -1961,6 +1961,13 @@ destruct n.
  destruct bnl as [| (b₂, n₂)].
   simpl in Hel; subst el; discriminate Hbnl₁.
 
+Theorem toto : ∀ nc, normalised_list (uncombine nc).
+Proof.
+intros (t, bnl).
+unfold uncombine; revert t.
+induction bnl as [| (b, n)]; intros; [ reflexivity | ].
+simpl in IHbnl; remember uncombine_loop as f; simpl; subst f.
+
 bbb.
   rewrite IHbnl in H₁; [ | intros H; discriminate H ].
   destruct f; discriminate H₁.
