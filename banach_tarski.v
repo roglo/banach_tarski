@@ -1946,37 +1946,24 @@ Theorem toto : ∀ nc, path nc ≠ [] → first (combine (uncombine nc)) = first
 Proof.
 intros (f, bnl) Hp; simpl in Hp; simpl.
 unfold uncombine; simpl.
-Print uncombine_loop.
-
-bbb.
-
 destruct bnl as [| (b, n)]; intros; [ exfalso; apply Hp; reflexivity | ].
-clear Hp.
+clear Hp; simpl.
+remember (repeat (E f b) n) as r eqn:Hr.
+remember (r ++ uncombine_loop (other_elem f) bnl) as el eqn:Hel; subst r.
+destruct (letter_dec f (first (combine el))) as [H₁| H₁]; [ | reflexivity ].
+remember (path (combine el)) as bnl₁ eqn:Hbnl₁.
+destruct bnl₁ as [| (b₁, n₁)]; [ reflexivity | ].
+destruct (Bool.bool_dec b b₁) as [H₂| H₂]; [ reflexivity | ].
+destruct n₁; [ exfalso | reflexivity ].
+destruct n.
+ rewrite app_nil_l in Hel.
+ rewrite Hel in H₁.
+ destruct bnl as [| (b₂, n₂)].
+  simpl in Hel; subst el; discriminate Hbnl₁.
 
 bbb.
-
-intros (f, bnl) Hp; simpl in Hp; simpl.
-unfold uncombine; simpl.
-revert f.
-induction bnl as [| (b, n)]; intros; [ exfalso; apply Hp; reflexivity | ].
-simpl.
-remember (repeat (E f b) n) as r eqn:Hr.
-remember (r ++ uncombine_loop (other_elem f) bnl) as el eqn:Hel.
-destruct (letter_dec f (first (combine el))) as [H₁| H₁].
- remember (path (combine el)) as bnl₁ eqn:Hbnl₁.
- destruct bnl₁ as [| (b₁, n₁)]; [ reflexivity | ].
- destruct (Bool.bool_dec b b₁) as [H₂| H₂]; [ reflexivity | ].
- destruct n₁; [ exfalso | reflexivity ].
- clear Hp.
- destruct n.
-  simpl in Hr; subst r.
-  rewrite app_nil_l in Hel.
-  rewrite Hel in H₁.
-  destruct bnl as [| (b₂, n₂)].
-   simpl in Hel; subst el; discriminate Hbnl₁.
-
-   rewrite IHbnl in H₁; [ | intros H; discriminate H ].
-   destruct f; discriminate H₁.
+  rewrite IHbnl in H₁; [ | intros H; discriminate H ].
+  destruct f; discriminate H₁.
 
   remember (uncombine_loop (other_elem f) bnl) as bnl₂ eqn:Hbnl₂.
   subst r el; simpl in Hbnl₁.
