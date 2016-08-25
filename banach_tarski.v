@@ -1561,8 +1561,6 @@ Fixpoint combine el :=
   | [] => {| first := la; path := [] |}
   end.
 
-Compute combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
-
 Fixpoint rotate_step pt e n :=
   match n with
   | O => pt
@@ -1845,6 +1843,49 @@ destruct (letter_dec t (first (combine el))) as [H₁| H₁].
    reflexivity.
 Qed.
 
+Fixpoint uncombine_loop first path :=
+  match path with
+  | (b, n) :: bnl =>
+      repeat (E first b) (S n) ++ uncombine_loop (other_elem first) bnl
+  | [] => []
+  end.
+
+Definition uncombine nc := uncombine_loop (first nc) (path nc).
+
+Compute combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
+Compute uncombine (combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ]).
+
+Theorem toto : ∀ nc x y z,
+  first nc = lb
+  → path nc ≠ []
+  → rotate_combined nc (P 1 0 0) = P x y z
+  → y ≠ 0%R.
+Proof.
+intros nc x y z Hf Hp Hr.
+generalize Hr; intros H₁.
+remember (uncombine nc) as el eqn:Hel.
+unfold uncombine in Hel.
+rewrite Hf in Hel.
+destruct el as [| e].
+ remember (path nc) as bnl eqn:Hbnl.
+ symmetry in Hbnl.
+ destruct bnl as [| (b, n)]; [ exfalso; apply Hp; reflexivity | ].
+ discriminate Hel.
+
+Theorem toto : ∀ nc el, el = uncombine nc → el ≠ [] → nc = combine el.
+Proof.
+intros nc el Hel Hu.
+unfold uncombine in Hel; symmetry in Hel.
+revert nc Hel Hu.
+induction el as [| e]; intros; [ exfalso; apply Hu; reflexivity | clear Hu ].
+simpl in Hel; simpl.
+destruct e as (t, d).
+destruct (letter_dec t (first (combine el))) as [H₁| H₁].
+ remember (path (combine el)) as bnl eqn:Hbnl.
+ symmetry in H₁, Hbnl.
+ destruct bnl as [| (b, n)].
+  destruct nc as (f, p).
+  simpl in Hel.
 bbb.
 
 Theorem toto : ∀ el a b c N,
