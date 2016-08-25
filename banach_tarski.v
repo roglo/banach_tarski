@@ -1855,6 +1855,9 @@ Definition uncombine nc := uncombine_loop (first nc) (path nc).
 Compute combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ].
 Compute uncombine (combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; ḅ; ḅ; ḅ]).
 
+Theorem other_elem_involutive : ∀ t, other_elem (other_elem t) = t.
+Proof. intros; destruct t; reflexivity. Qed.
+
 Theorem toto : ∀ nc x y z,
   first nc = lb
   → path nc ≠ []
@@ -1898,16 +1901,38 @@ destruct (letter_dec f (first (combine el))) as [Hf| Hf].
    destruct e as (t, d).
    simpl in Hf.
    destruct (letter_dec t (first (combine el))) as [H₁| H₁].
+    symmetry in H₁.
     remember (path (combine el)) as bnl₂ eqn:Hbnl₂.
     symmetry in Hbnl₂.
     destruct bnl₂ as [| (b₁, n₁)]; [ discriminate Hbnl₁ | ].
     destruct (Bool.bool_dec d b₁) as [H₂| H₂]; [ subst b₁ | ].
      discriminate Hbnl₁.
 
-     destruct n₁.
-      simpl in Hf, Hbnl₁.
-      subst bnl₂ f.
+     destruct n₁; [ | discriminate Hbnl₁ ].
+     simpl in Hf, Hbnl₁.
+     subst bnl₂ f.
+     rewrite other_elem_involutive in Hel.
+     destruct n.
+      simpl in Hel.
+      destruct bnl as [| (b₂, n₂)]; [ reflexivity | exfalso ].
+      simpl in Hel.
+      injection Hel; clear Hel; intros; subst b₂ el.
+      assert (Hn : (d, n₂) :: bnl ≠ []) by (intros H; discriminate).
+      apply IHbnl with (f := t) in Hn.
+      simpl in Hn.
+      rewrite H₁, Hbnl₂ in Hn.
+      rewrite letter_dec_diag in Hn.
+      destruct (Bool.bool_dec d b₁) as [H₃| H₃]; [ contradiction | ].
+      discriminate Hn.
 
+      exfalso.
+      simpl in Hel.
+      injection Hel; clear Hel; intros H₃ H₄ H₅.
+      destruct t; discriminate H₅.
+
+    discriminate Hbnl₁.
+    destruct (Bool.bool_dec b b₁) as [H₁| H₁]; [ subst b₁ | ].
+     f_equal.
 bbb.
 
 pose proof toto nc as Ht.
