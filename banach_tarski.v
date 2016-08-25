@@ -1860,6 +1860,10 @@ Compute uncombine (combine [ạ⁻¹; ḅ⁻¹; ạ; ḅ⁻¹; ạ⁻¹; ạ; �
 Theorem other_elem_involutive : ∀ t, other_elem (other_elem t) = t.
 Proof. intros; destruct t; reflexivity. Qed.
 
+Theorem fold_uncombine : ∀ f p,
+  uncombine_loop f p = uncombine {| first := f; path := p |}.
+Proof. reflexivity. Qed.
+
 Theorem toto : ∀ nc x y z,
   first nc = lb
   → path nc ≠ []
@@ -1938,7 +1942,17 @@ destruct (letter_dec f (first (combine el))) as [Hf| Hf].
      destruct n.
       simpl in Hel; subst el.
       destruct bnl as [| (b₂, n₂)]; [ discriminate Hbnl₁ | ].
-      remember combine as g; simpl in Hf, Hbnl₁; subst g.
+Theorem toto : ∀ nc, path nc ≠ [] →
+  first (combine (uncombine nc)) = first nc.
+Proof.
+intros (f, bnl) Hp; simpl.
+unfold uncombine; simpl.
+destruct bnl as [| (b, n)]; [ exfalso; apply Hp; reflexivity | ].
+bbb.
+
+rewrite fold_uncombine, toto in Hf.
+simpl in Hf; destruct f; discriminate Hf.
+
 bbb.
 
 Theorem toto : ∀ t d el,
