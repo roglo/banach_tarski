@@ -1948,6 +1948,33 @@ Proof.
 intros (f, bnl) Hp; simpl.
 unfold uncombine; simpl.
 destruct bnl as [| (b, n)]; [ exfalso; apply Hp; reflexivity | ].
+remember combine as g; simpl; subst g.
+remember (repeat (E f b) n) as r eqn:Hr.
+remember (r ++ uncombine_loop (other_elem f) bnl) as el eqn:Hel.
+simpl.
+destruct (letter_dec f (first (combine el))) as [H₁| H₁].
+ remember (path (combine el)) as bnl₁ eqn:Hbnl₁.
+ destruct bnl₁ as [| (b₁, n₁)]; [ reflexivity | ].
+ destruct (Bool.bool_dec b b₁) as [H₂| H₂]; [ reflexivity | ].
+ destruct n₁; [ exfalso | reflexivity ].
+ subst r el.
+ destruct n.
+  simpl in H₁.
+  destruct bnl as [| (b₂, n₂)]; [ discriminate Hbnl₁ | ].
+  remember combine as g; simpl in H₁; subst g.
+  remember (repeat (E (other_elem f) b₂) n₂) as r eqn:Hr.
+  remember (r ++ uncombine_loop (other_elem (other_elem f)) bnl) as bnl₂.
+  simpl in H₁.
+  destruct (letter_dec (other_elem f) (first (combine bnl₂))) as [H₃| H₃].
+   destruct (path (combine bnl₂)) as [| (b₃, n₃)].
+    destruct f; discriminate H₁.
+
+    destruct (Bool.bool_dec b₂ b₃) as [H₄| H₄].
+     destruct f; discriminate H₁.
+
+     destruct n₃.
+      simpl in Hbnl₁.
+(* c'est parti en couille, ça, non ? *)
 bbb.
 
 rewrite fold_uncombine, toto in Hf.
