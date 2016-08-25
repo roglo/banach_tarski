@@ -1872,6 +1872,51 @@ destruct el as [| e].
  destruct bnl as [| (b, n)]; [ exfalso; apply Hp; reflexivity | ].
  discriminate Hel.
 
+Theorem toto : ∀ nc, path nc ≠ [] → combine (uncombine nc) = nc.
+Proof.
+intros nc Hbnl.
+unfold uncombine.
+destruct nc as (f, bnl); simpl in Hbnl; simpl.
+revert f.
+induction bnl as [| (b, n)]; intros; [ exfalso; apply Hbnl; reflexivity | ].
+clear Hbnl; simpl.
+remember (repeat (E f b) n) as r eqn:Hr.
+remember (r ++ uncombine_loop (other_elem f) bnl) as el eqn:Hel; subst r.
+symmetry in Hel.
+destruct (letter_dec f (first (combine el))) as [Hf| Hf].
+ remember (path (combine el)) as bnl₁ eqn:Hbnl₁; symmetry in Hf, Hbnl₁.
+ destruct bnl₁ as [| (b₁, n₁)].
+  f_equal.
+  destruct el as [| e].
+   simpl in Hf; subst f.
+   destruct n; [ | discriminate Hel ].
+   simpl in Hel.
+   destruct bnl as [| (b₂, n₂)]; [ reflexivity | ].
+   discriminate Hel.
+
+   simpl in Hbnl₁.
+   destruct e as (t, d).
+   simpl in Hf.
+   destruct (letter_dec t (first (combine el))) as [H₁| H₁].
+    remember (path (combine el)) as bnl₂ eqn:Hbnl₂.
+    symmetry in Hbnl₂.
+    destruct bnl₂ as [| (b₁, n₁)]; [ discriminate Hbnl₁ | ].
+    destruct (Bool.bool_dec d b₁) as [H₂| H₂]; [ subst b₁ | ].
+     discriminate Hbnl₁.
+
+     destruct n₁.
+      simpl in Hf, Hbnl₁.
+      subst bnl₂ f.
+
+bbb.
+
+pose proof toto nc as Ht.
+unfold uncombine in Ht.
+rewrite Hf, <- Hel in Ht.
+simpl in Ht.
+
+bbb.
+
 Theorem toto : ∀ nc el, el = uncombine nc → el ≠ [] → nc = combine el.
 Proof.
 intros nc el Hel Hu.
