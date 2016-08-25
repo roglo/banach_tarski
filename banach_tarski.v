@@ -1967,7 +1967,51 @@ destruct (letter_dec f (first (combine el))) as [H₁| H₁].
    rewrite IHbnl in H₁; [ | intros H; discriminate H ].
    destruct f; discriminate H₁.
 
-  simpl.
+  remember (uncombine_loop (other_elem f) bnl) as bnl₂ eqn:Hbnl₂.
+  subst r el; simpl in Hbnl₁.
+  remember (repeat (E f b) n ++ bnl₂) as el₁ eqn:Hel₁.
+  destruct (letter_dec f (first (combine el₁))) as [H₃| H₃].
+   remember (path (combine el₁)) as bnl₃ eqn:Hbnl₃.
+   destruct bnl₃ as [| (b₂, n₂)].
+    injection Hbnl₁; intros H₄ H₅; symmetry in H₅; contradiction.
+
+    destruct (Bool.bool_dec b b₂) as [H₄| H₄]; [ discriminate Hbnl₁ | ].
+    destruct n₂.
+     simpl in Hbnl₁; subst bnl₃.
+     simpl in H₁.
+     rewrite <- Hel₁, <- H₃ in H₁.
+     rewrite letter_dec_diag in H₁.
+     rewrite <- Hbnl₃ in H₁.
+     destruct (Bool.bool_dec b b₂) as [H₅| H₅]; [ contradiction | ].
+     destruct f; discriminate H₁.
+
+     simpl in Hbnl₁.
+     injection Hbnl₁; clear Hbnl₁; intros; subst b₂ n₂ bnl₃.
+     clear H₄; simpl in H₁.
+     rewrite <- Hel₁, <- H₃ in H₁.
+     rewrite letter_dec_diag in H₁.
+     rewrite <- Hbnl₃ in H₁.
+     destruct (Bool.bool_dec b b₁) as [H₅| H₅]; [ contradiction | ].
+     clear H₅ H₁.
+     destruct bnl as [| (b₂, n₂)].
+      simpl in Hbnl₂; subst bnl₂.
+      rewrite app_nil_r in Hel₁; subst el₁.
+      destruct n; [ discriminate Hbnl₃ | ].
+      simpl in Hbnl₃, H₃.
+      remember (combine (repeat (E f b) n)) as nc eqn:Hnc.
+      destruct (letter_dec f (first nc)) as [H₁| H₁].
+       remember (path nc) as bnl eqn:Hbnl.
+       destruct bnl as [| (b₂, n₂)]; [ discriminate Hbnl₃ | ].
+       destruct (Bool.bool_dec b b₂) as [H₄| H₄]; [ subst b₂ | ].
+        simpl in Hbnl₃.
+        injection Hbnl₃; intros; subst; apply H₂; reflexivity.
+
+        destruct n₂; [ destruct f; discriminate H₃ | ].
+        simpl in Hbnl₃.
+        injection Hbnl₃; clear Hbnl₃; intros; subst b₂ n₂ bnl₁.
+
+(* there is an induction somewhere... *)
+
 bbb.
 intros (f, bnl) Hp; simpl in Hp; simpl.
 unfold uncombine; simpl.
