@@ -1627,7 +1627,7 @@ destruct t, d; simpl.
  f_equal; f_equal; apply mul_rot_z_rotate_step_comm.
 Qed.
 
-Theorem rot_inv_rot_x : ∀ pt,
+Theorem rot_rot_inv_x : ∀ pt,
   mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
 Proof.
 intros.
@@ -1656,7 +1656,7 @@ f_equal.
  field_simplify; reflexivity.
 Qed.
 
-Theorem inv_rot_rot_x : ∀ pt,
+Theorem rot_inv_rot_x : ∀ pt,
   mat_vec_mul rot_inv_x (mat_vec_mul rot_x pt) = pt.
 Proof.
 intros.
@@ -1685,7 +1685,7 @@ f_equal.
  field_simplify; reflexivity.
 Qed.
 
-Theorem rot_inv_rot_z : ∀ pt,
+Theorem rot_rot_inv_z : ∀ pt,
   mat_vec_mul rot_z (mat_vec_mul rot_inv_z pt) = pt.
 Proof.
 intros.
@@ -1714,7 +1714,7 @@ f_equal.
  field_simplify; reflexivity.
 Qed.
 
-Theorem inv_rot_rot_z : ∀ pt,
+Theorem rot_inv_rot_z : ∀ pt,
   mat_vec_mul rot_inv_z (mat_vec_mul rot_z pt) = pt.
 Proof.
 intros.
@@ -1756,7 +1756,7 @@ Theorem rot_step_rot_inv_x : ∀ pt n,
 Proof.
 intros.
 revert pt.
-induction n; intros; [ apply rot_inv_rot_x | simpl ].
+induction n; intros; [ apply rot_rot_inv_x | simpl ].
 symmetry; rewrite <- IHn.
 reflexivity.
 Qed.
@@ -1774,62 +1774,77 @@ destruct (letter_dec t (first (combine el))) as [H₁| H₁].
  remember (path nc) as bnl eqn:Hbnl.
  symmetry in Hbnl.
  destruct bnl as [| (b, n)].
- unfold rotate_combined; simpl.
- rewrite Hbnl; simpl; reflexivity.
+  unfold rotate_combined; simpl.
+  rewrite Hbnl; simpl; reflexivity.
 
- destruct (Bool.bool_dec d b) as [Hd| Hd]; [ subst d | ].
-  unfold rotate_combined.
-  rewrite Hbnl, <- H₁.
-  remember rotate_combined_loop as f.
-  remember rotate as g; simpl; subst f g.
-  apply rotate_combined_loop_succ.
+  destruct (Bool.bool_dec d b) as [Hd| Hd]; [ subst d | ].
+   unfold rotate_combined.
+   rewrite Hbnl, <- H₁.
+   remember rotate_combined_loop as f.
+   remember rotate as g; simpl; subst f g.
+   apply rotate_combined_loop_succ.
 
-  destruct n.
-   unfold rotate_combined; simpl.
-   destruct t, d; simpl.
-    rewrite Hbnl, <- H₁; simpl.
-    apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
-    rewrite rot_inv_rot_x; reflexivity.
+   destruct n.
+    unfold rotate_combined; simpl.
+    destruct t, d; simpl.
+     rewrite Hbnl, <- H₁; simpl.
+     apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
+     rewrite rot_rot_inv_x; reflexivity.
 
-    rewrite Hbnl, <- H₁; simpl.
-    apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
-    rewrite inv_rot_rot_x; reflexivity.
+     rewrite Hbnl, <- H₁; simpl.
+     apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
+     rewrite rot_inv_rot_x; reflexivity.
 
-    rewrite Hbnl, <- H₁; simpl.
-    apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
-    rewrite rot_inv_rot_z; reflexivity.
+     rewrite Hbnl, <- H₁; simpl.
+     apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
+     rewrite rot_rot_inv_z; reflexivity.
 
-    rewrite Hbnl, <- H₁; simpl.
-    apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
-    rewrite inv_rot_rot_z; reflexivity.
+     rewrite Hbnl, <- H₁; simpl.
+     apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
+     rewrite rot_inv_rot_z; reflexivity.
 
-   unfold rotate_combined; simpl.
-   destruct t, d; simpl.
-    rewrite Hbnl, <- H₁; simpl.
-    apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
-bbb.
-    rewrite rot_inv_rot_x; reflexivity.
+    unfold rotate_combined; simpl.
+    destruct t, d; simpl.
+     rewrite Hbnl, <- H₁; simpl.
+     apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
+     symmetry; rewrite mul_rot_x_rotate_step_comm.
+     rewrite rot_rot_inv_x; reflexivity.
 
-    rewrite Hbnl, <- H₁; simpl.
-    apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
-    rewrite inv_rot_rot_x; reflexivity.
+     rewrite Hbnl, <- H₁; simpl.
+     apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
+     symmetry; rewrite mul_rot_inv_x_rotate_step_comm.
+     rewrite rot_inv_rot_x; reflexivity.
 
-    rewrite Hbnl, <- H₁; simpl.
-    apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
-    rewrite rot_inv_rot_z; reflexivity.
+     rewrite Hbnl, <- H₁; simpl.
+     apply not_eq_sym, Bool.not_true_is_false in Hd; subst b.
+     symmetry; rewrite mul_rot_z_rotate_step_comm.
+     rewrite rot_rot_inv_z; reflexivity.
 
-    rewrite Hbnl, <- H₁; simpl.
-    apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
-    rewrite inv_rot_rot_z; reflexivity.
+     rewrite Hbnl, <- H₁; simpl.
+     apply not_eq_sym, Bool.not_false_is_true in Hd; subst b.
+     symmetry; rewrite mul_rot_inv_z_rotate_step_comm.
+     rewrite rot_inv_rot_z; reflexivity.
 
-bbb.
+ destruct t; simpl.
+  destruct d.
+   unfold rotate_combined; simpl; f_equal.
+   destruct (first (combine el)); [ exfalso; apply H₁; reflexivity | ].
+   reflexivity.
 
-revert t d bnl pt.
-induction n; intros; [ reflexivity | ].
-Opaque rotate_step.
-simpl in IHn; simpl.
-destruct t; simpl in IHn; simpl.
-destruct d.
+   unfold rotate_combined; simpl; f_equal.
+   destruct (first (combine el)); [ exfalso; apply H₁; reflexivity | ].
+   reflexivity.
+
+  destruct d.
+   unfold rotate_combined; simpl; f_equal.
+   destruct (first (combine el)); [ | exfalso; apply H₁; reflexivity ].
+   reflexivity.
+
+   unfold rotate_combined; simpl; f_equal.
+   destruct (first (combine el)); [ | exfalso; apply H₁; reflexivity ].
+   reflexivity.
+Qed.
+
 bbb.
 
 Theorem toto : ∀ el a b c N,
