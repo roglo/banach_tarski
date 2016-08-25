@@ -1942,11 +1942,22 @@ destruct (letter_dec f (first (combine el))) as [Hf| Hf].
      destruct n.
       simpl in Hel; subst el.
       destruct bnl as [| (b₂, n₂)]; [ discriminate Hbnl₁ | ].
-Theorem toto : ∀ nc, path nc ≠ [] →
-  first (combine (uncombine nc)) = first nc.
+Theorem toto : ∀ nc, path nc ≠ [] → first (combine (uncombine nc)) = first nc.
 Proof.
 intros (f, bnl) Hp; simpl in Hp; simpl.
-unfold uncombine; simpl; revert f.
+unfold uncombine; simpl.
+Print uncombine_loop.
+
+bbb.
+
+destruct bnl as [| (b, n)]; intros; [ exfalso; apply Hp; reflexivity | ].
+clear Hp.
+
+bbb.
+
+intros (f, bnl) Hp; simpl in Hp; simpl.
+unfold uncombine; simpl.
+revert f.
 induction bnl as [| (b, n)]; intros; [ exfalso; apply Hp; reflexivity | ].
 simpl.
 remember (repeat (E f b) n) as r eqn:Hr.
