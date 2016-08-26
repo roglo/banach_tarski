@@ -1920,6 +1920,11 @@ induction el as [| e]; intros.
   progress repeat rewrite Rplus_0_r.
   destruct d.
    exists (a'+4*b')%Z, (b'+2*a')%Z,(3*c')%Z, 1.
+   subst w'.
+   revert Habc; clear; intros.
+   induction el' as [| e].
+    simpl in Habc; simpl.
+    injection Habc; intros; subst.
 bbb.
 
 Theorem toto : ∀ nc x y z,
