@@ -1876,22 +1876,35 @@ Theorem toto : ∀ w el el' d,
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el' d Hw Hn Hel.
-revert w el d Hw Hn Hel.
-induction el' as [| e']; intros.
+destruct el as [| e]; [ discriminate Hel | ].
+injection Hel; clear Hel; intros; subst e el'.
+revert w d Hn Hw.
+induction el as [| e]; intros.
  destruct d.
   exists 1%Z, (-2)%Z, 0%Z, 1.
-  subst w el; simpl.
+  subst w; simpl.
   progress repeat rewrite Rmult_1_r.
   progress repeat rewrite Rmult_0_r.
   progress repeat rewrite Rplus_0_r.
   split; [ f_equal; lra | intros H; discriminate H ].
 
   exists 1%Z, 2%Z, 0%Z, 1.
-  subst w el; simpl.
+  subst w; simpl.
   progress repeat rewrite Rmult_1_r.
   progress repeat rewrite Rmult_0_r.
   progress repeat rewrite Rplus_0_r.
   split; [ f_equal; lra | intros H; discriminate H ].
+
+ remember (e :: el) as el' eqn:Hel.
+ remember (fold_left rotate el') as w' eqn:Hw'.
+ assert (Habc :
+   ∃ (a b c : ℤ) (k : ℕ),
+   w' (P 1 0 0) = P (IZR a / 3 ^ k) (IZR b * √ 2 / 3 ^ k) (IZR c / 3 ^ k)).
+  subst w'.
+  remember (fold_left rotate_param el' (1, 0, 0, O)%Z) as abc eqn:Habc.
+  symmetry in Habc.
+  destruct abc as (((a, b), c), N).
+  exists a, b, c, N.
 
 bbb.
 
