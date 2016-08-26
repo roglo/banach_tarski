@@ -1886,6 +1886,10 @@ destruct el as [| e].
  induction bnl as [| (b, n)]; intros; [ discriminate Hel | ].
  simpl in Hel.
  injection Hel; clear Hel; intros; subst e el.
+ unfold rotate_combined in Hr.
+ rewrite Hf, Hbnl in Hr.
+ simpl in Hr.
+ destruct b.
 
 Check rotate_param_app.
 bbb.
