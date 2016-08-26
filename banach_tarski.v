@@ -1924,7 +1924,27 @@ induction el as [| e]; intros.
    revert Habc; clear; intros.
    induction el' as [| e].
     simpl in Habc; simpl.
-    injection Habc; intros; subst.
+    injection Habc; intros H1 H2 H3.
+    symmetry in H1, H2; unfold Rdiv in H1, H2.
+    apply Rmult_integral in H1.
+    destruct H1 as [H1| H1].
+Focus 2.
+     exfalso; revert H1; apply Rinv_neq_0_compat, pow_nonzero; lra.
+
+     apply Rmult_integral in H2.
+     destruct H2 as [H2| H2].
+Focus 2.
+      exfalso; revert H2; apply Rinv_neq_0_compat, pow_nonzero; lra.
+
+      apply Rmult_integral in H2.
+      destruct H2 as [H2| H2]; [ | exfalso; revert H2; apply sqrt2_neq_0 ].
+      progress repeat rewrite plus_IZR.
+      progress repeat rewrite mult_IZR.
+      rewrite H1, H2; simpl.
+      progress repeat rewrite Rmult_0_r.
+      progress repeat rewrite Rmult_1_r.
+      progress repeat rewrite Rplus_0_r.
+      progress repeat rewrite Rplus_0_l.
 bbb.
 
 Theorem toto : ∀ nc x y z,
