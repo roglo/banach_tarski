@@ -1871,15 +1871,21 @@ Theorem toto : ∀ nc x y z,
   → y ≠ 0%R.
 Proof.
 intros nc x y z Hf Hp Hr.
-generalize Hr; intros H₁.
 remember (uncombine nc) as el eqn:Hel.
-unfold uncombine in Hel.
+unfold uncombine in Hel; symmetry in Hel.
 rewrite Hf in Hel.
 destruct el as [| e].
  remember (path nc) as bnl eqn:Hbnl.
  symmetry in Hbnl.
  destruct bnl as [| (b, n)]; [ exfalso; apply Hp; reflexivity | ].
  discriminate Hel.
+
+ remember (path nc) as bnl eqn:Hbnl; symmetry in Hbnl.
+ revert nc x y z e el Hf Hbnl Hr Hel.
+ clear Hp.
+ induction bnl as [| (b, n)]; intros; [ discriminate Hel | ].
+Check rotate_param_app.
+bbb.
 
 Theorem toto : ∀ nc, path nc ≠ [] → combine (uncombine nc) = nc.
 Proof.
