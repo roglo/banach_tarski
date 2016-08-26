@@ -1884,6 +1884,9 @@ destruct el as [| e].
  revert nc x y z e el Hf Hbnl Hr Hel.
  clear Hp.
  induction bnl as [| (b, n)]; intros; [ discriminate Hel | ].
+ simpl in Hel.
+ injection Hel; clear Hel; intros; subst e el.
+
 Check rotate_param_app.
 bbb.
 
