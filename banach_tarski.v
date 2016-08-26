@@ -1905,7 +1905,21 @@ induction el as [| e]; intros.
   symmetry in Habc.
   destruct abc as (((a, b), c), N).
   exists a, b, c, N.
+  apply rotate_param_rotate in Habc.
+  destruct Habc as (Habc, HN).
+  simpl in Habc.
+  rewrite Rmult_0_l in Habc.
+  unfold Rdiv in Habc.
+  do 2 rewrite RMicromega.Rinv_1 in Habc.
+  apply Habc.
 
+  destruct Habc as (a', (b', (c', (k', Habc)))).
+  subst w; simpl; rewrite <- Hw'.
+  progress repeat rewrite Rmult_1_r.
+  progress repeat rewrite Rmult_0_r.
+  progress repeat rewrite Rplus_0_r.
+  destruct d.
+   exists (a'+4*b')%Z, (b'+2*a')%Z,(3*c')%Z, 1.
 bbb.
 
 Theorem toto : ∀ nc x y z,
