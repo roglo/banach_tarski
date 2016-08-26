@@ -1919,13 +1919,14 @@ induction el as [| e]; intros.
   progress repeat rewrite Rmult_0_r.
   progress repeat rewrite Rplus_0_r.
   destruct d.
-   exists (a'+4*b')%Z, (b'+2*a')%Z,(3*c')%Z, 1.
+   exists (a'+4*b')%Z, (b'-2*a')%Z,(3*c')%Z, (S k').
    subst w'.
+split.
    revert Habc; clear; intros.
-   induction el' as [| e].
+   induction el' as [| e'].
     simpl in Habc; simpl.
     injection Habc; intros H1 H2 H3.
-    symmetry in H1, H2; unfold Rdiv in H1, H2.
+    symmetry in H1, H2; unfold Rdiv in H1, H2, H3.
     apply Rmult_integral in H1.
     destruct H1 as [H1| H1].
 Focus 2.
@@ -1938,13 +1939,19 @@ Focus 2.
 
       apply Rmult_integral in H2.
       destruct H2 as [H2| H2]; [ | exfalso; revert H2; apply sqrt2_neq_0 ].
+      apply Rmult_eq_compat_l with (r := (3 ^ k')%R) in H3.
+      rewrite Rmult_1_r in H3.
+      rewrite <- Rmult_assoc, Rmult_shuffle0 in H3.
+      rewrite Rinv_r_simpl_r in H3; [ | apply pow_nonzero; lra ].
       progress repeat rewrite plus_IZR.
+      progress repeat rewrite minus_IZR.
       progress repeat rewrite mult_IZR.
-      rewrite H1, H2; simpl.
+      rewrite H1, H2, <- H3; simpl.
       progress repeat rewrite Rmult_0_r.
-      progress repeat rewrite Rmult_1_r.
       progress repeat rewrite Rplus_0_r.
-      progress repeat rewrite Rplus_0_l.
+      progress repeat rewrite Rminus_0_l.
+      unfold Rdiv.
+      f_equal; field; apply pow_nonzero; lra.
 bbb.
 
 Theorem toto : ∀ nc x y z,
