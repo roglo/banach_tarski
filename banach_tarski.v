@@ -1890,6 +1890,10 @@ destruct el as [| e].
  rewrite Hf, Hbnl in Hr.
  simpl in Hr.
  destruct b.
+  assert (Habc : ∃ a b c, x = IZR a ∧ y = (IZR b * √2 / 3)%R ∧ z = IZR c).
+   remember (rotate_param (1, 0, 0, O)%Z ḅ) as abc eqn:Habc.
+   symmetry in Habc.
+   simpl in Habc.
 
 Check rotate_param_app.
 bbb.
