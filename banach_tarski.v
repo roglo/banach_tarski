@@ -1879,14 +1879,47 @@ intros w el el₁ d Hw Hn Hel.
 (* counter-example: *)
 Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
 (* but perhaps we should count the division by 3^k ? *)
-destruct el as [| e].
+revert w el₁ d Hw Hel.
+induction el as [| e]; intros.
  symmetry in Hel; apply app_eq_nil in Hel; destruct Hel; discriminate.
 
- rename el into el₂.
- remember (e :: el₂) as el eqn:Hel₂.
- clear e el₂ Hel₂.
- revert w el₁ d Hw Hel.
- induction el as [| e]; intros.
+ simpl in Hn.
+ remember (norm_list el) as el₂ eqn:Hel₂.
+ symmetry in Hel₂.
+ destruct el₂ as [| e₂].
+  injection Hn; clear Hn; intros; subst el.
+  destruct el₁ as [| e₁]; [ | destruct el₁; discriminate Hel ].
+  injection Hel; clear Hel; intros; subst e.
+  subst w; simpl.
+  progress repeat rewrite Rmult_1_r.
+  progress repeat rewrite Rmult_0_r.
+  progress repeat rewrite Rplus_0_r.
+  destruct d.
+   exists 1%Z, (-2)%Z, 0%Z, 1; simpl.
+   progress repeat rewrite Rmult_1_r.
+   split; [ f_equal; lra | intros H; discriminate H ].
+
+   exists 1%Z, 2%Z, 0%Z, 1; simpl.
+   progress repeat rewrite Rmult_1_r.
+   split; [ f_equal; lra | intros H; discriminate H ].
+
+  destruct (letter_opp_dec e e₂) as [H₁| H₁].
+   destruct e as (t₁, d₁).
+   destruct e₂ as (t₂, d₂).
+   apply letter_opp_iff in H₁.
+   destruct H₁; subst t₂ d₂; subst el₂.
+   remember (negb d₁) as d₂.
+   replace d₁ with (negb (negb d₁)) in Hel₂ by apply Bool.negb_involutive.
+   subst d₂.
+   exfalso; revert Hel₂; apply norm_list_impossible_start.
+
+   injection Hn; clear Hn; intros; subst el.
+   destruct el₁ as [| e₁]; [ discriminate Hel | simpl in Hel ].
+   injection Hel; clear Hel; intros H1 H2; subst e₁.
+   remember (fold_left rotate (e₂ :: el₂)) as w' eqn:Hw'.
+   pose proof IHel (eq_refl _) w' el₁ d (eq_refl _) H1 as H.
+   destruct H as (a', (b', (c', (k', (He, Hm))))).
+
 bbb.
 
 Theorem toto : ∀ w el el' d,
