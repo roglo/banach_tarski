@@ -1938,7 +1938,11 @@ induction el as [| e]; intros.
      progress repeat rewrite Rmult_0_r.
      progress repeat rewrite Rplus_0_l.
      progress repeat rewrite Rplus_0_r.
-     destruct t₂, d₂.
+     destruct t₂, d₂; [ | | | exfalso; apply H₁; constructor ].
+      pose proof IHel (eq_refl _) w' el₁ d (eq_refl _) H1.
+      destruct H as (a', (b', (c', (k', (Hp, Hb))))).
+      rewrite Hw', Hel₃ in Hp; simpl in Hp.
+
 bbb.
 
 Theorem toto : ∀ w el el' d,
