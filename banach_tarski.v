@@ -1942,6 +1942,20 @@ induction el as [| e]; intros.
       pose proof IHel (eq_refl _) w' el₁ d (eq_refl _) H1.
       destruct H as (a', (b', (c', (k', (Hp, Hb))))).
       rewrite Hw', Hel₃ in Hp; simpl in Hp.
+      progress repeat rewrite Rmult_1_l in Hp.
+      progress repeat rewrite Rmult_0_l in Hp.
+      progress repeat rewrite Rmult_0_r in Hp.
+      progress repeat rewrite Rplus_0_l in Hp.
+      progress repeat rewrite Rplus_0_r in Hp.
+bbb.
+      remember (fold_left rotate_param el₂ (3, -2, 1, 2%nat)%Z) as u eqn:Hu.
+      symmetry in Hu; destruct u as (((a, b), c), N).
+      eapply rotate_param_rotate in Hu.
+      destruct Hu as (Hu, HN); simpl in Hu.
+      progress repeat rewrite Rmult_1_r in Hu.
+      progress repeat rewrite Rmult_0_l in Hu.
+      replace (0 / 3)%R with 0%R in Hu by lra.
+      exists a
 
 bbb.
 
