@@ -1867,6 +1867,28 @@ Proof. reflexivity. Qed.
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" *)
 
+Theorem toto : ∀ w el el₁ d,
+  w = fold_left rotate el
+  → norm_list el = el
+  → el = el₁ ++ [E lb d]
+  → ∃ a b c k,
+    w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    (b mod 3 ≠ 0)%Z.
+Proof.
+intros w el el₁ d Hw Hn Hel.
+(* counter-example: *)
+Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
+(* but perhaps we should count the division by 3^k ? *)
+destruct el as [| e].
+ symmetry in Hel; apply app_eq_nil in Hel; destruct Hel; discriminate.
+
+ rename el into el₂.
+ remember (e :: el₂) as el eqn:Hel₂.
+ clear e el₂ Hel₂.
+ revert w el₁ d Hw Hel.
+ induction el as [| e]; intros.
+bbb.
+
 Theorem toto : ∀ w el el' d,
   w = fold_left rotate el
   → norm_list el = el
@@ -1914,11 +1936,15 @@ induction el as [| e]; intros.
   apply Habc.
 
   destruct Habc as (a', (b', (c', (k', Habc)))).
+bbb.
+
   subst w; simpl; rewrite <- Hw'.
   progress repeat rewrite Rmult_1_r.
   progress repeat rewrite Rmult_0_r.
   progress repeat rewrite Rplus_0_r.
   destruct d.
+bbb.
+
    rewrite Hw', Hel in Habc.
    simpl in Habc.
    destruct e as (t, d); destruct t, d.
