@@ -1920,6 +1920,7 @@ induction el as [| e]; intros.
   progress repeat rewrite Rplus_0_r.
   destruct d.
    exists (a'+4*b')%Z, (b'-2*a')%Z,(3*c')%Z, (S k').
+bbb.
    subst w'.
 split.
    revert Habc; clear; intros.
@@ -1952,6 +1953,8 @@ Focus 2.
       progress repeat rewrite Rminus_0_l.
       unfold Rdiv.
       f_equal; field; apply pow_nonzero; lra.
+
+simpl in Habc; simpl.
 bbb.
 
 Theorem toto : ∀ nc x y z,
