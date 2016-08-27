@@ -1919,7 +1919,23 @@ induction el as [| e]; intros.
   progress repeat rewrite Rmult_0_r.
   progress repeat rewrite Rplus_0_r.
   destruct d.
-   exists (a'+4*b')%Z, (b'-2*a')%Z,(3*c')%Z, (S k').
+   rewrite Hw', Hel in Habc.
+   simpl in Habc.
+   destruct e as (t, d); destruct t, d.
+    simpl in Habc.
+    progress repeat rewrite Rmult_1_r in Habc.
+    progress repeat rewrite Rmult_0_l in Habc.
+    progress repeat rewrite Rmult_0_r in Habc.
+    progress repeat rewrite Rplus_0_r in Habc.
+    rewrite Hw', Hel; simpl.
+    progress repeat rewrite Rmult_0_l.
+    progress repeat rewrite Rmult_1_l.
+    progress repeat rewrite Rmult_0_r.
+    progress repeat rewrite Rplus_0_l.
+    progress repeat rewrite Rplus_0_r.
+bbb.
+
+    exists (a'+4*b')%Z, (b'-2*a')%Z,(3*c')%Z, (S k').
 bbb.
    subst w'.
 split.
