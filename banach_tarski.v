@@ -1916,10 +1916,29 @@ induction el as [| e]; intros.
    injection Hn; clear Hn; intros; subst el.
    destruct el₁ as [| e₁]; [ discriminate Hel | simpl in Hel ].
    injection Hel; clear Hel; intros H1 H2; subst e₁.
-   remember (fold_left rotate (e₂ :: el₂)) as w' eqn:Hw'.
-   pose proof IHel (eq_refl _) w' el₁ d (eq_refl _) H1 as H.
-   destruct H as (a', (b', (c', (k', (He, Hm))))).
+   remember (e₂ :: el₂) as el₃ eqn:Hel₃.
+   remember (fold_left rotate el₃) as w' eqn:Hw'.
+   subst w; simpl; rewrite <- Hw'.
+   destruct e as (t₁, d₁); destruct t₁; simpl.
+    progress repeat rewrite Rmult_1_r.
+    progress repeat rewrite Rmult_0_r.
+    progress repeat rewrite Rplus_0_r.
+    destruct d₁.
+     eapply IHel; [ reflexivity | reflexivity | eassumption ].
+     eapply IHel; [ reflexivity | reflexivity | eassumption ].
 
+    progress repeat rewrite Rmult_1_r.
+    progress repeat rewrite Rmult_0_r.
+    progress repeat rewrite Rplus_0_r.
+    rewrite Hw', Hel₃; simpl.
+    destruct d₁; simpl.
+     destruct e₂ as (t₂, d₂); simpl.
+     progress repeat rewrite Rmult_1_l.
+     progress repeat rewrite Rmult_0_l.
+     progress repeat rewrite Rmult_0_r.
+     progress repeat rewrite Rplus_0_l.
+     progress repeat rewrite Rplus_0_r.
+     destruct t₂, d₂.
 bbb.
 
 Theorem toto : ∀ w el el' d,
