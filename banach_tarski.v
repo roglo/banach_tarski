@@ -1886,28 +1886,6 @@ Theorem toto : ∀ w el el₁ d,
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hw Hn Hel.
-revert w el₁ d Hw Hel.
-induction el as [| e] using rev_ind; intros.
- symmetry in Hel; apply app_eq_nil in Hel; destruct Hel; discriminate.
-
- apply app_inj_tail in Hel.
- destruct Hel; subst el₁ e.
- destruct (list_nil_app_dec el) as [Hel | (e, (el₁, Hel))].
-  subst el w; simpl.
-  progress repeat rewrite Rmult_1_r.
-  progress repeat rewrite Rmult_0_r.
-  progress repeat rewrite Rplus_0_r.
-  destruct d.
-   exists 1%Z, (-2)%Z, 0%Z, 1.
-   split; [ | intros H; discriminate H].
-   rewrite pow_1; f_equal; lra.
-
-   exists 1%Z, 2%Z, 0%Z, 1.
-   split; [ | intros H; discriminate H].
-   rewrite pow_1; f_equal; lra.
-
-bbb.
-intros w el el₁ d Hw Hn Hel.
 (* counter-example: *)
 Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
 (* but perhaps we should count the division by 3^k ? *)
@@ -1962,6 +1940,10 @@ destruct e as (t₁, d₁); destruct t₁; simpl.
  split; [ destruct d₁; assumption | assumption ].
 
  rewrite Hw; simpl; rewrite <- Hw'.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
+ destruct d₁.
 bbb.
    subst w; simpl; rewrite <- Hw'.
    destruct e as (t₁, d₁); destruct t₁; simpl.
