@@ -1944,6 +1944,16 @@ destruct e as (t₁, d₁); destruct t₁; simpl.
  progress repeat rewrite Rmult_0_r.
  progress repeat rewrite Rplus_0_r.
  destruct d₁.
+  subst w'.
+  remember (fold_left rotate_param el₃ (1%Z, (-2)%Z, 0%Z, 1)) as u eqn:Hu.
+  symmetry in Hu; destruct u as (((a, b), c), N).
+  apply rotate_param_rotate in Hu.
+  destruct Hu as (Hr, Hn); simpl in Hr.
+  rewrite Rmult_1_r in Hr.
+  replace (0/3)%R with 0%R in Hr by lra.
+  exists a, b, c, N.
+  split; [ apply Hr | ].
+
 bbb.
    subst w; simpl; rewrite <- Hw'.
    destruct e as (t₁, d₁); destruct t₁; simpl.
