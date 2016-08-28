@@ -1864,6 +1864,16 @@ Theorem fold_uncombine : ∀ f p,
   uncombine_loop f p = uncombine {| first := f; path := p |}.
 Proof. reflexivity. Qed.
 
+Theorem list_nil_app_dec {A} : ∀ (l : list A),
+  {l = []} + {∃ x l', l = l' ++ [x]}.
+Proof.
+intros l.
+destruct l as [| x]; [ left; reflexivity | right ].
+revert x.
+induction l as [| y] using rev_ind; intros; [ exists x, []; reflexivity | ].
+exists y, (x :: l); reflexivity.
+Qed.
+
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" *)
 
@@ -1875,6 +1885,28 @@ Theorem toto : ∀ w el el₁ d,
     w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
+intros w el el₁ d Hw Hn Hel.
+revert w el₁ d Hw Hel.
+induction el as [| e] using rev_ind; intros.
+ symmetry in Hel; apply app_eq_nil in Hel; destruct Hel; discriminate.
+
+ apply app_inj_tail in Hel.
+ destruct Hel; subst el₁ e.
+ destruct (list_nil_app_dec el) as [Hel | (e, (el₁, Hel))].
+  subst el w; simpl.
+  progress repeat rewrite Rmult_1_r.
+  progress repeat rewrite Rmult_0_r.
+  progress repeat rewrite Rplus_0_r.
+  destruct d.
+   exists 1%Z, (-2)%Z, 0%Z, 1.
+   split; [ | intros H; discriminate H].
+   rewrite pow_1; f_equal; lra.
+
+   exists 1%Z, 2%Z, 0%Z, 1.
+   split; [ | intros H; discriminate H].
+   rewrite pow_1; f_equal; lra.
+
+bbb.
 intros w el el₁ d Hw Hn Hel.
 (* counter-example: *)
 Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
@@ -1918,6 +1950,19 @@ induction el as [| e]; intros.
    injection Hel; clear Hel; intros H1 H2; subst e₁.
    remember (e₂ :: el₂) as el₃ eqn:Hel₃.
    remember (fold_left rotate el₃) as w' eqn:Hw'.
+
+pose proof IHel (eq_refl _) w' el₁ d (eq_refl _) H1 as H.
+destruct H as (a', (b', (c', (k', (Hp, Hb))))).
+destruct e as (t₁, d₁); destruct t₁; simpl.
+ rewrite Hw; simpl; rewrite <- Hw'.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
+ exists a', b', c', k'.
+ split; [ destruct d₁; assumption | assumption ].
+
+ rewrite Hw; simpl; rewrite <- Hw'.
+bbb.
    subst w; simpl; rewrite <- Hw'.
    destruct e as (t₁, d₁); destruct t₁; simpl.
     progress repeat rewrite Rmult_1_r.
