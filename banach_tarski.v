@@ -1929,6 +1929,35 @@ intros.
 unfold mat_mul; simpl; f_equal; ring.
 Qed.
 
+Definition rot_mat e :=
+  match e with
+  | ạ⁻¹ => rot_inv_x
+  | ạ => rot_x
+  | ḅ⁻¹ => rot_inv_z
+  | ḅ => rot_z
+  end.
+
+Theorem mat_vec_mul_rotate : ∀ pt e ml,
+  mat_vec_mul ml (rotate pt e) = mat_vec_mul (mat_mul ml (rot_mat e)) pt.
+Proof.
+intros.
+destruct pt as (x, y, z); simpl.
+destruct e as (t, d); destruct t, d; simpl; (f_equal; ring).
+Qed.
+
+Theorem rotate_by_mat_mul : ∀ pt el,
+  fold_left rotate el pt =
+  mat_vec_mul (fold_left mat_mul (rev (map rot_mat el)) mat_id) pt.
+Proof.
+intros pt el.
+revert pt.
+induction el as [| e]; intros.
+ destruct pt as (x, y, z); simpl; f_equal; ring.
+
+ simpl; rewrite IHel, fold_left_app; simpl.
+ rewrite mat_vec_mul_rotate; reflexivity.
+Qed.
+
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" *)
 
@@ -1971,63 +2000,7 @@ induction el as [| e]; intros.
 subst w.
 simpl.
 Print rotate.
-Definition rot_mat e :=
-  match e with
-  | ạ⁻¹ => rot_inv_x
-  | ạ => rot_x
-  | ḅ⁻¹ => rot_inv_z
-  | ḅ => rot_z
-  end.
-
-Theorem rotate_by_mat_mul : ∀ pt e el,
-  fold_left rotate (e :: el) pt =
-  mat_vec_mul (fold_left mat_mul (map rot_mat el) (rot_mat e)) pt.
-Proof.
-intros pt e el; simpl.
-(* non, ça doit pas être ça... enfin, faut voir... *)
-bbb.
-
-revert pt e.
-induction el as [| e₁]; intros; simpl.
- destruct e as (t, d); destruct t, d; reflexivity.
-
- destruct e as (t, d); destruct t, d;
-  destruct e₁ as (t₁, d₁); destruct t₁, d₁.
-Theorem toto : ∀ m ml,
-  fold_left mat_mul ml m = fold_left mat_mul (m :: ml) mat_id.
-Proof.
-intros m ml; simpl.
-rewrite mat_mul_id_l; reflexivity.
-Qed.
-Focus 3.
-rewrite IHel; simpl.
-remember (map rot_mat el) as ml.
-symmetry; rewrite toto; simpl.
-rewrite mat_mul_id_l.
-symmetry.
-
-Theorem mat_vec_assoc : ∀ pt ml m₁ m₂,
-  mat_vec_mul (fold_left mat_mul ml m₁) (mat_vec_mul m₂ pt) =
-  mat_vec_mul (mat_mul (fold_left mat_mul ml m₁) m₂) pt.
-Proof.
-Admitted. Show.
-rewrite mat_vec_assoc.
-
-bbb.
-
-Theorem mat_vec_assoc : ∀ pt ml m₁ m₂,
-  mat_vec_mul (fold_left mat_mul ml m₁) (mat_vec_mul m₂ pt) =
-  mat_vec_mul (fold_left mat_mul ml (mat_mul m₁ m₂)) pt.
-Proof.
-intros pt ml m₁ m₂.
-revert m₁ m₂ pt.
-induction ml as [| m]; intros; simpl.
- unfold mat_vec_mul, mat_mul; simpl.
- destruct pt as (x, y, z).
-  f_equal; ring.
-
-bbb.
-rewrite mat_vec_assoc.
+rewrite rotate_by_mat_mul.
 
 bbb.
 
