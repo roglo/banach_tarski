@@ -1990,7 +1990,17 @@ induction el as [| e]; intros.
   progress repeat rewrite Rmult_0_r.
   progress repeat rewrite Rplus_0_l.
   progress repeat rewrite Rplus_0_r.
-  destruct d.
+  unfold rot_inv_z, rot_z.
+  destruct d; simpl.
+   exists 1%Z, (-2)%Z, 0%Z, 1; simpl.
+   progress repeat rewrite Rmult_1_r.
+   split; [ f_equal; lra | intros H; discriminate H ].
+
+   exists 1%Z, 2%Z, 0%Z, 1; simpl.
+   progress repeat rewrite Rmult_1_r.
+   split; [ f_equal; lra | intros H; discriminate H ].
+
+  simpl in Hw.
 bbb.
 
 intros w el el₁ d Hw Hn Hel.
