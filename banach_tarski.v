@@ -1961,6 +1961,37 @@ destruct e as (t₁, d₁); destruct t₁; simpl.
    progress repeat rewrite Rmult_0_l in Hr.
    progress repeat rewrite Rplus_0_r in Hr.
    progress repeat rewrite Rplus_0_l in Hr.
+revert Hr; clear; intros.
+bbb.
+
+SearchAbout rotate_param.
+remember (fold_left rotate_param el₂ (3, -2, 8, 2%nat)%Z) as u eqn:Hu.
+symmetry in Hu; destruct u as (((a', b'), c'), N').
+generalize Hu; intros Hv.
+apply rotate_param_rotate in Hu; simpl in Hu.
+destruct Hu as (Hu, HN).
+progress repeat rewrite Rmult_1_r in Hu.
+replace ((2+1)/(3*3))%R with (1/3)%R in Hu by lra.
+replace (1/3*(-2*√2/3))%R with (-2*√2/(3*3))%R in Hr by lra.
+replace ((2+1+1+1+1+1+1)/(3*3))%R with (-2*√2/3*(-2*√2/3))%R in Hu.
+Focus 2.
+unfold Rdiv; do 2 rewrite <- Rmult_assoc.
+rewrite Rmult5_sqrt2_sqrt5; lra.
+rewrite Hr in Hu.
+injection Hu; clear Hu; intros Hc Hb Ha.
+
+
+Compute fold_left rotate [] (P (1/3) (-2*√2/9) (8/9)).
+
+revert H1 Hr; clear; intros.
+revert el₁ d a b c N H1 Hr.
+induction el₂ as [| e₂]; intros.
+ destruct el₁ as [| e₁]; [ discriminate H1 | simpl in H1 ].
+ injection H1; intros H2 H3.
+ symmetry in H2; apply app_eq_nil in H2; destruct H2; discriminate.
+
+
+
 bbb.
    subst w; simpl; rewrite <- Hw'.
    destruct e as (t₁, d₁); destruct t₁; simpl.
