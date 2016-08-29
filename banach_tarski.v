@@ -2000,7 +2000,24 @@ induction el as [| e]; intros.
    progress repeat rewrite Rmult_1_r.
    split; [ f_equal; lra | intros H; discriminate H ].
 
-  simpl in Hw.
+  destruct (letter_opp_dec e e₂) as [H₁| H₁].
+   destruct e as (t₁, d₁).
+   destruct e₂ as (t₂, d₂).
+   apply letter_opp_iff in H₁.
+   destruct H₁; subst t₂ d₂; subst el₂.
+   remember (negb d₁) as d₂.
+   replace d₁ with (negb (negb d₁)) in Hel₂ by apply Bool.negb_involutive.
+   subst d₂.
+   exfalso; revert Hel₂; apply norm_list_impossible_start.
+
+   injection Hn; clear Hn; intros; subst el.
+   destruct el₁ as [| e₁]; [ discriminate Hel | simpl in Hel ].
+   injection Hel; clear Hel; intros H1 H2; subst e₁.
+   remember (e₂ :: el₂) as el₃ eqn:Hel₃.
+   remember (fold_left mat_mul (rev (map rot_mat el₃)) mat_id) as w' eqn:Hw'.
+   pose proof IHel (eq_refl _) w' el₁ d (eq_refl _) H1 as H.
+   destruct H as (a', (b', (c', (k', (Hm, Hb))))).
+
 bbb.
 
 intros w el el₁ d Hw Hn Hel.
