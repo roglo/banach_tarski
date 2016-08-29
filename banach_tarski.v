@@ -1953,7 +1953,14 @@ destruct e as (t₁, d₁); destruct t₁; simpl.
   replace (0/3)%R with 0%R in Hr by lra.
   exists a, b, c, N.
   split; [ apply Hr | ].
-
+  subst el₃.
+  destruct e₂ as (t₂, d₂); destruct t₂, d₂.
+   simpl in Hr.
+   progress repeat rewrite Rmult_1_l in Hr.
+   progress repeat rewrite Rmult_0_r in Hr.
+   progress repeat rewrite Rmult_0_l in Hr.
+   progress repeat rewrite Rplus_0_r in Hr.
+   progress repeat rewrite Rplus_0_l in Hr.
 bbb.
    subst w; simpl; rewrite <- Hw'.
    destruct e as (t₁, d₁); destruct t₁; simpl.
