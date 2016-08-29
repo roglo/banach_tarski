@@ -2017,7 +2017,17 @@ induction el as [| e]; intros.
    remember (fold_left mat_mul (rev (map rot_mat el₃)) mat_id) as w' eqn:Hw'.
    pose proof IHel (eq_refl _) w' el₁ d (eq_refl _) H1 as H.
    destruct H as (a', (b', (c', (k', (Hm, Hb))))).
-
+simpl in Hm; simpl.
+progress repeat rewrite Rmult_1_r in Hm.
+progress repeat rewrite Rmult_0_r in Hm.
+progress repeat rewrite Rplus_0_r in Hm.
+progress repeat rewrite Rmult_1_r.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rplus_0_r.
+injection Hm; clear Hm; intros H2 H3 H4.
+simpl in Hw.
+rewrite fold_left_app, <- Hw' in Hw.
+simpl in Hw; rewrite Hw; simpl.
 bbb.
 
 intros w el el₁ d Hw Hn Hel.
