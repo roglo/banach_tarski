@@ -1954,11 +1954,54 @@ f_equal; ring_simplify; [ | reflexivity | reflexivity | ].
  rewrite Rsqr_sqrt; [ | lra ].
  progress repeat rewrite Rsqr_pow2; field.
 Qed.
-Definition rot_mat_mul m e := mat_mul m (rot_mat e).
 Theorem rotate_by_mat_mul : ∀ pt e el,
   fold_left rotate (e :: el) pt =
-  mat_vec_mul (fold_left rot_mat_mul el (rot_mat e)) pt.
+  mat_vec_mul (fold_left mat_mul (map rot_mat el) (rot_mat e)) pt.
 Proof.
+intros pt e el; simpl.
+revert pt e.
+induction el as [| e₁]; intros; simpl.
+ destruct e as (t, d); destruct t, d; reflexivity.
+
+ destruct e as (t, d); destruct t, d;
+  destruct e₁ as (t₁, d₁); destruct t₁, d₁.
+Theorem toto : ∀ m ml,
+  fold_left mat_mul ml m = fold_left mat_mul (m :: ml) mat_id.
+Proof.
+intros m ml; simpl.
+Theorem mat_mul_id_l : ∀ m, mat_mul mat_id m = m.
+Proof.
+intros m.
+unfold mat_mul, mat_id; simpl.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+destruct m; reflexivity.
+Qed.
+Show.
+rewrite mat_mul_id_l; reflexivity.
+Qed.
+Focus 3.
+rewrite IHel; simpl.
+remember (map rot_mat el) as ml.
+symmetry; rewrite toto; simpl.
+rewrite mat_mul_id_l.
+symmetry.
+
+Theorem mat_vec_assoc : ∀ pt ml m₁ m₂,
+  mat_vec_mul (fold_left mat_mul ml m₁) (mat_vec_mul m₂ pt) =
+  mat_vec_mul (fold_left mat_mul ml (mat_mul m₂ m₁)) pt.
+Proof.
+intros pt ml m₁ m₂.
+revert m₁ m₂ pt.
+induction ml as [| m]; intros; simpl.
+ unfold mat_vec_mul, mat_mul; simpl.
+ destruct pt as (x, y, z).
+  f_equal.
+   ring_simplify.
+   progress repeat rewrite Rplus_assoc; f_equal.
+
 bbb.
 
   destruct (letter_opp_dec e e₂) as [H₁| H₁].
