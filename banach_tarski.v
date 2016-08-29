@@ -1913,6 +1913,54 @@ induction el as [| e]; intros.
    progress repeat rewrite Rmult_1_r.
    split; [ f_equal; lra | intros H; discriminate H ].
 
+subst w.
+simpl.
+Print rotate.
+Definition rot_mat e :=
+  match e with
+  | ạ⁻¹ => rot_inv_x
+  | ạ => rot_x
+  | ḅ⁻¹ => rot_inv_z
+  | ḅ => rot_z
+  end.
+Print matrix.
+Definition mat_mul m₁ m₂ :=
+  mkmat
+    (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
+    (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
+    (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
+    (a₂₁ m₁ * a₁₁ m₂ + a₂₂ m₁ * a₂₁ m₂ + a₂₃ m₁ * a₃₁ m₂)
+    (a₂₁ m₁ * a₁₂ m₂ + a₂₂ m₁ * a₂₂ m₂ + a₂₃ m₁ * a₃₂ m₂)
+    (a₂₁ m₁ * a₁₃ m₂ + a₂₂ m₁ * a₂₃ m₂ + a₂₃ m₁ * a₃₃ m₂)
+    (a₃₁ m₁ * a₁₁ m₂ + a₃₂ m₁ * a₂₁ m₂ + a₃₃ m₁ * a₃₁ m₂)
+    (a₃₁ m₁ * a₁₂ m₂ + a₃₂ m₁ * a₂₂ m₂ + a₃₃ m₁ * a₃₂ m₂)
+    (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
+Definition mat_id := mkmat 1 0 0 0 1 0 0 0 1.
+Theorem mul_rot_x_rot_inv_x_id : mat_mul rot_x rot_inv_x = mat_id.
+Proof.
+unfold mat_mul, mat_id; simpl; unfold Rdiv.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite <- Rmult_assoc.
+f_equal; ring_simplify; [ | reflexivity | reflexivity | ].
+ progress repeat rewrite <- Rsqr_pow2.
+ rewrite Rsqr_sqrt; [ | lra ].
+ progress repeat rewrite Rsqr_pow2; field.
+
+ progress repeat rewrite <- Rsqr_pow2.
+ rewrite Rsqr_sqrt; [ | lra ].
+ progress repeat rewrite Rsqr_pow2; field.
+Qed.
+Definition rot_mat_mul m e := mat_mul m (rot_mat e).
+Theorem rotate_by_mat_mul : ∀ pt e el,
+  fold_left rotate (e :: el) pt =
+  mat_vec_mul (fold_left rot_mat_mul el (rot_mat e)) pt.
+Proof.
+bbb.
+
   destruct (letter_opp_dec e e₂) as [H₁| H₁].
    destruct e as (t₁, d₁).
    destruct e₂ as (t₂, d₂).
