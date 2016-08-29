@@ -1874,6 +1874,61 @@ induction l as [| y] using rev_ind; intros; [ exists x, []; reflexivity | ].
 exists y, (x :: l); reflexivity.
 Qed.
 
+Definition mat_mul m₁ m₂ :=
+  mkmat
+    (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
+    (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
+    (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
+    (a₂₁ m₁ * a₁₁ m₂ + a₂₂ m₁ * a₂₁ m₂ + a₂₃ m₁ * a₃₁ m₂)
+    (a₂₁ m₁ * a₁₂ m₂ + a₂₂ m₁ * a₂₂ m₂ + a₂₃ m₁ * a₃₂ m₂)
+    (a₂₁ m₁ * a₁₃ m₂ + a₂₂ m₁ * a₂₃ m₂ + a₂₃ m₁ * a₃₃ m₂)
+    (a₃₁ m₁ * a₁₁ m₂ + a₃₂ m₁ * a₂₁ m₂ + a₃₃ m₁ * a₃₁ m₂)
+    (a₃₁ m₁ * a₁₂ m₂ + a₃₂ m₁ * a₂₂ m₂ + a₃₃ m₁ * a₃₂ m₂)
+    (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
+
+Definition mat_id :=
+  mkmat
+    1 0 0
+    0 1 0
+    0 0 1.
+
+Theorem mat_mul_id_l : ∀ m, mat_mul mat_id m = m.
+Proof.
+intros m.
+unfold mat_mul, mat_id; simpl.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+destruct m; reflexivity.
+Qed.
+
+Theorem mul_rot_x_rot_inv_x_id : mat_mul rot_x rot_inv_x = mat_id.
+Proof.
+unfold mat_mul, mat_id; simpl; unfold Rdiv.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite <- Rmult_assoc.
+f_equal; ring_simplify; [ | reflexivity | reflexivity | ].
+ progress repeat rewrite <- Rsqr_pow2.
+ rewrite Rsqr_sqrt; [ | lra ].
+ progress repeat rewrite Rsqr_pow2; field.
+
+ progress repeat rewrite <- Rsqr_pow2.
+ rewrite Rsqr_sqrt; [ | lra ].
+ progress repeat rewrite Rsqr_pow2; field.
+Qed.
+
+Theorem mat_assoc : ∀ m₁ m₂ m₃,
+  mat_mul m₁ (mat_mul m₂ m₃) = mat_mul (mat_mul m₁ m₂) m₃.
+Proof.
+intros.
+unfold mat_mul; simpl; f_equal; ring.
+Qed.
+
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" *)
 
@@ -1923,42 +1978,15 @@ Definition rot_mat e :=
   | ḅ⁻¹ => rot_inv_z
   | ḅ => rot_z
   end.
-Print matrix.
-Definition mat_mul m₁ m₂ :=
-  mkmat
-    (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
-    (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
-    (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
-    (a₂₁ m₁ * a₁₁ m₂ + a₂₂ m₁ * a₂₁ m₂ + a₂₃ m₁ * a₃₁ m₂)
-    (a₂₁ m₁ * a₁₂ m₂ + a₂₂ m₁ * a₂₂ m₂ + a₂₃ m₁ * a₃₂ m₂)
-    (a₂₁ m₁ * a₁₃ m₂ + a₂₂ m₁ * a₂₃ m₂ + a₂₃ m₁ * a₃₃ m₂)
-    (a₃₁ m₁ * a₁₁ m₂ + a₃₂ m₁ * a₂₁ m₂ + a₃₃ m₁ * a₃₁ m₂)
-    (a₃₁ m₁ * a₁₂ m₂ + a₃₂ m₁ * a₂₂ m₂ + a₃₃ m₁ * a₃₂ m₂)
-    (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
-Definition mat_id := mkmat 1 0 0 0 1 0 0 0 1.
-Theorem mul_rot_x_rot_inv_x_id : mat_mul rot_x rot_inv_x = mat_id.
-Proof.
-unfold mat_mul, mat_id; simpl; unfold Rdiv.
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rmult_0_r.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite <- Rmult_assoc.
-f_equal; ring_simplify; [ | reflexivity | reflexivity | ].
- progress repeat rewrite <- Rsqr_pow2.
- rewrite Rsqr_sqrt; [ | lra ].
- progress repeat rewrite Rsqr_pow2; field.
 
- progress repeat rewrite <- Rsqr_pow2.
- rewrite Rsqr_sqrt; [ | lra ].
- progress repeat rewrite Rsqr_pow2; field.
-Qed.
 Theorem rotate_by_mat_mul : ∀ pt e el,
   fold_left rotate (e :: el) pt =
   mat_vec_mul (fold_left mat_mul (map rot_mat el) (rot_mat e)) pt.
 Proof.
 intros pt e el; simpl.
+(* non, ça doit pas être ça... enfin, faut voir... *)
+bbb.
+
 revert pt e.
 induction el as [| e₁]; intros; simpl.
  destruct e as (t, d); destruct t, d; reflexivity.
@@ -1969,17 +1997,6 @@ Theorem toto : ∀ m ml,
   fold_left mat_mul ml m = fold_left mat_mul (m :: ml) mat_id.
 Proof.
 intros m ml; simpl.
-Theorem mat_mul_id_l : ∀ m, mat_mul mat_id m = m.
-Proof.
-intros m.
-unfold mat_mul, mat_id; simpl.
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
-destruct m; reflexivity.
-Qed.
-Show.
 rewrite mat_mul_id_l; reflexivity.
 Qed.
 Focus 3.
@@ -1991,16 +2008,26 @@ symmetry.
 
 Theorem mat_vec_assoc : ∀ pt ml m₁ m₂,
   mat_vec_mul (fold_left mat_mul ml m₁) (mat_vec_mul m₂ pt) =
-  mat_vec_mul (fold_left mat_mul ml (mat_mul m₂ m₁)) pt.
+  mat_vec_mul (mat_mul (fold_left mat_mul ml m₁) m₂) pt.
+Proof.
+Admitted. Show.
+rewrite mat_vec_assoc.
+
+bbb.
+
+Theorem mat_vec_assoc : ∀ pt ml m₁ m₂,
+  mat_vec_mul (fold_left mat_mul ml m₁) (mat_vec_mul m₂ pt) =
+  mat_vec_mul (fold_left mat_mul ml (mat_mul m₁ m₂)) pt.
 Proof.
 intros pt ml m₁ m₂.
 revert m₁ m₂ pt.
 induction ml as [| m]; intros; simpl.
  unfold mat_vec_mul, mat_mul; simpl.
  destruct pt as (x, y, z).
-  f_equal.
-   ring_simplify.
-   progress repeat rewrite Rplus_assoc; f_equal.
+  f_equal; ring.
+
+bbb.
+rewrite mat_vec_assoc.
 
 bbb.
 
