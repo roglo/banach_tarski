@@ -2029,6 +2029,21 @@ simpl in Hw.
 rewrite fold_left_app, <- Hw' in Hw.
 simpl in Hw; rewrite Hw; simpl.
 rewrite H2, H3, H4.
+destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rplus_0_r.
+ exists a', b', c', k'.
+ split; [ reflexivity | assumption ].
+
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rplus_0_r.
+ exists a', b', c', k'.
+ split; [ reflexivity | assumption ].
+
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
 bbb.
 
 intros w el el₁ d Hw Hn Hel.
