@@ -2048,6 +2048,8 @@ destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
 Focus 2.
   subst w'; rewrite Hel₃; simpl; rewrite <- map_rev.
   rewrite fold_left_app; simpl.
+  destruct e₂ as (t₂, d₂); destruct t₂, d₂; simpl.
+   rewrite Rmult_0_r, Rplus_0_l.
 bbb. (* à voir... *)
 
   rewrite rev_app_distr; simpl.
