@@ -2046,9 +2046,22 @@ destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
  progress repeat rewrite Rplus_0_r.
  replace (a₁₂ w') with 0%R.
 Focus 2.
+  subst w'; rewrite Hel₃; simpl; rewrite <- map_rev.
+  rewrite fold_left_app; simpl.
+bbb. (* à voir... *)
+
+  rewrite rev_app_distr; simpl.
+  destruct d.
+   rewrite mat_mul_id_l.
+   clear; induction el₁ as [| e₁].
+    simpl.
+
   subst w'; rewrite H1; simpl; rewrite <- map_rev.
   rewrite rev_app_distr; simpl.
   destruct d.
+   rewrite mat_mul_id_l.
+   clear; induction el₁ as [| e₁].
+    simpl.
 bbb.
  subst el₃; rewrite Hw'.
  destruct e₂ as (t₂, d₂); destruct t₂, d₂; simpl.
