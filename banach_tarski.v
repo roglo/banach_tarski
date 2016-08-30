@@ -2045,6 +2045,15 @@ destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
  progress repeat rewrite Rmult_0_r.
  progress repeat rewrite Rplus_0_r.
 bbb.
+ subst el₃; rewrite Hw'.
+ destruct e₂ as (t₂, d₂); destruct t₂, d₂; simpl.
+  4: exfalso; apply H₁; constructor.
+
+  rewrite fold_left_app; simpl.
+  progress repeat rewrite Rmult_0_r.
+  progress repeat rewrite Rplus_0_l.
+
+bbb.
 
 intros w el el₁ d Hw Hn Hel.
 (* counter-example: *)
