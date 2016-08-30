@@ -2044,6 +2044,11 @@ destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
 
  progress repeat rewrite Rmult_0_r.
  progress repeat rewrite Rplus_0_r.
+ replace (a₁₂ w') with 0%R.
+Focus 2.
+  subst w'; rewrite H1; simpl; rewrite <- map_rev.
+  rewrite rev_app_distr; simpl.
+  destruct d.
 bbb.
  subst el₃; rewrite Hw'.
  destruct e₂ as (t₂, d₂); destruct t₂, d₂; simpl.
