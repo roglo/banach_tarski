@@ -2028,6 +2028,7 @@ injection Hm; clear Hm; intros H2 H3 H4.
 simpl in Hw.
 rewrite fold_left_app, <- Hw' in Hw.
 simpl in Hw; rewrite Hw; simpl.
+rewrite H2, H3, H4.
 bbb.
 
 intros w el el₁ d Hw Hn Hel.
