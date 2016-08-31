@@ -1974,7 +1974,7 @@ Theorem toto : ∀ w el el₁ d,
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hel Hn Hw.
-Compute fold_left rotate_param [ḅ] (1, 0, 0, O)%Z.
+Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 revert w el₁ d Hw Hel.
 induction el as [| e] using rev_ind; intros; [ discriminate Hel | ].
 destruct (norm_dec el) as [H₁| H₁].
@@ -2021,7 +2021,7 @@ destruct (norm_dec el) as [H₁| H₁].
     progress repeat rewrite Rplus_0_r in Hp.
     destruct d.
      simpl in Hac.
-     revert Hac Hb; clear; intros.
+     revert H₁ Hn Hac Hb; clear; intros.
      induction el as [| e]; simpl.
       split.
        rewrite Z.mul_comm; apply Z.mod_mul; intros H; discriminate H.
@@ -2032,9 +2032,11 @@ destruct (norm_dec el) as [H₁| H₁].
        rewrite Z.add_0_r; assumption.
 
       simpl in Hac.
-      destruct el as [| e₁]; [ apply IHel | ].
-      simpl in IHel.
-      destruct e as (t, d); destruct t.
+      destruct el as [| e₁].
+       destruct e as (t, d); destruct t, d; simpl.
+        split.
+         rewrite Z.mul_mod; [ | intros H; discriminate H ].
+         rewrite Hac; reflexivity.
 (* merde *)
 bbb.
 
