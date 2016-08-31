@@ -2079,6 +2079,7 @@ destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
   progress repeat rewrite Rmult_0_r, Rplus_0_r in H2, H3, H4.
   rewrite <- map_rev in H2, H3, H4.
   remember (fold_left mat_mul (map rot_mat (rev el₂)) mat_id) as m eqn:Hm.
+bbb.
 
 Theorem toto : ∀ el m,
   m = fold_left mat_mul (map rot_mat (rev el)) mat_id
