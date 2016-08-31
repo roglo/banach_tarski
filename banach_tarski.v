@@ -1962,6 +1962,165 @@ Qed.
     integers and b is not divisible by 3" *)
 
 Theorem toto : ∀ w el el₁ d,
+  el = E lb d :: el₁
+  → norm_list el = el
+  → w = fold_left rotate el
+  → ∃ a b c k,
+    w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    (b mod 3 ≠ 0)%Z.
+Proof.
+intros w el el₁ d Hel Hn Hw.
+revert w el₁ d Hw Hel.
+induction el as [| e] using rev_ind; intros; [ discriminate Hel | ].
+destruct (norm_dec el) as [H₁| H₁].
+ remember (fold_left rotate el) as w' eqn:Hw'.
+ destruct el as [| e₁].
+  injection Hel; clear Hel; intros; subst e el₁.
+  subst w; simpl.
+  progress repeat rewrite Rmult_1_r.
+  progress repeat rewrite Rmult_0_r.
+  progress repeat rewrite Rplus_0_r.
+  destruct d.
+   exists 1%Z, (-2)%Z, 0%Z, 1.
+   split; [ | intros H; discriminate H ].
+   simpl; f_equal; field.
+
+   exists 1%Z, 2%Z, 0%Z, 1.
+   split; [ | intros H; discriminate H ].
+   simpl; f_equal; field.
+
+  injection Hel; clear Hel; intros; subst e₁ el₁.
+  pose proof IHel H₁ w' el d (eq_refl _) (eq_refl _) as H.
+  destruct H as (a', (b', (c', (k', (Hp, Hb))))).
+  subst w; rewrite fold_left_app; rewrite <- Hw', Hp; simpl.
+  destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   exists (3*a')%Z, (b'+2*c')%Z, (-4*b'+c')%Z, (S k').
+   rewrite mult_IZR; simpl.
+   split.
+    f_equal; [ field; apply pow_nonzero; lra | | ].
+     rewrite plus_IZR, mult_IZR; simpl.
+     field_simplify; f_equal; apply pow_nonzero; lra.
+
+     rewrite plus_IZR, mult_IZR; simpl.
+     field_simplify; f_equal; try (apply pow_nonzero; lra).
+     rewrite <- Rsqr_pow2, Rsqr_sqrt; lra.
+
+    subst w'; simpl in Hp.
+    progress repeat rewrite Rmult_0_l in Hp.
+    progress repeat rewrite Rmult_0_r in Hp.
+    progress repeat rewrite Rmult_1_r in Hp.
+    progress repeat rewrite Rplus_0_r in Hp.
+    destruct d.
+    
+bbb.
+
+ pose proof IHel H₁ w' as H.
+ assert (Hel₁ : ∃ el₁, el = E lb d :: el₁).
+  induction el as [| e₁].
+
+bbb.
+intros w el el₁ d Hel Hn Hw.
+revert w el₁ d Hw Hel.
+induction el as [| e]; intros; [ discriminate Hel | ].
+simpl in Hn.
+remember (norm_list el) as el₂ eqn:Hel₂.
+symmetry in Hel₂.
+destruct el₂ as [| e₂].
+ injection Hn; clear Hn; intros; subst el.
+ destruct el₁ as [| e₁]; [ | destruct el₁; discriminate Hel ].
+ injection Hel; clear Hel; intros; subst e.
+ subst w; simpl.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
+ destruct d.
+  exists 1%Z, (-2)%Z, 0%Z, 1; simpl.
+  progress repeat rewrite Rmult_1_r.
+  split; [ f_equal; lra | intros H; discriminate H ].
+
+  exists 1%Z, 2%Z, 0%Z, 1; simpl.
+  progress repeat rewrite Rmult_1_r.
+  split; [ f_equal; lra | intros H; discriminate H ].
+
+ injection Hel; clear Hel; intros; subst e el₁.
+ destruct e₂ as (t₂, d₂).
+ destruct (letter_opp_dec (E lb d) (E t₂ d₂)) as [H₁| H₁].
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₂ d₂ el₂.
+  remember (negb d) as d₂.
+  replace d with (negb (negb d)) in Hel₂ by apply Bool.negb_involutive.
+  subst d₂.
+  exfalso; revert Hel₂; apply norm_list_impossible_start.
+
+  injection Hn; clear Hn; intros; subst el.
+  remember (fold_left rotate (E t₂ d₂ :: el₂)) as w' eqn:Hw'.
+  destruct t₂, d₂.
+bbb.
+  pose proof IHel (eq_refl _) w' el₂ d (eq_refl _).
+
+bbb.
+  destruct (letter_opp_dec e e₂) as [H₁| H₁].
+   destruct e as (t₁, d₁).
+   destruct e₂ as (t₂, d₂).
+   apply letter_opp_iff in H₁.
+   destruct H₁; subst t₂ d₂; subst el₂.
+   remember (negb d₁) as d₂.
+   replace d₁ with (negb (negb d₁)) in Hel₂ by apply Bool.negb_involutive.
+   subst d₂.
+   exfalso; revert Hel₂; apply norm_list_impossible_start.
+
+   injection Hn; clear Hn; intros; subst el.
+   destruct el₁ as [| e₁]; [ discriminate Hel | simpl in Hel ].
+   injection Hel; clear Hel; intros H1 H2; subst e₁.
+   remember (e₂ :: el₂) as el₃ eqn:Hel₃.
+   remember (fold_left rotate el₃) as w' eqn:Hw'.
+
+pose proof IHel (eq_refl _) w' el₁ d (eq_refl _) H1 as H.
+destruct H as (a', (b', (c', (k', (Hp, Hb))))).
+destruct e as (t₁, d₁); destruct t₁; simpl.
+ rewrite Hw; simpl; rewrite <- Hw'.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
+ exists a', b', c', k'.
+ split; [ destruct d₁; assumption | assumption ].
+
+ rewrite Hw; simpl; rewrite <- Hw'.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
+ destruct d₁.
+  subst w'.
+  remember (fold_left rotate_param el₃ (1%Z, (-2)%Z, 0%Z, 1)) as u eqn:Hu.
+  symmetry in Hu; destruct u as (((a, b), c), N).
+  apply rotate_param_rotate in Hu.
+  destruct Hu as (Hr, Hn); simpl in Hr.
+  rewrite Rmult_1_r in Hr.
+  replace (0/3)%R with 0%R in Hr by lra.
+  exists a, b, c, N.
+  split; [ apply Hr | ].
+  subst el₃.
+  destruct e₂ as (t₂, d₂); destruct t₂, d₂.
+   simpl in Hr.
+   progress repeat rewrite Rmult_1_l in Hr.
+   progress repeat rewrite Rmult_0_r in Hr.
+   progress repeat rewrite Rmult_0_l in Hr.
+   progress repeat rewrite Rplus_0_r in Hr.
+   progress repeat rewrite Rplus_0_l in Hr.
+revert Hr; clear; intros.
+bbb.
+ injection Hel; clear Hel; intros; subst e el₁.
+
+subst w.
+rewrite rotate_by_mat_mul.
+
+bbb.
+
+Theorem toto : ∀ w el el₁ d,
   w = fold_left rotate el
   → norm_list el = el
   → el = el₁ ++ [E lb d]
