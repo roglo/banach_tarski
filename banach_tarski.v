@@ -1967,9 +1967,13 @@ Theorem toto : ∀ w el el₁ d,
   → w = fold_left rotate el
   → ∃ a b c k,
     w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
-    (match last el (E lb d) with
-     | E la _ => (a mod 3 = 0)%Z
-     | E lb _ => (c mod 3 = 0)%Z
+    (match rev el with
+     | E lb _ :: E la _ :: _ => (c mod 3 = 0)%Z
+     | E la _ :: E lb _ :: _ => (a mod 3 = 0)%Z
+     | E lb _ :: E lb _ :: _ => (1 = 2)%Z
+     | E la _ :: E la _ :: rev_v => (2 = 3)%Z
+     | [E lb _] => (c mod 3 = 0)%Z
+     | _ => (4 = 5)%Z
      end) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
@@ -2023,6 +2027,7 @@ destruct (norm_dec el) as [H₁| H₁].
      simpl in Hac.
      revert H₁ Hn Hac Hb; clear; intros.
      induction el as [| e]; simpl.
+      simpl in Hac.
       split.
        rewrite Z.mul_comm; apply Z.mod_mul; intros H; discriminate H.
 
@@ -2032,11 +2037,11 @@ destruct (norm_dec el) as [H₁| H₁].
        rewrite Z.add_0_r; assumption.
 
       simpl in Hac.
-      destruct el as [| e₁].
-       destruct e as (t, d); destruct t, d; simpl.
-        split.
-         rewrite Z.mul_mod; [ | intros H; discriminate H ].
-         rewrite Hac; reflexivity.
+      rewrite rev_app_distr; simpl.
+      destruct e as (t, d); destruct t, d; simpl.
+       destruct el as [| e]; simpl.
+        simpl in Hac.
+        simpl in IHel.
 (* merde *)
 bbb.
 
