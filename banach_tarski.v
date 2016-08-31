@@ -2080,6 +2080,29 @@ destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
   rewrite <- map_rev in H2, H3, H4.
   remember (fold_left mat_mul (map rot_mat (rev el₂)) mat_id) as m eqn:Hm.
 
+Theorem toto : ∀ el m,
+  m = fold_left mat_mul (map rot_mat (rev el)) mat_id
+  → a₂₁ m = (- a₁₂ m)%R ∧
+    a₃₁ m = (- a₁₃ m)%R ∧
+    a₃₂ m = (- a₂₃ m)%R.
+Proof.
+intros el m Hm.
+revert m Hm.
+induction el as [| e]; intros; simpl.
+ subst m; simpl; rewrite Ropp_0.
+ split; [ reflexivity | split; reflexivity ].
+
+ simpl in Hm.
+ rewrite map_app, fold_left_app in Hm; simpl in Hm.
+ remember (fold_left mat_mul (map rot_mat (rev el)) mat_id) as m₂ eqn:Hm₂.
+ pose proof IHel m₂ (eq_refl _) as H.
+ destruct H as (H₁, (H₂, H₃)).
+ subst m; simpl.
+ rewrite H₁, H₂, H₃.
+ destruct e as (t, d); destruct t, d; simpl.
+  split.
+   ring_simplify.
+
 bbb.
 intros w el el₁ d Hw Hn Hel.
 (* counter-example: *)
