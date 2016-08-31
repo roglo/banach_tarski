@@ -2079,37 +2079,8 @@ destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
   progress repeat rewrite Rmult_0_r, Rplus_0_r in H2, H3, H4.
   rewrite <- map_rev in H2, H3, H4.
   remember (fold_left mat_mul (map rot_mat (rev el₂)) mat_id) as m eqn:Hm.
-bbb.
- replace (a₁₂ w') with 0%R.
-Focus 2.
-  subst w'; rewrite Hel₃; simpl; rewrite <- map_rev.
-  rewrite fold_left_app; simpl.
 
 bbb.
-
-  rewrite rev_app_distr; simpl.
-  destruct d.
-   rewrite mat_mul_id_l.
-   clear; induction el₁ as [| e₁].
-    simpl.
-
-  subst w'; rewrite H1; simpl; rewrite <- map_rev.
-  rewrite rev_app_distr; simpl.
-  destruct d.
-   rewrite mat_mul_id_l.
-   clear; induction el₁ as [| e₁].
-    simpl.
-bbb.
- subst el₃; rewrite Hw'.
- destruct e₂ as (t₂, d₂); destruct t₂, d₂; simpl.
-  4: exfalso; apply H₁; constructor.
-
-  rewrite fold_left_app; simpl.
-  progress repeat rewrite Rmult_0_r.
-  progress repeat rewrite Rplus_0_l.
-
-bbb.
-
 intros w el el₁ d Hw Hn Hel.
 (* counter-example: *)
 Compute fold_left rotate_param [ạ; ḅ] (1, 0, 0, O)%Z.
