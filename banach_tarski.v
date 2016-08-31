@@ -1967,9 +1967,14 @@ Theorem toto : ∀ w el el₁ d,
   → w = fold_left rotate el
   → ∃ a b c k,
     w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    (match last el (E lb d) with
+     | E la _ => (a mod 3 = 0)%Z
+     | E lb _ => (c mod 3 = 0)%Z
+     end) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hel Hn Hw.
+Compute fold_left rotate_param [ḅ] (1, 0, 0, O)%Z.
 revert w el₁ d Hw Hel.
 induction el as [| e] using rev_ind; intros; [ discriminate Hel | ].
 destruct (norm_dec el) as [H₁| H₁].
@@ -1982,16 +1987,16 @@ destruct (norm_dec el) as [H₁| H₁].
   progress repeat rewrite Rplus_0_r.
   destruct d.
    exists 1%Z, (-2)%Z, 0%Z, 1.
-   split; [ | intros H; discriminate H ].
-   simpl; f_equal; field.
+   split; [ simpl; f_equal; field | ].
+   split; [ reflexivity | intros H; discriminate H ].
 
    exists 1%Z, 2%Z, 0%Z, 1.
-   split; [ | intros H; discriminate H ].
-   simpl; f_equal; field.
+   split; [ simpl; f_equal; field | ].
+   split; [ reflexivity | intros H; discriminate H ].
 
   injection Hel; clear Hel; intros; subst e₁ el₁.
   pose proof IHel H₁ w' el d (eq_refl _) (eq_refl _) as H.
-  destruct H as (a', (b', (c', (k', (Hp, Hb))))).
+  destruct H as (a', (b', (c', (k', (Hp, (Hac, Hb)))))).
   subst w; rewrite fold_left_app; rewrite <- Hw', Hp; simpl.
   destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
    progress repeat rewrite Rmult_1_l.
@@ -2015,7 +2020,22 @@ destruct (norm_dec el) as [H₁| H₁].
     progress repeat rewrite Rmult_1_r in Hp.
     progress repeat rewrite Rplus_0_r in Hp.
     destruct d.
-    
+     simpl in Hac.
+     revert Hac Hb; clear; intros.
+     induction el as [| e]; simpl.
+      split.
+       rewrite Z.mul_comm; apply Z.mod_mul; intros H; discriminate H.
+
+       rewrite <- Z.add_mod_idemp_r; [ | intros H; discriminate H ].
+       rewrite Z.mul_mod; [ rewrite Hac; simpl | intros H; discriminate H ].
+       rewrite Z.mod_0_l; [ | intros H; discriminate H ].
+       rewrite Z.add_0_r; assumption.
+
+      simpl in Hac.
+      destruct el as [| e₁]; [ apply IHel | ].
+      simpl in IHel.
+      destruct e as (t, d); destruct t.
+(* merde *)
 bbb.
 
  pose proof IHel H₁ w' as H.
