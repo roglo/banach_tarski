@@ -1971,7 +1971,7 @@ Theorem toto : ∀ w el el₁ d,
      | E lb _ :: E la _ :: _ => (c mod 3 = 0)%Z
      | E la _ :: E lb _ :: _ => (a mod 3 = 0)%Z
      | E lb _ :: E lb _ :: _ => (1 = 2)%Z
-     | E la _ :: E la _ :: rev_v => (2 = 3)%Z
+     | E la _ :: E la _ :: rev_v => (rev_v = [])
      | [E lb _] => (c mod 3 = 0)%Z
      | _ => (4 = 5)%Z
      end) ∧
