@@ -1976,22 +1976,12 @@ Theorem toto : ∀ w el el₁ d,
   → w = fold_left rotate el
   → ∃ a b c k,
     w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
-(*
-    (match rev el with
-     | E lb _ :: E la _ :: _ => (c mod 3 = 0)%Z
-     | E la _ :: E lb _ :: _ => (a mod 3 = 0)%Z
-     | E lb _ :: E lb _ :: _ => (1 = 2)%Z
-     | E la _ :: E la _ :: rev_v => (rev_v = [])
-     | [E lb _] => (c mod 3 = 0)%Z
-     | _ => (4 = 5)%Z
-     end) ∧
-*)
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hel Hn Hw.
 remember (List.rev el₁) as rel₁ eqn:Hrel₁; symmetry in Hrel₁.
-revert w el el₁ rel₁ d Hel Hn Hw Hrel₁.
-fix IHrel₁ 4; intros.
+revert el el₁ rel₁ d w Hel Hrel₁ Hn Hw.
+fix IHrel₁ 3; intros.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 Guarded.
 destruct rel₁ as [| e₁].
@@ -2004,23 +1994,10 @@ destruct rel₁ as [| e₁].
   split; [ simpl; f_equal; field | intros H; discriminate H ].
 
  destruct rel₁ as [| e₂].
-  remember (fold_left rotate [E lb d]) as w' eqn:Hw'.
-  pose proof IHrel₁ w' el el₁.
-bbb.
-
   rewrite <- rev_involutive in Hrel₁.
   apply rev_rev in Hrel₁; simpl in Hrel₁; subst el₁.
-  pose proof IHrel₁.
-  pose proof IHrel₁ w' [E lb d] [] [] d (eq_refl _) (eq_refl _) Hw'
-    (eq_refl _) as H.
-  destruct H as (a', (b', (c', (k', (Hp, Hb))))).
-Guarded.
-bbb.
-
   destruct e₁ as (t₁, d₁).
   destruct t₁.
-   assert (Ha : (a' mod 3 = 0)%Z).
-
 Guarded.
 
 bbb.
