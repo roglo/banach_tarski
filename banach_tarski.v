@@ -1988,11 +1988,12 @@ Theorem toto : ∀ w el el₁ d,
 *)
     (b mod 3 ≠ 0)%Z.
 Proof.
-fix IHel 3.
-Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 intros w el el₁ d Hel Hn Hw.
-Guarded.
 remember (List.rev el₁) as rel₁ eqn:Hrel₁; symmetry in Hrel₁.
+revert w el el₁ rel₁ d Hel Hn Hw Hrel₁.
+fix IHrel₁ 4; intros.
+Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
+Guarded.
 destruct rel₁ as [| e₁].
  apply rev_is_nil in Hrel₁; subst el₁ el w; simpl.
  destruct d.
@@ -2003,9 +2004,22 @@ destruct rel₁ as [| e₁].
   split; [ simpl; f_equal; field | intros H; discriminate H ].
 
  destruct rel₁ as [| e₂].
+  remember (fold_left rotate [E lb d]) as w' eqn:Hw'.
+  pose proof IHrel₁ w' el el₁.
+bbb.
+
   rewrite <- rev_involutive in Hrel₁.
   apply rev_rev in Hrel₁; simpl in Hrel₁; subst el₁.
+  pose proof IHrel₁.
+  pose proof IHrel₁ w' [E lb d] [] [] d (eq_refl _) (eq_refl _) Hw'
+    (eq_refl _) as H.
+  destruct H as (a', (b', (c', (k', (Hp, Hb))))).
+Guarded.
+bbb.
+
   destruct e₁ as (t₁, d₁).
+  destruct t₁.
+   assert (Ha : (a' mod 3 = 0)%Z).
 
 Guarded.
 
