@@ -2041,6 +2041,13 @@ destruct (norm_dec el) as [H₁| H₁].
        apply eq_IZR_R0 in Hc'; subst c'; reflexivity.
 
        simpl in Hp.
+       destruct e as (t, d); destruct t, d.
+        simpl in Hp.
+        progress repeat rewrite Rmult_0_l in Hp.
+        progress repeat rewrite Rmult_0_r in Hp.
+        progress repeat rewrite Rmult_1_l in Hp.
+        progress repeat rewrite Rplus_0_l in Hp.
+        progress repeat rewrite Rplus_0_r in Hp.
 bbb.
 
      simpl in Hac.
