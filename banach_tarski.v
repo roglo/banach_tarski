@@ -2042,6 +2042,7 @@ destruct (norm_dec el) as [H₁| H₁].
        destruct el as [| e]; simpl.
         simpl in Hac.
         simpl in IHel.
+Compute fold_left rotate_param [ḅ⁻¹; ạ⁻¹; ạ⁻¹] (1, 0, 0, O)%Z.
 (* merde *)
 bbb.
 
