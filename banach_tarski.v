@@ -2101,6 +2101,12 @@ induction el₁ as [| e]; intros.
   apply norm_nil_iff in H₁.
   destruct H₁ as [H₁| H₁]; [ destruct el₁; discriminate H₁ | ].
   destruct H₁ as (el₃, (el₄, (t, (d, (H₁, H₂))))).
+  rewrite H₁ in Hn.
+  rewrite norm_list_cancel_inside, H₂ in Hn.
+  destruct el₂; [ simpl in Hn | destruct el₂; discriminate Hn ].
+  injection Hn; clear Hn; intros; subst e₂.
+  remember (norm_list el₁) as el₂ eqn:Hel₂; symmetry in Hel₂.
+  destruct el₂ as [| e₂]; [ exfalso | ].
 
 bbb.
    apply norm_list_app in Hn.
