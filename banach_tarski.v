@@ -2002,6 +2002,11 @@ destruct rel₁ as [| e₁].
   exists 1%Z, 2%Z, 0%Z, 1.
   split; [ simpl; f_equal; field | intros H; discriminate H ].
 
+ destruct rel₁ as [| e₂].
+  rewrite <- rev_involutive in Hrel₁.
+  apply rev_rev in Hrel₁; simpl in Hrel₁; subst el₁.
+  destruct e₁ as (t₁, d₁).
+
 Guarded.
 
 bbb.
