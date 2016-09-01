@@ -2107,7 +2107,9 @@ induction el₁ as [| e]; intros.
   injection Hn; clear Hn; intros; subst e₂.
   remember (norm_list el₁) as el₂ eqn:Hel₂; symmetry in Hel₂.
   destruct el₂ as [| e₂]; [ exfalso | ].
-
+   rewrite <- norm_list_cancel_inside with (t := t) (d := d) in H₂.
+   rewrite <- H₁ in H₂.
+   revert Hel₂ H₂; clear; intros.
 bbb.
    apply norm_list_app in Hn.
 
