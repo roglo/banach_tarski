@@ -1988,6 +1988,23 @@ Theorem toto : ∀ w el el₁ d,
 *)
     (b mod 3 ≠ 0)%Z.
 Proof.
+fix IHel 3.
+Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
+intros w el el₁ d Hel Hn Hw.
+Guarded.
+remember (List.rev el₁) as rel₁ eqn:Hrel₁; symmetry in Hrel₁.
+destruct rel₁ as [| e₁].
+ apply rev_is_nil in Hrel₁; subst el₁ el w; simpl.
+ destruct d.
+  exists 1%Z, (-2)%Z, 0%Z, 1.
+  split; [ simpl; f_equal; field | intros H; discriminate H ].
+
+  exists 1%Z, 2%Z, 0%Z, 1.
+  split; [ simpl; f_equal; field | intros H; discriminate H ].
+
+Guarded.
+
+bbb.
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 revert w el₁ d Hw Hel.
