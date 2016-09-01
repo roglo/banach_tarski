@@ -1998,6 +1998,23 @@ destruct rel₁ as [| e₁].
   apply rev_rev in Hrel₁; simpl in Hrel₁; subst el₁.
   destruct e₁ as (t₁, d₁).
   destruct t₁.
+   subst w el; simpl.
+   progress repeat rewrite Rmult_1_r.
+   progress repeat rewrite Rmult_0_r.
+   progress repeat rewrite Rplus_0_r.
+   destruct d₁, d; simpl.
+    progress repeat rewrite Rmult_1_l.
+    progress repeat rewrite Rmult_0_l.
+    progress repeat rewrite Rmult_0_r.
+    progress repeat rewrite Rplus_0_l.
+    progress repeat rewrite Rplus_0_r.
+    exists 3%Z, (-2)%Z, 8%Z, 2.
+    split; [ | intros H; discriminate H ].
+    unfold Rdiv.
+    progress repeat rewrite <- Rmult_assoc.
+    rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+    f_equal; field_simplify; lra.
+
 Guarded.
 
 bbb.
