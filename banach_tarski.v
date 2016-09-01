@@ -2002,19 +2002,44 @@ destruct rel₁ as [| e₁].
    progress repeat rewrite Rmult_1_r.
    progress repeat rewrite Rmult_0_r.
    progress repeat rewrite Rplus_0_r.
-   destruct d₁, d; simpl.
+   destruct d; simpl.
     progress repeat rewrite Rmult_1_l.
     progress repeat rewrite Rmult_0_l.
     progress repeat rewrite Rmult_0_r.
     progress repeat rewrite Rplus_0_l.
     progress repeat rewrite Rplus_0_r.
-    exists 3%Z, (-2)%Z, 8%Z, 2.
-    split; [ | intros H; discriminate H ].
-    unfold Rdiv.
-    progress repeat rewrite <- Rmult_assoc.
-    rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-    f_equal; field_simplify; lra.
+    destruct d₁.
+     exists 3%Z, (-2)%Z, 8%Z, 2.
+     split; [ | intros H; discriminate H ].
+     unfold Rdiv; progress repeat rewrite <- Rmult_assoc.
+     rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+     f_equal; field_simplify; lra.
 
+     exists 3%Z, (-2)%Z, (-8)%Z, 2.
+     split; [ | intros H; discriminate H ].
+     unfold Rdiv; progress repeat rewrite <- Rmult_assoc.
+     rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+     f_equal; field_simplify; lra.
+
+    progress repeat rewrite Rmult_1_l.
+    progress repeat rewrite Rmult_0_l.
+    progress repeat rewrite Rmult_0_r.
+    progress repeat rewrite Rplus_0_l.
+    progress repeat rewrite Rplus_0_r.
+    destruct d₁.
+     exists 3%Z, 2%Z, (-8)%Z, 2.
+     split; [ | intros H; discriminate H ].
+     unfold Rdiv; progress repeat rewrite <- Rmult_assoc.
+     rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+     f_equal; field_simplify; lra.
+
+     exists 3%Z, 2%Z, 8%Z, 2.
+     split; [ | intros H; discriminate H ].
+     unfold Rdiv; progress repeat rewrite <- Rmult_assoc.
+     rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+     f_equal; field_simplify; lra.
+
+   destruct (Bool.bool_dec d d₁) as [Hd| Hd]; [ subst d₁ | ].
 Guarded.
 
 bbb.
