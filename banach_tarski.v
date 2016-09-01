@@ -2039,7 +2039,21 @@ destruct rel₁ as [| e₁].
      rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
      f_equal; field_simplify; lra.
 
+   subst w el; simpl.
+   progress repeat rewrite Rmult_1_r.
+   progress repeat rewrite Rmult_0_r.
+   progress repeat rewrite Rplus_0_r.
    destruct (Bool.bool_dec d d₁) as [Hd| Hd]; [ subst d₁ | ].
+    destruct d; simpl.
+     unfold Rdiv; progress repeat rewrite <- Rmult_assoc.
+     rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+     progress repeat rewrite Rmult_1_l.
+     progress repeat rewrite Rmult_1_r.
+     progress repeat rewrite Rmult_0_l.
+     progress repeat rewrite Rplus_0_l.
+     progress repeat rewrite Rplus_0_r.
+     exists (-7)%Z.
+
 Guarded.
 
 bbb.
