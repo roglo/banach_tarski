@@ -2078,7 +2078,32 @@ destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
   split; [ simpl; f_equal; field | intros H; discriminate H ].
 
  subst el; rename el₂ into el.
- rewrite <- app_assoc in Hn, Hel, Hw; simpl in Hn, Hel, Hw.
+ rewrite <- app_assoc in Hel, Hw; simpl in Hel, Hw.
+ destruct e as (t₁, d₁).
+ destruct e₂ as (t₂, d₂).
+ destruct t₁, t₂.
+  destruct (Bool.bool_dec d₁ d₂) as [H₁| H₁]; [ subst d₂ | ].
+Theorem norm_list_app : ∀ el₁ el₂ e₁ e₂,
+  norm_list (el₁ ++ [e₁]) = el₂ ++ [e₂]
+  → norm_list el₁ = el₂.
+Proof.
+intros el₁ el₂ e₁ e₂ Hn.
+revert el₂ e₁ e₂ Hn.
+induction el₁ as [| e]; intros.
+ simpl in Hn.
+ destruct el₂; [ reflexivity | destruct el₂; discriminate Hn ].
+
+ simpl in Hn; simpl.
+ remember (norm_list (el₁ ++ [e₁])) as el₃ eqn:Hel₃.
+ symmetry in Hel₃.
+ destruct (list_nil_app_dec el₃) as [H₁ | (e₃, (el₄, Hel₄))].
+  subst el₃.
+  apply norm_nil_iff in H₁.
+  destruct H₁ as [H₁| H₁]; [ destruct el₁; discriminate H₁ | ].
+  destruct H₁ as (el₃, (el₄, (t, (d, (H₁, H₂))))).
+
+bbb.
+   apply norm_list_app in Hn.
 
 bbb.
 intros w el el₁ d Hel Hn Hw.
