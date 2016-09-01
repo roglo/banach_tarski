@@ -1958,6 +1958,15 @@ induction el as [| e]; intros.
  rewrite mat_vec_mul_rotate; reflexivity.
 Qed.
 
+Theorem Rdiv_eq_0 : ∀ x y, (y ≠ 0)%R → (x / y = 0)%R → x = 0%R.
+Proof.
+intros x y Hy H.
+apply Rmult_eq_compat_r with (r := y) in H.
+unfold Rdiv in H.
+rewrite Rmult_comm, <- Rmult_assoc, Rmult_shuffle0 in H.
+rewrite Rinv_r_simpl_r in H; [ lra | apply Hy ].
+Qed.
+
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" *)
 
@@ -1967,6 +1976,7 @@ Theorem toto : ∀ w el el₁ d,
   → w = fold_left rotate el
   → ∃ a b c k,
     w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+(*
     (match rev el with
      | E lb _ :: E la _ :: _ => (c mod 3 = 0)%Z
      | E la _ :: E lb _ :: _ => (a mod 3 = 0)%Z
@@ -1975,6 +1985,7 @@ Theorem toto : ∀ w el el₁ d,
      | [E lb _] => (c mod 3 = 0)%Z
      | _ => (4 = 5)%Z
      end) ∧
+*)
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hel Hn Hw.
@@ -1991,16 +2002,14 @@ destruct (norm_dec el) as [H₁| H₁].
   progress repeat rewrite Rplus_0_r.
   destruct d.
    exists 1%Z, (-2)%Z, 0%Z, 1.
-   split; [ simpl; f_equal; field | ].
-   split; [ reflexivity | intros H; discriminate H ].
+   split; [ simpl; f_equal; field | intros H; discriminate H ].
 
    exists 1%Z, 2%Z, 0%Z, 1.
-   split; [ simpl; f_equal; field | ].
-   split; [ reflexivity | intros H; discriminate H ].
+   split; [ simpl; f_equal; field | intros H; discriminate H ].
 
   injection Hel; clear Hel; intros; subst e₁ el₁.
   pose proof IHel H₁ w' el d (eq_refl _) (eq_refl _) as H.
-  destruct H as (a', (b', (c', (k', (Hp, (Hac, Hb)))))).
+  destruct H as (a', (b', (c', (k', (Hp, Hb))))).
   subst w; rewrite fold_left_app; rewrite <- Hw', Hp; simpl.
   destruct e as (t₁, d₁); destruct t₁, d₁; simpl.
    progress repeat rewrite Rmult_1_l.
@@ -2024,6 +2033,16 @@ destruct (norm_dec el) as [H₁| H₁].
     progress repeat rewrite Rmult_1_r in Hp.
     progress repeat rewrite Rplus_0_r in Hp.
     destruct d.
+     assert (Hc : (c' mod 3 = 0)%Z).
+      destruct el as [| e].
+       injection Hp; intros Hc' Hb' Ha'.
+       symmetry in Hc'.
+       apply Rdiv_eq_0 in Hc'; [ | apply pow_nonzero; lra ].
+       apply eq_IZR_R0 in Hc'; subst c'; reflexivity.
+
+       simpl in Hp.
+bbb.
+
      simpl in Hac.
      revert H₁ Hn Hac Hb; clear; intros.
      induction el as [| e]; simpl.
