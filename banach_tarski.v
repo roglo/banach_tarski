@@ -2016,6 +2016,7 @@ destruct (norm_dec el) as [H₁| H₁].
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
    progress repeat rewrite Rplus_0_r.
+bbb.
    exists (3*a')%Z, (b'+2*c')%Z, (-4*b'+c')%Z, (S k').
    rewrite mult_IZR; simpl.
    split.
