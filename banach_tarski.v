@@ -1978,6 +1978,7 @@ Theorem toto : ∀ w el el₁ d,
     w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
+(*
 intros w el el₁ d Hel Hn Hw.
 remember (List.rev el₁) as rel₁ eqn:Hrel₁; symmetry in Hrel₁.
 revert el el₁ rel₁ d w Hel Hrel₁ Hn Hw.
@@ -2055,6 +2056,29 @@ destruct rel₁ as [| e₁].
      exists (-7)%Z.
 
 Guarded.
+
+bbb.
+*)
+intros w el el₁ d Hel Hn Hw.
+Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
+revert w el₁ d Hw Hel.
+induction el as [| e] using rev_ind; intros; [ discriminate Hel | ].
+destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
+ subst el; simpl in Hel.
+ injection Hel; clear Hel; intros; subst e el₁.
+ subst w; simpl.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
+ destruct d.
+  exists 1%Z, (-2)%Z, 0%Z, 1.
+  split; [ simpl; f_equal; field | intros H; discriminate H ].
+
+  exists 1%Z, 2%Z, 0%Z, 1.
+  split; [ simpl; f_equal; field | intros H; discriminate H ].
+
+ subst el; rename el₂ into el.
+ rewrite <- app_assoc in Hn, Hel, Hw; simpl in Hn, Hel, Hw.
 
 bbb.
 intros w el el₁ d Hel Hn Hw.
