@@ -2217,12 +2217,38 @@ apply norm_nil_iff in Hn.
 destruct Hn as [Hn| Hn]; [ subst el₁; assumption | ].
 destruct Hn as (el₃, (el₄, (t, (d, (Hel, Hn))))).
 
+Require Import Setoid.
+
+Add Parametric Morphism : (@app free_elem)
+  with signature norm_eq ==> norm_eq ==> norm_eq
+  as norm_eq_app_morph.
+Proof.
+intros el₁ el₂ Hel₁ el₃ el₄ Hel₂.
+unfold "≡" in Hel₁, Hel₂ |-*.
+destruct (norm_dec el₁) as [H₁| H₁].
+ destruct (norm_dec el₂) as [H₂| H₂].
+  rewrite Hel₁, H₂ in H₁; subst el₂.
+  destruct (norm_dec el₃) as [H₃| H₃].
+   destruct (norm_dec el₄) as [H₄| H₄].
+    rewrite Hel₂, H₄ in H₃; subst el₄; reflexivity.
+
+    destruct H₄ as (el₅, (e, (el₆, H₄))).
+    revert el₃ el₄ el₅ e el₆ Hel₂ H₃ H₄.
+    induction el₄ as [| e₄]; intros; [ discriminate H₄ | ].
+    simpl in H₄.
+    destruct el₄ as [| e₄].
+
+bbb.
+
 Theorem toto : ∀ el₁ el₂, el₁ ++ el₂ ≡ norm_list el₁ ++ norm_list el₂.
 Proof.
+intros el₁ el₂.
+apply norm_eq_app_morph; symmetry; apply norm_list_norm_list.
+
+bbb.
 intros el₁ el₂; unfold norm_eq.
 remember (norm_list el₁) as el₃ eqn:Hel₁.
 remember (norm_list el₂) as el₄ eqn:Hel₂.
-
 bbb.
 
 Theorem toto : ∀ el₁ el₂,
