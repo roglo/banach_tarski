@@ -2177,6 +2177,24 @@ destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
    destruct (letter_opp_dec e₁ e₂) as [H₃| H₃]; [ clear H₃ | contradiction ].
    symmetry; simpl.
 SearchAbout (norm_list _ = []).
+Theorem toto : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = []
+  → norm_list el₁ = []
+  → norm_list el₂ = [].
+Proof.
+(*
+intros el₁ el₂ Ha Hn.
+apply norm_nil_iff in Ha.
+destruct Ha as [Ha| Ha].
+ apply app_eq_nil in Ha; destruct Ha; subst; reflexivity.
+
+ destruct Ha as (el₃, (el₄, (t, (d, (Hel, Ha))))).
+bbb.
+*)
+intros el₁ el₂ Ha Hn.
+apply norm_nil_iff in Hn.
+destruct Hn as [Hn| Hn]; [ subst el₁; assumption | ].
+destruct Hn as (el₃, (el₄, (t, (d, (Hel, Hn))))).
 bbb.
 
 Theorem toto : ∀ el₁ el₂,
