@@ -2131,8 +2131,30 @@ induction el₁ as [| e]; intros.
    rewrite norm_list_app with (el₂ := []) in H₂; [ discriminate H₂ | ].
    assumption.
 
-  destruct (letter_opp_dec e e₂) as [H₃| H₃].
+  destruct (letter_opp_dec e e₂) as [H₃| H₃]; [ | exfalso ].
 Check is_normal.
+
+Require Import Setoid.
+
+Add Parametric Morphism : (@app free_elem)
+  with signature norm_eq ==> norm_eq ==> norm_eq
+  as norm_eq_app_morph.
+Proof.
+intros el₁ el₂ Hel₁ el₃ el₄ Hel₂.
+unfold "≡" in Hel₁, Hel₂ |-*.
+destruct (norm_dec el₁) as [H₁| H₁].
+ destruct (norm_dec el₂) as [H₂| H₂].
+  rewrite Hel₁, H₂ in H₁; subst el₂.
+  destruct (norm_dec el₃) as [H₃| H₃].
+   destruct (norm_dec el₄) as [H₄| H₄].
+    rewrite Hel₂, H₄ in H₃; subst el₄; reflexivity.
+
+    destruct H₄ as (el₅, (e, (el₆, H₄))).
+    revert el₃ el₄ el₅ e el₆ Hel₂ H₃ H₄.
+    induction el₄ as [| e₄]; intros; [ discriminate H₄ | ].
+    simpl in H₄.
+    destruct el₄ as [| e₄].
+
 bbb.
 
 (*
@@ -2216,29 +2238,6 @@ intros el₁ el₂ Ha Hn.
 apply norm_nil_iff in Hn.
 destruct Hn as [Hn| Hn]; [ subst el₁; assumption | ].
 destruct Hn as (el₃, (el₄, (t, (d, (Hel, Hn))))).
-
-bbb.
-
-Require Import Setoid.
-
-Add Parametric Morphism : (@app free_elem)
-  with signature norm_eq ==> norm_eq ==> norm_eq
-  as norm_eq_app_morph.
-Proof.
-intros el₁ el₂ Hel₁ el₃ el₄ Hel₂.
-unfold "≡" in Hel₁, Hel₂ |-*.
-destruct (norm_dec el₁) as [H₁| H₁].
- destruct (norm_dec el₂) as [H₂| H₂].
-  rewrite Hel₁, H₂ in H₁; subst el₂.
-  destruct (norm_dec el₃) as [H₃| H₃].
-   destruct (norm_dec el₄) as [H₄| H₄].
-    rewrite Hel₂, H₄ in H₃; subst el₄; reflexivity.
-
-    destruct H₄ as (el₅, (e, (el₆, H₄))).
-    revert el₃ el₄ el₅ e el₆ Hel₂ H₃ H₄.
-    induction el₄ as [| e₄]; intros; [ discriminate H₄ | ].
-    simpl in H₄.
-    destruct el₄ as [| e₄].
 
 bbb.
 
