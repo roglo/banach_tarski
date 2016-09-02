@@ -97,6 +97,22 @@ destruct (letter_dec t t) as [p| p]; [ | exfalso; apply p; reflexivity ].
 destruct t; refine (match p with eq_refl => eq_refl end).
 Qed.
 
+Theorem free_elem_dec : ∀ e₁ e₂ : free_elem, { e₁ = e₂ } + { e₁ ≠ e₂ }.
+Proof.
+intros.
+destruct e₁ as (t₁, d₁).
+destruct e₂ as (t₂, d₂).
+destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
+ destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ subst d₂ | ].
+  left; reflexivity.
+
+  right; intros H; apply H₂.
+  injection H; intros; assumption.
+
+ right; intros H; apply H₁.
+ injection H; intros; assumption.
+Qed.
+
 Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
   if letter_dec l₁ l₂ then
     if Bool.bool_dec d₁ d₂ then False else True
@@ -2096,6 +2112,50 @@ Guarded.
 
 bbb.
 *)
+Check lt_wf_rec.
+Check rev_ind.
+
+Fixpoint list_lt {A} (eq_dec : ∀ x y : A, {x = y} + { x ≠ y})
+         (l₁ l₂ : list A) { struct l₂ } :=
+  match l₂ with
+  | [] => False
+  | x₂ :: l'₂ =>
+      match l₁ with
+      | [] => True
+      | x₁ :: l'₁ => if eq_dec x₁ x₂ then list_lt eq_dec l'₁ l'₂ else False
+      end
+  end.
+
+Theorem glop {A} : ∀ eq_dec (P : list A → Prop),
+  (∀ l, (∀ l', list_lt eq_dec l' l → P l') → P l)
+  → ∀ l, P l.
+Proof.
+intros eq_dec P H.
+fix IHl 1; intros l.
+destruct l as [| x]; [ apply H; intros l' H'; contradiction | ].
+apply H; intros l' H'; simpl in H'.
+destruct l' as [| x']; [ clear H' | ].
+ apply H; intros l' H'; contradiction.
+
+ destruct (eq_dec x' x) as [H₁| H₁]; [ subst x' | ].
+  apply H; intros l'' H''; simpl in H''.
+  destruct l'' as [| x''].
+   apply H; intros; contradiction.
+
+bbb.
+
+apply H; intros l' H'.
+bbb.
+
+intros w el el₁ d Hel Hn Hw.
+Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
+revert w el₁ d Hw Hel.
+
+Check (glop free_elem_dec).
+induction el using (glop free_elem_dec); intros.
+destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
+
+bbb.
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 revert w el₁ d Hw Hel.
@@ -2120,6 +2180,10 @@ destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
  destruct e₂ as (t₂, d₂).
  destruct t₁, t₂.
   destruct (Bool.bool_dec d₁ d₂) as [H₁| H₁]; [ subst d₂ | ].
+   assert (norm_list (el ++ [E la d₁]) = el ++ [E la d₁]).
+Focus 2.
+    pose proof IHel H.
+bbb.
 
 Theorem norm_list_app_elem : ∀ el₁ el₂ e₁ e₂,
   norm_list (el₁ ++ [e₁]) = el₂ ++ [e₂]
