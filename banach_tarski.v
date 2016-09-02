@@ -2132,7 +2132,7 @@ induction el₁ as [| e]; intros.
    assumption.
 
   destruct (letter_opp_dec e e₂) as [H₃| H₃].
-
+Check is_normal.
 bbb.
 
 (*
