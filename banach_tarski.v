@@ -2139,9 +2139,6 @@ destruct l' as [| x']; [ clear H' | ].
 
  destruct (eq_dec x' x) as [H₁| H₁]; [ subst x' | ].
   apply H; intros l'' H''; simpl in H''.
-  destruct l'' as [| x''].
-   apply H; intros; contradiction.
-
 bbb.
 
 apply H; intros l' H'.
