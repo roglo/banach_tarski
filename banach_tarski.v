@@ -2171,8 +2171,12 @@ destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
  injection H₁; clear H₁; intros; subst e el₃ el₄.
  remember (norm_list (el₁ ++ el₂)) as el₃ eqn:Hel₃; symmetry in Hel₃.
  destruct el₃ as [| e₃].
-  destruct (letter_opp_dec e₁ e₂) as [H₃| H₃].
-
+  destruct (letter_opp_dec e₁ e₂) as [H₃| H₃]; [ clear H₃ | contradiction ].
+  remember (norm_list el₁) as el₄ eqn:Hel₄; symmetry in Hel₄.
+  destruct el₄ as [| e₄].
+   destruct (letter_opp_dec e₁ e₂) as [H₃| H₃]; [ clear H₃ | contradiction ].
+   symmetry; simpl.
+SearchAbout (norm_list _ = []).
 bbb.
 
 Theorem toto : ∀ el₁ el₂,
