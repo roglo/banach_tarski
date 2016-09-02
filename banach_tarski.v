@@ -2126,34 +2126,11 @@ Theorem norm_list_app_elem : ∀ el₁ el₂ e₁ e₂,
   → norm_list el₁ = el₂.
 Proof.
 intros el₁ el₂ e₁ e₂ Hn.
-revert el₂ e₁ e₂ Hn.
-induction el₁ as [| e]; intros.
- simpl in Hn.
- destruct el₂; [ reflexivity | destruct el₂; discriminate Hn ].
-
- simpl in Hn; simpl.
- remember (norm_list (el₁ ++ [e₁])) as el₃ eqn:Hel₃.
- symmetry in Hel₃.
- destruct (list_nil_app_dec el₃) as [H₁ | (e₃, (el₄, Hel₄))].
-  subst el₃.
-  apply norm_nil_iff in H₁.
-  destruct H₁ as [H₁| H₁]; [ destruct el₁; discriminate H₁ | ].
-  destruct H₁ as (el₃, (el₄, (t, (d, (H₁, H₂))))).
-  rewrite H₁ in Hn.
-  rewrite norm_list_cancel_inside, H₂ in Hn.
-  destruct el₂; [ simpl in Hn | destruct el₂; discriminate Hn ].
-  injection Hn; clear Hn; intros; subst e₂.
-  remember (norm_list el₁) as el₂ eqn:Hel₂; symmetry in Hel₂.
-  destruct el₂ as [| e₂]; [ exfalso | ].
-   rewrite <- norm_list_cancel_inside with (t := t) (d := d) in H₂.
-   rewrite <- H₁ in H₂.
-   revert Hel₂ H₂; clear; intros.
-   rewrite norm_list_app with (el₂ := []) in H₂; [ discriminate H₂ | ].
-   assumption.
-
-  destruct (letter_opp_dec e e₂) as [H₃| H₃]; [ | exfalso ].
-Check is_normal.
-
+Compute norm_list ([ạ; ḅ] ++ [ḅ⁻¹]).
+Compute norm_list ([] ++ [ạ]).
+Compute norm_list ([ạ; ḅ]).
+Compute ([] : list free_elem).
+(* faux ! *)
 bbb.
 
 (*
