@@ -2091,13 +2091,15 @@ destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
  destruct e₂ as (t₂, d₂).
  destruct t₁, t₂.
   destruct (Bool.bool_dec d₁ d₂) as [H₁| H₁]; [ subst d₂ | ].
-bbb.
 
 Theorem norm_list_app : ∀ el₁ el₂ e₁ e₂,
   norm_list (el₁ ++ [e₁]) = el₂ ++ [e₂]
   → norm_list el₁ = el₂.
 Proof.
 intros el₁ el₂ e₁ e₂ Hn.
+Check is_normal.
+bbb.
+
 revert el₂ e₁ e₂ Hn.
 induction el₁ as [| e]; intros.
  simpl in Hn.
