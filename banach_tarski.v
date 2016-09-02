@@ -2165,13 +2165,13 @@ destruct (norm_dec el₁) as [H₁| H₁]; [ rewrite H₁; reflexivity | ].
 destruct H₁ as (el₃, (e, (el₄, H₁))).
 revert e el₂ el₃ el₄ H₁.
 induction el₁ as [| e₁]; intros; [ reflexivity | ].
-simpl.
-bbb.
-
 simpl in H₁; simpl.
 destruct el₁ as [| e₂]; [ discriminate H₁ | simpl ].
 destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
  injection H₁; clear H₁; intros; subst e el₃ el₄.
+ remember (norm_list (el₁ ++ el₂)) as el₃ eqn:Hel₃; symmetry in Hel₃.
+ destruct el₃ as [| e₃].
+  destruct (letter_opp_dec e₁ e₂) as [H₃| H₃].
 
 bbb.
 
