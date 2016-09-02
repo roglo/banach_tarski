@@ -5,7 +5,7 @@
 
 Require Import Utf8.
 Require Import List.
-Require Import Relations.
+Require Import Relations Setoid.
 Import ListNotations.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
@@ -379,6 +379,10 @@ Qed.
 
 Definition norm_eq x y := norm_list x = norm_list y.
 Notation "x ≡ y" := (norm_eq x y) (at level 70).
+Theorem fold_norm_eq : ∀ el₁ el₂,
+  norm_list el₁ = norm_list el₂
+  → el₁ ≡ el₂.
+Proof. intros; assumption. Qed.
 
 Definition norm_eq_refl : reflexive _ norm_eq.
 Proof. intros el₁; reflexivity. Qed.
@@ -397,6 +401,22 @@ Add Parametric Relation : _ norm_eq
  symmetry proved by norm_eq_sym
  transitivity proved by norm_eq_trans
  as norm_eq_equivalence.
+
+Add Parametric Morphism : (@app free_elem)
+  with signature norm_eq ==> norm_eq ==> norm_eq
+  as norm_eq_app_morph.
+Proof.
+intros el₁ el₂ Hel₁ el₃ el₄ Hel₂.
+unfold "≡" in Hel₁, Hel₂ |-*.
+pose proof is_normal el₁ el₃ [] as H.
+rewrite Hel₂, is_normal in H.
+do 2 rewrite app_nil_r in H.
+rewrite <- H; clear H.
+pose proof is_normal [] el₂ el₄ as H.
+rewrite <- Hel₁, is_normal in H.
+do 2 rewrite app_nil_l in H.
+assumption.
+Qed.
 
 Theorem norm_norm : ∀ s, norm (norm s) = norm s.
 Proof.
@@ -2133,27 +2153,6 @@ induction el₁ as [| e]; intros.
 
   destruct (letter_opp_dec e e₂) as [H₃| H₃]; [ | exfalso ].
 Check is_normal.
-
-Require Import Setoid.
-
-Add Parametric Morphism : (@app free_elem)
-  with signature norm_eq ==> norm_eq ==> norm_eq
-  as norm_eq_app_morph.
-Proof.
-intros el₁ el₂ Hel₁ el₃ el₄ Hel₂.
-unfold "≡" in Hel₁, Hel₂ |-*.
-destruct (norm_dec el₁) as [H₁| H₁].
- destruct (norm_dec el₂) as [H₂| H₂].
-  rewrite Hel₁, H₂ in H₁; subst el₂.
-  destruct (norm_dec el₃) as [H₃| H₃].
-   destruct (norm_dec el₄) as [H₄| H₄].
-    rewrite Hel₂, H₄ in H₃; subst el₄; reflexivity.
-
-    destruct H₄ as (el₅, (e, (el₆, H₄))).
-    revert el₃ el₄ el₅ e el₆ Hel₂ H₃ H₄.
-    induction el₄ as [| e₄]; intros; [ discriminate H₄ | ].
-    simpl in H₄.
-    destruct el₄ as [| e₄].
 
 bbb.
 
