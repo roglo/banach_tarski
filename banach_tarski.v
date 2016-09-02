@@ -2110,6 +2110,122 @@ induction el₁ as [| e]; intros.
    rewrite <- norm_list_cancel_inside with (t := t) (d := d) in H₂.
    rewrite <- H₁ in H₂.
    revert Hel₂ H₂; clear; intros.
+Theorem toto : ∀ el₁ el₂ el₃,
+  norm_list el₁ = el₂
+  → norm_list (el₁ ++ el₃) = norm_list (el₂ ++ el₃).
+Proof.
+(*
+intros el₁ el₂ el₃ Hn.
+revert el₁ el₃ Hn.
+induction el₂ as [| e₂]; intros; simpl.
+ apply norm_nil_iff in Hn.
+ destruct Hn as [Hn| Hn]; [ subst el₁; reflexivity | ].
+ destruct Hn as (el₄, (el₅, (t, (d, (Hel, Hn))))).
+ subst el₁; simpl; rewrite <- app_assoc; simpl.
+ rewrite norm_list_cancel_inside.
+bbb.
+*)
+(*
+intros el₁ el₂ el₃ Hn.
+revert el₁ el₂ Hn.
+induction el₃ as [| e₃] using rev_ind; intros.
+ do 2 rewrite app_nil_r.
+ rewrite <- norm_list_norm_list, Hn; reflexivity.
+
+ do 2 rewrite app_assoc.
+ apply IHel₃.
+bbb.
+*)
+(*
+intros el₁ el₂ el₃ Hn.
+revert el₂ el₃ Hn.
+induction el₁ as [| e₁] using rev_ind; intros; [ subst el₂; reflexivity | ].
+rewrite <- app_assoc; simpl.
+*)
+(*
+intros el₁ el₂ el₃ Hn.
+subst el₂.
+revert el₃.
+induction el₁ as [| e₁]; intros; [ reflexivity | simpl ].
+remember (norm_list el₁) as el₂ eqn:Hel₂; symmetry in Hel₂.
+destruct el₂ as [| e₂]; [ rewrite IHel₁; reflexivity | ].
+rewrite IHel₁; simpl.
+remember (norm_list (el₂ ++ el₃)) as el₄ eqn:Hel₄.
+symmetry in Hel₄.
+destruct el₄ as [| e₄].
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁]; [ symmetry; assumption | ].
+*)
+intros el₁ el₂ el₃ Hn.
+subst el₂.
+Theorem toto : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = norm_list (norm_list el₁ ++ el₂).
+Proof.
+intros el₁ el₂.
+(* est-ce que c'est vrai, ça ? *)
+bbb.
+
+Theorem toto : ∀ el₁ el₂,
+  norm_list el₁ = []
+  → norm_list (el₁ ++ el₂) = norm_list el₂.
+Proof.
+intros el₁ el₂ Hn.
+revert el₂.
+
+bbb.
+intros el₁ el₂ Hn.
+apply norm_nil_iff in Hn.
+destruct Hn as [Hn| Hn]; [ subst el₁; reflexivity | ].
+destruct Hn as (el₃, (el₄, (t, (d, (Hel, Hn))))).
+subst el₁; simpl; rewrite <- app_assoc; simpl.
+rewrite norm_list_cancel_inside.
+bbb.
+
+
+; [ reflexivity | simpl in Hn; simpl ].
+remember (norm_list el₁) as el₃ eqn:Hel; symmetry in Hel.
+destruct el₃ as [| e₂]; [ discriminate Hn | ].
+destruct (letter_opp_dec e₁ e₂) as [H₁| H₁]; [ subst el₃ | discriminate Hn ].
+destruct e₁ as (t₁, d₁).
+destruct e₂ as (t₂, d₂).
+apply letter_opp_iff in H₁.
+destruct H₁; subst t₂ d₂.
+
+bbb.
+
+intros el₁ el₂ Hn.
+revert el₁ Hn.
+induction el₂ as [| e₂]; intros; [ rewrite app_nil_r; assumption | simpl ].
+
+Theorem toto : ∀ el e,
+  norm_list el = []
+  → norm_list (el ++ [e]) = [e].
+Proof.
+intros el e Hn.
+revert e.
+induction el as [| e₁] using rev_ind; intros; [ reflexivity | ].
+remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+destruct el₁ as [| e₂].
+
+; [ discriminate Hn | simpl ].
+destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+ subst el₁.
+ remember (norm_list (el ++ [e])) as el₁ eqn:Hel; symmetry in Hel.
+ destruct el₁ as [| e₃].
+
+bbb.
+intros el e Hn.
+apply norm_nil_iff in Hn.
+destruct Hn as [Hn| Hn]; [ subst el; reflexivity | ].
+destruct Hn as (el₁, (el₂, (t, (d, (Hel, Hn))))).
+subst el; simpl; rewrite <- app_assoc; simpl.
+rewrite norm_list_cancel_inside.
+
+
+bbb.
+
+   apply norm_nil_iff in H₂.
+   destruct H₂ as [H₂| H₂]; [ destruct el₁; discriminate H₂ | ].
+   destruct H₂ as (el₃, (el₄, (t, (d, (H₁, H₂))))).
 bbb.
    apply norm_list_app in Hn.
 
