@@ -2161,7 +2161,18 @@ Theorem toto : ∀ el₁ el₂,
   norm_list (el₁ ++ el₂) = norm_list (norm_list el₁ ++ el₂).
 Proof.
 intros el₁ el₂.
-(* est-ce que c'est vrai, ça ? *)
+destruct (norm_dec el₁) as [H₁| H₁]; [ rewrite H₁; reflexivity | ].
+destruct H₁ as (el₃, (e, (el₄, H₁))).
+revert e el₂ el₃ el₄ H₁.
+induction el₁ as [| e₁]; intros; [ reflexivity | ].
+simpl.
+bbb.
+
+simpl in H₁; simpl.
+destruct el₁ as [| e₂]; [ discriminate H₁ | simpl ].
+destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
+ injection H₁; clear H₁; intros; subst e el₃ el₄.
+
 bbb.
 
 Theorem toto : ∀ el₁ el₂,
