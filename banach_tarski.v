@@ -1975,6 +1975,15 @@ rewrite Rmult_comm, <- Rmult_assoc, Rmult_shuffle0 in H.
 rewrite Rinv_r_simpl_r in H; [ lra | apply Hy ].
 Qed.
 
+Theorem norm_list_app : ∀ el₁ el₂ el₃,
+  norm_list el₁ = el₂
+  → norm_list (el₁ ++ el₃) = norm_list (el₂ ++ el₃).
+Proof.
+intros el₁ el₂ el₃ Hn.
+pose proof is_normal [] el₁ el₃ as H; simpl in H.
+rewrite Hn in H; symmetry; assumption.
+Qed.
+
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" *)
 
@@ -2092,14 +2101,11 @@ destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
  destruct t₁, t₂.
   destruct (Bool.bool_dec d₁ d₂) as [H₁| H₁]; [ subst d₂ | ].
 
-Theorem norm_list_app : ∀ el₁ el₂ e₁ e₂,
+Theorem norm_list_app_elem : ∀ el₁ el₂ e₁ e₂,
   norm_list (el₁ ++ [e₁]) = el₂ ++ [e₂]
   → norm_list el₁ = el₂.
 Proof.
 intros el₁ el₂ e₁ e₂ Hn.
-Check is_normal.
-bbb.
-
 revert el₂ e₁ e₂ Hn.
 induction el₁ as [| e]; intros.
  simpl in Hn.
@@ -2122,10 +2128,11 @@ induction el₁ as [| e]; intros.
    rewrite <- norm_list_cancel_inside with (t := t) (d := d) in H₂.
    rewrite <- H₁ in H₂.
    revert Hel₂ H₂; clear; intros.
-Theorem toto : ∀ el₁ el₂ el₃,
-  norm_list el₁ = el₂
-  → norm_list (el₁ ++ el₃) = norm_list (el₂ ++ el₃).
-Proof.
+   rewrite norm_list_app with (el₂ := []) in H₂; [ discriminate H₂ | ].
+   assumption.
+
+  destruct (letter_opp_dec e e₂) as [H₃| H₃].
+
 bbb.
 
 (*
