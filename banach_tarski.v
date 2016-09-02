@@ -2195,6 +2195,41 @@ intros el₁ el₂ Ha Hn.
 apply norm_nil_iff in Hn.
 destruct Hn as [Hn| Hn]; [ subst el₁; assumption | ].
 destruct Hn as (el₃, (el₄, (t, (d, (Hel, Hn))))).
+
+Theorem toto : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = norm_list (norm_list el₁ ++ norm_list el₂).
+Proof.
+intros.
+destruct (norm_dec (el₁ ++ el₂)) as [H₁| H₁].
+ rewrite H₁.
+ destruct (norm_dec el₁) as [H₂| H₂].
+  rewrite H₂.
+  destruct (norm_dec el₂) as [H₃| H₃].
+   rewrite H₃.
+   symmetry; assumption.
+
+   destruct H₃ as (el₃, (e, (el₄, Hs))).
+   destruct (norm_dec (el₁ ++ norm_list el₂)) as [H₄| H₄].
+    exfalso.
+    revert el₁ el₃ el₄ e H₁ H₂ Hs H₄.
+    induction el₂ as [| e₂]; intros; [ discriminate Hs | ].
+    simpl in Hs.
+    destruct el₂ as [| e₁]; [ discriminate Hs | ].
+    destruct (letter_opp_dec e₂ e₁) as [H₃| H₃].
+     injection Hs; clear Hs; intros; subst el₃ e el₄.
+     destruct e₂ as (t₂, d₂).
+     destruct e₁ as (t₁, d₁).
+     apply letter_opp_iff in H₃.
+     destruct H₃; subst t₁ d₁.
+     revert H₁; apply norm_list_impossible_consecutive.
+
+     remember (split_at_cancel (e₁ :: el₂)) as u eqn:Hu.
+     symmetry in Hu.
+     destruct u as [((el₅, e₃), el₆)| ]; [ | discriminate Hs ].
+     injection Hs; clear Hs; intros; subst el₃ e el₆.
+     rewrite cons_comm_app, app_assoc in H₁.
+     pose proof IHel₂ (el₁ ++ [e₂]) el₅ el₄ e₃ H₁ as H.
+simpl in H₄.
 bbb.
 
 Theorem toto : ∀ el₁ el₂,
