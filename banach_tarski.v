@@ -504,10 +504,7 @@ simpl in H; subst el.
 exists (mkF₂ (E x (negb d) :: nil)); simpl.
 unfold start_with, norm; simpl.
 split; [ | reflexivity ].
-set (e := E x d).
-set (ei := E x (negb d)).
-destruct (letter_opp_dec e ei) as [H| H]; [ reflexivity | ].
-exfalso; apply H, letter_opp_inv.
+rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
 Qed.
 
 Theorem norm_list_inv : ∀ x d el,
@@ -579,15 +576,9 @@ rewrite <- Hel₁, norm_list_norm_list.
 split; [ reflexivity | ].
 unfold start_with; simpl.
 rewrite norm_list_norm_list, Hel₁.
-set (e₁ := E x true).
-set (e₂ := E y d).
-destruct (letter_opp_dec e₁ e₂) as [H₂| H₂]; [ subst e₁ e₂ | reflexivity ].
-exfalso.
-unfold letter_opp in H₂.
-destruct (letter_dec x y) as [H₃| H₃]; [ | contradiction ].
-destruct (Bool.bool_dec true d) as [H₄| H₄]; [ contradiction | ].
-apply not_eq_sym, neq_negb in H₄; simpl in H₄.
-apply H₁; split; assumption.
+destruct (letter_dec x y) as [H₂| H₂]; [ | reflexivity ].
+destruct d; [ reflexivity | ].
+subst y; exfalso; apply H₁; split; reflexivity.
 Qed.
 
 Theorem decomposed_2 : ∀ s x,
@@ -2100,6 +2091,8 @@ destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
  destruct e₂ as (t₂, d₂).
  destruct t₁, t₂.
   destruct (Bool.bool_dec d₁ d₂) as [H₁| H₁]; [ subst d₂ | ].
+bbb.
+
 Theorem norm_list_app : ∀ el₁ el₂ e₁ e₂,
   norm_list (el₁ ++ [e₁]) = el₂ ++ [e₂]
   → norm_list el₁ = el₂.
@@ -2131,6 +2124,8 @@ Theorem toto : ∀ el₁ el₂ el₃,
   norm_list el₁ = el₂
   → norm_list (el₁ ++ el₃) = norm_list (el₂ ++ el₃).
 Proof.
+bbb.
+
 (*
 intros el₁ el₂ el₃ Hn.
 revert el₁ el₃ Hn.
