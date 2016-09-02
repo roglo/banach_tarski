@@ -5,6 +5,7 @@
 
 Require Import Utf8.
 Require Import List.
+Require Import Relations.
 Import ListNotations.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
@@ -332,6 +333,27 @@ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
  rewrite <- Hel₂; symmetry.
  apply norm_list_norm_list.
 Qed.
+
+Definition norm_eq x y := norm_list x = norm_list y.
+Notation "x ≡ y" := (norm_eq x y) (at level 70).
+
+Definition norm_eq_refl : reflexive _ norm_eq.
+Proof. intros el₁; reflexivity. Qed.
+
+Definition norm_eq_sym : symmetric _ norm_eq.
+Proof. intros el₁ el₂ H; symmetry; assumption. Qed.
+
+Definition norm_eq_trans : transitive _ norm_eq.
+Proof.
+intros el₁ el₂ el₃ H₁₂ H₂₃.
+etransitivity; eassumption.
+Qed.
+
+Add Parametric Relation : _ norm_eq
+ reflexivity proved by norm_eq_refl
+ symmetry proved by norm_eq_sym
+ transitivity proved by norm_eq_trans
+ as norm_eq_equivalence.
 
 Theorem norm_norm : ∀ s, norm (norm s) = norm s.
 Proof.
@@ -840,6 +862,7 @@ Notation "'ạ'" := (E la false).
 Notation "'ạ⁻¹'" := (E la true).
 Notation "'ḅ'" := (E lb false).
 Notation "'ḅ⁻¹'" := (E lb true).
+Notation "x ≡ y" := (norm_eq x y) (at level 70).
 
 Check decomposed_4.
 Check decomposed_2_a.
@@ -1461,8 +1484,6 @@ Theorem N_1_0_0 :
 Proof.
 split; [ reflexivity | split; reflexivity ].
 Qed.
-
-Require Import Relations.
 
 Definition eq_mod_3_refl : reflexive _ eq_mod_3.
 Proof.
@@ -2196,6 +2217,14 @@ apply norm_nil_iff in Hn.
 destruct Hn as [Hn| Hn]; [ subst el₁; assumption | ].
 destruct Hn as (el₃, (el₄, (t, (d, (Hel, Hn))))).
 
+Theorem toto : ∀ el₁ el₂, el₁ ++ el₂ ≡ norm_list el₁ ++ norm_list el₂.
+Proof.
+intros el₁ el₂; unfold norm_eq.
+remember (norm_list el₁) as el₃ eqn:Hel₁.
+remember (norm_list el₂) as el₄ eqn:Hel₂.
+
+bbb.
+
 Theorem toto : ∀ el₁ el₂,
   norm_list (el₁ ++ el₂) = norm_list (norm_list el₁ ++ norm_list el₂).
 Proof.
@@ -2225,8 +2254,14 @@ destruct (norm_dec (el₁ ++ el₂)) as [H₁| H₁].
     destruct u as [((el₅, e₃), el₆)| ]; [ | discriminate Hs ].
     injection Hs; clear Hs; intros; subst el₃ e el₆.
     rewrite cons_comm_app, app_assoc in H₁.
+    simpl in H₄.
+    destruct (norm_dec el₂) as [H₅| H₅].
+     rewrite H₅ in H₄.
+     destruct el₂ as [| e].
+      destruct (letter_opp_dec e₂ e₁) as [H₆| H₆]; [ contradiction | ].
+      clear H₆.
+
     pose proof IHel₂ (el₁ ++ [e₂]) el₅ el₄ e₃ H₁ as H.
-simpl in H₄.
 bbb.
 
 Theorem toto : ∀ el₁ el₂,
