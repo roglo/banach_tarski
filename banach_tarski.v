@@ -258,48 +258,91 @@ intros.
 apply (norm_list_impossible_consecutive x d el nil el').
 Qed.
 
+Theorem norm_list_cancel_start : ∀ el t d,
+  norm_list (E t d :: E t (negb d) :: el) = norm_list el.
+Proof.
+intros el t d.
+revert t d.
+induction el as [| (t₁, d₁)]; intros.
+ Transparent letter_opp_dec.
+ simpl; rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+
+ remember (E t₁ d₁ :: el) as el₁ eqn:Hel₁.
+ symmetry in Hel₁; simpl.
+ remember (norm_list el₁) as el₂ eqn:Hel₂.
+ symmetry in Hel₂; simpl.
+ destruct el₂ as [| (t₂, d₂)].
+  rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+
+  subst el₁.
+  destruct (letter_dec t t₂) as [H₁| H₁].
+   subst t₂.
+   destruct (Bool.bool_dec (negb d) d₂) as [H₁| H₁].
+    subst d₂.
+    rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+
+    apply negb_neq in H₁; subst d₂.
+    destruct el₂ as [| (t₂, d₂)]; [ reflexivity | ].
+    destruct (letter_dec t t₂) as [H₁| H₁]; [ | reflexivity ].
+    subst t₂.
+    destruct (Bool.bool_dec d d₂) as [H₁| H₁]; [ reflexivity | ].
+    apply not_eq_sym, neq_negb in H₁; subst d₂.
+    exfalso; revert Hel₂; apply norm_list_impossible_start.
+
+   rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+Qed.
+
+Theorem norm_list_cancel_inside : ∀ el₁ el₂ t d,
+  norm_list (el₁ ++ E t d :: E t (negb d) :: el₂) =
+  norm_list (el₁ ++ el₂).
+Proof.
+intros.
+revert el₂ t d.
+induction el₁ as [| e₁]; intros.
+ do 2 rewrite app_nil_l.
+ apply norm_list_cancel_start.
+
+ simpl; rewrite IHel₁; reflexivity.
+Qed.
+
+Theorem is_normal : ∀ el₁ el₂ el₃,
+  norm_list (el₁ ++ norm_list el₂ ++ el₃) =
+  norm_list (el₁ ++ el₂ ++ el₃).
+Proof.
+intros.
+revert el₁ el₃.
+induction el₂ as [| e₂]; intros; [ reflexivity | simpl ].
+remember (norm_list el₂) as el eqn:Hel₂; symmetry in Hel₂.
+destruct el as [| e].
+ simpl in IHel₂; simpl.
+ rewrite cons_comm_app, app_assoc.
+ rewrite IHel₂, <- app_assoc; reflexivity.
+
+ destruct (letter_opp_dec e₂ e) as [H₁| H₁].
+  destruct e as (t, d).
+  destruct e₂ as (t₂, d₂).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t d.
+  rewrite cons_comm_app.
+  do 2 rewrite app_assoc.
+  rewrite <- IHel₂.
+  do 2 rewrite <- app_assoc; simpl.
+  rewrite norm_list_cancel_inside.
+  reflexivity.
+
+  rewrite cons_comm_app.
+  do 2 rewrite app_assoc.
+  rewrite <- IHel₂.
+  do 2 rewrite <- app_assoc.
+  reflexivity.
+Qed.
+
 Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
 Proof.
 intros el.
-induction el as [| e]; [ reflexivity | simpl ].
-remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
-destruct el' as [| e']; [ reflexivity | ].
-Opaque letter_opp_dec.
-destruct (letter_opp_dec e e') as [H| H].
- unfold letter_opp in H.
- destruct e as (x, d).
- destruct e' as (x', d').
- destruct (letter_dec x x') as [Hx| Hx]; [ | contradiction ].
- subst x'.
- destruct (Bool.bool_dec d d') as [Hd| Hd]; [ contradiction | clear H ].
- simpl in IHel.
- remember (norm_list el') as el'' eqn:Hel''; symmetry in Hel''.
- destruct el'' as [| e''].
-  injection IHel; clear IHel; intros H; assumption.
-
-  destruct (letter_opp_dec (E x d') e'') as [He| He].
-   subst el''.
-   simpl in He.
-   destruct e'' as (x'', d'').
-   destruct (letter_dec x x'') as [Hx| Hx]; [ | contradiction ].
-   exfalso; subst x''.
-   destruct (Bool.bool_dec d' d'') as [Hd'| Hd']; [ contradiction | ].
-   clear He.
-   destruct d''.
-    apply Bool.not_true_iff_false in Hd'; subst d'.
-    revert Hel''; apply norm_list_impossible_start.
-
-    apply Bool.not_false_iff_true in Hd'; subst d'.
-    revert Hel''; apply norm_list_impossible_start.
-
-   injection IHel; intros H; apply H.
-
- remember (e' :: el') as el'' eqn:Hel''; simpl.
- destruct el'' as [| e'']; [ reflexivity | ].
- rewrite IHel.
- destruct (letter_opp_dec e e'') as [H₁| H₁]; [ | reflexivity ].
- injection Hel''; clear Hel''; intros; subst e'' el''.
- contradiction.
+pose proof is_normal [] el [] as H.
+simpl in H; do 2 rewrite app_nil_r in H.
+assumption.
 Qed.
 
 Theorem norm_list_is_cons : ∀ el e el₁,
@@ -662,53 +705,6 @@ Fixpoint split_at_cancel el :=
        | None => None
        end
   end.
-
-Theorem norm_list_cancel_start : ∀ el t d,
-  norm_list (E t d :: E t (negb d) :: el) = norm_list el.
-Proof.
-intros el t d.
-revert t d.
-induction el as [| (t₁, d₁)]; intros.
- Transparent letter_opp_dec.
- simpl; rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-
- remember (E t₁ d₁ :: el) as el₁ eqn:Hel₁.
- symmetry in Hel₁; simpl.
- remember (norm_list el₁) as el₂ eqn:Hel₂.
- symmetry in Hel₂; simpl.
- destruct el₂ as [| (t₂, d₂)].
-  rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-
-  subst el₁.
-  destruct (letter_dec t t₂) as [H₁| H₁].
-   subst t₂.
-   destruct (Bool.bool_dec (negb d) d₂) as [H₁| H₁].
-    subst d₂.
-    rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-
-    apply negb_neq in H₁; subst d₂.
-    destruct el₂ as [| (t₂, d₂)]; [ reflexivity | ].
-    destruct (letter_dec t t₂) as [H₁| H₁]; [ | reflexivity ].
-    subst t₂.
-    destruct (Bool.bool_dec d d₂) as [H₁| H₁]; [ reflexivity | ].
-    apply not_eq_sym, neq_negb in H₁; subst d₂.
-    exfalso; revert Hel₂; apply norm_list_impossible_start.
-
-   rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-Qed.
-
-Theorem norm_list_cancel_inside : ∀ el₁ el₂ t d,
-  norm_list (el₁ ++ E t d :: E t (negb d) :: el₂) =
-  norm_list (el₁ ++ el₂).
-Proof.
-intros.
-revert el₂ t d.
-induction el₁ as [| e₁]; intros.
- do 2 rewrite app_nil_l.
- apply norm_list_cancel_start.
-
- simpl; rewrite IHel₁; reflexivity.
-Qed.
 
 Theorem norm_dec : ∀ el,
   { norm_list el = el } +
@@ -2216,6 +2212,8 @@ intros el₁ el₂ Ha Hn.
 apply norm_nil_iff in Hn.
 destruct Hn as [Hn| Hn]; [ subst el₁; assumption | ].
 destruct Hn as (el₃, (el₄, (t, (d, (Hel, Hn))))).
+
+bbb.
 
 Require Import Setoid.
 
