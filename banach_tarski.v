@@ -2114,7 +2114,7 @@ bbb.
 *)
 Check lt_wf_rec.
 Check rev_ind.
-
+(*
 Fixpoint list_lt {A} (eq_dec : ∀ x y : A, {x = y} + { x ≠ y})
          (l₁ l₂ : list A) { struct l₂ } :=
   match l₂ with
@@ -2143,14 +2143,25 @@ bbb.
 
 apply H; intros l' H'.
 bbb.
-
+*)
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
-revert w el₁ d Hw Hel.
+remember (List.length el₁) as len eqn:Hlen; symmetry in Hlen.
+revert w el el₁ d Hn Hw Hel Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len.
+ apply length_zero_iff_nil in Hlen; subst el₁.
+ subst w el; simpl.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
+ destruct d.
+  exists 1%Z, (-2)%Z, 0%Z, 1.
+  split; [ simpl; f_equal; field | intros H; discriminate H ].
 
-Check (glop free_elem_dec).
-induction el using (glop free_elem_dec); intros.
-destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
+  exists 1%Z, 2%Z, 0%Z, 1.
+  split; [ simpl; f_equal; field | intros H; discriminate H ].
+
 
 bbb.
 intros w el el₁ d Hel Hn Hw.
