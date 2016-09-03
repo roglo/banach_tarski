@@ -267,11 +267,27 @@ destruct nl as [| e₂].
     eapply IHel, H₁.
 Qed.
 
+Theorem norm_list_impossible_consecutive2 : ∀ x d el el₁ el₂,
+  norm_list el ≠ el₁ ++ E x (negb d) :: E x d :: el₂.
+Proof.
+intros.
+remember (negb d) as d₁ eqn:Hd.
+apply Bool.negb_sym in Hd; subst d.
+apply norm_list_impossible_consecutive.
+Qed.
+
 Theorem norm_list_impossible_start : ∀ x d el el',
   norm_list el ≠ E x d :: E x (negb d) :: el'.
 Proof.
 intros.
 apply (norm_list_impossible_consecutive x d el nil el').
+Qed.
+
+Theorem norm_list_impossible_start2 : ∀ x d el el',
+  norm_list el ≠ E x (negb d) :: E x d :: el'.
+Proof.
+intros.
+apply (norm_list_impossible_consecutive2 x d el nil el').
 Qed.
 
 Theorem norm_list_cancel_start : ∀ el t d,
@@ -359,6 +375,30 @@ intros el.
 pose proof is_normal [] el [] as H.
 simpl in H; do 2 rewrite app_nil_r in H.
 assumption.
+Qed.
+
+Theorem norm_list_cons : ∀ el e,
+  norm_list (e :: el) = e :: el
+  → norm_list el = el.
+Proof.
+intros el e Hn.
+revert e Hn.
+induction el as [| e₁]; intros; [ reflexivity | ].
+remember (e₁ :: el) as el₁ eqn:Hel.
+simpl in Hn.
+remember (norm_list el₁) as el₂ eqn:Hel₁; symmetry in Hel₁.
+destruct el₂ as [| e₂].
+ injection Hn; clear Hn; intros; subst; discriminate H.
+ destruct (letter_opp_dec e e₂) as [H₁| H₁].
+  subst el₁ el₂.
+  destruct e as (t, d).
+  destruct e₂ as (t₂, d₂).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₂ d₂.
+  exfalso; revert Hel₁; apply norm_list_impossible_start2.
+
+  injection Hn; clear Hn; intros; subst el₁.
+  assumption.
 Qed.
 
 Theorem norm_list_is_cons : ∀ el e el₁,
@@ -2228,7 +2268,25 @@ destruct len.
        apply eq_IZR_R0 in Hc'.
        rewrite Hc', Z.mul_0_r, Z.add_0_r; assumption.
 
-     subst el₂; simpl in Hel.
+     subst el₂ el₁; simpl in Hel.
+     rewrite <- app_assoc in Hel; simpl in Hel.
+     rewrite app_comm_cons in Hel, Hw₁.
+     remember (E lb d :: el₃) as el₁ eqn:Hel₁.
+     remember (fold_left rotate el₁) as w₂ eqn:Hw₂.
+     destruct e₁ as (t₁, d₁); destruct t₁, d₁.
+      generalize Hn; intros H₂.
+      rewrite Hel in H₂.
+SearchAbout (norm_list (_ ++ _)).
+Theorem toto : ∀ el e, norm_list (el ++ [e]) = el ++ [e] → norm_list el = el.
+Proof.
+intros el e Hn.
+revert e Hn.
+induction el as [| e₁] using rev_ind; intros.
+bbb.
+
+      pose proof IHlen len (Nat.lt_succ_diag_r len) w₂ el₁ el₃ d.
+ w₁ el₁ el₂ d H₁ Hw₁ Hel₁
+      Hlen as H.
 bbb.
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
