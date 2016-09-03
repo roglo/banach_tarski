@@ -63,6 +63,13 @@ induction l₁ as [| x]; intros.
   apply IHl₁, H₁.
 Qed.
 
+Theorem rev_sym {A} : ∀ el₁ el₂ : list A, el₁ = rev el₂ → el₂ = rev el₁.
+Proof.
+intros el₁ el₂ H.
+subst el₁; symmetry.
+apply rev_involutive.
+Qed.
+
 (* Step 1 *)
 
 Section Free_Group.
@@ -2283,6 +2290,8 @@ Proof.
 intros el e Hn.
 revert e Hn.
 induction el as [| e₁] using rev_ind; intros; [ reflexivity | ].
+bbb.
+
 remember (el ++ [e₁]) as el₁ eqn:Hel.
 simpl in Hn.
 remember (norm_list el₁) as el₂ eqn:Hel₁; symmetry in Hel₁.
@@ -2291,6 +2300,46 @@ destruct el₂ as [| e₂].
  apply norm_nil_iff in Hel₁.
  destruct Hel₁ as [Hel₁ | Hel₁]; [ assumption | ].
  destruct Hel₁ as (el₂, (el₃, (t₁, (d₁, (He₁, Hn₁))))).
+
+
+Restart.
+intros el e Hn.
+
+Theorem toto : ∀ el, norm_list el = rev (norm_list (rev el)).
+Proof.
+Admitted. Show.
+
+rewrite toto in Hn.
+rewrite toto.
+rewrite rev_app_distr in Hn.
+remember (rev el) as el₁.
+
+apply rev_sym in Heqel₁.
+subst el.
+f_equal.
+apply norm_list_cons with (e := e).
+
+Theorem titi {A} : ∀ el₁ el₂ : list A, rev el₁ ++ el₂ = rev (el₁ ++ rev el₂).
+Admitted.
+Show.
+rewrite titi in Hn.
+SearchAbout ([_] ++ _).
+rewrite <- cons_to_app in Hn.
+rewrite <- toto in Hn.
+
+rewrite <- rev_app_distr in Hn.
+
+
+Theorem titi : ∀ el, norm_list (rev el) = rev (norm_list el).
+Proof.
+Admitted. Show.
+rewrite titi in Hn.
+remember (norm_list el) as el₁ eqn:Hel₁.
+destruct el₁ as [| e₁].
+simpl in Hn.
+destruct el; [ reflexivity | destruct el; discriminate Hn ].
+simpl in Hn.
+
 bbb.
  injection Hn; clear Hn; intros; subst; discriminate H.
 
