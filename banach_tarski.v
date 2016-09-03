@@ -2304,11 +2304,13 @@ destruct len.
       generalize Hn; intros H₂.
       rewrite Hel in H₂.
       apply norm_list_app_diag in H₂.
-      pose proof IHlen len (Nat.lt_succ_diag_r len) w₂ el₁ el₃ d H₂ Hw₂ Hel₁.
-shit.
-
- w₁ el₁ el₂ d H₁ Hw₁ Hel₁
-      Hlen as H.
+      destruct len; [ destruct el₃ in Hlen; discriminate Hlen | ].
+      assert (Hl : len < S (S len)) by (apply le_n_S, Nat.le_succ_diag_r).
+      rewrite app_length in Hlen; simpl in Hlen.
+      rewrite Nat.add_1_r in Hlen.
+      apply eq_add_S in Hlen.
+      pose proof IHlen len Hl w₂ el₁ el₃ d H₂ Hw₂ Hel₁ Hlen as H.
+      destruct H as (a'', (b'', (c'', (k'', (Hp', Hb'))))).
 bbb.
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
