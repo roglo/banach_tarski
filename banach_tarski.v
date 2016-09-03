@@ -389,6 +389,7 @@ simpl in Hn.
 remember (norm_list el₁) as el₂ eqn:Hel₁; symmetry in Hel₁.
 destruct el₂ as [| e₂].
  injection Hn; clear Hn; intros; subst; discriminate H.
+
  destruct (letter_opp_dec e e₂) as [H₁| H₁].
   subst el₁ el₂.
   destruct e as (t, d).
@@ -2281,7 +2282,29 @@ Theorem toto : ∀ el e, norm_list (el ++ [e]) = el ++ [e] → norm_list el = el
 Proof.
 intros el e Hn.
 revert e Hn.
-induction el as [| e₁] using rev_ind; intros.
+induction el as [| e₁] using rev_ind; intros; [ reflexivity | ].
+remember (el ++ [e₁]) as el₁ eqn:Hel.
+simpl in Hn.
+remember (norm_list el₁) as el₂ eqn:Hel₁; symmetry in Hel₁.
+destruct el₂ as [| e₂].
+ symmetry.
+ apply norm_nil_iff in Hel₁.
+ destruct Hel₁ as [Hel₁ | Hel₁]; [ assumption | ].
+ destruct Hel₁ as (el₂, (el₃, (t₁, (d₁, (He₁, Hn₁))))).
+bbb.
+ injection Hn; clear Hn; intros; subst; discriminate H.
+
+ destruct (letter_opp_dec e e₂) as [H₁| H₁].
+  subst el₁ el₂.
+  destruct e as (t, d).
+  destruct e₂ as (t₂, d₂).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₂ d₂.
+  exfalso; revert Hel₁; apply norm_list_impossible_start2.
+
+  injection Hn; clear Hn; intros; subst el₁.
+  assumption.
+Qed.
 bbb.
 
       pose proof IHlen len (Nat.lt_succ_diag_r len) w₂ el₁ el₃ d.
