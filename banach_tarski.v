@@ -2284,6 +2284,29 @@ destruct len.
      destruct e₁ as (t₁, d₁); destruct t₁, d₁.
       generalize Hn; intros H₂.
       rewrite Hel in H₂.
+Theorem toto : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = el₁ ++ el₂ → norm_list el₁ = el₁.
+Proof.
+intros el₁ el₂ Hn.
+revert el₂ Hn.
+induction el₁ as [| e₁]; intros; [ reflexivity | simpl ].
+bbb.
+
+remember (norm_list el₁) as el₃ eqn:Hel₃; symmetry in Hel₃.
+destruct el₃ as [| e₃].
+ rewrite <- app_comm_cons in Hn.
+ apply norm_list_cons, IHel₁ in Hn.
+ subst el₁; reflexivity.
+
+ destruct (letter_opp_dec e₁ e₃) as [H₁| H₁].
+  destruct e₁ as (t₁, d₁).
+  destruct e₃ as (t₃, d₃).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₃ d₃.
+  destruct el₃ as [| e₃]; [ exfalso | ].
+
+bbb.
+
 SearchAbout (norm_list (_ ++ _)).
 Theorem toto : ∀ el e, norm_list (el ++ [e]) = el ++ [e] → norm_list el = el.
 Proof.
