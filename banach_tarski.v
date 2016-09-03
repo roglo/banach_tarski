@@ -2290,8 +2290,6 @@ Proof.
 intros el e Hn.
 revert e Hn.
 induction el as [| e₁] using rev_ind; intros; [ reflexivity | ].
-bbb.
-
 remember (el ++ [e₁]) as el₁ eqn:Hel.
 simpl in Hn.
 remember (norm_list el₁) as el₂ eqn:Hel₁; symmetry in Hel₁.
@@ -2301,12 +2299,29 @@ destruct el₂ as [| e₂].
  destruct Hel₁ as [Hel₁ | Hel₁]; [ assumption | ].
  destruct Hel₁ as (el₂, (el₃, (t₁, (d₁, (He₁, Hn₁))))).
 
-
 Restart.
 intros el e Hn.
 
 Theorem toto : ∀ el, norm_list el = rev (norm_list (rev el)).
 Proof.
+Proof.
+intros el.
+induction el as [| e]; [ reflexivity | simpl ].
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁, IHel.
+destruct el₁ as [| e₁].
+ apply rev_is_nil in IHel.
+ pose proof is_normal [] (rev el) [e] as H.
+ rewrite IHel in H; simpl in H.
+ rewrite <- H; reflexivity.
+
+ destruct (letter_opp_dec e e₁) as [H₁| H₁].
+  destruct e as (t, d).
+  destruct e₁ as (t₁, d₁).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₁ d₁.
+bbb.
+
 Admitted. Show.
 
 rewrite toto in Hn.
