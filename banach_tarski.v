@@ -2162,6 +2162,35 @@ destruct len.
   exists 1%Z, 2%Z, 0%Z, 1.
   split; [ simpl; f_equal; field | intros H; discriminate H ].
 
+ destruct (list_nil_app_dec el₁) as [H₁| (e₁, (el₂, Hel₂))].
+  subst el₁; discriminate Hlen.
+
+  subst el₁; simpl in Hlen.
+  rewrite app_length in Hlen; simpl in Hlen.
+  rewrite Nat.add_1_r in Hlen.
+  apply eq_add_S in Hlen.
+  remember (E lb d :: el₂) as el₁ eqn:Hel₁.
+  remember (fold_left rotate el₁) as w₁ eqn:Hw₁.
+  destruct (norm_dec el₁) as [H₁| H₁].
+   pose proof IHlen len (Nat.lt_succ_diag_r len) w₁ el₁ el₂ d H₁ Hw₁ Hel₁
+     Hlen as H.
+   destruct H as (a', (b', (c', (k', (Hp, Hb))))).
+   rewrite Hw, Hel, app_comm_cons, <- Hel₁.
+   rewrite fold_left_app, <- Hw₁.
+   simpl.
+bbb.
+  destruct (list_nil_app_dec el₂) as [H₁| (e₂, (el₃, Hel₃))].
+   subst el₂ len; simpl in Hel; subst el w; simpl.
+   progress repeat rewrite Rmult_1_r.
+   progress repeat rewrite Rmult_0_r.
+   progress repeat rewrite Rplus_0_r.
+   destruct d; simpl.
+    destruct e₁ as (t₁, d₁); destruct t₁, d₁; simpl.
+     progress repeat rewrite Rmult_1_l.
+     progress repeat rewrite Rmult_0_l.
+     progress repeat rewrite Rmult_0_r.
+     progress repeat rewrite Rplus_0_l.
+     progress repeat rewrite Rplus_0_r.
 
 bbb.
 intros w el el₁ d Hel Hn Hw.
