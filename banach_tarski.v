@@ -2321,6 +2321,19 @@ destruct len.
         rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
         field; apply pow_nonzero; lra.
 
+        rewrite Hw₂ in Hp'.
+        rewrite Hw₁, fold_left_app, Hp' in Hp.
+        simpl in Hp.
+        progress repeat rewrite Rmult_1_l in Hp.
+        progress repeat rewrite Rmult_0_l in Hp.
+        progress repeat rewrite Rplus_0_l in Hp.
+        progress repeat rewrite Rplus_0_r in Hp.
+        injection Hp; clear Hp; intros Hc'' Hb'' Ha''.
+        unfold Rdiv in Hc''.
+        progress repeat rewrite <- Rmult_assoc in Hc''.
+        rewrite Rmult5_sqrt2_sqrt5 in Hc''.
+        rewrite Rmult_1_l in Hc''.
+        ring_simplify in Hc''.
 bbb.
         symmetry in Hc'.
         apply Rdiv_eq_0 in Hc'; [ | apply pow_nonzero; lra ].
