@@ -2176,8 +2176,30 @@ destruct len.
      Hlen as H.
    destruct H as (a', (b', (c', (k', (Hp, Hb))))).
    rewrite Hw, Hel, app_comm_cons, <- Hel₁.
-   rewrite fold_left_app, <- Hw₁.
-   simpl.
+   rewrite fold_left_app, <- Hw₁; simpl.
+   rewrite Hp; simpl.
+   destruct e₁ as (t₁, d₁); destruct t₁, d₁; simpl.
+    progress repeat rewrite Rmult_1_l.
+    progress repeat rewrite Rmult_0_l.
+    progress repeat rewrite Rplus_0_l.
+    progress repeat rewrite Rplus_0_r.
+    destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
+     subst el₂; simpl in Hlen; subst len; simpl in Hel.
+bbb.
+
+    destruct d.
+     exists (3*a')%Z, (b'+2*c')%Z, (-4*b'+c')%Z, (S k').
+     rewrite mult_IZR; simpl.
+     split.
+      f_equal; [ field; apply pow_nonzero; lra | | ].
+       rewrite plus_IZR, mult_IZR; simpl.
+       field_simplify; f_equal; apply pow_nonzero; lra.
+
+       rewrite plus_IZR, mult_IZR; simpl.
+       field_simplify; f_equal; try (apply pow_nonzero; lra).
+       rewrite <- Rsqr_pow2, Rsqr_sqrt; lra.
+
+      simpl.
 bbb.
   destruct (list_nil_app_dec el₂) as [H₁| (e₂, (el₃, Hel₃))].
    subst el₂ len; simpl in Hel; subst el w; simpl.
