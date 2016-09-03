@@ -2174,14 +2174,14 @@ destruct len.
   rewrite app_length in Hlen; simpl in Hlen.
   rewrite Nat.add_1_r in Hlen.
   apply eq_add_S in Hlen.
+  rewrite app_comm_cons in Hel.
   remember (E lb d :: el₂) as el₁ eqn:Hel₁.
   remember (fold_left rotate el₁) as w₁ eqn:Hw₁.
   destruct (norm_dec el₁) as [H₁| H₁].
    pose proof IHlen len (Nat.lt_succ_diag_r len) w₁ el₁ el₂ d H₁ Hw₁ Hel₁
      Hlen as H.
    destruct H as (a', (b', (c', (k', (Hp, Hb))))).
-   rewrite Hw, Hel, app_comm_cons, <- Hel₁.
-   rewrite fold_left_app, <- Hw₁; simpl.
+   rewrite Hw, Hel, fold_left_app, <- Hw₁; simpl.
    rewrite Hp; simpl.
    destruct e₁ as (t₁, d₁); destruct t₁, d₁; simpl.
     progress repeat rewrite Rmult_1_l.
@@ -2228,7 +2228,7 @@ destruct len.
        apply eq_IZR_R0 in Hc'.
        rewrite Hc', Z.mul_0_r, Z.add_0_r; assumption.
 
-     simpl.
+     subst el₂; simpl in Hel.
 bbb.
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
