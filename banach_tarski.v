@@ -863,6 +863,11 @@ Qed.
 Theorem Z_sub_sub_swap : ∀ a b c, (a - b - c)%Z = (a - c - b)%Z.
 Proof. intros. ring. Qed.
 
+Theorem Rdiv_0_l : ∀ x, (0 / x = 0)%R.
+Proof.
+intros x; unfold Rdiv; apply Rmult_0_l.
+Qed.
+
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
   (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
 Proof.
@@ -2185,35 +2190,45 @@ destruct len.
     progress repeat rewrite Rplus_0_r.
     destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
      subst el₂; simpl in Hlen; subst len; simpl in Hel.
-bbb.
+     subst el₁ w₁; simpl in Hp.
+     progress repeat rewrite Rmult_1_l in Hp.
+     progress repeat rewrite Rmult_1_r in Hp.
+     progress repeat rewrite Rmult_0_l in Hp.
+     progress repeat rewrite Rmult_0_r in Hp.
+     progress repeat rewrite Rplus_0_l in Hp.
+     progress repeat rewrite Rplus_0_r in Hp.
+     destruct d.
+      injection Hp; clear Hp; intros Hc' Hb' Ha'.
+      exists (3*a')%Z, (b'+2*c')%Z, (-4*b'+c')%Z, (S k'); simpl.
+      progress repeat rewrite plus_IZR.
+      progress repeat rewrite mult_IZR; simpl.
+      split.
+       f_equal; try (field; apply pow_nonzero; lra).
+       unfold Rdiv; do 2 rewrite <- Rmult_assoc.
+       rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+       field; apply pow_nonzero; lra.
 
-    destruct d.
-     exists (3*a')%Z, (b'+2*c')%Z, (-4*b'+c')%Z, (S k').
-     rewrite mult_IZR; simpl.
-     split.
-      f_equal; [ field; apply pow_nonzero; lra | | ].
-       rewrite plus_IZR, mult_IZR; simpl.
-       field_simplify; f_equal; apply pow_nonzero; lra.
+       symmetry in Hc'.
+       apply Rdiv_eq_0 in Hc'; [ | apply pow_nonzero; lra ].
+       apply eq_IZR_R0 in Hc'.
+       rewrite Hc', Z.mul_0_r, Z.add_0_r; assumption.
 
-       rewrite plus_IZR, mult_IZR; simpl.
-       field_simplify; f_equal; try (apply pow_nonzero; lra).
-       rewrite <- Rsqr_pow2, Rsqr_sqrt; lra.
+      injection Hp; clear Hp; intros Hc' Hb' Ha'.
+      exists (3*a')%Z, (b'+2*c')%Z, (-4*b'+c')%Z, (S k'); simpl.
+      progress repeat rewrite plus_IZR.
+      progress repeat rewrite mult_IZR; simpl.
+      split.
+       f_equal; try (field; apply pow_nonzero; lra).
+       unfold Rdiv; do 2 rewrite <- Rmult_assoc.
+       rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+       field; apply pow_nonzero; lra.
 
-      simpl.
-bbb.
-  destruct (list_nil_app_dec el₂) as [H₁| (e₂, (el₃, Hel₃))].
-   subst el₂ len; simpl in Hel; subst el w; simpl.
-   progress repeat rewrite Rmult_1_r.
-   progress repeat rewrite Rmult_0_r.
-   progress repeat rewrite Rplus_0_r.
-   destruct d; simpl.
-    destruct e₁ as (t₁, d₁); destruct t₁, d₁; simpl.
-     progress repeat rewrite Rmult_1_l.
-     progress repeat rewrite Rmult_0_l.
-     progress repeat rewrite Rmult_0_r.
-     progress repeat rewrite Rplus_0_l.
-     progress repeat rewrite Rplus_0_r.
+       symmetry in Hc'.
+       apply Rdiv_eq_0 in Hc'; [ | apply pow_nonzero; lra ].
+       apply eq_IZR_R0 in Hc'.
+       rewrite Hc', Z.mul_0_r, Z.add_0_r; assumption.
 
+     simpl.
 bbb.
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
