@@ -2073,6 +2073,25 @@ pose proof is_normal [] el₁ el₃ as H; simpl in H.
 rewrite Hn in H; symmetry; assumption.
 Qed.
 
+Theorem norm_list_app_diag : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = el₁ ++ el₂ → norm_list el₁ = el₁.
+Proof.
+intros el₁ el₂ Hn.
+revert el₂ Hn.
+induction el₁ as [| e₁]; intros; [ reflexivity | simpl ].
+generalize Hn; intros Hn₁.
+rewrite <- app_comm_cons in Hn₁.
+apply norm_list_cons, IHel₁ in Hn₁.
+rewrite Hn₁.
+destruct el₁ as [| e₂]; [ reflexivity | ].
+destruct (letter_opp_dec e₁ e₂) as [H₁| H₁]; [ exfalso | reflexivity ].
+destruct e₁ as (t₁, d₁).
+destruct e₂ as (t₂, d₂).
+apply letter_opp_iff in H₁.
+destruct H₁; subst t₂ d₂.
+revert Hn; apply norm_list_impossible_start.
+Qed.
+
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" *)
 
@@ -2284,163 +2303,10 @@ destruct len.
      destruct e₁ as (t₁, d₁); destruct t₁, d₁.
       generalize Hn; intros H₂.
       rewrite Hel in H₂.
-Theorem toto : ∀ el₁ el₂,
-  norm_list (el₁ ++ el₂) = el₁ ++ el₂ → norm_list el₁ = el₁.
-Proof.
-intros el₁ el₂ Hn.
-revert el₂ Hn.
-induction el₁ as [| e₁]; intros; [ reflexivity | simpl ].
-bbb.
+      apply norm_list_app_diag in H₂.
+      pose proof IHlen len (Nat.lt_succ_diag_r len) w₂ el₁ el₃ d H₂ Hw₂ Hel₁.
+shit.
 
-remember (norm_list el₁) as el₃ eqn:Hel₃; symmetry in Hel₃.
-destruct el₃ as [| e₃].
- rewrite <- app_comm_cons in Hn.
- apply norm_list_cons, IHel₁ in Hn.
- subst el₁; reflexivity.
-
- destruct (letter_opp_dec e₁ e₃) as [H₁| H₁].
-  destruct e₁ as (t₁, d₁).
-  destruct e₃ as (t₃, d₃).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t₃ d₃.
-  destruct el₃ as [| e₃]; [ exfalso | ].
-
-bbb.
-
-SearchAbout (norm_list (_ ++ _)).
-Theorem toto : ∀ el e, norm_list (el ++ [e]) = el ++ [e] → norm_list el = el.
-Proof.
-intros el e Hn.
-revert e Hn.
-induction el as [| e₁] using rev_ind; intros; [ reflexivity | ].
-remember (el ++ [e₁]) as el₁ eqn:Hel.
-simpl in Hn.
-remember (norm_list el₁) as el₂ eqn:Hel₁; symmetry in Hel₁.
-destruct el₂ as [| e₂].
- symmetry.
- apply norm_nil_iff in Hel₁.
- destruct Hel₁ as [Hel₁ | Hel₁]; [ assumption | ].
- destruct Hel₁ as (el₂, (el₃, (t₁, (d₁, (He₁, Hn₁))))).
-
-Restart.
-intros el e Hn.
-
-Theorem toto : ∀ el, norm_list (rev el) = rev (norm_list el).
-Proof.
-intros el.
-destruct (norm_dec el) as [H₁ | H₁].
-
-Theorem toto : ∀ el, norm_list el = el → norm_list (rev el) = rev el.
-Proof.
-intros el Hn.
-induction el as [| e]; [ reflexivity | ].
-simpl in Hn; simpl.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁].
- injection Hn; clear Hn; intros; subst el; reflexivity.
-
- destruct (letter_opp_dec e e₁) as [H₁| H₁].
-  destruct e as (t, d).
-  destruct e₁ as (t₁, d₁).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t₁ d₁ el₁.
-  exfalso; revert Hel₁; apply norm_list_impossible_start2.
-
-  injection Hn; clear Hn; intros; subst el.
-  pose proof IHel (eq_refl _) as H₂; clear IHel.
-  simpl in H₂; simpl.
-SearchAbout (norm_list (_ ++ _)).
-  simpl in Hel₁.
-  remember (norm_list el₁) as el₂ eqn:Hel₂.
-  symmetry in Hel₂.
-  destruct el₂ as [| e₂].
-   injection Hel₁; clear Hel₁; intros; subst el₁; simpl.
-   destruct (letter_opp_dec e₁ e) as [H₃| H₃]; [ | reflexivity ].
-   exfalso; apply H₁.
-   apply letter_opp_comm; assumption.
-
-   destruct (letter_opp_dec e₁ e₂) as [H₃| H₃].
-    destruct e₁ as (t₁, d₁).
-    destruct e₂ as (t₂, d₂).
-    apply letter_opp_iff in H₃.
-    destruct H₃; subst t₂ d₂ el₂.
-    exfalso; revert Hel₂; apply norm_list_impossible_start2.
-
-    injection Hel₁; clear Hel₁; intros; subst el₁.
-    simpl in H₂; simpl.
-
-bbb.
-
-Theorem toto : ∀ el, norm_list el = rev (norm_list (rev el)).
-Proof.
-intros el.
-induction el as [| e]; [ reflexivity | simpl ].
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁, IHel.
-destruct el₁ as [| e₁].
- apply rev_is_nil in IHel.
- pose proof is_normal [] (rev el) [e] as H.
- rewrite IHel in H; simpl in H.
- rewrite <- H; reflexivity.
-
- destruct (letter_opp_dec e e₁) as [H₁| H₁].
-  destruct e as (t, d).
-  destruct e₁ as (t₁, d₁).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t₁ d₁.
-bbb.
-
-Admitted. Show.
-
-rewrite toto in Hn.
-rewrite toto.
-rewrite rev_app_distr in Hn.
-remember (rev el) as el₁.
-
-apply rev_sym in Heqel₁.
-subst el.
-f_equal.
-apply norm_list_cons with (e := e).
-
-Theorem titi {A} : ∀ el₁ el₂ : list A, rev el₁ ++ el₂ = rev (el₁ ++ rev el₂).
-Admitted.
-Show.
-rewrite titi in Hn.
-SearchAbout ([_] ++ _).
-rewrite <- cons_to_app in Hn.
-rewrite <- toto in Hn.
-
-rewrite <- rev_app_distr in Hn.
-
-
-Theorem titi : ∀ el, norm_list (rev el) = rev (norm_list el).
-Proof.
-Admitted. Show.
-rewrite titi in Hn.
-remember (norm_list el) as el₁ eqn:Hel₁.
-destruct el₁ as [| e₁].
-simpl in Hn.
-destruct el; [ reflexivity | destruct el; discriminate Hn ].
-simpl in Hn.
-
-bbb.
- injection Hn; clear Hn; intros; subst; discriminate H.
-
- destruct (letter_opp_dec e e₂) as [H₁| H₁].
-  subst el₁ el₂.
-  destruct e as (t, d).
-  destruct e₂ as (t₂, d₂).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t₂ d₂.
-  exfalso; revert Hel₁; apply norm_list_impossible_start2.
-
-  injection Hn; clear Hn; intros; subst el₁.
-  assumption.
-Qed.
-bbb.
-
-      pose proof IHlen len (Nat.lt_succ_diag_r len) w₂ el₁ el₃ d.
  w₁ el₁ el₂ d H₁ Hw₁ Hel₁
       Hlen as H.
 bbb.
