@@ -2302,8 +2302,54 @@ destruct el₂ as [| e₂].
 Restart.
 intros el e Hn.
 
-Theorem toto : ∀ el, norm_list el = rev (norm_list (rev el)).
+Theorem toto : ∀ el, norm_list (rev el) = rev (norm_list el).
 Proof.
+intros el.
+destruct (norm_dec el) as [H₁ | H₁].
+
+Theorem toto : ∀ el, norm_list el = el → norm_list (rev el) = rev el.
+Proof.
+intros el Hn.
+induction el as [| e]; [ reflexivity | ].
+simpl in Hn; simpl.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁].
+ injection Hn; clear Hn; intros; subst el; reflexivity.
+
+ destruct (letter_opp_dec e e₁) as [H₁| H₁].
+  destruct e as (t, d).
+  destruct e₁ as (t₁, d₁).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₁ d₁ el₁.
+  exfalso; revert Hel₁; apply norm_list_impossible_start2.
+
+  injection Hn; clear Hn; intros; subst el.
+  pose proof IHel (eq_refl _) as H₂; clear IHel.
+  simpl in H₂; simpl.
+SearchAbout (norm_list (_ ++ _)).
+  simpl in Hel₁.
+  remember (norm_list el₁) as el₂ eqn:Hel₂.
+  symmetry in Hel₂.
+  destruct el₂ as [| e₂].
+   injection Hel₁; clear Hel₁; intros; subst el₁; simpl.
+   destruct (letter_opp_dec e₁ e) as [H₃| H₃]; [ | reflexivity ].
+   exfalso; apply H₁.
+   apply letter_opp_comm; assumption.
+
+   destruct (letter_opp_dec e₁ e₂) as [H₃| H₃].
+    destruct e₁ as (t₁, d₁).
+    destruct e₂ as (t₂, d₂).
+    apply letter_opp_iff in H₃.
+    destruct H₃; subst t₂ d₂ el₂.
+    exfalso; revert Hel₂; apply norm_list_impossible_start2.
+
+    injection Hel₁; clear Hel₁; intros; subst el₁.
+    simpl in H₂; simpl.
+
+bbb.
+
+Theorem toto : ∀ el, norm_list el = rev (norm_list (rev el)).
 Proof.
 intros el.
 induction el as [| e]; [ reflexivity | simpl ].
