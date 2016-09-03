@@ -5,7 +5,7 @@
 
 Require Import Utf8.
 Require Import List.
-Require Import Relations.
+Require Import Relations Setoid.
 Import ListNotations.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
@@ -95,6 +95,22 @@ Proof.
 intros t.
 destruct (letter_dec t t) as [p| p]; [ | exfalso; apply p; reflexivity ].
 destruct t; refine (match p with eq_refl => eq_refl end).
+Qed.
+
+Theorem free_elem_dec : ∀ e₁ e₂ : free_elem, { e₁ = e₂ } + { e₁ ≠ e₂ }.
+Proof.
+intros.
+destruct e₁ as (t₁, d₁).
+destruct e₂ as (t₂, d₂).
+destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
+ destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ subst d₂ | ].
+  left; reflexivity.
+
+  right; intros H; apply H₂.
+  injection H; intros; assumption.
+
+ right; intros H; apply H₁.
+ injection H; intros; assumption.
 Qed.
 
 Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
@@ -379,6 +395,10 @@ Qed.
 
 Definition norm_eq x y := norm_list x = norm_list y.
 Notation "x ≡ y" := (norm_eq x y) (at level 70).
+Theorem fold_norm_eq : ∀ el₁ el₂,
+  norm_list el₁ = norm_list el₂
+  → el₁ ≡ el₂.
+Proof. intros; assumption. Qed.
 
 Definition norm_eq_refl : reflexive _ norm_eq.
 Proof. intros el₁; reflexivity. Qed.
@@ -397,6 +417,22 @@ Add Parametric Relation : _ norm_eq
  symmetry proved by norm_eq_sym
  transitivity proved by norm_eq_trans
  as norm_eq_equivalence.
+
+Add Parametric Morphism : (@app free_elem)
+  with signature norm_eq ==> norm_eq ==> norm_eq
+  as norm_eq_app_morph.
+Proof.
+intros el₁ el₂ Hel₁ el₃ el₄ Hel₂.
+unfold "≡" in Hel₁, Hel₂ |-*.
+pose proof is_normal el₁ el₃ [] as H.
+rewrite Hel₂, is_normal in H.
+do 2 rewrite app_nil_r in H.
+rewrite <- H; clear H.
+pose proof is_normal [] el₂ el₄ as H.
+rewrite <- Hel₁, is_normal in H.
+do 2 rewrite app_nil_l in H.
+assumption.
+Qed.
 
 Theorem norm_norm : ∀ s, norm (norm s) = norm s.
 Proof.
@@ -2076,6 +2112,87 @@ Guarded.
 
 bbb.
 *)
+Check lt_wf_rec.
+Check rev_ind.
+(*
+Fixpoint list_lt {A} (eq_dec : ∀ x y : A, {x = y} + { x ≠ y})
+         (l₁ l₂ : list A) { struct l₂ } :=
+  match l₂ with
+  | [] => False
+  | x₂ :: l'₂ =>
+      match l₁ with
+      | [] => True
+      | x₁ :: l'₁ => if eq_dec x₁ x₂ then list_lt eq_dec l'₁ l'₂ else False
+      end
+  end.
+
+Theorem glop {A} : ∀ eq_dec (P : list A → Prop),
+  (∀ l, (∀ l', list_lt eq_dec l' l → P l') → P l)
+  → ∀ l, P l.
+Proof.
+intros eq_dec P H.
+fix IHl 1; intros l.
+destruct l as [| x]; [ apply H; intros l' H'; contradiction | ].
+apply H; intros l' H'; simpl in H'.
+destruct l' as [| x']; [ clear H' | ].
+ apply H; intros l' H'; contradiction.
+
+ destruct (eq_dec x' x) as [H₁| H₁]; [ subst x' | ].
+  apply H; intros l'' H''; simpl in H''.
+bbb.
+
+apply H; intros l' H'.
+bbb.
+*)
+intros w el el₁ d Hel Hn Hw.
+Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
+remember (List.length el₁) as len eqn:Hlen; symmetry in Hlen.
+revert w el el₁ d Hn Hw Hel Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len.
+ apply length_zero_iff_nil in Hlen; subst el₁.
+ subst w el; simpl.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_r.
+ destruct d.
+  exists 1%Z, (-2)%Z, 0%Z, 1.
+  split; [ simpl; f_equal; field | intros H; discriminate H ].
+
+  exists 1%Z, 2%Z, 0%Z, 1.
+  split; [ simpl; f_equal; field | intros H; discriminate H ].
+
+ destruct (list_nil_app_dec el₁) as [H₁| (e₁, (el₂, Hel₂))].
+  subst el₁; discriminate Hlen.
+
+  subst el₁; simpl in Hlen.
+  rewrite app_length in Hlen; simpl in Hlen.
+  rewrite Nat.add_1_r in Hlen.
+  apply eq_add_S in Hlen.
+  remember (E lb d :: el₂) as el₁ eqn:Hel₁.
+  remember (fold_left rotate el₁) as w₁ eqn:Hw₁.
+  destruct (norm_dec el₁) as [H₁| H₁].
+   pose proof IHlen len (Nat.lt_succ_diag_r len) w₁ el₁ el₂ d H₁ Hw₁ Hel₁
+     Hlen as H.
+   destruct H as (a', (b', (c', (k', (Hp, Hb))))).
+   rewrite Hw, Hel, app_comm_cons, <- Hel₁.
+   rewrite fold_left_app, <- Hw₁.
+   simpl.
+bbb.
+  destruct (list_nil_app_dec el₂) as [H₁| (e₂, (el₃, Hel₃))].
+   subst el₂ len; simpl in Hel; subst el w; simpl.
+   progress repeat rewrite Rmult_1_r.
+   progress repeat rewrite Rmult_0_r.
+   progress repeat rewrite Rplus_0_r.
+   destruct d; simpl.
+    destruct e₁ as (t₁, d₁); destruct t₁, d₁; simpl.
+     progress repeat rewrite Rmult_1_l.
+     progress repeat rewrite Rmult_0_l.
+     progress repeat rewrite Rmult_0_r.
+     progress repeat rewrite Rplus_0_l.
+     progress repeat rewrite Rplus_0_r.
+
+bbb.
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 revert w el₁ d Hw Hel.
@@ -2100,39 +2217,21 @@ destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, Hel₂)) ].
  destruct e₂ as (t₂, d₂).
  destruct t₁, t₂.
   destruct (Bool.bool_dec d₁ d₂) as [H₁| H₁]; [ subst d₂ | ].
+   assert (norm_list (el ++ [E la d₁]) = el ++ [E la d₁]).
+Focus 2.
+    pose proof IHel H.
+bbb.
 
 Theorem norm_list_app_elem : ∀ el₁ el₂ e₁ e₂,
   norm_list (el₁ ++ [e₁]) = el₂ ++ [e₂]
   → norm_list el₁ = el₂.
 Proof.
 intros el₁ el₂ e₁ e₂ Hn.
-revert el₂ e₁ e₂ Hn.
-induction el₁ as [| e]; intros.
- simpl in Hn.
- destruct el₂; [ reflexivity | destruct el₂; discriminate Hn ].
-
- simpl in Hn; simpl.
- remember (norm_list (el₁ ++ [e₁])) as el₃ eqn:Hel₃.
- symmetry in Hel₃.
- destruct (list_nil_app_dec el₃) as [H₁ | (e₃, (el₄, Hel₄))].
-  subst el₃.
-  apply norm_nil_iff in H₁.
-  destruct H₁ as [H₁| H₁]; [ destruct el₁; discriminate H₁ | ].
-  destruct H₁ as (el₃, (el₄, (t, (d, (H₁, H₂))))).
-  rewrite H₁ in Hn.
-  rewrite norm_list_cancel_inside, H₂ in Hn.
-  destruct el₂; [ simpl in Hn | destruct el₂; discriminate Hn ].
-  injection Hn; clear Hn; intros; subst e₂.
-  remember (norm_list el₁) as el₂ eqn:Hel₂; symmetry in Hel₂.
-  destruct el₂ as [| e₂]; [ exfalso | ].
-   rewrite <- norm_list_cancel_inside with (t := t) (d := d) in H₂.
-   rewrite <- H₁ in H₂.
-   revert Hel₂ H₂; clear; intros.
-   rewrite norm_list_app with (el₂ := []) in H₂; [ discriminate H₂ | ].
-   assumption.
-
-  destruct (letter_opp_dec e e₂) as [H₃| H₃].
-
+Compute norm_list ([ạ; ḅ] ++ [ḅ⁻¹]).
+Compute norm_list ([] ++ [ạ]).
+Compute norm_list ([ạ; ḅ]).
+Compute ([] : list free_elem).
+(* faux ! *)
 bbb.
 
 (*
@@ -2216,29 +2315,6 @@ intros el₁ el₂ Ha Hn.
 apply norm_nil_iff in Hn.
 destruct Hn as [Hn| Hn]; [ subst el₁; assumption | ].
 destruct Hn as (el₃, (el₄, (t, (d, (Hel, Hn))))).
-
-bbb.
-
-Require Import Setoid.
-
-Add Parametric Morphism : (@app free_elem)
-  with signature norm_eq ==> norm_eq ==> norm_eq
-  as norm_eq_app_morph.
-Proof.
-intros el₁ el₂ Hel₁ el₃ el₄ Hel₂.
-unfold "≡" in Hel₁, Hel₂ |-*.
-destruct (norm_dec el₁) as [H₁| H₁].
- destruct (norm_dec el₂) as [H₂| H₂].
-  rewrite Hel₁, H₂ in H₁; subst el₂.
-  destruct (norm_dec el₃) as [H₃| H₃].
-   destruct (norm_dec el₄) as [H₄| H₄].
-    rewrite Hel₂, H₄ in H₃; subst el₄; reflexivity.
-
-    destruct H₄ as (el₅, (e, (el₆, H₄))).
-    revert el₃ el₄ el₅ e el₆ Hel₂ H₃ H₄.
-    induction el₄ as [| e₄]; intros; [ discriminate H₄ | ].
-    simpl in H₄.
-    destruct el₄ as [| e₄].
 
 bbb.
 
