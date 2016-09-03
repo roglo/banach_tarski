@@ -2311,6 +2311,21 @@ destruct len.
       apply eq_add_S in Hlen.
       pose proof IHlen len Hl w₂ el₁ el₃ d H₂ Hw₂ Hel₁ Hlen as H.
       destruct H as (a'', (b'', (c'', (k'', (Hp', Hb'))))).
+      destruct d.
+       exists (3*a')%Z, (b'+2*c')%Z, (-4*b'+c')%Z, (S k'); simpl.
+       progress repeat rewrite plus_IZR.
+       progress repeat rewrite mult_IZR; simpl.
+       split.
+        f_equal; try (field; apply pow_nonzero; lra).
+        unfold Rdiv; do 2 rewrite <- Rmult_assoc.
+        rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+        field; apply pow_nonzero; lra.
+
+bbb.
+        symmetry in Hc'.
+        apply Rdiv_eq_0 in Hc'; [ | apply pow_nonzero; lra ].
+        apply eq_IZR_R0 in Hc'.
+        rewrite Hc', Z.mul_0_r, Z.add_0_r; assumption.
 bbb.
 intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
