@@ -2217,6 +2217,79 @@ apply H; intros l' H'.
 bbb.
 *)
 intros w el el₁ d Hel Hn Hw.
+subst w.
+Check rotate_param_rotate.
+remember (fold_left rotate_param el (1, 0, 0, O)%Z) as u eqn:Hu.
+symmetry in Hu; destruct u as (((a, b), c), len).
+generalize Hu; intros Hv.
+apply rotate_param_rotate in Hv; simpl in Hv.
+rewrite Rmult_0_l in Hv.
+rewrite Rdiv_0_l in Hv.
+replace (1/1)%R with 1%R in Hv by lra.
+destruct Hv as (Hv, Hlen).
+rewrite Hv.
+exists a, b, c, len.
+split; [ reflexivity | clear Hv ].
+symmetry in Hlen.
+rewrite Hel in Hlen; simpl in Hlen.
+destruct len; [ subst el; discriminate Hlen | ].
+apply eq_add_S in Hlen.
+
+Theorem titi : ∀ el el₁ d a b c n,
+  el = E lb d :: el₁
+  → norm_list el = el
+  → fold_left rotate_param el (1, 0, 0, O)%Z = (a, b, c, n + S (length el₁))
+  → (b mod 3 ≠ 0)%Z.
+Proof.
+intros el el₁ d a b c n Hel Hn Hu.
+remember (length el₁) as len eqn:Hlen; symmetry in Hlen.
+revert el el₁ d a b c n Hel Hn Hu Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len.
+ rewrite Nat.add_1_r in Hu.
+ apply length_zero_iff_nil in Hlen; subst el₁.
+ subst el; simpl in Hu.
+ destruct d; injection Hu; clear Hu; intros; subst; intros H; discriminate H.
+
+ destruct (list_nil_app_dec el₁) as [H₁| (e₁, (el₂, Hel₂))].
+  subst el₁; discriminate Hlen.
+
+  subst el₁; simpl in Hlen.
+  rewrite app_length in Hlen; simpl in Hlen.
+  rewrite Nat.add_1_r in Hlen.
+  apply eq_add_S in Hlen.
+  rewrite app_comm_cons in Hel.
+  remember (E lb d :: el₂) as el₁ eqn:Hel₁.
+  destruct (norm_dec el₁) as [H₁| H₁].
+   rewrite Hel, fold_left_app in Hu; simpl in Hu.
+   remember (fold_left rotate_param el₁ (1%Z, 0%Z, 0%Z, 0)) as v eqn:Hp.
+   symmetry in Hp.
+   destruct v as (((a', b'), c'), N').
+   destruct e₁ as (t₁, d₁); destruct t₁, d₁; simpl in Hu.
+    injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c.
+    rewrite <- Nat.add_succ_comm in HN; simpl in HN.
+    apply eq_add_S in HN; subst N'.
+    pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' n Hel₁
+      H₁ Hp Hlen as Hb'.
+    rename a' into a; rename b' into b; rename c' into c.
+    destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
+     subst el₂; simpl in Hlen; subst len; simpl in Hel.
+     subst el₁; simpl in Hp.
+     rewrite Nat.add_1_r in Hp.
+     destruct d; injection Hp; intros; subst; intros H; discriminate H.
+
+     subst el₂.
+     rewrite Hel₁ in Hel; simpl in Hel.
+     rewrite <- app_assoc in Hel; simpl in Hel.
+bbb.
+Show.
+subst len; eapply titi with (n := O); try eassumption.
+
+Show.
+subst len; eapply titi with (n := O); try eassumption.
+
+bbb.
+intros w el el₁ d Hel Hn Hw.
 Compute fold_left rotate_param [ḅ; ạ; ạ; ḅ] (1, 0, 0, O)%Z.
 remember (List.length el₁) as len eqn:Hlen; symmetry in Hlen.
 revert w el el₁ d Hn Hw Hel Hlen.
