@@ -1147,6 +1147,27 @@ destruct Hb as [Hb| Hb].
  rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
 Qed.
 
+Definition no_rotate := ([] : list free_elem).
+Definition is_neutral el := ∀ p, fold_left rotate el p = p.
+
+Theorem rotate_0 : is_neutral no_rotate.
+Proof. intros p; reflexivity. Qed.
+
+Theorem toto : ∀ el, norm_list el ≠ no_rotate → ¬ (is_neutral el).
+Proof.
+intros el Hn Hr.
+unfold no_rotate in Hn.
+destruct el as [| e]; [ apply Hn; reflexivity | clear Hn ].
+destruct e as (t, d); destruct t, d.
+ pose proof Hr (P 0 0 1) as H.
+ simpl in H.
+ progress repeat rewrite Rmult_0_r in H.
+ progress repeat rewrite Rmult_0_l in H.
+ progress repeat rewrite Rmult_1_r in H.
+ progress repeat rewrite Rplus_0_l in H.
+
+bbb.
+
 End Rotation.
 
 Check rotate_1_0_0_is_diff.
