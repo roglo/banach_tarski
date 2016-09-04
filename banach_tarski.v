@@ -1124,6 +1124,29 @@ apply eq_add_S in Hlen.
 subst len; eapply rotate_param_1_0_0_b_nonzero with (n := O); eassumption.
 Qed.
 
+Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
+  el = E lb d :: el₁
+  → norm_list el = el
+  → fold_left rotate el (P 1 0 0) ≠ P 1 0 0.
+Proof.
+intros el el₁ d Hel Hn.
+remember (fold_left rotate el) as w eqn:Hw.
+pose proof rotate_1_0_0_b_nonzero w el el₁ d Hel Hn Hw as H.
+destruct H as (a, (b, (c, (k, (Hp, Hm))))).
+rewrite Hp; intros H.
+injection H; intros Hc Hb Ha.
+apply Rmult_integral in Hb.
+destruct Hb as [Hb| Hb].
+ apply Rmult_integral in Hb.
+ destruct Hb as [Hb| Hb].
+  apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
+
+  revert Hb; apply sqrt2_neq_0.
+
+ apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
+ rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
+Qed.
+
 End Rotation.
 
-Check rotate_1_0_0_b_nonzero.
+Check rotate_1_0_0_is_diff.
