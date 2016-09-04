@@ -1,11 +1,14 @@
 (* Banach-Tarski paradox. *)
 (* Inspirations:
+   - Stan Wagon: The Banach-Tarski Paradox, Cambridge University Press
    - Wikipedia: Banach–Tarski paradox
    - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
 
 Require Import Utf8.
 Require Import List.
+(*
 Require Import Relations Setoid.
+*)
 Import ListNotations.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
@@ -20,8 +23,10 @@ intros b₁ b₂ H.
 destruct b₁, b₂; try reflexivity; exfalso; apply H; reflexivity.
 Qed.
 
+(*
 Theorem cons_to_app : ∀ A (x : A) l, x :: l = (x :: nil) ++ l.
 Proof. reflexivity. Qed.
+*)
 
 Theorem cons_comm_app {A} : ∀ (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
 Proof. reflexivity. Qed.
@@ -29,6 +34,7 @@ Proof. reflexivity. Qed.
 Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
 Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
 
+(*
 Theorem xor_or : ∀ P Q, P ⊕ Q → P ∨ Q.
 Proof.
 intros.
@@ -69,6 +75,7 @@ intros el₁ el₂ H.
 subst el₁; symmetry.
 apply rev_involutive.
 Qed.
+*)
 
 (* Step 1 *)
 
@@ -84,8 +91,10 @@ Inductive letter := la | lb.
 Inductive free_elem := E : letter → bool → free_elem.
 Record F₂ := mkF₂ { str : list free_elem }.
 
+(*
 Notation "x '⁺'" := (E x false) (at level 200, format "x ⁺").
 Notation "x '⁻¹'" := (E x true) (at level 200, format "x ⁻¹").
+*)
 Notation "'ạ'" := (E la false).
 Notation "'ạ⁻¹'" := (E la true).
 Notation "'ḅ'" := (E lb false).
@@ -104,6 +113,7 @@ destruct (letter_dec t t) as [p| p]; [ | exfalso; apply p; reflexivity ].
 destruct t; refine (match p with eq_refl => eq_refl end).
 Qed.
 
+(*
 Theorem free_elem_dec : ∀ e₁ e₂ : free_elem, { e₁ = e₂ } + { e₁ ≠ e₂ }.
 Proof.
 intros.
@@ -119,18 +129,21 @@ destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
  right; intros H; apply H₁.
  injection H; intros; assumption.
 Qed.
+*)
 
 Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
   if letter_dec l₁ l₂ then
     if Bool.bool_dec d₁ d₂ then False else True
   else False.
 
+(*
 Theorem bool_dec_diag : ∀ b, Bool.bool_dec b b = left (eq_refl _).
 Proof.
 intros b.
 destruct (Bool.bool_dec b b) as [p| p]; [ | exfalso; apply p; reflexivity ].
 destruct b; refine (match p with eq_refl => eq_refl end).
 Qed.
+*)
 
 Definition false_neq_negb_false : false ≠ negb false :=
   λ p, False_ind False
@@ -140,18 +153,22 @@ Definition true_neq_negb_true : true ≠ negb true :=
   λ p, False_ind False
    (eq_ind true (λ e : bool, if e then True else False) I false p).
 
+(*
 Definition negb_true_neq_true : negb true ≠ true := false_neq_negb_false.
 Definition negb_false_neq_false : negb false ≠ false := true_neq_negb_true.
+*)
 
 Theorem bool_dec_negb_r : ∀ b,
   Bool.bool_dec b (negb b) =
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
 Proof. intros b; destruct b; reflexivity. Qed.
 
+(*
 Theorem bool_dec_negb_l : ∀ b,
   Bool.bool_dec (negb b) b =
   right (if b return _ then negb_true_neq_true else negb_false_neq_false).
 Proof. intros b; destruct b; reflexivity. Qed.
+*)
 
 Theorem letter_opp_dec : ∀ e₁ e₂,
   {letter_opp e₁ e₂} + {not (letter_opp e₁ e₂)}.
@@ -166,6 +183,7 @@ destruct (letter_dec x₁ x₂) as [Hx| Hx].
  right; intros H; contradiction.
 Defined.
 
+(*
 Theorem letter_opp_comm : ∀ e₁ e₂, letter_opp e₁ e₂ → letter_opp e₂ e₁.
 Proof.
 intros e₁ e₂ H.
@@ -178,6 +196,7 @@ destruct (letter_dec x₁ x₁) as [H₃| H₃]; [ | apply H₃; reflexivity ].
 destruct (Bool.bool_dec d₂ d₁) as [H₄| H₄]; [ | constructor ].
 symmetry in H₄; contradiction.
 Qed.
+*)
 
 Theorem letter_opp_inv : ∀ x d, letter_opp (E x d) (E x (negb d)).
 Proof.
@@ -187,6 +206,7 @@ rewrite letter_dec_diag, bool_dec_negb_r.
 constructor.
 Qed.
 
+(*
 Theorem not_letter_opp_diag : ∀ x d, ¬ letter_opp (E x d) (E x d).
 Proof.
 intros.
@@ -194,6 +214,7 @@ unfold letter_opp.
 rewrite letter_dec_diag, bool_dec_diag.
 intros H; assumption.
 Qed.
+*)
 
 Theorem letter_opp_iff : ∀ x₁ d₁ x₂ d₂,
   letter_opp (E x₁ d₁) (E x₂ d₂)
@@ -223,10 +244,12 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
+(*
 Definition normalised_list el := norm_list el = el.
 
 Theorem norm_list_single : ∀ e, norm_list (e :: nil) = e :: nil.
 Proof. reflexivity. Qed.
+*)
 
 Theorem norm_list_impossible_consecutive : ∀ x d el el₁ el₂,
   norm_list el ≠ el₁ ++ E x d :: E x (negb d) :: el₂.
@@ -409,6 +432,7 @@ destruct el₂ as [| e₂].
   assumption.
 Qed.
 
+(*
 Theorem norm_list_is_cons : ∀ el e el₁,
   norm_list el = e :: el₁
   → el₁ = norm_list el₁.
@@ -505,6 +529,7 @@ subst el'; simpl.
 rewrite norm_list_norm_list.
 reflexivity.
 Qed.
+*)
 
 Definition empty s := str (norm s) = nil.
 Definition start_with x s :=
@@ -514,7 +539,9 @@ Definition start_with x s :=
   end.
 
 Notation "s = '∅'" := (empty s) (at level 70).
+(*
 Notation "s ≠ '∅'" := (¬ empty s) (at level 70).
+*)
 Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
   (at level 70, format "s  '∈'  Ṣ ( x )").
 
@@ -630,6 +657,7 @@ destruct el' as [| e el'].
   apply H₂, letter_opp_inv.
 Qed.
 
+(*
 Theorem norm_inv : ∀ x d el,
   norm (mkF₂ (E x d :: E x (negb d) :: el)) = norm (mkF₂ el).
 Proof.
@@ -638,6 +666,7 @@ unfold norm; f_equal.
 remember norm_list as f; simpl; subst f.
 apply norm_list_inv.
 Qed.
+*)
 
 Theorem start_with_start_with2 : ∀ s x y d,
   not (x = y ∧ d = false)
@@ -768,6 +797,7 @@ Proof. intros; apply decomposed_2. Qed.
 Theorem decomposed_2_b : ∀ s, s ∈ ḅ Ṣ(ḅ⁻¹) ⊕ s ∈ Ṣ(ḅ) .
 Proof. intros; apply decomposed_2. Qed.
 
+(*
 Fixpoint split_at_cancel el :=
   match el with
   | [] => None
@@ -884,6 +914,7 @@ split; [ intros Hel | ].
  destruct Hel as (el₁, (el₂, (t, (d, (Hel₁, Hel₂))))).
  subst el; rewrite norm_list_cancel_inside; assumption.
 Qed.
+*)
 
 End Free_Group.
 
@@ -901,6 +932,7 @@ Arguments Nat.modulo _ _ : simpl nomatch.
 Arguments Z.mul _ _ : simpl nomatch.
 (* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
 
+(*
 Theorem Nat_mod_add_once : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
 Proof.
 intros a b Hb.
@@ -910,6 +942,7 @@ Qed.
 
 Theorem Z_sub_sub_swap : ∀ a b c, (a - b - c)%Z = (a - c - b)%Z.
 Proof. intros. ring. Qed.
+*)
 
 Theorem Rdiv_0_l : ∀ x, (0 / x = 0)%R.
 Proof.
@@ -928,29 +961,34 @@ Qed.
 
 Section Rotation.
 
+(*
 Notation "s = '∅'" := (empty s) (at level 70).
 Notation "s ≠ '∅'" := (¬ empty s) (at level 70).
 Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
   (at level 70, format "s  '∈'  Ṣ ( x )").
 Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
   (at level 70, x at level 0, format "s  '∈'  x  Ṣ ( y )").
+*)
 Notation "'ạ'" := (E la false).
 Notation "'ạ⁻¹'" := (E la true).
 Notation "'ḅ'" := (E lb false).
 Notation "'ḅ⁻¹'" := (E lb true).
+(*
 Notation "x ≡ y" := (norm_eq x y) (at level 70).
+*)
 
 Check decomposed_4.
 Check decomposed_2_a.
 Check decomposed_2_b.
 
+(*
 Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
 Proof.
 intros.
 rewrite Rmult_comm, <- Rmult_assoc.
 f_equal; apply Rmult_comm.
 Qed.
-
+*)
 
 Inductive point := P : ℝ → ℝ → ℝ → point.
 Record matrix := mkmat
@@ -996,6 +1034,7 @@ Definition rotate_param '(a, b, c, N) e :=
   | ḅ⁻¹ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
   end.
 
+(*
 Theorem rotate_param_keep_dist : ∀ el x y z a b c n N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
   → ((a ^ 2 + 2 * b ^ 2 + c ^ 2) * 3 ^ Z.of_nat (2 * n) =
@@ -1022,6 +1061,7 @@ Compute (fold_left rotate_param [ḅ; ạ] (1, 0, 0, O)%Z).
 Compute (fold_left rotate_param [ḅ; ạ⁻¹] (1, 0, 0, O)%Z).
 Compute (fold_left rotate_param [ḅ⁻¹; ạ] (1, 0, 0, O)%Z).
 Compute (fold_left rotate_param [ḅ⁻¹; ạ⁻¹] (1, 0, 0, O)%Z).
+*)
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
@@ -1169,6 +1209,7 @@ split.
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
 Qed.
 
+(*
 Definition fst3 {A B C D} '((a, b, c, d) : A * B * C * D) := (a, b, c).
 
 Definition eq_mod_3 '(a₁, b₁, c₁) '(a₂, b₂, c₂) :=
@@ -1960,6 +2001,7 @@ Proof. intros; destruct t; reflexivity. Qed.
 Theorem fold_uncombine : ∀ f p,
   uncombine_loop f p = uncombine {| first := f; path := p |}.
 Proof. reflexivity. Qed.
+*)
 
 Theorem list_nil_app_dec {A} : ∀ (l : list A),
   {l = []} + {∃ x l', l = l' ++ [x]}.
@@ -1971,6 +2013,7 @@ induction l as [| y] using rev_ind; intros; [ exists x, []; reflexivity | ].
 exists y, (x :: l); reflexivity.
 Qed.
 
+(*
 Definition mat_mul m₁ m₂ :=
   mkmat
     (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
@@ -2072,6 +2115,7 @@ intros el₁ el₂ el₃ Hn.
 pose proof is_normal [] el₁ el₃ as H; simpl in H.
 rewrite Hn in H; symmetry; assumption.
 Qed.
+*)
 
 Theorem norm_list_app_diag : ∀ el₁ el₂,
   norm_list (el₁ ++ el₂) = el₁ ++ el₂ → norm_list el₁ = el₁.
