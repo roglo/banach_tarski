@@ -2281,6 +2281,27 @@ destruct len.
      subst el₂.
      rewrite Hel₁ in Hel; simpl in Hel.
      rewrite <- app_assoc in Hel; simpl in Hel.
+     destruct e₁ as (t₁, d₁); destruct t₁, d₁.
+      generalize Hn; intros H₂.
+      rewrite app_comm_cons in Hel.
+      rewrite Hel in H₂.
+      apply norm_list_app_diag in H₂.
+      destruct len; [ destruct el₃ in Hlen; discriminate Hlen | ].
+      assert (Hl : len < S (S len)) by (apply le_n_S, Nat.le_succ_diag_r).
+      rewrite app_length in Hlen; simpl in Hlen.
+      rewrite Nat.add_1_r in Hlen.
+      apply eq_add_S in Hlen.
+      remember (E lb d :: el₃) as el₂ eqn:Hel₂.
+      rewrite app_comm_cons, <- Hel₂ in Hel₁.
+      rewrite Hel₁, fold_left_app in Hp.
+      simpl in Hp.
+      remember (fold_left rotate_param el₂ (1, 0, 0, O)%Z) as p' eqn:Hp'.
+      symmetry in Hp'.
+      destruct p' as (((a', b'), c'), N').
+      simpl in Hp.
+      injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c.
+      rewrite <- Nat.add_succ_comm in HN; simpl in HN.
+      apply eq_add_S in HN; subst N'.
 bbb.
 Show.
 subst len; eapply titi with (n := O); try eassumption.
