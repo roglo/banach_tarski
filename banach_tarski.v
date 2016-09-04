@@ -2302,6 +2302,18 @@ destruct len.
       injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c.
       rewrite <- Nat.add_succ_comm in HN; simpl in HN.
       apply eq_add_S in HN; subst N'.
+      rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
+      remember (b' + 2 * c' + 2 * (-4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
+      ring_simplify in Hx; subst x.
+      replace 4%Z with (2 * 2)%Z by reflexivity.
+      rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
+      intros H; apply Hb'.
+      apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
+      apply Z.gauss in H; [ | reflexivity ].
+      destruct H as (k, H); rewrite H.
+      apply Z.mod_mul; intros; discriminate.
+
+      simpl. (* contradiction avec Hel et Hn *)
 bbb.
 Show.
 subst len; eapply titi with (n := O); try eassumption.
