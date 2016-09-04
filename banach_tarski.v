@@ -820,9 +820,6 @@ destruct H₁; subst t₂ d₂.
 revert Hn; apply norm_list_impossible_start.
 Qed.
 
-(* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
-    integers and b is not divisible by 3" *)
-
 Theorem rotate_param_1_0_0_b_nonzero : ∀ el el₁ d a b c n,
   el = E lb d :: el₁
   → norm_list el = el
@@ -1095,6 +1092,9 @@ destruct len.
      destruct H as (k, H); rewrite H.
      apply Z.mod_mul; intros; discriminate.
 Qed.
+
+(* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
+    integers and b is not divisible by 3" (Stan Wagon) *)
 
 Theorem rotate_1_0_0_b_nonzero : ∀ w el el₁ d,
   el = E lb d :: el₁
