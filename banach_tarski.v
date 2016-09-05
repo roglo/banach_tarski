@@ -820,18 +820,17 @@ destruct H₁; subst t₂ d₂.
 revert Hn; apply norm_list_impossible_start.
 Qed.
 
-Theorem rotate_param_1_0_0_b_nonzero : ∀ el el₁ d a b c n,
+Theorem rotate_param_1_0_0_b_nonzero : ∀ el el₁ d a b c,
   el = E lb d :: el₁
   → norm_list el = el
-  → fold_left rotate_param el (1, 0, 0, O)%Z = (a, b, c, n + S (length el₁))
+  → fold_left rotate_param el (1, 0, 0, O)%Z = (a, b, c, S (length el₁))
   → (b mod 3 ≠ 0)%Z.
 Proof.
-intros el el₁ d a b c n Hel Hn Hu.
+intros el el₁ d a b c Hel Hn Hu.
 remember (length el₁) as len eqn:Hlen; symmetry in Hlen.
-revert el el₁ d a b c n Hel Hn Hu Hlen.
+revert el el₁ d a b c Hel Hn Hu Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct len.
- rewrite Nat.add_1_r in Hu.
  apply length_zero_iff_nil in Hlen; subst el₁.
  subst el; simpl in Hu.
  destruct d; injection Hu; clear Hu; intros; subst; intros H; discriminate H.
@@ -852,16 +851,13 @@ destruct len.
   symmetry in Hp.
   destruct v as (((a', b'), c'), N').
   destruct e₁ as (t₁, d₁); destruct t₁, d₁; simpl in Hu.
-   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c.
-   rewrite <- Nat.add_succ_comm in HN; simpl in HN.
-   apply eq_add_S in HN; subst N'.
-   pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' n Hel₁
+   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c N'.
+   pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' Hel₁
      H₁ Hp Hlen as Hb'.
    rename a' into a; rename b' into b; rename c' into c.
    destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
     subst el₂; simpl in Hlen; subst len; simpl in Hel.
     subst el₁; simpl in Hp.
-    rewrite Nat.add_1_r in Hp.
     destruct d; injection Hp; intros; subst; intros H; discriminate H.
 
     subst el₂.
@@ -885,9 +881,7 @@ destruct len.
     destruct p' as (((a', b'), c'), N').
     simpl in Hp.
     destruct e₁ as (t₁, d₁); destruct t₁, d₁.
-     injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c.
-     rewrite <- Nat.add_succ_comm in HN; simpl in HN.
-     apply eq_add_S in HN; subst N'.
+     injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
      rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
      remember (b' + 2 * c' + 2 * (-4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
      ring_simplify in Hx; subst x.
@@ -910,16 +904,13 @@ destruct len.
      rewrite Z.mul_assoc, Z.mul_shuffle0.
      rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
-   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c.
-   rewrite <- Nat.add_succ_comm in HN; simpl in HN.
-   apply eq_add_S in HN; subst N'.
-   pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' n Hel₁
+   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c N'.
+   pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' Hel₁
      H₁ Hp Hlen as Hb'.
    rename a' into a; rename b' into b; rename c' into c.
    destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
     subst el₂; simpl in Hlen; subst len; simpl in Hel.
     subst el₁; simpl in Hp.
-    rewrite Nat.add_1_r in Hp.
     destruct d; injection Hp; intros; subst; intros H; discriminate H.
 
     subst el₂.
@@ -946,9 +937,7 @@ destruct len.
      exfalso; revert Hn; rewrite Hel.
      apply norm_list_impossible_consecutive.
 
-     injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c.
-     rewrite <- Nat.add_succ_comm in HN; simpl in HN.
-     apply eq_add_S in HN; subst N'.
+     injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
      rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
      remember (b' - 2 * c' - 2 * (4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
      ring_simplify in Hx; subst x.
@@ -970,16 +959,13 @@ destruct len.
      unfold Z.sub; rewrite Zopp_mult_distr_l.
      rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
-   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c.
-   rewrite <- Nat.add_succ_comm in HN; simpl in HN.
-   apply eq_add_S in HN; subst N'.
-   pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' n Hel₁
+   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c N'.
+   pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' Hel₁
      H₁ Hp Hlen as Hb'.
    rename a' into a; rename b' into b; rename c' into c.
    destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
     subst el₂; simpl in Hlen; subst len; simpl in Hel.
     subst el₁; simpl in Hp.
-    rewrite Nat.add_1_r in Hp.
     destruct d.
      injection Hp; intros; subst; simpl; intros H; discriminate H.
 
@@ -1014,9 +1000,7 @@ destruct len.
      rewrite Z.mul_assoc, Z.mul_shuffle0, Z.add_comm.
      rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
-     injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c.
-     rewrite <- Nat.add_succ_comm in HN; simpl in HN.
-     apply eq_add_S in HN; subst N'.
+     injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
      rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
      remember (-2 * (a' + 4 * b') + (-2 * a' + b') + 3 * b' * 3)%Z as x eqn:Hx.
      ring_simplify in Hx; subst x.
@@ -1031,16 +1015,13 @@ destruct len.
      exfalso; revert Hn; rewrite Hel.
      apply norm_list_impossible_consecutive.
 
-   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c.
-   rewrite <- Nat.add_succ_comm in HN; simpl in HN.
-   apply eq_add_S in HN; subst N'.
-   pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' n Hel₁
+   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c N'.
+   pose proof IHlen len (Nat.lt_succ_diag_r len) el₁ el₂ d a' b' c' Hel₁
      H₁ Hp Hlen as Hb'.
    rename a' into a; rename b' into b; rename c' into c.
    destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
     subst el₂; simpl in Hlen; subst len; simpl in Hel.
     subst el₁; simpl in Hp.
-    rewrite Nat.add_1_r in Hp.
     destruct d.
      exfalso; revert Hn; rewrite Hel; apply norm_list_impossible_start.
 
@@ -1078,9 +1059,7 @@ destruct len.
      exfalso; revert Hn; rewrite Hel.
      apply norm_list_impossible_consecutive.
 
-     injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c.
-     rewrite <- Nat.add_succ_comm in HN; simpl in HN.
-     apply eq_add_S in HN; subst N'.
+     injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
      rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
      remember (2 * (a' - 4 * b') + (2 * a' + b') + 3 * b' * 3)%Z as x eqn:Hx.
      ring_simplify in Hx; subst x.
@@ -1121,7 +1100,7 @@ symmetry in Hlen.
 rewrite Hel in Hlen; simpl in Hlen.
 destruct len; [ subst el; discriminate Hlen | ].
 apply eq_add_S in Hlen.
-subst len; eapply rotate_param_1_0_0_b_nonzero with (n := O); eassumption.
+subst len; eapply rotate_param_1_0_0_b_nonzero; eassumption.
 Qed.
 
 Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
