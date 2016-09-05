@@ -990,34 +990,15 @@ destruct len.
   symmetry in Hp.
   destruct v as (((a', b'), c'), N').
   assert (Hss : len < S len) by apply Nat.lt_succ_diag_r.
-  destruct e₁ as (t₁, d₁); destruct t₁, d₁; simpl in Hu.
-   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c N'.
-   pose proof IHlen len Hss el₁ el₂ d a' b' c' Hel₁ H₁ Hp Hlen as Hb'.
-   subst len.
-   replace (S (length el₂)) with (length el₁) in Hp by (subst; reflexivity).
-   pose proof rotate_1_0_0_prop _ d _ _ _ a' b' c' Hel₁ Hel Hn Hp Hb' as H.
-   assumption.
+  assert (N' = S len); [ | subst N' ].
+   destruct e₁ as (t₁, d₁).
+   destruct t₁, d₁; injection Hu; intros; subst N'; reflexivity.
 
-   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c N'.
-   pose proof IHlen len Hss el₁ el₂ d a' b' c' Hel₁ H₁ Hp Hlen as Hb'.
-   subst len.
+   pose proof IHlen _ Hss _ _ _ _ _ _ Hel₁ H₁ Hp Hlen as Hb'; subst len.
    replace (S (length el₂)) with (length el₁) in Hp by (subst; reflexivity).
-   pose proof rotate_1_0_0_prop _ d _ _ _ a' b' c' Hel₁ Hel Hn Hp Hb' as H.
-   assumption.
-
-   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c N'.
-   pose proof IHlen len Hss el₁ el₂ d a' b' c' Hel₁ H₁ Hp Hlen as Hb'.
-   subst len.
-   replace (S (length el₂)) with (length el₁) in Hp by (subst; reflexivity).
-   pose proof rotate_1_0_0_prop _ d _ _ _ a' b' c' Hel₁ Hel Hn Hp Hb' as H.
-   assumption.
-
-   injection Hu; clear Hu; intros HN Hc Hb Ha; subst a b c N'.
-   pose proof IHlen len Hss el₁ el₂ d a' b' c' Hel₁ H₁ Hp Hlen as Hb'.
-   subst len.
-   replace (S (length el₂)) with (length el₁) in Hp by (subst; reflexivity).
-   pose proof rotate_1_0_0_prop _ d _ _ _ a' b' c' Hel₁ Hel Hn Hp Hb' as H.
-   assumption.
+   pose proof rotate_1_0_0_prop _ _ _ _ _ _ _ _ Hel₁ Hel Hn Hp Hb' as H.
+   destruct e₁ as (t₁, d₁).
+   destruct t₁, d₁; injection Hu; intros; subst; assumption.
 Qed.
 
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
