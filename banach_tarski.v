@@ -973,7 +973,6 @@ Theorem rotate_0_0_1_prop : ∀ el d el₁ el₂ e a b c,
     | ḅ => ((b + 2 * a) mod 3 ≠ 0)%Z
     | ḅ⁻¹ => ((b - 2 * a) mod 3 ≠ 0)%Z
     end.
-(**)
 Proof.
 intros el d el₁ el₂ e a b c.
 intros Hel₁ Hel Hn Hp Hb'.
@@ -1145,6 +1144,48 @@ destruct len.
    destruct t₁, d₁; injection Hu; intros; subst; assumption.
 Qed.
 
+Theorem rotate_param_0_0_1_b_nonzero : ∀ el el₁ d a b c,
+  el = E la d :: el₁
+  → norm_list el = el
+  → fold_left rotate_param el (0, 0, 1, O)%Z = (a, b, c, S (length el₁))
+  → (b mod 3 ≠ 0)%Z.
+Proof.
+intros el el₁ d a b c Hel Hn Hu.
+remember (length el₁) as len eqn:Hlen; symmetry in Hlen.
+revert el el₁ d a b c Hel Hn Hu Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len.
+ apply length_zero_iff_nil in Hlen; subst el₁.
+ subst el; simpl in Hu.
+ destruct d; injection Hu; clear Hu; intros; subst; intros H; discriminate H.
+
+ destruct (list_nil_app_dec el₁) as [H₁| (e₁, (el₂, Hel₂))].
+  subst el₁; discriminate Hlen.
+
+  subst el₁; simpl in Hlen.
+  rewrite app_length in Hlen; simpl in Hlen.
+  rewrite Nat.add_1_r in Hlen.
+  apply eq_add_S in Hlen.
+  rewrite app_comm_cons in Hel.
+  remember (E la d :: el₂) as el₁ eqn:Hel₁.
+  generalize Hn; intros H₁; rewrite Hel in H₁.
+  apply norm_list_app_diag in H₁.
+  rewrite Hel, fold_left_app in Hu; simpl in Hu.
+  remember (fold_left rotate_param el₁ (0%Z, 0%Z, 1%Z, 0)) as v eqn:Hp.
+  symmetry in Hp.
+  destruct v as (((a', b'), c'), N').
+  assert (Hss : len < S len) by apply Nat.lt_succ_diag_r.
+  assert (N' = S len); [ | subst N' ].
+   destruct e₁ as (t₁, d₁).
+   destruct t₁, d₁; injection Hu; intros; subst N'; reflexivity.
+
+   pose proof IHlen _ Hss _ _ _ _ _ _ Hel₁ H₁ Hp Hlen as Hb'; subst len.
+   replace (S (length el₂)) with (length el₁) in Hp by (subst; reflexivity).
+   pose proof rotate_0_0_1_prop _ _ _ _ _ _ _ _ Hel₁ Hel Hn Hp Hb' as H.
+   destruct e₁ as (t₁, d₁).
+   destruct t₁, d₁; injection Hu; intros; subst; assumption.
+Qed.
+
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" (Stan Wagon) *)
 
@@ -1217,7 +1258,6 @@ destruct e as (t, d); destruct t, d.
  progress repeat rewrite Rmult_0_l in H.
  progress repeat rewrite Rmult_1_r in H.
  progress repeat rewrite Rplus_0_l in H.
-
 bbb.
 
 End Rotation.
