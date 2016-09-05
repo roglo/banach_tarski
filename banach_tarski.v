@@ -976,20 +976,24 @@ destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
    apply Z.mod_mul; intros; discriminate.
 Qed.
 
-Theorem rotate_param_1_0_0_b_nonzero : ∀ el el₁ d a b c,
-  el = E lb d :: el₁
+Theorem rotate_param_b_nonzero : ∀ p t d el el₁ a b c,
+  t = lb ∧ p = (1, 0, 0, O)%Z ∨
+  t = la ∧ p = (0, 0, 1, O)%Z
+  → el = E t d :: el₁
   → norm_list el = el
-  → fold_left rotate_param el (1, 0, 0, O)%Z = (a, b, c, S (length el₁))
+  → fold_left rotate_param el p = (a, b, c, length el)
   → (b mod 3 ≠ 0)%Z.
 Proof.
-intros el el₁ d a b c Hel Hn Hu.
+intros p t d el el₁ a b c Htp Hel Hn Hu.
 remember (length el₁) as len eqn:Hlen; symmetry in Hlen.
 revert el el₁ d a b c Hel Hn Hu Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct len.
  apply length_zero_iff_nil in Hlen; subst el₁.
  subst el; simpl in Hu.
- destruct d; injection Hu; clear Hu; intros; subst; intros H; discriminate H.
+ destruct Htp as [(Ht, Hp)| (Ht, Hp)]; subst t p.
+  destruct d; injection Hu; intros; subst; intros H; discriminate H.
+  destruct d; injection Hu; intros; subst; intros H; discriminate H.
 
  destruct (list_nil_app_dec el₁) as [H₁| (e₁, (el₂, Hel₂))].
   subst el₁; discriminate Hlen.
@@ -999,65 +1003,23 @@ destruct len.
   rewrite Nat.add_1_r in Hlen.
   apply eq_add_S in Hlen.
   rewrite app_comm_cons in Hel.
-  remember (E lb d :: el₂) as el₁ eqn:Hel₁.
+  remember (E t d :: el₂) as el₁ eqn:Hel₁.
   generalize Hn; intros H₁; rewrite Hel in H₁.
   apply norm_list_app_diag in H₁.
   rewrite Hel, fold_left_app in Hu; simpl in Hu.
-  remember (fold_left rotate_param el₁ (1%Z, 0%Z, 0%Z, 0)) as v eqn:Hp.
+  remember (fold_left rotate_param el₁ p) as v eqn:Hp.
   symmetry in Hp.
   destruct v as (((a', b'), c'), N').
   assert (Hss : len < S len) by apply Nat.lt_succ_diag_r.
   assert (N' = S len); [ | subst N' ].
    destruct e₁ as (t₁, d₁).
-   destruct t₁, d₁; injection Hu; intros; subst N'; reflexivity.
+   rewrite app_length in Hu; simpl in Hu; rewrite Nat.add_1_r in Hu.
+   destruct t₁, d₁; simpl in Hu; injection Hu; intros; subst; reflexivity.
 
-   pose proof IHlen _ Hss _ _ _ _ _ _ Hel₁ H₁ Hp Hlen as Hb'; subst len.
+   rewrite <- Hlen in Hp.
    replace (S (length el₂)) with (length el₁) in Hp by (subst; reflexivity).
-   pose proof rotate_prop (1, 0, 0, O)%Z lb d el el₁ el₂ e₁ a' b' c'
-     (or_introl (conj eq_refl eq_refl)) Hel₁ Hel Hn Hp Hb'.
-   destruct e₁ as (t₁, d₁).
-   destruct t₁, d₁; injection Hu; intros; subst; assumption.
-Qed.
-
-Theorem rotate_param_0_0_1_b_nonzero : ∀ el el₁ d a b c,
-  el = E la d :: el₁
-  → norm_list el = el
-  → fold_left rotate_param el (0, 0, 1, O)%Z = (a, b, c, S (length el₁))
-  → (b mod 3 ≠ 0)%Z.
-Proof.
-intros el el₁ d a b c Hel Hn Hu.
-remember (length el₁) as len eqn:Hlen; symmetry in Hlen.
-revert el el₁ d a b c Hel Hn Hu Hlen.
-induction len as (len, IHlen) using lt_wf_rec; intros.
-destruct len.
- apply length_zero_iff_nil in Hlen; subst el₁.
- subst el; simpl in Hu.
- destruct d; injection Hu; clear Hu; intros; subst; intros H; discriminate H.
-
- destruct (list_nil_app_dec el₁) as [H₁| (e₁, (el₂, Hel₂))].
-  subst el₁; discriminate Hlen.
-
-  subst el₁; simpl in Hlen.
-  rewrite app_length in Hlen; simpl in Hlen.
-  rewrite Nat.add_1_r in Hlen.
-  apply eq_add_S in Hlen.
-  rewrite app_comm_cons in Hel.
-  remember (E la d :: el₂) as el₁ eqn:Hel₁.
-  generalize Hn; intros H₁; rewrite Hel in H₁.
-  apply norm_list_app_diag in H₁.
-  rewrite Hel, fold_left_app in Hu; simpl in Hu.
-  remember (fold_left rotate_param el₁ (0%Z, 0%Z, 1%Z, 0)) as v eqn:Hp.
-  symmetry in Hp.
-  destruct v as (((a', b'), c'), N').
-  assert (Hss : len < S len) by apply Nat.lt_succ_diag_r.
-  assert (N' = S len); [ | subst N' ].
-   destruct e₁ as (t₁, d₁).
-   destruct t₁, d₁; injection Hu; intros; subst N'; reflexivity.
-
    pose proof IHlen _ Hss _ _ _ _ _ _ Hel₁ H₁ Hp Hlen as Hb'; subst len.
-   replace (S (length el₂)) with (length el₁) in Hp by (subst; reflexivity).
-   pose proof rotate_prop (0, 0, 1, O)%Z la d el el₁ el₂ e₁ a' b' c'
-     (or_intror (conj eq_refl eq_refl)) Hel₁ Hel Hn Hp Hb'.
+   pose proof rotate_prop p t d el el₁ el₂ e₁ a' b' c' Htp Hel₁ Hel Hn Hp Hb'.
    destruct e₁ as (t₁, d₁).
    destruct t₁, d₁; injection Hu; intros; subst; assumption.
 Qed.
@@ -1088,7 +1050,10 @@ symmetry in Hlen.
 rewrite Hel in Hlen; simpl in Hlen.
 destruct len; [ subst el; discriminate Hlen | ].
 apply eq_add_S in Hlen.
-subst len; eapply rotate_param_1_0_0_b_nonzero; eassumption.
+subst len.
+replace (S (length el₁)) with (length el) in Hu by (subst; reflexivity).
+eapply rotate_param_b_nonzero; try eassumption.
+left; split; reflexivity.
 Qed.
 
 Theorem rotate_0_0_1_b_nonzero : ∀ w el el₁ d,
@@ -1114,7 +1079,10 @@ symmetry in Hlen.
 rewrite Hel in Hlen; simpl in Hlen.
 destruct len; [ subst el; discriminate Hlen | ].
 apply eq_add_S in Hlen.
-subst len; eapply rotate_param_0_0_1_b_nonzero; eassumption.
+subst len.
+replace (S (length el₁)) with (length el) in Hu by (subst; reflexivity).
+eapply rotate_param_b_nonzero; try eassumption.
+right; split; reflexivity.
 Qed.
 
 Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
