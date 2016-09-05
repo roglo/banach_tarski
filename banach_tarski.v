@@ -641,8 +641,8 @@ Definition rotate_param '(a, b, c, N) e :=
   match e with
   | ạ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
   | ạ⁻¹ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
-  | ḅ => ((a - 4 * b)%Z, (2 * a + b)%Z, (3 * c)%Z, S N)
-  | ḅ⁻¹ => ((a + 4 * b)%Z, (- 2 * a + b)%Z, (3 * c)%Z, S N)
+  | ḅ => ((a - 4 * b)%Z, (b + 2 * a)%Z, (3 * c)%Z, S N)
+  | ḅ⁻¹ => ((a + 4 * b)%Z, (b - 2 * a)%Z, (3 * c)%Z, S N)
   end.
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
@@ -689,7 +689,7 @@ split.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
    split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
-   rewrite plus_IZR, plus_IZR.
+   rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
@@ -766,7 +766,7 @@ split.
    progress repeat rewrite <- Rmult_assoc.
    progress repeat rewrite mult_IZR.
    rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-   rewrite plus_IZR, plus_IZR.
+   rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    f_equal; f_equal.
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
@@ -920,14 +920,14 @@ destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
    rewrite Z.mul_assoc, Z.mul_shuffle0.
-   unfold Z.sub; rewrite Zopp_mult_distr_l.
+   unfold Z.sub at 1; rewrite Zopp_mult_distr_l.
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
-   remember (-2 * a' + b' - 2 * (a' + 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
+   remember (b' - 2 * a' - 2 * (a' + 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
    ring_simplify in Hx; subst x.
-   replace (-4)%Z with (2 * (-2))%Z by reflexivity.
-   rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
+   replace 4%Z with (2 * 2)%Z by reflexivity.
+   rewrite <- Z.mul_assoc, <- Z.mul_sub_distr_l.
    intros H; apply Hb'.
    apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
    apply Z.gauss in H; [ | reflexivity ].
@@ -950,7 +950,7 @@ destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
    apply norm_list_impossible_consecutive.
 
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
-   remember (2 * a' + b' + 2 * (a' - 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
+   remember (b' + 2 * a' + 2 * (a' - 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
    ring_simplify in Hx; subst x.
    replace 4%Z with (2 * 2)%Z by reflexivity.
    rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
@@ -968,11 +968,12 @@ Theorem rotate_0_0_1_prop : ∀ el d el₁ el₂ e a b c,
   → fold_left rotate_param el₁ (0, 0, 1, O)%Z = (a, b, c, length el₁)
   → (b mod 3)%Z ≠ 0%Z
   → match e with
-    | ạ => ((b + 2 * a) mod 3)%Z ≠ 0%Z
-    | ạ⁻¹ => ((b - 2 * a) mod 3)%Z ≠ 0%Z
-    | ḅ => ((b + 2 * c) mod 3)%Z ≠ 0%Z
-    | ḅ⁻¹ => ((b - 2 * c) mod 3)%Z ≠ 0%Z
+    | ạ => ((b - 2 * c) mod 3 ≠ 0)%Z
+    | ạ⁻¹ => ((b + 2 * c) mod 3 ≠ 0)%Z
+    | ḅ => ((b + 2 * a) mod 3 ≠ 0)%Z
+    | ḅ⁻¹ => ((b - 2 * a) mod 3 ≠ 0)%Z
     end.
+(**)
 Proof.
 intros el d el₁ el₂ e a b c.
 intros Hel₁ Hel Hn Hp Hb'.
@@ -983,7 +984,6 @@ destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
  subst el₁; simpl in Hp.
  destruct d; injection Hp; intros; subst.
   destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-bbb.
   revert Hn; apply norm_list_impossible_start.
 
   destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
@@ -1026,10 +1026,11 @@ bbb.
    exfalso; revert Hn; rewrite Hel.
    apply norm_list_impossible_consecutive.
 
-   rewrite Z.mul_assoc, Z.mul_shuffle0, Z.add_comm.
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   unfold Z.sub; rewrite Zopp_mult_distr_l.
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
-   rewrite Z.mul_assoc, Z.mul_shuffle0, Z.add_comm.
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
@@ -1048,10 +1049,11 @@ bbb.
    destruct H as (k, H); rewrite H.
    apply Z.mod_mul; intros; discriminate.
 
-   rewrite Z.mul_assoc, Z.mul_shuffle0, Z.add_comm.
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   unfold Z.sub at 1; rewrite Zopp_mult_distr_l.
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
-   rewrite Z.mul_assoc, Z.mul_shuffle0, Z.add_comm.
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
@@ -1060,14 +1062,14 @@ bbb.
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
    rewrite Z.mul_assoc, Z.mul_shuffle0.
-   unfold Z.sub; rewrite Zopp_mult_distr_l.
+   unfold Z.sub at 1; rewrite Zopp_mult_distr_l.
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
-   remember (-2 * (a' + 4 * b') + (-2 * a' + b') + 3 * b' * 3)%Z as x eqn:Hx.
+   remember (b' - 2 * a' - 2 * (a' + 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
    ring_simplify in Hx; subst x.
-   replace (-4)%Z with (2 * (-2))%Z by reflexivity.
-   rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
+   replace 4%Z with (2 * 2)%Z by reflexivity.
+   rewrite <- Z.mul_assoc, <- Z.mul_sub_distr_l.
    intros H; apply Hb'.
    apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
    apply Z.gauss in H; [ | reflexivity ].
@@ -1090,7 +1092,7 @@ bbb.
    apply norm_list_impossible_consecutive.
 
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
-   remember (2 * (a' - 4 * b') + (2 * a' + b') + 3 * b' * 3)%Z as x eqn:Hx.
+   remember (b' + 2 * a' + 2 * (a' - 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
    ring_simplify in Hx; subst x.
    replace 4%Z with (2 * 2)%Z by reflexivity.
    rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
