@@ -829,8 +829,8 @@ Theorem rotate_1_0_0_prop : ∀ el d el₁ el₂ e a b c,
   → match e with
     | ạ => ((b - 2 * c) mod 3)%Z ≠ 0%Z
     | ạ⁻¹ => ((b + 2 * c) mod 3)%Z ≠ 0%Z
-    | ḅ => ((2 * a + b) mod 3)%Z ≠ 0%Z
-    | ḅ⁻¹ => ((-2 * a + b) mod 3)%Z ≠ 0%Z
+    | ḅ => ((b + 2 * a) mod 3)%Z ≠ 0%Z
+    | ḅ⁻¹ => ((b - 2 * a) mod 3)%Z ≠ 0%Z
     end.
 Proof.
 intros el d el₁ el₂ e a b c.
@@ -864,6 +864,148 @@ destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
  rewrite Hel₁, fold_left_app in Hp.
  simpl in Hp.
  remember (fold_left rotate_param el₂ (1, 0, 0, O)%Z) as p' eqn:Hp'.
+ symmetry in Hp'.
+ destruct p' as (((a', b'), c'), N').
+ simpl in Hp.
+ destruct e₁ as (t₁, d₁); destruct t₁, d₁.
+  injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
+  destruct e as (t₂, d₂); destruct t₂, d₂.
+   rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
+   remember (b' + 2 * c' + 2 * (-4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
+   ring_simplify in Hx; subst x.
+   replace 4%Z with (2 * 2)%Z by reflexivity.
+   rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
+   intros H; apply Hb'.
+   apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
+   apply Z.gauss in H; [ | reflexivity ].
+   destruct H as (k, H); rewrite H.
+   apply Z.mod_mul; intros; discriminate.
+
+   exfalso; revert Hn; rewrite Hel.
+   apply norm_list_impossible_consecutive.
+
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   unfold Z.sub; rewrite Zopp_mult_distr_l.
+   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
+
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
+
+  injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
+  destruct e as (t₂, d₂); destruct t₂, d₂.
+   exfalso; revert Hn; rewrite Hel.
+   apply norm_list_impossible_consecutive.
+
+   rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
+   remember (b' - 2 * c' - 2 * (4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
+   ring_simplify in Hx; subst x.
+   replace 4%Z with (2 * 2)%Z by reflexivity.
+   rewrite <- Z.mul_assoc, <- Z.mul_sub_distr_l.
+   intros H; apply Hb'.
+   apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
+   apply Z.gauss in H; [ | reflexivity ].
+   destruct H as (k, H); rewrite H.
+   apply Z.mod_mul; intros; discriminate.
+
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   unfold Z.sub at 1; rewrite Zopp_mult_distr_l.
+   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
+
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
+
+  injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
+  destruct e as (t₂, d₂); destruct t₂, d₂.
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
+
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   unfold Z.sub; rewrite Zopp_mult_distr_l.
+   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
+
+   rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
+   remember (-2 * a' + b' - 2 * (a' + 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
+   ring_simplify in Hx; subst x.
+   replace (-4)%Z with (2 * (-2))%Z by reflexivity.
+   rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
+   intros H; apply Hb'.
+   apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
+   apply Z.gauss in H; [ | reflexivity ].
+   destruct H as (k, H); rewrite H.
+   apply Z.mod_mul; intros; discriminate.
+
+   exfalso; revert Hn; rewrite Hel.
+   apply norm_list_impossible_consecutive.
+
+  injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
+  destruct e as (t₂, d₂); destruct t₂, d₂.
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
+
+   rewrite Z.mul_assoc, Z.mul_shuffle0.
+   unfold Z.sub; rewrite Zopp_mult_distr_l.
+   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
+
+   exfalso; revert Hn; rewrite Hel.
+   apply norm_list_impossible_consecutive.
+
+   rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
+   remember (2 * a' + b' + 2 * (a' - 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
+   ring_simplify in Hx; subst x.
+   replace 4%Z with (2 * 2)%Z by reflexivity.
+   rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
+   intros H; apply Hb'.
+   apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
+   apply Z.gauss in H; [ | reflexivity ].
+   destruct H as (k, H); rewrite H.
+   apply Z.mod_mul; intros; discriminate.
+Qed.
+
+Theorem rotate_0_0_1_prop : ∀ el d el₁ el₂ e a b c,
+  el₁ = E la d :: el₂
+  → el = el₁ ++ [e]
+  → norm_list el = el
+  → fold_left rotate_param el₁ (0, 0, 1, O)%Z = (a, b, c, length el₁)
+  → (b mod 3)%Z ≠ 0%Z
+  → match e with
+    | ạ => ((b + 2 * a) mod 3)%Z ≠ 0%Z
+    | ạ⁻¹ => ((b - 2 * a) mod 3)%Z ≠ 0%Z
+    | ḅ => ((b + 2 * c) mod 3)%Z ≠ 0%Z
+    | ḅ⁻¹ => ((b - 2 * c) mod 3)%Z ≠ 0%Z
+    end.
+Proof.
+intros el d el₁ el₂ e a b c.
+intros Hel₁ Hel Hn Hp Hb'.
+rewrite Hel₁ in Hp at 2; simpl in Hp.
+remember (length el₂) as len eqn:Hlen.
+destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
+ subst el₂; simpl in Hlen; subst len; simpl in Hel.
+ subst el₁; simpl in Hp.
+ destruct d; injection Hp; intros; subst.
+  destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
+bbb.
+  revert Hn; apply norm_list_impossible_start.
+
+  destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
+  revert Hn; apply norm_list_impossible_start.
+
+ subst el₂.
+ rewrite Hel₁ in Hel; simpl in Hel.
+ rewrite <- app_assoc in Hel; simpl in Hel.
+ generalize Hn; intros H₂.
+ rewrite app_comm_cons in Hel.
+ rewrite Hel in H₂.
+ apply norm_list_app_diag in H₂.
+ destruct len; [ destruct el₃ in Hlen; discriminate Hlen | ].
+ assert (Hl : len < S (S len)) by (apply le_n_S, Nat.le_succ_diag_r).
+ rewrite app_length in Hlen; simpl in Hlen.
+ rewrite Nat.add_1_r in Hlen.
+ apply eq_add_S in Hlen.
+ remember (E la d :: el₃) as el₂ eqn:Hel₂.
+ rewrite app_comm_cons, <- Hel₂ in Hel₁.
+ rewrite Hel₁, fold_left_app in Hp.
+ simpl in Hp.
+ remember (fold_left rotate_param el₂ (0, 0, 1, O)%Z) as p' eqn:Hp'.
  symmetry in Hp'.
  destruct p' as (((a', b'), c'), N').
  simpl in Hp.
