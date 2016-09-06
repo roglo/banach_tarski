@@ -1164,7 +1164,7 @@ Record orbit := mkorb
      in_sphere : (ox ^ 2 + oy ^ 2 + oz ^ 2 = 1)%R }.
 
 Definition in_orbit orb x :=
-  ∃ el, fold_left rotate el x = P (ox orb) (oy orb) (oz orb).
+  ∃ el, fold_left rotate el (P (ox orb) (oy orb) (oz orb)) = x.
 
 Check in_orbit.
 
