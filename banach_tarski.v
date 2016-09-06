@@ -1161,10 +1161,10 @@ Section Orbit.
 
 Definition on_sphere '(P x y z) := (x ^ 2 + y ^ 2 + z ^ 2 = 1)%R.
 
-Record orbit := mkorb { ox : ℝ; oy : ℝ; oz : ℝ; oi : on_sphere (P ox oy oz) }.
+Record orbit := mkorb { op : point; oi : on_sphere op }.
 
-Definition in_orbit orb x :=
-  ∃ el, fold_left rotate el (P (ox orb) (oy orb) (oz orb)) = x.
+Definition in_orbit orb p :=
+  ∃ el, fold_left rotate el (op orb) = p.
 
 Definition same_orbit x y :=
   ∃ el, fold_left rotate el x = y.
