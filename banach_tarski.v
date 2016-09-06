@@ -1324,9 +1324,18 @@ Add Parametric Relation : _ same_orbit
 Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
   (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
 
-Definition glop :=
+Definition select_orbit_origin :=
   func_choice point point same_orbit
     (λ x, ex_intro (same_orbit x) x (same_orbit_refl x)).
-Print glop.
+
+Goal True.
+pose proof select_orbit_origin as H.
+destruct H as (f, Hf).
+assert (∀ x y, same_orbit x y → f x = f y).
+intros x y Hxy.
+pose proof Hf x as Hx.
+pose proof Hf y as Hy.
+(* bin non, ça va pas... on peut pas le démontrer... *)
+bbb.
 
 End Orbit.
