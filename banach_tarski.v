@@ -1131,19 +1131,19 @@ destruct Hb as [Hb| Hb].
  rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
 Qed.
 
-Definition no_rotate := ([] : list free_elem).
-Definition is_neutral el := ∀ p, fold_left rotate el p = p.
+Definition no_rotation := ([] : list free_elem).
+Definition is_identity el := ∀ p, fold_left rotate el p = p.
 
-Theorem rotate_0 : is_neutral no_rotate.
+Theorem rotate_0 : is_identity no_rotation.
 Proof. intros p; reflexivity. Qed.
 
-Theorem no_nonempty_is_neutral : ∀ el,
+Theorem nonempty_rotation_is_not_identity : ∀ el,
   norm_list el = el
-  → el ≠ no_rotate
-  → ¬ (is_neutral el).
+  → el ≠ no_rotation
+  → ¬ (is_identity el).
 Proof.
 intros el Hel Hr Hn.
-unfold no_rotate in Hr.
+unfold no_rotation in Hr.
 destruct el as [| e]; [ apply Hr; reflexivity | clear Hr ].
 destruct e as (t, d); destruct t.
  pose proof Hn (P 0 0 1) as H; revert H.
@@ -1154,3 +1154,5 @@ destruct e as (t, d); destruct t.
 Qed.
 
 End Rotation.
+
+Check nonempty_rotation_is_not_identity.
