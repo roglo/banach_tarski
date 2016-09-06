@@ -6,6 +6,7 @@
 
 Require Import Utf8.
 Require Import List.
+Require Import Relations.
 Import ListNotations.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
@@ -642,6 +643,8 @@ Definition rotate pt e :=
   | ḅ⁻¹ => mat_vec_mul rot_inv_z pt
   end.
 
+Definition neg_rot '(E t d) := E t (negb d).
+
 Definition rotate_param '(a, b, c, N) e :=
   match e with
   | ạ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
@@ -794,6 +797,122 @@ split.
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+Qed.
+
+Theorem rot_rot_inv_x : ∀ pt,
+  mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
+Proof.
+intros.
+unfold mat_vec_mul; simpl.
+destruct pt as (x, y, z).
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rplus_0_l.
+f_equal.
+ field_simplify; simpl.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite RMicromega.Rinv_1.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+
+ unfold Rdiv.
+ field_simplify; simpl.
+ progress repeat rewrite Rmult_1_r.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+Qed.
+
+Theorem rot_inv_rot_x : ∀ pt,
+  mat_vec_mul rot_inv_x (mat_vec_mul rot_x pt) = pt.
+Proof.
+intros.
+unfold mat_vec_mul; simpl.
+destruct pt as (x, y, z).
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rplus_0_l.
+f_equal.
+ field_simplify; simpl.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite RMicromega.Rinv_1.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+
+ unfold Rdiv.
+ field_simplify; simpl.
+ progress repeat rewrite Rmult_1_r.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+Qed.
+
+Theorem rot_rot_inv_z : ∀ pt,
+  mat_vec_mul rot_z (mat_vec_mul rot_inv_z pt) = pt.
+Proof.
+intros.
+unfold mat_vec_mul; simpl.
+destruct pt as (x, y, z).
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rplus_0_l.
+f_equal.
+ field_simplify; simpl.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite RMicromega.Rinv_1.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+
+ unfold Rdiv.
+ field_simplify; simpl.
+ progress repeat rewrite Rmult_1_r.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+Qed.
+
+Theorem rot_inv_rot_z : ∀ pt,
+  mat_vec_mul rot_inv_z (mat_vec_mul rot_z pt) = pt.
+Proof.
+intros.
+unfold mat_vec_mul; simpl.
+destruct pt as (x, y, z).
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rplus_0_l.
+f_equal.
+ field_simplify; simpl.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_1_r.
+ progress repeat rewrite RMicromega.Rinv_1.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
+
+ unfold Rdiv.
+ field_simplify; simpl.
+ progress repeat rewrite Rmult_1_r.
+ rewrite sqrt_sqrt; [ | lra ].
+ field_simplify; simpl.
+ unfold Rdiv.
+ field_simplify; reflexivity.
 Qed.
 
 Theorem list_nil_app_dec {A} : ∀ (l : list A),
@@ -1168,6 +1287,41 @@ Definition in_orbit orb p :=
 
 Definition same_orbit x y :=
   ∃ el, fold_left rotate el x = y.
+
+Theorem same_orbit_refl : reflexive _ same_orbit.
+Proof. intros; exists []; reflexivity. Qed.
+
+Theorem same_orbit_sym : symmetric _ same_orbit.
+Proof.
+intros p₁ p₂ (el, H); simpl in H.
+unfold same_orbit; simpl.
+exists (rev (map neg_rot el)).
+revert p₁ p₂ H.
+induction el as [| e]; intros; [ symmetry; assumption | simpl in H; simpl ].
+rewrite fold_left_app; simpl.
+apply IHel in H; rewrite H.
+destruct e as (t, d); destruct t, d; simpl.
+ apply rot_rot_inv_x.
+ apply rot_inv_rot_x.
+ apply rot_rot_inv_z.
+ apply rot_inv_rot_z.
+Qed.
+
+Theorem same_orbit_trans : transitive _ same_orbit.
+Proof.
+intros p₁ p₂ p₃ (el₁, H₁) (el₂, H₂); simpl in H₁, H₂.
+unfold same_orbit; simpl.
+exists (el₁ ++ el₂).
+rewrite fold_left_app, H₁, H₂; reflexivity.
+Qed.
+
+Add Parametric Relation : _ same_orbit
+ reflexivity proved by same_orbit_refl
+ symmetry proved by same_orbit_sym
+ transitivity proved by same_orbit_trans
+ as same_orbit_rel.
+
+bbb.
 
 Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
   (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
