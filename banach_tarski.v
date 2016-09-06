@@ -1328,14 +1328,16 @@ Definition select_orbit_origin :=
   func_choice point point same_orbit
     (λ x, ex_intro (same_orbit x) x (same_orbit_refl x)).
 
+Axiom my_axiom_of_choice : ∀ (A B : Type) (R : A → A → Prop),
+  ∃ f : A → B, ∀ x y, R x y → f x = f y.
+
+Definition select_orbit_origin2 :=
+  my_axiom_of_choice point point same_orbit.
+Print select_orbit_origin2.
+
 Goal True.
-pose proof select_orbit_origin as H.
+pose proof select_orbit_origin2 as H.
 destruct H as (f, Hf).
-assert (∀ x y, same_orbit x y → f x = f y).
-intros x y Hxy.
-pose proof Hf x as Hx.
-pose proof Hf y as Hy.
-(* bin non, ça va pas... on peut pas le démontrer... *)
 bbb.
 
 End Orbit.
