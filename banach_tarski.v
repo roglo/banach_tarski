@@ -1156,3 +1156,16 @@ Qed.
 End Rotation.
 
 Check nonempty_rotation_is_not_identity.
+
+Section Orbit.
+
+Record orbit := mkorb
+   { ox : ℝ; oy : ℝ; oz : ℝ;
+     in_sphere : (ox ^ 2 + oy ^ 2 + oz ^ 2 = 1)%R }.
+
+Definition in_orbit orb x :=
+  ∃ el, fold_left rotate el x = P (ox orb) (oy orb) (oz orb).
+
+Check in_orbit.
+
+End Orbit.
