@@ -1166,6 +1166,13 @@ Record orbit := mkorb
 Definition in_orbit orb x :=
   ∃ el, fold_left rotate el (P (ox orb) (oy orb) (oz orb)) = x.
 
-Check in_orbit.
+Definition same_orbit x y :=
+  ∃ el, fold_left rotate el x = y.
+
+Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
+  (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
+
+Definition glop := func_choice point point same_orbit.
+Print glop.
 
 End Orbit.
