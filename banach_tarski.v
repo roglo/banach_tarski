@@ -1321,18 +1321,12 @@ Add Parametric Relation : _ same_orbit
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
-bbb.
-
 Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
   (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
 
-Definition glop := func_choice orbit point in_orbit.
+Definition glop :=
+  func_choice point point same_orbit
+    (λ x, ex_intro (same_orbit x) x (same_orbit_refl x)).
 Print glop.
-(* non, c'est pas ça... *)
-
-Theorem pouet : ∀ p, on_sphere p → ∃ orb, in_orbit orb p.
-Proof.
-intros p Hs.
-bbb.
 
 End Orbit.
