@@ -1145,18 +1145,12 @@ Proof.
 intros el Hel Hr Hn.
 unfold no_rotate in Hr.
 destruct el as [| e]; [ apply Hr; reflexivity | clear Hr ].
-destruct e as (t, d); destruct t, d.
- pose proof Hn (P 0 0 1) as H.
- revert H; eapply rotate_0_0_1_is_diff; try eassumption; reflexivity.
+destruct e as (t, d); destruct t.
+ pose proof Hn (P 0 0 1) as H; revert H.
+ destruct d; eapply rotate_0_0_1_is_diff; try eassumption; reflexivity.
 
- pose proof Hn (P 0 0 1) as H.
- revert H; eapply rotate_0_0_1_is_diff; try eassumption; reflexivity.
-
- pose proof Hn (P 1 0 0) as H.
- revert H; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
-
- pose proof Hn (P 1 0 0) as H.
- revert H; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
+ pose proof Hn (P 1 0 0) as H; revert H.
+ destruct d; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
 Qed.
 
 End Rotation.
