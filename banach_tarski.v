@@ -1159,9 +1159,9 @@ Check nonempty_rotation_is_not_identity.
 
 Section Orbit.
 
-Record orbit := mkorb
-   { ox : ℝ; oy : ℝ; oz : ℝ;
-     in_sphere : (ox ^ 2 + oy ^ 2 + oz ^ 2 = 1)%R }.
+Definition on_sphere '(P x y z) := (x ^ 2 + y ^ 2 + z ^ 2 = 1)%R.
+
+Record orbit := mkorb { ox : ℝ; oy : ℝ; oz : ℝ; oi : on_sphere (P ox oy oz) }.
 
 Definition in_orbit orb x :=
   ∃ el, fold_left rotate el (P (ox orb) (oy orb) (oz orb)) = x.
@@ -1172,7 +1172,13 @@ Definition same_orbit x y :=
 Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
   (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
 
-Definition glop := func_choice point point same_orbit.
+Definition glop := func_choice orbit point in_orbit.
 Print glop.
+(* non, c'est pas ça... *)
+
+Theorem pouet : ∀ p, on_sphere p → ∃ orb, in_orbit orb p.
+Proof.
+intros p Hs.
+bbb.
 
 End Orbit.
