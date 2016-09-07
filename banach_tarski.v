@@ -1323,6 +1323,9 @@ Add Parametric Relation : _ same_orbit
 
 Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
   (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
+(* mmm... since same_orbit is an equivalence relation, it is reflexive;
+   then, the identity function works; no need of this version of axiom
+   of choice! *)
 
 Definition select_orbit_origin :=
   func_choice point point same_orbit
@@ -1330,6 +1333,8 @@ Definition select_orbit_origin :=
 
 Axiom my_axiom_of_choice : ∀ (A B : Type) (R : A → A → Prop),
   ∃ f : A → B, ∀ x y, R x y → f x = f y.
+(* drawback: I found nowhere this version of the axiom of choice!
+   I don't know if it is a correct version! *)
 
 Definition select_orbit_origin2 :=
   my_axiom_of_choice point point same_orbit.
