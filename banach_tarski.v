@@ -1367,6 +1367,11 @@ pose proof Rprop P (ex_intro _ x px) as H.
 destruct H as (min, (pmin, Hz)).
 pose proof Hz x px as Hx.
 pose proof Hz y py as Hy.
-bbb. (* ah bon ? *)
+set (Q u := u = x ∨ u = y).
+pose proof Rprop Q (ex_intro _ x (or_introl eq_refl)) as H.
+destruct H as (u, (qu, H)).
+assert (qy : Q y) by (subst Q; right; reflexivity).
+pose proof (H y qy).
+bbb. (* bordel... décidabilité ou ce genre de trucs... *)
 
 End Orbit.
