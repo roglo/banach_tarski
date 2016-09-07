@@ -1359,6 +1359,7 @@ Axiom Zermelo :
 Theorem Zermelo_imp_total_order : ∀ A, ∃ R, ∀ (P : A → Prop) x y,
   P x → P y → R x y ∨ R y x.
 Proof.
+(* à nettoyer *)
 intros A.
 pose proof Zermelo A as H.
 destruct H as (R, (Rord, Rprop)).
@@ -1372,6 +1373,14 @@ pose proof Rprop Q (ex_intro _ x (or_introl eq_refl)) as H.
 destruct H as (u, (qu, H)).
 assert (qy : Q y) by (subst Q; right; reflexivity).
 pose proof (H y qy).
-bbb. (* bordel... décidabilité ou ce genre de trucs... *)
+unfold Q in qu.
+destruct qu as [qu| qu].
+subst u.
+left; assumption.
+subst u.
+assert (qx : Q x) by (subst Q; left; reflexivity).
+pose proof H x qx.
+right; assumption.
+Qed.
 
 End Orbit.
