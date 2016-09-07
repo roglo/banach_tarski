@@ -1331,18 +1331,42 @@ Definition select_orbit_origin :=
   func_choice point point same_orbit
     (λ x, ex_intro (same_orbit x) x (same_orbit_refl x)).
 
-Axiom my_axiom_of_choice : ∀ (A B : Type) (R : A → A → Prop),
+Axiom my_choice : ∀ (A B : Type) (R : A → A → Prop),
   ∃ f : A → B, ∀ x y, R x y → f x = f y.
 (* drawback: I found nowhere this version of the axiom of choice!
    I don't know if it is a correct version! *)
 
 Definition select_orbit_origin2 :=
-  my_axiom_of_choice point point same_orbit.
+  my_choice point point same_orbit.
 Print select_orbit_origin2.
 
 Goal True.
 pose proof select_orbit_origin2 as H.
 destruct H as (f, Hf).
-bbb.
+Abort.
+
+Definition is_order {A} R :=
+  reflexive A R ∧ antisymmetric A R ∧ transitive A R.
+
+(* My idea of what Zermelo theorem should be...
+   For any type A, there exists an order R (reflexive, antisymmetric and
+   transitive) such that for any non empty subset P of A, there exists
+   an element y less than any other element z of P (R is well ordered). *)
+Axiom Zermelo :
+  ∀ (A : Type), ∃ (R : A → A → Prop), is_order R ∧
+  ∀ (P : A → Prop), (∃ x, P x) → ∃ y, P y ∧ ∀ z, P z → R y z.
+
+Theorem Zermelo_imp_total_order : ∀ A, ∃ R, ∀ (P : A → Prop) x y,
+  P x → P y → R x y ∨ R y x.
+Proof.
+intros A.
+pose proof Zermelo A as H.
+destruct H as (R, (Rord, Rprop)).
+exists R; intros P x y px py.
+pose proof Rprop P (ex_intro _ x px) as H.
+destruct H as (min, (pmin, Hz)).
+pose proof Hz x px as Hx.
+pose proof Hz y py as Hy.
+bbb. (* ah bon ? *)
 
 End Orbit.
