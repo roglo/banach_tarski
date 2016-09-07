@@ -1348,39 +1348,30 @@ Abort.
 Definition is_order {A} R :=
   reflexive A R ∧ antisymmetric A R ∧ transitive A R.
 
+Definition sub_type A := A → Prop.
+Definition not_empty {A} (P : A → Prop) := ∃ x, P x.
+
 (* My idea of what Zermelo theorem should be...
    For any type A, there exists an order R (reflexive, antisymmetric and
    transitive) such that for any non empty subset P of A, there exists
    an element y less than any other element z of P (R is well ordered). *)
 Axiom Zermelo :
   ∀ (A : Type), ∃ (R : A → A → Prop), is_order R ∧
-  ∀ (P : A → Prop), (∃ x, P x) → ∃ y, P y ∧ ∀ z, P z → R y z.
+  ∀ (P : sub_type A), not_empty P → ∃ y, P y ∧ ∀ z, P z → R y z.
 
 Theorem Zermelo_imp_total_order : ∀ A, ∃ R, ∀ (P : A → Prop) x y,
   P x → P y → R x y ∨ R y x.
 Proof.
-(* à nettoyer *)
 intros A.
 pose proof Zermelo A as H.
 destruct H as (R, (Rord, Rprop)).
 exists R; intros P x y px py.
-pose proof Rprop P (ex_intro _ x px) as H.
-destruct H as (min, (pmin, Hz)).
-pose proof Hz x px as Hx.
-pose proof Hz y py as Hy.
 set (Q u := u = x ∨ u = y).
 pose proof Rprop Q (ex_intro _ x (or_introl eq_refl)) as H.
 destruct H as (u, (qu, H)).
-assert (qy : Q y) by (subst Q; right; reflexivity).
-pose proof (H y qy).
-unfold Q in qu.
-destruct qu as [qu| qu].
-subst u.
-left; assumption.
-subst u.
-assert (qx : Q x) by (subst Q; left; reflexivity).
-pose proof H x qx.
-right; assumption.
+destruct qu; subst u.
+ left; apply H; right; reflexivity.
+ right; apply H; left; reflexivity.
 Qed.
 
 End Orbit.
