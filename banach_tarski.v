@@ -1280,13 +1280,9 @@ Section Orbit.
 
 Definition on_sphere '(P x y z) := (x ^ 2 + y ^ 2 + z ^ 2 = 1)%R.
 
-Record orbit := mkorb { op : point; oi : on_sphere op }.
+Record point_on_sphere := mkorb { op : point; oi : on_sphere op }.
 
-Definition in_orbit orb p :=
-  ∃ el, fold_left rotate el (op orb) = p.
-
-Definition same_orbit x y :=
-  ∃ el, fold_left rotate el x = y.
+Definition same_orbit x y := ∃ el, fold_left rotate el x = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
 Proof. intros; exists []; reflexivity. Qed.
@@ -1332,7 +1328,7 @@ Definition select_orbit_origin :=
     (λ x, ex_intro (same_orbit x) x (same_orbit_refl x)).
 
 Axiom my_choice : ∀ (A B : Type) (R : A → A → Prop),
-  ∃ f : A → B, ∀ x y, R x y → f x = f y.
+  { f : A → B | ∀ x y, R x y → f x = f y }.
 (* drawback: I found nowhere this version of the axiom of choice!
    I don't know if it is a correct version! *)
 
@@ -1414,5 +1410,13 @@ destruct H as (t, (qt, H)).
 destruct qt as [| qt]; [ subst t | destruct qt; subst t ].
  apply H; right; right; reflexivity.
 (* not sure... *) Abort.
+
+Definition orbit p :=
+  match my_choice point point same_orbit with
+  | exist _ f _ => f p
+  end.
+
+Theorem same_orbit_same_representant : ∀ (orb₁ orb₂ : orbit),
+  orb₁ = orb₂.
 
 End Orbit.
