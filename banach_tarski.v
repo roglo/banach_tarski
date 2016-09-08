@@ -1280,7 +1280,7 @@ Section Orbit.
 
 Definition on_sphere '(P x y z) := (x ^ 2 + y ^ 2 + z ^ 2 = 1)%R.
 
-Record point_on_sphere := mkorb { op : point; oi : on_sphere op }.
+Record point_on_sphere := mkpos { op : point; oi : on_sphere op }.
 
 Definition same_orbit x y := ∃ el, fold_left rotate el x = y.
 
@@ -1411,12 +1411,26 @@ destruct qt as [| qt]; [ subst t | destruct qt; subst t ].
  apply H; right; right; reflexivity.
 (* not sure... *) Abort.
 
-Definition orbit p :=
+Definition is_chosen_point (p : point) : Prop :=
   match my_choice point point same_orbit with
-  | exist _ f _ => f p
+  | exist _ f _ => f p = p
   end.
 
-Theorem same_orbit_same_representant : ∀ (orb₁ orb₂ : orbit),
-  orb₁ = orb₂.
+Record orbit :=
+  mkorb { base_point : point; orbit_prop : is_chosen_point base_point }.
+
+Theorem same_orbit_imp_same_base_point : ∀ (orb₁ orb₂ : orbit),
+  same_orbit (base_point orb₁) (base_point orb₂)
+  → base_point orb₁ = base_point orb₂.
+Proof.
+intros (p₁, H₁) (p₂, H₂) Hr; simpl in Hr; simpl.
+destruct Hr as (el, Hr).
+unfold is_chosen_point in H₁.
+unfold is_chosen_point in H₂.
+set (f := my_choice point point same_orbit) in H₁, H₂.
+destruct f as (f, fp).
+rewrite <- H₁, <- H₂.
+apply fp; exists el; assumption.
+Qed.
 
 End Orbit.
