@@ -1356,15 +1356,15 @@ Definition not_empty {A} (P : A → Prop) := ∃ x, P x.
    transitive) such that for any non empty subset P of A, there exists
    an element y less than any other element z of P (R is well ordered). *)
 Axiom Zermelo :
-  ∀ (A : Type), ∃ (R : A → A → Prop), is_order R ∧
+  ∀ (A : Type), ∃ (R : A → A → Prop), (*is_order R ∧*)
   ∀ (P : sub_type A), not_empty P → ∃ y, P y ∧ ∀ z, P z → R y z.
 
-Theorem Zermelo_imp_total_order : ∀ A, ∃ R, ∀ (P : A → Prop) x y,
+Theorem Zermelo_imp_total_order : ∀ A, ∃ R, ∀ (P : sub_type A) x y,
   P x → P y → R x y ∨ R y x.
 Proof.
 intros A.
 pose proof Zermelo A as H.
-destruct H as (R, (Rord, Rprop)).
+destruct H as (R, (*Rord,*) Rprop).
 exists R; intros P x y px py.
 set (Q u := u = x ∨ u = y).
 pose proof Rprop Q (ex_intro _ x (or_introl eq_refl)) as H.
@@ -1373,5 +1373,46 @@ destruct qu; subst u.
  left; apply H; right; reflexivity.
  right; apply H; left; reflexivity.
 Qed.
+
+Theorem Zermelo_relation_reflexive :
+  ∀ A, ∃ (R : A → A → Prop), ∀ (P : sub_type A) x, P x → R x x.
+Proof.
+intros A.
+pose proof Zermelo A as H.
+destruct H as (R, Rprop).
+exists R; intros P x px.
+pose proof Rprop (eq x) (ex_intro _ x (eq_refl _)) as H.
+destruct H as (y, (py, H)); subst y.
+apply H; reflexivity.
+Qed.
+
+Theorem Zermelo_relation_antisymmetric :
+  ∀ A, ∃ (R : A → A → Prop), ∀ (P : sub_type A) x y,
+  P x → P y → R x y → R y x → x = y.
+Proof.
+intros A.
+pose proof Zermelo A as H.
+destruct H as (R, Rprop).
+exists R; intros P x y px py Hxy Hyx.
+set (Q u := u = x ∨ u = y).
+pose proof Rprop Q (ex_intro _ x (or_introl eq_refl)) as H.
+destruct H as (t, (qt, H)).
+destruct qt; subst t.
+(* not sure... *) Abort.
+
+Theorem Zermelo_relation_transitive :
+  ∀ A, ∃ (R : A → A → Prop), ∀ (P : sub_type A) x y z,
+  P x → P y → P z → R x y → R y z → R x z.
+Proof.
+intros A.
+pose proof Zermelo A as H.
+destruct H as (R, Rprop).
+exists R; intros P x y z px py pz Hxy Hyz.
+set (Q t := t = x ∨ t = y ∨ t = z).
+pose proof Rprop Q (ex_intro _ x (or_introl eq_refl)) as H.
+destruct H as (t, (qt, H)).
+destruct qt as [| qt]; [ subst t | destruct qt; subst t ].
+ apply H; right; right; reflexivity.
+(* not sure... *) Abort.
 
 End Orbit.
