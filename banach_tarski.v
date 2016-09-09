@@ -1433,4 +1433,45 @@ rewrite <- H₁, <- H₂.
 apply fp; exists el; assumption.
 Qed.
 
+Axiom propositional_extensionality : ∀ A (P Q : A → Prop),
+  (∀ x, P x ↔ Q x) → P = Q.
+
+Theorem my_choice2 : ∀ (A B : Type) (R : A → A → Prop),
+  {f : A → B | ∀ x y : A, R x y → f x = f y}.
+Proof.
+intros.
+pose proof propositional_extensionality (A → Prop) as H1.
+Check func_choice.
+
+Record orbit2
+  mkorb2
+    {base_point2 : point;
+     orbit_mem : ∀ p
+(* ah putain, chuis perdu, bordel *)
+bbb.
+
+  ∀ (p' : point), ∃ el, fold_left rotate el p = p'.
+Print orbit2.
+
+Definition orbit2_eq orb₁ orb₂ :=
+
+orbit2 p = orbit2 p' →
+
+Theorem toto : ∀ A (B : A → orbit2),
+  (∀ (x : A), ∃ p, (B x p))
+  → {f : A → point | ∀ (x : A), B x (f x)}.
+Proof.
+
+pose proof func_choice (A → Prop) (A → Prop).
+bbb.
+
+Definition orbit2 := point → Prop.
+Definition same_orbit2 (orb₁ orb₂ : orbit2) := ∀ p, orb₁ p ↔ orb₂ p.
+Definition eq_orbit2 (orb₁ orb₂ : orbit2) := orb₁ = orb₂.
+
+Definition is_chosen_point2 (p : point) : Prop.
+Proof.
+pose proof func_choice orbit2 orbit2 eq_orbit2.
+
+
 End Orbit.
