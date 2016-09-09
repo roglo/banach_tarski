@@ -1326,6 +1326,12 @@ Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
 Axiom propositional_extensionality : ∀ A (P Q : A → Prop),
   (∀ x, P x ↔ Q x) → P = Q.
 
+Definition glop : ∃ f : (point → Prop) → point, ∀ x y z,
+  (x z ↔ y z) → f x = f y.
+Proof.
+pose proof func_choice (point → Prop) point.
+bbb.
+
 Definition glop : ∃ f : _ → point, ∀ x y z,
   (same_orbit x z ↔ same_orbit y z) → f x = f y.
 Proof.
