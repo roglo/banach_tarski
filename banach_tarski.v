@@ -1348,53 +1348,68 @@ Definition sub_type A := A → Prop.
 Definition not_empty {A} (P : A → Prop) := ∃ x, P x.
 
 (* My idea of what Zermelo theorem should be...
-   For any type A, there exists an order R (reflexive, antisymmetric and
-   transitive) such that for any non empty subset P of A, there exists
-   an element y less than any other element z of P (R is well ordered). *)
-Axiom Zermelo :
-  ∀ (A : Type), ∃ (R : A → A → Prop), (*is_order R ∧*)
-  ∀ (P : sub_type A), not_empty P → ∃ y, P y ∧ ∀ z, P z → R y z.
+   For any type A, there exists a relation R (R x y being interpreted
+   as "x lower that y"), such that for any non empty subset P of A,
+   there exists an unique element y less than any other element z of P
+   (R is well ordered). Must be unique otherwize R x y = True would
+   work and the axiom would be a useless theorem. *)
+Definition Zermelo_def A :=
+  ∃ (R : A → A → Prop),
+  ∀ (P : sub_type A), not_empty P →
+  ∃ y, unique (λ y, P y ∧ ∀ z, P z → R y z) y.
+
+Axiom Zermelo : ∀ A, Zermelo_def A.
 
 Theorem Zermelo_imp_total_order : ∀ A, ∃ R, ∀ (P : sub_type A) x y,
   P x → P y → R x y ∨ R y x.
 Proof.
 intros A.
 pose proof Zermelo A as H.
-destruct H as (R, (*Rord,*) Rprop).
+destruct H as (R, Rprop).
 exists R; intros P x y px py.
 set (Q u := u = x ∨ u = y).
 pose proof Rprop Q (ex_intro _ x (or_introl eq_refl)) as H.
-destruct H as (u, (qu, H)).
+destruct H as (u, ((qu, quu), H)).
 destruct qu; subst u.
- left; apply H; right; reflexivity.
- right; apply H; left; reflexivity.
+ left; apply quu; unfold Q; simpl; right; reflexivity.
+ right; apply quu; unfold Q; simpl; left; reflexivity.
 Qed.
 
 Theorem Zermelo_relation_reflexive :
-  ∀ A, ∃ (R : A → A → Prop), ∀ (P : sub_type A) x, P x → R x x.
+  ∀ A, ∃ (R : A → A → Prop),
+  (Zermelo_def A) ∧
+  reflexive _ R.
 Proof.
 intros A.
+bbb.
 pose proof Zermelo A as H.
 destruct H as (R, Rprop).
-exists R; intros P x px.
+exists R.
+split; [ apply Rprop | intros x ].
 pose proof Rprop (eq x) (ex_intro _ x (eq_refl _)) as H.
-destruct H as (y, (py, H)); subst y.
+destruct H as (y, ((py, H), Huniq)); subst y.
 apply H; reflexivity.
 Qed.
 
+bbb.
+
 Theorem Zermelo_relation_antisymmetric :
-  ∀ A, ∃ (R : A → A → Prop), ∀ (P : sub_type A) x y,
-  P x → P y → R x y → R y x → x = y.
+  ∀ A, ∃ (R : A → A → Prop), antisymmetric _ R.
 Proof.
 intros A.
 pose proof Zermelo A as H.
 destruct H as (R, Rprop).
-exists R; intros P x y px py Hxy Hyx.
+exists R; intros x y Rxy Ryx.
 set (Q u := u = x ∨ u = y).
 pose proof Rprop Q (ex_intro _ x (or_introl eq_refl)) as H.
-destruct H as (t, (qt, H)).
-destruct qt; subst t.
-(* not sure... *) Abort.
+destruct H as (z, ((pz, H), Huniq)).
+destruct pz; subst z.
+ apply Huniq.
+ split; [ right; reflexivity | ].
+ intros z qz.
+ destruct qz; subst z; [ assumption | ].
+
+bbb.
 
 Theorem Zermelo_relation_transitive :
   ∀ A, ∃ (R : A → A → Prop), ∀ (P : sub_type A) x y z,
