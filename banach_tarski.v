@@ -1326,6 +1326,26 @@ Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
 Axiom propositional_extensionality : ∀ A (P Q : A → Prop),
   (∀ x, P x ↔ Q x) → P = Q.
 
+(*
+Notation "∃ ! x , p" := (ex (unique (λ x, p) x)) (at level 200) :
+  type_scope.
+*)
+
+Theorem glop : ∀ A B (P : A → B → Prop),
+  (∀ x, exists ! y, P x y) → ∃ f : A → B, ∀ x, P x (f x).
+Proof.
+intros A B P Hu.
+pose proof func_choice A B P.
+assert (∀ x : A, ∃ y, P x y).
+ intros x.
+ pose proof Hu x as Hx.
+ destruct Hx as (y, Hx).
+ exists y.
+ destruct Hx as (Hx, Hux).
+ assumption.
+
+bbb.
+
 Definition base_point := point.
 (* pfff... j'arrive pas à réfléchir... *)
 bbb.
