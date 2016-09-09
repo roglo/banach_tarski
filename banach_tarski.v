@@ -1319,20 +1319,17 @@ Add Parametric Relation : _ same_orbit
 
 Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
   (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
-(* mmm... since same_orbit is an equivalence relation, it is reflexive;
-   then, the identity function works; no need of this version of axiom
-   of choice! *)
-
-Axiom propositional_extensionality : ∀ A (P Q : A → Prop),
-  (∀ x, P x ↔ Q x) → P = Q.
 
 (*
-Notation "∃ ! x , p" := (ex (unique (λ x, p) x)) (at level 200) :
-  type_scope.
+Axiom propositional_extensionality : ∀ A (P Q : A → Prop),
+  (∀ x, P x ↔ Q x) → P = Q.
 *)
 
-Theorem glop : ∀ A B (P : A → B → Prop),
-  (∀ x, exists ! y, P x y) → ∃ f : A → B, ∀ x, P x (f x).
+Notation "∃ ! x , p" := (ex (unique (λ x, p))) (at level 200) : type_scope.
+
+(*
+Theorem func_choice_unique : ∀ A B (P : A → B → Prop),
+  (∀ x, ∃! y, P x y) → ∃ f : A → B, ∀ x, P x (f x).
 Proof.
 intros A B P Hu.
 apply func_choice.
@@ -1343,29 +1340,89 @@ exists y.
 destruct Hx as (Hx, Hux).
 assumption.
 Qed.
+*)
 
 Definition Zermelo_def A :=
-  ∃ (R : A → A → Prop),
+  ∃ (R : A → A → Prop), order A R ∧ (* TODO: order could be deduced *)
   ∀ (P : A → Prop), (∃ x, P x) →
   ∃ y, unique (λ y, P y ∧ ∀ z, P z → R y z) y.
 
 Axiom Zermelo : ∀ A, Zermelo_def A.
 
-Theorem prout : ∀ x,
-  ∃ (R : point → point → Prop),
-  ∃ y, unique (λ y, same_orbit x y ∧ ∀ z, same_orbit x z → R y z) y.
+(*
+Theorem Zermelo_is_order A :
+  ∃ (R : A → A → Prop), order A R ∧
+  ∀ (P : A → Prop), (∃ x, P x) →
+  ∃ y, unique (λ y, P y ∧ ∀ z, P z → R y z) y.
+Proof.
+pose proof Zermelo A as H.
+destruct H as (R, HR).
+exists R.
+split; [ | intros x; apply HR; exists x; reflexivity ].
+split.
+ intros x.
+ pose proof HR (eq x) (ex_intro _ x eq_refl) as H.
+ destruct H as (y, H).
+ destruct H as ((Hxy, Hle), H).
+ subst y; apply Hle; reflexivity.
+
+ intros x y z Hxy Hyz.
+ set (Q t := t = x ∨ t = y ∨ t = z).
+ pose proof HR Q (ex_intro _ x (or_introl eq_refl)) as H.
+ destruct H as (t, H).
+ unfold unique in H; simpl in H.
+ destruct H as ((Hqt, Hrt), H).
+ destruct Hqt as [| [Hqt | Hqt]]; subst t.
+  apply Hrt; right; right; reflexivity.
+
+  pose proof H x as Hx.
+  assert (Hqx : Q x) by (left; reflexivity).
+  assert (Hz : ∀ z, Q z → R x z).
+   intros t Ht.
+   destruct Ht as [| [Ht| Ht]]; subst t; [ | assumption | ].
+    pose proof HR (eq x) (ex_intro _ x eq_refl) as Hxx.
+    destruct Hxx as (t, Hxx).
+    destruct Hxx as ((Hxy', Hle'), H').
+    subst t; apply Hle'; reflexivity.
+*)
+
+Theorem unique_choice_by_orbit :
+  ∃ (le : point → point → Prop), order _ le ∧
+  ∀ x, ∃ y, unique (λ y, same_orbit x y ∧ ∀ z, same_orbit x z → le y z) y.
 Proof.
 intros.
 pose proof Zermelo point.
-destruct H as (R, H).
+destruct H as (R, (Ho, H)).
 exists R.
-apply H.
-exists x; reflexivity.
+split; [ assumption | ].
+intros x; apply H; exists x; reflexivity.
 Qed.
 
-Theorem tagada : ∃ f : point → point, ∀ x x', same_orbit x x' → f x = f x'.
+Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x x',
+  same_orbit x x' → f x = f x'.
 Proof.
-pose proof func_choice.
+pose proof unique_choice_by_orbit.
+destruct H as (le, (Ho, H)).
+apply func_choice in H.
+destruct H as (f, Hf).
+exists f; intros x x' Hxx'.
+pose proof Hf x as Hx.
+unfold unique in Hx; simpl in Hx.
+destruct Hx as ((Hxfx, Hlex), Hx).
+pose proof Hf x' as Hx'.
+unfold unique in Hx'; simpl in Hx'.
+destruct Hx' as ((Hxfx', Hlex'), Hx').
+assert (H₁ : le (f x) (f x')).
+ apply Hlex.
+ etransitivity; [ eapply Hxx' | eassumption ].
+
+ assert (H₂ : le (f x') (f x)).
+  apply Hlex'.
+  etransitivity; [ symmetry; eassumption | apply Hxfx ].
+
+  destruct Ho as (Hor, Hot, Hoa).
+  apply Hoa; assumption.
+Qed.
 
 bbb.
 
