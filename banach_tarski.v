@@ -1436,6 +1436,31 @@ Qed.
 Axiom propositional_extensionality : ∀ A (P Q : A → Prop),
   (∀ x, P x ↔ Q x) → P = Q.
 
+Definition orbit2 p₁ := λ p₂, ∃ el, fold_left rotate el p₁ = p₂.
+
+Theorem orbit2_eq : ∀ x y,
+  (∀ z, orbit2 x z ↔ orbit2 y z)
+  → orbit2 x = orbit2 y.
+Proof.
+intros x y H.
+apply propositional_extensionality, H.
+Qed.
+
+Theorem exists_base_point_of_orbit :
+  ∃ f : point → point, ∀ p, (orbit2 p) (f p).
+Proof.
+refine (func_choice _ _ _ (λ x, ex_intro _ x (ex_intro _ [] (eq_refl _)))).
+Defined.
+
+bbb.
+
+Definition FunctionalChoice_on :=
+  ∀ (A B : Type) (R : A → B → Prop),
+  (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
+
+bbb.
+  (∀ p, in_orbit p₁ p ↔ in_orbit p₂ p)
+
 Theorem my_choice2 : ∀ (A B : Type) (R : A → A → Prop),
   {f : A → B | ∀ x y : A, R x y → f x = f y}.
 Proof.
