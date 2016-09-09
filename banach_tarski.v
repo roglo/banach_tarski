@@ -1335,19 +1335,38 @@ Theorem glop : ∀ A B (P : A → B → Prop),
   (∀ x, exists ! y, P x y) → ∃ f : A → B, ∀ x, P x (f x).
 Proof.
 intros A B P Hu.
-pose proof func_choice A B P.
-assert (∀ x : A, ∃ y, P x y).
- intros x.
- pose proof Hu x as Hx.
- destruct Hx as (y, Hx).
- exists y.
- destruct Hx as (Hx, Hux).
- assumption.
+apply func_choice.
+intros x.
+pose proof Hu x as Hx.
+destruct Hx as (y, Hx).
+exists y.
+destruct Hx as (Hx, Hux).
+assumption.
+Qed.
 
-bbb.
+Definition Zermelo_def A :=
+  ∃ (R : A → A → Prop),
+  ∀ (P : A → Prop), (∃ x, P x) →
+  ∃ y, unique (λ y, P y ∧ ∀ z, P z → R y z) y.
 
-Definition base_point := point.
-(* pfff... j'arrive pas à réfléchir... *)
+Axiom Zermelo : ∀ A, Zermelo_def A.
+
+Theorem prout : ∀ x,
+  ∃ (R : point → point → Prop),
+  ∃ y, unique (λ y, same_orbit x y ∧ ∀ z, same_orbit x z → R y z) y.
+Proof.
+intros.
+pose proof Zermelo point.
+destruct H as (R, H).
+exists R.
+apply H.
+exists x; reflexivity.
+Qed.
+
+Theorem tagada : ∃ f : point → point, ∀ x x', same_orbit x x' → f x = f x'.
+Proof.
+pose proof func_choice.
+
 bbb.
 
 Definition equiv_class := base_point → point → Prop.
