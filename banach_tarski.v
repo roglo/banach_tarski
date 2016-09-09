@@ -1323,6 +1323,35 @@ Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
    then, the identity function works; no need of this version of axiom
    of choice! *)
 
+Axiom propositional_extensionality : ∀ A (P Q : A → Prop),
+  (∀ x, P x ↔ Q x) → P = Q.
+
+Definition glop : ∃ f : _ → point, ∀ x y z,
+  (same_orbit x z ↔ same_orbit y z) → f x = f y.
+Proof.
+pose proof func_choice point point same_orbit
+  (λ x, ex_intro _ x (same_orbit_refl x)) as H.
+destruct H as (f, Hf).
+exists f; intros x y z Hs.
+assert (same_orbit x = same_orbit y).
+ apply propositional_extensionality.
+ intros t.
+merde.
+
+Definition glop : ∃ f : _ → point, ∀ x y, same_orbit x y → f x = f y.
+Proof.
+intros x y Hs.
+assert (Hz : ∀ z, same_orbit x z ↔ same_orbit y z).
+intros z; split; [ intros Hxz | intros Hyz ].
+ etransitivity; [ symmetry; eassumption | eassumption ].
+ etransitivity; eassumption.
+
+ apply propositional_extensionality in Hz.
+ pose proof Hf x as Hx.
+ pose proof Hf y as Hy.
+ rewrite <- Hz in Hy.
+bbb.
+
 Definition select_orbit_origin :=
   func_choice point point same_orbit
     (λ x, ex_intro (same_orbit x) x (same_orbit_refl x)).
