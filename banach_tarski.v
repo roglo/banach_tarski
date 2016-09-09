@@ -1326,9 +1326,17 @@ Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
 Axiom propositional_extensionality : ∀ A (P Q : A → Prop),
   (∀ x, P x ↔ Q x) → P = Q.
 
-Definition glop : ∃ f : (point → Prop) → point, ∀ x y z,
-  (x z ↔ y z) → f x = f y.
+Definition base_point := point.
+(* pfff... j'arrive pas à réfléchir... *)
+bbb.
+
+Definition equiv_class := base_point → point → Prop.
+
+Definition glop : ∃ f : equiv_class → point, ∀ x,
+  same_orbit x (f x) ∧ ∀ y, same_orbit x y → f x = f y.
 Proof.
+assert (∀ x : point, ∃ y : point, ...
+
 pose proof func_choice (point → Prop) point.
 bbb.
 
