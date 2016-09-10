@@ -1376,7 +1376,7 @@ assert (Hrefl : reflexive _ R).
 Qed.
 
 Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
-  same_orbit x y → f x = f y.
+  same_orbit x y ↔ f x = f y.
 Proof.
 assert
   (H : ∃ le, order _ le ∧
@@ -1390,20 +1390,25 @@ assert
  destruct H as (le, (Ho, H)).
  apply func_choice in H.
  destruct H as (f, Hf).
- exists f; intros x y Hxy.
+ exists f; intros x y.
  pose proof Hf x as Hx.
  unfold unique in Hx; simpl in Hx.
  destruct Hx as ((Hxfx, Hlex), Hx).
  pose proof Hf y as Hy.
  unfold unique in Hy; simpl in Hy.
  destruct Hy as ((Hyfy, Hley), Hy).
- destruct Ho as (_, _, Hoa).
- apply Hoa.
-  apply Hlex.
-  etransitivity; [ eapply Hxy | eassumption ].
+ split.
+  intros Hxy.
+  destruct Ho as (_, _, Hoa).
+  apply Hoa.
+   apply Hlex.
+   etransitivity; [ eapply Hxy | eassumption ].
 
-  apply Hley.
-  etransitivity; [ symmetry; eassumption | apply Hxfx ].
+   apply Hley.
+   etransitivity; [ symmetry; eassumption | apply Hxfx ].
+
+  intros Hfxy.
+  etransitivity; [ eapply Hxfx | rewrite Hfxy; symmetry; apply Hyfy ].
 Qed.
 
 Check same_choice_in_same_orbit.
