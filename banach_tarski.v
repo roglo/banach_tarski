@@ -1410,4 +1410,14 @@ Qed.
 
 Check same_choice_in_same_orbit.
 
+Theorem well_ordering_equiv_choice :
+  (∀ A, ∃ R : A → A → Prop, ∀ P,
+   (∃ x : A, P x) → ∃! y : A, P y ∧ (∀ z, P z → R y z)) ↔
+  (∀ A B (R : A → B → Prop), (∀ x, ∃ y : B, R x y) → ∃ f, ∀ x, R x (f x)).
+Proof.
+split.
+ intros well_ordering A B R H.
+ exists (λ a : A, ...
+bbb.
+
 End Orbit.
