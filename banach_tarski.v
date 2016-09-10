@@ -30,7 +30,7 @@ Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
 Notation "∃ ! x .. y , p" :=
   (ex (unique (fun x => .. (ex (unique (fun y => p))) ..)))
   (at level 200, x binder, right associativity,
-   format "'[' ∃ ! '/ ' x .. y , '/ ' p ']'")
+   format "'[' ∃ ! '/ '  x .. y , '/ '  p ']'")
   : type_scope.
 
 (* Step 1 *)
@@ -1375,39 +1375,35 @@ assert (Hrefl : reflexive _ R).
    split; assumption.
 Qed.
 
-Theorem unique_choice_by_orbit :
-  ∃ (le : point → point → Prop), order _ le ∧
-  ∀ x, ∃ y, unique (λ y, same_orbit x y ∧ ∀ z, same_orbit x z → le y z) y.
-Proof.
-intros.
-pose proof well_ordering_ordered point.
-destruct H as (R, (Ho, H)).
-exists R.
-split; [ assumption | ].
-intros x; apply H; exists x; reflexivity.
-Qed.
-
 Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
   same_orbit x y → f x = f y.
 Proof.
-pose proof unique_choice_by_orbit.
-destruct H as (le, (Ho, H)).
-apply func_choice in H.
-destruct H as (f, Hf).
-exists f; intros x y Hxy.
-pose proof Hf x as Hx.
-unfold unique in Hx; simpl in Hx.
-destruct Hx as ((Hxfx, Hlex), Hx).
-pose proof Hf y as Hy.
-unfold unique in Hy; simpl in Hy.
-destruct Hy as ((Hyfy, Hley), Hy).
-destruct Ho as (Hor, Hot, Hoa).
-apply Hoa.
- apply Hlex.
- etransitivity; [ eapply Hxy | eassumption ].
+assert
+  (H : ∃ le, order _ le ∧
+   ∀ x, ∃! y, same_orbit x y ∧ ∀ z, same_orbit x z → le y z).
+ pose proof well_ordering_ordered point as H.
+ destruct H as (R, (Ho, H)).
+ exists R.
+ split; [ assumption | ].
+ intros x; apply H; exists x; reflexivity.
 
- apply Hley.
- etransitivity; [ symmetry; eassumption | apply Hxfx ].
+ destruct H as (le, (Ho, H)).
+ apply func_choice in H.
+ destruct H as (f, Hf).
+ exists f; intros x y Hxy.
+ pose proof Hf x as Hx.
+ unfold unique in Hx; simpl in Hx.
+ destruct Hx as ((Hxfx, Hlex), Hx).
+ pose proof Hf y as Hy.
+ unfold unique in Hy; simpl in Hy.
+ destruct Hy as ((Hyfy, Hley), Hy).
+ destruct Ho as (_, _, Hoa).
+ apply Hoa.
+  apply Hlex.
+  etransitivity; [ eapply Hxy | eassumption ].
+
+  apply Hley.
+  etransitivity; [ symmetry; eassumption | apply Hxfx ].
 Qed.
 
 Check same_choice_in_same_orbit.
