@@ -1384,8 +1384,7 @@ assert
  pose proof well_ordering_ordered point as H.
  destruct H as (R, (Ho, H)).
  exists R.
- split; [ assumption | ].
- intros x; apply H; exists x; reflexivity.
+ split; [ assumption | intros x; apply H; exists x; reflexivity ].
 
  destruct H as (le, (Ho, H)).
  apply func_choice in H.
