@@ -1319,18 +1319,16 @@ Add Parametric Relation : _ same_orbit
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
-Axiom func_choice : ∀ (A B : Type) (R : A → B → Prop),
-  (∀ x : A, ∃ y : B, R x y) → ∃ f : A → B, ∀ x : A, R x (f x).
+Axiom func_choice : ∀ A B (R : A → B → Prop),
+  (∀ x, ∃ y, R x y) → ∃ f, ∀ x : A, R x (f x).
 
 Axiom well_ordering : ∀ A,
   ∃ (R : A → A → Prop),
-  ∀ (P : A → Prop), (∃ x, P x) →
-  ∃ ! y, P y ∧ ∀ z, P z → R y z.
+  ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
 
 Theorem well_ordering_ordered : ∀ A,
   ∃ (R : A → A → Prop), order _ R ∧
-  ∀ (P : A → Prop), (∃ x, P x) →
-  ∃ ! y, P y ∧ ∀ z, P z → R y z.
+  ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
 Proof.
 intros A.
 pose proof well_ordering A as H.
