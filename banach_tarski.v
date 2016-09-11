@@ -1386,6 +1386,12 @@ assert (∀ x, ∀ y z, P x y → P x z → y = z).
  pose proof Ht z Pxz as Hz.
  destruct Hy; assumption.
 
+(* voir aussi l'axiome du choix dépendant : en effet, on pourrait construire
+   la suite des orbites en 1/ faisant le premier orbite 2/ faisant le
+   deuxième en spécifiant que les points ne sont pas dans le premier
+   3/ faisant le troisième en spécifiant que les points ne sont pas dans
+   les deux premiers, etc. *)
+
 bbb.
 
 Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
