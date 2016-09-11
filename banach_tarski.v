@@ -1373,6 +1373,21 @@ assert (Hrefl : reflexive _ R).
    split; assumption.
 Qed.
 
+Theorem toto : ∀ A B (P : A → B → Prop),
+   (∀ x, ∃! y, P x y) → ∃ f, ∀ x, P x (f x).
+Proof.
+intros A B P Hxy.
+unfold unique in Hxy.
+assert (∀ x, ∀ y z, P x y → P x z → y = z).
+ intros x y z Pxy Pxz.
+ pose proof Hxy x as Hx.
+ destruct Hx as (t, (Hxt, Ht)).
+ pose proof Ht y Pxy as Hy.
+ pose proof Ht z Pxz as Hz.
+ destruct Hy; assumption.
+
+bbb.
+
 Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
   same_orbit x y ↔ f x = f y.
 Proof.
