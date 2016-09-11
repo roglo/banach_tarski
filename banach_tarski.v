@@ -1319,6 +1319,11 @@ Add Parametric Relation : _ same_orbit
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
+(*
+Require Import ChoiceFacts.
+Axiom func_choice : FunctionalChoice.
+*)
+
 Axiom func_choice : ∀ A B (R : A → B → Prop),
   (∀ x, ∃ y, R x y) → ∃ f, ∀ x : A, R x (f x).
 
@@ -1373,20 +1378,11 @@ assert (Hrefl : reflexive _ R).
    split; assumption.
 Qed.
 
-Theorem toto : ∀ A B (P : A → B → Prop),
-   (∀ x, ∃! y, P x y) → ∃ f, ∀ x, P x (f x).
-Proof.
-intros A B P Hxy.
-(* axiom of unique choice! it is an axiom! *)
-bbb.
-
 (* voir aussi l'axiome du choix dépendant : en effet, on pourrait construire
    la suite des orbites en 1/ faisant le premier orbite 2/ faisant le
    deuxième en spécifiant que les points ne sont pas dans le premier
    3/ faisant le troisième en spécifiant que les points ne sont pas dans
    les deux premiers, etc. *)
-
-bbb.
 
 Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
   same_orbit x y ↔ f x = f y.
