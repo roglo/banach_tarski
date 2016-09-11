@@ -1331,6 +1331,19 @@ Axiom well_ordering : ∀ A,
   ∃ (R : A → A → Prop),
   ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
 
+(*
+Theorem well_ordering_func : ∀ A B (P : A → B → Prop),
+  (∀ x, ∃ y, P x y)
+  → ∃ (le : B → B → Prop),
+    ∃ (f : A → B), ∀ x, P x (f x) ∧ ∀ z, P x z → le (f x) z.
+Proof.
+intros A B P non_empty.
+pose proof well_ordering B as H.
+destruct H as (R, H).
+exists R.
+bbb.
+*)
+
 Theorem well_ordering_ordered : ∀ A,
   ∃ (R : A → A → Prop), order _ R ∧
   ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
