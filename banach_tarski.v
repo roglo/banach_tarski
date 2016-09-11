@@ -1395,7 +1395,20 @@ Qed.
    la suite des orbites en 1/ faisant le premier orbite 2/ faisant le
    deuxième en spécifiant que les points ne sont pas dans le premier
    3/ faisant le troisième en spécifiant que les points ne sont pas dans
-   les deux premiers, etc. *)
+   les deux premiers, etc.
+
+Voyons voir...
+
+Require Import ChoiceFacts.
+Print FunctionalDependentChoice_on.
+
+Axiom dep_choice : ∀ A,
+  ∀ R : A → A → Prop,
+  (∀ x : A, ∃ y : A, R x y)
+  → ∀ y : A, ∃ f : ℕ → A, f 0 = y ∧ (∀ n : ℕ, R (f n) (f (S n))).
+
+Oui, mais il semble que ça ne marche que pour un nombre dénombrable
+d'ensembles, ce qui n'est pas mon cas. *)
 
 Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
   same_orbit x y ↔ f x = f y.
