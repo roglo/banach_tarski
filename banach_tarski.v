@@ -1321,63 +1321,7 @@ Add Parametric Relation : _ same_orbit
 
 Axiom func_choice : ∀ A B (R : A → B → Prop),
   (∀ x, ∃ y, R x y) → ∃ f, ∀ x : A, R x (f x).
-(**)
 
-Axiom well_ordering_ordered : ∀ A,
-  ∃ (R : A → A → Prop), order _ R ∧
-  ∀ P x, ∃ f : P x → A, ∀ y : P x, R (f y) x.
-
-Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
-  same_orbit x y ↔ f x = f y.
-Proof.
-pose proof well_ordering_ordered point as H.
-destruct H as (R, (Ho, H)).
-destruct Ho as (Hr, Ht, Ha).
-pose proof H (λ x, same_orbit x y)
-bbb.
-
-exists R.
-split; [ assumption | intros x ].
-pose proof H (R x) (ex_intro _ x (Hr x)) as Hx.
-
-assert
-  (H : ∃ le, order _ le ∧
-   ∀ x, ∃! y, same_orbit x y ∧ ∀ z, same_orbit x z → le y z).
- pose proof well_ordering_ordered point as H.
- destruct H as (R, (Ho, H)).
- exists R.
- split; [ assumption | intros x ].
- destruct Ho as (Hr, Ht, Ha).
- pose proof H (R x) (ex_intro _ x (Hr x)) as Hx.
-bbb.
- 
- split; [ assumption | intros x; apply H; exists x; reflexivity ].
-
- destruct H as (le, (Ho, H)).
- apply func_choice in H.
- destruct H as (f, Hf).
- exists f; intros x y.
- pose proof Hf x as Hx.
- unfold unique in Hx; simpl in Hx.
- destruct Hx as ((Hxfx, Hlex), Hx).
- pose proof Hf y as Hy.
- unfold unique in Hy; simpl in Hy.
- destruct Hy as ((Hyfy, Hley), Hy).
- split.
-  intros Hxy.
-  destruct Ho as (_, _, Hoa).
-  apply Hoa.
-   apply Hlex.
-   etransitivity; [ eapply Hxy | eassumption ].
-
-   apply Hley.
-   etransitivity; [ symmetry; eassumption | apply Hxfx ].
-
-  intros Hfxy.
-  etransitivity; [ eapply Hxfx | rewrite Hfxy; symmetry; apply Hyfy ].
-Qed.
-
-bbb.
 Axiom well_ordering : ∀ A,
   ∃ (R : A → A → Prop),
   ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
