@@ -1442,6 +1442,7 @@ Qed.
 Check same_choice_in_same_orbit.
 
 Theorem orbit_partition : ∃ f : point → point,
-...
+  ∀ x, (∃ y, x = f y)
+  les orbites de l'image de f forment une partition de la sphère.
 
 End Orbit.
