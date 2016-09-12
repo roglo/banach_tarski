@@ -1380,6 +1380,12 @@ assert (Hrefl : reflexive _ R).
    split; assumption.
 Qed.
 
+(* ok, this is a great theorem, but I don't like the fact that I had to
+   use both the axiom of well-ordering *and* the axiom of choice, which
+   are supposed to be equivalent; it is because the axiom of well ordering
+   is used for all the sphere (well ordering all points of the sphere),
+   which is used then to select a specific point (the "minimum" one) to
+   each orbit using... the axiom of choice *)
 Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
   same_orbit x y ↔ f x = f y.
 Proof.
@@ -1416,24 +1422,5 @@ assert
 Qed.
 
 Check same_choice_in_same_orbit.
-
-Theorem well_ordering_equiv_choice :
-  (∀ A, ∃ R : A → A → Prop, order _ R ∧ ∀ P,
-   (∃ x : A, P x) → ∃! y : A, P y ∧ (∀ z, P z → R y z)) ↔
-  (∀ A B (R : A → B → Prop), (∀ x, ∃ y : B, R x y) → ∃ f, ∀ x, R x (f x)).
-Proof.
-split.
- intros well_ordering_ordered A B R H.
- (* le sous-ensemble P a un plus petit élément : ce plus petit élément,
-    c'est lui que je vais choisir comme retour de f ; soit a un élément
-    de A ; R a est un sous-ensemble de B ; je vais donc utiliser
-    well_ordering pour sélectionner le plus petit élément de R a. *)
- pose proof well_ordering_ordered B as Hs.
- destruct Hs as (S, (Ho, Hs)).
- destruct Ho as (Hr, Ht, Ha).
- (* ici, faut que je prenne un P = R a *)
- Check (λ a : A, Hs (R a)).
- Check (λ a : A, Hs (R a) (ex_intro _ a Hr))...
-bbb.
 
 End Orbit.
