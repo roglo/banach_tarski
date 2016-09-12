@@ -1278,6 +1278,15 @@ destruct e as (t, d); destruct t.
  destruct d; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
 Qed.
 
+Theorem toto : ∀ p₁ p₂ m,
+  p₂ = mat_vec_mul m p₁
+  → ∀ el,
+    fold_left rotate el p₂ = fold_left rotate el (mat_vec_mul m p₁).
+(* ah oui mais c'est trivialement trivial, ça ; j'eusse aimé pouvoir
+   plutôt intervertir le chemin et la multiplication par m, mais c'est
+   pas commutatif, dans l'espace ! *)
+Abort.
+
 Theorem non_empty_path_leads_to_different_point : ∀ el p,
   norm_list el = el
   → el ≠ []
