@@ -1443,20 +1443,30 @@ Check same_choice_in_same_orbit.
 
 Definition in_image {A B} (f : A → B) := λ x, ∃ y, x = f y.
 
-(* the orbits of the image of f form a partition of the sphere *)
+(* the orbits of the image of f form a partition of the sphere
+   1/ ∀ x, x in the orbit of someone in the image of f,
+   2/ ∀ x y two different points in the image of x, their orbits
+      are different. *)
+
 Theorem orbit_partition : ∃ f : point → point,
-  ∀ x y, in_image f x → in_image f y → x ≠ y → ¬ same_orbit x y.
+  (∀ x, ∃ y, same_orbit (f y) x) ∧
+  (∀ x y, in_image f x → in_image f y → x ≠ y → ¬ same_orbit x y).
 Proof.
 pose proof same_choice_in_same_orbit as H.
 destruct H as (f, (Hxfx, Hiff)).
-exists f; intros x y Hx Hy Hneq.
-destruct Hx as (x', Hx).
-destruct Hy as (y', Hy).
-intros H; apply Hneq.
-subst x y; apply Hiff.
-etransitivity; [ apply Hxfx | ].
-etransitivity; [ eassumption | ].
-symmetry; apply Hxfx.
+exists f; split.
+ intros x.
+ exists x; symmetry.
+ apply Hxfx.
+
+ intros x y Hx Hy Hneq.
+ destruct Hx as (x', Hx).
+ destruct Hy as (y', Hy).
+ intros H; apply Hneq.
+ subst x y; apply Hiff.
+ etransitivity; [ apply Hxfx | ].
+ etransitivity; [ eassumption | ].
+ symmetry; apply Hxfx.
 Qed.
 
 End Orbit.
