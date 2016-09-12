@@ -1278,6 +1278,32 @@ destruct e as (t, d); destruct t.
  destruct d; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
 Qed.
 
+Theorem non_empty_path_leads_to_different_point : ∀ el p,
+  norm_list el = el
+  → el ≠ []
+  → p ≠ P 1 0 0 ∧ p ≠ P (-1) 0 0 ∧ p ≠ P 0 0 1 ∧ p ≠ P 0 0 (-1)
+  → fold_left rotate el p ≠ p.
+Proof.
+intros el p Hn Hel Hp.
+vvv.
+
+remember (fold_left rotate el) as w eqn:Hw.
+pose proof rotate_0_0_1_b_nonzero w el el₁ d Hel Hn Hw as H.
+destruct H as (a, (b, (c, (k, (Hp, Hm))))).
+rewrite Hp; intros H.
+injection H; intros Hc Hb Ha.
+apply Rmult_integral in Hb.
+destruct Hb as [Hb| Hb].
+ apply Rmult_integral in Hb.
+ destruct Hb as [Hb| Hb].
+  apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
+
+  revert Hb; apply sqrt2_neq_0.
+
+ apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
+ rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
+Qed.
+
 End Rotation.
 
 Check nonempty_rotation_is_not_identity.
