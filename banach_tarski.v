@@ -1331,6 +1331,24 @@ Axiom well_ordering : ∀ A,
   ∃ (R : A → A → Prop),
   ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
 
+(*
+Theorem well_ordering2 : ∀ A,
+  ∃ (R : A → A → Prop), ∀ (P : A → Prop), (∃ x, P x) →
+  ∃ f, (∀ x, P x → R (f x) x) ∧ (∀ x y, P x → P y → f x = f y).
+Proof.
+intros A.
+pose proof well_ordering A as H.
+destruct H as (R, H).
+exists R.
+intros P HP.
+pose proof H P HP as He.
+destruct He as (y, ((Py, Hy), Hyz)).
+exists (λ _, y).
+split; [ apply Hy | ].
+intros; reflexivity.
+Qed.
+*)
+
 (* definition of well-ordering above does not require R to be an order
    but actually, it is possible to deduce it from its definition *)
 Theorem well_ordering_ordered : ∀ A,
