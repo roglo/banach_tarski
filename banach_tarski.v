@@ -1404,8 +1404,9 @@ Qed.
    is used for all the sphere (well ordering all points of the sphere),
    which is used then to select a specific point (the "minimum" one) to
    each orbit using... the axiom of choice *)
-Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
-  same_orbit x y ↔ f x = f y.
+Theorem same_choice_in_same_orbit : ∃ f : point → point,
+  (∀ x, same_orbit x (f x)) ∧
+  (∀ x y, same_orbit x y ↔ f x = f y).
 Proof.
 assert
   (H : ∃ le, order _ le ∧
@@ -1418,25 +1419,31 @@ assert
  destruct H as (le, (Ho, H)).
  apply func_choice in H.
  destruct H as (f, Hf).
- exists f; intros x y.
- pose proof Hf x as Hx.
- unfold unique in Hx; simpl in Hx.
- destruct Hx as ((Hxfx, Hlex), Hx).
- pose proof Hf y as Hy.
- unfold unique in Hy; simpl in Hy.
- destruct Hy as ((Hyfy, Hley), Hy).
- split.
-  intros Hxy.
-  destruct Ho as (_, _, Hoa).
-  apply Hoa.
-   apply Hlex.
-   etransitivity; [ eapply Hxy | eassumption ].
+ exists f; split.
+  intros x.
+  pose proof Hf x as Hx.
+  unfold unique in Hx.
+  destruct Hx as ((Hxfx, Hlex), Hx); assumption.
 
-   apply Hley.
-   etransitivity; [ symmetry; eassumption | apply Hxfx ].
+  intros x y.
+  pose proof Hf x as Hx.
+  unfold unique in Hx; simpl in Hx.
+  destruct Hx as ((Hxfx, Hlex), Hx).
+  pose proof Hf y as Hy.
+  unfold unique in Hy; simpl in Hy.
+  destruct Hy as ((Hyfy, Hley), Hy).
+  split.
+   intros Hxy.
+   destruct Ho as (_, _, Hoa).
+   apply Hoa.
+    apply Hlex.
+    etransitivity; [ eapply Hxy | eassumption ].
 
-  intros Hfxy.
-  etransitivity; [ eapply Hxfx | rewrite Hfxy; symmetry; apply Hyfy ].
+    apply Hley.
+    etransitivity; [ symmetry; eassumption | apply Hxfx ].
+
+   intros Hfxy.
+   etransitivity; [ eapply Hxfx | rewrite Hfxy; symmetry; apply Hyfy ].
 Qed.
 
 Check same_choice_in_same_orbit.
