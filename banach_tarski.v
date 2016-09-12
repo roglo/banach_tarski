@@ -1441,4 +1441,7 @@ Qed.
 
 Check same_choice_in_same_orbit.
 
+Theorem orbit_partition : ∃ f : point → point,
+...
+
 End Orbit.
