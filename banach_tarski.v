@@ -1331,34 +1331,18 @@ Axiom well_ordering : ∀ A,
   ∃ (R : A → A → Prop),
   ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
 
-(*
-Theorem well_ordering2 : ∀ A,
-  ∃ (R : A → A → Prop), ∀ (P : A → Prop), (∃ x, P x) →
-  ∃ f, (∀ x, P x → R (f x) x) ∧ (∀ x y, P x → P y → f x = f y).
-Proof.
-intros A.
-pose proof well_ordering A as H.
-destruct H as (R, H).
-exists R.
-intros P HP.
-pose proof H P HP as He.
-destruct He as (y, ((Py, Hy), Hyz)).
-exists (λ _, y).
-split; [ apply Hy | ].
-intros; reflexivity.
-Qed.
-*)
+Definition total_order A (R : relation A) := ∀ x y, R x y ∨ R y x.
 
 (* definition of well-ordering above does not require R to be an order
-   but actually, it is possible to deduce it from its definition *)
+   but actually, it is possible to deduce it from its definition; it
+   is also a total order *)
 Theorem well_ordering_ordered : ∀ A,
-  ∃ (R : A → A → Prop), order _ R ∧
+  ∃ (R : A → A → Prop), order _ R ∧ total_order _ R ∧
   ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
 Proof.
 intros A.
 pose proof well_ordering A as H.
 destruct H as (R, H).
-exists R; split; [ | assumption ].
 assert (Hrefl : reflexive _ R).
  intros x.
  pose proof H (eq x) (ex_intro _ x eq_refl) as Hx.
@@ -1395,7 +1379,16 @@ assert (Hrefl : reflexive _ R).
     pose proof Hmin y (or_intror (or_introl eq_refl)) as Hzy.
     pose proof Hasym _ _ Hyz Hzy; subst y; assumption.
 
-   split; assumption.
+    exists R.
+    split; [ split; assumption | ].
+    split; [ | assumption ].
+    intros x y.
+    set (Q t := t = x ∨ t = y).
+    pose proof H Q (ex_intro _ x (or_introl eq_refl)) as Hx.
+    destruct Hx as (t, ((Ht, Hmin), Huniq)).
+    destruct Ht; subst t.
+     left; apply Hmin; right; reflexivity.
+     right; apply Hmin; left; reflexivity.
 Qed.
 
 (* ok, this is a great theorem, but I don't like the fact that I had to
@@ -1412,7 +1405,7 @@ assert
   (H : ∃ le, order _ le ∧
    ∀ x, ∃! y, same_orbit x y ∧ ∀ z, same_orbit x z → le y z).
  pose proof well_ordering_ordered point as H.
- destruct H as (R, (Ho, H)).
+ destruct H as (R, (Ho, (Htot, H))).
  exists R.
  split; [ assumption | intros x; apply H; exists x; reflexivity ].
 
