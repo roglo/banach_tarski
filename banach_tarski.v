@@ -1322,8 +1322,8 @@ Add Parametric Relation : _ same_orbit
 (*
 Require Import ChoiceFacts.
 Axiom func_choice : FunctionalChoice.
+Print FunctionalChoice_on.
 *)
-
 Axiom func_choice : ∀ A B (R : A → B → Prop),
   (∀ x, ∃ y, R x y) → ∃ f, ∀ x : A, R x (f x).
 
@@ -1331,19 +1331,8 @@ Axiom well_ordering : ∀ A,
   ∃ (R : A → A → Prop),
   ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
 
-(*
-Theorem well_ordering_func : ∀ A B (P : A → B → Prop),
-  (∀ x, ∃ y, P x y)
-  → ∃ (le : B → B → Prop),
-    ∃ (f : A → B), ∀ x, P x (f x) ∧ ∀ z, P x z → le (f x) z.
-Proof.
-intros A B P non_empty.
-pose proof well_ordering B as H.
-destruct H as (R, H).
-exists R.
-bbb.
-*)
-
+(* definition of well-ordering above does not require R to be an order
+   but actually, it is possible to deduce it from its definition *)
 Theorem well_ordering_ordered : ∀ A,
   ∃ (R : A → A → Prop), order _ R ∧
   ∀ P, (∃ x, P x) → ∃ ! y, P y ∧ ∀ z, P z → R y z.
@@ -1390,25 +1379,6 @@ assert (Hrefl : reflexive _ R).
 
    split; assumption.
 Qed.
-
-(* voir aussi l'axiome du choix dépendant : en effet, on pourrait construire
-   la suite des orbites en 1/ faisant le premier orbite 2/ faisant le
-   deuxième en spécifiant que les points ne sont pas dans le premier
-   3/ faisant le troisième en spécifiant que les points ne sont pas dans
-   les deux premiers, etc.
-
-Voyons voir...
-
-Require Import ChoiceFacts.
-Print FunctionalDependentChoice_on.
-
-Axiom dep_choice : ∀ A,
-  ∀ R : A → A → Prop,
-  (∀ x : A, ∃ y : A, R x y)
-  → ∀ y : A, ∃ f : ℕ → A, f 0 = y ∧ (∀ n : ℕ, R (f n) (f (S n))).
-
-Oui, mais il semble que ça ne marche que pour un nombre dénombrable
-d'ensembles, ce qui n'est pas mon cas. *)
 
 Theorem same_choice_in_same_orbit : ∃ f : point → point, ∀ x y,
   same_orbit x y ↔ f x = f y.
