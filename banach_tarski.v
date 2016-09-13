@@ -651,6 +651,8 @@ Definition rotate pt e :=
 
 Definition neg_rot '(E t d) := E t (negb d).
 
+Definition rev_path el := map neg_rot (rev el).
+
 Definition rotate_param '(a, b, c, N) e :=
   match e with
   | ạ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
@@ -1256,6 +1258,65 @@ destruct Hb as [Hb| Hb].
  rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
 Qed.
 
+Theorem rev_path_path : ∀ p el,
+  fold_left rotate (rev_path el) (fold_left rotate el p) = p.
+Proof.
+intros.
+Admitted.
+
+Theorem all_points_in_orbit_1_0_0_are_different : ∀ p₁ p₂ el₁ el₂,
+  fold_left rotate el₁ (P 1 0 0) = p₁
+  → fold_left rotate el₂ (P 1 0 0) = p₂
+  → norm_list el₁ = el₁
+  → norm_list el₂ = el₂
+  → el₁ ≠ el₂
+  → p₁ ≠ p₂.
+Proof.
+intros p₁ p₂ el₁ el₂ Hp₁ Hp₂ Hn₁ Hn₂ Hd Hp.
+destruct el₁ as [| e₁].
+ simpl in Hp₁; move Hp at top; clear Hn₁.
+ subst p₁ p₂.
+ destruct el₂ as [| e₂]; [ apply Hd; reflexivity | clear Hd ].
+  (* mouais, bon, il manque une hypothèse *)
+bbb.
+
+assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
+ rewrite fold_left_app, Hp₁, Hp, <- Hp₂.
+ apply rev_path_path.
+
+ revert H.
+ eapply rotate_1_0_0_is_diff.
+
+
+bbb.
+
+Theorem rotate_from_point_in_orbit_1_0_0_is_diff : ∀ p,
+  (∃ el, fold_left rotate el (P 1 0 0) = p)
+  → ∀ el, el ≠ []
+  → norm_list el = el
+  → fold_left rotate el p ≠ p.
+Proof.
+intros p (elp, Horb) el Hne Hel Hr.
+assert (fold_left rotate 
+vvv.
+
+remember (fold_left rotate el) as w eqn:Hw.
+pose proof rotate_0_0_1_b_nonzero w el el₁ d Hel Hn Hw as H.
+destruct H as (a, (b, (c, (k, (Hp, Hm))))).
+rewrite Hp; intros H.
+injection H; intros Hc Hb Ha.
+apply Rmult_integral in Hb.
+destruct Hb as [Hb| Hb].
+ apply Rmult_integral in Hb.
+ destruct Hb as [Hb| Hb].
+  apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
+
+  revert Hb; apply sqrt2_neq_0.
+
+ apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
+ rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
+Qed.
+
 Definition no_rotation := ([] : list free_elem).
 Definition is_identity el := ∀ p, fold_left rotate el p = p.
 
@@ -1286,32 +1347,6 @@ Theorem toto : ∀ p₁ p₂ m,
    plutôt intervertir le chemin et la multiplication par m, mais c'est
    pas commutatif, dans l'espace ! *)
 Abort.
-
-Theorem non_empty_path_leads_to_different_point : ∀ el p,
-  norm_list el = el
-  → el ≠ []
-  → p ≠ P 1 0 0 ∧ p ≠ P (-1) 0 0 ∧ p ≠ P 0 0 1 ∧ p ≠ P 0 0 (-1)
-  → fold_left rotate el p ≠ p.
-Proof.
-intros el p Hn Hel Hp.
-vvv.
-
-remember (fold_left rotate el) as w eqn:Hw.
-pose proof rotate_0_0_1_b_nonzero w el el₁ d Hel Hn Hw as H.
-destruct H as (a, (b, (c, (k, (Hp, Hm))))).
-rewrite Hp; intros H.
-injection H; intros Hc Hb Ha.
-apply Rmult_integral in Hb.
-destruct Hb as [Hb| Hb].
- apply Rmult_integral in Hb.
- destruct Hb as [Hb| Hb].
-  apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
-
-  revert Hb; apply sqrt2_neq_0.
-
- apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
- rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
-Qed.
 
 End Rotation.
 
