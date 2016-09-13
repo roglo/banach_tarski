@@ -1264,29 +1264,44 @@ Proof.
 intros.
 Admitted.
 
-Theorem all_points_in_orbit_1_0_0_are_different : ∀ p₁ p₂ el₁ el₂,
+Theorem all_points_in_orbit_1_0_0_are_different :
+  ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_left rotate el₁ (P 1 0 0) = p₁
   → fold_left rotate el₂ (P 1 0 0) = p₂
+  → el₁ = E lb d₁ :: el'₁
+  → el₂ = E lb d₂ :: el'₂
   → norm_list el₁ = el₁
   → norm_list el₂ = el₂
   → el₁ ≠ el₂
   → p₁ ≠ p₂.
 Proof.
-intros p₁ p₂ el₁ el₂ Hp₁ Hp₂ Hn₁ Hn₂ Hd Hp.
-destruct el₁ as [| e₁].
- simpl in Hp₁; move Hp at top; clear Hn₁.
- subst p₁ p₂.
- destruct el₂ as [| e₂]; [ apply Hd; reflexivity | clear Hd ].
-  (* mouais, bon, il manque une hypothèse *)
-bbb.
-
+intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
 assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
  rewrite fold_left_app, Hp₁, Hp, <- Hp₂.
  apply rev_path_path.
 
  revert H.
- eapply rotate_1_0_0_is_diff.
+ rewrite Hel₁.
+ eapply rotate_1_0_0_is_diff; [ rewrite <- app_comm_cons; f_equal | ].
+ rewrite <- Hel₁.
+bbb.
 
+ pose proof is_normal.
+Theorem toto : ∀ el,
+  norm_list el = el ↔ norm_list (rev_path el) = rev_path el.
+Proof.
+Admitted. Show.
+
+  apply toto.
+Theorem rev_path_app : ∀ el₁ el₂,
+  rev_path (el₁ ++ el₂) = rev_path el₂ ++ rev_path el₁.
+Admitted. Show.
+
+  rewrite rev_path_app.
+Theorem rev_path_involutive : ∀ el, rev_path (rev_path el) = el.
+Admitted. Show.
+
+  rewrite rev_path_involutive.
 
 bbb.
 
