@@ -1258,11 +1258,53 @@ destruct Hb as [Hb| Hb].
  rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
 Qed.
 
-Theorem rev_path_path : ∀ p el,
-  fold_left rotate (rev_path el) (fold_left rotate el p) = p.
+Theorem rev_path_cons : ∀ e el,
+  rev_path (e :: el) = rev_path el ++ rev_path [e].
 Proof.
-intros.
-Admitted.
+intros e el.
+unfold rev_path; simpl.
+rewrite map_app; reflexivity.
+Qed.
+
+Theorem rev_path_app : ∀ el₁ el₂,
+  rev_path (el₁ ++ el₂) = rev_path el₂ ++ rev_path el₁.
+Proof.
+intros el₁ el₂.
+revert el₁.
+induction el₂ as [| (t, d)]; intros; [ rewrite app_nil_r; reflexivity | ].
+rewrite rev_path_cons, cons_comm_app, app_assoc, IHel₂.
+rewrite <- app_assoc; f_equal; simpl.
+clear el₂ IHel₂.
+induction el₁ as [| e₁]; [ reflexivity | ].
+simpl; rewrite rev_path_cons; rewrite IHel₁.
+simpl; f_equal; symmetry.
+rewrite rev_path_cons; reflexivity.
+Qed.
+
+Theorem rev_path_involutive : ∀ el, rev_path (rev_path el) = el.
+Proof.
+intros el.
+induction el as [| (t, d)]; [ reflexivity | simpl ].
+rewrite rev_path_cons, rev_path_app.
+rewrite IHel; simpl; rewrite Bool.negb_involutive.
+reflexivity.
+Qed.
+
+Theorem app_rev_path_path : ∀ el, norm_list (rev_path el ++ el) = [].
+Proof.
+induction el as [| e]; [ reflexivity | ].
+rewrite rev_path_cons, <- app_assoc.
+destruct e as (t, d); simpl.
+destruct d; rewrite norm_list_cancel_inside; assumption.
+Qed.
+
+Theorem app_path_rev_path : ∀ el, norm_list (el ++ rev_path el) = [].
+Proof.
+intros el.
+remember (rev_path el) as rp.
+replace el with (rev_path (rev_path el)) by apply rev_path_involutive.
+subst rp; apply app_rev_path_path.
+Qed.
 
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
@@ -1279,12 +1321,12 @@ intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ H
 move Hp at top; subst p₂; rename p₁ into p.
 assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
  rewrite fold_left_app, Hp₁, <- Hp₂.
+ rewrite <- fold_left_app.
+bbb.
+
  apply rev_path_path.
 
 Check rotate_1_0_0_is_diff.
-
-bbb.
-
 Theorem norm_list_dec : ∀ el,
   { norm_list el = el } +
   { ∃ el₁ t d el₂, el = el₁ ++ E t d :: E t (negb d) :: el₂ }.
@@ -1299,7 +1341,13 @@ Admitted. Show.
   destruct H₁ as (el₃, (t, (d, (el₄, H₁)))).
   rewrite H₁ in H.
   rewrite fold_left_app in H.
-Theorem 
+Theorem toto : ∀ el t d p,
+  fold_left rotate (E t d :: E t (negb d) :: el) p = fold_left rotate el p.
+Proof.
+Admitted. Show.
+
+  rewrite toto in H.
+  rewrite <- fold_left_app in H.
 
 SearchAbout rotate.
 bbb.
@@ -1307,24 +1355,16 @@ bbb.
  apply norm_list_app_diag with (el₂ := el₂).
  rewrite <- app_assoc.
 
-Theorem app_rev_path_path : ∀ el, norm_list (rev_path el ++ el) = [].
-
- pose proof is_normal.
-Theorem toto : ∀ el,
-  norm_list el = el ↔ norm_list (rev_path el) = rev_path el.
-Proof.
-Admitted. Show.
-
   apply toto.
-Theorem rev_path_app : ∀ el₁ el₂,
-  rev_path (el₁ ++ el₂) = rev_path el₂ ++ rev_path el₁.
-Admitted. Show.
 
   rewrite rev_path_app.
-Theorem rev_path_involutive : ∀ el, rev_path (rev_path el) = el.
-Admitted. Show.
-
   rewrite rev_path_involutive.
+
+Theorem rev_path_path : ∀ p el,
+  fold_left rotate (rev_path el) (fold_left rotate el p) = p.
+Proof.
+intros.
+Admitted.
 
 bbb.
 
