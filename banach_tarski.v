@@ -1320,6 +1320,12 @@ destruct e as (t, d); destruct t, d; simpl.
  rewrite rot_inv_rot_z; reflexivity.
 Qed.
 
+Theorem norm_list_dec : ∀ el,
+  { norm_list el = el } +
+  { ∃ el₁ t d el₂, el = el₁ ++ E t d :: E t (negb d) :: el₂ }.
+Proof.
+Admitted.
+
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_left rotate el₁ (P 1 0 0) = p₁
@@ -1338,12 +1344,6 @@ assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
  rewrite <- fold_left_app, app_rev_path_path; reflexivity.
 
 Check rotate_1_0_0_is_diff.
-Theorem norm_list_dec : ∀ el,
-  { norm_list el = el } +
-  { ∃ el₁ t d el₂, el = el₁ ++ E t d :: E t (negb d) :: el₂ }.
-Proof.
-Admitted. Show.
-
  destruct (norm_list_dec (el₁ ++ rev_path el₂)) as [H₁| H₁].
   revert H; rewrite Hel₁.
   eapply rotate_1_0_0_is_diff; [ rewrite <- app_comm_cons; f_equal | ].
@@ -1362,7 +1362,16 @@ Admitted. Show.
   rewrite Hel₁ in H₁.
   simpl in H₁.
   destruct el₃ as [| e₃]; simpl in H₁.
-   injection H₁; clear H₁; intros; subst t d.
+   injection H₁; clear H₁; intros H₁ H₂ H₃; subst t d.
+   destruct el'₁ as [| e'₁]; simpl in H₁.
+   destruct (list_nil_app_dec el₂) as [H₂| (e₂, (el₃, H₂))]; subst el₂.
+    discriminate H₂.
+
+    rewrite H₂ in H₁.
+    rewrite rev_path_app in H₁; simpl in H₁.
+    destruct e₂ as (t₂, d₃); simpl in H₁.
+    injection H₁; clear H₁; intros; subst t₂ el₄.
+
 bbb.
 
  apply norm_list_app_diag with (el₂ := el₂).
