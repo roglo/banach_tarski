@@ -1277,11 +1277,11 @@ Theorem all_points_in_orbit_1_0_0_are_different :
 Proof.
 intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
 move Hp at top; subst p₂; rename p₁ into p.
-bbb.
-
 assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
- rewrite fold_left_app, Hp₁, Hp, <- Hp₂.
+ rewrite fold_left_app, Hp₁, <- Hp₂.
  apply rev_path_path.
+
+Check rotate_1_0_0_is_diff.
 
 bbb.
 
