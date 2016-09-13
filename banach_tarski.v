@@ -1336,9 +1336,6 @@ move Hp at top; subst p₂; rename p₁ into p.
 assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
  rewrite fold_left_app, Hp₁, <- Hp₂.
  rewrite <- fold_left_app, app_rev_path_path; reflexivity.
-bbb.
-
- apply rev_path_path.
 
 Check rotate_1_0_0_is_diff.
 Theorem norm_list_dec : ∀ el,
@@ -1362,8 +1359,10 @@ Admitted. Show.
 
   rewrite toto in H.
   rewrite <- fold_left_app in H.
-
-SearchAbout rotate.
+  rewrite Hel₁ in H₁.
+  simpl in H₁.
+  destruct el₃ as [| e₃]; simpl in H₁.
+   injection H₁; clear H₁; intros; subst t d.
 bbb.
 
  apply norm_list_app_diag with (el₂ := el₂).
