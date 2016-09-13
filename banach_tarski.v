@@ -1280,6 +1280,12 @@ assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
  rewrite fold_left_app, Hp₁, Hp, <- Hp₂.
  apply rev_path_path.
 
+Theorem norm_list_dec : ∀ el,
+  { norm_list el = el } +
+  { ∃ el₁ t d el₂, el = el₁ ++ E t d :: E t (negb d) :: el₂ }.
+Proof.
+bbb.
+
  revert H.
  rewrite Hel₁.
  eapply rotate_1_0_0_is_diff; [ rewrite <- app_comm_cons; f_equal | ].
