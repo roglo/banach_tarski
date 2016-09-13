@@ -1284,7 +1284,13 @@ assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
  rewrite Hel₁.
  eapply rotate_1_0_0_is_diff; [ rewrite <- app_comm_cons; f_equal | ].
  rewrite <- Hel₁.
+ (* ah bin non, c'est faux, non ? *)
 bbb.
+
+ apply norm_list_app_diag with (el₂ := el₂).
+ rewrite <- app_assoc.
+
+Theorem app_rev_path_path : ∀ el, norm_list (rev_path el ++ el) = [].
 
  pose proof is_normal.
 Theorem toto : ∀ el,
