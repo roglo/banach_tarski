@@ -1290,7 +1290,7 @@ rewrite IHel; simpl; rewrite Bool.negb_involutive.
 reflexivity.
 Qed.
 
-Theorem app_rev_path_path : ∀ el, norm_list (rev_path el ++ el) = [].
+Theorem norm_app_rev_path_path : ∀ el, norm_list (rev_path el ++ el) = [].
 Proof.
 induction el as [| e]; [ reflexivity | ].
 rewrite rev_path_cons, <- app_assoc.
@@ -1298,12 +1298,26 @@ destruct e as (t, d); simpl.
 destruct d; rewrite norm_list_cancel_inside; assumption.
 Qed.
 
-Theorem app_path_rev_path : ∀ el, norm_list (el ++ rev_path el) = [].
+Theorem norm_app_path_rev_path : ∀ el, norm_list (el ++ rev_path el) = [].
 Proof.
 intros el.
 remember (rev_path el) as rp.
 replace el with (rev_path (rev_path el)) by apply rev_path_involutive.
-subst rp; apply app_rev_path_path.
+subst rp; apply norm_app_rev_path_path.
+Qed.
+
+Theorem app_rev_path_path : ∀ p el,
+  fold_left rotate (el ++ rev_path el) p = p.
+Proof.
+intros.
+revert p.
+induction el as [| e]; intros; [ reflexivity | simpl ].
+rewrite rev_path_cons, app_assoc, fold_left_app, IHel.
+destruct e as (t, d); destruct t, d; simpl.
+ rewrite rot_rot_inv_x; reflexivity.
+ rewrite rot_inv_rot_x; reflexivity.
+ rewrite rot_rot_inv_z; reflexivity.
+ rewrite rot_inv_rot_z; reflexivity.
 Qed.
 
 Theorem all_points_in_orbit_1_0_0_are_different :
@@ -1321,7 +1335,7 @@ intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ H
 move Hp at top; subst p₂; rename p₁ into p.
 assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
  rewrite fold_left_app, Hp₁, <- Hp₂.
- rewrite <- fold_left_app.
+ rewrite <- fold_left_app, app_rev_path_path; reflexivity.
 bbb.
 
  apply rev_path_path.
@@ -1359,12 +1373,6 @@ bbb.
 
   rewrite rev_path_app.
   rewrite rev_path_involutive.
-
-Theorem rev_path_path : ∀ p el,
-  fold_left rotate (rev_path el) (fold_left rotate el p) = p.
-Proof.
-intros.
-Admitted.
 
 bbb.
 
