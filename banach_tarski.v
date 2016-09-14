@@ -1353,6 +1353,28 @@ Theorem rev_path_norm_list : ∀ el,
   rev_path (norm_list el) = norm_list (rev_path el).
 Proof.
 intros el.
+(**)
+destruct (norm_list_dec el) as [H₁| H₁].
+ rewrite H₁.
+SearchAbout rev_path.
+Theorem norm_list_rev_path : ∀ el,
+  norm_list el = el → norm_list (rev_path el) = rev_path el.
+Proof.
+Admitted. Show.
+
+ symmetry; apply norm_list_rev_path; assumption.
+
+ destruct H₁ as (el₁, (t, (d, (el₂, H₁)))).
+ rewrite H₁.
+ rewrite norm_list_cancel_inside.
+ rewrite rev_path_app.
+ do 2 rewrite rev_path_cons, rev_path_single; simpl.
+ rewrite Bool.negb_involutive.
+ do 2 rewrite <- app_assoc; simpl.
+ rewrite norm_list_cancel_inside.
+ rewrite <- rev_path_app.
+
+bbb.
 induction el as [| e]; [ reflexivity | simpl ].
 remember (norm_list el) as el₁ eqn:Hel₁.
 symmetry in Hel₁.
