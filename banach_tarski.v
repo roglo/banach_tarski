@@ -1368,6 +1368,20 @@ destruct el₁ as [| e₁].
   apply letter_opp_iff in H₁.
   destruct H₁; subst t₁ d₁.
   rewrite rev_path_cons, rev_path_single; simpl.
+bbb.
+
+(**)
+destruct el as [| e₂]; [ discriminate Hel₁ | ].
+simpl in Hel₁.
+remember (norm_list el) as el₂ eqn:Hel₂.
+symmetry in Hel₂.
+destruct el₂ as [| e₃].
+injection Hel₁; clear Hel₁; intros; subst e₂ el₁.
+
+destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, H₁))]; subst el.
+ discriminate Hel₁.
+
+bbb.
   rewrite rev_path_cons, rev_path_single in IHel; simpl in IHel.
   rewrite Bool.negb_involutive in IHel.
   apply app_inv_tail with (l := [E t d]).
