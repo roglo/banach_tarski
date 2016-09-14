@@ -1117,52 +1117,46 @@ destruct len.
   destruct d; injection Hu; intros; subst; intros H; discriminate H.
   destruct d; injection Hu; intros; subst; intros H; discriminate H.
 
- destruct (list_nil_app_dec el₁) as [H₁| (e₁, (el₂, Hel₂))].
-  subst el₁; discriminate Hlen.
+ destruct el₁ as [| e₁]; [ discriminate Hlen | simpl in Hlen ].
+ apply eq_add_S in Hlen.
+ rewrite <- app_comm_cons in Hel.
+ remember (el₁ ++ [E t d]) as el₂ eqn:Hel₁.
+ generalize Hn; intros H₁; rewrite Hel in H₁.
+ apply norm_list_cons in H₁.
+ rewrite Hel in Hu; simpl in Hu.
+ remember (fold_right rotate_param p el₂) as v eqn:Hp.
+ symmetry in Hp.
+ destruct v as (((a', b'), c'), N').
+ assert (Hss : len < S len) by apply Nat.lt_succ_diag_r.
+ assert (N' = S len); [ | subst N' ].
+  destruct e₁ as (t₁, d₁).
+  rewrite Hel₁, app_length, Nat.add_1_r in Hu.
+  destruct t₁, d₁; simpl in Hu; injection Hu; intros; subst; reflexivity.
 
-  subst el₁; simpl in Hlen.
-  rewrite app_length in Hlen; simpl in Hlen.
-  rewrite Nat.add_1_r in Hlen.
-  apply eq_add_S in Hlen.
-(*
-  rewrite app_comm_cons in Hel.
-  remember (E t d :: el₂) as el₁ eqn:Hel₁.
-*)
-  generalize Hn; intros H₁; rewrite Hel in H₁.
-  apply norm_list_app_diag in H₁.
-  rewrite Hel, fold_right_app in Hu; simpl in Hu.
-  remember (rotate_param (E t d) p) as p₁ eqn:Hp₁.
-bbb.
-  remember (fold_right rotate_param p el₁) as v eqn:Hp.
-  symmetry in Hp.
-  destruct v as (((a', b'), c'), N').
-  assert (Hss : len < S len) by apply Nat.lt_succ_diag_r.
-  assert (N' = S len); [ | subst N' ].
-   destruct e₁ as (t₁, d₁).
-   rewrite app_length in Hu; simpl in Hu; rewrite Nat.add_1_r in Hu.
-   destruct t₁, d₁; simpl in Hu; injection Hu; intros; subst; reflexivity.
-
-   rewrite <- Hlen in Hp.
-   replace (S (length el₂)) with (length el₁) in Hp by (subst; reflexivity).
+  rewrite <- Hlen in Hp.
+  replace (S (length el₁)) with (length el₂) in Hp.
    pose proof IHlen _ Hss _ _ _ _ _ _ Hel₁ H₁ Hp Hlen as Hb'; subst len.
-   pose proof rotate_prop p t d el el₁ el₂ e₁ a' b' c' Htp Hel₁ Hel Hn Hp Hb'.
+   pose proof rotate_prop p t d el el₂ el₁ e₁ a' b' c' Htp Hel₁ Hel Hn Hp Hb'.
    destruct e₁ as (t₁, d₁).
    destruct t₁, d₁; injection Hu; intros; subst; assumption.
+
+   subst; rewrite app_length, Nat.add_1_r; reflexivity.
 Qed.
 
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" (Stan Wagon) *)
 
 Theorem rotate_1_0_0_b_nonzero : ∀ w el el₁ d,
-  el = E lb d :: el₁
+  el = el₁ ++ [E lb d]
   → norm_list el = el
-  → w = fold_left rotate el
+  → w = (λ p, fold_right rotate p el)
   → ∃ a b c k,
     w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hel Hn Hw.
 subst w.
+bbb.
 remember (fold_left rotate_param el (1, 0, 0, O)%Z) as u eqn:Hu.
 symmetry in Hu; destruct u as (((a, b), c), len).
 generalize Hu; intros Hv.
