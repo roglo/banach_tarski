@@ -1346,6 +1346,35 @@ destruct IHel as [IHel| IHel].
  reflexivity.
 Qed.
 
+Theorem rev_path_single : ∀ e, rev_path [e] = [neg_rot e].
+Proof. intros e; reflexivity. Qed.
+
+Theorem rev_path_norm_list : ∀ el,
+  rev_path (norm_list el) = norm_list (rev_path el).
+Proof.
+intros el.
+induction el as [| e]; [ reflexivity | simpl ].
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁].
+ pose proof is_normal [] (rev_path el) (rev_path [e]).
+ rewrite <- IHel in H; simpl in H.
+ rewrite rev_path_single, H.
+ rewrite <- rev_path_cons; reflexivity.
+
+ destruct (letter_opp_dec e e₁) as [H₁| H₁].
+  destruct e as (t, d).
+  destruct e₁ as (t₁, d₁).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₁ d₁.
+  rewrite rev_path_cons, rev_path_single; simpl.
+  rewrite rev_path_cons, rev_path_single in IHel; simpl in IHel.
+  rewrite Bool.negb_involutive in IHel.
+  apply app_inv_tail with (l := [E t d]).
+  rewrite IHel.
+  (* merde c'est faux *)
+bbb.
+
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_left rotate el₁ (P 1 0 0) = p₁
@@ -1369,6 +1398,21 @@ assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
   rewrite <- Hel₁; assumption.
 
   destruct H₁ as (el₃, (t, (d, (el₄, H₁)))).
+clear H Hp₁ Hel₁.
+revert el₃ H₁.
+induction el₁ as [| e₁]; intros.
+ rewrite <- Hn₂ in H₁; simpl in H₁.
+bbb.
+rewrite rev_path_norm_list in H₁.
+revert H₁; apply norm_list_impossible_consecutive.
+destruct el₃ as [| e₃].
+ simpl in H₁.
+ injection H₁; clear H₁; intros H₁ H; subst e₁.
+
+
+  rewrite <- Hn₁, <- Hn₂ in H₁.
+SearchAbout rev_path.
+
 SearchAbout (norm_list _ ++ _).
 
 bbb.
