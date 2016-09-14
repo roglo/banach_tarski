@@ -1156,8 +1156,7 @@ Theorem rotate_1_0_0_b_nonzero : ∀ w el el₁ d,
 Proof.
 intros w el el₁ d Hel Hn Hw.
 subst w.
-bbb.
-remember (fold_left rotate_param el (1, 0, 0, O)%Z) as u eqn:Hu.
+remember (fold_right rotate_param (1, 0, 0, O)%Z el) as u eqn:Hu.
 symmetry in Hu; destruct u as (((a, b), c), len).
 generalize Hu; intros Hv.
 apply rotate_param_rotate in Hv; simpl in Hv.
@@ -1168,24 +1167,27 @@ exists a, b, c, len.
 split; [ reflexivity | clear Hv ].
 symmetry in Hlen.
 rewrite Hel in Hlen; simpl in Hlen.
-destruct len; [ subst el; discriminate Hlen | ].
-apply eq_add_S in Hlen.
-subst len.
-replace (S (length el₁)) with (length el) in Hu by (subst; reflexivity).
-eapply rotate_param_b_nonzero; try eassumption.
-left; split; reflexivity.
+rewrite app_length, Nat.add_1_r in Hlen.
+destruct len; [ discriminate Hlen | ].
+apply eq_add_S in Hlen; subst len.
+replace (S (length el₁)) with (length el) in Hu.
+ eapply rotate_param_b_nonzero; try eassumption.
+ left; split; reflexivity.
+
+ subst; rewrite app_length, Nat.add_1_r; reflexivity.
 Qed.
 
 Theorem rotate_0_0_1_b_nonzero : ∀ w el el₁ d,
-  el = E la d :: el₁
+  el = el₁ ++ [E la d]
   → norm_list el = el
-  → w = fold_left rotate el
+  → w = (λ p, fold_right rotate p el)
   → ∃ a b c k,
     w (P 0 0 1) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hel Hn Hw.
 subst w.
+bbb.
 remember (fold_left rotate_param el (0, 0, 1, O)%Z) as u eqn:Hu.
 symmetry in Hu; destruct u as (((a, b), c), len).
 generalize Hu; intros Hv.
