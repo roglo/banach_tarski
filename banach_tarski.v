@@ -1339,8 +1339,6 @@ destruct IHel as [IHel| IHel].
  reflexivity.
 
  right.
- (* call Theo to show him that this destruct is refused without this
-    "right" above *)
  destruct IHel as (el₁, (t, (d, (el₂, IHel)))).
  exists (e :: el₁), t, d, el₂; subst el.
  reflexivity.
@@ -1348,6 +1346,37 @@ Qed.
 
 Theorem rev_path_single : ∀ e, rev_path [e] = [neg_rot e].
 Proof. intros e; reflexivity. Qed.
+
+Theorem norm_list_rev_path : ∀ el,
+  norm_list el = el → norm_list (rev_path el) = rev_path el.
+Proof.
+intros el Hel.
+induction el as [| e]; [ reflexivity | ].
+rewrite rev_path_cons.
+simpl in Hel.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁].
+ injection Hel; clear Hel; intros; subst el.
+ reflexivity.
+
+ destruct (letter_opp_dec e e₁) as [H₁| H₁].
+  destruct e as (t, d).
+  destruct e₁ as (t₁, d₁).
+  apply letter_opp_iff in H₁.
+  destruct H₁; subst t₁ d₁.
+  rewrite Hel in Hel₁.
+  exfalso; revert Hel₁; apply norm_list_impossible_start2.
+
+  injection Hel; clear Hel; intros; subst el.
+  rewrite <- IHel at 2; [ | reflexivity ].
+bbb.
+
+  rewrite rev_path_cons at 2.
+  rewrite <- app_assoc.
+  re
+  do 2 rewrite rev_path_single.
+  simpl.
 
 Theorem rev_path_norm_list : ∀ el,
   rev_path (norm_list el) = norm_list (rev_path el).
@@ -1357,11 +1386,7 @@ intros el.
 destruct (norm_list_dec el) as [H₁| H₁].
  rewrite H₁.
 SearchAbout rev_path.
-Theorem norm_list_rev_path : ∀ el,
-  norm_list el = el → norm_list (rev_path el) = rev_path el.
-Proof.
-Admitted. Show.
-
+bbb.
  symmetry; apply norm_list_rev_path; assumption.
 
  destruct H₁ as (el₁, (t, (d, (el₂, H₁)))).
