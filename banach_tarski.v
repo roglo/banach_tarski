@@ -1324,7 +1324,27 @@ Theorem norm_list_dec : ∀ el,
   { norm_list el = el } +
   { ∃ el₁ t d el₂, el = el₁ ++ E t d :: E t (negb d) :: el₂ }.
 Proof.
-Admitted.
+intros el.
+induction el as [| e]; [ left; reflexivity | ].
+destruct IHel as [IHel| IHel].
+ simpl.
+ rewrite IHel.
+ destruct el as [| e₁]; [ left; reflexivity | ].
+ destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ right | left; reflexivity ].
+ destruct e as (t, d).
+ destruct e₁ as (t₁, d₁).
+ apply letter_opp_iff in H₁.
+ destruct H₁; subst t₁ d₁.
+ exists [], t, d, el.
+ reflexivity.
+
+ right.
+ (* call Theo to show him that this destruct is refused without this
+    "right" above *)
+ destruct IHel as (el₁, (t, (d, (el₂, IHel)))).
+ exists (e :: el₁), t, d, el₂; subst el.
+ reflexivity.
+Qed.
 
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
@@ -1343,13 +1363,15 @@ assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
  rewrite fold_left_app, Hp₁, <- Hp₂.
  rewrite <- fold_left_app, app_rev_path_path; reflexivity.
 
-Check rotate_1_0_0_is_diff.
  destruct (norm_list_dec (el₁ ++ rev_path el₂)) as [H₁| H₁].
   revert H; rewrite Hel₁.
   eapply rotate_1_0_0_is_diff; [ rewrite <- app_comm_cons; f_equal | ].
   rewrite <- Hel₁; assumption.
 
   destruct H₁ as (el₃, (t, (d, (el₄, H₁)))).
+SearchAbout (norm_list _ ++ _).
+
+bbb.
   rewrite H₁ in H.
   rewrite fold_left_app in H.
 Theorem toto : ∀ el t d p,
