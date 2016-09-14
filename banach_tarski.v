@@ -641,7 +641,7 @@ Definition rot_inv_z := mkmat
   (-2*√2/3) (1/3)     0
   0         0         1.
 
-Definition rotate pt e :=
+Definition rotate e pt :=
   match e with
   | ạ => mat_vec_mul rot_x pt
   | ạ⁻¹ => mat_vec_mul rot_inv_x pt
@@ -653,7 +653,7 @@ Definition neg_rot '(E t d) := E t (negb d).
 
 Definition rev_path el := map neg_rot (rev el).
 
-Definition rotate_param '(a, b, c, N) e :=
+Definition rotate_param e '(a, b, c, N) :=
   match e with
   | ạ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
   | ạ⁻¹ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
@@ -662,8 +662,8 @@ Definition rotate_param '(a, b, c, N) e :=
   end.
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
-  fold_left rotate_param el (x, y, z, n) = (a, b, c, N)
-  ↔ fold_left rotate el (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) =
+  fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
+  ↔ fold_right rotate (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
       P (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
     ∧ N = n + length el.
 Proof.
@@ -672,14 +672,13 @@ split.
  intros Hr.
  simpl in Hr; simpl.
  revert a₁ b₁ c₁ N₁ Hr.
- induction el as [| (t, d)] using rev_ind; intros.
+ induction el as [| (t, d)]; intros.
   simpl; simpl in Hr; rewrite Nat.add_0_r.
   injection Hr; intros; subst; simpl.
   split; reflexivity.
 
-  rewrite fold_left_app in Hr; simpl in Hr.
-  rewrite fold_left_app; simpl.
-  remember (fold_left rotate_param el (x, y, z, n)) as rp eqn:Hrp.
+  simpl in Hr; simpl.
+  remember (fold_right rotate_param (x, y, z, n) el) as rp eqn:Hrp.
   symmetry in Hrp.
   destruct rp as (((a, b), c), N).
   pose proof IHel _ _ _ _ (eq_refl _) as H.
@@ -694,29 +693,29 @@ split.
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl.
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
-   split; [ | rewrite app_length, Nat.add_assoc, Nat.add_1_r; reflexivity ].
+   split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
 
  intros Hr.
  revert x y z n a₁ b₁ c₁ N₁ Hr.
- induction el as [| e]; intros.
+ induction el as [| e] using rev_ind; intros.
   simpl in Hr; simpl; rewrite Nat.add_0_r in Hr.
   destruct Hr as (Hr, Hn); subst N₁.
   unfold Rdiv in Hr.
@@ -735,8 +734,11 @@ split.
    apply Rinv_neq_0_compat, pow_nonzero; lra.
 
   simpl in Hr; destruct Hr as (Hr, HN).
+  rewrite app_length, Nat.add_1_r in HN.
   rewrite <- Nat.add_succ_comm in HN.
   simpl; destruct e as (t, d).
+  rewrite fold_right_app; simpl.
+  rewrite fold_right_app in Hr; simpl in Hr.
   destruct t, d.
    apply IHel; split; [ | assumption ].
    rewrite <- Hr; simpl.
@@ -746,7 +748,6 @@ split.
    progress repeat rewrite Rplus_0_l.
    progress repeat rewrite Rplus_0_r.
    progress repeat rewrite <- Rmult_assoc.
-   progress repeat rewrite mult_IZR.
    rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
@@ -958,7 +959,7 @@ Theorem rotate_prop : ∀ p t d el el₁ el₂ e a b c,
   → el₁ = E t d :: el₂
   → el = el₁ ++ [e]
   → norm_list el = el
-  → fold_left rotate_param el₁ p = (a, b, c, length el₁)
+  → fold_right rotate_param p el₁ = (a, b, c, length el₁)
   → (b mod 3)%Z ≠ 0%Z
   → match e with
     | ạ => ((b - 2 * c) mod 3)%Z ≠ 0%Z
@@ -1003,13 +1004,14 @@ destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
  apply eq_add_S in Hlen.
  remember (E t d :: el₃) as el₂ eqn:Hel₂.
  rewrite app_comm_cons, <- Hel₂ in Hel₁.
- rewrite Hel₁, fold_left_app in Hp.
+ rewrite Hel₁, fold_right_app in Hp.
  simpl in Hp.
- remember (fold_left rotate_param el₂ p) as p' eqn:Hp'.
+ remember (fold_right rotate_param p el₂) as p' eqn:Hp'.
  symmetry in Hp'.
  destruct p' as (((a', b'), c'), N').
  simpl in Hp.
  destruct e₁ as (t₁, d₁); destruct t₁, d₁.
+bbb.
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
   destruct e as (t₂, d₂); destruct t₂, d₂.
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
