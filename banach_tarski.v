@@ -1107,7 +1107,6 @@ Theorem rotate_param_b_nonzero : ∀ p t d el el₁ a b c,
   → (b mod 3 ≠ 0)%Z.
 Proof.
 intros p t d el el₁ a b c Htp Hel Hn Hu.
-bbb.
 remember (length el₁) as len eqn:Hlen; symmetry in Hlen.
 revert el el₁ d a b c Hel Hn Hu Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
@@ -1125,12 +1124,16 @@ destruct len.
   rewrite app_length in Hlen; simpl in Hlen.
   rewrite Nat.add_1_r in Hlen.
   apply eq_add_S in Hlen.
+(*
   rewrite app_comm_cons in Hel.
   remember (E t d :: el₂) as el₁ eqn:Hel₁.
+*)
   generalize Hn; intros H₁; rewrite Hel in H₁.
   apply norm_list_app_diag in H₁.
-  rewrite Hel, fold_left_app in Hu; simpl in Hu.
-  remember (fold_left rotate_param el₁ p) as v eqn:Hp.
+  rewrite Hel, fold_right_app in Hu; simpl in Hu.
+  remember (rotate_param (E t d) p) as p₁ eqn:Hp₁.
+bbb.
+  remember (fold_right rotate_param p el₁) as v eqn:Hp.
   symmetry in Hp.
   destruct v as (((a', b'), c'), N').
   assert (Hss : len < S len) by apply Nat.lt_succ_diag_r.
