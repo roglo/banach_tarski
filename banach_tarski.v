@@ -956,8 +956,8 @@ Qed.
 Theorem rotate_prop : ∀ p t d el el₁ el₂ e a b c,
   t = lb ∧ p = (1, 0, 0, O)%Z ∨
   t = la ∧ p = (0, 0, 1, O)%Z
-  → el₁ = E t d :: el₂
-  → el = el₁ ++ [e]
+  → el₁ = el₂ ++ [E t d]
+  → el = e :: el₁
   → norm_list el = el
   → fold_right rotate_param p el₁ = (a, b, c, length el₁)
   → (b mod 3)%Z ≠ 0%Z
@@ -972,8 +972,8 @@ intros p t d el el₁ el₂ e a b c.
 intros Htp Hel₁ Hel Hn Hp Hb'.
 rewrite Hel₁ in Hp at 2; simpl in Hp.
 remember (length el₂) as len eqn:Hlen.
-destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
- subst el₂; simpl in Hlen; subst len; simpl in Hel.
+destruct el₂ as [| e₁].
+ simpl in Hlen; subst len; simpl in Hel.
  subst el₁; simpl in Hp.
  destruct Htp as [(Ht, Hq)| (Ht, Hq)]; subst t p.
   destruct d; injection Hp; intros; subst.
@@ -990,8 +990,8 @@ destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
    destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
    revert Hn; apply norm_list_impossible_start.
 
- subst el₂.
  rewrite Hel₁ in Hel; simpl in Hel.
+bbb.
  rewrite <- app_assoc in Hel; simpl in Hel.
  generalize Hn; intros H₂.
  rewrite app_comm_cons in Hel.
@@ -1011,6 +1011,10 @@ destruct (list_nil_app_dec el₂) as [H₂| (e₁, (el₃, Hel₃))].
  destruct p' as (((a', b'), c'), N').
  simpl in Hp.
  destruct e₁ as (t₁, d₁); destruct t₁, d₁.
+(*
+  destruct p as (((x, y), z), N); simpl in Hp.
+  unfold rotate_param at 2 in Hp.
+*)
 bbb.
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
   destruct e as (t₂, d₂); destruct t₂, d₂.
