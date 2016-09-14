@@ -991,31 +991,20 @@ destruct el₂ as [| e₁].
    revert Hn; apply norm_list_impossible_start.
 
  rewrite Hel₁ in Hel; simpl in Hel.
-bbb.
- rewrite <- app_assoc in Hel; simpl in Hel.
  generalize Hn; intros H₂.
- rewrite app_comm_cons in Hel.
+ do 2 rewrite app_comm_cons in Hel.
  rewrite Hel in H₂.
  apply norm_list_app_diag in H₂.
- destruct len; [ destruct el₃ in Hlen; discriminate Hlen | ].
- assert (Hl : len < S (S len)) by (apply le_n_S, Nat.le_succ_diag_r).
- rewrite app_length in Hlen; simpl in Hlen.
- rewrite Nat.add_1_r in Hlen.
- apply eq_add_S in Hlen.
- remember (E t d :: el₃) as el₂ eqn:Hel₂.
- rewrite app_comm_cons, <- Hel₂ in Hel₁.
+ destruct len; [ discriminate Hlen | ].
+ simpl in Hlen; apply eq_add_S in Hlen.
  rewrite Hel₁, fold_right_app in Hp.
  simpl in Hp.
- remember (fold_right rotate_param p el₂) as p' eqn:Hp'.
+ remember (rotate_param (E t d) p) as p₁ eqn:Hp₁.
+ remember (fold_right rotate_param p₁ el₂) as p' eqn:Hp'.
  symmetry in Hp'.
  destruct p' as (((a', b'), c'), N').
  simpl in Hp.
  destruct e₁ as (t₁, d₁); destruct t₁, d₁.
-(*
-  destruct p as (((x, y), z), N); simpl in Hp.
-  unfold rotate_param at 2 in Hp.
-*)
-bbb.
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
   destruct e as (t₂, d₂); destruct t₂, d₂.
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
@@ -1030,7 +1019,7 @@ bbb.
    apply Z.mod_mul; intros; discriminate.
 
    exfalso; revert Hn; rewrite Hel.
-   apply norm_list_impossible_consecutive.
+   apply norm_list_impossible_start.
 
    rewrite Z.mul_assoc, Z.mul_shuffle0.
    unfold Z.sub; rewrite Zopp_mult_distr_l.
@@ -1042,7 +1031,7 @@ bbb.
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
   destruct e as (t₂, d₂); destruct t₂, d₂.
    exfalso; revert Hn; rewrite Hel.
-   apply norm_list_impossible_consecutive.
+   apply norm_list_impossible_start.
 
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
    remember (b' - 2 * c' - 2 * (4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
@@ -1083,7 +1072,7 @@ bbb.
    apply Z.mod_mul; intros; discriminate.
 
    exfalso; revert Hn; rewrite Hel.
-   apply norm_list_impossible_consecutive.
+   apply norm_list_impossible_start.
 
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
   destruct e as (t₂, d₂); destruct t₂, d₂.
@@ -1095,7 +1084,7 @@ bbb.
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
    exfalso; revert Hn; rewrite Hel.
-   apply norm_list_impossible_consecutive.
+   apply norm_list_impossible_start.
 
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
    remember (b' + 2 * a' + 2 * (a' - 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
@@ -1112,12 +1101,13 @@ Qed.
 Theorem rotate_param_b_nonzero : ∀ p t d el el₁ a b c,
   t = lb ∧ p = (1, 0, 0, O)%Z ∨
   t = la ∧ p = (0, 0, 1, O)%Z
-  → el = E t d :: el₁
+  → el = el₁ ++ [E t d]
   → norm_list el = el
-  → fold_left rotate_param el p = (a, b, c, length el)
+  → fold_right rotate_param p el = (a, b, c, length el)
   → (b mod 3 ≠ 0)%Z.
 Proof.
 intros p t d el el₁ a b c Htp Hel Hn Hu.
+bbb.
 remember (length el₁) as len eqn:Hlen; symmetry in Hlen.
 revert el el₁ d a b c Hel Hn Hu Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
