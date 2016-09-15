@@ -1622,6 +1622,14 @@ do 2 rewrite fold_right_app; simpl.
 rewrite rotate_rotate_neg; reflexivity.
 Qed.
 
+Theorem length_rev_path : ∀ el, length (rev_path el) = length el.
+Proof.
+intros el.
+induction el as [| e]; [ reflexivity | simpl ].
+rewrite rev_path_cons, app_length; simpl.
+rewrite IHel, Nat.add_1_r; reflexivity.
+Qed.
+
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_right rotate (P 1 0 0) el₁ = p₁
@@ -1635,18 +1643,42 @@ Theorem all_points_in_orbit_1_0_0_are_different :
 Proof.
 intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
 move Hp at top; subst p₂; rename p₁ into p.
-remember (length el₁ + length el₂) as len eqn:Hlen.
-symmetry in Hlen.
-revert p el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hlen.
-induction len as (len, IHlen) using lt_wf_rec; intros.
-destruct len.
- apply Nat.eq_add_0 in Hlen.
- destruct Hlen as (Hl₁, Hl₂).
- apply length_zero_iff_nil in Hl₁.
- apply length_zero_iff_nil in Hl₂.
- move Hl₁ at top; move Hl₂ at top; subst el₁ el₂.
- destruct el'₁; discriminate Hel₁.
+assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
+ rewrite fold_right_app, Hp₁, <- Hp₂.
+ rewrite <- fold_right_app.
+ rewrite app_path_rev_path; reflexivity.
 
+ clear Hp₁ Hp₂.
+ remember (length (rev_path el₂ ++ el₁)) as len eqn:Hlen.
+ symmetry in Hlen.
+ revert p el₁ el₂ el'₁ el'₂ d₁ d₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hlen Hp.
+ induction len as (len, IHlen) using lt_wf_rec; intros.
+ destruct len.
+  rewrite app_length in Hlen.
+  apply Nat.eq_add_0 in Hlen.
+  destruct Hlen as (Hl₁, Hl₂).
+  apply length_zero_iff_nil in Hl₁.
+  apply length_zero_iff_nil in Hl₂.
+  apply rev_path_is_nil in Hl₁.
+  move Hl₁ at top; move Hl₂ at top; subst el₁ el₂.
+  destruct el'₁; discriminate Hel₁.
+
+  destruct (norm_list_dec (rev_path el₂ ++ el₁)) as [H₁| H₁].
+   revert Hp; rewrite Hel₁, app_assoc.
+   rewrite Hel₁, app_assoc in H₁.
+   remember (rev_path el₂ ++ el'₁) as el₄ eqn:Hel₄.
+   remember (el₄ ++ [E lb d₁]) as el₃ eqn:Hel₃.
+   pose proof rotate_1_0_0_is_diff el₃ el₄ d₁ Hel₃ H₁ as H₂.
+   apply H₂.
+
+   destruct H₁ as (el₃, (t, (d, (el₄, Hs)))).
+   rewrite Hs, rotate_simpl in Hp.
+   rewrite Hs in Hlen.
+   rewrite app_length in Hlen; simpl in Hlen.
+   do 2 rewrite Nat.add_succ_r in Hlen.
+   apply Nat.succ_inj in Hlen.
+   rewrite <- length_rev_path in Hlen.
+   rewrite <- app_length in Hlen.
 bbb.
 intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
 move Hp at top; subst p₂; rename p₁ into p.
