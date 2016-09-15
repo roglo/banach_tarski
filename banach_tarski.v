@@ -21,6 +21,12 @@ intros b₁ b₂ H.
 destruct b₁, b₂; try reflexivity; exfalso; apply H; reflexivity.
 Qed.
 
+Theorem negb_eq_eq : ∀ b₁ b₂, negb b₁ = negb b₂ → b₁ = b₂.
+Proof.
+intros b₁ b₂ Hn.
+destruct b₁, b₂; [ reflexivity | | | reflexivity ]; discriminate Hn.
+Qed.
+
 Theorem cons_comm_app {A} : ∀ (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
 Proof. reflexivity. Qed.
 
@@ -660,6 +666,16 @@ Definition rotate_param e '(a, b, c, N) :=
   | ḅ => ((a - 4 * b)%Z, (b + 2 * a)%Z, (3 * c)%Z, S N)
   | ḅ⁻¹ => ((a + 4 * b)%Z, (b - 2 * a)%Z, (3 * c)%Z, S N)
   end.
+
+Theorem neg_rot_eq_eq : ∀ e₁ e₂, neg_rot e₁ = neg_rot e₂ → e₁ = e₂.
+Proof.
+intros e₁ e₂ Hn.
+destruct e₁ as (t₁, d₁).
+destruct e₂ as (t₂, d₂).
+simpl in Hn.
+injection Hn; intros H₁ H₂; subst.
+apply negb_eq_eq in H₁; subst d₁; reflexivity.
+Qed.
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
@@ -1348,49 +1364,77 @@ destruct IHel as [IHel| IHel].
  reflexivity.
 Qed.
 
+Theorem rev_path_nil : rev_path [] = [].
+Proof. reflexivity. Qed.
+
 Theorem rev_path_single : ∀ e, rev_path [e] = [neg_rot e].
 Proof. intros e; reflexivity. Qed.
+
+Theorem rev_path_is_nil : ∀ el, rev_path el = [] → el = [].
+Proof.
+intros el Hr.
+destruct el as [| e]; [ reflexivity | ].
+rewrite rev_path_cons, rev_path_single in Hr.
+destruct (rev_path el); discriminate Hr.
+Qed.
+
+Theorem rev_path_eq_eq : ∀ el₁ el₂,
+  rev_path el₁ = rev_path el₂ → el₁ = el₂.
+Proof.
+intros el₁ el₂ Hr.
+revert el₂ Hr.
+induction el₁ as [| e₁]; intros.
+ rewrite rev_path_nil in Hr.
+ symmetry in Hr; apply rev_path_is_nil in Hr.
+ destruct Hr; reflexivity.
+
+ rewrite rev_path_cons, rev_path_single in Hr.
+ destruct el₂ as [| e₂].
+  rewrite rev_path_nil in Hr.
+  destruct (rev_path el₁); discriminate Hr.
+
+  rewrite rev_path_cons, rev_path_single in Hr.
+  apply app_inj_tail in Hr.
+  destruct Hr as (Hr, Hn).
+  apply IHel₁ in Hr.
+  apply neg_rot_eq_eq in Hn.
+  subst el₁ e₁; reflexivity.
+Qed.
 
 Theorem norm_list_rev_path : ∀ el,
   norm_list el = el → norm_list (rev_path el) = rev_path el.
 Proof.
 intros el Hel.
-induction el as [| e]; [ reflexivity | ].
-rewrite rev_path_cons.
-simpl in Hel.
-remember (norm_list el) as el₁ eqn:Hel₁.
+induction el as [| e] using rev_ind; [ reflexivity | ].
+rewrite rev_path_app; simpl.
+generalize Hel; intros Hn.
+apply norm_list_app_diag in Hn.
+rewrite IHel; [ | assumption ].
+remember (rev_path el) as el₁ eqn:Hel₁.
 symmetry in Hel₁.
-destruct el₁ as [| e₁].
- injection Hel; clear Hel; intros; subst el.
- reflexivity.
-
- destruct (letter_opp_dec e e₁) as [H₁| H₁].
-  destruct e as (t, d).
-  destruct e₁ as (t₁, d₁).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t₁ d₁.
-  rewrite Hel in Hel₁.
-  exfalso; revert Hel₁; apply norm_list_impossible_start2.
-
-  injection Hel; clear Hel; intros; subst el.
-  rewrite <- IHel at 2; [ | reflexivity ].
-bbb.
-
-  rewrite rev_path_cons at 2.
-  rewrite <- app_assoc.
-  re
-  do 2 rewrite rev_path_single.
-  simpl.
+destruct el₁ as [| e₁]; [ reflexivity | ].
+destruct (letter_opp_dec (neg_rot e) e₁) as [H₁| H₁]; [ | reflexivity ].
+exfalso.
+destruct e as (t, d).
+destruct e₁ as (t₁, d₁).
+apply letter_opp_iff in H₁; rewrite Bool.negb_involutive in H₁.
+destruct H₁; subst t₁ d₁.
+rewrite <- rev_path_involutive in Hel₁.
+rewrite rev_path_cons, rev_path_single in Hel₁.
+simpl in Hel₁.
+apply rev_path_eq_eq in Hel₁.
+rewrite Hel₁ in Hel.
+rewrite <- app_assoc in Hel; simpl in Hel.
+revert Hel.
+apply norm_list_impossible_consecutive2.
+Qed.
 
 Theorem rev_path_norm_list : ∀ el,
   rev_path (norm_list el) = norm_list (rev_path el).
 Proof.
 intros el.
-(**)
 destruct (norm_list_dec el) as [H₁| H₁].
  rewrite H₁.
-SearchAbout rev_path.
-bbb.
  symmetry; apply norm_list_rev_path; assumption.
 
  destruct H₁ as (el₁, (t, (d, (el₂, H₁)))).
