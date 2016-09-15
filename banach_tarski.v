@@ -1490,10 +1490,23 @@ destruct el₁ as [| e₁].
 bbb.
 *)
 intros el.
-induction el as [| e]; [ reflexivity | ].
-simpl.
 destruct (norm_dec el) as [H₁| H₁].
- rewrite H₁; rewrite H₁ in IHel.
+ rewrite H₁.
+ symmetry; apply norm_list_rev_path; assumption.
+
+ destruct H₁ as (el₁, (e, (el₂, H₁))).
+Theorem split_at_cancel_some : ∀ el el₁ el₂ e,
+  split_at_cancel el = Some (el₁, e, el₂)
+  → el = el₁ ++ e :: neg_rot e :: el₂.
+Proof.
+intros el el₁ el₂ e Hs.
+revert e el₁ el₂ Hs.
+induction el as [| e₁]; intros; [ discriminate Hs | ].
+simpl in Hs.
+destruct el as [| e₂]; [ discriminate Hs | ].
+
+bbb.
+
  destruct el as [| e₁]; [ reflexivity | ].
  destruct (letter_opp_dec e e₁) as [H₂| H₂].
   destruct e as (t, d).
