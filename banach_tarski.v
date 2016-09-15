@@ -1632,7 +1632,16 @@ assert (H : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
  rewrite app_path_rev_path; reflexivity.
 
  destruct (norm_list_dec (rev_path el₂ ++ el₁)) as [H₁| H₁].
-  revert H; rewrite Hel₁.
+  revert H; rewrite Hel₁, app_assoc.
+  rewrite Hel₁, app_assoc in H₁.
+  remember (rev_path el₂ ++ el'₁) as el₄ eqn:Hel₄.
+  remember (el₄ ++ [E lb d₁]) as el₃ eqn:Hel₃.
+  pose proof rotate_1_0_0_is_diff el₃ el₄ d₁ Hel₃ H₁ as H₂.
+  apply H₂.
+
+bbb.
+rewrite <- app_assoc, <- Hel₁ in Hel₃.
+bbb.
   eapply rotate_1_0_0_is_diff; [ rewrite <- app_comm_cons; f_equal | ].
   rewrite <- Hel₁.
 bbb.
