@@ -290,6 +290,53 @@ apply (norm_list_impossible_consecutive2 x d el nil el').
 Qed.
 *)
 
+Theorem norm_list_cancel : ∀ el e,
+  norm_list (e :: negf e :: el) = norm_list el.
+Proof.
+intros el (t, d).
+revert t d.
+induction el as [| (t₁, d₁)]; intros.
+ simpl; rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+
+ remember (E t₁ d₁ :: el) as el₁ eqn:Hel₁.
+ symmetry in Hel₁; simpl.
+ remember (norm_list el₁) as el₂ eqn:Hel₂.
+ symmetry in Hel₂; simpl.
+ destruct el₂ as [| (t₂, d₂)].
+  rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+
+  subst el₁.
+  destruct (letter_dec t t₂) as [H₁| H₁].
+   subst t₂.
+   destruct (Bool.bool_dec (negb d) d₂) as [H₁| H₁].
+    subst d₂.
+    rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+
+    apply negb_neq in H₁; subst d₂.
+    destruct el₂ as [| (t₂, d₂)]; [ reflexivity | ].
+    destruct (letter_dec t t₂) as [H₁| H₁]; [ | reflexivity ].
+    subst t₂.
+    destruct (Bool.bool_dec d d₂) as [H₁| H₁]; [ reflexivity | ].
+    apply not_eq_sym, neq_negb in H₁; subst d₂.
+    exfalso; revert Hel₂; apply norm_list_no_start.
+
+   rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
+Qed.
+
+Theorem norm_list_cancel_in : ∀ el₁ el₂ e,
+  norm_list (el₁ ++ e :: negf e :: el₂) =
+  norm_list (el₁ ++ el₂).
+Proof.
+intros.
+revert el₂ e.
+induction el₁ as [| e₁]; intros.
+ do 2 rewrite app_nil_l.
+ apply norm_list_cancel.
+
+ simpl; rewrite IHel₁; reflexivity.
+Qed.
+
+(*
 Theorem norm_list_cancel_start : ∀ el t d,
   norm_list (E t d :: E t (negb d) :: el) = norm_list el.
 Proof.
@@ -336,6 +383,7 @@ induction el₁ as [| e₁]; intros.
 
  simpl; rewrite IHel₁; reflexivity.
 Qed.
+*)
 
 Theorem is_normal : ∀ el₁ el₂ el₃,
   norm_list (el₁ ++ norm_list el₂ ++ el₃) =
@@ -359,7 +407,7 @@ destruct el as [| e].
   do 2 rewrite app_assoc.
   rewrite <- IHel₂.
   do 2 rewrite <- app_assoc; simpl.
-  rewrite norm_list_cancel_inside.
+  rewrite norm_list_cancel_in.
   reflexivity.
 
   rewrite cons_comm_app.
@@ -1453,7 +1501,7 @@ Proof.
 induction el as [| e]; [ reflexivity | ].
 rewrite rev_path_cons, <- app_assoc.
 destruct e as (t, d); simpl.
-destruct d; rewrite norm_list_cancel_inside; assumption.
+destruct d; rewrite norm_list_cancel_in; assumption.
 Qed.
 
 Theorem norm_app_path_rev_path : ∀ el, norm_list (el ++ rev_path el) = [].
@@ -1576,124 +1624,37 @@ Qed.
 Theorem rev_path_norm_list : ∀ el,
   rev_path (norm_list el) = norm_list (rev_path el).
 Proof.
-(*
 intros el.
-induction el as [| e] using rev_ind; [ reflexivity | ].
-rewrite rev_path_app, rev_path_single; simpl.
-rewrite <- IHel.
-remember (rev_path (norm_list el)) as el₁ eqn:Hel₁.
-symmetry in Hel₁, IHel.
-destruct el₁ as [| e₁].
- apply rev_path_is_nil in Hel₁.
- pose proof is_normal [] el [e] as H; simpl in H.
- simpl in H; rewrite Hel₁ in H; simpl in H.
- rewrite <- H; reflexivity.
+remember (length el) as len eqn:Hlen.
+symmetry in Hlen.
+revert el Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len.
+ apply length_zero_iff_nil in Hlen; subst el; reflexivity.
 
- destruct (letter_opp_dec (negf e) e₁) as [H₁| H₁].
-  destruct e as (t, d).
-  destruct e₁ as (t₁, d₁).
-  apply letter_opp_iff in H₁.
-  rewrite Bool.negb_involutive in H₁.
-  destruct H₁; subst t₁ d₁.
-bbb.
-*)
-intros el.
-destruct (norm_dec el) as [H₁| H₁].
- rewrite H₁.
- symmetry; apply norm_list_rev_path; assumption.
-
- destruct H₁ as (el₁, (e, (el₂, H₁))).
- generalize H₁; intros H₂.
- apply split_at_cancel_some in H₂.
- subst el.
-Check norm_list_cancel_inside.
-rewrite rev_path_app.
-rewrite rev_path_cons, rev_path_single.
-rewrite rev_path_cons, rev_path_single.
-rewrite negf_involutive; simpl.
-do 2 rewrite <- app_assoc; simpl.
-destruct e as (t, d); simpl.
-do 2 rewrite norm_list_cancel_inside.
-bbb.
-
- destruct el as [| e₁]; [ reflexivity | ].
- destruct (letter_opp_dec e e₁) as [H₂| H₂].
-  destruct e as (t, d).
-  destruct e₁ as (t₁, d₁).
-  apply letter_opp_iff in H₂.
-  destruct H₂; subst t₁ d₁.
+ destruct (norm_dec el) as [H₁| H₁].
   generalize H₁; intros H₂.
-  apply norm_list_cons in H₂.
-  do 2 rewrite rev_path_cons, rev_path_single; simpl.
-  rewrite <- app_assoc, Bool.negb_involutive; simpl.
-  rewrite norm_list_cancel_inside, app_nil_r.
-  rewrite rev_path_cons, rev_path_single in IHel; simpl in IHel.
-  rewrite Bool.negb_involutive in IHel.
-  symmetry in IHel.
-  apply norm_list_app_diag in IHel.
-  symmetry; assumption.
+  apply norm_list_rev_path in H₂.
+  rewrite H₁, H₂.
+  reflexivity.
 
-bbb.
-(*
-intros el.
-destruct (norm_list_dec el) as [H₁| H₁].
- rewrite H₁.
- symmetry; apply norm_list_rev_path; assumption.
+  destruct H₁ as (el₁, (e, (el₂, Hs))).
+  generalize Hs; intros H.
+  apply split_at_cancel_some in H.
+  rewrite H, norm_list_cancel_in.
+  rewrite rev_path_app, rev_path_cons, rev_path_cons.
+  do 2 rewrite rev_path_single.
+  do 2 rewrite <- app_assoc; simpl.
+  rewrite negf_involutive.
+  rewrite norm_list_cancel_in.
+  rewrite <- rev_path_app.
+  apply IHlen with (m := length (el₁ ++ el₂)); [ | reflexivity ].
+  rewrite <- Hlen, H; simpl.
+  do 2 rewrite app_length; simpl.
+  apply Nat.add_lt_mono_l.
+  etransitivity; eapply Nat.lt_succ_diag_r.
+Qed.
 
- destruct H₁ as (el₁, (t, (d, (el₂, H₁)))).
- rewrite H₁.
- rewrite norm_list_cancel_inside.
- rewrite rev_path_app.
- do 2 rewrite rev_path_cons, rev_path_single; simpl.
- rewrite Bool.negb_involutive.
- do 2 rewrite <- app_assoc; simpl.
- rewrite norm_list_cancel_inside.
- rewrite <- rev_path_app.
-bbb.
-  H₁ : el = el₁ ++ E t d :: E t (negb d) :: el₂
-  ============================
-  rev_path (norm_list (el₁ ++ el₂)) = norm_list (rev_path (el₁ ++ el₂))
-*)
-induction el as [| e]; [ reflexivity | simpl ].
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁].
- pose proof is_normal [] (rev_path el) (rev_path [e]).
- rewrite <- IHel in H; simpl in H.
- rewrite rev_path_single, H.
- rewrite <- rev_path_cons; reflexivity.
-
- destruct (letter_opp_dec e e₁) as [H₁| H₁].
-  destruct e as (t, d).
-  destruct e₁ as (t₁, d₁).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t₁ d₁.
-  rewrite rev_path_cons, rev_path_single; simpl.
-
-  rewrite rev_path_cons in IHel.
-Focus 2.
-  rewrite rev_path_cons, IHel.
-  symmetry; rewrite rev_path_cons.
-  rewrite rev_path_single.
-bbb.
-
-(**)
-destruct el as [| e₂]; [ discriminate Hel₁ | ].
-simpl in Hel₁.
-remember (norm_list el) as el₂ eqn:Hel₂.
-symmetry in Hel₂.
-destruct el₂ as [| e₃].
-injection Hel₁; clear Hel₁; intros; subst e₂ el₁.
-
-destruct (list_nil_app_dec el) as [H₁| (e₂, (el₂, H₁))]; subst el.
- discriminate Hel₁.
-
-bbb.
-  rewrite rev_path_cons, rev_path_single in IHel; simpl in IHel.
-  rewrite Bool.negb_involutive in IHel.
-  apply app_inv_tail with (l := [E t d]).
-  rewrite IHel.
-  (* merde c'est faux *)
 bbb.
 
 Theorem all_points_in_orbit_1_0_0_are_different :
