@@ -704,68 +704,6 @@ Proof. intros; apply decomposed_2. Qed.
 Theorem decomposed_2_b : ∀ s, s ∈ ḅ Ṣ(ḅ⁻¹) ⊕ s ∈ Ṣ(ḅ) .
 Proof. intros; apply decomposed_2. Qed.
 
-Fixpoint split_at_cancel el :=
-  match el with
-  | [] => None
-  | [e₁] => None
-  | e₁ :: (e₂ :: el₂) as el₁ =>
-      if letter_opp_dec e₁ e₂ then Some ([], e₁, el₂)
-      else
-       match split_at_cancel el₁ with
-       | Some (el₃, e₃, el₄) => Some (e₁ :: el₃, e₃, el₄)
-       | None => None
-       end
-  end.
-
-Theorem norm_dec : ∀ el,
-  { norm_list el = el } +
-  { ∃ el₁ e el₂, split_at_cancel el = Some (el₁, e, el₂) }.
-Proof.
-intros el.
-induction el as [| e]; [ left; reflexivity | ].
-destruct IHel as [H₁| H₁].
- simpl; rewrite H₁.
- destruct el as [| e₁]; [ left; reflexivity | ].
- simpl in H₁.
- destruct (letter_opp_dec e e₁) as [H₂| H₂]; [ | left; reflexivity ].
- right; exists [], e, el; reflexivity.
-
- right.
- destruct H₁ as (el₁, (e₁, (el₂, Hs))); simpl.
- destruct el as [| e₂]; [ discriminate Hs | ].
- destruct (letter_opp_dec e e₂) as [H₁| H₁].
-  exists [], e, el; reflexivity.
-
-  rewrite Hs.
-  exists (e :: el₁), e₁, el₂; reflexivity.
-Qed.
-
-Theorem split_at_cancel_some : ∀ el el₁ el₂ e,
-  split_at_cancel el = Some (el₁, e, el₂)
-  → el = el₁ ++ e :: negf e :: el₂.
-Proof.
-intros el el₁ el₂ e Hs.
-revert e el₁ el₂ Hs.
-induction el as [| e₁]; intros; [ discriminate Hs | ].
-simpl in Hs.
-destruct el as [| e₂]; [ discriminate Hs | ].
-destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
- injection Hs; clear Hs; intros; subst e el₁ el₂; simpl.
- f_equal; f_equal.
- destruct e₁ as (t₁, d₁).
- destruct e₂ as (t₂, d₂).
- apply letter_opp_iff in H₁.
- destruct H₁; subst t₂ d₂.
- reflexivity.
-
- remember (split_at_cancel (e₂ :: el)) as u eqn:Hu.
- symmetry in Hu.
- destruct u as [((el₃, e₃), el₄)| ]; [ | discriminate Hs ].
- injection Hs; clear Hs; intros; subst el₁ e₃ el₄; simpl.
- f_equal.
- apply IHel; reflexivity.
-Qed.
-
 End Free_Group.
 
 (* Step 2 *)
@@ -1522,6 +1460,22 @@ destruct t, d; simpl.
  rewrite rot_rot_inv_z; reflexivity.
 Qed.
 
+Theorem rotate_neg_rotate : ∀ e p, rotate (negf e) (rotate e p) = p.
+Proof.
+intros (t, d) p; simpl.
+destruct t, d; simpl.
+ rewrite rot_rot_inv_x; reflexivity.
+ rewrite rot_inv_rot_x; reflexivity.
+ rewrite rot_rot_inv_z; reflexivity.
+ rewrite rot_inv_rot_z; reflexivity.
+Qed.
+
+Theorem rev_path_nil : rev_path [] = [].
+Proof. reflexivity. Qed.
+
+Theorem rev_path_single : ∀ e, rev_path [e] = [negf e].
+Proof. intros e; reflexivity. Qed.
+
 Theorem app_rev_path_path : ∀ p el,
   fold_right rotate p (el ++ rev_path el) = p.
 Proof.
@@ -1530,6 +1484,17 @@ revert p.
 induction el as [| e]; intros; [ reflexivity | simpl ].
 rewrite rev_path_cons, app_assoc, fold_right_app.
 rewrite IHel; apply rotate_rotate_neg.
+Qed.
+
+Theorem app_path_rev_path : ∀ p el,
+  fold_right rotate p (rev_path el ++ el) = p.
+Proof.
+intros.
+revert p.
+induction el as [| e] using rev_ind; intros; [ reflexivity | simpl ].
+rewrite rev_path_app; simpl.
+rewrite app_assoc, fold_right_app; simpl.
+rewrite IHel; apply rotate_neg_rotate.
 Qed.
 
 Theorem norm_list_dec : ∀ el,
@@ -1555,12 +1520,6 @@ destruct IHel as [IHel| IHel].
  exists (e :: el₁), t, d, el₂; subst el.
  reflexivity.
 Qed.
-
-Theorem rev_path_nil : rev_path [] = [].
-Proof. reflexivity. Qed.
-
-Theorem rev_path_single : ∀ e, rev_path [e] = [negf e].
-Proof. intros e; reflexivity. Qed.
 
 Theorem rev_path_is_nil : ∀ el, rev_path el = [] → el = [].
 Proof.
@@ -1632,20 +1591,19 @@ induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct len.
  apply length_zero_iff_nil in Hlen; subst el; reflexivity.
 
- destruct (norm_dec el) as [H₁| H₁].
+ destruct (norm_list_dec el) as [H₁| H₁].
   generalize H₁; intros H₂.
   apply norm_list_rev_path in H₂.
   rewrite H₁, H₂.
   reflexivity.
 
-  destruct H₁ as (el₁, (e, (el₂, Hs))).
+  destruct H₁ as (el₁, (t, (d, (el₂, Hs)))).
   generalize Hs; intros H.
-  apply split_at_cancel_some in H.
   rewrite H, norm_list_cancel_in.
   rewrite rev_path_app, rev_path_cons, rev_path_cons.
   do 2 rewrite rev_path_single.
   do 2 rewrite <- app_assoc; simpl.
-  rewrite negf_involutive.
+  rewrite Bool.negb_involutive.
   rewrite norm_list_cancel_in.
   rewrite <- rev_path_app.
   apply IHlen with (m := length (el₁ ++ el₂)); [ | reflexivity ].
@@ -1655,14 +1613,12 @@ destruct len.
   etransitivity; eapply Nat.lt_succ_diag_r.
 Qed.
 
-bbb.
-
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
-  fold_left rotate el₁ (P 1 0 0) = p₁
-  → fold_left rotate el₂ (P 1 0 0) = p₂
-  → el₁ = E lb d₁ :: el'₁
-  → el₂ = E lb d₂ :: el'₂
+  fold_right rotate (P 1 0 0) el₁ = p₁
+  → fold_right rotate (P 1 0 0) el₂ = p₂
+  → el₁ = el'₁ ++ [E lb d₁]
+  → el₂ = el'₂ ++ [E lb d₂]
   → norm_list el₁ = el₁
   → norm_list el₂ = el₂
   → el₁ ≠ el₂
@@ -1670,14 +1626,18 @@ Theorem all_points_in_orbit_1_0_0_are_different :
 Proof.
 intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
 move Hp at top; subst p₂; rename p₁ into p.
-assert (H : fold_left rotate (el₁ ++ rev_path el₂) (P 1 0 0) = P 1 0 0).
- rewrite fold_left_app, Hp₁, <- Hp₂.
- rewrite <- fold_left_app, app_rev_path_path; reflexivity.
+assert (H : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
+ rewrite fold_right_app, Hp₁, <- Hp₂.
+ rewrite <- fold_right_app.
+ rewrite app_path_rev_path; reflexivity.
 
- destruct (norm_list_dec (el₁ ++ rev_path el₂)) as [H₁| H₁].
+ destruct (norm_list_dec (rev_path el₂ ++ el₁)) as [H₁| H₁].
   revert H; rewrite Hel₁.
   eapply rotate_1_0_0_is_diff; [ rewrite <- app_comm_cons; f_equal | ].
-  rewrite <- Hel₁; assumption.
+  rewrite <- Hel₁.
+bbb.
+
+; assumption.
 
   destruct H₁ as (el₃, (t, (d, (el₄, H₁)))).
 clear H Hp₁ Hel₁.
