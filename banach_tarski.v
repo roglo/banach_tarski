@@ -1639,6 +1639,7 @@ assert (H : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
   pose proof rotate_1_0_0_is_diff el₃ el₄ d₁ Hel₃ H₁ as H₂.
   apply H₂.
 
+  destruct H₁ as (el₃, (t, (d, (el₄, Hs)))).
 bbb.
 rewrite <- app_assoc, <- Hel₁ in Hel₃.
 bbb.
