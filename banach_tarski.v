@@ -58,6 +58,8 @@ Notation "'ạ⁻¹'" := (E la true).
 Notation "'ḅ'" := (E lb false).
 Notation "'ḅ⁻¹'" := (E lb true).
 
+Definition negf '(E t d) := E t (negb d).
+
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
 intros.
@@ -137,6 +139,57 @@ Fixpoint norm_list el :=
   end.
 
 Definition norm s := mkF₂ (norm_list (str s)).
+
+Theorem norm_list_no_consec : ∀ e el el₁ el₂,
+  norm_list el ≠ el₁ ++ e :: negf e :: el₂.
+Proof.
+intros e el el₁ el₂.
+revert el₁.
+induction el as [| e₁]; intros; [ intros H; destruct el₁; discriminate H | ].
+simpl; remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
+destruct nl as [| e₂].
+ clear; intros H.
+ destruct el₁ as [| e₂]; intros; [ discriminate H | simpl in H ].
+ injection H; clear H; intros; subst e₂.
+ destruct el₁; discriminate H.
+
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  intros H; subst nl.
+bbb.
+
+  pose proof IHel (e₂ :: el₁) as H₂; simpl in H₂.
+  intros H; apply H₂; f_equal; apply H.
+
+  unfold letter_opp in H₁.
+  destruct e₁ as (x₁, d₁).
+  destruct e₂ as (x₂, d₂).
+  destruct (letter_dec x₁ x₂) as [H₂| H₂].
+   subst x₂.
+   destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂].
+    clear H₁; subst d₂.
+    destruct el₁ as [| e₁].
+     simpl; intros H.
+     injection H; clear H; intros.
+bbb.
+     injection H; clear H; intros H₁ H₂ H₃ H₄ H₅.
+     subst d₁; destruct d; discriminate H₄.
+
+     simpl; intros H.
+     injection H; clear H; intros H₁ H₂; subst e₁.
+     eapply IHel, H₁.
+
+    exfalso; apply H₁; constructor.
+
+   clear H₁.
+   destruct el₁ as [| e₁].
+    simpl; intros H.
+    injection H; clear H; intros H₁ H₃ H₄ H₅ H₆.
+    subst x₁ x₂; apply H₂; reflexivity.
+
+    simpl; intros H.
+    injection H; clear H; intros H₁ H₃.
+    eapply IHel, H₁.
+Qed.
 
 Theorem norm_list_impossible_consecutive : ∀ x d el el₁ el₂,
   norm_list el ≠ el₁ ++ E x d :: E x (negb d) :: el₂.
@@ -608,6 +661,32 @@ destruct IHel as [H₁| H₁].
   exists (e :: el₁), e₁, el₂; reflexivity.
 Qed.
 
+Theorem split_at_cancel_some : ∀ el el₁ el₂ e,
+  split_at_cancel el = Some (el₁, e, el₂)
+  → el = el₁ ++ e :: negf e :: el₂.
+Proof.
+intros el el₁ el₂ e Hs.
+revert e el₁ el₂ Hs.
+induction el as [| e₁]; intros; [ discriminate Hs | ].
+simpl in Hs.
+destruct el as [| e₂]; [ discriminate Hs | ].
+destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+ injection Hs; clear Hs; intros; subst e el₁ el₂; simpl.
+ f_equal; f_equal.
+ destruct e₁ as (t₁, d₁).
+ destruct e₂ as (t₂, d₂).
+ apply letter_opp_iff in H₁.
+ destruct H₁; subst t₂ d₂.
+ reflexivity.
+
+ remember (split_at_cancel (e₂ :: el)) as u eqn:Hu.
+ symmetry in Hu.
+ destruct u as [((el₃, e₃), el₄)| ]; [ | discriminate Hs ].
+ injection Hs; clear Hs; intros; subst el₁ e₃ el₄; simpl.
+ f_equal.
+ apply IHel; reflexivity.
+Qed.
+
 End Free_Group.
 
 (* Step 2 *)
@@ -691,9 +770,7 @@ Definition rotate e pt :=
   | ḅ⁻¹ => mat_vec_mul rot_inv_z pt
   end.
 
-Definition neg_rot '(E t d) := E t (negb d).
-
-Definition rev_path el := map neg_rot (rev el).
+Definition rev_path el := map negf (rev el).
 
 Definition rotate_param e '(a, b, c, N) :=
   match e with
@@ -703,7 +780,7 @@ Definition rotate_param e '(a, b, c, N) :=
   | ḅ⁻¹ => ((a + 4 * b)%Z, (b - 2 * a)%Z, (3 * c)%Z, S N)
   end.
 
-Theorem neg_rot_eq_eq : ∀ e₁ e₂, neg_rot e₁ = neg_rot e₂ → e₁ = e₂.
+Theorem negf_eq_eq : ∀ e₁ e₂, negf e₁ = negf e₂ → e₁ = e₂.
 Proof.
 intros e₁ e₂ Hn.
 destruct e₁ as (t₁, d₁).
@@ -1356,7 +1433,7 @@ replace el with (rev_path (rev_path el)) by apply rev_path_involutive.
 subst rp; apply norm_app_rev_path_path.
 Qed.
 
-Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (neg_rot e) p) = p.
+Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.
 Proof.
 intros (t, d) p; simpl.
 destruct t, d; simpl.
@@ -1403,7 +1480,7 @@ Qed.
 Theorem rev_path_nil : rev_path [] = [].
 Proof. reflexivity. Qed.
 
-Theorem rev_path_single : ∀ e, rev_path [e] = [neg_rot e].
+Theorem rev_path_single : ∀ e, rev_path [e] = [negf e].
 Proof. intros e; reflexivity. Qed.
 
 Theorem rev_path_is_nil : ∀ el, rev_path el = [] → el = [].
@@ -1433,7 +1510,7 @@ induction el₁ as [| e₁]; intros.
   apply app_inj_tail in Hr.
   destruct Hr as (Hr, Hn).
   apply IHel₁ in Hr.
-  apply neg_rot_eq_eq in Hn.
+  apply negf_eq_eq in Hn.
   subst el₁ e₁; reflexivity.
 Qed.
 
@@ -1449,7 +1526,7 @@ rewrite IHel; [ | assumption ].
 remember (rev_path el) as el₁ eqn:Hel₁.
 symmetry in Hel₁.
 destruct el₁ as [| e₁]; [ reflexivity | ].
-destruct (letter_opp_dec (neg_rot e) e₁) as [H₁| H₁]; [ | reflexivity ].
+destruct (letter_opp_dec (negf e) e₁) as [H₁| H₁]; [ | reflexivity ].
 exfalso.
 destruct e as (t, d).
 destruct e₁ as (t₁, d₁).
@@ -1481,7 +1558,7 @@ destruct el₁ as [| e₁].
  simpl in H; rewrite Hel₁ in H; simpl in H.
  rewrite <- H; reflexivity.
 
- destruct (letter_opp_dec (neg_rot e) e₁) as [H₁| H₁].
+ destruct (letter_opp_dec (negf e) e₁) as [H₁| H₁].
   destruct e as (t, d).
   destruct e₁ as (t₁, d₁).
   apply letter_opp_iff in H₁.
@@ -1495,15 +1572,10 @@ destruct (norm_dec el) as [H₁| H₁].
  symmetry; apply norm_list_rev_path; assumption.
 
  destruct H₁ as (el₁, (e, (el₂, H₁))).
-Theorem split_at_cancel_some : ∀ el el₁ el₂ e,
-  split_at_cancel el = Some (el₁, e, el₂)
-  → el = el₁ ++ e :: neg_rot e :: el₂.
-Proof.
-intros el el₁ el₂ e Hs.
-revert e el₁ el₂ Hs.
-induction el as [| e₁]; intros; [ discriminate Hs | ].
-simpl in Hs.
-destruct el as [| e₂]; [ discriminate Hs | ].
+ generalize H₁; intros H₂.
+ apply split_at_cancel_some in H₂.
+ subst el.
+Check norm_list_impossible_consecutive.
 
 bbb.
 
@@ -1735,7 +1807,7 @@ Theorem same_orbit_sym : symmetric _ same_orbit.
 Proof.
 intros p₁ p₂ (el, H); simpl in H.
 unfold same_orbit; simpl.
-exists (rev (map neg_rot el)).
+exists (rev (map negf el)).
 revert p₁ p₂ H.
 induction el as [| e]; intros; [ symmetry; assumption | simpl in H; simpl ].
 rewrite fold_left_app; simpl.
