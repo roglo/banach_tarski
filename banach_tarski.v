@@ -197,6 +197,14 @@ destruct nl as [| e₂].
     eapply IHel, H₁.
 Qed.
 
+Theorem norm_list_no_consec2 : ∀ e el el₁ el₂,
+  norm_list el ≠ el₁ ++ negf e :: e :: el₂.
+Proof.
+intros e el el₁ el₂.
+pose proof norm_list_no_consec (negf e) el el₁ el₂ as H.
+rewrite negf_involutive in H; assumption.
+Qed.
+
 Theorem norm_list_no_start : ∀ e el el₂,
   norm_list el ≠ e :: negf e :: el₂.
 Proof.
@@ -208,8 +216,7 @@ Theorem norm_list_no_start2 : ∀ e el el₂,
   norm_list el ≠ negf e :: e :: el₂.
 Proof.
 intros e el el₂.
-pose proof norm_list_no_start (negf e) el el₂ as H.
-rewrite negf_involutive in H; assumption.
+apply norm_list_no_consec2 with (el₁ := []).
 Qed.
 
 (*
@@ -1563,8 +1570,7 @@ apply rev_path_eq_eq in Hel₁.
 rewrite Hel₁ in Hel.
 rewrite <- app_assoc in Hel; simpl in Hel.
 revert Hel.
-bbb.
-apply norm_list_impossible_consecutive2.
+apply norm_list_no_consec2 with (e := E t d).
 Qed.
 
 Theorem rev_path_norm_list : ∀ el,
@@ -1600,8 +1606,14 @@ destruct (norm_dec el) as [H₁| H₁].
  generalize H₁; intros H₂.
  apply split_at_cancel_some in H₂.
  subst el.
-Check norm_list_impossible_consecutive.
-
+Check norm_list_cancel_inside.
+rewrite rev_path_app.
+rewrite rev_path_cons, rev_path_single.
+rewrite rev_path_cons, rev_path_single.
+rewrite negf_involutive; simpl.
+do 2 rewrite <- app_assoc; simpl.
+destruct e as (t, d); simpl.
+do 2 rewrite norm_list_cancel_inside.
 bbb.
 
  destruct el as [| e₁]; [ reflexivity | ].
