@@ -1679,6 +1679,42 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    apply Nat.succ_inj in Hlen.
    rewrite <- length_rev_path in Hlen.
    rewrite <- app_length in Hlen.
+rewrite Hel₁, Hel₂ in Hs.
+rewrite rev_path_app, rev_path_single in Hs.
+rewrite <- app_assoc in Hs; simpl in Hs.
+destruct el₃ as [| e₃].
+ simpl in Hs.
+ injection Hs; clear Hs; intros Hs H₁ H₂; subst t d.
+ simpl in Hlen, Hp.
+ rewrite Bool.negb_involutive in Hs.
+ destruct el₄ as [| e₄].
+  destruct el'₁ as [| e'₁].
+   destruct el'₂ as [| e'₂].
+    simpl in Hs.
+    injection Hs; clear Hs; intros; subst d₂.
+    apply Hd; subst el₁ el₂; reflexivity.
+
+    rewrite rev_path_cons, rev_path_single in Hs; simpl in Hs.
+    destruct (rev_path el'₂); [ discriminate Hs | ].
+    destruct l; discriminate Hs.
+
+   destruct (rev_path el'₂); [ destruct el'₁; discriminate Hs | ].
+   destruct l; discriminate Hs.
+
+  rewrite <- Hel₁ in Hs.
+  destruct el'₂ as [| e'₂].
+   simpl in Hs.
+   destruct el'₁ as [| e'₁]; [ rewrite Hel₁ in Hs; discriminate Hs | ].
+   rewrite Hel₁ in Hs; simpl in Hs.
+   injection Hs; clear Hs; intros Hs H₁; subst e'₁.
+   rewrite <- Hs in Hp.
+   revert Hp.
+   eapply rotate_1_0_0_is_diff; [ reflexivity | ].
+   rewrite Hel₁ in Hn₁.
+   apply norm_list_app_diag in Hn₁.
+bbb.
+SearchAbout (norm_list (rev_path _)).
+   apply norm_list_rev_path in Hn₁.
 bbb.
 intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
 move Hp at top; subst p₂; rename p₁ into p.
