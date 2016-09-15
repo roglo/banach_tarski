@@ -1613,6 +1613,15 @@ destruct len.
   etransitivity; eapply Nat.lt_succ_diag_r.
 Qed.
 
+Theorem rotate_simpl : ∀ el₁ el₂ e p,
+  fold_right rotate p (el₁ ++ e :: negf e :: el₂) =
+  fold_right rotate p (el₁ ++ el₂).
+Proof.
+intros.
+do 2 rewrite fold_right_app; simpl.
+rewrite rotate_rotate_neg; reflexivity.
+Qed.
+
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_right rotate (P 1 0 0) el₁ = p₁
@@ -1640,6 +1649,10 @@ assert (H : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
   apply H₂.
 
   destruct H₁ as (el₃, (t, (d, (el₄, Hs)))).
+  rewrite Hs, rotate_simpl in H.
+bbb.
+
+SearchAbout (fold_right rotate).
 bbb.
 rewrite <- app_assoc, <- Hel₁ in Hel₃.
 bbb.
