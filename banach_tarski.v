@@ -140,6 +140,12 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
+Theorem negf_involutive : ∀ e, negf (negf e) = e.
+Proof.
+intros (t, d); simpl.
+rewrite Bool.negb_involutive; reflexivity.
+Qed.
+
 Theorem norm_list_no_consec : ∀ e el el₁ el₂,
   norm_list el ≠ el₁ ++ e :: negf e :: el₂.
 Proof.
@@ -155,10 +161,8 @@ destruct nl as [| e₂].
 
  destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
   intros H; subst nl.
-bbb.
-
   pose proof IHel (e₂ :: el₁) as H₂; simpl in H₂.
-  intros H; apply H₂; f_equal; apply H.
+  apply H₂; reflexivity.
 
   unfold letter_opp in H₁.
   destruct e₁ as (x₁, d₁).
@@ -169,10 +173,10 @@ bbb.
     clear H₁; subst d₂.
     destruct el₁ as [| e₁].
      simpl; intros H.
-     injection H; clear H; intros.
-bbb.
-     injection H; clear H; intros H₁ H₂ H₃ H₄ H₅.
-     subst d₁; destruct d; discriminate H₄.
+     injection H; clear H; intros H₁ H₂ H₃; subst e.
+     simpl in H₂.
+     injection H₂; clear H₂; intros H.
+     symmetry in H; revert H; apply Bool.no_fixpoint_negb.
 
      simpl; intros H.
      injection H; clear H; intros H₁ H₂; subst e₁.
@@ -183,14 +187,32 @@ bbb.
    clear H₁.
    destruct el₁ as [| e₁].
     simpl; intros H.
-    injection H; clear H; intros H₁ H₃ H₄ H₅ H₆.
-    subst x₁ x₂; apply H₂; reflexivity.
+    injection H; clear H; intros H₁ H₃ H₄; subst e.
+    simpl in H₃.
+    injection H₃; clear H₃; intros; subst x₂ d₂.
+    apply H₂; reflexivity.
 
     simpl; intros H.
     injection H; clear H; intros H₁ H₃.
     eapply IHel, H₁.
 Qed.
 
+Theorem norm_list_no_start : ∀ e el el₂,
+  norm_list el ≠ e :: negf e :: el₂.
+Proof.
+intros e el el₂.
+apply norm_list_no_consec with (el₁ := []).
+Qed.
+
+Theorem norm_list_no_start2 : ∀ e el el₂,
+  norm_list el ≠ negf e :: e :: el₂.
+Proof.
+intros e el el₂.
+pose proof norm_list_no_start (negf e) el el₂ as H.
+rewrite negf_involutive in H; assumption.
+Qed.
+
+(*
 Theorem norm_list_impossible_consecutive : ∀ x d el el₁ el₂,
   norm_list el ≠ el₁ ++ E x d :: E x (negb d) :: el₂.
 Proof.
@@ -259,6 +281,7 @@ Proof.
 intros.
 apply (norm_list_impossible_consecutive2 x d el nil el').
 Qed.
+*)
 
 Theorem norm_list_cancel_start : ∀ el t d,
   norm_list (E t d :: E t (negb d) :: el) = norm_list el.
@@ -289,7 +312,7 @@ induction el as [| (t₁, d₁)]; intros.
     subst t₂.
     destruct (Bool.bool_dec d d₂) as [H₁| H₁]; [ reflexivity | ].
     apply not_eq_sym, neq_negb in H₁; subst d₂.
-    exfalso; revert Hel₂; apply norm_list_impossible_start.
+    exfalso; revert Hel₂; apply norm_list_no_start.
 
    rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
 Qed.
@@ -366,7 +389,8 @@ destruct el₂ as [| e₂].
   destruct e₂ as (t₂, d₂).
   apply letter_opp_iff in H₁.
   destruct H₁; subst t₂ d₂.
-  exfalso; revert Hel₁; apply norm_list_impossible_start2.
+  pose proof norm_list_no_start2 (E t d) (e₁ :: el) (e₁ :: el) as H.
+  contradiction.
 
   injection Hn; clear Hn; intros; subst el₁.
   assumption.
@@ -489,7 +513,7 @@ destruct el' as [| e el'].
   destruct (letter_dec x x₁) as [H₂| H₂]; [ | contradiction ].
   destruct (Bool.bool_dec d d₁) as [H₃| H₃]; [ contradiction | clear H₁ ].
   apply not_eq_sym, neq_negb in H₃; subst x₁ d₁.
-  revert Hel'; apply norm_list_impossible_start.
+  revert Hel'; apply norm_list_no_start.
 
   destruct (letter_opp_dec xd xe) as [H₂| H₂]; [ reflexivity | exfalso ].
   subst xd xe.
@@ -540,7 +564,7 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
   destruct el as [| e]; [ contradiction | subst e ].
   destruct (letter_opp_dec ạ ạ⁻¹) as [H₁| H₁].
    destruct el as [| e]; [ contradiction | subst e ].
-   revert Hel; apply norm_list_impossible_start.
+   revert Hel; apply norm_list_no_start.
 
    apply H₁, letter_opp_inv.
 
@@ -580,7 +604,7 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
      destruct el as [| e]; [ contradiction | subst e ].
      destruct (letter_opp_dec ḅ ḅ⁻¹) as [H₁| H₁].
       destruct el as [| e]; [ contradiction | subst e ].
-      revert Hel; apply norm_list_impossible_start.
+      revert Hel; apply norm_list_no_start.
 
       apply H₁, letter_opp_inv.
 
@@ -1079,7 +1103,7 @@ destruct e₁ as (t₁, d₁).
 destruct e₂ as (t₂, d₂).
 apply letter_opp_iff in H₁.
 destruct H₁; subst t₂ d₂.
-revert Hn; apply norm_list_impossible_start.
+revert Hn; apply norm_list_no_start.
 Qed.
 
 Theorem rotate_prop : ∀ p t d el el₁ el₂ e a b c,
@@ -1107,17 +1131,17 @@ destruct el₂ as [| e₁].
  destruct Htp as [(Ht, Hq)| (Ht, Hq)]; subst t p.
   destruct d; injection Hp; intros; subst.
    destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-   revert Hn; apply norm_list_impossible_start.
+   revert Hn; apply norm_list_no_start.
 
    destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-   revert Hn; apply norm_list_impossible_start.
+   revert Hn; apply norm_list_no_start.
 
   destruct d; injection Hp; intros; subst.
    destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-   revert Hn; apply norm_list_impossible_start.
+   revert Hn; apply norm_list_no_start.
 
    destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-   revert Hn; apply norm_list_impossible_start.
+   revert Hn; apply norm_list_no_start.
 
  rewrite Hel₁ in Hel; simpl in Hel.
  generalize Hn; intros H₂.
@@ -1148,7 +1172,7 @@ destruct el₂ as [| e₁].
    apply Z.mod_mul; intros; discriminate.
 
    exfalso; revert Hn; rewrite Hel.
-   apply norm_list_impossible_start.
+   apply norm_list_no_start.
 
    rewrite Z.mul_assoc, Z.mul_shuffle0.
    unfold Z.sub; rewrite Zopp_mult_distr_l.
@@ -1160,7 +1184,7 @@ destruct el₂ as [| e₁].
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
   destruct e as (t₂, d₂); destruct t₂, d₂.
    exfalso; revert Hn; rewrite Hel.
-   apply norm_list_impossible_start.
+   apply norm_list_no_start.
 
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
    remember (b' - 2 * c' - 2 * (4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
@@ -1201,7 +1225,7 @@ destruct el₂ as [| e₁].
    apply Z.mod_mul; intros; discriminate.
 
    exfalso; revert Hn; rewrite Hel.
-   apply norm_list_impossible_start.
+   apply norm_list_no_start.
 
   injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
   destruct e as (t₂, d₂); destruct t₂, d₂.
@@ -1213,7 +1237,7 @@ destruct el₂ as [| e₁].
    rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
 
    exfalso; revert Hn; rewrite Hel.
-   apply norm_list_impossible_start.
+   apply norm_list_no_start.
 
    rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
    remember (b' + 2 * a' + 2 * (a' - 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
@@ -1539,6 +1563,7 @@ apply rev_path_eq_eq in Hel₁.
 rewrite Hel₁ in Hel.
 rewrite <- app_assoc in Hel; simpl in Hel.
 revert Hel.
+bbb.
 apply norm_list_impossible_consecutive2.
 Qed.
 
