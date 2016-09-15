@@ -1433,6 +1433,25 @@ Theorem rev_path_norm_list : ∀ el,
   rev_path (norm_list el) = norm_list (rev_path el).
 Proof.
 intros el.
+induction el as [| e] using rev_ind; [ reflexivity | ].
+rewrite rev_path_app, rev_path_single; simpl.
+rewrite <- IHel.
+remember (rev_path (norm_list el)) as el₁ eqn:Hel₁.
+symmetry in Hel₁, IHel.
+destruct el₁ as [| e₁].
+ apply rev_path_is_nil in Hel₁.
+ pose proof is_normal [] el [e] as H; simpl in H.
+ simpl in H; rewrite Hel₁ in H; simpl in H.
+ rewrite <- H; reflexivity.
+
+ destruct (letter_opp_dec (neg_rot e) e₁) as [H₁| H₁].
+  destruct e as (t, d).
+  destruct e₁ as (t₁, d₁).
+  apply letter_opp_iff in H₁.
+  rewrite Bool.negb_involutive in H₁.
+  destruct H₁; subst t₁ d₁.
+bbb.
+(*
 destruct (norm_list_dec el) as [H₁| H₁].
  rewrite H₁.
  symmetry; apply norm_list_rev_path; assumption.
@@ -1446,8 +1465,11 @@ destruct (norm_list_dec el) as [H₁| H₁].
  do 2 rewrite <- app_assoc; simpl.
  rewrite norm_list_cancel_inside.
  rewrite <- rev_path_app.
-
 bbb.
+  H₁ : el = el₁ ++ E t d :: E t (negb d) :: el₂
+  ============================
+  rev_path (norm_list (el₁ ++ el₂)) = norm_list (rev_path (el₁ ++ el₂))
+*)
 induction el as [| e]; [ reflexivity | simpl ].
 remember (norm_list el) as el₁ eqn:Hel₁.
 symmetry in Hel₁.
@@ -1463,6 +1485,12 @@ destruct el₁ as [| e₁].
   apply letter_opp_iff in H₁.
   destruct H₁; subst t₁ d₁.
   rewrite rev_path_cons, rev_path_single; simpl.
+
+  rewrite rev_path_cons in IHel.
+Focus 2.
+  rewrite rev_path_cons, IHel.
+  symmetry; rewrite rev_path_cons.
+  rewrite rev_path_single.
 bbb.
 
 (**)
