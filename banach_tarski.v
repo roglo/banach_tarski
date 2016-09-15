@@ -1490,21 +1490,26 @@ destruct el₁ as [| e₁].
 bbb.
 *)
 intros el.
+induction el as [| e]; [ reflexivity | ].
+simpl.
 destruct (norm_dec el) as [H₁| H₁].
- rewrite H₁.
- symmetry; apply norm_list_rev_path; assumption.
-
- destruct H₁ as (el₁, (e, (el₂, H₁))).
- revert el₁ e el₂ H₁.
- induction el as [| e₁]; intros; [ reflexivity | ].
- simpl in H₁.
- destruct el as [| e₂]; [ discriminate H₁ | ].
- destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
-  injection H₁; clear H₁; intros; subst el₁ e el₂.
+ rewrite H₁; rewrite H₁ in IHel.
+ destruct el as [| e₁]; [ reflexivity | ].
+ destruct (letter_opp_dec e e₁) as [H₂| H₂].
+  destruct e as (t, d).
   destruct e₁ as (t₁, d₁).
-  destruct e₂ as (t₂, d₂).
   apply letter_opp_iff in H₂.
-  destruct H₂; subst t₂ d₂.
+  destruct H₂; subst t₁ d₁.
+  generalize H₁; intros H₂.
+  apply norm_list_cons in H₂.
+  do 2 rewrite rev_path_cons, rev_path_single; simpl.
+  rewrite <- app_assoc, Bool.negb_involutive; simpl.
+  rewrite norm_list_cancel_inside, app_nil_r.
+  rewrite rev_path_cons, rev_path_single in IHel; simpl in IHel.
+  rewrite Bool.negb_involutive in IHel.
+  symmetry in IHel.
+  apply norm_list_app_diag in IHel.
+  symmetry; assumption.
 
 bbb.
 (*
