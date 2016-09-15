@@ -1635,6 +1635,21 @@ Theorem all_points_in_orbit_1_0_0_are_different :
 Proof.
 intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
 move Hp at top; subst p₂; rename p₁ into p.
+remember (length el₁ + length el₂) as len eqn:Hlen.
+symmetry in Hlen.
+revert p el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len.
+ apply Nat.eq_add_0 in Hlen.
+ destruct Hlen as (Hl₁, Hl₂).
+ apply length_zero_iff_nil in Hl₁.
+ apply length_zero_iff_nil in Hl₂.
+ move Hl₁ at top; move Hl₂ at top; subst el₁ el₂.
+ destruct el'₁; discriminate Hel₁.
+
+bbb.
+intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
+move Hp at top; subst p₂; rename p₁ into p.
 assert (H : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
  rewrite fold_right_app, Hp₁, <- Hp₂.
  rewrite <- fold_right_app.
