@@ -572,6 +572,42 @@ Proof. intros; apply decomposed_2. Qed.
 Theorem decomposed_2_b : ∀ s, s ∈ ḅ Ṣ(ḅ⁻¹) ⊕ s ∈ Ṣ(ḅ) .
 Proof. intros; apply decomposed_2. Qed.
 
+Fixpoint split_at_cancel el :=
+  match el with
+  | [] => None
+  | [e₁] => None
+  | e₁ :: (e₂ :: el₂) as el₁ =>
+      if letter_opp_dec e₁ e₂ then Some ([], e₁, el₂)
+      else
+       match split_at_cancel el₁ with
+       | Some (el₃, e₃, el₄) => Some (e₁ :: el₃, e₃, el₄)
+       | None => None
+       end
+  end.
+
+Theorem norm_dec : ∀ el,
+  { norm_list el = el } +
+  { ∃ el₁ e el₂, split_at_cancel el = Some (el₁, e, el₂) }.
+Proof.
+intros el.
+induction el as [| e]; [ left; reflexivity | ].
+destruct IHel as [H₁| H₁].
+ simpl; rewrite H₁.
+ destruct el as [| e₁]; [ left; reflexivity | ].
+ simpl in H₁.
+ destruct (letter_opp_dec e e₁) as [H₂| H₂]; [ | left; reflexivity ].
+ right; exists [], e, el; reflexivity.
+
+ right.
+ destruct H₁ as (el₁, (e₁, (el₂, Hs))); simpl.
+ destruct el as [| e₂]; [ discriminate Hs | ].
+ destruct (letter_opp_dec e e₂) as [H₁| H₁].
+  exists [], e, el; reflexivity.
+
+  rewrite Hs.
+  exists (e :: el₁), e₁, el₂; reflexivity.
+Qed.
+
 End Free_Group.
 
 (* Step 2 *)
@@ -1432,6 +1468,7 @@ Qed.
 Theorem rev_path_norm_list : ∀ el,
   rev_path (norm_list el) = norm_list (rev_path el).
 Proof.
+(*
 intros el.
 induction el as [| e] using rev_ind; [ reflexivity | ].
 rewrite rev_path_app, rev_path_single; simpl.
@@ -1451,7 +1488,27 @@ destruct el₁ as [| e₁].
   rewrite Bool.negb_involutive in H₁.
   destruct H₁; subst t₁ d₁.
 bbb.
+*)
+intros el.
+destruct (norm_dec el) as [H₁| H₁].
+ rewrite H₁.
+ symmetry; apply norm_list_rev_path; assumption.
+
+ destruct H₁ as (el₁, (e, (el₂, H₁))).
+ revert el₁ e el₂ H₁.
+ induction el as [| e₁]; intros; [ reflexivity | ].
+ simpl in H₁.
+ destruct el as [| e₂]; [ discriminate H₁ | ].
+ destruct (letter_opp_dec e₁ e₂) as [H₂| H₂].
+  injection H₁; clear H₁; intros; subst el₁ e el₂.
+  destruct e₁ as (t₁, d₁).
+  destruct e₂ as (t₂, d₂).
+  apply letter_opp_iff in H₂.
+  destruct H₂; subst t₂ d₂.
+
+bbb.
 (*
+intros el.
 destruct (norm_list_dec el) as [H₁| H₁].
  rewrite H₁.
  symmetry; apply norm_list_rev_path; assumption.
