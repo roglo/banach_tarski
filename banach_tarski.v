@@ -1830,7 +1830,18 @@ destruct el'₁ as [| e'₁].
  apply negf_eq_eq in H₂; subst e; simpl in Ht.
  rewrite Bool.negb_involutive in Ht.
  rewrite negf_involutive in Hd, Hs₂.
+ clear Hn₁.
+ rewrite app_nil_r in Hlen, Hp.
+ destruct el₄ as [| (t₄, d₄)].
+  rewrite rev_path_nil in Hs₂.
+  apply Hd; symmetry; assumption.
 
+  rewrite rev_path_cons, rev_path_single in Hs₂; simpl in Hs₂.
+  rewrite Hel₂, app_comm_cons in Hs₂.
+  apply app_inj_tail in Hs₂.
+  destruct Hs₂ as (Hs₂, Hs₃).
+  injection Hs₃; clear Hs₃; intros; subst t₄ d₂ el'₂.
+  clear Hd.
 bbb.
 
 pose proof IHlen len Hm el₁ (rev_path el₄).
