@@ -1761,6 +1761,7 @@ Theorem glop {A} : ∀ el₁ el₂ el₃ el₄ : list A,
     { ∃ el, el₁ = el₃ ++ el ∧ el₄ = el ++ el₂ }.
 Proof.
 intros el₁ el₂ el₃ el₄ Hel.
+destruct (lt_dec (length el₁) (length el₃)) as [H₁| H₁]; [ left | right ].
 
 bbb.
 
