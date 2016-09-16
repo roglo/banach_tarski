@@ -1692,6 +1692,32 @@ rewrite rev_path_cons, app_length; simpl.
 rewrite IHel, Nat.add_1_r; reflexivity.
 Qed.
 
+Theorem split_app_eq {A} : ∀ el₁ el₂ el₃ el₄ : list A,
+  el₁ ++ el₂ = el₃ ++ el₄
+  → { ∃ el, el₃ = el₁ ++ el ∧ el₂ = el ++ el₄ } +
+    { ∃ el, el₁ = el₃ ++ el ∧ el₄ = el ++ el₂ }.
+Proof.
+intros el₁ el₂ el₃ el₄ Hel.
+revert el₂ el₃ el₄ Hel.
+induction el₁ as [| e₁]; intros.
+ left; exists el₃.
+ split; [ reflexivity | assumption ].
+
+ destruct el₃ as [| e₃].
+  right; exists (e₁ :: el₁).
+  split; [ reflexivity | symmetry; assumption ].
+
+  simpl in Hel.
+  injection Hel; clear Hel; intros; subst e₃.
+  apply IHel₁ in H.
+  destruct H as [H| H].
+   left; destruct H as (el, (H₁, H₂)); subst el₂ el₃.
+   exists el; split; reflexivity.
+
+   right; destruct H as (el, (H₁, H₂)); subst el₁ el₄.
+   exists el; split; reflexivity.
+Qed.
+
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_right rotate (P 1 0 0) el₁ = p₁
@@ -1754,23 +1780,10 @@ Theorem glop : ∀ el₁ el₂ el₃ el₄ e,
   → norm_list el₁ = el₃ ++ [e] ∧ norm_list el₂ = negf e :: el₄.
 Proof.
 intros el₁ el₂ el₃ el₄ e Hn.
+apply split_app_eq in Hn.
+destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
+ exfalso; revert H₂; apply norm_list_no_consec.
 
-Theorem glop {A} : ∀ el₁ el₂ el₃ el₄ : list A,
-  el₁ ++ el₂ = el₃ ++ el₄
-  → { ∃ el, el₃ = el₁ ++ el ∧ el₂ = el ++ el₄ } +
-    { ∃ el, el₁ = el₃ ++ el ∧ el₄ = el ++ el₂ }.
-Proof.
-intros el₁ el₂ el₃ el₄ Hel.
-destruct (lt_dec (length el₁) (length el₃)) as [H₁| H₁]; [ left | right ].
- exists (skipn (length el₁) el₃).
- apply Nat.lt_le_incl in H₁.
- assert (H₂ : el₃ = el₁ ++ skipn (length el₁) el₃).
-  remember (length el₃ - length el₁) as len eqn:Hlen.
-  symmetry in Hlen.
-  revert el₁ el₂ el₃ el₄ Hel H₁ Hlen.
-  induction len; intros.
-   apply Nat.sub_0_le in Hlen.
-   apply le_antisym in Hlen; [ | assumption ].
 bbb.
 
    destruct el₃ as [| e₃]; [ discriminate Hlen | ].
