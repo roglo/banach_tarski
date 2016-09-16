@@ -1595,9 +1595,11 @@ destruct (rev_path el); discriminate Hr.
 Qed.
 
 Theorem rev_path_eq_eq : ∀ el₁ el₂,
-  rev_path el₁ = rev_path el₂ → el₁ = el₂.
+  rev_path el₁ = rev_path el₂ ↔ el₁ = el₂.
 Proof.
-intros el₁ el₂ Hr.
+intros el₁ el₂.
+split; [ | intros H; subst; reflexivity ].
+intros Hr.
 revert el₂ Hr.
 induction el₁ as [| e₁]; intros.
  rewrite rev_path_nil in Hr.
@@ -1638,7 +1640,7 @@ destruct H₁; subst t₁ d₁.
 rewrite <- rev_path_involutive in Hel₁.
 rewrite rev_path_cons, rev_path_single in Hel₁.
 simpl in Hel₁.
-apply rev_path_eq_eq in Hel₁.
+apply -> rev_path_eq_eq in Hel₁.
 rewrite Hel₁ in Hel.
 rewrite <- app_assoc in Hel; simpl in Hel.
 revert Hel.
@@ -1811,7 +1813,29 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    rewrite <- Hn₁, <- Hn₂ in Hs.
    rewrite rev_path_norm_list in Hs.
    apply norm_list_app_split in Hs.
-   destruct Hs as (Hs₁, Hs₂).
+   destruct Hs as (Hs₂, Hs₁).
+   rewrite <- rev_path_norm_list in Hs₂.
+   apply rev_path_eq_eq in Hs₂.
+   rewrite rev_path_involutive, rev_path_app in Hs₂; simpl in Hs₂.
+   rewrite Hn₁ in Hs₁.
+   rewrite Hn₂ in Hs₂.
+   destruct el₁ as [| e₁]; [ discriminate Hs₁ | ].
+   injection Hs₁; clear Hs₁; intros; subst e₁ el₃.
+   apply norm_list_cons in Hn₁.
+bbb.
+
+   remember (negf e :: el₁) as el₃ eqn:Hel₃.
+   remember (length (rev_path el₂ ++ el₃)) as len₁ eqn:Hlen₁.
+   symmetry in Hlen₁.
+   generalize Hlen₁; intros H₁.
+   rewrite Hel₃, Hs₂ in H₁.
+   rewrite rev_path_cons, rev_path_involutive, rev_path_single in H₁.
+   rewrite negf_involutive in H₁.
+   do 2 rewrite app_length in H₁; simpl in H₁.
+   rewrite Nat.add_1_r in H₁; simpl in H₁.
+   rewrite Nat.add_succ_r in H₁.
+   rewrite <- length_rev_path, <- app_length, Hlen in H₁.
+   move H₁ at top; subst len₁.
 
 bbb.
 
