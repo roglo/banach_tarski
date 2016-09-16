@@ -1754,6 +1754,14 @@ Theorem glop : ∀ el₁ el₂ el₃ el₄ e,
   → norm_list el₁ = el₃ ++ [e] ∧ norm_list el₂ = negf e :: el₄.
 Proof.
 intros el₁ el₂ el₃ el₄ e Hn.
+
+Theorem glop {A} : ∀ el₁ el₂ el₃ el₄ : list A,
+  el₁ ++ el₂ = el₃ ++ el₄
+  → { ∃ el, el₃ = el₁ ++ el ∧ el₂ = el ++ el₄ } +
+    { ∃ el, el₁ = el₃ ++ el ∧ el₄ = el ++ el₂ }.
+Proof.
+intros el₁ el₂ el₃ el₄ Hel.
+
 bbb.
 
 assert (rev_path el₂ = el₄ ++ [e] ∧ el₁ = negf e :: el₃).
