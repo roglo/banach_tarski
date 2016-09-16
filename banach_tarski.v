@@ -1762,7 +1762,33 @@ Theorem glop {A} : ∀ el₁ el₂ el₃ el₄ : list A,
 Proof.
 intros el₁ el₂ el₃ el₄ Hel.
 destruct (lt_dec (length el₁) (length el₃)) as [H₁| H₁]; [ left | right ].
+ exists (skipn (length el₁) el₃).
+ apply Nat.lt_le_incl in H₁.
+ assert (H₂ : el₃ = el₁ ++ skipn (length el₁) el₃).
+  remember (length el₃ - length el₁) as len eqn:Hlen.
+  symmetry in Hlen.
+  revert el₁ el₂ el₃ el₄ Hel H₁ Hlen.
+  induction len; intros.
+   apply Nat.sub_0_le in Hlen.
+   apply le_antisym in Hlen; [ | assumption ].
+bbb.
 
+   destruct el₃ as [| e₃]; [ discriminate Hlen | ].
+    Opaque minus.
+    simpl in Hlen.
+    Transparent minus.
+    simpl in H₁; apply le_S_n in H₁.
+    rewrite Nat.sub_succ_l in Hlen; [ | assumption ].
+    apply Nat.succ_inj in Hlen.
+    destruct (eq_nat_dec (length el₁) (length el₃)) as [H₂| H₂].
+
+Focus 2.
+
+Focus 2.
+ split; [ assumption | ].
+ apply app_inv_head with (l := el₁).
+ rewrite Hel, app_assoc; f_equal.
+ assumption.
 bbb.
 
 assert (rev_path el₂ = el₄ ++ [e] ∧ el₁ = negf e :: el₃).
