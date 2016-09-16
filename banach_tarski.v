@@ -1671,7 +1671,7 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    pose proof rotate_1_0_0_is_diff el₃ el₄ d₁ Hel₃ H₁ as H₂.
    apply H₂.
 
-   destruct H₁ as (el₃, (t, (d, (el₄, Hs)))).
+   destruct H₁ as (el₄, (t, (d, (el₃, Hs)))).
    rewrite Hs, rotate_simpl in Hp.
    rewrite Hs in Hlen.
    rewrite app_length in Hlen; simpl in Hlen.
@@ -1679,6 +1679,26 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    apply Nat.succ_inj in Hlen.
    rewrite <- length_rev_path in Hlen.
    rewrite <- app_length in Hlen.
+   destruct len; [ discriminate Hlen | ].
+   apply Nat.succ_inj in Hlen.
+assert (rev_path el₂ = el₄ ++ [E t d] ∧ el₁ = E t (negb d) :: el₃).
+Focus 2.
+destruct H as (Hel₄, Hel₃).
+rewrite Hel₁ in Hel₃.
+destruct el'₁ as [| e'₁].
+ simpl in Hel₁; injection Hel₃; clear Hel₃; intros; subst t d₁ el₃.
+ rewrite app_nil_r in Hp, Hlen.
+ destruct el'₂ as [| e'₂].
+  simpl in Hel₂.
+bbb.
+
+destruct el₁ as [| e₁]; [ discriminate Hel₃ | ].
+injection Hel₃; clear Hel₃; intros; subst e₁ el₃.
+destruct el'₁ as [| e'₁].
+ simpl in Hel₁; injection Hel₁; clear Hel₁; intros; subst t d₁ el₁.
+
+bbb.
+
 rewrite Hel₁, Hel₂ in Hs.
 rewrite rev_path_app, rev_path_single in Hs.
 rewrite <- app_assoc in Hs; simpl in Hs.
