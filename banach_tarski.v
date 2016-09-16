@@ -1749,6 +1749,11 @@ rewrite <- Hn₁, <- Hn₂ in Hs.
 rewrite rev_path_norm_list in Hs.
 SearchAbout (norm_list _ ++ norm_list _).
 
+Theorem glop : ∀ el₁ el₂ el₃ el₄ e,
+  norm_list el₁ ++ norm_list el₂ = el₃ ++ e :: negf e :: el₄
+  → norm_list el₁ = el₃ ++ [e] ∧ norm_list el₂ = negf e :: el₄.
+Proof.
+intros el₁ el₂ el₃ el₄ e Hn.
 bbb.
 
 assert (rev_path el₂ = el₄ ++ [e] ∧ el₁ = negf e :: el₃).
