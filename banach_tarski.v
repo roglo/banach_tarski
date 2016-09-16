@@ -704,6 +704,68 @@ Proof. intros; apply decomposed_2. Qed.
 Theorem decomposed_2_b : ∀ s, s ∈ ḅ Ṣ(ḅ⁻¹) ⊕ s ∈ Ṣ(ḅ) .
 Proof. intros; apply decomposed_2. Qed.
 
+Fixpoint split_at_cancel el :=
+  match el with
+  | [] => None
+  | [e₁] => None
+  | e₁ :: (e₂ :: el₂) as el₁ =>
+      if letter_opp_dec e₁ e₂ then Some ([], e₁, el₂)
+      else
+       match split_at_cancel el₁ with
+       | Some (el₃, e₃, el₄) => Some (e₁ :: el₃, e₃, el₄)
+       | None => None
+       end
+  end.
+
+Theorem norm_dec : ∀ el,
+  { norm_list el = el } +
+  { ∃ el₁ e el₂, split_at_cancel el = Some (el₁, e, el₂) }.
+Proof.
+intros el.
+induction el as [| e]; [ left; reflexivity | ].
+destruct IHel as [H₁| H₁].
+ simpl; rewrite H₁.
+ destruct el as [| e₁]; [ left; reflexivity | ].
+ simpl in H₁.
+ destruct (letter_opp_dec e e₁) as [H₂| H₂]; [ | left; reflexivity ].
+ right; exists [], e, el; reflexivity.
+
+ right.
+ destruct H₁ as (el₁, (e₁, (el₂, Hs))); simpl.
+ destruct el as [| e₂]; [ discriminate Hs | ].
+ destruct (letter_opp_dec e e₂) as [H₁| H₁].
+  exists [], e, el; reflexivity.
+
+  rewrite Hs.
+  exists (e :: el₁), e₁, el₂; reflexivity.
+Qed.
+
+Theorem split_at_cancel_some : ∀ el el₁ el₂ e,
+  split_at_cancel el = Some (el₁, e, el₂)
+  → el = el₁ ++ e :: negf e :: el₂.
+Proof.
+intros el el₁ el₂ e Hs.
+revert e el₁ el₂ Hs.
+induction el as [| e₁]; intros; [ discriminate Hs | ].
+simpl in Hs.
+destruct el as [| e₂]; [ discriminate Hs | ].
+destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+ injection Hs; clear Hs; intros; subst e el₁ el₂; simpl.
+ f_equal; f_equal.
+ destruct e₁ as (t₁, d₁).
+ destruct e₂ as (t₂, d₂).
+ apply letter_opp_iff in H₁.
+ destruct H₁; subst t₂ d₂.
+ reflexivity.
+
+ remember (split_at_cancel (e₂ :: el)) as u eqn:Hu.
+ symmetry in Hu.
+ destruct u as [((el₃, e₃), el₄)| ]; [ | discriminate Hs ].
+ injection Hs; clear Hs; intros; subst el₁ e₃ el₄; simpl.
+ f_equal.
+ apply IHel; reflexivity.
+Qed.
+
 End Free_Group.
 
 (* Step 2 *)
@@ -1663,7 +1725,7 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
   move Hl₁ at top; move Hl₂ at top; subst el₁ el₂.
   destruct el'₁; discriminate Hel₁.
 
-  destruct (norm_list_dec (rev_path el₂ ++ el₁)) as [H₁| H₁].
+  destruct (norm_dec (rev_path el₂ ++ el₁)) as [H₁| H₁].
    revert Hp; rewrite Hel₁, app_assoc.
    rewrite Hel₁, app_assoc in H₁.
    remember (rev_path el₂ ++ el'₁) as el₄ eqn:Hel₄.
@@ -1671,7 +1733,9 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    pose proof rotate_1_0_0_is_diff el₃ el₄ d₁ Hel₃ H₁ as H₂.
    apply H₂.
 
-   destruct H₁ as (el₄, (t, (d, (el₃, Hs)))).
+   destruct H₁ as (el₄, (e, (el₃, Ht))).
+   generalize Ht; intros Hs.
+   apply split_at_cancel_some in Hs.
    rewrite Hs, rotate_simpl in Hp.
    rewrite Hs in Hlen.
    rewrite app_length in Hlen; simpl in Hlen.
@@ -1681,7 +1745,8 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    rewrite <- app_length in Hlen.
    destruct len; [ discriminate Hlen | ].
    apply Nat.succ_inj in Hlen.
-assert (rev_path el₂ = el₄ ++ [E t d] ∧ el₁ = E t (negb d) :: el₃).
+assert (rev_path el₂ = el₄ ++ [e] ∧ el₁ = negf e :: el₃).
+bbb.
 Focus 2.
 destruct H as (Hel₄, Hel₃).
 rewrite Hel₁ in Hel₃.
