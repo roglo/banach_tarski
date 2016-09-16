@@ -1745,7 +1745,19 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    rewrite <- app_length in Hlen.
    destruct len; [ discriminate Hlen | ].
    apply Nat.succ_inj in Hlen.
+rewrite <- Hn₁, <- Hn₂ in Hs.
+rewrite rev_path_norm_list in Hs.
+SearchAbout (norm_list _ ++ norm_list _).
+
+bbb.
+
 assert (rev_path el₂ = el₄ ++ [e] ∧ el₁ = negf e :: el₃).
+Print split_at_cancel.
+rewrite <- Hn₁, <- Hn₂.
+rewrite <- norm_list_rev_path; [ | apply norm_list_norm_list ].
+rewrite Hn₂.
+
+
 bbb.
 Focus 2.
 destruct H as (Hel₄, Hel₃).
