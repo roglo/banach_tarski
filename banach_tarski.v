@@ -30,6 +30,9 @@ Qed.
 Theorem cons_comm_app {A} : ∀ (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
 Proof. reflexivity. Qed.
 
+Theorem cons_to_app {A} : ∀ (e : A) el, e :: el = [e] ++ el.
+Proof. reflexivity. Qed.
+
 Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
 Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
 
@@ -1718,6 +1721,40 @@ induction el₁ as [| e₁]; intros.
    exists el; split; reflexivity.
 Qed.
 
+Theorem norm_list_app_split : ∀ el₁ el₂ el₃ el₄ e,
+  norm_list el₁ ++ norm_list el₂ = el₃ ++ e :: negf e :: el₄
+  → norm_list el₁ = el₃ ++ [e] ∧ norm_list el₂ = negf e :: el₄.
+Proof.
+intros el₁ el₂ el₃ el₄ e Hn.
+apply split_app_eq in Hn.
+destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
+ exfalso; revert H₂; apply norm_list_no_consec.
+
+ rewrite cons_to_app in H₂.
+ apply split_app_eq in H₂.
+ destruct H₂ as [(el', (H₂, H₃))| (el', (H₂, H₃))].
+  subst el.
+  destruct el' as [| e'].
+   rewrite app_nil_r in H₁.
+   rewrite app_nil_l in H₃; symmetry in H₃.
+   split; assumption.
+
+   simpl in H₃.
+   injection H₃; clear H₃; intros H₂ H₃; subst e'.
+   exfalso; revert H₁; apply norm_list_no_consec.
+
+  destruct el as [| e₁].
+   simpl in H₂; subst el'.
+   exfalso; revert H₃; apply norm_list_no_start.
+
+   simpl in H₂.
+   injection H₂; clear H₂; intros H₂ H₄; subst e₁.
+   symmetry in H₂.
+   apply app_eq_nil in H₂.
+   destruct H₂; subst el el'.
+   split; assumption.
+Qed.  
+
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_right rotate (P 1 0 0) el₁ = p₁
@@ -1771,19 +1808,17 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    rewrite <- app_length in Hlen.
    destruct len; [ discriminate Hlen | ].
    apply Nat.succ_inj in Hlen.
-rewrite <- Hn₁, <- Hn₂ in Hs.
-rewrite rev_path_norm_list in Hs.
-SearchAbout (norm_list _ ++ norm_list _).
+   rewrite <- Hn₁, <- Hn₂ in Hs.
+   rewrite rev_path_norm_list in Hs.
+   apply norm_list_app_split in Hs.
+   destruct Hs as (Hs₁, Hs₂).
 
-Theorem glop : ∀ el₁ el₂ el₃ el₄ e,
-  norm_list el₁ ++ norm_list el₂ = el₃ ++ e :: negf e :: el₄
-  → norm_list el₁ = el₃ ++ [e] ∧ norm_list el₂ = negf e :: el₄.
-Proof.
-intros el₁ el₂ el₃ el₄ e Hn.
-apply split_app_eq in Hn.
-destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
- exfalso; revert H₂; apply norm_list_no_consec.
+bbb.
 
+ rewrite glop in H₂; remember [e] as ee.
+ rewrite glop in H₂; subst ee.
+ rewrite app_assoc in H₂.
+ apply split_app_eq in H₂.
 bbb.
 
    destruct el₃ as [| e₃]; [ discriminate Hlen | ].
