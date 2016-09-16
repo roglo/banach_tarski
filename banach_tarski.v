@@ -1757,6 +1757,20 @@ destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
    split; assumption.
 Qed.  
 
+Theorem rotate_rev_path : ∀ el p₁ p₂,
+  fold_right rotate p₁ el = p₂
+  → fold_right rotate p₂ (rev_path el) = p₁.
+Proof.
+intros el p₁ p₂ Hr.
+revert p₁ p₂ Hr.
+induction el as [| e]; intros; [ symmetry; assumption | ].
+simpl in Hr.
+rewrite rev_path_cons, rev_path_single, fold_right_app; simpl.
+apply IHel; rewrite <- Hr.
+rewrite rotate_neg_rotate.
+reflexivity.
+Qed.
+
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_right rotate (P 1 0 0) el₁ = p₁
@@ -1823,29 +1837,41 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    injection Hs₁; clear Hs₁; intros; subst e₁ el₃.
    apply norm_list_cons in Hn₁.
    assert (Hm : len < S (S len)) by (etransitivity; apply Nat.lt_succ_diag_r).
-destruct el'₁ as [| e'₁].
- simpl in Hel₁.
- injection Hel₁; clear Hel₁; intros H₁ H₂; subst el₁.
- rewrite <- negf_involutive in H₂.
- apply negf_eq_eq in H₂; subst e; simpl in Ht.
- rewrite Bool.negb_involutive in Ht.
- rewrite negf_involutive in Hd, Hs₂.
- clear Hn₁.
- rewrite app_nil_r in Hlen, Hp.
- destruct el₄ as [| (t₄, d₄)].
-  rewrite rev_path_nil in Hs₂.
-  apply Hd; symmetry; assumption.
+   destruct el'₁ as [| e'₁].
+    simpl in Hel₁.
+    injection Hel₁; clear Hel₁; intros H₁ H₂; subst el₁.
+    rewrite <- negf_involutive in H₂.
+    apply negf_eq_eq in H₂; subst e; simpl in Ht.
+    rewrite Bool.negb_involutive in Ht.
+    rewrite negf_involutive in Hd, Hs₂.
+    clear Hn₁.
+    rewrite app_nil_r in Hlen, Hp.
+    destruct el₄ as [| (t₄, d₄)].
+     rewrite rev_path_nil in Hs₂.
+     apply Hd; symmetry; assumption.
 
-  rewrite rev_path_cons, rev_path_single in Hs₂; simpl in Hs₂.
-  rewrite Hel₂, app_comm_cons in Hs₂.
-  apply app_inj_tail in Hs₂.
-  destruct Hs₂ as (Hs₂, Hs₃).
-  injection Hs₃; clear Hs₃; intros; subst t₄ d₂ el'₂.
-  clear Hd.
-bbb.
-
-pose proof IHlen len Hm el₁ (rev_path el₄).
-
+     rewrite rev_path_cons, rev_path_single in Hs₂; simpl in Hs₂.
+     rewrite Hel₂, app_comm_cons in Hs₂.
+     apply app_inj_tail in Hs₂.
+     destruct Hs₂ as (Hs₂, Hs₃).
+     injection Hs₃; clear Hs₃; intros; subst t₄ d₂ el'₂.
+     clear Hd.
+     generalize Hn₂; intros Hn₁.
+     apply norm_list_rev_path in Hn₁.
+     rewrite Hel₂ in Hn₁.
+     rewrite rev_path_app, rev_path_single in Hn₁.
+     remember norm_list as f; simpl in Hn₁; subst f.
+     rewrite Bool.negb_involutive in Hn₁.
+     rewrite rev_path_cons, rev_path_involutive in Hn₁.
+     rewrite app_comm_cons in Hn₁.
+     apply norm_list_app_diag in Hn₁.
+     apply norm_list_rev_path in Hn₁.
+     rewrite rev_path_cons, rev_path_single in Hn₁.
+     simpl in Hn₁.
+     apply rotate_rev_path in Hp.
+     rewrite rev_path_cons, rev_path_single in Hp; simpl in Hp.
+     revert Hp.
+     eapply rotate_1_0_0_is_diff; [ reflexivity | assumption ].
 bbb.
 
    remember (negf e :: el₁) as el₃ eqn:Hel₃.
