@@ -1775,10 +1775,10 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
  rewrite <- fold_right_app.
  rewrite app_path_rev_path; reflexivity.
 
- clear Hp₁ Hp₂.
+ clear p Hp₁ Hp₂.
  remember (length (rev_path el₂ ++ el₁)) as len eqn:Hlen.
  symmetry in Hlen.
- revert p el₁ el₂ el'₁ el'₂ d₁ d₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hlen Hp.
+ revert el₁ el₂ el'₁ el'₂ d₁ d₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hlen Hp.
  induction len as (len, IHlen) using lt_wf_rec; intros.
  destruct len.
   rewrite app_length in Hlen.
@@ -1822,6 +1822,19 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    destruct el₁ as [| e₁]; [ discriminate Hs₁ | ].
    injection Hs₁; clear Hs₁; intros; subst e₁ el₃.
    apply norm_list_cons in Hn₁.
+   assert (Hm : len < S (S len)) by (etransitivity; apply Nat.lt_succ_diag_r).
+destruct el'₁ as [| e'₁].
+ simpl in Hel₁.
+ injection Hel₁; clear Hel₁; intros H₁ H₂; subst el₁.
+ rewrite <- negf_involutive in H₂.
+ apply negf_eq_eq in H₂; subst e; simpl in Ht.
+ rewrite Bool.negb_involutive in Ht.
+ rewrite negf_involutive in Hd, Hs₂.
+
+bbb.
+
+pose proof IHlen len Hm el₁ (rev_path el₄).
+
 bbb.
 
    remember (negf e :: el₁) as el₃ eqn:Hel₃.
