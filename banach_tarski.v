@@ -1836,7 +1836,6 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    destruct el₁ as [| e₁]; [ discriminate Hs₁ | ].
    injection Hs₁; clear Hs₁; intros; subst e₁ el₃.
    apply norm_list_cons in Hn₁.
-   assert (Hm : len < S (S len)) by (etransitivity; apply Nat.lt_succ_diag_r).
    destruct el'₁ as [| e'₁].
     simpl in Hel₁.
     injection Hel₁; clear Hel₁; intros H₁ H₂; subst el₁.
@@ -1872,6 +1871,11 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
      rewrite rev_path_cons, rev_path_single in Hp; simpl in Hp.
      revert Hp.
      eapply rotate_1_0_0_is_diff; [ reflexivity | assumption ].
+
+    simpl in Hel₁.
+    injection Hel₁; clear Hel₁; intros H₁ H₂; subst e'₁.
+    assert (Hm : S len < S (S len)) by apply Nat.lt_succ_diag_r.
+    pose proof IHlen (S len) Hm el₁ el₂ el'₁ el'₂ d₁ d₂ H₁ Hel₂ Hn₁ Hn₂ as H.
 bbb.
 
    remember (negf e :: el₁) as el₃ eqn:Hel₃.
