@@ -1908,6 +1908,16 @@ Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
   → p₁ ≠ p₂.
 Proof.
 intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
+(* let p₀ = P 1 0 0 and w w' : paths. The previous theorem,
+   all_points_in_normal_orbit_are_different, says that
+     w ≠ w' ⇒ wp₀ ≠ w'p₀
+   Now we start from a point p which can be obtained by rotation m from p₀
+     p = mp₀
+   If w ≠ w', can we say that wp ≠ w'p, i.e. wmp₀ ≠ w'mp₀ ?
+
+   If wmp₀ = w'mp₀ then (w-w')mp₀ = 0; can we deduce that (w-w')p₀ = 0 ?
+   Nothing allows us to say that!
+ *)
 bbb.
 
 Definition no_rotation := ([] : list free_elem).
