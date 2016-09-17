@@ -1874,6 +1874,35 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
 
     simpl in Hel₁.
     injection Hel₁; clear Hel₁; intros H₁ H₂; subst e'₁.
+    destruct el₄ as [| (t₄, d₄)].
+     revert Hp; simpl.
+     eapply rotate_1_0_0_is_diff; eassumption.
+
+     rewrite rev_path_cons, rev_path_single in Hs₂; simpl in Hs₂.
+     rewrite Hel₂, app_comm_cons in Hs₂.
+     apply app_inj_tail in Hs₂.
+     destruct Hs₂ as (Hs₂, Hs₃).
+     injection Hs₃; clear Hs₃; intros; subst t₄ d₂ el'₂.
+     generalize Hn₂; intros Hn₃.
+     apply norm_list_rev_path in Hn₃.
+     rewrite Hel₂ in Hn₃.
+     rewrite rev_path_app, rev_path_single in Hn₃.
+     remember norm_list as f; simpl in Hn₃; subst f.
+     rewrite Bool.negb_involutive in Hn₃.
+     rewrite rev_path_cons, rev_path_involutive in Hn₃.
+     rewrite app_comm_cons in Hn₃.
+     apply norm_list_app_diag in Hn₃.
+     apply norm_list_rev_path in Hn₃.
+     rewrite rev_path_cons, rev_path_single in Hn₃.
+     simpl in Hn₃.
+     apply rotate_rev_path in Hp.
+     rewrite rev_path_app in Hp.
+     rewrite rev_path_cons, rev_path_single in Hp; simpl in Hp.
+     revert Hp.
+     rewrite app_assoc.
+     eapply rotate_1_0_0_is_diff; [ reflexivity | ].
+bbb.
+
     assert (Hm : S len < S (S len)) by apply Nat.lt_succ_diag_r.
     pose proof IHlen (S len) Hm el₁ el₂ el'₁ el'₂ d₁ d₂ H₁ Hel₂ Hn₁ Hn₂ as H.
 bbb.
