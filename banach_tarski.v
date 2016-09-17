@@ -1883,210 +1883,22 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
      apply app_inj_tail in Hs₂.
      destruct Hs₂ as (Hs₂, Hs₃).
      injection Hs₃; clear Hs₃; intros; subst t₄ d₂ el'₂.
-     generalize Hn₂; intros Hn₃.
-     apply norm_list_rev_path in Hn₃.
-     rewrite Hel₂ in Hn₃.
-     rewrite rev_path_app, rev_path_single in Hn₃.
-     remember norm_list as f; simpl in Hn₃; subst f.
-     rewrite Bool.negb_involutive in Hn₃.
-     rewrite rev_path_cons, rev_path_involutive in Hn₃.
-     rewrite app_comm_cons in Hn₃.
-     apply norm_list_app_diag in Hn₃.
-     apply norm_list_rev_path in Hn₃.
-     rewrite rev_path_cons, rev_path_single in Hn₃.
-     simpl in Hn₃.
      apply rotate_rev_path in Hp.
      rewrite rev_path_app in Hp.
-     rewrite rev_path_cons, rev_path_single in Hp; simpl in Hp.
+     remember (rev_path (E lb d₄ :: el₄)) as el₃ eqn:Hel₃.
      revert Hp.
-     rewrite app_assoc.
-     eapply rotate_1_0_0_is_diff; [ reflexivity | ].
-bbb.
-
-    assert (Hm : S len < S (S len)) by apply Nat.lt_succ_diag_r.
-    pose proof IHlen (S len) Hm el₁ el₂ el'₁ el'₂ d₁ d₂ H₁ Hel₂ Hn₁ Hn₂ as H.
-bbb.
-
-   remember (negf e :: el₁) as el₃ eqn:Hel₃.
-   remember (length (rev_path el₂ ++ el₃)) as len₁ eqn:Hlen₁.
-   symmetry in Hlen₁.
-   generalize Hlen₁; intros H₁.
-   rewrite Hel₃, Hs₂ in H₁.
-   rewrite rev_path_cons, rev_path_involutive, rev_path_single in H₁.
-   rewrite negf_involutive in H₁.
-   do 2 rewrite app_length in H₁; simpl in H₁.
-   rewrite Nat.add_1_r in H₁; simpl in H₁.
-   rewrite Nat.add_succ_r in H₁.
-   rewrite <- length_rev_path, <- app_length, Hlen in H₁.
-   move H₁ at top; subst len₁.
-
-bbb.
-
- rewrite glop in H₂; remember [e] as ee.
- rewrite glop in H₂; subst ee.
- rewrite app_assoc in H₂.
- apply split_app_eq in H₂.
-bbb.
-
-   destruct el₃ as [| e₃]; [ discriminate Hlen | ].
-    Opaque minus.
-    simpl in Hlen.
-    Transparent minus.
-    simpl in H₁; apply le_S_n in H₁.
-    rewrite Nat.sub_succ_l in Hlen; [ | assumption ].
-    apply Nat.succ_inj in Hlen.
-    destruct (eq_nat_dec (length el₁) (length el₃)) as [H₂| H₂].
-
-Focus 2.
-
-Focus 2.
- split; [ assumption | ].
- apply app_inv_head with (l := el₁).
- rewrite Hel, app_assoc; f_equal.
- assumption.
-bbb.
-
-assert (rev_path el₂ = el₄ ++ [e] ∧ el₁ = negf e :: el₃).
-Print split_at_cancel.
-rewrite <- Hn₁, <- Hn₂.
-rewrite <- norm_list_rev_path; [ | apply norm_list_norm_list ].
-rewrite Hn₂.
-
-
-bbb.
-Focus 2.
-destruct H as (Hel₄, Hel₃).
-rewrite Hel₁ in Hel₃.
-destruct el'₁ as [| e'₁].
- simpl in Hel₁; injection Hel₃; clear Hel₃; intros; subst t d₁ el₃.
- rewrite app_nil_r in Hp, Hlen.
- destruct el'₂ as [| e'₂].
-  simpl in Hel₂.
-bbb.
-
-destruct el₁ as [| e₁]; [ discriminate Hel₃ | ].
-injection Hel₃; clear Hel₃; intros; subst e₁ el₃.
-destruct el'₁ as [| e'₁].
- simpl in Hel₁; injection Hel₁; clear Hel₁; intros; subst t d₁ el₁.
-
-bbb.
-
-rewrite Hel₁, Hel₂ in Hs.
-rewrite rev_path_app, rev_path_single in Hs.
-rewrite <- app_assoc in Hs; simpl in Hs.
-destruct el₃ as [| e₃].
- simpl in Hs.
- injection Hs; clear Hs; intros Hs H₁ H₂; subst t d.
- simpl in Hlen, Hp.
- rewrite Bool.negb_involutive in Hs.
- destruct el₄ as [| e₄].
-  destruct el'₁ as [| e'₁].
-   destruct el'₂ as [| e'₂].
-    simpl in Hs.
-    injection Hs; clear Hs; intros; subst d₂.
-    apply Hd; subst el₁ el₂; reflexivity.
-
-    rewrite rev_path_cons, rev_path_single in Hs; simpl in Hs.
-    destruct (rev_path el'₂); [ discriminate Hs | ].
-    destruct l; discriminate Hs.
-
-   destruct (rev_path el'₂); [ destruct el'₁; discriminate Hs | ].
-   destruct l; discriminate Hs.
-
-  rewrite <- Hel₁ in Hs.
-  destruct el'₂ as [| e'₂].
-   simpl in Hs.
-   destruct el'₁ as [| e'₁]; [ rewrite Hel₁ in Hs; discriminate Hs | ].
-   rewrite Hel₁ in Hs; simpl in Hs.
-   injection Hs; clear Hs; intros Hs H₁; subst e'₁.
-   rewrite <- Hs in Hp.
-   revert Hp.
-   eapply rotate_1_0_0_is_diff; [ reflexivity | ].
-   rewrite Hel₁ in Hn₁.
-   apply norm_list_app_diag in Hn₁.
-bbb.
-SearchAbout (norm_list (rev_path _)).
-   apply norm_list_rev_path in Hn₁.
-bbb.
-intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
-move Hp at top; subst p₂; rename p₁ into p.
-assert (H : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
- rewrite fold_right_app, Hp₁, <- Hp₂.
- rewrite <- fold_right_app.
- rewrite app_path_rev_path; reflexivity.
-
- destruct (norm_list_dec (rev_path el₂ ++ el₁)) as [H₁| H₁].
-  revert H; rewrite Hel₁, app_assoc.
-  rewrite Hel₁, app_assoc in H₁.
-  remember (rev_path el₂ ++ el'₁) as el₄ eqn:Hel₄.
-  remember (el₄ ++ [E lb d₁]) as el₃ eqn:Hel₃.
-  pose proof rotate_1_0_0_is_diff el₃ el₄ d₁ Hel₃ H₁ as H₂.
-  apply H₂.
-
-  destruct H₁ as (el₃, (t, (d, (el₄, Hs)))).
-  rewrite Hs, rotate_simpl in H.
-bbb.
-
-SearchAbout (fold_right rotate).
-bbb.
-rewrite <- app_assoc, <- Hel₁ in Hel₃.
-bbb.
-  eapply rotate_1_0_0_is_diff; [ rewrite <- app_comm_cons; f_equal | ].
-  rewrite <- Hel₁.
-bbb.
-
-; assumption.
-
-  destruct H₁ as (el₃, (t, (d, (el₄, H₁)))).
-clear H Hp₁ Hel₁.
-revert el₃ H₁.
-induction el₁ as [| e₁]; intros.
- rewrite <- Hn₂ in H₁; simpl in H₁.
-bbb.
-rewrite rev_path_norm_list in H₁.
-revert H₁; apply norm_list_impossible_consecutive.
-destruct el₃ as [| e₃].
- simpl in H₁.
- injection H₁; clear H₁; intros H₁ H; subst e₁.
-
-
-  rewrite <- Hn₁, <- Hn₂ in H₁.
-SearchAbout rev_path.
-
-SearchAbout (norm_list _ ++ _).
-
-bbb.
-  rewrite H₁ in H.
-  rewrite fold_left_app in H.
-Theorem toto : ∀ el t d p,
-  fold_left rotate (E t d :: E t (negb d) :: el) p = fold_left rotate el p.
-Proof.
-Admitted. Show.
-
-  rewrite toto in H.
-  rewrite <- fold_left_app in H.
-  rewrite Hel₁ in H₁.
-  simpl in H₁.
-  destruct el₃ as [| e₃]; simpl in H₁.
-   injection H₁; clear H₁; intros H₁ H₂ H₃; subst t d.
-   destruct el'₁ as [| e'₁]; simpl in H₁.
-   destruct (list_nil_app_dec el₂) as [H₂| (e₂, (el₃, H₂))]; subst el₂.
-    discriminate H₂.
-
-    rewrite H₂ in H₁.
-    rewrite rev_path_app in H₁; simpl in H₁.
-    destruct e₂ as (t₂, d₃); simpl in H₁.
-    injection H₁; clear H₁; intros; subst t₂ el₄.
-
-bbb.
-
- apply norm_list_app_diag with (el₂ := el₂).
- rewrite <- app_assoc.
-
-  apply toto.
-
-  rewrite rev_path_app.
-  rewrite rev_path_involutive.
+     rewrite rev_path_cons, rev_path_single in Hel₃; simpl in Hel₃.
+     rewrite <- app_comm_cons, <- Hel₃ in Hel₂.
+     rewrite Hel₂ in Hd.
+     assert (Hd₂ : el₁ ≠ el₃) by (intros H; apply Hd; f_equal; assumption).
+     apply not_eq_sym in Hd₂.
+     rewrite Hel₂ in Hn₂.
+     apply norm_list_cons in Hn₂.
+     rewrite app_length, Nat.add_comm in Hlen.
+     eapply IHlen; try eassumption.
+      etransitivity; eapply Nat.lt_succ_diag_r.
+      rewrite app_length, length_rev_path; assumption.
+Qed.
 
 bbb.
 
