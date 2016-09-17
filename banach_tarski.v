@@ -1900,6 +1900,16 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
      * rewrite app_length, length_rev_path; assumption.
 Qed.
 
+Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
+  ¬ List.In p [P 1 0 0; P (-1) 0 0; P 0 0 1; P 0 0 (-1)]
+  → fold_right rotate p el₁ = p₁
+  → fold_right rotate p el₂ = p₂
+  → norm_list el₁ ≠ norm_list el₂
+  → p₁ ≠ p₂.
+Proof.
+intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
+bbb.
+
 Definition no_rotation := ([] : list free_elem).
 Definition is_identity el := ∀ p, fold_right rotate p el = p.
 
