@@ -1900,34 +1900,15 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
       rewrite app_length, length_rev_path; assumption.
 Qed.
 
-bbb.
-
 Theorem rotate_from_point_in_orbit_1_0_0_is_diff : ∀ p,
-  (∃ el, fold_left rotate el (P 1 0 0) = p)
+  (∃ el, fold_right rotate (P 1 0 0) el = p)
   → ∀ el, el ≠ []
   → norm_list el = el
-  → fold_left rotate el p ≠ p.
+  → fold_right rotate p el ≠ p.
 Proof.
 intros p (elp, Horb) el Hne Hel Hr.
-assert (fold_left rotate 
+(* faux : p = P 1 0 0, el = [ạ] *)
 vvv.
-
-remember (fold_left rotate el) as w eqn:Hw.
-pose proof rotate_0_0_1_b_nonzero w el el₁ d Hel Hn Hw as H.
-destruct H as (a, (b, (c, (k, (Hp, Hm))))).
-rewrite Hp; intros H.
-injection H; intros Hc Hb Ha.
-apply Rmult_integral in Hb.
-destruct Hb as [Hb| Hb].
- apply Rmult_integral in Hb.
- destruct Hb as [Hb| Hb].
-  apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
-
-  revert Hb; apply sqrt2_neq_0.
-
- apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
- rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
-Qed.
 
 Definition no_rotation := ([] : list free_elem).
 Definition is_identity el := ∀ p, fold_left rotate el p = p.
