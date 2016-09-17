@@ -1896,22 +1896,12 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
      apply norm_list_cons in Hn₂.
      rewrite app_length, Nat.add_comm in Hlen.
      eapply IHlen; try eassumption.
-      etransitivity; eapply Nat.lt_succ_diag_r.
-      rewrite app_length, length_rev_path; assumption.
+     * etransitivity; eapply Nat.lt_succ_diag_r.
+     * rewrite app_length, length_rev_path; assumption.
 Qed.
 
-Theorem rotate_from_point_in_orbit_1_0_0_is_diff : ∀ p,
-  (∃ el, fold_right rotate (P 1 0 0) el = p)
-  → ∀ el, el ≠ []
-  → norm_list el = el
-  → fold_right rotate p el ≠ p.
-Proof.
-intros p (elp, Horb) el Hne Hel Hr.
-(* faux : p = P 1 0 0, el = [ạ] *)
-vvv.
-
 Definition no_rotation := ([] : list free_elem).
-Definition is_identity el := ∀ p, fold_left rotate el p = p.
+Definition is_identity el := ∀ p, fold_right rotate p el = p.
 
 Theorem rotate_0 : is_identity no_rotation.
 Proof. intros p; reflexivity. Qed.
@@ -1923,7 +1913,8 @@ Theorem nonempty_rotation_is_not_identity : ∀ el,
 Proof.
 intros el Hel Hr Hn.
 unfold no_rotation in Hr.
-destruct el as [| e]; [ apply Hr; reflexivity | clear Hr ].
+destruct (list_nil_app_dec el) as [| H]; [ contradiction | clear Hr ].
+destruct H as (e, (el', H₁)).
 destruct e as (t, d); destruct t.
  pose proof Hn (P 0 0 1) as H; revert H.
  destruct d; eapply rotate_0_0_1_is_diff; try eassumption; reflexivity.
@@ -1932,22 +1923,13 @@ destruct e as (t, d); destruct t.
  destruct d; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
 Qed.
 
-Theorem toto : ∀ p₁ p₂ m,
-  p₂ = mat_vec_mul m p₁
-  → ∀ el,
-    fold_left rotate el p₂ = fold_left rotate el (mat_vec_mul m p₁).
-(* ah oui mais c'est trivialement trivial, ça ; j'eusse aimé pouvoir
-   plutôt intervertir le chemin et la multiplication par m, mais c'est
-   pas commutatif, dans l'espace ! *)
-Abort.
-
 End Rotation.
 
 Check nonempty_rotation_is_not_identity.
 
 Section Orbit.
 
-Definition same_orbit x y := ∃ el, fold_left rotate el x = y.
+Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
 Proof. intros; exists []; reflexivity. Qed.
@@ -1959,21 +1941,18 @@ unfold same_orbit; simpl.
 exists (rev (map negf el)).
 revert p₁ p₂ H.
 induction el as [| e]; intros; [ symmetry; assumption | simpl in H; simpl ].
-rewrite fold_left_app; simpl.
-apply IHel in H; rewrite H.
-destruct e as (t, d); destruct t, d; simpl.
- apply rot_rot_inv_x.
- apply rot_inv_rot_x.
- apply rot_rot_inv_z.
- apply rot_inv_rot_z.
+rewrite fold_right_app; simpl.
+apply IHel; rewrite <- H.
+rewrite rotate_neg_rotate.
+reflexivity.
 Qed.
 
 Theorem same_orbit_trans : transitive _ same_orbit.
 Proof.
 intros p₁ p₂ p₃ (el₁, H₁) (el₂, H₂); simpl in H₁, H₂.
 unfold same_orbit; simpl.
-exists (el₁ ++ el₂).
-rewrite fold_left_app, H₁, H₂; reflexivity.
+exists (el₂ ++ el₁).
+rewrite fold_right_app, H₁, H₂; reflexivity.
 Qed.
 
 Add Parametric Relation : _ same_orbit
@@ -2107,7 +2086,7 @@ Check same_choice_in_same_orbit.
 Definition in_image {A B} (f : A → B) := λ x, ∃ y, x = f y.
 
 (* the orbits of the image of f form a partition of the sphere
-   1/ ∀ x, x in the orbit of someone in the image of f,
+   1/ ∀ x, x is in the orbit of someone in the image of f,
    2/ ∀ x y two different points in the image of x, their orbits
       are different. *)
 
