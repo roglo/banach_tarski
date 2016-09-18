@@ -1922,7 +1922,10 @@ intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
    Nothing allows us to say that!
 
    Other possibility: restart from scratch. Prove the same thing as for
-   (1,0,0) and, for the first theorems, for (0,0,1). I don't know.
+   (1,0,0) and, for the first theorems, for (0,0,1). I don't know. The
+   problem is that the first theorem (e.g. rotate_1_0_0_b_nonzero) are
+   based on the fact that (1,0,0) is composed of integer numbers, what
+   is obviously not the case for all points on the sphere.
  *)
 bbb.
 
