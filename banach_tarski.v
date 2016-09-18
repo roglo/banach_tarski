@@ -1908,7 +1908,9 @@ Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
   → p₁ ≠ p₂.
 Proof.
 intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
-(* Let p₀ being the point (1,0,0).
+(* I have a problem.
+
+   Let p₀ being the point (1,0,0).
 
    To prove this (a generalisation of the previous theorem
    "all_points_in_normal_orbit_are_different" for any point p,
@@ -1916,8 +1918,9 @@ intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
 
    Let w be a non empty word (path); "rotate_1_0_0_is_diff" says
    that all points in the orbit of p₀ are different from p₀ (with
-   a little detail which is that, for p₀, w must end with "b", i.e.
-   its first rotation must not bearound the z axis). So we have
+   a little detail which is that, for p₀, w must end with "b" or
+   "b⁻¹", i.e. its first rotation must not bearound the z axis).
+   So we have
      wp₀ ≠ p₀
 
    How to generalise that? Let p be any point, how to prove that
