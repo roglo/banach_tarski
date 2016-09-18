@@ -1913,8 +1913,8 @@ intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
      w ≠ w' ⇒ wp₀ ≠ w'p₀
    Now we start from any point p: how do I prove the same thing?
    An idea would be to use the same theorem, considering that p can
-   be obtained from p₀ by a transformation m (a matrix, for example
-   a rotation):
+   be reduced to p₀ by a transformation m (a matrix, for example
+   a rotation), so
      p = mp₀
    If w ≠ w', can we say that wp ≠ w'p, i.e. wmp₀ ≠ w'mp₀ ?
 
