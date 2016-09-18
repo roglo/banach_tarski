@@ -1908,24 +1908,39 @@ Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
   → p₁ ≠ p₂.
 Proof.
 intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
-(* let p₀ = (1,0,0) and w w' : paths. The previous theorem,
-   "all_points_in_normal_orbit_are_different", says that
-     w ≠ w' ⇒ wp₀ ≠ w'p₀
-   Now we start from any point p: how do I prove the same thing?
-   An idea would be to use the same theorem, considering that p can
-   be reduced to p₀ by a transformation m (a matrix, for example
-   a rotation), so
+(* Let p₀ being the point (1,0,0).
+
+   To prove this (a generalisation of the previous theorem
+   "all_points_in_normal_orbit_are_different" for any point p,
+    not just p₀), we have a problem.
+
+   Let w be a non empty word (path); "rotate_1_0_0_is_diff" says
+   that all points in the orbit of p₀ are different from p₀ (for
+   p₀, w must end with "b", i.e. its first rotation must not be
+   around the z axis).
+     wp₀ ≠ p₀
+
+   How to generalise that? Let p be any point, how to prove that
+   for all non empty word w,
+     wp ≠ p
+
+   A first idea is to be reduced to p₀; we could find a rotation or
+   a combination of rotations, m, such that
      p = mp₀
-   If w ≠ w', can we say that wp ≠ w'p, i.e. wmp₀ ≠ w'mp₀ ?
 
-   If wmp₀ = w'mp₀ then (w-w')mp₀ = 0; can we deduce that (w-w')p₀ = 0 ?
-   Nothing allows us to say that!
+   Then, we must prove that wmp₀ ≠ mp₀
+   But how to prove that? w and m are not commutative!
 
-   Other possibility: restart from scratch. Prove the same thing as for
-   (1,0,0) and, for the first theorems, for (0,0,1). I don't know. The
-   problem is that the first theorem (e.g. rotate_1_0_0_b_nonzero) are
-   based on the fact that (1,0,0) is composed of integer numbers, what
-   is obviously not the case for all points on the sphere.
+   I can just prove that mwp₀ ≠ mp₀, what is not wmp₀ ≠ mp₀.
+
+   In other words, I have
+     (mw - m)p₀ ≠ 0
+   Can I prove that
+     (wm - m)p₀ ≠ 0 ?
+
+   A second idea is to do the same prove as for p₀. But for p₀, the
+   proof is based upon the fact that its coordinates are integer, which
+   is not necessarily the case for any p.
  *)
 bbb.
 
