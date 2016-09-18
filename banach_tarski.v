@@ -1939,7 +1939,7 @@ intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
      (wm - m)p₀ ≠ 0 ?
 
    A second idea is to do the same prove as for p₀. But for p₀, the
-   proof is based upon the fact that its coordinates are integer, which
+   proof is based upon the fact that its coordinates are integers, which
    is not necessarily the case for any p.
  *)
 bbb.
