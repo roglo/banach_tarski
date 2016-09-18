@@ -1915,9 +1915,9 @@ intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
     not just p₀), we have a problem.
 
    Let w be a non empty word (path); "rotate_1_0_0_is_diff" says
-   that all points in the orbit of p₀ are different from p₀ (for
-   p₀, w must end with "b", i.e. its first rotation must not be
-   around the z axis).
+   that all points in the orbit of p₀ are different from p₀ (with
+   a little detail which is that, for p₀, w must end with "b", i.e.
+   its first rotation must not bearound the z axis). So we have
      wp₀ ≠ p₀
 
    How to generalise that? Let p be any point, how to prove that
@@ -1938,7 +1938,7 @@ intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
    Can I prove that
      (wm - m)p₀ ≠ 0 ?
 
-   A second idea is to do the same prove as for p₀. But for p₀, the
+   A second idea is to do the same proof as for p₀. But for p₀, the
    proof is based upon the fact that its coordinates are integers, which
    is not necessarily the case for any p.
  *)
