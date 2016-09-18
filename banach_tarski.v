@@ -1901,22 +1901,28 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
 Qed.
 
 Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
-  ¬ List.In p [P 1 0 0; P (-1) 0 0; P 0 0 1; P 0 0 (-1)]
+  not (List.In p [P 1 0 0; P (-1) 0 0; P 0 0 1; P 0 0 (-1)])
   → fold_right rotate p el₁ = p₁
   → fold_right rotate p el₂ = p₂
   → norm_list el₁ ≠ norm_list el₂
   → p₁ ≠ p₂.
 Proof.
 intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
-(* let p₀ = P 1 0 0 and w w' : paths. The previous theorem,
-   all_points_in_normal_orbit_are_different, says that
+(* let p₀ = (1,0,0) and w w' : paths. The previous theorem,
+   "all_points_in_normal_orbit_are_different", says that
      w ≠ w' ⇒ wp₀ ≠ w'p₀
-   Now we start from a point p which can be obtained by rotation m from p₀
+   Now we start from any point p: how do I prove the same thing?
+   An idea would be to use the same theorem, considering that p can
+   be obtained from p₀ by a transformation m (a matrix, for example
+   a rotation):
      p = mp₀
    If w ≠ w', can we say that wp ≠ w'p, i.e. wmp₀ ≠ w'mp₀ ?
 
    If wmp₀ = w'mp₀ then (w-w')mp₀ = 0; can we deduce that (w-w')p₀ = 0 ?
    Nothing allows us to say that!
+
+   Other possibility: restart from scratch. Prove the same thing as for
+   (1,0,0) and, for the first theorems, for (0,0,1). I don't know.
  *)
 bbb.
 
