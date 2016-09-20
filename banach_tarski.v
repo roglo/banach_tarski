@@ -2017,6 +2017,33 @@ Axiom TTDA : ∀ (A B : Type) (P : A → B → Prop),
 Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
   ∃ f : A → A, ∀ x y : A, R x y → f x = f y.
 
+(* Bin TTCA est débile : si A est non vide (exprimé ci-dessous par
+   "A"), TTCA est un théorème, il suffit de prendre f x = a quel
+   que soit x ! *)
+Theorem th_TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
+  A →
+  ∃ f : A → A, ∀ x y : A, R x y → f x = f y.
+Proof.
+intros A R He a.
+exists (λ _, a).
+intros; reflexivity.
+Qed.
+
+(*
+Axiom my_choice : ∀ (A B : Type) (R : A → A → Prop),
+  { f : A → B | ∀ x y, R x y → f x = f y }.
+*)
+
+Theorem toto : ∃ f, ∀ x, same_orbit x (f x).
+Proof.
+assert (He : equiv _ same_orbit).
+ split; [ apply same_orbit_refl | ].
+ split; [ apply same_orbit_trans | apply same_orbit_sym ].
+
+ pose proof TTCA point same_orbit He as H.
+ destruct H as (f, Hf).
+ exists f; intros x.
+
 bbb.
 
 (*
