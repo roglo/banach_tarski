@@ -2008,49 +2008,32 @@ Add Parametric Relation : _ same_orbit
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
-(* Type-theoretical Description Axiom *)
-Axiom TTDA : ∀ (A B : Type) (P : A → B → Prop),
-  (∀ a : A, ∃ b : B, P a b)
-  → ∃ f : A → B, ∀ a : A, P a (f a).
+Definition equiv_same_orbit : equiv point same_orbit :=
+  conj same_orbit_refl (conj same_orbit_trans same_orbit_sym).
 
 (* Type-theoretical Choice Axiom *)
 Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
-  ∃ f : A → A, ∀ x y : A, R x y → f x = f y.
+  ∃ f : A → A, (∀ x : A, R x (f x)) ∧ (∀ x y, R x y → f x = f y).
 
-(* Bin TTCA est débile : si A est non vide (exprimé ci-dessous par
-   "A"), TTCA est un théorème, il suffit de prendre f x = a quel
-   que soit x ! *)
-Theorem th_TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
-  A →
-  ∃ f : A → A, ∀ x y : A, R x y → f x = f y.
+Theorem same_choice_in_same_orbit : ∃ f : point → point,
+  (∀ x, same_orbit x (f x)) ∧
+  (∀ x y, same_orbit x y ↔ f x = f y).
 Proof.
-intros A R He a.
-exists (λ _, a).
-intros; reflexivity.
+pose proof (TTCA _ _ equiv_same_orbit) as H.
+destruct H as (f, (Hx, Hxy)).
+exists f; split; [ apply Hx | ].
+intros x y.
+split; intros H; [ apply Hxy, H | ].
+transitivity (f x); [ apply Hx | ].
+transitivity (f y); [ destruct H; reflexivity | symmetry; apply Hx ].
 Qed.
-
-(*
-Axiom my_choice : ∀ (A B : Type) (R : A → A → Prop),
-  { f : A → B | ∀ x y, R x y → f x = f y }.
-*)
-
-Theorem toto : ∃ f, ∀ x, same_orbit x (f x).
-Proof.
-assert (He : equiv _ same_orbit).
- split; [ apply same_orbit_refl | ].
- split; [ apply same_orbit_trans | apply same_orbit_sym ].
-
- pose proof TTCA point same_orbit He as H.
- destruct H as (f, Hf).
- exists f; intros x.
-
-bbb.
 
 (*
 Require Import ChoiceFacts.
 Axiom func_choice : FunctionalChoice.
 Print FunctionalChoice_on.
 *)
+(*
 Axiom func_choice : ∀ A B (R : A → B → Prop),
   (∀ x, ∃ y, R x y) → ∃ f, ∀ x : A, R x (f x).
 
@@ -2117,6 +2100,7 @@ assert (Hrefl : reflexive _ R).
      left; apply Hmin; right; reflexivity.
      right; apply Hmin; left; reflexivity.
 Qed.
+*)
 
 (* ok, this is a great theorem, but I don't like the fact that I had to
    use both the axiom of well-ordering *and* the axiom of choice, which
@@ -2124,6 +2108,7 @@ Qed.
    is used for all the sphere (well ordering all points of the sphere),
    which is used then to select a specific point (the "minimum" one) to
    each orbit using... the axiom of choice *)
+(*
 Theorem same_choice_in_same_orbit : ∃ f : point → point,
   (∀ x, same_orbit x (f x)) ∧
   (∀ x y, same_orbit x y ↔ f x = f y).
@@ -2165,6 +2150,7 @@ assert
    intros Hfxy.
    etransitivity; [ eapply Hxfx | rewrite Hfxy; symmetry; apply Hyfy ].
 Qed.
+*)
 
 Check same_choice_in_same_orbit.
 
