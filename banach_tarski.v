@@ -222,77 +222,6 @@ intros e el el₂.
 apply norm_list_no_consec2 with (el₁ := []).
 Qed.
 
-(*
-Theorem norm_list_impossible_consecutive : ∀ x d el el₁ el₂,
-  norm_list el ≠ el₁ ++ E x d :: E x (negb d) :: el₂.
-Proof.
-intros.
-revert el₁.
-induction el as [| e₁]; intros; [ intros H; destruct el₁; discriminate H | ].
-simpl; remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
-destruct nl as [| e₂].
- clear; intros H.
- destruct el₁ as [| e₂]; intros; [ discriminate H | simpl in H ].
- injection H; clear H; intros; subst e₂.
- destruct el₁; discriminate H.
-
- destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
-  pose proof IHel (e₂ :: el₁) as H₂; simpl in H₂.
-  intros H; apply H₂; f_equal; apply H.
-
-  unfold letter_opp in H₁.
-  destruct e₁ as (x₁, d₁).
-  destruct e₂ as (x₂, d₂).
-  destruct (letter_dec x₁ x₂) as [H₂| H₂].
-   subst x₂.
-   destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂].
-    clear H₁; subst d₂.
-    destruct el₁ as [| e₁].
-     simpl; intros H.
-     injection H; clear H; intros H₁ H₂ H₃ H₄ H₅.
-     subst d₁; destruct d; discriminate H₄.
-
-     simpl; intros H.
-     injection H; clear H; intros H₁ H₂; subst e₁.
-     eapply IHel, H₁.
-
-    exfalso; apply H₁; constructor.
-
-   clear H₁.
-   destruct el₁ as [| e₁].
-    simpl; intros H.
-    injection H; clear H; intros H₁ H₃ H₄ H₅ H₆.
-    subst x₁ x₂; apply H₂; reflexivity.
-
-    simpl; intros H.
-    injection H; clear H; intros H₁ H₃.
-    eapply IHel, H₁.
-Qed.
-
-Theorem norm_list_impossible_consecutive2 : ∀ x d el el₁ el₂,
-  norm_list el ≠ el₁ ++ E x (negb d) :: E x d :: el₂.
-Proof.
-intros.
-remember (negb d) as d₁ eqn:Hd.
-apply Bool.negb_sym in Hd; subst d.
-apply norm_list_impossible_consecutive.
-Qed.
-
-Theorem norm_list_impossible_start : ∀ x d el el',
-  norm_list el ≠ E x d :: E x (negb d) :: el'.
-Proof.
-intros.
-apply (norm_list_impossible_consecutive x d el nil el').
-Qed.
-
-Theorem norm_list_impossible_start2 : ∀ x d el el',
-  norm_list el ≠ E x (negb d) :: E x d :: el'.
-Proof.
-intros.
-apply (norm_list_impossible_consecutive2 x d el nil el').
-Qed.
-*)
-
 Theorem norm_list_cancel : ∀ el e,
   norm_list (e :: negf e :: el) = norm_list el.
 Proof.
@@ -338,55 +267,6 @@ induction el₁ as [| e₁]; intros.
 
  simpl; rewrite IHel₁; reflexivity.
 Qed.
-
-(*
-Theorem norm_list_cancel_start : ∀ el t d,
-  norm_list (E t d :: E t (negb d) :: el) = norm_list el.
-Proof.
-intros el t d.
-revert t d.
-induction el as [| (t₁, d₁)]; intros.
- Transparent letter_opp_dec.
- simpl; rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-
- remember (E t₁ d₁ :: el) as el₁ eqn:Hel₁.
- symmetry in Hel₁; simpl.
- remember (norm_list el₁) as el₂ eqn:Hel₂.
- symmetry in Hel₂; simpl.
- destruct el₂ as [| (t₂, d₂)].
-  rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-
-  subst el₁.
-  destruct (letter_dec t t₂) as [H₁| H₁].
-   subst t₂.
-   destruct (Bool.bool_dec (negb d) d₂) as [H₁| H₁].
-    subst d₂.
-    rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-
-    apply negb_neq in H₁; subst d₂.
-    destruct el₂ as [| (t₂, d₂)]; [ reflexivity | ].
-    destruct (letter_dec t t₂) as [H₁| H₁]; [ | reflexivity ].
-    subst t₂.
-    destruct (Bool.bool_dec d d₂) as [H₁| H₁]; [ reflexivity | ].
-    apply not_eq_sym, neq_negb in H₁; subst d₂.
-    exfalso; revert Hel₂; apply norm_list_no_start.
-
-   rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-Qed.
-
-Theorem norm_list_cancel_inside : ∀ el₁ el₂ t d,
-  norm_list (el₁ ++ E t d :: E t (negb d) :: el₂) =
-  norm_list (el₁ ++ el₂).
-Proof.
-intros.
-revert el₂ t d.
-induction el₁ as [| e₁]; intros.
- do 2 rewrite app_nil_l.
- apply norm_list_cancel_start.
-
- simpl; rewrite IHel₁; reflexivity.
-Qed.
-*)
 
 Theorem is_normal : ∀ el₁ el₂ el₃,
   norm_list (el₁ ++ norm_list el₂ ++ el₃) =
