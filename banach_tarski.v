@@ -2169,5 +2169,3 @@ Definition equidecomposable G E₁ E₂ :=
   List.Forall2 (λ S₁ S₂, ∃ g, in_group G g ∧ g S₁ = S₂) P₁ P₂.
 
 End Equidecomposability.
-
-
