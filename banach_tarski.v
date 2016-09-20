@@ -2008,6 +2008,17 @@ Add Parametric Relation : _ same_orbit
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
+(* Type-theoretical Description Axiom *)
+Axiom TTDA : ∀ (A B : Type) (P : A → B → Prop),
+  (∀ a : A, ∃ b : B, P a b)
+  → ∃ f : A → B, ∀ a : A, P a (f a).
+
+(* Type-theoretical Choice Axiom *)
+Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
+  ∃ f : A → A, ∀ x y : A, R x y → f x = f y.
+
+bbb.
+
 (*
 Require Import ChoiceFacts.
 Axiom func_choice : FunctionalChoice.
