@@ -1786,6 +1786,26 @@ Theorem toto : ∀ el,
   → ∃ p₁ p₂, ∀ p, p ≠ p₁ → p ≠ p₂ → fold_right rotate p el ≠ p.
 Proof.
 intros el Hel Hn.
+destruct (list_nil_app_dec el) as [H₁| H₁].
+ subst el; exfalso; apply Hel; reflexivity.
+
+ clear Hel.
+ destruct H₁ as (e, (el₁, Hel)).
+ subst el; rename el₁ into el.
+ apply norm_list_app_diag in Hn.
+ destruct e as (t, d); destruct t.
+  destruct el as [| e].
+   rewrite app_nil_l.
+   exists (P 0 0 1), (P 0 0 (-1)); intros p Hp₁ Hp₂; simpl.
+   unfold mat_vec_mul, rot_inv_x; simpl.
+   destruct p as (x, y, z).
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   destruct d.
+    intros H.
+    injection H; clear H; intros Hz Hy; symmetry in Hy, Hz.
 bbb.
 
 Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
