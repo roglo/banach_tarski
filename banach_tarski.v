@@ -1825,6 +1825,7 @@ intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
    proof is based upon the fact that its coordinates are integers, which
    is not necessarily the case for any p.
  *)
+bbb.
 Abort.
 
 Definition no_rotation := ([] : list free_elem).
