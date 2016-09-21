@@ -1796,11 +1796,6 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
  destruct e as (t, d); destruct t.
   destruct el as [| e].
    rewrite app_nil_l.
-(**)
-   exists (P 0 0 1), (P 0 0 (-1)); intros p Hp₁ Hp₂ H.
-   Check all_points_in_orbit_1_0_0_are_different.
-
-bbb.
    exists (P 0 0 1), (P 0 0 (-1)); intros p Hp₁ Hp₂; simpl.
    unfold mat_vec_mul, rot_inv_x; simpl.
    destruct p as (x, y, z).
