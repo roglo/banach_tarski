@@ -1826,6 +1826,17 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     ring_simplify in Hz.
     field_simplify in Hy.
     field_simplify in Hz.
+    rewrite Rdiv_0_l in Hy, Hz.
+    apply Rmult_eq_compat_r with (r := 3%R) in Hy.
+    apply Rmult_eq_compat_r with (r := 3%R) in Hz.
+    rewrite Rmult_0_l in Hy, Hz.
+    unfold Rdiv in Hy, Hz.
+    rewrite Rmult_assoc in Hy, Hz.
+    rewrite Rinv_l in Hy, Hz; [ | lra | lra ].
+    rewrite Rmult_1_r in Hy, Hz.
+    apply Rmult_eq_compat_r with (r := √2) in Hz.
+    rewrite Rmult_0_l in Hz.
+    ring_simplify in Hz.
 bbb.
 
 Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
