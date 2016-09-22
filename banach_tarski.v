@@ -1850,7 +1850,6 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
  destruct H₁ as (e, (el₁, Hel₁)).
  clear Hel; rename Hel₁ into Hel.
  subst el; rename el₁ into el.
- apply norm_list_app_diag in Hn.
  destruct e as (t, d); destruct t.
   destruct el as [| e].
    rewrite app_nil_l.
@@ -1865,8 +1864,11 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
    progress repeat rewrite Rplus_0_r.
-   destruct d.
-    intros H.
+   assert (H :
+      ∀ u, (u = 2%R) ∨ (u = (-2)%R)
+      → P x (1 / 3 * y + u * √ 2 / 3 * z) ((- u) * √ 2 / 3 * y + 1 / 3 * z) ≠
+        P x y z).
+    intros u Hu H.
     injection H; clear H; intros Hz Hy; move Hy after Hz.
     apply Rplus_eq_compat_r with (r := (- 1 * y)%R) in Hy.
     apply Rplus_eq_compat_r with (r := (- 1 * z)%R) in Hz.
@@ -1897,7 +1899,15 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
      unfold determinant, Rdiv.
      do 2 rewrite <- Rmult_assoc.
      rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-     intros H; ring_simplify in H; lra.
+     intros H; ring_simplify in H.
+     destruct Hu; subst u; lra.
+
+    destruct d; [ apply H; left; reflexivity | ].
+    replace (2 * √2)%R with (- (- 2) * √2)%R by lra.
+    apply H; right; reflexivity.
+
+   apply norm_list_app_diag in Hn.
+   apply norm_list_cons in Hn.
 bbb.
 
 Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
