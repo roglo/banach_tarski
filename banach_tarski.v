@@ -817,6 +817,17 @@ Definition mat_id :=
     0 1 0
     0 0 1.
 
+Theorem mat_mul_id_r : ∀ m, mat_mul m mat_id = m.
+Proof.
+intros m.
+unfold mat_mul, mat_id; simpl.
+progress repeat rewrite Rmult_1_r.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+destruct m; reflexivity.
+Qed.
+
 Theorem negf_eq_eq : ∀ e₁ e₂, negf e₁ = negf e₂ → e₁ = e₂.
 Proof.
 intros e₁ e₂ Hn.
@@ -1993,6 +2004,12 @@ Theorem path_fixpoint : ∀ el m p,
   → fold_right rotate p el = p.
 Proof.
 intros el m p Hm Hp.
+subst m.
+revert p Hp.
+induction el as [| e] using rev_ind; intros; [ reflexivity | ].
+rewrite map_app, fold_right_app in Hp; simpl in Hp.
+rewrite fold_right_app; simpl.
+rewrite mat_mul_id_r in Hp.
 bbb.
 
 Definition matrix_fixpoint (m : matrix) : point.
