@@ -1976,6 +1976,33 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     rewrite fold_right_app in Hr.
 Abort. (* à compléter *)
 
+(* sources:
+   - wikipedia "rotation matrix"
+   - http://www.euclideanspace.com/maths/geometry/rotations/
+       conversions/matrixToAngle *)
+Definition matrix_fixpoint (m : matrix) :=
+  let x := (a₃₂ m - a₂₃ m)%R in
+  let y := (a₁₃ m - a₃₁ m)%R in
+  let z := (a₂₁ m - a₁₂ m)%R in
+  let r := (x² + y² + z²)%R in
+  P (x/r) (y/r) (z/r).
+
+Theorem path_fixpoint : ∀ el m p,
+  m = fold_right mat_mul mat_id (map mat_of_elem el)
+  → p = matrix_fixpoint m
+  → fold_right rotate p el = p.
+Proof.
+intros el m p Hm Hp.
+bbb.
+
+Definition matrix_fixpoint (m : matrix) : point.
+Proof.
+remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
+remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
+remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
+remember (x² + y² + z²)%R as r eqn:Hr.
+apply (P (x/r) (y/r) (z/r)).
+
 (* return rotation:
    - its axis (line passing through returned point and origin) and
    - its angle *)
@@ -1983,7 +2010,6 @@ Definition rotation_of_path (el : list free_elem) : (point * ℝ).
 Proof.
 remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
 bbb.
-*)
 
 Theorem toto : ∀ el, ∃ r,
   ∀ p, fold_right rotate p el = mat_vec_mul r p.
