@@ -726,9 +726,7 @@ assert (solve_1_var : ∀ a b c a' b' c' x y,
  split; [ eapply solve_1_var; eassumption | ].
  rewrite Rplus_comm in H₁, H₂.
  rewrite determinant_comm in Hd.
- rewrite determinant_comm.
- remember (determinant c' a' c a) as u.
- rewrite determinant_comm; subst u.
+ setoid_rewrite determinant_comm.
  eapply solve_1_var; eassumption.
 Qed. 
 
