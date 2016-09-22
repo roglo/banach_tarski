@@ -2010,6 +2010,9 @@ induction el as [| e] using rev_ind; intros; [ reflexivity | ].
 rewrite map_app, fold_right_app in Hp; simpl in Hp.
 rewrite fold_right_app; simpl.
 rewrite mat_mul_id_r in Hp.
+destruct e as (t, d); destruct t, d; simpl in Hp; simpl.
+ unfold rotate at 2; simpl.
+
 bbb.
 
 Definition matrix_fixpoint (m : matrix) : point.
