@@ -1919,6 +1919,13 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     pose proof Hp p Hps Hp₁ Hp₂ as H.
     intros Hr; apply H; clear H.
     rewrite fold_right_app in Hr.
+Abort. (* à compléter *)
+
+(* ah oui mais non... *)
+Theorem r_decomposed_4 : ∀ el,
+  norm_list el = [] ⊕ r_start_with el ạ ⊕ s ∈ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ḅ) ⊕ s ∈ Ṣ(ḅ⁻¹).
+Proof.
+intros s.
 bbb.
 
 Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
