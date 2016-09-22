@@ -1851,7 +1851,8 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
  clear Hel; rename Hel₁ into Hel.
  subst el; rename el₁ into el.
  destruct e as (t, d); destruct t.
-  destruct el as [| e].
+  revert d Hn.
+  induction el as [| e] using rev_ind; intros.
    rewrite app_nil_l.
    exists (P 1 0 0), (P (-1) 0 0).
    split; [ simpl; rewrite Rsqr_0, Rsqr_1; lra | ].
@@ -1907,7 +1908,17 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     apply H; right; reflexivity.
 
    apply norm_list_app_diag in Hn.
-   apply norm_list_cons in Hn.
+   destruct e as (t₁, d₁).
+    destruct t₁.
+    pose proof IHel d₁ Hn as H.
+    destruct H as (p₁, (p₂, (Hps₁, (Hps₂, Hp)))).
+    exists p₁, p₂.
+    split; [ assumption | ].
+    split; [ assumption | ].
+    intros p Hps Hp₁ Hp₂.
+    pose proof Hp p Hps Hp₁ Hp₂ as H.
+    intros Hr; apply H; clear H.
+    rewrite fold_right_app in Hr.
 bbb.
 
 Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
