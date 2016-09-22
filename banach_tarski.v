@@ -779,13 +779,15 @@ Definition rot_inv_z := mkmat
   (-2*√2/3) (1/3)     0
   0         0         1.
 
-Definition rotate e pt :=
+Definition mat_of_elem e :=
   match e with
-  | ạ => mat_vec_mul rot_x pt
-  | ạ⁻¹ => mat_vec_mul rot_inv_x pt
-  | ḅ => mat_vec_mul rot_z pt
-  | ḅ⁻¹ => mat_vec_mul rot_inv_z pt
+  | ạ => rot_x
+  | ạ⁻¹ => rot_inv_x
+  | ḅ => rot_z
+  | ḅ⁻¹ => rot_inv_z
   end.
+
+Definition rotate e pt := mat_vec_mul (mat_of_elem e) pt.
 
 Definition rev_path el := map negf (rev el).
 
@@ -831,33 +833,55 @@ split.
   destruct H as (H, HN).
   erewrite H.
   simpl in Hr; simpl; unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite Rmult_0_l.
-  progress repeat rewrite Rplus_0_l.
-  progress repeat rewrite Rplus_0_r.
-  progress repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+(**)
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl.
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   unfold Rdiv.
+   rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
 
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   unfold Rdiv.
+   rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
 
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   unfold Rdiv.
+   rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
 
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ f_equal; lra | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   progress repeat rewrite Rmult_1_l.
+   progress repeat rewrite Rmult_0_l.
+   progress repeat rewrite Rplus_0_l.
+   progress repeat rewrite Rplus_0_r.
+   progress repeat rewrite <- Rmult_assoc.
+   unfold Rdiv.
+   rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
 
  intros Hr.
  revert x y z n a₁ b₁ c₁ N₁ Hr.
@@ -1454,20 +1478,20 @@ Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.
 Proof.
 intros (t, d) p; simpl.
 destruct t, d; simpl.
- rewrite rot_inv_rot_x; reflexivity.
- rewrite rot_rot_inv_x; reflexivity.
- rewrite rot_inv_rot_z; reflexivity.
- rewrite rot_rot_inv_z; reflexivity.
+ apply rot_inv_rot_x.
+ apply rot_rot_inv_x.
+ apply rot_inv_rot_z.
+ apply rot_rot_inv_z.
 Qed.
 
 Theorem rotate_neg_rotate : ∀ e p, rotate (negf e) (rotate e p) = p.
 Proof.
 intros (t, d) p; simpl.
 destruct t, d; simpl.
- rewrite rot_rot_inv_x; reflexivity.
- rewrite rot_inv_rot_x; reflexivity.
- rewrite rot_rot_inv_z; reflexivity.
- rewrite rot_inv_rot_z; reflexivity.
+ apply rot_rot_inv_x.
+ apply rot_inv_rot_x.
+ apply rot_rot_inv_z.
+ apply rot_inv_rot_z.
 Qed.
 
 Theorem rev_path_nil : rev_path [] = [].
@@ -1861,10 +1885,12 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
    unfold on_sphere in Hsp.
    unfold mat_vec_mul, rot_inv_x; simpl.
    destruct p as (x, y, z).
+(*
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
    progress repeat rewrite Rplus_0_r.
+*)
    assert (H :
       ∀ u, (u = 2%R) ∨ (u = (-2)%R)
       → P x (1 / 3 * y + u * √ 2 / 3 * z) ((- u) * √ 2 / 3 * y + 1 / 3 * z) ≠
@@ -1903,9 +1929,20 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
      intros H; ring_simplify in H.
      destruct Hu; subst u; lra.
 
-    destruct d; [ apply H; left; reflexivity | ].
-    replace (2 * √2)%R with (- (- 2) * √2)%R by lra.
-    apply H; right; reflexivity.
+    unfold rotate; simpl.
+    destruct d; simpl.
+     progress repeat rewrite Rmult_1_l.
+     progress repeat rewrite Rmult_0_l.
+     progress repeat rewrite Rplus_0_l.
+     progress repeat rewrite Rplus_0_r.
+     apply H; left; reflexivity.
+
+     progress repeat rewrite Rmult_1_l.
+     progress repeat rewrite Rmult_0_l.
+     progress repeat rewrite Rplus_0_l.
+     progress repeat rewrite Rplus_0_r.
+     replace (2 * √2)%R with (- (- 2) * √2)%R by lra.
+     apply H; right; reflexivity.
 
    apply norm_list_app_diag in Hn.
    destruct e as (t₁, d₁).
@@ -1921,12 +1958,27 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     rewrite fold_right_app in Hr.
 Abort. (* à compléter *)
 
+Definition rotate_of_path (el : list free_elem) : (point * ℝ).
+Proof.
+Abort. (* à voir *)
+(*
+remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
+bbb.
+*)
+
+Theorem toto : ∀ el, ∃ r,
+  ∀ p, fold_right rotate p el = mat_vec_mul r p.
+Proof.
+Abort. (* à voir *)
+
 (* ah oui mais non... *)
+(*
 Theorem r_decomposed_4 : ∀ el,
   norm_list el = [] ⊕ r_start_with el ạ ⊕ s ∈ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ḅ) ⊕ s ∈ Ṣ(ḅ⁻¹).
 Proof.
 intros s.
 bbb.
+*)
 
 Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
   not (List.In p [P 1 0 0; P (-1) 0 0; P 0 0 1; P 0 0 (-1)])
@@ -1973,8 +2025,7 @@ intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
    proof is based upon the fact that its coordinates are integers, which
    is not necessarily the case for any p.
  *)
-bbb.
-Abort.
+Abort. (* à voir *)
 
 Definition no_rotation := ([] : list free_elem).
 Definition is_identity el := ∀ p, fold_right rotate p el = p.
