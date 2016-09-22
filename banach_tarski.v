@@ -799,6 +799,24 @@ Definition rotate_param e '(a, b, c, N) :=
   | ḅ⁻¹ => ((a + 4 * b)%Z, (b - 2 * a)%Z, (3 * c)%Z, S N)
   end.
 
+Definition mat_mul m₁ m₂ :=
+  mkmat
+    (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
+    (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
+    (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
+    (a₂₁ m₁ * a₁₁ m₂ + a₂₂ m₁ * a₂₁ m₂ + a₂₃ m₁ * a₃₁ m₂)
+    (a₂₁ m₁ * a₁₂ m₂ + a₂₂ m₁ * a₂₂ m₂ + a₂₃ m₁ * a₃₂ m₂)
+    (a₂₁ m₁ * a₁₃ m₂ + a₂₂ m₁ * a₂₃ m₂ + a₂₃ m₁ * a₃₃ m₂)
+    (a₃₁ m₁ * a₁₁ m₂ + a₃₂ m₁ * a₂₁ m₂ + a₃₃ m₁ * a₃₁ m₂)
+    (a₃₁ m₁ * a₁₂ m₂ + a₃₂ m₁ * a₂₂ m₂ + a₃₃ m₁ * a₃₂ m₂)
+    (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
+
+Definition mat_id :=
+  mkmat
+    1 0 0
+    0 1 0
+    0 0 1.
+
 Theorem negf_eq_eq : ∀ e₁ e₂, negf e₁ = negf e₂ → e₁ = e₂.
 Proof.
 intros e₁ e₂ Hn.
@@ -1958,10 +1976,11 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     rewrite fold_right_app in Hr.
 Abort. (* à compléter *)
 
-Definition rotate_of_path (el : list free_elem) : (point * ℝ).
+(* return rotation:
+   - its axis (line passing through returned point and origin) and
+   - its angle *)
+Definition rotation_of_path (el : list free_elem) : (point * ℝ).
 Proof.
-Abort. (* à voir *)
-(*
 remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
 bbb.
 *)
