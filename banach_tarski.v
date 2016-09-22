@@ -682,6 +682,56 @@ rewrite Rplus_comm, <- Rplus_assoc.
 f_equal; apply Rplus_comm.
 Qed.
 
+Theorem Rplus_opp_minus : ∀ a b, (a + - b = a - b)%R.
+Proof. reflexivity. Qed.
+
+Definition determinant a b c d := (a * d - b * c)%R.
+
+Theorem fold_determinant : ∀ a b c d, (a * d - b * c)%R = determinant a b c d.
+Proof. reflexivity. Qed.
+
+Theorem determinant_comm : ∀ a b c d,
+  determinant a b c d = determinant d c b a.
+Proof. intros; unfold determinant; ring. Qed.
+
+Theorem Rsolve_system_equation_2_variables : ∀ a b c a' b' c' x y,
+  (determinant a b a' b' ≠ 0)%R
+  → (a * x + b * y = c)%R
+  → (a' * x + b' * y = c')%R
+  → x = (determinant c b c' b' / determinant a b a' b')%R ∧
+    y = (determinant a c a' c' / determinant a b a' b')%R.
+Proof.
+assert (solve_1_var : ∀ a b c a' b' c' x y,
+  (determinant a b a' b' ≠ 0)%R
+  → (a * x + b * y = c)%R
+  → (a' * x + b' * y = c')%R
+  → x = (determinant c b c' b' / determinant a b a' b')%R).
+ intros a b c a' b' c' x y Hd H₁ H₂.
+ apply Rmult_eq_compat_r with (r := b') in H₁.
+ apply Rmult_eq_compat_r with (r := b) in H₂.
+ rewrite Rmult_plus_distr_r in H₁, H₂.
+ apply Rplus_eq_compat_r with (r := (- (c' * b))%R) in H₁.
+ replace (c' * b)%R with (b * c')%R in H₁ at 2 by apply Rmult_comm.
+ rewrite <- H₂ in H₁.
+ do 2 rewrite Rplus_opp_minus in H₁.
+ rewrite fold_determinant in H₁.
+ ring_simplify in H₁.
+ replace (a * x * b')%R with (x * a * b')%R in H₁ by ring.
+ do 2 rewrite Rmult_assoc in H₁.
+ rewrite <- Rmult_minus_distr_l in H₁.
+ rewrite fold_determinant in H₁.
+ rewrite <- H₁; field; assumption.
+
+ intros a b c a' b' c' x y Hd H₁ H₂.
+ split; [ eapply solve_1_var; eassumption | ].
+ rewrite Rplus_comm in H₁, H₂.
+ rewrite determinant_comm in Hd.
+ rewrite determinant_comm.
+ remember (determinant c' a' c a) as u.
+ rewrite determinant_comm; subst u.
+ eapply solve_1_var; eassumption.
+Qed. 
+
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
   (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
 Proof.
@@ -1824,19 +1874,32 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     apply Rplus_eq_compat_r with (r := (- 1 * z)%R) in Hz.
     ring_simplify in Hy.
     ring_simplify in Hz.
-    field_simplify in Hy.
-    field_simplify in Hz.
-    rewrite Rdiv_0_l in Hy, Hz.
-    apply Rmult_eq_compat_r with (r := 3%R) in Hy.
-    apply Rmult_eq_compat_r with (r := 3%R) in Hz.
-    rewrite Rmult_0_l in Hy, Hz.
-    unfold Rdiv in Hy, Hz.
-    rewrite Rmult_assoc in Hy, Hz.
-    rewrite Rinv_l in Hy, Hz; [ | lra | lra ].
-    rewrite Rmult_1_r in Hy, Hz.
-    apply Rmult_eq_compat_r with (r := √2) in Hz.
-    rewrite Rmult_0_l in Hz.
-    ring_simplify in Hz.
+    replace (1/3 * y - y)%R with (- (2/3) * y)%R in Hy by field.
+    unfold Rminus in Hz.
+    rewrite Rplus_assoc in Hz.
+    replace (1/3 * z + - z)%R with (- (2/3) * z)%R in Hz by field.
+    eapply Rsolve_system_equation_2_variables in Hy; [ | | eassumption ].
+     unfold determinant in Hy.
+     progress repeat rewrite Rmult_0_l in Hy.
+     progress repeat rewrite Rmult_0_r in Hy.
+     unfold Rdiv in Hy.
+     do 2 rewrite <- Rmult_assoc in Hy.
+     rewrite Rmult5_sqrt2_sqrt5 in Hy; [ | lra ].
+     rename Hz into H₂.
+     destruct Hy as (Hy, Hz).
+     ring_simplify in Hy.
+     ring_simplify in Hz.
+     subst y z.
+     ring_simplify in Hsp.
+     rewrite Rsqr_0, Rmult_0_r, Rplus_0_r in Hsp.
+     rewrite <- Rsqr_1 in Hsp.
+     apply Rsqr_eq in Hsp.
+     destruct Hsp; subst x; exfalso; [ apply Hp₁ | apply Hp₂ ]; reflexivity.
+
+     unfold determinant, Rdiv.
+     do 2 rewrite <- Rmult_assoc.
+     rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+     intros H; ring_simplify in H; lra.
 bbb.
 
 Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
