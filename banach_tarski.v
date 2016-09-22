@@ -1998,20 +1998,39 @@ Definition matrix_fixpoint (m : matrix) :=
   let r := (x² + y² + z²)%R in
   P (x/r) (y/r) (z/r).
 
-Theorem matrix_fixpoint_ok : ∀ m,
-  mat_vec_mul m (matrix_fixpoint m) = matrix_fixpoint m.
+Theorem matrix_fixpoint_ok : ∀ m p,
+  p = matrix_fixpoint m
+  → p ≠ P 0 0 0
+  → mat_vec_mul m p = p.
 Proof.
-intros.
+intros m p Hp Hn.
+subst p.
+unfold matrix_fixpoint in Hn.
 unfold matrix_fixpoint.
 remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
 remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
 remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
 remember (x² + y² + z²)%R as r eqn:Hr.
-unfold matrix_fixpoint; simpl.
-f_equal.
- field_simplify.
-  f_equal.
+assert (Hrnz : (r ≠ 0)%R).
+ intros H; apply Hn; clear Hn.
+ move H at top; subst r.
+ symmetry in Hr.
+ assert (H : (x = 0)%R).
+  apply Rsqr_0_uniq.
+  rewrite Rplus_assoc in Hr.
+  apply Rplus_eq_0_l with (y²+z²)%R; [ apply Rle_0_sqr | | assumption ].
+  apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 
+  move H at top; subst x.
+  rewrite Rsqr_0, Rplus_0_l in Hr.
+  apply Rplus_sqr_eq_0 in Hr.
+  move Hr at top; destruct Hr; subst y z.
+  f_equal; lra.
+
+ simpl.
+ f_equal.
+  field_simplify; [ | assumption | assumption ].
+  f_equal.
 bbb.
 
 Theorem path_fixpoint : ∀ el m p,
