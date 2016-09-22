@@ -1998,6 +1998,22 @@ Definition matrix_fixpoint (m : matrix) :=
   let r := (x² + y² + z²)%R in
   P (x/r) (y/r) (z/r).
 
+Theorem matrix_fixpoint_ok : ∀ m,
+  mat_vec_mul m (matrix_fixpoint m) = matrix_fixpoint m.
+Proof.
+intros.
+unfold matrix_fixpoint.
+remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
+remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
+remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
+remember (x² + y² + z²)%R as r eqn:Hr.
+unfold matrix_fixpoint; simpl.
+f_equal.
+ field_simplify.
+  f_equal.
+
+bbb.
+
 Theorem path_fixpoint : ∀ el m p,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
   → p = matrix_fixpoint m
@@ -2005,6 +2021,21 @@ Theorem path_fixpoint : ∀ el m p,
 Proof.
 intros el m p Hm Hp.
 subst m.
+(**)
+destruct (list_nil_app_dec el) as [H₁| H₁]; [ subst el; reflexivity | ].
+destruct H₁ as (e, (el', Hel)).
+subst el; rename el' into el.
+rewrite map_app, fold_right_app in Hp; simpl in Hp.
+rewrite mat_mul_id_r in Hp.
+rewrite fold_right_app; simpl.
+unfold rotate at 2.
+remember (mat_of_elem e) as m eqn:Hm; clear e Hm.
+revert p m Hp.
+induction el as [| e] using rev_ind; intros.
+ simpl in Hp; simpl.
+Check matrix_fixpoint_ok.
+
+bbb.
 revert p Hp.
 induction el as [| e] using rev_ind; intros; [ reflexivity | ].
 rewrite map_app, fold_right_app in Hp; simpl in Hp.
