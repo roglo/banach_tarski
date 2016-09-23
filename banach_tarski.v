@@ -2177,10 +2177,10 @@ assert (Hrnz : (r ≠ 0)%R).
   f_equal.
   unfold is_rotation_matrix in Hrm.
   destruct Hrm as (Ht & Hd).
-  subst x y z.
   unfold mat_det in Hd.
   unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
   injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+  subst x y z.
 bbb.
 
 Theorem path_fixpoint : ∀ el m p,
