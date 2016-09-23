@@ -2187,6 +2187,24 @@ assert (Hrnz : (r ≠ 0)%R).
   unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
   injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
   subst x y z.
+  apply Rmult_eq_reg_l with (a₃₂ m).
+  ring_simplify.
+  apply Rplus_eq_reg_l with (a₁₁ m * a₂₂ m * a₃₃ m)%R.
+  ring_simplify.
+  replace
+    (a₁₁ m * a₂₂ m * a₃₃ m + a₁₁ m * a₃₂ m ^ 2 - a₁₁ m * a₃₂ m * a₂₃ m)%R
+  with
+    (a₁₁ m * a₂₂ m * a₃₃ m - a₁₁ m * a₃₂ m * a₂₃ m + a₁₁ m * a₃₂ m ^ 2)%R
+  by ring.
+  setoid_rewrite Rmult_assoc.
+  rewrite <- Rmult_minus_distr_l.
+  setoid_rewrite <- Rmult_assoc.
+  do 2 rewrite Rmult_1_r.
+  replace (a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m))%R with
+    (1 - (a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
+          a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m)))%R
+  by (rewrite <- Hd; ring).
+  ring_simplify.
 bbb.
 
 Theorem path_fixpoint : ∀ el m p,
