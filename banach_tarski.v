@@ -1994,6 +1994,28 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     rewrite fold_right_app in Hr.
 Abort. (* à compléter *)
 
+Definition mat_transp m :=
+  mkmat 
+   (a₁₁ m) (a₂₁ m) (a₃₁ m)
+   (a₁₂ m) (a₂₂ m) (a₃₂ m)
+   (a₁₃ m) (a₂₃ m) (a₃₃ m).
+
+Definition mat_det m :=
+  (a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m) +
+   a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
+   a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%R.
+
+(* A is rotation matrix iff
+   - A tr(A) = I
+   - det A = 1
+ *)
+Definition is_rotation_matrix A :=
+  mat_mul A (mat_transp A) = mat_id ∧
+  mat_det A = 1%R.
+bbb.
+
+(* other possibility, but complicated *)
+bbb.
 (* R is rotation matrix iff
    1. R is normalized: the squares of the elements in any row or column
       sum to 1.
