@@ -824,6 +824,9 @@ Definition mat_id :=
     0 1 0
     0 0 1.
 
+Delimit Scope mat_scope with mat.
+Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
+
 Theorem mat_mul_id_r : ∀ m, mat_mul m mat_id = m.
 Proof.
 intros m.
@@ -2005,6 +2008,20 @@ Definition mat_det m :=
    a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
    a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%R.
 
+Theorem mat_transp_mul : ∀ m₁ m₂,
+  mat_transp (mat_mul m₁ m₂) = mat_mul (mat_transp m₂) (mat_transp m₁).
+Proof.
+intros m₁ m₂.
+unfold mat_transp, mat_mul; simpl; f_equal; ring.
+Qed.
+
+Theorem mat_mul_assoc : ∀ m₁ m₂ m₃,
+  (m₁ * (m₂ * m₃) = m₁ * m₂ * m₃)%mat.
+Proof.
+intros m₁ m₂ m₃.
+unfold mat_mul; simpl; f_equal; ring.
+Qed.
+
 (* A is rotation matrix iff
    - A tr(A) = I
    - det A = 1
@@ -2012,6 +2029,20 @@ Definition mat_det m :=
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
   mat_det A = 1%R.
+
+Theorem inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
+Proof.
+unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
+unfold mat_id, Rdiv.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite <- Rmult_assoc.
+progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
+split; [ f_equal; field | field ].
+Qed.
 
 Theorem toto : ∀ el m,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
@@ -2024,6 +2055,21 @@ induction el as [| e]; intros.
  rewrite mat_mul_id_r.
  split; [ reflexivity | ring ].
 
+ simpl in Hm.
+ remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m₁ eqn:Hm₁.
+ pose proof IHel m₁ eq_refl as Hr.
+ unfold is_rotation_matrix in Hr.
+ unfold is_rotation_matrix.
+ destruct Hr as (Hr & Hd).
+ rewrite Hm.
+ split.
+  destruct e as (t, d); destruct t, d; simpl.
+   rewrite mat_transp_mul.
+   rewrite mat_mul_assoc.
+   setoid_rewrite <- mat_mul_assoc at 2.
+   rewrite Hr, mat_mul_id_r.
+   pose proof inv_x_is_rotation_matrix as H.
+   destruct H; assumption.
 bbb.
 
 (* other possibility, but complicated *)
