@@ -2012,6 +2012,18 @@ Definition mat_det m :=
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
   mat_det A = 1%R.
+
+Theorem toto : ∀ el m,
+  m = fold_right mat_mul mat_id (map mat_of_elem el)
+  → is_rotation_matrix m.
+Proof.
+intros el m Hm.
+revert m Hm.
+induction el as [| e]; intros.
+ subst m; simpl; unfold is_rotation_matrix, mat_det; simpl.
+ rewrite mat_mul_id_r.
+ split; [ reflexivity | ring ].
+
 bbb.
 
 (* other possibility, but complicated *)
