@@ -2008,6 +2008,8 @@ Definition mat_det m :=
    a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
    a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%R.
 
+Arguments mat_det m%mat.
+
 Theorem mat_transp_mul : ∀ m₁ m₂,
   mat_transp (mat_mul m₁ m₂) = mat_mul (mat_transp m₂) (mat_transp m₁).
 Proof.
@@ -2022,6 +2024,13 @@ intros m₁ m₂ m₃.
 unfold mat_mul; simpl; f_equal; ring.
 Qed.
 
+Theorem mat_det_mul : ∀ m₁ m₂,
+  mat_det (m₁ * m₂) = (mat_det m₂ * mat_det m₁)%R.
+Proof.
+intros m₁ m₂.
+unfold mat_det; simpl; ring.
+Qed.
+
 (* A is rotation matrix iff
    - A tr(A) = I
    - det A = 1
@@ -2030,7 +2039,21 @@ Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
   mat_det A = 1%R.
 
-Theorem inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
+Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
+Proof.
+unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
+unfold mat_id, Rdiv.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite <- Rmult_assoc.
+progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
+split; [ f_equal; field | field ].
+Qed.
+
+Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
 unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, Rdiv.
@@ -2044,7 +2067,41 @@ progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
 split; [ f_equal; field | field ].
 Qed.
 
-Theorem toto : ∀ el m,
+Theorem rot_z_is_rotation_matrix : is_rotation_matrix rot_z.
+Proof.
+unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
+unfold mat_id, Rdiv.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rminus_0_l.
+progress repeat rewrite Rminus_0_r.
+progress repeat rewrite Ropp_mult_distr_l.
+progress repeat rewrite <- Rmult_assoc.
+progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
+split; [ f_equal; field | field ].
+Qed.
+
+Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
+Proof.
+unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
+unfold mat_id, Rdiv.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+progress repeat rewrite Rminus_0_l.
+progress repeat rewrite Rminus_0_r.
+progress repeat rewrite Ropp_mult_distr_l.
+progress repeat rewrite <- Rmult_assoc.
+progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
+split; [ f_equal; field | field ].
+Qed.
+
+Theorem path_is_rotation : ∀ el m,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
   → is_rotation_matrix m.
 Proof.
@@ -2062,116 +2119,16 @@ induction el as [| e]; intros.
  unfold is_rotation_matrix.
  destruct Hr as (Hr & Hd).
  rewrite Hm.
- split.
-  destruct e as (t, d); destruct t, d; simpl.
-   rewrite mat_transp_mul.
-   rewrite mat_mul_assoc.
-   setoid_rewrite <- mat_mul_assoc at 2.
-   rewrite Hr, mat_mul_id_r.
-   pose proof inv_x_is_rotation_matrix as H.
-   destruct H; assumption.
-bbb.
-
-(* other possibility, but complicated *)
-bbb.
-(* R is rotation matrix iff
-   1. R is normalized: the squares of the elements in any row or column
-      sum to 1.
-   2. R is orthogonal: the dot product of any pair of rows or any pair
-      of columns is 0.
-  https://www.fastgraph.com/makegames/3drotation/
-*)
-Definition is_rotation_matrix R :=
-  ((a₁₁ R)² + (a₁₂ R)² + (a₁₃ R)² = 1)%R ∧
-  ((a₂₁ R)² + (a₂₂ R)² + (a₂₃ R)² = 1)%R ∧
-  ((a₃₁ R)² + (a₃₂ R)² + (a₃₃ R)² = 1)%R ∧
-  ((a₁₁ R)² + (a₂₁ R)² + (a₃₁ R)² = 1)%R ∧
-  ((a₁₂ R)² + (a₂₂ R)² + (a₃₂ R)² = 1)%R ∧
-  ((a₁₃ R)² + (a₂₃ R)² + (a₃₃ R)² = 1)%R ∧
-  (a₁₁ R * a₂₁ R + a₁₂ R * a₂₂ R + a₁₃ R * a₂₃ R = 0)%R ∧
-  (a₂₁ R * a₃₁ R + a₂₂ R * a₃₂ R + a₂₃ R * a₃₃ R = 0)%R ∧
-  (a₃₁ R * a₁₁ R + a₃₂ R * a₁₂ R + a₃₃ R * a₁₃ R = 0)%R ∧
-  (a₁₁ R * a₁₂ R + a₂₁ R * a₂₂ R + a₃₁ R * a₃₂ R = 0)%R ∧
-  (a₁₂ R * a₁₃ R + a₂₂ R * a₂₃ R + a₃₂ R * a₃₃ R = 0)%R ∧
-  (a₁₃ R * a₁₁ R + a₂₃ R * a₂₁ R + a₃₃ R * a₃₁ R = 0)%R.
-
-Theorem toto : ∀ el m,
-  m = fold_right mat_mul mat_id (map mat_of_elem el)
-  → is_rotation_matrix m.
-Proof.
-intros el m Hm.
-revert m Hm.
-induction el as [| e]; intros.
- subst m; simpl; unfold is_rotation_matrix; simpl.
- progress repeat rewrite Rsqr_0.
- progress repeat rewrite Rsqr_1.
- progress repeat rewrite Rmult_0_l.
- progress repeat rewrite Rmult_0_r.
- progress repeat rewrite Rplus_0_l.
- progress repeat rewrite Rplus_0_r.
- progress repeat (split; [ reflexivity | ]); reflexivity.
-
- simpl in Hm.
- destruct e as (t, d); destruct t, d; simpl in Hm.
-  remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m₁ eqn:Hm₁.
-  pose proof IHel m₁ eq_refl as Hr.
-  clear IHel; subst m; rename m₁ into m.
-  unfold is_rotation_matrix; simpl.
-  progress repeat rewrite Rmult_0_l.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite Rplus_0_l.
-  progress repeat rewrite Rplus_0_r.
-  unfold is_rotation_matrix in Hr.
-  destruct Hr as (H₁, (H₂, (H₃, (H₄, (H₅, (H₆, (H₇, (H₈, H₉)))))))).
-  destruct H₉ as (H₉, (H₁₀, (H₁₁, H₁₂))).
-  split; [ assumption | ].
-  split.
-   progress repeat rewrite Rsqr_plus.
-   progress repeat rewrite Rsqr_mult.
-   ring_simplify.
-   progress repeat rewrite <- Rmult_plus_distr_l.
-   rewrite H₂, Rmult_1_r.
-   eapply Rplus_eq_reg_l.
-   do 6 rewrite <- Rplus_assoc.
-   rewrite Rplus_opp_l, Rplus_0_l.
-   progress repeat rewrite <- Rmult_plus_distr_l.
-   rewrite H₃, Rmult_1_r.
-   eapply Rplus_eq_reg_l.
-   do 3 rewrite <- Rplus_assoc.
-   rewrite Rplus_opp_l, Rplus_0_l.
-   progress repeat rewrite Rmult_assoc.
-   progress repeat rewrite <- Rmult_plus_distr_l.
-   ring_simplify.
-   rewrite Rmult_assoc, Rmult_shuffle0, <- Rmult_assoc.
-   setoid_rewrite Rmult_assoc.
-   progress repeat rewrite <- Rmult_plus_distr_l.
-   replace (a₃₁ m * a₂₁ m)%R with (a₂₁ m * a₃₁ m)%R by apply Rmult_comm.
-   rewrite H₈.
-   ring_simplify.
-   field_simplify.
-   rewrite <- Rsqr_pow2.
-   rewrite Rsqr_sqrt; [ | lra ].
-   field.
-
-   split.
-   (* infernal : faut que je fasse autrement *)
-bbb.
-
-(* R is normalized: the squares of the elements in any row or column sum
-   to 1. *)
-Theorem toto : ∀ el m,
-  m = fold_right mat_mul mat_id (map mat_of_elem el)
-  → ((a₁₁ m)² + (a₁₂ m)² + (a₁₃ m)² = 1)%R.
-Proof.
-intros el m Hm.
-revert m Hm.
-induction el as [| e] using rev_ind; intros.
- subst m; simpl; rewrite Rsqr_1, Rsqr_0; lra.
-
- rewrite map_app, fold_right_app in Hm; simpl in Hm.
- rewrite mat_mul_id_r in Hm.
-
-bbb.
+ rewrite mat_transp_mul, mat_mul_assoc.
+ setoid_rewrite <- mat_mul_assoc at 2.
+ rewrite Hr, mat_mul_id_r.
+ rewrite mat_det_mul, Hd, Rmult_1_l.
+ destruct e as (t, d); destruct t, d; simpl.
+  apply rot_inv_x_is_rotation_matrix.
+  apply rot_x_is_rotation_matrix.
+  apply rot_inv_z_is_rotation_matrix.
+  apply rot_z_is_rotation_matrix.
+Qed.
 
 (* sources:
    - wikipedia "rotation matrix"
