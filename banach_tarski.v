@@ -2138,7 +2138,7 @@ Definition matrix_fixpoint (m : matrix) :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
   let z := (a₂₁ m - a₁₂ m)%R in
-  let r := (x² + y² + z²)%R in
+  let r := √ (x² + y² + z²)%R in
   P (x/r) (y/r) (z/r).
 
 Theorem matrix_fixpoint_ok : ∀ m p,
@@ -2154,22 +2154,28 @@ unfold matrix_fixpoint.
 remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
 remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
 remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
-remember (x² + y² + z²)%R as r eqn:Hr.
+remember (√ (x² + y² + z²)%R) as r eqn:Hr.
 assert (Hrnz : (r ≠ 0)%R).
  intros H; apply Hn; clear Hn.
  move H at top; subst r.
  symmetry in Hr.
- assert (H : (x = 0)%R).
-  apply Rsqr_0_uniq.
-  rewrite Rplus_assoc in Hr.
-  apply Rplus_eq_0_l with (y²+z²)%R; [ apply Rle_0_sqr | | assumption ].
-  apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+ apply sqrt_eq_0 in Hr.
+  assert (H : (x = 0)%R).
+   apply Rsqr_0_uniq.
+   rewrite Rplus_assoc in Hr.
+   apply Rplus_eq_0_l with (y²+z²)%R; [ apply Rle_0_sqr | | assumption ].
+   apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 
-  move H at top; subst x.
-  rewrite Rsqr_0, Rplus_0_l in Hr.
-  apply Rplus_sqr_eq_0 in Hr.
-  move Hr at top; destruct Hr; subst y z.
-  f_equal; lra.
+   move H at top; subst x.
+   rewrite Rsqr_0, Rplus_0_l in Hr.
+   apply Rplus_sqr_eq_0 in Hr.
+   move Hr at top; destruct Hr; subst y z.
+   f_equal; lra.
+
+  do 3 rewrite Rsqr_pow2.
+  rewrite Rplus_assoc.
+  apply Rplus_le_le_0_compat; [ apply pow2_ge_0 | ].
+  apply Rplus_le_le_0_compat; apply pow2_ge_0.
 
  simpl.
  f_equal.
