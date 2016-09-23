@@ -2142,11 +2142,12 @@ Definition matrix_fixpoint (m : matrix) :=
   P (x/r) (y/r) (z/r).
 
 Theorem matrix_fixpoint_ok : ∀ m p,
-  p = matrix_fixpoint m
+  is_rotation_matrix m
+  → p = matrix_fixpoint m
   → p ≠ P 0 0 0
   → mat_vec_mul m p = p.
 Proof.
-intros m p Hp Hn.
+intros m p Hrm Hp Hn.
 subst p.
 unfold matrix_fixpoint in Hn.
 unfold matrix_fixpoint.
@@ -2174,6 +2175,8 @@ assert (Hrnz : (r ≠ 0)%R).
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
+  unfold is_rotation_matrix in Hrm.
+  destruct Hrm as (Ht & Hd).
 bbb.
 
 Theorem path_fixpoint : ∀ el m p,
