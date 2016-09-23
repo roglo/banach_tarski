@@ -1987,6 +1987,25 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     rewrite fold_right_app in Hr.
 Abort. (* à compléter *)
 
+(* Checking properties given in
+   https://www.fastgraph.com/makegames/3drotation/ *)
+
+(* R is normalized: the squares of the elements in any row or column sum
+   to 1. *)
+Theorem toto : ∀ el m,
+  m = fold_right mat_mul mat_id (map mat_of_elem el)
+  → ((a₁₁ m)² + (a₁₂ m)² + (a₁₃ m)² = 1)%R.
+Proof.
+intros el m Hm.
+revert m Hm.
+induction el as [| e] using rev_ind; intros.
+ subst m; simpl; rewrite Rsqr_1, Rsqr_0; lra.
+
+ rewrite map_app, fold_right_app in Hm; simpl in Hm.
+ rewrite mat_mul_id_r in Hm.
+
+bbb.
+
 (* sources:
    - wikipedia "rotation matrix"
    - http://www.euclideanspace.com/maths/geometry/rotations/
