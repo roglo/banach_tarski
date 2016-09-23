@@ -682,6 +682,13 @@ rewrite Rplus_comm, <- Rplus_assoc.
 f_equal; apply Rplus_comm.
 Qed.
 
+Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
+Proof.
+intros.
+rewrite Rmult_comm, <- Rmult_assoc.
+f_equal; apply Rmult_comm.
+Qed.
+
 Theorem Rplus_opp_minus : ∀ a b, (a + - b = a - b)%R.
 Proof. reflexivity. Qed.
 
@@ -1987,8 +1994,88 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
     rewrite fold_right_app in Hr.
 Abort. (* à compléter *)
 
-(* Checking properties given in
-   https://www.fastgraph.com/makegames/3drotation/ *)
+(* R is rotation matrix iff
+   1. R is normalized: the squares of the elements in any row or column
+      sum to 1.
+   2. R is orthogonal: the dot product of any pair of rows or any pair
+      of columns is 0.
+  https://www.fastgraph.com/makegames/3drotation/
+*)
+Definition is_rotation_matrix R :=
+  ((a₁₁ R)² + (a₁₂ R)² + (a₁₃ R)² = 1)%R ∧
+  ((a₂₁ R)² + (a₂₂ R)² + (a₂₃ R)² = 1)%R ∧
+  ((a₃₁ R)² + (a₃₂ R)² + (a₃₃ R)² = 1)%R ∧
+  ((a₁₁ R)² + (a₂₁ R)² + (a₃₁ R)² = 1)%R ∧
+  ((a₁₂ R)² + (a₂₂ R)² + (a₃₂ R)² = 1)%R ∧
+  ((a₁₃ R)² + (a₂₃ R)² + (a₃₃ R)² = 1)%R ∧
+  (a₁₁ R * a₂₁ R + a₁₂ R * a₂₂ R + a₁₃ R * a₂₃ R = 0)%R ∧
+  (a₂₁ R * a₃₁ R + a₂₂ R * a₃₂ R + a₂₃ R * a₃₃ R = 0)%R ∧
+  (a₃₁ R * a₁₁ R + a₃₂ R * a₁₂ R + a₃₃ R * a₁₃ R = 0)%R ∧
+  (a₁₁ R * a₁₂ R + a₂₁ R * a₂₂ R + a₃₁ R * a₃₂ R = 0)%R ∧
+  (a₁₂ R * a₁₃ R + a₂₂ R * a₂₃ R + a₃₂ R * a₃₃ R = 0)%R ∧
+  (a₁₃ R * a₁₁ R + a₂₃ R * a₂₁ R + a₃₃ R * a₃₁ R = 0)%R.
+
+Theorem toto : ∀ el m,
+  m = fold_right mat_mul mat_id (map mat_of_elem el)
+  → is_rotation_matrix m.
+Proof.
+intros el m Hm.
+revert m Hm.
+induction el as [| e]; intros.
+ subst m; simpl; unfold is_rotation_matrix; simpl.
+ progress repeat rewrite Rsqr_0.
+ progress repeat rewrite Rsqr_1.
+ progress repeat rewrite Rmult_0_l.
+ progress repeat rewrite Rmult_0_r.
+ progress repeat rewrite Rplus_0_l.
+ progress repeat rewrite Rplus_0_r.
+ progress repeat (split; [ reflexivity | ]); reflexivity.
+
+ simpl in Hm.
+ destruct e as (t, d); destruct t, d; simpl in Hm.
+  remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m₁ eqn:Hm₁.
+  pose proof IHel m₁ eq_refl as Hr.
+  clear IHel; subst m; rename m₁ into m.
+  unfold is_rotation_matrix; simpl.
+  progress repeat rewrite Rmult_0_l.
+  progress repeat rewrite Rmult_1_l.
+  progress repeat rewrite Rplus_0_l.
+  progress repeat rewrite Rplus_0_r.
+  unfold is_rotation_matrix in Hr.
+  destruct Hr as (H₁, (H₂, (H₃, (H₄, (H₅, (H₆, (H₇, (H₈, H₉)))))))).
+  destruct H₉ as (H₉, (H₁₀, (H₁₁, H₁₂))).
+  split; [ assumption | ].
+  split.
+   progress repeat rewrite Rsqr_plus.
+   progress repeat rewrite Rsqr_mult.
+   ring_simplify.
+   progress repeat rewrite <- Rmult_plus_distr_l.
+   rewrite H₂, Rmult_1_r.
+   eapply Rplus_eq_reg_l.
+   do 6 rewrite <- Rplus_assoc.
+   rewrite Rplus_opp_l, Rplus_0_l.
+   progress repeat rewrite <- Rmult_plus_distr_l.
+   rewrite H₃, Rmult_1_r.
+   eapply Rplus_eq_reg_l.
+   do 3 rewrite <- Rplus_assoc.
+   rewrite Rplus_opp_l, Rplus_0_l.
+   progress repeat rewrite Rmult_assoc.
+   progress repeat rewrite <- Rmult_plus_distr_l.
+   ring_simplify.
+   rewrite Rmult_assoc, Rmult_shuffle0, <- Rmult_assoc.
+   setoid_rewrite Rmult_assoc.
+   progress repeat rewrite <- Rmult_plus_distr_l.
+   replace (a₃₁ m * a₂₁ m)%R with (a₂₁ m * a₃₁ m)%R by apply Rmult_comm.
+   rewrite H₈.
+   ring_simplify.
+   field_simplify.
+   rewrite <- Rsqr_pow2.
+   rewrite Rsqr_sqrt; [ | lra ].
+   field.
+
+   split.
+   (* infernal : faut que je fasse autrement *)
+bbb.
 
 (* R is normalized: the squares of the elements in any row or column sum
    to 1. *)
