@@ -2232,28 +2232,6 @@ Focus 2.
 Unfocus. (* same problem for the first two goals; I guess the third is same *)
 
 bbb.
-  replace
-    (m₁₁ * (m₃₂ - m₂₃) + m₁₂ * (m₁₃ - m₃₁) + m₁₃ * (m₂₁ - m₁₂)
-     + - (m₃₂ - m₂₃))%R
-  with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₂ * (m₁₃ - m₃₁) + m₁₃ * (m₂₁ - m₁₂))%R
-    by ring.
-bbb.
-  apply Rmult_eq_reg_l with m₃₂.
-  ring_simplify.
-  apply Rplus_eq_reg_l with (m₁₁ * m₂₂ * m₃₃)%R.
-  ring_simplify.
-  replace (m₁₁ * m₂₂ * m₃₃ + m₁₁ * m₃₂ ^ 2 - m₁₁ * m₃₂ * m₂₃)%R
-  with (m₁₁ * m₂₂ * m₃₃ - m₁₁ * m₃₂ * m₂₃ + m₁₁ * m₃₂ ^ 2)%R
-  by ring.
-  setoid_rewrite Rmult_assoc.
-  rewrite <- Rmult_minus_distr_l.
-  setoid_rewrite <- Rmult_assoc.
-  do 2 rewrite Rmult_1_r.
-  replace (m₁₁ * (m₂₂ * m₃₃ - m₃₂ * m₂₃))%R with
-    (1 - (m₁₂ * (m₂₃ * m₃₁ - m₃₃ * m₂₁) + m₁₃ * (m₂₁ * m₃₂ - m₃₁ * m₂₂)))%R
-  by (rewrite <- Hd; ring).
-  ring_simplify.
-bbb.
 
 Theorem path_fixpoint : ∀ el m p,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
