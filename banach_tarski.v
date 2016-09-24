@@ -689,7 +689,7 @@ rewrite Rmult_comm, <- Rmult_assoc.
 f_equal; apply Rmult_comm.
 Qed.
 
-Theorem Rplus_opp_minus : ∀ a b, (a + - b = a - b)%R.
+Theorem fold_Rminus : ∀ a b, (a + - b = a - b)%R.
 Proof. reflexivity. Qed.
 
 Definition determinant a b c d := (a * d - b * c)%R.
@@ -720,7 +720,7 @@ assert (solve_1_var : ∀ a b c a' b' c' x y,
  apply Rplus_eq_compat_r with (r := (- (c' * b))%R) in H₁.
  replace (c' * b)%R with (b * c')%R in H₁ at 2 by apply Rmult_comm.
  rewrite <- H₂ in H₁.
- do 2 rewrite Rplus_opp_minus in H₁.
+ do 2 rewrite fold_Rminus in H₁.
  rewrite fold_determinant in H₁.
  ring_simplify in H₁.
  replace (a * x * b')%R with (x * a * b')%R in H₁ by ring.
@@ -2196,9 +2196,12 @@ assert (Hrnz : (r ≠ 0)%R).
   field_simplify; [ | assumption | assumption ].
   f_equal.
   subst x y z.
-  apply Rplus_eq_reg_r with (- (m₃₂ - m₂₃))%R.
-  rewrite Rplus_opp_r.
   ring_simplify.
+  apply Rplus_eq_reg_r with (- (m₃₂ - m₂₃))%R.
+  ring_simplify.
+  rewrite <- Rmult_minus_distr_l.
+  replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
+  with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
 bbb.
   replace
     (m₁₁ * (m₃₂ - m₂₃) + m₁₂ * (m₁₃ - m₃₁) + m₁₃ * (m₂₁ - m₁₂)
