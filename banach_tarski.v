@@ -2185,24 +2185,30 @@ assert (Hrnz : (r ≠ 0)%R).
   destruct Hrm as (Ht & Hd).
   unfold mat_det in Hd.
   unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
+  remember (a₁₁ m) as m₁₁.
+  remember (a₁₂ m) as m₁₂.
+  remember (a₁₃ m) as m₁₃.
+  remember (a₂₁ m) as m₂₁.
+  remember (a₂₂ m) as m₂₂.
+  remember (a₂₃ m) as m₂₃.
+  remember (a₃₁ m) as m₃₁.
+  remember (a₃₂ m) as m₃₂.
+  remember (a₃₃ m) as m₃₃.
   injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
   subst x y z.
-  apply Rmult_eq_reg_l with (a₃₂ m).
+  apply Rmult_eq_reg_l with m₃₂.
   ring_simplify.
-  apply Rplus_eq_reg_l with (a₁₁ m * a₂₂ m * a₃₃ m)%R.
+  apply Rplus_eq_reg_l with (m₁₁ * m₂₂ * m₃₃)%R.
   ring_simplify.
-  replace
-    (a₁₁ m * a₂₂ m * a₃₃ m + a₁₁ m * a₃₂ m ^ 2 - a₁₁ m * a₃₂ m * a₂₃ m)%R
-  with
-    (a₁₁ m * a₂₂ m * a₃₃ m - a₁₁ m * a₃₂ m * a₂₃ m + a₁₁ m * a₃₂ m ^ 2)%R
+  replace (m₁₁ * m₂₂ * m₃₃ + m₁₁ * m₃₂ ^ 2 - m₁₁ * m₃₂ * m₂₃)%R
+  with (m₁₁ * m₂₂ * m₃₃ - m₁₁ * m₃₂ * m₂₃ + m₁₁ * m₃₂ ^ 2)%R
   by ring.
   setoid_rewrite Rmult_assoc.
   rewrite <- Rmult_minus_distr_l.
   setoid_rewrite <- Rmult_assoc.
   do 2 rewrite Rmult_1_r.
-  replace (a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m))%R with
-    (1 - (a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
-          a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m)))%R
+  replace (m₁₁ * (m₂₂ * m₃₃ - m₃₂ * m₂₃))%R with
+    (1 - (m₁₂ * (m₂₃ * m₃₁ - m₃₃ * m₂₁) + m₁₃ * (m₂₁ * m₃₂ - m₃₁ * m₂₂)))%R
   by (rewrite <- Hd; ring).
   ring_simplify.
 bbb.
