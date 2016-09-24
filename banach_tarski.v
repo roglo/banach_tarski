@@ -692,6 +692,9 @@ Qed.
 Theorem fold_Rminus : ∀ a b, (a + - b = a - b)%R.
 Proof. reflexivity. Qed.
 
+Theorem fold_Rsqr : ∀ a, (a * a = a²)%R.
+Proof. reflexivity. Qed.
+
 Definition determinant a b c d := (a * d - b * c)%R.
 
 Theorem fold_determinant : ∀ a b c d, (a * d - b * c)%R = determinant a b c d.
@@ -2192,6 +2195,9 @@ assert (Hrnz : (r ≠ 0)%R).
  remember (a₃₁ m) as m₃₁.
  remember (a₃₂ m) as m₃₂.
  remember (a₃₃ m) as m₃₃.
+ setoid_rewrite fold_Rsqr in H₁.
+ setoid_rewrite fold_Rsqr in H₅.
+ setoid_rewrite fold_Rsqr in H₉.
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
