@@ -2195,8 +2195,17 @@ assert (Hrnz : (r ≠ 0)%R).
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
-bbb.
   subst x y z.
+  apply Rplus_eq_reg_r with (- (m₃₂ - m₂₃))%R.
+  rewrite Rplus_opp_r.
+  ring_simplify.
+bbb.
+  replace
+    (m₁₁ * (m₃₂ - m₂₃) + m₁₂ * (m₁₃ - m₃₁) + m₁₃ * (m₂₁ - m₁₂)
+     + - (m₃₂ - m₂₃))%R
+  with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₂ * (m₁₃ - m₃₁) + m₁₃ * (m₂₁ - m₁₂))%R
+    by ring.
+bbb.
   apply Rmult_eq_reg_l with m₃₂.
   ring_simplify.
   apply Rplus_eq_reg_l with (m₁₁ * m₂₂ * m₃₃)%R.
