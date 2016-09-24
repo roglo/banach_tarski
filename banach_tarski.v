@@ -2177,24 +2177,25 @@ assert (Hrnz : (r ≠ 0)%R).
   apply Rplus_le_le_0_compat; [ apply pow2_ge_0 | ].
   apply Rplus_le_le_0_compat; apply pow2_ge_0.
 
+ unfold is_special_ortho_matrix in Hrm.
+ destruct Hrm as (Ht & Hd).
+ unfold mat_det in Hd.
+ unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
+ injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
  simpl.
+ remember (a₁₁ m) as m₁₁.
+ remember (a₁₂ m) as m₁₂.
+ remember (a₁₃ m) as m₁₃.
+ remember (a₂₁ m) as m₂₁.
+ remember (a₂₂ m) as m₂₂.
+ remember (a₂₃ m) as m₂₃.
+ remember (a₃₁ m) as m₃₁.
+ remember (a₃₂ m) as m₃₂.
+ remember (a₃₃ m) as m₃₃.
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
-  unfold is_special_ortho_matrix in Hrm.
-  destruct Hrm as (Ht & Hd).
-  unfold mat_det in Hd.
-  unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
-  remember (a₁₁ m) as m₁₁.
-  remember (a₁₂ m) as m₁₂.
-  remember (a₁₃ m) as m₁₃.
-  remember (a₂₁ m) as m₂₁.
-  remember (a₂₂ m) as m₂₂.
-  remember (a₂₃ m) as m₂₃.
-  remember (a₃₁ m) as m₃₁.
-  remember (a₃₂ m) as m₃₂.
-  remember (a₃₃ m) as m₃₃.
-  injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+bbb.
   subst x y z.
   apply Rmult_eq_reg_l with m₃₂.
   ring_simplify.
