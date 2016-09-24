@@ -2208,6 +2208,29 @@ assert (Hrnz : (r ≠ 0)%R).
   rewrite <- Rmult_minus_distr_l.
   replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
   with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
+(*
+assert (m = (rot_x * rot_z * rot_inv_x * rot_inv_x * rot_inv_z)%mat); [ | subst; simpl ].
+Focus 2.
+ring_simplify.
+field_simplify.
+replace (√ 2 ^ 3)%R with (2 * √2)%R.
+field_simplify.
+replace (√ 2 ^ 5)%R with (4 * √2)%R.
+field_simplify.
+lra.
+*)
+
+Focus 2.
+  field_simplify; [ | assumption | assumption ].
+  f_equal.
+  subst x y z.
+  ring_simplify.
+  apply Rplus_eq_reg_r with (- (m₁₃ - m₃₁))%R.
+  ring_simplify.
+  replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
+  with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
+Unfocus. (* same problem for the first two goals; I guess the third is same *)
+
 bbb.
   replace
     (m₁₁ * (m₃₂ - m₂₃) + m₁₂ * (m₁₃ - m₃₁) + m₁₃ * (m₂₁ - m₁₂)
