@@ -2195,6 +2195,7 @@ assert (Hrnz : (r ≠ 0)%R).
  setoid_rewrite Rmult_comm in H₇.
  setoid_rewrite Rmult_comm in H₆.
  clear H₄ H₇ H₈; move H₆ after H₂.
+ move Hd before H₉.
  remember (a₁₁ m) as m₁₁.
  remember (a₁₂ m) as m₁₂.
  remember (a₁₃ m) as m₁₃.
@@ -2204,6 +2205,12 @@ assert (Hrnz : (r ≠ 0)%R).
  remember (a₃₁ m) as m₃₁.
  remember (a₃₂ m) as m₃₂.
  remember (a₃₃ m) as m₃₃.
+ replace
+   (m₁₁ * (m₂₂ * m₃₃ - m₃₂ * m₂₃) + m₁₂ * (m₂₃ * m₃₁ - m₃₃ * m₂₁) +
+    m₁₃ * (m₂₁ * m₃₂ - m₃₁ * m₂₂))%R
+ with
+ (m₁₁ * m₂₂ * m₃₃ - m₁₁ * m₂₃ * m₃₂ + m₁₂ * m₂₃ * m₃₁ - m₁₂ * m₂₁ * m₃₃ +
+  m₁₃ * m₂₁ * m₃₂ - m₁₃ * m₂₂ * m₃₁)%R in Hd by ring.
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
