@@ -2147,23 +2147,20 @@ Definition matrix_fixpoint (m : matrix) :=
 Theorem toto : ∀ el m p,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
   → p = matrix_fixpoint m
+  → p ≠ P 0 0 0
   → mat_vec_mul m p = p.
 Proof.
-intros el m p Hm Hp.
+intros el m p Hm Hp Hn.
 generalize Hm; intros Hrm.
 apply path_is_rotation in Hrm.
 subst p.
+unfold matrix_fixpoint in Hn.
 unfold matrix_fixpoint.
 remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
 remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
 remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
 remember (√ (x² + y² + z²)%R) as r eqn:Hr.
 assert (Hrnz : (r ≠ 0)%R).
- revert m x y z r Hm Hrm Hx Hy Hz Hr.
- induction el as [| e]; intros.
-  simpl in Hm; subst m; simpl in Hx, Hy, Hz.
-bbb.
-
  intros H; apply Hn; clear Hn.
  move H at top; subst r.
  symmetry in Hr.
@@ -2185,6 +2182,32 @@ bbb.
   apply Rplus_le_le_0_compat; [ apply pow2_ge_0 | ].
   apply Rplus_le_le_0_compat; apply pow2_ge_0.
 
+(**)
+revert m x y z r Hm Hx Hy Hz Hr Hn Hrm Hrnz.
+induction el as [| e]; intros.
+ simpl in Hm; subst m.
+ simpl in Hx, Hy, Hz.
+ rewrite Rminus_0_r in Hx, Hy, Hz; subst x y z.
+ rewrite Rdiv_0_l in Hn.
+ exfalso; apply Hn; reflexivity.
+
+ simpl in Hm.
+ remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m' eqn:Hm'.
+ subst m.
+ simpl in Hx, Hy, Hz.
+ destruct e as (t, d); destruct t, d; simpl in Hx, Hy, Hz.
+  ring_simplify in Hx.
+  ring_simplify in Hy.
+  ring_simplify in Hz.
+  simpl.
+  f_equal.
+   ring_simplify.
+   field_simplify; f_equal; [ | assumption | assumption ].
+bbb. (* faux *)
+
+ pose proof IHel m' x y z r eq_refl.
+
+bbb.
  unfold is_rotation_matrix in Hrm.
  destruct Hrm as (Ht & Hd).
  unfold mat_det in Hd.
