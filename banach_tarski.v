@@ -2211,6 +2211,11 @@ assert (Hrnz : (r ≠ 0)%R).
  with
  (m₁₁ * m₂₂ * m₃₃ - m₁₁ * m₂₃ * m₃₂ + m₁₂ * m₂₃ * m₃₁ - m₁₂ * m₂₁ * m₃₃ +
   m₁₃ * m₂₁ * m₃₂ - m₁₃ * m₂₂ * m₃₁)%R in Hd by ring.
+ move r before m.
+ move m₃₃ before m; move m₃₂ before m; move m₃₁ before m.
+ move m₂₃ before m; move m₂₂ before m; move m₂₁ before m.
+ move m₁₃ before m; move m₁₂ before m; move m₁₁ before m.
+ move Heqm₁₁ after Heqm₂₃; move Heqm₂₂ after Heqm₂₃; move Heqm₃₃ after Heqm₂₃.
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
@@ -2242,7 +2247,18 @@ Focus 2.
   ring_simplify.
   replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
   with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
-Unfocus. (* same problem for the first two goals; I guess the third is same *)
+Unfocus.
+
+Focus 3.
+  field_simplify; [ | assumption | assumption ].
+  f_equal.
+  subst x y z.
+  ring_simplify.
+  apply Rplus_eq_reg_r with (- (m₂₁ - m₁₂))%R.
+  ring_simplify.
+  replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
+  with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
+Unfocus.
 
 bbb.
 
