@@ -2034,17 +2034,17 @@ intros m₁ m₂.
 unfold mat_det; simpl; ring.
 Qed.
 
-(* A is a direct orthogonal matrix iff
+(* A is a rotation matrix iff
    - A tr(A) = I
    - det A = 1
  *)
-Definition is_special_ortho_matrix A :=
+Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
   mat_det A = 1%R.
 
-Theorem rot_x_is_special_ortho_matrix : is_special_ortho_matrix rot_x.
+Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
 Proof.
-unfold is_special_ortho_matrix, mat_transp, mat_mul, mat_det; simpl.
+unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, Rdiv.
 progress repeat rewrite Rmult_0_l.
 progress repeat rewrite Rmult_0_r.
@@ -2056,9 +2056,9 @@ progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
 split; [ f_equal; field | field ].
 Qed.
 
-Theorem rot_inv_x_is_special_ortho_matrix : is_special_ortho_matrix rot_inv_x.
+Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
-unfold is_special_ortho_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
+unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, Rdiv.
 progress repeat rewrite Rmult_0_l.
 progress repeat rewrite Rmult_0_r.
@@ -2070,9 +2070,9 @@ progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
 split; [ f_equal; field | field ].
 Qed.
 
-Theorem rot_z_is_special_ortho_matrix : is_special_ortho_matrix rot_z.
+Theorem rot_z_is_rotation_matrix : is_rotation_matrix rot_z.
 Proof.
-unfold is_special_ortho_matrix, mat_transp, mat_mul, mat_det; simpl.
+unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, Rdiv.
 progress repeat rewrite Rmult_0_l.
 progress repeat rewrite Rmult_0_r.
@@ -2087,9 +2087,9 @@ progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
 split; [ f_equal; field | field ].
 Qed.
 
-Theorem rot_inv_z_is_special_ortho_matrix : is_special_ortho_matrix rot_inv_z.
+Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
 Proof.
-unfold is_special_ortho_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
+unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, Rdiv.
 progress repeat rewrite Rmult_0_l.
 progress repeat rewrite Rmult_0_r.
@@ -2106,20 +2106,20 @@ Qed.
 
 Theorem path_is_rotation : ∀ el m,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
-  → is_special_ortho_matrix m.
+  → is_rotation_matrix m.
 Proof.
 intros el m Hm.
 revert m Hm.
 induction el as [| e]; intros.
- subst m; simpl; unfold is_special_ortho_matrix, mat_det; simpl.
+ subst m; simpl; unfold is_rotation_matrix, mat_det; simpl.
  rewrite mat_mul_id_r.
  split; [ reflexivity | ring ].
 
  simpl in Hm.
  remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m₁ eqn:Hm₁.
  pose proof IHel m₁ eq_refl as Hr.
- unfold is_special_ortho_matrix in Hr.
- unfold is_special_ortho_matrix.
+ unfold is_rotation_matrix in Hr.
+ unfold is_rotation_matrix.
  destruct Hr as (Hr & Hd).
  rewrite Hm.
  rewrite mat_transp_mul, mat_mul_assoc.
@@ -2127,10 +2127,10 @@ induction el as [| e]; intros.
  rewrite Hr, mat_mul_id_r.
  rewrite mat_det_mul, Hd, Rmult_1_l.
  destruct e as (t, d); destruct t, d; simpl.
-  apply rot_inv_x_is_special_ortho_matrix.
-  apply rot_x_is_special_ortho_matrix.
-  apply rot_inv_z_is_special_ortho_matrix.
-  apply rot_z_is_special_ortho_matrix.
+  apply rot_inv_x_is_rotation_matrix.
+  apply rot_x_is_rotation_matrix.
+  apply rot_inv_z_is_rotation_matrix.
+  apply rot_z_is_rotation_matrix.
 Qed.
 
 (* sources:
@@ -2145,7 +2145,7 @@ Definition matrix_fixpoint (m : matrix) :=
   P (x/r) (y/r) (z/r).
 
 Theorem matrix_fixpoint_ok : ∀ m p,
-  is_special_ortho_matrix m
+  is_rotation_matrix m
   → p = matrix_fixpoint m
   → p ≠ P 0 0 0
   → mat_vec_mul m p = p.
@@ -2180,12 +2180,21 @@ assert (Hrnz : (r ≠ 0)%R).
   apply Rplus_le_le_0_compat; [ apply pow2_ge_0 | ].
   apply Rplus_le_le_0_compat; apply pow2_ge_0.
 
- unfold is_special_ortho_matrix in Hrm.
+ unfold is_rotation_matrix in Hrm.
  destruct Hrm as (Ht & Hd).
  unfold mat_det in Hd.
  unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
  injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
  simpl.
+ setoid_rewrite fold_Rsqr in H₁.
+ setoid_rewrite fold_Rsqr in H₅.
+ setoid_rewrite fold_Rsqr in H₉.
+ move H₉ after H₁; move H₅ before H₁.
+ move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
+ setoid_rewrite Rmult_comm in H₂.
+ setoid_rewrite Rmult_comm in H₇.
+ setoid_rewrite Rmult_comm in H₆.
+ clear H₄ H₇ H₈.
  remember (a₁₁ m) as m₁₁.
  remember (a₁₂ m) as m₁₂.
  remember (a₁₃ m) as m₁₃.
@@ -2195,9 +2204,6 @@ assert (Hrnz : (r ≠ 0)%R).
  remember (a₃₁ m) as m₃₁.
  remember (a₃₂ m) as m₃₂.
  remember (a₃₃ m) as m₃₃.
- setoid_rewrite fold_Rsqr in H₁.
- setoid_rewrite fold_Rsqr in H₅.
- setoid_rewrite fold_Rsqr in H₉.
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
