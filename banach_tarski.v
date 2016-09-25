@@ -2189,12 +2189,12 @@ assert (Hrnz : (r ≠ 0)%R).
  setoid_rewrite fold_Rsqr in H₁.
  setoid_rewrite fold_Rsqr in H₅.
  setoid_rewrite fold_Rsqr in H₉.
- move H₉ after H₁; move H₅ before H₁.
+ move H₉ after H₁; move H₅ after H₁.
  move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
  setoid_rewrite Rmult_comm in H₂.
  setoid_rewrite Rmult_comm in H₇.
  setoid_rewrite Rmult_comm in H₆.
- clear H₄ H₇ H₈.
+ clear H₄ H₇ H₈; move H₆ after H₂.
  remember (a₁₁ m) as m₁₁.
  remember (a₁₂ m) as m₁₂.
  remember (a₁₃ m) as m₁₃.
