@@ -1540,6 +1540,9 @@ Qed.
 Theorem rev_path_nil : rev_path [] = [].
 Proof. reflexivity. Qed.
 
+(* because of Require Import Nsatz, there is a semantic error here
+Theorem rev_path_single : ∀ e, rev_path [e] = [negf e].
+*)
 Theorem rev_path_single : ∀ e, rev_path [e] = negf e :: [].
 Proof. intros e; reflexivity. Qed.
 
