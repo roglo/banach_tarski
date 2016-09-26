@@ -2220,6 +2220,8 @@ assert (Hrnz : (r ≠ 0)%R).
  move m₂₃ before m; move m₂₂ before m; move m₂₁ before m.
  move m₁₃ before m; move m₁₂ before m; move m₁₁ before m.
  move Heqm₁₁ after Heqm₂₃; move Heqm₂₂ after Heqm₂₃; move Heqm₃₃ after Heqm₂₃.
+ rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
+ rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
@@ -2230,6 +2232,7 @@ assert (Hrnz : (r ≠ 0)%R).
   rewrite <- Rmult_minus_distr_l.
   replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
   with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
+  revert Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁; clear; intros.
   nsatz.
 
   field_simplify; [ | assumption | assumption ].
@@ -2240,6 +2243,7 @@ assert (Hrnz : (r ≠ 0)%R).
   ring_simplify.
   replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
   with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
+  revert Hd H₁ H₂ H₃ H₁₁ H₂₁ (*H₃₁*); clear; intros.
   nsatz.
 
   field_simplify; [ | assumption | assumption ].
@@ -2250,6 +2254,7 @@ assert (Hrnz : (r ≠ 0)%R).
   ring_simplify.
   replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
   with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
+  revert Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁; clear; intros.
   nsatz.
 Qed.
 
