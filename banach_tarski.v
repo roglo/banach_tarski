@@ -2220,14 +2220,6 @@ assert (Hrnz : (r ≠ 0)%R).
  move m₂₃ before m; move m₂₂ before m; move m₂₁ before m.
  move m₁₃ before m; move m₁₂ before m; move m₁₁ before m.
  move Heqm₁₁ after Heqm₂₃; move Heqm₂₂ after Heqm₂₃; move Heqm₃₃ after Heqm₂₃.
-(*
-assert
-  (g : ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁,
-        (m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂,
-        (m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R = (0, 0, 0)%R).
-Focus 2.
-injection g; clear g; intros g₁ g₂ g₃.
-*)
  f_equal.
   field_simplify; [ | assumption | assumption ].
   f_equal.
@@ -2238,19 +2230,8 @@ injection g; clear g; intros g₁ g₂ g₃.
   rewrite <- Rmult_minus_distr_l.
   replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
   with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
-(*
-assert (m = (rot_x * rot_z * rot_inv_x * rot_inv_x * rot_inv_z)%mat); [ | subst; simpl ].
-Focus 2.
-ring_simplify.
-field_simplify.
-replace (√ 2 ^ 3)%R with (2 * √2)%R.
-field_simplify.
-replace (√ 2 ^ 5)%R with (4 * √2)%R.
-field_simplify.
-lra.
-*)
+  nsatz.
 
-Focus 2.
   field_simplify; [ | assumption | assumption ].
   f_equal.
   subst x y z.
@@ -2259,9 +2240,8 @@ Focus 2.
   ring_simplify.
   replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
   with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
-Unfocus.
+  nsatz.
 
-Focus 3.
   field_simplify; [ | assumption | assumption ].
   f_equal.
   subst x y z.
@@ -2270,11 +2250,7 @@ Focus 3.
   ring_simplify.
   replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
   with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
-Unfocus.
-
-nsatz.
-nsatz.
-nsatz.
+  nsatz.
 Qed.
 
 bbb.
