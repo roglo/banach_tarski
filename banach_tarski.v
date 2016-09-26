@@ -2144,7 +2144,7 @@ Definition matrix_fixpoint (m : matrix) :=
   let r := √ (x² + y² + z²)%R in
   P (x/r) (y/r) (z/r).
 
-Theorem toto : ∀ el m p,
+Theorem matrix_fixpoint_ok : ∀ el m p,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
   → p = matrix_fixpoint m
   → p ≠ P 0 0 0
@@ -2182,231 +2182,126 @@ assert (Hrnz : (r ≠ 0)%R).
   apply Rplus_le_le_0_compat; [ apply pow2_ge_0 | ].
   apply Rplus_le_le_0_compat; apply pow2_ge_0.
 
-(**)
-revert m x y z r Hm Hx Hy Hz Hr Hn Hrm Hrnz.
+ unfold is_rotation_matrix in Hrm.
+ destruct Hrm as (Ht & Hd).
+ unfold mat_det in Hd.
+ unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
+ injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+ simpl.
+ setoid_rewrite fold_Rsqr in H₁.
+ setoid_rewrite fold_Rsqr in H₅.
+ setoid_rewrite fold_Rsqr in H₉.
+ move H₉ after H₁; move H₅ after H₁.
+ move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
+ setoid_rewrite Rmult_comm in H₂.
+ setoid_rewrite Rmult_comm in H₇.
+ setoid_rewrite Rmult_comm in H₆.
+ clear H₄ H₇ H₈; move H₆ after H₂.
+ move Hd before H₉.
+ remember (a₁₁ m) as m₁₁.
+ remember (a₁₂ m) as m₁₂.
+ remember (a₁₃ m) as m₁₃.
+ remember (a₂₁ m) as m₂₁.
+ remember (a₂₂ m) as m₂₂.
+ remember (a₂₃ m) as m₂₃.
+ remember (a₃₁ m) as m₃₁.
+ remember (a₃₂ m) as m₃₂.
+ remember (a₃₃ m) as m₃₃.
+ replace
+   (m₁₁ * (m₂₂ * m₃₃ - m₃₂ * m₂₃) + m₁₂ * (m₂₃ * m₃₁ - m₃₃ * m₂₁) +
+    m₁₃ * (m₂₁ * m₃₂ - m₃₁ * m₂₂))%R
+ with
+ (m₁₁ * m₂₂ * m₃₃ - m₁₁ * m₂₃ * m₃₂ + m₁₂ * m₂₃ * m₃₁ - m₁₂ * m₂₁ * m₃₃ +
+  m₁₃ * m₂₁ * m₃₂ - m₁₃ * m₂₂ * m₃₁)%R in Hd by ring.
+ move r before m.
+ move m₃₃ before m; move m₃₂ before m; move m₃₁ before m.
+ move m₂₃ before m; move m₂₂ before m; move m₂₁ before m.
+ move m₁₃ before m; move m₁₂ before m; move m₁₁ before m.
+ move Heqm₁₁ after Heqm₂₃; move Heqm₂₂ after Heqm₂₃; move Heqm₃₃ after Heqm₂₃.
+(*
+assert
+  (g : ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁,
+        (m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂,
+        (m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R = (0, 0, 0)%R).
+Focus 2.
+injection g; clear g; intros g₁ g₂ g₃.
+*)
+ f_equal.
+  field_simplify; [ | assumption | assumption ].
+  f_equal.
+  subst x y z.
+  ring_simplify.
+  apply Rplus_eq_reg_r with (- (m₃₂ - m₂₃))%R.
+  ring_simplify.
+  rewrite <- Rmult_minus_distr_l.
+  replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
+  with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
+(*
+assert (m = (rot_x * rot_z * rot_inv_x * rot_inv_x * rot_inv_z)%mat); [ | subst; simpl ].
+Focus 2.
+ring_simplify.
+field_simplify.
+replace (√ 2 ^ 3)%R with (2 * √2)%R.
+field_simplify.
+replace (√ 2 ^ 5)%R with (4 * √2)%R.
+field_simplify.
+lra.
+*)
+
+Focus 2.
+  field_simplify; [ | assumption | assumption ].
+  f_equal.
+  subst x y z.
+  ring_simplify.
+  apply Rplus_eq_reg_r with (- (m₁₃ - m₃₁))%R.
+  ring_simplify.
+  replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
+  with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
+Unfocus.
+
+Focus 3.
+  field_simplify; [ | assumption | assumption ].
+  f_equal.
+  subst x y z.
+  ring_simplify.
+  apply Rplus_eq_reg_r with (- (m₂₁ - m₁₂))%R.
+  ring_simplify.
+  replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
+  with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
+Unfocus.
+
+bbb.
+(*
+assumption.
+assumption.
+assumption.
+clear x y z r Hx Hy Hz Hr Hn Hrnz.
+subst m₁₁ m₁₂ m₁₃ m₂₁ m₂₂ m₂₃ m₃₁ m₃₂ m₃₃.
+move H₁ before H₅.
+move Hd before Hm.
+move H₆ after H₂.
+revert m Hm Hd H₉ H₅ H₁ H₆ H₂ H₃.
 induction el as [| e]; intros.
- simpl in Hm; subst m.
- simpl in Hx, Hy, Hz.
- rewrite Rminus_0_r in Hx, Hy, Hz; subst x y z.
- rewrite Rdiv_0_l in Hn.
- exfalso; apply Hn; reflexivity.
+ simpl in Hm; subst m; simpl; f_equal; [ f_equal; ring | ring ].
 
  simpl in Hm.
  remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m' eqn:Hm'.
  subst m.
- simpl in Hx, Hy, Hz.
- destruct e as (t, d); destruct t, d; simpl in Hx, Hy, Hz.
-  ring_simplify in Hx.
-  ring_simplify in Hy.
-  ring_simplify in Hz.
-  simpl.
+ destruct e as (t, d); destruct t, d; simpl in *.
+  progress repeat rewrite Rmult_1_l.
+  progress repeat rewrite Rmult_0_l.
+  progress repeat rewrite Rplus_0_r.
+  progress repeat rewrite Rplus_0_l.
   f_equal.
-   ring_simplify.
-   field_simplify; f_equal; [ | assumption | assumption ].
-bbb. (* faux *)
-
- pose proof IHel m' x y z r eq_refl.
-
-bbb.
- unfold is_rotation_matrix in Hrm.
- destruct Hrm as (Ht & Hd).
- unfold mat_det in Hd.
- unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
- injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
- simpl.
- setoid_rewrite fold_Rsqr in H₁.
- setoid_rewrite fold_Rsqr in H₅.
- setoid_rewrite fold_Rsqr in H₉.
- move H₉ after H₁; move H₅ after H₁.
- move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
- setoid_rewrite Rmult_comm in H₂.
- setoid_rewrite Rmult_comm in H₇.
- setoid_rewrite Rmult_comm in H₆.
- clear H₄ H₇ H₈; move H₆ after H₂.
- move Hd before H₉.
- remember (a₁₁ m) as m₁₁.
- remember (a₁₂ m) as m₁₂.
- remember (a₁₃ m) as m₁₃.
- remember (a₂₁ m) as m₂₁.
- remember (a₂₂ m) as m₂₂.
- remember (a₂₃ m) as m₂₃.
- remember (a₃₁ m) as m₃₁.
- remember (a₃₂ m) as m₃₂.
- remember (a₃₃ m) as m₃₃.
- replace
-   (m₁₁ * (m₂₂ * m₃₃ - m₃₂ * m₂₃) + m₁₂ * (m₂₃ * m₃₁ - m₃₃ * m₂₁) +
-    m₁₃ * (m₂₁ * m₃₂ - m₃₁ * m₂₂))%R
- with
- (m₁₁ * m₂₂ * m₃₃ - m₁₁ * m₂₃ * m₃₂ + m₁₂ * m₂₃ * m₃₁ - m₁₂ * m₂₁ * m₃₃ +
-  m₁₃ * m₂₁ * m₃₂ - m₁₃ * m₂₂ * m₃₁)%R in Hd by ring.
- move r before m.
- move m₃₃ before m; move m₃₂ before m; move m₃₁ before m.
- move m₂₃ before m; move m₂₂ before m; move m₂₁ before m.
- move m₁₃ before m; move m₁₂ before m; move m₁₁ before m.
- move Heqm₁₁ after Heqm₂₃; move Heqm₂₂ after Heqm₂₃; move Heqm₃₃ after Heqm₂₃.
- f_equal.
-  field_simplify; [ | assumption | assumption ].
-  f_equal.
-  subst x y z.
-  ring_simplify.
-  apply Rplus_eq_reg_r with (- (m₃₂ - m₂₃))%R.
-  ring_simplify.
-  rewrite <- Rmult_minus_distr_l.
-  replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
-  with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
-(*
-assert (m = (rot_x * rot_z * rot_inv_x * rot_inv_x * rot_inv_z)%mat); [ | subst; simpl ].
-Focus 2.
+   f_equal.
+    ring_simplify.
+remember (2 * √ 2 / 3)%R as u.
+replace (-2 * √ 2 / 3)%R with (-u)%R.
 ring_simplify.
 field_simplify.
-replace (√ 2 ^ 3)%R with (2 * √2)%R.
-field_simplify.
-replace (√ 2 ^ 5)%R with (4 * √2)%R.
-field_simplify.
-lra.
-*)
-
-Focus 2.
-  field_simplify; [ | assumption | assumption ].
-  f_equal.
-  subst x y z.
-  ring_simplify.
-  apply Rplus_eq_reg_r with (- (m₁₃ - m₃₁))%R.
-  ring_simplify.
-  replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
-  with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
-Unfocus.
-
-Focus 3.
-  field_simplify; [ | assumption | assumption ].
-  f_equal.
-  subst x y z.
-  ring_simplify.
-  apply Rplus_eq_reg_r with (- (m₂₁ - m₁₂))%R.
-  ring_simplify.
-  replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
-  with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
-Unfocus.
+(* mouais, ça marcherait peut-être mais c'est compliqué *)
 bbb.
-
-(* caca *)
-Theorem matrix_fixpoint_ok : ∀ m p,
-  is_rotation_matrix m
-  → p = matrix_fixpoint m
-  → p ≠ P 0 0 0
-  → mat_vec_mul m p = p.
-Proof.
-intros m p Hrm Hp Hn.
-subst p.
-unfold matrix_fixpoint in Hn.
-unfold matrix_fixpoint.
-remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
-remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
-remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
-remember (√ (x² + y² + z²)%R) as r eqn:Hr.
-assert (Hrnz : (r ≠ 0)%R).
- intros H; apply Hn; clear Hn.
- move H at top; subst r.
- symmetry in Hr.
- apply sqrt_eq_0 in Hr.
-  assert (H : (x = 0)%R).
-   apply Rsqr_0_uniq.
-   rewrite Rplus_assoc in Hr.
-   apply Rplus_eq_0_l with (y²+z²)%R; [ apply Rle_0_sqr | | assumption ].
-   apply Rplus_le_le_0_compat; apply Rle_0_sqr.
-
-   move H at top; subst x.
-   rewrite Rsqr_0, Rplus_0_l in Hr.
-   apply Rplus_sqr_eq_0 in Hr.
-   move Hr at top; destruct Hr; subst y z.
-   f_equal; lra.
-
-  do 3 rewrite Rsqr_pow2.
-  rewrite Rplus_assoc.
-  apply Rplus_le_le_0_compat; [ apply pow2_ge_0 | ].
-  apply Rplus_le_le_0_compat; apply pow2_ge_0.
-
- unfold is_rotation_matrix in Hrm.
- destruct Hrm as (Ht & Hd).
- unfold mat_det in Hd.
- unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
- injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
- simpl.
- setoid_rewrite fold_Rsqr in H₁.
- setoid_rewrite fold_Rsqr in H₅.
- setoid_rewrite fold_Rsqr in H₉.
- move H₉ after H₁; move H₅ after H₁.
- move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
- setoid_rewrite Rmult_comm in H₂.
- setoid_rewrite Rmult_comm in H₇.
- setoid_rewrite Rmult_comm in H₆.
- clear H₄ H₇ H₈; move H₆ after H₂.
- move Hd before H₉.
- remember (a₁₁ m) as m₁₁.
- remember (a₁₂ m) as m₁₂.
- remember (a₁₃ m) as m₁₃.
- remember (a₂₁ m) as m₂₁.
- remember (a₂₂ m) as m₂₂.
- remember (a₂₃ m) as m₂₃.
- remember (a₃₁ m) as m₃₁.
- remember (a₃₂ m) as m₃₂.
- remember (a₃₃ m) as m₃₃.
- replace
-   (m₁₁ * (m₂₂ * m₃₃ - m₃₂ * m₂₃) + m₁₂ * (m₂₃ * m₃₁ - m₃₃ * m₂₁) +
-    m₁₃ * (m₂₁ * m₃₂ - m₃₁ * m₂₂))%R
- with
- (m₁₁ * m₂₂ * m₃₃ - m₁₁ * m₂₃ * m₃₂ + m₁₂ * m₂₃ * m₃₁ - m₁₂ * m₂₁ * m₃₃ +
-  m₁₃ * m₂₁ * m₃₂ - m₁₃ * m₂₂ * m₃₁)%R in Hd by ring.
- move r before m.
- move m₃₃ before m; move m₃₂ before m; move m₃₁ before m.
- move m₂₃ before m; move m₂₂ before m; move m₂₁ before m.
- move m₁₃ before m; move m₁₂ before m; move m₁₁ before m.
- move Heqm₁₁ after Heqm₂₃; move Heqm₂₂ after Heqm₂₃; move Heqm₃₃ after Heqm₂₃.
- f_equal.
-  field_simplify; [ | assumption | assumption ].
-  f_equal.
-  subst x y z.
-  ring_simplify.
-  apply Rplus_eq_reg_r with (- (m₃₂ - m₂₃))%R.
-  ring_simplify.
-  rewrite <- Rmult_minus_distr_l.
-  replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
-  with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
-(*
-assert (m = (rot_x * rot_z * rot_inv_x * rot_inv_x * rot_inv_z)%mat); [ | subst; simpl ].
-Focus 2.
-ring_simplify.
-field_simplify.
-replace (√ 2 ^ 3)%R with (2 * √2)%R.
-field_simplify.
-replace (√ 2 ^ 5)%R with (4 * √2)%R.
-field_simplify.
-lra.
 *)
-
-Focus 2.
-  field_simplify; [ | assumption | assumption ].
-  f_equal.
-  subst x y z.
-  ring_simplify.
-  apply Rplus_eq_reg_r with (- (m₁₃ - m₃₁))%R.
-  ring_simplify.
-  replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
-  with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
-Unfocus.
-
-Focus 3.
-  field_simplify; [ | assumption | assumption ].
-  f_equal.
-  subst x y z.
-  ring_simplify.
-  apply Rplus_eq_reg_r with (- (m₂₁ - m₁₂))%R.
-  ring_simplify.
-  replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
-  with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
-Unfocus.
-
-bbb.
 
 Theorem path_fixpoint : ∀ el m p,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
