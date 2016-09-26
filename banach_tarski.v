@@ -653,7 +653,7 @@ End Free_Group.
 
 (* Step 2 *)
 
-Require Import Reals Psatz.
+Require Import Reals Psatz Nsatz.
 
 Notation "'ℝ'" := R.
 Notation "'ℤ'" := Z.
@@ -855,7 +855,7 @@ Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
   ↔ fold_right rotate (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
       P (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
-    ∧ N = n + length el.
+    ∧ N = (n + length el)%nat.
 Proof.
 intros el x y z n a₁ b₁ c₁ N₁.
 split.
@@ -1539,7 +1539,9 @@ Qed.
 Theorem rev_path_nil : rev_path [] = [].
 Proof. reflexivity. Qed.
 
-Theorem rev_path_single : ∀ e, rev_path [e] = [negf e].
+Check nil.
+
+Theorem rev_path_single : ∀ e, rev_path (e :: []) = negf e :: [].
 Proof. intros e; reflexivity. Qed.
 
 Theorem app_rev_path_path : ∀ p el,
@@ -2153,6 +2155,7 @@ Proof.
 intros el m p Hm Hp Hn.
 generalize Hm; intros Hrm.
 apply path_is_rotation in Hrm.
+clear Hm.
 subst p.
 unfold matrix_fixpoint in Hn.
 unfold matrix_fixpoint.
@@ -2269,6 +2272,11 @@ Focus 3.
   replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
   with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
 Unfocus.
+
+nsatz.
+nsatz.
+nsatz.
+Qed.
 
 bbb.
 (*
