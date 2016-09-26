@@ -2245,23 +2245,15 @@ f_equal.
  nsatz.
 Qed.
 
-bbb.
+Definition fixpoint_of_path el :=
+ let m := fold_right mat_mul mat_id (map mat_of_elem el) in
+ let '(P x y z) := rotation_fixpoint m 1 in
+ let r := √ (x² + y² + z²) in
+ P (x / r) (y / r) (z / r).
 
-(* return rotation:
-   - its axis (line passing through returned point and origin) and
-   - its angle *)
-Definition rotation_of_path (el : list free_elem) : (point * ℝ).
-Proof.
-remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
 bbb.
-
-Theorem toto : ∀ el, ∃ r,
-  ∀ p, fold_right rotate p el = mat_vec_mul r p.
-Proof.
-Abort. (* à voir *)
 
 (* ah oui mais non... *)
-(*
 Theorem r_decomposed_4 : ∀ el,
   norm_list el = [] ⊕ r_start_with el ạ ⊕ s ∈ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ḅ) ⊕ s ∈ Ṣ(ḅ⁻¹).
 Proof.
