@@ -3,6 +3,7 @@
    - Stan Wagon: The Banach-Tarski Paradox, Cambridge University Press
    - Wikipedia: Banach–Tarski paradox
    - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
+(* Coq v8.6 *)
 
 Require Import Utf8.
 Require Import List.
@@ -2144,16 +2145,13 @@ Definition matrix_fixpoint (m : matrix) :=
   let r := √ (x² + y² + z²)%R in
   P (x/r) (y/r) (z/r).
 
-Theorem matrix_fixpoint_ok : ∀ el m p,
-  m = fold_right mat_mul mat_id (map mat_of_elem el)
+Theorem matrix_fixpoint_ok : ∀ m p,
+  is_rotation_matrix m
   → p = matrix_fixpoint m
   → p ≠ P 0 0 0
   → mat_vec_mul m p = p.
 Proof.
-intros el m p Hm Hp Hn.
-generalize Hm; intros Hrm.
-apply path_is_rotation in Hrm.
-clear Hm.
+intros m p Hrm Hp Hn.
 subst p.
 unfold matrix_fixpoint in Hn.
 unfold matrix_fixpoint.
@@ -2277,77 +2275,6 @@ nsatz.
 Qed.
 
 bbb.
-(*
-assumption.
-assumption.
-assumption.
-clear x y z r Hx Hy Hz Hr Hn Hrnz.
-subst m₁₁ m₁₂ m₁₃ m₂₁ m₂₂ m₂₃ m₃₁ m₃₂ m₃₃.
-move H₁ before H₅.
-move Hd before Hm.
-move H₆ after H₂.
-revert m Hm Hd H₉ H₅ H₁ H₆ H₂ H₃.
-induction el as [| e]; intros.
- simpl in Hm; subst m; simpl; f_equal; [ f_equal; ring | ring ].
-
- simpl in Hm.
- remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m' eqn:Hm'.
- subst m.
- destruct e as (t, d); destruct t, d; simpl in *.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite Rmult_0_l.
-  progress repeat rewrite Rplus_0_r.
-  progress repeat rewrite Rplus_0_l.
-  f_equal.
-   f_equal.
-    ring_simplify.
-remember (2 * √ 2 / 3)%R as u.
-replace (-2 * √ 2 / 3)%R with (-u)%R.
-ring_simplify.
-field_simplify.
-(* mouais, ça marcherait peut-être mais c'est compliqué *)
-bbb.
-*)
-
-Theorem path_fixpoint : ∀ el m p,
-  m = fold_right mat_mul mat_id (map mat_of_elem el)
-  → p = matrix_fixpoint m
-  → fold_right rotate p el = p.
-Proof.
-intros el m p Hm Hp.
-subst m.
-(**)
-destruct (list_nil_app_dec el) as [H₁| H₁]; [ subst el; reflexivity | ].
-destruct H₁ as (e, (el', Hel)).
-subst el; rename el' into el.
-rewrite map_app, fold_right_app in Hp; simpl in Hp.
-rewrite mat_mul_id_r in Hp.
-rewrite fold_right_app; simpl.
-unfold rotate at 2.
-remember (mat_of_elem e) as m eqn:Hm; clear e Hm.
-revert p m Hp.
-induction el as [| e] using rev_ind; intros.
- simpl in Hp; simpl.
-Check matrix_fixpoint_ok.
-
-bbb.
-revert p Hp.
-induction el as [| e] using rev_ind; intros; [ reflexivity | ].
-rewrite map_app, fold_right_app in Hp; simpl in Hp.
-rewrite fold_right_app; simpl.
-rewrite mat_mul_id_r in Hp.
-destruct e as (t, d); destruct t, d; simpl in Hp; simpl.
- unfold rotate at 2; simpl.
-
-bbb.
-
-Definition matrix_fixpoint (m : matrix) : point.
-Proof.
-remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
-remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
-remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
-remember (x² + y² + z²)%R as r eqn:Hr.
-apply (P (x/r) (y/r) (z/r)).
 
 (* return rotation:
    - its axis (line passing through returned point and origin) and
