@@ -2232,7 +2232,7 @@ assert (Hrnz : (r ≠ 0)%R).
   rewrite <- Rmult_minus_distr_l.
   replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
   with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
-  revert Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁; clear; intros.
+  clear - Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
   nsatz.
 
   field_simplify; [ | assumption | assumption ].
@@ -2243,7 +2243,7 @@ assert (Hrnz : (r ≠ 0)%R).
   ring_simplify.
   replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
   with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
-  revert Hd H₁ H₂ H₃ H₁₁ H₂₁ (*H₃₁*); clear; intros.
+  clear - Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
   nsatz.
 
   field_simplify; [ | assumption | assumption ].
@@ -2254,7 +2254,7 @@ assert (Hrnz : (r ≠ 0)%R).
   ring_simplify.
   replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
   with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
-  revert Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁; clear; intros.
+  clear - Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
   nsatz.
 Qed.
 
