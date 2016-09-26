@@ -1539,9 +1539,7 @@ Qed.
 Theorem rev_path_nil : rev_path [] = [].
 Proof. reflexivity. Qed.
 
-Check nil.
-
-Theorem rev_path_single : ∀ e, rev_path (e :: []) = negf e :: [].
+Theorem rev_path_single : ∀ e, rev_path [e] = negf e :: [].
 Proof. intros e; reflexivity. Qed.
 
 Theorem app_rev_path_path : ∀ p el,
