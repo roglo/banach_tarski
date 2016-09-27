@@ -2147,6 +2147,12 @@ Definition rotation_fixpoint (m : matrix) k :=
   let z := (a₂₁ m - a₁₂ m)%R in
   P (k * x) (k * y) (k * z).
 
+Definition rotation_fixpoint2 (m : matrix) k :=
+  let x := (a₂₃ m * a₁₂ m + (- a₂₂ m + 1) * a₁₃ m)%R in
+  let y := (- a₂₃ m + a₁₁ m + (a₂₁ m * a₁₃ m + a₂₃ m))%R in
+  let z := ((a₂₂ m - 1) * a₁₁ m + (- a₂₁ m * a₁₂ m + (- a₂₂ m + 1)))%R in
+  P (k * x) (k * y) (k * z).
+
 Theorem matrix_fixpoint_ok : ∀ m p k,
   is_rotation_matrix m
   → p = rotation_fixpoint m k
@@ -2195,6 +2201,7 @@ move m₁₃ before m; move m₁₂ before m; move m₁₁ before m.
 move Heqm₁₁ after Heqm₂₃; move Heqm₂₂ after Heqm₂₃; move Heqm₃₃ after Heqm₂₃.
 rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
 rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
+clear - Hx Hy Hz Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
 f_equal.
  field_simplify.
  f_equal.
@@ -2209,7 +2216,6 @@ f_equal.
  rewrite <- Rmult_minus_distr_l, <- Rmult_plus_distr_l.
  replace (m₁₁ * (m₃₂ - m₂₃) - m₃₂ + m₂₃ - m₁₂ * m₃₁ + m₁₃ * m₂₁)%R
  with ((m₁₁ - 1) * (m₃₂ - m₂₃) + m₁₃ * m₂₁ - m₁₂ * m₃₁)%R by ring.
- clear - Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
  nsatz.
 
  field_simplify.
@@ -2225,7 +2231,6 @@ f_equal.
  rewrite <- Rmult_plus_distr_l.
  replace (m₂₁ * m₃₂ - m₂₃ * m₁₂ + m₂₂ * m₁₃ - m₂₂ * m₃₁ - m₁₃ + m₃₁)%R
  with ((m₂₂ - 1) * (m₁₃ - m₃₁) + m₂₁ * m₃₂ - m₂₃ * m₁₂)%R by ring.
- clear - Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
  nsatz.
 
  field_simplify.
@@ -2241,7 +2246,6 @@ f_equal.
  rewrite <- Rmult_plus_distr_l.
  replace (- m₃₁ * m₂₃ + m₃₂ * m₁₃ + m₃₃ * m₂₁ - m₃₃ * m₁₂ - m₂₁ + m₁₂)%R
  with ((m₃₃ - 1) * (m₂₁ - m₁₂) + m₃₂ * m₁₃ - m₂₃ * m₃₁)%R by ring.
- clear - Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
  nsatz.
 Qed.
 
