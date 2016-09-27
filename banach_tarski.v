@@ -2251,68 +2251,6 @@ Definition fixpoint_of_path el :=
  let r := √ (x² + y² + z²) in
  P (x / r) (y / r) (z / r).
 
-Theorem r_decomposed_4 : ∀ el (f : point → point),
-  (∀ x y, same_orbit x y → f x = f y)
-  → (∀ x, same_orbit x (f x))
-  →
-
-bbb.
-
-(* ah oui mais non... *)
-Theorem r_decomposed_4 : ∀ el,
-  norm_list el = [] ⊕ r_start_with el ạ ⊕ s ∈ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ḅ) ⊕ s ∈ Ṣ(ḅ⁻¹).
-Proof.
-intros s.
-bbb.
-*)
-
-Theorem all_points_in_normal_orbit_are_different : ∀ p p₁ p₂ el₁ el₂,
-  not (List.In p [P 1 0 0; P (-1) 0 0; P 0 0 1; P 0 0 (-1)])
-  → fold_right rotate p el₁ = p₁
-  → fold_right rotate p el₂ = p₂
-  → norm_list el₁ ≠ norm_list el₂
-  → p₁ ≠ p₂.
-Proof.
-intros p p₁ p₂ el₁ el₂ Hexcl Hp₁ Hp₂ Hn Hp.
-(* I have a problem.
-
-   Let p₀ being the point (1,0,0).
-
-   To prove this (a generalisation of the previous theorem
-   "all_points_in_normal_orbit_are_different" for any point p,
-    not just p₀), we have a problem.
-
-   Let w be a non empty word (path); "rotate_1_0_0_is_diff" says
-   that all points in the orbit of p₀ are different from p₀ (with
-   a little detail which is that, for p₀, w must end with "b" or
-   "b⁻¹", i.e. its first rotation must not bearound the z axis).
-   So we have
-     wp₀ ≠ p₀
-
-   How to generalise that? Let p be any point, how to prove that
-   for all non empty word w,
-     wp ≠ p
-
-   A first idea is to be reduced to p₀; we could find a rotation or
-   a combination of rotations, m, such that
-     p = mp₀
-
-   Then, we must prove that wmp₀ ≠ mp₀
-   But how to prove that? w and m are not commutative!
-
-   I can just prove that mwp₀ ≠ mp₀, what is not wmp₀ ≠ mp₀.
-
-   In other words, I have
-     (mw - m)p₀ ≠ 0
-   Can I prove that
-     (wm - m)p₀ ≠ 0 ?
-
-   A second idea is to do the same proof as for p₀. But for p₀, the
-   proof is based upon the fact that its coordinates are integers, which
-   is not necessarily the case for any p.
- *)
-Abort. (* à voir *)
-
 Definition no_rotation := ([] : list free_elem).
 Definition is_identity el := ∀ p, fold_right rotate p el = p.
 
@@ -2423,6 +2361,37 @@ exists f; split.
  etransitivity; [ eassumption | ].
  symmetry; apply Hxfx.
 Qed.
+
+Notation "'ạ'" := (E la false).
+Notation "'ạ⁻¹'" := (E la true).
+Notation "'ḅ'" := (E lb false).
+Notation "'ḅ⁻¹'" := (E lb true).
+
+Theorem r_decomposed_4 : ∀ (f : point → point),
+  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂)
+  → (∀ p, same_orbit p (f p))
+  → ∀ p,
+    (∃ p₁, f p₁ = p) ⊕
+    (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
+       norm_list el = ạ :: el₁ ∧ fold_right rotate p₂ el = p) ⊕
+    (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
+       norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate p₂ el = p) ⊕
+    (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
+       norm_list el = ḅ :: el₁ ∧ fold_right rotate p₂ el = p) ⊕
+    (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
+       norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate p₂ el = p).
+Proof.
+intros f Hoe Ho p.
+
+bbb.
+
+(* ah oui mais non... *)
+Theorem r_decomposed_4 : ∀ el,
+  norm_list el = [] ⊕ r_start_with el ạ ⊕ s ∈ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ḅ) ⊕ s ∈ Ṣ(ḅ⁻¹).
+Proof.
+intros s.
+bbb.
+*)
 
 End Orbit.
 
