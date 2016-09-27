@@ -2385,7 +2385,9 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
   right.
   split.
    intros (p₁, Hp₁).
-
+   apply H₁; rewrite <- Hp₁ at 1.
+   apply Hoe; rewrite <- Hp₁.
+   apply Ho.
 bbb.
 
 (* ah oui mais non... *)
