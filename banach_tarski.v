@@ -2148,19 +2148,19 @@ Definition rotation_fixpoint (m : matrix) k :=
   P (k * x) (k * y) (k * z).
 
 Definition rotation_fixpoint2 (m : matrix) k :=
-  let x := (a₂₃ m * a₁₂ m + (- a₂₂ m + 1) * a₁₃ m)%R in
-  let y := (- a₂₃ m * a₁₁ m + (a₂₁ m * a₁₃ m + a₂₃ m))%R in
+  let x := (a₁₂ m * a₂₃ m + (- a₂₂ m + 1) * a₁₃ m)%R in
+  let y := (a₁₃ m * a₂₁ m + (- a₁₁ m + 1) * a₂₃ m)%R in
   let z := ((a₂₂ m - 1) * a₁₁ m + (- a₂₁ m * a₁₂ m + (- a₂₂ m + 1)))%R in
   P (k * x) (k * y) (k * z).
 
 Theorem matrix_fixpoint_ok : ∀ m p k,
   is_rotation_matrix m
-  → p = rotation_fixpoint m k
+  → p = rotation_fixpoint2 m k
   → mat_vec_mul m p = p.
 Proof.
 intros m p k Hrm Hn.
 subst p.
-unfold rotation_fixpoint.
+unfold rotation_fixpoint2.
 unfold is_rotation_matrix in Hrm.
 destruct Hrm as (Ht & Hd).
 unfold mat_det in Hd.
@@ -2177,10 +2177,12 @@ move Hd before H₉.
 rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
 rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
 f_equal.
- nsatz.
- nsatz.
+ ring_simplify; reflexivity.
+ ring_simplify; reflexivity.
  nsatz.
 Qed.
+
+bbb.
 
 Definition fixpoint_of_path el :=
  let m := fold_right mat_mul mat_id (map mat_of_elem el) in
