@@ -2161,9 +2161,11 @@ Proof.
 intros m p k Hrm Hn.
 subst p.
 unfold rotation_fixpoint.
+(*
 remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
 remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
 remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
+*)
 unfold is_rotation_matrix in Hrm.
 destruct Hrm as (Ht & Hd).
 unfold mat_det in Hd.
@@ -2201,11 +2203,10 @@ move m₁₃ before m; move m₁₂ before m; move m₁₁ before m.
 move Heqm₁₁ after Heqm₂₃; move Heqm₂₂ after Heqm₂₃; move Heqm₃₃ after Heqm₂₃.
 rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
 rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
-clear - Hx Hy Hz Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
+clear - Hd H₁ H₂ H₃ H₁₁ H₂₁ H₃₁.
 f_equal.
  field_simplify.
  f_equal.
- subst x y z.
  ring_simplify.
  apply Rplus_eq_reg_r with (- (k * (m₃₂ - m₂₃)))%R.
  ring_simplify.
@@ -2220,7 +2221,6 @@ f_equal.
 
  field_simplify.
  f_equal.
- subst x y z.
  ring_simplify.
  apply Rplus_eq_reg_r with (- k * (m₁₃ - m₃₁))%R.
  ring_simplify.
@@ -2235,7 +2235,6 @@ f_equal.
 
  field_simplify.
  f_equal.
- subst x y z.
  ring_simplify.
  apply Rplus_eq_reg_r with (- k * (m₂₁ - m₁₂))%R.
  ring_simplify.
