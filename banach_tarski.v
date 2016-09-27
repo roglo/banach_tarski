@@ -2150,7 +2150,7 @@ Definition rotation_fixpoint (m : matrix) k :=
 Definition rotation_fixpoint2 (m : matrix) k :=
   let x := (a₁₂ m * a₂₃ m + (- a₂₂ m + 1) * a₁₃ m)%R in
   let y := (a₁₃ m * a₂₁ m + (- a₁₁ m + 1) * a₂₃ m)%R in
-  let z := ((a₂₂ m - 1) * a₁₁ m + (- a₂₁ m * a₁₂ m + (- a₂₂ m + 1)))%R in
+  let z := ((a₂₂ m - 1) * (a₁₁ m - 1) - a₂₁ m * a₁₂ m)%R in
   P (k * x) (k * y) (k * z).
 
 Theorem matrix_fixpoint_ok : ∀ m p k,
@@ -2177,8 +2177,8 @@ move Hd before H₉.
 rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
 rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
 f_equal.
- ring_simplify; reflexivity.
- ring_simplify; reflexivity.
+ ring.
+ ring.
  nsatz.
 Qed.
 
