@@ -2386,8 +2386,16 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
   split.
    intros (p₁, Hp₁).
    apply H₁; rewrite <- Hp₁ at 1.
-   apply Hoe; rewrite <- Hp₁.
-   apply Ho.
+   apply Hoe; rewrite <- Hp₁; apply Ho.
+
+   pose proof Ho p as H.
+   destruct H as (el, Hel).
+   destruct el as [| e]; [ contradiction | ].
+   destruct e as (t, d); destruct t, d.
+    right.
+     split.
+      intros (p₁ & p₂ & el₁ & el₂ & Hp & Hn & Hr); subst p₂.
+      simpl in Hel.
 bbb.
 
 (* ah oui mais non... *)
