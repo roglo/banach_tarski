@@ -2370,6 +2370,22 @@ Notation "'ḅ⁻¹'" := (E lb true).
 Definition not_in_fixpoints p :=
   ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
 
+Theorem thing : ∀ f p p₁ el₁,
+  (∀ p₁ p₂ : point, same_orbit p₁ p₂ → f p₁ = f p₂)
+  → (∀ p : point, same_orbit p (f p))
+  → p = f p
+  → fold_right rotate (f p₁) el₁ = p
+  → f p₁ = p.
+Proof.
+intros f p p₁ el₁ Hoe Ho H₁ Hr.
+pose proof Ho p₁ as Hp₁.
+unfold same_orbit in Hp₁.
+destruct Hp₁ as (el₃ & Hp₁).
+rewrite <- Hp₁, <- fold_right_app in Hr.
+rewrite H₁; apply Hoe.
+exists (el₁ ++ el₃); assumption.
+Qed.
+
 Theorem r_decomposed_4 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
   → ∀ (f : point → point),
@@ -2405,22 +2421,33 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
   left.
    split; [ exists p; symmetry; assumption | ].
    intros H.
-   destruct H as [(H₂, _)| (_, H)].
-    destruct H₂ as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
-    assert (Hp₁ : f p₁ = p).
-     pose proof Ho p₁ as Hp₁.
-     unfold same_orbit in Hp₁.
-     destruct Hp₁ as (el₃ & Hp₁).
-     rewrite <- Hp₁, <- fold_right_app in Hr.
-     rewrite H₁; apply Hoe.
-     exists (el₁ ++ el₃); assumption.
+   destruct H as [(H, _)| (_, H)].
+    destruct H as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
+    erewrite thing in Hr; try eassumption.
+    revert Hr; apply Hnf.
+    rewrite Hn; intros H; discriminate H.
 
-     rewrite Hp₁ in Hr.
+    destruct H as [(H, _)| (_, H)].
+     destruct H as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
+     erewrite thing in Hr; try eassumption.
      revert Hr; apply Hnf.
      rewrite Hn; intros H; discriminate H.
 
-    destruct H as [(H₃, _)| (_, H)].
-     destruct H₃ as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr).
+     destruct H as [(H, _)| (_, H)].
+      destruct H as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
+      erewrite thing in Hr; try eassumption.
+      revert Hr; apply Hnf.
+      rewrite Hn; intros H; discriminate H.
+
+      destruct H as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
+      erewrite thing in Hr; try eassumption.
+      revert Hr; apply Hnf.
+      rewrite Hn; intros H; discriminate H.
+
+  right.
+  split.
+   intros (p₁, Hp₁).
+
 bbb.
 
 (* ah oui mais non... *)
