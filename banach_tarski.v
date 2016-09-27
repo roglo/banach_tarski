@@ -2367,7 +2367,9 @@ Notation "'ạ⁻¹'" := (E la true).
 Notation "'ḅ'" := (E lb false).
 Notation "'ḅ⁻¹'" := (E lb true).
 
-Theorem r_decomposed_4 : ∀ (f : point → point),
+Theorem r_decomposed_4 :
+  (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
+  → ∀ (f : point → point),
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂)
   → (∀ p, same_orbit p (f p))
   → ∀ p,
@@ -2381,7 +2383,27 @@ Theorem r_decomposed_4 : ∀ (f : point → point),
     (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
        norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate p₂ el = p).
 Proof.
-intros f Hoe Ho p.
+intros Rdec f Hoe Ho p.
+assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
+ intros (x₁, y₁, z₁) (x₂, y₂, z₂).
+ destruct (Rdec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
+  destruct (Rdec y₁ y₂) as [| H₂]; [ subst y₂ | right ].
+   destruct (Rdec z₁ z₂) as [| H₃]; [ subst z₂; left; reflexivity | right ].
+   intros H; apply H₃.
+   injection H; clear H; intros; subst; reflexivity.
+
+   intros H; apply H₂.
+   injection H; clear H; intros; subst; reflexivity.
+
+  intros H; apply H₁.
+  injection H; clear H; intros; subst; reflexivity.
+
+ destruct (Pdec p (f p)) as [H₁| H₁].
+  left.
+   split; [ exists p; symmetry; assumption | ].
+   intros H.
+   destruct H as [(H₂, H₃)| (H₂, H₃)].
+    destruct H₂ as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
 
 bbb.
 
