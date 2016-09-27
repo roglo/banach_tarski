@@ -2147,10 +2147,11 @@ Definition rotation_fixpoint (m : matrix) k :=
   let z := (a₂₁ m - a₁₂ m)%R in
   P (k * x) (k * y) (k * z).
 
+(* suggestion from Guillaume Hanrot *)
 Definition rotation_fixpoint2 (m : matrix) k :=
   let x := (a₁₂ m * a₂₃ m + (- a₂₂ m + 1) * a₁₃ m)%R in
   let y := (a₁₃ m * a₂₁ m + (- a₁₁ m + 1) * a₂₃ m)%R in
-  let z := ((a₂₂ m - 1) * (a₁₁ m - 1) - a₂₁ m * a₁₂ m)%R in
+  let z := ((a₁₁ m - 1) * (a₂₂ m - 1) - a₂₁ m * a₁₂ m)%R in
   P (k * x) (k * y) (k * z).
 
 Theorem matrix_fixpoint_ok : ∀ m p k,
@@ -2181,8 +2182,6 @@ f_equal.
  ring.
  nsatz.
 Qed.
-
-bbb.
 
 Definition fixpoint_of_path el :=
  let m := fold_right mat_mul mat_id (map mat_of_elem el) in
