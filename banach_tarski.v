@@ -2395,7 +2395,19 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
     right.
      split.
       intros (p₁ & p₂ & el₁ & el₂ & Hp & Hn & Hr); subst p₂.
+bbb.
       simpl in Hel.
+
+Theorem toto : ∀ el p,
+  fold_right rotate p el = fold_right rotate p (norm_list el).
+Proof.
+Admitted. Show.
+rewrite toto, Hn in Hr.
+simpl in Hr.
+
+bbb.
+      rewrite <- Hr in Hel at 1.
+      rewrite <- fold_right_app in Hel.
 bbb.
 
 (* ah oui mais non... *)
