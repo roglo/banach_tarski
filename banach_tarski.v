@@ -2251,6 +2251,11 @@ Definition fixpoint_of_path el :=
  let r := √ (x² + y² + z²) in
  P (x / r) (y / r) (z / r).
 
+Theorem r_decomposed_4 : ∀ el (f : point → point),
+  (∀ x y, same_orbit x y → f x = f y)
+  → (∀ x, same_orbit x (f x))
+  →
+
 bbb.
 
 (* ah oui mais non... *)
