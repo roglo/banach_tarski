@@ -2367,7 +2367,8 @@ Notation "'ạ⁻¹'" := (E la true).
 Notation "'ḅ'" := (E lb false).
 Notation "'ḅ⁻¹'" := (E lb true).
 
-Definition not_in_fixpoints p := ∀ el, fold_right rotate p el ≠ p.
+Definition not_in_fixpoints p :=
+  ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
 
 Theorem r_decomposed_4 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
@@ -2404,21 +2405,22 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
   left.
    split; [ exists p; symmetry; assumption | ].
    intros H.
-   destruct H as [(H₂, H₃)| (H₂, H₃)].
+   destruct H as [(H₂, _)| (_, H)].
     destruct H₂ as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
-    pose proof Hnf el₁ as H.
-    apply H; simpl.
-    pose proof Ho p as H₂.
-    unfold same_orbit in H₂.
-bbb. (* mmmm... faut voir... *)
+    assert (Hp₁ : f p₁ = p).
+     pose proof Ho p₁ as Hp₁.
+     unfold same_orbit in Hp₁.
+     destruct Hp₁ as (el₃ & Hp₁).
+     rewrite <- Hp₁, <- fold_right_app in Hr.
+     rewrite H₁; apply Hoe.
+     exists (el₁ ++ el₃); assumption.
 
-    rewrite H₁ at 1; rewrite <- Hr at 2.
-    f_equal.
-    apply Hoe.
-    symmetry.
-    unfold same_orbit.
-    exists el₁.
+     rewrite Hp₁ in Hr.
+     revert Hr; apply Hnf.
+     rewrite Hn; intros H; discriminate H.
 
+    destruct H as [(H₃, _)| (_, H)].
+     destruct H₃ as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr).
 bbb.
 
 (* ah oui mais non... *)
