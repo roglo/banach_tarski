@@ -2161,11 +2161,6 @@ Proof.
 intros m p k Hrm Hn.
 subst p.
 unfold rotation_fixpoint.
-(*
-remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
-remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
-remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
-*)
 unfold is_rotation_matrix in Hrm.
 destruct Hrm as (Ht & Hd).
 unfold mat_det in Hd.
