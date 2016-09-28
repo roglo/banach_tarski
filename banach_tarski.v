@@ -2442,25 +2442,9 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
       rewrite rev_path_app in Hel; simpl in Hel.
       rewrite <- fold_right_cons in Hel.
       rewrite rotate_rotate_norm, H₅ in H₆.
-Theorem toto : ∀ p₁ p₂ l₁ l₂,
-  fold_right rotate p₁ l₁ = p₂
-  → fold_right rotate p₁ l₂ = p₂
-  → norm_list l₁ = norm_list l₂.
-Proof.
-intros p₁ p₂ l₁ l₂ Hr₁ Hr₂.
-rewrite rotate_rotate_norm in Hr₁, Hr₂.
-apply rotate_rev_path in Hr₂.
-rewrite <- Hr₂, <- fold_right_app in Hr₁.
-rewrite rev_path_norm_list in Hr₁.
-SearchAbout (fold_right rotate).
-Theorem toto : ∀ el p, fold_right rotate p el = p → norm_list el = [].
-Proof.
-intros el p Hr.
-rewrite rotate_rotate_norm in Hr.
-
-bbb.
-
-eapply toto in Hel; [ | eassumption ].
+      apply rotate_rev_path in Hel.
+      rewrite <- Hel, <- fold_right_app in H₆.
+      revert H₆; apply Hnf.
 bbb.
       apply rotate_rev_path in H₆; simpl in H₆.
       rewrite <- Hel in H₆ at 1.
