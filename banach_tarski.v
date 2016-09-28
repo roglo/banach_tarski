@@ -2429,15 +2429,16 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
     rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
 
     destruct e as (t, d); destruct t, d.
-     right.
+     right. (* not the ạ case, but ạ⁻¹ *)
       split.
+       (* proof that it cannot be the ạ case *)
        intros (p₁ & el₁ & el₃ & Hn & Hr).
        unfold not_in_fixpoints in Hnf.
 rewrite rotate_rotate_norm in Hr.
 rewrite rotate_rotate_norm in Hel.
 rewrite H₂ in Hel.
 rewrite Hn in Hr.
-clear el el₁ H₂ Hn.
+(* clear el el₁ H₂ Hn. *)
 rewrite <- Hr in Hel at 1.
 rewrite <- fold_right_app in Hel.
 rewrite <- app_assoc in Hel.
@@ -2449,9 +2450,10 @@ assert (H : f p₁ = f p).
  transitivity (f p); [ | symmetry; apply Ho ].
  exists (el₂ ++ el₃); assumption.
 
- rewrite H in Hel.
+ rewrite H in Hel, Hr.
  (* note que ça prouve pas que N(el₂++el₃)=[], car f(p) peut justement
     être le point fixe de la rotation de el₂++el₃ *)
+ apply rotate_rev_path in Hr.
 bbb.
 
 (* ah oui mais non... *)
