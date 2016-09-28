@@ -2431,6 +2431,7 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
      right.
       split.
        intros (p₁ & p₂ & el₂ & el₃ & Hp & Hn & Hr); subst p₂.
+       unfold not_in_fixpoints in Hnf.
 bbb.
 
 (* ah oui mais non... *)
