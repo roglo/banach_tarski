@@ -2342,7 +2342,7 @@ Notation "'ḅ⁻¹'" := (E lb true).
 Definition not_in_fixpoints p :=
   ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
 
-Theorem thing : ∀ f p p₁ el₁,
+Theorem same_orbit_imp_representant : ∀ f p p₁ el₁,
   (∀ p₁ p₂ : point, same_orbit p₁ p₂ → f p₁ = f p₂)
   → (∀ p : point, same_orbit p (f p))
   → p = f p
@@ -2364,15 +2364,15 @@ Theorem r_decomposed_4 :
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂)
   → (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
-    (∃ p₁, f p₁ = p) ⊕
-    (∃ p₁ el el₁,
-        norm_list el = ạ :: el₁ ∧ fold_right rotate (f p₁) el = p) ⊕
-    (∃ p₁ el el₁,
-        norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p₁) el = p) ⊕
-    (∃ p₁ el el₁,
-        norm_list el = ḅ :: el₁ ∧ fold_right rotate (f p₁) el = p) ⊕
-    (∃ p₁ el el₁,
-        norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p₁) el = p).
+    f p = p ⊕
+    (∃ el el₁,
+        norm_list el = ạ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
+    (∃ el el₁,
+        norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
+    (∃ el el₁,
+        norm_list el = ḅ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
+    (∃ el el₁,
+        norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p) el = p).
 Proof.
 intros Rdec f Hoe Ho p Hnf.
 assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
@@ -2391,44 +2391,50 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
 
  destruct (Pdec p (f p)) as [H₁| H₁].
   left.
-   split; [ exists p; symmetry; assumption | ].
+   split; [ symmetry; assumption | ].
    intros H.
    destruct H as [(H, _)| (_, H)].
-    destruct H as (p₁ & el₁ & el₂ & Hn & Hr).
-    erewrite thing in Hr; try eassumption.
+    destruct H as (el₁ & el₂ & Hn & Hr).
+    erewrite same_orbit_imp_representant in Hr; try eassumption.
     revert Hr; apply Hnf.
     rewrite Hn; intros H; discriminate H.
 
     destruct H as [(H, _)| (_, H)].
-     destruct H as (p₁ & el₁ & el₂ & Hn & Hr).
-     erewrite thing in Hr; try eassumption.
+     destruct H as (el₁ & el₂ & Hn & Hr).
+     erewrite same_orbit_imp_representant in Hr; try eassumption.
      revert Hr; apply Hnf.
      rewrite Hn; intros H; discriminate H.
 
      destruct H as [(H, _)| (_, H)].
-      destruct H as (p₁ & el₁ & el₂ & Hn & Hr).
-      erewrite thing in Hr; try eassumption.
+      destruct H as (el₁ & el₂ & Hn & Hr).
+      erewrite same_orbit_imp_representant in Hr; try eassumption.
       revert Hr; apply Hnf.
       rewrite Hn; intros H; discriminate H.
 
-      destruct H as (p₁ & el₁ & el₂ & Hn & Hr).
-      erewrite thing in Hr; try eassumption.
+      destruct H as (el₁ & el₂ & Hn & Hr).
+      erewrite same_orbit_imp_representant in Hr; try eassumption.
       revert Hr; apply Hnf.
       rewrite Hn; intros H; discriminate H.
 
   right.
-  split.
-   intros (p₁, Hp₁).
-   apply H₁; rewrite <- Hp₁ at 1.
-   apply Hoe; rewrite <- Hp₁; apply Ho.
+  split; [ apply not_eq_sym; assumption | ].
 
-   pose proof Ho p as H.
-   destruct H as (el, Hel).
-   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-   destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-    rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
+  pose proof Ho p as H.
+  destruct H as (el, Hel).
+  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+  destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
+   rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
 
-    destruct e as (t, d); destruct t, d.
+   destruct e as (t, d); destruct t, d.
+    left.
+     split.
+      exists (rev_path el), (rev_path el₂).
+      split; [ | apply rotate_rev_path; assumption ].
+      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+      intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
+(* contradiction between paths *)
+bbb.
      right. (* not the ạ case, but ạ⁻¹ *)
       split.
        (* proof that it cannot be the ạ case *)
