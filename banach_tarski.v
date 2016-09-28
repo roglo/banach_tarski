@@ -2140,14 +2140,16 @@ Qed.
 (* sources:
    - wikipedia "rotation matrix"
    - http://www.euclideanspace.com/maths/geometry/rotations/
-       conversions/matrixToAngle *)
+       conversions/matrixToAngle
+   does not work if the rotation is 0 or π; but it cannot
+   happen in our case *)
 Definition rotation_fixpoint (m : matrix) k :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
   let z := (a₂₁ m - a₁₂ m)%R in
   P (k * x) (k * y) (k * z).
 
-(* suggestion from Guillaume Hanrot *)
+(* other possible definition suggested by Guillaume Hanrot *)
 Definition rotation_fixpoint2 (m : matrix) k :=
   let x := (a₁₂ m * a₂₃ m + (- a₂₂ m + 1) * a₁₃ m)%R in
   let y := (a₁₃ m * a₂₁ m + (- a₁₁ m + 1) * a₂₃ m)%R in
@@ -2156,12 +2158,12 @@ Definition rotation_fixpoint2 (m : matrix) k :=
 
 Theorem matrix_fixpoint_ok : ∀ m p k,
   is_rotation_matrix m
-  → p = rotation_fixpoint2 m k
+  → p = rotation_fixpoint m k
   → mat_vec_mul m p = p.
 Proof.
 intros m p k Hrm Hn.
 subst p.
-unfold rotation_fixpoint2.
+unfold rotation_fixpoint.
 unfold is_rotation_matrix in Hrm.
 destruct Hrm as (Ht & Hd).
 unfold mat_det in Hd.
@@ -2177,10 +2179,7 @@ clear H₄ H₇ H₈; move H₆ after H₂.
 move Hd before H₉.
 rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
 rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
-f_equal.
- ring.
- ring.
- nsatz.
+f_equal; nsatz.
 Qed.
 
 Definition fixpoint_of_path el :=
