@@ -2433,6 +2433,25 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
       split.
        intros (p₁ & el₁ & el₃ & Hn & Hr).
        unfold not_in_fixpoints in Hnf.
+rewrite rotate_rotate_norm in Hr.
+rewrite rotate_rotate_norm in Hel.
+rewrite H₂ in Hel.
+rewrite Hn in Hr.
+clear el el₁ H₂ Hn.
+rewrite <- Hr in Hel at 1.
+rewrite <- fold_right_app in Hel.
+rewrite <- app_assoc in Hel.
+simpl in Hel.
+rewrite rotate_simpl in Hel.
+assert (H : f p₁ = f p).
+ apply Hoe.
+ transitivity (f p₁); [ apply Ho | ].
+ transitivity (f p); [ | symmetry; apply Ho ].
+ exists (el₂ ++ el₃); assumption.
+
+ rewrite H in Hel.
+ (* note que ça prouve pas que N(el₂++el₃)=[], car f(p) peut justement
+    être le point fixe de la rotation de el₂++el₃ *)
 bbb.
 
 (* ah oui mais non... *)
