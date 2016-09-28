@@ -2425,12 +2425,13 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
    pose proof Ho p as H.
    destruct H as (el, Hel).
    remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-   destruct el₁ as [| e].
-    rewrite rotate_rotate_norm, Hel₁ in Hel; contradiction.
+   destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
+    rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
+
     destruct e as (t, d); destruct t, d.
      right.
       split.
-       intros (p₁ & p₂ & el₂ & el₃ & Hp & Hn & Hr); subst p₂.
+       intros (p₁ & p₂ & el₁ & el₃ & Hp & Hn & Hr); subst p₂.
        unfold not_in_fixpoints in Hnf.
 bbb.
 
