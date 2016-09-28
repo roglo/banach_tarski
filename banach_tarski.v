@@ -2365,14 +2365,14 @@ Theorem r_decomposed_4 :
   → (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
     (∃ p₁, f p₁ = p) ⊕
-    (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
-       norm_list el = ạ :: el₁ ∧ fold_right rotate p₂ el = p) ⊕
-    (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
-       norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate p₂ el = p) ⊕
-    (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
-       norm_list el = ḅ :: el₁ ∧ fold_right rotate p₂ el = p) ⊕
-    (∃ p₁ p₂ el el₁, p₂ = f p₁ ∧
-       norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate p₂ el = p).
+    (∃ p₁ el el₁,
+        norm_list el = ạ :: el₁ ∧ fold_right rotate (f p₁) el = p) ⊕
+    (∃ p₁ el el₁,
+        norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p₁) el = p) ⊕
+    (∃ p₁ el el₁,
+        norm_list el = ḅ :: el₁ ∧ fold_right rotate (f p₁) el = p) ⊕
+    (∃ p₁ el el₁,
+        norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p₁) el = p).
 Proof.
 intros Rdec f Hoe Ho p Hnf.
 assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
@@ -2394,24 +2394,24 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
    split; [ exists p; symmetry; assumption | ].
    intros H.
    destruct H as [(H, _)| (_, H)].
-    destruct H as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
+    destruct H as (p₁ & el₁ & el₂ & Hn & Hr).
     erewrite thing in Hr; try eassumption.
     revert Hr; apply Hnf.
     rewrite Hn; intros H; discriminate H.
 
     destruct H as [(H, _)| (_, H)].
-     destruct H as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
+     destruct H as (p₁ & el₁ & el₂ & Hn & Hr).
      erewrite thing in Hr; try eassumption.
      revert Hr; apply Hnf.
      rewrite Hn; intros H; discriminate H.
 
      destruct H as [(H, _)| (_, H)].
-      destruct H as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
+      destruct H as (p₁ & el₁ & el₂ & Hn & Hr).
       erewrite thing in Hr; try eassumption.
       revert Hr; apply Hnf.
       rewrite Hn; intros H; discriminate H.
 
-      destruct H as (p₁ & p₂ & el₁ & el₂ & Hfp & Hn & Hr); subst p₂.
+      destruct H as (p₁ & el₁ & el₂ & Hn & Hr).
       erewrite thing in Hr; try eassumption.
       revert Hr; apply Hnf.
       rewrite Hn; intros H; discriminate H.
@@ -2431,7 +2431,7 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
     destruct e as (t, d); destruct t, d.
      right.
       split.
-       intros (p₁ & p₂ & el₁ & el₃ & Hp & Hn & Hr); subst p₂.
+       intros (p₁ & el₁ & el₃ & Hn & Hr).
        unfold not_in_fixpoints in Hnf.
 bbb.
 
