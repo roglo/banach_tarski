@@ -1694,6 +1694,41 @@ do 2 rewrite fold_right_app; simpl.
 rewrite rotate_rotate_neg; reflexivity.
 Qed.
 
+Theorem rotate_rotate_norm : ∀ el p,
+  fold_right rotate p el = fold_right rotate p (norm_list el).
+Proof.
+intros el p.
+remember (length el) as len eqn:Hlen; symmetry in Hlen.
+revert el p Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct (norm_list_dec el) as [H₁| H₁]; [ rewrite H₁; reflexivity | ].
+destruct H₁ as (el₁ & t & d & el₂ & H₁).
+subst el.
+rewrite rotate_simpl, norm_list_cancel_in.
+destruct len; [ destruct el₁; discriminate Hlen | ].
+destruct len.
+ destruct el₁; [ discriminate Hlen | simpl in Hlen ].
+ destruct el₁; discriminate Hlen.
+
+ apply IHlen with len.
+  transitivity (S len); apply Nat.lt_succ_diag_r.
+
+  clear - Hlen.
+  revert len el₂ Hlen.
+  induction el₁ as [| e₁]; intros.
+   simpl in Hlen; simpl.
+   do 2 apply Nat.succ_inj in Hlen; assumption.
+
+   simpl in Hlen; simpl.
+   apply Nat.succ_inj in Hlen.
+   destruct len.
+    destruct el₁; [ discriminate Hlen | simpl in Hlen ].
+    destruct el₁; discriminate Hlen.
+
+    f_equal.
+    apply IHel₁; assumption.
+Qed.
+
 Theorem length_rev_path : ∀ el, length (rev_path el) = length el.
 Proof.
 intros el.
@@ -2389,24 +2424,13 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
 
    pose proof Ho p as H.
    destruct H as (el, Hel).
-   destruct el as [| e]; [ contradiction | ].
-   destruct e as (t, d); destruct t, d.
-    right.
-     split.
-      intros (p₁ & p₂ & el₁ & el₂ & Hp & Hn & Hr); subst p₂.
-bbb.
-      simpl in Hel.
-
-Theorem toto : ∀ el p,
-  fold_right rotate p el = fold_right rotate p (norm_list el).
-Proof.
-Admitted. Show.
-rewrite toto, Hn in Hr.
-simpl in Hr.
-
-bbb.
-      rewrite <- Hr in Hel at 1.
-      rewrite <- fold_right_app in Hel.
+   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+   destruct el₁ as [| e].
+    rewrite rotate_rotate_norm, Hel₁ in Hel; contradiction.
+    destruct e as (t, d); destruct t, d.
+     right.
+      split.
+       intros (p₁ & p₂ & el₂ & el₃ & Hp & Hn & Hr); subst p₂.
 bbb.
 
 (* ah oui mais non... *)
