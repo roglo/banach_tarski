@@ -2588,6 +2588,135 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
        rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 Qed.
 
+Theorem r_decomposed_2 :
+  (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
+  → ∀ (f : point → point),
+  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂)
+  → (∀ p, same_orbit p (f p))
+  → ∀ p, not_in_fixpoints p →
+    (∃ el el₁,
+        norm_list el = ạ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
+    (∃ el el₁,
+        norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p) (ạ :: el) = p).
+Proof.
+intros Rdec f Hoe Ho p Hnf.
+assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
+ intros (x₁, y₁, z₁) (x₂, y₂, z₂).
+ destruct (Rdec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
+  destruct (Rdec y₁ y₂) as [| H₂]; [ subst y₂ | right ].
+   destruct (Rdec z₁ z₂) as [| H₃]; [ subst z₂; left; reflexivity | right ].
+   intros H; apply H₃.
+   injection H; clear H; intros; subst; reflexivity.
+
+   intros H; apply H₂.
+   injection H; clear H; intros; subst; reflexivity.
+
+  intros H; apply H₁.
+  injection H; clear H; intros; subst; reflexivity.
+
+  pose proof Ho p as H.
+  destruct H as (el, Hel).
+  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+  destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
+   rewrite rotate_rotate_norm, H₂ in Hel; simpl in Hel.
+   right; split.
+    intros (el₁ & el₂ & H₁ & H₃).
+    rewrite <- Hel in H₃.
+    revert H₃; apply Hnf.
+    rewrite H₁; intros H; discriminate H.
+
+    exists (ạ⁻¹ :: []), [].
+    split; [ reflexivity | ].
+    pose proof rotate_simpl [] [] ạ p as H.
+    rewrite <- Hel; assumption.
+
+   destruct e as (t, d); destruct t, d.
+   *left; split.
+     exists (rev_path el), (rev_path el₂).
+     split; [ | apply rotate_rev_path; assumption ].
+     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+     intros (el₃ & el₄ & H₅ & H₆).
+     simpl in H₆.
+     rewrite rotate_rotate_norm, H₅ in H₆.
+     rewrite <- fold_right_cons in H₆.
+     rewrite rotate_rotate_norm in H₆.
+     pose proof rotate_simpl [] el₄ ạ (f p) as H.
+     do 2 rewrite app_nil_l in H.
+     replace (negf ạ) with ạ⁻¹ in H by reflexivity.
+     rewrite rotate_rotate_norm, H₆ in H; symmetry in H.
+     rewrite <- Hel, <- fold_right_app in H.
+     revert H; apply Hnf.
+
+bbb.
+     eapply not_in_fixpoints_one_path; try eassumption.
+      intros H; discriminate H.
+
+      destruct H₃ as (H₃ & [(H₄, H₅) | (H₄, H₅)]).
+       destruct H₄ as (el₁ & el₃ & H₄ & H₆).
+       eapply not_in_fixpoints_one_path; try eassumption.
+       intros H; discriminate H.
+
+       destruct H₅ as (el₁ & el₃ & H₅ & H₆).
+       eapply not_in_fixpoints_one_path; try eassumption.
+       intros H; discriminate H.
+
+   *right; split.
+     intros (el₁ & el₃ & H₅ & H₆).
+     eapply not_in_fixpoints_one_path; try eassumption.
+     intros H; discriminate H.
+
+     left; split.
+      exists (rev_path el), (rev_path el₂).
+      split; [ | apply rotate_rev_path; assumption ].
+      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+      intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
+       eapply not_in_fixpoints_one_path; try eassumption.
+       intros H; discriminate H.
+
+       destruct H₃ as (H₃ & H₄).
+       destruct H₄ as (el₁ & el₃ & H₄ & H₆).
+       eapply not_in_fixpoints_one_path; try eassumption.
+       intros H; discriminate H.
+
+   *right; split.
+     intros (el₁ & el₃ & H₅ & H₆).
+     eapply not_in_fixpoints_one_path; try eassumption.
+     intros H; discriminate H.
+
+     right; split.
+      intros (el₁ & el₃ & H₅ & H₆).
+      eapply not_in_fixpoints_one_path; try eassumption.
+      intros H; discriminate H.
+
+      left; split.
+       exists (rev_path el), (rev_path el₂).
+       split; [ | apply rotate_rev_path; assumption ].
+       rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+       intros (el₃ & el₄ & H₅ & H₆).
+       eapply not_in_fixpoints_one_path; try eassumption.
+       intros H; discriminate H.
+
+   *right; split.
+     intros (el₁ & el₃ & H₅ & H₆).
+     eapply not_in_fixpoints_one_path; try eassumption.
+     intros H; discriminate H.
+
+     right; split.
+      intros (el₁ & el₃ & H₅ & H₆).
+      eapply not_in_fixpoints_one_path; try eassumption.
+      intros H; discriminate H.
+
+      right; split.
+       intros (el₁ & el₃ & H₅ & H₆).
+       eapply not_in_fixpoints_one_path; try eassumption.
+       intros H; discriminate H.
+
+       exists (rev_path el), (rev_path el₂).
+       split; [ | apply rotate_rev_path; assumption ].
+       rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 bbb.
 
 End Orbit.
