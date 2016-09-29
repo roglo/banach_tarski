@@ -2641,13 +2641,28 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
      rewrite rotate_rotate_norm, H₅ in H₆.
      rewrite <- fold_right_cons in H₆.
      rewrite rotate_rotate_norm in H₆.
+     rewrite norm_list_cancel in H₆.
+     rewrite <- rotate_rotate_norm in H₆.
+bbb.
+
+apply rotate_rev_path in H₆.
+Check not_in_fixpoints_one_path.
+eapply not_in_fixpoints_one_path; try eassumption.
+bbb.
+
      pose proof rotate_simpl [] el₄ ạ (f p) as H.
      do 2 rewrite app_nil_l in H.
      replace (negf ạ) with ạ⁻¹ in H by reflexivity.
      rewrite rotate_rotate_norm, H₆ in H; symmetry in H.
      rewrite <- Hel, <- fold_right_app in H.
-     revert H; apply Hnf.
+bbb.
+destruct (norm_list_dec (el₄ ++ el)) as [H₁| H₁].
+ revert H; apply Hnf.
+ intros H; rewrite H in H₁.
+ destruct el as [| e]; [ destruct el₂; discriminate H₂ | ].
+ destruct el₄; discriminate H₁.
 
+ destruct H₁ as (el₁ & t & d & el₅ & H₁).
 bbb.
      eapply not_in_fixpoints_one_path; try eassumption.
       intros H; discriminate H.
