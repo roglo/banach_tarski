@@ -1801,13 +1801,22 @@ rewrite app_assoc, fold_right_app; simpl.
 rewrite IHel; apply rotate_neg_rotate.
 Qed.
 
-Theorem rotate_simpl : ∀ el₁ el₂ e p,
+Theorem rotate_cancel_in : ∀ el₁ el₂ e p,
   fold_right rotate p (el₁ ++ e :: negf e :: el₂) =
   fold_right rotate p (el₁ ++ el₂).
 Proof.
 intros.
 do 2 rewrite fold_right_app; simpl.
 rewrite rotate_rotate_neg; reflexivity.
+Qed.
+
+Theorem rotate_cancel_start : ∀ el e p,
+  fold_right rotate p (e :: negf e :: el) =
+  fold_right rotate p el.
+Proof.
+intros.
+pose proof rotate_cancel_in [] el e p as H.
+apply H.
 Qed.
 
 Theorem rotate_rotate_norm : ∀ el p,
@@ -1820,7 +1829,7 @@ induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct (norm_list_dec el) as [H₁| H₁]; [ rewrite H₁; reflexivity | ].
 destruct H₁ as (el₁ & t & d & el₂ & H₁).
 subst el.
-rewrite rotate_simpl, norm_list_cancel_in.
+rewrite rotate_cancel_in, norm_list_cancel_in.
 destruct len; [ destruct el₁; discriminate Hlen | ].
 destruct len.
  destruct el₁; [ discriminate Hlen | simpl in Hlen ].
@@ -1913,7 +1922,7 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    destruct H₁ as (el₄, (e, (el₃, Ht))).
    generalize Ht; intros Hs.
    apply split_at_cancel_some in Hs.
-   rewrite Hs, rotate_simpl in Hp.
+   rewrite Hs, rotate_cancel_in in Hp.
    rewrite Hs in Hlen.
    rewrite app_length in Hlen; simpl in Hlen.
    do 2 rewrite Nat.add_succ_r in Hlen.
@@ -2614,35 +2623,52 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
   intros H; apply H₁.
   injection H; clear H; intros; subst; reflexivity.
 
-  pose proof Ho p as H.
-  destruct H as (el, Hel).
-  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-  destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-   rewrite rotate_rotate_norm, H₂ in Hel; simpl in Hel.
-   right; split.
-    intros (el₁ & el₂ & H₁ & H₃).
-    rewrite <- Hel in H₃.
-    revert H₃; apply Hnf.
-    rewrite H₁; intros H; discriminate H.
+ pose proof Ho p as H.
+ apply same_orbit_sym in H.
+ destruct H as (el, Hel).
+ remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+ destruct el₁ as [| e₁].
+  rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+  clear Hel₁.
+  right; split.
+   intros (el₁ & el₂ & H₁ & H₃).
+   rewrite Hel in H₃.
+   revert H₃; apply Hnf.
+   intros H; rewrite H₁ in H; discriminate H.
 
-    exists (ạ⁻¹ :: []), [].
-    split; [ reflexivity | ].
-    pose proof rotate_simpl [] [] ạ p as H.
-    rewrite <- Hel; assumption.
+   exists (ạ⁻¹ :: []), [].
+   split; [ reflexivity | ].
+   rewrite Hel, rotate_cancel_start; reflexivity.
 
-   destruct e as (t, d); destruct t, d.
-   *left; split.
-     exists (rev_path el), (rev_path el₂).
-     split; [ | apply rotate_rev_path; assumption ].
-     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+  simpl.
+bbb.
 
-     intros (el₃ & el₄ & H₅ & H₆).
-     simpl in H₆.
-     rewrite rotate_rotate_norm, H₅ in H₆.
-     rewrite <- fold_right_cons in H₆.
-     rewrite rotate_rotate_norm in H₆.
-     rewrite norm_list_cancel in H₆.
-     rewrite <- rotate_rotate_norm in H₆.
+ destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
+  rewrite rotate_rotate_norm, H₂ in Hel; simpl in Hel.
+  right; split.
+   intros (el₁ & el₂ & H₁ & H₃).
+   rewrite <- Hel in H₃.
+   revert H₃; apply Hnf.
+   rewrite H₁; intros H; discriminate H.
+
+   exists (ạ⁻¹ :: []), [].
+   split; [ reflexivity | ].
+   pose proof rotate_cancel_in [] [] ạ p as H.
+   rewrite <- Hel; assumption.
+
+  destruct e as (t, d); destruct t, d.
+  *left; split.
+    exists (rev_path el), (rev_path el₂).
+    split; [ | apply rotate_rev_path; assumption ].
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+    intros (el₃ & el₄ & H₅ & H₆).
+    simpl in H₆.
+    rewrite rotate_rotate_norm, H₅ in H₆.
+    rewrite <- fold_right_cons in H₆.
+    rewrite rotate_rotate_norm in H₆.
+    rewrite norm_list_cancel in H₆.
+    rewrite <- rotate_rotate_norm in H₆.
 bbb.
 
 apply rotate_rev_path in H₆.
@@ -2650,7 +2676,7 @@ Check not_in_fixpoints_one_path.
 eapply not_in_fixpoints_one_path; try eassumption.
 bbb.
 
-     pose proof rotate_simpl [] el₄ ạ (f p) as H.
+     pose proof rotate_cancel_in [] el₄ ạ (f p) as H.
      do 2 rewrite app_nil_l in H.
      replace (negf ạ) with ạ⁻¹ in H by reflexivity.
      rewrite rotate_rotate_norm, H₆ in H; symmetry in H.
