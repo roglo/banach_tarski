@@ -2465,6 +2465,8 @@ destruct (norm_list_dec (norm_list el₃ ++ norm_list el)) as [H₃| H₃].
  destruct H₃ as (el₁ & t & d & el₅ & H₃).
  apply norm_list_app_split in H₃.
  destruct H₃ as (H₃ & H₆).
+ rewrite H₅ in H₃.
+ rewrite H₂ in H₆.
 
 bbb.
 intros H.
