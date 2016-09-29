@@ -2416,6 +2416,34 @@ rewrite H₁; apply Hoe.
 exists (el₁ ++ el₃); assumption.
 Qed.
 
+Theorem not_in_fixpoints_one_path : ∀ f p e₁ e₂ el el₂ el₁ el₃,
+  not_in_fixpoints p
+  → fold_right rotate p el = f p
+  → fold_right rotate (f p) el₁ = p
+  → norm_list el = el₂ ++ [e₁]
+  → norm_list el₁ = e₂ :: el₃
+  → e₂ ≠ negf e₁
+  → False.
+Proof.
+intros f p e₁ e₂ el el₂ el₁ el₃ Hnf Hel H₆ H₂ H₄ Hd.
+rewrite rotate_rotate_norm in Hel, H₆.
+rewrite <- Hel in H₆.
+rewrite <- fold_right_app in H₆.
+revert H₆.
+apply Hnf.
+intros H.
+apply norm_list_app_is_nil in H.
+ rewrite H₄, H₂ in H.
+ apply rev_path_eq_eq in H.
+ rewrite rev_path_involutive, rev_path_app in H.
+ apply not_eq_sym in Hd.
+ injection H; intros; contradiction.
+
+ rewrite norm_list_idemp; reflexivity.
+
+ rewrite norm_list_idemp; reflexivity.
+Qed.
+
 Theorem r_decomposed_4 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
   → ∀ (f : point → point),
@@ -2484,50 +2512,30 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
    rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
 
    destruct e as (t, d); destruct t, d.
-   left.
-    split.
+    left; split.
      exists (rev_path el), (rev_path el₂).
      split; [ | apply rotate_rev_path; assumption ].
      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
      intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
-      rewrite rotate_rotate_norm, H₂ in Hel.
-      apply rotate_rev_path in Hel.
-      rewrite rev_path_app in Hel; simpl in Hel.
-      rewrite <- fold_right_cons in Hel.
-      rewrite rotate_rotate_norm, H₅ in H₆.
-      apply rotate_rev_path in Hel.
-      rewrite <- Hel, <- fold_right_app in H₆.
-      revert H₆; apply Hnf.
-      rewrite rev_path_cons, rev_path_involutive.
-      rewrite rev_path_single.
-      replace (negf ạ) with ạ⁻¹ by reflexivity.
-      rewrite <- H₅, <- H₂.
-      intros H.
-      destruct (norm_list_dec (norm_list el₃ ++ norm_list el)) as [H₃| H₃].
-       rewrite H₃, H₅ in H; discriminate H.
+      eapply not_in_fixpoints_one_path; try eassumption.
+      intros H; discriminate H.
 
-       destruct H₃ as (el₁ & t & d & el₅ & H₃).
-       apply norm_list_app_split in H₃.
-       destruct H₃ as (H₃ & H₆).
-       rewrite H₅ in H₃.
-       rewrite H₂ in H₆.
-       apply norm_list_app_is_nil in H.
-        rewrite H₂, H₅ in H.
-        apply rev_path_eq_eq in H.
-        rewrite rev_path_involutive, rev_path_app in H.
-        discriminate H.
+      destruct H₃ as (H₃ & [(H₄, H₅) | (H₄, H₅)]).
+       destruct H₄ as (el₁ & el₃ & H₄ & H₆).
+       eapply not_in_fixpoints_one_path; try eassumption.
+       intros H; discriminate H.
 
-        rewrite norm_list_idemp; reflexivity.
+       destruct H₅ as (el₁ & el₃ & H₅ & H₆).
+       eapply not_in_fixpoints_one_path; try eassumption.
+       intros H; discriminate H.
 
-        rewrite norm_list_idemp; reflexivity.
+    right; split.
+     intros (el₁ & el₃ & H₅ & H₆).
+     eapply not_in_fixpoints_one_path; try eassumption.
+     intros H; discriminate H.
 
-      apply H₃; clear H₃.
-      exists (rev_path el), (rev_path el₂).
-      split.
-       rewrite <- rev_path_norm_list, H₂, rev_path_app.
-simpl.
-(* aïe... *)
+     simpl.
 bbb.
 
 (* ah oui mais non... *)
