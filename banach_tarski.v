@@ -2468,6 +2468,75 @@ destruct (norm_list_dec (norm_list el₃ ++ norm_list el)) as [H₃| H₃].
  rewrite H₅ in H₃.
  rewrite H₂ in H₆.
 
+Theorem norm_list_app_is_nil : ∀ el₁ el₂,
+  el₁ = norm_list el₁
+  → el₂ = norm_list el₂
+  → norm_list (el₁ ++ el₂) = []
+  → el₂ = rev_path el₁.
+Proof.
+intros el₁ el₂ Hel₁ Hel₂ Hn.
+(**)
+symmetry in Hel₁, Hel₂.
+revert el₂ Hel₂ Hn.
+induction el₁ as [| e₁] using rev_ind; intros.
+ simpl in Hn; rewrite <- Hel₂, Hn; reflexivity.
+
+ rewrite <- Hel₁, <- Hel₂.
+ rewrite rev_path_norm_list.
+ rewrite <- app_assoc in Hn.
+ apply norm_list_app_diag in Hel₁.
+ apply IHel₁ in Hn; [ | assumption | ].
+  rewrite rev_path_app, rev_path_single.
+  rewrite <- Hn.
+  rewrite <- app_comm_cons, app_nil_l.
+  rewrite <- app_comm_cons, app_nil_l.
+SearchAbout (_ :: negf _ :: _).
+Check norm_list_cancel.
+bbb.
+
+  rewrite rev_path_app, rev_path_single, <- app_comm_cons, app_nil_l.
+  rewrite <- Hn.
+
+  simpl in Hn; symmetry in Hn.
+
+  apply rev_path_eq_eq in Hn.
+  rewrite rev_path_involutive, rev_path_cons, rev_path_single in Hn.
+  symmetry in Hn.
+
+
+  rewrite rev_path_app, rev_path_single; simpl.
+  rewrite <- Hn.  
+  
+
+bbb.
+revert el₂ Hel₂ Hn.
+induction el₁ as [| e₁]; intros.
+ simpl in Hn; rewrite Hel₂, Hn; reflexivity.
+
+ simpl in Hn.
+ remember (norm_list (el₁ ++ el₂)) as el eqn:Hel.
+ symmetry in Hel.
+ symmetry in Hel₁; apply norm_list_cons in Hel₁; symmetry in Hel₁.
+ destruct el as [| e].
+  apply IHel₁ in Hel; [ discriminate Hn | assumption | assumption ].
+
+  destruct (letter_opp_dec e₁ e) as [H₁| H₁]; [ subst el | ].
+   destruct e₁ as (t₁, d₁).
+   destruct e as (t, d).
+   apply letter_opp_iff in H₁.
+   destruct H₁; subst t₁ d.
+   destruct el₂ as [| e₂].
+    rewrite app_nil_r in Hel.
+    rewrite Hel₁, Hel.
+bbb.
+
+apply norm_list_app_is_nil in H.
+ rewrite H₂, H₅ in H.
+SearchAbout rev_path.
+ apply rev_path_eq_eq in H.
+ rewrite rev_path_involutive, rev_path_app in H.
+ discriminate H.
+
 bbb.
 intros H.
 SearchAbout (norm_list (_ ++ _)).
