@@ -260,6 +260,15 @@ induction el as [| (t₁, d₁)]; intros.
    rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
 Qed.
 
+Theorem norm_list_cancel2 : ∀ el e,
+  norm_list (negf e :: e :: el) = norm_list el.
+Proof.
+intros el e.
+pose proof norm_list_cancel el (negf e) as H.
+rewrite negf_involutive in H.
+assumption.
+Qed.
+
 Theorem norm_list_cancel_in : ∀ el₁ el₂ e,
   norm_list (el₁ ++ e :: negf e :: el₂) =
   norm_list (el₁ ++ el₂).
@@ -305,7 +314,7 @@ destruct el as [| e].
   reflexivity.
 Qed.
 
-Theorem norm_list_norm_list : ∀ el, norm_list (norm_list el) = norm_list el.
+Theorem norm_list_idemp : ∀ el, norm_list (norm_list el) = norm_list el.
 Proof.
 intros el.
 pose proof is_normal [] el [] as H.
@@ -480,10 +489,10 @@ rewrite Hel₁.
 exists (mkF₂ (E x true :: E y d :: el₁)).
 remember norm_list as f; simpl; subst f.
 rewrite norm_list_inv.
-rewrite <- Hel₁, norm_list_norm_list.
+rewrite <- Hel₁, norm_list_idemp.
 split; [ reflexivity | ].
 unfold start_with; simpl.
-rewrite norm_list_norm_list, Hel₁.
+rewrite norm_list_idemp, Hel₁.
 destruct (letter_dec x y) as [H₂| H₂]; [ | reflexivity ].
 destruct d; [ reflexivity | ].
 subst y; exfalso; apply H₁; split; reflexivity.
@@ -1170,6 +1179,268 @@ destruct H₁; subst t₂ d₂.
 revert Hn; apply norm_list_no_start.
 Qed.
 
+Theorem norm_list_dec : ∀ el,
+  { norm_list el = el } +
+  { ∃ el₁ t d el₂, el = el₁ ++ E t d :: E t (negb d) :: el₂ }.
+Proof.
+intros el.
+induction el as [| e]; [ left; reflexivity | ].
+destruct IHel as [IHel| IHel].
+ simpl.
+ rewrite IHel.
+ destruct el as [| e₁]; [ left; reflexivity | ].
+ destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ right | left; reflexivity ].
+ destruct e as (t, d).
+ destruct e₁ as (t₁, d₁).
+ apply letter_opp_iff in H₁.
+ destruct H₁; subst t₁ d₁.
+ exists [], t, d, el.
+ reflexivity.
+
+ right.
+ destruct IHel as (el₁, (t, (d, (el₂, IHel)))).
+ exists (e :: el₁), t, d, el₂; subst el.
+ reflexivity.
+Qed.
+
+Theorem rev_path_cons : ∀ e el,
+  rev_path (e :: el) = rev_path el ++ rev_path [e].
+Proof.
+intros e el.
+unfold rev_path; simpl.
+rewrite map_app; reflexivity.
+Qed.
+
+Theorem rev_path_app : ∀ el₁ el₂,
+  rev_path (el₁ ++ el₂) = rev_path el₂ ++ rev_path el₁.
+Proof.
+intros el₁ el₂.
+revert el₁.
+induction el₂ as [| (t, d)]; intros; [ rewrite app_nil_r; reflexivity | ].
+rewrite rev_path_cons, cons_comm_app, app_assoc, IHel₂.
+rewrite <- app_assoc; f_equal; simpl.
+clear el₂ IHel₂.
+induction el₁ as [| e₁]; [ reflexivity | ].
+simpl; rewrite rev_path_cons; rewrite IHel₁.
+simpl; f_equal; symmetry.
+rewrite rev_path_cons; reflexivity.
+Qed.
+
+Theorem rev_path_involutive : ∀ el, rev_path (rev_path el) = el.
+Proof.
+intros el.
+induction el as [| (t, d)]; [ reflexivity | simpl ].
+rewrite rev_path_cons, rev_path_app.
+rewrite IHel; simpl; rewrite Bool.negb_involutive.
+reflexivity.
+Qed.
+
+(* because of Require Import Nsatz, there is a semantic error here
+Theorem rev_path_single : ∀ e, rev_path [e] = [negf e].
+*)
+Theorem rev_path_single : ∀ e, rev_path [e] = negf e :: [].
+Proof. intros e; reflexivity. Qed.
+
+Theorem rev_path_nil : rev_path [] = [].
+Proof. reflexivity. Qed.
+
+Theorem rev_path_is_nil : ∀ el, rev_path el = [] → el = [].
+Proof.
+intros el Hr.
+destruct el as [| e]; [ reflexivity | ].
+rewrite rev_path_cons, rev_path_single in Hr.
+destruct (rev_path el); discriminate Hr.
+Qed.
+
+Theorem rev_path_eq_eq : ∀ el₁ el₂,
+  rev_path el₁ = rev_path el₂ ↔ el₁ = el₂.
+Proof.
+intros el₁ el₂.
+split; [ | intros H; subst; reflexivity ].
+intros Hr.
+revert el₂ Hr.
+induction el₁ as [| e₁]; intros.
+ rewrite rev_path_nil in Hr.
+ symmetry in Hr; apply rev_path_is_nil in Hr.
+ destruct Hr; reflexivity.
+
+ rewrite rev_path_cons, rev_path_single in Hr.
+ destruct el₂ as [| e₂].
+  rewrite rev_path_nil in Hr.
+  destruct (rev_path el₁); discriminate Hr.
+
+  rewrite rev_path_cons, rev_path_single in Hr.
+  apply app_inj_tail in Hr.
+  destruct Hr as (Hr, Hn).
+  apply IHel₁ in Hr.
+  apply negf_eq_eq in Hn.
+  subst el₁ e₁; reflexivity.
+Qed.
+
+Theorem norm_list_rev_path : ∀ el,
+  norm_list el = el → norm_list (rev_path el) = rev_path el.
+Proof.
+intros el Hel.
+induction el as [| e] using rev_ind; [ reflexivity | ].
+rewrite rev_path_app; simpl.
+generalize Hel; intros Hn.
+apply norm_list_app_diag in Hn.
+rewrite IHel; [ | assumption ].
+remember (rev_path el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁]; [ reflexivity | ].
+destruct (letter_opp_dec (negf e) e₁) as [H₁| H₁]; [ | reflexivity ].
+exfalso.
+destruct e as (t, d).
+destruct e₁ as (t₁, d₁).
+apply letter_opp_iff in H₁; rewrite Bool.negb_involutive in H₁.
+destruct H₁; subst t₁ d₁.
+rewrite <- rev_path_involutive in Hel₁.
+rewrite rev_path_cons, rev_path_single in Hel₁.
+simpl in Hel₁.
+apply -> rev_path_eq_eq in Hel₁.
+rewrite Hel₁ in Hel.
+rewrite <- app_assoc in Hel; simpl in Hel.
+revert Hel.
+apply norm_list_no_consec2 with (e := E t d).
+Qed.
+
+Theorem rev_path_norm_list : ∀ el,
+  rev_path (norm_list el) = norm_list (rev_path el).
+Proof.
+intros el.
+remember (length el) as len eqn:Hlen.
+symmetry in Hlen.
+revert el Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len.
+ apply length_zero_iff_nil in Hlen; subst el; reflexivity.
+
+ destruct (norm_list_dec el) as [H₁| H₁].
+  generalize H₁; intros H₂.
+  apply norm_list_rev_path in H₂.
+  rewrite H₁, H₂.
+  reflexivity.
+
+  destruct H₁ as (el₁, (t, (d, (el₂, Hs)))).
+  generalize Hs; intros H.
+  rewrite H, norm_list_cancel_in.
+  rewrite rev_path_app, rev_path_cons, rev_path_cons.
+  do 2 rewrite rev_path_single.
+  do 2 rewrite <- app_assoc; simpl.
+  rewrite Bool.negb_involutive.
+  rewrite norm_list_cancel_in.
+  rewrite <- rev_path_app.
+  apply IHlen with (m := length (el₁ ++ el₂)); [ | reflexivity ].
+  rewrite <- Hlen, H; simpl.
+  do 2 rewrite app_length; simpl.
+  apply Nat.add_lt_mono_l.
+  etransitivity; eapply Nat.lt_succ_diag_r.
+Qed.
+
+Theorem split_app_eq {A} : ∀ el₁ el₂ el₃ el₄ : list A,
+  el₁ ++ el₂ = el₃ ++ el₄
+  → { ∃ el, el₃ = el₁ ++ el ∧ el₂ = el ++ el₄ } +
+    { ∃ el, el₁ = el₃ ++ el ∧ el₄ = el ++ el₂ }.
+Proof.
+intros el₁ el₂ el₃ el₄ Hel.
+revert el₂ el₃ el₄ Hel.
+induction el₁ as [| e₁]; intros.
+ left; exists el₃.
+ split; [ reflexivity | assumption ].
+
+ destruct el₃ as [| e₃].
+  right; exists (e₁ :: el₁).
+  split; [ reflexivity | symmetry; assumption ].
+
+  simpl in Hel.
+  injection Hel; clear Hel; intros; subst e₃.
+  apply IHel₁ in H.
+  destruct H as [H| H].
+   left; destruct H as (el, (H₁, H₂)); subst el₂ el₃.
+   exists el; split; reflexivity.
+
+   right; destruct H as (el, (H₁, H₂)); subst el₁ el₄.
+   exists el; split; reflexivity.
+Qed.
+
+Theorem norm_list_app_split : ∀ el₁ el₂ el₃ el₄ e,
+  norm_list el₁ ++ norm_list el₂ = el₃ ++ e :: negf e :: el₄
+  → norm_list el₁ = el₃ ++ [e] ∧ norm_list el₂ = negf e :: el₄.
+Proof.
+intros el₁ el₂ el₃ el₄ e Hn.
+apply split_app_eq in Hn.
+destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
+ exfalso; revert H₂; apply norm_list_no_consec.
+
+ rewrite cons_to_app in H₂.
+ apply split_app_eq in H₂.
+ destruct H₂ as [(el', (H₂, H₃))| (el', (H₂, H₃))].
+  subst el.
+  destruct el' as [| e'].
+   rewrite app_nil_r in H₁.
+   rewrite app_nil_l in H₃; symmetry in H₃.
+   split; assumption.
+
+   simpl in H₃.
+   injection H₃; clear H₃; intros H₂ H₃; subst e'.
+   exfalso; revert H₁; apply norm_list_no_consec.
+
+  destruct el as [| e₁].
+   simpl in H₂; subst el'.
+   exfalso; revert H₃; apply norm_list_no_start.
+
+   simpl in H₂.
+   injection H₂; clear H₂; intros H₂ H₄; subst e₁.
+   symmetry in H₂.
+   apply app_eq_nil in H₂.
+   destruct H₂; subst el el'.
+   split; assumption.
+Qed.  
+
+Theorem norm_list_app_is_nil : ∀ el₁ el₂,
+  el₁ = norm_list el₁
+  → el₂ = norm_list el₂
+  → norm_list (el₁ ++ el₂) = []
+  → el₂ = rev_path el₁.
+Proof.
+intros el₁ el₂ Hel₁ Hel₂ Hn.
+symmetry in Hel₁, Hel₂.
+remember (length (el₁ ++ el₂)) as len eqn:Hlen.
+symmetry in Hlen.
+rewrite <- Hel₁, <- Hel₂, rev_path_norm_list.
+revert el₁ el₂ Hel₁ Hel₂ Hn Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct (norm_list_dec (el₁ ++ el₂)) as [H₁| H₁].
+ rewrite H₁ in Hn.
+ apply app_eq_nil in Hn.
+ destruct Hn; subst el₁ el₂; reflexivity.
+
+ destruct H₁ as (el₃ & t & d & el₄ & H₁).
+ rewrite H₁, app_length, Nat.add_comm in Hlen.
+ destruct len; [ discriminate Hlen | ].
+ destruct len; [ discriminate Hlen | simpl in Hlen ].
+ do 2 apply -> Nat.succ_inj_wd in Hlen.
+ rewrite Nat.add_comm, <- app_length in Hlen.
+ assert (H₂ : len < S (S len)).
+  transitivity (S len); apply Nat.lt_succ_diag_r.
+
+  rewrite <- Hel₁, <- Hel₂ in H₁.
+  apply norm_list_app_split in H₁.
+  destruct H₁ as (H₃, H₄).
+  rewrite Hel₁ in H₃; rewrite H₃ in Hel₁.
+  apply norm_list_app_diag in Hel₁.
+  rewrite Hel₂ in H₄; rewrite H₄ in Hel₂.
+  apply norm_list_cons in Hel₂.
+  rewrite H₃, H₄ in Hn.
+  rewrite <- app_assoc, <- cons_comm_app in Hn.
+  rewrite norm_list_cancel_in in Hn.
+  pose proof IHlen len H₂ el₃ el₄ Hel₁ Hel₂ Hn Hlen as H.
+  rewrite Hel₂, <- rev_path_norm_list, Hel₁ in H.
+  rewrite H₃, H₄, H, rev_path_app.
+  reflexivity.
+Qed.
+
 Theorem rotate_prop : ∀ p t d el el₁ el₂ e a b c,
   t = lb ∧ p = (1, 0, 0, O)%Z ∨
   t = la ∧ p = (0, 0, 1, O)%Z
@@ -1473,38 +1744,6 @@ destruct Hb as [Hb| Hb].
  rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
 Qed.
 
-Theorem rev_path_cons : ∀ e el,
-  rev_path (e :: el) = rev_path el ++ rev_path [e].
-Proof.
-intros e el.
-unfold rev_path; simpl.
-rewrite map_app; reflexivity.
-Qed.
-
-Theorem rev_path_app : ∀ el₁ el₂,
-  rev_path (el₁ ++ el₂) = rev_path el₂ ++ rev_path el₁.
-Proof.
-intros el₁ el₂.
-revert el₁.
-induction el₂ as [| (t, d)]; intros; [ rewrite app_nil_r; reflexivity | ].
-rewrite rev_path_cons, cons_comm_app, app_assoc, IHel₂.
-rewrite <- app_assoc; f_equal; simpl.
-clear el₂ IHel₂.
-induction el₁ as [| e₁]; [ reflexivity | ].
-simpl; rewrite rev_path_cons; rewrite IHel₁.
-simpl; f_equal; symmetry.
-rewrite rev_path_cons; reflexivity.
-Qed.
-
-Theorem rev_path_involutive : ∀ el, rev_path (rev_path el) = el.
-Proof.
-intros el.
-induction el as [| (t, d)]; [ reflexivity | simpl ].
-rewrite rev_path_cons, rev_path_app.
-rewrite IHel; simpl; rewrite Bool.negb_involutive.
-reflexivity.
-Qed.
-
 Theorem norm_app_rev_path_path : ∀ el, norm_list (rev_path el ++ el) = [].
 Proof.
 induction el as [| e]; [ reflexivity | ].
@@ -1541,15 +1780,6 @@ destruct t, d; simpl.
  apply rot_inv_rot_z.
 Qed.
 
-Theorem rev_path_nil : rev_path [] = [].
-Proof. reflexivity. Qed.
-
-(* because of Require Import Nsatz, there is a semantic error here
-Theorem rev_path_single : ∀ e, rev_path [e] = [negf e].
-*)
-Theorem rev_path_single : ∀ e, rev_path [e] = negf e :: [].
-Proof. intros e; reflexivity. Qed.
-
 Theorem app_rev_path_path : ∀ p el,
   fold_right rotate p (el ++ rev_path el) = p.
 Proof.
@@ -1569,124 +1799,6 @@ induction el as [| e] using rev_ind; intros; [ reflexivity | simpl ].
 rewrite rev_path_app; simpl.
 rewrite app_assoc, fold_right_app; simpl.
 rewrite IHel; apply rotate_neg_rotate.
-Qed.
-
-Theorem norm_list_dec : ∀ el,
-  { norm_list el = el } +
-  { ∃ el₁ t d el₂, el = el₁ ++ E t d :: E t (negb d) :: el₂ }.
-Proof.
-intros el.
-induction el as [| e]; [ left; reflexivity | ].
-destruct IHel as [IHel| IHel].
- simpl.
- rewrite IHel.
- destruct el as [| e₁]; [ left; reflexivity | ].
- destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ right | left; reflexivity ].
- destruct e as (t, d).
- destruct e₁ as (t₁, d₁).
- apply letter_opp_iff in H₁.
- destruct H₁; subst t₁ d₁.
- exists [], t, d, el.
- reflexivity.
-
- right.
- destruct IHel as (el₁, (t, (d, (el₂, IHel)))).
- exists (e :: el₁), t, d, el₂; subst el.
- reflexivity.
-Qed.
-
-Theorem rev_path_is_nil : ∀ el, rev_path el = [] → el = [].
-Proof.
-intros el Hr.
-destruct el as [| e]; [ reflexivity | ].
-rewrite rev_path_cons, rev_path_single in Hr.
-destruct (rev_path el); discriminate Hr.
-Qed.
-
-Theorem rev_path_eq_eq : ∀ el₁ el₂,
-  rev_path el₁ = rev_path el₂ ↔ el₁ = el₂.
-Proof.
-intros el₁ el₂.
-split; [ | intros H; subst; reflexivity ].
-intros Hr.
-revert el₂ Hr.
-induction el₁ as [| e₁]; intros.
- rewrite rev_path_nil in Hr.
- symmetry in Hr; apply rev_path_is_nil in Hr.
- destruct Hr; reflexivity.
-
- rewrite rev_path_cons, rev_path_single in Hr.
- destruct el₂ as [| e₂].
-  rewrite rev_path_nil in Hr.
-  destruct (rev_path el₁); discriminate Hr.
-
-  rewrite rev_path_cons, rev_path_single in Hr.
-  apply app_inj_tail in Hr.
-  destruct Hr as (Hr, Hn).
-  apply IHel₁ in Hr.
-  apply negf_eq_eq in Hn.
-  subst el₁ e₁; reflexivity.
-Qed.
-
-Theorem norm_list_rev_path : ∀ el,
-  norm_list el = el → norm_list (rev_path el) = rev_path el.
-Proof.
-intros el Hel.
-induction el as [| e] using rev_ind; [ reflexivity | ].
-rewrite rev_path_app; simpl.
-generalize Hel; intros Hn.
-apply norm_list_app_diag in Hn.
-rewrite IHel; [ | assumption ].
-remember (rev_path el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁]; [ reflexivity | ].
-destruct (letter_opp_dec (negf e) e₁) as [H₁| H₁]; [ | reflexivity ].
-exfalso.
-destruct e as (t, d).
-destruct e₁ as (t₁, d₁).
-apply letter_opp_iff in H₁; rewrite Bool.negb_involutive in H₁.
-destruct H₁; subst t₁ d₁.
-rewrite <- rev_path_involutive in Hel₁.
-rewrite rev_path_cons, rev_path_single in Hel₁.
-simpl in Hel₁.
-apply -> rev_path_eq_eq in Hel₁.
-rewrite Hel₁ in Hel.
-rewrite <- app_assoc in Hel; simpl in Hel.
-revert Hel.
-apply norm_list_no_consec2 with (e := E t d).
-Qed.
-
-Theorem rev_path_norm_list : ∀ el,
-  rev_path (norm_list el) = norm_list (rev_path el).
-Proof.
-intros el.
-remember (length el) as len eqn:Hlen.
-symmetry in Hlen.
-revert el Hlen.
-induction len as (len, IHlen) using lt_wf_rec; intros.
-destruct len.
- apply length_zero_iff_nil in Hlen; subst el; reflexivity.
-
- destruct (norm_list_dec el) as [H₁| H₁].
-  generalize H₁; intros H₂.
-  apply norm_list_rev_path in H₂.
-  rewrite H₁, H₂.
-  reflexivity.
-
-  destruct H₁ as (el₁, (t, (d, (el₂, Hs)))).
-  generalize Hs; intros H.
-  rewrite H, norm_list_cancel_in.
-  rewrite rev_path_app, rev_path_cons, rev_path_cons.
-  do 2 rewrite rev_path_single.
-  do 2 rewrite <- app_assoc; simpl.
-  rewrite Bool.negb_involutive.
-  rewrite norm_list_cancel_in.
-  rewrite <- rev_path_app.
-  apply IHlen with (m := length (el₁ ++ el₂)); [ | reflexivity ].
-  rewrite <- Hlen, H; simpl.
-  do 2 rewrite app_length; simpl.
-  apply Nat.add_lt_mono_l.
-  etransitivity; eapply Nat.lt_succ_diag_r.
 Qed.
 
 Theorem rotate_simpl : ∀ el₁ el₂ e p,
@@ -1740,66 +1852,6 @@ induction el as [| e]; [ reflexivity | simpl ].
 rewrite rev_path_cons, app_length; simpl.
 rewrite IHel, Nat.add_1_r; reflexivity.
 Qed.
-
-Theorem split_app_eq {A} : ∀ el₁ el₂ el₃ el₄ : list A,
-  el₁ ++ el₂ = el₃ ++ el₄
-  → { ∃ el, el₃ = el₁ ++ el ∧ el₂ = el ++ el₄ } +
-    { ∃ el, el₁ = el₃ ++ el ∧ el₄ = el ++ el₂ }.
-Proof.
-intros el₁ el₂ el₃ el₄ Hel.
-revert el₂ el₃ el₄ Hel.
-induction el₁ as [| e₁]; intros.
- left; exists el₃.
- split; [ reflexivity | assumption ].
-
- destruct el₃ as [| e₃].
-  right; exists (e₁ :: el₁).
-  split; [ reflexivity | symmetry; assumption ].
-
-  simpl in Hel.
-  injection Hel; clear Hel; intros; subst e₃.
-  apply IHel₁ in H.
-  destruct H as [H| H].
-   left; destruct H as (el, (H₁, H₂)); subst el₂ el₃.
-   exists el; split; reflexivity.
-
-   right; destruct H as (el, (H₁, H₂)); subst el₁ el₄.
-   exists el; split; reflexivity.
-Qed.
-
-Theorem norm_list_app_split : ∀ el₁ el₂ el₃ el₄ e,
-  norm_list el₁ ++ norm_list el₂ = el₃ ++ e :: negf e :: el₄
-  → norm_list el₁ = el₃ ++ [e] ∧ norm_list el₂ = negf e :: el₄.
-Proof.
-intros el₁ el₂ el₃ el₄ e Hn.
-apply split_app_eq in Hn.
-destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
- exfalso; revert H₂; apply norm_list_no_consec.
-
- rewrite cons_to_app in H₂.
- apply split_app_eq in H₂.
- destruct H₂ as [(el', (H₂, H₃))| (el', (H₂, H₃))].
-  subst el.
-  destruct el' as [| e'].
-   rewrite app_nil_r in H₁.
-   rewrite app_nil_l in H₃; symmetry in H₃.
-   split; assumption.
-
-   simpl in H₃.
-   injection H₃; clear H₃; intros H₂ H₃; subst e'.
-   exfalso; revert H₁; apply norm_list_no_consec.
-
-  destruct el as [| e₁].
-   simpl in H₂; subst el'.
-   exfalso; revert H₃; apply norm_list_no_start.
-
-   simpl in H₂.
-   injection H₂; clear H₂; intros H₂ H₄; subst e₁.
-   symmetry in H₂.
-   apply app_eq_nil in H₂.
-   destruct H₂; subst el el'.
-   split; assumption.
-Qed.  
 
 Theorem rotate_rev_path : ∀ el p₁ p₂,
   fold_right rotate p₁ el = p₂
@@ -2432,13 +2484,13 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
    rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
 
    destruct e as (t, d); destruct t, d.
-    left.
-     split.
-      exists (rev_path el), (rev_path el₂).
-      split; [ | apply rotate_rev_path; assumption ].
-      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+   left.
+    split.
+     exists (rev_path el), (rev_path el₂).
+     split; [ | apply rotate_rev_path; assumption ].
+     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
-      intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
+     intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
       rewrite rotate_rotate_norm, H₂ in Hel.
       apply rotate_rev_path in Hel.
       rewrite rev_path_app in Hel; simpl in Hel.
@@ -2450,140 +2502,32 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
       rewrite rev_path_cons, rev_path_involutive.
       rewrite rev_path_single.
       replace (negf ạ) with ạ⁻¹ by reflexivity.
-(*
-rewrite <- app_comm_cons.
-*)
-rewrite <- H₅, <- H₂.
-(**)
-intros H.
-(*
-destruct (norm_list_dec (ạ⁻¹ :: el₄ ++ el₂ ++ [ạ⁻¹])) as [H₃| H₃].
-*)
-destruct (norm_list_dec (norm_list el₃ ++ norm_list el)) as [H₃| H₃].
- rewrite H₃, H₅ in H; discriminate H.
+      rewrite <- H₅, <- H₂.
+      intros H.
+      destruct (norm_list_dec (norm_list el₃ ++ norm_list el)) as [H₃| H₃].
+       rewrite H₃, H₅ in H; discriminate H.
 
- destruct H₃ as (el₁ & t & d & el₅ & H₃).
- apply norm_list_app_split in H₃.
- destruct H₃ as (H₃ & H₆).
- rewrite H₅ in H₃.
- rewrite H₂ in H₆.
+       destruct H₃ as (el₁ & t & d & el₅ & H₃).
+       apply norm_list_app_split in H₃.
+       destruct H₃ as (H₃ & H₆).
+       rewrite H₅ in H₃.
+       rewrite H₂ in H₆.
+       apply norm_list_app_is_nil in H.
+        rewrite H₂, H₅ in H.
+        apply rev_path_eq_eq in H.
+        rewrite rev_path_involutive, rev_path_app in H.
+        discriminate H.
 
-Theorem norm_list_app_is_nil : ∀ el₁ el₂,
-  el₁ = norm_list el₁
-  → el₂ = norm_list el₂
-  → norm_list (el₁ ++ el₂) = []
-  → el₂ = rev_path el₁.
-Proof.
-intros el₁ el₂ Hel₁ Hel₂ Hn.
-(**)
-symmetry in Hel₁, Hel₂.
-revert el₂ Hel₂ Hn.
-induction el₁ as [| e₁] using rev_ind; intros.
- simpl in Hn; rewrite <- Hel₂, Hn; reflexivity.
+        rewrite norm_list_idemp; reflexivity.
 
- rewrite <- Hel₁, <- Hel₂.
- rewrite rev_path_norm_list.
- rewrite <- app_assoc in Hn.
- apply norm_list_app_diag in Hel₁.
- apply IHel₁ in Hn; [ | assumption | ].
-  rewrite rev_path_app, rev_path_single.
-  rewrite <- Hn.
-  rewrite <- app_comm_cons, app_nil_l.
-  rewrite <- app_comm_cons, app_nil_l.
-SearchAbout (_ :: negf _ :: _).
-Check norm_list_cancel.
-bbb.
+        rewrite norm_list_idemp; reflexivity.
 
-  rewrite rev_path_app, rev_path_single, <- app_comm_cons, app_nil_l.
-  rewrite <- Hn.
-
-  simpl in Hn; symmetry in Hn.
-
-  apply rev_path_eq_eq in Hn.
-  rewrite rev_path_involutive, rev_path_cons, rev_path_single in Hn.
-  symmetry in Hn.
-
-
-  rewrite rev_path_app, rev_path_single; simpl.
-  rewrite <- Hn.  
-  
-
-bbb.
-revert el₂ Hel₂ Hn.
-induction el₁ as [| e₁]; intros.
- simpl in Hn; rewrite Hel₂, Hn; reflexivity.
-
- simpl in Hn.
- remember (norm_list (el₁ ++ el₂)) as el eqn:Hel.
- symmetry in Hel.
- symmetry in Hel₁; apply norm_list_cons in Hel₁; symmetry in Hel₁.
- destruct el as [| e].
-  apply IHel₁ in Hel; [ discriminate Hn | assumption | assumption ].
-
-  destruct (letter_opp_dec e₁ e) as [H₁| H₁]; [ subst el | ].
-   destruct e₁ as (t₁, d₁).
-   destruct e as (t, d).
-   apply letter_opp_iff in H₁.
-   destruct H₁; subst t₁ d.
-   destruct el₂ as [| e₂].
-    rewrite app_nil_r in Hel.
-    rewrite Hel₁, Hel.
-bbb.
-
-apply norm_list_app_is_nil in H.
- rewrite H₂, H₅ in H.
-SearchAbout rev_path.
- apply rev_path_eq_eq in H.
- rewrite rev_path_involutive, rev_path_app in H.
- discriminate H.
-
-bbb.
-intros H.
-SearchAbout (norm_list (_ ++ _)).
-bbb.
-bbb.
-      apply rotate_rev_path in H₆; simpl in H₆.
-      rewrite <- Hel in H₆ at 1.
-      rewrite <- fold_right_app in H₆.
-      simpl in H₆.
-
-      rewrite <- Hel, <- fold_right_app in H₆.
-bbb.
-simpl.
-
-      rewrite <- fold_right_cons in Hel.
-
-      rewrite <- rotate_cons in Hel.
-
-      rewrite rev_path_app, rev_path_single, <- cons_to_app in Hel.
-SearchAbout (negf _ = _).
-(* contradiction between paths *)
-bbb.
-     right. (* not the ạ case, but ạ⁻¹ *)
+      apply H₃; clear H₃.
+      exists (rev_path el), (rev_path el₂).
       split.
-       (* proof that it cannot be the ạ case *)
-       intros (p₁ & el₁ & el₃ & Hn & Hr).
-       unfold not_in_fixpoints in Hnf.
-rewrite rotate_rotate_norm in Hr.
-rewrite rotate_rotate_norm in Hel.
-rewrite H₂ in Hel.
-rewrite Hn in Hr.
-(* clear el el₁ H₂ Hn. *)
-rewrite <- Hr in Hel at 1.
-rewrite <- fold_right_app in Hel.
-rewrite <- app_assoc in Hel.
-simpl in Hel.
-rewrite rotate_simpl in Hel.
-assert (H : f p₁ = f p).
- apply Hoe.
- transitivity (f p₁); [ apply Ho | ].
- transitivity (f p); [ | symmetry; apply Ho ].
- exists (el₂ ++ el₃); assumption.
-
- rewrite H in Hel, Hr.
- (* note que ça prouve pas que N(el₂++el₃)=[], car f(p) peut justement
-    être le point fixe de la rotation de el₂++el₃ *)
- apply rotate_rev_path in Hr.
+       rewrite <- rev_path_norm_list, H₂, rev_path_app.
+simpl.
+(* aïe... *)
 bbb.
 
 (* ah oui mais non... *)
