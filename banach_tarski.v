@@ -1828,7 +1828,6 @@ Theorem all_points_in_orbit_1_0_0_are_different :
 Proof.
 intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
 move Hp at top; subst p₂; rename p₁ into p.
-bbb.
 (* perhaps I should generalize that to any starting point which is
    a fixpoint? something like that... *)
 assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
@@ -2448,11 +2447,29 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
       apply rotate_rev_path in Hel.
       rewrite <- Hel, <- fold_right_app in H₆.
       revert H₆; apply Hnf.
-rewrite rev_path_cons, rev_path_involutive.
-rewrite rev_path_single.
-replace (negf ạ) with ạ⁻¹ by reflexivity.
+      rewrite rev_path_cons, rev_path_involutive.
+      rewrite rev_path_single.
+      replace (negf ạ) with ạ⁻¹ by reflexivity.
+(*
+rewrite <- app_comm_cons.
+*)
 rewrite <- H₅, <- H₂.
+(**)
+intros H.
+(*
+destruct (norm_list_dec (ạ⁻¹ :: el₄ ++ el₂ ++ [ạ⁻¹])) as [H₃| H₃].
+*)
+destruct (norm_list_dec (norm_list el₃ ++ norm_list el)) as [H₃| H₃].
+ rewrite H₃, H₅ in H; discriminate H.
+
+ destruct H₃ as (el₁ & t & d & el₅ & H₃).
+ apply norm_list_app_split in H₃.
+ destruct H₃ as (H₃ & H₆).
+
+bbb.
+intros H.
 SearchAbout (norm_list (_ ++ _)).
+bbb.
 bbb.
       apply rotate_rev_path in H₆; simpl in H₆.
       rewrite <- Hel in H₆ at 1.
