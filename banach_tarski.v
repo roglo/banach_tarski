@@ -2683,28 +2683,22 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
     split; assumption.
 
     intros (el₃ & el₄ & H₅ & H₆).
-    apply rotate_rev_path in H₆.
-bbb.
-
-    eapply not_in_fixpoints_one_path; try eassumption.
-    simpl in H₆.
-    rewrite rotate_rotate_norm, H₅ in H₆.
-    rewrite <- fold_right_cons in H₆.
     rewrite rotate_rotate_norm in H₆.
-    rewrite norm_list_cancel in H₆.
-    rewrite <- rotate_rotate_norm in H₆.
-bbb.
-
+    simpl in H₆; rewrite H₅ in H₆.
 apply rotate_rev_path in H₆.
-Check not_in_fixpoints_one_path.
-eapply not_in_fixpoints_one_path; try eassumption.
-bbb.
+rewrite <- H₆, <- fold_right_app in Hel.
 
-     pose proof rotate_cancel_in [] el₄ ạ (f p) as H.
-     do 2 rewrite app_nil_l in H.
-     replace (negf ạ) with ạ⁻¹ in H by reflexivity.
-     rewrite rotate_rotate_norm, H₆ in H; symmetry in H.
-     rewrite <- Hel, <- fold_right_app in H.
+bbb.
+    destruct el₄ as [| e₄].
+     simpl in H₆; rewrite H₆ in Hel.
+     revert Hel; apply Hnf.
+     intros H; rewrite Hel₁ in H; discriminate H.
+
+     apply rotate_rev_path in H₆.
+     eapply not_in_fixpoints_one_path; try eassumption.
+     rewrite rev_path_cons, rev_path_single.
+bbb.
+SearchAbout (norm_list (_ ++ _)).
 bbb.
 destruct (norm_list_dec (el₄ ++ el)) as [H₁| H₁].
  revert H; apply Hnf.
