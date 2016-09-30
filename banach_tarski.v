@@ -136,6 +136,15 @@ split; intros H.
  apply letter_opp_inv.
 Qed.
 
+Theorem not_letter_opp_diag : ∀ e, ¬ letter_opp e e.
+Proof.
+intros (t, d) H.
+apply letter_opp_iff in H.
+destruct H as (_, H).
+symmetry in H.
+revert H; apply Bool.no_fixpoint_negb.
+Qed.
+
 Fixpoint norm_list el :=
   match el with
   | nil => nil
@@ -349,6 +358,16 @@ destruct el₂ as [| e₂].
 
   injection Hn; clear Hn; intros; subst el₁.
   assumption.
+Qed.
+
+Theorem norm_list_cons_cons : ∀ e el el₁,
+  norm_list el = e :: el₁
+  → norm_list (e :: norm_list el) = e :: norm_list el.
+Proof.
+intros * Hn; simpl.
+rewrite norm_list_idemp, Hn.
+destruct (letter_opp_dec e e) as [H₁| H₁]; [ | reflexivity ].
+exfalso; revert H₁; apply not_letter_opp_diag.
 Qed.
 
 Definition empty s := str (norm s) = nil.
@@ -2647,32 +2666,27 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
   *right; split.
     intros (el₃ & el₄ & H₅ & H₆).
     apply rotate_rev_path in H₆.
-    rewrite <- H₆, <- fold_right_app in Hel.
-    remember (norm_list (el ++ rev_path el₃)) as el₂ eqn:Hel₂.
-    symmetry in Hel₂.
-    destruct el₂ as [| e₂].
-Focus 2.
-revert Hel; apply Hnf.
-intros H; rewrite Hel₂ in H; discriminate H.
+    eapply not_in_fixpoints_one_path; try eassumption.
+     rewrite <- rev_path_norm_list, H₅.
+     rewrite rev_path_cons, rev_path_single; simpl.
+     reflexivity.
 
-SearchAbout (norm_list (_ ++ _)).
-     pose proof is_normal [] el (rev_path el₃) as H.
-     do 2 rewrite app_nil_l in H.
-     rewrite <- H, Hel₁ in Hel₂; clear H.
-     pose proof is_normal (ạ⁻¹ :: el₁) (rev_path el₃) [] as H.
-     do 2 rewrite app_nil_r in H.
-     rewrite <- H, <- rev_path_norm_list, H₅ in Hel₂; clear H.
-     rewrite rev_path_cons, rev_path_single in Hel₂.
-     rewrite <- app_comm_cons, negf_ạ in Hel₂.
-bbb.
+     intros H; discriminate H.
 
+    exists (ạ⁻¹ :: norm_list el), (norm_list el).
+    split; [ eapply norm_list_cons_cons; eassumption | ].
+    rewrite rotate_cancel_start, <- rotate_rotate_norm.
+    assumption.
 
   *left; split.
-    exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+    exists el, el₁.
+    split; assumption.
 
     intros (el₃ & el₄ & H₅ & H₆).
+    apply rotate_rev_path in H₆.
+bbb.
+
+    eapply not_in_fixpoints_one_path; try eassumption.
     simpl in H₆.
     rewrite rotate_rotate_norm, H₅ in H₆.
     rewrite <- fold_right_cons in H₆.
