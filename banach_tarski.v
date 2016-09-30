@@ -2578,21 +2578,22 @@ apply norm_list_app_is_nil in H.
  eapply norm_list_is_cons; eassumption.
 Qed.
 
+Definition Sa f p :=
+  ∃ el el₁, norm_list el = ạ :: el₁ ∧ fold_right rotate (f p) el = p.
+Definition Sa_1 f p :=
+  ∃ el el₁, norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p) el = p.
+Definition Sb f p :=
+  ∃ el el₁, norm_list el = ḅ :: el₁ ∧ fold_right rotate (f p) el = p.
+Definition Sb_1 f p :=
+  ∃ el el₁, norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p) el = p.
+
 Theorem r_decomposed_4 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
   → ∀ (f : point → point),
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
   (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
-    f p = p ⊕
-    (∃ el el₁,
-        norm_list el = ạ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
-    (∃ el el₁,
-        norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
-    (∃ el el₁,
-        norm_list el = ḅ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
-    (∃ el el₁,
-        norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p) el = p).
+    f p = p ⊕ Sa f p ⊕ Sa_1 f p ⊕ Sb f p ⊕ Sb_1 f p.
 Proof.
 intros Rdec f (Hoe, Ho) p Hnf.
 assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
@@ -2867,8 +2868,7 @@ Theorem r_decomposed_2_a :
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
   (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
-    (∃ el el₁,
-        norm_list el = ạ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
+    Sa f p ⊕
     (∃ el el₁,
         norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p) (ạ :: el) = p).
 Proof.
@@ -2882,8 +2882,7 @@ Theorem r_decomposed_2_b :
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
   (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
-    (∃ el el₁,
-        norm_list el = ḅ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
+    Sb f p ⊕
     (∃ el el₁,
         norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p) (ḅ :: el) = p).
 Proof.
