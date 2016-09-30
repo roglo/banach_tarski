@@ -2504,12 +2504,12 @@ apply norm_list_app_is_nil in H.
  rewrite norm_list_idemp; reflexivity.
 Qed.
 
-Theorem not_in_fixpoints_one_path2 : ∀ p e el₄ el₁ el el₃,
+Theorem not_in_fixpoints_one_path2 : ∀ p e e₁ el₄ el₁ el el₃,
   not_in_fixpoints p
   → fold_right rotate p (el ++ rev_path (e :: el₄)) = p
-  → norm_list el = ạ :: el₁
-  → norm_list el₃ = ạ⁻¹ :: e :: el₄
-  → e ≠ ạ
+  → norm_list el = e₁ :: el₁
+  → norm_list el₃ = negf e₁ :: e :: el₄
+  → e ≠ e₁
   → False.
 Proof.
 intros * Hnf Hel Hel₁ H₅ He.
@@ -2751,7 +2751,13 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
        -eapply not_in_fixpoints_one_path2; try eassumption.
         intros H; discriminate H.
 
-       -
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+      +destruct e as (t, d); destruct t, d.
 bbb.
        -eapply not_in_fixpoints_one_path2; try eassumption.
         intros H; discriminate H.
