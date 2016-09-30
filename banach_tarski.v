@@ -2758,30 +2758,140 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
         intros H; discriminate H.
 
       +destruct e as (t, d); destruct t, d.
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -revert H₅; apply norm_list_no_start2.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+      +destruct e as (t, d); destruct t, d.
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -revert H₅; apply norm_list_no_start2.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+      +destruct e as (t, d); destruct t, d.
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -revert H₅; apply norm_list_no_start2.
+
+     +apply H₁; destruct e as (t, d); simpl.
+      rewrite letter_dec_diag, bool_dec_negb_r.
+      constructor.
+
+  *right; split.
+    intros (el₃ & el₄ & H₅ & H₆).
+    apply rotate_rev_path in H₆.
+    eapply not_in_fixpoints_one_path; try eassumption.
+     rewrite <- rev_path_norm_list, H₅.
+     rewrite rev_path_cons, rev_path_single; simpl.
+     reflexivity.
+
+     rewrite negf_involutive.
+     apply not_eq_sym; assumption.
+
+    exists (negf e :: norm_list el), (norm_list el).
+    split.
+Check norm_list_cons_cons.
+SearchAbout (norm_list _ = _ :: _).
 bbb.
+
+    split; [ eapply norm_list_cons_cons; eassumption | ].
+    rewrite rotate_cancel_start, <- rotate_rotate_norm.
+    assumption.
+
+bbb.
+
+    rewrite rotate_rotate_norm in H₆.
+    simpl in H₆; rewrite H₅ in H₆.
+    apply rotate_rev_path in H₆.
+    rewrite <- H₆, <- fold_right_app in Hel.
+bbb.
+    destruct el₄ as [| e₄].
+     destruct (letter_opp_dec e (negf e)) as [H₂| H₂].
+      rewrite app_nil_r in Hel.
+      revert Hel; apply Hnf.
+      intros H; rewrite Hel₁ in H; discriminate H.
+
+      apply H₁.
+      destruct e as (t, d); simpl.
+      rewrite letter_dec_diag, bool_dec_negb_r.
+      constructor.
+
+     destruct (letter_opp_dec e (negf e)) as [H₁| H₁].
+      destruct e₄ as (t₄, d₄); destruct t₄, d₄.
+      +destruct e as (t, d); destruct t, d.
+       -revert H₅; apply norm_list_no_start2.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
        -eapply not_in_fixpoints_one_path2; try eassumption.
         intros H; discriminate H.
 
        -eapply not_in_fixpoints_one_path2; try eassumption.
         intros H; discriminate H.
 
-
-        destruct (free_elem_dec e e₄) as [H₂| H₂]; [ subst e₄ | ].
-       revert H₅; apply norm_list_no_start2.
-
-       destruct e₄ as (t₄, d₄); destruct t₄, d₄.
-       +eapply not_in_fixpoints_one_path2; try eassumption.
+      +destruct e as (t, d); destruct t, d.
+       -eapply not_in_fixpoints_one_path2; try eassumption.
         intros H; discriminate H.
 
-     +revert H₅.
-      apply norm_list_no_start.
+       -revert H₅; apply norm_list_no_start2.
 
-     +eapply not_in_fixpoints_one_path2; try eassumption.
-      intros H; discriminate H.
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
 
-     +eapply not_in_fixpoints_one_path2; try eassumption.
-      intros H; discriminate H.
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
 
+      +destruct e as (t, d); destruct t, d.
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -revert H₅; apply norm_list_no_start2.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+      +destruct e as (t, d); destruct t, d.
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -eapply not_in_fixpoints_one_path2; try eassumption.
+        intros H; discriminate H.
+
+       -revert H₅; apply norm_list_no_start2.
+
+     +apply H₁; destruct e as (t, d); simpl.
+      rewrite letter_dec_diag, bool_dec_negb_r.
+      constructor.
+
+    exists el, el₁.
+    split; assumption.
 bbb.
 
   destruct e₁ as (t, d); destruct t, d.
