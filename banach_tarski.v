@@ -110,6 +110,14 @@ Definition true_neq_negb_true : true ≠ negb true :=
   λ p, False_ind False
    (eq_ind true (λ e : bool, if e then True else False) I false p).
 
+Definition negb_true_neq_true : negb true ≠ true := false_neq_negb_false.
+Definition negb_false_neq_false : negb false ≠ false := true_neq_negb_true.
+
+Theorem bool_dec_negb_l : ∀ b,
+  Bool.bool_dec (negb b) b =
+  right (if b return _ then negb_true_neq_true else negb_false_neq_false).
+Proof. intros b; destruct b; reflexivity. Qed.
+
 Theorem bool_dec_negb_r : ∀ b,
   Bool.bool_dec b (negb b) =
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
@@ -152,14 +160,65 @@ split; intros H.
  apply letter_opp_inv.
 Qed.
 
+Theorem letter_opp_negf : ∀ e₁ e₂, letter_opp e₁ e₂ ↔ e₁ = negf e₂.
+Proof.
+intros.
+destruct e₁ as (t₁, d₁).
+destruct e₂ as (t₂, d₂).
+split; intros H.
+ apply letter_opp_iff in H.
+ destruct H; subst t₂ d₂; simpl.
+ rewrite Bool.negb_involutive; reflexivity.
+
+ injection H; intros; subst; simpl.
+ rewrite letter_dec_diag, bool_dec_negb_l.
+ constructor.
+Qed.
+
+Theorem no_fixpoint_negf : ∀ e, negf e ≠ e.
+Proof.
+intros * H.
+destruct e as (t, d).
+injection H.
+apply Bool.no_fixpoint_negb.
+Qed.
+
 Theorem not_letter_opp_diag : ∀ e, ¬ letter_opp e e.
 Proof.
-intros (t, d) H.
-apply letter_opp_iff in H.
-destruct H as (_, H).
-symmetry in H.
-revert H; apply Bool.no_fixpoint_negb.
+intros e H.
+apply letter_opp_negf in H; symmetry in H.
+revert H; apply no_fixpoint_negf.
 Qed.
+
+Theorem negf_involutive : ∀ e, negf (negf e) = e.
+Proof.
+intros (t, d); simpl.
+rewrite Bool.negb_involutive; reflexivity.
+Qed.
+
+Theorem letter_opp_negf_l : ∀ e, letter_opp (negf e) e.
+Proof.
+intros.
+apply letter_opp_negf; reflexivity.
+Qed.
+
+Theorem letter_opp_negf_r : ∀ e, letter_opp e (negf e).
+Proof.
+intros.
+apply letter_opp_negf.
+rewrite negf_involutive; reflexivity.
+Qed.
+
+Theorem letter_opp_sym : ∀ e₁ e₂, letter_opp e₁ e₂ → letter_opp e₂ e₁.
+Proof.
+intros * H.
+apply letter_opp_negf in H.
+subst e₁.
+SearchAbout (letter_opp _ (negf _) _).
+bbb.
+
+Theorem negf_ạ : negf ạ = ạ⁻¹.
+Proof. reflexivity. Qed.
 
 Fixpoint norm_list el :=
   match el with
@@ -172,15 +231,6 @@ Fixpoint norm_list el :=
   end.
 
 Definition norm s := mkF₂ (norm_list (str s)).
-
-Theorem negf_ạ : negf ạ = ạ⁻¹.
-Proof. reflexivity. Qed.
-
-Theorem negf_involutive : ∀ e, negf (negf e) = e.
-Proof.
-intros (t, d); simpl.
-rewrite Bool.negb_involutive; reflexivity.
-Qed.
 
 Theorem norm_list_no_consec : ∀ e el el₁ el₂,
   norm_list el ≠ el₁ ++ e :: negf e :: el₂.
@@ -310,6 +360,15 @@ induction el₁ as [| e₁]; intros.
  simpl; rewrite IHel₁; reflexivity.
 Qed.
 
+Theorem norm_list_cancel_in2 : ∀ el₁ el₂ e,
+  norm_list (el₁ ++ negf e :: e :: el₂) =
+  norm_list (el₁ ++ el₂).
+Proof.
+intros.
+pose proof norm_list_cancel_in el₁ el₂ (negf e) as H.
+rewrite negf_involutive in H; assumption.
+Qed.
+
 Theorem is_normal : ∀ el₁ el₂ el₃,
   norm_list (el₁ ++ norm_list el₂ ++ el₃) =
   norm_list (el₁ ++ el₂ ++ el₃).
@@ -324,15 +383,12 @@ destruct el as [| e].
  rewrite IHel₂, <- app_assoc; reflexivity.
 
  destruct (letter_opp_dec e₂ e) as [H₁| H₁].
-  destruct e as (t, d).
-  destruct e₂ as (t₂, d₂).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t d.
+  apply letter_opp_negf in H₁; subst e₂.
   rewrite cons_comm_app.
   do 2 rewrite app_assoc.
   rewrite <- IHel₂.
   do 2 rewrite <- app_assoc; simpl.
-  rewrite norm_list_cancel_in.
+  rewrite norm_list_cancel_in2.
   reflexivity.
 
   rewrite cons_comm_app.
@@ -364,25 +420,39 @@ destruct el₂ as [| e₂].
  injection Hn; clear Hn; intros; subst; discriminate H.
 
  destruct (letter_opp_dec e e₂) as [H₁| H₁].
-  subst el₁ el₂.
-  destruct e as (t, d).
-  destruct e₂ as (t₂, d₂).
-  apply letter_opp_iff in H₁.
-  destruct H₁; subst t₂ d₂.
-  pose proof norm_list_no_start2 (E t d) (e₁ :: el) (e₁ :: el) as H.
-  contradiction.
+  apply letter_opp_negf in H₁; subst e el₂.
+  exfalso; revert Hel₁; apply norm_list_no_start.
 
   injection Hn; clear Hn; intros; subst el₁.
   assumption.
 Qed.
 
-Theorem norm_list_cons_cons : ∀ e el el₁,
-  norm_list el = e :: el₁
+Theorem norm_list_cons_cons : ∀ e₁ e el el₁,
+  norm_list el = e₁ :: el₁
+  → e₁ ≠ negf e
   → norm_list (e :: norm_list el) = e :: norm_list el.
 Proof.
-intros * Hn; simpl.
+intros * Hn Hnf; simpl.
 rewrite norm_list_idemp, Hn.
-destruct (letter_opp_dec e e) as [H₁| H₁]; [ | reflexivity ].
+destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ | reflexivity ].
+exfalso; apply Hnf, letter_opp_negf, letter_opp_comm.
+bbb.
+
+SearchAbout negf.
+
+bbb.
+
+exfalso; apply Hnf; clear Hnf.
+
+SearchAbout (letter_opp _ _ → _).
+
+destruct e₁ as (t₁, d₁).
+destruct e as (t, d).
+apply letter_opp_iff in H₁.
+destruct H₁; subst t₁ d₁.
+apply Hnf; reflexivity.
+
+
 exfalso; revert H₁; apply not_letter_opp_diag.
 Qed.
 
@@ -689,6 +759,7 @@ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
  f_equal; f_equal.
  destruct e₁ as (t₁, d₁).
  destruct e₂ as (t₂, d₂).
+bbb.
  apply letter_opp_iff in H₁.
  destruct H₁; subst t₂ d₂.
  reflexivity.
@@ -1212,6 +1283,7 @@ destruct el₁ as [| e₂]; [ reflexivity | ].
 destruct (letter_opp_dec e₁ e₂) as [H₁| H₁]; [ exfalso | reflexivity ].
 destruct e₁ as (t₁, d₁).
 destruct e₂ as (t₂, d₂).
+bbb.
 apply letter_opp_iff in H₁.
 destruct H₁; subst t₂ d₂.
 revert Hn; apply norm_list_no_start.
@@ -1230,6 +1302,7 @@ destruct IHel as [IHel| IHel].
  destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ right | left; reflexivity ].
  destruct e as (t, d).
  destruct e₁ as (t₁, d₁).
+bbb.
  apply letter_opp_iff in H₁.
  destruct H₁; subst t₁ d₁.
  exists [], t, d, el.
@@ -1344,6 +1417,7 @@ destruct (letter_opp_dec (negf e) e₁) as [H₁| H₁]; [ | reflexivity ].
 exfalso.
 destruct e as (t, d).
 destruct e₁ as (t₁, d₁).
+bbb.
 apply letter_opp_iff in H₁; rewrite Bool.negb_involutive in H₁.
 destruct H₁; subst t₁ d₁.
 rewrite <- rev_path_involutive in Hel₁.
