@@ -2581,8 +2581,8 @@ Qed.
 Theorem r_decomposed_4 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
   → ∀ (f : point → point),
-  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂)
-  → (∀ p, same_orbit p (f p))
+  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
+  (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
     f p = p ⊕
     (∃ el el₁,
@@ -2594,7 +2594,7 @@ Theorem r_decomposed_4 :
     (∃ el el₁,
         norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p) el = p).
 Proof.
-intros Rdec f Hoe Ho p Hnf.
+intros Rdec f (Hoe, Ho) p Hnf.
 assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
  intros (x₁, y₁, z₁) (x₂, y₂, z₂).
  destruct (Rdec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
@@ -2725,15 +2725,15 @@ Qed.
 Theorem r_decomposed_2 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
   → ∀ (f : point → point),
-  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂)
-  → (∀ p, same_orbit p (f p))
+  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
+  (∀ p, same_orbit p (f p))
   → ∀ e p, not_in_fixpoints p →
     (∃ el el₁,
         norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
     (∃ el el₁,
         norm_list el = negf e :: el₁ ∧ fold_right rotate (f p) (e :: el) = p).
 Proof.
-intros Rdec f Hoe Ho e p Hnf.
+intros Rdec f (Hoe, Ho) e p Hnf.
 assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
  intros (x₁, y₁, z₁) (x₂, y₂, z₂).
  destruct (Rdec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
@@ -2864,30 +2864,30 @@ Qed.
 Theorem r_decomposed_2_a :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
   → ∀ (f : point → point),
-  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂)
-  → (∀ p, same_orbit p (f p))
+  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
+  (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
     (∃ el el₁,
         norm_list el = ạ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
     (∃ el el₁,
         norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p) (ạ :: el) = p).
 Proof.
-intros Rdec f Hoe Ho p Hnf.
+intros Rdec f HoeHo p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
 
 Theorem r_decomposed_2_b :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
   → ∀ (f : point → point),
-  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂)
-  → (∀ p, same_orbit p (f p))
+  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
+  (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
     (∃ el el₁,
         norm_list el = ḅ :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
     (∃ el el₁,
         norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p) (ḅ :: el) = p).
 Proof.
-intros Rdec f Hoe Ho p Hnf.
+intros Rdec f HoeHo p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
 
