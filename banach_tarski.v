@@ -148,6 +148,9 @@ Fixpoint norm_list el :=
 
 Definition norm s := mkF₂ (norm_list (str s)).
 
+Theorem negf_ạ : negf ạ = ạ⁻¹.
+Proof. reflexivity. Qed.
+
 Theorem negf_involutive : ∀ e, negf (negf e) = e.
 Proof.
 intros (t, d); simpl.
@@ -2627,7 +2630,7 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
  apply same_orbit_sym in H.
  destruct H as (el, Hel).
  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
- destruct el₁ as [| e₁].
+ destruct el₁ as [| e].
   rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
   clear Hel₁.
   right; split.
@@ -2640,23 +2643,30 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
    split; [ reflexivity | ].
    rewrite Hel, rotate_cancel_start; reflexivity.
 
-  simpl.
+  destruct e as (t, d); destruct t, d.
+  *right; split.
+    intros (el₃ & el₄ & H₅ & H₆).
+    apply rotate_rev_path in H₆.
+    rewrite <- H₆, <- fold_right_app in Hel.
+    remember (norm_list (el ++ rev_path el₃)) as el₂ eqn:Hel₂.
+    symmetry in Hel₂.
+    destruct el₂ as [| e₂].
+Focus 2.
+revert Hel; apply Hnf.
+intros H; rewrite Hel₂ in H; discriminate H.
+
+SearchAbout (norm_list (_ ++ _)).
+     pose proof is_normal [] el (rev_path el₃) as H.
+     do 2 rewrite app_nil_l in H.
+     rewrite <- H, Hel₁ in Hel₂; clear H.
+     pose proof is_normal (ạ⁻¹ :: el₁) (rev_path el₃) [] as H.
+     do 2 rewrite app_nil_r in H.
+     rewrite <- H, <- rev_path_norm_list, H₅ in Hel₂; clear H.
+     rewrite rev_path_cons, rev_path_single in Hel₂.
+     rewrite <- app_comm_cons, negf_ạ in Hel₂.
 bbb.
 
- destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  rewrite rotate_rotate_norm, H₂ in Hel; simpl in Hel.
-  right; split.
-   intros (el₁ & el₂ & H₁ & H₃).
-   rewrite <- Hel in H₃.
-   revert H₃; apply Hnf.
-   rewrite H₁; intros H; discriminate H.
 
-   exists (ạ⁻¹ :: []), [].
-   split; [ reflexivity | ].
-   pose proof rotate_cancel_in [] [] ạ p as H.
-   rewrite <- Hel; assumption.
-
-  destruct e as (t, d); destruct t, d.
   *left; split.
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
