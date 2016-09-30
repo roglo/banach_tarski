@@ -1225,6 +1225,19 @@ destruct IHel as [IHel| IHel].
  reflexivity.
 Qed.
 
+Theorem norm_list_is_cons : ∀ el e el₁,
+  norm_list el = e :: el₁ → norm_list el₁ = el₁.
+Proof.
+intros * H.
+destruct (norm_list_dec el₁) as [H₁| H₁]; [ assumption | ].
+destruct H₁ as (el₂ & t & d & el₃ & H₁).
+subst el₁.
+exfalso; revert H.
+replace (E t (negb d)) with (negf (E t d)) by reflexivity.
+rewrite app_comm_cons.
+apply norm_list_no_consec.
+Qed.
+
 Theorem rev_path_cons : ∀ e el,
   rev_path (e :: el) = rev_path el ++ rev_path [e].
 Proof.
@@ -2475,6 +2488,37 @@ apply norm_list_app_is_nil in H.
  rewrite norm_list_idemp; reflexivity.
 Qed.
 
+Theorem not_in_fixpoints_one_path2 : ∀ p e el₄ el₁ el el₃,
+  not_in_fixpoints p
+  → fold_right rotate p (el ++ rev_path (e :: el₄)) = p
+  → norm_list el = ạ :: el₁
+  → norm_list el₃ = ạ⁻¹ :: e :: el₄
+  → e ≠ ạ
+  → False.
+Proof.
+intros * Hnf Hel Hel₁ H₅ He.
+revert Hel; apply Hnf.
+intros H.
+pose proof is_normal [] el (rev_path (e :: el₄)) as H₁.
+do 2 rewrite app_nil_l in H₁.
+rewrite <- H₁ in H; clear H₁.
+rewrite rev_path_cons, rev_path_single in H; simpl in H.
+apply norm_list_app_is_nil in H.
+ rewrite Hel₁ in H.
+ apply rev_path_eq_eq in H.
+ rewrite rev_path_app in H.
+ do 2 rewrite rev_path_involutive in H.
+ simpl in H; rewrite negf_involutive in H.
+ injection H; intros; contradiction.
+
+ rewrite norm_list_idemp; reflexivity.
+
+ symmetry.
+ rewrite <- rev_path_single, <- rev_path_app; simpl.
+ rewrite <- rev_path_norm_list; f_equal.
+ eapply norm_list_is_cons; eassumption.
+Qed.
+
 Theorem r_decomposed_4 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
   → ∀ (f : point → point),
@@ -2685,97 +2729,57 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
     intros (el₃ & el₄ & H₅ & H₆).
     rewrite rotate_rotate_norm in H₆.
     simpl in H₆; rewrite H₅ in H₆.
-apply rotate_rev_path in H₆.
-rewrite <- H₆, <- fold_right_app in Hel.
-
-bbb.
+    apply rotate_rev_path in H₆.
+    rewrite <- H₆, <- fold_right_app in Hel.
     destruct el₄ as [| e₄].
-     simpl in H₆; rewrite H₆ in Hel.
+     rewrite app_nil_r in Hel.
      revert Hel; apply Hnf.
      intros H; rewrite Hel₁ in H; discriminate H.
 
-     apply rotate_rev_path in H₆.
-     eapply not_in_fixpoints_one_path; try eassumption.
-     rewrite rev_path_cons, rev_path_single.
-bbb.
-SearchAbout (norm_list (_ ++ _)).
-bbb.
-destruct (norm_list_dec (el₄ ++ el)) as [H₁| H₁].
- revert H; apply Hnf.
- intros H; rewrite H in H₁.
- destruct el as [| e]; [ destruct el₂; discriminate H₂ | ].
- destruct el₄; discriminate H₁.
-
- destruct H₁ as (el₁ & t & d & el₅ & H₁).
-bbb.
-     eapply not_in_fixpoints_one_path; try eassumption.
+     destruct e₄ as (t₄, d₄); destruct t₄, d₄.
+     +eapply not_in_fixpoints_one_path2; try eassumption.
       intros H; discriminate H.
 
-      destruct H₃ as (H₃ & [(H₄, H₅) | (H₄, H₅)]).
-       destruct H₄ as (el₁ & el₃ & H₄ & H₆).
-       eapply not_in_fixpoints_one_path; try eassumption.
-       intros H; discriminate H.
+     +revert H₅.
+      apply norm_list_no_start.
 
-       destruct H₅ as (el₁ & el₃ & H₅ & H₆).
-       eapply not_in_fixpoints_one_path; try eassumption.
-       intros H; discriminate H.
-
-   *right; split.
-     intros (el₁ & el₃ & H₅ & H₆).
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     left; split.
-      exists (rev_path el), (rev_path el₂).
-      split; [ | apply rotate_rev_path; assumption ].
-      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-      intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
-       eapply not_in_fixpoints_one_path; try eassumption.
-       intros H; discriminate H.
-
-       destruct H₃ as (H₃ & H₄).
-       destruct H₄ as (el₁ & el₃ & H₄ & H₆).
-       eapply not_in_fixpoints_one_path; try eassumption.
-       intros H; discriminate H.
-
-   *right; split.
-     intros (el₁ & el₃ & H₅ & H₆).
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     right; split.
-      intros (el₁ & el₃ & H₅ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
+     +eapply not_in_fixpoints_one_path2; try eassumption.
       intros H; discriminate H.
 
-      left; split.
-       exists (rev_path el), (rev_path el₂).
-       split; [ | apply rotate_rev_path; assumption ].
-       rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-       intros (el₃ & el₄ & H₅ & H₆).
-       eapply not_in_fixpoints_one_path; try eassumption.
-       intros H; discriminate H.
-
-   *right; split.
-     intros (el₁ & el₃ & H₅ & H₆).
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     right; split.
-      intros (el₁ & el₃ & H₅ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
+     +eapply not_in_fixpoints_one_path2; try eassumption.
       intros H; discriminate H.
 
-      right; split.
-       intros (el₁ & el₃ & H₅ & H₆).
-       eapply not_in_fixpoints_one_path; try eassumption.
-       intros H; discriminate H.
+  *right; split.
+    intros (el₃ & el₄ & H₅ & H₆).
+    apply rotate_rev_path in H₆.
+    eapply not_in_fixpoints_one_path; try eassumption.
+     rewrite <- rev_path_norm_list, H₅.
+     rewrite rev_path_cons, rev_path_single; simpl.
+     reflexivity.
 
-       exists (rev_path el), (rev_path el₂).
-       split; [ | apply rotate_rev_path; assumption ].
-       rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+     intros H; discriminate H.
+
+    exists (ạ⁻¹ :: norm_list el), (norm_list el).
+    split; [ simpl; rewrite norm_list_idemp, Hel₁; reflexivity | ].
+    rewrite rotate_cancel_start, <- rotate_rotate_norm.
+    assumption.
+
+  *right; split.
+    intros (el₃ & el₄ & H₅ & H₆).
+    apply rotate_rev_path in H₆.
+    eapply not_in_fixpoints_one_path; try eassumption.
+     rewrite <- rev_path_norm_list, H₅.
+     rewrite rev_path_cons, rev_path_single; simpl.
+     reflexivity.
+
+     intros H; discriminate H.
+
+    exists (ạ⁻¹ :: norm_list el), (norm_list el).
+    split; [ simpl; rewrite norm_list_idemp, Hel₁; reflexivity | ].
+    rewrite rotate_cancel_start, <- rotate_rotate_norm.
+    assumption.
+Qed.
+
 bbb.
 
 End Orbit.
