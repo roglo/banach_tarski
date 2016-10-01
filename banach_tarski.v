@@ -2728,8 +2728,7 @@ Theorem r_decomposed_2 :
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
   (∀ p, same_orbit p (f p))
   → ∀ e p, not_in_fixpoints p →
-    (∃ el el₁,
-        norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p) ⊕
+    St e f p ⊕
     (∃ el el₁,
         norm_list el = negf e :: el₁ ∧ fold_right rotate (f p) (e :: el) = p).
 Proof.
