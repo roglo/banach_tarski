@@ -2578,13 +2578,13 @@ apply norm_list_app_is_nil in H.
  eapply norm_list_is_cons; eassumption.
 Qed.
 
+Definition Em (f : point → point) p := f p = p.
 Definition St e f p :=
-  ∃ el el₁, norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p.
-
-Definition Sa := St ạ.
-Definition Sa_1 := St ạ⁻¹.
-Definition Sb := St ḅ.
-Definition Sb_1 := St ḅ⁻¹.
+  ∃ el el₁,
+  norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p.
+Definition eSt e₁ e₂ f p :=
+  ∃ el el₁,
+  norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p.
 
 Theorem r_decomposed_4 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
@@ -2592,7 +2592,7 @@ Theorem r_decomposed_4 :
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
   (∀ p, same_orbit p (f p))
   → ∀ p, not_in_fixpoints p →
-    f p = p ⊕ Sa f p ⊕ Sa_1 f p ⊕ Sb f p ⊕ Sb_1 f p.
+    Em f p ⊕ St ạ f p ⊕ St ạ⁻¹ f p ⊕ St ḅ f p ⊕ St ḅ⁻¹ f p.
 Proof.
 intros Rdec f (Hoe, Ho) p Hnf.
 assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
@@ -2728,9 +2728,7 @@ Theorem r_decomposed_2 :
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
   (∀ p, same_orbit p (f p))
   → ∀ e p, not_in_fixpoints p →
-    St e f p ⊕
-    (∃ el el₁,
-        norm_list el = negf e :: el₁ ∧ fold_right rotate (f p) (e :: el) = p).
+    St e f p ⊕ eSt e (negf e) f p.
 Proof.
 intros Rdec f (Hoe, Ho) e p Hnf.
 assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
@@ -2865,10 +2863,8 @@ Theorem r_decomposed_2_a :
   → ∀ (f : point → point),
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
   (∀ p, same_orbit p (f p))
-  → ∀ p, not_in_fixpoints p →
-    Sa f p ⊕
-    (∃ el el₁,
-        norm_list el = ạ⁻¹ :: el₁ ∧ fold_right rotate (f p) (ạ :: el) = p).
+  → ∀ p, not_in_fixpoints p
+  → St ạ f p ⊕ eSt ạ ạ⁻¹ f p.
 Proof.
 intros Rdec f HoeHo p Hnf.
 apply r_decomposed_2; assumption.
@@ -2879,10 +2875,8 @@ Theorem r_decomposed_2_b :
   → ∀ (f : point → point),
   (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
   (∀ p, same_orbit p (f p))
-  → ∀ p, not_in_fixpoints p →
-    Sb f p ⊕
-    (∃ el el₁,
-        norm_list el = ḅ⁻¹ :: el₁ ∧ fold_right rotate (f p) (ḅ :: el) = p).
+  → ∀ p, not_in_fixpoints p
+  → St ḅ f p ⊕ eSt ḅ ḅ⁻¹ f p.
 Proof.
 intros Rdec f HoeHo p Hnf.
 apply r_decomposed_2; assumption.
