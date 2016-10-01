@@ -2575,7 +2575,7 @@ apply norm_list_app_is_nil in H.
 Qed.
 
 (* I am looking for better names for cf_prop1 and cf_prop2... *)
-Class choice_function {A} (R : A → A → Prop) f := mkcf
+Record choice_function {A} (R : A → A → Prop) f := mkcf
   { cf_prop1 : ∀ x y, R x y → f x = f y;
     cf_prop2 : ∀ x, R x (f x) }.
 
@@ -2591,9 +2591,7 @@ Definition eṢ e₁ e₂ f p :=
 
 Theorem r_decomposed_4 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
-  → ∀ (f : point → point),
-  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
-  (∀ p, same_orbit p (f p))
+  → ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p →
     Ẹ f p ⊕ Ṣ ạ f p ⊕ Ṣ ạ⁻¹ f p ⊕ Ṣ ḅ f p ⊕ Ṣ ḅ⁻¹ f p.
 Proof.
@@ -2727,9 +2725,7 @@ Qed.
 
 Theorem r_decomposed_2 :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
-  → ∀ (f : point → point),
-  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
-  (∀ p, same_orbit p (f p))
+  → ∀ f, orbit_selector f
   → ∀ e p, not_in_fixpoints p →
     Ṣ e f p ⊕ eṢ e (negf e) f p.
 Proof.
@@ -2863,25 +2859,21 @@ Qed.
 
 Theorem r_decomposed_2_a :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
-  → ∀ (f : point → point),
-  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
-  (∀ p, same_orbit p (f p))
+  → ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p
   → Ṣ ạ f p ⊕ eṢ ạ ạ⁻¹ f p.
 Proof.
-intros Rdec f HoeHo p Hnf.
+intros Rdec f Hos p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
 
 Theorem r_decomposed_2_b :
   (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
-  → ∀ (f : point → point),
-  (∀ p₁ p₂, same_orbit p₁ p₂ → f p₁ = f p₂) ∧
-  (∀ p, same_orbit p (f p))
+  → ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p
   → Ṣ ḅ f p ⊕ eṢ ḅ ḅ⁻¹ f p.
 Proof.
-intros Rdec f HoeHo p Hnf.
+intros Rdec f Hos p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
 
