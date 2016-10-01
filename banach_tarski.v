@@ -2624,9 +2624,9 @@ split; intros H.
   assumption.
 Qed.
 
-Inductive path :=
-  | EE : path
-  | SS : free_elem → path.
+Inductive path_kind :=
+  | EE : path_kind
+  | SS : free_elem → path_kind.
 
 Definition in_path f pa p :=
   match pa with
@@ -2636,11 +2636,16 @@ Definition in_path f pa p :=
      norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p
   end.
 
+Delimit Scope path_scope with P.
+Notation "p '∈' 'Ẹ' f" := (in_path f EE p) (at level 70) : path_scope.
+Notation "p '∈' 'Ṣ' f e" := (in_path f (SS e) p) (at level 70) : path_scope.
+
 Theorem r_decomposed_4 :
   R_eq_dec_on
   → ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p →
-    in_path f EE p ⊕ in_path f (SS ạ) p ⊕ Ṣ ạ⁻¹ f p ⊕ Ṣ ḅ f p ⊕ Ṣ ḅ⁻¹ f p.
+  in_path f EE p ⊕ in_path f (SS ạ) p ⊕ in_path f (SS ạ⁻¹) p ⊕
+  in_path f (SS ḅ) p ⊕ in_path f (SS ḅ⁻¹) p.
 Proof.
 intros Rdec f (Hoe, Ho) p Hnf.
 (* à voir... *)
