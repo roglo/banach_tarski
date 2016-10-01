@@ -2409,8 +2409,6 @@ Qed.
 
 End Rotation.
 
-Check nonempty_rotation_is_not_identity.
-
 Section Orbit.
 
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
@@ -2464,8 +2462,6 @@ split; intros H; [ apply Hxy, H | ].
 transitivity (f x); [ apply Hx | ].
 transitivity (f y); [ destruct H; reflexivity | symmetry; apply Hx ].
 Qed.
-
-Check same_choice_in_same_orbit.
 
 Definition in_image {A B} (f : A → B) := λ x, ∃ y, x = f y.
 
@@ -2577,6 +2573,13 @@ apply norm_list_app_is_nil in H.
  rewrite <- rev_path_norm_list; f_equal.
  eapply norm_list_is_cons; eassumption.
 Qed.
+
+(* I am looking for better names for cf_prop1 and cf_prop2... *)
+Class choice_function {A} (R : A → A → Prop) f := mkcf
+  { cf_prop1 : ∀ x y, R x y → f x = f y;
+    cf_prop2 : ∀ x, R x (f x) }.
+
+Definition orbit_selector := choice_function same_orbit.
 
 Definition Ẹ (f : point → point) p := f p = p.
 Definition Ṣ e f p :=
