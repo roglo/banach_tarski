@@ -2574,10 +2574,11 @@ apply norm_list_app_is_nil in H.
  eapply norm_list_is_cons; eassumption.
 Qed.
 
-(* I am looking for better names for cf_prop1 and cf_prop2... *)
+Definition R_eq_dec_on := ∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R }.
+
 Record choice_function {A} (R : A → A → Prop) f := mkcf
-  { cf_prop1 : ∀ x y, R x y → f x = f y;
-    cf_prop2 : ∀ x, R x (f x) }.
+  { cf_repr_uniqueness : ∀ x y, R x y → f x = f y;
+    cf_repr_membership : ∀ x, R x (f x) }.
 
 Definition orbit_selector := choice_function same_orbit.
 
@@ -2590,7 +2591,7 @@ Definition eṢ e₁ e₂ f p :=
   norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p.
 
 Theorem r_decomposed_4 :
-  (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
+  R_eq_dec_on
   → ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p →
     Ẹ f p ⊕ Ṣ ạ f p ⊕ Ṣ ạ⁻¹ f p ⊕ Ṣ ḅ f p ⊕ Ṣ ḅ⁻¹ f p.
@@ -2724,7 +2725,7 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
 Qed.
 
 Theorem r_decomposed_2 :
-  (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
+  R_eq_dec_on
   → ∀ f, orbit_selector f
   → ∀ e p, not_in_fixpoints p →
     Ṣ e f p ⊕ eṢ e (negf e) f p.
@@ -2858,7 +2859,7 @@ assert (Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }).
 Qed.
 
 Theorem r_decomposed_2_a :
-  (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
+  R_eq_dec_on
   → ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p
   → Ṣ ạ f p ⊕ eṢ ạ ạ⁻¹ f p.
@@ -2868,7 +2869,7 @@ apply r_decomposed_2; assumption.
 Qed.
 
 Theorem r_decomposed_2_b :
-  (∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R })
+  R_eq_dec_on
   → ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p
   → Ṣ ḅ f p ⊕ eṢ ḅ ḅ⁻¹ f p.
