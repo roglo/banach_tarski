@@ -2590,7 +2590,7 @@ Definition eṢ e₁ e₂ f p :=
   ∃ el el₁,
   norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p.
 
-Theorem toto : ∀ f e₁ e₂ p, orbit_selector f →
+Theorem eS_is_S_rotated : ∀ f e₁ e₂ p, orbit_selector f →
   eṢ e₁ e₂ f p ↔ Ṣ e₂ f (rotate (negf e₁) p).
 Proof.
 intros * (Hoe, Ho).
@@ -2599,24 +2599,30 @@ split; intros H.
  exists el, el₁.
  split; [ assumption | ].
  simpl in H₂.
- destruct e₁ as (t₁, d₁); destruct t₁, d₁.
-*  simpl.
-assert (H : fold_right rotate (f p) el = rotate ạ p).
-rewrite <- H₂ at 2.
-rewrite rotate_rotate_neg.
-reflexivity.
-rewrite <- H.
-f_equal.
-apply Hoe.
-rewrite H.
-unfold same_orbit.
-exists (ạ⁻¹ :: []).
-simpl.
-apply rotate_rotate_neg.
+ assert (H : fold_right rotate (f p) el = rotate (negf e₁) p).
+  rewrite <- H₂ at 2.
+  rewrite rotate_neg_rotate; reflexivity.
 
-*
+  rewrite <- H; f_equal.
+  apply Hoe; rewrite H.
+  exists (e₁ :: []); simpl.
+  apply rotate_rotate_neg.
 
-bbb.
+ destruct H as (el & el₁ & H₁ & H₂).
+ exists el, el₁.
+ split; [ assumption | ].
+ simpl.
+ remember (rotate (negf e₁) p) as p' eqn:Hp'.
+ assert (H : rotate e₁ (fold_right rotate (f p') el) = p).
+  rewrite H₂; subst p'.
+  rewrite rotate_rotate_neg; reflexivity.
+
+  rewrite <- H; f_equal; f_equal.
+  apply Hoe; rewrite H.
+  exists (negf e₁ :: []); simpl.
+  rewrite <- H, rotate_neg_rotate.
+  assumption.
+Qed.
 
 Theorem r_decomposed_4 :
   R_eq_dec_on
