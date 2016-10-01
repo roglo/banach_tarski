@@ -2912,6 +2912,42 @@ intros Rdec f Hos p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
 
+Theorem r_decomposed_2' :
+  R_eq_dec_on
+  → ∀ f, orbit_selector f
+  → ∀ e p, not_in_fixpoints p →
+    Ṣ e f p ⊕ Ṣ (negf e) f (rotate (negf e) p).
+Proof.
+intros Rdec f Hos e p Hnf.
+pose proof r_decomposed_2 Rdec f Hos e p Hnf as H.
+destruct H as [(H₁, H₂)| (H₁, H₂)].
+ left; split; [ assumption | ].
+ intros H; apply H₂, eS_is_S_rotated; assumption.
+
+ right; split; [ assumption | ].
+ apply eS_is_S_rotated; assumption.
+Qed.
+
+Theorem r_decomposed_2_a' :
+  R_eq_dec_on
+  → ∀ f, orbit_selector f
+  → ∀ p, not_in_fixpoints p
+  → Ṣ ạ f p ⊕ Ṣ ạ⁻¹ f (rotate ạ⁻¹ p).
+Proof.
+intros Rdec f Hos p Hnf.
+apply r_decomposed_2'; assumption.
+Qed.
+
+Theorem r_decomposed_2_b' :
+  R_eq_dec_on
+  → ∀ f, orbit_selector f
+  → ∀ p, not_in_fixpoints p
+  → Ṣ ḅ f p ⊕ Ṣ ḅ⁻¹ f (rotate ḅ⁻¹ p).
+Proof.
+intros Rdec f Hos p Hnf.
+apply r_decomposed_2'; assumption.
+Qed.
+
 bbb.
 
 End Orbit.
