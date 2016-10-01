@@ -2624,6 +2624,28 @@ split; intros H.
   assumption.
 Qed.
 
+Inductive path :=
+  | EE : path
+  | SS : free_elem → path.
+
+Definition in_path f pa p :=
+  match pa with
+  | EE => f p = p
+  | SS e =>
+     ∃ el el₁,
+     norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p
+  end.
+
+Theorem r_decomposed_4 :
+  R_eq_dec_on
+  → ∀ f, orbit_selector f
+  → ∀ p, not_in_fixpoints p →
+    in_path f EE p ⊕ in_path f (SS ạ) p ⊕ Ṣ ạ⁻¹ f p ⊕ Ṣ ḅ f p ⊕ Ṣ ḅ⁻¹ f p.
+Proof.
+intros Rdec f (Hoe, Ho) p Hnf.
+(* à voir... *)
+bbb.
+
 Theorem r_decomposed_4 :
   R_eq_dec_on
   → ∀ f, orbit_selector f
@@ -2911,6 +2933,10 @@ Proof.
 intros Rdec f Hos p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
+
+(*
+rotate_set e₁ (Ṣ e₂ f p) = Ṣ (negf e₁) f (rotate (negf e₂) p).
+*)
 
 Theorem r_decomposed_2' :
   R_eq_dec_on
