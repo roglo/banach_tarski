@@ -2590,6 +2590,17 @@ Definition eṢ e₁ e₂ f p :=
   ∃ el el₁,
   norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p.
 
+Theorem toto : ∀ f e₁ e₂ p, eṢ e₁ e₂ f p ↔ Ṣ e₂ f (rotate e₁ p).
+Proof.
+intros.
+split; intros H.
+ destruct H as (el & el₁ & H₁ & H₂).
+ exists el, el₁.
+ split; [ assumption | ].
+ simpl.
+
+bbb.
+
 Theorem r_decomposed_4 :
   R_eq_dec_on
   → ∀ f, orbit_selector f
