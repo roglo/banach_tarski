@@ -2662,10 +2662,13 @@ Definition in_rotated_path f e₁ pa p :=
 
 Delimit Scope path_scope with P.
 Notation "p '∈' 'Ẹ' f" := (in_path f EE p)
-  (at level 70, only parsing)
+  (at level 70)
   : path_scope.
 Notation "p '∈' 'Ṣ' f e" := (in_path f (SS e) p)
-  (at level 70, f at level 0, only parsing)
+  (at level 70, f at level 0)
+  : path_scope.
+Notation "p '∈' e₁ 'Ṣ' f e₂" := (in_rotated_path f e₁ (SS e₂) p)
+  (at level 70, e₁ at level 0, f at level 0, e₂ at level 0)
   : path_scope.
 
 Theorem r_decomposed_4 :
@@ -2791,18 +2794,10 @@ Qed.
 
 Theorem r_decomposed_2 :
   ∀ f, orbit_selector f
-  → ∀ e p, not_in_fixpoints p →
-    (p ∈ Ṣ f e)%P ⊕ in_rotated_path f e (SS (negf e)) p.
+  → ∀ e p, not_in_fixpoints p
+  → (p ∈ Ṣ f e)%P ⊕ (p ∈ e Ṣ f (negf e))%P.
 Proof.
 intros f (Hoe, Ho) e p Hnf.
-(*
-Theorem r_decomposed_2 :
-  ∀ f, orbit_selector f
-  → ∀ e p, not_in_fixpoints p →
-    (p ∈ Ṣ f e)%P ⊕ eṢ e (negf e) f p.
-Proof.
-intros f (Hoe, Ho) e p Hnf.
-*)
 pose proof Ho p as H.
 apply same_orbit_sym in H.
 destruct H as (el, Hel).
@@ -2917,56 +2912,21 @@ destruct el₁ as [| e₁].
 Qed.
 
 Theorem r_decomposed_2_a :
-  R_eq_dec_on
-  → ∀ f, orbit_selector f
+  ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p
-  → (p ∈ Ṣ f ạ)%P ⊕ eṢ ạ ạ⁻¹ f p.
+  → (p ∈ Ṣ f ạ)%P ⊕ (p ∈ ạ Ṣ f ạ⁻¹)%P.
 Proof.
-intros Rdec f Hos p Hnf.
+intros f Hos p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
 
 Theorem r_decomposed_2_b :
-  R_eq_dec_on
-  → ∀ f, orbit_selector f
+  ∀ f, orbit_selector f
   → ∀ p, not_in_fixpoints p
-  → (p ∈ Ṣ f ḅ)%P ⊕ eṢ ḅ ḅ⁻¹ f p.
+  → (p ∈ Ṣ f ḅ)%P ⊕ (p ∈ ḅ Ṣ f ḅ⁻¹)%P.
 Proof.
-intros Rdec f Hos p Hnf.
+intros f Hos p Hnf.
 apply r_decomposed_2; assumption.
-Qed.
-
-Theorem r_decomposed_2' :
-  ∀ f, orbit_selector f
-  → ∀ e p, not_in_fixpoints p →
-    (p ∈ Ṣ f e)%P ⊕ Ṣ (negf e) f (rotate (negf e) p).
-Proof.
-intros f Hos e p Hnf.
-pose proof r_decomposed_2 f Hos e p Hnf as H.
-destruct H as [(H₁, H₂)| (H₁, H₂)].
- left; split; [ assumption | ].
- intros H; apply H₂, eS_is_S_rotated; assumption.
-
- right; split; [ assumption | ].
- apply eS_is_S_rotated; assumption.
-Qed.
-
-Theorem r_decomposed_2_a' :
-  ∀ f, orbit_selector f
-  → ∀ p, not_in_fixpoints p
-  → (p ∈ Ṣ f ạ)%P ⊕ Ṣ ạ⁻¹ f (rotate ạ⁻¹ p).
-Proof.
-intros f Hos p Hnf.
-apply r_decomposed_2'; assumption.
-Qed.
-
-Theorem r_decomposed_2_b' :
-  ∀ f, orbit_selector f
-  → ∀ p, not_in_fixpoints p
-  → (p ∈ Ṣ f ḅ)%P ⊕ Ṣ ḅ⁻¹ f (rotate ḅ⁻¹ p).
-Proof.
-intros f Hos p Hnf.
-apply r_decomposed_2'; assumption.
 Qed.
 
 bbb.
