@@ -2703,11 +2703,8 @@ Definition EE {os : orbit_sel_model} := λ p, p = os_fun p.
 Definition SS {os : orbit_sel_model} e := λ p,
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
-
-bbb.
-
-Definition eSS {os : orbit_sel_model} (e : free_elem) E := λ p,
-  E p.
+Definition rot {os : orbit_sel_model} e (E : point → Prop) := λ p,
+  E (rotate (negf e) p).
 
 Theorem r_decomposed_4 :
   R_eq_dec_on
@@ -2717,6 +2714,15 @@ Theorem r_decomposed_4 :
   → partition not_in_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros Rdec s Hs f Hf os Hos.
+
+Theorem r_decomposed_2 :
+  ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → ∀ os, os = mkos f
+  → ∀ e,
+    partition not_in_fixpoints [SS e; rot e (SS (negf e))].
+Proof.
+Print rotate.
 bbb.
 
 Theorem r_decomposed_4 :
