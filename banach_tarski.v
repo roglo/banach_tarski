@@ -2925,6 +2925,18 @@ intros f Hos p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
 
+Check in_path.
+Check in_rotated_path.
+
+Definition void {A} (_ : A) := False.
+Definition intersection_is_void {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
+  ∀ p, (E₁ p → ¬ E₂ p) ∧ (E₂ p → ¬ E₁ p).
+
+Definition partition {A} (E : A) (Ei : list (A → Prop)) :=
+  union_is Ei E ∧
+  ∀ i j, i < length Ei ∧ j < length Ei ∧ i ≠ j →
+  intersection_is_void (nth void Ei i) (nth void Ei j).
+
 bbb.
 
 End Orbit.
