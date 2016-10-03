@@ -2925,23 +2925,37 @@ intros f Hos p Hnf.
 apply r_decomposed_2; assumption.
 Qed.
 
-Check in_path.
-Check in_rotated_path.
-
-Definition void {A} (_ : A) := False.
-Definition intersection_is_void {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
-  ∀ p, (E₁ p → ¬ E₂ p) ∧ (E₂ p → ¬ E₁ p).
-
-Definition partition {A} (E : A) (Ei : list (A → Prop)) :=
-  union_is Ei E ∧
-  ∀ i j, i < length Ei ∧ j < length Ei ∧ i ≠ j →
-  intersection_is_void (nth void Ei i) (nth void Ei j).
-
-bbb.
-
 End Orbit.
 
 Section Equidecomposability.
+
+Delimit Scope set_scope with S.
+
+Class set_model A :=
+  { set_eq : (A → Prop) → (A → Prop) → Prop }.
+Notation "a = b" := (set_eq a b) : set_scope.
+
+Definition intersection {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
+  λ x, E₁ x ∧ E₂ x.
+Definition union {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
+  λ x, E₁ x ∨ E₂ x.
+(*
+Definition set_eq {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
+  ∀ x, E₁ x ↔ E₂ x.
+*)
+
+Definition void {A} (_ : A) := False.
+Notation "'Ø'" := (void) : set_scope.
+
+Definition union_list {A} (Ei : list (A → Prop)) :=
+  fold_left union Ei void.
+
+Definition nth_set {A} i (Ei : list (A → Prop)) := List.nth i Ei void.
+
+Definition partition {A} {S : set_model A} (E : A → Prop)
+    (Ei : list (A → Prop)) :=
+  (E = union_list Ei)%S ∧
+  ∀ i j, i ≠ j → (intersection (nth_set i Ei) (nth_set j Ei) = Ø)%S.
 
 Definition in_group G g := ...
 
