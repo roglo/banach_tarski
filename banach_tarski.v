@@ -2933,34 +2933,28 @@ Delimit Scope set_scope with S.
 
 Class set_model A :=
   { set_eq : (A → Prop) → (A → Prop) → Prop }.
-Notation "a = b" := (set_eq a b) : set_scope.
-
-Definition intersection {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
-  λ x, E₁ x ∧ E₂ x.
-Definition union {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
-  λ x, E₁ x ∨ E₂ x.
-Notation "E₁ 'Ị' E₂" := (intersection E₁ E₂) (at level 70) : set_scope.
-(* level au pif : à préciser *)
 
 Definition void {A} (_ : A) := False.
-Notation "'Ø'" := (void) : set_scope.
 
+Definition intersection {A} (E₁ E₂ : A → Prop) :=
+  λ x, E₁ x ∧ E₂ x.
+Definition union {A} (E₁ E₂ : A → Prop) :=
+  λ x, E₁ x ∨ E₂ x.
 Definition union_list {A} (Ei : list (A → Prop)) :=
   fold_left union Ei void.
-Notation "'Ụ' Es" := (union_list Es) (at level 70) : set_scope.
-(* level au pif : à préciser *)
+Definition nth_set {A} i (Ei : list (A → Prop)) :=
+  List.nth i Ei void.
 
-Definition nth_set {A} i (Ei : list (A → Prop)) := List.nth i Ei void.
-Notation "E .[ i ]" := (nth_set i E) (at level 70) : set_scope.
-(* level au pif : à préciser *)
+Notation "a = b" := (set_eq a b) : set_scope.
+Notation "'∅'" := (void) : set_scope.
+Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
+Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
+Notation "'⊔' Es" := (union_list Es) (at level 60) : set_scope.
+Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
 
-(* ça chie syntaxiquement à cause des levels : il faut les mettre
-   correctement ci-dessus ! *)
 Definition partition {A} {S : set_model A} E Ep :=
-  (E = Ụ Ep)%S ∧
-  ∀ i j, i ≠ j → Ep.[i] Ị Ep.[j] = Ø)%S.
-
-Print partition.
+  (E = ⊔ Ep)%S ∧
+  ∀ i j, i ≠ j → (Ep.[i] ⋂ Ep.[j] = ∅)%S.
 (*
 Definition set_eq {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
   ∀ x, E₁ x ↔ E₂ x.
