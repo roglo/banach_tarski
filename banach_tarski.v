@@ -2650,7 +2650,7 @@ Definition in_path f pa p :=
 
 Definition in_rotated_path f e₁ pa p :=
   match pa with
-  | None => False
+  | None => rotate e₁ p = p
   | Some e₂ =>
      ∃ el el₁,
      norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p
