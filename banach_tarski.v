@@ -2640,34 +2640,30 @@ split; intros H.
   assumption.
 Qed.
 
-Inductive path_kind :=
-  | EE : path_kind
-  | SS : free_elem → path_kind.
-
 Definition in_path f pa p :=
   match pa with
-  | EE => f p = p
-  | SS e =>
+  | None => f p = p
+  | Some e =>
      ∃ el el₁,
      norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p
   end.
 
 Definition in_rotated_path f e₁ pa p :=
   match pa with
-  | EE => False
-  | SS e₂ =>
+  | None => False
+  | Some e₂ =>
      ∃ el el₁,
      norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p
   end.
 
 Delimit Scope path_scope with P.
-Notation "p '∈' 'Ẹ' f" := (in_path f EE p)
+Notation "p '∈' 'Ẹ' f" := (in_path f None p)
   (at level 70)
   : path_scope.
-Notation "p '∈' 'Ṣ' f e" := (in_path f (SS e) p)
+Notation "p '∈' 'Ṣ' f e" := (in_path f (Some e) p)
   (at level 70, f at level 0)
   : path_scope.
-Notation "p '∈' e₁ 'Ṣ' f e₂" := (in_rotated_path f e₁ (SS e₂) p)
+Notation "p '∈' e₁ 'Ṣ' f e₂" := (in_rotated_path f e₁ (Some e₂) p)
   (at level 70, e₁ at level 0, f at level 0, e₂ at level 0)
   : path_scope.
 
