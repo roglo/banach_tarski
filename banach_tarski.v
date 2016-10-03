@@ -2667,6 +2667,50 @@ Notation "p '∈' e₁ 'Ṣ' f e₂" := (in_rotated_path f e₁ (Some e₂) p)
   (at level 70, e₁ at level 0, f at level 0, e₂ at level 0)
   : path_scope.
 
+Delimit Scope set_scope with S.
+
+Class set_model A := mksm
+  { set_eq : (A → Prop) → (A → Prop) → Prop }.
+
+Definition void {A} (_ : A) := False.
+
+Definition intersection {A} (E₁ E₂ : A → Prop) :=
+  λ x, E₁ x ∧ E₂ x.
+Definition union {A} (E₁ E₂ : A → Prop) :=
+  λ x, E₁ x ∨ E₂ x.
+Definition union_list {A} (Ei : list (A → Prop)) :=
+  fold_left union Ei void.
+Definition nth_set {A} i (Ei : list (A → Prop)) :=
+  List.nth i Ei void.
+
+Notation "a = b" := (set_eq a b) : set_scope.
+Notation "'∅'" := (void) : set_scope.
+Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
+Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
+Notation "'⊔' Es" := (union_list Es) (at level 60) : set_scope.
+Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
+
+Definition partition {A} {S : set_model A} E Ep :=
+  (E = ⊔ Ep)%S ∧
+  ∀ i j, i ≠ j → (Ep.[i] ⋂ Ep.[j] = ∅)%S.
+
+Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
+
+Definition EE (f : point → point) := λ p, p = f p.
+
+Theorem r_decomposed_4 :
+  R_eq_dec_on
+  → ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → partition not_in_fixpoints (EE f :: []).
+(*
+  → (p ∈ Ẹ f)%P ⊕ (p ∈ Ṣ f ạ)%P ⊕ (p ∈ Ṣ f ạ⁻¹)%P ⊕
+    (p ∈ Ṣ f ḅ)%P ⊕ (p ∈ Ṣ f ḅ⁻¹)%P.
+*)
+Proof.
+intros Rdec f (Hoe, Ho) p Hnf.
+bbb.
+
 Theorem r_decomposed_4 :
   R_eq_dec_on
   → ∀ f, orbit_selector f
@@ -2928,37 +2972,6 @@ Qed.
 End Orbit.
 
 Section Equidecomposability.
-
-Delimit Scope set_scope with S.
-
-Class set_model A :=
-  { set_eq : (A → Prop) → (A → Prop) → Prop }.
-
-Definition void {A} (_ : A) := False.
-
-Definition intersection {A} (E₁ E₂ : A → Prop) :=
-  λ x, E₁ x ∧ E₂ x.
-Definition union {A} (E₁ E₂ : A → Prop) :=
-  λ x, E₁ x ∨ E₂ x.
-Definition union_list {A} (Ei : list (A → Prop)) :=
-  fold_left union Ei void.
-Definition nth_set {A} i (Ei : list (A → Prop)) :=
-  List.nth i Ei void.
-
-Notation "a = b" := (set_eq a b) : set_scope.
-Notation "'∅'" := (void) : set_scope.
-Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
-Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
-Notation "'⊔' Es" := (union_list Es) (at level 60) : set_scope.
-Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
-
-Definition partition {A} {S : set_model A} E Ep :=
-  (E = ⊔ Ep)%S ∧
-  ∀ i j, i ≠ j → (Ep.[i] ⋂ Ep.[j] = ∅)%S.
-(*
-Definition set_eq {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
-  ∀ x, E₁ x ↔ E₂ x.
-*)
 
 Definition in_group G g := ...
 
