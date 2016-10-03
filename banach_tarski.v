@@ -2696,19 +2696,27 @@ Definition partition {A} {S : set_model A} E Ep :=
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
 
-Definition EE (f : point → point) := λ p, p = f p.
+Class orbit_sel_model := mkos
+  { os_fun : point → point }.
+
+Definition EE {os : orbit_sel_model} := λ p, p = os_fun p.
+Definition SS {os : orbit_sel_model} e := λ p,
+  ∃ el el₁,
+  norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
+
+bbb.
+
+Definition eSS {os : orbit_sel_model} (e : free_elem) E := λ p,
+  E p.
 
 Theorem r_decomposed_4 :
   R_eq_dec_on
   → ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
-  → partition not_in_fixpoints (EE f :: []).
-(*
-  → (p ∈ Ẹ f)%P ⊕ (p ∈ Ṣ f ạ)%P ⊕ (p ∈ Ṣ f ạ⁻¹)%P ⊕
-    (p ∈ Ṣ f ḅ)%P ⊕ (p ∈ Ṣ f ḅ⁻¹)%P.
-*)
+  → ∀ os, os = mkos f
+  → partition not_in_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros Rdec f (Hoe, Ho) p Hnf.
+intros Rdec s Hs f Hf os Hos.
 bbb.
 
 Theorem r_decomposed_4 :
