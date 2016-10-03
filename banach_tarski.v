@@ -2939,23 +2939,32 @@ Definition intersection {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
   λ x, E₁ x ∧ E₂ x.
 Definition union {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
   λ x, E₁ x ∨ E₂ x.
-(*
-Definition set_eq {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
-  ∀ x, E₁ x ↔ E₂ x.
-*)
+Notation "E₁ 'Ị' E₂" := (intersection E₁ E₂) (at level 70) : set_scope.
+(* level au pif : à préciser *)
 
 Definition void {A} (_ : A) := False.
 Notation "'Ø'" := (void) : set_scope.
 
 Definition union_list {A} (Ei : list (A → Prop)) :=
   fold_left union Ei void.
+Notation "'Ụ' Es" := (union_list Es) (at level 70) : set_scope.
+(* level au pif : à préciser *)
 
 Definition nth_set {A} i (Ei : list (A → Prop)) := List.nth i Ei void.
+Notation "E .[ i ]" := (nth_set i E) (at level 70) : set_scope.
+(* level au pif : à préciser *)
 
-Definition partition {A} {S : set_model A} (E : A → Prop)
-    (Ei : list (A → Prop)) :=
-  (E = union_list Ei)%S ∧
-  ∀ i j, i ≠ j → (intersection (nth_set i Ei) (nth_set j Ei) = Ø)%S.
+(* ça chie syntaxiquement à cause des levels : il faut les mettre
+   correctement ci-dessus ! *)
+Definition partition {A} {S : set_model A} E Ep :=
+  (E = Ụ Ep)%S ∧
+  ∀ i j, i ≠ j → Ep.[i] Ị Ep.[j] = Ø)%S.
+
+Print partition.
+(*
+Definition set_eq {A} (E₁ : A → Prop) (E₂ : A → Prop) :=
+  ∀ x, E₁ x ↔ E₂ x.
+*)
 
 Definition in_group G g := ...
 
