@@ -2868,6 +2868,183 @@ Theorem r_decomposed_2 :
     is_partition not_in_fixpoints [SS e; rot e (SS (negf e))].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos e; subst os s.
+split.
+*unfold is_partition; intros p.
+ split.
+ -intros Hnf.
+  unfold union_list; simpl; unfold union.
+  pose proof Ho p as H.
+  apply same_orbit_sym in H.
+  destruct H as (el, Hel).
+  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+  destruct el₁ as [| e₁].
+   rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+   clear Hel₁.
+   right; left.
+unfold rot.
+unfold SS.
+bbb.
+(*
+  destruct (Pdec Rdec p (f p)) as [H₁| H₁]; [ left; split; assumption | ].
+  right.
+  pose proof Ho p as H.
+  destruct H as (el, Hel).
+  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+  destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
+  +rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
+
+  +destruct e as (t, d); destruct t, d.
+   **left; split; [ assumption | ].
+    exists (rev_path el), (rev_path el₂).
+    split; [ | apply rotate_rev_path; assumption ].
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+   **right; left; split; [ assumption | ].
+    exists (rev_path el), (rev_path el₂).
+    split; [ | apply rotate_rev_path; assumption ].
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+   **right; right; left; split; [ assumption | ].
+    exists (rev_path el), (rev_path el₂).
+    split; [ | apply rotate_rev_path; assumption ].
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+   **right; right; right; left; split; [ assumption | ].
+    exists (rev_path el), (rev_path el₂).
+    split; [ | apply rotate_rev_path; assumption ].
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+
+ -intros Hul.
+  unfold union_list in Hul; simpl in Hul; unfold union in Hul.
+  intros el Hel.
+  destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
+
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
+
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
+
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
+
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
+
+  +contradiction.
+
+bbb.
+*)
+bbb.
+
+ right; split.
+  intros (el₁ & el₂ & H₁ & H₃).
+  rewrite Hel in H₃.
+  revert H₃; apply Hnf.
+  intros H; rewrite H₁ in H; discriminate H.
+
+  exists (negf e :: []), [].
+  split; [ reflexivity | ].
+  rewrite Hel, rotate_cancel_start; reflexivity.
+
+ destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
+ *left; split.
+   exists el, el₁.
+   split; assumption.
+
+   intros (el₃ & el₄ & H₅ & H₆).
+   rewrite rotate_rotate_norm in H₆.
+   simpl in H₆; rewrite H₅ in H₆.
+   apply rotate_rev_path in H₆.
+   rewrite <- H₆, <- fold_right_app in Hel.
+   destruct el₄ as [| e₄].
+    destruct (letter_opp_dec e (negf e)) as [H₁| H₁].
+     rewrite app_nil_r in Hel.
+     revert Hel; apply Hnf.
+     intros H; rewrite Hel₁ in H; discriminate H.
+
+     apply H₁.
+     destruct e as (t, d); simpl.
+     rewrite letter_dec_diag, bool_dec_negb_r.
+     constructor.
+
+    destruct (letter_opp_dec e (negf e)) as [H₁| H₁].
+     destruct e₄ as (t₄, d₄); destruct t₄, d₄.
+     +destruct e as (t, d); destruct t, d.
+      -revert H₅; apply norm_list_no_start2.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+     +destruct e as (t, d); destruct t, d.
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -revert H₅; apply norm_list_no_start2.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+     +destruct e as (t, d); destruct t, d.
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -revert H₅; apply norm_list_no_start2.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+     +destruct e as (t, d); destruct t, d.
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -eapply not_in_fixpoints_one_path2; try eassumption.
+       intros H; discriminate H.
+
+      -revert H₅; apply norm_list_no_start2.
+
+    +apply H₁; destruct e as (t, d); simpl.
+     rewrite letter_dec_diag, bool_dec_negb_r.
+     constructor.
+
+ *right; split.
+   intros (el₃ & el₄ & H₅ & H₆).
+   apply rotate_rev_path in H₆.
+   eapply not_in_fixpoints_one_path; try eassumption.
+    rewrite <- rev_path_norm_list, H₅.
+    rewrite rev_path_cons, rev_path_single; simpl.
+    reflexivity.
+
+    rewrite negf_involutive.
+    apply not_eq_sym; assumption.
+
+   exists (negf e :: norm_list el), (norm_list el).
+   split.
+    eapply norm_list_cons_cons; [ eassumption | ].
+    rewrite negf_involutive.
+    apply not_eq_sym; assumption.
+
+    rewrite rotate_cancel_start, <- rotate_rotate_norm.
+    assumption.
+Qed.
+
 bbb.
 
 (* old version; should be removed if ok above *)
