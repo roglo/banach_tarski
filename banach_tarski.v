@@ -2548,10 +2548,9 @@ Theorem not_in_fixpoints_one_path2 : ∀ p e e₁ el₄ el₁ el el₃,
   → fold_right rotate p (el ++ rev_path (e :: el₄)) = p
   → norm_list el = e₁ :: el₁
   → norm_list el₃ = negf e₁ :: e :: el₄
-  → e ≠ e₁
   → False.
 Proof.
-intros * Hnf Hel Hel₁ H₅ He.
+intros * Hnf Hel Hel₁ H₅.
 revert Hel; apply Hnf.
 intros H.
 pose proof is_normal [] el (rev_path (e :: el₄)) as H₁.
@@ -2564,7 +2563,8 @@ apply norm_list_app_is_nil in H.
  rewrite rev_path_app in H.
  do 2 rewrite rev_path_involutive in H.
  simpl in H; rewrite negf_involutive in H.
- injection H; intros; contradiction.
+ injection H; intros; subst e₁.
+ revert H₅; apply norm_list_no_start2.
 
  rewrite norm_list_idemp; reflexivity.
 
@@ -2721,15 +2721,35 @@ destruct ti, tj.
    intros H; discriminate H.
 Qed.
 
-Theorem not_start_with_rot : ∀ f os, os = mkos f →
-  ∀ e p, SS e p → rot e (SS (negf e)) p → False.
+Theorem fold_right_single {A B} (f : A → B → B) x y :
+  fold_right f x [y] = f y x.
+Proof. reflexivity. Qed.
+
+Theorem not_start_with_rot :
+  ∀ f, orbit_selector f
+  → ∀ os, os = mkos f
+  → ∀ e p, SS e p → rot e (SS (negf e)) p → False.
 Proof.
-intros f os Hos (t, d) p Hs Hr; simpl in Hr; subst os.
+intros f (Hoe, Ho) os Hos e p Hs Hr; simpl in Hr; subst os.
 destruct Hs as (Hnf & el & el₁ & Hn & Hs); simpl in Hs.
 destruct Hr as (Hrnf & elr & elr₁ & Hnr & Hsr); simpl in Hsr.
+assert (Hr : f p = f (rotate (negf e) p)).
+ apply Hoe.
+ exists (negf e :: []); reflexivity.
+
+ rewrite <- Hr in Hsr.
+ eapply rotate_rev_path in Hsr.
+ rewrite <- fold_right_single, <- fold_right_app in Hsr.
+ rewrite <- Hsr in Hs.
+ rewrite <- fold_right_app in Hs.
+ rewrite <- rev_path_single, <- rev_path_app in Hs; simpl in Hs.
+Check not_in_fixpoints_one_path2.
+ eapply not_in_fixpoints_one_path2 in Hs; try eassumption.
+
 bbb.
 
-eapply rotate_rev_path in Hsr.
+bbb.
+
 destruct ti, tj.
 +destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
  *eapply not_in_fixpoints_one_path; try eassumption.
@@ -2790,7 +2810,7 @@ destruct ti, tj.
    intros H; discriminate H.
 Qed.
 bbb.
-
+*)
 
 Theorem r_decomposed_4 :
   R_eq_dec_on
