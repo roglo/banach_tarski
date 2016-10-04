@@ -2755,6 +2755,7 @@ split.
   destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
   +unfold EE in Hul; simpl in Hul.
    intros H; apply Hel; clear Hel.
+   (* mmmm... tout le boulot est à faire... *)
 bbb.
    destruct el as [| e]; [ reflexivity | ].
 bbb.
