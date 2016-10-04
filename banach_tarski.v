@@ -2598,7 +2598,7 @@ Record choice_function {A} (R : A → A → Prop) f := mkcf
 
 Definition orbit_selector := choice_function same_orbit.
 
-Definition all_points_but_fixpoints p :=
+Definition all_but_fixpoints p :=
   ∀ el p₁, same_orbit p p₁
   → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
 
@@ -2635,9 +2635,9 @@ Class orbit_sel_model := mkos
   { os_fun : point → point }.
 
 Definition EE {os : orbit_sel_model} :=
-  λ p, all_points_but_fixpoints p ∧ p = os_fun p.
+  λ p, all_but_fixpoints p ∧ p = os_fun p.
 Definition SS {os : orbit_sel_model} e := λ p,
-  all_points_but_fixpoints p ∧
+  all_but_fixpoints p ∧
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
 Definition rot {os : orbit_sel_model} e (E : point → Prop) := λ p,
@@ -2774,7 +2774,7 @@ Theorem r_decomposed_4 :
   → ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos f
-  → is_partition all_points_but_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+  → is_partition all_but_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros Rdec s Hs f (Hoe, Ho) os Hos; subst os s.
 split.
@@ -2933,7 +2933,7 @@ Theorem r_decomposed_2 :
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos f
   → ∀ e,
-    is_partition all_points_but_fixpoints [SS e; rot e (SS (negf e))].
+    is_partition all_but_fixpoints [SS e; rot e (SS (negf e))].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos e; subst os s.
 split.
@@ -3026,7 +3026,7 @@ Theorem r_decomposed_2_a :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos f
-  → is_partition all_points_but_fixpoints [SS ạ; rot ạ (SS ạ⁻¹)].
+  → is_partition all_but_fixpoints [SS ạ; rot ạ (SS ạ⁻¹)].
 Proof.
 intros.
 eapply r_decomposed_2; eassumption.
@@ -3036,7 +3036,7 @@ Theorem r_decomposed_2_b :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos f
-  → is_partition all_points_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
+  → is_partition all_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
 Proof.
 intros.
 eapply r_decomposed_2; eassumption.
