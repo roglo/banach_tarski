@@ -2672,19 +2672,19 @@ Delimit Scope set_scope with S.
 Class set_model A := mksm
   { set_eq : (A → Prop) → (A → Prop) → Prop }.
 
-Definition void {A} (_ : A) := False.
+Definition empty_set {A} (_ : A) := False.
 
 Definition intersection {A} (E₁ E₂ : A → Prop) :=
   λ x, E₁ x ∧ E₂ x.
 Definition union {A} (E₁ E₂ : A → Prop) :=
   λ x, E₁ x ∨ E₂ x.
 Definition union_list {A} (Ei : list (A → Prop)) :=
-  fold_right union void Ei.
+  fold_right union empty_set Ei.
 Definition nth_set {A} i (Ei : list (A → Prop)) :=
-  List.nth i Ei void.
+  List.nth i Ei empty_set.
 
 Notation "a = b" := (set_eq a b) : set_scope.
-Notation "'∅'" := (void) : set_scope.
+Notation "'∅'" := (empty_set) : set_scope.
 Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
 Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
 Notation "'⊔' Es" := (union_list Es) (at level 60) : set_scope.
@@ -2699,12 +2699,74 @@ Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x �
 Class orbit_sel_model := mkos
   { os_fun : point → point }.
 
-Definition EE {os : orbit_sel_model} := λ p, p = os_fun p.
+Definition EE {os : orbit_sel_model} :=
+  λ p, not_in_fixpoints p ∧ p = os_fun p.
 Definition SS {os : orbit_sel_model} e := λ p,
+  not_in_fixpoints p ∧
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
 Definition rot {os : orbit_sel_model} e (E : point → Prop) := λ p,
   E (rotate (negf e) p).
+
+Theorem empty_set_not_full_set : ∀ f os, os = mkos f →
+  ∀ e p, EE p → SS e p → False.
+Proof.
+intros f os Hos e p He Hs; subst os.
+destruct He as (Hinf & He); simpl in He.
+destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
+rewrite <- He in Hs.
+eapply Hinf; [ | eassumption ].
+intros H; rewrite Hn in H; discriminate H.
+Qed.
+
+Theorem start_with_same : ∀ f os, os = mkos f →
+  ∀ e₁ e₂ p, SS e₁ p → SS e₂ p → e₁ = e₂.
+Proof.
+intros f os Hos (ti, di) (tj, dj) p Hsi Hsj; subst os.
+destruct Hsi as (Hinf & eli & eli₁ & Hni & Hsi); simpl in Hsi.
+destruct Hsj as (Hjnf & elj & elj₁ & Hnj & Hsj); simpl in Hsj.
+eapply rotate_rev_path in Hsj.
+destruct ti, tj.
++destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
+ *eapply not_in_fixpoints_one_path; try eassumption.
+   rewrite <- rev_path_norm_list, Hnj.
+   rewrite rev_path_cons, rev_path_single; reflexivity.
+
+   intros H; discriminate H.
+
+ *eapply not_in_fixpoints_one_path; try eassumption.
+   rewrite <- rev_path_norm_list, Hnj.
+   rewrite rev_path_cons, rev_path_single; reflexivity.
+
+   intros H; discriminate H.
+
++exfalso.
+ eapply not_in_fixpoints_one_path; try eassumption.
+  rewrite <- rev_path_norm_list, Hnj.
+  rewrite rev_path_cons, rev_path_single; reflexivity.
+
+  intros H; discriminate H.
+
++exfalso.
+ eapply not_in_fixpoints_one_path; try eassumption.
+  rewrite <- rev_path_norm_list, Hnj.
+  rewrite rev_path_cons, rev_path_single; reflexivity.
+
+  intros H; discriminate H.
+
++destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
+ *eapply not_in_fixpoints_one_path; try eassumption.
+   rewrite <- rev_path_norm_list, Hnj.
+   rewrite rev_path_cons, rev_path_single; reflexivity.
+
+   intros H; discriminate H.
+
+ *eapply not_in_fixpoints_one_path; try eassumption.
+   rewrite <- rev_path_norm_list, Hnj.
+   rewrite rev_path_cons, rev_path_single; reflexivity.
+
+   intros H; discriminate H.
+Qed.
 
 Theorem r_decomposed_4 :
   R_eq_dec_on
@@ -2713,13 +2775,13 @@ Theorem r_decomposed_4 :
   → ∀ os, os = mkos f
   → is_partition not_in_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros Rdec s Hs f (Hoe, Ho) os Hos; subst os.
+intros Rdec s Hs f (Hoe, Ho) os Hos; subst os s.
 split.
- unfold is_partition; subst s; intros p.
+*unfold is_partition; intros p.
  split.
  -intros Hnf.
   unfold union_list; simpl; unfold union.
-  destruct (Pdec Rdec p (f p)) as [H₁| H₁]; [ left; assumption | ].
+  destruct (Pdec Rdec p (f p)) as [H₁| H₁]; [ left; split; assumption | ].
   right.
   pose proof Ho p as H.
   destruct H as (el, Hel).
@@ -2728,41 +2790,141 @@ split.
   +rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
 
   +destruct e as (t, d); destruct t, d.
-   *left.
+   **left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
-   *right; left.
+   **right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
-   *right; right; left.
+   **right; right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
-   *right; right; right; left.
+   **right; right; right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
  -intros Hul.
   unfold union_list in Hul; simpl in Hul; unfold union in Hul.
-  unfold not_in_fixpoints.
   intros el Hel.
   destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
-  +unfold EE in Hul; simpl in Hul.
-   intros H; apply Hel; clear Hel.
-   (* mmmm... tout le boulot est à faire... *)
-bbb.
-   destruct el as [| e]; [ reflexivity | ].
-bbb.
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
 
-Check not_in_fixpoints_one_path.
-Check same_orbit_imp_representant.
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
 
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
+
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
+
+  +destruct Hul as (Hnf, Hul); simpl in Hul.
+   apply Hnf; assumption.
+
+  +contradiction.
+
+*intros i j Hij p.
+ unfold intersection, nth_set.
+ split.
+  intros (Hi, Hj); unfold empty_set.
+  destruct i; [ simpl in Hi | ].
+   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+   destruct Hi as (Hinf & Hi); simpl in Hi.
+   destruct j.
+    eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
+    split; assumption.
+
+    destruct j.
+     eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
+     split; assumption.
+
+     destruct j.
+      eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
+      split; assumption.
+
+      destruct j; [ | destruct j; contradiction ].
+      eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
+      split; assumption.
+
+  destruct i; [ simpl in Hi | ].
+   destruct j; [ clear Hij | ].
+    eapply empty_set_not_full_set; [ reflexivity | eassumption | eassumption ].
+
+    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+    destruct j; [ simpl in Hj | ].
+     eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+     discriminate Hi.
+
+     destruct j; [ simpl in Hj | ].
+      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+      discriminate Hi.
+
+      destruct j; [ simpl in Hj | destruct j; contradiction ].
+      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+      discriminate Hi.
+
+   destruct i; [ simpl in Hi | ].
+    destruct j; [ clear Hij | ].
+     eapply empty_set_not_full_set; [ reflexivity | eassumption | eassumption ].
+
+     destruct j; [ simpl in Hj | ].
+      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+      discriminate Hi.
+
+      destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+      destruct j; [ simpl in Hj | ].
+       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+       discriminate Hi.
+
+       destruct j; [ simpl in Hj | destruct j; contradiction ].
+       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+       discriminate Hi.
+
+    destruct i; [ simpl in Hi | ].
+     destruct j; [ clear Hij | ].
+      eapply empty_set_not_full_set; [ reflexivity | | ]; eassumption.
+
+      destruct j; [ simpl in Hj | ].
+       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+       discriminate Hi.
+
+       destruct j; [ simpl in Hj | ].
+        eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+        discriminate Hi.
+
+        destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+        destruct j; [ simpl in Hj | destruct j; contradiction ].
+        eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+        discriminate Hi.
+
+     destruct i; [ simpl in Hi | ].
+      destruct j; [ clear Hij | ].
+       eapply empty_set_not_full_set; [ reflexivity | | ]; eassumption.
+
+       destruct j; [ simpl in Hj | ].
+        eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+        discriminate Hi.
+
+        destruct j; [ simpl in Hj | ].
+         eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+         discriminate Hi.
+
+         destruct j; [ simpl in Hj | ].
+          eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+          discriminate Hi.
+
+          destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+          destruct j; contradiction.
+
+      destruct i; contradiction.
 bbb.
 (*
   intros H.
