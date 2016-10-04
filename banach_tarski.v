@@ -2721,22 +2721,22 @@ split.
   +rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
 
   +destruct e as (t, d); destruct t, d.
-   **left; split; [ assumption | ].
+    left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
-   **right; left; split; [ assumption | ].
+    right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
-   **right; right; left; split; [ assumption | ].
+    right; right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
 
-   **right; right; right; left; split; [ assumption | ].
+    right; right; right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
@@ -2881,8 +2881,15 @@ split.
    rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
    clear Hel₁.
    right; left.
+unfold rot, SS.
+bbb.
+
 unfold rot.
 unfold SS.
+split.
+unfold not_in_fixpoints in Hnf; unfold not_in_fixpoints.
+intros el₁ Hn.
+pose proof Hnf (el ++ [e]) as H.
 bbb.
 (*
   destruct (Pdec Rdec p (f p)) as [H₁| H₁]; [ left; split; assumption | ].
