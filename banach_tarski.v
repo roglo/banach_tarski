@@ -3046,7 +3046,8 @@ End Orbit.
 
 Section Equidecomposability.
 
-(* rot ạ is an example of a member of the group *)
+(* "rot ạ" is an example of a member of the group *)
+Check rot.
 
 bbb.
 
