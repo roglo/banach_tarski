@@ -2932,14 +2932,21 @@ split.
       exists (el₃ ++ [negf e]).
       rewrite fold_right_app; assumption.
 
-      simpl.
-      exists (negf e :: []), [].
-      split; [ reflexivity | simpl ].
       assert (H : f p = f (rotate (negf e) p)).
        apply Hoe.
        exists (negf e :: []); reflexivity.
 
-       rewrite <- H.
+       simpl; rewrite <- H.
+       exists (negf e :: el), (e₁ :: el₁); simpl.
+       rewrite Hel₁, Hel.
+       destruct (letter_opp_dec (negf e) e₁) as [H₂| H₂].
+        exfalso.
+        apply letter_opp_negf in H₂.
+        apply H₁, negf_eq_eq; assumption.
+
+        split; reflexivity.
+
+ -intros Hul.
 bbb.
       exists el, el₁.
    split; assumption.
