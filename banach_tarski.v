@@ -2598,6 +2598,10 @@ Record choice_function {A} (R : A → A → Prop) f := mkcf
 
 Definition orbit_selector := choice_function same_orbit.
 
+Definition orbit_has_no_fixpoints p :=
+  ∀ el p₁, same_orbit p p₁
+  → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
+
 Delimit Scope set_scope with S.
 
 Class set_model A := mksm
@@ -2631,9 +2635,9 @@ Class orbit_sel_model := mkos
   { os_fun : point → point }.
 
 Definition EE {os : orbit_sel_model} :=
-  λ p, not_in_fixpoints p ∧ p = os_fun p.
+  λ p, orbit_has_no_fixpoints p ∧ p = os_fun p.
 Definition SS {os : orbit_sel_model} e := λ p,
-  not_in_fixpoints p ∧
+  orbit_has_no_fixpoints p ∧
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
 Definition rot {os : orbit_sel_model} e (E : point → Prop) := λ p,
@@ -2646,7 +2650,7 @@ intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
 rewrite <- He in Hs.
-eapply Hinf; [ | eassumption ].
+eapply Hinf; [ reflexivity | | eassumption ].
 intros H; rewrite Hn in H; discriminate H.
 Qed.
 
@@ -2660,12 +2664,18 @@ eapply rotate_rev_path in Hsj.
 destruct ti, tj.
 +destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
  *eapply not_in_fixpoints_one_path; try eassumption.
+   intros el Hn.
+   apply Hjnf; [ reflexivity | assumption ].
+
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; reflexivity.
 
    intros H; discriminate H.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
+   intros el Hn.
+   apply Hjnf; [ reflexivity | assumption ].
+
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; reflexivity.
 
@@ -2673,6 +2683,9 @@ destruct ti, tj.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
+  intros el Hn.
+  apply Hjnf; [ reflexivity | assumption ].
+
   rewrite <- rev_path_norm_list, Hnj.
   rewrite rev_path_cons, rev_path_single; reflexivity.
 
@@ -2680,6 +2693,9 @@ destruct ti, tj.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
+  intros el Hn.
+  apply Hjnf; [ reflexivity | assumption ].
+
   rewrite <- rev_path_norm_list, Hnj.
   rewrite rev_path_cons, rev_path_single; reflexivity.
 
@@ -2687,12 +2703,18 @@ destruct ti, tj.
 
 +destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
  *eapply not_in_fixpoints_one_path; try eassumption.
+   intros el Hn.
+   apply Hjnf; [ reflexivity | assumption ].
+
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; reflexivity.
 
    intros H; discriminate H.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
+   intros el Hn.
+   apply Hjnf; [ reflexivity | assumption ].
+
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; reflexivity.
 
@@ -2704,7 +2726,7 @@ Theorem r_decomposed_4 :
   → ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos f
-  → is_partition not_in_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+  → is_partition orbit_has_no_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros Rdec s Hs f (Hoe, Ho) os Hos; subst os s.
 split.
@@ -2865,7 +2887,7 @@ Theorem r_decomposed_2 :
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos f
   → ∀ e,
-    is_partition not_in_fixpoints [SS e; rot e (SS (negf e))].
+    is_partition orbit_has_no_fixpoints [SS e; rot e (SS (negf e))].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos e; subst os s.
 split.
