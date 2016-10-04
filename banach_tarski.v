@@ -2900,87 +2900,48 @@ split.
   destruct H as (el, Hel).
   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
   destruct el₁ as [| e₁].
-   rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+   +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
    clear Hel₁.
    right; left.
-unfold rot, SS.
+   unfold rot, SS.
+   split.
+    intros el₁ p₁ Hp Hn.
+    apply Hnf; [ | assumption ].
+    destruct Hp as (el₂ & Hp).
+    exists (el₂ ++ [negf e]).
+    rewrite fold_right_app; assumption.
+
+    exists (negf e :: []), [].
+    split; [ reflexivity | simpl ].
+    assert (H : f p = f (rotate (negf e) p)).
+     apply Hoe.
+     exists (negf e :: []); reflexivity.
+
+     rewrite <- H, Hel; reflexivity.
+
+   +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
+     left; split; [ assumption | ].
+     exists el, el₁; split; assumption.
+
+     right; left.
+     unfold rot, SS.
+     split.
+      intros el₂ p₁ Hp Hn.
+      apply Hnf; [ | assumption ].
+      destruct Hp as (el₃ & Hp).
+      exists (el₃ ++ [negf e]).
+      rewrite fold_right_app; assumption.
+
+      simpl.
+      exists (negf e :: []), [].
+      split; [ reflexivity | simpl ].
+      assert (H : f p = f (rotate (negf e) p)).
+       apply Hoe.
+       exists (negf e :: []); reflexivity.
+
+       rewrite <- H.
 bbb.
-
-unfold rot.
-unfold SS.
-split.
-unfold not_in_fixpoints in Hnf; unfold not_in_fixpoints.
-intros el₁ Hn.
-pose proof Hnf (el ++ [e]) as H.
-bbb.
-(*
-  destruct (Pdec Rdec p (f p)) as [H₁| H₁]; [ left; split; assumption | ].
-  right.
-  pose proof Ho p as H.
-  destruct H as (el, Hel).
-  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-  destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  +rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
-
-  +destruct e as (t, d); destruct t, d.
-   **left; split; [ assumption | ].
-    exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-   **right; left; split; [ assumption | ].
-    exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-   **right; right; left; split; [ assumption | ].
-    exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-   **right; right; right; left; split; [ assumption | ].
-    exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
- -intros Hul.
-  unfold union_list in Hul; simpl in Hul; unfold union in Hul.
-  intros el Hel.
-  destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
-
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
-
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
-
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
-
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
-
-  +contradiction.
-
-bbb.
-*)
-bbb.
-
- right; split.
-  intros (el₁ & el₂ & H₁ & H₃).
-  rewrite Hel in H₃.
-  revert H₃; apply Hnf.
-  intros H; rewrite H₁ in H; discriminate H.
-
-  exists (negf e :: []), [].
-  split; [ reflexivity | ].
-  rewrite Hel, rotate_cancel_start; reflexivity.
-
- destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
- *left; split.
-   exists el, el₁.
+      exists el, el₁.
    split; assumption.
 
    intros (el₃ & el₄ & H₅ & H₆).
