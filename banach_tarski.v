@@ -3042,11 +3042,13 @@ intros.
 eapply r_decomposed_2; eassumption.
 Qed.
 
-bbb.
-
 End Orbit.
 
 Section Equidecomposability.
+
+(* rot ạ is an example of a member of the group *)
+
+bbb.
 
 Definition in_group G g := ...
 
