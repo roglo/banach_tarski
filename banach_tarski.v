@@ -2598,75 +2598,6 @@ Record choice_function {A} (R : A → A → Prop) f := mkcf
 
 Definition orbit_selector := choice_function same_orbit.
 
-Definition Ẹ (f : point → point) p := f p = p.
-Definition Ṣ e f p :=
-  ∃ el el₁,
-  norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p.
-Definition eṢ e₁ e₂ f p :=
-  ∃ el el₁,
-  norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p.
-
-Theorem eS_is_S_rotated : ∀ f e₁ e₂ p, orbit_selector f →
-  eṢ e₁ e₂ f p ↔ Ṣ e₂ f (rotate (negf e₁) p).
-Proof.
-intros * (Hoe, Ho).
-split; intros H.
- destruct H as (el & el₁ & H₁ & H₂).
- exists el, el₁.
- split; [ assumption | ].
- simpl in H₂.
- assert (H : fold_right rotate (f p) el = rotate (negf e₁) p).
-  rewrite <- H₂ at 2.
-  rewrite rotate_neg_rotate; reflexivity.
-
-  rewrite <- H; f_equal.
-  apply Hoe; rewrite H.
-  exists (e₁ :: []); simpl.
-  apply rotate_rotate_neg.
-
- destruct H as (el & el₁ & H₁ & H₂).
- exists el, el₁.
- split; [ assumption | ].
- simpl.
- remember (rotate (negf e₁) p) as p' eqn:Hp'.
- assert (H : rotate e₁ (fold_right rotate (f p') el) = p).
-  rewrite H₂; subst p'.
-  rewrite rotate_rotate_neg; reflexivity.
-
-  rewrite <- H; f_equal; f_equal.
-  apply Hoe; rewrite H.
-  exists (negf e₁ :: []); simpl.
-  rewrite <- H, rotate_neg_rotate.
-  assumption.
-Qed.
-
-Definition in_path f pa p :=
-  match pa with
-  | None => f p = p
-  | Some e =>
-     ∃ el el₁,
-     norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p
-  end.
-
-Definition in_rotated_path f e₁ pa p :=
-  match pa with
-  | None => rotate e₁ p = p
-  | Some e₂ =>
-     ∃ el el₁,
-     norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p
-  end.
-
-Delimit Scope path_scope with P.
-Notation "p '∈' 'Ẹ' f" := (in_path f None p)
-  (at level 70)
-  : path_scope.
-Notation "p '∈' 'Ṣ' f e" := (in_path f (Some e) p)
-  (at level 70, f at level 0)
-  : path_scope.
-Notation "p '∈' e₁ 'Ṣ' f e₂" := (in_rotated_path f e₁ (Some e₂) p)
-  (at level 70, e₁ at level 0, f at level 0, e₂ at level 0)
-  : path_scope.
-
 Delimit Scope set_scope with S.
 
 Class set_model A := mksm
@@ -2834,7 +2765,7 @@ split.
 *intros i j Hij p.
  unfold intersection, nth_set.
  split.
-  intros (Hi, Hj); unfold empty_set.
+ +intros (Hi, Hj); unfold empty_set.
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    destruct Hi as (Hinf & Hi); simpl in Hi.
@@ -2925,128 +2856,90 @@ split.
           destruct j; contradiction.
 
       destruct i; contradiction.
-bbb.
-(*
-  intros H.
-  destruct H as [(H, _)| (_, H)].
-   destruct H as (el₁ & el₂ & Hn & Hr).
-   erewrite same_orbit_imp_representant in Hr; try eassumption.
-   revert Hr; apply Hnf.
-   rewrite Hn; intros H; discriminate H.
 
-   destruct H as [(H, _)| (_, H)].
-    destruct H as (el₁ & el₂ & Hn & Hr).
-    erewrite same_orbit_imp_representant in Hr; try eassumption.
-    revert Hr; apply Hnf.
-    rewrite Hn; intros H; discriminate H.
-
-    destruct H as [(H, _)| (_, H)].
-     destruct H as (el₁ & el₂ & Hn & Hr).
-     erewrite same_orbit_imp_representant in Hr; try eassumption.
-     revert Hr; apply Hnf.
-     rewrite Hn; intros H; discriminate H.
-
-     destruct H as (el₁ & el₂ & Hn & Hr).
-     erewrite same_orbit_imp_representant in Hr; try eassumption.
-     revert Hr; apply Hnf.
-     rewrite Hn; intros H; discriminate H.
- right.
- split; [ apply not_eq_sym; assumption | ].
-
- pose proof Ho p as H.
- destruct H as (el, Hel).
- remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
- destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
-
-  destruct e as (t, d); destruct t, d.
-  *left; split.
-    exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-    intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     destruct H₃ as (H₃ & [(H₄, H₅) | (H₄, H₅)]).
-      destruct H₄ as (el₁ & el₃ & H₄ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-      destruct H₅ as (el₁ & el₃ & H₅ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-*)
-
-  *right; split.
-    intros (el₁ & el₃ & H₅ & H₆).
-    eapply not_in_fixpoints_one_path; try eassumption.
-    intros H; discriminate H.
-
-    left; split.
-     exists (rev_path el), (rev_path el₂).
-     split; [ | apply rotate_rev_path; assumption ].
-     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-     intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-      destruct H₃ as (H₃ & H₄).
-      destruct H₄ as (el₁ & el₃ & H₄ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-  *right; split.
-    intros (el₁ & el₃ & H₅ & H₆).
-    eapply not_in_fixpoints_one_path; try eassumption.
-    intros H; discriminate H.
-
-    right; split.
-     intros (el₁ & el₃ & H₅ & H₆).
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     left; split.
-      exists (rev_path el), (rev_path el₂).
-      split; [ | apply rotate_rev_path; assumption ].
-      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-      intros (el₃ & el₄ & H₅ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-  *right; split.
-    intros (el₁ & el₃ & H₅ & H₆).
-    eapply not_in_fixpoints_one_path; try eassumption.
-    intros H; discriminate H.
-
-    right; split.
-     intros (el₁ & el₃ & H₅ & H₆).
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     right; split.
-      intros (el₁ & el₃ & H₅ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-      exists (rev_path el), (rev_path el₂).
-      split; [ | apply rotate_rev_path; assumption ].
-      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+ +intros H; contradiction.
 Qed.
-bbb.
 
 Theorem r_decomposed_2 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos f
   → ∀ e,
-    partition not_in_fixpoints [SS e; rot e (SS (negf e))].
+    is_partition not_in_fixpoints [SS e; rot e (SS (negf e))].
 Proof.
-Print rotate.
+intros s Hs f (Hoe, Ho) os Hos e; subst os s.
 bbb.
+
+(* old version; should be removed if ok above *)
+
+Definition Ẹ (f : point → point) p := f p = p.
+Definition Ṣ e f p :=
+  ∃ el el₁,
+  norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p.
+Definition eṢ e₁ e₂ f p :=
+  ∃ el el₁,
+  norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p.
+
+Theorem eS_is_S_rotated : ∀ f e₁ e₂ p, orbit_selector f →
+  eṢ e₁ e₂ f p ↔ Ṣ e₂ f (rotate (negf e₁) p).
+Proof.
+intros * (Hoe, Ho).
+split; intros H.
+ destruct H as (el & el₁ & H₁ & H₂).
+ exists el, el₁.
+ split; [ assumption | ].
+ simpl in H₂.
+ assert (H : fold_right rotate (f p) el = rotate (negf e₁) p).
+  rewrite <- H₂ at 2.
+  rewrite rotate_neg_rotate; reflexivity.
+
+  rewrite <- H; f_equal.
+  apply Hoe; rewrite H.
+  exists (e₁ :: []); simpl.
+  apply rotate_rotate_neg.
+
+ destruct H as (el & el₁ & H₁ & H₂).
+ exists el, el₁.
+ split; [ assumption | ].
+ simpl.
+ remember (rotate (negf e₁) p) as p' eqn:Hp'.
+ assert (H : rotate e₁ (fold_right rotate (f p') el) = p).
+  rewrite H₂; subst p'.
+  rewrite rotate_rotate_neg; reflexivity.
+
+  rewrite <- H; f_equal; f_equal.
+  apply Hoe; rewrite H.
+  exists (negf e₁ :: []); simpl.
+  rewrite <- H, rotate_neg_rotate.
+  assumption.
+Qed.
+
+Definition in_path f pa p :=
+  match pa with
+  | None => f p = p
+  | Some e =>
+     ∃ el el₁,
+     norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p
+  end.
+
+Definition in_rotated_path f e₁ pa p :=
+  match pa with
+  | None => rotate e₁ p = p
+  | Some e₂ =>
+     ∃ el el₁,
+     norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p
+  end.
+
+Delimit Scope path_scope with P.
+Notation "p '∈' 'Ẹ' f" := (in_path f None p)
+  (at level 70)
+  : path_scope.
+Notation "p '∈' 'Ṣ' f e" := (in_path f (Some e) p)
+  (at level 70, f at level 0)
+  : path_scope.
+Notation "p '∈' e₁ 'Ṣ' f e₂" := (in_rotated_path f e₁ (Some e₂) p)
+  (at level 70, e₁ at level 0, f at level 0, e₂ at level 0)
+  : path_scope.
 
 Theorem r_decomposed_4 :
   R_eq_dec_on
