@@ -2742,75 +2742,32 @@ assert (Hr : f p = f (rotate (negf e) p)).
  rewrite <- fold_right_single, <- fold_right_app in Hsr.
  rewrite <- Hsr in Hs.
  rewrite <- fold_right_app in Hs.
- rewrite <- rev_path_single, <- rev_path_app in Hs; simpl in Hs.
-Check not_in_fixpoints_one_path2.
- eapply not_in_fixpoints_one_path2 in Hs; try eassumption.
-
-bbb.
-
-bbb.
-
-destruct ti, tj.
-+destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
- *eapply not_in_fixpoints_one_path; try eassumption.
-   intros el Hn.
-   apply Hjnf; [ reflexivity | assumption ].
-
-   rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; reflexivity.
-
-   intros H; discriminate H.
-
- *eapply not_in_fixpoints_one_path; try eassumption.
-   intros el Hn.
-   apply Hjnf; [ reflexivity | assumption ].
-
-   rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; reflexivity.
-
-   intros H; discriminate H.
-
-+exfalso.
- eapply not_in_fixpoints_one_path; try eassumption.
-  intros el Hn.
-  apply Hjnf; [ reflexivity | assumption ].
-
-  rewrite <- rev_path_norm_list, Hnj.
-  rewrite rev_path_cons, rev_path_single; reflexivity.
-
-  intros H; discriminate H.
-
-+exfalso.
- eapply not_in_fixpoints_one_path; try eassumption.
-  intros el Hn.
-  apply Hjnf; [ reflexivity | assumption ].
-
-  rewrite <- rev_path_norm_list, Hnj.
-  rewrite rev_path_cons, rev_path_single; reflexivity.
-
-  intros H; discriminate H.
-
-+destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
- *eapply not_in_fixpoints_one_path; try eassumption.
-   intros el Hn.
-   apply Hjnf; [ reflexivity | assumption ].
-
-   rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; reflexivity.
-
-   intros H; discriminate H.
-
- *eapply not_in_fixpoints_one_path; try eassumption.
-   intros el Hn.
-   apply Hjnf; [ reflexivity | assumption ].
-
-   rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; reflexivity.
-
-   intros H; discriminate H.
+ rewrite rotate_rotate_norm in Hs.
+ pose proof is_normal [] el (rev_path elr ++ [negf e]) as H.
+ do 2 rewrite app_nil_l in H.
+ rewrite <- H in Hs; clear H.
+ rewrite <- is_normal in Hs.
+ rewrite <- rev_path_norm_list in Hs.
+ rewrite Hnr in Hs.
+ rewrite <- rotate_rotate_norm in Hs.
+ rewrite rev_path_cons in Hs.
+ rewrite rev_path_single in Hs.
+ rewrite <- app_assoc in Hs.
+ simpl in Hs.
+ rewrite negf_involutive in Hs.
+ rewrite app_assoc in Hs.
+ rewrite rotate_cancel_in in Hs.
+ rewrite app_nil_r in Hs.
+ eapply Hnf; [ reflexivity | | eassumption ].
+ intros H.
+ apply norm_list_app_is_nil in H.
+ 2 : symmetry; apply norm_list_idemp.
+ 2 : rewrite <- rev_path_norm_list; eapply norm_list_is_cons in Hnr.
+ 2 : rewrite Hnr; reflexivity.
+ apply -> rev_path_eq_eq in H.
+ rewrite H, Hn in Hnr.
+ revert Hnr; apply norm_list_no_start2.
 Qed.
-bbb.
-*)
 
 Theorem r_decomposed_4 :
   R_eq_dec_on
@@ -3049,539 +3006,43 @@ split.
  intros (Hi, Hj); unfold empty_set.
  destruct i; [ simpl in Hi | ].
   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
-  destruct j.
-   simpl in Hj.
-   eapply not_start_with_rot in Hi; [ | reflexivity | assumption ].
-   contradiction.
-
-bbb.
-
-
-   split; assumption.
-
-   destruct j.
-    eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
-    split; assumption.
-
-    destruct j.
-     eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
-     split; assumption.
-
-     destruct j; [ | destruct j; contradiction ].
-     eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
-     split; assumption.
-
- destruct i; [ simpl in Hi | ].
-  destruct j; [ clear Hij | ].
-   eapply empty_set_not_full_set; [ reflexivity | eassumption | eassumption ].
-
-   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
-   destruct j; [ simpl in Hj | ].
-    eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-    discriminate Hi.
-
-    destruct j; [ simpl in Hj | ].
-     eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-     discriminate Hi.
-
-     destruct j; [ simpl in Hj | destruct j; contradiction ].
-     eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-     discriminate Hi.
+  destruct j; [ | destruct j; contradiction ].
+  simpl in Hj.
+  eapply not_start_with_rot in Hi; try eassumption; [ | reflexivity ].
+  split; assumption.
 
   destruct i; [ simpl in Hi | ].
-   destruct j; [ clear Hij | ].
-    eapply empty_set_not_full_set; [ reflexivity | eassumption | eassumption ].
+   destruct j; [ simpl in Hj; clear Hij | ].
+    eapply not_start_with_rot in Hj; try eassumption; [ | reflexivity ].
+    split; assumption.
 
-    destruct j; [ simpl in Hj | ].
-     eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-     discriminate Hi.
+    destruct j; [ apply Hij; reflexivity | clear Hij ].
+    destruct j; contradiction.
 
-     destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
-     destruct j; [ simpl in Hj | ].
-      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-      discriminate Hi.
-
-      destruct j; [ simpl in Hj | destruct j; contradiction ].
-      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-      discriminate Hi.
-
-   destruct i; [ simpl in Hi | ].
-    destruct j; [ clear Hij | ].
-     eapply empty_set_not_full_set; [ reflexivity | | ]; eassumption.
-
-     destruct j; [ simpl in Hj | ].
-      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-      discriminate Hi.
-
-      destruct j; [ simpl in Hj | ].
-       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-       discriminate Hi.
-
-       destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
-       destruct j; [ simpl in Hj | destruct j; contradiction ].
-       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-       discriminate Hi.
-
-    destruct i; [ simpl in Hi | ].
-     destruct j; [ clear Hij | ].
-      eapply empty_set_not_full_set; [ reflexivity | | ]; eassumption.
-
-      destruct j; [ simpl in Hj | ].
-       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-       discriminate Hi.
-
-       destruct j; [ simpl in Hj | ].
-        eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-        discriminate Hi.
-
-        destruct j; [ simpl in Hj | ].
-         eapply start_with_same in Hi; [ | reflexivity | eassumption ].
-         discriminate Hi.
-
-         destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
-         destruct j; contradiction.
-
-     destruct i; contradiction.
-
-
-
-bbb.
-  Hij : i ≠ j
-  Hi : List.nth i [SS e; rot e (SS (negf e))] (λ _ : point, False) p
-  Hj : List.nth j [SS e; rot e (SS (negf e))] (λ _ : point, False) p
-  ============================
-  False
-
-  Hij : i ≠ j
-  Hi : List.nth i [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹] ∅%S p
-  Hj : List.nth j [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹] ∅%S p
-  ============================
-  False
-bbb.
-      exists el, el₁.
-   split; assumption.
-
-   intros (el₃ & el₄ & H₅ & H₆).
-   rewrite rotate_rotate_norm in H₆.
-   simpl in H₆; rewrite H₅ in H₆.
-   apply rotate_rev_path in H₆.
-   rewrite <- H₆, <- fold_right_app in Hel.
-   destruct el₄ as [| e₄].
-    destruct (letter_opp_dec e (negf e)) as [H₁| H₁].
-     rewrite app_nil_r in Hel.
-     revert Hel; apply Hnf.
-     intros H; rewrite Hel₁ in H; discriminate H.
-
-     apply H₁.
-     destruct e as (t, d); simpl.
-     rewrite letter_dec_diag, bool_dec_negb_r.
-     constructor.
-
-    destruct (letter_opp_dec e (negf e)) as [H₁| H₁].
-     destruct e₄ as (t₄, d₄); destruct t₄, d₄.
-     +destruct e as (t, d); destruct t, d.
-      -revert H₅; apply norm_list_no_start2.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-     +destruct e as (t, d); destruct t, d.
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -revert H₅; apply norm_list_no_start2.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-     +destruct e as (t, d); destruct t, d.
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -revert H₅; apply norm_list_no_start2.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-     +destruct e as (t, d); destruct t, d.
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -revert H₅; apply norm_list_no_start2.
-
-    +apply H₁; destruct e as (t, d); simpl.
-     rewrite letter_dec_diag, bool_dec_negb_r.
-     constructor.
-
- *right; split.
-   intros (el₃ & el₄ & H₅ & H₆).
-   apply rotate_rev_path in H₆.
-   eapply not_in_fixpoints_one_path; try eassumption.
-    rewrite <- rev_path_norm_list, H₅.
-    rewrite rev_path_cons, rev_path_single; simpl.
-    reflexivity.
-
-    rewrite negf_involutive.
-    apply not_eq_sym; assumption.
-
-   exists (negf e :: norm_list el), (norm_list el).
-   split.
-    eapply norm_list_cons_cons; [ eassumption | ].
-    rewrite negf_involutive.
-    apply not_eq_sym; assumption.
-
-    rewrite rotate_cancel_start, <- rotate_rotate_norm.
-    assumption.
-Qed.
-
-bbb.
-
-(* old version; should be removed if ok above *)
-
-Definition Ẹ (f : point → point) p := f p = p.
-Definition Ṣ e f p :=
-  ∃ el el₁,
-  norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p.
-Definition eṢ e₁ e₂ f p :=
-  ∃ el el₁,
-  norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p.
-
-Theorem eS_is_S_rotated : ∀ f e₁ e₂ p, orbit_selector f →
-  eṢ e₁ e₂ f p ↔ Ṣ e₂ f (rotate (negf e₁) p).
-Proof.
-intros * (Hoe, Ho).
-split; intros H.
- destruct H as (el & el₁ & H₁ & H₂).
- exists el, el₁.
- split; [ assumption | ].
- simpl in H₂.
- assert (H : fold_right rotate (f p) el = rotate (negf e₁) p).
-  rewrite <- H₂ at 2.
-  rewrite rotate_neg_rotate; reflexivity.
-
-  rewrite <- H; f_equal.
-  apply Hoe; rewrite H.
-  exists (e₁ :: []); simpl.
-  apply rotate_rotate_neg.
-
- destruct H as (el & el₁ & H₁ & H₂).
- exists el, el₁.
- split; [ assumption | ].
- simpl.
- remember (rotate (negf e₁) p) as p' eqn:Hp'.
- assert (H : rotate e₁ (fold_right rotate (f p') el) = p).
-  rewrite H₂; subst p'.
-  rewrite rotate_rotate_neg; reflexivity.
-
-  rewrite <- H; f_equal; f_equal.
-  apply Hoe; rewrite H.
-  exists (negf e₁ :: []); simpl.
-  rewrite <- H, rotate_neg_rotate.
-  assumption.
-Qed.
-
-Definition in_path f pa p :=
-  match pa with
-  | None => f p = p
-  | Some e =>
-     ∃ el el₁,
-     norm_list el = e :: el₁ ∧ fold_right rotate (f p) el = p
-  end.
-
-Definition in_rotated_path f e₁ pa p :=
-  match pa with
-  | None => rotate e₁ p = p
-  | Some e₂ =>
-     ∃ el el₁,
-     norm_list el = e₂ :: el₁ ∧ fold_right rotate (f p) (e₁ :: el) = p
-  end.
-
-Delimit Scope path_scope with P.
-Notation "p '∈' 'Ẹ' f" := (in_path f None p)
-  (at level 70)
-  : path_scope.
-Notation "p '∈' 'Ṣ' f e" := (in_path f (Some e) p)
-  (at level 70, f at level 0)
-  : path_scope.
-Notation "p '∈' e₁ 'Ṣ' f e₂" := (in_rotated_path f e₁ (Some e₂) p)
-  (at level 70, e₁ at level 0, f at level 0, e₂ at level 0)
-  : path_scope.
-
-Theorem r_decomposed_4 :
-  R_eq_dec_on
-  → ∀ f, orbit_selector f
-  → ∀ p, not_in_fixpoints p
-  → (p ∈ Ẹ f)%P ⊕ (p ∈ Ṣ f ạ)%P ⊕ (p ∈ Ṣ f ạ⁻¹)%P ⊕
-    (p ∈ Ṣ f ḅ)%P ⊕ (p ∈ Ṣ f ḅ⁻¹)%P.
-Proof.
-intros Rdec f (Hoe, Ho) p Hnf.
-destruct (Pdec Rdec p (f p)) as [H₁| H₁].
- left.
-  split; [ symmetry; assumption | ].
-  intros H.
-  destruct H as [(H, _)| (_, H)].
-   destruct H as (el₁ & el₂ & Hn & Hr).
-   erewrite same_orbit_imp_representant in Hr; try eassumption.
-   revert Hr; apply Hnf.
-   rewrite Hn; intros H; discriminate H.
-
-   destruct H as [(H, _)| (_, H)].
-    destruct H as (el₁ & el₂ & Hn & Hr).
-    erewrite same_orbit_imp_representant in Hr; try eassumption.
-    revert Hr; apply Hnf.
-    rewrite Hn; intros H; discriminate H.
-
-    destruct H as [(H, _)| (_, H)].
-     destruct H as (el₁ & el₂ & Hn & Hr).
-     erewrite same_orbit_imp_representant in Hr; try eassumption.
-     revert Hr; apply Hnf.
-     rewrite Hn; intros H; discriminate H.
-
-     destruct H as (el₁ & el₂ & Hn & Hr).
-     erewrite same_orbit_imp_representant in Hr; try eassumption.
-     revert Hr; apply Hnf.
-     rewrite Hn; intros H; discriminate H.
-
- right.
- split; [ apply not_eq_sym; assumption | ].
-
- pose proof Ho p as H.
- destruct H as (el, Hel).
- remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
- destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
-
-  destruct e as (t, d); destruct t, d.
-  *left; split.
-    exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-    intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     destruct H₃ as (H₃ & [(H₄, H₅) | (H₄, H₅)]).
-      destruct H₄ as (el₁ & el₃ & H₄ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-      destruct H₅ as (el₁ & el₃ & H₅ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-  *right; split.
-    intros (el₁ & el₃ & H₅ & H₆).
-    eapply not_in_fixpoints_one_path; try eassumption.
-    intros H; discriminate H.
-
-    left; split.
-     exists (rev_path el), (rev_path el₂).
-     split; [ | apply rotate_rev_path; assumption ].
-     rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-     intros [((el₃ & el₄ & H₅ & H₆) & H₄) | H₃].
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-      destruct H₃ as (H₃ & H₄).
-      destruct H₄ as (el₁ & el₃ & H₄ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-  *right; split.
-    intros (el₁ & el₃ & H₅ & H₆).
-    eapply not_in_fixpoints_one_path; try eassumption.
-    intros H; discriminate H.
-
-    right; split.
-     intros (el₁ & el₃ & H₅ & H₆).
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     left; split.
-      exists (rev_path el), (rev_path el₂).
-      split; [ | apply rotate_rev_path; assumption ].
-      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-
-      intros (el₃ & el₄ & H₅ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-  *right; split.
-    intros (el₁ & el₃ & H₅ & H₆).
-    eapply not_in_fixpoints_one_path; try eassumption.
-    intros H; discriminate H.
-
-    right; split.
-     intros (el₁ & el₃ & H₅ & H₆).
-     eapply not_in_fixpoints_one_path; try eassumption.
-     intros H; discriminate H.
-
-     right; split.
-      intros (el₁ & el₃ & H₅ & H₆).
-      eapply not_in_fixpoints_one_path; try eassumption.
-      intros H; discriminate H.
-
-      exists (rev_path el), (rev_path el₂).
-      split; [ | apply rotate_rev_path; assumption ].
-      rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
-Qed.
-
-Theorem r_decomposed_2 :
-  ∀ f, orbit_selector f
-  → ∀ e p, not_in_fixpoints p
-  → (p ∈ Ṣ f e)%P ⊕ (p ∈ e Ṣ f (negf e))%P.
-Proof.
-intros f (Hoe, Ho) e p Hnf.
-pose proof Ho p as H.
-apply same_orbit_sym in H.
-destruct H as (el, Hel).
-remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-destruct el₁ as [| e₁].
- rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
- clear Hel₁.
- right; split.
-  intros (el₁ & el₂ & H₁ & H₃).
-  rewrite Hel in H₃.
-  revert H₃; apply Hnf.
-  intros H; rewrite H₁ in H; discriminate H.
-
-  exists (negf e :: []), [].
-  split; [ reflexivity | ].
-  rewrite Hel, rotate_cancel_start; reflexivity.
-
- destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
- *left; split.
-   exists el, el₁.
-   split; assumption.
-
-   intros (el₃ & el₄ & H₅ & H₆).
-   rewrite rotate_rotate_norm in H₆.
-   simpl in H₆; rewrite H₅ in H₆.
-   apply rotate_rev_path in H₆.
-   rewrite <- H₆, <- fold_right_app in Hel.
-   destruct el₄ as [| e₄].
-    destruct (letter_opp_dec e (negf e)) as [H₁| H₁].
-     rewrite app_nil_r in Hel.
-     revert Hel; apply Hnf.
-     intros H; rewrite Hel₁ in H; discriminate H.
-
-     apply H₁.
-     destruct e as (t, d); simpl.
-     rewrite letter_dec_diag, bool_dec_negb_r.
-     constructor.
-
-    destruct (letter_opp_dec e (negf e)) as [H₁| H₁].
-     destruct e₄ as (t₄, d₄); destruct t₄, d₄.
-     +destruct e as (t, d); destruct t, d.
-      -revert H₅; apply norm_list_no_start2.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-     +destruct e as (t, d); destruct t, d.
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -revert H₅; apply norm_list_no_start2.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-     +destruct e as (t, d); destruct t, d.
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -revert H₅; apply norm_list_no_start2.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-     +destruct e as (t, d); destruct t, d.
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -eapply not_in_fixpoints_one_path2; try eassumption.
-       intros H; discriminate H.
-
-      -revert H₅; apply norm_list_no_start2.
-
-    +apply H₁; destruct e as (t, d); simpl.
-     rewrite letter_dec_diag, bool_dec_negb_r.
-     constructor.
-
- *right; split.
-   intros (el₃ & el₄ & H₅ & H₆).
-   apply rotate_rev_path in H₆.
-   eapply not_in_fixpoints_one_path; try eassumption.
-    rewrite <- rev_path_norm_list, H₅.
-    rewrite rev_path_cons, rev_path_single; simpl.
-    reflexivity.
-
-    rewrite negf_involutive.
-    apply not_eq_sym; assumption.
-
-   exists (negf e :: norm_list el), (norm_list el).
-   split.
-    eapply norm_list_cons_cons; [ eassumption | ].
-    rewrite negf_involutive.
-    apply not_eq_sym; assumption.
-
-    rewrite rotate_cancel_start, <- rotate_rotate_norm.
-    assumption.
+   destruct i; contradiction.
 Qed.
 
 Theorem r_decomposed_2_a :
-  ∀ f, orbit_selector f
-  → ∀ p, not_in_fixpoints p
-  → (p ∈ Ṣ f ạ)%P ⊕ (p ∈ ạ Ṣ f ạ⁻¹)%P.
+  ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → ∀ os, os = mkos f
+  → is_partition orbit_has_no_fixpoints [SS ạ; rot ạ (SS ạ⁻¹)].
 Proof.
-intros f Hos p Hnf.
-apply r_decomposed_2; assumption.
+intros.
+eapply r_decomposed_2; eassumption.
 Qed.
 
 Theorem r_decomposed_2_b :
-  ∀ f, orbit_selector f
-  → ∀ p, not_in_fixpoints p
-  → (p ∈ Ṣ f ḅ)%P ⊕ (p ∈ ḅ Ṣ f ḅ⁻¹)%P.
+  ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → ∀ os, os = mkos f
+  → is_partition orbit_has_no_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
 Proof.
-intros f Hos p Hnf.
-apply r_decomposed_2; assumption.
+intros.
+eapply r_decomposed_2; eassumption.
 Qed.
+
+bbb.
 
 End Orbit.
 
@@ -3590,7 +3051,7 @@ Section Equidecomposability.
 Definition in_group G g := ...
 
 Definition equidecomposable G E₁ E₂ :=
-  ∃ P₁ P₂, partition E₁ P₁ ∧ partition E₂ P₂ ∧ length P₁ = length P₂ ∧
+  ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, in_group G g ∧ g S₁ = S₂) P₁ P₂.
 
 End Equidecomposability.
