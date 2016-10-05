@@ -2656,7 +2656,6 @@ split.
   right; right; assumption.
 
  intros i j Hij; subst s.
-(**)
  destruct i.
   unfold nth_set, intersection, set_eq; simpl.
   intros x.
@@ -2685,7 +2684,14 @@ split.
     apply Hi with (i := 1%nat) (j := S (S i)); [ intros H; discriminate H | ].
     unfold nth_set, intersection; simpl.
     split; assumption.
-bbb.
+
+  apply Hi with (i := S (S i)) (j := S (S j)).
+   intros H; apply Hij.
+   apply Nat.succ_inj; assumption.
+
+   unfold nth_set, intersection; simpl.
+   split; assumption.
+Qed.
 
 Class sel_model {A} := mkos
   { os_fun : A → A }.
@@ -3110,19 +3116,6 @@ intros.
 eapply r_decomposed_2; eassumption.
 Qed.
 
-Theorem r_decomposed_2_a_with_E :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
-  → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [(SS ạ ⋃ EE)%S; rot ạ (SS ạ⁻¹)].
-Proof.
-intros.
-(* ah bin non, EE est dans rot ạ (SS ạ⁻¹)... *)
-bbb.
-
-eapply r_decomposed_2; eassumption.
-Qed.
-
 End Orbit.
 
 Section Equidecomposability.
@@ -3146,7 +3139,7 @@ Check rot.
 
 Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 
-Definition transf_group (s : orbit_sel_model) :=
+Definition transf_group (os : sel_model) :=
   λ (g : (point → Prop) → (point → Prop)),
   (∀ S, g S = rot (E la false) S) ∧
   (∀ S, g S = xtransl 3 S) ∧
@@ -3154,22 +3147,26 @@ Definition transf_group (s : orbit_sel_model) :=
 
 Check transf_group.
 
-Definition G f := transf_group (mkos f).
+Definition G f := transf_group (mkos _ f).
 
 Definition equidecomposable (s : set_model point) G E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
 
-Theorem Banach_Tarski_paradox : ∀ s f os, os = mkos f →
-  equidecomposable s (G f) all_but_fixpoints
-    (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
+Theorem Banach_Tarski_paradox :
+  R_eq_dec_on
+  → ∀ s f os, s = set_equiv → orbit_selector f → os = mkos _ f →
+    equidecomposable s (G f) all_but_fixpoints
+      (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
-intros s f os Hos.
-exists [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+intros Rdec s f os Hs Hosf Hos.
+exists [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 exists
   (map (xtransl 3) [SS ạ; rot ạ (SS ạ⁻¹)] ++
-   map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S.
-simpl.
+   map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
+split; [ eapply r_decomposed_4; try eassumption | ].
+split.
+
 bbb.
 
 End Equidecomposability.
