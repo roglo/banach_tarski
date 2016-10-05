@@ -3166,7 +3166,7 @@ exists
    map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
 split; [ eapply r_decomposed_4; try eassumption | ].
 split.
-Theorem glop :
+Theorem partition_union :
   ∀ A s, s = set_equiv →
   ∀ (F₁ F₂ : A → Prop) P₁ P₂,
   (intersection F₁ F₂ = empty_set)%S
@@ -3196,7 +3196,7 @@ Admitted.
 Show.
  apply toto with (g := xtransl 3) in Ha; simpl in Ha.
  apply toto with (g := xtransl 6) in Hb; simpl in Hb.
- eapply glop in Ha; try eassumption.
+ eapply partition_union in Ha; try eassumption.
   simpl in Ha.
 
 bbb.
