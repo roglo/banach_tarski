@@ -3213,6 +3213,20 @@ split.
     induction P₁ as [| Q]; intros; [ right; assumption | simpl; right ].
     apply IHP₁; assumption.
 
+  intros Hu.
+  unfold union_list, set_eq in HF₁, HF₂.
+  simpl in HF₁, HF₂.
+  clear - HF₁ HF₂ Hu.
+  revert F₁ F₂ P₂ x HF₁ HF₂ Hu.
+  induction P₁ as [| Q]; intros; [ right; apply HF₂; assumption | ].
+  rename F₂0 into F₂.
+  simpl in Hu.
+  destruct Hu as [Hu| Hu]; [ left; apply HF₁; left; assumption | ].
+  eapply IHP₁; try eassumption.
+  intros y.
+   split.
+    intros Hy.
+
 bbb.
 
 Admitted.
