@@ -3046,6 +3046,20 @@ End Orbit.
 
 Section Equidecomposability.
 
+Delimit Scope set_scope with S.
+
+Notation "'ạ'" := (E la false).
+Notation "'ạ⁻¹'" := (E la true).
+Notation "'ḅ'" := (E lb false).
+Notation "'ḅ⁻¹'" := (E lb true).
+
+Notation "a = b" := (set_eq a b) : set_scope.
+Notation "'∅'" := (empty_set) : set_scope.
+Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
+Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
+Notation "'⊔' Es" := (union_list Es) (at level 60) : set_scope.
+Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
+
 (* "rot ạ" is an example of a member of the group *)
 Check rot.
 
@@ -3065,11 +3079,16 @@ Definition equidecomposable (s : set_model point) G E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
 
-Theorem Banach_Tarski_paradox : ∀ s f,
+Theorem Banach_Tarski_paradox : ∀ s f os, os = mkos f →
   equidecomposable s (G f) all_but_fixpoints
     (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
-intros s f.
+intros s f os Hos.
+exists [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+exists
+  (map (xtransl 3) [SS ạ; rot ạ (SS ạ⁻¹)] ++
+   map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S.
+simpl.
 bbb.
 
 End Equidecomposability.
