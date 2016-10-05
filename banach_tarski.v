@@ -2655,26 +2655,36 @@ split.
   destruct H as [[H| H]| H]; [ left; assumption | right; left; assumption | ].
   right; right; assumption.
 
- intros i j Hij.
- pose proof Hi i j Hij as Hm.
- subst s; simpl in Hm |-*.
- intros x.
- pose proof Hm x as Hx.
- split; intros H.
-  apply Hx.
-  split.
-   destruct H as (H₁ & H₂).
-   unfold nth_set, union in H₁ |-*.
-   simpl in H₁; simpl.
-   destruct i.
-    destruct H₁ as [| H₁]; [ assumption | ].
-    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
-    unfold nth_set in H₂; simpl in H₂.
-    destruct j.
-     simpl in H₂.
-unfold nth_set in Hx; simpl in Hx.
-destruct Hx as (H₃ & H₄).
+ intros i j Hij; subst s.
+(**)
+ destruct i.
+  unfold nth_set, intersection, set_eq; simpl.
+  intros x.
+  split; [ | contradiction ].
+  intros (H₁, H₂).
+  destruct j; [ apply Hij; reflexivity | clear Hij ].
+  destruct H₁ as [H₁| H₁].
+   apply Hi with (i := O) (j := S (S j)); [ intros H; discriminate H | ].
+   unfold nth_set, intersection; simpl.
+   split; assumption.
 
+   apply Hi with (i := 1%nat) (j := S (S j)); [ intros H; discriminate H | ].
+   unfold nth_set, intersection; simpl.
+   split; assumption.
+
+  unfold nth_set, intersection, union, set_eq; simpl.
+  intros x.
+  split; [ | contradiction ].
+  intros (H₁ & H₂).
+  destruct j.
+   destruct H₂ as [H₂| H₂].
+    apply Hi with (i := O) (j := S (S i)); [ intros H; discriminate H | ].
+    unfold nth_set, intersection; simpl.
+    split; assumption.
+
+    apply Hi with (i := 1%nat) (j := S (S i)); [ intros H; discriminate H | ].
+    unfold nth_set, intersection; simpl.
+    split; assumption.
 bbb.
 
 Class sel_model {A} := mkos
