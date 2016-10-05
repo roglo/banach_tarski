@@ -2769,7 +2769,7 @@ assert (Hr : f p = f (rotate (negf e) p)).
  revert Hnr; apply norm_list_no_start2.
 Qed.
 
-Theorem r_decomposed_4 :
+Theorem r_decomposed_5 :
   R_eq_dec_on
   → ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
