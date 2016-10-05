@@ -3166,8 +3166,26 @@ exists
    map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
 split; [ eapply r_decomposed_4; try eassumption | ].
 split.
-Check r_decomposed_2_a.
-Check r_decomposed_2_b.
+Theorem glop :
+  ∀ A s, s = set_equiv →
+  ∀ (F₁ F₂ : A → Prop) P₁ P₂,
+  (intersection F₁ F₂ = empty_set)%S
+  → is_partition F₁ P₁
+  → is_partition F₂ P₂
+  → is_partition (union F₁ F₂) (P₁ ++ P₂).
+Admitted.
+ pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
+ pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
+Theorem toto : ∀ A s, s = set_equiv →
+  ∀ (F : A → Prop) P g,
+  is_partition F P → is_partition (g F) (map g P).
+  (* probably missing that g is member of a "good" group *)
+Admitted.
+Show.
+ apply toto with (g := xtransl 3) in Ha; simpl in Ha.
+ apply toto with (g := xtransl 6) in Hb; simpl in Hb.
+ eapply glop in Ha; try eassumption.
+  simpl in Ha.
 
 bbb.
 
