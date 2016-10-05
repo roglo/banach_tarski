@@ -2656,6 +2656,25 @@ split.
   right; right; assumption.
 
  intros i j Hij.
+ pose proof Hi i j Hij as Hm.
+ subst s; simpl in Hm |-*.
+ intros x.
+ pose proof Hm x as Hx.
+ split; intros H.
+  apply Hx.
+  split.
+   destruct H as (H₁ & H₂).
+   unfold nth_set, union in H₁ |-*.
+   simpl in H₁; simpl.
+   destruct i.
+    destruct H₁ as [| H₁]; [ assumption | ].
+    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+    unfold nth_set in H₂; simpl in H₂.
+    destruct j.
+     simpl in H₂.
+unfold nth_set in Hx; simpl in Hx.
+destruct Hx as (H₃ & H₄).
+
 bbb.
 
 Class sel_model {A} := mkos
