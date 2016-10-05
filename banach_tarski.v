@@ -3049,12 +3049,27 @@ Section Equidecomposability.
 (* "rot ạ" is an example of a member of the group *)
 Check rot.
 
-bbb.
+Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 
-Definition in_group G g := ...
+Definition transf_group (s : orbit_sel_model) :=
+  λ (g : (point → Prop) → (point → Prop)),
+  (∀ S, g S = rot (E la false) S) ∧
+  (∀ S, g S = xtransl 3 S) ∧
+  (∀ S, g S = xtransl 6 S).
 
-Definition equidecomposable G E₁ E₂ :=
+Check transf_group.
+
+Definition G f := transf_group (mkos f).
+
+Definition equidecomposable (s : set_model point) G E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
-  List.Forall2 (λ S₁ S₂, ∃ g, in_group G g ∧ g S₁ = S₂) P₁ P₂.
+  List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
+
+Theorem Banach_Tarski_paradox : ∀ s f,
+  equidecomposable s (G f) all_but_fixpoints
+    (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
+Proof.
+intros s f.
+bbb.
 
 End Equidecomposability.
