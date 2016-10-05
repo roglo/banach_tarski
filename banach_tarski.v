@@ -3216,16 +3216,29 @@ split.
   intros Hu.
   unfold union_list, set_eq in HF₁, HF₂.
   simpl in HF₁, HF₂.
+(*
   clear - HF₁ HF₂ Hu.
-  revert F₁ F₂ P₂ x HF₁ HF₂ Hu.
+*)
+  revert F₁ F₂ P₂ x HP₁ HP₂ HF₁ HF₂ HFF Hu.
   induction P₁ as [| Q]; intros; [ right; apply HF₂; assumption | ].
   rename F₂0 into F₂.
   simpl in Hu.
   destruct Hu as [Hu| Hu]; [ left; apply HF₁; left; assumption | ].
   eapply IHP₁; try eassumption.
+   intros i j Hij.
+   pose proof HP₁ i j Hij x as (H₁ & H₂).
+   unfold nth_set, set_eq; simpl.
+   intros y.
+   split; intros HH.
+    destruct HH as (H₃, H₄).
+bbb.
+
   intros y.
    split.
     intros Hy.
+    destruct (HF₁ y) as (HFy & HPy).
+    simpl in HFy.
+    pose proof HFy Hy as [H| H].
 
 bbb.
 
