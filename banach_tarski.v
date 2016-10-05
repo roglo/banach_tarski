@@ -3173,6 +3173,18 @@ Theorem glop :
   → is_partition F₁ P₁
   → is_partition F₂ P₂
   → is_partition (union F₁ F₂) (P₁ ++ P₂).
+Proof.
+intros * Hs F₁ F₂ * HFF HF₁ HF₂.
+destruct HF₁ as (HF₁ & HP₁).
+destruct HF₂ as (HF₂ & HP₂).
+split.
+ unfold union, union_list, set_eq; subst s; simpl.
+ intros x.
+ split.
+  rewrite fold_right_app.
+  intros [HF| HF].
+bbb.
+
 Admitted.
  pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
  pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
