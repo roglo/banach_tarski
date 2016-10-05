@@ -2631,19 +2631,49 @@ Definition is_partition {A} {S : set_model A} E Ep :=
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
 
-Class orbit_sel_model := mkos
-  { os_fun : point → point }.
+Class sel_model {A} := mkos
+  { os_fun : A → A }.
 
-Definition EE {os : orbit_sel_model} :=
+Theorem is_partition_group_first_2_together :
+  ∀ A s, s = set_equiv →
+  ∀ (R : A → A → Prop),
+  ∀ f, choice_function R f →
+  ∀ os, os = mkos _ f →
+  ∀ (F : A → Prop) P₁ P₂ Pl,
+  is_partition F (P₁ :: P₂ :: Pl)
+  → is_partition F (union P₁ P₂ :: Pl).
+Proof.
+intros * Hs * Hcf * Hos * Hp.
+destruct Hp as (Hu & Hi).
+split.
+ unfold union_list, union, set_eq in Hu |-*.
+ subst s; simpl in Hu |-*.
+ intros x.
+ pose proof Hu x as H₁.
+ destruct H₁ as (H₁ & H₂).
+ split; intros H.
+  apply H₁ in H.
+  destruct H as [H| H]; [ left; left; assumption | ].
+  destruct H as [H| H]; [ left; right; assumption | ].
+  right; assumption.
+
+  apply H₂.
+  destruct H as [[H| H]| H]; [ left; assumption | right; left; assumption | ].
+  right; right; assumption.
+
+ intros i j Hij.
+bbb.
+
+Definition EE {os : sel_model} :=
   λ p, all_but_fixpoints p ∧ p = os_fun p.
-Definition SS {os : orbit_sel_model} e := λ p,
+Definition SS {os : sel_model} e := λ p,
   all_but_fixpoints p ∧
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
-Definition rot {os : orbit_sel_model} e (E : point → Prop) := λ p,
+Definition rot {os : @sel_model point} e (E : point → Prop) := λ p,
   E (rotate (negf e) p).
 
-Theorem empty_set_not_full_set : ∀ f os, os = mkos f →
+Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
   ∀ e p, EE p → SS e p → False.
 Proof.
 intros f os Hos e p He Hs; subst os.
@@ -2654,7 +2684,7 @@ eapply Hinf; [ reflexivity | | eassumption ].
 intros H; rewrite Hn in H; discriminate H.
 Qed.
 
-Theorem start_with_same : ∀ f os, os = mkos f →
+Theorem start_with_same : ∀ f os, os = mkos _ f →
   ∀ e₁ e₂ p, SS e₁ p → SS e₂ p → e₁ = e₂.
 Proof.
 intros f os Hos (ti, di) (tj, dj) p Hsi Hsj; subst os.
@@ -2727,7 +2757,7 @@ Proof. reflexivity. Qed.
 
 Theorem not_start_with_rot :
   ∀ f, orbit_selector f
-  → ∀ os, os = mkos f
+  → ∀ os, os = mkos _ f
   → ∀ e p, SS e p → rot e (SS (negf e)) p → False.
 Proof.
 intros f (Hoe, Ho) os Hos e p Hs Hr; simpl in Hr; subst os.
@@ -2773,7 +2803,7 @@ Theorem r_decomposed_5 :
   R_eq_dec_on
   → ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
-  → ∀ os, os = mkos f
+  → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros Rdec s Hs f (Hoe, Ho) os Hos; subst os s.
@@ -2928,10 +2958,22 @@ split.
      destruct i; contradiction.
 Qed.
 
+Theorem r_decomposed_4 :
+  R_eq_dec_on
+  → ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → ∀ os, os = mkos _ f
+  → is_partition all_but_fixpoints [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+Proof.
+intros Rdec s Hs f HoeHo os Hos.
+pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
+eapply is_partition_group_first_2_together; eassumption.
+Qed.
+
 Theorem r_decomposed_2 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
-  → ∀ os, os = mkos f
+  → ∀ os, os = mkos _ f
   → ∀ e,
     is_partition all_but_fixpoints [SS e; rot e (SS (negf e))].
 Proof.
@@ -3025,7 +3067,7 @@ Qed.
 Theorem r_decomposed_2_a :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
-  → ∀ os, os = mkos f
+  → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints [SS ạ; rot ạ (SS ạ⁻¹)].
 Proof.
 intros.
@@ -3035,7 +3077,7 @@ Qed.
 Theorem r_decomposed_2_b :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
-  → ∀ os, os = mkos f
+  → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
 Proof.
 intros.
@@ -3045,7 +3087,7 @@ Qed.
 Theorem r_decomposed_2_a_with_E :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
-  → ∀ os, os = mkos f
+  → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints [(SS ạ ⋃ EE)%S; rot ạ (SS ạ⁻¹)].
 Proof.
 intros.
