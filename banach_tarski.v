@@ -3183,6 +3183,36 @@ split.
  split.
   rewrite fold_right_app.
   intros [HF| HF].
+   unfold union_list, set_eq in HF₁.
+   simpl in HF₁.
+   destruct (HF₁ x) as (HFx & HPx).
+   apply HFx in HF.
+   clear - HF.
+   revert P₂ x HF.
+   induction P₁ as [| P]; intros; [ contradiction | ].
+   simpl in HF; simpl.
+   destruct HF as [HF| HF]; [ left; assumption | right ].
+   apply IHP₁; assumption.
+
+   unfold union_list, set_eq in HF₂.
+   simpl in HF₂.
+   destruct (HF₂ x) as (HFx & HPx).
+   apply HFx in HF.
+   clear - HF.
+   revert P₁ x HF.
+   induction P₂ as [| P]; intros; [ contradiction | ].
+   simpl in HF; simpl.
+   destruct HF as [HF| HF].
+    clear - HF.
+    revert P₂ x HF.
+    induction P₁ as [| Q]; intros; [ left; assumption | right ].
+    apply IHP₁; assumption.
+
+    clear - HF.
+    revert P₂ x HF.
+    induction P₁ as [| Q]; intros; [ right; assumption | simpl; right ].
+    apply IHP₁; assumption.
+
 bbb.
 
 Admitted.
