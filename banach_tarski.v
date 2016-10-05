@@ -2631,19 +2631,13 @@ Definition is_partition {A} {S : set_model A} E Ep :=
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
 
-Class sel_model {A} := mkos
-  { os_fun : A → A }.
-
 Theorem is_partition_group_first_2_together :
   ∀ A s, s = set_equiv →
-  ∀ (R : A → A → Prop),
-  ∀ f, choice_function R f →
-  ∀ os, os = mkos _ f →
   ∀ (F : A → Prop) P₁ P₂ Pl,
   is_partition F (P₁ :: P₂ :: Pl)
   → is_partition F (union P₁ P₂ :: Pl).
 Proof.
-intros * Hs * Hcf * Hos * Hp.
+intros * Hs * Hp.
 destruct Hp as (Hu & Hi).
 split.
  unfold union_list, union, set_eq in Hu |-*.
@@ -2663,6 +2657,9 @@ split.
 
  intros i j Hij.
 bbb.
+
+Class sel_model {A} := mkos
+  { os_fun : A → A }.
 
 Definition EE {os : sel_model} :=
   λ p, all_but_fixpoints p ∧ p = os_fun p.
