@@ -3166,6 +3166,8 @@ exists
    map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
 split; [ eapply r_decomposed_4; try eassumption | ].
 split.
+Check r_decomposed_2_a.
+Check r_decomposed_2_b.
 
 bbb.
 
