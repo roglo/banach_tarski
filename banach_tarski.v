@@ -3046,7 +3046,7 @@ Theorem r_decomposed_2_a_with_E :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos f
-  → is_partition all_but_fixpoints [union (SS ạ) EE; rot ạ (SS ạ⁻¹)].
+  → is_partition all_but_fixpoints [(SS ạ ⋃ EE)%S; rot ạ (SS ạ⁻¹)].
 Proof.
 intros.
 (* ah bin non, EE est dans rot ạ (SS ạ⁻¹)... *)
