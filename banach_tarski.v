@@ -2730,12 +2730,12 @@ split.
    induction P₂ as [| P]; intros; [ contradiction | ].
    simpl in HF; simpl.
    destruct HF as [HF| HF].
-   --clear - HF.
+    clear - HF.
     revert P₂ x HF.
     induction P₁ as [| Q]; intros; [ left; assumption | right ].
     apply IHP₁; assumption.
 
-   --clear - HF.
+    clear - HF.
     revert P₂ x HF.
     induction P₁ as [| Q]; intros; [ right; assumption | simpl; right ].
     apply IHP₁; assumption.
@@ -2755,6 +2755,9 @@ induction P₂ as [| Q]; intros.
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    split; [ | contradiction ].
    intros (H₁ & H₂).
+   destruct HP as (HP, _).
+   unfold intersection in HP.
+
 bbb.
    revert HF₁ HF₂ HFF H₁ H₂; clear; intros.
 bbb.
