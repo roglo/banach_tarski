@@ -2746,6 +2746,7 @@ revert P₁ HP₁ HF₁ Hu.
 induction P₂ as [| Q]; intros.
  left; subst s; apply HF₁; rewrite app_nil_r in Hu; assumption.
 
+bbb.
  assert (HP₂' : ∀ i j : nat, i ≠ j → (P₂ .[ i] ⋂ P₂ .[ j] = ∅)%S).
   subst s.
   intros i j Hij y.
