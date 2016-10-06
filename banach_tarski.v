@@ -2696,10 +2696,10 @@ Qed.
 Theorem partition_union :
   ∀ A s, s = set_equiv →
   ∀ (F₁ F₂ : A → Prop) P₁ P₂,
-  (intersection F₁ F₂ = empty_set)%S
+  (F₁ ⋂ F₂ = ∅)%S
   → is_partition F₁ P₁
   → is_partition F₂ P₂
-  → is_partition (union F₁ F₂) (P₁ ++ P₂).
+  → is_partition (F₁ ⋃ F₂)%S (P₁ ++ P₂).
 Proof.
 intros * Hs F₁ F₂ * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
