@@ -2743,6 +2743,7 @@ split.
  +intros Hu.
   unfold union_list, set_eq in HF₁, HF₂.
   simpl in HF₁, HF₂.
+bbb.
 (*
   clear - HF₁ HF₂ Hu.
 *)
