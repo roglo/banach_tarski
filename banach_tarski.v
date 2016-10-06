@@ -2821,11 +2821,35 @@ split.
  intros x.
  split; intros H.
   destruct H as (H₁, H₂).
+bbb.
 
 Theorem toto : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)) i,
-  ((P₁ ++ P₁).[i] = P₁.[i] ⋃ P₂.[i])%S.
+  ((P₁ ++ P₂).[i] = P₁.[i] ⋃ P₂.[i-length P₁])%S.
 Proof.
 intros * Hs *.
+unfold nth_set, union, set_eq; subst s; simpl.
+intros x.
+bbb.
+
+split; intros H.
+ destruct (lt_dec i (length P₁)) as [H₁| H₁].
+  left.
+  revert P₁ H H₁.
+  induction i; intros.
+   destruct P₁; [ exfalso; revert H₁; apply lt_irrefl | assumption ].
+
+   destruct P₁ as [| P]; [ exfalso; revert H₁; apply Nat.nlt_0_r | ].
+   simpl in H, H₁; simpl.
+   apply Nat.succ_lt_mono in H₁.
+   apply IHi; assumption.
+
+  right.
+  apply Nat.nlt_ge in H₁.
+  destruct (eq_nat_dec i (length P₁)) as [H₂| H₂].
+
+  remember (length P₁ - i)%nat as j eqn:Hj.
+
+  symmetry in Hj; apply Nat.add_sub_eq_nz in Hj.
 bbb.
 
 revert P₁.
