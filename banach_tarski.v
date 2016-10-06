@@ -2622,14 +2622,38 @@ Notation "a = b" := (set_eq a b) : set_scope.
 Notation "'∅'" := (empty_set) : set_scope.
 Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
 Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
-Notation "'⊔' Es" := (union_list Es) (at level 60) : set_scope.
+Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
 Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
 
 Definition is_partition {A} {S : set_model A} E Ep :=
-  (E = ⊔ Ep)%S ∧
+  (E = ∐ Ep)%S ∧
   ∀ i j, i ≠ j → (Ep.[i] ⋂ Ep.[j] = ∅)%S.
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
+
+Theorem set_eq_refl A : reflexive _ (@set_eq A set_equiv).
+Proof. intros P x; split; intros; assumption. Qed.
+
+Theorem set_eq_sym A : symmetric _ (@set_eq A set_equiv).
+Proof.
+intros P₁ P₂ HPP x.
+destruct (HPP x) as (H₁, H₂).
+split; intros H; [ apply H₂, H | apply H₁, H ].
+Qed.
+
+Theorem set_eq_trans A : transitive _ (@set_eq A set_equiv).
+Proof.
+intros P₁ P₂ P₃ H₁₂ H₂₃ x.
+destruct (H₁₂ x) as (H₁, H₂).
+destruct (H₂₃ x) as (H₃, H₄).
+split; intros H; [ apply H₃, H₁, H | apply H₂, H₄, H ].
+Qed.
+
+Add Parametric Relation A : (A → Prop) (@set_eq A set_equiv)
+ reflexivity proved by (set_eq_refl A)
+ symmetry proved by (set_eq_sym A)
+ transitivity proved by (set_eq_trans A)
+ as set_eq_rel.
 
 Theorem union_empty_r : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop), (F ⋃ ∅ = F)%S.
@@ -2638,6 +2662,67 @@ intros * Hs *.
 subst s; intros x.
 split; intros H; [ | left; assumption ].
 destruct H as [H| H]; [ assumption | contradiction ].
+Qed.
+
+Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : A → Prop),
+  (E ⋃ (F ⋃ G) = (E ⋃ F) ⋃ G)%S.
+Proof.
+intros * Hs E *.
+unfold set_eq, union; subst s; intros x.
+split; intros H.
+ destruct H as [H| [H| H]].
+  left; left; assumption.
+  left; right; assumption.
+  right; assumption.
+
+ destruct H as [[H| H]| H].
+  left; assumption.
+  right; left; assumption.
+  right; right; assumption.
+Qed.
+
+Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)),
+  (∐ (P₁ ++ P₂) = (∐ P₁) ⋃ (∐ P₂))%S.
+Proof.
+intros * Hs *.
+revert P₁.
+induction P₂ as [| Q]; intros.
+ rewrite app_nil_r; simpl; subst s.
+ rewrite union_empty_r; reflexivity.
+
+ rewrite cons_comm_app, app_assoc; simpl; subst s.
+ rewrite IHP₂, union_assoc; [ | reflexivity ].
+ intros x.
+ split; intros H.
+  destruct H as [H| H]; [ left | right; assumption ].
+  unfold union_list in H.
+  rewrite fold_right_app in H.
+  simpl in H.
+  clear - H.
+  induction P₁ as [| R P₁].
+   simpl in H; simpl.
+   destruct H as [H| H]; [ right; assumption | contradiction ].
+
+   simpl in H.
+   destruct H as [H| H]; [ simpl; left; left; assumption | ].
+   apply IHP₁ in H.
+   destruct H as [H| H]; [ simpl; left; right; assumption | ].
+   right; assumption.
+
+  destruct H as [H| H]; [ left | right; assumption ].
+  unfold union_list.
+  rewrite fold_right_app; simpl.
+  clear - H.
+  induction P₁ as [| R P₁].
+   simpl in H; simpl; left.
+   destruct H; [ contradiction | assumption ].
+
+   simpl in H; simpl.
+   destruct H.
+    destruct H; [ left; assumption | right ].
+    apply IHP₁; left; assumption.
+
+    right; apply IHP₁; right; assumption.
 Qed.
 
 Theorem is_partition_group_first_2_together :
@@ -2714,17 +2799,16 @@ intros * Hs F₁ F₂ * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
-Theorem toto : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)),
-  (⊔ (P₁ ++ P₂) = union (⊔ P₁) (⊔ P₂))%S.
-Proof.
-intros * Hs *.
-unfold union_list.
-revert P₁.
-induction P₂ as [| Q]; intros.
- rewrite app_nil_r; simpl.
-(**)
- (* prouver que set_equiv est une relation d'équivalence ! *)
- rewrite union_empty_r.
+ subst s; rewrite union_list_app.
+
+bbb.
+
+ pose proof IHP₂ (P₁ ++ [Q]) as H.
+ subst s; rewrite IHP₂; intros x; simpl.
+ split; intros H₁.
+
+Theorem toto : 
+  (∐ (P₁ ++ P₂) ⋃ (∐ P₃) = union (∐ P₁) (∐ P₂))%S.
 
 bbb.
  set (u := fold_right union empty_set P₁).
@@ -3291,7 +3375,7 @@ Notation "a = b" := (set_eq a b) : set_scope.
 Notation "'∅'" := (empty_set) : set_scope.
 Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
 Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
-Notation "'⊔' Es" := (union_list Es) (at level 60) : set_scope.
+Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
 Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
 
 (* "rot ạ" is an example of a member of the group *)
