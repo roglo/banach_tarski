@@ -2821,16 +2821,12 @@ split.
  intros x.
  split; intros H.
   destruct H as (H₁, H₂).
-bbb.
-
 Theorem toto : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)) i,
   ((P₁ ++ P₂).[i] = P₁.[i] ⋃ P₂.[i-length P₁])%S.
 Proof.
 intros * Hs *.
 unfold nth_set, union, set_eq; subst s; simpl.
 intros x.
-bbb.
-
 split; intros H.
  destruct (lt_dec i (length P₁)) as [H₁| H₁].
   left.
@@ -2845,11 +2841,48 @@ split; intros H.
 
   right.
   apply Nat.nlt_ge in H₁.
-  destruct (eq_nat_dec i (length P₁)) as [H₂| H₂].
+  rewrite <- app_nth2; assumption.
 
-  remember (length P₁ - i)%nat as j eqn:Hj.
+ destruct H as [H| H].
+  destruct (lt_dec i (length P₁)) as [H₁| H₁].
+   rewrite app_nth1; assumption.
 
+   exfalso; apply H₁; clear H₁.
+   revert P₁ H.
+   induction i; intros.
+    destruct P₁; [ contradiction | apply Nat.lt_0_succ ].
+
+    destruct P₁ as [| P]; [ contradiction | ].
+    simpl in H; simpl.
+    apply -> Nat.succ_lt_mono.
+    apply IHi, H.
+
+  destruct (lt_dec i (length P₁)) as [H₁| H₁].
+   replace (i - length P₁)%nat with O in H.
+bbb.
+
+   rewrite app_nth1; [ | assumption ].
+destruct P₂; [ contradiction | ].
+simpl in H.
+
+   SearchAbout (_ - _ = 0)%nat.
+
+edestruct Nat.sub_0_le in H.
+
+   apply Nat.nlt_ge in H₁.
+
+   rewrite app_nth2; [ | assumption ].
+
+
+
+
+
+bbb.
+
+  remember (i - length P₁)%nat as j eqn:Hj.
   symmetry in Hj; apply Nat.add_sub_eq_nz in Hj.
+
+
 bbb.
 
 revert P₁.
