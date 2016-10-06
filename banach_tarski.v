@@ -2799,141 +2799,52 @@ intros * Hs F₁ F₂ * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
- subst s; rewrite union_list_app.
+ subst s; rewrite union_list_app; [ | reflexivity ].
+ transitivity (F₁ ⋃ ∐ P₂)%S.
+  intros x.
+  split; intros H.
+   destruct H as [H| H]; [ left; assumption | right ].
+   apply HF₂; assumption.
 
-bbb.
+   destruct H as [H| H]; [ left; assumption | right ].
+   apply HF₂; assumption.
 
- pose proof IHP₂ (P₁ ++ [Q]) as H.
- subst s; rewrite IHP₂; intros x; simpl.
- split; intros H₁.
+  split; intros H.
+   destruct H as [H| H]; [ left | right; assumption ].
+   apply HF₁; assumption.
 
-Theorem toto : 
-  (∐ (P₁ ++ P₂) ⋃ (∐ P₃) = union (∐ P₁) (∐ P₂))%S.
+   destruct H as [H| H]; [ left | right; assumption ].
+   apply HF₁; assumption.
 
-bbb.
- set (u := fold_right union empty_set P₁).
- pose proof union_empty_r A s Hs u as Ht.
- unfold set_eq; subst s; intros x.
- split; apply Ht.
-
- rewrite cons_comm_app, app_assoc.
-
-bbb.
-
- pose proof union_empty_r A s Hs P₁ P₂ as Ht.
- unfold set_eq; subst s; simpl; intros x.
- split; intros H.
-  apply Ht.
-  destruct H as [H| H]; [ left; apply HF₁; assumption | ].
-  right; apply HF₂; assumption.
-
-  unfold union.
-  unfold union_list in H.
-bbb.
-
- unfold union, union_list, set_eq; rewrite Hs; simpl.
-
-Theorem toto : ∀ A l₁ l₂ (x : A) f,
-  (∀ y, f y x = y)
-  → fold_right f x (l₁ ++ l₂) =
-    f (fold_right f x l₁) (fold_right f x l₂).
-Proof.
-intros * Hx.
-rewrite fold_right_app.
-revert l₁ x Hx.
-induction l₂ as [| y l₂]; intros; [ rewrite Hx; reflexivity | simpl ].
-remember (fold_right f x l₁) as u.
-remember (fold_right f x l₂) as v.
-replace (f u (f y v)) with (f (f u y) v).
-subst u v.
-rewrite <- IHl₂.
-bbb.
-
+ intros * Hij.
+ unfold intersection, set_eq; subst s; simpl.
  intros x.
- split.
-  rewrite fold_right_app; subst s.
-  intros [HF| HF].
-   unfold union_list, set_eq in HF₁.
-   simpl in HF₁.
-   destruct (HF₁ x) as (HFx & HPx).
-   apply HFx in HF.
-   clear - HF.
-   revert P₂ x HF.
-   induction P₁ as [| P]; intros; [ contradiction | ].
-   simpl in HF; simpl.
-   destruct HF as [HF| HF]; [ left; assumption | right ].
-   apply IHP₁; assumption.
+ split; intros H.
+  destruct H as (H₁, H₂).
 
-   unfold union_list, set_eq in HF₂.
-   simpl in HF₂.
-   destruct (HF₂ x) as (HFx & HPx).
-   apply HFx in HF.
-   clear - HF.
-   revert P₁ x HF.
-   induction P₂ as [| P]; intros; [ contradiction | ].
-   simpl in HF; simpl.
-   destruct HF as [HF| HF].
-    clear - HF.
-    revert P₂ x HF.
-    induction P₁ as [| Q]; intros; [ left; assumption | right ].
-    apply IHP₁; assumption.
-
-    clear - HF.
-    revert P₂ x HF.
-    induction P₁ as [| Q]; intros; [ right; assumption | simpl; right ].
-    apply IHP₁; assumption.
-
- intros Hu.
+Theorem toto : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)) i,
+  ((P₁ ++ P₁).[i] = P₁.[i] ⋃ P₂.[i])%S.
+Proof.
+intros * Hs *.
 bbb.
 
-(**)
-revert P₁ HP₁ HF₁ Hu.
+revert P₁.
 induction P₂ as [| Q]; intros.
- left; subst s; apply HF₁; rewrite app_nil_r in Hu; assumption.
+ unfold nth_set; simpl.
+ destruct i.
+  destruct P₁.
+   subst s; symmetry.
+   apply union_empty_r; reflexivity.
 
-bbb.
- assert (HP₂' : ∀ i j : nat, i ≠ j → (P₂ .[ i] ⋂ P₂ .[ j] = ∅)%S).
-  subst s.
-  intros i j Hij y.
-  pose proof HP₂ i j Hij y as HP.
-  unfold nth_set in HP |-*; simpl in HP |-*.
-  destruct i.
-   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
-   split; [ | contradiction ].
-   intros (H₁ & H₂).
-   destruct HP as (HP, _).
-   unfold intersection in HP.
+   subst s; symmetry.
+   apply union_empty_r; reflexivity.
 
-bbb.
-   revert HF₁ HF₂ HFF H₁ H₂; clear; intros.
-bbb.
-   apply HP.
-   split.
-bbb.
-  unfold union_list, set_eq in HF₁, HF₂.
-  simpl in HF₁, HF₂.
-(*
-  clear - HF₁ HF₂ Hu.
-*)
-  revert F₁ F₂ P₂ x HP₁ HP₂ HF₁ HF₂ HFF Hu.
-  induction P₁ as [| Q]; intros; [ right; apply HF₂; assumption | ].
-  simpl in Hu.
-  destruct Hu as [Hu| Hu]; [ left; apply HF₁; left; assumption | ].
-  eapply IHP₁; try eassumption.
-   intros i j Hij.
-   pose proof HP₁ i j Hij x as (H₁ & H₂).
-   unfold nth_set, set_eq; simpl.
-   intros y.
-   split; intros HH.
-    destruct HH as (H₃, H₄).
-bbb.
+  induction P₁.
+   subst s; symmetry.
+   apply union_empty_r; reflexivity.
 
-  intros y.
-   split.
-    intros Hy.
-    destruct (HF₁ y) as (HFy & HPy).
-    simpl in HFy.
-    pose proof HFy Hy as [H| H].
+   simpl.
+   subst s; symmetry.
 
 bbb.
 
