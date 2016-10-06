@@ -59,7 +59,7 @@ Section Free_Group.
 Inductive letter := la | lb.
 
 Inductive free_elem := E : letter → bool → free_elem.
-Record F₂ := mkF₂ { str : list free_elem }.
+Record F2 := mkF₂ { str : list free_elem }.
 
 Notation "'ạ'" := (E la false).
 Notation "'ạ⁻¹'" := (E la true).
@@ -2693,6 +2693,81 @@ split.
    split; assumption.
 Qed.
 
+Theorem partition_union :
+  ∀ A s, s = set_equiv →
+  ∀ (F₁ F₂ : A → Prop) P₁ P₂,
+  (intersection F₁ F₂ = empty_set)%S
+  → is_partition F₁ P₁
+  → is_partition F₂ P₂
+  → is_partition (union F₁ F₂) (P₁ ++ P₂).
+Proof.
+intros * Hs F₁ F₂ * HFF HF₁ HF₂.
+destruct HF₁ as (HF₁ & HP₁).
+destruct HF₂ as (HF₂ & HP₂).
+split.
+ unfold union, union_list, set_eq; subst s; simpl.
+ intros x.
+ split.
+  rewrite fold_right_app.
+  intros [HF| HF].
+   unfold union_list, set_eq in HF₁.
+   simpl in HF₁.
+   destruct (HF₁ x) as (HFx & HPx).
+   apply HFx in HF.
+   clear - HF.
+   revert P₂ x HF.
+   induction P₁ as [| P]; intros; [ contradiction | ].
+   simpl in HF; simpl.
+   destruct HF as [HF| HF]; [ left; assumption | right ].
+   apply IHP₁; assumption.
+
+   unfold union_list, set_eq in HF₂.
+   simpl in HF₂.
+   destruct (HF₂ x) as (HFx & HPx).
+   apply HFx in HF.
+   clear - HF.
+   revert P₁ x HF.
+   induction P₂ as [| P]; intros; [ contradiction | ].
+   simpl in HF; simpl.
+   destruct HF as [HF| HF].
+    clear - HF.
+    revert P₂ x HF.
+    induction P₁ as [| Q]; intros; [ left; assumption | right ].
+    apply IHP₁; assumption.
+
+    clear - HF.
+    revert P₂ x HF.
+    induction P₁ as [| Q]; intros; [ right; assumption | simpl; right ].
+    apply IHP₁; assumption.
+
+  intros Hu.
+  unfold union_list, set_eq in HF₁, HF₂.
+  simpl in HF₁, HF₂.
+(*
+  clear - HF₁ HF₂ Hu.
+*)
+  revert F₁ F₂ P₂ x HP₁ HP₂ HF₁ HF₂ HFF Hu.
+  induction P₁ as [| Q]; intros; [ right; apply HF₂; assumption | ].
+  simpl in Hu.
+  destruct Hu as [Hu| Hu]; [ left; apply HF₁; left; assumption | ].
+  eapply IHP₁; try eassumption.
+   intros i j Hij.
+   pose proof HP₁ i j Hij x as (H₁ & H₂).
+   unfold nth_set, set_eq; simpl.
+   intros y.
+   split; intros HH.
+    destruct HH as (H₃, H₄).
+bbb.
+
+  intros y.
+   split.
+    intros Hy.
+    destruct (HF₁ y) as (HFy & HPy).
+    simpl in HFy.
+    pose proof HFy Hy as [H| H].
+
+bbb.
+
 Class sel_model {A} := mkos
   { os_fun : A → A }.
 
@@ -3166,83 +3241,6 @@ exists
    map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
 split; [ eapply r_decomposed_4; try eassumption | ].
 split.
-Theorem partition_union :
-  ∀ A s, s = set_equiv →
-  ∀ (F₁ F₂ : A → Prop) P₁ P₂,
-  (intersection F₁ F₂ = empty_set)%S
-  → is_partition F₁ P₁
-  → is_partition F₂ P₂
-  → is_partition (union F₁ F₂) (P₁ ++ P₂).
-Proof.
-intros * Hs F₁ F₂ * HFF HF₁ HF₂.
-destruct HF₁ as (HF₁ & HP₁).
-destruct HF₂ as (HF₂ & HP₂).
-split.
- unfold union, union_list, set_eq; subst s; simpl.
- intros x.
- split.
-  rewrite fold_right_app.
-  intros [HF| HF].
-   unfold union_list, set_eq in HF₁.
-   simpl in HF₁.
-   destruct (HF₁ x) as (HFx & HPx).
-   apply HFx in HF.
-   clear - HF.
-   revert P₂ x HF.
-   induction P₁ as [| P]; intros; [ contradiction | ].
-   simpl in HF; simpl.
-   destruct HF as [HF| HF]; [ left; assumption | right ].
-   apply IHP₁; assumption.
-
-   unfold union_list, set_eq in HF₂.
-   simpl in HF₂.
-   destruct (HF₂ x) as (HFx & HPx).
-   apply HFx in HF.
-   clear - HF.
-   revert P₁ x HF.
-   induction P₂ as [| P]; intros; [ contradiction | ].
-   simpl in HF; simpl.
-   destruct HF as [HF| HF].
-    clear - HF.
-    revert P₂ x HF.
-    induction P₁ as [| Q]; intros; [ left; assumption | right ].
-    apply IHP₁; assumption.
-
-    clear - HF.
-    revert P₂ x HF.
-    induction P₁ as [| Q]; intros; [ right; assumption | simpl; right ].
-    apply IHP₁; assumption.
-
-  intros Hu.
-  unfold union_list, set_eq in HF₁, HF₂.
-  simpl in HF₁, HF₂.
-(*
-  clear - HF₁ HF₂ Hu.
-*)
-  revert F₁ F₂ P₂ x HP₁ HP₂ HF₁ HF₂ HFF Hu.
-  induction P₁ as [| Q]; intros; [ right; apply HF₂; assumption | ].
-  rename F₂0 into F₂.
-  simpl in Hu.
-  destruct Hu as [Hu| Hu]; [ left; apply HF₁; left; assumption | ].
-  eapply IHP₁; try eassumption.
-   intros i j Hij.
-   pose proof HP₁ i j Hij x as (H₁ & H₂).
-   unfold nth_set, set_eq; simpl.
-   intros y.
-   split; intros HH.
-    destruct HH as (H₃, H₄).
-bbb.
-
-  intros y.
-   split.
-    intros Hy.
-    destruct (HF₁ y) as (HFy & HPy).
-    simpl in HFy.
-    pose proof HFy Hy as [H| H].
-
-bbb.
-
-Admitted.
  pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
  pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
 Theorem toto : ∀ A s, s = set_equiv →
