@@ -2755,6 +2755,7 @@ induction P₂ as [| Q]; intros.
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    split; [ | contradiction ].
    intros (H₁ & H₂).
+bbb.
    revert HF₁ HF₂ HFF H₁ H₂; clear; intros.
 bbb.
    apply HP.
