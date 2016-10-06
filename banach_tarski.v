@@ -2631,6 +2631,15 @@ Definition is_partition {A} {S : set_model A} E Ep :=
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
 
+Theorem union_empty_r : ∀ A s, s = set_equiv →
+  ∀ (F : A → Prop), (F ⋃ ∅ = F)%S.
+Proof.
+intros * Hs *.
+subst s; intros x.
+split; intros H; [ | left; assumption ].
+destruct H as [H| H]; [ assumption | contradiction ].
+Qed.
+
 Theorem is_partition_group_first_2_together :
   ∀ A s, s = set_equiv →
   ∀ (F : A → Prop) P₁ P₂ Pl,
@@ -2705,6 +2714,39 @@ intros * Hs F₁ F₂ * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
+Theorem toto : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)),
+  (⊔ (P₁ ++ P₂) = union (⊔ P₁) (⊔ P₂))%S.
+Proof.
+intros * Hs *.
+unfold union_list.
+revert P₁.
+induction P₂ as [| Q]; intros.
+ rewrite app_nil_r; simpl.
+(**)
+ (* prouver que set_equiv est une relation d'équivalence ! *)
+ rewrite union_empty_r.
+
+bbb.
+ set (u := fold_right union empty_set P₁).
+ pose proof union_empty_r A s Hs u as Ht.
+ unfold set_eq; subst s; intros x.
+ split; apply Ht.
+
+ rewrite cons_comm_app, app_assoc.
+
+bbb.
+
+ pose proof union_empty_r A s Hs P₁ P₂ as Ht.
+ unfold set_eq; subst s; simpl; intros x.
+ split; intros H.
+  apply Ht.
+  destruct H as [H| H]; [ left; apply HF₁; assumption | ].
+  right; apply HF₂; assumption.
+
+  unfold union.
+  unfold union_list in H.
+bbb.
+
  unfold union, union_list, set_eq; rewrite Hs; simpl.
 
 Theorem toto : ∀ A l₁ l₂ (x : A) f,
