@@ -2705,10 +2705,10 @@ intros * Hs F₁ F₂ * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
--unfold union, union_list, set_eq; subst s; simpl.
+-unfold union, union_list, set_eq; rewrite Hs; simpl.
  intros x.
  split.
- +rewrite fold_right_app.
+ +rewrite fold_right_app; subst s.
   intros [HF| HF].
   *unfold union_list, set_eq in HF₁.
    simpl in HF₁.
@@ -2741,9 +2741,27 @@ split.
     apply IHP₁; assumption.
 
  +intros Hu.
+(**)
+revert P₁ HP₁ HF₁ Hu.
+induction P₂ as [| Q]; intros.
+ left; subst s; apply HF₁; rewrite app_nil_r in Hu; assumption.
+
+ assert (HP₂' : ∀ i j : nat, i ≠ j → (P₂ .[ i] ⋂ P₂ .[ j] = ∅)%S).
+  subst s.
+  intros i j Hij y.
+  pose proof HP₂ i j Hij y as HP.
+  unfold nth_set in HP |-*; simpl in HP |-*.
+  destruct i.
+   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+   split; [ | contradiction ].
+   intros (H₁ & H₂).
+   revert HF₁ HF₂ HFF H₁ H₂; clear; intros.
+bbb.
+   apply HP.
+   split.
+bbb.
   unfold union_list, set_eq in HF₁, HF₂.
   simpl in HF₁, HF₂.
-bbb.
 (*
   clear - HF₁ HF₂ Hu.
 *)
