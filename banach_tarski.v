@@ -2705,12 +2705,29 @@ intros * Hs F₁ F₂ * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
--unfold union, union_list, set_eq; rewrite Hs; simpl.
+ unfold union, union_list, set_eq; rewrite Hs; simpl.
+
+Theorem toto : ∀ A l₁ l₂ (x : A) f,
+  (∀ y, f y x = y)
+  → fold_right f x (l₁ ++ l₂) =
+    f (fold_right f x l₁) (fold_right f x l₂).
+Proof.
+intros * Hx.
+rewrite fold_right_app.
+revert l₁ x Hx.
+induction l₂ as [| y l₂]; intros; [ rewrite Hx; reflexivity | simpl ].
+remember (fold_right f x l₁) as u.
+remember (fold_right f x l₂) as v.
+replace (f u (f y v)) with (f (f u y) v).
+subst u v.
+rewrite <- IHl₂.
+bbb.
+
  intros x.
  split.
- +rewrite fold_right_app; subst s.
+  rewrite fold_right_app; subst s.
   intros [HF| HF].
-  *unfold union_list, set_eq in HF₁.
+   unfold union_list, set_eq in HF₁.
    simpl in HF₁.
    destruct (HF₁ x) as (HFx & HPx).
    apply HFx in HF.
@@ -2721,7 +2738,7 @@ split.
    destruct HF as [HF| HF]; [ left; assumption | right ].
    apply IHP₁; assumption.
 
-  *unfold union_list, set_eq in HF₂.
+   unfold union_list, set_eq in HF₂.
    simpl in HF₂.
    destruct (HF₂ x) as (HFx & HPx).
    apply HFx in HF.
@@ -2740,7 +2757,9 @@ split.
     induction P₁ as [| Q]; intros; [ right; assumption | simpl; right ].
     apply IHP₁; assumption.
 
- +intros Hu.
+ intros Hu.
+bbb.
+
 (**)
 revert P₁ HP₁ HF₁ Hu.
 induction P₂ as [| Q]; intros.
