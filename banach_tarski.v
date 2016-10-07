@@ -2104,7 +2104,7 @@ Qed.
 Definition on_sphere_ray r '(P x y z) := (x² + y² + z² = r)%R.
 Definition on_sphere '(P x y z) := (x² + y² + z² = 1)%R.
 
-Theorem toto : ∀ el,
+Theorem tagada : ∀ el,
   el ≠ []
   → norm_list el = el
   → ∃ p₁ p₂, on_sphere p₁ ∧ on_sphere p₂ ∧ ∀ p, on_sphere p →
@@ -2305,6 +2305,15 @@ progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
 split; [ f_equal; field | field ].
 Qed.
 
+Theorem rotate_is_rotation_matrix : ∀ e, is_rotation_matrix (mat_of_elem e).
+Proof.
+intros (t, d); destruct t, d.
+ apply rot_inv_x_is_rotation_matrix.
+ apply rot_x_is_rotation_matrix.
+ apply rot_inv_z_is_rotation_matrix.
+ apply rot_z_is_rotation_matrix.
+Qed.
+
 Theorem path_is_rotation : ∀ el m,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
   → is_rotation_matrix m.
@@ -2327,11 +2336,7 @@ induction el as [| e]; intros.
  setoid_rewrite <- mat_mul_assoc at 2.
  rewrite Hr, mat_mul_id_r.
  rewrite mat_det_mul, Hd, Rmult_1_l.
- destruct e as (t, d); destruct t, d; simpl.
-  apply rot_inv_x_is_rotation_matrix.
-  apply rot_x_is_rotation_matrix.
-  apply rot_inv_z_is_rotation_matrix.
-  apply rot_z_is_rotation_matrix.
+ apply rotate_is_rotation_matrix.
 Qed.
 
 (* sources:
@@ -2605,6 +2610,50 @@ Definition all_but_fixpoints p :=
   in_sphere p ∧
   ∀ el p₁, same_orbit p p₁
   → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
+
+Theorem on_sphere_ray_after_rotation : ∀ p m r,
+  on_sphere_ray r p
+  → is_rotation_matrix m
+  → on_sphere_ray r (mat_vec_mul m p).
+Proof.
+intros * His Hm.
+destruct p as (x, y, z).
+unfold on_sphere_ray in His.
+unfold on_sphere_ray; simpl.
+unfold is_rotation_matrix in Hm.
+destruct Hm as (Hm, Hd).
+unfold mat_det in Hd.
+unfold mat_mul, mat_id in Hm; simpl in Hm.
+injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+nsatz.
+Qed.
+
+Theorem in_sphere_after_rotation : ∀ p m,
+  in_sphere p
+  → is_rotation_matrix m
+  → in_sphere (mat_vec_mul m p).
+Proof.
+intros * His Hrm.
+destruct p as (x, y, z).
+remember (P x y z) as p eqn:HP.
+remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
+assert (Hos : on_sphere_ray r p) by (subst p; assumption).
+pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
+unfold in_sphere in His.
+unfold on_sphere_ray in H.
+unfold in_sphere.
+subst p; simpl in *.
+rewrite H, <- Hos; assumption.
+Qed.
+
+Theorem in_sphere_after_rotate : ∀ p e,
+  in_sphere p
+  → in_sphere (rotate e p).
+Proof.
+intros * His.
+apply in_sphere_after_rotation; [ assumption | ].
+apply rotate_is_rotation_matrix.
+Qed.
 
 Delimit Scope set_scope with S.
 
@@ -3237,70 +3286,13 @@ split.
    right; left.
    unfold rot, SS.
    split.
-(**)
-split.
- destruct Hnf as (His, _).
-Theorem on_sphere_ray_after_rotation : ∀ p m r,
-  on_sphere_ray r p
-  → is_rotation_matrix m
-  → on_sphere_ray r (mat_vec_mul m p).
-Proof.
-intros * His Hm.
-destruct p as (x, y, z).
-unfold on_sphere_ray in His.
-unfold on_sphere_ray; simpl.
-unfold is_rotation_matrix in Hm.
-destruct Hm as (Hm, Hd).
-unfold mat_det in Hd.
-unfold mat_mul, mat_id in Hm; simpl in Hm.
-injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-nsatz.
-Qed.
+    split.
+     destruct Hnf as (His, _).
+     apply in_sphere_after_rotate; assumption.
 
-Theorem in_sphere_after_rotation : ∀ p m,
-  in_sphere p
-  → is_rotation_matrix m
-  → in_sphere (mat_vec_mul m p).
-Proof.
-intros * His Hrm.
-destruct p as (x, y, z).
-remember (P x y z) as p eqn:HP.
-remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : on_sphere_ray r p) by (subst p; assumption).
-pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
-unfold in_sphere in His.
-unfold on_sphere_ray in H.
-unfold in_sphere.
-subst p; simpl in *.
-rewrite H, <- Hos; assumption.
-Qed.
-
-Theorem in_sphere_after_rotate : ∀ p e,
-  in_sphere p
-  → in_sphere (rotate e p).
-Proof.
-intros * His.
+     intros el₁ p₁ Hp Hn.
+     apply Hnf; [ | assumption ].
 bbb.
-destruct p as (x, y, z).
-remember (x² + y² + z²)%R as r eqn:Hr.
-pose proof on_sphere_ray_after_rotation (P x y z) (mat_of_elem e) r as H.
-bbb.
-
-destruct p as (x, y, z).
-simpl in His |-*.
-do 3 rewrite Rsqr_pow2 in His; simpl in His.
-progress repeat rewrite Rmult_1_r in His.
-do 3 rewrite Rsqr_pow2; simpl.
-ring_simplify; simpl.
-progress repeat rewrite Rmult_1_r; simpl.
-destruct e as (t, d); destruct t, d; simpl.
- ring_simplify.
-bbb.
-
-   apply in_sphere_after_rotate; assumption.
-bbb.
-    intros el₁ p₁ Hp Hn.
-    apply Hnf; [ | assumption ].
     destruct Hp as (el₂ & Hp).
     exists (el₂ ++ [negf e]).
     rewrite fold_right_app; assumption.
