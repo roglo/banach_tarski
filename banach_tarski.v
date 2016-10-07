@@ -3257,11 +3257,27 @@ injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 nsatz.
 Qed.
 
+Theorem in_sphere_after_rotation : ∀ p m,
+  in_sphere p
+  → is_rotation_matrix m
+  → in_sphere (mat_vec_mul m p).
+Proof.
+intros * His Hrm.
+destruct p as (x, y, z).
+remember (P x y z) as p eqn:HP.
+remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
+assert (Hos : on_sphere_ray r p) by (subst p; assumption).
+pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
+clear - His H.
+
+bbb.
+
 Theorem in_sphere_after_rotate : ∀ p e,
   in_sphere p
   → in_sphere (rotate e p).
 Proof.
 intros * His.
+bbb.
 destruct p as (x, y, z).
 remember (x² + y² + z²)%R as r eqn:Hr.
 pose proof on_sphere_ray_after_rotation (P x y z) (mat_of_elem e) r as H.
