@@ -3292,10 +3292,9 @@ split.
 
      intros el₁ p₁ Hp Hn.
      apply Hnf; [ | assumption ].
-bbb.
-    destruct Hp as (el₂ & Hp).
-    exists (el₂ ++ [negf e]).
-    rewrite fold_right_app; assumption.
+     destruct Hp as (el₂ & Hp).
+     exists (el₂ ++ [negf e]).
+     rewrite fold_right_app; assumption.
 
     exists (negf e :: []), [].
     split; [ reflexivity | simpl ].
@@ -3312,11 +3311,15 @@ bbb.
      right; left.
      unfold rot, SS.
      split.
-      intros el₂ p₁ Hp Hn.
-      apply Hnf; [ | assumption ].
-      destruct Hp as (el₃ & Hp).
-      exists (el₃ ++ [negf e]).
-      rewrite fold_right_app; assumption.
+      split.
+       destruct Hnf as (His, _).
+       apply in_sphere_after_rotate; assumption.
+
+       intros el₂ p₁ Hp Hn.
+       apply Hnf; [ | assumption ].
+       destruct Hp as (el₃ & Hp).
+       exists (el₃ ++ [negf e]).
+       rewrite fold_right_app; assumption.
 
       assert (H : f p = f (rotate (negf e) p)).
        apply Hoe.
@@ -3334,11 +3337,16 @@ bbb.
 
  -intros Hul.
   destruct Hul as [(H, _)| [(H, _)| Hul]]; [ assumption | | contradiction ].
-  intros el p₁ Hso Hn.
-  apply H; [ | assumption ].
-  etransitivity; [ | eassumption ].
-  exists (e :: []).
-  apply rotate_rotate_neg.
+  split.
+   destruct H as (His, _).
+   apply in_sphere_after_rotate with (e := e) in His.
+   rewrite rotate_rotate_neg in His; assumption.
+
+   intros el p₁ Hso Hn.
+   apply H; [ | assumption ].
+   etransitivity; [ | eassumption ].
+   exists (e :: []).
+   apply rotate_rotate_neg.
 
 *intros i j Hij p.
  split; [ | contradiction ].
@@ -3468,7 +3476,9 @@ Show.
   split; [ intros (H₁, H₂) | contradiction ].
   unfold xtransl in H₁, H₂.
   unfold empty_set; simpl.
-unfold all_but_fixpoints in H₁, H₂.
+  destruct H₁ as (H₁, H₃).
+  destruct H₂ as (H₂, H₄).
+  unfold in_sphere in H₁.
 
 bbb.
 
