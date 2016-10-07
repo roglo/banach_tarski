@@ -2598,7 +2598,10 @@ Record choice_function {A} (R : A → A → Prop) f := mkcf
 
 Definition orbit_selector := choice_function same_orbit.
 
+Definition in_sphere '(P x y z) := (x² + y² + z² <= 1)%R.
+
 Definition all_but_fixpoints p :=
+  in_sphere p ∧
   ∀ el p₁, same_orbit p p₁
   → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
 
@@ -3081,7 +3084,9 @@ split.
 
  -intros Hul.
   unfold union_list in Hul; simpl in Hul; unfold union in Hul.
+(*
   intros el Hel.
+*)
   destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
   +destruct Hul as (Hnf, Hul); simpl in Hul.
    apply Hnf; assumption.
@@ -3231,6 +3236,28 @@ split.
    right; left.
    unfold rot, SS.
    split.
+(**)
+split.
+ destruct Hnf as (His, _).
+Theorem in_sphere_after_rotate : ∀ p e,
+  in_sphere p
+  → in_sphere (rotate e p).
+Proof.
+intros * His.
+destruct p as (x, y, z).
+simpl in His |-*.
+destruct e as (t, d); destruct t, d; simpl.
+ progress repeat rewrite Rmult_0_l.
+ progress repeat rewrite Rmult_1_l.
+ progress repeat rewrite Rplus_0_l.
+ progress repeat rewrite Rplus_0_r.
+ do 3 rewrite Rsqr_pow2.
+ do 2 rewrite binomial; simpl.
+ unfold C; simpl.
+bbb.
+
+   apply in_sphere_after_rotate; assumption.
+bbb.
     intros el₁ p₁ Hp Hn.
     apply Hnf; [ | assumption ].
     destruct Hp as (el₂ & Hp).
@@ -3408,6 +3435,7 @@ Show.
   split; [ intros (H₁, H₂) | contradiction ].
   unfold xtransl in H₁, H₂.
   unfold empty_set; simpl.
+unfold all_but_fixpoints in H₁, H₂.
 
 bbb.
 
