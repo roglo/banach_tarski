@@ -3239,6 +3239,25 @@ split.
 (**)
 split.
  destruct Hnf as (His, _).
+Theorem on_sphere_after_rotation : ∀ p m,
+  on_sphere p
+  → is_rotation_matrix m
+  → on_sphere (mat_vec_mul m p).
+Proof.
+intros * His Hm.
+destruct p as (x, y, z).
+unfold on_sphere in His.
+unfold on_sphere; simpl.
+unfold is_rotation_matrix in Hm.
+destruct Hm as (Hm, Hd).
+unfold mat_det in Hd.
+unfold mat_mul, mat_id in Hm; simpl in Hm.
+injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+nsatz.
+Qed.
+
+bbb.
+
 Theorem in_sphere_after_rotate : ∀ p e,
   in_sphere p
   → in_sphere (rotate e p).
