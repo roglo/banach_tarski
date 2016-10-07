@@ -3401,9 +3401,13 @@ Admitted.
 Show.
  apply toto with (g := xtransl 3) in Ha; simpl in Ha; [ | assumption ].
  apply toto with (g := xtransl 6) in Hb; simpl in Hb; [ | assumption ].
- eapply partition_union in Ha; try eassumption.
-  simpl in Ha.
-  subst s; rewrite union_comm in Ha; [ | reflexivity ].
+ eapply partition_union in Hb; [ | apply Hs | | apply Ha ].
+  assumption.
+
+  unfold intersection, set_eq; subst s; intros (x, y, z).
+  split; [ intros (H₁, H₂) | contradiction ].
+  unfold xtransl in H₁, H₂.
+  unfold empty_set; simpl.
 
 bbb.
 
