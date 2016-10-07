@@ -2101,6 +2101,7 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
      * rewrite app_length, length_rev_path; assumption.
 Qed.
 
+Definition on_sphere_ray r '(P x y z) := (x² + y² + z² = r)%R.
 Definition on_sphere '(P x y z) := (x² + y² + z² = 1)%R.
 
 Theorem toto : ∀ el,
@@ -3239,15 +3240,15 @@ split.
 (**)
 split.
  destruct Hnf as (His, _).
-Theorem on_sphere_after_rotation : ∀ p m,
-  on_sphere p
+Theorem on_sphere_ray_after_rotation : ∀ p m r,
+  on_sphere_ray r p
   → is_rotation_matrix m
-  → on_sphere (mat_vec_mul m p).
+  → on_sphere_ray r (mat_vec_mul m p).
 Proof.
 intros * His Hm.
 destruct p as (x, y, z).
-unfold on_sphere in His.
-unfold on_sphere; simpl.
+unfold on_sphere_ray in His.
+unfold on_sphere_ray; simpl.
 unfold is_rotation_matrix in Hm.
 destruct Hm as (Hm, Hd).
 unfold mat_det in Hd.
@@ -3256,13 +3257,16 @@ injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 nsatz.
 Qed.
 
-bbb.
-
 Theorem in_sphere_after_rotate : ∀ p e,
   in_sphere p
   → in_sphere (rotate e p).
 Proof.
 intros * His.
+destruct p as (x, y, z).
+remember (x² + y² + z²)%R as r eqn:Hr.
+pose proof on_sphere_ray_after_rotation (P x y z) (mat_of_elem e) r as H.
+bbb.
+
 destruct p as (x, y, z).
 simpl in His |-*.
 do 3 rewrite Rsqr_pow2 in His; simpl in His.
