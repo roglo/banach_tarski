@@ -2623,7 +2623,8 @@ Notation "'∅'" := (empty_set) : set_scope.
 Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
 Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
 Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
-Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
+Notation "E .[ i ]" := (nth_set i E) (at level 1, format "E .[ i ]")
+: set_scope.
 
 Definition is_partition {A} {S : set_model A} E Ep :=
   (E = ∐ Ep)%S ∧
@@ -2725,6 +2726,31 @@ induction P₂ as [| Q]; intros.
     right; apply IHP₁; right; assumption.
 Qed.
 
+Theorem nth_set_union_list : ∀ A (P : list (A → Prop)) i x,
+  i < length P → (P.[i])%S x → (∐ P)%S x.
+Proof.
+intros A P i x Hi H.
+revert P H Hi.
+induction i; intros P H Hi.
+ destruct P as [| E P]; [ contradiction | left; assumption ].
+
+ destruct P as [| E P]; [ contradiction | simpl in Hi ].
+ apply Nat.succ_lt_mono in Hi.
+ right; apply IHi; assumption.
+Qed.
+
+Theorem nth_set_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)) i,
+  ((P₁ ++ P₂).[i] =
+   if lt_dec i (length P₁) then P₁.[i] else P₂.[i-length P₁])%S.
+Proof.
+intros * Hs *.
+unfold nth_set, union, set_eq; subst s; simpl; intros.
+destruct (lt_dec i (length P₁)) as [H₁| H₁].
+ rewrite app_nth1; [ reflexivity | assumption ].
+
+ rewrite app_nth2; [ reflexivity | apply Nat.nlt_ge; assumption ].
+Qed.
+
 Theorem is_partition_group_first_2_together :
   ∀ A s, s = set_equiv →
   ∀ (F : A → Prop) P₁ P₂ Pl,
@@ -2821,88 +2847,18 @@ split.
  intros x.
  split; intros H.
   destruct H as (H₁, H₂).
-Theorem toto : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)) i,
-  ((P₁ ++ P₂).[i] = P₁.[i] ⋃ P₂.[i-length P₁])%S.
-Proof.
-intros * Hs *.
-unfold nth_set, union, set_eq; subst s; simpl.
-intros x.
-split; intros H.
- destruct (lt_dec i (length P₁)) as [H₁| H₁].
-  left.
-  revert P₁ H H₁.
-  induction i; intros.
-   destruct P₁; [ exfalso; revert H₁; apply lt_irrefl | assumption ].
+  apply (nth_set_app _ _ eq_refl) in H₁.
+  apply (nth_set_app _ _ eq_refl) in H₂.
+  destruct (lt_dec i (length P₁)) as [H₃| H₃].
+   destruct (lt_dec j (length P₁)) as [H₄| H₄].
+    eapply HP₁; [ eassumption | split; assumption ].
 
-   destruct P₁ as [| P]; [ exfalso; revert H₁; apply Nat.nlt_0_r | ].
-   simpl in H, H₁; simpl.
-   apply Nat.succ_lt_mono in H₁.
-   apply IHi; assumption.
+    apply HFF.
+    split.
+     apply HF₁.
+     eapply nth_set_union_list; eassumption.
 
-  right.
-  apply Nat.nlt_ge in H₁.
-  rewrite <- app_nth2; assumption.
-
- destruct H as [H| H].
-  destruct (lt_dec i (length P₁)) as [H₁| H₁].
-   rewrite app_nth1; assumption.
-
-   exfalso; apply H₁; clear H₁.
-   revert P₁ H.
-   induction i; intros.
-    destruct P₁; [ contradiction | apply Nat.lt_0_succ ].
-
-    destruct P₁ as [| P]; [ contradiction | ].
-    simpl in H; simpl.
-    apply -> Nat.succ_lt_mono.
-    apply IHi, H.
-
-  destruct (lt_dec i (length P₁)) as [H₁| H₁].
-   replace (i - length P₁)%nat with O in H.
-bbb.
-
-   rewrite app_nth1; [ | assumption ].
-destruct P₂; [ contradiction | ].
-simpl in H.
-
-   SearchAbout (_ - _ = 0)%nat.
-
-edestruct Nat.sub_0_le in H.
-
-   apply Nat.nlt_ge in H₁.
-
-   rewrite app_nth2; [ | assumption ].
-
-
-
-
-
-bbb.
-
-  remember (i - length P₁)%nat as j eqn:Hj.
-  symmetry in Hj; apply Nat.add_sub_eq_nz in Hj.
-
-
-bbb.
-
-revert P₁.
-induction P₂ as [| Q]; intros.
- unfold nth_set; simpl.
- destruct i.
-  destruct P₁.
-   subst s; symmetry.
-   apply union_empty_r; reflexivity.
-
-   subst s; symmetry.
-   apply union_empty_r; reflexivity.
-
-  induction P₁.
-   subst s; symmetry.
-   apply union_empty_r; reflexivity.
-
-   simpl.
-   subst s; symmetry.
-
+     apply Nat.nlt_ge in H₄.
 bbb.
 
 Class sel_model {A} := mkos
