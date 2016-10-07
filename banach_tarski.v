@@ -3246,14 +3246,13 @@ Proof.
 intros * His.
 destruct p as (x, y, z).
 simpl in His |-*.
+do 3 rewrite Rsqr_pow2 in His; simpl in His.
+progress repeat rewrite Rmult_1_r in His.
+do 3 rewrite Rsqr_pow2; simpl.
+ring_simplify; simpl.
+progress repeat rewrite Rmult_1_r; simpl.
 destruct e as (t, d); destruct t, d; simpl.
- progress repeat rewrite Rmult_0_l.
- progress repeat rewrite Rmult_1_l.
- progress repeat rewrite Rplus_0_l.
- progress repeat rewrite Rplus_0_r.
- do 3 rewrite Rsqr_pow2.
- do 2 rewrite binomial; simpl.
- unfold C; simpl.
+ ring_simplify.
 bbb.
 
    apply in_sphere_after_rotate; assumption.
