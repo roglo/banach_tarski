@@ -2665,6 +2665,13 @@ split; intros H; [ | left; assumption ].
 destruct H as [H| H]; [ assumption | contradiction ].
 Qed.
 
+Theorem union_comm : ∀ A s, s = set_equiv → ∀ (E F : A → Prop),
+  (E ⋃ F = F ⋃ E)%S.
+Proof.
+intros * Hs E *; subst s; intros x.
+apply or_comm.
+Qed.
+
 Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : A → Prop),
   (E ⋃ (F ⋃ G) = (E ⋃ F) ⋃ G)%S.
 Proof.
@@ -2845,21 +2852,52 @@ split.
  intros * Hij.
  unfold intersection, set_eq; subst s; simpl.
  intros x.
- split; intros H.
-  destruct H as (H₁, H₂).
-  apply (nth_set_app _ _ eq_refl) in H₁.
-  apply (nth_set_app _ _ eq_refl) in H₂.
-  destruct (lt_dec i (length P₁)) as [H₃| H₃].
-   destruct (lt_dec j (length P₁)) as [H₄| H₄].
-    eapply HP₁; [ eassumption | split; assumption ].
+ split; intros H; [ | contradiction ].
+ destruct H as (H₁, H₂).
+ apply (nth_set_app _ _ eq_refl) in H₁.
+ apply (nth_set_app _ _ eq_refl) in H₂.
+ destruct (lt_dec i (length P₁)) as [H₃| H₃].
+  destruct (lt_dec j (length P₁)) as [H₄| H₄].
+   eapply HP₁; [ eassumption | split; assumption ].
 
-    apply HFF.
-    split.
-     apply HF₁.
+   apply HFF.
+   split.
+    apply HF₁.
+    eapply nth_set_union_list; eassumption.
+
+    destruct (lt_dec (j - length P₁) (length P₂)) as [H₅| H₅].
+     apply HF₂.
      eapply nth_set_union_list; eassumption.
 
-     apply Nat.nlt_ge in H₄.
-bbb.
+     apply Nat.nlt_ge in H₅.
+     unfold nth_set in H₂.
+     rewrite nth_overflow in H₂; [ contradiction | assumption ].
+
+  apply Nat.nlt_ge in H₃.
+  destruct (lt_dec j (length P₁)) as [H₄| H₄].
+   apply HFF.
+   split.
+    apply HF₁.
+    eapply nth_set_union_list; eassumption.
+
+    destruct (lt_dec (i - length P₁) (length P₂)) as [H₅| H₅].
+     apply HF₂.
+     eapply nth_set_union_list; eassumption.
+
+     apply Nat.nlt_ge in H₅.
+     unfold nth_set in H₁.
+     rewrite nth_overflow in H₁; [ contradiction | assumption ].
+
+   apply Nat.nlt_ge in H₄.
+   eapply HP₂; [ | split; [ apply H₁ | apply H₂] ].
+   intros H.
+   apply Nat.add_cancel_l with (p := length P₁) in H.
+   rewrite Nat.add_sub_assoc in H; [ | assumption ].
+   rewrite Nat.add_sub_assoc in H; [ | assumption ].
+   rewrite Nat.add_comm, Nat.add_sub in H.
+   rewrite Nat.add_comm, Nat.add_sub in H.
+   contradiction.
+Qed.
 
 Class sel_model {A} := mkos
   { os_fun : A → A }.
@@ -3288,6 +3326,25 @@ End Orbit.
 
 Section Equidecomposability.
 
+Add Parametric Morphism {A} : (@is_partition A set_equiv)
+  with signature @set_eq A set_equiv ==> eq ==> iff
+  as is_partition_morph.
+Proof.
+intros E F HEF P.
+unfold is_partition.
+unfold set_eq in HEF; simpl in HEF.
+unfold set_eq; simpl.
+split; intros (H₁, H₂).
+ split; [ | assumption ].
+ intros x.
+ split; intros H; [ apply H₁, HEF; assumption | apply HEF, H₁; assumption ].
+
+ split; [ | assumption ].
+ intros x.
+ split; intros H; [ apply H₁, HEF; assumption | apply HEF, H₁; assumption ].
+Qed.
+
+
 Delimit Scope set_scope with S.
 
 Notation "'ạ'" := (E la false).
@@ -3342,10 +3399,11 @@ Theorem toto : ∀ A s, s = set_equiv →
   (* probably missing that g is member of a "good" group *)
 Admitted.
 Show.
- apply toto with (g := xtransl 3) in Ha; simpl in Ha.
- apply toto with (g := xtransl 6) in Hb; simpl in Hb.
+ apply toto with (g := xtransl 3) in Ha; simpl in Ha; [ | assumption ].
+ apply toto with (g := xtransl 6) in Hb; simpl in Hb; [ | assumption ].
  eapply partition_union in Ha; try eassumption.
   simpl in Ha.
+  subst s; rewrite union_comm in Ha; [ | reflexivity ].
 
 bbb.
 
