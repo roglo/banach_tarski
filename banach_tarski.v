@@ -3268,9 +3268,12 @@ remember (P x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
 assert (Hos : on_sphere_ray r p) by (subst p; assumption).
 pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
-clear - His H.
-
-bbb.
+unfold in_sphere in His.
+unfold on_sphere_ray in H.
+unfold in_sphere.
+subst p; simpl in *.
+rewrite H, <- Hos; assumption.
+Qed.
 
 Theorem in_sphere_after_rotate : ∀ p e,
   in_sphere p
