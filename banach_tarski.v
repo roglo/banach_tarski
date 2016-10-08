@@ -767,6 +767,9 @@ Notation "'√'" := sqrt.
 Arguments Nat.modulo _ _ : simpl nomatch.
 Arguments Z.mul _ _ : simpl nomatch.
 
+Theorem Rsub_add : ∀ x y, (x - y + y = x)%R.
+Proof. intros; lra. Qed.
+
 Theorem Rdiv_0_l : ∀ x, (0 / x = 0)%R.
 Proof.
 intros x; unfold Rdiv; apply Rmult_0_l.
@@ -899,7 +902,11 @@ Definition mat_of_elem e :=
   | ḅ⁻¹ => rot_inv_z
   end.
 
-Definition rotate e pt := mat_vec_mul (mat_of_elem e) pt.
+Definition vec_add '(P x y z) '(P x' y' z') := P (x + x') (y + y') (z + z').
+Definition vec_sub '(P x y z) '(P x' y' z') := P (x - x') (y - y') (z - z').
+
+Definition rotate c e pt :=
+  vec_add (mat_vec_mul (mat_of_elem e) (vec_sub pt c)) c.
 
 Definition rev_path el := map negf (rev el).
 
@@ -932,6 +939,18 @@ Definition mat_id :=
 Delimit Scope mat_scope with mat.
 Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
 
+Theorem vec_sub_add : ∀ p₁ p₂, vec_sub (vec_add p₁ p₂) p₂ = p₁.
+Proof.
+intros (x₁, y₁, z₁) (x₂, y₂, z₂); simpl.
+f_equal; lra.
+Qed.
+
+Theorem vec_add_sub : ∀ p₁ p₂, vec_add (vec_sub p₁ p₂) p₂ = p₁.
+Proof.
+intros (x₁, y₁, z₁) (x₂, y₂, z₂); simpl.
+f_equal; lra.
+Qed.
+
 Theorem mat_mul_id_r : ∀ m, mat_mul m mat_id = m.
 Proof.
 intros m.
@@ -953,9 +972,12 @@ injection Hn; intros H₁ H₂; subst.
 apply negb_eq_eq in H₁; subst d₁; reflexivity.
 Qed.
 
+Definition orig := P 0 0 0.
+
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
-  ↔ fold_right rotate (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
+  ↔ fold_right (rotate orig)
+       (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
       P (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
     ∧ N = (n + length el)%nat.
 Proof.
@@ -977,12 +999,13 @@ split.
   destruct H as (H, HN).
   erewrite H.
   simpl in Hr; simpl; unfold Rdiv.
-(**)
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl.
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   unfold rotate, orig; simpl.
+   progress repeat rewrite Rminus_0_r.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -995,6 +1018,8 @@ split.
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   unfold rotate, orig; simpl.
+   progress repeat rewrite Rminus_0_r.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -1007,6 +1032,8 @@ split.
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   unfold rotate, orig; simpl.
+   progress repeat rewrite Rminus_0_r.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -1019,6 +1046,8 @@ split.
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   unfold rotate, orig; simpl.
+   progress repeat rewrite Rminus_0_r.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -1056,7 +1085,9 @@ split.
   destruct t, d.
    apply IHel; split; [ | assumption ].
    rewrite <- Hr; simpl.
+   unfold rotate, orig; simpl.
    unfold Rdiv.
+   progress repeat rewrite Rminus_0_r.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -1072,7 +1103,9 @@ split.
 
    apply IHel; split; [ | assumption ].
    rewrite <- Hr; simpl.
+   unfold rotate, orig; simpl.
    unfold Rdiv.
+   progress repeat rewrite Rminus_0_r.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -1089,7 +1122,9 @@ split.
 
    apply IHel; split; [ | assumption ].
    rewrite <- Hr; simpl.
+   unfold rotate, orig; simpl.
    unfold Rdiv.
+   progress repeat rewrite Rminus_0_r.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -1106,7 +1141,9 @@ split.
 
    apply IHel; split; [ | assumption ].
    rewrite <- Hr; simpl.
+   unfold rotate, orig; simpl.
    unfold Rdiv.
+   progress repeat rewrite Rminus_0_r.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -1731,7 +1768,7 @@ Qed.
 Theorem rotate_1_0_0_b_nonzero : ∀ w el el₁ d,
   el = el₁ ++ [E lb d]
   → norm_list el = el
-  → w = (λ p, fold_right rotate p el)
+  → w = (λ p, fold_right (rotate orig) p el)
   → ∃ a b c k,
     w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
@@ -1762,7 +1799,7 @@ Qed.
 Theorem rotate_0_0_1_b_nonzero : ∀ w el el₁ d,
   el = el₁ ++ [E la d]
   → norm_list el = el
-  → w = (λ p, fold_right rotate p el)
+  → w = (λ p, fold_right (rotate orig) p el)
   → ∃ a b c k,
     w (P 0 0 1) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
@@ -1793,10 +1830,10 @@ Qed.
 Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
   el = el₁ ++ [E lb d]
   → norm_list el = el
-  → fold_right rotate (P 1 0 0) el ≠ P 1 0 0.
+  → fold_right (rotate orig) (P 1 0 0) el ≠ P 1 0 0.
 Proof.
 intros el el₁ d Hel Hn.
-remember (λ p, fold_right rotate p el) as w eqn:Hw.
+remember (λ p, fold_right (rotate orig) p el) as w eqn:Hw.
 pose proof rotate_1_0_0_b_nonzero w el el₁ d Hel Hn Hw as H.
 destruct H as (a, (b, (c, (k, (Hp, Hm))))).
 rewrite Hw in Hp.
@@ -1817,10 +1854,10 @@ Qed.
 Theorem rotate_0_0_1_is_diff : ∀ el el₁ d,
   el = el₁ ++ [E la d]
   → norm_list el = el
-  → fold_right rotate (P 0 0 1) el ≠ P 0 0 1.
+  → fold_right (rotate orig) (P 0 0 1) el ≠ P 0 0 1.
 Proof.
 intros el el₁ d Hel Hn.
-remember (λ p, fold_right rotate p el) as w eqn:Hw.
+remember (λ p, fold_right (rotate orig) p el) as w eqn:Hw.
 pose proof rotate_0_0_1_b_nonzero w el el₁ d Hel Hn Hw as H.
 destruct H as (a, (b, (c, (k, (Hp, Hm))))).
 rewrite Hw in Hp.
@@ -1854,28 +1891,30 @@ replace el with (rev_path (rev_path el)) by apply rev_path_involutive.
 subst rp; apply norm_app_rev_path_path.
 Qed.
 
-Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.
+Theorem rotate_rotate_neg : ∀ e p₀ p, rotate p₀ e (rotate p₀ (negf e) p) = p.
 Proof.
-intros (t, d) p; simpl.
+intros (t, d) *; simpl.
+unfold rotate; simpl; rewrite vec_sub_add.
 destruct t, d; simpl.
- apply rot_inv_rot_x.
- apply rot_rot_inv_x.
- apply rot_inv_rot_z.
- apply rot_rot_inv_z.
+ rewrite rot_inv_rot_x; apply vec_add_sub.
+ rewrite rot_rot_inv_x; apply vec_add_sub.
+ rewrite rot_inv_rot_z; apply vec_add_sub.
+ rewrite rot_rot_inv_z; apply vec_add_sub.
 Qed.
 
-Theorem rotate_neg_rotate : ∀ e p, rotate (negf e) (rotate e p) = p.
+Theorem rotate_neg_rotate : ∀ e p₀ p, rotate p₀ (negf e) (rotate p₀ e p) = p.
 Proof.
-intros (t, d) p; simpl.
+intros (t, d) *; simpl.
+unfold rotate; simpl; rewrite vec_sub_add.
 destruct t, d; simpl.
- apply rot_rot_inv_x.
- apply rot_inv_rot_x.
- apply rot_rot_inv_z.
- apply rot_inv_rot_z.
+ rewrite rot_rot_inv_x; apply vec_add_sub.
+ rewrite rot_inv_rot_x; apply vec_add_sub.
+ rewrite rot_rot_inv_z; apply vec_add_sub.
+ rewrite rot_inv_rot_z; apply vec_add_sub.
 Qed.
 
-Theorem app_rev_path_path : ∀ p el,
-  fold_right rotate p (el ++ rev_path el) = p.
+Theorem app_rev_path_path : ∀ p₀ p el,
+  fold_right (rotate p₀) p (el ++ rev_path el) = p.
 Proof.
 intros.
 revert p.
@@ -1884,8 +1923,8 @@ rewrite rev_path_cons, app_assoc, fold_right_app.
 rewrite IHel; apply rotate_rotate_neg.
 Qed.
 
-Theorem app_path_rev_path : ∀ p el,
-  fold_right rotate p (rev_path el ++ el) = p.
+Theorem app_path_rev_path : ∀ p₀ p el,
+  fold_right (rotate p₀) p (rev_path el ++ el) = p.
 Proof.
 intros.
 revert p.
@@ -1895,28 +1934,28 @@ rewrite app_assoc, fold_right_app; simpl.
 rewrite IHel; apply rotate_neg_rotate.
 Qed.
 
-Theorem rotate_cancel_in : ∀ el₁ el₂ e p,
-  fold_right rotate p (el₁ ++ e :: negf e :: el₂) =
-  fold_right rotate p (el₁ ++ el₂).
+Theorem rotate_cancel_in : ∀ el₁ el₂ e p₀ p,
+  fold_right (rotate p₀) p (el₁ ++ e :: negf e :: el₂) =
+  fold_right (rotate p₀) p (el₁ ++ el₂).
 Proof.
 intros.
 do 2 rewrite fold_right_app; simpl.
 rewrite rotate_rotate_neg; reflexivity.
 Qed.
 
-Theorem rotate_cancel_start : ∀ el e p,
-  fold_right rotate p (e :: negf e :: el) =
-  fold_right rotate p el.
+Theorem rotate_cancel_start : ∀ el e p₀ p,
+  fold_right (rotate p₀) p (e :: negf e :: el) =
+  fold_right (rotate p₀) p el.
 Proof.
 intros.
-pose proof rotate_cancel_in [] el e p as H.
+pose proof rotate_cancel_in [] el e p₀ p as H.
 apply H.
 Qed.
 
-Theorem rotate_rotate_norm : ∀ el p,
-  fold_right rotate p el = fold_right rotate p (norm_list el).
+Theorem rotate_rotate_norm : ∀ el p₀ p,
+  fold_right (rotate p₀) p el = fold_right (rotate p₀) p (norm_list el).
 Proof.
-intros el p.
+intros el p₀ p.
 remember (length el) as len eqn:Hlen; symmetry in Hlen.
 revert el p Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
@@ -1956,11 +1995,11 @@ rewrite rev_path_cons, app_length; simpl.
 rewrite IHel, Nat.add_1_r; reflexivity.
 Qed.
 
-Theorem rotate_rev_path : ∀ el p₁ p₂,
-  fold_right rotate p₁ el = p₂
-  → fold_right rotate p₂ (rev_path el) = p₁.
+Theorem rotate_rev_path : ∀ el p₀ p₁ p₂,
+  fold_right (rotate p₀) p₁ el = p₂
+  → fold_right (rotate p₀) p₂ (rev_path el) = p₁.
 Proof.
-intros el p₁ p₂ Hr.
+intros el p₀ p₁ p₂ Hr.
 revert p₁ p₂ Hr.
 induction el as [| e]; intros; [ symmetry; assumption | ].
 simpl in Hr.
@@ -1972,8 +2011,8 @@ Qed.
 
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
-  fold_right rotate (P 1 0 0) el₁ = p₁
-  → fold_right rotate (P 1 0 0) el₂ = p₂
+  fold_right (rotate orig) (P 1 0 0) el₁ = p₁
+  → fold_right (rotate orig) (P 1 0 0) el₂ = p₂
   → el₁ = el'₁ ++ [E lb d₁]
   → el₂ = el'₂ ++ [E lb d₂]
   → norm_list el₁ = el₁
@@ -1985,7 +2024,8 @@ intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ H
 move Hp at top; subst p₂; rename p₁ into p.
 (* perhaps I should generalize that to any starting point which is
    a fixpoint? something like that... *)
-assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
+assert
+  (Hp : fold_right (rotate orig) (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
  rewrite fold_right_app, Hp₁, <- Hp₂.
  rewrite <- fold_right_app.
  rewrite app_path_rev_path; reflexivity.
@@ -2108,7 +2148,7 @@ Theorem tagada : ∀ el,
   el ≠ []
   → norm_list el = el
   → ∃ p₁ p₂, on_sphere p₁ ∧ on_sphere p₂ ∧ ∀ p, on_sphere p →
-    p ≠ p₁ → p ≠ p₂ → fold_right rotate p el ≠ p.
+    p ≠ p₁ → p ≠ p₂ → fold_right (rotate orig) p el ≠ p.
 Proof.
 intros el Hel Hn.
 destruct (list_nil_app_dec el) as [H₁| H₁].
@@ -2128,12 +2168,6 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
    unfold on_sphere in Hsp.
    unfold mat_vec_mul, rot_inv_x; simpl.
    destruct p as (x, y, z).
-(*
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-*)
    assert (H :
       ∀ u, (u = 2%R) ∨ (u = (-2)%R)
       → P x (1 / 3 * y + u * √ 2 / 3 * z) ((- u) * √ 2 / 3 * y + 1 / 3 * z) ≠
@@ -2178,12 +2212,14 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
      progress repeat rewrite Rmult_0_l.
      progress repeat rewrite Rplus_0_l.
      progress repeat rewrite Rplus_0_r.
+     progress repeat rewrite Rminus_0_r.
      apply H; left; reflexivity.
 
      progress repeat rewrite Rmult_1_l.
      progress repeat rewrite Rmult_0_l.
      progress repeat rewrite Rplus_0_l.
      progress repeat rewrite Rplus_0_r.
+     progress repeat rewrite Rminus_0_r.
      replace (2 * √2)%R with (- (- 2) * √2)%R by lra.
      apply H; right; reflexivity.
 
@@ -2391,15 +2427,15 @@ Definition fixpoint_of_path el :=
  P (x / r) (y / r) (z / r).
 
 Definition no_rotation := ([] : list free_elem).
-Definition is_identity el := ∀ p, fold_right rotate p el = p.
+Definition is_identity p₀ el := ∀ p, fold_right (rotate p₀) p el = p.
 
-Theorem rotate_0 : is_identity no_rotation.
+Theorem rotate_0 : is_identity orig no_rotation.
 Proof. intros p; reflexivity. Qed.
 
 Theorem nonempty_rotation_is_not_identity : ∀ el,
   norm_list el = el
   → el ≠ no_rotation
-  → ¬ (is_identity el).
+  → ¬ (is_identity orig el).
 Proof.
 intros el Hel Hr Hn.
 unfold no_rotation in Hr.
@@ -2417,7 +2453,9 @@ End Rotation.
 
 Section Orbit.
 
-Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
+Definition same_orbit p₀ x y := ∃ el, fold_right (rotate p₀) x el = y.
+
+bbb.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
 Proof. intros; exists []; reflexivity. Qed.
