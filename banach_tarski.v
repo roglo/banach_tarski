@@ -3487,11 +3487,9 @@ Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 
 Definition transf_group (os : sel_model) :=
   λ (g : (point → Prop) → (point → Prop)),
-  (∀ S, g S = rot p₀ (E la false) S) ∧
+  (∀ S, ∃ p₀, g S = rot p₀ (E la false) S) ∧
   (∀ S, g S = xtransl 3 S) ∧
   (∀ S, g S = xtransl 6 S).
-
-Check transf_group.
 
 Definition G f := transf_group (mkos _ f).
 
@@ -3501,19 +3499,20 @@ Definition equidecomposable (s : set_model point) G E₁ E₂ :=
 
 Theorem Banach_Tarski_paradox :
   R_eq_dec_on
-  → ∀ s f os, s = set_equiv → orbit_selector p₀ f → os = mkos _ f →
-    equidecomposable s (G f) all_but_fixpoints
-      (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
+  → ∀ s f os, s = set_equiv → orbit_selector orig f → os = mkos _ f →
+    equidecomposable s (G f) (all_but_fixpoints orig)
+      (xtransl 3 (all_but_fixpoints orig)
+       ⋃ xtransl 6 (all_but_fixpoints orig))%S.
 Proof.
 intros Rdec s f os Hs Hosf Hos.
-exists [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+exists [(EE orig ⋃ SS orig ạ)%S; SS orig ạ⁻¹; SS orig ḅ; SS orig ḅ⁻¹].
 exists
-  (map (xtransl 3) [SS ạ; rot ạ (SS ạ⁻¹)] ++
-   map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
+  (map (xtransl 3) [SS orig ạ; rot orig ạ (SS orig ạ⁻¹)] ++
+   map (xtransl 6) [SS orig ḅ; rot orig ḅ (SS orig ḅ⁻¹)])%S; simpl.
 split; [ eapply r_decomposed_4; try eassumption | ].
 split.
- pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
- pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
+ pose proof r_decomposed_2_a s Hs orig f Hosf os Hos as Ha.
+ pose proof r_decomposed_2_b s Hs orig f Hosf os Hos as Hb.
 Theorem toto : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop) P g,
   is_partition F P → is_partition (g F) (map g P).
