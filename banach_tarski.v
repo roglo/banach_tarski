@@ -770,6 +770,9 @@ Arguments Z.mul _ _ : simpl nomatch.
 Theorem Rsub_add : ∀ x y, (x - y + y = x)%R.
 Proof. intros; lra. Qed.
 
+Theorem Radd_sub : ∀ x y, (x + y - y = x)%R.
+Proof. intros; lra. Qed.
+
 Theorem Rdiv_0_l : ∀ x, (0 / x = 0)%R.
 Proof.
 intros x; unfold Rdiv; apply Rmult_0_l.
@@ -2646,45 +2649,60 @@ Definition all_but_fixpoints p₀ p :=
   ∀ el p₁, same_orbit p₀ p p₁
   → norm_list el ≠ [] → fold_right (rotate p₀) p₁ el ≠ p₁.
 
-Theorem on_sphere_ray_after_rotation : ∀ p m r,
-  on_sphere_ray r p
+Theorem on_sphere_ray_after_rotation : ∀ p₀ p m r,
+  on_sphere_ray r p₀ p
   → is_rotation_matrix m
-  → on_sphere_ray r (mat_vec_mul m p).
+  → on_sphere_ray r p₀ (vec_add (mat_vec_mul m (vec_sub p p₀)) p₀).
 Proof.
 intros * His Hm.
+destruct p₀ as (x₀, y₀, z₀).
 destruct p as (x, y, z).
 unfold on_sphere_ray in His.
 unfold on_sphere_ray; simpl.
 unfold is_rotation_matrix in Hm.
+remember (x - x₀)%R as x₁.
+remember (y - y₀)%R as y₁.
+remember (z - z₀)%R as z₁.
+do 3 rewrite Radd_sub.
+clear x₀ y₀ z₀ x y z Heqx₁ Heqy₁ Heqz₁.
 destruct Hm as (Hm, Hd).
 unfold mat_det in Hd.
 unfold mat_mul, mat_id in Hm; simpl in Hm.
 injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-nsatz.
+ring_simplify in H₁.
+ring_simplify in H₅.
+ring_simplify in H₉.
+move H₄ before H₂; setoid_rewrite Rmult_comm in H₂.
+move H₇ before H₃; setoid_rewrite Rmult_comm in H₃.
+move H₈ before H₆; setoid_rewrite Rmult_comm in H₆.
+clear H₄ H₇ H₈.
+do 3 rewrite <- Rsqr_pow2 in H₁, H₅, H₉.
+Time nsatz.
 Qed.
 
 Theorem in_sphere_after_rotation : ∀ p₀ p m,
   in_sphere p₀ p
   → is_rotation_matrix m
-  → in_sphere p₀ (mat_vec_mul m p).
+  → in_sphere p₀ (vec_add (mat_vec_mul m (vec_sub p p₀)) p₀).
 Proof.
 intros * His Hrm.
 destruct p₀ as (x₀, y₀, z₀).
 destruct p as (x, y, z).
+remember (P x₀ y₀ z₀) as p₀ eqn:HP₀.
 remember (P x y z) as p eqn:HP.
 remember ((x - x₀)² + (y - y₀)² + (z - z₀)²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : on_sphere_ray r p₀ p) by (subst p; assumption).
-pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
+assert (Hos : on_sphere_ray r p₀ p) by (subst p₀ p; assumption).
+pose proof on_sphere_ray_after_rotation _ _ _ _ Hos Hrm as H.
 unfold in_sphere in His.
 unfold on_sphere_ray in H.
 unfold in_sphere.
-subst p; simpl in *.
+subst p₀ p; simpl in *.
 rewrite H, <- Hos; assumption.
 Qed.
 
-Theorem in_sphere_after_rotate : ∀ p e,
-  in_sphere p
-  → in_sphere (rotate e p).
+Theorem in_sphere_after_rotate : ∀ p₀ p e,
+  in_sphere p₀ p
+  → in_sphere p₀ (rotate p₀ e p).
 Proof.
 intros * His.
 apply in_sphere_after_rotation; [ assumption | ].
@@ -2991,19 +3009,19 @@ Qed.
 Class sel_model {A} := mkos
   { os_fun : A → A }.
 
-Definition EE {os : sel_model} :=
-  λ p, all_but_fixpoints p ∧ p = os_fun p.
-Definition SS {os : sel_model} e := λ p,
-  all_but_fixpoints p ∧
+Definition EE {os : sel_model} p₀ :=
+  λ p, all_but_fixpoints p₀ p ∧ p = os_fun p.
+Definition SS {os : sel_model} p₀ e := λ p,
+  all_but_fixpoints p₀ p ∧
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right (rotate p₀) (os_fun p) el = p.
-Definition rot {os : @sel_model point} e (E : point → Prop) := λ p,
-  E (rotate (negf e) p).
+Definition rot {os : @sel_model point} p₀ e (E : point → Prop) := λ p,
+  E (rotate p₀ (negf e) p).
 
 Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
-  ∀ e p, EE p → SS e p → False.
+  ∀ e p₀ p, EE p₀ p → SS p₀ e p → False.
 Proof.
-intros f os Hos e p He Hs; subst os.
+intros * Hos * He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
 rewrite <- He in Hs.
@@ -3012,9 +3030,9 @@ intros H; rewrite Hn in H; discriminate H.
 Qed.
 
 Theorem start_with_same : ∀ f os, os = mkos _ f →
-  ∀ e₁ e₂ p, SS e₁ p → SS e₂ p → e₁ = e₂.
+  ∀ e₁ e₂ p₀ p, SS p₀ e₁ p → SS p₀ e₂ p → e₁ = e₂.
 Proof.
-intros f os Hos (ti, di) (tj, dj) p Hsi Hsj; subst os.
+intros * Hos (ti, di) (tj, dj) * Hsi Hsj; subst os.
 destruct Hsi as (Hinf & eli & eli₁ & Hni & Hsi); simpl in Hsi.
 destruct Hsj as (Hjnf & elj & elj₁ & Hnj & Hsj); simpl in Hsj.
 eapply rotate_rev_path in Hsj.
@@ -3083,14 +3101,14 @@ Theorem fold_right_single {A B} (f : A → B → B) x y :
 Proof. reflexivity. Qed.
 
 Theorem not_start_with_rot :
-  ∀ f, orbit_selector f
+  ∀ p₀ f, orbit_selector p₀ f
   → ∀ os, os = mkos _ f
-  → ∀ e p, SS e p → rot e (SS (negf e)) p → False.
+  → ∀ e p, SS p₀ e p → rot p₀ e (SS p₀ (negf e)) p → False.
 Proof.
-intros f (Hoe, Ho) os Hos e p Hs Hr; simpl in Hr; subst os.
+intros p₀ f (Hoe, Ho) os Hos e p Hs Hr; simpl in Hr; subst os.
 destruct Hs as (Hnf & el & el₁ & Hn & Hs); simpl in Hs.
 destruct Hr as (Hrnf & elr & elr₁ & Hnr & Hsr); simpl in Hsr.
-assert (Hr : f p = f (rotate (negf e) p)).
+assert (Hr : f p = f (rotate p₀ (negf e) p)).
  apply Hoe.
  exists (negf e :: []); reflexivity.
 
@@ -3129,11 +3147,12 @@ Qed.
 Theorem r_decomposed_5 :
   R_eq_dec_on
   → ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  → ∀ p₀ f, orbit_selector p₀ f
   → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+  → is_partition (all_but_fixpoints p₀)
+      [EE p₀; SS p₀ ạ; SS p₀ ạ⁻¹; SS p₀ ḅ; SS p₀ ḅ⁻¹].
 Proof.
-intros Rdec s Hs f (Hoe, Ho) os Hos; subst os s.
+intros Rdec s Hs p₀ f (Hoe, Ho) os Hos; subst os s.
 split.
 *unfold is_partition; intros p.
  split.
@@ -3290,14 +3309,17 @@ Qed.
 Theorem r_decomposed_4 :
   R_eq_dec_on
   → ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  → ∀ p₀ f, orbit_selector p₀ f
   → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+  → is_partition (all_but_fixpoints p₀)
+      [(EE p₀ ⋃ SS p₀ ạ)%S; SS p₀ ạ⁻¹; SS p₀ ḅ; SS p₀ ḅ⁻¹].
 Proof.
-intros Rdec s Hs f HoeHo os Hos.
-pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
+intros Rdec s Hs p₀ f HoeHo os Hos.
+pose proof r_decomposed_5 Rdec s Hs p₀ f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together; eassumption.
 Qed.
+
+bbb.
 
 Theorem r_decomposed_2 :
   ∀ s, s = set_equiv
