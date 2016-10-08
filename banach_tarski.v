@@ -3319,16 +3319,14 @@ pose proof r_decomposed_5 Rdec s Hs p₀ f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together; eassumption.
 Qed.
 
-bbb.
-
 Theorem r_decomposed_2 :
   ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  → ∀ p₀ f, orbit_selector p₀ f
   → ∀ os, os = mkos _ f
   → ∀ e,
-    is_partition all_but_fixpoints [SS e; rot e (SS (negf e))].
+    is_partition (all_but_fixpoints p₀) [SS p₀ e; rot p₀ e (SS p₀ (negf e))].
 Proof.
-intros s Hs f (Hoe, Ho) os Hos e; subst os s.
+intros s Hs p₀ f (Hoe, Ho) os Hos e; subst os s.
 split.
 *unfold is_partition; intros p.
  split.
@@ -3356,7 +3354,7 @@ split.
 
     exists (negf e :: []), [].
     split; [ reflexivity | simpl ].
-    assert (H : f p = f (rotate (negf e) p)).
+    assert (H : f p = f (rotate p₀ (negf e) p)).
      apply Hoe.
      exists (negf e :: []); reflexivity.
 
@@ -3379,7 +3377,7 @@ split.
        exists (el₃ ++ [negf e]).
        rewrite fold_right_app; assumption.
 
-      assert (H : f p = f (rotate (negf e) p)).
+      assert (H : f p = f (rotate p₀ (negf e) p)).
        apply Hoe.
        exists (negf e :: []); reflexivity.
 
@@ -3430,9 +3428,9 @@ Qed.
 
 Theorem r_decomposed_2_a :
   ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  → ∀ p₀ f, orbit_selector p₀ f
   → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [SS ạ; rot ạ (SS ạ⁻¹)].
+  → is_partition (all_but_fixpoints p₀) [SS p₀ ạ; rot p₀ ạ (SS p₀ ạ⁻¹)].
 Proof.
 intros.
 eapply r_decomposed_2; eassumption.
@@ -3440,9 +3438,9 @@ Qed.
 
 Theorem r_decomposed_2_b :
   ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  → ∀ p₀ f, orbit_selector p₀ f
   → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
+  → is_partition (all_but_fixpoints p₀) [SS p₀ ḅ; rot p₀ ḅ (SS p₀ ḅ⁻¹)].
 Proof.
 intros.
 eapply r_decomposed_2; eassumption.
@@ -3485,14 +3483,11 @@ Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
 Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
 Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
 
-(* "rot ạ" is an example of a member of the group *)
-Check rot.
-
 Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 
 Definition transf_group (os : sel_model) :=
   λ (g : (point → Prop) → (point → Prop)),
-  (∀ S, g S = rot (E la false) S) ∧
+  (∀ S, g S = rot p₀ (E la false) S) ∧
   (∀ S, g S = xtransl 3 S) ∧
   (∀ S, g S = xtransl 6 S).
 
@@ -3506,7 +3501,7 @@ Definition equidecomposable (s : set_model point) G E₁ E₂ :=
 
 Theorem Banach_Tarski_paradox :
   R_eq_dec_on
-  → ∀ s f os, s = set_equiv → orbit_selector f → os = mkos _ f →
+  → ∀ s f os, s = set_equiv → orbit_selector p₀ f → os = mkos _ f →
     equidecomposable s (G f) all_but_fixpoints
       (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
