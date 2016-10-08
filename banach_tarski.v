@@ -2141,16 +2141,17 @@ assert
      * rewrite app_length, length_rev_path; assumption.
 Qed.
 
-Definition on_sphere_ray r '(P x y z) := (x² + y² + z² = r)%R.
-Definition on_sphere '(P x y z) := (x² + y² + z² = 1)%R.
+Definition on_sphere_ray r '(P x₀ y₀ z₀) '(P x y z) :=
+  ((x - x₀)² + (y - y₀)² + (z - z₀)² = r)%R.
+Definition on_sphere := on_sphere_ray 1.
 
 Theorem tagada : ∀ el,
   el ≠ []
   → norm_list el = el
-  → ∃ p₁ p₂, on_sphere p₁ ∧ on_sphere p₂ ∧ ∀ p, on_sphere p →
+  → ∃ p₁ p₂, on_sphere orig p₁ ∧ on_sphere orig p₂ ∧ ∀ p, on_sphere orig p →
     p ≠ p₁ → p ≠ p₂ → fold_right (rotate orig) p el ≠ p.
 Proof.
-intros el Hel Hn.
+intros * Hel Hn.
 destruct (list_nil_app_dec el) as [H₁| H₁].
  subst el; exfalso; apply Hel; reflexivity.
 
@@ -2162,8 +2163,8 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
   induction el as [| e] using rev_ind; intros.
    rewrite app_nil_l.
    exists (P 1 0 0), (P (-1) 0 0).
-   split; [ simpl; rewrite Rsqr_0, Rsqr_1; lra | ].
-   split; [ simpl; rewrite Rsqr_0, <- Rsqr_neg, Rsqr_1; lra | ].
+   split; [ simpl; repeat rewrite Rsqr_pow2; lra | ].
+   split; [ simpl; repeat rewrite Rsqr_pow2; lra | ].
    intros p Hsp Hp₁ Hp₂; simpl.
    unfold on_sphere in Hsp.
    unfold mat_vec_mul, rot_inv_x; simpl.
@@ -2186,17 +2187,12 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
      unfold determinant in Hy.
      progress repeat rewrite Rmult_0_l in Hy.
      progress repeat rewrite Rmult_0_r in Hy.
-     unfold Rdiv in Hy.
-     do 2 rewrite <- Rmult_assoc in Hy.
-     rewrite Rmult5_sqrt2_sqrt5 in Hy; [ | lra ].
+     rewrite Rminus_0_r, Rdiv_0_l in Hy.
      rename Hz into H₂.
-     destruct Hy as (Hy, Hz).
-     ring_simplify in Hy.
-     ring_simplify in Hz.
-     subst y z.
+     destruct Hy; subst y z.
+     simpl in Hsp; repeat rewrite Rsqr_pow2 in Hsp.
      ring_simplify in Hsp.
-     rewrite Rsqr_0, Rmult_0_r, Rplus_0_r in Hsp.
-     rewrite <- Rsqr_1 in Hsp.
+     rewrite <- Rsqr_1, <- Rsqr_pow2 in Hsp.
      apply Rsqr_eq in Hsp.
      destruct Hsp; subst x; exfalso; [ apply Hp₁ | apply Hp₂ ]; reflexivity.
 
@@ -2455,12 +2451,10 @@ Section Orbit.
 
 Definition same_orbit p₀ x y := ∃ el, fold_right (rotate p₀) x el = y.
 
-bbb.
-
-Theorem same_orbit_refl : reflexive _ same_orbit.
+Theorem same_orbit_refl {p₀} : reflexive _ (same_orbit p₀).
 Proof. intros; exists []; reflexivity. Qed.
 
-Theorem same_orbit_sym : symmetric _ same_orbit.
+Theorem same_orbit_sym {p₀} : symmetric _ (same_orbit p₀).
 Proof.
 intros p₁ p₂ (el, H); simpl in H.
 unfold same_orbit; simpl.
@@ -2473,7 +2467,7 @@ rewrite rotate_neg_rotate.
 reflexivity.
 Qed.
 
-Theorem same_orbit_trans : transitive _ same_orbit.
+Theorem same_orbit_trans {p₀} : transitive _ (same_orbit p₀).
 Proof.
 intros p₁ p₂ p₃ (el₁, H₁) (el₂, H₂); simpl in H₁, H₂.
 unfold same_orbit; simpl.
@@ -2481,24 +2475,25 @@ exists (el₂ ++ el₁).
 rewrite fold_right_app, H₁, H₂; reflexivity.
 Qed.
 
-Add Parametric Relation : _ same_orbit
+Add Parametric Relation {p₀} : _ (same_orbit p₀)
  reflexivity proved by same_orbit_refl
  symmetry proved by same_orbit_sym
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
-Definition equiv_same_orbit : equiv point same_orbit :=
+Definition equiv_same_orbit p₀ : equiv point (same_orbit p₀) :=
   conj same_orbit_refl (conj same_orbit_trans same_orbit_sym).
 
 (* Type-theoretical Choice Axiom *)
 Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
   ∃ f : A → A, (∀ x : A, R x (f x)) ∧ (∀ x y, R x y → f x = f y).
 
-Theorem same_choice_in_same_orbit : ∃ f : point → point,
-  (∀ x, same_orbit x (f x)) ∧
-  (∀ x y, same_orbit x y ↔ f x = f y).
+Theorem same_choice_in_same_orbit : ∀ p₀, ∃ f : point → point,
+  (∀ x, same_orbit p₀ x (f x)) ∧
+  (∀ x y, same_orbit p₀ x y ↔ f x = f y).
 Proof.
-pose proof (TTCA _ _ equiv_same_orbit) as H.
+intros p₀.
+pose proof (TTCA _ _ (equiv_same_orbit p₀)) as H.
 destruct H as (f, (Hx, Hxy)).
 exists f; split; [ apply Hx | ].
 intros x y.
@@ -2514,11 +2509,12 @@ Definition in_image {A B} (f : A → B) := λ x, ∃ y, x = f y.
    2/ ∀ x y two different points in the image of x, their orbits
       are different. *)
 
-Theorem orbit_partition : ∃ f : point → point,
-  (∀ x, ∃ y, same_orbit (f y) x) ∧
-  (∀ x y, in_image f x → in_image f y → x ≠ y → ¬ same_orbit x y).
+Theorem orbit_partition : ∀ p₀, ∃ f : point → point,
+  (∀ x, ∃ y, same_orbit p₀ (f y) x) ∧
+  (∀ x y, in_image f x → in_image f y → x ≠ y → ¬ same_orbit p₀ x y).
 Proof.
-pose proof same_choice_in_same_orbit as H.
+intros.
+pose proof same_choice_in_same_orbit p₀ as H.
 destruct H as (f, (Hxfx, Hiff)).
 exists f; split.
  intros x.
@@ -2540,17 +2536,17 @@ Notation "'ạ⁻¹'" := (E la true).
 Notation "'ḅ'" := (E lb false).
 Notation "'ḅ⁻¹'" := (E lb true).
 
-Definition not_in_fixpoints p :=
-  ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
+Definition not_in_fixpoints p₀ p :=
+  ∀ el, norm_list el ≠ [] → fold_right (rotate p₀) p el ≠ p.
 
-Theorem same_orbit_imp_representant : ∀ f p p₁ el₁,
-  (∀ p₁ p₂ : point, same_orbit p₁ p₂ → f p₁ = f p₂)
-  → (∀ p : point, same_orbit p (f p))
+Theorem same_orbit_imp_representant : ∀ f p₀ p p₁ el₁,
+  (∀ p₁ p₂ : point, same_orbit p₀ p₁ p₂ → f p₁ = f p₂)
+  → (∀ p : point, same_orbit p₀ p (f p))
   → p = f p
-  → fold_right rotate (f p₁) el₁ = p
+  → fold_right (rotate p₀) (f p₁) el₁ = p
   → f p₁ = p.
 Proof.
-intros f p p₁ el₁ Hoe Ho H₁ Hr.
+intros * Hoe Ho H₁ Hr.
 pose proof Ho p₁ as Hp₁.
 unfold same_orbit in Hp₁.
 destruct Hp₁ as (el₃ & Hp₁).
@@ -2559,16 +2555,16 @@ rewrite H₁; apply Hoe.
 exists (el₁ ++ el₃); assumption.
 Qed.
 
-Theorem not_in_fixpoints_one_path : ∀ f p e₁ e₂ el el₂ el₁ el₃,
-  not_in_fixpoints p
-  → fold_right rotate p el = f p
-  → fold_right rotate (f p) el₁ = p
+Theorem not_in_fixpoints_one_path : ∀ f p₀ p e₁ e₂ el el₂ el₁ el₃,
+  not_in_fixpoints p₀ p
+  → fold_right (rotate p₀) p el = f p
+  → fold_right (rotate p₀) (f p) el₁ = p
   → norm_list el = el₂ ++ [e₁]
   → norm_list el₁ = e₂ :: el₃
   → e₂ ≠ negf e₁
   → False.
 Proof.
-intros f p e₁ e₂ el el₂ el₁ el₃ Hnf Hel H₆ H₂ H₄ Hd.
+intros * Hnf Hel H₆ H₂ H₄ Hd.
 rewrite rotate_rotate_norm in Hel, H₆.
 rewrite <- Hel in H₆.
 rewrite <- fold_right_app in H₆.
@@ -2587,9 +2583,9 @@ apply norm_list_app_is_nil in H.
  rewrite norm_list_idemp; reflexivity.
 Qed.
 
-Theorem not_in_fixpoints_one_path2 : ∀ p e e₁ el₄ el₁ el el₃,
-  not_in_fixpoints p
-  → fold_right rotate p (el ++ rev_path (e :: el₄)) = p
+Theorem not_in_fixpoints_one_path2 : ∀ p₀ p e e₁ el₄ el₁ el el₃,
+  not_in_fixpoints p₀ p
+  → fold_right (rotate p₀) p (el ++ rev_path (e :: el₄)) = p
   → norm_list el = e₁ :: el₁
   → norm_list el₃ = negf e₁ :: e :: el₄
   → False.
@@ -2640,14 +2636,15 @@ Record choice_function {A} (R : A → A → Prop) f := mkcf
   { cf_repr_uniqueness : ∀ x y, R x y → f x = f y;
     cf_repr_membership : ∀ x, R x (f x) }.
 
-Definition orbit_selector := choice_function same_orbit.
+Definition orbit_selector p₀ := choice_function (same_orbit p₀).
 
-Definition in_sphere '(P x y z) := (x² + y² + z² <= 1)%R.
+Definition in_sphere '(P x₀ y₀ z₀) '(P x y z) :=
+  ((x - x₀)² + (y - y₀)² + (z - z₀)² <= 1)%R.
 
-Definition all_but_fixpoints p :=
-  in_sphere p ∧
-  ∀ el p₁, same_orbit p p₁
-  → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
+Definition all_but_fixpoints p₀ p :=
+  in_sphere p₀ p ∧
+  ∀ el p₁, same_orbit p₀ p p₁
+  → norm_list el ≠ [] → fold_right (rotate p₀) p₁ el ≠ p₁.
 
 Theorem on_sphere_ray_after_rotation : ∀ p m r,
   on_sphere_ray r p
@@ -2666,16 +2663,17 @@ injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 nsatz.
 Qed.
 
-Theorem in_sphere_after_rotation : ∀ p m,
-  in_sphere p
+Theorem in_sphere_after_rotation : ∀ p₀ p m,
+  in_sphere p₀ p
   → is_rotation_matrix m
-  → in_sphere (mat_vec_mul m p).
+  → in_sphere p₀ (mat_vec_mul m p).
 Proof.
 intros * His Hrm.
+destruct p₀ as (x₀, y₀, z₀).
 destruct p as (x, y, z).
 remember (P x y z) as p eqn:HP.
-remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : on_sphere_ray r p) by (subst p; assumption).
+remember ((x - x₀)² + (y - y₀)² + (z - z₀)²)%R as r eqn:Hr; symmetry in Hr.
+assert (Hos : on_sphere_ray r p₀ p) by (subst p; assumption).
 pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
 unfold in_sphere in His.
 unfold on_sphere_ray in H.
@@ -2998,7 +2996,7 @@ Definition EE {os : sel_model} :=
 Definition SS {os : sel_model} e := λ p,
   all_but_fixpoints p ∧
   ∃ el el₁,
-  norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
+  norm_list el = e :: el₁ ∧ fold_right (rotate p₀) (os_fun p) el = p.
 Definition rot {os : @sel_model point} e (E : point → Prop) := λ p,
   E (rotate (negf e) p).
 
