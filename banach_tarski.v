@@ -3424,9 +3424,8 @@ Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 
 Definition transf_group (os : sel_model) :=
   λ (g : (point → Prop) → (point → Prop)),
-  (∀ S, g S = rot (E la false) S) ∧
-  (∀ S, g S = xtransl 3 S) ∧
-  (∀ S, g S = xtransl 6 S).
+  (g = rot (E la false)) ∨
+  (∃ dx, g = xtransl dx).
 
 Check transf_group.
 
@@ -3451,12 +3450,51 @@ split; [ eapply r_decomposed_4; try eassumption | ].
 split.
  pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
  pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
-Theorem toto : ∀ A s, s = set_equiv →
-  ∀ (F : A → Prop) P g,
-  is_partition F P → is_partition (g F) (map g P).
+Theorem toto : ∀ s f, s = set_equiv → orbit_selector f →
+  ∀ (F : point → Prop) P g,
+  G f g → is_partition F P → is_partition (g F) (map g P).
   (* probably missing that g is member of a "good" group *)
 Proof.
-intros * Hs F P * HP.
+intros * Hs Ho F P * HG HP.
+unfold is_partition in HP |-*.
+destruct HP as (HF, HP).
+split.
+ destruct HG as [HG| HG].
+  subst g.
+  unfold set_eq; subst s; simpl.
+  intros x; unfold rot; simpl.
+  split; intros H.
+(**)
+induction P as [| P PL].
+ unfold set_eq in HF; simpl in HF.
+ exfalso; eapply HF; eassumption.
+
+ simpl; unfold union; simpl.
+ simpl in HF.
+   pose proof (HF (rotate ạ⁻¹ x)) as H₁.
+   destruct H₁ as (H₁, H₂).
+   pose proof H₁ H as H₃.
+   unfold union in H₃.
+   destruct H₃ as [H₃| H₃]; [ left; assumption | ].
+Focus 1.
+right; apply IHPL.
+Focus 2.
+intros y.
+split; intros H₄.
+pose proof HF y.
+destruct H0.
+apply H0 in H₄.
+destruct H₄; [ | assumption ].
+
+
+bbb.
+   unfold set_eq in HF; simpl in HF.
+   unfold union_list in HF; simpl in HF.
+   unfold union_list; simpl.
+   pose proof (HF (rotate ạ⁻¹ x)) as H₁.
+   destruct H₁ as (H₁, H₂).
+   pose proof H₁ H as H₃.
+
 bbb.
 
 Show.
