@@ -977,7 +977,6 @@ split.
   destruct H as (H, HN).
   erewrite H.
   simpl in Hr; simpl; unfold Rdiv.
-(**)
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl.
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, plus_IZR.
@@ -2128,12 +2127,6 @@ destruct (list_nil_app_dec el) as [H₁| H₁].
    unfold on_sphere in Hsp.
    unfold mat_vec_mul, rot_inv_x; simpl.
    destruct p as (x, y, z).
-(*
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-*)
    assert (H :
       ∀ u, (u = 2%R) ∨ (u = (-2)%R)
       → P x (1 / 3 * y + u * √ 2 / 3 * z) ((- u) * √ 2 / 3 * y + 1 / 3 * z) ≠
@@ -3134,9 +3127,6 @@ split.
 
  -intros Hul.
   unfold union_list in Hul; simpl in Hul; unfold union in Hul.
-(*
-  intros el Hel.
-*)
   destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
   +destruct Hul as (Hnf, Hul); simpl in Hul.
    apply Hnf; assumption.
@@ -3465,7 +3455,10 @@ Theorem toto : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop) P g,
   is_partition F P → is_partition (g F) (map g P).
   (* probably missing that g is member of a "good" group *)
-Admitted.
+Proof.
+intros * Hs F P * HP.
+bbb.
+
 Show.
  apply toto with (g := xtransl 3) in Ha; simpl in Ha; [ | assumption ].
  apply toto with (g := xtransl 6) in Hb; simpl in Hb; [ | assumption ].
