@@ -3488,8 +3488,7 @@ Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 Definition transf_group (os : sel_model) :=
   λ (g : (point → Prop) → (point → Prop)),
   (∀ S, ∃ p₀, g S = rot p₀ (E la false) S) ∧
-  (∀ S, g S = xtransl 3 S) ∧
-  (∀ S, g S = xtransl 6 S).
+  (∀ S, ∃ dx, g S = xtransl dx S).
 
 Definition G f := transf_group (mkos _ f).
 
@@ -3518,7 +3517,10 @@ Theorem toto : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop) P g,
   is_partition F P → is_partition (g F) (map g P).
   (* probably missing that g is member of a "good" group *)
-Admitted.
+Proof.
+intros * Hs F P * HP.
+bbb.
+
 Show.
  apply toto with (g := xtransl 3) in Ha; simpl in Ha; [ | assumption ].
  apply toto with (g := xtransl 6) in Hb; simpl in Hb; [ | assumption ].
@@ -3528,13 +3530,24 @@ Show.
   unfold intersection, set_eq; subst s; intros (x, y, z).
   split; [ intros (H₁, H₂) | contradiction ].
   unfold xtransl in H₁, H₂.
-bbb.
-  unfold empty_set; simpl.
   destruct H₁ as (H₁, H₃).
   destruct H₂ as (H₂, H₄).
-bbb.
-  unfold in_sphere in H₁.
+  unfold orig in H₁, H₂; simpl in H₁, H₂.
+  do 3 rewrite Rminus_0_r in H₁, H₂.
+  apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
+  apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
+  apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
+  apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
+  clear - H₁ H₂.
+  rewrite <- Rsqr_1 in H₁ at 4.
+  rewrite <- Rsqr_1 in H₂ at 6.
+  apply Rsqr_le_abs_0 in H₁.
+  apply Rsqr_le_abs_0 in H₂.
+  rewrite Rabs_R1 in H₁, H₂.
+  unfold Rabs in H₁, H₂.
+  destruct (Rcase_abs (x + 3)), (Rcase_abs (x + 6)); lra.
 
+ split; [ reflexivity | ].
 bbb.
 
 End Equidecomposability.
