@@ -3530,6 +3530,7 @@ Show.
   unfold empty_set; simpl.
   destruct H₁ as (H₁, H₃).
   destruct H₂ as (H₂, H₄).
+bbb.
   unfold in_sphere in H₁.
 
 bbb.
