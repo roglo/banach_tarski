@@ -3500,7 +3500,8 @@ Definition equidecomposable (s : set_model point) G E₁ E₂ :=
 Theorem Banach_Tarski_paradox :
   R_eq_dec_on
   → ∀ s f os, s = set_equiv → orbit_selector orig f → os = mkos _ f →
-    equidecomposable s (G f) (all_but_fixpoints orig)
+    equidecomposable s (G f)
+      (all_but_fixpoints orig)
       (xtransl 3 (all_but_fixpoints orig)
        ⋃ xtransl 6 (all_but_fixpoints orig))%S.
 Proof.
@@ -3527,6 +3528,7 @@ Show.
   unfold intersection, set_eq; subst s; intros (x, y, z).
   split; [ intros (H₁, H₂) | contradiction ].
   unfold xtransl in H₁, H₂.
+bbb.
   unfold empty_set; simpl.
   destruct H₁ as (H₁, H₃).
   destruct H₂ as (H₂, H₄).
