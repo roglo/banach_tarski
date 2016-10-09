@@ -49,7 +49,9 @@ Notation "∃ ! x .. y , p" :=
 
 (* Step 1 *)
 
+(*
 Section Free_Group.
+*)
 
 (* a = E la false
    a⁻¹ = E la true
@@ -58,15 +60,15 @@ Section Free_Group.
 
 Inductive letter := la | lb.
 
-Inductive free_elem := E : letter → bool → free_elem.
+Inductive free_elem := FE : letter → bool → free_elem.
 Record F2 := mkF₂ { str : list free_elem }.
 
-Notation "'ạ'" := (E la false).
-Notation "'ạ⁻¹'" := (E la true).
-Notation "'ḅ'" := (E lb false).
-Notation "'ḅ⁻¹'" := (E lb true).
+Notation "'ạ'" := (FE la false).
+Notation "'ạ⁻¹'" := (FE la true).
+Notation "'ḅ'" := (FE lb false).
+Notation "'ḅ⁻¹'" := (FE lb true).
 
-Definition negf '(E t d) := E t (negb d).
+Definition negf '(FE t d) := FE t (negb d).
 
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
@@ -97,7 +99,7 @@ destruct (letter_dec t t) as [p| p]; [ | exfalso; apply p; reflexivity ].
 destruct t; refine (match p with eq_refl => eq_refl end).
 Qed.
 
-Definition letter_opp '(E l₁ d₁) '(E l₂ d₂) :=
+Definition letter_opp '(FE l₁ d₁) '(FE l₂ d₂) :=
   if letter_dec l₁ l₂ then
     if Bool.bool_dec d₁ d₂ then False else True
   else False.
@@ -136,7 +138,7 @@ destruct (letter_dec x₁ x₂) as [Hx| Hx].
  right; intros H; contradiction.
 Defined.
 
-Theorem letter_opp_inv : ∀ x d, letter_opp (E x d) (E x (negb d)).
+Theorem letter_opp_inv : ∀ x d, letter_opp (FE x d) (FE x (negb d)).
 Proof.
 intros.
 unfold letter_opp.
@@ -145,7 +147,7 @@ constructor.
 Qed.
 
 Theorem letter_opp_iff : ∀ x₁ d₁ x₂ d₂,
-  letter_opp (E x₁ d₁) (E x₂ d₂)
+  letter_opp (FE x₁ d₁) (FE x₂ d₂)
   ↔ x₁ = x₂ ∧ d₂ = negb d₁.
 Proof.
 intros x₁ d₁ x₂ d₂.
@@ -313,7 +315,7 @@ revert t d.
 induction el as [| (t₁, d₁)]; intros.
  simpl; rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
 
- remember (E t₁ d₁ :: el) as el₁ eqn:Hel₁.
+ remember (FE t₁ d₁ :: el) as el₁ eqn:Hel₁.
  symmetry in Hel₁; simpl.
  remember (norm_list el₁) as el₂ eqn:Hel₂.
  symmetry in Hel₂; simpl.
@@ -446,6 +448,8 @@ Definition start_with x s :=
   | e :: el => x = e
   end.
 
+Section Halte.
+
 Notation "s = '∅'" := (empty s) (at level 70).
 Notation "s ≠ '∅'" := (¬ empty s) (at level 70).
 Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
@@ -510,7 +514,7 @@ Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
 
 Theorem empty_start_with2 : ∀ s x d,
   empty s
-  → start_with2 (E x d) (E x (negb d)) s.
+  → start_with2 (FE x d) (FE x (negb d)) s.
 Proof.
 intros s x d H.
 unfold empty in H.
@@ -518,18 +522,18 @@ unfold start_with2.
 remember (norm s) as ns eqn:Hns; symmetry in Hns.
 destruct ns as (el).
 simpl in H; subst el.
-exists (mkF₂ (E x (negb d) :: nil)); simpl.
+exists (mkF₂ (FE x (negb d) :: nil)); simpl.
 unfold start_with, norm; simpl.
 split; [ | reflexivity ].
 rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
 Qed.
 
 Theorem norm_list_inv : ∀ x d el,
-  norm_list (E x d :: E x (negb d) :: el) = norm_list el.
+  norm_list (FE x d :: FE x (negb d) :: el) = norm_list el.
 Proof.
 intros.
-remember (E x d) as xd eqn:Hxd.
-remember (E x (negb d)) as xe eqn:Hxe.
+remember (FE x d) as xd eqn:Hxd.
+remember (FE x (negb d)) as xe eqn:Hxe.
 move xe before xd.
 simpl.
 remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
@@ -565,8 +569,8 @@ Qed.
 
 Theorem start_with_start_with2 : ∀ s x y d,
   not (x = y ∧ d = false)
-  → start_with (E y d) s
-  → start_with2 (E x false) (E x true) s.
+  → start_with (FE y d) s
+  → start_with2 (FE x false) (FE x true) s.
 Proof.
 intros s x y d H₁ H.
 unfold start_with in H.
@@ -577,7 +581,7 @@ destruct el₁ as [| e₁]; [ contradiction | subst e₁ ].
 unfold norm.
 remember norm_list as f; simpl; subst f.
 rewrite Hel₁.
-exists (mkF₂ (E x true :: E y d :: el₁)).
+exists (mkF₂ (FE x true :: FE y d :: el₁)).
 remember norm_list as f; simpl; subst f.
 rewrite norm_list_inv.
 rewrite <- Hel₁, norm_list_idemp.
@@ -590,7 +594,7 @@ subst y; exfalso; apply H₁; split; reflexivity.
 Qed.
 
 Theorem decomposed_2 : ∀ s x,
-  start_with2 (E x false) (E x true) s ⊕ start_with (E x false) s.
+  start_with2 (FE x false) (FE x true) s ⊕ start_with (FE x false) s.
 Proof.
 intros s x.
 destruct (decomposed_4 s) as [(H, _)| (_, H)].
@@ -661,7 +665,7 @@ destruct (decomposed_4 s) as [(H, _)| (_, H)].
 Qed.
 
 Theorem decomposed_2_or : ∀ s x,
-  start_with2 (E x false) (E x true) s ∨ start_with (E x false) s.
+  start_with2 (FE x false) (FE x true) s ∨ start_with (FE x false) s.
 Proof.
 intros s x.
 destruct (decomposed_4_or s) as [H| [H| [H| [H|H]]]].
@@ -691,6 +695,8 @@ Proof. intros; apply decomposed_2. Qed.
 
 Theorem decomposed_2_b : ∀ s, s ∈ ḅ Ṣ(ḅ⁻¹) ⊕ s ∈ Ṣ(ḅ) .
 Proof. intros; apply decomposed_2. Qed.
+
+End Halte.
 
 Fixpoint split_at_cancel el :=
   match el with
@@ -751,7 +757,9 @@ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
  apply IHel; reflexivity.
 Qed.
 
+(*
 End Free_Group.
+*)
 
 (* Step 2 *)
 
@@ -852,12 +860,14 @@ rewrite Rmult_comm, Rmult_assoc; f_equal.
 apply sqrt_sqrt; assumption.
 Qed.
 
+(*
 Section Rotation.
+*)
 
-Notation "'ạ'" := (E la false).
-Notation "'ạ⁻¹'" := (E la true).
-Notation "'ḅ'" := (E lb false).
-Notation "'ḅ⁻¹'" := (E lb true).
+Notation "'ạ'" := (FE la false).
+Notation "'ạ⁻¹'" := (FE la true).
+Notation "'ḅ'" := (FE lb false).
+Notation "'ḅ⁻¹'" := (FE lb true).
 
 Check decomposed_4.
 Check decomposed_2_a.
@@ -1265,7 +1275,7 @@ Qed.
 
 Theorem norm_list_dec : ∀ el,
   { norm_list el = el } +
-  { ∃ el₁ t d el₂, el = el₁ ++ E t d :: E t (negb d) :: el₂ }.
+  { ∃ el₁ t d el₂, el = el₁ ++ FE t d :: FE t (negb d) :: el₂ }.
 Proof.
 intros el.
 induction el as [| e]; [ left; reflexivity | ].
@@ -1293,7 +1303,7 @@ destruct (norm_list_dec el₁) as [H₁| H₁]; [ assumption | ].
 destruct H₁ as (el₂ & t & d & el₃ & H₁).
 subst el₁.
 exfalso; revert H.
-replace (E t (negb d)) with (negf (E t d)) by reflexivity.
+replace (FE t (negb d)) with (negf (FE t d)) by reflexivity.
 rewrite app_comm_cons.
 apply norm_list_no_consec.
 Qed.
@@ -1537,7 +1547,7 @@ Qed.
 Theorem rotate_prop : ∀ p t d el el₁ el₂ e a b c,
   t = lb ∧ p = (1, 0, 0, O)%Z ∨
   t = la ∧ p = (0, 0, 1, O)%Z
-  → el₁ = el₂ ++ [E t d]
+  → el₁ = el₂ ++ [FE t d]
   → el = e :: el₁
   → norm_list el = el
   → fold_right rotate_param p el₁ = (a, b, c, length el₁)
@@ -1580,7 +1590,7 @@ destruct el₂ as [| e₁].
  simpl in Hlen; apply eq_add_S in Hlen.
  rewrite Hel₁, fold_right_app in Hp.
  simpl in Hp.
- remember (rotate_param (E t d) p) as p₁ eqn:Hp₁.
+ remember (rotate_param (FE t d) p) as p₁ eqn:Hp₁.
  remember (fold_right rotate_param p₁ el₂) as p' eqn:Hp'.
  symmetry in Hp'.
  destruct p' as (((a', b'), c'), N').
@@ -1682,7 +1692,7 @@ Qed.
 Theorem rotate_param_b_nonzero : ∀ p t d el el₁ a b c,
   t = lb ∧ p = (1, 0, 0, O)%Z ∨
   t = la ∧ p = (0, 0, 1, O)%Z
-  → el = el₁ ++ [E t d]
+  → el = el₁ ++ [FE t d]
   → norm_list el = el
   → fold_right rotate_param p el = (a, b, c, length el)
   → (b mod 3 ≠ 0)%Z.
@@ -1701,7 +1711,7 @@ destruct len.
  destruct el₁ as [| e₁]; [ discriminate Hlen | simpl in Hlen ].
  apply eq_add_S in Hlen.
  rewrite <- app_comm_cons in Hel.
- remember (el₁ ++ [E t d]) as el₂ eqn:Hel₁.
+ remember (el₁ ++ [FE t d]) as el₂ eqn:Hel₁.
  generalize Hn; intros H₁; rewrite Hel in H₁.
  apply norm_list_cons in H₁.
  rewrite Hel in Hu; simpl in Hu.
@@ -1728,7 +1738,7 @@ Qed.
     integers and b is not divisible by 3" (Stan Wagon) *)
 
 Theorem rotate_1_0_0_b_nonzero : ∀ w el el₁ d,
-  el = el₁ ++ [E lb d]
+  el = el₁ ++ [FE lb d]
   → norm_list el = el
   → w = (λ p, fold_right rotate p el)
   → ∃ a b c k,
@@ -1759,7 +1769,7 @@ replace (S (length el₁)) with (length el) in Hu.
 Qed.
 
 Theorem rotate_0_0_1_b_nonzero : ∀ w el el₁ d,
-  el = el₁ ++ [E la d]
+  el = el₁ ++ [FE la d]
   → norm_list el = el
   → w = (λ p, fold_right rotate p el)
   → ∃ a b c k,
@@ -1790,7 +1800,7 @@ replace (S (length el₁)) with (length el) in Hu.
 Qed.
 
 Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
-  el = el₁ ++ [E lb d]
+  el = el₁ ++ [FE lb d]
   → norm_list el = el
   → fold_right rotate (P 1 0 0) el ≠ P 1 0 0.
 Proof.
@@ -1814,7 +1824,7 @@ destruct Hb as [Hb| Hb].
 Qed.
 
 Theorem rotate_0_0_1_is_diff : ∀ el el₁ d,
-  el = el₁ ++ [E la d]
+  el = el₁ ++ [FE la d]
   → norm_list el = el
   → fold_right rotate (P 0 0 1) el ≠ P 0 0 1.
 Proof.
@@ -1973,8 +1983,8 @@ Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_right rotate (P 1 0 0) el₁ = p₁
   → fold_right rotate (P 1 0 0) el₂ = p₂
-  → el₁ = el'₁ ++ [E lb d₁]
-  → el₂ = el'₂ ++ [E lb d₂]
+  → el₁ = el'₁ ++ [FE lb d₁]
+  → el₂ = el'₂ ++ [FE lb d₂]
   → norm_list el₁ = el₁
   → norm_list el₂ = el₂
   → el₁ ≠ el₂
@@ -2008,7 +2018,7 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
    revert Hp; rewrite Hel₁, app_assoc.
    rewrite Hel₁, app_assoc in H₁.
    remember (rev_path el₂ ++ el'₁) as el₄ eqn:Hel₄.
-   remember (el₄ ++ [E lb d₁]) as el₃ eqn:Hel₃.
+   remember (el₄ ++ [FE lb d₁]) as el₃ eqn:Hel₃.
    pose proof rotate_1_0_0_is_diff el₃ el₄ d₁ Hel₃ H₁ as H₂.
    apply H₂.
 
@@ -2085,7 +2095,7 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
      injection Hs₃; clear Hs₃; intros; subst t₄ d₂ el'₂.
      apply rotate_rev_path in Hp.
      rewrite rev_path_app in Hp.
-     remember (rev_path (E lb d₄ :: el₄)) as el₃ eqn:Hel₃.
+     remember (rev_path (FE lb d₄ :: el₄)) as el₃ eqn:Hel₃.
      revert Hp.
      rewrite rev_path_cons, rev_path_single in Hel₃; simpl in Hel₃.
      rewrite <- app_comm_cons, <- Hel₃ in Hel₂.
@@ -2406,9 +2416,11 @@ destruct e as (t, d); destruct t.
  destruct d; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
 Qed.
 
+(*
 End Rotation.
 
 Section Orbit.
+*)
 
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
@@ -2490,10 +2502,10 @@ exists f; split.
  symmetry; apply Hxfx.
 Qed.
 
-Notation "'ạ'" := (E la false).
-Notation "'ạ⁻¹'" := (E la true).
-Notation "'ḅ'" := (E lb false).
-Notation "'ḅ⁻¹'" := (E lb true).
+Notation "'ạ'" := (FE la false).
+Notation "'ạ⁻¹'" := (FE la true).
+Notation "'ḅ'" := (FE lb false).
+Notation "'ḅ⁻¹'" := (FE lb true).
 
 Definition not_in_fixpoints p :=
   ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
@@ -2678,6 +2690,10 @@ Definition is_partition {A} {S : set_model A} E Ep :=
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
 
+(*
+End Orbit.
+*)
+
 Theorem set_eq_refl A : reflexive _ (@set_eq A set_equiv).
 Proof. intros P x; split; intros; assumption. Qed.
 
@@ -2701,6 +2717,23 @@ Add Parametric Relation A : (A → Prop) (@set_eq A set_equiv)
  symmetry proved by (set_eq_sym A)
  transitivity proved by (set_eq_trans A)
  as set_eq_rel.
+
+(*
+Section Orbit2.
+*)
+
+Delimit Scope set_scope with S.
+Notation "'ạ'" := (FE la false).
+Notation "'ạ⁻¹'" := (FE la true).
+Notation "'ḅ'" := (FE lb false).
+Notation "'ḅ⁻¹'" := (FE lb true).
+Notation "a = b" := (set_eq a b) : set_scope.
+Notation "'∅'" := (empty_set) : set_scope.
+Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
+Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
+Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
+Notation "E .[ i ]" := (nth_set i E) (at level 1, format "E .[ i ]")
+: set_scope.
 
 Theorem union_empty_r : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop), (F ⋃ ∅ = F)%S.
@@ -3380,9 +3413,11 @@ intros.
 eapply r_decomposed_2; eassumption.
 Qed.
 
+(*
 End Orbit.
 
 Section Equidecomposability.
+*)
 
 Add Parametric Morphism {A} : (@is_partition A set_equiv)
   with signature @set_eq A set_equiv ==> eq ==> iff
@@ -3405,10 +3440,10 @@ Qed.
 
 Delimit Scope set_scope with S.
 
-Notation "'ạ'" := (E la false).
-Notation "'ạ⁻¹'" := (E la true).
-Notation "'ḅ'" := (E lb false).
-Notation "'ḅ⁻¹'" := (E lb true).
+Notation "'ạ'" := (FE la false).
+Notation "'ạ⁻¹'" := (FE la true).
+Notation "'ḅ'" := (FE lb false).
+Notation "'ḅ⁻¹'" := (FE lb true).
 
 Notation "a = b" := (set_eq a b) : set_scope.
 Notation "'∅'" := (empty_set) : set_scope.
@@ -3542,6 +3577,13 @@ split.
  clear F HF.
  assert (Hgi : ∀ E₁ E₂, (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S).
 Focus 2.
+induction P.
+subst s; intros x.
+split; [ | contradiction ].
+destruct i, j; intros (H, _); contradiction.
+subst s.
+simpl.
+etransitivity.
 
 bbb.
  assert (Hgi : ∀ E₁ E₂ x, (E₁ ⋂ E₂)%S x → (g E₁ ⋂ g E₂)%S x).
