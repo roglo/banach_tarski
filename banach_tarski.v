@@ -3424,7 +3424,7 @@ Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 
 Definition transf_group (os : sel_model) :=
   λ (g : (point → Prop) → (point → Prop)),
-  (g = rot (E la false)) ∨
+  (∃ e, g = rot e) ∨
   (∃ dx, g = xtransl dx).
 
 Check transf_group.
@@ -3459,16 +3459,16 @@ intros * Hs Ho F P * HG HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
- destruct HG as [HG| HG].
+-destruct HG as [(e, HG)| HG].
  *subst g.
   unfold set_eq; subst s; simpl.
   intros x.
   split.
-  +intros Ha.
-   revert F HF Ha.
+  +intros He.
+   revert F HF He.
    induction P as [| Q P]; intros; [ exfalso; eapply HF; eassumption | ].
    simpl in HF; simpl.
-   generalize Ha; intros H.
+   generalize He; intros H.
    apply HF in H; simpl in H.
    destruct H as [H| H]; [ left; assumption | right ].
    eapply IHP; [ | simpl; reflexivity | eassumption ].
@@ -3482,11 +3482,11 @@ split.
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
 
-  +intros Hma.
+  +intros Hme.
    revert F HF.
    induction P as [| Q P]; intros; [ contradiction | ].
-   simpl in HF, Hma; apply HF.
-   destruct Hma as [Hma| Hma]; [ left; assumption | ].
+   simpl in HF, Hme; apply HF.
+   destruct Hme as [Hme| Hme]; [ left; assumption | ].
    right; simpl.
    apply IHP; [ | assumption | intros y; split; intros H; apply H ].
    intros i j Hij y.
@@ -3499,6 +3499,46 @@ split.
     apply HQ; split; assumption.
 
  *destruct HG as (dx, HG); subst g.
+  unfold set_eq; subst s; simpl.
+  intros (x, y, z).
+  split.
+  +intros Hp.
+   revert F HF Hp.
+   induction P as [| Q P]; intros.
+    unfold set_eq in HF; simpl in HF.
+    apply HF in Hp; contradiction.
+
+    simpl in HF; simpl.
+    generalize Hp; intros H.
+    apply HF in H; simpl in H.
+    destruct H as [H| H]; [ left; assumption | right ].
+    eapply IHP; [ | simpl; reflexivity | eassumption ].
+    intros i j Hij.
+    unfold set_eq; simpl; intros q.
+    assert (HSij : S i ≠ S j).
+     intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+     pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
+     destruct HP as (HQ, _).
+     split; [ intros (HPi, HPj) | contradiction ].
+     apply HQ; split; assumption.
+
+  +intros Hme.
+   revert F HF.
+   induction P as [| Q P]; intros; [ contradiction | ].
+   simpl in HF, Hme; apply HF.
+   destruct Hme as [Hme| Hme]; [ left; assumption | ].
+   right; simpl.
+   apply IHP; [ | assumption | intros q; split; intros H; apply H ].
+   intros i j Hij q.
+   assert (HSij : S i ≠ S j).
+    intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+    pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
+    destruct HP as (HQ, _).
+    split; [ intros (HPi, HPj) | contradiction ].
+    apply HQ; split; assumption.
+-
 bbb.
 
 Show.
