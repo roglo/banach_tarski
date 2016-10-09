@@ -3539,19 +3539,60 @@ split.
     apply HQ; split; assumption.
 
 -intros i j Hij.
+ clear F HF.
  unfold set_eq; subst s; simpl.
+(**)
+ intros p; split; intros H; [ | contradiction ].
+ unfold nth_set in H.
+ destruct H as (Hi, Hj).
+ destruct i; simpl in Hi.
+  destruct P as [| P PL]; [ contradiction | ].
+  simpl in Hi.
+
+bbb.
+
+ remember set_equiv as s.
+ replace ∅%S with (g ∅)%S in Hi, Hj.
+Focus 2.
+  unfold set_eq in H; simpl in H.
+  pose proof H p as Hp.
+  destruct Hp as (_, Hp).
+
+SearchAbout (List.nth _ (map _ _)).
+
+ rewrite map_nth in Hi.
+
+bbb.
  intros q; split; intros H; [ | contradiction ].
- revert i j q F Hij HF H.
+ revert i j q Hij H.
  induction P as [| Q P]; intros; [ destruct H, i, j; contradiction | ].
  simpl in H.
  destruct H as (Hi, Hj).
-bbb.
- assert (HSij : S i ≠ S j).
-  intros HSij; apply Hij, Nat.succ_inj; assumption.
+ remember set_equiv as s.
+ assert (HR : ∀ i j : ℕ, i ≠ j → (P .[ i] ⋂ P .[ j] = ∅)%S).
+  subst s.
+  intros i₁ j₁ Hij₁.
+  split; intros H; [ | contradiction ].
+  assert (HSij₁ : S i₁ ≠ S j₁).
+   intros HSij; apply Hij₁, Nat.succ_inj; assumption.
 
-  pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
-  destruct HP as (HQ, _).
-  apply HQ.
+   pose proof HP (S i₁) (S j₁) HSij₁ x as HQ; simpl in HQ.
+   destruct HQ as (HQ, _).
+   apply HQ; assumption.
+
+  destruct i.
+   unfold nth_set in Hi; simpl in Hi.
+   destruct j; [ apply Hij; reflexivity | ].
+   unfold nth_set in Hj; simpl in Hj.
+
+bbb.
+
+  unfold nth_set in HP; simpl in HP.
+  destruct i.
+   unfold nth_set in Hi; simpl in Hi.
+
+bbb.
+  apply HP.
   unfold nth_set; simpl; simpl in H.
   destruct H as (Hi, Hj).
 bbb.
