@@ -3460,8 +3460,16 @@ unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
  destruct HG as [HG| HG].
+  (* rot ạ *)
   subst g.
   unfold set_eq; subst s; simpl.
+(**)
+  intros x.
+  split.
+   intros Ha.
+
+bbb.
+
   intros x; unfold rot; simpl.
   split; intros H.
 (**)
