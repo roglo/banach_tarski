@@ -3548,10 +3548,11 @@ split.
 
   pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
   destruct HP as (HQ, _).
+bbb.
+
   apply HQ.
   unfold nth_set; simpl; simpl in H.
   destruct H as (Hi, Hj).
-
 bbb.
 
 Show.
