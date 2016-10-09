@@ -3453,7 +3453,6 @@ split.
 Theorem toto : ∀ s f, s = set_equiv → orbit_selector f →
   ∀ (F : point → Prop) P g,
   G f g → is_partition F P → is_partition (g F) (map g P).
-  (* probably missing that g is member of a "good" group *)
 Proof.
 intros * Hs Ho F P * HG HP.
 unfold is_partition in HP |-*.
@@ -3538,7 +3537,14 @@ split.
     destruct HP as (HQ, _).
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
--
+-intros i j Hij.
+ revert i j F Hij HF.
+ induction P as [| Q P]; intros.
+  unfold set_eq; subst s; simpl.
+  intros x; split; intros H; [ | contradiction ].
+  destruct H, i, j; contradiction.
+
+  simpl.
 bbb.
 
 Show.
