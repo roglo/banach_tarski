@@ -3460,12 +3460,11 @@ unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
  destruct HG as [HG| HG].
-  (* rot ạ *)
-  subst g.
+ *subst g.
   unfold set_eq; subst s; simpl.
   intros x.
   split.
-   intros Ha.
+  +intros Ha.
    revert F HF Ha.
    induction P as [| Q P]; intros; [ exfalso; eapply HF; eassumption | ].
    simpl in HF; simpl.
@@ -3483,7 +3482,23 @@ split.
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
 
-   intros Hma.
+  +intros Hma.
+   revert F HF.
+   induction P as [| Q P]; intros; [ contradiction | ].
+   simpl in HF, Hma; apply HF.
+   destruct Hma as [Hma| Hma]; [ left; assumption | ].
+   right; simpl.
+   apply IHP; [ | assumption | intros y; split; intros H; apply H ].
+   intros i j Hij y.
+   assert (HSij : S i ≠ S j).
+    intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+    pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
+    destruct HP as (HQ, _).
+    split; [ intros (HPi, HPj) | contradiction ].
+    apply HQ; split; assumption.
+
+ *destruct HG as (dx, HG); subst g.
 bbb.
 
 Show.
