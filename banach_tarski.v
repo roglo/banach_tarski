@@ -3537,14 +3537,21 @@ split.
     destruct HP as (HQ, _).
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
--intros i j Hij.
- revert i j F Hij HF.
- induction P as [| Q P]; intros.
-  unfold set_eq; subst s; simpl.
-  intros x; split; intros H; [ | contradiction ].
-  destruct H, i, j; contradiction.
 
-  simpl.
+-intros i j Hij.
+ unfold set_eq; subst s; simpl.
+ intros q; split; intros H; [ | contradiction ].
+ revert i j q F Hij HF H.
+ induction P as [| Q P]; intros; [ destruct H, i, j; contradiction | ].
+ assert (HSij : S i ≠ S j).
+  intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+  pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
+  destruct HP as (HQ, _).
+  apply HQ.
+  unfold nth_set; simpl; simpl in H.
+  destruct H as (Hi, Hj).
+
 bbb.
 
 Show.
