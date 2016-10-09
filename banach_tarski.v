@@ -3540,7 +3540,29 @@ split.
 
 -intros i j Hij.
  clear F HF.
- assert (∀ E₁ E₂ x, (E₁ ⋂ E₂)%S x → (g E₁ ⋂ g E₂)%S x).
+ assert (Hgi : ∀ E₁ E₂, (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S).
+Focus 2.
+
+bbb.
+ assert (Hgi : ∀ E₁ E₂ x, (E₁ ⋂ E₂)%S x → (g E₁ ⋂ g E₂)%S x).
+Focus 2.
+induction P.
+subst s; intros x.
+split; [ | contradiction ].
+destruct i, j; intros (H, _); contradiction.
+
+simpl.
+unfold nth_set.
+destruct i, j; simpl.
+
+
+subst s; intros x.
+split; [ | contradiction ].
+unfold nth_set.
+destruct i, j; simpl; intros (H₁, H₂); simpl.
+
+
+
 bbb.
 
  unfold set_eq; subst s; simpl.
