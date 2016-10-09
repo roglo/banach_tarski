@@ -3463,46 +3463,27 @@ split.
   (* rot ạ *)
   subst g.
   unfold set_eq; subst s; simpl.
-(**)
   intros x.
   split.
    intros Ha.
+   revert F HF Ha.
+   induction P as [| Q P]; intros; [ exfalso; eapply HF; eassumption | ].
+   simpl in HF; simpl.
+   generalize Ha; intros H.
+   apply HF in H; simpl in H.
+   destruct H as [H| H]; [ left; assumption | right ].
+   eapply IHP; [ | simpl; reflexivity | eassumption ].
+   intros i j Hij.
+   unfold set_eq; simpl; intros y.
+   assert (HSij : S i ≠ S j).
+    intros HSij; apply Hij, Nat.succ_inj; assumption.
 
-bbb.
+    pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
+    destruct HP as (HQ, _).
+    split; [ intros (HPi, HPj) | contradiction ].
+    apply HQ; split; assumption.
 
-  intros x; unfold rot; simpl.
-  split; intros H.
-(**)
-induction P as [| P PL].
- unfold set_eq in HF; simpl in HF.
- exfalso; eapply HF; eassumption.
-
- simpl; unfold union; simpl.
- simpl in HF.
-   pose proof (HF (rotate ạ⁻¹ x)) as H₁.
-   destruct H₁ as (H₁, H₂).
-   pose proof H₁ H as H₃.
-   unfold union in H₃.
-   destruct H₃ as [H₃| H₃]; [ left; assumption | ].
-Focus 1.
-right; apply IHPL.
-Focus 2.
-intros y.
-split; intros H₄.
-pose proof HF y.
-destruct H0.
-apply H0 in H₄.
-destruct H₄; [ | assumption ].
-
-
-bbb.
-   unfold set_eq in HF; simpl in HF.
-   unfold union_list in HF; simpl in HF.
-   unfold union_list; simpl.
-   pose proof (HF (rotate ạ⁻¹ x)) as H₁.
-   destruct H₁ as (H₁, H₂).
-   pose proof H₁ H as H₃.
-
+   intros Hma.
 bbb.
 
 Show.
