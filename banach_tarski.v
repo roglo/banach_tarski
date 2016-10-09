@@ -3540,6 +3540,9 @@ split.
 
 -intros i j Hij.
  clear F HF.
+ assert (∀ E₁ E₂ x, (E₁ ⋂ E₂)%S x → (g E₁ ⋂ g E₂)%S x).
+bbb.
+
  unfold set_eq; subst s; simpl.
 (**)
  intros p; split; intros H; [ | contradiction ].
