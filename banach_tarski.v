@@ -3473,6 +3473,16 @@ Check transf_group.
 
 Definition G f := transf_group (mkos _ f).
 
+Theorem group_inter_distr : ∀ s f g E₁ E₂, s = set_equiv → G f g → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
+  intros * Hs HG; subst s; intros p.
+  destruct HG as [(e, HG)| (dx, HG)].
+   subst g; split; intros H; assumption.
+
+   subst g.
+   destruct p as (x, y, z).
+   split; intros H; assumption.
+Qed.
+
 Definition equidecomposable (s : set_model point) G E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
@@ -3582,7 +3592,45 @@ split.
 
 -intros i j Hij.
  clear F HF.
- assert (Hgi : ∀ E₁ E₂, (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S).
+ unfold nth_set.
+ assert (He : (empty_set = g empty_set)%S).
+  destruct HG as [(e, HG)| (dx, HG)]; [ subst g s; reflexivity | ].
+  subst g s; intros p; destruct p as (x, y, z); simpl.
+  split; [ contradiction | intros H; contradiction ].
+
+  replace (List.nth i (map g P) empty_set) with
+    (List.nth i (map g P) (g empty_set)).
+Focus 2.
+   unfold set_eq in He; subst s; simpl in He.
+   clear - He.
+   induction P as [| P PL].
+    destruct i; simpl.
+bbb.
+
+  replace empty_set with (g empty_set) by apply He.
+  do 2 rewrite map_nth.
+  subst s; symmetry.
+  etransitivity; [ symmetry | eapply group_inter_distr; auto ].
+  pose proof HP i j Hij as H.
+  unfold nth_set in H.
+  unfold set_eq in H |-*.
+  simpl in H |-*.
+  intros p.
+  pose proof H p as H₁.
+  destruct H₁ as (H₁, _).
+  split.
+   intros Hg.
+   replace (g empty_set) with (@empty_set point) by apply He.
+   apply H₁.
+   destruct HG as [(e, HG)| (dx, HG)].
+    subst g; apply H in Hg; contradiction.
+
+    subst g; destruct p as (x, y, z).
+    apply H in Hg; contradiction.
+
+   intros H₂.
+   simpl in H.
+bbb.
 Focus 2.
 (*
 pose proof (Hgi P.[i] P.[j])%S as Hgij.
