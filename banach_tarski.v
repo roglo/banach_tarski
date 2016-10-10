@@ -3620,14 +3620,26 @@ Definition equidecomposable (s : set_model point) G E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
 
+Let s := @set_equiv point.
+
+Inductive B M : point → Prop :=
+  | B₀ : ∀ x, (∃ y, M y ∧ x = rotate ạ⁻¹ y) → B M x
+  | Bn : ∀ x, (∃ y, B M y ∧ x = rotate ạ⁻¹ y) → B M x.
+
+Check B.
+
 Theorem Banach_Tarski_paradox :
   R_eq_dec_on
-  → ∀ s f os, s = set_equiv → orbit_selector f → os = mkos _ f →
-    equidecomposable s (G f) all_but_fixpoints
+  → ∀ s M os, s = set_equiv → orbit_selector M → os = mkos _ M →
+    equidecomposable s (G M) all_but_fixpoints
       (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
-intros Rdec s f os Hs Hosf Hos.
-bbb. (* bin non, "aE U aS(a)" n'est pas "S(a)"... *)
+intros Rdec s M os Hs Hosf Hos.
+Check EE.
+Check B.
+exists [(EE ⋃ SS ạ ⋃ (B M))%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+bbb.
+(* bin non, "aE U aS(a)" n'est pas "S(a)"... *)
 exists [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 exists
   (map (xtransl 3) [SS ạ; rot ạ (SS ạ⁻¹)] ++
