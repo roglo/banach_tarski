@@ -3598,9 +3598,31 @@ split.
   subst g s; intros p; destruct p as (x, y, z); simpl.
   split; [ contradiction | intros H; contradiction ].
 
+  subst s.
+Set Printing All. Show.
+Add Parametric Morphism {A} : (@List.nth (A → Prop))
+  with signature eq ==> eq ==> (@set_eq A set_equiv) ==> (@set_eq A set_equiv)
+  as nth_set_eq_morph.
+Admitted.
+  rewrite He at 1.
+bbb.
+
+set (e := empty_set).
+unfold e at 3.
+subst s.
+  rewrite He.
+Show.
+bbb.
+*)
+
+bbb.
   replace (List.nth i (map g P) empty_set) with
     (List.nth i (map g P) (g empty_set)).
 Focus 2.
+bbb.
+
+bbb.
+
    unfold set_eq in He; subst s; simpl in He.
    clear - He.
    induction P as [| P PL].
