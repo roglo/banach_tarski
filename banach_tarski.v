@@ -2916,6 +2916,8 @@ split.
    pose proof H₁ H as H₃.
    destruct H₃ as [H₃| H₃]; [ left; left; assumption | ].
    destruct H₃ as [H₃| H₃].
+    unfold included in HB.
+
 (* does "B x" has to be decidable ? *)
 bbb.
  pose proof Hu x as H₁.
