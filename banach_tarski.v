@@ -3374,8 +3374,23 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p bm.
  destruct bm as [bm (p & Hp & Hbm)| bm].
   subst bm M; simpl in Hp.
-  unfold SS.
+  split.
+   unfold all_but_fixpoints.
+   split.
+bbb.
 
+   unfold is_partition in H.
+   destruct H as (Ha & Hij).
+   unfold union_list, set_eq in Ha; subst s; simpl in Ha.
+   apply Ha.
+   unfold union; simpl.
+   right; left.
+   unfold SS.
+  ============================
+  all_but_fixpoints (rotate ạ⁻¹ p)
+  ∧ (∃ el el₁ : list free_elem,
+     norm_list el = ạ⁻¹ :: el₁
+     ∧ fold_right rotate (os_fun (rotate ạ⁻¹ p)) el = rotate ạ⁻¹ p)
 bbb.
 
 Theorem old_r_decomposed_4 :
