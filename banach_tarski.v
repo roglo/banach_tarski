@@ -2677,6 +2677,8 @@ Definition union {A} (E₁ E₂ : A → Prop) :=
   λ x, E₁ x ∨ E₂ x.
 Definition union_list {A} (Ei : list (A → Prop)) :=
   fold_right union empty_set Ei.
+Definition subtract {A} (E₁ E₂ : A → Prop) :=
+  λ x, E₁ x ∧ ¬ E₂ x.
 Definition nth_set {A} i (Ei : list (A → Prop)) :=
   List.nth i Ei empty_set.
 
@@ -2684,6 +2686,7 @@ Notation "a = b" := (set_eq a b) : set_scope.
 Notation "'∅'" := (empty_set) : set_scope.
 Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
 Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
+Notation "E₁ \ E₂" := (subtract E₁ E₂) (at level 50) : set_scope.
 Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
 Notation "E .[ i ]" := (nth_set i E) (at level 1, format "E .[ i ]")
 : set_scope.
@@ -3630,20 +3633,21 @@ Check B.
 
 Theorem Banach_Tarski_paradox :
   R_eq_dec_on
-  → ∀ s M os, s = set_equiv → orbit_selector M → os = mkos _ M →
-    equidecomposable s (G M) all_but_fixpoints
+  → ∀ s f os, s = set_equiv → orbit_selector f → os = mkos _ f →
+    equidecomposable s (G f) all_but_fixpoints
       (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
-intros Rdec s M os Hs Hosf Hos.
-Check EE.
-Check B.
-exists [(EE ⋃ SS ạ ⋃ (B M))%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
-bbb.
-(* bin non, "aE U aS(a)" n'est pas "S(a)"... *)
-exists [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+intros Rdec s f os Hs Hosf Hos.
+set (M := λ p, f p = p).
+set (A₁ := (EE ⋃ SS ạ ⋃ B M)%S).
+set (A₂ := (SS ạ⁻¹ \ B M)%S).
+set (A₃ := SS ḅ).
+set (A₄ := SS ḅ⁻¹).
+exists [A₁; A₂; A₃; A₄].
 exists
-  (map (xtransl 3) [SS ạ; rot ạ (SS ạ⁻¹)] ++
-   map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
+  (map (xtransl 3) [A₁; rot ạ A₂] ++
+   map (xtransl 6) [A₃; rot ḅ A₄]); simpl.
+bbb.
 split; [ eapply r_decomposed_4; try eassumption | ].
 split.
  pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
