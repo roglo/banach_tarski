@@ -864,10 +864,12 @@ Qed.
 Section Rotation.
 *)
 
+(*
 Notation "'ạ'" := (FE la false).
 Notation "'ạ⁻¹'" := (FE la true).
 Notation "'ḅ'" := (FE lb false).
 Notation "'ḅ⁻¹'" := (FE lb true).
+*)
 
 Check decomposed_4.
 Check decomposed_2_a.
@@ -2502,10 +2504,12 @@ exists f; split.
  symmetry; apply Hxfx.
 Qed.
 
+(*
 Notation "'ạ'" := (FE la false).
 Notation "'ạ⁻¹'" := (FE la true).
 Notation "'ḅ'" := (FE lb false).
 Notation "'ḅ⁻¹'" := (FE lb true).
+*)
 
 Definition not_in_fixpoints p :=
   ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
@@ -2722,6 +2726,7 @@ Add Parametric Relation A : (A → Prop) (@set_eq A set_equiv)
 Section Orbit2.
 *)
 
+(*
 Delimit Scope set_scope with S.
 Notation "'ạ'" := (FE la false).
 Notation "'ạ⁻¹'" := (FE la true).
@@ -2734,6 +2739,7 @@ Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
 Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
 Notation "E .[ i ]" := (nth_set i E) (at level 1, format "E .[ i ]")
 : set_scope.
+*)
 
 Theorem union_empty_r : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop), (F ⋃ ∅ = F)%S.
@@ -3437,7 +3443,7 @@ split; intros (H₁, H₂).
  split; intros H; [ apply H₁, HEF; assumption | apply HEF, H₁; assumption ].
 Qed.
 
-
+(*
 Delimit Scope set_scope with S.
 
 Notation "'ạ'" := (FE la false).
@@ -3451,6 +3457,7 @@ Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope
 Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
 Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
 Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
+*)
 
 (* "rot ạ" is an example of a member of the group *)
 Check rot.
@@ -3577,13 +3584,45 @@ split.
  clear F HF.
  assert (Hgi : ∀ E₁ E₂, (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S).
 Focus 2.
-induction P.
+(*
+pose proof (Hgi P.[i] P.[j])%S as Hgij.
+etransitivity.
+eapply set_eq_trans.
+; [ | eapply (Hgi P.[i] P.[j])%S | ].
+*)
+
+unfold nth_set.
+induction P as [| P PL].
 subst s; intros x.
 split; [ | contradiction ].
 destruct i, j; intros (H, _); contradiction.
-subst s.
-simpl.
-etransitivity.
+
+destruct i, j; simpl.
+ exfalso; apply Hij; reflexivity.
+
+ subst s.
+ transitivity (g P ⋂ List.nth j (map g PL) (g ∅))%S.
+  intros p.
+  split; intros (Hi, Hj).
+   split; [ assumption | ].
+   destruct HG as [(e, HG)| (dx, HG)]; [ subst g; assumption | ].
+   subst g; simpl.
+   clear - Hj; revert j Hj.
+   induction PL; intros; [ destruct j; contradiction | ].
+   destruct j; [ assumption | apply IHPL; assumption ].
+
+   split; [ assumption | ].
+   destruct HG as [(e, HG)| (dx, HG)]; [ subst g; assumption | ].
+   subst g; simpl.
+   clear - Hj; revert j Hj.
+   induction PL; intros; [ destruct p, j; contradiction | ].
+   destruct j; [ assumption | apply IHPL; assumption ].
+
+  intros p.
+  split.
+   intros (Hi, Hj).
+
+bbb.
 
 bbb.
  assert (Hgi : ∀ E₁ E₂ x, (E₁ ⋂ E₂)%S x → (g E₁ ⋂ g E₂)%S x).
