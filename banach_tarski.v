@@ -3290,6 +3290,19 @@ split.
      destruct i; contradiction.
 Qed.
 
+Theorem is_partition_union_subtract :
+  ∀ A s, s = set_equiv →
+  ∀ (F : A → Prop) P₁ P₂ Pl (B : A → Prop),
+  is_partition F (P₁ :: P₂ :: Pl)
+  → (∀ p, B p → P₂ p)
+  → is_partition F (P₁ ⋃ B :: P₂ \ B :: Pl)%S.
+Proof.
+intros A s Hs F P₁ P₂ Pl B Hp HB.
+destruct Hp as (Hu & Hi).
+split.
+
+bbb.
+
 Theorem r_decomposed_4 :
   R_eq_dec_on
   → ∀ s, s = set_equiv
@@ -3301,19 +3314,9 @@ Theorem r_decomposed_4 :
 Proof.
 intros Rdec s Hs f HoeHo os Hos M.
 pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
-eapply is_partition_group_first_2_together in H.
-Theorem is_partition_union_subtract :
-  ∀ A s, s = set_equiv →
-  ∀ (F : A → Prop) P₁ P₂ Pl,
-  is_partition F (P₁ :: P₂ :: Pl)
-  → B .... (* à déterminer *)
-  → is_partition F (union P₁ B :: subtract P₂ B :: Pl).
-
-bbb.
-eapply is_partition_group_first_2_together; eassumption.
-Qed.
-
-    
+eapply is_partition_group_first_2_together in H; [ | assumption ].
+apply is_partition_union_subtract; [ assumption | assumption | ].
+bbb.    
 
 Theorem old_r_decomposed_4 :
   R_eq_dec_on
