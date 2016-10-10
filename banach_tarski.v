@@ -2996,8 +2996,15 @@ Definition SS {os : sel_model} e := λ p,
   all_but_fixpoints p ∧
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
-Definition rot {os : @sel_model point} e (E : point → Prop) := λ p,
-  E (rotate (negf e) p).
+
+Let s := @set_equiv point.
+
+Inductive B M : point → Prop :=
+  | B₀ : ∀ x, (∃ y, M y ∧ x = rotate ạ⁻¹ y) → B M x
+  | Bn : ∀ x, (∃ y, B M y ∧ x = rotate ạ⁻¹ y) → B M x.
+
+Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
+Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 
 Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
   ∀ e p, EE p → SS e p → False.
@@ -3480,35 +3487,29 @@ split; intros (H₁, H₂).
  split; [ apply HE; assumption | apply HF; assumption ].
 Qed.
 
-Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
-
-Definition transf_group (os : sel_model) :=
+Definition G :=
   λ (g : (point → Prop) → (point → Prop)),
   (∃ e, g = rot e) ∨
   (∃ dx, g = xtransl dx).
 
-Check transf_group.
-
-Definition G f := transf_group (mkos _ f).
-
-Theorem group_inter_distr : ∀ s f g E₁ E₂, s = set_equiv →
-  G f g
+Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
+  G g
    → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
 Proof.
-  intros * Hs HG; subst s; intros p.
-  destruct HG as [(e, HG)| (dx, HG)].
-   subst g; split; intros H; assumption.
+intros s * HG; subst s; intros p.
+destruct HG as [(e, HG)| (dx, HG)].
+ subst g; split; intros H; assumption.
 
-   subst g.
-   destruct p as (x, y, z).
-   split; intros H; assumption.
+ subst g.
+ destruct p as (x, y, z).
+ split; intros H; assumption.
 Qed.
 
-Theorem partition_group_map : ∀ s f, s = set_equiv → orbit_selector f →
+Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
   ∀ (F : point → Prop) P g,
-  G f g → is_partition F P → is_partition (g F) (map g P).
+  G g → is_partition F P → is_partition (g F) (map g P).
 Proof.
-intros * Hs Ho F P * HG HP.
+intros s f Ho F P * HG HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
@@ -3623,21 +3624,13 @@ Definition equidecomposable (s : set_model point) G E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
 
-Let s := @set_equiv point.
-
-Inductive B M : point → Prop :=
-  | B₀ : ∀ x, (∃ y, M y ∧ x = rotate ạ⁻¹ y) → B M x
-  | Bn : ∀ x, (∃ y, B M y ∧ x = rotate ạ⁻¹ y) → B M x.
-
-Check B.
-
 Theorem Banach_Tarski_paradox :
   R_eq_dec_on
-  → ∀ s f os, s = set_equiv → orbit_selector f → os = mkos _ f →
-    equidecomposable s (G f) all_but_fixpoints
+  → ∀ (s := set_equiv) f os, orbit_selector f → os = mkos _ f →
+    equidecomposable s G all_but_fixpoints
       (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
-intros Rdec s f os Hs Hosf Hos.
+intros Rdec s f os Hosf Hos.
 set (M := λ p, f p = p).
 set (A₁ := (EE ⋃ SS ạ ⋃ B M)%S).
 set (A₂ := (SS ạ⁻¹ \ B M)%S).
@@ -3647,6 +3640,8 @@ exists [A₁; A₂; A₃; A₄].
 exists
   (map (xtransl 3) [A₁; rot ạ A₂] ++
    map (xtransl 6) [A₃; rot ḅ A₄]); simpl.
+Check r_decomposed_4.
+
 bbb.
 split; [ eapply r_decomposed_4; try eassumption | ].
 split.
