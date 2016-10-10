@@ -3627,6 +3627,7 @@ Theorem Banach_Tarski_paradox :
       (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
 intros Rdec s f os Hs Hosf Hos.
+bbb. (* bin non, "aE U aS(a)" n'est pas "S(a)"... *)
 exists [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 exists
   (map (xtransl 3) [SS ạ; rot ạ (SS ạ⁻¹)] ++
