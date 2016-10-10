@@ -2679,6 +2679,8 @@ Definition union_list {A} (Ei : list (A → Prop)) :=
   fold_right union empty_set Ei.
 Definition subtract {A} (E₁ E₂ : A → Prop) :=
   λ x, E₁ x ∧ ¬ E₂ x.
+Definition included {A} (E₁ E₂ : A → Prop) :=
+  ∀ x, E₁ x → E₂ x.
 Definition nth_set {A} i (Ei : list (A → Prop)) :=
   List.nth i Ei empty_set.
 
@@ -2686,7 +2688,8 @@ Notation "a = b" := (set_eq a b) : set_scope.
 Notation "'∅'" := (empty_set) : set_scope.
 Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
 Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
-Notation "E₁ \ E₂" := (subtract E₁ E₂) (at level 50) : set_scope.
+Notation "E₁ '\' E₂" := (subtract E₁ E₂) (at level 50) : set_scope.
+Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60) : set_scope.
 Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
 Notation "E .[ i ]" := (nth_set i E) (at level 1, format "E .[ i ]")
 : set_scope.
@@ -2727,21 +2730,6 @@ Add Parametric Relation A : (A → Prop) (@set_eq A set_equiv)
 
 (*
 Section Orbit2.
-*)
-
-(*
-Delimit Scope set_scope with S.
-Notation "'ạ'" := (FE la false).
-Notation "'ạ⁻¹'" := (FE la true).
-Notation "'ḅ'" := (FE lb false).
-Notation "'ḅ⁻¹'" := (FE lb true).
-Notation "a = b" := (set_eq a b) : set_scope.
-Notation "'∅'" := (empty_set) : set_scope.
-Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
-Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
-Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
-Notation "E .[ i ]" := (nth_set i E) (at level 1, format "E .[ i ]")
-: set_scope.
 *)
 
 Theorem union_empty_r : ∀ A s, s = set_equiv →
@@ -3294,13 +3282,12 @@ Theorem is_partition_union_subtract :
   ∀ A s, s = set_equiv →
   ∀ (F : A → Prop) P₁ P₂ Pl (B : A → Prop),
   is_partition F (P₁ :: P₂ :: Pl)
-  → (∀ p, B p → P₂ p)
+  → (B ⊂ P₂)%S
   → is_partition F (P₁ ⋃ B :: P₂ \ B :: Pl)%S.
 Proof.
 intros A s Hs F P₁ P₂ Pl B Hp HB.
 destruct Hp as (Hu & Hi).
 split.
-
 bbb.
 
 Theorem r_decomposed_4 :
