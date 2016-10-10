@@ -3371,7 +3371,11 @@ intros Rdec s Hs f HoeHo os Hos M.
 pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together in H; [ | assumption ].
 apply is_partition_union_subtract; [ assumption | assumption | | ].
- Print B.
+ intros p bm.
+ destruct bm as [bm (p & Hp & Hbm)| bm].
+  subst bm M; simpl in Hp.
+  unfold SS.
+
 bbb.
 
 Theorem old_r_decomposed_4 :
