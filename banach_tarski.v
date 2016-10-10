@@ -2896,6 +2896,84 @@ split.
    split; assumption.
 Qed.
 
+Theorem is_partition_union_subtract :
+  ∀ A s, s = set_equiv →
+  ∀ (F : A → Prop) P₁ P₂ Pl (B : A → Prop),
+  is_partition F (P₁ :: P₂ :: Pl)
+  → (B ⊂ P₂)%S
+  → is_partition F (P₁ ⋃ B :: P₂ \ B :: Pl)%S.
+Proof.
+intros A s Hs F P₁ P₂ Pl B Hp HB.
+destruct Hp as (Hu & Hi).
+split.
+ unfold union_list, union, subtract, set_eq in Hu |-*.
+ subst s; simpl in Hu |-*.
+ intros x.
+(**)
+ split; intros H.
+  pose proof Hu x as H₁.
+  destruct H₁ as (H₁ & H₂).
+   pose proof H₁ H as H₃.
+   destruct H₃ as [H₃| H₃]; [ left; left; assumption | ].
+   destruct H₃ as [H₃| H₃].
+(* does "B x" has to be decidable ? *)
+bbb.
+ pose proof Hu x as H₁.
+ destruct H₁ as (H₁ & H₂).
+ split; intros H.
+  apply H₁ in H.
+  destruct H as [H| H]; [ left; left; assumption | ].
+  destruct H as [H| H].
+   right; left.
+   split; [ assumption | ].
+bbb.
+
+  destruct H as [H| H]; [ left; right; assumption | ].
+  right; assumption.
+
+  apply H₂.
+  destruct H as [[H| H]| H]; [ left; assumption | right; left; assumption | ].
+  right; right; assumption.
+
+ intros i j Hij; subst s.
+ destruct i.
+  unfold nth_set, intersection, set_eq; simpl.
+  intros x.
+  split; [ | contradiction ].
+  intros (H₁, H₂).
+  destruct j; [ apply Hij; reflexivity | clear Hij ].
+  destruct H₁ as [H₁| H₁].
+   apply Hi with (i := O) (j := S (S j)); [ intros H; discriminate H | ].
+   unfold nth_set, intersection; simpl.
+   split; assumption.
+
+   apply Hi with (i := 1%nat) (j := S (S j)); [ intros H; discriminate H | ].
+   unfold nth_set, intersection; simpl.
+   split; assumption.
+
+  unfold nth_set, intersection, union, set_eq; simpl.
+  intros x.
+  split; [ | contradiction ].
+  intros (H₁ & H₂).
+  destruct j.
+   destruct H₂ as [H₂| H₂].
+    apply Hi with (i := O) (j := S (S i)); [ intros H; discriminate H | ].
+    unfold nth_set, intersection; simpl.
+    split; assumption.
+
+    apply Hi with (i := 1%nat) (j := S (S i)); [ intros H; discriminate H | ].
+    unfold nth_set, intersection; simpl.
+    split; assumption.
+
+  apply Hi with (i := S (S i)) (j := S (S j)).
+   intros H; apply Hij.
+   apply Nat.succ_inj; assumption.
+
+   unfold nth_set, intersection; simpl.
+   split; assumption.
+
+bbb.
+
 Theorem partition_union :
   ∀ A s, s = set_equiv →
   ∀ (F₁ F₂ : A → Prop) P₁ P₂,
@@ -3129,7 +3207,7 @@ Theorem r_decomposed_5 :
 Proof.
 intros Rdec s Hs f (Hoe, Ho) os Hos; subst os s.
 split.
-*unfold is_partition; intros p.
+*intros p.
  split.
  -intros Hnf.
   unfold union_list; simpl; unfold union.
@@ -3277,18 +3355,6 @@ split.
 
      destruct i; contradiction.
 Qed.
-
-Theorem is_partition_union_subtract :
-  ∀ A s, s = set_equiv →
-  ∀ (F : A → Prop) P₁ P₂ Pl (B : A → Prop),
-  is_partition F (P₁ :: P₂ :: Pl)
-  → (B ⊂ P₂)%S
-  → is_partition F (P₁ ⋃ B :: P₂ \ B :: Pl)%S.
-Proof.
-intros A s Hs F P₁ P₂ Pl B Hp HB.
-destruct Hp as (Hu & Hi).
-split.
-bbb.
 
 Theorem r_decomposed_4 :
   R_eq_dec_on
