@@ -3295,6 +3295,31 @@ Theorem r_decomposed_4 :
   → ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
+  → ∀ (M := λ p, f p = p),
+    is_partition all_but_fixpoints
+      [((EE ⋃ SS ạ) ⋃ B M)%S; (SS ạ⁻¹ \ B M)%S; SS ḅ; SS ḅ⁻¹].
+Proof.
+intros Rdec s Hs f HoeHo os Hos M.
+pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
+eapply is_partition_group_first_2_together in H.
+Theorem is_partition_union_subtract :
+  ∀ A s, s = set_equiv →
+  ∀ (F : A → Prop) P₁ P₂ Pl,
+  is_partition F (P₁ :: P₂ :: Pl)
+  → B .... (* à déterminer *)
+  → is_partition F (union P₁ B :: subtract P₂ B :: Pl).
+
+bbb.
+eapply is_partition_group_first_2_together; eassumption.
+Qed.
+
+    
+
+Theorem old_r_decomposed_4 :
+  R_eq_dec_on
+  → ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros Rdec s Hs f HoeHo os Hos.
