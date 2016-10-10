@@ -3443,24 +3443,39 @@ split; intros (H₁, H₂).
  split; intros H; [ apply H₁, HEF; assumption | apply HEF, H₁; assumption ].
 Qed.
 
-(*
-Delimit Scope set_scope with S.
+Add Parametric Morphism {A} : (@List.nth (A → Prop))
+  with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as nth_set_morph.
+Proof.
+intros i l a b Hab.
+revert i.
+induction l as [| y]; intros; [ destruct i; apply Hab | ].
+destruct i; simpl; [ reflexivity | apply IHl ].
+Qed.
 
-Notation "'ạ'" := (FE la false).
-Notation "'ạ⁻¹'" := (FE la true).
-Notation "'ḅ'" := (FE lb false).
-Notation "'ḅ⁻¹'" := (FE lb true).
+Add Parametric Morphism {A} : (@intersection A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as intersection_morph.
+Proof.
+intros E E' HE F F' HF.
+unfold intersection; intros p.
+split; intros (H₁, H₂).
+ split; [ apply HE; assumption | apply HF; assumption ].
+ split; [ apply HE; assumption | apply HF; assumption ].
+Qed.
 
-Notation "a = b" := (set_eq a b) : set_scope.
-Notation "'∅'" := (empty_set) : set_scope.
-Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
-Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
-Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
-Notation "E .[ i ]" := (nth_set i E) (at level 1) : set_scope.
-*)
-
-(* "rot ạ" is an example of a member of the group *)
-Check rot.
+Add Parametric Morphism {A} : (@intersection A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
+  as intersection_iff_morph.
+Proof.
+intros E E' HE F F' HF a.
+unfold intersection.
+split; intros (H₁, H₂).
+ split; [ apply HE; assumption | apply HF; assumption ].
+ split; [ apply HE; assumption | apply HF; assumption ].
+Qed.
 
 Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
 
@@ -3510,12 +3525,12 @@ intros * Hs Ho F P * HG HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
--destruct HG as [(e, HG)| HG].
- *subst g.
+ destruct HG as [(e, HG)| HG].
+  subst g.
   unfold set_eq; subst s; simpl.
   intros x.
   split.
-  +intros He.
+   intros He.
    revert F HF He.
    induction P as [| Q P]; intros; [ exfalso; eapply HF; eassumption | ].
    simpl in HF; simpl.
@@ -3533,7 +3548,7 @@ split.
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
 
-  +intros Hme.
+   intros Hme.
    revert F HF.
    induction P as [| Q P]; intros; [ contradiction | ].
    simpl in HF, Hme; apply HF.
@@ -3549,11 +3564,11 @@ split.
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
 
- *destruct HG as (dx, HG); subst g.
+  destruct HG as (dx, HG); subst g.
   unfold set_eq; subst s; simpl.
   intros (x, y, z).
   split.
-  +intros Hp.
+   intros Hp.
    revert F HF Hp.
    induction P as [| Q P]; intros.
     unfold set_eq in HF; simpl in HF.
@@ -3574,7 +3589,7 @@ split.
      split; [ intros (HPi, HPj) | contradiction ].
      apply HQ; split; assumption.
 
-  +intros Hme.
+   intros Hme.
    revert F HF.
    induction P as [| Q P]; intros; [ contradiction | ].
    simpl in HF, Hme; apply HF.
@@ -3590,7 +3605,7 @@ split.
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
 
--intros i j Hij.
+ intros i j Hij.
  clear F HF.
  unfold nth_set.
  assert (He : (empty_set = g empty_set)%S).
@@ -3599,144 +3614,26 @@ split.
   split; [ contradiction | intros H; contradiction ].
 
   subst s.
-Set Printing All. Show.
-Add Parametric Morphism {A} : (@List.nth (A → Prop))
-  with signature eq ==> eq ==> (@set_eq A set_equiv) ==> (@set_eq A set_equiv)
-  as nth_set_eq_morph.
-Admitted.
-  rewrite He at 1.
-bbb.
-
-set (e := empty_set).
-unfold e at 3.
-subst s.
-  rewrite He.
-Show.
-bbb.
-*)
-
-bbb.
-  replace (List.nth i (map g P) empty_set) with
-    (List.nth i (map g P) (g empty_set)).
-Focus 2.
-bbb.
-
-bbb.
-
-   unfold set_eq in He; subst s; simpl in He.
-   clear - He.
-   induction P as [| P PL].
-    destruct i; simpl.
-bbb.
-
-  replace empty_set with (g empty_set) by apply He.
+  rewrite He at 1 2.
   do 2 rewrite map_nth.
-  subst s; symmetry.
+  symmetry.
   etransitivity; [ symmetry | eapply group_inter_distr; auto ].
   pose proof HP i j Hij as H.
   unfold nth_set in H.
   unfold set_eq in H |-*.
   simpl in H |-*.
   intros p.
-  pose proof H p as H₁.
-  destruct H₁ as (H₁, _).
-  split.
-   intros Hg.
-   replace (g empty_set) with (@empty_set point) by apply He.
+  split; [ | contradiction ].
+  intros Hg; apply He.
+  destruct HG as [(e, HG)| (dx, HG)]; [ subst g; apply H, Hg | ].
+  subst g; destruct p as (x, y, z).
+  unfold xtransl in Hg.
+  apply H, Hg.
+bbb.
+
    apply H₁.
-   destruct HG as [(e, HG)| (dx, HG)].
-    subst g; apply H in Hg; contradiction.
-
-    subst g; destruct p as (x, y, z).
-    apply H in Hg; contradiction.
-
-   intros H₂.
-   simpl in H.
-bbb.
-Focus 2.
-(*
-pose proof (Hgi P.[i] P.[j])%S as Hgij.
-etransitivity.
-eapply set_eq_trans.
-; [ | eapply (Hgi P.[i] P.[j])%S | ].
-*)
-
-unfold nth_set.
-induction P as [| P PL].
-subst s; intros x.
-split; [ | contradiction ].
-destruct i, j; intros (H, _); contradiction.
-
-destruct i, j; simpl.
- exfalso; apply Hij; reflexivity.
-
- subst s.
- transitivity (g P ⋂ List.nth j (map g PL) (g ∅))%S.
-  intros p.
-  split; intros (Hi, Hj).
-   split; [ assumption | ].
-   destruct HG as [(e, HG)| (dx, HG)]; [ subst g; assumption | ].
-   subst g; simpl.
-   clear - Hj; revert j Hj.
-   induction PL; intros; [ destruct j; contradiction | ].
-   destruct j; [ assumption | apply IHPL; assumption ].
-
-   split; [ assumption | ].
-   destruct HG as [(e, HG)| (dx, HG)]; [ subst g; assumption | ].
-   subst g; simpl.
-   clear - Hj; revert j Hj.
-   induction PL; intros; [ destruct p, j; contradiction | ].
-   destruct j; [ assumption | apply IHPL; assumption ].
-
-  intros p.
-  split.
-   intros (Hi, Hj).
-
-bbb.
-
-bbb.
- assert (Hgi : ∀ E₁ E₂ x, (E₁ ⋂ E₂)%S x → (g E₁ ⋂ g E₂)%S x).
-Focus 2.
-induction P.
-subst s; intros x.
-split; [ | contradiction ].
-destruct i, j; intros (H, _); contradiction.
-
-simpl.
-unfold nth_set.
-destruct i, j; simpl.
-
-
-subst s; intros x.
-split; [ | contradiction ].
-unfold nth_set.
-destruct i, j; simpl; intros (H₁, H₂); simpl.
-
-
-
-bbb.
-
- unfold set_eq; subst s; simpl.
-(**)
- intros p; split; intros H; [ | contradiction ].
- unfold nth_set in H.
- destruct H as (Hi, Hj).
- destruct i; simpl in Hi.
-  destruct P as [| P PL]; [ contradiction | ].
-  simpl in Hi.
-
-bbb.
-
- remember set_equiv as s.
- replace ∅%S with (g ∅)%S in Hi, Hj.
-Focus 2.
-  unfold set_eq in H; simpl in H.
-  pose proof H p as Hp.
-  destruct Hp as (_, Hp).
-
-SearchAbout (List.nth _ (map _ _)).
-
- rewrite map_nth in Hi.
+   rewrite He.
+  rewrite map_nth.
 
 bbb.
  intros q; split; intros H; [ | contradiction ].
