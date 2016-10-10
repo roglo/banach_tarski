@@ -3488,7 +3488,10 @@ Check transf_group.
 
 Definition G f := transf_group (mkos _ f).
 
-Theorem group_inter_distr : ∀ s f g E₁ E₂, s = set_equiv → G f g → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
+Theorem group_inter_distr : ∀ s f g E₁ E₂, s = set_equiv →
+  G f g
+   → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
+Proof.
   intros * Hs HG; subst s; intros p.
   destruct HG as [(e, HG)| (dx, HG)].
    subst g; split; intros H; assumption.
@@ -3498,26 +3501,7 @@ Theorem group_inter_distr : ∀ s f g E₁ E₂, s = set_equiv → G f g → (g 
    split; intros H; assumption.
 Qed.
 
-Definition equidecomposable (s : set_model point) G E₁ E₂ :=
-  ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
-  List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
-
-Theorem Banach_Tarski_paradox :
-  R_eq_dec_on
-  → ∀ s f os, s = set_equiv → orbit_selector f → os = mkos _ f →
-    equidecomposable s (G f) all_but_fixpoints
-      (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
-Proof.
-intros Rdec s f os Hs Hosf Hos.
-exists [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
-exists
-  (map (xtransl 3) [SS ạ; rot ạ (SS ạ⁻¹)] ++
-   map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
-split; [ eapply r_decomposed_4; try eassumption | ].
-split.
- pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
- pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
-Theorem toto : ∀ s f, s = set_equiv → orbit_selector f →
+Theorem partition_group_map : ∀ s f, s = set_equiv → orbit_selector f →
   ∀ (F : point → Prop) P g,
   G f g → is_partition F P → is_partition (g F) (map g P).
 Proof.
@@ -3617,7 +3601,8 @@ split.
   rewrite He at 1 2.
   do 2 rewrite map_nth.
   symmetry.
-  etransitivity; [ symmetry | eapply group_inter_distr; auto ].
+  etransitivity; [ | eapply group_inter_distr; try reflexivity; eassumption ].
+  symmetry.
   pose proof HP i j Hij as H.
   unfold nth_set in H.
   unfold set_eq in H |-*.
@@ -3629,72 +3614,55 @@ split.
   subst g; destruct p as (x, y, z).
   unfold xtransl in Hg.
   apply H, Hg.
-bbb.
+Qed.
 
-   apply H₁.
-   rewrite He.
-  rewrite map_nth.
+Definition equidecomposable (s : set_model point) G E₁ E₂ :=
+  ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
+  List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
 
-bbb.
- intros q; split; intros H; [ | contradiction ].
- revert i j q Hij H.
- induction P as [| Q P]; intros; [ destruct H, i, j; contradiction | ].
- simpl in H.
- destruct H as (Hi, Hj).
- remember set_equiv as s.
- assert (HR : ∀ i j : ℕ, i ≠ j → (P .[ i] ⋂ P .[ j] = ∅)%S).
-  subst s.
-  intros i₁ j₁ Hij₁.
-  split; intros H; [ | contradiction ].
-  assert (HSij₁ : S i₁ ≠ S j₁).
-   intros HSij; apply Hij₁, Nat.succ_inj; assumption.
+Theorem Banach_Tarski_paradox :
+  R_eq_dec_on
+  → ∀ s f os, s = set_equiv → orbit_selector f → os = mkos _ f →
+    equidecomposable s (G f) all_but_fixpoints
+      (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
+Proof.
+intros Rdec s f os Hs Hosf Hos.
+exists [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+exists
+  (map (xtransl 3) [SS ạ; rot ạ (SS ạ⁻¹)] ++
+   map (xtransl 6) [SS ḅ; rot ḅ (SS ḅ⁻¹)])%S; simpl.
+split; [ eapply r_decomposed_4; try eassumption | ].
+split.
+ pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
+ pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
+ eapply partition_group_map with (g := xtransl 3) in Ha; try eassumption.
+  eapply partition_group_map with (g := xtransl 6) in Hb; try eassumption.
+   eapply partition_union in Hb; [ | apply Hs | | apply Ha ].
+    eassumption.
 
-   pose proof HP (S i₁) (S j₁) HSij₁ x as HQ; simpl in HQ.
-   destruct HQ as (HQ, _).
-   apply HQ; assumption.
+    unfold intersection, set_eq; subst s; intros (x, y, z).
+    split; [ intros (H₁, H₂) | contradiction ].
+    unfold xtransl in H₁, H₂.
+    unfold empty_set; simpl.
+    destruct H₁ as (H₁, H₃).
+    destruct H₂ as (H₂, H₄).
+    unfold in_sphere in H₁, H₂.
+    apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
+    apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
+    apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
+    apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
+    clear - H₁ H₂.
+    rewrite <- Rsqr_1 in H₁ at 4.
+    rewrite <- Rsqr_1 in H₂ at 6.
+    apply Rsqr_le_abs_0 in H₁.
+    apply Rsqr_le_abs_0 in H₂.
+    rewrite Rabs_R1 in H₁, H₂.
+    unfold Rabs in H₁, H₂.
+    destruct (Rcase_abs (x + 3)), (Rcase_abs (x + 6)); lra.
 
-  destruct i.
-   unfold nth_set in Hi; simpl in Hi.
-   destruct j; [ apply Hij; reflexivity | ].
-   unfold nth_set in Hj; simpl in Hj.
+   right; exists 6%R; reflexivity.
 
-bbb.
-
-  unfold nth_set in HP; simpl in HP.
-  destruct i.
-   unfold nth_set in Hi; simpl in Hi.
-
-bbb.
-  apply HP.
-  unfold nth_set; simpl; simpl in H.
-  destruct H as (Hi, Hj).
-bbb.
-
-Show.
- apply toto with (g := xtransl 3) in Ha; simpl in Ha; [ | assumption ].
- apply toto with (g := xtransl 6) in Hb; simpl in Hb; [ | assumption ].
- eapply partition_union in Hb; [ | apply Hs | | apply Ha ].
-  assumption.
-
-  unfold intersection, set_eq; subst s; intros (x, y, z).
-  split; [ intros (H₁, H₂) | contradiction ].
-  unfold xtransl in H₁, H₂.
-  unfold empty_set; simpl.
-  destruct H₁ as (H₁, H₃).
-  destruct H₂ as (H₂, H₄).
-  unfold in_sphere in H₁, H₂.
-  apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
-  apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
-  apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
-  apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
-  clear - H₁ H₂.
-  rewrite <- Rsqr_1 in H₁ at 4.
-  rewrite <- Rsqr_1 in H₂ at 6.
-  apply Rsqr_le_abs_0 in H₁.
-  apply Rsqr_le_abs_0 in H₂.
-  rewrite Rabs_R1 in H₁, H₂.
-  unfold Rabs in H₁, H₂.
-  destruct (Rcase_abs (x + 3)), (Rcase_abs (x + 6)); lra.
+  right; exists 3%R; reflexivity.
 
  split; [ reflexivity | ].
 
