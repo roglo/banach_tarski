@@ -2928,44 +2928,53 @@ split.
    right; right; assumption.
 
  intros i j Hij; subst s.
-bbb.
  destruct i.
-  unfold nth_set, intersection, set_eq; simpl.
+  unfold nth_set, intersection, union, subtract, set_eq; simpl.
   intros x.
   split; [ | contradiction ].
   intros (H₁, H₂).
   destruct j; [ apply Hij; reflexivity | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   apply Hi with (i := O) (j := S (S j)); [ intros H; discriminate H | ].
+   apply Hi with (i := O) (j := S j); [ intros H; discriminate H | ].
    unfold nth_set, intersection; simpl.
-   split; assumption.
+   split; [ assumption | ].
+   destruct j; [ destruct H₂; assumption | assumption ].
 
-   apply Hi with (i := 1%nat) (j := S (S j)); [ intros H; discriminate H | ].
-   unfold nth_set, intersection; simpl.
-   split; assumption.
+   apply Hi with (i := 1%nat) (j := S j).
+    destruct j; [ destruct H₂; contradiction | intros H; discriminate H ].
 
-  unfold nth_set, intersection, union, set_eq; simpl.
+    unfold nth_set, intersection; simpl.
+    split; [ apply HB; assumption | ].
+    destruct j; [ destruct H₂; contradiction | assumption ].
+
+  unfold nth_set, intersection, union, subtract, set_eq; simpl.
   intros x.
   split; [ | contradiction ].
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    apply Hi with (i := O) (j := S (S i)); [ intros H; discriminate H | ].
+    apply Hi with (i := O) (j := S i); [ intros H; discriminate H | ].
     unfold nth_set, intersection; simpl.
-    split; assumption.
+    split; [ assumption | ].
+    destruct i; [ destruct H₁; assumption | assumption ].
 
-    apply Hi with (i := 1%nat) (j := S (S i)); [ intros H; discriminate H | ].
-    unfold nth_set, intersection; simpl.
-    split; assumption.
+    apply Hi with (i := 1%nat) (j := S i).
+     destruct i; [ | intros H; discriminate H ].
+     destruct H₁; contradiction.
 
-  apply Hi with (i := S (S i)) (j := S (S j)).
-   intros H; apply Hij.
-   apply Nat.succ_inj; assumption.
+     unfold nth_set, intersection; simpl.
+     split; [ apply HB; assumption | ].
+     destruct i; [ apply HB; assumption | assumption ].
+
+  apply Hi with (i := S i) (j := S j).
+   intros H; apply Hij; assumption.
 
    unfold nth_set, intersection; simpl.
-   split; assumption.
+   split.
+    destruct i; [ destruct H₁; assumption | assumption ].
 
-bbb.
+    destruct j; [ destruct H₂; assumption | assumption ].
+Qed.
 
 Theorem partition_union :
   ∀ A s, s = set_equiv →
@@ -3361,8 +3370,9 @@ Proof.
 intros Rdec s Hs f HoeHo os Hos M.
 pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together in H; [ | assumption ].
-apply is_partition_union_subtract; [ assumption | assumption | ].
-bbb.    
+apply is_partition_union_subtract; [ assumption | assumption | | ].
+ Print B.
+bbb.
 
 Theorem old_r_decomposed_4 :
   R_eq_dec_on
