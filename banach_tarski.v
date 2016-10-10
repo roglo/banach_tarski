@@ -2901,43 +2901,34 @@ Theorem is_partition_union_subtract :
   ∀ (F : A → Prop) P₁ P₂ Pl (B : A → Prop),
   is_partition F (P₁ :: P₂ :: Pl)
   → (B ⊂ P₂)%S
+  → (∀ x, Decidable.decidable (B x))
   → is_partition F (P₁ ⋃ B :: P₂ \ B :: Pl)%S.
 Proof.
-intros A s Hs F P₁ P₂ Pl B Hp HB.
+intros A s Hs F P₁ P₂ Pl B Hp HB HBdec.
 destruct Hp as (Hu & Hi).
 split.
  unfold union_list, union, subtract, set_eq in Hu |-*.
  subst s; simpl in Hu |-*.
  intros x.
-(**)
  split; intros H.
   pose proof Hu x as H₁.
   destruct H₁ as (H₁ & H₂).
-   pose proof H₁ H as H₃.
-   destruct H₃ as [H₃| H₃]; [ left; left; assumption | ].
-   destruct H₃ as [H₃| H₃].
-    unfold included in HB.
+  pose proof H₁ H as H₃.
+  destruct H₃ as [H₃| H₃]; [ left; left; assumption | ].
+  destruct H₃ as [H₃| H₃]; [ | right; right; assumption ].
+  destruct (HBdec x) as [H₄| H₄]; [ left; right; assumption | ].
+  right; left; split; assumption.
 
-(* does "B x" has to be decidable ? *)
-bbb.
- pose proof Hu x as H₁.
- destruct H₁ as (H₁ & H₂).
- split; intros H.
-  apply H₁ in H.
-  destruct H as [H| H]; [ left; left; assumption | ].
-  destruct H as [H| H].
-   right; left.
-   split; [ assumption | ].
-bbb.
+  apply Hu.
+  destruct H as [[H₁| H₁]| [H₁| H₁]]; [ left; assumption | | | ].
+   right; left; apply HB; assumption.
 
-  destruct H as [H| H]; [ left; right; assumption | ].
-  right; assumption.
+   right; left; destruct H₁; assumption.
 
-  apply H₂.
-  destruct H as [[H| H]| H]; [ left; assumption | right; left; assumption | ].
-  right; right; assumption.
+   right; right; assumption.
 
  intros i j Hij; subst s.
+bbb.
  destruct i.
   unfold nth_set, intersection, set_eq; simpl.
   intros x.
