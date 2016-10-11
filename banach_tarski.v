@@ -3687,16 +3687,23 @@ Fixpoint app_gr f p :=
 Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
   (app_gr g (E₁ ⋂ E₂) = app_gr g E₁ ⋂ app_gr g E₂)%S.
 Proof.
-intros s *; subst s; intros p.
-revert E₁ E₂ p.
+intros s *; subst s.
+revert E₁ E₂.
 induction g as [e| dx | g IHg h IHh ]; intros; simpl.
- split; intros H; assumption.
+ intros p; split; intros H; assumption.
 
- destruct p as (x, y, z).
- split; intros H; assumption.
+ intros (x, y, z); split; intros H; assumption.
 
+ intros p.
  split.
   intros H; apply IHg.
+(*
+Theorem toto : ∀ (s := set_equiv) g E F,
+  (E = F)%S → ∀ p, app_gr g E p → app_gr g F p.
+Admitted. Show.
+*)
+  pose proof toto g (app_gr h E₁) (app_gr h E₂).
+  rewrite <- IHh.
 bbb.
 
   split.
