@@ -2486,6 +2486,28 @@ Definition equiv_same_orbit : equiv point same_orbit :=
 Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
   ∃ f : A → A, (∀ x : A, R x (f x)) ∧ (∀ x y, R x y → f x = f y).
 
+(* TTCA implies excluded middle: do you believe that? Diaconescu! *)
+Theorem excluded_middle : ∀ P, P ∨ ¬P.
+Proof.
+intros P.
+set (R (x y : bool) := x = y ∨ P).
+assert (He : equiv _ R).
+ split; [ intros b; left; reflexivity | ].
+ split.
+  intros b c d Hbc [Hcd| Hcd]; [ subst c; assumption | right; assumption ].
+  intros b c [Hbc| Hbc]; [ left; symmetry | right ]; assumption.
+
+ destruct (TTCA bool R He) as (f & Hx & Hxy).
+ destruct (Bool.bool_dec (f false) (f true)) as [H| H].
+  destruct (Hx true) as [Ht| Ht]; [ | left; assumption ].
+  destruct (Hx false) as [Hf| Hf]; [ | left; assumption ].
+  rewrite <- Ht, <- Hf in H; discriminate H.
+
+  right; intros H₁; apply H.
+  apply Hxy; unfold R.
+  right; assumption.
+Qed.
+
 Theorem same_choice_in_same_orbit : ∃ f : point → point,
   (∀ x, same_orbit x (f x)) ∧
   (∀ x y, same_orbit x y ↔ f x = f y).
@@ -3417,6 +3439,10 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
 
  intros p.
  unfold Decidable.decidable; simpl.
+ apply excluded_middle.
+Qed.
+
+(*
  unfold B.
  unfold all_but_fixpoints.
  unfold in_sphere.
@@ -3425,12 +3451,14 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
  2: right; intros ((H₁, _), _); contradiction.
  remember (P x y z) as p eqn:Hp.
  rewrite and_assoc.
+
  set (u n :=
    if Pdec p (fold_right rotate (f p) (repeat ạ⁻¹ n)) then S O else O).
 
 Print on_orbit_by_seq_of.
 (* TODO: define and use LPO *)
 bbb.
+*)
 
 Theorem old_r_decomposed_4 :
   ∀ s, s = set_equiv
@@ -3550,7 +3578,7 @@ split.
    destruct i; contradiction.
 Qed.
 
-Theorem r_decomposed_2_a :
+Theorem old_r_decomposed_2_a :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
@@ -3559,6 +3587,14 @@ Proof.
 intros.
 eapply r_decomposed_2; eassumption.
 Qed.
+
+Theorem r_decomposed_2_a :
+  ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → ∀ os, os = mkos _ f
+  → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
+Proof.
+Admitted.
 
 Theorem r_decomposed_2_b :
   ∀ s, s = set_equiv
@@ -3779,42 +3815,45 @@ exists [A₁; A₂; A₃; A₄].
 exists
   (map (xtransl 3) [A₁; rot ạ A₂] ++
    map (xtransl 6) [A₃; rot ḅ A₄]); simpl.
-Check old_r_decomposed_4.
-bbb.
-split; [ eapply old_r_decomposed_4; try eassumption | ].
 split.
- pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
- pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
- eapply partition_group_map with (g := xtransl 3) in Ha; try eassumption.
-  eapply partition_group_map with (g := xtransl 6) in Hb; try eassumption.
-   eapply partition_union in Hb; [ | apply Hs | | apply Ha ].
-    eassumption.
+ subst A₁ A₂ A₃ A₄.
+ eapply r_decomposed_4; try eassumption; reflexivity.
 
-    unfold intersection, set_eq; subst s; intros (x, y, z).
-    split; [ intros (H₁, H₂) | contradiction ].
-    unfold xtransl in H₁, H₂.
-    unfold empty_set; simpl.
-    destruct H₁ as (H₁, H₃).
-    destruct H₂ as (H₂, H₄).
-    unfold in_sphere in H₁, H₂.
-    apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
-    apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
-    apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
-    apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
-    clear - H₁ H₂.
-    rewrite <- Rsqr_1 in H₁ at 4.
-    rewrite <- Rsqr_1 in H₂ at 6.
-    apply Rsqr_le_abs_0 in H₁.
-    apply Rsqr_le_abs_0 in H₂.
-    rewrite Rabs_R1 in H₁, H₂.
-    unfold Rabs in H₁, H₂.
-    destruct (Rcase_abs (x + 3)), (Rcase_abs (x + 6)); lra.
+ split.
+  subst s; remember set_equiv as s eqn:Hs.
+  pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
+  pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
+  subst s; set (s := set_equiv).
+  eapply partition_group_map with (g := xtransl 3) in Ha; try eassumption.
+   eapply partition_group_map with (g := xtransl 6) in Hb; try eassumption.
+    eapply partition_union in Hb; [ | reflexivity | | apply Ha ].
+     eapply Hb.
 
-   right; exists 6%R; reflexivity.
+     unfold intersection, set_eq; subst s; intros (x, y, z).
+     split; [ intros (H₁, H₂) | contradiction ].
+     unfold xtransl in H₁, H₂.
+     unfold empty_set; simpl.
+     destruct H₁ as (H₁, H₃).
+     destruct H₂ as (H₂, H₄).
+     unfold in_sphere in H₁, H₂.
+     apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
+     apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
+     apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
+     apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
+     clear - H₁ H₂.
+     rewrite <- Rsqr_1 in H₁ at 4.
+     rewrite <- Rsqr_1 in H₂ at 6.
+     apply Rsqr_le_abs_0 in H₁.
+     apply Rsqr_le_abs_0 in H₂.
+     rewrite Rabs_R1 in H₁, H₂.
+     unfold Rabs in H₁, H₂.
+     destruct (Rcase_abs (x + 3)), (Rcase_abs (x + 6)); lra.
 
-  right; exists 3%R; reflexivity.
+    right; exists 6%R; reflexivity.
 
- split; [ reflexivity | ].
+   right; exists 3%R; reflexivity.
+
+  split; [ reflexivity | ].
 
 bbb.
 
