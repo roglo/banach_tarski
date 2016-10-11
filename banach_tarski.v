@@ -3664,18 +3664,16 @@ split; intros (H₁, H₂).
  split; [ apply HE; assumption | apply HF; assumption ].
 Qed.
 
-Definition G :=
+Definition old_G :=
   λ (g : (point → Prop) → (point → Prop)),
   (∃ e, g = rot e) ∨
   (∃ dx, g = xtransl dx) ∨
   (∃ e dx, g = λ p, xtransl dx (rot e p)).
 
-Print nat.
-
-Inductive GG :=
-  | Rot : free_elem → GG
-  | Xtransl : ℝ → GG
-  | Comb : GG → GG → GG.
+Inductive G :=
+  | Rot : free_elem → G
+  | Xtransl : ℝ → G
+  | Comb : G → G → G.
 
 Fixpoint app_gr f p :=
   match f with
@@ -3683,6 +3681,23 @@ Fixpoint app_gr f p :=
   | Xtransl dx => xtransl dx p
   | Comb g h => app_gr g (app_gr h p)
   end.
+
+Theorem gr_subst : ∀ (s := set_equiv) g E F,
+  (E = F)%S → ∀ p, app_gr g E p → app_gr g F p.
+Proof.
+intros s * HEF * HE.
+revert E F p HEF HE.
+induction g as [e| dx | g IHg h IHh]; intros.
+ apply HEF, HE.
+
+ destruct p as (x, y, z).
+ apply HEF, HE.
+
+ simpl in HE; simpl.
+ eapply IHg; [ | eassumption ].
+ split; intros H; [ eapply IHh; eassumption | ].
+ eapply IHh; [ symmetry; eassumption | eassumption ].
+Qed.
 
 Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
   (app_gr g (E₁ ⋂ E₂) = app_gr g E₁ ⋂ app_gr g E₂)%S.
@@ -3697,29 +3712,14 @@ induction g as [e| dx | g IHg h IHh ]; intros; simpl.
  intros p.
  split.
   intros H; apply IHg.
-(*
-Theorem toto : ∀ (s := set_equiv) g E F,
-  (E = F)%S → ∀ p, app_gr g E p → app_gr g F p.
-Admitted. Show.
-*)
-  pose proof toto g (app_gr h E₁) (app_gr h E₂).
-  rewrite <- IHh.
-bbb.
+  eapply gr_subst; [ apply IHh | apply H ].
 
-  split.
-
-; intros H; [ split; apply H | ].
-
- (* I don't even understand why it works *)
- subst g; destruct p as (x, y, z); simpl.
- split; intros H; [ split; apply H | ].
- destruct H as (H₁ & H₂).
- split; [ apply H₁ | apply H₂ ].
+  intros H; apply IHg in H.
+  eapply gr_subst; [ symmetry; apply IHh | eassumption ].
 Qed.
-bbb.
 
-Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
-  G g
+Theorem old_group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
+  old_G g
    → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
 Proof.
 intros s * HG; subst s; intros p.
@@ -3729,7 +3729,6 @@ destruct HG as [(e, HG)| [(dx, HG)| (e & dx & HG)]].
  subst g; destruct p as (x, y, z).
  split; intros H; assumption.
 
- (* I don't even understand why it works *)
  subst g; destruct p as (x, y, z); simpl.
  split; intros H; [ split; apply H | ].
  destruct H as (H₁ & H₂).
@@ -3738,7 +3737,14 @@ Qed.
 
 Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
   ∀ (F : point → Prop) P g,
-  G g → is_partition F P → is_partition (g F) (map g P).
+  is_partition F P → is_partition (app_gr g F) (map (app_gr g) P).
+Proof.
+intros s f Ho F P * HP.
+bbb.
+
+Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
+  ∀ (F : point → Prop) P g,
+  old_G g → is_partition F P → is_partition (g F) (map g P).
 Proof.
 intros s f Ho F P * HG HP.
 unfold is_partition in HP |-*.
