@@ -1304,6 +1304,22 @@ destruct IHel as [IHel| IHel].
  reflexivity.
 Qed.
 
+Theorem norm_list_repeat : ∀ e n, norm_list (repeat e n) = repeat e n.
+Proof.
+intros e n.
+induction n; [ reflexivity | simpl ].
+rewrite IHn.
+remember (repeat e n) as el eqn:Hel.
+symmetry in Hel.
+destruct el as [| e₁]; [ reflexivity | ].
+destruct (letter_opp_dec e e₁) as [H| H]; [ | reflexivity ].
+apply letter_opp_negf in H; subst e.
+exfalso.
+destruct n; [ discriminate Hel | ].
+injection Hel; clear Hel; intros Hel H.
+revert H; apply no_fixpoint_negf.
+Qed.
+
 Theorem norm_list_is_cons : ∀ el e el₁,
   norm_list el = e :: el₁ → norm_list el₁ = el₁.
 Proof.
@@ -3087,8 +3103,11 @@ Definition SS {os : sel_model} e := λ p,
 Let s := @set_equiv point.
 
 Definition on_orbit_by_seq_of e {os : sel_model} p :=
+  ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p.
+(*
   ∃ el, 0 < length (norm_list el) ∧
   Forall (eq e) (norm_list el) ∧ fold_right rotate (os_fun p) el = p.
+*)
 
 Definition B {os : sel_model} := λ p,
   all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
@@ -3391,71 +3410,26 @@ pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together in H; [ | assumption ].
 apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p bm.
- destruct bm as (Ha & el & Hlen & Hel & Hr).
+ destruct bm as (Ha & n & Ho).
  split; [ assumption | ].
- destruct el as [| e]; [ exfalso; revert Hlen; apply Nat.nlt_0_r | ].
- simpl in Hlen, Hel, Hr.
- remember (norm_list el) as el₁ eqn:Hel₁.
- symmetry in Hel₁.
- destruct el₁ as [| e₁].
-  exists (ạ⁻¹ :: []), [].
-  split; [ reflexivity | ].
-  apply Forall_inv in Hel; subst e.
-  rewrite rotate_rotate_norm, Hel₁ in Hr.
-  assumption.
-
-  destruct (letter_opp_dec e e₁) as [H₁| H₁].
-   apply letter_opp_sym, letter_opp_negf in H₁; subst e₁.
-   destruct el₁ as [| e₁]; [ exfalso; revert Hlen; apply Nat.nlt_0_r | ].
-   rewrite rotate_rotate_norm, Hel₁ in Hr.
-   simpl in Hr.
-   rewrite rotate_rotate_neg in Hr.
-   exists (ạ⁻¹ :: el₁), el₁.
-   split; [ | apply Forall_inv in Hel; subst e₁; assumption ].
-   apply Forall_inv2 in Hel.
-   destruct Hel as (_, Hel).
-   clear - Hel.
-   destruct (norm_list_dec (ạ⁻¹ :: el₁)) as [H₁| H₁]; [ assumption | ].
-   destruct H₁ as (el₂ & t & d & el₃ & Hel₁).
-   exfalso.
-   destruct el₂ as [| e₂].
-    simpl in Hel₁.
-    injection Hel₁; clear Hel₁; intros; subst t d el₁.
-    apply Forall_inv in Hel; discriminate Hel.
-
-    simpl in Hel₁.
-    injection Hel₁; clear Hel₁; intros; subst e₂ el₁.
-    induction el₂ as [| e₂].
-     simpl in Hel.
-     apply Forall_inv2 in Hel.
-     destruct Hel as (H & Hel).
-     injection H; clear H; intros; subst t d; simpl in Hel.
-     apply Forall_inv in Hel; discriminate Hel.
-
-     simpl in Hel.
-     apply Forall_inv2 in Hel.
-     destruct Hel as (_, Hel).
-     apply IHel₂; assumption.
-
-   apply Forall_inv2 in Hel.
-   destruct Hel as (H₂, Hel); subst e.
-   apply Forall_inv2 in Hel.
-   destruct Hel as (H₂, Hel); subst e₁.
-   exists (ạ⁻¹ :: el), (norm_list el).
-   split; [ | assumption ].
-   simpl; rewrite Hel₁; reflexivity.
+ exists (repeat ạ⁻¹ (S n)), (repeat ạ⁻¹ n).
+ split; [ rewrite norm_list_repeat; reflexivity | assumption ].
 
  intros p.
  unfold Decidable.decidable; simpl.
-unfold B.
-unfold all_but_fixpoints.
-unfold in_sphere.
-destruct p as (x, y, z).
-destruct (Rle_dec (x² + y² + z²) 1) as [Hle| Hgt].
-2: right; intros ((H₁, _), _); contradiction.
+ unfold B.
+ unfold all_but_fixpoints.
+ unfold in_sphere.
+ destruct p as (x, y, z).
+ destruct (Rle_dec (x² + y² + z²) 1) as [Hle| Hgt].
+ 2: right; intros ((H₁, _), _); contradiction.
+ remember (P x y z) as p eqn:Hp.
+ rewrite and_assoc.
+ set (u n :=
+   if Pdec p (fold_right rotate (f p) (repeat ạ⁻¹ n)) then S O else O).
 
 Print on_orbit_by_seq_of.
-
+(* TODO: define and use LPO *)
 bbb.
 
 Theorem old_r_decomposed_4 :
