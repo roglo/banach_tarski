@@ -3086,12 +3086,12 @@ Definition SS {os : sel_model} e := λ p,
 
 Let s := @set_equiv point.
 
-Definition on_orbit_by_seq_of_neg_a {os : sel_model} p :=
+Definition on_orbit_by_seq_of e {os : sel_model} p :=
   ∃ el, 0 < length (norm_list el) ∧
-  Forall (eq ạ⁻¹) (norm_list el) ∧ fold_right rotate (os_fun p) el = p.
+  Forall (eq e) (norm_list el) ∧ fold_right rotate (os_fun p) el = p.
 
 Definition B {os : sel_model} := λ p,
-  all_but_fixpoints p ∧ on_orbit_by_seq_of_neg_a p.
+  all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
 
 Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
 Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
