@@ -3667,19 +3667,25 @@ Qed.
 Definition G :=
   λ (g : (point → Prop) → (point → Prop)),
   (∃ e, g = rot e) ∨
-  (∃ dx, g = xtransl dx).
+  (∃ dx, g = xtransl dx) ∨
+  (∃ e dx, g = λ p, xtransl dx (rot e p)).
 
 Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
   G g
    → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
 Proof.
 intros s * HG; subst s; intros p.
-destruct HG as [(e, HG)| (dx, HG)].
+destruct HG as [(e, HG)| [(dx, HG)| (e & dx & HG)]].
  subst g; split; intros H; assumption.
 
- subst g.
- destruct p as (x, y, z).
+ subst g; destruct p as (x, y, z).
  split; intros H; assumption.
+
+ (* I don't even understand why it works *)
+ subst g; destruct p as (x, y, z); simpl.
+ split; intros H; [ split; apply H | ].
+ destruct H as (H₁ & H₂).
+ split; [ apply H₁ | apply H₂ ].
 Qed.
 
 Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
@@ -3690,7 +3696,7 @@ intros s f Ho F P * HG HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
- destruct HG as [(e, HG)| HG].
+ destruct HG as [(e, HG)| [(dx, Hg)| (e & dx & HG)]].
   subst g.
   unfold set_eq; subst s; simpl.
   intros x.
@@ -3729,7 +3735,7 @@ split.
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
 
-  destruct HG as (dx, HG); subst g.
+  subst g.
   unfold set_eq; subst s; simpl.
   intros (x, y, z).
   split.
@@ -3769,6 +3775,10 @@ split.
     destruct HP as (HQ, _).
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
+
+  subst g.
+  
+bbb.
 
  intros i j Hij.
  clear F HF.
