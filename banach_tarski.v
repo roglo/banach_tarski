@@ -38,6 +38,13 @@ Theorem fold_right_cons {A B} : ∀ f (x : A) (y : B) l,
   fold_right f x (y :: l) = f y (fold_right f x l).
 Proof. reflexivity. Qed.
 
+Theorem Forall_inv2 : ∀ A (P : A → Prop) a l,
+  List.Forall P (a :: l) → P a ∧ List.Forall P l.
+Proof.
+intros A P a l H.
+inversion H; split; assumption.
+Qed.
+
 Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
 Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
 
@@ -3067,9 +3074,10 @@ Definition SS {os : sel_model} e := λ p,
 
 Let s := @set_equiv point.
 
-Inductive B M : point → Prop :=
-  | B₀ : ∀ x, (∃ y, M y ∧ x = rotate ạ⁻¹ y) → B M x
-  | Bn : ∀ x, (∃ y, B M y ∧ x = rotate ạ⁻¹ y) → B M x.
+Definition B {os : sel_model} := λ p,
+  all_but_fixpoints p ∧
+  ∃ el, 0 < length (norm_list el) ∧
+  Forall (eq ạ⁻¹) (norm_list el) ∧ fold_right rotate (os_fun p) el = p.
 
 Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
 Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
@@ -3363,20 +3371,46 @@ Theorem r_decomposed_4 :
   → ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → ∀ (M := λ p, f p = p),
-    is_partition all_but_fixpoints
-      [((EE ⋃ SS ạ) ⋃ B M)%S; (SS ạ⁻¹ \ B M)%S; SS ḅ; SS ḅ⁻¹].
+  → is_partition all_but_fixpoints
+      [((EE ⋃ SS ạ) ⋃ B)%S; (SS ạ⁻¹ \ B)%S; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros Rdec s Hs f HoeHo os Hos M.
+intros Rdec s Hs f HoeHo os Hos.
 pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together in H; [ | assumption ].
 apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p bm.
- destruct bm as [bm (p & Hp & Hbm)| bm].
-  subst bm M; simpl in Hp.
-  split.
-   unfold all_but_fixpoints.
-   split.
+ destruct bm as (Ha & el & Hlen & Hel & Hr).
+ split; [ assumption | ].
+ destruct el as [| e]; [ exfalso; revert Hlen; apply Nat.nlt_0_r | ].
+ simpl in Hlen, Hel, Hr.
+ remember (norm_list el) as el₁ eqn:Hel₁.
+ symmetry in Hel₁.
+ destruct el₁ as [| e₁].
+  exists (ạ⁻¹ :: []), [].
+  split; [ reflexivity | ].
+  apply Forall_inv in Hel; subst e.
+  rewrite rotate_rotate_norm, Hel₁ in Hr.
+  assumption.
+
+  destruct (letter_opp_dec e e₁) as [H₁| H₁].
+   apply letter_opp_sym, letter_opp_negf in H₁; subst e₁.
+   destruct el₁ as [| e₁]; [ exfalso; revert Hlen; apply Nat.nlt_0_r | ].
+   rewrite rotate_rotate_norm, Hel₁ in Hr.
+   simpl in Hr.
+   rewrite rotate_rotate_neg in Hr.
+   exists (ạ⁻¹ :: el₁), el₁.
+   split; [ | apply Forall_inv in Hel; subst e₁; assumption ].
+   clear - Hel.
+bbb.
+   apply Forall_inv2 in Hel.
+   destruct Hel as (H, Hel); subst e₁.
+   induction el₁ as [| e el]; [ reflexivity | ].
+   apply Forall_inv2 in Hel.
+   destruct Hel as (H, Hel); subst e.
+   remember (ạ⁻¹ :: el) as el₁.
+   simpl; rewrite IHel.
+   destruct el₁ as [| e₁]; [ reflexivity | ].
+
 bbb.
 
    unfold is_partition in H.
