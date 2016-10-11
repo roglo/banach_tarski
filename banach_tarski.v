@@ -3854,6 +3854,16 @@ split.
    right; exists 3%R; reflexivity.
 
   split; [ reflexivity | ].
+  constructor.
+   exists (xtransl 3).
+   split; [ right; exists 3%R; reflexivity | reflexivity ].
+
+   constructor.
+    exists (λ p, xtransl 3 (rot ạ p)).
+    split; [ | reflexivity ].
+    unfold G.
+    (* ah merde, il faut que ce soit un groupe, donc qu'on puisse
+       combiner les transformations *)
 
 bbb.
 
