@@ -2596,14 +2596,25 @@ apply norm_list_app_is_nil in H.
  eapply norm_list_is_cons; eassumption.
 Qed.
 
-Definition R_eq_dec_on := ∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R }.
-
-Theorem Pdec : R_eq_dec_on → ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }.
+Theorem Req_dec : ∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R }.
 Proof.
- intros Rdec (x₁, y₁, z₁) (x₂, y₂, z₂).
- destruct (Rdec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
-  destruct (Rdec y₁ y₂) as [| H₂]; [ subst y₂ | right ].
-   destruct (Rdec z₁ z₂) as [| H₃]; [ subst z₂; left; reflexivity | right ].
+intros x y.
+destruct (Rle_dec x y) as [H₁| H₁].
+ destruct (Rle_dec y x) as [H₂| H₂].
+  left; apply Rle_antisym; assumption.
+
+  right; intros H; subst y; apply H₂, Rle_refl.
+
+ right; intros H; subst y.
+ apply H₁, Rle_refl.
+Qed.
+
+Theorem Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }.
+Proof.
+ intros (x₁, y₁, z₁) (x₂, y₂, z₂).
+ destruct (Req_dec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
+  destruct (Req_dec y₁ y₂) as [| H₂]; [ subst y₂ | right ].
+   destruct (Req_dec z₁ z₂) as [| H₃]; [ subst z₂; left; reflexivity | right ].
    intros H; apply H₃.
    injection H; clear H; intros; subst; reflexivity.
 
@@ -2622,10 +2633,11 @@ Definition orbit_selector := choice_function same_orbit.
 
 Definition in_sphere '(P x y z) := (x² + y² + z² <= 1)%R.
 
-Definition all_but_fixpoints p :=
-  in_sphere p ∧
+Definition orbit_has_fixpoint p :=
   ∀ el p₁, same_orbit p p₁
   → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
+
+Definition all_but_fixpoints p := in_sphere p ∧ orbit_has_fixpoint p.
 
 Theorem on_sphere_ray_after_rotation : ∀ p m r,
   on_sphere_ray r p
@@ -3074,10 +3086,12 @@ Definition SS {os : sel_model} e := λ p,
 
 Let s := @set_equiv point.
 
-Definition B {os : sel_model} := λ p,
-  all_but_fixpoints p ∧
+Definition on_orbit_by_seq_of_neg_a {os : sel_model} p :=
   ∃ el, 0 < length (norm_list el) ∧
   Forall (eq ạ⁻¹) (norm_list el) ∧ fold_right rotate (os_fun p) el = p.
+
+Definition B {os : sel_model} := λ p,
+  all_but_fixpoints p ∧ on_orbit_by_seq_of_neg_a p.
 
 Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
 Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
@@ -3209,19 +3223,18 @@ assert (Hr : f p = f (rotate (negf e) p)).
 Qed.
 
 Theorem r_decomposed_5 :
-  R_eq_dec_on
-  → ∀ s, s = set_equiv
+  ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros Rdec s Hs f (Hoe, Ho) os Hos; subst os s.
+intros s Hs f (Hoe, Ho) os Hos; subst os s.
 split.
 *intros p.
  split.
  -intros Hnf.
   unfold union_list; simpl; unfold union.
-  destruct (Pdec Rdec p (f p)) as [H₁| H₁]; [ left; split; assumption | ].
+  destruct (Pdec p (f p)) as [H₁| H₁]; [ left; split; assumption | ].
   right.
   pose proof Ho p as H.
   destruct H as (el, Hel).
@@ -3367,15 +3380,14 @@ split.
 Qed.
 
 Theorem r_decomposed_4 :
-  R_eq_dec_on
-  → ∀ s, s = set_equiv
+  ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints
       [((EE ⋃ SS ạ) ⋃ B)%S; (SS ạ⁻¹ \ B)%S; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros Rdec s Hs f HoeHo os Hos.
-pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
+intros s Hs f HoeHo os Hos.
+pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together in H; [ | assumption ].
 apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p bm.
@@ -3436,17 +3448,23 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p.
  unfold Decidable.decidable; simpl.
 Print B.
+unfold B.
+unfold all_but_fixpoints.
+unfold in_sphere.
+destruct p as (x, y, z).
+destruct (Rle_dec (x² + y² + z²) 1) as [Hle| Hgt].
+2: right; intros ((H₁ & H₂) & el & Hlen & Ha & Hr); contradiction.
+
 bbb.
 
 Theorem old_r_decomposed_4 :
-  R_eq_dec_on
-  → ∀ s, s = set_equiv
+  ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros Rdec s Hs f HoeHo os Hos.
-pose proof r_decomposed_5 Rdec s Hs f HoeHo os Hos as H.
+intros s Hs f HoeHo os Hos.
+pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together; eassumption.
 Qed.
 
@@ -3773,25 +3791,22 @@ Definition equidecomposable (s : set_model point) G E₁ E₂ :=
   List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
 
 Theorem Banach_Tarski_paradox :
-  R_eq_dec_on
-  → ∀ (s := set_equiv) f os, orbit_selector f → os = mkos _ f →
-    equidecomposable s G all_but_fixpoints
-      (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
+  ∀ (s := set_equiv) f os, orbit_selector f → os = mkos _ f →
+  equidecomposable s G all_but_fixpoints
+    (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
-intros Rdec s f os Hosf Hos.
-set (M := λ p, f p = p).
-set (A₁ := (EE ⋃ SS ạ ⋃ B M)%S).
-set (A₂ := (SS ạ⁻¹ \ B M)%S).
+intros s f os Hosf Hos.
+set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
+set (A₂ := (SS ạ⁻¹ \ B)%S).
 set (A₃ := SS ḅ).
 set (A₄ := SS ḅ⁻¹).
 exists [A₁; A₂; A₃; A₄].
 exists
   (map (xtransl 3) [A₁; rot ạ A₂] ++
    map (xtransl 6) [A₃; rot ḅ A₄]); simpl.
-Check r_decomposed_4.
-
+Check old_r_decomposed_4.
 bbb.
-split; [ eapply r_decomposed_4; try eassumption | ].
+split; [ eapply old_r_decomposed_4; try eassumption | ].
 split.
  pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
  pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
