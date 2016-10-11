@@ -3670,10 +3670,20 @@ Definition G :=
   (∃ dx, g = xtransl dx) ∨
   (∃ e dx, g = λ p, xtransl dx (rot e p)).
 
+Inductive GG g :=
+  | Rot : (∃ e, g = rot e) → GG g
+  | Trans : (∃ dx, g = xtransl dx) → GG g.
+
+Print GG.
+
 Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
-  G g
+  GG g
    → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
 Proof.
+intros s * HG; subst s; intros p.
+destruct HG as [(e, HG)| (dx, HG)].
+
+bbb.
 intros s * HG; subst s; intros p.
 destruct HG as [(e, HG)| [(dx, HG)| (e & dx & HG)]].
  subst g; split; intros H; assumption.
