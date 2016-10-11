@@ -3447,13 +3447,14 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
 
  intros p.
  unfold Decidable.decidable; simpl.
-Print B.
 unfold B.
 unfold all_but_fixpoints.
 unfold in_sphere.
 destruct p as (x, y, z).
 destruct (Rle_dec (x² + y² + z²) 1) as [Hle| Hgt].
-2: right; intros ((H₁ & H₂) & el & Hlen & Ha & Hr); contradiction.
+2: right; intros ((H₁, _), _); contradiction.
+
+Print on_orbit_by_seq_of.
 
 bbb.
 
