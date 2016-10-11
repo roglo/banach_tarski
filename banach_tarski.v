@@ -3400,31 +3400,42 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
    rewrite rotate_rotate_neg in Hr.
    exists (ạ⁻¹ :: el₁), el₁.
    split; [ | apply Forall_inv in Hel; subst e₁; assumption ].
+   apply Forall_inv2 in Hel.
+   destruct Hel as (_, Hel).
    clear - Hel.
-bbb.
-   apply Forall_inv2 in Hel.
-   destruct Hel as (H, Hel); subst e₁.
-   induction el₁ as [| e el]; [ reflexivity | ].
-   apply Forall_inv2 in Hel.
-   destruct Hel as (H, Hel); subst e.
-   remember (ạ⁻¹ :: el) as el₁.
-   simpl; rewrite IHel.
-   destruct el₁ as [| e₁]; [ reflexivity | ].
+   destruct (norm_list_dec (ạ⁻¹ :: el₁)) as [H₁| H₁]; [ assumption | ].
+   destruct H₁ as (el₂ & t & d & el₃ & Hel₁).
+   exfalso.
+   destruct el₂ as [| e₂].
+    simpl in Hel₁.
+    injection Hel₁; clear Hel₁; intros; subst t d el₁.
+    apply Forall_inv in Hel; discriminate Hel.
 
-bbb.
+    simpl in Hel₁.
+    injection Hel₁; clear Hel₁; intros; subst e₂ el₁.
+    induction el₂ as [| e₂].
+     simpl in Hel.
+     apply Forall_inv2 in Hel.
+     destruct Hel as (H & Hel).
+     injection H; clear H; intros; subst t d; simpl in Hel.
+     apply Forall_inv in Hel; discriminate Hel.
 
-   unfold is_partition in H.
-   destruct H as (Ha & Hij).
-   unfold union_list, set_eq in Ha; subst s; simpl in Ha.
-   apply Ha.
-   unfold union; simpl.
-   right; left.
-   unfold SS.
-  ============================
-  all_but_fixpoints (rotate ạ⁻¹ p)
-  ∧ (∃ el el₁ : list free_elem,
-     norm_list el = ạ⁻¹ :: el₁
-     ∧ fold_right rotate (os_fun (rotate ạ⁻¹ p)) el = rotate ạ⁻¹ p)
+     simpl in Hel.
+     apply Forall_inv2 in Hel.
+     destruct Hel as (_, Hel).
+     apply IHel₂; assumption.
+
+   apply Forall_inv2 in Hel.
+   destruct Hel as (H₂, Hel); subst e.
+   apply Forall_inv2 in Hel.
+   destruct Hel as (H₂, Hel); subst e₁.
+   exists (ạ⁻¹ :: el), (norm_list el).
+   split; [ | assumption ].
+   simpl; rewrite Hel₁; reflexivity.
+
+ intros p.
+ unfold Decidable.decidable; simpl.
+Print B.
 bbb.
 
 Theorem old_r_decomposed_4 :
