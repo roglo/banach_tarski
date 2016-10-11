@@ -3670,20 +3670,51 @@ Definition G :=
   (∃ dx, g = xtransl dx) ∨
   (∃ e dx, g = λ p, xtransl dx (rot e p)).
 
-Inductive GG g :=
-  | Rot : (∃ e, g = rot e) → GG g
-  | Trans : (∃ dx, g = xtransl dx) → GG g.
+Print nat.
 
-Print GG.
+Inductive GG :=
+  | Rot : free_elem → GG
+  | Xtransl : ℝ → GG
+  | Comb : GG → GG → GG.
+
+Fixpoint app_gr f p :=
+  match f with
+  | Rot e => rot e p
+  | Xtransl dx => xtransl dx p
+  | Comb g h => app_gr g (app_gr h p)
+  end.
 
 Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
-  GG g
+  (app_gr g (E₁ ⋂ E₂) = app_gr g E₁ ⋂ app_gr g E₂)%S.
+Proof.
+intros s *; subst s; intros p.
+revert E₁ E₂ p.
+induction g as [e| dx | g IHg h IHh ]; intros; simpl.
+ split; intros H; assumption.
+
+ destruct p as (x, y, z).
+ split; intros H; assumption.
+
+ split.
+  intros H; apply IHg.
+bbb.
+
+  split.
+
+; intros H; [ split; apply H | ].
+
+ (* I don't even understand why it works *)
+ subst g; destruct p as (x, y, z); simpl.
+ split; intros H; [ split; apply H | ].
+ destruct H as (H₁ & H₂).
+ split; [ apply H₁ | apply H₂ ].
+Qed.
+bbb.
+
+Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
+  G g
    → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
 Proof.
-intros s * HG; subst s; intros p.
-destruct HG as [(e, HG)| (dx, HG)].
-
-bbb.
 intros s * HG; subst s; intros p.
 destruct HG as [(e, HG)| [(dx, HG)| (e & dx & HG)]].
  subst g; split; intros H; assumption.
