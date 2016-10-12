@@ -3439,10 +3439,9 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
 
  intros p.
  unfold Decidable.decidable; simpl.
+ (* I am ashamed to use EM here, but I have it thanks to TTCA... *)
  apply excluded_middle.
-Qed.
-
-(*
+(* perhaps I could decompose the cases above:
  unfold B.
  unfold all_but_fixpoints.
  unfold in_sphere.
@@ -3457,8 +3456,8 @@ Qed.
 
 Print on_orbit_by_seq_of.
 (* TODO: define and use LPO *)
-bbb.
 *)
+Qed.
 
 Theorem old_r_decomposed_4 :
   ∀ s, s = set_equiv
