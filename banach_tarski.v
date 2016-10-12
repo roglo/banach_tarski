@@ -3826,8 +3826,33 @@ split.
    induction P as [| P PL]; intros.
     eapply gr_subst in Hgh; [ | apply IHh ].
     eapply gr_subst in Hgh; [ apply IHg in Hgh; contradiction | ].
-    symmetry; subst s; assumption.
+    symmetry; eassumption.
 
+    eapply gr_subst in Hgh; [ | simpl; apply IHh ].
+    eapply gr_subst in Hgh.
+     apply IHg in Hgh.
+     destruct Hgh as [Hgh| Hgh].
+simpl in HF, IHg, IHh, Hgh |-*.
+bbb.
+
+Focus 2.
+simpl in HF, IHg, IHh, Hgh |-*.
+right.
+eapply IHPL.
+2: reflexivity.
+
+    eapply gr_subst in Hgh; [ | symmetry; eassumption ].
+
+bbb.
+
+assert (∀ i j : ℕ, i ≠ j → (PL.[i] ⋂ PL.[j] = ∅)%S).
+Focus 2.
+pose proof IHPL H (∐ PL)%S (set_eq_refl _ _).
+
+    eapply gr_subst in Hgh.
+Focus 2.
+simpl in *.
+intros q.
 bbb.
 
 Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
