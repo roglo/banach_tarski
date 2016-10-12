@@ -3734,10 +3734,10 @@ induction g as [e| dx | g IHg h IHh ]; intros; simpl.
  intros p.
  split.
   intros H; apply IHg.
-  eapply gr_subst; [ apply IHh | apply H ].
+  rewrite <- IHh; assumption.
 
   intros H; apply IHg in H.
-  eapply gr_subst; [ symmetry; apply IHh | eassumption ].
+  rewrite IHh; assumption.
 Qed.
 
 Theorem group_union_distr : ∀ (s := set_equiv) g E₁ E₂,
@@ -3753,10 +3753,10 @@ induction g as [e| dx | g IHg h IHh ]; intros; simpl.
  intros p.
  split.
   intros H; apply IHg.
-  eapply gr_subst; [ apply IHh | apply H ].
+  rewrite <- IHh; assumption.
 
   intros H; apply IHg in H.
-  eapply gr_subst; [ symmetry; apply IHh | eassumption ].
+  rewrite IHh; assumption.
 Qed.
 
 Theorem group_union_list_distr : ∀ (s := set_equiv) f PL,
@@ -3881,24 +3881,60 @@ split.
    intros Hgh.
    revert F HF IHg IHh Hgh.
    induction P as [| P PL]; intros.
-    eapply gr_subst in Hgh; [ | apply IHh ].
-    eapply gr_subst in Hgh; [ apply IHg in Hgh; contradiction | ].
-    symmetry; eassumption.
+    rewrite IHh in Hgh; simpl in Hgh.
+    eapply app_gr_empty_set, Hgh.
 
-    eapply gr_subst in Hgh; [ | simpl; apply IHh ].
-     simpl in Hgh.
-     apply group_union_distr in Hgh.
-     destruct Hgh as [Hgh| Hgh]; [ left; assumption | right ].
-Focus 1.
-eapply IHPL.
-2: reflexivity.
-2: apply group_union_list_distr.
-2: apply group_union_list_distr.
-Focus 2.
-pose proof group_union_list_distr h PL.
-rewrite <- H in Hgh.
-assumption.
+    rewrite IHh in Hgh.
+    simpl in Hgh.
+    apply group_union_distr in Hgh.
+    destruct Hgh as [Hgh| Hgh]; [ left; assumption | right ].
+    eapply IHPL.
+     intros i j Hij.
+     unfold set_eq; simpl; intros y.
+     assert (HSij : S i ≠ S j).
+      intros HSij; apply Hij, Nat.succ_inj; assumption.
 
+      pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
+      destruct HP as (HQ, _).
+      split; [ intros (HPi, HPj) | contradiction ].
+      apply HQ; split; assumption.
+
+     reflexivity.
+
+     apply group_union_list_distr.
+
+     apply group_union_list_distr.
+
+     pose proof group_union_list_distr h PL.
+     rewrite <- H in Hgh; assumption.
+
+   intros Hgh.
+   revert F HF IHg IHh Hgh.
+   induction P as [| P PL]; intros; [ contradiction | ].
+bbb.
+   eapply gr_subst in Hgh; [ | simpl; apply IHh ].
+    simpl in Hgh.
+    apply group_union_distr in Hgh.
+    destruct Hgh as [Hgh| Hgh]; [ left; assumption | right ].
+    eapply IHPL.
+     intros i j Hij.
+     unfold set_eq; simpl; intros y.
+     assert (HSij : S i ≠ S j).
+      intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+      pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
+      destruct HP as (HQ, _).
+      split; [ intros (HPi, HPj) | contradiction ].
+      apply HQ; split; assumption.
+
+     reflexivity.
+
+     apply group_union_list_distr.
+
+     apply group_union_list_distr.
+
+     pose proof group_union_list_distr h PL.
+     rewrite <- H in Hgh; assumption.
 bbb.
 
 Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
