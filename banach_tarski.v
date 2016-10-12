@@ -3699,6 +3699,17 @@ induction g as [e| dx | g IHg h IHh]; intros.
  eapply IHh; [ symmetry; eassumption | eassumption ].
 Qed.
 
+Theorem app_gr_empty_set : ∀ (s := set_equiv) f, (app_gr f ∅ = ∅)%S.
+Proof.
+intros s * p.
+split; intros H; [ | contradiction ].
+revert p H.
+induction f; intros; [ contradiction | destruct p; contradiction | ].
+simpl in H.
+eapply gr_subst in H; [ apply IHf1 in H; contradiction | ].
+split; [ apply IHf2 | intros; contradiction ].
+Qed.
+
 Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
   (app_gr g (E₁ ⋂ E₂) = app_gr g E₁ ⋂ app_gr g E₂)%S.
 Proof.
@@ -3716,6 +3727,41 @@ induction g as [e| dx | g IHg h IHh ]; intros; simpl.
 
   intros H; apply IHg in H.
   eapply gr_subst; [ symmetry; apply IHh | eassumption ].
+Qed.
+
+Theorem group_union_distr : ∀ (s := set_equiv) g E₁ E₂,
+  (app_gr g (E₁ ⋃ E₂) = app_gr g E₁ ⋃ app_gr g E₂)%S.
+Proof.
+intros s *; subst s.
+revert E₁ E₂.
+induction g as [e| dx | g IHg h IHh ]; intros; simpl.
+ intros p; split; intros H; assumption.
+
+ intros (x, y, z); split; intros H; assumption.
+
+ intros p.
+ split.
+  intros H; apply IHg.
+  eapply gr_subst; [ apply IHh | apply H ].
+
+  intros H; apply IHg in H.
+  eapply gr_subst; [ symmetry; apply IHh | eassumption ].
+Qed.
+
+Theorem group_union_list_distr : ∀ (s := set_equiv) f PL,
+  (app_gr f (∐ PL) = ∐ map (app_gr f) PL)%S.
+Proof.
+intros s *.
+induction PL as [| P PL].
+intros p; split; intros H; [ | contradiction ].
+apply app_gr_empty_set in H; contradiction.
+simpl in IHPL; simpl.
+intros p; split; intros H.
+ apply group_union_distr in H.
+ destruct H as [H| H]; [ left; assumption | right; apply IHPL; assumption ].
+
+ apply group_union_distr.
+ destruct H as [H| H]; [ left; assumption | right; apply IHPL; assumption ].
 Qed.
 
 Theorem old_group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
@@ -3829,10 +3875,25 @@ split.
     symmetry; eassumption.
 
     eapply gr_subst in Hgh; [ | simpl; apply IHh ].
+     simpl in Hgh.
+     apply group_union_distr in Hgh.
+     destruct Hgh as [Hgh| Hgh]; [ left; assumption | right ].
+Focus 1.
+eapply IHPL.
+2: reflexivity.
+2: apply group_union_list_distr.
+2: apply group_union_list_distr.
+Focus 2.
+pose proof group_union_list_distr h PL.
+
+bbb.
+
     eapply gr_subst in Hgh.
      apply IHg in Hgh.
      destruct Hgh as [Hgh| Hgh].
 simpl in HF, IHg, IHh, Hgh |-*.
+left.
+
 bbb.
 
 Focus 2.
