@@ -3659,22 +3659,43 @@ split; intros (H₁, H₂).
   intros p.
   split; intros HF.
    clear - HEF HEFl H₁ HF.
-   revert El HEFl H₁.
+   revert p El HF HEFl H₁.
    induction Fl as [| F₁ Fl]; intros.
     destruct El as [| E₁ El]; [ apply H₁, HEF, HF | ].
     apply Forall2_cons_nil in HEFl; contradiction.
 
     simpl.
-    destruct El as [| E₁ El]; [ inversion HEFl | ].
-pose proof HEF p.
-destruct H as (_, H).
-apply H in HF.
-apply H₁ in HF.
-simpl in HF.
-    inversion HEFl; subst x l y l'.
-    rewrite <- H3.
-destruct HF as [HF| HF].
-left; assumption.
+    destruct El as [| E₁ El].
+     apply Forall2_nil_cons in HEFl; contradiction.
+
+     pose proof HEF p.
+     destruct H as (_, H).
+     apply H, H₁ in HF; simpl in HF.
+     apply Forall2_cons_cons in HEFl.
+     destruct HEFl as (HEF₁, HEFl).
+     destruct HF as [HF| HF]; [ left; apply HEF₁, HF | right ].
+     eapply IHFl; [ apply HEF, H₁; right; apply HF | eassumption | ].
+     intros x.
+     split; intros H₂.
+      apply H₁ in H₂; simpl in H₂.
+      destruct H₂ as [H₂| H₂].
+
+      generalize HEFl; intros HFel.
+      apply Forall2_eq_list in HFel; apply HFel.
+      eapply IHFl; [ | eassumption | ].
+Focus 2.
+intros y.
+split; intros H₃.
+ pose proof H₁ y as H₄.
+ destruct H₄ as (H₄, H₅).
+ pose proof H₄ H₃ as H₆.
+ destruct H₆; [ | assumption ].
+ apply HFel.
+ eapply IHFl; [ apply HEF, H₃ | eassumption | ].
+ intros z.
+
+bbb.
+
 right.
 clear - HF H5.
 apply Forall2_eq_list in H5.
