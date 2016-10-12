@@ -3617,6 +3617,41 @@ destruct HF as [HF| HF].
 left; assumption.
 right.
 clear - HF H5.
+(* faut-il redéfinir eq_list = (∐ El = ∐ Fl)%S, plutôt que Forall2 ? *)
+bbb.
+
+Theorem Forall2_eq_list {A} : ∀ (s := set_equiv) (El Fl : list (A → Prop)),
+  set_eq_list El Fl
+  → (∐ El = ∐ Fl)%S.
+Admitted. Show.
+
+apply Forall2_eq_list in H5.
+Print set_eq_list.
+
+erewrite <- H5.
+
+revert El HF H5.
+induction Fl as [| F FL]; intros.
+ destruct El as [| E El]; [ contradiction | inversion H5 ].
+
+ destruct El as [| E El]; [ contradiction | ].
+ inversion H5; subst x l y l'.
+ destruct HF as [HF| HF].
+  left; apply H2; assumption.
+  right.
+  eapply IHFL; eassumption.
+apply HEF, H₁.
+clear - HEFl HF.
+SearchAbout Forall2.
+Theorem Forall2_sym {A} : ∀ R (l₁ l₂ : list A),
+  Forall2 R l₁ l₂
+  → symmetric _ R
+  → Forall2 R l₂ l₁.
+Admitted. Show.
+
+apply Forall2_sym in HEFl; [ | apply set_eq_sym ].
+
+
 bbb.
 
  split; [ | assumption ].
