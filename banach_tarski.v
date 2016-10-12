@@ -3698,6 +3698,18 @@ induction g as [e| dx | g IHg h IHh]; intros.
  eapply IHh; [ symmetry; eassumption | eassumption ].
 Qed.
 
+Add Parametric Morphism : app_gr
+with signature eq ==> (@set_eq _ set_equiv) ==> eq ==> iff
+as app_gr_morph.
+Proof.
+intros g p q Hpq r.
+split; intros H.
+ eapply gr_subst; eassumption.
+
+ symmetry in Hpq.
+ eapply gr_subst; eassumption.
+Qed.
+
 Theorem app_gr_empty_set : ∀ (s := set_equiv) f, (app_gr f ∅ = ∅)%S.
 Proof.
 intros s * p.
@@ -3884,35 +3896,9 @@ eapply IHPL.
 2: apply group_union_list_distr.
 Focus 2.
 pose proof group_union_list_distr h PL.
+rewrite <- H in Hgh.
+assumption.
 
-bbb.
-
-    eapply gr_subst in Hgh.
-     apply IHg in Hgh.
-     destruct Hgh as [Hgh| Hgh].
-simpl in HF, IHg, IHh, Hgh |-*.
-left.
-
-bbb.
-
-Focus 2.
-simpl in HF, IHg, IHh, Hgh |-*.
-right.
-eapply IHPL.
-2: reflexivity.
-
-    eapply gr_subst in Hgh; [ | symmetry; eassumption ].
-
-bbb.
-
-assert (∀ i j : ℕ, i ≠ j → (PL.[i] ⋂ PL.[j] = ∅)%S).
-Focus 2.
-pose proof IHPL H (∐ PL)%S (set_eq_refl _ _).
-
-    eapply gr_subst in Hgh.
-Focus 2.
-simpl in *.
-intros q.
 bbb.
 
 Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
