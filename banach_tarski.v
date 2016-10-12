@@ -3140,7 +3140,7 @@ Definition B {os : sel_model} := λ p,
   all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
 
 Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
-Definition xtransl dx (S : point → Prop) '(P x y z) := S (P (x + dx) y z).
+Definition xtransl dx (E : point → Prop) '(P x y z) := E (P (x - dx) y z).
 
 Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
   ∀ e p, EE p → SS e p → False.
@@ -3689,7 +3689,7 @@ Fixpoint app_gr f p :=
 Fixpoint app_gr_point f p :=
   match f with
   | Rot e => rotate (negf e) p
-  | Xtransl dx => match p with P x y z => P (x + dx) y z end
+  | Xtransl dx => match p with P x y z => P (x - dx) y z end
   | Comb g h => app_gr_point h (app_gr_point g p)
   end.
 
@@ -4159,7 +4159,7 @@ split.
    apply Rsqr_le_abs_0 in H₂.
    rewrite Rabs_R1 in H₁, H₂.
    unfold Rabs in H₁, H₂.
-   destruct (Rcase_abs (x + 3)), (Rcase_abs (x + 6)); lra.
+   destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
 
   split; [ reflexivity | ].
   constructor; [ exists (Xtransl 3); reflexivity | ].
