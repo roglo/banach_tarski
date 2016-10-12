@@ -3567,22 +3567,83 @@ intros.
 eapply r_decomposed_2; eassumption.
 Qed.
 
+Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
+  ¬Forall2 R [] (x :: l).
+Proof.
+intros A B * H.
+inversion H.
+Qed.
+
+Theorem Forall2_cons_nil : ∀ A B (R : A → B → Prop) x l,
+  ¬Forall2 R (x :: l) [].
+Proof.
+intros A B * H.
+inversion H.
+Qed.
+
+Theorem Forall2_cons_cons : ∀ A B (R : A → B → Prop) x y l l',
+  Forall2 R (x :: l) (y :: l')
+  → R x y ∧ Forall2 R l l'.
+Proof.
+intros A B * H.
+inversion H; subst.
+split; assumption.
+Qed.
+
 Definition set_eq_list {A} (s := set_equiv) (El Fl : list (A → Prop)) :=
   Forall2 set_eq El Fl.
+
+Theorem Forall2_eq_list {A} : ∀ (s := set_equiv) (El Fl : list (A → Prop)),
+  set_eq_list El Fl
+  → (∐ El = ∐ Fl)%S.
+Proof.
+intros s * Hs.
+revert Fl Hs.
+induction El as [| E El]; intros.
+ destruct Fl as [| F Fl]; [ reflexivity | ].
+ unfold set_eq_list in Hs.
+ apply Forall2_nil_cons in Hs; contradiction.
+
+ destruct Fl as [| F Fl].
+  unfold set_eq_list in Hs.
+  apply Forall2_cons_nil in Hs; contradiction.
+
+  intros p; simpl.
+  unfold set_eq_list in Hs.
+  apply Forall2_cons_cons in Hs.
+  destruct Hs as (HEF, Hall).
+  apply IHEl in Hall.
+  split; intros H.
+   destruct H as [H| H]; [ left; apply HEF, H | ].
+   right; apply Hall; assumption.
+
+   destruct H as [H| H]; [ left; apply HEF, H | ].
+   right; apply Hall; assumption.
+Qed.
 
 Add Parametric Morphism {A} : (@union A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
   as union_morph.
 Proof.
-Admitted.
+intros E E' HE F F' HF.
+intros p.
+split.
+ intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+ intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+Qed.
 
 Add Parametric Morphism {A} : (@union A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
   as union_iff_morph.
 Proof.
-Admitted.
+intros E E' HE F F' HF.
+intros p.
+split.
+ intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+ intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+Qed.
 
 Add Parametric Morphism {A} : (@is_partition A set_equiv)
   with signature @set_eq A set_equiv ==> set_eq_list ==> iff
@@ -3601,8 +3662,7 @@ split; intros (H₁, H₂).
    revert El HEFl H₁.
    induction Fl as [| F₁ Fl]; intros.
     destruct El as [| E₁ El]; [ apply H₁, HEF, HF | ].
-    (* TODO: faire des lemmes sur Forall2 *)
-    inversion HEFl.
+    apply Forall2_cons_nil in HEFl; contradiction.
 
     simpl.
     destruct El as [| E₁ El]; [ inversion HEFl | ].
@@ -3617,18 +3677,13 @@ destruct HF as [HF| HF].
 left; assumption.
 right.
 clear - HF H5.
-(* faut-il redéfinir eq_list = (∐ El = ∐ Fl)%S, plutôt que Forall2 ? *)
-bbb.
-
-Theorem Forall2_eq_list {A} : ∀ (s := set_equiv) (El Fl : list (A → Prop)),
-  set_eq_list El Fl
-  → (∐ El = ∐ Fl)%S.
-Admitted. Show.
-
 apply Forall2_eq_list in H5.
 Print set_eq_list.
 
-erewrite <- H5.
+apply H5, HF.
+apply HEF, H₁.
+clear - HEFl HF.
+bbb.
 
 revert El HF H5.
 induction Fl as [| F FL]; intros.
