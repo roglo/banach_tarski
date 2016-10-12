@@ -3935,7 +3935,42 @@ split.
     rewrite set_eq_equiv; [ | rewrite group_union_list_distr; reflexivity ].
     rewrite map_map; assumption.
 
- simpl.
+ intros i j Hij p.
+ split; intros H; [ | contradiction ].
+ unfold nth_set in H.
+ rewrite <- app_gr_empty_set with (f := g) in H.
+ do 2 rewrite map_nth in H.
+ destruct H as (Hi, Hj).
+destruct i.
+destruct j; [ apply Hij; reflexivity | ].
+
+bbb.
+ clear HF; revert i j Hij Hi Hj.
+ induction P as [| P PL]; intros.
+  destruct i; apply app_gr_empty_set in Hi; contradiction.
+
+  simpl in Hi, Hj.
+  destruct i.
+   destruct j; [ apply Hij; reflexivity | ].
+bbb.
+
+Check app_gr.
+SearchAbout (app_gr _ (List.nth _ _ _)).
+
+ pose proof HP i j Hij p as Hp.
+
+ apply Hp.
+ split.
+
+
+ unfold set_eq in Hp.
+ subst s; simpl in Hp.
+ pose proof HP
+
+ eapply HP; [ eassumption | ].
+ split.
+unfold nth_set.
+
 bbb.
 
 Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
