@@ -3819,6 +3819,15 @@ split.
     split; [ intros (HPi, HPj) | contradiction ].
     apply HQ; split; assumption.
 
+  intros p.
+  split.
+   intros Hgh.
+   revert F HF IHg IHh Hgh.
+   induction P as [| P PL]; intros.
+    eapply gr_subst in Hgh; [ | apply IHh ].
+    eapply gr_subst in Hgh; [ apply IHg in Hgh; contradiction | ].
+    symmetry; subst s; assumption.
+
 bbb.
 
 Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
