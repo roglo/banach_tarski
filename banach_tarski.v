@@ -3700,14 +3700,20 @@ Qed.
 
 Add Parametric Morphism : app_gr
 with signature eq ==> (@set_eq _ set_equiv) ==> eq ==> iff
+as app_gr_morph_iff.
+Proof.
+intros g p q Hpq r.
+split; intros H; [ eapply gr_subst; eassumption | ].
+symmetry in Hpq; eapply gr_subst; eassumption.
+Qed.
+
+Add Parametric Morphism : app_gr
+with signature eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
 as app_gr_morph.
 Proof.
 intros g p q Hpq r.
-split; intros H.
- eapply gr_subst; eassumption.
-
- symmetry in Hpq.
- eapply gr_subst; eassumption.
+split; intros H; [ eapply gr_subst; eassumption | ].
+symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
 Theorem app_gr_empty_set : ∀ (s := set_equiv) f, (app_gr f ∅ = ∅)%S.
@@ -3911,6 +3917,67 @@ split.
    intros Hgh.
    revert F HF IHg IHh Hgh.
    induction P as [| P PL]; intros; [ contradiction | ].
+   destruct Hgh as [Hgh| Hgh].
+bbb.
+
+rewrite HF; simpl.
+Add Parametric Morphism {A} : (@union A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as union_morph.
+Proof.
+(*
+intros E E' HE F F' HF.
+unfold intersection; intros p.
+split; intros (H₁, H₂).
+ split; [ apply HE; assumption | apply HF; assumption ].
+ split; [ apply HE; assumption | apply HF; assumption ].
+Qed.
+*)
+Admitted.
+Show.
+
+rewrite group_union_distr.
+rewrite group_union_list_distr.
+
+(*
+Add Parametric Morphism {A} : (@union A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
+  as union_iff_morph.
+(*
+Proof.
+intros E E' HE F F' HF a.
+unfold intersection.
+split; intros (H₁, H₂).
+ split; [ apply HE; assumption | apply HF; assumption ].
+ split; [ apply HE; assumption | apply HF; assumption ].
+Qed.
+*)Admitted. Show.
+*)
+
+Show.
+
+Check union_morph.
+rewrite group_union_distr.
+bbb.
+
+simpl in IHg, IHh, Hgh.
+Check group_union_distr.
+rewrite group_union_distr.
+
+   destruct Hgh as [Hgh| Hgh].
+bbb.
+
+   rewrite IHh.
+Check group_union_distr.
+
+   rewrite HF; simpl.
+
+simpl in IHg, IHh, Hgh.
+simpl.
+
+
 bbb.
    eapply gr_subst in Hgh; [ | simpl; apply IHh ].
     simpl in Hgh.
