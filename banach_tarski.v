@@ -3686,6 +3686,24 @@ Fixpoint app_gr f p :=
   | Comb g h => app_gr g (app_gr h p)
   end.
 
+Fixpoint app_gr_point f p :=
+  match f with
+  | Rot e => rotate (negf e) p
+  | Xtransl dx => match p with P x y z => P (x + dx) y z end
+  | Comb g h => app_gr_point h (app_gr_point g p)
+  end.
+
+Theorem app_gr_app_gr_point : ∀ g E p, app_gr g E p → E (app_gr_point g p).
+Proof.
+intros * Hp.
+revert E p Hp.
+induction g; intros; [ assumption | destruct p; assumption | ].
+simpl in Hp; simpl.
+apply IHg1 in Hp.
+apply IHg2 in Hp.
+assumption.
+Qed.
+
 Theorem gr_subst : ∀ (s := set_equiv) g E F,
   (E = F)%S → ∀ p, app_gr g E p → app_gr g F p.
 Proof.
@@ -3941,38 +3959,37 @@ split.
  rewrite <- app_gr_empty_set with (f := g) in H.
  do 2 rewrite map_nth in H.
  destruct H as (Hi, Hj).
-destruct i.
-destruct j; [ apply Hij; reflexivity | ].
-
-bbb.
- clear HF; revert i j Hij Hi Hj.
- induction P as [| P PL]; intros.
-  destruct i; apply app_gr_empty_set in Hi; contradiction.
-
-  simpl in Hi, Hj.
-  destruct i.
-   destruct j; [ apply Hij; reflexivity | ].
-bbb.
-
-Check app_gr.
-SearchAbout (app_gr _ (List.nth _ _ _)).
-
- pose proof HP i j Hij p as Hp.
-
- apply Hp.
+ pose proof HP i j Hij (app_gr_point g p) as Hp.
+ unfold nth_set in Hp.
+ destruct Hp as (Hpi, _).
+ apply Hpi; clear Hpi.
  split.
+  clear - Hi.
+  rename P into Ql.
+  revert p Ql Hi.
+  induction i; intros.
+   destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hi; contradiction | ].
+   simpl in Hi; simpl.
+   apply app_gr_app_gr_point; assumption.
 
+   destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hi; contradiction | ].
+   simpl in Hi; simpl.
+   apply IHi; assumption.
 
- unfold set_eq in Hp.
- subst s; simpl in Hp.
- pose proof HP
+  clear - Hj.
+  rename P into Ql.
+  revert p Ql Hj.
+  induction j; intros.
+   destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hj; contradiction | ].
+   simpl in Hj; simpl.
+   apply app_gr_app_gr_point; assumption.
 
- eapply HP; [ eassumption | ].
- split.
-unfold nth_set.
+   destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hj; contradiction | ].
+   simpl in Hj; simpl.
+   apply IHj; assumption.
+Qed.
 
-bbb.
-
+(*
 Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
   ∀ (F : point → Prop) P g,
   old_G g → is_partition F P → is_partition (g F) (map g P).
@@ -4062,7 +4079,6 @@ split.
     apply HQ; split; assumption.
 
   subst g.
-  
 bbb.
 
  intros i j Hij.
@@ -4091,14 +4107,15 @@ bbb.
   unfold xtransl in Hg.
   apply H, Hg.
 Qed.
+*)
 
-Definition equidecomposable (s : set_model point) G E₁ E₂ :=
+Definition equidecomposable (s : set_model point) E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
-  List.Forall2 (λ S₁ S₂, ∃ g, G g ∧ g S₁ = S₂) P₁ P₂.
+  List.Forall2 (λ S₁ S₂, ∃ g, app_gr g S₁ = S₂) P₁ P₂.
 
 Theorem Banach_Tarski_paradox :
   ∀ (s := set_equiv) f os, orbit_selector f → os = mkos _ f →
-  equidecomposable s G all_but_fixpoints
+  equidecomposable s all_but_fixpoints
     (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
 intros s f os Hosf Hos.
@@ -4119,46 +4136,38 @@ split.
   pose proof r_decomposed_2_a s Hs f Hosf os Hos as Ha.
   pose proof r_decomposed_2_b s Hs f Hosf os Hos as Hb.
   subst s; set (s := set_equiv).
-  eapply partition_group_map with (g := xtransl 3) in Ha; try eassumption.
-   eapply partition_group_map with (g := xtransl 6) in Hb; try eassumption.
-    eapply partition_union in Hb; [ | reflexivity | | apply Ha ].
-     eapply Hb.
+  eapply partition_group_map with (g := Xtransl 3) in Ha; try eassumption.
+  eapply partition_group_map with (g := Xtransl 6) in Hb; try eassumption.
+  eapply partition_union in Hb; [ | reflexivity | | apply Ha ].
+   apply Hb.
 
-     unfold intersection, set_eq; subst s; intros (x, y, z).
-     split; [ intros (H₁, H₂) | contradiction ].
-     unfold xtransl in H₁, H₂.
-     unfold empty_set; simpl.
-     destruct H₁ as (H₁, H₃).
-     destruct H₂ as (H₂, H₄).
-     unfold in_sphere in H₁, H₂.
-     apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
-     apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
-     apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
-     apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
-     clear - H₁ H₂.
-     rewrite <- Rsqr_1 in H₁ at 4.
-     rewrite <- Rsqr_1 in H₂ at 6.
-     apply Rsqr_le_abs_0 in H₁.
-     apply Rsqr_le_abs_0 in H₂.
-     rewrite Rabs_R1 in H₁, H₂.
-     unfold Rabs in H₁, H₂.
-     destruct (Rcase_abs (x + 3)), (Rcase_abs (x + 6)); lra.
-
-    right; exists 6%R; reflexivity.
-
-   right; exists 3%R; reflexivity.
+   unfold intersection, set_eq; subst s; intros (x, y, z).
+   split; [ intros (H₁, H₂) | contradiction ].
+   simpl in H₁, H₂.
+   unfold empty_set; simpl.
+   destruct H₁ as (H₁, H₃).
+   destruct H₂ as (H₂, H₄).
+   unfold in_sphere in H₁, H₂.
+   apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
+   apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
+   apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
+   apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
+   clear - H₁ H₂.
+   rewrite <- Rsqr_1 in H₁ at 4.
+   rewrite <- Rsqr_1 in H₂ at 6.
+   apply Rsqr_le_abs_0 in H₁.
+   apply Rsqr_le_abs_0 in H₂.
+   rewrite Rabs_R1 in H₁, H₂.
+   unfold Rabs in H₁, H₂.
+   destruct (Rcase_abs (x + 3)), (Rcase_abs (x + 6)); lra.
 
   split; [ reflexivity | ].
+  constructor; [ exists (Xtransl 3); reflexivity | ].
+  constructor; [ exists (Comb (Xtransl 3) (Rot ạ)); reflexivity | ].
+  constructor; [ exists (Xtransl 6); reflexivity | ].
+  constructor; [ exists (Comb (Xtransl 6) (Rot ḅ)); reflexivity | ].
   constructor.
-   exists (xtransl 3).
-   split; [ right; exists 3%R; reflexivity | reflexivity ].
-
-   constructor.
-    exists (λ p, xtransl 3 (rot ạ p)).
-    split; [ | reflexivity ].
-    unfold G.
-    (* ah merde, il faut que ce soit un groupe, donc qu'on puisse
-       combiner les transformations *)
+Qed.
 
 bbb.
 
