@@ -56,10 +56,6 @@ Notation "∃ ! x .. y , p" :=
 
 (* Step 1 *)
 
-(*
-Section Free_Group.
-*)
-
 (* a = E la false
    a⁻¹ = E la true
    b = E lb false
@@ -764,12 +760,6 @@ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
  apply IHel; reflexivity.
 Qed.
 
-(*
-End Free_Group.
-*)
-
-(* Step 2 *)
-
 Require Import Reals Psatz Nsatz.
 
 Notation "'ℝ'" := R.
@@ -866,17 +856,6 @@ rewrite <- Rmult_assoc; f_equal.
 rewrite Rmult_comm, Rmult_assoc; f_equal.
 apply sqrt_sqrt; assumption.
 Qed.
-
-(*
-Section Rotation.
-*)
-
-(*
-Notation "'ạ'" := (FE la false).
-Notation "'ạ⁻¹'" := (FE la true).
-Notation "'ḅ'" := (FE lb false).
-Notation "'ḅ⁻¹'" := (FE lb true).
-*)
 
 Check decomposed_4.
 Check decomposed_2_a.
@@ -3131,10 +3110,6 @@ Let s := @set_equiv point.
 
 Definition on_orbit_by_seq_of e {os : sel_model} p :=
   ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p.
-(*
-  ∃ el, 0 < length (norm_list el) ∧
-  Forall (eq e) (norm_list el) ∧ fold_right rotate (os_fun p) el = p.
-*)
 
 Definition B {os : sel_model} := λ p,
   all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
@@ -3592,39 +3567,58 @@ intros.
 eapply r_decomposed_2; eassumption.
 Qed.
 
-Theorem r_decomposed_2_a :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
-  → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
+Definition set_eq_list {A} (s := set_equiv) (El Fl : list (A → Prop)) :=
+  Forall2 set_eq El Fl.
+
+Add Parametric Morphism {A} : (@union A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as union_morph.
 Proof.
 Admitted.
 
-Theorem r_decomposed_2_b :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
-  → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
+Add Parametric Morphism {A} : (@union A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
+  as union_iff_morph.
 Proof.
-intros.
-eapply r_decomposed_2; eassumption.
-Qed.
-
-(*
-End Orbit.
-
-Section Equidecomposability.
-*)
+Admitted.
 
 Add Parametric Morphism {A} : (@is_partition A set_equiv)
-  with signature @set_eq A set_equiv ==> eq ==> iff
+  with signature @set_eq A set_equiv ==> set_eq_list ==> iff
   as is_partition_morph.
 Proof.
-intros E F HEF P.
+intros E F HEF El Fl HEFl.
 unfold is_partition.
 unfold set_eq in HEF; simpl in HEF.
 unfold set_eq; simpl.
+unfold set_eq_list in HEFl.
 split; intros (H₁, H₂).
+ split.
+  intros p.
+  split; intros HF.
+   clear - HEF HEFl H₁ HF.
+   revert El HEFl H₁.
+   induction Fl as [| F₁ Fl]; intros.
+    destruct El as [| E₁ El]; [ apply H₁, HEF, HF | ].
+    (* TODO: faire des lemmes sur Forall2 *)
+    inversion HEFl.
+
+    simpl.
+    destruct El as [| E₁ El]; [ inversion HEFl | ].
+pose proof HEF p.
+destruct H as (_, H).
+apply H in HF.
+apply H₁ in HF.
+simpl in HF.
+    inversion HEFl; subst x l y l'.
+    rewrite <- H3.
+destruct HF as [HF| HF].
+left; assumption.
+right.
+clear - HF H5.
+bbb.
+
  split; [ | assumption ].
  intros x.
  split; intros H; [ apply H₁, HEF; assumption | apply HEF, H₁; assumption ].
@@ -3643,6 +3637,39 @@ revert i.
 induction l as [| y]; intros; [ destruct i; apply Hab | ].
 destruct i; simpl; [ reflexivity | apply IHl ].
 Qed.
+
+Theorem r_decomposed_2_a :
+  ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → ∀ os, os = mkos _ f
+  → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
+Proof.
+intros s Hs f (Hoe, Ho) os Hos.
+assert (rot ạ (SS ạ⁻¹ \ B) = rot ạ (SS ạ⁻¹) \ rot ạ B)%S.
+Focus 2.
+ rewrite H.
+bbb.
+
+apply is_partition_union_subtract; [ reflexivity | | | ].
+Check r_decomposed_2.
+
+bbb.
+
+Theorem r_decomposed_2_b :
+  ∀ s, s = set_equiv
+  → ∀ f, orbit_selector f
+  → ∀ os, os = mkos _ f
+  → is_partition all_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
+Proof.
+intros.
+eapply r_decomposed_2; eassumption.
+Qed.
+
+(*
+End Orbit.
+
+Section Equidecomposability.
+*)
 
 Add Parametric Morphism {A} : (@intersection A)
   with signature
