@@ -3740,6 +3740,85 @@ Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
   is_partition F P → is_partition (app_gr g F) (map (app_gr g) P).
 Proof.
 intros s f Ho F P * HP.
+unfold is_partition in HP |-*.
+destruct HP as (HF, HP).
+split.
+ induction g as [e| dx | g IHg h IHh ]; intros; simpl.
+  intros p.
+  split.
+   intros Hr.
+   revert F HF Hr.
+   induction P as [| P PL]; intros; [ apply HF in Hr; contradiction | ].
+   simpl in HF; simpl.
+   generalize Hr; intros H.
+   apply HF in H; simpl in H.
+   destruct H as [H| H]; [ left; assumption | right ].
+   eapply IHPL; [ | reflexivity | eassumption ].
+   intros i j Hij.
+   unfold set_eq; simpl; intros y.
+   assert (HSij : S i ≠ S j).
+    intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+    pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
+    destruct HP as (HQ, _).
+    split; [ intros (HPi, HPj) | contradiction ].
+    apply HQ; split; assumption.
+
+   intros Hme.
+   revert F HF.
+   induction P as [| P PL]; intros; [ contradiction | ].
+   simpl in HF, Hme; apply HF.
+   destruct Hme as [Hme| Hme]; [ left; assumption | ].
+   right; simpl.
+   apply IHPL; [ | assumption | intros y; split; intros H; apply H ].
+   intros i j Hij y.
+   assert (HSij : S i ≠ S j).
+    intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+    pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
+    destruct HP as (HQ, _).
+    split; [ intros (HPi, HPj) | contradiction ].
+    apply HQ; split; assumption.
+
+  intros (x, y, z).
+  split.
+   intros Hp.
+   revert F HF Hp.
+   induction P as [| P PL]; intros.
+    unfold set_eq in HF; simpl in HF.
+    apply HF in Hp; contradiction.
+
+    simpl in HF; simpl.
+    generalize Hp; intros H.
+    apply HF in H; simpl in H.
+    destruct H as [H| H]; [ left; assumption | right ].
+    eapply IHPL; [ | simpl; reflexivity | eassumption ].
+    intros i j Hij.
+    unfold set_eq; simpl; intros q.
+    assert (HSij : S i ≠ S j).
+     intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+     pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
+     destruct HP as (HQ, _).
+     split; [ intros (HPi, HPj) | contradiction ].
+     apply HQ; split; assumption.
+
+   intros Hme.
+   revert F HF.
+   induction P as [| P PL]; intros; [ contradiction | ].
+   simpl in HF, Hme; apply HF.
+   destruct Hme as [Hme| Hme]; [ left; assumption | ].
+   right; simpl.
+   apply IHPL; [ | assumption | intros q; split; intros H; apply H ].
+   intros i j Hij q.
+   assert (HSij : S i ≠ S j).
+    intros HSij; apply Hij, Nat.succ_inj; assumption.
+
+    pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
+    destruct HP as (HQ, _).
+    split; [ intros (HPi, HPj) | contradiction ].
+    apply HQ; split; assumption.
+
 bbb.
 
 Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
