@@ -2785,6 +2785,11 @@ Add Parametric Relation A : (A → Prop) (@set_eq A set_equiv)
  transitivity proved by (set_eq_trans A)
  as set_eq_rel.
 
+Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : A → Prop),
+  (E = F)%S
+  → ∀ p, E p ↔ F p.
+Proof. intros s * HEF; apply HEF. Qed.
+
 (*
 Section Orbit2.
 *)
@@ -3918,90 +3923,19 @@ split.
    revert F HF IHg IHh Hgh.
    induction P as [| P PL]; intros; [ contradiction | ].
    destruct Hgh as [Hgh| Hgh].
-bbb.
+    rewrite IHh; simpl.
+    rewrite set_eq_equiv; [ | rewrite group_union_distr; reflexivity ].
+    left; assumption.
 
-rewrite HF; simpl.
-Add Parametric Morphism {A} : (@union A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
-  as union_morph.
-Proof.
-(*
-intros E E' HE F F' HF.
-unfold intersection; intros p.
-split; intros (H₁, H₂).
- split; [ apply HE; assumption | apply HF; assumption ].
- split; [ apply HE; assumption | apply HF; assumption ].
-Qed.
-*)
-Admitted.
-Show.
+    rewrite HF; simpl.
+    rewrite set_eq_equiv; [ | rewrite group_union_distr; reflexivity ].
+    rewrite set_eq_equiv; [ | rewrite group_union_distr; reflexivity ].
+    right.
+    rewrite group_union_list_distr.
+    rewrite set_eq_equiv; [ | rewrite group_union_list_distr; reflexivity ].
+    rewrite map_map; assumption.
 
-rewrite group_union_distr.
-rewrite group_union_list_distr.
-
-(*
-Add Parametric Morphism {A} : (@union A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
-  as union_iff_morph.
-(*
-Proof.
-intros E E' HE F F' HF a.
-unfold intersection.
-split; intros (H₁, H₂).
- split; [ apply HE; assumption | apply HF; assumption ].
- split; [ apply HE; assumption | apply HF; assumption ].
-Qed.
-*)Admitted. Show.
-*)
-
-Show.
-
-Check union_morph.
-rewrite group_union_distr.
-bbb.
-
-simpl in IHg, IHh, Hgh.
-Check group_union_distr.
-rewrite group_union_distr.
-
-   destruct Hgh as [Hgh| Hgh].
-bbb.
-
-   rewrite IHh.
-Check group_union_distr.
-
-   rewrite HF; simpl.
-
-simpl in IHg, IHh, Hgh.
-simpl.
-
-
-bbb.
-   eapply gr_subst in Hgh; [ | simpl; apply IHh ].
-    simpl in Hgh.
-    apply group_union_distr in Hgh.
-    destruct Hgh as [Hgh| Hgh]; [ left; assumption | right ].
-    eapply IHPL.
-     intros i j Hij.
-     unfold set_eq; simpl; intros y.
-     assert (HSij : S i ≠ S j).
-      intros HSij; apply Hij, Nat.succ_inj; assumption.
-
-      pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
-      destruct HP as (HQ, _).
-      split; [ intros (HPi, HPj) | contradiction ].
-      apply HQ; split; assumption.
-
-     reflexivity.
-
-     apply group_union_list_distr.
-
-     apply group_union_list_distr.
-
-     pose proof group_union_list_distr h PL.
-     rewrite <- H in Hgh; assumption.
+ simpl.
 bbb.
 
 Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
