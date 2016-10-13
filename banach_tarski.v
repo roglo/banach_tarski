@@ -3086,7 +3086,7 @@ Definition on_orbit_by_seq_of e {os : sel_model} p :=
   ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p.
 
 Definition B {os : sel_model} := λ p,
-  all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
+  all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ (os_fun p).
 
 Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
 Definition xtransl dx (E : point → Prop) '(P x y z) := E (P (x - dx) y z).
@@ -3379,16 +3379,32 @@ Theorem r_decomposed_4 :
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints
-      [((EE ⋃ SS ạ) ⋃ B)%S; (SS ạ⁻¹ \ B)%S; SS ḅ; SS ḅ⁻¹].
+      [(EE ⋃ SS ạ ⋃ B)%S; (SS ạ⁻¹ \ B)%S; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros s Hs f HoeHo os Hos.
 pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
+destruct HoeHo as (Hoe, Ho).
 eapply is_partition_group_first_2_together in H; [ | assumption ].
 apply is_partition_union_subtract; [ assumption | assumption | | ].
- intros p bm.
- destruct bm as (Ha & n & Ho).
- split; [ assumption | ].
- exists (repeat ạ⁻¹ (S n)), (repeat ạ⁻¹ n).
+ intros p bm; subst os.
+ destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
+ split; [ assumption | simpl ].
+ pose proof Ho p as Hop.
+ destruct Hop as (el, Hop).
+ apply rotate_rev_path in Hop.
+ exists (repeat ạ⁻¹ (S n) ++ rev_path el), (repeat ạ⁻¹ n ++ rev_path el).
+ split.
+Check norm_list_repeat.
+Focus 2.
+bbb.
+
+rewrite fold_right_app, Hop.
+rewrite <- Hop at 1.
+rewrite <- fold_right_app.
+
+
+ split; [ rewrite norm_list_repeat; reflexivity | ].
+bbb.
  split; [ rewrite norm_list_repeat; reflexivity | assumption ].
 
  intros p.
@@ -3714,6 +3730,9 @@ Theorem r_decomposed_2_a :
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst s.
+Print B.
+bbb.
+
 split.
 *intros p.
  split.
@@ -3744,7 +3763,6 @@ split.
 
      unfold B; simpl.
      intros (Haf, Hoo).
-bbb.
 destruct Hoo as (n & Hoo).
 subst os; simpl in Hoo.
 rewrite Hfr, Hel in Hoo.
@@ -3755,6 +3773,9 @@ unfold all_but_fixpoints in Hnf, Haf.
 destruct Hnf as (His, Hoh).
 destruct Haf as (Hir, Hor).
 rewrite Hel in Hfr.
+Print B.
+Print on_orbit_by_seq_of.
+unfold orbit_has_no_fixpoint in Hor.
 (* bloqué *)
 bbb.
 
