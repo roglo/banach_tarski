@@ -1506,40 +1506,24 @@ destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
 Qed.  
 
 Theorem norm_list_is_nil_between : ∀ e el,
-  norm_list (negf e :: el ++ [e]) = [] → norm_list el = [].
+  norm_list (negf e :: el ++ [e]) = [] ↔ norm_list el = [].
 Proof.
-intros e el Hn.
-bbb.
+assert (H : ∀ e el, norm_list el = [] → norm_list (negf e :: el ++ [e]) = []).
+ intros e el Hn.
+ rewrite cons_to_app, <- is_normal, Hn, app_nil_l.
+ remember norm_list as f; simpl; subst f.
+ rewrite norm_list_cancel2; reflexivity.
 
-revert e Hn.
-induction el as [| e₁]; intros; [ reflexivity | ].
-destruct (free_elem_dec e₁ e) as [H₁| H₁].
- subst e₁.
+ intros e el.
+ split; intros Hn; [ | apply H; assumption ].
+ apply H with (e := negf e) in Hn.
+ rewrite negf_involutive in Hn.
  remember norm_list as f; simpl in Hn; subst f.
- rewrite norm_list_cancel2 in Hn.
- replace (el ++ [e]) with ([] ++ el ++ [e]) in Hn by reflexivity.
- rewrite <- is_normal in Hn; simpl in Hn; simpl.
- remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
- destruct el₁ as [| e₁]; [ discriminate Hn | ].
- destruct (letter_opp_dec e e₁) as [H₁| H₁].
-  apply letter_opp_sym, letter_opp_negf in H₁; subst e₁.
-  remember norm_list as f; simpl in Hn; subst f.
-  apply IHel in Hn.
-bbb.
-
-SearchAbout (norm_list (_ ++ _)).
- simpl.
-
-bbb.
- rewrite norm_list_cancel_in2 in Hn.
-
-remember (length el) as len eqn:Hlen.
-symmetry in Hlen.
-revert e el Hn Hlen.
-induction len; intros.
- apply length_zero_iff_nil in Hlen; subst el; reflexivity.
-
-bbb.
+ rewrite norm_list_cancel in Hn.
+ rewrite <- app_assoc in Hn; simpl in Hn.
+ rewrite norm_list_cancel_in, app_nil_r in Hn.
+ assumption.
+Qed.
 
 Theorem norm_list_app_is_nil : ∀ el₁ el₂,
   el₁ = norm_list el₁
@@ -2668,63 +2652,11 @@ remember (negf e :: rev_path el ++ e :: [])  as el₁ eqn:Hel₁.
 remember (norm_list el₁) as el₂ eqn:Hel₂.
 symmetry in Hel₂.
 destruct el₂ as [| e₂].
- exfalso.
- subst el₁.
- apply Hel; clear Hel.
- clear - Hel₂.
- assert (norm_list (rev_path el) = []).
-  remember (rev_path el) as el₁; clear el Heqel₁.
-  rename el₁ into el.
-SearchAbout (norm_list _ = []).
-SearchAbout (norm_list (_ ++ _)).
+ exfalso; subst el₁; apply Hel.
+ apply norm_list_is_nil_between in Hel₂.
+ rewrite <- rev_path_norm_list in Hel₂.
+ apply rev_path_is_nil in Hel₂; assumption.
 
-apply norm_list_is_nil_between in Hel₂; assumption.
-
-rewrite <- rev_path_norm_list in H.
-apply rev_path_is_nil in H; assumption.
-bbb.
-
- remember (length el) as len eqn:Hlen; symmetry in Hlen.
- revert e el Hel₂ Hlen.
- induction len; intros.
-  apply length_zero_iff_nil in Hlen; subst el; reflexivity.
-
-  destruct el as [| e₁]; [ reflexivity | ].
-  simpl in Hel₂, Hlen; simpl.
-  remember (norm_list el) as el₁ eqn:Hel₁.
-  symmetry in Hel₁.
-  destruct el₁ as [| e₂]; [ exfalso | ].
-bbb.
-
-  rewrite rev_path_cons, rev_path_single in Hel₂; simpl in Hel₂.
-  rewrite <- app_assoc in Hel₂; simpl in Hel₂.
-  destruct (free_elem_dec e e₁) as [H₁| H₁].
-   subst e₁.
-   rewrite norm_list_cancel_in2, app_nil_r in Hel₂.
-   rewrite <- rev_path_norm_list in Hel₂.
-   remember (norm_list el) as el₁ eqn:Hel₁.
-   symmetry in Hel₁.
-   destruct el₁ as [| e₁]; [ discriminate Hel₂ | ].
-   destruct (letter_opp_dec e e₁) as [H₁| H₁].
-    apply letter_opp_sym, letter_opp_negf in H₁; subst e₁.
-    destruct el₁ as [| e₁]; [ reflexivity | exfalso ].
-bbb.
-
-
-
- rewrite cons_to_app, <- is_normal, <- rev_path_norm_list in Hel₂.
- remember norm_list as f; simpl in Hel₂; subst f.
- remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
- destruct (norm_list_dec (negf e :: rev_path el₁ ++ [e])) as [H₁| H₁].
-  rewrite H₁ in Hel₂; discriminate Hel₂.
-
-  destruct H₁ as (el₂ & t & d & el₃ & H₁).
-  rewrite H₁ in Hel₂.
-  rewrite norm_list_cancel_in in Hel₂.
-
-Check norm_list_dec.
-bbb.
-Focus 2.
  apply same_orbit_rotate with (e := negf e) in Hso.
  rewrite rotate_neg_rotate in Hso.
  assert (Hn : norm_list el₁ ≠ []) by (rewrite Hel₂; intros H; discriminate H).
@@ -2739,59 +2671,7 @@ Focus 2.
  rewrite norm_list_cancel_in.
  rewrite <- rotate_rotate_norm.
  apply app_path_rev_path.
-
-bbb.
-assert (Hn : norm_list el₁ ≠ []).
- intros H; apply Hel; clear Hel.
- subst el₁.
- rewrite cons_to_app, <- is_normal in H.
- rewrite <- rev_path_norm_list in H.
- remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
- destruct el₁ as [| e₁]; [ reflexivity | exfalso ].
- rewrite rev_path_cons, rev_path_single in H.
- rewrite <- app_assoc in H.
- apply norm_list_app_is_nil in H.
-(* c'est vrai, ce truc ? *)
-bbb.
- destruct (free_elem_dec e e₁) as [H₁| H₁].
-  subst e₁.
-
- destruct (letter_opp_dec e₁ (negf e) as [H₁| H₁].
-  apply letter_opp_negf in H₁; subst e₁.
-
- remember norm_list as f; simpl in H; subst f.
-bbb.
- destruct el₁ as [| e₁]; [ reflexivity | exfalso ].
- rewrite rev_path_cons, rev_path_single in H.
- rewrite <- app_assoc in H.
- remember norm_list as f; simpl in H; subst f.
-
-bbb.
-Focus 2.
-pose proof His el₁ (rotate (negf e) p₁) Hso Hn.
-intros Hr; apply H; clear H.
-rewrite <- Hr at 1.
-rewrite <- fold_right_cons.
-rewrite <- fold_right_app.
-rewrite Hel₁.
-rewrite cons_comm_app.
-rewrite app_comm_cons.
-rewrite <- app_assoc.
-simpl; f_equal.
-rewrite rotate_rotate_norm.
-rewrite norm_list_cancel_in.
-rewrite <- rotate_rotate_norm.
-apply app_path_rev_path.
-bbb.
-
-
-pose proof His el (rotate (negf e) p₁) Hso Hel.
-intros Hr; apply H; clear H.
-rewrite <- Hr at 1.
-rewrite <- fold_right_cons.
-rewrite <- fold_right_app.
-bbb.
-
+Qed.
 
 Delimit Scope set_scope with S.
 
@@ -3851,25 +3731,17 @@ split.
    split.
     split.
      destruct Hnf as (His, Hnf).
-split.
-apply in_sphere_after_rotate; assumption.
-apply no_fixpoint_after_rotate; assumption.
+     split; [ apply in_sphere_after_rotate; assumption | ].
+     apply no_fixpoint_after_rotate; assumption.
+
 bbb.
-     apply in_sphere_after_rotate; assumption.
+     exists (negf e :: []), [].
+     split; [ reflexivity | simpl ].
+     assert (H : f p = f (rotate (negf e) p)).
+      apply Hoe.
+      exists (negf e :: []); reflexivity.
 
-     intros el₁ p₁ Hp Hn.
-     apply Hnf; [ | assumption ].
-     destruct Hp as (el₂ & Hp).
-     exists (el₂ ++ [negf e]).
-     rewrite fold_right_app; assumption.
-
-    exists (negf e :: []), [].
-    split; [ reflexivity | simpl ].
-    assert (H : f p = f (rotate (negf e) p)).
-     apply Hoe.
-     exists (negf e :: []); reflexivity.
-
-     rewrite <- H, Hel; reflexivity.
+      rewrite <- H, Hel; reflexivity.
 
    +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
      left; split; [ assumption | ].
