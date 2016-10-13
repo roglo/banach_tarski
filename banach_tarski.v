@@ -3649,6 +3649,23 @@ induction i; intros.
   apply IHi, HEFL.
 Qed.
 
+Theorem set_eq_list_sym {A} : ∀ (El Fl : list (A → Prop)),
+  set_eq_list El Fl
+  → set_eq_list Fl El.
+Proof.
+intros * Hs.
+revert Fl Hs.
+induction El as [| E El]; intros.
+ destruct Fl as [| F Fl]; [ | apply Forall2_nil_cons in Hs; contradiction ].
+ assumption.
+
+ destruct Fl as [| F Fl]; [ apply Forall2_cons_nil in Hs; contradiction | ].
+ apply Forall2_cons_cons in Hs; simpl.
+ destruct Hs as (HEF, HEFL).
+ constructor; [ split; apply HEF | ].
+ apply IHEl, HEFL.
+Qed.
+
 Add Parametric Morphism {A} : (@union A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -3683,7 +3700,7 @@ unfold set_eq in HEF; simpl in HEF.
 unfold set_eq; simpl.
 split; intros (H₁, H₂).
  split.
-  intros p.
+  intros x.
   apply Forall2_eq_list in HEFl.
   split; intros HF; [ apply HEFl, H₁, HEF, HF | apply HEF, H₁, HEFl, HF ].
 
@@ -3692,77 +3709,18 @@ split; intros (H₁, H₂).
   intros (HFi, HFj).
   eapply H₂; [ eassumption | ].
   split; eapply set_eq_list_nth; eassumption.
-vvv.
 
-     pose proof HEF p.
-     destruct H as (_, H).
-     apply H, H₁ in HF; simpl in HF.
-     destruct HF as [HF| HF]; [ left; apply HEF₁, HF | right ].
-     eapply IHFl; [ apply HEF, H₁; right; apply HF | eassumption | ].
-     intros x.
-     split; intros H₂.
-      apply H₁ in H₂; simpl in H₂.
-      destruct H₂ as [H₂| H₂].
+ apply set_eq_list_sym in HEFl.
+ split.
+  intros x.
+  apply Forall2_eq_list in HEFl.
+  split; intros HF; [ apply HEFl, H₁, HEF, HF | apply HEF, H₁, HEFl, HF ].
 
-bbb.
-      generalize HEFl; intros HFel.
-      apply Forall2_eq_list in HFel; apply HFel.
-bbb.
-      eapply IHFl; [ | eassumption | ].
-Focus 2.
-intros y.
-split; intros H₃.
- pose proof H₁ y as H₄.
- destruct H₄ as (H₄, H₅).
- pose proof H₄ H₃ as H₆.
- destruct H₆; [ | assumption ].
- apply HFel.
- eapply IHFl; [ apply HEF, H₃ | eassumption | ].
- intros z.
-
-bbb.
-
-right.
-clear - HF H5.
-apply Forall2_eq_list in H5.
-Print set_eq_list.
-
-apply H5, HF.
-apply HEF, H₁.
-clear - HEFl HF.
-bbb.
-
-revert El HF H5.
-induction Fl as [| F FL]; intros.
- destruct El as [| E El]; [ contradiction | inversion H5 ].
-
- destruct El as [| E El]; [ contradiction | ].
- inversion H5; subst x l y l'.
- destruct HF as [HF| HF].
-  left; apply H2; assumption.
-  right.
-  eapply IHFL; eassumption.
-apply HEF, H₁.
-clear - HEFl HF.
-SearchAbout Forall2.
-Theorem Forall2_sym {A} : ∀ R (l₁ l₂ : list A),
-  Forall2 R l₁ l₂
-  → symmetric _ R
-  → Forall2 R l₂ l₁.
-Admitted. Show.
-
-apply Forall2_sym in HEFl; [ | apply set_eq_sym ].
-
-
-bbb.
-
- split; [ | assumption ].
- intros x.
- split; intros H; [ apply H₁, HEF; assumption | apply HEF, H₁; assumption ].
-
- split; [ | assumption ].
- intros x.
- split; intros H; [ apply H₁, HEF; assumption | apply HEF, H₁; assumption ].
+  intros i j Hij x.
+  split; [ | intros H; contradiction ].
+  intros (HFi, HFj).
+  eapply H₂; [ eassumption | ].
+  split; eapply set_eq_list_nth; try eassumption.
 Qed.
 
 Add Parametric Morphism {A} : (@List.nth (A → Prop))
