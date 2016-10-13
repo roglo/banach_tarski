@@ -3723,18 +3723,47 @@ split.
   apply same_orbit_sym in H.
   destruct H as (el, Hel).
   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-  destruct el₁ as [| e₁].
-   +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
-   clear Hel₁.
-   right; left.
-   unfold rot, SS.
-   split.
-    split.
-     destruct Hnf as (His, Hnf).
-     split; [ apply in_sphere_after_rotate; assumption | ].
-     apply no_fixpoint_after_rotate; assumption.
+  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
+   apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
 
-     subst os; simpl.
+   destruct el₁ as [| e₁].
+    +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+    clear Hel₁.
+    right; left.
+    unfold rot, SS.
+    split.
+     split.
+      destruct Hnf as (His, Hnf).
+      split; [ apply in_sphere_after_rotate; assumption | ].
+      apply no_fixpoint_after_rotate; assumption.
+
+      subst os; simpl.
+      rewrite Hfr, Hel.
+      exists (ạ⁻¹ :: []), [].
+      split; reflexivity.
+
+    unfold B; simpl.
+    intros (Haf, Hoo).
+destruct Hoo as (n & Hoo).
+subst os; simpl in Hoo.
+rewrite Hfr, Hel in Hoo.
+apply f_equal with (f := rotate ạ) in Hoo.
+do 2 rewrite rotate_rotate_neg in Hoo.
+destruct n; [ clear Hoo | ].
+unfold all_but_fixpoints in Hnf, Haf.
+destruct Hnf as (His, Hoh).
+destruct Haf as (Hir, Hor).
+rewrite Hel in Hfr.
+(* bloqué *)
+bbb.
+
+destruct n.
+ simpl in Hoo.
+
+simpl in Hoo.
+subst
+
+bbb.
      pose proof Ho (rotate ạ⁻¹ p) as H.
      destruct H as (el₁, H).
      apply rotate_rev_path in H.
