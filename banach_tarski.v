@@ -3374,6 +3374,13 @@ split.
      destruct i; contradiction.
 Qed.
 
+Theorem os_fun_idemp : ∀ f, orbit_selector f → ∀ p, f (f p) = f p.
+Proof.
+intros f Hos p.
+destruct Hos as (Hso & Ho).
+apply Hso; symmetry; apply Ho.
+Qed.
+
 Theorem r_decomposed_4 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
@@ -3388,10 +3395,15 @@ eapply is_partition_group_first_2_together in H; [ | assumption ].
 apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p bm; subst os.
  destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
+ rewrite os_fun_idemp in Hr.
+ (* et là, normalement, Hr est une contradiction *)
+bbb.
+
  split; [ assumption | simpl ].
  pose proof Ho p as Hop.
  destruct Hop as (el, Hop).
  apply rotate_rev_path in Hop.
+bbb.
  exists (repeat ạ⁻¹ (S n) ++ rev_path el), (repeat ạ⁻¹ n ++ rev_path el).
  split.
 Check norm_list_repeat.
