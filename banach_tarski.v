@@ -2709,6 +2709,10 @@ intros * Hnf Hrm.
 unfold orbit_has_no_fixpoint in Hnf.
 intros el p₁ Hso Hel.
 assert (Hsot : same_orbit p (mat_vec_mul (mat_transp m) p₁)).
+ destruct Hso as (el₁, Hso).
+ unfold same_orbit.
+bbb.
+
 Focus 2.
 pose proof Hnf el (mat_vec_mul (mat_transp m) p₁) Hsot Hel.
 SearchAbout mat_transp.
