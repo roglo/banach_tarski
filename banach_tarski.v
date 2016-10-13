@@ -2117,97 +2117,6 @@ Qed.
 Definition on_sphere_ray r '(P x y z) := (x² + y² + z² = r)%R.
 Definition on_sphere '(P x y z) := (x² + y² + z² = 1)%R.
 
-Theorem tagada : ∀ el,
-  el ≠ []
-  → norm_list el = el
-  → ∃ p₁ p₂, on_sphere p₁ ∧ on_sphere p₂ ∧ ∀ p, on_sphere p →
-    p ≠ p₁ → p ≠ p₂ → fold_right rotate p el ≠ p.
-Proof.
-intros el Hel Hn.
-destruct (list_nil_app_dec el) as [H₁| H₁].
- subst el; exfalso; apply Hel; reflexivity.
-
- destruct H₁ as (e, (el₁, Hel₁)).
- clear Hel; rename Hel₁ into Hel.
- subst el; rename el₁ into el.
- destruct e as (t, d); destruct t.
-  revert d Hn.
-  induction el as [| e] using rev_ind; intros.
-   rewrite app_nil_l.
-   exists (P 1 0 0), (P (-1) 0 0).
-   split; [ simpl; rewrite Rsqr_0, Rsqr_1; lra | ].
-   split; [ simpl; rewrite Rsqr_0, <- Rsqr_neg, Rsqr_1; lra | ].
-   intros p Hsp Hp₁ Hp₂; simpl.
-   unfold on_sphere in Hsp.
-   unfold mat_vec_mul, rot_inv_x; simpl.
-   destruct p as (x, y, z).
-   assert (H :
-      ∀ u, (u = 2%R) ∨ (u = (-2)%R)
-      → P x (1 / 3 * y + u * √ 2 / 3 * z) ((- u) * √ 2 / 3 * y + 1 / 3 * z) ≠
-        P x y z).
-    intros u Hu H.
-    injection H; clear H; intros Hz Hy; move Hy after Hz.
-    apply Rplus_eq_compat_r with (r := (- 1 * y)%R) in Hy.
-    apply Rplus_eq_compat_r with (r := (- 1 * z)%R) in Hz.
-    ring_simplify in Hy.
-    ring_simplify in Hz.
-    replace (1/3 * y - y)%R with (- (2/3) * y)%R in Hy by field.
-    unfold Rminus in Hz.
-    rewrite Rplus_assoc in Hz.
-    replace (1/3 * z + - z)%R with (- (2/3) * z)%R in Hz by field.
-    eapply Rsolve_system_equation_2_variables in Hy; [ | | eassumption ].
-     unfold determinant in Hy.
-     progress repeat rewrite Rmult_0_l in Hy.
-     progress repeat rewrite Rmult_0_r in Hy.
-     unfold Rdiv in Hy.
-     do 2 rewrite <- Rmult_assoc in Hy.
-     rewrite Rmult5_sqrt2_sqrt5 in Hy; [ | lra ].
-     rename Hz into H₂.
-     destruct Hy as (Hy, Hz).
-     ring_simplify in Hy.
-     ring_simplify in Hz.
-     subst y z.
-     ring_simplify in Hsp.
-     rewrite Rsqr_0, Rmult_0_r, Rplus_0_r in Hsp.
-     rewrite <- Rsqr_1 in Hsp.
-     apply Rsqr_eq in Hsp.
-     destruct Hsp; subst x; exfalso; [ apply Hp₁ | apply Hp₂ ]; reflexivity.
-
-     unfold determinant, Rdiv.
-     do 2 rewrite <- Rmult_assoc.
-     rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-     intros H; ring_simplify in H.
-     destruct Hu; subst u; lra.
-
-    unfold rotate; simpl.
-    destruct d; simpl.
-     progress repeat rewrite Rmult_1_l.
-     progress repeat rewrite Rmult_0_l.
-     progress repeat rewrite Rplus_0_l.
-     progress repeat rewrite Rplus_0_r.
-     apply H; left; reflexivity.
-
-     progress repeat rewrite Rmult_1_l.
-     progress repeat rewrite Rmult_0_l.
-     progress repeat rewrite Rplus_0_l.
-     progress repeat rewrite Rplus_0_r.
-     replace (2 * √2)%R with (- (- 2) * √2)%R by lra.
-     apply H; right; reflexivity.
-
-   apply norm_list_app_diag in Hn.
-   destruct e as (t₁, d₁).
-    destruct t₁.
-    pose proof IHel d₁ Hn as H.
-    destruct H as (p₁, (p₂, (Hps₁, (Hps₂, Hp)))).
-    exists p₁, p₂.
-    split; [ assumption | ].
-    split; [ assumption | ].
-    intros p Hps Hp₁ Hp₂.
-    pose proof Hp p Hps Hp₁ Hp₂ as H.
-    intros Hr; apply H; clear H.
-    rewrite fold_right_app in Hr.
-Abort. (* à compléter *)
-
 Definition mat_transp m :=
   mkmat 
    (a₁₁ m) (a₂₁ m) (a₃₁ m)
@@ -2700,46 +2609,79 @@ apply in_sphere_after_rotation; [ assumption | ].
 apply rotate_is_rotation_matrix.
 Qed.
 
-Theorem no_fixpoint_after_rotation : ∀ p m,
-  orbit_has_no_fixpoint p
-  → is_rotation_matrix m
-  → orbit_has_no_fixpoint (mat_vec_mul m p).
+Theorem same_orbit_rotate : ∀ e p₁ p₂,
+  same_orbit p₁ p₂
+  → same_orbit (rotate e p₁) (rotate e p₂).
 Proof.
-intros * Hnf Hrm.
-unfold orbit_has_no_fixpoint in Hnf.
-intros el p₁ Hso Hel.
-assert (Hsot : same_orbit p (mat_vec_mul (mat_transp m) p₁)).
- destruct Hso as (el₁, Hso).
- unfold same_orbit.
-bbb.
-
-Focus 2.
-pose proof Hnf el (mat_vec_mul (mat_transp m) p₁) Hsot Hel.
-SearchAbout mat_transp.
-Print is_rotation_matrix.
-unfold is_rotation_matrix in Hrm.
-
-bbb.
-destruct p as (x, y, z).
-remember (P x y z) as p eqn:HP.
-remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : on_sphere_ray r p) by (subst p; assumption).
-pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
-unfold in_sphere in His.
-unfold on_sphere_ray in H.
-unfold in_sphere.
-subst p; simpl in *.
-rewrite H, <- Hos; assumption.
-bbb.
+intros * Hso.
+destruct Hso as (el, Hr).
+exists (e :: el ++ [negf e]); simpl.
+rewrite fold_right_app; simpl.
+rewrite rotate_neg_rotate.
+f_equal; assumption.
+Qed.
 
 Theorem no_fixpoint_after_rotate : ∀ p e,
   orbit_has_no_fixpoint p
   → orbit_has_no_fixpoint (rotate e p).
 Proof.
 intros * His.
-apply no_fixpoint_after_rotation; [ assumption | ].
-apply rotate_is_rotation_matrix.
-Qed.
+unfold orbit_has_no_fixpoint in His.
+intros el p₁ Hso Hel.
+apply same_orbit_rotate with (e := negf e) in Hso.
+rewrite rotate_neg_rotate in Hso.
+remember (negf e :: rev_path el ++ e :: [])  as el₁ eqn:Hel₁.
+assert (Hn : norm_list el₁ ≠ []).
+ intros H; apply Hel; clear Hel.
+ subst el₁.
+ rewrite cons_to_app, <- is_normal in H.
+ rewrite <- rev_path_norm_list in H.
+ remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+ destruct el₁ as [| e₁]; [ reflexivity | exfalso ].
+ rewrite rev_path_cons, rev_path_single in H.
+ rewrite <- app_assoc in H.
+ apply norm_list_app_is_nil in H.
+(* c'est vrai, ce truc ? *)
+bbb.
+ destruct (free_elem_dec e e₁) as [H₁| H₁].
+  subst e₁.
+
+ destruct (letter_opp_dec e₁ (negf e) as [H₁| H₁].
+  apply letter_opp_negf in H₁; subst e₁.
+
+ remember norm_list as f; simpl in H; subst f.
+bbb.
+ destruct el₁ as [| e₁]; [ reflexivity | exfalso ].
+ rewrite rev_path_cons, rev_path_single in H.
+ rewrite <- app_assoc in H.
+ remember norm_list as f; simpl in H; subst f.
+
+bbb.
+Focus 2.
+pose proof His el₁ (rotate (negf e) p₁) Hso Hn.
+intros Hr; apply H; clear H.
+rewrite <- Hr at 1.
+rewrite <- fold_right_cons.
+rewrite <- fold_right_app.
+rewrite Hel₁.
+rewrite cons_comm_app.
+rewrite app_comm_cons.
+rewrite <- app_assoc.
+simpl; f_equal.
+rewrite rotate_rotate_norm.
+rewrite norm_list_cancel_in.
+rewrite <- rotate_rotate_norm.
+apply app_path_rev_path.
+bbb.
+
+
+pose proof His el (rotate (negf e) p₁) Hso Hel.
+intros Hr; apply H; clear H.
+rewrite <- Hr at 1.
+rewrite <- fold_right_cons.
+rewrite <- fold_right_app.
+bbb.
+
 
 Delimit Scope set_scope with S.
 
