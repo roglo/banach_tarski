@@ -3734,6 +3734,12 @@ split.
      split; [ apply in_sphere_after_rotate; assumption | ].
      apply no_fixpoint_after_rotate; assumption.
 
+     subst os; simpl.
+     pose proof Ho (rotate ạ⁻¹ p) as H.
+     destruct H as (el₁, H).
+     apply rotate_rev_path in H.
+     exists (rev_path el₁).
+
 bbb.
      exists (negf e :: []), [].
      split; [ reflexivity | simpl ].
