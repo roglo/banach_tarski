@@ -3742,8 +3742,9 @@ split.
       exists (ạ⁻¹ :: []), [].
       split; reflexivity.
 
-    unfold B; simpl.
-    intros (Haf, Hoo).
+     unfold B; simpl.
+     intros (Haf, Hoo).
+bbb.
 destruct Hoo as (n & Hoo).
 subst os; simpl in Hoo.
 rewrite Hfr, Hel in Hoo.
