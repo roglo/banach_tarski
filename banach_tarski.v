@@ -3740,12 +3740,19 @@ Theorem r_decomposed_2_a :
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos.
-assert (rot ạ (SS ạ⁻¹ \ B) = rot ạ (SS ạ⁻¹) \ rot ạ B)%S.
+set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
+set (A₂ := rot ạ (SS ạ⁻¹ \ B)%S).
+set (A'₂ := (rot ạ (SS ạ⁻¹) \ rot ạ B)%S).
+assert (HAA : A₂ = A'₂).
 Focus 2.
- rewrite H.
+ rewrite HAA.
+ subst A₁ A₂ A'₂.
+(* ah oui mais ça va pas du tout, ça, faut pas roter ạ le \ B !
+   mais, du coup, c'est foutu pour l'équidécomposabilité ;
+   chuis dans la merde, là *)
 bbb.
 
-apply is_partition_union_subtract; [ reflexivity | | | ].
+ apply is_partition_union_subtract; [ reflexivity | | | ].
 Check r_decomposed_2.
 
 bbb.
