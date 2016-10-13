@@ -3381,6 +3381,12 @@ destruct Hos as (Hso & Ho).
 apply Hso; symmetry; apply Ho.
 Qed.
 
+Theorem rotate_infinite : ∀ n e p,
+  fold_right rotate p (repeat e (S n)) ≠ p.
+Proof.
+intros.
+bbb.
+
 Theorem r_decomposed_4 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
@@ -3396,7 +3402,8 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p bm; subst os.
  destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
  rewrite os_fun_idemp in Hr.
- (* et là, normalement, Hr est une contradiction *)
+ exfalso; revert Hr; apply rotate_infinite.
+
 bbb.
 
  split; [ assumption | simpl ].
