@@ -3653,26 +3653,24 @@ intros E F HEF El Fl HEFl.
 unfold is_partition.
 unfold set_eq in HEF; simpl in HEF.
 unfold set_eq; simpl.
-unfold set_eq_list in HEFl.
 split; intros (H₁, H₂).
  split.
   intros p.
-  split; intros HF.
-   clear - HEF HEFl H₁ HF.
-   revert p El HF HEFl H₁.
-   induction Fl as [| F₁ Fl]; intros.
-    destruct El as [| E₁ El]; [ apply H₁, HEF, HF | ].
-    apply Forall2_cons_nil in HEFl; contradiction.
+  apply Forall2_eq_list in HEFl.
+  split; intros HF; [ apply HEFl, H₁, HEF, HF | apply HEF, H₁, HEFl, HF ].
 
-    simpl.
-    destruct El as [| E₁ El].
-     apply Forall2_nil_cons in HEFl; contradiction.
+  intros i j Hij x.
+  split; [ | intros H; contradiction ].
+  intros (HFi, HFj).
+  eapply H₂; [ eassumption | ].
+  unfold set_eq_list in HEFl.
+  clear - HEFl HFi HFj.
+  split.
+vvv.
 
      pose proof HEF p.
      destruct H as (_, H).
      apply H, H₁ in HF; simpl in HF.
-     apply Forall2_cons_cons in HEFl.
-     destruct HEFl as (HEF₁, HEFl).
      destruct HF as [HF| HF]; [ left; apply HEF₁, HF | right ].
      eapply IHFl; [ apply HEF, H₁; right; apply HF | eassumption | ].
      intros x.
@@ -3680,8 +3678,10 @@ split; intros (H₁, H₂).
       apply H₁ in H₂; simpl in H₂.
       destruct H₂ as [H₂| H₂].
 
+bbb.
       generalize HEFl; intros HFel.
       apply Forall2_eq_list in HFel; apply HFel.
+bbb.
       eapply IHFl; [ | eassumption | ].
 Focus 2.
 intros y.
