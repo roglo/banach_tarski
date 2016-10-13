@@ -2466,7 +2466,7 @@ Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
   ∃ f : A → A, (∀ x : A, R x (f x)) ∧ (∀ x y, R x y → f x = f y).
 
 (* TTCA implies excluded middle: do you believe that? Diaconescu! *)
-Theorem excluded_middle : ∀ P, P ∨ ¬P.
+Theorem EM : ∀ P, P ∨ ¬P.
 Proof.
 intros P.
 set (R (x y : bool) := x = y ∨ P).
@@ -2723,7 +2723,8 @@ Definition nth_set {A} i (Ei : list (A → Prop)) :=
 Notation "a = b" := (set_eq a b) : set_scope.
 Notation "'∅'" := (empty_set) : set_scope.
 Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
-Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50) : set_scope.
+Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50, left associativity)
+: set_scope.
 Notation "E₁ '\' E₂" := (subtract E₁ E₂) (at level 50) : set_scope.
 Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60) : set_scope.
 Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
@@ -3420,7 +3421,7 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p.
  unfold Decidable.decidable; simpl.
  (* I am ashamed to use EM here, but I have it thanks to TTCA... *)
- apply excluded_middle.
+ apply EM.
 (* perhaps I could decompose the cases above:
  unfold B.
  unfold all_but_fixpoints.
@@ -3740,19 +3741,18 @@ Theorem r_decomposed_2_a :
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos.
+(* ah bin non, c'est faux, ça : EE est dans les deux partitions *)
+bbb.
+
 set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
 set (A₂ := rot ạ (SS ạ⁻¹ \ B)%S).
-set (A'₂ := (rot ạ (SS ạ⁻¹) \ rot ạ B)%S).
+set (A'₂ := (rot ạ (SS ạ⁻¹) \ B)%S).
 assert (HAA : A₂ = A'₂).
 Focus 2.
  rewrite HAA.
- subst A₁ A₂ A'₂.
-(* ah oui mais ça va pas du tout, ça, faut pas roter ạ le \ B !
-   mais, du coup, c'est foutu pour l'équidécomposabilité ;
-   chuis dans la merde, là *)
-bbb.
+ subst A₁ A₂ A'₂ s.
+ apply is_partition_union_subtract; [ reflexivity | | | intros p; apply EM ].
 
- apply is_partition_union_subtract; [ reflexivity | | | ].
 Check r_decomposed_2.
 
 bbb.
