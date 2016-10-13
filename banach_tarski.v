@@ -3621,6 +3621,14 @@ induction El as [| E El]; intros.
    right; apply Hall; assumption.
 Qed.
 
+Theorem set_eq_list_nth {A} : ∀ El Fl i (x : A),
+  set_eq_list El Fl
+  → Fl.[i]%S x
+  → El.[i]%S x.
+Proof.
+intros * Hs HF.
+bbb.
+
 Add Parametric Morphism {A} : (@union A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -3663,9 +3671,7 @@ split; intros (H₁, H₂).
   split; [ | intros H; contradiction ].
   intros (HFi, HFj).
   eapply H₂; [ eassumption | ].
-  unfold set_eq_list in HEFl.
-  clear - HEFl HFi HFj.
-  split.
+  split; eapply set_eq_list_nth; eassumption.
 vvv.
 
      pose proof HEF p.
