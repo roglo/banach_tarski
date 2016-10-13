@@ -3621,13 +3621,33 @@ induction El as [| E El]; intros.
    right; apply Hall; assumption.
 Qed.
 
-Theorem set_eq_list_nth {A} : ∀ El Fl i (x : A),
+Theorem set_eq_list_nth {A} : ∀ (s := set_equiv) (El Fl : list (A → Prop)),
   set_eq_list El Fl
-  → Fl.[i]%S x
-  → El.[i]%S x.
+  → ∀ i, (El.[i] = Fl.[i])%S.
 Proof.
-intros * Hs HF.
-bbb.
+intros s * Hs i.
+revert El Fl Hs.
+induction i; intros.
+ destruct El as [| E El].
+  destruct Fl as [| F Fl]; [ | apply Forall2_nil_cons in Hs; contradiction ].
+  reflexivity.
+
+  destruct Fl as [| F Fl]; [ apply Forall2_cons_nil in Hs; contradiction | ].
+  apply Forall2_cons_cons in Hs; simpl.
+  unfold nth_set; simpl; intros x.
+  destruct Hs as (HEF, HEFL).
+  apply HEF.
+
+ destruct El as [| E El].
+  destruct Fl as [| F Fl]; [ | apply Forall2_nil_cons in Hs; contradiction ].
+  reflexivity.
+
+  destruct Fl as [| F Fl]; [ apply Forall2_cons_nil in Hs; contradiction | ].
+  apply Forall2_cons_cons in Hs; simpl.
+  unfold nth_set; simpl; intros x.
+  destruct Hs as (HEF, HEFL).
+  apply IHi, HEFL.
+Qed.
 
 Add Parametric Morphism {A} : (@union A)
   with signature
