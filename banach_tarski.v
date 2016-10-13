@@ -2650,11 +2650,11 @@ Definition orbit_selector := choice_function same_orbit.
 
 Definition in_sphere '(P x y z) := (x² + y² + z² <= 1)%R.
 
-Definition orbit_has_fixpoint p :=
+Definition orbit_has_no_fixpoint p :=
   ∀ el p₁, same_orbit p p₁
   → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
 
-Definition all_but_fixpoints p := in_sphere p ∧ orbit_has_fixpoint p.
+Definition all_but_fixpoints p := in_sphere p ∧ orbit_has_no_fixpoint p.
 
 Theorem on_sphere_ray_after_rotation : ∀ p m r,
   on_sphere_ray r p
@@ -2697,6 +2697,43 @@ Theorem in_sphere_after_rotate : ∀ p e,
 Proof.
 intros * His.
 apply in_sphere_after_rotation; [ assumption | ].
+apply rotate_is_rotation_matrix.
+Qed.
+
+Theorem no_fixpoint_after_rotation : ∀ p m,
+  orbit_has_no_fixpoint p
+  → is_rotation_matrix m
+  → orbit_has_no_fixpoint (mat_vec_mul m p).
+Proof.
+intros * Hnf Hrm.
+unfold orbit_has_no_fixpoint in Hnf.
+intros el p₁ Hso Hel.
+assert (Hsot : same_orbit p (mat_vec_mul (mat_transp m) p₁)).
+Focus 2.
+pose proof Hnf el (mat_vec_mul (mat_transp m) p₁) Hsot Hel.
+SearchAbout mat_transp.
+Print is_rotation_matrix.
+unfold is_rotation_matrix in Hrm.
+
+bbb.
+destruct p as (x, y, z).
+remember (P x y z) as p eqn:HP.
+remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
+assert (Hos : on_sphere_ray r p) by (subst p; assumption).
+pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
+unfold in_sphere in His.
+unfold on_sphere_ray in H.
+unfold in_sphere.
+subst p; simpl in *.
+rewrite H, <- Hos; assumption.
+bbb.
+
+Theorem no_fixpoint_after_rotate : ∀ p e,
+  orbit_has_no_fixpoint p
+  → orbit_has_no_fixpoint (rotate e p).
+Proof.
+intros * His.
+apply no_fixpoint_after_rotation; [ assumption | ].
 apply rotate_is_rotation_matrix.
 Qed.
 
@@ -3460,7 +3497,7 @@ Theorem r_decomposed_2 :
 Proof.
 intros s Hs f (Hoe, Ho) os Hos e; subst os s.
 split.
-*unfold is_partition; intros p.
+*intros p.
  split.
  -intros Hnf.
   unfold union_list; simpl; unfold union.
@@ -3740,8 +3777,108 @@ Theorem r_decomposed_2_a :
   → ∀ os, os = mkos _ f
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
-intros s Hs f (Hoe, Ho) os Hos.
-(* ah bin non, c'est faux, ça : EE est dans les deux partitions *)
+intros s Hs f (Hoe, Ho) os Hos; subst s.
+split.
+*intros p.
+ split.
+ -intros Hnf.
+  unfold union_list; simpl; unfold union.
+  pose proof Ho p as H.
+  apply same_orbit_sym in H.
+  destruct H as (el, Hel).
+  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+  destruct el₁ as [| e₁].
+   +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+   clear Hel₁.
+   right; left.
+   unfold rot, SS.
+   split.
+    split.
+     destruct Hnf as (His, Hnf).
+split.
+apply in_sphere_after_rotate; assumption.
+apply no_fixpoint_after_rotate; assumption.
+bbb.
+     apply in_sphere_after_rotate; assumption.
+
+     intros el₁ p₁ Hp Hn.
+     apply Hnf; [ | assumption ].
+     destruct Hp as (el₂ & Hp).
+     exists (el₂ ++ [negf e]).
+     rewrite fold_right_app; assumption.
+
+    exists (negf e :: []), [].
+    split; [ reflexivity | simpl ].
+    assert (H : f p = f (rotate (negf e) p)).
+     apply Hoe.
+     exists (negf e :: []); reflexivity.
+
+     rewrite <- H, Hel; reflexivity.
+
+   +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
+     left; split; [ assumption | ].
+     exists el, el₁; split; assumption.
+
+     right; left.
+     unfold rot, SS.
+     split.
+      split.
+       destruct Hnf as (His, _).
+       apply in_sphere_after_rotate; assumption.
+
+       intros el₂ p₁ Hp Hn.
+       apply Hnf; [ | assumption ].
+       destruct Hp as (el₃ & Hp).
+       exists (el₃ ++ [negf e]).
+       rewrite fold_right_app; assumption.
+
+      assert (H : f p = f (rotate (negf e) p)).
+       apply Hoe.
+       exists (negf e :: []); reflexivity.
+
+       simpl; rewrite <- H.
+       exists (negf e :: el), (e₁ :: el₁); simpl.
+       rewrite Hel₁, Hel.
+       destruct (letter_opp_dec (negf e) e₁) as [H₂| H₂].
+        exfalso.
+        apply letter_opp_negf in H₂.
+        apply H₁, negf_eq_eq; assumption.
+
+        split; reflexivity.
+
+ -intros Hul.
+  destruct Hul as [(H, _)| [(H, _)| Hul]]; [ assumption | | contradiction ].
+  split.
+   destruct H as (His, _).
+   apply in_sphere_after_rotate with (e := e) in His.
+   rewrite rotate_rotate_neg in His; assumption.
+
+   intros el p₁ Hso Hn.
+   apply H; [ | assumption ].
+   etransitivity; [ | eassumption ].
+   exists (e :: []).
+   apply rotate_rotate_neg.
+
+*intros i j Hij p.
+ split; [ | contradiction ].
+ unfold nth_set.
+ intros (Hi, Hj); unfold empty_set.
+ destruct i; [ simpl in Hi | ].
+  destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+  destruct j; [ | destruct j; contradiction ].
+  simpl in Hj.
+  eapply not_start_with_rot in Hi; try eassumption; [ | reflexivity ].
+  split; assumption.
+
+  destruct i; [ simpl in Hi | ].
+   destruct j; [ simpl in Hj; clear Hij | ].
+    eapply not_start_with_rot in Hj; try eassumption; [ | reflexivity ].
+    split; assumption.
+
+    destruct j; [ apply Hij; reflexivity | clear Hij ].
+    destruct j; contradiction.
+
+   destruct i; contradiction.
 bbb.
 
 set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
