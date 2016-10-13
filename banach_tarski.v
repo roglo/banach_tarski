@@ -2628,9 +2628,30 @@ Proof.
 intros * His.
 unfold orbit_has_no_fixpoint in His.
 intros el p₁ Hso Hel.
-apply same_orbit_rotate with (e := negf e) in Hso.
-rewrite rotate_neg_rotate in Hso.
 remember (negf e :: rev_path el ++ e :: [])  as el₁ eqn:Hel₁.
+remember (norm_list el₁) as el₂ eqn:Hel₂.
+symmetry in Hel₂.
+destruct el₂ as [| e₂].
+ subst el₁.
+
+bbb.
+Focus 2.
+ apply same_orbit_rotate with (e := negf e) in Hso.
+ rewrite rotate_neg_rotate in Hso.
+ assert (Hn : norm_list el₁ ≠ []) by (rewrite Hel₂; intros H; discriminate H).
+ pose proof His el₁ (rotate (negf e) p₁) Hso Hn.
+ intros Hr; apply H; clear H.
+ rewrite <- Hr at 1.
+ rewrite <- fold_right_cons, <- fold_right_app.
+ rewrite Hel₁, cons_comm_app, app_comm_cons.
+ rewrite <- app_assoc.
+ simpl; f_equal.
+ rewrite rotate_rotate_norm.
+ rewrite norm_list_cancel_in.
+ rewrite <- rotate_rotate_norm.
+ apply app_path_rev_path.
+
+bbb.
 assert (Hn : norm_list el₁ ≠ []).
  intros H; apply Hel; clear Hel.
  subst el₁.
