@@ -3381,11 +3381,14 @@ destruct Hos as (Hso & Ho).
 apply Hso; symmetry; apply Ho.
 Qed.
 
+(*
 Theorem rotate_infinite : ∀ n e p,
   fold_right rotate p (repeat e (S n)) ≠ p.
 Proof.
 intros.
-bbb.
+must be true but supposes to know that acos(1/3) is not a rational
+factor of pi
+*)
 
 Theorem r_decomposed_4 :
   ∀ s, s = set_equiv
@@ -3402,50 +3405,17 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p bm; subst os.
  destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
  rewrite os_fun_idemp in Hr.
- exfalso; revert Hr; apply rotate_infinite.
+ unfold all_but_fixpoints in Ha.
+ destruct Ha as (His, Hoh).
+ unfold orbit_has_no_fixpoint in Hoh.
+ exfalso; revert Hr.
+ apply Hoh; [ apply Ho | ].
+ rewrite norm_list_repeat.
+ intros Hr; discriminate Hr.
 
-bbb.
+ split; assumption.
 
- split; [ assumption | simpl ].
- pose proof Ho p as Hop.
- destruct Hop as (el, Hop).
- apply rotate_rev_path in Hop.
-bbb.
- exists (repeat ạ⁻¹ (S n) ++ rev_path el), (repeat ạ⁻¹ n ++ rev_path el).
- split.
-Check norm_list_repeat.
-Focus 2.
-bbb.
-
-rewrite fold_right_app, Hop.
-rewrite <- Hop at 1.
-rewrite <- fold_right_app.
-
-
- split; [ rewrite norm_list_repeat; reflexivity | ].
-bbb.
- split; [ rewrite norm_list_repeat; reflexivity | assumption ].
-
- intros p.
- unfold Decidable.decidable; simpl.
- (* I am ashamed to use EM here, but I have it thanks to TTCA... *)
- apply EM.
-(* perhaps I could decompose the cases above:
- unfold B.
- unfold all_but_fixpoints.
- unfold in_sphere.
- destruct p as (x, y, z).
- destruct (Rle_dec (x² + y² + z²) 1) as [Hle| Hgt].
- 2: right; intros ((H₁, _), _); contradiction.
- remember (P x y z) as p eqn:Hp.
- rewrite and_assoc.
-
- set (u n :=
-   if Pdec p (fold_right rotate (f p) (repeat ạ⁻¹ n)) then S O else O).
-
-Print on_orbit_by_seq_of.
-(* TODO: define and use LPO *)
-*)
+ intros p; apply EM.
 Qed.
 
 Theorem old_r_decomposed_4 :
@@ -3749,9 +3719,6 @@ Theorem r_decomposed_2_a :
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst s.
-Print B.
-bbb.
-
 split.
 *intros p.
  split.
@@ -3783,8 +3750,12 @@ split.
      unfold B; simpl.
      intros (Haf, Hoo).
 destruct Hoo as (n & Hoo).
-subst os; simpl in Hoo.
+remember fold_right as g.
+remember S as h.
+subst os; simpl in Hoo; subst g h.
 rewrite Hfr, Hel in Hoo.
+bbb.
+
 apply f_equal with (f := rotate ạ) in Hoo.
 do 2 rewrite rotate_rotate_neg in Hoo.
 destruct n; [ clear Hoo | ].
