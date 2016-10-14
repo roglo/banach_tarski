@@ -3721,16 +3721,15 @@ Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst s.
 split.
 *intros p.
- split.
- -intros Hnf.
-  unfold union_list; simpl; unfold union.
-  pose proof Ho p as H.
-  apply same_orbit_sym in H.
-  destruct H as (el, Hel).
-  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
-   apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
-
+ assert (Hfr : f (rotate ạ⁻¹ p) = f p).
+  apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
+  split.
+  -intros Hnf.
+   unfold union_list; simpl; unfold union.
+   pose proof Ho p as H.
+   apply same_orbit_sym in H.
+   destruct H as (el, Hel).
+   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
    destruct el₁ as [| e₁].
     +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
     clear Hel₁.
@@ -3819,19 +3818,36 @@ split.
    rewrite rotate_rotate_neg in Hoo; assumption.
 
 *intros i j Hij p.
- split; [ | contradiction ].
- unfold nth_set.
- intros (Hi, Hj); unfold empty_set.
- destruct i; [ simpl in Hi | ].
-  destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
-  destruct j; [ | destruct j; contradiction ].
-  destruct Hj as (Hs & Hb).
-  destruct Hi as [[Hi| Hi] | Hi].
-   destruct Hi as (Hnfr, Hp).
-   unfold SS in Hs.
-   destruct Hs as (Hnf & el & el₁ & Hn & Hr).
-   subst os; simpl in Hp, Hr.
+ assert (Hfr : f (rotate ạ⁻¹ p) = f p).
+  apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
 
+  split; [ | contradiction ].
+  unfold nth_set.
+  intros (Hi, Hj); unfold empty_set.
+  destruct i; [ simpl in Hi | ].
+   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+   destruct j; [ simpl in Hj | destruct j; contradiction ].
+   destruct Hj as (Hs & Hb).
+   destruct Hi as [[Hi| Hi] | Hi].
+    destruct Hi as (Hnfr, Hp).
+    unfold SS in Hs.
+    destruct Hs as (Hnf & el & el₁ & Hn & Hr).
+    subst os; simpl in Hnf, Hp, Hr.
+    rewrite <- Hp in Hfr.
+    rewrite Hfr in Hr.
+    rewrite rotate_rotate_norm, Hn in Hr.
+    simpl in Hr.
+    apply f_equal with (f := rotate (FE la false)) in Hr.
+    do 2 rewrite rotate_rotate_neg in Hr.
+    destruct el₁ as [| e].
+     clear el Hn Hr.
+     apply Hb; clear Hb; unfold B.
+     split; [ assumption | simpl ].
+     unfold on_orbit_by_seq_of.
+     rewrite Hfr.
+     remember S as g; simpl; subst g.
+     rewrite <- Hp.
+(* bloqué *)
 bbb.
   eapply not_start_with_rot in Hi; try eassumption; [ | reflexivity ].
   split; assumption.
