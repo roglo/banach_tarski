@@ -3855,6 +3855,18 @@ split.
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
+   destruct Hj as (Hs & Hb); simpl in Hs, Hb; apply Hb; clear Hb.
+   destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
+   split; [ assumption | ].
+   destruct Hi as [[Hi| Hi] | Hi].
+    destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
+    exists O; simpl.
+    rewrite Hfr, <- Hp; reflexivity.
+
+    destruct Hi as (Hnf & el₂ & el₃ & Hn₁ & Hr₁).
+    unfold on_orbit_by_seq_of; subst os; simpl; simpl in Hr.
+    rewrite Hfr in Hr |-*.
+
 bbb.
 -
    destruct Hj as (Hs & Hb).
