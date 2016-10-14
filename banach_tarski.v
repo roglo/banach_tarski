@@ -2171,10 +2171,6 @@ intros m₁ m₂.
 unfold mat_det; simpl; ring.
 Qed.
 
-(* A is a rotation matrix iff
-   - A tr(A) = I
-   - det A = 1
- *)
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
   mat_det A = 1%R.
@@ -2349,12 +2345,6 @@ destruct e as (t, d); destruct t.
  destruct d; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
 Qed.
 
-(*
-End Rotation.
-
-Section Orbit.
-*)
-
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
@@ -2431,11 +2421,6 @@ Qed.
 
 Definition in_image {A B} (f : A → B) := λ x, ∃ y, x = f y.
 
-(* the orbits of the image of f form a partition of the sphere
-   1/ ∀ x, x is in the orbit of someone in the image of f,
-   2/ ∀ x y two different points in the image of x, their orbits
-      are different. *)
-
 Theorem orbit_partition : ∃ f : point → point,
   (∀ x, ∃ y, same_orbit (f y) x) ∧
   (∀ x y, in_image f x → in_image f y → x ≠ y → ¬ same_orbit x y).
@@ -2456,13 +2441,6 @@ exists f; split.
  etransitivity; [ eassumption | ].
  symmetry; apply Hxfx.
 Qed.
-
-(*
-Notation "'ạ'" := (FE la false).
-Notation "'ạ⁻¹'" := (FE la true).
-Notation "'ḅ'" := (FE lb false).
-Notation "'ḅ⁻¹'" := (FE lb true).
-*)
 
 Definition not_in_fixpoints p :=
   ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
@@ -2710,10 +2688,6 @@ Definition is_partition {A} {S : set_model A} E Ep :=
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
 
-(*
-End Orbit.
-*)
-
 Theorem set_eq_refl A : reflexive _ (@set_eq A set_equiv).
 Proof. intros P x; split; intros; assumption. Qed.
 
@@ -2742,10 +2716,6 @@ Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : A → Prop),
   (E = F)%S
   → ∀ p, E p ↔ F p.
 Proof. intros s * HEF; apply HEF. Qed.
-
-(*
-Section Orbit2.
-*)
 
 Theorem union_empty_r : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop), (F ⋃ ∅ = F)%S.
@@ -3413,15 +3383,6 @@ destruct Hos as (Hso & Ho).
 apply Hso; symmetry; apply Ho.
 Qed.
 
-(*
-Theorem rotate_infinite : ∀ n e p,
-  fold_right rotate p (repeat e (S n)) ≠ p.
-Proof.
-intros.
-must be true but supposes to know that acos(1/3) is not a rational
-factor of pi
-*)
-
 Theorem r_decomposed_4 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
@@ -3907,12 +3868,6 @@ intros.
 eapply r_decomposed_2; eassumption.
 Qed.
 
-(*
-End Orbit.
-
-Section Equidecomposability.
-*)
-
 Add Parametric Morphism {A} : (@intersection A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -4322,6 +4277,4 @@ split.
   constructor.
 Qed.
 
-bbb.
-
-End Equidecomposability.
+Check Banach_Tarski_paradox.
