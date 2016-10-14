@@ -3825,8 +3825,13 @@ split.
  destruct i; [ simpl in Hi | ].
   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
   destruct j; [ | destruct j; contradiction ].
-  simpl in Hj.
-Check not_start_with_rot.
+  destruct Hj as (Hs & Hb).
+  destruct Hi as [[Hi| Hi] | Hi].
+   destruct Hi as (Hnfr, Hp).
+   unfold SS in Hs.
+   destruct Hs as (Hnf & el & el₁ & Hn & Hr).
+   subst os; simpl in Hp, Hr.
+
 bbb.
   eapply not_start_with_rot in Hi; try eassumption; [ | reflexivity ].
   split; assumption.
