@@ -3719,6 +3719,8 @@ Theorem r_decomposed_2_a :
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst s.
+(* pas bon parce que le cas vide est dans les deux ensembles *)
+bbb.
 split.
 *intros p.
  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
