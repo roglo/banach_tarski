@@ -3769,11 +3769,30 @@ split.
 
         subst os; simpl.
         rewrite Hfr.
-        exists (ạ⁻¹ :: el), el.
+        exists (ạ⁻¹ :: el), (norm_list el).
         split; [ | simpl; f_equal; assumption ].
-        simpl; rewrite Hel₁.
-        f_equal; rewrite <- Hel₁.
-(* merde, c'est faux *)
+        simpl; rewrite Hel₁; reflexivity.
+
+       intros H; apply HB; clear HB.
+       split; [ assumption | subst os; simpl ].
+       destruct H as (Haf & Hoo); simpl in Hoo.
+       rewrite Hfr in Hoo; assumption.
+
+      left; left; right.
+      split; [ assumption | ].
+      exists el, el₁.
+      subst os; split; assumption.
+
+      right; left.
+      split; simpl.
+       split.
+        destruct Hnf as (His & Hnf).
+        split; [ apply in_sphere_after_rotate; assumption | ].
+        apply no_fixpoint_after_rotate; assumption.
+
+bbb.
+        exists el, (ạ :: ḅ⁻¹ :: el₁).
+
 bbb.
 
 apply f_equal with (f := rotate ạ) in Hoo.
