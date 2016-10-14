@@ -3749,11 +3749,15 @@ split.
 
      unfold B; simpl.
      intros (Haf, Hoo).
-destruct Hoo as (n & Hoo).
-remember fold_right as g.
-remember S as h.
-subst os; simpl in Hoo; subst g h.
-rewrite Hfr, Hel in Hoo.
+     destruct Hoo as (n & Hoo).
+     remember fold_right as g; remember S as h.
+     subst os; simpl in Hoo; subst g h.
+     rewrite Hfr, Hel, Hel in Hoo.
+     destruct Hnf as (His, Hnf).
+     exfalso; revert Hoo; apply Hnf; [ reflexivity | ].
+     rewrite norm_list_repeat; intros H; discriminate H.
+
+    +
 bbb.
 
 apply f_equal with (f := rotate ạ) in Hoo.
