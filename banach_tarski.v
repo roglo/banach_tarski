@@ -3757,7 +3757,23 @@ split.
      exfalso; revert Hoo; apply Hnf; [ reflexivity | ].
      rewrite norm_list_repeat; intros H; discriminate H.
 
-    +
+    +destruct e₁ as (t, d); destruct t, d.
+      destruct (EM (B p)) as [HB| HB]; [ left; right; assumption | ].
+      right; left; simpl.
+      split.
+       unfold SS; simpl.
+       split.
+        destruct Hnf as (His, Hnf).
+        split; [ apply in_sphere_after_rotate; assumption | ].
+        apply no_fixpoint_after_rotate; assumption.
+
+        subst os; simpl.
+        rewrite Hfr.
+        exists (ạ⁻¹ :: el), el.
+        split; [ | simpl; f_equal; assumption ].
+        simpl; rewrite Hel₁.
+        f_equal; rewrite <- Hel₁.
+(* merde, c'est faux *)
 bbb.
 
 apply f_equal with (f := rotate ạ) in Hoo.
