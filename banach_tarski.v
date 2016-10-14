@@ -3086,7 +3086,7 @@ Definition on_orbit_by_seq_of e {os : sel_model} p :=
   ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p.
 
 Definition B {os : sel_model} := λ p,
-  all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ (os_fun p).
+  all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
 
 Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
 Definition xtransl dx (E : point → Prop) '(P x y z) := E (P (x - dx) y z).
@@ -3404,16 +3404,9 @@ eapply is_partition_group_first_2_together in H; [ | assumption ].
 apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p bm; subst os.
  destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
- rewrite os_fun_idemp in Hr.
- unfold all_but_fixpoints in Ha.
- destruct Ha as (His, Hoh).
- unfold orbit_has_no_fixpoint in Hoh.
- exfalso; revert Hr.
- apply Hoh; [ apply Ho | ].
- rewrite norm_list_repeat.
- intros Hr; discriminate Hr.
-
- split; assumption.
+ split; [ assumption | ].
+ exists (repeat ạ⁻¹ (S n)), (repeat ạ⁻¹ n).
+ split; [ apply norm_list_repeat | assumption ].
 
  intros p; apply EM.
 Qed.
@@ -3719,8 +3712,6 @@ Theorem r_decomposed_2_a :
   → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst s.
-(* pas bon parce que le cas vide est dans les deux ensembles *)
-bbb.
 split.
 *intros p.
  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
@@ -3753,7 +3744,20 @@ split.
      destruct Hoo as (n & Hoo).
      remember fold_right as g; remember S as h.
      subst os; simpl in Hoo; subst g h.
-     rewrite Hfr, Hel, Hel in Hoo.
+     rewrite Hfr, Hel in Hoo.
+bbb.
+
+destruct Haf as (His, Haf).
+pose proof Haf (repeat ạ⁻¹ n) (rotate ạ⁻¹ p) (same_orbit_refl _).
+as H; simpl in H.
+apply f_equal with (f := rotate (FE la false)) in Hoo.
+simpl in Hoo.
+do 2 rewrite rotate_rotate_neg in Hoo.
+revert Hoo; apply Hnf; [ reflexivity | ].
+     rewrite norm_list_repeat; intros H.
+
+; discriminate H.
+
      destruct Hnf as (His, Hnf).
      exfalso; revert Hoo; apply Hnf; [ reflexivity | ].
      rewrite norm_list_repeat; intros H; discriminate H.
@@ -3829,9 +3833,30 @@ split.
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
+-
    destruct Hj as (Hs & Hb).
    destruct Hi as [[Hi| Hi] | Hi].
++
+
+apply Hb; clear Hb; simpl.
+unfold B.
+Print on_orbit_by_seq_of.
+Print B.
+
+
+simpl in Hs, Hb.
     destruct Hi as (Hnfr, Hp).
+subst os; simpl in Hp.
+apply Hb; clear Hb.
+unfold B.
+split.
+Focus 2.
+simpl.
+rewrite Hfr.
+unfold on_orbit_by_seq_of.
+exists O.
+simpl.
+
     unfold SS in Hs.
     destruct Hs as (Hnf & el & el₁ & Hn & Hr).
     subst os; simpl in Hnf, Hp, Hr.
