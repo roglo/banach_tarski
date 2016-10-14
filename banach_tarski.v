@@ -4263,11 +4263,15 @@ Definition equidecomposable (s : set_model point) E₁ E₂ :=
   List.Forall2 (λ S₁ S₂, ∃ g, app_gr g S₁ = S₂) P₁ P₂.
 
 Theorem Banach_Tarski_paradox :
-  ∀ (s := set_equiv) f os, orbit_selector f → os = mkos _ f →
-  equidecomposable s all_but_fixpoints
+  equidecomposable set_equiv all_but_fixpoints
     (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
 Proof.
-intros s f os Hosf Hos.
+set (s := set_equiv).
+pose proof TTCA _ same_orbit equiv_same_orbit as H.
+destruct H as (f & Hu & Hm).
+remember (mkcf _ _ f Hm Hu) as Hosf.
+remember (mkos _ f) as os eqn:Hos.
+clear HeqHosf.
 set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
 set (A₂ := (SS ạ⁻¹ \ B)%S).
 set (A₃ := SS ḅ).
