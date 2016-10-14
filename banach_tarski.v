@@ -3856,68 +3856,16 @@ split.
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
    destruct Hj as (Hs & Hb); simpl in Hs, Hb; apply Hb; clear Hb.
-   destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
-   split; [ assumption | ].
+   split; [ destruct Hs; assumption | ].
    destruct Hi as [[Hi| Hi] | Hi].
+    destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
     destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
     exists O; simpl.
     rewrite Hfr, <- Hp; reflexivity.
 
-    destruct Hi as (Hnf & el₂ & el₃ & Hn₁ & Hr₁).
-    unfold on_orbit_by_seq_of; subst os; simpl; simpl in Hr.
-    rewrite Hfr in Hr |-*.
-
-bbb.
--
-   destruct Hj as (Hs & Hb).
-   destruct Hi as [[Hi| Hi] | Hi].
-+
-
-apply Hb; clear Hb; simpl.
-unfold B.
-Print on_orbit_by_seq_of.
-Print B.
-
-
-simpl in Hs, Hb.
-    destruct Hi as (Hnfr, Hp).
-subst os; simpl in Hp.
-apply Hb; clear Hb.
-unfold B.
-split.
-Focus 2.
-simpl.
-rewrite Hfr.
-unfold on_orbit_by_seq_of.
-exists O.
-simpl.
-
-    unfold SS in Hs.
-    destruct Hs as (Hnf & el & el₁ & Hn & Hr).
-    subst os; simpl in Hnf, Hp, Hr.
-    rewrite <- Hp in Hfr.
-    rewrite Hfr in Hr.
-    rewrite rotate_rotate_norm, Hn in Hr.
-    simpl in Hr.
-    apply f_equal with (f := rotate (FE la false)) in Hr.
-    do 2 rewrite rotate_rotate_neg in Hr.
-    destruct el₁ as [| e].
-     clear el Hn Hr.
-     apply Hb; clear Hb; unfold B.
-     split; [ assumption | simpl ].
-     unfold on_orbit_by_seq_of.
-     rewrite Hfr.
-     remember S as g; simpl; subst g.
-     rewrite <- Hp.
-(* bloqué *)
-bbb.
-  eapply not_start_with_rot in Hi; try eassumption; [ | reflexivity ].
-  split; assumption.
-
-  destruct i; [ simpl in Hi | ].
-   destruct j; [ simpl in Hj; clear Hij | ].
-    eapply not_start_with_rot in Hj; try eassumption; [ | reflexivity ].
+    eapply not_start_with_rot in Hi; try eassumption; [ contradiction | ].
     split; assumption.
+bbb.
 
     destruct j; [ apply Hij; reflexivity | clear Hij ].
     destruct j; contradiction.
