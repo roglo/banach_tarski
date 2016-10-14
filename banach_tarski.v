@@ -3757,7 +3757,8 @@ split.
      exfalso; revert Hoo; apply Hnf; [ reflexivity | ].
      rewrite norm_list_repeat; intros H; discriminate H.
 
-    +destruct e₁ as (t, d); destruct t, d.
+    +destruct e₁ as (t, d); destruct t.
+     destruct d.
       destruct (EM (B p)) as [HB| HB]; [ left; right; assumption | ].
       right; left; simpl.
       split.
@@ -3783,43 +3784,41 @@ split.
       exists el, el₁.
       subst os; split; assumption.
 
-      right; left.
-      split; simpl.
-       split.
-        destruct Hnf as (His & Hnf).
-        split; [ apply in_sphere_after_rotate; assumption | ].
-        apply no_fixpoint_after_rotate; assumption.
+     right; left.
+     split; simpl.
+      split.
+       destruct Hnf as (His & Hnf).
+       split; [ apply in_sphere_after_rotate; assumption | ].
+       apply no_fixpoint_after_rotate; assumption.
 
-bbb.
-        exists el, (ạ :: ḅ⁻¹ :: el₁).
+       subst os; simpl; rewrite Hfr.
+       exists (ạ⁻¹ :: el), (norm_list el).
+       split; [ | simpl; f_equal; assumption ].
+       simpl; rewrite Hel₁; reflexivity.
 
-bbb.
+      intros (Hnf₂, Hoo).
+      subst os; simpl in Hoo.
+      rewrite Hfr in Hoo.
+      unfold on_orbit_by_seq_of in Hoo.
+      destruct Hoo as (n, Hr).
+      rewrite os_fun_idemp in Hr; [ | split; assumption ].
+      unfold all_but_fixpoints in Hnf.
+      destruct Hnf as (Hns, Hon).
+      revert Hr; apply Hon; [ apply Ho | ].
+      rewrite norm_list_repeat; intros H; discriminate H.
 
-apply f_equal with (f := rotate ạ) in Hoo.
-do 2 rewrite rotate_rotate_neg in Hoo.
-destruct n; [ clear Hoo | ].
-unfold all_but_fixpoints in Hnf, Haf.
-destruct Hnf as (His, Hoh).
-destruct Haf as (Hir, Hor).
-rewrite Hel in Hfr.
-Print B.
-Print on_orbit_by_seq_of.
-unfold orbit_has_no_fixpoint in Hor.
-(* bloqué *)
-bbb.
+ -intros HE.
+  simpl in HE.
+  destruct HE as [[[HE| HE]| HE]| [HE| HE]]; try (destruct HE; assumption).
+  destruct HE as (((His & Hoo) & HE) & HB).
+  split.
+   apply in_sphere_after_rotate with (e := ạ) in His.
+   rewrite rotate_rotate_neg in His; assumption.
 
-destruct n.
- simpl in Hoo.
+   apply no_fixpoint_after_rotate with (e := ạ) in Hoo.
+   rewrite rotate_rotate_neg in Hoo; assumption.
 
-simpl in Hoo.
-subst
-
-bbb.
-     pose proof Ho (rotate ạ⁻¹ p) as H.
-     destruct H as (el₁, H).
-     apply rotate_rev_path in H.
-     exists (rev_path el₁).
-
+*
 bbb.
      exists (negf e :: []), [].
      split; [ reflexivity | simpl ].
