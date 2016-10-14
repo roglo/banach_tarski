@@ -1236,13 +1236,13 @@ Record choice_function {A} (R : A → A → Prop) f := mkcf
 
 Definition orbit_selector := choice_function same_orbit.
 
-Definition in_sphere '(P x y z) := (x² + y² + z² <= 1)%R.
+Definition sphere '(P x y z) := (x² + y² + z² <= 1)%R.
 
 Definition orbit_has_no_fixpoint p :=
   ∀ el p₁, same_orbit p p₁
   → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
 
-Definition all_but_fixpoints p := in_sphere p ∧ orbit_has_no_fixpoint p.
+Definition all_but_fixpoints p := sphere p ∧ orbit_has_no_fixpoint p.
 
 Theorem on_sphere_ray_after_rotation : ∀ p m r,
   on_sphere_ray r p
@@ -1262,9 +1262,9 @@ nsatz.
 Qed.
 
 Theorem in_sphere_after_rotation : ∀ p m,
-  in_sphere p
+  sphere p
   → is_rotation_matrix m
-  → in_sphere (mat_vec_mul m p).
+  → sphere (mat_vec_mul m p).
 Proof.
 intros * His Hrm.
 destruct p as (x, y, z).
@@ -1272,16 +1272,16 @@ remember (P x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
 assert (Hos : on_sphere_ray r p) by (subst p; assumption).
 pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
-unfold in_sphere in His.
+unfold sphere in His.
 unfold on_sphere_ray in H.
-unfold in_sphere.
+unfold sphere.
 subst p; simpl in *.
 rewrite H, <- Hos; assumption.
 Qed.
 
 Theorem in_sphere_after_rotate : ∀ p e,
-  in_sphere p
-  → in_sphere (rotate e p).
+  sphere p
+  → sphere (rotate e p).
 Proof.
 intros * His.
 apply in_sphere_after_rotation; [ assumption | ].
@@ -2700,7 +2700,7 @@ split.
    unfold empty_set; simpl.
    destruct H₁ as (H₁, H₃).
    destruct H₂ as (H₂, H₄).
-   unfold in_sphere in H₁, H₂.
+   unfold sphere in H₁, H₂.
    apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
    apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
    apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
@@ -2723,3 +2723,8 @@ split.
 Qed.
 
 Check Banach_Tarski_paradox_but_fixpoints.
+
+Theorem Banach_Tarski_paradox :
+  equidecomposable set_equiv sphere (xtransl 3 sphere ⋃ xtransl 6 sphere)%S.
+Proof.
+bbb.
