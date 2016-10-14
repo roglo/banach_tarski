@@ -3748,19 +3748,27 @@ split.
         simpl; rewrite Hel₁; reflexivity.
 
        intros H; apply HB; clear HB.
+bbb.
        split; [ assumption | exfalso ].
        destruct H as (Haf & Hoo); simpl in Hoo.
-unfold on_orbit_by_seq_of in Hoo.
-destruct Hoo as (n, Hoo); subst os; simpl in Hoo.
-rewrite Hfr in Hoo.
-
-apply f_equal with (f := rotate (FE la false)) in Hoo.
-do 2 rewrite rotate_rotate_neg in Hoo.
-destruct n.
-simpl in Hoo.
-rewrite rotate_rotate_norm, Hel₁ in Hel.
-simpl in Hel.
-
+       unfold on_orbit_by_seq_of in Hoo.
+       destruct Hoo as (n, Hoo); subst os; simpl in Hoo.
+       rewrite Hfr in Hoo.
+       apply f_equal with (f := rotate (FE la false)) in Hoo.
+       do 2 rewrite rotate_rotate_neg in Hoo.
+       destruct n.
+        simpl in Hoo.
+        rewrite rotate_rotate_norm, Hel₁ in Hel.
+        simpl in Hel.
+        destruct el₁ as [| e₁].
+         simpl in Hel.
+         rewrite Hoo in Hel.
+         revert Hel.
+         destruct Hnf as (His, Hon).
+         unfold orbit_has_no_fixpoint in Hon.
+         pose proof Hon (ạ⁻¹ :: []) p (same_orbit_refl _) as H₁.
+         apply H₁.
+         intros H; discriminate H.
 bbb.
 
 exists (S n); simpl.
