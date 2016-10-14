@@ -38,24 +38,6 @@ Theorem fold_right_cons {A B} : ∀ f (x : A) (y : B) l,
   fold_right f x (y :: l) = f y (fold_right f x l).
 Proof. reflexivity. Qed.
 
-(*
-Theorem Forall_inv2 : ∀ A (P : A → Prop) a l,
-  List.Forall P (a :: l) → P a ∧ List.Forall P l.
-Proof.
-intros A P a l H.
-inversion H; split; assumption.
-Qed.
-
-Definition xor (A B : Prop) : Prop := A ∧ ¬B ∨ ¬A ∧ B.
-Notation "x ⊕ y" := (xor x y) (at level 85, right associativity).
-
-Notation "∃ ! x .. y , p" :=
-  (ex (unique (fun x => .. (ex (unique (fun y => p))) ..)))
-  (at level 200, x binder, right associativity,
-   format "'[' ∃ ! '/ '  x .. y , '/ '  p ']'")
-  : type_scope.
-*)
-
 (* Step 1 *)
 
 (* a = E la false
@@ -66,9 +48,6 @@ Notation "∃ ! x .. y , p" :=
 Inductive letter := la | lb.
 
 Inductive free_elem := FE : letter → bool → free_elem.
-(*
-Record F2 := mkF₂ { str : list free_elem }.
-*)
 
 Notation "'ạ'" := (FE la false).
 Notation "'ạ⁻¹'" := (FE la true).
@@ -192,28 +171,11 @@ injection H.
 apply Bool.no_fixpoint_negb.
 Qed.
 
-(*
-Theorem not_letter_opp_diag : ∀ e, ¬ letter_opp e e.
-Proof.
-intros e H.
-apply letter_opp_negf in H; symmetry in H.
-revert H; apply no_fixpoint_negf.
-Qed.
-*)
-
 Theorem negf_involutive : ∀ e, negf (negf e) = e.
 Proof.
 intros (t, d); simpl.
 rewrite Bool.negb_involutive; reflexivity.
 Qed.
-
-(*
-Theorem letter_opp_negf_l : ∀ e, letter_opp (negf e) e.
-Proof.
-intros.
-apply letter_opp_negf; reflexivity.
-Qed.
-*)
 
 Theorem letter_opp_negf_r : ∀ e, letter_opp e (negf e).
 Proof.
@@ -230,11 +192,6 @@ subst e₁.
 apply letter_opp_negf_r.
 Qed.
 
-(*
-Theorem negf_ạ : negf ạ = ạ⁻¹.
-Proof. reflexivity. Qed.
-*)
-
 Fixpoint norm_list el :=
   match el with
   | nil => nil
@@ -244,10 +201,6 @@ Fixpoint norm_list el :=
       | e₂ :: el₂ => if letter_opp_dec e₁ e₂ then el₂ else e₁ :: e₂ :: el₂
       end
   end.
-
-(*
-Definition norm s := mkF₂ (norm_list (str s)).
-*)
 
 Theorem norm_list_no_consec : ∀ e el el₁ el₂,
   norm_list el ≠ el₁ ++ e :: negf e :: el₂.
@@ -444,424 +397,13 @@ destruct el₂ as [| e₂].
   assumption.
 Qed.
 
-(*
-Theorem norm_list_cons_cons : ∀ e₁ e el el₁,
-  norm_list el = e₁ :: el₁
-  → e₁ ≠ negf e
-  → norm_list (e :: norm_list el) = e :: norm_list el.
-Proof.
-intros * Hn Hnf; simpl.
-rewrite norm_list_idemp, Hn.
-destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ | reflexivity ].
-exfalso; apply Hnf, letter_opp_negf, letter_opp_sym.
-assumption.
-Qed.
-
-Definition empty s := str (norm s) = nil.
-Definition start_with x s :=
-  match str (norm s) with
-  | nil => False
-  | e :: el => x = e
-  end.
-
-Notation "s = '∅'" := (empty s) (at level 70).
-Notation "s ≠ '∅'" := (¬ empty s) (at level 70).
-Notation "s '∈' 'Ṣ' ( x )" := (start_with x s)
-  (at level 70, format "s  '∈'  Ṣ ( x )").
-
-Theorem decomposed_4 : ∀ s,
-  s = ∅ ⊕ s ∈ Ṣ(ạ) ⊕ s ∈ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ḅ) ⊕ s ∈ Ṣ(ḅ⁻¹).
-Proof.
-intros s.
-unfold empty, start_with.
-remember (norm s) as ns eqn:Hns; symmetry in Hns.
-destruct ns as (el); simpl.
-destruct el as [| e].
- left; split; [ reflexivity | ].
- intros H.
- destruct H as [(H, _)| (_, H)]; [ contradiction | ].
- destruct H as [(H, _)| (_, H)]; [ contradiction | ].
- destruct H as [(H, _)| (_, H)]; contradiction.
-
- right.
- split; [ intros H; discriminate H | ].
- destruct e as (x, d).
- destruct x.
-  destruct d.
-   right; split; [ intros H; discriminate H | ].
-   left; split; [ reflexivity | ].
-   intros [(H, _)| (_, H)]; discriminate H.
-
-   left; split; [ reflexivity | ].
-   intros [(H, _)| (_, [(H, _)| (_, H)])]; discriminate H.
-
-  right; split; [ intros H; discriminate H | ].
-  right; split; [ intros H; discriminate H | ].
-  destruct d.
-   right; split; [ intros H; discriminate H | reflexivity ].
-
-   left; split; [ reflexivity | intros H; discriminate H ].
-Qed.
-
-Theorem decomposed_4_or : ∀ s, empty s ∨
-  start_with ạ s ∨ start_with ạ⁻¹ s ∨ start_with ḅ s ∨ start_with ḅ⁻¹ s.
-Proof.
-intros s.
-unfold empty, start_with.
-remember (norm s) as ns eqn:Hns; symmetry in Hns.
-destruct ns as (el); simpl.
-destruct el as [| e]; [ left; reflexivity | right ].
-destruct e as (x, d).
-destruct x.
- destruct d; [ right; left; reflexivity | left; reflexivity ].
-
- right; right.
- destruct d; [ right; reflexivity | left; reflexivity ].
-Qed.
-
-(* definition start_with2 x y s ↔ s in xS(y) *)
-Definition start_with2 x y s :=
-  ∃ t, norm s = norm (mkF₂ (x :: str t)) ∧ start_with y t.
-
-Notation "s '∈' x 'Ṣ' ( y )" := (start_with2 x y s)
-  (at level 70, x at level 0, format "s  '∈'  x  Ṣ ( y )").
-
-Theorem empty_start_with2 : ∀ s x d,
-  empty s
-  → start_with2 (FE x d) (FE x (negb d)) s.
-Proof.
-intros s x d H.
-unfold empty in H.
-unfold start_with2.
-remember (norm s) as ns eqn:Hns; symmetry in Hns.
-destruct ns as (el).
-simpl in H; subst el.
-exists (mkF₂ (FE x (negb d) :: nil)); simpl.
-unfold start_with, norm; simpl.
-split; [ | reflexivity ].
-rewrite letter_dec_diag, bool_dec_negb_r; reflexivity.
-Qed.
-
-Theorem norm_list_inv : ∀ x d el,
-  norm_list (FE x d :: FE x (negb d) :: el) = norm_list el.
-Proof.
-intros.
-remember (FE x d) as xd eqn:Hxd.
-remember (FE x (negb d)) as xe eqn:Hxe.
-move xe before xd.
-simpl.
-remember (norm_list el) as el' eqn:Hel'; symmetry in Hel'.
-destruct el' as [| e el'].
- destruct (letter_opp_dec xd xe) as [H₁| H₁]; [ reflexivity | ].
- exfalso; subst xd xe; apply H₁, letter_opp_inv.
-
- destruct (letter_opp_dec xe e) as [H₁| H₁].
-  unfold letter_opp in H₁.
-  destruct xe as (x₁, d₁).
-  injection Hxe; clear Hxe; intros; subst x₁ d₁.
-  destruct e as (x₂, d₂).
-  destruct (letter_dec x x₂) as [H₂| H₂]; [ | contradiction ].
-  destruct (Bool.bool_dec (negb d) d₂) as [H₃| H₃]; [ contradiction | ].
-  clear H₁; apply not_eq_sym in H₃.
-  apply neq_negb in H₃.
-  rewrite Bool.negb_involutive in H₃; subst x₂ d₂.
-  rewrite <- Hxd in Hel'; rewrite <- Hxd.
-  destruct el' as [| e']; [ reflexivity | ].
-  destruct (letter_opp_dec xd e') as [H₁| H₁]; [ | reflexivity ].
-  exfalso; subst xd.
-  unfold letter_opp in H₁.
-  destruct e' as (x₁, d₁).
-  destruct (letter_dec x x₁) as [H₂| H₂]; [ | contradiction ].
-  destruct (Bool.bool_dec d d₁) as [H₃| H₃]; [ contradiction | clear H₁ ].
-  apply not_eq_sym, neq_negb in H₃; subst x₁ d₁.
-  revert Hel'; apply norm_list_no_start.
-
-  destruct (letter_opp_dec xd xe) as [H₂| H₂]; [ reflexivity | exfalso ].
-  subst xd xe.
-  apply H₂, letter_opp_inv.
-Qed.
-
-Theorem start_with_start_with2 : ∀ s x y d,
-  not (x = y ∧ d = false)
-  → start_with (FE y d) s
-  → start_with2 (FE x false) (FE x true) s.
-Proof.
-intros s x y d H₁ H.
-unfold start_with in H.
-unfold start_with2; simpl.
-destruct s as (el); simpl in H.
-remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-destruct el₁ as [| e₁]; [ contradiction | subst e₁ ].
-unfold norm.
-remember norm_list as f; simpl; subst f.
-rewrite Hel₁.
-exists (mkF₂ (FE x true :: FE y d :: el₁)).
-remember norm_list as f; simpl; subst f.
-rewrite norm_list_inv.
-rewrite <- Hel₁, norm_list_idemp.
-split; [ reflexivity | ].
-unfold start_with; simpl.
-rewrite norm_list_idemp, Hel₁.
-destruct (letter_dec x y) as [H₂| H₂]; [ | reflexivity ].
-destruct d; [ reflexivity | ].
-subst y; exfalso; apply H₁; split; reflexivity.
-Qed.
-
-Theorem decomposed_2 : ∀ s x,
-  start_with2 (FE x false) (FE x true) s ⊕ start_with (FE x false) s.
-Proof.
-intros s x.
-destruct (decomposed_4 s) as [(H, _)| (_, H)].
- left; split; [ apply empty_start_with2; assumption | ].
- unfold empty in H; unfold start_with.
- rewrite H; intros H'; assumption.
-
- destruct H as [(H, _)| (_, H)].
- destruct x.
-  right; split; [ intros (t, (Hn, Ht)) | assumption ].
-  unfold start_with in H, Ht; rewrite Hn in H; simpl in H.
-  unfold norm in Ht; simpl in Ht.
-  remember (norm_list (str t)) as el eqn:Hel; symmetry in Hel.
-  destruct el as [| e]; [ contradiction | subst e ].
-  destruct (letter_opp_dec ạ ạ⁻¹) as [H₁| H₁].
-   destruct el as [| e]; [ contradiction | subst e ].
-   revert Hel; apply norm_list_no_start.
-
-   apply H₁, letter_opp_inv.
-
-  left; split.
-   eapply start_with_start_with2; [ | eassumption ].
-   intros (H₁, _); discriminate H₁.
-
-   intros H₁.
-   unfold start_with in H, H₁.
-   destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
-
-  destruct H as [(H, _)| (_, H)].
-  left; split.
-   eapply start_with_start_with2; [ | eassumption ].
-   intros (_, H₁); discriminate H₁.
-
-   intros H₁.
-   unfold start_with in H, H₁.
-   destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
-
-   destruct H as [(H, _)| (_, H)].
-    destruct x.
-     left; split.
-      eapply start_with_start_with2; [ | eassumption ].
-      intros (H₁, _); discriminate H₁.
-
-      intros H₁.
-      unfold start_with in H, H₁.
-      destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
-
-     right; split; [ | assumption ].
-     unfold start_with in H.
-     intros (t, (Hn, Ht)).
-     rewrite Hn in H; simpl in H.
-     unfold start_with, norm in Ht; simpl in Ht.
-     remember (norm_list (str t)) as el eqn:Hel; symmetry in Hel.
-     destruct el as [| e]; [ contradiction | subst e ].
-     destruct (letter_opp_dec ḅ ḅ⁻¹) as [H₁| H₁].
-      destruct el as [| e]; [ contradiction | subst e ].
-      revert Hel; apply norm_list_no_start.
-
-      apply H₁, letter_opp_inv.
-
-    left; split.
-     eapply start_with_start_with2; [ | eassumption ].
-     intros (_, H₁); discriminate H₁.
-
-     intros H₁.
-     unfold start_with in H, H₁.
-     destruct (str (norm s)); [ contradiction | subst f; discriminate H₁ ].
-Qed.
-
-Theorem decomposed_2_or : ∀ s x,
-  start_with2 (FE x false) (FE x true) s ∨ start_with (FE x false) s.
-Proof.
-intros s x.
-destruct (decomposed_4_or s) as [H| [H| [H| [H|H]]]].
- left; apply empty_start_with2; assumption.
-
- destruct x as [H₁| H₁]; [ right; assumption | ].
- left.
- eapply start_with_start_with2; [ | eassumption ].
- intros (H₁, _); discriminate H₁.
-
- left.
- eapply start_with_start_with2; [ | eassumption ].
- intros (_, H₁); discriminate H₁.
-
- destruct x as [H₁| H₁]; [ | right; assumption ].
- left.
- eapply start_with_start_with2; [ | eassumption ].
- intros (H₁, _); discriminate H₁.
-
- left.
- eapply start_with_start_with2; [ | eassumption ].
- intros (_, H₁); discriminate H₁.
-Qed.
-
-Theorem decomposed_2_a : ∀ s, s ∈ ạ Ṣ(ạ⁻¹) ⊕ s ∈ Ṣ(ạ) .
-Proof. intros; apply decomposed_2. Qed.
-
-Theorem decomposed_2_b : ∀ s, s ∈ ḅ Ṣ(ḅ⁻¹) ⊕ s ∈ Ṣ(ḅ) .
-Proof. intros; apply decomposed_2. Qed.
-
-End Halte.
-
-Fixpoint split_at_cancel el :=
-  match el with
-  | [] => None
-  | [e₁] => None
-  | e₁ :: (e₂ :: el₂) as el₁ =>
-      if letter_opp_dec e₁ e₂ then Some ([], e₁, el₂)
-      else
-       match split_at_cancel el₁ with
-       | Some (el₃, e₃, el₄) => Some (e₁ :: el₃, e₃, el₄)
-       | None => None
-       end
-  end.
-
-Theorem norm_dec : ∀ el,
-  { norm_list el = el } +
-  { ∃ el₁ e el₂, split_at_cancel el = Some (el₁, e, el₂) }.
-Proof.
-intros el.
-induction el as [| e]; [ left; reflexivity | ].
-destruct IHel as [H₁| H₁].
- simpl; rewrite H₁.
- destruct el as [| e₁]; [ left; reflexivity | ].
- simpl in H₁.
- destruct (letter_opp_dec e e₁) as [H₂| H₂]; [ | left; reflexivity ].
- right; exists [], e, el; reflexivity.
-
- right.
- destruct H₁ as (el₁, (e₁, (el₂, Hs))); simpl.
- destruct el as [| e₂]; [ discriminate Hs | ].
- destruct (letter_opp_dec e e₂) as [H₁| H₁].
-  exists [], e, el; reflexivity.
-
-  rewrite Hs.
-  exists (e :: el₁), e₁, el₂; reflexivity.
-Qed.
-
-Theorem split_at_cancel_some : ∀ el el₁ el₂ e,
-  split_at_cancel el = Some (el₁, e, el₂)
-  → el = el₁ ++ e :: negf e :: el₂.
-Proof.
-intros el el₁ el₂ e Hs.
-revert e el₁ el₂ Hs.
-induction el as [| e₁]; intros; [ discriminate Hs | ].
-simpl in Hs.
-destruct el as [| e₂]; [ discriminate Hs | ].
-destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
- injection Hs; clear Hs; intros; subst e el₁ el₂; simpl.
- f_equal; f_equal.
- apply letter_opp_sym, letter_opp_negf in H₁.
- assumption.
-
- remember (split_at_cancel (e₂ :: el)) as u eqn:Hu.
- symmetry in Hu.
- destruct u as [((el₃, e₃), el₄)| ]; [ | discriminate Hs ].
- injection Hs; clear Hs; intros; subst el₁ e₃ el₄; simpl.
- f_equal.
- apply IHel; reflexivity.
-Qed.
-*)
-
 Require Import Reals Psatz Nsatz.
 
 Notation "'ℝ'" := R.
-(*
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
-*)
 
 Notation "'√'" := sqrt.
-
-(* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
-(*
-Arguments Nat.modulo _ _ : simpl nomatch.
-Arguments Z.mul _ _ : simpl nomatch.
-
-Theorem Rdiv_0_l : ∀ x, (0 / x = 0)%R.
-Proof.
-intros x; unfold Rdiv; apply Rmult_0_l.
-Qed.
-
-Theorem Rdiv_1_r : ∀ x, (x / 1 = x)%R.
-Proof.
-intros x; lra.
-Qed.
-
-Theorem Rplus_shuffle0 : ∀ n m p : ℝ, (n + m + p)%R = (n + p + m)%R.
-Proof.
-intros.
-rewrite Rplus_comm, <- Rplus_assoc.
-f_equal; apply Rplus_comm.
-Qed.
-
-Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
-Proof.
-intros.
-rewrite Rmult_comm, <- Rmult_assoc.
-f_equal; apply Rmult_comm.
-Qed.
-
-Theorem fold_Rminus : ∀ a b, (a + - b = a - b)%R.
-Proof. reflexivity. Qed.
-
-Theorem fold_Rsqr : ∀ a, (a * a = a²)%R.
-Proof. reflexivity. Qed.
-
-Definition determinant a b c d := (a * d - b * c)%R.
-
-Theorem fold_determinant : ∀ a b c d, (a * d - b * c)%R = determinant a b c d.
-Proof. reflexivity. Qed.
-
-Theorem determinant_comm : ∀ a b c d,
-  determinant a b c d = determinant d c b a.
-Proof. intros; unfold determinant; ring. Qed.
-
-Theorem Rsolve_system_equation_2_variables : ∀ a b c a' b' c' x y,
-  (determinant a b a' b' ≠ 0)%R
-  → (a * x + b * y = c)%R
-  → (a' * x + b' * y = c')%R
-  → x = (determinant c b c' b' / determinant a b a' b')%R ∧
-    y = (determinant a c a' c' / determinant a b a' b')%R.
-Proof.
-assert (solve_1_var : ∀ a b c a' b' c' x y,
-  (determinant a b a' b' ≠ 0)%R
-  → (a * x + b * y = c)%R
-  → (a' * x + b' * y = c')%R
-  → x = (determinant c b c' b' / determinant a b a' b')%R).
- intros a b c a' b' c' x y Hd H₁ H₂.
- apply Rmult_eq_compat_r with (r := b') in H₁.
- apply Rmult_eq_compat_r with (r := b) in H₂.
- rewrite Rmult_plus_distr_r in H₁, H₂.
- apply Rplus_eq_compat_r with (r := (- (c' * b))%R) in H₁.
- replace (c' * b)%R with (b * c')%R in H₁ at 2 by apply Rmult_comm.
- rewrite <- H₂ in H₁.
- do 2 rewrite fold_Rminus in H₁.
- rewrite fold_determinant in H₁.
- ring_simplify in H₁.
- replace (a * x * b')%R with (x * a * b')%R in H₁ by ring.
- do 2 rewrite Rmult_assoc in H₁.
- rewrite <- Rmult_minus_distr_l in H₁.
- rewrite fold_determinant in H₁.
- rewrite <- H₁; field; assumption.
-
- intros a b c a' b' c' x y Hd H₁ H₂.
- split; [ eapply solve_1_var; eassumption | ].
- rewrite Rplus_comm in H₁, H₂.
- rewrite determinant_comm in Hd.
- setoid_rewrite determinant_comm.
- eapply solve_1_var; eassumption.
-Qed. 
-*)
 
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
   (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
@@ -872,12 +414,6 @@ rewrite <- Rmult_assoc; f_equal.
 rewrite Rmult_comm, Rmult_assoc; f_equal.
 apply sqrt_sqrt; assumption.
 Qed.
-
-(*
-Check decomposed_4.
-Check decomposed_2_a.
-Check decomposed_2_b.
-*)
 
 Inductive point := P : ℝ → ℝ → ℝ → point.
 Record matrix := mkmat
@@ -919,16 +455,6 @@ Definition rotate e pt := mat_vec_mul (mat_of_elem e) pt.
 
 Definition rev_path el := map negf (rev el).
 
-(*
-Definition rotate_param e '(a, b, c, N) :=
-  match e with
-  | ạ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
-  | ạ⁻¹ => ((3 * a)%Z, (b + 2 * c)%Z, (- 4 * b + c)%Z, S N)
-  | ḅ => ((a - 4 * b)%Z, (b + 2 * a)%Z, (3 * c)%Z, S N)
-  | ḅ⁻¹ => ((a + 4 * b)%Z, (b - 2 * a)%Z, (3 * c)%Z, S N)
-  end.
-*)
-
 Definition mat_mul m₁ m₂ :=
   mkmat
     (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
@@ -947,22 +473,6 @@ Definition mat_id :=
     0 1 0
     0 0 1.
 
-(*
-Delimit Scope mat_scope with mat.
-Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
-
-Theorem mat_mul_id_r : ∀ m, mat_mul m mat_id = m.
-Proof.
-intros m.
-unfold mat_mul, mat_id; simpl.
-progress repeat rewrite Rmult_1_r.
-progress repeat rewrite Rmult_0_r.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
-destruct m; reflexivity.
-Qed.
-*)
-
 Theorem negf_eq_eq : ∀ e₁ e₂, negf e₁ = negf e₂ → e₁ = e₂.
 Proof.
 intros e₁ e₂ Hn.
@@ -972,176 +482,6 @@ simpl in Hn.
 injection Hn; intros H₁ H₂; subst.
 apply negb_eq_eq in H₁; subst d₁; reflexivity.
 Qed.
-
-(*
-Theorem rotate_param_rotate : ∀ el x y z n a b c N,
-  fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
-  ↔ fold_right rotate (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
-      P (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
-    ∧ N = (n + length el)%nat.
-Proof.
-intros el x y z n a₁ b₁ c₁ N₁.
-split.
- intros Hr.
- simpl in Hr; simpl.
- revert a₁ b₁ c₁ N₁ Hr.
- induction el as [| (t, d)]; intros.
-  simpl; simpl in Hr; rewrite Nat.add_0_r.
-  injection Hr; intros; subst; simpl.
-  split; reflexivity.
-
-  simpl in Hr; simpl.
-  remember (fold_right rotate_param (x, y, z, n) el) as rp eqn:Hrp.
-  symmetry in Hrp.
-  destruct rp as (((a, b), c), N).
-  pose proof IHel _ _ _ _ (eq_refl _) as H.
-  destruct H as (H, HN).
-  erewrite H.
-  simpl in Hr; simpl; unfold Rdiv.
-  destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl.
-   split; [ | rewrite Nat.add_succ_r; reflexivity ].
-   rewrite plus_IZR, plus_IZR.
-   progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   unfold Rdiv.
-   rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
-
-   split; [ | rewrite Nat.add_succ_r; reflexivity ].
-   rewrite plus_IZR, minus_IZR.
-   progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   unfold Rdiv.
-   rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
-
-   split; [ | rewrite Nat.add_succ_r; reflexivity ].
-   rewrite plus_IZR, minus_IZR.
-   progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   unfold Rdiv.
-   rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
-
-   split; [ | rewrite Nat.add_succ_r; reflexivity ].
-   rewrite plus_IZR, minus_IZR.
-   progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   unfold Rdiv.
-   rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
-
- intros Hr.
- revert x y z n a₁ b₁ c₁ N₁ Hr.
- induction el as [| e] using rev_ind; intros.
-  simpl in Hr; simpl; rewrite Nat.add_0_r in Hr.
-  destruct Hr as (Hr, Hn); subst N₁.
-  unfold Rdiv in Hr.
-  injection Hr; intros Hz Hy Hx.
-  f_equal; f_equal; f_equal.
-   apply Rmult_eq_reg_r, eq_IZR in Hx; [ assumption | ].
-   apply Rinv_neq_0_compat, pow_nonzero; lra.
-
-   apply Rmult_eq_reg_r in Hy.
-    apply Rmult_eq_reg_r in Hy; [ | apply sqrt2_neq_0 ].
-    apply eq_IZR; assumption.
-
-    apply Rinv_neq_0_compat, pow_nonzero; lra.
-
-   apply Rmult_eq_reg_r, eq_IZR in Hz; [ assumption | ].
-   apply Rinv_neq_0_compat, pow_nonzero; lra.
-
-  simpl in Hr; destruct Hr as (Hr, HN).
-  rewrite app_length, Nat.add_1_r in HN.
-  rewrite <- Nat.add_succ_comm in HN.
-  simpl; destruct e as (t, d).
-  rewrite fold_right_app; simpl.
-  rewrite fold_right_app in Hr; simpl in Hr.
-  destruct t, d.
-   apply IHel; split; [ | assumption ].
-   rewrite <- Hr; simpl.
-   unfold Rdiv.
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-   rewrite plus_IZR, plus_IZR.
-   progress repeat rewrite mult_IZR.
-   f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-
-   apply IHel; split; [ | assumption ].
-   rewrite <- Hr; simpl.
-   unfold Rdiv.
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   progress repeat rewrite mult_IZR.
-   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-   rewrite minus_IZR, plus_IZR.
-   progress repeat rewrite mult_IZR.
-   f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-
-   apply IHel; split; [ | assumption ].
-   rewrite <- Hr; simpl.
-   unfold Rdiv.
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   progress repeat rewrite mult_IZR.
-   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-   rewrite plus_IZR, minus_IZR.
-   progress repeat rewrite mult_IZR.
-   f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-
-   apply IHel; split; [ | assumption ].
-   rewrite <- Hr; simpl.
-   unfold Rdiv.
-   progress repeat rewrite Rmult_1_l.
-   progress repeat rewrite Rmult_0_l.
-   progress repeat rewrite Rplus_0_l.
-   progress repeat rewrite Rplus_0_r.
-   progress repeat rewrite <- Rmult_assoc.
-   progress repeat rewrite mult_IZR.
-   rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-   rewrite minus_IZR, plus_IZR.
-   progress repeat rewrite mult_IZR.
-   f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-Qed.
-*)
 
 Theorem rot_rot_inv_x : ∀ pt,
   mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
@@ -1592,327 +932,6 @@ destruct (norm_list_dec (el₁ ++ el₂)) as [H₁| H₁].
   reflexivity.
 Qed.
 
-(*
-Theorem rotate_prop : ∀ p t d el el₁ el₂ e a b c,
-  t = lb ∧ p = (1, 0, 0, O)%Z ∨
-  t = la ∧ p = (0, 0, 1, O)%Z
-  → el₁ = el₂ ++ [FE t d]
-  → el = e :: el₁
-  → norm_list el = el
-  → fold_right rotate_param p el₁ = (a, b, c, length el₁)
-  → (b mod 3)%Z ≠ 0%Z
-  → match e with
-    | ạ => ((b - 2 * c) mod 3)%Z ≠ 0%Z
-    | ạ⁻¹ => ((b + 2 * c) mod 3)%Z ≠ 0%Z
-    | ḅ => ((b + 2 * a) mod 3)%Z ≠ 0%Z
-    | ḅ⁻¹ => ((b - 2 * a) mod 3)%Z ≠ 0%Z
-    end.
-Proof.
-intros p t d el el₁ el₂ e a b c.
-intros Htp Hel₁ Hel Hn Hp Hb'.
-rewrite Hel₁ in Hp at 2; simpl in Hp.
-remember (length el₂) as len eqn:Hlen.
-destruct el₂ as [| e₁].
- simpl in Hlen; subst len; simpl in Hel.
- subst el₁; simpl in Hp.
- destruct Htp as [(Ht, Hq)| (Ht, Hq)]; subst t p.
-  destruct d; injection Hp; intros; subst.
-   destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-   revert Hn; apply norm_list_no_start.
-
-   destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-   revert Hn; apply norm_list_no_start.
-
-  destruct d; injection Hp; intros; subst.
-   destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-   revert Hn; apply norm_list_no_start.
-
-   destruct e as (t₁, d₁); destruct t₁, d₁; intros H; try discriminate H.
-   revert Hn; apply norm_list_no_start.
-
- rewrite Hel₁ in Hel; simpl in Hel.
- generalize Hn; intros H₂.
- do 2 rewrite app_comm_cons in Hel.
- rewrite Hel in H₂.
- apply norm_list_app_diag in H₂.
- destruct len; [ discriminate Hlen | ].
- simpl in Hlen; apply eq_add_S in Hlen.
- rewrite Hel₁, fold_right_app in Hp.
- simpl in Hp.
- remember (rotate_param (FE t d) p) as p₁ eqn:Hp₁.
- remember (fold_right rotate_param p₁ el₂) as p' eqn:Hp'.
- symmetry in Hp'.
- destruct p' as (((a', b'), c'), N').
- simpl in Hp.
- destruct e₁ as (t₁, d₁); destruct t₁, d₁.
-  injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
-  destruct e as (t₂, d₂); destruct t₂, d₂.
-   rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
-   remember (b' + 2 * c' + 2 * (-4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
-   ring_simplify in Hx; subst x.
-   replace 4%Z with (2 * 2)%Z by reflexivity.
-   rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
-   intros H; apply Hb'.
-   apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
-   apply Z.gauss in H; [ | reflexivity ].
-   destruct H as (k, H); rewrite H.
-   apply Z.mod_mul; intros; discriminate.
-
-   exfalso; revert Hn; rewrite Hel.
-   apply norm_list_no_start.
-
-   rewrite Z.mul_assoc, Z.mul_shuffle0.
-   unfold Z.sub; rewrite Zopp_mult_distr_l.
-   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
-
-   rewrite Z.mul_assoc, Z.mul_shuffle0.
-   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
-
-  injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
-  destruct e as (t₂, d₂); destruct t₂, d₂.
-   exfalso; revert Hn; rewrite Hel.
-   apply norm_list_no_start.
-
-   rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
-   remember (b' - 2 * c' - 2 * (4 * b' + c') + 3 * b' * 3)%Z as x eqn:Hx.
-   ring_simplify in Hx; subst x.
-   replace 4%Z with (2 * 2)%Z by reflexivity.
-   rewrite <- Z.mul_assoc, <- Z.mul_sub_distr_l.
-   intros H; apply Hb'.
-   apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
-   apply Z.gauss in H; [ | reflexivity ].
-   destruct H as (k, H); rewrite H.
-   apply Z.mod_mul; intros; discriminate.
-
-   rewrite Z.mul_assoc, Z.mul_shuffle0.
-   unfold Z.sub at 1; rewrite Zopp_mult_distr_l.
-   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
-
-   rewrite Z.mul_assoc, Z.mul_shuffle0.
-   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
-
-  injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
-  destruct e as (t₂, d₂); destruct t₂, d₂.
-   rewrite Z.mul_assoc, Z.mul_shuffle0.
-   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
-
-   rewrite Z.mul_assoc, Z.mul_shuffle0.
-   unfold Z.sub at 1; rewrite Zopp_mult_distr_l.
-   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
-
-   rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
-   remember (b' - 2 * a' - 2 * (a' + 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
-   ring_simplify in Hx; subst x.
-   replace 4%Z with (2 * 2)%Z by reflexivity.
-   rewrite <- Z.mul_assoc, <- Z.mul_sub_distr_l.
-   intros H; apply Hb'.
-   apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
-   apply Z.gauss in H; [ | reflexivity ].
-   destruct H as (k, H); rewrite H.
-   apply Z.mod_mul; intros; discriminate.
-
-   exfalso; revert Hn; rewrite Hel.
-   apply norm_list_no_start.
-
-  injection Hp; clear Hp; intros HN Hc Hb Ha; subst a b c N'.
-  destruct e as (t₂, d₂); destruct t₂, d₂.
-   rewrite Z.mul_assoc, Z.mul_shuffle0.
-   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
-
-   rewrite Z.mul_assoc, Z.mul_shuffle0.
-   unfold Z.sub; rewrite Zopp_mult_distr_l.
-   rewrite Z.mod_add; [ assumption | intros H; discriminate H ].
-
-   exfalso; revert Hn; rewrite Hel.
-   apply norm_list_no_start.
-
-   rewrite <- Z.mod_add with (b := (3 * b')%Z); [ | intros; discriminate ].
-   remember (b' + 2 * a' + 2 * (a' - 4 * b') + 3 * b' * 3)%Z as x eqn:Hx.
-   ring_simplify in Hx; subst x.
-   replace 4%Z with (2 * 2)%Z by reflexivity.
-   rewrite <- Z.mul_assoc, <- Z.mul_add_distr_l.
-   intros H; apply Hb'.
-   apply Znumtheory.Zmod_divide in H; [ | intros; discriminate ].
-   apply Z.gauss in H; [ | reflexivity ].
-   destruct H as (k, H); rewrite H.
-   apply Z.mod_mul; intros; discriminate.
-Qed.
-
-Theorem rotate_param_b_nonzero : ∀ p t d el el₁ a b c,
-  t = lb ∧ p = (1, 0, 0, O)%Z ∨
-  t = la ∧ p = (0, 0, 1, O)%Z
-  → el = el₁ ++ [FE t d]
-  → norm_list el = el
-  → fold_right rotate_param p el = (a, b, c, length el)
-  → (b mod 3 ≠ 0)%Z.
-Proof.
-intros p t d el el₁ a b c Htp Hel Hn Hu.
-remember (length el₁) as len eqn:Hlen; symmetry in Hlen.
-revert el el₁ d a b c Hel Hn Hu Hlen.
-induction len as (len, IHlen) using lt_wf_rec; intros.
-destruct len.
- apply length_zero_iff_nil in Hlen; subst el₁.
- subst el; simpl in Hu.
- destruct Htp as [(Ht, Hp)| (Ht, Hp)]; subst t p.
-  destruct d; injection Hu; intros; subst; intros H; discriminate H.
-  destruct d; injection Hu; intros; subst; intros H; discriminate H.
-
- destruct el₁ as [| e₁]; [ discriminate Hlen | simpl in Hlen ].
- apply eq_add_S in Hlen.
- rewrite <- app_comm_cons in Hel.
- remember (el₁ ++ [FE t d]) as el₂ eqn:Hel₁.
- generalize Hn; intros H₁; rewrite Hel in H₁.
- apply norm_list_cons in H₁.
- rewrite Hel in Hu; simpl in Hu.
- remember (fold_right rotate_param p el₂) as v eqn:Hp.
- symmetry in Hp.
- destruct v as (((a', b'), c'), N').
- assert (Hss : len < S len) by apply Nat.lt_succ_diag_r.
- assert (N' = S len); [ | subst N' ].
-  destruct e₁ as (t₁, d₁).
-  rewrite Hel₁, app_length, Nat.add_1_r in Hu.
-  destruct t₁, d₁; simpl in Hu; injection Hu; intros; subst; reflexivity.
-
-  rewrite <- Hlen in Hp.
-  replace (S (length el₁)) with (length el₂) in Hp.
-   pose proof IHlen _ Hss _ _ _ _ _ _ Hel₁ H₁ Hp Hlen as Hb'; subst len.
-   pose proof rotate_prop p t d el el₂ el₁ e₁ a' b' c' Htp Hel₁ Hel Hn Hp Hb'.
-   destruct e₁ as (t₁, d₁).
-   destruct t₁, d₁; injection Hu; intros; subst; assumption.
-
-   subst; rewrite app_length, Nat.add_1_r; reflexivity.
-Qed.
-
-(* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
-    integers and b is not divisible by 3" (Stan Wagon) *)
-
-Theorem rotate_1_0_0_b_nonzero : ∀ w el el₁ d,
-  el = el₁ ++ [FE lb d]
-  → norm_list el = el
-  → w = (λ p, fold_right rotate p el)
-  → ∃ a b c k,
-    w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
-    (b mod 3 ≠ 0)%Z.
-Proof.
-intros w el el₁ d Hel Hn Hw.
-subst w.
-remember (fold_right rotate_param (1, 0, 0, O)%Z el) as u eqn:Hu.
-symmetry in Hu; destruct u as (((a, b), c), len).
-generalize Hu; intros Hv.
-apply rotate_param_rotate in Hv; simpl in Hv.
-rewrite Rmult_0_l, Rdiv_0_l, Rdiv_1_r in Hv.
-destruct Hv as (Hv, Hlen).
-rewrite Hv.
-exists a, b, c, len.
-split; [ reflexivity | clear Hv ].
-symmetry in Hlen.
-rewrite Hel in Hlen; simpl in Hlen.
-rewrite app_length, Nat.add_1_r in Hlen.
-destruct len; [ discriminate Hlen | ].
-apply eq_add_S in Hlen; subst len.
-replace (S (length el₁)) with (length el) in Hu.
- eapply rotate_param_b_nonzero; try eassumption.
- left; split; reflexivity.
-
- subst; rewrite app_length, Nat.add_1_r; reflexivity.
-Qed.
-
-Theorem rotate_0_0_1_b_nonzero : ∀ w el el₁ d,
-  el = el₁ ++ [FE la d]
-  → norm_list el = el
-  → w = (λ p, fold_right rotate p el)
-  → ∃ a b c k,
-    w (P 0 0 1) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
-    (b mod 3 ≠ 0)%Z.
-Proof.
-intros w el el₁ d Hel Hn Hw.
-subst w.
-remember (fold_right rotate_param (0, 0, 1, O)%Z el) as u eqn:Hu.
-symmetry in Hu; destruct u as (((a, b), c), len).
-generalize Hu; intros Hv.
-apply rotate_param_rotate in Hv; simpl in Hv.
-rewrite Rmult_0_l, Rdiv_0_l, Rdiv_1_r in Hv.
-destruct Hv as (Hv, Hlen).
-rewrite Hv.
-exists a, b, c, len.
-split; [ reflexivity | clear Hv ].
-symmetry in Hlen.
-rewrite Hel in Hlen; simpl in Hlen.
-rewrite app_length, Nat.add_1_r in Hlen.
-destruct len; [ discriminate Hlen | ].
-apply eq_add_S in Hlen; subst len.
-replace (S (length el₁)) with (length el) in Hu.
- eapply rotate_param_b_nonzero; try eassumption.
- right; split; reflexivity.
-
- subst; rewrite app_length, Nat.add_1_r; reflexivity.
-Qed.
-
-Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
-  el = el₁ ++ [FE lb d]
-  → norm_list el = el
-  → fold_right rotate (P 1 0 0) el ≠ P 1 0 0.
-Proof.
-intros el el₁ d Hel Hn.
-remember (λ p, fold_right rotate p el) as w eqn:Hw.
-pose proof rotate_1_0_0_b_nonzero w el el₁ d Hel Hn Hw as H.
-destruct H as (a, (b, (c, (k, (Hp, Hm))))).
-rewrite Hw in Hp.
-rewrite Hp; intros H.
-injection H; intros Hc Hb Ha.
-apply Rmult_integral in Hb.
-destruct Hb as [Hb| Hb].
- apply Rmult_integral in Hb.
- destruct Hb as [Hb| Hb].
-  apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
-
-  revert Hb; apply sqrt2_neq_0.
-
- apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
- rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
-Qed.
-
-Theorem rotate_0_0_1_is_diff : ∀ el el₁ d,
-  el = el₁ ++ [FE la d]
-  → norm_list el = el
-  → fold_right rotate (P 0 0 1) el ≠ P 0 0 1.
-Proof.
-intros el el₁ d Hel Hn.
-remember (λ p, fold_right rotate p el) as w eqn:Hw.
-pose proof rotate_0_0_1_b_nonzero w el el₁ d Hel Hn Hw as H.
-destruct H as (a, (b, (c, (k, (Hp, Hm))))).
-rewrite Hw in Hp.
-rewrite Hp; intros H.
-injection H; intros Hc Hb Ha.
-apply Rmult_integral in Hb.
-destruct Hb as [Hb| Hb].
- apply Rmult_integral in Hb.
- destruct Hb as [Hb| Hb].
-  apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
-
-  revert Hb; apply sqrt2_neq_0.
-
- apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
- rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
-Qed.
-
-Theorem norm_app_rev_path_path : ∀ el, norm_list (rev_path el ++ el) = [].
-Proof.
-induction el as [| e]; [ reflexivity | ].
-rewrite rev_path_cons, <- app_assoc.
-destruct e as (t, d); simpl.
-destruct d; rewrite norm_list_cancel_in; assumption.
-Qed.
-
-Theorem norm_app_path_rev_path : ∀ el, norm_list (el ++ rev_path el) = [].
-Proof.
-intros el.
-remember (rev_path el) as rp.
-replace el with (rev_path (rev_path el)) by apply rev_path_involutive.
-subst rp; apply norm_app_rev_path_path.
-Qed.
-*)
-
 Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.
 Proof.
 intros (t, d) p; simpl.
@@ -1933,18 +952,6 @@ destruct t, d; simpl.
  apply rot_inv_rot_z.
 Qed.
 
-(*
-Theorem app_rev_path_path : ∀ p el,
-  fold_right rotate p (el ++ rev_path el) = p.
-Proof.
-intros.
-revert p.
-induction el as [| e]; intros; [ reflexivity | simpl ].
-rewrite rev_path_cons, app_assoc, fold_right_app.
-rewrite IHel; apply rotate_rotate_neg.
-Qed.
-*)
-
 Theorem app_path_rev_path : ∀ p el,
   fold_right rotate p (rev_path el ++ el) = p.
 Proof.
@@ -1964,17 +971,6 @@ intros.
 do 2 rewrite fold_right_app; simpl.
 rewrite rotate_rotate_neg; reflexivity.
 Qed.
-
-(*
-Theorem rotate_cancel_start : ∀ el e p,
-  fold_right rotate p (e :: negf e :: el) =
-  fold_right rotate p el.
-Proof.
-intros.
-pose proof rotate_cancel_in [] el e p as H.
-apply H.
-Qed.
-*)
 
 Theorem rotate_rotate_norm : ∀ el p,
   fold_right rotate p el = fold_right rotate p (norm_list el).
@@ -2011,16 +1007,6 @@ destruct len.
     apply IHel₁; assumption.
 Qed.
 
-(*
-Theorem length_rev_path : ∀ el, length (rev_path el) = length el.
-Proof.
-intros el.
-induction el as [| e]; [ reflexivity | simpl ].
-rewrite rev_path_cons, app_length; simpl.
-rewrite IHel, Nat.add_1_r; reflexivity.
-Qed.
-*)
-
 Theorem rotate_rev_path : ∀ el p₁ p₂,
   fold_right rotate p₁ el = p₂
   → fold_right rotate p₂ (rev_path el) = p₁.
@@ -2035,143 +1021,7 @@ rewrite rotate_neg_rotate.
 reflexivity.
 Qed.
 
-(*
-Theorem all_points_in_orbit_1_0_0_are_different :
-  ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
-  fold_right rotate (P 1 0 0) el₁ = p₁
-  → fold_right rotate (P 1 0 0) el₂ = p₂
-  → el₁ = el'₁ ++ [FE lb d₁]
-  → el₂ = el'₂ ++ [FE lb d₂]
-  → norm_list el₁ = el₁
-  → norm_list el₂ = el₂
-  → el₁ ≠ el₂
-  → p₁ ≠ p₂.
-Proof.
-intros p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂ Hp₁ Hp₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hp.
-move Hp at top; subst p₂; rename p₁ into p.
-(* perhaps I should generalize that to any starting point which is
-   a fixpoint? something like that... *)
-assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
- rewrite fold_right_app, Hp₁, <- Hp₂.
- rewrite <- fold_right_app.
- rewrite app_path_rev_path; reflexivity.
-
- clear p Hp₁ Hp₂.
- remember (length (rev_path el₂ ++ el₁)) as len eqn:Hlen.
- symmetry in Hlen.
- revert el₁ el₂ el'₁ el'₂ d₁ d₂ Hel₁ Hel₂ Hn₁ Hn₂ Hd Hlen Hp.
- induction len as (len, IHlen) using lt_wf_rec; intros.
- destruct len.
-  rewrite app_length in Hlen.
-  apply Nat.eq_add_0 in Hlen.
-  destruct Hlen as (Hl₁, Hl₂).
-  apply length_zero_iff_nil in Hl₁.
-  apply length_zero_iff_nil in Hl₂.
-  apply rev_path_is_nil in Hl₁.
-  move Hl₁ at top; move Hl₂ at top; subst el₁ el₂.
-  destruct el'₁; discriminate Hel₁.
-
-  destruct (norm_dec (rev_path el₂ ++ el₁)) as [H₁| H₁].
-   revert Hp; rewrite Hel₁, app_assoc.
-   rewrite Hel₁, app_assoc in H₁.
-   remember (rev_path el₂ ++ el'₁) as el₄ eqn:Hel₄.
-   remember (el₄ ++ [FE lb d₁]) as el₃ eqn:Hel₃.
-   pose proof rotate_1_0_0_is_diff el₃ el₄ d₁ Hel₃ H₁ as H₂.
-   apply H₂.
-
-   destruct H₁ as (el₄, (e, (el₃, Ht))).
-   generalize Ht; intros Hs.
-   apply split_at_cancel_some in Hs.
-   rewrite Hs, rotate_cancel_in in Hp.
-   rewrite Hs in Hlen.
-   rewrite app_length in Hlen; simpl in Hlen.
-   do 2 rewrite Nat.add_succ_r in Hlen.
-   apply Nat.succ_inj in Hlen.
-   rewrite <- length_rev_path in Hlen.
-   rewrite <- app_length in Hlen.
-   destruct len; [ discriminate Hlen | ].
-   apply Nat.succ_inj in Hlen.
-   rewrite <- Hn₁, <- Hn₂ in Hs.
-   rewrite rev_path_norm_list in Hs.
-   apply norm_list_app_split in Hs.
-   destruct Hs as (Hs₂, Hs₁).
-   rewrite <- rev_path_norm_list in Hs₂.
-   apply rev_path_eq_eq in Hs₂.
-   rewrite rev_path_involutive, rev_path_app in Hs₂; simpl in Hs₂.
-   rewrite Hn₁ in Hs₁.
-   rewrite Hn₂ in Hs₂.
-   destruct el₁ as [| e₁]; [ discriminate Hs₁ | ].
-   injection Hs₁; clear Hs₁; intros; subst e₁ el₃.
-   apply norm_list_cons in Hn₁.
-   destruct el'₁ as [| e'₁].
-    simpl in Hel₁.
-    injection Hel₁; clear Hel₁; intros H₁ H₂; subst el₁.
-    rewrite <- negf_involutive in H₂.
-    apply negf_eq_eq in H₂; subst e; simpl in Ht.
-    rewrite Bool.negb_involutive in Ht.
-    rewrite negf_involutive in Hd, Hs₂.
-    clear Hn₁.
-    rewrite app_nil_r in Hlen, Hp.
-    destruct el₄ as [| (t₄, d₄)].
-     rewrite rev_path_nil in Hs₂.
-     apply Hd; symmetry; assumption.
-
-     rewrite rev_path_cons, rev_path_single in Hs₂; simpl in Hs₂.
-     rewrite Hel₂, app_comm_cons in Hs₂.
-     apply app_inj_tail in Hs₂.
-     destruct Hs₂ as (Hs₂, Hs₃).
-     injection Hs₃; clear Hs₃; intros; subst t₄ d₂ el'₂.
-     clear Hd.
-     generalize Hn₂; intros Hn₁.
-     apply norm_list_rev_path in Hn₁.
-     rewrite Hel₂ in Hn₁.
-     rewrite rev_path_app, rev_path_single in Hn₁.
-     remember norm_list as f; simpl in Hn₁; subst f.
-     rewrite Bool.negb_involutive in Hn₁.
-     rewrite rev_path_cons, rev_path_involutive in Hn₁.
-     rewrite app_comm_cons in Hn₁.
-     apply norm_list_app_diag in Hn₁.
-     apply norm_list_rev_path in Hn₁.
-     rewrite rev_path_cons, rev_path_single in Hn₁.
-     simpl in Hn₁.
-     apply rotate_rev_path in Hp.
-     rewrite rev_path_cons, rev_path_single in Hp; simpl in Hp.
-     revert Hp.
-     eapply rotate_1_0_0_is_diff; [ reflexivity | assumption ].
-
-    simpl in Hel₁.
-    injection Hel₁; clear Hel₁; intros H₁ H₂; subst e'₁.
-    destruct el₄ as [| (t₄, d₄)].
-     revert Hp; simpl.
-     eapply rotate_1_0_0_is_diff; eassumption.
-
-     rewrite rev_path_cons, rev_path_single in Hs₂; simpl in Hs₂.
-     rewrite Hel₂, app_comm_cons in Hs₂.
-     apply app_inj_tail in Hs₂.
-     destruct Hs₂ as (Hs₂, Hs₃).
-     injection Hs₃; clear Hs₃; intros; subst t₄ d₂ el'₂.
-     apply rotate_rev_path in Hp.
-     rewrite rev_path_app in Hp.
-     remember (rev_path (FE lb d₄ :: el₄)) as el₃ eqn:Hel₃.
-     revert Hp.
-     rewrite rev_path_cons, rev_path_single in Hel₃; simpl in Hel₃.
-     rewrite <- app_comm_cons, <- Hel₃ in Hel₂.
-     rewrite Hel₂ in Hd.
-     assert (Hd₂ : el₁ ≠ el₃) by (intros H; apply Hd; f_equal; assumption).
-     apply not_eq_sym in Hd₂.
-     rewrite Hel₂ in Hn₂.
-     apply norm_list_cons in Hn₂.
-     rewrite app_length, Nat.add_comm in Hlen.
-     eapply IHlen; try eassumption.
-     * etransitivity; eapply Nat.lt_succ_diag_r.
-     * rewrite app_length, length_rev_path; assumption.
-Qed.
-*)
-
 Definition on_sphere_ray r '(P x y z) := (x² + y² + z² = r)%R.
-(*
-Definition on_sphere '(P x y z) := (x² + y² + z² = 1)%R.
-*)
 
 Definition mat_transp m :=
   mkmat 
@@ -2183,31 +1033,6 @@ Definition mat_det m :=
   (a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m) +
    a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
    a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%R.
-
-(*
-Arguments mat_det m%mat.
-
-Theorem mat_transp_mul : ∀ m₁ m₂,
-  mat_transp (mat_mul m₁ m₂) = mat_mul (mat_transp m₂) (mat_transp m₁).
-Proof.
-intros m₁ m₂.
-unfold mat_transp, mat_mul; simpl; f_equal; ring.
-Qed.
-
-Theorem mat_mul_assoc : ∀ m₁ m₂ m₃,
-  (m₁ * (m₂ * m₃) = m₁ * m₂ * m₃)%mat.
-Proof.
-intros m₁ m₂ m₃.
-unfold mat_mul; simpl; f_equal; ring.
-Qed.
-
-Theorem mat_det_mul : ∀ m₁ m₂,
-  mat_det (m₁ * m₂) = (mat_det m₂ * mat_det m₁)%R.
-Proof.
-intros m₁ m₂.
-unfold mat_det; simpl; ring.
-Qed.
-*)
 
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
@@ -2284,107 +1109,6 @@ intros (t, d); destruct t, d.
  apply rot_z_is_rotation_matrix.
 Qed.
 
-(*
-Theorem path_is_rotation : ∀ el m,
-  m = fold_right mat_mul mat_id (map mat_of_elem el)
-  → is_rotation_matrix m.
-Proof.
-intros el m Hm.
-revert m Hm.
-induction el as [| e]; intros.
- subst m; simpl; unfold is_rotation_matrix, mat_det; simpl.
- rewrite mat_mul_id_r.
- split; [ reflexivity | ring ].
-
- simpl in Hm.
- remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m₁ eqn:Hm₁.
- pose proof IHel m₁ eq_refl as Hr.
- unfold is_rotation_matrix in Hr.
- unfold is_rotation_matrix.
- destruct Hr as (Hr & Hd).
- rewrite Hm.
- rewrite mat_transp_mul, mat_mul_assoc.
- setoid_rewrite <- mat_mul_assoc at 2.
- rewrite Hr, mat_mul_id_r.
- rewrite mat_det_mul, Hd, Rmult_1_l.
- apply rotate_is_rotation_matrix.
-Qed.
-
-(* sources:
-   - wikipedia "rotation matrix"
-   - http://www.euclideanspace.com/maths/geometry/rotations/
-       conversions/matrixToAngle
-   does not work if the rotation is 0 or π; but it cannot
-   happen in our case *)
-Definition rotation_fixpoint (m : matrix) k :=
-  let x := (a₃₂ m - a₂₃ m)%R in
-  let y := (a₁₃ m - a₃₁ m)%R in
-  let z := (a₂₁ m - a₁₂ m)%R in
-  P (k * x) (k * y) (k * z).
-
-(* other possible definition suggested by Guillaume Hanrot *)
-Definition rotation_fixpoint2 (m : matrix) k :=
-  let x := (a₁₂ m * a₂₃ m + (- a₂₂ m + 1) * a₁₃ m)%R in
-  let y := (a₁₃ m * a₂₁ m + (- a₁₁ m + 1) * a₂₃ m)%R in
-  let z := ((a₁₁ m - 1) * (a₂₂ m - 1) - a₂₁ m * a₁₂ m)%R in
-  P (k * x) (k * y) (k * z).
-
-Theorem matrix_fixpoint_ok : ∀ m p k,
-  is_rotation_matrix m
-  → p = rotation_fixpoint m k
-  → mat_vec_mul m p = p.
-Proof.
-intros m p k Hrm Hn.
-subst p.
-unfold rotation_fixpoint.
-unfold is_rotation_matrix in Hrm.
-destruct Hrm as (Ht & Hd).
-unfold mat_det in Hd.
-unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
-injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-simpl.
-setoid_rewrite fold_Rsqr in H₁.
-setoid_rewrite fold_Rsqr in H₅.
-setoid_rewrite fold_Rsqr in H₉.
-move H₉ after H₁; move H₅ after H₁.
-move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
-clear H₄ H₇ H₈; move H₆ after H₂.
-move Hd before H₉.
-rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
-rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
-f_equal; nsatz.
-Qed.
-
-Definition fixpoint_of_path el :=
- let m := fold_right mat_mul mat_id (map mat_of_elem el) in
- let '(P x y z) := rotation_fixpoint m 1 in
- let r := √ (x² + y² + z²) in
- P (x / r) (y / r) (z / r).
-
-Definition no_rotation := ([] : list free_elem).
-Definition is_identity el := ∀ p, fold_right rotate p el = p.
-
-Theorem rotate_0 : is_identity no_rotation.
-Proof. intros p; reflexivity. Qed.
-
-Theorem nonempty_rotation_is_not_identity : ∀ el,
-  norm_list el = el
-  → el ≠ no_rotation
-  → ¬ (is_identity el).
-Proof.
-intros el Hel Hr Hn.
-unfold no_rotation in Hr.
-destruct (list_nil_app_dec el) as [| H]; [ contradiction | clear Hr ].
-destruct H as (e, (el', H₁)).
-destruct e as (t, d); destruct t.
- pose proof Hn (P 0 0 1) as H; revert H.
- destruct d; eapply rotate_0_0_1_is_diff; try eassumption; reflexivity.
-
- pose proof Hn (P 1 0 0) as H; revert H.
- destruct d; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
-Qed.
-*)
-
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
@@ -2446,64 +1170,8 @@ assert (He : equiv _ R).
   right; assumption.
 Qed.
 
-(*
-Theorem same_choice_in_same_orbit : ∃ f : point → point,
-  (∀ x, same_orbit x (f x)) ∧
-  (∀ x y, same_orbit x y ↔ f x = f y).
-Proof.
-pose proof (TTCA _ _ equiv_same_orbit) as H.
-destruct H as (f, (Hx, Hxy)).
-exists f; split; [ apply Hx | ].
-intros x y.
-split; intros H; [ apply Hxy, H | ].
-transitivity (f x); [ apply Hx | ].
-transitivity (f y); [ destruct H; reflexivity | symmetry; apply Hx ].
-Qed.
-
-Definition in_image {A B} (f : A → B) := λ x, ∃ y, x = f y.
-
-Theorem orbit_partition : ∃ f : point → point,
-  (∀ x, ∃ y, same_orbit (f y) x) ∧
-  (∀ x y, in_image f x → in_image f y → x ≠ y → ¬ same_orbit x y).
-Proof.
-pose proof same_choice_in_same_orbit as H.
-destruct H as (f, (Hxfx, Hiff)).
-exists f; split.
- intros x.
- exists x; symmetry.
- apply Hxfx.
-
- intros x y Hx Hy Hneq.
- destruct Hx as (x', Hx).
- destruct Hy as (y', Hy).
- intros H; apply Hneq.
- subst x y; apply Hiff.
- etransitivity; [ apply Hxfx | ].
- etransitivity; [ eassumption | ].
- symmetry; apply Hxfx.
-Qed.
-*)
-
 Definition not_in_fixpoints p :=
   ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
-
-(*
-Theorem same_orbit_imp_representant : ∀ f p p₁ el₁,
-  (∀ p₁ p₂ : point, same_orbit p₁ p₂ → f p₁ = f p₂)
-  → (∀ p : point, same_orbit p (f p))
-  → p = f p
-  → fold_right rotate (f p₁) el₁ = p
-  → f p₁ = p.
-Proof.
-intros f p p₁ el₁ Hoe Ho H₁ Hr.
-pose proof Ho p₁ as Hp₁.
-unfold same_orbit in Hp₁.
-destruct Hp₁ as (el₃ & Hp₁).
-rewrite <- Hp₁, <- fold_right_app in Hr.
-rewrite H₁; apply Hoe.
-exists (el₁ ++ el₃); assumption.
-Qed.
-*)
 
 Theorem not_in_fixpoints_one_path : ∀ f p e₁ e₂ el el₂ el₁ el₃,
   not_in_fixpoints p
@@ -2532,39 +1200,6 @@ apply norm_list_app_is_nil in H.
 
  rewrite norm_list_idemp; reflexivity.
 Qed.
-
-(*
-Theorem not_in_fixpoints_one_path2 : ∀ p e e₁ el₄ el₁ el el₃,
-  not_in_fixpoints p
-  → fold_right rotate p (el ++ rev_path (e :: el₄)) = p
-  → norm_list el = e₁ :: el₁
-  → norm_list el₃ = negf e₁ :: e :: el₄
-  → False.
-Proof.
-intros * Hnf Hel Hel₁ H₅.
-revert Hel; apply Hnf.
-intros H.
-pose proof is_normal [] el (rev_path (e :: el₄)) as H₁.
-do 2 rewrite app_nil_l in H₁.
-rewrite <- H₁ in H; clear H₁.
-rewrite rev_path_cons, rev_path_single in H; simpl in H.
-apply norm_list_app_is_nil in H.
- rewrite Hel₁ in H.
- apply rev_path_eq_eq in H.
- rewrite rev_path_app in H.
- do 2 rewrite rev_path_involutive in H.
- simpl in H; rewrite negf_involutive in H.
- injection H; intros; subst e₁.
- revert H₅; apply norm_list_no_start2.
-
- rewrite norm_list_idemp; reflexivity.
-
- symmetry.
- rewrite <- rev_path_single, <- rev_path_app; simpl.
- rewrite <- rev_path_norm_list; f_equal.
- eapply norm_list_is_cons; eassumption.
-Qed.
-*)
 
 Theorem Req_dec : ∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R }.
 Proof.
@@ -2771,15 +1406,6 @@ subst s; intros x.
 split; intros H; [ | left; assumption ].
 destruct H as [H| H]; [ assumption | contradiction ].
 Qed.
-
-(*
-Theorem union_comm : ∀ A s, s = set_equiv → ∀ (E F : A → Prop),
-  (E ⋃ F = F ⋃ E)%S.
-Proof.
-intros * Hs E *; subst s; intros x.
-apply or_comm.
-Qed.
-*)
 
 Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : A → Prop),
   (E ⋃ (F ⋃ G) = (E ⋃ F) ⋃ G)%S.
@@ -3097,10 +1723,6 @@ Definition SS {os : sel_model} e := λ p,
   all_but_fixpoints p ∧
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
-
-(*
-Let s := @set_equiv point.
-*)
 
 Definition on_orbit_by_seq_of e {os : sel_model} p :=
   ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p.
@@ -3425,15 +2047,6 @@ split.
      destruct i; contradiction.
 Qed.
 
-(*
-Theorem os_fun_idemp : ∀ f, orbit_selector f → ∀ p, f (f p) = f p.
-Proof.
-intros f Hos p.
-destruct Hos as (Hso & Ho).
-apply Hso; symmetry; apply Ho.
-Qed.
-*)
-
 Theorem r_decomposed_4 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
@@ -3454,19 +2067,6 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
 
  intros p; apply EM.
 Qed.
-
-(*
-Theorem old_r_decomposed_4 :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
-  → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [(EE ⋃ SS ạ)%S; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
-Proof.
-intros s Hs f HoeHo os Hos.
-pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
-eapply is_partition_group_first_2_together; eassumption.
-Qed.
-*)
 
 Theorem r_decomposed_2 :
   ∀ s, s = set_equiv
@@ -3574,174 +2174,6 @@ split.
 
    destruct i; contradiction.
 Qed.
-
-(*
-Theorem old_r_decomposed_2_a :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
-  → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [SS ạ; rot ạ (SS ạ⁻¹)].
-Proof.
-intros.
-eapply r_decomposed_2; eassumption.
-Qed.
-
-Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
-  ¬Forall2 R [] (x :: l).
-Proof.
-intros A B * H.
-inversion H.
-Qed.
-
-Theorem Forall2_cons_nil : ∀ A B (R : A → B → Prop) x l,
-  ¬Forall2 R (x :: l) [].
-Proof.
-intros A B * H.
-inversion H.
-Qed.
-
-Theorem Forall2_cons_cons : ∀ A B (R : A → B → Prop) x y l l',
-  Forall2 R (x :: l) (y :: l')
-  → R x y ∧ Forall2 R l l'.
-Proof.
-intros A B * H.
-inversion H; subst.
-split; assumption.
-Qed.
-
-Definition set_eq_list {A} (s := set_equiv) (El Fl : list (A → Prop)) :=
-  Forall2 set_eq El Fl.
-
-Theorem Forall2_eq_list {A} : ∀ (s := set_equiv) (El Fl : list (A → Prop)),
-  set_eq_list El Fl
-  → (∐ El = ∐ Fl)%S.
-Proof.
-intros s * Hs.
-revert Fl Hs.
-induction El as [| E El]; intros.
- destruct Fl as [| F Fl]; [ reflexivity | ].
- unfold set_eq_list in Hs.
- apply Forall2_nil_cons in Hs; contradiction.
-
- destruct Fl as [| F Fl].
-  unfold set_eq_list in Hs.
-  apply Forall2_cons_nil in Hs; contradiction.
-
-  intros p; simpl.
-  unfold set_eq_list in Hs.
-  apply Forall2_cons_cons in Hs.
-  destruct Hs as (HEF, Hall).
-  apply IHEl in Hall.
-  split; intros H.
-   destruct H as [H| H]; [ left; apply HEF, H | ].
-   right; apply Hall; assumption.
-
-   destruct H as [H| H]; [ left; apply HEF, H | ].
-   right; apply Hall; assumption.
-Qed.
-
-Theorem set_eq_list_nth {A} : ∀ (s := set_equiv) (El Fl : list (A → Prop)),
-  set_eq_list El Fl
-  → ∀ i, (El.[i] = Fl.[i])%S.
-Proof.
-intros s * Hs i.
-revert El Fl Hs.
-induction i; intros.
- destruct El as [| E El].
-  destruct Fl as [| F Fl]; [ | apply Forall2_nil_cons in Hs; contradiction ].
-  reflexivity.
-
-  destruct Fl as [| F Fl]; [ apply Forall2_cons_nil in Hs; contradiction | ].
-  apply Forall2_cons_cons in Hs; simpl.
-  unfold nth_set; simpl; intros x.
-  destruct Hs as (HEF, HEFL).
-  apply HEF.
-
- destruct El as [| E El].
-  destruct Fl as [| F Fl]; [ | apply Forall2_nil_cons in Hs; contradiction ].
-  reflexivity.
-
-  destruct Fl as [| F Fl]; [ apply Forall2_cons_nil in Hs; contradiction | ].
-  apply Forall2_cons_cons in Hs; simpl.
-  unfold nth_set; simpl; intros x.
-  destruct Hs as (HEF, HEFL).
-  apply IHi, HEFL.
-Qed.
-
-Theorem set_eq_list_sym {A} : ∀ (El Fl : list (A → Prop)),
-  set_eq_list El Fl
-  → set_eq_list Fl El.
-Proof.
-intros * Hs.
-revert Fl Hs.
-induction El as [| E El]; intros.
- destruct Fl as [| F Fl]; [ | apply Forall2_nil_cons in Hs; contradiction ].
- assumption.
-
- destruct Fl as [| F Fl]; [ apply Forall2_cons_nil in Hs; contradiction | ].
- apply Forall2_cons_cons in Hs; simpl.
- destruct Hs as (HEF, HEFL).
- constructor; [ split; apply HEF | ].
- apply IHEl, HEFL.
-Qed.
-
-Add Parametric Morphism {A} : (@union A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
-  as union_morph.
-Proof.
-intros E E' HE F F' HF.
-intros p.
-split.
- intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
- intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
-Qed.
-
-Add Parametric Morphism {A} : (@union A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
-  as union_iff_morph.
-Proof.
-intros E E' HE F F' HF.
-intros p.
-split.
- intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
- intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
-Qed.
-
-Add Parametric Morphism {A} : (@is_partition A set_equiv)
-  with signature @set_eq A set_equiv ==> set_eq_list ==> iff
-  as is_partition_morph.
-Proof.
-intros E F HEF El Fl HEFl.
-unfold is_partition.
-unfold set_eq in HEF; simpl in HEF.
-unfold set_eq; simpl.
-split; intros (H₁, H₂).
- split.
-  intros x.
-  apply Forall2_eq_list in HEFl.
-  split; intros HF; [ apply HEFl, H₁, HEF, HF | apply HEF, H₁, HEFl, HF ].
-
-  intros i j Hij x.
-  split; [ | intros H; contradiction ].
-  intros (HFi, HFj).
-  eapply H₂; [ eassumption | ].
-  split; eapply set_eq_list_nth; eassumption.
-
- apply set_eq_list_sym in HEFl.
- split.
-  intros x.
-  apply Forall2_eq_list in HEFl.
-  split; intros HF; [ apply HEFl, H₁, HEF, HF | apply HEF, H₁, HEFl, HF ].
-
-  intros i j Hij x.
-  split; [ | intros H; contradiction ].
-  intros (HFi, HFj).
-  eapply H₂; [ eassumption | ].
-  split; eapply set_eq_list_nth; try eassumption.
-Qed.
-*)
 
 Add Parametric Morphism {A} : (@List.nth (A → Prop))
   with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -3947,14 +2379,6 @@ split; intros (H₁, H₂).
  split; [ apply HE; assumption | apply HF; assumption ].
 Qed.
 
-(*
-Definition old_G :=
-  λ (g : (point → Prop) → (point → Prop)),
-  (∃ e, g = rot e) ∨
-  (∃ dx, g = xtransl dx) ∨
-  (∃ e dx, g = λ p, xtransl dx (rot e p)).
-*)
-
 Inductive G :=
   | Rot : free_elem → G
   | Xtransl : ℝ → G
@@ -4031,27 +2455,6 @@ eapply gr_subst in H; [ apply IHf1 in H; contradiction | ].
 split; [ apply IHf2 | intros; contradiction ].
 Qed.
 
-(*
-Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
-  (app_gr g (E₁ ⋂ E₂) = app_gr g E₁ ⋂ app_gr g E₂)%S.
-Proof.
-intros s *; subst s.
-revert E₁ E₂.
-induction g as [e| dx | g IHg h IHh ]; intros; simpl.
- intros p; split; intros H; assumption.
-
- intros (x, y, z); split; intros H; assumption.
-
- intros p.
- split.
-  intros H; apply IHg.
-  rewrite <- IHh; assumption.
-
-  intros H; apply IHg in H.
-  rewrite IHh; assumption.
-Qed.
-*)
-
 Theorem group_union_distr : ∀ (s := set_equiv) g E₁ E₂,
   (app_gr g (E₁ ⋃ E₂) = app_gr g E₁ ⋃ app_gr g E₂)%S.
 Proof.
@@ -4086,25 +2489,6 @@ intros p; split; intros H.
  apply group_union_distr.
  destruct H as [H| H]; [ left; assumption | right; apply IHPL; assumption ].
 Qed.
-
-(*
-Theorem old_group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
-  old_G g
-   → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
-Proof.
-intros s * HG; subst s; intros p.
-destruct HG as [(e, HG)| [(dx, HG)| (e & dx & HG)]].
- subst g; split; intros H; assumption.
-
- subst g; destruct p as (x, y, z).
- split; intros H; assumption.
-
- subst g; destruct p as (x, y, z); simpl.
- split; intros H; [ split; apply H | ].
- destruct H as (H₁ & H₂).
- split; [ apply H₁ | apply H₂ ].
-Qed.
-*)
 
 Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
   ∀ (F : point → Prop) P g,
@@ -4278,7 +2662,7 @@ Definition equidecomposable (s : set_model point) E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, app_gr g S₁ = S₂) P₁ P₂.
 
-Theorem Banach_Tarski_paradox :
+Theorem Banach_Tarski_paradox_but_fixpoints :
   equidecomposable set_equiv all_but_fixpoints
     (xtransl 3 all_but_fixpoints ⋃ xtransl 6 all_but_fixpoints)%S.
 Proof.
@@ -4338,4 +2722,4 @@ split.
   constructor.
 Qed.
 
-Check Banach_Tarski_paradox.
+Check Banach_Tarski_paradox_but_fixpoints.
