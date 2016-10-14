@@ -38,6 +38,7 @@ Theorem fold_right_cons {A B} : ∀ f (x : A) (y : B) l,
   fold_right f x (y :: l) = f y (fold_right f x l).
 Proof. reflexivity. Qed.
 
+(*
 Theorem Forall_inv2 : ∀ A (P : A → Prop) a l,
   List.Forall P (a :: l) → P a ∧ List.Forall P l.
 Proof.
@@ -53,6 +54,7 @@ Notation "∃ ! x .. y , p" :=
   (at level 200, x binder, right associativity,
    format "'[' ∃ ! '/ '  x .. y , '/ '  p ']'")
   : type_scope.
+*)
 
 (* Step 1 *)
 
@@ -64,7 +66,9 @@ Notation "∃ ! x .. y , p" :=
 Inductive letter := la | lb.
 
 Inductive free_elem := FE : letter → bool → free_elem.
+(*
 Record F2 := mkF₂ { str : list free_elem }.
+*)
 
 Notation "'ạ'" := (FE la false).
 Notation "'ạ⁻¹'" := (FE la true).
@@ -188,12 +192,14 @@ injection H.
 apply Bool.no_fixpoint_negb.
 Qed.
 
+(*
 Theorem not_letter_opp_diag : ∀ e, ¬ letter_opp e e.
 Proof.
 intros e H.
 apply letter_opp_negf in H; symmetry in H.
 revert H; apply no_fixpoint_negf.
 Qed.
+*)
 
 Theorem negf_involutive : ∀ e, negf (negf e) = e.
 Proof.
@@ -201,11 +207,13 @@ intros (t, d); simpl.
 rewrite Bool.negb_involutive; reflexivity.
 Qed.
 
+(*
 Theorem letter_opp_negf_l : ∀ e, letter_opp (negf e) e.
 Proof.
 intros.
 apply letter_opp_negf; reflexivity.
 Qed.
+*)
 
 Theorem letter_opp_negf_r : ∀ e, letter_opp e (negf e).
 Proof.
@@ -222,8 +230,10 @@ subst e₁.
 apply letter_opp_negf_r.
 Qed.
 
+(*
 Theorem negf_ạ : negf ạ = ạ⁻¹.
 Proof. reflexivity. Qed.
+*)
 
 Fixpoint norm_list el :=
   match el with
@@ -235,7 +245,9 @@ Fixpoint norm_list el :=
       end
   end.
 
+(*
 Definition norm s := mkF₂ (norm_list (str s)).
+*)
 
 Theorem norm_list_no_consec : ∀ e el el₁ el₂,
   norm_list el ≠ el₁ ++ e :: negf e :: el₂.
@@ -432,6 +444,7 @@ destruct el₂ as [| e₂].
   assumption.
 Qed.
 
+(*
 Theorem norm_list_cons_cons : ∀ e₁ e el el₁,
   norm_list el = e₁ :: el₁
   → e₁ ≠ negf e
@@ -450,8 +463,6 @@ Definition start_with x s :=
   | nil => False
   | e :: el => x = e
   end.
-
-Section Halte.
 
 Notation "s = '∅'" := (empty s) (at level 70).
 Notation "s ≠ '∅'" := (¬ empty s) (at level 70).
@@ -759,16 +770,20 @@ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
  f_equal.
  apply IHel; reflexivity.
 Qed.
+*)
 
 Require Import Reals Psatz Nsatz.
 
 Notation "'ℝ'" := R.
+(*
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
+*)
 
 Notation "'√'" := sqrt.
 
 (* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
+(*
 Arguments Nat.modulo _ _ : simpl nomatch.
 Arguments Z.mul _ _ : simpl nomatch.
 
@@ -846,6 +861,7 @@ assert (solve_1_var : ∀ a b c a' b' c' x y,
  setoid_rewrite determinant_comm.
  eapply solve_1_var; eassumption.
 Qed. 
+*)
 
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
   (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
@@ -857,9 +873,11 @@ rewrite Rmult_comm, Rmult_assoc; f_equal.
 apply sqrt_sqrt; assumption.
 Qed.
 
+(*
 Check decomposed_4.
 Check decomposed_2_a.
 Check decomposed_2_b.
+*)
 
 Inductive point := P : ℝ → ℝ → ℝ → point.
 Record matrix := mkmat
@@ -901,6 +919,7 @@ Definition rotate e pt := mat_vec_mul (mat_of_elem e) pt.
 
 Definition rev_path el := map negf (rev el).
 
+(*
 Definition rotate_param e '(a, b, c, N) :=
   match e with
   | ạ => ((3 * a)%Z, (b - 2 * c)%Z, (4 * b + c)%Z, S N)
@@ -908,6 +927,7 @@ Definition rotate_param e '(a, b, c, N) :=
   | ḅ => ((a - 4 * b)%Z, (b + 2 * a)%Z, (3 * c)%Z, S N)
   | ḅ⁻¹ => ((a + 4 * b)%Z, (b - 2 * a)%Z, (3 * c)%Z, S N)
   end.
+*)
 
 Definition mat_mul m₁ m₂ :=
   mkmat
@@ -927,6 +947,7 @@ Definition mat_id :=
     0 1 0
     0 0 1.
 
+(*
 Delimit Scope mat_scope with mat.
 Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
 
@@ -940,6 +961,7 @@ progress repeat rewrite Rplus_0_l.
 progress repeat rewrite Rplus_0_r.
 destruct m; reflexivity.
 Qed.
+*)
 
 Theorem negf_eq_eq : ∀ e₁ e₂, negf e₁ = negf e₂ → e₁ = e₂.
 Proof.
@@ -951,6 +973,7 @@ injection Hn; intros H₁ H₂; subst.
 apply negb_eq_eq in H₁; subst d₁; reflexivity.
 Qed.
 
+(*
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
   ↔ fold_right rotate (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
@@ -1118,6 +1141,7 @@ split.
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
 Qed.
+*)
 
 Theorem rot_rot_inv_x : ∀ pt,
   mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
@@ -1568,6 +1592,7 @@ destruct (norm_list_dec (el₁ ++ el₂)) as [H₁| H₁].
   reflexivity.
 Qed.
 
+(*
 Theorem rotate_prop : ∀ p t d el el₁ el₂ e a b c,
   t = lb ∧ p = (1, 0, 0, O)%Z ∨
   t = la ∧ p = (0, 0, 1, O)%Z
@@ -1886,6 +1911,7 @@ remember (rev_path el) as rp.
 replace el with (rev_path (rev_path el)) by apply rev_path_involutive.
 subst rp; apply norm_app_rev_path_path.
 Qed.
+*)
 
 Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.
 Proof.
@@ -1907,6 +1933,7 @@ destruct t, d; simpl.
  apply rot_inv_rot_z.
 Qed.
 
+(*
 Theorem app_rev_path_path : ∀ p el,
   fold_right rotate p (el ++ rev_path el) = p.
 Proof.
@@ -1916,6 +1943,7 @@ induction el as [| e]; intros; [ reflexivity | simpl ].
 rewrite rev_path_cons, app_assoc, fold_right_app.
 rewrite IHel; apply rotate_rotate_neg.
 Qed.
+*)
 
 Theorem app_path_rev_path : ∀ p el,
   fold_right rotate p (rev_path el ++ el) = p.
@@ -1937,6 +1965,7 @@ do 2 rewrite fold_right_app; simpl.
 rewrite rotate_rotate_neg; reflexivity.
 Qed.
 
+(*
 Theorem rotate_cancel_start : ∀ el e p,
   fold_right rotate p (e :: negf e :: el) =
   fold_right rotate p el.
@@ -1945,6 +1974,7 @@ intros.
 pose proof rotate_cancel_in [] el e p as H.
 apply H.
 Qed.
+*)
 
 Theorem rotate_rotate_norm : ∀ el p,
   fold_right rotate p el = fold_right rotate p (norm_list el).
@@ -1981,6 +2011,7 @@ destruct len.
     apply IHel₁; assumption.
 Qed.
 
+(*
 Theorem length_rev_path : ∀ el, length (rev_path el) = length el.
 Proof.
 intros el.
@@ -1988,6 +2019,7 @@ induction el as [| e]; [ reflexivity | simpl ].
 rewrite rev_path_cons, app_length; simpl.
 rewrite IHel, Nat.add_1_r; reflexivity.
 Qed.
+*)
 
 Theorem rotate_rev_path : ∀ el p₁ p₂,
   fold_right rotate p₁ el = p₂
@@ -2003,6 +2035,7 @@ rewrite rotate_neg_rotate.
 reflexivity.
 Qed.
 
+(*
 Theorem all_points_in_orbit_1_0_0_are_different :
   ∀ p₁ p₂ el₁ el₂ el'₁ el'₂ d₁ d₂,
   fold_right rotate (P 1 0 0) el₁ = p₁
@@ -2133,9 +2166,12 @@ assert (Hp : fold_right rotate (P 1 0 0) (rev_path el₂ ++ el₁) = P 1 0 0).
      * etransitivity; eapply Nat.lt_succ_diag_r.
      * rewrite app_length, length_rev_path; assumption.
 Qed.
+*)
 
 Definition on_sphere_ray r '(P x y z) := (x² + y² + z² = r)%R.
+(*
 Definition on_sphere '(P x y z) := (x² + y² + z² = 1)%R.
+*)
 
 Definition mat_transp m :=
   mkmat 
@@ -2148,6 +2184,7 @@ Definition mat_det m :=
    a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
    a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%R.
 
+(*
 Arguments mat_det m%mat.
 
 Theorem mat_transp_mul : ∀ m₁ m₂,
@@ -2170,6 +2207,7 @@ Proof.
 intros m₁ m₂.
 unfold mat_det; simpl; ring.
 Qed.
+*)
 
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
@@ -2246,6 +2284,7 @@ intros (t, d); destruct t, d.
  apply rot_z_is_rotation_matrix.
 Qed.
 
+(*
 Theorem path_is_rotation : ∀ el m,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
   → is_rotation_matrix m.
@@ -2344,6 +2383,7 @@ destruct e as (t, d); destruct t.
  pose proof Hn (P 1 0 0) as H; revert H.
  destruct d; eapply rotate_1_0_0_is_diff; try eassumption; reflexivity.
 Qed.
+*)
 
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
@@ -2406,6 +2446,7 @@ assert (He : equiv _ R).
   right; assumption.
 Qed.
 
+(*
 Theorem same_choice_in_same_orbit : ∃ f : point → point,
   (∀ x, same_orbit x (f x)) ∧
   (∀ x y, same_orbit x y ↔ f x = f y).
@@ -2441,10 +2482,12 @@ exists f; split.
  etransitivity; [ eassumption | ].
  symmetry; apply Hxfx.
 Qed.
+*)
 
 Definition not_in_fixpoints p :=
   ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
 
+(*
 Theorem same_orbit_imp_representant : ∀ f p p₁ el₁,
   (∀ p₁ p₂ : point, same_orbit p₁ p₂ → f p₁ = f p₂)
   → (∀ p : point, same_orbit p (f p))
@@ -2460,6 +2503,7 @@ rewrite <- Hp₁, <- fold_right_app in Hr.
 rewrite H₁; apply Hoe.
 exists (el₁ ++ el₃); assumption.
 Qed.
+*)
 
 Theorem not_in_fixpoints_one_path : ∀ f p e₁ e₂ el el₂ el₁ el₃,
   not_in_fixpoints p
@@ -2489,6 +2533,7 @@ apply norm_list_app_is_nil in H.
  rewrite norm_list_idemp; reflexivity.
 Qed.
 
+(*
 Theorem not_in_fixpoints_one_path2 : ∀ p e e₁ el₄ el₁ el el₃,
   not_in_fixpoints p
   → fold_right rotate p (el ++ rev_path (e :: el₄)) = p
@@ -2519,6 +2564,7 @@ apply norm_list_app_is_nil in H.
  rewrite <- rev_path_norm_list; f_equal.
  eapply norm_list_is_cons; eassumption.
 Qed.
+*)
 
 Theorem Req_dec : ∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R }.
 Proof.
@@ -2675,7 +2721,7 @@ Notation "a = b" := (set_eq a b) : set_scope.
 Notation "'∅'" := (empty_set) : set_scope.
 Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
 Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50, left associativity)
-: set_scope.
+  : set_scope.
 Notation "E₁ '\' E₂" := (subtract E₁ E₂) (at level 50) : set_scope.
 Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60) : set_scope.
 Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
@@ -2726,12 +2772,14 @@ split; intros H; [ | left; assumption ].
 destruct H as [H| H]; [ assumption | contradiction ].
 Qed.
 
+(*
 Theorem union_comm : ∀ A s, s = set_equiv → ∀ (E F : A → Prop),
   (E ⋃ F = F ⋃ E)%S.
 Proof.
 intros * Hs E *; subst s; intros x.
 apply or_comm.
 Qed.
+*)
 
 Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : A → Prop),
   (E ⋃ (F ⋃ G) = (E ⋃ F) ⋃ G)%S.
@@ -3050,7 +3098,9 @@ Definition SS {os : sel_model} e := λ p,
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
 
+(*
 Let s := @set_equiv point.
+*)
 
 Definition on_orbit_by_seq_of e {os : sel_model} p :=
   ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p.
@@ -3186,7 +3236,6 @@ assert (Hr : f p = f (rotate (negf e) p)).
  rewrite H, Hn in Hnr.
  revert Hnr; apply norm_list_no_start2.
 Qed.
-
 
 Theorem decompose_2a_contrad_case :
   ∀ f, orbit_selector f
@@ -3376,12 +3425,14 @@ split.
      destruct i; contradiction.
 Qed.
 
+(*
 Theorem os_fun_idemp : ∀ f, orbit_selector f → ∀ p, f (f p) = f p.
 Proof.
 intros f Hos p.
 destruct Hos as (Hso & Ho).
 apply Hso; symmetry; apply Ho.
 Qed.
+*)
 
 Theorem r_decomposed_4 :
   ∀ s, s = set_equiv
@@ -3404,6 +3455,7 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
  intros p; apply EM.
 Qed.
 
+(*
 Theorem old_r_decomposed_4 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
@@ -3414,6 +3466,7 @@ intros s Hs f HoeHo os Hos.
 pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
 eapply is_partition_group_first_2_together; eassumption.
 Qed.
+*)
 
 Theorem r_decomposed_2 :
   ∀ s, s = set_equiv
@@ -3522,6 +3575,7 @@ split.
    destruct i; contradiction.
 Qed.
 
+(*
 Theorem old_r_decomposed_2_a :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
@@ -3687,6 +3741,7 @@ split; intros (H₁, H₂).
   eapply H₂; [ eassumption | ].
   split; eapply set_eq_list_nth; try eassumption.
 Qed.
+*)
 
 Add Parametric Morphism {A} : (@List.nth (A → Prop))
   with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -3892,11 +3947,13 @@ split; intros (H₁, H₂).
  split; [ apply HE; assumption | apply HF; assumption ].
 Qed.
 
+(*
 Definition old_G :=
   λ (g : (point → Prop) → (point → Prop)),
   (∃ e, g = rot e) ∨
   (∃ dx, g = xtransl dx) ∨
   (∃ e dx, g = λ p, xtransl dx (rot e p)).
+*)
 
 Inductive G :=
   | Rot : free_elem → G
@@ -3974,6 +4031,7 @@ eapply gr_subst in H; [ apply IHf1 in H; contradiction | ].
 split; [ apply IHf2 | intros; contradiction ].
 Qed.
 
+(*
 Theorem group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
   (app_gr g (E₁ ⋂ E₂) = app_gr g E₁ ⋂ app_gr g E₂)%S.
 Proof.
@@ -3992,6 +4050,7 @@ induction g as [e| dx | g IHg h IHh ]; intros; simpl.
   intros H; apply IHg in H.
   rewrite IHh; assumption.
 Qed.
+*)
 
 Theorem group_union_distr : ∀ (s := set_equiv) g E₁ E₂,
   (app_gr g (E₁ ⋃ E₂) = app_gr g E₁ ⋃ app_gr g E₂)%S.
@@ -4028,6 +4087,7 @@ intros p; split; intros H.
  destruct H as [H| H]; [ left; assumption | right; apply IHPL; assumption ].
 Qed.
 
+(*
 Theorem old_group_inter_distr : ∀ (s := set_equiv) g E₁ E₂,
   old_G g
    → (g (E₁ ⋂ E₂) = g E₁ ⋂ g E₂)%S.
@@ -4044,6 +4104,7 @@ destruct HG as [(e, HG)| [(dx, HG)| (e & dx & HG)]].
  destruct H as (H₁ & H₂).
  split; [ apply H₁ | apply H₂ ].
 Qed.
+*)
 
 Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
   ∀ (F : point → Prop) P g,
