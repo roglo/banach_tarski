@@ -4264,7 +4264,7 @@ Definition equidecomposable (s : set_model point) E₁ E₂ :=
 
 Theorem Banach_Tarski_paradox :
   equidecomposable set_equiv all_but_fixpoints
-    (union (xtransl 3 all_but_fixpoints) (xtransl 6 all_but_fixpoints)).
+    (xtransl 3 all_but_fixpoints ⋃ xtransl 6 all_but_fixpoints)%S.
 Proof.
 set (s := set_equiv).
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
