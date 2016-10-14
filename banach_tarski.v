@@ -3752,46 +3752,22 @@ split.
        unfold on_orbit_by_seq_of in Hoo |-*.
        remember S as g;
        subst os; simpl in Hoo |-*; subst g.
-       rewrite Hfr in Hoo.
-simpl in Hoo.
-apply f_equal with (f := rotate (FE la false)) in Hoo.
-do 2 rewrite rotate_rotate_neg in Hoo.
-
-bbb.
-
-replace (repeat ạ⁻¹ (S n)) with (repeat ạ⁻¹ n ++ [ạ⁻¹]) in Hoo.
-rewrite fold_right_app in Hoo.
-
-bbb.
-       split; [ assumption | exfalso ].
-       destruct H as (Haf & Hoo); simpl in Hoo.
-       unfold on_orbit_by_seq_of in Hoo.
-       destruct Hoo as (n, Hoo); subst os; simpl in Hoo.
-       rewrite Hfr in Hoo.
+       rewrite Hfr in Hoo; simpl in Hoo.
        apply f_equal with (f := rotate (FE la false)) in Hoo.
        do 2 rewrite rotate_rotate_neg in Hoo.
-       destruct n.
-        simpl in Hoo.
-        rewrite rotate_rotate_norm, Hel₁ in Hel.
-        simpl in Hel.
-        destruct el₁ as [| e₁].
-         simpl in Hel.
-         rewrite Hoo in Hel.
-         revert Hel.
-         destruct Hnf as (His, Hon).
-         unfold orbit_has_no_fixpoint in Hon.
-         pose proof Hon (ạ⁻¹ :: []) p (same_orbit_refl _) as H₁.
-         apply H₁.
-         intros H; discriminate H.
-bbb.
-
-exists (S n); simpl.
-       rewrite Hfr in Hoo; assumption.
+       destruct n; [ | exists n; assumption ].
+       simpl in Hoo.
+       rewrite Hoo in Hel.
+       destruct Hnf as (His & Hoh).
+       unfold orbit_has_no_fixpoint in Hoh.
+       exfalso; revert Hel.
+       apply Hoh; [ reflexivity | ].
+       rewrite Hel₁; intros H; discriminate H.
 
       left; left; right.
       split; [ assumption | ].
-      exists el, el₁.
-      subst os; split; assumption.
+      exists el, el₁; subst os.
+      split; assumption.
 
      right; left.
      split; simpl.
@@ -3807,9 +3783,20 @@ exists (S n); simpl.
 
       intros (Hnf₂, Hoo).
       subst os; simpl in Hoo.
+      unfold on_orbit_by_seq_of in Hoo; simpl in Hoo.
       rewrite Hfr in Hoo.
-      unfold on_orbit_by_seq_of in Hoo.
       destruct Hoo as (n, Hr).
+      apply f_equal with (f := rotate (FE la false)) in Hr.
+      do 2 rewrite rotate_rotate_neg in Hr.
+      destruct n.
+       simpl in Hr; rewrite Hr in Hel.
+       destruct Hnf as (His, Hoh).
+       revert Hel; apply Hoh; [ reflexivity | ].
+       rewrite Hel₁; intros H; discriminate H.
+
+       simpl.
+
+bbb.
       rewrite os_fun_idemp in Hr; [ | split; assumption ].
       unfold all_but_fixpoints in Hnf.
       destruct Hnf as (Hns, Hon).
