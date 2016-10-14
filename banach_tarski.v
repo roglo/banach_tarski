@@ -3747,7 +3747,21 @@ split.
         split; [ | simpl; f_equal; assumption ].
         simpl; rewrite Hel₁; reflexivity.
 
-       intros H; apply HB; clear HB.
+       simpl; intros (Haf & n & Hoo); apply HB; clear HB.
+       split; [ assumption | ].
+       unfold on_orbit_by_seq_of in Hoo |-*.
+       remember S as g;
+       subst os; simpl in Hoo |-*; subst g.
+       rewrite Hfr in Hoo.
+simpl in Hoo.
+apply f_equal with (f := rotate (FE la false)) in Hoo.
+do 2 rewrite rotate_rotate_neg in Hoo.
+
+bbb.
+
+replace (repeat ạ⁻¹ (S n)) with (repeat ạ⁻¹ n ++ [ạ⁻¹]) in Hoo.
+rewrite fold_right_app in Hoo.
+
 bbb.
        split; [ assumption | exfalso ].
        destruct H as (Haf & Hoo); simpl in Hoo.
