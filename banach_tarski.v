@@ -3716,6 +3716,7 @@ split.
 *intros p.
  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
   apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
+
   split.
   -intros Hnf.
    unfold union_list; simpl; unfold union.
@@ -3725,42 +3726,9 @@ split.
    remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
    destruct el₁ as [| e₁].
     +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
-    clear Hel₁.
-    right; left.
-    unfold rot, SS.
-    split.
-     split.
-      destruct Hnf as (His, Hnf).
-      split; [ apply in_sphere_after_rotate; assumption | ].
-      apply no_fixpoint_after_rotate; assumption.
-
-      subst os; simpl.
-      rewrite Hfr, Hel.
-      exists (ạ⁻¹ :: []), [].
-      split; reflexivity.
-
-     unfold B; simpl.
-     intros (Haf, Hoo).
-     destruct Hoo as (n & Hoo).
-     remember fold_right as g; remember S as h.
-     subst os; simpl in Hoo; subst g h.
-     rewrite Hfr, Hel in Hoo.
-bbb.
-
-destruct Haf as (His, Haf).
-pose proof Haf (repeat ạ⁻¹ n) (rotate ạ⁻¹ p) (same_orbit_refl _).
-as H; simpl in H.
-apply f_equal with (f := rotate (FE la false)) in Hoo.
-simpl in Hoo.
-do 2 rewrite rotate_rotate_neg in Hoo.
-revert Hoo; apply Hnf; [ reflexivity | ].
-     rewrite norm_list_repeat; intros H.
-
-; discriminate H.
-
-     destruct Hnf as (His, Hnf).
-     exfalso; revert Hoo; apply Hnf; [ reflexivity | ].
-     rewrite norm_list_repeat; intros H; discriminate H.
+    clear el Hel₁.
+    left; left; left.
+    split; [ assumption | subst os; symmetry; assumption ].
 
     +destruct e₁ as (t, d); destruct t.
      destruct d.
@@ -3780,8 +3748,22 @@ revert Hoo; apply Hnf; [ reflexivity | ].
         simpl; rewrite Hel₁; reflexivity.
 
        intros H; apply HB; clear HB.
-       split; [ assumption | subst os; simpl ].
+       split; [ assumption | exfalso ].
        destruct H as (Haf & Hoo); simpl in Hoo.
+unfold on_orbit_by_seq_of in Hoo.
+destruct Hoo as (n, Hoo); subst os; simpl in Hoo.
+rewrite Hfr in Hoo.
+
+apply f_equal with (f := rotate (FE la false)) in Hoo.
+do 2 rewrite rotate_rotate_neg in Hoo.
+destruct n.
+simpl in Hoo.
+rewrite rotate_rotate_norm, Hel₁ in Hel.
+simpl in Hel.
+
+bbb.
+
+exists (S n); simpl.
        rewrite Hfr in Hoo; assumption.
 
       left; left; right.
