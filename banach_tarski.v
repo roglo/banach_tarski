@@ -3217,6 +3217,38 @@ assert (Hr : f p = f (rotate (negf e) p)).
  revert Hnr; apply norm_list_no_start2.
 Qed.
 
+
+Theorem decompose_2a_contrad_case :
+  ∀ f, orbit_selector f
+  → ∀ os, os = mkos _ f
+  → ∀ p, (EE ⋃ SS ạ ⋃ B)%S p
+  → rot ạ (SS ạ⁻¹ \ B)%S p
+  → False.
+Proof.
+intros * (Hoe, Ho) * Hos * Hi Hj.
+ assert (Hfr : f (rotate ạ⁻¹ p) = f p).
+  apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
+
+   destruct Hj as (Hs & Hb); simpl in Hs, Hb; apply Hb; clear Hb.
+   split; [ destruct Hs; assumption | ].
+   destruct Hi as [[Hi| Hi] | Hi].
+    destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
+    destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
+    exists O; simpl.
+    rewrite Hfr, <- Hp; reflexivity.
+
+    eapply not_start_with_rot in Hi; try eassumption; [ contradiction | ].
+    split; assumption.
+
+    destruct Hi as (Hnf, Hoo).
+    destruct Hoo as (n, Hoo).
+    unfold on_orbit_by_seq_of.
+    remember S as g; subst os; simpl in Hoo; simpl; subst g.
+    rewrite Hfr; simpl.
+    exists (S n).
+    rewrite Hoo; reflexivity.
+Qed.
+
 Theorem r_decomposed_5 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
@@ -3855,36 +3887,15 @@ split.
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
-   destruct Hj as (Hs & Hb); simpl in Hs, Hb; apply Hb; clear Hb.
-   split; [ destruct Hs; assumption | ].
-   destruct Hi as [[Hi| Hi] | Hi].
-    destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
-    destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
-    exists O; simpl.
-    rewrite Hfr, <- Hp; reflexivity.
+   eapply decompose_2a_contrad_case; try eassumption; split; assumption.
 
-    eapply not_start_with_rot in Hi; try eassumption; [ contradiction | ].
-    split; assumption.
-bbb.
+   destruct i; [ simpl in Hi | destruct i; contradiction ].
+   destruct j.
+    eapply decompose_2a_contrad_case; try eassumption; split; assumption.
 
     destruct j; [ apply Hij; reflexivity | clear Hij ].
     destruct j; contradiction.
-
-   destruct i; contradiction.
-bbb.
-
-set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
-set (A₂ := rot ạ (SS ạ⁻¹ \ B)%S).
-set (A'₂ := (rot ạ (SS ạ⁻¹) \ B)%S).
-assert (HAA : A₂ = A'₂).
-Focus 2.
- rewrite HAA.
- subst A₁ A₂ A'₂ s.
- apply is_partition_union_subtract; [ reflexivity | | | intros p; apply EM ].
-
-Check r_decomposed_2.
-
-bbb.
+Qed.
 
 Theorem r_decomposed_2_b :
   ∀ s, s = set_equiv
@@ -4246,126 +4257,6 @@ split.
    simpl in Hj; simpl.
    apply IHj; assumption.
 Qed.
-
-(*
-Theorem old_partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
-  ∀ (F : point → Prop) P g,
-  old_G g → is_partition F P → is_partition (g F) (map g P).
-Proof.
-intros s f Ho F P * HG HP.
-unfold is_partition in HP |-*.
-destruct HP as (HF, HP).
-split.
- destruct HG as [(e, HG)| [(dx, Hg)| (e & dx & HG)]].
-  subst g.
-  unfold set_eq; subst s; simpl.
-  intros x.
-  split.
-   intros He.
-   revert F HF He.
-   induction P as [| Q P]; intros; [ exfalso; eapply HF; eassumption | ].
-   simpl in HF; simpl.
-   generalize He; intros H.
-   apply HF in H; simpl in H.
-   destruct H as [H| H]; [ left; assumption | right ].
-   eapply IHP; [ | simpl; reflexivity | eassumption ].
-   intros i j Hij.
-   unfold set_eq; simpl; intros y.
-   assert (HSij : S i ≠ S j).
-    intros HSij; apply Hij, Nat.succ_inj; assumption.
-
-    pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
-    destruct HP as (HQ, _).
-    split; [ intros (HPi, HPj) | contradiction ].
-    apply HQ; split; assumption.
-
-   intros Hme.
-   revert F HF.
-   induction P as [| Q P]; intros; [ contradiction | ].
-   simpl in HF, Hme; apply HF.
-   destruct Hme as [Hme| Hme]; [ left; assumption | ].
-   right; simpl.
-   apply IHP; [ | assumption | intros y; split; intros H; apply H ].
-   intros i j Hij y.
-   assert (HSij : S i ≠ S j).
-    intros HSij; apply Hij, Nat.succ_inj; assumption.
-
-    pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
-    destruct HP as (HQ, _).
-    split; [ intros (HPi, HPj) | contradiction ].
-    apply HQ; split; assumption.
-
-  subst g.
-  unfold set_eq; subst s; simpl.
-  intros (x, y, z).
-  split.
-   intros Hp.
-   revert F HF Hp.
-   induction P as [| Q P]; intros.
-    unfold set_eq in HF; simpl in HF.
-    apply HF in Hp; contradiction.
-
-    simpl in HF; simpl.
-    generalize Hp; intros H.
-    apply HF in H; simpl in H.
-    destruct H as [H| H]; [ left; assumption | right ].
-    eapply IHP; [ | simpl; reflexivity | eassumption ].
-    intros i j Hij.
-    unfold set_eq; simpl; intros q.
-    assert (HSij : S i ≠ S j).
-     intros HSij; apply Hij, Nat.succ_inj; assumption.
-
-     pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
-     destruct HP as (HQ, _).
-     split; [ intros (HPi, HPj) | contradiction ].
-     apply HQ; split; assumption.
-
-   intros Hme.
-   revert F HF.
-   induction P as [| Q P]; intros; [ contradiction | ].
-   simpl in HF, Hme; apply HF.
-   destruct Hme as [Hme| Hme]; [ left; assumption | ].
-   right; simpl.
-   apply IHP; [ | assumption | intros q; split; intros H; apply H ].
-   intros i j Hij q.
-   assert (HSij : S i ≠ S j).
-    intros HSij; apply Hij, Nat.succ_inj; assumption.
-
-    pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
-    destruct HP as (HQ, _).
-    split; [ intros (HPi, HPj) | contradiction ].
-    apply HQ; split; assumption.
-
-  subst g.
-bbb.
-
- intros i j Hij.
- clear F HF.
- unfold nth_set.
- assert (He : (empty_set = g empty_set)%S).
-  destruct HG as [(e, HG)| (dx, HG)]; [ subst g s; reflexivity | ].
-  subst g s; intros p; destruct p as (x, y, z); simpl.
-  split; [ contradiction | intros H; contradiction ].
-
-  subst s.
-  rewrite He at 1 2.
-  do 2 rewrite map_nth.
-  symmetry.
-  etransitivity; [ | eapply group_inter_distr; try reflexivity; eassumption ].
-  symmetry.
-  pose proof HP i j Hij as H.
-  unfold nth_set in H.
-  unfold set_eq in H |-*.
-  simpl in H |-*.
-  intros p.
-  split; [ | contradiction ].
-  intros Hg; apply He.
-  destruct HG as [(e, HG)| (dx, HG)]; [ subst g; apply H, Hg | ].
-  subst g; destruct p as (x, y, z).
-  unfold xtransl in Hg.
-  apply H, Hg.
-Qed.
-*)
 
 Definition equidecomposable (s : set_model point) E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
