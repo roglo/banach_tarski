@@ -3705,6 +3705,22 @@ induction l as [| y]; intros; [ destruct i; apply Hab | ].
 destruct i; simpl; [ reflexivity | apply IHl ].
 Qed.
 
+Theorem app_repeat_diag : ∀ A (e : A) n,
+  repeat e n ++ (e :: []) = e :: repeat e n.
+Proof.
+intros.
+induction n; [ reflexivity | ].
+simpl; rewrite IHn; reflexivity.
+Qed.
+
+Theorem rev_path_repeat : ∀ e n, rev_path (repeat e n) = repeat (negf e) n.
+Proof.
+intros e n.
+induction n; [ reflexivity | simpl ].
+rewrite rev_path_cons, rev_path_single, IHn.
+apply app_repeat_diag.
+Qed.
+
 Theorem r_decomposed_2_a :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
@@ -3794,14 +3810,29 @@ split.
        revert Hel; apply Hoh; [ reflexivity | ].
        rewrite Hel₁; intros H; discriminate H.
 
-       simpl.
+       apply rotate_rev_path in Hr.
+       rewrite <- Hr, <- fold_right_app in Hel.
+       destruct Hnf as (His, Hoh).
+       revert Hel.
+       apply Hoh; [ reflexivity | ].
+       replace el with ([] ++ el) by reflexivity.
+       rewrite <- app_assoc, <- is_normal, Hel₁, app_nil_l.
+       rewrite rev_path_repeat.
+       remember norm_list as g; remember S as h; simpl; subst g h.
+       rewrite cons_to_app, app_assoc.
+       intros H.
+       eapply norm_list_app_is_nil in H.
+        simpl in H.
+        apply f_equal with (f := rev_path) in H.
+        rewrite rev_path_involutive in H.
+        rewrite <- app_repeat_diag in H.
+        rewrite rev_path_app in H; simpl in H.
+        discriminate H.
 
-bbb.
-      rewrite os_fun_idemp in Hr; [ | split; assumption ].
-      unfold all_but_fixpoints in Hnf.
-      destruct Hnf as (Hns, Hon).
-      revert Hr; apply Hon; [ apply Ho | ].
-      rewrite norm_list_repeat; intros H; discriminate H.
+        unfold app; rewrite <- Hel₁; symmetry.
+        apply norm_list_idemp.
+
+        symmetry; apply norm_list_repeat.
 
  -intros HE.
   simpl in HE.
@@ -3824,6 +3855,7 @@ bbb.
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
+bbb.
 -
    destruct Hj as (Hs & Hb).
    destruct Hi as [[Hi| Hi] | Hi].
