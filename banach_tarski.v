@@ -2856,6 +2856,15 @@ split.
     split; [ assumption | ].
     exists el, 1%R.
     split; [ assumption | ].
+    remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
+    unfold rotation_fixpoint.
+    progress repeat rewrite Rmult_1_l.
+    remember (√((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+    rename Heqr into Hr.
+    destruct p₁ as (x₁, y₁, z₁).
+    unfold rotate in H.
+    f_equal.
+Inspect 1.
 bbb.
 
 Focus 2.
