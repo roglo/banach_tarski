@@ -2779,14 +2779,16 @@ Definition rotation_fixpoint (m : matrix) k :=
   let r := √ (x² + y² + z²) in
   P (k * x / r) (k * y / r) (k * z / r).
 
-Definition sphere_fixpoints : point → Prop :=
+Definition sphere_fixpoint : point → Prop :=
   λ p, ∃ el k,
   norm_list el ≠ [] ∧
-  (k <= 1)%R ∧
   p = rotation_fixpoint (fold_right mat_mul mat_id (map mat_of_elem el)) k.
 
+Definition orbit_has_fixpoint : point → Prop :=
+  λ p, ∃ p', same_orbit p p' ∧ sphere_fixpoint p'.
+
 Definition sphere_points_in_orbits_having_fixpoint : point → Prop :=
-  λ p, ∃ p', same_orbit p p' ∧ sphere_fixpoints p'.
+  λ p, sphere p ∧ orbit_has_fixpoint p.
 
 Theorem sphere_partition_by_fixpoints :
   let s := set_equiv in
@@ -2799,6 +2801,8 @@ split.
  -unfold set_eq, union_list; subst s; simpl; intros p.
  split.
   +intros Hs; rewrite union_empty_r; [ | reflexivity ].
+  unfold sphere_but_fixpoints, sphere_points_in_orbits_having_fixpoint.
+  unfold union.
 bbb.
 
 Theorem Banach_Tarski_paradox :
