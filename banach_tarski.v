@@ -2834,9 +2834,9 @@ Theorem sphere_partition_by_fixpoints :
 Proof.
 intros s.
 split.
- -unfold set_eq, union_list; subst s; simpl; intros p.
+ unfold set_eq, union_list; subst s; simpl; intros p.
  split.
-  +intros Hs; rewrite union_empty_r; [ | reflexivity ].
+  intros Hs; rewrite union_empty_r; [ | reflexivity ].
   unfold sphere_but_fixpoints, sphere_points_in_orbits_having_fixpoint.
   unfold union.
   destruct (EM (orbit_has_fixpoint p)) as [Hoh| Hoh].
@@ -2856,7 +2856,12 @@ split.
     split; [ assumption | ].
     exists el, 1%R.
     split; [ assumption | ].
-Inspect 1.
+bbb.
+
+Focus 2.
+  intros [(H, _) | [(H, _)| H]]; [ assumption | assumption | contradiction ].
+
+
 bbb.
 
 Theorem Banach_Tarski_paradox :
