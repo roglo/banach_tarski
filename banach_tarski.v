@@ -2742,4 +2742,6 @@ exists
   (map (xtransl 3) [A₁; rot ạ A₂] ++
    map (xtransl 6) [A₃; rot ḅ A₄]); simpl.
 split.
+ subst A₁ A₂ A₃ A₄.
+
 bbb.
