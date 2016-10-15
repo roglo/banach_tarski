@@ -2742,6 +2742,28 @@ Qed.
 
 Check Banach_Tarski_paradox_but_fixpoints.
 
+(* sources:
+   - wikipedia "rotation matrix"
+   - http://www.euclideanspace.com/maths/geometry/rotations/
+       conversions/matrixToAngle
+   does not work if the rotation is 0 or π; but it cannot
+   happen in our case *)
+Definition rotation_fixpoint (m : matrix) k :=
+  let x := (a₃₂ m - a₂₃ m)%R in
+  let y := (a₁₃ m - a₃₁ m)%R in
+  let z := (a₂₁ m - a₁₂ m)%R in
+  let r := √ (x² + y² + z²) in
+  P (k * x / r) (k * y / r) (k * z / r).
+
+Definition sphere_fixpoint : point → Prop :=
+  λ p, ∃ el k,
+  norm_list el ≠ [] ∧
+  (k <= 1)%R ∧
+  p = rotation_fixpoint (fold_right mat_mul mat_id (map mat_of_elem el)) k.
+
+Definition sphere_points_in_orbits_having_fixpoint : point → Prop :=
+  λ p, ∃ p', same_orbit p p' ∧ sphere_fixpoint p'.
+
 Theorem Banach_Tarski_paradox :
   equidecomposable set_equiv sphere (xtransl 3 sphere ⋃ xtransl 6 sphere)%S.
 Proof.
