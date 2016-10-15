@@ -2803,6 +2803,22 @@ split.
   +intros Hs; rewrite union_empty_r; [ | reflexivity ].
   unfold sphere_but_fixpoints, sphere_points_in_orbits_having_fixpoint.
   unfold union.
+  destruct (EM (orbit_has_fixpoint p)) as [Hoh| Hoh].
+   right; split; assumption.
+
+   left; split; [ assumption | ].
+   unfold orbit_has_fixpoint in Hoh.
+   unfold orbit_has_no_fixpoint.
+   intros * Hso Hn.
+   assert (H : ∀ p', not (same_orbit p p' ∧ sphere_fixpoint p')).
+    intros p' H; apply Hoh.
+    exists p'; assumption.
+
+    clear Hoh; rename H into Hoh.
+    pose proof Hoh p₁ as Hp.
+    intros H; apply Hp; clear Hp.
+    split; [ assumption | ].
+    unfold sphere_fixpoint.
 bbb.
 
 Theorem Banach_Tarski_paradox :
