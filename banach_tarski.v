@@ -1262,7 +1262,7 @@ Definition orbit_has_no_fixpoint p :=
   ∀ el p₁, same_orbit p p₁
   → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
 
-Definition all_but_fixpoints p := sphere p ∧ orbit_has_no_fixpoint p.
+Definition sphere_but_fixpoints p := sphere p ∧ orbit_has_no_fixpoint p.
 
 Theorem on_sphere_ray_after_rotation : ∀ p m r,
   on_sphere_ray r p
@@ -1744,9 +1744,9 @@ Class sel_model {A} := mkos
   { os_fun : A → A }.
 
 Definition EE {os : sel_model} :=
-  λ p, all_but_fixpoints p ∧ p = os_fun p.
+  λ p, sphere_but_fixpoints p ∧ p = os_fun p.
 Definition SS {os : sel_model} e := λ p,
-  all_but_fixpoints p ∧
+  sphere_but_fixpoints p ∧
   ∃ el el₁,
   norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
 
@@ -1754,7 +1754,7 @@ Definition on_orbit_by_seq_of e {os : sel_model} p :=
   ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p.
 
 Definition B {os : sel_model} := λ p,
-  all_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
+  sphere_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
 
 Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
 Definition xtransl dx (E : point → Prop) '(P x y z) := E (P (x - dx) y z).
@@ -1916,7 +1916,7 @@ Theorem r_decomposed_5 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+  → is_partition sphere_but_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst os s.
 split.
@@ -2073,7 +2073,7 @@ Theorem r_decomposed_4 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints
+  → is_partition sphere_but_fixpoints
       [(EE ⋃ SS ạ ⋃ B)%S; (SS ạ⁻¹ \ B)%S; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros s Hs f HoeHo os Hos.
@@ -2095,7 +2095,7 @@ Theorem r_decomposed_2 :
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → ∀ e,
-    is_partition all_but_fixpoints [SS e; rot e (SS (negf e))].
+    is_partition sphere_but_fixpoints [SS e; rot e (SS (negf e))].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos e; subst os s.
 split.
@@ -2219,7 +2219,7 @@ Theorem r_decomposed_2_a :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
+  → is_partition sphere_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst s.
 split.
@@ -2363,7 +2363,7 @@ Theorem r_decomposed_2_b :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition all_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
+  → is_partition sphere_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
 Proof.
 intros.
 eapply r_decomposed_2; eassumption.
@@ -2681,8 +2681,8 @@ Definition equidecomposable (s : set_model point) E₁ E₂ :=
   List.Forall2 (λ S₁ S₂, ∃ g, app_gr g S₁ = S₂) P₁ P₂.
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
-  equidecomposable set_equiv all_but_fixpoints
-    (xtransl 3 all_but_fixpoints ⋃ xtransl 6 all_but_fixpoints)%S.
+  equidecomposable set_equiv sphere_but_fixpoints
+    (xtransl 3 sphere_but_fixpoints ⋃ xtransl 6 sphere_but_fixpoints)%S.
 Proof.
 set (s := set_equiv).
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
