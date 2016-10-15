@@ -796,6 +796,12 @@ Notation "'ℕ'" := nat.
 
 Notation "'√'" := sqrt.
 
+Theorem fold_Rsqr : ∀ a, (a * a = a²)%R.
+Proof. reflexivity. Qed.
+
+Theorem Rmul_div : ∀ x y z, (x * y / z = x / z * y)%R.
+Proof. intros; lra. Qed.
+
 Theorem Req_dec : ∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R }.
 Proof.
 intros x y.
@@ -2790,6 +2796,36 @@ Definition orbit_has_fixpoint : point → Prop :=
 Definition sphere_points_in_orbits_having_fixpoint : point → Prop :=
   λ p, sphere p ∧ orbit_has_fixpoint p.
 
+Theorem matrix_fixpoint_ok : ∀ m p k,
+  is_rotation_matrix m
+  → p = rotation_fixpoint m k
+  → mat_vec_mul m p = p.
+Proof.
+intros m p k Hrm Hn.
+subst p.
+unfold rotation_fixpoint.
+remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+setoid_rewrite Rmul_div.
+remember (k / r)%R as kr.
+unfold is_rotation_matrix in Hrm.
+destruct Hrm as (Ht & Hd).
+unfold mat_det in Hd.
+unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
+injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+simpl.
+setoid_rewrite fold_Rsqr in H₁.
+setoid_rewrite fold_Rsqr in H₅.
+setoid_rewrite fold_Rsqr in H₉.
+move H₉ after H₁; move H₅ after H₁.
+move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
+clear H₄ H₇ H₈; move H₆ after H₂.
+move Hd before H₉.
+rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
+rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
+clear Heqr Heqkr.
+f_equal; nsatz.
+Qed.
+
 Theorem sphere_partition_by_fixpoints :
   let s := set_equiv in
   is_partition sphere
@@ -2818,7 +2854,9 @@ split.
     pose proof Hoh p₁ as Hp.
     intros H; apply Hp; clear Hp.
     split; [ assumption | ].
-    unfold sphere_fixpoint.
+    exists el, 1%R.
+    split; [ assumption | ].
+Inspect 1.
 bbb.
 
 Theorem Banach_Tarski_paradox :
