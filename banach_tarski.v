@@ -2935,7 +2935,7 @@ split; [ assumption | ].
 remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
 generalize Hm; intros Hrm.
 apply path_is_rotation in Hrm.
-SearchAbout rotation_fixpoint.
+bbb.
 unfold rotation_fixpoint.
 remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
 destruct p as (x, y, z).
