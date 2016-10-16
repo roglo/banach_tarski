@@ -883,6 +883,20 @@ Definition mat_id :=
     0 1 0
     0 0 1.
 
+Delimit Scope mat_scope with mat.
+Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
+
+Theorem mat_mul_id_r : ∀ m, mat_mul m mat_id = m.
+Proof.
+intros m.
+unfold mat_mul, mat_id; simpl.
+progress repeat rewrite Rmult_1_r.
+progress repeat rewrite Rmult_0_r.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+destruct m; reflexivity.
+Qed.
+
 Theorem rot_rot_inv_x : ∀ pt,
   mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
 Proof.
@@ -1100,6 +1114,29 @@ Definition mat_det m :=
   (a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m) +
    a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
    a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%R.
+
+Arguments mat_det m%mat.
+
+Theorem mat_transp_mul : ∀ m₁ m₂,
+  mat_transp (mat_mul m₁ m₂) = mat_mul (mat_transp m₂) (mat_transp m₁).
+Proof.
+intros m₁ m₂.
+unfold mat_transp, mat_mul; simpl; f_equal; ring.
+Qed.
+
+Theorem mat_mul_assoc : ∀ m₁ m₂ m₃,
+  (m₁ * (m₂ * m₃) = m₁ * m₂ * m₃)%mat.
+Proof.
+intros m₁ m₂ m₃.
+unfold mat_mul; simpl; f_equal; ring.
+Qed.
+
+Theorem mat_det_mul : ∀ m₁ m₂,
+  mat_det (m₁ * m₂) = (mat_det m₂ * mat_det m₁)%R.
+Proof.
+intros m₁ m₂.
+unfold mat_det; simpl; ring.
+Qed.
 
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
@@ -2826,6 +2863,54 @@ clear Heqr Heqkr.
 f_equal; nsatz.
 Qed.
 
+Theorem glop : ∀ el p,
+  fold_right rotate p el
+  = mat_vec_mul (fold_right mat_mul mat_id (map mat_of_elem el)) p.
+Admitted.
+
+Theorem path_is_rotation : ∀ el m,
+  m = fold_right mat_mul mat_id (map mat_of_elem el)
+  → is_rotation_matrix m.
+Proof.
+intros el m Hm.
+revert m Hm.
+induction el as [| e]; intros.
+ subst m; simpl; unfold is_rotation_matrix, mat_det; simpl.
+ rewrite mat_mul_id_r.
+ split; [ reflexivity | ring ].
+
+ simpl in Hm.
+ remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m₁ eqn:Hm₁.
+ pose proof IHel m₁ eq_refl as Hr.
+ unfold is_rotation_matrix in Hr.
+ unfold is_rotation_matrix.
+ destruct Hr as (Hr & Hd).
+ rewrite Hm.
+ rewrite mat_transp_mul, mat_mul_assoc.
+ setoid_rewrite <- mat_mul_assoc at 2.
+ rewrite Hr, mat_mul_id_r.
+ rewrite mat_det_mul, Hd, Rmult_1_l.
+ apply rotate_is_rotation_matrix.
+Qed.
+
+Theorem sphere_fixpoint_prop : ∀ p el,
+  norm_list el ≠ []
+  → fold_right rotate p el = p
+  → sphere_fixpoint p.
+Proof.
+intros * Hn Hr.
+unfold sphere_fixpoint.
+rewrite glop in Hr.
+exists el, 1%R.
+split; [ assumption | ].
+remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
+generalize Hm; intros Hrm.
+apply path_is_rotation in Hrm.
+bbb.
+
+eapply matrix_fixpoint_ok with (k := 1%R) in Hrm; [ | reflexivity ].
+bbb.
+
 Theorem sphere_partition_by_fixpoints :
   let s := set_equiv in
   is_partition sphere
@@ -2854,6 +2939,10 @@ split.
     pose proof Hoh p₁ as Hp.
     intros H; apply Hp; clear Hp.
     split; [ assumption | ].
+    eapply sphere_fixpoint_prop; eassumption.
+
+bbb.
+
     exists el, 1%R.
     split; [ assumption | ].
     remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
