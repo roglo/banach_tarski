@@ -897,6 +897,25 @@ progress repeat rewrite Rplus_0_r.
 destruct m; reflexivity.
 Qed.
 
+Theorem mat_vec_mul_id : ∀ p, mat_vec_mul mat_id p = p.
+Proof.
+intros (x, y, z).
+unfold mat_vec_mul; simpl.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+reflexivity.
+Qed.
+
+Theorem mat_vec_mul_assoc : ∀ m₁ m₂ p,
+  mat_vec_mul (m₁ * m₂)%mat p = mat_vec_mul m₁ (mat_vec_mul m₂ p).
+Proof.
+intros m₁ m₂ (x, y, z).
+unfold mat_vec_mul.
+simpl; f_equal; lra.
+Qed.
+
 Theorem rot_rot_inv_x : ∀ pt,
   mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
 Proof.
@@ -2863,10 +2882,14 @@ clear Heqr Heqkr.
 f_equal; nsatz.
 Qed.
 
-Theorem glop : ∀ el p,
+Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el
   = mat_vec_mul (fold_right mat_mul mat_id (map mat_of_elem el)) p.
-Admitted.
+Proof.
+intros el p.
+induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
+rewrite IHel, mat_vec_mul_assoc; reflexivity.
+Qed.
 
 Theorem path_is_rotation : ∀ el m,
   m = fold_right mat_mul mat_id (map mat_of_elem el)
@@ -2900,7 +2923,7 @@ Theorem sphere_fixpoint_prop : ∀ p el,
 Proof.
 intros * Hn Hr.
 unfold sphere_fixpoint.
-rewrite glop in Hr.
+rewrite rotate_vec_mul in Hr.
 exists el, 1%R.
 split; [ assumption | ].
 remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
