@@ -2922,6 +2922,7 @@ induction el as [| e]; intros.
  apply rotate_is_rotation_matrix.
 Qed.
 
+(*
 Theorem sphere_fixpoint_prop : ∀ p el,
   norm_list el ≠ []
   → fold_right rotate p el = p
@@ -2977,6 +2978,7 @@ split.
  intros i j Hij.
 
 bbb.
+*)
 
 Theorem Banach_Tarski_paradox :
   equidecomposable set_equiv sphere (xtransl 3 sphere ⋃ xtransl 6 sphere)%S.
@@ -2987,6 +2989,7 @@ destruct H as (f & Hu & Hm).
 remember (mkcf _ _ f Hm Hu) as Hosf.
 remember (mkos _ f) as os eqn:Hos.
 clear HeqHosf.
+bbb.
 set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
 set (A₂ := (SS ạ⁻¹ \ B)%S).
 set (A₃ := SS ḅ).
