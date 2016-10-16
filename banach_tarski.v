@@ -802,6 +802,13 @@ Proof. reflexivity. Qed.
 Theorem Rmul_div : ∀ x y z, (x * y / z = x / z * y)%R.
 Proof. intros; lra. Qed.
 
+Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
+Proof.
+intros.
+rewrite Rmult_comm, <- Rmult_assoc.
+f_equal; apply Rmult_comm.
+Qed.
+
 Theorem Req_dec : ∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R }.
 Proof.
 intros x y.
@@ -2931,6 +2938,8 @@ apply path_is_rotation in Hrm.
 SearchAbout rotation_fixpoint.
 unfold rotation_fixpoint.
 remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+destruct p as (x, y, z).
+remember (√ (x² + y² + z²)) as rp eqn:Hrp.
 bbb.
 
 Theorem sphere_partition_by_fixpoints :
