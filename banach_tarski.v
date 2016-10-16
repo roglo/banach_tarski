@@ -2842,8 +2842,7 @@ Definition rotation_fixpoint (m : matrix) k :=
   P (k * x / r) (k * y / r) (k * z / r).
 
 Definition sphere_fixpoint : point → Prop :=
-  λ p, ∃ el k,
-  norm_list el ≠ [] ∧
+  λ p, ∃ el, norm_list el ≠ [] ∧ ∃ k,
   p = rotation_fixpoint (fold_right mat_mul mat_id (map mat_of_elem el)) k.
 
 Definition orbit_has_fixpoint : point → Prop :=
@@ -2924,15 +2923,12 @@ Proof.
 intros * Hn Hr.
 unfold sphere_fixpoint.
 rewrite rotate_vec_mul in Hr.
-exists el, 1%R.
+exists el.
 split; [ assumption | ].
 remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
 generalize Hm; intros Hrm.
 apply path_is_rotation in Hrm.
 SearchAbout rotation_fixpoint.
-bbb.
-
-eapply matrix_fixpoint_ok with (k := 1%R) in Hrm; [ | reflexivity ].
 bbb.
 
 Theorem sphere_partition_by_fixpoints :
