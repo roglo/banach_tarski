@@ -2929,6 +2929,7 @@ split; [ assumption | ].
 remember (fold_right mat_mul mat_id (map mat_of_elem el)) as m eqn:Hm.
 generalize Hm; intros Hrm.
 apply path_is_rotation in Hrm.
+SearchAbout rotation_fixpoint.
 bbb.
 
 eapply matrix_fixpoint_ok with (k := 1%R) in Hrm; [ | reflexivity ].
