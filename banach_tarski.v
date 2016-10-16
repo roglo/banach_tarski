@@ -2841,6 +2841,7 @@ Check Banach_Tarski_paradox_but_fixpoints.
        conversions/matrixToAngle
    does not work if the rotation is 0 or π; but it cannot
    happen in our case *)
+(*
 Definition rotation_fixpoint (m : matrix) k :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
@@ -2921,6 +2922,7 @@ induction el as [| e]; intros.
  rewrite mat_det_mul, Hd, Rmult_1_l.
  apply rotate_is_rotation_matrix.
 Qed.
+*)
 
 (*
 Theorem sphere_fixpoint_prop : ∀ p el,
