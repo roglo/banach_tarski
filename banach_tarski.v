@@ -2889,10 +2889,34 @@ Qed.
 Definition partition_prod {A} (P Q : list (A → Prop)) :=
   List.map (λ '(p, q), (p ⋂ q)%S) (list_prod P Q).
 
+Theorem list_prod_nil_r : ∀ A B (l : list A),
+  list_prod l ([] : list B) = [].
+Proof.
+intros A B l.
+induction l as [| x]; [ reflexivity | assumption ].
+Qed.
+
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
 Proof.
-intros A s E P Q HP HQ.
+intros A s E P Q (HEP, HPij) (HEQ, HQij).
+unfold partition_prod; simpl.
+split.
+ intros x.
+ split; intros H.
+  revert E Q HEP HEQ HQij H.
+  induction P as [| P PL]; intros; [ apply HEP, H | simpl ].
+(*
+  unfold union_list.
+  rewrite map_app, fold_right_app, map_map.
+*)
+  pose proof HEP x as Hx.
+  destruct Hx as (Hx, _).
+  pose proof Hx H as HPx.
+  destruct HPx as [HPx| HPx].
+destruct Q as [| Q QL].
+rewrite list_prod_nil_r; simpl.
+
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
