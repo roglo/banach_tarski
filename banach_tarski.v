@@ -2507,6 +2507,8 @@ Fixpoint app_gr_point f p :=
   | Comb g h => app_gr_point h (app_gr_point g p)
   end.
 
+Definition app_gr_ident := Xtransl 0.
+
 Theorem app_gr_app_gr_point : ∀ g E p, app_gr g E p → E (app_gr_point g p).
 Proof.
 intros * Hp.
@@ -2796,7 +2798,8 @@ split; [ apply is_partition_single | ].
 split; [ apply is_partition_single | ].
 split; [ reflexivity | ].
 constructor.
-
+ exists app_gr_ident; simpl; unfold xtransl; simpl.
+(* chiasse, il va me falloir l'extensionalité des prédicats *)
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
