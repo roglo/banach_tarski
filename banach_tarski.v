@@ -2928,6 +2928,24 @@ split.
    destruct HQx as [HQx| HQx]; [ left; split; assumption | ].
    right; apply IHQL, HQx.
 
+   rewrite map_app.
+   pose proof union_list_app _ s eq_refl
+     (map (λ '(p, q), p ⋂ q) (map (λ y : A → Prop, (P, y)) Q))%S
+     (map (λ '(p, q), p ⋂ q) (list_prod PL Q))%S as HH.
+   apply HH; clear HH.
+   right.
+   clear -HEP HEQ HPx H.
+   induction Q as [| Q QL].
+    rewrite HEP in HEQ.
+    pose proof HEQ x as Hx.
+    exfalso; apply Hx.
+    right; assumption.
+
+    simpl in HEQ; simpl.
+    pose proof HEQ x as Hx.
+    destruct Hx as (Hx, _).
+    apply Hx in H.
+    destruct H as [H| H].
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
