@@ -2773,6 +2773,40 @@ Definition equidecomposable (s : set_model point) E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, app_gr g S₁ = S₂) P₁ P₂.
 
+Theorem is_partition_single : ∀ A (s := @set_equiv A) E, is_partition E [E].
+Proof.
+intros.
+split; [ symmetry; eapply union_empty_r; reflexivity | ].
+intros * Hij.
+destruct i.
+ destruct j; [ exfalso; apply Hij; reflexivity | ].
+ destruct j.
+  split; [ intros (_, H); contradiction | contradiction ].
+  split; [ intros (_, H); contradiction | contradiction ].
+
+ split; [ intros (H, _) | contradiction ].
+ destruct i; contradiction.
+Qed.
+
+Theorem equidec_refl : reflexive _ (equidecomposable set_equiv).
+Proof.
+intros E.
+exists (E :: []), (E :: []).
+split; [ apply is_partition_single | ].
+split; [ apply is_partition_single | ].
+split; [ reflexivity | ].
+constructor.
+
+bbb.
+
+Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
+ reflexivity proved by set_equidec_refl
+ symmetry proved by set_equidec_sym
+ transitivity proved by set_equidec_trans
+ as set_equidec_morph.
+
+bbb.
+
 Theorem Banach_Tarski_paradox_but_fixpoints :
   equidecomposable set_equiv sphere_but_fixpoints
     (xtransl 3 sphere_but_fixpoints ⋃ xtransl 6 sphere_but_fixpoints)%S.
