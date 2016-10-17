@@ -2886,11 +2886,8 @@ exists (app_gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
 Qed.
 
-Fixpoint partition_prod {A} (PL QL : list (A → Prop)) :=
-  match PL with
-  | [] => []
-  | P1 :: PL1 => map (intersection P1) QL ++ partition_prod PL1 QL
-  end.
+Definition partition_prod {A} (PL QL : list (A → Prop)) :=
+  map (λ '(p, q), intersection p q) (list_prod PL QL).
 
 Theorem union_list_intersection : ∀ A (s := set_equiv) E (P : A → Prop) QL x,
   (E = ∐ QL)%S
@@ -2917,6 +2914,8 @@ split.
  intros x.
  split; intros H.
   induction P as [| P PL]; [ exfalso; eapply HEP, H | simpl ].
+  unfold partition_prod; simpl.
+  rewrite map_app, map_map.
   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
     (partition_prod PL Q) as HH.
   apply HH; clear HH.
@@ -2931,6 +2930,8 @@ split.
    clear - HEQ H HPL.
    revert E Q HEQ H.
    induction PL as [| P PL]; intros; [ contradiction | simpl ].
+   unfold partition_prod; simpl.
+   rewrite map_app, map_map.
    pose proof union_list_app _ s eq_refl (map (intersection P) Q)
      (partition_prod PL Q) as HH.
    apply HH; clear HH.
@@ -2939,7 +2940,14 @@ split.
 
     right; eapply IHPL; eassumption.
 
-  simpl.
+  clear - HEP HEQ H.
+bbb.
+apply HEP.
+bbb.
+  revert E Q HEP HEQ H.
+  induction P as [| P PL]; intros; [ contradiction | ].
+  simpl in HEP.
+
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
