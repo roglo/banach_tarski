@@ -2886,17 +2886,24 @@ exists (app_gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
 Qed.
 
+Definition partition_prod {A} (P Q : list (A → Prop)) :=
+  List.map (λ '(p, q), (p ⋂ q)%S) (list_prod P Q).
+
+Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
+  is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
+Proof.
+intros A s E P Q HP HQ.
+bbb.
+
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
 intros E F G HEF HFG.
 destruct HEF as (P & Q & HP & HQ & Hlen1 & HEF).
 destruct HFG as (R & S & HR & HS & Hlen2 & HFG).
 unfold equidecomposable.
-bbb.
-
-exists P, S.
-split; [ assumption | ].
-split; [ assumption | ].
+set (QR := partition_prod Q R).
+set (s := set_equiv).
+pose proof partition_prod_is_partition _ F Q R HQ HR as HPQ.
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
