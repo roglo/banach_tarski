@@ -2537,42 +2537,12 @@ Fixpoint app_gr_inv f :=
   | Comb g h => Comb (app_gr_inv h) (app_gr_inv g)
   end.
 
-Theorem app_gr_inv_l : ∀ (s := set_equiv) g E,
-  (app_gr (app_gr_inv g) (app_gr g E) = E)%S.
-Proof.
-intros.
-induction g; simpl.
- unfold rot; simpl.
- intros p.
- rewrite negf_involutive, rotate_neg_rotate.
- reflexivity.
-
- intros (x, y, z); simpl.
- unfold Rminus; rewrite Ropp_involutive.
- rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
- reflexivity.
-
-bbb.
-
-Theorem app_gr_app_gr_point : ∀ g E p, app_gr g E p → E (app_gr_point g p).
-Proof.
-intros * Hp.
-revert E p Hp.
-induction g; intros; [ assumption | assumption | destruct p; assumption | ].
-simpl in Hp; simpl.
-apply IHg1 in Hp.
-apply IHg2 in Hp.
-assumption.
-Qed.
-
 Theorem gr_subst : ∀ (s := set_equiv) g E F,
   (E = F)%S → ∀ p, app_gr g E p → app_gr g F p.
 Proof.
 intros s * HEF * HE.
 revert E F p HEF HE.
-induction g as [| e| dx | g IHg h IHh]; intros.
- apply HEF, HE.
-
+induction g as [ e| dx | g IHg h IHh]; intros.
  apply HEF, HE.
 
  destruct p as (x, y, z).
@@ -2602,6 +2572,40 @@ split; intros H; [ eapply gr_subst; eassumption | ].
 symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
+Theorem app_gr_inv_l : ∀ (s := set_equiv) g E,
+  (app_gr (app_gr_inv g) (app_gr g E) = E)%S.
+Proof.
+intros.
+revert E.
+induction g; intros; simpl.
+ unfold rot; simpl.
+ intros p.
+ rewrite negf_involutive, rotate_neg_rotate.
+ reflexivity.
+
+ intros (x, y, z); simpl.
+ unfold Rminus; rewrite Ropp_involutive.
+ rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+ reflexivity.
+
+ intros p.
+ split; intros H.
+  rewrite IHg1 in H; apply IHg2; assumption.
+
+  rewrite IHg1; apply IHg2, H.
+Qed.
+
+Theorem app_gr_app_gr_point : ∀ g E p, app_gr g E p → E (app_gr_point g p).
+Proof.
+intros * Hp.
+revert E p Hp.
+induction g; intros; [ assumption | destruct p; assumption | ].
+simpl in Hp; simpl.
+apply IHg1 in Hp.
+apply IHg2 in Hp.
+assumption.
+Qed.
+
 Theorem app_gr_empty_set : ∀ (s := set_equiv) f, (app_gr f ∅ = ∅)%S.
 Proof.
 intros s * p.
@@ -2618,9 +2622,7 @@ Theorem group_union_distr : ∀ (s := set_equiv) g E₁ E₂,
 Proof.
 intros s *; subst s.
 revert E₁ E₂.
-induction g as [| e| dx | g IHg h IHh ]; intros; simpl.
- intros p; split; intros H; assumption.
-
+induction g as [ e| dx | g IHg h IHh ]; intros; simpl.
  intros p; split; intros H; assumption.
 
  intros (x, y, z); split; intros H; assumption.
@@ -2658,18 +2660,7 @@ intros s f Ho F P * HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
- induction g as [| e| dx | g IHg h IHh ]; intros; simpl.
-  intros p.
-  split.
-   intros Hr; apply HF in Hr; clear -Hr.
-   induction P as [| P PL]; [ contradiction | ].
-   destruct Hr; [ left; assumption | right; apply IHPL; assumption ].
-
-   intros Hme.
-   apply HF; clear -Hme.
-   induction P as [| P PL]; [ contradiction | ].
-   destruct Hme; [ left; assumption | right; apply IHPL; assumption ].
-
+ induction g as [e| dx | g IHg h IHh ]; intros; simpl.
   split.
    intros Hr.
    revert F HF Hr.
@@ -2867,7 +2858,6 @@ Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
 Proof.
 intros * Hs HF.
-bbb.
 revert l2 HF.
 induction l1 as [| x]; intros.
  destruct l2 as [| y]; [ constructor | ].
@@ -2893,7 +2883,20 @@ apply Forall2_sym; [ | assumption ].
 clear -HEF.
 intros E F (g & Hg).
 exists (app_gr_inv g); rewrite <- Hg.
+apply app_gr_inv_l.
+Qed.
 
+Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
+Proof.
+intros E F G HEF HFG.
+destruct HEF as (P & Q & HP & HQ & Hlen1 & HEF).
+destruct HFG as (R & S & HR & HS & Hlen2 & HFG).
+unfold equidecomposable.
+bbb.
+
+exists P, S.
+split; [ assumption | ].
+split; [ assumption | ].
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
