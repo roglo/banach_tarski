@@ -2896,6 +2896,7 @@ intros A B l.
 induction l as [| x]; [ reflexivity | assumption ].
 Qed.
 
+(*
 Definition my_list_prod {A B} (l : list A) (l' : list B) :=
   fold_right
     (λ x l1, fold_right (λ y l'1, (x, y) :: l'1) l1 l')
@@ -2923,6 +2924,7 @@ simpl.
 rewrite IHl.
 f_equal.
 bbb.
+*)
 
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
@@ -2932,6 +2934,8 @@ unfold partition_prod; simpl.
 split.
  intros x.
  split; intros H.
+bbb.
+
   revert E Q HEP HEQ HQij H.
   induction P as [| P PL]; intros; [ apply HEP, H | simpl ].
   pose proof HEP x as Hx.
@@ -2974,7 +2978,11 @@ split.
     destruct Hx as (Hx, _).
     apply Hx in H.
     destruct H as [H| H].
-SearchAbout list_prod.
+     destruct PL as [| P' PL]; [ contradiction | ].
+     simpl in HPx; simpl.
+     destruct HPx as [HPx| HPx]; [ left; split; assumption | right ].
+     rewrite map_app, map_map.
+
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
