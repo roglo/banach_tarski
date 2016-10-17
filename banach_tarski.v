@@ -2815,8 +2815,23 @@ split; [ reflexivity | ].
 constructor; [ exists Gident; reflexivity | constructor ].
 Qed.
 
+Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
+ symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
+Proof.
+intros * Hs.
+bbb.
+
 Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).
 Proof.
+intros E F (P₁ & P₂ & HP₁ & HP₂ & Hlen & HEF).
+exists P₂, P₁.
+split; [ assumption | ].
+split; [ assumption | ].
+split; [ symmetry; assumption | ].
+apply Forall2_sym; [ | assumption ].
+clear -HEF.
+intros E F (g & Hg).
+
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
