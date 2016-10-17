@@ -2906,10 +2906,6 @@ split.
  split; intros H.
   revert E Q HEP HEQ HQij H.
   induction P as [| P PL]; intros; [ apply HEP, H | simpl ].
-(*
-  unfold union_list.
-  rewrite map_app, fold_right_app, map_map.
-*)
   pose proof HEP x as Hx.
   destruct Hx as (Hx, _).
   pose proof Hx H as HPx.
@@ -2920,10 +2916,17 @@ split.
    pose proof Hx' H as HQx.
    destruct HQx as [HQx| HQx]; [ left; split; assumption | right ].
    rewrite map_app, map_map.
-   subst s.
-Check union_list_app.
-unfold union_list.
-rewrite fold_right_app.
+   pose proof union_list_app _ s eq_refl
+     (map (λ x0 : A → Prop, P ⋂ x0) QL)%S
+     (map (λ '(p, q), p ⋂ q) (list_prod PL (Q :: QL)))%S as HH.
+   apply HH; clear HH.
+   left.
+   unfold union_list; simpl.
+   clear - HPx HQx.
+   induction QL as [| Q QL]; [ contradiction | ].
+   simpl in HQx; simpl.
+   destruct HQx as [HQx| HQx]; [ left; split; assumption | ].
+   right; apply IHQL, HQx.
 
 bbb.
 
