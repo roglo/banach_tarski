@@ -2914,9 +2914,11 @@ split.
   destruct Hx as (Hx, _).
   pose proof Hx H as HPx.
   destruct HPx as [HPx| HPx].
-destruct Q as [| Q QL].
-rewrite list_prod_nil_r; simpl.
-
+   destruct Q as [| Q QL]; [ exfalso; eapply HEQ, H | simpl ].
+   pose proof HEQ x as Hx'.
+   destruct Hx' as (Hx', _).
+   pose proof Hx' H as HQx.
+   destruct HQx as [HQx| HQx]; [ left; split; assumption | right ].
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
