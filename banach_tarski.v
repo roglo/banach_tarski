@@ -45,6 +45,29 @@ Theorem fold_right_single : ∀ A B (f : A → B → B) x y,
   fold_right f x [y] = f y x.
 Proof. reflexivity. Qed.
 
+Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
+  ¬Forall2 R [] (x :: l).
+Proof.
+intros A B * H.
+inversion H.
+Qed.
+
+Theorem Forall2_cons_nil : ∀ A B (R : A → B → Prop) x l,
+  ¬Forall2 R (x :: l) [].
+Proof.
+intros A B * H.
+inversion H.
+Qed.
+
+Theorem Forall2_cons_cons : ∀ A B (R : A → B → Prop) x y l l',
+  Forall2 R (x :: l) (y :: l')
+  → R x y ∧ Forall2 R l l'.
+Proof.
+intros A B * H.
+inversion H; subst.
+split; assumption.
+Qed.
+
 Theorem app_repeat_diag : ∀ A (e : A) n,
   repeat e n ++ [e] = e :: repeat e n.
 Proof.
@@ -2510,6 +2533,14 @@ Fixpoint app_gr_point f p :=
   | Comb g h => app_gr_point h (app_gr_point g p)
   end.
 
+Fixpoint app_gr_inv f :=
+  match f with
+  | Gident => Gident
+  | Rot e => Rot (negf e)
+  | Xtransl dx => Xtransl (-dx)
+  | Comb g h => Comb (app_gr_inv h) (app_gr_inv g)
+  end.
+
 Theorem app_gr_app_gr_point : ∀ g E p, app_gr g E p → E (app_gr_point g p).
 Proof.
 intros * Hp.
@@ -2818,8 +2849,20 @@ Qed.
 Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
 Proof.
-intros * Hs.
-bbb.
+intros * Hs HF.
+revert l2 HF.
+induction l1 as [| x]; intros.
+ destruct l2 as [| y]; [ constructor | ].
+ apply Forall2_nil_cons in HF; contradiction.
+
+ destruct l2 as [| y].
+  apply Forall2_cons_nil in HF; contradiction.
+
+  apply Forall2_cons_cons in HF.
+  destruct HF as (HR & HF).
+  constructor; [ apply Hs; assumption | ].
+  apply IHl1; assumption.
+Qed.
 
 Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).
 Proof.
@@ -2831,6 +2874,7 @@ split; [ symmetry; assumption | ].
 apply Forall2_sym; [ | assumption ].
 clear -HEF.
 intros E F (g & Hg).
+exists (app_gr_inv g); rewrite <- Hg.
 
 bbb.
 
