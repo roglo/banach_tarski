@@ -2886,103 +2886,60 @@ exists (app_gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
 Qed.
 
-Definition partition_prod {A} (P Q : list (A → Prop)) :=
-  List.map (λ '(p, q), (p ⋂ q)%S) (list_prod P Q).
+Fixpoint partition_prod {A} (PL QL : list (A → Prop)) :=
+  match PL with
+  | [] => []
+  | P1 :: PL1 => map (intersection P1) QL ++ partition_prod PL1 QL
+  end.
 
-Theorem list_prod_nil_r : ∀ A B (l : list A),
-  list_prod l ([] : list B) = [].
+Theorem union_list_intersection : ∀ A (s := set_equiv) E (P : A → Prop) QL x,
+  (E = ∐ QL)%S
+  → E x
+  → P x
+  → (∐ map (intersection P) QL)%S x.
 Proof.
-intros A B l.
-induction l as [| x]; [ reflexivity | assumption ].
+intros A s E P * HEQ HE HP.
+revert E HEQ HE.
+induction QL as [| Q QL]; intros; [ exfalso; eapply HEQ, HE | simpl ].
+simpl in HEQ.
+pose proof HEQ x as Hqx.
+destruct Hqx as (Hqx, Hqxi).
+pose proof Hqx HE as HQQL.
+destruct HQQL as [HQ | HQL]; [ left; split; assumption | right ].
+eapply IHQL; [ reflexivity | eassumption ].
 Qed.
-
-(*
-Definition my_list_prod {A B} (l : list A) (l' : list B) :=
-  fold_right
-    (λ x l1, fold_right (λ y l'1, (x, y) :: l'1) l1 l')
-    [] l.
-
-Eval compute in list_prod [1;2;3] [false; true].
-Eval compute in my_list_prod [1;2;3] [false; true].
-
-Theorem list_prod_is : ∀ A B (l : list A) (l' : list B),
-  list_prod l l' = my_list_prod l l'.
-Proof.
-intros A B l l'; unfold my_list_prod.
-revert l'.
-induction l as [| x]; intros; [ reflexivity | simpl; rewrite <- IHl ].
-bbb.
-
-clear IHl.
-revert x l'.
-induction l as [| y]; intros.
-simpl.
-rewrite app_nil_r.
-induction l' as [| x']; [ reflexivity | simpl ].
-f_equal.
-simpl.
-rewrite IHl.
-f_equal.
-bbb.
-*)
 
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
 Proof.
 intros A s E P Q (HEP, HPij) (HEQ, HQij).
-unfold partition_prod; simpl.
 split.
  intros x.
  split; intros H.
-bbb.
-
-  revert E Q HEP HEQ HQij H.
-  induction P as [| P PL]; intros; [ apply HEP, H | simpl ].
+  induction P as [| P PL]; [ exfalso; eapply HEP, H | simpl ].
+  pose proof union_list_app _ s eq_refl (map (intersection P) Q)
+    (partition_prod PL Q) as HH.
+  apply HH; clear HH.
+  simpl in HEP.
   pose proof HEP x as Hx.
-  destruct Hx as (Hx, _).
-  pose proof Hx H as HPx.
-  destruct HPx as [HPx| HPx].
-   destruct Q as [| Q QL]; [ exfalso; eapply HEQ, H | simpl ].
-   pose proof HEQ x as Hx'.
-   destruct Hx' as (Hx', _).
-   pose proof Hx' H as HQx.
-   destruct HQx as [HQx| HQx]; [ left; split; assumption | right ].
-   rewrite map_app, map_map.
-   pose proof union_list_app _ s eq_refl
-     (map (λ x0 : A → Prop, P ⋂ x0) QL)%S
-     (map (λ '(p, q), p ⋂ q) (list_prod PL (Q :: QL)))%S as HH.
-   apply HH; clear HH.
-   left.
-   unfold union_list; simpl.
-   clear - HPx HQx.
-   induction QL as [| Q QL]; [ contradiction | ].
-   simpl in HQx; simpl.
-   destruct HQx as [HQx| HQx]; [ left; split; assumption | ].
-   right; apply IHQL, HQx.
+  destruct Hx as (Hx, Hxi).
+  pose proof Hx H as HPPL.
+  destruct HPPL as [HP| HPL].
+   left; eapply union_list_intersection; eassumption.
 
-   rewrite map_app.
-   pose proof union_list_app _ s eq_refl
-     (map (λ '(p, q), p ⋂ q) (map (λ y : A → Prop, (P, y)) Q))%S
-     (map (λ '(p, q), p ⋂ q) (list_prod PL Q))%S as HH.
-   apply HH; clear HH.
    right.
-   clear -HEP HEQ HPx H.
-   induction Q as [| Q QL].
-    rewrite HEP in HEQ.
-    pose proof HEQ x as Hx.
-    exfalso; apply Hx.
-    right; assumption.
+   clear - HEQ H HPL.
+   revert E Q HEQ H.
+   induction PL as [| P PL]; intros; [ contradiction | simpl ].
+   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
+     (partition_prod PL Q) as HH.
+   apply HH; clear HH.
+   destruct HPL as [HPL| HPL].
+    left; eapply union_list_intersection; eassumption.
 
-    simpl in HEQ; simpl.
-    pose proof HEQ x as Hx.
-    destruct Hx as (Hx, _).
-    apply Hx in H.
-    destruct H as [H| H].
-     destruct PL as [| P' PL]; [ contradiction | ].
-     simpl in HPx; simpl.
-     destruct HPx as [HPx| HPx]; [ left; split; assumption | right ].
-     rewrite map_app, map_map.
+    right; eapply IHPL; eassumption.
 
+  simpl.
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
