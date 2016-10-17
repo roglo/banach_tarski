@@ -1812,7 +1812,7 @@ Qed.
 Class sel_model {A} := mkos
   { os_fun : A → A }.
 
-Definition EE {os : sel_model} :=
+Definition M {os : sel_model} :=
   λ p, sphere_but_fixpoints p ∧ p = os_fun p.
 Definition SS {os : sel_model} e := λ p,
   sphere_but_fixpoints p ∧
@@ -1829,7 +1829,7 @@ Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
 Definition xtransl dx (E : point → Prop) '(P x y z) := E (P (x - dx) y z).
 
 Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
-  ∀ e p, EE p → SS e p → False.
+  ∀ e p, M p → SS e p → False.
 Proof.
 intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
@@ -1953,7 +1953,7 @@ Qed.
 Theorem decompose_2a_contrad_case :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → ∀ p, (EE ⋃ SS ạ ⋃ B)%S p
+  → ∀ p, (M ⋃ SS ạ ⋃ B)%S p
   → rot ạ (SS ạ⁻¹ \ B)%S p
   → False.
 Proof.
@@ -1985,7 +1985,7 @@ Theorem r_decomposed_5 :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition sphere_but_fixpoints [EE; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+  → is_partition sphere_but_fixpoints [M; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst os s.
 split.
@@ -2143,7 +2143,7 @@ Theorem r_decomposed_4 :
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints
-      [(EE ⋃ SS ạ ⋃ B)%S; (SS ạ⁻¹ \ B)%S; SS ḅ; SS ḅ⁻¹].
+      [(M ⋃ SS ạ ⋃ B)%S; (SS ạ⁻¹ \ B)%S; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros s Hs f HoeHo os Hos.
 pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
@@ -2288,7 +2288,7 @@ Theorem r_decomposed_2_a :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition sphere_but_fixpoints [(EE ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
+  → is_partition sphere_but_fixpoints [(M ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst s.
 split.
@@ -2783,7 +2783,7 @@ destruct H as (f & Hu & Hm).
 remember (mkcf _ _ f Hm Hu) as Hosf.
 remember (mkos _ f) as os eqn:Hos.
 clear HeqHosf.
-set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
+set (A₁ := (M ⋃ SS ạ ⋃ B)%S).
 set (A₂ := (SS ạ⁻¹ \ B)%S).
 set (A₃ := SS ḅ).
 set (A₄ := SS ḅ⁻¹).
@@ -2992,7 +2992,7 @@ remember (mkcf _ _ f Hm Hu) as Hosf.
 remember (mkos _ f) as os eqn:Hos.
 clear HeqHosf.
 bbb.
-set (A₁ := (EE ⋃ SS ạ ⋃ B)%S).
+set (A₁ := (M ⋃ SS ạ ⋃ B)%S).
 set (A₂ := (SS ạ⁻¹ \ B)%S).
 set (A₃ := SS ḅ).
 set (A₄ := SS ḅ⁻¹).
