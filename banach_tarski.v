@@ -2489,12 +2489,14 @@ Qed.
 (* Transformation group *)
 
 Inductive G :=
+  | Gident : G
   | Rot : free_elem → G
   | Xtransl : ℝ → G
   | Comb : G → G → G.
 
 Fixpoint app_gr f p :=
   match f with
+  | Gident => p
   | Rot e => rot e p
   | Xtransl dx => xtransl dx p
   | Comb g h => app_gr g (app_gr h p)
@@ -2502,18 +2504,17 @@ Fixpoint app_gr f p :=
 
 Fixpoint app_gr_point f p :=
   match f with
+  | Gident => p
   | Rot e => rotate (negf e) p
   | Xtransl dx => match p with P x y z => P (x - dx) y z end
   | Comb g h => app_gr_point h (app_gr_point g p)
   end.
 
-Definition app_gr_ident := Xtransl 0.
-
 Theorem app_gr_app_gr_point : ∀ g E p, app_gr g E p → E (app_gr_point g p).
 Proof.
 intros * Hp.
 revert E p Hp.
-induction g; intros; [ assumption | destruct p; assumption | ].
+induction g; intros; [ assumption | assumption | destruct p; assumption | ].
 simpl in Hp; simpl.
 apply IHg1 in Hp.
 apply IHg2 in Hp.
@@ -2525,7 +2526,9 @@ Theorem gr_subst : ∀ (s := set_equiv) g E F,
 Proof.
 intros s * HEF * HE.
 revert E F p HEF HE.
-induction g as [e| dx | g IHg h IHh]; intros.
+induction g as [| e| dx | g IHg h IHh]; intros.
+ apply HEF, HE.
+
  apply HEF, HE.
 
  destruct p as (x, y, z).
@@ -2560,7 +2563,7 @@ Proof.
 intros s * p.
 split; intros H; [ | contradiction ].
 revert p H.
-induction f; intros; [ contradiction | destruct p; contradiction | ].
+induction f; intros; try contradiction; [ destruct p; contradiction | ].
 simpl in H.
 eapply gr_subst in H; [ apply IHf1 in H; contradiction | ].
 split; [ apply IHf2 | intros; contradiction ].
@@ -2571,7 +2574,9 @@ Theorem group_union_distr : ∀ (s := set_equiv) g E₁ E₂,
 Proof.
 intros s *; subst s.
 revert E₁ E₂.
-induction g as [e| dx | g IHg h IHh ]; intros; simpl.
+induction g as [| e| dx | g IHg h IHh ]; intros; simpl.
+ intros p; split; intros H; assumption.
+
  intros p; split; intros H; assumption.
 
  intros (x, y, z); split; intros H; assumption.
@@ -2609,8 +2614,18 @@ intros s f Ho F P * HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
- induction g as [e| dx | g IHg h IHh ]; intros; simpl.
+ induction g as [| e| dx | g IHg h IHh ]; intros; simpl.
   intros p.
+  split.
+   intros Hr; apply HF in Hr; clear -Hr.
+   induction P as [| P PL]; [ contradiction | ].
+   destruct Hr; [ left; assumption | right; apply IHPL; assumption ].
+
+   intros Hme.
+   apply HF; clear -Hme.
+   induction P as [| P PL]; [ contradiction | ].
+   destruct Hme; [ left; assumption | right; apply IHPL; assumption ].
+
   split.
    intros Hr.
    revert F HF Hr.
@@ -2797,16 +2812,18 @@ exists (E :: []), (E :: []).
 split; [ apply is_partition_single | ].
 split; [ apply is_partition_single | ].
 split; [ reflexivity | ].
-constructor.
- exists app_gr_ident; simpl; unfold xtransl; simpl.
-(* chiasse, il va me falloir l'extensionalité des prédicats *)
+constructor; [ exists Gident; reflexivity | constructor ].
+Qed.
+
+Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).
+Proof.
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
- reflexivity proved by set_equidec_refl
- symmetry proved by set_equidec_sym
- transitivity proved by set_equidec_trans
- as set_equidec_morph.
+ reflexivity proved by equidec_refl
+ symmetry proved by equidec_sym
+ transitivity proved by equidec_trans
+ as equidec_morph.
 
 bbb.
 
