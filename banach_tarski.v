@@ -2919,6 +2919,9 @@ split.
    destruct Hx' as (Hx', _).
    pose proof Hx' H as HQx.
    destruct HQx as [HQx| HQx]; [ left; split; assumption | right ].
+   rewrite map_app, map_map.
+SearchAbout (union_list (_ ++ _)).
+
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
