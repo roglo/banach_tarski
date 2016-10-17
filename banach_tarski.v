@@ -2512,14 +2512,12 @@ Qed.
 (* Transformation group *)
 
 Inductive G :=
-  | Gident : G
   | Rot : free_elem → G
   | Xtransl : ℝ → G
   | Comb : G → G → G.
 
 Fixpoint app_gr f p :=
   match f with
-  | Gident => p
   | Rot e => rot e p
   | Xtransl dx => xtransl dx p
   | Comb g h => app_gr g (app_gr h p)
@@ -2527,7 +2525,6 @@ Fixpoint app_gr f p :=
 
 Fixpoint app_gr_point f p :=
   match f with
-  | Gident => p
   | Rot e => rotate (negf e) p
   | Xtransl dx => match p with P x y z => P (x - dx) y z end
   | Comb g h => app_gr_point h (app_gr_point g p)
@@ -2535,11 +2532,27 @@ Fixpoint app_gr_point f p :=
 
 Fixpoint app_gr_inv f :=
   match f with
-  | Gident => Gident
   | Rot e => Rot (negf e)
   | Xtransl dx => Xtransl (-dx)
   | Comb g h => Comb (app_gr_inv h) (app_gr_inv g)
   end.
+
+Theorem app_gr_inv_l : ∀ (s := set_equiv) g E,
+  (app_gr (app_gr_inv g) (app_gr g E) = E)%S.
+Proof.
+intros.
+induction g; simpl.
+ unfold rot; simpl.
+ intros p.
+ rewrite negf_involutive, rotate_neg_rotate.
+ reflexivity.
+
+ intros (x, y, z); simpl.
+ unfold Rminus; rewrite Ropp_involutive.
+ rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+ reflexivity.
+
+bbb.
 
 Theorem app_gr_app_gr_point : ∀ g E p, app_gr g E p → E (app_gr_point g p).
 Proof.
@@ -2819,7 +2832,7 @@ Qed.
 
 Definition equidecomposable (s : set_model point) E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
-  List.Forall2 (λ S₁ S₂, ∃ g, app_gr g S₁ = S₂) P₁ P₂.
+  List.Forall2 (λ S₁ S₂, ∃ g, (app_gr g S₁ = S₂)%S) P₁ P₂.
 
 Theorem is_partition_single : ∀ A (s := @set_equiv A) E, is_partition E [E].
 Proof.
@@ -2843,13 +2856,18 @@ exists (E :: []), (E :: []).
 split; [ apply is_partition_single | ].
 split; [ apply is_partition_single | ].
 split; [ reflexivity | ].
-constructor; [ exists Gident; reflexivity | constructor ].
+constructor; [ | constructor ].
+exists (Xtransl 0); simpl.
+unfold xtransl; intros (x, y, z).
+rewrite Rminus_0_r.
+reflexivity.
 Qed.
 
 Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
 Proof.
 intros * Hs HF.
+bbb.
 revert l2 HF.
 induction l1 as [| x]; intros.
  destruct l2 as [| y]; [ constructor | ].
