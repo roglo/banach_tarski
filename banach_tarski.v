@@ -2920,7 +2920,10 @@ split.
    pose proof Hx' H as HQx.
    destruct HQx as [HQx| HQx]; [ left; split; assumption | right ].
    rewrite map_app, map_map.
-SearchAbout (union_list (_ ++ _)).
+   subst s.
+Check union_list_app.
+unfold union_list.
+rewrite fold_right_app.
 
 bbb.
 
