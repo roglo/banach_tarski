@@ -2965,33 +2965,21 @@ reflexivity.
 Qed.
 
 Theorem partition_prod_single_r : ∀ A (s := set_equiv)PL (Q : A → Prop) i,
-  ((partition_prod PL [Q]).[i] = (map (λ p, intersection p Q) PL).[i])%S.
+  ((partition_prod PL [Q]).[i] = (map (intersection Q) PL).[i])%S.
 Proof.
 intros A s PL Q i.
-induction PL as [| P PL]; [ reflexivity | ].
+revert i.
+induction PL as [| P PL]; intros; [ reflexivity | ].
 rewrite partition_prod_cons_l.
-bbb.
+simpl; rewrite fold_set_eq.
+destruct i.
+ unfold nth_set; simpl; rewrite fold_set_eq.
+ apply intersection_comm; reflexivity.
 
-destruct (lt_dec i (length PL)) as [H₁| H₁].
- unfold nth_set.
- rewrite <- map_nth.
- rewrite app_nth1.
- rewrite fold_nth_set.
- remember List.nth as f; simpl; subst f.
- rewrite IHPL.
-
-bbb.
- rewrite IHPL.
-
-bbb.
-
-simpl.
-
-simpl; rewrite <- IHPL.
-rewrite partition_prod_cons_l; simpl.
-f_equal.
-Check intersection_comm.
-bbb.
+ unfold nth_set; simpl; rewrite fold_set_eq.
+ do 2 rewrite fold_nth_set.
+ apply IHPL.
+Qed.
 
 Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) i,
   ((partition_prod PL QL).[i] = PL.[i / length QL] ⋂ QL.[i mod length QL])%S.
@@ -3008,8 +2996,7 @@ destruct QL as [| Q QL].
   remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
   rewrite fold_set_eq.
   rewrite Nat.div_1_r, Nat.mod_1_r.
-
-Check partition_prod_single_r.
+  rewrite partition_prod_single_r.
 bbb.
 
 revert PL QL.
