@@ -2941,34 +2941,16 @@ rewrite app_length, IHPL, map_length.
 reflexivity.
 Qed.
 
+(* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
+Arguments Nat.modulo _ _ : simpl nomatch.
+Arguments Z.mul _ _ : simpl nomatch.
+
+(*
 Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) i,
  ((partition_prod PL QL).[i] =
   intersection (PL.[i / length QL]) (QL.[i mod length QL]))%S.
 Proof.
 intros *.
-(*
-destruct QL as [| Q QL].
- rewrite partition_prod_nil_r.
- split; [ destruct i; contradiction | simpl; intros H ].
- destruct H as (_, H); contradiction.
-
- revert Q QL i.
- induction PL as [| P PL]; intros.
-  rewrite partition_prod_nil_l.
-  intros x; split; intros H; [ destruct i; contradiction | ].
-  destruct H as (H, _).
-  destruct (i / length (Q :: QL)); contradiction.
-
-  rewrite partition_prod_cons_l.
-  intros x.
-   split; intros H.
-bbb.
-
-  destruct i.
-   simpl.
-
-bbb.
-*)
 revert PL QL.
 induction i; intros.
 (**)
@@ -2993,7 +2975,8 @@ induction i; intros.
    destruct PL as [| P PL]; [ contradiction | ].
     rewrite partition_prod_cons_l in H.
     unfold nth_set in H; simpl in H.
-
+    remember Nat.div as f; remember Nat.modulo as g.
+    simpl; subst f g.
 bbb.
  intros x.
  split.
@@ -3016,6 +2999,7 @@ bbb.
     simpl in HPQL; rewrite Nat.sub_diag in HPQL.
 
 bbb.
+*)
 
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
@@ -3095,6 +3079,8 @@ split.
  clear E HEP.
  destruct (lt_dec i (length P * length Q)) as [Hi| Hi].
   destruct (lt_dec j (length P * length Q)) as [Hj| Hj].
+   rewrite <- partition_prod_length in Hi, Hj.
+bbb.
 Inspect 1.
 apply nth_partition_prod in HP.
 apply nth_partition_prod in HQ.
