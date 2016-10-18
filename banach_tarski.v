@@ -2889,6 +2889,13 @@ Qed.
 Definition partition_prod {A} (PL QL : list (A → Prop)) :=
   map (λ '(p, q), intersection p q) (list_prod PL QL).
 
+Theorem list_prod_nil_r : ∀ A B (l : list A),
+  list_prod l ([] : list B) = [].
+Proof.
+intros A B l.
+induction l as [| x]; [ reflexivity | assumption ].
+Qed.
+
 Theorem union_list_intersection : ∀ A (P : A → Prop) QL x,
   P x
   → (∐ QL)%S x
@@ -2929,21 +2936,62 @@ split.
   clear - HEP HEQ H.
   revert E Q HEP HEQ H.
   induction P as [| P PL]; intros; [ contradiction | ].
-unfold partition_prod in H.
-simpl in H.
-rewrite map_app, map_map in H.
-pose proof union_list_app _ s eq_refl (map (intersection P) Q)
- (partition_prod PL Q) as HH.
-apply HH in H; clear HH.
-destruct H as [H| H].
-simpl in HEP.
-apply HEP.
-left.
-clear -HEQ H.
-revert E HEQ.
-induction Q as [| Q QL]; intros; [ contradiction | ].
-simpl in H.
-destruct H as [(H, _)| H]; [ assumption | ].
+  unfold partition_prod in H; simpl in H.
+  rewrite map_app, map_map in H.
+  pose proof union_list_app _ s eq_refl (map (intersection P) Q)
+    (partition_prod PL Q) as HH.
+  apply HH in H; clear HH.
+  apply HEP; simpl.
+  destruct H as [H| H].
+   left.
+   clear -H.
+   induction Q as [| Q QL]; [ contradiction | ].
+   destruct H as [H| H]; [ destruct H; assumption | apply IHQL, H ].
+
+   right.
+   clear -s H.
+   revert Q H.
+   induction PL as [| P PL]; intros; [ contradiction | ].
+   unfold partition_prod in H; simpl in H.
+   rewrite map_app, map_map in H.
+   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
+     (partition_prod PL Q) as HH.
+   apply HH in H; clear HH.
+   destruct H as [H| H].
+    left.
+    clear -H.
+    induction Q as [| Q QL]; [ contradiction | ].
+    destruct H as [H| H]; [ destruct H; assumption | apply IHQL, H ].
+
+   right.
+   clear -s H.
+   revert Q H.
+   induction PL as [| P PL]; intros; [ contradiction | ].
+   unfold partition_prod in H; simpl in H.
+   rewrite map_app, map_map in H.
+   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
+     (partition_prod PL Q) as HH.
+   apply HH in H; clear HH.
+   destruct H as [H| H].
+    left.
+    clear -H.
+    induction Q as [| Q QL]; [ contradiction | ].
+    destruct H as [H| H]; [ destruct H; assumption | apply IHQL, H ].
+
+   right.
+   clear -s H.
+   revert Q H.
+   induction PL as [| P PL]; intros; [ contradiction | ].
+   unfold partition_prod in H; simpl in H.
+   rewrite map_app, map_map in H.
+   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
+     (partition_prod PL Q) as HH.
+   apply HH in H; clear HH.
+   destruct H as [H| H].
+    left.
+    clear -H.
+    induction Q as [| Q QL]; [ contradiction | ].
+    destruct H as [H| H]; [ destruct H; assumption | apply IHQL, H ].
 
 bbb.
 
