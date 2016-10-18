@@ -1520,6 +1520,13 @@ unfold set_eq, intersection; simpl.
 intros x; split; [ intros (H, _); contradiction | contradiction ].
 Qed.
 
+Theorem intersection_comm : ∀ A s, s = set_equiv → ∀ (E F : A → Prop),
+  (E ⋂ F = F ⋂ E)%S.
+Proof.
+intros * Hs E *; subst s; intros x.
+split; intros (H₁, H₂); split; assumption.
+Qed.
+
 Theorem union_empty_r : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop), (F ⋃ ∅ = F)%S.
 Proof.
@@ -2953,9 +2960,26 @@ rewrite app_length, IHPL, map_length.
 reflexivity.
 Qed.
 
-(* to prevent 'simpl' to expand 2*a, 3*a, and so on, into matches *)
-Arguments Nat.modulo _ _ : simpl nomatch.
-Arguments Z.mul _ _ : simpl nomatch.
+Theorem partition_prod_single_r : ∀ A (s := set_equiv)PL (Q : A → Prop) i,
+  ((partition_prod PL [Q]).[i] = (map (intersection Q) PL).[i])%S.
+Proof.
+intros A s PL Q i.
+induction PL as [| P PL]; [ reflexivity | ].
+rewrite partition_prod_cons_l.
+destruct (lt_dec i (length PL)) as [H₁| H₁].
+ unfold nth_set.
+ rewrite <- map_nth.
+ rewrite app_nth1.
+ remember List.nth as f; simpl; subst f.
+bbb.
+
+simpl.
+
+simpl; rewrite <- IHPL.
+rewrite partition_prod_cons_l; simpl.
+f_equal.
+Check intersection_comm.
+bbb.
 
 Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) i,
   ((partition_prod PL QL).[i] = PL.[i / length QL] ⋂ QL.[i mod length QL])%S.
@@ -2968,6 +2992,12 @@ destruct QL as [| Q QL].
 
  remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
  rewrite fold_set_eq.
+ destruct QL as [| Q₁ QL].
+  remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
+  rewrite fold_set_eq.
+  rewrite Nat.div_1_r, Nat.mod_1_r.
+
+Check partition_prod_single_r.
 bbb.
 
 revert PL QL.
