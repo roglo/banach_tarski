@@ -2994,6 +2994,44 @@ induction QL as [| Q QL]; intros.
  unfold nth_set.
  remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
  rewrite fold_set_eq, fold_nth_set, fold_nth_set.
+ remember (i mod S (length QL)) as a eqn:Ha.
+ symmetry in Ha.
+ destruct a.
+  apply Nat.mod_divides in Ha; [ | intros HH; discriminate HH ].
+  destruct Ha as (a, Ha); rewrite Nat.mul_comm in Ha.
+  rewrite Ha.
+  rewrite Nat.div_mul; [ | intros HH; discriminate HH ].
+  clear - a.
+  revert PL Q QL.
+  induction a; intros.
+   rewrite Nat.mul_0_l.
+   destruct PL as [| P PL].
+    rewrite partition_prod_nil_l; simpl.
+    unfold nth_set; simpl; rewrite fold_set_eq.
+    symmetry; apply intersection_empty_l.
+
+    rewrite partition_prod_cons_l; simpl.
+    unfold nth_set; simpl; rewrite fold_set_eq.
+    reflexivity.
+
+   destruct PL as [| P PL].
+    rewrite partition_prod_nil_l; simpl.
+    unfold nth_set; simpl; rewrite fold_set_eq.
+    symmetry; apply intersection_empty_l.
+
+    rewrite partition_prod_cons_l; simpl.
+    unfold nth_set; simpl; rewrite fold_set_eq.
+    do 2 rewrite fold_nth_set.
+    unfold nth_set.
+    rewrite app_nth2.
+     rewrite map_length, Nat.add_comm, Nat.add_sub.
+     do 2 rewrite fold_nth_set.
+     apply IHa.
+
+     rewrite map_length.
+     apply Nat.le_add_r.
+
+  simpl.
 bbb.
 
  destruct QL as [| Q₁ QL].
