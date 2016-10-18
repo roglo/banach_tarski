@@ -1508,6 +1508,14 @@ Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : A → Prop),
   → ∀ p, E p ↔ F p.
 Proof. intros s * HEF; apply HEF. Qed.
 
+Theorem intersection_empty_l : ∀ A (s := set_equiv) (E : A → Prop),
+  (∅ ⋂ E = ∅)%S.
+Proof.
+intros.
+unfold set_eq, intersection; simpl.
+intros x; split; [ intros (H, _); contradiction | contradiction ].
+Qed.
+
 Theorem union_empty_r : ∀ A s, s = set_equiv →
   ∀ (F : A → Prop), (F ⋃ ∅ = F)%S.
 Proof.
@@ -3077,6 +3085,37 @@ split.
  intros (HQ, HP).
  rewrite HEP in HEQ.
  clear E HEP.
+(**)
+ destruct (lt_dec i (length Q)) as [Hi| Hi].
+  assert
+    (HPM : ((partition_prod P Q).[i] = (map (intersection P.[0]) Q).[i])%S).
+   destruct P as [| P PL].
+    rewrite partition_prod_nil_l.
+    unfold nth_set; simpl.
+    destruct i; simpl.
+     destruct Q as [| Q QL]; [ reflexivity | simpl ].
+     intros y.
+     split; [ contradiction | ].
+     intros H; apply intersection_empty_l in H; contradiction.
+
+     destruct Q as [| Q QL]; [ reflexivity | simpl ].
+     intros y.
+     split; [ contradiction | ].
+     intros H.
+     clear -H.
+     revert i H.
+     induction QL as [| Q QL]; intros; [ destruct i; contradiction | ].
+     simpl in H.
+     destruct i; [ apply intersection_empty_l in H; contradiction | ].
+     eapply IHQL, H.
+
+    rewrite partition_prod_cons_l.
+    unfold nth_set; simpl.
+    intros y.
+    rewrite app_nth1; [ reflexivity | rewrite map_length; assumption ].
+
+   apply HPM in HQ.
+bbb.
  destruct (lt_dec i (length P * length Q)) as [Hi| Hi].
   destruct (lt_dec j (length P * length Q)) as [Hj| Hj].
    rewrite <- partition_prod_length in Hi, Hj.
