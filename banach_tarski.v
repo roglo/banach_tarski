@@ -1507,6 +1507,10 @@ Theorem fold_set_eq : ∀ A (s := set_equiv) (P Q : A → Prop),
   (∀ x, P x ↔ Q x) = (P = Q)%S.
 Proof. intros; reflexivity. Qed.
 
+Theorem fold_nth_set : ∀ A (Ei : list (A → Prop)) i,
+  List.nth i Ei ∅%S = nth_set i Ei.
+Proof. reflexivity. Qed.
+
 Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : A → Prop),
   (E = F)%S
   → ∀ p, E p ↔ F p.
@@ -2961,16 +2965,24 @@ reflexivity.
 Qed.
 
 Theorem partition_prod_single_r : ∀ A (s := set_equiv)PL (Q : A → Prop) i,
-  ((partition_prod PL [Q]).[i] = (map (intersection Q) PL).[i])%S.
+  ((partition_prod PL [Q]).[i] = (map (λ p, intersection p Q) PL).[i])%S.
 Proof.
 intros A s PL Q i.
 induction PL as [| P PL]; [ reflexivity | ].
 rewrite partition_prod_cons_l.
+bbb.
+
 destruct (lt_dec i (length PL)) as [H₁| H₁].
  unfold nth_set.
  rewrite <- map_nth.
  rewrite app_nth1.
+ rewrite fold_nth_set.
  remember List.nth as f; simpl; subst f.
+ rewrite IHPL.
+
+bbb.
+ rewrite IHPL.
+
 bbb.
 
 simpl.
