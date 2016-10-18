@@ -1468,12 +1468,12 @@ Definition nth_set {A} i (Ei : list (A → Prop)) :=
 
 Notation "a = b" := (set_eq a b) : set_scope.
 Notation "'∅'" := (empty_set) : set_scope.
-Notation "E₁ '⋂' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
-Notation "E₁ '⋃' E₂" := (union E₁ E₂) (at level 50, left associativity)
+Notation "E₁ '∩' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
+Notation "E₁ '∪' E₂" := (union E₁ E₂) (at level 50, left associativity)
   : set_scope.
-Notation "E₁ '\' E₂" := (subtract E₁ E₂) (at level 50) : set_scope.
+Notation "E₁ '∖' E₂" := (subtract E₁ E₂) (at level 50) : set_scope.
 Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60) : set_scope.
-Notation "'∐' Es" := (union_list Es) (at level 60) : set_scope.
+Notation "'⋃' Es" := (union_list Es) (at level 60) : set_scope.
 Notation "E .[ i ]" := (nth_set i E) (at level 1, format "E .[ i ]")
 : set_scope.
 
@@ -1517,7 +1517,7 @@ Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : A → Prop),
 Proof. intros s * HEF; apply HEF. Qed.
 
 Theorem intersection_empty_l : ∀ A (s := set_equiv) (E : A → Prop),
-  (∅ ⋂ E = ∅)%S.
+  (∅ ∩ E = ∅)%S.
 Proof.
 intros.
 unfold set_eq, intersection; simpl.
@@ -1525,14 +1525,14 @@ intros x; split; [ intros (H, _); contradiction | contradiction ].
 Qed.
 
 Theorem intersection_comm : ∀ A s, s = set_equiv → ∀ (E F : A → Prop),
-  (E ⋂ F = F ⋂ E)%S.
+  (E ∩ F = F ∩ E)%S.
 Proof.
 intros * Hs E *; subst s; intros x.
 split; intros (H₁, H₂); split; assumption.
 Qed.
 
 Theorem union_empty_r : ∀ A s, s = set_equiv →
-  ∀ (F : A → Prop), (F ⋃ ∅ = F)%S.
+  ∀ (F : A → Prop), (F ∪ ∅ = F)%S.
 Proof.
 intros * Hs *.
 subst s; intros x.
@@ -1541,7 +1541,7 @@ destruct H as [H| H]; [ assumption | contradiction ].
 Qed.
 
 Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : A → Prop),
-  (E ⋃ (F ⋃ G) = (E ⋃ F) ⋃ G)%S.
+  (E ∪ (F ∪ G) = (E ∪ F) ∪ G)%S.
 Proof.
 intros * Hs E *.
 unfold set_eq, union; subst s; intros x.
@@ -1558,7 +1558,7 @@ split; intros H.
 Qed.
 
 Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)),
-  (∐ (P₁ ++ P₂) = (∐ P₁) ⋃ (∐ P₂))%S.
+  (⋃ (P₁ ++ P₂) = (⋃ P₁) ∪ (⋃ P₂))%S.
 Proof.
 intros * Hs *.
 revert P₁.
@@ -1602,7 +1602,7 @@ induction P₂ as [| Q]; intros.
 Qed.
 
 Theorem nth_set_union_list : ∀ A (P : list (A → Prop)) i x,
-  i < length P → (P.[i])%S x → (∐ P)%S x.
+  i < length P → (P.[i])%S x → (⋃ P)%S x.
 Proof.
 intros A P i x Hi H.
 revert P H Hi.
@@ -1629,8 +1629,8 @@ Qed.
 (* Partitions *)
 
 Definition is_partition {A} {S : set_model A} E Ep :=
-  (E = ∐ Ep)%S ∧
-  ∀ i j, i ≠ j → (Ep.[i] ⋂ Ep.[j] = ∅)%S.
+  (E = ⋃ Ep)%S ∧
+  ∀ i j, i ≠ j → (Ep.[i] ∩ Ep.[j] = ∅)%S.
 
 Theorem is_partition_group_first_2_together :
   ∀ A s, s = set_equiv →
@@ -1700,7 +1700,7 @@ Theorem is_partition_union_subtract :
   is_partition F (P₁ :: P₂ :: Pl)
   → (B ⊂ P₂)%S
   → (∀ x, Decidable.decidable (B x))
-  → is_partition F (P₁ ⋃ B :: P₂ \ B :: Pl)%S.
+  → is_partition F (P₁ ∪ B :: P₂ ∖ B :: Pl)%S.
 Proof.
 intros A s Hs F P₁ P₂ Pl B Hp HB HBdec.
 destruct Hp as (Hu & Hi).
@@ -1777,17 +1777,17 @@ Qed.
 Theorem partition_union :
   ∀ A s, s = set_equiv →
   ∀ (F₁ F₂ : A → Prop) P₁ P₂,
-  (F₁ ⋂ F₂ = ∅)%S
+  (F₁ ∩ F₂ = ∅)%S
   → is_partition F₁ P₁
   → is_partition F₂ P₂
-  → is_partition (F₁ ⋃ F₂)%S (P₁ ++ P₂).
+  → is_partition (F₁ ∪ F₂)%S (P₁ ++ P₂).
 Proof.
 intros * Hs F₁ F₂ * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
  subst s; rewrite union_list_app; [ | reflexivity ].
- transitivity (F₁ ⋃ ∐ P₂)%S.
+ transitivity (F₁ ∪ ⋃ P₂)%S.
   intros x.
   split; intros H.
    destruct H as [H| H]; [ left; assumption | right ].
@@ -1999,8 +1999,8 @@ Qed.
 Theorem decompose_2a_contrad_case :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → ∀ p, (M ⋃ SS ạ ⋃ B)%S p
-  → rot ạ (SS ạ⁻¹ \ B)%S p
+  → ∀ p, (M ∪ SS ạ ∪ B)%S p
+  → rot ạ (SS ạ⁻¹ ∖ B)%S p
   → False.
 Proof.
 intros * (Hoe, Ho) * Hos * Hi Hj.
@@ -2189,7 +2189,7 @@ Theorem r_decomposed_4 :
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints
-      [(M ⋃ SS ạ ⋃ B)%S; (SS ạ⁻¹ \ B)%S; SS ḅ; SS ḅ⁻¹].
+      [(M ∪ SS ạ ∪ B)%S; (SS ạ⁻¹ ∖ B)%S; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros s Hs f HoeHo os Hos.
 pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
@@ -2334,7 +2334,7 @@ Theorem r_decomposed_2_a :
   ∀ s, s = set_equiv
   → ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition sphere_but_fixpoints [(M ⋃ SS ạ ⋃ B)%S; rot ạ (SS ạ⁻¹ \ B)%S].
+  → is_partition sphere_but_fixpoints [(M ∪ SS ạ ∪ B)%S; rot ạ (SS ạ⁻¹ ∖ B)%S].
 Proof.
 intros s Hs f (Hoe, Ho) os Hos; subst s.
 split.
@@ -2641,7 +2641,7 @@ split; [ apply IHf2 | intros; contradiction ].
 Qed.
 
 Theorem group_union_distr : ∀ (s := set_equiv) g E₁ E₂,
-  (app_gr g (E₁ ⋃ E₂) = app_gr g E₁ ⋃ app_gr g E₂)%S.
+  (app_gr g (E₁ ∪ E₂) = app_gr g E₁ ∪ app_gr g E₂)%S.
 Proof.
 intros s *; subst s.
 revert E₁ E₂.
@@ -2660,7 +2660,7 @@ induction g as [ e| dx | g IHg h IHh ]; intros; simpl.
 Qed.
 
 Theorem group_union_list_distr : ∀ (s := set_equiv) f PL,
-  (app_gr f (∐ PL) = ∐ map (app_gr f) PL)%S.
+  (app_gr f (⋃ PL) = ⋃ map (app_gr f) PL)%S.
 Proof.
 intros s *.
 induction PL as [| P PL].
@@ -2921,8 +2921,8 @@ Qed.
 
 Theorem union_list_intersection : ∀ A (P : A → Prop) QL x,
   P x
-  → (∐ QL)%S x
-  → (∐ map (intersection P) QL)%S x.
+  → (⋃ QL)%S x
+  → (⋃ map (intersection P) QL)%S x.
 Proof.
 intros A P QL * HP HQL.
 induction QL as [| Q QL]; intros; [ contradiction | simpl ].
@@ -2983,7 +2983,7 @@ Qed.
 
 (*
 Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) i,
-  ((partition_prod PL QL).[i] = PL.[i / length QL] ⋂ QL.[i mod length QL])%S.
+  ((partition_prod PL QL).[i] = PL.[i / length QL] ∩ QL.[i mod length QL])%S.
 Proof.
 intros *.
 revert i.
@@ -3182,6 +3182,11 @@ split.
  clear E HEP.
  unfold partition_prod in HP, HQ.
  remember (list_prod P Q) as LPQ eqn:HLPQ.
+Compute seq 0 5.
+assert
+  (partition_prod P Q =
+   map (λ '(i, j), (P.[i] ∩ P.[j])%S)
+     (list_prod (seq O (length P)) (seq O (length Q)))).
 
 bbb.
 
@@ -3321,7 +3326,7 @@ bbb.
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
   equidecomposable set_equiv sphere_but_fixpoints
-    (xtransl 3 sphere_but_fixpoints ⋃ xtransl 6 sphere_but_fixpoints)%S.
+    (xtransl 3 sphere_but_fixpoints ∪ xtransl 6 sphere_but_fixpoints)%S.
 Proof.
 set (s := set_equiv).
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
@@ -3329,8 +3334,8 @@ destruct H as (f & Hu & Hm).
 remember (mkcf _ _ f Hm Hu) as Hosf.
 remember (mkos _ f) as os eqn:Hos.
 clear HeqHosf.
-set (A₁ := (M ⋃ SS ạ ⋃ B)%S).
-set (A₂ := (SS ạ⁻¹ \ B)%S).
+set (A₁ := (M ∪ SS ạ ∪ B)%S).
+set (A₂ := (SS ạ⁻¹ ∖ B)%S).
 set (A₃ := SS ḅ).
 set (A₄ := SS ḅ⁻¹).
 exists [A₁; A₂; A₃; A₄].
@@ -3529,7 +3534,7 @@ bbb.
 *)
 
 Theorem Banach_Tarski_paradox :
-  equidecomposable set_equiv sphere (xtransl 3 sphere ⋃ xtransl 6 sphere)%S.
+  equidecomposable set_equiv sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
 Proof.
 set (s := set_equiv).
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
@@ -3538,8 +3543,8 @@ remember (mkcf _ _ f Hm Hu) as Hosf.
 remember (mkos _ f) as os eqn:Hos.
 clear HeqHosf.
 bbb.
-set (A₁ := (M ⋃ SS ạ ⋃ B)%S).
-set (A₂ := (SS ạ⁻¹ \ B)%S).
+set (A₁ := (M ∪ SS ạ ∪ B)%S).
+set (A₂ := (SS ạ⁻¹ ∖ B)%S).
 set (A₃ := SS ḅ).
 set (A₄ := SS ḅ⁻¹).
 exists [A₁; A₂; A₃; A₄].
