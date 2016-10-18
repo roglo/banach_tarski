@@ -2963,36 +2963,12 @@ split.
     induction Q as [| Q QL]; [ contradiction | ].
     destruct H as [H| H]; [ destruct H; assumption | apply IHQL, H ].
 
-   right.
-   clear -s H.
-   revert Q H.
-   induction PL as [| P PL]; intros; [ contradiction | ].
-   unfold partition_prod in H; simpl in H.
-   rewrite map_app, map_map in H.
-   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
-     (partition_prod PL Q) as HH.
-   apply HH in H; clear HH.
-   destruct H as [H| H].
-    left.
-    clear -H.
-    induction Q as [| Q QL]; [ contradiction | ].
-    destruct H as [H| H]; [ destruct H; assumption | apply IHQL, H ].
+    right.
+    eapply IHPL, H.
 
-   right.
-   clear -s H.
-   revert Q H.
-   induction PL as [| P PL]; intros; [ contradiction | ].
-   unfold partition_prod in H; simpl in H.
-   rewrite map_app, map_map in H.
-   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
-     (partition_prod PL Q) as HH.
-   apply HH in H; clear HH.
-   destruct H as [H| H].
-    left.
-    clear -H.
-    induction Q as [| Q QL]; [ contradiction | ].
-    destruct H as [H| H]; [ destruct H; assumption | apply IHQL, H ].
-
+ intros i j Hij.
+ split; [ | intros H; contradiction ].
+ intros (HQ, HP).
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
