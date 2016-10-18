@@ -2946,7 +2946,7 @@ Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) 
   intersection (PL.[i / length QL]) (QL.[i mod length QL]))%S.
 Proof.
 intros *.
-(**)
+(*
 destruct QL as [| Q QL].
  rewrite partition_prod_nil_r.
  split; [ destruct i; contradiction | simpl; intros H ].
@@ -2960,13 +2960,15 @@ destruct QL as [| Q QL].
   destruct (i / length (Q :: QL)); contradiction.
 
   rewrite partition_prod_cons_l.
-
+  intros x.
+   split; intros H.
 bbb.
 
   destruct i.
    simpl.
 
 bbb.
+*)
 revert PL QL.
 induction i; intros.
 (**)
@@ -2984,6 +2986,13 @@ induction i; intros.
   rewrite partition_prod_nil_r.
   split; [ contradiction | simpl; intros H ].
   destruct H as (_, H); contradiction.
+
+  intros x.
+  split; intros H.
+   simpl in H.
+   destruct PL as [| P PL]; [ contradiction | ].
+    rewrite partition_prod_cons_l in H.
+    unfold nth_set in H; simpl in H.
 
 bbb.
  intros x.
