@@ -3080,13 +3080,6 @@ split.
  destruct (lt_dec i (length P * length Q)) as [Hi| Hi].
   destruct (lt_dec j (length P * length Q)) as [Hj| Hj].
    rewrite <- partition_prod_length in Hi, Hj.
-bbb.
-Inspect 1.
-apply nth_partition_prod in HP.
-apply nth_partition_prod in HQ.
-bbb.
-
-   rewrite <- partition_prod_length in Hi, Hj.
    remember (partition_prod P Q) as PQ eqn:HPQ.
    symmetry in HPQ.
    revert i j P Q Hij HPQ HPij HQij HEQ HP HQ Hi Hj.
@@ -3094,10 +3087,10 @@ bbb.
     revert Hi; apply Nat.nlt_0_r.
 
     simpl in Hi, Hj.
-
     destruct i.
      destruct j; [ apply Hij; reflexivity | ].
      unfold nth_set in HP, HQ; simpl in HP, HQ.
+     apply Nat.succ_lt_mono in Hj.
 
 bbb.
 
