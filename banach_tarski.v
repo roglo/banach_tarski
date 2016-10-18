@@ -3018,6 +3018,20 @@ split.
  rewrite HEP in HEQ.
  clear E HEP.
  destruct (lt_dec i (length P * length Q)) as [Hi| Hi].
+  destruct (lt_dec j (length P * length Q)) as [Hj| Hj].
+   rewrite <- partition_prod_length in Hi, Hj.
+   remember (partition_prod P Q) as PQ eqn:HPQ.
+   symmetry in HPQ.
+   revert i j P Q Hij HPQ HPij HQij HEQ HP HQ Hi Hj.
+   induction PQ as [| PQ PLQ]; intros i j P; intros.
+    revert Hi; apply Nat.nlt_0_r.
+
+    simpl in Hi, Hj.
+    destruct i.
+     destruct j; [ apply Hij; reflexivity | ].
+     unfold nth_set in HP, HQ; simpl in HP, HQ.
+bbb.
+
 Focus 2.
   apply Hi; clear - HQ.
   rewrite <- partition_prod_length.
@@ -3042,6 +3056,7 @@ Focus 2.
   destruct j; [ apply Nat.lt_0_succ | simpl ].
   apply -> Nat.succ_lt_mono.
   apply IHPL; assumption.
+
 bbb.
 
   revert P Q HQ.
