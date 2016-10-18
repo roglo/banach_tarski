@@ -2981,6 +2981,7 @@ destruct i.
  apply IHPL.
 Qed.
 
+(*
 Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) i,
   ((partition_prod PL QL).[i] = PL.[i / length QL] ⋂ QL.[i mod length QL])%S.
 Proof.
@@ -3031,7 +3032,13 @@ induction QL as [| Q QL]; intros.
      rewrite map_length.
      apply Nat.le_add_r.
 
-  simpl.
+  destruct i.
+   rewrite Nat.mod_0_l in Ha; [ | intros H; discriminate H ].
+   discriminate Ha.
+
+   unfold nth_set.
+   remember Nat.div as f; simpl; subst f.
+   rewrite fold_set_eq, fold_nth_set, fold_nth_set, fold_nth_set.
 bbb.
 
  destruct QL as [| Q₁ QL].
@@ -3173,9 +3180,8 @@ split.
  intros (HQ, HP).
  rewrite HEP in HEQ.
  clear E HEP.
-
-apply glop in HP.
-apply glop in HQ.
+ unfold partition_prod in HP, HQ.
+ remember (list_prod P Q) as LPQ eqn:HLPQ.
 
 bbb.
 
