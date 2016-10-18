@@ -2941,6 +2941,73 @@ rewrite app_length, IHPL, map_length.
 reflexivity.
 Qed.
 
+Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) i,
+ ((partition_prod PL QL).[i] =
+  intersection (PL.[i / length QL]) (QL.[i mod length QL]))%S.
+Proof.
+intros *.
+(**)
+destruct QL as [| Q QL].
+ rewrite partition_prod_nil_r.
+ split; [ destruct i; contradiction | simpl; intros H ].
+ destruct H as (_, H); contradiction.
+
+ revert Q QL i.
+ induction PL as [| P PL]; intros.
+  rewrite partition_prod_nil_l.
+  intros x; split; intros H; [ destruct i; contradiction | ].
+  destruct H as (H, _).
+  destruct (i / length (Q :: QL)); contradiction.
+
+  rewrite partition_prod_cons_l.
+
+bbb.
+
+  destruct i.
+   simpl.
+
+bbb.
+revert PL QL.
+induction i; intros.
+(**)
+ destruct QL as [| Q QL].
+  rewrite partition_prod_nil_r.
+  split; [ contradiction | simpl; intros H ].
+  destruct H as (_, H); contradiction.
+
+  simpl; rewrite Nat.sub_diag.
+  destruct PL as [| P PL]; [ | reflexivity ].
+  rewrite partition_prod_nil_l.
+  intros x; split; [ contradiction | intros (H, _); contradiction ].
+
+ destruct QL as [| Q QL].
+  rewrite partition_prod_nil_r.
+  split; [ contradiction | simpl; intros H ].
+  destruct H as (_, H); contradiction.
+
+bbb.
+ intros x.
+ split.
+  intros HPQ.
+   destruct QL as [| Q QL].
+    rewrite partition_prod_nil_r in HPQ.
+    contradiction.
+
+    simpl; rewrite Nat.sub_diag.
+    destruct PL as [| P PL]; [ contradiction | ].
+    rewrite partition_prod_cons_l in HPQ.
+    unfold nth_set in HPQ; simpl in HPQ.
+    unfold nth_set; assumption.
+
+  intros HPQL.
+   destruct QL as [| Q QL].
+    destruct HPQL as (_, HPQL).
+    contradiction.
+
+    simpl in HPQL; rewrite Nat.sub_diag in HPQL.
+
+bbb.
+
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
 Proof.
@@ -3019,6 +3086,11 @@ split.
  clear E HEP.
  destruct (lt_dec i (length P * length Q)) as [Hi| Hi].
   destruct (lt_dec j (length P * length Q)) as [Hj| Hj].
+Inspect 1.
+apply nth_partition_prod in HP.
+apply nth_partition_prod in HQ.
+bbb.
+
    rewrite <- partition_prod_length in Hi, Hj.
    remember (partition_prod P Q) as PQ eqn:HPQ.
    symmetry in HPQ.
@@ -3027,9 +3099,11 @@ split.
     revert Hi; apply Nat.nlt_0_r.
 
     simpl in Hi, Hj.
+
     destruct i.
      destruct j; [ apply Hij; reflexivity | ].
      unfold nth_set in HP, HQ; simpl in HP, HQ.
+
 bbb.
 
 Focus 2.
