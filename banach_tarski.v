@@ -1503,6 +1503,10 @@ Add Parametric Relation A : (A → Prop) (@set_eq A set_equiv)
  transitivity proved by (set_eq_trans A)
  as set_eq_rel.
 
+Theorem fold_set_eq : ∀ A (s := set_equiv) (P Q : A → Prop),
+  (∀ x, P x ↔ Q x) = (P = Q)%S.
+Proof. intros; reflexivity. Qed.
+
 Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : A → Prop),
   (E = F)%S
   → ∀ p, E p ↔ F p.
@@ -2957,6 +2961,13 @@ Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) 
   ((partition_prod PL QL).[i] = PL.[i / length QL] ⋂ QL.[i mod length QL])%S.
 Proof.
 intros *.
+destruct QL as [| Q QL].
+ rewrite partition_prod_nil_r.
+ split; [ destruct i; contradiction | intros H ].
+ destruct H as (_, H); contradiction.
+
+ remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
+ rewrite fold_set_eq.
 bbb.
 
 revert PL QL.
