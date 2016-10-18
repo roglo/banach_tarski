@@ -2985,18 +2985,41 @@ Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) 
   ((partition_prod PL QL).[i] = PL.[i / length QL] ⋂ QL.[i mod length QL])%S.
 Proof.
 intros *.
-destruct QL as [| Q QL].
+revert i.
+induction QL as [| Q QL]; intros.
  rewrite partition_prod_nil_r.
  split; [ destruct i; contradiction | intros H ].
  destruct H as (_, H); contradiction.
 
+ unfold nth_set.
  remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
- rewrite fold_set_eq.
+ rewrite fold_set_eq, fold_nth_set, fold_nth_set.
+bbb.
+
  destruct QL as [| Q₁ QL].
   remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
   rewrite fold_set_eq.
   rewrite Nat.div_1_r, Nat.mod_1_r.
   rewrite partition_prod_single_r.
+  unfold nth_set; simpl.
+  rewrite fold_set_eq, fold_nth_set, fold_nth_set.
+  revert i.
+  induction PL as [| P PL]; intros.
+   intros x; unfold nth_set; simpl.
+   destruct i.
+    split; [ contradiction | intros H ].
+    apply intersection_empty_l in H; contradiction.
+
+    split; [ contradiction | intros H ].
+    apply intersection_empty_l in H; contradiction.
+
+   destruct i.
+    unfold nth_set; simpl; rewrite fold_set_eq.
+    apply intersection_comm; reflexivity.
+
+    unfold nth_set; simpl; rewrite fold_set_eq, fold_nth_set, fold_nth_set.
+    apply IHPL.
+
 bbb.
 
 revert PL QL.
