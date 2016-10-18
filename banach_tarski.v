@@ -2969,6 +2969,19 @@ split.
  intros i j Hij.
  split; [ | intros H; contradiction ].
  intros (HQ, HP).
+ rewrite HEP in HEQ.
+ clear E HEP.
+bbb.
+ revert i j Q HEQ HQij Hij HP HQ.
+ induction P as [| P PL]; intros; [ destruct i; contradiction | ].
+ unfold partition_prod in HP, HQ.
+ simpl in HP, HQ.
+ rewrite map_app, map_map in HP, HQ.
+ unfold nth_set in HP, HQ.
+
+
+bbb.
+ revert P Q HPij HEQ HQij HP HQ.
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
