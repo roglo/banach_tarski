@@ -2907,6 +2907,40 @@ destruct HQL as [HQ| HQL]; [ left; split; assumption | right ].
 apply IHQL, HQL.
 Qed.
 
+Theorem partition_prod_nil_l : ∀ A (Q : list (A → Prop)),
+  partition_prod [] Q = [].
+Proof. reflexivity. Qed.
+
+Theorem partition_prod_nil_r : ∀ A (P : list (A → Prop)),
+  partition_prod P [] = [].
+Proof.
+intros A P.
+unfold partition_prod.
+induction P as [| P PL]; [ reflexivity | apply IHPL ].
+Qed.
+
+Theorem partition_prod_cons_l : ∀ A P (PL QL : list (A → Prop)),
+  partition_prod (P :: PL) QL =
+  map (intersection P) QL ++ partition_prod PL QL.
+Proof.
+intros A P PL QL.
+unfold partition_prod; simpl.
+rewrite map_app, map_map.
+reflexivity.
+Qed.
+
+Theorem partition_prod_length :
+  ∀ A (P Q : list (A → Prop)),
+  length (partition_prod P Q) = (length P * length Q)%nat.
+Proof.
+intros A P Q.
+revert Q.
+induction P as [| P PL]; intros; [ reflexivity | simpl ].
+rewrite partition_prod_cons_l.
+rewrite app_length, IHPL, map_length.
+reflexivity.
+Qed.
+
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
 Proof.
@@ -2966,11 +3000,77 @@ split.
     right.
     eapply IHPL, H.
 
+(*
+ assert
+   (HPQ : ∀ i j, i ≠ j →
+    ((partition_prod P Q).[i] ≠ (partition_prod P Q).[j])%S).
+  intros i j Hij.
+  rewrite HEP in HEQ.
+  clear E HEP.
+  revert Q i j Hij HEQ HPij HQij.
+  induction P as [| P PL]; intros.
+   simpl in HEQ.
+   rewrite partition_prod_nil_l.
+*)
  intros i j Hij.
  split; [ | intros H; contradiction ].
  intros (HQ, HP).
  rewrite HEP in HEQ.
  clear E HEP.
+ destruct (lt_dec i (length P * length Q)) as [Hi| Hi].
+Focus 2.
+  apply Hi; clear - HQ.
+  rewrite <- partition_prod_length.
+  unfold nth_set in HQ.
+  remember (partition_prod P Q) as PL.
+  clear - HQ.
+  revert i HQ.
+  induction PL as [| P PL]; intros; [ destruct i; contradiction | ].
+  destruct i; [ apply Nat.lt_0_succ | simpl ].
+  apply -> Nat.succ_lt_mono.
+  apply IHPL; assumption.
+
+  destruct (lt_dec j (length P * length Q)) as [Hj| Hj].
+Focus 2.
+   apply Hj; clear - HP.
+  rewrite <- partition_prod_length.
+  unfold nth_set in HP.
+  remember (partition_prod P Q) as PL.
+  clear - HP.
+  revert j HP.
+  induction PL as [| P PL]; intros; [ destruct j; contradiction | ].
+  destruct j; [ apply Nat.lt_0_succ | simpl ].
+  apply -> Nat.succ_lt_mono.
+  apply IHPL; assumption.
+bbb.
+
+  revert P Q HQ.
+  induction i; intros P Q HQ.
+   destruct P as [| P PL]; [ contradiction | ].
+   destruct Q as [| Q QL]; [ | apply Nat.lt_0_succ ].
+   rewrite partition_prod_nil_r in HQ; contradiction.
+
+   destruct P as [| P PL]; [ contradiction | ].
+   destruct Q as [| Q QL].
+    rewrite partition_prod_nil_r in HQ; contradiction.
+
+    unfold partition_prod in HQ; simpl in HQ.
+    rewrite map_app, map_map in HQ.
+    unfold nth_set in HQ; simpl in HQ.
+bbb.
+    simpl.
+    apply -> Nat.succ_lt_mono.
+bbb.
+
+
+  destruct (lt_dec j (length P * length Q)) as [Hj| Hj].
+
+ revert P Q HEQ HPij HQij HP HQ.
+ induction i; intros P Q HEQ HPij HQij HP HQ.
+  destruct j; [ apply Hij; reflexivity | ].
+  unfold nth_set in HP, HQ.
+
+
 bbb.
  revert i j Q HEQ HQij Hij HP HQ.
  induction P as [| P PL]; intros; [ destruct i; contradiction | ].
