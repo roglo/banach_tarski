@@ -3068,23 +3068,13 @@ split.
     right.
     eapply IHPL, H.
 
-(*
- assert
-   (HPQ : ∀ i j, i ≠ j →
-    ((partition_prod P Q).[i] ≠ (partition_prod P Q).[j])%S).
-  intros i j Hij.
-  rewrite HEP in HEQ.
-  clear E HEP.
-  revert Q i j Hij HEQ HPij HQij.
-  induction P as [| P PL]; intros.
-   simpl in HEQ.
-   rewrite partition_prod_nil_l.
-*)
  intros i j Hij.
  split; [ | intros H; contradiction ].
  intros (HQ, HP).
  rewrite HEP in HEQ.
  clear E HEP.
+bbb.
+
 (**)
  destruct (lt_dec i (length Q)) as [Hi| Hi].
   assert
