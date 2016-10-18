@@ -2953,15 +2953,14 @@ Qed.
 Arguments Nat.modulo _ _ : simpl nomatch.
 Arguments Z.mul _ _ : simpl nomatch.
 
-(*
 Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) i,
- ((partition_prod PL QL).[i] =
-  intersection (PL.[i / length QL]) (QL.[i mod length QL]))%S.
+  ((partition_prod PL QL).[i] = PL.[i / length QL] ⋂ QL.[i mod length QL])%S.
 Proof.
 intros *.
+bbb.
+
 revert PL QL.
 induction i; intros.
-(**)
  destruct QL as [| Q QL].
   rewrite partition_prod_nil_r.
   split; [ contradiction | simpl; intros H ].
@@ -3073,6 +3072,10 @@ split.
  intros (HQ, HP).
  rewrite HEP in HEQ.
  clear E HEP.
+
+apply glop in HP.
+apply glop in HQ.
+
 bbb.
 
 (**)
