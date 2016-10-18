@@ -2929,7 +2929,21 @@ split.
   clear - HEP HEQ H.
   revert E Q HEP HEQ H.
   induction P as [| P PL]; intros; [ contradiction | ].
-  simpl in HEP.
+unfold partition_prod in H.
+simpl in H.
+rewrite map_app, map_map in H.
+pose proof union_list_app _ s eq_refl (map (intersection P) Q)
+ (partition_prod PL Q) as HH.
+apply HH in H; clear HH.
+destruct H as [H| H].
+simpl in HEP.
+apply HEP.
+left.
+clear -HEQ H.
+revert E HEQ.
+induction Q as [| Q QL]; intros; [ contradiction | ].
+simpl in H.
+destruct H as [(H, _)| H]; [ assumption | ].
 
 bbb.
 
