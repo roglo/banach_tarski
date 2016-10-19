@@ -2997,6 +2997,8 @@ split.
  induction l as [| y]; intros; [ constructor | ].
  constructor.
  intros H; subst y.
+Focus 2.
+ eapply IHl.
 
 bbb.
 
