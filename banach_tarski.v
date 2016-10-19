@@ -2973,6 +2973,25 @@ f_equal.
  f_equal; apply IHl.
 Qed.
 
+Definition all_different {A} (l : list A) :=
+  match l with
+  | x :: _ => ∀ i j, i ≠ j → List.nth i l x ≠ List.nth j l x
+  | [] => True
+  end.
+
+Theorem list_prod_seq_all_diff : ∀ s len s' len',
+  all_different (list_prod (seq s len) (seq s' len')).
+Proof.
+intros.
+unfold all_different.
+remember (list_prod (seq s len) (seq s' len')) as l eqn:Hl.
+symmetry in Hl.
+destruct l as [| (i, j) l]; [ constructor | ].
+intros i' j' Hij'.
+
+bbb.
+
+(*
 Theorem list_prod_seq_all_diff : ∀ s len s' len' p l,
  list_prod (seq s len) (seq s' len') ≠ p :: p :: l.
 Proof.
@@ -2995,6 +3014,7 @@ induction l as [| (i, j) l]; intros.
  eapply IHl.
 
 bbb.
+*)
 
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : set A) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
@@ -3083,6 +3103,12 @@ split.
     split; [ assumption | ].
     destruct (eq_nat_dec i' i'') as [Hii| Hii]; [ right | left; assumption ].
     intros H; subst i'' j''.
+    pose proof list_prod_seq_all_diff 0 (length P) 0 (length Q).
+    rewrite Hl in H.
+    eapply H with (i := O) (j := 1); [ apply Nat.neq_succ_diag_r | ].
+    reflexivity.
+bbb.
+
     exfalso; eapply list_prod_seq_all_diff; eassumption.
 
 bbb.
