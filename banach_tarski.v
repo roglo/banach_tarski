@@ -2515,20 +2515,6 @@ split; intros (H₁, H₂).
  split; [ apply HE; assumption | apply HF; assumption ].
 Qed.
 
-(*
-Add Parametric Morphism {A} : (@intersection A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
-  as intersection_iff_morph.
-Proof.
-intros E E' HE F F' HF a.
-unfold intersection.
-split; intros (H₁, H₂).
- split; [ apply HE; assumption | apply HF; assumption ].
- split; [ apply HE; assumption | apply HF; assumption ].
-Qed.
-*)
-
 Add Parametric Morphism {A} : (@union A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -2540,20 +2526,6 @@ split.
  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
 Qed.
-
-(*
-Add Parametric Morphism {A} : (@union A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
-  as union_iff_morph.
-Proof.
-intros E E' HE F F' HF.
-intros p.
-split.
- intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
- intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
-Qed.
-*)
 
 (* Transformation group *)
 
@@ -2600,16 +2572,13 @@ induction g as [ e| dx | g IHg h IHh]; intros.
  eapply IHh; [ symmetry; eassumption | eassumption ].
 Qed.
 
-(*
-Add Parametric Morphism : app_gr
-with signature eq ==> (@set_eq _ set_equiv) ==> eq ==> iff
-as app_gr_morph_iff.
+Add Parametric Morphism {A} : (@setp A)
+with signature (@set_eq _ set_equiv) ==> eq ==> iff
+as setp_morph.
 Proof.
-intros g p q Hpq r.
-split; intros H; [ eapply gr_subst; eassumption | ].
-symmetry in Hpq; eapply gr_subst; eassumption.
+intros E F HEF x.
+apply HEF.
 Qed.
-*)
 
 Add Parametric Morphism : app_gr
 with signature eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -2638,13 +2607,12 @@ induction g; intros; simpl.
 
  intros p.
  split; intros H.
-bbb.
   rewrite IHg1 in H; apply IHg2; assumption.
 
   rewrite IHg1; apply IHg2, H.
 Qed.
 
-Theorem app_gr_app_gr_point : ∀ g E p, app_gr g E p → E (app_gr_point g p).
+Theorem app_gr_app_gr_point : ∀ g E p, p ∈ app_gr g E → app_gr_point g p ∈ E.
 Proof.
 intros * Hp.
 revert E p Hp.
@@ -2702,7 +2670,7 @@ intros p; split; intros H.
 Qed.
 
 Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
-  ∀ (F : point → Prop) P g,
+  ∀ (F : set point) P g,
   is_partition F P → is_partition (app_gr g F) (map (app_gr g) P).
 Proof.
 intros s f Ho F P * HP.
@@ -2834,12 +2802,10 @@ split.
 
  intros i j Hij p.
  split; intros H; [ | contradiction ].
- unfold nth_set in H.
  rewrite <- app_gr_empty_set with (f := g) in H.
  do 2 rewrite map_nth in H.
  destruct H as (Hi, Hj).
  pose proof HP i j Hij (app_gr_point g p) as Hp.
- unfold nth_set in Hp.
  destruct Hp as (Hpi, _).
  apply Hpi; clear Hpi.
  split.
@@ -2935,14 +2901,14 @@ exists (app_gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
 Qed.
 
-Definition partition_prod {A} (PL QL : list (A → Prop)) :=
+Definition partition_prod {A} (PL QL : list (set A)) :=
   map (λ '(p, q), intersection p q) (list_prod PL QL).
 
-Theorem partition_prod_nil_l : ∀ A (Q : list (A → Prop)),
+Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
   partition_prod [] Q = [].
 Proof. reflexivity. Qed.
 
-Theorem partition_prod_nil_r : ∀ A (P : list (A → Prop)),
+Theorem partition_prod_nil_r : ∀ A (P : list (set A)),
   partition_prod P [] = [].
 Proof.
 intros A P.
@@ -2950,7 +2916,7 @@ unfold partition_prod.
 induction P as [| P PL]; [ reflexivity | apply IHPL ].
 Qed.
 
-Theorem partition_prod_cons_l : ∀ A P (PL QL : list (A → Prop)),
+Theorem partition_prod_cons_l : ∀ A P (PL QL : list (set A)),
   partition_prod (P :: PL) QL =
   map (intersection P) QL ++ partition_prod PL QL.
 Proof.
@@ -2961,7 +2927,7 @@ reflexivity.
 Qed.
 
 Theorem partition_prod_length :
-  ∀ A (P Q : list (A → Prop)),
+  ∀ A (P Q : list (set A)),
   length (partition_prod P Q) = (length P * length Q)%nat.
 Proof.
 intros A P Q.
@@ -2972,7 +2938,7 @@ rewrite app_length, IHPL, map_length.
 reflexivity.
 Qed.
 
-Theorem partition_prod_single_r : ∀ A (s := set_equiv)PL (Q : A → Prop) i,
+Theorem partition_prod_single_r : ∀ A (s := set_equiv) PL (Q : set A) i,
   ((partition_prod PL [Q]).[i] = (map (intersection Q) PL).[i])%S.
 Proof.
 intros A s PL Q i.
@@ -2980,16 +2946,10 @@ revert i.
 induction PL as [| P PL]; intros; [ reflexivity | ].
 rewrite partition_prod_cons_l.
 simpl; rewrite fold_set_eq.
-destruct i.
- unfold nth_set; simpl; rewrite fold_set_eq.
- apply intersection_comm; reflexivity.
-
- unfold nth_set; simpl; rewrite fold_set_eq.
- do 2 rewrite fold_nth_set.
- apply IHPL.
+destruct i; [ apply intersection_comm; reflexivity | apply IHPL ].
 Qed.
 
-Theorem partition_prod_by_seq : ∀ A (PL QL : list (A → Prop)),
+Theorem partition_prod_by_seq : ∀ A (PL QL : list (set A)),
   (partition_prod PL QL =
    map (λ '(i, j), (PL.[i] ∩ QL.[j])%S)
      (list_prod (seq O (length PL)) (seq O (length QL)))).
@@ -3013,7 +2973,7 @@ f_equal.
  f_equal; apply IHl.
 Qed.
 
-Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
+Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : set A) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
 Proof.
 intros A s E P Q (HEP, HPij) (HEQ, HQij).
@@ -3085,16 +3045,10 @@ split.
  destruct ij as (i', j').
  destruct i.
   simpl in Hi.
-  unfold nth_set in Hi; simpl in Hi.
-  do 2 rewrite fold_nth_set in Hi.
   destruct Hi as (HiP, HiQ).
   destruct j; [ apply Hij; reflexivity | ].
   simpl in Hj.
-  unfold nth_set at 1 in Hj; simpl in Hj.
-  rewrite fold_nth_set in Hj.
-bbb.
-  remember (λ '(i, j), (P.[i] ∩ Q.[j])%S) as f eqn:Hf.
-bbb.
+Abort.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
@@ -3104,7 +3058,9 @@ destruct HFG as (R & S & HR & HS & Hlen2 & HFG).
 unfold equidecomposable.
 set (QR := partition_prod Q R).
 set (s := set_equiv).
+(*
 pose proof partition_prod_is_partition _ F Q R HQ HR as HPQ.
+*)
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
@@ -3112,8 +3068,6 @@ Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans
  as equidec_morph.
-
-bbb.
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
   equidecomposable set_equiv sphere_but_fixpoints
