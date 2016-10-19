@@ -1372,6 +1372,14 @@ unfold set_eq, intersection; simpl.
 intros x; split; [ intros (H, _); contradiction | contradiction ].
 Qed.
 
+Theorem intersection_empty_r : ∀ A (s := set_equiv) (E : set A),
+  (E ∩ ∅ = ∅)%S.
+Proof.
+intros.
+unfold set_eq, intersection; simpl.
+intros x; split; [ intros (_, H); contradiction | contradiction ].
+Qed.
+
 Theorem intersection_comm : ∀ A s, s = set_equiv → ∀ (E F : set A),
   (E ∩ F = F ∩ E)%S.
 Proof.
@@ -2973,10 +2981,7 @@ f_equal.
  f_equal; apply IHl.
 Qed.
 
-Definition old_all_different {A} d (l : list A) :=
-  ∀ i j, i < length l → j < length l → i ≠ j →
-  List.nth i l d ≠ List.nth j l d.
-
+(*
 Fixpoint all_different {A} (l : list A) :=
   match l with
   | x :: l' => Forall (λ y, x ≠ y) l' ∧ all_different l'
@@ -2986,6 +2991,29 @@ Fixpoint all_different {A} (l : list A) :=
 Theorem list_prod_seq_all_diff : ∀ s len s' len',
   all_different (list_prod (seq s len) (seq s' len')).
 Proof.
+intros.
+bbb.
+
+remember (len * len')%nat as glen eqn:H.
+assert (Hglen : (len * len' ≤ glen)%nat) by (subst glen; reflexivity).
+clear H.
+revert s len s' len' Hglen.
+induction glen; intros.
+ apply Nat.le_0_r in Hglen.
+ apply Nat.eq_mul_0 in Hglen.
+ destruct Hglen as [Hglen| Hglen]; [ subst len | subst len' ].
+  reflexivity.
+
+  rewrite list_prod_nil_r; reflexivity.
+
+ destruct len; [ reflexivity | simpl in Hglen; simpl ].
+ destruct len'; [ subst l; rewrite list_prod_nil_r; reflexivity | ].
+ simpl in Hl.
+
+ eapply IHglen; [ eassumption | simpl ].
+
+
+bbb.
 intros.
 remember (list_prod (seq s len) (seq s' len')) as l eqn:Hl.
 symmetry in Hl.
@@ -2997,6 +3025,8 @@ split.
  induction l as [| y]; intros; [ constructor | ].
  constructor.
  intros H; subst y.
+bbb.
+
 Focus 2.
  eapply IHl.
 
@@ -3011,6 +3041,7 @@ induction l as [| (i', j') l]; intros * Hl * Hi Hj Hij.
   destruct j; [ exfalso; apply Hij; reflexivity | simpl ].
 
 bbb.
+*)
 
 (*
 Theorem list_prod_seq_all_diff : ∀ s len s' len' p l,
@@ -3036,6 +3067,22 @@ induction l as [| (i, j) l]; intros.
 
 bbb.
 *)
+
+Theorem partition_prod_nth :
+  ∀ A (s := set_equiv) (PL QL : list (set A)) len i,
+  len = length QL
+  → ((partition_prod PL QL).[i] = PL.[i / len] ∩ QL.[i mod len])%S.
+Proof.
+intros * Hlen.
+symmetry in Hlen.
+revert PL QL i Hlen.
+induction len; intros.
+ apply length_zero_iff_nil in Hlen; subst QL.
+ rewrite partition_prod_nil_r.
+ rewrite intersection_empty_r.
+ destruct i; reflexivity.
+
+bbb.
 
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : set A) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
@@ -3098,6 +3145,12 @@ split.
 
  intros i j Hij.
  split; [ | intros H; contradiction ].
+  erewrite partition_prod_nth; [ | reflexivity ].
+  erewrite partition_prod_nth; [ | reflexivity ].
+  intros Hx; simpl.
+
+bbb.
+
  rewrite partition_prod_by_seq.
  remember (list_prod (seq 0 (length P)) (seq 0 (length Q))) as l eqn:Hl.
  symmetry in Hl.
