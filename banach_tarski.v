@@ -2973,6 +2973,12 @@ f_equal.
  f_equal; apply IHl.
 Qed.
 
+Theorem list_prod_seq_all_diff : ∀ s len s' len' p l,
+ list_prod (seq s len) (seq s' len') ≠ p :: p :: l.
+Proof.
+intros.
+bbb.
+
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : set A) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
 Proof.
@@ -3048,18 +3054,19 @@ split.
   destruct Hi as (HiP, HiQ).
   destruct j; [ apply Hij; reflexivity | ].
   simpl in Hj.
-assert (∃ i'' j'', x ∈ P.[i''] ∩ Q.[j''] ∧ (i' ≠ i'' ∨ j' ≠ j'')).
- clear - HPij HQij Hl HiP HiQ Hj.
- revert P Q j HPij HQij Hl HiP HiQ Hj.
- induction l as [| (i'', j'') l]; intros P; intros.
-  destruct j; contradiction.
+  assert (∃ i'' j'', x ∈ P.[i''] ∩ Q.[j''] ∧ (i' ≠ i'' ∨ j' ≠ j'')).
+   clear - HPij HQij Hl HiP HiQ Hj.
+   revert P Q j HPij HQij Hl HiP HiQ Hj.
+   induction l as [| (i'', j'') l]; intros P; intros.
+   destruct j; contradiction.
 
-  simpl in Hj.
-  destruct j.
-   exists i'', j''.
-   split; [ assumption | ].
-   destruct (eq_nat_dec i' i'') as [Hii| Hii]; [ right | left; assumption ].
-   intros H; subst i'' j''.
+   simpl in Hj.
+   destruct j.
+    exists i'', j''.
+    split; [ assumption | ].
+    destruct (eq_nat_dec i' i'') as [Hii| Hii]; [ right | left; assumption ].
+    intros H; subst i'' j''.
+    exfalso; eapply list_prod_seq_all_diff; eassumption.
 
 bbb.
 Focus 2.
