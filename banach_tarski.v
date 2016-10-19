@@ -1169,8 +1169,6 @@ rewrite rotate_neg_rotate.
 reflexivity.
 Qed.
 
-Definition on_sphere_ray r '(P x y z) := (x² + y² + z² = r)%R.
-
 Definition mat_transp m :=
   mkmat 
    (a₁₁ m) (a₂₁ m) (a₃₁ m)
@@ -1296,206 +1294,42 @@ Proof.
   injection H; clear H; intros; subst; reflexivity.
 Qed.
 
-(* Orbits *)
-
-Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
-
-Theorem same_orbit_refl : reflexive _ same_orbit.
-Proof. intros; exists []; reflexivity. Qed.
-
-Theorem same_orbit_sym : symmetric _ same_orbit.
-Proof.
-intros p₁ p₂ (el, H); simpl in H.
-unfold same_orbit; simpl.
-exists (rev (map negf el)).
-revert p₁ p₂ H.
-induction el as [| e]; intros; [ symmetry; assumption | simpl in H; simpl ].
-rewrite fold_right_app; simpl.
-apply IHel; rewrite <- H.
-rewrite rotate_neg_rotate.
-reflexivity.
-Qed.
-
-Theorem same_orbit_trans : transitive _ same_orbit.
-Proof.
-intros p₁ p₂ p₃ (el₁, H₁) (el₂, H₂); simpl in H₁, H₂.
-unfold same_orbit; simpl.
-exists (el₂ ++ el₁).
-rewrite fold_right_app, H₁, H₂; reflexivity.
-Qed.
-
-Add Parametric Relation : _ same_orbit
- reflexivity proved by same_orbit_refl
- symmetry proved by same_orbit_sym
- transitivity proved by same_orbit_trans
- as same_orbit_rel.
-
-Definition equiv_same_orbit : equiv point same_orbit :=
-  conj same_orbit_refl (conj same_orbit_trans same_orbit_sym).
-
-Definition not_in_fixpoints p :=
-  ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p.
-
-Theorem not_in_fixpoints_one_path : ∀ f p e₁ e₂ el el₂ el₁ el₃,
-  not_in_fixpoints p
-  → fold_right rotate p el = f p
-  → fold_right rotate (f p) el₁ = p
-  → norm_list el = el₂ ++ [e₁]
-  → norm_list el₁ = e₂ :: el₃
-  → e₂ ≠ negf e₁
-  → False.
-Proof.
-intros f p e₁ e₂ el el₂ el₁ el₃ Hnf Hel H₆ H₂ H₄ Hd.
-rewrite rotate_rotate_norm in Hel, H₆.
-rewrite <- Hel in H₆.
-rewrite <- fold_right_app in H₆.
-revert H₆.
-apply Hnf.
-intros H.
-apply norm_list_app_is_nil in H.
- rewrite H₄, H₂ in H.
- apply rev_path_eq_eq in H.
- rewrite rev_path_involutive, rev_path_app in H.
- apply not_eq_sym in Hd.
- injection H; intros; contradiction.
-
- rewrite norm_list_idemp; reflexivity.
-
- rewrite norm_list_idemp; reflexivity.
-Qed.
-
-Definition orbit_selector := choice_function same_orbit.
-
-Definition sphere '(P x y z) := (x² + y² + z² <= 1)%R.
-
-Definition orbit_has_no_fixpoint p :=
-  ∀ el p₁, same_orbit p p₁
-  → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁.
-
-Definition sphere_but_fixpoints p := sphere p ∧ orbit_has_no_fixpoint p.
-
-Theorem on_sphere_ray_after_rotation : ∀ p m r,
-  on_sphere_ray r p
-  → is_rotation_matrix m
-  → on_sphere_ray r (mat_vec_mul m p).
-Proof.
-intros * His Hm.
-destruct p as (x, y, z).
-unfold on_sphere_ray in His.
-unfold on_sphere_ray; simpl.
-unfold is_rotation_matrix in Hm.
-destruct Hm as (Hm, Hd).
-unfold mat_det in Hd.
-unfold mat_mul, mat_id in Hm; simpl in Hm.
-injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-nsatz.
-Qed.
-
-Theorem in_sphere_after_rotation : ∀ p m,
-  sphere p
-  → is_rotation_matrix m
-  → sphere (mat_vec_mul m p).
-Proof.
-intros * His Hrm.
-destruct p as (x, y, z).
-remember (P x y z) as p eqn:HP.
-remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : on_sphere_ray r p) by (subst p; assumption).
-pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
-unfold sphere in His.
-unfold on_sphere_ray in H.
-unfold sphere.
-subst p; simpl in *.
-rewrite H, <- Hos; assumption.
-Qed.
-
-Theorem in_sphere_after_rotate : ∀ p e,
-  sphere p
-  → sphere (rotate e p).
-Proof.
-intros * His.
-apply in_sphere_after_rotation; [ assumption | ].
-apply rotate_is_rotation_matrix.
-Qed.
-
-Theorem same_orbit_rotate : ∀ e p₁ p₂,
-  same_orbit p₁ p₂
-  → same_orbit (rotate e p₁) (rotate e p₂).
-Proof.
-intros * Hso.
-destruct Hso as (el, Hr).
-exists (e :: el ++ [negf e]); simpl.
-rewrite fold_right_app; simpl.
-rewrite rotate_neg_rotate.
-f_equal; assumption.
-Qed.
-
-Theorem no_fixpoint_after_rotate : ∀ p e,
-  orbit_has_no_fixpoint p
-  → orbit_has_no_fixpoint (rotate e p).
-Proof.
-intros * His.
-unfold orbit_has_no_fixpoint in His.
-intros el p₁ Hso Hel.
-remember (negf e :: rev_path el ++ e :: [])  as el₁ eqn:Hel₁.
-remember (norm_list el₁) as el₂ eqn:Hel₂.
-symmetry in Hel₂.
-destruct el₂ as [| e₂].
- exfalso; subst el₁; apply Hel.
- apply norm_list_is_nil_between in Hel₂.
- rewrite <- rev_path_norm_list in Hel₂.
- apply rev_path_is_nil in Hel₂; assumption.
-
- apply same_orbit_rotate with (e := negf e) in Hso.
- rewrite rotate_neg_rotate in Hso.
- assert (Hn : norm_list el₁ ≠ []) by (rewrite Hel₂; intros H; discriminate H).
- pose proof His el₁ (rotate (negf e) p₁) Hso Hn.
- intros Hr; apply H; clear H.
- rewrite <- Hr at 1.
- rewrite <- fold_right_cons, <- fold_right_app.
- rewrite Hel₁, cons_comm_app, app_comm_cons.
- rewrite <- app_assoc.
- simpl; f_equal.
- rewrite rotate_rotate_norm.
- rewrite norm_list_cancel_in.
- rewrite <- rotate_rotate_norm.
- apply app_path_rev_path.
-Qed.
-
 (* Sets as Predicates *)
+
+Record set A := mkset { setp : A → Prop }.
+Arguments mkset [A] _.
+Arguments setp [A] _ _.
+
+Class set_model A := mksm { set_eq : set A → set A → Prop }.
+
+Definition empty_set {A} := mkset (λ _ : A, False).
+
+Notation "x '∈' E" := (setp E x) (at level 60).
+Notation "x '∉' E" := (¬ setp E x) (at level 60).
+Notation "'∅'" := (empty_set).
+
+Definition intersection {A} (E₁ E₂ : set A) :=
+  mkset (λ x, x ∈ E₁ ∧ x ∈ E₂).
+Definition union {A} (E₁ E₂ : set A) :=
+  mkset (λ x, x ∈ E₁ ∨ x ∈ E₂).
+Definition union_list {A} (Ei : list (set A)) :=
+  fold_right union ∅ Ei.
+Definition subtract {A} (E₁ E₂ : set A) :=
+  mkset (λ x, x ∈ E₁ ∧ x ∉ E₂).
+Definition included {A} (E₁ E₂ : set A) :=
+  ∀ x, x ∈ E₁ → x ∈ E₂.
 
 Delimit Scope set_scope with S.
 
-Class set_model A := mksm
-  { set_eq : (A → Prop) → (A → Prop) → Prop }.
-
-Definition empty_set {A} (_ : A) := False.
-
-Definition intersection {A} (E₁ E₂ : A → Prop) :=
-  λ x, E₁ x ∧ E₂ x.
-Definition union {A} (E₁ E₂ : A → Prop) :=
-  λ x, E₁ x ∨ E₂ x.
-Definition union_list {A} (Ei : list (A → Prop)) :=
-  fold_right union empty_set Ei.
-Definition subtract {A} (E₁ E₂ : A → Prop) :=
-  λ x, E₁ x ∧ ¬ E₂ x.
-Definition included {A} (E₁ E₂ : A → Prop) :=
-  ∀ x, E₁ x → E₂ x.
-Definition nth_set {A} i (Ei : list (A → Prop)) :=
-  List.nth i Ei empty_set.
-
 Notation "a = b" := (set_eq a b) : set_scope.
-Notation "'∅'" := (empty_set) : set_scope.
-Notation "E₁ '∩' E₂" := (intersection E₁ E₂) (at level 40) : set_scope.
-Notation "E₁ '∪' E₂" := (union E₁ E₂) (at level 50, left associativity)
-  : set_scope.
-Notation "E₁ '∖' E₂" := (subtract E₁ E₂) (at level 50) : set_scope.
-Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60) : set_scope.
-Notation "'⋃' Es" := (union_list Es) (at level 60) : set_scope.
-Notation "E .[ i ]" := (nth_set i E) (at level 1, format "E .[ i ]")
-: set_scope.
+Notation "E₁ '∩' E₂" := (intersection E₁ E₂) (at level 40).
+Notation "E₁ '∪' E₂" := (union E₁ E₂) (at level 50, left associativity).
+Notation "E₁ '∖' E₂" := (subtract E₁ E₂) (at level 50).
+Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60).
+Notation "'⋃' Es" := (union_list Es) (at level 55).
+Notation "E .[ i ]" := (List.nth i E ∅) (at level 1, format "E .[ i ]").
 
-Definition set_equiv {A} := mksm A (λ (E₁ E₂ : A → Prop), ∀ x, E₁ x ↔ E₂ x).
+Definition set_equiv {A} := mksm A (λ (E₁ E₂ : set A), ∀ x, x ∈ E₁ ↔ x ∈ E₂).
 
 Theorem set_eq_refl A : reflexive _ (@set_eq A set_equiv).
 Proof. intros P x; split; intros; assumption. Qed.
@@ -1515,26 +1349,22 @@ destruct (H₂₃ x) as (H₃, H₄).
 split; intros H; [ apply H₃, H₁, H | apply H₂, H₄, H ].
 Qed.
 
-Add Parametric Relation A : (A → Prop) (@set_eq A set_equiv)
+Add Parametric Relation A : (set A) (@set_eq A set_equiv)
  reflexivity proved by (set_eq_refl A)
  symmetry proved by (set_eq_sym A)
  transitivity proved by (set_eq_trans A)
  as set_eq_rel.
 
-Theorem fold_set_eq : ∀ A (s := set_equiv) (P Q : A → Prop),
-  (∀ x, P x ↔ Q x) = (P = Q)%S.
+Theorem fold_set_eq : ∀ A (s := set_equiv) (P Q : set A),
+  (∀ x, x ∈ P ↔ x ∈ Q) = (P = Q)%S.
 Proof. intros; reflexivity. Qed.
 
-Theorem fold_nth_set : ∀ A (Ei : list (A → Prop)) i,
-  List.nth i Ei ∅%S = nth_set i Ei.
-Proof. reflexivity. Qed.
-
-Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : A → Prop),
+Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : set A),
   (E = F)%S
-  → ∀ p, E p ↔ F p.
+  → ∀ p, p ∈ E ↔ p ∈ F.
 Proof. intros s * HEF; apply HEF. Qed.
 
-Theorem intersection_empty_l : ∀ A (s := set_equiv) (E : A → Prop),
+Theorem intersection_empty_l : ∀ A (s := set_equiv) (E : set A),
   (∅ ∩ E = ∅)%S.
 Proof.
 intros.
@@ -1542,15 +1372,15 @@ unfold set_eq, intersection; simpl.
 intros x; split; [ intros (H, _); contradiction | contradiction ].
 Qed.
 
-Theorem intersection_comm : ∀ A s, s = set_equiv → ∀ (E F : A → Prop),
+Theorem intersection_comm : ∀ A s, s = set_equiv → ∀ (E F : set A),
   (E ∩ F = F ∩ E)%S.
 Proof.
 intros * Hs E *; subst s; intros x.
 split; intros (H₁, H₂); split; assumption.
 Qed.
 
-Theorem union_empty_r : ∀ A s, s = set_equiv →
-  ∀ (F : A → Prop), (F ∪ ∅ = F)%S.
+Theorem union_empty_r : ∀ A s, s = set_equiv → ∀ (F : set A),
+  (F ∪ ∅ = F)%S.
 Proof.
 intros * Hs *.
 subst s; intros x.
@@ -1558,7 +1388,7 @@ split; intros H; [ | left; assumption ].
 destruct H as [H| H]; [ assumption | contradiction ].
 Qed.
 
-Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : A → Prop),
+Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : set A),
   (E ∪ (F ∪ G) = (E ∪ F) ∪ G)%S.
 Proof.
 intros * Hs E *.
@@ -1575,7 +1405,7 @@ split; intros H.
   right; right; assumption.
 Qed.
 
-Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)),
+Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (set A)),
   (⋃ (P₁ ++ P₂) = (⋃ P₁) ∪ (⋃ P₂))%S.
 Proof.
 intros * Hs *.
@@ -1619,8 +1449,8 @@ induction P₂ as [| Q]; intros.
     right; apply IHP₁; right; assumption.
 Qed.
 
-Theorem nth_set_union_list : ∀ A (P : list (A → Prop)) i x,
-  i < length P → (P.[i])%S x → (⋃ P)%S x.
+Theorem nth_set_union_list : ∀ A (P : list (set A)) i x,
+  i < length P → x ∈ P.[i] → x ∈ ⋃ P.
 Proof.
 intros A P i x Hi H.
 revert P H Hi.
@@ -1632,27 +1462,196 @@ induction i; intros P H Hi.
  right; apply IHi; assumption.
 Qed.
 
-Theorem nth_set_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (A → Prop)) i,
-  ((P₁ ++ P₂).[i] =
-   if lt_dec i (length P₁) then P₁.[i] else P₂.[i-length P₁])%S.
+Theorem nth_set_app : ∀ A (P₁ P₂ : list (set A)) i,
+  (P₁ ++ P₂).[i] =
+  if lt_dec i (length P₁) then P₁.[i] else P₂.[i-length P₁].
 Proof.
-intros * Hs *.
-unfold nth_set, union, set_eq; subst s; simpl; intros.
+intros.
+unfold union, set_eq; simpl; intros.
 destruct (lt_dec i (length P₁)) as [H₁| H₁].
  rewrite app_nth1; [ reflexivity | assumption ].
 
  rewrite app_nth2; [ reflexivity | apply Nat.nlt_ge; assumption ].
 Qed.
 
-Theorem union_list_intersection : ∀ A (P : A → Prop) QL x,
-  P x
-  → (⋃ QL)%S x
-  → (⋃ map (intersection P) QL)%S x.
+Theorem union_list_intersection : ∀ A (S : set A) SL x,
+  x ∈ S
+  → x ∈ ⋃ SL
+  → x ∈ ⋃ map (intersection S) SL.
 Proof.
 intros A P QL * HP HQL.
 induction QL as [| Q QL]; intros; [ contradiction | simpl ].
 destruct HQL as [HQ| HQL]; [ left; split; assumption | right ].
 apply IHQL, HQL.
+Qed.
+
+(* Orbits *)
+
+Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
+
+Theorem same_orbit_refl : reflexive _ same_orbit.
+Proof. intros; exists []; reflexivity. Qed.
+
+Theorem same_orbit_sym : symmetric _ same_orbit.
+Proof.
+intros p₁ p₂ (el, H); simpl in H.
+unfold same_orbit; simpl.
+exists (rev (map negf el)).
+revert p₁ p₂ H.
+induction el as [| e]; intros; [ symmetry; assumption | simpl in H; simpl ].
+rewrite fold_right_app; simpl.
+apply IHel; rewrite <- H.
+rewrite rotate_neg_rotate.
+reflexivity.
+Qed.
+
+Theorem same_orbit_trans : transitive _ same_orbit.
+Proof.
+intros p₁ p₂ p₃ (el₁, H₁) (el₂, H₂); simpl in H₁, H₂.
+unfold same_orbit; simpl.
+exists (el₂ ++ el₁).
+rewrite fold_right_app, H₁, H₂; reflexivity.
+Qed.
+
+Add Parametric Relation : _ same_orbit
+ reflexivity proved by same_orbit_refl
+ symmetry proved by same_orbit_sym
+ transitivity proved by same_orbit_trans
+ as same_orbit_rel.
+
+Definition equiv_same_orbit : equiv point same_orbit :=
+  conj same_orbit_refl (conj same_orbit_trans same_orbit_sym).
+
+Definition not_in_fixpoints :=
+  mkset (λ p, ∀ el, norm_list el ≠ [] → fold_right rotate p el ≠ p).
+
+Theorem not_in_fixpoints_one_path : ∀ f p e₁ e₂ el el₂ el₁ el₃,
+  p ∈ not_in_fixpoints
+  → fold_right rotate p el = f p
+  → fold_right rotate (f p) el₁ = p
+  → norm_list el = el₂ ++ [e₁]
+  → norm_list el₁ = e₂ :: el₃
+  → e₂ ≠ negf e₁
+  → False.
+Proof.
+intros f p e₁ e₂ el el₂ el₁ el₃ Hnf Hel H₆ H₂ H₄ Hd.
+rewrite rotate_rotate_norm in Hel, H₆.
+rewrite <- Hel in H₆.
+rewrite <- fold_right_app in H₆.
+revert H₆.
+apply Hnf.
+intros H.
+apply norm_list_app_is_nil in H.
+ rewrite H₄, H₂ in H.
+ apply rev_path_eq_eq in H.
+ rewrite rev_path_involutive, rev_path_app in H.
+ apply not_eq_sym in Hd.
+ injection H; intros; contradiction.
+
+ rewrite norm_list_idemp; reflexivity.
+
+ rewrite norm_list_idemp; reflexivity.
+Qed.
+
+Definition orbit_selector := choice_function same_orbit.
+
+Definition sphere_ray r := mkset (λ '(P x y z), (x² + y² + z² = r)%R).
+Definition sphere := mkset (λ '(P x y z), (x² + y² + z² <= 1)%R).
+
+Definition orbit_without_fixpoint :=
+  mkset
+    (λ p, ∀ el p₁, same_orbit p p₁
+     → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁).
+
+Definition sphere_but_fixpoints :=
+  mkset (λ p, p ∈ sphere ∧ p ∈ orbit_without_fixpoint).
+
+Theorem on_sphere_ray_after_rotation : ∀ p m r,
+  p ∈ sphere_ray r
+  → is_rotation_matrix m
+  → mat_vec_mul m p ∈ sphere_ray r.
+Proof.
+intros * His Hm.
+destruct p as (x, y, z).
+unfold sphere_ray in His; simpl in His.
+unfold sphere_ray; simpl.
+unfold is_rotation_matrix in Hm.
+destruct Hm as (Hm, Hd).
+unfold mat_det in Hd.
+unfold mat_mul, mat_id in Hm; simpl in Hm.
+injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+nsatz.
+Qed.
+
+Theorem in_sphere_after_rotation : ∀ p m,
+  p ∈ sphere
+  → is_rotation_matrix m
+  → mat_vec_mul m p ∈ sphere.
+Proof.
+intros * His Hrm.
+destruct p as (x, y, z).
+remember (P x y z) as p eqn:HP.
+remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
+assert (Hos : p ∈ sphere_ray r) by (subst p; assumption).
+pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
+unfold sphere in His.
+unfold sphere_ray in H.
+unfold sphere.
+subst p; simpl in *.
+rewrite H, <- Hos; assumption.
+Qed.
+
+Theorem in_sphere_after_rotate : ∀ p e,
+  p ∈ sphere
+  → rotate e p ∈ sphere.
+Proof.
+intros * His.
+apply in_sphere_after_rotation; [ assumption | ].
+apply rotate_is_rotation_matrix.
+Qed.
+
+Theorem same_orbit_rotate : ∀ e p₁ p₂,
+  same_orbit p₁ p₂
+  → same_orbit (rotate e p₁) (rotate e p₂).
+Proof.
+intros * Hso.
+destruct Hso as (el, Hr).
+exists (e :: el ++ [negf e]); simpl.
+rewrite fold_right_app; simpl.
+rewrite rotate_neg_rotate.
+f_equal; assumption.
+Qed.
+
+Theorem no_fixpoint_after_rotate : ∀ p e,
+  p ∈ orbit_without_fixpoint
+  → rotate e p ∈ orbit_without_fixpoint.
+Proof.
+intros * His.
+unfold orbit_without_fixpoint in His.
+intros el p₁ Hso Hel.
+remember (negf e :: rev_path el ++ e :: [])  as el₁ eqn:Hel₁.
+remember (norm_list el₁) as el₂ eqn:Hel₂.
+symmetry in Hel₂.
+destruct el₂ as [| e₂].
+ exfalso; subst el₁; apply Hel.
+ apply norm_list_is_nil_between in Hel₂.
+ rewrite <- rev_path_norm_list in Hel₂.
+ apply rev_path_is_nil in Hel₂; assumption.
+
+ apply same_orbit_rotate with (e := negf e) in Hso.
+ rewrite rotate_neg_rotate in Hso.
+ assert (Hn : norm_list el₁ ≠ []) by (rewrite Hel₂; intros H; discriminate H).
+ pose proof His el₁ (rotate (negf e) p₁) Hso Hn.
+ intros Hr; apply H; clear H.
+ rewrite <- Hr at 1.
+ rewrite <- fold_right_cons, <- fold_right_app.
+ rewrite Hel₁, cons_comm_app, app_comm_cons.
+ rewrite <- app_assoc.
+ simpl; f_equal.
+ rewrite rotate_rotate_norm.
+ rewrite norm_list_cancel_in.
+ rewrite <- rotate_rotate_norm.
+ apply app_path_rev_path.
 Qed.
 
 (* Partitions *)
@@ -1662,12 +1661,11 @@ Definition is_partition {A} {S : set_model A} E Ep :=
   ∀ i j, i ≠ j → (Ep.[i] ∩ Ep.[j] = ∅)%S.
 
 Theorem is_partition_group_first_2_together :
-  ∀ A s, s = set_equiv →
-  ∀ (F : A → Prop) P₁ P₂ Pl,
+  ∀ A (s := set_equiv) (F : set A) P₁ P₂ Pl,
   is_partition F (P₁ :: P₂ :: Pl)
-  → is_partition F (union P₁ P₂ :: Pl).
+  → is_partition F (P₁ ∪ P₂ :: Pl).
 Proof.
-intros * Hs * Hp.
+intros * Hp.
 destruct Hp as (Hu & Hi).
 split.
  unfold union_list, union, set_eq in Hu |-*.
@@ -1687,51 +1685,50 @@ split.
 
  intros i j Hij; subst s.
  destruct i.
-  unfold nth_set, intersection, set_eq; simpl.
+  unfold intersection, set_eq; simpl.
   intros x.
   split; [ | contradiction ].
   intros (H₁, H₂).
   destruct j; [ apply Hij; reflexivity | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   apply Hi with (i := O) (j := S (S j)); [ intros H; discriminate H | ].
-   unfold nth_set, intersection; simpl.
-   split; assumption.
+   eapply Hi with (i := O) (j := S (S j)); [ intros H; discriminate H | ].
+   unfold intersection; simpl.
+   split; eassumption.
 
-   apply Hi with (i := 1%nat) (j := S (S j)); [ intros H; discriminate H | ].
-   unfold nth_set, intersection; simpl.
-   split; assumption.
+   eapply Hi with (i := 1%nat) (j := S (S j)); [ intros H; discriminate H | ].
+   unfold intersection; simpl.
+   split; eassumption.
 
-  unfold nth_set, intersection, union, set_eq; simpl.
+  unfold intersection, union, set_eq; simpl.
   intros x.
   split; [ | contradiction ].
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    apply Hi with (i := O) (j := S (S i)); [ intros H; discriminate H | ].
-    unfold nth_set, intersection; simpl.
-    split; assumption.
+    eapply Hi with (i := O) (j := S (S i)); [ intros H; discriminate H | ].
+    unfold intersection; simpl.
+    split; eassumption.
 
-    apply Hi with (i := 1%nat) (j := S (S i)); [ intros H; discriminate H | ].
-    unfold nth_set, intersection; simpl.
-    split; assumption.
+    eapply Hi with (i := 1%nat) (j := S (S i)); [ intros H; discriminate H | ].
+    unfold intersection; simpl.
+    split; eassumption.
 
-  apply Hi with (i := S (S i)) (j := S (S j)).
+  apply Hi with (i := S (S i)) (j := S (S j)) (x := x).
    intros H; apply Hij.
    apply Nat.succ_inj; assumption.
 
-   unfold nth_set, intersection; simpl.
+   unfold intersection; simpl.
    split; assumption.
 Qed.
 
 Theorem is_partition_union_subtract :
-  ∀ A s, s = set_equiv →
-  ∀ (F : A → Prop) P₁ P₂ Pl (B : A → Prop),
+  ∀ A (s := set_equiv) (F : set A) P₁ P₂ Pl (B : set A),
   is_partition F (P₁ :: P₂ :: Pl)
   → (B ⊂ P₂)%S
-  → (∀ x, Decidable.decidable (B x))
+  → (∀ x, Decidable.decidable (x ∈ B))
   → is_partition F (P₁ ∪ B :: P₂ ∖ B :: Pl)%S.
 Proof.
-intros A s Hs F P₁ P₂ Pl B Hp HB HBdec.
+intros A s F P₁ P₂ Pl B Hp HB HBdec.
 destruct Hp as (Hu & Hi).
 split.
  unfold union_list, union, subtract, set_eq in Hu |-*.
@@ -1756,47 +1753,47 @@ split.
 
  intros i j Hij; subst s.
  destruct i.
-  unfold nth_set, intersection, union, subtract, set_eq; simpl.
+  unfold intersection, union, subtract, set_eq; simpl.
   intros x.
   split; [ | contradiction ].
   intros (H₁, H₂).
   destruct j; [ apply Hij; reflexivity | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   apply Hi with (i := O) (j := S j); [ intros H; discriminate H | ].
-   unfold nth_set, intersection; simpl.
-   split; [ assumption | ].
+   eapply Hi with (i := O) (j := S j); [ intros H; discriminate H | ].
+   unfold intersection; simpl.
+   split; [ eassumption | ].
    destruct j; [ destruct H₂; assumption | assumption ].
 
-   apply Hi with (i := 1%nat) (j := S j).
+   eapply Hi with (i := 1%nat) (j := S j).
     destruct j; [ destruct H₂; contradiction | intros H; discriminate H ].
 
-    unfold nth_set, intersection; simpl.
-    split; [ apply HB; assumption | ].
+    unfold intersection; simpl.
+    split; [ apply HB; eassumption | ].
     destruct j; [ destruct H₂; contradiction | assumption ].
 
-  unfold nth_set, intersection, union, subtract, set_eq; simpl.
+  unfold intersection, union, subtract, set_eq; simpl.
   intros x.
   split; [ | contradiction ].
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    apply Hi with (i := O) (j := S i); [ intros H; discriminate H | ].
-    unfold nth_set, intersection; simpl.
-    split; [ assumption | ].
+    eapply Hi with (i := O) (j := S i); [ intros H; discriminate H | ].
+    unfold intersection; simpl.
+    split; [ eassumption | ].
     destruct i; [ destruct H₁; assumption | assumption ].
 
-    apply Hi with (i := 1%nat) (j := S i).
+    eapply Hi with (i := 1%nat) (j := S i).
      destruct i; [ | intros H; discriminate H ].
      destruct H₁; contradiction.
 
-     unfold nth_set, intersection; simpl.
-     split; [ apply HB; assumption | ].
+     unfold intersection; simpl.
+     split; [ apply HB; eassumption | ].
      destruct i; [ apply HB; assumption | assumption ].
 
-  apply Hi with (i := S i) (j := S j).
+  apply Hi with (i := S i) (j := S j) (x := x).
    intros H; apply Hij; assumption.
 
-   unfold nth_set, intersection; simpl.
+   unfold intersection; simpl.
    split.
     destruct i; [ destruct H₁; assumption | assumption ].
 
@@ -1804,19 +1801,18 @@ split.
 Qed.
 
 Theorem partition_union :
-  ∀ A s, s = set_equiv →
-  ∀ (F₁ F₂ : A → Prop) P₁ P₂,
+  ∀ A (s := set_equiv) (F₁ F₂ : set A) P₁ P₂,
   (F₁ ∩ F₂ = ∅)%S
   → is_partition F₁ P₁
   → is_partition F₂ P₂
-  → is_partition (F₁ ∪ F₂)%S (P₁ ++ P₂).
+  → is_partition (F₁ ∪ F₂) (P₁ ++ P₂).
 Proof.
-intros * Hs F₁ F₂ * HFF HF₁ HF₂.
+intros * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
  subst s; rewrite union_list_app; [ | reflexivity ].
- transitivity (F₁ ∪ ⋃ P₂)%S.
+ transitivity (F₁ ∪ ⋃ P₂).
   intros x.
   split; intros H.
    destruct H as [H| H]; [ left; assumption | right ].
@@ -1837,13 +1833,12 @@ split.
  intros x.
  split; intros H; [ | contradiction ].
  destruct H as (H₁, H₂).
- apply (nth_set_app _ _ eq_refl) in H₁.
- apply (nth_set_app _ _ eq_refl) in H₂.
+ rewrite nth_set_app in H₁, H₂.
  destruct (lt_dec i (length P₁)) as [H₃| H₃].
   destruct (lt_dec j (length P₁)) as [H₄| H₄].
-   eapply HP₁; [ eassumption | split; assumption ].
+   eapply HP₁; [ eassumption | split; eassumption ].
 
-   apply HFF.
+   eapply HFF.
    split.
     apply HF₁.
     eapply nth_set_union_list; eassumption.
@@ -1853,12 +1848,11 @@ split.
      eapply nth_set_union_list; eassumption.
 
      apply Nat.nlt_ge in H₅.
-     unfold nth_set in H₂.
      rewrite nth_overflow in H₂; [ contradiction | assumption ].
 
   apply Nat.nlt_ge in H₃.
   destruct (lt_dec j (length P₁)) as [H₄| H₄].
-   apply HFF.
+   apply HFF with x.
    split.
     apply HF₁.
     eapply nth_set_union_list; eassumption.
@@ -1868,7 +1862,6 @@ split.
      eapply nth_set_union_list; eassumption.
 
      apply Nat.nlt_ge in H₅.
-     unfold nth_set in H₁.
      rewrite nth_overflow in H₁; [ contradiction | assumption ].
 
    apply Nat.nlt_ge in H₄.
@@ -1884,27 +1877,31 @@ Qed.
 
 (* Orbit representant *)
 
-Class sel_model {A} := mkos
-  { os_fun : A → A }.
+Class sel_model {A} := mkos { os_fun : A → A }.
+
+Definition orbit_by_seq_of e {os : sel_model} :=
+  mkset (λ p, ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p).
 
 Definition M {os : sel_model} :=
-  λ p, sphere_but_fixpoints p ∧ p = os_fun p.
-Definition SS {os : sel_model} e := λ p,
-  sphere_but_fixpoints p ∧
-  ∃ el el₁,
-  norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p.
+  mkset (λ p, p ∈ sphere_but_fixpoints ∧ p = os_fun p).
+Definition SS {os : sel_model} e :=
+  mkset
+    (λ p,
+     p ∈ sphere_but_fixpoints ∧
+     ∃ el el₁,
+       norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p).
+Definition B {os : sel_model} :=
+  mkset (λ p, p ∈ sphere_but_fixpoints ∧ p ∈ orbit_by_seq_of ạ⁻¹).
 
-Definition on_orbit_by_seq_of e {os : sel_model} p :=
-  ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p.
+Opaque M SS B.
 
-Definition B {os : sel_model} := λ p,
-  sphere_but_fixpoints p ∧ on_orbit_by_seq_of ạ⁻¹ p.
-
-Definition rot e (E : point → Prop) := λ p, E (rotate (negf e) p).
-Definition xtransl dx (E : point → Prop) '(P x y z) := E (P (x - dx) y z).
+Definition rot e (E : set point) :=
+  mkset (λ p, rotate (negf e) p ∈ E).
+Definition xtransl dx (E : set point) :=
+  mkset (λ '(P x y z), (P (x - dx) y z) ∈ E).
 
 Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
-  ∀ e p, M p → SS e p → False.
+  ∀ e p, p ∈ M → p ∈ SS e → False.
 Proof.
 intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
@@ -1915,7 +1912,7 @@ intros H; rewrite Hn in H; discriminate H.
 Qed.
 
 Theorem start_with_same : ∀ f os, os = mkos _ f →
-  ∀ e₁ e₂ p, SS e₁ p → SS e₂ p → e₁ = e₂.
+  ∀ e₁ e₂ p, p ∈ SS e₁ → p ∈ SS e₂ → e₁ = e₂.
 Proof.
 intros f os Hos (ti, di) (tj, dj) p Hsi Hsj; subst os.
 destruct Hsi as (Hinf & eli & eli₁ & Hni & Hsi); simpl in Hsi.
@@ -1984,7 +1981,7 @@ Qed.
 Theorem not_start_with_rot :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → ∀ e p, SS e p → rot e (SS (negf e)) p → False.
+  → ∀ e p, p ∈ SS e → p ∈ rot e (SS (negf e)) → False.
 Proof.
 intros f (Hoe, Ho) os Hos e p Hs Hr; simpl in Hr; subst os.
 destruct Hs as (Hnf & el & el₁ & Hn & Hs); simpl in Hs.
@@ -2028,8 +2025,8 @@ Qed.
 Theorem decompose_2a_contrad_case :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → ∀ p, (M ∪ SS ạ ∪ B)%S p
-  → rot ạ (SS ạ⁻¹ ∖ B)%S p
+  → ∀ p, p ∈ M ∪ SS ạ ∪ B
+  → p ∈ rot ạ (SS ạ⁻¹ ∖ B)
   → False.
 Proof.
 intros * (Hoe, Ho) * Hos * Hi Hj.
@@ -2049,7 +2046,7 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
 
     destruct Hi as (Hnf, Hoo).
     destruct Hoo as (n, Hoo).
-    unfold on_orbit_by_seq_of.
+    unfold orbit_by_seq_of.
     remember S as g; subst os; simpl in Hoo; simpl; subst g.
     rewrite Hfr; simpl.
     exists (S n).
@@ -2057,12 +2054,11 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
 Qed.
 
 Theorem r_decomposed_5 :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  ∀ (s := set_equiv) f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints [M; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros s Hs f (Hoe, Ho) os Hos; subst os s.
+intros s f (Hoe, Ho) os Hos; subst os s.
 split.
 *intros p.
  split.
@@ -2119,8 +2115,7 @@ split.
 
 *intros i j Hij p.
  split; [ | contradiction ].
- unfold nth_set.
- intros (Hi, Hj); unfold empty_set.
+ intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
   destruct Hi as (Hinf & Hi); simpl in Hi.
@@ -2214,17 +2209,16 @@ split.
 Qed.
 
 Theorem r_decomposed_4 :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  ∀ (s := set_equiv) f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints
-      [(M ∪ SS ạ ∪ B)%S; (SS ạ⁻¹ ∖ B)%S; SS ḅ; SS ḅ⁻¹].
+      [M ∪ SS ạ ∪ B; SS ạ⁻¹ ∖ B; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros s Hs f HoeHo os Hos.
-pose proof r_decomposed_5 s Hs f HoeHo os Hos as H.
+intros s f HoeHo os Hos.
+pose proof r_decomposed_5 f HoeHo os Hos as H.
 destruct HoeHo as (Hoe, Ho).
-eapply is_partition_group_first_2_together in H; [ | assumption ].
-apply is_partition_union_subtract; [ assumption | assumption | | ].
+eapply is_partition_group_first_2_together in H.
+apply is_partition_union_subtract; [ assumption | | ].
  intros p bm; subst os.
  destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
  split; [ assumption | ].
@@ -2235,13 +2229,12 @@ apply is_partition_union_subtract; [ assumption | assumption | | ].
 Qed.
 
 Theorem r_decomposed_2 :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  ∀ (s := set_equiv) f, orbit_selector f
   → ∀ os, os = mkos _ f
   → ∀ e,
     is_partition sphere_but_fixpoints [SS e; rot e (SS (negf e))].
 Proof.
-intros s Hs f (Hoe, Ho) os Hos e; subst os s.
+intros s f (Hoe, Ho) os Hos e; subst os s.
 split.
 *intros p.
  split.
@@ -2255,7 +2248,7 @@ split.
    +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
    clear Hel₁.
    right; left.
-   unfold rot, SS.
+   unfold rot.
    split.
     split.
      destruct Hnf as (His, _).
@@ -2280,7 +2273,7 @@ split.
      exists el, el₁; split; assumption.
 
      right; left.
-     unfold rot, SS.
+     unfold rot.
      split.
       split.
        destruct Hnf as (His, _).
@@ -2321,8 +2314,7 @@ split.
 
 *intros i j Hij p.
  split; [ | contradiction ].
- unfold nth_set.
- intros (Hi, Hj); unfold empty_set.
+ intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
   destruct j; [ | destruct j; contradiction ].
@@ -2341,7 +2333,7 @@ split.
    destruct i; contradiction.
 Qed.
 
-Add Parametric Morphism {A} : (@List.nth (A → Prop))
+Add Parametric Morphism {A} : (@List.nth (set A))
   with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
   as nth_set_morph.
 Proof.
@@ -2360,12 +2352,11 @@ apply app_repeat_diag.
 Qed.
 
 Theorem r_decomposed_2_a :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  ∀ (s := set_equiv) f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition sphere_but_fixpoints [(M ∪ SS ạ ∪ B)%S; rot ạ (SS ạ⁻¹ ∖ B)%S].
+  → is_partition sphere_but_fixpoints [M ∪ SS ạ ∪ B; rot ạ (SS ạ⁻¹ ∖ B)].
 Proof.
-intros s Hs f (Hoe, Ho) os Hos; subst s.
+intros s f (Hoe, Ho) os Hos; subst s.
 split.
 *intros p.
  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
@@ -2386,10 +2377,9 @@ split.
 
     +destruct e₁ as (t, d); destruct t.
      destruct d.
-      destruct (EM (B p)) as [HB| HB]; [ left; right; assumption | ].
+      destruct (EM (p ∈ B)) as [HB| HB]; [ left; right; assumption | ].
       right; left; simpl.
       split.
-       unfold SS; simpl.
        split.
         destruct Hnf as (His, Hnf).
         split; [ apply in_sphere_after_rotate; assumption | ].
@@ -2403,7 +2393,7 @@ split.
 
        simpl; intros (Haf & n & Hoo); apply HB; clear HB.
        split; [ assumption | ].
-       unfold on_orbit_by_seq_of in Hoo |-*.
+       unfold orbit_by_seq_of in Hoo |-*; simpl.
        remember S as g;
        subst os; simpl in Hoo |-*; subst g.
        rewrite Hfr in Hoo; simpl in Hoo.
@@ -2413,7 +2403,7 @@ split.
        simpl in Hoo.
        rewrite Hoo in Hel.
        destruct Hnf as (His & Hoh).
-       unfold orbit_has_no_fixpoint in Hoh.
+       unfold orbit_without_fixpoint in Hoh.
        exfalso; revert Hel.
        apply Hoh; [ reflexivity | ].
        rewrite Hel₁; intros H; discriminate H.
@@ -2437,7 +2427,7 @@ split.
 
       intros (Hnf₂, Hoo).
       subst os; simpl in Hoo.
-      unfold on_orbit_by_seq_of in Hoo; simpl in Hoo.
+      unfold orbit_by_seq_of in Hoo; simpl in Hoo.
       rewrite Hfr in Hoo.
       destruct Hoo as (n, Hr).
       apply f_equal with (f := rotate (FE la false)) in Hr.
@@ -2488,24 +2478,24 @@ split.
   apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
 
   split; [ | contradiction ].
-  unfold nth_set.
-  intros (Hi, Hj); unfold empty_set.
+  intros (Hi, Hj).
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
-   eapply decompose_2a_contrad_case; try eassumption; split; assumption.
+   eapply decompose_2a_contrad_case; unfold union; try eassumption.
+   split; assumption.
 
    destruct i; [ simpl in Hi | destruct i; contradiction ].
    destruct j.
-    eapply decompose_2a_contrad_case; try eassumption; split; assumption.
+    eapply decompose_2a_contrad_case; unfold union; try eassumption.
+    split; assumption.
 
     destruct j; [ apply Hij; reflexivity | clear Hij ].
     destruct j; contradiction.
 Qed.
 
 Theorem r_decomposed_2_b :
-  ∀ s, s = set_equiv
-  → ∀ f, orbit_selector f
+  ∀ (s := set_equiv) f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
 Proof.
@@ -2525,6 +2515,7 @@ split; intros (H₁, H₂).
  split; [ apply HE; assumption | apply HF; assumption ].
 Qed.
 
+(*
 Add Parametric Morphism {A} : (@intersection A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
@@ -2536,6 +2527,7 @@ split; intros (H₁, H₂).
  split; [ apply HE; assumption | apply HF; assumption ].
  split; [ apply HE; assumption | apply HF; assumption ].
 Qed.
+*)
 
 Add Parametric Morphism {A} : (@union A)
   with signature
@@ -2549,6 +2541,7 @@ split.
  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
 Qed.
 
+(*
 Add Parametric Morphism {A} : (@union A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> eq ==> iff
@@ -2560,6 +2553,7 @@ split.
  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
 Qed.
+*)
 
 (* Transformation group *)
 
@@ -2590,7 +2584,7 @@ Fixpoint app_gr_inv f :=
   end.
 
 Theorem gr_subst : ∀ (s := set_equiv) g E F,
-  (E = F)%S → ∀ p, app_gr g E p → app_gr g F p.
+  (E = F)%S → ∀ p, p ∈ app_gr g E → p ∈ app_gr g F.
 Proof.
 intros s * HEF * HE.
 revert E F p HEF HE.
@@ -2606,6 +2600,7 @@ induction g as [ e| dx | g IHg h IHh]; intros.
  eapply IHh; [ symmetry; eassumption | eassumption ].
 Qed.
 
+(*
 Add Parametric Morphism : app_gr
 with signature eq ==> (@set_eq _ set_equiv) ==> eq ==> iff
 as app_gr_morph_iff.
@@ -2614,6 +2609,7 @@ intros g p q Hpq r.
 split; intros H; [ eapply gr_subst; eassumption | ].
 symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
+*)
 
 Add Parametric Morphism : app_gr
 with signature eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -2642,6 +2638,7 @@ induction g; intros; simpl.
 
  intros p.
  split; intros H.
+bbb.
   rewrite IHg1 in H; apply IHg2; assumption.
 
   rewrite IHg1; apply IHg2, H.
@@ -3308,7 +3305,7 @@ split.
 
    left; split; [ assumption | ].
    unfold orbit_has_fixpoint in Hoh.
-   unfold orbit_has_no_fixpoint.
+   unfold orbit_without_fixpoint.
    intros * Hso Hn.
    assert (H : ∀ p', not (same_orbit p p' ∧ sphere_fixpoint p')).
     intros p' H; apply Hoh.
