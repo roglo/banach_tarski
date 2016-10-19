@@ -3075,12 +3075,45 @@ Theorem partition_prod_nth :
 Proof.
 intros * Hlen.
 symmetry in Hlen.
+revert PL QL len Hlen.
+induction i; intros.
+ destruct len.
+  apply length_zero_iff_nil in Hlen; subst QL.
+  rewrite partition_prod_nil_r.
+  simpl; intros x.
+  split; [ contradiction | intros (_, H); contradiction ].
+
+  rewrite Nat.div_0_l; [ | intros H; discriminate H ].
+  rewrite Nat.mod_0_l; [ | intros H; discriminate H ].
+  destruct PL as [| P PL].
+   rewrite partition_prod_nil_l.
+   rewrite intersection_empty_l; reflexivity.
+
+   rewrite partition_prod_cons_l.
+   intros x; simpl.
+   split; intros Hx.
+    destruct QL as [| Q QL]; [ discriminate Hlen | assumption ].
+    destruct QL as [| Q QL]; [ discriminate Hlen | assumption ].
+
+ simpl.
+bbb.
+
+intros * Hlen.
+symmetry in Hlen.
 revert PL QL i Hlen.
 induction len; intros.
  apply length_zero_iff_nil in Hlen; subst QL.
  rewrite partition_prod_nil_r.
  rewrite intersection_empty_r.
  destruct i; reflexivity.
+
+SearchAbout (_ mod _)%nat.
+pose proof Nat.mod_eq i (S len).
+pose proof Nat.div_mod i (S len).
+pose proof Nat.div_exact i (S len).
+
+bbb.
+
 
 bbb.
 
