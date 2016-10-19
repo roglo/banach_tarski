@@ -45,6 +45,24 @@ Theorem fold_right_single : ∀ A B (f : A → B → B) x y,
   fold_right f x [y] = f y x.
 Proof. reflexivity. Qed.
 
+Theorem list_prod_nil_r : ∀ A B (l : list A),
+  list_prod l ([] : list B) = [].
+Proof.
+intros A B l.
+induction l as [| x]; [ reflexivity | assumption ].
+Qed.
+
+Theorem list_prod_map_l : ∀ A B C (f : A → B) l (l' : list C),
+  list_prod (map f l) l' =
+  map (λ '(x, x'), (f x, x')) (list_prod l l').
+Proof.
+intros A B *.
+revert l'.
+induction l as [| x l]; intros; [ reflexivity | simpl ].
+rewrite map_app.
+f_equal; [ rewrite map_map; reflexivity | apply IHl ].
+Qed.
+
 Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
   ¬Forall2 R [] (x :: l).
 Proof.
@@ -1626,6 +1644,17 @@ destruct (lt_dec i (length P₁)) as [H₁| H₁].
  rewrite app_nth2; [ reflexivity | apply Nat.nlt_ge; assumption ].
 Qed.
 
+Theorem union_list_intersection : ∀ A (P : A → Prop) QL x,
+  P x
+  → (⋃ QL)%S x
+  → (⋃ map (intersection P) QL)%S x.
+Proof.
+intros A P QL * HP HQL.
+induction QL as [| Q QL]; intros; [ contradiction | simpl ].
+destruct HQL as [HQ| HQL]; [ left; split; assumption | right ].
+apply IHQL, HQL.
+Qed.
+
 (* Partitions *)
 
 Definition is_partition {A} {S : set_model A} E Ep :=
@@ -2912,24 +2941,6 @@ Qed.
 Definition partition_prod {A} (PL QL : list (A → Prop)) :=
   map (λ '(p, q), intersection p q) (list_prod PL QL).
 
-Theorem list_prod_nil_r : ∀ A B (l : list A),
-  list_prod l ([] : list B) = [].
-Proof.
-intros A B l.
-induction l as [| x]; [ reflexivity | assumption ].
-Qed.
-
-Theorem union_list_intersection : ∀ A (P : A → Prop) QL x,
-  P x
-  → (⋃ QL)%S x
-  → (⋃ map (intersection P) QL)%S x.
-Proof.
-intros A P QL * HP HQL.
-induction QL as [| Q QL]; intros; [ contradiction | simpl ].
-destruct HQL as [HQ| HQL]; [ left; split; assumption | right ].
-apply IHQL, HQL.
-Qed.
-
 Theorem partition_prod_nil_l : ∀ A (Q : list (A → Prop)),
   partition_prod [] Q = [].
 Proof. reflexivity. Qed.
@@ -2981,140 +2992,29 @@ destruct i.
  apply IHPL.
 Qed.
 
-(*
-Theorem nth_partition_prod : ∀ A (s := set_equiv) (PL QL : list (A → Prop)) i,
-  ((partition_prod PL QL).[i] = PL.[i / length QL] ∩ QL.[i mod length QL])%S.
+Theorem partition_prod_by_seq : ∀ A (PL QL : list (A → Prop)),
+  (partition_prod PL QL =
+   map (λ '(i, j), (PL.[i] ∩ QL.[j])%S)
+     (list_prod (seq O (length PL)) (seq O (length QL)))).
 Proof.
 intros *.
-revert i.
-induction QL as [| Q QL]; intros.
- rewrite partition_prod_nil_r.
- split; [ destruct i; contradiction | intros H ].
- destruct H as (_, H); contradiction.
+unfold partition_prod.
+revert QL.
+induction PL as [| P PL]; intros; [ reflexivity | simpl ].
+do 2 rewrite map_app, map_map.
+f_equal.
+ induction QL as [| Q QL]; [ reflexivity | simpl ].
+ rewrite IHQL, <- seq_shift, map_map; reflexivity.
 
- unfold nth_set.
- remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
- rewrite fold_set_eq, fold_nth_set, fold_nth_set.
- remember (i mod S (length QL)) as a eqn:Ha.
- symmetry in Ha.
- destruct a.
-  apply Nat.mod_divides in Ha; [ | intros HH; discriminate HH ].
-  destruct Ha as (a, Ha); rewrite Nat.mul_comm in Ha.
-  rewrite Ha.
-  rewrite Nat.div_mul; [ | intros HH; discriminate HH ].
-  clear - a.
-  revert PL Q QL.
-  induction a; intros.
-   rewrite Nat.mul_0_l.
-   destruct PL as [| P PL].
-    rewrite partition_prod_nil_l; simpl.
-    unfold nth_set; simpl; rewrite fold_set_eq.
-    symmetry; apply intersection_empty_l.
-
-    rewrite partition_prod_cons_l; simpl.
-    unfold nth_set; simpl; rewrite fold_set_eq.
-    reflexivity.
-
-   destruct PL as [| P PL].
-    rewrite partition_prod_nil_l; simpl.
-    unfold nth_set; simpl; rewrite fold_set_eq.
-    symmetry; apply intersection_empty_l.
-
-    rewrite partition_prod_cons_l; simpl.
-    unfold nth_set; simpl; rewrite fold_set_eq.
-    do 2 rewrite fold_nth_set.
-    unfold nth_set.
-    rewrite app_nth2.
-     rewrite map_length, Nat.add_comm, Nat.add_sub.
-     do 2 rewrite fold_nth_set.
-     apply IHa.
-
-     rewrite map_length.
-     apply Nat.le_add_r.
-
-  destruct i.
-   rewrite Nat.mod_0_l in Ha; [ | intros H; discriminate H ].
-   discriminate Ha.
-
-   unfold nth_set.
-   remember Nat.div as f; simpl; subst f.
-   rewrite fold_set_eq, fold_nth_set, fold_nth_set, fold_nth_set.
-bbb.
-
- destruct QL as [| Q₁ QL].
-  remember Nat.div as f; remember Nat.modulo as g; simpl; subst f g.
-  rewrite fold_set_eq.
-  rewrite Nat.div_1_r, Nat.mod_1_r.
-  rewrite partition_prod_single_r.
-  unfold nth_set; simpl.
-  rewrite fold_set_eq, fold_nth_set, fold_nth_set.
-  revert i.
-  induction PL as [| P PL]; intros.
-   intros x; unfold nth_set; simpl.
-   destruct i.
-    split; [ contradiction | intros H ].
-    apply intersection_empty_l in H; contradiction.
-
-    split; [ contradiction | intros H ].
-    apply intersection_empty_l in H; contradiction.
-
-   destruct i.
-    unfold nth_set; simpl; rewrite fold_set_eq.
-    apply intersection_comm; reflexivity.
-
-    unfold nth_set; simpl; rewrite fold_set_eq, fold_nth_set, fold_nth_set.
-    apply IHPL.
-
-bbb.
-
-revert PL QL.
-induction i; intros.
- destruct QL as [| Q QL].
-  rewrite partition_prod_nil_r.
-  split; [ contradiction | simpl; intros H ].
-  destruct H as (_, H); contradiction.
-
-  simpl; rewrite Nat.sub_diag.
-  destruct PL as [| P PL]; [ | reflexivity ].
-  rewrite partition_prod_nil_l.
-  intros x; split; [ contradiction | intros (H, _); contradiction ].
-
- destruct QL as [| Q QL].
-  rewrite partition_prod_nil_r.
-  split; [ contradiction | simpl; intros H ].
-  destruct H as (_, H); contradiction.
-
-  intros x.
-  split; intros H.
-   simpl in H.
-   destruct PL as [| P PL]; [ contradiction | ].
-    rewrite partition_prod_cons_l in H.
-    unfold nth_set in H; simpl in H.
-    remember Nat.div as f; remember Nat.modulo as g.
-    simpl; subst f g.
-bbb.
- intros x.
- split.
-  intros HPQ.
-   destruct QL as [| Q QL].
-    rewrite partition_prod_nil_r in HPQ.
-    contradiction.
-
-    simpl; rewrite Nat.sub_diag.
-    destruct PL as [| P PL]; [ contradiction | ].
-    rewrite partition_prod_cons_l in HPQ.
-    unfold nth_set in HPQ; simpl in HPQ.
-    unfold nth_set; assumption.
-
-  intros HPQL.
-   destruct QL as [| Q QL].
-    destruct HPQL as (_, HPQL).
-    contradiction.
-
-    simpl in HPQL; rewrite Nat.sub_diag in HPQL.
-
-bbb.
-*)
+ rewrite <- seq_shift.
+ rewrite list_prod_map_l.
+ rewrite IHPL.
+ rewrite map_map.
+ remember (list_prod (seq 0 (length PL)) (seq 0 (length QL))) as l eqn:Hl.
+ clear.
+ induction l as [| (i, j) l]; [ reflexivity | simpl ].
+ f_equal; apply IHl.
+Qed.
 
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : A → Prop) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
@@ -3177,16 +3077,11 @@ split.
 
  intros i j Hij.
  split; [ | intros H; contradiction ].
+ rewrite partition_prod_by_seq.
+ remember (list_prod (seq 0 (length P)) (seq 0 (length Q))) as l eqn:Hl.
  intros (HQ, HP).
  rewrite HEP in HEQ.
  clear E HEP.
- unfold partition_prod in HP, HQ.
- remember (list_prod P Q) as LPQ eqn:HLPQ.
-Compute seq 0 5.
-assert
-  (partition_prod P Q =
-   map (λ '(i, j), (P.[i] ∩ P.[j])%S)
-     (list_prod (seq O (length P)) (seq O (length Q)))).
 
 bbb.
 
