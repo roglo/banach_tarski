@@ -2973,21 +2973,24 @@ f_equal.
  f_equal; apply IHl.
 Qed.
 
-Definition all_different {A} (l : list A) :=
-  match l with
-  | x :: _ => ∀ i j, i ≠ j → List.nth i l x ≠ List.nth j l x
-  | [] => True
-  end.
+Definition all_different {A} d (l : list A) :=
+  ∀ i j, i < length l → j < length l → i ≠ j →
+  List.nth i l d ≠ List.nth j l d.
 
 Theorem list_prod_seq_all_diff : ∀ s len s' len',
-  all_different (list_prod (seq s len) (seq s' len')).
+  all_different (len, len') (list_prod (seq s len) (seq s' len')).
 Proof.
 intros.
 unfold all_different.
 remember (list_prod (seq s len) (seq s' len')) as l eqn:Hl.
 symmetry in Hl.
-destruct l as [| (i, j) l]; [ constructor | ].
-intros i' j' Hij'.
+revert s len s' len' Hl.
+induction l as [| (i', j') l]; intros * Hl * Hi Hj Hij.
+ exfalso; revert Hi; apply Nat.nlt_0_r.
+
+ simpl in Hi, Hj.
+ destruct i.
+  destruct j; [ exfalso; apply Hij; reflexivity | simpl ].
 
 bbb.
 
