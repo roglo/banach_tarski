@@ -2979,12 +2979,20 @@ Proof.
 intros * Hl.
 revert s len s' len' p Hl.
 induction l as [| (i, j) l]; intros.
-
-
- destruct len; [ discriminate Hl | simpl in Hl ].
+ revert s s' len' p Hl.
+ induction len; intros; [ discriminate Hl | simpl in Hl ].
  destruct len'; [ rewrite list_prod_nil_r in Hl; discriminate Hl | ].
  simpl in Hl.
  injection Hl; clear Hl; intros Hl; intros; subst p.
+ destruct len'; simpl in Hl.
+  destruct len; [ discriminate Hl | simpl in Hl ].
+  injection Hl; clear Hl; intros Hl Hs.
+  revert Hs; apply Nat.neq_succ_diag_l.
+
+  injection Hl; clear Hl; intros Hl Hs.
+  revert Hs; apply Nat.neq_succ_diag_l.
+
+ eapply IHl.
 
 bbb.
 
