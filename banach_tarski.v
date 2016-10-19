@@ -3048,7 +3048,28 @@ split.
   destruct Hi as (HiP, HiQ).
   destruct j; [ apply Hij; reflexivity | ].
   simpl in Hj.
-Abort.
+assert (∃ i'' j'', x ∈ P.[i''] ∩ Q.[j''] ∧ (i' ≠ i'' ∨ j' ≠ j'')).
+ clear - HPij HQij Hl HiP HiQ Hj.
+ revert P Q j HPij HQij Hl HiP HiQ Hj.
+ induction l as [| (i'', j'') l]; intros P; intros.
+  destruct j; contradiction.
+
+  simpl in Hj.
+  destruct j.
+   exists i'', j''.
+   split; [ assumption | ].
+   destruct (eq_nat_dec i' i'') as [Hii| Hii]; [ right | left; assumption ].
+   intros H; subst i'' j''.
+
+bbb.
+Focus 2.
+destruct H as (i'' & j'' & H'' & Hiijj).
+destruct H'' as (Hxi & Hxj).
+destruct Hiijj as [Hii| Hjj].
+ eapply HPij; [ eassumption | split; eassumption ].
+ eapply HQij; [ eassumption | split; eassumption ].
+
+bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
