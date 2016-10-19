@@ -2976,7 +2976,16 @@ Qed.
 Theorem list_prod_seq_all_diff : ∀ s len s' len' p l,
  list_prod (seq s len) (seq s' len') ≠ p :: p :: l.
 Proof.
-intros.
+intros * Hl.
+revert s len s' len' p Hl.
+induction l as [| (i, j) l]; intros.
+
+
+ destruct len; [ discriminate Hl | simpl in Hl ].
+ destruct len'; [ rewrite list_prod_nil_r in Hl; discriminate Hl | ].
+ simpl in Hl.
+ injection Hl; clear Hl; intros Hl; intros; subst p.
+
 bbb.
 
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : set A) P Q,
