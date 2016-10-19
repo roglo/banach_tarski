@@ -3083,7 +3083,7 @@ split.
  intros (Hi, Hj).
  rewrite HEP in HEQ.
  clear E HEP.
- revert P Q HPij HQij HEQ Hl Hi Hj.
+ revert x P Q i j Hij HPij HQij HEQ Hl Hi Hj.
  induction l as [| ij l]; intros P; intros; [ destruct i; contradiction | ].
  destruct ij as (i', j').
  destruct i.
@@ -3094,6 +3094,8 @@ split.
   destruct j; [ apply Hij; reflexivity | ].
   simpl in Hj.
   unfold nth_set at 1 in Hj; simpl in Hj.
+  rewrite fold_nth_set in Hj.
+bbb.
   remember (λ '(i, j), (P.[i] ∩ Q.[j])%S) as f eqn:Hf.
 bbb.
 
