@@ -3073,6 +3073,7 @@ Theorem partition_prod_nth :
   len = length QL
   → ((partition_prod PL QL).[i] = PL.[i / len] ∩ QL.[i mod len])%S.
 Proof.
+(*
 intros * Hlen.
 symmetry in Hlen.
 revert PL QL len Hlen.
@@ -3097,7 +3098,7 @@ induction i; intros.
 
  simpl.
 bbb.
-
+*)
 intros * Hlen.
 symmetry in Hlen.
 revert PL QL i Hlen.
@@ -3107,13 +3108,23 @@ induction len; intros.
  rewrite intersection_empty_r.
  destruct i; reflexivity.
 
-SearchAbout (_ mod _)%nat.
-pose proof Nat.mod_eq i (S len).
-pose proof Nat.div_mod i (S len).
-pose proof Nat.div_exact i (S len).
+ destruct (zerop (i mod S len)) as [Hi| Hi].
+  apply Nat.mod_divides in Hi; [ | intros HH; discriminate HH ].
+  destruct Hi as (c, Hi).
+  subst i.
+  rewrite Nat.mul_comm.
+  rewrite Nat.div_mul; [ | intros H; discriminate H ].
+  rewrite Nat.mod_mul; [ | intros H; discriminate H ].
+Focus 2.
+SearchAbout (_ mod _ ≠ 0)%nat.
 
 bbb.
 
+SearchAbout (_ * _ / _ = _)%nat.
+SearchAbout (_ mod _ = 0)%nat.
+pose proof Nat.mod_eq i (S len).
+pose proof Nat.div_mod i (S len).
+pose proof Nat.div_exact i (S len).
 
 bbb.
 
