@@ -3083,7 +3083,7 @@ split.
  intros (Hi, Hj).
  rewrite HEP in HEQ.
  clear E HEP.
- revert x P Q i j Hij HPij HQij HEQ Hl Hi Hj.
+ revert P Q x i j Hij HPij HQij HEQ Hl Hi Hj.
  induction l as [| ij l]; intros P; intros; [ destruct i; contradiction | ].
  destruct ij as (i', j').
  destruct i.
