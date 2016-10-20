@@ -2948,6 +2948,18 @@ rewrite map_app, map_map.
 reflexivity.
 Qed.
 
+Theorem partition_prod_length :
+  ∀ A (P Q : list (set A)),
+  length (partition_prod P Q) = (length P * length Q)%nat.
+Proof.
+intros A P Q.
+revert Q.
+induction P as [| P PL]; intros; [ reflexivity | simpl ].
+rewrite partition_prod_cons_l.
+rewrite app_length, IHPL, map_length.
+reflexivity.
+Qed.
+
 Theorem partition_prod_nth :
   ∀ A (s := set_equiv) (PL QL : list (set A)) len i,
   len = length QL
@@ -3109,9 +3121,35 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
  remember (partition_prod PF P'F) as PPF eqn:HPPF.
  remember (map (λ '(gi, PPFi), app_gr (app_gr_inv gi) PPFi) (combine gll PPF))
    as P'E eqn:HP'E.
- assert (length gll = length PPF).
-bbb.
- assert (is_partition E P'E).
+ assert (Hleq : length gll = length PPF).
+  subst gll PPF PEF.
+  rewrite partition_prod_length.
+  clear - PE HP'E Hlen1 Hgl.
+  revert PE PF P'E P'F Hlen1 Hgl HP'E.
+  induction gl as [| g gl]; intros.
+   simpl in HP'E; simpl; subst P'E.
+   destruct PE as [| PE₁ PE].
+    symmetry in Hlen1.
+    apply length_zero_iff_nil in Hlen1.
+    subst PF; reflexivity.
+
+    destruct PF as [| PF₁ PF]; [ reflexivity | ].
+    simpl in Hgl; apply Forall2_nil_cons in Hgl; contradiction.
+
+   simpl.
+   rewrite app_length, repeat_length.
+   destruct PE as [| PE₁ PE].
+    apply Forall2_cons_nil in Hgl; contradiction.
+    destruct PF as [| PF₁ PF].
+     apply Forall2_cons_nil in Hgl; contradiction.
+
+     simpl in Hlen1, Hgl; simpl; f_equal.
+     apply Nat.succ_inj in Hlen1.
+     apply Forall2_cons_cons in Hgl.
+     destruct Hgl as (Hgl₁, Hgl).
+     eapply IHgl; [ eassumption | assumption | reflexivity ].
+
+  assert (Hophophop : is_partition E P'E).
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
