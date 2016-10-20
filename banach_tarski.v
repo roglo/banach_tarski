@@ -13,6 +13,20 @@ Import ListNotations.
 
 (* Misc *)
 
+Theorem nat_div_add_once : ∀ a b, b ≠ 0 → (a + b) / b = S (a / b).
+Proof.
+intros a b Hb.
+replace b with (1 * b) at 1 by apply Nat.mul_1_l.
+rewrite Nat.div_add; [ apply Nat.add_1_r | assumption ].
+Qed.
+
+Theorem nat_mod_add_once : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
+Proof.
+intros a b Hb.
+replace b with (1 * b) at 1 by apply Nat.mul_1_l.
+apply Nat.mod_add; assumption.
+Qed.
+
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
 Proof.
 intros.
@@ -2934,199 +2948,58 @@ rewrite map_app, map_map.
 reflexivity.
 Qed.
 
-Theorem partition_prod_length :
-  ∀ A (P Q : list (set A)),
-  length (partition_prod P Q) = (length P * length Q)%nat.
-Proof.
-intros A P Q.
-revert Q.
-induction P as [| P PL]; intros; [ reflexivity | simpl ].
-rewrite partition_prod_cons_l.
-rewrite app_length, IHPL, map_length.
-reflexivity.
-Qed.
-
-Theorem partition_prod_single_r : ∀ A (s := set_equiv) PL (Q : set A) i,
-  ((partition_prod PL [Q]).[i] = (map (intersection Q) PL).[i])%S.
-Proof.
-intros A s PL Q i.
-revert i.
-induction PL as [| P PL]; intros; [ reflexivity | ].
-rewrite partition_prod_cons_l.
-simpl; rewrite fold_set_eq.
-destruct i; [ apply intersection_comm; reflexivity | apply IHPL ].
-Qed.
-
-Theorem partition_prod_by_seq : ∀ A (PL QL : list (set A)),
-  (partition_prod PL QL =
-   map (λ '(i, j), (PL.[i] ∩ QL.[j])%S)
-     (list_prod (seq O (length PL)) (seq O (length QL)))).
-Proof.
-intros *.
-unfold partition_prod.
-revert QL.
-induction PL as [| P PL]; intros; [ reflexivity | simpl ].
-do 2 rewrite map_app, map_map.
-f_equal.
- induction QL as [| Q QL]; [ reflexivity | simpl ].
- rewrite IHQL, <- seq_shift, map_map; reflexivity.
-
- rewrite <- seq_shift.
- rewrite list_prod_map_l.
- rewrite IHPL.
- rewrite map_map.
- remember (list_prod (seq 0 (length PL)) (seq 0 (length QL))) as l eqn:Hl.
- clear.
- induction l as [| (i, j) l]; [ reflexivity | simpl ].
- f_equal; apply IHl.
-Qed.
-
-(*
-Fixpoint all_different {A} (l : list A) :=
-  match l with
-  | x :: l' => Forall (λ y, x ≠ y) l' ∧ all_different l'
-  | [] => True
-  end.
-
-Theorem list_prod_seq_all_diff : ∀ s len s' len',
-  all_different (list_prod (seq s len) (seq s' len')).
-Proof.
-intros.
-bbb.
-
-remember (len * len')%nat as glen eqn:H.
-assert (Hglen : (len * len' ≤ glen)%nat) by (subst glen; reflexivity).
-clear H.
-revert s len s' len' Hglen.
-induction glen; intros.
- apply Nat.le_0_r in Hglen.
- apply Nat.eq_mul_0 in Hglen.
- destruct Hglen as [Hglen| Hglen]; [ subst len | subst len' ].
-  reflexivity.
-
-  rewrite list_prod_nil_r; reflexivity.
-
- destruct len; [ reflexivity | simpl in Hglen; simpl ].
- destruct len'; [ subst l; rewrite list_prod_nil_r; reflexivity | ].
- simpl in Hl.
-
- eapply IHglen; [ eassumption | simpl ].
-
-
-bbb.
-intros.
-remember (list_prod (seq s len) (seq s' len')) as l eqn:Hl.
-symmetry in Hl.
-revert s len s' len' Hl.
-induction l as [| x]; intros; [ constructor | simpl ].
-split.
- clear - Hl.
- revert x s len s' len' Hl.
- induction l as [| y]; intros; [ constructor | ].
- constructor.
- intros H; subst y.
-bbb.
-
-Focus 2.
- eapply IHl.
-
-bbb.
-
-unfold all_different.
-induction l as [| (i', j') l]; intros * Hl * Hi Hj Hij.
- exfalso; revert Hi; apply Nat.nlt_0_r.
-
- simpl in Hi, Hj.
- destruct i.
-  destruct j; [ exfalso; apply Hij; reflexivity | simpl ].
-
-bbb.
-*)
-
-(*
-Theorem list_prod_seq_all_diff : ∀ s len s' len' p l,
- list_prod (seq s len) (seq s' len') ≠ p :: p :: l.
-Proof.
-intros * Hl.
-revert s len s' len' p Hl.
-induction l as [| (i, j) l]; intros.
- revert s s' len' p Hl.
- induction len; intros; [ discriminate Hl | simpl in Hl ].
- destruct len'; [ rewrite list_prod_nil_r in Hl; discriminate Hl | ].
- simpl in Hl.
- injection Hl; clear Hl; intros Hl; intros; subst p.
- destruct len'; simpl in Hl.
-  destruct len; [ discriminate Hl | simpl in Hl ].
-  injection Hl; clear Hl; intros Hl Hs.
-  revert Hs; apply Nat.neq_succ_diag_l.
-
-  injection Hl; clear Hl; intros Hl Hs.
-  revert Hs; apply Nat.neq_succ_diag_l.
-
- eapply IHl.
-
-bbb.
-*)
-
 Theorem partition_prod_nth :
   ∀ A (s := set_equiv) (PL QL : list (set A)) len i,
   len = length QL
   → ((partition_prod PL QL).[i] = PL.[i / len] ∩ QL.[i mod len])%S.
 Proof.
-(*
 intros * Hlen.
-symmetry in Hlen.
-revert PL QL len Hlen.
-induction i; intros.
- destruct len.
-  apply length_zero_iff_nil in Hlen; subst QL.
-  rewrite partition_prod_nil_r.
-  simpl; intros x.
-  split; [ contradiction | intros (_, H); contradiction ].
+subst len.
+revert QL i.
+induction PL as [| P PL]; intros.
+ intros x.
+ split; intros Hx; [ destruct i; contradiction | ].
+ destruct Hx as (Hx, _).
+ destruct (i / length QL)%nat; contradiction.
 
-  rewrite Nat.div_0_l; [ | intros H; discriminate H ].
-  rewrite Nat.mod_0_l; [ | intros H; discriminate H ].
-  destruct PL as [| P PL].
-   rewrite partition_prod_nil_l.
-   rewrite intersection_empty_l; reflexivity.
+ rewrite partition_prod_cons_l.
+ destruct (lt_dec i (length QL)) as [Hi| Hi].
+  rewrite app_nth1; [| rewrite map_length; assumption ].
+  rewrite Nat.div_small; [ simpl | assumption ].
+  rewrite Nat.mod_small; [ simpl | assumption ].
+  intros x; clear.
+  split; intros Hx.
+   revert i Hx.
+   induction QL as [| Q QL]; intros; [ destruct i; contradiction | ].
+   simpl in Hx; simpl.
+   destruct i; [ assumption | apply IHQL; assumption ].
 
-   rewrite partition_prod_cons_l.
-   intros x; simpl.
-   split; intros Hx.
-    destruct QL as [| Q QL]; [ discriminate Hlen | assumption ].
-    destruct QL as [| Q QL]; [ discriminate Hlen | assumption ].
+   revert i Hx.
+   induction QL as [| Q QL]; intros.
+    destruct Hx; destruct i; contradiction.
 
- simpl.
-bbb.
-*)
-intros * Hlen.
-symmetry in Hlen.
-revert PL QL i Hlen.
-induction len; intros.
- apply length_zero_iff_nil in Hlen; subst QL.
- rewrite partition_prod_nil_r.
- rewrite intersection_empty_r.
- destruct i; reflexivity.
+    destruct i; simpl in Hx; simpl; [ assumption | ].
+    apply IHQL; assumption.
 
- destruct (zerop (i mod S len)) as [Hi| Hi].
-  apply Nat.mod_divides in Hi; [ | intros HH; discriminate HH ].
-  destruct Hi as (c, Hi).
-  subst i.
-  rewrite Nat.mul_comm.
-  rewrite Nat.div_mul; [ | intros H; discriminate H ].
-  rewrite Nat.mod_mul; [ | intros H; discriminate H ].
-Focus 2.
-SearchAbout (_ mod _ ≠ 0)%nat.
+  apply Nat.nlt_ge in Hi.
+  rewrite app_nth2; [| rewrite map_length; assumption ].
+  rewrite map_length.
+  remember (i - length QL)%nat as j eqn:Hj.
+  assert (H : (i = j + length QL)%nat).
+   rewrite Hj.
+   rewrite Nat.sub_add; [ reflexivity | assumption ].
 
-bbb.
+   subst i; clear Hi Hj.
+   destruct QL as [| Q QL].
+    rewrite partition_prod_nil_r; simpl.
+    intros x.
+    split; intros Hx; [ destruct j; contradiction | ].
+    destruct Hx; destruct j; contradiction.
 
-SearchAbout (_ * _ / _ = _)%nat.
-SearchAbout (_ mod _ = 0)%nat.
-pose proof Nat.mod_eq i (S len).
-pose proof Nat.div_mod i (S len).
-pose proof Nat.div_exact i (S len).
-
-bbb.
+    rewrite nat_mod_add_once; [ | intros H; discriminate H ].
+    rewrite nat_div_add_once; [ | intros H; discriminate H ].
+    apply IHPL.
+Qed.
 
 Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : set A) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
@@ -3192,51 +3065,6 @@ split.
   erewrite partition_prod_nth; [ | reflexivity ].
   erewrite partition_prod_nth; [ | reflexivity ].
   intros Hx; simpl.
-
-bbb.
-
- rewrite partition_prod_by_seq.
- remember (list_prod (seq 0 (length P)) (seq 0 (length Q))) as l eqn:Hl.
- symmetry in Hl.
- intros (Hi, Hj).
- rewrite HEP in HEQ.
- clear E HEP.
- revert P Q x i j Hij HPij HQij HEQ Hl Hi Hj.
- induction l as [| ij l]; intros P; intros; [ destruct i; contradiction | ].
- destruct ij as (i', j').
- destruct i.
-  simpl in Hi.
-  destruct Hi as (HiP, HiQ).
-  destruct j; [ apply Hij; reflexivity | ].
-  simpl in Hj.
-  assert (∃ i'' j'', x ∈ P.[i''] ∩ Q.[j''] ∧ (i' ≠ i'' ∨ j' ≠ j'')).
-   clear - HPij HQij Hl HiP HiQ Hj.
-   revert P Q j HPij HQij Hl HiP HiQ Hj.
-   induction l as [| (i'', j'') l]; intros P; intros.
-   destruct j; contradiction.
-
-   simpl in Hj.
-   destruct j.
-    exists i'', j''.
-    split; [ assumption | ].
-    destruct (eq_nat_dec i' i'') as [Hii| Hii]; [ right | left; assumption ].
-    intros H; subst i'' j''.
-    pose proof list_prod_seq_all_diff 0 (length P) 0 (length Q).
-    rewrite Hl in H.
-    eapply H with (i := O) (j := 1); [ apply Nat.neq_succ_diag_r | ].
-    reflexivity.
-bbb.
-
-    exfalso; eapply list_prod_seq_all_diff; eassumption.
-
-bbb.
-Focus 2.
-destruct H as (i'' & j'' & H'' & Hiijj).
-destruct H'' as (Hxi & Hxj).
-destruct Hiijj as [Hii| Hjj].
- eapply HPij; [ eassumption | split; eassumption ].
- eapply HQij; [ eassumption | split; eassumption ].
-
 bbb.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
@@ -3247,9 +3075,7 @@ destruct HFG as (R & S & HR & HS & Hlen2 & HFG).
 unfold equidecomposable.
 set (QR := partition_prod Q R).
 set (s := set_equiv).
-(*
 pose proof partition_prod_is_partition _ F Q R HQ HR as HPQ.
-*)
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
