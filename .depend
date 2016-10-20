@@ -1,0 +1,4 @@
+Misc.vio: Misc.v
+Misc.vo Misc.glob Misc.v.beautified: Misc.v
+banach_tarski.vio: banach_tarski.v Misc.vio
+banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo
