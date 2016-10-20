@@ -273,11 +273,11 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
   assert (Hophophop : is_partition E P'E).
    split.
     subst P'E.
+bbb.
     remember (combine gll PPF) as gpl eqn:Hgpl.
     symmetry in Hgpl.
     induction gpl as [| gp].
      intros p; split; [ intros H; simpl | contradiction ].
-bbb.
      destruct gll as [| gl₁ gll].
       symmetry in Hleq.
       apply length_zero_iff_nil in Hleq; subst PPF.
@@ -302,7 +302,7 @@ destruct gl as [| g₁ gl].
  apply Forall2_cons_cons in Hgl.
  destruct Hgl as (Hgg, Hgl).
  destruct gl as [| g₂ gl].
-clear G P'G HP'G Hlen2 HFG Hgll Hleq Hgpl HFQR.
+(*clear G P'G HP'G Hlen2 HFG Hgll Hleq Hgpl HFQR.*)
 simpl in Hlen1; apply Nat.succ_inj in Hlen1.
 unfold is_partition in HPE.
 destruct HPE as (HE, HPE).
@@ -310,9 +310,15 @@ rewrite HE in H.
 destruct H as [H| H].
  apply app_gr_app_gr_inv in Hgg.
  rewrite <- Hgg in H.
-
-bbb.
   remember (app_gr_point g₁ p) as q eqn:Hq.
+pose proof HPF q as Hfq.
+destruct Hfq as (_, Hfq).
+destruct g₁.
+Require Import Words.
+simpl in Hq.
+simpl in H.
+rewrite negf_involutive in H.
+bbb.
   apply HPF with (x := q).
 bbb.
 
