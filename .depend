@@ -1,3 +1,5 @@
+Equidecomp.vio: Equidecomp.v Misc.vio Matrix.vio Pset.vio Partition.vio OrbitRepr.vio Transformation.vio
+Equidecomp.vo Equidecomp.glob Equidecomp.v.beautified: Equidecomp.v Misc.vo Matrix.vo Pset.vo Partition.vo OrbitRepr.vo Transformation.vo
 Matrix.vio: Matrix.v Words.vio Normalize.vio Reverse.vio MiscReals.vio
 Matrix.vo Matrix.glob Matrix.v.beautified: Matrix.v Words.vo Normalize.vo Reverse.vo MiscReals.vo
 Misc.vio: Misc.v
@@ -20,5 +22,5 @@ Transformation.vio: Transformation.v Words.vio MiscReals.vio Matrix.vio Pset.vio
 Transformation.vo Transformation.glob Transformation.v.beautified: Transformation.v Words.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo
 Words.vio: Words.v Misc.vio
 Words.vo Words.glob Words.v.beautified: Words.v Misc.vo
-banach_tarski.vio: banach_tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio Transformation.vio
-banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo Transformation.vo
+banach_tarski.vio: banach_tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio Transformation.vio Equidecomp.vio
+banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo Transformation.vo Equidecomp.vo
