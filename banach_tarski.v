@@ -3111,9 +3111,7 @@ intros E F G HEF HFG.
 destruct HEF as (P & Q & HP & HQ & Hlen1 & HEF).
 destruct HFG as (R & S & HR & HS & Hlen2 & HFG).
 unfold equidecomposable.
-set (QR := partition_prod Q R).
-set (s := set_equiv).
-pose proof partition_prod_is_partition _ F Q R HQ HR as HPQ.
+pose proof partition_prod_is_partition _ F Q R HQ HR as HFQR.
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
