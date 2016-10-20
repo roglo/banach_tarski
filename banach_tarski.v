@@ -2551,10 +2551,10 @@ Qed.
 
 (* Transformation group *)
 
-Inductive G :=
-  | Rot : free_elem → G
-  | Xtransl : ℝ → G
-  | Comb : G → G → G.
+Inductive Gr :=
+  | Rot : free_elem → Gr
+  | Xtransl : ℝ → Gr
+  | Comb : Gr → Gr → Gr.
 
 Fixpoint app_gr f p :=
   match f with
