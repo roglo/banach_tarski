@@ -77,6 +77,13 @@ rewrite map_app.
 f_equal; [ rewrite map_map; reflexivity | apply IHl ].
 Qed.
 
+Theorem Forall_inv2 : ∀ A (P : A → Prop) a l,
+  List.Forall P (a :: l) → P a ∧ List.Forall P l.
+Proof.
+intros A P a l H.
+inversion H; split; assumption.
+Qed.
+
 Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
   ¬Forall2 R [] (x :: l).
 Proof.
@@ -98,6 +105,20 @@ Proof.
 intros A B * H.
 inversion H; subst.
 split; assumption.
+Qed.
+
+Theorem Forall2_Forall_combine : ∀ A f (l1 l2 : list A),
+  Forall2 f l1 l2
+  → Forall (λ '(x, y), f x y) (combine l1 l2).
+Proof.
+intros * HF.
+revert l2 HF.
+induction l1 as [| x1 l1]; intros; [ constructor | ].
+destruct l2 as [| x2 l2]; [ constructor | ].
+apply Forall2_cons_cons in HF.
+destruct HF as (Hf, HF).
+simpl; constructor; [ assumption | ].
+apply IHl1; assumption.
 Qed.
 
 Theorem app_repeat_diag : ∀ A (e : A) n,
@@ -3068,6 +3089,22 @@ destruct HEF as (P & Q & HP & HQ & Hlen1 & HEF).
 destruct HFG as (R & S & HR & HS & Hlen2 & HFG).
 unfold equidecomposable.
 pose proof partition_prod_is_partition _ F Q R HQ HR as HFQR.
+apply Forall2_Forall_combine in HEF.
+remember (combine P Q) as PQ eqn:HPQ.
+set (s := set_equiv).
+assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl PQ).
+ clear -HEF.
+ induction PQ as [| PQ PQL]; [ exists []; constructor | ].
+ apply Forall_inv2 in HEF.
+ destruct PQ as (P, Q).
+ destruct HEF as ((g, Hg), HPQL).
+ apply IHPQL in HPQL.
+ destruct HPQL as (gl, HPQL).
+ exists (g :: gl).
+ constructor; assumption.
+
+ destruct Hgl as (gl, Hgl).
+
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
