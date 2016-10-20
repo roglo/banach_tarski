@@ -1336,8 +1336,10 @@ Definition included {A} (E₁ E₂ : set A) :=
 Delimit Scope set_scope with S.
 
 Notation "a = b" := (set_eq a b) : set_scope.
-Notation "E₁ '∩' E₂" := (intersection E₁ E₂) (at level 40).
-Notation "E₁ '∪' E₂" := (union E₁ E₂) (at level 50, left associativity).
+Notation "E₁ '∩' E₂" := (intersection E₁ E₂)
+  (at level 40, left associativity).
+Notation "E₁ '∪' E₂" := (union E₁ E₂)
+  (at level 50, left associativity).
 Notation "E₁ '∖' E₂" := (subtract E₁ E₂) (at level 50).
 Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60).
 Notation "'⋃' Es" := (union_list Es) (at level 55).
@@ -1399,6 +1401,27 @@ Theorem intersection_comm : ∀ A s, s = set_equiv → ∀ (E F : set A),
 Proof.
 intros * Hs E *; subst s; intros x.
 split; intros (H₁, H₂); split; assumption.
+Qed.
+
+Theorem intersection_assoc : ∀ A (s := set_equiv) (E F G : set A),
+  (E ∩ (F ∩ G) = (E ∩ F) ∩ G)%S.
+Proof.
+intros * x.
+split.
+ intros (H₁, (H₂, H₃)).
+ split; [ split; assumption | assumption ].
+
+ intros ((H₁, H₂), H₃).
+ split; [ assumption | split; assumption ].
+Qed.
+
+Theorem intersection_shuffle0 : ∀ A (s := set_equiv) (E F G : set A),
+  (E ∩ F ∩ G = E ∩ G ∩ F)%S.
+Proof.
+intros * x.
+split; intros ((H₁, H₂), H₃).
+ split; [ split; assumption | assumption ].
+ split; [ split; assumption | assumption ].
 Qed.
 
 Theorem union_empty_r : ∀ A s, s = set_equiv → ∀ (F : set A),
@@ -3062,10 +3085,25 @@ split.
 
  intros i j Hij.
  split; [ | intros H; contradiction ].
-  erewrite partition_prod_nth; [ | reflexivity ].
-  erewrite partition_prod_nth; [ | reflexivity ].
-  intros Hx; simpl.
-bbb.
+ erewrite partition_prod_nth; [ | reflexivity ].
+ erewrite partition_prod_nth; [ | reflexivity ].
+ remember (length Q) as len eqn:Hlen.
+ destruct Q as [| Q QL]; [ intros (_ & _ & H); subst len; contradiction | ].
+ simpl in Hlen.
+ intros Hx; simpl.
+ destruct Hx as ((Hpi, Hqi), (Hpj, Hqj)).
+ destruct (eq_nat_dec (i / len) (j / len)) as [Hd| Hd].
+  destruct (eq_nat_dec (i mod len) (j mod len)) as [Hm| Hm].
+   assert (Hnlen : (len ≠ 0)%nat) by (subst len; intros H; discriminate H).
+   pose proof Nat.div_mod i len Hnlen as Hi.
+   pose proof Nat.div_mod j len Hnlen as Hj.
+   rewrite Hd, Hm, <- Hj in Hi.
+   contradiction.
+
+   eapply HQij; [ apply Hm | split; eassumption ].
+
+  eapply HPij; [ apply Hd | split; eassumption ].
+Qed.
 
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
