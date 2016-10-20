@@ -1,10 +1,12 @@
 Misc.vio: Misc.v
 Misc.vo Misc.glob Misc.v.beautified: Misc.v
+MiscReals.vio: MiscReals.v Misc.vio Words.vio Normalize.vio Reverse.vio
+MiscReals.vo MiscReals.glob MiscReals.v.beautified: MiscReals.v Misc.vo Words.vo Normalize.vo Reverse.vo
 Normalize.vio: Normalize.v Misc.vio Words.vio
 Normalize.vo Normalize.glob Normalize.v.beautified: Normalize.v Misc.vo Words.vo
 Reverse.vio: Reverse.v Misc.vio Words.vio Normalize.vio
 Reverse.vo Reverse.glob Reverse.v.beautified: Reverse.v Misc.vo Words.vo Normalize.vo
 Words.vio: Words.v Misc.vio
 Words.vo Words.glob Words.v.beautified: Words.v Misc.vo
-banach_tarski.vio: banach_tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio
-banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo
+banach_tarski.vio: banach_tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio
+banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo
