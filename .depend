@@ -1,3 +1,5 @@
+Matrix.vio: Matrix.v Words.vio Normalize.vio Reverse.vio MiscReals.vio
+Matrix.vo Matrix.glob Matrix.v.beautified: Matrix.v Words.vo Normalize.vo Reverse.vo MiscReals.vo
 Misc.vio: Misc.v
 Misc.vo Misc.glob Misc.v.beautified: Misc.v
 MiscReals.vio: MiscReals.v Misc.vio Words.vio Normalize.vio Reverse.vio
@@ -8,5 +10,5 @@ Reverse.vio: Reverse.v Misc.vio Words.vio Normalize.vio
 Reverse.vo Reverse.glob Reverse.v.beautified: Reverse.v Misc.vo Words.vo Normalize.vo
 Words.vio: Words.v Misc.vio
 Words.vo Words.glob Words.v.beautified: Words.v Misc.vo
-banach_tarski.vio: banach_tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio
-banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo
+banach_tarski.vio: banach_tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio Matrix.vio
+banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo Matrix.vo
