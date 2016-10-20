@@ -30,11 +30,11 @@ Fixpoint app_gr_point f p :=
   | Comb g h => app_gr_point h (app_gr_point g p)
   end.
 
-Fixpoint app_gr_inv f :=
+Fixpoint gr_inv f :=
   match f with
   | Rot e => Rot (negf e)
   | Xtransl dx => Xtransl (-dx)
-  | Comb g h => Comb (app_gr_inv h) (app_gr_inv g)
+  | Comb g h => Comb (gr_inv h) (gr_inv g)
   end.
 
 Theorem gr_subst : ∀ (s := set_equiv) g E F,
@@ -72,7 +72,7 @@ symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
 Theorem app_gr_inv_l : ∀ (s := set_equiv) g E,
-  (app_gr (app_gr_inv g) (app_gr g E) = E)%S.
+  (app_gr (gr_inv g) (app_gr g E) = E)%S.
 Proof.
 intros.
 revert E.
@@ -92,6 +92,14 @@ induction g; intros; simpl.
   rewrite IHg1 in H; apply IHg2; assumption.
 
   rewrite IHg1; apply IHg2, H.
+Qed.
+
+Theorem app_gr_app_gr_inv : ∀ (s := set_equiv) g E F,
+  (app_gr g E = F)%S → (app_gr (gr_inv g) F = E)%S.
+Proof.
+intros * Ha.
+rewrite <- Ha.
+apply app_gr_inv_l.
 Qed.
 
 Theorem app_gr_app_gr_point : ∀ g E p, p ∈ app_gr g E → app_gr_point g p ∈ E.

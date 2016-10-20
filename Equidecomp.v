@@ -40,7 +40,7 @@ split; [ symmetry; assumption | ].
 apply Forall2_sym; [ | assumption ].
 clear -HEF.
 intros E F (g & Hg).
-exists (app_gr_inv g); rewrite <- Hg.
+exists (gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
 Qed.
 
@@ -240,7 +240,7 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
  remember (fold_right (λ g gl, repeat g (length P'F) ++ gl) [] gl) as gll.
  rename Heqgll into Hgll.
  remember (partition_prod PF P'F) as PPF eqn:HPPF.
- remember (map (λ '(gi, PPFi), app_gr (app_gr_inv gi) PPFi) (combine gll PPF))
+ remember (map (λ '(gi, PPFi), app_gr (gr_inv gi) PPFi) (combine gll PPF))
    as P'E eqn:HP'E.
  assert (Hleq : length gll = length PPF).
   subst gll PPF PEF.
@@ -301,6 +301,18 @@ destruct gl as [| g₁ gl].
  apply Forall2_cons_cons in Hgl.
  destruct Hgl as (Hgg, Hgl).
  destruct gl as [| g₂ gl].
+clear G P'G HP'G Hlen2 HFG Hgll Hleq Hgpl HFQR.
+simpl in Hlen1; apply Nat.succ_inj in Hlen1.
+unfold is_partition in HPE.
+destruct HPE as (HE, HPE).
+rewrite HE in H.
+destruct H as [H| H].
+ apply app_gr_app_gr_inv in Hgg.
+ rewrite <- Hgg in H.
+
+bbb.
+  remember (app_gr_point g₁ p) as q eqn:Hq.
+  apply HPF with (x := q).
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
