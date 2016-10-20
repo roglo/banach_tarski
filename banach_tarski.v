@@ -1380,50 +1380,6 @@ Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : set A),
   → ∀ p, p ∈ E ↔ p ∈ F.
 Proof. intros s * HEF; apply HEF. Qed.
 
-Theorem intersection_empty_l : ∀ A (s := set_equiv) (E : set A),
-  (∅ ∩ E = ∅)%S.
-Proof.
-intros.
-unfold set_eq, intersection; simpl.
-intros x; split; [ intros (H, _); contradiction | contradiction ].
-Qed.
-
-Theorem intersection_empty_r : ∀ A (s := set_equiv) (E : set A),
-  (E ∩ ∅ = ∅)%S.
-Proof.
-intros.
-unfold set_eq, intersection; simpl.
-intros x; split; [ intros (_, H); contradiction | contradiction ].
-Qed.
-
-Theorem intersection_comm : ∀ A s, s = set_equiv → ∀ (E F : set A),
-  (E ∩ F = F ∩ E)%S.
-Proof.
-intros * Hs E *; subst s; intros x.
-split; intros (H₁, H₂); split; assumption.
-Qed.
-
-Theorem intersection_assoc : ∀ A (s := set_equiv) (E F G : set A),
-  (E ∩ (F ∩ G) = (E ∩ F) ∩ G)%S.
-Proof.
-intros * x.
-split.
- intros (H₁, (H₂, H₃)).
- split; [ split; assumption | assumption ].
-
- intros ((H₁, H₂), H₃).
- split; [ assumption | split; assumption ].
-Qed.
-
-Theorem intersection_shuffle0 : ∀ A (s := set_equiv) (E F G : set A),
-  (E ∩ F ∩ G = E ∩ G ∩ F)%S.
-Proof.
-intros * x.
-split; intros ((H₁, H₂), H₃).
- split; [ split; assumption | assumption ].
- split; [ split; assumption | assumption ].
-Qed.
-
 Theorem union_empty_r : ∀ A s, s = set_equiv → ∀ (F : set A),
   (F ∪ ∅ = F)%S.
 Proof.
