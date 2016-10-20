@@ -181,6 +181,24 @@ Theorem bool_dec_negb_r : ∀ b,
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
 Proof. intros b; destruct b; reflexivity. Qed.
 
+Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
+ symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
+Proof.
+intros * Hs HF.
+revert l2 HF.
+induction l1 as [| x]; intros.
+ destruct l2 as [| y]; [ constructor | ].
+ apply Forall2_nil_cons in HF; contradiction.
+
+ destruct l2 as [| y].
+  apply Forall2_cons_nil in HF; contradiction.
+
+  apply Forall2_cons_cons in HF.
+  destruct HF as (HR & HF).
+  constructor; [ apply Hs; assumption | ].
+  apply IHl1; assumption.
+Qed.
+
 (* Type-theoretical Choice Axiom *)
 Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
   ∃ f : A → A, (∀ x : A, R x (f x)) ∧ (∀ x y, R x y → f x = f y).

@@ -16,21 +16,6 @@ Definition equidecomposable (s : set_model point) E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, (app_gr g S₁ = S₂)%S) P₁ P₂.
 
-Theorem is_partition_single : ∀ A (s := @set_equiv A) E, is_partition E [E].
-Proof.
-intros.
-split; [ symmetry; eapply union_empty_r; reflexivity | ].
-intros * Hij.
-destruct i.
- destruct j; [ exfalso; apply Hij; reflexivity | ].
- destruct j.
-  split; [ intros (_, H); contradiction | contradiction ].
-  split; [ intros (_, H); contradiction | contradiction ].
-
- split; [ intros (H, _) | contradiction ].
- destruct i; contradiction.
-Qed.
-
 Theorem equidec_refl : reflexive _ (equidecomposable set_equiv).
 Proof.
 intros E.
@@ -43,24 +28,6 @@ exists (Xtransl 0); simpl.
 unfold xtransl; intros (x, y, z).
 rewrite Rminus_0_r.
 reflexivity.
-Qed.
-
-Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
- symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
-Proof.
-intros * Hs HF.
-revert l2 HF.
-induction l1 as [| x]; intros.
- destruct l2 as [| y]; [ constructor | ].
- apply Forall2_nil_cons in HF; contradiction.
-
- destruct l2 as [| y].
-  apply Forall2_cons_nil in HF; contradiction.
-
-  apply Forall2_cons_cons in HF.
-  destruct HF as (HR & HF).
-  constructor; [ apply Hs; assumption | ].
-  apply IHl1; assumption.
 Qed.
 
 Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).

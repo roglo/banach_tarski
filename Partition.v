@@ -228,3 +228,18 @@ split.
    rewrite Nat.add_comm, Nat.add_sub in H.
    contradiction.
 Qed.
+
+Theorem is_partition_single : ∀ A (s := @set_equiv A) E, is_partition E [E].
+Proof.
+intros.
+split; [ symmetry; eapply union_empty_r; reflexivity | ].
+intros * Hij.
+destruct i.
+ destruct j; [ exfalso; apply Hij; reflexivity | ].
+ destruct j.
+  split; [ intros (_, H); contradiction | contradiction ].
+  split; [ intros (_, H); contradiction | contradiction ].
+
+ split; [ intros (H, _) | contradiction ].
+ destruct i; contradiction.
+Qed.
