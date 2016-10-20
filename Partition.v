@@ -243,3 +243,11 @@ destruct i.
  split; [ intros (H, _) | contradiction ].
  destruct i; contradiction.
 Qed.
+
+Theorem is_partition_empty : ∀ A (s := set_equiv) (E : set A),
+  is_partition E [] → (E = ∅)%S.
+Proof.
+intros * HP.
+destruct HP as (HE & _).
+assumption.
+Qed.

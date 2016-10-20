@@ -273,6 +273,34 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
   assert (Hophophop : is_partition E P'E).
    split.
     subst P'E.
+    remember (combine gll PPF) as gpl eqn:Hgpl.
+    symmetry in Hgpl.
+    induction gpl as [| gp].
+     intros p; split; [ intros H; simpl | contradiction ].
+     destruct gll as [| gl₁ gll].
+      symmetry in Hleq.
+      apply length_zero_iff_nil in Hleq; subst PPF.
+      destruct PF as [| PF₁ PF].
+       apply length_zero_iff_nil in Hlen1; subst PE.
+       apply is_partition_empty in HPE.
+       rewrite HPE in H; contradiction.
+
+       destruct PE as [| PE₁ PE]; [ discriminate Hlen1 | ].
+       destruct P'F as [| P'F₁ P'F ].
+        apply is_partition_empty in HP'F.
+        unfold is_partition in HPF.
+        destruct HPF as (HPF, HPFij).
+        rewrite HP'F in HPF.
+        simpl in HPF.
+simpl in Hgll, HPEF.
+subst PEF.
+destruct gl as [| g₁ gl].
+ apply Forall2_nil_cons in Hgl; contradiction.
+
+ simpl in Hgll.
+ apply Forall2_cons_cons in Hgl.
+ destruct Hgl as (Hgg, Hgl).
+ destruct gl as [| g₂ gl].
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
