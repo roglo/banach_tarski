@@ -277,6 +277,7 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
     symmetry in Hgpl.
     induction gpl as [| gp].
      intros p; split; [ intros H; simpl | contradiction ].
+bbb.
      destruct gll as [| gl₁ gll].
       symmetry in Hleq.
       apply length_zero_iff_nil in Hleq; subst PPF.
