@@ -17,4 +17,6 @@ depend:
 .v.vo:
 	coqc $<
 
+.PHONY: all clean depend
+
 include .depend
