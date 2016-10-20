@@ -3104,10 +3104,14 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
  constructor; assumption.
 
  destruct Hgl as (gl, Hgl).
-vvv.
- set (xxx := map (λ '(gi, PPFi), ...) (combine gl (partition_prod PF P'F))).
- assert (is_partition E (partition_prod PE (map2 (λ '(gi, P'Fi), 
-
+ remember (fold_right (λ g gl, repeat g (length P'F) ++ gl) [] gl) as gll.
+ rename Heqgll into Hgll.
+ remember (partition_prod PF P'F) as PPF eqn:HPPF.
+ remember (map (λ '(gi, PPFi), app_gr (app_gr_inv gi) PPFi) (combine gll PPF))
+   as P'E eqn:HP'E.
+ assert (length gll = length PPF).
+bbb.
+ assert (is_partition E P'E).
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
