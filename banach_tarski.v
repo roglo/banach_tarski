@@ -3150,6 +3150,8 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
      eapply IHgl; [ eassumption | assumption | reflexivity ].
 
   assert (Hophophop : is_partition E P'E).
+   split.
+    subst P'E.
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
