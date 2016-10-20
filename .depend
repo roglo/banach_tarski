@@ -1,6 +1,8 @@
 Misc.vio: Misc.v
 Misc.vo Misc.glob Misc.v.beautified: Misc.v
+Normalize.vio: Normalize.v Misc.vio Words.vio
+Normalize.vo Normalize.glob Normalize.v.beautified: Normalize.v Misc.vo Words.vo
 Words.vio: Words.v Misc.vio
 Words.vo Words.glob Words.v.beautified: Words.v Misc.vo
-banach_tarski.vio: banach_tarski.v Misc.vio Words.vio
-banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo Words.vo
+banach_tarski.vio: banach_tarski.v Misc.vio Words.vio Normalize.vio
+banach_tarski.vo banach_tarski.glob banach_tarski.v.beautified: banach_tarski.v Misc.vo Words.vo Normalize.vo
