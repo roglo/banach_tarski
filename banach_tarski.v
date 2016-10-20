@@ -3085,25 +3085,28 @@ Qed.
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
 intros E F G HEF HFG.
-destruct HEF as (P & Q & HP & HQ & Hlen1 & HEF).
-destruct HFG as (R & S & HR & HS & Hlen2 & HFG).
+destruct HEF as (PE & PF & HPE & HPF & Hlen1 & HEF).
+destruct HFG as (P'F & P'G & HP'F & HP'G & Hlen2 & HFG).
 unfold equidecomposable.
-pose proof partition_prod_is_partition _ F Q R HQ HR as HFQR.
+pose proof partition_prod_is_partition _ F PF P'F HPF HP'F as HFQR.
 apply Forall2_Forall_combine in HEF.
-remember (combine P Q) as PQ eqn:HPQ.
+remember (combine PE PF) as PEF eqn:HPEF.
 set (s := set_equiv).
-assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl PQ).
+assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl PEF).
  clear -HEF.
- induction PQ as [| PQ PQL]; [ exists []; constructor | ].
+ induction PEF as [| PEF₁ PEF]; [ exists []; constructor | ].
  apply Forall_inv2 in HEF.
- destruct PQ as (P, Q).
- destruct HEF as ((g, Hg), HPQL).
- apply IHPQL in HPQL.
- destruct HPQL as (gl, HPQL).
+ destruct PEF₁ as (E₁, F₁).
+ destruct HEF as ((g, Hg), HPEF).
+ apply IHPEF in HPEF.
+ destruct HPEF as (gl, HPEF).
  exists (g :: gl).
  constructor; assumption.
 
  destruct Hgl as (gl, Hgl).
+vvv.
+ set (xxx := map (λ '(gi, PPFi), ...) (combine gl (partition_prod PF P'F))).
+ assert (is_partition E (partition_prod PE (map2 (λ '(gi, P'Fi), 
 
 bbb.
 
