@@ -45,7 +45,7 @@ apply app_gr_inv_l.
 Qed.
 
 Definition partition_prod {A} (PL QL : list (set A)) :=
-  map (λ '(p, q), intersection p q) (list_prod PL QL).
+  concat (map (λ p, map (intersection p) QL) PL).
 
 Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
   partition_prod [] Q = [].
@@ -62,12 +62,7 @@ Qed.
 Theorem partition_prod_cons_l : ∀ A P (PL QL : list (set A)),
   partition_prod (P :: PL) QL =
   map (intersection P) QL ++ partition_prod PL QL.
-Proof.
-intros A P PL QL.
-unfold partition_prod; simpl.
-rewrite map_app, map_map.
-reflexivity.
-Qed.
+Proof. reflexivity. Qed.
 
 Theorem partition_prod_length :
   ∀ A (P Q : list (set A)),
@@ -146,28 +141,16 @@ split.
   clear - s HP HQ.
   induction P as [| P PL]; [ contradiction | simpl in HP ].
   destruct HP as [HP| HP].
-   unfold partition_prod; simpl.
-   rewrite map_app, map_map.
-   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
-    (partition_prod PL Q) as HH.
-   apply HH; clear HH.
+   rewrite partition_prod_cons_l, union_list_app; [ | reflexivity ].
    left; eapply union_list_intersection; assumption.
 
-   unfold partition_prod; simpl.
-   rewrite map_app, map_map.
-   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
-    (partition_prod PL Q) as HH.
-   apply HH; clear HH.
+   rewrite partition_prod_cons_l, union_list_app; [ | reflexivity ].
    right; apply IHPL; assumption.
 
   clear - HEP HEQ H.
   revert E Q HEP HEQ H.
   induction P as [| P PL]; intros; [ contradiction | ].
-  unfold partition_prod in H; simpl in H.
-  rewrite map_app, map_map in H.
-  pose proof union_list_app _ s eq_refl (map (intersection P) Q)
-    (partition_prod PL Q) as HH.
-  apply HH in H; clear HH.
+  rewrite partition_prod_cons_l, union_list_app in H; [ | reflexivity ].
   apply HEP; simpl.
   destruct H as [H| H].
    left.
@@ -179,11 +162,7 @@ split.
    clear -s H.
    revert Q H.
    induction PL as [| P PL]; intros; [ contradiction | ].
-   unfold partition_prod in H; simpl in H.
-   rewrite map_app, map_map in H.
-   pose proof union_list_app _ s eq_refl (map (intersection P) Q)
-     (partition_prod PL Q) as HH.
-   apply HH in H; clear HH.
+   rewrite partition_prod_cons_l, union_list_app in H; [ | reflexivity ].
    destruct H as [H| H].
     left.
     clear -H.
