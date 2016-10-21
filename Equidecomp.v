@@ -218,7 +218,10 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
  destruct Hgl as (gl, Hgl).
  remember (partition_prod PF P'F) as PPF eqn:HPPF.
  unfold partition_prod in HPPF.
-
+ remember
+   (concat
+      (map (λ '(p, g), map (λ q, app_gr (gr_inv g) (p ∩ q)) P'F)
+        (combine PF gl))) as PPE eqn:HPPE.
 bbb.
  remember (fold_right (λ g gl, repeat g (length P'F) ++ gl) [] gl) as gll.
  rename Heqgll into Hgll.
