@@ -1,4 +1,4 @@
-TARGET=banach_tarski.vo
+TARGET=Banach_Tarski.vo
 
 all: $(TARGET)
 
