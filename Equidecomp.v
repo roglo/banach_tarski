@@ -216,6 +216,7 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
  constructor; assumption.
 
  destruct Hgl as (gl, Hgl).
+Print partition_prod.
 bbb.
  remember (fold_right (λ g gl, repeat g (length P'F) ++ gl) [] gl) as gll.
  rename Heqgll into Hgll.
@@ -253,7 +254,6 @@ bbb.
   assert (Hophophop : is_partition E P'E).
    split.
     subst P'E.
-bbb.
     remember (combine gll PPF) as gpl eqn:Hgpl.
     symmetry in Hgpl.
     induction gpl as [| gp].
