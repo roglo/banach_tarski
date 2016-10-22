@@ -265,7 +265,28 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
        simpl in Hlen1, Hlen3.
        apply Nat.succ_inj in Hlen1.
        apply Nat.succ_inj in Hlen3.
-assert (HPM : is_partition (E ∖ PE₁) PE).
+       assert (HPM : is_partition (E ∖ PE₁) PE).
+        split.
+         destruct HPE as (Hu & Hi).
+         intros p; rewrite Hu; simpl.
+         split; intros Hp.
+          destruct Hp as ([Hp| Hp], Hnp); [ contradiction | ].
+          assumption.
+
+          split; [ right; assumption | ].
+          clear Hlen1.
+          revert E p Hu Hp.
+          induction PE as [| PE₂ PE]; intros; [ contradiction | ].
+          destruct Hp as [Hp| Hp].
+           pose proof Hi 0 1 (Nat.neq_succ_diag_r 0) as H.
+           simpl in H; intros Hp₁; eapply H; split; eassumption.
+
+           eapply IHPE; [ | reflexivity | assumption ].
+           intros i j Hij.
+bbb.
+
+
+destruct (Hu p) as [Hup| Hup].
 bbb.
        pose proof IHPF (E ∖ PE₁).
 

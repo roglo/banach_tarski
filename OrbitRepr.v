@@ -661,3 +661,15 @@ split.
  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
 Qed.
+
+Add Parametric Morphism {A} : (@subtract A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as subtract_morph.
+Proof.
+intros E E' HE F F' HF.
+unfold subtract; intros p.
+split; intros (H₁, H₂).
+ split; [ apply HE; assumption | intros H; apply H₂, HF; assumption ].
+ split; [ apply HE; assumption | intros H; apply H₂, HF; assumption ].
+Qed.
