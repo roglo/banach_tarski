@@ -234,25 +234,25 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
   remember
     (flat_map (λ '(p, g), map (λ q, app_gr (gr_inv g) (p ∩ q)) P'F)
        (combine PF gl)) as PPE eqn:HPPE.
-  assert (Hleq : length PPE = length PPF).
-   subst PPE PPF.
-   rewrite partition_prod_length.
-clear HPF Hlen1 HPEF HFQR.
-   induction PF as [| PF₁ PF]; intros; [ reflexivity | ].
+
+  assert (Hlen3 : length PPE = length PPF).
+   assert (H : length gl = length PF).
+    transitivity (length PEF); [ assumption | ].
+    rewrite HPEF, combine_length, Hlen1, Nat.min_idempotent.
+    reflexivity.
+
+    subst PPE PPF.
+    rewrite partition_prod_length.
+    clear HPF Hlen1 HPEF HFQR Hgl HglPEF.
+    revert gl H.
+    induction PF as [| PF₁ PF]; intros; [ reflexivity | ].
+    destruct gl as [| g gl]; [ discriminate H | ].
+    simpl in H; apply Nat.succ_inj in H.
+    simpl; rewrite app_length, IHPF; [ | assumption ].
+    rewrite map_length; reflexivity.
+
    simpl.
-   destruct gl as [| g gl].
-    symmetry in HglPEF.
-    apply length_zero_iff_nil in HglPEF; subst PEF.
-Theorem combine_nil_r : ∀ A B (l : list A), combine l ([] : list B) = [].
-Proof. intros; destruct l; reflexivity. Qed.
-    rewrite combine_nil_r in IHPF; simpl in IHPF; simpl.
-bbb.
-
-   erewrite <- IHPF.
-    symmetry in HglPEF.
-    apply length_zero_iff_nil in HglPEF; subst PEF.
-    simpl.
-
+   assert (is_partition E PPE).
 bbb.
 
 Theorem flat_map_length : ∀ A B (f : A → list B) l,
