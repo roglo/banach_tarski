@@ -45,7 +45,7 @@ apply app_gr_inv_l.
 Qed.
 
 Definition partition_prod {A} (PL QL : list (set A)) :=
-  concat (map (λ p, map (intersection p) QL) PL).
+  flat_map (λ p, map (intersection p) QL) PL.
 
 Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
   partition_prod [] Q = [].
@@ -71,7 +71,6 @@ Proof.
 intros A P Q.
 revert Q.
 induction P as [| P PL]; intros; [ reflexivity | simpl ].
-rewrite partition_prod_cons_l.
 rewrite app_length, IHPL, map_length.
 reflexivity.
 Qed.
@@ -216,12 +215,62 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
  constructor; assumption.
 
  destruct Hgl as (gl, Hgl).
- remember (partition_prod PF P'F) as PPF eqn:HPPF.
- unfold partition_prod in HPPF.
- remember
-   (concat
-      (map (λ '(p, g), map (λ q, app_gr (gr_inv g) (p ∩ q)) P'F)
-        (combine PF gl))) as PPE eqn:HPPE.
+ assert (HglPEF : length gl = length PEF).
+  clear - Hgl.
+  revert PEF Hgl.
+  induction gl as [| g gl]; intros.
+   destruct PEF as [| PEF₁ PEF]; [ reflexivity | ].
+   apply Forall2_nil_cons in Hgl; contradiction.
+
+   destruct PEF as [| PEF₁ PEF].
+    apply Forall2_cons_nil in Hgl; contradiction.
+
+    simpl; f_equal.
+    apply Forall2_cons_cons in Hgl.
+    destruct Hgl as (_, Hgl).
+    apply IHgl; assumption.
+
+  remember (partition_prod PF P'F) as PPF eqn:HPPF.
+  remember
+    (flat_map (λ '(p, g), map (λ q, app_gr (gr_inv g) (p ∩ q)) P'F)
+       (combine PF gl)) as PPE eqn:HPPE.
+  assert (Hleq : length PPE = length PPF).
+   subst PPE PPF.
+   rewrite partition_prod_length.
+   clear - HglPEF.
+   revert P'F.
+   induction PF as [| PF₁ PF]; intros; [ reflexivity | ].
+   simpl.
+   destruct gl as [| g gl].
+    symmetry in HglPEF.
+    apply length_zero_iff_nil in HglPEF; subst PEF.
+Theorem combine_nil_r : ∀ A B (l : list A), combine l ([] : list B) = [].
+Proof. intros; destruct l; reflexivity. Qed.
+
+SearchAbout combine.
+    rewrite combine_nil_r in IHPF; simpl in IHPF; simpl.
+bbb.
+
+   erewrite <- IHPF.
+    symmetry in HglPEF.
+    apply length_zero_iff_nil in HglPEF; subst PEF.
+    simpl.
+
+bbb.
+
+Theorem flat_map_length : ∀ A B (f : A → list B) l,
+  length (flat_map f l) = fold_right (λ x, Nat.add (length (f x))) O l.
+Proof.
+intros.
+induction l as [| x]; [ reflexivity | simpl ].
+rewrite <- IHl.
+apply app_length.
+Qed.
+
+Show.
+do 2 rewrite flat_map_length.
+
+
 bbb.
  remember (fold_right (λ g gl, repeat g (length P'F) ++ gl) [] gl) as gll.
  rename Heqgll into Hgll.
