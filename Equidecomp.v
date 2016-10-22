@@ -283,13 +283,29 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
 
            eapply IHPE; [ | reflexivity | assumption ].
            intros i j Hij.
-bbb.
+           destruct i.
+            destruct j; [ exfalso; apply Hij; reflexivity | ].
+            Opaque set_eq.
+            pose proof Hi 0 (S (S j)) as H; simpl in H.
+            apply H; intros HH; discriminate HH.
 
+            destruct j.
+             pose proof Hi (S (S i)) 0 as H; simpl in H.
+             apply H; intros HH; discriminate HH.
 
-destruct (Hu p) as [Hup| Hup].
-bbb.
-       pose proof IHPF (E ∖ PE₁).
+             simpl.
+             pose proof Hi (S (S i)) (S (S j)) as H; simpl in H.
+             apply H; intros HH.
+             apply Nat.succ_inj in HH; contradiction.
 
+         intros i j Hij.
+         destruct HPE as (Hu, Hi).
+         pose proof Hi (S i) (S j) as H; simpl in H.
+         apply H; intros HH.
+         apply Nat.succ_inj in HH; contradiction.
+
+        pose proof IHPF (E ∖ PE₁) PE gl HPM Hlen1 Hlen3 as H.
+        rewrite union_list_app; [ | reflexivity ].
 bbb.
   assert (Hophophop : is_partition E P'E).
    split.
