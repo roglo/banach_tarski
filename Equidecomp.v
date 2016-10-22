@@ -235,73 +235,34 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
     (flat_map (λ '(p, g), map (λ q, app_gr (gr_inv g) (p ∩ q)) P'F)
        (combine PF gl)) as PPE eqn:HPPE.
 
-  assert (Hlen3 : length PPE = length PPF).
-   assert (H : length gl = length PF).
-    transitivity (length PEF); [ assumption | ].
-    rewrite HPEF, combine_length, Hlen1, Nat.min_idempotent.
-    reflexivity.
+  assert (Hlen3 : length gl = length PF).
+   transitivity (length PEF); [ assumption | ].
+   rewrite HPEF, combine_length, Hlen1, Nat.min_idempotent.
+   reflexivity.
 
+   assert (Hlen4 : length PPE = length PPF).
     subst PPE PPF.
     rewrite partition_prod_length.
     clear HPF Hlen1 HPEF HFQR Hgl HglPEF.
-    revert gl H.
+    revert gl Hlen3.
     induction PF as [| PF₁ PF]; intros; [ reflexivity | ].
-    destruct gl as [| g gl]; [ discriminate H | ].
-    simpl in H; apply Nat.succ_inj in H.
+    destruct gl as [| g gl]; [ discriminate Hlen3 | ].
+    simpl in Hlen3; apply Nat.succ_inj in Hlen3.
     simpl; rewrite app_length, IHPF; [ | assumption ].
     rewrite map_length; reflexivity.
 
-   simpl.
-   assert (is_partition E PPE).
-bbb.
+    assert (is_partition E PPE).
+     split.
+      rewrite HPPE.
+      clear - Hlen1 Hlen3 HPE.
+      revert E PE gl HPE Hlen1 Hlen3.
+      induction PF as [| PF₁ PF]; intros.
+       apply length_zero_iff_nil in Hlen1; subst PE; apply HPE.
 
-Theorem flat_map_length : ∀ A B (f : A → list B) l,
-  length (flat_map f l) = fold_right (λ x, Nat.add (length (f x))) O l.
-Proof.
-intros.
-induction l as [| x]; [ reflexivity | simpl ].
-rewrite <- IHl.
-apply app_length.
-Qed.
-
-Show.
-do 2 rewrite flat_map_length.
-
+       destruct gl as [| g gl]; [ discriminate Hlen3 | ].
+        simpl; rewrite fold_set_eq.
 
 bbb.
- remember (fold_right (λ g gl, repeat g (length P'F) ++ gl) [] gl) as gll.
- rename Heqgll into Hgll.
- remember (partition_prod PF P'F) as PPF eqn:HPPF.
- remember (map (λ '(gi, PPFi), app_gr (gr_inv gi) PPFi) (combine gll PPF))
-   as P'E eqn:HP'E.
- assert (Hleq : length gll = length PPF).
-  subst gll PPF PEF.
-  rewrite partition_prod_length.
-  clear - PE HP'E Hlen1 Hgl.
-  revert PE PF P'E P'F Hlen1 Hgl HP'E.
-  induction gl as [| g gl]; intros.
-   simpl in HP'E; simpl; subst P'E.
-   destruct PE as [| PE₁ PE].
-    symmetry in Hlen1.
-    apply length_zero_iff_nil in Hlen1.
-    subst PF; reflexivity.
-
-    destruct PF as [| PF₁ PF]; [ reflexivity | ].
-    simpl in Hgl; apply Forall2_nil_cons in Hgl; contradiction.
-
-   simpl.
-   rewrite app_length, repeat_length.
-   destruct PE as [| PE₁ PE].
-    apply Forall2_cons_nil in Hgl; contradiction.
-    destruct PF as [| PF₁ PF].
-     apply Forall2_cons_nil in Hgl; contradiction.
-
-     simpl in Hlen1, Hgl; simpl; f_equal.
-     apply Nat.succ_inj in Hlen1.
-     apply Forall2_cons_cons in Hgl.
-     destruct Hgl as (Hgl₁, Hgl).
-     eapply IHgl; [ eassumption | assumption | reflexivity ].
-
   assert (Hophophop : is_partition E P'E).
    split.
     subst P'E.
