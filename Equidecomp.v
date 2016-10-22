@@ -237,8 +237,7 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
   assert (Hleq : length PPE = length PPF).
    subst PPE PPF.
    rewrite partition_prod_length.
-   clear - HglPEF.
-   revert P'F.
+clear HPF Hlen1 HPEF HFQR.
    induction PF as [| PF₁ PF]; intros; [ reflexivity | ].
    simpl.
    destruct gl as [| g gl].
@@ -246,8 +245,6 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
     apply length_zero_iff_nil in HglPEF; subst PEF.
 Theorem combine_nil_r : ∀ A B (l : list A), combine l ([] : list B) = [].
 Proof. intros; destruct l; reflexivity. Qed.
-
-SearchAbout combine.
     rewrite combine_nil_r in IHPF; simpl in IHPF; simpl.
 bbb.
 
