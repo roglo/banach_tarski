@@ -260,7 +260,14 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
        apply length_zero_iff_nil in Hlen1; subst PE; apply HPE.
 
        destruct gl as [| g gl]; [ discriminate Hlen3 | ].
-        simpl; rewrite fold_set_eq.
+       simpl; rewrite fold_set_eq.
+       destruct PE as [| PE₁ PE]; [ discriminate Hlen1 | ].
+       simpl in Hlen1, Hlen3.
+       apply Nat.succ_inj in Hlen1.
+       apply Nat.succ_inj in Hlen3.
+assert (HPM : is_partition (E ∖ PE₁) PE).
+bbb.
+       pose proof IHPF (E ∖ PE₁).
 
 bbb.
   assert (Hophophop : is_partition E P'E).
