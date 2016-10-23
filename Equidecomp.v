@@ -306,6 +306,28 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
 
         pose proof IHPF (E ∖ PE₁) PE gl HPM Hlen1 Hlen3 as H.
         rewrite union_list_app; [ | reflexivity ].
+Theorem set_subtract_union : ∀ A (s := set_equiv) (E F G : set A),
+  (∀ x, x ∈ F ∨ x ∉ F) → F ⊂ E → (E ∖ F = G)%S → (E = F ∪ G)%S.
+Proof.
+intros * HDF HFE HEF.
+unfold included in HFE.
+unfold subtract in HEF.
+Transparent set_eq.
+unfold set_eq in HEF.
+simpl in HEF.
+unfold union, set_eq; simpl.
+intros x.
+split; intros Hx.
+ destruct (HDF x) as [HF| HnF]; [ left; assumption | ].
+ right; apply HEF; split; assumption.
+
+ destruct Hx as [Hx| Hx]; [ apply HFE; assumption | ].
+ apply HEF; assumption.
+Qed.
+
+apply set_subtract_union in H.
+Focus 2.
+
 bbb.
   assert (Hophophop : is_partition E P'E).
    split.
