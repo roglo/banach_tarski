@@ -268,17 +268,13 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
       move Hlen2 before Hlen1.
       move Hlen3 before Hlen2.
       rewrite partition_prod_length in Hlen3.
-bbb.
-      revert F HPF HP'F.
+      revert E F PE P'F gl PPE HPE HPF HP'F HFQR Hlen1 Hlen2 Hlen3
+        Hgl HPPE.
       induction PF as [| PF₁ PF]; intros.
        apply length_zero_iff_nil in Hlen1; subst PE PPE; apply HPE.
 
-
-; apply HPE.
-
-bbb.
-      rewrite HPPE.
-      subst PEF.
+       destruct gl as [| g₁ gl]; [ discriminate Hlen2 | ].
+       simpl in HPPE.
 bbb.
 (*
       clear - Hlen1 Hlen3 HPE HPF Hgl HP'F.
