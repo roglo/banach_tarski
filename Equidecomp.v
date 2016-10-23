@@ -268,6 +268,33 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
       move Hlen2 before Hlen1.
       move Hlen3 before Hlen2.
       rewrite partition_prod_length in Hlen3.
+assert (HFin : Forall (λ Fi, Fi ⊂ F) PF).
+ destruct HPF as (HPFU, HPFI).
+ clear HP'F HFQR Hlen1 Hlen2 Hlen3 Hgl HPPE HPFI.
+ revert F HPFU.
+ induction PF as [| PF₁ PF]; intros; [ constructor | ].
+ constructor; [ rewrite HPFU; left; assumption | ].
+ pose proof IHPF (union_list PF) (set_eq_refl _ _).
+
+bbb.
+
+intros E E' HE F F' HF.
+unfold intersection; intros p.
+split; intros (H₁, H₂).
+ split; [ apply HE; assumption | apply HF; assumption ].
+ split; [ apply HE; assumption | apply HF; assumption ].
+Qed.
+bbb.
+  rewrite HPFU.
+
+assert
+  (HFi : Forall (λ Fi, (Fi = union_list (map (intersection Fi) P'F))%S) PF).
+ clear HPF HFQR Hlen1 Hlen2 Hlen3 Hgl HPPE.
+ induction PF as [| PF₁ PF]; [ constructor | ].
+ constructor; [ | assumption ].
+ destruct HP'F as (HFU, HFI).
+
+bbb.
       revert E F PE P'F gl PPE HPE HPF HP'F HFQR Hlen1 Hlen2 Hlen3
         Hgl HPPE.
       induction PF as [| PF₁ PF]; intros.

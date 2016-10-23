@@ -673,3 +673,12 @@ split; intros (H₁, H₂).
  split; [ apply HE; assumption | intros H; apply H₂, HF; assumption ].
  split; [ apply HE; assumption | intros H; apply H₂, HF; assumption ].
 Qed.
+
+Add Parametric Morphism {A} : (@included A)
+  with signature eq ==> (@set_eq _ set_equiv) ==> iff
+  as included_morph.
+Proof.
+intros E F G HFG.
+unfold set_eq in HFG; simpl in HFG.
+split; intros HE x Hx; apply HFG, HE, Hx.
+Qed.
