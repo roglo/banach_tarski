@@ -265,6 +265,21 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
        simpl in Hlen1, Hlen3.
        apply Nat.succ_inj in Hlen1.
        apply Nat.succ_inj in Hlen3.
+(**)
+       rewrite union_list_app; [ | reflexivity ].
+       generalize HPE; intros HUI.
+       destruct HUI as (HU, HI); rewrite HU.
+       remember set_eq as f; simpl; subst f.
+       apply union_morph.
+        Focus 2.
+        eapply IHPF; try eassumption.
+        split; [ reflexivity | ].
+        intros i j Hij.
+        pose proof HI (S i) (S j) as H.
+        apply H; intros HH; apply Nat.succ_inj in HH.
+        contradiction.
+
+bbb.
        assert (HPM : is_partition (E ∖ PE₁) PE).
         split.
          destruct HPE as (Hu & Hi).
