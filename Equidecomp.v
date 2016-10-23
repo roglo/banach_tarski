@@ -268,7 +268,7 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
       move Hlen2 before Hlen1.
       move Hlen3 before Hlen2.
       rewrite partition_prod_length in Hlen3.
-assert (HFin : Forall (λ Fi, Fi ⊂ F) PF).
+assert (Hinc : Forall (λ Fi, Fi ⊂ F) PF).
  destruct HPF as (HPFU, HPFI).
  apply union_list_all_included; assumption.
 
