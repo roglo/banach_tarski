@@ -255,8 +255,12 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
      split.
       rewrite HPPE.
       subst PEF.
-      clear - Hlen1 Hlen3 HPE Hgl.
-      revert E PE gl HPE Hlen1 Hlen3 Hgl.
+(*
+      clear - Hlen1 Hlen3 HPE HPF Hgl HP'F.
+*)
+clear HEF Hlen2 HFG HPPF HFQR HglPEF HPPE.
+(**)
+      revert E F PE P'F gl HPE HPF HP'F Hlen1 Hlen3 Hgl.
       induction PF as [| PF₁ PF]; intros.
        apply length_zero_iff_nil in Hlen1; subst PE; apply HPE.
 
@@ -276,13 +280,18 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
        destruct Hgl as (Hg, Hgl).
        apply union_morph.
         Focus 2.
+bbb.
         eapply IHPF; try eassumption.
-        split; [ reflexivity | ].
-        intros i j Hij.
-        pose proof HI (S i) (S j) as H.
-        apply H; intros HH; apply Nat.succ_inj in HH.
-        contradiction.
+         split; [ reflexivity | ].
+         intros i j Hij.
+         pose proof HI (S i) (S j) as H.
+         apply H; intros HH; apply Nat.succ_inj in HH.
+         contradiction.
+bbb.
 
+        rewrite fold_set_eq in Hg.
+induction P'F as [| P'F₁ P'F].
+remember set_eq as f; simpl; subst f.
 bbb.
        assert (HPM : is_partition (E ∖ PE₁) PE).
         split.
