@@ -1,11 +1,6 @@
-(* Banach-Tarski paradox. *)
-(* Inspirations:
-   - Stan Wagon: The Banach-Tarski Paradox, Cambridge University Press
-   - Wikipedia: Banach–Tarski paradox
-   - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
-(* Coq v8.6 *)
+(* Sets as A → Prop *)
 
-Require Import Utf8 List Relations NPeano Compare_dec.
+Require Import Utf8 List Relations NPeano Compare_dec Setoid.
 Require Import Misc.
 
 Record set A := mkset { setp : A → Prop }.
@@ -68,6 +63,51 @@ Add Parametric Relation A : (set A) (@set_eq A set_equiv)
  symmetry proved by (set_eq_sym A)
  transitivity proved by (set_eq_trans A)
  as set_eq_rel.
+
+Add Parametric Morphism {A} : (@intersection A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as intersection_morph.
+Proof.
+intros E E' HE F F' HF.
+unfold intersection; intros p.
+split; intros (H₁, H₂).
+ split; [ apply HE; assumption | apply HF; assumption ].
+ split; [ apply HE; assumption | apply HF; assumption ].
+Qed.
+
+Add Parametric Morphism {A} : (@union A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as union_morph.
+Proof.
+intros E E' HE F F' HF.
+intros p.
+split.
+ intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+ intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+Qed.
+
+Add Parametric Morphism {A} : (@subtract A)
+  with signature
+    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as subtract_morph.
+Proof.
+intros E E' HE F F' HF.
+unfold subtract; intros p.
+split; intros (H₁, H₂).
+ split; [ apply HE; assumption | intros H; apply H₂, HF; assumption ].
+ split; [ apply HE; assumption | intros H; apply H₂, HF; assumption ].
+Qed.
+
+Add Parametric Morphism {A} : (@included A)
+  with signature eq ==> (@set_eq _ set_equiv) ==> iff
+  as included_morph.
+Proof.
+intros E F G HFG.
+unfold set_eq in HFG; simpl in HFG.
+split; intros HE x Hx; apply HFG, HE, Hx.
+Qed.
 
 Theorem fold_set_eq : ∀ A (s := set_equiv) (P Q : set A),
   (∀ x, x ∈ P ↔ x ∈ Q) = (P = Q)%S.
@@ -182,4 +222,18 @@ intros A P QL * HP HQL.
 induction QL as [| Q QL]; intros; [ contradiction | simpl ].
 destruct HQL as [HQ| HQL]; [ left; split; assumption | right ].
 apply IHQL, HQL.
+Qed.
+
+Theorem union_list_all_included : ∀ A (s := set_equiv) (E : set A) EL,
+  (E = ⋃ EL)%S → Forall (λ Ei, Ei ⊂ E) EL.
+Proof.
+intros * HE.
+apply Forall_forall.
+intros F HF.
+rewrite HE.
+clear - HF.
+revert F HF.
+induction EL as [| E EL]; intros; [ contradiction | ].
+destruct HF as [HF| HF]; [ left; subst E; assumption | ].
+right; eapply IHEL; eassumption.
 Qed.

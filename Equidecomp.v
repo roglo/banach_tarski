@@ -270,18 +270,61 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
       rewrite partition_prod_length in Hlen3.
 assert (HFin : Forall (λ Fi, Fi ⊂ F) PF).
  destruct HPF as (HPFU, HPFI).
- clear HP'F HFQR Hlen1 Hlen2 Hlen3 Hgl HPPE HPFI.
+ apply union_list_all_included; assumption.
+
+bbb.
  revert F HPFU.
  induction PF as [| PF₁ PF]; intros; [ constructor | ].
  constructor; [ rewrite HPFU; left; assumption | ].
- pose proof IHPF (union_list PF) (set_eq_refl _ _).
-SearchAbout (union_list (_ :: _)).
-Theorem union_list_cons : ∀ A (s := set_equiv) (E F : set A) G,
-  (E = union_list (F :: G))%S → (E = union F (union_list G))%S.
+Theorem union_list_cons : ∀ A (s := set_equiv) (E : set A) EL,
+  (⋃ (E :: EL) = E ∪ (⋃ EL))%S.
+Proof. reflexivity. Qed.
+Show.
+ rewrite union_list_cons in HPFU.
+ pose proof IHPF _ (set_eq_refl _ _) as HF.
+ clear -HPFU HF.
+ revert PF₁ F HPFU HF.
+ induction PF as [| PF₂ PF]; intros; [ constructor | ].
+ constructor.
+ simpl in HF.
+ apply Forall_inv2 in HF.
+ destruct HF as (HFI, HFA).
+ intros p Hp.
+ apply HPFU.
+ right; left; assumption.
+apply IHPF with (PF₁ := union PF₁ PF₂).
+rewrite HPFU.
+remember set_eq as f; simpl; subst f.
+rewrite union_assoc.
+reflexivity.
+reflexivity.
+apply Forall_inv2 in HF.
+destruct HF as (HFI, HFA).
+bbb.
+
+apply IHPF with (PF₁ := empty_set).
+SearchAbout (union _ empty_set).
+Theorem union_empty_l : ∀ A (s := set_equiv) (E : set A), (union empty_set E = E)%S.
 Admitted. Show.
-Check union_list_cons.
- apply union_list_cons in HPFU.
-SearchAbout ((_ = union _ _)%S → _).
+rewrite union_empty_l; reflexivity.
+apply IHPF with (PF₁ := empty_set).
+rewrite union_empty_l; reflexivity.
+apply IHPF with (PF₁ := empty_set).
+rewrite union_empty_l; reflexivity.
+apply IHPF with (PF₁ := empty_set).
+rewrite union_empty_l; reflexivity.
+apply IHPF with (PF₁ := empty_set).
+rewrite union_empty_l; reflexivity.
+
+bbb.
+ apply HFI in Hp.
+ destruct Hp as [Hp| Hp].
+ simpl in HPFU.
+ apply HPFU.
+ right; left; assumption.
+
+
+simpl in HPFU.
 
 bbb.
 
