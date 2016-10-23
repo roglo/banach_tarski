@@ -280,6 +280,25 @@ assert
  destruct Hinc as (Hinc₁, Hinc).
  constructor; [ | apply IHPF; assumption ].
  destruct HP'F as (HFU, HFI).
+ clear Hinc IHPF HFI.
+ revert F PF₁ HFU Hinc₁.
+ induction P'F as [| P'F₁ P'F]; intros.
+  rewrite HFU in Hinc₁; simpl in Hinc₁.
+  split; [ apply Hinc₁ | contradiction ].
+
+  remember set_eq as f; simpl; subst f.
+  intros p.
+  split; intros Hp.
+bbb.
+   left.
+    split; [ assumption | ].
+
+Theorem included_intersection : ∀ A (s := set_equiv) (E F G : set A),
+  E ⊂ F → E ⊂ G → (E = F ∩ G)%S.
+Admitted. Show.
+
+Set Printing All. Show.
+Check included_intersection.
 
 bbb.
       revert E F PE P'F gl PPE HPE HPF HP'F HFQR Hlen1 Hlen2 Hlen3
