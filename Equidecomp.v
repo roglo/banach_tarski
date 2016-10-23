@@ -275,6 +275,11 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
 
        destruct gl as [| g₁ gl]; [ discriminate Hlen2 | ].
        simpl in HPPE.
+       clear Hlen1.
+       revert E HPE.
+       induction PE as [| PE₁ PE]; intros.
+        apply Forall2_cons_nil in Hgl; contradiction.
+
 bbb.
 (*
       clear - Hlen1 Hlen3 HPE HPF Hgl HP'F.
