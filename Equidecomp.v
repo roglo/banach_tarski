@@ -253,8 +253,10 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
 
     assert (is_partition E PPE).
      split.
+bbb.
       rewrite HPPE.
       subst PEF.
+bbb.
 (*
       clear - Hlen1 Hlen3 HPE HPF Hgl HP'F.
 *)
