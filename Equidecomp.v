@@ -259,7 +259,6 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
       clear - Hlen1 Hlen3 HPE HPF Hgl HP'F.
 *)
 clear HEF Hlen2 HFG HPPF HFQR HglPEF HPPE.
-(**)
       revert E F PE P'F gl HPE HPF HP'F Hlen1 Hlen3 Hgl.
       induction PF as [| PF₁ PF]; intros.
        apply length_zero_iff_nil in Hlen1; subst PE; apply HPE.
@@ -270,7 +269,7 @@ clear HEF Hlen2 HFG HPPF HFQR HglPEF HPPE.
        simpl in Hlen1, Hlen3.
        apply Nat.succ_inj in Hlen1.
        apply Nat.succ_inj in Hlen3.
-(**)
+(*
        rewrite union_list_app; [ | reflexivity ].
        generalize HPE; intros HUI.
        destruct HUI as (HU, HI); rewrite HU.
@@ -293,6 +292,7 @@ bbb.
 induction P'F as [| P'F₁ P'F].
 remember set_eq as f; simpl; subst f.
 bbb.
+*)
        assert (HPM : is_partition (E ∖ PE₁) PE).
         split.
          destruct HPE as (Hu & Hi).
@@ -309,23 +309,31 @@ bbb.
            pose proof Hi 0 1 (Nat.neq_succ_diag_r 0) as H.
            simpl in H; intros Hp₁; eapply H; split; eassumption.
 
-           eapply IHPE; [ | reflexivity | assumption ].
-           intros i j Hij.
-           destruct i.
-            destruct j; [ exfalso; apply Hij; reflexivity | ].
-            Opaque set_eq.
-            pose proof Hi 0 (S (S j)) as H; simpl in H.
-            apply H; intros HH; discriminate HH.
-
-            destruct j.
-             pose proof Hi (S (S i)) 0 as H; simpl in H.
+           eapply IHPE; [ | | reflexivity | assumption ].
+            intros i j Hij.
+            destruct i.
+             destruct j; [ exfalso; apply Hij; reflexivity | ].
+             pose proof Hi 0 (S (S j)) as H.
+             remember set_eq as f; simpl in H; subst f.
              apply H; intros HH; discriminate HH.
 
-             simpl.
-             pose proof Hi (S (S i)) (S (S j)) as H; simpl in H.
-             apply H; intros HH.
-             apply Nat.succ_inj in HH; contradiction.
+             destruct j.
+              pose proof Hi (S (S i)) 0 as H.
+              remember set_eq as f; simpl in H; subst f.
+              apply H; intros HH; discriminate HH.
 
+              simpl.
+              pose proof Hi (S (S i)) (S (S j)) as H; simpl in H.
+              apply H; intros HH.
+              apply Nat.succ_inj in HH; contradiction.
+
+            remember (PE₂ :: PE) as PE'.
+            remember set_eq as f; simpl in Hgl; simpl; subst f.
+            subst PE'.
+            apply Forall2_cons_cons in Hgl.
+            destruct Hgl as (Hg, Hgl).
+            constructor; [ assumption | ].
+bbb.
          intros i j Hij.
          destruct HPE as (Hu, Hi).
          pose proof Hi (S i) (S j) as H; simpl in H.
