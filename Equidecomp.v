@@ -276,9 +276,9 @@ assert
   (HFi : Forall (λ Fi, (Fi = union_list (map (intersection Fi) P'F))%S) PF).
  clear HPF HFQR Hlen1 Hlen2 Hlen3 Hgl HPPE.
  induction PF as [| PF₁ PF]; [ constructor | ].
- constructor.
-bbb.
- constructor; [ | assumption ].
+ apply Forall_inv2 in Hinc.
+ destruct Hinc as (Hinc₁, Hinc).
+ constructor; [ | apply IHPF; assumption ].
  destruct HP'F as (HFU, HFI).
 
 bbb.
