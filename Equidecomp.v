@@ -275,6 +275,13 @@ assert (HFin : Forall (λ Fi, Fi ⊂ F) PF).
  induction PF as [| PF₁ PF]; intros; [ constructor | ].
  constructor; [ rewrite HPFU; left; assumption | ].
  pose proof IHPF (union_list PF) (set_eq_refl _ _).
+SearchAbout (union_list (_ :: _)).
+Theorem union_list_cons : ∀ A (s := set_equiv) (E F : set A) G,
+  (E = union_list (F :: G))%S → (E = union F (union_list G))%S.
+Admitted. Show.
+Check union_list_cons.
+ apply union_list_cons in HPFU.
+SearchAbout ((_ = union _ _)%S → _).
 
 bbb.
 
