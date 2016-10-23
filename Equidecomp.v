@@ -254,8 +254,9 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
     assert (is_partition E PPE).
      split.
       rewrite HPPE.
-      clear - Hlen1 Hlen3 HPE.
-      revert E PE gl HPE Hlen1 Hlen3.
+      subst PEF.
+      clear - Hlen1 Hlen3 HPE Hgl.
+      revert E PE gl HPE Hlen1 Hlen3 Hgl.
       induction PF as [| PF₁ PF]; intros.
        apply length_zero_iff_nil in Hlen1; subst PE; apply HPE.
 
@@ -270,6 +271,9 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
        generalize HPE; intros HUI.
        destruct HUI as (HU, HI); rewrite HU.
        remember set_eq as f; simpl; subst f.
+       simpl in Hgl.
+       apply Forall2_cons_cons in Hgl.
+       destruct Hgl as (Hg, Hgl).
        apply union_morph.
         Focus 2.
         eapply IHPF; try eassumption.
