@@ -253,6 +253,29 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
 
     assert (is_partition E PPE).
      split.
+(**)
+      subst PEF PPF.
+      clear HEF G P'G HP'G Hlen2 HFG.
+      move s at top.
+      move P'F before PF.
+      move HP'F before HPF.
+      move HFQR before HP'F.
+      move gl before HFQR.
+      move PPE before gl.
+      rename Hlen3 into Hlen2.
+      clear HglPEF.
+      rename Hlen4 into Hlen3.
+      move Hlen2 before Hlen1.
+      move Hlen3 before Hlen2.
+      rewrite partition_prod_length in Hlen3.
+bbb.
+      revert F HPF HP'F.
+      induction PF as [| PF₁ PF]; intros.
+       apply length_zero_iff_nil in Hlen1; subst PE PPE; apply HPE.
+
+
+; apply HPE.
+
 bbb.
       rewrite HPPE.
       subst PEF.
