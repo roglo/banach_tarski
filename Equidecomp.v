@@ -301,10 +301,16 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
            destruct Hgl as (Hg, Hgl).
            simpl in Hlen1; apply Nat.succ_inj in Hlen1.
            constructor; [ | eapply IHPE; eassumption ].
-SearchAbout (map (intersection _)).
+assert (included PE₁ (union_list (map (app_gr_inv g) P'F))).
+Focus 2.
 pose proof union_intersection_self _ [PE₁] (map (app_gr_inv g) P'F).
-simpl in H.
-rewrite union_empty_r in H.
+simpl in H0.
+rewrite union_empty_r in H0; [ | reflexivity ].
+apply H0 in H; clear H0.
+apply Forall_inv in H.
+intros x.
+apply H.
+
 bbb.
         assert
           (HEi :
