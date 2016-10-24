@@ -285,10 +285,11 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
              (λ '(Ei, gi),
               (Ei =
                app_gr (gr_inv gi)
-                 (⋃ map (intersection (app_gr gi Ei)) P'F))%S)
+                 (⋃ map (λ p'fi, intersection (app_gr gi Ei) p'fi) P'F))%S)
              (combine PE gl)).
          apply Forall_forall.
          intros (Ei, gi) Hin.
+
 bbb.
 
  clear HPF HFQR Hlen1 Hlen2 Hlen3 Hgl HPPE.

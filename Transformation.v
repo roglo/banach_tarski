@@ -124,23 +124,22 @@ eapply gr_subst in H; [ apply IHf1 in H; contradiction | ].
 split; [ apply IHf2 | intros; contradiction ].
 Qed.
 
-Theorem group_union_distr : ∀ (s := set_equiv) g E₁ E₂,
-  (app_gr g (E₁ ∪ E₂) = app_gr g E₁ ∪ app_gr g E₂)%S.
+Theorem group_intersection_distr : ∀ (s := set_equiv) g E F,
+  (app_gr g (E ∩ F) = app_gr g E ∩ app_gr g F)%S.
 Proof.
-intros s *; subst s.
-revert E₁ E₂.
-induction g as [ e| dx | g IHg h IHh ]; intros; simpl.
- intros p; split; intros H; assumption.
+intros.
+revert E F.
+induction g; intros; [ reflexivity | intros (x, y, z); reflexivity | ].
+intros p; simpl; rewrite IHg2, IHg1; reflexivity.
+Qed.
 
- intros (x, y, z); split; intros H; assumption.
-
- intros p.
- split.
-  intros H; apply IHg.
-  rewrite <- IHh; assumption.
-
-  intros H; apply IHg in H.
-  rewrite IHh; assumption.
+Theorem group_union_distr : ∀ (s := set_equiv) g E F,
+  (app_gr g (E ∪ F) = app_gr g E ∪ app_gr g F)%S.
+Proof.
+intros.
+revert E F.
+induction g; intros; [ reflexivity | intros (x, y, z); reflexivity | ].
+intros p; simpl; rewrite IHg2, IHg1; reflexivity.
 Qed.
 
 Theorem group_union_list_distr : ∀ (s := set_equiv) f PL,
