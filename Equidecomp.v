@@ -286,6 +286,12 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
                 (Ei = ⋃ map (intersection Ei) (map (app_gr_inv gi) P'F)%S)%S)
              (combine PE gl)).
          rewrite <- Hlen2 in Hlen1.
+apply Forall_forall.
+intros (p, gi) Hx.
+Check union_intersection_self.
+pose proof union_intersection_self _ PF (map (app_gr_inv gi) P'F).
+
+bbb.
          clear HPE Hlen2 Hlen3 HPPE HPF HFQR Hinc HFi.
          revert gl PF Hlen1 Hgl .
          induction PE as [| PE₁ PE]; intros.
@@ -301,15 +307,29 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
            destruct Hgl as (Hg, Hgl).
            simpl in Hlen1; apply Nat.succ_inj in Hlen1.
            constructor; [ | eapply IHPE; eassumption ].
-assert (included PE₁ (union_list (map (app_gr_inv g) P'F))).
+Check union_intersection_self.
+vvv.
+assert (included PE₁ (union_list (map (app_gr_inv g) (PF₁ :: P'F)))).
 Focus 2.
-pose proof union_intersection_self _ [PE₁] (map (app_gr_inv g) P'F).
+pose proof union_intersection_self _ [PE₁] (map (app_gr_inv g) (PF₁ :: P'F)).
 simpl in H0.
 rewrite union_empty_r in H0; [ | reflexivity ].
 apply H0 in H; clear H0.
 apply Forall_inv in H.
 intros x.
+split.
+ intros Hx.
+ apply H in Hx.
+ destruct Hx as [Hx| Hx]; [ | assumption ].
+
+Focus 2.
+ intros Hx.
+ apply H.
+ right; assumption.
+
 apply H.
+
+SearchAbout PF₁.
 
 bbb.
         assert
