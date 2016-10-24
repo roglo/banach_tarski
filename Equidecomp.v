@@ -293,8 +293,9 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
              (combine PE gl)).
          rewrite <- Hlen2 in Hlen1.
          apply Forall_forall.
-         intros (Ei, gi) HEi.
-         generalize HEi; intros Hgi.
+         intros (Ei, gi) HEin.
+         generalize HEin; intros HEi.
+         generalize HEin; intros Hgi.
          apply in_combine_l in HEi.
          apply in_combine_r in Hgi.
          apply union_intersection_self.
