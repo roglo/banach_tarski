@@ -194,6 +194,23 @@ intros p; split; intros H.
  destruct H as [H| H]; [ left; assumption | right; apply IHPL; assumption ].
 Qed.
 
+Theorem union_list_map_app_gr : ∀ (s := set_equiv) g EL,
+  (⋃ map (app_gr g) EL = app_gr g (⋃ EL))%S.
+Proof.
+intros.
+induction EL as [| E₁ EL].
+ intros x; rewrite app_gr_empty_set; split; contradiction.
+
+ intros x; simpl.
+ rewrite group_union_distr.
+ split; intros Hx.
+  destruct Hx as [Hx| Hx]; [ left; assumption | ].
+  right; apply IHEL; assumption.
+
+  destruct Hx as [Hx| Hx]; [ left; assumption | ].
+  right; apply IHEL; assumption.
+Qed.
+
 Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
   ∀ (F : set point) P g,
   is_partition F P → is_partition (app_gr g F) (map (app_gr g) P).
