@@ -275,3 +275,14 @@ induction FL as [| F₁ FL]; intros.
   destruct Hx as [Hx| Hx]; [ destruct Hx; assumption | ].
   apply IHFL, Hx.
 Qed.
+
+Theorem union_intersection_self2 :
+  ∀ A (s:=set_equiv) (EL FL : list (set A)),
+  ⋃ EL ⊂ ⋃ FL
+  → ∀ Ei, List.In Ei EL
+  → (Ei = ⋃ map (intersection Ei) FL)%S.
+Proof.
+intros * HEF.
+apply Forall_forall, union_intersection_self.
+assumption.
+Qed.

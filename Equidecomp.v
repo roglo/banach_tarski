@@ -286,10 +286,12 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
                 (Ei = ⋃ map (intersection Ei) (map (app_gr_inv gi) P'F)%S)%S)
              (combine PE gl)).
          rewrite <- Hlen2 in Hlen1.
-apply Forall_forall.
-intros (p, gi) Hx.
-Check union_intersection_self.
-pose proof union_intersection_self _ PF (map (app_gr_inv gi) P'F).
+         apply Forall_forall.
+         intros (p, gi) Hp.
+         generalize Hp; intros Hgi.
+         apply in_combine_l in Hp.
+         apply in_combine_r in Hgi.
+         eapply union_intersection_self2; [ | eassumption ].
 
 bbb.
          clear HPE Hlen2 Hlen3 HPPE HPF HFQR Hinc HFi.
