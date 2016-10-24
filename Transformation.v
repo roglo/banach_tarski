@@ -56,14 +56,6 @@ induction g as [ e| dx | g IHg h IHh]; intros.
  eapply IHh; [ symmetry; eassumption | eassumption ].
 Qed.
 
-Add Parametric Morphism {A} : (@setp A)
-with signature (@set_eq _ set_equiv) ==> eq ==> iff
-as setp_morph.
-Proof.
-intros E F HEF x.
-apply HEF.
-Qed.
-
 Add Parametric Morphism : app_gr
 with signature eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
 as app_gr_morph.

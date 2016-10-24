@@ -255,3 +255,11 @@ split; intros Hx.
  destruct Hx as [(Hx, _)| Hx]; [ assumption | ].
  apply IHEL, Hx.
 Qed. 
+
+Add Parametric Morphism {A} : (@setp A)
+with signature (@set_eq _ set_equiv) ==> eq ==> iff
+as setp_morph.
+Proof.
+intros E F HEF x.
+apply HEF.
+Qed.
