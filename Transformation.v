@@ -37,6 +37,8 @@ Fixpoint gr_inv f :=
   | Comb g h => Comb (gr_inv h) (gr_inv g)
   end.
 
+Definition app_gr_inv g := app_gr (gr_inv g).
+
 Theorem gr_subst : ∀ (s := set_equiv) g E F,
   (E = F)%S → ∀ p, p ∈ app_gr g E → p ∈ app_gr g F.
 Proof.
@@ -71,10 +73,20 @@ split; intros H; [ eapply gr_subst; eassumption | ].
 symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
+Add Parametric Morphism : app_gr_inv
+with signature eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+as app_gr_inv_morph.
+Proof.
+intros g p q Hpq r.
+split; intros H; [ eapply gr_subst; eassumption | ].
+symmetry in Hpq; eapply gr_subst; eassumption.
+Qed.
+
 Theorem app_gr_inv_l : ∀ (s := set_equiv) g E,
-  (app_gr (gr_inv g) (app_gr g E) = E)%S.
+  (app_gr_inv g (app_gr g E) = E)%S.
 Proof.
 intros.
+unfold app_gr_inv.
 revert E.
 induction g; intros; simpl.
  unfold rot; simpl.
@@ -95,7 +107,7 @@ induction g; intros; simpl.
 Qed.
 
 Theorem app_gr_app_gr_inv : ∀ (s := set_equiv) g E F,
-  (app_gr g E = F)%S → (app_gr (gr_inv g) F = E)%S.
+  (app_gr g E = F)%S → (app_gr_inv g F = E)%S.
 Proof.
 intros * Ha.
 rewrite <- Ha.

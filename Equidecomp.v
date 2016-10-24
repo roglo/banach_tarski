@@ -232,7 +232,7 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
 
   remember (partition_prod PF P'F) as PPF eqn:HPPF.
   remember
-    (flat_map (λ '(p, g), map (λ q, app_gr (gr_inv g) (p ∩ q)) P'F)
+    (flat_map (λ '(p, g), map (λ q, app_gr_inv g (p ∩ q)) P'F)
        (combine PF gl)) as PPE eqn:HPPE.
 
   assert (Hlen3 : length gl = length PF).
@@ -283,12 +283,38 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
           (HEi :
            Forall
              (λ '(Ei, gi),
+                (Ei = ⋃ map (intersection Ei) (map (app_gr_inv gi) P'F)%S)%S)
+             (combine PE gl)).
+         rewrite <- Hlen2 in Hlen1.
+         clear HPE Hlen2 Hlen3 HPPE HPF HFQR Hinc HFi.
+         revert gl PF Hlen1 Hgl .
+         induction PE as [| PE₁ PE]; intros.
+          destruct gl as [| g gl]; [ constructor | ].
+          apply Forall2_cons_nil in Hgl; contradiction.
+
+          destruct gl as [| g gl]; [ discriminate Hlen1 | ].
+          destruct PF as [| PF₁ PF].
+           apply Forall2_cons_nil in Hgl; contradiction.
+
+           remember set_eq as f; simpl in Hgl; simpl; subst f.
+           apply Forall2_cons_cons in Hgl.
+           destruct Hgl as (Hg, Hgl).
+           simpl in Hlen1; apply Nat.succ_inj in Hlen1.
+           constructor; [ | eapply IHPE; eassumption ].
+
+bbb.
+        assert
+          (HEi :
+           Forall
+             (λ '(Ei, gi),
               (Ei =
-               app_gr (gr_inv gi)
+               app_gr_inv gi
                  (⋃ map (λ p'fi, intersection (app_gr gi Ei) p'fi) P'F))%S)
              (combine PE gl)).
          apply Forall_forall.
          intros (Ei, gi) Hin.
+rewrite group_union_list_distr.
+rewrite map_map.
 
 bbb.
 
