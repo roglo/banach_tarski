@@ -301,9 +301,34 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
          apply union_intersection_self.
          unfold app_gr_inv.
          rewrite union_list_map_app_gr.
-Theorem included_comp : ∀ E F g, E ⊂ F ↔ app_gr g E ⊂ app_gr g F.
-Admitted. Show.
-         apply included_comp with (g := gi).
+Require Import Words.
+Theorem included_group : ∀ E F g, E ⊂ F ↔ app_gr g E ⊂ app_gr g F.
+Proof.
+intros.
+split; intros HEF.
+ revert E F HEF.
+ induction g as [e| dx| ]; intros.
+  intros p Hp; apply HEF; assumption.
+
+  intros (x, y, z) Hp; apply HEF; assumption.
+
+  apply IHg1, IHg2; assumption.
+
+ intros p Hp.
+ revert p E F HEF Hp.
+ induction g as [e| dx| ]; intros.
+  pose proof HEF (rotate e p) as H; simpl in H.
+  rewrite rotate_neg_rotate in H; apply H, Hp.
+
+  destruct p as (x, y, z); simpl in HEF.
+  pose proof HEF (P (x + dx) y z) as H; simpl in H.
+Require Import Psatz.
+  replace (x + dx - dx)%R with x in H by lra.
+  apply H, Hp.
+
+  simpl in HEF.
+bbb.
+         apply included_group with (g := gi).
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
 Proof. reflexivity. Qed.
          rewrite fold_app_gr_inv.
