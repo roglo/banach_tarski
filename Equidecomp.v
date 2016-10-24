@@ -272,13 +272,23 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
        destruct HPF as (HPFU, HPFI).
        apply union_list_all_included; assumption.
 
-       assert
-         (HFi : Forall (λ Fi, (Fi = ⋃ map (intersection Fi) P'F)%S) PF).
+       assert (HFi : Forall (λ Fi, (Fi = ⋃ map (intersection Fi) P'F)%S) PF).
         apply union_intersection_self.
         destruct HPF as (HPFU, HPFI).
         destruct HP'F as (HP'FU, HP'FI).
         rewrite <- HPFU, <- HP'FU.
         intros x Hx; assumption.
+
+        assert
+          (HEi :
+           Forall
+             (λ '(Ei, gi),
+              (Ei =
+               app_gr (gr_inv gi)
+                 (⋃ map (intersection (app_gr gi Ei)) P'F))%S)
+             (combine PE gl)).
+         apply Forall_forall.
+         intros (Ei, gi) Hin.
 bbb.
 
  clear HPF HFQR Hlen1 Hlen2 Hlen3 Hgl HPPE.
