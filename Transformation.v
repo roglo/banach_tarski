@@ -106,6 +106,30 @@ induction g; intros; simpl.
   rewrite IHg1; apply IHg2, H.
 Qed.
 
+Theorem app_gr_inv_r : ∀ (s := set_equiv) g E,
+  (app_gr g (app_gr_inv g E) = E)%S.
+Proof.
+intros.
+unfold app_gr_inv.
+revert E.
+induction g; intros; simpl.
+ unfold rot; simpl.
+ intros p.
+ rewrite negf_involutive, rotate_rotate_neg.
+ reflexivity.
+
+ intros (x, y, z); simpl.
+ unfold Rminus; rewrite Ropp_involutive.
+ rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
+ reflexivity.
+
+ intros p.
+ split; intros H.
+  rewrite IHg2 in H; apply IHg1; assumption.
+
+  rewrite IHg2; apply IHg1, H.
+Qed.
+
 Theorem app_gr_app_gr_inv : ∀ (s := set_equiv) g E F,
   (app_gr g E = F)%S → (app_gr_inv g F = E)%S.
 Proof.

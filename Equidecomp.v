@@ -299,6 +299,20 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
          apply in_combine_l in HEi.
          apply in_combine_r in Hgi.
          apply union_intersection_self.
+Theorem union_list_map_app_gr : ∀ (s := set_equiv) g EL,
+  (union_list (map (app_gr g) EL) = app_gr g (union_list EL))%S.
+Proof.
+intros.
+bbb.
+         unfold app_gr_inv.
+         rewrite union_list_map_app_gr.
+Theorem included_comp : ∀ E F g, E ⊂ F ↔ app_gr g E ⊂ app_gr g F.
+Admitted. Show.
+         apply included_comp with (g := gi).
+Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
+Proof. reflexivity. Qed.
+         rewrite fold_app_gr_inv.
+         rewrite app_gr_inv_r.
 
 bbb.
  assert (HEEL : E ∩ (⋃ EL) ⊂ ⋃ EL).
