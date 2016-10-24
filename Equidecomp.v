@@ -273,11 +273,17 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
        apply union_list_all_included; assumption.
 
        assert (HFi : Forall (λ Fi, (Fi = ⋃ map (intersection Fi) P'F)%S) PF).
+        apply Forall_forall.
+        intros Fi HFi.
         apply union_intersection_self.
         destruct HPF as (HPFU, HPFI).
         destruct HP'F as (HP'FU, HP'FI).
-        rewrite <- HPFU, <- HP'FU.
-        intros x Hx; assumption.
+        rewrite <- HP'FU, HPFU.
+        clear -HFi.
+        induction PF as [| PF₁ PF]; [ contradiction | ].
+        simpl in HFi; simpl.
+        destruct HFi as [HFi| HFi]; [ subst PF₁; left; assumption | ].
+        right; apply IHPF; assumption.
 
         assert
           (HEi :
@@ -287,11 +293,75 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
              (combine PE gl)).
          rewrite <- Hlen2 in Hlen1.
          apply Forall_forall.
-         intros (p, gi) Hp.
-         generalize Hp; intros Hgi.
-         apply in_combine_l in Hp.
+         intros (Ei, gi) HEi.
+         generalize HEi; intros Hgi.
+         apply in_combine_l in HEi.
          apply in_combine_r in Hgi.
+         apply union_intersection_self.
+
+bbb.
+ assert (HEEL : E ∩ (⋃ EL) ⊂ ⋃ EL).
+Focus 2.
+ assert (HxE : x ∈ E ∩ (⋃ EL)).
+Focus 2.
+ pose proof IHEL (intersection E (union_list EL)) x HEEL HxE as Hxu.
+ right.
+ clear - s Hx Hx' Hxu.
+ revert x E Hx Hx' Hxu.
+ induction EL as [| Ei EL]; intros; [ contradiction | ].
+ simpl in Hx', Hxu; simpl.
+ destruct Hx' as [Hx'| Hx']; [ left; split; assumption | ].
+ destruct Hxu as [Hxu| Hxu].
+  destruct Hxu as ((Hxe & _) & Hxi); left; split; assumption.
+
+  right.
+  assert (HEE : (E = E ∩ (Ei ∪ (⋃ EL)))%S).
+Focus 2.
+  assert (HxEEL : x ∈ E ∩ (⋃ EL)) by (split; assumption).
+  assert (Hxm : x ∈ ⋃ map (intersection (E ∩ (⋃ EL) ∩ (⋃ EL))) EL).
+Focus 2.
+  pose proof IHEL x (intersection E (union_list EL)) HxEEL Hx' Hxm.
+  clear - H.
+  revert x E H.
+  induction EL as [| Ei EL]; intros; [ contradiction | ].
+  simpl in H; simpl.
+  destruct H as [H| H].
+   destruct H as ((Hx & H) & Hxi).
+   destruct H as [H| H]; [ left; split; assumption | ].
+   right.
+   clear -Hx H.
+   revert x E Hx H.
+   induction EL as [| Ei EL]; intros; [ contradiction | ].
+   simpl in H; simpl.
+   destruct H as [H| H]; [ left; split; assumption | ].
+   right; apply IHEL; assumption.
+
+bbb.
+
+ right; apply IHEL; [ | assumption ].
+
+revert E HEL.
+induction EL as [| Ei EL]; intros.
+ simpl in HEL; simpl.
+ intros x; split; intros Hx; [ | contradiction ].
+ apply HEL in Hx; contradiction.
+
+ simpl in HEL; simpl.
+ intros x.
+ split; intros Hx.
+  pose proof HEL _ Hx as Hx'.
+  destruct Hx' as [Hx'| Hx']; [ left; split; assumption | ].
+
+bbb.
+
+Admitted. Show.
+
+apply union_intersection_self3.
+
+bbb.
          eapply union_intersection_self2; [ | eassumption ].
+         destruct HPE as (HPEU, HPEI).
+         rewrite <- HPEU.
 
 bbb.
          clear HPE Hlen2 Hlen3 HPPE HPF HFQR Hinc HFi.

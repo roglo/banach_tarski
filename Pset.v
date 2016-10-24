@@ -237,52 +237,21 @@ destruct HF as [HF| HF]; [ left; subst E; assumption | ].
 right; eapply IHEL; eassumption.
 Qed.
 
-Theorem union_intersection_self :
-  ∀ A (s := set_equiv) (EL FL : list (set A)),
-  ⋃ EL ⊂ ⋃ FL
-  → (Forall (λ ELi, (ELi = ⋃ map (intersection ELi) FL)%S) EL).
+Theorem union_intersection_self : ∀ A (s:=set_equiv) (E : set A) EL,
+  E ⊂ ⋃ EL
+  → (E = ⋃ map (intersection E) EL)%S.
 Proof.
-(* likely to be cleaned up *)
-intros * HEF.
-apply Forall_forall; intros ELi HELi.
-induction FL as [| F₁ FL]; intros.
- intros x; split; [ | contradiction ].
- intros Hx; apply HEF; clear HEF.
- induction EL as [| E EL]; intros; [ contradiction | ].
- destruct HELi as [HELi| HELi]; [ subst E; left; assumption | right ].
- eapply IHEL; eassumption.
+intros * HEL x.
+split; intros Hx.
+ generalize Hx; intros Hxl.
+ apply HEL in Hxl.
+ clear -Hx Hxl.
+ induction EL as [| E₁ EL]; intros; [ contradiction | ].
+ destruct Hxl as [Hxl| Hxl]; [ left; split; assumption | ].
+ right; apply IHEL; assumption.
 
- simpl in HEF; simpl.
- intros x; split; intros Hx.
-  unfold included in HEF.
-  assert (H : x ∈ union_list EL).
-   clear - HELi Hx.
-   induction EL as [| E EL]; [ contradiction | ].
-   destruct HELi as [HELi| HELi]; [  subst E; left; assumption | right ].
-   apply IHEL, HELi.
-
-   pose proof HEF x H as Hx2.
-   destruct Hx2 as [Hx2| Hx2]; [ left; split; assumption | right ].
-   clear - HELi Hx H Hx2.
-   induction FL as [| F FL]; intros; [ contradiction | simpl ].
-   destruct Hx2 as [Hx2| Hx2]; [ left; split; assumption | ].
-   right; apply IHFL; assumption.
-
-  destruct Hx as [Hx| Hx]; [ destruct Hx; assumption | ].
-  clear - Hx.
-  induction FL as [| F FL]; [ contradiction | ].
-  simpl in Hx.
-  destruct Hx as [Hx| Hx]; [ destruct Hx; assumption | ].
-  apply IHFL, Hx.
-Qed.
-
-Theorem union_intersection_self2 :
-  ∀ A (s:=set_equiv) (EL FL : list (set A)),
-  ⋃ EL ⊂ ⋃ FL
-  → ∀ Ei, List.In Ei EL
-  → (Ei = ⋃ map (intersection Ei) FL)%S.
-Proof.
-intros * HEF.
-apply Forall_forall, union_intersection_self.
-assumption.
-Qed.
+ clear -Hx.
+ induction EL as [| E₁ EL]; intros; [ contradiction | ].
+ destruct Hx as [(Hx, _)| Hx]; [ assumption | ].
+ apply IHEL, Hx.
+Qed. 
