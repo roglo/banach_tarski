@@ -268,25 +268,17 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
       move Hlen2 before Hlen1.
       move Hlen3 before Hlen2.
       rewrite partition_prod_length in Hlen3.
-assert (Hinc : Forall (λ Fi, Fi ⊂ F) PF).
- destruct HPF as (HPFU, HPFI).
- apply union_list_all_included; assumption.
+      assert (Hinc : Forall (λ Fi, Fi ⊂ F) PF).
+       destruct HPF as (HPFU, HPFI).
+       apply union_list_all_included; assumption.
 
-assert
-  (HFi : Forall (λ Fi, (Fi = ⋃ map (intersection Fi) P'F)%S) PF).
-
-Theorem glop : ∀ A (s := set_equiv) (EL FL : list (set A)),
-  ⋃ EL ⊂ ⋃ FL
-  → (Forall (λ ELi, (ELi = ⋃ map (intersection ELi) FL)%S) EL).
-Proof.
-intros * HEF.
-bbb.
-
-apply glop.
-destruct HPF as (HPFU, HPFI).
-destruct HP'F as (HP'FU, HP'FI).
-rewrite <- HPFU, <- HP'FU.
-intros x Hx; assumption.
+       assert
+         (HFi : Forall (λ Fi, (Fi = ⋃ map (intersection Fi) P'F)%S) PF).
+        apply union_intersection_self.
+        destruct HPF as (HPFU, HPFI).
+        destruct HP'F as (HP'FU, HP'FI).
+        rewrite <- HPFU, <- HP'FU.
+        intros x Hx; assumption.
 bbb.
 
  clear HPF HFQR Hlen1 Hlen2 Hlen3 Hgl HPPE.
