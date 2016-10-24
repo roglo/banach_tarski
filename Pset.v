@@ -101,12 +101,11 @@ split; intros (H₁, H₂).
 Qed.
 
 Add Parametric Morphism {A} : (@included A)
-  with signature eq ==> (@set_eq _ set_equiv) ==> iff
+  with signature (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> iff
   as included_morph.
 Proof.
-intros E F G HFG.
-unfold set_eq in HFG; simpl in HFG.
-split; intros HE x Hx; apply HFG, HE, Hx.
+intros E F HEF E' F' HE'F'.
+split; intros HEE' x HF; apply HE'F', HEE', HEF, HF.
 Qed.
 
 Theorem fold_set_eq : ∀ A (s := set_equiv) (P Q : set A),

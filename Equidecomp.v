@@ -273,7 +273,22 @@ assert (Hinc : Forall (λ Fi, Fi ⊂ F) PF).
  apply union_list_all_included; assumption.
 
 assert
-  (HFi : Forall (λ Fi, (Fi = union_list (map (intersection Fi) P'F))%S) PF).
+  (HFi : Forall (λ Fi, (Fi = ⋃ map (intersection Fi) P'F)%S) PF).
+
+Theorem glop : ∀ A (s := set_equiv) (EL FL : list (set A)),
+  ⋃ EL ⊂ ⋃ FL
+  → (Forall (λ ELi, (ELi = ⋃ map (intersection ELi) FL)%S) EL).
+Proof.
+intros * HEF.
+bbb.
+
+apply glop.
+destruct HPF as (HPFU, HPFI).
+destruct HP'F as (HP'FU, HP'FI).
+rewrite <- HPFU, <- HP'FU.
+intros x Hx; assumption.
+bbb.
+
  clear HPF HFQR Hlen1 Hlen2 Hlen3 Hgl HPPE.
  induction PF as [| PF₁ PF]; [ constructor | ].
  apply Forall_inv2 in Hinc.
