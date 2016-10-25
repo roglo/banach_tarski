@@ -239,12 +239,12 @@ assert
  assert (is_partition E PPE).
   split.
    subst PPE PEF.
-   clear HEF HPFF'.
+   clear HEF HPFF' HFG G P'G HP'G Hlen2.
    destruct HPE as (HPEU, _).
    destruct HPF as (HPFU, _).
    destruct HP'F as (HP'FU, _).
    assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; assumption).
-   clear Hlen2 HFG HP'FU.
+   clear HP'FU.
    revert E F gl PF P'F HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
    induction PE as [| E₁ PE]; intros.
     apply length_zero_iff_nil in Hlen3; subst gl; assumption.
@@ -285,7 +285,7 @@ assert
       pose proof (Hgl (S i)) as H; simpl in H.
       assumption.
 
-   simpl.
+   intros i j Hij.
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
