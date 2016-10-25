@@ -38,7 +38,7 @@ Notation "E₁ '∖' E₂" := (subtract E₁ E₂) (at level 50).
 Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60).
 Notation "'⋃' Es" := (union_list Es) (at level 55).
 Notation "E .[ i ]" := (List.nth i E ∅)
-  (at level 1, format "E '[' .[ i ] ']'").
+  (at level 1, format "'[' E '[' .[ i ] ']' ']'").
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : set A), ∀ x, x ∈ E₁ ↔ x ∈ E₂).
 
@@ -132,6 +132,14 @@ intros.
 subst s; intros x.
 split; intros H; [ | left; assumption ].
 destruct H as [H| H]; [ assumption | contradiction ].
+Qed.
+
+Theorem intersection_empty_l : ∀ A (s := set_equiv) (F : set A),
+  (∅ ∩ F = ∅)%S.
+Proof.
+intros.
+subst s; intros x.
+split; intros H; [ destruct H as (H, _); contradiction | contradiction ].
 Qed.
 
 Theorem intersection_empty_r : ∀ A (s := set_equiv) (F : set A),

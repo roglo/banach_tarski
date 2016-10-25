@@ -287,6 +287,53 @@ assert
 
    intros i j Hij.
    remember (length P'F) as len eqn:Hlen.
+   assert
+     ((PPE.[i] =
+      PE.[i/len] ∩ app_gr_inv (nth (i/len) gl gr_ident) P'F.[i mod len])%S).
+    subst PPE.
+    clear - Hlen3 Hlen.
+    revert i gl Hlen3.
+    induction PE as [| E₁ PE]; intros.
+     apply length_zero_iff_nil in Hlen3; subst gl; simpl.
+     do 3 rewrite match_id.
+     rewrite intersection_empty_l; reflexivity.
+
+     destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
+     simpl in Hlen3; simpl.
+     apply Nat.succ_inj in Hlen3.
+     destruct (zerop (i / len)) as [Hil| Hil].
+      rewrite Hil; simpl.
+      remember ((λ '(gi, Ei),
+        map (λ F'j : set point, Ei ∩ app_gr_inv gi F'j) P'F)) as ff.
+      set (gg := λ F'j : set point, E₁ ∩ app_gr_inv g₁ F'j).
+      destruct (lt_dec i len) as [Hi| Hi].
+       rewrite app_nth1; [ | rewrite map_length; subst len; assumption ].
+       pose proof map_nth gg P'F ∅ i as H.
+subst len.
+clear - Hi.
+revert P'F Hi.
+induction i; intros.
+ destruct P'F as [| F'₁ P'F].
+  exfalso; revert Hi; apply Nat.nlt_0_r.
+
+  rewrite Nat.mod_0_l; [ simpl | intros HH; discriminate HH ].
+  reflexivity.
+
+ destruct P'F as [| F'₁ P'F].
+  exfalso; revert Hi; apply Nat.nlt_0_r.
+
+Arguments Nat.modulo : simpl never.
+  simpl.
+
+SearchAbout (nth (S _)).
+
+bbb.
+       assert (Hgg : (gg ∅ = ∅)%S).
+        subst gg; unfold app_gr_inv; rewrite app_gr_empty_set.
+        apply intersection_empty_r.
+
+        rewrite Hgg in H.
+bbb.
    destruct (eq_nat_dec (i / len) (j / len)) as [Hil| Hil].
 bbb.
 
