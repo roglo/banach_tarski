@@ -199,7 +199,7 @@ intros E F G HEF HFG.
 destruct HEF as (PE & PF & HPE & HPF & Hlen1 & HEF).
 destruct HFG as (P'F & P'G & HP'F & HP'G & Hlen2 & HFG).
 unfold equidecomposable.
-pose proof partition_prod_is_partition _ F PF P'F HPF HP'F as HFQR.
+pose proof partition_prod_is_partition _ F PF P'F HPF HP'F as HPFF'.
 apply Forall2_Forall_combine in HEF.
 remember (combine PE PF) as PEF eqn:HPEF.
 set (s := set_equiv).
@@ -207,6 +207,10 @@ assert
   (Hgl : ∃ gl,
    Forall (λ '((gi, Ei), Fi), (app_gr gi Ei = Fi)%S)
      (combine (combine gl PE) PF)).
+
+exists []; constructor.
+(* !!!!! *)
+bbb.
  subst PEF.
  clear - HEF.
  revert PF HEF.
@@ -219,13 +223,32 @@ assert
  exists (g₁ :: gl); constructor; assumption.
 
  destruct Hgl as (gl, Hgl).
+ assert (Hlen3 : length gl = length PF).
+  transitivity (length PEF); [ assumption | ].
+  rewrite HPEF, combine_length, Hlen1, Nat.min_idempotent.
+  reflexivity.
+
+
  remember
    (flat_map (λ '(gi, Ei), map (λ F'j, Ei ∩ app_gr_inv gi F'j) P'F)
       (combine gl PE)) as PPE eqn:HPPE.
  assert (is_partition E PPE).
   split.
+   subst PPE.
+   remember (combine gl PE) as gpl eqn:Hgpl.
+   symmetry in Hgpl.
+   induction gpl as [| (g₁, E₁) gpl].
+    intros p; split; intros Hp; [ simpl | contradiction ].
+    destruct PE as [| E₁ PE].
+     destruct HPE as (HPEU, HPEI).
+     rewrite HPEU in Hp; contradiction.
+
+     destruct gl as [| g₁ gl]; [ | discriminate Hgpl ].
+     destruct PF as [| F₁ PF]; [ discriminate Hlen1 | ].
+
 
 bbb.
+*)
 assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl PEF).
  clear -HEF.
  induction PEF as [| PEF₁ PEF]; [ exists []; constructor | ].
