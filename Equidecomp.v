@@ -328,6 +328,12 @@ Require Import Psatz.
 
   simpl in HEF.
 bbb.
+
+pose proof IHg1 p _ _ HEF.
+
+SearchAbout app_gr.
+
+bbb.
          apply included_group with (g := gi).
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
 Proof. reflexivity. Qed.
