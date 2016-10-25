@@ -243,50 +243,47 @@ assert
    destruct HPE as (HPEU, _).
    destruct HPF as (HPFU, _).
    destruct HP'F as (HP'FU, _).
-   assert (HUP'F : F ⊂ ⋃ P'F).
-    rewrite HP'FU.
-    intros x H; assumption.
+   assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; assumption).
+   clear Hlen2 HFG HP'FU.
+   revert E F gl PF P'F HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
+   induction PE as [| E₁ PE]; intros.
+    apply length_zero_iff_nil in Hlen3; subst gl; assumption.
 
-    clear Hlen2 HFG HP'FU.
-    revert E F gl PF P'F HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
-    induction PE as [| E₁ PE]; intros.
-     apply length_zero_iff_nil in Hlen3; subst gl; assumption.
+    destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
+    rewrite HPEU; simpl.
+    rewrite union_list_app; [ | reflexivity ].
+    simpl in Hlen3; apply Nat.succ_inj in Hlen3.
+    apply union_morph.
+     pose proof union_intersection_self point E₁ (map (app_gr_inv g₁) P'F).
+     rewrite map_map in H.
+     apply H.
+     assert (HEF : E₁ ⊂ app_gr_inv g₁ F).
+      rewrite HPFU.
+      apply included_group with g₁.
+      rewrite app_gr_inv_r.
+      intros p Hp.
+      pose proof Hgl 0 p as Hgl₁; simpl in Hgl₁.
+      apply Hgl₁ in Hp.
+      destruct PF as [| P₁ PF]; [ contradiction | simpl in Hp ].
+      left; assumption.
 
-     destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
-     rewrite HPEU; simpl.
-     rewrite union_list_app; [ | reflexivity ].
-     simpl in Hlen3; apply Nat.succ_inj in Hlen3.
-     apply union_morph.
-      pose proof union_intersection_self point E₁ (map (app_gr_inv g₁) P'F).
-      rewrite map_map in H.
-      apply H.
-      assert (HEF : E₁ ⊂ app_gr_inv g₁ F).
-       rewrite HPFU.
-       apply included_group with g₁.
-       rewrite app_gr_inv_r.
-       intros p Hp.
-       pose proof Hgl 0 p as Hgl₁; simpl in Hgl₁.
-       apply Hgl₁ in Hp.
-       destruct PF as [| P₁ PF]; [ contradiction | simpl in Hp ].
-       left; assumption.
-
-       destruct PF as [| F₁ PF ]; [ discriminate Hlen1 | ].
-       simpl in Hlen1; apply Nat.succ_inj in Hlen1.
-       apply included_group with (g := gr_inv g₁) in HUP'F.
-       rewrite group_union_list_distr in HUP'F.
-       rewrite fold_app_gr_inv in HUP'F.
-       eapply included_trans; eassumption.
-
-      destruct PF as [| F₁ PF]; [ discriminate Hlen1 |  ].
+      destruct PF as [| F₁ PF ]; [ discriminate Hlen1 | ].
       simpl in Hlen1; apply Nat.succ_inj in Hlen1.
-      eapply IHPE; [ | | | eassumption | assumption | ]; try reflexivity.
-       rewrite HPFU in HUP'F.
-       intros p Hp; apply HUP'F.
-       right; assumption.
+      apply included_group with (g := gr_inv g₁) in HUP'F.
+      rewrite group_union_list_distr in HUP'F.
+      rewrite fold_app_gr_inv in HUP'F.
+      eapply included_trans; eassumption.
 
-       intros i.
-       pose proof (Hgl (S i)) as H; simpl in H.
-       assumption.
+     destruct PF as [| F₁ PF]; [ discriminate Hlen1 |  ].
+     simpl in Hlen1; apply Nat.succ_inj in Hlen1.
+     eapply IHPE; [ | | | eassumption | assumption | ]; try reflexivity.
+      rewrite HPFU in HUP'F.
+      intros p Hp; apply HUP'F.
+      right; assumption.
+
+      intros i.
+      pose proof (Hgl (S i)) as H; simpl in H.
+      assumption.
 
    simpl.
 bbb.
