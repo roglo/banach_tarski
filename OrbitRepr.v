@@ -289,7 +289,7 @@ split.
 
   destruct i; [ simpl in Hi | ].
    destruct j; [ clear Hij | ].
-    eapply empty_set_not_full_set; [ reflexivity | eassumption | eassumption ].
+    eapply empty_set_not_full_set; [ reflexivity | | ]; eassumption.
 
     destruct j; [ simpl in Hj | ].
      eapply start_with_same in Hi; [ | reflexivity | eassumption ].

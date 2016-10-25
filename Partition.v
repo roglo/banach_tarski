@@ -63,9 +63,11 @@ split.
     unfold intersection; simpl.
     split; eassumption.
 
-    eapply Hi with (i := 1%nat) (j := S (S i)); [ intros H; discriminate H | ].
-    unfold intersection; simpl.
-    split; eassumption.
+    eapply Hi with (i := 1%nat) (j := S (S i)).
+     intros H; discriminate H.
+
+     unfold intersection; simpl.
+     split; eassumption.
 
   apply Hi with (i := S (S i)) (j := S (S j)) (x := x).
    intros H; apply Hij.

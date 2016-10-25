@@ -418,12 +418,15 @@ Proof.
  intros (x₁, y₁, z₁) (x₂, y₂, z₂).
  destruct (Req_dec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
   destruct (Req_dec y₁ y₂) as [| H₂]; [ subst y₂ | right ].
-   destruct (Req_dec z₁ z₂) as [| H₃]; [ subst z₂; left; reflexivity | right ].
-   intros H; apply H₃.
-   injection H; clear H; intros; subst; reflexivity.
+   destruct (Req_dec z₁ z₂) as [| H₃].
+    subst z₂; left; reflexivity.
 
-   intros H; apply H₂.
-   injection H; clear H; intros; subst; reflexivity.
+    right.
+    intros H; apply H₃.
+    injection H; clear H; intros; subst; reflexivity.
+
+    intros H; apply H₂.
+    injection H; clear H; intros; subst; reflexivity.
 
   intros H; apply H₁.
   injection H; clear H; intros; subst; reflexivity.
