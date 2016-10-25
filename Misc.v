@@ -102,7 +102,7 @@ inversion H; subst.
 split; assumption.
 Qed.
 
-Theorem Forall2_Forall_combine : ∀ A f (l1 l2 : list A),
+Theorem Forall2_Forall_combine : ∀ A B f (l1 : list A) (l2 : list B),
   Forall2 f l1 l2
   → Forall (λ '(x, y), f x y) (combine l1 l2).
 Proof.

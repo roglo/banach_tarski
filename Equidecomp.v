@@ -214,6 +214,7 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
  exists (g :: gl).
  constructor; assumption.
 
+ clear HEF.
  destruct Hgl as (gl, Hgl).
  assert (HglPEF : length gl = length PEF).
   clear - Hgl.
@@ -255,7 +256,7 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
      split.
 (**)
       subst PEF PPF.
-      clear HEF G P'G HP'G Hlen2 HFG.
+      clear (*HEF*)G P'G HP'G Hlen2 HFG.
       move s at top.
       move P'F before PF.
       move HP'F before HPF.
@@ -305,6 +306,12 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
          rewrite fold_app_gr_inv, app_gr_inv_r.
          destruct HP'F as (HP'FU, HP'FI).
          rewrite <- HP'FU.
+bbb.
+apply Forall2_Forall_combine in Hgl.
+rewrite Forall_forall in Hgl.
+bbb.
+
+pose proof Hgl (gi, (Ei, app_gr gi Ei)); simpl in H.
 bbb.
  assert (HEEL : E ∩ (⋃ EL) ⊂ ⋃ EL).
 Focus 2.
