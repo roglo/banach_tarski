@@ -174,24 +174,8 @@ induction g; intros; [ reflexivity | intros (x, y, z); reflexivity | ].
 intros p; simpl; rewrite IHg2, IHg1; reflexivity.
 Qed.
 
-Theorem group_union_list_distr : ∀ (s := set_equiv) f PL,
-  (app_gr f (⋃ PL) = ⋃ map (app_gr f) PL)%S.
-Proof.
-intros s *.
-induction PL as [| P PL].
-intros p; split; intros H; [ | contradiction ].
-apply app_gr_empty_set in H; contradiction.
-simpl in IHPL; simpl.
-intros p; split; intros H.
- apply group_union_distr in H.
- destruct H as [H| H]; [ left; assumption | right; apply IHPL; assumption ].
-
- apply group_union_distr.
- destruct H as [H| H]; [ left; assumption | right; apply IHPL; assumption ].
-Qed.
-
-Theorem union_list_map_app_gr : ∀ (s := set_equiv) g EL,
-  (⋃ map (app_gr g) EL = app_gr g (⋃ EL))%S.
+Theorem group_union_list_distr : ∀ (s := set_equiv) f EL,
+  (app_gr f (⋃ EL) = ⋃ map (app_gr f) EL)%S.
 Proof.
 intros.
 induction EL as [| E₁ EL].
