@@ -306,6 +306,45 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
          rewrite fold_app_gr_inv, app_gr_inv_r.
          destruct HP'F as (HP'FU, HP'FI).
          rewrite <- HP'FU.
+bbb.
+assert (Hgl2 : Forall2 (λ '(S₁, g) S₂, (app_gr g S₁ = S₂)%S) (combine PE gl) PF).
+Focus 2.
+clear -HEin Hgl2 HPF.
+remember (combine PE gl) as PEgl eqn:HPEgl.
+symmetry in HPEgl.
+revert Ei gi PE PF gl HPEgl HEin HPF Hgl2.
+induction PEgl as [| (E₁, g₁) PEGL]; intros; [ contradiction | ].
+simpl in HEin.
+destruct HEin as [HEin| HEin].
+ injection HEin; clear HEin; intros; subst E₁ g₁.
+ destruct PF as [| F₁ PF].
+  apply Forall2_cons_nil in Hgl2; contradiction.
+
+  apply Forall2_cons_cons in Hgl2.
+  destruct Hgl2 as (Hgl2i, Hgl2).
+  rewrite Hgl2i.
+  destruct HPF as (HPFU, HPFI).
+  rewrite HPFU.
+  left; assumption.
+
+ destruct PE as [| E₂ PE]; [ discriminate HPEgl | ].
+ destruct gl as [| g₂ gl]; [ discriminate HPEgl | ].
+ simpl in HPEgl.
+ injection HPEgl; clear HPEgl; intros HPEgl; intros; subst E₂ g₂.
+ destruct PF as [| F₁ PF].
+  apply Forall2_cons_nil in Hgl2; contradiction.
+
+  apply Forall2_cons_cons in Hgl2.
+  destruct Hgl2 as (Hgl2i, Hgl2).
+
+bbb.
+
+
+apply Forall2_Forall_combine in Hgl2.
+rewrite Forall_forall in Hgl2.
+simpl in Hgl2.
+
+
 apply Forall2_Forall_combine in Hgl.
 rewrite Forall_forall in Hgl.
 bbb.
