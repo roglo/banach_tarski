@@ -306,12 +306,8 @@ assert (Hgl : ∃ gl, Forall2 (λ g '(S₁, S₂), (app_gr g S₁ = S₂)%S) gl 
          rewrite fold_app_gr_inv, app_gr_inv_r.
          destruct HP'F as (HP'FU, HP'FI).
          rewrite <- HP'FU.
-bbb.
 apply Forall2_Forall_combine in Hgl.
 rewrite Forall_forall in Hgl.
-bbb.
-
-pose proof Hgl (gi, (Ei, app_gr gi Ei)); simpl in H.
 bbb.
  assert (HEEL : E ∩ (⋃ EL) ⊂ ⋃ EL).
 Focus 2.
