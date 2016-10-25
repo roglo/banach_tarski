@@ -293,6 +293,12 @@ assert
     symmetry in Hcgp.
     destruct cgp as [| (g₁, E₁) cgp]; [ apply intersection_empty_r | ].
     simpl.
+remember (λ F'j : set point, E₁ ∩ app_gr_inv g₁ F'j) as ff.
+do 2 rewrite nth_set_app.
+rewrite map_length, Nat.sub_0_l.
+destruct (lt_dec 0 (length P'F)) as [H₁| H₁].
+ destruct (lt_dec (S j) (length P'F)) as [H₂| H₂].
+
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
