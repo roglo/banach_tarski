@@ -287,8 +287,12 @@ reflexivity.
 3: eassumption.
 reflexivity.
 rewrite HPFU in HUP'F.
-intros p.
+intros p Hp.
+apply HUP'F.
+right; assumption.
+assumption.
 bbb.
+
 (*
 
 
