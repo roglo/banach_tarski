@@ -65,6 +65,12 @@ Add Parametric Relation A : (set A) (@set_eq A set_equiv)
  transitivity proved by (set_eq_trans A)
  as set_eq_rel.
 
+Theorem included_trans A : transitive _ (@included A).
+Proof.
+intros E F G HEF HFG x Hx.
+apply HFG, HEF, Hx.
+Qed.
+
 Add Parametric Morphism {A} : (@intersection A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)

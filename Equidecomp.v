@@ -275,9 +275,7 @@ assert
        apply included_group with (g := gr_inv g₁) in HUP'F.
        rewrite group_union_list_distr in HUP'F.
        rewrite fold_app_gr_inv in HUP'F.
-       (* transitivity *)
-       intros p Hp.
-       apply HUP'F, HEF, Hp.
+       eapply included_trans; eassumption.
 
       destruct PF as [| F₁ PF]; [ discriminate Hlen1 |  ].
       simpl in Hlen1; apply Nat.succ_inj in Hlen1.
