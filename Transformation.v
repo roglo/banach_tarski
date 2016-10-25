@@ -85,8 +85,7 @@ intros.
 unfold app_gr_inv.
 revert E.
 induction g; intros; simpl.
- unfold rot; simpl.
- intros p.
+ intros p; simpl.
  rewrite negf_involutive, rotate_neg_rotate.
  reflexivity.
 
@@ -109,8 +108,7 @@ intros.
 unfold app_gr_inv.
 revert E.
 induction g; intros; simpl.
- unfold rot; simpl.
- intros p.
+ intros p; simpl.
  rewrite negf_involutive, rotate_rotate_neg.
  reflexivity.
 

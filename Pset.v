@@ -8,6 +8,7 @@ Arguments mkset [A] _.
 Arguments setp [A] _ _.
 
 Class set_model A := mksm { set_eq : set A → set A → Prop }.
+Arguments set_eq : simpl never.
 
 Definition empty_set {A} := mkset (λ _ : A, False).
 

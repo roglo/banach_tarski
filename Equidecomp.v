@@ -24,7 +24,7 @@ split; [ apply is_partition_single | ].
 split; [ apply is_partition_single | ].
 split; [ reflexivity | ].
 constructor; [ | constructor ].
-exists (Xtransl 0); simpl.
+exists (Xtransl 0); unfold set_eq; simpl.
 unfold xtransl; intros (x, y, z).
 rewrite Rminus_0_r.
 reflexivity.
@@ -253,8 +253,7 @@ assert
      apply length_zero_iff_nil in Hlen3; subst gl; assumption.
 
      destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
-     rewrite HPEU.
-     Opaque set_eq. simpl. Transparent set_eq.
+     rewrite HPEU; simpl.
      rewrite union_list_app; [ | reflexivity ].
      simpl in Hlen3; apply Nat.succ_inj in Hlen3.
      apply union_morph.
@@ -266,8 +265,7 @@ assert
        apply included_group with g₁.
        rewrite app_gr_inv_r.
        intros p Hp.
-       pose proof Hgl 0 p as Hgl₁.
-       Opaque set_eq. simpl in Hgl₁. Transparent set_eq.
+       pose proof Hgl 0 p as Hgl₁; simpl in Hgl₁.
        apply Hgl₁ in Hp.
        destruct PF as [| P₁ PF]; [ contradiction | simpl in Hp ].
        left; assumption.
@@ -289,11 +287,10 @@ assert
        right; assumption.
 
        intros i.
-       pose proof (Hgl (S i)) as H.
-       Opaque set_eq. simpl in H. Transparent set_eq.
+       pose proof (Hgl (S i)) as H; simpl in H.
        assumption.
 
-   Opaque set_eq. simpl. Transparent set_eq.
+   simpl.
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
