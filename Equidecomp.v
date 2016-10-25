@@ -204,12 +204,10 @@ apply Forall2_Forall_combine in HEF.
 remember (combine PE PF) as PEF eqn:HPEF.
 set (s := set_equiv).
 assert
-  (Hgl : ∃ gl,
-   Forall (λ '((gi, Ei), Fi), (app_gr gi Ei = Fi)%S)
-     (combine (combine gl PE) PF)).
+  (Hgl : ∃ gl, length gl = length PE ∧
+   ∀ i, i < length PE →
+   (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i PF ∅)%S).
 
-exists []; constructor.
-(* !!!!! *)
 bbb.
  subst PEF.
  clear - HEF.

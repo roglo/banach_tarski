@@ -37,6 +37,7 @@ Fixpoint gr_inv f :=
   | Comb g h => Comb (gr_inv h) (gr_inv g)
   end.
 
+Definition gr_ident := Xtransl 0.
 Definition app_gr_inv g := app_gr (gr_inv g).
 
 Theorem gr_subst : ∀ (s := set_equiv) g E F,
