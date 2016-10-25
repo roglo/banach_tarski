@@ -193,20 +193,6 @@ split.
   eapply HPij; [ apply Hd | split; eassumption ].
 Qed.
 
-Fixpoint combine3 {A B C} (al : list A) (bl : list B) (cl : list C) :=
-  match al with
-  | [] => []
-  | a :: al' =>
-      match bl with
-      | [] => []
-      | b :: bl' =>
-          match cl with
-          | [] => []
-          | c :: cl' => (a, b, c) :: combine3 al' bl' cl'
-          end
-      end
-  end.
-
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
 intros E F G HEF HFG.
@@ -217,7 +203,10 @@ pose proof partition_prod_is_partition _ F PF P'F HPF HP'F as HFQR.
 apply Forall2_Forall_combine in HEF.
 remember (combine PE PF) as PEF eqn:HPEF.
 set (s := set_equiv).
-assert (Hgl : ∃ gl, Forall (λ '(gi, Ei, Fi), (app_gr gi Ei = Fi)%S) (combine3 gl PE PF)).
+assert
+  (Hgl : ∃ gl,
+   Forall (λ '((gi, Ei), Fi), (app_gr gi Ei = Fi)%S)
+     (combine (combine gl PE) PF)).
  subst PEF.
  clear - HEF.
  revert PF HEF.
@@ -231,7 +220,7 @@ assert (Hgl : ∃ gl, Forall (λ '(gi, Ei, Fi), (app_gr gi Ei = Fi)%S) (combine3
 
  destruct Hgl as (gl, Hgl).
  remember
-   (flat_map (λ '(gi, Ei), map (λ P'i, Ei ∩ app_gr_inv gi E'i) P'F)
+   (flat_map (λ '(gi, Ei), map (λ F'j, Ei ∩ app_gr_inv gi F'j) P'F)
       (combine gl PE)) as PPE eqn:HPPE.
  assert (is_partition E PPE).
   split.
