@@ -207,20 +207,34 @@ assert
   (Hgl : ∃ gl, length gl = length PE ∧
    ∀ i, i < length PE →
    (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i PF ∅)%S).
+ subst PEF.
+ clear HPE HPF HPFF'.
+ revert PF Hlen1 HEF.
+ induction PE as [| E₁ PE]; intros.
+  exists []; split; [ reflexivity | ].
+  intros i Hlen; exfalso; revert Hlen; apply Nat.nlt_0_r.
+
+  destruct PF as [| F₁ PF]; [ discriminate Hlen1 | ].
+  simpl in Hlen1; apply Nat.succ_inj in Hlen1.
+  remember set_eq as f; simpl in HEF; apply Forall_inv2 in HEF; subst f.
+  destruct HEF as ((g₁, HgEF), HEF).
+  apply IHPE in HEF; [ | assumption ].
+  destruct HEF as (gl & Hlen3 & HEF).
+  exists (g₁ :: gl).
+  split; [ simpl; rewrite Hlen3; reflexivity | ].
+  intros i Hlen.
+  remember set_eq as f; simpl; subst f.
+  destruct i; [ assumption | ].
+  simpl in Hlen; apply Nat.succ_lt_mono in Hlen.
+  apply HEF; assumption.
+
+ destruct Hgl as (gl & Hlen3 & Hgl).
+ move P'F before PF; move P'G before P'F.
+ move gl before P'G.
+ move Hlen2 before Hlen1.
+ move Hlen3 before Hlen2.
 
 bbb.
- subst PEF.
- clear - HEF.
- revert PF HEF.
- induction PE as [| PE₁ PE]; intros; [ exists []; constructor | ].
- destruct PF as [| PF₁ PF]; [ exists []; constructor | simpl in HEF ].
- apply Forall_inv2 in HEF.
- destruct HEF as ((g₁, Hg), HEF).
- apply IHPE in HEF.
- destruct HEF as (gl, HEF).
- exists (g₁ :: gl); constructor; assumption.
-
- destruct Hgl as (gl, Hgl).
  assert (Hlen3 : length gl = length PF).
   transitivity (length PEF); [ assumption | ].
   rewrite HPEF, combine_length, Hlen1, Nat.min_idempotent.
