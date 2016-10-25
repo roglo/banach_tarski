@@ -37,7 +37,7 @@ Notation "E₁ '∪' E₂" := (union E₁ E₂)
 Notation "E₁ '∖' E₂" := (subtract E₁ E₂) (at level 50).
 Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60).
 Notation "'⋃' Es" := (union_list Es) (at level 55).
-Notation "E .[ i ]" := (List.nth i E ∅) (at level 1, format "E .[ i ]").
+Notation "E .[ i ]" := (List.nth i E ∅) (at level 1, format "E '[' .[ i ] ']'").
 
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : set A), ∀ x, x ∈ E₁ ↔ x ∈ E₂).
 
