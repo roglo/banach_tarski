@@ -286,6 +286,13 @@ assert
       assumption.
 
    intros i j Hij.
+   subst PPE.
+   destruct i.
+    destruct j; [ exfalso; apply Hij; reflexivity | ].
+    remember (combine gl PE) as cgp eqn:Hcgp.
+    symmetry in Hcgp.
+    destruct cgp as [| (g₁, E₁) cgp]; [ apply intersection_empty_r | ].
+    simpl.
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)

@@ -124,13 +124,21 @@ Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : set A),
   → ∀ p, p ∈ E ↔ p ∈ F.
 Proof. intros s * HEF; apply HEF. Qed.
 
-Theorem union_empty_r : ∀ A s, s = set_equiv → ∀ (F : set A),
+Theorem union_empty_r : ∀ A (s := set_equiv) (F : set A),
   (F ∪ ∅ = F)%S.
 Proof.
-intros * Hs *.
+intros.
 subst s; intros x.
 split; intros H; [ | left; assumption ].
 destruct H as [H| H]; [ assumption | contradiction ].
+Qed.
+
+Theorem intersection_empty_r : ∀ A (s := set_equiv) (F : set A),
+  (F ∩ ∅ = ∅)%S.
+Proof.
+intros.
+subst s; intros x.
+split; intros H; [ destruct H as (_, H); contradiction | contradiction ].
 Qed.
 
 Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : set A),
