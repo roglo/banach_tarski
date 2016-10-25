@@ -74,6 +74,9 @@ split; intros H; [ eapply gr_subst; eassumption | ].
 symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
+Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
+Proof. reflexivity. Qed.
+
 Theorem app_gr_inv_l : ∀ (s := set_equiv) g E,
   (app_gr_inv g (app_gr g E) = E)%S.
 Proof.
@@ -201,6 +204,35 @@ induction EL as [| E₁ EL].
 
   destruct Hx as [Hx| Hx]; [ left; assumption | ].
   right; apply IHEL; assumption.
+Qed.
+
+Theorem included_group : ∀ E F g, E ⊂ F ↔ app_gr g E ⊂ app_gr g F.
+Proof.
+intros.
+split; intros HEF.
+ revert E F HEF.
+ induction g as [e| dx| ]; intros.
+  intros p Hp; apply HEF; assumption.
+
+  intros (x, y, z) Hp; apply HEF; assumption.
+
+  apply IHg1, IHg2; assumption.
+
+ intros p Hp.
+ revert p E F HEF Hp.
+ induction g as [e| dx| ]; intros.
+  pose proof HEF (rotate e p) as H; simpl in H.
+  rewrite rotate_neg_rotate in H; apply H, Hp.
+
+  destruct p as (x, y, z); simpl in HEF.
+  pose proof HEF (P (x + dx) y z) as H; simpl in H.
+  unfold Rminus in H.
+  rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r in H.
+  apply H, Hp.
+
+  simpl in HEF.
+  eapply IHg2; [ | eassumption ].
+  intros q Hq; eapply IHg1; eassumption.
 Qed.
 
 Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
