@@ -231,8 +231,8 @@ assert (Hgl : ∃ gl, Forall (λ '(gi, Ei, Fi), (app_gr gi Ei = Fi)%S) (combine3
 
  destruct Hgl as (gl, Hgl).
  remember
-   (flat_map (λ '(gi, Pi), map (λ P'i, app_gr_inv gi (Pi ∩ P'i)) P'F)
-      (combine gl PF)) as PPE eqn:HPPE.
+   (flat_map (λ '(gi, Ei), map (λ P'i, Ei ∩ app_gr_inv gi E'i) P'F)
+      (combine gl PE)) as PPE eqn:HPPE.
  assert (is_partition E PPE).
   split.
 
