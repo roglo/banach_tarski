@@ -8,6 +8,9 @@
 Require Import Utf8 List Relations NPeano.
 Import ListNotations.
 
+Theorem match_id : ∀ A a (b : A), match a with O => b | S _ => b end = b.
+Proof. intros A a b; destruct a; reflexivity. Qed.
+
 Theorem nat_div_add_once : ∀ a b, b ≠ 0 → (a + b) / b = S (a / b).
 Proof.
 intros a b Hb.

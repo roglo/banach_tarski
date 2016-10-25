@@ -205,14 +205,16 @@ remember (combine PE PF) as PEF eqn:HPEF.
 set (s := set_equiv).
 assert
   (Hgl : ∃ gl, length gl = length PE ∧
-   ∀ i, i < length PE →
-   (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i PF ∅)%S).
+   ∀ i, (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i PF ∅)%S).
  subst PEF.
  clear HPE HPF HPFF'.
  revert PF Hlen1 HEF.
  induction PE as [| E₁ PE]; intros.
   exists []; split; [ reflexivity | ].
-  intros i Hlen; exfalso; revert Hlen; apply Nat.nlt_0_r.
+  symmetry in Hlen1; apply length_zero_iff_nil in Hlen1; subst PF.
+  intros i; simpl.
+  do 2 rewrite match_id; simpl.
+  intros (x, y, z); split; contradiction.
 
   destruct PF as [| F₁ PF]; [ discriminate Hlen1 | ].
   simpl in Hlen1; apply Nat.succ_inj in Hlen1.
@@ -222,17 +224,20 @@ assert
   destruct HEF as (gl & Hlen3 & HEF).
   exists (g₁ :: gl).
   split; [ simpl; rewrite Hlen3; reflexivity | ].
-  intros i Hlen.
+  intros i.
   remember set_eq as f; simpl; subst f.
-  destruct i; [ assumption | ].
-  simpl in Hlen; apply Nat.succ_lt_mono in Hlen.
-  apply HEF; assumption.
+  destruct i; [ assumption | apply HEF ].
 
  destruct Hgl as (gl & Hlen3 & Hgl).
  move P'F before PF; move P'G before P'F.
  move gl before P'G.
  move Hlen2 before Hlen1.
  move Hlen3 before Hlen2.
+ assert
+   (Hgli :
+    ∀ i, (app_gr_inv (nth i gl gr_ident) (nth i PF ∅) = nth i PE ∅)%S).
+  intros i.
+  rewrite <- Hgl, app_gr_inv_l; reflexivity.
 
 bbb.
  assert (Hlen3 : length gl = length PF).
