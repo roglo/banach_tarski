@@ -66,6 +66,44 @@ Qed.
 
 (*
 Theorem partition_combine_is_partition :
+  ∀ A (s := set_equiv) fl (E F : set A) PE PF P'F,
+  (E = ⋃ PE)%S
+  → (F = ⋃ PF)%S
+  → length PE = length PF
+  → length fl = length PE
+  → (∀ i, (nth i fl (λ E, E) PE.[i] = PF.[i])%S)
+  → F ⊂ ⋃ P'F
+  → is_partition E (partition_combine fl PE P'F).
+Proof.
+*)
+
+(*
+Theorem partition_combine_is_partition :
+  ∀ A B (s := set_equiv) (fl : list (set A → set B)) E PE PF,
+  is_partition E (partition_combine fl PE PF).
+Proof.
+bbb.
+
+Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : set A) P Q,
+  is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
+Proof.
+intros * HEP HEQ.
+rewrite equiv_partition_prod_prod2.
+unfold partition_prod2.
+set (fl := map (λ _ E : set A, E) P).
+eapply partition_combine_is_partition.
+bbb.
+
+set (gl := repeat (λ E, (E : set A)) (length P)).
+destruct HEP as (HEPU, HEPI).
+destruct HEQ as (HEQU, HEQI).
+pose proof partition_combine_is_partition _ gl E E P Q Q HEPU HEQU.
+bbb.
+*)
+
+(*
+  Hgl : ∀ i : nat, (app_gr (nth i gl gr_ident) PE.[i] = PF.[i])%S
+Theorem partition_combine_is_partition :
   ∀ A (s := set_equiv) (E : set A) gl PE PF,
   is_partition E PE
   → is_partition (⋃ map (λ '(gi, Ei), gi Ei) (combine gl PE)) PF
@@ -262,12 +300,6 @@ assert
  move Hlen3 before Hlen2.
  remember (partition_combine (map app_gr_inv gl) PE P'F) as PPE eqn:HPPE.
  assert (is_partition E PPE).
-(*
-rewrite HPPE.
-apply partition_combine_is_partition.
-assumption.
-bbb.
-*)
   split.
    subst PPE PEF.
    clear HEF HPFF' HFG G P'G HP'G Hlen2.
