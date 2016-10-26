@@ -44,43 +44,35 @@ exists (gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
 Qed.
 
-Definition partition_combine {A} gl (PE PF : list (set A)) :=
-  flat_map (λ '(gi, Ei), map (λ Fj, Ei ∩ gi Fj) PF)
-    (combine gl PE).
+Definition partition_combine {A} fl (PE PF : list (set A)) :=
+  flat_map (λ '(fi, Ei), map (λ Fj, Ei ∩ fi Fj) PF)
+    (combine fl PE).
 
-Definition partition_prod {A} (PL QL : list (set A)) :=
-  flat_map (λ p, map (intersection p) QL) PL.
+Definition partition_prod {A} (PE PF : list (set A)) :=
+  flat_map (λ p, map (intersection p) PF) PE.
 
 Definition partition_prod2 {A} (PE PF : list (set A)) :=
-  partition_combine (map (λ _ E, E) PF) PE PF.
-
-Check @partition_prod.
-Check @partition_prod2.
+  partition_combine (map (λ _ E, E) PE) PE PF.
 
 Theorem equiv_partition_prod_prod2 : ∀ A (PE PF : list (set A)),
   partition_prod PE PF = partition_prod2 PE PF.
 Proof.
 intros.
-(* à vérifier *)
-bbb.
 unfold partition_prod, partition_prod2.
 unfold partition_combine.
-revert PF.
 induction PE as [| E₁ PE]; intros; [ destruct PF; reflexivity | simpl ].
-destruct PF as [| F₁ PF].
- clear; simpl.
- induction PE; [ reflexivity | apply IHPE ].
+f_equal; apply IHPE.
+Qed.
 
- simpl; f_equal; f_equal.
- pose proof IHPE (F₁ :: PF).
- simpl in H.
- rewrite H.
-f_equal.
-destruct PE; [ destruct PF; reflexivity | ].
-destruct PF.
-simpl.
-
-bbb.
+(*
+Theorem partition_combine_is_partition :
+  ∀ A (s := set_equiv) (E : set A) gl PE PF,
+  is_partition E PE
+  → is_partition (⋃ map (λ '(gi, Ei), gi Ei) (combine gl PE)) PF
+  → is_partition E (partition_combine gl PE PF).
+Proof.
+intros * HE HF.
+*)
 
 Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
   partition_prod [] Q = [].
@@ -268,18 +260,23 @@ assert
  move gl before P'G.
  move Hlen2 before Hlen1.
  move Hlen3 before Hlen2.
- remember (partition_combine (map (λ g, app_gr (gr_inv g)) gl) PE P'F)
-   as PPE eqn:HPPE.
+ remember (partition_combine (map app_gr_inv gl) PE P'F) as PPE eqn:HPPE.
  assert (is_partition E PPE).
+(*
+rewrite HPPE.
+apply partition_combine_is_partition.
+assumption.
+bbb.
+*)
   split.
    subst PPE PEF.
-   unfold partition_combine.
    clear HEF HPFF' HFG G P'G HP'G Hlen2.
    destruct HPE as (HPEU, _).
    destruct HPF as (HPFU, _).
    destruct HP'F as (HP'FU, _).
    assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; assumption).
    clear HP'FU.
+   unfold partition_combine.
    revert E F gl PF P'F HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
    induction PE as [| E₁ PE]; intros.
     apply length_zero_iff_nil in Hlen3; subst gl; assumption.
