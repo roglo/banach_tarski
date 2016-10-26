@@ -44,7 +44,7 @@ exists (gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
 Qed.
 
-Definition partition_combine {A} fl (PE PF : list (set A)) :=
+Definition partition_combine {A B} (fl : list (set A → set B)) PE PF :=
   flat_map (λ '(fi, Ei), map (λ Fj, Ei ∩ fi Fj) PF)
     (combine fl PE).
 
