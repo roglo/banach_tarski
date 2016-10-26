@@ -66,6 +66,9 @@ Add Parametric Relation A : (set A) (@set_eq A set_equiv)
  transitivity proved by (set_eq_trans A)
  as set_eq_rel.
 
+Theorem eq_set_eq : ∀ A (s := set_equiv) (x y : set A), x = y → (x = y)%S.
+Proof. intros; subst x; reflexivity. Qed.
+
 Theorem included_trans A : transitive _ (@included A).
 Proof.
 intros E F G HEF HFG x Hx.

@@ -110,20 +110,16 @@ split.
    simpl.
    destruct (lt_dec i (length PF)) as [Hi| Hi].
     rewrite app_nth1; [ | rewrite map_length; assumption ].
+    pose proof Hfle 0 as H; simpl in H.
+    pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) PF ∅ i as Him; simpl in Him.
+    apply eq_set_eq in Him.
+    rewrite H, intersection_empty_r in Him; rewrite Him.
     destruct (lt_dec j (length PF)) as [Hj| Hj].
      rewrite app_nth1; [ | rewrite map_length; assumption ].
-     pose proof Hfli 0 i j Hij as Hjk.
-     simpl in Hjk.
-     pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) PF ∅ i as Him; simpl in Him.
+     pose proof Hfli 0 i j Hij as Hjk; simpl in Hjk.
      pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) PF ∅ j as Hjm; simpl in Hjm.
-     pose proof Hfle 0 as H; simpl in H.
-Theorem glop : ∀ A (s := set_equiv) (x y : set A), x = y → (x = y)%S.
-Proof. intros; subst x; reflexivity. Qed.
-     apply glop in Him.
-     apply glop in Hjm.
-     rewrite H, intersection_empty_r in Him.
-     rewrite H, intersection_empty_r in Hjm.
-     rewrite Him, Hjm.
+     apply eq_set_eq in Hjm.
+     rewrite H, intersection_empty_r in Hjm; rewrite Hjm.
      rewrite intersection_shuffle0.
      do 2 rewrite <- intersection_assoc.
      rewrite intersection_comm in Hjk; rewrite Hjk.
