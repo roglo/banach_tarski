@@ -150,11 +150,29 @@ subst s; intros x.
 split; intros H; [ destruct H as (_, H); contradiction | contradiction ].
 Qed.
 
-Theorem union_assoc : ∀ A s, s = set_equiv → ∀ (E F G : set A),
+Theorem intersection_comm : ∀ A (s := set_equiv) (E F : set A),
+  (E ∩ F = F ∩ E)%S.
+Proof.
+intros; intros x.
+split; intros H; destruct H as (HE & HF); split; assumption.
+Qed.
+
+Theorem intersection_assoc : ∀ A (s := set_equiv) (E F G : set A),
+  (E ∩ (F ∩ G) = (E ∩ F) ∩ G)%S.
+Proof.
+intros; intros x.
+split; intros H.
+ destruct H as (HE & (HF & HG)).
+ split; [ split; assumption | assumption ].
+
+ destruct H as ((HE & HF) & HG).
+ split; [ assumption | split; assumption ].
+Qed.
+
+Theorem union_assoc : ∀ A (s := set_equiv) (E F G : set A),
   (E ∪ (F ∪ G) = (E ∪ F) ∪ G)%S.
 Proof.
-intros * Hs E *.
-unfold set_eq, union; subst s; intros x.
+intros; intros x.
 split; intros H.
  destruct H as [H| [H| H]].
   left; left; assumption.
@@ -167,6 +185,18 @@ split; intros H.
   right; right; assumption.
 Qed.
 
+Theorem intersection_shuffle0 : ∀ A (s := set_equiv) (E F G : set A),
+  (E ∩ F ∩ G = E ∩ G ∩ F)%S.
+Proof.
+intros; intros x.
+split; intros H.
+ destruct H as ((HE & HF) & HG).
+ split; [ split; assumption | assumption ].
+
+ destruct H as ((HE & HF) & HG).
+ split; [ split; assumption | assumption ].
+Qed.
+
 Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (set A)),
   (⋃ (P₁ ++ P₂) = (⋃ P₁) ∪ (⋃ P₂))%S.
 Proof.
@@ -177,7 +207,7 @@ induction P₂ as [| Q]; intros.
  rewrite union_empty_r; reflexivity.
 
  rewrite cons_comm_app, app_assoc; simpl; subst s.
- rewrite IHP₂, union_assoc; [ | reflexivity ].
+ rewrite IHP₂, union_assoc.
  intros x.
  split; intros H.
   destruct H as [H| H]; [ left | right; assumption ].

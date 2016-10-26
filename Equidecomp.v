@@ -115,8 +115,38 @@ split.
      pose proof Hfli 0 i j Hij as Hjk.
      simpl in Hjk.
      pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) PF ∅ i as Him; simpl in Him.
-     pose proof Hfle 0 as H.
-     simpl in H.
+     pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) PF ∅ j as Hjm; simpl in Hjm.
+     pose proof Hfle 0 as H; simpl in H.
+Theorem glop : ∀ A (s := set_equiv) (x y : set A), x = y → (x = y)%S.
+Proof. intros; subst x; reflexivity. Qed.
+     apply glop in Him.
+     apply glop in Hjm.
+     rewrite H, intersection_empty_r in Him.
+     rewrite H, intersection_empty_r in Hjm.
+     rewrite Him, Hjm.
+     rewrite intersection_shuffle0.
+     do 2 rewrite <- intersection_assoc.
+     rewrite intersection_comm in Hjk; rewrite Hjk.
+     do 2 rewrite intersection_empty_r.
+     reflexivity.
+
+     apply Nat.nlt_ge in Hj.
+     rewrite app_nth2; [ | rewrite map_length; assumption ].
+     rewrite map_length.
+bbb.
+
+rewrite H in Him.
+bbb.
+     set (ff := (λ Fj, E₁ ∩ f₁ Fj)) in Him |-*.
+SearchAbout (nth _ (map _ _)).
+     induction PF as [| F₁ PF].
+      simpl; do 2 rewrite match_id; apply intersection_empty_l.
+
+      simpl in Him; simpl.
+      destruct i.
+       destruct j; [ exfalso; apply Hij; reflexivity | ].
+       simpl in Hjk.
+       rewrite Him.
 bbb.
 
 (*
