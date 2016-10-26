@@ -70,14 +70,15 @@ Theorem partition_combine_is_partition :
   → length fl = length PE
   → (∀ i, PE.[i] ⊂ ⋃ map (nth i fl (λ E, E)) PF)
   → (∀ i j k, j ≠ k → (nth i fl (λ E, E) PF.[j] ∩ nth i fl (λ E, E) PF.[k] = ∅)%S)
+  → (∀ i, (nth i fl (λ E, E) ∅ = ∅)%S)
   → is_partition E (partition_combine fl PE PF).
 Proof.
-intros * HPE HPF Hlen3 Hfl Hfli.
+intros * HPE HPF Hlen3 Hfl Hfli Hfle.
 split.
  destruct HPE as (HPEU, _).
  destruct HPF as (HPFU, _).
  assert (HUPF : F ⊂ ⋃ PF) by (rewrite HPFU; intros x H; assumption).
- clear HPFU Hfli.
+ clear HPFU Hfli Hfle.
  unfold partition_combine.
  revert E F fl PF HPEU HUPF Hlen3 Hfl.
  induction PE as [| E₁ PE]; intros.
@@ -98,7 +99,32 @@ split.
    intros i; apply (Hfl (S i)).
 
  intros i j Hij.
+ unfold partition_combine; simpl.
+ revert i j E F fl PF HPE HPF Hlen3 Hfl Hfli Hfle Hij.
+ induction PE as [| E₁ PE]; intros.
+  destruct fl; simpl; do 2 rewrite match_id; apply intersection_empty_l.
+
+  destruct fl as [| f₁ fl].
+   simpl; do 2 rewrite match_id; apply intersection_empty_l.
+
+   simpl.
+   destruct (lt_dec i (length PF)) as [Hi| Hi].
+    rewrite app_nth1; [ | rewrite map_length; assumption ].
+    destruct (lt_dec j (length PF)) as [Hj| Hj].
+     rewrite app_nth1; [ | rewrite map_length; assumption ].
+     pose proof Hfli 0 i j Hij as Hjk.
+     simpl in Hjk.
+     pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) PF ∅ i as Him; simpl in Him.
+     pose proof Hfle 0 as H.
+     simpl in H.
 bbb.
+
+(*
+Theorem glop :
+  (map f E).[i] = f E.[i].
+
+bbb.
+*)
 
 Theorem partition_prod_is_partition2 : ∀ A (s := set_equiv) (E : set A) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
