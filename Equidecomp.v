@@ -45,8 +45,7 @@ apply app_gr_inv_l.
 Qed.
 
 Definition partition_combine {A B} (fl : list (set A → set B)) PE PF :=
-  flat_map (λ '(fi, Ei), map (λ Fj, Ei ∩ fi Fj) PF)
-    (combine fl PE).
+  flat_map (λ '(fi, Ei), map (λ Fj, Ei ∩ fi Fj) PF) (combine fl PE).
 
 Definition partition_prod {A} (PE PF : list (set A)) :=
   flat_map (λ p, map (intersection p) PF) PE.
@@ -64,53 +63,55 @@ induction PE as [| E₁ PE]; intros; [ destruct PF; reflexivity | simpl ].
 f_equal; apply IHPE.
 Qed.
 
-(*
 Theorem partition_combine_is_partition :
-  ∀ A (s := set_equiv) fl (E F : set A) PE PF P'F,
-  (E = ⋃ PE)%S
-  → (F = ⋃ PF)%S
-  → length PE = length PF
+  ∀ A (s := set_equiv) (fl : list (set A → set A)) E F PE P'F,
+  is_partition E PE
+  → is_partition F P'F
   → length fl = length PE
-  → (∀ i, (nth i fl (λ E, E) PE.[i] = PF.[i])%S)
-  → F ⊂ ⋃ P'F
+  → (∀ i, PE.[i] ⊂ ⋃ map (nth i fl (λ E, E)) P'F)
   → is_partition E (partition_combine fl PE P'F).
 Proof.
-*)
+intros * HPE HP'F Hlen3 Hfl.
+split.
+ destruct HPE as (HPEU, _).
+ destruct HP'F as (HP'FU, _).
+ assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; assumption).
+ clear HP'FU.
+ unfold partition_combine.
+ revert E F fl P'F HPEU HUP'F Hlen3 Hfl.
+ induction PE as [| E₁ PE]; intros.
+  destruct fl as [| f₁ fl]; [ assumption | discriminate Hlen3 ].
 
-(*
-Theorem partition_combine_is_partition :
-  ∀ A B (s := set_equiv) (fl : list (set A → set B)) E PE PF,
-  is_partition E (partition_combine fl PE PF).
-Proof.
-bbb.
+  destruct fl as [| f₁ fl]; [ discriminate Hlen3 | ].
+  rewrite HPEU; simpl.
+  rewrite union_list_app; [ | reflexivity ].
+  simpl in Hlen3; apply Nat.succ_inj in Hlen3.
+  apply union_morph.
+   pose proof union_intersection_self A E₁ (map f₁ P'F).
+   rewrite map_map in H.
+   apply H.
+   pose proof Hfl 0 as Hf; simpl in Hf.
+   apply Hf.
 
-Theorem partition_prod_is_partition : ∀ A (s := set_equiv) (E : set A) P Q,
+   eapply IHPE; try eassumption; [ reflexivity | ].
+   intros i; apply (Hfl (S i)).
+
+ intros i j Hij.
+Admitted.
+
+Theorem partition_prod_is_partition2 : ∀ A (s := set_equiv) (E : set A) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
 Proof.
-intros * HEP HEQ.
+intros A s E P Q HPE HQE.
 rewrite equiv_partition_prod_prod2.
 unfold partition_prod2.
-set (fl := map (λ _ E : set A, E) P).
 eapply partition_combine_is_partition.
-bbb.
-
-set (gl := repeat (λ E, (E : set A)) (length P)).
-destruct HEP as (HEPU, HEPI).
-destruct HEQ as (HEQU, HEQI).
-pose proof partition_combine_is_partition _ gl E E P Q Q HEPU HEQU.
-bbb.
-*)
-
-(*
-  Hgl : ∀ i : nat, (app_gr (nth i gl gr_ident) PE.[i] = PF.[i])%S
-Theorem partition_combine_is_partition :
-  ∀ A (s := set_equiv) (E : set A) gl PE PF,
-  is_partition E PE
-  → is_partition (⋃ map (λ '(gi, Ei), gi Ei) (combine gl PE)) PF
-  → is_partition E (partition_combine gl PE PF).
-Proof.
-intros * HE HF.
-*)
+ assumption.
+ eassumption.
+ rewrite map_length; reflexivity.
+ intros i.
+(* mouais... *)
+Abort.
 
 Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
   partition_prod [] Q = [].
@@ -298,10 +299,10 @@ assert
  move gl before P'G.
  move Hlen2 before Hlen1.
  move Hlen3 before Hlen2.
- remember (partition_combine (map app_gr_inv gl) PE P'F) as PPE eqn:HPPE.
- assert (is_partition E PPE).
+ set (fl := map app_gr_inv gl).
+ subst PEF.
+ assert (is_partition E (partition_combine fl PE P'F)).
   split.
-   subst PPE PEF.
    clear HEF HPFF' HFG G P'G HP'G Hlen2.
    destruct HPE as (HPEU, _).
    destruct HPF as (HPFU, _).
@@ -309,6 +310,7 @@ assert
    assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; assumption).
    clear HP'FU.
    unfold partition_combine.
+   subst fl.
    revert E F gl PF P'F HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
    induction PE as [| E₁ PE]; intros.
     apply length_zero_iff_nil in Hlen3; subst gl; assumption.
@@ -351,6 +353,7 @@ assert
 
    intros i j Hij.
    remember (length P'F) as len eqn:Hlen.
+bbb.
    assert
      ((PPE.[i] =
       PE.[i/len] ∩ app_gr_inv (nth (i/len) gl gr_ident) P'F.[i mod len])%S).
