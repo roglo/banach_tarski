@@ -97,7 +97,7 @@ split.
    intros i; apply (Hfl (S i)).
 
  intros i j Hij.
-Admitted.
+bbb.
 
 Theorem partition_prod_is_partition2 : ∀ A (s := set_equiv) (E : set A) P Q,
   is_partition E P → is_partition E Q → is_partition E (partition_prod P Q).
@@ -105,13 +105,33 @@ Proof.
 intros A s E P Q HPE HQE.
 rewrite equiv_partition_prod_prod2.
 unfold partition_prod2.
-eapply partition_combine_is_partition.
- assumption.
- eassumption.
+eapply partition_combine_is_partition; try eassumption.
  rewrite map_length; reflexivity.
+
  intros i.
-(* mouais... *)
-Abort.
+ assert (nth i (map (λ _ E : set A, E) P) (λ E, E) = λ E, E).
+  clear; revert i.
+  induction P as [| E EL]; intros; [ simpl; apply match_id | simpl ].
+  destruct i; [ reflexivity | apply IHEL ].
+
+  rewrite H.
+  assert (map (λ E, E) Q = Q).
+   clear.
+   induction Q as [| E EL]; [ reflexivity | simpl ].
+   f_equal; apply IHEL.
+
+   rewrite H0.
+   destruct HQE as (HQEU, _); rewrite <- HQEU.
+   destruct HPE as (HPEU, _); rewrite HPEU.
+   clear.
+   revert i.
+   induction P as [| E EL]; intros.
+    simpl; rewrite match_id.
+    intros x Hx; assumption.
+
+    simpl.
+    destruct i; [ left; assumption | right; eapply IHEL; eassumption ].
+Qed.
 
 Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
   partition_prod [] Q = [].
