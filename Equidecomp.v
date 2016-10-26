@@ -44,8 +44,43 @@ exists (gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
 Qed.
 
+Definition partition_combine {A} gl (PE PF : list (set A)) :=
+  flat_map (λ '(gi, Ei), map (λ Fj, Ei ∩ gi Fj) PF)
+    (combine gl PE).
+
 Definition partition_prod {A} (PL QL : list (set A)) :=
   flat_map (λ p, map (intersection p) QL) PL.
+
+Definition partition_prod2 {A} (PE PF : list (set A)) :=
+  partition_combine (map (λ _ E, E) PF) PE PF.
+
+Check @partition_prod.
+Check @partition_prod2.
+
+Theorem equiv_partition_prod_prod2 : ∀ A (PE PF : list (set A)),
+  partition_prod PE PF = partition_prod2 PE PF.
+Proof.
+intros.
+(* à vérifier *)
+bbb.
+unfold partition_prod, partition_prod2.
+unfold partition_combine.
+revert PF.
+induction PE as [| E₁ PE]; intros; [ destruct PF; reflexivity | simpl ].
+destruct PF as [| F₁ PF].
+ clear; simpl.
+ induction PE; [ reflexivity | apply IHPE ].
+
+ simpl; f_equal; f_equal.
+ pose proof IHPE (F₁ :: PF).
+ simpl in H.
+ rewrite H.
+f_equal.
+destruct PE; [ destruct PF; reflexivity | ].
+destruct PF.
+simpl.
+
+bbb.
 
 Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
   partition_prod [] Q = [].
@@ -233,12 +268,12 @@ assert
  move gl before P'G.
  move Hlen2 before Hlen1.
  move Hlen3 before Hlen2.
- remember
-   (flat_map (λ '(gi, Ei), map (λ F'j, Ei ∩ app_gr_inv gi F'j) P'F)
-      (combine gl PE)) as PPE eqn:HPPE.
+ remember (partition_combine (map (λ g, app_gr (gr_inv g)) gl) PE P'F)
+   as PPE eqn:HPPE.
  assert (is_partition E PPE).
   split.
    subst PPE PEF.
+   unfold partition_combine.
    clear HEF HPFF' HFG G P'G HP'G Hlen2.
    destruct HPE as (HPEU, _).
    destruct HPF as (HPFU, _).
@@ -290,7 +325,7 @@ assert
    assert
      ((PPE.[i] =
       PE.[i/len] ∩ app_gr_inv (nth (i/len) gl gr_ident) P'F.[i mod len])%S).
-    subst PPE.
+    subst PPE; unfold partition_combine.
     clear - Hlen3 Hlen.
     revert i gl Hlen3.
     induction PE as [| E₁ PE]; intros.
