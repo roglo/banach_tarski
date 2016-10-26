@@ -64,21 +64,22 @@ f_equal; apply IHPE.
 Qed.
 
 Theorem partition_combine_is_partition :
-  ∀ A (s := set_equiv) (fl : list (set A → set A)) E F PE P'F,
+  ∀ A (s := set_equiv) (fl : list (set A → set A)) E F PE PF,
   is_partition E PE
-  → is_partition F P'F
+  → is_partition F PF
   → length fl = length PE
-  → (∀ i, PE.[i] ⊂ ⋃ map (nth i fl (λ E, E)) P'F)
-  → is_partition E (partition_combine fl PE P'F).
+  → (∀ i, PE.[i] ⊂ ⋃ map (nth i fl (λ E, E)) PF)
+  → (∀ i j k, j ≠ k → (nth i fl (λ E, E) PF.[j] ∩ nth i fl (λ E, E) PF.[k] = ∅)%S)
+  → is_partition E (partition_combine fl PE PF).
 Proof.
-intros * HPE HP'F Hlen3 Hfl.
+intros * HPE HPF Hlen3 Hfl Hfli.
 split.
  destruct HPE as (HPEU, _).
- destruct HP'F as (HP'FU, _).
- assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; assumption).
- clear HP'FU.
+ destruct HPF as (HPFU, _).
+ assert (HUPF : F ⊂ ⋃ PF) by (rewrite HPFU; intros x H; assumption).
+ clear HPFU Hfli.
  unfold partition_combine.
- revert E F fl P'F HPEU HUP'F Hlen3 Hfl.
+ revert E F fl PF HPEU HUPF Hlen3 Hfl.
  induction PE as [| E₁ PE]; intros.
   destruct fl as [| f₁ fl]; [ assumption | discriminate Hlen3 ].
 
@@ -87,7 +88,7 @@ split.
   rewrite union_list_app; [ | reflexivity ].
   simpl in Hlen3; apply Nat.succ_inj in Hlen3.
   apply union_morph.
-   pose proof union_intersection_self A E₁ (map f₁ P'F).
+   pose proof union_intersection_self A E₁ (map f₁ PF).
    rewrite map_map in H.
    apply H.
    pose proof Hfl 0 as Hf; simpl in Hf.
@@ -105,22 +106,21 @@ Proof.
 intros A s E P Q HPE HQE.
 rewrite equiv_partition_prod_prod2.
 unfold partition_prod2.
-eapply partition_combine_is_partition; try eassumption.
- rewrite map_length; reflexivity.
+assert (Hi : ∀ i, nth i (map (λ _ E : set A, E) P) (λ E, E) = λ E, E).
+ clear; intros i; revert i.
+ induction P as [| E EL]; intros; [ simpl; apply match_id | simpl ].
+ destruct i; [ reflexivity | apply IHEL ].
 
- intros i.
- assert (nth i (map (λ _ E : set A, E) P) (λ E, E) = λ E, E).
-  clear; revert i.
-  induction P as [| E EL]; intros; [ simpl; apply match_id | simpl ].
-  destruct i; [ reflexivity | apply IHEL ].
+ eapply partition_combine_is_partition; try eassumption.
+  rewrite map_length; reflexivity.
 
-  rewrite H.
-  assert (map (λ E, E) Q = Q).
+  intros i; rewrite Hi.
+  assert (HQ : map (λ E, E) Q = Q).
    clear.
    induction Q as [| E EL]; [ reflexivity | simpl ].
    f_equal; apply IHEL.
 
-   rewrite H0.
+   rewrite HQ.
    destruct HQE as (HQEU, _); rewrite <- HQEU.
    destruct HPE as (HPEU, _); rewrite HPEU.
    clear.
@@ -131,6 +131,11 @@ eapply partition_combine_is_partition; try eassumption.
 
     simpl.
     destruct i; [ left; assumption | right; eapply IHEL; eassumption ].
+
+ intros i j k Hjk.
+ rewrite Hi.
+ destruct HQE as (HQEU, HQEI).
+ apply HQEI; assumption.
 Qed.
 
 Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
