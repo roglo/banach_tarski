@@ -549,24 +549,24 @@ Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
 intros E F G HEF HFG.
 unfold equidecomposable.
-destruct HEF as (PE & PF & HPE & HPF & HEF).
-destruct HFG as (P'F & P'G & HP'F & HP'G & HFG).
+destruct HEF as (PE & P₁F & HPE & HP₁F & HEF).
+destruct HFG as (P₂F & PG & HP₂F & HPG & HFG).
 set (s := set_equiv).
 assert
   (Hgl : ∃ gl, length gl = length PE ∧
-   ∀ i, (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i PF ∅)%S).
+   ∀ i, (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i P₁F ∅)%S).
  apply Forall2_Forall_combine in HEF.
  destruct HEF as (HEF, Hlen1).
- clear HPE HPF.
- revert PF Hlen1 HEF.
+ clear HPE HP₁F.
+ revert P₁F Hlen1 HEF.
  induction PE as [| E₁ PE]; intros.
   exists []; split; [ reflexivity | ].
-  symmetry in Hlen1; apply length_zero_iff_nil in Hlen1; subst PF.
+  symmetry in Hlen1; apply length_zero_iff_nil in Hlen1; subst P₁F.
   intros i; simpl.
   do 2 rewrite match_id; simpl.
   intros (x, y, z); split; contradiction.
 
-  destruct PF as [| F₁ PF]; [ discriminate Hlen1 | ].
+  destruct P₁F as [| F₁ P₁F]; [ discriminate Hlen1 | ].
   simpl in Hlen1; apply Nat.succ_inj in Hlen1.
   simpl in HEF; apply Forall_inv2 in HEF.
   destruct HEF as ((g₁, HgEF), HEF).
@@ -578,24 +578,24 @@ assert
   destruct i; [ assumption | apply HEF ].
 
  assert
-   (Hhl : ∃ hl, length hl = length P'G ∧
-    ∀ i, (app_gr (nth i hl gr_ident) (nth i P'G ∅) = nth i P'F ∅)%S).
+   (Hhl : ∃ hl, length hl = length PG ∧
+    ∀ i, (app_gr (nth i hl gr_ident) (nth i PG ∅) = nth i P₂F ∅)%S).
   apply Forall2_Forall_combine in HFG.
   destruct HFG as (HFG, Hlen2).
-  clear HP'G HP'F.
-  revert P'F Hlen2 HFG.
-  induction P'G as [| G₁ P'G]; intros.
+  clear HPG HP₂F.
+  revert P₂F Hlen2 HFG.
+  induction PG as [| G₁ PG]; intros.
    exists []; split; [ reflexivity | ].
-   apply length_zero_iff_nil in Hlen2; subst P'F.
+   apply length_zero_iff_nil in Hlen2; subst P₂F.
    intros i; simpl.
    do 2 rewrite match_id; simpl.
    intros (x, y, z); split; contradiction.
 
-   destruct P'F as [| F₁ P'F]; [ discriminate Hlen2 | ].
+   destruct P₂F as [| F₁ P₂F]; [ discriminate Hlen2 | ].
    simpl in Hlen2; apply Nat.succ_inj in Hlen2.
    simpl in HFG; apply Forall_inv2 in HFG.
    destruct HFG as ((h₁, HhFG), HFG).
-   apply IHP'G in HFG; [ | assumption ].
+   apply IHPG in HFG; [ | assumption ].
    destruct HFG as (hl & Hlen3 & HFG).
    exists (gr_inv h₁ :: hl).
    split; [ simpl; rewrite Hlen3; reflexivity | ].
@@ -611,16 +611,16 @@ assert
   apply Forall2_Forall_combine in HFG.
   destruct HFG as (HFG, Hlen2).
   remember (map app_gr_inv gl) as fl eqn:Hfl.
-  assert (Hpcf : is_partition E (partition_combine fl PE P'F)).
-   eapply partition_combine_is_partition with (PF := PF); eassumption.
+  assert (Hpcf : is_partition E (partition_combine fl PE P₂F)).
+   eapply partition_combine_is_partition with (PF := P₁F); eassumption.
 
-   exists (partition_combine fl PE P'F).
+   exists (partition_combine fl PE P₂F).
    remember (map app_gr_inv hl) as f'l eqn:Hf'l.
-   assert (Hpcg : is_partition G (partition_combine f'l P'G PF)).
+   assert (Hpcg : is_partition G (partition_combine f'l PG P₁F)).
     symmetry in Hlen2.
-    eapply partition_combine_is_partition with (PF := P'F); eassumption.
+    eapply partition_combine_is_partition with (PF := P₂F); eassumption.
 
-    exists (partition_combine f'l P'G PF).
+    exists (partition_combine f'l PG P₁F).
     split; [ assumption | ].
     split; [ assumption | ].
     apply Forall2_Forall_combine.
@@ -643,8 +643,8 @@ assert
 *)
      rewrite Hlen2 in Hi.
      rewrite <- Hlen1, Nat.mul_comm in Hj.
-     remember (nth (i / length P'F) gl gr_ident) as gi.
-     remember (nth (j / length PF) hl gr_ident) as hj.
+     remember (nth (i / length P₂F) gl gr_ident) as gi.
+     remember (nth (j / length P₁F) hl gr_ident) as hj.
      exists (Comb (gr_inv hj) gi); subst gi hj; simpl.
      apply eq_set_eq in HU.
      apply eq_set_eq in HV.
@@ -653,10 +653,10 @@ assert
        rewrite <- HU, <- HV; clear HU HV.
        rewrite group_intersection_distr, Hgl.
        rewrite group_intersection_distr.
-       destruct (eq_nat_dec (i / length P'F) (j / length PF)) as [Hidj| Hidj].
+       destruct (eq_nat_dec (i / length P₂F) (j / length P₁F)) as [Hidj| Hidj].
         rewrite <- Hidj.
 
-bbb.
+Prbb.
 
 Focus 2.
      subst fl f'l.
