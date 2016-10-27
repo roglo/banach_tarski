@@ -626,10 +626,30 @@ assert
     apply Forall2_Forall_combine.
     split.
      apply Forall_forall.
-     intros (p, q) Hp.
-     generalize Hp; intros Hq.
-     apply in_combine_l in Hp.
-     apply in_combine_r in Hq.
+     intros (U, V) HU.
+     generalize HU; intros HV.
+     apply in_combine_l in HU.
+     apply in_combine_r in HV.
+     apply In_nth with (d := ∅) in HU.
+     apply In_nth with (d := ∅) in HV.
+     destruct HU as (i & Hi & HU).
+     destruct HV as (j & Hj & HV).
+     subst fl f'l.
+     rewrite partition_combine_length in Hi; [ | rewrite map_length; easy ].
+     rewrite partition_combine_length in Hj; [ | rewrite map_length; easy ].
+(*
+     remember (map app_gr_inv gl) as fl eqn:Hfl.
+     remember (map app_gr_inv hl) as f'l eqn:Hf'l.
+*)
+     rewrite Hlen2 in Hi.
+     rewrite <- Hlen1, Nat.mul_comm in Hj.
+     exists (Comb (nth i gl gr_ident) (nth j hl gr_ident)); simpl.
+     apply eq_set_eq in HU.
+     apply eq_set_eq in HV.
+     rewrite partition_combine_nth in HU; [ | reflexivity | | ].
+      rewrite partition_combine_nth in HV; [ | reflexivity | | ].
+       destruct (eq_nat_dec (i / length P'F) (j / length PF)) as [Hidj| Hidj].
+        rewrite Hidj in HU.
 bbb.
 
 Focus 2.
@@ -645,4 +665,3 @@ Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans
  as equidec_morph.
-*)
