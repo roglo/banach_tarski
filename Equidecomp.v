@@ -129,26 +129,14 @@ split.
      apply Nat.nlt_ge in Hj.
      rewrite app_nth2; [ | rewrite map_length; assumption ].
      rewrite map_length.
-bbb.
-
-rewrite H in Him.
-bbb.
-     set (ff := (λ Fj, E₁ ∩ f₁ Fj)) in Him |-*.
-SearchAbout (nth _ (map _ _)).
-     induction PF as [| F₁ PF].
-      simpl; do 2 rewrite match_id; apply intersection_empty_l.
-
-      simpl in Him; simpl.
-      destruct i.
-       destruct j; [ exfalso; apply Hij; reflexivity | ].
-       simpl in Hjk.
-       rewrite Him.
-bbb.
-
+Abort. (* à voir si on peut continuer quand même *)
 (*
-Theorem glop :
-  (map f E).[i] = f E.[i].
-
+bbb.
+     assert (∃ k l, (PE.[k] ∩ nth k fl (λ E, E) PF.[l] = (flat_map (λ '(fi, Ei), map (λ Fj, Ei ∩ fi Fj) PF) (combine fl PE)).[j - length PF])%S).
+Focus 2.
+destruct H0 as (k & l & Hkl).
+rewrite <- Hkl.
+pose proof Hfli 0 ...
 bbb.
 *)
 
@@ -163,6 +151,7 @@ assert (Hi : ∀ i, nth i (map (λ _ E : set A, E) P) (λ E, E) = λ E, E).
  induction P as [| E EL]; intros; [ simpl; apply match_id | simpl ].
  destruct i; [ reflexivity | apply IHEL ].
 
+Abort. (* tant que partition_prod_is_partition n'est pas fait...
  eapply partition_combine_is_partition; try eassumption.
   rewrite map_length; reflexivity.
 
@@ -189,6 +178,7 @@ assert (Hi : ∀ i, nth i (map (λ _ E : set A, E) P) (λ E, E) = λ E, E).
  destruct HQE as (HQEU, HQEI).
  apply HQEI; assumption.
 Qed.
+*)
 
 Theorem partition_prod_nil_l : ∀ A (Q : list (set A)),
   partition_prod [] Q = [].
@@ -376,7 +366,7 @@ assert
  move gl before P'G.
  move Hlen2 before Hlen1.
  move Hlen3 before Hlen2.
- set (fl := map app_gr_inv gl).
+ remember (map app_gr_inv gl) as fl eqn:Hfl.
  subst PEF.
  assert (is_partition E (partition_combine fl PE P'F)).
   split.
@@ -429,7 +419,45 @@ assert
       assumption.
 
    intros i j Hij.
-   remember (length P'F) as len eqn:Hlen.
+   unfold partition_combine; simpl.
+(*
+   revert i j E F fl PF HPE HPF Hlen3 Hfl Hfli Hfle Hij.
+*)
+   clear HPF HPFF'.
+   revert i j E F gl fl HPE HP'F Hlen3 Hgl Hfl Hij.
+   induction PE as [| E₁ PE]; intros.
+    destruct fl; simpl; do 2 rewrite match_id; apply intersection_empty_l.
+
+    destruct fl as [| f₁ fl].
+     simpl; do 2 rewrite match_id; apply intersection_empty_l.
+
+     simpl.
+     destruct (lt_dec i (length P'F)) as [Hi| Hi].
+      rewrite app_nth1; [ | rewrite map_length; assumption ].
+      assert (H : (f₁ ∅ = ∅)%S).
+       destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
+       simpl in Hfl; injection Hfl; clear Hfl; intros; subst f₁ fl.
+       apply app_gr_empty_set.
+
+       pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) P'F ∅ i as Him; simpl in Him.
+       apply eq_set_eq in Him.
+       rewrite H, intersection_empty_r in Him; rewrite Him.
+       destruct (lt_dec j (length P'F)) as [Hj| Hj].
+        rewrite app_nth1; [ | rewrite map_length; assumption ].
+bbb.
+        pose proof Hfli 0 i j Hij as Hjk; simpl in Hjk.
+        pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) PF ∅ j as Hjm; simpl in Hjm.
+        apply eq_set_eq in Hjm.
+        rewrite H, intersection_empty_r in Hjm; rewrite Hjm.
+        rewrite intersection_shuffle0.
+        do 2 rewrite <- intersection_assoc.
+        rewrite intersection_comm in Hjk; rewrite Hjk.
+        do 2 rewrite intersection_empty_r.
+        reflexivity.
+
+        apply Nat.nlt_ge in Hj.
+        rewrite app_nth2; [ | rewrite map_length; assumption ].
+        rewrite map_length.
 bbb.
    assert
      ((PPE.[i] =
