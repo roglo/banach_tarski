@@ -431,29 +431,34 @@ assert
     destruct fl as [| f₁ fl].
      simpl; do 2 rewrite match_id; apply intersection_empty_l.
 
-     simpl.
-     destruct (lt_dec i (length P'F)) as [Hi| Hi].
-      rewrite app_nth1; [ | rewrite map_length; assumption ].
-      assert (H : (f₁ ∅ = ∅)%S).
+     assert (Hfij : (f₁ P'F.[i] ∩ f₁ P'F.[j] = ∅)%S).
+      destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
+      simpl in Hfl; injection Hfl; clear Hfl; intros; subst f₁ fl.
+      unfold app_gr_inv; rewrite <- group_intersection_distr.
+      destruct HP'F as (HP'FU, HP'FI).
+      rewrite HP'FI; [ apply app_gr_empty_set | assumption ].
+
+      assert (Hf₁ : (f₁ ∅ = ∅)%S).
        destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
        simpl in Hfl; injection Hfl; clear Hfl; intros; subst f₁ fl.
        apply app_gr_empty_set.
 
-       pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) P'F ∅ i as Him; simpl in Him.
-       apply eq_set_eq in Him.
-       rewrite H, intersection_empty_r in Him; rewrite Him.
-       destruct (lt_dec j (length P'F)) as [Hj| Hj].
+       simpl.
+       destruct (lt_dec i (length P'F)) as [Hi| Hi].
         rewrite app_nth1; [ | rewrite map_length; assumption ].
-bbb.
-        pose proof Hfli 0 i j Hij as Hjk; simpl in Hjk.
-        pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) PF ∅ j as Hjm; simpl in Hjm.
-        apply eq_set_eq in Hjm.
-        rewrite H, intersection_empty_r in Hjm; rewrite Hjm.
-        rewrite intersection_shuffle0.
-        do 2 rewrite <- intersection_assoc.
-        rewrite intersection_comm in Hjk; rewrite Hjk.
-        do 2 rewrite intersection_empty_r.
-        reflexivity.
+        pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) P'F ∅ i as Him; simpl in Him.
+        apply eq_set_eq in Him.
+        rewrite Hf₁, intersection_empty_r in Him; rewrite Him.
+        destruct (lt_dec j (length P'F)) as [Hj| Hj].
+         rewrite app_nth1; [ | rewrite map_length; assumption ].
+         pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) P'F ∅ j as Hjm; simpl in Hjm.
+         apply eq_set_eq in Hjm.
+         rewrite Hf₁, intersection_empty_r in Hjm; rewrite Hjm.
+         rewrite intersection_shuffle0.
+         do 2 rewrite <- intersection_assoc.
+         rewrite intersection_comm in Hfij; rewrite Hfij.
+         do 2 rewrite intersection_empty_r.
+         reflexivity.
 
         apply Nat.nlt_ge in Hj.
         rewrite app_nth2; [ | rewrite map_length; assumption ].
