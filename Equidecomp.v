@@ -210,12 +210,78 @@ rewrite app_length, IHPL, map_length.
 reflexivity.
 Qed.
 
-Theorem partition_combine_nth : ∀ A fl (PE : list (set A)) PF i len,
+Theorem partition_combine_nth :
+  ∀ A (s := set_equiv) fl (PE : list (set A)) PF i len,
   len = length PF
-  → (partition_combine fl PE PF).[i] =
-    PE.[i / len] ∩ nth (i / len) fl id PF.[i mod len].
+  → length fl = length PE
+  → (∀ f, List.In f fl → (f ∅ = ∅)%S)
+  → ((partition_combine fl PE PF).[i] =
+     PE.[i / len] ∩ nth (i / len) fl id PF.[i mod len])%S.
 Proof.
-bbb. (* s'inspirer de partition_prod_nth ci-dessous *)
+intros * Hlen HlfP Hf.
+subst len.
+unfold partition_combine; simpl.
+revert fl PF i HlfP Hf.
+induction PE as [| E₁ PE]; intros.
+ destruct fl as [| f₁ fl]; [ | discriminate HlfP ].
+ intros x.
+ split; intros Hx; [ destruct i; contradiction | ].
+ destruct Hx as (Hx, _).
+ destruct (i / length PF)%nat; contradiction.
+
+ destruct fl as [| f₁ fl]; [ discriminate HlfP | ].
+ simpl in HlfP; apply Nat.succ_inj in HlfP; simpl.
+ destruct (lt_dec i (length PF)) as [Hi| Hi].
+  rewrite app_nth1; [| rewrite map_length; assumption ].
+  rewrite Nat.div_small; [ simpl | assumption ].
+  rewrite Nat.mod_small; [ simpl | assumption ].
+  intros x; clear - HlfP Hf.
+  split; intros Hx.
+   revert i Hx.
+   induction PF as [| F₁ PF]; intros; [ destruct i; contradiction | ].
+   simpl in Hx; simpl.
+   destruct i; [ assumption | apply IHPF; assumption ].
+
+   revert i Hx.
+   induction PF as [| F₁ PF]; intros.
+    destruct Hx as (_, Hx).
+    destruct i; simpl in Hx; simpl.
+     rewrite Hf in Hx; [ contradiction | left; reflexivity ].
+     rewrite Hf in Hx; [ contradiction | left; reflexivity ].
+
+    destruct i; simpl in Hx; simpl; [ assumption | ].
+    apply IHPF; assumption.
+
+  apply Nat.nlt_ge in Hi.
+  rewrite app_nth2; [| rewrite map_length; assumption ].
+  rewrite map_length.
+  remember (i - length PF)%nat as j eqn:Hj.
+  assert (H : (i = j + length PF)%nat).
+   rewrite Hj.
+   rewrite Nat.sub_add; [ reflexivity | assumption ].
+
+   subst i; clear Hi Hj.
+   destruct PF as [| F₁ PF].
+    simpl.
+    intros x.
+    split; intros Hx.
+     destruct j; simpl in Hx.
+      induction (combine fl PE) as [| (y, z) l]; [ contradiction | ].
+      apply IHl, Hx.
+
+      induction (combine fl PE) as [| (y, z) l]; [ contradiction | ].
+      apply IHl, Hx.
+
+     rewrite Hf in Hx; [ | left; reflexivity ].
+     rewrite intersection_empty_r in Hx.
+     contradiction.
+
+    rewrite nat_mod_add_once; [ | intros H; discriminate H ].
+    rewrite nat_div_add_once; [ | intros H; discriminate H ].
+    apply IHPE; [ assumption | ].
+    intros f Hfi.
+    apply Hf; right; assumption.
+Qed.
 
 Theorem partition_prod_nth :
   ∀ A (s := set_equiv) (PL QL : list (set A)) len i,
@@ -429,10 +495,56 @@ assert
 
 (**)
    intros i j Hij.
-   erewrite partition_combine_nth; [ | reflexivity ].
+   erewrite partition_combine_nth; [ | reflexivity | | ].
+    erewrite partition_combine_nth; [ | reflexivity | | ].
+     remember (length P'F) as len eqn:Hlen.
+     destruct len.
+      symmetry in Hlen.
+      apply length_zero_iff_nil in Hlen; subst P'F; simpl.
+      subst fl.
+      destruct gl as [| g₁ gl].
+       simpl; unfold id, Datatypes.id at 2; simpl.
+       do 2 rewrite intersection_empty_r; reflexivity.
+
+       simpl; unfold app_gr_inv; rewrite app_gr_empty_set.
+       do 2 rewrite intersection_empty_r; reflexivity.
+
+      destruct HPE as (HPEU, HPEI).
+      destruct HPF as (HPFU, HPFI).
+      destruct (eq_nat_dec (i / S len) (j / S len)) as [Hd| Hd].
+       destruct (eq_nat_dec (i mod S len) (j mod S len)) as [Hm| Hm].
+        assert (Hnlen : (S len ≠ 0)%nat) by (intros H; discriminate H).
+        pose proof Nat.div_mod i (S len) Hnlen as Hi.
+        pose proof Nat.div_mod j (S len) Hnlen as Hj.
+        rewrite Hd, Hm, <- Hj in Hi;  contradiction.
+
+        rewrite intersection_shuffle0, intersection_assoc.
+Arguments Nat.div : simpl never.
+Arguments Nat.modulo : simpl never.
+        subst fl; simpl.
+pose proof map_nth app_gr_inv gl.
+bbb.
+
+bbb.
+        rewrite HPEI.
+
+; [ | assumption ].
+        do 2 rewrite intersection_empty_l; reflexivity.
+
+
+
+        eapply HQij; [ apply Hm | split; eassumption ].
+
+  eapply HPij; [ apply Hd | split; eassumption ].
+     destruct (eq_nat_dec (i / len) (j / len)) as [Hijlen| Hijlen].
+      destruct (eq_nat_dec (i mod len) (j mod len) as...
+bbb.
+      rewrite Hijlen.
+
+
+
    erewrite partition_combine_nth; [ | reflexivity ].
    remember (length P'F) as len eqn:Hlen.
-   destruct (eq_nat_dec (i / len) (j / len)) as [Hijlen| Hijlen].
 
 bbb.
    intros i j Hij.
