@@ -150,7 +150,6 @@ Theorem partition_combine_is_partition :
   → is_partition E (partition_combine fl PE P'F).
 Proof.
 intros * HPE HPF Hlen1 Hlen3 HP'F Hgl * Hfl.
-(* nettoyage à faire; essayer de supprimer PF... *)
 split.
  destruct HPE as (HPEU, _).
  destruct HPF as (HPFU, _).
@@ -259,7 +258,7 @@ split.
   apply in_map_iff in Hf.
   destruct Hf as (g & Hg & Hix).
   subst f; apply app_gr_empty_set.
-qed.
+Qed.
 
 Theorem old_partition_combine_is_partition :
   ∀ A (s := set_equiv) (fl : list (set A → set A)) E F PE PF,
@@ -529,18 +528,15 @@ Qed.
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
 intros E F G HEF HFG.
+unfold equidecomposable.
 destruct HEF as (PE & PF & HPE & HPF & Hlen1 & HEF).
 destruct HFG as (P'F & P'G & HP'F & HP'G & Hlen2 & HFG).
-unfold equidecomposable.
-pose proof partition_prod_is_partition _ F PF P'F HPF HP'F as HPFF'.
-apply Forall2_Forall_combine in HEF.
-remember (combine PE PF) as PEF eqn:HPEF.
 set (s := set_equiv).
 assert
   (Hgl : ∃ gl, length gl = length PE ∧
    ∀ i, (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i PF ∅)%S).
- subst PEF.
- clear HPE HPF HPFF'.
+ apply Forall2_Forall_combine in HEF.
+ clear HPE HPF.
  revert PF Hlen1 HEF.
  induction PE as [| E₁ PE]; intros.
   exists []; split; [ reflexivity | ].
@@ -551,27 +547,58 @@ assert
 
   destruct PF as [| F₁ PF]; [ discriminate Hlen1 | ].
   simpl in Hlen1; apply Nat.succ_inj in Hlen1.
-  remember set_eq as f; simpl in HEF; apply Forall_inv2 in HEF; subst f.
+  simpl in HEF; apply Forall_inv2 in HEF.
   destruct HEF as ((g₁, HgEF), HEF).
   apply IHPE in HEF; [ | assumption ].
   destruct HEF as (gl & Hlen3 & HEF).
   exists (g₁ :: gl).
   split; [ simpl; rewrite Hlen3; reflexivity | ].
-  intros i.
-  remember set_eq as f; simpl; subst f.
+  intros i; simpl.
   destruct i; [ assumption | apply HEF ].
 
- destruct Hgl as (gl & Hlen3 & Hgl).
- move P'F before PF; move P'G before P'F.
- move gl before P'G.
- move Hlen2 before Hlen1.
- move Hlen3 before Hlen2.
- remember (map app_gr_inv gl) as fl eqn:Hfl.
- subst PEF.
- assert (Hpc : is_partition E (partition_combine fl PE P'F)).
-  eapply partition_combine_is_partition with (PF := PF); eassumption.
+ assert
+   (Hhl : ∃ hl, length hl = length P'G ∧
+    ∀ i, (app_gr (nth i hl gr_ident) (nth i P'G ∅) = nth i P'F ∅)%S).
+  apply Forall2_Forall_combine in HFG.
+  clear HP'G HP'F.
+  revert P'F Hlen2 HFG.
+  induction P'G as [| G₁ P'G]; intros.
+   exists []; split; [ reflexivity | ].
+   apply length_zero_iff_nil in Hlen2; subst P'F.
+   intros i; simpl.
+   do 2 rewrite match_id; simpl.
+   intros (x, y, z); split; contradiction.
 
-  exists (partition_combine fl PE P'F).
+   destruct P'F as [| F₁ P'F]; [ discriminate Hlen2 | ].
+   simpl in Hlen2; apply Nat.succ_inj in Hlen2.
+   simpl in HFG; apply Forall_inv2 in HFG.
+   destruct HFG as ((h₁, HhFG), HFG).
+   apply IHP'G in HFG; [ | assumption ].
+   destruct HFG as (hl & Hlen3 & HFG).
+   exists (gr_inv h₁ :: hl).
+   split; [ simpl; rewrite Hlen3; reflexivity | ].
+   intros i; simpl.
+   destruct i; [ | apply HFG ].
+   rewrite <- HhFG, fold_app_gr_inv.
+   rewrite app_gr_inv_l; reflexivity.
+
+  destruct Hgl as (gl & Hlen3 & Hgl).
+  destruct Hhl as (hl & Hlen4 & Hhl).
+  remember (map app_gr_inv gl) as fl eqn:Hfl.
+  assert (Hpcf : is_partition E (partition_combine fl PE P'F)).
+   eapply partition_combine_is_partition with (PF := PF); eassumption.
+
+   exists (partition_combine fl PE P'F).
+   remember (map app_gr_inv hl) as f'l eqn:Hf'l.
+   assert (Hpcg : is_partition G (partition_combine f'l P'G PF)).
+    symmetry in Hlen2.
+    eapply partition_combine_is_partition with (PF := P'F); try eassumption.
+
+    exists (partition_combine f'l P'G PF).
+    split; [ assumption | ].
+    split; [ assumption | ].
+    split.
+Check partition_combine_length.
 
 bbb.
 
