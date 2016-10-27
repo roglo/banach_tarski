@@ -443,7 +443,7 @@ assert
  move Hlen3 before Hlen2.
  remember (map app_gr_inv gl) as fl eqn:Hfl.
  subst PEF.
- assert (is_partition E (partition_combine fl PE P'F)).
+ assert (Hpc : is_partition E (partition_combine fl PE P'F)).
   split.
    clear HEF HPFF' HFG G P'G HP'G Hlen2.
    destruct HPE as (HPEU, _).
@@ -493,7 +493,6 @@ assert
       pose proof (Hgl (S i)) as H; simpl in H.
       assumption.
 
-(**)
    intros i j Hij.
    erewrite partition_combine_nth; [ | reflexivity | | ].
     erewrite partition_combine_nth; [ | reflexivity | | ].
@@ -510,7 +509,7 @@ assert
        do 2 rewrite intersection_empty_r; reflexivity.
 
       destruct HPE as (HPEU, HPEI).
-      destruct HPF as (HPFU, HPFI).
+      destruct HP'F as (HP'FU, HP'FI).
       destruct (eq_nat_dec (i / S len) (j / S len)) as [Hd| Hd].
        destruct (eq_nat_dec (i mod S len) (j mod S len)) as [Hm| Hm].
         assert (Hnlen : (S len ≠ 0)%nat) by (intros H; discriminate H).
@@ -518,119 +517,47 @@ assert
         pose proof Nat.div_mod j (S len) Hnlen as Hj.
         rewrite Hd, Hm, <- Hj in Hi;  contradiction.
 
-        rewrite intersection_shuffle0, intersection_assoc.
         subst fl; rewrite <- Hd; simpl.
-pose proof map_nth app_gr_inv gl gr_ident (i / S len).
-simpl in H.
-bbb.
-        rewrite HPEI.
+        pose proof map_nth app_gr_inv gl gr_ident (i / S len) as Hi.
+        destruct (lt_dec (i / S len) (length gl)) as [Hil| Hil].
+         rewrite nth_indep with (d' := id) in Hi.
+          rewrite Hi, intersection_shuffle0.
+          rewrite intersection_assoc, <- intersection_assoc.
+          unfold app_gr_inv; rewrite <- group_intersection_distr.
+          apply not_eq_sym in Hm.
+          rewrite HP'FI; [ | assumption ].
+          rewrite app_gr_empty_set.
+          apply intersection_empty_r.
 
-; [ | assumption ].
-        do 2 rewrite intersection_empty_l; reflexivity.
+          rewrite map_length; assumption.
 
+         apply Nat.nlt_ge in Hil.
+         rewrite Hlen3 in Hil.
+         rewrite nth_overflow; [ | assumption ].
+         do 2 rewrite intersection_empty_l; reflexivity.
 
+       rewrite intersection_shuffle0, intersection_assoc.
+       rewrite HPEI; [ | assumption ].
+       do 2 rewrite intersection_empty_l; reflexivity.
 
-        eapply HQij; [ apply Hm | split; eassumption ].
+     subst fl; rewrite map_length; assumption.
 
-  eapply HPij; [ apply Hd | split; eassumption ].
-     destruct (eq_nat_dec (i / len) (j / len)) as [Hijlen| Hijlen].
-      destruct (eq_nat_dec (i mod len) (j mod len) as...
-bbb.
-      rewrite Hijlen.
+     subst fl.
+     intros f Hf.
+     apply in_map_iff in Hf.
+     destruct Hf as (g & Hg & Hix).
+     subst f; apply app_gr_empty_set.
 
+    subst fl; rewrite map_length; assumption.
 
+    subst fl.
+    intros f Hf.
+    apply in_map_iff in Hf.
+    destruct Hf as (g & Hg & Hix).
+    subst f; apply app_gr_empty_set.
 
-   erewrite partition_combine_nth; [ | reflexivity ].
-   remember (length P'F) as len eqn:Hlen.
+  exists (partition_combine fl PE P'F).
 
-bbb.
-   intros i j Hij.
-   unfold partition_combine; simpl.
-   clear HPF HPFF'.
-   revert i j E F gl fl HPE HP'F Hlen3 Hgl Hfl Hij.
-   induction PE as [| E₁ PE]; intros.
-    destruct fl; simpl; do 2 rewrite match_id; apply intersection_empty_l.
-
-    destruct fl as [| f₁ fl].
-     simpl; do 2 rewrite match_id; apply intersection_empty_l.
-
-     destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
-     simpl in Hfl; injection Hfl; clear Hfl; intros Hfl Hf₁; subst fl.
-     assert (Hfij : (f₁ P'F.[i] ∩ f₁ P'F.[j] = ∅)%S).
-      subst f₁; unfold app_gr_inv; rewrite <- group_intersection_distr.
-      destruct HP'F as (HP'FU, HP'FI).
-      rewrite HP'FI; [ apply app_gr_empty_set | assumption ].
-
-      assert (Hf₁e : (f₁ ∅ = ∅)%S) by (subst f₁; apply app_gr_empty_set).
-      simpl.
-      destruct (lt_dec i (length P'F)) as [Hi| Hi].
-       rewrite app_nth1; [ | rewrite map_length; assumption ].
-       pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) P'F ∅ i as Him; simpl in Him.
-       apply eq_set_eq in Him.
-       rewrite Hf₁e, intersection_empty_r in Him; rewrite Him.
-       destruct (lt_dec j (length P'F)) as [Hj| Hj].
-        rewrite app_nth1; [ | rewrite map_length; assumption ].
-        pose proof map_nth (λ Fj, E₁ ∩ f₁ Fj) P'F ∅ j as Hjm; simpl in Hjm.
-        apply eq_set_eq in Hjm.
-        rewrite Hf₁e, intersection_empty_r in Hjm; rewrite Hjm.
-        rewrite intersection_shuffle0.
-        do 2 rewrite <- intersection_assoc.
-        rewrite intersection_comm in Hfij; rewrite Hfij.
-        do 2 rewrite intersection_empty_r.
-        reflexivity.
-
-        apply Nat.nlt_ge in Hj.
-        rewrite app_nth2; [ | rewrite map_length; assumption ].
-        rewrite map_length.
-bbb.
-   assert
-     ((PPE.[i] =
-      PE.[i/len] ∩ app_gr_inv (nth (i/len) gl gr_ident) P'F.[i mod len])%S).
-    subst PPE; unfold partition_combine.
-    clear - Hlen3 Hlen.
-    revert i gl Hlen3.
-    induction PE as [| E₁ PE]; intros.
-     apply length_zero_iff_nil in Hlen3; subst gl; simpl.
-     do 3 rewrite match_id.
-     rewrite intersection_empty_l; reflexivity.
-
-     destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
-     simpl in Hlen3; simpl.
-     apply Nat.succ_inj in Hlen3.
-     destruct (zerop (i / len)) as [Hil| Hil].
-      rewrite Hil; simpl.
-      remember ((λ '(gi, Ei),
-        map (λ F'j : set point, Ei ∩ app_gr_inv gi F'j) P'F)) as ff.
-      set (gg := λ F'j : set point, E₁ ∩ app_gr_inv g₁ F'j).
-      destruct (lt_dec i len) as [Hi| Hi].
-       rewrite app_nth1; [ | rewrite map_length; subst len; assumption ].
-       pose proof map_nth gg P'F ∅ i as H.
-subst len.
-clear - Hi.
-revert P'F Hi.
-induction i; intros.
- destruct P'F as [| F'₁ P'F].
-  exfalso; revert Hi; apply Nat.nlt_0_r.
-
-  rewrite Nat.mod_0_l; [ simpl | intros HH; discriminate HH ].
-  reflexivity.
-
- destruct P'F as [| F'₁ P'F].
-  exfalso; revert Hi; apply Nat.nlt_0_r.
-
-Arguments Nat.modulo : simpl never.
-  simpl.
-
-SearchAbout (nth (S _)).
-
-bbb.
-       assert (Hgg : (gg ∅ = ∅)%S).
-        subst gg; unfold app_gr_inv; rewrite app_gr_empty_set.
-        apply intersection_empty_r.
-
-        rewrite Hgg in H.
-bbb.
-   destruct (eq_nat_dec (i / len) (j / len)) as [Hil| Hil].
 bbb.
 
 Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
