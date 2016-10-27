@@ -150,6 +150,7 @@ Theorem partition_combine_is_partition :
   → is_partition E (partition_combine fl PE P'F).
 Proof.
 intros * HPE HPF Hlen1 Hlen3 HP'F Hgl * Hfl.
+(* nettoyage à faire; essayer de supprimer PF... *)
 split.
  destruct HPE as (HPEU, _).
  destruct HPF as (HPFU, _).
@@ -180,8 +181,6 @@ split.
     destruct PF as [| P₁ PF]; [ contradiction | simpl in Hp ].
     left; assumption.
 
-    destruct PF as [| F₁ PF ]; [ discriminate Hlen1 | ].
-    simpl in Hlen1; apply Nat.succ_inj in Hlen1.
     apply included_group with (g := gr_inv g₁) in HUP'F.
     rewrite group_union_list_distr in HUP'F.
     rewrite fold_app_gr_inv in HUP'F.
@@ -260,7 +259,7 @@ split.
   apply in_map_iff in Hf.
   destruct Hf as (g & Hg & Hix).
   subst f; apply app_gr_empty_set.
-Qed.
+qed.
 
 Theorem old_partition_combine_is_partition :
   ∀ A (s := set_equiv) (fl : list (set A → set A)) E F PE PF,
