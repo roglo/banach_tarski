@@ -394,6 +394,32 @@ Theorem partition_prod_cons_l : ∀ A P (PL QL : list (set A)),
   map (intersection P) QL ++ partition_prod PL QL.
 Proof. reflexivity. Qed.
 
+Theorem partition_combine_length :
+  ∀ A fl (PE PF : list (set A)),
+  length fl = length PE
+  → length (partition_combine fl PE PF) = (length PE * length PF)%nat.
+Proof.
+intros * Hlen.
+unfold partition_combine; simpl.
+revert fl PF Hlen.
+induction PE as [| E₁ PE]; intros; [ destruct fl; reflexivity | simpl ].
+destruct fl as [| f₁ fl]; [ discriminate Hlen | ].
+destruct PF as [| F₁ FL].
+ unfold partition_combine; simpl.
+ rewrite Nat.mul_0_r.
+ induction (combine fl PE) as [| (x, y) l]; [ reflexivity | apply IHl ].
+
+ simpl in Hlen; simpl; f_equal.
+ apply Nat.succ_inj in Hlen.
+ apply IHPE with (PF := FL) in Hlen.
+vvv.
+
+SearchAbout flat_map.
+
+ unfold partition_combine in Hlen.
+ rewrite Hlen.
+
+
 Theorem partition_prod_length :
   ∀ A (P Q : list (set A)),
   length (partition_prod P Q) = (length P * length Q)%nat.
