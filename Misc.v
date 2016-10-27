@@ -8,6 +8,9 @@
 Require Import Utf8 List Relations NPeano.
 Import ListNotations.
 
+Arguments Nat.div : simpl never.
+Arguments Nat.modulo : simpl never.
+
 Theorem match_id : ∀ A a (b : A), match a with O => b | S _ => b end = b.
 Proof. intros A a b; destruct a; reflexivity. Qed.
 

@@ -506,7 +506,7 @@ assert
        simpl; unfold id, Datatypes.id at 2; simpl.
        do 2 rewrite intersection_empty_r; reflexivity.
 
-       simpl; unfold app_gr_inv; rewrite app_gr_empty_set.
+       simpl; unfold app_gr_inv, Nat.div; rewrite app_gr_empty_set.
        do 2 rewrite intersection_empty_r; reflexivity.
 
       destruct HPE as (HPEU, HPEI).
@@ -519,12 +519,9 @@ assert
         rewrite Hd, Hm, <- Hj in Hi;  contradiction.
 
         rewrite intersection_shuffle0, intersection_assoc.
-Arguments Nat.div : simpl never.
-Arguments Nat.modulo : simpl never.
-        subst fl; simpl.
-pose proof map_nth app_gr_inv gl.
-bbb.
-
+        subst fl; rewrite <- Hd; simpl.
+pose proof map_nth app_gr_inv gl gr_ident (i / S len).
+simpl in H.
 bbb.
         rewrite HPEI.
 
