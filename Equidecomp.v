@@ -650,11 +650,11 @@ assert
      apply eq_set_eq in HV.
      rewrite partition_combine_nth in HU; [ | reflexivity | | ].
       rewrite partition_combine_nth in HV; [ | reflexivity | | ].
+       rewrite <- HU, <- HV; clear HU HV.
+       rewrite group_intersection_distr, Hgl.
+       rewrite group_intersection_distr.
        destruct (eq_nat_dec (i / length P'F) (j / length PF)) as [Hidj| Hidj].
-        rewrite <- HU, <- HV; clear HU HV.
         rewrite <- Hidj.
-        rewrite group_intersection_distr, Hgl.
-        rewrite group_intersection_distr.
 
 bbb.
 
