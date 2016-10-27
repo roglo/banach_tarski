@@ -12,6 +12,8 @@ Require Import Reals.
 Require Import Misc Matrix Pset.
 Require Import Partition OrbitRepr Transformation.
 
+Definition id {A} := @Datatypes.id A.
+
 Definition equidecomposable (s : set_model point) E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, (app_gr g S₁ = S₂)%S) P₁ P₂.
@@ -68,9 +70,9 @@ Theorem partition_combine_is_partition :
   is_partition E PE
   → is_partition F PF
   → length fl = length PE
-  → (∀ i, PE.[i] ⊂ ⋃ map (nth i fl (λ E, E)) PF)
-  → (∀ i j k, j ≠ k → (nth i fl (λ E, E) PF.[j] ∩ nth i fl (λ E, E) PF.[k] = ∅)%S)
-  → (∀ i, (nth i fl (λ E, E) ∅ = ∅)%S)
+  → (∀ i, PE.[i] ⊂ ⋃ map (nth i fl id) PF)
+  → (∀ i j k, j ≠ k → (nth i fl id PF.[j] ∩ nth i fl id PF.[k] = ∅)%S)
+  → (∀ i, (nth i fl id ∅ = ∅)%S)
   → is_partition E (partition_combine fl PE PF).
 Proof.
 intros * HPE HPF Hlen3 Hfl Hfli Hfle.
@@ -132,7 +134,7 @@ split.
 Abort. (* à voir si on peut continuer quand même *)
 (*
 bbb.
-     assert (∃ k l, (PE.[k] ∩ nth k fl (λ E, E) PF.[l] = (flat_map (λ '(fi, Ei), map (λ Fj, Ei ∩ fi Fj) PF) (combine fl PE)).[j - length PF])%S).
+     assert (∃ k l, (PE.[k] ∩ nth k fl id PF.[l] = (flat_map (λ '(fi, Ei), map (λ Fj, Ei ∩ fi Fj) PF) (combine fl PE)).[j - length PF])%S).
 Focus 2.
 destruct H0 as (k & l & Hkl).
 rewrite <- Hkl.
@@ -146,7 +148,7 @@ Proof.
 intros A s E P Q HPE HQE.
 rewrite equiv_partition_prod_prod2.
 unfold partition_prod2.
-assert (Hi : ∀ i, nth i (map (λ _ E : set A, E) P) (λ E, E) = λ E, E).
+assert (Hi : ∀ i, nth i (map (λ _ E : set A, E) P) id = λ E, E).
  clear; intros i; revert i.
  induction P as [| E EL]; intros; [ simpl; apply match_id | simpl ].
  destruct i; [ reflexivity | apply IHEL ].
@@ -156,7 +158,7 @@ Abort. (* tant que partition_prod_is_partition n'est pas fait...
   rewrite map_length; reflexivity.
 
   intros i; rewrite Hi.
-  assert (HQ : map (λ E, E) Q = Q).
+  assert (HQ : map id Q = Q).
    clear.
    induction Q as [| E EL]; [ reflexivity | simpl ].
    f_equal; apply IHEL.
@@ -207,6 +209,13 @@ induction P as [| P PL]; intros; [ reflexivity | simpl ].
 rewrite app_length, IHPL, map_length.
 reflexivity.
 Qed.
+
+Theorem partition_combine_nth : ∀ A fl (PE : list (set A)) PF i len,
+  len = length PF
+  → (partition_combine fl PE PF).[i] =
+    PE.[i / len] ∩ nth (i / len) fl id PF.[i mod len].
+Proof.
+bbb. (* s'inspirer de partition_prod_nth ci-dessous *)
 
 Theorem partition_prod_nth :
   ∀ A (s := set_equiv) (PL QL : list (set A)) len i,
@@ -418,6 +427,14 @@ assert
       pose proof (Hgl (S i)) as H; simpl in H.
       assumption.
 
+(**)
+   intros i j Hij.
+   erewrite partition_combine_nth; [ | reflexivity ].
+   erewrite partition_combine_nth; [ | reflexivity ].
+   remember (length P'F) as len eqn:Hlen.
+   destruct (eq_nat_dec (i / len) (j / len)) as [Hijlen| Hijlen].
+
+bbb.
    intros i j Hij.
    unfold partition_combine; simpl.
    clear HPF HPFF'.
