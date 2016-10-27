@@ -650,6 +650,7 @@ assert
       rewrite partition_combine_nth in HV; [ | reflexivity | | ].
        destruct (eq_nat_dec (i / length P'F) (j / length PF)) as [Hidj| Hidj].
         rewrite Hidj in HU.
+        rewrite <- HU, <- HV.
 bbb.
 
 Focus 2.
