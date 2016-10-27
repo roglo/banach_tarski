@@ -643,6 +643,7 @@ assert
 *)
      rewrite Hlen2 in Hi.
      rewrite <- Hlen1, Nat.mul_comm in Hj.
+bbb. (* something like "nth (i / length ...)" instead of "nth i" below *)
      exists (Comb (nth j hl gr_ident) (nth i gl gr_ident)); simpl.
      apply eq_set_eq in HU.
      apply eq_set_eq in HV.
@@ -650,7 +651,9 @@ assert
       rewrite partition_combine_nth in HV; [ | reflexivity | | ].
        destruct (eq_nat_dec (i / length P'F) (j / length PF)) as [Hidj| Hidj].
         rewrite <- Hidj in HV.
-        rewrite <- HU, <- HV.
+        rewrite <- HU, <- HV; clear HU HV.
+rewrite group_intersection_distr.
+Check Hgl.
 bbb.
 
 Focus 2.
