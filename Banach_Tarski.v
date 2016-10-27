@@ -64,7 +64,6 @@ split.
    unfold Rabs in H₁, H₂.
    destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
 
-  split; [ reflexivity | ].
   constructor; [ exists (Xtransl 3); reflexivity | ].
   constructor; [ exists (Comb (Xtransl 3) (Rot ạ)); reflexivity | ].
   constructor; [ exists (Xtransl 6); reflexivity | ].

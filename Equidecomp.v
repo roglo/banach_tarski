@@ -15,7 +15,7 @@ Require Import Partition OrbitRepr Transformation.
 Definition id {A} := @Datatypes.id A.
 
 Definition equidecomposable (s : set_model point) E₁ E₂ :=
-  ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧ length P₁ = length P₂ ∧
+  ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, (app_gr g S₁ = S₂)%S) P₁ P₂.
 
 Theorem equidec_refl : reflexive _ (equidecomposable set_equiv).
@@ -24,7 +24,6 @@ intros E.
 exists (E :: []), (E :: []).
 split; [ apply is_partition_single | ].
 split; [ apply is_partition_single | ].
-split; [ reflexivity | ].
 constructor; [ | constructor ].
 exists (Xtransl 0); unfold set_eq; simpl.
 unfold xtransl; intros (x, y, z).
@@ -34,11 +33,10 @@ Qed.
 
 Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).
 Proof.
-intros E F (P₁ & P₂ & HP₁ & HP₂ & Hlen & HEF).
+intros E F (P₁ & P₂ & HP₁ & HP₂ & HEF).
 exists P₂, P₁.
 split; [ assumption | ].
 split; [ assumption | ].
-split; [ symmetry; assumption | ].
 apply Forall2_sym; [ | assumption ].
 clear -HEF.
 intros E F (g & Hg).
@@ -410,15 +408,11 @@ destruct PF as [| F₁ FL].
  induction (combine fl PE) as [| (x, y) l]; [ reflexivity | apply IHl ].
 
  simpl in Hlen; simpl; f_equal.
+ rewrite app_length, map_length.
  apply Nat.succ_inj in Hlen.
- apply IHPE with (PF := FL) in Hlen.
-vvv.
-
-SearchAbout flat_map.
-
- unfold partition_combine in Hlen.
- rewrite Hlen.
-
+ apply IHPE with (PF := F₁ :: FL) in Hlen.
+ simpl in Hlen; rewrite Hlen; reflexivity.
+Qed.
 
 Theorem partition_prod_length :
   ∀ A (P Q : list (set A)),
@@ -555,13 +549,14 @@ Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
 intros E F G HEF HFG.
 unfold equidecomposable.
-destruct HEF as (PE & PF & HPE & HPF & Hlen1 & HEF).
-destruct HFG as (P'F & P'G & HP'F & HP'G & Hlen2 & HFG).
+destruct HEF as (PE & PF & HPE & HPF & HEF).
+destruct HFG as (P'F & P'G & HP'F & HP'G & HFG).
 set (s := set_equiv).
 assert
   (Hgl : ∃ gl, length gl = length PE ∧
    ∀ i, (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i PF ∅)%S).
  apply Forall2_Forall_combine in HEF.
+ destruct HEF as (HEF, Hlen1).
  clear HPE HPF.
  revert PF Hlen1 HEF.
  induction PE as [| E₁ PE]; intros.
@@ -586,6 +581,7 @@ assert
    (Hhl : ∃ hl, length hl = length P'G ∧
     ∀ i, (app_gr (nth i hl gr_ident) (nth i P'G ∅) = nth i P'F ∅)%S).
   apply Forall2_Forall_combine in HFG.
+  destruct HFG as (HFG, Hlen2).
   clear HP'G HP'F.
   revert P'F Hlen2 HFG.
   induction P'G as [| G₁ P'G]; intros.
@@ -610,6 +606,10 @@ assert
 
   destruct Hgl as (gl & Hlen3 & Hgl).
   destruct Hhl as (hl & Hlen4 & Hhl).
+  apply Forall2_Forall_combine in HEF.
+  destruct HEF as (HEF, Hlen1).
+  apply Forall2_Forall_combine in HFG.
+  destruct HFG as (HFG, Hlen2).
   remember (map app_gr_inv gl) as fl eqn:Hfl.
   assert (Hpcf : is_partition E (partition_combine fl PE P'F)).
    eapply partition_combine_is_partition with (PF := PF); eassumption.
@@ -618,13 +618,25 @@ assert
    remember (map app_gr_inv hl) as f'l eqn:Hf'l.
    assert (Hpcg : is_partition G (partition_combine f'l P'G PF)).
     symmetry in Hlen2.
-    eapply partition_combine_is_partition with (PF := P'F); try eassumption.
+    eapply partition_combine_is_partition with (PF := P'F); eassumption.
 
     exists (partition_combine f'l P'G PF).
     split; [ assumption | ].
     split; [ assumption | ].
+    apply Forall2_Forall_combine.
     split.
-Check partition_combine_length.
+     apply Forall_forall.
+     intros (p, q) Hp.
+     generalize Hp; intros Hq.
+     apply in_combine_l in Hp.
+     apply in_combine_r in Hq.
+bbb.
+
+Focus 2.
+     subst fl f'l.
+     rewrite partition_combine_length; [ | now rewrite map_length ].
+     rewrite partition_combine_length; [ | now rewrite map_length ].
+     rewrite Hlen1, Hlen2; apply Nat.mul_comm.
 
 bbb.
 
@@ -633,3 +645,4 @@ Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans
  as equidec_morph.
+*)
