@@ -420,9 +420,6 @@ assert
 
    intros i j Hij.
    unfold partition_combine; simpl.
-(*
-   revert i j E F fl PF HPE HPF Hlen3 Hfl Hfli Hfle Hij.
-*)
    clear HPF HPFF'.
    revert i j E F gl fl HPE HP'F Hlen3 Hgl Hfl Hij.
    induction PE as [| E₁ PE]; intros.
