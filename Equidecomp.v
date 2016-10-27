@@ -656,7 +656,7 @@ assert
        destruct (eq_nat_dec (i / length P₂F) (j / length P₁F)) as [Hidj| Hidj].
         rewrite <- Hidj.
 
-Prbb.
+bbb.
 
 Focus 2.
      subst fl f'l.
