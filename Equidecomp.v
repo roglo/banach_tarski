@@ -662,11 +662,80 @@ rewrite HPE', partition_combine_nth; [ | reflexivity | | ].
 rewrite HPG', partition_combine_nth; [ | reflexivity | | ].
 rewrite group_intersection_distr.
 rewrite Hgl.
+
+(**)
 Require Export Setoid.
-Add Parametric Morphism {A} : (λ n l f E, @List.nth (set A → set A) n l f E)
+Add Parametric Morphism : (λ n l, @nth _ n (map app_gr_inv l) id)
+  with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as nth_set_morph2.
+Proof.
+intros n l E F HEF x.
+Admitted. Show.
+(*
+rewrite <- Hhl. (* fails *)
+*)
+assert (toto:
+(
+  app_gr (gr_inv (nth (j mod length P₁F) hl gr_ident))
+     (P₁F.[i / length P₂F]
+      ∩ app_gr (nth (i / length P₂F) gl gr_ident)
+          (nth (i / length P₂F) (map app_gr_inv gl) id
+             P₂F.[i mod length P₂F]))
+=
+  app_gr (gr_inv (nth (j mod length P₁F) hl gr_ident))
+     (P₁F.[i / length P₂F]
+      ∩ app_gr (nth (i / length P₂F) gl gr_ident)
+          (nth (i / length P₂F) (map app_gr_inv gl) id
+             (app_gr (nth (i mod length P₂F) hl gr_ident) PG.[i mod length P₂F])))
+)%S
+).
+apply app_gr_morph; [ reflexivity | ].
+apply intersection_morph; [ reflexivity | ].
+apply app_gr_morph; [ reflexivity | ].
+apply nth_set_morph2; try reflexivity.
+rewrite <- Hhl; reflexivity. (* does not fail! *)
+bbb.
+
+Check nth_set_morph2.
+rewrite toto.
+bbb.
+
+(*
+apply nth_set_morph2; try reflexivity.
+*)
+rewrite <- Hhl.
+reflexivity.
+bbb.
+
+Definition gr_eq_list (gl₁ gl₂ : list Gr) := gl₁ = gl₂.
+Add Parametric Morphism : (map app_gr_inv)
+  with signature gr_eq_list ==> eq
+  as map_app_gr_inv_morph.
+Proof.
+intros.
+Admitted. Show.
+rewrite <- Hhl.
+bbb.
+Add Parametric Morphism : (@nth (set point → set point))
   with signature eq ==> eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
   as nth_set_morph2.
+Proof.
 Admitted. Show.
+rewrite <- Hhl.
+bbb.
+
+intros n l d E F HEF x.
+split; intros Hx.
+ unfold set_eq in HEF.
+ simpl in HEF.
+ revert n d E F x HEF Hx.
+ induction l as [| y l]; intros.
+  simpl in Hx; rewrite match_id in Hx.
+  simpl; rewrite match_id.
+
+bbb.
+
+
 rewrite <- Hhl.
 rewrite group_intersection_distr.
 
