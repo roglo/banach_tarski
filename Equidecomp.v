@@ -721,6 +721,9 @@ Fail rewrite <- Hhl.
 apply nth_set_morph2_Proper; [ reflexivity | reflexivity | ].
 rewrite <- Hhl.
 reflexivity.
+remember (i mod length P₂F) as III.
+remember (j / length P₁F) as JJJ.
+
 bbb.
 
 assert (toto:
