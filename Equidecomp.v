@@ -324,6 +324,30 @@ Theorem permuted_partition_is_partition :
   → is_partition E PE
   → is_partition E P'E.
 Proof.
+intros * Hpe Hpa.
+destruct Hpa as (Hpau, Hpai).
+split.
+ rewrite Hpau; clear -Hpe.
+ induction Hpe; [ reflexivity | | | ].
+  simpl; rewrite IHHpe; reflexivity.
+
+  simpl.
+  rewrite union_comm, <- union_assoc.
+  apply union_morph; [ reflexivity | apply union_comm ].
+
+  etransitivity; eassumption.
+
+ clear -Hpe Hpai.
+ intros i j Hij.
+bbb.
+ induction Hpe; intros i j Hij.
+  simpl; do 2 rewrite match_id; apply intersection_empty_l.
+
+  simpl.
+  destruct i.
+   destruct j; [ exfalso; apply Hij; reflexivity | ].
+   pose proof Hpai 0 (S j) Hij as H; simpl in H.
+
 bbb.
 
 Theorem partition_combine_partition_combine_swi :

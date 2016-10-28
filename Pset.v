@@ -160,6 +160,13 @@ intros; intros x.
 split; intros H; destruct H as (HE & HF); split; assumption.
 Qed.
 
+Theorem union_comm : ∀ A (s := set_equiv) (E F : set A),
+  (E ∪ F = F ∪ E)%S.
+Proof.
+intros; intros x.
+split; intros [HE| HF]; [ right | left | right | left ]; assumption.
+Qed.
+
 Theorem intersection_assoc : ∀ A (s := set_equiv) (E F G : set A),
   (E ∩ (F ∩ G) = (E ∩ F) ∩ G)%S.
 Proof.
