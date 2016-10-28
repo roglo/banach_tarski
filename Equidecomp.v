@@ -643,23 +643,35 @@ assert
 *)
      rewrite Hlen2 in Hi.
      rewrite <- Hlen1, Nat.mul_comm in Hj.
-remember gr_ident as toto in |-*.
-(*
-     remember (nth (i / length P₂F) gl gr_ident) as gi.
-     remember (nth (j mod length P₁F) hl gr_ident) as hj.
-     exists (Comb (gr_inv hj) gi); subst gi hj; simpl.
-*)
-exists toto.
      apply eq_set_eq in HU.
      apply eq_set_eq in HV.
-rewrite <- HU, <- HV; clear HU HV.
-rewrite partition_combine_nth; [ | reflexivity | | ].
-rewrite partition_combine_nth; [ | reflexivity | | ].
-rewrite group_intersection_distr.
+remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
+remember (partition_combine (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
+destruct Hpcf as (HpcfU, HpcfI).
+destruct Hpcg as (HpcgU, HpcgI).
+(**)
+     remember (nth (i / length P₂F) gl gr_ident) as gi.
+     remember (gr_inv (nth (j mod length P₁F) hl gr_ident)) as hj.
+     exists (Comb hj gi); subst gi hj; simpl.
 (*
-rewrite intersection_comm.
+remember gr_ident as toto in |-*.
+exists toto.
 *)
-apply intersection_morph.
+rewrite <- HU, <- HV; clear HU HV.
+rewrite HPE', partition_combine_nth; [ | reflexivity | | ].
+rewrite HPG', partition_combine_nth; [ | reflexivity | | ].
+rewrite group_intersection_distr.
+rewrite Hgl.
+Require Export Setoid.
+Add Parametric Morphism {A} : (λ n l f E, @List.nth (set A → set A) n l f E)
+  with signature eq ==> eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as nth_set_morph2.
+Admitted. Show.
+rewrite <- Hhl.
+rewrite group_intersection_distr.
+
+bbb.
+
 pose proof Hhl (i mod length P₂F) as H.
 
 bbb.
