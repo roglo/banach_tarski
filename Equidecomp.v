@@ -272,7 +272,7 @@ revert PE P'F.
 induction fl as [| f₁ fl]; intros; simpl.
  induction P'F as [| F'₁ P'F]; [ reflexivity | apply IHP'F ].
 
- destruct P'F as [| F'₁ P'F]; simpl.
+ induction P'F as [| F'₁ P'F]; simpl.
   rewrite flat_map_nil_fun; [ constructor | ].
   apply Forall_forall; intros (f, x) H; reflexivity.
 
@@ -281,8 +281,9 @@ induction fl as [| f₁ fl]; intros; simpl.
    apply Forall_forall; intros; reflexivity.
 
    constructor.
-Print Permutation.
-SearchAbout (Permutation (_ ++ _)).
+   rewrite IHP'F.
+do 2 rewrite flat_map_concat_map.
+simpl.
 bbb.
 
 Theorem permuted_partition_is_partition :
