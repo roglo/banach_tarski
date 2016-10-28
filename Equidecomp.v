@@ -661,6 +661,7 @@ rewrite <- HU, <- HV; clear HU HV.
 rewrite HPE', partition_combine_nth; [ | reflexivity | | ].
 rewrite HPG', partition_combine_nth; [ | reflexivity | | ].
 rewrite group_intersection_distr.
+rewrite group_intersection_distr.
 rewrite Hgl.
 
 (**)
@@ -670,10 +671,39 @@ Add Parametric Morphism : (λ n l, @nth _ n (map app_gr_inv l) id)
   as nth_set_morph2.
 Proof.
 intros n l E F HEF x.
-Admitted. Show.
+split; intros Hx.
+ revert n x Hx.
+ induction l as [| y l]; intros.
+  simpl in Hx; rewrite match_id in Hx.
+  simpl; rewrite match_id.
+  apply HEF; assumption.
+
+  simpl in Hx; simpl.
+  destruct n; [ rewrite <- HEF; assumption | ].
+  apply IHl; assumption.
+
+ revert n x Hx.
+ induction l as [| y l]; intros.
+  simpl in Hx; rewrite match_id in Hx.
+  simpl; rewrite match_id.
+  apply HEF; assumption.
+
+  simpl in Hx; simpl.
+  destruct n; [ rewrite HEF; assumption | ].
+  apply IHl; assumption.
+Qed.
 (*
 rewrite <- Hhl. (* fails *)
 *)
+(* this works *)
+etransitivity.
+apply intersection_morph; [ reflexivity | ].
+apply app_gr_morph; [ reflexivity | ].
+apply app_gr_morph; [ reflexivity | ].
+apply nth_set_morph2; [ reflexivity | reflexivity | ].
+symmetry; apply Hhl.
+bbb.
+
 assert (toto:
 (
   app_gr (gr_inv (nth (j mod length P₁F) hl gr_ident))
