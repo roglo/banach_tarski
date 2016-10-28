@@ -693,15 +693,34 @@ split; intros Hx.
   apply IHl; assumption.
 Qed.
 (*
-rewrite <- Hhl. (* fails *)
+Focus 1.
+clear - s Hhl.
+subst s.
+
+rewrite <- Hhl.
+replace (P₂F.[i mod length P₂F]) with ((app_gr (nth (i mod length P₂F) hl gr_ident) PG.[i mod length P₂F])).
+Focus 2.
+
+Require Import Relations OrdersFacts.
+Print Instances Proper.
+(*
+Typeclasses eauto := debug.
+Fail rewrite <- Hhl. (* fails *)
+Print Instances Proper.
+*)
 *)
 (* this works *)
 etransitivity.
-apply intersection_morph; [ reflexivity | ].
-apply app_gr_morph; [ reflexivity | ].
-apply app_gr_morph; [ reflexivity | ].
-apply nth_set_morph2; [ reflexivity | reflexivity | ].
-symmetry; apply Hhl.
+apply intersection_morph_Proper; [ reflexivity | ].
+apply app_gr_morph_Proper; [ reflexivity | ].
+apply app_gr_morph_Proper; [ reflexivity | ].
+(*
+Typeclasses eauto := debug.
+Fail rewrite <- Hhl.
+*)
+apply nth_set_morph2_Proper; [ reflexivity | reflexivity | ].
+rewrite <- Hhl.
+reflexivity.
 bbb.
 
 assert (toto:
