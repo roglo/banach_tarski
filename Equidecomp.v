@@ -616,11 +616,12 @@ assert
 
    exists (partition_combine fl PE P₂F).
    remember (map app_gr_inv hl) as f'l eqn:Hf'l.
-   assert (Hpcg : is_partition G (partition_combine f'l PG P₁F)).
+bbb.
+   assert (Hpcg : is_partition G (partition_combine_swi f'l PG P₁F)).
     symmetry in Hlen2.
-    eapply partition_combine_is_partition with (PF := P₂F); eassumption.
+    eapply partition_combine_swi_is_partition with (PF := P₂F); eassumption.
 
-    exists (partition_combine f'l PG P₁F).
+    exists (partition_combine_swi f'l PG P₁F).
     split; [ assumption | ].
     split; [ assumption | ].
     apply Forall2_Forall_combine.
@@ -650,9 +651,9 @@ remember (partition_combine (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
 destruct Hpcf as (HpcfU, HpcfI).
 destruct Hpcg as (HpcgU, HpcgI).
 (**)
-     remember (nth (i / length P₂F) gl gr_ident) as gi.
-     remember (gr_inv (nth (j mod length P₁F) hl gr_ident)) as hj.
-     exists (Comb hj gi); subst gi hj; simpl.
+     remember (nth (i / length P₁F) hl gr_ident) as hi.
+     remember (nth (j / length P₂F) gl gr_ident) as gj.
+     exists (Comb hi gj); subst hi gj; simpl.
 (*
 remember gr_ident as toto in |-*.
 exists toto.
@@ -662,7 +663,6 @@ rewrite HPE', partition_combine_nth; [ | reflexivity | | ].
 rewrite HPG', partition_combine_nth; [ | reflexivity | | ].
 rewrite group_intersection_distr.
 rewrite group_intersection_distr.
-rewrite Hgl.
 
 (**)
 Require Export Setoid.
@@ -692,6 +692,7 @@ split; intros Hx.
   destruct n; [ rewrite HEF; assumption | ].
   apply IHl; assumption.
 Qed.
+
 (*
 Focus 1.
 clear - s Hhl.
@@ -714,6 +715,8 @@ etransitivity.
 apply intersection_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
+bbb.
+
 (*
 Typeclasses eauto := debug.
 Fail rewrite <- Hhl.
