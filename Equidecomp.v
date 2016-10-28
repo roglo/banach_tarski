@@ -266,6 +266,22 @@ Theorem partition_combine_partition_combine_swi :
   is_partition E (partition_combine fl PE P'F)
   → is_partition E (partition_combine_swi fl PE P'F).
 Proof.
+intros * HP.
+unfold partition_combine in HP.
+unfold partition_combine_swi.
+destruct HP as (HPU, HPI).
+split.
+ rewrite HPU; clear.
+ revert PE P'F.
+ induction fl as [| f₁ fl]; intros; simpl.
+  induction P'F as [| F'₁ P'F]; [ reflexivity | apply IHP'F ].
+
+  destruct PE as [| E₁ PE]; simpl.
+   induction P'F as [| F'₁ P'F]; [ reflexivity | apply IHP'F ].
+
+   rewrite union_list_app, IHfl.
+   clear.
+
 bbb.
 
 Theorem partition_combine_swi_is_partition :
