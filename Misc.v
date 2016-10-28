@@ -153,6 +153,17 @@ split; intros HF.
   apply IHl1; assumption.
 Qed.
 
+Theorem flat_map_nil_fun : ∀ A B (f : A → list B) l,
+ Forall (λ x, f x = []) l
+ → flat_map f l = [].
+Proof.
+intros * HF.
+induction l as [| x l]; [ reflexivity | simpl ].
+apply Forall_inv2 in HF.
+destruct HF as (Hx, HF).
+rewrite IHl; [ rewrite Hx; reflexivity | assumption ].
+Qed.
+
 Theorem app_repeat_diag : ∀ A (e : A) n,
   repeat e n ++ [e] = e :: repeat e n.
 Proof.

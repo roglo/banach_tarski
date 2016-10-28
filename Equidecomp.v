@@ -261,6 +261,38 @@ split.
   subst f; apply app_gr_empty_set.
 Qed.
 
+Require Import Permutation.
+Theorem partition_combine_swi_is_permutation :
+  ∀ A (fl : list (set A → set A)) PE P'F,
+  Permutation (partition_combine_swi fl PE P'F) (partition_combine fl PE P'F).
+Proof.
+intros.
+unfold partition_combine_swi, partition_combine.
+revert PE P'F.
+induction fl as [| f₁ fl]; intros; simpl.
+ induction P'F as [| F'₁ P'F]; [ reflexivity | apply IHP'F ].
+
+ destruct P'F as [| F'₁ P'F]; simpl.
+  rewrite flat_map_nil_fun; [ constructor | ].
+  apply Forall_forall; intros (f, x) H; reflexivity.
+
+  destruct PE as [| E₁ PE]; simpl.
+   rewrite flat_map_nil_fun; [ constructor | ].
+   apply Forall_forall; intros; reflexivity.
+
+   constructor.
+Print Permutation.
+SearchAbout (Permutation (_ ++ _)).
+bbb.
+
+Theorem permuted_partition_is_partition :
+  ∀ A (s := set_equiv) (E : set A) PE P'E,
+  Permutation PE P'E
+  → is_partition E PE
+  → is_partition E P'E.
+Proof.
+bbb.
+
 Theorem partition_combine_partition_combine_swi :
   ∀ A (s := set_equiv) E (fl : list (set A → set A)) PE P'F,
   is_partition E (partition_combine fl PE P'F)
