@@ -643,15 +643,32 @@ assert
 *)
      rewrite Hlen2 in Hi.
      rewrite <- Hlen1, Nat.mul_comm in Hj.
+remember gr_ident as toto in |-*.
+(*
      remember (nth (i / length P₂F) gl gr_ident) as gi.
-     remember (nth (j / length P₁F) hl gr_ident) as hj.
+     remember (nth (j mod length P₁F) hl gr_ident) as hj.
      exists (Comb (gr_inv hj) gi); subst gi hj; simpl.
+*)
+exists toto.
      apply eq_set_eq in HU.
      apply eq_set_eq in HV.
+rewrite <- HU, <- HV; clear HU HV.
+rewrite partition_combine_nth; [ | reflexivity | | ].
+rewrite partition_combine_nth; [ | reflexivity | | ].
+rewrite group_intersection_distr.
+(*
+rewrite intersection_comm.
+*)
+apply intersection_morph.
+pose proof Hhl (i mod length P₂F) as H.
+
+bbb.
      rewrite partition_combine_nth in HU; [ | reflexivity | | ].
       rewrite partition_combine_nth in HV; [ | reflexivity | | ].
        rewrite <- HU, <- HV; clear HU HV.
-       rewrite group_intersection_distr, Hgl.
+       rewrite group_intersection_distr.
+bbb.
+       rewrite Hgl.
        rewrite group_intersection_distr.
        destruct (eq_nat_dec (i / length P₂F) (j / length P₁F)) as [Hidj| Hidj].
         rewrite <- Hidj.
