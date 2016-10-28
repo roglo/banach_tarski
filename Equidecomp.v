@@ -262,10 +262,12 @@ split.
 Qed.
 
 Require Import Permutation.
+
 Theorem partition_combine_swi_is_permutation :
   ∀ A (fl : list (set A → set A)) PE P'F,
   Permutation (partition_combine_swi fl PE P'F) (partition_combine fl PE P'F).
 Proof.
+(* there exists likely a simpler proof; to be seen one day... *)
 intros.
 unfold partition_combine_swi, partition_combine.
 do 2 rewrite flat_map_concat_map.
@@ -285,12 +287,36 @@ induction fl as [| f₁ fl]; intros; simpl.
 
    constructor.
    rewrite IHP'F.
-   etransitivity.
+   etransitivity; [ apply Permutation_app_comm | ].
+   simpl; rewrite <- app_assoc.
+   apply Permutation_app_head.
+   rewrite <- IHfl.
+   clear.
+   remember (combine fl PE) as l eqn:Hl.
+   clear.
+   revert F'₁ P'F.
+   induction l as [| x l]; intros.
+    rewrite <- flat_map_concat_map.
+    rewrite flat_map_nil_fun; [ constructor | ].
+    apply Forall_forall; intros; reflexivity.
+
+    simpl; destruct x as (x, y).
+    rewrite <- IHl; simpl.
+    etransitivity; [ apply Permutation_app_comm | simpl ].
+    constructor.
+    rewrite app_assoc.
+    etransitivity; [ | apply Permutation_app_comm ].
+    apply Permutation_app; [ reflexivity | ].
+    clear.
+    revert x y l.
+    induction P'F as [| F₁ P'F]; intros; [ constructor | simpl ].
+    constructor.
+    etransitivity; [ | apply Permutation_app_comm ].
+    rewrite <- app_assoc.
+    apply Permutation_app; [ reflexivity | ].
+    rewrite IHP'F.
     apply Permutation_app_comm.
-    simpl; rewrite <- app_assoc.
-    apply Permutation_app_head.
-    rewrite <- IHfl.
-bbb.
+Qed.
 
 Theorem permuted_partition_is_partition :
   ∀ A (s := set_equiv) (E : set A) PE P'E,
@@ -306,22 +332,10 @@ Theorem partition_combine_partition_combine_swi :
   → is_partition E (partition_combine_swi fl PE P'F).
 Proof.
 intros * HP.
-unfold partition_combine in HP.
-unfold partition_combine_swi.
-destruct HP as (HPU, HPI).
-split.
- rewrite HPU; clear.
- revert PE P'F.
- induction fl as [| f₁ fl]; intros; simpl.
-  induction P'F as [| F'₁ P'F]; [ reflexivity | apply IHP'F ].
-
-  destruct PE as [| E₁ PE]; simpl.
-   induction P'F as [| F'₁ P'F]; [ reflexivity | apply IHP'F ].
-
-   rewrite union_list_app, IHfl.
-   clear.
-
-bbb.
+eapply permuted_partition_is_partition; [ | eassumption ].
+symmetry.
+apply partition_combine_swi_is_permutation.
+Qed.
 
 Theorem partition_combine_swi_is_partition :
   ∀ (s := set_equiv) E F PE PF P'F gl,
