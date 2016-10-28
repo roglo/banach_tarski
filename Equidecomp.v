@@ -268,22 +268,28 @@ Theorem partition_combine_swi_is_permutation :
 Proof.
 intros.
 unfold partition_combine_swi, partition_combine.
+do 2 rewrite flat_map_concat_map.
 revert PE P'F.
 induction fl as [| f₁ fl]; intros; simpl.
  induction P'F as [| F'₁ P'F]; [ reflexivity | apply IHP'F ].
 
  induction P'F as [| F'₁ P'F]; simpl.
+  rewrite <- flat_map_concat_map.
   rewrite flat_map_nil_fun; [ constructor | ].
   apply Forall_forall; intros (f, x) H; reflexivity.
 
   destruct PE as [| E₁ PE]; simpl.
+   rewrite <- flat_map_concat_map.
    rewrite flat_map_nil_fun; [ constructor | ].
    apply Forall_forall; intros; reflexivity.
 
    constructor.
    rewrite IHP'F.
-do 2 rewrite flat_map_concat_map.
-simpl.
+   etransitivity.
+    apply Permutation_app_comm.
+    simpl; rewrite <- app_assoc.
+    apply Permutation_app_head.
+    rewrite <- IHfl.
 bbb.
 
 Theorem permuted_partition_is_partition :
