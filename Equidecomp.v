@@ -338,8 +338,54 @@ split.
 
  intros i j Hij x.
  split; [ intros Hx; simpl | contradiction ].
- destruct Hx as (Hxi, Hxj).
  clear E Hpau.
+ assert (Hl :
+   ∀ i j, i ≠ j → ∃ i' j', i' ≠ j' ∧ PE.[i'] = P'E.[i] ∧ PE.[j'] = P'E.[j]).
+  clear i j Hij Hx Hpai.
+  intros i j Hij.
+  induction Hpe.
+   exists i, j; simpl.
+   do 2 rewrite match_id.
+   split; [ assumption | split; reflexivity ].
+
+   destruct IHHpe as (i' & j' & Hi'j' & Hl & Hl').
+   destruct i.
+    revert i' j' Hi'j' Hl Hl'.
+    induction j; intros; [ exfalso; apply Hij; reflexivity | ].
+bbb.
+
+   exists (S i'), (S j'); simpl.
+   split; [ intros H; apply Hi'j', Nat.succ_inj; assumption | ].
+   destruct i.
+    destruct j; [ exfalso; apply Hij; reflexivity | ].
+
+bbb.
+
+   exists i', j'.
+   split; [ assumption | ].
+   split.
+    destruct i'.
+     destruct i; [ reflexivity | simpl ].
+     destruct j'; [ exfalso; apply Hi'j'; reflexivity | ].
+
+
+; simpl.
+   induction i'.
+    induction j'; [ exfalso; apply Hi'j'; reflexivity | ].
+    split.
+     induction i; [ reflexivity | ].
+
+bbb.
+
+Focus 2.
+  pose proof Hl i j Hij as H.
+  destruct H as (i' & j' & Hi'j' & Hi' & Hj').
+  rewrite <- Hi', <- Hj' in Hx.
+  pose proof Hpai i' j' Hi'j' as H.
+  rewrite H in Hx; contradiction.
+
+
+
 bbb.
  apply Permutation_sym in Hpe.
  destruct (lt_dec i (length P'E)) as [Hil| Hil].
