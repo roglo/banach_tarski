@@ -331,8 +331,26 @@ induction HP.
 
  destruct IHHP as (l'' & HPl & Hl'').
  exists (l'' ++ [length l]).
- simpl.
+ simpl; split.
+  clear - HPl.
+  revert l HPl.
+  induction l'' as [| x'']; intros.
+   destruct l as [| x]; [ constructor; constructor | ].
+   apply Permutation_sym, Permutation_nil_cons in HPl.
+   contradiction.
 
+   simpl.
+bbb.
+
+  clear HP.
+  induction HPl.
+   simpl.
+   induction l; [ constructor; constructor | ].
+   simpl in IHl; simpl.
+   inversion IHl; subst.
+   symmetry in H2; apply length_zero_iff_nil in H2; subst l.
+   simpl in IHl, H0.
+   simpl.
 bbb.
 
 Theorem permuted_partition_is_partition :
