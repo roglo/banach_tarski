@@ -30,6 +30,7 @@ Definition included {A} (E₁ E₂ : set A) :=
 Delimit Scope set_scope with S.
 
 Notation "a = b" := (set_eq a b) : set_scope.
+Notation "a ≠ b" := (¬ set_eq a b) : set_scope.
 Notation "E₁ '∩' E₂" := (intersection E₁ E₂)
   (at level 40, left associativity).
 Notation "E₁ '∪' E₂" := (union E₁ E₂)

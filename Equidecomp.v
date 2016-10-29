@@ -339,8 +339,8 @@ split.
  intros i j Hij x.
  split; [ intros Hx; simpl | contradiction ].
  destruct Hx as (Hxi, Hxj).
+ clear E Hpau.
 bbb.
-
  apply Permutation_sym in Hpe.
  destruct (lt_dec i (length P'E)) as [Hil| Hil].
   assert (H : List.In P'E.[i] P'E) by (apply nth_In; assumption).
@@ -356,7 +356,6 @@ bbb.
    rewrite <- H in Hxj; clear H.
 
 bbb.
-(* essayer Permutation_ind_bis *)
  inversion Hpe.
   subst PE P'E.
   simpl; do 2 rewrite match_id; apply intersection_empty_l.
