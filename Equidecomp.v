@@ -318,6 +318,23 @@ induction fl as [| f₁ fl]; intros; simpl.
     apply Permutation_app_comm.
 Qed.
 
+Theorem glop : ∀ A (l l' : list A) d,
+  Permutation l l'
+  → ∃ l'', Permutation (seq 0 (length l)) l'' ∧
+    ∀ i, i < length l → nth i l d = nth (nth i l'' 0) l' d.
+Proof.
+intros * HP.
+induction HP.
+ exists []; simpl.
+ split; [ constructor | ].
+ intros i Hi; exfalso; revert Hi; apply Nat.nlt_0_r.
+
+ destruct IHHP as (l'' & HPl & Hl'').
+ exists (l'' ++ [length l]).
+ simpl.
+
+bbb.
+
 Theorem permuted_partition_is_partition :
   ∀ A (s := set_equiv) (E : set A) PE P'E,
   Permutation PE P'E
@@ -338,7 +355,28 @@ split.
 
  intros i j Hij x.
  split; [ intros Hx; simpl | contradiction ].
+ apply Permutation_sym in Hpe.
+ apply glop with (d := ∅) in Hpe.
+ destruct Hpe as (l & Hl & HPl).
  clear E Hpau.
+ destruct (lt_dec i (length P'E)) as [Hi| Hi].
+  rewrite HPl in Hx; [ | assumption ].
+  destruct (lt_dec j (length P'E)) as [Hj| Hj].
+   rewrite HPl in Hx; [ | assumption ].
+   rewrite Hpai in Hx; [ contradiction | ].
+
+Focus 2.
+   apply Nat.nlt_ge in Hj.
+   rewrite nth_overflow with (l := P'E) in Hx; [ | assumption ].
+   rewrite intersection_empty_r in Hx; contradiction.
+
+Focus 2.
+  apply Nat.nlt_ge in Hi.
+  rewrite nth_overflow in Hx; [ | assumption ].
+  rewrite intersection_empty_l in Hx; contradiction.
+
+bbb.
+
  assert (Hl :
    ∀ i j, i ≠ j → ∃ i' j', i' ≠ j' ∧ PE.[i'] = P'E.[i] ∧ PE.[j'] = P'E.[j]).
   clear i j Hij Hx Hpai.
