@@ -325,6 +325,7 @@ intros * H.
 apply Permutation_sym, Permutation_nil_cons in H; easy.
 Qed.
 
+(*
 Theorem glop : ∀ A (l l' : list A) d s,
   Permutation l l'
   → ∃ l'', Permutation (seq s (length l)) l'' ∧
@@ -338,7 +339,9 @@ induction l as [| x l]; intros.
  intros i Hi; apply Nat.nlt_0_r in Hi; easy.
 
  destruct l' as [| x' l']; [ apply Permutation_cons_nil in HP; easy | ].
- simpl.
+ induction HP.
+  exists []; split; [ reflexivity | ].
+  intros i Hi; apply Nat.nlt_0_r in Hi; easy.
 
 bbb.
 intros * HP.
@@ -397,6 +400,7 @@ apply gogo.
 simpl.
 
 bbb.
+*)
 
 Theorem permuted_partition_is_partition :
   ∀ A (s := set_equiv) (E : set A) PE P'E,
@@ -419,6 +423,7 @@ split.
  intros i j Hij x.
  split; [ intros Hx; simpl | contradiction ].
  apply Permutation_sym in Hpe.
+bbb.
  apply glop with (d := ∅) in Hpe.
  destruct Hpe as (l & Hl & HPl).
  clear E Hpau.
