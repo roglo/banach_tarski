@@ -318,11 +318,29 @@ induction fl as [| f₁ fl]; intros; simpl.
     apply Permutation_app_comm.
 Qed.
 
+Theorem Permutation_cons_nil : ∀ A l (x : A),
+  ¬ Permutation (x :: l) [].
+Proof.
+intros * H.
+apply Permutation_sym, Permutation_nil_cons in H; easy.
+Qed.
+
 Theorem glop : ∀ A (l l' : list A) d s,
   Permutation l l'
   → ∃ l'', Permutation (seq s (length l)) l'' ∧
     ∀ i, i < length l → nth i l d = nth (nth i l'' 0 - s) l' d.
 Proof.
+intros * HP.
+revert s l' HP.
+induction l as [| x l]; intros.
+ destruct l' as [| x' l']; [ | apply Permutation_nil_cons in HP; easy ].
+ exists []; split; [ reflexivity | ].
+ intros i Hi; apply Nat.nlt_0_r in Hi; easy.
+
+ destruct l' as [| x' l']; [ apply Permutation_cons_nil in HP; easy | ].
+ simpl.
+
+bbb.
 intros * HP.
 induction HP.
  exists []; simpl.
@@ -356,7 +374,6 @@ induction HP.
       destruct l as [| y l]; [ discriminate H1 | simpl in H1 ].
       injection H1; clear H1; intros; subst x'' l0.
       simpl in HPl; simpl.
-Check perm_swap.
 rewrite cons_comm_app.
 SearchAbout (Permutation (_ :: _)).
 bbb.
