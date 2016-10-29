@@ -331,23 +331,56 @@ split.
  induction Hpe; [ reflexivity | | | ].
   simpl; rewrite IHHpe; reflexivity.
 
-  simpl.
-  rewrite union_comm, <- union_assoc.
+  simpl; rewrite union_comm, <- union_assoc.
   apply union_morph; [ reflexivity | apply union_comm ].
 
   etransitivity; eassumption.
 
- clear -Hpe Hpai.
- intros i j Hij.
+ intros i j Hij x.
+ split; [ intros Hx; simpl | contradiction ].
+ destruct Hx as (Hxi, Hxj).
 bbb.
- induction Hpe; intros i j Hij.
+
+ apply Permutation_sym in Hpe.
+ destruct (lt_dec i (length P'E)) as [Hil| Hil].
+  assert (H : List.In P'E.[i] P'E) by (apply nth_In; assumption).
+  eapply Permutation_in in H; [ | eassumption ].
+  apply In_nth with (d := ∅) in H.
+  destruct H as (i' & Hi' & H).
+  rewrite <- H in Hxi; clear H.
+  destruct (lt_dec j (length P'E)) as [Hjl| Hjl].
+   assert (H : List.In P'E.[j] P'E) by (apply nth_In; assumption).
+   eapply Permutation_in in H; [ | eassumption ].
+   apply In_nth with (d := ∅) in H.
+   destruct H as (j' & Hj' & H).
+   rewrite <- H in Hxj; clear H.
+
+bbb.
+(* essayer Permutation_ind_bis *)
+ inversion Hpe.
+  subst PE P'E.
+  simpl; do 2 rewrite match_id; apply intersection_empty_l.
+
+  subst PE P'E.
+  simpl.
+  destruct i.
+   induction j; [ exfalso; apply Hij; reflexivity | ].
+   destruct j.
+
+bbb.
+ clear E Hpau.
+ induction Hpe as [| E₁ PE P'E| | ]; intros * Hij.
   simpl; do 2 rewrite match_id; apply intersection_empty_l.
 
   simpl.
-  destruct i.
-   destruct j; [ exfalso; apply Hij; reflexivity | ].
-   pose proof Hpai 0 (S j) Hij as H; simpl in H.
-
+  induction i.
+   induction j; [ exfalso; apply Hij; reflexivity | ].
+   destruct j.
+    clear IHj.
+    intros x; split; [ intros Hx | contradiction ].
+    destruct Hx as (Hx₁, Hx).
+    pose proof Hpai 0 1 Hij x as H; simpl in H.
+    apply H; split; [ assumption | clear H ].
 bbb.
 
 Theorem partition_combine_partition_combine_swi :
