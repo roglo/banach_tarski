@@ -318,10 +318,10 @@ induction fl as [| f₁ fl]; intros; simpl.
     apply Permutation_app_comm.
 Qed.
 
-Theorem glop : ∀ A (l l' : list A) d,
+Theorem glop : ∀ A (l l' : list A) d s,
   Permutation l l'
-  → ∃ l'', Permutation (seq 0 (length l)) l'' ∧
-    ∀ i, i < length l → nth i l d = nth (nth i l'' 0) l' d.
+  → ∃ l'', Permutation (seq s (length l)) l'' ∧
+    ∀ i, i < length l → nth i l d = nth (nth i l'' 0 - s) l' d.
 Proof.
 intros * HP.
 induction HP.
@@ -330,27 +330,55 @@ induction HP.
  intros i Hi; exfalso; revert Hi; apply Nat.nlt_0_r.
 
  destruct IHHP as (l'' & HPl & Hl'').
- exists (l'' ++ [length l]).
+ exists (l'' ++ [length l + s]).
  simpl; split.
   clear - HPl.
-  revert l HPl.
+  revert s l HPl.
   induction l'' as [| x'']; intros.
    destruct l as [| x]; [ constructor; constructor | ].
    apply Permutation_sym, Permutation_nil_cons in HPl.
    contradiction.
 
    simpl.
+   destruct l as [| x l].
+    simpl in HPl; apply Permutation_nil_cons in HPl.
+    contradiction.
+
+    simpl in HPl; simpl.
+    destruct (eq_nat_dec s x'') as [Hs| Hx].
+     subst x''; constructor.
+     apply Permutation_cons_inv in HPl.
+     rewrite <- Nat.add_succ_r.
+     apply IHl''; assumption.
+
+     inversion HPl; [ contradiction | | ].
+      subst y x0 l''.
+      destruct l as [| y l]; [ discriminate H1 | simpl in H1 ].
+      injection H1; clear H1; intros; subst x'' l0.
+      simpl in HPl; simpl.
+Check perm_swap.
+rewrite cons_comm_app.
+SearchAbout (Permutation (_ :: _)).
 bbb.
 
-  clear HP.
-  induction HPl.
-   simpl.
-   induction l; [ constructor; constructor | ].
-   simpl in IHl; simpl.
-   inversion IHl; subst.
-   symmetry in H2; apply length_zero_iff_nil in H2; subst l.
-   simpl in IHl, H0.
-   simpl.
+Theorem gogo : ∀ A (x y : A) l l',
+  Permutation l l'
+  → Permutation (x :: y :: l) (y :: x :: l').
+Proof.
+intros * HP.
+induction HP; [ constructor | | | ].
+
+
+ inversion IHHP; subst.
+  constructor; constructor; constructor; assumption.
+
+  inversion IHHP; subst.
+   constructor; constructor; constructor; assumption.
+bbb.
+
+apply gogo.
+simpl.
+
 bbb.
 
 Theorem permuted_partition_is_partition :
