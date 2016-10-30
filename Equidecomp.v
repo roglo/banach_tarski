@@ -263,10 +263,32 @@ Qed.
 
 Require Import Permutation.
 
+Theorem Permutation_flat_map_map : ∀ A B C (f : A → B → C) la lb,
+  Permutation
+    (flat_map (λ a, map (λ b, f a b) lb) la)
+    (flat_map (λ b, map (λ a, f a b) la) lb).
+Proof.
+intros.
+revert lb.
+induction la as [| a la]; intros.
+ simpl; rewrite flat_map_nil_fun; [ easy | ].
+ induction lb; constructor; easy.
+
+ simpl.
+bbb.
+
 Theorem partition_combine_swi_is_permutation :
   ∀ A (fl : list (set A → set A)) PE P'F,
   Permutation (partition_combine_swi fl PE P'F) (partition_combine fl PE P'F).
 Proof.
+intros.
+unfold partition_combine, partition_combine_swi.
+rewrite Permutation_flat_map_map.
+revert P'F.
+induction (combine fl PE) as [| a la]; intros lb; [ easy | ].
+simpl; rewrite IHla; destruct a; easy.
+bbb.
+
 (* there exists likely a simpler proof; to be seen one day... *)
 intros.
 unfold partition_combine_swi, partition_combine.
