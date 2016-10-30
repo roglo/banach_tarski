@@ -327,8 +327,8 @@ Qed.
 
 Theorem glop : ∀ A (l l' : list A) d s,
   Permutation l l'
-  → ∃ l'', Permutation (seq s (length l)) l'' ∧
-    ∀ i, i < length l → nth i l d = nth (nth i l'' 0 - s) l' d.
+  → ∃ σ, Permutation (seq s (length l)) σ ∧
+    ∀ i, i < length l → nth i l d = nth (nth i σ 0 - s) l' d.
 Proof.
 intros * HP.
 remember (length l) as len eqn:Hlen.
