@@ -76,6 +76,16 @@ intros E F G HEF HFG x Hx.
 apply HFG, HEF, Hx.
 Qed.
 
+Theorem included_in_empty : ∀ A (s := set_equiv) (E : set A),
+  E ⊂ ∅
+  → (E = ∅)%S.
+Proof.
+intros * HE.
+intros x.
+split; intros Hx; [ | contradiction ].
+apply HE in Hx; easy.
+Qed.
+
 Add Parametric Morphism {A} : (@intersection A)
   with signature
     (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
@@ -206,6 +216,45 @@ split; intros H.
 
  destruct H as ((HE & HF) & HG).
  split; [ split; assumption | assumption ].
+Qed.
+
+Theorem union_is_empty : ∀ A (s := set_equiv) (E F : set A),
+  (E ∪ F = ∅)%S → (E = ∅)%S ∧ (F = ∅)%S.
+Proof.
+intros * HEF.
+split; intros x.
+ split; [ intros Hx; apply HEF; left; easy | easy ].
+ split; [ intros Hx; apply HEF; right; easy | easy ].
+Qed.
+
+Theorem union_list_is_empty_iff : ∀ A (s := set_equiv) (EL : list (set A)),
+  (⋃ EL = ∅)%S ↔ Forall (λ E, (E = ∅)%S) EL.
+Proof.
+intros *.
+split; intros HEL.
+ apply Forall_forall; intros E HE.
+ revert E HE.
+ induction EL as [| E₁ EL]; intros; [ easy | ].
+ simpl in HEL, HE.
+ apply union_is_empty in HEL.
+ destruct HEL as (HE₁, HEL).
+ destruct HE as [HE| HE]; [ subst E₁; easy | ].
+ apply IHEL, HE; apply HEL.
+
+ rewrite Forall_forall in HEL.
+ induction EL as [| E₁ EL]; intros; [ easy | ].
+ intros x; split; [ intros Hx | easy ].
+ simpl in Hx.
+ destruct Hx as [Hx| Hx].
+  apply HEL in Hx; [ easy | left; easy ].
+  pose proof HEL (⋃ EL) as H.
+bbb.
+  apply HEL in Hx; [ easy | simpl ].
+  right.
+
+ apply HEL.
+bbb.
+
 Qed.
 
 Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (set A)),

@@ -423,6 +423,8 @@ split.
  intros i j Hij x.
  split; [ intros Hx; simpl | contradiction ].
  apply Permutation_sym in Hpe.
+Abort.
+(*
 bbb.
  apply glop with (d := ∅) in Hpe.
  destruct Hpe as (l & Hl & HPl).
@@ -490,8 +492,6 @@ Focus 2.
   pose proof Hpai i' j' Hi'j' as H.
   rewrite H in Hx; contradiction.
 
-
-
 bbb.
  apply Permutation_sym in Hpe.
  destruct (lt_dec i (length P'E)) as [Hil| Hil].
@@ -544,6 +544,7 @@ eapply permuted_partition_is_partition; [ | eassumption ].
 symmetry.
 apply partition_combine_swi_is_permutation.
 Qed.
+*)
 
 Theorem partition_combine_swi_is_partition :
   ∀ (s := set_equiv) E F PE PF P'F gl,
@@ -556,6 +557,126 @@ Theorem partition_combine_swi_is_partition :
   → ∀ fl, fl = map app_gr_inv gl
   → is_partition E (partition_combine_swi fl PE P'F).
 Proof.
+intros * HPE HPF Hlen1 Hlen3 HP'F Hgl * Hfl.
+split.
+ destruct HPE as (HPEU, _).
+ destruct HPF as (HPFU, _).
+ destruct HP'F as (HP'FU, _).
+ assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; assumption).
+ clear HP'FU.
+ unfold partition_combine_swi.
+ subst fl.
+ revert E F gl PE PF HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
+ induction P'F as [| F'₁ P'F]; intros.
+  apply included_in_empty in HUP'F.
+  rewrite HPFU in HUP'F.
+  apply union_list_is_empty in HUP'F.
+  rewrite Forall_forall in HUP'F.
+  simpl; rewrite HPEU.
+
+bbb.
+ induction PE as [| E₁ PE]; intros.
+  apply length_zero_iff_nil in Hlen3; subst gl; assumption.
+
+  destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
+  rewrite HPEU; simpl.
+  rewrite union_list_app; [ | reflexivity ].
+  simpl in Hlen3; apply Nat.succ_inj in Hlen3.
+  apply union_morph.
+   pose proof union_intersection_self point E₁ (map (app_gr_inv g₁) P'F).
+   rewrite map_map in H.
+   apply H.
+   assert (HEF : E₁ ⊂ app_gr_inv g₁ F).
+    rewrite HPFU.
+    apply included_group with g₁.
+    rewrite app_gr_inv_r.
+    intros p Hp.
+    pose proof Hgl 0 p as Hgl₁; simpl in Hgl₁.
+    apply Hgl₁ in Hp.
+    destruct PF as [| P₁ PF]; [ contradiction | simpl in Hp ].
+    left; assumption.
+
+    apply included_group with (g := gr_inv g₁) in HUP'F.
+    rewrite group_union_list_distr in HUP'F.
+    rewrite fold_app_gr_inv in HUP'F.
+    eapply included_trans; eassumption.
+
+   destruct PF as [| F₁ PF]; [ discriminate Hlen1 |  ].
+   simpl in Hlen1; apply Nat.succ_inj in Hlen1.
+   eapply IHPE; [ | | | eassumption | assumption | ]; try reflexivity.
+    rewrite HPFU in HUP'F.
+    intros p Hp; apply HUP'F.
+    right; assumption.
+
+    intros i.
+    pose proof (Hgl (S i)) as H; simpl in H.
+    assumption.
+
+ intros i j Hij.
+ erewrite partition_combine_nth; [ | reflexivity | | ].
+  erewrite partition_combine_nth; [ | reflexivity | | ].
+   remember (length P'F) as len eqn:Hlen.
+   destruct len.
+    symmetry in Hlen.
+    apply length_zero_iff_nil in Hlen; subst P'F; simpl.
+    subst fl.
+    destruct gl as [| g₁ gl].
+     simpl; unfold id, Datatypes.id at 2; simpl.
+     do 2 rewrite intersection_empty_r; reflexivity.
+
+     simpl; unfold app_gr_inv, Nat.div; rewrite app_gr_empty_set.
+     do 2 rewrite intersection_empty_r; reflexivity.
+
+    destruct HPE as (HPEU, HPEI).
+    destruct HP'F as (HP'FU, HP'FI).
+    destruct (eq_nat_dec (i / S len) (j / S len)) as [Hd| Hd].
+     destruct (eq_nat_dec (i mod S len) (j mod S len)) as [Hm| Hm].
+      assert (Hnlen : (S len ≠ 0)%nat) by (intros H; discriminate H).
+      pose proof Nat.div_mod i (S len) Hnlen as Hi.
+      pose proof Nat.div_mod j (S len) Hnlen as Hj.
+      rewrite Hd, Hm, <- Hj in Hi;  contradiction.
+
+      subst fl; rewrite <- Hd; simpl.
+      pose proof map_nth app_gr_inv gl gr_ident (i / S len) as Hi.
+      destruct (lt_dec (i / S len) (length gl)) as [Hil| Hil].
+       rewrite nth_indep with (d' := id) in Hi.
+        rewrite Hi, intersection_shuffle0.
+        rewrite intersection_assoc, <- intersection_assoc.
+        unfold app_gr_inv; rewrite <- group_intersection_distr.
+        apply not_eq_sym in Hm.
+        rewrite HP'FI; [ | assumption ].
+        rewrite app_gr_empty_set.
+        apply intersection_empty_r.
+
+        rewrite map_length; assumption.
+
+       apply Nat.nlt_ge in Hil.
+       rewrite Hlen3 in Hil.
+       rewrite nth_overflow; [ | assumption ].
+       do 2 rewrite intersection_empty_l; reflexivity.
+
+     rewrite intersection_shuffle0, intersection_assoc.
+     rewrite HPEI; [ | assumption ].
+     do 2 rewrite intersection_empty_l; reflexivity.
+
+   subst fl; rewrite map_length; assumption.
+
+   subst fl.
+   intros f Hf.
+   apply in_map_iff in Hf.
+   destruct Hf as (g & Hg & Hix).
+   subst f; apply app_gr_empty_set.
+
+  subst fl; rewrite map_length; assumption.
+
+  subst fl.
+  intros f Hf.
+  apply in_map_iff in Hf.
+  destruct Hf as (g & Hg & Hix).
+  subst f; apply app_gr_empty_set.
+bbb.
+
+intros * HPE HPF Hlen1 Hlen3 HP'F Hgl * Hfl.
 intros * HPE HPF Hlen1 Hlen3 HP'F Hgl * Hfl.
 apply partition_combine_partition_combine_swi.
 eapply partition_combine_is_partition with (F := F) (PF := PF); eassumption.
