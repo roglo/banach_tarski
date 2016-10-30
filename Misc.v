@@ -276,3 +276,33 @@ Qed.
 Record choice_function {A} (R : A → A → Prop) f := mkcf
   { cf_repr_uniqueness : ∀ x y, R x y → f x = f y;
     cf_repr_membership : ∀ x, R x (f x) }.
+
+Require Import Permutation.
+
+Theorem Permutation_cons_nil : ∀ A l (x : A),
+  ¬ Permutation (x :: l) [].
+Proof.
+intros * H.
+apply Permutation_sym, Permutation_nil_cons in H; easy.
+Qed.
+
+Theorem Permutation_flat_map_map : ∀ A B C (f : A → B → C) la lb,
+  Permutation
+    (flat_map (λ a, map (λ b, f a b) lb) la)
+    (flat_map (λ b, map (λ a, f a b) la) lb).
+Proof.
+intros.
+revert lb.
+induction la as [| a la]; intros.
+ simpl; rewrite flat_map_nil_fun; [ easy | ].
+ induction lb; constructor; easy.
+
+ simpl.
+ rewrite IHla; clear IHla.
+ revert a la.
+ induction lb as [| b lb]; intros; [ easy | ].
+ simpl; constructor; rewrite <- IHlb.
+ do 2 rewrite app_assoc.
+ apply Permutation_app_tail.
+ apply Permutation_app_comm.
+Qed.

@@ -263,20 +263,6 @@ Qed.
 
 Require Import Permutation.
 
-Theorem Permutation_flat_map_map : ∀ A B C (f : A → B → C) la lb,
-  Permutation
-    (flat_map (λ a, map (λ b, f a b) lb) la)
-    (flat_map (λ b, map (λ a, f a b) la) lb).
-Proof.
-intros.
-revert lb.
-induction la as [| a la]; intros.
- simpl; rewrite flat_map_nil_fun; [ easy | ].
- induction lb; constructor; easy.
-
- simpl.
-bbb.
-
 Theorem partition_combine_swi_is_permutation :
   ∀ A (fl : list (set A → set A)) PE P'F,
   Permutation (partition_combine_swi fl PE P'F) (partition_combine fl PE P'F).
@@ -284,67 +270,8 @@ Proof.
 intros.
 unfold partition_combine, partition_combine_swi.
 rewrite Permutation_flat_map_map.
-revert P'F.
-induction (combine fl PE) as [| a la]; intros lb; [ easy | ].
+induction (combine fl PE) as [| a la]; intros; [ easy | ].
 simpl; rewrite IHla; destruct a; easy.
-bbb.
-
-(* there exists likely a simpler proof; to be seen one day... *)
-intros.
-unfold partition_combine_swi, partition_combine.
-do 2 rewrite flat_map_concat_map.
-revert PE P'F.
-induction fl as [| f₁ fl]; intros; simpl.
- induction P'F as [| F'₁ P'F]; [ reflexivity | apply IHP'F ].
-
- induction P'F as [| F'₁ P'F]; simpl.
-  rewrite <- flat_map_concat_map.
-  rewrite flat_map_nil_fun; [ constructor | ].
-  apply Forall_forall; intros (f, x) H; reflexivity.
-
-  destruct PE as [| E₁ PE]; simpl.
-   rewrite <- flat_map_concat_map.
-   rewrite flat_map_nil_fun; [ constructor | ].
-   apply Forall_forall; intros; reflexivity.
-
-   constructor.
-   rewrite IHP'F.
-   etransitivity; [ apply Permutation_app_comm | ].
-   simpl; rewrite <- app_assoc.
-   apply Permutation_app_head.
-   rewrite <- IHfl.
-   clear.
-   remember (combine fl PE) as l eqn:Hl.
-   clear.
-   revert F'₁ P'F.
-   induction l as [| x l]; intros.
-    rewrite <- flat_map_concat_map.
-    rewrite flat_map_nil_fun; [ constructor | ].
-    apply Forall_forall; intros; reflexivity.
-
-    simpl; destruct x as (x, y).
-    rewrite <- IHl; simpl.
-    etransitivity; [ apply Permutation_app_comm | simpl ].
-    constructor.
-    rewrite app_assoc.
-    etransitivity; [ | apply Permutation_app_comm ].
-    apply Permutation_app; [ reflexivity | ].
-    clear.
-    revert x y l.
-    induction P'F as [| F₁ P'F]; intros; [ constructor | simpl ].
-    constructor.
-    etransitivity; [ | apply Permutation_app_comm ].
-    rewrite <- app_assoc.
-    apply Permutation_app; [ reflexivity | ].
-    rewrite IHP'F.
-    apply Permutation_app_comm.
-Qed.
-
-Theorem Permutation_cons_nil : ∀ A l (x : A),
-  ¬ Permutation (x :: l) [].
-Proof.
-intros * H.
-apply Permutation_sym, Permutation_nil_cons in H; easy.
 Qed.
 
 Theorem glop : ∀ A (l l' : list A) d s,
