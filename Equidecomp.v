@@ -331,6 +331,33 @@ Theorem glop : ∀ A (l l' : list A) d s,
     ∀ i, i < length l → nth i l d = nth (nth i l'' 0 - s) l' d.
 Proof.
 intros * HP.
+remember (length l) as len eqn:Hlen.
+symmetry in Hlen.
+revert l l' d s HP Hlen.
+induction len; intros.
+ exists [].
+ split; [ easy | intros i Hi; apply Nat.nlt_0_r in Hi; easy ].
+
+ destruct l as [| x l]; [ easy | ].
+ simpl in Hlen; apply Nat.succ_inj in Hlen.
+ assert (HP' : ∃ l₁ l₂, l' = l₁ ++ x :: l₂).
+  clear -HP Hlen.
+  revert x l l' HP Hlen.
+  induction len; intros.
+   apply length_zero_iff_nil in Hlen; subst l.
+   exists [], [].
+   apply Permutation_length_1_inv in HP; easy.
+
+   destruct l as [| y l]; [ easy | simpl in Hlen ].
+   apply Nat.succ_inj in Hlen.
+bbb.
+
+  revert x l len HP Hlen.
+  induction l' as [| x']; intros.
+   apply Permutation_cons_nil in HP; easy.
+
+   inversion HP; subst; [ exists [], l'; easy | exists [x'], l0; easy | ].
+   rename l'0 into l''; rename H0 into H''.
 
 bbb.
 intros * HP.
