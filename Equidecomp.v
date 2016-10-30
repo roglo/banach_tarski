@@ -558,6 +558,9 @@ Theorem partition_combine_swi_is_partition :
   → is_partition E (partition_combine_swi fl PE P'F).
 Proof.
 intros * HPE HPF Hlen1 Hlen3 HP'F Hgl * Hfl.
+bbb.
+
+intros * HPE HPF Hlen1 Hlen3 HP'F Hgl * Hfl.
 split.
  destruct HPE as (HPEU, _).
  destruct HPF as (HPFU, _).
@@ -568,16 +571,40 @@ split.
  subst fl.
  revert E F gl PE PF HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
  induction P'F as [| F'₁ P'F]; intros.
+  simpl in HUP'F; simpl.
   apply included_in_empty in HUP'F.
   rewrite HPFU in HUP'F.
-  apply union_list_is_empty in HUP'F.
+  apply union_list_is_empty_iff in HUP'F.
   rewrite Forall_forall in HUP'F.
-  simpl; rewrite HPEU.
+  assert (HF : ∀ i, (PF.[i] = ∅)%S).
+   intros i.
+   destruct (lt_dec i (length PF)) as [Hi| Hi].
+    apply HUP'F, nth_In; easy.
+
+    apply Nat.nlt_ge in Hi.
+    rewrite nth_overflow; easy.
+
+    assert (HE : ∀ i, (PE.[i] = ∅)%S).
+     intros i.
+     pose proof Hgl i as H.
+     rewrite HF in H.
+     apply app_gr_app_gr_inv in H.
+     unfold app_gr_inv in H.
+     rewrite app_gr_empty_set in H; easy.
+
+     rewrite HPEU.
+     intros x; split; [ intros Hx; simpl | easy ].
+     clear -HE Hx.
+     induction PE as [| E PE]; [ easy | ].
+     destruct Hx as [Hx| Hx].
+      pose proof HE 0 as H; simpl in H.
+      rewrite H in Hx; easy.
+
+      apply IHPE; [ | easy ].
+      intros i.
+      pose proof HE (S i); easy.
 
 bbb.
- induction PE as [| E₁ PE]; intros.
-  apply length_zero_iff_nil in Hlen3; subst gl; assumption.
-
   destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
   rewrite HPEU; simpl.
   rewrite union_list_app; [ | reflexivity ].

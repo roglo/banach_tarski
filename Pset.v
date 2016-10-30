@@ -242,19 +242,15 @@ split; intros HEL.
  apply IHEL, HE; apply HEL.
 
  rewrite Forall_forall in HEL.
+ split; [ intros Hx; simpl | easy ].
+ revert x Hx.
  induction EL as [| E₁ EL]; intros; [ easy | ].
- intros x; split; [ intros Hx | easy ].
  simpl in Hx.
  destruct Hx as [Hx| Hx].
   apply HEL in Hx; [ easy | left; easy ].
-  pose proof HEL (⋃ EL) as H.
-bbb.
-  apply HEL in Hx; [ easy | simpl ].
-  right.
 
- apply HEL.
-bbb.
-
+  eapply IHEL; [ | eassumption ].
+  intros E HE; apply HEL; right; assumption.
 Qed.
 
 Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (set A)),
