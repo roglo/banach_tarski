@@ -319,9 +319,9 @@ intros i Hilen.
     rewrite <- Hlen, HP, app_length.
     apply Nat.le_add_r.
 
-    rewrite Hnn.
-rewrite H.
-f_equal.
+    rewrite Hnn, H.
+    rewrite app_nth1.
+     rewrite app_nth1; [ easy | ].
 
 bbb.
 SearchAbout firstn.
