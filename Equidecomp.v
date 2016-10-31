@@ -310,9 +310,16 @@ intros i Hilen.
   apply Nat.succ_lt_mono in Hilen.
   pose proof Hσ i Hilen as H.
   destruct (lt_dec i (length l₁)) as [H₁| H₁].
-   assert (nth i (firstn (length l₁) σ ++ []) 0 = nth i σ 0).
-    rewrite app_nth1.
-    now rewrite nth_firstn.
+   assert (Hnn : nth i (firstn (length l₁) σ ++ []) 0 = nth i σ 0).
+    rewrite app_nth1; [ now rewrite nth_firstn | ].
+    rewrite firstn_length_le; [ easy | ].
+    apply Permutation_length in Hs.
+    rewrite seq_length in Hs; rewrite <- Hs.
+    apply Permutation_length in HP.
+    rewrite <- Hlen, HP, app_length.
+    apply Nat.le_add_r.
+
+    rewrite Hnn.
 
 bbb.
 SearchAbout firstn.
