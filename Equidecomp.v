@@ -274,14 +274,6 @@ induction (combine fl PE) as [| a la]; intros; [ easy | ].
 simpl; rewrite IHla; destruct a; easy.
 Qed.
 
-Theorem Permutation_cons_app : ∀ A (x : A) l l',
-  Permutation (x :: l) l'
-  → ∃ l₁ l₂ : list A, l' = l₁ ++ x :: l₂.
-Proof.
-intros * HP.
-apply Permutation_in with (x := x) in HP; [ now apply in_split | left; easy ].
-Qed.
-
 Theorem glop : ∀ A (l l' : list A) d s,
   Permutation l l'
   → ∃ σ, Permutation (seq s (length l)) σ ∧
@@ -298,7 +290,7 @@ induction len; intros.
  destruct l as [| x l]; [ easy | ].
  simpl in Hlen; apply Nat.succ_inj in Hlen.
  assert (HP' : ∃ l₁ l₂, l' = l₁ ++ x :: l₂).
-  eapply Permutation_cons_app; eassumption.
+  eapply Permutation_cons_exist; eassumption.
 
   destruct HP' as (l₁ & l₂ & Hl'); subst l'.
   apply Permutation_app_inv with (l1 := []) in HP; simpl in HP.
@@ -320,6 +312,8 @@ intros i Hilen.
   destruct (lt_dec i (length l₁)) as [H₁| H₁].
    assert (nth i (firstn (length l₁) σ ++ []) 0 = nth i σ 0).
     rewrite app_nth1.
+    now rewrite nth_firstn.
+
 bbb.
 SearchAbout firstn.
      rewrite firstn_all2.

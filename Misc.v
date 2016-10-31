@@ -182,6 +182,18 @@ induction l as [| y] using rev_ind; intros; [ exists x, []; reflexivity | ].
 exists y, (x :: l); reflexivity.
 Qed.
 
+Theorem nth_firstn : ∀ A (l : list A) i n d,
+  i < n
+  → nth i (firstn n l) d =  nth i l d.
+Proof.
+intros * Hin.
+revert i n Hin.
+induction l as [| x l]; intros; [ destruct n, i; easy | simpl ].
+destruct n, i; try easy.
+apply Nat.succ_lt_mono in Hin; simpl.
+now apply IHl.
+Qed.
+
 Theorem split_app_eq : ∀ A (el₁ el₂ el₃ el₄ : list A),
   el₁ ++ el₂ = el₃ ++ el₄
   → { ∃ el, el₃ = el₁ ++ el ∧ el₂ = el ++ el₄ } +
@@ -284,6 +296,14 @@ Theorem Permutation_cons_nil : ∀ A l (x : A),
 Proof.
 intros * H.
 apply Permutation_sym, Permutation_nil_cons in H; easy.
+Qed.
+
+Theorem Permutation_cons_exist : ∀ A (x : A) l l',
+  Permutation (x :: l) l'
+  → ∃ l₁ l₂ : list A, l' = l₁ ++ x :: l₂.
+Proof.
+intros * HP.
+apply Permutation_in with (x := x) in HP; [ now apply in_split | left; easy ].
 Qed.
 
 Theorem Permutation_flat_map_map : ∀ A B C (f : A → B → C) la lb,
