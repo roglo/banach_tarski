@@ -274,6 +274,14 @@ induction (combine fl PE) as [| a la]; intros; [ easy | ].
 simpl; rewrite IHla; destruct a; easy.
 Qed.
 
+Theorem Permutation_cons_app : ∀ A (x : A) l l',
+  Permutation (x :: l) l'
+  → ∃ l₁ l₂ : list A, l' = l₁ ++ x :: l₂.
+Proof.
+intros * HP.
+apply Permutation_in with (x := x) in HP; [ now apply in_split | left; easy ].
+Qed.
+
 Theorem glop : ∀ A (l l' : list A) d s,
   Permutation l l'
   → ∃ σ, Permutation (seq s (length l)) σ ∧
@@ -285,17 +293,61 @@ symmetry in Hlen.
 revert l l' d s HP Hlen.
 induction len; intros.
  exists [].
- split; [ easy | intros i Hi; apply Nat.nlt_0_r in Hi; easy ].
+ split; [ easy | intros i Hi; now apply Nat.nlt_0_r in Hi ].
 
  destruct l as [| x l]; [ easy | ].
  simpl in Hlen; apply Nat.succ_inj in Hlen.
  assert (HP' : ∃ l₁ l₂, l' = l₁ ++ x :: l₂).
+  eapply Permutation_cons_app; eassumption.
+
+  destruct HP' as (l₁ & l₂ & Hl'); subst l'.
+  apply Permutation_app_inv with (l1 := []) in HP; simpl in HP.
+  apply IHlen with (d := d) (s := s) in HP; [ | easy ].
+  destruct HP as (σ & HP & Hσ).
+remember (map S σ) as σ' eqn:Hσ'.
+exists (firstn (length l₁) σ' ++ [s] ++ skipn (length l₁) σ').
+subst σ'.
+split.
+ simpl.
+ apply Permutation.Permutation_cons_app.
+ rewrite firstn_skipn.
+SearchAbout (Permutation (seq _ _)).
+ clear -HP.
+ revert σ HP.
+ induction len; intros; simpl in HP; simpl.
+  destruct σ as [| σ₁ σ]; [ easy | now apply Permutation_nil_cons in HP ].
+
+  destruct σ as [| σ₁ σ]; [ now apply Permutation_cons_nil in HP | simpl ].
+Focus 2.
+intros i Hilen.
+destruct i; simpl.
+ destruct l₁ as [| x₁ l₁]; [ simpl; now rewrite Nat.sub_diag | simpl ].
+ destruct σ as [| σ₁ σ].
+simpl.
+rewrite Nat.sub_diag.
+simpl in Hσ.
+bbb. (* ah putain, ça commence à me gonfler, putain *)
+
+split. Focus 2.
+intros i Hilen.
+destruct (lt_dec i (length l₁)) as [H₁| H₁].
+assert (nth i (firstn (length l₁) σ ++ []) 0 = nth i σ 0).
+rewrite app_nth1.
+2: rewrite firstn_length.
+
+
+
+bbb.
+
+  exists
+bbb.
+
   clear -HP Hlen.
   revert x l l' HP Hlen.
   induction len; intros.
    apply length_zero_iff_nil in Hlen; subst l.
    exists [], [].
-   apply Permutation_length_1_inv in HP; easy.
+   now apply Permutation_length_1_inv in HP.
 
    destruct l as [| y l]; [ easy | simpl in Hlen ].
    apply Nat.succ_inj in Hlen.
