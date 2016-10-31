@@ -302,8 +302,25 @@ induction len; intros.
 
   destruct HP' as (l₁ & l₂ & Hl'); subst l'.
   apply Permutation_app_inv with (l1 := []) in HP; simpl in HP.
-  apply IHlen with (d := d) (s := s) in HP; [ | easy ].
-  destruct HP as (σ & HP & Hσ).
+  generalize HP; intros H.
+  apply IHlen with (d := d) (s := s) in H; [ | easy ].
+  destruct H as (σ & Hs & Hσ).
+(**)
+exists (s + length l₁ :: firstn (length l₁) σ).
+split. Focus 2.
+intros i Hilen.
+ simpl.
+ destruct i.
+  rewrite Nat.add_comm, Nat.add_sub.
+  rewrite app_nth2; [ | unfold ge; easy ].
+  now rewrite Nat.sub_diag.
+
+bbb.
+  destruct (lt_dec i (s + length l₁)) as [H₁| H₁].
+   rewrite app_nth1.
+
+
+bbb.
 remember (map S σ) as σ' eqn:Hσ'.
 exists (firstn (length l₁) σ' ++ [s] ++ skipn (length l₁) σ').
 subst σ'.
@@ -325,8 +342,9 @@ split.
   apply IHlen.
   eapply Permutation_cons_app_inv; eassumption.
 
-bbb.
 intros i Hilen.
+bbb.
+
 destruct i; simpl.
  destruct l₁ as [| x₁ l₁]; [ simpl; now rewrite Nat.sub_diag | simpl ].
  destruct σ as [| σ₁ σ].
