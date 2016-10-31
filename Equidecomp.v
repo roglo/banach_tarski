@@ -306,7 +306,7 @@ induction len; intros.
   apply IHlen with (d := d) (s := s) in H; [ | easy ].
   destruct H as (σ & Hs & Hσ).
 (**)
-exists (s + length l₁ :: firstn (length l₁) σ).
+exists (s + length l₁ :: firstn (length l₁) σ ++ []).
 split. Focus 2.
 intros i Hilen.
  simpl.
@@ -315,9 +315,17 @@ intros i Hilen.
   rewrite app_nth2; [ | unfold ge; easy ].
   now rewrite Nat.sub_diag.
 
+  apply Nat.succ_lt_mono in Hilen.
+  pose proof Hσ i Hilen as H.
+  destruct (lt_dec i (length l₁)) as [H₁| H₁].
+   assert (nth i (firstn (length l₁) σ ++ []) 0 = nth i σ 0).
+    rewrite app_nth1.
 bbb.
-  destruct (lt_dec i (s + length l₁)) as [H₁| H₁].
-   rewrite app_nth1.
+SearchAbout firstn.
+     rewrite firstn_all2.
+
+
+2: rewrite firstn_length_le; [ easy | ].
 
 
 bbb.
