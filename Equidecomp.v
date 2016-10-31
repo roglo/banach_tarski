@@ -299,6 +299,7 @@ induction len; intros.
 
    destruct l as [| y l]; [ easy | simpl in Hlen ].
    apply Nat.succ_inj in Hlen.
+   destruct l' as [| x' l']; [ now apply Permutation_cons_nil in HP | ].
 bbb.
 
   revert x l len HP Hlen.
