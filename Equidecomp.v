@@ -320,6 +320,8 @@ intros i Hilen.
     apply Nat.le_add_r.
 
     rewrite Hnn.
+rewrite H.
+f_equal.
 
 bbb.
 SearchAbout firstn.
