@@ -311,14 +311,21 @@ split.
  simpl.
  apply Permutation.Permutation_cons_app.
  rewrite firstn_skipn.
-SearchAbout (Permutation (seq _ _)).
  clear -HP.
- revert σ HP.
+ revert s σ HP.
  induction len; intros; simpl in HP; simpl.
   destruct σ as [| σ₁ σ]; [ easy | now apply Permutation_nil_cons in HP ].
 
-  destruct σ as [| σ₁ σ]; [ now apply Permutation_cons_nil in HP | simpl ].
-Focus 2.
+  generalize HP; intros H.
+  apply Permutation_cons_app in H.
+  destruct H as (l₁ & l₂ & Hσ); subst σ.
+  rewrite map_app; simpl.
+  apply Permutation.Permutation_cons_app.
+  rewrite <- map_app.
+  apply IHlen.
+  eapply Permutation_cons_app_inv; eassumption.
+
+bbb.
 intros i Hilen.
 destruct i; simpl.
  destruct l₁ as [| x₁ l₁]; [ simpl; now rewrite Nat.sub_diag | simpl ].
@@ -326,6 +333,10 @@ destruct i; simpl.
 simpl.
 rewrite Nat.sub_diag.
 simpl in Hσ.
+destruct len; [ | now apply Permutation_cons_nil in HP ].
+clear Hσ Hilen.
+simpl in HP.
+
 bbb. (* ah putain, ça commence à me gonfler, putain *)
 
 split. Focus 2.
