@@ -592,6 +592,18 @@ split.
           intros x; split; [ intros Hx; simpl | easy ].
           eapply IHHpe1_1 with (E₁ := E₂); [ | eassumption ].
           intros i k Hik.
+          destruct i.
+           destruct k; [ exfalso; now apply Hik | ].
+           destruct k; [ now apply (Hpai 1 0 (Nat.neq_succ_diag_l 0)) | ].
+           now apply (Hpai 1 (S (S k))).
+
+           destruct i.
+            destruct k; [ now apply (Hpai 0 1 (Nat.neq_succ_diag_r 0)) | ].
+            destruct k; [ exfalso; now apply Hik | ].
+            now apply (Hpai 0 (S (S k)) (Nat.neq_0_succ (S k))).
+
+            assert (Hsi : S (S i) ≠ 1) by easy.
+            destruct k; [ now apply (Hpai (S (S i)) 1 Hsi) | ].
 bbb.
 
       destruct k; [ now apply (Hpai 0 1 Hij x) | ].
