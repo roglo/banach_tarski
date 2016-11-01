@@ -553,10 +553,32 @@ split.
         remember intersection as f; simpl in Hy; subst f.
         clear IHHpe1 Hik.
         revert E₁ E₂ y k Hpai Hy.
-        induction Hpe1 as [| E₃ PE P'E | E₂ E₃ PE | PE P'E P''E ]; intros.
+        induction Hpe1 as [| E₃ PE P'E | E₃ E₄ PE | PE P'E P''E ]; intros.
          simpl in Hy; rewrite match_id in Hy; easy.
 
          destruct k.
+          remember intersection as f; simpl in Hy; subst f.
+          now apply (Hpai 1 2 (Nat.neq_succ_diag_r 1) y).
+
+          remember intersection as f; simpl in Hy; subst f.
+          eapply IHHpe1 with (E₁ := E₁); [ | eassumption ].
+          intros i j Hij.
+          destruct i.
+           destruct j; [ exfalso; now apply Hij | simpl ].
+           destruct j; [ apply (Hpai 0 1 (Nat.neq_succ_diag_r 0)) | ].
+           now apply (Hpai 0 (S (S (S j)))).
+
+           destruct i.
+            destruct j; [ now apply (Hpai 1 0) | ].
+            destruct j; [ exfalso; now apply Hij | ].
+            now apply (Hpai 1 (S (S (S j)))).
+
+            destruct j; [ now apply (Hpai (S (S (S i))) 0) | ].
+            destruct j; [ now apply (Hpai (S (S (S i))) 1) | ].
+            apply Nat.succ_inj_wd_neg in Hij.
+            now apply (Hpai (S (S (S i))) (S (S (S j)))).
+
+         simpl.
 bbb.
 
       destruct k; [ now apply (Hpai 0 1 Hij x) | ].
