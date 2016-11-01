@@ -27,6 +27,11 @@ Definition subtract {A} (E₁ E₂ : set A) :=
 Definition included {A} (E₁ E₂ : set A) :=
   ∀ x, x ∈ E₁ → x ∈ E₂.
 
+Arguments intersection : simpl never.
+Arguments union : simpl never.
+Arguments subtract : simpl never.
+Arguments included : simpl never.
+
 Delimit Scope set_scope with S.
 
 Notation "a = b" := (set_eq a b) : set_scope.
@@ -263,7 +268,8 @@ induction P₂ as [| Q]; intros.
  rewrite union_empty_r; reflexivity.
 
  rewrite cons_comm_app, app_assoc; simpl; subst s.
- rewrite IHP₂, union_assoc.
+ rewrite IHP₂.
+ unfold union_list; simpl; rewrite union_assoc.
  intros x.
  split; intros H.
   destruct H as [H| H]; [ left | right; assumption ].

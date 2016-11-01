@@ -555,6 +555,8 @@ split.
         revert E₁ E₂ y k Hpai Hy.
         induction Hpe1 as [| E₃ PE P'E | E₂ E₃ PE | PE P'E P''E ]; intros.
          simpl in Hy; rewrite match_id in Hy; easy.
+
+         destruct k.
 bbb.
 
       destruct k; [ now apply (Hpai 0 1 Hij x) | ].
