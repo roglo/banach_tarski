@@ -1,7 +1,9 @@
-Banach_Tarski.vio: Banach_Tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio Transformation.vio Equidecomp.vio
-Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified: Banach_Tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo Transformation.vo Equidecomp.vo
-Equidecomp.vio: Equidecomp.v Misc.vio Matrix.vio Pset.vio Partition.vio OrbitRepr.vio Transformation.vio Words.vio
-Equidecomp.vo Equidecomp.glob Equidecomp.v.beautified: Equidecomp.v Misc.vo Matrix.vo Pset.vo Partition.vo OrbitRepr.vo Transformation.vo Words.vo
+Banach_Tarski.vio: Banach_Tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio GroupTransf.vio Equidecomp.vio
+Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified: Banach_Tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo GroupTransf.vo Equidecomp.vo
+Equidecomp.vio: Equidecomp.v Misc.vio Matrix.vio Pset.vio Partition.vio OrbitRepr.vio GroupTransf.vio
+Equidecomp.vo Equidecomp.glob Equidecomp.v.beautified: Equidecomp.v Misc.vo Matrix.vo Pset.vo Partition.vo OrbitRepr.vo GroupTransf.vo
+GroupTransf.vio: GroupTransf.v Words.vio MiscReals.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio
+GroupTransf.vo GroupTransf.glob GroupTransf.v.beautified: GroupTransf.v Words.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo
 Matrix.vio: Matrix.v Words.vio Normalize.vio Reverse.vio MiscReals.vio
 Matrix.vo Matrix.glob Matrix.v.beautified: Matrix.v Words.vo Normalize.vo Reverse.vo MiscReals.vo
 Misc.vio: Misc.v
@@ -20,7 +22,5 @@ Pset.vio: Pset.v Misc.vio
 Pset.vo Pset.glob Pset.v.beautified: Pset.v Misc.vo
 Reverse.vio: Reverse.v Misc.vio Words.vio Normalize.vio
 Reverse.vo Reverse.glob Reverse.v.beautified: Reverse.v Misc.vo Words.vo Normalize.vo
-Transformation.vio: Transformation.v Words.vio MiscReals.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio
-Transformation.vo Transformation.glob Transformation.v.beautified: Transformation.v Words.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo
 Words.vio: Words.v Misc.vio
 Words.vo Words.glob Words.v.beautified: Words.v Misc.vo

@@ -10,7 +10,7 @@ Import ListNotations.
 Require Import Reals.
 
 Require Import Misc Matrix Pset.
-Require Import Partition OrbitRepr Transformation.
+Require Import Partition OrbitRepr GroupTransf.
 
 Definition id {A} := @Datatypes.id A.
 

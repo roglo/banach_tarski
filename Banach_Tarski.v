@@ -10,7 +10,7 @@ Import ListNotations.
 Require Import Reals Psatz Nsatz.
 
 Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
-Require Import Partition OrbitRepr Transformation Equidecomp.
+Require Import Partition OrbitRepr GroupTransf Equidecomp.
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
   equidecomposable set_equiv sphere_but_fixpoints
