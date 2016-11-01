@@ -533,6 +533,12 @@ induction Hpe as [| E₁ PE P'E | | ]; intros.
    destruct j; [ now apply (Hpai 0 1 (Nat.neq_0_succ 0) x) | ].
    now apply (Hpai 0 (S (S (S j))) Hij x).
 
+   simpl.
+bbb.
+   induction Hpe1.
+    apply Permutation_nil in Hpe2; subst P''E.
+    simpl in Hx; now rewrite match_id in Hx.
+   eapply IHHpe1; [ | | eapply Hx₁ | | ]; try eassumption.
    eapply IHHpe2; [ | | eapply Hx₁ | | ]; try eassumption.
 Focus 2.
 
