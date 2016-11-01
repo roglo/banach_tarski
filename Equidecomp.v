@@ -604,6 +604,11 @@ split.
 
             assert (Hsi : S (S i) ≠ 1) by easy.
             destruct k; [ now apply (Hpai (S (S i)) 1 Hsi) | ].
+            destruct k.
+             now apply (Hpai (S (S i)) 0 (Nat.neq_succ_0 (S i))).
+             now apply (Hpai (S (S i)) (S (S k)) Hik).
+
+          idtac.
 bbb.
 
       destruct k; [ now apply (Hpai 0 1 Hij x) | ].
