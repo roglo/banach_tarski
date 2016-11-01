@@ -492,6 +492,27 @@ split.
 
   etransitivity; eassumption.
 
+(**)
+ intros i j Hij x.
+ split; [ intros Hx; simpl | contradiction ].
+ apply Permutation_nth_error in Hpe.
+ destruct Hpe as (Hlen & f & Hfi & Hn).
+ unfold FinFun.Injective in Hfi.
+ assert (Hfij : f i ≠ f j) by (intros H; now apply Hfi in H).
+ assert (P'E.[i] = PE.[f i]).
+  pose proof Hn i as Hi.
+  remember (nth_error P'E i) as p'i eqn:H'i.
+  symmetry in Hi, H'i.
+  destruct p'i as [v | ].
+   apply nth_error_In in Hi.
+   apply nth_error_In in H'i.
+Check In_nth.
+
+SearchAbout (List.In _ _ → _).
+bbb.
+
+ pose proof (Hpai (f i) (f j) Hfij) as H.
+bbb.
  intros i j Hij x.
  split; [ intros Hx; simpl | contradiction ].
  clear E Hpau.
