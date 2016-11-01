@@ -533,7 +533,9 @@ induction Hpe as [| E₁ PE P'E | | ]; intros.
    destruct j; [ now apply (Hpai 0 1 (Nat.neq_0_succ 0) x) | ].
    now apply (Hpai 0 (S (S (S j))) Hij x).
 
-   simpl.
+   eapply IHHpe2; [ | | eapply Hx₁ | | ]; try eassumption.
+Focus 2.
+
 bbb.
 pose proof Hpai 0 (S k) Hik as H.
 simpl in H.
