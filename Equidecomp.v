@@ -506,7 +506,7 @@ induction Hpe as [| E₁ PE P'E | | ]; intros.
   pose proof Hpai 0 (S j) Hij as HEP; simpl in HEP.
   clear IHHpe.
   revert E₁ j x Hpai Hij Hx₁ Hx HEP.
-  induction Hpe as [| E₂ PE P'E | E₂ E₃ PE | ]; intros.
+  induction Hpe as [| E₂ PE P'E | E₂ E₃ PE | PE P'E P''E ]; intros.
    simpl in Hx; now rewrite match_id in Hx.
 
    destruct j; [ now apply (HEP x) | ].
@@ -528,7 +528,12 @@ induction Hpe as [| E₁ PE P'E | | ]; intros.
      intros H; now apply Nat.succ_inj in H.
 
    destruct j; [ now apply (Hpai 0 2 (Nat.neq_0_succ 1) x) | ].
+   remember (E₃ :: PE) as u; simpl in Hx; subst u.
+   remember (E₂ :: PE) as u; simpl in HEP; subst u.
+   destruct j; [ now apply (Hpai 0 1 (Nat.neq_0_succ 0) x) | ].
+   now apply (Hpai 0 (S (S (S j))) Hij x).
 
+   simpl.
 bbb.
 pose proof Hpai 0 (S k) Hik as H.
 simpl in H.
