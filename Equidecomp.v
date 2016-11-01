@@ -501,16 +501,15 @@ induction Hpe as [| E₁ PE P'E | | ]; intros.
  destruct Hx as (Hx, _); simpl in Hx; now rewrite match_id in Hx.
 
  destruct i.
-  destruct j; [ now apply Hij | simpl in Hx ].
-  destruct Hx as (Hx₁, Hx).
-  pose proof Hpai 0 (S j) Hij as HEP; simpl in HEP.
+  destruct j; [ now apply Hij | ].
+  remember intersection as f; simpl in Hx; subst f.
   clear IHHpe.
-  revert E₁ j x Hpai Hij Hx₁ Hx HEP.
+  revert E₁ j x Hpai Hij (*Hx₁*) Hx (*HEP*).
   induction Hpe as [| E₂ PE P'E | E₂ E₃ PE | PE P'E P''E ]; intros.
    simpl in Hx; now rewrite match_id in Hx.
 
-   destruct j; [ now apply (HEP x) | ].
-   simpl in Hx, HEP.
+   destruct j; [ now apply (Hpai 0 1 Hij x) | ].
+   remember intersection as f; simpl in Hx; subst f.
    eapply IHHpe with (j := j) (E₁ := E₁); try eassumption; [ | easy ].
    intros i k Hik.
    destruct (eq_nat_dec i (S k)) as [Hisk| Hisk].
@@ -528,8 +527,8 @@ induction Hpe as [| E₁ PE P'E | | ]; intros.
      intros H; now apply Nat.succ_inj in H.
 
    destruct j; [ now apply (Hpai 0 2 (Nat.neq_0_succ 1) x) | ].
-   remember (E₃ :: PE) as u; simpl in Hx; subst u.
-   remember (E₂ :: PE) as u; simpl in HEP; subst u.
+   remember intersection as f.
+   remember (E₃ :: PE) as u; simpl in Hx; subst f u.
    destruct j; [ now apply (Hpai 0 1 (Nat.neq_0_succ 0) x) | ].
    now apply (Hpai 0 (S (S (S j))) Hij x).
 
