@@ -506,23 +506,34 @@ induction Hpe as [| E₁ PE P'E | | ]; intros.
   pose proof Hpai 0 (S j) Hij as HEP; simpl in HEP.
   clear IHHpe.
   revert E₁ j x Hpai Hij Hx₁ Hx HEP.
-  induction Hpe as [| E₂ PE P'E | | ]; intros.
+  induction Hpe as [| E₂ PE P'E | E₂ E₃ PE | ]; intros.
    simpl in Hx; now rewrite match_id in Hx.
 
    destruct j; [ now apply (HEP x) | ].
    simpl in Hx, HEP.
    eapply IHHpe with (j := j) (E₁ := E₁); try eassumption; [ | easy ].
    intros i k Hik.
-bbb.
+   destruct (eq_nat_dec i (S k)) as [Hisk| Hisk].
+    subst i.
+    destruct k; [ now apply (Hpai 2 0) | ].
+    apply (Hpai (S (S (S k))) (S (S k))).
+    intros H; now apply Nat.succ_inj in H.
 
-   destruct i.
-    destruct k; [ exfalso; now apply Hik | ].
-    simpl.
+    destruct i.
+     destruct k; [ exfalso; now apply Hik | ].
+     now apply (Hpai 0 (S (S k))).
+
+     destruct k; [ now apply (Hpai (S (S i)) 0) | ].
+     apply (Hpai (S (S i)) (S (S k))).
+     intros H; now apply Nat.succ_inj in H.
+
+   destruct j; [ now apply (Hpai 0 2 (Nat.neq_0_succ 1) x) | ].
+
+bbb.
 pose proof Hpai 0 (S k) Hik as H.
 simpl in H.
 destruct k.
 
-   destruct (eq_nat_dec i (S k)) as [Hisk| Hisk].
 Focus 2.
 pose proof Hpai i (S k) Hisk as H.
 simpl in H; simpl.
