@@ -274,6 +274,7 @@ induction (combine fl PE) as [| a la]; intros; [ easy | ].
 simpl; rewrite IHla; destruct a; easy.
 Qed.
 
+(*
 Theorem glop : ∀ A (l l' : list A) d s,
   Permutation l l'
   → ∃ σ, Permutation (seq s (length l)) σ ∧
@@ -493,6 +494,40 @@ split.
 
  intros i j Hij x.
  split; [ intros Hx; simpl | contradiction ].
+(**)
+clear E Hpau.
+revert i j x Hij Hx.
+induction Hpe as [| E₁ PE P'E | | ]; intros.
+ destruct Hx as (Hx, _); simpl in Hx; now rewrite match_id in Hx.
+
+ destruct i.
+  destruct j; [ now apply Hij | simpl in Hx ].
+  destruct Hx as (Hx₁, Hx).
+  pose proof Hpai 0 (S j) Hij as HEP; simpl in HEP.
+  clear IHHpe.
+  revert E₁ j x Hpai Hij Hx₁ Hx HEP.
+  induction Hpe as [| E₂ PE P'E | | ]; intros.
+   simpl in Hx; now rewrite match_id in Hx.
+
+   destruct j; [ now apply (HEP x) | ].
+   simpl in Hx, HEP.
+   eapply IHHpe with (j := j) (E₁ := E₁); try eassumption; [ | easy ].
+   intros i k Hik.
+bbb.
+
+   destruct i.
+    destruct k; [ exfalso; now apply Hik | ].
+    simpl.
+pose proof Hpai 0 (S k) Hik as H.
+simpl in H.
+destruct k.
+
+   destruct (eq_nat_dec i (S k)) as [Hisk| Hisk].
+Focus 2.
+pose proof Hpai i (S k) Hisk as H.
+simpl in H; simpl.
+
+bbb.
  apply Permutation_sym in Hpe.
  apply glop with (d := ∅) in Hpe.
  destruct Hpe as (l & Hl & HPl).
