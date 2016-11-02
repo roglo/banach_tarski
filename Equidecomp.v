@@ -202,6 +202,30 @@ Proof.
 intros * Hlen HlfP Hf.
 subst len.
 unfold partition_combine_swi; simpl.
+revert fl PE i HlfP Hf.
+induction PF as [| F₁ PF]; intros.
+ simpl; do 2 rewrite match_id.
+ clear -Hf.
+ remember (i mod length PE) as j eqn:Hj; clear Hj.
+ assert (Hj : ∀ j, (nth j fl id ∅ = ∅)%S).
+  clear -Hf.
+  induction fl as [| f₁ fl]; intros; [ simpl; now rewrite match_id | ].
+  destruct j; [ now apply Hf; left | simpl ].
+  apply IHfl.
+  intros f₂ Hf₂; now apply Hf; right.
+
+  now rewrite Hj, intersection_empty_r.
+
+ simpl.
+ destruct (lt_dec i (length fl)) as [Hi| Hi].
+  rewrite app_nth1.
+   2: rewrite map_length, combine_length, Nat.min_l; [ easy | ].
+   2: now rewrite HlfP.
+
+bbb.
+intros * Hlen HlfP Hf.
+subst len.
+unfold partition_combine_swi; simpl.
 revert fl PF i HlfP Hf.
 induction PE as [| E₁ PE]; intros.
  apply length_zero_iff_nil in HlfP; subst fl; simpl.
