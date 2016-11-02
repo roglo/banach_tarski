@@ -499,310 +499,29 @@ split.
  destruct Hpe as (Hlen & f & Hfi & Hn).
  unfold FinFun.Injective in Hfi.
  assert (Hfij : f i ≠ f j) by (intros H; now apply Hfi in H).
- assert (P'E.[i] = PE.[f i]).
-  pose proof Hn i as Hi.
-  remember (nth_error P'E i) as p'i eqn:H'i.
-  symmetry in Hi, H'i.
-  destruct p'i as [v | ].
-   apply nth_error_In in Hi.
-   apply nth_error_In in H'i.
-Check In_nth.
+ assert (HP'P : ∀ i, P'E.[i] = PE.[f i]).
+  intros k.
+  pose proof Hn k as Hk.
+  remember (nth_error P'E k) as p'k eqn:H'k.
+  symmetry in Hk, H'k.
+  destruct p'k as [v | ].
+   apply nth_error_split in Hk.
+   apply nth_error_split in H'k.
+   destruct Hk as (l1 & l2 & HPE & Hlen1).
+   destruct H'k as (l'1 & l'2 & HP'E & Hlen'1).
+   rewrite HPE, HP'E, <- Hlen1, <- Hlen'1.
+   rewrite app_nth2; [ | now unfold ge ].
+   rewrite app_nth2; [ | now unfold ge ].
+   now do 2 rewrite Nat.sub_diag.
 
-SearchAbout (List.In _ _ → _).
-bbb.
+   apply nth_error_None in Hk.
+   apply nth_error_None in H'k.
+   rewrite nth_overflow; [ | easy ].
+   now rewrite nth_overflow.
 
- pose proof (Hpai (f i) (f j) Hfij) as H.
-bbb.
- intros i j Hij x.
- split; [ intros Hx; simpl | contradiction ].
- clear E Hpau.
- revert i j x Hij Hx.
- induction Hpe as [| E₁ PE P'E | | ]; intros.
-  destruct Hx as (Hx, _); simpl in Hx; now rewrite match_id in Hx.
-
-  destruct i.
-   destruct j; [ now apply Hij | ].
-   remember intersection as f; simpl in Hx; subst f.
-   clear IHHpe.
-   revert E₁ j x Hpai Hij Hx.
-   induction Hpe as [| E₂ PE P'E | E₂ E₃ PE | PE P'E P''E ]; intros.
-    simpl in Hx; now rewrite match_id in Hx.
-
-    destruct j; [ now apply (Hpai 0 1 Hij x) | ].
-    remember intersection as f; simpl in Hx; subst f.
-    eapply IHHpe with (j := j) (E₁ := E₁); try eassumption; [ | easy ].
-    intros i k Hik.
-    destruct (eq_nat_dec i (S k)) as [Hisk| Hisk].
-     subst i.
-     destruct k; [ now apply (Hpai 2 0) | ].
-     apply (Hpai (S (S (S k))) (S (S k))).
-     intros H; now apply Nat.succ_inj in H.
-
-     destruct i.
-      destruct k; [ exfalso; now apply Hik | ].
-      now apply (Hpai 0 (S (S k))).
-
-      destruct k; [ now apply (Hpai (S (S i)) 0) | ].
-      apply (Hpai (S (S i)) (S (S k))).
-      intros H; now apply Nat.succ_inj in H.
-
-    destruct j; [ now apply (Hpai 0 2 (Nat.neq_0_succ 1) x) | ].
-    remember intersection as f.
-    remember (E₃ :: PE) as u; simpl in Hx; subst f u.
-    destruct j; [ now apply (Hpai 0 1 (Nat.neq_0_succ 0) x) | ].
-    now apply (Hpai 0 (S (S (S j))) Hij x).
-
-    eapply IHHpe2; [ | eassumption | eapply Hx ].
-    intros i k Hik.
-    intros y; split; [ intros Hy; simpl | easy ].
-    destruct i.
-    destruct k; [ exfalso; now apply Hik | ].
-     eapply (IHHpe1 E₁ k y); eassumption.
-
-     destruct k.
-      rewrite intersection_comm in Hy.
-      eapply (IHHpe1 E₁ i y); try eassumption; easy.
-
-      remember intersection as f; simpl in Hy; subst f.
-      clear x j P''E Hpe2 IHHpe1 IHHpe2 Hx Hij.
-      revert E₁ i k y Hpai Hik Hy.
-      induction Hpe1 as [| E₂ PE P'E | E₂ E₃ PE | PE P'E P''E ]; intros.
-       simpl in Hy; now rewrite match_id in Hy.
-
-       destruct i.
-        destruct k; [ exfalso; apply Hik; easy | ].
-        remember intersection as f; simpl in Hy; subst f.
-        clear IHHpe1 Hik.
-        revert E₁ E₂ y k Hpai Hy.
-        induction Hpe1 as [| E₃ PE P'E | E₃ E₄ PE | PE P'E P''E]; intros.
-         simpl in Hy; rewrite match_id in Hy; easy.
-
-         destruct k.
-          remember intersection as f; simpl in Hy; subst f.
-          now apply (Hpai 1 2 (Nat.neq_succ_diag_r 1) y).
-
-          remember intersection as f; simpl in Hy; subst f.
-          eapply IHHpe1 with (E₁ := E₁); [ | eassumption ].
-          intros i j Hij.
-          destruct i.
-           destruct j; [ exfalso; now apply Hij | simpl ].
-           destruct j; [ apply (Hpai 0 1 (Nat.neq_succ_diag_r 0)) | ].
-           now apply (Hpai 0 (S (S (S j)))).
-
-           destruct i.
-            destruct j; [ now apply (Hpai 1 0) | ].
-            destruct j; [ exfalso; now apply Hij | ].
-            now apply (Hpai 1 (S (S (S j)))).
-
-            destruct j; [ now apply (Hpai (S (S (S i))) 0) | ].
-            destruct j; [ now apply (Hpai (S (S (S i))) 1) | ].
-            apply Nat.succ_inj_wd_neg in Hij.
-            now apply (Hpai (S (S (S i))) (S (S (S j)))).
-
-         destruct k; [ now apply (Hpai 1 3 (n_SSn 1) y) | ].
-         destruct k; [ now apply (Hpai 1 2 (n_Sn 1) y) | ].
-         assert (Hk : 1 ≠ S (S (S (S k)))) by easy.
-         now apply (Hpai 1 (S (S (S (S k)))) Hk y).
-
-         eapply IHHpe1_2 with (E₁ := E₁); [ | eassumption ].
-         clear y k Hy.
-         intros i j Hij.
-         destruct i.
-          destruct j; [ exfalso; now apply Hij | ].
-          destruct j; [ now apply (Hpai 0 1 Hij) | simpl ].
-          intros x; split; [ intros Hx; simpl | easy ].
-          eapply IHHpe1_1 with (E₁ := E₂); [ | eassumption ].
-          intros i k Hik.
-          destruct i.
-           destruct k; [ exfalso; now apply Hik | ].
-           destruct k; [ now apply (Hpai 1 0 (Nat.neq_succ_diag_l 0)) | ].
-           now apply (Hpai 1 (S (S k))).
-
-           destruct i.
-            destruct k; [ now apply (Hpai 0 1 (Nat.neq_succ_diag_r 0)) | ].
-            destruct k; [ exfalso; now apply Hik | ].
-            now apply (Hpai 0 (S (S k)) (Nat.neq_0_succ (S k))).
-
-            assert (Hsi : S (S i) ≠ 1) by easy.
-            destruct k; [ now apply (Hpai (S (S i)) 1 Hsi) | ].
-            destruct k.
-             now apply (Hpai (S (S i)) 0 (Nat.neq_succ_0 (S i))).
-             now apply (Hpai (S (S i)) (S (S k)) Hik).
-
-          idtac.
-bbb.
-
-      destruct k; [ now apply (Hpai 0 1 Hij x) | ].
-bbb.
-   remember intersection as f; simpl in Hx; subst f.
-   eapply IHHpe with (j := j) (E₁ := E₁); try eassumption; [ | easy ].
-   intros i k Hik.
-   destruct (eq_nat_dec i (S k)) as [Hisk| Hisk].
-    subst i.
-    destruct k; [ now apply (Hpai 2 0) | ].
-    apply (Hpai (S (S (S k))) (S (S k))).
-    intros H; now apply Nat.succ_inj in H.
-
-    destruct i.
-     destruct k; [ exfalso; now apply Hik | ].
-     now apply (Hpai 0 (S (S k))).
-
-     destruct k; [ now apply (Hpai (S (S i)) 0) | ].
-     apply (Hpai (S (S i)) (S (S k))).
-     intros H; now apply Nat.succ_inj in H.
-
-   destruct j; [ now apply (Hpai 0 2 (Nat.neq_0_succ 1) x) | ].
-   remember intersection as f.
-   remember (E₃ :: PE) as u; simpl in Hx; subst f u.
-   destruct j; [ now apply (Hpai 0 1 (Nat.neq_0_succ 0) x) | ].
-   now apply (Hpai 0 (S (S (S j))) Hij x).
-
-   eapply IHHpe2; [ | eassumption | eapply Hx ].
-   intros i k Hik.
-   intros y; split; [ intros Hy; simpl | easy ].
-   destruct i.
-    destruct k; [ exfalso; now apply Hik | ].
-    eapply (IHHpe1 E₁ k y); eassumption.
-
-    destruct k.
-     rewrite intersection_comm in Hy.
-     eapply (IHHpe1 E₁ i y); try eassumption; easy.
-
-     simpl in Hy.
-     clear x j P''E Hpe2 IHHpe1 IHHpe2 Hx Hij.
-     apply -> Nat.succ_inj_wd_neg in Hik.
-     revert E₁ i k y Hpai Hik Hy.
-     induction Hpe1 as [| E₂ PE P'E | E₂ E₃ PE | PE P'E P''E ]; intros.
-bbb.
-    pose proof (IHHpe1 E₁ k x).
-    eapply (IHHpe1 E₁ k x).
-bbb.
-   induction Hpe1.
-    apply Permutation_nil in Hpe2; subst P''E.
-    simpl in Hx; now rewrite match_id in Hx.
-   eapply IHHpe1; [ | | eapply Hx₁ | | ]; try eassumption.
-   eapply IHHpe2; [ | | eapply Hx₁ | | ]; try eassumption.
-Focus 2.
-
-bbb.
-pose proof Hpai 0 (S k) Hik as H.
-simpl in H.
-destruct k.
-
-Focus 2.
-pose proof Hpai i (S k) Hisk as H.
-simpl in H; simpl.
-
-bbb.
- apply Permutation_sym in Hpe.
- apply glop with (d := ∅) in Hpe.
- destruct Hpe as (l & Hl & HPl).
- clear E Hpau.
- destruct (lt_dec i (length P'E)) as [Hi| Hi].
-  rewrite HPl in Hx; [ | assumption ].
-  destruct (lt_dec j (length P'E)) as [Hj| Hj].
-   rewrite HPl in Hx; [ | assumption ].
-   rewrite Hpai in Hx; [ contradiction | ].
-
-Focus 2.
-   apply Nat.nlt_ge in Hj.
-   rewrite nth_overflow with (l := P'E) in Hx; [ | assumption ].
-   rewrite intersection_empty_r in Hx; contradiction.
-
-Focus 2.
-  apply Nat.nlt_ge in Hi.
-  rewrite nth_overflow in Hx; [ | assumption ].
-  rewrite intersection_empty_l in Hx; contradiction.
-
-bbb.
-
- assert (Hl :
-   ∀ i j, i ≠ j → ∃ i' j', i' ≠ j' ∧ PE.[i'] = P'E.[i] ∧ PE.[j'] = P'E.[j]).
-  clear i j Hij Hx Hpai.
-  intros i j Hij.
-  induction Hpe.
-   exists i, j; simpl.
-   do 2 rewrite match_id.
-   split; [ assumption | split; reflexivity ].
-
-   destruct IHHpe as (i' & j' & Hi'j' & Hl & Hl').
-   destruct i.
-    revert i' j' Hi'j' Hl Hl'.
-    induction j; intros; [ exfalso; apply Hij; reflexivity | ].
-bbb.
-
-   exists (S i'), (S j'); simpl.
-   split; [ intros H; apply Hi'j', Nat.succ_inj; assumption | ].
-   destruct i.
-    destruct j; [ exfalso; apply Hij; reflexivity | ].
-
-bbb.
-
-   exists i', j'.
-   split; [ assumption | ].
-   split.
-    destruct i'.
-     destruct i; [ reflexivity | simpl ].
-     destruct j'; [ exfalso; apply Hi'j'; reflexivity | ].
-
-
-; simpl.
-   induction i'.
-    induction j'; [ exfalso; apply Hi'j'; reflexivity | ].
-    split.
-     induction i; [ reflexivity | ].
-
-bbb.
-
-Focus 2.
-  pose proof Hl i j Hij as H.
-  destruct H as (i' & j' & Hi'j' & Hi' & Hj').
-  rewrite <- Hi', <- Hj' in Hx.
-  pose proof Hpai i' j' Hi'j' as H.
-  rewrite H in Hx; contradiction.
-
-bbb.
- apply Permutation_sym in Hpe.
- destruct (lt_dec i (length P'E)) as [Hil| Hil].
-  assert (H : List.In P'E.[i] P'E) by (apply nth_In; assumption).
-  eapply Permutation_in in H; [ | eassumption ].
-  apply In_nth with (d := ∅) in H.
-  destruct H as (i' & Hi' & H).
-  rewrite <- H in Hxi; clear H.
-  destruct (lt_dec j (length P'E)) as [Hjl| Hjl].
-   assert (H : List.In P'E.[j] P'E) by (apply nth_In; assumption).
-   eapply Permutation_in in H; [ | eassumption ].
-   apply In_nth with (d := ∅) in H.
-   destruct H as (j' & Hj' & H).
-   rewrite <- H in Hxj; clear H.
-
-bbb.
- inversion Hpe.
-  subst PE P'E.
-  simpl; do 2 rewrite match_id; apply intersection_empty_l.
-
-  subst PE P'E.
-  simpl.
-  destruct i.
-   induction j; [ exfalso; apply Hij; reflexivity | ].
-   destruct j.
-
-bbb.
- clear E Hpau.
- induction Hpe as [| E₁ PE P'E| | ]; intros * Hij.
-  simpl; do 2 rewrite match_id; apply intersection_empty_l.
-
-  simpl.
-  induction i.
-   induction j; [ exfalso; apply Hij; reflexivity | ].
-   destruct j.
-    clear IHj.
-    intros x; split; [ intros Hx | contradiction ].
-    destruct Hx as (Hx₁, Hx).
-    pose proof Hpai 0 1 Hij x as H; simpl in H.
-    apply H; split; [ assumption | clear H ].
-bbb.
-*)
+  do 2 rewrite HP'P in Hx.
+  now rewrite Hpai in Hx.
+Qed.
 
 Theorem partition_combine_partition_combine_swi :
   ∀ A (s := set_equiv) E (fl : list (set A → set A)) PE P'F,
@@ -868,6 +587,17 @@ destruct PF as [| F₁ FL].
  apply Nat.succ_inj in Hlen.
  apply IHPE with (PF := F₁ :: FL) in Hlen.
  simpl in Hlen; rewrite Hlen; reflexivity.
+Qed.
+
+Theorem partition_combine_swi_length :
+  ∀ A fl (PE PF : list (set A)),
+  length fl = length PE
+  → length (partition_combine_swi fl PE PF) = (length PE * length PF)%nat.
+Proof.
+intros * Hlen.
+pose proof partition_combine_swi_is_permutation _ fl PE PF as H.
+apply Permutation_length in H.
+now rewrite H; apply partition_combine_length.
 Qed.
 
 Theorem partition_prod_length :
@@ -1091,8 +821,8 @@ assert
      destruct HU as (i & Hi & HU).
      destruct HV as (j & Hj & HV).
      subst fl f'l.
-     rewrite partition_combine_length in Hi; [ | rewrite map_length; easy ].
-     rewrite partition_combine_length in Hj; [ | rewrite map_length; easy ].
+     rewrite partition_combine_length in Hi; [ | now rewrite map_length ].
+     rewrite partition_combine_swi_length in Hj; [ | now rewrite map_length ].
 (*
      remember (map app_gr_inv gl) as fl eqn:Hfl.
      remember (map app_gr_inv hl) as f'l eqn:Hf'l.
@@ -1102,10 +832,9 @@ assert
      apply eq_set_eq in HU.
      apply eq_set_eq in HV.
 remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
-remember (partition_combine (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
+remember (partition_combine_swi (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
 destruct Hpcf as (HpcfU, HpcfI).
 destruct Hpcg as (HpcgU, HpcgI).
-(**)
      remember (nth (i / length P₁F) hl gr_ident) as hi.
      remember (nth (j / length P₂F) gl gr_ident) as gj.
      exists (Comb hi gj); subst hi gj; simpl.
@@ -1115,7 +844,9 @@ exists toto.
 *)
 rewrite <- HU, <- HV; clear HU HV.
 rewrite HPE', partition_combine_nth; [ | reflexivity | | ].
-rewrite HPG', partition_combine_nth; [ | reflexivity | | ].
+rewrite HPG'.
+bbb.
+rewrite HPG', partition_combine_swi_nth; [ | reflexivity | | ].
 rewrite group_intersection_distr.
 rewrite group_intersection_distr.
 
