@@ -219,32 +219,66 @@ induction PF as [| F₁ PF]; intros.
  simpl.
  destruct (lt_dec i (length fl)) as [Hi| Hi].
   rewrite app_nth1.
+   rewrite HlfP in Hi.
+   rewrite Nat.mod_small; [ | easy ].
+   rewrite Nat.div_small; [ | easy ].
+   intros x; clear - HlfP Hf.
+   split; intros Hx.
+    revert i fl Hx HlfP Hf.
+    induction PE as [| E₁ PE]; intros.
+     apply length_zero_iff_nil in HlfP; subst fl.
+     simpl in Hx; now rewrite match_id in Hx.
+
+     destruct fl as [| f₁ fl]; [ easy | ].
+     simpl in HlfP; apply Nat.succ_inj in HlfP.
+     destruct i; [ easy | ].
+     simpl in Hx; simpl.
+     apply IHPE; [ easy | easy | ].
+     intros f Hfi.
+     now apply Hf; right.
+
+    destruct Hx as (Hx, Hxn).
+    revert x i fl HlfP Hf Hx Hxn.
+    induction PE as [| E₁ PE]; intros.
+     now simpl in Hx; rewrite match_id in Hx.
+
+     destruct fl as [| f₁ fl]; [ easy | ].
+     simpl in HlfP; apply Nat.succ_inj in HlfP.
+     simpl in Hx; simpl.
+     destruct i; [ now split | ].
+     apply IHPE; [ easy | | easy | easy ].
+     intros f Hfi.
+     now apply Hf; right.
+
+   rewrite map_length, combine_length, Nat.min_l; [ easy | ].
+   now rewrite HlfP.
+
+  apply Nat.nlt_ge in Hi.
+  rewrite app_nth2.
    2: rewrite map_length, combine_length, Nat.min_l; [ easy | ].
    2: now rewrite HlfP.
 
-bbb.
-intros * Hlen HlfP Hf.
-subst len.
-unfold partition_combine_swi; simpl.
-revert fl PF i HlfP Hf.
-induction PE as [| E₁ PE]; intros.
- apply length_zero_iff_nil in HlfP; subst fl; simpl.
- rewrite flat_map_nil_fun; [ | induction PF as [| P₁ PF]; now constructor ].
- simpl; rewrite match_id.
- now rewrite intersection_empty_l.
+   rewrite IHPF; [ | easy | easy ].
+   rewrite map_length, combine_length, Nat.min_l; [ | now rewrite HlfP ].
+   rewrite HlfP in Hi.
+   generalize Hi; intros H.
+   apply Nat.div_le_mono with (c := length PE) in H.
+   rewrite Nat.div_same in H.
+    remember (i / length PE) as j eqn:Hj; symmetry in Hj.
+    destruct j; [ now apply Nat.le_0_r in H | ].
+    rewrite HlfP.
 
- simpl.
- destruct fl as [| f₁ fl]; [ easy | ].
- simpl in HlfP; apply Nat.succ_inj in HlfP; simpl.
 bbb.
- destruct (lt_dec i (length PF)) as [Hi| Hi].
-  rewrite app_nth1; [| rewrite map_length; assumption ].
-  rewrite Nat.div_small; [ simpl | assumption ].
-  rewrite Nat.mod_small; [ simpl | assumption ].
-  intros x; clear - HlfP Hf.
-  split; intros Hx.
-   revert i Hx.
-   induction PF as [| F₁ PF]; intros; [ destruct i; contradiction | ].
+
+   destruct i.
+    apply Nat.le_0_r, length_zero_iff_nil in Hi; subst fl.
+    symmetry in HlfP; apply length_zero_iff_nil in HlfP; subst PE.
+    simpl; rewrite intersection_empty_l.
+    rewrite flat_map_nil_fun; [ easy | ].
+    clear; induction PF as [| F₂ PF]; now constructor.
+
+
+bbb.
    simpl in Hx; simpl.
    destruct i; [ assumption | apply IHPF; assumption ].
 
