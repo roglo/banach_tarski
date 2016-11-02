@@ -139,6 +139,132 @@ induction PE as [| E₁ PE]; intros.
     apply Hf; right; assumption.
 Qed.
 
+Theorem partition_combine_swi_nth_from_combine :
+  ∀ A (s := set_equiv) fl (PE PF : list (set A)) i lenE lenF,
+  lenE = length PE
+  → lenF = length PF
+  → length fl = length PE
+  → (∀ f, List.In f fl → (f ∅ = ∅)%S)
+  → ((partition_combine_swi fl PE PF).[i] =
+     (partition_combine fl PE PF).[(i mod lenE) * lenF + i / lenE])%S.
+Proof.
+intros * HlenE HlenF Hflp Hf.
+rewrite partition_combine_nth; try eassumption.
+destruct (eq_nat_dec lenE 0) as [HEz| HEnz].
+ subst lenE.
+ apply length_zero_iff_nil in HEz; subst PE.
+ apply length_zero_iff_nil in Hflp; subst fl.
+ simpl; do 2 rewrite match_id.
+ unfold partition_combine_swi; simpl.
+ rewrite flat_map_nil_fun; simpl.
+  rewrite match_id; now rewrite intersection_empty_l.
+
+  clear; induction PF; now constructor; easy.
+
+ destruct (eq_nat_dec lenF 0) as [HFz| HFnz].
+  subst lenF.
+  apply length_zero_iff_nil in HFz; subst PF.
+  simpl; rewrite match_id.
+  rewrite Nat.mul_0_r, Nat.add_0_l.
+  assert (Hj : ∀ j, (nth j fl id ∅ = ∅)%S).
+   clear -Hf.
+   induction fl as [| f₁ fl]; intros; [ simpl; now rewrite match_id | simpl ].
+   destruct j.
+    rewrite Hf; [ easy | now left ].
+
+    apply IHfl.
+    intros f Hfi.
+    apply Hf; now right.
+
+   now rewrite Hj, intersection_empty_r.
+
+  rewrite Nat.div_add_l; [ | easy ].
+  setoid_rewrite Nat.add_comm.
+  rewrite Nat.mod_add; [ | easy ].
+  rewrite Nat.div_div; [ | easy | easy ].
+  destruct (lt_dec i (lenE * lenF)) as [Hi| Hi].
+   rewrite Nat.div_small; [ | easy ].
+   rewrite Nat.add_0_l.
+   replace ((i / lenE) mod lenF) with (i / lenE).
+ Focus 2.
+ rewrite Nat.mod_small; [ easy | ].
+ now apply Nat.div_lt_upper_bound.
+Abort.
+
+Theorem partition_combine_swi_nth :
+  ∀ A (s := set_equiv) fl (PE : list (set A)) PF i len,
+  len = length PE
+  → length fl = length PE
+  → (∀ f, List.In f fl → (f ∅ = ∅)%S)
+  → ((partition_combine_swi fl PE PF).[i] =
+     PE.[i mod len] ∩ nth (i mod len) fl id PF.[i / len])%S.
+Proof.
+intros * Hlen HlfP Hf.
+subst len.
+unfold partition_combine_swi; simpl.
+revert fl PF i HlfP Hf.
+induction PE as [| E₁ PE]; intros.
+ apply length_zero_iff_nil in HlfP; subst fl; simpl.
+ rewrite flat_map_nil_fun; [ | induction PF as [| P₁ PF]; now constructor ].
+ simpl; rewrite match_id.
+ now rewrite intersection_empty_l.
+
+ simpl.
+ destruct fl as [| f₁ fl]; [ easy | ].
+ simpl in HlfP; apply Nat.succ_inj in HlfP; simpl.
+bbb.
+ destruct (lt_dec i (length PF)) as [Hi| Hi].
+  rewrite app_nth1; [| rewrite map_length; assumption ].
+  rewrite Nat.div_small; [ simpl | assumption ].
+  rewrite Nat.mod_small; [ simpl | assumption ].
+  intros x; clear - HlfP Hf.
+  split; intros Hx.
+   revert i Hx.
+   induction PF as [| F₁ PF]; intros; [ destruct i; contradiction | ].
+   simpl in Hx; simpl.
+   destruct i; [ assumption | apply IHPF; assumption ].
+
+   revert i Hx.
+   induction PF as [| F₁ PF]; intros.
+    destruct Hx as (_, Hx).
+    destruct i; simpl in Hx; simpl.
+     rewrite Hf in Hx; [ contradiction | left; reflexivity ].
+     rewrite Hf in Hx; [ contradiction | left; reflexivity ].
+
+    destruct i; simpl in Hx; simpl; [ assumption | ].
+    apply IHPF; assumption.
+
+  apply Nat.nlt_ge in Hi.
+  rewrite app_nth2; [| rewrite map_length; assumption ].
+  rewrite map_length.
+  remember (i - length PF)%nat as j eqn:Hj.
+  assert (H : (i = j + length PF)%nat).
+   rewrite Hj.
+   rewrite Nat.sub_add; [ reflexivity | assumption ].
+
+   subst i; clear Hi Hj.
+   destruct PF as [| F₁ PF].
+    simpl.
+    intros x.
+    split; intros Hx.
+     destruct j; simpl in Hx.
+      induction (combine fl PE) as [| (y, z) l]; [ contradiction | ].
+      apply IHl, Hx.
+
+      induction (combine fl PE) as [| (y, z) l]; [ contradiction | ].
+      apply IHl, Hx.
+
+     rewrite Hf in Hx; [ | left; reflexivity ].
+     rewrite intersection_empty_r in Hx.
+     contradiction.
+
+    rewrite nat_mod_add_once; [ | intros H; discriminate H ].
+    rewrite nat_div_add_once; [ | intros H; discriminate H ].
+    apply IHPE; [ assumption | ].
+    intros f Hfi.
+    apply Hf; right; assumption.
+Qed.
+
 Theorem partition_combine_is_partition :
   ∀ (s := set_equiv) E F PE PF P'F gl,
   is_partition E PE
