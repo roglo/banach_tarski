@@ -1036,6 +1036,8 @@ rewrite <- Hhl.
 *)
 rewrite Nat.add_0_r.
 do 2 rewrite app_gr_nth.
+replace Datatypes.id with (@id (set point)) by easy.
+
 bbb.
 rewrite app_gr_nth.
 
