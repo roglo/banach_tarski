@@ -5,7 +5,7 @@
    - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
 (* Coq v8.6 *)
 
-Require Import Utf8 List NPeano Compare_dec.
+Require Import Utf8 List NPeano Compare_dec Setoid.
 Import ListNotations.
 
 Require Import Pset.
@@ -252,4 +252,14 @@ Proof.
 intros * HP.
 destruct HP as (HE & _).
 assumption.
+Qed.
+
+Add Parametric Morphism {A} : (@is_partition A set_equiv)
+ with signature (@set_eq _ set_equiv) ==> eq ==> iff
+ as is_partition_morph.
+Proof.
+intros E F HEF SL.
+unfold is_partition.
+rewrite <- HEF.
+now split.
 Qed.

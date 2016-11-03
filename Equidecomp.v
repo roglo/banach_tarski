@@ -261,66 +261,28 @@ induction PF as [| F₁ PF]; intros.
    rewrite IHPF; [ | easy | easy ].
    rewrite map_length, combine_length, Nat.min_l; [ | now rewrite HlfP ].
    rewrite HlfP in Hi.
-   generalize Hi; intros H.
-   apply Nat.div_le_mono with (c := length PE) in H.
-   rewrite Nat.div_same in H.
+   remember (length PE) as len eqn:Hlen; symmetry in Hlen.
+   destruct (eq_nat_dec len 0) as [Hzl| Hnzl].
+    move Hzl at top; subst len.
+    apply length_zero_iff_nil in Hlen.
+    apply length_zero_iff_nil in HlfP.
+    subst PE fl; simpl.
+    now do 2 rewrite intersection_empty_l.
+
+    subst len.
+    generalize Hi; intros H.
+    apply Nat.div_le_mono with (c := length PE) in H; [ | easy ].
+    rewrite Nat.div_same in H; [ | easy ].
     remember (i / length PE) as j eqn:Hj; symmetry in Hj.
     destruct j; [ now apply Nat.le_0_r in H | ].
     rewrite HlfP.
-
-bbb.
-
-   destruct i.
-    apply Nat.le_0_r, length_zero_iff_nil in Hi; subst fl.
-    symmetry in HlfP; apply length_zero_iff_nil in HlfP; subst PE.
-    simpl; rewrite intersection_empty_l.
-    rewrite flat_map_nil_fun; [ easy | ].
-    clear; induction PF as [| F₂ PF]; now constructor.
-
-
-bbb.
-   simpl in Hx; simpl.
-   destruct i; [ assumption | apply IHPF; assumption ].
-
-   revert i Hx.
-   induction PF as [| F₁ PF]; intros.
-    destruct Hx as (_, Hx).
-    destruct i; simpl in Hx; simpl.
-     rewrite Hf in Hx; [ contradiction | left; reflexivity ].
-     rewrite Hf in Hx; [ contradiction | left; reflexivity ].
-
-    destruct i; simpl in Hx; simpl; [ assumption | ].
-    apply IHPF; assumption.
-
-  apply Nat.nlt_ge in Hi.
-  rewrite app_nth2; [| rewrite map_length; assumption ].
-  rewrite map_length.
-  remember (i - length PF)%nat as j eqn:Hj.
-  assert (H : (i = j + length PF)%nat).
-   rewrite Hj.
-   rewrite Nat.sub_add; [ reflexivity | assumption ].
-
-   subst i; clear Hi Hj.
-   destruct PF as [| F₁ PF].
-    simpl.
-    intros x.
-    split; intros Hx.
-     destruct j; simpl in Hx.
-      induction (combine fl PE) as [| (y, z) l]; [ contradiction | ].
-      apply IHl, Hx.
-
-      induction (combine fl PE) as [| (y, z) l]; [ contradiction | ].
-      apply IHl, Hx.
-
-     rewrite Hf in Hx; [ | left; reflexivity ].
-     rewrite intersection_empty_r in Hx.
-     contradiction.
-
-    rewrite nat_mod_add_once; [ | intros H; discriminate H ].
-    rewrite nat_div_add_once; [ | intros H; discriminate H ].
-    apply IHPE; [ assumption | ].
-    intros f Hfi.
-    apply Hf; right; assumption.
+    remember (i - length PE) as k eqn:Hk.
+    assert (i = k + length PE) by (now subst k; rewrite Nat.sub_add).
+    subst i; clear Hk.
+    rewrite nat_mod_add_once; [ | easy ].
+    rewrite nat_div_add_once in Hj; [ | easy ].
+    apply Nat.succ_inj in Hj.
+    now rewrite Hj.
 Qed.
 
 Theorem partition_combine_is_partition :
@@ -1026,61 +988,26 @@ destruct Hpcg as (HpcgU, HpcgI).
 remember gr_ident as toto in |-*.
 exists toto.
 *)
+(*
+remember (length PG) as lenPG eqn:HlenPG.
+symmetry in HlenPG.
+destruct lenPG; [ rewrite Nat.mul_0_r in Hi; now apply Nat.nlt_0_r in Hi | ].
+*)
 rewrite <- HU, <- HV; clear HU HV.
-rewrite HPE', partition_combine_nth; [ | reflexivity | | ].
-rewrite HPG'.
+rewrite HPE', partition_combine_nth; [ | easy | | ].
+ rewrite HPG', partition_combine_swi_nth; [ | easy | | ].
+  do 2 rewrite group_intersection_distr.
+  rewrite <- Hlen1, Hlen2.
 bbb.
-rewrite HPG', partition_combine_swi_nth; [ | reflexivity | | ].
-rewrite group_intersection_distr.
-rewrite group_intersection_distr.
 
-(**)
-Require Export Setoid.
-Add Parametric Morphism : (λ n l, @nth _ n (map app_gr_inv l) id)
-  with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
-  as nth_set_morph2.
-Proof.
-intros n l E F HEF x.
-split; intros Hx.
- revert n x Hx.
- induction l as [| y l]; intros.
-  simpl in Hx; rewrite match_id in Hx.
-  simpl; rewrite match_id.
-  apply HEF; assumption.
-
-  simpl in Hx; simpl.
-  destruct n; [ rewrite <- HEF; assumption | ].
-  apply IHl; assumption.
-
- revert n x Hx.
- induction l as [| y l]; intros.
-  simpl in Hx; rewrite match_id in Hx.
-  simpl; rewrite match_id.
-  apply HEF; assumption.
-
-  simpl in Hx; simpl.
-  destruct n; [ rewrite HEF; assumption | ].
-  apply IHl; assumption.
-Qed.
-
-(*
-Focus 1.
-clear - s Hhl.
-subst s.
-
-rewrite <- Hhl.
-replace (P₂F.[i mod length P₂F]) with ((app_gr (nth (i mod length P₂F) hl gr_ident) PG.[i mod length P₂F])).
+  rewrite Nat.div_small.
 Focus 2.
+   rewrite <- Hlen1.
+   etransitivity; [ eassumption | ].
 
-Require Import Relations OrdersFacts.
-Print Instances Proper.
-(*
-Typeclasses eauto := debug.
-Fail rewrite <- Hhl. (* fails *)
-Print Instances Proper.
-*)
-*)
-(* this works *)
+   destruct PG as [| G₁ PG].
+bbb.
+
 etransitivity.
 apply intersection_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
