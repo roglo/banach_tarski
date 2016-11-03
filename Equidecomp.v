@@ -981,6 +981,7 @@ remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
 remember (partition_combine_swi (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
 destruct Hpcf as (HpcfU, HpcfI).
 destruct Hpcg as (HpcgU, HpcgI).
+bbb.
      remember (nth (i / length P₂F) gl gr_ident) as gi.
      remember (nth (j / length P₁F) hl gr_ident) as hj.
      exists (Comb hj gi); subst gi hj; simpl.
