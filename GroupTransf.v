@@ -8,7 +8,7 @@
 Require Import Utf8.
 Require Import Reals Nsatz.
 
-Require Import Words MiscReals Matrix Pset Orbit.
+Require Import Misc Words MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr.
 
 Inductive Gr :=
@@ -55,6 +55,28 @@ induction g as [ e| dx | g IHg h IHh]; intros.
  eapply IHg; [ | eassumption ].
  split; intros H; [ eapply IHh; eassumption | ].
  eapply IHh; [ symmetry; eassumption | eassumption ].
+Qed.
+
+Theorem app_gr_ident : ∀ (s := set_equiv) E, (app_gr gr_ident E = E)%S.
+Proof.
+intros.
+unfold gr_ident; simpl.
+unfold xtransl; simpl.
+intros (x, y, z); simpl.
+now rewrite Rminus_0_r.
+Qed.
+
+Theorem app_gr_nth : ∀ (s := set_equiv) E fl i,
+  (app_gr (List.nth i fl gr_ident) E =
+   List.nth i (map app_gr fl) Datatypes.id E)%S.
+Proof.
+intros.
+revert E i.
+induction fl as [| f₁ fl]; intros.
+ simpl; do 2 rewrite match_id.
+ apply app_gr_ident.
+
+ destruct i; [ easy | apply IHfl ].
 Qed.
 
 Add Parametric Morphism : app_gr

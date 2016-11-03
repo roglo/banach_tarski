@@ -1035,6 +1035,9 @@ symmetry; apply Hhl.
 rewrite <- Hhl.
 *)
 rewrite Nat.add_0_r.
+do 2 rewrite app_gr_nth.
+bbb.
+rewrite app_gr_nth.
 
 bbb.
 
