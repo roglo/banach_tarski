@@ -981,9 +981,9 @@ remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
 remember (partition_combine_swi (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
 destruct Hpcf as (HpcfU, HpcfI).
 destruct Hpcg as (HpcgU, HpcgI).
-     remember (nth (i / length P₁F) hl gr_ident) as hi.
-     remember (nth (j / length P₂F) gl gr_ident) as gj.
-     exists (Comb hi gj); subst hi gj; simpl.
+     remember (nth (i / length P₂F) gl gr_ident) as gi.
+     remember (nth (j / length P₁F) hl gr_ident) as hj.
+     exists (Comb hj gi); subst gi hj; simpl.
 (*
 remember gr_ident as toto in |-*.
 exists toto.
@@ -998,20 +998,44 @@ rewrite HPE', partition_combine_nth; [ | easy | | ].
  rewrite HPG', partition_combine_swi_nth; [ | easy | | ].
   do 2 rewrite group_intersection_distr.
   rewrite <- Hlen1, Hlen2.
-bbb.
+  rewrite Hgl.
 
-  rewrite Nat.div_small.
-Focus 2.
-   rewrite <- Hlen1.
-   etransitivity; [ eassumption | ].
+Require Import Setoid.
+Add Parametric Morphism :
+  (λ n fl, @nth (set point → set point) n (map app_gr_inv fl) id)
+  with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as nth_map_app_gr_morph.
+Proof.
+intros n fl E F HEF x.
+split; intros Hx.
+ revert n Hx.
+ induction fl as [| f₁ fl]; intros.
+  simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
 
-   destruct PG as [| G₁ PG].
-bbb.
+  simpl in Hx; simpl.
+  now destruct n; [ rewrite <- HEF | apply IHfl ].
 
+ revert n Hx.
+ induction fl as [| f₁ fl]; intros.
+  simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
+
+  simpl in Hx; simpl.
+  now destruct n; [ rewrite HEF | apply IHfl ].
+Qed.
+
+Show.
+(* works: *)
 etransitivity.
 apply intersection_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
+apply nth_map_app_gr_morph; [ easy | easy | ].
+symmetry; apply Hhl.
+(* doesn't work:
+rewrite <- Hhl.
+*)
+rewrite Nat.add_0_r.
+
 bbb.
 
 (*
