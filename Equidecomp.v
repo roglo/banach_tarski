@@ -994,8 +994,13 @@ symmetry in HlenPG.
 destruct lenPG; [ rewrite Nat.mul_0_r in Hi; now apply Nat.nlt_0_r in Hi | ].
 *)
 rewrite <- HU, <- HV; clear HU HV.
-rewrite HPE', partition_combine_nth; [ | easy | | ].
- rewrite HPG', partition_combine_swi_nth; [ | easy | | ].
+rewrite HPE', HPG'.
+Check partition_combine_nth.
+bbb.
+Check partition_combine_swi_nth.
+bbb.
+rewrite partition_combine_nth; [ | easy | | ].
+ rewrite partition_combine_swi_nth; [ | easy | | ].
   do 2 rewrite group_intersection_distr.
 rewrite Hlen2.
 (*
