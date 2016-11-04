@@ -1048,6 +1048,8 @@ apply app_gr_morph_Proper; [ reflexivity | ].
 apply nth_map_app_gr_inv_morph; [ easy | easy | ].
 symmetry; apply Hhl.
 do 2 rewrite Nat.add_0_r.
+bbb.
+
 SearchAbout app_gr.
 Check app_gr_inv_l.
 bbb.
