@@ -981,8 +981,8 @@ remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
 remember (partition_combine_swi (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
 destruct Hpcf as (HpcfU, HpcfI).
 destruct Hpcg as (HpcgU, HpcgI).
-     remember (nth (i / length PE) gl gr_ident) as gi.
-     remember (nth (j / length PG) (map gr_inv hl) gr_ident) as hj.
+     remember (nth (i / length PG) gl gr_ident) as gi.
+     remember (nth (j / length PE) (map gr_inv hl) gr_ident) as hj.
      exists (Comb hj gi); subst gi hj; simpl.
 (*
 remember gr_ident as toto in |-*.
@@ -995,8 +995,6 @@ destruct lenPG; [ rewrite Nat.mul_0_r in Hi; now apply Nat.nlt_0_r in Hi | ].
 *)
 rewrite <- HU, <- HV; clear HU HV.
 rewrite HPE', HPG'.
-Check partition_combine_nth.
-Check partition_combine_swi_nth.
 rewrite partition_combine_nth; [ | easy | | ].
  rewrite partition_combine_swi_nth; [ | easy | | ].
   do 2 rewrite group_intersection_distr.
