@@ -942,11 +942,11 @@ assert
   destruct HEF as (HEF, Hlen1).
   apply Forall2_Forall_combine in HFG.
   destruct HFG as (HFG, Hlen2).
-  remember (map app_gr_inv gl) as fl eqn:Hfl.
-  assert (Hpcf : is_partition E (partition_combine fl PE P₂F)).
+  remember (map app_gr_inv gl) as g'l eqn:Hg'l.
+  assert (Hpcf : is_partition E (partition_combine g'l PE P₂F)).
    eapply partition_combine_is_partition with (PF := P₁F); eassumption.
 
-   exists (partition_combine fl PE P₂F).
+   exists (partition_combine g'l PE P₂F).
    remember (map app_gr_inv hl) as f'l eqn:Hf'l.
    assert (Hpcg : is_partition G (partition_combine_swi f'l PG P₁F)).
     symmetry in Hlen2.
@@ -966,7 +966,7 @@ assert
      apply In_nth with (d := ∅) in HV.
      destruct HU as (i & Hi & HU).
      destruct HV as (j & Hj & HV).
-     subst fl f'l.
+     subst g'l f'l.
      rewrite partition_combine_length in Hi; [ | now rewrite map_length ].
      rewrite partition_combine_swi_length in Hj; [ | now rewrite map_length ].
 (*
