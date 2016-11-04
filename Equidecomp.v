@@ -958,23 +958,27 @@ assert
     apply Forall2_Forall_combine.
     split.
      apply Forall_forall.
-     intros (U, V) HU.
-     generalize HU; intros HV.
-     apply in_combine_l in HU.
-     apply in_combine_r in HV.
-     apply In_nth with (d := ∅) in HU.
-     apply In_nth with (d := ∅) in HV.
-     destruct HU as (i & Hi & HU).
-     destruct HV as (j & Hj & HV).
+     intros (U, V) HUV.
+     apply In_nth with (d := (∅, ∅)) in HUV.
+     rewrite combine_length in HUV.
+     rewrite partition_combine_length in HUV.
+     2: now rewrite Hg'l, map_length.
+     rewrite partition_combine_swi_length in HUV.
+     2: now rewrite Hh'l, map_length.
+     rewrite <- Hlen1, Hlen2, Nat.mul_comm in HUV.
+     rewrite Nat.min_l in HUV; [ | easy ].
+     destruct HUV as (i & Hi & HUV).
+     rewrite combine_nth in HUV.
+     injection HUV; clear HUV; intros HV HU.
      subst g'l h'l.
+(*
      rewrite partition_combine_length in Hi; [ | now rewrite map_length ].
      rewrite partition_combine_swi_length in Hj; [ | now rewrite map_length ].
-(*
      remember (map app_gr_inv gl) as fl eqn:Hfl.
      remember (map app_gr_inv hl) as f'l eqn:Hf'l.
-*)
      rewrite Hlen2 in Hi.
      rewrite <- Hlen1, Nat.mul_comm in Hj.
+*)
      apply eq_set_eq in HU.
      apply eq_set_eq in HV.
 remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
