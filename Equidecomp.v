@@ -985,9 +985,8 @@ remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
 remember (partition_combine_swi (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
 destruct Hpcf as (HpcfU, HpcfI).
 destruct Hpcg as (HpcgU, HpcgI).
-bbb.
      remember (nth (i / length PG) gl gr_ident) as gi.
-     remember (nth (j / length PE) (map gr_inv hl) gr_ident) as hj.
+     remember (nth (i mod length PG) (map gr_inv hl) gr_ident) as hj.
      exists (Comb hj gi); subst gi hj; simpl.
 (*
 remember gr_ident as toto in |-*.
@@ -1032,12 +1031,33 @@ split; intros Hx.
 Qed.
 
 Show.
+rewrite Hgl.
+rewrite intersection_comm.
+apply intersection_morph.
+Focus 2.
+rewrite app_gr_nth.
+replace Datatypes.id with (@id (set point)) by easy.
+now rewrite map_map.
+
+rewrite app_gr_nth.
+replace Datatypes.id with (@id (set point)) by easy.
+rewrite map_map.
+etransitivity.
+apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+apply app_gr_morph_Proper; [ reflexivity | ].
+apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+symmetry; apply Hhl.
+do 2 rewrite Nat.add_0_r.
+SearchAbout app_gr.
+Check app_gr_inv_l.
+bbb.
 (* works: *)
 etransitivity.
 apply intersection_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
 apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+
 symmetry; apply Hhl.
 (* doesn't work:
 rewrite <- Hhl.
@@ -1049,6 +1069,8 @@ apply intersection_morph_Proper; [ reflexivity | ].
 apply nth_map_app_gr_inv_morph; [ easy | easy | ].
 symmetry; apply Hgl.
 rewrite Nat.add_0_r.
+bbb.
+
 rewrite intersection_comm.
 (**)
 bbb.
