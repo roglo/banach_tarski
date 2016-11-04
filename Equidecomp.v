@@ -998,7 +998,6 @@ rewrite HPE', HPG'.
 Check partition_combine_nth.
 Check partition_combine_swi_nth.
 rewrite partition_combine_nth; [ | easy | | ].
-bbb.
  rewrite partition_combine_swi_nth; [ | easy | | ].
   do 2 rewrite group_intersection_distr.
 rewrite Hlen2.
