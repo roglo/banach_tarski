@@ -982,7 +982,7 @@ remember (partition_combine_swi (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
 destruct Hpcf as (HpcfU, HpcfI).
 destruct Hpcg as (HpcgU, HpcgI).
      remember (nth (i / length P₂F) gl gr_ident) as gi.
-     remember (nth (j / length P₁F) hl gr_ident) as hj.
+     remember (nth (j mod length P₂F) hl gr_ident) as hj.
      exists (Comb hj gi); subst gi hj; simpl.
 (*
 remember gr_ident as toto in |-*.
@@ -997,14 +997,17 @@ rewrite <- HU, <- HV; clear HU HV.
 rewrite HPE', partition_combine_nth; [ | easy | | ].
  rewrite HPG', partition_combine_swi_nth; [ | easy | | ].
   do 2 rewrite group_intersection_distr.
+rewrite Hlen2.
+(*
   rewrite <- Hlen1, Hlen2.
+*)
   rewrite Hgl.
 
 Require Import Setoid.
 Add Parametric Morphism :
   (λ n fl, @nth (set point → set point) n (map app_gr_inv fl) id)
   with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
-  as nth_map_app_gr_morph.
+  as nth_map_app_gr_inv_morph.
 Proof.
 intros n fl E F HEF x.
 split; intros Hx.
@@ -1029,7 +1032,7 @@ etransitivity.
 apply intersection_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
 apply app_gr_morph_Proper; [ reflexivity | ].
-apply nth_map_app_gr_morph; [ easy | easy | ].
+apply nth_map_app_gr_inv_morph; [ easy | easy | ].
 symmetry; apply Hhl.
 (* doesn't work:
 rewrite <- Hhl.
@@ -1037,6 +1040,9 @@ rewrite <- Hhl.
 rewrite Nat.add_0_r.
 do 2 rewrite app_gr_nth.
 replace Datatypes.id with (@id (set point)) by easy.
+rewrite intersection_comm.
+apply intersection_morph.
+Focus 2.
 
 bbb.
 rewrite app_gr_nth.
