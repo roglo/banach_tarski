@@ -947,12 +947,12 @@ assert
    eapply partition_combine_is_partition with (PF := P₁F); eassumption.
 
    exists (partition_combine g'l PE P₂F).
-   remember (map app_gr_inv hl) as f'l eqn:Hf'l.
-   assert (Hpcg : is_partition G (partition_combine_swi f'l PG P₁F)).
+   remember (map app_gr_inv hl) as h'l eqn:Hh'l.
+   assert (Hpcg : is_partition G (partition_combine_swi h'l PG P₁F)).
     symmetry in Hlen2.
     eapply partition_combine_swi_is_partition with (PF := P₂F); eassumption.
 
-    exists (partition_combine_swi f'l PG P₁F).
+    exists (partition_combine_swi h'l PG P₁F).
     split; [ assumption | ].
     split; [ assumption | ].
     apply Forall2_Forall_combine.
@@ -966,7 +966,7 @@ assert
      apply In_nth with (d := ∅) in HV.
      destruct HU as (i & Hi & HU).
      destruct HV as (j & Hj & HV).
-     subst g'l f'l.
+     subst g'l h'l.
      rewrite partition_combine_length in Hi; [ | now rewrite map_length ].
      rewrite partition_combine_swi_length in Hj; [ | now rewrite map_length ].
 (*
@@ -981,8 +981,8 @@ remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
 remember (partition_combine_swi (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
 destruct Hpcf as (HpcfU, HpcfI).
 destruct Hpcg as (HpcgU, HpcgI).
-     remember (nth (i / length P₂F) gl gr_ident) as gi.
-     remember (nth (j mod length P₂F) hl gr_ident) as hj.
+     remember (nth (i / length PE) gl gr_ident) as gi.
+     remember (nth (j / length PG) (map gr_inv hl) gr_ident) as hj.
      exists (Comb hj gi); subst gi hj; simpl.
 (*
 remember gr_ident as toto in |-*.
@@ -1001,7 +1001,6 @@ rewrite Hlen2.
 (*
   rewrite <- Hlen1, Hlen2.
 *)
-  rewrite Hgl.
 
 Require Import Setoid.
 Add Parametric Morphism :
@@ -1038,7 +1037,28 @@ symmetry; apply Hhl.
 rewrite <- Hhl.
 *)
 rewrite Nat.add_0_r.
-do 2 rewrite app_gr_nth.
+symmetry.
+etransitivity.
+apply intersection_morph_Proper; [ reflexivity | ].
+apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+symmetry; apply Hgl.
+rewrite Nat.add_0_r.
+rewrite intersection_comm.
+(**)
+apply intersection_morph.
+Check app_gr_nth.
+
+bbb.
+rewrite app_gr_nth.
+
+
+apply app_gr_morph_Proper; [ reflexivity | ].
+apply app_gr_morph_Proper; [ reflexivity | ].
+apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+symmetry; apply Hhl.
+
+
+rewrite app_gr_nth.
 replace Datatypes.id with (@id (set point)) by easy.
 rewrite intersection_comm.
 apply intersection_morph.
