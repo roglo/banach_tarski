@@ -16,7 +16,7 @@ Theorem rev_path_cons : ∀ e el,
 Proof.
 intros e el.
 unfold rev_path; simpl.
-rewrite map_app; easy.
+now rewrite map_app.
 Qed.
 
 Theorem rev_path_app : ∀ el₁ el₂,
@@ -24,14 +24,14 @@ Theorem rev_path_app : ∀ el₁ el₂,
 Proof.
 intros el₁ el₂.
 revert el₁.
-induction el₂ as [| (t, d)]; intros; [ rewrite app_nil_r; easy | ].
+induction el₂ as [| (t, d)]; intros; [ now rewrite app_nil_r | ].
 rewrite rev_path_cons, cons_comm_app, app_assoc, IHel₂.
 rewrite <- app_assoc; f_equal; simpl.
 clear el₂ IHel₂.
 induction el₁ as [| e₁]; [ easy | ].
 simpl; rewrite rev_path_cons; rewrite IHel₁.
 simpl; f_equal; symmetry.
-rewrite rev_path_cons; easy.
+now rewrite rev_path_cons.
 Qed.
 
 Theorem rev_path_involutive : ∀ el, rev_path (rev_path el) = el.
@@ -47,7 +47,7 @@ Qed.
 Theorem rev_path_single : ∀ e, rev_path [e] = [negf e].
 *)
 Theorem rev_path_single : ∀ e, rev_path [e] = negf e :: [].
-Proof. intros e; easy. Qed.
+Proof. easy. Qed.
 
 Theorem rev_path_nil : rev_path [] = [].
 Proof. easy. Qed.
@@ -57,7 +57,7 @@ Proof.
 intros el Hr.
 destruct el as [| e]; [ easy | ].
 rewrite rev_path_cons, rev_path_single in Hr.
-destruct (rev_path el); easy.
+now destruct (rev_path el).
 Qed.
 
 Theorem rev_path_eq_eq : ∀ el₁ el₂,
@@ -70,19 +70,19 @@ revert el₂ Hr.
 induction el₁ as [| e₁]; intros.
  rewrite rev_path_nil in Hr.
  symmetry in Hr; apply rev_path_is_nil in Hr.
- destruct Hr; easy.
+ now destruct Hr.
 
  rewrite rev_path_cons, rev_path_single in Hr.
  destruct el₂ as [| e₂].
   rewrite rev_path_nil in Hr.
-  destruct (rev_path el₁); easy.
+  now destruct (rev_path el₁).
 
   rewrite rev_path_cons, rev_path_single in Hr.
   apply app_inj_tail in Hr.
   destruct Hr as (Hr, Hn).
   apply IHel₁ in Hr.
   apply negf_eq_eq in Hn.
-  subst el₁ e₁; easy.
+  now subst el₁ e₁.
 Qed.
 
 Theorem norm_list_rev_path : ∀ el,

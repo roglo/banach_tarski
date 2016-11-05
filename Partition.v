@@ -34,7 +34,7 @@ split.
   now right.
 
   apply H₂.
-  destruct H as [[H| H]| H]; [ left; easy | right; now left | ].
+  destruct H as [[H| H]| H]; [ now left | right; now left | ].
   right; now right.
 
  intros i j Hij; subst s.
@@ -43,13 +43,13 @@ split.
   intros x.
   split; [ | easy ].
   intros (H₁, H₂).
-  destruct j; [ apply Hij; easy | clear Hij ].
+  destruct j; [ now apply Hij | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   eapply Hi with (i := O) (j := S (S j)); [ intros H; easy | ].
+   eapply Hi with (i := O) (j := S (S j)); [ now intros H | ].
    unfold intersection; simpl.
    split; eassumption.
 
-   eapply Hi with (i := 1%nat) (j := S (S j)); [ intros H; easy | ].
+   eapply Hi with (i := 1%nat) (j := S (S j)); [ now intros H | ].
    unfold intersection; simpl.
    split; eassumption.
 
@@ -59,19 +59,19 @@ split.
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    eapply Hi with (i := O) (j := S (S i)); [ intros H; easy | ].
+    eapply Hi with (i := O) (j := S (S i)); [ now intros H | ].
     unfold intersection; simpl.
     split; eassumption.
 
     eapply Hi with (i := 1%nat) (j := S (S i)).
-     intros H; easy.
+     now intros H.
 
      unfold intersection; simpl.
      split; eassumption.
 
   apply Hi with (i := S (S i)) (j := S (S j)) (x := x).
    intros H; apply Hij.
-   apply Nat.succ_inj; easy.
+   now apply Nat.succ_inj.
 
    unfold intersection; simpl.
    now split.
@@ -100,7 +100,7 @@ split.
   right; left; now split.
 
   apply Hu.
-  destruct H as [[H₁| H₁]| [H₁| H₁]]; [ left; easy | | | ].
+  destruct H as [[H₁| H₁]| [H₁| H₁]]; [ now left | | | ].
    right; left; now apply HB.
 
    right; left; now destruct H₁.
@@ -113,19 +113,19 @@ split.
   intros x.
   split; [ | easy ].
   intros (H₁, H₂).
-  destruct j; [ apply Hij; easy | clear Hij ].
+  destruct j; [ now apply Hij | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   eapply Hi with (i := O) (j := S j); [ intros H; easy | ].
+   eapply Hi with (i := O) (j := S j); [ now intros H | ].
    unfold intersection; simpl.
    split; [ eassumption | ].
-   destruct j; [ destruct H₂; easy | easy ].
+   destruct j; [ now destruct H₂ | easy ].
 
    eapply Hi with (i := 1%nat) (j := S j).
     destruct j; [ now destruct H₂ | easy ].
 
     unfold intersection; simpl.
     split; [ apply HB; eassumption | ].
-    destruct j; [ destruct H₂; easy | easy ].
+    destruct j; [ now destruct H₂ | easy ].
 
   unfold intersection, union, subtract, set_eq; simpl.
   intros x.
@@ -133,27 +133,27 @@ split.
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    eapply Hi with (i := O) (j := S i); [ intros H; easy | ].
+    eapply Hi with (i := O) (j := S i); [ now intros H | ].
     unfold intersection; simpl.
     split; [ eassumption | ].
-    destruct i; [ destruct H₁; easy | easy ].
+    destruct i; [ now destruct H₁ | easy ].
 
     eapply Hi with (i := 1%nat) (j := S i).
-     destruct i; [ | intros H; easy ].
-     destruct H₁; easy.
+     destruct i; [ | now intros H ].
+     now destruct H₁.
 
      unfold intersection; simpl.
      split; [ apply HB; eassumption | ].
-     destruct i; [ apply HB; easy | easy ].
+     destruct i; [ now apply HB | easy ].
 
   apply Hi with (i := S i) (j := S j) (x := x).
    intros H; now apply Hij.
 
    unfold intersection; simpl.
    split.
-    destruct i; [ destruct H₁; easy | easy ].
+    destruct i; [ now destruct H₁ | easy ].
 
-    destruct j; [ destruct H₂; easy | easy ].
+    destruct j; [ now destruct H₂ | easy ].
 Qed.
 
 Theorem partition_union :
@@ -171,18 +171,18 @@ split.
  transitivity (F₁ ∪ ⋃ P₂).
   intros x.
   split; intros H.
-   destruct H as [H| H]; [ left; easy | right ].
-   apply HF₂; easy.
+   destruct H as [H| H]; [ now left | right ].
+   now apply HF₂.
 
-   destruct H as [H| H]; [ left; easy | right ].
-   apply HF₂; easy.
+   destruct H as [H| H]; [ now left | right ].
+   now apply HF₂.
 
   split; intros H.
-   destruct H as [H| H]; [ left | right; easy ].
-   apply HF₁; easy.
+   destruct H as [H| H]; [ left | now right ].
+   now apply HF₁.
 
-   destruct H as [H| H]; [ left | right; easy ].
-   apply HF₁; easy.
+   destruct H as [H| H]; [ left | now right ].
+   now apply HF₁.
 
  intros * Hij.
  unfold intersection, set_eq; subst s; simpl.
@@ -239,11 +239,11 @@ intros * Hij.
 destruct i.
  destruct j; [ exfalso; now apply Hij | ].
  destruct j.
-  split; [ intros (_, H); easy | easy ].
-  split; [ intros (_, H); easy | easy ].
+  split; [ now intros (_, H) | easy ].
+  split; [ now intros (_, H) | easy ].
 
  split; [ intros (H, _) | easy ].
- destruct i; easy.
+ now destruct i.
 Qed.
 
 Theorem is_partition_empty : ∀ A (s := set_equiv) (E : set A),

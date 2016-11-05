@@ -22,7 +22,7 @@ intros p₁ p₂ (el, H); simpl in H.
 unfold same_orbit; simpl.
 exists (rev (map negf el)).
 revert p₁ p₂ H.
-induction el as [| e]; intros; [ symmetry; easy | simpl in H; simpl ].
+induction el as [| e]; intros; [ now symmetry | simpl in H; simpl ].
 rewrite fold_right_app; simpl.
 apply IHel; rewrite <- H.
 rewrite rotate_neg_rotate.
@@ -34,7 +34,7 @@ Proof.
 intros p₁ p₂ p₃ (el₁, H₁) (el₂, H₂); simpl in H₁, H₂.
 unfold same_orbit; simpl.
 exists (el₂ ++ el₁).
-rewrite fold_right_app, H₁, H₂; easy.
+now rewrite fold_right_app, H₁, H₂.
 Qed.
 
 Add Parametric Relation : _ same_orbit
@@ -72,9 +72,9 @@ apply norm_list_app_is_nil in H.
  apply not_eq_sym in Hd.
  injection H; now intros.
 
- rewrite norm_list_idemp; easy.
+ now rewrite norm_list_idemp.
 
- rewrite norm_list_idemp; easy.
+ now rewrite norm_list_idemp.
 Qed.
 
 Definition orbit_selector := choice_function same_orbit.
@@ -116,13 +116,13 @@ intros * His Hrm.
 destruct p as (x, y, z).
 remember (P x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : p ∈ sphere_ray r) by (subst p; easy).
+assert (Hos : p ∈ sphere_ray r) by now subst p.
 pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
 unfold sphere in His.
 unfold sphere_ray in H.
 unfold sphere.
 subst p; simpl in *.
-rewrite H, <- Hos; easy.
+now rewrite H, <- Hos.
 Qed.
 
 Theorem in_sphere_after_rotate : ∀ p e,
@@ -160,7 +160,7 @@ destruct el₂ as [| e₂].
  exfalso; subst el₁; apply Hel.
  apply norm_list_is_nil_between in Hel₂.
  rewrite <- rev_path_norm_list in Hel₂.
- apply rev_path_is_nil in Hel₂; easy.
+ now apply rev_path_is_nil in Hel₂.
 
  apply same_orbit_rotate with (e := negf e) in Hso.
  rewrite rotate_neg_rotate in Hso.

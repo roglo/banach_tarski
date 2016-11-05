@@ -85,7 +85,7 @@ split; intros H.
  destruct (letter_dec x₁ x₂) as [H₁| H₁]; [ | easy ].
  split; [ easy | ].
  destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ easy | ].
- apply neq_negb, not_eq_sym; easy.
+ now apply neq_negb, not_eq_sym.
 
  destruct H; subst x₂ d₂.
  apply letter_opp_inv.
@@ -99,7 +99,7 @@ destruct e₂ as (t₂, d₂).
 split; intros H.
  apply letter_opp_iff in H.
  destruct H; subst t₂ d₂; simpl.
- rewrite Bool.negb_involutive; easy.
+ now rewrite Bool.negb_involutive.
 
  injection H; intros; subst; simpl.
  rewrite letter_dec_diag, bool_dec_negb_l.
@@ -117,14 +117,14 @@ Qed.
 Theorem negf_involutive : ∀ e, negf (negf e) = e.
 Proof.
 intros (t, d); simpl.
-rewrite Bool.negb_involutive; easy.
+now rewrite Bool.negb_involutive.
 Qed.
 
 Theorem letter_opp_negf_r : ∀ e, letter_opp e (negf e).
 Proof.
 intros.
 apply letter_opp_negf.
-rewrite negf_involutive; easy.
+now rewrite negf_involutive.
 Qed.
 
 Theorem letter_opp_sym : ∀ e₁ e₂, letter_opp e₁ e₂ → letter_opp e₂ e₁.
