@@ -204,7 +204,7 @@ split.
      eapply nth_set_union_list; eassumption.
 
      apply Nat.nlt_ge in H₅.
-     rewrite nth_overflow in H₂; [ easy | easy ].
+     now rewrite nth_overflow in H₂.
 
   apply Nat.nlt_ge in H₃.
   destruct (lt_dec j (length P₁)) as [H₄| H₄].
@@ -218,7 +218,7 @@ split.
      eapply nth_set_union_list; eassumption.
 
      apply Nat.nlt_ge in H₅.
-     rewrite nth_overflow in H₁; [ easy | easy ].
+     now rewrite nth_overflow in H₁.
 
    apply Nat.nlt_ge in H₄.
    eapply HP₂; [ | split; [ apply H₁ | apply H₂] ].

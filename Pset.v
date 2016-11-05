@@ -150,7 +150,7 @@ Proof.
 intros.
 subst s; intros x.
 split; intros H; [ | now left ].
-destruct H as [H| H]; [ easy | easy ].
+now destruct H.
 Qed.
 
 Theorem intersection_empty_l : ∀ A (s := set_equiv) (F : set A),
@@ -293,14 +293,14 @@ induction P₂ as [| Q]; intros.
   clear - H.
   induction P₁ as [| R P₁].
    simpl in H; simpl; left.
-   destruct H; [ easy | easy ].
+   now destruct H.
 
    simpl in H; simpl.
    destruct H.
     destruct H; [ now left | right ].
-    apply IHP₁; now left.
+    now apply IHP₁; left.
 
-    right; apply IHP₁; now right.
+    now right; apply IHP₁; right.
 Qed.
 
 Theorem nth_set_union_list : ∀ A (P : list (set A)) i x,
