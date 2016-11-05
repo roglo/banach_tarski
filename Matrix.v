@@ -262,14 +262,14 @@ intros el p.
 remember (length el) as len eqn:Hlen; symmetry in Hlen.
 revert el p Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
-destruct (norm_list_dec el) as [H₁| H₁]; [ rewrite H₁; easy | ].
+destruct (norm_list_dec el) as [H₁| H₁]; [ now rewrite H₁ | ].
 destruct H₁ as (el₁ & t & d & el₂ & H₁).
 subst el.
 rewrite rotate_cancel_in, norm_list_cancel_in.
-destruct len; [ destruct el₁; easy | ].
+destruct len; [ now destruct el₁ | ].
 destruct len.
  destruct el₁; [ easy | simpl in Hlen ].
- destruct el₁; easy.
+ now destruct el₁.
 
  apply IHlen with len.
   transitivity (S len); apply Nat.lt_succ_diag_r.
@@ -278,16 +278,16 @@ destruct len.
   revert len el₂ Hlen.
   induction el₁ as [| e₁]; intros.
    simpl in Hlen; simpl.
-   do 2 apply Nat.succ_inj in Hlen; easy.
+   now do 2 apply Nat.succ_inj in Hlen.
 
    simpl in Hlen; simpl.
    apply Nat.succ_inj in Hlen.
    destruct len.
     destruct el₁; [ easy | simpl in Hlen ].
-    destruct el₁; easy.
+    now destruct el₁.
 
     f_equal.
-    apply IHel₁; easy.
+    now apply IHel₁.
 Qed.
 
 Theorem rotate_rev_path : ∀ el p₁ p₂,
@@ -296,7 +296,7 @@ Theorem rotate_rev_path : ∀ el p₁ p₂,
 Proof.
 intros el p₁ p₂ Hr.
 revert p₁ p₂ Hr.
-induction el as [| e]; intros; [ symmetry; easy | ].
+induction el as [| e]; intros; [ now symmetry | ].
 simpl in Hr.
 rewrite rev_path_cons, rev_path_single, fold_right_app; simpl.
 apply IHel; rewrite <- Hr.

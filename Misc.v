@@ -25,7 +25,7 @@ Theorem nat_mod_add_once : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
 Proof.
 intros a b Hb.
 replace b with (1 * b) at 1 by apply Nat.mul_1_l.
-apply Nat.mod_add; easy.
+now apply Nat.mod_add.
 Qed.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
@@ -151,10 +151,10 @@ split; intros HF.
    revert l2 HF.
    induction l1 as [| x1 l1]; intros.
     destruct l2 as [| x2 l2]; [ easy | ].
-    apply Forall2_nil_cons in HF; easy.
+    now apply Forall2_nil_cons in HF.
 
     destruct l2 as [| x2 l2].
-     apply Forall2_cons_nil in HF; easy.
+     now apply Forall2_cons_nil in HF.
 
      apply Forall2_cons_cons in HF.
      destruct HF as (Hf, HF).

@@ -50,5 +50,5 @@ intros a b c d Hb.
 rewrite Rmult_comm, <- Rmult_assoc; f_equal.
 rewrite <- Rmult_assoc; f_equal.
 rewrite Rmult_comm, Rmult_assoc; f_equal.
-apply sqrt_sqrt; easy.
+now apply sqrt_sqrt.
 Qed.
