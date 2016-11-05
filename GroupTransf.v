@@ -57,6 +57,19 @@ induction g as [ e| dx | g IHg h IHh]; intros.
  eapply IHh; [ symmetry; eassumption | eassumption ].
 Qed.
 
+Theorem xtransl_0 : ∀ (s := set_equiv) E, (xtransl 0 E = E)%S.
+Proof.
+intros; intros (x, y, z); simpl.
+now unfold Rminus; rewrite Ropp_0, Rplus_0_r.
+Qed.
+
+Theorem xtransl_xtransl : ∀ (s := set_equiv) E dx dy,
+  (xtransl dx (xtransl dy E) = xtransl (dx + dy) E)%S.
+Proof.
+intros; intros (x, y, z); simpl.
+now replace (x - dx - dy)%R with (x - (dx + dy))%R by lra.
+Qed.
+
 Theorem app_gr_ident : ∀ (s := set_equiv) E, (app_gr gr_ident E = E)%S.
 Proof.
 intros.
@@ -114,6 +127,13 @@ Proof.
 intros g p q Hpq r.
 split; intros H; [ eapply gr_subst; eassumption | ].
 symmetry in Hpq; eapply gr_subst; eassumption.
+Qed.
+
+Add Parametric Morphism : xtransl
+  with signature eq ==> @set_eq _ set_equiv ==> @set_eq _ set_equiv
+  as xtransl_morph.
+Proof.
+intros dx E F HEF (x, y, z); simpl; now rewrite HEF.
 Qed.
 
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.

@@ -107,20 +107,16 @@ do 2 rewrite map_length.
 split; [ | easy ].
 rewrite Forall_forall in HEF.
 apply Forall_forall; intros (E₁, F₁) HEF₁.
-SearchAbout (List.In (_, _)).
-Check in_prod_iff.
-SearchAbout (combine (map _ _)).
-SearchAbout (List.In _ (combine _ _)).
-SearchAbout list_prod.
-Print list_prod.
-bbb.
-Theorem combine_map
-  combine (map f l₁) (map f l₂) =
-    (list_prod ...
-
-eapply in_prod_iff in HEF₁.
-
-bbb.
+rewrite combine_map in HEF₁.
+apply in_map_iff in HEF₁.
+destruct HEF₁ as ((E₂ & F₂) & Hp & HEF₁).
+injection Hp; clear Hp; intros; subst E₁ F₁.
+apply HEF in HEF₁.
+destruct HEF₁ as (g, HEF₁).
+exists (Comb (Xtransl dx) (Comb g (Xtransl (-dx)))); simpl.
+rewrite xtransl_xtransl, Rplus_opp_l.
+now rewrite xtransl_0, HEF₁.
+Qed.
 
 Theorem equidec_sphere_with_and_without_fixpoints :
   equidecomposable set_equiv sphere sphere_but_fixpoints.
@@ -137,7 +133,6 @@ etransitivity; [ | etransitivity ].
 
  apply equidec_union.
   intros p; split; [ intros (H3, H6) | easy ].
-
 bbb.
 
   Focus 3.

@@ -67,15 +67,36 @@ intros A B l.
 induction l as [| x]; [ reflexivity | assumption ].
 Qed.
 
+Theorem list_prod_map : ∀ A B C D (f : A → B) (g : C → D) l l',
+  list_prod (map f l) (map g l') =
+  map (λ '(x, x'), (f x, g x')) (list_prod l l').
+Proof.
+intros.
+revert l'.
+induction l as [| x l]; intros; [ easy | simpl ].
+rewrite map_app.
+f_equal; [ | apply IHl ].
+rewrite map_map.
+induction l' as [| x' l']; [ easy | now simpl; rewrite IHl' ].
+Qed.
+
 Theorem list_prod_map_l : ∀ A B C (f : A → B) l (l' : list C),
   list_prod (map f l) l' =
   map (λ '(x, x'), (f x, x')) (list_prod l l').
 Proof.
-intros A B *.
+intros.
 revert l'.
-induction l as [| x l]; intros; [ reflexivity | simpl ].
-rewrite map_app.
-f_equal; [ rewrite map_map; reflexivity | apply IHl ].
+induction l as [| x l]; intros; [ easy | simpl; rewrite map_app ].
+f_equal; [ now rewrite map_map | apply IHl ].
+Qed.
+
+Theorem combine_map : ∀ A B C D (f : A → B) (g : C → D) l l',
+  combine (map f l) (map g l') = map (λ '(x, y), (f x, g y)) (combine l l').
+Proof.
+intros.
+revert l'.
+induction l as [| x l]; intros; [ easy | simpl ].
+destruct l' as [| x' l']; [ easy | simpl; f_equal; apply IHl ].
 Qed.
 
 Theorem Forall_inv2 : ∀ A (P : A → Prop) a l,
