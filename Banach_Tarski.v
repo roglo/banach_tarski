@@ -147,8 +147,8 @@ simpl in H3, H6.
 now apply (Rno_intersect_spheres_x3_x6 x y z).
 Qed.
 
-Theorem equidec_sphere_with_and_without_fixpoints :
-  equidecomposable set_equiv sphere sphere_but_fixpoints.
+Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
+  equidecomposable _ sphere sphere_but_fixpoints.
 Proof.
 bbb.
 
