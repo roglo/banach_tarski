@@ -118,13 +118,25 @@ rewrite xtransl_xtransl, Rplus_opp_l.
 now rewrite xtransl_0, HEF₁.
 Qed.
 
+Theorem separated_spheres_without_fixpoints : ∀ (s := set_equiv),
+  (xtransl 3 sphere_but_fixpoints ∩ xtransl 6 sphere_but_fixpoints = ∅)%S.
+Proof.
+intros p; split; [ intros (H3, H6) | easy ].
+bbb.
+
+Theorem separated_spheres : ∀ (s := set_equiv),
+  (xtransl 3 sphere ∩ xtransl 6 sphere = ∅)%S.
+Proof.
+intros p; split; [ intros (H3, H6) | easy ].
+bbb.
+
 Theorem equidec_sphere_with_and_without_fixpoints :
   equidecomposable set_equiv sphere sphere_but_fixpoints.
 Proof.
 bbb.
 
-Theorem Banach_Tarski_paradox :
-  equidecomposable set_equiv sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
+Theorem Banach_Tarski_paradox : ∀ (s := set_equiv),
+  equidecomposable _ sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
 Proof.
 etransitivity; [ | etransitivity ].
  2: apply Banach_Tarski_paradox_but_fixpoints.
@@ -132,14 +144,15 @@ etransitivity; [ | etransitivity ].
  apply equidec_sphere_with_and_without_fixpoints.
 
  apply equidec_union.
-  intros p; split; [ intros (H3, H6) | easy ].
-bbb.
+  apply separated_spheres_without_fixpoints.
 
-  Focus 3.
+  apply separated_spheres.
+
   apply equidec_transl; symmetry.
   apply equidec_sphere_with_and_without_fixpoints.
-   Focus 3.
 
+  apply equidec_transl; symmetry.
   apply equidec_sphere_with_and_without_fixpoints.
+Qed.
 
-bbb.
+Check Banach_Tarski_paradox.
