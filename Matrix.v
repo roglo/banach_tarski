@@ -77,7 +77,7 @@ progress repeat rewrite Rmult_1_r.
 progress repeat rewrite Rmult_0_r.
 progress repeat rewrite Rplus_0_l.
 progress repeat rewrite Rplus_0_r.
-destruct m; easy.
+now destruct m.
 Qed.
 
 Theorem mat_vec_mul_id : ∀ p, mat_vec_mul mat_id p = p.
@@ -252,7 +252,7 @@ Theorem rotate_cancel_in : ∀ el₁ el₂ e p,
 Proof.
 intros.
 do 2 rewrite fold_right_app; simpl.
-rewrite rotate_rotate_neg; easy.
+now rewrite rotate_rotate_neg.
 Qed.
 
 Theorem rotate_rotate_norm : ∀ el p,

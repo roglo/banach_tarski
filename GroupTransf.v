@@ -147,13 +147,11 @@ unfold app_gr_inv.
 revert E.
 induction g; intros; simpl.
  intros p; simpl.
- rewrite negf_involutive, rotate_neg_rotate.
- easy.
+ now rewrite negf_involutive, rotate_neg_rotate.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
- rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
- easy.
+ now rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
 
  intros p.
  split; intros H.
@@ -170,13 +168,11 @@ unfold app_gr_inv.
 revert E.
 induction g; intros; simpl.
  intros p; simpl.
- rewrite negf_involutive, rotate_rotate_neg.
- easy.
+ now rewrite negf_involutive, rotate_rotate_neg.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
- rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
- easy.
+ now rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
 
  intros p.
  split; intros H.
@@ -197,11 +193,10 @@ Theorem app_gr_app_gr_point : ∀ g E p, p ∈ app_gr g E → app_gr_point g p �
 Proof.
 intros * Hp.
 revert E p Hp.
-induction g; intros; [ easy | destruct p; easy | ].
+induction g; intros; [ easy | now destruct p | ].
 simpl in Hp; simpl.
 apply IHg1 in Hp.
-apply IHg2 in Hp.
-easy.
+now apply IHg2 in Hp.
 Qed.
 
 Theorem app_gr_empty_set : ∀ (s := set_equiv) f, (app_gr f ∅ = ∅)%S.
@@ -209,10 +204,10 @@ Proof.
 intros s * p.
 split; intros H; [ | easy ].
 revert p H.
-induction f; intros; try easy; [ destruct p; easy | ].
+induction f; intros; try easy; [ now destruct p | ].
 simpl in H.
-eapply gr_subst in H; [ apply IHf1 in H; easy | ].
-split; [ apply IHf2 | intros; easy ].
+eapply gr_subst in H; [ now apply IHf1 in H | ].
+split; [ apply IHf2 | easy ].
 Qed.
 
 Theorem app_gr_app_gr_inv : ∀ (s := set_equiv) E g,
@@ -260,7 +255,7 @@ Theorem group_intersection_distr : ∀ (s := set_equiv) g E F,
 Proof.
 intros.
 revert E F.
-induction g; intros; [ easy | intros (x, y, z); easy | ].
+induction g; intros; [ easy | now intros (x, y, z) | ].
 intros p; simpl; now rewrite IHg2, IHg1.
 Qed.
 
@@ -269,8 +264,8 @@ Theorem group_union_distr : ∀ (s := set_equiv) g E F,
 Proof.
 intros.
 revert E F.
-induction g; intros; [ easy | intros (x, y, z); easy | ].
-intros p; simpl; now rewrite IHg2, IHg1.
+induction g; intros; [ easy | now intros (x, y, z) | ].
+now intros p; simpl; rewrite IHg2, IHg1.
 Qed.
 
 Theorem group_union_list_distr : ∀ (s := set_equiv) f EL,
@@ -283,10 +278,10 @@ induction EL as [| E₁ EL].
  intros x; simpl.
  rewrite group_union_distr.
  split; intros Hx.
-  destruct Hx as [Hx| Hx]; [ left; easy | ].
+  destruct Hx as [Hx| Hx]; [ now left | ].
   right; now apply IHEL.
 
-  destruct Hx as [Hx| Hx]; [ left; easy | ].
+  destruct Hx as [Hx| Hx]; [ now left | ].
   right; now apply IHEL.
 Qed.
 
@@ -300,7 +295,7 @@ split; intros HEF.
 
   intros (x, y, z) Hp; now apply HEF.
 
-  apply IHg1, IHg2; easy.
+  now apply IHg1, IHg2.
 
  intros p Hp.
  revert p E F HEF Hp.
@@ -330,11 +325,11 @@ split.
   split.
    intros Hr.
    revert F HF Hr.
-   induction P as [| P PL]; intros; [ apply HF in Hr; easy | ].
+   induction P as [| P PL]; intros; [ now apply HF in Hr | ].
    simpl in HF; simpl.
    generalize Hr; intros H.
    apply HF in H; simpl in H.
-   destruct H as [H| H]; [ left; easy | right ].
+   destruct H as [H| H]; [ now left | right ].
    eapply IHPL; [ | easy | eassumption ].
    intros i j Hij.
    unfold set_eq; simpl; intros y.
@@ -350,7 +345,7 @@ split.
    revert F HF.
    induction P as [| P PL]; intros; [ easy | ].
    simpl in HF, Hme; apply HF.
-   destruct Hme as [Hme| Hme]; [ left; easy | ].
+   destruct Hme as [Hme| Hme]; [ now left | ].
    right; simpl.
    apply IHPL; [ | easy | intros y; split; intros H; apply H ].
    intros i j Hij y.
@@ -368,13 +363,13 @@ split.
    revert F HF Hp.
    induction P as [| P PL]; intros.
     unfold set_eq in HF; simpl in HF.
-    apply HF in Hp; easy.
+    now apply HF in Hp.
 
     simpl in HF; simpl.
     generalize Hp; intros H.
     apply HF in H; simpl in H.
-    destruct H as [H| H]; [ left; easy | right ].
-    eapply IHPL; [ | simpl; easy | eassumption ].
+    destruct H as [H| H]; [ now left | right ].
+    eapply IHPL; [ | easy | eassumption ].
     intros i j Hij.
     unfold set_eq; simpl; intros q.
     assert (HSij : S i ≠ S j).
@@ -389,7 +384,7 @@ split.
    revert F HF.
    induction P as [| P PL]; intros; [ easy | ].
    simpl in HF, Hme; apply HF.
-   destruct Hme as [Hme| Hme]; [ left; easy | ].
+   destruct Hme as [Hme| Hme]; [ now left | ].
    right; simpl.
    apply IHPL; [ | easy | intros q; split; intros H; apply H ].
    intros i j Hij q.
@@ -412,7 +407,7 @@ split.
     rewrite IHh in Hgh.
     simpl in Hgh.
     apply group_union_distr in Hgh.
-    destruct Hgh as [Hgh| Hgh]; [ left; easy | right ].
+    destruct Hgh as [Hgh| Hgh]; [ now left | right ].
     eapply IHPL.
      intros i j Hij.
      unfold set_eq; simpl; intros y.
@@ -431,23 +426,23 @@ split.
      apply group_union_list_distr.
 
      pose proof group_union_list_distr h PL.
-     rewrite <- H in Hgh; easy.
+     now rewrite <- H in Hgh.
 
    intros Hgh.
    revert F HF IHg IHh Hgh.
    induction P as [| P PL]; intros; [ easy | ].
    destruct Hgh as [Hgh| Hgh].
     rewrite IHh; simpl.
-    rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
+    rewrite set_eq_equiv; [ | now rewrite group_union_distr ].
     now left.
 
     rewrite HF; simpl.
-    rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
-    rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
+    rewrite set_eq_equiv; [ | now rewrite group_union_distr ].
+    rewrite set_eq_equiv; [ | now rewrite group_union_distr ].
     right.
     rewrite group_union_list_distr.
-    rewrite set_eq_equiv; [ | rewrite group_union_list_distr; easy ].
-    rewrite map_map; easy.
+    rewrite set_eq_equiv; [ | now rewrite group_union_list_distr ].
+    now rewrite map_map.
 
  intros i j Hij p.
  split; intros H; [ | easy ].
@@ -462,23 +457,23 @@ split.
   rename P into Ql.
   revert p Ql Hi.
   induction i; intros.
-   destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hi; easy | ].
+   destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hi | ].
    simpl in Hi; simpl.
-   apply app_gr_app_gr_point; easy.
+   now apply app_gr_app_gr_point.
 
-   destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hi; easy | ].
+   destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hi | ].
    simpl in Hi; simpl.
-   apply IHi; easy.
+   now apply IHi.
 
   clear - Hj.
   rename P into Ql.
   revert p Ql Hj.
   induction j; intros.
-   destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hj; easy | ].
+   destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hj | ].
    simpl in Hj; simpl.
-   apply app_gr_app_gr_point; easy.
+   now apply app_gr_app_gr_point.
 
-   destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hj; easy | ].
+   destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hj | ].
    simpl in Hj; simpl.
-   apply IHj; easy.
+   now apply IHj.
 Qed.

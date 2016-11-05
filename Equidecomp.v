@@ -268,8 +268,7 @@ split.
     now right.
 
     intros i.
-    pose proof (Hgl (S i)) as H; simpl in H.
-    easy.
+    now pose proof (Hgl (S i)) as H; simpl in H.
 
  intros i j Hij.
  erewrite partition_combine_nth; [ | easy | | ].
@@ -293,7 +292,7 @@ split.
       assert (Hnlen : (S len ≠ 0)%nat) by easy.
       pose proof Nat.div_mod i (S len) Hnlen as Hi.
       pose proof Nat.div_mod j (S len) Hnlen as Hj.
-      rewrite Hd, Hm, <- Hj in Hi;  easy.
+      now rewrite Hd, Hm, <- Hj in Hi.
 
       subst fl; rewrite <- Hd; simpl.
       pose proof map_nth app_gr_inv gl gr_ident (i / S len) as Hi.
@@ -536,7 +535,7 @@ assert
    intros i; simpl.
    destruct i; [ | apply HFG ].
    rewrite <- HhFG, fold_app_gr_inv.
-   rewrite app_gr_inv_l; easy.
+   now rewrite app_gr_inv_l.
 
   destruct Hgl as (gl & Hlen3 & Hgl).
   destruct Hhl as (hl & Hlen4 & Hhl).
