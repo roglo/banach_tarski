@@ -100,6 +100,14 @@ unfold equidecomposable.
 exists (map (xtransl dx) PE), (map (xtransl dx) PF).
 split; [ apply (partition_group_map E PE (Xtransl dx) HPE) | ].
 split; [ apply (partition_group_map F PF (Xtransl dx) HPF) | ].
+apply Forall2_Forall_combine in HEF.
+destruct HEF as (HEF, Hlen).
+apply Forall2_Forall_combine.
+do 2 rewrite map_length.
+split; [ | easy ].
+rewrite Forall_forall in HEF.
+apply Forall_forall; intros (E₁, F₁) HEF₁.
+
 bbb.
 
 Theorem equidec_sphere_with_and_without_fixpoints :
