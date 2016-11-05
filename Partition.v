@@ -29,13 +29,13 @@ split.
  destruct H₁ as (H₁ & H₂).
  split; intros H.
   apply H₁ in H.
-  destruct H as [H| H]; [ left; left; assumption | ].
-  destruct H as [H| H]; [ left; right; assumption | ].
-  right; assumption.
+  destruct H as [H| H]; [ left; left; easy | ].
+  destruct H as [H| H]; [ left; right; easy | ].
+  right; easy.
 
   apply H₂.
-  destruct H as [[H| H]| H]; [ left; assumption | right; left; assumption | ].
-  right; right; assumption.
+  destruct H as [[H| H]| H]; [ left; easy | right; left; easy | ].
+  right; right; easy.
 
  intros i j Hij; subst s.
  destruct i.
@@ -71,10 +71,10 @@ split.
 
   apply Hi with (i := S (S i)) (j := S (S j)) (x := x).
    intros H; apply Hij.
-   apply Nat.succ_inj; assumption.
+   apply Nat.succ_inj; easy.
 
    unfold intersection; simpl.
-   split; assumption.
+   split; easy.
 Qed.
 
 Theorem is_partition_union_subtract :
@@ -94,18 +94,18 @@ split.
   pose proof Hu x as H₁.
   destruct H₁ as (H₁ & H₂).
   pose proof H₁ H as H₃.
-  destruct H₃ as [H₃| H₃]; [ left; left; assumption | ].
-  destruct H₃ as [H₃| H₃]; [ | right; right; assumption ].
-  destruct (HBdec x) as [H₄| H₄]; [ left; right; assumption | ].
-  right; left; split; assumption.
+  destruct H₃ as [H₃| H₃]; [ left; left; easy | ].
+  destruct H₃ as [H₃| H₃]; [ | right; right; easy ].
+  destruct (HBdec x) as [H₄| H₄]; [ left; right; easy | ].
+  right; left; split; easy.
 
   apply Hu.
-  destruct H as [[H₁| H₁]| [H₁| H₁]]; [ left; assumption | | | ].
-   right; left; apply HB; assumption.
+  destruct H as [[H₁| H₁]| [H₁| H₁]]; [ left; easy | | | ].
+   right; left; apply HB; easy.
 
-   right; left; destruct H₁; assumption.
+   right; left; destruct H₁; easy.
 
-   right; right; assumption.
+   right; right; easy.
 
  intros i j Hij; subst s.
  destruct i.
@@ -118,14 +118,14 @@ split.
    eapply Hi with (i := O) (j := S j); [ intros H; discriminate H | ].
    unfold intersection; simpl.
    split; [ eassumption | ].
-   destruct j; [ destruct H₂; assumption | assumption ].
+   destruct j; [ destruct H₂; easy | easy ].
 
    eapply Hi with (i := 1%nat) (j := S j).
     destruct j; [ destruct H₂; contradiction | intros H; discriminate H ].
 
     unfold intersection; simpl.
     split; [ apply HB; eassumption | ].
-    destruct j; [ destruct H₂; contradiction | assumption ].
+    destruct j; [ destruct H₂; contradiction | easy ].
 
   unfold intersection, union, subtract, set_eq; simpl.
   intros x.
@@ -136,7 +136,7 @@ split.
     eapply Hi with (i := O) (j := S i); [ intros H; discriminate H | ].
     unfold intersection; simpl.
     split; [ eassumption | ].
-    destruct i; [ destruct H₁; assumption | assumption ].
+    destruct i; [ destruct H₁; easy | easy ].
 
     eapply Hi with (i := 1%nat) (j := S i).
      destruct i; [ | intros H; discriminate H ].
@@ -144,16 +144,16 @@ split.
 
      unfold intersection; simpl.
      split; [ apply HB; eassumption | ].
-     destruct i; [ apply HB; assumption | assumption ].
+     destruct i; [ apply HB; easy | easy ].
 
   apply Hi with (i := S i) (j := S j) (x := x).
-   intros H; apply Hij; assumption.
+   intros H; apply Hij; easy.
 
    unfold intersection; simpl.
    split.
-    destruct i; [ destruct H₁; assumption | assumption ].
+    destruct i; [ destruct H₁; easy | easy ].
 
-    destruct j; [ destruct H₂; assumption | assumption ].
+    destruct j; [ destruct H₂; easy | easy ].
 Qed.
 
 Theorem partition_union :
@@ -171,18 +171,18 @@ split.
  transitivity (F₁ ∪ ⋃ P₂).
   intros x.
   split; intros H.
-   destruct H as [H| H]; [ left; assumption | right ].
-   apply HF₂; assumption.
+   destruct H as [H| H]; [ left; easy | right ].
+   apply HF₂; easy.
 
-   destruct H as [H| H]; [ left; assumption | right ].
-   apply HF₂; assumption.
+   destruct H as [H| H]; [ left; easy | right ].
+   apply HF₂; easy.
 
   split; intros H.
-   destruct H as [H| H]; [ left | right; assumption ].
-   apply HF₁; assumption.
+   destruct H as [H| H]; [ left | right; easy ].
+   apply HF₁; easy.
 
-   destruct H as [H| H]; [ left | right; assumption ].
-   apply HF₁; assumption.
+   destruct H as [H| H]; [ left | right; easy ].
+   apply HF₁; easy.
 
  intros * Hij.
  unfold intersection, set_eq; subst s; simpl.
@@ -204,7 +204,7 @@ split.
      eapply nth_set_union_list; eassumption.
 
      apply Nat.nlt_ge in H₅.
-     rewrite nth_overflow in H₂; [ contradiction | assumption ].
+     rewrite nth_overflow in H₂; [ contradiction | easy ].
 
   apply Nat.nlt_ge in H₃.
   destruct (lt_dec j (length P₁)) as [H₄| H₄].
@@ -218,14 +218,14 @@ split.
      eapply nth_set_union_list; eassumption.
 
      apply Nat.nlt_ge in H₅.
-     rewrite nth_overflow in H₁; [ contradiction | assumption ].
+     rewrite nth_overflow in H₁; [ contradiction | easy ].
 
    apply Nat.nlt_ge in H₄.
    eapply HP₂; [ | split; [ apply H₁ | apply H₂] ].
    intros H.
    apply Nat.add_cancel_l with (p := length P₁) in H.
-   rewrite Nat.add_sub_assoc in H; [ | assumption ].
-   rewrite Nat.add_sub_assoc in H; [ | assumption ].
+   rewrite Nat.add_sub_assoc in H; [ | easy ].
+   rewrite Nat.add_sub_assoc in H; [ | easy ].
    rewrite Nat.add_comm, Nat.add_sub in H.
    rewrite Nat.add_comm, Nat.add_sub in H.
    contradiction.
@@ -251,7 +251,7 @@ Theorem is_partition_empty : ∀ A (s := set_equiv) (E : set A),
 Proof.
 intros * HP.
 destruct HP as (HE & _).
-assumption.
+easy.
 Qed.
 
 Add Parametric Morphism {A} : (@is_partition A set_equiv)

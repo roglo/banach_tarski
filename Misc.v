@@ -18,14 +18,14 @@ Theorem nat_div_add_once : ∀ a b, b ≠ 0 → (a + b) / b = S (a / b).
 Proof.
 intros a b Hb.
 replace b with (1 * b) at 1 by apply Nat.mul_1_l.
-rewrite Nat.div_add; [ apply Nat.add_1_r | assumption ].
+rewrite Nat.div_add; [ apply Nat.add_1_r | easy ].
 Qed.
 
 Theorem nat_mod_add_once : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
 Proof.
 intros a b Hb.
 replace b with (1 * b) at 1 by apply Nat.mul_1_l.
-apply Nat.mod_add; assumption.
+apply Nat.mod_add; easy.
 Qed.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
@@ -64,7 +64,7 @@ Theorem list_prod_nil_r : ∀ A B (l : list A),
   list_prod l ([] : list B) = [].
 Proof.
 intros A B l.
-induction l as [| x]; [ easy | assumption ].
+induction l as [| x]; [ easy | easy ].
 Qed.
 
 Theorem list_prod_map : ∀ A B C D (f : A → B) (g : C → D) l l',
@@ -103,7 +103,7 @@ Theorem Forall_inv2 : ∀ A (P : A → Prop) a l,
   List.Forall P (a :: l) → P a ∧ List.Forall P l.
 Proof.
 intros A P a l H.
-inversion H; split; assumption.
+inversion H; split; easy.
 Qed.
 
 Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
@@ -126,7 +126,7 @@ Theorem Forall2_cons_cons : ∀ A B (R : A → B → Prop) x y l l',
 Proof.
 intros A B * H.
 inversion H; subst.
-split; assumption.
+split; easy.
 Qed.
 
 Theorem Forall2_Forall_combine : ∀ A B f (l1 : list A) (l2 : list B),
@@ -144,7 +144,7 @@ split; intros HF.
   apply Forall2_cons_cons in HF.
   destruct HF as (Hf, HF).
   split.
-   constructor; [ assumption | now apply IHl1 ].
+   constructor; [ easy | now apply IHl1 ].
 
    f_equal.
    clear -HF.
@@ -171,7 +171,7 @@ split; intros HF.
   apply Forall_inv2 in HF.
   destruct HF as (Hf, HF).
   constructor; [ easy | ].
-  apply IHl1; assumption.
+  apply IHl1; easy.
 Qed.
 
 Theorem flat_map_nil_fun : ∀ A B (f : A → list B) l,
@@ -182,7 +182,7 @@ intros * HF.
 induction l as [| x l]; [ easy | simpl ].
 apply Forall_inv2 in HF.
 destruct HF as (Hx, HF).
-rewrite IHl; [ rewrite Hx; easy | assumption ].
+rewrite IHl; [ rewrite Hx; easy | easy ].
 Qed.
 
 Theorem app_repeat_diag : ∀ A (e : A) n,
@@ -224,11 +224,11 @@ intros A el₁ el₂ el₃ el₄ Hel.
 revert el₂ el₃ el₄ Hel.
 induction el₁ as [| e₁]; intros.
  left; exists el₃.
- split; [ easy | assumption ].
+ split; [ easy | easy ].
 
  destruct el₃ as [| e₃].
   right; exists (e₁ :: el₁).
-  split; [ easy | symmetry; assumption ].
+  split; [ easy | symmetry; easy ].
 
   simpl in Hel.
   injection Hel; clear Hel; intros; subst e₃.
@@ -276,8 +276,8 @@ induction l1 as [| x]; intros.
 
   apply Forall2_cons_cons in HF.
   destruct HF as (HR & HF).
-  constructor; [ apply Hs; assumption | ].
-  apply IHl1; assumption.
+  constructor; [ apply Hs; easy | ].
+  apply IHl1; easy.
 Qed.
 
 (* Type-theoretical Choice Axiom *)
@@ -292,18 +292,18 @@ set (R (x y : bool) := x = y ∨ P).
 assert (He : equiv _ R).
  split; [ intros b; left; easy | ].
  split.
-  intros b c d Hbc [Hcd| Hcd]; [ subst c; assumption | right; assumption ].
-  intros b c [Hbc| Hbc]; [ left; symmetry | right ]; assumption.
+  intros b c d Hbc [Hcd| Hcd]; [ subst c; easy | right; easy ].
+  intros b c [Hbc| Hbc]; [ left; symmetry | right ]; easy.
 
  destruct (TTCA bool R He) as (f & Hx & Hxy).
  destruct (Bool.bool_dec (f false) (f true)) as [H| H].
-  destruct (Hx true) as [Ht| Ht]; [ | left; assumption ].
-  destruct (Hx false) as [Hf| Hf]; [ | left; assumption ].
+  destruct (Hx true) as [Ht| Ht]; [ | left; easy ].
+  destruct (Hx false) as [Hf| Hf]; [ | left; easy ].
   rewrite <- Ht, <- Hf in H; discriminate H.
 
   right; intros H₁; apply H.
   apply Hxy; unfold R.
-  right; assumption.
+  right; easy.
 Qed.
 
 Record choice_function {A} (R : A → A → Prop) f := mkcf

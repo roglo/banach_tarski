@@ -75,7 +75,7 @@ Theorem norm_list_no_consec2 : ∀ e el el₁ el₂,
 Proof.
 intros e el el₁ el₂.
 pose proof norm_list_no_consec (negf e) el el₁ el₂ as H.
-rewrite negf_involutive in H; assumption.
+rewrite negf_involutive in H; easy.
 Qed.
 
 Theorem norm_list_no_start : ∀ e el el₂,
@@ -131,7 +131,7 @@ Proof.
 intros el e.
 pose proof norm_list_cancel el (negf e) as H.
 rewrite negf_involutive in H.
-assumption.
+easy.
 Qed.
 
 Theorem norm_list_cancel_in : ∀ el₁ el₂ e,
@@ -153,7 +153,7 @@ Theorem norm_list_cancel_in2 : ∀ el₁ el₂ e,
 Proof.
 intros.
 pose proof norm_list_cancel_in el₁ el₂ (negf e) as H.
-rewrite negf_involutive in H; assumption.
+rewrite negf_involutive in H; easy.
 Qed.
 
 Theorem is_normal : ∀ el₁ el₂ el₃,
@@ -190,7 +190,7 @@ Proof.
 intros el.
 pose proof is_normal [] el [] as H.
 simpl in H; do 2 rewrite app_nil_r in H.
-assumption.
+easy.
 Qed.
 
 Theorem norm_list_cons : ∀ el e,
@@ -211,7 +211,7 @@ destruct el₂ as [| e₂].
   exfalso; revert Hel₁; apply norm_list_no_start.
 
   injection Hn; clear Hn; intros; subst el₁.
-  assumption.
+  easy.
 Qed.
 
 Theorem norm_list_app_diag : ∀ el₁ el₂,
@@ -272,7 +272,7 @@ Theorem norm_list_is_cons : ∀ el e el₁,
   norm_list el = e :: el₁ → norm_list el₁ = el₁.
 Proof.
 intros * H.
-destruct (norm_list_dec el₁) as [H₁| H₁]; [ assumption | ].
+destruct (norm_list_dec el₁) as [H₁| H₁]; [ easy | ].
 destruct H₁ as (el₂ & t & d & el₃ & H₁).
 subst el₁.
 exfalso; revert H.
@@ -297,7 +297,7 @@ destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
   destruct el' as [| e'].
    rewrite app_nil_r in H₁.
    rewrite app_nil_l in H₃; symmetry in H₃.
-   split; assumption.
+   split; easy.
 
    simpl in H₃.
    injection H₃; clear H₃; intros H₂ H₃; subst e'.
@@ -312,7 +312,7 @@ destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
    symmetry in H₂.
    apply app_eq_nil in H₂.
    destruct H₂; subst el el'.
-   split; assumption.
+   split; easy.
 Qed.  
 
 Theorem norm_list_is_nil_between : ∀ e el,
@@ -325,12 +325,12 @@ assert (H : ∀ e el, norm_list el = [] → norm_list (negf e :: el ++ [e]) = []
  rewrite norm_list_cancel2; easy.
 
  intros e el.
- split; intros Hn; [ | apply H; assumption ].
+ split; intros Hn; [ | apply H; easy ].
  apply H with (e := negf e) in Hn.
  rewrite negf_involutive in Hn.
  remember norm_list as f; simpl in Hn; subst f.
  rewrite norm_list_cancel in Hn.
  rewrite <- app_assoc in Hn; simpl in Hn.
  rewrite norm_list_cancel_in, app_nil_r in Hn.
- assumption.
+ easy.
 Qed.

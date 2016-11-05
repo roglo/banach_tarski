@@ -36,10 +36,10 @@ destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
   left; easy.
 
   right; intros H; apply H₂.
-  injection H; intros; assumption.
+  injection H; intros; easy.
 
  right; intros H; apply H₁.
- injection H; intros; assumption.
+ injection H; intros; easy.
 Qed.
 
 Theorem letter_dec_diag : ∀ t, letter_dec t t = left (eq_refl _).
@@ -83,9 +83,9 @@ intros x₁ d₁ x₂ d₂.
 split; intros H.
  unfold letter_opp in H.
  destruct (letter_dec x₁ x₂) as [H₁| H₁]; [ | contradiction ].
- split; [ assumption | ].
+ split; [ easy | ].
  destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ contradiction | ].
- apply neq_negb, not_eq_sym; assumption.
+ apply neq_negb, not_eq_sym; easy.
 
  destruct H; subst x₂ d₂.
  apply letter_opp_inv.

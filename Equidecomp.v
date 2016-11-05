@@ -33,9 +33,9 @@ Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).
 Proof.
 intros E F (P₁ & P₂ & HP₁ & HP₂ & HEF).
 exists P₂, P₁.
-split; [ assumption | ].
-split; [ assumption | ].
-apply Forall2_sym; [ | assumption ].
+split; [ easy | ].
+split; [ easy | ].
+apply Forall2_sym; [ | easy ].
 clear -HEF.
 intros E F (g & Hg).
 exists (gr_inv g); rewrite <- Hg.
@@ -70,15 +70,15 @@ induction PE as [| E₁ PE]; intros.
  destruct fl as [| f₁ fl]; [ discriminate HlfP | ].
  simpl in HlfP; apply Nat.succ_inj in HlfP; simpl.
  destruct (lt_dec i (length PF)) as [Hi| Hi].
-  rewrite app_nth1; [| rewrite map_length; assumption ].
-  rewrite Nat.div_small; [ simpl | assumption ].
-  rewrite Nat.mod_small; [ simpl | assumption ].
+  rewrite app_nth1; [| rewrite map_length; easy ].
+  rewrite Nat.div_small; [ simpl | easy ].
+  rewrite Nat.mod_small; [ simpl | easy ].
   intros x; clear - HlfP Hf.
   split; intros Hx.
    revert i Hx.
    induction PF as [| F₁ PF]; intros; [ destruct i; contradiction | ].
    simpl in Hx; simpl.
-   destruct i; [ assumption | apply IHPF; assumption ].
+   destruct i; [ easy | apply IHPF; easy ].
 
    revert i Hx.
    induction PF as [| F₁ PF]; intros.
@@ -87,16 +87,16 @@ induction PE as [| E₁ PE]; intros.
      rewrite Hf in Hx; [ contradiction | left; easy ].
      rewrite Hf in Hx; [ contradiction | left; easy ].
 
-    destruct i; simpl in Hx; simpl; [ assumption | ].
-    apply IHPF; assumption.
+    destruct i; simpl in Hx; simpl; [ easy | ].
+    apply IHPF; easy.
 
   apply Nat.nlt_ge in Hi.
-  rewrite app_nth2; [| rewrite map_length; assumption ].
+  rewrite app_nth2; [| rewrite map_length; easy ].
   rewrite map_length.
   remember (i - length PF)%nat as j eqn:Hj.
   assert (H : (i = j + length PF)%nat).
    rewrite Hj.
-   rewrite Nat.sub_add; [ easy | assumption ].
+   rewrite Nat.sub_add; [ easy | easy ].
 
    subst i; clear Hi Hj.
    destruct PF as [| F₁ PF].
@@ -116,9 +116,9 @@ induction PE as [| E₁ PE]; intros.
 
     rewrite nat_mod_add_once; [ | intros H; discriminate H ].
     rewrite nat_div_add_once; [ | intros H; discriminate H ].
-    apply IHPE; [ assumption | ].
+    apply IHPE; [ easy | ].
     intros f Hfi.
-    apply Hf; right; assumption.
+    apply Hf; right; easy.
 Qed.
 
 Theorem partition_combine_swi_nth :
@@ -231,13 +231,13 @@ split.
  destruct HPE as (HPEU, _).
  destruct HPF as (HPFU, _).
  destruct HP'F as (HP'FU, _).
- assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; assumption).
+ assert (HUP'F : F ⊂ ⋃ P'F) by (rewrite HP'FU; intros x H; easy).
  clear HP'FU.
  unfold partition_combine.
  subst fl.
  revert E F gl PF P'F HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
  induction PE as [| E₁ PE]; intros.
-  apply length_zero_iff_nil in Hlen3; subst gl; assumption.
+  apply length_zero_iff_nil in Hlen3; subst gl; easy.
 
   destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
   rewrite HPEU; simpl.
@@ -255,7 +255,7 @@ split.
     pose proof Hgl 0 p as Hgl₁; simpl in Hgl₁.
     apply Hgl₁ in Hp.
     destruct PF as [| P₁ PF]; [ contradiction | simpl in Hp ].
-    left; assumption.
+    left; easy.
 
     apply included_group with (g := gr_inv g₁) in HUP'F.
     rewrite group_union_list_distr in HUP'F.
@@ -264,14 +264,14 @@ split.
 
    destruct PF as [| F₁ PF]; [ discriminate Hlen1 |  ].
    simpl in Hlen1; apply Nat.succ_inj in Hlen1.
-   eapply IHPE; [ | | | eassumption | assumption | ]; try easy.
+   eapply IHPE; [ | | | eassumption | easy | ]; try easy.
     rewrite HPFU in HUP'F.
     intros p Hp; apply HUP'F.
-    right; assumption.
+    right; easy.
 
     intros i.
     pose proof (Hgl (S i)) as H; simpl in H.
-    assumption.
+    easy.
 
  intros i j Hij.
  erewrite partition_combine_nth; [ | easy | | ].
@@ -305,22 +305,22 @@ split.
         rewrite intersection_assoc, <- intersection_assoc.
         unfold app_gr_inv; rewrite <- group_intersection_distr.
         apply not_eq_sym in Hm.
-        rewrite HP'FI; [ | assumption ].
+        rewrite HP'FI; [ | easy ].
         rewrite app_gr_empty_set.
         apply intersection_empty_r.
 
-        rewrite map_length; assumption.
+        rewrite map_length; easy.
 
        apply Nat.nlt_ge in Hil.
        rewrite Hlen3 in Hil.
-       rewrite nth_overflow; [ | assumption ].
+       rewrite nth_overflow; [ | easy ].
        do 2 rewrite intersection_empty_l; easy.
 
      rewrite intersection_shuffle0, intersection_assoc.
-     rewrite HPEI; [ | assumption ].
+     rewrite HPEI; [ | easy ].
      do 2 rewrite intersection_empty_l; easy.
 
-   subst fl; rewrite map_length; assumption.
+   subst fl; rewrite map_length; easy.
 
    subst fl.
    intros f Hf.
@@ -328,7 +328,7 @@ split.
    destruct Hf as (g & Hg & Hix).
    subst f; apply app_gr_empty_set.
 
-  subst fl; rewrite map_length; assumption.
+  subst fl; rewrite map_length; easy.
 
   subst fl.
   intros f Hf.
@@ -506,12 +506,12 @@ assert
   simpl in Hlen1; apply Nat.succ_inj in Hlen1.
   simpl in HEF; apply Forall_inv2 in HEF.
   destruct HEF as ((g₁, HgEF), HEF).
-  apply IHPE in HEF; [ | assumption ].
+  apply IHPE in HEF; [ | easy ].
   destruct HEF as (gl & Hlen3 & HEF).
   exists (g₁ :: gl).
   split; [ simpl; rewrite Hlen3; easy | ].
   intros i; simpl.
-  destruct i; [ assumption | apply HEF ].
+  destruct i; [ easy | apply HEF ].
 
  assert
    (Hhl : ∃ hl, length hl = length PG ∧
@@ -531,7 +531,7 @@ assert
    simpl in Hlen2; apply Nat.succ_inj in Hlen2.
    simpl in HFG; apply Forall_inv2 in HFG.
    destruct HFG as ((h₁, HhFG), HFG).
-   apply IHPG in HFG; [ | assumption ].
+   apply IHPG in HFG; [ | easy ].
    destruct HFG as (hl & Hlen3 & HFG).
    exists (gr_inv h₁ :: hl).
    split; [ simpl; rewrite Hlen3; easy | ].
@@ -557,8 +557,8 @@ assert
     eapply partition_combine_swi_is_partition with (PF := P₂F); eassumption.
 
     exists (partition_combine_swi h'l PG P₁F).
-    split; [ assumption | ].
-    split; [ assumption | ].
+    split; [ easy | ].
+    split; [ easy | ].
     apply Forall2_Forall_combine.
     split.
      apply Forall_forall.

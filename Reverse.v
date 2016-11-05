@@ -93,7 +93,7 @@ induction el as [| e] using rev_ind; [ easy | ].
 rewrite rev_path_app; simpl.
 generalize Hel; intros Hn.
 apply norm_list_app_diag in Hn.
-rewrite IHel; [ | assumption ].
+rewrite IHel; [ | easy ].
 remember (rev_path el) as el₁ eqn:Hel₁.
 symmetry in Hel₁.
 destruct el₁ as [| e₁]; [ easy | ].

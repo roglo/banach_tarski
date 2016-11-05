@@ -157,7 +157,7 @@ induction g; intros; simpl.
 
  intros p.
  split; intros H.
-  rewrite IHg1 in H; apply IHg2; assumption.
+  rewrite IHg1 in H; apply IHg2; easy.
 
   rewrite IHg1; apply IHg2, H.
 Qed.
@@ -180,7 +180,7 @@ induction g; intros; simpl.
 
  intros p.
  split; intros H.
-  rewrite IHg2 in H; apply IHg1; assumption.
+  rewrite IHg2 in H; apply IHg1; easy.
 
   rewrite IHg2; apply IHg1, H.
 Qed.
@@ -197,11 +197,11 @@ Theorem app_gr_app_gr_point : ∀ g E p, p ∈ app_gr g E → app_gr_point g p �
 Proof.
 intros * Hp.
 revert E p Hp.
-induction g; intros; [ assumption | destruct p; assumption | ].
+induction g; intros; [ easy | destruct p; easy | ].
 simpl in Hp; simpl.
 apply IHg1 in Hp.
 apply IHg2 in Hp.
-assumption.
+easy.
 Qed.
 
 Theorem app_gr_empty_set : ∀ (s := set_equiv) f, (app_gr f ∅ = ∅)%S.
@@ -283,11 +283,11 @@ induction EL as [| E₁ EL].
  intros x; simpl.
  rewrite group_union_distr.
  split; intros Hx.
-  destruct Hx as [Hx| Hx]; [ left; assumption | ].
-  right; apply IHEL; assumption.
+  destruct Hx as [Hx| Hx]; [ left; easy | ].
+  right; apply IHEL; easy.
 
-  destruct Hx as [Hx| Hx]; [ left; assumption | ].
-  right; apply IHEL; assumption.
+  destruct Hx as [Hx| Hx]; [ left; easy | ].
+  right; apply IHEL; easy.
 Qed.
 
 Theorem included_group : ∀ E F g, E ⊂ F ↔ app_gr g E ⊂ app_gr g F.
@@ -296,11 +296,11 @@ intros.
 split; intros HEF.
  revert E F HEF.
  induction g as [e| dx| ]; intros.
-  intros p Hp; apply HEF; assumption.
+  intros p Hp; apply HEF; easy.
 
-  intros (x, y, z) Hp; apply HEF; assumption.
+  intros (x, y, z) Hp; apply HEF; easy.
 
-  apply IHg1, IHg2; assumption.
+  apply IHg1, IHg2; easy.
 
  intros p Hp.
  revert p E F HEF Hp.
@@ -334,33 +334,33 @@ split.
    simpl in HF; simpl.
    generalize Hr; intros H.
    apply HF in H; simpl in H.
-   destruct H as [H| H]; [ left; assumption | right ].
+   destruct H as [H| H]; [ left; easy | right ].
    eapply IHPL; [ | easy | eassumption ].
    intros i j Hij.
    unfold set_eq; simpl; intros y.
    assert (HSij : S i ≠ S j).
-    intros HSij; apply Hij, Nat.succ_inj; assumption.
+    intros HSij; apply Hij, Nat.succ_inj; easy.
 
     pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
     destruct HP as (HQ, _).
     split; [ intros (HPi, HPj) | contradiction ].
-    apply HQ; split; assumption.
+    apply HQ; split; easy.
 
    intros Hme.
    revert F HF.
    induction P as [| P PL]; intros; [ contradiction | ].
    simpl in HF, Hme; apply HF.
-   destruct Hme as [Hme| Hme]; [ left; assumption | ].
+   destruct Hme as [Hme| Hme]; [ left; easy | ].
    right; simpl.
-   apply IHPL; [ | assumption | intros y; split; intros H; apply H ].
+   apply IHPL; [ | easy | intros y; split; intros H; apply H ].
    intros i j Hij y.
    assert (HSij : S i ≠ S j).
-    intros HSij; apply Hij, Nat.succ_inj; assumption.
+    intros HSij; apply Hij, Nat.succ_inj; easy.
 
     pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
     destruct HP as (HQ, _).
     split; [ intros (HPi, HPj) | contradiction ].
-    apply HQ; split; assumption.
+    apply HQ; split; easy.
 
   intros (x, y, z).
   split.
@@ -373,33 +373,33 @@ split.
     simpl in HF; simpl.
     generalize Hp; intros H.
     apply HF in H; simpl in H.
-    destruct H as [H| H]; [ left; assumption | right ].
+    destruct H as [H| H]; [ left; easy | right ].
     eapply IHPL; [ | simpl; easy | eassumption ].
     intros i j Hij.
     unfold set_eq; simpl; intros q.
     assert (HSij : S i ≠ S j).
-     intros HSij; apply Hij, Nat.succ_inj; assumption.
+     intros HSij; apply Hij, Nat.succ_inj; easy.
 
      pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
      destruct HP as (HQ, _).
      split; [ intros (HPi, HPj) | contradiction ].
-     apply HQ; split; assumption.
+     apply HQ; split; easy.
 
    intros Hme.
    revert F HF.
    induction P as [| P PL]; intros; [ contradiction | ].
    simpl in HF, Hme; apply HF.
-   destruct Hme as [Hme| Hme]; [ left; assumption | ].
+   destruct Hme as [Hme| Hme]; [ left; easy | ].
    right; simpl.
-   apply IHPL; [ | assumption | intros q; split; intros H; apply H ].
+   apply IHPL; [ | easy | intros q; split; intros H; apply H ].
    intros i j Hij q.
    assert (HSij : S i ≠ S j).
-    intros HSij; apply Hij, Nat.succ_inj; assumption.
+    intros HSij; apply Hij, Nat.succ_inj; easy.
 
     pose proof HP (S i) (S j) HSij q as HP; simpl in HP.
     destruct HP as (HQ, _).
     split; [ intros (HPi, HPj) | contradiction ].
-    apply HQ; split; assumption.
+    apply HQ; split; easy.
 
   intros p.
   split.
@@ -412,17 +412,17 @@ split.
     rewrite IHh in Hgh.
     simpl in Hgh.
     apply group_union_distr in Hgh.
-    destruct Hgh as [Hgh| Hgh]; [ left; assumption | right ].
+    destruct Hgh as [Hgh| Hgh]; [ left; easy | right ].
     eapply IHPL.
      intros i j Hij.
      unfold set_eq; simpl; intros y.
      assert (HSij : S i ≠ S j).
-      intros HSij; apply Hij, Nat.succ_inj; assumption.
+      intros HSij; apply Hij, Nat.succ_inj; easy.
 
       pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
       destruct HP as (HQ, _).
       split; [ intros (HPi, HPj) | contradiction ].
-      apply HQ; split; assumption.
+      apply HQ; split; easy.
 
      easy.
 
@@ -431,7 +431,7 @@ split.
      apply group_union_list_distr.
 
      pose proof group_union_list_distr h PL.
-     rewrite <- H in Hgh; assumption.
+     rewrite <- H in Hgh; easy.
 
    intros Hgh.
    revert F HF IHg IHh Hgh.
@@ -439,7 +439,7 @@ split.
    destruct Hgh as [Hgh| Hgh].
     rewrite IHh; simpl.
     rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
-    left; assumption.
+    left; easy.
 
     rewrite HF; simpl.
     rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
@@ -447,7 +447,7 @@ split.
     right.
     rewrite group_union_list_distr.
     rewrite set_eq_equiv; [ | rewrite group_union_list_distr; easy ].
-    rewrite map_map; assumption.
+    rewrite map_map; easy.
 
  intros i j Hij p.
  split; intros H; [ | contradiction ].
@@ -464,11 +464,11 @@ split.
   induction i; intros.
    destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hi; contradiction | ].
    simpl in Hi; simpl.
-   apply app_gr_app_gr_point; assumption.
+   apply app_gr_app_gr_point; easy.
 
    destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hi; contradiction | ].
    simpl in Hi; simpl.
-   apply IHi; assumption.
+   apply IHi; easy.
 
   clear - Hj.
   rename P into Ql.
@@ -476,9 +476,9 @@ split.
   induction j; intros.
    destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hj; contradiction | ].
    simpl in Hj; simpl.
-   apply app_gr_app_gr_point; assumption.
+   apply app_gr_app_gr_point; easy.
 
    destruct Ql as [| Q Ql]; [ apply app_gr_empty_set in Hj; contradiction | ].
    simpl in Hj; simpl.
-   apply IHj; assumption.
+   apply IHj; easy.
 Qed.

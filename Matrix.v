@@ -278,7 +278,7 @@ destruct len.
   revert len el₂ Hlen.
   induction el₁ as [| e₁]; intros.
    simpl in Hlen; simpl.
-   do 2 apply Nat.succ_inj in Hlen; assumption.
+   do 2 apply Nat.succ_inj in Hlen; easy.
 
    simpl in Hlen; simpl.
    apply Nat.succ_inj in Hlen.
@@ -287,7 +287,7 @@ destruct len.
     destruct el₁; discriminate Hlen.
 
     f_equal.
-    apply IHel₁; assumption.
+    apply IHel₁; easy.
 Qed.
 
 Theorem rotate_rev_path : ∀ el p₁ p₂,
@@ -296,7 +296,7 @@ Theorem rotate_rev_path : ∀ el p₁ p₂,
 Proof.
 intros el p₁ p₂ Hr.
 revert p₁ p₂ Hr.
-induction el as [| e]; intros; [ symmetry; assumption | ].
+induction el as [| e]; intros; [ symmetry; easy | ].
 simpl in Hr.
 rewrite rev_path_cons, rev_path_single, fold_right_app; simpl.
 apply IHel; rewrite <- Hr.

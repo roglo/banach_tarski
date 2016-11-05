@@ -57,7 +57,7 @@ destruct ti, tj.
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ easy | assumption ].
+   apply Hjnf; [ easy | easy ].
 
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
@@ -66,7 +66,7 @@ destruct ti, tj.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ easy | assumption ].
+   apply Hjnf; [ easy | easy ].
 
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
@@ -76,7 +76,7 @@ destruct ti, tj.
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
   intros el Hn.
-  apply Hjnf; [ easy | assumption ].
+  apply Hjnf; [ easy | easy ].
 
   rewrite <- rev_path_norm_list, Hnj.
   rewrite rev_path_cons, rev_path_single; easy.
@@ -86,7 +86,7 @@ destruct ti, tj.
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
   intros el Hn.
-  apply Hjnf; [ easy | assumption ].
+  apply Hjnf; [ easy | easy ].
 
   rewrite <- rev_path_norm_list, Hnj.
   rewrite rev_path_cons, rev_path_single; easy.
@@ -96,7 +96,7 @@ destruct ti, tj.
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ easy | assumption ].
+   apply Hjnf; [ easy | easy ].
 
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
@@ -105,7 +105,7 @@ destruct ti, tj.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ easy | assumption ].
+   apply Hjnf; [ easy | easy ].
 
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
@@ -169,7 +169,7 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
   apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
 
    destruct Hj as (Hs & Hb); simpl in Hs, Hb; apply Hb; clear Hb.
-   split; [ destruct Hs; assumption | ].
+   split; [ destruct Hs; easy | ].
    destruct Hi as [[Hi| Hi] | Hi].
     destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
     destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
@@ -177,7 +177,7 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
     rewrite Hfr, <- Hp; easy.
 
     eapply not_start_with_rot in Hi; try eassumption; [ contradiction | ].
-    split; assumption.
+    split; easy.
 
     destruct Hi as (Hnf, Hoo).
     destruct Hoo as (n, Hoo).
@@ -199,7 +199,7 @@ split.
  split.
  -intros Hnf.
   unfold union_list; simpl; unfold union.
-  destruct (Pdec p (f p)) as [H₁| H₁]; [ left; split; assumption | ].
+  destruct (Pdec p (f p)) as [H₁| H₁]; [ left; split; easy | ].
   right.
   pose proof Ho p as H.
   destruct H as (el, Hel).
@@ -208,43 +208,43 @@ split.
   +rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
 
   +destruct e as (t, d); destruct t, d.
-    left; split; [ assumption | ].
+    left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
+    split; [ | apply rotate_rev_path; easy ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
 
-    right; left; split; [ assumption | ].
+    right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
+    split; [ | apply rotate_rev_path; easy ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
 
-    right; right; left; split; [ assumption | ].
+    right; right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
+    split; [ | apply rotate_rev_path; easy ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
 
-    right; right; right; left; split; [ assumption | ].
+    right; right; right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; assumption ].
+    split; [ | apply rotate_rev_path; easy ].
     rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
 
  -intros Hul.
   unfold union_list in Hul; simpl in Hul; unfold union in Hul.
   destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
+   apply Hnf; easy.
 
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
+   apply Hnf; easy.
 
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
+   apply Hnf; easy.
 
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
+   apply Hnf; easy.
 
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; assumption.
+   apply Hnf; easy.
 
   +contradiction.
 
@@ -256,19 +256,19 @@ split.
   destruct Hi as (Hinf & Hi); simpl in Hi.
   destruct j.
    eapply empty_set_not_full_set; [ easy | | eassumption ].
-   split; assumption.
+   split; easy.
 
    destruct j.
     eapply empty_set_not_full_set; [ easy | | eassumption ].
-    split; assumption.
+    split; easy.
 
     destruct j.
      eapply empty_set_not_full_set; [ easy | | eassumption ].
-     split; assumption.
+     split; easy.
 
      destruct j; [ | destruct j; contradiction ].
      eapply empty_set_not_full_set; [ easy | | eassumption ].
-     split; assumption.
+     split; easy.
 
  destruct i; [ simpl in Hi | ].
   destruct j; [ clear Hij | ].
@@ -353,12 +353,12 @@ intros s f HoeHo os Hos.
 pose proof r_decomposed_5 f HoeHo os Hos as H.
 destruct HoeHo as (Hoe, Ho).
 eapply is_partition_group_first_2_together in H.
-apply is_partition_union_subtract; [ assumption | | ].
+apply is_partition_union_subtract; [ easy | | ].
  intros p bm; subst os.
  destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
- split; [ assumption | ].
+ split; [ easy | ].
  exists (repeat ạ⁻¹ (S n)), (repeat ạ⁻¹ n).
- split; [ apply norm_list_repeat | assumption ].
+ split; [ apply norm_list_repeat | easy ].
 
  intros p; apply EM.
 Qed.
@@ -387,13 +387,13 @@ split.
    split.
     split.
      destruct Hnf as (His, _).
-     apply in_sphere_after_rotate; assumption.
+     apply in_sphere_after_rotate; easy.
 
      intros el₁ p₁ Hp Hn.
-     apply Hnf; [ | assumption ].
+     apply Hnf; [ | easy ].
      destruct Hp as (el₂ & Hp).
      exists (el₂ ++ [negf e]).
-     rewrite fold_right_app; assumption.
+     rewrite fold_right_app; easy.
 
     exists (negf e :: []), [].
     split; [ easy | simpl ].
@@ -404,21 +404,21 @@ split.
      rewrite <- H, Hel; easy.
 
    +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
-     left; split; [ assumption | ].
-     exists el, el₁; split; assumption.
+     left; split; [ easy | ].
+     exists el, el₁; split; easy.
 
      right; left.
      unfold rot.
      split.
       split.
        destruct Hnf as (His, _).
-       apply in_sphere_after_rotate; assumption.
+       apply in_sphere_after_rotate; easy.
 
        intros el₂ p₁ Hp Hn.
-       apply Hnf; [ | assumption ].
+       apply Hnf; [ | easy ].
        destruct Hp as (el₃ & Hp).
        exists (el₃ ++ [negf e]).
-       rewrite fold_right_app; assumption.
+       rewrite fold_right_app; easy.
 
       assert (H : f p = f (rotate (negf e) p)).
        apply Hoe.
@@ -430,19 +430,19 @@ split.
        destruct (letter_opp_dec (negf e) e₁) as [H₂| H₂].
         exfalso.
         apply letter_opp_negf in H₂.
-        apply H₁, negf_eq_eq; assumption.
+        apply H₁, negf_eq_eq; easy.
 
         split; easy.
 
  -intros Hul.
-  destruct Hul as [(H, _)| [(H, _)| Hul]]; [ assumption | | contradiction ].
+  destruct Hul as [(H, _)| [(H, _)| Hul]]; [ easy | | contradiction ].
   split.
    destruct H as (His, _).
    apply in_sphere_after_rotate with (e := e) in His.
-   rewrite rotate_rotate_neg in His; assumption.
+   rewrite rotate_rotate_neg in His; easy.
 
    intros el p₁ Hso Hn.
-   apply H; [ | assumption ].
+   apply H; [ | easy ].
    etransitivity; [ | eassumption ].
    exists (e :: []).
    apply rotate_rotate_neg.
@@ -455,12 +455,12 @@ split.
   destruct j; [ | destruct j; contradiction ].
   simpl in Hj.
   eapply not_start_with_rot in Hi; try eassumption; [ | easy ].
-  split; assumption.
+  split; easy.
 
   destruct i; [ simpl in Hi | ].
    destruct j; [ simpl in Hj; clear Hij | ].
     eapply not_start_with_rot in Hj; try eassumption; [ | easy ].
-    split; assumption.
+    split; easy.
 
     destruct j; [ apply Hij; easy | clear Hij ].
     destruct j; contradiction.
@@ -508,33 +508,33 @@ split.
     +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
     clear el Hel₁.
     left; left; left.
-    split; [ assumption | subst os; symmetry; assumption ].
+    split; [ easy | subst os; symmetry; easy ].
 
     +destruct e₁ as (t, d); destruct t.
      destruct d.
-      destruct (EM (p ∈ B)) as [HB| HB]; [ left; right; assumption | ].
+      destruct (EM (p ∈ B)) as [HB| HB]; [ left; right; easy | ].
       right; left; simpl.
       split.
        split.
         destruct Hnf as (His, Hnf).
-        split; [ apply in_sphere_after_rotate; assumption | ].
-        apply no_fixpoint_after_rotate; assumption.
+        split; [ apply in_sphere_after_rotate; easy | ].
+        apply no_fixpoint_after_rotate; easy.
 
         subst os; simpl.
         rewrite Hfr.
         exists (ạ⁻¹ :: el), (norm_list el).
-        split; [ | simpl; f_equal; assumption ].
+        split; [ | simpl; f_equal; easy ].
         simpl; rewrite Hel₁; easy.
 
        simpl; intros (Haf & n & Hoo); apply HB; clear HB.
-       split; [ assumption | ].
+       split; [ easy | ].
        unfold orbit_by_seq_of in Hoo |-*; simpl.
        remember S as g;
        subst os; simpl in Hoo |-*; subst g.
        rewrite Hfr in Hoo; simpl in Hoo.
        apply f_equal with (f := rotate (FE la false)) in Hoo.
        do 2 rewrite rotate_rotate_neg in Hoo.
-       destruct n; [ | exists n; assumption ].
+       destruct n; [ | exists n; easy ].
        simpl in Hoo.
        rewrite Hoo in Hel.
        destruct Hnf as (His & Hoh).
@@ -544,20 +544,20 @@ split.
        rewrite Hel₁; intros H; discriminate H.
 
       left; left; right.
-      split; [ assumption | ].
+      split; [ easy | ].
       exists el, el₁; subst os.
-      split; assumption.
+      split; easy.
 
      right; left.
      split; simpl.
       split.
        destruct Hnf as (His & Hnf).
-       split; [ apply in_sphere_after_rotate; assumption | ].
-       apply no_fixpoint_after_rotate; assumption.
+       split; [ apply in_sphere_after_rotate; easy | ].
+       apply no_fixpoint_after_rotate; easy.
 
        subst os; simpl; rewrite Hfr.
        exists (ạ⁻¹ :: el), (norm_list el).
-       split; [ | simpl; f_equal; assumption ].
+       split; [ | simpl; f_equal; easy ].
        simpl; rewrite Hel₁; easy.
 
       intros (Hnf₂, Hoo).
@@ -599,14 +599,14 @@ split.
 
  -intros HE.
   simpl in HE.
-  destruct HE as [[[HE| HE]| HE]| [HE| HE]]; try (destruct HE; assumption).
+  destruct HE as [[[HE| HE]| HE]| [HE| HE]]; try (destruct HE; easy).
   destruct HE as (((His & Hoo) & HE) & HB).
   split.
    apply in_sphere_after_rotate with (e := ạ) in His.
-   rewrite rotate_rotate_neg in His; assumption.
+   rewrite rotate_rotate_neg in His; easy.
 
    apply no_fixpoint_after_rotate with (e := ạ) in Hoo.
-   rewrite rotate_rotate_neg in Hoo; assumption.
+   rewrite rotate_rotate_neg in Hoo; easy.
 
 *intros i j Hij p.
  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
@@ -618,12 +618,12 @@ split.
    destruct j; [ exfalso; apply Hij; easy | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
    eapply decompose_2a_contrad_case; unfold union; try eassumption.
-   split; assumption.
+   split; easy.
 
    destruct i; [ simpl in Hi | destruct i; contradiction ].
    destruct j.
     eapply decompose_2a_contrad_case; unfold union; try eassumption.
-    split; assumption.
+    split; easy.
 
     destruct j; [ apply Hij; easy | clear Hij ].
     destruct j; contradiction.

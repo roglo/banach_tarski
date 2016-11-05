@@ -49,7 +49,7 @@ Notation "E .[ i ]" := (List.nth i E ∅)
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : set A), ∀ x, x ∈ E₁ ↔ x ∈ E₂).
 
 Theorem set_eq_refl A : reflexive _ (@set_eq A set_equiv).
-Proof. intros P x; split; intros; assumption. Qed.
+Proof. intros P x; split; intros; easy. Qed.
 
 Theorem set_eq_sym A : symmetric _ (@set_eq A set_equiv).
 Proof.
@@ -99,8 +99,8 @@ Proof.
 intros E E' HE F F' HF.
 unfold intersection; intros p.
 split; intros (H₁, H₂).
- split; [ apply HE; assumption | apply HF; assumption ].
- split; [ apply HE; assumption | apply HF; assumption ].
+ split; [ apply HE; easy | apply HF; easy ].
+ split; [ apply HE; easy | apply HF; easy ].
 Qed.
 
 Add Parametric Morphism {A} : (@union A)
@@ -123,8 +123,8 @@ Proof.
 intros E E' HE F F' HF.
 unfold subtract; intros p.
 split; intros (H₁, H₂).
- split; [ apply HE; assumption | intros H; apply H₂, HF; assumption ].
- split; [ apply HE; assumption | intros H; apply H₂, HF; assumption ].
+ split; [ apply HE; easy | intros H; apply H₂, HF; easy ].
+ split; [ apply HE; easy | intros H; apply H₂, HF; easy ].
 Qed.
 
 Add Parametric Morphism {A} : (@included A)
@@ -149,8 +149,8 @@ Theorem union_empty_r : ∀ A (s := set_equiv) (F : set A),
 Proof.
 intros.
 subst s; intros x.
-split; intros H; [ | left; assumption ].
-destruct H as [H| H]; [ assumption | contradiction ].
+split; intros H; [ | left; easy ].
+destruct H as [H| H]; [ easy | contradiction ].
 Qed.
 
 Theorem intersection_empty_l : ∀ A (s := set_equiv) (F : set A),
@@ -173,14 +173,14 @@ Theorem intersection_comm : ∀ A (s := set_equiv) (E F : set A),
   (E ∩ F = F ∩ E)%S.
 Proof.
 intros; intros x.
-split; intros H; destruct H as (HE & HF); split; assumption.
+split; intros H; destruct H as (HE & HF); split; easy.
 Qed.
 
 Theorem union_comm : ∀ A (s := set_equiv) (E F : set A),
   (E ∪ F = F ∪ E)%S.
 Proof.
 intros; intros x.
-split; intros [HE| HF]; [ right | left | right | left ]; assumption.
+split; intros [HE| HF]; [ right | left | right | left ]; easy.
 Qed.
 
 Theorem intersection_assoc : ∀ A (s := set_equiv) (E F G : set A),
@@ -189,10 +189,10 @@ Proof.
 intros; intros x.
 split; intros H.
  destruct H as (HE & (HF & HG)).
- split; [ split; assumption | assumption ].
+ split; [ split; easy | easy ].
 
  destruct H as ((HE & HF) & HG).
- split; [ assumption | split; assumption ].
+ split; [ easy | split; easy ].
 Qed.
 
 Theorem union_assoc : ∀ A (s := set_equiv) (E F G : set A),
@@ -201,14 +201,14 @@ Proof.
 intros; intros x.
 split; intros H.
  destruct H as [H| [H| H]].
-  left; left; assumption.
-  left; right; assumption.
-  right; assumption.
+  left; left; easy.
+  left; right; easy.
+  right; easy.
 
  destruct H as [[H| H]| H].
-  left; assumption.
-  right; left; assumption.
-  right; right; assumption.
+  left; easy.
+  right; left; easy.
+  right; right; easy.
 Qed.
 
 Theorem intersection_shuffle0 : ∀ A (s := set_equiv) (E F G : set A),
@@ -217,10 +217,10 @@ Proof.
 intros; intros x.
 split; intros H.
  destruct H as ((HE & HF) & HG).
- split; [ split; assumption | assumption ].
+ split; [ split; easy | easy ].
 
  destruct H as ((HE & HF) & HG).
- split; [ split; assumption | assumption ].
+ split; [ split; easy | easy ].
 Qed.
 
 Theorem union_is_empty : ∀ A (s := set_equiv) (E F : set A),
@@ -255,7 +255,7 @@ split; intros HEL.
   apply HEL in Hx; [ easy | left; easy ].
 
   eapply IHEL; [ | eassumption ].
-  intros E HE; apply HEL; right; assumption.
+  intros E HE; apply HEL; right; easy.
 Qed.
 
 Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (set A)),
@@ -272,35 +272,35 @@ induction P₂ as [| Q]; intros.
  unfold union_list; simpl; rewrite union_assoc.
  intros x.
  split; intros H.
-  destruct H as [H| H]; [ left | right; assumption ].
+  destruct H as [H| H]; [ left | right; easy ].
   unfold union_list in H.
   rewrite fold_right_app in H.
   simpl in H.
   clear - H.
   induction P₁ as [| R P₁].
    simpl in H; simpl.
-   destruct H as [H| H]; [ right; assumption | contradiction ].
+   destruct H as [H| H]; [ right; easy | contradiction ].
 
    simpl in H.
-   destruct H as [H| H]; [ simpl; left; left; assumption | ].
+   destruct H as [H| H]; [ simpl; left; left; easy | ].
    apply IHP₁ in H.
-   destruct H as [H| H]; [ simpl; left; right; assumption | ].
-   right; assumption.
+   destruct H as [H| H]; [ simpl; left; right; easy | ].
+   right; easy.
 
-  destruct H as [H| H]; [ left | right; assumption ].
+  destruct H as [H| H]; [ left | right; easy ].
   unfold union_list.
   rewrite fold_right_app; simpl.
   clear - H.
   induction P₁ as [| R P₁].
    simpl in H; simpl; left.
-   destruct H; [ contradiction | assumption ].
+   destruct H; [ contradiction | easy ].
 
    simpl in H; simpl.
    destruct H.
-    destruct H; [ left; assumption | right ].
-    apply IHP₁; left; assumption.
+    destruct H; [ left; easy | right ].
+    apply IHP₁; left; easy.
 
-    right; apply IHP₁; right; assumption.
+    right; apply IHP₁; right; easy.
 Qed.
 
 Theorem nth_set_union_list : ∀ A (P : list (set A)) i x,
@@ -309,11 +309,11 @@ Proof.
 intros A P i x Hi H.
 revert P H Hi.
 induction i; intros P H Hi.
- destruct P as [| E P]; [ contradiction | left; assumption ].
+ destruct P as [| E P]; [ contradiction | left; easy ].
 
  destruct P as [| E P]; [ contradiction | simpl in Hi ].
  apply Nat.succ_lt_mono in Hi.
- right; apply IHi; assumption.
+ right; apply IHi; easy.
 Qed.
 
 Theorem nth_set_app : ∀ A (P₁ P₂ : list (set A)) i,
@@ -323,9 +323,9 @@ Proof.
 intros.
 unfold union, set_eq; simpl; intros.
 destruct (lt_dec i (length P₁)) as [H₁| H₁].
- rewrite app_nth1; [ easy | assumption ].
+ rewrite app_nth1; [ easy | easy ].
 
- rewrite app_nth2; [ easy | apply Nat.nlt_ge; assumption ].
+ rewrite app_nth2; [ easy | apply Nat.nlt_ge; easy ].
 Qed.
 
 Theorem union_list_intersection : ∀ A (S : set A) SL x,
@@ -335,7 +335,7 @@ Theorem union_list_intersection : ∀ A (S : set A) SL x,
 Proof.
 intros A P QL * HP HQL.
 induction QL as [| Q QL]; intros; [ contradiction | simpl ].
-destruct HQL as [HQ| HQL]; [ left; split; assumption | right ].
+destruct HQL as [HQ| HQL]; [ left; split; easy | right ].
 apply IHQL, HQL.
 Qed.
 
@@ -349,7 +349,7 @@ rewrite HE.
 clear - HF.
 revert F HF.
 induction EL as [| E EL]; intros; [ contradiction | ].
-destruct HF as [HF| HF]; [ left; subst E; assumption | ].
+destruct HF as [HF| HF]; [ left; subst E; easy | ].
 right; eapply IHEL; eassumption.
 Qed.
 
@@ -363,12 +363,12 @@ split; intros Hx.
  apply HEL in Hxl.
  clear -Hx Hxl.
  induction EL as [| E₁ EL]; intros; [ contradiction | ].
- destruct Hxl as [Hxl| Hxl]; [ left; split; assumption | ].
- right; apply IHEL; assumption.
+ destruct Hxl as [Hxl| Hxl]; [ left; split; easy | ].
+ right; apply IHEL; easy.
 
  clear -Hx.
  induction EL as [| E₁ EL]; intros; [ contradiction | ].
- destruct Hx as [(Hx, _)| Hx]; [ assumption | ].
+ destruct Hx as [(Hx, _)| Hx]; [ easy | ].
  apply IHEL, Hx.
 Qed. 
 

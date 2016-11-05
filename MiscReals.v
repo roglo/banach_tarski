@@ -35,7 +35,7 @@ Proof.
 intros x y.
 destruct (Rle_dec x y) as [H₁| H₁].
  destruct (Rle_dec y x) as [H₂| H₂].
-  left; apply Rle_antisym; assumption.
+  left; apply Rle_antisym; easy.
 
   right; intros H; subst y; apply H₂, Rle_refl.
 
@@ -50,5 +50,5 @@ intros a b c d Hb.
 rewrite Rmult_comm, <- Rmult_assoc; f_equal.
 rewrite <- Rmult_assoc; f_equal.
 rewrite Rmult_comm, Rmult_assoc; f_equal.
-apply sqrt_sqrt; assumption.
+apply sqrt_sqrt; easy.
 Qed.

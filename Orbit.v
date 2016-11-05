@@ -22,7 +22,7 @@ intros p₁ p₂ (el, H); simpl in H.
 unfold same_orbit; simpl.
 exists (rev (map negf el)).
 revert p₁ p₂ H.
-induction el as [| e]; intros; [ symmetry; assumption | simpl in H; simpl ].
+induction el as [| e]; intros; [ symmetry; easy | simpl in H; simpl ].
 rewrite fold_right_app; simpl.
 apply IHel; rewrite <- H.
 rewrite rotate_neg_rotate.
@@ -116,13 +116,13 @@ intros * His Hrm.
 destruct p as (x, y, z).
 remember (P x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : p ∈ sphere_ray r) by (subst p; assumption).
+assert (Hos : p ∈ sphere_ray r) by (subst p; easy).
 pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
 unfold sphere in His.
 unfold sphere_ray in H.
 unfold sphere.
 subst p; simpl in *.
-rewrite H, <- Hos; assumption.
+rewrite H, <- Hos; easy.
 Qed.
 
 Theorem in_sphere_after_rotate : ∀ p e,
@@ -130,7 +130,7 @@ Theorem in_sphere_after_rotate : ∀ p e,
   → rotate e p ∈ sphere.
 Proof.
 intros * His.
-apply in_sphere_after_rotation; [ assumption | ].
+apply in_sphere_after_rotation; [ easy | ].
 apply rotate_is_rotation_matrix.
 Qed.
 
@@ -143,7 +143,7 @@ destruct Hso as (el, Hr).
 exists (e :: el ++ [negf e]); simpl.
 rewrite fold_right_app; simpl.
 rewrite rotate_neg_rotate.
-f_equal; assumption.
+f_equal; easy.
 Qed.
 
 Theorem no_fixpoint_after_rotate : ∀ p e,
@@ -160,7 +160,7 @@ destruct el₂ as [| e₂].
  exfalso; subst el₁; apply Hel.
  apply norm_list_is_nil_between in Hel₂.
  rewrite <- rev_path_norm_list in Hel₂.
- apply rev_path_is_nil in Hel₂; assumption.
+ apply rev_path_is_nil in Hel₂; easy.
 
  apply same_orbit_rotate with (e := negf e) in Hso.
  rewrite rotate_neg_rotate in Hso.
