@@ -73,17 +73,33 @@ Qed.
 
 Check Banach_Tarski_paradox_but_fixpoints.
 
-Theorem equidec_union : ∀ E₁ E₂ F₁ F₂,
-  equidecomposable set_equiv E₁ E₂
+Theorem equidec_union : ∀ (s := set_equiv) E₁ E₂ F₁ F₂,
+  (E₁ ∩ F₁ = ∅)%S
+  → (E₂ ∩ F₂ = ∅)%S
+  → equidecomposable set_equiv E₁ E₂
   → equidecomposable set_equiv F₁ F₂
   → equidecomposable set_equiv (E₁ ∪ F₁) (E₂ ∪ F₂).
 Proof.
-bbb.
+intros * HEF₁ HEF₂ HE HF.
+destruct HE as (PE₁ & PE₂ & HE₁ & HE₂ & HE).
+destruct HF as (PF₁ & PF₂ & HF₁ & HF₂ & HF).
+unfold equidecomposable.
+exists (PE₁ ++ PF₁), (PE₂ ++ PF₂).
+split; [ now apply partition_union | ].
+split; [ now apply partition_union | ].
+now apply Forall2_app.
+Qed.
 
 Theorem equidec_transl : ∀ dx E F,
   equidecomposable set_equiv E F
   → equidecomposable set_equiv (xtransl dx E) (xtransl dx F).
 Proof.
+intros * HEF.
+destruct HEF as (PE & PF & HPE & HPF & HEF).
+unfold equidecomposable.
+exists (map (xtransl dx) PE), (map (xtransl dx) PF).
+split; [ apply (partition_group_map E PE (Xtransl dx) HPE) | ].
+split; [ apply (partition_group_map F PF (Xtransl dx) HPF) | ].
 bbb.
 
 Theorem equidec_sphere_with_and_without_fixpoints :
@@ -99,8 +115,16 @@ etransitivity; [ | etransitivity ].
 
  apply equidec_sphere_with_and_without_fixpoints.
 
- apply equidec_union; apply equidec_transl; symmetry.
+ apply equidec_union.
+  intros p; split; [ intros (H3, H6) | easy ].
+
+bbb.
+
+  Focus 3.
+  apply equidec_transl; symmetry.
   apply equidec_sphere_with_and_without_fixpoints.
+   Focus 3.
+
   apply equidec_sphere_with_and_without_fixpoints.
 
 bbb.

@@ -299,11 +299,10 @@ split; intros HEF.
   intros q Hq; eapply IHg1; eassumption.
 Qed.
 
-Theorem partition_group_map : ∀ (s := set_equiv) f, orbit_selector f →
-  ∀ (F : set point) P g,
+Theorem partition_group_map : ∀ (s := set_equiv) (F : set point) P g,
   is_partition F P → is_partition (app_gr g F) (map (app_gr g) P).
 Proof.
-intros s f Ho F P * HP.
+intros s F P * HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
