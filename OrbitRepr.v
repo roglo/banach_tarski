@@ -123,7 +123,7 @@ destruct Hs as (Hnf & el & el₁ & Hn & Hs); simpl in Hs.
 destruct Hr as (Hrnf & elr & elr₁ & Hnr & Hsr); simpl in Hsr.
 assert (Hr : f p = f (rotate (negf e) p)).
  apply Hoe.
- exists (negf e :: []); easy.
+ now exists (negf e :: []).
 
  rewrite <- Hr in Hsr.
  eapply rotate_rev_path in Hsr.
@@ -151,7 +151,7 @@ assert (Hr : f p = f (rotate (negf e) p)).
  apply norm_list_app_is_nil in H.
  2 : symmetry; apply norm_list_idemp.
  2 : rewrite <- rev_path_norm_list; eapply norm_list_is_cons in Hnr.
- 2 : rewrite Hnr; easy.
+ 2 : now rewrite Hnr.
  apply -> rev_path_eq_eq in H.
  rewrite H, Hn in Hnr.
  revert Hnr; apply norm_list_no_start2.
@@ -169,12 +169,12 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
   apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
 
    destruct Hj as (Hs & Hb); simpl in Hs, Hb; apply Hb; clear Hb.
-   split; [ destruct Hs; easy | ].
+   split; [ now destruct Hs | ].
    destruct Hi as [[Hi| Hi] | Hi].
     destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
     destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
     exists O; simpl.
-    rewrite Hfr, <- Hp; easy.
+    now rewrite Hfr, <- Hp.
 
     eapply not_start_with_rot in Hi; try eassumption; [ easy | ].
     now split.
@@ -185,7 +185,7 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
     remember S as g; subst os; simpl in Hoo; simpl; subst g.
     rewrite Hfr; simpl.
     exists (S n).
-    rewrite Hoo; easy.
+    now rewrite Hoo.
 Qed.
 
 Theorem r_decomposed_5 :
@@ -205,46 +205,46 @@ split.
   destruct H as (el, Hel).
   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
   destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  +rewrite rotate_rotate_norm, H₂ in Hel; easy.
+  +now rewrite rotate_rotate_norm, H₂ in Hel.
 
   +destruct e as (t, d); destruct t, d.
     left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; easy ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
+    split; [ | now apply rotate_rev_path ].
+    now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
     right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; easy ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
+    split; [ | now apply rotate_rev_path ].
+    now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
     right; right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; easy ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
+    split; [ | now apply rotate_rev_path ].
+    now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
     right; right; right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
-    split; [ | apply rotate_rev_path; easy ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
+    split; [ | now apply rotate_rev_path ].
+    now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
  -intros Hul.
   unfold union_list in Hul; simpl in Hul; unfold union in Hul.
   destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; easy.
+   now apply Hnf.
 
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; easy.
+   now apply Hnf.
 
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; easy.
+   now apply Hnf.
 
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; easy.
+   now apply Hnf.
 
   +destruct Hul as (Hnf, Hul); simpl in Hul.
-   apply Hnf; easy.
+   now apply Hnf.
 
   +easy.
 
@@ -266,7 +266,7 @@ split.
      eapply empty_set_not_full_set; [ easy | | eassumption ].
      now split.
 
-     destruct j; [ | destruct j; easy ].
+     destruct j; [ | now destruct j ].
      eapply empty_set_not_full_set; [ easy | | eassumption ].
      now split.
 
@@ -283,7 +283,7 @@ split.
      eapply start_with_same in Hi; [ | easy | eassumption ].
      easy.
 
-     destruct j; [ simpl in Hj | destruct j; easy ].
+     destruct j; [ simpl in Hj | now destruct j ].
      eapply start_with_same in Hi; [ | easy | eassumption ].
      easy.
 
@@ -300,7 +300,7 @@ split.
       eapply start_with_same in Hi; [ | easy | eassumption ].
       easy.
 
-      destruct j; [ simpl in Hj | destruct j; easy ].
+      destruct j; [ simpl in Hj | now destruct j ].
       eapply start_with_same in Hi; [ | easy | eassumption ].
       easy.
 
@@ -317,7 +317,7 @@ split.
        easy.
 
        destruct j; [ exfalso; now apply Hij | clear Hij ].
-       destruct j; [ simpl in Hj | destruct j; easy ].
+       destruct j; [ simpl in Hj | now destruct j ].
        eapply start_with_same in Hi; [ | easy | eassumption ].
        easy.
 
@@ -338,9 +338,9 @@ split.
          easy.
 
          destruct j; [ exfalso; now apply Hij | clear Hij ].
-         destruct j; easy.
+         now destruct j.
 
-     destruct i; easy.
+     now destruct i.
 Qed.
 
 Theorem r_decomposed_4 :
@@ -387,19 +387,19 @@ split.
    split.
     split.
      destruct Hnf as (His, _).
-     apply in_sphere_after_rotate; easy.
+     now apply in_sphere_after_rotate.
 
      intros el₁ p₁ Hp Hn.
      apply Hnf; [ | easy ].
      destruct Hp as (el₂ & Hp).
      exists (el₂ ++ [negf e]).
-     rewrite fold_right_app; easy.
+     now rewrite fold_right_app.
 
     exists (negf e :: []), [].
     split; [ easy | simpl ].
     assert (H : f p = f (rotate (negf e) p)).
      apply Hoe.
-     exists (negf e :: []); easy.
+     now exists (negf e :: []).
 
      rewrite <- H, Hel; easy.
 
