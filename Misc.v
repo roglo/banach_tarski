@@ -171,7 +171,7 @@ split; intros HF.
   apply Forall_inv2 in HF.
   destruct HF as (Hf, HF).
   constructor; [ easy | ].
-  apply IHl1; easy.
+  now apply IHl1.
 Qed.
 
 Theorem flat_map_nil_fun : ∀ A B (f : A → list B) l,
@@ -182,7 +182,7 @@ intros * HF.
 induction l as [| x l]; [ easy | simpl ].
 apply Forall_inv2 in HF.
 destruct HF as (Hx, HF).
-rewrite IHl; [ rewrite Hx; easy | easy ].
+rewrite IHl; [ now rewrite Hx | easy ].
 Qed.
 
 Theorem app_repeat_diag : ∀ A (e : A) n,
@@ -197,9 +197,9 @@ Theorem list_nil_app_dec {A} : ∀ (l : list A),
   {l = []} + {∃ x l', l = l' ++ [x]}.
 Proof.
 intros l.
-destruct l as [| x]; [ left; easy | right ].
+destruct l as [| x]; [ now left | right ].
 revert x.
-induction l as [| y] using rev_ind; intros; [ exists x, []; easy | ].
+induction l as [| y] using rev_ind; intros; [ now exists x, [] | ].
 exists y, (x :: l); easy.
 Qed.
 
