@@ -593,11 +593,16 @@ assert
            rewrite app_gr_nth.
            replace Datatypes.id with (@id (set point)) by easy.
            rewrite map_map.
+           (* does not work, I don't know why
+           rewrite <- Hhl.
+           *)
+           (* using transitivity instead *)
            etransitivity.
-            apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+            apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
             apply app_gr_morph_Proper; [ reflexivity | ].
-            apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+            apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
             symmetry; apply Hhl.
+
             do 2 rewrite Nat.add_0_r.
             do 2 rewrite <- app_gr_nth_inv.
             assert (HPGnz : length PG ≠ 0).
