@@ -107,6 +107,18 @@ do 2 rewrite map_length.
 split; [ | easy ].
 rewrite Forall_forall in HEF.
 apply Forall_forall; intros (E₁, F₁) HEF₁.
+SearchAbout (List.In (_, _)).
+Check in_prod_iff.
+SearchAbout (combine (map _ _)).
+SearchAbout (List.In _ (combine _ _)).
+SearchAbout list_prod.
+Print list_prod.
+bbb.
+Theorem combine_map
+  combine (map f l₁) (map f l₂) =
+    (list_prod ...
+
+eapply in_prod_iff in HEF₁.
 
 bbb.
 
