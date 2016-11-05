@@ -1,9 +1,7 @@
 (* Banach-Tarski paradox. *)
-(* Inspirations:
-   - Stan Wagon: The Banach-Tarski Paradox, Cambridge University Press
-   - Wikipedia: Banach–Tarski paradox
-   - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
 (* Coq v8.6 *)
+
+(* Equidecomposability *)
 
 Require Import Utf8 List Relations.
 Import ListNotations.
@@ -255,9 +253,6 @@ induction PF as [| F₁ PF]; intros.
 
   apply Nat.nlt_ge in Hi.
   rewrite app_nth2.
-   2: rewrite map_length, combine_length, Nat.min_l; [ easy | ].
-   2: now rewrite HlfP.
-
    rewrite IHPF; [ | easy | easy ].
    rewrite map_length, combine_length, Nat.min_l; [ | now rewrite HlfP ].
    rewrite HlfP in Hi.
@@ -283,6 +278,9 @@ induction PF as [| F₁ PF]; intros.
     rewrite nat_div_add_once in Hj; [ | easy ].
     apply Nat.succ_inj in Hj.
     now rewrite Hj.
+
+   rewrite map_length, combine_length, Nat.min_l; [ easy | ].
+   now rewrite HlfP.
 Qed.
 
 Theorem partition_combine_is_partition :
@@ -420,206 +418,6 @@ induction (combine fl PE) as [| a la]; intros; [ easy | ].
 simpl; rewrite IHla; destruct a; easy.
 Qed.
 
-(*
-Theorem glop : ∀ A (l l' : list A) d s,
-  Permutation l l'
-  → ∃ σ, Permutation (seq s (length l)) σ ∧
-    ∀ i, i < length l → nth i l d = nth (nth i σ 0 - s) l' d.
-Proof.
-intros * HP.
-remember (length l) as len eqn:Hlen.
-symmetry in Hlen.
-revert l l' d s HP Hlen.
-induction len; intros.
- exists [].
- split; [ easy | intros i Hi; now apply Nat.nlt_0_r in Hi ].
-
- destruct l as [| x l]; [ easy | ].
- simpl in Hlen; apply Nat.succ_inj in Hlen.
- assert (HP' : ∃ l₁ l₂, l' = l₁ ++ x :: l₂).
-  eapply Permutation_cons_exist; eassumption.
-
-  destruct HP' as (l₁ & l₂ & Hl'); subst l'.
-  apply Permutation_app_inv with (l1 := []) in HP; simpl in HP.
-  generalize HP; intros H.
-  apply IHlen with (d := d) (s := s) in H; [ | easy ].
-  destruct H as (σ & Hs & Hσ).
-(**)
-exists (s + length l₁ :: firstn (length l₁) σ ++ []).
-split. Focus 2.
-intros i Hilen.
- simpl.
- destruct i.
-  rewrite Nat.add_comm, Nat.add_sub.
-  rewrite app_nth2; [ | unfold ge; easy ].
-  now rewrite Nat.sub_diag.
-
-  apply Nat.succ_lt_mono in Hilen.
-  pose proof Hσ i Hilen as H.
-  destruct (lt_dec i (length l₁)) as [H₁| H₁].
-   assert (Hnn : nth i (firstn (length l₁) σ ++ []) 0 = nth i σ 0).
-    rewrite app_nth1; [ now rewrite nth_firstn | ].
-    rewrite firstn_length_le; [ easy | ].
-    apply Permutation_length in Hs.
-    rewrite seq_length in Hs; rewrite <- Hs.
-    apply Permutation_length in HP.
-    rewrite <- Hlen, HP, app_length.
-    apply Nat.le_add_r.
-
-    rewrite Hnn, H.
-    rewrite app_nth1.
-     rewrite app_nth1; [ easy | ].
-
-bbb.
-SearchAbout firstn.
-     rewrite firstn_all2.
-
-
-2: rewrite firstn_length_le; [ easy | ].
-
-
-bbb.
-remember (map S σ) as σ' eqn:Hσ'.
-exists (firstn (length l₁) σ' ++ [s] ++ skipn (length l₁) σ').
-subst σ'.
-split.
- simpl.
- apply Permutation.Permutation_cons_app.
- rewrite firstn_skipn.
- clear -HP.
- revert s σ HP.
- induction len; intros; simpl in HP; simpl.
-  destruct σ as [| σ₁ σ]; [ easy | now apply Permutation_nil_cons in HP ].
-
-  generalize HP; intros H.
-  apply Permutation_cons_app in H.
-  destruct H as (l₁ & l₂ & Hσ); subst σ.
-  rewrite map_app; simpl.
-  apply Permutation.Permutation_cons_app.
-  rewrite <- map_app.
-  apply IHlen.
-  eapply Permutation_cons_app_inv; eassumption.
-
-intros i Hilen.
-bbb.
-
-destruct i; simpl.
- destruct l₁ as [| x₁ l₁]; [ simpl; now rewrite Nat.sub_diag | simpl ].
- destruct σ as [| σ₁ σ].
-simpl.
-rewrite Nat.sub_diag.
-simpl in Hσ.
-destruct len; [ | now apply Permutation_cons_nil in HP ].
-clear Hσ Hilen.
-simpl in HP.
-
-bbb. (* ah putain, ça commence à me gonfler, putain *)
-
-split. Focus 2.
-intros i Hilen.
-destruct (lt_dec i (length l₁)) as [H₁| H₁].
-assert (nth i (firstn (length l₁) σ ++ []) 0 = nth i σ 0).
-rewrite app_nth1.
-2: rewrite firstn_length.
-
-
-
-bbb.
-
-  exists
-bbb.
-
-  clear -HP Hlen.
-  revert x l l' HP Hlen.
-  induction len; intros.
-   apply length_zero_iff_nil in Hlen; subst l.
-   exists [], [].
-   now apply Permutation_length_1_inv in HP.
-
-   destruct l as [| y l]; [ easy | simpl in Hlen ].
-   apply Nat.succ_inj in Hlen.
-   destruct l' as [| x' l']; [ now apply Permutation_cons_nil in HP | ].
-bbb.
-
-  revert x l len HP Hlen.
-  induction l' as [| x']; intros.
-   apply Permutation_cons_nil in HP; easy.
-
-   inversion HP; subst; [ exists [], l'; easy | exists [x'], l0; easy | ].
-   rename l'0 into l''; rename H0 into H''.
-
-bbb.
-intros * HP.
-revert s l' HP.
-induction l as [| x l]; intros.
- destruct l' as [| x' l']; [ | apply Permutation_nil_cons in HP; easy ].
- exists []; split; [ reflexivity | ].
- intros i Hi; apply Nat.nlt_0_r in Hi; easy.
-
- destruct l' as [| x' l']; [ apply Permutation_cons_nil in HP; easy | ].
- induction HP.
-  exists []; split; [ reflexivity | ].
-  intros i Hi; apply Nat.nlt_0_r in Hi; easy.
-
-bbb.
-intros * HP.
-induction HP.
- exists []; simpl.
- split; [ constructor | ].
- intros i Hi; exfalso; revert Hi; apply Nat.nlt_0_r.
-
- destruct IHHP as (l'' & HPl & Hl'').
- exists (l'' ++ [length l + s]).
- simpl; split.
-  clear - HPl.
-  revert s l HPl.
-  induction l'' as [| x'']; intros.
-   destruct l as [| x]; [ constructor; constructor | ].
-   apply Permutation_sym, Permutation_nil_cons in HPl.
-   contradiction.
-
-   simpl.
-   destruct l as [| x l].
-    simpl in HPl; apply Permutation_nil_cons in HPl.
-    contradiction.
-
-    simpl in HPl; simpl.
-    destruct (eq_nat_dec s x'') as [Hs| Hx].
-     subst x''; constructor.
-     apply Permutation_cons_inv in HPl.
-     rewrite <- Nat.add_succ_r.
-     apply IHl''; assumption.
-
-     inversion HPl; [ contradiction | | ].
-      subst y x0 l''.
-      destruct l as [| y l]; [ discriminate H1 | simpl in H1 ].
-      injection H1; clear H1; intros; subst x'' l0.
-      simpl in HPl; simpl.
-rewrite cons_comm_app.
-SearchAbout (Permutation (_ :: _)).
-bbb.
-
-Theorem gogo : ∀ A (x y : A) l l',
-  Permutation l l'
-  → Permutation (x :: y :: l) (y :: x :: l').
-Proof.
-intros * HP.
-induction HP; [ constructor | | | ].
-
-
- inversion IHHP; subst.
-  constructor; constructor; constructor; assumption.
-
-  inversion IHHP; subst.
-   constructor; constructor; constructor; assumption.
-bbb.
-
-apply gogo.
-simpl.
-
-bbb.
-*)
-
 Theorem permuted_partition_is_partition :
   ∀ A (s := set_equiv) (E : set A) PE P'E,
   Permutation PE P'E
@@ -638,7 +436,6 @@ split.
 
   etransitivity; eassumption.
 
-(**)
  intros i j Hij x.
  split; [ intros Hx; simpl | contradiction ].
  apply Permutation_nth_error in Hpe.
@@ -985,8 +782,6 @@ assert
      apply In_nth with (d := (∅, ∅)) in HUV.
      rewrite combine_length in HUV.
      rewrite partition_combine_length in HUV.
-      2: now rewrite Hg'l, map_length.
-
       rewrite partition_combine_swi_length in HUV.
        2: now rewrite Hh'l, map_length.
 
@@ -1074,6 +869,8 @@ assert
           now subst h'l; rewrite map_length.
 
          now subst g'l; rewrite map_length.
+
+      now rewrite Hg'l, map_length.
 
      rewrite partition_combine_length.
       rewrite partition_combine_swi_length.
