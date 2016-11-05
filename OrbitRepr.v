@@ -62,7 +62,7 @@ destruct ti, tj.
    rewrite <- rev_path_norm_list, Hnj.
    now rewrite rev_path_cons, rev_path_single.
 
-   now intros H.
+   easy.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
@@ -71,7 +71,7 @@ destruct ti, tj.
    rewrite <- rev_path_norm_list, Hnj.
    now rewrite rev_path_cons, rev_path_single.
 
-   now intros H.
+   easy.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
@@ -81,7 +81,7 @@ destruct ti, tj.
   rewrite <- rev_path_norm_list, Hnj.
   now rewrite rev_path_cons, rev_path_single.
 
-  now intros H.
+  easy.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
@@ -91,7 +91,7 @@ destruct ti, tj.
   rewrite <- rev_path_norm_list, Hnj.
   now rewrite rev_path_cons, rev_path_single.
 
-  now intros H.
+  easy.
 
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
@@ -101,7 +101,7 @@ destruct ti, tj.
    rewrite <- rev_path_norm_list, Hnj.
    now rewrite rev_path_cons, rev_path_single.
 
-   now intros H.
+   easy.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
@@ -110,7 +110,7 @@ destruct ti, tj.
    rewrite <- rev_path_norm_list, Hnj.
    now rewrite rev_path_cons, rev_path_single.
 
-   now intros H.
+   easy.
 Qed.
 
 Theorem not_start_with_rot :
@@ -541,7 +541,7 @@ split.
        unfold orbit_without_fixpoint in Hoh.
        exfalso; revert Hel.
        apply Hoh; [ easy | ].
-       rewrite Hel₁; now intros H.
+       now rewrite Hel₁.
 
       left; left; right.
       split; [ easy | ].
@@ -571,7 +571,7 @@ split.
        simpl in Hr; rewrite Hr in Hel.
        destruct Hnf as (His, Hoh).
        revert Hel; apply Hoh; [ easy | ].
-       rewrite Hel₁; now intros H.
+       now rewrite Hel₁.
 
        apply rotate_rev_path in Hr.
        rewrite <- Hr, <- fold_right_app in Hel.

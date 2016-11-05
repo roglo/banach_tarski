@@ -49,7 +49,7 @@ Notation "E .[ i ]" := (List.nth i E ∅)
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : set A), ∀ x, x ∈ E₁ ↔ x ∈ E₂).
 
 Theorem set_eq_refl A : reflexive _ (@set_eq A set_equiv).
-Proof. intros P x; split; now intros. Qed.
+Proof. now intros P x; split. Qed.
 
 Theorem set_eq_sym A : symmetric _ (@set_eq A set_equiv).
 Proof.

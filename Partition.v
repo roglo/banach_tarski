@@ -45,11 +45,11 @@ split.
   intros (H₁, H₂).
   destruct j; [ now apply Hij | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   eapply Hi with (i := O) (j := S (S j)); [ now intros H | ].
+   eapply Hi with (i := O) (j := S (S j)); [ easy | ].
    unfold intersection; simpl.
    split; eassumption.
 
-   eapply Hi with (i := 1%nat) (j := S (S j)); [ now intros H | ].
+   eapply Hi with (i := 1%nat) (j := S (S j)); [ easy | ].
    unfold intersection; simpl.
    split; eassumption.
 
@@ -59,12 +59,12 @@ split.
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    eapply Hi with (i := O) (j := S (S i)); [ now intros H | ].
+    eapply Hi with (i := O) (j := S (S i)); [ easy | ].
     unfold intersection; simpl.
     split; eassumption.
 
     eapply Hi with (i := 1%nat) (j := S (S i)).
-     now intros H.
+     easy.
 
      unfold intersection; simpl.
      split; eassumption.
@@ -115,7 +115,7 @@ split.
   intros (H₁, H₂).
   destruct j; [ now apply Hij | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   eapply Hi with (i := O) (j := S j); [ now intros H | ].
+   eapply Hi with (i := O) (j := S j); [ easy | ].
    unfold intersection; simpl.
    split; [ eassumption | ].
    destruct j; [ now destruct H₂ | easy ].
@@ -133,13 +133,13 @@ split.
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    eapply Hi with (i := O) (j := S i); [ now intros H | ].
+    eapply Hi with (i := O) (j := S i); [ easy | ].
     unfold intersection; simpl.
     split; [ eassumption | ].
     destruct i; [ now destruct H₁ | easy ].
 
     eapply Hi with (i := 1%nat) (j := S i).
-     destruct i; [ | now intros H ].
+     destruct i; [ | easy ].
      now destruct H₁.
 
      unfold intersection; simpl.
