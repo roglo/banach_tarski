@@ -64,7 +64,7 @@ Theorem rev_path_eq_eq : ∀ el₁ el₂,
   rev_path el₁ = rev_path el₂ ↔ el₁ = el₂.
 Proof.
 intros el₁ el₂.
-split; [ | intros H; subst; easy ].
+split; [ | intros H; now subst ].
 intros Hr.
 revert el₂ Hr.
 induction el₁ as [| e₁]; intros.
@@ -120,7 +120,7 @@ symmetry in Hlen.
 revert el Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct len.
- apply length_zero_iff_nil in Hlen; subst el; easy.
+ apply length_zero_iff_nil in Hlen; now subst el.
 
  destruct (norm_list_dec el) as [H₁| H₁].
   generalize H₁; intros H₂.
@@ -160,7 +160,7 @@ induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct (norm_list_dec (el₁ ++ el₂)) as [H₁| H₁].
  rewrite H₁ in Hn.
  apply app_eq_nil in Hn.
- destruct Hn; subst el₁ el₂; easy.
+ destruct Hn; now subst el₁ el₂.
 
  destruct H₁ as (el₃ & t & d & el₄ & H₁).
  rewrite H₁, app_length, Nat.add_comm in Hlen.

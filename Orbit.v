@@ -70,7 +70,7 @@ apply norm_list_app_is_nil in H.
  apply rev_path_eq_eq in H.
  rewrite rev_path_involutive, rev_path_app in H.
  apply not_eq_sym in Hd.
- injection H; intros; easy.
+ injection H; now intros.
 
  rewrite norm_list_idemp; easy.
 

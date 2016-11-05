@@ -12,7 +12,7 @@ Arguments Nat.div : simpl never.
 Arguments Nat.modulo : simpl never.
 
 Theorem match_id : ∀ A a (b : A), match a with O => b | S _ => b end = b.
-Proof. intros A a b; destruct a; easy. Qed.
+Proof. intros A a b; now destruct a. Qed.
 
 Theorem nat_div_add_once : ∀ a b, b ≠ 0 → (a + b) / b = S (a / b).
 Proof.
@@ -31,13 +31,13 @@ Qed.
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
 Proof.
 intros.
-destruct x, y; try easy; exfalso; apply H; easy.
+destruct x, y; try easy; exfalso; now apply H.
 Qed.
 
 Theorem negb_neq : ∀ b₁ b₂, negb b₁ ≠ b₂ → b₁ = b₂.
 Proof.
 intros b₁ b₂ H.
-destruct b₁, b₂; try easy; exfalso; apply H; easy.
+destruct b₁, b₂; try easy; exfalso; now apply H.
 Qed.
 
 Theorem negb_eq_eq : ∀ b₁ b₂, negb b₁ = negb b₂ → b₁ = b₂.
@@ -103,7 +103,7 @@ Theorem Forall_inv2 : ∀ A (P : A → Prop) a l,
   List.Forall P (a :: l) → P a ∧ List.Forall P l.
 Proof.
 intros A P a l H.
-inversion H; split; easy.
+inversion H; now split.
 Qed.
 
 Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
@@ -190,7 +190,7 @@ Theorem app_repeat_diag : ∀ A (e : A) n,
 Proof.
 intros.
 induction n; [ easy | ].
-simpl; rewrite IHn; easy.
+simpl; now rewrite IHn.
 Qed.
 
 Theorem list_nil_app_dec {A} : ∀ (l : list A),
@@ -235,10 +235,10 @@ induction el₁ as [| e₁]; intros.
   apply IHel₁ in H.
   destruct H as [H| H].
    left; destruct H as (el, (H₁, H₂)); subst el₂ el₃.
-   exists el; split; easy.
+   exists el; now split.
 
    right; destruct H as (el, (H₁, H₂)); subst el₁ el₄.
-   exists el; split; easy.
+   exists el; now split.
 Qed.
 
 Definition false_neq_negb_false : false ≠ negb false :=
@@ -255,12 +255,12 @@ Definition negb_false_neq_false : negb false ≠ false := true_neq_negb_true.
 Theorem bool_dec_negb_l : ∀ b,
   Bool.bool_dec (negb b) b =
   right (if b return _ then negb_true_neq_true else negb_false_neq_false).
-Proof. intros b; destruct b; easy. Qed.
+Proof. intros b; now destruct b. Qed.
 
 Theorem bool_dec_negb_r : ∀ b,
   Bool.bool_dec b (negb b) =
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
-Proof. intros b; destruct b; easy. Qed.
+Proof. intros b; now destruct b. Qed.
 
 Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
@@ -290,10 +290,10 @@ Proof.
 intros P.
 set (R (x y : bool) := x = y ∨ P).
 assert (He : equiv _ R).
- split; [ intros b; left; easy | ].
+ split; [ intros b; now left | ].
  split.
-  intros b c d Hbc [Hcd| Hcd]; [ subst c; easy | right; easy ].
-  intros b c [Hbc| Hbc]; [ left; symmetry | right ]; easy.
+  now intros b c d Hbc [Hcd| Hcd]; [ subst c | right ].
+  intros b c [Hbc| Hbc]; [ now left; symmetry | now right ].
 
  destruct (TTCA bool R He) as (f & Hx & Hxy).
  destruct (Bool.bool_dec (f false) (f true)) as [H| H].
@@ -336,7 +336,7 @@ intros.
 revert lb.
 induction la as [| a la]; intros.
  simpl; rewrite flat_map_nil_fun; [ easy | ].
- induction lb; constructor; easy.
+ induction lb; now constructor.
 
  simpl.
  rewrite IHla; clear IHla.

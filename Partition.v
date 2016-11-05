@@ -29,13 +29,13 @@ split.
  destruct H₁ as (H₁ & H₂).
  split; intros H.
   apply H₁ in H.
-  destruct H as [H| H]; [ left; left; easy | ].
-  destruct H as [H| H]; [ left; right; easy | ].
+  destruct H as [H| H]; [ left; now left | ].
+  destruct H as [H| H]; [ left; now right | ].
   now right.
 
   apply H₂.
-  destruct H as [[H| H]| H]; [ left; easy | right; left; easy | ].
-  right; right; easy.
+  destruct H as [[H| H]| H]; [ left; easy | right; now left | ].
+  right; now right.
 
  intros i j Hij; subst s.
  destruct i.
@@ -94,18 +94,18 @@ split.
   pose proof Hu x as H₁.
   destruct H₁ as (H₁ & H₂).
   pose proof H₁ H as H₃.
-  destruct H₃ as [H₃| H₃]; [ left; left; easy | ].
-  destruct H₃ as [H₃| H₃]; [ | right; right; easy ].
-  destruct (HBdec x) as [H₄| H₄]; [ left; right; easy | ].
-  right; left; split; easy.
+  destruct H₃ as [H₃| H₃]; [ left; now left | ].
+  destruct H₃ as [H₃| H₃]; [ | right; now right ].
+  destruct (HBdec x) as [H₄| H₄]; [ left; now right | ].
+  right; left; now split.
 
   apply Hu.
   destruct H as [[H₁| H₁]| [H₁| H₁]]; [ left; easy | | | ].
-   right; left; apply HB; easy.
+   right; left; now apply HB.
 
-   right; left; destruct H₁; easy.
+   right; left; now destruct H₁.
 
-   right; right; easy.
+   right; now right.
 
  intros i j Hij; subst s.
  destruct i.
@@ -121,7 +121,7 @@ split.
    destruct j; [ destruct H₂; easy | easy ].
 
    eapply Hi with (i := 1%nat) (j := S j).
-    destruct j; [ destruct H₂; easy | intros H; easy ].
+    destruct j; [ now destruct H₂ | easy ].
 
     unfold intersection; simpl.
     split; [ apply HB; eassumption | ].
@@ -147,7 +147,7 @@ split.
      destruct i; [ apply HB; easy | easy ].
 
   apply Hi with (i := S i) (j := S j) (x := x).
-   intros H; apply Hij; easy.
+   intros H; now apply Hij.
 
    unfold intersection; simpl.
    split.
@@ -234,10 +234,10 @@ Qed.
 Theorem is_partition_single : ∀ A (s := @set_equiv A) E, is_partition E [E].
 Proof.
 intros.
-split; [ symmetry; eapply union_empty_r; easy | ].
+split; [ symmetry; now eapply union_empty_r | ].
 intros * Hij.
 destruct i.
- destruct j; [ exfalso; apply Hij; easy | ].
+ destruct j; [ exfalso; now apply Hij | ].
  destruct j.
   split; [ intros (_, H); easy | easy ].
   split; [ intros (_, H); easy | easy ].

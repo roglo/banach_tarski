@@ -49,7 +49,7 @@ Notation "E .[ i ]" := (List.nth i E ∅)
 Definition set_equiv {A} := mksm A (λ (E₁ E₂ : set A), ∀ x, x ∈ E₁ ↔ x ∈ E₂).
 
 Theorem set_eq_refl A : reflexive _ (@set_eq A set_equiv).
-Proof. intros P x; split; intros; easy. Qed.
+Proof. intros P x; split; now intros. Qed.
 
 Theorem set_eq_sym A : symmetric _ (@set_eq A set_equiv).
 Proof.
@@ -73,7 +73,7 @@ Add Parametric Relation A : (set A) (@set_eq A set_equiv)
  as set_eq_rel.
 
 Theorem eq_set_eq : ∀ A (s := set_equiv) (x y : set A), x = y → (x = y)%S.
-Proof. intros; subst x; easy. Qed.
+Proof. intros; now subst x. Qed.
 
 Theorem included_trans A : transitive _ (@included A).
 Proof.
@@ -99,8 +99,8 @@ Proof.
 intros E E' HE F F' HF.
 unfold intersection; intros p.
 split; intros (H₁, H₂).
- split; [ apply HE; easy | apply HF; easy ].
- split; [ apply HE; easy | apply HF; easy ].
+ now split; [ apply HE | apply HF ].
+ now split; [ apply HE | apply HF ].
 Qed.
 
 Add Parametric Morphism {A} : (@union A)
@@ -123,8 +123,8 @@ Proof.
 intros E E' HE F F' HF.
 unfold subtract; intros p.
 split; intros (H₁, H₂).
- split; [ apply HE; easy | intros H; apply H₂, HF; easy ].
- split; [ apply HE; easy | intros H; apply H₂, HF; easy ].
+ split; [ apply HE; easy | intros H; now apply H₂, HF ].
+ split; [ apply HE; easy | intros H; now apply H₂, HF ].
 Qed.
 
 Add Parametric Morphism {A} : (@included A)
@@ -173,7 +173,7 @@ Theorem intersection_comm : ∀ A (s := set_equiv) (E F : set A),
   (E ∩ F = F ∩ E)%S.
 Proof.
 intros; intros x.
-split; intros H; destruct H as (HE & HF); split; easy.
+split; intros H; destruct H as (HE & HF); now split.
 Qed.
 
 Theorem union_comm : ∀ A (s := set_equiv) (E F : set A),
@@ -201,14 +201,14 @@ Proof.
 intros; intros x.
 split; intros H.
  destruct H as [H| [H| H]].
-  left; left; easy.
-  left; right; easy.
+  left; now left.
+  left; now right.
   now right.
 
  destruct H as [[H| H]| H].
   now left.
-  right; left; easy.
-  right; right; easy.
+  right; now left.
+  right; now right.
 Qed.
 
 Theorem intersection_shuffle0 : ∀ A (s := set_equiv) (E F G : set A),
@@ -228,8 +228,8 @@ Theorem union_is_empty : ∀ A (s := set_equiv) (E F : set A),
 Proof.
 intros * HEF.
 split; intros x.
- split; [ intros Hx; apply HEF; left; easy | easy ].
- split; [ intros Hx; apply HEF; right; easy | easy ].
+ split; [ intros Hx; apply HEF; now left | easy ].
+ split; [ intros Hx; apply HEF; now right | easy ].
 Qed.
 
 Theorem union_list_is_empty_iff : ∀ A (s := set_equiv) (EL : list (set A)),
@@ -255,7 +255,7 @@ split; intros HEL.
   apply HEL in Hx; [ easy | left; easy ].
 
   eapply IHEL; [ | eassumption ].
-  intros E HE; apply HEL; right; easy.
+  intros E HE; apply HEL; now right.
 Qed.
 
 Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (set A)),
@@ -282,9 +282,9 @@ induction P₂ as [| Q]; intros.
    destruct H as [H| H]; [ right; easy | easy ].
 
    simpl in H.
-   destruct H as [H| H]; [ simpl; left; left; easy | ].
+   destruct H as [H| H]; [ simpl; left; now left | ].
    apply IHP₁ in H.
-   destruct H as [H| H]; [ simpl; left; right; easy | ].
+   destruct H as [H| H]; [ simpl; left; now right | ].
    now right.
 
   destruct H as [H| H]; [ left | right; easy ].
@@ -298,9 +298,9 @@ induction P₂ as [| Q]; intros.
    simpl in H; simpl.
    destruct H.
     destruct H; [ left; easy | right ].
-    apply IHP₁; left; easy.
+    apply IHP₁; now left.
 
-    right; apply IHP₁; right; easy.
+    right; apply IHP₁; now right.
 Qed.
 
 Theorem nth_set_union_list : ∀ A (P : list (set A)) i x,
@@ -313,7 +313,7 @@ induction i; intros P H Hi.
 
  destruct P as [| E P]; [ easy | simpl in Hi ].
  apply Nat.succ_lt_mono in Hi.
- right; apply IHi; easy.
+ right; now apply IHi.
 Qed.
 
 Theorem nth_set_app : ∀ A (P₁ P₂ : list (set A)) i,
@@ -335,7 +335,7 @@ Theorem union_list_intersection : ∀ A (S : set A) SL x,
 Proof.
 intros A P QL * HP HQL.
 induction QL as [| Q QL]; intros; [ easy | simpl ].
-destruct HQL as [HQ| HQL]; [ left; split; easy | right ].
+destruct HQL as [HQ| HQL]; [ left; now split | right ].
 apply IHQL, HQL.
 Qed.
 
@@ -349,7 +349,7 @@ rewrite HE.
 clear - HF.
 revert F HF.
 induction EL as [| E EL]; intros; [ easy | ].
-destruct HF as [HF| HF]; [ left; subst E; easy | ].
+destruct HF as [HF| HF]; [ left; now subst E | ].
 right; eapply IHEL; eassumption.
 Qed.
 
@@ -363,8 +363,8 @@ split; intros Hx.
  apply HEL in Hxl.
  clear -Hx Hxl.
  induction EL as [| E₁ EL]; intros; [ easy | ].
- destruct Hxl as [Hxl| Hxl]; [ left; split; easy | ].
- right; apply IHEL; easy.
+ destruct Hxl as [Hxl| Hxl]; [ left; now split | ].
+ right; now apply IHEL.
 
  clear -Hx.
  induction EL as [| E₁ EL]; intros; [ easy | ].

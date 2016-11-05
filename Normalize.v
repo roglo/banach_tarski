@@ -24,7 +24,7 @@ Theorem norm_list_no_consec : ∀ e el el₁ el₂,
 Proof.
 intros e el el₁ el₂.
 revert el₁.
-induction el as [| e₁]; intros; [ intros H; destruct el₁; easy | ].
+induction el as [| e₁]; intros; [ intros H; now destruct el₁ | ].
 simpl; remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
 destruct nl as [| e₂].
  clear; intros H.
@@ -98,7 +98,7 @@ Proof.
 intros el (t, d).
 revert t d.
 induction el as [| (t₁, d₁)]; intros.
- simpl; rewrite letter_dec_diag, bool_dec_negb_r; easy.
+ simpl; now rewrite letter_dec_diag, bool_dec_negb_r.
 
  remember (FE t₁ d₁ :: el) as el₁ eqn:Hel₁.
  symmetry in Hel₁; simpl.
@@ -144,7 +144,7 @@ induction el₁ as [| e₁]; intros.
  do 2 rewrite app_nil_l.
  apply norm_list_cancel.
 
- simpl; rewrite IHel₁; easy.
+ simpl; now rewrite IHel₁.
 Qed.
 
 Theorem norm_list_cancel_in2 : ∀ el₁ el₂ e,
@@ -204,7 +204,7 @@ remember (e₁ :: el) as el₁ eqn:Hel.
 simpl in Hn.
 remember (norm_list el₁) as el₂ eqn:Hel₁; symmetry in Hel₁.
 destruct el₂ as [| e₂].
- injection Hn; clear Hn; intros; subst; easy.
+ injection Hn; clear Hn; intros; now subst.
 
  destruct (letter_opp_dec e e₂) as [H₁| H₁].
   apply letter_opp_negf in H₁; subst e el₂.

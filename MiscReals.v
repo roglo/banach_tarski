@@ -35,7 +35,7 @@ Proof.
 intros x y.
 destruct (Rle_dec x y) as [H₁| H₁].
  destruct (Rle_dec y x) as [H₂| H₂].
-  left; apply Rle_antisym; easy.
+  left; now apply Rle_antisym.
 
   right; intros H; subst y; apply H₂, Rle_refl.
 

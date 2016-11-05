@@ -43,7 +43,7 @@ destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
 rewrite <- He in Hs.
 eapply Hinf; [ easy | | eassumption ].
-intros H; rewrite Hn in H; easy.
+intros H; now rewrite Hn in H.
 Qed.
 
 Theorem start_with_same : ∀ f os, os = mkos _ f →
@@ -199,7 +199,7 @@ split.
  split.
  -intros Hnf.
   unfold union_list; simpl; unfold union.
-  destruct (Pdec p (f p)) as [H₁| H₁]; [ left; split; easy | ].
+  destruct (Pdec p (f p)) as [H₁| H₁]; [ left; now split | ].
   right.
   pose proof Ho p as H.
   destruct H as (el, Hel).
@@ -252,7 +252,7 @@ split.
  split; [ | easy ].
  intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
-  destruct j; [ exfalso; apply Hij; easy | clear Hij ].
+  destruct j; [ exfalso; now apply Hij | clear Hij ].
   destruct Hi as (Hinf & Hi); simpl in Hi.
   destruct j.
    eapply empty_set_not_full_set; [ easy | | eassumption ].
@@ -274,7 +274,7 @@ split.
   destruct j; [ clear Hij | ].
    eapply empty_set_not_full_set; [ easy | eassumption | eassumption ].
 
-   destruct j; [ exfalso; apply Hij; easy | clear Hij ].
+   destruct j; [ exfalso; now apply Hij | clear Hij ].
    destruct j; [ simpl in Hj | ].
     eapply start_with_same in Hi; [ | easy | eassumption ].
     easy.
@@ -295,7 +295,7 @@ split.
      eapply start_with_same in Hi; [ | easy | eassumption ].
      easy.
 
-     destruct j; [ exfalso; apply Hij; easy | clear Hij ].
+     destruct j; [ exfalso; now apply Hij | clear Hij ].
      destruct j; [ simpl in Hj | ].
       eapply start_with_same in Hi; [ | easy | eassumption ].
       easy.
@@ -316,7 +316,7 @@ split.
        eapply start_with_same in Hi; [ | easy | eassumption ].
        easy.
 
-       destruct j; [ exfalso; apply Hij; easy | clear Hij ].
+       destruct j; [ exfalso; now apply Hij | clear Hij ].
        destruct j; [ simpl in Hj | destruct j; easy ].
        eapply start_with_same in Hi; [ | easy | eassumption ].
        easy.
@@ -337,7 +337,7 @@ split.
          eapply start_with_same in Hi; [ | easy | eassumption ].
          easy.
 
-         destruct j; [ exfalso; apply Hij; easy | clear Hij ].
+         destruct j; [ exfalso; now apply Hij | clear Hij ].
          destruct j; easy.
 
      destruct i; easy.
@@ -405,7 +405,7 @@ split.
 
    +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
      left; split; [ easy | ].
-     exists el, el₁; split; easy.
+     exists el, el₁; now split.
 
      right; left.
      unfold rot.
@@ -451,7 +451,7 @@ split.
  split; [ | easy ].
  intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
-  destruct j; [ exfalso; apply Hij; easy | clear Hij ].
+  destruct j; [ exfalso; now apply Hij | clear Hij ].
   destruct j; [ | destruct j; easy ].
   simpl in Hj.
   eapply not_start_with_rot in Hi; try eassumption; [ | easy ].
@@ -508,11 +508,11 @@ split.
     +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
     clear el Hel₁.
     left; left; left.
-    split; [ easy | subst os; symmetry; easy ].
+    split; [ easy | subst os; now symmetry ].
 
     +destruct e₁ as (t, d); destruct t.
      destruct d.
-      destruct (EM (p ∈ B)) as [HB| HB]; [ left; right; easy | ].
+      destruct (EM (p ∈ B)) as [HB| HB]; [ left; now right | ].
       right; left; simpl.
       split.
        split.
@@ -523,8 +523,8 @@ split.
         subst os; simpl.
         rewrite Hfr.
         exists (ạ⁻¹ :: el), (norm_list el).
-        split; [ | simpl; f_equal; easy ].
-        simpl; rewrite Hel₁; easy.
+        split; [ | simpl; now f_equal ].
+        simpl; now rewrite Hel₁.
 
        simpl; intros (Haf & n & Hoo); apply HB; clear HB.
        split; [ easy | ].
@@ -541,7 +541,7 @@ split.
        unfold orbit_without_fixpoint in Hoh.
        exfalso; revert Hel.
        apply Hoh; [ easy | ].
-       rewrite Hel₁; intros H; easy.
+       rewrite Hel₁; now intros H.
 
       left; left; right.
       split; [ easy | ].
@@ -557,8 +557,8 @@ split.
 
        subst os; simpl; rewrite Hfr.
        exists (ạ⁻¹ :: el), (norm_list el).
-       split; [ | simpl; f_equal; easy ].
-       simpl; rewrite Hel₁; easy.
+       split; [ | simpl; now f_equal ].
+       simpl; now rewrite Hel₁.
 
       intros (Hnf₂, Hoo).
       subst os; simpl in Hoo.
@@ -571,7 +571,7 @@ split.
        simpl in Hr; rewrite Hr in Hel.
        destruct Hnf as (His, Hoh).
        revert Hel; apply Hoh; [ easy | ].
-       rewrite Hel₁; intros H; easy.
+       rewrite Hel₁; now intros H.
 
        apply rotate_rev_path in Hr.
        rewrite <- Hr, <- fold_right_app in Hel.
@@ -599,7 +599,7 @@ split.
 
  -intros HE.
   simpl in HE.
-  destruct HE as [[[HE| HE]| HE]| [HE| HE]]; try (destruct HE; easy).
+  destruct HE as [[[HE| HE]| HE]| [HE| HE]]; try now destruct HE.
   destruct HE as (((His & Hoo) & HE) & HB).
   split.
    apply in_sphere_after_rotate with (e := ạ) in His.
@@ -615,7 +615,7 @@ split.
   split; [ | easy ].
   intros (Hi, Hj).
   destruct i; [ simpl in Hi | ].
-   destruct j; [ exfalso; apply Hij; easy | clear Hij ].
+   destruct j; [ exfalso; now apply Hij | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; easy ].
    eapply decompose_2a_contrad_case; unfold union; try eassumption.
    now split.

@@ -23,7 +23,7 @@ Definition negf '(FE t d) := FE t (negb d).
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
 intros.
-destruct l1, l2; try (left; easy); right; intros H; easy.
+destruct l1, l2; try (now left); right; now intros H.
 Defined.
 
 Theorem free_elem_dec : ∀ e₁ e₂ : free_elem, { e₁ = e₂ } + { e₁ ≠ e₂ }.
@@ -36,16 +36,16 @@ destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
   now left.
 
   right; intros H; apply H₂.
-  injection H; intros; easy.
+  injection H; now intros.
 
  right; intros H; apply H₁.
- injection H; intros; easy.
+ injection H; now intros.
 Qed.
 
 Theorem letter_dec_diag : ∀ t, letter_dec t t = left (eq_refl _).
 Proof.
 intros t.
-destruct (letter_dec t t) as [p| p]; [ | exfalso; apply p; easy ].
+destruct (letter_dec t t) as [p| p]; [ | exfalso; now apply p ].
 destruct t; refine (match p with eq_refl => eq_refl end).
 Qed.
 
@@ -62,9 +62,9 @@ destruct e₁ as (x₁, d₁).
 destruct e₂ as (x₂, d₂); simpl.
 destruct (letter_dec x₁ x₂) as [Hx| Hx].
  destruct (Bool.bool_dec d₁ d₂) as [Hd| Hd]; [ | left; constructor ].
- right; intros H; easy.
+ right; now intros H.
 
- right; intros H; easy.
+ right; now intros H.
 Defined.
 
 Theorem letter_opp_inv : ∀ x d, letter_opp (FE x d) (FE x (negb d)).

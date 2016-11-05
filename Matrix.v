@@ -419,15 +419,15 @@ Proof.
  destruct (Req_dec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
   destruct (Req_dec y₁ y₂) as [| H₂]; [ subst y₂ | right ].
    destruct (Req_dec z₁ z₂) as [| H₃].
-    subst z₂; left; easy.
+    subst z₂; now left.
 
     right.
     intros H; apply H₃.
-    injection H; clear H; intros; subst; easy.
+    injection H; clear H; intros; now subst.
 
     intros H; apply H₂.
-    injection H; clear H; intros; subst; easy.
+    injection H; clear H; intros; now subst.
 
   intros H; apply H₁.
-  injection H; clear H; intros; subst; easy.
+  injection H; clear H; intros; now subst.
 Qed.

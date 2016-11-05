@@ -62,9 +62,9 @@ revert fl PF i HlfP Hf.
 induction PE as [| E₁ PE]; intros.
  destruct fl as [| f₁ fl]; [ | easy ].
  intros x.
- split; intros Hx; [ destruct i; easy | ].
+ split; intros Hx; [ now destruct i | ].
  destruct Hx as (Hx, _).
- destruct (i / length PF)%nat; easy.
+ now destruct (i / length PF)%nat.
 
  destruct fl as [| f₁ fl]; [ easy | ].
  simpl in HlfP; apply Nat.succ_inj in HlfP; simpl.
@@ -75,7 +75,7 @@ induction PE as [| E₁ PE]; intros.
   intros x; clear - HlfP Hf.
   split; intros Hx.
    revert i Hx.
-   induction PF as [| F₁ PF]; intros; [ destruct i; easy | ].
+   induction PF as [| F₁ PF]; intros; [ now destruct i | ].
    simpl in Hx; simpl.
    destruct i; [ easy | now apply IHPF ].
 
@@ -110,14 +110,13 @@ induction PE as [| E₁ PE]; intros.
       apply IHl, Hx.
 
      rewrite Hf in Hx; [ | now left ].
-     rewrite intersection_empty_r in Hx.
-     easy.
+     now rewrite intersection_empty_r in Hx.
 
-    rewrite nat_mod_add_once; [ | intros H; easy ].
-    rewrite nat_div_add_once; [ | intros H; easy ].
+    rewrite nat_mod_add_once; [ | easy ].
+    rewrite nat_div_add_once; [ | easy ].
     apply IHPE; [ easy | ].
     intros f Hfi.
-    apply Hf; now right.
+    now apply Hf; right.
 Qed.
 
 Theorem partition_combine_swi_nth :
@@ -291,7 +290,7 @@ split.
     destruct HP'F as (HP'FU, HP'FI).
     destruct (eq_nat_dec (i / S len) (j / S len)) as [Hd| Hd].
      destruct (eq_nat_dec (i mod S len) (j mod S len)) as [Hm| Hm].
-      assert (Hnlen : (S len ≠ 0)%nat) by (intros H; easy).
+      assert (Hnlen : (S len ≠ 0)%nat) by easy.
       pose proof Nat.div_mod i (S len) Hnlen as Hi.
       pose proof Nat.div_mod j (S len) Hnlen as Hj.
       rewrite Hd, Hm, <- Hj in Hi;  easy.
@@ -313,13 +312,13 @@ split.
        apply Nat.nlt_ge in Hil.
        rewrite Hlen3 in Hil.
        rewrite nth_overflow; [ | easy ].
-       do 2 rewrite intersection_empty_l; easy.
+       now do 2 rewrite intersection_empty_l.
 
      rewrite intersection_shuffle0, intersection_assoc.
      rewrite HPEI; [ | easy ].
-     do 2 rewrite intersection_empty_l; easy.
+     now do 2 rewrite intersection_empty_l.
 
-   subst fl; rewrite map_length; easy.
+   now subst fl; rewrite map_length.
 
    subst fl.
    intros f Hf.
@@ -327,7 +326,7 @@ split.
    destruct Hf as (g & Hg & Hix).
    subst f; apply app_gr_empty_set.
 
-  subst fl; rewrite map_length; easy.
+  now subst fl; rewrite map_length.
 
   subst fl.
   intros f Hf.
@@ -346,7 +345,7 @@ intros.
 unfold partition_combine, partition_combine_swi.
 rewrite Permutation_flat_map_map.
 induction (combine fl PE) as [| a la]; intros; [ easy | ].
-simpl; rewrite IHla; destruct a; easy.
+now simpl; rewrite IHla; destruct a.
 Qed.
 
 Theorem permuted_partition_is_partition :
@@ -360,7 +359,7 @@ destruct Hpa as (Hpau, Hpai).
 split.
  rewrite Hpau; clear -Hpe.
  induction Hpe; [ easy | | | ].
-  simpl; rewrite IHHpe; easy.
+  now simpl; rewrite IHHpe.
 
   simpl; rewrite union_comm, <- union_assoc.
   apply union_morph; [ easy | apply union_comm ].
@@ -432,7 +431,7 @@ Proof.
 intros * Hlen.
 unfold partition_combine; simpl.
 revert fl PF Hlen.
-induction PE as [| E₁ PE]; intros; [ destruct fl; easy | simpl ].
+induction PE as [| E₁ PE]; intros; [ now destruct fl | simpl ].
 destruct fl as [| f₁ fl]; [ easy | ].
 destruct PF as [| F₁ FL].
  unfold partition_combine; simpl.
@@ -443,7 +442,7 @@ destruct PF as [| F₁ FL].
  rewrite app_length, map_length.
  apply Nat.succ_inj in Hlen.
  apply IHPE with (PF := F₁ :: FL) in Hlen.
- simpl in Hlen; rewrite Hlen; easy.
+ now simpl in Hlen; rewrite Hlen.
 Qed.
 
 Theorem partition_combine_swi_length :
@@ -499,7 +498,7 @@ assert
   symmetry in Hlen1; apply length_zero_iff_nil in Hlen1; subst P₁F.
   intros i; simpl.
   do 2 rewrite match_id; simpl.
-  intros (x, y, z); split; easy.
+  now intros (x, y, z); split.
 
   destruct P₁F as [| F₁ P₁F]; [ easy | ].
   simpl in Hlen1; apply Nat.succ_inj in Hlen1.
@@ -508,7 +507,7 @@ assert
   apply IHPE in HEF; [ | easy ].
   destruct HEF as (gl & Hlen3 & HEF).
   exists (g₁ :: gl).
-  split; [ simpl; rewrite Hlen3; easy | ].
+  split; [ now simpl; rewrite Hlen3 | ].
   intros i; simpl.
   destruct i; [ easy | apply HEF ].
 
@@ -524,7 +523,7 @@ assert
    apply length_zero_iff_nil in Hlen2; subst P₂F.
    intros i; simpl.
    do 2 rewrite match_id; simpl.
-   intros (x, y, z); split; easy.
+   now intros (x, y, z); split.
 
    destruct P₂F as [| F₁ P₂F]; [ easy | ].
    simpl in Hlen2; apply Nat.succ_inj in Hlen2.
@@ -533,7 +532,7 @@ assert
    apply IHPG in HFG; [ | easy ].
    destruct HFG as (hl & Hlen3 & HFG).
    exists (gr_inv h₁ :: hl).
-   split; [ simpl; rewrite Hlen3; easy | ].
+   split; [ now simpl; rewrite Hlen3 | ].
    intros i; simpl.
    destruct i; [ | apply HFG ].
    rewrite <- HhFG, fold_app_gr_inv.
