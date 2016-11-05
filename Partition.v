@@ -31,7 +31,7 @@ split.
   apply H₁ in H.
   destruct H as [H| H]; [ left; left; easy | ].
   destruct H as [H| H]; [ left; right; easy | ].
-  right; easy.
+  now right.
 
   apply H₂.
   destruct H as [[H| H]| H]; [ left; easy | right; left; easy | ].
@@ -74,7 +74,7 @@ split.
    apply Nat.succ_inj; easy.
 
    unfold intersection; simpl.
-   split; easy.
+   now split.
 Qed.
 
 Theorem is_partition_union_subtract :

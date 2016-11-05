@@ -439,7 +439,7 @@ split.
    destruct Hgh as [Hgh| Hgh].
     rewrite IHh; simpl.
     rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
-    left; easy.
+    now left.
 
     rewrite HF; simpl.
     rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].

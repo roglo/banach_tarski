@@ -117,7 +117,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; easy.
+ now field_simplify.
 
  unfold Rdiv.
  field_simplify; simpl.
@@ -125,7 +125,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; easy.
+ now field_simplify.
 Qed.
 
 Theorem rot_inv_rot_x : ∀ pt,
@@ -146,7 +146,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; easy.
+ now field_simplify.
 
  unfold Rdiv.
  field_simplify; simpl.
@@ -154,7 +154,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; easy.
+ now field_simplify.
 Qed.
 
 Theorem rot_rot_inv_z : ∀ pt,
@@ -175,7 +175,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; easy.
+ now field_simplify.
 
  unfold Rdiv.
  field_simplify; simpl.
@@ -183,7 +183,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; easy.
+ now field_simplify.
 Qed.
 
 Theorem rot_inv_rot_z : ∀ pt,
@@ -204,7 +204,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; easy.
+ now field_simplify.
 
  unfold Rdiv.
  field_simplify; simpl.
@@ -212,7 +212,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; easy.
+ now field_simplify.
 Qed.
 
 Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.

@@ -126,7 +126,7 @@ Theorem Forall2_cons_cons : ∀ A B (R : A → B → Prop) x y l l',
 Proof.
 intros A B * H.
 inversion H; subst.
-split; easy.
+now split.
 Qed.
 
 Theorem Forall2_Forall_combine : ∀ A B f (l1 : list A) (l2 : list B),
@@ -303,7 +303,7 @@ assert (He : equiv _ R).
 
   right; intros H₁; apply H.
   apply Hxy; unfold R.
-  right; easy.
+  now right.
 Qed.
 
 Record choice_function {A} (R : A → A → Prop) f := mkcf

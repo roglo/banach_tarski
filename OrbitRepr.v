@@ -177,7 +177,7 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
     rewrite Hfr, <- Hp; easy.
 
     eapply not_start_with_rot in Hi; try eassumption; [ contradiction | ].
-    split; easy.
+    now split.
 
     destruct Hi as (Hnf, Hoo).
     destruct Hoo as (n, Hoo).
@@ -256,19 +256,19 @@ split.
   destruct Hi as (Hinf & Hi); simpl in Hi.
   destruct j.
    eapply empty_set_not_full_set; [ easy | | eassumption ].
-   split; easy.
+   now split.
 
    destruct j.
     eapply empty_set_not_full_set; [ easy | | eassumption ].
-    split; easy.
+    now split.
 
     destruct j.
      eapply empty_set_not_full_set; [ easy | | eassumption ].
-     split; easy.
+     now split.
 
      destruct j; [ | destruct j; contradiction ].
      eapply empty_set_not_full_set; [ easy | | eassumption ].
-     split; easy.
+     now split.
 
  destruct i; [ simpl in Hi | ].
   destruct j; [ clear Hij | ].
@@ -432,7 +432,7 @@ split.
         apply letter_opp_negf in H₂.
         apply H₁, negf_eq_eq; easy.
 
-        split; easy.
+        now split.
 
  -intros Hul.
   destruct Hul as [(H, _)| [(H, _)| Hul]]; [ easy | | contradiction ].
@@ -455,12 +455,12 @@ split.
   destruct j; [ | destruct j; contradiction ].
   simpl in Hj.
   eapply not_start_with_rot in Hi; try eassumption; [ | easy ].
-  split; easy.
+  now split.
 
   destruct i; [ simpl in Hi | ].
    destruct j; [ simpl in Hj; clear Hij | ].
     eapply not_start_with_rot in Hj; try eassumption; [ | easy ].
-    split; easy.
+    now split.
 
     destruct j; [ apply Hij; easy | clear Hij ].
     destruct j; contradiction.
@@ -546,7 +546,7 @@ split.
       left; left; right.
       split; [ easy | ].
       exists el, el₁; subst os.
-      split; easy.
+      now split.
 
      right; left.
      split; simpl.
@@ -618,12 +618,12 @@ split.
    destruct j; [ exfalso; apply Hij; easy | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
    eapply decompose_2a_contrad_case; unfold union; try eassumption.
-   split; easy.
+   now split.
 
    destruct i; [ simpl in Hi | destruct i; contradiction ].
    destruct j.
     eapply decompose_2a_contrad_case; unfold union; try eassumption.
-    split; easy.
+    now split.
 
     destruct j; [ apply Hij; easy | clear Hij ].
     destruct j; contradiction.

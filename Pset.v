@@ -203,10 +203,10 @@ split; intros H.
  destruct H as [H| [H| H]].
   left; left; easy.
   left; right; easy.
-  right; easy.
+  now right.
 
  destruct H as [[H| H]| H].
-  left; easy.
+  now left.
   right; left; easy.
   right; right; easy.
 Qed.
@@ -285,7 +285,7 @@ induction P₂ as [| Q]; intros.
    destruct H as [H| H]; [ simpl; left; left; easy | ].
    apply IHP₁ in H.
    destruct H as [H| H]; [ simpl; left; right; easy | ].
-   right; easy.
+   now right.
 
   destruct H as [H| H]; [ left | right; easy ].
   unfold union_list.

@@ -33,7 +33,7 @@ destruct e₁ as (t₁, d₁).
 destruct e₂ as (t₂, d₂).
 destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
  destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ subst d₂ | ].
-  left; easy.
+  now left.
 
   right; intros H; apply H₂.
   injection H; intros; easy.

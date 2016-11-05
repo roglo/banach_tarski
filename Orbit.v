@@ -143,7 +143,7 @@ destruct Hso as (el, Hr).
 exists (e :: el ++ [negf e]); simpl.
 rewrite fold_right_app; simpl.
 rewrite rotate_neg_rotate.
-f_equal; easy.
+now f_equal.
 Qed.
 
 Theorem no_fixpoint_after_rotate : ∀ p e,

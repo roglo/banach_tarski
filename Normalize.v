@@ -297,7 +297,7 @@ destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
   destruct el' as [| e'].
    rewrite app_nil_r in H₁.
    rewrite app_nil_l in H₃; symmetry in H₃.
-   split; easy.
+   now split.
 
    simpl in H₃.
    injection H₃; clear H₃; intros H₂ H₃; subst e'.
@@ -312,7 +312,7 @@ destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
    symmetry in H₂.
    apply app_eq_nil in H₂.
    destruct H₂; subst el el'.
-   split; easy.
+   now split.
 Qed.  
 
 Theorem norm_list_is_nil_between : ∀ e el,
