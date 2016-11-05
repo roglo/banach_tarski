@@ -57,7 +57,7 @@ Proof.
 intros el Hr.
 destruct el as [| e]; [ easy | ].
 rewrite rev_path_cons, rev_path_single in Hr.
-destruct (rev_path el); discriminate Hr.
+destruct (rev_path el); easy.
 Qed.
 
 Theorem rev_path_eq_eq : ∀ el₁ el₂,
@@ -75,7 +75,7 @@ induction el₁ as [| e₁]; intros.
  rewrite rev_path_cons, rev_path_single in Hr.
  destruct el₂ as [| e₂].
   rewrite rev_path_nil in Hr.
-  destruct (rev_path el₁); discriminate Hr.
+  destruct (rev_path el₁); easy.
 
   rewrite rev_path_cons, rev_path_single in Hr.
   apply app_inj_tail in Hr.
@@ -164,8 +164,8 @@ destruct (norm_list_dec (el₁ ++ el₂)) as [H₁| H₁].
 
  destruct H₁ as (el₃ & t & d & el₄ & H₁).
  rewrite H₁, app_length, Nat.add_comm in Hlen.
- destruct len; [ discriminate Hlen | ].
- destruct len; [ discriminate Hlen | simpl in Hlen ].
+ destruct len; [ easy | ].
+ destruct len; [ easy | simpl in Hlen ].
  do 2 apply -> Nat.succ_inj_wd in Hlen.
  rewrite Nat.add_comm, <- app_length in Hlen.
  assert (H₂ : len < S (S len)).

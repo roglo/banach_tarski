@@ -43,7 +43,7 @@ Qed.
 Theorem negb_eq_eq : ∀ b₁ b₂, negb b₁ = negb b₂ → b₁ = b₂.
 Proof.
 intros b₁ b₂ Hn.
-destruct b₁, b₂; [ easy | | | easy ]; discriminate Hn.
+now destruct b₁, b₂.
 Qed.
 
 Theorem cons_comm_app : ∀ A (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
@@ -151,10 +151,10 @@ split; intros HF.
    revert l2 HF.
    induction l1 as [| x1 l1]; intros.
     destruct l2 as [| x2 l2]; [ easy | ].
-    apply Forall2_nil_cons in HF; contradiction.
+    apply Forall2_nil_cons in HF; easy.
 
     destruct l2 as [| x2 l2].
-     apply Forall2_cons_nil in HF; contradiction.
+     apply Forall2_cons_nil in HF; easy.
 
      apply Forall2_cons_cons in HF.
      destruct HF as (Hf, HF).
@@ -269,10 +269,10 @@ intros * Hs HF.
 revert l2 HF.
 induction l1 as [| x]; intros.
  destruct l2 as [| y]; [ constructor | ].
- apply Forall2_nil_cons in HF; contradiction.
+ apply Forall2_nil_cons in HF; easy.
 
  destruct l2 as [| y].
-  apply Forall2_cons_nil in HF; contradiction.
+  apply Forall2_cons_nil in HF; easy.
 
   apply Forall2_cons_cons in HF.
   destruct HF as (HR & HF).
@@ -299,7 +299,7 @@ assert (He : equiv _ R).
  destruct (Bool.bool_dec (f false) (f true)) as [H| H].
   destruct (Hx true) as [Ht| Ht]; [ | left; easy ].
   destruct (Hx false) as [Hf| Hf]; [ | left; easy ].
-  rewrite <- Ht, <- Hf in H; discriminate H.
+  rewrite <- Ht, <- Hf in H; easy.
 
   right; intros H₁; apply H.
   apply Hxy; unfold R.

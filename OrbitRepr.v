@@ -43,7 +43,7 @@ destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
 rewrite <- He in Hs.
 eapply Hinf; [ easy | | eassumption ].
-intros H; rewrite Hn in H; discriminate H.
+intros H; rewrite Hn in H; easy.
 Qed.
 
 Theorem start_with_same : ∀ f os, os = mkos _ f →
@@ -62,7 +62,7 @@ destruct ti, tj.
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
 
-   intros H; discriminate H.
+   intros H; easy.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
@@ -71,7 +71,7 @@ destruct ti, tj.
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
 
-   intros H; discriminate H.
+   intros H; easy.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
@@ -81,7 +81,7 @@ destruct ti, tj.
   rewrite <- rev_path_norm_list, Hnj.
   rewrite rev_path_cons, rev_path_single; easy.
 
-  intros H; discriminate H.
+  intros H; easy.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
@@ -91,7 +91,7 @@ destruct ti, tj.
   rewrite <- rev_path_norm_list, Hnj.
   rewrite rev_path_cons, rev_path_single; easy.
 
-  intros H; discriminate H.
+  intros H; easy.
 
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
@@ -101,7 +101,7 @@ destruct ti, tj.
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
 
-   intros H; discriminate H.
+   intros H; easy.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
@@ -110,7 +110,7 @@ destruct ti, tj.
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
 
-   intros H; discriminate H.
+   intros H; easy.
 Qed.
 
 Theorem not_start_with_rot :
@@ -176,7 +176,7 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
     exists O; simpl.
     rewrite Hfr, <- Hp; easy.
 
-    eapply not_start_with_rot in Hi; try eassumption; [ contradiction | ].
+    eapply not_start_with_rot in Hi; try eassumption; [ easy | ].
     now split.
 
     destruct Hi as (Hnf, Hoo).
@@ -205,7 +205,7 @@ split.
   destruct H as (el, Hel).
   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
   destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  +rewrite rotate_rotate_norm, H₂ in Hel; contradiction.
+  +rewrite rotate_rotate_norm, H₂ in Hel; easy.
 
   +destruct e as (t, d); destruct t, d.
     left; split; [ easy | ].
@@ -246,10 +246,10 @@ split.
   +destruct Hul as (Hnf, Hul); simpl in Hul.
    apply Hnf; easy.
 
-  +contradiction.
+  +easy.
 
 *intros i j Hij p.
- split; [ | contradiction ].
+ split; [ | easy ].
  intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
   destruct j; [ exfalso; apply Hij; easy | clear Hij ].
@@ -266,7 +266,7 @@ split.
      eapply empty_set_not_full_set; [ easy | | eassumption ].
      now split.
 
-     destruct j; [ | destruct j; contradiction ].
+     destruct j; [ | destruct j; easy ].
      eapply empty_set_not_full_set; [ easy | | eassumption ].
      now split.
 
@@ -277,15 +277,15 @@ split.
    destruct j; [ exfalso; apply Hij; easy | clear Hij ].
    destruct j; [ simpl in Hj | ].
     eapply start_with_same in Hi; [ | easy | eassumption ].
-    discriminate Hi.
+    easy.
 
     destruct j; [ simpl in Hj | ].
      eapply start_with_same in Hi; [ | easy | eassumption ].
-     discriminate Hi.
+     easy.
 
-     destruct j; [ simpl in Hj | destruct j; contradiction ].
+     destruct j; [ simpl in Hj | destruct j; easy ].
      eapply start_with_same in Hi; [ | easy | eassumption ].
-     discriminate Hi.
+     easy.
 
   destruct i; [ simpl in Hi | ].
    destruct j; [ clear Hij | ].
@@ -293,16 +293,16 @@ split.
 
     destruct j; [ simpl in Hj | ].
      eapply start_with_same in Hi; [ | easy | eassumption ].
-     discriminate Hi.
+     easy.
 
      destruct j; [ exfalso; apply Hij; easy | clear Hij ].
      destruct j; [ simpl in Hj | ].
       eapply start_with_same in Hi; [ | easy | eassumption ].
-      discriminate Hi.
+      easy.
 
-      destruct j; [ simpl in Hj | destruct j; contradiction ].
+      destruct j; [ simpl in Hj | destruct j; easy ].
       eapply start_with_same in Hi; [ | easy | eassumption ].
-      discriminate Hi.
+      easy.
 
    destruct i; [ simpl in Hi | ].
     destruct j; [ clear Hij | ].
@@ -310,16 +310,16 @@ split.
 
      destruct j; [ simpl in Hj | ].
       eapply start_with_same in Hi; [ | easy | eassumption ].
-      discriminate Hi.
+      easy.
 
       destruct j; [ simpl in Hj | ].
        eapply start_with_same in Hi; [ | easy | eassumption ].
-       discriminate Hi.
+       easy.
 
        destruct j; [ exfalso; apply Hij; easy | clear Hij ].
-       destruct j; [ simpl in Hj | destruct j; contradiction ].
+       destruct j; [ simpl in Hj | destruct j; easy ].
        eapply start_with_same in Hi; [ | easy | eassumption ].
-       discriminate Hi.
+       easy.
 
     destruct i; [ simpl in Hi | ].
      destruct j; [ clear Hij | ].
@@ -327,20 +327,20 @@ split.
 
       destruct j; [ simpl in Hj | ].
        eapply start_with_same in Hi; [ | easy | eassumption ].
-       discriminate Hi.
+       easy.
 
        destruct j; [ simpl in Hj | ].
         eapply start_with_same in Hi; [ | easy | eassumption ].
-        discriminate Hi.
+        easy.
 
         destruct j; [ simpl in Hj | ].
          eapply start_with_same in Hi; [ | easy | eassumption ].
-         discriminate Hi.
+         easy.
 
          destruct j; [ exfalso; apply Hij; easy | clear Hij ].
-         destruct j; contradiction.
+         destruct j; easy.
 
-     destruct i; contradiction.
+     destruct i; easy.
 Qed.
 
 Theorem r_decomposed_4 :
@@ -435,7 +435,7 @@ split.
         now split.
 
  -intros Hul.
-  destruct Hul as [(H, _)| [(H, _)| Hul]]; [ easy | | contradiction ].
+  destruct Hul as [(H, _)| [(H, _)| Hul]]; [ easy | | easy ].
   split.
    destruct H as (His, _).
    apply in_sphere_after_rotate with (e := e) in His.
@@ -448,11 +448,11 @@ split.
    apply rotate_rotate_neg.
 
 *intros i j Hij p.
- split; [ | contradiction ].
+ split; [ | easy ].
  intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
   destruct j; [ exfalso; apply Hij; easy | clear Hij ].
-  destruct j; [ | destruct j; contradiction ].
+  destruct j; [ | destruct j; easy ].
   simpl in Hj.
   eapply not_start_with_rot in Hi; try eassumption; [ | easy ].
   now split.
@@ -463,9 +463,9 @@ split.
     now split.
 
     destruct j; [ apply Hij; easy | clear Hij ].
-    destruct j; contradiction.
+    destruct j; easy.
 
-   destruct i; contradiction.
+   destruct i; easy.
 Qed.
 
 Add Parametric Morphism {A} : (@List.nth (set A))
@@ -541,7 +541,7 @@ split.
        unfold orbit_without_fixpoint in Hoh.
        exfalso; revert Hel.
        apply Hoh; [ easy | ].
-       rewrite Hel₁; intros H; discriminate H.
+       rewrite Hel₁; intros H; easy.
 
       left; left; right.
       split; [ easy | ].
@@ -571,7 +571,7 @@ split.
        simpl in Hr; rewrite Hr in Hel.
        destruct Hnf as (His, Hoh).
        revert Hel; apply Hoh; [ easy | ].
-       rewrite Hel₁; intros H; discriminate H.
+       rewrite Hel₁; intros H; easy.
 
        apply rotate_rev_path in Hr.
        rewrite <- Hr, <- fold_right_app in Hel.
@@ -590,7 +590,7 @@ split.
         rewrite rev_path_involutive in H.
         rewrite <- app_repeat_diag in H.
         rewrite rev_path_app in H; simpl in H.
-        discriminate H.
+        easy.
 
         unfold app; rewrite <- Hel₁; symmetry.
         apply norm_list_idemp.
@@ -612,21 +612,21 @@ split.
  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
   apply Hoe; exists (ạ :: []); apply rotate_neg_rotate.
 
-  split; [ | contradiction ].
+  split; [ | easy ].
   intros (Hi, Hj).
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; apply Hij; easy | clear Hij ].
-   destruct j; [ simpl in Hj | destruct j; contradiction ].
+   destruct j; [ simpl in Hj | destruct j; easy ].
    eapply decompose_2a_contrad_case; unfold union; try eassumption.
    now split.
 
-   destruct i; [ simpl in Hi | destruct i; contradiction ].
+   destruct i; [ simpl in Hi | destruct i; easy ].
    destruct j.
     eapply decompose_2a_contrad_case; unfold union; try eassumption.
     now split.
 
     destruct j; [ apply Hij; easy | clear Hij ].
-    destruct j; contradiction.
+    destruct j; easy.
 Qed.
 
 Theorem r_decomposed_2_b :

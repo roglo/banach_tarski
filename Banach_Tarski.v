@@ -45,7 +45,7 @@ split.
    apply Hb.
 
    unfold intersection, set_eq; subst s; intros (x, y, z).
-   split; [ intros (H₁, H₂) | contradiction ].
+   split; [ intros (H₁, H₂) | easy ].
    simpl in H₁, H₂.
    unfold empty_set; simpl.
    destruct H₁ as (H₁, H₃).

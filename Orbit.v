@@ -70,7 +70,7 @@ apply norm_list_app_is_nil in H.
  apply rev_path_eq_eq in H.
  rewrite rev_path_involutive, rev_path_app in H.
  apply not_eq_sym in Hd.
- injection H; intros; contradiction.
+ injection H; intros; easy.
 
  rewrite norm_list_idemp; easy.
 
@@ -164,7 +164,7 @@ destruct el₂ as [| e₂].
 
  apply same_orbit_rotate with (e := negf e) in Hso.
  rewrite rotate_neg_rotate in Hso.
- assert (Hn : norm_list el₁ ≠ []) by (rewrite Hel₂; intros H; discriminate H).
+ assert (Hn : norm_list el₁ ≠ []) by (now rewrite Hel₂).
  pose proof His el₁ (rotate (negf e) p₁) Hso Hn.
  intros Hr; apply H; clear H.
  rewrite <- Hr at 1.

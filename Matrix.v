@@ -266,10 +266,10 @@ destruct (norm_list_dec el) as [H₁| H₁]; [ rewrite H₁; easy | ].
 destruct H₁ as (el₁ & t & d & el₂ & H₁).
 subst el.
 rewrite rotate_cancel_in, norm_list_cancel_in.
-destruct len; [ destruct el₁; discriminate Hlen | ].
+destruct len; [ destruct el₁; easy | ].
 destruct len.
- destruct el₁; [ discriminate Hlen | simpl in Hlen ].
- destruct el₁; discriminate Hlen.
+ destruct el₁; [ easy | simpl in Hlen ].
+ destruct el₁; easy.
 
  apply IHlen with len.
   transitivity (S len); apply Nat.lt_succ_diag_r.
@@ -283,8 +283,8 @@ destruct len.
    simpl in Hlen; simpl.
    apply Nat.succ_inj in Hlen.
    destruct len.
-    destruct el₁; [ discriminate Hlen | simpl in Hlen ].
-    destruct el₁; discriminate Hlen.
+    destruct el₁; [ easy | simpl in Hlen ].
+    destruct el₁; easy.
 
     f_equal.
     apply IHel₁; easy.

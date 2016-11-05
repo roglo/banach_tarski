@@ -87,7 +87,7 @@ Theorem included_in_empty : ∀ A (s := set_equiv) (E : set A),
 Proof.
 intros * HE.
 intros x.
-split; intros Hx; [ | contradiction ].
+split; intros Hx; [ | easy ].
 apply HE in Hx; easy.
 Qed.
 
@@ -150,7 +150,7 @@ Proof.
 intros.
 subst s; intros x.
 split; intros H; [ | left; easy ].
-destruct H as [H| H]; [ easy | contradiction ].
+destruct H as [H| H]; [ easy | easy ].
 Qed.
 
 Theorem intersection_empty_l : ∀ A (s := set_equiv) (F : set A),
@@ -158,7 +158,7 @@ Theorem intersection_empty_l : ∀ A (s := set_equiv) (F : set A),
 Proof.
 intros.
 subst s; intros x.
-split; intros H; [ destruct H as (H, _); contradiction | contradiction ].
+split; intros H; [ destruct H as (H, _); easy | easy ].
 Qed.
 
 Theorem intersection_empty_r : ∀ A (s := set_equiv) (F : set A),
@@ -166,7 +166,7 @@ Theorem intersection_empty_r : ∀ A (s := set_equiv) (F : set A),
 Proof.
 intros.
 subst s; intros x.
-split; intros H; [ destruct H as (_, H); contradiction | contradiction ].
+split; intros H; [ destruct H as (_, H); easy | easy ].
 Qed.
 
 Theorem intersection_comm : ∀ A (s := set_equiv) (E F : set A),
@@ -279,7 +279,7 @@ induction P₂ as [| Q]; intros.
   clear - H.
   induction P₁ as [| R P₁].
    simpl in H; simpl.
-   destruct H as [H| H]; [ right; easy | contradiction ].
+   destruct H as [H| H]; [ right; easy | easy ].
 
    simpl in H.
    destruct H as [H| H]; [ simpl; left; left; easy | ].
@@ -293,7 +293,7 @@ induction P₂ as [| Q]; intros.
   clear - H.
   induction P₁ as [| R P₁].
    simpl in H; simpl; left.
-   destruct H; [ contradiction | easy ].
+   destruct H; [ easy | easy ].
 
    simpl in H; simpl.
    destruct H.
@@ -309,9 +309,9 @@ Proof.
 intros A P i x Hi H.
 revert P H Hi.
 induction i; intros P H Hi.
- destruct P as [| E P]; [ contradiction | left; easy ].
+ destruct P as [| E P]; [ easy | left; easy ].
 
- destruct P as [| E P]; [ contradiction | simpl in Hi ].
+ destruct P as [| E P]; [ easy | simpl in Hi ].
  apply Nat.succ_lt_mono in Hi.
  right; apply IHi; easy.
 Qed.
@@ -334,7 +334,7 @@ Theorem union_list_intersection : ∀ A (S : set A) SL x,
   → x ∈ ⋃ map (intersection S) SL.
 Proof.
 intros A P QL * HP HQL.
-induction QL as [| Q QL]; intros; [ contradiction | simpl ].
+induction QL as [| Q QL]; intros; [ easy | simpl ].
 destruct HQL as [HQ| HQL]; [ left; split; easy | right ].
 apply IHQL, HQL.
 Qed.
@@ -348,7 +348,7 @@ intros F HF.
 rewrite HE.
 clear - HF.
 revert F HF.
-induction EL as [| E EL]; intros; [ contradiction | ].
+induction EL as [| E EL]; intros; [ easy | ].
 destruct HF as [HF| HF]; [ left; subst E; easy | ].
 right; eapply IHEL; eassumption.
 Qed.
@@ -362,12 +362,12 @@ split; intros Hx.
  generalize Hx; intros Hxl.
  apply HEL in Hxl.
  clear -Hx Hxl.
- induction EL as [| E₁ EL]; intros; [ contradiction | ].
+ induction EL as [| E₁ EL]; intros; [ easy | ].
  destruct Hxl as [Hxl| Hxl]; [ left; split; easy | ].
  right; apply IHEL; easy.
 
  clear -Hx.
- induction EL as [| E₁ EL]; intros; [ contradiction | ].
+ induction EL as [| E₁ EL]; intros; [ easy | ].
  destruct Hx as [(Hx, _)| Hx]; [ easy | ].
  apply IHEL, Hx.
 Qed. 

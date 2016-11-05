@@ -41,30 +41,30 @@ split.
  destruct i.
   unfold intersection, set_eq; simpl.
   intros x.
-  split; [ | contradiction ].
+  split; [ | easy ].
   intros (H₁, H₂).
   destruct j; [ apply Hij; easy | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   eapply Hi with (i := O) (j := S (S j)); [ intros H; discriminate H | ].
+   eapply Hi with (i := O) (j := S (S j)); [ intros H; easy | ].
    unfold intersection; simpl.
    split; eassumption.
 
-   eapply Hi with (i := 1%nat) (j := S (S j)); [ intros H; discriminate H | ].
+   eapply Hi with (i := 1%nat) (j := S (S j)); [ intros H; easy | ].
    unfold intersection; simpl.
    split; eassumption.
 
   unfold intersection, union, set_eq; simpl.
   intros x.
-  split; [ | contradiction ].
+  split; [ | easy ].
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    eapply Hi with (i := O) (j := S (S i)); [ intros H; discriminate H | ].
+    eapply Hi with (i := O) (j := S (S i)); [ intros H; easy | ].
     unfold intersection; simpl.
     split; eassumption.
 
     eapply Hi with (i := 1%nat) (j := S (S i)).
-     intros H; discriminate H.
+     intros H; easy.
 
      unfold intersection; simpl.
      split; eassumption.
@@ -111,36 +111,36 @@ split.
  destruct i.
   unfold intersection, union, subtract, set_eq; simpl.
   intros x.
-  split; [ | contradiction ].
+  split; [ | easy ].
   intros (H₁, H₂).
   destruct j; [ apply Hij; easy | clear Hij ].
   destruct H₁ as [H₁| H₁].
-   eapply Hi with (i := O) (j := S j); [ intros H; discriminate H | ].
+   eapply Hi with (i := O) (j := S j); [ intros H; easy | ].
    unfold intersection; simpl.
    split; [ eassumption | ].
    destruct j; [ destruct H₂; easy | easy ].
 
    eapply Hi with (i := 1%nat) (j := S j).
-    destruct j; [ destruct H₂; contradiction | intros H; discriminate H ].
+    destruct j; [ destruct H₂; easy | intros H; easy ].
 
     unfold intersection; simpl.
     split; [ apply HB; eassumption | ].
-    destruct j; [ destruct H₂; contradiction | easy ].
+    destruct j; [ destruct H₂; easy | easy ].
 
   unfold intersection, union, subtract, set_eq; simpl.
   intros x.
-  split; [ | contradiction ].
+  split; [ | easy ].
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
-    eapply Hi with (i := O) (j := S i); [ intros H; discriminate H | ].
+    eapply Hi with (i := O) (j := S i); [ intros H; easy | ].
     unfold intersection; simpl.
     split; [ eassumption | ].
     destruct i; [ destruct H₁; easy | easy ].
 
     eapply Hi with (i := 1%nat) (j := S i).
-     destruct i; [ | intros H; discriminate H ].
-     destruct H₁; contradiction.
+     destruct i; [ | intros H; easy ].
+     destruct H₁; easy.
 
      unfold intersection; simpl.
      split; [ apply HB; eassumption | ].
@@ -187,7 +187,7 @@ split.
  intros * Hij.
  unfold intersection, set_eq; subst s; simpl.
  intros x.
- split; intros H; [ | contradiction ].
+ split; intros H; [ | easy ].
  destruct H as (H₁, H₂).
  rewrite nth_set_app in H₁, H₂.
  destruct (lt_dec i (length P₁)) as [H₃| H₃].
@@ -204,7 +204,7 @@ split.
      eapply nth_set_union_list; eassumption.
 
      apply Nat.nlt_ge in H₅.
-     rewrite nth_overflow in H₂; [ contradiction | easy ].
+     rewrite nth_overflow in H₂; [ easy | easy ].
 
   apply Nat.nlt_ge in H₃.
   destruct (lt_dec j (length P₁)) as [H₄| H₄].
@@ -218,7 +218,7 @@ split.
      eapply nth_set_union_list; eassumption.
 
      apply Nat.nlt_ge in H₅.
-     rewrite nth_overflow in H₁; [ contradiction | easy ].
+     rewrite nth_overflow in H₁; [ easy | easy ].
 
    apply Nat.nlt_ge in H₄.
    eapply HP₂; [ | split; [ apply H₁ | apply H₂] ].
@@ -228,7 +228,7 @@ split.
    rewrite Nat.add_sub_assoc in H; [ | easy ].
    rewrite Nat.add_comm, Nat.add_sub in H.
    rewrite Nat.add_comm, Nat.add_sub in H.
-   contradiction.
+   easy.
 Qed.
 
 Theorem is_partition_single : ∀ A (s := @set_equiv A) E, is_partition E [E].
@@ -239,11 +239,11 @@ intros * Hij.
 destruct i.
  destruct j; [ exfalso; apply Hij; easy | ].
  destruct j.
-  split; [ intros (_, H); contradiction | contradiction ].
-  split; [ intros (_, H); contradiction | contradiction ].
+  split; [ intros (_, H); easy | easy ].
+  split; [ intros (_, H); easy | easy ].
 
- split; [ intros (H, _) | contradiction ].
- destruct i; contradiction.
+ split; [ intros (H, _) | easy ].
+ destruct i; easy.
 Qed.
 
 Theorem is_partition_empty : ∀ A (s := set_equiv) (E : set A),

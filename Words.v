@@ -23,7 +23,7 @@ Definition negf '(FE t d) := FE t (negb d).
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
 intros.
-destruct l1, l2; try (left; easy); right; intros H; discriminate H.
+destruct l1, l2; try (left; easy); right; intros H; easy.
 Defined.
 
 Theorem free_elem_dec : ∀ e₁ e₂ : free_elem, { e₁ = e₂ } + { e₁ ≠ e₂ }.
@@ -62,9 +62,9 @@ destruct e₁ as (x₁, d₁).
 destruct e₂ as (x₂, d₂); simpl.
 destruct (letter_dec x₁ x₂) as [Hx| Hx].
  destruct (Bool.bool_dec d₁ d₂) as [Hd| Hd]; [ | left; constructor ].
- right; intros H; contradiction.
+ right; intros H; easy.
 
- right; intros H; contradiction.
+ right; intros H; easy.
 Defined.
 
 Theorem letter_opp_inv : ∀ x d, letter_opp (FE x d) (FE x (negb d)).
@@ -82,9 +82,9 @@ Proof.
 intros x₁ d₁ x₂ d₂.
 split; intros H.
  unfold letter_opp in H.
- destruct (letter_dec x₁ x₂) as [H₁| H₁]; [ | contradiction ].
+ destruct (letter_dec x₁ x₂) as [H₁| H₁]; [ | easy ].
  split; [ easy | ].
- destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ contradiction | ].
+ destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ easy | ].
  apply neq_negb, not_eq_sym; easy.
 
  destruct H; subst x₂ d₂.
@@ -142,5 +142,5 @@ destruct e₁ as (t₁, d₁).
 destruct e₂ as (t₂, d₂).
 simpl in Hn.
 injection Hn; intros H₁ H₂; subst.
-apply negb_eq_eq in H₁; subst d₁; easy.
+now apply negb_eq_eq in H₁; subst d₁.
 Qed.

@@ -24,13 +24,13 @@ Theorem norm_list_no_consec : ∀ e el el₁ el₂,
 Proof.
 intros e el el₁ el₂.
 revert el₁.
-induction el as [| e₁]; intros; [ intros H; destruct el₁; discriminate H | ].
+induction el as [| e₁]; intros; [ intros H; destruct el₁; easy | ].
 simpl; remember (norm_list el) as nl eqn:Hnl; symmetry in Hnl.
 destruct nl as [| e₂].
  clear; intros H.
- destruct el₁ as [| e₂]; intros; [ discriminate H | simpl in H ].
+ destruct el₁ as [| e₂]; intros; [ easy | simpl in H ].
  injection H; clear H; intros; subst e₂.
- destruct el₁; discriminate H.
+ destruct el₁; easy.
 
  destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
   intros H; subst nl.
@@ -204,7 +204,7 @@ remember (e₁ :: el) as el₁ eqn:Hel.
 simpl in Hn.
 remember (norm_list el₁) as el₂ eqn:Hel₁; symmetry in Hel₁.
 destruct el₂ as [| e₂].
- injection Hn; clear Hn; intros; subst; discriminate H.
+ injection Hn; clear Hn; intros; subst; easy.
 
  destruct (letter_opp_dec e e₂) as [H₁| H₁].
   apply letter_opp_negf in H₁; subst e el₂.
@@ -263,7 +263,7 @@ destruct el as [| e₁]; [ easy | ].
 destruct (letter_opp_dec e e₁) as [H| H]; [ | easy ].
 apply letter_opp_negf in H; subst e.
 exfalso.
-destruct n; [ discriminate Hel | ].
+destruct n; [ easy | ].
 injection Hel; clear Hel; intros Hel H.
 revert H; apply no_fixpoint_negf.
 Qed.
