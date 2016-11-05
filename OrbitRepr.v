@@ -401,7 +401,7 @@ split.
      apply Hoe.
      now exists (negf e :: []).
 
-     rewrite <- H, Hel; easy.
+     now rewrite <- H, Hel.
 
    +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
      left; split; [ easy | ].
@@ -412,17 +412,17 @@ split.
      split.
       split.
        destruct Hnf as (His, _).
-       apply in_sphere_after_rotate; easy.
+       now apply in_sphere_after_rotate.
 
        intros el₂ p₁ Hp Hn.
        apply Hnf; [ | easy ].
        destruct Hp as (el₃ & Hp).
        exists (el₃ ++ [negf e]).
-       rewrite fold_right_app; easy.
+       now rewrite fold_right_app.
 
       assert (H : f p = f (rotate (negf e) p)).
        apply Hoe.
-       exists (negf e :: []); easy.
+       now exists (negf e :: []).
 
        simpl; rewrite <- H.
        exists (negf e :: el), (e₁ :: el₁); simpl.
@@ -430,7 +430,7 @@ split.
        destruct (letter_opp_dec (negf e) e₁) as [H₂| H₂].
         exfalso.
         apply letter_opp_negf in H₂.
-        apply H₁, negf_eq_eq; easy.
+        now apply H₁, negf_eq_eq.
 
         now split.
 
@@ -439,7 +439,7 @@ split.
   split.
    destruct H as (His, _).
    apply in_sphere_after_rotate with (e := e) in His.
-   rewrite rotate_rotate_neg in His; easy.
+   now rewrite rotate_rotate_neg in His.
 
    intros el p₁ Hso Hn.
    apply H; [ | easy ].
@@ -452,7 +452,7 @@ split.
  intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
   destruct j; [ exfalso; now apply Hij | clear Hij ].
-  destruct j; [ | destruct j; easy ].
+  destruct j; [ | now destruct j ].
   simpl in Hj.
   eapply not_start_with_rot in Hi; try eassumption; [ | easy ].
   now split.
@@ -462,10 +462,10 @@ split.
     eapply not_start_with_rot in Hj; try eassumption; [ | easy ].
     now split.
 
-    destruct j; [ apply Hij; easy | clear Hij ].
-    destruct j; easy.
+    destruct j; [ now apply Hij | clear Hij ].
+    now destruct j.
 
-   destruct i; easy.
+   now destruct i.
 Qed.
 
 Add Parametric Morphism {A} : (@List.nth (set A))
@@ -517,8 +517,8 @@ split.
       split.
        split.
         destruct Hnf as (His, Hnf).
-        split; [ apply in_sphere_after_rotate; easy | ].
-        apply no_fixpoint_after_rotate; easy.
+        split; [ now apply in_sphere_after_rotate | ].
+        now apply no_fixpoint_after_rotate.
 
         subst os; simpl.
         rewrite Hfr.
@@ -534,7 +534,7 @@ split.
        rewrite Hfr in Hoo; simpl in Hoo.
        apply f_equal with (f := rotate (FE la false)) in Hoo.
        do 2 rewrite rotate_rotate_neg in Hoo.
-       destruct n; [ | exists n; easy ].
+       destruct n; [ | now exists n ].
        simpl in Hoo.
        rewrite Hoo in Hel.
        destruct Hnf as (His & Hoh).
@@ -552,8 +552,8 @@ split.
      split; simpl.
       split.
        destruct Hnf as (His & Hnf).
-       split; [ apply in_sphere_after_rotate; easy | ].
-       apply no_fixpoint_after_rotate; easy.
+       split; [ now apply in_sphere_after_rotate | ].
+       now apply no_fixpoint_after_rotate.
 
        subst os; simpl; rewrite Hfr.
        exists (ạ⁻¹ :: el), (norm_list el).
@@ -603,10 +603,10 @@ split.
   destruct HE as (((His & Hoo) & HE) & HB).
   split.
    apply in_sphere_after_rotate with (e := ạ) in His.
-   rewrite rotate_rotate_neg in His; easy.
+   now rewrite rotate_rotate_neg in His.
 
    apply no_fixpoint_after_rotate with (e := ạ) in Hoo.
-   rewrite rotate_rotate_neg in Hoo; easy.
+   now rewrite rotate_rotate_neg in Hoo.
 
 *intros i j Hij p.
  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
@@ -616,17 +616,17 @@ split.
   intros (Hi, Hj).
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; now apply Hij | clear Hij ].
-   destruct j; [ simpl in Hj | destruct j; easy ].
+   destruct j; [ simpl in Hj | now destruct j ].
    eapply decompose_2a_contrad_case; unfold union; try eassumption.
    now split.
 
-   destruct i; [ simpl in Hi | destruct i; easy ].
+   destruct i; [ simpl in Hi | now destruct i ].
    destruct j.
     eapply decompose_2a_contrad_case; unfold union; try eassumption.
     now split.
 
-    destruct j; [ apply Hij; easy | clear Hij ].
-    destruct j; easy.
+    destruct j; [ now apply Hij | clear Hij ].
+    now destruct j.
 Qed.
 
 Theorem r_decomposed_2_b :
