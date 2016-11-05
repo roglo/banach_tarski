@@ -26,7 +26,7 @@ constructor; [ | constructor ].
 exists (Xtransl 0); unfold set_eq; simpl.
 unfold xtransl; intros (x, y, z).
 rewrite Rminus_0_r.
-reflexivity.
+easy.
 Qed.
 
 Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).
@@ -84,8 +84,8 @@ induction PE as [| E₁ PE]; intros.
    induction PF as [| F₁ PF]; intros.
     destruct Hx as (_, Hx).
     destruct i; simpl in Hx; simpl.
-     rewrite Hf in Hx; [ contradiction | left; reflexivity ].
-     rewrite Hf in Hx; [ contradiction | left; reflexivity ].
+     rewrite Hf in Hx; [ contradiction | left; easy ].
+     rewrite Hf in Hx; [ contradiction | left; easy ].
 
     destruct i; simpl in Hx; simpl; [ assumption | ].
     apply IHPF; assumption.
@@ -96,7 +96,7 @@ induction PE as [| E₁ PE]; intros.
   remember (i - length PF)%nat as j eqn:Hj.
   assert (H : (i = j + length PF)%nat).
    rewrite Hj.
-   rewrite Nat.sub_add; [ reflexivity | assumption ].
+   rewrite Nat.sub_add; [ easy | assumption ].
 
    subst i; clear Hi Hj.
    destruct PF as [| F₁ PF].
@@ -110,7 +110,7 @@ induction PE as [| E₁ PE]; intros.
       induction (combine fl PE) as [| (y, z) l]; [ contradiction | ].
       apply IHl, Hx.
 
-     rewrite Hf in Hx; [ | left; reflexivity ].
+     rewrite Hf in Hx; [ | left; easy ].
      rewrite intersection_empty_r in Hx.
      contradiction.
 
@@ -241,7 +241,7 @@ split.
 
   destruct gl as [| g₁ gl]; [ discriminate Hlen3 | ].
   rewrite HPEU; simpl.
-  rewrite union_list_app; [ | reflexivity ].
+  rewrite union_list_app; [ | easy ].
   simpl in Hlen3; apply Nat.succ_inj in Hlen3.
   apply union_morph.
    pose proof union_intersection_self point E₁ (map (app_gr_inv g₁) P'F).
@@ -264,7 +264,7 @@ split.
 
    destruct PF as [| F₁ PF]; [ discriminate Hlen1 |  ].
    simpl in Hlen1; apply Nat.succ_inj in Hlen1.
-   eapply IHPE; [ | | | eassumption | assumption | ]; try reflexivity.
+   eapply IHPE; [ | | | eassumption | assumption | ]; try easy.
     rewrite HPFU in HUP'F.
     intros p Hp; apply HUP'F.
     right; assumption.
@@ -274,8 +274,8 @@ split.
     assumption.
 
  intros i j Hij.
- erewrite partition_combine_nth; [ | reflexivity | | ].
-  erewrite partition_combine_nth; [ | reflexivity | | ].
+ erewrite partition_combine_nth; [ | easy | | ].
+  erewrite partition_combine_nth; [ | easy | | ].
    remember (length P'F) as len eqn:Hlen.
    destruct len.
     symmetry in Hlen.
@@ -283,10 +283,10 @@ split.
     subst fl.
     destruct gl as [| g₁ gl].
      simpl; unfold id, Datatypes.id at 2; simpl.
-     do 2 rewrite intersection_empty_r; reflexivity.
+     do 2 rewrite intersection_empty_r; easy.
 
      simpl; unfold app_gr_inv, Nat.div; rewrite app_gr_empty_set.
-     do 2 rewrite intersection_empty_r; reflexivity.
+     do 2 rewrite intersection_empty_r; easy.
 
     destruct HPE as (HPEU, HPEI).
     destruct HP'F as (HP'FU, HP'FI).
@@ -314,11 +314,11 @@ split.
        apply Nat.nlt_ge in Hil.
        rewrite Hlen3 in Hil.
        rewrite nth_overflow; [ | assumption ].
-       do 2 rewrite intersection_empty_l; reflexivity.
+       do 2 rewrite intersection_empty_l; easy.
 
      rewrite intersection_shuffle0, intersection_assoc.
      rewrite HPEI; [ | assumption ].
-     do 2 rewrite intersection_empty_l; reflexivity.
+     do 2 rewrite intersection_empty_l; easy.
 
    subst fl; rewrite map_length; assumption.
 
@@ -360,11 +360,11 @@ intros * Hpe Hpa.
 destruct Hpa as (Hpau, Hpai).
 split.
  rewrite Hpau; clear -Hpe.
- induction Hpe; [ reflexivity | | | ].
-  simpl; rewrite IHHpe; reflexivity.
+ induction Hpe; [ easy | | | ].
+  simpl; rewrite IHHpe; easy.
 
   simpl; rewrite union_comm, <- union_assoc.
-  apply union_morph; [ reflexivity | apply union_comm ].
+  apply union_morph; [ easy | apply union_comm ].
 
   etransitivity; eassumption.
 
@@ -433,18 +433,18 @@ Proof.
 intros * Hlen.
 unfold partition_combine; simpl.
 revert fl PF Hlen.
-induction PE as [| E₁ PE]; intros; [ destruct fl; reflexivity | simpl ].
+induction PE as [| E₁ PE]; intros; [ destruct fl; easy | simpl ].
 destruct fl as [| f₁ fl]; [ discriminate Hlen | ].
 destruct PF as [| F₁ FL].
  unfold partition_combine; simpl.
  rewrite Nat.mul_0_r.
- induction (combine fl PE) as [| (x, y) l]; [ reflexivity | apply IHl ].
+ induction (combine fl PE) as [| (x, y) l]; [ easy | apply IHl ].
 
  simpl in Hlen; simpl; f_equal.
  rewrite app_length, map_length.
  apply Nat.succ_inj in Hlen.
  apply IHPE with (PF := F₁ :: FL) in Hlen.
- simpl in Hlen; rewrite Hlen; reflexivity.
+ simpl in Hlen; rewrite Hlen; easy.
 Qed.
 
 Theorem partition_combine_swi_length :
@@ -496,7 +496,7 @@ assert
  clear HPE HP₁F.
  revert P₁F Hlen1 HEF.
  induction PE as [| E₁ PE]; intros.
-  exists []; split; [ reflexivity | ].
+  exists []; split; [ easy | ].
   symmetry in Hlen1; apply length_zero_iff_nil in Hlen1; subst P₁F.
   intros i; simpl.
   do 2 rewrite match_id; simpl.
@@ -509,7 +509,7 @@ assert
   apply IHPE in HEF; [ | assumption ].
   destruct HEF as (gl & Hlen3 & HEF).
   exists (g₁ :: gl).
-  split; [ simpl; rewrite Hlen3; reflexivity | ].
+  split; [ simpl; rewrite Hlen3; easy | ].
   intros i; simpl.
   destruct i; [ assumption | apply HEF ].
 
@@ -521,7 +521,7 @@ assert
   clear HPG HP₂F.
   revert P₂F Hlen2 HFG.
   induction PG as [| G₁ PG]; intros.
-   exists []; split; [ reflexivity | ].
+   exists []; split; [ easy | ].
    apply length_zero_iff_nil in Hlen2; subst P₂F.
    intros i; simpl.
    do 2 rewrite match_id; simpl.
@@ -534,11 +534,11 @@ assert
    apply IHPG in HFG; [ | assumption ].
    destruct HFG as (hl & Hlen3 & HFG).
    exists (gr_inv h₁ :: hl).
-   split; [ simpl; rewrite Hlen3; reflexivity | ].
+   split; [ simpl; rewrite Hlen3; easy | ].
    intros i; simpl.
    destruct i; [ | apply HFG ].
    rewrite <- HhFG, fold_app_gr_inv.
-   rewrite app_gr_inv_l; reflexivity.
+   rewrite app_gr_inv_l; easy.
 
   destruct Hgl as (gl & Hlen3 & Hgl).
   destruct Hhl as (hl & Hlen4 & Hhl).
@@ -599,7 +599,7 @@ assert
            (* using transitivity instead *)
            etransitivity.
             apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
-            apply app_gr_morph_Proper; [ reflexivity | ].
+            apply app_gr_morph_Proper; [ easy | ].
             apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
             symmetry; apply Hhl.
 

@@ -42,7 +42,7 @@ intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
 rewrite <- He in Hs.
-eapply Hinf; [ reflexivity | | eassumption ].
+eapply Hinf; [ easy | | eassumption ].
 intros H; rewrite Hn in H; discriminate H.
 Qed.
 
@@ -54,61 +54,61 @@ destruct Hsi as (Hinf & eli & eli₁ & Hni & Hsi); simpl in Hsi.
 destruct Hsj as (Hjnf & elj & elj₁ & Hnj & Hsj); simpl in Hsj.
 eapply rotate_rev_path in Hsj.
 destruct ti, tj.
-+destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
++destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ reflexivity | assumption ].
+   apply Hjnf; [ easy | assumption ].
 
    rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; reflexivity.
+   rewrite rev_path_cons, rev_path_single; easy.
 
    intros H; discriminate H.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ reflexivity | assumption ].
+   apply Hjnf; [ easy | assumption ].
 
    rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; reflexivity.
+   rewrite rev_path_cons, rev_path_single; easy.
 
    intros H; discriminate H.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
   intros el Hn.
-  apply Hjnf; [ reflexivity | assumption ].
+  apply Hjnf; [ easy | assumption ].
 
   rewrite <- rev_path_norm_list, Hnj.
-  rewrite rev_path_cons, rev_path_single; reflexivity.
+  rewrite rev_path_cons, rev_path_single; easy.
 
   intros H; discriminate H.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
   intros el Hn.
-  apply Hjnf; [ reflexivity | assumption ].
+  apply Hjnf; [ easy | assumption ].
 
   rewrite <- rev_path_norm_list, Hnj.
-  rewrite rev_path_cons, rev_path_single; reflexivity.
+  rewrite rev_path_cons, rev_path_single; easy.
 
   intros H; discriminate H.
 
-+destruct di, dj; [ reflexivity | exfalso | exfalso | reflexivity ].
++destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ reflexivity | assumption ].
+   apply Hjnf; [ easy | assumption ].
 
    rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; reflexivity.
+   rewrite rev_path_cons, rev_path_single; easy.
 
    intros H; discriminate H.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ reflexivity | assumption ].
+   apply Hjnf; [ easy | assumption ].
 
    rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; reflexivity.
+   rewrite rev_path_cons, rev_path_single; easy.
 
    intros H; discriminate H.
 Qed.
@@ -123,7 +123,7 @@ destruct Hs as (Hnf & el & el₁ & Hn & Hs); simpl in Hs.
 destruct Hr as (Hrnf & elr & elr₁ & Hnr & Hsr); simpl in Hsr.
 assert (Hr : f p = f (rotate (negf e) p)).
  apply Hoe.
- exists (negf e :: []); reflexivity.
+ exists (negf e :: []); easy.
 
  rewrite <- Hr in Hsr.
  eapply rotate_rev_path in Hsr.
@@ -151,7 +151,7 @@ assert (Hr : f p = f (rotate (negf e) p)).
  apply norm_list_app_is_nil in H.
  2 : symmetry; apply norm_list_idemp.
  2 : rewrite <- rev_path_norm_list; eapply norm_list_is_cons in Hnr.
- 2 : rewrite Hnr; reflexivity.
+ 2 : rewrite Hnr; easy.
  apply -> rev_path_eq_eq in H.
  rewrite H, Hn in Hnr.
  revert Hnr; apply norm_list_no_start2.
@@ -174,7 +174,7 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
     destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
     destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
     exists O; simpl.
-    rewrite Hfr, <- Hp; reflexivity.
+    rewrite Hfr, <- Hp; easy.
 
     eapply not_start_with_rot in Hi; try eassumption; [ contradiction | ].
     split; assumption.
@@ -185,7 +185,7 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
     remember S as g; subst os; simpl in Hoo; simpl; subst g.
     rewrite Hfr; simpl.
     exists (S n).
-    rewrite Hoo; reflexivity.
+    rewrite Hoo; easy.
 Qed.
 
 Theorem r_decomposed_5 :
@@ -211,22 +211,22 @@ split.
     left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
 
     right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
 
     right; right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
 
     right; right; right; left; split; [ assumption | ].
     exists (rev_path el), (rev_path el₂).
     split; [ | apply rotate_rev_path; assumption ].
-    rewrite <- rev_path_norm_list, H₂, rev_path_app; reflexivity.
+    rewrite <- rev_path_norm_list, H₂, rev_path_app; easy.
 
  -intros Hul.
   unfold union_list in Hul; simpl in Hul; unfold union in Hul.
@@ -252,92 +252,92 @@ split.
  split; [ | contradiction ].
  intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
-  destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+  destruct j; [ exfalso; apply Hij; easy | clear Hij ].
   destruct Hi as (Hinf & Hi); simpl in Hi.
   destruct j.
-   eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
+   eapply empty_set_not_full_set; [ easy | | eassumption ].
    split; assumption.
 
    destruct j.
-    eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
+    eapply empty_set_not_full_set; [ easy | | eassumption ].
     split; assumption.
 
     destruct j.
-     eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
+     eapply empty_set_not_full_set; [ easy | | eassumption ].
      split; assumption.
 
      destruct j; [ | destruct j; contradiction ].
-     eapply empty_set_not_full_set; [ reflexivity | | eassumption ].
+     eapply empty_set_not_full_set; [ easy | | eassumption ].
      split; assumption.
 
  destruct i; [ simpl in Hi | ].
   destruct j; [ clear Hij | ].
-   eapply empty_set_not_full_set; [ reflexivity | eassumption | eassumption ].
+   eapply empty_set_not_full_set; [ easy | eassumption | eassumption ].
 
-   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+   destruct j; [ exfalso; apply Hij; easy | clear Hij ].
    destruct j; [ simpl in Hj | ].
-    eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+    eapply start_with_same in Hi; [ | easy | eassumption ].
     discriminate Hi.
 
     destruct j; [ simpl in Hj | ].
-     eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+     eapply start_with_same in Hi; [ | easy | eassumption ].
      discriminate Hi.
 
      destruct j; [ simpl in Hj | destruct j; contradiction ].
-     eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+     eapply start_with_same in Hi; [ | easy | eassumption ].
      discriminate Hi.
 
   destruct i; [ simpl in Hi | ].
    destruct j; [ clear Hij | ].
-    eapply empty_set_not_full_set; [ reflexivity | | ]; eassumption.
+    eapply empty_set_not_full_set; [ easy | | ]; eassumption.
 
     destruct j; [ simpl in Hj | ].
-     eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+     eapply start_with_same in Hi; [ | easy | eassumption ].
      discriminate Hi.
 
-     destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+     destruct j; [ exfalso; apply Hij; easy | clear Hij ].
      destruct j; [ simpl in Hj | ].
-      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+      eapply start_with_same in Hi; [ | easy | eassumption ].
       discriminate Hi.
 
       destruct j; [ simpl in Hj | destruct j; contradiction ].
-      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+      eapply start_with_same in Hi; [ | easy | eassumption ].
       discriminate Hi.
 
    destruct i; [ simpl in Hi | ].
     destruct j; [ clear Hij | ].
-     eapply empty_set_not_full_set; [ reflexivity | | ]; eassumption.
+     eapply empty_set_not_full_set; [ easy | | ]; eassumption.
 
      destruct j; [ simpl in Hj | ].
-      eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+      eapply start_with_same in Hi; [ | easy | eassumption ].
       discriminate Hi.
 
       destruct j; [ simpl in Hj | ].
-       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+       eapply start_with_same in Hi; [ | easy | eassumption ].
        discriminate Hi.
 
-       destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+       destruct j; [ exfalso; apply Hij; easy | clear Hij ].
        destruct j; [ simpl in Hj | destruct j; contradiction ].
-       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+       eapply start_with_same in Hi; [ | easy | eassumption ].
        discriminate Hi.
 
     destruct i; [ simpl in Hi | ].
      destruct j; [ clear Hij | ].
-      eapply empty_set_not_full_set; [ reflexivity | | ]; eassumption.
+      eapply empty_set_not_full_set; [ easy | | ]; eassumption.
 
       destruct j; [ simpl in Hj | ].
-       eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+       eapply start_with_same in Hi; [ | easy | eassumption ].
        discriminate Hi.
 
        destruct j; [ simpl in Hj | ].
-        eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+        eapply start_with_same in Hi; [ | easy | eassumption ].
         discriminate Hi.
 
         destruct j; [ simpl in Hj | ].
-         eapply start_with_same in Hi; [ | reflexivity | eassumption ].
+         eapply start_with_same in Hi; [ | easy | eassumption ].
          discriminate Hi.
 
-         destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+         destruct j; [ exfalso; apply Hij; easy | clear Hij ].
          destruct j; contradiction.
 
      destruct i; contradiction.
@@ -396,12 +396,12 @@ split.
      rewrite fold_right_app; assumption.
 
     exists (negf e :: []), [].
-    split; [ reflexivity | simpl ].
+    split; [ easy | simpl ].
     assert (H : f p = f (rotate (negf e) p)).
      apply Hoe.
-     exists (negf e :: []); reflexivity.
+     exists (negf e :: []); easy.
 
-     rewrite <- H, Hel; reflexivity.
+     rewrite <- H, Hel; easy.
 
    +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
      left; split; [ assumption | ].
@@ -422,7 +422,7 @@ split.
 
       assert (H : f p = f (rotate (negf e) p)).
        apply Hoe.
-       exists (negf e :: []); reflexivity.
+       exists (negf e :: []); easy.
 
        simpl; rewrite <- H.
        exists (negf e :: el), (e₁ :: el₁); simpl.
@@ -432,7 +432,7 @@ split.
         apply letter_opp_negf in H₂.
         apply H₁, negf_eq_eq; assumption.
 
-        split; reflexivity.
+        split; easy.
 
  -intros Hul.
   destruct Hul as [(H, _)| [(H, _)| Hul]]; [ assumption | | contradiction ].
@@ -451,18 +451,18 @@ split.
  split; [ | contradiction ].
  intros (Hi, Hj).
  destruct i; [ simpl in Hi | ].
-  destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+  destruct j; [ exfalso; apply Hij; easy | clear Hij ].
   destruct j; [ | destruct j; contradiction ].
   simpl in Hj.
-  eapply not_start_with_rot in Hi; try eassumption; [ | reflexivity ].
+  eapply not_start_with_rot in Hi; try eassumption; [ | easy ].
   split; assumption.
 
   destruct i; [ simpl in Hi | ].
    destruct j; [ simpl in Hj; clear Hij | ].
-    eapply not_start_with_rot in Hj; try eassumption; [ | reflexivity ].
+    eapply not_start_with_rot in Hj; try eassumption; [ | easy ].
     split; assumption.
 
-    destruct j; [ apply Hij; reflexivity | clear Hij ].
+    destruct j; [ apply Hij; easy | clear Hij ].
     destruct j; contradiction.
 
    destruct i; contradiction.
@@ -475,13 +475,13 @@ Proof.
 intros i l a b Hab.
 revert i.
 induction l as [| y]; intros; [ destruct i; apply Hab | ].
-destruct i; simpl; [ reflexivity | apply IHl ].
+destruct i; simpl; [ easy | apply IHl ].
 Qed.
 
 Theorem rev_path_repeat : ∀ e n, rev_path (repeat e n) = repeat (negf e) n.
 Proof.
 intros e n.
-induction n; [ reflexivity | simpl ].
+induction n; [ easy | simpl ].
 rewrite rev_path_cons, rev_path_single, IHn.
 apply app_repeat_diag.
 Qed.
@@ -524,7 +524,7 @@ split.
         rewrite Hfr.
         exists (ạ⁻¹ :: el), (norm_list el).
         split; [ | simpl; f_equal; assumption ].
-        simpl; rewrite Hel₁; reflexivity.
+        simpl; rewrite Hel₁; easy.
 
        simpl; intros (Haf & n & Hoo); apply HB; clear HB.
        split; [ assumption | ].
@@ -540,7 +540,7 @@ split.
        destruct Hnf as (His & Hoh).
        unfold orbit_without_fixpoint in Hoh.
        exfalso; revert Hel.
-       apply Hoh; [ reflexivity | ].
+       apply Hoh; [ easy | ].
        rewrite Hel₁; intros H; discriminate H.
 
       left; left; right.
@@ -558,7 +558,7 @@ split.
        subst os; simpl; rewrite Hfr.
        exists (ạ⁻¹ :: el), (norm_list el).
        split; [ | simpl; f_equal; assumption ].
-       simpl; rewrite Hel₁; reflexivity.
+       simpl; rewrite Hel₁; easy.
 
       intros (Hnf₂, Hoo).
       subst os; simpl in Hoo.
@@ -570,15 +570,15 @@ split.
       destruct n.
        simpl in Hr; rewrite Hr in Hel.
        destruct Hnf as (His, Hoh).
-       revert Hel; apply Hoh; [ reflexivity | ].
+       revert Hel; apply Hoh; [ easy | ].
        rewrite Hel₁; intros H; discriminate H.
 
        apply rotate_rev_path in Hr.
        rewrite <- Hr, <- fold_right_app in Hel.
        destruct Hnf as (His, Hoh).
        revert Hel.
-       apply Hoh; [ reflexivity | ].
-       replace el with ([] ++ el) by reflexivity.
+       apply Hoh; [ easy | ].
+       replace el with ([] ++ el) by easy.
        rewrite <- app_assoc, <- is_normal, Hel₁, app_nil_l.
        rewrite rev_path_repeat.
        remember norm_list as g; remember S as h; simpl; subst g h.
@@ -615,7 +615,7 @@ split.
   split; [ | contradiction ].
   intros (Hi, Hj).
   destruct i; [ simpl in Hi | ].
-   destruct j; [ exfalso; apply Hij; reflexivity | clear Hij ].
+   destruct j; [ exfalso; apply Hij; easy | clear Hij ].
    destruct j; [ simpl in Hj | destruct j; contradiction ].
    eapply decompose_2a_contrad_case; unfold union; try eassumption.
    split; assumption.
@@ -625,7 +625,7 @@ split.
     eapply decompose_2a_contrad_case; unfold union; try eassumption.
     split; assumption.
 
-    destruct j; [ apply Hij; reflexivity | clear Hij ].
+    destruct j; [ apply Hij; easy | clear Hij ].
     destruct j; contradiction.
 Qed.
 

@@ -18,7 +18,7 @@ Notation "'ℕ'" := nat.
 Notation "'√'" := sqrt.
 
 Theorem fold_Rsqr : ∀ a, (a * a = a²)%R.
-Proof. reflexivity. Qed.
+Proof. easy. Qed.
 
 Theorem Rmul_div : ∀ x y z, (x * y / z = x / z * y)%R.
 Proof. intros; lra. Qed.

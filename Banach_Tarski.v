@@ -32,7 +32,7 @@ exists
    map (xtransl 6) [A₃; rot ḅ A₄]); simpl.
 split.
  subst A₁ A₂ A₃ A₄.
- eapply r_decomposed_4; try eassumption; reflexivity.
+ eapply r_decomposed_4; try eassumption; easy.
 
  split.
   subst s; remember set_equiv as s eqn:Hs.
@@ -64,10 +64,10 @@ split.
    unfold Rabs in H₁, H₂.
    destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
 
-  constructor; [ exists (Xtransl 3); reflexivity | ].
-  constructor; [ exists (Comb (Xtransl 3) (Rot ạ)); reflexivity | ].
-  constructor; [ exists (Xtransl 6); reflexivity | ].
-  constructor; [ exists (Comb (Xtransl 6) (Rot ḅ)); reflexivity | ].
+  constructor; [ exists (Xtransl 3); easy | ].
+  constructor; [ exists (Comb (Xtransl 3) (Rot ạ)); easy | ].
+  constructor; [ exists (Xtransl 6); easy | ].
+  constructor; [ exists (Comb (Xtransl 6) (Rot ḅ)); easy | ].
   constructor.
 Qed.
 

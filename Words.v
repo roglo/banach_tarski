@@ -23,7 +23,7 @@ Definition negf '(FE t d) := FE t (negb d).
 Theorem letter_dec : ∀ l1 l2 : letter, {l1 = l2} + {l1 ≠ l2}.
 Proof.
 intros.
-destruct l1, l2; try (left; reflexivity); right; intros H; discriminate H.
+destruct l1, l2; try (left; easy); right; intros H; discriminate H.
 Defined.
 
 Theorem free_elem_dec : ∀ e₁ e₂ : free_elem, { e₁ = e₂ } + { e₁ ≠ e₂ }.
@@ -33,7 +33,7 @@ destruct e₁ as (t₁, d₁).
 destruct e₂ as (t₂, d₂).
 destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
  destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ subst d₂ | ].
-  left; reflexivity.
+  left; easy.
 
   right; intros H; apply H₂.
   injection H; intros; assumption.
@@ -45,7 +45,7 @@ Qed.
 Theorem letter_dec_diag : ∀ t, letter_dec t t = left (eq_refl _).
 Proof.
 intros t.
-destruct (letter_dec t t) as [p| p]; [ | exfalso; apply p; reflexivity ].
+destruct (letter_dec t t) as [p| p]; [ | exfalso; apply p; easy ].
 destruct t; refine (match p with eq_refl => eq_refl end).
 Qed.
 
@@ -99,7 +99,7 @@ destruct e₂ as (t₂, d₂).
 split; intros H.
  apply letter_opp_iff in H.
  destruct H; subst t₂ d₂; simpl.
- rewrite Bool.negb_involutive; reflexivity.
+ rewrite Bool.negb_involutive; easy.
 
  injection H; intros; subst; simpl.
  rewrite letter_dec_diag, bool_dec_negb_l.
@@ -117,14 +117,14 @@ Qed.
 Theorem negf_involutive : ∀ e, negf (negf e) = e.
 Proof.
 intros (t, d); simpl.
-rewrite Bool.negb_involutive; reflexivity.
+rewrite Bool.negb_involutive; easy.
 Qed.
 
 Theorem letter_opp_negf_r : ∀ e, letter_opp e (negf e).
 Proof.
 intros.
 apply letter_opp_negf.
-rewrite negf_involutive; reflexivity.
+rewrite negf_involutive; easy.
 Qed.
 
 Theorem letter_opp_sym : ∀ e₁ e₂, letter_opp e₁ e₂ → letter_opp e₂ e₁.
@@ -142,5 +142,5 @@ destruct e₁ as (t₁, d₁).
 destruct e₂ as (t₂, d₂).
 simpl in Hn.
 injection Hn; intros H₁ H₂; subst.
-apply negb_eq_eq in H₁; subst d₁; reflexivity.
+apply negb_eq_eq in H₁; subst d₁; easy.
 Qed.

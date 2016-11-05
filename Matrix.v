@@ -77,7 +77,7 @@ progress repeat rewrite Rmult_1_r.
 progress repeat rewrite Rmult_0_r.
 progress repeat rewrite Rplus_0_l.
 progress repeat rewrite Rplus_0_r.
-destruct m; reflexivity.
+destruct m; easy.
 Qed.
 
 Theorem mat_vec_mul_id : ∀ p, mat_vec_mul mat_id p = p.
@@ -88,7 +88,7 @@ progress repeat rewrite Rmult_0_l.
 progress repeat rewrite Rmult_1_l.
 progress repeat rewrite Rplus_0_l.
 progress repeat rewrite Rplus_0_r.
-reflexivity.
+easy.
 Qed.
 
 Theorem mat_vec_mul_assoc : ∀ m₁ m₂ p,
@@ -117,7 +117,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; reflexivity.
+ field_simplify; easy.
 
  unfold Rdiv.
  field_simplify; simpl.
@@ -125,7 +125,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; reflexivity.
+ field_simplify; easy.
 Qed.
 
 Theorem rot_inv_rot_x : ∀ pt,
@@ -146,7 +146,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; reflexivity.
+ field_simplify; easy.
 
  unfold Rdiv.
  field_simplify; simpl.
@@ -154,7 +154,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; reflexivity.
+ field_simplify; easy.
 Qed.
 
 Theorem rot_rot_inv_z : ∀ pt,
@@ -175,7 +175,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; reflexivity.
+ field_simplify; easy.
 
  unfold Rdiv.
  field_simplify; simpl.
@@ -183,7 +183,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; reflexivity.
+ field_simplify; easy.
 Qed.
 
 Theorem rot_inv_rot_z : ∀ pt,
@@ -204,7 +204,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; reflexivity.
+ field_simplify; easy.
 
  unfold Rdiv.
  field_simplify; simpl.
@@ -212,7 +212,7 @@ f_equal.
  rewrite sqrt_sqrt; [ | lra ].
  field_simplify; simpl.
  unfold Rdiv.
- field_simplify; reflexivity.
+ field_simplify; easy.
 Qed.
 
 Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.
@@ -240,7 +240,7 @@ Theorem app_path_rev_path : ∀ p el,
 Proof.
 intros.
 revert p.
-induction el as [| e] using rev_ind; intros; [ reflexivity | simpl ].
+induction el as [| e] using rev_ind; intros; [ easy | simpl ].
 rewrite rev_path_app; simpl.
 rewrite app_assoc, fold_right_app; simpl.
 rewrite IHel; apply rotate_neg_rotate.
@@ -252,7 +252,7 @@ Theorem rotate_cancel_in : ∀ el₁ el₂ e p,
 Proof.
 intros.
 do 2 rewrite fold_right_app; simpl.
-rewrite rotate_rotate_neg; reflexivity.
+rewrite rotate_rotate_neg; easy.
 Qed.
 
 Theorem rotate_rotate_norm : ∀ el p,
@@ -262,7 +262,7 @@ intros el p.
 remember (length el) as len eqn:Hlen; symmetry in Hlen.
 revert el p Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
-destruct (norm_list_dec el) as [H₁| H₁]; [ rewrite H₁; reflexivity | ].
+destruct (norm_list_dec el) as [H₁| H₁]; [ rewrite H₁; easy | ].
 destruct H₁ as (el₁ & t & d & el₂ & H₁).
 subst el.
 rewrite rotate_cancel_in, norm_list_cancel_in.
@@ -301,7 +301,7 @@ simpl in Hr.
 rewrite rev_path_cons, rev_path_single, fold_right_app; simpl.
 apply IHel; rewrite <- Hr.
 rewrite rotate_neg_rotate.
-reflexivity.
+easy.
 Qed.
 
 Definition mat_transp m :=
@@ -419,15 +419,15 @@ Proof.
  destruct (Req_dec x₁ x₂) as [| H₁]; [ subst x₂ | right ].
   destruct (Req_dec y₁ y₂) as [| H₂]; [ subst y₂ | right ].
    destruct (Req_dec z₁ z₂) as [| H₃].
-    subst z₂; left; reflexivity.
+    subst z₂; left; easy.
 
     right.
     intros H; apply H₃.
-    injection H; clear H; intros; subst; reflexivity.
+    injection H; clear H; intros; subst; easy.
 
     intros H; apply H₂.
-    injection H; clear H; intros; subst; reflexivity.
+    injection H; clear H; intros; subst; easy.
 
   intros H; apply H₁.
-  injection H; clear H; intros; subst; reflexivity.
+  injection H; clear H; intros; subst; easy.
 Qed.

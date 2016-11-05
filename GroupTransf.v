@@ -137,7 +137,7 @@ intros dx E F HEF (x, y, z); simpl; now rewrite HEF.
 Qed.
 
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
-Proof. reflexivity. Qed.
+Proof. easy. Qed.
 
 Theorem app_gr_inv_l : ∀ (s := set_equiv) g E,
   (app_gr_inv g (app_gr g E) = E)%S.
@@ -148,12 +148,12 @@ revert E.
 induction g; intros; simpl.
  intros p; simpl.
  rewrite negf_involutive, rotate_neg_rotate.
- reflexivity.
+ easy.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
  rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
- reflexivity.
+ easy.
 
  intros p.
  split; intros H.
@@ -171,12 +171,12 @@ revert E.
 induction g; intros; simpl.
  intros p; simpl.
  rewrite negf_involutive, rotate_rotate_neg.
- reflexivity.
+ easy.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
  rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
- reflexivity.
+ easy.
 
  intros p.
  split; intros H.
@@ -260,8 +260,8 @@ Theorem group_intersection_distr : ∀ (s := set_equiv) g E F,
 Proof.
 intros.
 revert E F.
-induction g; intros; [ reflexivity | intros (x, y, z); reflexivity | ].
-intros p; simpl; rewrite IHg2, IHg1; reflexivity.
+induction g; intros; [ easy | intros (x, y, z); easy | ].
+intros p; simpl; rewrite IHg2, IHg1; easy.
 Qed.
 
 Theorem group_union_distr : ∀ (s := set_equiv) g E F,
@@ -269,8 +269,8 @@ Theorem group_union_distr : ∀ (s := set_equiv) g E F,
 Proof.
 intros.
 revert E F.
-induction g; intros; [ reflexivity | intros (x, y, z); reflexivity | ].
-intros p; simpl; rewrite IHg2, IHg1; reflexivity.
+induction g; intros; [ easy | intros (x, y, z); easy | ].
+intros p; simpl; rewrite IHg2, IHg1; easy.
 Qed.
 
 Theorem group_union_list_distr : ∀ (s := set_equiv) f EL,
@@ -335,7 +335,7 @@ split.
    generalize Hr; intros H.
    apply HF in H; simpl in H.
    destruct H as [H| H]; [ left; assumption | right ].
-   eapply IHPL; [ | reflexivity | eassumption ].
+   eapply IHPL; [ | easy | eassumption ].
    intros i j Hij.
    unfold set_eq; simpl; intros y.
    assert (HSij : S i ≠ S j).
@@ -374,7 +374,7 @@ split.
     generalize Hp; intros H.
     apply HF in H; simpl in H.
     destruct H as [H| H]; [ left; assumption | right ].
-    eapply IHPL; [ | simpl; reflexivity | eassumption ].
+    eapply IHPL; [ | simpl; easy | eassumption ].
     intros i j Hij.
     unfold set_eq; simpl; intros q.
     assert (HSij : S i ≠ S j).
@@ -424,7 +424,7 @@ split.
       split; [ intros (HPi, HPj) | contradiction ].
       apply HQ; split; assumption.
 
-     reflexivity.
+     easy.
 
      apply group_union_list_distr.
 
@@ -438,15 +438,15 @@ split.
    induction P as [| P PL]; intros; [ contradiction | ].
    destruct Hgh as [Hgh| Hgh].
     rewrite IHh; simpl.
-    rewrite set_eq_equiv; [ | rewrite group_union_distr; reflexivity ].
+    rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
     left; assumption.
 
     rewrite HF; simpl.
-    rewrite set_eq_equiv; [ | rewrite group_union_distr; reflexivity ].
-    rewrite set_eq_equiv; [ | rewrite group_union_distr; reflexivity ].
+    rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
+    rewrite set_eq_equiv; [ | rewrite group_union_distr; easy ].
     right.
     rewrite group_union_list_distr.
-    rewrite set_eq_equiv; [ | rewrite group_union_list_distr; reflexivity ].
+    rewrite set_eq_equiv; [ | rewrite group_union_list_distr; easy ].
     rewrite map_map; assumption.
 
  intros i j Hij p.

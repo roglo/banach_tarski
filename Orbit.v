@@ -14,7 +14,7 @@ Require Import Misc Words Normalize Reverse Matrix Pset.
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
-Proof. intros; exists []; reflexivity. Qed.
+Proof. intros; exists []; easy. Qed.
 
 Theorem same_orbit_sym : symmetric _ same_orbit.
 Proof.
@@ -26,7 +26,7 @@ induction el as [| e]; intros; [ symmetry; assumption | simpl in H; simpl ].
 rewrite fold_right_app; simpl.
 apply IHel; rewrite <- H.
 rewrite rotate_neg_rotate.
-reflexivity.
+easy.
 Qed.
 
 Theorem same_orbit_trans : transitive _ same_orbit.
@@ -34,7 +34,7 @@ Proof.
 intros p₁ p₂ p₃ (el₁, H₁) (el₂, H₂); simpl in H₁, H₂.
 unfold same_orbit; simpl.
 exists (el₂ ++ el₁).
-rewrite fold_right_app, H₁, H₂; reflexivity.
+rewrite fold_right_app, H₁, H₂; easy.
 Qed.
 
 Add Parametric Relation : _ same_orbit
@@ -72,9 +72,9 @@ apply norm_list_app_is_nil in H.
  apply not_eq_sym in Hd.
  injection H; intros; contradiction.
 
- rewrite norm_list_idemp; reflexivity.
+ rewrite norm_list_idemp; easy.
 
- rewrite norm_list_idemp; reflexivity.
+ rewrite norm_list_idemp; easy.
 Qed.
 
 Definition orbit_selector := choice_function same_orbit.

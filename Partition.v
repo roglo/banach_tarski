@@ -43,7 +43,7 @@ split.
   intros x.
   split; [ | contradiction ].
   intros (H₁, H₂).
-  destruct j; [ apply Hij; reflexivity | clear Hij ].
+  destruct j; [ apply Hij; easy | clear Hij ].
   destruct H₁ as [H₁| H₁].
    eapply Hi with (i := O) (j := S (S j)); [ intros H; discriminate H | ].
    unfold intersection; simpl.
@@ -113,7 +113,7 @@ split.
   intros x.
   split; [ | contradiction ].
   intros (H₁, H₂).
-  destruct j; [ apply Hij; reflexivity | clear Hij ].
+  destruct j; [ apply Hij; easy | clear Hij ].
   destruct H₁ as [H₁| H₁].
    eapply Hi with (i := O) (j := S j); [ intros H; discriminate H | ].
    unfold intersection; simpl.
@@ -167,7 +167,7 @@ intros * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
- subst s; rewrite union_list_app; [ | reflexivity ].
+ subst s; rewrite union_list_app; [ | easy ].
  transitivity (F₁ ∪ ⋃ P₂).
   intros x.
   split; intros H.
@@ -234,10 +234,10 @@ Qed.
 Theorem is_partition_single : ∀ A (s := @set_equiv A) E, is_partition E [E].
 Proof.
 intros.
-split; [ symmetry; eapply union_empty_r; reflexivity | ].
+split; [ symmetry; eapply union_empty_r; easy | ].
 intros * Hij.
 destruct i.
- destruct j; [ exfalso; apply Hij; reflexivity | ].
+ destruct j; [ exfalso; apply Hij; easy | ].
  destruct j.
   split; [ intros (_, H); contradiction | contradiction ].
   split; [ intros (_, H); contradiction | contradiction ].

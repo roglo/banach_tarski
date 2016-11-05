@@ -73,7 +73,7 @@ Add Parametric Relation A : (set A) (@set_eq A set_equiv)
  as set_eq_rel.
 
 Theorem eq_set_eq : ∀ A (s := set_equiv) (x y : set A), x = y → (x = y)%S.
-Proof. intros; subst x; reflexivity. Qed.
+Proof. intros; subst x; easy. Qed.
 
 Theorem included_trans A : transitive _ (@included A).
 Proof.
@@ -137,7 +137,7 @@ Qed.
 
 Theorem fold_set_eq : ∀ A (s := set_equiv) (P Q : set A),
   (∀ x, x ∈ P ↔ x ∈ Q) = (P = Q)%S.
-Proof. intros; reflexivity. Qed.
+Proof. intros; easy. Qed.
 
 Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : set A),
   (E = F)%S
@@ -265,7 +265,7 @@ intros * Hs *.
 revert P₁.
 induction P₂ as [| Q]; intros.
  rewrite app_nil_r; simpl; subst s.
- rewrite union_empty_r; reflexivity.
+ rewrite union_empty_r; easy.
 
  rewrite cons_comm_app, app_assoc; simpl; subst s.
  rewrite IHP₂.
@@ -323,9 +323,9 @@ Proof.
 intros.
 unfold union, set_eq; simpl; intros.
 destruct (lt_dec i (length P₁)) as [H₁| H₁].
- rewrite app_nth1; [ reflexivity | assumption ].
+ rewrite app_nth1; [ easy | assumption ].
 
- rewrite app_nth2; [ reflexivity | apply Nat.nlt_ge; assumption ].
+ rewrite app_nth2; [ easy | apply Nat.nlt_ge; assumption ].
 Qed.
 
 Theorem union_list_intersection : ∀ A (S : set A) SL x,

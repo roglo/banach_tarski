@@ -12,7 +12,7 @@ Arguments Nat.div : simpl never.
 Arguments Nat.modulo : simpl never.
 
 Theorem match_id : ∀ A a (b : A), match a with O => b | S _ => b end = b.
-Proof. intros A a b; destruct a; reflexivity. Qed.
+Proof. intros A a b; destruct a; easy. Qed.
 
 Theorem nat_div_add_once : ∀ a b, b ≠ 0 → (a + b) / b = S (a / b).
 Proof.
@@ -31,40 +31,40 @@ Qed.
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
 Proof.
 intros.
-destruct x, y; try reflexivity; exfalso; apply H; reflexivity.
+destruct x, y; try easy; exfalso; apply H; easy.
 Qed.
 
 Theorem negb_neq : ∀ b₁ b₂, negb b₁ ≠ b₂ → b₁ = b₂.
 Proof.
 intros b₁ b₂ H.
-destruct b₁, b₂; try reflexivity; exfalso; apply H; reflexivity.
+destruct b₁, b₂; try easy; exfalso; apply H; easy.
 Qed.
 
 Theorem negb_eq_eq : ∀ b₁ b₂, negb b₁ = negb b₂ → b₁ = b₂.
 Proof.
 intros b₁ b₂ Hn.
-destruct b₁, b₂; [ reflexivity | | | reflexivity ]; discriminate Hn.
+destruct b₁, b₂; [ easy | | | easy ]; discriminate Hn.
 Qed.
 
 Theorem cons_comm_app : ∀ A (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
-Proof. reflexivity. Qed.
+Proof. easy. Qed.
 
 Theorem cons_to_app : ∀ A (e : A) el, e :: el = [e] ++ el.
-Proof. reflexivity. Qed.
+Proof. easy. Qed.
 
 Theorem fold_right_cons : ∀ A B f (x : A) (y : B) l,
   fold_right f x (y :: l) = f y (fold_right f x l).
-Proof. reflexivity. Qed.
+Proof. easy. Qed.
 
 Theorem fold_right_single : ∀ A B (f : A → B → B) x y,
   fold_right f x [y] = f y x.
-Proof. reflexivity. Qed.
+Proof. easy. Qed.
 
 Theorem list_prod_nil_r : ∀ A B (l : list A),
   list_prod l ([] : list B) = [].
 Proof.
 intros A B l.
-induction l as [| x]; [ reflexivity | assumption ].
+induction l as [| x]; [ easy | assumption ].
 Qed.
 
 Theorem list_prod_map : ∀ A B C D (f : A → B) (g : C → D) l l',
@@ -138,7 +138,7 @@ split; intros HF.
  revert l2 HF.
  induction l1 as [| x1 l1]; intros.
   destruct l2 as [| x2 l2]; [ | now apply Forall2_nil_cons in HF ].
-  split; [ constructor | reflexivity ].
+  split; [ constructor | easy ].
 
   destruct l2 as [| x2 l2]; [ now apply Forall2_cons_nil in HF | simpl ].
   apply Forall2_cons_cons in HF.
@@ -150,7 +150,7 @@ split; intros HF.
    clear -HF.
    revert l2 HF.
    induction l1 as [| x1 l1]; intros.
-    destruct l2 as [| x2 l2]; [ reflexivity | ].
+    destruct l2 as [| x2 l2]; [ easy | ].
     apply Forall2_nil_cons in HF; contradiction.
 
     destruct l2 as [| x2 l2].
@@ -179,28 +179,28 @@ Theorem flat_map_nil_fun : ∀ A B (f : A → list B) l,
  → flat_map f l = [].
 Proof.
 intros * HF.
-induction l as [| x l]; [ reflexivity | simpl ].
+induction l as [| x l]; [ easy | simpl ].
 apply Forall_inv2 in HF.
 destruct HF as (Hx, HF).
-rewrite IHl; [ rewrite Hx; reflexivity | assumption ].
+rewrite IHl; [ rewrite Hx; easy | assumption ].
 Qed.
 
 Theorem app_repeat_diag : ∀ A (e : A) n,
   repeat e n ++ [e] = e :: repeat e n.
 Proof.
 intros.
-induction n; [ reflexivity | ].
-simpl; rewrite IHn; reflexivity.
+induction n; [ easy | ].
+simpl; rewrite IHn; easy.
 Qed.
 
 Theorem list_nil_app_dec {A} : ∀ (l : list A),
   {l = []} + {∃ x l', l = l' ++ [x]}.
 Proof.
 intros l.
-destruct l as [| x]; [ left; reflexivity | right ].
+destruct l as [| x]; [ left; easy | right ].
 revert x.
-induction l as [| y] using rev_ind; intros; [ exists x, []; reflexivity | ].
-exists y, (x :: l); reflexivity.
+induction l as [| y] using rev_ind; intros; [ exists x, []; easy | ].
+exists y, (x :: l); easy.
 Qed.
 
 Theorem nth_firstn : ∀ A (l : list A) i n d,
@@ -224,21 +224,21 @@ intros A el₁ el₂ el₃ el₄ Hel.
 revert el₂ el₃ el₄ Hel.
 induction el₁ as [| e₁]; intros.
  left; exists el₃.
- split; [ reflexivity | assumption ].
+ split; [ easy | assumption ].
 
  destruct el₃ as [| e₃].
   right; exists (e₁ :: el₁).
-  split; [ reflexivity | symmetry; assumption ].
+  split; [ easy | symmetry; assumption ].
 
   simpl in Hel.
   injection Hel; clear Hel; intros; subst e₃.
   apply IHel₁ in H.
   destruct H as [H| H].
    left; destruct H as (el, (H₁, H₂)); subst el₂ el₃.
-   exists el; split; reflexivity.
+   exists el; split; easy.
 
    right; destruct H as (el, (H₁, H₂)); subst el₁ el₄.
-   exists el; split; reflexivity.
+   exists el; split; easy.
 Qed.
 
 Definition false_neq_negb_false : false ≠ negb false :=
@@ -255,12 +255,12 @@ Definition negb_false_neq_false : negb false ≠ false := true_neq_negb_true.
 Theorem bool_dec_negb_l : ∀ b,
   Bool.bool_dec (negb b) b =
   right (if b return _ then negb_true_neq_true else negb_false_neq_false).
-Proof. intros b; destruct b; reflexivity. Qed.
+Proof. intros b; destruct b; easy. Qed.
 
 Theorem bool_dec_negb_r : ∀ b,
   Bool.bool_dec b (negb b) =
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
-Proof. intros b; destruct b; reflexivity. Qed.
+Proof. intros b; destruct b; easy. Qed.
 
 Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
@@ -290,7 +290,7 @@ Proof.
 intros P.
 set (R (x y : bool) := x = y ∨ P).
 assert (He : equiv _ R).
- split; [ intros b; left; reflexivity | ].
+ split; [ intros b; left; easy | ].
  split.
   intros b c d Hbc [Hcd| Hcd]; [ subst c; assumption | right; assumption ].
   intros b c [Hbc| Hbc]; [ left; symmetry | right ]; assumption.
