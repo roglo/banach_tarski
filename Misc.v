@@ -200,7 +200,7 @@ intros l.
 destruct l as [| x]; [ now left | right ].
 revert x.
 induction l as [| y] using rev_ind; intros; [ now exists x, [] | ].
-exists y, (x :: l); easy.
+now exists y, (x :: l).
 Qed.
 
 Theorem nth_firstn : ∀ A (l : list A) i n d,
@@ -209,7 +209,7 @@ Theorem nth_firstn : ∀ A (l : list A) i n d,
 Proof.
 intros * Hin.
 revert i n Hin.
-induction l as [| x l]; intros; [ destruct n, i; easy | simpl ].
+induction l as [| x l]; intros; [ now destruct n, i | simpl ].
 destruct n, i; try easy.
 apply Nat.succ_lt_mono in Hin; simpl.
 now apply IHl.
@@ -269,15 +269,15 @@ intros * Hs HF.
 revert l2 HF.
 induction l1 as [| x]; intros.
  destruct l2 as [| y]; [ constructor | ].
- apply Forall2_nil_cons in HF; easy.
+ now apply Forall2_nil_cons in HF.
 
  destruct l2 as [| y].
-  apply Forall2_cons_nil in HF; easy.
+  now apply Forall2_cons_nil in HF.
 
   apply Forall2_cons_cons in HF.
   destruct HF as (HR & HF).
-  constructor; [ apply Hs; easy | ].
-  apply IHl1; easy.
+  constructor; [ now apply Hs | ].
+  now apply IHl1.
 Qed.
 
 (* Type-theoretical Choice Axiom *)
@@ -293,12 +293,12 @@ assert (He : equiv _ R).
  split; [ intros b; now left | ].
  split.
   now intros b c d Hbc [Hcd| Hcd]; [ subst c | right ].
-  intros b c [Hbc| Hbc]; [ now left; symmetry | now right ].
+  now intros b c [Hbc| Hbc]; [ left; symmetry | right ].
 
  destruct (TTCA bool R He) as (f & Hx & Hxy).
  destruct (Bool.bool_dec (f false) (f true)) as [H| H].
-  destruct (Hx true) as [Ht| Ht]; [ | left; easy ].
-  destruct (Hx false) as [Hf| Hf]; [ | left; easy ].
+  destruct (Hx true) as [Ht| Ht]; [ | now left ].
+  destruct (Hx false) as [Hf| Hf]; [ | now left ].
   rewrite <- Ht, <- Hf in H; easy.
 
   right; intros H₁; apply H.
