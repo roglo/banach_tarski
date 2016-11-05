@@ -30,12 +30,12 @@ destruct nl as [| e₂].
  clear; intros H.
  destruct el₁ as [| e₂]; intros; [ easy | simpl in H ].
  injection H; clear H; intros; subst e₂.
- destruct el₁; easy.
+ now destruct el₁.
 
  destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
   intros H; subst nl.
   pose proof IHel (e₂ :: el₁) as H₂; simpl in H₂.
-  apply H₂; easy.
+  now apply H₂.
 
   unfold letter_opp in H₁.
   destruct e₁ as (x₁, d₁).
@@ -63,7 +63,7 @@ destruct nl as [| e₂].
     injection H; clear H; intros H₁ H₃ H₄; subst e.
     simpl in H₃.
     injection H₃; clear H₃; intros; subst x₂ d₂.
-    apply H₂; easy.
+    now apply H₂.
 
     simpl; intros H.
     injection H; clear H; intros H₁ H₃.
@@ -75,7 +75,7 @@ Theorem norm_list_no_consec2 : ∀ e el el₁ el₂,
 Proof.
 intros e el el₁ el₂.
 pose proof norm_list_no_consec (negf e) el el₁ el₂ as H.
-rewrite negf_involutive in H; easy.
+now rewrite negf_involutive in H.
 Qed.
 
 Theorem norm_list_no_start : ∀ e el el₂,
@@ -105,14 +105,14 @@ induction el as [| (t₁, d₁)]; intros.
  remember (norm_list el₁) as el₂ eqn:Hel₂.
  symmetry in Hel₂; simpl.
  destruct el₂ as [| (t₂, d₂)].
-  rewrite letter_dec_diag, bool_dec_negb_r; easy.
+  now rewrite letter_dec_diag, bool_dec_negb_r.
 
   subst el₁.
   destruct (letter_dec t t₂) as [H₁| H₁].
    subst t₂.
    destruct (Bool.bool_dec (negb d) d₂) as [H₁| H₁].
     subst d₂.
-    rewrite letter_dec_diag, bool_dec_negb_r; easy.
+    now rewrite letter_dec_diag, bool_dec_negb_r.
 
     apply negb_neq in H₁; subst d₂.
     destruct el₂ as [| (t₂, d₂)]; [ easy | ].
@@ -122,7 +122,7 @@ induction el as [| (t₁, d₁)]; intros.
     apply not_eq_sym, neq_negb in H₁; subst d₂.
     exfalso; revert Hel₂; apply norm_list_no_start.
 
-   rewrite letter_dec_diag, bool_dec_negb_r; easy.
+   now rewrite letter_dec_diag, bool_dec_negb_r.
 Qed.
 
 Theorem norm_list_cancel2 : ∀ el e,
@@ -153,7 +153,7 @@ Theorem norm_list_cancel_in2 : ∀ el₁ el₂ e,
 Proof.
 intros.
 pose proof norm_list_cancel_in el₁ el₂ (negf e) as H.
-rewrite negf_involutive in H; easy.
+now rewrite negf_involutive in H.
 Qed.
 
 Theorem is_normal : ∀ el₁ el₂ el₃,
@@ -167,7 +167,7 @@ remember (norm_list el₂) as el eqn:Hel₂; symmetry in Hel₂.
 destruct el as [| e].
  simpl in IHel₂; simpl.
  rewrite cons_comm_app, app_assoc.
- rewrite IHel₂, <- app_assoc; easy.
+ now rewrite IHel₂, <- app_assoc.
 
  destruct (letter_opp_dec e₂ e) as [H₁| H₁].
   apply letter_opp_negf in H₁; subst e₂.
@@ -235,12 +235,12 @@ Theorem norm_list_dec : ∀ el,
   { ∃ el₁ t d el₂, el = el₁ ++ FE t d :: FE t (negb d) :: el₂ }.
 Proof.
 intros el.
-induction el as [| e]; [ left; easy | ].
+induction el as [| e]; [ now left | ].
 destruct IHel as [IHel| IHel].
  simpl.
  rewrite IHel.
- destruct el as [| e₁]; [ left; easy | ].
- destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ right | left; easy ].
+ destruct el as [| e₁]; [ now left | ].
+ destruct (letter_opp_dec e e₁) as [H₁| H₁]; [ right | now left ].
  apply letter_opp_sym, letter_opp_negf in H₁; subst e₁.
  destruct e as (t, d).
  exists [], t, d, el.
@@ -322,10 +322,10 @@ assert (H : ∀ e el, norm_list el = [] → norm_list (negf e :: el ++ [e]) = []
  intros e el Hn.
  rewrite cons_to_app, <- is_normal, Hn, app_nil_l.
  remember norm_list as f; simpl; subst f.
- rewrite norm_list_cancel2; easy.
+ now rewrite norm_list_cancel2.
 
  intros e el.
- split; intros Hn; [ | apply H; easy ].
+ split; intros Hn; [ | now apply H ].
  apply H with (e := negf e) in Hn.
  rewrite negf_involutive in Hn.
  remember norm_list as f; simpl in Hn; subst f.

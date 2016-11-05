@@ -60,28 +60,18 @@ destruct ti, tj.
    now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; easy.
+   now rewrite rev_path_cons, rev_path_single.
 
-   intros H; easy.
+   now intros H.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
    now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; easy.
+   now rewrite rev_path_cons, rev_path_single.
 
-   intros H; easy.
-
-+exfalso.
- eapply not_in_fixpoints_one_path; try eassumption.
-  intros el Hn.
-  now apply Hjnf.
-
-  rewrite <- rev_path_norm_list, Hnj.
-  rewrite rev_path_cons, rev_path_single; easy.
-
-  intros H; easy.
+   now intros H.
 
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
@@ -89,9 +79,19 @@ destruct ti, tj.
   now apply Hjnf.
 
   rewrite <- rev_path_norm_list, Hnj.
-  rewrite rev_path_cons, rev_path_single; easy.
+  now rewrite rev_path_cons, rev_path_single.
 
-  intros H; easy.
+  now intros H.
+
++exfalso.
+ eapply not_in_fixpoints_one_path; try eassumption.
+  intros el Hn.
+  now apply Hjnf.
+
+  rewrite <- rev_path_norm_list, Hnj.
+  now rewrite rev_path_cons, rev_path_single.
+
+  now intros H.
 
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
@@ -99,18 +99,18 @@ destruct ti, tj.
    now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; easy.
+   now rewrite rev_path_cons, rev_path_single.
 
-   intros H; easy.
+   now intros H.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
    now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
-   rewrite rev_path_cons, rev_path_single; easy.
+   now rewrite rev_path_cons, rev_path_single.
 
-   intros H; easy.
+   now intros H.
 Qed.
 
 Theorem not_start_with_rot :

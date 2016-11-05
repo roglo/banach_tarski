@@ -299,7 +299,7 @@ assert (He : equiv _ R).
  destruct (Bool.bool_dec (f false) (f true)) as [H| H].
   destruct (Hx true) as [Ht| Ht]; [ | now left ].
   destruct (Hx false) as [Hf| Hf]; [ | now left ].
-  rewrite <- Ht, <- Hf in H; easy.
+  now rewrite <- Ht, <- Hf in H.
 
   right; intros H₁; apply H.
   apply Hxy; unfold R.
@@ -316,7 +316,7 @@ Theorem Permutation_cons_nil : ∀ A l (x : A),
   ¬ Permutation (x :: l) [].
 Proof.
 intros * H.
-apply Permutation_sym, Permutation_nil_cons in H; easy.
+now apply Permutation_sym, Permutation_nil_cons in H.
 Qed.
 
 Theorem Permutation_cons_exist : ∀ A (x : A) l l',
@@ -324,7 +324,7 @@ Theorem Permutation_cons_exist : ∀ A (x : A) l l',
   → ∃ l₁ l₂ : list A, l' = l₁ ++ x :: l₂.
 Proof.
 intros * HP.
-apply Permutation_in with (x := x) in HP; [ now apply in_split | left; easy ].
+apply Permutation_in with (x := x) in HP; [ now apply in_split | now left ].
 Qed.
 
 Theorem Permutation_flat_map_map : ∀ A B C (f : A → B → C) la lb,
