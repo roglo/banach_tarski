@@ -12,6 +12,26 @@ Require Import Reals Psatz Nsatz.
 Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 
+Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
+  ((x - 3)² + y² + z² <= 1)%R
+  → ((x - 6)² + y² + z² <= 1)%R
+  → False.
+Proof.
+intros x y z H3 H6.
+apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
+apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
+apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
+apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
+clear - H3 H6.
+rewrite <- Rsqr_1 in H3 at 4.
+rewrite <- Rsqr_1 in H6 at 6.
+apply Rsqr_le_abs_0 in H3.
+apply Rsqr_le_abs_0 in H6.
+rewrite Rabs_R1 in H3, H6.
+unfold Rabs in H3, H6.
+destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
+Qed.
+
 Theorem Banach_Tarski_paradox_but_fixpoints :
   equidecomposable set_equiv sphere_but_fixpoints
     (xtransl 3 sphere_but_fixpoints ∪ xtransl 6 sphere_but_fixpoints)%S.
@@ -51,18 +71,7 @@ split.
    destruct H₁ as (H₁, H₃).
    destruct H₂ as (H₂, H₄).
    unfold sphere in H₁, H₂.
-   apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
-   apply Rplus_le_reg_pos_r in H₁; [ | apply Rle_0_sqr ].
-   apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
-   apply Rplus_le_reg_pos_r in H₂; [ | apply Rle_0_sqr ].
-   clear - H₁ H₂.
-   rewrite <- Rsqr_1 in H₁ at 4.
-   rewrite <- Rsqr_1 in H₂ at 6.
-   apply Rsqr_le_abs_0 in H₁.
-   apply Rsqr_le_abs_0 in H₂.
-   rewrite Rabs_R1 in H₁, H₂.
-   unfold Rabs in H₁, H₂.
-   destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
+   now apply (Rno_intersect_spheres_x3_x6 x y z).
 
   constructor; [ now exists (Xtransl 3) | ].
   constructor; [ now exists (Comb (Xtransl 3) (Rot ạ)) | ].
@@ -121,10 +130,13 @@ Qed.
 Theorem separated_spheres_without_fixpoints : ∀ (s := set_equiv),
   (xtransl 3 sphere_but_fixpoints ∩ xtransl 6 sphere_but_fixpoints = ∅)%S.
 Proof.
-intros p; split; [ intros (H3, H6) | easy ].
+intros * (x, y, z); split; [ intros (H3, H6); simpl | easy ].
 unfold sphere_but_fixpoints in H3, H6.
 simpl in H3, H6.
-bbb.
+destruct H3 as (H3, _).
+destruct H6 as (H6, _).
+now apply (Rno_intersect_spheres_x3_x6 x y z).
+Qed.
 
 Theorem separated_spheres : ∀ (s := set_equiv),
   (xtransl 3 sphere ∩ xtransl 6 sphere = ∅)%S.
