@@ -567,8 +567,6 @@ assert
      rewrite combine_length in HUV.
      rewrite partition_combine_length in HUV.
       rewrite partition_combine_swi_length in HUV.
-       2: now rewrite Hh'l, map_length.
-
        rewrite <- Hlen1, Hlen2, Nat.mul_comm in HUV.
        rewrite Nat.min_l in HUV; [ | easy ].
        destruct HUV as (i & Hi & HUV).
@@ -592,11 +590,6 @@ assert
           rewrite Hlen2, Hgl.
           rewrite intersection_comm.
           apply intersection_morph.
-           Focus 2.
-           rewrite app_gr_nth.
-           replace Datatypes.id with (@id (set point)) by easy.
-           now rewrite map_map.
-
            rewrite app_gr_nth.
            replace Datatypes.id with (@id (set point)) by easy.
            rewrite map_map.
@@ -612,16 +605,15 @@ assert
              now apply Nat.nlt_0_r in Hi.
 
              setoid_rewrite nth_indep with (d' := gr_inv gr_ident).
-              Focus 2.
-              rewrite map_length, Hlen4.
-              now apply Nat.mod_upper_bound.
-
               do 2 rewrite map_nth.
               rewrite gr_inv_ident.
               remember (nth (i / length PG) gl gr_ident) as x.
               do 2 rewrite fold_app_gr_inv.
               rewrite app_gr_app_gr_inv.
               now rewrite app_gr_inv_app_gr.
+
+              rewrite map_length, Hlen4.
+              now apply Nat.mod_upper_bound.
 
               now rewrite Hlen3; apply Nat.div_lt_upper_bound.
 
@@ -630,6 +622,10 @@ assert
 
               rewrite Hlen4.
               now apply Nat.mod_upper_bound.
+
+           rewrite app_gr_nth.
+           replace Datatypes.id with (@id (set point)) by easy.
+           now rewrite map_map.
 
           now rewrite map_length.
 
@@ -653,6 +649,8 @@ assert
           now subst h'l; rewrite map_length.
 
          now subst g'l; rewrite map_length.
+
+       now rewrite Hh'l, map_length.
 
       now rewrite Hg'l, map_length.
 
