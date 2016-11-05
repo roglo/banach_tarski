@@ -149,12 +149,13 @@ assert (Hr : f p = f (rotate (negf e) p)).
  eapply Hnf; [ reflexivity | | eassumption ].
  intros H.
  apply norm_list_app_is_nil in H.
- 2 : symmetry; apply norm_list_idemp.
- 2 : rewrite <- rev_path_norm_list; eapply norm_list_is_cons in Hnr.
- 2 : now rewrite Hnr.
- apply -> rev_path_eq_eq in H.
- rewrite H, Hn in Hnr.
- revert Hnr; apply norm_list_no_start2.
+  apply -> rev_path_eq_eq in H.
+  rewrite H, Hn in Hnr.
+  revert Hnr; apply norm_list_no_start2.
+
+  symmetry; apply norm_list_idemp.
+  rewrite <- rev_path_norm_list; eapply norm_list_is_cons in Hnr.
+  now rewrite Hnr.
 Qed.
 
 Theorem decompose_2a_contrad_case :
