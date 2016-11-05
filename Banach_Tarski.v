@@ -73,29 +73,34 @@ Qed.
 
 Check Banach_Tarski_paradox_but_fixpoints.
 
+Theorem equidec_union : ∀ E₁ E₂ F₁ F₂,
+  equidecomposable set_equiv E₁ E₂
+  → equidecomposable set_equiv F₁ F₂
+  → equidecomposable set_equiv (E₁ ∪ F₁) (E₂ ∪ F₂).
+Proof.
+bbb.
+
+Theorem equidec_transl : ∀ dx E F,
+  equidecomposable set_equiv E F
+  → equidecomposable set_equiv (xtransl dx E) (xtransl dx F).
+Proof.
+bbb.
+
+Theorem equidec_sphere_with_and_without_fixpoints :
+  equidecomposable set_equiv sphere sphere_but_fixpoints.
+Proof.
+bbb.
+
 Theorem Banach_Tarski_paradox :
   equidecomposable set_equiv sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
 Proof.
-(*
-set (s := set_equiv).
-pose proof TTCA _ same_orbit equiv_same_orbit as H.
-destruct H as (f & Hu & Hm).
-remember (mkcf _ _ f Hm Hu) as Hosf.
-remember (mkos _ f) as os eqn:Hos.
-clear HeqHosf.
-*)
 etransitivity; [ | etransitivity ].
-2: apply Banach_Tarski_paradox_but_fixpoints.
-bbb.
-set (A₁ := (M ∪ SS ạ ∪ B)%S).
-set (A₂ := (SS ạ⁻¹ ∖ B)%S).
-set (A₃ := SS ḅ).
-set (A₄ := SS ḅ⁻¹).
-exists [A₁; A₂; A₃; A₄].
-exists
-  (map (xtransl 3) [A₁; rot ạ A₂] ++
-   map (xtransl 6) [A₃; rot ḅ A₄]); simpl.
-split.
- subst A₁ A₂ A₃ A₄.
+ 2: apply Banach_Tarski_paradox_but_fixpoints.
+
+ apply equidec_sphere_with_and_without_fixpoints.
+
+ apply equidec_union; apply equidec_transl; symmetry.
+  apply equidec_sphere_with_and_without_fixpoints.
+  apply equidec_sphere_with_and_without_fixpoints.
 
 bbb.
