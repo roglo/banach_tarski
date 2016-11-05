@@ -76,12 +76,16 @@ Check Banach_Tarski_paradox_but_fixpoints.
 Theorem Banach_Tarski_paradox :
   equidecomposable set_equiv sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
 Proof.
+(*
 set (s := set_equiv).
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
 destruct H as (f & Hu & Hm).
 remember (mkcf _ _ f Hm Hu) as Hosf.
 remember (mkos _ f) as os eqn:Hos.
 clear HeqHosf.
+*)
+etransitivity; [ | etransitivity ].
+2: apply Banach_Tarski_paradox_but_fixpoints.
 bbb.
 set (A₁ := (M ∪ SS ạ ∪ B)%S).
 set (A₂ := (SS ạ⁻¹ ∖ B)%S).
