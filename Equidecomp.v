@@ -1048,10 +1048,42 @@ apply app_gr_morph_Proper; [ reflexivity | ].
 apply nth_map_app_gr_inv_morph; [ easy | easy | ].
 symmetry; apply Hhl.
 do 2 rewrite Nat.add_0_r.
+do 2 rewrite <- app_gr_nth_inv.
+setoid_rewrite nth_indep with (d' := gr_inv gr_ident).
+Focus 2.
+ rewrite map_length, Hlen4.
+ apply Nat.mod_upper_bound.
+ intros H; rewrite H in Hi.
+ now apply Nat.nlt_0_r in Hi.
+
+do 2 rewrite map_nth.
+rewrite gr_inv_ident.
+remember (nth (i / length PG) gl gr_ident) as x.
+do 2 rewrite fold_app_gr_inv.
+rewrite app_gr_app_gr_inv.
+now rewrite app_gr_inv_app_gr.
+
 bbb.
 
-SearchAbout app_gr.
-Check app_gr_inv_l.
+Theorem map_nth_endo : ∀ A (f : A → A) l d n,
+  n < length l
+  → nth n (map f l) d = f (nth n l d).
+Proof.
+intros.
+induction l as [| x l].
+ simpl; rewrite match_id.
+
+rewrite <- map_nth.
+rewrite map_map.
+
+bbb.
+
+Check app_gr_nth.
+Theorem app_gr_app_gr : ∀ E g h,
+  app_gr g (app_gr h E) = app_gr (Comb g h) E.
+Proof. reflexivity. Qed.
+do 3 rewrite app_gr_app_gr.
+
 bbb.
 (* works: *)
 etransitivity.

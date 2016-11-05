@@ -6,7 +6,7 @@
 (* Coq v8.6 *)
 
 Require Import Utf8.
-Require Import Reals Nsatz.
+Require Import Reals Nsatz Psatz.
 
 Require Import Misc Words MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr.
@@ -79,6 +79,25 @@ induction fl as [| f₁ fl]; intros.
  destruct i; [ easy | apply IHfl ].
 Qed.
 
+Theorem app_gr_nth_inv : ∀ (s := set_equiv) E fl i,
+  (app_gr (List.nth i (map gr_inv fl) gr_ident) E =
+   List.nth i (map app_gr_inv fl) Datatypes.id E)%S.
+Proof.
+intros.
+revert E i.
+induction fl as [| f₁ fl]; intros.
+ simpl; do 2 rewrite match_id.
+ apply app_gr_ident.
+
+ destruct i; [ easy | apply IHfl ].
+Qed.
+
+Theorem gr_inv_ident : gr_inv gr_ident = gr_ident.
+Proof.
+unfold gr_ident; simpl.
+f_equal; apply Ropp_0.
+Qed.
+
 Add Parametric Morphism : app_gr
 with signature eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
 as app_gr_morph.
@@ -146,7 +165,7 @@ induction g; intros; simpl.
   rewrite IHg2; apply IHg1, H.
 Qed.
 
-Theorem app_gr_app_gr_inv : ∀ (s := set_equiv) g E F,
+Theorem inv_app_gr : ∀ (s := set_equiv) g E F,
   (app_gr g E = F)%S → (app_gr_inv g F = E)%S.
 Proof.
 intros * Ha.
@@ -174,6 +193,46 @@ induction f; intros; try contradiction; [ destruct p; contradiction | ].
 simpl in H.
 eapply gr_subst in H; [ apply IHf1 in H; contradiction | ].
 split; [ apply IHf2 | intros; contradiction ].
+Qed.
+
+Theorem app_gr_app_gr_inv : ∀ (s := set_equiv) E g,
+  (app_gr g (app_gr_inv g E) = E)%S.
+Proof.
+intros.
+unfold app_gr_inv.
+revert E.
+induction g; intros.
+ intros p; simpl.
+ rewrite negf_involutive.
+ now rewrite rotate_rotate_neg.
+
+ intros (x, y, z); simpl.
+ unfold Rminus; rewrite Ropp_involutive.
+ now replace (x + - r + r)%R with x by lra.
+
+ simpl.
+ rewrite IHg2.
+ apply IHg1.
+Qed.
+
+Theorem app_gr_inv_app_gr : ∀ (s := set_equiv) E g,
+  (app_gr_inv g (app_gr g E) = E)%S.
+Proof.
+intros.
+unfold app_gr_inv.
+revert E.
+induction g; intros.
+ intros p; simpl.
+ rewrite negf_involutive.
+ now rewrite rotate_neg_rotate.
+
+ intros (x, y, z); simpl.
+ unfold Rminus; rewrite Ropp_involutive.
+ now replace (x + r + - r)%R with x by lra.
+
+ simpl.
+ rewrite IHg1.
+ apply IHg2.
 Qed.
 
 Theorem group_intersection_distr : ∀ (s := set_equiv) g E F,
