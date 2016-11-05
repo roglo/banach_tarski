@@ -57,7 +57,7 @@ destruct ti, tj.
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ easy | easy ].
+   now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
@@ -66,7 +66,7 @@ destruct ti, tj.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ easy | easy ].
+   now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
@@ -76,7 +76,7 @@ destruct ti, tj.
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
   intros el Hn.
-  apply Hjnf; [ easy | easy ].
+  now apply Hjnf.
 
   rewrite <- rev_path_norm_list, Hnj.
   rewrite rev_path_cons, rev_path_single; easy.
@@ -86,7 +86,7 @@ destruct ti, tj.
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
   intros el Hn.
-  apply Hjnf; [ easy | easy ].
+  now apply Hjnf.
 
   rewrite <- rev_path_norm_list, Hnj.
   rewrite rev_path_cons, rev_path_single; easy.
@@ -96,7 +96,7 @@ destruct ti, tj.
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ easy | easy ].
+   now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.
@@ -105,7 +105,7 @@ destruct ti, tj.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   apply Hjnf; [ easy | easy ].
+   now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
    rewrite rev_path_cons, rev_path_single; easy.

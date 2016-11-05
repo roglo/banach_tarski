@@ -96,7 +96,7 @@ induction PE as [| E₁ PE]; intros.
   remember (i - length PF)%nat as j eqn:Hj.
   assert (H : (i = j + length PF)%nat).
    rewrite Hj.
-   rewrite Nat.sub_add; [ easy | easy ].
+   now rewrite Nat.sub_add.
 
    subst i; clear Hi Hj.
    destruct PF as [| F₁ PF].

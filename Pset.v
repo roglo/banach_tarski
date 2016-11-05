@@ -323,7 +323,7 @@ Proof.
 intros.
 unfold union, set_eq; simpl; intros.
 destruct (lt_dec i (length P₁)) as [H₁| H₁].
- rewrite app_nth1; [ easy | easy ].
+ now rewrite app_nth1.
 
  rewrite app_nth2; [ easy | apply Nat.nlt_ge; easy ].
 Qed.

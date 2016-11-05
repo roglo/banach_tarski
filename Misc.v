@@ -64,7 +64,7 @@ Theorem list_prod_nil_r : ∀ A B (l : list A),
   list_prod l ([] : list B) = [].
 Proof.
 intros A B l.
-induction l as [| x]; [ easy | easy ].
+now induction l.
 Qed.
 
 Theorem list_prod_map : ∀ A B C D (f : A → B) (g : C → D) l l',
@@ -224,11 +224,11 @@ intros A el₁ el₂ el₃ el₄ Hel.
 revert el₂ el₃ el₄ Hel.
 induction el₁ as [| e₁]; intros.
  left; exists el₃.
- split; [ easy | easy ].
+ now split.
 
  destruct el₃ as [| e₃].
   right; exists (e₁ :: el₁).
-  split; [ easy | symmetry; easy ].
+  now split.
 
   simpl in Hel.
   injection Hel; clear Hel; intros; subst e₃.
