@@ -877,6 +877,29 @@ split.
   eapply HPij; [ apply Hd | split; eassumption ].
 Qed.
 
+Require Import Setoid.
+Add Parametric Morphism :
+  (λ n fl, @nth (set point → set point) n (map app_gr_inv fl) id)
+  with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  as nth_map_app_gr_inv_morph.
+Proof.
+intros n fl E F HEF x.
+split; intros Hx.
+ revert n Hx.
+ induction fl as [| f₁ fl]; intros.
+  simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
+
+  simpl in Hx; simpl.
+  now destruct n; [ rewrite <- HEF | apply IHfl ].
+
+ revert n Hx.
+ induction fl as [| f₁ fl]; intros.
+  simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
+
+  simpl in Hx; simpl.
+  now destruct n; [ rewrite HEF | apply IHfl ].
+Qed.
+
 Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
 Proof.
 intros E F G HEF HFG.
@@ -962,136 +985,104 @@ assert
      apply In_nth with (d := (∅, ∅)) in HUV.
      rewrite combine_length in HUV.
      rewrite partition_combine_length in HUV.
-     2: now rewrite Hg'l, map_length.
-     rewrite partition_combine_swi_length in HUV.
-     2: now rewrite Hh'l, map_length.
-     rewrite <- Hlen1, Hlen2, Nat.mul_comm in HUV.
-     rewrite Nat.min_l in HUV; [ | easy ].
-     destruct HUV as (i & Hi & HUV).
-     rewrite combine_nth in HUV.
-     injection HUV; clear HUV; intros HV HU.
-     subst g'l h'l.
-(*
-     rewrite partition_combine_length in Hi; [ | now rewrite map_length ].
-     rewrite partition_combine_swi_length in Hj; [ | now rewrite map_length ].
-     remember (map app_gr_inv gl) as fl eqn:Hfl.
-     remember (map app_gr_inv hl) as f'l eqn:Hf'l.
-     rewrite Hlen2 in Hi.
-     rewrite <- Hlen1, Nat.mul_comm in Hj.
-*)
-     apply eq_set_eq in HU.
-     apply eq_set_eq in HV.
-remember (partition_combine (map app_gr_inv gl) PE P₂F) as PE' eqn:HPE'.
-remember (partition_combine_swi (map app_gr_inv hl) PG P₁F) as PG' eqn:HPG'.
-destruct Hpcf as (HpcfU, HpcfI).
-destruct Hpcg as (HpcgU, HpcgI).
-     remember (nth (i / length PG) gl gr_ident) as gi.
-     remember (nth (i mod length PG) (map gr_inv hl) gr_ident) as hj.
-     exists (Comb hj gi); subst gi hj; simpl.
-(*
-remember gr_ident as toto in |-*.
-exists toto.
-*)
-(*
-remember (length PG) as lenPG eqn:HlenPG.
-symmetry in HlenPG.
-destruct lenPG; [ rewrite Nat.mul_0_r in Hi; now apply Nat.nlt_0_r in Hi | ].
-*)
-rewrite <- HU, <- HV; clear HU HV.
-rewrite HPE', HPG'.
-rewrite partition_combine_nth; [ | easy | | ].
- rewrite partition_combine_swi_nth; [ | easy | | ].
-  do 2 rewrite group_intersection_distr.
-rewrite Hlen2.
-(*
-  rewrite <- Hlen1, Hlen2.
-*)
+      2: now rewrite Hg'l, map_length.
 
-Require Import Setoid.
-Add Parametric Morphism :
-  (λ n fl, @nth (set point → set point) n (map app_gr_inv fl) id)
-  with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
-  as nth_map_app_gr_inv_morph.
-Proof.
-intros n fl E F HEF x.
-split; intros Hx.
- revert n Hx.
- induction fl as [| f₁ fl]; intros.
-  simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
+      rewrite partition_combine_swi_length in HUV.
+       2: now rewrite Hh'l, map_length.
 
-  simpl in Hx; simpl.
-  now destruct n; [ rewrite <- HEF | apply IHfl ].
+       rewrite <- Hlen1, Hlen2, Nat.mul_comm in HUV.
+       rewrite Nat.min_l in HUV; [ | easy ].
+       destruct HUV as (i & Hi & HUV).
+       rewrite combine_nth in HUV.
+        injection HUV; clear HUV; intros HV HU.
+        apply eq_set_eq in HU.
+        apply eq_set_eq in HV.
+        remember (partition_combine g'l PE P₂F) as PE' eqn:HPE'.
+        remember (partition_combine_swi h'l PG P₁F) as PG' eqn:HPG'.
+        subst g'l h'l.
+        destruct Hpcf as (HpcfU, HpcfI).
+        destruct Hpcg as (HpcgU, HpcgI).
+        remember (nth (i / length PG) gl gr_ident) as gi.
+        remember (nth (i mod length PG) (map gr_inv hl) gr_ident) as hj.
+        exists (Comb hj gi); subst gi hj; simpl.
+        rewrite <- HU, <- HV; clear HU HV.
+        rewrite HPE', HPG'.
+        rewrite partition_combine_nth; [ | easy | | ].
+         rewrite partition_combine_swi_nth; [ | easy | | ].
+          do 2 rewrite group_intersection_distr.
+          rewrite Hlen2, Hgl.
+          rewrite intersection_comm.
+          apply intersection_morph.
+           Focus 2.
+           rewrite app_gr_nth.
+           replace Datatypes.id with (@id (set point)) by easy.
+           now rewrite map_map.
 
- revert n Hx.
- induction fl as [| f₁ fl]; intros.
-  simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
+           rewrite app_gr_nth.
+           replace Datatypes.id with (@id (set point)) by easy.
+           rewrite map_map.
+           etransitivity.
+            apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+            apply app_gr_morph_Proper; [ reflexivity | ].
+            apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+            symmetry; apply Hhl.
+            do 2 rewrite Nat.add_0_r.
+            do 2 rewrite <- app_gr_nth_inv.
+            assert (HPGnz : length PG ≠ 0).
+             intros H; rewrite H in Hi.
+             now apply Nat.nlt_0_r in Hi.
 
-  simpl in Hx; simpl.
-  now destruct n; [ rewrite HEF | apply IHfl ].
-Qed.
+             setoid_rewrite nth_indep with (d' := gr_inv gr_ident).
+              Focus 2.
+              rewrite map_length, Hlen4.
+              now apply Nat.mod_upper_bound.
 
-Show.
-rewrite Hgl.
-rewrite intersection_comm.
-apply intersection_morph.
-Focus 2.
-rewrite app_gr_nth.
-replace Datatypes.id with (@id (set point)) by easy.
-now rewrite map_map.
+              do 2 rewrite map_nth.
+              rewrite gr_inv_ident.
+              remember (nth (i / length PG) gl gr_ident) as x.
+              do 2 rewrite fold_app_gr_inv.
+              rewrite app_gr_app_gr_inv.
+              now rewrite app_gr_inv_app_gr.
 
-rewrite app_gr_nth.
-replace Datatypes.id with (@id (set point)) by easy.
-rewrite map_map.
-etransitivity.
-apply nth_map_app_gr_inv_morph; [ easy | easy | ].
-apply app_gr_morph_Proper; [ reflexivity | ].
-apply nth_map_app_gr_inv_morph; [ easy | easy | ].
-symmetry; apply Hhl.
-do 2 rewrite Nat.add_0_r.
-do 2 rewrite <- app_gr_nth_inv.
-assert (HPGnz : length PG ≠ 0).
-intros H; rewrite H in Hi.
-now apply Nat.nlt_0_r in Hi.
+              now rewrite Hlen3; apply Nat.div_lt_upper_bound.
 
-setoid_rewrite nth_indep with (d' := gr_inv gr_ident).
-Focus 2.
- rewrite map_length, Hlen4.
- now apply Nat.mod_upper_bound.
+              rewrite map_length, Hlen3.
+              now apply Nat.div_lt_upper_bound.
 
-do 2 rewrite map_nth.
-rewrite gr_inv_ident.
-remember (nth (i / length PG) gl gr_ident) as x.
-do 2 rewrite fold_app_gr_inv.
-rewrite app_gr_app_gr_inv.
-now rewrite app_gr_inv_app_gr.
-rewrite Hlen3.
-now apply Nat.div_lt_upper_bound.
-rewrite map_length, Hlen3.
-now apply Nat.div_lt_upper_bound.
-rewrite Hlen4.
-now apply Nat.mod_upper_bound.
-now rewrite map_length.
-intros f Hif.
-clear -Hif.
-induction hl as [| h₁ hl]; [ easy | ].
-destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHhl ].
-now rewrite map_length.
-intros f Hif.
-clear -Hif.
-induction gl as [| g₁ gl]; [ easy | ].
-destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHgl ].
-rewrite partition_combine_length.
-rewrite partition_combine_swi_length.
-rewrite Hlen1, Hlen2.
-apply Nat.mul_comm.
-now subst h'l; rewrite map_length.
-now subst g'l; rewrite map_length.
-rewrite partition_combine_length.
-rewrite partition_combine_swi_length.
-rewrite Hlen1, Hlen2.
-apply Nat.mul_comm.
-now subst h'l; rewrite map_length.
-now subst g'l; rewrite map_length.
+              rewrite Hlen4.
+              now apply Nat.mod_upper_bound.
+
+          now rewrite map_length.
+
+          intros f Hif.
+          clear -Hif.
+          induction hl as [| h₁ hl]; [ easy | ].
+          destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHhl ].
+
+         now rewrite map_length.
+
+         intros f Hif.
+         clear -Hif.
+         induction gl as [| g₁ gl]; [ easy | ].
+         destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHgl ].
+
+        rewrite partition_combine_length.
+         rewrite partition_combine_swi_length.
+          rewrite Hlen1, Hlen2.
+          apply Nat.mul_comm.
+
+          now subst h'l; rewrite map_length.
+
+         now subst g'l; rewrite map_length.
+
+     rewrite partition_combine_length.
+      rewrite partition_combine_swi_length.
+       rewrite Hlen1, Hlen2.
+       apply Nat.mul_comm.
+
+       now subst h'l; rewrite map_length.
+
+       now subst g'l; rewrite map_length.
 Qed.
 
 Add Parametric Relation : (set point) (equidecomposable set_equiv)
