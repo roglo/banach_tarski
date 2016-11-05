@@ -1049,12 +1049,14 @@ apply nth_map_app_gr_inv_morph; [ easy | easy | ].
 symmetry; apply Hhl.
 do 2 rewrite Nat.add_0_r.
 do 2 rewrite <- app_gr_nth_inv.
+assert (HPGnz : length PG ≠ 0).
+intros H; rewrite H in Hi.
+now apply Nat.nlt_0_r in Hi.
+
 setoid_rewrite nth_indep with (d' := gr_inv gr_ident).
 Focus 2.
  rewrite map_length, Hlen4.
- apply Nat.mod_upper_bound.
- intros H; rewrite H in Hi.
- now apply Nat.nlt_0_r in Hi.
+ now apply Nat.mod_upper_bound.
 
 do 2 rewrite map_nth.
 rewrite gr_inv_ident.
@@ -1062,180 +1064,37 @@ remember (nth (i / length PG) gl gr_ident) as x.
 do 2 rewrite fold_app_gr_inv.
 rewrite app_gr_app_gr_inv.
 now rewrite app_gr_inv_app_gr.
+rewrite Hlen3.
+now apply Nat.div_lt_upper_bound.
+rewrite map_length, Hlen3.
+now apply Nat.div_lt_upper_bound.
+rewrite Hlen4.
+now apply Nat.mod_upper_bound.
+now rewrite map_length.
+intros f Hif.
+clear -Hif.
+induction hl as [| h₁ hl]; [ easy | ].
+destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHhl ].
+now rewrite map_length.
+intros f Hif.
+clear -Hif.
+induction gl as [| g₁ gl]; [ easy | ].
+destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHgl ].
+rewrite partition_combine_length.
+rewrite partition_combine_swi_length.
+rewrite Hlen1, Hlen2.
+apply Nat.mul_comm.
+now subst h'l; rewrite map_length.
+now subst g'l; rewrite map_length.
+rewrite partition_combine_length.
+rewrite partition_combine_swi_length.
+rewrite Hlen1, Hlen2.
+apply Nat.mul_comm.
+now subst h'l; rewrite map_length.
+now subst g'l; rewrite map_length.
+Qed.
 
-bbb.
-
-Theorem map_nth_endo : ∀ A (f : A → A) l d n,
-  n < length l
-  → nth n (map f l) d = f (nth n l d).
-Proof.
-intros.
-induction l as [| x l].
- simpl; rewrite match_id.
-
-rewrite <- map_nth.
-rewrite map_map.
-
-bbb.
-
-Check app_gr_nth.
-Theorem app_gr_app_gr : ∀ E g h,
-  app_gr g (app_gr h E) = app_gr (Comb g h) E.
-Proof. reflexivity. Qed.
-do 3 rewrite app_gr_app_gr.
-
-bbb.
-(* works: *)
-etransitivity.
-apply intersection_morph_Proper; [ reflexivity | ].
-apply app_gr_morph_Proper; [ reflexivity | ].
-apply app_gr_morph_Proper; [ reflexivity | ].
-apply nth_map_app_gr_inv_morph; [ easy | easy | ].
-
-symmetry; apply Hhl.
-(* doesn't work:
-rewrite <- Hhl.
-*)
-rewrite Nat.add_0_r.
-symmetry.
-etransitivity.
-apply intersection_morph_Proper; [ reflexivity | ].
-apply nth_map_app_gr_inv_morph; [ easy | easy | ].
-symmetry; apply Hgl.
-rewrite Nat.add_0_r.
-bbb.
-
-rewrite intersection_comm.
-(**)
-bbb.
-
-apply intersection_morph.
-Check app_gr_nth.
-
-bbb.
-rewrite app_gr_nth.
-
-
-apply app_gr_morph_Proper; [ reflexivity | ].
-apply app_gr_morph_Proper; [ reflexivity | ].
-apply nth_map_app_gr_inv_morph; [ easy | easy | ].
-symmetry; apply Hhl.
-
-
-rewrite app_gr_nth.
-replace Datatypes.id with (@id (set point)) by easy.
-rewrite intersection_comm.
-apply intersection_morph.
-Focus 2.
-
-bbb.
-rewrite app_gr_nth.
-
-bbb.
-
-(*
-Typeclasses eauto := debug.
-Fail rewrite <- Hhl.
-*)
-apply nth_set_morph2_Proper; [ reflexivity | reflexivity | ].
-rewrite <- Hhl.
-reflexivity.
-remember (i mod length P₂F) as III.
-remember (j / length P₁F) as JJJ.
-
-bbb.
-
-assert (toto:
-(
-  app_gr (gr_inv (nth (j mod length P₁F) hl gr_ident))
-     (P₁F.[i / length P₂F]
-      ∩ app_gr (nth (i / length P₂F) gl gr_ident)
-          (nth (i / length P₂F) (map app_gr_inv gl) id
-             P₂F.[i mod length P₂F]))
-=
-  app_gr (gr_inv (nth (j mod length P₁F) hl gr_ident))
-     (P₁F.[i / length P₂F]
-      ∩ app_gr (nth (i / length P₂F) gl gr_ident)
-          (nth (i / length P₂F) (map app_gr_inv gl) id
-             (app_gr (nth (i mod length P₂F) hl gr_ident) PG.[i mod length P₂F])))
-)%S
-).
-apply app_gr_morph; [ reflexivity | ].
-apply intersection_morph; [ reflexivity | ].
-apply app_gr_morph; [ reflexivity | ].
-apply nth_set_morph2; try reflexivity.
-rewrite <- Hhl; reflexivity. (* does not fail! *)
-bbb.
-
-Check nth_set_morph2.
-rewrite toto.
-bbb.
-
-(*
-apply nth_set_morph2; try reflexivity.
-*)
-rewrite <- Hhl.
-reflexivity.
-bbb.
-
-Definition gr_eq_list (gl₁ gl₂ : list Gr) := gl₁ = gl₂.
-Add Parametric Morphism : (map app_gr_inv)
-  with signature gr_eq_list ==> eq
-  as map_app_gr_inv_morph.
-Proof.
-intros.
-Admitted. Show.
-rewrite <- Hhl.
-bbb.
-Add Parametric Morphism : (@nth (set point → set point))
-  with signature eq ==> eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
-  as nth_set_morph2.
-Proof.
-Admitted. Show.
-rewrite <- Hhl.
-bbb.
-
-intros n l d E F HEF x.
-split; intros Hx.
- unfold set_eq in HEF.
- simpl in HEF.
- revert n d E F x HEF Hx.
- induction l as [| y l]; intros.
-  simpl in Hx; rewrite match_id in Hx.
-  simpl; rewrite match_id.
-
-bbb.
-
-
-rewrite <- Hhl.
-rewrite group_intersection_distr.
-
-bbb.
-
-pose proof Hhl (i mod length P₂F) as H.
-
-bbb.
-     rewrite partition_combine_nth in HU; [ | reflexivity | | ].
-      rewrite partition_combine_nth in HV; [ | reflexivity | | ].
-       rewrite <- HU, <- HV; clear HU HV.
-       rewrite group_intersection_distr.
-bbb.
-       rewrite Hgl.
-       rewrite group_intersection_distr.
-       destruct (eq_nat_dec (i / length P₂F) (j / length P₁F)) as [Hidj| Hidj].
-        rewrite <- Hidj.
-
-bbb.
-
-Focus 2.
-     subst fl f'l.
-     rewrite partition_combine_length; [ | now rewrite map_length ].
-     rewrite partition_combine_length; [ | now rewrite map_length ].
-     rewrite Hlen1, Hlen2; apply Nat.mul_comm.
-
-bbb.
-
-Add Parametric Relation : (point → Prop) (equidecomposable set_equiv)
+Add Parametric Relation : (set point) (equidecomposable set_equiv)
  reflexivity proved by equidec_refl
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans
