@@ -122,6 +122,8 @@ Theorem separated_spheres_without_fixpoints : ∀ (s := set_equiv),
   (xtransl 3 sphere_but_fixpoints ∩ xtransl 6 sphere_but_fixpoints = ∅)%S.
 Proof.
 intros p; split; [ intros (H3, H6) | easy ].
+unfold sphere_but_fixpoints in H3, H6.
+simpl in H3, H6.
 bbb.
 
 Theorem separated_spheres : ∀ (s := set_equiv),
