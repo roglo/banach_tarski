@@ -150,6 +150,9 @@ Qed.
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
 Proof.
+intros.
+About rot.
+assert (∃ θ, ∀ p n, p ∈ sphere ∖ sphere_but_fixpoints → not (p ∈ set_rotate (INR n * θ) (sphere ∖ sphere_but_fixpoints))).
 bbb.
 
 Theorem Banach_Tarski_paradox : ∀ (s := set_equiv),

@@ -21,6 +21,9 @@ Definition mat_vec_mul mat '(P x y z) :=
     (a₂₁ mat * x + a₂₂ mat * y + a₂₃ mat * z)
     (a₃₁ mat * x + a₃₂ mat * y + a₃₃ mat * z).
 
+Definition mat_of_rot p θ := mkmat
+  ???
+
 Definition rot_x := mkmat
   1         0         0
   0         (1/3)     (-2*√2/3)
