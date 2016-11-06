@@ -153,12 +153,15 @@ rewrite rotate_neg_rotate.
 now f_equal.
 Qed.
 
-Theorem no_fixpoint_after_rotate : ∀ p e,
-  p ∈ orbit_without_fixpoint
-  → rotate e p ∈ orbit_without_fixpoint.
+Theorem no_fixpoint_after_rotate : ∀ p e, p ∉ D → rotate e p ∉ D.
 Proof.
-intros * His.
-unfold orbit_without_fixpoint in His.
+intros * His Hr; apply His; clear His.
+unfold D in Hr; simpl in Hr.
+destruct Hr as (el & P₁ & Hso & Hn & Hr).
+
+bbb.
+intros * His Hr; apply His; clear His.
+unfold D in Hr; simpl in Hr.
 intros el p₁ Hso Hel.
 remember (negf e :: rev_path el ++ e :: [])  as el₁ eqn:Hel₁.
 remember (norm_list el₁) as el₂ eqn:Hel₂.
