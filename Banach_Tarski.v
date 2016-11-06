@@ -158,6 +158,7 @@ assert
   (∃ ax θ, ∀ p n,
    p ∈ sphere ∖ sphere_but_fixpoints
    → p ∉ rotate_set ax (INR n * θ) (sphere ∖ sphere_but_fixpoints)).
+About sphere_but_fixpoints.
 bbb.
 
 Theorem Banach_Tarski_paradox : ∀ (s := set_equiv),
