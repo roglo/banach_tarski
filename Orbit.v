@@ -87,15 +87,7 @@ Definition D :=
     (λ p, ∃ el p₁, same_orbit p p₁
      ∧ norm_list el ≠ [] ∧ fold_right rotate p₁ el = p₁).
 
-(*
-Definition orbit_without_fixpoint :=
-  mkset
-    (λ p, ∀ el p₁, same_orbit p p₁
-     → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁).
-*)
-
-Definition sphere_but_fixpoints :=
-  mkset (λ p, p ∈ sphere ∖ D).
+Definition sphere_but_fixpoints := sphere ∖ D.
 
 Theorem on_sphere_ray_after_rotation : ∀ p m r,
   p ∈ sphere_ray r
@@ -159,46 +151,10 @@ intros * His Hr; apply His; clear His.
 unfold D in Hr; simpl in Hr.
 unfold D; simpl.
 destruct Hr as (el & p₁ & Hso & Hn & Hr).
-bbb.
-exists el, (rotate (negf e) p₁).
+exists el, p₁.
 split; [ | easy ].
 destruct Hso as (el₁ & Hso).
-exists (rev_path el₁).
-apply rotate_rev_path.
-
-bbb.
-
-unfold same_orbit in Hso.
-destruct Hso as (el₁ & Hso).
-apply rotate_rev_path in Hso.
-rewrite <- Hr in Hso.
-rewrite <- fold_right_app in Hso.
-
-bbb.
-intros * His Hr; apply His; clear His.
-unfold D in Hr; simpl in Hr.
-intros el p₁ Hso Hel.
-remember (negf e :: rev_path el ++ e :: [])  as el₁ eqn:Hel₁.
-remember (norm_list el₁) as el₂ eqn:Hel₂.
-symmetry in Hel₂.
-destruct el₂ as [| e₂].
- exfalso; subst el₁; apply Hel.
- apply norm_list_is_nil_between in Hel₂.
- rewrite <- rev_path_norm_list in Hel₂.
- now apply rev_path_is_nil in Hel₂.
-
- apply same_orbit_rotate with (e := negf e) in Hso.
- rewrite rotate_neg_rotate in Hso.
- assert (Hn : norm_list el₁ ≠ []) by (now rewrite Hel₂).
- pose proof His el₁ (rotate (negf e) p₁) Hso Hn.
- intros Hr; apply H; clear H.
- rewrite <- Hr at 1.
- rewrite <- fold_right_cons, <- fold_right_app.
- rewrite Hel₁, cons_comm_app, app_comm_cons.
- rewrite <- app_assoc.
- simpl; f_equal.
- rewrite rotate_rotate_norm.
- rewrite norm_list_cancel_in.
- rewrite <- rotate_rotate_norm.
- apply app_path_rev_path.
+unfold same_orbit.
+exists (el₁ ++ [e]).
+now rewrite fold_right_app.
 Qed.
