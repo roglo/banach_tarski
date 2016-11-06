@@ -21,6 +21,8 @@ Definition mat_vec_mul mat '(P x y z) :=
     (a₂₁ mat * x + a₂₂ mat * y + a₂₃ mat * z)
     (a₃₁ mat * x + a₃₂ mat * y + a₃₃ mat * z).
 
+(* https://en.wikipedia.org/wiki/Rotation_matrix
+   #Rotation_matrix_from_axis_and_angle *)
 Definition rot_mat_of_axis_cos '(P x y z) cosθ :=
   let sinθ := √ (1 - cosθ²) in mkmat
   (cosθ+x²*(1-cosθ))    (x*y*(1-cosθ)-z*sinθ) (x*z*(1-cosθ)+y*sinθ)
@@ -44,14 +46,17 @@ Definition rot_inv_z := mkmat
   (-2*√2/3) (1/3)     0
   0         0         1.
 
-(*
-Theorem glop : rot_x = rot_mat_of_axis_ang (P 1 0 0) (1/3).
+Theorem rot_x_means_rot_x : rot_x = rot_mat_of_axis_cos (P 1 0 0) (1/3).
 Proof.
 unfold rot_x; simpl.
 setoid_rewrite Rsqr_pow2.
 f_equal; try lra; ring_simplify.
-bbb.
-*)
+ replace (1 - (1 / 3) ^ 2)%R with (2 * (2 / 3) ^ 2)%R by field.
+ rewrite sqrt_mult; [ rewrite sqrt_pow2; lra | lra | lra ].
+
+ replace (1 - (1 / 3) ^ 2)%R with (2 * (2 / 3) ^ 2)%R by field.
+ rewrite sqrt_mult; [ rewrite sqrt_pow2; lra | lra | lra ].
+Qed.
 
 Definition mat_of_elem e :=
   match e with
