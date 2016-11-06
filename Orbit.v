@@ -82,10 +82,17 @@ Definition orbit_selector := choice_function same_orbit.
 Definition sphere_ray r := mkset (λ '(P x y z), (x² + y² + z² = r)%R).
 Definition sphere := mkset (λ '(P x y z), (x² + y² + z² <= 1)%R).
 
+Definition orbit_having_fixpoints :=
+  mkset
+    (λ p, ∃ el p₁, same_orbit p p₁
+     ∧ norm_list el ≠ [] ∧ fold_right rotate p₁ el = p₁).
+
 Definition orbit_without_fixpoint :=
   mkset
     (λ p, ∀ el p₁, same_orbit p p₁
      → norm_list el ≠ [] → fold_right rotate p₁ el ≠ p₁).
+
+bbb. (* redefinition with 'orbit_having_fixpoints' ? *)
 
 Definition sphere_but_fixpoints :=
   mkset (λ p, p ∈ sphere ∧ p ∈ orbit_without_fixpoint).
