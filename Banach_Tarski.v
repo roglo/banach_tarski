@@ -160,6 +160,10 @@ Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
 Proof.
 intros.
+assert (∃ p₁, p₁ ∈ sphere ∖ D).
+unfold "∈", "∖".
+bbb.
+
 assert (∃ p₁, p₁ ∉ D).
 bbb.
 assert (∀ p₁, (∀ el p, ¬ (same_orbit p₁ p ∧ norm_list el ≠ [] ∧ fold_right rotate p el = p)) → p₁ ∉ D).
