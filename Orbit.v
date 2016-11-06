@@ -157,7 +157,15 @@ Theorem no_fixpoint_after_rotate : ∀ p e, p ∉ D → rotate e p ∉ D.
 Proof.
 intros * His Hr; apply His; clear His.
 unfold D in Hr; simpl in Hr.
+unfold D; simpl.
 destruct Hr as (el & p₁ & Hso & Hn & Hr).
+bbb.
+
+unfold same_orbit in Hso.
+destruct Hso as (el₁ & Hso).
+apply rotate_rev_path in Hso.
+rewrite <- Hr in Hso.
+rewrite <- fold_right_app in Hso.
 
 bbb.
 intros * His Hr; apply His; clear His.
