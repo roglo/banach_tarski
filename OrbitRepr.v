@@ -49,9 +49,6 @@ exists el, p.
 now rewrite Hn.
 Qed.
 
-Theorem in_subtract : ∀ A (x : A) E F, x ∈ E ∧ x ∉ F ↔ x ∈ E ∖ F.
-Proof. easy. Qed.
-
 Theorem start_with_same : ∀ f os, os = mkos _ f →
   ∀ e₁ e₂ p, p ∈ SS e₁ → p ∈ SS e₂ → e₁ = e₂.
 Proof.
@@ -74,8 +71,9 @@ destruct ti, tj.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-bbb.
-   now apply Hjnf.
+   destruct Hinf as (Hps, Hnpd).
+   intros H; apply Hnpd.
+   now exists el, p.
 
    rewrite <- rev_path_norm_list, Hnj.
    now rewrite rev_path_cons, rev_path_single.
@@ -85,7 +83,9 @@ bbb.
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
   intros el Hn.
-  now apply Hjnf.
+  destruct Hinf as (Hps, Hnpd).
+  intros H; apply Hnpd.
+  now exists el, p.
 
   rewrite <- rev_path_norm_list, Hnj.
   now rewrite rev_path_cons, rev_path_single.
@@ -95,7 +95,9 @@ bbb.
 +exfalso.
  eapply not_in_fixpoints_one_path; try eassumption.
   intros el Hn.
-  now apply Hjnf.
+  destruct Hinf as (Hps, Hnpd).
+  intros H; apply Hnpd.
+  now exists el, p.
 
   rewrite <- rev_path_norm_list, Hnj.
   now rewrite rev_path_cons, rev_path_single.
@@ -105,7 +107,9 @@ bbb.
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   now apply Hjnf.
+   destruct Hinf as (Hps, Hnpd).
+   intros H; apply Hnpd.
+   now exists el, p.
 
    rewrite <- rev_path_norm_list, Hnj.
    now rewrite rev_path_cons, rev_path_single.
@@ -114,7 +118,9 @@ bbb.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   now apply Hjnf.
+   destruct Hinf as (Hps, Hnpd).
+   intros H; apply Hnpd.
+   now exists el, p.
 
    rewrite <- rev_path_norm_list, Hnj.
    now rewrite rev_path_cons, rev_path_single.
@@ -155,6 +161,7 @@ assert (Hr : f p = f (rotate (negf e) p)).
  rewrite app_assoc in Hs.
  rewrite rotate_cancel_in in Hs.
  rewrite app_nil_r in Hs.
+bbb.
  eapply Hnf; [ reflexivity | | eassumption ].
  intros H.
  apply norm_list_app_is_nil in H.
