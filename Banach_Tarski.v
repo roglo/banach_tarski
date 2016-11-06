@@ -162,7 +162,7 @@ Proof.
 intros.
 assert (∃ p₁, p₁ ∈ sphere ∖ D).
 unfold "∈", "∖".
-bbb.
+found.
 
 assert (∃ p₁, p₁ ∉ D).
 bbb.
