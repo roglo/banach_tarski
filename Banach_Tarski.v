@@ -150,12 +150,24 @@ Qed.
 Definition rotate_set axis ang E :=
   mkset (λ p, mat_vec_mul (rot_mat_of_axis_cos axis (-cos ang)) p ∈ E).
 
+Theorem glop : (∀ A (P : A → Prop), (∀ x, ¬ (P x)) → ¬ (∃ x, P x)).
+Proof.
+intros A P Hf (x & He).
+revert He; apply Hf.
+Qed.
+
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
 Proof.
 intros.
 assert (∃ p₁, p₁ ∉ D).
+bbb.
+assert (∀ p₁, (∀ el p, ¬ (same_orbit p₁ p ∧ norm_list el ≠ [] ∧ fold_right rotate p el = p)) → p₁ ∉ D).
+intros p₁ Hf.
+apply glop; intros el (p, Hp).
+revert Hp; apply Hf.
 simpl.
+
 bbb.
 
 assert (∃ p₁ θ, ∀ p n, p ∈ D → p ∉ rotate_set p₁ (INR n * θ) D).
