@@ -550,10 +550,8 @@ split.
        simpl in Hoo.
        rewrite Hoo in Hel.
        destruct Hnf as (His & Hoh).
-bbb.
-       unfold orbit_without_fixpoint in Hoh.
-       exfalso; revert Hel.
-       apply Hoh; [ easy | ].
+       exfalso; apply Hoh.
+       exists el, p.
        now rewrite Hel₁.
 
       left; left; right.
@@ -583,14 +581,15 @@ bbb.
       destruct n.
        simpl in Hr; rewrite Hr in Hel.
        destruct Hnf as (His, Hoh).
-       revert Hel; apply Hoh; [ easy | ].
-       now rewrite Hel₁.
+       now apply Hoh; exists el, p; rewrite Hel₁.
 
        apply rotate_rev_path in Hr.
        rewrite <- Hr, <- fold_right_app in Hel.
        destruct Hnf as (His, Hoh).
-       revert Hel.
-       apply Hoh; [ easy | ].
+       apply Hoh.
+       exists (el ++ rev_path (repeat ạ⁻¹ (S n))), p.
+       split; [ easy | ].
+       split; [ | easy ].
        replace el with ([] ++ el) by easy.
        rewrite <- app_assoc, <- is_normal, Hel₁, app_nil_l.
        rewrite rev_path_repeat.
@@ -602,8 +601,7 @@ bbb.
         apply f_equal with (f := rev_path) in H.
         rewrite rev_path_involutive in H.
         rewrite <- app_repeat_diag in H.
-        rewrite rev_path_app in H; simpl in H.
-        easy.
+        now rewrite rev_path_app in H; simpl in H.
 
         unfold app; rewrite <- Hel₁; symmetry.
         apply norm_list_idemp.
