@@ -161,8 +161,11 @@ assert (Hr : f p = f (rotate (negf e) p)).
  rewrite app_assoc in Hs.
  rewrite rotate_cancel_in in Hs.
  rewrite app_nil_r in Hs.
-bbb.
- eapply Hnf; [ reflexivity | | eassumption ].
+ destruct Hnf as (Hps, Hnpd).
+ apply Hnpd.
+ exists (norm_list el ++ rev_path elr₁), p.
+ split; [ easy | ].
+ split; [ | easy ].
  intros H.
  apply norm_list_app_is_nil in H.
   apply -> rev_path_eq_eq in H.
@@ -406,11 +409,8 @@ split.
      destruct Hnf as (His, _).
      now apply in_sphere_after_rotate.
 
-     intros el₁ p₁ Hp Hn.
-     apply Hnf; [ | easy ].
-     destruct Hp as (el₂ & Hp).
-     exists (el₂ ++ [negf e]).
-     now rewrite fold_right_app.
+     destruct Hnf as (Hps, Hnpd).
+     now apply no_fixpoint_after_rotate.
 
     exists (negf e :: []), [].
     split; [ easy | simpl ].
@@ -431,11 +431,8 @@ split.
        destruct Hnf as (His, _).
        now apply in_sphere_after_rotate.
 
-       intros el₂ p₁ Hp Hn.
-       apply Hnf; [ | easy ].
-       destruct Hp as (el₃ & Hp).
-       exists (el₃ ++ [negf e]).
-       now rewrite fold_right_app.
+       destruct Hnf.
+       now apply no_fixpoint_after_rotate.
 
       assert (H : f p = f (rotate (negf e) p)).
        apply Hoe.
@@ -458,11 +455,9 @@ split.
    apply in_sphere_after_rotate with (e := e) in His.
    now rewrite rotate_rotate_neg in His.
 
-   intros el p₁ Hso Hn.
-   apply H; [ | easy ].
-   etransitivity; [ | eassumption ].
-   exists (e :: []).
-   apply rotate_rotate_neg.
+   destruct H as (Hs, Hnp).
+   apply no_fixpoint_after_rotate with (e := e) in Hnp.
+   now rewrite rotate_rotate_neg in Hnp.
 
 *intros i j Hij p.
  split; [ | easy ].
@@ -555,6 +550,7 @@ split.
        simpl in Hoo.
        rewrite Hoo in Hel.
        destruct Hnf as (His & Hoh).
+bbb.
        unfold orbit_without_fixpoint in Hoh.
        exfalso; revert Hel.
        apply Hoh; [ easy | ].
