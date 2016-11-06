@@ -87,6 +87,8 @@ Definition D :=
     (λ p, ∃ el p₁, same_orbit p p₁
      ∧ norm_list el ≠ [] ∧ fold_right rotate p₁ el = p₁).
 
+Arguments D : simpl never.
+
 Definition sphere_but_fixpoints := sphere ∖ D.
 
 Theorem on_sphere_ray_after_rotation : ∀ p m r,

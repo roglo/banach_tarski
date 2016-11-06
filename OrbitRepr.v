@@ -42,9 +42,15 @@ intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
 rewrite <- He in Hs.
-eapply Hinf; [ easy | | eassumption ].
-intros H; now rewrite Hn in H.
+unfold sphere_but_fixpoints in Hinf; simpl in Hinf.
+destruct Hinf as (Hle1 & Hinf).
+apply Hinf; clear Hinf.
+exists el, p.
+now rewrite Hn.
 Qed.
+
+Theorem in_subtract : ∀ A (x : A) E F, x ∈ E ∧ x ∉ F ↔ x ∈ E ∖ F.
+Proof. easy. Qed.
 
 Theorem start_with_same : ∀ f os, os = mkos _ f →
   ∀ e₁ e₂ p, p ∈ SS e₁ → p ∈ SS e₂ → e₁ = e₂.
@@ -57,7 +63,9 @@ destruct ti, tj.
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
-   now apply Hjnf.
+   destruct Hinf as (Hps, Hnpd).
+   intros H; apply Hnpd; clear Hnpd.
+   now exists el, p.
 
    rewrite <- rev_path_norm_list, Hnj.
    now rewrite rev_path_cons, rev_path_single.
@@ -66,6 +74,7 @@ destruct ti, tj.
 
  *eapply not_in_fixpoints_one_path; try eassumption.
    intros el Hn.
+bbb.
    now apply Hjnf.
 
    rewrite <- rev_path_norm_list, Hnj.
