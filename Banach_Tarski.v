@@ -147,12 +147,17 @@ simpl in H3, H6.
 now apply (Rno_intersect_spheres_x3_x6 x y z).
 Qed.
 
+Definition rotate_set axis ang E :=
+  mkset (λ p, mat_vec_mul (rot_mat_of_axis_cos axis (-cos ang)) p ∈ E).
+
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
 Proof.
 intros.
-About rot.
-assert (∃ θ, ∀ p n, p ∈ sphere ∖ sphere_but_fixpoints → not (p ∈ set_rotate (INR n * θ) (sphere ∖ sphere_but_fixpoints))).
+assert
+  (∃ ax θ, ∀ p n,
+   p ∈ sphere ∖ sphere_but_fixpoints
+   → p ∉ rotate_set ax (INR n * θ) (sphere ∖ sphere_but_fixpoints)).
 bbb.
 
 Theorem Banach_Tarski_paradox : ∀ (s := set_equiv),

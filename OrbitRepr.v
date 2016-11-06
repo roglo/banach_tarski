@@ -30,8 +30,6 @@ Definition B {os : sel_model} :=
 
 Opaque M SS B.
 
-Definition set_rotate θ E := mkset (λ p, mat_mul_vec (mat_of_rot (-θ)) p ∈ E)).
-
 Definition rot e (E : set point) :=
   mkset (λ p, rotate (negf e) p ∈ E).
 Definition xtransl dx (E : set point) :=
