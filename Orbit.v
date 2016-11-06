@@ -159,10 +159,13 @@ intros * His Hr; apply His; clear His.
 unfold D in Hr; simpl in Hr.
 unfold D; simpl.
 destruct Hr as (el & p₁ & Hso & Hn & Hr).
-exists el, p₁.
+bbb.
+exists el, (rotate (negf e) p₁).
 split; [ | easy ].
 destruct Hso as (el₁ & Hso).
-exists (rev el₁).
+exists (rev_path el₁).
+apply rotate_rev_path.
+
 bbb.
 
 unfold same_orbit in Hso.
