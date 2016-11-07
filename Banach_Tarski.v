@@ -170,10 +170,16 @@ Fixpoint path_of_nat_aux it (n : nat) :=
               match (n - 4) mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ end :: l
           | 3 =>
               match (n - 4) mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ⁻¹ end :: l
+
           | 4 =>
               match (n - 4) mod 3 with 0 => ạ | 1 => ḅ | _ => ḅ⁻¹ end :: l
           | 5 =>
               match (n - 4) mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ end :: l
+          | 6 =>
+              match (n - 4) mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ⁻¹ end :: l
+          | 7 =>
+              match (n - 4) mod 3 with 0 => ạ⁻¹ | 1 => ḅ | _ => ḅ⁻¹ end :: l
+
           | _ =>
               []
           end
@@ -181,30 +187,6 @@ Fixpoint path_of_nat_aux it (n : nat) :=
   end.
 
 Definition path_of_nat n := path_of_nat_aux (S n) n.
-
-(*
-Definition path_of_nat n := path_of_nat_aux (S n) n.
-
-Fixpoint path_of_nat_aux it n :=
-  match it with
-  | O => []
-  | S it' =>
-      let l :=
-        match n / 4 with
-        | 0 => []
-        | S n' => path_of_nat_aux it' n'
-        end
-      in
-      match n mod 4 with
-      | 0 => ạ
-      | 1 => ạ⁻¹
-      | 2 => ḅ
-      | _ => ḅ⁻¹
-      end :: l
-  end.
-
-Definition path_of_nat n := path_of_nat_aux (S n) n.
-*)
 
 Compute (path_of_nat 0).
 Compute (path_of_nat 1).
@@ -230,6 +212,35 @@ Compute (path_of_nat 20).
 Compute (path_of_nat 21).
 Compute (path_of_nat 22).
 Compute (path_of_nat 23).
+Compute (path_of_nat 24).
+Compute (path_of_nat 25).
+Compute (path_of_nat 26).
+Compute (path_of_nat 27).
+Compute (path_of_nat 28).
+
+(*
+Definition path_of_nat n := path_of_nat_aux (S n) n.
+
+Fixpoint path_of_nat_aux it n :=
+  match it with
+  | O => []
+  | S it' =>
+      let l :=
+        match n / 4 with
+        | 0 => []
+        | S n' => path_of_nat_aux it' n'
+        end
+      in
+      match n mod 4 with
+      | 0 => ạ
+      | 1 => ạ⁻¹
+      | 2 => ḅ
+      | _ => ḅ⁻¹
+      end :: l
+  end.
+
+Definition path_of_nat n := path_of_nat_aux (S n) n.
+*)
 
 bbb.
 
