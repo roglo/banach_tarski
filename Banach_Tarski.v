@@ -163,7 +163,6 @@ Fixpoint path_of_nat_aux it (n : nat) :=
       | 3 => ḅ⁻¹ :: []
       | S (S (S (S n'))) =>
           let l := path_of_nat_aux it' (n' / 3) in
-(**)
           match l with
           | FE t d :: _ =>
               match n' mod 3 with
@@ -173,36 +172,6 @@ Fixpoint path_of_nat_aux it (n : nat) :=
               end
           | [] => []
           end
-(*
-          match n' mod 3 with
-          | 0 =>
-              match l with e :: _ => e :: l | [] => [] end
-          | 1 =>
-              match l with
-              | FE t _ :: _ => FE (othl t) false :: l
-              | [] => []
-              end
-          | _ =>
-              match l with
-              | FE t _ :: _ => FE (othl t) true :: l
-              | [] => []
-              end
-          end
-*)
-(*
-          match l with
-          | ạ :: _ =>
-              match n' mod 3 with 0 => ạ | 1 => ḅ | _ => ḅ⁻¹ end :: l
-          | ạ⁻¹ :: _ =>
-              match n' mod 3 with 0 => ạ⁻¹ | 1 => ḅ | _ => ḅ⁻¹ end :: l
-          | ḅ :: _ =>
-              match n' mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ end :: l
-          | ḅ⁻¹ :: _ =>
-              match n' mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ⁻¹ end :: l
-          | [] =>
-              []
-          end
-*)
       end
   end.
 
