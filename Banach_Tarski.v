@@ -304,6 +304,17 @@ split.
   symmetry in Hn3.
   destruct n3.
    rewrite Hl, <- IHm.
+Focus 7.
+ split.
+  intros n₁ n₂ H Hn; apply H; clear H.
+  unfold path_of_nat in Hn.
+  revert n₂ Hn.
+  induction n₁; intros.
+   destruct n₂; [ easy | exfalso ].
+   destruct n₂; [ easy | ].
+   destruct n₂; [ easy | ].
+   destruct n₂; [ easy | ].
+
 bbb.
 
    destruct el as [| e el]; [ easy | ].
