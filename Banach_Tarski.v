@@ -161,12 +161,11 @@ Fixpoint path_of_nat_aux it n :=
         end
       in
       match n mod 4 with
-      | 0 => ạ :: l
-      | 1 => ạ⁻¹ :: l
-      | 2 => ḅ :: l
-      | 3 => ḅ⁻¹ :: l
-      | _ => []
-      end
+      | 0 => ạ
+      | 1 => ạ⁻¹
+      | 2 => ḅ
+      | _ => ḅ⁻¹
+      end :: l
   end.
 
 Definition path_of_nat n := path_of_nat_aux (S n) n.
