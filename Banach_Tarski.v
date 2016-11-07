@@ -159,6 +159,28 @@ Fixpoint path_of_pos p :=
   | _ => []
   end.
 
+bbb.
+
+Fixpoint list_bool_of_pos p :=
+  match p with
+  | xH => []
+  | xO p => false :: list_bool_of_pos p
+  | xI p => true :: list_bool_of_pos p
+  end.
+
+Compute (list_bool_of_pos 5).
+
+Fixpoint path_of_list_bool lb :=
+  match lb with
+  | false :: false :: lb' => ạ :: path_of_list_bool lb'
+  | true :: false :: lb' => ạ⁻¹ :: path_of_list_bool lb'
+  | false :: true :: lb' => ḅ :: path_of_list_bool lb'
+  | true :: true :: lb' => ḅ⁻¹ :: path_of_list_bool lb'
+  | _ => []
+  end.
+
+Compute (path_of_list_bool (list_bool_of_pos 8)).
+
 Print path_of_pos.
 
 Compute (path_of_pos 16).
