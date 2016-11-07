@@ -163,30 +163,19 @@ Fixpoint path_of_nat_aux it (n : nat) :=
           let l := path_of_nat_aux it' ((n - 4) / 3) in
           match (n - 4) / 3 with
           | 0 =>
-              match (n - 4) mod 3 with
-              | 0 => ạ
-              | 1 => ḅ
-              | _ => ḅ⁻¹
-              end :: l
+              match (n - 4) mod 3 with 0 => ạ | 1 => ḅ | _ => ḅ⁻¹ end :: l
           | 1 =>
-              match (n - 4) mod 3 with
-              | 0 => ạ⁻¹
-              | 1 => ḅ
-              | _ => ḅ⁻¹
-              end :: l
+              match (n - 4) mod 3 with 0 => ạ⁻¹ | 1 => ḅ | _ => ḅ⁻¹ end :: l
           | 2 =>
-              match (n - 4) mod 3 with
-              | 0 => ạ
-              | 1 => ạ⁻¹
-              | _ => ḅ
-              end :: l
+              match (n - 4) mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ end :: l
           | 3 =>
-              match (n - 4) mod 3 with
-              | 0 => ạ
-              | 1 => ạ⁻¹
-              | _ => ḅ⁻¹
-              end :: l
-          | _ => []
+              match (n - 4) mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ⁻¹ end :: l
+          | 4 =>
+              match (n - 4) mod 3 with 0 => ạ | 1 => ḅ | _ => ḅ⁻¹ end :: l
+          | 5 =>
+              match (n - 4) mod 3 with 0 => ạ | 1 => ạ⁻¹ | _ => ḅ end :: l
+          | _ =>
+              []
           end
       end
   end.
@@ -238,6 +227,9 @@ Compute (path_of_nat 17).
 Compute (path_of_nat 18).
 Compute (path_of_nat 19).
 Compute (path_of_nat 20).
+Compute (path_of_nat 21).
+Compute (path_of_nat 22).
+Compute (path_of_nat 23).
 
 bbb.
 
