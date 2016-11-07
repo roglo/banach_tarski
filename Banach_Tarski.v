@@ -150,11 +150,53 @@ Qed.
 Definition rotate_set axis ang E :=
   mkset (λ p, mat_vec_mul (rot_mat_of_axis_cos axis (-cos ang)) p ∈ E).
 
-Theorem glop : (∀ A (P : A → Prop), (∀ x, ¬ (P x)) → ¬ (∃ x, P x)).
+Fixpoint path_of_pos p :=
+  match p with
+  | xO (xO p) => ạ :: path_of_pos p
+  | xI (xO p) => ạ⁻¹ :: path_of_pos p
+  | xO (xI p) => ḅ :: path_of_pos p
+  | xI (xI p) => ḅ⁻¹ :: path_of_pos p
+  | _ => []
+  end.
+
+Print path_of_pos.
+
+Compute (path_of_pos 16).
+
+bbb.
+
+Fixpoint path_of_N n :=
+  match N.modulo n 4 with
+  | N0 => ạ ::
+      match N with
+      | N0 => []
+      | Npos p =>
+
+path_of_N (N.div n 4)
+  | Npos p => []
+  end.
+
+Fixpoint path_of_nat n :=
+  match n mod 4 with
+  | 0 => ạ :: path_of_nat (n / 4)
+  | 1 => ạ⁻¹ :: path_of_nat (n / 4)
+  | 2 => ḅ :: path_of_nat (n / 4)
+  | 3 => ḅ⁻¹ :: path_of_nat (n / 4)
+  | S n' => []
+  end.
+
+Check path_of_nat.
+
+Theorem toto : ∃ (f : nat → list free_elem),
+  (∀ n, norm_list (f n) = f n) ∧
+  (∀ m n, m ≠ n → f m ≠ f n) ∧ (∀ el, ∃ n, f n = el).
 Proof.
-intros A P Hf (x & He).
-revert He; apply Hf.
-Qed.
+bbb.
+
+Theorem glop : ∃ (f : nat → point),
+  (∀ n, f n ∈ D) ∧ (∀ m n, m ≠ n → f m ≠ f n) ∧ (∀ p, ∃ n, f n = p).
+Proof.
+bbb.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
@@ -168,7 +210,7 @@ assert (∃ p₁, p₁ ∉ D).
 bbb.
 assert (∀ p₁, (∀ el p, ¬ (same_orbit p₁ p ∧ norm_list el ≠ [] ∧ fold_right rotate p el = p)) → p₁ ∉ D).
 intros p₁ Hf.
-apply glop; intros el (p, Hp).
+apply Classical_Pred_Type.all_not_not_ex; intros el (p, Hp).
 revert Hp; apply Hf.
 simpl.
 
