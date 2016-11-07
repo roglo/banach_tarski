@@ -150,6 +150,8 @@ Qed.
 Definition rotate_set axis ang E :=
   mkset (λ p, mat_vec_mul (rot_mat_of_axis_cos axis (-cos ang)) p ∈ E).
 
+Definition othl t := match t with la => lb | lb => la end.
+
 Fixpoint path_of_nat_aux it (n : nat) :=
   match it with
   | O => []
@@ -161,6 +163,33 @@ Fixpoint path_of_nat_aux it (n : nat) :=
       | 3 => ḅ⁻¹ :: []
       | S (S (S (S n'))) =>
           let l := path_of_nat_aux it' (n' / 3) in
+(**)
+          match l with
+          | FE t d :: _ =>
+              match n' mod 3 with
+              | 0 => FE t d :: l
+              | 1 => FE (othl t) false :: l
+              | _ => FE (othl t) true :: l
+              end
+          | [] => []
+          end
+(*
+          match n' mod 3 with
+          | 0 =>
+              match l with e :: _ => e :: l | [] => [] end
+          | 1 =>
+              match l with
+              | FE t _ :: _ => FE (othl t) false :: l
+              | [] => []
+              end
+          | _ =>
+              match l with
+              | FE t _ :: _ => FE (othl t) true :: l
+              | [] => []
+              end
+          end
+*)
+(*
           match l with
           | ạ :: _ =>
               match n' mod 3 with 0 => ạ | 1 => ḅ | _ => ḅ⁻¹ end :: l
@@ -173,6 +202,7 @@ Fixpoint path_of_nat_aux it (n : nat) :=
           | [] =>
               []
           end
+*)
       end
   end.
 
@@ -250,30 +280,6 @@ Compute (path_of_nat 68).
 Compute (path_of_nat 69).
 Compute (path_of_nat 70).
 
-(*
-Definition path_of_nat n := path_of_nat_aux (S n) n.
-
-Fixpoint path_of_nat_aux it n :=
-  match it with
-  | O => []
-  | S it' =>
-      let l :=
-        match n / 4 with
-        | 0 => []
-        | S n' => path_of_nat_aux it' n'
-        end
-      in
-      match n mod 4 with
-      | 0 => ạ
-      | 1 => ạ⁻¹
-      | 2 => ḅ
-      | _ => ḅ⁻¹
-      end :: l
-  end.
-
-Definition path_of_nat n := path_of_nat_aux (S n) n.
-*)
-
 Theorem toto : ∃ (f : nat → list free_elem),
   (∀ n, norm_list (f n) = f n) ∧
   (∀ m n, m ≠ n → f m ≠ f n) ∧ (∀ el, ∃ n, f n = el).
@@ -297,6 +303,9 @@ split.
   remember (n mod 3) as n3 eqn:Hn3.
   symmetry in Hn3.
   destruct n3.
+   rewrite Hl, <- IHm.
+bbb.
+
    destruct el as [| e el]; [ easy | ].
    destruct e as (t, d); destruct t, d.
 
