@@ -274,12 +274,32 @@ Fixpoint path_of_nat_aux it n :=
 Definition path_of_nat n := path_of_nat_aux (S n) n.
 *)
 
-bbb.
-
 Theorem toto : ∃ (f : nat → list free_elem),
   (∀ n, norm_list (f n) = f n) ∧
   (∀ m n, m ≠ n → f m ≠ f n) ∧ (∀ el, ∃ n, f n = el).
 Proof.
+exists path_of_nat.
+split.
+ intros n.
+ unfold path_of_nat.
+ remember (S n) as m.
+ assert (Hm: n < m) by (subst m; apply Nat.lt_succ_diag_r).
+ clear Heqm; revert n Hm.
+ induction m; intros; [ easy | ].
+ destruct n; [ easy | simpl ].
+ destruct n; [ easy | ].
+ destruct n; [ easy | ].
+ destruct n; [ easy | ].
+ simpl.
+ remember (path_of_nat_aux m (n / 3)) as l eqn:Hl.
+ destruct l as [| e el]; [ easy | ].
+ destruct e as (t, d); destruct t, d.
+  remember (n mod 3) as n3 eqn:Hn3.
+  symmetry in Hn3.
+  destruct n3.
+   destruct el as [| e el]; [ easy | ].
+   destruct e as (t, d); destruct t, d.
+
 bbb.
 
 Theorem glop : ∃ (f : nat → point),
