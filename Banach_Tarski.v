@@ -273,16 +273,36 @@ split.
   symmetry in Hn3.
   destruct n3.
    rewrite Hl, <- IHm.
+bbb.
+
 Focus 7.
  split.
   intros n₁ n₂ H Hn; apply H; clear H.
   unfold path_of_nat in Hn.
   revert n₂ Hn.
   induction n₁; intros.
+   simpl in Hn.
    destruct n₂; [ easy | exfalso ].
    destruct n₂; [ easy | ].
    destruct n₂; [ easy | ].
    destruct n₂; [ easy | ].
+   remember (path_of_nat_aux (S (S (S (S n₂)))) (n₂ / 3)) as el eqn:Hel.
+   symmetry in Hel.
+   destruct el as [| e el]; [ easy | ].
+   destruct e as (t, d); destruct t, d.
+    destruct (n₂ mod 3) as [ | n]; [ easy | now destruct n ].
+    destruct (n₂ mod 3) as [ | n]; [ easy | now destruct n ].
+    destruct (n₂ mod 3) as [ | n]; [ easy | now destruct n ].
+    destruct (n₂ mod 3) as [ | n]; [ easy | now destruct n ].
+
+   destruct n₂.
+    remember (S n₁) as n eqn:Hsn; simpl in Hn.
+    destruct n; [ easy | exfalso ].
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    destruct n; [ easy | ].
+    rewrite Hsn in IHn₁, Hn.
+
 
 bbb.
 
