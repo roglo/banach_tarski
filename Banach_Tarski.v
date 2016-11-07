@@ -150,25 +150,38 @@ Qed.
 Definition rotate_set axis ang E :=
   mkset (λ p, mat_vec_mul (rot_mat_of_axis_cos axis (-cos ang)) p ∈ E).
 
-Definition path_of_nat n :=
-  match n with
-  | 0 => ạ :: []
-  | 1 => ạ⁻¹ :: []
-  | 2 => ḅ :: []
-  | 3 => ḅ⁻¹ :: []
-  | 4 => [ạ; ạ]
-  | 5 => [ḅ; ạ]
-  | 6 => [ḅ⁻¹; ạ]
-  | 7 => [ạ⁻¹; ạ⁻¹]
-  | 8 => [ḅ; ạ⁻¹]
-  | 9 => [ḅ⁻¹; ạ⁻¹]
-  | 10 => [ạ; ḅ]
-  | 11 => [ạ⁻¹; ḅ]
-  | 12 => [ḅ; ḅ]
-  | 13 => [ạ; ḅ⁻¹]
-  | 14 => [ạ⁻¹; ḅ⁻¹]
-  | _ => [ḅ⁻¹; ḅ⁻¹]
+Fixpoint path_of_nat_aux it (n : nat) :=
+  match it with
+  | O => []
+  | S it' =>
+      match n with
+      | 0 => ạ :: []
+      | 1 => ạ⁻¹ :: []
+      | 2 => ḅ :: []
+      | 3 => ḅ⁻¹ :: []
+      | _ =>
+          let l := path_of_nat_aux it' ((n - 4) / 3) in
+          match n with
+          | 4 => ạ
+          | 5 => ḅ
+          | 6 => ḅ⁻¹
+
+          | 7 => ạ⁻¹
+          | 8 => ḅ
+          | 9 => ḅ⁻¹
+
+          | 10 => ạ
+          | 11 => ạ⁻¹
+          | 12 => ḅ
+
+          | 13 => ạ
+          | 14 => ạ⁻¹
+          | _ => ḅ⁻¹
+          end :: l
+      end
   end.
+
+Definition path_of_nat n := path_of_nat_aux (S n) n.
 
 (*
 Definition path_of_nat n := path_of_nat_aux (S n) n.
