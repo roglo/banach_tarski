@@ -167,25 +167,27 @@ Fixpoint path_of_nat_aux it (n : nat) :=
               | 0 => ạ
               | 1 => ḅ
               | _ => ḅ⁻¹
-              end
+              end :: l
           | 1 =>
               match (n - 4) mod 3 with
               | 0 => ạ⁻¹
               | 1 => ḅ
               | _ => ḅ⁻¹
-              end
-bbb.
-
-          match n with
-          | 10 => ạ
-          | 11 => ạ⁻¹
-          | 12 => ḅ
-
-          match n with
-          | 13 => ạ
-          | 14 => ạ⁻¹
-          | _ => ḅ⁻¹
-          end :: l
+              end :: l
+          | 2 =>
+              match (n - 4) mod 3 with
+              | 0 => ạ
+              | 1 => ạ⁻¹
+              | _ => ḅ
+              end :: l
+          | 3 =>
+              match (n - 4) mod 3 with
+              | 0 => ạ
+              | 1 => ạ⁻¹
+              | _ => ḅ⁻¹
+              end :: l
+          | _ => []
+          end
       end
   end.
 
