@@ -305,6 +305,27 @@ Fixpoint Rfrac_to_bin x n :=
 Definition R_to_int_frac x :=
   mkraif (Rfloor x) (Rfrac_to_bin (Rfracp x)).
 
+Fixpoint bin_to_Rfrac_aux it (u : ℕ → bool) pow i :=
+  match it with
+  | 0 => 0%R
+  | S it' =>
+      if u i then (pow + bin_to_Rfrac_aux it' u (pow / 2) (S i))%R
+      else bin_to_Rfrac_aux it' u (pow / 2)%R (S i)
+  end.
+
+(* ok, but how many iterations should I do? an infinity! So I should
+   define some kind of equality between reals; but this equality is
+   not going to be the equality between reals defined in the library! *)
+Definition bin_to_Rfrac u := bin_to_Rfrac_aux 50 u (1/2)%R 0.
+
+Check completeness.
+Print bound.
+
+bbb.
+
+Definition int_frac_to_R rif :=
+  IZR (Rint rif) + bin_to_Rfrac (Rfrac rif).
+
 Example R_to_int_frac_bij :
   FinFun.Injective R_to_int_frac ∧
   FinFun.Surjective R_to_int_frac.
@@ -313,6 +334,8 @@ split.
  intros x y Hxy.
  unfold R_to_int_frac in Hxy.
  injection Hxy; clear Hxy; intros Hf Hi.
+Check archimed.
+Print FinFun.Bijective.
 bbb.
 
 Example R_is_uncountable : is_uncountable_infinite R.
