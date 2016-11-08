@@ -164,6 +164,12 @@ Fixpoint nat_of_path el :=
   | [] => 1%nat
   end.
 
+Compute (nat_of_path []).
+Compute (nat_of_path [ạ]).
+Compute (nat_of_path [ạ⁻¹]).
+Compute (nat_of_path [ḅ]).
+Compute (nat_of_path [ḅ⁻¹]).
+
 Theorem nat_of_path_ne_0 : ∀ el, nat_of_path el ≠ 0%nat.
 Proof.
 intros * H.
@@ -199,22 +205,34 @@ induction el₁ as [| e₁ el₁]; intros.
     2: apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | easy ].
 
     rewrite <- Nat.mul_sub_distr_r in Hf.
-    apply Nat.add_sub_eq_r in Hf.
     set (n₁ := nat_of_free_elem e₁) in Hf.
     set (n₂ := nat_of_free_elem e₂) in Hf.
-    destruct (le_dec n₁ n₂) as [H₂| H₂].
-     pose proof Nat.sub_0_le n₁ n₂ as H.
-     destruct H as (_, H).
-     rewrite H in Hf; [ clear H | easy ].
-     symmetry in Hf.
+    set (np₁ := nat_of_path el₁) in Hf, H₁.
+    set (np₂ := nat_of_path el₂) in Hf, H₁.
+    destruct (lt_eq_lt_dec n₁ n₂) as [[H₂| H₂]| H₂].
+     destruct (eq_nat_dec np₁ np₂) as [H₃| H₃].
+      subst np₁ np₂; rewrite H₃, Nat.sub_diag in Hf; simpl in Hf.
+      rewrite Hf in H₂; now apply Nat.lt_irrefl in H₂.
+
+      apply nat_neq_le_lt in H₁; [ | easy ].
+      apply Nat.add_sub_eq_r in Hf; symmetry in Hf.
+      pose proof Nat.sub_0_le n₁ n₂ as H.
+      destruct H as (_, H).
+      rewrite H in Hf; [ clear H | now apply Nat.lt_le_incl ].
+      apply Nat.eq_mul_0_l in Hf; [ | easy ].
+      now apply Nat.sub_0_le, Nat.nlt_ge in Hf.
+
+     rewrite H₂ in Hf.
+     apply Nat.add_sub_eq_r in Hf.
+     rewrite Nat.sub_diag in Hf; symmetry in Hf.
      apply Nat.eq_mul_0_l in Hf; [ | easy ].
      apply Nat.sub_0_le in Hf.
-     apply le_antisym in Hf; [ | easy ].
-     f_equal; [ | now apply IHel₁ ].
-bbb.
-      now apply nat_of_free_elem_injective.
+     apply Nat.le_antisymm in Hf; [ | easy ].
+     subst n₁ n₂ np₁ np₂.
+     apply nat_of_free_elem_injective in H₂.
+     f_equal; [ easy | now apply IHel₁ ].
 
-      apply nat_neq_le_lt in H₂; [ | easy ].
+     exfalso.
 bbb.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
