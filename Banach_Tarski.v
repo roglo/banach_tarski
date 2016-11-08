@@ -316,8 +316,60 @@ Fixpoint bin_to_Rfrac_aux it (u : ℕ → bool) pow i :=
 (* ok, but how many iterations should I do? an infinity! So I should
    define some kind of equality between reals; but this equality is
    not going to be the equality between reals defined in the library! *)
-Definition bin_to_Rfrac u := bin_to_Rfrac_aux 50 u (1/2)%R 0.
+Definition bin_to_Rfrac u it := bin_to_Rfrac_aux it u (1/2)%R 0.
 
+Print completeness.
+
+Check bin_to_Rfrac.
+
+Definition E u x := ∃ it, bin_to_Rfrac u it = x.
+Print E.
+
+Theorem bin_to_Rfrac_aux_le_2_pow : ∀ u it pow i,
+  (0 < pow)%R
+  → (bin_to_Rfrac_aux it u pow i <= 2 * pow)%R.
+Proof.
+intros * Hpow.
+revert pow i Hpow.
+induction it; intros; simpl; [ lra | ].
+remember (u i) as b eqn:Hb; symmetry in Hb.
+destruct b.
+ replace (2 * pow)%R with (pow + pow)%R by lra.
+ apply Rplus_le_compat; [ lra | ].
+ replace pow with (2 * (pow / 2))%R at 2 by lra.
+ apply IHit; lra.
+
+ apply Rle_trans with (r2 := pow); [ | lra ].
+ replace pow with (2 * (pow / 2))%R at 2 by lra.
+ apply IHit; lra.
+Qed.
+
+Theorem bin_to_Rfrac_le_1 : ∀ u it, (bin_to_Rfrac u it <= 1)%R.
+Proof.
+intros.
+assert (Hlt : (0 < 1 / 2)%R) by lra.
+pose proof bin_to_Rfrac_aux_le_2_pow u it (1/2) 0 Hlt.
+now replace (2 * (1/2))%R with 1%R in H by lra.
+Qed.
+
+Theorem E_bound : ∀ u, bound (E u).
+Proof.
+intros.
+unfold bound.
+exists 1.
+unfold is_upper_bound.
+intros x HE; unfold E in HE.
+destruct HE as (it, HE); subst x.
+apply bin_to_Rfrac_le_1.
+Qed.
+
+Theorem E_non_empty : ∀ u, ∃ x, E u x.
+Proof.
+bbb.
+
+Check (λ u, completeness (E u) (E_bound u) (E_non_empty u)).
+
+bbb.
 Definition E x :=
   let u := Rfrac_to_bin (Rfracp x) in
   ∀ ε, ∃ n, (Rabs (bin_to_Rfrac_aux n u (1/2) 0 - x) < ε)%R.
