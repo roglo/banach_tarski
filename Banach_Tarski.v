@@ -296,19 +296,28 @@ split.
  rewrite minus_IZR; simpl; lra.
 Qed.
 
-Fixpoint frac_to_bin x n :=
+Fixpoint Rfrac_to_bin x n :=
   match n with
-  | 0 => Rfloor (x * 2)
-...
+  | 0 => if Z.eq_dec (Rfloor (x * 2)%R) 0 then false else true
+  | S n' => Rfrac_to_bin (x * 2)%R n'
+  end.
 
-Definition R_to_R_as_int_frac x := mkraif (Rfloor x) (frac_to_bin (Rfracp x)).
+Definition R_to_int_frac x :=
+  mkraif (Rfloor x) (Rfrac_to_bin (Rfracp x)).
+
+Example R_to_int_frac_bij :
+  FinFun.Injective R_to_int_frac ∧
+  FinFun.Surjective R_to_int_frac.
+Proof.
+split.
+ intros x y Hxy.
+ unfold R_to_int_frac in Hxy.
+ injection Hxy; clear Hxy; intros Hf Hi.
+bbb.
 
 Example R_is_uncountable : is_uncountable_infinite R.
 Proof.
 intros f.
-Check completeness.
-SearchAbout up.
-Print archimed.
 bbb.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
