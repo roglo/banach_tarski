@@ -322,9 +322,6 @@ Print completeness.
 
 Check bin_to_Rfrac.
 
-Definition E u x := ∃ it, bin_to_Rfrac u it = x.
-Print E.
-
 Theorem bin_to_Rfrac_aux_le_2_pow : ∀ u it pow i,
   (0 < pow)%R
   → (bin_to_Rfrac_aux it u pow i <= 2 * pow)%R.
@@ -352,48 +349,30 @@ pose proof bin_to_Rfrac_aux_le_2_pow u it (1/2) 0 Hlt.
 now replace (2 * (1/2))%R with 1%R in H by lra.
 Qed.
 
-Theorem E_bound : ∀ u, bound (E u).
+Definition Rset_of_bin_seq u := mkset (λ x, ∃ it, bin_to_Rfrac u it = x).
+
+Theorem Rset_of_bin_seq_bound : ∀ u, bound (setp (Rset_of_bin_seq u)).
 Proof.
 intros.
 unfold bound.
 exists 1.
 unfold is_upper_bound.
-intros x HE; unfold E in HE.
+intros x HE; unfold Rset_of_bin_seq in HE.
 destruct HE as (it, HE); subst x.
 apply bin_to_Rfrac_le_1.
 Qed.
 
-Theorem E_non_empty : ∀ u, ∃ x, E u x.
+Theorem Rset_of_bin_seq_non_empty : ∀ u, ∃ x, x ∈ Rset_of_bin_seq u.
 Proof.
-bbb.
-
-Check (λ u, completeness (E u) (E_bound u) (E_non_empty u)).
-
-bbb.
-Definition E x :=
-  let u := Rfrac_to_bin (Rfracp x) in
-  ∀ ε, ∃ n, (Rabs (bin_to_Rfrac_aux n u (1/2) 0 - x) < ε)%R.
-Theorem E_bound : bound E.
-Proof.
-unfold bound.
-exists 1.
-unfold is_upper_bound.
-intros x HE.
-unfold E in HE.
+intros.
+unfold Rset_of_bin_seq; simpl.
 Admitted.
 
-Theorem E_non_empty : ∃ x, E x.
-Proof.
-unfold E.
-bbb.
+Definition R_of_bin_seq u :=
+  completeness (setp (Rset_of_bin_seq u)) (Rset_of_bin_seq_bound u)
+    (Rset_of_bin_seq_non_empty u).
 
-Check (completeness E) E_bound E_non_empty.
-
-bbb.
-
-Print is_lub.
-Print bound.
-Print is_upper_bound.
+Print R_of_bin_seq.
 
 bbb.
 
