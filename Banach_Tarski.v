@@ -318,8 +318,30 @@ Fixpoint bin_to_Rfrac_aux it (u : ℕ → bool) pow i :=
    not going to be the equality between reals defined in the library! *)
 Definition bin_to_Rfrac u := bin_to_Rfrac_aux 50 u (1/2)%R 0.
 
-Check completeness.
+Definition E x :=
+  let u := Rfrac_to_bin (Rfracp x) in
+  ∀ ε, ∃ n, (Rabs (bin_to_Rfrac_aux n u (1/2) 0 - x) < ε)%R.
+Theorem E_bound : bound E.
+Proof.
+unfold bound.
+exists 1.
+unfold is_upper_bound.
+intros x HE.
+unfold E in HE.
+Admitted.
+
+Theorem E_non_empty : ∃ x, E x.
+Proof.
+unfold E.
+bbb.
+
+Check (completeness E) E_bound E_non_empty.
+
+bbb.
+
+Print is_lub.
 Print bound.
+Print is_upper_bound.
 
 bbb.
 
