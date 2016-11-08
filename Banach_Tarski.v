@@ -173,10 +173,9 @@ destruct H as (H, _).
 now apply Nat.eq_mul_0_l in H.
 Qed.
 
-Theorem paths_are_countable : ∃ (f : list free_elem → nat),
-  (∀ el₁ el₂, el₁ ≠ el₂ → f el₁ ≠ f el₂).
+Theorem nat_of_path_injective : FinFun.Injective nat_of_path.
 Proof.
-exists nat_of_path; intros * H Hf; apply H; clear H.
+intros el₁ el₂ Hf.
 revert el₂ Hf.
 induction el₁ as [| e₁ el₁]; intros.
  destruct el₂ as [| e₂ el₂]; [ easy | exfalso; simpl in Hf ].
@@ -188,6 +187,20 @@ induction el₁ as [| e₁ el₁]; intros.
   destruct n; [ revert Hn; apply nat_of_path_ne_0 | easy ].
 
   simpl in Hf.
+  apply Nat.add_sub_eq_l in Hf.
+  destruct (le_dec (nat_of_path el₁) (nat_of_path el₂)) as [H₁| H₁].
+   rewrite Nat.add_sub_swap in Hf.
+    2: apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | easy ].
+
+    rewrite <- Nat.mul_sub_distr_r in Hf.
+    apply Nat.add_sub_eq_r in Hf.
+    destruct (le_dec (nat_of_free_elem e₁) (nat_of_free_elem e₂)) as [H₂| H₂].
+bbb.
+
+Theorem paths_are_countable : ∃ (f : list free_elem → nat),
+  (∀ el₁ el₂, el₁ ≠ el₂ → f el₁ ≠ f el₂).
+Proof.
+exists nat_of_path.
 bbb.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
