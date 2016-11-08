@@ -273,6 +273,13 @@ intros el₁ el₂ H Hnp; apply H.
 now apply nat_of_path_injective.
 Qed.
 
+Definition is_uncountable_infinite A := ∀ f : nat → A, ∃ x, ∀ n, f n ≠ x.
+
+Theorem R_is_uncountable : is_uncountable_infinite R.
+Proof.
+intros f.
+bbb.
+
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
 Proof.
