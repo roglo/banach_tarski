@@ -173,6 +173,12 @@ destruct H as (H, _).
 now apply Nat.eq_mul_0_l in H.
 Qed.
 
+Theorem nat_of_free_elem_injective : FinFun.Injective nat_of_free_elem.
+Proof.
+intros (t₁, d₁) (t₂, d₂) He; simpl in He.
+now destruct t₁, d₁, t₂, d₂.
+Qed.
+
 Theorem nat_of_path_injective : FinFun.Injective nat_of_path.
 Proof.
 intros el₁ el₂ Hf.
@@ -194,7 +200,21 @@ induction el₁ as [| e₁ el₁]; intros.
 
     rewrite <- Nat.mul_sub_distr_r in Hf.
     apply Nat.add_sub_eq_r in Hf.
-    destruct (le_dec (nat_of_free_elem e₁) (nat_of_free_elem e₂)) as [H₂| H₂].
+    set (n₁ := nat_of_free_elem e₁) in Hf.
+    set (n₂ := nat_of_free_elem e₂) in Hf.
+    destruct (le_dec n₁ n₂) as [H₂| H₂].
+     pose proof Nat.sub_0_le n₁ n₂ as H.
+     destruct H as (_, H).
+     rewrite H in Hf; [ clear H | easy ].
+     symmetry in Hf.
+     apply Nat.eq_mul_0_l in Hf; [ | easy ].
+     apply Nat.sub_0_le in Hf.
+     apply le_antisym in Hf; [ | easy ].
+     f_equal; [ | now apply IHel₁ ].
+bbb.
+      now apply nat_of_free_elem_injective.
+
+      apply nat_neq_le_lt in H₂; [ | easy ].
 bbb.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),

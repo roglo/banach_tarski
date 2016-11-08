@@ -5,7 +5,7 @@
    - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
 (* Coq v8.6 *)
 
-Require Import Utf8 List Relations NPeano.
+Require Import Utf8 List Relations NPeano Compare_dec.
 Import ListNotations.
 
 Arguments Nat.div : simpl never.
@@ -26,6 +26,14 @@ Proof.
 intros a b Hb.
 replace b with (1 * b) at 1 by apply Nat.mul_1_l.
 now apply Nat.mod_add.
+Qed.
+
+Theorem nat_neq_le_lt : ∀ x y : nat, x ≠ y → x ≤ y → x < y.
+Proof.
+intros * Hnxy Hxy.
+apply le_lt_eq_dec in Hxy.
+destruct Hxy as [Hle| Heq]; [ easy | ].
+now exfalso; apply Hnxy.
 Qed.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
