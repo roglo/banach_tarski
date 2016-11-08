@@ -277,7 +277,7 @@ Definition is_uncountable_infinite A := ∀ f : nat → A, ∃ x, ∀ n, f n ≠
 
 Record R_as_int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
-Definition Rfloor x := if Req_dec (IZR (up x - 1)) x then (up x - 2)%Z else (up x - 1)%Z.
+Definition Rfloor x := up x - 1.
 Definition Rfracp x := x - IZR (Rfloor x).
 
 Theorem Rflacp_in_0_1 : ∀ x, (0 <= Rfracp x)%R ∧ (Rfracp x < 1)%R.
@@ -288,33 +288,18 @@ destruct Ha as (Hgt, Hle).
 unfold Rfracp, Rfloor.
 unfold "_-_", sub_notation.
 split.
- destruct (Req_dec (IZR (up x - 1)) x) as [H₁| H₁].
-  replace (up x - 2)%Z with (up x - 1 - 1)%Z by ring.
-  rewrite minus_IZR, H₁; lra.
+ rewrite minus_IZR; simpl.
+ apply Rplus_le_compat_l with (r := - (IZR (up x) - x)) in Hle.
+ rewrite Rplus_opp_l in Hle.
+ unfold "_-_", "-_", sub_notation, opp_notation in Hle; lra.
 
-  apply Rlt_le in Hgt.
-  apply Rplus_le_compat_r with (r := -x) in Hgt.
-  rewrite Rplus_opp_r in Hgt.
-  rewrite minus_IZR; simpl; lra.
-
- destruct (Req_dec (IZR (up x - 1)) x) as [H₁| H₁].
-  replace (up x - 2)%Z with (up x - 1 - 1)%Z by ring.
-  rewrite minus_IZR, H₁; simpl.
-
-bbb.
-
-Check _-_.
-Check (_-_ x)%R.
-
-  rewrite H₁ in Hgt.
-  now apply Rlt_irrefl in Hgt.
-Check archimed.
-
-bbb.
+ rewrite minus_IZR; simpl; lra.
+Qed.
 
 Fixpoint frac_to_bin x n :=
   match n with
   | 0 => Rfloor (x * 2)
+...
 
 Definition R_to_R_as_int_frac x := mkraif (Rfloor x) (frac_to_bin (Rfracp x)).
 
