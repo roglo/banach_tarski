@@ -185,6 +185,19 @@ intros (t₁, d₁) (t₂, d₂) He; simpl in He.
 now destruct t₁, d₁, t₂, d₂.
 Qed.
 
+Theorem nat_of_free_elem_sub_le : ∀ e₁ e₂,
+  nat_of_free_elem e₁ - nat_of_free_elem e₂ < 4.
+Proof.
+intros (t₁, d₁) (t₂, d₂).
+destruct t₁, d₁, t₂, d₂; simpl; try apply Nat.lt_0_succ.
+ apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
+ do 2 apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
+ apply Nat.lt_succ_diag_r.
+ apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
+ apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
+ do 2 apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
+Qed.
+
 Theorem nat_of_path_injective : FinFun.Injective nat_of_path.
 Proof.
 intros el₁ el₂ Hf.
@@ -199,50 +212,66 @@ induction el₁ as [| e₁ el₁]; intros.
   destruct n; [ revert Hn; apply nat_of_path_ne_0 | easy ].
 
   simpl in Hf.
-  destruct (le_dec (nat_of_path el₁) (nat_of_path el₂)) as [H₁| H₁].
-(*
+  set (np₁ := nat_of_path el₁) in Hf.
+  set (np₂ := nat_of_path el₂) in Hf.
+  set (n₁ := nat_of_free_elem e₁) in Hf.
+  set (n₂ := nat_of_free_elem e₂) in Hf.
+  destruct (lt_eq_lt_dec np₁ np₂) as [[H₁| H₁]| H₁].
    apply Nat.add_sub_eq_l in Hf.
-*)
-bbb.
    rewrite Nat.add_sub_swap in Hf.
-    2: apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | easy ].
-
     rewrite <- Nat.mul_sub_distr_r in Hf.
-    set (n₁ := nat_of_free_elem e₁) in Hf.
-    set (n₂ := nat_of_free_elem e₂) in Hf.
-    set (np₁ := nat_of_path el₁) in Hf, H₁.
-    set (np₂ := nat_of_path el₂) in Hf, H₁.
-    destruct (lt_eq_lt_dec n₁ n₂) as [[H₂| H₂]| H₂].
-     destruct (eq_nat_dec np₁ np₂) as [H₃| H₃].
-      subst np₁ np₂; rewrite H₃, Nat.sub_diag in Hf; simpl in Hf.
-      rewrite Hf in H₂; now apply Nat.lt_irrefl in H₂.
+    apply Nat.add_sub_eq_r in Hf.
+    remember (np₂ - np₁)%nat as n eqn:Hn.
+    symmetry in Hn.
+    destruct n.
+     apply Nat.sub_0_le in Hn.
+     now apply Nat.nlt_ge in Hn.
 
-      apply nat_neq_le_lt in H₁; [ | easy ].
-      apply Nat.add_sub_eq_r in Hf; symmetry in Hf.
-      pose proof Nat.sub_0_le n₁ n₂ as H.
-      destruct H as (_, H).
-      rewrite H in Hf; [ clear H | now apply Nat.lt_le_incl ].
-      apply Nat.eq_mul_0_l in Hf; [ | easy ].
-      now apply Nat.sub_0_le, Nat.nlt_ge in Hf.
+     pose proof (nat_of_free_elem_sub_le e₁ e₂) as H.
+     fold n₁ n₂ in H; rewrite Hf in H.
+     rewrite Nat.mul_succ_l in H.
+     apply Nat.lt_add_lt_sub_r in H.
+     rewrite Nat.sub_diag in H.
+     now apply Nat.nlt_0_r in H.
 
-     rewrite H₂ in Hf.
-     apply Nat.add_sub_eq_r in Hf.
-     rewrite Nat.sub_diag in Hf; symmetry in Hf.
-     apply Nat.eq_mul_0_l in Hf; [ | easy ].
-     apply Nat.sub_0_le in Hf.
-     apply Nat.le_antisymm in Hf; [ | easy ].
-     subst n₁ n₂ np₁ np₂.
-     apply nat_of_free_elem_injective in H₂.
-     f_equal; [ easy | now apply IHel₁ ].
+    apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | ].
+    now apply Nat.lt_le_incl.
 
-     simpl.
-bbb.
+   rewrite H₁ in Hf.
+   apply Nat.add_cancel_l in Hf.
+   subst n₁ n₂ np₁ np₂.
+   apply nat_of_free_elem_injective in Hf.
+   f_equal; [ easy | now apply IHel₁ ].
+
+   symmetry in Hf.
+   apply Nat.add_sub_eq_l in Hf.
+   rewrite Nat.add_sub_swap in Hf.
+    rewrite <- Nat.mul_sub_distr_r in Hf.
+    apply Nat.add_sub_eq_r in Hf.
+    remember (np₁ - np₂)%nat as n eqn:Hn.
+    symmetry in Hn.
+    destruct n.
+     apply Nat.sub_0_le in Hn.
+     now apply Nat.nlt_ge in Hn.
+
+     pose proof (nat_of_free_elem_sub_le e₂ e₁) as H.
+     fold n₁ n₂ in H; rewrite Hf in H.
+     rewrite Nat.mul_succ_l in H.
+     apply Nat.lt_add_lt_sub_r in H.
+     rewrite Nat.sub_diag in H.
+     now apply Nat.nlt_0_r in H.
+
+    apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | ].
+    now apply Nat.lt_le_incl.
+Qed.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
   (∀ el₁ el₂, el₁ ≠ el₂ → f el₁ ≠ f el₂).
 Proof.
 exists nat_of_path.
-bbb.
+intros el₁ el₂ H Hnp; apply H.
+now apply nat_of_path_injective.
+Qed.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
