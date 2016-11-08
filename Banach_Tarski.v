@@ -366,18 +366,22 @@ Theorem Rset_of_bin_seq_non_empty : ∀ u, ∃ x, x ∈ Rset_of_bin_seq u.
 Proof.
 intros.
 unfold Rset_of_bin_seq; simpl.
-Admitted.
+bbb.
 
 Definition R_of_bin_seq u :=
   completeness (setp (Rset_of_bin_seq u)) (Rset_of_bin_seq_bound u)
     (Rset_of_bin_seq_non_empty u).
 
-Print R_of_bin_seq.
-
-bbb.
-
 Definition int_frac_to_R rif :=
-  IZR (Rint rif) + bin_to_Rfrac (Rfrac rif).
+  IZR (Rint rif) + proj1_sig (R_of_bin_seq (Rfrac rif)).
+
+Example R_to_int_frac_bij : FinFun.Bijective R_to_int_frac.
+Proof.
+unfold FinFun.Bijective.
+exists int_frac_to_R.
+split.
+ intros x.
+bbb.
 
 Example R_to_int_frac_bij :
   FinFun.Injective R_to_int_frac ∧
