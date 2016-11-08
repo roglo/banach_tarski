@@ -150,170 +150,44 @@ Qed.
 Definition rotate_set axis ang E :=
   mkset (λ p, mat_vec_mul (rot_mat_of_axis_cos axis (-cos ang)) p ∈ E).
 
-Definition othl t := match t with la => lb | lb => la end.
-
-Fixpoint path_of_nat_aux it (n : nat) :=
-  match it with
-  | O => []
-  | S it' =>
-      match n with
-      | 0 => ạ :: []
-      | 1 => ạ⁻¹ :: []
-      | 2 => ḅ :: []
-      | 3 => ḅ⁻¹ :: []
-      | S (S (S (S n'))) =>
-          let l := path_of_nat_aux it' (n' / 3) in
-          match l with
-          | FE t d :: _ =>
-              match n' mod 3 with
-              | 0 => FE t d :: l
-              | 1 => FE (othl t) false :: l
-              | _ => FE (othl t) true :: l
-              end
-          | [] => []
-          end
-      end
+Definition nat_of_free_elem e : nat :=
+  match e with
+  | ạ => 0
+  | ạ⁻¹ => 1
+  | ḅ => 2
+  | ḅ⁻¹ => 3
   end.
 
-Definition path_of_nat n := path_of_nat_aux (S n) n.
+Fixpoint nat_of_path el :=
+  match el with
+  | e :: el' => (nat_of_path el' * 4 + nat_of_free_elem e)%nat
+  | [] => 1%nat
+  end.
 
-Compute (path_of_nat 0).
-Compute (path_of_nat 1).
-Compute (path_of_nat 2).
-Compute (path_of_nat 3).
-Compute (path_of_nat 4).
-Compute (path_of_nat 5).
-Compute (path_of_nat 6).
-Compute (path_of_nat 7).
-Compute (path_of_nat 8).
-Compute (path_of_nat 9).
-Compute (path_of_nat 10).
-Compute (path_of_nat 11).
-Compute (path_of_nat 12).
-Compute (path_of_nat 13).
-Compute (path_of_nat 14).
-Compute (path_of_nat 15).
-Compute (path_of_nat 16).
-Compute (path_of_nat 17).
-Compute (path_of_nat 18).
-Compute (path_of_nat 19).
-Compute (path_of_nat 20).
-Compute (path_of_nat 21).
-Compute (path_of_nat 22).
-Compute (path_of_nat 23).
-Compute (path_of_nat 24).
-Compute (path_of_nat 25).
-Compute (path_of_nat 26).
-Compute (path_of_nat 27).
-Compute (path_of_nat 28).
-Compute (path_of_nat 29).
-Compute (path_of_nat 30).
-Compute (path_of_nat 31).
-Compute (path_of_nat 32).
-Compute (path_of_nat 33).
-Compute (path_of_nat 34).
-Compute (path_of_nat 35).
-Compute (path_of_nat 36).
-Compute (path_of_nat 37).
-Compute (path_of_nat 38).
-Compute (path_of_nat 39).
-Compute (path_of_nat 40).
-Compute (path_of_nat 41).
-Compute (path_of_nat 42).
-Compute (path_of_nat 43).
-Compute (path_of_nat 44).
-Compute (path_of_nat 45).
-Compute (path_of_nat 46).
-Compute (path_of_nat 47).
-Compute (path_of_nat 48).
-Compute (path_of_nat 49).
-Compute (path_of_nat 50).
-Compute (path_of_nat 51).
-Compute (path_of_nat 52).
-Compute (path_of_nat 53).
-Compute (path_of_nat 54).
-Compute (path_of_nat 55).
-Compute (path_of_nat 56).
-Compute (path_of_nat 57).
-Compute (path_of_nat 58).
-Compute (path_of_nat 59).
-Compute (path_of_nat 60).
-Compute (path_of_nat 61).
-Compute (path_of_nat 62).
-Compute (path_of_nat 63).
-Compute (path_of_nat 64).
-Compute (path_of_nat 65).
-Compute (path_of_nat 66).
-Compute (path_of_nat 67).
-Compute (path_of_nat 68).
-Compute (path_of_nat 69).
-Compute (path_of_nat 70).
-
-Theorem toto : ∃ (f : nat → list free_elem),
-  (∀ n, norm_list (f n) = f n) ∧
-  (∀ m n, m ≠ n → f m ≠ f n) ∧ (∀ el, ∃ n, f n = el).
+Theorem nat_of_path_ne_0 : ∀ el, nat_of_path el ≠ 0%nat.
 Proof.
-exists path_of_nat.
-split.
- intros n.
- unfold path_of_nat.
- remember (S n) as m.
- assert (Hm: n < m) by (subst m; apply Nat.lt_succ_diag_r).
- clear Heqm; revert n Hm.
- induction m; intros; [ easy | ].
- destruct n; [ easy | simpl ].
- destruct n; [ easy | ].
- destruct n; [ easy | ].
- destruct n; [ easy | ].
- simpl.
- remember (path_of_nat_aux m (n / 3)) as l eqn:Hl.
- destruct l as [| e el]; [ easy | ].
- destruct e as (t, d); destruct t, d.
-  remember (n mod 3) as n3 eqn:Hn3.
-  symmetry in Hn3.
-  destruct n3.
-   rewrite Hl, <- IHm.
-bbb.
+intros * H.
+induction el as [| e el]; [ easy | ].
+simpl in H; apply Nat.eq_add_0 in H.
+destruct H as (H, _).
+now apply Nat.eq_mul_0_l in H.
+Qed.
 
-Focus 7.
- split.
-  intros n₁ n₂ H Hn; apply H; clear H.
-  unfold path_of_nat in Hn.
-  revert n₂ Hn.
-  induction n₁; intros.
-   simpl in Hn.
-   destruct n₂; [ easy | exfalso ].
-   destruct n₂; [ easy | ].
-   destruct n₂; [ easy | ].
-   destruct n₂; [ easy | ].
-   remember (path_of_nat_aux (S (S (S (S n₂)))) (n₂ / 3)) as el eqn:Hel.
-   symmetry in Hel.
-   destruct el as [| e el]; [ easy | ].
-   destruct e as (t, d); destruct t, d.
-    destruct (n₂ mod 3) as [ | n]; [ easy | now destruct n ].
-    destruct (n₂ mod 3) as [ | n]; [ easy | now destruct n ].
-    destruct (n₂ mod 3) as [ | n]; [ easy | now destruct n ].
-    destruct (n₂ mod 3) as [ | n]; [ easy | now destruct n ].
-
-   destruct n₂.
-    remember (S n₁) as n eqn:Hsn; simpl in Hn.
-    destruct n; [ easy | exfalso ].
-    destruct n; [ easy | ].
-    destruct n; [ easy | ].
-    destruct n; [ easy | ].
-    rewrite Hsn in IHn₁, Hn.
-
-
-bbb.
-
-   destruct el as [| e el]; [ easy | ].
-   destruct e as (t, d); destruct t, d.
-
-bbb.
-
-Theorem glop : ∃ (f : nat → point),
-  (∀ n, f n ∈ D) ∧ (∀ m n, m ≠ n → f m ≠ f n) ∧ (∀ p, ∃ n, f n = p).
+Theorem paths_are_countable : ∃ (f : list free_elem → nat),
+  (∀ el₁ el₂, el₁ ≠ el₂ → f el₁ ≠ f el₂).
 Proof.
+exists nat_of_path; intros * H Hf; apply H; clear H.
+revert el₂ Hf.
+induction el₁ as [| e₁ el₁]; intros.
+ destruct el₂ as [| e₂ el₂]; [ easy | exfalso; simpl in Hf ].
+ remember (nat_of_path el₂) as n eqn:Hn; symmetry in Hn.
+ destruct n; [ revert Hn; apply nat_of_path_ne_0 | easy ].
+
+ destruct el₂ as [| e₂ el₂]; [ exfalso; simpl in Hf | ].
+  remember (nat_of_path el₁) as n eqn:Hn; symmetry in Hn.
+  destruct n; [ revert Hn; apply nat_of_path_ne_0 | easy ].
+
+  simpl in Hf.
 bbb.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
@@ -322,7 +196,7 @@ Proof.
 intros.
 assert (∃ p₁, p₁ ∈ sphere ∖ D).
 unfold "∈", "∖".
-found.
+bbb.
 
 assert (∃ p₁, p₁ ∉ D).
 bbb.
