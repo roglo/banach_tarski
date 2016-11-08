@@ -199,8 +199,11 @@ induction el₁ as [| e₁ el₁]; intros.
   destruct n; [ revert Hn; apply nat_of_path_ne_0 | easy ].
 
   simpl in Hf.
-  apply Nat.add_sub_eq_l in Hf.
   destruct (le_dec (nat_of_path el₁) (nat_of_path el₂)) as [H₁| H₁].
+(*
+   apply Nat.add_sub_eq_l in Hf.
+*)
+bbb.
    rewrite Nat.add_sub_swap in Hf.
     2: apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | easy ].
 
@@ -232,7 +235,7 @@ induction el₁ as [| e₁ el₁]; intros.
      apply nat_of_free_elem_injective in H₂.
      f_equal; [ easy | now apply IHel₁ ].
 
-     exfalso.
+     simpl.
 bbb.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
