@@ -275,9 +275,48 @@ Qed.
 
 Definition is_uncountable_infinite A := ∀ f : nat → A, ∃ x, ∀ n, f n ≠ x.
 
-Theorem R_is_uncountable : is_uncountable_infinite R.
+Record R_as_int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
+
+Definition Rfloor x := if Req_dec (IZR (up x - 1)) x then (up x - 1)%Z else up x.
+Definition Rfracp x := x - IZR (Rfloor x).
+
+Theorem Rflacp_in_0_1 : ∀ x, (0 <= Rfracp x)%R ∧ (Rfracp x < 1)%R.
+Proof.
+intros x.
+pose proof archimed x as Ha.
+destruct Ha as (Hgt, Hle).
+split.
+ unfold Rfracp.
+ unfold Rfloor.
+ unfold "_-_", sub_notation.
+ destruct (Req_dec (IZR (up x - 1)) x) as [H₁| H₁].
+  rewrite H₁.
+  rewrite Rminus_diag_eq; [ apply Rle_refl | easy ].
+
+  rewrite minus_IZR in H₁; simpl in H₁.
+bbb.
+
+Check _-_.
+Check (_-_ x)%R.
+
+  rewrite H₁ in Hgt.
+  now apply Rlt_irrefl in Hgt.
+Check archimed.
+
+bbb.
+
+Fixpoint frac_to_bin x n :=
+  match n with
+  | 0 => Rfloor (x * 2)
+
+Definition R_to_R_as_int_frac x := mkraif (Rfloor x) (frac_to_bin (Rfracp x)).
+
+Example R_is_uncountable : is_uncountable_infinite R.
 Proof.
 intros f.
+Check completeness.
+SearchAbout up.
+Print archimed.
 bbb.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
