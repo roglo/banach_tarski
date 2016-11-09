@@ -318,6 +318,8 @@ assert (HAB : (A = B)%S).
  destruct HB as (f, HB).
  pose proof HB a Ha as H.
  destruct H as (n, H).
+bbb.
+
  pose proof HA f as H₁.
 bbb.
 
