@@ -282,6 +282,14 @@ Qed.
 Definition is_uncountable U A := ∀ f : ℕ → U, ∃ a, a ∈ A → ∀ n, f n ≠ a.
 Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
 
+Add Parametric Morphism {U} : (@is_countable U)
+ with signature (@set_eq _ set_equiv) ==> iff
+ as is_countable_morph.
+Proof.
+intros E F HEF.
+split; intros H; destruct H as (f, H); exists f; intros x Hx; now apply H, HEF.
+Qed.
+
 Theorem uncountable_sub_countable_not_empty : ∀ {U} (A B : set U),
   is_uncountable _ A
   → is_countable _ B
@@ -297,7 +305,18 @@ set (s := @set_equiv U).
 assert (HAB : (A = B)%S).
  intros x.
  split; [ intros Ha | now intros Hb; apply HBA ].
+ pose proof HnA x as H.
+ simpl in H.
+ apply (classic (x ∈ B)).
+ now intros Hb; apply H.
 
+ rewrite <- HAB in HB.
+ unfold is_uncountable in HA.
+ unfold is_countable in HB.
+ destruct HB as (f, HB).
+ pose proof HA f as H.
+ destruct H as (a, H).
+ pose proof HB a as H₁.
 bbb.
 
 (* equivalence between ℝ and a representation with integer and fractional
