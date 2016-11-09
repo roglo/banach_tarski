@@ -377,28 +377,17 @@ split.
  intros x.
  remember (int_frac_of_R x) as rif eqn:Hrif.
  unfold R_of_int_frac.
- remember (R_of_bin_seq (Rfrac rif)) as c eqn:Hc.
- symmetry in Hc.
- destruct c as (y, Hy); simpl.
- unfold R_of_bin_seq in Hc.
- unfold is_lub in Hy.
- destruct Hy as (Hyub, Hyb).
-(**)
- set (s := Rset_of_bin_seq (Rfrac rif)) in *.
- unfold is_upper_bound in Hyub, Hyb.
- subst rif; simpl.
-(*
- clear Hc.
+ destruct (R_of_bin_seq (Rfrac rif)) as (y, Hy); simpl.
  remember (Rset_of_bin_seq (Rfrac rif)) as s eqn:Hs.
- unfold is_upper_bound in Hyub, Hyb.
  subst rif; simpl in Hs; simpl.
-*)
  assert ((x - IZR (Rfloor x) = y)%R); [ | lra ].
  unfold Rfloor.
  unfold "_-_", sub_notation.
  rewrite minus_IZR; simpl.
  replace _ with (x + 1 - IZR (up x))%R by lra.
- (* ça va pas, ça: il faudrait que y soit le m du Hc *)
+ unfold is_lub in Hy.
+ destruct Hy as (Hyub, Hyb).
+ unfold is_upper_bound in Hyub, Hyb.
 bbb.
 
 Example int_frac_of_R_bij :
