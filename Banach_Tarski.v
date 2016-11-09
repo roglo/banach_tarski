@@ -273,7 +273,19 @@ intros el₁ el₂ H Hnp; apply H.
 now apply nat_of_path_injective.
 Qed.
 
-Definition is_uncountable_infinite A := ∀ f : nat → A, ∃ x, ∀ n, f n ≠ x.
+Definition is_uncountable U A := ∀ f : ℕ → U, ∃ a, a ∈ A → ∀ n, f n ≠ a.
+Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
+
+Theorem toto : ∀ {U} (A B : set U),
+  is_uncountable _ A
+  → is_countable _ B
+  → B ⊂ A
+  → ∃ x, x ∈ A ∖ B.
+Proof.
+intros * HA HB HBA.
+bbb.
+
+bbb.
 
 (* equivalence between ℝ and a representation with integer and fractional
    part, the fractional part being a boolean sequence (false for 0, true
