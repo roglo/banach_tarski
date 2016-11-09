@@ -398,6 +398,7 @@ split.
  unfold "_-_", sub_notation.
  rewrite minus_IZR; simpl.
  replace _ with (x + 1 - IZR (up x))%R by lra.
+ (* ça va pas, ça: il faudrait que y soit le m du Hc *)
 bbb.
 
 Example int_frac_of_R_bij :
