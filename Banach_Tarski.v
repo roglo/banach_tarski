@@ -279,7 +279,6 @@ intros * HnP.
 now destruct (EM P).
 Qed.
 
-Definition is_uncountable U A := (∃ a, a ∈ A) ∧ ∀ f : ℕ → U, ∃ a, a ∈ A → ∀ n, f n ≠ a.
 Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
 
 Add Parametric Morphism {U} : (@is_countable U)
@@ -291,7 +290,7 @@ split; intros H; destruct H as (f, H); exists f; intros x Hx; now apply H, HEF.
 Qed.
 
 Theorem uncountable_sub_countable_not_empty : ∀ {U} (A B : set U),
-  is_uncountable _ A
+  not (is_countable _ A)
   → is_countable _ B
   → B ⊂ A
   → ∃ x, x ∈ A ∖ B.
@@ -310,31 +309,8 @@ assert (HAB : (A = B)%S).
  apply (classic (x ∈ B)).
  now intros Hb; apply H.
 
- rewrite <- HAB in HB.
- clear B HBA HnA HAB.
- unfold is_uncountable in HA.
- destruct HA as ((a, Ha), HA).
- unfold is_countable in HB.
- destruct HB as (f, HB).
- pose proof HB a Ha as H.
- destruct H as (n, H).
-bbb.
-
- pose proof HA f as H₁.
-bbb.
-
- destruct H₁ as (a, H₁).
- pose proof HB a as H₂.
-bbb.
-
- destruct (EM (a ∈ A)) as [H₂| H₂].
-  pose proof H₁ H₂ as H₃.
-  pose proof HB a H₂ as H₄.
-  destruct H₄ as (n, H₄).
-  revert H₄; apply H₃.
-
-  simpl.
-bbb.
+ now rewrite <- HAB in HB.
+Qed.
 
 (* equivalence between ℝ and a representation with integer and fractional
    part, the fractional part being a boolean sequence (false for 0, true
