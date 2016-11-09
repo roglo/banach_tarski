@@ -275,7 +275,7 @@ Qed.
 
 Definition is_uncountable_infinite A := ∀ f : nat → A, ∃ x, ∀ n, f n ≠ x.
 
-Record R_as_int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
+Record int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
 Definition Rfloor x := up x - 1.
 Definition Rfracp x := x - IZR (Rfloor x).
@@ -302,7 +302,7 @@ Fixpoint Rfrac_to_bin x n :=
   | S n' => Rfrac_to_bin (x * 2)%R n'
   end.
 
-Definition R_to_int_frac x :=
+Definition int_frac_of_R x :=
   mkraif (Rfloor x) (Rfrac_to_bin (Rfracp x)).
 
 Fixpoint bin_to_Rfrac_aux it (u : ℕ → bool) pow i :=
@@ -376,25 +376,36 @@ Definition R_of_bin_seq u :=
 Definition int_frac_to_R rif :=
   IZR (Rint rif) + proj1_sig (R_of_bin_seq (Rfrac rif)).
 
-Example R_to_int_frac_bij : FinFun.Bijective R_to_int_frac.
+Example int_frac_of_R_bij : FinFun.Bijective int_frac_of_R.
 Proof.
 unfold FinFun.Bijective.
 exists int_frac_to_R.
 split.
  intros x.
- unfold int_frac_to_R, R_to_int_frac; simpl.
- unfold R_of_bin_seq.
- remember (Rfrac_to_bin (Rfracp x)) as bin eqn:Hbin.
- unfold Rset_of_bin_seq; simpl.
+ remember (int_frac_of_R x) as rif eqn:Hrif.
+ unfold int_frac_to_R.
+ remember (R_of_bin_seq (Rfrac rif)) as c eqn:Hc.
+ symmetry in Hc.
+ destruct c as (y, Hy); simpl.
+ unfold R_of_bin_seq in Hc.
+ unfold is_lub in Hy.
+ destruct Hy as (Hyub, Hyb).
+(*
+ set (s := Rset_of_bin_seq (Rfrac rif)) in *.
+*)
+ clear Hc.
+ remember (Rset_of_bin_seq (Rfrac rif)) as s eqn:Hs.
+(**)
+ unfold is_upper_bound in Hyub, Hyb.
 bbb.
 
-Example R_to_int_frac_bij :
-  FinFun.Injective R_to_int_frac ∧
-  FinFun.Surjective R_to_int_frac.
+Example int_frac_of_R_bij :
+  FinFun.Injective int_frac_of_R ∧
+  FinFun.Surjective int_frac_of_R.
 Proof.
 split.
  intros x y Hxy.
- unfold R_to_int_frac in Hxy.
+ unfold int_frac_of_R in Hxy.
  injection Hxy; clear Hxy; intros Hf Hi.
 Check archimed.
 Print FinFun.Bijective.
