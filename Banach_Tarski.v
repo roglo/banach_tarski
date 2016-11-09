@@ -275,6 +275,14 @@ Qed.
 
 Definition is_uncountable_infinite A := ∀ f : nat → A, ∃ x, ∀ n, f n ≠ x.
 
+bbb.
+
+(* drawback with int_frac representation below: I will not be able
+   to prove that it is in bijection with the interval [0..1[ of ℝ
+   because e.g. 0.01111...=0.1000... so we have two representations
+   of some real values; this drawback exist for all radices; I may
+   have problems with the Cantor diagonal argument *)
+
 Record int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
 Definition Rfloor x := up x - 1.
