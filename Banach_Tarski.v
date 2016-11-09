@@ -275,13 +275,9 @@ Qed.
 
 Definition is_uncountable_infinite A := ∀ f : nat → A, ∃ x, ∀ n, f n ≠ x.
 
-bbb.
-
-(* drawback with int_frac representation below: I will not be able
-   to prove that it is in bijection with the interval [0..1[ of ℝ
-   because e.g. 0.01111...=0.1000... so we have two representations
-   of some real values; this drawback exist for all radices; I may
-   have problems with the Cantor diagonal argument *)
+(* equivalence between ℝ and a representation with integer and fractional
+   part, the fractional part being a boolean sequence (false for 0, true
+   for 1 *)
 
 Record int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
@@ -295,13 +291,11 @@ pose proof archimed x as Ha.
 destruct Ha as (Hgt, Hle).
 unfold Rfracp, Rfloor.
 unfold "_-_", sub_notation.
-split.
- rewrite minus_IZR; simpl.
- apply Rplus_le_compat_l with (r := - (IZR (up x) - x)) in Hle.
- rewrite Rplus_opp_l in Hle.
- unfold "_-_", "-_", sub_notation, opp_notation in Hle; lra.
-
- rewrite minus_IZR; simpl; lra.
+split; [ | rewrite minus_IZR; simpl; lra ].
+rewrite minus_IZR; simpl.
+apply Rplus_le_compat_l with (r := - (IZR (up x) - x)) in Hle.
+rewrite Rplus_opp_l in Hle.
+unfold "_-_", "-_", sub_notation, opp_notation in Hle; lra.
 Qed.
 
 Fixpoint R_to_bin x n :=
