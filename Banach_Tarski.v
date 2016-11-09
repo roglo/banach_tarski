@@ -395,6 +395,84 @@ split.
  remember (x - (IZR (up x) - 1))%R as z.
  assert (Hz : z = (x + 1 - IZR (up x))%R) by lra; clear Heqz.
  move Hz after Hs.
+ assert (Hyz : (y <= z)%R).
+  apply Hyb.
+  intros t Ht.
+  rewrite Hs in Ht; simpl in Ht.
+  destruct Ht as (it, Ht); subst t.
+  unfold bin_to_Rfrac.
+bbb.
+
+Theorem glop : ∀ z it pow i,
+  (0 <= z < 1)%R
+  → (0 < pow <= 1/2)%R
+  → (bin_to_Rfrac_aux it (R_to_bin z) pow i <= z)%R.
+Proof.
+intros * Hz Hpow.
+revert pow i Hpow.
+induction it; intros; [ easy | simpl ].
+remember (R_to_bin z i) as b eqn:Hb.
+symmetry in Hb.
+
+Theorem toto : ∀ z, R_to_bin z 0 = false → (z <= 1/2)%R.
+Admitted. Show.
+
+Theorem titi : ∀ z, R_to_bin z 0 = true → (1/2 <= z)%R.
+Admitted. Show.
+
+induction i.
+ destruct b.
+(*
+ apply titi in Hb.
+*)
+ simpl in Hb.
+ destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁]; [ easy | ].
+ clear Hb; unfold Rfloor in H₁.
+ unfold "_-_", sub_notation in H₁.
+ assert (H : up (z * 2) = 1).
+  destruct (Z.eq_dec (up (z * 2)) 1) as [H₂| H₂]; [ easy | ].
+  exfalso; apply H₁; clear H₁.
+
+ exfalso; apply H₁; clear H₁.
+
+
+ pose proof archimed (2 * z) as H.
+ destruct H as (Hz₁, Hz₂).
+
+
+bbb.
+
+ assert (up (z * 2) = 1)
+
+ pose proof archimed z as H.
+ destruct H as (H
+
+bbb.
+
+ 
+
+Print bin_to_Rfrac_aux.
+
+ simpl.
+
+
+bbb.
+
+(* return to int_frac_of_R_bij *)
+apply glop; [ | lra ].
+pose proof archimed x as H; lra.
+
+bbb.
+
+apply glop; lra.
+
+bbb.
+
+  induction it.
+   rewrite Hz; simpl.
+   pose proof archimed x as H; lra.
+
+   simpl.
 bbb.
 
 Example int_frac_of_R_bij :
