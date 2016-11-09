@@ -296,14 +296,14 @@ split.
  rewrite minus_IZR; simpl; lra.
 Qed.
 
-Fixpoint Rfrac_to_bin x n :=
+Fixpoint R_to_bin x n :=
   match n with
-  | 0 => if Z.eq_dec (Rfloor (x * 2)%R) 0 then false else true
-  | S n' => Rfrac_to_bin (x * 2)%R n'
+  | 0 => if Z.eq_dec (Rfloor (x * 2)%R mod 2) 0 then false else true
+  | S n' => R_to_bin (x * 2)%R n'
   end.
 
 Definition int_frac_of_R x :=
-  mkraif (Rfloor x) (Rfrac_to_bin (Rfracp x)).
+  mkraif (Rfloor x) (R_to_bin (Rfracp x)).
 
 Fixpoint bin_to_Rfrac_aux it (u : ℕ → bool) pow i :=
   match it with
