@@ -380,14 +380,19 @@ split.
  destruct (R_of_bin_seq (Rfrac rif)) as (y, Hy); simpl.
  remember (Rset_of_bin_seq (Rfrac rif)) as s eqn:Hs.
  subst rif; simpl in Hs; simpl.
- assert ((x - IZR (Rfloor x) = y)%R); [ | lra ].
+ assert (y = (x - IZR (Rfloor x))%R); [ | lra ].
  unfold Rfloor.
  unfold "_-_", sub_notation.
- rewrite minus_IZR; simpl.
- replace _ with (x + 1 - IZR (up x))%R by lra.
  unfold is_lub in Hy.
  destruct Hy as (Hyub, Hyb).
  unfold is_upper_bound in Hyub, Hyb.
+ unfold Rfracp, Rfloor in Hs.
+ unfold "_-_", sub_notation in Hs.
+ rewrite minus_IZR in Hs; simpl in Hs.
+ rewrite minus_IZR; simpl.
+ remember (x - (IZR (up x) - 1))%R as z.
+ assert (Hz : z = (x + 1 - IZR (up x))%R) by lra; clear Heqz.
+ move Hz after Hs.
 bbb.
 
 Example int_frac_of_R_bij :
