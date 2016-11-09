@@ -383,14 +383,16 @@ split.
  unfold R_of_bin_seq in Hc.
  unfold is_lub in Hy.
  destruct Hy as (Hyub, Hyb).
-(*
+(**)
  set (s := Rset_of_bin_seq (Rfrac rif)) in *.
-*)
+ unfold is_upper_bound in Hyub, Hyb.
+ subst rif; simpl.
+(*
  clear Hc.
  remember (Rset_of_bin_seq (Rfrac rif)) as s eqn:Hs.
-(**)
  unfold is_upper_bound in Hyub, Hyb.
  subst rif; simpl in Hs; simpl.
+*)
  assert ((x - IZR (Rfloor x) = y)%R); [ | lra ].
  unfold Rfloor.
  unfold "_-_", sub_notation.
