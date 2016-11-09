@@ -296,7 +296,7 @@ Theorem uncountable_sub_countable_not_empty : ∀ {U} (A B : set U),
   → ∃ x, x ∈ A ∖ B.
 Proof.
 intros * HA HB HBA.
-apply (classic (∃ x, x ∈ A ∖ B)).
+apply classic.
 intros HnE.
 assert (HnA : ∀ x, x ∉ A ∖ B) by (now intros x Hx; apply HnE; exists x).
 clear HnE.
@@ -305,7 +305,7 @@ assert (HAB : (A = B)%S); [ | now rewrite HAB in HA ].
 intros x.
 split; [ intros Ha | now intros Hb; apply HBA ].
 pose proof HnA x as H; simpl in H.
-apply (classic (x ∈ B)).
+apply classic.
 now intros Hb; apply H.
 Qed.
 
