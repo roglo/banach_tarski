@@ -279,7 +279,7 @@ intros * HnP.
 now destruct (EM P).
 Qed.
 
-Definition is_uncountable U A := ∀ f : ℕ → U, ∃ a, a ∈ A → ∀ n, f n ≠ a.
+Definition is_uncountable U A := (∃ a, a ∈ A) ∧ ∀ f : ℕ → U, ∃ a, a ∈ A → ∀ n, f n ≠ a.
 Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
 
 Add Parametric Morphism {U} : (@is_countable U)
@@ -313,12 +313,18 @@ assert (HAB : (A = B)%S).
  rewrite <- HAB in HB.
  clear B HBA HnA HAB.
  unfold is_uncountable in HA.
+ destruct HA as ((a, Ha), HA).
  unfold is_countable in HB.
  destruct HB as (f, HB).
+ pose proof HB a Ha as H.
+ destruct H as (n, H).
+ pose proof HA f as H₁.
 bbb.
 
- pose proof HA f as H₁.
  destruct H₁ as (a, H₁).
+ pose proof HB a as H₂.
+bbb.
+
  destruct (EM (a ∈ A)) as [H₂| H₂].
   pose proof H₁ H₂ as H₃.
   pose proof HB a H₂ as H₄.
