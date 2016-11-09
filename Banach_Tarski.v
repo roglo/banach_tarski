@@ -273,17 +273,30 @@ intros el₁ el₂ H Hnp; apply H.
 now apply nat_of_path_injective.
 Qed.
 
+Theorem classic : ∀ (P : Prop), ¬¬P → P.
+Proof.
+intros * HnP.
+now destruct (EM P).
+Qed.
+
 Definition is_uncountable U A := ∀ f : ℕ → U, ∃ a, a ∈ A → ∀ n, f n ≠ a.
 Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
 
-Theorem toto : ∀ {U} (A B : set U),
+Theorem uncountable_sub_countable_not_empty : ∀ {U} (A B : set U),
   is_uncountable _ A
   → is_countable _ B
   → B ⊂ A
   → ∃ x, x ∈ A ∖ B.
 Proof.
 intros * HA HB HBA.
-bbb.
+apply (classic (∃ x, x ∈ A ∖ B)).
+intros HnE.
+assert (HnA : ∀ x, x ∉ A ∖ B) by (now intros x Hx; apply HnE; exists x).
+clear HnE.
+set (s := @set_equiv U).
+assert (HAB : (A = B)%S).
+ intros x.
+ split; [ intros Ha | now intros Hb; apply HBA ].
 
 bbb.
 
