@@ -313,6 +313,16 @@ assert (HAB : (A = B)%S).
  rewrite <- HAB in HB.
  unfold is_uncountable in HA.
  unfold is_countable in HB.
+ destruct HB as (f, HB).
+ pose proof HA f as H₁.
+ destruct H₁ as (a, H₁).
+ destruct (EM (a ∈ A)) as [H₂| H₂].
+  pose proof H₁ H₂ as H₃.
+  pose proof HB a H₂ as H₄.
+  destruct H₄ as (n, H₄).
+  revert H₄; apply H₃.
+
+  simpl.
 bbb.
 
 (* equivalence between ℝ and a representation with integer and fractional
