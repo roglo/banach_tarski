@@ -313,14 +313,7 @@ Fixpoint bin_to_Rfrac_aux it (u : ℕ → bool) pow i :=
       else bin_to_Rfrac_aux it' u (pow / 2)%R (S i)
   end.
 
-(* ok, but how many iterations should I do? an infinity! So I should
-   define some kind of equality between reals; but this equality is
-   not going to be the equality between reals defined in the library! *)
 Definition bin_to_Rfrac u it := bin_to_Rfrac_aux it u (1/2)%R 0.
-
-Print completeness.
-
-Check bin_to_Rfrac.
 
 Theorem bin_to_Rfrac_aux_le_2_pow : ∀ u it pow i,
   (0 < pow)%R
