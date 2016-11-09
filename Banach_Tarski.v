@@ -301,15 +301,12 @@ intros HnE.
 assert (HnA : ∀ x, x ∉ A ∖ B) by (now intros x Hx; apply HnE; exists x).
 clear HnE.
 set (s := @set_equiv U).
-assert (HAB : (A = B)%S).
- intros x.
- split; [ intros Ha | now intros Hb; apply HBA ].
- pose proof HnA x as H.
- simpl in H.
- apply (classic (x ∈ B)).
- now intros Hb; apply H.
-
- now rewrite <- HAB in HB.
+assert (HAB : (A = B)%S); [ | now rewrite HAB in HA ].
+intros x.
+split; [ intros Ha | now intros Hb; apply HBA ].
+pose proof HnA x as H; simpl in H.
+apply (classic (x ∈ B)).
+now intros Hb; apply H.
 Qed.
 
 (* equivalence between ℝ and a representation with integer and fractional
