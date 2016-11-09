@@ -401,18 +401,37 @@ split.
   rewrite Hs in Ht; simpl in Ht.
   destruct Ht as (it, Ht); subst t.
   unfold bin_to_Rfrac.
-bbb.
 
 Theorem glop : ∀ z it pow i,
   (0 <= z < 1)%R
-  → (0 < pow <= 1/2)%R
+  → (0 < pow <= 1/2^(S i))%R
   → (bin_to_Rfrac_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
-revert pow i Hpow.
+revert z pow i Hz Hpow.
 induction it; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb.
 symmetry in Hb.
+destruct b.
+ destruct it.
+  simpl.
+  destruct i.
+   simpl in Hb.
+   destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁]; [ easy | ].
+   clear Hb.
+   assert (H2 : (2 > 0)%Z) by (apply Z.gt_lt_iff, Z.lt_0_2).
+   pose proof Zdiv.Z_mod_lt (Rfloor (z * 2)) 2 H2 as H.
+   clear H2.
+   remember (Rfloor (z * 2) mod 2)%Z as n eqn:Hn.
+   destruct H as (Hn₁, Hn₂).
+   destruct (Z.eq_dec n 0) as [H₂| H₂]; [ easy | ].
+   destruct (Z.eq_dec n 1) as [H₃| H₃].
+    subst n.
+    clear H₂ Hn₂ Hn₁ H₁.
+    unfold Rfloor in H₃.
+    unfold "_-_", sub_notation in H₃.
+
+bbb.
 
 Theorem toto : ∀ z, R_to_bin z 0 = false → (z <= 1/2)%R.
 Admitted. Show.
