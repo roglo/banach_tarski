@@ -366,17 +366,17 @@ Definition R_of_bin_seq u :=
   completeness (setp (Rset_of_bin_seq u)) (Rset_of_bin_seq_bound u)
     (Rset_of_bin_seq_non_empty u).
 
-Definition int_frac_to_R rif :=
-  IZR (Rint rif) + proj1_sig (R_of_bin_seq (Rfrac rif)).
+Definition R_of_int_frac rif :=
+  (IZR (Rint rif) + proj1_sig (R_of_bin_seq (Rfrac rif)))%R.
 
 Example int_frac_of_R_bij : FinFun.Bijective int_frac_of_R.
 Proof.
 unfold FinFun.Bijective.
-exists int_frac_to_R.
+exists R_of_int_frac.
 split.
  intros x.
  remember (int_frac_of_R x) as rif eqn:Hrif.
- unfold int_frac_to_R.
+ unfold R_of_int_frac.
  remember (R_of_bin_seq (Rfrac rif)) as c eqn:Hc.
  symmetry in Hc.
  destruct c as (y, Hy); simpl.
@@ -390,6 +390,12 @@ split.
  remember (Rset_of_bin_seq (Rfrac rif)) as s eqn:Hs.
 (**)
  unfold is_upper_bound in Hyub, Hyb.
+ subst rif; simpl in Hs; simpl.
+ assert ((x - IZR (Rfloor x) = y)%R); [ | lra ].
+ unfold Rfloor.
+ unfold "_-_", sub_notation.
+ rewrite minus_IZR; simpl.
+ replace _ with (x + 1 - IZR (up x))%R by lra.
 bbb.
 
 Example int_frac_of_R_bij :
