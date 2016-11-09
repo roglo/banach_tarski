@@ -311,9 +311,12 @@ assert (HAB : (A = B)%S).
  now intros Hb; apply H.
 
  rewrite <- HAB in HB.
+ clear B HBA HnA HAB.
  unfold is_uncountable in HA.
  unfold is_countable in HB.
  destruct HB as (f, HB).
+bbb.
+
  pose proof HA f as H₁.
  destruct H₁ as (a, H₁).
  destruct (EM (a ∈ A)) as [H₂| H₂].
