@@ -449,22 +449,25 @@ Theorem glop : ∀ z it,
 Proof.
 intros * Hz.
 unfold bin_to_R.
+(*
 revert z Hz.
 induction it; intros; [ easy | simpl ].
 destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁].
 bbb.
+*)
 
 Theorem glip : ∀ z it pow i,
-  (0 <= z)%R
-  → (pow <= 1/2)%R
+  (0 <= z < 1)%R
   → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
-intros * Hz Hpow.
-revert z pow i Hz Hpow.
+intros * Hz.
+revert z pow i Hz.
 induction it; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b; [ simpl | apply IHit; lra ].
-revert z Hz Hb.
+bbb.
+
+revert z pow Hz Hb.
 induction i; intros; simpl in Hb.
  destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁]; [ easy | clear Hb ].
  apply Rnot_lt_le in H₁.
