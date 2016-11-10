@@ -441,27 +441,25 @@ split.
 
 Theorem glop : ∀ u it pow i,
   (0 < pow)%R
+  → u i = false
   → (bin_to_Rfrac_aux it u (pow / 2) (S i) <=
      bin_to_Rfrac_aux (S it) u pow i)%R.
 Proof.
-intros * Hpow.
-bbb.
-
-revert pow i Hpow.
-induction it; intros; simpl; [ apply Rle_refl | ].
+intros * Hpow Hui.
+revert pow i Hui Hpow.
+destruct it; intros; simpl; [ rewrite Hui; apply Rle_refl | ].
 remember (u (S i)) as usi eqn:Husi; symmetry in Husi.
-destruct usi as [Hsi| Hsi].
- remember (u i) as ui eqn:Hui; symmetry in Hui.
- destruct ui as [Hi| Hi].
-  eapply Rle_trans; [ apply Rplus_le_compat_l, IHit; lra | ].
-  apply Rplus_le_compat_r; lra.
+rewrite Hui; apply Rle_refl.
+Qed.
 
-  destruct it; simpl.
-bbb.
+eapply Rle_trans.
+ apply glop; [ lra | now simpl; rewrite H₁ ].
 
-eapply Rle_trans; [ apply glop; lra | simpl ].
-(* works not! *)
-
+ simpl; rewrite H₁; simpl.
+ eapply Rle_trans; [ | apply IHit ].
+ (* no: I have an extra iteration...
+    but... pow is smaller... it may work... I have to try another
+    lemma for this *)
 bbb.
 
 Theorem glop : ∀ z it pow i,
