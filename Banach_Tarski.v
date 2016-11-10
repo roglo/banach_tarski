@@ -460,6 +460,31 @@ eapply Rle_trans.
  (* no: I have an extra iteration...
     but... pow is smaller... it may work... I have to try another
     lemma for this *)
+
+Theorem toto : ∀ u it pow i,
+  (0 < pow)%R
+  → 0 < it
+  → (pow / 2 + bin_to_Rfrac_aux it u (pow / 2) (S i) <=
+     bin_to_Rfrac_aux it u pow i)%R.
+Proof.
+intros * Hpow Hit.
+revert pow i Hpow.
+induction it; intros; [ now apply Nat.nlt_0_r in Hit | ].
+simpl; clear Hit.
+remember (u (S i)) as usi eqn:Husi; symmetry in Husi.
+remember (u i) as ui eqn:Hui; symmetry in Hui.
+destruct usi.
+ destruct ui.
+  rewrite <- Rplus_assoc.
+  apply Rplus_le_compat; [ lra | ].
+
+  destruct it; [ apply Rle_refl | ].
+  eapply Rle_trans; [ | apply IHit ]; try lra.
+  apply Nat.lt_0_succ.
+
+ destruct it.
+  simpl.
+
 bbb.
 
 Theorem glop : ∀ z it pow i,
