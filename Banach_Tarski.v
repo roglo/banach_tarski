@@ -465,8 +465,24 @@ remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
  2: apply IHit; [ easy | lra ].
 
- destruct it.
+ clear IHit.
+ revert z pow i Hz Hpow Hb.
+ induction it; intros.
   simpl.
+Focus 2.
+simpl.
+remember (R_to_bin (z * 2) i) as b' eqn:Hb'; symmetry in Hb'.
+destruct b'.
+ assert (pow / 2 <= 1/2)%R by lra.
+ pose proof IHit z (pow/2)%R (S i) Hz H Hb'.
+ (* shit, ça marche pas *)
+
+bbb.
+
+ eapply Rle_trans.
+  2: apply IHit with (pow := pow).
+
+  apply Rplus_le_compat_l.
 
 bbb.
 
