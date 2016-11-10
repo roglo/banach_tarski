@@ -435,6 +435,33 @@ split.
   rewrite Hs in Ht; simpl in Ht.
   destruct Ht as (it, Ht); subst t.
   unfold bin_to_Rfrac.
+
+  induction it; simpl; [ rewrite Hz; pose proof (archimed x); lra | ].
+  destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁].
+
+Theorem glop : ∀ u it pow i,
+  (0 < pow)%R
+  → (bin_to_Rfrac_aux it u (pow / 2) (S i) <=
+     bin_to_Rfrac_aux (S it) u pow i)%R.
+Proof.
+intros * Hpow.
+bbb.
+
+revert pow i Hpow.
+induction it; intros; simpl; [ apply Rle_refl | ].
+remember (u (S i)) as usi eqn:Husi; symmetry in Husi.
+destruct usi as [Hsi| Hsi].
+ remember (u i) as ui eqn:Hui; symmetry in Hui.
+ destruct ui as [Hi| Hi].
+  eapply Rle_trans; [ apply Rplus_le_compat_l, IHit; lra | ].
+  apply Rplus_le_compat_r; lra.
+
+  destruct it; simpl.
+bbb.
+
+eapply Rle_trans; [ apply glop; lra | simpl ].
+(* works not! *)
+
 bbb.
 
 Theorem glop : ∀ z it pow i,
