@@ -265,6 +265,16 @@ induction el₁ as [| e₁ el₁]; intros.
     now apply Nat.lt_le_incl.
 Qed.
 
+Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
+
+(*
+Theorem paths_are_countable :
+  is_countable (list free_elem) (mkset (λ _, True)).
+Proof.
+unfold is_countable.
+Check nat_of_path.
+*)
+
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
   (∀ el₁ el₂, el₁ ≠ el₂ → f el₁ ≠ f el₂).
 Proof.
@@ -278,8 +288,6 @@ Proof.
 intros * HnP.
 now destruct (EM P).
 Qed.
-
-Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
 
 Add Parametric Morphism {U} : (@is_countable U)
  with signature (@set_eq _ set_equiv) ==> iff
@@ -435,9 +443,13 @@ split.
   rewrite Hs in Ht; simpl in Ht.
   destruct Ht as (it, Ht); subst t.
   unfold bin_to_Rfrac.
+(**)
+Print R_to_bin.
 
+bbb.
   induction it; simpl; [ rewrite Hz; pose proof (archimed x); lra | ].
   destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁].
+bbb.
 
 Theorem glop : ∀ u it pow i,
   (0 < pow)%R
@@ -463,10 +475,24 @@ eapply Rle_trans.
 
 Theorem toto : ∀ u it pow i,
   (0 < pow)%R
-  → 0 < it
-  → (pow / 2 + bin_to_Rfrac_aux it u (pow / 2) (S i) <=
-     bin_to_Rfrac_aux it u pow i)%R.
+  → (bin_to_Rfrac_aux it u (pow / 2) (S i) <=
+     pow / 2 ^ it + bin_to_Rfrac_aux it u pow i)%R.
 Proof.
+intros * Hpow.
+Admitted. Show.
+
+(* return to theorem *)
+
+
+eapply Rle_trans; [ apply toto; lra | ].
+
+
+eapply Rle_trans; [ apply Rplus_le_compat_l, IHit | ].
+
+; [ eapply IHit | ].
+
+
+
 intros * Hpow Hit.
 revert pow i Hpow.
 induction it; intros; [ now apply Nat.nlt_0_r in Hit | ].
