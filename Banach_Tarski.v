@@ -444,13 +444,11 @@ split.
   destruct Ht as (it, Ht); subst t.
 
 Theorem glop : ∀ z it,
-  (0 <= z)%R
+  (0 <= z < 1)%R
   → (bin_to_R (R_to_bin z) it <= z)%R.
 Proof.
 intros * Hz.
 unfold bin_to_R.
-bbb.
-
 revert z Hz.
 induction it; intros; [ easy | simpl ].
 destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁].
