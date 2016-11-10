@@ -442,9 +442,52 @@ split.
   intros t Ht.
   rewrite Hs in Ht; simpl in Ht.
   destruct Ht as (it, Ht); subst t.
-  unfold bin_to_Rfrac.
+
+Theorem glop : ∀ z it,
+  (0 <= z)%R
+  → (bin_to_Rfrac (R_to_bin z) it <= z)%R.
+Proof.
+intros * Hz.
+unfold bin_to_Rfrac.
+revert z Hz.
+induction it; intros; [ easy | simpl ].
+destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁].
+
+Theorem glip : ∀ z it pow i,
+  (0 <= z)%R
+  → (pow <= 1/2)%R
+  → (bin_to_Rfrac_aux it (R_to_bin z) pow i <= z)%R.
+Proof.
+intros * Hz Hpow.
+revert z pow i Hz Hpow.
+induction it; intros; [ easy | simpl ].
+remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
+destruct b.
+ 2: apply IHit; [ easy | lra ].
+
+ destruct it.
+  simpl.
+
+bbb.
+
+(* glip works for glop *)
+apply glip; [ easy | lra ].
+
+bbb.
+
+(* glop works *)
+apply glop.
+pose proof archimed x as H; lra.
+bbb.
+
 (**)
 Print R_to_bin.
+assert (0 <= z < 1)%R
+clear Hz Hs.
+
+revert z.
+induction it; intros.
+simpl.
 
 bbb.
   induction it; simpl; [ rewrite Hz; pose proof (archimed x); lra | ].
