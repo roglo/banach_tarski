@@ -458,14 +458,35 @@ bbb.
 
 Theorem glip : ∀ z it pow i,
   (0 <= z < 1)%R
-  → (pow <= 1/2)%R
+  → (pow <= 1/2^(S i))%R
   → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert z pow i Hz Hpow.
 induction it; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
-destruct b; [ simpl | apply IHit; lra ].
+destruct b.
+ Focus 2.
+ apply IHit; [ easy | ].
+ apply Rmult_le_reg_r with (r := 2%R); [ lra | ].
+ replace (pow / 2 * 2)%R with pow by lra.
+ eapply Rle_trans; [ eassumption | ].
+ remember (S i) as si.
+ rewrite Rmult_comm; simpl.
+ apply Rmult_le_reg_r with (r := (2 ^ si)%R); [ apply pow_lt; lra | ].
+ remember (2 ^ si)%R as x.
+ assert (x ≠ 0)%R.
+  intros H; rewrite H in Heqx; symmetry in Heqx; revert Heqx.
+  apply pow_nonzero; lra.
+
+  unfold Rdiv.
+  do 2 rewrite Rmult_1_l.
+  rewrite Rinv_l; [ | easy ].
+  rewrite Rinv_mult_distr; [ | lra | easy ].
+  do 2 rewrite Rmult_assoc.
+  rewrite Rinv_l; [ lra | easy ].
+
+ simpl.
 bbb.
 
 revert z pow Hz Hb.
