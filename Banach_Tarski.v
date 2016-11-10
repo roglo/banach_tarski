@@ -435,6 +435,7 @@ split.
   rewrite Hs in Ht; simpl in Ht.
   destruct Ht as (it, Ht); subst t.
   unfold bin_to_Rfrac.
+bbb.
 
 Theorem glop : ∀ z it pow i,
   (0 <= z < 1)%R
