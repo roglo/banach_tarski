@@ -342,26 +342,26 @@ Qed.
 
 Fixpoint R_to_bin x n :=
   match n with
-  | 0 => if Z.eq_dec (Rfloor (x * 2)%R mod 2) 0 then false else true
+  | 0 => if Rlt_dec (Rfracp (x * 2)%R) (1/2) then false else true
   | S n' => R_to_bin (x * 2)%R n'
   end.
 
 Definition int_frac_of_R x :=
   mkraif (Rfloor x) (R_to_bin (Rfracp x)).
 
-Fixpoint bin_to_Rfrac_aux it (u : ℕ → bool) pow i :=
+Fixpoint bin_to_R_aux it (u : ℕ → bool) pow i :=
   match it with
   | 0 => 0%R
   | S it' =>
-      if u i then (pow + bin_to_Rfrac_aux it' u (pow / 2) (S i))%R
-      else bin_to_Rfrac_aux it' u (pow / 2)%R (S i)
+      if u i then (pow + bin_to_R_aux it' u (pow / 2) (S i))%R
+      else bin_to_R_aux it' u (pow / 2)%R (S i)
   end.
 
-Definition bin_to_Rfrac u it := bin_to_Rfrac_aux it u (1/2)%R 0.
+Definition bin_to_R u it := bin_to_R_aux it u (1/2)%R 0.
 
-Theorem bin_to_Rfrac_aux_le_2_pow : ∀ u it pow i,
+Theorem bin_to_R_aux_le_2_pow : ∀ u it pow i,
   (0 < pow)%R
-  → (bin_to_Rfrac_aux it u pow i <= 2 * pow)%R.
+  → (bin_to_R_aux it u pow i <= 2 * pow)%R.
 Proof.
 intros * Hpow.
 revert pow i Hpow.
@@ -378,15 +378,15 @@ destruct b.
  apply IHit; lra.
 Qed.
 
-Theorem bin_to_Rfrac_le_1 : ∀ u it, (bin_to_Rfrac u it <= 1)%R.
+Theorem bin_to_R_le_1 : ∀ u it, (bin_to_R u it <= 1)%R.
 Proof.
 intros.
 assert (Hlt : (0 < 1 / 2)%R) by lra.
-pose proof bin_to_Rfrac_aux_le_2_pow u it (1/2) 0 Hlt.
+pose proof bin_to_R_aux_le_2_pow u it (1/2) 0 Hlt.
 now replace (2 * (1/2))%R with 1%R in H by lra.
 Qed.
 
-Definition Rset_of_bin_seq u := mkset (λ x, ∃ it, bin_to_Rfrac u it = x).
+Definition Rset_of_bin_seq u := mkset (λ x, ∃ it, bin_to_R u it = x).
 
 Theorem Rset_of_bin_seq_bound : ∀ u, bound (setp (Rset_of_bin_seq u)).
 Proof.
@@ -396,14 +396,14 @@ exists 1.
 unfold is_upper_bound.
 intros x HE; unfold Rset_of_bin_seq in HE.
 destruct HE as (it, HE); subst x.
-apply bin_to_Rfrac_le_1.
+apply bin_to_R_le_1.
 Qed.
 
 Theorem Rset_of_bin_seq_non_empty : ∀ u, ∃ x, x ∈ Rset_of_bin_seq u.
 Proof.
 intros.
 unfold Rset_of_bin_seq; simpl.
-now exists (bin_to_Rfrac u 0), 0%nat.
+now exists (bin_to_R u 0), 0%nat.
 Qed.
 
 Definition R_of_bin_seq u :=
@@ -445,31 +445,42 @@ split.
 
 Theorem glop : ∀ z it,
   (0 <= z)%R
-  → (bin_to_Rfrac (R_to_bin z) it <= z)%R.
+  → (bin_to_R (R_to_bin z) it <= z)%R.
 Proof.
 intros * Hz.
-unfold bin_to_Rfrac.
+unfold bin_to_R.
 bbb.
-(*
+
 revert z Hz.
 induction it; intros; [ easy | simpl ].
-destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁].
+destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁].
 bbb.
-*)
 
 Theorem glip : ∀ z it pow i,
   (0 <= z)%R
   → (pow <= 1/2)%R
-  → (bin_to_Rfrac_aux it (R_to_bin z) pow i <= z)%R.
+  → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert z pow i Hz Hpow.
 induction it; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
-destruct b.
- 2: apply IHit; [ easy | lra ].
+destruct b; [ simpl | apply IHit; lra ].
+revert z Hz Hb.
+induction i; intros; simpl in Hb.
+ destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁]; [ easy | clear Hb ].
+ apply Rnot_lt_le in H₁.
+Focus 2.
+ assert (Hz2 : (0 <= z * 2)%R) by lra.
+ pose proof IHi (z * 2)%R Hz2 Hb.
+ destruct it.
+  simpl in H.
+  simpl.
 
- clear IHit.
+
+bbb.
+
+clear IHit.
  revert z pow i Hz Hpow Hb.
  induction it; intros.
   simpl.
@@ -517,8 +528,8 @@ bbb.
 Theorem glop : ∀ u it pow i,
   (0 < pow)%R
   → u i = false
-  → (bin_to_Rfrac_aux it u (pow / 2) (S i) <=
-     bin_to_Rfrac_aux (S it) u pow i)%R.
+  → (bin_to_R_aux it u (pow / 2) (S i) <=
+     bin_to_R_aux (S it) u pow i)%R.
 Proof.
 intros * Hpow Hui.
 revert pow i Hui Hpow.
@@ -538,8 +549,8 @@ eapply Rle_trans.
 
 Theorem toto : ∀ u it pow i,
   (0 < pow)%R
-  → (bin_to_Rfrac_aux it u (pow / 2) (S i) <=
-     pow / 2 ^ it + bin_to_Rfrac_aux it u pow i)%R.
+  → (bin_to_R_aux it u (pow / 2) (S i) <=
+     pow / 2 ^ it + bin_to_R_aux it u pow i)%R.
 Proof.
 intros * Hpow.
 Admitted. Show.
@@ -579,7 +590,7 @@ bbb.
 Theorem glop : ∀ z it pow i,
   (0 <= z < 1)%R
   → (0 < pow <= 1/2^(S i))%R
-  → (bin_to_Rfrac_aux it (R_to_bin z) pow i <= z)%R.
+  → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert z pow i Hz Hpow.
@@ -644,7 +655,7 @@ bbb.
 
  
 
-Print bin_to_Rfrac_aux.
+Print bin_to_R_aux.
 
  simpl.
 
