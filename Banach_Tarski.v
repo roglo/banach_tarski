@@ -449,10 +449,13 @@ Theorem glop : ∀ z it,
 Proof.
 intros * Hz.
 unfold bin_to_Rfrac.
+bbb.
+(*
 revert z Hz.
 induction it; intros; [ easy | simpl ].
 destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁].
 bbb.
+*)
 
 Theorem glip : ∀ z it pow i,
   (0 <= z)%R
