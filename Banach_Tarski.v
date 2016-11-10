@@ -458,10 +458,11 @@ bbb.
 
 Theorem glip : ∀ z it pow i,
   (0 <= z < 1)%R
+  → (pow <= 1/2)%R
   → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
-intros * Hz.
-revert z pow i Hz.
+intros * Hz Hpow.
+revert z pow i Hz Hpow.
 induction it; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b; [ simpl | apply IHit; lra ].
