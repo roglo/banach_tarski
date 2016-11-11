@@ -445,20 +445,22 @@ split.
    rewrite Hu; clear.
    unfold bin_to_R.
 
-Theorem tagada : ∀ z pow i n,
-  bin_to_R_aux n (R_to_bin z) pow i =
-  bin_to_R_aux n (truncated_bool_sequence (R_to_bin z) n) pow i.
+Theorem tagada : ∀ z pow i m n,
+  i + n <= m
+  → bin_to_R_aux n (R_to_bin z) pow i =
+    bin_to_R_aux n (truncated_bool_sequence (R_to_bin z) m) pow i.
 Proof.
-intros.
-revert pow i.
+intros * Hm.
+revert pow i m Hm.
 induction n; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
- remember (truncated_bool_sequence (R_to_bin z) (S n) i) as b' eqn:Hb'.
+ remember (truncated_bool_sequence (R_to_bin z) m i) as b' eqn:Hb'.
  symmetry in Hb'.
  destruct b'.
   apply Rplus_eq_compat_l.
   apply IHn.
+  now rewrite Nat.add_succ_comm.
 
 bbb.
 
