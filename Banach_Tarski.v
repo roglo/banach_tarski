@@ -462,6 +462,9 @@ destruct b.
   apply IHn.
   now rewrite Nat.add_succ_comm.
 
+  rewrite <- Nat.add_succ_comm in Hm; simpl in Hm.
+  destruct m; [ now apply Nat.nle_succ_0 in Hm | ].
+  apply <- Nat.succ_le_mono in Hm.
 bbb.
 
  destruct (Rlt_dec (frac_part z) (1 / 2)) as [H₁| H₁].
