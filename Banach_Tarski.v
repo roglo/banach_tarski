@@ -410,6 +410,8 @@ Definition R_of_bin_seq u :=
 Definition R_of_int_frac rif :=
   (IZR (Rint rif) + proj1_sig (R_of_bin_seq (Rfrac rif)))%R.
 
+Definition truncated_bool_sequence u n i := if lt_dec i n then false else u i.
+
 Example int_frac_of_R_bij : FinFun.Bijective int_frac_of_R.
 Proof.
 unfold FinFun.Bijective.
@@ -429,15 +431,18 @@ split.
  unfold Rset_of_bin_seq in Hs.
  assert (Hyz : ∀ ε, (0 < ε)%R → ∃ η, (0 < η < ε ∧ z - η <= y)%R).
   intros * Hε.
-  assert (Hn : ∃ n, (0 < z - (1 / 2) ^ n < ε)%R).
+  assert
+    (Hn : ∃ n,
+     (0 < z - bin_to_R (truncated_bool_sequence (R_to_bin z) n) n < ε)%R).
    Focus 2.
    destruct Hn as (n, Hn).
-   exists (z - (1 / 2) ^ n)%R.
+   remember (truncated_bool_sequence (R_to_bin z) n) as u eqn:Hu.
+   exists (z - bin_to_R u n)%R.
    split; [ easy | ].
-   replace (z - (z - (1 / 2) ^ n))%R with ((1 / 2) ^ n)%R by lra.
-   apply Hyub.
-   rewrite Hs; simpl.
-   (* mais non, en fait, ça va pas. *)
+   replace (z - (z - bin_to_R u n))%R with (bin_to_R u n) by lra.
+   apply Hyub; rewrite Hs; simpl.
+   exists n.
+
 bbb.
 
   assert (Hn : ∃ n η, (0 < η < ε ∧ z - η = (1 / 2) ^ n)%R).
