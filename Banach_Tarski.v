@@ -487,6 +487,17 @@ destruct b.
   rewrite Rinv_l; [ lra | easy ].
 
  simpl.
+ clear -Hz Hpow Hb.
+ revert z pow i Hz Hpow Hb.
+ induction it; intros.
+  simpl; rewrite Rplus_0_r.
+  revert z pow Hz Hpow Hb.
+  induction i; intros.
+   simpl in Hb.
+   destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁]; [ easy | ].
+   apply Rnot_lt_le in H₁.
+   unfold Rfracp in H₁.
+   unfold "_-_", sub_notation in H₁.
 bbb.
 
 revert z pow Hz Hb.
