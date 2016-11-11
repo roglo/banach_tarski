@@ -429,6 +429,30 @@ split.
  unfold Rset_of_bin_seq in Hs.
  assert (Hyz : ∀ ε, (0 < ε)%R → ∃ η, (0 < η < ε ∧ z - η <= y)%R).
   intros * Hε.
+  assert (Hn : ∃ n, (0 < z - (1 / 2) ^ n < ε)%R).
+   Focus 2.
+   destruct Hn as (n, Hn).
+   exists (z - (1 / 2) ^ n)%R.
+   split; [ easy | ].
+   replace (z - (z - (1 / 2) ^ n))%R with ((1 / 2) ^ n)%R by lra.
+   apply Hyub.
+   rewrite Hs; simpl.
+   (* mais non, en fait, ça va pas. *)
+bbb.
+
+  assert (Hn : ∃ n η, (0 < η < ε ∧ z - η = (1 / 2) ^ n)%R).
+   Focus 2.
+   destruct Hn as (n & η & Hη & Hn).
+   exists η.
+   split; [ easy | ].
+   rewrite Hn.
+   apply Hyub.
+   rewrite Hs; simpl.
+bbb.
+    split; [ | easy ].
+    eapply Rlt_trans; [ | eassumption ].
+    apply pow_lt; lra.
+
   assert (Hn : ∃ n η, (1 / 2 ^ n < η < ε)%R).
    Focus 2.
    destruct Hn as (n & η & Hn & Hη).
@@ -445,8 +469,7 @@ split.
      eapply Rlt_trans; [ | eassumption ].
      apply pow_lt; lra.
 
-bbb.
-    apply Hylub.
+    apply Hyub.
     rewrite Hs; simpl.
 bbb.
 
