@@ -440,36 +440,6 @@ split.
   rewrite Hs in Ht; simpl in Ht.
   destruct Ht as (it, Ht); subst t.
 
-Theorem Int_part_is_0 : ∀ x, (0 <= x < 1)%R → Int_part x = 0.
-Proof.
-intros * Hx.
-unfold Int_part.
-pose proof archimed x as H.
-destruct H as (Hgt, Hle).
-destruct Hx as (Hx1, Hx2).
-apply Z.sub_move_r; simpl.
-apply Rplus_le_compat_r with (r := x) in Hle.
-unfold Rminus in Hle.
-rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r in Hle.
-remember (up x) as z eqn:Hz; symmetry in Hz.
-assert (Hzp : (0 <= z)%Z).
- subst z; apply le_IZR; simpl.
- eapply Rle_trans; [ eassumption | now apply Rlt_le ].
-
- apply IZN in Hzp.
- destruct Hzp as (n, Hn).
- move Hn at top; subst z.
- destruct n; [ simpl in Hgt; lra | ].
- destruct n; [ easy | exfalso ].
- apply Rle_not_lt in Hle; apply Hle.
- apply Rlt_le_trans with (r2 := (1 + 1)%R); [ lra | ].
- rewrite <- INR_IZR_INZ; simpl.
- destruct n; [ lra | ].
- rewrite Rplus_assoc.
- replace 2%R with (0 + 2)%R at 1 by lra.
- apply Rplus_le_compat_r, pos_INR.
-Qed.
-
 Theorem glop : ∀ z it,
   (0 <= z < 1)%R
   → (bin_to_R (R_to_bin z) it <= z)%R.
