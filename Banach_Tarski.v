@@ -484,7 +484,7 @@ bbb.
 *)
 
 Theorem glip : ∀ z it pow i,
-  (0 <= z < 1)%R
+  (0 <= z < 1/2^i)%R
   → (pow <= 1/2^(S i))%R
   → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
@@ -493,6 +493,9 @@ revert z pow i Hz Hpow.
 induction it; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
+ simpl in Hb.
+
+bbb.
  Focus 2.
  apply IHit; [ easy | ].
  apply Rmult_le_reg_r with (r := 2%R); [ lra | ].
@@ -530,6 +533,7 @@ destruct b.
    now apply Rle_trans with (r2 := (1/2)%R).
 
    simpl in Hb.
+bbb.
    pose proof IHi (z * 2)%R.
 bbb.
 
@@ -577,6 +581,12 @@ clear Heqy.
 bbb.
   pose proof pos_INR_nat_of_P p~0 as H.
 SearchAbout INR.
+bbb.
+
+(* return to glop *)
+Check glip.
+apply glip; simpl; lra.
+Qed.
 bbb.
 
 Theorem glup : ∀ x, (0 <= x < 1)%R → frac_part x = x.
