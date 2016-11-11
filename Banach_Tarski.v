@@ -416,6 +416,8 @@ unfold FinFun.Bijective.
 exists R_of_int_frac.
 split.
  intros x.
+
+bbb.
  remember (int_frac_of_R x) as rif eqn:Hrif.
  unfold R_of_int_frac.
  destruct (R_of_bin_seq (Rfrac rif)) as (y, Hy); simpl.
@@ -423,22 +425,24 @@ split.
  subst rif; simpl in Hs; simpl.
  assert (y = (x - IZR (Int_part x))%R); [ | lra ].
  unfold Int_part.
- unfold "_-_", sub_notation.
  unfold is_lub in Hy.
  destruct Hy as (Hyub, Hyb).
  unfold is_upper_bound in Hyub, Hyb.
  unfold frac_part, Int_part in Hs.
- unfold "_-_", sub_notation in Hs.
  rewrite minus_IZR in Hs; simpl in Hs.
  rewrite minus_IZR; simpl.
  remember (x - (IZR (up x) - 1))%R as z.
  assert (Hz : z = (x + 1 - IZR (up x))%R) by lra; clear Heqz.
  move Hz after Hs.
+bbb.
+
  assert (Hyz : (y <= z)%R).
   apply Hyb.
   intros t Ht.
   rewrite Hs in Ht; simpl in Ht.
   destruct Ht as (it, Ht); subst t.
+
+bbb.
 
 Theorem glop : ∀ z it,
   (0 <= z < 1)%R
