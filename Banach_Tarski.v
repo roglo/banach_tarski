@@ -323,15 +323,12 @@ Qed.
 
 Record int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
-Definition Rfloor x := up x - 1.
-Definition Rfracp x := x - IZR (Rfloor x).
-
-Theorem Rflacp_in_0_1 : ∀ x, (0 <= Rfracp x)%R ∧ (Rfracp x < 1)%R.
+Theorem Rfracp_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
 Proof.
 intros x.
 pose proof archimed x as Ha.
 destruct Ha as (Hgt, Hle).
-unfold Rfracp, Rfloor.
+unfold frac_part, Int_part.
 unfold "_-_", sub_notation.
 split; [ | rewrite minus_IZR; simpl; lra ].
 rewrite minus_IZR; simpl.
@@ -342,12 +339,12 @@ Qed.
 
 Fixpoint R_to_bin x n :=
   match n with
-  | 0 => if Rlt_dec (Rfracp (x * 2)%R) (1/2) then false else true
+  | 0 => if Rlt_dec (frac_part x) (1/2) then false else true
   | S n' => R_to_bin (x * 2)%R n'
   end.
 
 Definition int_frac_of_R x :=
-  mkraif (Rfloor x) (R_to_bin (Rfracp x)).
+  mkraif (Int_part x) (R_to_bin (frac_part x)).
 
 Fixpoint bin_to_R_aux it (u : ℕ → bool) pow i :=
   match it with
@@ -424,13 +421,13 @@ split.
  destruct (R_of_bin_seq (Rfrac rif)) as (y, Hy); simpl.
  remember (Rset_of_bin_seq (Rfrac rif)) as s eqn:Hs.
  subst rif; simpl in Hs; simpl.
- assert (y = (x - IZR (Rfloor x))%R); [ | lra ].
- unfold Rfloor.
+ assert (y = (x - IZR (Int_part x))%R); [ | lra ].
+ unfold Int_part.
  unfold "_-_", sub_notation.
  unfold is_lub in Hy.
  destruct Hy as (Hyub, Hyb).
  unfold is_upper_bound in Hyub, Hyb.
- unfold Rfracp, Rfloor in Hs.
+ unfold frac_part, Int_part in Hs.
  unfold "_-_", sub_notation in Hs.
  rewrite minus_IZR in Hs; simpl in Hs.
  rewrite minus_IZR; simpl.
@@ -452,7 +449,7 @@ unfold bin_to_R.
 (*
 revert z Hz.
 induction it; intros; [ easy | simpl ].
-destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁].
+destruct (Rlt_dec (frac_part (z * 2)) (1/2)) as [H₁| H₁].
 bbb.
 *)
 
@@ -494,15 +491,111 @@ destruct b.
   revert z pow Hz Hpow Hb.
   induction i; intros.
    simpl in Hb.
-   destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁]; [ easy | ].
+   destruct (Rlt_dec (frac_part z) (1/2)) as [H₁| H₁]; [ easy | ].
    apply Rnot_lt_le in H₁.
-   unfold Rfracp in H₁.
+
+Theorem glup : ∀ x, (0 <= x < 1)%R → Int_part x = 0.
+Proof.
+intros * Hx.
+unfold Int_part.
+pose proof archimed x as H.
+destruct H as (Hgt, Hle).
+destruct Hx as (Hx1, Hx2).
+apply Z.sub_move_r; simpl.
+apply Rplus_le_compat_r with (r := x) in Hle.
+unfold Rminus in Hle.
+rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r in Hle.
+bbb.
+
+induction (up x) as [| p| p].
+ now apply Rle_not_lt in Hx1.
+
+ apply Rplus_le_compat_r with (r := x) in Hle.
+ unfold Rminus in Hle.
+ rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r in Hle.
+SearchAbout (IZR _ <= _)%R.
+base_Int_part:
+  ∀ r : ℝ, (IZR (Int_part r) <= r)%R ∧ (IZR (Int_part r) - r > -1)%R
+
+ apply eq_IZR.
+ remember (IZR (Z.pos p)) as y eqn:Hy; simpl.
+ simpl in Hy.
+ induction p.
+  simpl in Hy.
+
+ remember (Pos.to_nat p) as n.
+ assert (1 <= n) as Hn.
+  subst n.
+
+
+bbb.
+ assert (1 <= IZR (Z.pos p))%R.
+ apply inj_IZR.
+bbb.
+
+ simpl in Hgt, Hle.
+ induction p; simpl; [ exfalso | exfalso | easy ].
+  simpl in Hgt, Hle.
+  pose proof le_Pmult_nat p 2.
+  destruct (Pos.iter_op Init.Nat.add p 2).
+   apply Nat.nlt_ge in H; apply H, Nat.lt_0_succ.
+
+   simpl in Hgt, Hle.
+   destruct n.
+    apply Nat.nlt_ge in H; apply H, Nat.lt_succ_diag_r.
+
+    apply Rle_trans with (r1 := 1 + 1 - x) in Hle.
+     unfold "_-_", sub_notation in Hle.
+     unfold "_+_", add_notation in Hle.
+     apply Rlt_not_le in Hx2; apply Hx2.
+     unfold one, one_notation in Hle; lra.
+
+     assert (0 <= INR (S n))%R; [ apply pos_INR | lra ].
+
+  remember (INR (Pos.to_nat p~0)) as y.
+bbb.
+
+SearchAbout (INR (Pos.to_nat _)).
+  assert ((1 <= INR (Pos.to_nat p~0))%R).
+Focus 2.
+clear Heqy.
+
+
+bbb.
+  pose proof pos_INR_nat_of_P p~0 as H.
+SearchAbout INR.
+bbb.
+
+Theorem glup : ∀ x, (0 <= x < 1)%R → frac_part x = x.
+Proof.
+intros * Hx.
+unfold frac_part.
+bbb.
+
+SearchAbout frac_part.
+bbb.
+Rfracp_in_0_1: ∀ x : ℝ, (0 <= frac_part x < 1)%R
+   unfold frac_part in H₁.
+
+
+
    unfold "_-_", sub_notation in H₁.
+bbb.
+
+Theorem Int_part_
+
+bbb.
+   unfold frac_part, Int_part in H₁.
+   unfold "_-_", sub_notation in H₁.
+   pose proof archimed z.
+   rewrite minus_IZR in H₁; simpl in H₁.
+
+SearchAbout up.
 bbb.
 
 revert z pow Hz Hb.
 induction i; intros; simpl in Hb.
- destruct (Rlt_dec (Rfracp (z * 2)) (1/2)) as [H₁| H₁]; [ easy | clear Hb ].
+ destruct (Rlt_dec (frac_part (z * 2)) (1/2)) as [H₁| H₁]; [ easy | clear Hb ].
  apply Rnot_lt_le in H₁.
 Focus 2.
  assert (Hz2 : (0 <= z * 2)%R) by lra.
@@ -556,7 +649,7 @@ simpl.
 
 bbb.
   induction it; simpl; [ rewrite Hz; pose proof (archimed x); lra | ].
-  destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁].
+  destruct (Z.eq_dec (Int_part (z * 2) mod 2) 0) as [H₁| H₁].
 bbb.
 
 Theorem glop : ∀ u it pow i,
@@ -636,18 +729,18 @@ destruct b.
   simpl.
   destruct i.
    simpl in Hb.
-   destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁]; [ easy | ].
+   destruct (Z.eq_dec (Int_part (z * 2) mod 2) 0) as [H₁| H₁]; [ easy | ].
    clear Hb.
    assert (H2 : (2 > 0)%Z) by (apply Z.gt_lt_iff, Z.lt_0_2).
-   pose proof Zdiv.Z_mod_lt (Rfloor (z * 2)) 2 H2 as H.
+   pose proof Zdiv.Z_mod_lt (Int_part (z * 2)) 2 H2 as H.
    clear H2.
-   remember (Rfloor (z * 2) mod 2)%Z as n eqn:Hn.
+   remember (Int_part (z * 2) mod 2)%Z as n eqn:Hn.
    destruct H as (Hn₁, Hn₂).
    destruct (Z.eq_dec n 0) as [H₂| H₂]; [ easy | ].
    destruct (Z.eq_dec n 1) as [H₃| H₃].
     subst n.
     clear H₂ Hn₂ Hn₁ H₁.
-    unfold Rfloor in H₃.
+    unfold Int_part in H₃.
     unfold "_-_", sub_notation in H₃.
 
 bbb.
@@ -664,8 +757,8 @@ induction i.
  apply titi in Hb.
 *)
  simpl in Hb.
- destruct (Z.eq_dec (Rfloor (z * 2) mod 2) 0) as [H₁| H₁]; [ easy | ].
- clear Hb; unfold Rfloor in H₁.
+ destruct (Z.eq_dec (Int_part (z * 2) mod 2) 0) as [H₁| H₁]; [ easy | ].
+ clear Hb; unfold Int_part in H₁.
  unfold "_-_", sub_notation in H₁.
  assert (H : up (z * 2) = 1).
   destruct (Z.eq_dec (up (z * 2)) 1) as [H₂| H₂]; [ easy | ].
