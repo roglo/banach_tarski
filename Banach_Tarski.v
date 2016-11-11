@@ -423,12 +423,37 @@ split.
  subst rif; simpl in Hs; simpl.
  assert (y = frac_part x); [ | unfold frac_part in H; lra ].
  unfold is_lub in Hy.
- destruct Hy as (Hyub, Hyb).
- unfold is_upper_bound in Hyub, Hyb.
+ destruct Hy as (Hyub, Hylub).
+ unfold is_upper_bound in Hyub, Hylub.
  remember (frac_part x) as z eqn:Hz.
- move Hz after Hs.
  unfold Rset_of_bin_seq in Hs.
+ assert (Hyz : ∀ ε, (0 < ε)%R → ∃ η, (0 < η < ε ∧ z - η <= y)%R).
+  intros * Hε.
+  assert (Hn : ∃ n η, (1 / 2 ^ n < η < ε)%R).
+   Focus 2.
+   destruct Hn as (n & η & Hn & Hη).
+   exists η.
+   split.
+    assert (H : (1 / 2 ^ n = (1 / 2) ^ n)%R).
+     clear Hn.
+     induction n; simpl; [ lra | rewrite <- IHn ].
+     unfold Rdiv; do 3 rewrite Rmult_1_l.
+     apply Rinv_mult_distr; [ lra | apply pow_nonzero; lra ].
 
+     rewrite H in Hn.
+     split; [ | easy ].
+     eapply Rlt_trans; [ | eassumption ].
+     apply pow_lt; lra.
+
+bbb.
+    apply Hylub.
+    rewrite Hs; simpl.
+bbb.
+
+  apply Hyub; rewrite Hs; simpl.
+  remember (R_to_bin z) as u eqn:Hu.
+   (* non : il faut que ça tombe juste, exactement *)
+Print R_to_bin.
 bbb.
 
  assert (Hyz : (y <= z)%R).
