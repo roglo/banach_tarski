@@ -442,6 +442,28 @@ split.
    replace (z - (z - bin_to_R u n))%R with (bin_to_R u n) by lra.
    apply Hyub; rewrite Hs; simpl.
    exists n.
+   rewrite Hu; clear.
+   unfold bin_to_R.
+
+Theorem tagada : ∀ z pow i n,
+  bin_to_R_aux n (R_to_bin z) pow i =
+  bin_to_R_aux n (truncated_bool_sequence (R_to_bin z) n) pow i.
+Proof.
+intros.
+revert pow i.
+induction n; intros; [ easy | simpl ].
+remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
+destruct b.
+ remember (truncated_bool_sequence (R_to_bin z) (S n) i) as b' eqn:Hb'.
+ symmetry in Hb'.
+ destruct b'.
+  apply Rplus_eq_compat_l.
+  apply IHn.
+
+bbb.
+
+ destruct (Rlt_dec (frac_part z) (1 / 2)) as [H₁| H₁].
+
 
 bbb.
 
