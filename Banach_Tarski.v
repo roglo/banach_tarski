@@ -489,11 +489,84 @@ Theorem glip : ∀ z it pow i,
   → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
+revert z i pow Hz Hpow.
+induction it; intros; [ easy | simpl ].
+remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
+destruct b as [H₁| H₁].
+ destruct i.
+  rewrite pow_O, Rdiv_1_r in Hz; rewrite pow_1 in Hpow; simpl in Hb.
+  unfold frac_part in Hb.
+  rewrite Int_part_is_0 in Hb; [ | lra ].
+  rewrite Rminus_0_r in Hb.
+  destruct (Rlt_dec z (1 / 2)) as [H₁| H₁]; [ easy | clear Hb ].
+  apply Rnot_lt_le in H₁.
+  assert (Hz' : (0 <= z - 1 / 2 < 1 / 1)%R) by lra.
+  assert (Hpow' : (pow <= 1 / 2 ^ 1)%R) by now rewrite pow_1.
+  pose proof IHit (z - 1 / 2)%R O pow Hz' Hpow'.
+  destruct it; [ simpl; lra | ].
+  simpl in H; simpl.
+  unfold frac_part in H.
+  rewrite Int_part_is_0 in H; [ | lra ].
+  rewrite Rminus_0_r in H.
+  unfold frac_part.
+  rewrite Rdiv_1_r in Hz'.
+  rewrite Int_part_is_0.
+bbb.
+; [ | lra ].
+  rewrite Rminus_0_r in H.
+  unfold frac_part.
+
+bbb.
+intros * Hz Hpow.
+revert z pow it Hz Hpow.
+induction i; intros.
+ rewrite pow_O in Hz; rewrite pow_1 in Hpow.
+ rewrite Rdiv_1_r in Hz.
+ revert z Hz.
+ induction it; intros; [ easy | simpl ].
+(**)
+ unfold frac_part.
+ rewrite Int_part_is_0; [ | lra ].
+ rewrite Rminus_0_r.
+ destruct (Rlt_dec z (1 / 2)) as [H₁| H₁].
+ destruct it; simpl; [ easy | ].
+(**)
+ unfold frac_part.
+ rewrite Int_part_is_0; [ | lra ].
+ rewrite Rminus_0_r.
+ destruct (Rlt_dec (z * 2) (1 / 2)) as [H₂| H₂].
+ destruct it; simpl; [ easy | ].
+(**)
+ unfold frac_part.
+ rewrite Int_part_is_0; [ | lra ].
+ rewrite Rminus_0_r.
+ destruct (Rlt_dec (z * 2 * 2) (1 / 2)) as [H₃| H₃].
+ destruct it; simpl; [ easy | ].
+(**)
+ unfold frac_part.
+ rewrite Int_part_is_0; [ | lra ].
+ rewrite Rminus_0_r.
+ destruct (Rlt_dec (z * 2 * 2 * 2) (1 / 2)) as [H₄| H₄].
+ destruct it; simpl; [ easy | ].
+(**)
+ unfold frac_part.
+ rewrite Int_part_is_0; [ | lra ].
+ rewrite Rminus_0_r.
+
+bbb.
+
+
+2: split; [ easy | ].
+
+bbb.
+
+intros * Hz Hpow.
 revert z pow i Hz Hpow.
 induction it; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
  simpl in Hb.
+ pose proof IHit (z - pow)%R pow.
 bbb.
 
  Focus 2.
