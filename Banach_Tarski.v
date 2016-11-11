@@ -506,6 +506,10 @@ apply Rplus_le_compat_r with (r := x) in Hle.
 unfold Rminus in Hle.
 rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r in Hle.
 bbb.
+base_fp
+     : ∀ r : ℝ, (frac_part r >= 0)%R ∧ (frac_part r < 1)%R
+base_Int_part:
+  ∀ r : ℝ, (IZR (Int_part r) <= r)%R ∧ (IZR (Int_part r) - r > -1)%R
 
 induction (up x) as [| p| p].
  now apply Rle_not_lt in Hx1.
@@ -514,8 +518,6 @@ induction (up x) as [| p| p].
  unfold Rminus in Hle.
  rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r in Hle.
 SearchAbout (IZR _ <= _)%R.
-base_Int_part:
-  ∀ r : ℝ, (IZR (Int_part r) <= r)%R ∧ (IZR (Int_part r) - r > -1)%R
 
  apply eq_IZR.
  remember (IZR (Z.pos p)) as y eqn:Hy; simpl.
