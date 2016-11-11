@@ -467,6 +467,14 @@ destruct b.
   apply <- Nat.succ_le_mono in Hm.
 bbb.
 
+Theorem pouet : ∀ u n i,
+  truncated_bool_sequence u (S n) i = false
+  → truncated_bool_sequence u (S n) = truncated_bool_sequence u n.
+Admitted. Show.
+
+  erewrite pouet; [ | eassumption ].
+bbb.
+
  destruct (Rlt_dec (frac_part z) (1 / 2)) as [H₁| H₁].
 
 
