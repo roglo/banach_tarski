@@ -494,10 +494,8 @@ induction it; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
  simpl in Hb.
- assert ((1/2 <= z * 2^S i)%R).
-  Focus 2.
-
 bbb.
+
  Focus 2.
  apply IHit; [ easy | ].
  apply Rmult_le_reg_r with (r := 2%R); [ lra | ].
