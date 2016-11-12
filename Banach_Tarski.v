@@ -461,6 +461,29 @@ split.
     intros n.
     split.
      unfold bin_to_R.
+rewrite Ht.
+SearchAbout bin_to_R_aux.
+rewrite <- trunc_bool_seq_eq.
+
+Theorem toto : ∀ z n pow i,
+  (0 <= z)%R
+  → (0 <= pow <= 1 / 2)%R
+  → (bin_to_R_aux n (R_to_bin z) pow i <= z)%R.
+Proof.
+intros * Hz Hpow.
+revert pow i Hpow.
+induction n; intros; simpl; [ easy | ].
+remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
+destruct b; [ | apply IHn; lra ].
+SearchAbout bin_to_R_aux.
+
+bbb.
+(* fin de toto *)
+eapply Rplus_le_reg_l.
+rewrite Rplus_minus, Rplus_0_r.
+apply toto.
+bbb.
+
      induction n.
       simpl; subst z.
       rewrite Rminus_0_r.
@@ -474,10 +497,10 @@ split.
 
        simpl in Hb; clear H₁.
        destruct (Rlt_dec (frac_part z) (1 / 2)) as [H₁| H₁]; subst b.
-bbb.
         rewrite Ht in IHn; rewrite Ht.
         rewrite <- trunc_bool_seq_eq in IHn; [ | easy ].
         rewrite <- trunc_bool_seq_eq; [ | easy ].
+SearchAbout bin_to_R_aux.
 bbb.
    Focus 2.
    destruct Hn as (n, Hn).
