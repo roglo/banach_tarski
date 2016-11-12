@@ -465,6 +465,8 @@ destruct b.
   rewrite <- Nat.add_succ_comm in Hm; simpl in Hm.
   destruct m; [ now apply Nat.nle_succ_0 in Hm | ].
   apply <- Nat.succ_le_mono in Hm.
+  unfold truncated_bool_sequence in Hb'.
+  destruct (lt_dec i (S m)) as [Him| Him]; [ clear Hb' | ].
 bbb.
 
 Theorem pouet : ∀ u n i,
