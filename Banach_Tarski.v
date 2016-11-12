@@ -475,7 +475,11 @@ revert pow i Hpow.
 induction n; intros; simpl; [ easy | ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b; [ | apply IHn; lra ].
-SearchAbout bin_to_R_aux.
+erewrite trunc_bool_seq_eq; [ | reflexivity ].
+simpl.
+unfold trunc_bool_seq; simpl.
+destruct n; simpl.
+SearchAbout R_to_bin.
 
 bbb.
 (* fin de toto *)
