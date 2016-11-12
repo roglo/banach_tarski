@@ -458,6 +458,10 @@ split.
   assert
     (Hn : ∃ n,
      (0 < z - bin_to_R (trunc_bool_seq (R_to_bin z) n) n < ε)%R).
+Check archimed.
+   pose proof archimed (z - ε).
+bbb.
+
    Focus 2.
    destruct Hn as (n, Hn).
    remember (trunc_bool_seq (R_to_bin z) n) as u eqn:Hu.
