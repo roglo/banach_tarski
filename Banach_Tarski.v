@@ -469,6 +469,7 @@ destruct b.
   rewrite <- Nat.add_succ_comm in Hm; simpl in Hm.
   destruct m; [ now apply Nat.nle_succ_0 in Hm | ].
   apply <- Nat.succ_le_mono in Hm.
+bbb.
   unfold trunc_bool_seq in Hb'.
   destruct (lt_dec i (S m)) as [Him| Him]; [ clear Hb' | ].
 bbb.
