@@ -412,6 +412,30 @@ Definition R_of_int_frac rif :=
 
 Definition trunc_bool_seq u n i := if lt_dec i n then u i else false.
 
+Theorem trunc_bool_seq_eq : ∀ z pow i m n,
+  i + n <= m
+  → bin_to_R_aux n (R_to_bin z) pow i =
+    bin_to_R_aux n (trunc_bool_seq (R_to_bin z) m) pow i.
+Proof.
+intros * Hm.
+revert pow i m Hm.
+induction n; intros; [ easy | simpl ].
+remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
+remember (trunc_bool_seq (R_to_bin z) m i) as b' eqn:Hb'.
+symmetry in Hb'.
+assert (b = b').
+ subst b b'.
+ unfold trunc_bool_seq.
+ destruct (lt_dec i m) as [| H₁]; [ easy | ].
+ exfalso; apply H₁.
+ apply Nat.lt_le_trans with (m := (i + S n)%nat); [ | easy ].
+ apply Nat.lt_add_pos_r; apply Nat.lt_0_succ.
+
+ move H at top; subst b'.
+ rewrite <- Nat.add_succ_comm in Hm.
+ destruct b; [ now apply Rplus_eq_compat_l, IHn | now apply IHn ].
+Qed.
+
 Example int_frac_of_R_bij : FinFun.Bijective int_frac_of_R.
 Proof.
 unfold FinFun.Bijective.
@@ -444,43 +468,7 @@ split.
    exists n.
    rewrite Hu; clear.
    unfold bin_to_R.
-
-Theorem tagada : ∀ z pow i m n,
-  i + n <= m
-  → (pow < (1 / 2) ^ S i)%R
-  → bin_to_R_aux n (R_to_bin z) pow i =
-    bin_to_R_aux n (trunc_bool_seq (R_to_bin z) m) pow i.
-Proof.
-intros * Hm Hpow.
-revert pow i m Hm Hpow.
-induction n; intros; [ easy | simpl ].
-remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
-remember (trunc_bool_seq (R_to_bin z) m i) as b' eqn:Hb'.
-symmetry in Hb'.
-assert (b = b').
- subst b b'.
- unfold trunc_bool_seq.
- destruct (lt_dec i m) as [| H₁]; [ easy | ].
- exfalso; apply H₁.
- apply Nat.lt_le_trans with (m := (i + S n)%nat); [ | easy ].
- apply Nat.lt_add_pos_r; apply Nat.lt_0_succ.
-
- move H at top; subst b'.
- rewrite <- Nat.add_succ_comm in Hm.
- destruct b.
-  apply Rplus_eq_compat_l.
-  apply IHn; [ easy | ].
-  remember (S i) as si; simpl; subst si.
-  unfold Rdiv; rewrite Rmult_1_l, Rmult_comm.
-  apply Rmult_lt_compat_l; [ lra | ].
-  now unfold Rdiv in Hpow; rewrite Rmult_1_l in Hpow.
-
-  apply IHn; [ easy | ].
-  remember (S i) as si; simpl; subst si.
-  unfold Rdiv; rewrite Rmult_1_l, Rmult_comm.
-  apply Rmult_lt_compat_l; [ lra | ].
-  now unfold Rdiv in Hpow; rewrite Rmult_1_l in Hpow.
-Qed.
+   now apply trunc_bool_seq_eq.
 
 bbb.
 
