@@ -410,7 +410,7 @@ Definition R_of_bin_seq u :=
 Definition R_of_int_frac rif :=
   (IZR (Rint rif) + proj1_sig (R_of_bin_seq (Rfrac rif)))%R.
 
-Definition trunc_bool_seq u n i := if lt_dec i n then false else u i.
+Definition trunc_bool_seq u n i := if lt_dec i n then u i else false.
 
 Example int_frac_of_R_bij : FinFun.Bijective int_frac_of_R.
 Proof.
@@ -459,34 +459,29 @@ remember (trunc_bool_seq (R_to_bin z) m i) as b' eqn:Hb'.
 symmetry in Hb'.
 assert (b = b').
  subst b b'.
- clear - Hm.
- assert (i < m).
- Focus 2.
- clear n Hm.
-bbb.
  unfold trunc_bool_seq.
- revert m H.
- induction i; intros.
-  destruct (lt_dec 0 m) as [H₁| H₁]; [ | easy ].
-  (* merdalor... *)
-bbb.
+ destruct (lt_dec i m) as [| H₁]; [ easy | ].
+ exfalso; apply H₁.
+ apply Nat.lt_le_trans with (m := (i + S n)%nat); [ | easy ].
+ apply Nat.lt_add_pos_r; apply Nat.lt_0_succ.
 
-destruct b.
- destruct b'.
+ move H at top; subst b'.
+ rewrite <- Nat.add_succ_comm in Hm.
+ destruct b.
   apply Rplus_eq_compat_l.
-  apply IHn; [ now rewrite Nat.add_succ_comm | ].
+  apply IHn; [ easy | ].
   remember (S i) as si; simpl; subst si.
   unfold Rdiv; rewrite Rmult_1_l, Rmult_comm.
   apply Rmult_lt_compat_l; [ lra | ].
   now unfold Rdiv in Hpow; rewrite Rmult_1_l in Hpow.
 
-  rewrite <- Nat.add_succ_comm in Hm; simpl in Hm.
-  destruct m; [ now apply Nat.nle_succ_0 in Hm | ].
-  apply <- Nat.succ_le_mono in Hm.
-Print bin_to_R_aux.
-bbb.
-  unfold trunc_bool_seq in Hb'.
-  destruct (lt_dec i (S m)) as [Him| Him]; [ clear Hb' | ].
+  apply IHn; [ easy | ].
+  remember (S i) as si; simpl; subst si.
+  unfold Rdiv; rewrite Rmult_1_l, Rmult_comm.
+  apply Rmult_lt_compat_l; [ lra | ].
+  now unfold Rdiv in Hpow; rewrite Rmult_1_l in Hpow.
+Qed.
+
 bbb.
 
 Theorem pouet : ∀ u n i,
