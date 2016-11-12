@@ -323,7 +323,7 @@ Qed.
 
 Record int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
-Theorem Rfracp_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
+Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
 Proof.
 intros x.
 pose proof archimed x as Ha.
@@ -455,22 +455,29 @@ split.
  unfold Rset_of_bin_seq in Hs.
  assert (Hyz : ∀ ε, (0 < ε)%R → ∃ η, (0 < η < ε ∧ z - η <= y)%R).
   intros * Hε.
-  assert
-    (Hn : ∃ n,
-     (0 < z - bin_to_R (trunc_bool_seq (R_to_bin z) n) n < ε)%R).
-Check archimed.
-   pose proof archimed (z - ε).
-bbb.
+  remember (trunc_bool_seq (R_to_bin z)) as t eqn:Ht.
+  assert (Hn : ∃ n, (0 < z - bin_to_R (t n) n < ε)%R).
+   assert (∀ n, (0 <= z - bin_to_R (t n) n < (1 / 2) ^ n)%R).
+    intros n.
+    split.
+     unfold bin_to_R.
+     induction n.
+      simpl; subst z.
+      rewrite Rminus_0_r.
+      apply frac_part_in_0_1.
 
+      simpl.
+      destruct (t (S n)) as [H₁ | H₁].
+
+bbb.
    Focus 2.
    destruct Hn as (n, Hn).
-   remember (trunc_bool_seq (R_to_bin z) n) as u eqn:Hu.
-   exists (z - bin_to_R u n)%R.
+   exists (z - bin_to_R (t n) n)%R.
    split; [ easy | ].
-   replace (z - (z - bin_to_R u n))%R with (bin_to_R u n) by lra.
+   replace (z - (z - bin_to_R (t n) n))%R with (bin_to_R (t n) n) by lra.
    apply Hyub; rewrite Hs; simpl.
    exists n.
-   rewrite Hu; clear.
+   rewrite Ht; clear.
    unfold bin_to_R.
    now apply trunc_bool_seq_eq.
 
