@@ -455,9 +455,23 @@ intros * Hm Hpow.
 revert pow i m Hm Hpow.
 induction n; intros; [ easy | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
+remember (trunc_bool_seq (R_to_bin z) m i) as b' eqn:Hb'.
+symmetry in Hb'.
+assert (b = b').
+ subst b b'.
+ clear - Hm.
+ assert (i < m).
+ Focus 2.
+ clear n Hm.
+bbb.
+ unfold trunc_bool_seq.
+ revert m H.
+ induction i; intros.
+  destruct (lt_dec 0 m) as [H₁| H₁]; [ | easy ].
+  (* merdalor... *)
+bbb.
+
 destruct b.
- remember (trunc_bool_seq (R_to_bin z) m i) as b' eqn:Hb'.
- symmetry in Hb'.
  destruct b'.
   apply Rplus_eq_compat_l.
   apply IHn; [ now rewrite Nat.add_succ_comm | ].
@@ -469,6 +483,7 @@ destruct b.
   rewrite <- Nat.add_succ_comm in Hm; simpl in Hm.
   destruct m; [ now apply Nat.nle_succ_0 in Hm | ].
   apply <- Nat.succ_le_mono in Hm.
+Print bin_to_R_aux.
 bbb.
   unfold trunc_bool_seq in Hb'.
   destruct (lt_dec i (S m)) as [Him| Him]; [ clear Hb' | ].
