@@ -467,8 +467,17 @@ split.
       apply frac_part_in_0_1.
 
       simpl.
-      destruct (t (S n)) as [H₁ | H₁].
+      remember (t (S n) 0%nat) as b eqn:Hb.
+      rewrite Ht in Hb; unfold trunc_bool_seq in Hb.
+      destruct (lt_dec 0 (S n)) as [H₁| H₁].
+       2: exfalso; apply H₁, Nat.lt_0_succ.
 
+       simpl in Hb; clear H₁.
+       destruct (Rlt_dec (frac_part z) (1 / 2)) as [H₁| H₁]; subst b.
+bbb.
+        rewrite Ht in IHn; rewrite Ht.
+        rewrite <- trunc_bool_seq_eq in IHn; [ | easy ].
+        rewrite <- trunc_bool_seq_eq; [ | easy ].
 bbb.
    Focus 2.
    destruct Hn as (n, Hn).
