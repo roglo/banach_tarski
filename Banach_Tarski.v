@@ -481,20 +481,95 @@ induction i; intros.
  apply Rplus_le_compat_l.
  replace 0%R with (IZR 0) by easy.
  apply IZR_le.
+
 Theorem tutu : ∀ x, (0 <= x)%R → (0 <= Int_part x)%Z.
 Proof.
 intros * Hx.
+(*
+unfold Int_part.
+apply Zle_minus_le_0.
+pose proof archimed x as H.
+SearchAbout Int_part.
+
+intros * Hx.
 pose proof archimed x as H.
 replace (up x) with (Int_part x + 1)%Z in H by apply Z.sub_add.
-rewrite plus_IZR in H.
-simpl in H.
+rewrite plus_IZR in H; simpl in H.
 remember (Int_part x) as z eqn:Hz; symmetry in Hz.
 destruct z as [| p| p]; [ easy | apply Pos2Z.is_nonneg | exfalso ].
+SearchAbout (IZR (Z.neg _)).
+unfold Int_part in Hz.
+
 clear H.
+*)
 
 Theorem tintin : ∀ x y, (x <= y)%R → (Int_part x <= Int_part y)%Z.
 Proof.
 intros * Hxy.
+destruct (Z_le_gt_dec (Int_part x) (Int_part y)) as [| Hlt]; [ easy | ].
+exfalso; apply Z.gt_lt in Hlt.
+apply IZR_lt in Hlt.
+pose proof base_Int_part x as Hx.
+pose proof base_Int_part y as Hy.
+destruct Hx as (Hx1, Hx2).
+destruct Hy as (Hy1, Hy2).
+remember (IZR (Int_part x)) as a eqn:Ha.
+remember (IZR (Int_part y)) as b eqn:Hb.
+assert (Hab : (0 < a - b < 1)%R).
+ split.
+  apply Rplus_lt_reg_r with (r := b).
+  now rewrite Rplus_0_l, Rplus_comm, Rplus_minus.
+
+  eapply Rle_lt_trans.
+   apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
+
+   eapply Rle_lt_trans.
+    apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
+
+    apply Rgt_lt, Ropp_lt_contravar in Hy2.
+    rewrite Ropp_minus_distr in Hy2.
+    now rewrite Ropp_involutive in Hy2.
+
+ idtac.
+bbb.
+
+
+   apply Ropp_le_contravar.
+
+   apply Z.sub_le_mono_r.
+
+; [ eassumption | ].
+
+bbb.
+
+intros * Hxy.
+pose proof base_Int_part (y - x) as Hyx.
+destruct (Rle_dec (frac_part x) (frac_part y)) as [H1| H1].
+ apply Rle_ge in H1.
+ rewrite Rminus_Int_part1 in Hyx; [ | easy ].
+ rewrite <- Z_R_minus in Hyx.
+ destruct Hyx as (H2, H3).
+SearchAbout (IZR (Int_part _)).
+  apply Rgt_lt in H3.
+  apply Rplus_lt_compat_l with (r := (y - x)%R) in H3.
+  rewrite Rplus_minus in H3.
+  apply Rplus_lt_compat_l with (r := IZR (Int_part x)) in H3.
+  rewrite Rplus_minus in H3.
+
+  apply Rge_le in H1.
+
+SearchAbout (_ < _ → _)%R.
+
+
+Print archimed.
+Print Int_part.
+
+SearchAbout (Int_part (_ - _)).
+
+pose proof archimed (y - x) as H.
+destruct H as (H1, H2).
+Print Int_part.
+
 pose proof base_Int_part x as Hx.
 pose proof base_Int_part y as Hy.
 destruct Hx as (Hx1, Hx2).
