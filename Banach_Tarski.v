@@ -527,9 +527,6 @@ destruct b.
 bbb.
 Show.
 
-(* fin de tutu *)
-
-
 (* fin de titi *)
 pose proof titi z it 0 Hz as H.
 now rewrite pow_1 in H.
