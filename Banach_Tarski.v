@@ -456,6 +456,14 @@ induction i; intros.
    simpl in H; simpl; lra.
 Qed.
 
+Theorem bin_to_R_aux_succ : ∀ k u pow i,
+  (bin_to_R_aux (S k) u pow i =
+   (if u i then pow else 0) + bin_to_R_aux k u (pow / 2) (S i))%R.
+Proof.
+intros; simpl.
+destruct (u i); [ easy | now rewrite Rplus_0_l ].
+Qed.
+
 Example int_frac_of_R_bij : FinFun.Bijective int_frac_of_R.
 Proof.
 unfold FinFun.Bijective.
@@ -493,7 +501,10 @@ Proof.
 intros * Hz.
 remember (1 / 2)%R as pow eqn:Hpow.
 revert z i Hz.
-induction k; intros; [ easy | simpl ].
+induction k; intros; [ easy | ].
+rewrite bin_to_R_aux_succ.
+bbb.
+
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
  Focus 2.
@@ -506,9 +517,18 @@ destruct b.
  now rewrite Rmult_shuffle0 in H.
 
  pose proof IHk z (S i) Hz as H.
-SearchAbout bin_to_R_aux.
+ remember (S i) as si; simpl in H; subst si.
+ subst pow.
+ unfold Rdiv in H |-*.
+ rewrite Rmult_1_l in H |-*; simpl in H.
+ rewrite <- Rmult_assoc in H.
+ rewrite Rmult_shuffle0 in H.
 
 bbb.
+Show.
+
+(* fin de tutu *)
+
 
 (* fin de titi *)
 pose proof titi z it 0 Hz as H.
