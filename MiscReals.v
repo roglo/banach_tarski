@@ -116,3 +116,44 @@ destruct Ha as (Hgt, Hle).
 unfold frac_part, Int_part.
 rewrite minus_IZR; simpl; lra.
 Qed.
+
+Theorem Int_part_le_compat : ∀ x y, (x <= y)%R → (Int_part x <= Int_part y)%Z.
+Proof.
+intros * Hxy.
+destruct (Z_le_gt_dec (Int_part x) (Int_part y)) as [| Hlt]; [ easy | ].
+exfalso; apply Z.gt_lt in Hlt.
+apply IZR_lt in Hlt.
+pose proof base_Int_part x as Hx.
+pose proof base_Int_part y as Hy.
+destruct Hx as (Hx1, Hx2).
+destruct Hy as (Hy1, Hy2).
+remember (IZR (Int_part x)) as a eqn:Ha.
+remember (IZR (Int_part y)) as b eqn:Hb.
+assert (Hab : (0 < a - b < 1)%R).
+ split.
+  apply Rplus_lt_reg_r with (r := b).
+  now rewrite Rplus_0_l, Rplus_comm, Rplus_minus.
+
+  eapply Rle_lt_trans.
+   apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
+
+   eapply Rle_lt_trans.
+    apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
+
+    apply Rgt_lt, Ropp_lt_contravar in Hy2.
+    rewrite Ropp_minus_distr in Hy2.
+    now rewrite Ropp_involutive in Hy2.
+
+ rewrite Ha, Hb in Hab.
+ rewrite Z_R_minus in Hab.
+ replace 0%R with (IZR 0) in Hab by lra.
+ replace 1%R with (IZR 1) in Hab by lra.
+ destruct Hab as (H1, H2).
+ apply lt_IZR in H1.
+ apply lt_IZR in H2.
+ remember (Int_part x - Int_part y)%Z as z.
+ clear -H1 H2.
+ rewrite Z.one_succ in H2.
+ apply Zlt_succ_le in H2.
+ now apply Zle_not_lt in H2.
+Qed.

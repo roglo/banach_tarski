@@ -416,6 +416,46 @@ assert (b = b').
  destruct b; [ now apply Rplus_eq_compat_l, IHn | now apply IHn ].
 Qed.
 
+Theorem R_to_bin_true_pow_le : ∀ z pow i,
+  (0 <= z)%R
+  → (0 <= pow <= (1 / 2) ^ S i)%R
+  → R_to_bin z i = true
+  → (pow <= z)%R.
+Proof.
+intros * Hz Hpow Hi.
+revert z pow Hz Hi Hpow.
+induction i; intros.
+ simpl in Hi.
+ destruct (Rlt_dec (frac_part z) (1 / 2)) as [| H₁]; [ easy | ].
+ clear Hi; apply Rnot_lt_le in H₁; rewrite pow_1 in Hpow.
+ destruct Hpow as (Hpow₀, Hpow₁).
+ eapply Rle_trans; [ eassumption | ].
+ eapply Rle_trans; [ eassumption | ].
+ unfold frac_part.
+ apply Rplus_le_reg_r with (r := IZR (Int_part z)).
+ rewrite Rplus_comm, Rplus_minus.
+ replace z with (z + 0)%R at 1 by lra.
+ apply Rplus_le_compat_l.
+ replace 0%R with (IZR 0) by easy.
+ apply IZR_le.
+ replace 0%Z with (Int_part 0); [ now apply Int_part_le_compat | ].
+ replace 0%Z with (Z.of_nat 0); [ now rewrite <- Int_part_INR | easy ].
+
+ apply (Rmult_le_reg_r 2); [ lra | ].
+ apply IHi; [ | easy | ].
+  apply (Rmult_le_compat_r 2) in Hz; [ | lra ].
+  now rewrite Rmult_0_l in Hz.
+
+  split.
+   destruct Hpow as (H, _).
+   apply (Rmult_le_compat_r 2) in H; [ | lra ].
+   now rewrite Rmult_0_l in H.
+
+   destruct Hpow as (_, H).
+   apply (Rmult_le_compat_r 2) in H; [ | lra ].
+   simpl in H; simpl; lra.
+Qed.
+
 Example int_frac_of_R_bij : FinFun.Bijective int_frac_of_R.
 Proof.
 unfold FinFun.Bijective.
@@ -458,239 +498,8 @@ erewrite trunc_bool_seq_eq; [ | reflexivity ].
 simpl; unfold trunc_bool_seq; simpl.
 destruct n; simpl.
  rewrite Rplus_0_r.
- clear - Hz Hpow Hb.
-
-Theorem titi : ∀ z pow i,
-  (0 <= z)%R
-  → (0 <= pow <= (1 / 2) ^ S i)%R
-  → R_to_bin z i = true
-  → (pow <= z)%R.
-Proof.
-intros * Hz Hpow Hi.
-induction i; intros.
- simpl in Hi.
- destruct (Rlt_dec (frac_part z) (1 / 2)) as [| H₁]; [ easy | ].
- clear Hi; apply Rnot_lt_le in H₁; rewrite pow_1 in Hpow.
- destruct Hpow as (Hpow₀, Hpow₁).
- eapply Rle_trans; [ eassumption | ].
- eapply Rle_trans; [ eassumption | ].
- unfold frac_part.
- apply Rplus_le_reg_r with (r := IZR (Int_part z)).
- rewrite Rplus_comm, Rplus_minus.
- replace z with (z + 0)%R at 1 by lra.
- apply Rplus_le_compat_l.
- replace 0%R with (IZR 0) by easy.
- apply IZR_le.
-
-Theorem tutu : ∀ x, (0 <= x)%R → (0 <= Int_part x)%Z.
-Proof.
-intros * Hx.
-(*
-unfold Int_part.
-apply Zle_minus_le_0.
-pose proof archimed x as H.
-SearchAbout Int_part.
-
-intros * Hx.
-pose proof archimed x as H.
-replace (up x) with (Int_part x + 1)%Z in H by apply Z.sub_add.
-rewrite plus_IZR in H; simpl in H.
-remember (Int_part x) as z eqn:Hz; symmetry in Hz.
-destruct z as [| p| p]; [ easy | apply Pos2Z.is_nonneg | exfalso ].
-SearchAbout (IZR (Z.neg _)).
-unfold Int_part in Hz.
-
-clear H.
-*)
-
-Theorem tintin : ∀ x y, (x <= y)%R → (Int_part x <= Int_part y)%Z.
-Proof.
-intros * Hxy.
-destruct (Z_le_gt_dec (Int_part x) (Int_part y)) as [| Hlt]; [ easy | ].
-exfalso; apply Z.gt_lt in Hlt.
-apply IZR_lt in Hlt.
-pose proof base_Int_part x as Hx.
-pose proof base_Int_part y as Hy.
-destruct Hx as (Hx1, Hx2).
-destruct Hy as (Hy1, Hy2).
-remember (IZR (Int_part x)) as a eqn:Ha.
-remember (IZR (Int_part y)) as b eqn:Hb.
-assert (Hab : (0 < a - b < 1)%R).
- split.
-  apply Rplus_lt_reg_r with (r := b).
-  now rewrite Rplus_0_l, Rplus_comm, Rplus_minus.
-
-  eapply Rle_lt_trans.
-   apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
-
-   eapply Rle_lt_trans.
-    apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
-
-    apply Rgt_lt, Ropp_lt_contravar in Hy2.
-    rewrite Ropp_minus_distr in Hy2.
-    now rewrite Ropp_involutive in Hy2.
-
- idtac.
+ eapply R_to_bin_true_pow_le; eassumption.
 bbb.
-
-
-   apply Ropp_le_contravar.
-
-   apply Z.sub_le_mono_r.
-
-; [ eassumption | ].
-
-bbb.
-
-intros * Hxy.
-pose proof base_Int_part (y - x) as Hyx.
-destruct (Rle_dec (frac_part x) (frac_part y)) as [H1| H1].
- apply Rle_ge in H1.
- rewrite Rminus_Int_part1 in Hyx; [ | easy ].
- rewrite <- Z_R_minus in Hyx.
- destruct Hyx as (H2, H3).
-SearchAbout (IZR (Int_part _)).
-  apply Rgt_lt in H3.
-  apply Rplus_lt_compat_l with (r := (y - x)%R) in H3.
-  rewrite Rplus_minus in H3.
-  apply Rplus_lt_compat_l with (r := IZR (Int_part x)) in H3.
-  rewrite Rplus_minus in H3.
-
-  apply Rge_le in H1.
-
-SearchAbout (_ < _ → _)%R.
-
-
-Print archimed.
-Print Int_part.
-
-SearchAbout (Int_part (_ - _)).
-
-pose proof archimed (y - x) as H.
-destruct H as (H1, H2).
-Print Int_part.
-
-pose proof base_Int_part x as Hx.
-pose proof base_Int_part y as Hy.
-destruct Hx as (Hx1, Hx2).
-destruct Hy as (Hy1, Hy2).
-SearchAbout (Int_part (_ - _)).
-bbb.
-unfold Int_part.
-SearchAbout Int_part.
-
-bbb.
-
-simpl in H.
-SearchAbout (INR (Pos.to_nat _)).
-
-
-SearchAbout (IZR (Int_part _)).
-SearchAbout (_ <= IZR _)%Z.
-
-bbb.
-
-apply Zle_minus_le_0.
-destruct Hx as [Hx| ]; [ | now subst x; rewrite up_0 ].
-
-Theorem tata : ∀ x, (0 < x)%R → (1 <= up x)%Z.
-Proof.
-intros x Hx.
-replace (up x) with (Int_part x + 1)%Z in H.
-pose proof archimed x as H.
-SearchAbout frac_part.
-Print frac_part.
-Print Int_part.
-
-bbb.
-
-
-rewrite <- tech_up with (z := Int_part (x + 1)).
-
-Theorem tata' : ∀ x, (0 <= x)%R → (1 <= up x)%Z.
-Proof.
-intros x Hx.
-pose proof archimed x as H.
-
-rewrite <- tech_up with (z := Int_part (x + 1)).
- unfold Int_part.
-bbb.
-
-SearchAbout up.
-
-bbb.
-
-
-pose proof archimed (x + 1) as H.
-remember (up x) as z eqn:Hz; symmetry in Hz.
-simpl in H.
-bbb.
-
-destruct H as (Hgt, Hle).
-
-assert (Hzp : (0 <= z)%Z).
- subst z; apply le_IZR; simpl.
- eapply Rlt_le, Rlt_trans; [ eassumption | ].
-
-; eassumption.
-
- apply IZN in Hzp.
- destruct Hzp as (n, Hn).
- move Hn at top; subst z.
- rewrite <- INR_IZR_INZ in Hle, Hgt; simpl.
- destruct n; [ simpl in Hgt; lra | ].
- destruct n; [ easy | exfalso ].
- apply Rle_not_lt in Hle; apply Hle.
- apply Rlt_le_trans with (r2 := (1 + 1)%R); [ lra | ].
- destruct n.
-  exfalso.
-  simpl in *.
-  apply Rgt_lt in Hgt.
-  apply Hle; clear Hle.
-SearchAbout up.
-
-bbb.
-SearchAbout (_ = up _).
-   erewrite <- tech_up in Hz.
-
-bbb.
-
-  apply Rnot_lt_le in Hle.
-
-
- destruct n; [ lra | ].
- rewrite Rplus_assoc.
- replace 2%R with (0 + 2)%R at 1 by lra.
- apply Rplus_le_compat_r, pos_INR.
-Qed.
-SearchAbout Int_part.
-bbb.
-
-unfold Int_part.
-apply Zle_minus_le_0.
-SearchAbout up.
-
-
-rewrite <- up_tech with (z := 0); [ easy | easy | ].
-easy.
-
-SearchAbout up.
-pose proof archimed z as H.
-destruct H as (H₁, H₂).
-apply Zle_minus_le_0.
-*)
-bbb.
-
-(* fin de tata *)
-now apply tata.
-
-bbb.
-(* fin de tutu *)
-now apply tutu.
-
-bbb.
-(* fin de titi *)
-eapply titi; eassumption.
 
 bbb.
 (* fin de toto *)
