@@ -85,3 +85,12 @@ assert (Hzp : (0 <= z)%Z).
  replace 2%R with (0 + 2)%R at 1 by lra.
  apply Rplus_le_compat_r, pos_INR.
 Qed.
+
+Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
+Proof.
+intros x.
+pose proof archimed x as Ha.
+destruct Ha as (Hgt, Hle).
+unfold frac_part, Int_part.
+rewrite minus_IZR; simpl; lra.
+Qed.

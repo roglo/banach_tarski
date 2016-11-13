@@ -164,12 +164,6 @@ Fixpoint nat_of_path el :=
   | [] => 1%nat
   end.
 
-Compute (nat_of_path []).
-Compute (nat_of_path [ạ]).
-Compute (nat_of_path [ạ⁻¹]).
-Compute (nat_of_path [ḅ]).
-Compute (nat_of_path [ḅ⁻¹]).
-
 Theorem nat_of_path_ne_0 : ∀ el, nat_of_path el ≠ 0%nat.
 Proof.
 intros * H.
@@ -323,20 +317,6 @@ Qed.
 
 Record int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
-Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
-Proof.
-intros x.
-pose proof archimed x as Ha.
-destruct Ha as (Hgt, Hle).
-unfold frac_part, Int_part.
-unfold "_-_", sub_notation.
-split; [ | rewrite minus_IZR; simpl; lra ].
-rewrite minus_IZR; simpl.
-apply Rplus_le_compat_l with (r := - (IZR (up x) - x)) in Hle.
-rewrite Rplus_opp_l in Hle.
-unfold "_-_", "-_", sub_notation, opp_notation in Hle; lra.
-Qed.
-
 Fixpoint R_to_bin x n :=
   match n with
   | 0 => if Rlt_dec (frac_part x) (1/2) then false else true
@@ -462,24 +442,43 @@ split.
     split.
      unfold bin_to_R.
 rewrite Ht.
-SearchAbout bin_to_R_aux.
 rewrite <- trunc_bool_seq_eq.
 
 Theorem toto : ∀ z n pow i,
   (0 <= z)%R
-  → (0 <= pow <= 1 / 2)%R
+  → (0 <= pow <= (1 / 2) ^ S i)%R
   → (bin_to_R_aux n (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert pow i Hpow.
 induction n; intros; simpl; [ easy | ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
-destruct b; [ | apply IHn; lra ].
+destruct b; [ | apply IHn; split; simpl in Hpow; simpl; lra ].
 erewrite trunc_bool_seq_eq; [ | reflexivity ].
-simpl.
-unfold trunc_bool_seq; simpl.
+simpl; unfold trunc_bool_seq; simpl.
 destruct n; simpl.
-SearchAbout R_to_bin.
+ rewrite Rplus_0_r.
+ clear - Hz Hpow Hb.
+
+Theorem titi : ∀ z pow i,
+  (0 <= z)%R
+  → (0 <= pow <= (1 / 2) ^ S i)%R
+  → R_to_bin z i = true
+  → (pow <= z)%R.
+Proof.
+intros * Hz Hpow Hi.
+induction i; intros.
+ simpl in Hi.
+ destruct (Rlt_dec (frac_part z) (1 / 2)) as [| H₁]; [ easy | ].
+ clear Hi; apply Rnot_lt_le in H₁; rewrite pow_1 in Hpow.
+ destruct Hpow as (Hpow₀, Hpow₁).
+ eapply Rle_trans; [ eassumption | ].
+ eapply Rle_trans; [ eassumption | ].
+ unfold frac_part.
+
+bbb.
+(* fin de titi *)
+eapply titi; eassumption.
 
 bbb.
 (* fin de toto *)
