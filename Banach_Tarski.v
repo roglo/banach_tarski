@@ -484,17 +484,37 @@ induction i; intros.
 Theorem tutu : ∀ x, (0 <= x)%R → (0 <= Int_part x)%Z.
 Proof.
 intros * Hx.
+pose proof archimed x as H.
+replace (up x) with (Int_part x + 1)%Z in H by apply Z.sub_add.
+rewrite plus_IZR in H.
+simpl in H.
+SearchAbout (IZR (Int_part _)).
+SearchAbout (_ <= IZR _)%Z.
+
+bbb.
+
 apply Zle_minus_le_0.
 destruct Hx as [Hx| ]; [ | now subst x; rewrite up_0 ].
 
 Theorem tata : ∀ x, (0 < x)%R → (1 <= up x)%Z.
 Proof.
 intros x Hx.
+replace (up x) with (Int_part x + 1)%Z in H.
+pose proof archimed x as H.
+SearchAbout frac_part.
+Print frac_part.
+Print Int_part.
+
+bbb.
+
+
 rewrite <- tech_up with (z := Int_part (x + 1)).
 
 Theorem tata' : ∀ x, (0 <= x)%R → (1 <= up x)%Z.
 Proof.
 intros x Hx.
+pose proof archimed x as H.
+
 rewrite <- tech_up with (z := Int_part (x + 1)).
  unfold Int_part.
 bbb.
