@@ -473,6 +473,8 @@ split.
  unfold is_upper_bound in Hyub, Hylub.
  remember (frac_part x) as z eqn:Hz.
  unfold Rset_of_bin_seq in Hs.
+bbb.
+
  assert (Hyz : ∀ ε, (0 < ε)%R → ∃ η, (0 < η < ε ∧ z - η <= y)%R).
   intros * Hε.
   remember (trunc_bool_seq (R_to_bin z)) as t eqn:Ht.
@@ -498,13 +500,17 @@ destruct b; [ | apply IHn; split; simpl in Hpow; simpl; lra ].
 erewrite trunc_bool_seq_eq; [ | reflexivity ].
 simpl; unfold trunc_bool_seq; simpl.
 *)
-destruct n; simpl.
- rewrite Rplus_0_r.
+clear IHn.
+revert z pow i Hz Hpow Hb.
+induction n; intros; simpl.
+ simpl; rewrite Rplus_0_r.
  eapply R_to_bin_true_pow_le; eassumption.
 
  destruct (lt_dec (S i) (S (i + S n))) as [H₁| H₁].
   remember (R_to_bin (z * 2) i) as b' eqn:Hb'; symmetry in Hb'.
   destruct b'.
+
+   pose proof IHn (z - pow).
 bbb.
 
 bbb.
