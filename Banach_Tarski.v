@@ -473,6 +473,55 @@ split.
  unfold is_upper_bound in Hyub, Hylub.
  remember (frac_part x) as z eqn:Hz.
  unfold Rset_of_bin_seq in Hs.
+ assert (Hyz : (y <= z)%R).
+  apply Hylub.
+  intros z₁ Hz₁.
+  pose proof Hyub z₁ Hz₁ as Hzy.
+  generalize Hz₁; intros Hz'₁.
+  rewrite Hs in Hz'₁; simpl in Hz'₁.
+  destruct Hz'₁ as (it, Hz'₁).
+
+Theorem toto : ∀ z it, (0 <= z)%R → (bin_to_R (R_to_bin z) it <= z)%R.
+Proof.
+intros * Hz.
+unfold bin_to_R.
+
+Theorem titi : ∀ z k i,
+  (0 <= z)%R
+  → (bin_to_R_aux k (R_to_bin z) ((1 / 2) ^ S i) i <= z)%R.
+Proof.
+intros * Hz.
+remember (1 / 2)%R as pow eqn:Hpow.
+revert z i Hz.
+induction k; intros; [ easy | simpl ].
+remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
+destruct b.
+ Focus 2.
+ pose proof IHk z (S i) Hz as H.
+ remember (S i) as si; simpl in H; subst si.
+ subst pow.
+ unfold Rdiv in H |-*.
+ rewrite Rmult_1_l in H |-*; simpl in H.
+ rewrite <- Rmult_assoc in H.
+ now rewrite Rmult_shuffle0 in H.
+
+ pose proof IHk z (S i) Hz as H.
+SearchAbout bin_to_R_aux.
+
+bbb.
+
+(* fin de titi *)
+pose proof titi z it 0 Hz as H.
+now rewrite pow_1 in H.
+Qed.
+
+(* fin de toto *)
+rewrite <- Hz'₁.
+apply toto; rewrite Hz; apply frac_part_in_0_1.
+bbb.
+
+  rewrite Hs in Ht; simpl in Ht.
+  destruct Ht as (it, Ht).
 bbb.
 
  assert (Hyz : ∀ ε, (0 < ε)%R → ∃ η, (0 < η < ε ∧ z - η <= y)%R).
