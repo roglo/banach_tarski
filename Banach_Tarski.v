@@ -456,6 +456,19 @@ induction i; intros.
    simpl in H; simpl; lra.
 Qed.
 
+(*
+Definition trunc_bool_seq u n i := if lt_dec i n then u i else false.
+*)
+Theorem toto : ∀ k u pow i,
+  (bin_to_R_aux (S k) u pow i =
+   trunc_bool_seq u ...
+   
+   (if u i then pow else 0) + bin_to_R_aux k u (pow / 2) (S i))%R.
+Proof.
+intros; simpl.
+destruct (u i); [ easy | now rewrite Rplus_0_l ].
+Qed.
+
 Theorem bin_to_R_aux_succ : ∀ k u pow i,
   (bin_to_R_aux (S k) u pow i =
    (if u i then pow else 0) + bin_to_R_aux k u (pow / 2) (S i))%R.
