@@ -494,11 +494,17 @@ revert pow i Hpow.
 induction n; intros; simpl; [ easy | ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b; [ | apply IHn; split; simpl in Hpow; simpl; lra ].
+(*
 erewrite trunc_bool_seq_eq; [ | reflexivity ].
 simpl; unfold trunc_bool_seq; simpl.
+*)
 destruct n; simpl.
  rewrite Rplus_0_r.
  eapply R_to_bin_true_pow_le; eassumption.
+
+ destruct (lt_dec (S i) (S (i + S n))) as [H₁| H₁].
+  remember (R_to_bin (z * 2) i) as b' eqn:Hb'; symmetry in Hb'.
+  destruct b'.
 bbb.
 
 bbb.
