@@ -490,7 +490,19 @@ destruct Hx as [Hx| ]; [ | now subst x; rewrite up_0 ].
 Theorem tata : ∀ x, (0 < x)%R → (1 <= up x)%Z.
 Proof.
 intros x Hx.
+rewrite <- tech_up with (z := Int_part (x + 1)).
+
+Theorem tata' : ∀ x, (0 <= x)%R → (1 <= up x)%Z.
+Proof.
+intros x Hx.
+rewrite <- tech_up with (z := Int_part (x + 1)).
+ unfold Int_part.
 bbb.
+
+SearchAbout up.
+
+bbb.
+
 
 pose proof archimed (x + 1) as H.
 remember (up x) as z eqn:Hz; symmetry in Hz.
