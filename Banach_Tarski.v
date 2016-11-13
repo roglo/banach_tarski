@@ -488,6 +488,28 @@ pose proof archimed x as H.
 replace (up x) with (Int_part x + 1)%Z in H by apply Z.sub_add.
 rewrite plus_IZR in H.
 simpl in H.
+remember (Int_part x) as z eqn:Hz; symmetry in Hz.
+destruct z as [| p| p]; [ easy | apply Pos2Z.is_nonneg | exfalso ].
+clear H.
+
+Theorem tintin : ∀ x y, (x <= y)%R → (Int_part x <= Int_part y)%Z.
+Proof.
+intros * Hxy.
+pose proof base_Int_part x as Hx.
+pose proof base_Int_part y as Hy.
+destruct Hx as (Hx1, Hx2).
+destruct Hy as (Hy1, Hy2).
+SearchAbout (Int_part (_ - _)).
+bbb.
+unfold Int_part.
+SearchAbout Int_part.
+
+bbb.
+
+simpl in H.
+SearchAbout (INR (Pos.to_nat _)).
+
+
 SearchAbout (IZR (Int_part _)).
 SearchAbout (_ <= IZR _)%Z.
 
