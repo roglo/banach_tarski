@@ -56,6 +56,28 @@ Qed.
 Theorem Rdiv_1_r : ∀ x, (x / 1)%R = x.
 Proof. intros x; lra. Qed.
 
+Theorem up_0 : (up 0 = 1)%Z.
+Proof.
+pose proof archimed 0 as H.
+rewrite Rminus_0_r in H.
+remember (up 0) as z eqn:Hz; clear Hz.
+destruct H as (H₁, H₂).
+assert (H : (0 <= z)%Z).
+ apply le_IZR; simpl.
+ eapply Rle_trans; [ apply Rlt_le; eassumption | apply Rle_refl ].
+
+ apply IZN in H.
+ destruct H as (n, H); subst z.
+ rewrite <- INR_IZR_INZ in H₁, H₂.
+ destruct n; [ now apply Rlt_irrefl in H₁ | ].
+ destruct n; [ easy | exfalso ].
+ apply Rle_not_lt in H₂; apply H₂.
+ remember (S n) as sn; simpl; subst sn; clear.
+ induction n; [ simpl; lra | ].
+ remember (S n) as sn; simpl; subst sn.
+ eapply Rlt_le_trans; [ eassumption | lra ].
+Qed.
+
 Theorem Int_part_is_0 : ∀ x, (0 <= x < 1)%R → Int_part x = 0%Z.
 Proof.
 intros * Hx.

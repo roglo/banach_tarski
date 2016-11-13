@@ -475,6 +475,89 @@ induction i; intros.
  eapply Rle_trans; [ eassumption | ].
  eapply Rle_trans; [ eassumption | ].
  unfold frac_part.
+ apply Rplus_le_reg_r with (r := IZR (Int_part z)).
+ rewrite Rplus_comm, Rplus_minus.
+ replace z with (z + 0)%R at 1 by lra.
+ apply Rplus_le_compat_l.
+ replace 0%R with (IZR 0) by easy.
+ apply IZR_le.
+Theorem tutu : ∀ x, (0 <= x)%R → (0 <= Int_part x)%Z.
+Proof.
+intros * Hx.
+apply Zle_minus_le_0.
+destruct Hx as [Hx| ]; [ | now subst x; rewrite up_0 ].
+
+Theorem tata : ∀ x, (0 < x)%R → (1 <= up x)%Z.
+Proof.
+intros x Hx.
+bbb.
+
+pose proof archimed (x + 1) as H.
+remember (up x) as z eqn:Hz; symmetry in Hz.
+simpl in H.
+bbb.
+
+destruct H as (Hgt, Hle).
+
+assert (Hzp : (0 <= z)%Z).
+ subst z; apply le_IZR; simpl.
+ eapply Rlt_le, Rlt_trans; [ eassumption | ].
+
+; eassumption.
+
+ apply IZN in Hzp.
+ destruct Hzp as (n, Hn).
+ move Hn at top; subst z.
+ rewrite <- INR_IZR_INZ in Hle, Hgt; simpl.
+ destruct n; [ simpl in Hgt; lra | ].
+ destruct n; [ easy | exfalso ].
+ apply Rle_not_lt in Hle; apply Hle.
+ apply Rlt_le_trans with (r2 := (1 + 1)%R); [ lra | ].
+ destruct n.
+  exfalso.
+  simpl in *.
+  apply Rgt_lt in Hgt.
+  apply Hle; clear Hle.
+SearchAbout up.
+
+bbb.
+SearchAbout (_ = up _).
+   erewrite <- tech_up in Hz.
+
+bbb.
+
+  apply Rnot_lt_le in Hle.
+
+
+ destruct n; [ lra | ].
+ rewrite Rplus_assoc.
+ replace 2%R with (0 + 2)%R at 1 by lra.
+ apply Rplus_le_compat_r, pos_INR.
+Qed.
+SearchAbout Int_part.
+bbb.
+
+unfold Int_part.
+apply Zle_minus_le_0.
+SearchAbout up.
+
+
+rewrite <- up_tech with (z := 0); [ easy | easy | ].
+easy.
+
+SearchAbout up.
+pose proof archimed z as H.
+destruct H as (H₁, H₂).
+apply Zle_minus_le_0.
+*)
+bbb.
+
+(* fin de tata *)
+now apply tata.
+
+bbb.
+(* fin de tutu *)
+now apply tutu.
 
 bbb.
 (* fin de titi *)
