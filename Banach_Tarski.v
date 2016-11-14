@@ -470,6 +470,20 @@ rewrite Rmult_assoc.
 destruct (u k); [ now rewrite Rplus_assoc | easy ].
 Qed.
 
+Theorem sphere_not_countable : ¬ (is_countable _ sphere).
+Proof.
+intros H.
+unfold is_countable in H.
+destruct H as (f, Hf).
+assert (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, f n ≠ a).
+
+ Focus 2.
+ destruct Hcontr as (a & Ha & Hnn).
+ apply Hf in Ha.
+ destruct Ha as (n, Hn).
+ eapply Hnn; eassumption.
+bbb.
+
 (*
 Theorem toto : ∀ k u pow i,
   (bin_to_R_aux (S k) u pow i =
@@ -538,7 +552,6 @@ revert i.
 induction k; intros; [ simpl; lra | simpl ].
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
-
 
 bbb.
 Theorem titi : ∀ z i j k,
