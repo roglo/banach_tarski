@@ -499,6 +499,10 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
  unfold is_upper_bound in Hzub, Hzlub.
  unfold Rset_of_bin_seq in Hzub, Hzlub, Hrp.
  simpl in Hzub, Hzlub, Hrp.
+ split.
+  Focus 2.
+  intros n Hz.
+  subst u z.
 bbb.
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
