@@ -519,10 +519,46 @@ Theorem toto : ∀ z it, (0 <= z)%R → (bin_to_R (R_to_bin z) it <= z)%R.
 Proof.
 intros * Hz.
 unfold bin_to_R.
+(*
 remember (R_to_bin z) as u eqn:Hu.
 destruct it; [ easy | simpl; subst u ].
-Print R_to_bin.
+remember (R_to_bin z 0) as b eqn:Hb; symmetry in Hb.
+destruct b.
 (* I need a property about R_to_bin... *)
+Print R_to_bin.
+*)
+
+Theorem titi : ∀ z i k,
+  (0 <= z)%R
+  → (1 - (1 / 2) ^ k +
+     bin_to_R_aux k (R_to_bin z) ((1 / 2) ^ S i) i <= z)%R.
+Proof.
+intros * Hz.
+revert i.
+induction k; intros; [ simpl; lra | simpl ].
+remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
+destruct b.
+
+
+bbb.
+Theorem titi : ∀ z i j k,
+  (bin_to_R_aux i (R_to_bin z) (1 / 2) j +
+   bin_to_R_aux k (R_to_bin z) ((1 / 2) ^ S (i + j)) (i + j) <= z)%R.
+Proof.
+intros.
+revert j k.
+induction i; intros.
+ simpl.
+ (* no : I miss a basis case, something saying :
+      (blah bla blah for 0 <= z)%R
+    and I don't have that *)
+
+bbb.
+(* end of titi; return to toto *)
+pose proof titi z 0 it as H.
+simpl in H.
+now rewrite Rplus_0_l, Rmult_1_r in H.
+
 bbb.
 
 (*
