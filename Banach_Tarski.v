@@ -529,7 +529,7 @@ revert z i Hz.
 induction k; intros; [ easy | ].
 rewrite <- Nat.add_1_r.
 rewrite bin_to_R_aux_add.
-simpl.
+remember (S i) as si; simpl; subst si.
 bbb.
 
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
