@@ -513,11 +513,39 @@ split.
   generalize Hz₁; intros Hz'₁.
   rewrite Hs in Hz'₁; simpl in Hz'₁.
   destruct Hz'₁ as (it, Hz'₁).
+  subst z₁.
 
 Theorem toto : ∀ z it, (0 <= z)%R → (bin_to_R (R_to_bin z) it <= z)%R.
 Proof.
 intros * Hz.
 unfold bin_to_R.
+Print R_to_bin.
+(* I need a property about R_to_bin... *)
+bbb.
+
+(*
+replace it with (0 + it)%nat by easy.
+rewrite bin_to_R_aux_add.
+
+Check bin_to_R_aux_add.
+*)
+
+(*
+Theorem titi : ∀ z i k pow,
+  (0 <= z)%R
+  → R_to_bin z (k + i) = true
+  → (bin_to_R_aux k (R_to_bin z) (pow ^ S i) i + pow ^ S i / 2 ^ k <= z)%R.
+Proof.
+intros * Hz.
+revert k pow.
+induction i; intros.
+Admitted. Show.
+
+(* end of titi; return to toto *)
+destruct it; [ easy | simpl ].
+destruct (Rlt_dec (frac_part z) (1 / 2)) as [H₁| H₁].
+*)
+
 
 Theorem titi : ∀ z k i,
   (0 <= z)%R
@@ -530,6 +558,11 @@ induction k; intros; [ easy | ].
 rewrite <- Nat.add_1_r.
 rewrite bin_to_R_aux_add.
 remember (S i) as si; simpl; subst si.
+rewrite Rplus_0_r.
+remember (R_to_bin z (k + i)) as b eqn:Hb; symmetry in Hb.
+destruct b; [ | now rewrite Rplus_0_r; apply IHk ].
+Print bin_to_R.
+
 bbb.
 
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
@@ -560,7 +593,6 @@ now rewrite pow_1 in H.
 Qed.
 
 (* fin de toto *)
-rewrite <- Hz'₁.
 apply toto; rewrite Hz; apply frac_part_in_0_1.
 bbb.
 
