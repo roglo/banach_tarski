@@ -475,12 +475,6 @@ Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
 
-bbb.
-
-(* use a definition with completeness... *)
-Definition limit_to_infinity (u : ℕ → ℝ) :=
-  u O.
-
 Theorem unit_interv_not_countable : ¬ (is_countable _ unit_interv).
 Proof.
 intros H.
@@ -496,8 +490,10 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
  clear; simpl.
  remember (λ n, R_to_bin (f n)) as g eqn:Hg.
  remember (cantor_diagonal g) as u eqn:Hu.
- exists (limit_to_infinity (bin_to_R u)).
-
+ remember (R_of_bin_seq u) as rp eqn:Hrp.
+ symmetry in Hrp.
+ destruct rp as (z, Hz).
+ exists z.
 bbb.
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
