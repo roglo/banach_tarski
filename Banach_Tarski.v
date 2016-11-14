@@ -456,17 +456,28 @@ induction i; intros.
    simpl in H; simpl; lra.
 Qed.
 
+Theorem bin_to_R_aux_add : ∀ u pow i j k,
+  (bin_to_R_aux (i + j) u pow k =
+   bin_to_R_aux i u pow k + bin_to_R_aux j u (pow / 2 ^ i) (i + k))%R.
+Proof.
+intros.
+revert pow j k.
+induction i; intros; [ now simpl; rewrite Rplus_0_l, Rdiv_1_r | simpl ].
+unfold Rdiv in IHi |-*.
+rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+rewrite IHi, <- Nat.add_succ_comm.
+rewrite Rmult_assoc.
+destruct (u k); [ now rewrite Rplus_assoc | easy ].
+Qed.
+
 (*
-Definition trunc_bool_seq u n i := if lt_dec i n then u i else false.
-*)
 Theorem toto : ∀ k u pow i,
   (bin_to_R_aux (S k) u pow i =
-   trunc_bool_seq u ...
-   
-   (if u i then pow else 0) + bin_to_R_aux k u (pow / 2) (S i))%R.
+   bin_to_R_aux 1 u pow i + bin_to_R_aux k u (pow / 2) (S i))%R.
 Proof.
 intros; simpl.
-destruct (u i); [ easy | now rewrite Rplus_0_l ].
+destruct (u i); [ | now rewrite Rplus_0_l ].
+now rewrite Rplus_0_r.
 Qed.
 
 Theorem bin_to_R_aux_succ : ∀ k u pow i,
@@ -476,6 +487,7 @@ Proof.
 intros; simpl.
 destruct (u i); [ easy | now rewrite Rplus_0_l ].
 Qed.
+*)
 
 Example int_frac_of_R_bij : FinFun.Bijective int_frac_of_R.
 Proof.
@@ -515,7 +527,9 @@ intros * Hz.
 remember (1 / 2)%R as pow eqn:Hpow.
 revert z i Hz.
 induction k; intros; [ easy | ].
-rewrite bin_to_R_aux_succ.
+rewrite <- Nat.add_1_r.
+rewrite bin_to_R_aux_add.
+simpl.
 bbb.
 
 remember (R_to_bin z i) as b eqn:Hb; symmetry in Hb.
