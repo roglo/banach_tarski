@@ -473,6 +473,8 @@ Qed.
 Definition whole_set A := mkset (λ _ : A, True).
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
+Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
+
 Theorem unit_interv_not_countable : ¬ (is_countable _ unit_interv).
 Proof.
 intros H.
@@ -486,7 +488,11 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
  eapply Hnn; eassumption.
 
  clear; simpl.
+ remember (λ n, R_to_bin (f n)) as g eqn:Hg.
+ remember (cantor_diagonal g) as u eqn:Hu.
 bbb.
+ (* actually the limit when it → ∞, not bin_to_R u it *)
+ exists (bin_to_R u 0).
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
 Proof.
