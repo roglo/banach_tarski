@@ -476,12 +476,13 @@ intros H.
 unfold is_countable in H.
 destruct H as (f, Hf).
 assert (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, f n ≠ a).
-
  Focus 2.
  destruct Hcontr as (a & Ha & Hnn).
  apply Hf in Ha.
  destruct Ha as (n, Hn).
  eapply Hnn; eassumption.
+
+ clear.
 bbb.
 
 (*
