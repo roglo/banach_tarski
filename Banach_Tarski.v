@@ -519,6 +519,8 @@ Theorem toto : ∀ z it, (0 <= z)%R → (bin_to_R (R_to_bin z) it <= z)%R.
 Proof.
 intros * Hz.
 unfold bin_to_R.
+remember (R_to_bin z) as u eqn:Hu.
+destruct it; [ easy | simpl; subst u ].
 Print R_to_bin.
 (* I need a property about R_to_bin... *)
 bbb.
