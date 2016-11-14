@@ -470,6 +470,39 @@ rewrite Rmult_assoc.
 destruct (u k); [ now rewrite Rplus_assoc | easy ].
 Qed.
 
+Definition whole_set A := mkset (λ _ : A, True).
+Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
+
+Theorem unit_interv_not_countable : ¬ (is_countable _ unit_interv).
+Proof.
+intros H.
+unfold is_countable in H.
+destruct H as (f, Hf).
+assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
+ Focus 2.
+ destruct Hcontr as (a & Ha & Hnn).
+ apply Hf in Ha.
+ destruct Ha as (n, Hn).
+ eapply Hnn; eassumption.
+
+ clear; simpl.
+bbb.
+
+Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
+Proof.
+intros H.
+unfold is_countable in H.
+destruct H as (f, Hf).
+assert (Hcontr : ∃ a, a ∈ whole_set _ ∧ ∀ n, f n ≠ a).
+ Focus 2.
+ destruct Hcontr as (a & Ha & Hnn).
+ apply Hf in Ha.
+ destruct Ha as (n, Hn).
+ eapply Hnn; eassumption.
+
+ clear; simpl.
+bbb.
+
 Theorem sphere_not_countable : ¬ (is_countable _ sphere).
 Proof.
 intros H.
@@ -483,6 +516,7 @@ assert (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, f n ≠ a).
  eapply Hnn; eassumption.
 
  clear.
+
 bbb.
 
 (*
