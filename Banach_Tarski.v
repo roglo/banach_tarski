@@ -514,7 +514,40 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
    Focus 2.
    intros n Hz.
    subst z.
+(*
    unfold cantor_diagonal in Hd; subst d g.
+*)
+pose proof Hzub n as H; simpl in H.
+
+Theorem glip : ∀ k u x,
+  (partial_sum u k <= x)%R
+  → ∀ i, i < k → Nat.b2n (u i) <= Nat.b2n (R_to_bin x i).
+Proof.
+intros * Hp i Hik.
+unfold partial_sum in Hp.
+revert i Hik.
+induction k; intros; [ now apply Nat.nlt_0_r in Hik | ].
+simpl in Hp.
+remember (u O) as u₀ eqn:Hu₀; symmetry in Hu₀.
+destruct u₀.
+bbb.
+
+(* end of glip; return to theorem *)
+assert (H1 : ∀ i, Nat.b2n (d i) <= Nat.b2n (R_to_bin (f n) i)).
+now eapply glip.
+rewrite Hd in H1; simpl in H1.
+unfold cantor_diagonal in H1; simpl in H1.
+rewrite Hg in H1; simpl in H1.
+bbb.
+
+(* suggestion of possible theorems, to be proved if true *)
+Theorem toto : ∀ x y,
+  (x <= y)%R ↔
+  ∀ k, (partial_sum (R_to_bin x) k <= partial_sum (R_to_bin y) k)%R.
+Theorem titi : ∀ x y,
+  (x <= y)%R ↔
+  ∀ k, Nat.b2n (R_to_bin x k) <= Nat.b2n (R_to_bin y k).
+
 bbb.
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
