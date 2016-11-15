@@ -485,7 +485,7 @@ Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
 Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
   if zerop (i mod 2) then negb (g (i / 2) i) else g (i / 2) i.
 
-Definition Canonical u := ∀ i, ∃ j, i ≤ j ∧ u i = false.
+Definition Canonical u := ∀ i, ∃ j, i ≤ j ∧ u j = false.
 
 Lemma mamia : ∀ g : ℕ → ℕ → bool, (∀ n, Canonical (g n))
   → ¬ (∀ u, Canonical u → ∃ n, ∀ i, g n i = u i).
@@ -501,10 +501,18 @@ enough (Hdc : Canonical (cantor_diagonal2 g)).
  rewrite Nat.div_mul in Hcontr; [ | easy ].
  now symmetry in Hcontr; apply no_fixpoint_negb in Hcontr.
 
- unfold cantor_diagonal2.
  intros i.
- specialize (Hc i i).
+ unfold cantor_diagonal2.
+ unfold Canonical in Hc.
+bbb.
+
+ specialize (Hc (i / 2) i).
  destruct Hc as (k & Hik & Hc).
+ exists (
+
+ exists (1 + i * 2)%nat.
+ rewrite Nat.mod_add; [ | easy ].
+ simpl.
 bbb.
 
  exists j.
