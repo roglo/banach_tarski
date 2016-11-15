@@ -481,35 +481,43 @@ Definition whole_set A := mkset (λ _ : A, True).
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
+Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
+  if zerop (i mod 2) then negb (g (i / 2) i) else g (i / 2) i.
+
+Theorem bool_seq_not_countable : ∀ g : ℕ → ℕ → bool, ¬ (FinFun.Surjective g).
+Proof.
+intros g Hcontr.
+unfold FinFun.Surjective in Hcontr.
+specialize (Hcontr (λ i, negb (g i i))).
+destruct Hcontr as (n, Hn).
+enough (g n n = negb (g n n)).
+ eapply no_fixpoint_negb; symmetry; eassumption.
+
+ now remember (negb (g n n)) as x; rewrite Hn; subst x.
+Qed.
 
 Theorem unit_interv_not_countable : ¬ (is_countable _ unit_interv).
 Proof.
 intros H.
 unfold is_countable in H.
 destruct H as (f, Hf).
-assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
- Focus 2.
+enough (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
  destruct Hcontr as (a & Ha & Hnn).
  apply Hf in Ha.
  destruct Ha as (n, Hn).
  eapply Hnn; eassumption.
 
  clear; simpl.
- remember (λ n, frac_part_to_bin (f n)) as g eqn:Hg.
- remember (cantor_diagonal g) as d eqn:Hd.
- remember (R_of_bin_seq d) as rp eqn:Hrp.
- symmetry in Hrp.
+ set (g n := frac_part_to_bin (f n)).
+ set (d := cantor_diagonal g).
+ set (rp := R_of_bin_seq d).
  destruct rp as (z, Hz).
  exists z.
  unfold is_lub in Hz.
  destruct Hz as (Hzub, Hzlub).
  unfold is_upper_bound in Hzub, Hzlub.
- unfold Rset_of_bin_seq in Hzub, Hzlub, Hrp.
- simpl in Hzub, Hzlub, Hrp.
- unfold R_of_bin_seq in Hrp.
-(**)
- clear Hrp.
-(**)
+ unfold Rset_of_bin_seq in Hzub, Hzlub.
+ simpl in Hzub, Hzlub.
  assert (∀ k, partial_sum d k <= z)%R by now intros; apply Hzub; exists k.
  clear Hzub; rename H into Hzub.
  assert (H : ∀ b, (∀ k, (partial_sum d k <= b)%R) → (z <= b)%R).
@@ -520,6 +528,21 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
   split.
    Focus 2.
    intros n Hz.
+   unfold g in d.
+   unfold cantor_diagonal in d.
+   remember (d n) as b eqn:Hb.
+Print partial_sum.
+Print partial_sum_aux.
+Search partial_sum_aux.
+
+   unfold d in Hb; simpl in Hb.
+   rewrite Hz in Hb.
+bbb.
+   remember (g n) as u eqn:Hu.
+   unfold g in Hu.
+   rewrite Hz in Hu.
+
+bbb.
    subst z.
 Print frac_part_to_bin.
 (*
