@@ -326,44 +326,44 @@ Fixpoint R_to_bin x n :=
 Definition int_frac_of_R x :=
   mkraif (Int_part x) (R_to_bin (frac_part x)).
 
-Fixpoint bin_to_R_aux it (u : ℕ → bool) pow i :=
-  match it with
+Fixpoint partial_sum_aux k (u : ℕ → bool) pow i :=
+  match k with
   | 0 => 0%R
-  | S it' =>
-      if u i then (pow + bin_to_R_aux it' u (pow / 2) (S i))%R
-      else bin_to_R_aux it' u (pow / 2)%R (S i)
+  | S k' =>
+      if u i then (pow + partial_sum_aux k' u (pow / 2) (S i))%R
+      else partial_sum_aux k' u (pow / 2)%R (S i)
   end.
 
-Definition bin_to_R u it := bin_to_R_aux it u (1/2)%R 0.
+Definition partial_sum u k := partial_sum_aux k u (1/2)%R 0.
 
-Theorem bin_to_R_aux_le_2_pow : ∀ u it pow i,
+Theorem partial_sum_aux_le_2_pow : ∀ u k pow i,
   (0 < pow)%R
-  → (bin_to_R_aux it u pow i <= 2 * pow)%R.
+  → (partial_sum_aux k u pow i <= 2 * pow)%R.
 Proof.
 intros * Hpow.
 revert pow i Hpow.
-induction it; intros; simpl; [ lra | ].
+induction k; intros; simpl; [ lra | ].
 remember (u i) as b eqn:Hb; symmetry in Hb.
 destruct b.
  replace (2 * pow)%R with (pow + pow)%R by lra.
  apply Rplus_le_compat; [ lra | ].
  replace pow with (2 * (pow / 2))%R at 2 by lra.
- apply IHit; lra.
+ apply IHk; lra.
 
  apply Rle_trans with (r2 := pow); [ | lra ].
  replace pow with (2 * (pow / 2))%R at 2 by lra.
- apply IHit; lra.
+ apply IHk; lra.
 Qed.
 
-Theorem bin_to_R_le_1 : ∀ u it, (bin_to_R u it <= 1)%R.
+Theorem partial_sum_le_1 : ∀ u k, (partial_sum u k <= 1)%R.
 Proof.
 intros.
 assert (Hlt : (0 < 1 / 2)%R) by lra.
-pose proof bin_to_R_aux_le_2_pow u it (1/2) 0 Hlt.
+pose proof partial_sum_aux_le_2_pow u k (1/2) 0 Hlt.
 now replace (2 * (1/2))%R with 1%R in H by lra.
 Qed.
 
-Definition Rset_of_bin_seq u := mkset (λ x, ∃ it, bin_to_R u it = x).
+Definition Rset_of_bin_seq u := mkset (λ x, ∃ k, partial_sum u k = x).
 
 Theorem Rset_of_bin_seq_bound : ∀ u, bound (setp (Rset_of_bin_seq u)).
 Proof.
@@ -372,15 +372,15 @@ unfold bound.
 exists 1.
 unfold is_upper_bound.
 intros x HE; unfold Rset_of_bin_seq in HE.
-destruct HE as (it, HE); subst x.
-apply bin_to_R_le_1.
+destruct HE as (k, HE); subst x.
+apply partial_sum_le_1.
 Qed.
 
 Theorem Rset_of_bin_seq_non_empty : ∀ u, ∃ x, x ∈ Rset_of_bin_seq u.
 Proof.
 intros.
 unfold Rset_of_bin_seq; simpl.
-now exists (bin_to_R u 0), 0%nat.
+now exists (partial_sum u 0), 0%nat.
 Qed.
 
 Definition R_of_bin_seq u :=
@@ -394,8 +394,8 @@ Definition trunc_bool_seq u n i := if lt_dec i n then u i else false.
 
 Theorem trunc_bool_seq_eq : ∀ z pow i m n,
   i + n <= m
-  → bin_to_R_aux n (R_to_bin z) pow i =
-    bin_to_R_aux n (trunc_bool_seq (R_to_bin z) m) pow i.
+  → partial_sum_aux n (R_to_bin z) pow i =
+    partial_sum_aux n (trunc_bool_seq (R_to_bin z) m) pow i.
 Proof.
 intros * Hm.
 revert pow i m Hm.
@@ -456,9 +456,9 @@ induction i; intros.
    simpl in H; simpl; lra.
 Qed.
 
-Theorem bin_to_R_aux_add : ∀ u pow i j k,
-  (bin_to_R_aux (i + j) u pow k =
-   bin_to_R_aux i u pow k + bin_to_R_aux j u (pow / 2 ^ i) (i + k))%R.
+Theorem partial_sum_aux_add : ∀ u pow i j k,
+  (partial_sum_aux (i + j) u pow k =
+   partial_sum_aux i u pow k + partial_sum_aux j u (pow / 2 ^ i) (i + k))%R.
 Proof.
 intros.
 revert pow j k.
@@ -499,10 +499,21 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
  unfold is_upper_bound in Hzub, Hzlub.
  unfold Rset_of_bin_seq in Hzub, Hzlub, Hrp.
  simpl in Hzub, Hzlub, Hrp.
- split.
-  Focus 2.
-  intros n Hz.
-  subst u z.
+ unfold R_of_bin_seq in Hrp.
+(**)
+ clear Hrp.
+(**)
+ assert (∀ k, partial_sum u k <= z)%R by now intros; apply Hzub; exists k.
+ clear Hzub; rename H into Hzub.
+ assert (H : ∀ b, (∀ k, (partial_sum u k <= b)%R) → (z <= b)%R).
+  intros b H; apply Hzlub.
+  now intros x (k, Hk); subst x.
+
+  clear Hzlub; rename H into Hzlub.
+  split.
+   Focus 2.
+   intros n Hz.
+   subst z.
 bbb.
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
@@ -538,17 +549,17 @@ bbb.
 
 (*
 Theorem toto : ∀ k u pow i,
-  (bin_to_R_aux (S k) u pow i =
-   bin_to_R_aux 1 u pow i + bin_to_R_aux k u (pow / 2) (S i))%R.
+  (partial_sum_aux (S k) u pow i =
+   partial_sum_aux 1 u pow i + partial_sum_aux k u (pow / 2) (S i))%R.
 Proof.
 intros; simpl.
 destruct (u i); [ | now rewrite Rplus_0_l ].
 now rewrite Rplus_0_r.
 Qed.
 
-Theorem bin_to_R_aux_succ : ∀ k u pow i,
-  (bin_to_R_aux (S k) u pow i =
-   (if u i then pow else 0) + bin_to_R_aux k u (pow / 2) (S i))%R.
+Theorem partial_sum_aux_succ : ∀ k u pow i,
+  (partial_sum_aux (S k) u pow i =
+   (if u i then pow else 0) + partial_sum_aux k u (pow / 2) (S i))%R.
 Proof.
 intros; simpl.
 destruct (u i); [ easy | now rewrite Rplus_0_l ].
@@ -581,10 +592,10 @@ split.
   destruct Hz'₁ as (it, Hz'₁).
   subst z₁.
 
-Theorem toto : ∀ z it, (0 <= z)%R → (bin_to_R (R_to_bin z) it <= z)%R.
+Theorem toto : ∀ z it, (0 <= z)%R → (partial_sum (R_to_bin z) it <= z)%R.
 Proof.
 intros * Hz.
-unfold bin_to_R.
+unfold partial_sum.
 (*
 remember (R_to_bin z) as u eqn:Hu.
 destruct it; [ easy | simpl; subst u ].
@@ -597,7 +608,7 @@ Print R_to_bin.
 Theorem titi : ∀ z i k,
   (0 <= z)%R
   → (1 - (1 / 2) ^ k +
-     bin_to_R_aux k (R_to_bin z) ((1 / 2) ^ S i) i <= z)%R.
+     partial_sum_aux k (R_to_bin z) ((1 / 2) ^ S i) i <= z)%R.
 Proof.
 intros * Hz.
 revert i.
@@ -607,8 +618,8 @@ destruct b.
 
 bbb.
 Theorem titi : ∀ z i j k,
-  (bin_to_R_aux i (R_to_bin z) (1 / 2) j +
-   bin_to_R_aux k (R_to_bin z) ((1 / 2) ^ S (i + j)) (i + j) <= z)%R.
+  (partial_sum_aux i (R_to_bin z) (1 / 2) j +
+   partial_sum_aux k (R_to_bin z) ((1 / 2) ^ S (i + j)) (i + j) <= z)%R.
 Proof.
 intros.
 revert j k.
@@ -628,16 +639,16 @@ bbb.
 
 (*
 replace it with (0 + it)%nat by easy.
-rewrite bin_to_R_aux_add.
+rewrite partial_sum_aux_add.
 
-Check bin_to_R_aux_add.
+Check partial_sum_aux_add.
 *)
 
 (*
 Theorem titi : ∀ z i k pow,
   (0 <= z)%R
   → R_to_bin z (k + i) = true
-  → (bin_to_R_aux k (R_to_bin z) (pow ^ S i) i + pow ^ S i / 2 ^ k <= z)%R.
+  → (partial_sum_aux k (R_to_bin z) (pow ^ S i) i + pow ^ S i / 2 ^ k <= z)%R.
 Proof.
 intros * Hz.
 revert k pow.
@@ -652,19 +663,19 @@ destruct (Rlt_dec (frac_part z) (1 / 2)) as [H₁| H₁].
 
 Theorem titi : ∀ z k i,
   (0 <= z)%R
-  → (bin_to_R_aux k (R_to_bin z) ((1 / 2) ^ S i) i <= z)%R.
+  → (partial_sum_aux k (R_to_bin z) ((1 / 2) ^ S i) i <= z)%R.
 Proof.
 intros * Hz.
 remember (1 / 2)%R as pow eqn:Hpow.
 revert z i Hz.
 induction k; intros; [ easy | ].
 rewrite <- Nat.add_1_r.
-rewrite bin_to_R_aux_add.
+rewrite partial_sum_aux_add.
 remember (S i) as si; simpl; subst si.
 rewrite Rplus_0_r.
 remember (R_to_bin z (k + i)) as b eqn:Hb; symmetry in Hb.
 destruct b; [ | now rewrite Rplus_0_r; apply IHk ].
-Print bin_to_R.
+Print partial_sum.
 
 bbb.
 
@@ -706,18 +717,18 @@ bbb.
  assert (Hyz : ∀ ε, (0 < ε)%R → ∃ η, (0 < η < ε ∧ z - η <= y)%R).
   intros * Hε.
   remember (trunc_bool_seq (R_to_bin z)) as t eqn:Ht.
-  assert (Hn : ∃ n, (0 < z - bin_to_R (t n) n < ε)%R).
-   assert (∀ n, (0 <= z - bin_to_R (t n) n < (1 / 2) ^ n)%R).
+  assert (Hn : ∃ n, (0 < z - partial_sum (t n) n < ε)%R).
+   assert (∀ n, (0 <= z - partial_sum (t n) n < (1 / 2) ^ n)%R).
     intros n.
     split.
-     unfold bin_to_R.
+     unfold partial_sum.
 rewrite Ht.
 rewrite <- trunc_bool_seq_eq.
 
 Theorem toto : ∀ z n pow i,
   (0 <= z)%R
   → (0 <= pow <= (1 / 2) ^ S i)%R
-  → (bin_to_R_aux n (R_to_bin z) pow i <= z)%R.
+  → (partial_sum_aux n (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert pow i Hpow.
@@ -764,17 +775,17 @@ bbb.
         rewrite Ht in IHn; rewrite Ht.
         rewrite <- trunc_bool_seq_eq in IHn; [ | easy ].
         rewrite <- trunc_bool_seq_eq; [ | easy ].
-SearchAbout bin_to_R_aux.
+SearchAbout partial_sum_aux.
 bbb.
    Focus 2.
    destruct Hn as (n, Hn).
-   exists (z - bin_to_R (t n) n)%R.
+   exists (z - partial_sum (t n) n)%R.
    split; [ easy | ].
-   replace (z - (z - bin_to_R (t n) n))%R with (bin_to_R (t n) n) by lra.
+   replace (z - (z - partial_sum (t n) n))%R with (partial_sum (t n) n) by lra.
    apply Hyub; rewrite Hs; simpl.
    exists n.
    rewrite Ht; clear.
-   unfold bin_to_R.
+   unfold partial_sum.
    now apply trunc_bool_seq_eq.
 
 bbb.
@@ -841,10 +852,10 @@ bbb.
 
 Theorem glop : ∀ z it,
   (0 <= z < 1)%R
-  → (bin_to_R (R_to_bin z) it <= z)%R.
+  → (partial_sum (R_to_bin z) it <= z)%R.
 Proof.
 intros * Hz.
-unfold bin_to_R.
+unfold partial_sum.
 (*
 revert z Hz.
 induction it; intros; [ easy | simpl ].
@@ -855,7 +866,7 @@ bbb.
 Theorem glip : ∀ z it pow i,
   (0 <= z < 1/2^i)%R
   → (pow <= 1/2^(S i))%R
-  → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
+  → (partial_sum_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert z i pow Hz Hpow.
@@ -1120,8 +1131,8 @@ bbb.
 Theorem glop : ∀ u it pow i,
   (0 < pow)%R
   → u i = false
-  → (bin_to_R_aux it u (pow / 2) (S i) <=
-     bin_to_R_aux (S it) u pow i)%R.
+  → (partial_sum_aux it u (pow / 2) (S i) <=
+     partial_sum_aux (S it) u pow i)%R.
 Proof.
 intros * Hpow Hui.
 revert pow i Hui Hpow.
@@ -1141,8 +1152,8 @@ eapply Rle_trans.
 
 Theorem toto : ∀ u it pow i,
   (0 < pow)%R
-  → (bin_to_R_aux it u (pow / 2) (S i) <=
-     pow / 2 ^ it + bin_to_R_aux it u pow i)%R.
+  → (partial_sum_aux it u (pow / 2) (S i) <=
+     pow / 2 ^ it + partial_sum_aux it u pow i)%R.
 Proof.
 intros * Hpow.
 Admitted. Show.
@@ -1182,7 +1193,7 @@ bbb.
 Theorem glop : ∀ z it pow i,
   (0 <= z < 1)%R
   → (0 < pow <= 1/2^(S i))%R
-  → (bin_to_R_aux it (R_to_bin z) pow i <= z)%R.
+  → (partial_sum_aux it (R_to_bin z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert z pow i Hz Hpow.
@@ -1247,7 +1258,7 @@ bbb.
 
  
 
-Print bin_to_R_aux.
+Print partial_sum_aux.
 
  simpl.
 
