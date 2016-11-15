@@ -317,11 +317,8 @@ Qed.
 
 Record int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
-Fixpoint frac_part_to_bin x n :=
-  match n with
-  | 0 => if Rlt_dec (frac_part x) (1/2) then false else true
-  | S n' => frac_part_to_bin (x * 2)%R n'
-  end.
+Definition frac_part_to_bin x n :=
+  if Rlt_dec (frac_part (x * 2 ^ n)) (1 / 2) then false else true.
 
 Definition int_frac_of_R x :=
   mkraif (Int_part x) (frac_part_to_bin (frac_part x)).
@@ -335,6 +332,13 @@ Fixpoint partial_sum_aux k (u : ℕ → bool) pow i :=
   end.
 
 Definition partial_sum u k := partial_sum_aux k u (1/2)%R 0.
+
+Theorem frac_part_to_bin_succ : ∀ x i, frac_part_to_bin x (S i) = frac_part_to_bin (x * 2) i.
+Proof.
+intros.
+unfold frac_part_to_bin; simpl.
+now rewrite Rmult_assoc.
+Qed.
 
 Theorem partial_sum_aux_le_2_pow : ∀ u k pow i,
   (0 < pow)%R
@@ -425,7 +429,8 @@ Proof.
 intros * Hz Hpow Hi.
 revert z pow Hz Hi Hpow.
 induction i; intros.
- simpl in Hi.
+ unfold frac_part_to_bin in Hi.
+ rewrite pow_O, Rmult_1_r in Hi.
  destruct (Rlt_dec (frac_part z) (1 / 2)) as [| H₁]; [ easy | ].
  clear Hi; apply Rnot_lt_le in H₁; rewrite pow_1 in Hpow.
  destruct Hpow as (Hpow₀, Hpow₁).
@@ -442,9 +447,11 @@ induction i; intros.
  replace 0%Z with (Z.of_nat 0); [ now rewrite <- Int_part_INR | easy ].
 
  apply (Rmult_le_reg_r 2); [ lra | ].
- apply IHi; [ | easy | ].
+ apply IHi.
   apply (Rmult_le_compat_r 2) in Hz; [ | lra ].
   now rewrite Rmult_0_l in Hz.
+
+  now rewrite <- frac_part_to_bin_succ.
 
   split.
    destruct Hpow as (H, _).
