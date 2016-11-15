@@ -589,7 +589,18 @@ split.
    rewrite Int_part_is_0; [ | easy ].
    rewrite Rminus_0_r in H2 |-*.
    eapply Rle_lt_trans; eassumption.
+   destruct (Rlt_dec y (1 / 2)) as [H3 | H3].
+    assert (H4 : (x < 1 / 2)%R).
+     eapply Rle_lt_trans; [ apply Hxy | apply H3 ].
 
+     assert (Hx' : (0 <= x * 2 < 1)%R) by lra.
+     assert (Hy' : (0 <= y * 2 < 1)%R) by lra.
+     assert (Hxy' : (x * 2 <= y * 2)%R) by lra.
+     simpl in H2; rewrite <- Rmult_assoc in H2.
+     pose proof IHk (x * 2)%R (y * 2)%R Hx' Hy' Hxy' H2 as H5.
+     now simpl; rewrite <- Rmult_assoc.
+
+    idtac.
 bbb.
    simpl in H2; simpl.
    rewrite <- Rmult_assoc.
