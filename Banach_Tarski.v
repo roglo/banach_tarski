@@ -482,9 +482,6 @@ Definition whole_set A := mkset (λ _ : A, True).
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
-
-(* non *)
-bbb.
 Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
   if zerop (i mod 2) then negb (g (i / 2) i) else g (i / 2) i.
 
@@ -497,20 +494,23 @@ intros * Hc Hcontr.
 enough (Hdc : Canonical (cantor_diagonal2 g)).
  specialize (Hcontr (cantor_diagonal2 g) Hdc).
  destruct Hcontr as (n, Hcontr).
- specialize (Hcontr n).
-(*
+ specialize (Hcontr (n * 2)%nat).
  unfold cantor_diagonal2 in Hcontr.
-*)
- unfold Canonical in Hdc.
- destruct (zerop (n mod 2)) as [Hz| Hnz].
-bbb.
-
+ rewrite Nat.mod_mul in Hcontr; [ | easy ].
+ simpl in Hcontr.
+ rewrite Nat.div_mul in Hcontr; [ | easy ].
  now symmetry in Hcontr; apply no_fixpoint_negb in Hcontr.
 
- unfold cantor_diagonal.
+ unfold cantor_diagonal2.
  intros i.
  specialize (Hc i i).
- destruct Hc as (j, Hc).
+ destruct Hc as (k & Hik & Hc).
+bbb.
+
+ exists j.
+ split; [ easy | ].
+ destruct (zerop (i mod 2)) as [H1| H1].
+
 bbb.
 
 Lemma crophage : ∀ u,
