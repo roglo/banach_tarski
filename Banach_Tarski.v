@@ -333,7 +333,8 @@ Fixpoint partial_sum_aux k (u : ℕ → bool) pow i :=
 
 Definition partial_sum u k := partial_sum_aux k u (1/2)%R 0.
 
-Theorem frac_part_to_bin_succ : ∀ x i, frac_part_to_bin x (S i) = frac_part_to_bin (x * 2) i.
+Theorem frac_part_to_bin_succ : ∀ x i,
+  frac_part_to_bin x (S i) = frac_part_to_bin (x * 2) i.
 Proof.
 intros.
 unfold frac_part_to_bin; simpl.
@@ -483,6 +484,38 @@ Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
 Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
   if zerop (i mod 2) then negb (g (i / 2) i) else g (i / 2) i.
+
+Definition Canonical u := ∀ i, ∃ j, i ≤ j → u i = false.
+Definition Canonical' u := ∀ i, ∃ j, i ≤ j ∧ u i = false.
+
+Lemma crophage : ∀ u,
+  Canonical u →
+  ∀ i, u i = frac_part_to_bin (proj1_sig (R_of_bin_seq u)) i.
+Proof.
+intros u Hc i.
+unfold frac_part_to_bin.
+set (s := R_of_bin_seq u).
+destruct s as (z, Hz); simpl.
+unfold is_lub in Hz.
+unfold is_upper_bound in Hz; simpl in Hz.
+destruct Hz as (Hzub, Hzlub).
+assert (∀ k, partial_sum u k <= z)%R by now intros; apply Hzub; exists k.
+clear Hzub; rename H into Hzub.
+assert (H : ∀ b, (∀ k, (partial_sum u k <= b)%R) → (z <= b)%R).
+ intros b H; apply Hzlub.
+ now intros x (k, Hk); subst x.
+
+ clear Hzlub; rename H into Hzlub.
+ destruct (Rlt_dec (frac_part (z * 2 ^ i)) (1 / 2)) as [H1| H1].
+
+bbb.
+
+unfold R_of_bin_seq in Hx.
+bbb.
+unfold R_of_bin_seq.
+simpl.
+
+bbb.
 
 Theorem bool_seq_not_countable : ∀ g : ℕ → ℕ → bool, ¬ (FinFun.Surjective g).
 Proof.
