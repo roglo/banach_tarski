@@ -503,6 +503,8 @@ enough (Hdc : Canonical (cantor_diagonal2 g)).
 
  intros i.
  unfold cantor_diagonal2.
+bbb.
+
  unfold Canonical in Hc.
 bbb.
 
