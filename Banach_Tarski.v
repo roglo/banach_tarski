@@ -565,24 +565,28 @@ bbb.
 *)
 
 Theorem titi : ∀ x y,
-  (x <= y)%R ↔
-  ∀ k, Nat.b2n (frac_part_to_bin x k) <= Nat.b2n (frac_part_to_bin y k).
+  (0 <= x < 1)%R
+  → (0 <= y < 1)%R
+  → (x <= y)%R ↔
+    ∀ k, Nat.b2n (frac_part_to_bin x k) <= Nat.b2n (frac_part_to_bin y k).
 Proof.
-intros.
+intros * Hx Hy.
 split.
  intros Hxy k.
  unfold frac_part_to_bin.
- destruct (Rlt_dec (frac_part (x * 2 ^ k)) (1 / 2)) as [Hx| Hx].
-  destruct (Rlt_dec (frac_part (y * 2 ^ k)) (1 / 2)) as [Hy| Hy]; [ easy | ].
+ destruct (Rlt_dec (frac_part (x * 2 ^ k)) (1 / 2)) as [H1| H1].
+  destruct (Rlt_dec (frac_part (y * 2 ^ k)) (1 / 2)) as [H2| H2]; [ easy | ].
   apply Nat.le_0_l.
 
-  destruct (Rlt_dec (frac_part (y * 2 ^ k)) (1 / 2)) as [Hy| Hy]; [ | easy ].
-  exfalso; apply Hx; clear Hx.
+  destruct (Rlt_dec (frac_part (y * 2 ^ k)) (1 / 2)) as [H2| H2]; [ | easy ].
+  exfalso; apply H1; clear H1.
   induction k.
    simpl in Hy; simpl.
-   rewrite Rmult_1_r in Hy |-*.
-   unfold frac_part in Hy |-*.
-   pose proof Int_part_le_compat _ _ Hxy as Hi.
+   rewrite Rmult_1_r in H2 |-*.
+   unfold frac_part in H2 |-*.
+   rewrite Int_part_is_0 in H2; [ | easy ].
+   rewrite Int_part_is_0; [ | easy ].
+   rewrite Rminus_0_r in H2 |-*.
 bbb.
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
