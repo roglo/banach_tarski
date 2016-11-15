@@ -108,13 +108,13 @@ assert (Hzp : (0 <= z)%Z).
  apply Rplus_le_compat_r, pos_INR.
 Qed.
 
+(* useless since there is theorem 'base_fp' in Coq library *)
 Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
 Proof.
 intros x.
-pose proof archimed x as Ha.
-destruct Ha as (Hgt, Hle).
-unfold frac_part, Int_part.
-rewrite minus_IZR; simpl; lra.
+pose proof base_fp x as H.
+destruct H as (H1, H2).
+now apply Rge_le in H1.
 Qed.
 
 Theorem Int_part_le_compat : ∀ x y, (x <= y)%R → (Int_part x <= Int_part y)%Z.

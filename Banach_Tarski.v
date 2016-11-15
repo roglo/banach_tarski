@@ -522,7 +522,6 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
    intros n Hz.
    subst z.
 Print frac_part_to_bin.
-bbb.
 (*
    unfold cantor_diagonal in Hd; subst d g.
 *)
@@ -554,13 +553,36 @@ bbb.
 *)
 
 (* suggestion of possible theorems, to be proved if true *)
+(*
 Theorem toto : ∀ x y,
   (x <= y)%R ↔
   ∀ k, (partial_sum (frac_part_to_bin x) k <= partial_sum (frac_part_to_bin y) k)%R.
+Proof.
+intros.
+split.
+ intros Hxy k.
+bbb.
+*)
+
 Theorem titi : ∀ x y,
   (x <= y)%R ↔
   ∀ k, Nat.b2n (frac_part_to_bin x k) <= Nat.b2n (frac_part_to_bin y k).
+Proof.
+intros.
+split.
+ intros Hxy k.
+ unfold frac_part_to_bin.
+ destruct (Rlt_dec (frac_part (x * 2 ^ k)) (1 / 2)) as [Hx| Hx].
+  destruct (Rlt_dec (frac_part (y * 2 ^ k)) (1 / 2)) as [Hy| Hy]; [ easy | ].
+  apply Nat.le_0_l.
 
+  destruct (Rlt_dec (frac_part (y * 2 ^ k)) (1 / 2)) as [Hy| Hy]; [ | easy ].
+  exfalso; apply Hx; clear Hx.
+  induction k.
+   simpl in Hy; simpl.
+   rewrite Rmult_1_r in Hy |-*.
+   unfold frac_part in Hy |-*.
+   pose proof Int_part_le_compat _ _ Hxy as Hi.
 bbb.
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
