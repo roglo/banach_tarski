@@ -580,13 +580,21 @@ split.
 
   destruct (Rlt_dec (frac_part (y * 2 ^ k)) (1 / 2)) as [H2| H2]; [ | easy ].
   exfalso; apply H1; clear H1.
-  induction k.
-   simpl in Hy; simpl.
+  revert x y Hx Hy Hxy H2.
+  induction k; intros.
+   simpl in H2; simpl.
    rewrite Rmult_1_r in H2 |-*.
    unfold frac_part in H2 |-*.
    rewrite Int_part_is_0 in H2; [ | easy ].
    rewrite Int_part_is_0; [ | easy ].
    rewrite Rminus_0_r in H2 |-*.
+   eapply Rle_lt_trans; eassumption.
+
+bbb.
+   simpl in H2; simpl.
+   rewrite <- Rmult_assoc.
+   apply IHk with (y := (y * 2)%R).
+
 bbb.
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
