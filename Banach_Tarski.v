@@ -600,7 +600,7 @@ split.
      pose proof IHk (x * 2)%R (y * 2)%R Hx' Hy' Hxy' H2 as H5.
      now simpl; rewrite <- Rmult_assoc.
 
-    idtac.
+    apply Rnot_lt_le in H3.
 bbb.
    simpl in H2; simpl.
    rewrite <- Rmult_assoc.
