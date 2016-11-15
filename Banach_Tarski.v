@@ -489,8 +489,8 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
 
  clear; simpl.
  remember (λ n, R_to_bin (f n)) as g eqn:Hg.
- remember (cantor_diagonal g) as u eqn:Hu.
- remember (R_of_bin_seq u) as rp eqn:Hrp.
+ remember (cantor_diagonal g) as d eqn:Hd.
+ remember (R_of_bin_seq d) as rp eqn:Hrp.
  symmetry in Hrp.
  destruct rp as (z, Hz).
  exists z.
@@ -503,9 +503,9 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
 (**)
  clear Hrp.
 (**)
- assert (∀ k, partial_sum u k <= z)%R by now intros; apply Hzub; exists k.
+ assert (∀ k, partial_sum d k <= z)%R by now intros; apply Hzub; exists k.
  clear Hzub; rename H into Hzub.
- assert (H : ∀ b, (∀ k, (partial_sum u k <= b)%R) → (z <= b)%R).
+ assert (H : ∀ b, (∀ k, (partial_sum d k <= b)%R) → (z <= b)%R).
   intros b H; apply Hzlub.
   now intros x (k, Hk); subst x.
 
@@ -514,6 +514,7 @@ assert (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
    Focus 2.
    intros n Hz.
    subst z.
+   unfold cantor_diagonal in Hd; subst d g.
 bbb.
 
 Theorem R_not_countable : ¬ (is_countable ℝ (whole_set _)).
