@@ -496,6 +496,11 @@ enough (g n n = negb (g n n)).
  now remember (negb (g n n)) as x; rewrite Hn; subst x.
 Qed.
 
+Print frac_part_to_bin.
+Check R_of_bin_seq.
+
+bbb.
+
 Theorem unit_interv_not_countable : ¬ (is_countable _ unit_interv).
 Proof.
 intros H.
