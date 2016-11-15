@@ -487,10 +487,30 @@ Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
 
 Definition Canonical u := ∀ i, ∃ j, i ≤ j ∧ u j = false.
 
+Lemma stication : ∀ r, Canonical (frac_part_to_bin r).
+Proof.
+intros r i.
+unfold frac_part_to_bin.
+(* but how if x = 1/2 + 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1
+   but how do we prove x = 1 indeed? *)
+Print completeness.
+Print frac_part.
+(* frac (x * 2) = x *)
+bbb.
+
 Lemma mamia : ∀ g : ℕ → ℕ → bool, (∀ n, Canonical (g n))
   → ¬ (∀ u, Canonical u → ∃ n, ∀ i, g n i = u i).
 Proof.
 intros * Hc Hcontr.
+(* cantor_diagonal does not work; example: if g n = 0 for all n; they
+   are all made of zeroes, therefore they are canonical; however the
+   cantor diagonal is made of all ones, which is not canonical; then
+   if I take cantor_diagonal as u in Hcontr, I cannot conclude *)
+(* cantor_diagonal2 does not work either, with, for all n,
+     g n = 0 1 0 1 0 1 0 1 0 1...
+   in that case, cantor_diagonal2 is made of all ones too *)
+bbb.
+
 enough (Hdc : Canonical (cantor_diagonal2 g)).
  specialize (Hcontr (cantor_diagonal2 g) Hdc).
  destruct Hcontr as (n, Hcontr).
