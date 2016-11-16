@@ -490,7 +490,7 @@ Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
 
 Definition ext_eq {A B} (f g : A → B) := ∀ a, f a = g a.
 
-Lemma canon_seq_not_countable : ¬ (is_countable _ ext_eq Canonical_seq).
+Theorem canon_seq_not_countable : ¬ (is_countable _ ext_eq Canonical_seq).
 Proof.
 unfold is_countable, ext_eq.
 intros (g, Hcontr).
@@ -528,7 +528,7 @@ enough (Hdc : cantor_canon_diagonal g ∈ Canonical_seq).
   now rewrite Hi2 in Hi.
 Qed.
 
-Lemma converted_real_is_canonical : ∀ r, frac_part_to_bin r ∈ Canonical_seq.
+Theorem converted_real_is_canonical : ∀ r, frac_part_to_bin r ∈ Canonical_seq.
 Proof.
 intros r i.
 unfold frac_part_to_bin.
