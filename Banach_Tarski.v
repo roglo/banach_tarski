@@ -493,6 +493,7 @@ Lemma canon_seq_not_countable : ∀ g : ℕ → ℕ → bool, (∀ n, Canonical 
   → ¬ (∀ u, Canonical u → ∃ n, ∀ i, g n i = u i).
 Proof.
 intros * Hc Hcontr.
+(* peut-être pas besoin de l'hypothèse Hc... *)
 enough (Hdc : Canonical (cantor_diagonal2 g)).
  specialize (Hcontr (cantor_diagonal2 g) Hdc).
  destruct Hcontr as (n, Hcontr).
@@ -530,6 +531,22 @@ enough (Hdc : Canonical (cantor_diagonal2 g)).
     rewrite Hp, Nat.mul_comm in Hi'.
     now rewrite Nat.mod_mul in Hi'.
 
+  idtac.
+bbb.
+  destruct (Bool.bool_dec (g (i / 2) (i - 1)%nat) false) as [Hgi| Hgi].
+   exists i.
+   split; [ easy | ].
+   destruct (zerop (i mod 2)) as [Hi2| Hi2]; [ now rewrite Hi2 in Hi | easy ].
+bbb.
+
+   exists i.
+   split; [ easy | ].
+   destruct (zerop (i mod 2)) as [Hi'| Hi'].
+    apply not_false_is_true in Hi.
+    now rewrite Hi.
+
+    rewrite Hp, Nat.mul_comm in Hi'.
+    now rewrite Nat.mod_mul in Hi'.
 
 bbb.
  destruct (zerop (i mod 2)) as [Hi| Hi].
