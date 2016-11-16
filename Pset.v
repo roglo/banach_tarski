@@ -11,6 +11,7 @@ Class set_model A := mksm { set_eq : set A → set A → Prop }.
 Arguments set_eq : simpl never.
 
 Definition empty_set {A} := mkset (λ _ : A, False).
+Definition whole_set A := mkset (λ _ : A, True).
 
 Notation "x '∈' E" := (setp E x) (at level 60).
 Notation "x '∉' E" := (¬ setp E x) (at level 60).

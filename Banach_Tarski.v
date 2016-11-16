@@ -262,13 +262,17 @@ Qed.
 Definition is_countable U (eqU : relation U) A :=
   ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, eqU (f n) a.
 
-(*
-Theorem paths_are_countable :
-  is_countable (list free_elem) (mkset (λ _, True)).
+Theorem paths_are_countable : is_countable _ eq (whole_set (list free_elem)).
 Proof.
 unfold is_countable.
-Check nat_of_path.
-*)
+
+Theorem glop : ∀ A B (f : A → B),
+  FinFun.Injective f
+  → ∃ g, FinFun.Surjective g ∧ (∀ a, g (f a) = a) ∧ (∀ b, f (g b) = b).
+Proof.
+intros * Hinj.
+unfold FinFun.Injective in Hinj.
+bbb.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
   (∀ el₁ el₂, el₁ ≠ el₂ → f el₁ ≠ f el₂).
@@ -479,7 +483,6 @@ rewrite Rmult_assoc.
 destruct (u k); [ now rewrite Rplus_assoc | easy ].
 Qed.
 
-Definition whole_set A := mkset (λ _ : A, True).
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 (* 0x → 10; 1x → 00 *)
