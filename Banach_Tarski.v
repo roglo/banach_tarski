@@ -337,18 +337,16 @@ destruct m.
     do 5 apply -> Nat.succ_le_mono.
     apply Nat.le_0_l.
 
-    subst p; rewrite Nat.mod_add; [ simpl | easy ].
+    subst p; rewrite Nat.mod_add; [ | easy ].
     rewrite Nat.sub_0_r, Hmd, Hmm.
-    rewrite nat_div_add_once; [ | easy ].
+    rewrite Nat.div_add; [ | easy ].
     destruct (lt_dec (S m) 5) as [Hm| Hm].
      f_equal; [ now destruct e as (t, d); destruct t, d | ].
      now destruct e as (t, d); destruct t, d.
 
-     apply Nat.nlt_ge in Hm.
-     apply Nat.succ_le_mono in Hm.
+     apply Nat.nlt_ge, Nat.succ_le_mono in Hm.
      apply Nat.div_le_mono with (c := 4) in Hm; [ | easy ].
-     rewrite Hmd in Hm.
-     now apply Nat.nle_succ_0 in Hm.
+     now rewrite Hmd in Hm; apply Nat.nle_succ_0 in Hm.
 
    destruct mm.
     remember (2 * 4)%nat as p eqn:Hp.
@@ -361,71 +359,17 @@ destruct m.
      apply Nat.le_0_l.
 
      subst p; rewrite Nat.mod_add; [ | easy ].
-bbb.
-
-     now destruct e as (t, d); destruct t, d.
-bbb.
-    exists (S (nat_of_free_elem e) + p)%nat.
-    destruct (lt_dec (S (nat_of_free_elem e + p)) 5) as [He| He].
-     exfalso; apply Nat.nle_gt in He; apply He.
-     rewrite Nat.add_comm; subst p; simpl.
-     do 5 apply -> Nat.succ_le_mono.
-     apply Nat.le_0_l.
-
-     subst p; rewrite Nat.mod_add; [ simpl | easy ].
      rewrite Nat.sub_0_r, Hmd, Hmm.
-bbb.
-     rewrite nat_div_add_once; [ | easy ].
+     rewrite Nat.div_add; [ | easy ].
      destruct (lt_dec (S m) 5) as [Hm| Hm].
       f_equal; [ now destruct e as (t, d); destruct t, d | ].
       now destruct e as (t, d); destruct t, d.
 
-      apply Nat.nlt_ge in Hm.
-      apply Nat.succ_le_mono in Hm.
+      apply Nat.nlt_ge, Nat.succ_le_mono in Hm.
       apply Nat.div_le_mono with (c := 4) in Hm; [ | easy ].
-      rewrite Hmd in Hm.
-      now apply Nat.nle_succ_0 in Hm.
+      now rewrite Hmd in Hm; apply Nat.nle_succ_0 in Hm.
 
-bbb.
-
-   destruct e as (t, d); destruct t, d; simpl.
-   now destruct e as (t, d); destruct t, d.
-bbb.
-
-  idtac.
-
-
-bbb.
- simpl in IHel; rewrite Nat.sub_0_r in IHel; subst el.
- destruct (lt_dec (S m) 5) as [Hm| Hm].
-  remember (m mod 4) as mm eqn:Hmm; symmetry in Hmm.
-  destruct mm; simpl.
-   remember (1 * 4)%nat as p eqn:Hp.
-   exists (S (nat_of_free_elem e) + p)%nat.
-   simpl; rewrite Nat.sub_0_r.
-   destruct (lt_dec (S (nat_of_free_elem e + p)) 5) as [He| He].
-    exfalso; apply Nat.nle_gt in He; apply He.
-    rewrite Nat.add_comm; subst p; simpl.
-    do 5 apply -> Nat.succ_le_mono.
-    apply Nat.le_0_l.
-
-    subst p; rewrite Nat.mod_add; [ | easy ].
-    now destruct e as (t, d); destruct t, d.
-
-   destruct mm; simpl.
-    remember (2 * 4)%nat as p eqn:Hp.
-    exists (S (nat_of_free_elem e) + p)%nat.
-    simpl; rewrite Nat.sub_0_r.
-    destruct (lt_dec (S (nat_of_free_elem e + p)) 5) as [He| He].
-     exfalso; apply Nat.nle_gt in He; apply He.
-     rewrite Nat.add_comm; subst p; simpl.
-     do 5 apply -> Nat.succ_le_mono.
-     apply Nat.le_0_l.
-
-     subst p; rewrite Nat.mod_add; [ | easy ].
-     now destruct e as (t, d); destruct t, d.
-
-    destruct mm; simpl.
+    destruct mm.
      remember (3 * 4)%nat as p eqn:Hp.
      exists (S (nat_of_free_elem e) + p)%nat.
      simpl; rewrite Nat.sub_0_r.
@@ -436,9 +380,17 @@ bbb.
       apply Nat.le_0_l.
 
       subst p; rewrite Nat.mod_add; [ | easy ].
-      now destruct e as (t, d); destruct t, d.
+      rewrite Nat.sub_0_r, Hmd, Hmm.
+      rewrite Nat.div_add; [ | easy ].
+      destruct (lt_dec (S m) 5) as [Hm| Hm].
+       f_equal; [ now destruct e as (t, d); destruct t, d | ].
+       now destruct e as (t, d); destruct t, d.
 
-     destruct mm; simpl.
+       apply Nat.nlt_ge, Nat.succ_le_mono in Hm.
+       apply Nat.div_le_mono with (c := 4) in Hm; [ | easy ].
+       now rewrite Hmd in Hm; apply Nat.nle_succ_0 in Hm.
+
+     destruct mm.
       remember (4 * 4)%nat as p eqn:Hp.
       exists (S (nat_of_free_elem e) + p)%nat.
       simpl; rewrite Nat.sub_0_r.
@@ -449,14 +401,16 @@ bbb.
        apply Nat.le_0_l.
 
        subst p; rewrite Nat.mod_add; [ | easy ].
-       now destruct e as (t, d); destruct t, d.
+       rewrite Nat.sub_0_r, Hmd, Hmm.
+       rewrite Nat.div_add; [ | easy ].
+       destruct (lt_dec (S m) 5) as [Hm| Hm].
+        f_equal; [ now destruct e as (t, d); destruct t, d | ].
+        now destruct e as (t, d); destruct t, d.
 
-      exfalso.
-      assert (H4 : (4 ≠ 0)%nat) by easy.
-      pose proof Nat.mod_upper_bound m 4 H4 as H.
-      rewrite Hmm in H.
-      now do 4 apply Nat.succ_lt_mono in H.
-bbb.
+        apply Nat.nlt_ge, Nat.succ_le_mono in Hm.
+        apply Nat.div_le_mono with (c := 4) in Hm; [ | easy ].
+        now rewrite Hmd in Hm; apply Nat.nle_succ_0 in Hm.
+Show. bbb.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
   (∀ el₁ el₂, el₁ ≠ el₂ → f el₁ ≠ f el₂).
