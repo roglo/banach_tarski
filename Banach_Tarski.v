@@ -164,6 +164,54 @@ Fixpoint nat_of_path el :=
   | [] => 1%nat
   end.
 
+Definition free_elem_of_nat n :=
+  match n with
+  | 0 => ạ
+  | 1 => ạ⁻¹
+  | 2 => ḅ
+  | _ => ḅ⁻¹
+  end.
+
+Fixpoint path_of_nat_aux it (n : nat) :=
+  match it with
+  | O => ạ :: []
+  | S it' =>
+      if lt_dec n 4 then free_elem_of_nat n :: []
+      else
+        free_elem_of_nat (n mod 4) ::
+        path_of_nat_aux it' ((n - 4) / 4)
+  end.
+
+Definition path_of_nat n :=
+  match n with
+  | O => []
+  | S n' => path_of_nat_aux n' n'
+  end.
+
+Compute (path_of_nat 0).
+Compute (path_of_nat 1).
+Compute (path_of_nat 2).
+Compute (path_of_nat 3).
+Compute (path_of_nat 4).
+Compute (path_of_nat 5).
+Compute (path_of_nat 6).
+Compute (path_of_nat 7).
+Compute (path_of_nat 8).
+Compute (path_of_nat 9).
+Compute (path_of_nat 10).
+Compute (path_of_nat 11).
+Compute (path_of_nat 12).
+Compute (path_of_nat 13).
+Compute (path_of_nat 14).
+Compute (path_of_nat 15).
+Compute (path_of_nat 16).
+Compute (path_of_nat 17).
+Compute (path_of_nat 18).
+Compute (path_of_nat 19).
+Compute (path_of_nat 20).
+Compute (path_of_nat 21).
+Compute (path_of_nat 22).
+
 Theorem nat_of_path_ne_0 : ∀ el, nat_of_path el ≠ 0%nat.
 Proof.
 intros * H.
@@ -264,14 +312,10 @@ Definition is_countable U (eqU : relation U) A :=
 
 Theorem paths_are_countable : is_countable _ eq (whole_set (list free_elem)).
 Proof.
-unfold is_countable.
-
-Theorem glop : ∀ A B (f : A → B),
-  FinFun.Injective f
-  → ∃ g, FinFun.Surjective g ∧ (∀ a, g (f a) = a) ∧ (∀ b, f (g b) = b).
-Proof.
-intros * Hinj.
-unfold FinFun.Injective in Hinj.
+unfold is_countable; simpl.
+exists path_of_nat.
+intros el _.
+unfold path_of_nat.
 bbb.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
