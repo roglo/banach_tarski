@@ -487,13 +487,13 @@ Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
 Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
   if zerop (i mod 2) then negb (g (i / 2) i) else false.
 
-Definition Canonical u := ∀ i, ∃ j, i ≤ j ∧ u j = false.
+Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
 
 Lemma canon_seq_not_countable : ∀ g : ℕ → ℕ → bool,
-  ¬ (∀ u, Canonical u → ∃ n, ∀ i, g n i = u i).
+  ¬ (∀ u, u ∈ Canonical_seq → ∃ n, ∀ i, g n i = u i).
 Proof.
 intros * Hcontr.
-enough (Hdc : Canonical (cantor_diagonal2 g)).
+enough (Hdc : cantor_diagonal2 g ∈ Canonical_seq).
  specialize (Hcontr (cantor_diagonal2 g) Hdc).
  destruct Hcontr as (n, Hcontr).
  specialize (Hcontr (n * 2)%nat).
@@ -527,7 +527,7 @@ enough (Hdc : Canonical (cantor_diagonal2 g)).
   now rewrite Hi2 in Hi.
 Qed.
 
-Lemma converted_real_is_canonical : ∀ r, Canonical (frac_part_to_bin r).
+Lemma converted_real_is_canonical : ∀ r, frac_part_to_bin r ∈ Canonical_seq.
 Proof.
 intros r i.
 unfold frac_part_to_bin.
@@ -539,7 +539,7 @@ Print frac_part.
 bbb.
 
 Lemma crophage : ∀ u,
-  Canonical u →
+  u ∈ Canonical_seq →
   ∀ i, u i = frac_part_to_bin (proj1_sig (R_of_bin_seq u)) i.
 Proof.
 intros u Hc i.
