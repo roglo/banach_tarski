@@ -487,7 +487,7 @@ Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
 
 Definition Canonical u := ∀ i, ∃ j, i ≤ j ∧ u j = false.
 
-Lemma stication : ∀ r, Canonical (frac_part_to_bin r).
+Lemma converted_real_is_canonical : ∀ r, Canonical (frac_part_to_bin r).
 Proof.
 intros r i.
 unfold frac_part_to_bin.
@@ -498,7 +498,7 @@ Print frac_part.
 (* frac (x * 2) = x *)
 bbb.
 
-Lemma mamia : ∀ g : ℕ → ℕ → bool, (∀ n, Canonical (g n))
+Lemma canon_seq_not_countable : ∀ g : ℕ → ℕ → bool, (∀ n, Canonical (g n))
   → ¬ (∀ u, Canonical u → ∃ n, ∀ i, g n i = u i).
 Proof.
 intros * Hc Hcontr.
