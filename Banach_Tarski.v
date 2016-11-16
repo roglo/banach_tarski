@@ -318,11 +318,11 @@ Qed.
 
 Record int_frac := mkraif { Rint : ℤ; Rfrac : ℕ → bool }.
 
-Definition frac_part_to_bin x n :=
+Definition bin_of_frac_part x n :=
   if Rlt_dec (frac_part (x * 2 ^ n)) (1 / 2) then false else true.
 
 Definition int_frac_of_R x :=
-  mkraif (Int_part x) (frac_part_to_bin (frac_part x)).
+  mkraif (Int_part x) (bin_of_frac_part (frac_part x)).
 
 Fixpoint partial_sum_aux k (u : ℕ → bool) pow i :=
   match k with
@@ -334,11 +334,11 @@ Fixpoint partial_sum_aux k (u : ℕ → bool) pow i :=
 
 Definition partial_sum u k := partial_sum_aux k u (1/2)%R 0.
 
-Theorem frac_part_to_bin_succ : ∀ x i,
-  frac_part_to_bin x (S i) = frac_part_to_bin (x * 2) i.
+Theorem bin_of_frac_part_succ : ∀ x i,
+  bin_of_frac_part x (S i) = bin_of_frac_part (x * 2) i.
 Proof.
 intros.
-unfold frac_part_to_bin; simpl.
+unfold bin_of_frac_part; simpl.
 now rewrite Rmult_assoc.
 Qed.
 
@@ -400,14 +400,14 @@ Definition trunc_bool_seq u n i := if lt_dec i n then u i else false.
 
 Theorem trunc_bool_seq_eq : ∀ z pow i m n,
   i + n <= m
-  → partial_sum_aux n (frac_part_to_bin z) pow i =
-    partial_sum_aux n (trunc_bool_seq (frac_part_to_bin z) m) pow i.
+  → partial_sum_aux n (bin_of_frac_part z) pow i =
+    partial_sum_aux n (trunc_bool_seq (bin_of_frac_part z) m) pow i.
 Proof.
 intros * Hm.
 revert pow i m Hm.
 induction n; intros; [ easy | simpl ].
-remember (frac_part_to_bin z i) as b eqn:Hb; symmetry in Hb.
-remember (trunc_bool_seq (frac_part_to_bin z) m i) as b' eqn:Hb'.
+remember (bin_of_frac_part z i) as b eqn:Hb; symmetry in Hb.
+remember (trunc_bool_seq (bin_of_frac_part z) m i) as b' eqn:Hb'.
 symmetry in Hb'.
 assert (b = b').
  subst b b'.
@@ -422,16 +422,16 @@ assert (b = b').
  destruct b; [ now apply Rplus_eq_compat_l, IHn | now apply IHn ].
 Qed.
 
-Theorem frac_part_to_bin_true_pow_le : ∀ z pow i,
+Theorem bin_of_frac_part_true_pow_le : ∀ z pow i,
   (0 <= z)%R
   → (0 <= pow <= (1 / 2) ^ S i)%R
-  → frac_part_to_bin z i = true
+  → bin_of_frac_part z i = true
   → (pow <= z)%R.
 Proof.
 intros * Hz Hpow Hi.
 revert z pow Hz Hi Hpow.
 induction i; intros.
- unfold frac_part_to_bin in Hi.
+ unfold bin_of_frac_part in Hi.
  rewrite pow_O, Rmult_1_r in Hi.
  destruct (Rlt_dec (frac_part z) (1 / 2)) as [| H₁]; [ easy | ].
  clear Hi; apply Rnot_lt_le in H₁; rewrite pow_1 in Hpow.
@@ -453,7 +453,7 @@ induction i; intros.
   apply (Rmult_le_compat_r 2) in Hz; [ | lra ].
   now rewrite Rmult_0_l in Hz.
 
-  now rewrite <- frac_part_to_bin_succ.
+  now rewrite <- bin_of_frac_part_succ.
 
   split.
    destruct Hpow as (H, _).
@@ -528,10 +528,12 @@ enough (Hdc : cantor_canon_diagonal g ∈ Canonical_seq).
   now rewrite Hi2 in Hi.
 Qed.
 
-Theorem converted_real_is_canonical : ∀ r, frac_part_to_bin r ∈ Canonical_seq.
+Theorem converted_real_is_canonical : ∀ r, bin_of_frac_part r ∈ Canonical_seq.
 Proof.
 intros r i.
-unfold frac_part_to_bin.
+unfold bin_of_frac_part.
+bbb.
+
 (* but how if x = 1/2 + 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1
    but how do we prove x = 1 indeed? *)
 Print completeness.
@@ -541,10 +543,10 @@ bbb.
 
 Lemma crophage : ∀ u,
   u ∈ Canonical_seq →
-  ∀ i, u i = frac_part_to_bin (proj1_sig (R_of_bin_seq u)) i.
+  ∀ i, u i = bin_of_frac_part (proj1_sig (R_of_bin_seq u)) i.
 Proof.
 intros u Hc i.
-unfold frac_part_to_bin.
+unfold bin_of_frac_part.
 set (s := R_of_bin_seq u).
 destruct s as (z, Hz); simpl.
 unfold is_lub in Hz.
@@ -580,7 +582,7 @@ enough (g n n = negb (g n n)).
  now remember (negb (g n n)) as x; rewrite Hn; subst x.
 Qed.
 
-Print frac_part_to_bin.
+Print bin_of_frac_part.
 Check R_of_bin_seq.
 
 bbb.
@@ -597,7 +599,7 @@ enough (Hcontr : ∃ z, z ∈ unit_interv ∧ ∀ n, f n ≠ z).
  eapply Hnn; eassumption.
 
  clear; simpl.
- set (g n := frac_part_to_bin (f n)).
+ set (g n := bin_of_frac_part (f n)).
  set (d := cantor_diagonal g).
  set (rp := R_of_bin_seq d).
  destruct rp as (z, Hz).
@@ -633,7 +635,7 @@ bbb.
 
 bbb.
    subst z.
-Print frac_part_to_bin.
+Print bin_of_frac_part.
 (*
    unfold cantor_diagonal in Hd; subst d g.
 *)
@@ -642,7 +644,7 @@ pose proof Hzub n as H; simpl in H.
 (*
 Theorem glip : ∀ k u x,
   (partial_sum u k <= x)%R
-  → ∀ i, i < k → Nat.b2n (u i) <= Nat.b2n (frac_part_to_bin x i).
+  → ∀ i, i < k → Nat.b2n (u i) <= Nat.b2n (bin_of_frac_part x i).
 Proof.
 intros * Hp i Hik.
 unfold partial_sum in Hp.
@@ -656,7 +658,7 @@ Print partial_sum_aux.
 bbb.
 
 (* end of glip; return to theorem *)
-assert (H1 : ∀ i, Nat.b2n (d i) <= Nat.b2n (frac_part_to_bin (f n) i)).
+assert (H1 : ∀ i, Nat.b2n (d i) <= Nat.b2n (bin_of_frac_part (f n) i)).
 now eapply glip.
 rewrite Hd in H1; simpl in H1.
 unfold cantor_diagonal in H1; simpl in H1.
@@ -668,7 +670,7 @@ bbb.
 (*
 Theorem toto : ∀ x y,
   (x <= y)%R ↔
-  ∀ k, (partial_sum (frac_part_to_bin x) k <= partial_sum (frac_part_to_bin y) k)%R.
+  ∀ k, (partial_sum (bin_of_frac_part x) k <= partial_sum (bin_of_frac_part y) k)%R.
 Proof.
 intros.
 split.
@@ -680,12 +682,12 @@ Theorem titi : ∀ x y,
   (0 <= x < 1)%R
   → (0 <= y < 1)%R
   → (x <= y)%R ↔
-    ∀ k, Nat.b2n (frac_part_to_bin x k) <= Nat.b2n (frac_part_to_bin y k).
+    ∀ k, Nat.b2n (bin_of_frac_part x k) <= Nat.b2n (bin_of_frac_part y k).
 Proof.
 intros * Hx Hy.
 split.
  intros Hxy k.
- unfold frac_part_to_bin.
+ unfold bin_of_frac_part.
  destruct (Rlt_dec (frac_part (x * 2 ^ k)) (1 / 2)) as [H1| H1].
   destruct (Rlt_dec (frac_part (y * 2 ^ k)) (1 / 2)) as [H2| H2]; [ easy | ].
   apply Nat.le_0_l.
@@ -796,34 +798,34 @@ split.
   destruct Hz'₁ as (it, Hz'₁).
   subst z₁.
 
-Theorem toto : ∀ z it, (0 <= z)%R → (partial_sum (frac_part_to_bin z) it <= z)%R.
+Theorem toto : ∀ z it, (0 <= z)%R → (partial_sum (bin_of_frac_part z) it <= z)%R.
 Proof.
 intros * Hz.
 unfold partial_sum.
 (*
-remember (frac_part_to_bin z) as u eqn:Hu.
+remember (bin_of_frac_part z) as u eqn:Hu.
 destruct it; [ easy | simpl; subst u ].
-remember (frac_part_to_bin z 0) as b eqn:Hb; symmetry in Hb.
+remember (bin_of_frac_part z 0) as b eqn:Hb; symmetry in Hb.
 destruct b.
-(* I need a property about frac_part_to_bin... *)
-Print frac_part_to_bin.
+(* I need a property about bin_of_frac_part... *)
+Print bin_of_frac_part.
 *)
 
 Theorem titi : ∀ z i k,
   (0 <= z)%R
   → (1 - (1 / 2) ^ k +
-     partial_sum_aux k (frac_part_to_bin z) ((1 / 2) ^ S i) i <= z)%R.
+     partial_sum_aux k (bin_of_frac_part z) ((1 / 2) ^ S i) i <= z)%R.
 Proof.
 intros * Hz.
 revert i.
 induction k; intros; [ simpl; lra | simpl ].
-remember (frac_part_to_bin z i) as b eqn:Hb; symmetry in Hb.
+remember (bin_of_frac_part z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
 
 bbb.
 Theorem titi : ∀ z i j k,
-  (partial_sum_aux i (frac_part_to_bin z) (1 / 2) j +
-   partial_sum_aux k (frac_part_to_bin z) ((1 / 2) ^ S (i + j)) (i + j) <= z)%R.
+  (partial_sum_aux i (bin_of_frac_part z) (1 / 2) j +
+   partial_sum_aux k (bin_of_frac_part z) ((1 / 2) ^ S (i + j)) (i + j) <= z)%R.
 Proof.
 intros.
 revert j k.
@@ -851,8 +853,8 @@ Check partial_sum_aux_add.
 (*
 Theorem titi : ∀ z i k pow,
   (0 <= z)%R
-  → frac_part_to_bin z (k + i) = true
-  → (partial_sum_aux k (frac_part_to_bin z) (pow ^ S i) i + pow ^ S i / 2 ^ k <= z)%R.
+  → bin_of_frac_part z (k + i) = true
+  → (partial_sum_aux k (bin_of_frac_part z) (pow ^ S i) i + pow ^ S i / 2 ^ k <= z)%R.
 Proof.
 intros * Hz.
 revert k pow.
@@ -867,7 +869,7 @@ destruct (Rlt_dec (frac_part z) (1 / 2)) as [H₁| H₁].
 
 Theorem titi : ∀ z k i,
   (0 <= z)%R
-  → (partial_sum_aux k (frac_part_to_bin z) ((1 / 2) ^ S i) i <= z)%R.
+  → (partial_sum_aux k (bin_of_frac_part z) ((1 / 2) ^ S i) i <= z)%R.
 Proof.
 intros * Hz.
 remember (1 / 2)%R as pow eqn:Hpow.
@@ -877,13 +879,13 @@ rewrite <- Nat.add_1_r.
 rewrite partial_sum_aux_add.
 remember (S i) as si; simpl; subst si.
 rewrite Rplus_0_r.
-remember (frac_part_to_bin z (k + i)) as b eqn:Hb; symmetry in Hb.
+remember (bin_of_frac_part z (k + i)) as b eqn:Hb; symmetry in Hb.
 destruct b; [ | now rewrite Rplus_0_r; apply IHk ].
 Print partial_sum.
 
 bbb.
 
-remember (frac_part_to_bin z i) as b eqn:Hb; symmetry in Hb.
+remember (bin_of_frac_part z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
  Focus 2.
  pose proof IHk z (S i) Hz as H.
@@ -920,7 +922,7 @@ bbb.
 
  assert (Hyz : ∀ ε, (0 < ε)%R → ∃ η, (0 < η < ε ∧ z - η <= y)%R).
   intros * Hε.
-  remember (trunc_bool_seq (frac_part_to_bin z)) as t eqn:Ht.
+  remember (trunc_bool_seq (bin_of_frac_part z)) as t eqn:Ht.
   assert (Hn : ∃ n, (0 < z - partial_sum (t n) n < ε)%R).
    assert (∀ n, (0 <= z - partial_sum (t n) n < (1 / 2) ^ n)%R).
     intros n.
@@ -932,12 +934,12 @@ rewrite <- trunc_bool_seq_eq.
 Theorem toto : ∀ z n pow i,
   (0 <= z)%R
   → (0 <= pow <= (1 / 2) ^ S i)%R
-  → (partial_sum_aux n (frac_part_to_bin z) pow i <= z)%R.
+  → (partial_sum_aux n (bin_of_frac_part z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert pow i Hpow.
 induction n; intros; simpl; [ easy | ].
-remember (frac_part_to_bin z i) as b eqn:Hb; symmetry in Hb.
+remember (bin_of_frac_part z i) as b eqn:Hb; symmetry in Hb.
 destruct b; [ | apply IHn; split; simpl in Hpow; simpl; lra ].
 (*
 erewrite trunc_bool_seq_eq; [ | reflexivity ].
@@ -947,10 +949,10 @@ clear IHn.
 revert z pow i Hz Hpow Hb.
 induction n; intros; simpl.
  simpl; rewrite Rplus_0_r.
- eapply frac_part_to_bin_true_pow_le; eassumption.
+ eapply bin_of_frac_part_true_pow_le; eassumption.
 
  destruct (lt_dec (S i) (S (i + S n))) as [H₁| H₁].
-  remember (frac_part_to_bin (z * 2) i) as b' eqn:Hb'; symmetry in Hb'.
+  remember (bin_of_frac_part (z * 2) i) as b' eqn:Hb'; symmetry in Hb'.
   destruct b'.
 
    pose proof IHn (z - pow).
@@ -1041,9 +1043,9 @@ bbb.
 bbb.
 
   apply Hyub; rewrite Hs; simpl.
-  remember (frac_part_to_bin z) as u eqn:Hu.
+  remember (bin_of_frac_part z) as u eqn:Hu.
    (* non : il faut que ça tombe juste, exactement *)
-Print frac_part_to_bin.
+Print bin_of_frac_part.
 bbb.
 
  assert (Hyz : (y <= z)%R).
@@ -1056,7 +1058,7 @@ bbb.
 
 Theorem glop : ∀ z it,
   (0 <= z < 1)%R
-  → (partial_sum (frac_part_to_bin z) it <= z)%R.
+  → (partial_sum (bin_of_frac_part z) it <= z)%R.
 Proof.
 intros * Hz.
 unfold partial_sum.
@@ -1070,12 +1072,12 @@ bbb.
 Theorem glip : ∀ z it pow i,
   (0 <= z < 1/2^i)%R
   → (pow <= 1/2^(S i))%R
-  → (partial_sum_aux it (frac_part_to_bin z) pow i <= z)%R.
+  → (partial_sum_aux it (bin_of_frac_part z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert z i pow Hz Hpow.
 induction it; intros; [ easy | simpl ].
-remember (frac_part_to_bin z i) as b eqn:Hb; symmetry in Hb.
+remember (bin_of_frac_part z i) as b eqn:Hb; symmetry in Hb.
 destruct b as [H₁| H₁].
  destruct i.
   rewrite pow_O, Rdiv_1_r in Hz; rewrite pow_1 in Hpow; simpl in Hb.
@@ -1147,7 +1149,7 @@ bbb.
 intros * Hz Hpow.
 revert z pow i Hz Hpow.
 induction it; intros; [ easy | simpl ].
-remember (frac_part_to_bin z i) as b eqn:Hb; symmetry in Hb.
+remember (bin_of_frac_part z i) as b eqn:Hb; symmetry in Hb.
 destruct b.
  simpl in Hb.
  pose proof IHit (z - pow)%R pow.
@@ -1293,7 +1295,7 @@ clear IHit.
   simpl.
 Focus 2.
 simpl.
-remember (frac_part_to_bin (z * 2) i) as b' eqn:Hb'; symmetry in Hb'.
+remember (bin_of_frac_part (z * 2) i) as b' eqn:Hb'; symmetry in Hb'.
 destruct b'.
  assert (pow / 2 <= 1/2)%R by lra.
  pose proof IHit z (pow/2)%R (S i) Hz H Hb'.
@@ -1319,7 +1321,7 @@ pose proof archimed x as H; lra.
 bbb.
 
 (**)
-Print frac_part_to_bin.
+Print bin_of_frac_part.
 assert (0 <= z < 1)%R
 clear Hz Hs.
 
@@ -1397,12 +1399,12 @@ bbb.
 Theorem glop : ∀ z it pow i,
   (0 <= z < 1)%R
   → (0 < pow <= 1/2^(S i))%R
-  → (partial_sum_aux it (frac_part_to_bin z) pow i <= z)%R.
+  → (partial_sum_aux it (bin_of_frac_part z) pow i <= z)%R.
 Proof.
 intros * Hz Hpow.
 revert z pow i Hz Hpow.
 induction it; intros; [ easy | simpl ].
-remember (frac_part_to_bin z i) as b eqn:Hb.
+remember (bin_of_frac_part z i) as b eqn:Hb.
 symmetry in Hb.
 destruct b.
  destruct it.
@@ -1425,10 +1427,10 @@ destruct b.
 
 bbb.
 
-Theorem toto : ∀ z, frac_part_to_bin z 0 = false → (z <= 1/2)%R.
+Theorem toto : ∀ z, bin_of_frac_part z 0 = false → (z <= 1/2)%R.
 Admitted. Show.
 
-Theorem titi : ∀ z, frac_part_to_bin z 0 = true → (1/2 <= z)%R.
+Theorem titi : ∀ z, bin_of_frac_part z 0 = true → (1/2 <= z)%R.
 Admitted. Show.
 
 induction i.
