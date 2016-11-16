@@ -489,6 +489,14 @@ Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
 
 Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
 
+(*
+Lemma canon_seq_not_countable : ¬ (is_countable _ Canonical_seq).
+Proof.
+unfold is_countable.
+intros g.
+...
+*)
+
 Lemma canon_seq_not_countable : ∀ g : ℕ → ℕ → bool,
   ¬ (∀ u, u ∈ Canonical_seq → ∃ n, ∀ i, g n i = u i).
 Proof.
