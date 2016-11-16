@@ -284,17 +284,17 @@ intros * HnP.
 now destruct (EM P).
 Qed.
 
-Add Parametric Morphism {U} : (@is_countable U eq)
- with signature (@set_eq _ set_equiv) ==> iff
+Add Parametric Morphism {U} : (@is_countable U)
+ with signature eq ==> (@set_eq _ set_equiv) ==> iff
  as is_countable_morph.
 Proof.
-intros E F HEF.
+intros eqU E F HEF.
 split; intros H; destruct H as (f, H); exists f; intros x Hx; now apply H, HEF.
 Qed.
 
-Theorem uncountable_sub_countable_not_empty : ∀ {U} (A B : set U),
-  not (is_countable _ eq A)
-  → is_countable _ eq B
+Theorem uncountable_sub_countable_not_empty : ∀ {U} (A B : set U) eqU,
+  not (is_countable _ eqU A)
+  → is_countable _ eqU B
   → B ⊂ A
   → ∃ x, x ∈ A ∖ B.
 Proof.
@@ -304,7 +304,7 @@ intros HnE.
 assert (HnA : ∀ x, x ∉ A ∖ B) by (now intros x Hx; apply HnE; exists x).
 clear HnE.
 set (s := @set_equiv U).
-assert (HAB : (A = B)%S); [ | now rewrite HAB in HA ].
+enough (HAB : (A = B)%S) by (now rewrite HAB in HA).
 intros x.
 split; [ intros Ha | now intros Hb; apply HBA ].
 pose proof HnA x as H; simpl in H.
