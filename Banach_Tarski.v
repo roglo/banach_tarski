@@ -321,7 +321,6 @@ destruct m.
  exists (S (nat_of_free_elem e)).
  now destruct e as (t, d); destruct t, d.
 
-(**)
  subst el.
  remember (m / 4) as md eqn:Hmd; symmetry in Hmd.
  revert e m Hmd.
@@ -410,6 +409,13 @@ destruct m.
         apply Nat.nlt_ge, Nat.succ_le_mono in Hm.
         apply Nat.div_le_mono with (c := 4) in Hm; [ | easy ].
         now rewrite Hmd in Hm; apply Nat.nle_succ_0 in Hm.
+
+      assert (H4 : (4 ≠ 0)%nat) by easy.
+      pose proof Nat.mod_upper_bound m 4 H4 as H.
+      rewrite Hmm in H.
+      now do 4 apply Nat.succ_lt_mono in H.
+
+  idtac.
 Show. bbb.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
