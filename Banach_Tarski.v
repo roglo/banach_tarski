@@ -174,19 +174,13 @@ Definition free_elem_of_nat n :=
 
 Fixpoint path_of_nat_aux it (n : nat) :=
   match it with
-  | O => ạ :: []
+  | O => []
   | S it' =>
-      if lt_dec n 4 then free_elem_of_nat n :: []
-      else
-        free_elem_of_nat (n mod 4) ::
-        path_of_nat_aux it' ((n - 4) / 4)
+      free_elem_of_nat ((n - 1) mod 4) ::
+      if lt_dec n 5 then [] else path_of_nat_aux it' ((n - 1) / 4)
   end.
 
-Definition path_of_nat n :=
-  match n with
-  | O => []
-  | S n' => path_of_nat_aux n' n'
-  end.
+Definition path_of_nat n := path_of_nat_aux n n.
 
 Compute (path_of_nat 0).
 Compute (path_of_nat 1).
@@ -211,6 +205,10 @@ Compute (path_of_nat 19).
 Compute (path_of_nat 20).
 Compute (path_of_nat 21).
 Compute (path_of_nat 22).
+Compute (path_of_nat 23).
+Compute (path_of_nat 24).
+Compute (path_of_nat 25).
+Compute (path_of_nat 26).
 
 Theorem nat_of_path_ne_0 : ∀ el, nat_of_path el ≠ 0%nat.
 Proof.
@@ -316,6 +314,11 @@ unfold is_countable; simpl.
 exists path_of_nat.
 intros el _.
 unfold path_of_nat.
+induction el as [| e el]; [ now exists O | ].
+destruct IHel as (m, IHel).
+bbb.
+
+exists (S m * 4 + nat_of_free_elem e)%nat.
 bbb.
 
 Theorem paths_are_countable : ∃ (f : list free_elem → nat),
