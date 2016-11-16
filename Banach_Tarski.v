@@ -482,25 +482,94 @@ Definition whole_set A := mkset (λ _ : A, True).
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
+
+(* 0x → 10; 1x → 01 *)
 Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
-  if zerop (i mod 2) then negb (g (i / 2) i) else g (i / 2) i.
+  if zerop (i mod 2) then negb (g (i / 2) i) else g (i / 2) (i - 1)%nat.
 
 Definition Canonical u := ∀ i, ∃ j, i ≤ j ∧ u j = false.
-
-Lemma converted_real_is_canonical : ∀ r, Canonical (frac_part_to_bin r).
-Proof.
-intros r i.
-unfold frac_part_to_bin.
-(* but how if x = 1/2 + 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1
-   but how do we prove x = 1 indeed? *)
-Print completeness.
-Print frac_part.
-(* frac (x * 2) = x *)
-bbb.
 
 Lemma canon_seq_not_countable : ∀ g : ℕ → ℕ → bool, (∀ n, Canonical (g n))
   → ¬ (∀ u, Canonical u → ∃ n, ∀ i, g n i = u i).
 Proof.
+intros * Hc Hcontr.
+enough (Hdc : Canonical (cantor_diagonal2 g)).
+ specialize (Hcontr (cantor_diagonal2 g) Hdc).
+ destruct Hcontr as (n, Hcontr).
+ specialize (Hcontr (n * 2)%nat).
+ unfold cantor_diagonal2 in Hcontr.
+ rewrite Nat.mod_mul in Hcontr; [ | easy ].
+ simpl in Hcontr.
+ rewrite Nat.div_mul in Hcontr; [ | easy ].
+ now symmetry in Hcontr; apply no_fixpoint_negb in Hcontr.
+
+ intros i.
+ unfold cantor_diagonal2.
+ destruct (zerop (i mod 2)) as [Hi| Hi].
+  apply Nat.mod_divides in Hi; [ | easy ].
+  destruct Hi as (p, Hp).
+  destruct (Bool.bool_dec (g (i / 2) i) false) as [Hi| Hi].
+   exists (S i).
+   split; [ now apply Nat.le_le_succ_r | ].
+   rewrite Nat.sub_succ, Nat.sub_0_r.
+   destruct (zerop (S i mod 2)) as [Hsi| Hsi].
+    rewrite Hp, <- Nat.add_1_l, Nat.mul_comm in Hsi.
+    now rewrite Nat.mod_add in Hsi.
+
+    rewrite Hp, <- Nat.add_1_l, Nat.mul_comm.
+    rewrite Nat.div_add; [ | easy ].
+    rewrite Hp, Nat.mul_comm in Hi.
+    now rewrite Nat.div_mul in Hi.
+
+   exists i.
+   split; [ easy | ].
+   destruct (zerop (i mod 2)) as [Hi'| Hi'].
+    apply not_false_is_true in Hi.
+    now rewrite Hi.
+
+    rewrite Hp, Nat.mul_comm in Hi'.
+    now rewrite Nat.mod_mul in Hi'.
+
+
+bbb.
+ destruct (zerop (i mod 2)) as [Hi| Hi].
+  apply Nat.mod_divides in Hi; [ | easy ].
+  destruct Hi as (p, Hp).
+  exists (i + 1)%nat.
+
+bbb.
+
+ unfold Canonical in Hc.
+ specialize (Hc (i / 2) i).
+ destruct Hc as (k & Hik & Hk).
+bbb.
+ destruct (zerop (i mod 2)) as [Hi| Hi].
+  apply Nat.mod_divides in Hi; [ | easy ].
+  destruct Hi as (p, Hp).
+
+
+
+ pose proof (Hc (i / 2) i) as Hi.
+ destruct Hi as (k & Hik & Hi).
+ destruct (zerop (k mod 2)) as [Hk| Hk].
+  exists (S k).
+  split; [ now apply Nat.le_le_succ_r | ].
+  apply Nat.mod_divides in Hk; [ | easy ].
+  destruct Hk as (p, Hp).
+  destruct (zerop (S k mod 2)) as [Hk'| Hk'].
+   exfalso.
+   rewrite Hp, <- Nat.add_1_l, Nat.mul_comm in Hk'.
+   now rewrite Nat.mod_add in Hk'.
+bbb.
+
+
+  split;
+
+ exists k.
+ split; [ easy | ].
+ destruct (zerop (k mod 2)) as [Hk| Hk].
+bbb.
+
 intros * Hc Hcontr.
 (* cantor_diagonal does not work; example: if g n = 0 for all n; they
    are all made of zeroes, therefore they are canonical; however the
@@ -541,6 +610,17 @@ bbb.
  split; [ easy | ].
  destruct (zerop (i mod 2)) as [H1| H1].
 
+bbb.
+
+Lemma converted_real_is_canonical : ∀ r, Canonical (frac_part_to_bin r).
+Proof.
+intros r i.
+unfold frac_part_to_bin.
+(* but how if x = 1/2 + 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1
+   but how do we prove x = 1 indeed? *)
+Print completeness.
+Print frac_part.
+(* frac (x * 2) = x *)
 bbb.
 
 Lemma crophage : ∀ u,
