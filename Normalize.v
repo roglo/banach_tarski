@@ -290,7 +290,7 @@ apply split_app_eq in Hn.
 destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
  exfalso; revert H₂; apply norm_list_no_consec.
 
- rewrite cons_to_app in H₂.
+ rewrite app_of_cons in H₂.
  apply split_app_eq in H₂.
  destruct H₂ as [(el', (H₂, H₃))| (el', (H₂, H₃))].
   subst el.
@@ -320,7 +320,7 @@ Theorem norm_list_is_nil_between : ∀ e el,
 Proof.
 assert (H : ∀ e el, norm_list el = [] → norm_list (negf e :: el ++ [e]) = []).
  intros e el Hn.
- rewrite cons_to_app, <- is_normal, Hn, app_nil_l.
+ rewrite app_of_cons, <- is_normal, Hn, app_nil_l.
  remember norm_list as f; simpl; subst f.
  now rewrite norm_list_cancel2.
 

@@ -594,7 +594,7 @@ split.
        rewrite <- app_assoc, <- is_normal, Hel₁, app_nil_l.
        rewrite rev_path_repeat.
        remember norm_list as g; remember S as h; simpl; subst g h.
-       rewrite cons_to_app, app_assoc.
+       rewrite app_of_cons, app_assoc.
        intros H.
        eapply norm_list_app_is_nil in H.
         simpl in H.

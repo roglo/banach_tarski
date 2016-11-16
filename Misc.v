@@ -57,7 +57,7 @@ Qed.
 Theorem cons_comm_app : ∀ A (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
 Proof. easy. Qed.
 
-Theorem cons_to_app : ∀ A (e : A) el, e :: el = [e] ++ el.
+Theorem app_of_cons : ∀ A (e : A) el, e :: el = [e] ++ el.
 Proof. easy. Qed.
 
 Theorem fold_right_cons : ∀ A B f (x : A) (y : B) l,
