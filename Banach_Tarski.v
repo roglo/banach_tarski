@@ -259,7 +259,8 @@ induction el₁ as [| e₁ el₁]; intros.
     now apply Nat.lt_le_incl.
 Qed.
 
-Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
+Definition is_countable U (eqU : relation U) A :=
+  ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, eqU (f n) a.
 
 (*
 Theorem paths_are_countable :
@@ -283,7 +284,7 @@ intros * HnP.
 now destruct (EM P).
 Qed.
 
-Add Parametric Morphism {U} : (@is_countable U)
+Add Parametric Morphism {U} : (@is_countable U eq)
  with signature (@set_eq _ set_equiv) ==> iff
  as is_countable_morph.
 Proof.
@@ -292,8 +293,8 @@ split; intros H; destruct H as (f, H); exists f; intros x Hx; now apply H, HEF.
 Qed.
 
 Theorem uncountable_sub_countable_not_empty : ∀ {U} (A B : set U),
-  not (is_countable _ A)
-  → is_countable _ B
+  not (is_countable _ eq A)
+  → is_countable _ eq B
   → B ⊂ A
   → ∃ x, x ∈ A ∖ B.
 Proof.
@@ -481,38 +482,30 @@ Qed.
 Definition whole_set A := mkset (λ _ : A, True).
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
-Definition cantor_diagonal (g : ℕ → ℕ → bool) i := negb (g i i).
-
 (* 0x → 10; 1x → 00 *)
-Definition cantor_diagonal2 (g : ℕ → ℕ → bool) i :=
+Definition cantor_canon_diagonal (g : ℕ → ℕ → bool) i :=
   if zerop (i mod 2) then negb (g (i / 2) i) else false.
 
 Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
 
-(*
-Lemma canon_seq_not_countable : ¬ (is_countable _ Canonical_seq).
-Proof.
-unfold is_countable.
-intros g.
-...
-*)
+Definition ext_eq {A B} (f g : A → B) := ∀ a, f a = g a.
 
-Lemma canon_seq_not_countable : ∀ g : ℕ → ℕ → bool,
-  ¬ (∀ u, u ∈ Canonical_seq → ∃ n, ∀ i, g n i = u i).
+Lemma canon_seq_not_countable : ¬ (is_countable _ ext_eq Canonical_seq).
 Proof.
-intros * Hcontr.
-enough (Hdc : cantor_diagonal2 g ∈ Canonical_seq).
- specialize (Hcontr (cantor_diagonal2 g) Hdc).
+unfold is_countable, ext_eq.
+intros (g, Hcontr).
+enough (Hdc : cantor_canon_diagonal g ∈ Canonical_seq).
+ specialize (Hcontr (cantor_canon_diagonal g) Hdc).
  destruct Hcontr as (n, Hcontr).
  specialize (Hcontr (n * 2)%nat).
- unfold cantor_diagonal2 in Hcontr.
+ unfold cantor_canon_diagonal in Hcontr.
  rewrite Nat.mod_mul in Hcontr; [ | easy ].
  simpl in Hcontr.
  rewrite Nat.div_mul in Hcontr; [ | easy ].
  now symmetry in Hcontr; apply no_fixpoint_negb in Hcontr.
 
  intros i.
- unfold cantor_diagonal2.
+ unfold cantor_canon_diagonal.
  destruct (zerop (i mod 2)) as [Hi| Hi].
   apply Nat.mod_divides in Hi; [ | easy ].
   destruct Hi as (p, Hp).
