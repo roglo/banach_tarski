@@ -189,33 +189,55 @@ Definition path_of_nat n :=
   | S n' => path_of_nat_aux n n'
   end.
 
-Compute (path_of_nat 0).
-Compute (path_of_nat 1).
-Compute (path_of_nat 2).
-Compute (path_of_nat 3).
-Compute (path_of_nat 4).
-Compute (path_of_nat 5).
-Compute (path_of_nat 6).
-Compute (path_of_nat 7).
-Compute (path_of_nat 8).
-Compute (path_of_nat 9).
-Compute (path_of_nat 10).
-Compute (path_of_nat 11).
-Compute (path_of_nat 12).
-Compute (path_of_nat 13).
-Compute (path_of_nat 14).
-Compute (path_of_nat 15).
-Compute (path_of_nat 16).
-Compute (path_of_nat 17).
-Compute (path_of_nat 18).
-Compute (path_of_nat 19).
-Compute (path_of_nat 20).
-Compute (path_of_nat 21).
-Compute (path_of_nat 22).
-Compute (path_of_nat 23).
-Compute (path_of_nat 24).
-Compute (path_of_nat 25).
-Compute (path_of_nat 26).
+Theorem path_of_nat_aux_enough_iter : ∀ m n p,
+  m < n
+ → m < p
+  → path_of_nat_aux n m = path_of_nat_aux p m.
+Proof.
+intros * Hmn Hmp.
+revert m p Hmn Hmp.
+induction n; intros; [ easy | ].
+destruct p; [ easy | ].
+simpl; f_equal.
+remember (m / 4) as q eqn:Hq; symmetry in Hq.
+destruct q; [ easy | ].
+destruct m; [ easy | ].
+apply Nat.succ_lt_mono in Hmn.
+apply Nat.succ_lt_mono in Hmp.
+destruct (lt_dec q n) as [Hqn| Hqn].
+ destruct (lt_dec q p) as [Hqp| Hqp]; [ apply IHn; easy | ].
+ apply Nat.nlt_ge in Hqp.
+ apply Nat.succ_le_mono in Hqp.
+ rewrite <- Hq in Hqp.
+ apply Nat.succ_lt_mono in Hmp.
+ assert (H : S m < S m / 4) by (eapply Nat.lt_le_trans; eassumption).
+ apply Nat.nle_gt in H.
+ exfalso; apply H; clear.
+ remember (S m) as n; clear m Heqn.
+ apply Nat.div_le_upper_bound; [ easy | ].
+ induction n; [ easy | ].
+ rewrite Nat.mul_comm; simpl.
+ apply -> Nat.succ_le_mono.
+ eapply Nat.le_trans; [ eassumption | ].
+ rewrite Nat.mul_comm.
+ eapply Nat.le_trans; [ | eapply Nat.le_succ_diag_r ].
+ eapply Nat.le_trans; eapply Nat.le_succ_diag_r.
+
+ apply Nat.nlt_ge in Hqn.
+ apply Nat.succ_le_mono in Hqn.
+ rewrite <- Hq in Hqn.
+ assert (H : m < S m / 4).
+  eapply lt_trans; [ eapply Hmn | assumption ].
+
+  exfalso; clear - H.
+  apply Nat.nle_gt in H.
+  exfalso; apply H; clear.
+  destruct m; [ easy | ].
+  apply Nat.div_le_upper_bound; [ easy | simpl ].
+  rewrite <- Nat.add_succ_comm; simpl.
+  do 2 apply -> Nat.succ_le_mono.
+  apply Nat.le_add_r.
+Qed.
 
 Theorem nat_of_path_ne_0 : ∀ el, nat_of_path el ≠ 0%nat.
 Proof.
@@ -328,85 +350,24 @@ enough (Hn : ∃ n, path_of_nat (S n) = e :: el).
  unfold path_of_nat. 
 
 Theorem glop : ∀ e el, ∃ m n, (n < m)%nat ∧ path_of_nat_aux m n = e :: el.
-Admitted. Show.
+Proof.
+intros.
+revert e.
+induction el as [| e₁]; intros.
+ remember (nat_of_free_elem e) as p eqn:Hp.
+ exists (S p), p.
+ split; [ now apply Nat.lt_succ_r | ].
+ now subst p; destruct e as (t, d); destruct t, d.
+
+bbb.
 
 (* end of glop; return to paths_are_countable *)
 pose proof glop e el.
 destruct H as (m & n & Hmn & H).
-
-Theorem glip : ∀ m n p,
-  m < n
- → m < p
-  → path_of_nat_aux n m = path_of_nat_aux p m.
-Proof.
-intros * Hmn Hmp.
-revert m p Hmn Hmp.
-induction n; intros; [ easy | ].
-destruct p; [ easy | ].
-simpl; f_equal.
-remember (m / 4) as q eqn:Hq; symmetry in Hq.
-destruct q; [ easy | ].
-destruct m; [ easy | ].
-apply Nat.succ_lt_mono in Hmn.
-apply Nat.succ_lt_mono in Hmp.
-destruct (lt_dec q n) as [Hqn| Hqn].
- destruct (lt_dec q p) as [Hqp| Hqp]; [ apply IHn; easy | ].
- apply Nat.nlt_ge in Hqp.
- apply Nat.succ_le_mono in Hqp.
- rewrite <- Hq in Hqp.
- apply Nat.succ_lt_mono in Hmp.
- assert (H : S m < S m / 4) by (eapply Nat.lt_le_trans; eassumption).
- apply Nat.nle_gt in H.
- exfalso; apply H; clear.
- remember (S m) as n; clear m Heqn.
- apply Nat.div_le_upper_bound; [ easy | ].
- induction n; [ easy | ].
- rewrite Nat.mul_comm; simpl.
- apply -> Nat.succ_le_mono.
- eapply Nat.le_trans; [ eassumption | ].
- rewrite Nat.mul_comm.
- eapply Nat.le_trans; [ | eapply Nat.le_succ_diag_r ].
- eapply Nat.le_trans; eapply Nat.le_succ_diag_r.
-
- apply Nat.nlt_ge in Hqn.
-bbb.
-
-pose proof IHn m p Hmn Hmp.
-
-
-bbb.
-(* end of glip; return to glop *)
-
 exists n.
-rewrite glip with (p := m); [ easy | apply Nat.lt_succ_diag_r | easy ].
-bbb.
+rewrite path_of_nat_aux_enough_iter with (p := m); try easy.
+apply Nat.lt_succ_diag_r.
 
-
-Theorem glip : ∀ m n, n < m → path_of_nat_aux m n = path_of_nat_aux (S n) n.
-Proof.
-intros * Hnm.
-revert m Hnm.
-induction n; intros; [ now destruct m | ].
-destruct m; [ easy | ].
-apply Nat.succ_lt_mono in Hnm.
-remember (S n) as sn; simpl; subst sn.
-f_equal.
-remember (S n / 4) as p eqn:Hp; symmetry in Hp.
-destruct p; [ easy | ].
-
-
-pose proof IHn m Hnm as Hm.
-
-bbb.
-intros * Hnm.
-revert n Hnm.
-induction m; intros; [ easy | ].
-simpl; f_equal.
-remember (n / 4) as p eqn:Hp; symmetry in Hp.
-destruct p; [ easy | ].
-destruct n; [ easy | ].
-apply Nat.succ_lt_mono in Hnm.
-apply IHm in Hnm.
 bbb.
 
 Theorem glop : ∀ e it m,
