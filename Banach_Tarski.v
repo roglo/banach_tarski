@@ -316,12 +316,94 @@ intros el _.
 unfold path_of_nat.
 induction el as [| e el]; [ now exists O | ].
 destruct IHel as (m, IHel).
-destruct m.
- simpl in IHel; subst el.
- exists (S (nat_of_free_elem e)).
+subst el.
+revert e.
+induction m; intros.
+ simpl; exists (S (nat_of_free_elem e)).
  now destruct e as (t, d); destruct t, d.
 
- subst el.
+ simpl.
+ rewrite Nat.sub_0_r.
+ destruct (lt_dec (S m) 5) as [Hm| Hm].
+  apply Nat.succ_lt_mono in Hm.
+  destruct m; simpl.
+   remember (1 * 4)%nat as p eqn:Hp.
+   exists (S (nat_of_free_elem e) + p)%nat.
+   simpl; rewrite Nat.sub_0_r.
+   destruct (lt_dec (S (nat_of_free_elem e + p)) 5) as [He| He].
+    exfalso; apply Nat.nle_gt in He; apply He.
+    rewrite Nat.add_comm; subst p; simpl.
+    do 5 apply -> Nat.succ_le_mono; apply Nat.le_0_l.
+
+    subst p; rewrite Nat.mod_add; [ | easy ].
+    rewrite Nat.div_add; [ | easy ].
+    now f_equal; destruct e as (t, d); destruct t, d.
+
+  apply Nat.succ_lt_mono in Hm.
+  destruct m; simpl.
+   remember (2 * 4)%nat as p eqn:Hp.
+   exists (S (nat_of_free_elem e) + p)%nat.
+   simpl; rewrite Nat.sub_0_r.
+   destruct (lt_dec (S (nat_of_free_elem e + p)) 5) as [He| He].
+    exfalso; apply Nat.nle_gt in He; apply He.
+    rewrite Nat.add_comm; subst p; simpl.
+    do 5 apply -> Nat.succ_le_mono; apply Nat.le_0_l.
+
+    subst p; rewrite Nat.mod_add; [ | easy ].
+    rewrite Nat.div_add; [ | easy ].
+    now f_equal; destruct e as (t, d); destruct t, d.
+
+  apply Nat.succ_lt_mono in Hm.
+
+  destruct m; simpl.
+   remember (3 * 4)%nat as p eqn:Hp.
+   exists (S (nat_of_free_elem e) + p)%nat.
+   simpl; rewrite Nat.sub_0_r.
+   destruct (lt_dec (S (nat_of_free_elem e + p)) 5) as [He| He].
+    exfalso; apply Nat.nle_gt in He; apply He.
+    rewrite Nat.add_comm; subst p; simpl.
+    do 5 apply -> Nat.succ_le_mono; apply Nat.le_0_l.
+
+    subst p; rewrite Nat.mod_add; [ | easy ].
+    rewrite Nat.div_add; [ | easy ].
+    now f_equal; destruct e as (t, d); destruct t, d.
+
+  apply Nat.succ_lt_mono in Hm.
+  destruct m; simpl.
+   remember (4 * 4)%nat as p eqn:Hp.
+   exists (S (nat_of_free_elem e) + p)%nat.
+   simpl; rewrite Nat.sub_0_r.
+   destruct (lt_dec (S (nat_of_free_elem e + p)) 5) as [He| He].
+    exfalso; apply Nat.nle_gt in He; apply He.
+    rewrite Nat.add_comm; subst p; simpl.
+    do 5 apply -> Nat.succ_le_mono; apply Nat.le_0_l.
+
+    subst p; rewrite Nat.mod_add; [ | easy ].
+    rewrite Nat.div_add; [ | easy ].
+    now f_equal; destruct e as (t, d); destruct t, d.
+
+  now apply Nat.succ_lt_mono in Hm.
+
+  apply Nat.nlt_ge in Hm.
+  apply Nat.succ_le_mono in Hm.
+
+bbb.
+
+  apply Nat.succ_lt_mono in Hm.
+  destruct m; simpl.
+   remember (1 * 4)%nat as p eqn:Hp.
+   exists (S (nat_of_free_elem e) + p)%nat.
+   simpl; rewrite Nat.sub_0_r.
+   destruct (lt_dec (S (nat_of_free_elem e + p)) 5) as [He| He].
+    exfalso; apply Nat.nle_gt in He; apply He.
+    rewrite Nat.add_comm; subst p; simpl.
+    do 5 apply -> Nat.succ_le_mono; apply Nat.le_0_l.
+
+    subst p; rewrite Nat.mod_add; [ | easy ].
+    rewrite Nat.div_add; [ | easy ].
+    now f_equal; destruct e as (t, d); destruct t, d.
+
+bbb.
  remember (m / 4) as md eqn:Hmd; symmetry in Hmd.
  revert e m Hmd.
  induction md; intros.
