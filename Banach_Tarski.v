@@ -317,6 +317,30 @@ unfold path_of_nat.
 induction el as [| e el]; [ now exists O | ].
 destruct IHel as (m, IHel).
 subst el.
+
+Theorem glop : ∀ e it m,
+  (it ≤ m)%nat
+  → ∃ n : ℕ, path_of_nat_aux n n = e :: path_of_nat_aux it m.
+Proof.
+intros * Hit.
+revert e m Hit.
+induction it; intros.
+ simpl; exists (S (nat_of_free_elem e)).
+ now destruct e as (t, d); destruct t, d.
+
+ destruct m; [ easy | ].
+ apply Nat.succ_le_mono in Hit; simpl.
+ rewrite Nat.sub_0_r.
+ destruct (lt_dec (S m) 5) as [Hm| Hm].
+  Focus 2.
+  apply IHit with (e := e) in Hit.
+  destruct Hit as (p, Hit).
+
+bbb.
+
+
+; ; [ now exists 2%nat | ].
+
 revert e.
 induction m; intros.
  simpl; exists (S (nat_of_free_elem e)).
