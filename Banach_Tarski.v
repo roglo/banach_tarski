@@ -319,22 +319,32 @@ destruct IHel as (m, IHel).
 subst el.
 
 Theorem glop : ∀ e it m,
-  (it ≤ m)%nat
-  → ∃ n : ℕ, path_of_nat_aux n n = e :: path_of_nat_aux it m.
+  (m ≤ it)%nat
+  → ∃ it' m',
+    (m' ≤ it')%nat ∧ path_of_nat_aux it' m' = e :: path_of_nat_aux it m.
 Proof.
 intros * Hit.
 revert e m Hit.
 induction it; intros.
- simpl; exists (S (nat_of_free_elem e)).
+ simpl; exists (S (nat_of_free_elem e)), (S (nat_of_free_elem e)).
  now destruct e as (t, d); destruct t, d.
+
+ destruct m.
+bbb.
 
  destruct m; [ easy | ].
  apply Nat.succ_le_mono in Hit; simpl.
  rewrite Nat.sub_0_r.
  destruct (lt_dec (S m) 5) as [Hm| Hm].
   Focus 2.
+  apply Nat.nlt_ge in Hm.
+  apply Nat.succ_le_mono in Hm.
+Print path_of_nat_aux.
+
+bbb.
+
   apply IHit with (e := e) in Hit.
-  destruct Hit as (p, Hit).
+  destruct Hit as (it'' & m'' & Hm' & Hit).
 
 bbb.
 
