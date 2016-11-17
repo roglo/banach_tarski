@@ -330,6 +330,25 @@ induction it; intros.
  now destruct e as (t, d); destruct t, d.
 
  destruct m.
+  simpl.
+  remember (1 * 4)%nat as p eqn:Hp.
+  remember (nat_of_free_elem e) as n eqn:Hn.
+  remember (S n + p)%nat as m eqn:Hm.
+  exists m, m; split; [ easy | ].
+  subst m; simpl; rewrite Nat.sub_0_r; subst p.
+  rewrite Nat.mod_add; [ | easy ].
+  rewrite Nat.div_add; [ simpl | easy ].
+  destruct (lt_dec (S (n + 4)) 5) as [Hlt| Hge].
+   rewrite Nat.add_comm in Hlt; simpl in Hlt.
+   now do 5 apply Nat.succ_lt_mono in Hlt.
+
+   subst n.
+   now destruct e as (t, d); destruct t, d; simpl.
+
+  apply Nat.succ_le_mono in Hit.
+  pose proof IHit e m Hit as H.
+  destruct H as (it'' & m'' & Hit'' & H).
+
 bbb.
 
  destruct m; [ easy | ].
