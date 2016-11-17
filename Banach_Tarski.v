@@ -354,10 +354,24 @@ Proof.
 intros.
 revert e.
 induction el as [| e₁]; intros.
- remember (nat_of_free_elem e) as p eqn:Hp.
- exists (S p), p.
+ remember (nat_of_free_elem e) as m eqn:Hm.
+ exists (S m), m.
  split; [ now apply Nat.lt_succ_r | ].
- now subst p; destruct e as (t, d); destruct t, d.
+ now subst m; destruct e as (t, d); destruct t, d.
+
+ pose proof IHel e₁ as He₁.
+ destruct He₁ as (p & q & Hpq & He₁).
+ rewrite <- He₁.
+ remember (nat_of_free_elem e) as r eqn:Hr.
+ exists (S (S p * 4 + r)), (S p * 4 + r)%nat.
+ split.
+  Focus 2.
+  simpl.
+vvv.
+  do 2 rewrite Nat.add_0_r.
+  subst m.
+  destruct e as (t, d); destruct t, d; simpl.
+
 
 bbb.
 
