@@ -83,6 +83,10 @@ Theorem Int_part_close_to_1 : ∀ r n,
   → Int_part (r * (INR n + 1)) = Z.of_nat n.
 Proof.
 intros * Hn.
+revert r Hn.
+induction n; intros.
+Focus 2.
+
 bbb.
 
 Theorem Int_part_is_0 : ∀ x, (0 <= x < 1)%R → Int_part x = 0%Z.
