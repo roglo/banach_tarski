@@ -664,18 +664,18 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
  intros Hj.
  assert
-   (∃ k,
-    (k = O ∨ bin_of_frac_part r k = false) ∧
-    (∀ j, k < j → bin_of_frac_part r j = true)).
+   (Hk : ∃ k,
+    (k = O ∧ ∀ j, bin_of_frac_part r j = true) ∨
+    (bin_of_frac_part r k = false ∧
+     ∀ j, k < j → bin_of_frac_part r j = true)).
   induction i.
    exists O.
-   split; [ now left | ].
-   intros j H.
-   now apply Hj, Nat.lt_le_incl.
+   left; split; [ easy | ].
+   intros j.
+   apply Hj, Nat.le_0_l.
 
    destruct (Bool.bool_dec (bin_of_frac_part r i) false) as [Hi'| Hi'].
-    exists i.
-    split; [ now right | easy ].
+    exists i; now right; split.
 
     apply IHi.
     intros j Hij.
@@ -685,26 +685,21 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     now apply not_false_iff_true in Hi'; subst j.
 
   clear Hj.
-  destruct H as (k & Hk & Hkj).
-  destruct Hk as [Hk | Hk].
+  destruct Hk as (k & Hk).
+  destruct Hk as [(H, Hk) | (H, Hk)].
    subst k.
-   destruct (Bool.bool_dec (bin_of_frac_part r O) true) as [Hk| Hk].
-    enough (r = 1)%R.
-     subst r.
-     unfold bin_of_frac_part in Hk.
-     simpl in Hk.
-     rewrite Rmult_1_l in Hk.
-     destruct (Rlt_dec (frac_part 1) (1 / 2)) as [H| H]; [ easy | ].
-     specialize (Hkj 1%nat (Nat.lt_0_succ 0)).
-     unfold bin_of_frac_part in Hkj; simpl in Hkj.
-     rewrite Rmult_1_l, Rmult_1_r in Hkj.
-     destruct (Rlt_dec (frac_part 2) (1 / 2)) as [H2| H2]; [ easy | ].
-     apply H2.
-     unfold frac_part.
-     replace 2%R with (INR 2) by easy.
-     rewrite Int_part_INR; simpl; lra.
+   enough (r = 1)%R.
+    subst r.
+    unfold bin_of_frac_part in Hk.
+    specialize (Hk O).
+    rewrite Rmult_1_l, pow_O in Hk.
+    destruct (Rlt_dec (frac_part 1) (1 / 2)) as [H| H]; [ easy | ].
+    apply H.
+    unfold frac_part.
+    replace 1%R with (INR 1) by easy.
+    rewrite Int_part_INR; simpl; lra.
 
-     idtac.
+    idtac.
 bbb.
 
 (* but how if x = 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1/2
