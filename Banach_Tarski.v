@@ -699,14 +699,17 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     replace 1%R with (INR 1) by easy.
     rewrite Int_part_INR; simpl; lra.
 
-    idtac.
-bbb.
-
-(* but how if x = 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1/2
-   but how do we prove x = 1/2 indeed in that case? *)
-Print completeness.
-Print frac_part.
-(* frac (x * 2) = x *)
+    set (E x := ∃ k, partial_sum (bin_of_frac_part r) k = x).
+    Check (completeness E).
+    assert (bound E).
+     unfold bound, E; exists 1.
+     unfold is_upper_bound.
+     intros x Hx.
+     destruct Hx as (k, Hx).
+     subst x.
+     clear - Hk.
+     unfold partial_sum.
+     induction k; [ apply Rle_0_1 | simpl ].
 bbb.
 
 Lemma crophage : ∀ u,
