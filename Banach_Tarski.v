@@ -710,6 +710,8 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      set (m := completeness E Hb He).
      destruct m as (x & Hxu & Hxlu).
      unfold E, is_upper_bound in Hxu, Hxlu.
+bbb.
+
      assert (Hx : (x = 1)%R).
       assert (Hx1 : (x <= 1)%R).
        apply Hxlu; intros y (k, Hy); subst y.
@@ -728,8 +730,12 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
           destruct Hxy as (Hxy, Hy1).
           assert (H1 : x = y) by (now apply Rle_antisym).
           move H1 at top; subst y.
-          clear H Hxy.
-
+          clear H Hxu Hxy Hky.
+          rewrite <- Hy in Hy1.
+          clear -Hk Hy1.
+          unfold partial_sum in Hy1.
+          destruct k.
+           simpl in Hy1.
 bbb.
 
 Lemma crophage : ∀ u,
