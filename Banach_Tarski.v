@@ -688,13 +688,23 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
   destruct H as (k & Hk & Hkj).
   destruct Hk as [Hk | Hk].
    subst k.
-bbb.
+   destruct (Bool.bool_dec (bin_of_frac_part r O) true) as [Hk| Hk].
+    enough (r = 1)%R.
+     subst r.
+     unfold bin_of_frac_part in Hk.
+     simpl in Hk.
+     rewrite Rmult_1_l in Hk.
+     destruct (Rlt_dec (frac_part 1) (1 / 2)) as [H| H]; [ easy | ].
+     specialize (Hkj 1%nat (Nat.lt_0_succ 0)).
+     unfold bin_of_frac_part in Hkj; simpl in Hkj.
+     rewrite Rmult_1_l, Rmult_1_r in Hkj.
+     destruct (Rlt_dec (frac_part 2) (1 / 2)) as [H2| H2]; [ easy | ].
+     apply H2.
+     unfold frac_part.
+     replace 2%R with (INR 2) by easy.
+     rewrite Int_part_INR; simpl; lra.
 
- enough (r = (IZR (Int_part (r * 2 ^ i)) / 2 ^ i)%R).
-  rewrite H in Hj; clear H.
-  simpl in Hj.
-
-
+     idtac.
 bbb.
 
 (* but how if x = 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1/2
