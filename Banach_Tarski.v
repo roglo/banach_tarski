@@ -651,9 +651,11 @@ enough (Hdc : cantor_canon_diagonal g ∈ Canonical_seq).
   now rewrite Hi2 in Hi.
 Qed.
 
-Theorem converted_real_is_canonical : ∀ r, bin_of_frac_part r ∈ Canonical_seq.
+Theorem converted_real_is_canonical : ∀ r,
+  (0 <= r)%R
+  → bin_of_frac_part r ∈ Canonical_seq.
 Proof.
-intros r i.
+intros r Hr i.
 enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
  apply classic.
  intros Hj; apply H; clear H; intros j Hij.
@@ -711,6 +713,30 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      destruct m as (x & Hxu & Hxlu).
      unfold E, is_upper_bound in Hxu, Hxlu.
      rename x into lub; clear E Hb He.
+     assert (Hrlub : r = lub).
+      assert (lub <= r)%R.
+       apply Hxlu; intros x (k & Hx); subst x.
+       clear -Hr Hk.
+       unfold partial_sum.
+bbb.
+
+SearchAbout partial_sum_aux.
+rewrite trunc_bool_seq_eq with (m := k); [ | easy ].
+       induction k; [ easy | ].
+rewrite <- Nat.add_1_l.
+SearchAbout partial_sum_aux.
+rewrite partial_sum_aux_add.
+simpl.
+unfold trunc_bool_seq.
+remember (trunc_bool_seq (bin_of_frac_part r) (S k) 0) as b eqn:Hb.
+symmetry in Hb.
+destruct b.
+
+
+
+rewrite Hk.
+rewrite Rmult_1_r.
+       simpl.
 bbb.
 
      assert (Hx : (x = 1)%R).
