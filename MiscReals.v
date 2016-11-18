@@ -78,8 +78,22 @@ assert (H : (0 <= z)%Z).
  eapply Rlt_le_trans; [ eassumption | lra ].
 Qed.
 
+Theorem Int_part_close_to_1 : ∀ r n,
+  (INR n / INR (n + 1) <= r < 1)%R
+  → Int_part (r * (INR n + 1)) = Z.of_nat n.
+Proof.
+intros * Hn.
+bbb.
+
 Theorem Int_part_is_0 : ∀ x, (0 <= x < 1)%R → Int_part x = 0%Z.
 Proof.
+intros * Hx.
+assert ((INR 0 / INR (0 + 1) <= x < 1)%R) by (now simpl; lra).
+pose proof Int_part_close_to_1 x 0 H as H1.
+simpl in H1.
+now rewrite Rplus_0_l, Rmult_1_r in H1.
+bbb.
+
 intros * Hx.
 unfold Int_part.
 pose proof archimed x as H.

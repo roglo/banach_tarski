@@ -652,7 +652,7 @@ enough (Hdc : cantor_canon_diagonal g ∈ Canonical_seq).
 Qed.
 
 Theorem converted_real_is_canonical : ∀ r,
-  (0 <= r)%R
+  (0 <= r < 1)%R
   → bin_of_frac_part r ∈ Canonical_seq.
 Proof.
 intros r Hr i.
@@ -718,6 +718,46 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
        apply Hxlu; intros x (k & Hx); subst x.
        clear -Hr Hk.
        unfold partial_sum.
+destruct k; [ easy | simpl ].
+rewrite Hk.
+pose proof Hk O as H.
+unfold bin_of_frac_part in H.
+simpl in H.
+rewrite Rmult_1_r in H.
+destruct (Rlt_dec (frac_part r) (1 / 2)) as [| Hk0]; [ easy | ].
+apply Rnot_lt_le in Hk0.
+unfold frac_part in Hk0.
+rewrite Int_part_is_0 in Hk0; [ | easy ].
+rewrite Rminus_0_r in Hk0.
+clear H.
+destruct k; [ now rewrite Rplus_0_r | simpl ].
+rewrite Hk.
+pose proof Hk 1%nat as H.
+unfold bin_of_frac_part in H.
+simpl in H.
+rewrite Rmult_1_r in H.
+destruct (Rlt_dec (frac_part (r * 2)) (1 / 2)) as [| Hk1]; [ easy | ].
+apply Rnot_lt_le in Hk1.
+unfold frac_part in Hk1.
+SearchAbout Int_part.
+Theorem glop : ∀ r, (1 / 2 <= r < 1)%R → Int_part (r * 2) = 1.
+Proof.
+About Int_part_is_0.
+bbb.
+
+bbb.
+rewrite Int_part_is_0 in Hk1; [ | ].
+rewrite Rminus_0_r in Hk0.
+clear H.
+
+
+destruct k; simpl.
+rewrite Rplus_0_r.
+pose proof Hk O as Hk0.
+unfold bin_of_frac_part in Hk0.
+simpl in Hk0.
+rewrite Rmult_1_r in Hk0.
+
 bbb.
 
 SearchAbout partial_sum_aux.
