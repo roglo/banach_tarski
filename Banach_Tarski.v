@@ -663,6 +663,38 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
  now apply not_true_iff_false in H.
 
  intros Hj.
+ assert
+   (∃ k,
+    (k = O ∨ bin_of_frac_part r k = false) ∧
+    (∀ j, k < j → bin_of_frac_part r j = true)).
+  induction i.
+   exists O.
+   split; [ now left | ].
+   intros j H.
+   now apply Hj, Nat.lt_le_incl.
+
+   destruct (Bool.bool_dec (bin_of_frac_part r i) false) as [Hi'| Hi'].
+    exists i.
+    split; [ now right | easy ].
+
+    apply IHi.
+    intros j Hij.
+    destruct (lt_dec i j) as [H| H]; [ now apply Hj | ].
+    apply Nat.nlt_ge in H.
+    apply Nat.le_antisymm in H; [ | easy ].
+    now apply not_false_iff_true in Hi'; subst j.
+
+  clear Hj.
+  destruct H as (k & Hk & Hkj).
+  destruct Hk as [Hk | Hk].
+   subst k.
+bbb.
+
+ enough (r = (IZR (Int_part (r * 2 ^ i)) / 2 ^ i)%R).
+  rewrite H in Hj; clear H.
+  simpl in Hj.
+
+
 bbb.
 
 (* but how if x = 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1/2
