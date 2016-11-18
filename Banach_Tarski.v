@@ -710,6 +710,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      set (m := completeness E Hb He).
      destruct m as (x & Hxu & Hxlu).
      unfold E, is_upper_bound in Hxu, Hxlu.
+     rename x into lub; clear E Hb He.
 bbb.
 
      assert (Hx : (x = 1)%R).
