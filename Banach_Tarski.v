@@ -700,16 +700,36 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     rewrite Int_part_INR; simpl; lra.
 
     set (E x := ∃ k, partial_sum (bin_of_frac_part r) k = x).
-    Check (completeness E).
-    assert (bound E).
+    assert (Hb : bound E).
      unfold bound, E; exists 1.
      unfold is_upper_bound.
-     intros x Hx.
-     destruct Hx as (k, Hx).
-     subst x.
-     clear - Hk.
-     unfold partial_sum.
-     induction k; [ apply Rle_0_1 | simpl ].
+     intros x (k, Hx); subst x.
+     apply partial_sum_le_1.
+
+     assert (He : ∃ x, E x) by (now exists 0%R, 0%nat).
+     set (m := completeness E Hb He).
+     destruct m as (x & Hxu & Hxlu).
+     unfold E, is_upper_bound in Hxu, Hxlu.
+     assert (Hx : (x = 1)%R).
+      assert (Hx1 : (x <= 1)%R).
+       apply Hxlu; intros y (k, Hy); subst y.
+       apply partial_sum_le_1.
+
+       assert (Hx2 : (1 <= x)%R).
+        apply Rnot_lt_le.
+        intros H.
+        enough (Hy : ∃ y k,
+          (x <= y < 1)%R ∧ partial_sum (bin_of_frac_part r) k = y).
+         destruct Hy as (y & k & Hxy & Hy).
+         assert (Hky : ∃ k, partial_sum (bin_of_frac_part r) k = y).
+          now exists k.
+
+          specialize (Hxu y Hky).
+          destruct Hxy as (Hxy, Hy1).
+          assert (H1 : x = y) by (now apply Rle_antisym).
+          move H1 at top; subst y.
+          clear H Hxy.
+
 bbb.
 
 Lemma crophage : ∀ u,
