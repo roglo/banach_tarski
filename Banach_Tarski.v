@@ -654,11 +654,19 @@ Qed.
 Theorem converted_real_is_canonical : ∀ r, bin_of_frac_part r ∈ Canonical_seq.
 Proof.
 intros r i.
-unfold bin_of_frac_part.
+enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
+ apply classic.
+ intros Hj; apply H; clear H; intros j Hij.
+ apply classic.
+ intros H; apply Hj; clear Hj.
+ exists j; split; [ easy | ].
+ now apply not_true_iff_false in H.
+
+ intros Hj.
 bbb.
 
-(* but how if x = 1/2 + 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1
-   but how do we prove x = 1 indeed? *)
+(* but how if x = 1/4 + 1/8 + 1/16 + ... ? ok, it is equal to 1/2
+   but how do we prove x = 1/2 indeed in that case? *)
 Print completeness.
 Print frac_part.
 (* frac (x * 2) = x *)
