@@ -556,149 +556,7 @@ Proof. now intros; exists e. Qed.
 
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id bin_of_frac_part id_nat).
 
-Theorem bin_of_frac_part_surj : ∀ u : ℕ → bool, ∃ x : ℝ,
-  x ∈ unit_interv ∧ ∀ n, bin_of_frac_part x n = u n.
-Proof.
-intros u.
-set (s := R_of_bin_seq u).
-destruct s as (lub, Hlub); simpl in Hlub.
-unfold is_lub, is_upper_bound in Hlub.
-destruct Hlub as (Hub, Hlub).
-exists lub.
-split.
- simpl; split; [ now apply Hub; exists O | ].
- apply Hlub; intros x (k & Hk); subst x.
- apply partial_sum_le_1.
-
- intros n.
-bbb.
-
-Theorem trunc_bool_seq_eq : ∀ z pow i m n,
-  i + n <= m
-  → partial_sum_aux n (bin_of_frac_part z) pow i =
-    partial_sum_aux n (trunc_bool_seq (bin_of_frac_part z) m) pow i.
-Proof.
-intros * Hm.
-revert pow i m Hm.
-induction n; intros; [ easy | simpl ].
-remember (bin_of_frac_part z i) as b eqn:Hb; symmetry in Hb.
-remember (trunc_bool_seq (bin_of_frac_part z) m i) as b' eqn:Hb'.
-symmetry in Hb'.
-assert (b = b').
- subst b b'.
- unfold trunc_bool_seq.
- destruct (lt_dec i m) as [| H₁]; [ easy | ].
- exfalso; apply H₁.
- apply Nat.lt_le_trans with (m := (i + S n)%nat); [ | easy ].
- apply Nat.lt_add_pos_r; apply Nat.lt_0_succ.
-
- move H at top; subst b'.
- rewrite <- Nat.add_succ_comm in Hm.
- destruct b; [ now apply Rplus_eq_compat_l, IHn | now apply IHn ].
-Qed.
-
-Theorem bin_of_frac_part_true_pow_le : ∀ z pow i,
-  (0 <= z)%R
-  → (0 <= pow <= (1 / 2) ^ S i)%R
-  → bin_of_frac_part z i = true
-  → (pow <= z)%R.
-Proof.
-intros * Hz Hpow Hi.
-revert z pow Hz Hi Hpow.
-induction i; intros.
- unfold bin_of_frac_part in Hi.
- rewrite pow_O, Rmult_1_r in Hi.
- destruct (Rlt_dec (frac_part z) (1 / 2)) as [| H₁]; [ easy | ].
- clear Hi; apply Rnot_lt_le in H₁; rewrite pow_1 in Hpow.
- destruct Hpow as (Hpow₀, Hpow₁).
- eapply Rle_trans; [ eassumption | ].
- eapply Rle_trans; [ eassumption | ].
- unfold frac_part.
- apply Rplus_le_reg_r with (r := IZR (Int_part z)).
- rewrite Rplus_comm, Rplus_minus.
- replace z with (z + 0)%R at 1 by lra.
- apply Rplus_le_compat_l.
- replace 0%R with (IZR 0) by easy.
- apply IZR_le.
- replace 0%Z with (Int_part 0); [ now apply Int_part_le_compat | ].
- replace 0%Z with (Z.of_nat 0); [ now rewrite <- Int_part_INR | easy ].
-
- apply (Rmult_le_reg_r 2); [ lra | ].
- apply IHi.
-  apply (Rmult_le_compat_r 2) in Hz; [ | lra ].
-  now rewrite Rmult_0_l in Hz.
-
-  now rewrite <- bin_of_frac_part_succ.
-
-  split.
-   destruct Hpow as (H, _).
-   apply (Rmult_le_compat_r 2) in H; [ | lra ].
-   now rewrite Rmult_0_l in H.
-
-   destruct Hpow as (_, H).
-   apply (Rmult_le_compat_r 2) in H; [ | lra ].
-   simpl in H; simpl; lra.
-Qed.
-
-Theorem partial_sum_aux_add : ∀ u pow i j k,
-  (partial_sum_aux (i + j) u pow k =
-   partial_sum_aux i u pow k + partial_sum_aux j u (pow / 2 ^ i) (i + k))%R.
-Proof.
-intros.
-revert pow j k.
-induction i; intros; [ now simpl; rewrite Rplus_0_l, Rdiv_1_r | simpl ].
-unfold Rdiv in IHi |-*.
-rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
-rewrite IHi, <- Nat.add_succ_comm.
-rewrite Rmult_assoc.
-destruct (u k); [ now rewrite Rplus_assoc | easy ].
-Qed.
-
-(* 0x → 10; 1x → 00 *)
-Definition cantor_canon_diagonal (g : ℕ → ℕ → bool) i :=
-  if zerop (i mod 2) then negb (g (i / 2) i) else false.
-
 Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
-
-Definition ext_eq {A B} (f g : A → B) := ∀ a, f a = g a.
-
-Theorem canon_seq_not_countable : ¬ (is_countable _ ext_eq Canonical_seq).
-Proof.
-unfold is_countable, ext_eq.
-intros (g, Hcontr).
-enough (Hdc : cantor_canon_diagonal g ∈ Canonical_seq).
- specialize (Hcontr (cantor_canon_diagonal g) Hdc).
- destruct Hcontr as (n, Hcontr).
- specialize (Hcontr (n * 2)%nat).
- unfold cantor_canon_diagonal in Hcontr.
- rewrite Nat.mod_mul in Hcontr; [ | easy ].
- simpl in Hcontr.
- rewrite Nat.div_mul in Hcontr; [ | easy ].
- now symmetry in Hcontr; apply no_fixpoint_negb in Hcontr.
-
- intros i.
- unfold cantor_canon_diagonal.
- destruct (zerop (i mod 2)) as [Hi| Hi].
-  apply Nat.mod_divides in Hi; [ | easy ].
-  destruct Hi as (p, Hp).
-  destruct (Bool.bool_dec (g (i / 2) i) false) as [Hi| Hi].
-   exists (S i).
-   split; [ now apply Nat.le_le_succ_r | ].
-   destruct (zerop (S i mod 2)) as [Hsi| Hsi]; [ | easy ].
-   rewrite Hp, <- Nat.add_1_l, Nat.mul_comm in Hsi.
-   now rewrite Nat.mod_add in Hsi.
-
-   exists i.
-   split; [ easy | ].
-   destruct (zerop (i mod 2)) as [Hi2| Hi2]; [ | easy ].
-   apply not_false_is_true in Hi.
-   now rewrite Hi.
-
-  exists i.
-  split; [ easy | ].
-  destruct (zerop (i mod 2)) as [Hi2| Hi2]; [ | easy ].
-  now rewrite Hi2 in Hi.
-Qed.
 
 Theorem converted_real_is_canonical : ∀ r,
   (0 <= r < 1)%R
@@ -877,6 +735,152 @@ bbb.
           destruct k.
            simpl in Hy1.
 bbb.
+
+Theorem bin_of_frac_part_surj : ∀ u : ℕ → bool, ∃ x : ℝ,
+  x ∈ unit_interv ∧ ∀ n, bin_of_frac_part x n = u n.
+Proof.
+intros u.
+set (s := R_of_bin_seq u).
+destruct s as (lub, Hlub); simpl in Hlub.
+unfold is_lub, is_upper_bound in Hlub.
+destruct Hlub as (Hub, Hlub).
+exists lub.
+split.
+ simpl; split; [ now apply Hub; exists O | ].
+ apply Hlub; intros x (k & Hk); subst x.
+ apply partial_sum_le_1.
+
+ intros n; symmetry.
+ unfold bin_of_frac_part.
+ destruct (Rlt_dec (frac_part (lub * 2 ^ n)) (1 / 2)) as [H₁| H₁].
+   (* oui mais non, il y a là le syndrôme du 0,9999... = 1;
+      faut prouver la canonicité de bin_of_frac_part d'abord *)
+bbb.
+
+Theorem trunc_bool_seq_eq : ∀ z pow i m n,
+  i + n <= m
+  → partial_sum_aux n (bin_of_frac_part z) pow i =
+    partial_sum_aux n (trunc_bool_seq (bin_of_frac_part z) m) pow i.
+Proof.
+intros * Hm.
+revert pow i m Hm.
+induction n; intros; [ easy | simpl ].
+remember (bin_of_frac_part z i) as b eqn:Hb; symmetry in Hb.
+remember (trunc_bool_seq (bin_of_frac_part z) m i) as b' eqn:Hb'.
+symmetry in Hb'.
+assert (b = b').
+ subst b b'.
+ unfold trunc_bool_seq.
+ destruct (lt_dec i m) as [| H₁]; [ easy | ].
+ exfalso; apply H₁.
+ apply Nat.lt_le_trans with (m := (i + S n)%nat); [ | easy ].
+ apply Nat.lt_add_pos_r; apply Nat.lt_0_succ.
+
+ move H at top; subst b'.
+ rewrite <- Nat.add_succ_comm in Hm.
+ destruct b; [ now apply Rplus_eq_compat_l, IHn | now apply IHn ].
+Qed.
+
+Theorem bin_of_frac_part_true_pow_le : ∀ z pow i,
+  (0 <= z)%R
+  → (0 <= pow <= (1 / 2) ^ S i)%R
+  → bin_of_frac_part z i = true
+  → (pow <= z)%R.
+Proof.
+intros * Hz Hpow Hi.
+revert z pow Hz Hi Hpow.
+induction i; intros.
+ unfold bin_of_frac_part in Hi.
+ rewrite pow_O, Rmult_1_r in Hi.
+ destruct (Rlt_dec (frac_part z) (1 / 2)) as [| H₁]; [ easy | ].
+ clear Hi; apply Rnot_lt_le in H₁; rewrite pow_1 in Hpow.
+ destruct Hpow as (Hpow₀, Hpow₁).
+ eapply Rle_trans; [ eassumption | ].
+ eapply Rle_trans; [ eassumption | ].
+ unfold frac_part.
+ apply Rplus_le_reg_r with (r := IZR (Int_part z)).
+ rewrite Rplus_comm, Rplus_minus.
+ replace z with (z + 0)%R at 1 by lra.
+ apply Rplus_le_compat_l.
+ replace 0%R with (IZR 0) by easy.
+ apply IZR_le.
+ replace 0%Z with (Int_part 0); [ now apply Int_part_le_compat | ].
+ replace 0%Z with (Z.of_nat 0); [ now rewrite <- Int_part_INR | easy ].
+
+ apply (Rmult_le_reg_r 2); [ lra | ].
+ apply IHi.
+  apply (Rmult_le_compat_r 2) in Hz; [ | lra ].
+  now rewrite Rmult_0_l in Hz.
+
+  now rewrite <- bin_of_frac_part_succ.
+
+  split.
+   destruct Hpow as (H, _).
+   apply (Rmult_le_compat_r 2) in H; [ | lra ].
+   now rewrite Rmult_0_l in H.
+
+   destruct Hpow as (_, H).
+   apply (Rmult_le_compat_r 2) in H; [ | lra ].
+   simpl in H; simpl; lra.
+Qed.
+
+Theorem partial_sum_aux_add : ∀ u pow i j k,
+  (partial_sum_aux (i + j) u pow k =
+   partial_sum_aux i u pow k + partial_sum_aux j u (pow / 2 ^ i) (i + k))%R.
+Proof.
+intros.
+revert pow j k.
+induction i; intros; [ now simpl; rewrite Rplus_0_l, Rdiv_1_r | simpl ].
+unfold Rdiv in IHi |-*.
+rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+rewrite IHi, <- Nat.add_succ_comm.
+rewrite Rmult_assoc.
+destruct (u k); [ now rewrite Rplus_assoc | easy ].
+Qed.
+
+(* 0x → 10; 1x → 00 *)
+Definition cantor_canon_diagonal (g : ℕ → ℕ → bool) i :=
+  if zerop (i mod 2) then negb (g (i / 2) i) else false.
+
+Definition ext_eq {A B} (f g : A → B) := ∀ a, f a = g a.
+
+Theorem canon_seq_not_countable : ¬ (is_countable _ ext_eq Canonical_seq).
+Proof.
+unfold is_countable, ext_eq.
+intros (g, Hcontr).
+enough (Hdc : cantor_canon_diagonal g ∈ Canonical_seq).
+ specialize (Hcontr (cantor_canon_diagonal g) Hdc).
+ destruct Hcontr as (n, Hcontr).
+ specialize (Hcontr (n * 2)%nat).
+ unfold cantor_canon_diagonal in Hcontr.
+ rewrite Nat.mod_mul in Hcontr; [ | easy ].
+ simpl in Hcontr.
+ rewrite Nat.div_mul in Hcontr; [ | easy ].
+ now symmetry in Hcontr; apply no_fixpoint_negb in Hcontr.
+
+ intros i.
+ unfold cantor_canon_diagonal.
+ destruct (zerop (i mod 2)) as [Hi| Hi].
+  apply Nat.mod_divides in Hi; [ | easy ].
+  destruct Hi as (p, Hp).
+  destruct (Bool.bool_dec (g (i / 2) i) false) as [Hi| Hi].
+   exists (S i).
+   split; [ now apply Nat.le_le_succ_r | ].
+   destruct (zerop (S i mod 2)) as [Hsi| Hsi]; [ | easy ].
+   rewrite Hp, <- Nat.add_1_l, Nat.mul_comm in Hsi.
+   now rewrite Nat.mod_add in Hsi.
+
+   exists i.
+   split; [ easy | ].
+   destruct (zerop (i mod 2)) as [Hi2| Hi2]; [ | easy ].
+   apply not_false_is_true in Hi.
+   now rewrite Hi.
+
+  exists i.
+  split; [ easy | ].
+  destruct (zerop (i mod 2)) as [Hi2| Hi2]; [ | easy ].
+  now rewrite Hi2 in Hi.
+Qed.
 
 Lemma crophage : ∀ u,
   u ∈ Canonical_seq →
