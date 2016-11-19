@@ -533,10 +533,11 @@ apply (f_equal (fun f => f x)) in H.
 exact (no_fixpoint_negb _ H).
 Qed.
 
-Lemma Cantor_gen : ∀ E X Y (Yss : set Y) (sX : E → X) (sY : Y → (E → bool)),
+Lemma Cantor_gen : ∀ E X Y (Yss : Y → Prop),
+  ∀ (sX : E → X) (sY : Y → (E → bool)),
   ∀ (sX_surj : ∀ e, ∃ x, sX x = e),
-  ∀ (sY_surj : ∀ f, ∃ y, y ∈ Yss ∧ sY y = f),
-  ∀ f : X → Y, ∃ y, ∀ x, y ∈ Yss ∧ y ≠ f x.
+  ∀ (sY_surj : ∀ f, ∃ y, Yss y ∧ sY y = f),
+  ∀ f : X → Y, ∃ y, ∀ x, Yss y ∧ y ≠ f x.
 Proof.
 intros * sX_surj sY_surj F.
 destruct Cantor with E (fun e => sY (F (sX e))) as [f H].
@@ -548,15 +549,13 @@ specialize (H e).
 now intros H2; apply H; f_equal.
 Qed.
 
+(* End code Rémi Nollet, modified *)
+
 Definition id {A} (a : A) := a.
 Theorem id_nat : ∀ e : ℕ, ∃ x : ℕ, id x = e.
 Proof. now intros; exists e. Qed.
 
-Check Cantor_gen.
-
-(* End code Rémi Nollet, modified *)
-
-Check (Cantor_gen ℕ ℕ ℝ unit_interv id bin_of_frac_part id_nat).
+Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id bin_of_frac_part id_nat).
 
 Theorem id_glop : ∀ u : ℕ → bool, ∃ y : ℝ,
   y ∈ unit_interv ∧ bin_of_frac_part y = u.
