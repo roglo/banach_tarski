@@ -593,7 +593,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     apply Nat.le_antisymm in H; [ | easy ].
     now apply not_false_iff_true in Hi'; subst j.
 
-  clear Hj.
+  clear i Hj.
   destruct Hk as (k & Hk).
   destruct Hk as [(H, Hk) | (H, Hk)].
    subst k.
@@ -620,21 +620,23 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      destruct m as (x & Hxu & Hxlu).
      unfold E, is_upper_bound in Hxu, Hxlu.
      rename x into lub; clear E Hb He.
+     assert (H : ∀ k pow i,
+       partial_sum_aux k (bin_of_frac_part r) pow i =
+       partial_sum_aux k (λ _, true) pow i).
+      intros.
+      revert i pow.
+      induction k; intros; [ easy | simpl; rewrite Hk ].
+      apply Rplus_eq_compat_l, IHk.
+
+      clear Hk; rename H into Hk.
+unfold partial_sum in Hxu.
+bbb.
+rewrite Hk in Hxu.
+
+
      assert (Hrlub : r = lub).
       assert (lub <= r)%R.
        apply Hxlu; intros x (k & Hx); subst x.
-       clear -Hr Hk.
-       unfold partial_sum.
-       assert (H : ∀ k pow i,
-         partial_sum_aux k (bin_of_frac_part r) pow i =
-         partial_sum_aux k (λ _, true) pow i).
-        clear k; intros.
-        revert i pow.
-        induction k; intros; [ easy | simpl ].
-        rewrite Hk.
-        apply Rplus_eq_compat_l, IHk.
-
-       rewrite H; clear H Hk.
 bbb.
 destruct k; [ easy | simpl ].
 rewrite Hk.
