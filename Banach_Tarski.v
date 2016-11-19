@@ -535,15 +535,15 @@ Qed.
 
 Lemma Cantor_gen : ∀ E X Y (Yss : set Y) (sX : E → X) (sY : Y → (E → bool)),
   ∀ (sX_surj : ∀ e, ∃ x, sX x = e),
-  ∀ (sY_surj : ∀ f, ∃ y, y ∈ Yss → sY y = f),
-  ∀ f : X → Y, ∃ y, ∀ x, y ∈ Yss → y ≠ f x.
+  ∀ (sY_surj : ∀ f, ∃ y, y ∈ Yss ∧ sY y = f),
+  ∀ f : X → Y, ∃ y, ∀ x, y ∈ Yss ∧ y ≠ f x.
 Proof.
 intros * sX_surj sY_surj F.
 destruct Cantor with E (fun e => sY (F (sX e))) as [f H].
-destruct sY_surj with f as [y]; subst.
-exists y; intros x ?; subst.
+destruct sY_surj with f as [y Hy]; subst.
+destruct Hy as (Hy, Hyf).
+exists y; intros x; split; [ easy | ]; subst.
 destruct sX_surj with x as [e]; subst.
-rewrite <- H0 in H; [ | easy ].
 specialize (H e).
 now intros H2; apply H; f_equal.
 Qed.
@@ -559,15 +559,13 @@ Check Cantor_gen.
 Check (Cantor_gen ℕ ℕ ℝ unit_interv id bin_of_frac_part id_nat).
 
 Theorem id_glop : ∀ u : ℕ → bool, ∃ y : ℝ,
-  y ∈ unit_interv
-  → bin_of_frac_part y = u.
+  y ∈ unit_interv ∧ bin_of_frac_part y = u.
 Proof.
 intros u.
 set (s := R_of_bin_seq u).
 destruct s as (lub, Hlub); simpl in Hlub.
 unfold is_lub, is_upper_bound in Hlub.
 destruct Hlub as (Hub, Hlub).
-
 bbb.
 
 Theorem trunc_bool_seq_eq : ∀ z pow i m n,
