@@ -548,7 +548,7 @@ specialize (H e).
 now intros H2; apply H; subst.
 Qed.
 
-(* End code Rémi Nollet, modified *)
+(* End code Rémi Nollet *)
 
 Definition id {A} (a : A) := a.
 Theorem id_nat : ∀ e : ℕ, ∃ x : ℕ, id x = e.
@@ -564,6 +564,8 @@ set (s := R_of_bin_seq u).
 destruct s as (lub, Hlub); simpl in Hlub.
 unfold is_lub, is_upper_bound in Hlub.
 destruct Hlub as (Hub, Hlub).
+exists lub.
+split.
 bbb.
 
 Theorem trunc_bool_seq_eq : ∀ z pow i m n,
