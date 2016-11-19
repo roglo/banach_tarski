@@ -436,6 +436,39 @@ apply classic.
 now intros Hb; apply H.
 Qed.
 
+Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
+
+(* Begin code Rémi Nollet, modified *)
+
+Theorem Cantor : ∀ E (F : E → (E → bool)), ∃ f : E → bool, ∀ x, f ≠ F x.
+Proof.
+intros E F; exists (fun e => negb (F e e)); intros x H.
+apply (f_equal (fun f => f x)) in H.
+exact (no_fixpoint_negb _ H).
+Qed.
+
+Lemma Cantor_gen : ∀ E X Y (sX : E → X) (sY : Y → (E → bool)),
+  ∀ (sX_surj : ∀ e, ∃ x, sX x = e),
+  ∀ (sY_surj : ∀ f, ∃ y, sY y = f),
+  ∀ f : X → Y, ∃ y, ∀ x, y ≠ f x.
+Proof.
+intros * sX_surj sY_surj F.
+destruct Cantor with E (fun e => sY (F (sX e))) as [f H].
+destruct sY_surj with f as [y]; subst.
+exists y; intros x ?; subst.
+destruct sX_surj with x as [e]; subst.
+apply (H e); reflexivity.
+Qed.
+
+Definition id {A} (a : A) := a.
+Check Cantor_gen.
+Check (Cantor_gen ℕ ℕ ℝ id).
+bbb.
+
+(* End code Rémi Nollet, modified *)
+
+bbb.
+
 (* equivalence between ℝ and a representation with integer and fractional
    part, the fractional part being a boolean sequence (false for 0, true
    for 1 *)
@@ -602,8 +635,6 @@ rewrite IHi, <- Nat.add_succ_comm.
 rewrite Rmult_assoc.
 destruct (u k); [ now rewrite Rplus_assoc | easy ].
 Qed.
-
-Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 (* 0x → 10; 1x → 00 *)
 Definition cantor_canon_diagonal (g : ℕ → ℕ → bool) i :=
