@@ -438,37 +438,6 @@ Qed.
 
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
-(* Begin code Rémi Nollet, modified *)
-
-Theorem Cantor : ∀ E (F : E → (E → bool)), ∃ f : E → bool, ∀ x, f ≠ F x.
-Proof.
-intros E F; exists (fun e => negb (F e e)); intros x H.
-apply (f_equal (fun f => f x)) in H.
-exact (no_fixpoint_negb _ H).
-Qed.
-
-Lemma Cantor_gen : ∀ E X Y (sX : E → X) (sY : Y → (E → bool)),
-  ∀ (sX_surj : ∀ e, ∃ x, sX x = e),
-  ∀ (sY_surj : ∀ f, ∃ y, sY y = f),
-  ∀ f : X → Y, ∃ y, ∀ x, y ≠ f x.
-Proof.
-intros * sX_surj sY_surj F.
-destruct Cantor with E (fun e => sY (F (sX e))) as [f H].
-destruct sY_surj with f as [y]; subst.
-exists y; intros x ?; subst.
-destruct sX_surj with x as [e]; subst.
-apply (H e); reflexivity.
-Qed.
-
-Definition id {A} (a : A) := a.
-Check Cantor_gen.
-Check (Cantor_gen ℕ ℕ ℝ id).
-bbb.
-
-(* End code Rémi Nollet, modified *)
-
-bbb.
-
 (* equivalence between ℝ and a representation with integer and fractional
    part, the fractional part being a boolean sequence (false for 0, true
    for 1 *)
@@ -554,6 +523,52 @@ Definition R_of_int_frac rif :=
   (IZR (Rint rif) + proj1_sig (R_of_bin_seq (Rfrac rif)))%R.
 
 Definition trunc_bool_seq u n i := if lt_dec i n then u i else false.
+
+(* Begin code Rémi Nollet, modified *)
+
+Theorem Cantor : ∀ E (F : E → (E → bool)), ∃ f : E → bool, ∀ x, f ≠ F x.
+Proof.
+intros E F; exists (fun e => negb (F e e)); intros x H.
+apply (f_equal (fun f => f x)) in H.
+exact (no_fixpoint_negb _ H).
+Qed.
+
+Lemma Cantor_gen : ∀ E X Y (Yss : set Y) (sX : E → X) (sY : Y → (E → bool)),
+  ∀ (sX_surj : ∀ e, ∃ x, sX x = e),
+  ∀ (sY_surj : ∀ f, ∃ y, y ∈ Yss → sY y = f),
+  ∀ f : X → Y, ∃ y, ∀ x, y ∈ Yss → y ≠ f x.
+Proof.
+intros * sX_surj sY_surj F.
+destruct Cantor with E (fun e => sY (F (sX e))) as [f H].
+destruct sY_surj with f as [y]; subst.
+exists y; intros x ?; subst.
+destruct sX_surj with x as [e]; subst.
+rewrite <- H0 in H; [ | easy ].
+specialize (H e).
+now intros H2; apply H; f_equal.
+Qed.
+
+Definition id {A} (a : A) := a.
+Theorem id_nat : ∀ e : ℕ, ∃ x : ℕ, id x = e.
+Proof. now intros; exists e. Qed.
+
+Check Cantor_gen.
+
+(* End code Rémi Nollet, modified *)
+
+Check (Cantor_gen ℕ ℕ ℝ unit_interv id bin_of_frac_part id_nat).
+
+Theorem id_glop : ∀ u : ℕ → bool, ∃ y : ℝ,
+  y ∈ unit_interv
+  → bin_of_frac_part y = u.
+Proof.
+intros u.
+set (s := R_of_bin_seq u).
+destruct s as (lub, Hlub); simpl in Hlub.
+unfold is_lub, is_upper_bound in Hlub.
+destruct Hlub as (Hub, Hlub).
+
+bbb.
 
 Theorem trunc_bool_seq_eq : ∀ z pow i m n,
   i + n <= m
