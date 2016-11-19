@@ -78,14 +78,82 @@ assert (H : (0 <= z)%Z).
  eapply Rlt_le_trans; [ eassumption | lra ].
 Qed.
 
+Theorem Int_part_le_compat : ∀ x y, (x <= y)%R → (Int_part x <= Int_part y)%Z.
+Proof.
+intros * Hxy.
+destruct (Z_le_gt_dec (Int_part x) (Int_part y)) as [| Hlt]; [ easy | ].
+exfalso; apply Z.gt_lt in Hlt.
+apply IZR_lt in Hlt.
+pose proof base_Int_part x as Hx.
+pose proof base_Int_part y as Hy.
+destruct Hx as (Hx1, Hx2).
+destruct Hy as (Hy1, Hy2).
+remember (IZR (Int_part x)) as a eqn:Ha.
+remember (IZR (Int_part y)) as b eqn:Hb.
+assert (Hab : (0 < a - b < 1)%R).
+ split.
+  apply Rplus_lt_reg_r with (r := b).
+  now rewrite Rplus_0_l, Rplus_comm, Rplus_minus.
+
+  eapply Rle_lt_trans.
+   apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
+
+   eapply Rle_lt_trans.
+    apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
+
+    apply Rgt_lt, Ropp_lt_contravar in Hy2.
+    rewrite Ropp_minus_distr in Hy2.
+    now rewrite Ropp_involutive in Hy2.
+
+ rewrite Ha, Hb in Hab.
+ rewrite Z_R_minus in Hab.
+ replace 0%R with (IZR 0) in Hab by lra.
+ replace 1%R with (IZR 1) in Hab by lra.
+ destruct Hab as (H1, H2).
+ apply lt_IZR in H1.
+ apply lt_IZR in H2.
+ remember (Int_part x - Int_part y)%Z as z.
+ clear -H1 H2.
+ rewrite Z.one_succ in H2.
+ apply Zlt_succ_le in H2.
+ now apply Zle_not_lt in H2.
+Qed.
+
 Theorem Int_part_close_to_1 : ∀ r n,
   (INR n / INR (n + 1) <= r < 1)%R
-  → Int_part (r * (INR n + 1)) = Z.of_nat n.
+  → Int_part (r * (INR (n + 1))) = Z.of_nat n.
 Proof.
-intros * Hn.
-revert r Hn.
-induction n; intros.
-Focus 2.
+intros * (Hnr, Hr1).
+apply Rmult_le_compat_r with (r := INR (n + 1)) in Hnr; [ | apply pos_INR ].
+rewrite <- Rmul_div in Hnr.
+unfold Rdiv in Hnr.
+rewrite Rmult_assoc in Hnr.
+rewrite Rinv_r in Hnr; [ | now apply not_0_INR; rewrite Nat.add_comm ].
+rewrite Rmult_1_r in Hnr.
+apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1.
+ Focus 2.
+ rewrite plus_INR; simpl.
+ apply Rplus_le_lt_0_compat; [ apply pos_INR | lra ].
+
+ rewrite Rmult_1_l in Hr1.
+ remember (r * INR (n + 1))%R as x eqn:Hx.
+ clear r Hx.
+ apply Int_part_le_compat in Hnr.
+ rewrite Int_part_INR in Hnr.
+ apply Z.le_antisymm; [ | easy ].
+ rewrite plus_INR in Hr1; simpl in Hr1.
+ apply Rplus_lt_compat_r with (r := (-1)%R) in Hr1.
+ rewrite Rplus_assoc in Hr1.
+ rewrite Rplus_opp_r, Rplus_0_r in Hr1.
+SearchAbout Int_part.
+bbb.
+
+ generalize Hr1; intros Hr2.
+ apply Rlt_le in Hr2.
+ apply Int_part_le_compat in Hr2.
+ rewrite Int_part_INR in Hr2.
+SearchAbout (Int_part _ <= _)%Z.
+SearchAbout (_ < INR _)%R.
 
 bbb.
 
@@ -133,45 +201,4 @@ intros x.
 pose proof base_fp x as H.
 destruct H as (H1, H2).
 now apply Rge_le in H1.
-Qed.
-
-Theorem Int_part_le_compat : ∀ x y, (x <= y)%R → (Int_part x <= Int_part y)%Z.
-Proof.
-intros * Hxy.
-destruct (Z_le_gt_dec (Int_part x) (Int_part y)) as [| Hlt]; [ easy | ].
-exfalso; apply Z.gt_lt in Hlt.
-apply IZR_lt in Hlt.
-pose proof base_Int_part x as Hx.
-pose proof base_Int_part y as Hy.
-destruct Hx as (Hx1, Hx2).
-destruct Hy as (Hy1, Hy2).
-remember (IZR (Int_part x)) as a eqn:Ha.
-remember (IZR (Int_part y)) as b eqn:Hb.
-assert (Hab : (0 < a - b < 1)%R).
- split.
-  apply Rplus_lt_reg_r with (r := b).
-  now rewrite Rplus_0_l, Rplus_comm, Rplus_minus.
-
-  eapply Rle_lt_trans.
-   apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
-
-   eapply Rle_lt_trans.
-    apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
-
-    apply Rgt_lt, Ropp_lt_contravar in Hy2.
-    rewrite Ropp_minus_distr in Hy2.
-    now rewrite Ropp_involutive in Hy2.
-
- rewrite Ha, Hb in Hab.
- rewrite Z_R_minus in Hab.
- replace 0%R with (IZR 0) in Hab by lra.
- replace 1%R with (IZR 1) in Hab by lra.
- destruct Hab as (H1, H2).
- apply lt_IZR in H1.
- apply lt_IZR in H2.
- remember (Int_part x - Int_part y)%Z as z.
- clear -H1 H2.
- rewrite Z.one_succ in H2.
- apply Zlt_succ_le in H2.
- now apply Zle_not_lt in H2.
 Qed.
