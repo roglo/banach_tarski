@@ -137,88 +137,26 @@ apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1.
 
  rewrite Rmult_1_l in Hr1.
  remember (r * INR (n + 1))%R as x eqn:Hx.
- pose proof base_Int_part x as H.
- destruct H as (Hix, Hmx).
- assert (Hnx : (x < IZR (Int_part x) + 1)%R) by lra; clear Hmx.
  rewrite plus_INR in Hr1; simpl in Hr1.
  rewrite INR_IZR_INZ in Hnr.
  rewrite INR_IZR_INZ in Hr1.
- clear r Hx.
-bbb.
-
- apply Int_part_le_compat in Hnr.
- rewrite Int_part_INR in Hnr.
- apply Z.le_antisymm; [ | easy ].
- rewrite plus_INR in Hr1; simpl in Hr1.
- apply Rplus_lt_compat_r with (r := (-1)%R) in Hr1.
- replace (x + -1)%R with (x - 1)%R in Hr1 by lra.
- rewrite Rplus_assoc in Hr1.
- rewrite Rplus_opp_r, Rplus_0_r in Hr1.
- apply le_IZR.
- rewrite <- INR_IZR_INZ.
- pose proof base_Int_part x as H.
- destruct H as (Hix, Hmx).
- eapply Rle_trans; [ eassumption | ].
-vvv.
-SearchAbout (_ < _ → _ <= _)%R.
-SearchAbout IZR.
-SearchAbout Int_part.
-Check INR_IZR_INZ.
-SearchAbout (IZR (Int_part _)).
-bbb.
- rewrite <- Int_part_INR.
- apply Int_part_le_compat.
-
-
-bbb.
-
- generalize Hr1; intros Hr2.
- apply Rlt_le in Hr2.
- apply Int_part_le_compat in Hr2.
- rewrite Int_part_INR in Hr2.
-SearchAbout (Int_part _ <= _)%Z.
-SearchAbout (_ < INR _)%R.
-
-bbb.
+ unfold Int_part.
+ apply Z.add_cancel_r with (p := 1%Z).
+ rewrite Z.sub_add; symmetry.
+ apply tech_up; [ now rewrite plus_IZR | ].
+ rewrite plus_IZR; simpl.
+ now apply Rplus_le_compat_r.
+Qed.
 
 Theorem Int_part_is_0 : ∀ x, (0 <= x < 1)%R → Int_part x = 0%Z.
 Proof.
 intros * Hx.
 assert ((INR 0 / INR (0 + 1) <= x < 1)%R) by (now simpl; lra).
 pose proof Int_part_close_to_1 x 0 H as H1.
-simpl in H1.
-now rewrite Rplus_0_l, Rmult_1_r in H1.
-bbb.
-
-intros * Hx.
-unfold Int_part.
-pose proof archimed x as H.
-destruct H as (Hgt, Hle).
-destruct Hx as (Hx1, Hx2).
-apply Z.sub_move_r; simpl.
-apply Rplus_le_compat_r with (r := x) in Hle.
-unfold Rminus in Hle.
-rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r in Hle.
-remember (up x) as z eqn:Hz; symmetry in Hz.
-assert (Hzp : (0 <= z)%Z).
- subst z; apply le_IZR; simpl.
- eapply Rle_trans; [ eassumption | now apply Rlt_le ].
-
- apply IZN in Hzp.
- destruct Hzp as (n, Hn).
- move Hn at top; subst z.
- destruct n; [ simpl in Hgt; lra | ].
- destruct n; [ easy | exfalso ].
- apply Rle_not_lt in Hle; apply Hle.
- apply Rlt_le_trans with (r2 := (1 + 1)%R); [ lra | ].
- rewrite <- INR_IZR_INZ; simpl.
- destruct n; [ lra | ].
- rewrite Rplus_assoc.
- replace 2%R with (0 + 2)%R at 1 by lra.
- apply Rplus_le_compat_r, pos_INR.
+now simpl in H1; rewrite Rmult_1_r in H1.
 Qed.
 
-(* useless since there is theorem 'base_fp' in Coq library *)
+(* useless since there is theorem 'base_fp' in Coq library
 Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
 Proof.
 intros x.
@@ -226,3 +164,4 @@ pose proof base_fp x as H.
 destruct H as (H1, H2).
 now apply Rge_le in H1.
 Qed.
+*)
