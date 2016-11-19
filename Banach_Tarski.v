@@ -625,16 +625,16 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
        apply Hxlu; intros x (k & Hx); subst x.
        clear -Hr Hk.
        unfold partial_sum.
-       assert (H : ∀ j, (1 / 2 <= frac_part (r * 2 ^ j))%R).
-        intros j; specialize (Hk j); unfold bin_of_frac_part in Hk.
-        destruct (Rlt_dec (frac_part (r * 2 ^ j)) (1 / 2)); [ easy | ].
-        now apply Rnot_lt_le.
+       assert (H : ∀ k pow i,
+         partial_sum_aux k (bin_of_frac_part r) pow i =
+         partial_sum_aux k (λ _, true) pow i).
+        clear k; intros.
+        revert i pow.
+        induction k; intros; [ easy | simpl ].
+        rewrite Hk.
+        apply Rplus_eq_compat_l, IHk.
 
-        clear Hk; rename H into Hk.
-
-Print partial_sum_aux.
-Print bin_of_frac_part.
-
+       rewrite H; clear H Hk.
 bbb.
 destruct k; [ easy | simpl ].
 rewrite Hk.
