@@ -744,6 +744,22 @@ rewrite Int_part_close_to_1 in Hk1; [| now split ].
 simpl in Hk1.
 apply Rplus_le_compat_r with (r := 1) in Hk1.
 replace (_ - 1 + 1)%R with (r * 2)%R in Hk1 by lra.
+field_simplify in Hk1.
+rewrite Rmult_1_r, Rmult_comm in Hk1.
+field_simplify in Hk1.
+rewrite Rdiv_1_r in Hk1.
+apply Rmult_le_compat_l with (r := (/2)%R) in Hk1; [ | lra ].
+rewrite <- Rmult_assoc in Hk1.
+rewrite Rinv_l, Rmult_1_l in Hk1; [ | lra ].
+field_simplify in Hk1.
+rewrite Rdiv_1_r in Hk1.
+clear H Hk0.
+rewrite <- Rplus_assoc.
+remember (1 / 2 + 1 / 2 / 2)%R as u.
+field_simplify in Hequ.
+rewrite Rdiv_1_r in Hequ.
+replace (6 / 8)%R with (3 / 4)%R in Hequ by lra.
+subst u.
 bbb.
 Check Int_part_close_to_1.
 
