@@ -526,17 +526,16 @@ Definition trunc_bool_seq u n i := if lt_dec i n then u i else false.
 
 (* Begin code Rémi Nollet, modified *)
 
-Theorem Cantor : ∀ E (F : E → (E → bool)), ∃ f : E → bool, ∀ x, f ≠ F x.
+Theorem Cantor : ∀ E (F : E → (E → bool)), ∃ f : E → bool, ∀ x, f x ≠ F x x.
 Proof.
 intros E F; exists (fun e => negb (F e e)); intros x H.
-apply (f_equal (fun f => f x)) in H.
 exact (no_fixpoint_negb _ H).
 Qed.
 
 Lemma Cantor_gen : ∀ E X Y (Yss : Y → Prop),
   ∀ (sX : E → X) (sY : Y → (E → bool)),
   ∀ (sX_surj : ∀ e, ∃ x, sX x = e),
-  ∀ (sY_surj : ∀ f, ∃ y, Yss y ∧ sY y = f),
+  ∀ (sY_surj : ∀ f, ∃ y, Yss y ∧ ∀ x, sY y x = f x),
   ∀ f : X → Y, ∃ y, ∀ x, Yss y ∧ y ≠ f x.
 Proof.
 intros * sX_surj sY_surj F.
@@ -546,7 +545,7 @@ destruct Hy as (Hy, Hyf).
 exists y; intros x; split; [ easy | ]; subst.
 destruct sX_surj with x as [e]; subst.
 specialize (H e).
-now intros H2; apply H; f_equal.
+now intros H2; apply H; subst.
 Qed.
 
 (* End code Rémi Nollet, modified *)
@@ -557,8 +556,8 @@ Proof. now intros; exists e. Qed.
 
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id bin_of_frac_part id_nat).
 
-Theorem id_glop : ∀ u : ℕ → bool, ∃ y : ℝ,
-  y ∈ unit_interv ∧ bin_of_frac_part y = u.
+Theorem id_glop : ∀ u : ℕ → bool, ∃ x : ℝ,
+  x ∈ unit_interv ∧ ∀ n, bin_of_frac_part x n = u n.
 Proof.
 intros u.
 set (s := R_of_bin_seq u).
