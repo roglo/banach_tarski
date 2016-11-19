@@ -739,6 +739,14 @@ rewrite Rmult_1_r in H.
 destruct (Rlt_dec (frac_part (r * 2)) (1 / 2)) as [| Hk1]; [ easy | ].
 apply Rnot_lt_le in Hk1.
 unfold frac_part in Hk1.
+replace 2%R with (INR (1 + 1)) in Hk1 at 3 by easy.
+rewrite Int_part_close_to_1 in Hk1; [| now split ].
+simpl in Hk1.
+apply Rplus_le_compat_r with (r := 1) in Hk1.
+replace (_ - 1 + 1)%R with (r * 2)%R in Hk1 by lra.
+bbb.
+Check Int_part_close_to_1.
+
 SearchAbout Int_part.
 Theorem glop : ∀ r, (1 / 2 <= r < 1)%R → Int_part (r * 2) = 1.
 Proof.
