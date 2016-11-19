@@ -436,7 +436,7 @@ apply classic.
 now intros Hb; apply H.
 Qed.
 
-Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
+Definition unit_interv := mkset (λ x, (0 <= x <= 1)%R).
 
 (* equivalence between ℝ and a representation with integer and fractional
    part, the fractional part being a boolean sequence (false for 0, true
@@ -556,7 +556,7 @@ Proof. now intros; exists e. Qed.
 
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id bin_of_frac_part id_nat).
 
-Theorem id_glop : ∀ u : ℕ → bool, ∃ x : ℝ,
+Theorem bin_of_frac_part_surj : ∀ u : ℕ → bool, ∃ x : ℝ,
   x ∈ unit_interv ∧ ∀ n, bin_of_frac_part x n = u n.
 Proof.
 intros u.
@@ -566,6 +566,11 @@ unfold is_lub, is_upper_bound in Hlub.
 destruct Hlub as (Hub, Hlub).
 exists lub.
 split.
+ simpl; split; [ now apply Hub; exists O | ].
+ apply Hlub; intros x (k & Hk); subst x.
+ apply partial_sum_le_1.
+
+ intros n.
 bbb.
 
 Theorem trunc_bool_seq_eq : ∀ z pow i m n,
