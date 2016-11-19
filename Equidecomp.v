@@ -5,12 +5,10 @@
 
 Require Import Utf8 List Relations.
 Import ListNotations.
-Require Import Reals.
+Require Import Reals.Rdefinitions.
 
 Require Import Misc Matrix Pset.
 Require Import Partition OrbitRepr GroupTransf.
-
-Definition id {A} := @Datatypes.id A.
 
 Definition equidecomposable (s : set_model point) E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧
@@ -25,7 +23,7 @@ split; [ apply is_partition_single | ].
 constructor; [ | constructor ].
 exists (Xtransl 0); unfold set_eq; simpl.
 unfold xtransl; intros (x, y, z).
-now rewrite Rminus_0_r.
+now rewrite RIneq.Rminus_0_r.
 Qed.
 
 Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).
@@ -279,7 +277,7 @@ split.
     apply length_zero_iff_nil in Hlen; subst P'F; simpl.
     subst fl.
     destruct gl as [| g₁ gl].
-     simpl; unfold id, Datatypes.id at 2; simpl.
+     simpl; unfold id at 2; simpl.
      now do 2 rewrite intersection_empty_r.
 
      simpl; unfold app_gr_inv, Nat.div; rewrite app_gr_empty_set.
