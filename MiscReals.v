@@ -137,15 +137,39 @@ apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1.
 
  rewrite Rmult_1_l in Hr1.
  remember (r * INR (n + 1))%R as x eqn:Hx.
+ pose proof base_Int_part x as H.
+ destruct H as (Hix, Hmx).
+ assert (Hnx : (x < IZR (Int_part x) + 1)%R) by lra; clear Hmx.
+ rewrite plus_INR in Hr1; simpl in Hr1.
+ rewrite INR_IZR_INZ in Hnr.
+ rewrite INR_IZR_INZ in Hr1.
  clear r Hx.
+bbb.
+
  apply Int_part_le_compat in Hnr.
  rewrite Int_part_INR in Hnr.
  apply Z.le_antisymm; [ | easy ].
  rewrite plus_INR in Hr1; simpl in Hr1.
  apply Rplus_lt_compat_r with (r := (-1)%R) in Hr1.
+ replace (x + -1)%R with (x - 1)%R in Hr1 by lra.
  rewrite Rplus_assoc in Hr1.
  rewrite Rplus_opp_r, Rplus_0_r in Hr1.
+ apply le_IZR.
+ rewrite <- INR_IZR_INZ.
+ pose proof base_Int_part x as H.
+ destruct H as (Hix, Hmx).
+ eapply Rle_trans; [ eassumption | ].
+vvv.
+SearchAbout (_ < _ → _ <= _)%R.
+SearchAbout IZR.
 SearchAbout Int_part.
+Check INR_IZR_INZ.
+SearchAbout (IZR (Int_part _)).
+bbb.
+ rewrite <- Int_part_INR.
+ apply Int_part_le_compat.
+
+
 bbb.
 
  generalize Hr1; intros Hr2.
