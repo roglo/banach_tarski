@@ -629,10 +629,25 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
       apply Rplus_eq_compat_l, IHk.
 
       clear Hk; rename H into Hk.
-unfold partial_sum in Hxu.
-bbb.
-rewrite Hk in Hxu.
+      unfold partial_sum in Hxu.
+      assert (H : ∀ x : ℝ,
+        (∃ k : ℕ, partial_sum_aux k (λ _, true) (1 / 2) 0 = x)
+        → (x <= lub)%R).
+       intros * (k, H); rewrite <- Hk in H.
+       now apply Hxu; exists k.
 
+       clear Hxu; rename H into Hxu.
+       unfold partial_sum in Hxlu.
+       assert (H : ∀ b,
+         (∀ x, (∃ k : ℕ, partial_sum_aux k (λ _, true) (1 / 2) 0 = x)
+          → (x <= b)%R)
+         → (lub <= b)%R).
+        intros * H.
+        apply Hxlu; intros * (k, H1); apply H; exists k.
+        now rewrite <- Hk.
+
+        clear Hxlu; rename H into Hxlu; clear Hk.
+bbb.
 
      assert (Hrlub : r = lub).
       assert (lub <= r)%R.
