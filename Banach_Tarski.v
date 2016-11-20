@@ -609,11 +609,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     rewrite Int_part_INR; simpl; lra.
 
     set (u := bin_of_frac_part r) in Hk.
-bbb.
-    assert (∀ ε, (ε > 0)%R → ∃ k, (Rabs (r - partial_sum u k) < ε)%R).
-     intros * Hε.
-bbb.
-    set (E x := ∃ k, partial_sum (bin_of_frac_part r) k = x).
+    set (E x := ∃ k, partial_sum u k = x).
     assert (Hb : bound E).
      unfold bound, E; exists 1.
      unfold is_upper_bound.
@@ -625,6 +621,23 @@ bbb.
      destruct m as (x & Hxu & Hxlu).
      unfold E, is_upper_bound in Hxu, Hxlu.
      rename x into lub; clear E Hb He.
+     assert (Hpsp : ∀ k, (2 * partial_sum u (S k) = 1 + partial_sum u k)%R).
+      assert
+        (H : ∀ k pow i,
+         (2 * partial_sum_aux (S k) u pow i =
+          2 * pow + partial_sum_aux k u pow i)%R).
+       intros k.
+       induction k; intros; [ simpl; rewrite Hk; lra | ].
+       remember (S k) as sk; simpl; subst sk.
+       rewrite Hk, Rmult_plus_distr_l.
+       apply Rplus_eq_compat_l.
+       rewrite IHk; simpl; rewrite Hk; lra.
+
+       intros k; unfold partial_sum; rewrite H; lra.
+
+      idtac.
+bbb.
+
      assert (H : ∀ k pow i,
        partial_sum_aux k (bin_of_frac_part r) pow i =
        partial_sum_aux k (λ _, true) pow i).
