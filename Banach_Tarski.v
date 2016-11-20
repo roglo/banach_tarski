@@ -608,15 +608,27 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     replace 1%R with (INR 1) by easy.
     rewrite Int_part_INR; simpl; lra.
 
-    destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
-    exfalso; apply Rnot_le_lt in Hr1.
-    assert (∃ k, (r + (1 / 2) ^ k < 1)%R).
-     enough (∃ k, ((1 / 2) ^ k < 1 - r)%R).
-      destruct H as (k & H); exists k; lra.
+    assert (Hk' : ∀ j, (1 / 2 <= frac_part (r * 2 ^ j))%R).
+     intros j; specialize (Hk j).
+     unfold bin_of_frac_part in Hk.
+     remember (frac_part (r * 2 ^ j)) as x.
+     destruct (Rlt_dec x (1 / 2)) as [| H]; [ easy | ].
+     now apply Rnot_lt_le in H.
 
-      assert (0 < 1 - r)%R by lra.
-      remember (1 - r)%R as ε eqn:Hε.
-      clear - H.
+     clear Hk; rename Hk' into Hk.
+     destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
+     exfalso; apply Rnot_le_lt in Hr1.
+     assert (∃ k, (r + (1 / 2) ^ k < 1)%R).
+      enough (∃ k, ((1 / 2) ^ k < 1 - r)%R).
+       destruct H as (k & H); exists k; lra.
+
+       assert (0 < 1 - r)%R by lra.
+       remember (1 - r)%R as ε eqn:Hε.
+       clear - H.
+Focus 2.
+destruct H as (k, H).
+
+bbb.
       specialize (archimed ε); intros (H1, H2).
 assert (myarchi : ∀ ε x, (ε > 0)%R → ∃ N, (ε * INR N > x)%R).
  clear; intros * Hε.
