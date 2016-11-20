@@ -621,21 +621,31 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      destruct m as (x & Hxu & Hxlu).
      unfold E, is_upper_bound in Hxu, Hxlu.
      rename x into lub; clear E Hb He.
-     assert (Hpsp : ∀ k, (2 * partial_sum u (S k) = 1 + partial_sum u k)%R).
+     assert (Hpsp : ∀ k, (partial_sum u (S k) = (1 + partial_sum u k) / 2)%R).
       assert
         (H : ∀ k pow i,
-         (2 * partial_sum_aux (S k) u pow i =
-          2 * pow + partial_sum_aux k u pow i)%R).
+         (partial_sum_aux (S k) u pow i =
+          pow + partial_sum_aux k u pow i / 2)%R).
        intros k.
        induction k; intros; [ simpl; rewrite Hk; lra | ].
        remember (S k) as sk; simpl; subst sk.
-       rewrite Hk, Rmult_plus_distr_l.
-       apply Rplus_eq_compat_l.
+       rewrite Hk; apply Rplus_eq_compat_l.
        rewrite IHk; simpl; rewrite Hk; lra.
 
        intros k; unfold partial_sum; rewrite H; lra.
 
-      idtac.
+      assert (Hek : ∀ x,
+        (∃ k : ℕ, partial_sum u k = x)%R
+        → (∃ k : ℕ, partial_sum u k = (1 + x) / 2)%R).
+       intros x (k & Hkx).
+       now exists (S k); rewrite Hpsp, Hkx.
+
+bbb.
+       assert (lub <= 1)%R.
+        apply Hxlu.
+        intros x Hkx.
+        apply Hek in Hkx.
+        destruct Hkx as (k, Hkx).
 bbb.
 
      assert (H : ∀ k pow i,
