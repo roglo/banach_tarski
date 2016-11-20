@@ -608,6 +608,10 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     replace 1%R with (INR 1) by easy.
     rewrite Int_part_INR; simpl; lra.
 
+    set (u := bin_of_frac_part r) in Hk.
+bbb.
+    assert (∀ ε, (ε > 0)%R → ∃ k, (Rabs (r - partial_sum u k) < ε)%R).
+     intros * Hε.
 bbb.
     set (E x := ∃ k, partial_sum (bin_of_frac_part r) k = x).
     assert (Hb : bound E).
