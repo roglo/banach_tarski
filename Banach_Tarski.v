@@ -618,6 +618,10 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      clear Hk; rename Hk' into Hk.
      destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
      exfalso; apply Rnot_le_lt in Hr1.
+     assert (∃ k, ((1 / 2) ^ k < 1 - r)%R).
+      assert (0 < 1 - r)%R by lra.
+      remember (1 - r)%R as ε eqn:Hε.
+      clear - H.
 bbb.
      assert (∃ k, (r + (1 / 2) ^ k < 1)%R).
       enough (∃ k, ((1 / 2) ^ k < 1 - r)%R).
