@@ -608,6 +608,13 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     replace 1%R with (INR 1) by easy.
     rewrite Int_part_INR; simpl; lra.
 
+    assert (Hk' : ∀ j, (1 / 2 <= frac_part (r * 2 ^ j))%R).
+     intros j; specialize (Hk j).
+     unfold bin_of_frac_part in Hk.
+     remember (frac_part (r * 2 ^ j)) as x.
+     destruct (Rlt_dec x (1 / 2)) as [| H]; [ easy | ].
+     now apply Rnot_lt_le in H.
+
     set (u := bin_of_frac_part r) in Hk.
     set (E x := ∃ k, partial_sum u k = x).
     assert (Hb : bound E).
