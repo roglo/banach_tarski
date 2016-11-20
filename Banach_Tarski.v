@@ -559,7 +559,7 @@ Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id bin_of_frac_part id_nat).
 Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
 
 Theorem converted_real_is_canonical : ∀ r,
-  (0 <= r < 1)%R
+  (0 <= r <= 1)%R
   → bin_of_frac_part r ∈ Canonical_seq.
 Proof.
 intros r Hr i.
@@ -608,6 +608,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     replace 1%R with (INR 1) by easy.
     rewrite Int_part_INR; simpl; lra.
 
+bbb.
     set (E x := ∃ k, partial_sum (bin_of_frac_part r) k = x).
     assert (Hb : bound E).
      unfold bound, E; exists 1.
