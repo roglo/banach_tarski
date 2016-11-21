@@ -677,6 +677,10 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
            apply Rlt_not_le in H; apply H, Hk.
 
            fold n.
+           unfold frac_part.
+           specialize (base_Int_part (r * n)); intros (H1, H2).
+assert (IZR (Int_part (r * n)) = u k * n)%R.
+SearchAbout up.
 bbb.
 
 Proof.
