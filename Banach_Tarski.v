@@ -622,16 +622,43 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
       assert (0 < 1 - r)%R by lra.
       remember (1 - r)%R as ε eqn:Hε.
       clear - H.
-Fixpoint smaller_two_power_aux k ε pow :=
-  match k with
-  | O => None
-  | S k' =>
-      if Rlt_dec pow ε then Some pow
-      else smaller_two_power_aux k' ε (pow / 2)%R
-  end.
-      remember (Z.to_nat (up (1 / ε))) as k eqn:Hk; symmetry in Hk.
-      remember (smaller_two_power_aux k ε 1) as s eqn:Hs; symmetry in Hs.
-      destruct s as [s |].
+      specialize (archimed (1 / ε)); intros (H1, H2).
+      remember (up (1 / ε)) as z eqn:Hz.
+      exists (Z.to_nat z).
+      apply Rlt_trans with (r2 := (1 / IZR z)%R).
+       unfold Rdiv.
+       rewrite Rpow_mult_distr, pow1.
+       do 2 rewrite Rmult_1_l.
+       rewrite <- Rinv_pow; [ | lra ].
+       apply Rinv_lt_contravar.
+        apply Rmult_lt_0_compat; [ | apply pow_lt; lra ].
+        apply Rlt_trans with (r2 := (1 / ε)%R); [ | easy ].
+        now unfold Rdiv; rewrite Rmult_1_l; apply Rinv_0_lt_compat.
+
+        remember (Z.to_nat z) as n eqn:Hn.
+        apply (f_equal Z.of_nat) in Hn.
+        rewrite Z2Nat.id in Hn.
+         rewrite <- Hn; rewrite <- INR_IZR_INZ.
+         clear; induction n; [ apply pow_lt; lra | simpl ].
+         destruct n; [ lra | ].
+         apply Rplus_lt_reg_r with (r := (-1)%R).
+         rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+         eapply Rlt_trans; [ eassumption | ].
+         apply Rplus_lt_reg_r with (r := 1%R).
+         rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
+         rewrite double.
+         apply Rplus_lt_compat_l.
+         apply Rlt_pow_R1; [ lra | ].
+         apply Nat.lt_0_succ.
+
+         apply le_IZR; simpl; apply Rlt_le.
+         apply Rlt_trans with (r2 := (1 / ε)%R); [ | easy ].
+         unfold Rdiv; rewrite Rmult_1_l.
+         now apply Rinv_0_lt_compat.
+
+       idtac.
+bbb.
+
 Focus 2.
 exfalso.
 induction k.
