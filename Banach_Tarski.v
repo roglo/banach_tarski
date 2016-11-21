@@ -618,74 +618,35 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      clear Hk; rename Hk' into Hk.
      destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
      exfalso; apply Rnot_le_lt in Hr1.
-     assert (∃ k, ((1 / 2) ^ k < 1 - r)%R).
+     assert (Hk1r : ∃ k, ((1 / 2) ^ k < 1 - r)%R).
       assert (0 < 1 - r)%R by lra.
       remember (1 - r)%R as ε eqn:Hε.
       clear - H.
-      specialize (archimed (1 / ε)); intros (H1, H2).
-      remember (up (1 / ε)) as z eqn:Hz.
-      exists (Z.to_nat z).
-      apply Rlt_trans with (r2 := (1 / IZR z)%R).
-       unfold Rdiv.
-       rewrite Rpow_mult_distr, pow1.
-       do 2 rewrite Rmult_1_l.
-       rewrite <- Rinv_pow; [ | lra ].
-       apply Rinv_lt_contravar.
-        apply Rmult_lt_0_compat; [ | apply pow_lt; lra ].
-        apply Rlt_trans with (r2 := (1 / ε)%R); [ | easy ].
-        now unfold Rdiv; rewrite Rmult_1_l; apply Rinv_0_lt_compat.
+      apply archimed_cor1 in H.
+      destruct H as (k & Hkε & Hk).
+      exists k.
+      eapply Rlt_trans; [ | eassumption ].
+      unfold Rdiv.
+      rewrite Rpow_mult_distr, pow1, Rmult_1_l.
+      rewrite <- Rinv_pow; [ | lra ].
+      apply Rinv_lt_contravar.
+       apply Rmult_lt_0_compat; [ | apply pow_lt; lra ].
+       now apply lt_INR in Hk.
 
-        remember (Z.to_nat z) as n eqn:Hn.
-        apply (f_equal Z.of_nat) in Hn.
-        rewrite Z2Nat.id in Hn.
-         rewrite <- Hn; rewrite <- INR_IZR_INZ.
-         clear; induction n; [ apply pow_lt; lra | simpl ].
-         destruct n; [ lra | ].
-         apply Rplus_lt_reg_r with (r := (-1)%R).
-         rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
-         eapply Rlt_trans; [ eassumption | ].
-         apply Rplus_lt_reg_r with (r := 1%R).
-         rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
-         rewrite double.
-         apply Rplus_lt_compat_l.
-         apply Rlt_pow_R1; [ lra | ].
-         apply Nat.lt_0_succ.
+       clear - Hk.
+       induction k; simpl; [ lra | ].
+       destruct k; [ lra | ].
+       apply Rplus_lt_reg_r with (r := (-1)%R).
+       rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+       eapply Rlt_trans; [ apply IHk, Nat.lt_0_succ | ].
+       apply Rplus_lt_reg_r with (r := 1%R).
+       rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
+       rewrite double.
+       apply Rplus_lt_compat_l.
+       apply Rlt_pow_R1; [ lra | ].
+       apply Nat.lt_0_succ.
 
-         apply le_IZR; simpl; apply Rlt_le.
-         apply Rlt_trans with (r2 := (1 / ε)%R); [ | easy ].
-         unfold Rdiv; rewrite Rmult_1_l.
-         now apply Rinv_0_lt_compat.
-
-       idtac.
-bbb.
-
-Focus 2.
-exfalso.
-induction k.
- specialize (archimed (1 / ε)); intros (H1, H2).
-bbb.
- apply (f_equal Z.of_nat) in Hk; simpl in Hk.
- rewrite Z2Nat.id in Hk.
-  rewrite Hk in H1; simpl in H1.
-  apply Rmult_lt_compat_r with (r := ε) in H1; [ | easy ].
-  unfold Rdiv in H1; rewrite Rmult_assoc, Rinv_l in H1; lra.
-bbb.
-
-SearchAbout (INR (Z.to_nat _)).
-Check eq_INR.
-apply INR_eq in Hk.
-
-bbb.
-     assert (∃ k, (r + (1 / 2) ^ k < 1)%R).
-      enough (∃ k, ((1 / 2) ^ k < 1 - r)%R).
-       destruct H as (k & H); exists k; lra.
-
-       assert (0 < 1 - r)%R by lra.
-       remember (1 - r)%R as ε eqn:Hε.
-       clear - H.
-Focus 2.
-destruct H as (k, H).
-
+      destruct Hk1r as (k, Hk1r).
 bbb.
       specialize (archimed ε); intros (H1, H2).
 assert (myarchi : ∀ ε x, (ε > 0)%R → ∃ N, (ε * INR N > x)%R).
