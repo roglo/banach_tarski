@@ -622,6 +622,32 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
       assert (0 < 1 - r)%R by lra.
       remember (1 - r)%R as ε eqn:Hε.
       clear - H.
+Fixpoint smaller_two_power_aux k ε pow :=
+  match k with
+  | O => None
+  | S k' =>
+      if Rlt_dec pow ε then Some pow
+      else smaller_two_power_aux k' ε (pow / 2)%R
+  end.
+      remember (Z.to_nat (up (1 / ε))) as k eqn:Hk; symmetry in Hk.
+      remember (smaller_two_power_aux k ε 1) as s eqn:Hs; symmetry in Hs.
+      destruct s as [s |].
+Focus 2.
+exfalso.
+induction k.
+ specialize (archimed (1 / ε)); intros (H1, H2).
+bbb.
+ apply (f_equal Z.of_nat) in Hk; simpl in Hk.
+ rewrite Z2Nat.id in Hk.
+  rewrite Hk in H1; simpl in H1.
+  apply Rmult_lt_compat_r with (r := ε) in H1; [ | easy ].
+  unfold Rdiv in H1; rewrite Rmult_assoc, Rinv_l in H1; lra.
+bbb.
+
+SearchAbout (INR (Z.to_nat _)).
+Check eq_INR.
+apply INR_eq in Hk.
+
 bbb.
      assert (∃ k, (r + (1 / 2) ^ k < 1)%R).
       enough (∃ k, ((1 / 2) ^ k < 1 - r)%R).
