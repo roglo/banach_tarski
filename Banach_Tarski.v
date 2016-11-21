@@ -681,6 +681,14 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
            specialize (base_Int_part (r * n)); intros (H1, H2).
 assert (IZR (Int_part (r * n)) = u k * n)%R.
 SearchAbout up.
+Theorem toto : ∀ x i j,
+  (INR i <= x < INR (S i))%R
+  → (INR j <= x < INR (S j))%R
+  → i = j.
+Admitted.
+Show.
+SearchAbout (IZR (Int_part _)).
+
 bbb.
 
 Proof.
