@@ -636,6 +636,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
         remember (S k) as sk; simpl; subst sk.
         rewrite Hb.
+        rewrite IHk.
 bbb.
 
 Proof.
