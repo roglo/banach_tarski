@@ -643,11 +643,10 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
       assert (Hb : ∀ k, bin_of_frac_part r k = true).
        intros k.
        simpl; unfold bin_of_frac_part.
-       destruct (Rlt_dec (frac_part (r * 2 ^ k)) (1 / 2)) as [H1| H1].
-        apply Rlt_not_le in H1.
-        now specialize (Hk k).
-
-        easy.
+       set (x := frac_part (r * 2 ^ k)).
+       destruct (Rlt_dec x (1 / 2)) as [H1| H1]; [ | easy ].
+       apply Rlt_not_le in H1.
+       now specialize (Hk k).
 
        assert (Hps : ∀ k, (u (S k) = u k + 1 / 2 ^ S k)%R).
         intros k; subst u; unfold partial_sum.
@@ -655,9 +654,21 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
         rewrite Rinv_mult_distr; [ now rewrite Rmult_assoc | lra | ].
         apply pow_nonzero; lra.
 
-        destruct Hir as (k, Hir).
-        rewrite <- Hu in Hir.
-        rewrite Hps in Hir.
+        destruct Hir as (k & Hur & Hru).
+        rewrite <- Hu in Hur, Hru.
+        rewrite Hps in Hru.
+        set (n := (2 ^ S k)%R).
+        apply Rmult_le_compat_r with (r := n) in Hur.
+         2: apply pow_le; lra.
+
+         apply Rmult_lt_compat_r with (r := n) in Hru.
+          2: apply pow_lt; lra.
+
+          rewrite Rmult_plus_distr_r in Hru.
+          unfold Rdiv at 1 in Hru.
+          rewrite Rmult_assoc in Hru.
+          rewrite Rinv_l, Rmult_1_r in Hru.
+
 bbb.
 
 Proof.
