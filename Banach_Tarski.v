@@ -618,6 +618,32 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      clear Hk; rename Hk' into Hk.
      destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
      exfalso; apply Rnot_le_lt in Hr1.
+     remember (partial_sum (bin_of_frac_part r)) as u eqn:Hu.
+     enough (Hir : ∃ k, (u k <= r < u (S k))%R).
+      rewrite Hu in Hir.
+      assert (Hb : ∀ k, bin_of_frac_part r k = true).
+       intros k.
+       simpl; unfold bin_of_frac_part.
+       destruct (Rlt_dec (frac_part (r * 2 ^ k)) (1 / 2)) as [H1| H1].
+        apply Rlt_not_le in H1.
+        now specialize (Hk k).
+
+        easy.
+
+       assert (Hps : ∀ k, (u (S k) = u k + 1 / 2 ^ S k)%R).
+        intros k; subst u; unfold partial_sum.
+        induction k; [ simpl; rewrite Hb; lra | ].
+
+        remember (S k) as sk; simpl; subst sk.
+        rewrite Hb.
+bbb.
+
+Proof.
+intros.
+unfold partial_sum.
+destruct k; simpl.
+
+
 bbb.
      assert (0 < 1 - r)%R by lra.
      assert (Hk1r : ∃ k, ((1 / 2) ^ k < 1 - r)%R).
