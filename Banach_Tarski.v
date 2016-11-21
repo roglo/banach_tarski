@@ -666,10 +666,17 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
           rewrite Rmult_plus_distr_r in Hru.
           simpl in Hru; unfold Rdiv in Hru.
-          rewrite Rinv_mult_distr in Hru.
+          unfold n in Hru.
+          rewrite Rinv_mult_distr in Hru; [ | lra | apply pow_nonzero; lra ].
           do 2 rewrite Rmult_assoc in Hru.
-          rewrite Rinv_l, Rmult_1_r in Hru.
-SearchAbout (_ * / _)%R.
+          rewrite Rinv_l in Hru; [ | apply pow_nonzero; lra ].
+          fold n in Hru.
+          rewrite Rmult_1_r in Hru.
+          rewrite fold_Rdiv in Hru.
+          enough (H : (frac_part (r * 2 ^ k) < 1 / 2)%R).
+           apply Rlt_not_le in H; apply H, Hk.
+
+           fold n.
 bbb.
 
 Proof.

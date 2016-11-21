@@ -53,6 +53,9 @@ rewrite Rmult_comm, Rmult_assoc; f_equal.
 now apply sqrt_sqrt.
 Qed.
 
+Theorem fold_Rdiv : ∀ x y, (x * / y = x / y)%R.
+Proof. easy. Qed.
+
 Theorem Rdiv_1_r : ∀ x, (x / 1)%R = x.
 Proof. intros x; lra. Qed.
 
