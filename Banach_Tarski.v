@@ -656,8 +656,8 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
         destruct Hir as (k & Hur & Hru).
         rewrite <- Hu in Hur, Hru.
-        rewrite Hps in Hru.
-        set (n := (2 ^ S k)%R).
+        rewrite Hps in Hru; simpl in Hru.
+        set (n := (2 ^ k)%R) in Hru.
         apply Rmult_le_compat_r with (r := n) in Hur.
          2: apply pow_le; lra.
 
@@ -665,10 +665,11 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
           2: apply pow_lt; lra.
 
           rewrite Rmult_plus_distr_r in Hru.
-          unfold Rdiv at 1 in Hru.
-          rewrite Rmult_assoc in Hru.
+          simpl in Hru; unfold Rdiv in Hru.
+          rewrite Rinv_mult_distr in Hru.
+          do 2 rewrite Rmult_assoc in Hru.
           rewrite Rinv_l, Rmult_1_r in Hru.
-
+SearchAbout (_ * / _)%R.
 bbb.
 
 Proof.
