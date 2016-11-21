@@ -618,8 +618,9 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      clear Hk; rename Hk' into Hk.
      destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
      exfalso; apply Rnot_le_lt in Hr1.
+bbb.
+     assert (0 < 1 - r)%R by lra.
      assert (Hk1r : ∃ k, ((1 / 2) ^ k < 1 - r)%R).
-      assert (0 < 1 - r)%R by lra.
       remember (1 - r)%R as ε eqn:Hε.
       clear - H.
       apply archimed_cor1 in H.
