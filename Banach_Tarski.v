@@ -558,6 +558,25 @@ Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id bin_of_frac_part id_nat).
 
 Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
 
+Theorem partial_sum_aux_succ_all_true : ∀ r k pow i,
+  (∀ k : ℕ, bin_of_frac_part r k = true)
+  → partial_sum_aux (S k) (bin_of_frac_part r) pow i =
+    (partial_sum_aux k (bin_of_frac_part r) pow i + pow / 2 ^ k)%R.
+Proof.
+intros * Hb.
+revert pow i.
+induction k; intros; [ simpl; rewrite Hb; lra | ].
+simpl in IHk; simpl.
+do 2 rewrite Hb.
+specialize (IHk (pow / 2)%R (S i)).
+rewrite Hb in IHk; rewrite IHk.
+rewrite Rplus_assoc.
+apply Rplus_eq_compat_l.
+apply Rplus_eq_compat_l.
+unfold Rdiv; rewrite Rinv_mult_distr; [ now rewrite Rmult_assoc | lra | ].
+apply pow_nonzero; lra.
+Qed.
+
 Theorem converted_real_is_canonical : ∀ r,
   (0 <= r <= 1)%R
   → bin_of_frac_part r ∈ Canonical_seq.
@@ -632,11 +651,13 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
        assert (Hps : ∀ k, (u (S k) = u k + 1 / 2 ^ S k)%R).
         intros k; subst u; unfold partial_sum.
-        induction k; [ simpl; rewrite Hb; lra | ].
+        rewrite partial_sum_aux_succ_all_true; simpl; [ unfold Rdiv | easy ].
+        rewrite Rinv_mult_distr; [ now rewrite Rmult_assoc | lra | ].
+        apply pow_nonzero; lra.
 
-        remember (S k) as sk; simpl; subst sk.
-        rewrite Hb.
-        rewrite IHk.
+        destruct Hir as (k, Hir).
+        rewrite <- Hu in Hir.
+        rewrite Hps in Hir.
 bbb.
 
 Proof.
