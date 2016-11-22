@@ -659,7 +659,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
  intros Hj.
  assert
    (Hk : ∃ k,
-    ((k = O ∨ bin_of_frac_part r (pred k) = false) ∧
+    ((k = O ∨ k ≠ O ∧ bin_of_frac_part r (pred k) = false) ∧
      ∀ j, k ≤ j → bin_of_frac_part r j = true)).
   induction i.
    exists O; split; [ now left | easy ].
@@ -680,35 +680,32 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
    subst r.
    unfold bin_of_frac_part in Hk.
    specialize (Hk O).
-   destruct H as [H| H].
+   destruct H as [H| (Hkz, H)].
     subst k.
     pose proof Hk (le_refl O) as H1.
     simpl in H1; rewrite Rinv_l in H1; [ | lra ].
     rewrite fp_R1 in H1.
     destruct (Rlt_dec 0 (1 / 2)); [ easy | lra ].
 
-    destruct k.
-     pose proof Hk (le_refl O) as H1.
-     simpl in H1; rewrite Rinv_l in H1; [ | lra ].
-     rewrite fp_R1 in H1.
-     destruct (Rlt_dec 0 (1 / 2)); [ easy | lra ].
+    destruct k; [ now apply Hkz | ].
+    unfold bin_of_frac_part in H; simpl in H.
+    rewrite Rinv_mult_distr in H; [ | lra | apply pow_nonzero; lra ].
+    rewrite Rmult_assoc, Rinv_l in H; [ | apply pow_nonzero; lra ].
+    unfold Rdiv in H; rewrite Rmult_1_r, Rmult_1_l in H.
+    destruct (Rlt_dec (frac_part (/ 2)) (/ 2)) as [H1| ]; [ | easy ].
+    rewrite frac_part_self in H1; lra.
 
-     unfold bin_of_frac_part in H; simpl in H.
-     rewrite Rinv_mult_distr in H; [ | lra | apply pow_nonzero; lra ].
-     rewrite Rmult_assoc, Rinv_l in H; [ | apply pow_nonzero; lra ].
-     unfold Rdiv in H; rewrite Rmult_1_r, Rmult_1_l in H.
-     destruct (Rlt_dec (frac_part (/ 2)) (/ 2)) as [H1| ]; [ | easy ].
-     rewrite frac_part_self in H1; lra.
-
-bbb.
-   assert (Hk' : ∀ j, (1 / 2 <= frac_part (r * 2 ^ j))%R).
-    intros j; specialize (Hk j).
+   rename H into Hkk.
+   assert (Hk' : ∀ j, k ≤ j → (1 / 2 <= frac_part (r * 2 ^ j))%R).
+    intros j Hkj.
+    specialize (Hk j Hkj).
     unfold bin_of_frac_part in Hk.
     remember (frac_part (r * 2 ^ j)) as x.
     destruct (Rlt_dec x (1 / 2)) as [| H]; [ easy | ].
     now apply Rnot_lt_le in H.
 
     clear Hk; rename Hk' into Hk.
+bbb.
     destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
     exfalso; apply Rnot_le_lt in Hr1.
     remember (partial_sum (bin_of_frac_part r)) as u eqn:Hu.
