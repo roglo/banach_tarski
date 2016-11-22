@@ -234,6 +234,13 @@ induction i; [ apply fp_R1 | simpl ].
 now apply frac_part_mult_for_0.
 Qed.
 
+Theorem frac_part_self : ∀ x, (0 <= x < 1)%R → frac_part x = x.
+Proof.
+intros * Hx.
+unfold frac_part.
+rewrite Int_part_is_0; [ lra | easy ].
+Qed.
+
 (* useless since there is theorem 'base_fp' in Coq library
 Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
 Proof.

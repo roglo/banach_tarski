@@ -659,18 +659,13 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
  intros Hj.
  assert
    (Hk : ∃ k,
-    (k = O ∧ ∀ j, bin_of_frac_part r j = true) ∨
-    (bin_of_frac_part r k = false ∧
-     ∀ j, k < j → bin_of_frac_part r j = true)).
-bbb.
+    ((k = O ∨ bin_of_frac_part r (pred k) = false) ∧
+     ∀ j, k ≤ j → bin_of_frac_part r j = true)).
   induction i.
-   exists O.
-   left; split; [ easy | ].
-   intros j.
-   apply Hj, Nat.le_0_l.
+   exists O; split; [ now left | easy ].
 
    destruct (Bool.bool_dec (bin_of_frac_part r i) false) as [Hi'| Hi'].
-    exists i; now right; split.
+    exists (S i); split; [ now right | easy ].
 
     apply IHi.
     intros j Hij.
@@ -680,89 +675,97 @@ bbb.
     now apply not_false_iff_true in Hi'; subst j.
 
   clear i Hj.
-  destruct Hk as (k & Hk).
-  destruct Hk as [(H, Hk) | (H, Hk)].
-   subst k.
-   enough (r = 1)%R.
-    subst r.
+  destruct Hk as (k & H & Hk).
+  enough (r = (/ 2 ^ k)%R).
+   subst r.
+   unfold bin_of_frac_part in Hk.
+   specialize (Hk O).
+   destruct H as [H| H].
+    subst k.
+    pose proof Hk (le_refl O) as H1.
+    simpl in H1; rewrite Rinv_l in H1; [ | lra ].
+    rewrite fp_R1 in H1.
+    destruct (Rlt_dec 0 (1 / 2)); [ easy | lra ].
+
+    destruct k.
+     pose proof Hk (le_refl O) as H1.
+     simpl in H1; rewrite Rinv_l in H1; [ | lra ].
+     rewrite fp_R1 in H1.
+     destruct (Rlt_dec 0 (1 / 2)); [ easy | lra ].
+
+     unfold bin_of_frac_part in H; simpl in H.
+     rewrite Rinv_mult_distr in H; [ | lra | apply pow_nonzero; lra ].
+     rewrite Rmult_assoc, Rinv_l in H; [ | apply pow_nonzero; lra ].
+     unfold Rdiv in H; rewrite Rmult_1_r, Rmult_1_l in H.
+     destruct (Rlt_dec (frac_part (/ 2)) (/ 2)) as [H1| ]; [ | easy ].
+     rewrite frac_part_self in H1; lra.
+
+bbb.
+   assert (Hk' : ∀ j, (1 / 2 <= frac_part (r * 2 ^ j))%R).
+    intros j; specialize (Hk j).
     unfold bin_of_frac_part in Hk.
-    specialize (Hk O).
-    rewrite Rmult_1_l, pow_O in Hk.
-    destruct (Rlt_dec (frac_part 1) (1 / 2)) as [H| H]; [ easy | ].
-    apply H.
-    unfold frac_part.
-    replace 1%R with (INR 1) by easy.
-    rewrite Int_part_INR; simpl; lra.
+    remember (frac_part (r * 2 ^ j)) as x.
+    destruct (Rlt_dec x (1 / 2)) as [| H]; [ easy | ].
+    now apply Rnot_lt_le in H.
 
-    assert (Hk' : ∀ j, (1 / 2 <= frac_part (r * 2 ^ j))%R).
-     intros j; specialize (Hk j).
-     unfold bin_of_frac_part in Hk.
-     remember (frac_part (r * 2 ^ j)) as x.
-     destruct (Rlt_dec x (1 / 2)) as [| H]; [ easy | ].
-     now apply Rnot_lt_le in H.
+    clear Hk; rename Hk' into Hk.
+    destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
+    exfalso; apply Rnot_le_lt in Hr1.
+    remember (partial_sum (bin_of_frac_part r)) as u eqn:Hu.
+    enough (Hir : ∃ k, (u k <= r < u (S k))%R).
+     rewrite Hu in Hir.
+     assert (Hb : ∀ k, bin_of_frac_part r k = true).
+      intros k.
+      simpl; unfold bin_of_frac_part.
+      set (x := frac_part (r * 2 ^ k)).
+      destruct (Rlt_dec x (1 / 2)) as [H1| H1]; [ | easy ].
+      apply Rlt_not_le in H1.
+      now specialize (Hk k).
 
-     clear Hk; rename Hk' into Hk.
-     destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
-     exfalso; apply Rnot_le_lt in Hr1.
-     remember (partial_sum (bin_of_frac_part r)) as u eqn:Hu.
-     enough (Hir : ∃ k, (u k <= r < u (S k))%R).
-      rewrite Hu in Hir.
-      assert (Hb : ∀ k, bin_of_frac_part r k = true).
-       intros k.
-       simpl; unfold bin_of_frac_part.
-       set (x := frac_part (r * 2 ^ k)).
-       destruct (Rlt_dec x (1 / 2)) as [H1| H1]; [ | easy ].
-       apply Rlt_not_le in H1.
-       now specialize (Hk k).
+      assert (Hps : ∀ k, (u (S k) = u k + 1 / 2 ^ S k)%R).
+       intros k; subst u; unfold partial_sum.
+       now rewrite partial_sum_aux_succ_all_true.
 
-       assert (Hps : ∀ k, (u (S k) = u k + 1 / 2 ^ S k)%R).
-        intros k; subst u; unfold partial_sum.
-        now rewrite partial_sum_aux_succ_all_true.
+       destruct Hir as (k & Hur & Hru).
+       rewrite <- Hu in Hur, Hru.
+       rewrite Hps in Hru; simpl in Hru.
+       set (n := (2 ^ k)%R) in Hru.
+       apply Rmult_le_compat_r with (r := n) in Hur.
+        2: apply pow_le; lra.
 
-        destruct Hir as (k & Hur & Hru).
-        rewrite <- Hu in Hur, Hru.
-        rewrite Hps in Hru; simpl in Hru.
-        set (n := (2 ^ k)%R) in Hru.
-        apply Rmult_le_compat_r with (r := n) in Hur.
-         2: apply pow_le; lra.
+        apply Rmult_lt_compat_r with (r := n) in Hru.
+         2: apply pow_lt; lra.
 
-         apply Rmult_lt_compat_r with (r := n) in Hru.
-          2: apply pow_lt; lra.
+         rewrite Rmult_plus_distr_r in Hru.
+         simpl in Hru; unfold Rdiv in Hru.
+         unfold n in Hru.
+         rewrite Rinv_mult_distr in Hru; [ | lra | apply pow_nonzero; lra ].
+         do 2 rewrite Rmult_assoc in Hru.
+         rewrite Rinv_l in Hru; [ | apply pow_nonzero; lra ].
+         fold n in Hru.
+         rewrite Rmult_1_r in Hru.
+         rewrite fold_Rdiv in Hru.
+         enough (H : (frac_part (r * 2 ^ k) < 1 / 2)%R).
+          apply Rlt_not_le in H; apply H, Hk.
 
-          rewrite Rmult_plus_distr_r in Hru.
-          simpl in Hru; unfold Rdiv in Hru.
-          unfold n in Hru.
-          rewrite Rinv_mult_distr in Hru; [ | lra | apply pow_nonzero; lra ].
-          do 2 rewrite Rmult_assoc in Hru.
-          rewrite Rinv_l in Hru; [ | apply pow_nonzero; lra ].
-          fold n in Hru.
-          rewrite Rmult_1_r in Hru.
-          rewrite fold_Rdiv in Hru.
-          enough (H : (frac_part (r * 2 ^ k) < 1 / 2)%R).
-           apply Rlt_not_le in H; apply H, Hk.
+          fold n.
+          assert (Hukn : (frac_part (u k * n) = 0)%R).
+           rewrite Hu; unfold n; simpl; clear - Hb.
+           unfold partial_sum.
+           rewrite partial_sum_aux_mult_distr_r.
+           rewrite Rmult_1_l.
+           apply frac_part_partial_sum_0.
+           intros j Hjk.
+           rewrite Rpow_div_sub; [ | lra | easy ].
+           apply frac_part_pow, (frac_part_INR 2).
 
-           fold n.
-           assert (Hukn : (frac_part (u k * n) = 0)%R).
-            rewrite Hu; unfold n; simpl; clear - Hb.
-            unfold partial_sum.
-            rewrite partial_sum_aux_mult_distr_r.
-            rewrite Rmult_1_l.
-            apply frac_part_partial_sum_0.
-            intros j Hjk.
-            rewrite Rpow_div_sub; [ | lra | easy ].
-            apply frac_part_pow, (frac_part_INR 2).
+           enough (IZR (Int_part (r * n)) = u k * n)%R.
+            unfold frac_part; lra.
 
-            enough (IZR (Int_part (r * n)) = u k * n)%R.
-             unfold frac_part; lra.
-
-             unfold frac_part in Hukn.
-             eapply Rplus_eq_compat_l in Hukn.
-             rewrite Rplus_minus, Rplus_0_r in Hukn.
-             rewrite Hukn; f_equal.
-SearchAbout (Int_part _ = Int_part _).
-Focus 3.
-(* actually it is the same thing as the first case, with k ≥ 0 *)
-(* I should make a common proof *)
+            unfold frac_part in Hukn.
+            eapply Rplus_eq_compat_l in Hukn.
+            rewrite Rplus_minus, Rplus_0_r in Hukn.
+            rewrite Hukn; f_equal.
 bbb.
 
 unfold bin_of_frac_part in H.
