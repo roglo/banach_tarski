@@ -574,11 +574,9 @@ Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
 Theorem partial_sum_aux_succ_all_true : ∀ r k pow i,
   (∀ k : ℕ, bin_of_frac_part r k = true)
   → partial_sum_aux (S k) (bin_of_frac_part r) pow i =
-    (partial_sum_aux k (bin_of_frac_part r) pow i + pow / 2 ^ k)%R.
+    (partial_sum_aux k (bin_of_frac_part r) pow i + pow / 2 ^ S k)%R.
 Proof.
 intros * Hb.
-bbb.
-
 revert pow i.
 induction k; intros; [ simpl; rewrite Hb; lra | ].
 simpl in IHk; simpl.
@@ -588,8 +586,11 @@ rewrite Hb in IHk; rewrite IHk.
 rewrite Rplus_assoc.
 apply Rplus_eq_compat_l.
 apply Rplus_eq_compat_l.
-unfold Rdiv; rewrite Rinv_mult_distr; [ now rewrite Rmult_assoc | lra | ].
-apply pow_nonzero; lra.
+unfold Rdiv.
+rewrite <- Rmult_assoc.
+rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+rewrite <- Rmult_assoc.
+rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
 Qed.
 
 Theorem partial_sum_aux_mult_distr_r : ∀ k u pow i x,
@@ -599,7 +600,7 @@ intros.
 revert pow i.
 induction k; intros; [ now rewrite Rmult_0_l | simpl ].
 destruct (u i).
- rewrite Rmult_plus_distr_r.
+ rewrite Rmult_plus_distr_r, Rmult_div.
  apply Rplus_eq_compat_l.
  now rewrite IHk; unfold Rdiv; rewrite Rmult_shuffle0.
 
@@ -679,9 +680,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
        assert (Hps : ∀ k, (u (S k) = u k + 1 / 2 ^ S k)%R).
         intros k; subst u; unfold partial_sum.
-        rewrite partial_sum_aux_succ_all_true; simpl; [ unfold Rdiv | easy ].
-        rewrite Rinv_mult_distr; [ now rewrite Rmult_assoc | lra | ].
-        apply pow_nonzero; lra.
+        now rewrite partial_sum_aux_succ_all_true.
 
         destruct Hir as (k & Hur & Hru).
         rewrite <- Hu in Hur, Hru.
@@ -711,7 +710,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
             unfold partial_sum.
             rewrite partial_sum_aux_mult_distr_r.
 Theorem toto : ∀ k u pow i,
-  frac_part (2 * pow) = 0%R
+  frac_part pow = 0%R
   → frac_part (partial_sum_aux k u pow i) = 0%R.
 Proof.
 intros * Hp.
@@ -720,6 +719,9 @@ induction k; intros; [ apply fp_R0 | simpl ].
 destruct (u i).
  rewrite plus_frac_part2.
   rewrite IHk, Rplus_0_r.
+bbb.
+
+  replace pow with (pow / 2 + pow / 2)%R in Hp by lra.
 
 bbb.
 

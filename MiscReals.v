@@ -20,7 +20,7 @@ Notation "'√'" := sqrt.
 Theorem fold_Rsqr : ∀ a, (a * a = a²)%R.
 Proof. easy. Qed.
 
-Theorem Rmul_div : ∀ x y z, (x * y / z = x / z * y)%R.
+Theorem Rmult_div : ∀ x y z, (x * y / z = x / z * y)%R.
 Proof. intros; lra. Qed.
 
 Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
@@ -128,7 +128,7 @@ Theorem Int_part_close_to_1 : ∀ r n,
 Proof.
 intros * (Hnr, Hr1).
 apply Rmult_le_compat_r with (r := INR (n + 1)) in Hnr; [ | apply pos_INR ].
-rewrite <- Rmul_div in Hnr.
+rewrite <- Rmult_div in Hnr.
 unfold Rdiv in Hnr.
 rewrite Rmult_assoc in Hnr.
 rewrite Rinv_r in Hnr; [ | now apply not_0_INR; rewrite Nat.add_comm ].
