@@ -454,11 +454,11 @@ Fixpoint partial_sum_aux k (u : ℕ → bool) pow i :=
   match k with
   | 0 => 0%R
   | S k' =>
-      if u i then (pow + partial_sum_aux k' u (pow / 2) (S i))%R
+      if u i then (pow / 2 + partial_sum_aux k' u (pow / 2) (S i))%R
       else partial_sum_aux k' u (pow / 2)%R (S i)
   end.
 
-Definition partial_sum u k := partial_sum_aux k u (1/2)%R 0.
+Definition partial_sum u k := partial_sum_aux k u 1%R 0.
 
 Theorem bin_of_frac_part_succ : ∀ x i,
   bin_of_frac_part x (S i) = bin_of_frac_part (x * 2) i.
@@ -487,12 +487,25 @@ destruct b.
  apply IHk; lra.
 Qed.
 
+Theorem partial_sum_aux_le_pow : ∀ u k pow i,
+  (0 <= pow)%R
+  → (partial_sum_aux k u pow i <= pow)%R.
+Proof.
+intros * Hpow.
+revert pow i Hpow.
+induction k; intros; simpl; [ lra | ].
+destruct (u i).
+ apply Rplus_le_reg_l with (r := (- (pow / 2))%R).
+ rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+ eapply Rle_trans; [ apply IHk; lra | lra ].
+
+ eapply Rle_trans; [ apply IHk; lra | lra ].
+Qed.
+
 Theorem partial_sum_le_1 : ∀ u k, (partial_sum u k <= 1)%R.
 Proof.
 intros.
-assert (Hlt : (0 < 1 / 2)%R) by lra.
-pose proof partial_sum_aux_le_2_pow u k (1/2) 0 Hlt.
-now replace (2 * (1/2))%R with 1%R in H by lra.
+apply partial_sum_aux_le_pow; lra.
 Qed.
 
 Definition Rset_of_bin_seq u := mkset (λ x, ∃ k, partial_sum u k = x).
@@ -564,6 +577,8 @@ Theorem partial_sum_aux_succ_all_true : ∀ r k pow i,
     (partial_sum_aux k (bin_of_frac_part r) pow i + pow / 2 ^ k)%R.
 Proof.
 intros * Hb.
+bbb.
+
 revert pow i.
 induction k; intros; [ simpl; rewrite Hb; lra | ].
 simpl in IHk; simpl.
@@ -695,6 +710,23 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
             rewrite Hu; unfold n; simpl; clear - Hb.
             unfold partial_sum.
             rewrite partial_sum_aux_mult_distr_r.
+Theorem toto : ∀ k u pow i,
+  frac_part (2 * pow) = 0%R
+  → frac_part (partial_sum_aux k u pow i) = 0%R.
+Proof.
+intros * Hp.
+revert pow i Hp.
+induction k; intros; [ apply fp_R0 | simpl ].
+destruct (u i).
+ rewrite plus_frac_part2.
+  rewrite IHk, Rplus_0_r.
+
+bbb.
+
+apply toto.
+
+
+bbb.
             induction k; [ apply fp_R0 | ].
             simpl; rewrite Hb.
 bbb.
