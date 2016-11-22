@@ -709,6 +709,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
             rewrite Hu; unfold n; simpl; clear - Hb.
             unfold partial_sum.
             rewrite partial_sum_aux_mult_distr_r.
+            rewrite Rmult_1_l.
 bbb.
 
 Theorem toto : ∀ k u pow i,
