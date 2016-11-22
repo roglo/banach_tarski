@@ -694,10 +694,9 @@ destruct b.
  unfold Rdiv at 1; rewrite Rmult_comm, Rmult_assoc.
  rewrite Rinv_l, Rmult_1_r; [ | lra ].
  rewrite <- Rmult_assoc, Rmult_shuffle0.
-  rewrite plus_frac_part2.
-  rewrite frac_part_mult_for_0.
-Focus 3.
-(* not good; hypothesis Hpow likely not good *)
+ rewrite plus_frac_part2.
+  rewrite Rplus_comm.
+  rewrite frac_part_mult_for_0; [ | apply IHk | ].
 bbb.
 
   replace 2%R with (INR 2) at 5 by now simpl.
