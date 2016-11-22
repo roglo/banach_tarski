@@ -680,7 +680,9 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
            assert (frac_part (u k * n) = 0)%R.
             rewrite Hu; unfold n; simpl; clear.
             unfold partial_sum.
+bbb.
             destruct k; [ simpl; rewrite Rmult_0_l; apply fp_R0 | ].
+vvv.
 
 Theorem toto : ∀ k u pow i,
   frac_part (pow * 2) = 0%R
