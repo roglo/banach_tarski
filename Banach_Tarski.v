@@ -694,6 +694,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     clear Hk; rename Hk' into Hk.
     destruct Hkk as [Hkk| Hkk].
      subst k; rewrite pow_O, Rmult_1_r.
+     unfold frac_part.
 bbb.
     destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
     exfalso; apply Rnot_le_lt in Hr1.
