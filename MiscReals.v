@@ -159,6 +159,25 @@ pose proof Int_part_close_to_1 x 0 H as H1.
 now simpl in H1; rewrite Rmult_1_r in H1.
 Qed.
 
+Theorem frac_part_mult_nat : ∀ x n,
+  frac_part x = 0%R
+  → frac_part (x * INR n) = 0%R.
+Proof.
+intros * Hx.
+induction n; simpl; [ rewrite Rmult_0_r; apply fp_R0 | ].
+destruct n; [ now rewrite Rmult_1_r | ].
+rewrite Rmult_plus_distr_l, Rmult_1_r.
+rewrite plus_frac_part2; rewrite Hx, IHn; lra.
+Qed.
+
+Theorem pow_INR : ∀ n k, INR (n ^ k) = (INR n ^ k)%R.
+Proof.
+intros.
+induction k; [ easy | ].
+simpl; rewrite mult_INR.
+now rewrite IHk.
+Qed.
+
 (* useless since there is theorem 'base_fp' in Coq library
 Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
 Proof.

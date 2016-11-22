@@ -677,15 +677,61 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
            apply Rlt_not_le in H; apply H, Hk.
 
            fold n.
+           assert (frac_part (u k * n) = 0)%R.
+            rewrite Hu; unfold n; simpl; clear.
+            unfold partial_sum.
+
+Theorem toto : ∀ k u pow i,
+  frac_part pow = 0%R
+  → frac_part (partial_sum_aux k u (pow / 2) i * 2 ^ k) = 0%R.
+Proof.
+intros * Hpow.
+revert pow i Hpow.
+induction k; intros; simpl; [ rewrite Rmult_0_l; apply fp_R0 | ].
+remember (u i) as b eqn:Hb; symmetry in Hb.
+destruct b.
+ rewrite Rmult_plus_distr_r, <- Rmult_assoc.
+ unfold Rdiv at 1; rewrite Rmult_comm, Rmult_assoc.
+ rewrite Rinv_l, Rmult_1_r; [ | lra ].
+ rewrite <- Rmult_assoc, Rmult_shuffle0.
+  rewrite plus_frac_part2.
+  replace 2%R with (INR 2) at 5 by now simpl.
+  rewrite frac_part_mult_nat.
+   rewrite Rplus_0_r, Rmult_comm.
+   replace (2 ^ k)%R with (INR (2 ^ k)); [ now rewrite frac_part_mult_nat | ].
+   now rewrite pow_INR.
+
+bbb.
+
+SearchAbout (frac_part (_ * _)).
+
+Print partial_sum_aux.
+
+            induction k; [ simpl; rewrite Rmult_0_l; apply fp_R0 | ].
+            simpl.
+            remember (bin_of_frac_part r 0) as b eqn:Hb.
+            symmetry in Hb.
+            destruct b.
+             rewrite Rmult_plus_distr_r, <- Rmult_assoc.
+             unfold Rdiv at 1; rewrite Rmult_1_l.
+             rewrite Rinv_l, Rmult_1_l.
+bbb.
+
            unfold frac_part.
-           specialize (base_Int_part (r * n)); intros (H1, H2).
-assert (IZR (Int_part (r * n)) = u k * n)%R.
-SearchAbout up.
 Theorem toto : ∀ x z,
   (IZR z <= x < IZR (z + 1))%R
   → z = Int_part x.
 Admitted.
 Show.
+
+SearchAbout IZR.
+
+bbb.
+           specialize (base_Int_part (r * n)); intros (H1, H2).
+assert (IZR (Int_part (r * n)) = u k * n)%R.
+SearchAbout up.
+
+
 bbb.
 rewrite <- toto with (z := (u k * n)%R).
 bbb.
