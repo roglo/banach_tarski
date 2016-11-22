@@ -682,7 +682,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
             unfold partial_sum.
 
 Theorem toto : ∀ k u pow i,
-  frac_part pow = 0%R
+  frac_part (pow * 2 ^ k) = 0%R
   → frac_part (partial_sum_aux k u (pow / 2) i * 2 ^ k) = 0%R.
 Proof.
 intros * Hpow.
@@ -695,11 +695,28 @@ destruct b.
  rewrite Rinv_l, Rmult_1_r; [ | lra ].
  rewrite <- Rmult_assoc, Rmult_shuffle0.
   rewrite plus_frac_part2.
+  rewrite frac_part_mult_for_0.
+Focus 3.
+(* not good; hypothesis Hpow likely not good *)
+bbb.
+
   replace 2%R with (INR 2) at 5 by now simpl.
   rewrite frac_part_mult_nat.
    rewrite Rplus_0_r, Rmult_comm.
+   simpl in Hpow.
+   rewrite <- Rmult_assoc, Rmult_shuffle0 in Hpow.
+bbb.
+
+   replace 2%R with (INR 2); [ now rewrite frac_part_mult_nat | ].
+   rewrite frac_part_mult_nat in Hpow.
+
+
    replace (2 ^ k)%R with (INR (2 ^ k)); [ now rewrite frac_part_mult_nat | ].
    now rewrite pow_INR.
+
+   idtac.
+   apply IHk.
+bbb.
 
 bbb.
 

@@ -159,15 +159,42 @@ pose proof Int_part_close_to_1 x 0 H as H1.
 now simpl in H1; rewrite Rmult_1_r in H1.
 Qed.
 
-Theorem frac_part_mult_nat : ∀ x n,
+Theorem frac_part_mult_for_0 : ∀ x y,
   frac_part x = 0%R
-  → frac_part (x * INR n) = 0%R.
+  → frac_part y = 0%R
+  → frac_part (x * y) = 0%R.
 Proof.
-intros * Hx.
-induction n; simpl; [ rewrite Rmult_0_r; apply fp_R0 | ].
-destruct n; [ now rewrite Rmult_1_r | ].
-rewrite Rmult_plus_distr_l, Rmult_1_r.
-rewrite plus_frac_part2; rewrite Hx, IHn; lra.
+intros * Hx Hy.
+apply fp_nat in Hy.
+destruct Hy as (i, Hy); subst y.
+destruct i; simpl; [ rewrite Rmult_0_r; apply fp_R0 | | ].
+ remember (Pos.to_nat p) as n eqn:Hn; clear p Hn.
+ induction n; simpl; [ rewrite Rmult_0_r; apply fp_R0 | ].
+ destruct n; [ now rewrite Rmult_1_r | ].
+ rewrite Rmult_plus_distr_l, Rmult_1_r.
+ rewrite plus_frac_part2; rewrite Hx, IHn; lra.
+
+ remember (Pos.to_nat p) as n eqn:Hn; clear p Hn.
+ induction n; simpl; [ rewrite Ropp_0, Rmult_0_r; apply fp_R0 | ].
+ destruct n.
+  rewrite <- Ropp_mult_distr_r, Rmult_1_r.
+  replace (- x)%R with (0 - x)%R by lra.
+  rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
+  rewrite Rminus_diag_eq; [ easy | apply fp_R0 ].
+
+  rewrite Ropp_plus_distr, Rmult_plus_distr_l.
+  rewrite plus_frac_part2.
+   rewrite IHn, Rplus_0_l.
+   rewrite <- Ropp_mult_distr_r, Rmult_1_r.
+   replace (- x)%R with (0 - x)%R by lra.
+   rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
+   rewrite Rminus_diag_eq; [ easy | apply fp_R0 ].
+
+   rewrite IHn, Rplus_0_l.
+   rewrite <- Ropp_mult_distr_r, Rmult_1_r.
+   replace (- x)%R with (0 - x)%R by lra.
+   rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
+   rewrite fp_R0, Rminus_diag_eq; [ lra | easy ].
 Qed.
 
 Theorem pow_INR : ∀ n k, INR (n ^ k) = (INR n ^ k)%R.
