@@ -709,6 +709,8 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
             rewrite Hu; unfold n; simpl; clear - Hb.
             unfold partial_sum.
             rewrite partial_sum_aux_mult_distr_r.
+bbb.
+
 Theorem toto : ∀ k u pow i,
   frac_part pow = 0%R
   → frac_part (partial_sum_aux k u pow i) = 0%R.
