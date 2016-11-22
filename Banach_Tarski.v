@@ -662,6 +662,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     (k = O ∧ ∀ j, bin_of_frac_part r j = true) ∨
     (bin_of_frac_part r k = false ∧
      ∀ j, k < j → bin_of_frac_part r j = true)).
+bbb.
   induction i.
    exists O.
    left; split; [ easy | ].
@@ -760,6 +761,10 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
              rewrite Hukn; f_equal.
 SearchAbout (Int_part _ = Int_part _).
 Focus 3.
+(* actually it is the same thing as the first case, with k ≥ 0 *)
+(* I should make a common proof *)
+bbb.
+
 unfold bin_of_frac_part in H.
 destruct (Rlt_dec (frac_part (r * 2 ^ k)) (1 / 2)) as [H1| H1]; [ | easy ].
 clear H.
