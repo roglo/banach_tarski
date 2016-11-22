@@ -205,6 +205,21 @@ simpl; rewrite mult_INR.
 now rewrite IHk.
 Qed.
 
+Theorem frac_part_INR : ∀ n, frac_part (INR n) = 0%R.
+Proof.
+intros.
+unfold frac_part.
+rewrite Int_part_INR.
+now rewrite <- INR_IZR_INZ, Rminus_diag_eq.
+Qed.
+
+Theorem fp_R1 : frac_part 1 = 0%R.
+Proof.
+replace 1%R with (INR 1) by easy.
+apply frac_part_INR.
+Qed.
+
+
 (* useless since there is theorem 'base_fp' in Coq library
 Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
 Proof.

@@ -577,6 +577,20 @@ unfold Rdiv; rewrite Rinv_mult_distr; [ now rewrite Rmult_assoc | lra | ].
 apply pow_nonzero; lra.
 Qed.
 
+Theorem partial_sum_aux_mult_distr_r : ∀ k u pow i x,
+  (partial_sum_aux k u pow i * x)%R = partial_sum_aux k u (pow * x) i.
+Proof.
+intros.
+revert pow i.
+induction k; intros; [ now rewrite Rmult_0_l | simpl ].
+destruct (u i).
+ rewrite Rmult_plus_distr_r.
+ apply Rplus_eq_compat_l.
+ now rewrite IHk; unfold Rdiv; rewrite Rmult_shuffle0.
+
+ now rewrite IHk; unfold Rdiv; rewrite Rmult_shuffle0.
+Qed.
+
 Theorem converted_real_is_canonical : ∀ r,
   (0 <= r <= 1)%R
   → bin_of_frac_part r ∈ Canonical_seq.
@@ -678,34 +692,28 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
            fold n.
            assert (frac_part (u k * n) = 0)%R.
-            rewrite Hu; unfold n; simpl; clear.
+            rewrite Hu; unfold n; simpl; clear - Hb.
             unfold partial_sum.
-Theorem toto : ∀ k u pow i x,
-  frac_part (partial_sum_aux k u pow i * x) =
-  frac_part (partial_sum_aux k u (pow * x) i).
-Proof.
-intros.
-revert pow i.
-induction k; intros; [ now rewrite Rmult_0_l | simpl ].
-destruct (u i).
-rewrite Rmult_plus_distr_r.
-set (r1 := (pow * x)%R).
-set (r2 := (partial_sum_aux k u (pow / 2) (S i) * x)%R).
-set (r3 := (partial_sum_aux k u (r1 / 2) (S i))).
-destruct (Rlt_dec (frac_part r1 + frac_part r2) 1%R) as [H1| H1].
- rewrite plus_frac_part2; [ | easy ].
- destruct (Rlt_dec (frac_part r1 + frac_part r3) 1%R) as [H2| H2].
-  rewrite plus_frac_part2; [ | easy ].
-  apply Rplus_eq_compat_l.
-  unfold r2, r3, r1, Rdiv; rewrite Rmult_shuffle0.
-  apply IHk.
-
-  apply Rnot_lt_ge in H2.
-  rewrite plus_frac_part1; [ | easy ].
-vvv.
-
-rewrite toto.
+            rewrite partial_sum_aux_mult_distr_r.
+            induction k; [ apply fp_R0 | ].
+            simpl; rewrite Hb.
 bbb.
+            simpl.
+            destruct k.
+             simpl; rewrite Hb, Rplus_0_r.
+             unfold Rdiv; rewrite Rmult_1_r, Rmult_assoc.
+             rewrite Rinv_l, Rmult_1_r; [ apply fp_R1 | lra ].
+
+             destruct k.
+              simpl; rewrite Hb, Hb, Rplus_0_r.
+bbb.
+
+             rewrite plus_frac_part2.
+
+SearchAbout (frac_part R1).
+
+             apply fp_R1.
+
 
 bbb.
             destruct k; [ simpl; rewrite Rmult_0_l; apply fp_R0 | ].
