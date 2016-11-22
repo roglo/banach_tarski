@@ -714,11 +714,16 @@ Theorem toto : ∀ k u pow i,
   → frac_part (partial_sum_aux k u pow i) = 0%R.
 Proof.
 intros * Hp.
+Print partial_sum_aux.
+
+bbb.
+
 revert pow i Hp.
 induction k; intros; [ apply fp_R0 | simpl ].
 destruct (u i).
  rewrite plus_frac_part2.
   rewrite IHk, Rplus_0_r.
+
 bbb.
 
   replace pow with (pow / 2 + pow / 2)%R in Hp by lra.
