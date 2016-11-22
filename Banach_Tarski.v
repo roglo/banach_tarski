@@ -680,6 +680,33 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
            assert (frac_part (u k * n) = 0)%R.
             rewrite Hu; unfold n; simpl; clear.
             unfold partial_sum.
+Theorem toto : ∀ k u pow i x,
+  frac_part (partial_sum_aux k u pow i * x) =
+  frac_part (partial_sum_aux k u (pow * x) i).
+Proof.
+intros.
+revert pow i.
+induction k; intros; [ now rewrite Rmult_0_l | simpl ].
+destruct (u i).
+rewrite Rmult_plus_distr_r.
+set (r1 := (pow * x)%R).
+set (r2 := (partial_sum_aux k u (pow / 2) (S i) * x)%R).
+set (r3 := (partial_sum_aux k u (r1 / 2) (S i))).
+destruct (Rlt_dec (frac_part r1 + frac_part r2) 1%R) as [H1| H1].
+ rewrite plus_frac_part2; [ | easy ].
+ destruct (Rlt_dec (frac_part r1 + frac_part r3) 1%R) as [H2| H2].
+  rewrite plus_frac_part2; [ | easy ].
+  apply Rplus_eq_compat_l.
+  unfold r2, r3, r1, Rdiv; rewrite Rmult_shuffle0.
+  apply IHk.
+
+  apply Rnot_lt_ge in H2.
+  rewrite plus_frac_part1; [ | easy ].
+vvv.
+
+rewrite toto.
+bbb.
+
 bbb.
             destruct k; [ simpl; rewrite Rmult_0_l; apply fp_R0 | ].
 vvv.
