@@ -219,6 +219,20 @@ replace 1%R with (INR 1) by easy.
 apply frac_part_INR.
 Qed.
 
+Theorem Rpow_div_sub : ∀ x i j, (x ≠ 0)%R → j ≤ i → (x ^ i / x ^ j = x ^ (i - j))%R.
+Proof.
+intros * Hx Hij.
+unfold Rdiv.
+replace i with ((i - j) + j)%nat at 1 by now rewrite Nat.sub_add.
+now symmetry; apply pow_RN_plus.
+Qed.
+
+Theorem frac_part_pow : ∀ x i, frac_part x = 0%R → frac_part (x ^ i) = 0%R.
+Proof.
+intros * Hx.
+induction i; [ apply fp_R1 | simpl ].
+now apply frac_part_mult_for_0.
+Qed.
 
 (* useless since there is theorem 'base_fp' in Coq library
 Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.

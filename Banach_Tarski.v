@@ -607,6 +607,42 @@ destruct (u i).
  now rewrite IHk; unfold Rdiv; rewrite Rmult_shuffle0.
 Qed.
 
+Theorem frac_part_partial_sum_0 : ∀ k u pow i,
+  (∀ j, j ≤ k → frac_part (pow / 2 ^ j) = 0)
+  → frac_part (partial_sum_aux k u pow i) = 0%R.
+Proof.
+intros * Hj.
+revert pow i Hj.
+induction k; intros; [ apply fp_R0 | simpl ].
+destruct (u i).
+ assert (H : 1%nat ≤ S k) by (apply -> Nat.succ_le_mono; apply Nat.le_0_l).
+ apply Hj in H; rewrite pow_1 in H.
+ rewrite plus_frac_part2; rewrite H, Rplus_0_l.
+  rewrite IHk; [ lra | intros j Hjk ].
+  apply Nat.succ_le_mono in Hjk.
+  apply Hj in Hjk; simpl in Hjk.
+  unfold Rdiv in Hjk.
+  rewrite Rinv_mult_distr in Hjk; [ | lra | apply pow_nonzero; lra ].
+  rewrite <- Rmult_assoc in Hjk.
+  now do 2 rewrite fold_Rdiv in Hjk.
+
+  rewrite IHk; [ lra | intros j Hjk ].
+  apply Nat.succ_le_mono in Hjk.
+  apply Hj in Hjk; simpl in Hjk.
+  unfold Rdiv in Hjk.
+  rewrite Rinv_mult_distr in Hjk; [ | lra | apply pow_nonzero; lra ].
+  rewrite <- Rmult_assoc in Hjk.
+  now do 2 rewrite fold_Rdiv in Hjk.
+
+ rewrite IHk; [ lra | intros j Hjk ].
+ apply Nat.succ_le_mono in Hjk.
+ apply Hj in Hjk; simpl in Hjk.
+ unfold Rdiv in Hjk.
+ rewrite Rinv_mult_distr in Hjk; [ | lra | apply pow_nonzero; lra ].
+ rewrite <- Rmult_assoc in Hjk.
+ now do 2 rewrite fold_Rdiv in Hjk.
+Qed.
+
 Theorem converted_real_is_canonical : ∀ r,
   (0 <= r <= 1)%R
   → bin_of_frac_part r ∈ Canonical_seq.
@@ -705,18 +741,26 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
            apply Rlt_not_le in H; apply H, Hk.
 
            fold n.
-           assert (frac_part (u k * n) = 0)%R.
+           assert (Hukn : (frac_part (u k * n) = 0)%R).
             rewrite Hu; unfold n; simpl; clear - Hb.
             unfold partial_sum.
             rewrite partial_sum_aux_mult_distr_r.
             rewrite Rmult_1_l.
-bbb.
+            apply frac_part_partial_sum_0.
+            intros j Hjk.
+            rewrite Rpow_div_sub; [ | lra | easy ].
+            apply frac_part_pow, (frac_part_INR 2).
 
-Theorem toto : ∀ k u pow i,
-  frac_part pow = 0%R
-  → frac_part (partial_sum_aux k u pow i) = 0%R.
-Proof.
-intros * Hp.
+            enough (IZR (Int_part (r * n)) = u k * n)%R.
+             unfold frac_part; lra.
+
+             unfold frac_part in Hukn.
+             eapply Rplus_eq_compat_l in Hukn.
+             rewrite Rplus_minus, Rplus_0_r in Hukn.
+             rewrite Hukn; f_equal.
+SearchAbout (Int_part _ = Int_part _).
+bbb. 
+
 Print partial_sum_aux.
 
 bbb.
