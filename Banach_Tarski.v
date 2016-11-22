@@ -759,6 +759,19 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
              rewrite Rplus_minus, Rplus_0_r in Hukn.
              rewrite Hukn; f_equal.
 SearchAbout (Int_part _ = Int_part _).
+Focus 3.
+unfold bin_of_frac_part in H.
+destruct (Rlt_dec (frac_part (r * 2 ^ k)) (1 / 2)) as [H1| H1]; [ | easy ].
+clear H.
+assert (∀ j, (k < j)%nat → frac_part (r * 2 ^ j) >= 1 / 2)%R.
+ intros j Hkj.
+ apply Hk in Hkj.
+ unfold bin_of_frac_part in Hkj.
+ apply Rnot_lt_ge.
+ now destruct (Rlt_dec (frac_part (r * 2 ^ j)) (1 / 2)).
+
+ clear Hk; rename H into Hk.
+
 bbb. 
 
 Print partial_sum_aux.
