@@ -680,10 +680,11 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
            assert (frac_part (u k * n) = 0)%R.
             rewrite Hu; unfold n; simpl; clear.
             unfold partial_sum.
+            destruct k; [ simpl; rewrite Rmult_0_l; apply fp_R0 | ].
 
 Theorem toto : ∀ k u pow i,
-  frac_part (pow * 2 ^ k) = 0%R
-  → frac_part (partial_sum_aux k u (pow / 2) i * 2 ^ k) = 0%R.
+  frac_part (pow * 2) = 0%R
+  → frac_part (partial_sum_aux k u pow i * 2 ^ k) = 0%R.
 Proof.
 intros * Hpow.
 revert pow i Hpow.
@@ -691,11 +692,47 @@ induction k; intros; simpl; [ rewrite Rmult_0_l; apply fp_R0 | ].
 remember (u i) as b eqn:Hb; symmetry in Hb.
 destruct b.
  rewrite Rmult_plus_distr_r, <- Rmult_assoc.
+(**)
+ rewrite plus_frac_part2.
+  rewrite frac_part_mult_for_0; [ | easy | ].
+   rewrite Rplus_0_l.
+   rewrite <- Rmult_assoc, Rmult_shuffle0, Rmult_comm.
+
+Theorem titi : ∀ n x,
+  frac_part x = 0%R ∨ frac_part x = (/ INR n)%R →
+  frac_part (INR n * x) = 0%R.
+Proof.
+Admitted.
+Show.
+replace 2%R with (INR 2) at 1 by easy.
+apply titi.
+destruct (Req_dec (frac_part pow) 0) as [H1| H1].
+ left; apply IHk.
+ unfold Rdiv; rewrite Rmult_assoc, Rinv_l; [ | lra ].
+ now rewrite Rmult_1_r.
+
+ right.
+
+bbb.
+
+Theorem titi : ∀ n x, (n ≥ 2)%nat →
+  frac_part (INR n * x) = 0%R ↔
+  frac_part x = 0%R ∨ ∃ d, (d | n) ∧ frac_part x = (/ INR d)%R.
+Proof.
+intros * Hn.
+split; intros Hx.
+revert x Hx.
+induction n; intros; [ easy | ].
+destruct n; [ now apply Nat.succ_le_mono in Hn | ].
+
+bbb.
  unfold Rdiv at 1; rewrite Rmult_comm, Rmult_assoc.
  rewrite Rinv_l, Rmult_1_r; [ | lra ].
  rewrite <- Rmult_assoc, Rmult_shuffle0.
  simpl in Hpow.
  rewrite plus_frac_part2.
+Print partial_sum_aux.
+
   rewrite Rplus_comm.
   rewrite frac_part_mult_for_0; [ | apply IHk | ].
 bbb.
