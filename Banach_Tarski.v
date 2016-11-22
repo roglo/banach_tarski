@@ -675,30 +675,14 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     now apply not_false_iff_true in Hi'; subst j.
 
   clear i Hj.
-  destruct Hk as (k & H & Hk).
+  destruct Hk as (k & Hkk & Hk).
 (**)
-  enough (frac_part (r * 2 ^ k) = 0).
-bbb.
-  enough (r = (/ 2 ^ k)%R).
-   subst r.
+  enough (Hrk : frac_part (r * 2 ^ k) = 0%R).
+   specialize (Hk k (Nat.le_refl _)).
    unfold bin_of_frac_part in Hk.
-   specialize (Hk O).
-   destruct H as [H| (Hkz, H)].
-    subst k.
-    pose proof Hk (le_refl O) as H1.
-    simpl in H1; rewrite Rinv_l in H1; [ | lra ].
-    rewrite fp_R1 in H1.
-    destruct (Rlt_dec 0 (1 / 2)); [ easy | lra ].
+   rewrite Hrk in Hk.
+   destruct (Rlt_dec 0 (1 / 2)) as [| H1]; [ easy | apply H1; lra ].
 
-    destruct k; [ now apply Hkz | ].
-    unfold bin_of_frac_part in H; simpl in H.
-    rewrite Rinv_mult_distr in H; [ | lra | apply pow_nonzero; lra ].
-    rewrite Rmult_assoc, Rinv_l in H; [ | apply pow_nonzero; lra ].
-    unfold Rdiv in H; rewrite Rmult_1_r, Rmult_1_l in H.
-    destruct (Rlt_dec (frac_part (/ 2)) (/ 2)) as [H1| ]; [ | easy ].
-    rewrite frac_part_self in H1; lra.
-
-   rename H into Hkk.
    assert (Hk' : ∀ j, k ≤ j → (1 / 2 <= frac_part (r * 2 ^ j))%R).
     intros j Hkj.
     specialize (Hk j Hkj).
@@ -708,6 +692,8 @@ bbb.
     now apply Rnot_lt_le in H.
 
     clear Hk; rename Hk' into Hk.
+    destruct Hkk as [Hkk| Hkk].
+     subst k; rewrite pow_O, Rmult_1_r.
 bbb.
     destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
     exfalso; apply Rnot_le_lt in Hr1.
