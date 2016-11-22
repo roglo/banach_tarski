@@ -694,6 +694,7 @@ destruct b.
  unfold Rdiv at 1; rewrite Rmult_comm, Rmult_assoc.
  rewrite Rinv_l, Rmult_1_r; [ | lra ].
  rewrite <- Rmult_assoc, Rmult_shuffle0.
+ simpl in Hpow.
  rewrite plus_frac_part2.
   rewrite Rplus_comm.
   rewrite frac_part_mult_for_0; [ | apply IHk | ].
