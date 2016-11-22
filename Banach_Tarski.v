@@ -676,6 +676,9 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
   clear i Hj.
   destruct Hk as (k & H & Hk).
+(**)
+  enough (frac_part (r * 2 ^ k) = 0).
+bbb.
   enough (r = (/ 2 ^ k)%R).
    subst r.
    unfold bin_of_frac_part in Hk.
@@ -705,7 +708,6 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     now apply Rnot_lt_le in H.
 
     clear Hk; rename Hk' into Hk.
-    remember (partial_sum (bin_of_frac_part r)) as u eqn:Hu.
 bbb.
     destruct (Rle_dec 1 r) as [Hr1| Hr1]; [ lra | ].
     exfalso; apply Rnot_le_lt in Hr1.
