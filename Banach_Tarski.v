@@ -619,6 +619,21 @@ assert (Hb : bound E).
 
   destruct (completeness E Hb He) as (y & Hy1 & Hy2).
   exists y; clear Hb He; simpl.
+  assert (Hy3 : (∀ k, partial_sum3 u k <= y)%R).
+   unfold is_upper_bound, E in Hy1; simpl in Hy1.
+   now intros k; apply Hy1; exists k.
+
+(*
+   clear Hy1; rename Hy3 into Hy1.
+*)
+   assert (Hy4 : (∀ b, (∀ k, partial_sum3 u k <= b) → (y <= b))%R).
+    unfold is_upper_bound, E in Hy2; simpl in Hy2.
+    intros b H; apply Hy2; intros x (k, Hx); subst x.
+    apply H.
+
+(*
+    clear Hy2; rename Hy3 into Hy2.
+*)
   split.
    split.
     apply Hy1; unfold E; simpl.
@@ -634,6 +649,38 @@ assert (Hb : bound E).
    destruct (Rlt_dec (frac_part x) (1 / 3)) as [Hx| Hx].
     subst x E.
     unfold is_upper_bound in Hy1.
+    destruct n.
+     simpl in Hx.
+     rewrite Rmult_1_r in Hx.
+clear Hy1 Hy2.
+specialize (Hy3 O).
+unfold partial_sum3 in Hy3; simpl in Hy3.
+specialize (Hy4 1).
+unfold partial_sum3 in Hy4; simpl in Hy4.
+bbb.
+
+Theorem toto : ∀ u y n,
+  (∀ k, (partial_sum3 u k <= y)%R)
+  → (∀ b, (∀ k : ℕ, (partial_sum3 u k <= b)%R) → (y <= b)%R)
+  → IZR (Int_part (y * 3 ^ S n)) = (3 ^ S n * partial_sum3 u n)%R.
+Proof.
+intros * Hk1 Hk2.
+induction n.
+ simpl; rewrite Rmult_1_r.
+ specialize (Hk1 O).
+ unfold partial_sum3 in Hk1; simpl in Hk1.
+ unfold partial_sum3; simpl.
+ rewrite Rmult_0_r.
+ specialize (Hk2 1).
+
+bbb.
+ assert (∀ ε, (ε > 0)%R → (y <= 1 - ε)%R).
+  intros ε Hε.
+  apply Hk2; intros k.
+ 
+
+ specialize (Hk2 1).
+bbb.
 
 bbb.
 Check Rseries_CV_comp.
@@ -642,6 +689,9 @@ bbb.
 Check
   (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat
      ter_bin_of_frac_part_surj).
+
+Print unit_interv.
+Print set.
 
 bbb.
 
