@@ -12,6 +12,8 @@ Require Import Reals Psatz Nsatz.
 Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 
+Notation "x '≤' y" := (Rle x y) : R_scope.
+
 Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
   → ((x - 6)² + y² + z² <= 1)%R
@@ -436,7 +438,7 @@ apply classic.
 now intros Hb; apply H.
 Qed.
 
-Definition unit_interv := mkset (λ x, (0 <= x <= 1)%R).
+Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 (* equivalence between ℝ and a representation with integer and fractional
    part, the fractional part being a boolean sequence (false for 0, true
@@ -582,7 +584,7 @@ Definition partial_sum3 u k := partial_sum3_aux k u 1%R 0.
 
 Theorem partial_sum3_aux_le_pow : ∀ u k pow i,
   (0 <= pow)%R
-  → (partial_sum3_aux k u pow i <= pow)%R.
+  → (partial_sum3_aux k u pow i <= pow / 2)%R.
 Proof.
 intros * Hpow.
 revert pow i Hpow.
@@ -595,7 +597,7 @@ destruct (u i).
  eapply Rle_trans; [ apply IHk; lra | lra ].
 Qed.
 
-Theorem partial_sum3_le_1 : ∀ u k, (partial_sum3 u k <= 1)%R.
+Theorem partial_sum3_le_half : ∀ u k, (partial_sum3 u k ≤ 1 / 2)%R.
 Proof.
 intros.
 apply partial_sum3_aux_le_pow; lra.
@@ -609,9 +611,9 @@ Proof.
 intros.
 set (E x := ∃ k, partial_sum3 u k = x).
 assert (Hb : bound E).
- exists 1%R; subst E; simpl.
+ exists (1 / 2)%R; subst E; simpl.
  intros r (k & H); subst r.
- apply partial_sum3_le_1.
+ apply partial_sum3_le_half.
 
  assert (He : ∃ r, E r).
   exists 0; subst E; simpl.
@@ -633,16 +635,16 @@ assert (Hb : bound E).
 (*
     clear Hr2; rename Hr3 into Hr2.
 *)
-bbb.
-  exists r; clear Hb He; simpl.
-  split.
+  assert (Hh : (r ≤ 1 / 2)%R).
+   apply Hr2; unfold E; simpl.
+   intros x (k & H); subst x.
+   apply partial_sum3_le_half.
+
+   exists r; clear Hb He; simpl.
    split.
+    split; [ | lra ].
     apply Hr1; unfold E; simpl.
     now exists O; unfold partial_sum3.
-
-    apply Hr2; unfold E; simpl.
-    intros x (k & H); subst x.
-    apply partial_sum3_le_1.
 
 (**)
    intros n.
@@ -656,6 +658,7 @@ destruct n.
  remember (u O) as b eqn:Hb; symmetry in Hb.
  destruct b.
   destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr |]; [ exfalso | easy ].
+(* ouais *)
 
 bbb.
 destruct (Req_dec y 1) as [H1| H1].

@@ -16,6 +16,7 @@ Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
 
 Notation "'√'" := sqrt.
+Notation "x '≤' y" := (Rle x y) : R_scope.
 
 Theorem fold_Rsqr : ∀ a, (a * a = a²)%R.
 Proof. easy. Qed.
