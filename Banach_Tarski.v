@@ -737,6 +737,10 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
  intros Hj.
  specialize (bin_of_frac_part_first_true r i Hr Hj); intros Hk.
  destruct Hk as (k & Hk1 & Hk2); clear i Hj.
+ assert (H : (0 <= r / 2 <= 1 / 2)%R) by lra.
+ clear Hr; rename H into Hr.
+ remember (r / 2)%R as r'; clear r Heqr'.
+ rename r' into r; move Hr before r.
 bbb.
 
  assert
