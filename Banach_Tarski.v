@@ -736,7 +736,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
  intros Hj.
  specialize (bin_of_frac_part_first_true r i Hr Hj); intros Hk.
- destruct Hk as (k & Hk1 & Hk2).
+ destruct Hk as (k & Hk1 & Hk2); clear i Hj.
 bbb.
 
  assert
