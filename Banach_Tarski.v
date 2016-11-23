@@ -652,8 +652,8 @@ assert (Hb : bound E).
     destruct n.
      simpl in Hx.
      rewrite Rmult_1_r in Hx.
-(*
 clear Hy1 Hy2.
+(*
 specialize (Hy3 O).
 unfold partial_sum3 in Hy3; simpl in Hy3.
 specialize (Hy4 1).
