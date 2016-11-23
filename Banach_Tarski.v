@@ -741,6 +741,37 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
  clear Hr; rename H into Hr.
  remember (r / 2)%R as r'; clear r Heqr'.
  rename r' into r; move Hr before r.
+ enough (H : r = ((2 * IZR (Int_part (r * 2 ^ k)) + 1) / 2 ^ S k)%R).
+  unfold bin_of_frac_part in Hk1.
+  destruct (Rlt_dec (frac_part (r * 2 ^ k)) (1 / 2)) as [H1| ]; [ | easy ].
+  clear Hk1; rewrite H in H1.
+  set (x := (2 ^ S k)%R) in H1; simpl in x; subst x.
+  unfold Rdiv in H1 at 1.
+  rewrite Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
+  do 2 rewrite Rmult_assoc in H1.
+  rewrite Rinv_l in H1; [ | apply pow_nonzero; lra ].
+  rewrite Rmult_1_r in H1.
+  rewrite Rmult_plus_distr_r in H1.
+  rewrite Rmult_assoc, Rmult_comm, Rmult_assoc in H1.
+  rewrite Rinv_l in H1; [ | lra ].
+  rewrite Rmult_1_r, fold_Rdiv in H1.
+  rewrite plus_frac_part2 in H1.
+SearchAbout (frac_part _ = 0%R).
+
+Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0%R.
+Proof.
+intros z.
+destruct (Z_le_dec 0 z) as [Hz| Hz].
+ rewrite <- Z2Nat.id with (n := z); [ | easy ].
+ rewrite <- INR_IZR_INZ.
+ apply frac_part_INR.
+
+ apply Z.nle_gt in Hz.
+ destruct z as [| p| p]; [ easy | easy | clear Hz; simpl ].
+ remember (Pos.to_nat p) as n; clear p Heqn.
+ induction n; [ simpl; rewrite Ropp_0; apply fp_R0 | simpl ].
+ destruct n.
+
 bbb.
 
  assert
