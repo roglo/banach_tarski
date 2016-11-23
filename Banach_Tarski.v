@@ -659,13 +659,80 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
  intros Hj.
  assert
    (Hk : ∃ k,
-    ((k = O ∨ k ≠ O ∧ bin_of_frac_part r (pred k) = false) ∧
-     ∀ j, k ≤ j → bin_of_frac_part r j = true)).
-  induction i.
-   exists O; split; [ now left | easy ].
+    bin_of_frac_part (r / 2) k = false ∧
+    ∀ j, k < j → bin_of_frac_part (r / 2) j = true).
+  destruct (Req_dec r 1) as [Hr1| Hr1].
+   subst r; specialize (Hj i (le_refl i)).
+   unfold bin_of_frac_part in Hj.
+   rewrite Rmult_1_l in Hj.
+   rewrite frac_part_pow in Hj.
+    destruct (Rlt_dec 0 (1 / 2)); [ easy | lra ].
 
+    replace 2%R with (INR 2) by easy.
+    apply frac_part_INR.
+
+   induction i.
+    exists O.
+    split.
+     unfold bin_of_frac_part; simpl.
+     rewrite Rmult_1_r.
+     destruct (Rlt_dec (frac_part (r / 2)) (1 / 2)) as [ | H]; [ easy | ].
+     exfalso; apply H; clear H.
+     rewrite frac_part_self; lra.
+
+     intros j Hj0.
+     destruct j; [ easy | clear Hj0 ].
+     unfold bin_of_frac_part.
+     set (x := (r / 2 * 2 ^ S j)%R).
+     destruct (Rlt_dec (frac_part x) (1 / 2)) as [H| ]; [ exfalso | easy ].
+     subst x; simpl in H.
+     unfold Rdiv at 1 in H.
+     rewrite Rmult_assoc, Rmult_comm, <- Rmult_assoc in H.
+     rewrite Rinv_l, Rmult_1_l in H; [ | lra ].
+     specialize (Hj j (Nat.le_0_l j)).
+     unfold bin_of_frac_part in Hj; simpl in Hj.
+     rewrite Rmult_comm in H.
+     set (x := (r * 2 ^ j)%R) in Hj, H.
+     now destruct (Rlt_dec (frac_part x) (1 / 2)).
+
+bbb.
+    exists (S i).
+    split.
+     unfold bin_of_frac_part.
+     set (x := (r / 2 * 2 ^ S i)%R).
+     destruct (Rlt_dec (frac_part x) (1 / 2)) as [| H]; [ easy | ].
+     exfalso; apply H; clear H; subst x.
+     unfold Rdiv at 1; simpl.
+     rewrite Rmult_assoc, Rmult_comm, <- Rmult_assoc.
+     rewrite Rinv_l, Rmult_1_l; [ | lra ].
+bbb.
+
+     subst x; simpl in H.
+     unfold Rdiv at 1 in H.
+     rewrite Rmult_assoc, Rmult_comm, <- Rmult_assoc in H.
+     rewrite Rinv_l, Rmult_1_l in H; [ | lra ].
+     specialize (Hj (S i) (Nat.le_refl _)).
+     unfold bin_of_frac_part in Hj; simpl in Hj.
+     rewrite Rmult_comm in H.
+     set (x := (r * 2 ^ i)%R) in Hj, H.
+     now destruct (Rlt_dec (frac_part x) (1 / 2)).
+
+     exfalso; apply H; clear H; subst x; simpl.
+     unfold Rdiv at 1.
+
+     rewrite frac_part_self.
+bbb.
+
+ assert
+   (Hk : ∃ k,
+    match k with
+    | O => True
+    | S k' => bin_of_frac_part r k' = false
+    end ∧
+    ∀ j, k ≤ j → bin_of_frac_part r j = true).
+   induction i; [ now exists O | ].
    destruct (Bool.bool_dec (bin_of_frac_part r i) false) as [Hi'| Hi'].
-    exists (S i); split; [ now right | easy ].
+    now exists (S i).
 
     apply IHi.
     intros j Hij.
@@ -676,6 +743,39 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
   clear i Hj.
   destruct Hk as (k & Hkk & Hk).
+bbb.
+
+  destruct k.
+   enough (H : r = 1%R).
+    subst r.
+    specialize (Hk O (Nat.le_refl _)).
+    unfold bin_of_frac_part in Hk; simpl in Hk.
+    rewrite Rmult_1_r in Hk.
+    rewrite fp_R1 in Hk.
+    destruct (Rlt_dec 0 (1 / 2)) as [| H]; [ easy | lra ].
+
+bbb.
+  set (u := bin_of_frac_part r).
+  set
+    (v i :=
+       match k with
+       | O => false
+       | S k' =>
+           if lt_dec i k' then u i
+           else if eq_nat_dec i k' then true
+           else false
+       end).
+  enough (r = partial_sum v k).
+   subst u v.
+   specialize (Hk k (le_refl _)).
+   induction k.
+    simpl in H.
+    unfold bin_of_frac_part in Hk; simpl in Hk.
+    rewrite Rmult_1_r in Hk.
+    destruct (Rlt_dec (frac_part r) (1 / 2)) as [H1| H1]; [ easy | ].
+    rewrite H in H1; simpl in H1.
+    apply H1; clear H1.
+
 bbb.
 (**)
   enough (Hrk : frac_part (r * 2 ^ k) = 0%R).
