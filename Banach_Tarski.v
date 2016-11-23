@@ -676,6 +676,7 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
 
   clear i Hj.
   destruct Hk as (k & Hkk & Hk).
+bbb.
 (**)
   enough (Hrk : frac_part (r * 2 ^ k) = 0%R).
    specialize (Hk k (Nat.le_refl _)).
@@ -698,8 +699,11 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
      enough (He : ∃ x, E x).
       set (c := completeness _ Hb He).
       destruct c as (lub & Hub & Hlub).
-      assert (lub = partial_sum u k).
-
+      set
+        (v i :=
+           if lt_dec i k then u i
+           else if eq_nat_dec i k then true else false).
+      assert (lub = partial_sum v k).
 bbb.
     destruct Hkk as [Hkk| Hkk].
      subst k; rewrite pow_O, Rmult_1_r.
