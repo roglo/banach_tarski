@@ -567,7 +567,27 @@ Definition id {A} (a : A) := a.
 Theorem id_nat : ∀ e : ℕ, ∃ x : ℕ, id x = e.
 Proof. now intros; exists e. Qed.
 
-Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id bin_of_frac_part id_nat).
+Print bin_of_frac_part.
+Definition ter_bin_of_frac_part x n :=
+  if Rlt_dec (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
+
+Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
+
+Theorem ter_bin_of_frac_part_surj : ∀ f : ℕ → bool,
+  ∃ y : ℝ, y ∈ unit_interv ∧ (∀ x : ℕ, ter_bin_of_frac_part y x = f x).
+Proof.
+intros.
+Check completeness.
+bbb.
+
+set (g u := 
+bbb.
+
+Check
+  (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat
+     ter_bin_of_frac_part_surj).
+
+bbb.
 
 Definition Canonical_seq := mkset (λ u, ∀ i, ∃ j, i ≤ j ∧ u j = false).
 
@@ -721,6 +741,7 @@ destruct (Req_dec r 1) as [Hr1| Hr1].
      now rewrite Rmult_comm in H'.
 Qed.
 
+(*
 Theorem converted_real_is_canonical : ∀ r,
   (0 <= r <= 1)%R
   → bin_of_frac_part r ∈ Canonical_seq.
@@ -1330,6 +1351,7 @@ bbb.
           destruct k.
            simpl in Hy1.
 bbb.
+*)
 
 Theorem bin_of_frac_part_surj : ∀ u : ℕ → bool, ∃ x : ℝ,
   x ∈ unit_interv ∧ ∀ n, bin_of_frac_part x n = u n.
