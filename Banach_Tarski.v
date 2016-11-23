@@ -645,7 +645,17 @@ assert (Hb : bound E).
 
 (**)
    intros n.
-clear E Hy1 Hy2; symmetry.
+clear E Hy1 Hy2.
+unfold ter_bin_of_frac_part.
+destruct n.
+ rewrite pow_O, Rmult_1_r.
+ specialize (Hy3 1%nat).
+ unfold partial_sum3 in Hy3; simpl in Hy3.
+ rewrite Rplus_0_r in Hy3.
+ remember (u O) as b eqn:Hb; symmetry in Hb.
+ destruct b.
+  destruct (Rlt_dec (frac_part y) (1 / 3)) as [Hy |]; [ exfalso | easy ].
+
 bbb.
 destruct (Req_dec y 1) as [H1| H1].
 subst y.
