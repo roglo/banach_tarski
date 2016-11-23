@@ -692,6 +692,15 @@ enough (H : ¬ (∀ j, i ≤ j → bin_of_frac_part r j = true)).
     now apply Rnot_lt_le in H.
 
     clear Hk; rename Hk' into Hk.
+    set (u := bin_of_frac_part r).
+    set (E x := ∃ k, partial_sum u k = x).
+    enough (Hb : bound E).
+     enough (He : ∃ x, E x).
+      set (c := completeness _ Hb He).
+      destruct c as (lub & Hub & Hlub).
+      assert (lub = partial_sum u k).
+
+bbb.
     destruct Hkk as [Hkk| Hkk].
      subst k; rewrite pow_O, Rmult_1_r.
      unfold frac_part.
