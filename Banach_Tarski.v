@@ -643,6 +643,30 @@ assert (Hb : bound E).
     intros x (k & H); subst x.
     apply partial_sum3_le_1.
 
+(**)
+   intros n.
+clear E Hy1 Hy2; symmetry.
+bbb.
+destruct (Req_dec y 1) as [H1| H1].
+subst y.
+unfold ter_bin_of_frac_part.
+rewrite Rmult_1_l.
+destruct n.
+rewrite pow_O.
+rewrite fp_R1.
+destruct (Rlt_dec 0 (1 / 3)) as [H| ]; [ clear H | lra ].
+bbb.
+
+assert (H : ∀ k, (partial_sum3 u k <= 1)%R) by apply partial_sum3_le_1.
+specialize (Hy4 1%R H); clear H.
+bbb.
+
+specialize (Hy3 1%nat).
+unfold partial_sum3 in Hy3; simpl in Hy3.
+remember (u O) as b eqn:Hb; symmetry in Hb.
+destruct b; [ exfalso | easy ].
+
+bbb.
    intros n.
    unfold ter_bin_of_frac_part; symmetry.
    set (x := (y * 3 ^ n)%R).
@@ -652,13 +676,15 @@ assert (Hb : bound E).
     destruct n.
      simpl in Hx.
      rewrite Rmult_1_r in Hx.
-clear Hy1 Hy2.
-(*
-specialize (Hy3 O).
-unfold partial_sum3 in Hy3; simpl in Hy3.
-specialize (Hy4 1).
-unfold partial_sum3 in Hy4; simpl in Hy4.
-*)
+     clear Hy1 Hy2.
+     specialize (Hy3 1%nat).
+     unfold partial_sum3 in Hy3; simpl in Hy3.
+     remember (u O) as b eqn:Hb; symmetry in Hb.
+     destruct b; [ exfalso | easy ].
+     rewrite Rplus_0_r in Hy3.
+     unfold partial_sum3 in Hy4; simpl in Hy4.
+     assert (H : ∀ k, (partial_sum3 u k <= 1)%R) by apply partial_sum3_le_1.
+     specialize (Hy4 1%R H); clear H.
 bbb.
 
 Theorem toto : ∀ u y,
