@@ -652,11 +652,32 @@ assert (Hb : bound E).
     destruct n.
      simpl in Hx.
      rewrite Rmult_1_r in Hx.
+(*
 clear Hy1 Hy2.
 specialize (Hy3 O).
 unfold partial_sum3 in Hy3; simpl in Hy3.
 specialize (Hy4 1).
 unfold partial_sum3 in Hy4; simpl in Hy4.
+*)
+bbb.
+
+Theorem toto : ∀ u y,
+  (∀ k, (partial_sum3 u k <= y)%R)
+  → (∀ b, (∀ k : ℕ, (partial_sum3 u k <= b)%R) → (y <= b)%R)
+  → (frac_part y < 1 / 3)%R
+  → IZR (Int_part (y * 3)) = 0%R.
+Proof.
+intros * Hk1 Hk2 Hy.
+specialize (Hk1 O).
+unfold partial_sum3 in Hk1; simpl in Hk1.
+unfold partial_sum3; simpl.
+assert (H : ∀ k, (partial_sum3 u k <= 1)%R) by apply partial_sum3_le_1.
+specialize (Hk2 1%R H); clear H.
+unfold frac_part in Hy.
+Admitted. Show.
+
+eapply toto in Hx; try eassumption.
+
 bbb.
 
 Theorem toto : ∀ u y n,
