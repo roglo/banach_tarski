@@ -617,44 +617,45 @@ assert (Hb : bound E).
   exists 0; subst E; simpl.
   now exists O; unfold partial_sum3.
 
-  destruct (completeness E Hb He) as (y & Hy1 & Hy2).
-  exists y; clear Hb He; simpl.
-  assert (Hy3 : (∀ k, partial_sum3 u k <= y)%R).
-   unfold is_upper_bound, E in Hy1; simpl in Hy1.
-   now intros k; apply Hy1; exists k.
+  destruct (completeness E Hb He) as (r & Hr1 & Hr2).
+  assert (Hr3 : (∀ k, partial_sum3 u k <= r)%R).
+   unfold is_upper_bound, E in Hr1; simpl in Hr1.
+   now intros k; apply Hr1; exists k.
 
 (*
    clear Hy1; rename Hy3 into Hy1.
 *)
-   assert (Hy4 : (∀ b, (∀ k, partial_sum3 u k <= b) → (y <= b))%R).
-    unfold is_upper_bound, E in Hy2; simpl in Hy2.
-    intros b H; apply Hy2; intros x (k, Hx); subst x.
+   assert (Hr4 : (∀ b, (∀ k, partial_sum3 u k <= b) → (r <= b))%R).
+    unfold is_upper_bound, E in Hr2; simpl in Hr2.
+    intros b H; apply Hr2; intros x (k, Hx); subst x.
     apply H.
 
 (*
-    clear Hy2; rename Hy3 into Hy2.
+    clear Hr2; rename Hr3 into Hr2.
 *)
+bbb.
+  exists r; clear Hb He; simpl.
   split.
    split.
-    apply Hy1; unfold E; simpl.
+    apply Hr1; unfold E; simpl.
     now exists O; unfold partial_sum3.
 
-    apply Hy2; unfold E; simpl.
+    apply Hr2; unfold E; simpl.
     intros x (k & H); subst x.
     apply partial_sum3_le_1.
 
 (**)
    intros n.
-clear E Hy1 Hy2.
+clear E Hr1 Hr2.
 unfold ter_bin_of_frac_part.
 destruct n.
  rewrite pow_O, Rmult_1_r.
- specialize (Hy3 1%nat).
- unfold partial_sum3 in Hy3; simpl in Hy3.
- rewrite Rplus_0_r in Hy3.
+ specialize (Hr3 1%nat).
+ unfold partial_sum3 in Hr3; simpl in Hr3.
+ rewrite Rplus_0_r in Hr3.
  remember (u O) as b eqn:Hb; symmetry in Hb.
  destruct b.
-  destruct (Rlt_dec (frac_part y) (1 / 3)) as [Hy |]; [ exfalso | easy ].
+  destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr |]; [ exfalso | easy ].
 
 bbb.
 destruct (Req_dec y 1) as [H1| H1].
@@ -668,7 +669,7 @@ destruct (Rlt_dec 0 (1 / 3)) as [H| ]; [ clear H | lra ].
 bbb.
 
 assert (H : ∀ k, (partial_sum3 u k <= 1)%R) by apply partial_sum3_le_1.
-specialize (Hy4 1%R H); clear H.
+specialize (Hr4 1%R H); clear H.
 bbb.
 
 specialize (Hy3 1%nat).
