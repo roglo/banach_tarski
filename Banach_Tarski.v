@@ -567,20 +567,76 @@ Definition id {A} (a : A) := a.
 Theorem id_nat : ∀ e : ℕ, ∃ x : ℕ, id x = e.
 Proof. now intros; exists e. Qed.
 
-Print bin_of_frac_part.
 Definition ter_bin_of_frac_part x n :=
   if Rlt_dec (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
 
-Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
+Fixpoint partial_sum3_aux k (u : ℕ → bool) pow i :=
+  match k with
+  | 0 => 0%R
+  | S k' =>
+      if u i then (pow / 3 + partial_sum3_aux k' u (pow / 3) (S i))%R
+      else partial_sum3_aux k' u (pow / 3)%R (S i)
+  end.
 
-Theorem ter_bin_of_frac_part_surj : ∀ f : ℕ → bool,
-  ∃ y : ℝ, y ∈ unit_interv ∧ (∀ x : ℕ, ter_bin_of_frac_part y x = f x).
+Definition partial_sum3 u k := partial_sum3_aux k u 1%R 0.
+
+Theorem partial_sum3_aux_le_pow : ∀ u k pow i,
+  (0 <= pow)%R
+  → (partial_sum3_aux k u pow i <= pow)%R.
+Proof.
+intros * Hpow.
+revert pow i Hpow.
+induction k; intros; simpl; [ lra | ].
+destruct (u i).
+ apply Rplus_le_reg_l with (r := (- (pow / 3))%R).
+ rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+ eapply Rle_trans; [ apply IHk; lra | lra ].
+
+ eapply Rle_trans; [ apply IHk; lra | lra ].
+Qed.
+
+Theorem partial_sum3_le_1 : ∀ u k, (partial_sum3 u k <= 1)%R.
 Proof.
 intros.
-Check completeness.
-bbb.
+apply partial_sum3_aux_le_pow; lra.
+Qed.
 
-set (g u := 
+Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
+
+Theorem ter_bin_of_frac_part_surj : ∀ u : ℕ → bool,
+  ∃ y : ℝ, y ∈ unit_interv ∧ (∀ x : ℕ, ter_bin_of_frac_part y x = u x).
+Proof.
+intros.
+set (E x := ∃ k, partial_sum3 u k = x).
+assert (Hb : bound E).
+ exists 1%R; subst E; simpl.
+ intros r (k & H); subst r.
+ apply partial_sum3_le_1.
+
+ assert (He : ∃ r, E r).
+  exists 0; subst E; simpl.
+  now exists O; unfold partial_sum3.
+
+  destruct (completeness E Hb He) as (y & Hy1 & Hy2).
+  exists y; clear Hb He; simpl.
+  split.
+   split.
+    apply Hy1; unfold E; simpl.
+    now exists O; unfold partial_sum3.
+
+    apply Hy2; unfold E; simpl.
+    intros x (k & H); subst x.
+    apply partial_sum3_le_1.
+
+   intros n.
+   unfold ter_bin_of_frac_part; symmetry.
+   set (x := (y * 3 ^ n)%R).
+   destruct (Rlt_dec (frac_part x) (1 / 3)) as [Hx| Hx].
+    subst x E.
+    unfold is_upper_bound in Hy1.
+
+bbb.
+Check Rseries_CV_comp.
 bbb.
 
 Check
