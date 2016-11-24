@@ -17,6 +17,15 @@ Notation "'ℕ'" := nat.
 
 Notation "'√'" := sqrt.
 Notation "x '≤' y" := (Rle x y) : R_scope.
+Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
+ (at level 70, y at next level) : R_scope.
+
+
+Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%R.
+Proof. intros; lra. Qed.
+
+Theorem fold_Rdiv : ∀ x y, (x * / y = x / y)%R.
+Proof. easy. Qed.
 
 Theorem fold_Rsqr : ∀ a, (a * a = a²)%R.
 Proof. easy. Qed.
@@ -53,9 +62,6 @@ rewrite <- Rmult_assoc; f_equal.
 rewrite Rmult_comm, Rmult_assoc; f_equal.
 now apply sqrt_sqrt.
 Qed.
-
-Theorem fold_Rdiv : ∀ x y, (x * / y = x / y)%R.
-Proof. easy. Qed.
 
 Theorem Rdiv_1_r : ∀ x, (x / 1)%R = x.
 Proof. intros x; lra. Qed.
@@ -214,6 +220,34 @@ rewrite Int_part_INR.
 now rewrite <- INR_IZR_INZ, Rminus_diag_eq.
 Qed.
 
+Theorem Int_part_IZR : ∀ z, Int_part (IZR z) = z.
+Proof.
+intros.
+destruct (Z_le_dec 0 z) as [Hz| Hz].
+ apply Z2Nat.id in Hz.
+ rewrite <- Hz at 1.
+ rewrite <- INR_IZR_INZ.
+ now rewrite Int_part_INR.
+
+ apply Z.nle_gt in Hz.
+ destruct z as [| p| p]; [ easy | easy | ].
+ replace (IZR (Z.neg p)) with (0 + IZR (Z.neg p))%R by lra; simpl.
+ rewrite fold_Rminus.
+ rewrite Rminus_Int_part1.
+  rewrite Int_part_is_0; [ | lra ].
+  simpl; rewrite Int_part_INR.
+  now rewrite positive_nat_Z.
+
+  rewrite fp_R0, frac_part_INR; lra.
+Qed.
+
+Theorem frac_part_IZR : ∀ z, (frac_part (IZR z) = 0)%R.
+Proof.
+intros.
+unfold frac_part.
+rewrite Int_part_IZR; lra.
+Qed.
+
 Theorem fp_R1 : frac_part 1 = 0%R.
 Proof.
 replace 1%R with (INR 1) by easy.
@@ -240,6 +274,27 @@ Proof.
 intros * Hx.
 unfold frac_part.
 rewrite Int_part_is_0; [ lra | easy ].
+Qed.
+
+Theorem frac_part_interv : ∀ x, (0 ≤ frac_part x < 1)%R.
+Proof.
+intros.
+unfold frac_part.
+specialize (base_Int_part x); intros Hx; lra.
+Qed.
+
+Theorem Int_part_interv : ∀ z x, (IZR z ≤ x < IZR (z + 1))%R → Int_part x = z.
+Proof.
+intros * (Hzx, Hxz).
+rewrite plus_IZR in Hxz; simpl in Hxz.
+assert (H : (0 ≤ x - IZR z < 1)%R) by lra.
+apply Int_part_is_0 in H.
+rewrite Rminus_Int_part1 in H.
+ rewrite Int_part_IZR in H.
+ now apply -> Z.sub_move_0_r in H.
+
+ rewrite frac_part_IZR.
+ apply Rle_ge, frac_part_interv.
 Qed.
 
 (* useless since there is theorem 'base_fp' in Coq library

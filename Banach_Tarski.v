@@ -674,16 +674,10 @@ induction n.
  rewrite Rplus_0_r in Hr1.
  remember (u O) as b eqn:Hb; symmetry in Hb.
  destruct b; simpl.
-Theorem toto : ∀ z x, (IZR z ≤ x < IZR (z + 1))%R → Int_part x = z.
-Proof.
-intros * (Hzx, Hxz).
-specialize (base_Int_part x); intros (H1, H2).
+  rewrite (Int_part_interv 1); [ easy | simpl; lra ].
 
 bbb.
-
-rewrite toto with (z := 1%Z); [ easy | simpl; lra ].
-bbb.
-  specialize (base_Int_part (r * 3)); intros (H1, H2).
+  rewrite (Int_part_interv 0); [ easy | simpl ].
 bbb.
 
 Theorem toto : ∀ u r n,
