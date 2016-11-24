@@ -653,14 +653,13 @@ assert (Hb : bound E).
 
       intros n.
       clear E Hr1 Hr2.
-      unfold ter_bin_of_frac_part.
+      unfold ter_bin_of_frac_part; symmetry.
       induction n.
        rewrite pow_O, Rmult_1_r.
        pose proof (Hr3 1%nat) as Hr1.
        unfold partial_sum3 in Hr1; simpl in Hr1.
        rewrite Rplus_0_r in Hr1.
        remember (u O) as b eqn:Hb; symmetry in Hb.
-       symmetry.
        destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr | Hr].
         destruct b; [ exfalso | easy ].
         unfold frac_part in Hr.
@@ -677,9 +676,26 @@ assert (Hb : bound E).
 
        idtac.
        simpl.
-clear IHn.
-pose proof (Hr3 n) as Hrn.
-unfold partial_sum3 in Hrn.
+destruct n.
+ simpl; rewrite Rmult_1_r.
+ simpl in IHn; rewrite Rmult_1_r in IHn.
+ destruct (Rlt_dec (frac_part (r * 3)) (1 / 3)) as [Hr| Hr].
+  specialize (Hr3 2%nat) as Hr2.
+  unfold partial_sum3 in Hr2; simpl in Hr2.
+  rewrite IHn in Hr2.
+  destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr1| Hr1].
+   unfold frac_part in Hr1.
+   pose proof Hr3 O as HrO.
+   unfold partial_sum3 in HrO; simpl in HrO.
+   rewrite Int_part_is_0 in Hr1; [ | lra ].
+   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+   rewrite Rplus_0_r in Hr2.
+   destruct b1; [ exfalso | easy ].
+bbb.
+  destruct b.
+   field_simplify in Hr2.
+   rewrite Rdiv_1_r in Hr2.
+
 bbb.
 
 assert (∀ k, (partial_sum u k ≤ 1 / 3)%R).
