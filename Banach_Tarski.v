@@ -616,6 +616,48 @@ replace (1 / 6)%R with (1 / 3 / 2)%R by lra.
 apply partial_sum3_aux_le_pow; lra.
 Qed.
 
+Theorem partial_sum3_aux_succ : ∀ u n pow i,
+  partial_sum3_aux (S n) u pow i =
+  (partial_sum3_aux n u pow i +
+   INR (Nat.b2n (u (i + n)%nat)) * pow / 3 ^ S n)%R.
+Proof.
+intros.
+revert pow i.
+induction n; intros.
+ simpl; rewrite Rplus_0_r, Rplus_0_l, Rmult_1_r, Nat.add_0_r.
+ destruct (u i); simpl; lra.
+
+ remember (S n) as sn; simpl; subst sn.
+ remember (u i) as bi eqn:Hbi; symmetry in Hbi.
+ destruct bi.
+  remember (3 ^ S n)%R as sn3 eqn:Hsn3.
+  rewrite IHn; simpl; rewrite Hbi.
+  rewrite Rplus_assoc.
+  do 2 apply Rplus_eq_compat_l.
+  rewrite <- Nat.add_succ_comm.
+  unfold Rdiv; subst sn3.
+  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+  now do 3 rewrite Rmult_assoc.
+
+  remember (3 ^ S n)%R as sn3 eqn:Hsn3.
+  rewrite IHn; simpl; rewrite Hbi.
+  rewrite <- Nat.add_succ_comm.
+  apply Rplus_eq_compat_l.
+  unfold Rdiv; subst sn3.
+  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+  now do 3 rewrite Rmult_assoc.
+Qed.
+
+Theorem partial_sum3_succ : ∀ u n,
+  (partial_sum3 u (S n) =
+   partial_sum3 u n + INR (Nat.b2n (u n)) / 3 ^ S n)%R.
+Proof.
+intros.
+unfold partial_sum3.
+rewrite partial_sum3_aux_succ.
+now rewrite Rmult_1_r.
+Qed.
+
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
 
 Theorem ter_bin_of_frac_part_surj : ∀ u : ℕ → bool,
@@ -656,7 +698,7 @@ assert (Hb : bound E).
       intros n.
       clear E Hr1 Hr2.
       unfold ter_bin_of_frac_part; symmetry.
-Theorem toto : ∀ u r n,
+Theorem titi : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%R)
   → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
   → IZR (Int_part (r * 3 ^ S n)) =
@@ -682,6 +724,7 @@ induction n.
   apply Hr2; intros k.
   now apply partial_sum3_le_1_6.
 
+ idtac.
  remember (S n) as sn; simpl; subst sn.
 bbb.
 
@@ -701,7 +744,20 @@ assert (Hk : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
   apply Hr2 in Hk.
   rewrite Int_part_is_0; [ easy | lra ].
 
-  simpl.
+  rewrite partial_sum3_succ.
+  rewrite Rmult_plus_distr_l.
+  remember (S n) as sn eqn:Hsn.
+  rewrite Hsn at 2; simpl; subst sn.
+  rewrite Rmult_assoc, <- IHn.
+  setoid_rewrite Rmult_comm.
+  rewrite <- Rmult_div.
+  unfold Rdiv.
+  rewrite Rmult_assoc.
+  rewrite Rinv_r; [ | apply pow_nonzero; lra ].
+  rewrite Rmult_1_r.
+  rewrite Rmult_comm at 1.
+  apply titi.
+bbb.
 
 bbb.
       induction n.
