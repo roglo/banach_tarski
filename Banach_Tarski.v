@@ -661,7 +661,7 @@ Qed.
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
 
 Theorem ter_bin_of_frac_part_surj : ∀ u : ℕ → bool,
-  ∃ y : ℝ, y ∈ unit_interv ∧ (∀ x : ℕ, ter_bin_of_frac_part y x = u x).
+  ∃ y : ℝ, y ∈ unit_interv ∧ (∀ n, ter_bin_of_frac_part y n = u n).
 Proof.
 intros.
 set (E x := ∃ k, partial_sum3 u k = x).
@@ -700,6 +700,17 @@ assert (Hb : bound E).
       unfold ter_bin_of_frac_part; symmetry.
       destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1].
        unfold frac_part in H1.
+revert r Hh Hr3 Hr4 H1.
+       induction n; intros.
+        simpl in H1; rewrite Rmult_1_r in H1.
+        assert (HrO : (0 ≤ r)%R) by now specialize (Hr3 O).
+        rewrite Int_part_is_0 in H1; [ | lra ].
+        simpl in H1; rewrite Rminus_0_r in H1.
+        specialize (Hr3 1%nat).
+        unfold partial_sum3 in Hr3; simpl in Hr3.
+        destruct (u O); [ lra | easy ].
+
+        simpl in H1.
 bbb.
 
 Theorem titi : ∀ u r n,
