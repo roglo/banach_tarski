@@ -705,10 +705,11 @@ Theorem titi : ∀ u r n,
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
 Proof.
 intros * Hr1 Hr2.
-assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
-assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
-unfold partial_sum3 in Hr1.
-induction n.
+revert u r Hr1 Hr2.
+induction n; intros.
+ assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
+ assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
+ unfold partial_sum3 in Hr1.
  simpl; do 2 rewrite Rmult_1_r.
  setoid_rewrite Int_part_is_0 at 2; [ simpl | lra ].
  rewrite Rmult_0_r, Rplus_0_l.
@@ -724,9 +725,42 @@ induction n.
   apply Hr2; intros k.
   now apply partial_sum3_le_1_6.
 
- idtac.
+ assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
+ assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
+ remember (S (S n)) as ssn; simpl; subst ssn.
  remember (S n) as sn; simpl; subst sn.
-Admitted. (* pour l'instant *)
+ do 2 rewrite <- Rmult_assoc.
+ set (v n := u (S n)); fold (v n).
+ apply IHn.
+  intros k.
+  unfold partial_sum3.
+  induction k; simpl; [ lra | ].
+  remember (v O) as b eqn:Hb; symmetry in Hb.
+  destruct b.
+bbb.
+
+ assert
+   (Hp :
+    ∀ k, partial_sum3 v k = (3 * partial_sum3 u k - INR (Nat.b2n (u O)))%R).
+  intros.
+  subst v; clear.
+  unfold partial_sum3.
+  induction k.
+   simpl.
+
+
+ apply IHn.
+  intros k.
+bbb.
+
+  apply Rmult_le_reg_r with (r := (/ 3)%R); [ lra | ].
+  rewrite Rmult_assoc, Rinv_r; [ | lra ].
+  rewrite Rmult_1_r.
+  rewrite fold_Rdiv.
+  apply Rle_trans with (r2 := partial_sum3 u (S k)); [ | apply Hr1 ].
+  unfold v; simpl.
+  unfold partial_sum3; simpl.
+bbb.
 
 Theorem toto : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%R)
@@ -752,6 +786,15 @@ bbb.
   rewrite Int_part_is_0; [ easy | lra ].
 
   rewrite partial_sum3_succ.
+  rewrite Rmult_plus_distr_l.
+  setoid_rewrite Rmult_comm at 5.
+  unfold Rdiv; rewrite Rmult_assoc.
+  rewrite Rinv_l; [ | apply pow_nonzero; lra ].
+  rewrite Rmult_1_r.
+  remember (r * 3 ^ S n)%R as x; simpl; subst x.
+  rewrite Rmult_assoc, <- IHn.
+  apply titi.
+
 bbb.
 
 Check tutu.
