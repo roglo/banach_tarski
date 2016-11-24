@@ -732,7 +732,15 @@ induction n; intros.
  do 2 rewrite <- Rmult_assoc.
  set (v n := u (S n)); fold (v n).
  apply IHn.
+(**)
+(*
+assert (Hk : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
+ apply partial_sum3_le_half.
+*)
   intros k.
+subst v; clear -Hr1.
+bbb.
+
   unfold partial_sum3.
   induction k; simpl; [ lra | ].
   remember (v O) as b eqn:Hb; symmetry in Hb.
@@ -761,6 +769,7 @@ bbb.
   unfold v; simpl.
   unfold partial_sum3; simpl.
 bbb.
+*)
 
 Theorem toto : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%R)
