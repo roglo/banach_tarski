@@ -654,6 +654,47 @@ assert (Hb : bound E).
       intros n.
       clear E Hr1 Hr2.
       unfold ter_bin_of_frac_part; symmetry.
+Theorem toto : ∀ u r n,
+  (∀ k, (partial_sum3 u k ≤ r)%R)
+  → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
+  → IZR (Int_part (r * 3 ^ S n)) =
+    (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
+Proof.
+intros * Hr1 Hr2.
+assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
+assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
+unfold partial_sum3 in Hr1.
+induction n.
+ simpl; do 2 rewrite Rmult_1_r.
+ setoid_rewrite Int_part_is_0 at 2; [ simpl | lra ].
+ rewrite Rmult_0_r, Rplus_0_l.
+ specialize (Hr1 1%nat); simpl in Hr1.
+ rewrite Rplus_0_r in Hr1.
+ remember (u O) as b eqn:Hb; symmetry in Hb.
+ destruct b; simpl.
+  specialize (base_Int_part (r * 3)); intros (H1, H2).
+SearchAbout Int_part.
+
+bbb.
+
+Theorem toto : ∀ u r n,
+  (∀ k, (partial_sum3 u k ≤ r)%R)
+  → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
+  → IZR (Int_part (r * 3 ^ n)) = (3 ^ n * partial_sum3 u n)%R.
+Proof.
+intros * Hr1 Hr2.
+assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
+assert (Hk : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
+ apply partial_sum3_le_half.
+
+ induction n.
+  simpl; rewrite Rmult_1_l, Rmult_1_r.
+  unfold partial_sum3; simpl.
+  apply Hr2 in Hk.
+  rewrite Int_part_is_0; [ easy | lra ].
+
+  simpl.
+
 bbb.
       induction n.
        rewrite pow_O, Rmult_1_r.
