@@ -13,6 +13,8 @@ Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 
 Notation "x '≤' y" := (Rle x y) : R_scope.
+Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
+ (at level 70, y at next level) : R_scope.
 
 Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
@@ -672,9 +674,16 @@ induction n.
  rewrite Rplus_0_r in Hr1.
  remember (u O) as b eqn:Hb; symmetry in Hb.
  destruct b; simpl.
-  specialize (base_Int_part (r * 3)); intros (H1, H2).
-SearchAbout Int_part.
+Theorem toto : ∀ z x, (IZR z ≤ x < IZR (z + 1))%R → Int_part x = z.
+Proof.
+intros * (Hzx, Hxz).
+specialize (base_Int_part x); intros (H1, H2).
 
+bbb.
+
+rewrite toto with (z := 1%Z); [ easy | simpl; lra ].
+bbb.
+  specialize (base_Int_part (r * 3)); intros (H1, H2).
 bbb.
 
 Theorem toto : ∀ u r n,
