@@ -603,6 +603,17 @@ intros.
 apply partial_sum3_aux_le_pow; lra.
 Qed.
 
+Theorem partial_sum3_le_1_6 : ∀ u k,
+  u O = false
+  → (partial_sum3 u k ≤ 1 / 6)%R.
+Proof.
+intros * Hb.
+unfold partial_sum3.
+destruct k; simpl; [ lra | rewrite Hb ].
+replace (1 / 6)%R with (1 / 3 / 2)%R by lra.
+apply partial_sum3_aux_le_pow; lra.
+Qed.
+
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
 
 Theorem ter_bin_of_frac_part_surj : ∀ u : ℕ → bool,
@@ -624,48 +635,54 @@ assert (Hb : bound E).
    unfold is_upper_bound, E in Hr1; simpl in Hr1.
    now intros k; apply Hr1; exists k.
 
-(*
-   clear Hy1; rename Hy3 into Hy1.
-*)
    assert (Hr4 : (∀ b, (∀ k, partial_sum3 u k <= b) → (r <= b))%R).
     unfold is_upper_bound, E in Hr2; simpl in Hr2.
     intros b H; apply Hr2; intros x (k, Hx); subst x.
     apply H.
 
-(*
-    clear Hr2; rename Hr3 into Hr2.
-*)
-  assert (Hh : (r ≤ 1 / 2)%R).
-   apply Hr2; unfold E; simpl.
-   intros x (k & H); subst x.
-   apply partial_sum3_le_half.
+    assert (Hh : (r ≤ 1 / 2)%R).
+     apply Hr2; unfold E; simpl.
+     intros x (k & H); subst x.
+     apply partial_sum3_le_half.
 
-   exists r; clear Hb He; simpl.
-   split.
-    split; [ | lra ].
-    apply Hr1; unfold E; simpl.
-    now exists O; unfold partial_sum3.
+     exists r; clear Hb He; simpl.
+     split.
+      split; [ | lra ].
+      apply Hr1; unfold E; simpl.
+      now exists O; unfold partial_sum3.
 
-   intros n.
-   clear E Hr1 Hr2.
-   unfold ter_bin_of_frac_part.
-   destruct n.
-    rewrite pow_O, Rmult_1_r.
-    pose proof (Hr3 1%nat) as Hr1.
-    unfold partial_sum3 in Hr1; simpl in Hr1.
-    rewrite Rplus_0_r in Hr1.
-    remember (u O) as b eqn:Hb; symmetry in Hb.
-    destruct b.
-     destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr |]; [ exfalso | easy ].
-     unfold frac_part in Hr.
-     rewrite Int_part_is_0 in Hr; [ | lra ].
-     rewrite Rminus_0_r in Hr; lra.
+      intros n.
+      clear E Hr1 Hr2.
+      unfold ter_bin_of_frac_part.
+      induction n.
+       rewrite pow_O, Rmult_1_r.
+       pose proof (Hr3 1%nat) as Hr1.
+       unfold partial_sum3 in Hr1; simpl in Hr1.
+       rewrite Rplus_0_r in Hr1.
+       remember (u O) as b eqn:Hb; symmetry in Hb.
+       destruct b.
+        destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr |]; [ exfalso | easy ].
+        unfold frac_part in Hr.
+        rewrite Int_part_is_0 in Hr; [ | lra ].
+        rewrite Rminus_0_r in Hr; lra.
 
-     destruct (Rlt_dec (frac_part r) (1 / 3)) as [| Hr]; [ easy | exfalso ].
-     unfold frac_part in Hr.
-     rewrite Int_part_is_0 in Hr; [ | lra ].
-     rewrite Rminus_0_r in Hr.
-     apply Hr; clear Hr.
+        destruct (Rlt_dec (frac_part r) (1 / 3)) as [| Hr]; [ easy | exfalso ].
+        unfold frac_part in Hr.
+        rewrite Int_part_is_0 in Hr; [ | lra ].
+        rewrite Rminus_0_r in Hr.
+        apply Hr; clear Hr.
+        apply Rle_lt_trans with (r2 := (1 / 6)%R); [ | lra ].
+        apply Hr4.
+        now intros k; apply partial_sum3_le_1_6.
+
+       idtac.
+       simpl.
+bbb.
+
+assert (∀ k, (partial_sum u k ≤ 1 / 3)%R).
+ intros k; unfold partial_sum.
+ induction k; simpl; [ lra | rewrite Hb ].
+
 bbb.
 
 specialize (Hr3 2%nat).
