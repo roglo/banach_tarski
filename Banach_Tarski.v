@@ -654,6 +654,7 @@ assert (Hb : bound E).
       intros n.
       clear E Hr1 Hr2.
       unfold ter_bin_of_frac_part; symmetry.
+bbb.
       induction n.
        rewrite pow_O, Rmult_1_r.
        pose proof (Hr3 1%nat) as Hr1.
@@ -688,9 +689,17 @@ destruct n.
    pose proof Hr3 O as HrO.
    unfold partial_sum3 in HrO; simpl in HrO.
    rewrite Int_part_is_0 in Hr1; [ | lra ].
+   rewrite Rminus_0_r in Hr1.
    remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
    rewrite Rplus_0_r in Hr2.
    destruct b1; [ exfalso | easy ].
+   unfold frac_part in Hr.
+   rewrite Int_part_is_0 in Hr; [ | lra ].
+   rewrite Rminus_0_r in Hr; lra.
+
+   apply Rnot_lt_ge in Hr1.
+   rewrite Rplus_0_r in Hr2.
+
 bbb.
   destruct b.
    field_simplify in Hr2.
