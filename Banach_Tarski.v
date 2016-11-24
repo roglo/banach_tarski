@@ -660,23 +660,26 @@ assert (Hb : bound E).
        unfold partial_sum3 in Hr1; simpl in Hr1.
        rewrite Rplus_0_r in Hr1.
        remember (u O) as b eqn:Hb; symmetry in Hb.
-       destruct b.
-        destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr |]; [ exfalso | easy ].
+       symmetry.
+       destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr | Hr].
+        destruct b; [ exfalso | easy ].
         unfold frac_part in Hr.
-        rewrite Int_part_is_0 in Hr; [ | lra ].
-        rewrite Rminus_0_r in Hr; lra.
+        rewrite Int_part_is_0 in Hr; lra.
 
-        destruct (Rlt_dec (frac_part r) (1 / 3)) as [| Hr]; [ easy | exfalso ].
-        unfold frac_part in Hr.
-        rewrite Int_part_is_0 in Hr; [ | lra ].
-        rewrite Rminus_0_r in Hr.
-        apply Hr; clear Hr.
+        destruct b; [ easy | exfalso ].
+        apply Hr.
+        unfold frac_part.
+        rewrite Int_part_is_0; [ | lra ].
+        rewrite Rminus_0_r.
         apply Rle_lt_trans with (r2 := (1 / 6)%R); [ | lra ].
-        apply Hr4.
-        now intros k; apply partial_sum3_le_1_6.
+        apply Hr4; intros k.
+        now apply partial_sum3_le_1_6.
 
        idtac.
        simpl.
+clear IHn.
+pose proof (Hr3 n) as Hrn.
+unfold partial_sum3 in Hrn.
 bbb.
 
 assert (∀ k, (partial_sum u k ≤ 1 / 3)%R).
