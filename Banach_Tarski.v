@@ -646,19 +646,33 @@ assert (Hb : bound E).
     apply Hr1; unfold E; simpl.
     now exists O; unfold partial_sum3.
 
-(**)
    intros n.
-clear E Hr1 Hr2.
-unfold ter_bin_of_frac_part.
-destruct n.
- rewrite pow_O, Rmult_1_r.
- specialize (Hr3 1%nat).
- unfold partial_sum3 in Hr3; simpl in Hr3.
- rewrite Rplus_0_r in Hr3.
- remember (u O) as b eqn:Hb; symmetry in Hb.
- destruct b.
-  destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr |]; [ exfalso | easy ].
-(* ouais *)
+   clear E Hr1 Hr2.
+   unfold ter_bin_of_frac_part.
+   destruct n.
+    rewrite pow_O, Rmult_1_r.
+    pose proof (Hr3 1%nat) as Hr1.
+    unfold partial_sum3 in Hr1; simpl in Hr1.
+    rewrite Rplus_0_r in Hr1.
+    remember (u O) as b eqn:Hb; symmetry in Hb.
+    destruct b.
+     destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr |]; [ exfalso | easy ].
+     unfold frac_part in Hr.
+     rewrite Int_part_is_0 in Hr; [ | lra ].
+     rewrite Rminus_0_r in Hr; lra.
+
+     destruct (Rlt_dec (frac_part r) (1 / 3)) as [| Hr]; [ easy | exfalso ].
+     unfold frac_part in Hr.
+     rewrite Int_part_is_0 in Hr; [ | lra ].
+     rewrite Rminus_0_r in Hr.
+     apply Hr; clear Hr.
+bbb.
+
+specialize (Hr3 2%nat).
+unfold partial_sum3 in Hr3; simpl in Hr3.
+rewrite Hb, Rplus_0_r in Hr3.
+remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+destruct b1.
 
 bbb.
 destruct (Req_dec y 1) as [H1| H1].
