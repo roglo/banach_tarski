@@ -698,6 +698,10 @@ assert (Hb : bound E).
       intros n.
       clear E Hr1 Hr2.
       unfold ter_bin_of_frac_part; symmetry.
+      destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1].
+       unfold frac_part in H1.
+bbb.
+
 Theorem titi : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%R)
   → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
