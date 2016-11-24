@@ -726,7 +726,7 @@ induction n.
 
  idtac.
  remember (S n) as sn; simpl; subst sn.
-bbb.
+Admitted. (* pour l'instant *)
 
 Theorem toto : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%R)
@@ -738,11 +738,38 @@ assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
 assert (Hk : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
  apply partial_sum3_le_half.
 
+(*
+unfold partial_sum3.
+Print partial_sum3_aux.
+Check partial_sum3_aux_succ.
+bbb.
+*)
+
  induction n.
   simpl; rewrite Rmult_1_l, Rmult_1_r.
   unfold partial_sum3; simpl.
   apply Hr2 in Hk.
   rewrite Int_part_is_0; [ easy | lra ].
+
+  rewrite partial_sum3_succ.
+bbb.
+
+Check tutu.
+rewrite tutu.
+remember (3 ^ S n)%R as s3 eqn:Hs3; simpl.
+rewrite Rmult_plus_distr_l, Rmult_1_l.
+rewrite Hs3 at 2; simpl.
+rewrite Rmult_assoc.
+rewrite <- IHn.
+setoid_rewrite Rmult_comm at 4.
+rewrite <- Rmult_div.
+unfold Rdiv.
+rewrite Rmult_assoc; subst s3.
+rewrite Rinv_r; [ | apply pow_nonzero; lra ].
+rewrite Rmult_1_r.
+apply titi.
+
+bbb.
 
   rewrite partial_sum3_succ.
   rewrite Rmult_plus_distr_l.
@@ -757,8 +784,6 @@ assert (Hk : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
   rewrite Rmult_1_r.
   rewrite Rmult_comm at 1.
   apply titi.
-bbb.
-
 bbb.
       induction n.
        rewrite pow_O, Rmult_1_r.
