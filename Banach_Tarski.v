@@ -676,8 +676,13 @@ induction n.
  destruct b; simpl.
   rewrite (Int_part_interv 1); [ easy | simpl; lra ].
 
-bbb.
   rewrite (Int_part_interv 0); [ easy | simpl ].
+  split; [ lra | ].
+  enough (r ≤ 1 / 6)%R by lra.
+  apply Hr2; intros k.
+  now apply partial_sum3_le_1_6.
+
+ remember (S n) as sn; simpl; subst sn.
 bbb.
 
 Theorem toto : ∀ u r n,
