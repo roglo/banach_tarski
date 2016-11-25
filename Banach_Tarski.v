@@ -765,7 +765,7 @@ induction n; intros.
     rewrite (Int_part_interv 4); simpl; [ | lra ].
     rewrite (Int_part_interv 1); simpl; lra.
 
-    assert (H : ∀ k, (partial_sum3 u k ≤ 7 / 18)%R).
+    assert (H : ∀ k, (partial_sum3 u k ≤ / 3 + / 2 * / 9)%R).
      intros k.
      unfold partial_sum3.
      destruct k; simpl; [ lra | rewrite Hb ].
