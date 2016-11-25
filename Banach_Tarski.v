@@ -837,24 +837,25 @@ induction n; intros.
         apply partial_sum3_aux_le_pow; lra.
 
      destruct b2.
+      assert (H718 : ∀ k, (partial_sum3 u k ≤ 7 / 18)%R).
+       intros k.
+       unfold partial_sum3.
+       destruct k; simpl; [ lra | rewrite Hb ].
+       apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
+       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+       destruct k; simpl; [ lra | rewrite Hb1 ].
+       destruct k; simpl; [ lra | rewrite Hb2 ].
+       apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
+       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
+       apply partial_sum3_aux_le_pow; lra.
+
+       apply Hr2 in H718.
+       rewrite (Int_part_interv 10); simpl; [ | lra ].
+       rewrite (Int_part_interv 3); simpl; lra.
+
 bbb.
-
-      rewrite (Int_part_interv 10); simpl.
-2: split.
-2: ring_simplify.
-3: ring_simplify.
-
-
-; [ | lra ].
-bbb.
-     assert (H6 : ∀ k, (partial_sum3 u k ≤ 1 / 6)%R).
-      now intros k; apply partial_sum3_le_1_6.
-
-      apply Hr2 in H6.
-      setoid_rewrite Int_part_is_0 at 2; [ | lra ].
-      rewrite Rmult_0_r, Rplus_0_l.
-      destruct b1.
-       rewrite (Int_part_interv 1); [ easy | simpl; lra ].
+      assert (H718 : ∀ k, (partial_sum3 u k ≤ 7 / 18)%R).
 
        rewrite (Int_part_interv 0); [ easy | simpl ].
        split; [ lra | ].
@@ -866,6 +867,7 @@ bbb.
        eapply Rle_trans; [ apply partial_sum3_aux_le_pow; lra | lra ].
 
 bbb.
+ (* general case of titi that does not work *)
  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
  assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
  remember (S (S n)) as ssn; simpl; subst ssn.
