@@ -737,12 +737,25 @@ induction n; intros.
  rewrite Rplus_0_r in Hr1.
  remember (u O) as b eqn:Hb; symmetry in Hb.
  destruct b; simpl.
-  assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
-  rewrite (Int_part_interv 1); [ | simpl; lra ].
-  rewrite (Int_part_interv 0); simpl; lra.
+  assert (H : (∀ k, partial_sum3 u k ≤ 1 / 2)%R).
+   intros k.
+   unfold partial_sum3.
+   destruct k; simpl; [ lra | rewrite Hb ].
+   apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
+   rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+   apply Rle_trans with (r2 := (1 / 3 / 2)%R); [ | lra ].
+   apply partial_sum3_aux_le_pow; lra.
+
+   apply Hr2 in H.
+   rewrite (Int_part_interv 1); [ | simpl; lra ].
+   rewrite (Int_part_interv 0); simpl; lra.
 
    assert (H : ∀ k, (partial_sum3 u k ≤ 1 / 6)%R).
-    now intros k; apply partial_sum3_le_1_6.
+    intros k.
+    unfold partial_sum3.
+    destruct k; simpl; [ lra | rewrite Hb ].
+    apply Rle_trans with (r2 := (1 / 3 / 2)%R); [ | lra ].
+    apply partial_sum3_aux_le_pow; lra.
 
     apply Hr2 in H.
     rewrite (Int_part_interv 0); [ | simpl; lra ].
