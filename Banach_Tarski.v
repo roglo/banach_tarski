@@ -703,6 +703,11 @@ Theorem toto : ∀ u r n,
   IZR (Int_part (r * 3 ^ n)) = (partial_sum3 u n * 3 ^ n)%R.
 Admitted. Show.
 
+(*
+Theorem titi : ∀ u r n,
+  (∀ k, frac_part (r * 3 ^ n) ≤ partial_sum_aux k u 1 n + o (u (n + k) / 3 ^ S k))%R.
+*)
+
 unfold frac_part in H1.
 rewrite (toto u) in H1.
 unfold Rminus in H1.
