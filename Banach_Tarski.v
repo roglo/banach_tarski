@@ -838,6 +838,15 @@ induction n; intros.
 
      destruct b2.
 bbb.
+
+      rewrite (Int_part_interv 10); simpl.
+2: split.
+2: ring_simplify.
+3: ring_simplify.
+
+
+; [ | lra ].
+bbb.
      assert (H6 : ∀ k, (partial_sum3 u k ≤ 1 / 6)%R).
       now intros k; apply partial_sum3_le_1_6.
 
