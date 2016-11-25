@@ -700,45 +700,27 @@ assert (Hb : bound E).
       unfold ter_bin_of_frac_part; symmetry.
       destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1].
 Theorem toto : ∀ u r n,
-  IZR (Int_part (r * 3 ^ n)) = (partial_sum3 u n * 3 ^ n)%R.
-Admitted. Show.
+  (∀ k : ℕ, (partial_sum3 u k ≤ r)%R)
+  → (∀ b : ℝ, (∀ k : ℕ, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
+  → IZR (Int_part (r * 3 ^ n)) = (partial_sum3 u n * 3 ^ n)%R.
+Proof.
+intros * Hk1 Hk2.
+induction n.
+ unfold partial_sum3; simpl.
+ do 2 rewrite Rmult_1_r.
+ specialize (Hk1 O); simpl in Hk1.
+ unfold partial_sum3 in Hk1; simpl in Hk1.
+ specialize (Hk2 (1 / 2)%R (partial_sum3_le_half u)).
+ replace 0%R with (IZR 0) by easy.
+ apply IZR_eq, Int_part_interv; simpl; lra.
 
-(*
-Theorem titi : ∀ u r n,
-  (∀ k, frac_part (r * 3 ^ n) ≤ partial_sum_aux k u 1 n + o (u (n + k) / 3 ^ S k))%R.
-*)
-
-unfold frac_part in H1.
-rewrite (toto u) in H1.
-unfold Rminus in H1.
-rewrite Ropp_mult_distr_l in H1.
-rewrite <- Rmult_plus_distr_r in H1.
-rewrite fold_Rminus in H1.
-apply Rmult_lt_compat_r with (r := (/ 3 ^ n)%R) in H1.
- rewrite Rmult_assoc in H1.
- rewrite Rinv_r in H1; [ | apply pow_nonzero; lra ].
- rewrite Rmult_1_r in H1.
- unfold Rdiv in H1.
- rewrite Rmult_assoc in H1.
- rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
- replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
- rewrite fold_Rdiv in H1.
-
-bbb.
-      destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1].
-       unfold frac_part in H1.
-revert r Hh Hr3 Hr4 H1.
-       induction n; intros.
-        simpl in H1; rewrite Rmult_1_r in H1.
-        assert (HrO : (0 ≤ r)%R) by now specialize (Hr3 O).
-        rewrite Int_part_is_0 in H1; [ | lra ].
-        simpl in H1; rewrite Rminus_0_r in H1.
-        specialize (Hr3 1%nat).
-        unfold partial_sum3 in Hr3; simpl in Hr3.
-        destruct (u O); [ lra | easy ].
-
-        simpl in H1.
-bbb.
+ rewrite partial_sum3_succ.
+ rewrite Rmult_plus_distr_r.
+ unfold Rdiv; rewrite Rmult_assoc.
+ rewrite Rinv_l; [ | apply pow_nonzero; lra ].
+ rewrite Rmult_1_r.
+ remember (r * 3 ^ S n)%R as x; simpl; subst x.
+ rewrite <- Rmult_assoc, Rmult_shuffle0, <- IHn.
 
 Theorem titi : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%R)
@@ -774,14 +756,49 @@ induction n; intros.
  do 2 rewrite <- Rmult_assoc.
  set (v n := u (S n)); fold (v n).
  apply IHn.
-(**)
-(*
-assert (Hk : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
- apply partial_sum3_le_half.
-*)
   intros k.
-subst v; clear -Hr1.
+  subst v; clear -Hr1 Hr12.
 bbb.
+
+(* end of titi; return to toto *)
+setoid_rewrite Rmult_comm at 3.
+apply titi; easy.
+
+bbb.
+
+(* end of toto; return to ter_bin_of_frac_part_surj *)
+unfold frac_part in H1.
+rewrite (toto u) in H1; [ | easy | easy ].
+unfold Rminus in H1.
+rewrite Ropp_mult_distr_l in H1.
+rewrite <- Rmult_plus_distr_r in H1.
+rewrite fold_Rminus in H1.
+apply Rmult_lt_compat_r with (r := (/ 3 ^ n)%R) in H1.
+ rewrite Rmult_assoc in H1.
+ rewrite Rinv_r in H1; [ | apply pow_nonzero; lra ].
+ rewrite Rmult_1_r in H1.
+ unfold Rdiv in H1.
+ rewrite Rmult_assoc in H1.
+ rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
+ replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
+ rewrite fold_Rdiv in H1.
+
+bbb.
+      destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1].
+       unfold frac_part in H1.
+revert r Hh Hr3 Hr4 H1.
+       induction n; intros.
+        simpl in H1; rewrite Rmult_1_r in H1.
+        assert (HrO : (0 ≤ r)%R) by now specialize (Hr3 O).
+        rewrite Int_part_is_0 in H1; [ | lra ].
+        simpl in H1; rewrite Rminus_0_r in H1.
+        specialize (Hr3 1%nat).
+        unfold partial_sum3 in Hr3; simpl in Hr3.
+        destruct (u O); [ lra | easy ].
+
+        simpl in H1.
+bbb.
+
 
   unfold partial_sum3.
   induction k; simpl; [ lra | ].
