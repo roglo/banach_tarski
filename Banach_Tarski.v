@@ -698,9 +698,26 @@ assert (Hb : bound E).
       intros n.
       clear E Hr1 Hr2.
       unfold ter_bin_of_frac_part; symmetry.
-bbb.
-Theorem toto :
-  frac_part (r * 3 ^ n) = u n / 3 + u (S n) / 3 ^ 2 + ...
+      destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1].
+Theorem toto : ∀ u r n,
+  IZR (Int_part (r * 3 ^ n)) = (partial_sum3 u n * 3 ^ n)%R.
+Admitted. Show.
+
+unfold frac_part in H1.
+rewrite (toto u) in H1.
+unfold Rminus in H1.
+rewrite Ropp_mult_distr_l in H1.
+rewrite <- Rmult_plus_distr_r in H1.
+rewrite fold_Rminus in H1.
+apply Rmult_lt_compat_r with (r := (/ 3 ^ n)%R) in H1.
+ rewrite Rmult_assoc in H1.
+ rewrite Rinv_r in H1; [ | apply pow_nonzero; lra ].
+ rewrite Rmult_1_r in H1.
+ unfold Rdiv in H1.
+ rewrite Rmult_assoc in H1.
+ rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
+ replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
+ rewrite fold_Rdiv in H1.
 
 bbb.
       destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1].
