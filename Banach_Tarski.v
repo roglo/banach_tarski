@@ -731,14 +731,13 @@ Proof.
 intros * Hr1 Hr2.
 revert u r Hr1 Hr2.
 induction n; intros.
- assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
- assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
  unfold partial_sum3 in Hr1.
  simpl; do 2 rewrite Rmult_1_r.
  specialize (Hr1 1%nat); simpl in Hr1.
  rewrite Rplus_0_r in Hr1.
  remember (u O) as b eqn:Hb; symmetry in Hb.
  destruct b; simpl.
+  assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
   rewrite (Int_part_interv 1); [ | simpl; lra ].
   rewrite (Int_part_interv 0); simpl; lra.
 
@@ -750,8 +749,6 @@ induction n; intros.
     rewrite (Int_part_interv 0); simpl; lra.
 
  clear IHn; destruct n.
-  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
-  assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
   unfold partial_sum3 in Hr1.
   simpl; rewrite Rmult_1_r.
   pose proof (Hr1 1%nat) as H1; simpl in H1.
@@ -762,6 +759,7 @@ induction n; intros.
   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
   destruct b.
    destruct b1.
+    assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
     rewrite (Int_part_interv 4); simpl; [ | lra ].
     rewrite (Int_part_interv 1); simpl; lra.
 
@@ -807,8 +805,6 @@ induction n; intros.
      rewrite (Int_part_interv 0); simpl; lra.
 
   destruct n.
-   assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
-   assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
    unfold partial_sum3 in Hr1.
    simpl; rewrite Rmult_1_r.
    pose proof (Hr1 1%nat) as H1; simpl in H1.
@@ -823,10 +819,12 @@ induction n; intros.
    destruct b.
     destruct b1.
      destruct b2.
+      assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
       rewrite (Int_part_interv 13); simpl; [ | lra ].
       rewrite (Int_part_interv 4); simpl; lra.
 
       rewrite (Int_part_interv 12); simpl.
+       assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
        rewrite (Int_part_interv 4); simpl; lra.
 
        split; [ lra | ].
