@@ -750,55 +750,111 @@ induction n; intros.
   now apply partial_sum3_le_1_6.
 
   clear IHn; destruct n.
-  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
-  assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
-  unfold partial_sum3 in Hr1.
-  simpl; rewrite Rmult_1_r.
-  pose proof (Hr1 1%nat) as H1; simpl in H1.
-  rewrite Rplus_0_r in H1.
-  remember (u O) as b eqn:Hb; symmetry in Hb.
-  pose proof (Hr1 2%nat) as H2.
-  simpl in H2; rewrite Hb, Rplus_0_r in H2.
-  remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-  destruct b.
-   destruct b1.
-    rewrite (Int_part_interv 4); simpl; [ | lra ].
-    rewrite (Int_part_interv 1); simpl; lra.
-
-    rewrite (Int_part_interv 3); simpl.
+   assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
+   assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
+   unfold partial_sum3 in Hr1.
+   simpl; rewrite Rmult_1_r.
+   pose proof (Hr1 1%nat) as H1; simpl in H1.
+   rewrite Rplus_0_r in H1.
+   remember (u O) as b eqn:Hb; symmetry in Hb.
+   pose proof (Hr1 2%nat) as H2.
+   simpl in H2; rewrite Hb, Rplus_0_r in H2.
+   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+   destruct b.
+    destruct b1.
+     rewrite (Int_part_interv 4); simpl; [ | lra ].
      rewrite (Int_part_interv 1); simpl; lra.
 
-     split; [ lra | ].
-     enough (r ≤ (7 / 18))%R by lra.
-     apply Hr2; intros k.
-     unfold partial_sum3.
-     destruct k; simpl; [ lra | rewrite Hb ].
-     destruct k; simpl; [ lra | rewrite Hb1 ].
-     apply Rplus_le_reg_l with (r := (- / 3)%R).
-     unfold Rdiv at 1; rewrite Rmult_1_l, <- Rplus_assoc.
-     rewrite Rplus_opp_l, Rplus_0_l.
-     replace (- / 3 + 7 / 18)%R with ((1 / 3 / 3) / 2)%R by lra.
-     apply partial_sum3_aux_le_pow; lra.
+     rewrite (Int_part_interv 3); simpl.
+      rewrite (Int_part_interv 1); simpl; lra.
 
-   assert (H6 : ∀ k, (partial_sum3 u k ≤ 1 / 6)%R).
-    now intros k; apply partial_sum3_le_1_6.
+      split; [ lra | ].
+      enough (r ≤ (7 / 18))%R by lra.
+      apply Hr2; intros k.
+      unfold partial_sum3.
+      destruct k; simpl; [ lra | rewrite Hb ].
+      destruct k; simpl; [ lra | rewrite Hb1 ].
+      apply Rplus_le_reg_l with (r := (- / 3)%R).
+      unfold Rdiv at 1; rewrite Rmult_1_l, <- Rplus_assoc.
+      rewrite Rplus_opp_l, Rplus_0_l.
+      replace (- / 3 + 7 / 18)%R with ((1 / 3 / 3) / 2)%R by lra.
+      apply partial_sum3_aux_le_pow; lra.
 
-    apply Hr2 in H6.
-    setoid_rewrite Int_part_is_0 at 2; [ | lra ].
-    rewrite Rmult_0_r, Rplus_0_l.
-    destruct b1.
-     rewrite (Int_part_interv 1); [ easy | simpl; lra ].
+    assert (H6 : ∀ k, (partial_sum3 u k ≤ 1 / 6)%R).
+     now intros k; apply partial_sum3_le_1_6.
 
-     rewrite (Int_part_interv 0); [ easy | simpl ].
-     split; [ lra | ].
-     enough (r ≤ 1 / 18)%R by lra.
-     apply Hr2; intros k.
-     unfold partial_sum3.
-     destruct k; simpl; [ lra | rewrite Hb ].
-     destruct k; simpl; [ lra | rewrite Hb1 ].
-     eapply Rle_trans; [ apply partial_sum3_aux_le_pow; lra | lra ].
+     apply Hr2 in H6.
+     setoid_rewrite Int_part_is_0 at 2; [ | lra ].
+     rewrite Rmult_0_r, Rplus_0_l.
+     destruct b1.
+      rewrite (Int_part_interv 1); [ easy | simpl; lra ].
+
+      rewrite (Int_part_interv 0); [ easy | simpl ].
+      split; [ lra | ].
+      enough (r ≤ 1 / 18)%R by lra.
+      apply Hr2; intros k.
+      unfold partial_sum3.
+      destruct k; simpl; [ lra | rewrite Hb ].
+      destruct k; simpl; [ lra | rewrite Hb1 ].
+      eapply Rle_trans; [ apply partial_sum3_aux_le_pow; lra | lra ].
 
    destruct n.
+    assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
+    assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
+    unfold partial_sum3 in Hr1.
+    simpl; rewrite Rmult_1_r.
+    pose proof (Hr1 1%nat) as H1; simpl in H1.
+    rewrite Rplus_0_r in H1.
+    remember (u O) as b eqn:Hb; symmetry in Hb.
+    pose proof (Hr1 2%nat) as H2.
+    simpl in H2; rewrite Hb, Rplus_0_r in H2.
+    remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+    pose proof (Hr1 3%nat) as H3.
+    simpl in H3; rewrite Hb, Hb1, Rplus_0_r in H3.
+    remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
+    destruct b.
+     destruct b1.
+      destruct b2.
+       rewrite (Int_part_interv 13); simpl; [ | lra ].
+       rewrite (Int_part_interv 4); simpl; lra.
+
+       rewrite (Int_part_interv 12); simpl.
+        rewrite (Int_part_interv 4); simpl; lra.
+
+        split; [ lra | ].
+        ring_simplify.
+        enough (r ≤ (25 / 54))%R by lra.
+        apply Hr2; intros k.
+        unfold partial_sum3.
+        destruct k; simpl; [ lra | rewrite Hb ].
+        destruct k; simpl; [ lra | rewrite Hb1 ].
+        destruct k; simpl; [ lra | rewrite Hb2 ].
+        apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
+        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+        apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
+        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+        apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
+        apply partial_sum3_aux_le_pow; lra.
+
+     destruct b2.
+bbb.
+     assert (H6 : ∀ k, (partial_sum3 u k ≤ 1 / 6)%R).
+      now intros k; apply partial_sum3_le_1_6.
+
+      apply Hr2 in H6.
+      setoid_rewrite Int_part_is_0 at 2; [ | lra ].
+      rewrite Rmult_0_r, Rplus_0_l.
+      destruct b1.
+       rewrite (Int_part_interv 1); [ easy | simpl; lra ].
+
+       rewrite (Int_part_interv 0); [ easy | simpl ].
+       split; [ lra | ].
+       enough (r ≤ 1 / 18)%R by lra.
+       apply Hr2; intros k.
+       unfold partial_sum3.
+       destruct k; simpl; [ lra | rewrite Hb ].
+       destruct k; simpl; [ lra | rewrite Hb1 ].
+       eapply Rle_trans; [ apply partial_sum3_aux_le_pow; lra | lra ].
 
 bbb.
  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
