@@ -837,7 +837,7 @@ induction n; intros.
         apply partial_sum3_aux_le_pow; lra.
 
       destruct b2.
-       assert (H718 : ∀ k, (partial_sum3 u k ≤ / 3 + / 27 + / 2 * / 27)%R).
+       assert (H : ∀ k, (partial_sum3 u k ≤ / 3 + / 27 + / 2 * / 27)%R).
         intros k.
         unfold partial_sum3.
         destruct k; simpl; [ lra | rewrite Hb ].
@@ -850,11 +850,11 @@ induction n; intros.
         apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
         apply partial_sum3_aux_le_pow; lra.
 
-        apply Hr2 in H718.
+        apply Hr2 in H.
         rewrite (Int_part_interv 10); simpl; [ | lra ].
         rewrite (Int_part_interv 3); simpl; lra.
 
-       assert (H1854 : ∀ k, (partial_sum3 u k ≤ / 3 + / 2 * / 27)%R).
+       assert (H : ∀ k, (partial_sum3 u k ≤ / 3 + / 2 * / 27)%R).
         intros k.
         unfold partial_sum3.
         destruct k; simpl; [ lra | rewrite Hb ].
@@ -865,7 +865,7 @@ induction n; intros.
         apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
         apply partial_sum3_aux_le_pow; lra.
 
-        apply Hr2 in H1854.
+        apply Hr2 in H.
          rewrite (Int_part_interv (3 * 3)); simpl; [ | lra ].
          rewrite (Int_part_interv 3); simpl; lra.
 
