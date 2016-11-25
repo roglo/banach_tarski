@@ -885,34 +885,52 @@ induction n; intros.
         apply partial_sum3_aux_le_pow; lra.
 
         apply Hr2 in H.
-bbb.
-        rewrite (Int_part_interv 10); simpl; [ | lra ].
-        rewrite (Int_part_interv 3); simpl; lra.
+        rewrite (Int_part_interv 4); simpl; [ | lra ].
+        rewrite (Int_part_interv 1); simpl; lra.
 
-       assert (H1854 : ∀ k, (partial_sum3 u k ≤ / 3 + / 2 * / 27)%R).
+       assert (H : ∀ k, (partial_sum3 u k ≤ / 9 + / 2 * / 27)%R).
         intros k.
         unfold partial_sum3.
         destruct k; simpl; [ lra | rewrite Hb ].
-        apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
+        destruct k; simpl; [ lra | rewrite Hb1 ].
+        apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
         rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+        destruct k; simpl; [ lra | rewrite Hb2 ].
+        apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
+        apply partial_sum3_aux_le_pow; lra.
+
+        apply Hr2 in H.
+        rewrite (Int_part_interv 3); simpl; [ | lra ].
+        rewrite (Int_part_interv 1); simpl; lra.
+
+      destruct b2.
+       assert (H : ∀ k, (partial_sum3 u k ≤ / 27 + / 2 * / 27)%R).
+        intros k.
+        unfold partial_sum3.
+        destruct k; simpl; [ lra | rewrite Hb ].
+        destruct k; simpl; [ lra | rewrite Hb1 ].
+        destruct k; simpl; [ lra | rewrite Hb2 ].
+        apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
+        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+        apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
+        apply partial_sum3_aux_le_pow; lra.
+
+        apply Hr2 in H.
+        rewrite (Int_part_interv 1); simpl; [ | lra ].
+        rewrite (Int_part_interv 0); simpl; lra.
+
+       assert (H : ∀ k, (partial_sum3 u k ≤ / 2 * / 27)%R).
+        intros k.
+        unfold partial_sum3.
+        destruct k; simpl; [ lra | rewrite Hb ].
         destruct k; simpl; [ lra | rewrite Hb1 ].
         destruct k; simpl; [ lra | rewrite Hb2 ].
         apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
         apply partial_sum3_aux_le_pow; lra.
 
-        apply Hr2 in H1854.
-        rewrite (Int_part_interv 9); simpl; [ | lra ].
-        rewrite (Int_part_interv 3); simpl; lra.
-bbb.
-
-       rewrite (Int_part_interv 0); [ easy | simpl ].
-       split; [ lra | ].
-       enough (r ≤ 1 / 18)%R by lra.
-       apply Hr2; intros k.
-       unfold partial_sum3.
-       destruct k; simpl; [ lra | rewrite Hb ].
-       destruct k; simpl; [ lra | rewrite Hb1 ].
-       eapply Rle_trans; [ apply partial_sum3_aux_le_pow; lra | lra ].
+        apply Hr2 in H.
+        rewrite (Int_part_interv 0); simpl; [ | lra ].
+        rewrite (Int_part_interv 0); simpl; lra.
 
 bbb.
  (* general case of titi that does not work *)
