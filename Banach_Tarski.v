@@ -748,12 +748,12 @@ induction n; intros.
    apply partial_sum3_aux_le_pow; lra.
 
  unfold b2b in H.
- destruct b; simpl in H.
-  rewrite (Int_part_interv 1); simpl; [ | lra ].
-  rewrite (Int_part_interv 0); simpl; lra.
+ rewrite (Int_part_interv (Z.b2z b)).
+  rewrite (Int_part_interv 0).
+   destruct b; simpl in H; simpl; lra.
+   destruct b; simpl in H; simpl; lra.
 
-  rewrite (Int_part_interv 0); simpl; [ | lra ].
-  rewrite (Int_part_interv 0); simpl; lra.
+  destruct b; simpl in H; simpl; lra.
 
  clear IHn.
  destruct n.
