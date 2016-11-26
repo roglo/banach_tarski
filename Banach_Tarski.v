@@ -735,6 +735,18 @@ intros * Hr1 Hr2.
 assert (Hrp : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
  apply Hr2; intros k; unfold partial_sum3.
  apply partial_sum3_aux_le_pow; [ lra | ].
+
+Theorem tutu : ∀ u r n pow i ,
+  (∀ k : ℕ, (partial_sum3 u k ≤ r)%R)
+  → (∀ b : ℝ, (∀ k : ℕ, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
+  → (partial_sum3_aux n u pow i + / (2 * 3 ^ n))%R = (1 / 2)%R.
+Proof.
+intros * Hr1 Hr2.
+revert pow i.
+induction n; intros; simpl; [ lra | ].
+remember (u i) as b eqn:Hb; symmetry in Hb.
+destruct b.
+ Focus 2.
 bbb.
 *)
 revert u r Hr1 Hr2.
