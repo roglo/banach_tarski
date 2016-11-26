@@ -838,23 +838,26 @@ Proof.
 intros * Hr1 Hr2.
 revert u r Hr1 Hr2.
 induction n; intros.
- unfold partial_sum3 in Hr1; simpl; rewrite Rmult_1_r.
  assert (H : (r ≤ partial_sum3 u 1 + / (2 * 3 ^ 1))%R).
   apply Hr2, partial_sum3_upper_bound.
 
+  simpl; rewrite Rmult_1_r.
+  specialize (Hr1 1%nat).
   unfold partial_sum3 in H; simpl in H.
-  specialize (Hr1 1%nat); simpl in Hr1.
+  unfold partial_sum3 in Hr1; simpl in Hr1.
   rewrite (Int_part_interv (Z.b2z (u O))).
    rewrite (Int_part_interv 0); destruct (u O); simpl in H; simpl; lra.
    destruct (u O); simpl in H; simpl; lra.
 
  clear IHn.
  destruct n.
-  unfold partial_sum3 in Hr1; simpl; rewrite Rmult_1_r.
   assert (H : (r ≤ partial_sum3 u 2 + / (2 * 3 ^ 2))%R).
    apply Hr2, partial_sum3_upper_bound.
 
-   unfold partial_sum3 in H; specialize (Hr1 2%nat).
+   simpl; rewrite Rmult_1_r.
+   specialize (Hr1 2%nat).
+   unfold partial_sum3 in H; simpl in H.
+   unfold partial_sum3 in Hr1; simpl in Hr1.
    simpl in Hr1, H.
    rewrite (Int_part_interv (3 * Z.b2z (u O) + Z.b2z (u 1%nat))).
     rewrite (Int_part_interv (Z.b2z (u O))).
@@ -864,11 +867,13 @@ induction n; intros.
     destruct (u O), (u 1%nat); simpl in H; simpl; lra.
 
   destruct n.
-   unfold partial_sum3 in Hr1; simpl; rewrite Rmult_1_r.
    assert (H : (r ≤ partial_sum3 u 3 + / (2 * 3 ^ 3))%R).
     apply Hr2, partial_sum3_upper_bound.
 
-    unfold partial_sum3 in H; specialize (Hr1 3%nat).
+    simpl; rewrite Rmult_1_r.
+    specialize (Hr1 3%nat).
+    unfold partial_sum3 in H; simpl in H.
+    unfold partial_sum3 in Hr1; simpl in Hr1.
     simpl in Hr1, H.
     remember (u O) as b eqn:Hb; symmetry in Hb.
     remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
@@ -881,11 +886,13 @@ induction n; intros.
      destruct b, b1, b2; simpl in H; simpl; lra.
 
    destruct n.
-    unfold partial_sum3 in Hr1; simpl; rewrite Rmult_1_r.
     assert (H : (r ≤ partial_sum3 u 4 + / (2 * 3 ^ 4))%R).
      apply Hr2, partial_sum3_upper_bound.
 
-     unfold partial_sum3 in H; specialize (Hr1 4%nat).
+     simpl; rewrite Rmult_1_r.
+     specialize (Hr1 4%nat).
+     unfold partial_sum3 in H; simpl in H.
+     unfold partial_sum3 in Hr1; simpl in Hr1.
      simpl in Hr1, H.
      remember (u O) as b eqn:Hb; symmetry in Hb.
      remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
