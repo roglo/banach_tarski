@@ -799,12 +799,11 @@ induction n; intros.
    unfold partial_sum3 in Hr1.
    simpl; rewrite Rmult_1_r.
    pose proof (Hr1 3%nat) as H3; simpl in H3.
-   remember (u O) as b eqn:Hb; symmetry in Hb.
-   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-   remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
    assert (H : (r ≤ partial_sum3 u 3 + / (2 * 27))%R).
-    apply Hr2; intros k; unfold partial_sum3, b2r.
-    simpl; rewrite Hb, Hb1, Hb2.
+    apply Hr2; intros k; unfold partial_sum3, b2r; simpl.
+    remember (u O) as b eqn:Hb; symmetry in Hb.
+    remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+    remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
     destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb ].
     destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb1 ].
     destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb2 ].
@@ -846,7 +845,9 @@ induction n; intros.
        apply partial_sum3_aux_le_pow; lra.
 
    unfold partial_sum3 in H; simpl in H.
-   rewrite Hb, Hb1, Hb2 in H.
+   remember (u O) as b eqn:Hb; symmetry in Hb.
+   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+   remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
    rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
     rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
      destruct b, b1, b2; simpl in H; simpl; lra.
