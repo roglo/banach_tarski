@@ -584,11 +584,12 @@ Fixpoint partial_sum3_aux k (u : ℕ → bool) pow i :=
 
 Definition partial_sum3 u k := partial_sum3_aux k u 1%R 0.
 
-Theorem partial_sum3_aux_le_pow : ∀ u k pow i,
+Theorem partial_sum3_aux_le_pow : ∀ u k pow pow2 i,
   (0 <= pow)%R
-  → (partial_sum3_aux k u pow i <= pow / 2)%R.
+  → pow2 = (pow / 2)%R
+  → (partial_sum3_aux k u pow i <= pow2)%R.
 Proof.
-intros * Hpow.
+intros * Hpow Hpow2; subst pow2.
 revert pow i Hpow.
 induction k; intros; simpl; [ lra | ].
 destruct (u i).
@@ -612,7 +613,6 @@ Proof.
 intros * Hb.
 unfold partial_sum3.
 destruct k; simpl; [ lra | rewrite Hb ].
-replace (1 / 6)%R with (1 / 3 / 2)%R by lra.
 apply partial_sum3_aux_le_pow; lra.
 Qed.
 
@@ -744,7 +744,6 @@ induction n; intros.
    destruct k; simpl; [ lra | rewrite Hb ].
    apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
    rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-   apply Rle_trans with (r2 := (1 / 3 / 2)%R); [ | lra ].
    apply partial_sum3_aux_le_pow; lra.
 
    rewrite (Int_part_interv 1); [ | simpl; lra ].
@@ -753,7 +752,6 @@ induction n; intros.
    assert (H : (r ≤ / 6)%R).
     apply Hr2; intros k; unfold partial_sum3.
     destruct k; simpl; [ lra | rewrite Hb ].
-    apply Rle_trans with (r2 := (1 / 3 / 2)%R); [ | lra ].
     apply partial_sum3_aux_le_pow; lra.
 
     rewrite (Int_part_interv 0); [ | simpl; lra ].
@@ -775,7 +773,6 @@ induction n; intros.
      destruct k; simpl; [ lra | rewrite Hb ].
      apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
      rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-     apply Rle_trans with (r2 := (1 / 3 / 2)%R); [ | lra ].
      apply partial_sum3_aux_le_pow; lra.
 
      rewrite (Int_part_interv 4); simpl; [ | lra ].
@@ -787,7 +784,6 @@ induction n; intros.
      apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
      rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
      destruct k; simpl; [ lra | rewrite Hb1 ].
-     apply Rle_trans with (r2 := (1 / 3 / 3 / 2)%R); [ | lra ].
      apply partial_sum3_aux_le_pow; lra.
 
      rewrite (Int_part_interv 3); [ | simpl; lra ].
@@ -800,7 +796,6 @@ induction n; intros.
      destruct k; simpl; [ lra | rewrite Hb1 ].
      apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
      rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-     apply Rle_trans with (r2 := (1 / 3 / 3 / 2)%R); [ | lra ].
      apply partial_sum3_aux_le_pow; lra.
 
      rewrite (Int_part_interv 1); [ | simpl; lra ].
@@ -810,7 +805,6 @@ induction n; intros.
      apply Hr2; intros k; unfold partial_sum3.
      destruct k; simpl; [ lra | rewrite Hb ].
      destruct k; simpl; [ lra | rewrite Hb1 ].
-     apply Rle_trans with (r2 := (1 / 3 / 3 / 2)%R); [ | lra ].
      apply partial_sum3_aux_le_pow; lra.
 
      rewrite (Int_part_interv 0); [ | simpl; lra ].
@@ -842,19 +836,15 @@ induction n; intros.
       destruct b2; simpl.
        apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
-       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
       destruct b2; simpl.
        apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
-       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
      destruct b1; simpl.
@@ -863,19 +853,15 @@ induction n; intros.
       destruct b2; simpl.
        apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
-       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
       destruct b2; simpl.
        apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
-       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
    unfold b2b in H.
