@@ -849,20 +849,12 @@ induction n; intros.
        apply partial_sum3_aux_le_pow; lra.
 
    unfold b2b in H.
-   destruct b.
-    rewrite (Int_part_interv (9 + 3 * Z.b2z b1 + Z.b2z b2)).
-     rewrite (Int_part_interv (3 + Z.b2z b1)).
-      destruct b1, b2; simpl in H; simpl; lra.
-      destruct b1, b2; simpl in H; simpl; lra.
+   rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
+    rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
+     destruct b, b1, b2; simpl in H; simpl; lra.
+     destruct b, b1, b2; simpl in H; simpl; lra.
 
-     destruct b1, b2; simpl in H; simpl; lra.
-
-    rewrite (Int_part_interv (3 * Z.b2z b1 + Z.b2z b2)).
-     rewrite (Int_part_interv (Z.b2z b1)).
-      destruct b1, b2; simpl in H; simpl; lra.
-      destruct b1, b2; simpl in H; simpl; lra.
-
-     destruct b1, b2; simpl in H; simpl; lra.
+    destruct b, b1, b2; simpl in H; simpl; lra.
 bbb.
  (* general case of titi that does not work *)
  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
