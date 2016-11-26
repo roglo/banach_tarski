@@ -737,27 +737,23 @@ induction n; intros.
  rewrite Rplus_0_r in Hr1.
  remember (u O) as b eqn:Hb; symmetry in Hb.
  destruct b; simpl.
-  assert (H : (∀ k, partial_sum3 u k ≤ 1 / 2)%R).
-   intros k.
-   unfold partial_sum3.
+  assert (H : (r ≤ / 2)%R).
+   apply Hr2; intros k; unfold partial_sum3.
    destruct k; simpl; [ lra | rewrite Hb ].
    apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
    rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
    apply Rle_trans with (r2 := (1 / 3 / 2)%R); [ | lra ].
    apply partial_sum3_aux_le_pow; lra.
 
-   apply Hr2 in H.
    rewrite (Int_part_interv 1); [ | simpl; lra ].
    rewrite (Int_part_interv 0); simpl; lra.
 
-   assert (H : ∀ k, (partial_sum3 u k ≤ 1 / 6)%R).
-    intros k.
-    unfold partial_sum3.
+   assert (H : (r ≤ / 6)%R).
+    apply Hr2; intros k; unfold partial_sum3.
     destruct k; simpl; [ lra | rewrite Hb ].
     apply Rle_trans with (r2 := (1 / 3 / 2)%R); [ | lra ].
     apply partial_sum3_aux_le_pow; lra.
 
-    apply Hr2 in H.
     rewrite (Int_part_interv 0); [ | simpl; lra ].
     rewrite (Int_part_interv 0); simpl; lra.
 
@@ -772,13 +768,19 @@ induction n; intros.
   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
   destruct b.
    destruct b1.
-    assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
-    rewrite (Int_part_interv 4); simpl; [ | lra ].
-    rewrite (Int_part_interv 1); simpl; lra.
+    assert (H : (r ≤ 1 / 3 + 1 / 9 + / (2 * 9))%R).
+     apply Hr2; intros k; unfold partial_sum3.
+     destruct k; simpl; [ lra | rewrite Hb ].
+     apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
+     rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+     apply Rle_trans with (r2 := (1 / 3 / 2)%R); [ | lra ].
+     apply partial_sum3_aux_le_pow; lra.
 
-    assert (H : ∀ k, (partial_sum3 u k ≤ / 3 + / 2 * / 9)%R).
-     intros k.
-     unfold partial_sum3.
+     rewrite (Int_part_interv 4); simpl; [ | lra ].
+     rewrite (Int_part_interv 1); simpl; lra.
+
+    assert (H : (r ≤ 1 / 3 + 0 / 9 + / (2 * 9))%R).
+     apply Hr2; intros k; unfold partial_sum3.
      destruct k; simpl; [ lra | rewrite Hb ].
      apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
      rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
@@ -786,14 +788,12 @@ induction n; intros.
      apply Rle_trans with (r2 := (1 / 3 / 3 / 2)%R); [ | lra ].
      apply partial_sum3_aux_le_pow; lra.
 
-     apply Hr2 in H.
      rewrite (Int_part_interv 3); [ | simpl; lra ].
      rewrite (Int_part_interv 1); simpl; lra.
 
    destruct b1.
-    assert (H : ∀ k, (partial_sum3 u k ≤ / 9 + / 2 * / 9)%R).
-     intros k.
-     unfold partial_sum3.
+    assert (H : (r ≤ 0 / 3 + 1 / 9 + / (2 * 9))%R).
+     apply Hr2; intros k; unfold partial_sum3.
      destruct k; simpl; [ lra | rewrite Hb ].
      destruct k; simpl; [ lra | rewrite Hb1 ].
      apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
@@ -801,19 +801,16 @@ induction n; intros.
      apply Rle_trans with (r2 := (1 / 3 / 3 / 2)%R); [ | lra ].
      apply partial_sum3_aux_le_pow; lra.
 
-     apply Hr2 in H.
      rewrite (Int_part_interv 1); [ | simpl; lra ].
      rewrite (Int_part_interv 0); simpl; lra.
 
-    assert (H : ∀ k, (partial_sum3 u k ≤ / 2 * / 9)%R).
-     intros k.
-     unfold partial_sum3.
+    assert (H : (r ≤ 0 / 3 + 0 / 9 + / (2 * 9))%R).
+     apply Hr2; intros k; unfold partial_sum3.
      destruct k; simpl; [ lra | rewrite Hb ].
      destruct k; simpl; [ lra | rewrite Hb1 ].
      apply Rle_trans with (r2 := (1 / 3 / 3 / 2)%R); [ | lra ].
      apply partial_sum3_aux_le_pow; lra.
 
-     apply Hr2 in H.
      rewrite (Int_part_interv 0); [ | simpl; lra ].
      rewrite (Int_part_interv 0); simpl; lra.
 
@@ -832,30 +829,40 @@ induction n; intros.
    destruct b.
     destruct b1.
      destruct b2.
-      assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
-      rewrite (Int_part_interv 13); simpl; [ | lra ].
-      rewrite (Int_part_interv 4); simpl; lra.
-
-      rewrite (Int_part_interv 12); simpl.
-       assert (Hr12 : (r ≤ 1 / 2)%R) by apply Hr2, partial_sum3_le_half.
-       rewrite (Int_part_interv 4); simpl; lra.
-
-       split; [ lra | ].
-       ring_simplify.
-       enough (r ≤ (25 / 54))%R by lra.
-       apply Hr2; intros k.
-       unfold partial_sum3.
+      assert (H : (r ≤ 1 / 3 + 1 / 9 + 1 / 27 + / (2 * 27))%R).
+       apply Hr2; intros k; unfold partial_sum3.
        destruct k; simpl; [ lra | rewrite Hb ].
-       destruct k; simpl; [ lra | rewrite Hb1 ].
-       destruct k; simpl; [ lra | rewrite Hb2 ].
        apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+       destruct k; simpl; [ lra | rewrite Hb1 ].
        apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
+       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+       destruct k; simpl; [ lra | rewrite Hb2 ].
+       apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
        rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
        apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
        apply partial_sum3_aux_le_pow; lra.
 
+       rewrite (Int_part_interv 13); simpl; [ | lra ].
+       rewrite (Int_part_interv 4); simpl; lra.
+
+      assert (H : (r ≤ 1 / 3 + 1 / 9 + 0 / 27 + / (2 * 27))%R).
+       apply Hr2; intros k; unfold partial_sum3.
+       destruct k; simpl; [ lra | rewrite Hb ].
+       apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
+       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+       destruct k; simpl; [ lra | rewrite Hb1 ].
+       apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
+       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+       destruct k; simpl; [ lra | rewrite Hb2 ].
+       apply Rle_trans with (r2 := (1 / 3 / 3 / 3 / 2)%R); [ | lra ].
+       apply partial_sum3_aux_le_pow; lra.
+
+       rewrite (Int_part_interv 12); simpl; [ | lra ].
+       rewrite (Int_part_interv 4); simpl; lra.
+
      destruct b2.
+bbb.
       assert (H : ∀ k, (partial_sum3 u k ≤ / 3 + / 27 + / 2 * / 27)%R).
        intros k.
        unfold partial_sum3.
