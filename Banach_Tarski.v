@@ -731,8 +731,29 @@ Theorem titi : ∀ u r n,
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
 Proof.
 intros * Hr1 Hr2.
-assert (Hrp : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
+assert (H : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
  apply Hr2; intros k; unfold partial_sum3.
+(**)
+ destruct (le_dec k n) as [ Hkn | Hkn ].
+bbb.
+
+ induction n; intros; [ apply partial_sum3_aux_le_pow; simpl; lra | simpl ].
+ remember (u O) as b eqn:Hb; symmetry in Hb.
+ destruct b.
+  destruct n; [ apply partial_sum3_aux_le_pow; simpl; lra | simpl ].
+  remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+  destruct b1.
+   destruct n; [ apply partial_sum3_aux_le_pow; simpl; lra | simpl ].
+   remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
+   destruct b2.
+    destruct n; [ apply partial_sum3_aux_le_pow; simpl; lra | simpl ].
+bbb.
+Focus 2.
+  destruct n.
+   destruct k; simpl; [ lra | ].
+   rewrite Hb;  apply partial_sum3_aux_le_pow; simpl; lra.
+
+
 bbb.
 
 Theorem tutu : ∀ u r n pow i ,
