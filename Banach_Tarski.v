@@ -847,47 +847,44 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
   unfold partial_sum3 in Hr1; simpl in Hr1.
   set (s := 0%Z).
   rewrite (Int_part_interv (3 * s + Z.b2z (u O))).
-   rewrite (Int_part_interv s).
-    destruct (u O); simpl in H; simpl; lra.
-    destruct (u O); simpl in H; simpl; lra.
-
-   destruct (u O); simpl in H; simpl; lra.
-
- destruct n.
-  simpl; rewrite Rmult_1_r.
-  unfold partial_sum3 in H; simpl in H.
-  unfold partial_sum3 in Hr1; simpl in Hr1.
-  set (s := Z.b2z (u O)).
-  rewrite (Int_part_interv (3 * s + Z.b2z (u 1%nat))).
-   rewrite (Int_part_interv (Z.b2z (u O))).
-    destruct (u O), (u 1%nat); simpl in H; simpl; lra.
-    destruct (u O), (u 1%nat); simpl in H; simpl; lra.
-
-   destruct (u O), (u 1%nat); simpl in H; simpl; lra.
+   rewrite (Int_part_interv s); destruct (u O); simpl; lra.
+   destruct (u O); simpl; lra.
 
   destruct n.
    simpl; rewrite Rmult_1_r.
    unfold partial_sum3 in H; simpl in H.
    unfold partial_sum3 in Hr1; simpl in Hr1.
-   set (s := (3 * Z.b2z (u O) + Z.b2z (u 1%nat))%Z).
-   rewrite (Int_part_interv (3 * s + Z.b2z (u 2))).
-    rewrite (Int_part_interv s).
-     destruct (u O), (u 1%nat), (u 2); simpl in H; simpl; lra.
-     destruct (u O), (u 1%nat), (u 2); simpl in H; simpl; lra.
+   set (s := Z.b2z (u O)).
+   rewrite (Int_part_interv (3 * s + Z.b2z (u 1%nat))).
+    rewrite (Int_part_interv (Z.b2z (u O))).
+     destruct (u O), (u 1%nat); simpl; lra.
+     destruct (u O), (u 1%nat); simpl; lra.
 
-    destruct (u O), (u 1%nat), (u 2); simpl in H; simpl; lra.
+    destruct (u O), (u 1%nat); simpl; lra.
 
    destruct n.
     simpl; rewrite Rmult_1_r.
     unfold partial_sum3 in H; simpl in H.
     unfold partial_sum3 in Hr1; simpl in Hr1.
-    set (s := (3 * (3 * Z.b2z (u O) + Z.b2z (u 1%nat)) + Z.b2z (u 2%nat))%Z).
-    rewrite (Int_part_interv (3 * s + Z.b2z (u 3))).
+    set (s := (3 * Z.b2z (u O) + Z.b2z (u 1%nat))%Z).
+    rewrite (Int_part_interv (3 * s + Z.b2z (u 2))).
      rewrite (Int_part_interv s).
-      destruct (u O), (u 1%nat), (u 2), (u 3); simpl in H; simpl; lra.
-      destruct (u O), (u 1%nat), (u 2), (u 3); simpl in H; simpl; lra.
+      destruct (u O), (u 1%nat), (u 2); simpl; lra.
+      destruct (u O), (u 1%nat), (u 2); simpl; lra.
 
-     destruct (u O), (u 1%nat), (u 2), (u 3); simpl in H; simpl; lra.
+     destruct (u O), (u 1%nat), (u 2); simpl; lra.
+
+    destruct n.
+     simpl; rewrite Rmult_1_r.
+     unfold partial_sum3 in H; simpl in H.
+     unfold partial_sum3 in Hr1; simpl in Hr1.
+     set (s := (3 * (3 * Z.b2z (u O) + Z.b2z (u 1%nat)) + Z.b2z (u 2%nat))%Z).
+     rewrite (Int_part_interv (3 * s + Z.b2z (u 3))).
+      rewrite (Int_part_interv s).
+       destruct (u O), (u 1%nat), (u 2), (u 3); simpl; lra.
+       destruct (u O), (u 1%nat), (u 2), (u 3); simpl; lra.
+
+      destruct (u O), (u 1%nat), (u 2), (u 3); simpl; lra.
 bbb.
  (* general case of titi that does not work *)
  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
