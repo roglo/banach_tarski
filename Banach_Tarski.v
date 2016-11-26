@@ -828,7 +828,6 @@ induction n; intros.
    pose proof (Hr1 3%nat) as H3.
    simpl in H3; rewrite Hb, Hb1, Rplus_0_r in H3.
    remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
-(**)
    assert (H : (r ≤ b2b b / 3 + b2b b1 / 9 + b2b b2 / 27 + / (2 * 27))%R).
     apply Hr2; intros k; unfold partial_sum3, b2b.
     destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb ].
