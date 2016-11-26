@@ -765,6 +765,23 @@ Qed.
 
 Definition b2r b := INR (Nat.b2n b).
 
+Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
+  partial_sum3_aux (S k) u pow i =
+  ((pow * b2r (u i) + partial_sum3_aux k (λ n, u (S n)) pow i) / 3)%R.
+Proof.
+intros.
+set (v := λ n, u (S n)).
+revert pow i.
+induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl; lra | ].
+rewrite partial_sum3_aux_succ.
+rewrite IHk.
+rewrite partial_sum3_aux_succ.
+set (x := partial_sum3_aux k v pow i).
+unfold v; rewrite <- Nat.add_succ_comm; simpl.
+set (y := INR (Nat.b2n (u (S (i + k))))).
+field_simplify; [ easy | | ]; apply pow_nonzero; lra.
+Qed.
+
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
 
 Theorem ter_bin_of_frac_part_surj : ∀ u : ℕ → bool,
@@ -840,7 +857,8 @@ specialize (Hr1 (S n)).
 assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
  apply Hr2, partial_sum3_upper_bound.
 
- revert u Hr1 Hr2 H.
+ clear Hr2.
+ revert u r Hr1 H.
  induction n; intros.
   simpl; rewrite Rmult_1_r.
   unfold partial_sum3 in H; simpl in H.
@@ -850,6 +868,22 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
    rewrite (Int_part_interv s); destruct (u O); simpl; lra.
    destruct (u O); simpl; lra.
 
+  remember (S (S n)) as ssn; simpl; subst ssn.
+  remember (S n) as sn; simpl; subst sn.
+  do 2 rewrite <- Rmult_assoc.
+  set (v n := u (S n)); fold (v n).
+  apply IHn.
+   unfold partial_sum3 in Hr1 |-*.
+   remember (S n) as sn; simpl in Hr1; simpl.
+   remember (u O) as b eqn:Hb; symmetry in Hb.
+   subst sn.
+   rewrite partial_sum3_aux_shift_seq in Hr1.
+   fold v in Hr1; simpl.
+   set (x := partial_sum3_aux n v (1 / 3) 1) in Hr1 |-*.
+   unfold v, b2r in Hr1 |-*.
+   destruct b, (u 1%nat); simpl in Hr1; simpl; lra.
+
+bbb.
   destruct n.
    simpl; rewrite Rmult_1_r.
    unfold partial_sum3 in H; simpl in H.
