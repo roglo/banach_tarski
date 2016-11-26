@@ -836,11 +836,11 @@ Theorem titi : ∀ u r n,
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
 Proof.
 intros * Hr1 Hr2.
-revert u r Hr1 Hr2.
-induction n; intros.
- assert (H : (r ≤ partial_sum3 u 1 + / (2 * 3 ^ 1))%R).
-  apply Hr2, partial_sum3_upper_bound.
+assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
+ apply Hr2, partial_sum3_upper_bound.
 
+ revert u Hr1 Hr2 H.
+ induction n; intros.
   simpl; rewrite Rmult_1_r.
   specialize (Hr1 1%nat).
   unfold partial_sum3 in H; simpl in H.
@@ -849,63 +849,50 @@ induction n; intros.
    rewrite (Int_part_interv 0); destruct (u O); simpl in H; simpl; lra.
    destruct (u O); simpl in H; simpl; lra.
 
- clear IHn.
  destruct n.
-  assert (H : (r ≤ partial_sum3 u 2 + / (2 * 3 ^ 2))%R).
-   apply Hr2, partial_sum3_upper_bound.
-
-   simpl; rewrite Rmult_1_r.
-   specialize (Hr1 2%nat).
-   unfold partial_sum3 in H; simpl in H.
-   unfold partial_sum3 in Hr1; simpl in Hr1.
-   simpl in Hr1, H.
-   rewrite (Int_part_interv (3 * Z.b2z (u O) + Z.b2z (u 1%nat))).
-    rewrite (Int_part_interv (Z.b2z (u O))).
-     destruct (u O), (u 1%nat); simpl in H; simpl; lra.
-     destruct (u O), (u 1%nat); simpl in H; simpl; lra.
-
+  simpl; rewrite Rmult_1_r.
+  specialize (Hr1 2%nat).
+  unfold partial_sum3 in H; simpl in H.
+  unfold partial_sum3 in Hr1; simpl in Hr1.
+  rewrite (Int_part_interv (3 * Z.b2z (u O) + Z.b2z (u 1%nat))).
+   rewrite (Int_part_interv (Z.b2z (u O))).
+    destruct (u O), (u 1%nat); simpl in H; simpl; lra.
     destruct (u O), (u 1%nat); simpl in H; simpl; lra.
 
-  destruct n.
-   assert (H : (r ≤ partial_sum3 u 3 + / (2 * 3 ^ 3))%R).
-    apply Hr2, partial_sum3_upper_bound.
+   destruct (u O), (u 1%nat); simpl in H; simpl; lra.
 
+  destruct n.
+   simpl; rewrite Rmult_1_r.
+   specialize (Hr1 3%nat).
+   unfold partial_sum3 in H; simpl in H.
+   unfold partial_sum3 in Hr1; simpl in Hr1.
+   remember (u O) as b eqn:Hb; symmetry in Hb.
+   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+   remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
+   rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
+    rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
+     destruct b, b1, b2; simpl in H; simpl; lra.
+     destruct b, b1, b2; simpl in H; simpl; lra.
+
+    destruct b, b1, b2; simpl in H; simpl; lra.
+
+   destruct n.
     simpl; rewrite Rmult_1_r.
-    specialize (Hr1 3%nat).
+    specialize (Hr1 4%nat).
     unfold partial_sum3 in H; simpl in H.
     unfold partial_sum3 in Hr1; simpl in Hr1.
-    simpl in Hr1, H.
     remember (u O) as b eqn:Hb; symmetry in Hb.
     remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
     remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
-    rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
-     rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
-      destruct b, b1, b2; simpl in H; simpl; lra.
-      destruct b, b1, b2; simpl in H; simpl; lra.
-
-     destruct b, b1, b2; simpl in H; simpl; lra.
-
-   destruct n.
-    assert (H : (r ≤ partial_sum3 u 4 + / (2 * 3 ^ 4))%R).
-     apply Hr2, partial_sum3_upper_bound.
-
-     simpl; rewrite Rmult_1_r.
-     specialize (Hr1 4%nat).
-     unfold partial_sum3 in H; simpl in H.
-     unfold partial_sum3 in Hr1; simpl in Hr1.
-     simpl in Hr1, H.
-     remember (u O) as b eqn:Hb; symmetry in Hb.
-     remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-     remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
-     remember (u 3%nat) as b3 eqn:Hb3; symmetry in Hb3.
-     rewrite
-       (Int_part_interv
-          (27 * Z.b2z b + 9 * Z.b2z b1 + 3 * Z.b2z b2 + Z.b2z b3)).
-      rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
-       destruct b, b1, b2, b3; simpl in H; simpl; lra.
-       destruct b, b1, b2, b3; simpl in H; simpl; lra.
-
+    remember (u 3%nat) as b3 eqn:Hb3; symmetry in Hb3.
+    rewrite
+      (Int_part_interv
+         (27 * Z.b2z b + 9 * Z.b2z b1 + 3 * Z.b2z b2 + Z.b2z b3)).
+     rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
       destruct b, b1, b2, b3; simpl in H; simpl; lra.
+      destruct b, b1, b2, b3; simpl in H; simpl; lra.
+
+     destruct b, b1, b2, b3; simpl in H; simpl; lra.
 bbb.
  (* general case of titi that does not work *)
  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
