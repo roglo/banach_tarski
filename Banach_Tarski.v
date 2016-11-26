@@ -658,6 +658,27 @@ rewrite partial_sum3_aux_succ.
 now rewrite Rmult_1_r.
 Qed.
 
+Theorem partial_sum3_aux_add : ∀ u k₁ k₂ pow i,
+  partial_sum3_aux (k₁ + k₂) u pow i =
+  (partial_sum3_aux k₁ u pow i +
+   partial_sum3_aux k₂ u (pow / 3 ^ k₁) (i + k₁))%R.
+Proof.
+intros.
+revert k₂ pow i.
+induction k₁; intros.
+ now simpl; rewrite Rplus_0_l, Nat.add_0_r, Rdiv_1_r.
+
+ simpl.
+ remember (u i) as bi eqn:Hbi; symmetry in Hbi.
+ rewrite <- Nat.add_succ_comm.
+ unfold Rdiv at 7.
+ rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+ rewrite <- Rmult_assoc; do 2 rewrite fold_Rdiv.
+ destruct bi; [ | apply IHk₁; lra ].
+ rewrite Rplus_assoc.
+ apply Rplus_eq_compat_l, IHk₁; lra.
+Qed.
+
 Definition b2r b := INR (Nat.b2n b).
 
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
@@ -735,6 +756,17 @@ assert (H : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
  apply Hr2; intros k; unfold partial_sum3.
 (**)
  destruct (le_dec k n) as [ Hkn | Hkn ].
+  remember (n - k)%nat as nk eqn:Hnk.
+  assert (Hn : (n = k + nk)%nat).
+   now subst nk; rewrite Nat.add_comm, Nat.sub_add.
+
+   subst n.
+   rewrite partial_sum3_aux_add, Nat.add_0_l, Rplus_assoc.
+   eapply Rplus_le_reg_l; rewrite Rplus_opp_l.
+   rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+   apply Rplus_le_le_0_compat.
+    (* to be proved *)
+    apply partial_sum3_aux_pos.
 bbb.
 
  induction n; intros; [ apply partial_sum3_aux_le_pow; simpl; lra | simpl ].
