@@ -733,6 +733,7 @@ Proof.
 intros * Hr1 Hr2.
 assert (Hrp : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
  apply Hr2; intros k; unfold partial_sum3.
+bbb.
 
 Theorem tutu : ∀ u r n pow i ,
   (0 ≤ pow)%R
@@ -740,7 +741,6 @@ Theorem tutu : ∀ u r n pow i ,
   → (∀ b : ℝ, (∀ k : ℕ, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
   → (partial_sum3_aux n u pow i ≤ pow / (2 * 3 ^ i))%R.
 Proof.
-(*
 intros * Hpow Hr1 Hr2.
 revert pow i Hpow.
 induction n; intros; simpl.
@@ -753,6 +753,8 @@ induction n; intros; simpl.
  destruct b.
   apply Rplus_le_reg_l with (r := (- (pow / 3))%R).
   rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+  destruct n.
+   simpl.
 
 bbb.
   eapply Rle_trans; [ apply IHn; lra | ].
