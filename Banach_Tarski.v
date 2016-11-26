@@ -813,14 +813,9 @@ induction n; intros.
   destruct n.
    unfold partial_sum3 in Hr1.
    simpl; rewrite Rmult_1_r.
-   pose proof (Hr1 1%nat) as H1; simpl in H1.
-   rewrite Rplus_0_r in H1.
+   pose proof (Hr1 3%nat) as H3; simpl in H3.
    remember (u O) as b eqn:Hb; symmetry in Hb.
-   pose proof (Hr1 2%nat) as H2.
-   simpl in H2; rewrite Hb, Rplus_0_r in H2.
    remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-   pose proof (Hr1 3%nat) as H3.
-   simpl in H3; rewrite Hb, Hb1, Rplus_0_r in H3.
    remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
    assert (H : (r ≤ b2b b / 3 + b2b b1 / 9 + b2b b2 / 27 + / (2 * 27))%R).
     apply Hr2; intros k; unfold partial_sum3, b2b.
