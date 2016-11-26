@@ -854,8 +854,8 @@ induction n; intros.
   assert (H : (r ≤ partial_sum3 u 2 + / (2 * 3 ^ 2))%R).
    apply Hr2, partial_sum3_upper_bound.
 
-   unfold partial_sum3 in H; simpl in H.
-   specialize (Hr1 2%nat); simpl in Hr1.
+   unfold partial_sum3 in H; specialize (Hr1 2%nat).
+   simpl in Hr1, H.
    rewrite (Int_part_interv (3 * Z.b2z (u O) + Z.b2z (u 1%nat))).
     rewrite (Int_part_interv (Z.b2z (u O))).
      destruct (u O), (u 1%nat); simpl in H; simpl; lra.
@@ -868,8 +868,8 @@ induction n; intros.
    assert (H : (r ≤ partial_sum3 u 3 + / (2 * 3 ^ 3))%R).
     apply Hr2, partial_sum3_upper_bound.
 
-    unfold partial_sum3 in H; simpl in H.
-    specialize (Hr1 3%nat); simpl in Hr1.
+    unfold partial_sum3 in H; specialize (Hr1 3%nat).
+    simpl in Hr1, H.
     remember (u O) as b eqn:Hb; symmetry in Hb.
     remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
     remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
@@ -885,8 +885,8 @@ induction n; intros.
     assert (H : (r ≤ partial_sum3 u 4 + / (2 * 3 ^ 4))%R).
      apply Hr2, partial_sum3_upper_bound.
 
-     unfold partial_sum3 in H; simpl in H.
-     specialize (Hr1 4%nat); simpl in Hr1.
+     unfold partial_sum3 in H; specialize (Hr1 4%nat).
+     simpl in Hr1, H.
      remember (u O) as b eqn:Hb; symmetry in Hb.
      remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
      remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
