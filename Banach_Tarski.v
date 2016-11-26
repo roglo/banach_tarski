@@ -731,24 +731,41 @@ Theorem titi : ∀ u r n,
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
 Proof.
 intros * Hr1 Hr2.
-(*
 assert (Hrp : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
  apply Hr2; intros k; unfold partial_sum3.
- apply partial_sum3_aux_le_pow; [ lra | ].
 
 Theorem tutu : ∀ u r n pow i ,
-  (∀ k : ℕ, (partial_sum3 u k ≤ r)%R)
+  (0 ≤ pow)%R
+  → (∀ k : ℕ, (partial_sum3 u k ≤ r)%R)
   → (∀ b : ℝ, (∀ k : ℕ, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
-  → (partial_sum3_aux n u pow i + / (2 * 3 ^ n))%R = (1 / 2)%R.
+  → (partial_sum3_aux n u pow i ≤ pow / (2 * 3 ^ i))%R.
 Proof.
-intros * Hr1 Hr2.
-revert pow i.
-induction n; intros; simpl; [ lra | ].
-remember (u i) as b eqn:Hb; symmetry in Hb.
-destruct b.
+(*
+intros * Hpow Hr1 Hr2.
+revert pow i Hpow.
+induction n; intros; simpl.
+ unfold Rdiv; apply Rmult_le_pos; [ easy | ].
+ rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+ apply Rmult_le_pos; [ lra | ].
+ rewrite Rinv_pow; [ apply pow_le; lra| lra ].
+
+ remember (u i) as b eqn:Hb; symmetry in Hb.
+ destruct b.
+  apply Rplus_le_reg_l with (r := (- (pow / 3))%R).
+  rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+
+bbb.
+  eapply Rle_trans; [ apply IHn; lra | ].
+bbb.
+  apply partial_sum3_aux_le_pow; [ lra | ].
+
  Focus 2.
 bbb.
+
+ apply partial_sum3_aux_le_pow; [ lra | ].
+bbb.
 *)
+intros * Hpow Hr1 Hr2.
 revert u r Hr1 Hr2.
 induction n; intros.
  unfold partial_sum3 in Hr1.
