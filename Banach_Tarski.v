@@ -854,12 +854,12 @@ Theorem titi : ∀ u r n,
 Proof.
 intros * Hr1 Hr2.
 specialize (Hr1 (S n)).
-assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
- apply Hr2, partial_sum3_upper_bound.
+revert u r Hr1 Hr2.
+induction n; intros.
+ assert (H : (r ≤ partial_sum3 u (S O) + / (2 * 3 ^ S O))%R).
+  apply Hr2, partial_sum3_upper_bound.
 
- clear Hr2.
- revert u r Hr1 H.
- induction n; intros.
+  clear Hr2.
   simpl; rewrite Rmult_1_r.
   unfold partial_sum3 in H; simpl in H.
   unfold partial_sum3 in Hr1; simpl in Hr1.
@@ -868,6 +868,7 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
    rewrite (Int_part_interv s); destruct (u O); simpl; lra.
    destruct (u O); simpl; lra.
 
+(*
   remember (S (S n)) as ssn; simpl; subst ssn.
   remember (S n) as sn; simpl; subst sn.
   do 2 rewrite <- Rmult_assoc.
@@ -883,7 +884,24 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
    unfold v, b2r in Hr1 |-*.
    destruct b, (u 1%nat); simpl in Hr1; simpl; lra.
 
+   intros b Hk.
+
+   unfold partial_sum3 in H |-*.
+   remember (S n) as sn; simpl in H; subst sn; simpl.
+   rewrite partial_sum3_aux_shift_seq in H.
+   fold v in H.
+   set (x := partial_sum3_aux n v (1 / 3) 1) in H |-*.
+   unfold v; simpl; unfold b2r in H.
+   destruct (u O).
+    destruct (u 1%nat); simpl in H.
+     rewrite Rmult_1_r in H.
+     apply Rmult_le_reg_r with (r := (/ 3)%R); [ lra | ].
+     rewrite Rmult_assoc, Rinv_r, Rmult_1_r; [ | lra ].
 bbb.
+*)
+ assert (H : (r ≤ partial_sum3 u (S (S n)) + / (2 * 3 ^ S (S n)))%R).
+  apply Hr2, partial_sum3_upper_bound.
+
   destruct n.
    simpl; rewrite Rmult_1_r.
    unfold partial_sum3 in H; simpl in H.
