@@ -735,7 +735,7 @@ intros * Hr1 Hr2.
 assert (Hrp : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
  apply Hr2; intros k; unfold partial_sum3.
  apply partial_sum3_aux_le_pow; [ lra | ].
- induction n; simpl; [ lra | ].
+bbb.
 *)
 revert u r Hr1 Hr2.
 induction n; intros.
