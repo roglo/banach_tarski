@@ -836,12 +836,6 @@ Theorem titi : ∀ u r n,
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
 Proof.
 intros * Hr1 Hr2.
-assert (H : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
- apply Hr2; intros k.
- apply partial_sum3_upper_bound.
-bbb.
-
-intros * Hr1 Hr2.
 revert u r Hr1 Hr2.
 induction n; intros.
  unfold partial_sum3 in Hr1.
@@ -849,24 +843,13 @@ induction n; intros.
  pose proof (Hr1 1%nat) as H1; simpl in H1.
  remember (u O) as b eqn:Hb; symmetry in Hb.
  assert (H : (r ≤ partial_sum3 u 1 + / (2 * 3 ^ 1))%R).
-  apply Hr2; intros k; unfold partial_sum3, b2r.
-  simpl; rewrite Hb.
-  destruct k; simpl; [ destruct b; simpl; lra | rewrite Hb ].
-  destruct b; simpl.
-   apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
-   rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-   apply partial_sum3_aux_le_pow; lra.
+  apply Hr2, partial_sum3_upper_bound.
 
-   apply partial_sum3_aux_le_pow; lra.
-
- unfold partial_sum3 in H; simpl in H.
- rewrite Hb in H.
- rewrite (Int_part_interv (Z.b2z b)).
-  rewrite (Int_part_interv 0).
+  unfold partial_sum3 in H; simpl in H.
+  rewrite Hb in H.
+  rewrite (Int_part_interv (Z.b2z b)).
+   rewrite (Int_part_interv 0); destruct b; simpl in H; simpl; lra.
    destruct b; simpl in H; simpl; lra.
-   destruct b; simpl in H; simpl; lra.
-
-  destruct b; simpl in H; simpl; lra.
 
  clear IHn.
  destruct n.
@@ -876,95 +859,34 @@ induction n; intros.
   remember (u O) as b eqn:Hb; symmetry in Hb.
   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
   assert (H : (r ≤ partial_sum3 u 2 + / (2 * 3 ^ 2))%R).
-   apply Hr2; intros k; unfold partial_sum3, b2r.
-   simpl; rewrite Hb, Hb1.
-   destruct k; simpl; [ destruct b, b1; simpl; lra | rewrite Hb ].
-   destruct k; simpl; [ destruct b, b1; simpl; lra | rewrite Hb1 ].
-   destruct b; simpl.
-    apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
-    rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-    destruct b1; simpl.
-     apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
-     rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-     apply partial_sum3_aux_le_pow; lra.
+   apply Hr2, partial_sum3_upper_bound.
 
-     apply partial_sum3_aux_le_pow; lra.
+   unfold partial_sum3 in H; simpl in H.
+   rewrite Hb, Hb1 in H.
+   rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
+    rewrite (Int_part_interv (Z.b2z b )).
+     destruct b, b1; simpl in H; simpl; lra.
+     destruct b, b1; simpl in H; simpl; lra.
 
-    destruct b1; simpl.
-     apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
-     rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-     apply partial_sum3_aux_le_pow; lra.
-
-     apply partial_sum3_aux_le_pow; lra.
-
-  unfold partial_sum3 in H; simpl in H.
-  rewrite Hb, Hb1 in H.
-  rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
-   rewrite (Int_part_interv (Z.b2z b )).
     destruct b, b1; simpl in H; simpl; lra.
-    destruct b, b1; simpl in H; simpl; lra.
-
-   destruct b, b1; simpl in H; simpl; lra.
 
   destruct n.
    unfold partial_sum3 in Hr1.
    simpl; rewrite Rmult_1_r.
    pose proof (Hr1 3%nat) as H3; simpl in H3.
    assert (H : (r ≤ partial_sum3 u 3 + / (2 * 3 ^ 3))%R).
-    apply Hr2; intros k; unfold partial_sum3, b2r; simpl.
+    apply Hr2, partial_sum3_upper_bound.
+
+    unfold partial_sum3 in H; simpl in H.
     remember (u O) as b eqn:Hb; symmetry in Hb.
     remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
     remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
-    destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb ].
-    destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb1 ].
-    destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb2 ].
-    destruct b; simpl.
-     apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
-     rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-     destruct b1; simpl.
-      apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
-      rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-      destruct b2; simpl.
-       apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
-       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-       apply partial_sum3_aux_le_pow; lra.
+    rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
+     rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
+      destruct b, b1, b2; simpl in H; simpl; lra.
+      destruct b, b1, b2; simpl in H; simpl; lra.
 
-       apply partial_sum3_aux_le_pow; lra.
-
-      destruct b2; simpl.
-       apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
-       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-       apply partial_sum3_aux_le_pow; lra.
-
-       apply partial_sum3_aux_le_pow; lra.
-
-     destruct b1; simpl.
-      apply Rplus_le_reg_l with (r := (- (1 / 3 / 3))%R).
-      rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-      destruct b2; simpl.
-       apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
-       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-       apply partial_sum3_aux_le_pow; lra.
-
-       apply partial_sum3_aux_le_pow; lra.
-
-      destruct b2; simpl.
-       apply Rplus_le_reg_l with (r := (- (1 / 3 / 3 / 3))%R).
-       rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-       apply partial_sum3_aux_le_pow; lra.
-
-       apply partial_sum3_aux_le_pow; lra.
-
-   unfold partial_sum3 in H; simpl in H.
-   remember (u O) as b eqn:Hb; symmetry in Hb.
-   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-   remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
-   rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
-    rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
      destruct b, b1, b2; simpl in H; simpl; lra.
-     destruct b, b1, b2; simpl in H; simpl; lra.
-
-    destruct b, b1, b2; simpl in H; simpl; lra.
 bbb.
  (* general case of titi that does not work *)
  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
