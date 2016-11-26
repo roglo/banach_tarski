@@ -737,8 +737,9 @@ induction n; intros.
  simpl; rewrite Rmult_1_r.
  pose proof (Hr1 1%nat) as H1; simpl in H1.
  remember (u O) as b eqn:Hb; symmetry in Hb.
- assert (H : (r ≤ b2r b / 3 + / (2 * 3))%R).
+ assert (H : (r ≤ partial_sum3 u 1 + / (2 * 3))%R).
   apply Hr2; intros k; unfold partial_sum3, b2r.
+  simpl; rewrite Hb.
   destruct k; simpl; [ destruct b; simpl; lra | rewrite Hb ].
   destruct b; simpl.
    apply Rplus_le_reg_l with (r := (- (1 / 3))%R).
@@ -747,7 +748,8 @@ induction n; intros.
 
    apply partial_sum3_aux_le_pow; lra.
 
- unfold b2r in H.
+ unfold partial_sum3 in H; simpl in H.
+ rewrite Hb in H.
  rewrite (Int_part_interv (Z.b2z b)).
   rewrite (Int_part_interv 0).
    destruct b; simpl in H; simpl; lra.
@@ -762,8 +764,9 @@ induction n; intros.
   pose proof (Hr1 2%nat) as H2; simpl in H2.
   remember (u O) as b eqn:Hb; symmetry in Hb.
   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-  assert (H : (r ≤ b2r b / 3 + b2r b1 / 9 + / (2 * 9))%R).
+  assert (H : (r ≤ partial_sum3 u 2 + / (2 * 9))%R).
    apply Hr2; intros k; unfold partial_sum3, b2r.
+   simpl; rewrite Hb, Hb1.
    destruct k; simpl; [ destruct b, b1; simpl; lra | rewrite Hb ].
    destruct k; simpl; [ destruct b, b1; simpl; lra | rewrite Hb1 ].
    destruct b; simpl.
@@ -783,7 +786,8 @@ induction n; intros.
 
      apply partial_sum3_aux_le_pow; lra.
 
-  unfold b2r in H.
+  unfold partial_sum3 in H; simpl in H.
+  rewrite Hb, Hb1 in H.
   rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
    rewrite (Int_part_interv (Z.b2z b )).
     destruct b, b1; simpl in H; simpl; lra.
@@ -798,8 +802,9 @@ induction n; intros.
    remember (u O) as b eqn:Hb; symmetry in Hb.
    remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
    remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
-   assert (H : (r ≤ b2r b / 3 + b2r b1 / 9 + b2r b2 / 27 + / (2 * 27))%R).
+   assert (H : (r ≤ partial_sum3 u 3 + / (2 * 27))%R).
     apply Hr2; intros k; unfold partial_sum3, b2r.
+    simpl; rewrite Hb, Hb1, Hb2.
     destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb ].
     destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb1 ].
     destruct k; simpl; [ destruct b, b1, b2; simpl; lra | rewrite Hb2 ].
@@ -840,7 +845,8 @@ induction n; intros.
 
        apply partial_sum3_aux_le_pow; lra.
 
-   unfold b2r in H.
+   unfold partial_sum3 in H; simpl in H.
+   rewrite Hb, Hb1, Hb2 in H.
    rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
     rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
      destruct b, b1, b2; simpl in H; simpl; lra.
