@@ -850,27 +850,19 @@ induction n; intros.
 
    unfold b2b in H.
    destruct b.
-    destruct b1; simpl in H.
-     rewrite (Int_part_interv (12 + Z.b2z b2)).
-      rewrite (Int_part_interv 4); destruct b2; simpl in H; simpl; lra.
+    rewrite (Int_part_interv (9 + 3 * Z.b2z b1 + Z.b2z b2)).
+     rewrite (Int_part_interv (3 + Z.b2z b1)).
+      destruct b1, b2; simpl in H; simpl; lra.
+      destruct b1, b2; simpl in H; simpl; lra.
 
-      destruct b2; simpl in H; simpl; lra.
+     destruct b1, b2; simpl in H; simpl; lra.
 
-     rewrite (Int_part_interv (9 + Z.b2z b2)).
-      rewrite (Int_part_interv 3); destruct b2; simpl in H; simpl; lra.
+    rewrite (Int_part_interv (3 * Z.b2z b1 + Z.b2z b2)).
+     rewrite (Int_part_interv (Z.b2z b1)).
+      destruct b1, b2; simpl in H; simpl; lra.
+      destruct b1, b2; simpl in H; simpl; lra.
 
-      destruct b2; simpl in H; simpl; lra.
-
-    destruct b1.
-     rewrite (Int_part_interv (3 + Z.b2z b2)).
-      rewrite (Int_part_interv 1); destruct b2; simpl in H; simpl; lra.
-
-      destruct b2; simpl in H; simpl; lra.
-
-     rewrite (Int_part_interv (Z.b2z b2)).
-      rewrite (Int_part_interv 0); destruct b2; simpl in H; simpl; lra.
-
-      destruct b2; simpl in H; simpl; lra.
+     destruct b1, b2; simpl in H; simpl; lra.
 bbb.
  (* general case of titi that does not work *)
  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
