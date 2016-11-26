@@ -731,6 +731,12 @@ Theorem titi : ∀ u r n,
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
 Proof.
 intros * Hr1 Hr2.
+(*
+assert (Hrp : (r ≤ partial_sum3 u n + / (2 * 3 ^ n))%R).
+ apply Hr2; intros k; unfold partial_sum3.
+ apply partial_sum3_aux_le_pow; [ lra | ].
+ induction n; simpl; [ lra | ].
+*)
 revert u r Hr1 Hr2.
 induction n; intros.
  unfold partial_sum3 in Hr1.
