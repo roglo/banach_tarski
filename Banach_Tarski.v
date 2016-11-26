@@ -864,7 +864,7 @@ induction n; intros.
    unfold partial_sum3 in H; simpl in H.
    rewrite Hb, Hb1 in H.
    rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
-    rewrite (Int_part_interv (Z.b2z b )).
+    rewrite (Int_part_interv (Z.b2z b)).
      destruct b, b1; simpl in H; simpl; lra.
      destruct b, b1; simpl in H; simpl; lra.
 
@@ -887,6 +887,27 @@ induction n; intros.
       destruct b, b1, b2; simpl in H; simpl; lra.
 
      destruct b, b1, b2; simpl in H; simpl; lra.
+
+   destruct n.
+    unfold partial_sum3 in Hr1.
+    simpl; rewrite Rmult_1_r.
+    pose proof (Hr1 4%nat) as H3; simpl in H3.
+    assert (H : (r ≤ partial_sum3 u 4 + / (2 * 3 ^ 4))%R).
+     apply Hr2, partial_sum3_upper_bound.
+
+     unfold partial_sum3 in H; simpl in H.
+     remember (u O) as b eqn:Hb; symmetry in Hb.
+     remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+     remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
+     remember (u 3%nat) as b3 eqn:Hb3; symmetry in Hb3.
+     rewrite
+       (Int_part_interv
+          (27 * Z.b2z b + 9 * Z.b2z b1 + 3 * Z.b2z b2 + Z.b2z b3)).
+      rewrite (Int_part_interv (9 * Z.b2z b + 3 * Z.b2z b1 + Z.b2z b2)).
+       destruct b, b1, b2, b3; simpl in H; simpl; lra.
+       destruct b, b1, b2, b3; simpl in H; simpl; lra.
+
+      destruct b, b1, b2, b3; simpl in H; simpl; lra.
 bbb.
  (* general case of titi that does not work *)
  assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
