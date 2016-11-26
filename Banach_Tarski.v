@@ -838,46 +838,38 @@ Proof.
 intros * Hr1 Hr2.
 revert u r Hr1 Hr2.
 induction n; intros.
- unfold partial_sum3 in Hr1.
- simpl; rewrite Rmult_1_r.
- pose proof (Hr1 1%nat) as H1; simpl in H1.
- remember (u O) as b eqn:Hb; symmetry in Hb.
+ unfold partial_sum3 in Hr1; simpl; rewrite Rmult_1_r.
  assert (H : (r ≤ partial_sum3 u 1 + / (2 * 3 ^ 1))%R).
   apply Hr2, partial_sum3_upper_bound.
 
   unfold partial_sum3 in H; simpl in H.
-  rewrite Hb in H.
-  rewrite (Int_part_interv (Z.b2z b)).
-   rewrite (Int_part_interv 0); destruct b; simpl in H; simpl; lra.
-   destruct b; simpl in H; simpl; lra.
+  specialize (Hr1 1%nat); simpl in Hr1.
+  rewrite (Int_part_interv (Z.b2z (u O))).
+   rewrite (Int_part_interv 0); destruct (u O); simpl in H; simpl; lra.
+   destruct (u O); simpl in H; simpl; lra.
 
  clear IHn.
  destruct n.
-  unfold partial_sum3 in Hr1.
-  simpl; rewrite Rmult_1_r.
-  pose proof (Hr1 2%nat) as H2; simpl in H2.
-  remember (u O) as b eqn:Hb; symmetry in Hb.
-  remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
+  unfold partial_sum3 in Hr1; simpl; rewrite Rmult_1_r.
   assert (H : (r ≤ partial_sum3 u 2 + / (2 * 3 ^ 2))%R).
    apply Hr2, partial_sum3_upper_bound.
 
    unfold partial_sum3 in H; simpl in H.
-   rewrite Hb, Hb1 in H.
-   rewrite (Int_part_interv (3 * Z.b2z b + Z.b2z b1)).
-    rewrite (Int_part_interv (Z.b2z b)).
-     destruct b, b1; simpl in H; simpl; lra.
-     destruct b, b1; simpl in H; simpl; lra.
+   specialize (Hr1 2%nat); simpl in Hr1.
+   rewrite (Int_part_interv (3 * Z.b2z (u O) + Z.b2z (u 1%nat))).
+    rewrite (Int_part_interv (Z.b2z (u O))).
+     destruct (u O), (u 1%nat); simpl in H; simpl; lra.
+     destruct (u O), (u 1%nat); simpl in H; simpl; lra.
 
-    destruct b, b1; simpl in H; simpl; lra.
+    destruct (u O), (u 1%nat); simpl in H; simpl; lra.
 
   destruct n.
-   unfold partial_sum3 in Hr1.
-   simpl; rewrite Rmult_1_r.
-   pose proof (Hr1 3%nat) as H3; simpl in H3.
+   unfold partial_sum3 in Hr1; simpl; rewrite Rmult_1_r.
    assert (H : (r ≤ partial_sum3 u 3 + / (2 * 3 ^ 3))%R).
     apply Hr2, partial_sum3_upper_bound.
 
     unfold partial_sum3 in H; simpl in H.
+    specialize (Hr1 3%nat); simpl in Hr1.
     remember (u O) as b eqn:Hb; symmetry in Hb.
     remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
     remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
@@ -889,13 +881,12 @@ induction n; intros.
      destruct b, b1, b2; simpl in H; simpl; lra.
 
    destruct n.
-    unfold partial_sum3 in Hr1.
-    simpl; rewrite Rmult_1_r.
-    pose proof (Hr1 4%nat) as H3; simpl in H3.
+    unfold partial_sum3 in Hr1; simpl; rewrite Rmult_1_r.
     assert (H : (r ≤ partial_sum3 u 4 + / (2 * 3 ^ 4))%R).
      apply Hr2, partial_sum3_upper_bound.
 
      unfold partial_sum3 in H; simpl in H.
+     specialize (Hr1 4%nat); simpl in Hr1.
      remember (u O) as b eqn:Hb; symmetry in Hb.
      remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
      remember (u 2%nat) as b2 eqn:Hb2; symmetry in Hb2.
