@@ -737,7 +737,7 @@ induction n; intros.
  simpl; rewrite Rmult_1_r.
  pose proof (Hr1 1%nat) as H1; simpl in H1.
  remember (u O) as b eqn:Hb; symmetry in Hb.
- assert (H : (r ≤ partial_sum3 u 1 + / (2 * 3))%R).
+ assert (H : (r ≤ partial_sum3 u 1 + / (2 * 3 ^ 1))%R).
   apply Hr2; intros k; unfold partial_sum3, b2r.
   simpl; rewrite Hb.
   destruct k; simpl; [ destruct b; simpl; lra | rewrite Hb ].
@@ -764,7 +764,7 @@ induction n; intros.
   pose proof (Hr1 2%nat) as H2; simpl in H2.
   remember (u O) as b eqn:Hb; symmetry in Hb.
   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-  assert (H : (r ≤ partial_sum3 u 2 + / (2 * 9))%R).
+  assert (H : (r ≤ partial_sum3 u 2 + / (2 * 3 ^ 2))%R).
    apply Hr2; intros k; unfold partial_sum3, b2r.
    simpl; rewrite Hb, Hb1.
    destruct k; simpl; [ destruct b, b1; simpl; lra | rewrite Hb ].
@@ -799,7 +799,7 @@ induction n; intros.
    unfold partial_sum3 in Hr1.
    simpl; rewrite Rmult_1_r.
    pose proof (Hr1 3%nat) as H3; simpl in H3.
-   assert (H : (r ≤ partial_sum3 u 3 + / (2 * 27))%R).
+   assert (H : (r ≤ partial_sum3 u 3 + / (2 * 3 ^ 3))%R).
     apply Hr2; intros k; unfold partial_sum3, b2r; simpl.
     remember (u O) as b eqn:Hb; symmetry in Hb.
     remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
