@@ -1076,7 +1076,7 @@ assert (Hb : bound E).
         apply pow_lt; lra.
 Qed.
 
-Theorem Cantor_N_R :
+Theorem Cantor_ℕ_ℝ :
   ∀ f : ℕ → ℝ, ∃ y : ℝ, ∀ x : ℕ, y ∈ unit_interv ∧ y ≠ f x.
 Proof.
 apply
