@@ -1077,7 +1077,7 @@ assert (Hb : bound E).
 Qed.
 
 Theorem Cantor_ℕ_ℝ :
-  ∀ f : ℕ → ℝ, ∃ y : ℝ, ∀ x : ℕ, y ∈ unit_interv ∧ y ≠ f x.
+  ∀ f : ℕ → ℝ, ∃ x : ℝ, ∀ n : ℕ, x ∈ unit_interv ∧ x ≠ f n.
 Proof.
 apply
   (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat
