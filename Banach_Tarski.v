@@ -1033,277 +1033,52 @@ assert (Hb : bound E).
         rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
         replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
         rewrite fold_Rdiv in H1.
+        specialize (Hr3 (S n)).
+        rewrite partial_sum3_succ in Hr3.
+        destruct (u n); [ exfalso | easy ].
+        simpl in Hr3, H1; lra.
 
-bbb.
-      destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1].
+        apply Rinv_0_lt_compat, pow_lt; lra.
+
+       apply Rnot_lt_le in H1.
        unfold frac_part in H1.
-revert r Hh Hr3 Hr4 H1.
-       induction n; intros.
-        simpl in H1; rewrite Rmult_1_r in H1.
-        assert (HrO : (0 ≤ r)%R) by now specialize (Hr3 O).
-        rewrite Int_part_is_0 in H1; [ | lra ].
-        simpl in H1; rewrite Rminus_0_r in H1.
-        specialize (Hr3 1%nat).
-        unfold partial_sum3 in Hr3; simpl in Hr3.
-        destruct (u O); [ lra | easy ].
+       rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
+       unfold Rminus in H1.
+       rewrite Ropp_mult_distr_l in H1.
+       rewrite <- Rmult_plus_distr_r in H1.
+       rewrite fold_Rminus in H1.
+       apply Rmult_le_compat_r with (r := (/ 3 ^ n)%R) in H1.
+        rewrite Rmult_assoc in H1.
+        rewrite Rinv_r in H1; [ | apply pow_nonzero; lra ].
+        rewrite Rmult_1_r in H1.
+        unfold Rdiv in H1; rewrite Rmult_1_l in H1.
+        rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
+        replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
+        specialize (partial_sum3_upper_bound u (S n)); intros H.
+        apply Hr4 in H.
+        rewrite partial_sum3_succ in H.
+        destruct (u n); [ easy | exfalso ].
+        simpl in H1, H.
+        unfold Rdiv in H.
+        rewrite Rmult_0_l, Rplus_0_r in H.
+        rewrite Rinv_mult_distr in H; [ | lra | ].
+         set (s := partial_sum3 u n) in H1, H.
+         set (t := (/ (3 * 3 ^ n))%R) in H1, H.
+         enough (0 < t)%R by lra; subst t.
+         apply Rinv_0_lt_compat.
+         apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
 
-        simpl in H1.
-bbb.
+         apply Rmult_integral_contrapositive.
+         split; [ lra | apply pow_nonzero; lra ].
 
-
-  unfold partial_sum3.
-  induction k; simpl; [ lra | ].
-  remember (v O) as b eqn:Hb; symmetry in Hb.
-  destruct b.
-bbb.
-
- assert
-   (Hp :
-    ∀ k, partial_sum3 v k = (3 * partial_sum3 u k - INR (Nat.b2n (u O)))%R).
-  intros.
-  subst v; clear.
-  unfold partial_sum3.
-  induction k.
-   simpl.
-
-
- apply IHn.
-  intros k.
-bbb.
-
-  apply Rmult_le_reg_r with (r := (/ 3)%R); [ lra | ].
-  rewrite Rmult_assoc, Rinv_r; [ | lra ].
-  rewrite Rmult_1_r.
-  rewrite fold_Rdiv.
-  apply Rle_trans with (r2 := partial_sum3 u (S k)); [ | apply Hr1 ].
-  unfold v; simpl.
-  unfold partial_sum3; simpl.
-bbb.
-*)
-
-Theorem toto : ∀ u r n,
-  (∀ k, (partial_sum3 u k ≤ r)%R)
-  → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
-  → IZR (Int_part (r * 3 ^ n)) = (3 ^ n * partial_sum3 u n)%R.
-Proof.
-intros * Hr1 Hr2.
-assert (HrO : (0 ≤ r)%R) by now specialize (Hr1 O).
-assert (Hk : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
- apply partial_sum3_le_half.
-
-(*
-unfold partial_sum3.
-Print partial_sum3_aux.
-Check partial_sum3_aux_succ.
-bbb.
-*)
-
- induction n.
-  simpl; rewrite Rmult_1_l, Rmult_1_r.
-  unfold partial_sum3; simpl.
-  apply Hr2 in Hk.
-  rewrite Int_part_is_0; [ easy | lra ].
-
-  rewrite partial_sum3_succ.
-  rewrite Rmult_plus_distr_l.
-  setoid_rewrite Rmult_comm at 5.
-  unfold Rdiv; rewrite Rmult_assoc.
-  rewrite Rinv_l; [ | apply pow_nonzero; lra ].
-  rewrite Rmult_1_r.
-  remember (r * 3 ^ S n)%R as x; simpl; subst x.
-  rewrite Rmult_assoc, <- IHn.
-  apply titi.
-
-bbb.
-
-Check tutu.
-rewrite tutu.
-remember (3 ^ S n)%R as s3 eqn:Hs3; simpl.
-rewrite Rmult_plus_distr_l, Rmult_1_l.
-rewrite Hs3 at 2; simpl.
-rewrite Rmult_assoc.
-rewrite <- IHn.
-setoid_rewrite Rmult_comm at 4.
-rewrite <- Rmult_div.
-unfold Rdiv.
-rewrite Rmult_assoc; subst s3.
-rewrite Rinv_r; [ | apply pow_nonzero; lra ].
-rewrite Rmult_1_r.
-apply titi.
-
-bbb.
-
-  rewrite partial_sum3_succ.
-  rewrite Rmult_plus_distr_l.
-  remember (S n) as sn eqn:Hsn.
-  rewrite Hsn at 2; simpl; subst sn.
-  rewrite Rmult_assoc, <- IHn.
-  setoid_rewrite Rmult_comm.
-  rewrite <- Rmult_div.
-  unfold Rdiv.
-  rewrite Rmult_assoc.
-  rewrite Rinv_r; [ | apply pow_nonzero; lra ].
-  rewrite Rmult_1_r.
-  rewrite Rmult_comm at 1.
-  apply titi.
-bbb.
-      induction n.
-       rewrite pow_O, Rmult_1_r.
-       pose proof (Hr3 1%nat) as Hr1.
-       unfold partial_sum3 in Hr1; simpl in Hr1.
-       rewrite Rplus_0_r in Hr1.
-       remember (u O) as b eqn:Hb; symmetry in Hb.
-       destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr | Hr].
-        destruct b; [ exfalso | easy ].
-        unfold frac_part in Hr.
-        rewrite Int_part_is_0 in Hr; lra.
-
-        destruct b; [ easy | exfalso ].
-        apply Hr.
-        unfold frac_part.
-        rewrite Int_part_is_0; [ | lra ].
-        rewrite Rminus_0_r.
-        apply Rle_lt_trans with (r2 := (1 / 6)%R); [ | lra ].
-        apply Hr4; intros k.
-        now apply partial_sum3_le_1_6.
-
-       idtac.
-       simpl.
-destruct n.
- simpl; rewrite Rmult_1_r.
- simpl in IHn; rewrite Rmult_1_r in IHn.
- destruct (Rlt_dec (frac_part (r * 3)) (1 / 3)) as [Hr| Hr].
-  specialize (Hr3 2%nat) as Hr2.
-  unfold partial_sum3 in Hr2; simpl in Hr2.
-  rewrite IHn in Hr2.
-  destruct (Rlt_dec (frac_part r) (1 / 3)) as [Hr1| Hr1].
-   unfold frac_part in Hr1.
-   pose proof Hr3 O as HrO.
-   unfold partial_sum3 in HrO; simpl in HrO.
-   rewrite Int_part_is_0 in Hr1; [ | lra ].
-   rewrite Rminus_0_r in Hr1.
-   remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-   rewrite Rplus_0_r in Hr2.
-   destruct b1; [ exfalso | easy ].
-   unfold frac_part in Hr.
-   rewrite Int_part_is_0 in Hr; [ | lra ].
-   rewrite Rminus_0_r in Hr; lra.
-
-   apply Rnot_lt_ge in Hr1.
-   rewrite Rplus_0_r in Hr2.
-
-bbb.
-  destruct b.
-   field_simplify in Hr2.
-   rewrite Rdiv_1_r in Hr2.
-
-bbb.
-
-assert (∀ k, (partial_sum u k ≤ 1 / 3)%R).
- intros k; unfold partial_sum.
- induction k; simpl; [ lra | rewrite Hb ].
-
-bbb.
-
-specialize (Hr3 2%nat).
-unfold partial_sum3 in Hr3; simpl in Hr3.
-rewrite Hb, Rplus_0_r in Hr3.
-remember (u 1%nat) as b1 eqn:Hb1; symmetry in Hb1.
-destruct b1.
-
-bbb.
-destruct (Req_dec y 1) as [H1| H1].
-subst y.
-unfold ter_bin_of_frac_part.
-rewrite Rmult_1_l.
-destruct n.
-rewrite pow_O.
-rewrite fp_R1.
-destruct (Rlt_dec 0 (1 / 3)) as [H| ]; [ clear H | lra ].
-bbb.
-
-assert (H : ∀ k, (partial_sum3 u k <= 1)%R) by apply partial_sum3_le_1.
-specialize (Hr4 1%R H); clear H.
-bbb.
-
-specialize (Hy3 1%nat).
-unfold partial_sum3 in Hy3; simpl in Hy3.
-remember (u O) as b eqn:Hb; symmetry in Hb.
-destruct b; [ exfalso | easy ].
-
-bbb.
-   intros n.
-   unfold ter_bin_of_frac_part; symmetry.
-   set (x := (y * 3 ^ n)%R).
-   destruct (Rlt_dec (frac_part x) (1 / 3)) as [Hx| Hx].
-    subst x E.
-    unfold is_upper_bound in Hy1.
-    destruct n.
-     simpl in Hx.
-     rewrite Rmult_1_r in Hx.
-     clear Hy1 Hy2.
-     specialize (Hy3 1%nat).
-     unfold partial_sum3 in Hy3; simpl in Hy3.
-     remember (u O) as b eqn:Hb; symmetry in Hb.
-     destruct b; [ exfalso | easy ].
-     rewrite Rplus_0_r in Hy3.
-     unfold partial_sum3 in Hy4; simpl in Hy4.
-     assert (H : ∀ k, (partial_sum3 u k <= 1)%R) by apply partial_sum3_le_1.
-     specialize (Hy4 1%R H); clear H.
-bbb.
-
-Theorem toto : ∀ u y,
-  (∀ k, (partial_sum3 u k <= y)%R)
-  → (∀ b, (∀ k : ℕ, (partial_sum3 u k <= b)%R) → (y <= b)%R)
-  → (frac_part y < 1 / 3)%R
-  → IZR (Int_part (y * 3)) = 0%R.
-Proof.
-intros * Hk1 Hk2 Hy.
-specialize (Hk1 O).
-unfold partial_sum3 in Hk1; simpl in Hk1.
-unfold partial_sum3; simpl.
-assert (H : ∀ k, (partial_sum3 u k <= 1)%R) by apply partial_sum3_le_1.
-specialize (Hk2 1%R H); clear H.
-unfold frac_part in Hy.
-Admitted. Show.
-
-eapply toto in Hx; try eassumption.
-
-bbb.
-
-Theorem toto : ∀ u y n,
-  (∀ k, (partial_sum3 u k <= y)%R)
-  → (∀ b, (∀ k : ℕ, (partial_sum3 u k <= b)%R) → (y <= b)%R)
-  → IZR (Int_part (y * 3 ^ S n)) = (3 ^ S n * partial_sum3 u n)%R.
-Proof.
-intros * Hk1 Hk2.
-induction n.
- simpl; rewrite Rmult_1_r.
- specialize (Hk1 O).
- unfold partial_sum3 in Hk1; simpl in Hk1.
- unfold partial_sum3; simpl.
- rewrite Rmult_0_r.
- specialize (Hk2 1).
-
-bbb.
- assert (∀ ε, (ε > 0)%R → (y <= 1 - ε)%R).
-  intros ε Hε.
-  apply Hk2; intros k.
- 
-
- specialize (Hk2 1).
-bbb.
-
-bbb.
-Check Rseries_CV_comp.
-bbb.
+        apply Rlt_le.
+        apply Rinv_0_lt_compat.
+        apply pow_lt; lra.
+Qed.
 
 Check
   (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat
      ter_bin_of_frac_part_surj).
-
-Print unit_interv.
-Print set.
 
 bbb.
 
