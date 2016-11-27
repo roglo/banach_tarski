@@ -782,7 +782,7 @@ set (y := INR (Nat.b2n (u (S (i + k))))).
 field_simplify; [ easy | | ]; apply pow_nonzero; lra.
 Qed.
 
-(* Σ (i=0,c-1) 3^(c-i)ui *)
+(* Σ (i=0,c-1) 3^(c-1-i)ui *)
 Fixpoint n_partial_sum3 (u : ℕ → bool) c :=
   match c with
   | O => O
@@ -806,6 +806,134 @@ set (m := n_partial_sum3 v n).
 subst v.
 do 3 rewrite Nat.add_0_r.
 ring.
+Qed.
+
+Theorem partial_sum3_n_partial_sum3 : ∀ u n,
+  (3 ^ n * partial_sum3 u n = INR (n_partial_sum3 u n))%R.
+Proof.
+intros.
+unfold partial_sum3.
+induction n; [ simpl; lra | ].
+rewrite partial_sum3_aux_succ, n_partial_sum3_succ.
+rewrite plus_INR, mult_INR; simpl.
+replace (2 + 1)%R with 3%R by lra.
+rewrite Rmult_plus_distr_l.
+rewrite Rmult_assoc.
+rewrite IHn.
+apply Rplus_eq_compat_l.
+rewrite Rmult_comm.
+unfold Rdiv.
+rewrite Rmult_1_r.
+rewrite Rmult_assoc, Rinv_l, Rmult_1_r; [ easy | ].
+apply Rmult_integral_contrapositive.
+split; [ lra | ].
+apply pow_nonzero; lra.
+Qed.
+
+Theorem le_partial_sum3_lt_n_partial_sum3 : ∀ u r n,
+  (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R
+  → (r * 3 ^ n < INR (n_partial_sum3 u n) + 1)%R.
+Proof.
+intros * Hr2.
+apply Rmult_le_compat_r with (r := (3 ^ n)%R) in Hr2; [ | apply pow_le; lra ].
+rewrite Rmult_plus_distr_r in Hr2.
+rewrite Rinv_mult_distr in Hr2; [ | lra | apply pow_nonzero; lra ].
+simpl in Hr2.
+rewrite Rinv_mult_distr in Hr2; [ | lra | apply pow_nonzero; lra ].
+rewrite <- Rmult_assoc in Hr2.
+rewrite Rmult_assoc in Hr2.
+rewrite Rinv_l in Hr2; [ | apply pow_nonzero; lra ].
+rewrite Rmult_1_r in Hr2.
+rewrite <- Rinv_mult_distr in Hr2; [ | lra | lra ].
+setoid_rewrite Rmult_comm in Hr2 at 2.
+rewrite partial_sum3_succ in Hr2.
+rewrite Rmult_plus_distr_l in Hr2.
+unfold Rdiv in Hr2; simpl in Hr2.
+rewrite Rinv_mult_distr in Hr2; [ | lra | apply pow_nonzero; lra ].
+rewrite <- Rmult_assoc, Rmult_shuffle0 in Hr2.
+rewrite <- Rmult_assoc in Hr2.
+rewrite Rmult_assoc, Rmult_shuffle0 in Hr2.
+rewrite <- Rmult_assoc in Hr2.
+rewrite Rinv_r in Hr2; [ | apply pow_nonzero; lra ].
+rewrite Rmult_1_l in Hr2.
+rewrite  partial_sum3_n_partial_sum3 in Hr2.
+destruct (u n); simpl in Hr2; lra.
+Qed.
+
+Theorem Int_part_n_partial_sum3 : ∀ u r n,
+  (∀ k, (partial_sum3 u k ≤ r)%R)
+  → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
+  → Int_part (r * 3 ^ n) = Z.of_nat (n_partial_sum3 u n).
+Proof.
+intros * Hr1 Hr2.
+specialize (Hr1 (S n)).
+assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
+ apply Hr2, partial_sum3_upper_bound.
+
+ clear Hr2; rename H into Hr2.
+ rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u n))); [ easy | ].
+ rewrite plus_IZR, <- INR_IZR_INZ; simpl.
+ split.
+  revert u r Hr1 Hr2.
+  induction n; intros.
+   unfold partial_sum3 in Hr1, Hr2; simpl in Hr1, Hr2; simpl.
+   destruct (u O); simpl; lra.
+
+   unfold partial_sum3 in Hr1, Hr2.
+   rewrite partial_sum3_aux_shift_seq in Hr1, Hr2.
+   rewrite Rmult_1_l in Hr1, Hr2.
+   rewrite n_partial_sum3_succ2.
+   remember (u O) as b eqn:Hb; symmetry in Hb.
+   unfold b2r in Hr1, Hr2.
+   destruct b.
+    remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
+    simpl; rewrite Nat.mul_1_r.
+    set (v n := u (S n)) in *.
+    rewrite plus_INR.
+    apply Rplus_le_reg_l with (r := (- INR (3 ^ n))%R).
+    rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+    rewrite Rplus_comm.
+    rewrite pow_INR; simpl.
+    replace (2 + 1)%R with 3%R by lra.
+    replace (- 3 ^ n)%R with ((- 1) * 3 ^ n)%R by lra.
+    rewrite <- Rmult_assoc, <- Rmult_plus_distr_r, fold_Rminus.
+    apply IHn; [ unfold partial_sum3; lra | ].
+    unfold partial_sum3.
+    set (x := partial_sum3_aux (S n) v 1 0) in *.
+    apply Rplus_le_reg_r with (r := 1%R).
+    replace (r * 3 - 1 + 1)%R with (r * 3)%R by lra.
+    remember 3%R as three.
+    rewrite Rplus_comm, <- Rplus_assoc; subst three.
+    apply Rmult_le_reg_r with (r := (/ 3)%R); [ lra | ].
+    rewrite Rmult_assoc, Rinv_r; [ | lra ].
+    rewrite Rmult_1_r.
+    rewrite Rmult_plus_distr_r.
+    rewrite fold_Rdiv.
+    rewrite <- Rinv_mult_distr; [ | | lra ].
+     now rewrite <- Rmult_assoc in Hr2; rewrite Rmult_shuffle0.
+
+     apply Rmult_integral_contrapositive.
+     split; [ lra | apply pow_nonzero; lra ].
+
+    remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
+    simpl; rewrite Nat.mul_0_r, Nat.add_0_l.
+    rewrite Rplus_0_l in Hr1, Hr2.
+    set (v n := u (S n)) in *.
+    rewrite <- Rmult_assoc.
+    apply IHn; [ unfold partial_sum3; lra | ].
+    unfold partial_sum3.
+    set (x := partial_sum3_aux (S n) v 1 0) in *.
+    apply Rmult_le_reg_r with (r := (/ 3)%R); [ lra | ].
+    rewrite Rmult_assoc, Rinv_r; [ | lra ].
+    rewrite Rmult_1_r.
+    rewrite Rmult_plus_distr_r.
+    rewrite fold_Rdiv.
+    rewrite <- Rinv_mult_distr; [ | | lra ].
+     now rewrite <- Rmult_assoc in Hr2; rewrite Rmult_shuffle0.
+
+     apply Rmult_integral_contrapositive.
+     split; [ lra | apply pow_nonzero; lra ].
+     now apply le_partial_sum3_lt_n_partial_sum3.
 Qed.
 
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
@@ -879,83 +1007,20 @@ Theorem titi : ∀ u r n,
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
 Proof.
 intros * Hr1 Hr2.
+rewrite Int_part_n_partial_sum3 with (u := u); [ | easy | easy ].
+rewrite Int_part_n_partial_sum3 with (u := u); [ | easy | easy ].
+do 2 rewrite <- INR_IZR_INZ.
+rewrite n_partial_sum3_succ.
+rewrite plus_INR, mult_INR.
+now replace (INR 3) with 3%R by (simpl; lra).
+(* titi completed!!! *)
+
+bbb.
+
 rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u (S n)))).
  rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u n))).
 
-Theorem glop : ∀ u r n,
-  (∀ k, (partial_sum3 u k ≤ r)%R)
-  → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
-  → Int_part (r * 3 ^ n) = Z.of_nat (n_partial_sum3 u n).
-Proof.
-intros * Hr1 Hr2.
-specialize (Hr1 (S n)).
-assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
- apply Hr2, partial_sum3_upper_bound.
-
- clear Hr2; rename H into Hr2.
- rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u n))); [ easy | ].
- rewrite plus_IZR, <- INR_IZR_INZ; simpl.
- split.
-  revert u r Hr1 Hr2.
-  induction n; intros.
-   unfold partial_sum3 in Hr1, Hr2; simpl in Hr1, Hr2; simpl.
-   destruct (u O); simpl; lra.
-
-   unfold partial_sum3 in Hr1, Hr2.
-   rewrite partial_sum3_aux_shift_seq in Hr1, Hr2.
-   rewrite Rmult_1_l in Hr1, Hr2.
-   rewrite n_partial_sum3_succ2.
-   remember (u O) as b eqn:Hb; symmetry in Hb.
-   unfold b2r in Hr1, Hr2.
-   destruct b.
-    remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
-    simpl; rewrite Nat.mul_1_r.
-    set (v n := u (S n)) in *.
-    rewrite plus_INR.
-    apply Rplus_le_reg_l with (r := (- INR (3 ^ n))%R).
-    rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-    rewrite Rplus_comm.
-    rewrite pow_INR; simpl.
-    replace (2 + 1)%R with 3%R by lra.
-    replace (- 3 ^ n)%R with ((- 1) * 3 ^ n)%R by lra.
-    rewrite <- Rmult_assoc, <- Rmult_plus_distr_r, fold_Rminus.
-    apply IHn; [ unfold partial_sum3; lra | ].
-    unfold partial_sum3.
-    set (x := partial_sum3_aux (S n) v 1 0) in *.
-    apply Rplus_le_reg_r with (r := 1%R).
-    replace (r * 3 - 1 + 1)%R with (r * 3)%R by lra.
-    remember 3%R as three.
-    rewrite Rplus_comm, <- Rplus_assoc; subst three.
-    apply Rmult_le_reg_r with (r := (/ 3)%R); [ lra | ].
-    rewrite Rmult_assoc, Rinv_r; [ | lra ].
-    rewrite Rmult_1_r.
-    rewrite Rmult_plus_distr_r.
-    rewrite fold_Rdiv.
-    rewrite <- Rinv_mult_distr; [ | | lra ].
-     now rewrite <- Rmult_assoc in Hr2; rewrite Rmult_shuffle0.
-
-     apply Rmult_integral_contrapositive.
-     split; [ lra | apply pow_nonzero; lra ].
-
-    remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
-    simpl; rewrite Nat.mul_0_r, Nat.add_0_l.
-    rewrite Rplus_0_l in Hr1, Hr2.
-    set (v n := u (S n)) in *.
-    rewrite <- Rmult_assoc.
-    apply IHn; [ unfold partial_sum3; lra | ].
-    unfold partial_sum3.
-    set (x := partial_sum3_aux (S n) v 1 0) in *.
-    apply Rmult_le_reg_r with (r := (/ 3)%R); [ lra | ].
-    rewrite Rmult_assoc, Rinv_r; [ | lra ].
-    rewrite Rmult_1_r.
-    rewrite Rmult_plus_distr_r.
-    rewrite fold_Rdiv.
-    rewrite <- Rinv_mult_distr; [ | | lra ].
-     now rewrite <- Rmult_assoc in Hr2; rewrite Rmult_shuffle0.
-
-     apply Rmult_integral_contrapositive.
-     split; [ lra | apply pow_nonzero; lra ].
-
+bbb.
   revert u r Hr1 Hr2.
   induction n; intros.
    unfold partial_sum3 in Hr1, Hr2; simpl in Hr1, Hr2; simpl.
@@ -980,6 +1045,7 @@ Check n_partial_sum3_succ.
 eapply Rlt_le_trans.
  apply IHn with (u := v).
   unfold partial_sum3.
+  set (x := partial_sum3_aux (S n) v 1 0) in *.
 
 bbb.
 
