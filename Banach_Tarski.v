@@ -977,8 +977,6 @@ induction n.
  now apply IZR_Int_part_mult_pow_succ.
 Qed.
 
-Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
-
 Theorem ter_bin_of_frac_part_surj : ∀ u : ℕ → bool,
   ∃ r : ℝ, r ∈ unit_interv ∧ (∀ n, ter_bin_of_frac_part r n = u n).
 Proof.
@@ -1084,10 +1082,8 @@ specialize
      ter_bin_of_frac_part_surj).
 intros H f.
 specialize (H f).
-destruct H as (x, H).
-exists x.
-split; [ now specialize (H O) | ].
-now intros n; apply H.
+destruct H as (x, H); exists x.
+now split; [ specialize (H O) | intros n; apply H ].
 Qed.
 
 Theorem R_not_countable : ¬ (is_countable ℝ eq (whole_set _)).
