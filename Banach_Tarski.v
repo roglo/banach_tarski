@@ -783,15 +783,30 @@ field_simplify; [ easy | | ]; apply pow_nonzero; lra.
 Qed.
 
 (* Σ (i=0,c-1) 3^(c-i)ui *)
-Fixpoint z_partial_sum3 (u : ℕ → bool) c :=
+Fixpoint n_partial_sum3 (u : ℕ → bool) c :=
   match c with
-  | 0 => 0%Z
-  | S c' => (3 * z_partial_sum3 u c' + Z.b2z (u c'))%Z
+  | O => O
+  | S c' => (3 * n_partial_sum3 u c' + Nat.b2n (u c'))%nat
   end.
 
-Theorem z_partial_sum3_succ : ∀ u n,
-  z_partial_sum3 u (S n) = (3 * z_partial_sum3 u n + Z.b2z (u n))%Z.
+Theorem n_partial_sum3_succ : ∀ u n,
+  n_partial_sum3 u (S n) = (3 * n_partial_sum3 u n + Nat.b2n (u n))%nat.
 Proof. easy. Qed.
+
+Theorem n_partial_sum3_succ2 : ∀ u n,
+  n_partial_sum3 u (S n) =
+  (3 ^ n * Nat.b2n (u O) + n_partial_sum3 (λ n, u (S n)) n)%nat.
+Proof.
+intros.
+set (v n := u (S n)).
+induction n; [ now simpl; do 2 rewrite Nat.add_0_r | ].
+remember (S n) as sn; simpl; subst sn.
+rewrite IHn; simpl.
+set (m := n_partial_sum3 v n).
+subst v.
+do 3 rewrite Nat.add_0_r.
+ring.
+Qed.
 
 Check (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat).
 
@@ -864,13 +879,13 @@ Theorem titi : ∀ u r n,
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%R.
 Proof.
 intros * Hr1 Hr2.
-rewrite (Int_part_interv (z_partial_sum3 u (S n))).
- rewrite (Int_part_interv (z_partial_sum3 u n)).
+rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u (S n)))).
+ rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u n))).
 
 Theorem glop : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%R)
   → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%R) → (r ≤ b)%R)
-  → Int_part (r * 3 ^ n) = z_partial_sum3 u n.
+  → Int_part (r * 3 ^ n) = Z.of_nat (n_partial_sum3 u n).
 Proof.
 intros * Hr1 Hr2.
 specialize (Hr1 (S n)).
@@ -878,13 +893,33 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
  apply Hr2, partial_sum3_upper_bound.
 
  clear Hr2; rename H into Hr2.
- rewrite (Int_part_interv (z_partial_sum3 u n)); [ easy | ].
+ rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u n))); [ easy | ].
+ rewrite plus_IZR, <- INR_IZR_INZ; simpl.
  split.
   revert u r Hr1 Hr2.
   induction n; intros.
    unfold partial_sum3 in Hr1, Hr2; simpl in Hr1, Hr2; simpl.
    destruct (u O); simpl; lra.
 
+   rewrite n_partial_sum3_succ2.
+   set (v n := u (S n)).
+   remember (S n) as sn.
+   unfold partial_sum3 in Hr1, Hr2; simpl in Hr1, Hr2; subst sn.
+   remember (u O) as b eqn:Hb; symmetry in Hb.
+   destruct b.
+    simpl; rewrite Nat.mul_1_r.
+    rewrite plus_INR.
+    apply Rplus_le_reg_l with (r := (- INR (3 ^ n))%R).
+    rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
+    rewrite Rplus_comm.
+    rewrite pow_INR; simpl.
+    replace (2 + 1)%R with 3%R by lra.
+    replace (- 3 ^ n)%R with ((- 1) * 3 ^ n)%R by lra.
+    rewrite <- Rmult_assoc, <- Rmult_plus_distr_r, fold_Rminus.
+    apply IHn.
+     subst v; unfold partial_sum3; simpl.
+
+bbb.
    rewrite z_partial_sum3_succ, plus_IZR, mult_IZR.
    simpl; ring_simplify.
    apply Rmult_le_reg_l with (r := (/ 3)%R); [ lra | ].
@@ -893,6 +928,8 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
    do 2 rewrite <- Rmult_assoc.
    rewrite Rinv_l, Rmult_1_l; [ | lra ].
    rewrite Rmult_comm, fold_Rdiv.
+bbb.
+
    rewrite partial_sum3_succ in Hr1, Hr2.
    rewrite partial_sum3_succ in Hr1, Hr2.
    remember (u n) as b eqn:Hb; symmetry in Hb.
