@@ -977,6 +977,10 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
     rewrite Rmult_1_l.
 SearchAbout n_partial_sum3.
 Check n_partial_sum3_succ.
+eapply Rlt_le_trans.
+ apply IHn with (u := v).
+  unfold partial_sum3.
+
 bbb.
 
     rewrite plus_INR.
