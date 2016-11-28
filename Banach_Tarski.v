@@ -391,7 +391,7 @@ Qed.
 Definition is_countable U (eqU : relation U) A :=
   ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, eqU (f n) a.
 
-Theorem paths_are_countable : is_countable _ eq (whole_set (list free_elem)).
+Theorem paths_are_countable : is_countable (list free_elem) eq whole_set.
 Proof.
 unfold is_countable; simpl.
 exists path_of_nat.
@@ -1087,12 +1087,12 @@ destruct H as (x, H); exists x.
 intros n; apply H.
 Qed.
 
-Theorem R_not_countable : ¬ (is_countable ℝ eq (whole_set _)).
+Theorem R_not_countable : ¬ (is_countable ℝ eq whole_set).
 Proof.
 intros H.
 unfold is_countable in H.
 destruct H as (f, Hf).
-assert (Hcontr : ∃ a, a ∈ whole_set _ ∧ ∀ n, f n ≠ a).
+assert (Hcontr : ∃ a, a ∈ whole_set ∧ ∀ n, f n ≠ a).
  clear; simpl.
  specialize (Cantor_ℕ_ℝ f); intros (x & Hf).
  exists x; split; [ easy | ].
