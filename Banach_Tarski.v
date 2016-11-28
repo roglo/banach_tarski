@@ -1146,12 +1146,33 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, f n ≠ a).
  now symmetry in Hn.
 Qed.
 
+Definition rotation_fixpoint (m : matrix) k :=
+  let x := (a₃₂ m - a₂₃ m)%R in
+  let y := (a₁₃ m - a₃₁ m)%R in
+  let z := (a₂₁ m - a₁₂ m)%R in
+  let r := √ (x² + y² + z²) in
+  P (k * x / r) (k * y / r) (k * z / r).
+
+Definition mat_of_path el :=
+  List.fold_right mat_mul mat_id (map mat_of_elem el).
+
+Definition fixpoint_of_path el :=
+  rotation_fixpoint (mat_of_path el) 1.
+
+Definition fixpoint_of_nat n :=
+ fixpoint_of_path (path_of_nat n).
+
 Theorem D_is_countable : is_countable _ eq D.
 Proof.
-unfold is_countable, D; simpl.
-SearchAbout is_countable.
-Check paths_are_countable.
+exists fixpoint_of_nat.
+intros p Hp.
+unfold D in Hp; simpl in Hp.
+destruct Hp as (el & p₁ & Hs & Hn & Hr).
 bbb.
+
+(* using Cantor_gen, we could prove that ℝ ∖ a countable set contains at
+   least one element; if D is countable, ℝ ∖ D countains at least one
+   element *)
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
