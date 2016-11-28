@@ -1146,12 +1146,20 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, f n ≠ a).
  now symmetry in Hn.
 Qed.
 
+Theorem D_is_countable : is_countable _ eq D.
+Proof.
+unfold is_countable, D; simpl.
+SearchAbout is_countable.
+Check paths_are_countable.
+bbb.
+
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
 Proof.
 intros.
 assert (∃ p₁, p₁ ∈ sphere ∖ D).
-unfold "∈", "∖".
+ unfold "∈", "∖".
+ SearchAbout D.
 bbb.
 
 assert (∃ p₁, p₁ ∉ D).
