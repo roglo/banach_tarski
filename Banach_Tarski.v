@@ -15,6 +15,8 @@ Require Import Partition OrbitRepr GroupTransf Equidecomp.
 Notation "x '≤' y" := (Rle x y) : R_scope.
 Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
  (at level 70, y at next level) : R_scope.
+Notation "x '≤' y '≤' z" := (Rle x y ∧ Rle y z)
+ (at level 70, y at next level) : R_scope.
 
 Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
@@ -1074,8 +1076,7 @@ assert (Hb : bound E).
         apply pow_lt; lra.
 Qed.
 
-Theorem Cantor_ℕ_ℝ :
-  ∀ f : ℕ → ℝ, ∃ x : ℝ, x ∈ unit_interv ∧ ∀ n : ℕ, x ≠ f n.
+Theorem Cantor_ℕ_ℝ : ∀ f : ℕ → ℝ, ∃ x : ℝ, ∀ n : ℕ, x ≠ f n.
 Proof.
 specialize
   (Cantor_gen ℕ ℕ ℝ (setp unit_interv) id ter_bin_of_frac_part id_nat
@@ -1083,7 +1084,7 @@ specialize
 intros H f.
 specialize (H f).
 destruct H as (x, H); exists x.
-now split; [ specialize (H O) | intros n; apply H ].
+intros n; apply H.
 Qed.
 
 Theorem R_not_countable : ¬ (is_countable ℝ eq (whole_set _)).
@@ -1093,7 +1094,7 @@ unfold is_countable in H.
 destruct H as (f, Hf).
 assert (Hcontr : ∃ a, a ∈ whole_set _ ∧ ∀ n, f n ≠ a).
  clear; simpl.
- specialize (Cantor_ℕ_ℝ f); intros (x & Hx & Hf).
+ specialize (Cantor_ℕ_ℝ f); intros (x & Hf).
  exists x; split; [ easy | ].
  intros n; specialize (Hf n).
  now intros H; apply Hf.
@@ -1101,7 +1102,23 @@ assert (Hcontr : ∃ a, a ∈ whole_set _ ∧ ∀ n, f n ≠ a).
  destruct Hcontr as (a & Ha & Hnn).
  apply Hf in Ha.
  destruct Ha as (n, Hn).
- eapply Hnn; eassumption.
+ now apply (Hnn n).
+Qed.
+
+Definition ter_bin_of_point '(P x y z) := ter_bin_of_frac_part x.
+
+Theorem ter_bin_of_sphere_surj : ∀ u : ℕ → bool,
+  ∃ p : point, p ∈ sphere ∧ (∀ n, ter_bin_of_point p n = u n).
+Proof.
+intros.
+specialize (ter_bin_of_frac_part_surj u); intros (r & Hr & Hn).
+exists (P r 0 0); simpl in Hr; simpl.
+split; [ | easy ].
+do 2 rewrite Rsqr_pow2.
+rewrite pow_i; [ | apply Nat.lt_0_succ ].
+do 2 rewrite Rplus_0_r.
+replace 1%R with (1 ^ 2)%R by lra.
+apply pow_incr; lra.
 Qed.
 
 Theorem sphere_not_countable : ¬ (is_countable _ eq sphere).
@@ -1115,11 +1132,19 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, f n ≠ a).
  destruct Ha as (n, Hn).
  eapply Hnn; eassumption.
 
-bbb.
- specialize (Cantor_ℕ_point f); intros (x & Hx & Hf).
- clear.
-
-bbb.
+ specialize
+  (Cantor_gen ℕ ℕ point (setp sphere) id ter_bin_of_point id_nat
+     ter_bin_of_sphere_surj).
+ intros H.
+ specialize (H f).
+ destruct H as (p, H).
+ exists p.
+ split; [ apply (H O) | ].
+ intros n Hn.
+ specialize (H n).
+ destruct H.
+ now symmetry in Hn.
+Qed.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
   equidecomposable _ sphere sphere_but_fixpoints.
