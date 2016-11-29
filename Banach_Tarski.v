@@ -1159,20 +1159,19 @@ Definition mat_of_path el :=
 Definition fixpoint_of_path el :=
   rotation_fixpoint (mat_of_path el) 1.
 
-Definition not_empty_norm_path_of_nat n :=
-  match norm_list (path_of_nat n) with
+Definition map_empty_path_to_single el :=
+  match el with
   | [] => ạ :: []
-  | el => el
+  | _ => el
   end.
 
-Definition not_empty_norm_path :=
-  mkset (λ el, norm_list el = el ∧ el ≠ []).
-
 Definition fixpoint_of_nat n :=
-  fixpoint_of_path (not_empty_norm_path_of_nat n).
+  fixpoint_of_path (map_empty_path_to_single (norm_list (path_of_nat n))).
 
 Theorem D_is_countable : is_countable _ eq D.
 Proof.
+unfold is_countable, D; simpl.
+bbb.
 exists fixpoint_of_nat.
 intros p Hp.
 unfold D in Hp; simpl in Hp.
