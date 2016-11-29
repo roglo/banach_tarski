@@ -284,10 +284,9 @@ induction el as [| e₁]; intros.
  now apply path_of_nat_aux_cons.
 Qed.
 
-Definition is_countable U (eqU : relation U) A :=
-  ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, eqU (f n) a.
+Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
 
-Theorem paths_are_countable : is_countable (list free_elem) eq full_set.
+Theorem paths_are_countable : is_countable (list free_elem) full_set.
 Proof.
 unfold is_countable; simpl.
 exists path_of_nat.
@@ -837,7 +836,7 @@ destruct H as (x, H); exists x.
 intros n; apply H.
 Qed.
 
-Theorem R_not_countable : ¬ (is_countable ℝ eq full_set).
+Theorem R_not_countable : ¬ (is_countable ℝ full_set).
 Proof.
 intros H.
 unfold is_countable in H.
@@ -871,7 +870,7 @@ replace 1%R with (1 ^ 2)%R by lra.
 apply pow_incr; lra.
 Qed.
 
-Theorem sphere_not_countable : ¬ (is_countable _ eq sphere).
+Theorem sphere_not_countable : ¬ (is_countable _ sphere).
 Proof.
 intros H.
 unfold is_countable in H.
@@ -918,7 +917,7 @@ Definition map_empty_path_to_single el :=
 Definition fixpoint_of_nat n :=
   fixpoint_of_path (map_empty_path_to_single (norm_list (path_of_nat n))).
 
-Theorem D_is_countable : is_countable _ eq D.
+Theorem D_is_countable : is_countable _ D.
 Proof.
 unfold is_countable, D; simpl.
 bbb.
