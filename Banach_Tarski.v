@@ -1165,6 +1165,9 @@ Definition not_empty_norm_path_of_nat n :=
   | el => el
   end.
 
+Definition not_empty_norm_path :=
+  mkset (λ el, norm_list el = el ∧ el ≠ []).
+
 Definition fixpoint_of_nat n :=
   fixpoint_of_path (not_empty_norm_path_of_nat n).
 
