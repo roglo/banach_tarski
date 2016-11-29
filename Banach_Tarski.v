@@ -153,21 +153,12 @@ simpl in H3, H6.
 now apply (Rno_intersect_spheres_x3_x6 x y z).
 Qed.
 
-Definition rotate_set axis ang E :=
-  mkset (λ p, mat_vec_mul (rot_mat_of_axis_cos axis (-cos ang)) p ∈ E).
-
 Definition nat_of_free_elem e : nat :=
   match e with
   | ạ => 0
   | ạ⁻¹ => 1
   | ḅ => 2
   | ḅ⁻¹ => 3
-  end.
-
-Fixpoint nat_of_path el :=
-  match el with
-  | e :: el' => (nat_of_path el' * 4 + nat_of_free_elem e)%nat
-  | [] => 1%nat
   end.
 
 Definition free_elem_of_nat n :=
@@ -293,101 +284,6 @@ induction el as [| e₁]; intros.
  now apply path_of_nat_aux_cons.
 Qed.
 
-Theorem nat_of_path_ne_0 : ∀ el, nat_of_path el ≠ 0%nat.
-Proof.
-intros * H.
-induction el as [| e el]; [ easy | ].
-simpl in H; apply Nat.eq_add_0 in H.
-destruct H as (H, _).
-now apply Nat.eq_mul_0_l in H.
-Qed.
-
-Theorem nat_of_free_elem_injective : FinFun.Injective nat_of_free_elem.
-Proof.
-intros (t₁, d₁) (t₂, d₂) He; simpl in He.
-now destruct t₁, d₁, t₂, d₂.
-Qed.
-
-Theorem nat_of_free_elem_sub_le : ∀ e₁ e₂,
-  nat_of_free_elem e₁ - nat_of_free_elem e₂ < 4.
-Proof.
-intros (t₁, d₁) (t₂, d₂).
-destruct t₁, d₁, t₂, d₂; simpl; try apply Nat.lt_0_succ.
- apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
- do 2 apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
- apply Nat.lt_succ_diag_r.
- apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
- apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
- do 2 apply -> Nat.succ_lt_mono; apply Nat.lt_0_succ.
-Qed.
-
-Theorem nat_of_path_injective : FinFun.Injective nat_of_path.
-Proof.
-intros el₁ el₂ Hf.
-revert el₂ Hf.
-induction el₁ as [| e₁ el₁]; intros.
- destruct el₂ as [| e₂ el₂]; [ easy | exfalso; simpl in Hf ].
- remember (nat_of_path el₂) as n eqn:Hn; symmetry in Hn.
- destruct n; [ revert Hn; apply nat_of_path_ne_0 | easy ].
-
- destruct el₂ as [| e₂ el₂]; [ exfalso; simpl in Hf | ].
-  remember (nat_of_path el₁) as n eqn:Hn; symmetry in Hn.
-  destruct n; [ revert Hn; apply nat_of_path_ne_0 | easy ].
-
-  simpl in Hf.
-  set (np₁ := nat_of_path el₁) in Hf.
-  set (np₂ := nat_of_path el₂) in Hf.
-  set (n₁ := nat_of_free_elem e₁) in Hf.
-  set (n₂ := nat_of_free_elem e₂) in Hf.
-  destruct (lt_eq_lt_dec np₁ np₂) as [[H₁| H₁]| H₁].
-   apply Nat.add_sub_eq_l in Hf.
-   rewrite Nat.add_sub_swap in Hf.
-    rewrite <- Nat.mul_sub_distr_r in Hf.
-    apply Nat.add_sub_eq_r in Hf.
-    remember (np₂ - np₁)%nat as n eqn:Hn.
-    symmetry in Hn.
-    destruct n.
-     apply Nat.sub_0_le in Hn.
-     now apply Nat.nlt_ge in Hn.
-
-     pose proof (nat_of_free_elem_sub_le e₁ e₂) as H.
-     fold n₁ n₂ in H; rewrite Hf in H.
-     rewrite Nat.mul_succ_l in H.
-     apply Nat.lt_add_lt_sub_r in H.
-     rewrite Nat.sub_diag in H.
-     now apply Nat.nlt_0_r in H.
-
-    apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | ].
-    now apply Nat.lt_le_incl.
-
-   rewrite H₁ in Hf.
-   apply Nat.add_cancel_l in Hf.
-   subst n₁ n₂ np₁ np₂.
-   apply nat_of_free_elem_injective in Hf.
-   f_equal; [ easy | now apply IHel₁ ].
-
-   symmetry in Hf.
-   apply Nat.add_sub_eq_l in Hf.
-   rewrite Nat.add_sub_swap in Hf.
-    rewrite <- Nat.mul_sub_distr_r in Hf.
-    apply Nat.add_sub_eq_r in Hf.
-    remember (np₁ - np₂)%nat as n eqn:Hn.
-    symmetry in Hn.
-    destruct n.
-     apply Nat.sub_0_le in Hn.
-     now apply Nat.nlt_ge in Hn.
-
-     pose proof (nat_of_free_elem_sub_le e₂ e₁) as H.
-     fold n₁ n₂ in H; rewrite Hf in H.
-     rewrite Nat.mul_succ_l in H.
-     apply Nat.lt_add_lt_sub_r in H.
-     rewrite Nat.sub_diag in H.
-     now apply Nat.nlt_0_r in H.
-
-    apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | ].
-    now apply Nat.lt_le_incl.
-Qed.
-
 Definition is_countable U (eqU : relation U) A :=
   ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, eqU (f n) a.
 
@@ -406,40 +302,6 @@ enough (Hn : ∃ n, path_of_nat (S n) = e :: el).
  exists n; unfold path_of_nat.
  rewrite path_of_nat_aux_enough_iter with (p := m); try easy.
  apply Nat.lt_succ_diag_r.
-Qed.
-
-Theorem classic : ∀ (P : Prop), ¬¬P → P.
-Proof.
-intros * HnP.
-now destruct (EM P).
-Qed.
-
-Add Parametric Morphism {U} : (@is_countable U)
- with signature eq ==> (@set_eq _ set_equiv) ==> iff
- as is_countable_morph.
-Proof.
-intros eqU E F HEF.
-split; intros H; destruct H as (f, H); exists f; intros x Hx; now apply H, HEF.
-Qed.
-
-Theorem uncountable_sub_countable_not_empty : ∀ {U} (A B : set U) eqU,
-  not (is_countable _ eqU A)
-  → is_countable _ eqU B
-  → B ⊂ A
-  → ∃ x, x ∈ A ∖ B.
-Proof.
-intros * HA HB HBA.
-apply classic.
-intros HnE.
-assert (HnA : ∀ x, x ∉ A ∖ B) by (now intros x Hx; apply HnE; exists x).
-clear HnE.
-set (s := @set_equiv U).
-enough (HAB : (A = B)%S) by (now rewrite HAB in HA).
-intros x.
-split; [ intros Ha | now intros Hb; apply HBA ].
-pose proof HnA x as H; simpl in H.
-apply classic.
-now intros Hb; apply H.
 Qed.
 
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
