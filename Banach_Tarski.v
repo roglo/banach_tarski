@@ -1159,8 +1159,14 @@ Definition mat_of_path el :=
 Definition fixpoint_of_path el :=
   rotation_fixpoint (mat_of_path el) 1.
 
+Definition not_empty_norm_path_of_nat n :=
+  match norm_list (path_of_nat n) with
+  | [] => ạ :: []
+  | el => el
+  end.
+
 Definition fixpoint_of_nat n :=
-  fixpoint_of_path (path_of_nat n).
+  fixpoint_of_path (not_empty_norm_path_of_nat n).
 
 Theorem D_is_countable : is_countable _ eq D.
 Proof.
@@ -1169,6 +1175,7 @@ intros p Hp.
 unfold D in Hp; simpl in Hp.
 destruct Hp as (el & p₁ & Hs & Hn & Hr).
 bbb.
+SearchAbout FinFun.Surjective.
 
 (* using Cantor_gen, we could prove that ℝ ∖ a countable set contains at
    least one element; if D is countable, ℝ ∖ D countains at least one
