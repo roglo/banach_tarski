@@ -24,10 +24,7 @@ Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%R.
 Proof. intros. now fold (Rminus x y). Qed.
 
 Theorem fold_Rdiv : ∀ x y, (x * / y = x / y)%R.
-Proof. easy. Qed.
-
-Theorem fold_Rsqr : ∀ a, (a * a = a²)%R.
-Proof. easy. Qed.
+Proof. intros; now fold (Rdiv x y). Qed.
 
 Theorem Rmult_div : ∀ x y z, (x * y / z = x / z * y)%R.
 Proof. intros; lra. Qed.

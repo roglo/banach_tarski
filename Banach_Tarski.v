@@ -647,7 +647,8 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
     rewrite pow_INR; simpl.
     replace (2 + 1)%R with 3%R by lra.
     replace (- 3 ^ n)%R with ((- 1) * 3 ^ n)%R by lra.
-    rewrite <- Rmult_assoc, <- Rmult_plus_distr_r, fold_Rminus.
+    rewrite <- Rmult_assoc, <- Rmult_plus_distr_r.
+    fold (Rminus (r * 3) 1).
     apply IHn; [ unfold partial_sum3; lra | ].
     unfold partial_sum3.
     set (x := partial_sum3_aux (S n) v 1 0) in *.
@@ -784,7 +785,7 @@ assert (Hb : bound E).
         rewrite Rmult_assoc in H1.
         rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
         replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
-        rewrite fold_Rdiv in H1.
+        fold (Rdiv 1 (3 ^ S n)) in H1.
         specialize (Hr3 (S n)).
         rewrite partial_sum3_succ in Hr3.
         destruct (u n); [ exfalso | easy ].
