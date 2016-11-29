@@ -608,16 +608,6 @@ intros.
 apply partial_sum3_aux_le_pow; lra.
 Qed.
 
-Theorem partial_sum3_le_1_6 : ∀ u k,
-  u O = false
-  → (partial_sum3 u k ≤ 1 / 6)%R.
-Proof.
-intros * Hb.
-unfold partial_sum3.
-destruct k; simpl; [ lra | rewrite Hb ].
-apply partial_sum3_aux_le_pow; lra.
-Qed.
-
 Theorem partial_sum3_aux_succ : ∀ u n pow i,
   partial_sum3_aux (S n) u pow i =
   (partial_sum3_aux n u pow i +
