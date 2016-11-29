@@ -1160,7 +1160,7 @@ Definition fixpoint_of_path el :=
   rotation_fixpoint (mat_of_path el) 1.
 
 Definition fixpoint_of_nat n :=
- fixpoint_of_path (path_of_nat n).
+  fixpoint_of_path (path_of_nat n).
 
 Theorem D_is_countable : is_countable _ eq D.
 Proof.
