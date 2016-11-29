@@ -570,6 +570,8 @@ Qed.
 (* End code Rémi Nollet *)
 
 Definition id {A} (a : A) := a.
+Definition b2r b := INR (Nat.b2n b).
+
 Theorem id_nat : ∀ e : ℕ, ∃ x : ℕ, id x = e.
 Proof. now intros; exists e. Qed.
 
@@ -586,7 +588,7 @@ Fixpoint partial_sum3_aux k (u : ℕ → bool) pow i :=
 
 Definition partial_sum3 u k := partial_sum3_aux k u 1%R 0.
 
-Theorem partial_sum3_aux_le_pow : ∀ u k pow pow2 i,
+Theorem partial_sum3_aux_le_half_pow : ∀ u k pow pow2 i,
   (0 <= pow)%R
   → pow2 = (pow / 2)%R
   → (partial_sum3_aux k u pow i <= pow2)%R.
@@ -726,7 +728,7 @@ destruct (le_dec k n) as [ Hkn | Hkn ].
     rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
     field_simplify; [ | apply pow_nonzero; lra ].
     rewrite Rdiv_1_r.
-    apply partial_sum3_aux_le_pow.
+    apply partial_sum3_aux_le_half_pow.
      unfold Rdiv; rewrite Rmult_1_l.
      apply Rmult_le_pos; [ | lra ].
      eapply Rmult_le_reg_l; [ | rewrite Rmult_0_r, Rinv_r; try lra ].
@@ -748,8 +750,6 @@ destruct (le_dec k n) as [ Hkn | Hkn ].
       simpl; unfold Rdiv.
       rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
 Qed.
-
-Definition b2r b := INR (Nat.b2n b).
 
 Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
   partial_sum3_aux (S k) u pow i =
@@ -949,7 +949,7 @@ induction n.
  specialize (Hk1 O); simpl in Hk1.
  unfold partial_sum3 in Hk1; simpl in Hk1.
  assert (H : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
-  intros k; apply partial_sum3_aux_le_pow; lra.
+  intros k; apply partial_sum3_aux_le_half_pow; lra.
 
   specialize (Hk2 (1 / 2)%R H).
   replace 0%R with (IZR 0) by easy.
@@ -974,7 +974,7 @@ set (E x := ∃ k, partial_sum3 u k = x).
 assert (Hb : bound E).
  exists (1 / 2)%R; subst E; simpl.
  intros r (k & H); subst r.
- apply partial_sum3_aux_le_pow; lra.
+ apply partial_sum3_aux_le_half_pow; lra.
 
  assert (He : ∃ r, E r).
   exists 0; subst E; simpl.
@@ -993,7 +993,7 @@ assert (Hb : bound E).
     assert (Hh : (r ≤ 1 / 2)%R).
      apply Hr2; unfold E; simpl.
      intros x (k & H); subst x.
-     apply partial_sum3_aux_le_pow; lra.
+     apply partial_sum3_aux_le_half_pow; lra.
 
      exists r; clear Hb He; simpl.
      split.
