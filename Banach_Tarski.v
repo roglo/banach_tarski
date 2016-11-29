@@ -602,12 +602,6 @@ destruct (u i).
  eapply Rle_trans; [ apply IHk; lra | lra ].
 Qed.
 
-Theorem partial_sum3_le_half : ∀ u k, (partial_sum3 u k ≤ 1 / 2)%R.
-Proof.
-intros.
-apply partial_sum3_aux_le_pow; lra.
-Qed.
-
 Theorem partial_sum3_aux_succ : ∀ u n pow i,
   partial_sum3_aux (S n) u pow i =
   (partial_sum3_aux n u pow i +
@@ -954,9 +948,12 @@ induction n.
  do 2 rewrite Rmult_1_r.
  specialize (Hk1 O); simpl in Hk1.
  unfold partial_sum3 in Hk1; simpl in Hk1.
- specialize (Hk2 (1 / 2)%R (partial_sum3_le_half u)).
- replace 0%R with (IZR 0) by easy.
- apply IZR_eq, Int_part_interv; simpl; lra.
+ assert (H : ∀ k, (partial_sum3 u k ≤ 1 / 2)%R).
+  intros k; apply partial_sum3_aux_le_pow; lra.
+
+  specialize (Hk2 (1 / 2)%R H).
+  replace 0%R with (IZR 0) by easy.
+  apply IZR_eq, Int_part_interv; simpl; lra.
 
  rewrite partial_sum3_succ.
  rewrite Rmult_plus_distr_r.
@@ -977,7 +974,7 @@ set (E x := ∃ k, partial_sum3 u k = x).
 assert (Hb : bound E).
  exists (1 / 2)%R; subst E; simpl.
  intros r (k & H); subst r.
- apply partial_sum3_le_half.
+ apply partial_sum3_aux_le_pow; lra.
 
  assert (He : ∃ r, E r).
   exists 0; subst E; simpl.
@@ -996,7 +993,7 @@ assert (Hb : bound E).
     assert (Hh : (r ≤ 1 / 2)%R).
      apply Hr2; unfold E; simpl.
      intros x (k & H); subst x.
-     apply partial_sum3_le_half.
+     apply partial_sum3_aux_le_pow; lra.
 
      exists r; clear Hb He; simpl.
      split.
