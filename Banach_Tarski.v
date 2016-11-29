@@ -883,7 +883,7 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  specialize (Hf (exist _ a Ha)).
  destruct Hf as (n, Hn).
  specialize (Hnn n).
- now rewrite Hn in Hnn.
+ now rewrite Hn in Hnn; apply Hnn.
 
  specialize
   (Cantor_gen ℕ ℕ point (setp sphere) id ter_bin_of_point id_nat
