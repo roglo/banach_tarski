@@ -20,9 +20,8 @@ Notation "x '≤' y" := (Rle x y) : R_scope.
 Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
  (at level 70, y at next level) : R_scope.
 
-
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%R.
-Proof. intros; lra. Qed.
+Proof. intros. now fold (Rminus x y). Qed.
 
 Theorem fold_Rdiv : ∀ x y, (x * / y = x / y)%R.
 Proof. easy. Qed.
@@ -40,7 +39,7 @@ rewrite Rmult_comm, <- Rmult_assoc.
 f_equal; apply Rmult_comm.
 Qed.
 
-Theorem Req_dec : ∀ x y : ℝ, { (x = y)%R } + { (x ≠ y)%R }.
+Theorem Req_dec : ∀ x y : ℝ, { x = y } + { x ≠ y }.
 Proof.
 intros x y.
 destruct (Rle_dec x y) as [H₁| H₁].

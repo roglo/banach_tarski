@@ -284,13 +284,16 @@ induction el as [| e₁]; intros.
  now apply path_of_nat_aux_cons.
 Qed.
 
+(*
 Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
+*)
+Definition is_countable A := ∃ f : ℕ → A, ∀ a, ∃ n, f n = a.
 
-Theorem paths_are_countable : is_countable (list free_elem) full_set.
+Theorem paths_are_countable : is_countable (list free_elem).
 Proof.
 unfold is_countable; simpl.
 exists path_of_nat.
-intros el _.
+intros el.
 destruct el as [| e el]; [ now exists O | ].
 enough (Hn : ∃ n, path_of_nat (S n) = e :: el).
  destruct Hn as (n, Hn).
@@ -836,22 +839,22 @@ destruct H as (x, H); exists x.
 intros n; apply H.
 Qed.
 
-Theorem R_not_countable : ¬ (is_countable ℝ full_set).
+Theorem R_not_countable : ¬ (is_countable ℝ).
 Proof.
 intros H.
 unfold is_countable in H.
 destruct H as (f, Hf).
-assert (Hcontr : ∃ a, a ∈ full_set ∧ ∀ n, f n ≠ a).
+assert (Hcontr : ∃ a, ∀ n, f n ≠ a).
  clear; simpl.
  specialize (Cantor_ℕ_ℝ f); intros (x & Hf).
- exists x; split; [ easy | ].
+ exists x.
  intros n; specialize (Hf n).
  now intros H; apply Hf.
 
- destruct Hcontr as (a & Ha & Hnn).
- apply Hf in Ha.
- destruct Ha as (n, Hn).
- now apply (Hnn n).
+ destruct Hcontr as (a & Ha).
+ specialize (Hf a).
+ destruct Hf as (n & Hf).
+ now apply (Ha n).
 Qed.
 
 Definition ter_bin_of_point '(P x y z) := ter_bin_of_frac_part x.
@@ -870,23 +873,23 @@ replace 1%R with (1 ^ 2)%R by lra.
 apply pow_incr; lra.
 Qed.
 
-Theorem sphere_not_countable : ¬ (is_countable _ sphere).
+Theorem sphere_not_countable : ¬ (is_countable {p : point | p ∈ sphere}).
 Proof.
 intros H.
 unfold is_countable in H.
 destruct H as (f, Hf).
-enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, f n ≠ a).
+enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  destruct Hcontr as (a & Ha & Hnn).
- apply Hf in Ha.
- destruct Ha as (n, Hn).
- eapply Hnn; eassumption.
+ specialize (Hf (exist _ a Ha)).
+ destruct Hf as (n, Hn).
+ specialize (Hnn n).
+ now rewrite Hn in Hnn.
 
  specialize
   (Cantor_gen ℕ ℕ point (setp sphere) id ter_bin_of_point id_nat
      ter_bin_of_sphere_surj).
  intros H.
- specialize (H f).
- destruct H as (p, H).
+ specialize (H (λ n, proj1_sig (f n))) as (p, H).
  exists p.
  split; [ apply (H O) | ].
  intros n Hn.
@@ -917,7 +920,7 @@ Definition map_empty_path_to_single el :=
 Definition fixpoint_of_nat n :=
   fixpoint_of_path (map_empty_path_to_single (norm_list (path_of_nat n))).
 
-Theorem D_is_countable : is_countable _ D.
+Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable, D; simpl.
 bbb.
