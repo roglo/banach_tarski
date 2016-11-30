@@ -35,27 +35,25 @@ Definition set_eq {A} (E₁ E₂ : set A) := ∀ x, x ∈ E₁ ↔ x ∈ E₂.
 
 Notation "E₁ = E₂" := (set_eq E₁ E₂) : set_scope.
 Notation "E₁ ≠ E₂" := (¬ set_eq E₁ E₂) : set_scope.
-Notation "E₁ '∩' E₂" := (intersection E₁ E₂)
-  (at level 40, left associativity).
-Notation "E₁ '∪' E₂" := (union E₁ E₂)
-  (at level 50, left associativity).
+Notation "E₁ '∩' E₂" := (intersection E₁ E₂) (at level 40).
+Notation "E₁ '∪' E₂" := (union E₁ E₂) (at level 50).
 Notation "E₁ '∖' E₂" := (subtract E₁ E₂) (at level 50).
 Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60).
 Notation "'⋃' Es" := (union_list Es) (at level 55).
 Notation "E .[ i ]" := (List.nth i E ∅)
   (at level 1, format "'[' E '[' .[ i ] ']' ']'").
 
-Theorem set_eq_refl A : reflexive _ (@set_eq A).
+Theorem set_eq_refl A : reflexive (set A) set_eq.
 Proof. now intros P x; split. Qed.
 
-Theorem set_eq_sym A : symmetric _ (@set_eq A).
+Theorem set_eq_sym A : symmetric (set A) set_eq.
 Proof.
 intros P₁ P₂ HPP x.
 destruct (HPP x) as (H₁, H₂).
 split; intros H; [ apply H₂, H | apply H₁, H ].
 Qed.
 
-Theorem set_eq_trans A : transitive _ (@set_eq A).
+Theorem set_eq_trans A : transitive (set A) set_eq.
 Proof.
 intros P₁ P₂ P₃ H₁₂ H₂₃ x.
 destruct (H₁₂ x) as (H₁, H₂).
