@@ -12,12 +12,6 @@ Require Import Reals Psatz Nsatz.
 Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 
-Notation "x '≤' y" := (Rle x y) : R_scope.
-Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
- (at level 70, y at next level) : R_scope.
-Notation "x '≤' y '≤' z" := (Rle x y ∧ Rle y z)
- (at level 70, y at next level) : R_scope.
-
 Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
   → ((x - 6)² + y² + z² <= 1)%R
@@ -281,9 +275,6 @@ induction el as [| e₁]; intros.
  now apply path_of_nat_aux_cons.
 Qed.
 
-(*
-Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
-*)
 Definition is_countable A := ∃ f : ℕ → A, ∀ a, ∃ n, f n = a.
 
 Theorem paths_are_countable : is_countable (list free_elem).
