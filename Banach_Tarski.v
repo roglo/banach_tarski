@@ -33,10 +33,9 @@ destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
 Qed.
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
-  equidecomposable set_equiv sphere_but_fixpoints
+  equidecomposable sphere_but_fixpoints
     (xtransl 3 sphere_but_fixpoints ∪ xtransl 6 sphere_but_fixpoints)%S.
 Proof.
-set (s := set_equiv).
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
 destruct H as (f & Hu & Hm).
 remember (mkcf _ _ f Hm Hu) as Hosf.
@@ -55,16 +54,14 @@ split.
  eapply r_decomposed_4; now try eassumption.
 
  split.
-  subst s; remember set_equiv as s eqn:Hs.
   pose proof r_decomposed_2_a f Hosf os Hos as Ha.
   pose proof r_decomposed_2_b f Hosf os Hos as Hb.
-  subst s; set (s := set_equiv).
   eapply partition_group_map with (g := Xtransl 3) in Ha; try eassumption.
   eapply partition_group_map with (g := Xtransl 6) in Hb; try eassumption.
   eapply partition_union in Hb; [ | | apply Ha ].
    apply Hb.
 
-   unfold intersection, set_eq; subst s; intros (x, y, z).
+   unfold intersection, set_eq; intros (x, y, z).
    split; [ intros (H₁, H₂) | easy ].
    simpl in H₁, H₂.
    unfold empty_set; simpl.
@@ -82,12 +79,12 @@ Qed.
 
 Check Banach_Tarski_paradox_but_fixpoints.
 
-Theorem equidec_union : ∀ (s := set_equiv) E₁ E₂ F₁ F₂,
+Theorem equidec_union : ∀ E₁ E₂ F₁ F₂,
   (E₁ ∩ F₁ = ∅)%S
   → (E₂ ∩ F₂ = ∅)%S
-  → equidecomposable set_equiv E₁ E₂
-  → equidecomposable set_equiv F₁ F₂
-  → equidecomposable set_equiv (E₁ ∪ F₁) (E₂ ∪ F₂).
+  → equidecomposable E₁ E₂
+  → equidecomposable F₁ F₂
+  → equidecomposable (E₁ ∪ F₁) (E₂ ∪ F₂).
 Proof.
 intros * HEF₁ HEF₂ HE HF.
 destruct HE as (PE₁ & PE₂ & HE₁ & HE₂ & HE).
@@ -100,8 +97,8 @@ now apply Forall2_app.
 Qed.
 
 Theorem equidec_transl : ∀ dx E F,
-  equidecomposable set_equiv E F
-  → equidecomposable set_equiv (xtransl dx E) (xtransl dx F).
+  equidecomposable E F
+  → equidecomposable (xtransl dx E) (xtransl dx F).
 Proof.
 intros * HEF.
 destruct HEF as (PE & PF & HPE & HPF & HEF).
@@ -127,7 +124,7 @@ rewrite xtransl_xtransl, Rplus_opp_l.
 now rewrite xtransl_0, HEF₁.
 Qed.
 
-Theorem separated_spheres_without_fixpoints : ∀ (s := set_equiv),
+Theorem separated_spheres_without_fixpoints :
   (xtransl 3 sphere_but_fixpoints ∩ xtransl 6 sphere_but_fixpoints = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6); simpl | easy ].
@@ -138,7 +135,7 @@ destruct H6 as (H6, _).
 now apply (Rno_intersect_spheres_x3_x6 x y z).
 Qed.
 
-Theorem separated_spheres : ∀ (s := set_equiv),
+Theorem separated_spheres :
   (xtransl 3 sphere ∩ xtransl 6 sphere = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6) | easy ].
@@ -278,9 +275,6 @@ induction el as [| e₁]; intros.
  now apply path_of_nat_aux_cons.
 Qed.
 
-(*
-Definition is_countable U A := ∃ f : ℕ → U, ∀ a, a ∈ A → ∃ n, f n = a.
-*)
 Definition is_countable A := ∃ f : ℕ → A, ∀ a, ∃ n, f n = a.
 
 Theorem paths_are_countable : is_countable (list free_elem).
@@ -641,7 +635,8 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
     rewrite pow_INR; simpl.
     replace (2 + 1)%R with 3%R by lra.
     replace (- 3 ^ n)%R with ((- 1) * 3 ^ n)%R by lra.
-    rewrite <- Rmult_assoc, <- Rmult_plus_distr_r, fold_Rminus.
+    rewrite <- Rmult_assoc, <- Rmult_plus_distr_r.
+    fold (Rminus (r * 3) 1).
     apply IHn; [ unfold partial_sum3; lra | ].
     unfold partial_sum3.
     set (x := partial_sum3_aux (S n) v 1 0) in *.
@@ -778,7 +773,7 @@ assert (Hb : bound E).
         rewrite Rmult_assoc in H1.
         rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
         replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
-        rewrite fold_Rdiv in H1.
+        fold (Rdiv 1 (3 ^ S n)) in H1.
         specialize (Hr3 (S n)).
         rewrite partial_sum3_succ in Hr3.
         destruct (u n); [ exfalso | easy ].
@@ -877,7 +872,7 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  specialize (Hf (exist _ a Ha)).
  destruct Hf as (n, Hn).
  specialize (Hnn n).
- now rewrite Hn in Hnn.
+ now rewrite Hn in Hnn; apply Hnn.
 
  specialize
   (Cantor_gen ℕ ℕ point (setp sphere) id ter_bin_of_point id_nat
@@ -929,8 +924,8 @@ SearchAbout FinFun.Surjective.
    least one element; if D is countable, ℝ ∖ D countains at least one
    element *)
 
-Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
-  equidecomposable _ sphere sphere_but_fixpoints.
+Theorem equidec_sphere_with_and_without_fixpoints :
+  equidecomposable sphere sphere_but_fixpoints.
 Proof.
 intros.
 assert (∃ p₁, p₁ ∈ sphere ∖ D).
@@ -951,8 +946,8 @@ bbb.
 assert (∃ p₁ θ, ∀ p n, p ∈ D → p ∉ rotate_set p₁ (INR n * θ) D).
 bbb.
 
-Theorem Banach_Tarski_paradox : ∀ (s := set_equiv),
-  equidecomposable _ sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
+Theorem Banach_Tarski_paradox :
+  equidecomposable sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
 Proof.
 transitivity sphere_but_fixpoints.
  apply equidec_sphere_with_and_without_fixpoints.

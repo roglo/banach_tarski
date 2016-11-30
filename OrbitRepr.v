@@ -209,11 +209,11 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
 Qed.
 
 Theorem r_decomposed_5 :
-  ∀ (s := set_equiv) f, orbit_selector f
+  ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints [M; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros s f (Hoe, Ho) os Hos; subst os s.
+intros f (Hoe, Ho) os Hos; subst os.
 split.
 *intros p.
  split.
@@ -364,12 +364,12 @@ split.
 Qed.
 
 Theorem r_decomposed_4 :
-  ∀ (s := set_equiv) f, orbit_selector f
+  ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints
       [M ∪ SS ạ ∪ B; SS ạ⁻¹ ∖ B; SS ḅ; SS ḅ⁻¹].
 Proof.
-intros s f HoeHo os Hos.
+intros f HoeHo os Hos.
 pose proof r_decomposed_5 f HoeHo os Hos as H.
 destruct HoeHo as (Hoe, Ho).
 eapply is_partition_group_first_2_together in H.
@@ -384,12 +384,12 @@ apply is_partition_union_subtract; [ easy | | ].
 Qed.
 
 Theorem r_decomposed_2 :
-  ∀ (s := set_equiv) f, orbit_selector f
+  ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → ∀ e,
     is_partition sphere_but_fixpoints [SS e; rot e (SS (negf e))].
 Proof.
-intros s f (Hoe, Ho) os Hos e; subst os s.
+intros f (Hoe, Ho) os Hos e; subst os.
 split.
 *intros p.
  split.
@@ -481,7 +481,7 @@ split.
 Qed.
 
 Add Parametric Morphism {A} : (@List.nth (set A))
-  with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  with signature eq ==> eq ==> set_eq ==> set_eq
   as nth_set_morph.
 Proof.
 intros i l a b Hab.
@@ -499,11 +499,11 @@ apply app_repeat_diag.
 Qed.
 
 Theorem r_decomposed_2_a :
-  ∀ (s := set_equiv) f, orbit_selector f
+  ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints [M ∪ SS ạ ∪ B; rot ạ (SS ạ⁻¹ ∖ B)].
 Proof.
-intros s f (Hoe, Ho) os Hos; subst s.
+intros f (Hoe, Ho) os Hos.
 split.
 *intros p.
  assert (Hfr : f (rotate ạ⁻¹ p) = f p).
@@ -641,7 +641,7 @@ split.
 Qed.
 
 Theorem r_decomposed_2_b :
-  ∀ (s := set_equiv) f, orbit_selector f
+  ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition sphere_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
 Proof.

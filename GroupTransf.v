@@ -40,10 +40,10 @@ Fixpoint gr_inv f :=
 Definition gr_ident := Xtransl 0.
 Definition app_gr_inv g := app_gr (gr_inv g).
 
-Theorem gr_subst : ∀ (s := set_equiv) g E F,
+Theorem gr_subst : ∀ g E F,
   (E = F)%S → ∀ p, p ∈ app_gr g E → p ∈ app_gr g F.
 Proof.
-intros s * HEF * HE.
+intros * HEF * HE.
 revert E F p HEF HE.
 induction g as [ e| dx | g IHg h IHh]; intros.
  apply HEF, HE.
@@ -57,20 +57,20 @@ induction g as [ e| dx | g IHg h IHh]; intros.
  eapply IHh; [ symmetry; eassumption | eassumption ].
 Qed.
 
-Theorem xtransl_0 : ∀ (s := set_equiv) E, (xtransl 0 E = E)%S.
+Theorem xtransl_0 : ∀ E, (xtransl 0 E = E)%S.
 Proof.
 intros; intros (x, y, z); simpl.
 now unfold Rminus; rewrite Ropp_0, Rplus_0_r.
 Qed.
 
-Theorem xtransl_xtransl : ∀ (s := set_equiv) E dx dy,
+Theorem xtransl_xtransl : ∀ E dx dy,
   (xtransl dx (xtransl dy E) = xtransl (dx + dy) E)%S.
 Proof.
 intros; intros (x, y, z); simpl.
 now replace (x - dx - dy)%R with (x - (dx + dy))%R by lra.
 Qed.
 
-Theorem app_gr_ident : ∀ (s := set_equiv) E, (app_gr gr_ident E = E)%S.
+Theorem app_gr_ident : ∀ E, (app_gr gr_ident E = E)%S.
 Proof.
 intros.
 unfold gr_ident; simpl.
@@ -79,7 +79,7 @@ intros (x, y, z); simpl.
 now rewrite Rminus_0_r.
 Qed.
 
-Theorem app_gr_nth : ∀ (s := set_equiv) E fl i,
+Theorem app_gr_nth : ∀ E fl i,
   (app_gr (List.nth i fl gr_ident) E =
    List.nth i (map app_gr fl) Datatypes.id E)%S.
 Proof.
@@ -92,7 +92,7 @@ induction fl as [| f₁ fl]; intros.
  destruct i; [ easy | apply IHfl ].
 Qed.
 
-Theorem app_gr_nth_inv : ∀ (s := set_equiv) E fl i,
+Theorem app_gr_nth_inv : ∀ E fl i,
   (app_gr (List.nth i (map gr_inv fl) gr_ident) E =
    List.nth i (map app_gr_inv fl) Datatypes.id E)%S.
 Proof.
@@ -112,7 +112,7 @@ f_equal; apply Ropp_0.
 Qed.
 
 Add Parametric Morphism : app_gr
-with signature eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+with signature eq ==> set_eq ==> set_eq
 as app_gr_morph.
 Proof.
 intros g p q Hpq r.
@@ -121,7 +121,7 @@ symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
 Add Parametric Morphism : app_gr_inv
-with signature eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+with signature eq ==> set_eq ==> set_eq
 as app_gr_inv_morph.
 Proof.
 intros g p q Hpq r.
@@ -130,7 +130,7 @@ symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
 Add Parametric Morphism : xtransl
-  with signature eq ==> @set_eq _ set_equiv ==> @set_eq _ set_equiv
+  with signature eq ==> set_eq ==> set_eq
   as xtransl_morph.
 Proof.
 intros dx E F HEF (x, y, z); simpl; now rewrite HEF.
@@ -139,7 +139,7 @@ Qed.
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
 Proof. easy. Qed.
 
-Theorem app_gr_inv_l : ∀ (s := set_equiv) g E,
+Theorem app_gr_inv_l : ∀ g E,
   (app_gr_inv g (app_gr g E) = E)%S.
 Proof.
 intros.
@@ -160,7 +160,7 @@ induction g; intros; simpl.
   rewrite IHg1; apply IHg2, H.
 Qed.
 
-Theorem app_gr_inv_r : ∀ (s := set_equiv) g E,
+Theorem app_gr_inv_r : ∀ g E,
   (app_gr g (app_gr_inv g E) = E)%S.
 Proof.
 intros.
@@ -181,7 +181,7 @@ induction g; intros; simpl.
   rewrite IHg2; apply IHg1, H.
 Qed.
 
-Theorem inv_app_gr : ∀ (s := set_equiv) g E F,
+Theorem inv_app_gr : ∀ g E F,
   (app_gr g E = F)%S → (app_gr_inv g F = E)%S.
 Proof.
 intros * Ha.
@@ -199,9 +199,9 @@ apply IHg1 in Hp.
 now apply IHg2 in Hp.
 Qed.
 
-Theorem app_gr_empty_set : ∀ (s := set_equiv) f, (app_gr f ∅ = ∅)%S.
+Theorem app_gr_empty_set : ∀ f, (app_gr f ∅ = ∅)%S.
 Proof.
-intros s * p.
+intros * p.
 split; intros H; [ | easy ].
 revert p H.
 induction f; intros; try easy; [ now destruct p | ].
@@ -210,7 +210,7 @@ eapply gr_subst in H; [ now apply IHf1 in H | ].
 split; [ apply IHf2 | easy ].
 Qed.
 
-Theorem app_gr_app_gr_inv : ∀ (s := set_equiv) E g,
+Theorem app_gr_app_gr_inv : ∀ E g,
   (app_gr g (app_gr_inv g E) = E)%S.
 Proof.
 intros.
@@ -230,7 +230,7 @@ induction g; intros.
  apply IHg1.
 Qed.
 
-Theorem app_gr_inv_app_gr : ∀ (s := set_equiv) E g,
+Theorem app_gr_inv_app_gr : ∀ E g,
   (app_gr_inv g (app_gr g E) = E)%S.
 Proof.
 intros.
@@ -250,7 +250,7 @@ induction g; intros.
  apply IHg2.
 Qed.
 
-Theorem group_intersection_distr : ∀ (s := set_equiv) g E F,
+Theorem group_intersection_distr : ∀ g E F,
   (app_gr g (E ∩ F) = app_gr g E ∩ app_gr g F)%S.
 Proof.
 intros.
@@ -259,7 +259,7 @@ induction g; intros; [ easy | now intros (x, y, z) | ].
 intros p; simpl; now rewrite IHg2, IHg1.
 Qed.
 
-Theorem group_union_distr : ∀ (s := set_equiv) g E F,
+Theorem group_union_distr : ∀ g E F,
   (app_gr g (E ∪ F) = app_gr g E ∪ app_gr g F)%S.
 Proof.
 intros.
@@ -268,7 +268,7 @@ induction g; intros; [ easy | now intros (x, y, z) | ].
 now intros p; simpl; rewrite IHg2, IHg1.
 Qed.
 
-Theorem group_union_list_distr : ∀ (s := set_equiv) f EL,
+Theorem group_union_list_distr : ∀ f EL,
   (app_gr f (⋃ EL) = ⋃ map (app_gr f) EL)%S.
 Proof.
 intros.
@@ -314,10 +314,10 @@ split; intros HEF.
   intros q Hq; eapply IHg1; eassumption.
 Qed.
 
-Theorem partition_group_map : ∀ (s := set_equiv) (F : set point) P g,
+Theorem partition_group_map : ∀ (F : set point) P g,
   is_partition F P → is_partition (app_gr g F) (map (app_gr g) P).
 Proof.
-intros s F P * HP.
+intros F P * HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
