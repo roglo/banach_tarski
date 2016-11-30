@@ -10,12 +10,12 @@ Import ListNotations.
 
 Require Import Pset.
 
-Definition is_partition {A} {S : set_model A} E Ep :=
+Definition is_partition {A} (E : set A) (Ep : list (set A)) :=
   (E = ⋃ Ep)%S ∧
   ∀ i j, i ≠ j → (Ep.[i] ∩ Ep.[j] = ∅)%S.
 
 Theorem is_partition_group_first_2_together :
-  ∀ A (s := set_equiv) (F : set A) P₁ P₂ Pl,
+  ∀ A (F : set A) P₁ P₂ Pl,
   is_partition F (P₁ :: P₂ :: Pl)
   → is_partition F (P₁ ∪ P₂ :: Pl).
 Proof.
@@ -23,7 +23,7 @@ intros * Hp.
 destruct Hp as (Hu & Hi).
 split.
  unfold union_list, union, set_eq in Hu |-*.
- subst s; simpl in Hu |-*.
+ simpl in Hu |-*.
  intros x.
  pose proof Hu x as H₁.
  destruct H₁ as (H₁ & H₂).
@@ -37,7 +37,7 @@ split.
   destruct H as [[H| H]| H]; [ now left | right; now left | ].
   right; now right.
 
- intros i j Hij; subst s.
+ intros i j Hij.
  destruct i.
   unfold intersection, set_eq; simpl.
   intros x.
@@ -78,17 +78,17 @@ split.
 Qed.
 
 Theorem is_partition_union_subtract :
-  ∀ A (s := set_equiv) (F : set A) P₁ P₂ Pl (B : set A),
+  ∀ A (F : set A) P₁ P₂ Pl (B : set A),
   is_partition F (P₁ :: P₂ :: Pl)
   → (B ⊂ P₂)%S
   → (∀ x, Decidable.decidable (x ∈ B))
   → is_partition F (P₁ ∪ B :: P₂ ∖ B :: Pl)%S.
 Proof.
-intros A s F P₁ P₂ Pl B Hp HB HBdec.
+intros A F P₁ P₂ Pl B Hp HB HBdec.
 destruct Hp as (Hu & Hi).
 split.
  unfold union_list, union, subtract, set_eq in Hu |-*.
- subst s; simpl in Hu |-*.
+ simpl in Hu |-*.
  intros x.
  split; intros H.
   pose proof Hu x as H₁.
@@ -107,7 +107,7 @@ split.
 
    right; now right.
 
- intros i j Hij; subst s.
+ intros i j Hij.
  destruct i.
   unfold intersection, union, subtract, set_eq; simpl.
   intros x.
@@ -157,7 +157,7 @@ split.
 Qed.
 
 Theorem partition_union :
-  ∀ A (s := set_equiv) (F₁ F₂ : set A) P₁ P₂,
+  ∀ A (F₁ F₂ : set A) P₁ P₂,
   (F₁ ∩ F₂ = ∅)%S
   → is_partition F₁ P₁
   → is_partition F₂ P₂
@@ -167,7 +167,7 @@ intros * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
- subst s; rewrite union_list_app; [ | easy ].
+ rewrite union_list_app.
  transitivity (F₁ ∪ ⋃ P₂).
   intros x.
   split; intros H.
@@ -185,7 +185,7 @@ split.
    now apply HF₁.
 
  intros * Hij.
- unfold intersection, set_eq; subst s; simpl.
+ unfold intersection, set_eq; simpl.
  intros x.
  split; intros H; [ | easy ].
  destruct H as (H₁, H₂).
@@ -231,7 +231,7 @@ split.
    easy.
 Qed.
 
-Theorem is_partition_single : ∀ A (s := @set_equiv A) E, is_partition E [E].
+Theorem is_partition_single : ∀ A (E : set A), is_partition E [E].
 Proof.
 intros.
 split; [ symmetry; now eapply union_empty_r | ].
@@ -246,7 +246,7 @@ destruct i.
  now destruct i.
 Qed.
 
-Theorem is_partition_empty : ∀ A (s := set_equiv) (E : set A),
+Theorem is_partition_empty : ∀ A (E : set A),
   is_partition E [] → (E = ∅)%S.
 Proof.
 intros * HP.
@@ -254,8 +254,8 @@ destruct HP as (HE & _).
 easy.
 Qed.
 
-Add Parametric Morphism {A} : (@is_partition A set_equiv)
- with signature (@set_eq _ set_equiv) ==> eq ==> iff
+Add Parametric Morphism {A} : (@is_partition A)
+ with signature set_eq ==> eq ==> iff
  as is_partition_morph.
 Proof.
 intros E F HEF SL.

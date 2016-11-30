@@ -10,11 +10,11 @@ Require Import Reals.Rdefinitions.
 Require Import Misc Matrix Pset.
 Require Import Partition OrbitRepr GroupTransf.
 
-Definition equidecomposable (s : set_model point) E₁ E₂ :=
+Definition equidecomposable E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧
   List.Forall2 (λ S₁ S₂, ∃ g, (app_gr g S₁ = S₂)%S) P₁ P₂.
 
-Theorem equidec_refl : reflexive _ (equidecomposable set_equiv).
+Theorem equidec_refl : reflexive _ equidecomposable.
 Proof.
 intros E.
 exists (E :: []), (E :: []).
@@ -26,7 +26,7 @@ unfold xtransl; intros (x, y, z).
 now rewrite RIneq.Rminus_0_r.
 Qed.
 
-Theorem equidec_sym : symmetric _ (equidecomposable set_equiv).
+Theorem equidec_sym : symmetric _ equidecomposable.
 Proof.
 intros E F (P₁ & P₂ & HP₁ & HP₂ & HEF).
 exists P₂, P₁.
@@ -46,7 +46,7 @@ Definition partition_combine_swi {A B} (fl : list (set A → set B)) PE PF :=
   flat_map (λ Fj, map (λ '(fi, Ei), Ei ∩ fi Fj) (combine fl PE)) PF.
 
 Theorem partition_combine_nth :
-  ∀ A (s := set_equiv) fl (PE : list (set A)) PF i len,
+  ∀ A fl (PE : list (set A)) PF i len,
   len = length PF
   → length fl = length PE
   → (∀ f, List.In f fl → (f ∅ = ∅)%S)
@@ -118,7 +118,7 @@ induction PE as [| E₁ PE]; intros.
 Qed.
 
 Theorem partition_combine_swi_nth :
-  ∀ A (s := set_equiv) fl (PE : list (set A)) PF i len,
+  ∀ A fl (PE : list (set A)) PF i len,
   len = length PE
   → length fl = length PE
   → (∀ f, List.In f fl → (f ∅ = ∅)%S)
@@ -212,7 +212,7 @@ induction PF as [| F₁ PF]; intros.
 Qed.
 
 Theorem partition_combine_is_partition :
-  ∀ (s := set_equiv) E F PE PF P'F gl,
+  ∀ E F PE PF P'F gl,
   is_partition E PE
   → is_partition F PF
   → length PE = length PF
@@ -237,7 +237,7 @@ split.
 
   destruct gl as [| g₁ gl]; [ easy | ].
   rewrite HPEU; simpl.
-  rewrite union_list_app; [ | easy ].
+  rewrite union_list_app.
   simpl in Hlen3; apply Nat.succ_inj in Hlen3.
   apply union_morph.
    pose proof union_intersection_self point E₁ (map (app_gr_inv g₁) P'F).
@@ -346,7 +346,7 @@ now simpl; rewrite IHla; destruct a.
 Qed.
 
 Theorem permuted_partition_is_partition :
-  ∀ A (s := set_equiv) (E : set A) PE P'E,
+  ∀ A (E : set A) PE P'E,
   Permutation PE P'E
   → is_partition E PE
   → is_partition E P'E.
@@ -394,7 +394,7 @@ split.
 Qed.
 
 Theorem partition_combine_partition_combine_swi :
-  ∀ A (s := set_equiv) E (fl : list (set A → set A)) PE P'F,
+  ∀ A E (fl : list (set A → set A)) PE P'F,
   is_partition E (partition_combine fl PE P'F)
   → is_partition E (partition_combine_swi fl PE P'F).
 Proof.
@@ -405,7 +405,7 @@ apply partition_combine_swi_is_permutation.
 Qed.
 
 Theorem partition_combine_swi_is_partition :
-  ∀ (s := set_equiv) E F PE PF P'F gl,
+  ∀ E F PE PF P'F gl,
   is_partition E PE
   → is_partition F PF
   → length PE = length PF
@@ -456,7 +456,7 @@ Qed.
 Require Import Setoid.
 Add Parametric Morphism :
   (λ n fl, @nth (set point → set point) n (map app_gr_inv fl) id)
-  with signature eq ==> eq ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  with signature eq ==> eq ==> set_eq ==> set_eq
   as nth_map_app_gr_inv_morph.
 Proof.
 intros n fl E F HEF x.
@@ -476,13 +476,12 @@ split; intros Hx.
   now destruct n; [ rewrite HEF | apply IHfl ].
 Qed.
 
-Theorem equidec_trans : transitive _ (equidecomposable set_equiv).
+Theorem equidec_trans : transitive _ equidecomposable.
 Proof.
 intros E F G HEF HFG.
 unfold equidecomposable.
 destruct HEF as (PE & P₁F & HPE & HP₁F & HEF).
 destruct HFG as (P₂F & PG & HP₂F & HPG & HFG).
-set (s := set_equiv).
 assert
   (Hgl : ∃ gl, length gl = length PE ∧
    ∀ i, (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i P₁F ∅)%S).
@@ -664,7 +663,7 @@ assert
        now subst g'l; rewrite map_length.
 Qed.
 
-Add Parametric Relation : (set point) (equidecomposable set_equiv)
+Add Parametric Relation : (set point) equidecomposable
  reflexivity proved by equidec_refl
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans

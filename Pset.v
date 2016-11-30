@@ -7,9 +7,6 @@ Record set A := mkset { setp : A → Prop }.
 Arguments mkset [A] _.
 Arguments setp [A] _ _.
 
-Class set_model A := mksm { set_eq : set A → set A → Prop }.
-Arguments set_eq : simpl never.
-
 Definition empty_set {A} := mkset (λ _ : A, False).
 
 Notation "x '∈' E" := (setp E x) (at level 60).
@@ -34,8 +31,10 @@ Arguments included : simpl never.
 
 Delimit Scope set_scope with S.
 
-Notation "a = b" := (set_eq a b) : set_scope.
-Notation "a ≠ b" := (¬ set_eq a b) : set_scope.
+Definition set_eq {A} (E₁ E₂ : set A) := ∀ x, x ∈ E₁ ↔ x ∈ E₂.
+
+Notation "E₁ = E₂" := (set_eq E₁ E₂) : set_scope.
+Notation "E₁ ≠ E₂" := (¬ set_eq E₁ E₂) : set_scope.
 Notation "E₁ '∩' E₂" := (intersection E₁ E₂)
   (at level 40, left associativity).
 Notation "E₁ '∪' E₂" := (union E₁ E₂)
@@ -46,19 +45,17 @@ Notation "'⋃' Es" := (union_list Es) (at level 55).
 Notation "E .[ i ]" := (List.nth i E ∅)
   (at level 1, format "'[' E '[' .[ i ] ']' ']'").
 
-Definition set_equiv {A} := mksm A (λ (E₁ E₂ : set A), ∀ x, x ∈ E₁ ↔ x ∈ E₂).
-
-Theorem set_eq_refl A : reflexive _ (@set_eq A set_equiv).
+Theorem set_eq_refl A : reflexive _ (@set_eq A).
 Proof. now intros P x; split. Qed.
 
-Theorem set_eq_sym A : symmetric _ (@set_eq A set_equiv).
+Theorem set_eq_sym A : symmetric _ (@set_eq A).
 Proof.
 intros P₁ P₂ HPP x.
 destruct (HPP x) as (H₁, H₂).
 split; intros H; [ apply H₂, H | apply H₁, H ].
 Qed.
 
-Theorem set_eq_trans A : transitive _ (@set_eq A set_equiv).
+Theorem set_eq_trans A : transitive _ (@set_eq A).
 Proof.
 intros P₁ P₂ P₃ H₁₂ H₂₃ x.
 destruct (H₁₂ x) as (H₁, H₂).
@@ -66,13 +63,13 @@ destruct (H₂₃ x) as (H₃, H₄).
 split; intros H; [ apply H₃, H₁, H | apply H₂, H₄, H ].
 Qed.
 
-Add Parametric Relation A : (set A) (@set_eq A set_equiv)
+Add Parametric Relation A : (set A) (@set_eq A)
  reflexivity proved by (set_eq_refl A)
  symmetry proved by (set_eq_sym A)
  transitivity proved by (set_eq_trans A)
  as set_eq_rel.
 
-Theorem eq_set_eq : ∀ A (s := set_equiv) (x y : set A), x = y → (x = y)%S.
+Theorem eq_set_eq : ∀ A (x y : set A), x = y → (x = y)%S.
 Proof. intros; now subst x. Qed.
 
 Theorem included_trans A : transitive _ (@included A).
@@ -81,7 +78,7 @@ intros E F G HEF HFG x Hx.
 apply HFG, HEF, Hx.
 Qed.
 
-Theorem included_in_empty : ∀ A (s := set_equiv) (E : set A),
+Theorem included_in_empty : ∀ A (E : set A),
   E ⊂ ∅
   → (E = ∅)%S.
 Proof.
@@ -92,8 +89,7 @@ now apply HE in Hx.
 Qed.
 
 Add Parametric Morphism {A} : (@intersection A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  with signature set_eq ==> set_eq ==> set_eq
   as intersection_morph.
 Proof.
 intros E E' HE F F' HF.
@@ -104,8 +100,7 @@ split; intros (H₁, H₂).
 Qed.
 
 Add Parametric Morphism {A} : (@union A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  with signature set_eq ==> set_eq ==> set_eq
   as union_morph.
 Proof.
 intros E E' HE F F' HF.
@@ -116,8 +111,7 @@ split.
 Qed.
 
 Add Parametric Morphism {A} : (@subtract A)
-  with signature
-    (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv)
+  with signature set_eq ==> set_eq ==> set_eq
   as subtract_morph.
 Proof.
 intros E E' HE F F' HF.
@@ -128,62 +122,59 @@ split; intros (H₁, H₂).
 Qed.
 
 Add Parametric Morphism {A} : (@included A)
-  with signature (@set_eq _ set_equiv) ==> (@set_eq _ set_equiv) ==> iff
+  with signature set_eq ==> set_eq ==> iff
   as included_morph.
 Proof.
 intros E F HEF E' F' HE'F'.
 split; intros HEE' x HF; apply HE'F', HEE', HEF, HF.
 Qed.
 
-Theorem fold_set_eq : ∀ A (s := set_equiv) (P Q : set A),
+Theorem fold_set_eq : ∀ A (P Q : set A),
   (∀ x, x ∈ P ↔ x ∈ Q) = (P = Q)%S.
 Proof. easy. Qed.
 
-Theorem set_eq_equiv {A} : ∀ (s := set_equiv) (E F : set A),
+Theorem set_eq_equiv {A} : ∀ (E F : set A),
   (E = F)%S
   → ∀ p, p ∈ E ↔ p ∈ F.
 Proof. intros s * HEF; apply HEF. Qed.
 
-Theorem union_empty_r : ∀ A (s := set_equiv) (F : set A),
+Theorem union_empty_r : ∀ A (F : set A),
   (F ∪ ∅ = F)%S.
 Proof.
-intros.
-subst s; intros x.
+intros * x.
 split; intros H; [ | now left ].
 now destruct H.
 Qed.
 
-Theorem intersection_empty_l : ∀ A (s := set_equiv) (F : set A),
+Theorem intersection_empty_l : ∀ A (F : set A),
   (∅ ∩ F = ∅)%S.
 Proof.
-intros.
-subst s; intros x.
+intros * x.
 split; intros H; [ now destruct H as (H, _) | easy ].
 Qed.
 
-Theorem intersection_empty_r : ∀ A (s := set_equiv) (F : set A),
+Theorem intersection_empty_r : ∀ A (F : set A),
   (F ∩ ∅ = ∅)%S.
 Proof.
-intros.
-subst s; intros x.
+intros * x.
 split; intros H; [ now destruct H as (_, H) | easy ].
 Qed.
 
-Theorem intersection_comm : ∀ A (s := set_equiv) (E F : set A),
+Theorem intersection_comm : ∀ A (E F : set A),
   (E ∩ F = F ∩ E)%S.
 Proof.
 intros; intros x.
 split; intros H; destruct H as (HE & HF); now split.
 Qed.
 
-Theorem union_comm : ∀ A (s := set_equiv) (E F : set A),
+Theorem union_comm : ∀ A (E F : set A),
   (E ∪ F = F ∪ E)%S.
 Proof.
 intros; intros x.
 now split; intros [HE| HF]; [ right | left | right | left ] .
 Qed.
 
-Theorem intersection_assoc : ∀ A (s := set_equiv) (E F G : set A),
+Theorem intersection_assoc : ∀ A (E F G : set A),
   (E ∩ (F ∩ G) = (E ∩ F) ∩ G)%S.
 Proof.
 intros; intros x.
@@ -195,7 +186,7 @@ split; intros H.
  split; [ easy | now split ].
 Qed.
 
-Theorem union_assoc : ∀ A (s := set_equiv) (E F G : set A),
+Theorem union_assoc : ∀ A (E F G : set A),
   (E ∪ (F ∪ G) = (E ∪ F) ∪ G)%S.
 Proof.
 intros; intros x.
@@ -211,7 +202,7 @@ split; intros H.
   right; now right.
 Qed.
 
-Theorem intersection_shuffle0 : ∀ A (s := set_equiv) (E F G : set A),
+Theorem intersection_shuffle0 : ∀ A (E F G : set A),
   (E ∩ F ∩ G = E ∩ G ∩ F)%S.
 Proof.
 intros; intros x.
@@ -223,7 +214,7 @@ split; intros H.
  split; [ now split | easy ].
 Qed.
 
-Theorem union_is_empty : ∀ A (s := set_equiv) (E F : set A),
+Theorem union_is_empty : ∀ A (E F : set A),
   (E ∪ F = ∅)%S → (E = ∅)%S ∧ (F = ∅)%S.
 Proof.
 intros * HEF.
@@ -232,7 +223,7 @@ split; intros x.
  split; [ intros Hx; apply HEF; now right | easy ].
 Qed.
 
-Theorem union_list_is_empty_iff : ∀ A (s := set_equiv) (EL : list (set A)),
+Theorem union_list_is_empty_iff : ∀ A (EL : list (set A)),
   (⋃ EL = ∅)%S ↔ Forall (λ E, (E = ∅)%S) EL.
 Proof.
 intros *.
@@ -258,16 +249,16 @@ split; intros HEL.
   intros E HE; apply HEL; now right.
 Qed.
 
-Theorem union_list_app : ∀ A s, s = set_equiv → ∀ (P₁ P₂ : list (set A)),
+Theorem union_list_app : ∀ A (P₁ P₂ : list (set A)),
   (⋃ (P₁ ++ P₂) = (⋃ P₁) ∪ (⋃ P₂))%S.
 Proof.
-intros * Hs *.
+intros.
 revert P₁.
 induction P₂ as [| Q]; intros.
- rewrite app_nil_r; simpl; subst s.
+ rewrite app_nil_r; simpl.
  now rewrite union_empty_r.
 
- rewrite cons_comm_app, app_assoc; simpl; subst s.
+ rewrite cons_comm_app, app_assoc; simpl.
  rewrite IHP₂.
  unfold union_list; simpl; rewrite union_assoc.
  intros x.
@@ -339,7 +330,7 @@ destruct HQL as [HQ| HQL]; [ left; now split | right ].
 apply IHQL, HQL.
 Qed.
 
-Theorem union_list_all_included : ∀ A (s := set_equiv) (E : set A) EL,
+Theorem union_list_all_included : ∀ A (E : set A) EL,
   (E = ⋃ EL)%S → Forall (λ Ei, Ei ⊂ E) EL.
 Proof.
 intros * HE.
@@ -353,7 +344,7 @@ destruct HF as [HF| HF]; [ left; now subst E | ].
 right; eapply IHEL; eassumption.
 Qed.
 
-Theorem union_intersection_self : ∀ A (s:=set_equiv) (E : set A) EL,
+Theorem union_intersection_self : ∀ A (E : set A) EL,
   E ⊂ ⋃ EL
   → (E = ⋃ map (intersection E) EL)%S.
 Proof.
@@ -373,7 +364,7 @@ split; intros Hx.
 Qed. 
 
 Add Parametric Morphism {A} : (@setp A)
-with signature (@set_eq _ set_equiv) ==> eq ==> iff
+with signature set_eq ==> eq ==> iff
 as setp_morph.
 Proof.
 intros E F HEF x.

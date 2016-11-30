@@ -39,10 +39,9 @@ destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
 Qed.
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
-  equidecomposable set_equiv sphere_but_fixpoints
+  equidecomposable sphere_but_fixpoints
     (xtransl 3 sphere_but_fixpoints ∪ xtransl 6 sphere_but_fixpoints)%S.
 Proof.
-set (s := set_equiv).
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
 destruct H as (f & Hu & Hm).
 remember (mkcf _ _ f Hm Hu) as Hosf.
@@ -61,16 +60,14 @@ split.
  eapply r_decomposed_4; now try eassumption.
 
  split.
-  subst s; remember set_equiv as s eqn:Hs.
   pose proof r_decomposed_2_a f Hosf os Hos as Ha.
   pose proof r_decomposed_2_b f Hosf os Hos as Hb.
-  subst s; set (s := set_equiv).
   eapply partition_group_map with (g := Xtransl 3) in Ha; try eassumption.
   eapply partition_group_map with (g := Xtransl 6) in Hb; try eassumption.
   eapply partition_union in Hb; [ | | apply Ha ].
    apply Hb.
 
-   unfold intersection, set_eq; subst s; intros (x, y, z).
+   unfold intersection, set_eq; intros (x, y, z).
    split; [ intros (H₁, H₂) | easy ].
    simpl in H₁, H₂.
    unfold empty_set; simpl.
@@ -88,12 +85,12 @@ Qed.
 
 Check Banach_Tarski_paradox_but_fixpoints.
 
-Theorem equidec_union : ∀ (s := set_equiv) E₁ E₂ F₁ F₂,
+Theorem equidec_union : ∀ E₁ E₂ F₁ F₂,
   (E₁ ∩ F₁ = ∅)%S
   → (E₂ ∩ F₂ = ∅)%S
-  → equidecomposable set_equiv E₁ E₂
-  → equidecomposable set_equiv F₁ F₂
-  → equidecomposable set_equiv (E₁ ∪ F₁) (E₂ ∪ F₂).
+  → equidecomposable E₁ E₂
+  → equidecomposable F₁ F₂
+  → equidecomposable (E₁ ∪ F₁) (E₂ ∪ F₂).
 Proof.
 intros * HEF₁ HEF₂ HE HF.
 destruct HE as (PE₁ & PE₂ & HE₁ & HE₂ & HE).
@@ -106,8 +103,8 @@ now apply Forall2_app.
 Qed.
 
 Theorem equidec_transl : ∀ dx E F,
-  equidecomposable set_equiv E F
-  → equidecomposable set_equiv (xtransl dx E) (xtransl dx F).
+  equidecomposable E F
+  → equidecomposable (xtransl dx E) (xtransl dx F).
 Proof.
 intros * HEF.
 destruct HEF as (PE & PF & HPE & HPF & HEF).
@@ -133,7 +130,7 @@ rewrite xtransl_xtransl, Rplus_opp_l.
 now rewrite xtransl_0, HEF₁.
 Qed.
 
-Theorem separated_spheres_without_fixpoints : ∀ (s := set_equiv),
+Theorem separated_spheres_without_fixpoints :
   (xtransl 3 sphere_but_fixpoints ∩ xtransl 6 sphere_but_fixpoints = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6); simpl | easy ].
@@ -144,7 +141,7 @@ destruct H6 as (H6, _).
 now apply (Rno_intersect_spheres_x3_x6 x y z).
 Qed.
 
-Theorem separated_spheres : ∀ (s := set_equiv),
+Theorem separated_spheres :
   (xtransl 3 sphere ∩ xtransl 6 sphere = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6) | easy ].
@@ -936,8 +933,8 @@ SearchAbout FinFun.Surjective.
    least one element; if D is countable, ℝ ∖ D countains at least one
    element *)
 
-Theorem equidec_sphere_with_and_without_fixpoints : ∀ (s := set_equiv),
-  equidecomposable _ sphere sphere_but_fixpoints.
+Theorem equidec_sphere_with_and_without_fixpoints :
+  equidecomposable sphere sphere_but_fixpoints.
 Proof.
 intros.
 assert (∃ p₁, p₁ ∈ sphere ∖ D).
@@ -958,8 +955,8 @@ bbb.
 assert (∃ p₁ θ, ∀ p n, p ∈ D → p ∉ rotate_set p₁ (INR n * θ) D).
 bbb.
 
-Theorem Banach_Tarski_paradox : ∀ (s := set_equiv),
-  equidecomposable _ sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
+Theorem Banach_Tarski_paradox :
+  equidecomposable sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
 Proof.
 transitivity sphere_but_fixpoints.
  apply equidec_sphere_with_and_without_fixpoints.
