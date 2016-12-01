@@ -374,6 +374,26 @@ exists (nat_of_prod_nat na nb).
 remember (prod_nat_of_nat (nat_of_prod_nat na nb)) as ij eqn:Hij.
 symmetry in Hij.
 destruct ij as (i, j).
+
+Theorem prod_nat_of_nat_inv : ∀ i j,
+  prod_nat_of_nat (nat_of_prod_nat i j) = (i, j).
+Proof.
+intros.
+revert i.
+induction j; intros; simpl.
+ induction i; [ easy | simpl ].
+ rewrite <- Nat.add_succ_comm; simpl.
+ remember (prod_nat_of_nat (nat_of_prod_nat_O i + i)) as ij' eqn:Hij'.
+ symmetry in Hij'.
+ destruct ij' as (i', j').
+ destruct i'.
+
+bbb.
+
+rewrite prod_nat_of_nat_inv in Hij.
+injection Hij; intros; subst; easy.
+Qed.
+
 revert na Hij.
 induction nb; intros.
  simpl in Hij.
