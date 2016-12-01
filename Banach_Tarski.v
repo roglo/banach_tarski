@@ -367,6 +367,26 @@ intros * (fa, HA) (fb, HB).
 unfold is_countable.
 exists (λ n, let (i, j) := prod_nat_of_nat n in (fa i, fb j)).
 intros (a, b).
+specialize (HA a) as (na, Hna).
+specialize (HB b) as (nb, Hnb).
+subst a b.
+exists (nat_of_prod_nat na nb).
+remember (prod_nat_of_nat (nat_of_prod_nat na nb)) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij as (i, j).
+revert na Hij.
+induction nb; intros.
+ simpl in Hij.
+ revert i j Hij.
+ induction na; intros; [ simpl in Hij; now injection Hij; intros; subst | ].
+ simpl in Hij.
+ rewrite <- Nat.add_succ_comm in Hij; simpl in Hij.
+ remember (prod_nat_of_nat (nat_of_prod_nat_O na + na)) as ij' eqn:Hij'.
+ symmetry in Hij'.
+ destruct ij' as (i', j').
+ destruct i'.
+  injection Hij; clear Hij; intros; subst i j.
+
 bbb.
 
 Definition rotation_fixpoint (m : matrix) k :=
