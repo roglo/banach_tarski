@@ -335,11 +335,11 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  now symmetry in Hn.
 Qed.
 
-Fixpoint prod_nat n :=
+Fixpoint prod_nat_of_nat n :=
   match n with
   | O => (O, O)
   | S n' =>
-      let (i, j) := prod_nat n' in
+      let (i, j) := prod_nat_of_nat n' in
       match i with
       | O => (S j, O)
       | S i' => (i', S j)
@@ -353,7 +353,7 @@ Theorem countable_product_types : ∀ A B,
 Proof.
 intros * (fa, HA) (fb, HB).
 unfold is_countable.
-exists (λ n, let (i, j) := prod_nat n in (fa i, fb j)).
+exists (λ n, let (i, j) := prod_nat_of_nat n in (fa i, fb j)).
 intros (a, b).
 bbb.
 
