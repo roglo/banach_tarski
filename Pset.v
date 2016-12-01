@@ -3,19 +3,7 @@
 Require Import Utf8 List Relations NPeano Compare_dec Setoid.
 Require Import Misc.
 
-Inductive set (A : Type) : Type := mkset : (A → Prop) → set A.
-Definition setp (A : Type) (E : set A) :=
-  match E with
-  | mkset _ P => P
-  end.
-
-(*
-Inductive set (A : Type) : Type :=
-    mkset : (A → Prop) → set A
-Inductive sig (A : Type) (P : A → Prop) : Type :=
-    exist : ∀ x : A, P x → {x : A | P x}
-*)
-
+Record set A := mkset { setp : A → Prop }.
 Arguments mkset [A] _.
 Arguments setp [A] _ _.
 
