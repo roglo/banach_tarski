@@ -362,10 +362,16 @@ Fixpoint greatest_triangular_aux k n :=
   | O => O
   | S k' =>
       let m := (k * (k + 1) / 2)%nat in
-      if le_dec m n then m else greatest_triangular_aux k' n
+      if le_dec m n then k else greatest_triangular_aux k' n
   end.
 
-Definition greatest_triangular n := greatest_triangular_aux n n.
+Definition greatest_triangular_index n := greatest_triangular_aux n n.
+
+Definition fixpoint_orbit_point_of_nat n :=
+  let k := greatest_triangular_aux n in
+  let s := ((k * S k) / 2)%nat in
+  let p := fixpoint_of_nat (k - (n - s)) in
+  let el := path_of_nat ...
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
