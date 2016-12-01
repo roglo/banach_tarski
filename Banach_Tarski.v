@@ -346,6 +346,24 @@ Fixpoint prod_nat_of_nat n :=
       end
   end.
 
+Fixpoint nat_of_prod_nat_O j : nat :=
+  match j with
+  | O => O
+  | S j' => nat_of_prod_nat_O j' + S j
+  end.
+
+Fixpoint nat_of_prod_nat i j : nat :=
+  match i with
+  | O => nat_of_prod_nat_O j
+  | S i' => (* nat_of_prod_nat i' j + S j *) non
+  end.
+
+    0 1 2 3 4
+  0 0 2 5 9
+  1 1 4 8
+  2 3 7
+  3 6
+
 Theorem countable_product_types : ∀ A B,
   is_countable A
   → is_countable B
