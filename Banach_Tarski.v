@@ -335,6 +335,28 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  now symmetry in Hn.
 Qed.
 
+Fixpoint prod_nat n :=
+  match n with
+  | O => (O, O)
+  | S n' =>
+      let (i, j) := prod_nat n' in
+      match i with
+      | O => (S j, O)
+      | S i' => (i', S j)
+      end
+  end.
+
+Theorem countable_product_types : ∀ A B,
+  is_countable A
+  → is_countable B
+  → is_countable (A * B).
+Proof.
+intros * (fa, HA) (fb, HB).
+unfold is_countable.
+exists (λ n, let (i, j) := prod_nat n in (fa i, fb j)).
+intros (a, b).
+bbb.
+
 Definition rotation_fixpoint (m : matrix) k :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
@@ -356,22 +378,6 @@ Definition map_empty_path_to_single el :=
 
 Definition fixpoint_of_nat n :=
   fixpoint_of_path (map_empty_path_to_single (norm_list (path_of_nat n))).
-
-Fixpoint greatest_triangular_aux k n :=
-  match k with
-  | O => O
-  | S k' =>
-      let m := (k * (k + 1) / 2)%nat in
-      if le_dec m n then k else greatest_triangular_aux k' n
-  end.
-
-Definition greatest_triangular_index n := greatest_triangular_aux n n.
-
-Definition fixpoint_orbit_point_of_nat n :=
-  let k := greatest_triangular_aux n in
-  let s := ((k * S k) / 2)%nat in
-  let p := fixpoint_of_nat (k - (n - s)) in
-  let el := path_of_nat ...
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
