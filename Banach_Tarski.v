@@ -10,7 +10,7 @@ Import ListNotations.
 Require Import Reals Psatz Nsatz.
 
 Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
-Require Import Partition OrbitRepr GroupTransf Equidecomp.
+Require Import Partition OrbitRepr GroupTransf Equidecomp Cantor.
 
 Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
@@ -295,32 +295,6 @@ enough (Hn : ∃ n, path_of_nat (S n) = e :: el).
 Qed.
 
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
-
-(* Begin code Rémi Nollet, modified *)
-
-Theorem Cantor : ∀ E (F : E → (E → bool)), ∃ f : E → bool, ∀ x, f x ≠ F x x.
-Proof.
-intros E F; exists (fun e => negb (F e e)); intros x H.
-exact (no_fixpoint_negb _ H).
-Qed.
-
-Lemma Cantor_gen : ∀ E X Y (Yss : Y → Prop),
-  ∀ (sX : E → X) (sY : Y → (E → bool)),
-  ∀ (sX_surj : ∀ e, ∃ x, sX x = e),
-  ∀ (sY_surj : ∀ f, ∃ y, Yss y ∧ ∀ x, sY y x = f x),
-  ∀ f : X → Y, ∃ y, ∀ x, Yss y ∧ y ≠ f x.
-Proof.
-intros * sX_surj sY_surj F.
-destruct Cantor with E (fun e => sY (F (sX e))) as [f H].
-destruct sY_surj with f as [y Hy]; subst.
-destruct Hy as (Hy, Hyf).
-exists y; intros x; split; [ easy | ]; subst.
-destruct sX_surj with x as [e]; subst.
-specialize (H e).
-now intros H2; apply H; subst.
-Qed.
-
-(* End code Rémi Nollet *)
 
 Definition id {A} (a : A) := a.
 Definition b2r b := INR (Nat.b2n b).
