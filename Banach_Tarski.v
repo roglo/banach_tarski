@@ -382,6 +382,10 @@ intros.
 revert i.
 induction j; intros; simpl.
  induction i; [ easy | simpl ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+bbb.
+
  rewrite <- Nat.add_succ_comm; simpl.
  remember (prod_nat_of_nat (nat_of_prod_nat_O i + i)) as ij' eqn:Hij'.
  symmetry in Hij'.
