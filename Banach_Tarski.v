@@ -357,6 +357,15 @@ Definition map_empty_path_to_single el :=
 Definition fixpoint_of_nat n :=
   fixpoint_of_path (map_empty_path_to_single (norm_list (path_of_nat n))).
 
+Fixpoint biggest_nat_sum_aux k n :=
+  match k with
+  | O => O
+  | S k' =>
+      if le_dec (k * (k + 1) / 2)%nat n then k else biggest_nat_sum_aux k' n
+  end.
+
+Definition biggest_nat_sum n := biggest_nat_sum_aux n n.
+
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable, D; simpl.
