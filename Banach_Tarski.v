@@ -426,15 +426,23 @@ induction n; intros.
  rewrite Nat.mul_comm; simpl.
  symmetry; rewrite Nat.mul_comm; simpl.
 (* merde, c'est faux *)
-bbb.
+Abort.
 
 Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
 intros (i, j); simpl.
 destruct j.
+ induction i; [ easy | ].
  destruct i; [ easy | ].
- destruct i; [ easy | ].
+simpl in IHi; simpl.
+assert (nat_of_prod_nat_O_r i + i = nat_of_prod_nat_O_r (S i) - 1)%nat.
+ now simpl; rewrite Nat.sub_0_r.
+rewrite H in IHi.
+bbb.
+Print prod_nat_of_nat.
+assert (∀ i, prod_nat_of_nat (i - 1) =
+
  destruct i; [ easy | ].
  destruct i; [ easy | ].
 simpl.
