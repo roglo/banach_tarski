@@ -439,6 +439,10 @@ rewrite IHi, nat_of_nat_nat_succ_l.
 now rewrite <- Nat.add_succ_r, Nat.add_0_r.
 Qed.
 
+(* make a function returning k such that k is the biggest value
+   such k(k+1)/2 ≤ i; apply it to (i+j) in the following theorem *)
+bbb.
+
 Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
