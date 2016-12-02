@@ -401,6 +401,33 @@ rewrite nat_of_nat_nat_succ_l, Nat.add_0_r.
 now rewrite <- Nat.add_succ_comm.
 Qed.
 
+Theorem glop : ∀ i n,
+  nat_of_prod_nat_O_r (i + S n) =
+  S (nat_of_prod_nat_O_r i + i * S n + n * (S n) / 2)%nat.
+Proof.
+intros.
+revert i.
+induction n; intros.
+ simpl.
+ rewrite Nat.div_small; [ | apply Nat.lt_0_succ ].
+ rewrite Nat.mul_1_r.
+ rewrite Nat.add_0_r.
+ now rewrite Nat.add_comm.
+
+ rewrite <- Nat.add_succ_comm, IHn; simpl.
+ f_equal; rewrite <- Nat.add_succ_r.
+ ring_simplify.
+ do 2 rewrite <- Nat.add_assoc; f_equal.
+ symmetry.
+ replace 2%nat with (1 * 2)%nat at 1 by easy.
+ rewrite Nat.div_add_l; [ | easy ].
+ simpl; symmetry.
+ rewrite Nat.add_assoc, Nat.add_comm; simpl; f_equal.
+ rewrite Nat.mul_comm; simpl.
+ symmetry; rewrite Nat.mul_comm; simpl.
+(* merde, c'est faux *)
+bbb.
+
 Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
@@ -410,6 +437,7 @@ destruct j.
  destruct i; [ easy | ].
  destruct i; [ easy | ].
  destruct i; [ easy | ].
+simpl.
 
 bbb.
 intros (i, j); simpl.
