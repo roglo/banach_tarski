@@ -360,23 +360,6 @@ Fixpoint nat_of_nat_nat i j : nat :=
 
 Definition nat_of_prod_nat '(i, j) := nat_of_nat_nat i j.
 
-Theorem countable_product_types : ∀ A B,
-  is_countable A
-  → is_countable B
-  → is_countable (A * B).
-Proof.
-intros * (fa, HA) (fb, HB).
-unfold is_countable.
-exists (λ n, let (i, j) := prod_nat_of_nat n in (fa i, fb j)).
-intros (a, b).
-specialize (HA a) as (na, Hna).
-specialize (HB b) as (nb, Hnb).
-subst a b.
-exists (nat_of_prod_nat (na, nb)).
-remember (prod_nat_of_nat (nat_of_prod_nat (na, nb))) as ij eqn:Hij.
-symmetry in Hij.
-destruct ij as (i, j).
-
 Theorem nat_of_nat_nat_succ_l : ∀ i j,
   nat_of_nat_nat (S i) j = S (nat_of_nat_nat i j + i + j).
 Proof.
@@ -409,9 +392,62 @@ Qed.
 Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
-intros (i, j).
+intros (i, j); simpl.
+(*
+remember (i + j)%nat as n eqn:Hn.
+symmetry in Hn.
+revert i j Hn.
+induction n; intros.
+ apply Nat.eq_add_0 in Hn.
+ now destruct Hn; subst.
+
+ destruct j.
+  rewrite Nat.add_0_r in Hn; subst i; simpl.
+  remember (prod_nat_of_nat (nat_of_prod_nat_O_r n + n)) as ij eqn:Hij.
+  symmetry in Hij.
+  destruct ij as (i', j').
+  destruct i'.
+   induction j'.
+*)
 revert i.
 induction j; intros; simpl.
+ induction i; [ easy | simpl ].
+bbb.
+
+assert (∀ i, nat_of_prod_nat (S i, O) = S (nat_of_prod_nat (O, i))).
+ clear; intros.
+ simpl.
+Focus 2.
+ simpl in H.
+ specialize (H i).
+ apply Nat.succ_inj in H.
+ rewrite H.
+remember (prod_nat_of_nat (nat_of_nat_nat 0 i)) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij as (i', j).
+destruct i'.
+
+Inspect 2.
+Print nat_of_prod_nat_O_r.
+bbb.
+
+Theorem countable_product_types : ∀ A B,
+  is_countable A
+  → is_countable B
+  → is_countable (A * B).
+Proof.
+intros * (fa, HA) (fb, HB).
+unfold is_countable.
+exists (λ n, let (i, j) := prod_nat_of_nat n in (fa i, fb j)).
+intros (a, b).
+specialize (HA a) as (na, Hna).
+specialize (HB b) as (nb, Hnb).
+subst a b.
+exists (nat_of_prod_nat (na, nb)).
+remember (prod_nat_of_nat (nat_of_prod_nat (na, nb))) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij as (i, j).
+
 bbb.
 
 enough (∀ i, (nat_of_prod_nat_O_r i = (i * S i) / 2)%nat).
