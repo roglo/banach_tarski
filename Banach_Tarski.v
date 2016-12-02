@@ -346,6 +346,22 @@ Fixpoint prod_nat_of_nat n :=
       end
   end.
 
+Fixpoint nat_of_nat_nat_aux k i j : nat :=
+  match k with
+  | O => O
+  | S k' =>
+      match j with
+      | O =>
+          match i with
+          | O => O
+          | S i' => S (nat_of_nat_nat_aux k' O i')
+          end
+      | S j' => S (nat_of_nat_nat_aux k' (S i) j')
+      end
+  end.
+
+Definition nat_of_nat_nat2 i j := nat_of_nat_nat_aux (i + j) i j.
+
 Fixpoint nat_of_prod_nat_O_r i : nat :=
   match i with
   | O => O
@@ -523,14 +539,23 @@ induction k; intros.
 
      simpl in Hg; simpl.
 (* plein le cul; je continue ou pas ? *)
-bbb.
+Abort.
 
 Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
 intros (i, j); simpl.
-destruct j.
- simpl.
+induction j.
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+bbb.
+
  destruct i; [ easy | ].
  rewrite nat_of_prod_nat_O_r_succ; simpl.
 induction i; [ easy | ].
