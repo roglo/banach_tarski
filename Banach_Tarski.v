@@ -346,17 +346,19 @@ Fixpoint prod_nat_of_nat n :=
       end
   end.
 
-Fixpoint nat_of_prod_nat_O i : nat :=
+Fixpoint nat_of_prod_nat_O_r i : nat :=
   match i with
   | O => O
-  | S i' => nat_of_prod_nat_O i' + i
+  | S i' => nat_of_prod_nat_O_r i' + i
   end.
 
-Fixpoint nat_of_prod_nat i j : nat :=
+Fixpoint nat_of_nat_nat i j : nat :=
   match j with
-  | O => nat_of_prod_nat_O i
-  | S j' => S (nat_of_prod_nat (S i) j')
+  | O => nat_of_prod_nat_O_r i
+  | S j' => S (nat_of_nat_nat (S i) j')
   end.
+
+Definition nat_of_prod_nat '(i, j) := nat_of_nat_nat i j.
 
 Theorem countable_product_types : ∀ A B,
   is_countable A
@@ -370,17 +372,18 @@ intros (a, b).
 specialize (HA a) as (na, Hna).
 specialize (HB b) as (nb, Hnb).
 subst a b.
-exists (nat_of_prod_nat na nb).
-remember (prod_nat_of_nat (nat_of_prod_nat na nb)) as ij eqn:Hij.
+exists (nat_of_prod_nat (na, nb)).
+remember (prod_nat_of_nat (nat_of_prod_nat (na, nb))) as ij eqn:Hij.
 symmetry in Hij.
 destruct ij as (i, j).
 
-Theorem prod_nat_of_nat_inv : ∀ i j,
-  prod_nat_of_nat (nat_of_prod_nat i j) = (i, j).
+Theorem prod_nat_of_nat_inv : ∀ ij,
+  prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
-intros.
+intros (i, j).
 revert i.
 induction j; intros; simpl.
+bbb.
  induction i; [ easy | simpl ].
  destruct i; [ easy | ].
  destruct i; [ easy | ].
