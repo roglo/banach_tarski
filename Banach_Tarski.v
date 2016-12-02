@@ -428,13 +428,42 @@ induction n; intros.
 (* merde, c'est faux *)
 Abort.
 
+Theorem glop : ∀ i,
+  nat_of_nat_nat i 1 = S (S (nat_of_nat_nat 0 i)).
+Proof.
+intros.
+induction i; [ easy | ].
+simpl; do 3 f_equal.
+simpl in IHi; do 2 apply Nat.succ_inj in IHi.
+rewrite IHi, nat_of_nat_nat_succ_l.
+now rewrite <- Nat.add_succ_r, Nat.add_0_r.
+Qed.
+
 Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
 intros (i, j); simpl.
 destruct j.
- induction i; [ easy | ].
+ simpl.
  destruct i; [ easy | ].
+ rewrite nat_of_prod_nat_O_r_succ; simpl.
+induction i; [ easy | ].
+simpl.
+rewrite nat_of_nat_nat_succ_l, Nat.add_0_r.
+simpl.
+Print prod_nat_of_nat.
+
+bbb.
+
+rewrite nat_of_nat_nat_succ_l.
+rewrite Nat.add_0_r.
+simpl.
+
+bbb.
+
+ destruct i; [ easy | ].
+Check nat_of_prod_nat_O_r_succ.
+
 simpl in IHi; simpl.
 assert (nat_of_prod_nat_O_r i + i = nat_of_prod_nat_O_r (S i) - 1)%nat.
  now simpl; rewrite Nat.sub_0_r.
