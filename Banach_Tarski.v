@@ -405,6 +405,27 @@ Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
 intros (i, j); simpl.
+remember (nat_of_nat_nat i j) as n eqn:Hn.
+symmetry in Hn.
+revert i j Hn.
+induction n; intros.
+ destruct j; intros; [ now destruct i | easy ].
+
+ destruct j.
+  destruct i; [ easy | ].
+  simpl in Hn; simpl.
+  apply Nat.succ_inj in Hn.
+  remember (prod_nat_of_nat n) as ij eqn:Hij.
+  symmetry in Hij.
+  destruct ij as (i', j').
+  destruct i'.
+   subst n.
+
+Theorem glop : ∀ m n,
+  prod_nat_of_nat (m + n) = ...
+
+bbb.
+intros (i, j); simpl.
 revert i.
 induction j; intros; simpl.
  induction i; [ easy | ].
