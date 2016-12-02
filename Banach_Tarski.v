@@ -428,19 +428,101 @@ induction n; intros.
 (* merde, c'est faux *)
 Abort.
 
-Theorem glop : ∀ i,
-  nat_of_nat_nat i 1 = S (S (nat_of_nat_nat 0 i)).
+Fixpoint greatest_triangular_aux k n :=
+  match k with
+  | O => O
+  | S k' =>
+      let m := (k * (k + 1) / 2)%nat in
+      if le_dec m n then k else greatest_triangular_aux k' n
+  end.
+
+Definition greatest_triangular_index n := greatest_triangular_aux n n.
+
+Theorem succ_succ_div_2 : ∀ n, (S (S n) / 2 = S (n / 2))%nat.
 Proof.
-intros.
-induction i; [ easy | ].
-simpl; do 3 f_equal.
-simpl in IHi; do 2 apply Nat.succ_inj in IHi.
-rewrite IHi, nat_of_nat_nat_succ_l.
-now rewrite <- Nat.add_succ_r, Nat.add_0_r.
+intros n.
+do 2 rewrite <- Nat.add_1_r.
+rewrite <- Nat.add_assoc; simpl.
+replace 2%nat with (1 * 2)%nat by easy.
+rewrite Nat.div_add; [ | easy ].
+now rewrite Nat.add_1_r.
 Qed.
 
-(* make a function returning k such that k is the biggest value
-   such k(k+1)/2 ≤ i; apply it to (i+j) in the following theorem *)
+Theorem glop : ∀ n i j,
+  prod_nat_of_nat n = (i, j)
+  → i = (greatest_triangular_index n + j)%nat.
+Proof.
+intros * Hp.
+unfold greatest_triangular_index.
+
+Theorem glip : ∀ n i j k,
+  (n ≤ k)%nat
+  → prod_nat_of_nat n = (i, j)
+  → i = (greatest_triangular_aux k n + j)%nat.
+Proof.
+intros * Hnk Hp.
+revert i j n Hnk Hp.
+induction k; intros.
+ simpl; apply Nat.le_0_r in Hnk; subst n.
+ simpl in Hp.
+ now injection Hp; intros; subst.
+
+ destruct n.
+  simpl in Hp.
+  injection Hp; clear Hp; intros; subst i j; simpl.
+  destruct (le_dec (S (k + 1 + k * S (k + 1)) / 2) 0) as [H1| H1].
+   apply Nat.le_0_r in H1.
+   rewrite Nat.add_1_r in H1; simpl in H1.
+   now rewrite succ_succ_div_2 in H1.
+
+   now specialize (IHk O O O (Nat.le_0_l k) (eq_refl _)).
+
+  apply Nat.succ_le_mono in Hnk.
+  simpl in Hp.
+  remember (prod_nat_of_nat n) as ij eqn:Hij.
+  symmetry in Hij.
+  destruct ij as (i', j').
+  destruct i'.
+   injection Hp; clear Hp; intros; subst i j.
+   rewrite Nat.add_0_r; simpl.
+   destruct (le_dec (S (k + 1 + k * S (k + 1)) / 2) (S n)) as [H1| H1].
+    f_equal.
+    rewrite Nat.add_1_r in H1; simpl in H1.
+    rewrite succ_succ_div_2 in H1.
+    apply Nat.succ_le_mono in H1.
+    apply IHk in Hij; [ | easy ].
+    symmetry in Hij; symmetry.
+    apply Nat.eq_add_0 in Hij.
+    destruct Hij as (Hg, Hj'); subst j'.
+    destruct n.
+     destruct k; [ easy | exfalso ].
+     apply Nat.le_0_r in H1; simpl in H1.
+     rewrite Nat.add_succ_r in H1.
+     now rewrite succ_succ_div_2 in H1.
+
+     clear -Hg.
+     induction k; [ easy | exfalso; simpl in Hg ].
+     destruct (le_dec (S (k + 1 + k * S (k + 1)) / 2) (S n)) as [H1| H1].
+      easy.
+
+      apply IHk in Hg; subst k.
+      apply H1; simpl.
+      unfold div; simpl.
+      apply -> Nat.succ_le_mono.
+      apply Nat.le_0_l.
+
+    apply IHk in Hij; [ | easy ].
+    symmetry in Hij; symmetry.
+    apply Nat.eq_add_0 in Hij.
+    destruct Hij as (Hg, Hj'); subst j'.
+    destruct k.
+     exfalso; simpl in Hg.
+     apply Nat.le_0_r in Hnk; subst n.
+     simpl in H1.
+     now apply H1.
+
+     simpl in Hg; simpl.
+(* plein le cul; je continue ou pas ? *)
 bbb.
 
 Theorem prod_nat_of_nat_inv : ∀ ij,
