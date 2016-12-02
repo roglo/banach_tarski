@@ -405,6 +405,65 @@ Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
 intros (i, j); simpl.
+destruct j.
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+
+bbb.
+intros (i, j); simpl.
+remember (i + j)%nat as s eqn:Hs.
+symmetry in Hs.
+revert i j Hs.
+induction s; intros.
+ apply Nat.eq_add_0 in Hs.
+ now destruct Hs; subst i j.
+
+ revert i Hs.
+ induction j; intros.
+  rewrite Nat.add_0_r in Hs; subst i.
+  rewrite nat_of_nat_nat_succ_l, Nat.add_0_r.
+  rewrite <- Nat.add_succ_r; simpl.
+bbb.
+
+intros (i, j); simpl.
+destruct j.
+ simpl.
+ destruct i; [ easy | simpl ].
+ remember (prod_nat_of_nat (nat_of_prod_nat_O_r i + i)) as ij eqn:Hij.
+ symmetry in Hij.
+ destruct ij as (i', j').
+ destruct i'.
+  destruct i; [ now simpl in Hij; injection Hij; intros; subst | ].
+  rewrite nat_of_prod_nat_O_r_succ in Hij.
+  simpl in Hij.
+  remember (prod_nat_of_nat (nat_of_nat_nat 0 i + S i)) as ij eqn:Hij2.
+  symmetry in Hij2.
+  destruct ij as (i'', j'').
+  destruct i''; [ easy | ].
+  injection Hij; clear Hij; intros; subst i'' j'.
+  rewrite <- Nat.add_succ_comm in Hij2; simpl in Hij2.
+  remember (prod_nat_of_nat (nat_of_nat_nat 0 i + i)) as ij eqn:Hij3.
+  symmetry in Hij3.
+  destruct ij as (i''', j''').
+  destruct i'''.
+   injection Hij2; clear Hij2; intros; subst j'' j'''.
+bbb.
+SearchAbout nat_of_nat_nat.
+Print nat_of_nat_nat.
+
+  rewrite nat_of_prod_nat_O_r_succ, <- Nat.add_succ_comm in Hij.
+  simpl in Hij.
+  re
+SearchAbout nat_of_prod_nat_O_r.
+
+remember (i + j)%nat as s eqn:Hs.
+symmetry in Hs.
+
+
+
+intros (i, j); simpl.
 remember (nat_of_nat_nat i j) as n eqn:Hn.
 symmetry in Hn.
 revert i j Hn.
