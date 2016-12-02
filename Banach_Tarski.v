@@ -349,7 +349,7 @@ Fixpoint prod_nat_of_nat n :=
 Fixpoint nat_of_prod_nat_O_r i : nat :=
   match i with
   | O => O
-  | S i' => nat_of_prod_nat_O_r i' + i
+  | S i' => S (nat_of_prod_nat_O_r i' + i')
   end.
 
 Fixpoint nat_of_nat_nat i j : nat :=
@@ -377,6 +377,35 @@ remember (prod_nat_of_nat (nat_of_prod_nat (na, nb))) as ij eqn:Hij.
 symmetry in Hij.
 destruct ij as (i, j).
 
+Theorem nat_of_nat_nat_succ_l : ∀ i j,
+  nat_of_nat_nat (S i) j = S (nat_of_nat_nat i j + i + j).
+Proof.
+intros.
+revert i.
+induction j; intros; [ now rewrite Nat.add_0_r | ].
+simpl; rewrite IHj.
+do 2 rewrite <- Nat.add_assoc.
+now rewrite <- Nat.add_succ_comm.
+Qed.
+
+Theorem nat_of_prod_nat_inv : ∀ n,
+  nat_of_prod_nat (prod_nat_of_nat n) = n.
+Proof.
+intros.
+induction n; [ easy | simpl ].
+remember (prod_nat_of_nat n) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij as (i, j); simpl in IHn.
+destruct i.
+ simpl; f_equal; subst n.
+ clear Hij.
+ induction j; [ easy | ].
+ simpl; rewrite IHj; f_equal.
+ now rewrite nat_of_nat_nat_succ_l, Nat.add_0_r, <- Nat.add_succ_comm, <- IHj.
+
+ now simpl; rewrite IHn.
+Qed.
+
 Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
@@ -384,7 +413,42 @@ intros (i, j).
 revert i.
 induction j; intros; simpl.
 bbb.
- induction i; [ easy | simpl ].
+
+enough (∀ i, (nat_of_prod_nat_O_r i = (i * S i) / 2)%nat).
+ rewrite H.
+ induction i; [ easy | ].
+ simpl.
+bbb.
+
+ destruct i; [ easy | ].
+(*
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+ destruct i; [ easy | ].
+bbb.
+
+Compute (nat_of_prod_nat_O_r 4).
+*)
+enough (∀ i, nat_of_prod_nat_O_r (S i) = S (nat_of_prod_nat_O_r i + i)).
+ rewrite H.
+ simpl.
+ rename i into i₁.
+
+
+ remember (prod_nat_of_nat (nat_of_prod_nat_O_r i + i)) as ij eqn:Hij.
+ symmetry in Hij.
+ destruct ij as (i', j').
+ destruct i'.
+enough (nat_of_prod_nat_O_r i + i = nat_of_nat_nat 0 i)%nat.
+rewrite H in Hij.
+
+Focus 2.
+Compute (nat_of_prod_nat_O_r 4).
+apply (f_equal nat_of_prod_nat) in Hij.
+simpl in Hij.
+
+bbb.
  destruct i; [ easy | ].
  destruct i; [ easy | ].
 bbb.
