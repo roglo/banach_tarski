@@ -376,6 +376,29 @@ Fixpoint nat_of_nat_nat i j : nat :=
 
 Definition nat_of_prod_nat '(i, j) := nat_of_nat_nat i j.
 
+Theorem succ_succ_div_2 : ∀ n, (S (S n) / 2 = S (n / 2))%nat.
+Proof.
+intros n.
+do 2 rewrite <- Nat.add_1_r.
+rewrite <- Nat.add_assoc; simpl.
+replace 2%nat with (1 * 2)%nat by easy.
+rewrite Nat.div_add; [ | easy ].
+now rewrite Nat.add_1_r.
+Qed.
+
+Theorem nat_of_prod_nat_O_r_sum : ∀ i,
+  nat_of_prod_nat_O_r i = ((i * S i) / 2)%nat.
+Proof.
+intros.
+induction i; [ easy | ].
+simpl; rewrite IHi; rewrite succ_succ_div_2; f_equal.
+setoid_rewrite Nat.mul_comm; simpl.
+rewrite Nat.add_assoc.
+replace (i + i)%nat with (i * 2)%nat by ring.
+rewrite Nat.div_add_l; [ | easy ].
+apply Nat.add_comm.
+Qed.
+
 Theorem nat_of_nat_nat_succ_l : ∀ i j,
   nat_of_nat_nat (S i) j = S (nat_of_nat_nat i j + i + j).
 Proof.
@@ -453,16 +476,6 @@ Fixpoint greatest_triangular_aux k n :=
   end.
 
 Definition greatest_triangular_index n := greatest_triangular_aux n n.
-
-Theorem succ_succ_div_2 : ∀ n, (S (S n) / 2 = S (n / 2))%nat.
-Proof.
-intros n.
-do 2 rewrite <- Nat.add_1_r.
-rewrite <- Nat.add_assoc; simpl.
-replace 2%nat with (1 * 2)%nat by easy.
-rewrite Nat.div_add; [ | easy ].
-now rewrite Nat.add_1_r.
-Qed.
 
 Fixpoint sum_up_to k :=
   match k with
@@ -550,14 +563,18 @@ Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
 intros (i, j).
-revert i j.
-apply nat_double_ind.
- intros j.
- induction j; [ easy | simpl ].
-bbb.
-
 induction j.
  simpl.
+ rewrite nat_of_prod_nat_O_r_sum.
+bbb.
+
+ induction i; [ easy | simpl ].
+ rewrite succ_succ_div_2.
+ simpl.
+ rewrite Nat.mul_comm; simpl.
+ rewrite <- Nat.div2_div.
+bbb.
+
  destruct i; [ easy | ].
  destruct i; [ easy | ].
  destruct i; [ easy | ].
