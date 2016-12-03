@@ -464,6 +464,22 @@ rewrite Nat.div_add; [ | easy ].
 now rewrite Nat.add_1_r.
 Qed.
 
+Fixpoint sum_up_to k :=
+  match k with
+  | O => O
+  | S k' => (k + sum_up_to k')%nat
+  end.
+
+Theorem essai : ∀ k, prod_nat_of_nat (sum_up_to k) = (k, O).
+Proof.
+intros k.
+induction k; [ easy | simpl ].
+remember (prod_nat_of_nat (k + sum_up_to k)) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij as (i, j).
+destruct i.
+bbb.
+
 Theorem prod_nat_of_nat_inv_O_r : ∀ i,
   prod_nat_of_nat (nat_of_prod_nat_O_r i) = (i, O).
 Proof.
