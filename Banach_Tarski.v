@@ -470,6 +470,20 @@ Fixpoint sum_up_to k :=
   | S k' => (k + sum_up_to k')%nat
   end.
 
+Theorem caca : ∀ i j, prod_nat_of_nat (sum_up_to (i + j) + j) = (i, j).
+Proof.
+intros.
+remember (i + j)%nat as k eqn:Hk.
+symmetry in Hk.
+revert i j Hk.
+induction k; intros.
+ apply Nat.eq_add_0 in Hk.
+ now destruct Hk; subst.
+
+ remember prod_nat_of_nat as f; simpl; subst f.
+ rewrite <- Nat.add_succ_r.
+bbb.
+
 Theorem essai : ∀ k, prod_nat_of_nat (sum_up_to k) = (k, O).
 Proof.
 intros k.
