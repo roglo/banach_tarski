@@ -482,16 +482,40 @@ induction k; intros.
 
  remember prod_nat_of_nat as f; simpl; subst f.
  rewrite <- Nat.add_succ_r.
-bbb.
+Abort.
 
 Theorem essai : ∀ k, prod_nat_of_nat (sum_up_to k) = (k, O).
 Proof.
+intros k.
+induction k as (k, Hk) using lt_wf_rec.
+destruct k; [ easy | simpl ].
+remember (prod_nat_of_nat (k + sum_up_to k)) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij as (i, j).
+destruct i.
+ f_equal; f_equal.
+ remember (prod_nat_of_nat (S k + sum_up_to k)) as ij eqn:Hij₁.
+ symmetry in Hij₁.
+ destruct ij as (i₁, j₁).
+ generalize Hij₁; intros H.
+ simpl in H; rewrite Hij in H.
+ injection H; clear H; intros; subst i₁ j₁.
+bbb.
+
 intros k.
 induction k; [ easy | simpl ].
 remember (prod_nat_of_nat (k + sum_up_to k)) as ij eqn:Hij.
 symmetry in Hij.
 destruct ij as (i, j).
 destruct i.
+ f_equal; f_equal.
+ remember (prod_nat_of_nat (S k + sum_up_to k)) as ij eqn:Hij₁.
+ symmetry in Hij₁.
+ destruct ij as (i₁, j₁).
+ generalize Hij₁; intros H.
+ simpl in H; rewrite Hij in H.
+ injection H; clear H; intros; subst i₁ j₁.
+SearchAbout (_ → (∀ _ : nat, _ _)).
 bbb.
 
 Theorem prod_nat_of_nat_inv_O_r : ∀ i,
