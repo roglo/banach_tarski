@@ -580,10 +580,24 @@ Theorem prod_nat_of_nat_inv : ∀ ij,
 Proof.
 intros (i, j).
 rewrite nat_of_prod_nat_form; simpl.
-induction i.
+revert i.
+induction j; intros.
+ simpl.
+ induction i; [ easy | simpl ].
+ rewrite succ_succ_div_2.
+ do 2 rewrite Nat.add_0_r in IHi.
+ do 2 rewrite Nat.add_0_r.
+ simpl.
+Restart.
+
+intros (i, j).
+rewrite nat_of_prod_nat_form; simpl.
+revert j.
+induction i; intros.
  simpl.
  induction j; [ easy | simpl ].
  rewrite succ_succ_div_2.
+ simpl.
 bbb.
 
  induction i; [ easy | simpl ].
