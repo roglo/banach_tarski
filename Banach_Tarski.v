@@ -376,6 +376,8 @@ Fixpoint nat_of_nat_nat i j : nat :=
 
 Definition nat_of_prod_nat '(i, j) := nat_of_nat_nat i j.
 
+Definition nat_of_prod_nat_f '(i, j) := ((i + j) * S (i + j) / 2 + j)%nat.
+
 Theorem succ_succ_div_2 : ∀ n, (S (S n) / 2 = S (n / 2))%nat.
 Proof.
 intros n.
@@ -397,6 +399,20 @@ rewrite Nat.add_assoc.
 replace (i + i)%nat with (i * 2)%nat by ring.
 rewrite Nat.div_add_l; [ | easy ].
 apply Nat.add_comm.
+Qed.
+
+Theorem nat_of_prod_nat_form : ∀ ij,
+  nat_of_prod_nat ij = nat_of_prod_nat_f ij.
+Proof.
+intros (i, j); simpl.
+revert i.
+induction j; intros.
+ simpl; do 2 rewrite Nat.add_0_r.
+ apply nat_of_prod_nat_O_r_sum.
+
+ simpl; rewrite Nat.add_succ_r; f_equal.
+ rewrite <- Nat.add_succ_comm.
+ apply IHj.
 Qed.
 
 Theorem nat_of_nat_nat_succ_l : ∀ i j,
@@ -563,9 +579,11 @@ Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
 intros (i, j).
-induction j.
+rewrite nat_of_prod_nat_form; simpl.
+induction i.
  simpl.
- rewrite nat_of_prod_nat_O_r_sum.
+ induction j; [ easy | simpl ].
+ rewrite succ_succ_div_2.
 bbb.
 
  induction i; [ easy | simpl ].
