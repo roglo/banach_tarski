@@ -468,8 +468,28 @@ Theorem prod_nat_of_nat_inv_O_r : ∀ i,
   prod_nat_of_nat (nat_of_prod_nat_O_r i) = (i, O).
 Proof.
 intros i.
-induction i; [ easy | ].
-simpl.
+induction i; [ easy | simpl ].
+remember (prod_nat_of_nat (nat_of_prod_nat_O_r i + i)) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij as (i₁, j).
+destruct i₁.
+ f_equal; f_equal.
+ destruct i; [ now simpl in Hij; injection Hij; intros; subst j | ].
+ simpl in IHi, Hij.
+ remember (prod_nat_of_nat (nat_of_prod_nat_O_r i + i)) as ij eqn:Hij₂.
+ symmetry in Hij₂.
+ destruct ij as (i₂, j₂).
+ destruct i₂.
+  injection IHi; clear IHi; intros; subst j₂.
+  remember (prod_nat_of_nat (nat_of_prod_nat_O_r i + i + S i)) as ij eqn:Hij₃.
+  symmetry in Hij₃.
+  destruct ij as (i₃, j₃).
+  destruct i₃; [ easy | ].
+  injection Hij; clear Hij; intros; subst i₃ j.
+  f_equal; rename j₃ into j.
+  destruct i; [ now simpl in Hij₃; injection Hij₃; intros; subst j | ].
+  simpl in Hij₂, Hij₃.
+
 bbb.
 
 Theorem prod_nat_of_nat_inv : ∀ ij,
