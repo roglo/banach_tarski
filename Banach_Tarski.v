@@ -500,8 +500,8 @@ destruct i.
  generalize Hij₁; intros H.
  simpl in H; rewrite Hij in H.
  injection H; clear H; intros; subst i₁ j₁.
-bbb.
-
+Abort.
+(*
 intros k.
 induction k; [ easy | simpl ].
 remember (prod_nat_of_nat (k + sum_up_to k)) as ij eqn:Hij.
@@ -517,6 +517,7 @@ destruct i.
  injection H; clear H; intros; subst i₁ j₁.
 SearchAbout (_ → (∀ _ : nat, _ _)).
 bbb.
+*)
 
 Theorem prod_nat_of_nat_inv_O_r : ∀ i,
   prod_nat_of_nat (nat_of_prod_nat_O_r i) = (i, O).
@@ -543,13 +544,18 @@ destruct i₁.
   f_equal; rename j₃ into j.
   destruct i; [ now simpl in Hij₃; injection Hij₃; intros; subst j | ].
   simpl in Hij₂, Hij₃.
-
-bbb.
+Abort.
 
 Theorem prod_nat_of_nat_inv : ∀ ij,
   prod_nat_of_nat (nat_of_prod_nat ij) = ij.
 Proof.
-intros (i, j); simpl.
+intros (i, j).
+revert i j.
+apply nat_double_ind.
+ intros j.
+ induction j; [ easy | simpl ].
+bbb.
+
 induction j.
  simpl.
  destruct i; [ easy | ].
