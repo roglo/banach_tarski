@@ -408,6 +408,53 @@ specialize (HA a) as (n, HA).
 now subst; exists n.
 Qed.
 
+Definition Z_of_N n :=
+  if zerop n then 0%Z
+  else if even n then (Z.of_nat n / 2)%Z
+  else (- Z.of_nat n / 2)%Z.
+
+Definition N_of_Z z :=
+  match z with
+  | 0%Z => O
+  | Zpos p => Pos.to_nat (2 * p)
+  | Zneg p => Pos.to_nat (2 * p - 1)
+  end.
+
+Theorem Z_countable : is_countable Z.
+Proof.
+exists Z_of_N; intros z.
+exists (N_of_Z z).
+induction z; [ easy | | ]; simpl.
+ unfold Z_of_N; simpl.
+ destruct (zerop (Pos.to_nat p~0)) as [H| H].
+  exfalso.
+  rewrite Pos2Nat.inj_xO in H.
+  apply Nat.eq_mul_0 in H.
+  destruct H; [ easy | revert H; apply Pos2Nat_nonzero ].
+
+  destruct (Nat.even (Pos.to_nat p~0)).
+   now rewrite positive_nat_Z, <- Z.div2_div.
+
+  rewrite positive_nat_Z, <- Z.div2_div; simpl.
+bbb.
+  rewrite Pos2Z.neg_xO.
+  rewrite Z.mul_comm, Z.div_mul; [ | easy ].
+
+bbb.
+
+  apply (f_equal Pos.of_nat) in H.
+  simpl in H.
+SearchAbout (Pos.of_nat (Pos.to_nat _)).
+
+
+
+  revert H; apply Pos2Nat.nonzero.
+
+  induction p.
+
+
+bbb.
+
 Require Import QArith.
 Theorem Q_countable : is_countable Q.
 Proof.
@@ -415,7 +462,6 @@ set (A := (Z * positive)%type).
 set (f x := Qmake (fst x) (snd x)).
 apply (countable_surjection A Q f).
  apply countable_product_types.
-  unfold is_countable.
 bbb.
 
 Focus 3.

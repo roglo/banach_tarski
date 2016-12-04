@@ -5,7 +5,7 @@
    - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
 (* Coq v8.6 *)
 
-Require Import Utf8 List Relations NPeano Compare_dec.
+Require Import Utf8 List Relations NPeano PArith Compare_dec.
 Import ListNotations.
 
 Arguments Nat.div : simpl never.
@@ -52,6 +52,13 @@ Theorem negb_eq_eq : ∀ b₁ b₂, negb b₁ = negb b₂ → b₁ = b₂.
 Proof.
 intros b₁ b₂ Hn.
 now destruct b₁, b₂.
+Qed.
+
+Theorem Pos2Nat_nonzero : ∀ p, Pos.to_nat p ≠ O.
+Proof.
+intros p Hp.
+specialize (Pos2Nat.is_pos p); intros H.
+now rewrite Hp in H.
 Qed.
 
 Theorem cons_comm_app : ∀ A (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
