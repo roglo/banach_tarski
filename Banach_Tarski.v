@@ -469,6 +469,13 @@ induction z; [ easy | | ]; simpl.
      rewrite Nat.mul_sub_distr_l; simpl.
      rewrite Nat.add_0_r.
      unfold Pos.to_nat at 3; simpl.
+     remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
+     destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | ].
+     simpl; rewrite Nat.sub_0_r.
+     rewrite Nat.sub_add; [ easy | rewrite Nat.add_succ_r ].
+     apply -> Nat.succ_le_mono; apply Nat.le_0_l.
+
+     idtac.
 bbb.
 
 Require Import QArith.
