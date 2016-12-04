@@ -416,8 +416,8 @@ Definition Z_of_N n :=
 Definition N_of_Z z :=
   match z with
   | 0%Z => O
-  | Zpos p => Pos.to_nat (2 * p)
-  | Zneg p => Pos.to_nat (2 * p - 1)
+  | Zpos _ => Z.to_nat (2 * z)
+  | Zneg _ => Z.to_nat (- 2 * z - 1)
   end.
 
 Theorem Z_countable : is_countable Z.
@@ -457,6 +457,7 @@ induction z; [ easy | | ]; simpl.
 
   remember (Nat.even (Pos.to_nat (p~0 - 1))) as e eqn:He; symmetry in He.
   destruct e.
+bbb.
    exfalso; revert He.
    apply not_true_iff_false.
    rewrite <- Nat.negb_odd.
@@ -475,7 +476,11 @@ induction z; [ easy | | ]; simpl.
      rewrite Nat.sub_add; [ easy | rewrite Nat.add_succ_r ].
      apply -> Nat.succ_le_mono; apply Nat.le_0_l.
 
-     idtac.
+     simpl in H.
+     rewrite Pos2Nat.inj_sub in H.
+      unfold Pos.to_nat at 2 in H; simpl in H.
+      rewrite Pos2Nat.inj_xO in H.
+
 bbb.
 
 Require Import QArith.
