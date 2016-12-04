@@ -394,9 +394,34 @@ rewrite prod_nat_of_nat_inv in Hij.
 now injection Hij; intros; subst.
 Qed.
 
+Theorem countable_surjection : ∀ A B (f : A → B),
+  is_countable A
+  → FinFun.Surjective f
+  → is_countable B.
+Proof.
+intros * (fa, HA) Hf.
+unfold FinFun.Surjective in Hf.
+exists (λ n, f (fa n)).
+intros b.
+specialize (Hf b) as (a, Hf).
+specialize (HA a) as (n, HA).
+now subst; exists n.
+Qed.
+
 Require Import QArith.
 Theorem Q_countable : is_countable Q.
 Proof.
+set (A := (Z * positive)%type).
+set (f x := Qmake (fst x) (snd x)).
+apply (countable_surjection A Q f).
+ apply countable_product_types.
+  unfold is_countable.
+bbb.
+
+Focus 3.
+ unfold FinFun.Surjective, f, A; simpl.
+ intros (n, d).
+ now exists (n, d).
 bbb.
 
 Definition rotation_fixpoint (m : matrix) k :=
