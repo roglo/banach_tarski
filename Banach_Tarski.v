@@ -451,6 +451,7 @@ induction z; [ easy | | ]; simpl.
    simpl in H.
    now rewrite Nat.add_0_r, Nat.sub_0_r, Nat.add_comm in H.
 
+  rewrite <- Pos.add_diag.
 bbb.
 
 Require Import QArith.
