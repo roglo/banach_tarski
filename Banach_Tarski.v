@@ -465,6 +465,10 @@ induction z; [ easy | | ]; simpl.
    exists (Pos.to_nat (p - 1)).
    rewrite Pos2Nat.inj_sub.
     rewrite Pos2Nat.inj_xO.
+    rewrite Pos2Nat.inj_sub.
+     rewrite Nat.mul_sub_distr_l; simpl.
+     rewrite Nat.add_0_r.
+     unfold Pos.to_nat at 3; simpl.
 bbb.
 
 Require Import QArith.
