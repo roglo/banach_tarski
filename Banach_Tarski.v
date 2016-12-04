@@ -580,14 +580,59 @@ Theorem prod_nat_of_nat_inv : ∀ ij,
 Proof.
 intros (i, j).
 rewrite nat_of_prod_nat_form; simpl.
+bbb.
+
 revert i.
 induction j; intros.
  simpl.
- induction i; [ easy | simpl ].
- rewrite succ_succ_div_2.
+ induction i; [ easy | ].
  do 2 rewrite Nat.add_0_r in IHi.
  do 2 rewrite Nat.add_0_r.
+
+Theorem glop : ∀ k, prod_nat_of_nat (k * S k / 2) = (k, O).
+Proof.
+Admitted.
+
+(*
+Theorem glop : ∀ i k,
+  i = (k * S k / 2)%nat
+  → prod_nat_of_nat i = (k, O).
+Proof.
+intros * Hk.
+revert i Hk.
+induction k; intros; [ now subst i | ].
+subst i; simpl.
+rewrite succ_succ_div_2; simpl.
+
+bbb.
+intros * Hk.
+revert k Hk.
+induction i; intros.
+ destruct k; [ easy | simpl in Hk ].
+ now rewrite succ_succ_div_2 in Hk.
+
  simpl.
+ remember (prod_nat_of_nat i) as ij eqn:Hij₁.
+ symmetry in Hij₁.
+ destruct ij as (i₁, j₁).
+ destruct i₁.
+  f_equal.
+  destruct k; [ easy | ].
+  f_equal; simpl in Hk.
+  rewrite succ_succ_div_2 in Hk.
+  apply Nat.succ_inj in Hk.
+  rewrite Hk in Hij₁.
+  rewrite Nat.mul_comm in Hij₁.
+  simpl in Hij₁.
+
+bbb.
+*)
+Show.
+Check glop.
+apply glop.
+setoid_rewrite <- Nat.add_succ_comm at 2 3.
+
+bbb.
 Restart.
 
 intros (i, j).
