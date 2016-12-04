@@ -360,6 +360,9 @@ induction i; intros.
 Theorem glop : ∀ n p, (p ≤ 2 * n)%nat → Nat.sqrt (n * n + p) = n.
 Proof.
 intros * Hp.
+apply Nat.le_antisymm.
+bbb.
+
 revert n Hp.
 induction p; intros; [ rewrite Nat.add_0_r; apply Nat.sqrt_square | ].
 rewrite <- Nat.add_succ_comm; simpl.
