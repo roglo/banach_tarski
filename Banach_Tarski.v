@@ -335,6 +335,67 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  now symmetry in Hn.
 Qed.
 
+Definition prod_nat_of_nat n :=
+  let s := Nat.sqrt n in
+  (s - (n - s ^ 2), n - s ^ 2)%nat.
+
+Definition nat_of_prod_nat '(i, j) :=
+  ((i + j) ^ 2 + j)%nat.
+
+Theorem prod_nat_of_nat_inv : ∀ i j,
+  prod_nat_of_nat (nat_of_prod_nat (i, j)) = (i, j).
+Proof.
+intros; simpl.
+unfold prod_nat_of_nat.
+rewrite Nat.mul_1_r.
+remember ((i + j) * (i + j) + j)%nat as n eqn:Hn.
+remember (Nat.sqrt n) as s eqn:Hs.
+revert j n s Hn Hs.
+induction i; intros.
+ simpl; rewrite Nat.mul_1_r.
+ simpl in Hn.
+ revert n s Hn Hs.
+ induction j; intros; [ now subst n s | ].
+
+Theorem glop : ∀ n p, (p ≤ 2 * n)%nat → Nat.sqrt (n * n + p) = n.
+Proof.
+intros * Hp.
+revert p Hp.
+induction n; intros; [ now apply Nat.le_0_r in Hp; subst p | ].
+simpl.
+
+bbb.
+revert i.
+induction j; intros.
+ simpl; rewrite Nat.mul_1_r.
+ do 2 rewrite Nat.add_0_r.
+ unfold prod_nat_of_nat.
+ rewrite Nat.sqrt_square, Nat.pow_2_r.
+ now rewrite Nat.sub_diag, Nat.sub_0_r.
+
+ remember (nat_of_prod_nat (i, S j)) as n eqn:Hn.
+ unfold prod_nat_of_nat.
+ unfold nat_of_prod_nat in Hn.
+bbb.
+
+Theorem countable_product_types : ∀ A B,
+  is_countable A
+  → is_countable B
+  → is_countable (A * B).
+Proof.
+intros * (fa, HA) (fb, HB).
+unfold is_countable.
+exists (λ n, let (i, j) := prod_nat_of_nat n in (fa i, fb j)).
+intros (a, b).
+specialize (HA a) as (na, Hna).
+specialize (HB b) as (nb, Hnb).
+subst a b.
+exists (nat_of_prod_nat (na, nb)).
+remember (prod_nat_of_nat (nat_of_prod_nat (na, nb))) as ij eqn:Hij.
+symmetry in Hij.
+destruct ij as (i, j).
+bbb.
+
 Fixpoint prod_nat_of_nat n :=
   match n with
   | O => (O, O)
