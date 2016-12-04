@@ -451,7 +451,20 @@ induction z; [ easy | | ]; simpl.
    simpl in H.
    now rewrite Nat.add_0_r, Nat.sub_0_r, Nat.add_comm in H.
 
-  rewrite <- Pos.add_diag.
+   rewrite <- Pos.add_diag.
+   eapply Pos.le_lt_trans; [ | apply Pos.lt_add_diag_r ].
+   apply Pos.le_1_l.
+
+  remember (Nat.even (Pos.to_nat (p~0 - 1))) as e eqn:He; symmetry in He.
+  destruct e.
+   exfalso; revert He.
+   apply not_true_iff_false.
+   rewrite <- Nat.negb_odd.
+   apply negb_false_iff.
+   apply Nat.odd_spec.
+   exists (Pos.to_nat (p - 1)).
+   rewrite Pos2Nat.inj_sub.
+    rewrite Pos2Nat.inj_xO.
 bbb.
 
 Require Import QArith.
