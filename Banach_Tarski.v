@@ -432,26 +432,24 @@ induction z; [ easy | | ]; simpl.
   apply Nat.eq_mul_0 in H.
   destruct H; [ easy | revert H; apply Pos2Nat_nonzero ].
 
-  destruct (Nat.even (Pos.to_nat p~0)).
-   now rewrite positive_nat_Z, <- Z.div2_div.
+  remember (Nat.even (Pos.to_nat p~0)) as e eqn:He; symmetry in He.
+  destruct e; [ now rewrite positive_nat_Z, <- Z.div2_div | ].
+  exfalso; revert He.
+  apply not_false_iff_true.
+  apply Nat.even_spec.
+  exists (Pos.to_nat p).
+  apply Pos2Nat.inj_xO.
 
-  rewrite positive_nat_Z, <- Z.div2_div; simpl.
-bbb.
-  rewrite Pos2Z.neg_xO.
-  rewrite Z.mul_comm, Z.div_mul; [ | easy ].
-
-bbb.
-
-  apply (f_equal Pos.of_nat) in H.
-  simpl in H.
-SearchAbout (Pos.of_nat (Pos.to_nat _)).
-
-
-
-  revert H; apply Pos2Nat.nonzero.
-
-  induction p.
-
+ unfold Z_of_N.
+ destruct (zerop (Pos.to_nat (p~0 - 1))) as [H| H].
+  exfalso.
+  rewrite Pos2Nat.inj_sub in H.
+   unfold Pos.to_nat at 2 in H; simpl in H.
+   rewrite Pos2Nat.inj_xO in H.
+   remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
+   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | ].
+   simpl in H.
+   now rewrite Nat.add_0_r, Nat.sub_0_r, Nat.add_comm in H.
 
 bbb.
 
