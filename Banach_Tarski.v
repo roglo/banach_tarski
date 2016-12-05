@@ -394,6 +394,26 @@ rewrite prod_nat_of_nat_inv in Hij.
 now injection Hij; intros; subst.
 Qed.
 
+Theorem countable_sum_types : ∀ A B,
+  is_countable A
+  → is_countable B
+  → is_countable (A + B).
+Proof.
+intros * (fa, Ha) (fb, Hb).
+unfold is_countable.
+exists (λ n, if zerop (n mod 2) then inl (fa (n / 2)) else inr (fb (n / 2))).
+intros [a| b].
+ specialize (Ha a) as (n, Ha).
+ exists (n * 2)%nat; subst a.
+ rewrite Nat.mod_mul; [ simpl | easy ].
+ now rewrite Nat.div_mul.
+
+ specialize (Hb b) as (n, Hb).
+ exists (n * 2 + 1)%nat; subst b.
+ rewrite Nat.add_comm, Nat.mod_add; [ simpl | easy ].
+ now rewrite <- Nat.add_1_l, Nat.div_add.
+Qed.
+
 Theorem countable_surjection : ∀ A B (f : A → B),
   is_countable A
   → FinFun.Surjective f
@@ -408,18 +428,6 @@ specialize (HA a) as (n, HA).
 now subst; exists n.
 Qed.
 
-Definition Z_of_N n :=
-  if zerop n then 0%Z
-  else if even n then (Z.of_nat n / 2)%Z
-  else (- Z.of_nat n / 2)%Z.
-
-Definition N_of_Z z :=
-  match z with
-  | 0%Z => O
-  | Zpos _ => Z.to_nat (2 * z)
-  | Zneg _ => Z.to_nat (- 2 * z - 1)
-  end.
-
 Theorem Pos_countable : is_countable positive.
 Proof.
 unfold is_countable.
@@ -429,76 +437,34 @@ exists (Pos.to_nat p).
 apply Pos2Nat.id.
 Qed.
 
+Theorem unit_countable : is_countable unit.
+Proof.
+exists (λ n, tt).
+intros a; exists O.
+now destruct a.
+Qed.
+
 Theorem Z_countable : is_countable Z.
 Proof.
-exists Z_of_N; intros z.
-exists (N_of_Z z).
-induction z; [ easy | | ]; simpl.
- unfold Z_of_N; simpl.
- destruct (zerop (Pos.to_nat p~0)) as [H| H].
-  exfalso.
-  rewrite Pos2Nat.inj_xO in H.
-  apply Nat.eq_mul_0 in H.
-  destruct H; [ easy | revert H; apply Pos2Nat_nonzero ].
+set (A := unit).
+set (B := (positive + positive)%type).
+specialize (countable_sum_types _ _ Pos_countable Pos_countable).
+intros Hs.
+specialize (countable_sum_types _ _ unit_countable Hs).
+intros Hc.
+set (f c := match c with inl p => Z.pos p | inr p => Z.neg p end).
+set (g c := match c with inl tt => 0%Z | inr d => f d end).
+subst f.
+enough (H : FinFun.Surjective g).
+ now specialize (countable_surjection _ _ g Hc H).
 
-  remember (Nat.even (Pos.to_nat p~0)) as e eqn:He; symmetry in He.
-  destruct e; [ now rewrite positive_nat_Z, <- Z.div2_div | ].
-  exfalso; revert He.
-  apply not_false_iff_true.
-  apply Nat.even_spec.
-  exists (Pos.to_nat p).
-  apply Pos2Nat.inj_xO.
-
- unfold Z_of_N.
- destruct (zerop (Pos.to_nat (Pos.pred_double p))) as [H| H].
-  exfalso; revert H; apply Pos2Nat_nonzero.
-
-  clear H.
-  rewrite Pos.pred_double_spec.
-  rewrite Pos2Nat.inj_pred; [ | apply Pos_lt_1_xO ].
-  rewrite Pos2Nat.inj_xO.
-  remember (Nat.even (pred (2 * Pos.to_nat p))) as e eqn:He.
-  symmetry in He.
-  destruct e.
-   exfalso; revert He.
-   apply not_true_iff_false.
-   rewrite <- Nat.negb_odd.
-   apply negb_false_iff.
-   apply Nat.odd_spec.
-   remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
-   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | simpl ].
-   rewrite Nat.add_0_r, Nat.add_succ_r.
-   apply Nat.Odd_succ, Nat.even_spec.
-   rewrite Nat.even_add; apply eqb_reflx.
-
-   clear He.
-   remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
-   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | simpl ].
-   apply Z.opp_inj.
-   rewrite Pos2Z.opp_neg.
-   rewrite Nat.add_0_r, Nat.add_succ_r.
-   rewrite Nat2Z.inj_succ.
-   rewrite Zdiv.Z_div_nz_opp_full.
-    unfold Z.succ.
-    rewrite nat_add_diag_mul_2.
-    rewrite Nat2Z.inj_mul.
-    replace (Z.of_nat 2) with 2%Z by easy.
-    rewrite Z.mul_comm.
-    rewrite Z.div_add_l; [ | easy ].
-    rewrite Z.div_small; [ | easy ].
-    rewrite Z.add_0_r.
-    unfold Z.sub; rewrite <- Z.opp_add_distr.
-    rewrite Z.opp_involutive.
-    apply SuccNat2Pos.inv in Hn; subst p; simpl.
-    rewrite Z.add_1_r.
-    symmetry; apply Zpos_P_of_succ_nat.
-
-    rewrite nat_add_diag_mul_2.
-    rewrite Nat2Z.inj_mul.
-    replace (Z.of_nat 2) with 2%Z by easy.
-    unfold Z.succ.
-    rewrite Z.add_comm, Z.mul_comm.
-    now rewrite Z.mod_add.
+ subst g.
+ unfold FinFun.Surjective.
+ intros z.
+ exists
+   (match z with
+    | 0%Z => inl tt | Z.pos p => inr (inl p) | Z.neg p => inr (inr p) end).
+ now destruct z.
 Qed.
 
 Require Import QArith.
