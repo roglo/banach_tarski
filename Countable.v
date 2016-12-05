@@ -4,7 +4,7 @@
 Require Import Utf8 NPeano Bool Compare_dec.
 Require Import Misc.
 
-Definition is_countable A := ∃ f : nat → A, ∀ a, ∃ n, f n = a.
+Definition is_countable A := ∃ f : nat → A, FinFun.Surjective f.
 
 Definition prod_nat_of_nat n :=
   let s := Nat.sqrt n in
