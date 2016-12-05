@@ -444,9 +444,7 @@ induction z; [ easy | | ]; simpl.
  destruct (zerop (Pos.to_nat (Pos.pred_double p))) as [H| H].
   exfalso; revert H; apply Pos2Nat_nonzero.
 
-assert (Hp : (1 < p)%positive).
-bbb.
-
+  clear H.
   remember (Nat.even (Pos.to_nat (Pos.pred_double p))) as e eqn:He.
   symmetry in He.
   destruct e.
