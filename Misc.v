@@ -14,6 +14,12 @@ Arguments Nat.modulo : simpl never.
 Theorem match_id : ∀ A a (b : A), match a with O => b | S _ => b end = b.
 Proof. intros A a b; now destruct a. Qed.
 
+Theorem nat_add_diag_mul_2 : ∀ n, (n + n = 2 * n)%nat.
+Proof.
+intros.
+destruct n; [ easy | now simpl; rewrite Nat.add_0_r ].
+Qed.
+
 Theorem nat_div_add_once : ∀ a b, b ≠ 0 → (a + b) / b = S (a / b).
 Proof.
 intros a b Hb.

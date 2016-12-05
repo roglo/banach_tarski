@@ -420,6 +420,15 @@ Definition N_of_Z z :=
   | Zneg _ => Z.to_nat (- 2 * z - 1)
   end.
 
+Theorem Pos_countable : is_countable positive.
+Proof.
+unfold is_countable.
+exists Pos.of_nat.
+intros p.
+exists (Pos.to_nat p).
+apply Pos2Nat.id.
+Qed.
+
 Theorem Z_countable : is_countable Z.
 Proof.
 exists Z_of_N; intros z.
@@ -445,7 +454,10 @@ induction z; [ easy | | ]; simpl.
   exfalso; revert H; apply Pos2Nat_nonzero.
 
   clear H.
-  remember (Nat.even (Pos.to_nat (Pos.pred_double p))) as e eqn:He.
+  rewrite Pos.pred_double_spec.
+  rewrite Pos2Nat.inj_pred; [ | apply Pos_lt_1_xO ].
+  rewrite Pos2Nat.inj_xO.
+  remember (Nat.even (pred (2 * Pos.to_nat p))) as e eqn:He.
   symmetry in He.
   destruct e.
    exfalso; revert He.
@@ -453,84 +465,41 @@ induction z; [ easy | | ]; simpl.
    rewrite <- Nat.negb_odd.
    apply negb_false_iff.
    apply Nat.odd_spec.
-   exists (Pos.to_nat p - 1)%nat.
    remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
-   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | ].
-   rewrite Pos.pred_double_spec.
-   rewrite Pos2Nat.inj_pred; [ | apply Pos_lt_1_xO ].
-   rewrite Pos2Nat.inj_xO, Hn; simpl.
-   do 2 rewrite Nat.add_0_r.
-   now rewrite Nat.sub_0_r, Nat.add_1_r, Nat.add_succ_r.
+   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | simpl ].
+   rewrite Nat.add_0_r, Nat.add_succ_r.
+   apply Nat.Odd_succ, Nat.even_spec.
+   rewrite Nat.even_add; apply eqb_reflx.
 
-bbb.
-   remember (Pos.to_nat (p - 1)) as n eqn:Hn; symmetry in Hn.
-   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | ].
-   rewrite Pos.pred_double_spec.
-   rewrite Pos2Nat.inj_pred; [ | apply Pos_lt_1_xO ].
-SearchAbout (Pos.to_nat (_ - _)).
-rewrite Pos2Nat.inj_sub_max in Hn.
-rewrite Pos2Nat.inj_1 in Hn.
-remember (Pos.to_nat p) as m eqn:Hm.
-symmetry in Hm.
-destruct m; [ exfalso; revert Hm; apply Pos2Nat_nonzero | ].
-simpl in Hn; rewrite Nat.sub_0_r in Hn.
-destruct m.
- apply Nat.succ_inj in Hn; subst n.
-SearchAbout (Pos.to_nat _ = 1)%nat.
-assert (p = 1)%positive.
-Focus 2.
-subst p; simpl.
+   clear He.
+   remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
+   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | simpl ].
+   apply Z.opp_inj.
+   rewrite Pos2Z.opp_neg.
+   rewrite Nat.add_0_r, Nat.add_succ_r.
+   rewrite Nat2Z.inj_succ.
+   rewrite Zdiv.Z_div_nz_opp_full.
+    unfold Z.succ.
+    rewrite nat_add_diag_mul_2.
+    rewrite Nat2Z.inj_mul.
+    replace (Z.of_nat 2) with 2%Z by easy.
+    rewrite Z.mul_comm.
+    rewrite Z.div_add_l; [ | easy ].
+    rewrite Z.div_small; [ | easy ].
+    rewrite Z.add_0_r.
+    unfold Z.sub; rewrite <- Z.opp_add_distr.
+    rewrite Z.opp_involutive.
+    apply SuccNat2Pos.inv in Hn; subst p; simpl.
+    rewrite Z.add_1_r.
+    symmetry; apply Zpos_P_of_succ_nat.
 
-Focus 2.
-
-
-Inspect 2.
-
-bbb.
-   rewrite Pos2Nat.inj_sub in Hn.
-Focus 2.
-bbb.
-    destruct p; [ apply Pos_lt_1_xI | apply Pos_lt_1_xO | ].
-Check Pos.sub_diag.
-vvv.
-
-induction p.
- rewrite Pos.xI_succ_xO, Pos.double_succ.
- apply Pos.lt_1_succ.
-
- rewrite <- Pos.add_diag.
- eapply Pos.lt_le_trans; [ apply IHp | ].
-  rewrite <- Pos.add_diag.
-
-SearchAbout (_~0)%positive.
-Check Pos.add_diag.
-SearchAbout (_ <= _)%positive.
- apply Pos.leb_le.
-SearchAbout ((_ <=? _)%positive = true).
-
-bbb.
-
-rewrite Pos.xI_succ_xO; apply Pos.lt_1_succ.
-
-bbb.
-   rewrite Pos2Nat.inj_sub.
-    rewrite Pos2Nat.inj_xO.
-    rewrite Pos2Nat.inj_sub.
-     rewrite Nat.mul_sub_distr_l; simpl.
-     rewrite Nat.add_0_r.
-     unfold Pos.to_nat at 3; simpl.
-     remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
-     destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | ].
-     simpl; rewrite Nat.sub_0_r.
-     rewrite Nat.sub_add; [ easy | rewrite Nat.add_succ_r ].
-     apply -> Nat.succ_le_mono; apply Nat.le_0_l.
-
-     simpl in H.
-     rewrite Pos2Nat.inj_sub in H.
-      unfold Pos.to_nat at 2 in H; simpl in H.
-      rewrite Pos2Nat.inj_xO in H.
-
-bbb.
+    rewrite nat_add_diag_mul_2.
+    rewrite Nat2Z.inj_mul.
+    replace (Z.of_nat 2) with 2%Z by easy.
+    unfold Z.succ.
+    rewrite Z.add_comm, Z.mul_comm.
+    now rewrite Z.mod_add.
+Qed.
 
 Require Import QArith.
 Theorem Q_countable : is_countable Q.
@@ -538,13 +507,15 @@ Proof.
 set (A := (Z * positive)%type).
 set (f x := Qmake (fst x) (snd x)).
 apply (countable_surjection A Q f).
- apply countable_product_types.
-bbb.
+ apply countable_product_types; [ apply Z_countable | apply Pos_countable ].
 
-Focus 3.
  unfold FinFun.Surjective, f, A; simpl.
  intros (n, d).
  now exists (n, d).
+Qed.
+
+(* put Pos_countable, Z_countable and Q_countable in a separated file. *)
+
 bbb.
 
 Definition rotation_fixpoint (m : matrix) k :=
