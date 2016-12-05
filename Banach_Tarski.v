@@ -336,10 +336,6 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  now symmetry in Hn.
 Qed.
 
-(* put Pos_countable, Z_countable and Q_countable in a separated file. *)
-
-bbb.
-
 Definition rotation_fixpoint (m : matrix) k :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
