@@ -446,8 +446,6 @@ Qed.
 
 Theorem Z_countable : is_countable Z.
 Proof.
-set (A := unit).
-set (B := (positive + positive)%type).
 specialize (countable_sum_types _ _ Pos_countable Pos_countable).
 intros Hs.
 specialize (countable_sum_types _ _ unit_countable Hs).
