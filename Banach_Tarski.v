@@ -441,29 +441,22 @@ induction z; [ easy | | ]; simpl.
   apply Pos2Nat.inj_xO.
 
  unfold Z_of_N.
- destruct (zerop (Pos.to_nat (p~0 - 1))) as [H| H].
-  exfalso.
-  rewrite Pos2Nat.inj_sub in H.
-   unfold Pos.to_nat at 2 in H; simpl in H.
-   rewrite Pos2Nat.inj_xO in H.
-   remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
-   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | ].
-   simpl in H.
-   now rewrite Nat.add_0_r, Nat.sub_0_r, Nat.add_comm in H.
+ destruct (zerop (Pos.to_nat (Pos.pred_double p))) as [H| H].
+  exfalso; revert H; apply Pos2Nat_nonzero.
 
-   rewrite <- Pos.add_diag.
-   eapply Pos.le_lt_trans; [ | apply Pos.lt_add_diag_r ].
-   apply Pos.le_1_l.
-
-  remember (Nat.even (Pos.to_nat (p~0 - 1))) as e eqn:He; symmetry in He.
-  destruct e.
+assert (Hp : (1 < p)%positive).
 bbb.
+
+  remember (Nat.even (Pos.to_nat (Pos.pred_double p))) as e eqn:He.
+  symmetry in He.
+  destruct e.
    exfalso; revert He.
    apply not_true_iff_false.
    rewrite <- Nat.negb_odd.
    apply negb_false_iff.
    apply Nat.odd_spec.
    exists (Pos.to_nat (p - 1)).
+bbb.
    rewrite Pos2Nat.inj_sub.
     rewrite Pos2Nat.inj_xO.
     rewrite Pos2Nat.inj_sub.
