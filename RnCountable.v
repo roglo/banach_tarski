@@ -4,12 +4,10 @@
 Require Import Utf8.
 Require Import Reals Psatz.
 
-Require Import MiscReals Cantor.
+Require Import MiscReals Countable.
 
 Notation "'ℝ'" := R.
 Notation "x '≤' y" := (Rle x y) : R_scope.
-
-Definition is_countable A := ∃ f : nat → A, ∀ a, ∃ n, f n = a.
 
 Definition ter_bin_of_frac_part x n :=
   if Rlt_dec (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
