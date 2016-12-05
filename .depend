@@ -22,6 +22,8 @@ Partition.vio: Partition.v Pset.vio
 Partition.vo Partition.glob Partition.v.beautified: Partition.v Pset.vo
 Pset.vio: Pset.v Misc.vio
 Pset.vo Pset.glob Pset.v.beautified: Pset.v Misc.vo
+QCountable.vio: QCountable.v Countable.vio
+QCountable.vo QCountable.glob QCountable.v.beautified: QCountable.v Countable.vo
 Reverse.vio: Reverse.v Misc.vio Words.vio Normalize.vio
 Reverse.vo Reverse.glob Reverse.v.beautified: Reverse.v Misc.vo Words.vo Normalize.vo
 RnCountable.vio: RnCountable.v MiscReals.vio Countable.vio
