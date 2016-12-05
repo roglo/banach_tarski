@@ -453,7 +453,65 @@ induction z; [ easy | | ]; simpl.
    rewrite <- Nat.negb_odd.
    apply negb_false_iff.
    apply Nat.odd_spec.
-   exists (Pos.to_nat (p - 1)).
+   exists (Pos.to_nat p - 1)%nat.
+   remember (Pos.to_nat p) as n eqn:Hn; symmetry in Hn.
+   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | ].
+   rewrite Pos.pred_double_spec.
+   rewrite Pos2Nat.inj_pred; [ | apply Pos_lt_1_xO ].
+   rewrite Pos2Nat.inj_xO, Hn; simpl.
+   do 2 rewrite Nat.add_0_r.
+   now rewrite Nat.sub_0_r, Nat.add_1_r, Nat.add_succ_r.
+
+bbb.
+   remember (Pos.to_nat (p - 1)) as n eqn:Hn; symmetry in Hn.
+   destruct n; [ exfalso; revert Hn; apply Pos2Nat_nonzero | ].
+   rewrite Pos.pred_double_spec.
+   rewrite Pos2Nat.inj_pred; [ | apply Pos_lt_1_xO ].
+SearchAbout (Pos.to_nat (_ - _)).
+rewrite Pos2Nat.inj_sub_max in Hn.
+rewrite Pos2Nat.inj_1 in Hn.
+remember (Pos.to_nat p) as m eqn:Hm.
+symmetry in Hm.
+destruct m; [ exfalso; revert Hm; apply Pos2Nat_nonzero | ].
+simpl in Hn; rewrite Nat.sub_0_r in Hn.
+destruct m.
+ apply Nat.succ_inj in Hn; subst n.
+SearchAbout (Pos.to_nat _ = 1)%nat.
+assert (p = 1)%positive.
+Focus 2.
+subst p; simpl.
+
+Focus 2.
+
+
+Inspect 2.
+
+bbb.
+   rewrite Pos2Nat.inj_sub in Hn.
+Focus 2.
+bbb.
+    destruct p; [ apply Pos_lt_1_xI | apply Pos_lt_1_xO | ].
+Check Pos.sub_diag.
+vvv.
+
+induction p.
+ rewrite Pos.xI_succ_xO, Pos.double_succ.
+ apply Pos.lt_1_succ.
+
+ rewrite <- Pos.add_diag.
+ eapply Pos.lt_le_trans; [ apply IHp | ].
+  rewrite <- Pos.add_diag.
+
+SearchAbout (_~0)%positive.
+Check Pos.add_diag.
+SearchAbout (_ <= _)%positive.
+ apply Pos.leb_le.
+SearchAbout ((_ <=? _)%positive = true).
+
+bbb.
+
+rewrite Pos.xI_succ_xO; apply Pos.lt_1_succ.
+
 bbb.
    rewrite Pos2Nat.inj_sub.
     rewrite Pos2Nat.inj_xO.
