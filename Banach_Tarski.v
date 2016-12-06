@@ -468,12 +468,57 @@ unfold fixpoint_of_path in Hp₁.
 now rewrite <- Hel₁ in Hp₁.
 Qed.
 
+Fixpoint nat_of_path_aux el :=
+  match el with
+  | e :: el' => (nat_of_path_aux el' * 4 + nat_of_free_elem e + 1)%nat
+  | [] => O
+  end.
+
+Definition nat_of_path el :=
+  match el with
+  | e :: el' => nat_of_path_aux el
+  | [] => O
+  end.
+
+(*
+Compute (path_of_nat (nat_of_path [])).
+Compute (path_of_nat (nat_of_path [ạ])).
+Compute (path_of_nat (nat_of_path [ạ⁻¹])).
+Compute (path_of_nat (nat_of_path [ḅ])).
+Compute (path_of_nat (nat_of_path [ḅ⁻¹])).
+Compute (path_of_nat (nat_of_path [ạ; ạ])).
+Compute (path_of_nat (nat_of_path [ạ; ạ⁻¹])).
+Compute (path_of_nat (nat_of_path [ạ; ḅ])).
+Compute (path_of_nat (nat_of_path [ạ; ḅ⁻¹])).
+
+Compute (nat_of_path (path_of_nat 0)).
+Compute (nat_of_path (path_of_nat 1)).
+Compute (nat_of_path (path_of_nat 2)).
+Compute (nat_of_path (path_of_nat 3)).
+Compute (nat_of_path (path_of_nat 4)).
+Compute (nat_of_path (path_of_nat 5)).
+Compute (nat_of_path (path_of_nat 6)).
+Compute (nat_of_path (path_of_nat 7)).
+Compute (nat_of_path (path_of_nat 8)).
+Compute (nat_of_path (path_of_nat 9)).
+Compute (nat_of_path (path_of_nat 10)).
+Compute (nat_of_path (path_of_nat 11)).
+Compute (nat_of_path (path_of_nat 12)).
+Compute (nat_of_path (path_of_nat 13)).
+*)
+
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 unfold FinFun.Surjective.
 intros (p, Hp).
+unfold D in Hp; simpl in Hp.
+destruct Hp as (el₁ & p₁ & (el & Hs) & Hn & Hr); simpl.
+remember (nat_of_path el₁) as nf eqn:Hnf.
+remember (nat_of_path el) as no eqn:Hno.
+exists (nat_of_prod_nat (nf, no)).
+
 bbb.
 
 unfold is_countable, D; simpl.
