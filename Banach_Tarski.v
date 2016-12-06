@@ -445,16 +445,21 @@ split; [ | split ].
   apply mat_of_path_is_rotation_matrix.
 Qed.
 
+Definition D_of_nat_nat nf no :=
+  let p₁ := fixpoint_of_nat nf in
+  let el := not_empty_path_of_nat no in
+  fold_right rotate p₁ el.
+
+Definition D_of_prod_nat '(nf, no) :=
+  D_of_nat_nat nf no.
+
 Definition D_of_nat n :=
- let '(nf, no) := prod_nat_of_nat n in
- let p₁ := fixpoint_of_nat nf in
- let el := not_empty_path_of_nat no in
- fold_right rotate p₁ el.
+ D_of_prod_nat (prod_nat_of_nat n).
 
 Theorem D_of_nat_in_D : ∀ n, D_of_nat n ∈ D.
 Proof.
 intros n.
-unfold D_of_nat.
+unfold D_of_nat, D_of_prod_nat, D_of_nat_nat.
 remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
 destruct nfo as (nf, no).
 remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
@@ -509,6 +514,11 @@ Compute (nat_of_path (path_of_nat 13)).
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
+set (A := (nat * nat)%type).
+set (f := D_of_prod_nat).
+apply (countable_surjection A {p : point | p ∈ D} f).
+bbb.
+
 unfold is_countable.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 unfold FinFun.Surjective.
