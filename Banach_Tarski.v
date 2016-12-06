@@ -415,10 +415,39 @@ induction el as [| e el].
  apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
 Qed.
 
+Theorem D_of_nat_prop : ∀ n nf no p p₁ el el₁,
+  (nf, no) = prod_nat_of_nat n
+  → el₁ = not_empty_path_of_path (path_of_nat nf)
+  → p₁ = rotation_fixpoint (mat_of_path el₁) 1
+  → el = not_empty_path_of_nat no
+  → p = fold_right rotate p₁ el
+  → same_orbit p p₁ ∧ norm_list el₁ ≠ [] ∧ fold_right rotate p₁ el₁ = p₁.
+Proof.
+intros * Hnfo Hel₁ Hp₁ Hel Hp.
+split; [ | split ].
+ exists (rev_path el).
+ symmetry in Hp; apply rotate_rev_path in Hp; apply Hp.
+
+ rewrite Hel₁.
+ unfold not_empty_path_of_path.
+ unfold map_empty_path_to_single.
+ remember (norm_list (path_of_nat nf)) as nel eqn:Hnel.
+ symmetry in Hnel.
+ destruct nel as [| e₁ nel]; [ intros H; discriminate H | ].
+ rewrite <- Hnel, norm_list_idemp, Hnel; intros H; discriminate H.
+
+ unfold fixpoint_of_path in Hp₁.
+ apply matrix_fixpoint_ok in Hp₁.
+  unfold mat_of_path in Hp₁.
+  rewrite <- rotate_vec_mul in Hp₁;
+  apply Hp₁.
+
+  apply mat_of_path_is_rotation_matrix.
+Qed.
+
 Definition D_of_nat (n : ℕ) : {p : point | p ∈ D}.
 Proof.
 remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
-symmetry in Hnfo.
 destruct nfo as (nf, no).
 remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
 remember (not_empty_path_of_nat no) as el eqn:Hel.
@@ -427,29 +456,34 @@ unfold fixpoint_of_nat in Hp₁.
 unfold fixpoint_of_path in Hp₁.
 remember (not_empty_path_of_path (path_of_nat nf)) as el₁ eqn:Hel₁.
 exists p, el₁, p₁.
-split; [ | split ].
- exists (rev_path el).
- now symmetry in Hp; apply rotate_rev_path in Hp.
+eapply D_of_nat_prop; eassumption.
+Qed.
 
- rewrite Hel₁.
- unfold not_empty_path_of_path.
- unfold map_empty_path_to_single.
- remember (norm_list (path_of_nat nf)) as nel eqn:Hnel.
- symmetry in Hnel.
- destruct nel as [| e₁ nel]; [ easy | ].
- now rewrite <- Hnel, norm_list_idemp, Hnel.
+Print D_of_nat.
 
- unfold fixpoint_of_path in Hp₁.
- apply matrix_fixpoint_ok in Hp₁.
-  unfold mat_of_path in Hp₁.
-  now rewrite <- rotate_vec_mul in Hp₁.
-
-  apply mat_of_path_is_rotation_matrix.
-Defined.
+Definition D_of_nat' n : {p : point | p ∈ D} :=
+  let nfo := prod_nat_of_nat n in
+(
+  let '(nf, no) := nfo in
+  λ (Hnfo0 : (nf, no) = prod_nat_of_nat n),
+  let p₁ := fixpoint_of_nat nf in
+  let el := not_empty_path_of_nat no in
+  let p := fold_right rotate p₁ el in
+  let  el₁ := not_empty_path_of_path (path_of_nat nf) in
+  exist _ p
+   (ex_intro _ el₁
+     (ex_intro _ p₁
+       (D_of_nat_prop n nf no p p₁ el el₁ Hnfo0 eq_refl
+          eq_refl eq_refl eq_refl)))
+)
+eq_refl.
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
-exists D_of_nat.
+exists D_of_nat'.
+unfold D_of_nat'.
+unfold FinFun.Surjective.
+intros Hp.
 bbb.
 
 unfold is_countable, D; simpl.
