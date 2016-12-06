@@ -394,6 +394,27 @@ clear Heqr Heqkr.
 f_equal; nsatz.
 Qed.
 
+Theorem rotate_vec_mul : ∀ el p,
+  fold_right rotate p el
+  = mat_vec_mul (fold_right mat_mul mat_id (map mat_of_elem el)) p.
+Proof.
+intros el p.
+induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
+rewrite IHel, mat_vec_mul_assoc; reflexivity.
+Qed.
+
+Theorem mat_of_path_is_rotation_matrix : ∀ el,
+ is_rotation_matrix (mat_of_path el).
+Proof.
+intros.
+induction el as [| e el].
+ unfold mat_of_path; simpl.
+ apply mat_id_is_rotation_matrix.
+
+ unfold mat_of_path; simpl; fold (mat_of_path el).
+ apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
+Qed.
+
 Definition D_of_nat (n : ℕ) : {p : point | p ∈ D}.
 Proof.
 remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
@@ -420,24 +441,18 @@ split; [ | split ].
 
  unfold fixpoint_of_path in Hp₁.
  apply matrix_fixpoint_ok in Hp₁.
-  unfold rotate.
+  unfold mat_of_path in Hp₁.
+  now rewrite <- rotate_vec_mul in Hp₁.
 
-(*
-rewrite fold_right_map.
-Print mat_of_path.
-*)
-unfold mat_of_path in Hp₁.
-(*
-SearchAbout mat_mul.
-*)
-rewrite <- fold_right_map in Hp₁.
-
-bbb.
+  apply mat_of_path_is_rotation_matrix.
+Defined.
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
-unfold is_countable, D; simpl.
+exists D_of_nat.
 bbb.
+
+unfold is_countable, D; simpl.
 exists fixpoint_of_nat.
 intros p Hp.
 unfold D in Hp; simpl in Hp.

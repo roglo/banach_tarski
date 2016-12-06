@@ -89,6 +89,17 @@ Definition mat_id :=
 Delimit Scope mat_scope with mat.
 Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
 
+Theorem mat_mul_id_l : ∀ m, mat_mul mat_id m = m.
+Proof.
+intros m.
+unfold mat_mul, mat_id; simpl.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+now destruct m.
+Qed.
+
 Theorem mat_mul_id_r : ∀ m, mat_mul m mat_id = m.
 Proof.
 intros m.
@@ -335,7 +346,11 @@ Definition mat_det m :=
    a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
    a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%R.
 
+Arguments mat_transp m%mat.
 Arguments mat_det m%mat.
+
+Theorem mat_transp_id : mat_transp mat_id = mat_id.
+Proof. easy. Qed.
 
 Theorem mat_transp_mul : ∀ m₁ m₂,
   mat_transp (mat_mul m₁ m₂) = mat_mul (mat_transp m₂) (mat_transp m₁).
@@ -361,6 +376,14 @@ Qed.
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
   mat_det A = 1%R.
+
+Arguments is_rotation_matrix A%mat.
+
+Theorem mat_id_is_rotation_matrix : is_rotation_matrix mat_id.
+Proof.
+split; [ now rewrite mat_transp_id, mat_mul_id_l | ].
+unfold mat_det; simpl; ring.
+Qed.
 
 Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
 Proof.
@@ -431,6 +454,22 @@ intros (t, d); destruct t, d.
  apply rot_x_is_rotation_matrix.
  apply rot_inv_z_is_rotation_matrix.
  apply rot_z_is_rotation_matrix.
+Qed.
+
+Theorem mat_mul_is_rotation_matrix : ∀ m1 m2,
+  is_rotation_matrix m1
+  → is_rotation_matrix m2
+  → is_rotation_matrix (m1 * m2).
+Proof.
+intros * (Hm1, Hd1) (Hm2, Hd2).
+unfold is_rotation_matrix.
+rewrite mat_transp_mul.
+rewrite mat_mul_assoc.
+setoid_rewrite <- mat_mul_assoc at 2.
+rewrite Hm2, mat_mul_id_r, Hm1.
+split; [ easy | ].
+rewrite mat_det_mul, Hd1, Hd2.
+apply Rmult_1_r.
 Qed.
 
 Theorem Pdec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }.
