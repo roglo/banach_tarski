@@ -346,17 +346,93 @@ Definition rotation_fixpoint (m : matrix) k :=
 Definition mat_of_path el :=
   List.fold_right mat_mul mat_id (map mat_of_elem el).
 
-Definition fixpoint_of_path el :=
-  rotation_fixpoint (mat_of_path el) 1.
-
 Definition map_empty_path_to_single el :=
   match el with
   | [] => ạ :: []
   | _ => el
   end.
 
+Definition not_empty_path_of_path el :=
+  map_empty_path_to_single (norm_list el).
+
+Definition not_empty_path_of_nat n :=
+  not_empty_path_of_path (path_of_nat n).
+
+Definition fixpoint_of_path el :=
+  rotation_fixpoint (mat_of_path (not_empty_path_of_path el)) 1.
+
 Definition fixpoint_of_nat n :=
-  fixpoint_of_path (map_empty_path_to_single (norm_list (path_of_nat n))).
+  fixpoint_of_path (path_of_nat n).
+
+Theorem matrix_fixpoint_ok : ∀ m p k,
+  is_rotation_matrix m
+  → p = rotation_fixpoint m k
+  → mat_vec_mul m p = p.
+Proof.
+intros m p k Hrm Hn.
+subst p.
+unfold rotation_fixpoint.
+remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+setoid_rewrite Rmult_div.
+remember (k / r)%R as kr.
+unfold is_rotation_matrix in Hrm.
+destruct Hrm as (Ht & Hd).
+unfold mat_det in Hd.
+unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
+injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+simpl.
+setoid_rewrite fold_Rsqr in H₁.
+setoid_rewrite fold_Rsqr in H₅.
+setoid_rewrite fold_Rsqr in H₉.
+move H₉ after H₁; move H₅ after H₁.
+move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
+clear H₄ H₇ H₈; move H₆ after H₂.
+move Hd before H₉.
+rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
+rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
+clear Heqr Heqkr.
+f_equal; nsatz.
+Qed.
+
+Definition D_of_nat (n : ℕ) : {p : point | p ∈ D}.
+Proof.
+remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
+symmetry in Hnfo.
+destruct nfo as (nf, no).
+remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
+remember (not_empty_path_of_nat no) as el eqn:Hel.
+remember (fold_right rotate p₁ el) as p eqn:Hp.
+unfold fixpoint_of_nat in Hp₁.
+unfold fixpoint_of_path in Hp₁.
+remember (not_empty_path_of_path (path_of_nat nf)) as el₁ eqn:Hel₁.
+exists p, el₁, p₁.
+split; [ | split ].
+ exists (rev_path el).
+ now symmetry in Hp; apply rotate_rev_path in Hp.
+
+ rewrite Hel₁.
+ unfold not_empty_path_of_path.
+ unfold map_empty_path_to_single.
+ remember (norm_list (path_of_nat nf)) as nel eqn:Hnel.
+ symmetry in Hnel.
+ destruct nel as [| e₁ nel]; [ easy | ].
+ now rewrite <- Hnel, norm_list_idemp, Hnel.
+
+ unfold fixpoint_of_path in Hp₁.
+ apply matrix_fixpoint_ok in Hp₁.
+  unfold rotate.
+
+(*
+rewrite fold_right_map.
+Print mat_of_path.
+*)
+unfold mat_of_path in Hp₁.
+(*
+SearchAbout mat_mul.
+*)
+rewrite <- fold_right_map in Hp₁.
+
+bbb.
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.

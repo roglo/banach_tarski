@@ -109,6 +109,13 @@ Theorem fold_right_single : ∀ A B (f : A → B → B) x y,
   fold_right f x [y] = f y x.
 Proof. easy. Qed.
 
+Theorem fold_right_map : ∀ A B C (f : B → A → A) (a : A) (l : list C) g,
+  fold_right (λ b a, f (g b) a) a l = fold_right f a (map g l).
+Proof.
+intros.
+induction l as [| c l]; [ easy | now simpl; f_equal ].
+Qed.
+
 Theorem list_prod_nil_r : ∀ A B (l : list A),
   list_prod l ([] : list B) = [].
 Proof.
