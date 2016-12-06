@@ -445,45 +445,35 @@ split; [ | split ].
   apply mat_of_path_is_rotation_matrix.
 Qed.
 
-Definition D_of_nat (n : ℕ) : {p : point | p ∈ D}.
+Definition D_of_nat n :=
+ let '(nf, no) := prod_nat_of_nat n in
+ let p₁ := fixpoint_of_nat nf in
+ let el := not_empty_path_of_nat no in
+ fold_right rotate p₁ el.
+
+Theorem D_of_nat_in_D : ∀ n, D_of_nat n ∈ D.
 Proof.
+intros n.
+unfold D_of_nat.
 remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
 destruct nfo as (nf, no).
 remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
 remember (not_empty_path_of_nat no) as el eqn:Hel.
 remember (fold_right rotate p₁ el) as p eqn:Hp.
+remember (not_empty_path_of_path (path_of_nat nf)) as el₁ eqn:Hel₁.
+exists el₁, p₁.
+eapply D_of_nat_prop; try eassumption.
 unfold fixpoint_of_nat in Hp₁.
 unfold fixpoint_of_path in Hp₁.
-remember (not_empty_path_of_path (path_of_nat nf)) as el₁ eqn:Hel₁.
-exists p, el₁, p₁.
-eapply D_of_nat_prop; eassumption.
+now rewrite <- Hel₁ in Hp₁.
 Qed.
-
-Print D_of_nat.
-
-Definition D_of_nat' n : {p : point | p ∈ D} :=
-  let nfo := prod_nat_of_nat n in
-(
-  let '(nf, no) := nfo in
-  λ (Hnfo0 : (nf, no) = prod_nat_of_nat n),
-  let p₁ := fixpoint_of_nat nf in
-  let el := not_empty_path_of_nat no in
-  let p := fold_right rotate p₁ el in
-  let  el₁ := not_empty_path_of_path (path_of_nat nf) in
-  exist _ p
-   (ex_intro _ el₁
-     (ex_intro _ p₁
-       (D_of_nat_prop n nf no p p₁ el el₁ Hnfo0 eq_refl
-          eq_refl eq_refl eq_refl)))
-)
-eq_refl.
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
-exists D_of_nat'.
-unfold D_of_nat'.
+unfold is_countable.
+exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 unfold FinFun.Surjective.
-intros Hp.
+intros (p, Hp).
 bbb.
 
 unfold is_countable, D; simpl.
