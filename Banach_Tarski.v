@@ -11,7 +11,7 @@ Require Import Reals Psatz Nsatz.
 
 Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
-Require Import Countable RnCountable.
+Require Import Countable QCountable RnCountable.
 
 Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
@@ -456,21 +456,37 @@ Definition D_of_prod_nat '(nf, no) :=
 Definition D_of_nat n :=
  D_of_prod_nat (prod_nat_of_nat n).
 
-Theorem D_of_nat_in_D : ∀ n, D_of_nat n ∈ D.
+Theorem D_of_nat_nat_in_D : ∀ nf no, D_of_nat_nat nf no ∈ D.
 Proof.
-intros n.
-unfold D_of_nat, D_of_prod_nat, D_of_nat_nat.
-remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
-destruct nfo as (nf, no).
+intros nf no.
+unfold D_of_nat_nat.
 remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
 remember (not_empty_path_of_nat no) as el eqn:Hel.
 remember (fold_right rotate p₁ el) as p eqn:Hp.
 remember (not_empty_path_of_path (path_of_nat nf)) as el₁ eqn:Hel₁.
 exists el₁, p₁.
-eapply D_of_nat_prop; try eassumption.
 unfold fixpoint_of_nat in Hp₁.
 unfold fixpoint_of_path in Hp₁.
-now rewrite <- Hel₁ in Hp₁.
+rewrite <- Hel₁ in Hp₁.
+eapply D_of_nat_prop with (no := no); try eassumption.
+symmetry; apply prod_nat_of_nat_inv.
+Qed.
+
+Theorem D_of_prod_nat_in_D : ∀ nn, D_of_prod_nat nn ∈ D.
+Proof.
+intros (nf, no).
+apply D_of_nat_nat_in_D.
+Qed.
+
+Theorem D_of_nat_in_D : ∀ n, D_of_nat n ∈ D.
+Proof.
+intros n.
+unfold D_of_nat.
+unfold D_of_prod_nat.
+remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
+symmetry in Hnfo.
+destruct nfo as (nf, no).
+apply D_of_nat_nat_in_D.
 Qed.
 
 Fixpoint nat_of_path_aux el :=
@@ -514,9 +530,13 @@ Compute (nat_of_path (path_of_nat 13)).
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
-set (A := (nat * nat)%type).
-set (f := D_of_prod_nat).
-apply (countable_surjection A {p : point | p ∈ D} f).
+set (f := λ nn, exist _ (D_of_prod_nat nn) (D_of_prod_nat_in_D nn)).
+apply (countable_surjection (nat * nat) {p : point | p ∈ D} f).
+ apply countable_product_types; apply nat_countable.
+
+ unfold FinFun.Surjective.
+ intros (p, Hp).
+
 bbb.
 
 unfold is_countable.
