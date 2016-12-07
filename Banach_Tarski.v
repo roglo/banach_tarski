@@ -470,7 +470,7 @@ unfold fixpoint_of_path in Hp₁.
 rewrite <- Hel₁ in Hp₁.
 eapply D_of_nat_prop with (no := no); try eassumption.
 symmetry; apply prod_nat_of_nat_inv.
-Qed.
+Defined.
 
 Theorem D_of_prod_nat_in_D : ∀ nn, D_of_prod_nat nn ∈ D.
 Proof.
@@ -487,7 +487,7 @@ remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
 symmetry in Hnfo.
 destruct nfo as (nf, no).
 apply D_of_nat_nat_in_D.
-Qed.
+Defined.
 
 Fixpoint nat_of_path_aux el :=
   match el with
@@ -530,25 +530,46 @@ Compute (nat_of_path (path_of_nat 13)).
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
+unfold is_countable.
+Print D.
+
+bbb.
+(*
 set (f := λ nn, exist _ (D_of_prod_nat nn) (D_of_prod_nat_in_D nn)).
 apply (countable_surjection (nat * nat) {p : point | p ∈ D} f).
  apply countable_product_types; apply nat_countable.
 
  unfold FinFun.Surjective.
  intros (p, Hp).
-
+ unfold D in Hp; simpl in Hp.
+ destruct Hp as (el₁ & p₁ & (el & Hs) & Hn & Hr).
+ remember (nat_of_path el₁) as nf eqn:Hnf.
+ remember (nat_of_path el) as no eqn:Hno.
+ exists (nf, no); unfold f.
+ unfold D_of_prod_nat, D_of_nat_nat.
+ unfold fixpoint_of_nat.
+ unfold fixpoint_of_path.
 bbb.
-
+*)
 unfold is_countable.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 unfold FinFun.Surjective.
 intros (p, Hp).
 unfold D in Hp; simpl in Hp.
-destruct Hp as (el₁ & p₁ & (el & Hs) & Hn & Hr); simpl.
+destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr); simpl.
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path el) as no eqn:Hno.
 exists (nat_of_prod_nat (nf, no)).
+remember (nat_of_prod_nat (nf, no)) as n eqn:Hn.
+bbb.
 
+Require Import NPeano.
+unfold D_of_nat_in_D; simpl.
+rewrite Nat.mul_1_r.
+
+unfold D_of_nat_nat_in_D; simpl.
+
+enough (H : p = D_of_nat (nat_of_prod_nat (nf, no))).
 bbb.
 
 unfold is_countable, D; simpl.
