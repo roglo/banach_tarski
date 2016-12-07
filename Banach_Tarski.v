@@ -445,6 +445,50 @@ split; [ | split ].
   apply mat_of_path_is_rotation_matrix.
 Qed.
 
+Theorem toto : ∀ (p p₁ : point) (el el₁ : list free_elem),
+  norm_list el₁ ≠ []
+  → fold_right rotate p₁ el₁ = p₁
+  → fold_right rotate p el = p₁
+  → p ∈ D.
+Proof.
+intros * Hnl Hr Hs.
+refine
+    (@ex_intro (list free_elem)
+       (fun el0 : list free_elem =>
+        @ex point
+          (fun p₁0 : point =>
+           and (same_orbit p p₁0)
+             (and
+                (not
+                   (@eq (list free_elem) (norm_list el0)
+                      (@Datatypes.nil free_elem)))
+                (@eq point
+                   (@fold_right point free_elem rotate p₁0 el0) p₁0)))) el₁
+       (@ex_intro point
+          (fun p₁0 : point =>
+           and (same_orbit p p₁0)
+             (and
+                (not
+                   (@eq (list free_elem) (norm_list el₁)
+                      (@Datatypes.nil free_elem)))
+                (@eq point (@fold_right point free_elem rotate p₁0 el₁) p₁0))) p₁
+          (@conj (same_orbit p p₁)
+             (and
+                (not
+                   (@eq (list free_elem) (norm_list el₁)
+                      (@Datatypes.nil free_elem)))
+                (@eq point (@fold_right point free_elem rotate p₁ el₁) p₁))
+             (@ex_intro (list free_elem)
+                (fun el0 : list free_elem =>
+                 @eq point (@fold_right point free_elem rotate p el0) p₁) el Hs)
+             (@conj
+                (not
+                   (@eq (list free_elem) (norm_list el₁)
+                      (@Datatypes.nil free_elem)))
+                (@eq point
+                   (@fold_right point free_elem rotate p₁ el₁) p₁) Hnl Hr)))).
+Defined.
+
 Definition D_of_nat_nat nf no :=
   let p₁ := fixpoint_of_nat nf in
   let el := not_empty_path_of_nat no in
@@ -530,37 +574,29 @@ Compute (nat_of_path (path_of_nat 13)).
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
-unfold is_countable.
-Print D.
-
-bbb.
-(*
-set (f := λ nn, exist _ (D_of_prod_nat nn) (D_of_prod_nat_in_D nn)).
-apply (countable_surjection (nat * nat) {p : point | p ∈ D} f).
- apply countable_product_types; apply nat_countable.
-
- unfold FinFun.Surjective.
- intros (p, Hp).
- unfold D in Hp; simpl in Hp.
- destruct Hp as (el₁ & p₁ & (el & Hs) & Hn & Hr).
- remember (nat_of_path el₁) as nf eqn:Hnf.
- remember (nat_of_path el) as no eqn:Hno.
- exists (nf, no); unfold f.
- unfold D_of_prod_nat, D_of_nat_nat.
- unfold fixpoint_of_nat.
- unfold fixpoint_of_path.
-bbb.
-*)
-unfold is_countable.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
+(*
+exists (λ n, exist _ (D_of_nat n) (toto q p₁ el el₁ Hnl Hr Hs)).
+*)
 unfold FinFun.Surjective.
 intros (p, Hp).
 unfold D in Hp; simpl in Hp.
-destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr); simpl.
+destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path el) as no eqn:Hno.
 exists (nat_of_prod_nat (nf, no)).
 remember (nat_of_prod_nat (nf, no)) as n eqn:Hn.
+apply EqdepFacts.eq_dep_eq_sig.
+set (P := λ p : point, @setp point D p).
+rename p into q.
+set (p := D_of_nat n : point); simpl in p.
+set (x := D_of_nat_in_D n : P p); simpl in x.
+set (y := toto q p₁ el el₁ Hnl Hr Hs).
+enough (H : p = q).
+ subst q; unfold toto in y; fold y.
+ enough (H : x = y) by (rewrite H; constructor).
+ subst x y; subst P.
+
 bbb.
 
 Require Import NPeano.
