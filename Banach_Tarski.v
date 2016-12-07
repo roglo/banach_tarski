@@ -574,11 +574,12 @@ Compute (nat_of_path (path_of_nat 13)).
 
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
-exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 (*
-exists (λ n, exist _ (D_of_nat n) (toto q p₁ el el₁ Hnl Hr Hs)).
+exists (λ n, exist _ (D_of_nat n) (toto p p₁ el el₁ Hnl Hr Hs)).
 *)
+unfold is_countable.
 unfold FinFun.Surjective.
+exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 intros (p, Hp).
 unfold D in Hp; simpl in Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
@@ -597,6 +598,11 @@ enough (H : p = q).
  enough (H : x = y) by (rewrite H; constructor).
  subst x y; subst P.
 
+ unfold D_of_nat_in_D.
+ unfold prod_nat_of_nat.
+Require Import NPeano. Show.
+ unfold D_of_nat_nat_in_D.
+SearchAbout (ex_intro _ _ _ = ex_intro _ _ _).
 bbb.
 
 Require Import NPeano.
