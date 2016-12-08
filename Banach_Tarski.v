@@ -445,6 +445,7 @@ split; [ | split ].
   apply mat_of_path_is_rotation_matrix.
 Qed.
 
+(*
 Theorem toto : ∀ (p p₁ : point) (el el₁ : list free_elem),
   norm_list el₁ ≠ []
   → fold_right rotate p₁ el₁ = p₁
@@ -488,6 +489,7 @@ refine
                 (@eq point
                    (@fold_right point free_elem rotate p₁ el₁) p₁) Hnl Hr)))).
 Defined.
+*)
 
 Definition D_of_nat_nat nf no :=
   let p₁ := fixpoint_of_nat nf in
@@ -584,7 +586,8 @@ intros (p, Hp).
 Print D_of_nat.
 
 Definition nat_of_D (p : point) (Hp : p ∈ D) : nat.
-SearchAbout (_ ∈ D).
+unfold D in Hp; simpl in Hp.
+bbb.
 
 bbb.
 
