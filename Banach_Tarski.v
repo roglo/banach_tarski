@@ -629,6 +629,13 @@ Focus 2.
  generalize Hnfo; intros H.
  eapply D_of_nat_prop in H; try eassumption; [ | reflexivity ].
  destruct H as (Hso₂ & Hnel₂ & Hr₂).
+ rewrite Hn in Hnfo.
+ rewrite prod_nat_of_nat_inv in Hnfo.
+ injection Hnfo; clear Hnfo; intros H1 H2.
+ move H1 at top; move H2 at top.
+ subst nf' no'.
+
+bbb.
  unfold prod_nat_of_nat in Hnfo.
  remember Nat.pow as f.
  injection Hnfo; clear Hnfo; intros Hno' Hnf'; subst f.
