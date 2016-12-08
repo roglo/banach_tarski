@@ -621,18 +621,17 @@ Focus 2.
  remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
  destruct nfo as (nf', no').
  unfold D_of_nat_nat.
-(*
- unfold prod_nat_of_nat in Hnfo.
- remember Nat.pow as f.
- injection Hnfo; clear Hnfo; intros Hno' Hnf'; subst f.
-*)
  unfold fixpoint_of_nat.
  unfold fixpoint_of_path.
  remember (not_empty_path_of_path (path_of_nat nf')) as el₂ eqn:Hel₂.
  remember (rotation_fixpoint (mat_of_path el₂) 1) as p₂ eqn:Hp₂.
  remember (not_empty_path_of_nat no') as el₃ eqn:Hel₃.
- eapply D_of_nat_prop in Hnfo; try eassumption; [ | reflexivity ].
- destruct Hnfo as (Hso₂ & Hnel₂ & Hr₂).
+ generalize Hnfo; intros H.
+ eapply D_of_nat_prop in H; try eassumption; [ | reflexivity ].
+ destruct H as (Hso₂ & Hnel₂ & Hr₂).
+ unfold prod_nat_of_nat in Hnfo.
+ remember Nat.pow as f.
+ injection Hnfo; clear Hnfo; intros Hno' Hnf'; subst f.
 
 bbb.
  subst x y; subst P.
