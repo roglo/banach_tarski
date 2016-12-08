@@ -445,7 +445,6 @@ split; [ | split ].
   apply mat_of_path_is_rotation_matrix.
 Qed.
 
-(*
 Theorem toto : ∀ (p p₁ : point) (el el₁ : list free_elem),
   norm_list el₁ ≠ []
   → fold_right rotate p₁ el₁ = p₁
@@ -489,7 +488,6 @@ refine
                 (@eq point
                    (@fold_right point free_elem rotate p₁ el₁) p₁) Hnl Hr)))).
 Defined.
-*)
 
 Definition D_of_nat_nat nf no :=
   let p₁ := fixpoint_of_nat nf in
@@ -582,16 +580,27 @@ exists (λ n, exist _ (D_of_nat n) (toto p p₁ el el₁ Hnl Hr Hs)).
 unfold is_countable.
 unfold FinFun.Surjective.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
-intros (p, Hp).
+intros y.
+remember y as z eqn:Hz.
+destruct y as (p & el₁ & y).
+bbb.
+
+destruct y as (p & el₁ & p₁ & (el & Hs) & Hnl & Hr).
+
+
+(*
 Print D_of_nat.
 
 Definition nat_of_D (p : point) (Hp : p ∈ D) : nat.
 unfold D in Hp; simpl in Hp.
+About D.
 bbb.
 
 bbb.
 
 unfold D in Hp; simpl in Hp.
+*)
+intros (p, Hp).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path el) as no eqn:Hno.
@@ -606,8 +615,8 @@ set (y := toto q p₁ el el₁ Hnl Hr Hs).
 enough (H : p = q).
  subst q; unfold toto in y; fold y.
  enough (H : x = y) by (rewrite H; constructor).
- subst x y; subst P.
 
+ subst x y; subst P.
  unfold D_of_nat_in_D.
  unfold prod_nat_of_nat.
  unfold D_of_nat_nat_in_D.
