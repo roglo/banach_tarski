@@ -580,6 +580,7 @@ exists (λ n, exist _ (D_of_nat n) (toto p p₁ el el₁ Hnl Hr Hs)).
 unfold is_countable.
 unfold FinFun.Surjective.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
+(*
 intros y.
 remember y as z eqn:Hz.
 destruct y as (p & el₁ & y).
@@ -587,8 +588,6 @@ bbb.
 
 destruct y as (p & el₁ & p₁ & (el & Hs) & Hnl & Hr).
 
-
-(*
 Print D_of_nat.
 
 Definition nat_of_D (p : point) (Hp : p ∈ D) : nat.
@@ -616,6 +615,7 @@ enough (H : p = q).
  subst q; unfold toto in y; fold y.
  enough (H : x = y) by (rewrite H; constructor).
 
+bbb.
  subst x y; subst P.
  unfold D_of_nat_in_D.
  unfold prod_nat_of_nat.
