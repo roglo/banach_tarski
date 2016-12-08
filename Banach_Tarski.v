@@ -634,6 +634,20 @@ Focus 2.
  injection Hnfo; clear Hnfo; intros H1 H2.
  move H1 at top; move H2 at top.
  subst nf' no'.
+ rewrite Hno in Hel₃.
+ unfold not_empty_path_of_nat in Hel₃.
+SearchAbout nat_of_path.
+
+Theorem path_of_nat_inv : ∀ el, path_of_nat (nat_of_path el) = el.
+Proof.
+intros el.
+induction el as [| e₁ el]; [ easy | simpl ].
+unfold nat_of_path in IHel.
+destruct el as [| e₂ el].
+ simpl; rewrite Nat.add_1_r; simpl.
+ now destruct e₁ as (t, d); destruct t, d.
+
+ simpl in IHel; simpl.
 
 bbb.
  unfold prod_nat_of_nat in Hnfo.
