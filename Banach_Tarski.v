@@ -581,6 +581,13 @@ unfold is_countable.
 unfold FinFun.Surjective.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 intros (p, Hp).
+Print D_of_nat.
+
+Definition nat_of_D (p : point) (Hp : p ∈ D) : nat.
+SearchAbout (_ ∈ D).
+
+bbb.
+
 unfold D in Hp; simpl in Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 remember (nat_of_path el₁) as nf eqn:Hnf.
@@ -600,9 +607,12 @@ enough (H : p = q).
 
  unfold D_of_nat_in_D.
  unfold prod_nat_of_nat.
-Require Import NPeano. Show.
  unfold D_of_nat_nat_in_D.
-SearchAbout (ex_intro _ _ _ = ex_intro _ _ _).
+ set (i := (Nat.sqrt n - (n - Nat.sqrt n ^ 2))%nat).
+ set (j := (n - Nat.sqrt n ^ 2)%nat).
+ set (p₂ := fixpoint_of_nat i).
+ set (el₂ := not_empty_path_of_nat j).
+ set (el₃ := not_empty_path_of_path (path_of_nat i)).
 bbb.
 
 Require Import NPeano.
