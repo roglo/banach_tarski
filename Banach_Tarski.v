@@ -792,7 +792,6 @@ simpl in Hso.
 subst nf no.
 simpl in Hso.
 unfold D_of_nat_nat in Hso.
-Print not_empty_path_of_nat.
 bbb.
 
  destruct el as [| e₁ el].
