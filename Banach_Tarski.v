@@ -535,7 +535,7 @@ Defined.
 
 Fixpoint nat_of_path_aux el :=
   match el with
-  | e :: el' => (nat_of_path_aux el' * 4 + nat_of_free_elem e + 1)%nat
+  | e :: el' => S (nat_of_path_aux el' * 4 + nat_of_free_elem e)
   | [] => O
   end.
 
@@ -544,6 +544,45 @@ Definition nat_of_path el :=
   | e :: el' => nat_of_path_aux el
   | [] => O
   end.
+
+Theorem path_of_nat_inv : ∀ el, path_of_nat (nat_of_path el) = el.
+Proof.
+intros el.
+unfold path_of_nat, nat_of_path.
+destruct el as [| e₁ el]; [ easy | simpl ].
+rewrite Nat.add_comm.
+rewrite Nat.mod_add; [ | easy ].
+rewrite Nat.div_add; [ | easy ].
+f_equal; [ now destruct e₁ as (t, d); destruct t, d | ].
+
+bbb.
+intros el.
+unfold path_of_nat, nat_of_path.
+destruct el as [| e₁ el]; [ easy | simpl ].
+remember (nat_of_path_aux el * 4 + nat_of_free_elem e₁)%nat as n eqn:Hn.
+symmetry in Hn.
+destruct n.
+ apply Nat.eq_add_0 in Hn; simpl.
+ destruct Hn as (H4, H1).
+ apply Nat.eq_mul_0 in H4.
+ destruct H4 as [H4| H4]; [ | easy ].
+ destruct el; [ | easy ].
+ now destruct e₁ as (t, d); destruct t, d.
+
+ destruct n.
+  rewrite Nat.add_comm in Hn; simpl.
+  remember (nat_of_free_elem e₁) as n eqn:Hnn.
+  symmetry in Hnn.
+  destruct n; [ now destruct el | simpl in Hn ].
+  apply Nat.succ_inj in Hn.
+  apply Nat.eq_add_0 in Hn.
+  destruct Hn as (Hn, Hel); subst n.
+  apply Nat.eq_mul_0 in Hel.
+  destruct Hel as [Hel| Hel]; [ | easy ].
+  destruct el; [ | easy ].
+  now destruct e₁ as (t, d); destruct t, d.
+
+bbb.
 
 (*
 Compute (path_of_nat (nat_of_path [])).
@@ -637,19 +676,9 @@ Focus 2.
  rewrite Hno in Hel₃.
  unfold not_empty_path_of_nat in Hel₃.
 SearchAbout nat_of_path.
-
-Theorem path_of_nat_inv : ∀ el, path_of_nat (nat_of_path el) = el.
-Proof.
-intros el.
-induction el as [| e₁ el]; [ easy | simpl ].
-unfold nat_of_path in IHel.
-destruct el as [| e₂ el].
- simpl; rewrite Nat.add_1_r; simpl.
- now destruct e₁ as (t, d); destruct t, d.
-
- simpl in IHel; simpl.
-
-bbb.
+Check path_of_nat_inv.
+(* end of path_of_nat_inv; return to previous *)
+ rewrite path_of_nat_inv in Hel₃.
  unfold prod_nat_of_nat in Hnfo.
  remember Nat.pow as f.
  injection Hnfo; clear Hnfo; intros Hno' Hnf'; subst f.
