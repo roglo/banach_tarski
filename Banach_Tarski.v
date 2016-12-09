@@ -694,6 +694,18 @@ enough (H : ∃ f : ℕ * ℕ → {p : point | p ∈ D}, ∀ y, ∃ nfo, f nfo =
    remember (not_empty_path_of_path (path_of_nat nf)) as el₂ eqn:Hel₂.
    remember (rotation_fixpoint (mat_of_path el₂) 1) as p₂ eqn:Hp₂.
    remember (not_empty_path_of_nat no) as el₃ eqn:Hel₃.
+   rewrite Hno in Hel₃.
+   unfold not_empty_path_of_nat in Hel₃.
+   rewrite path_of_nat_inv in Hel₃.
+   rewrite Hnf in Hel₂.
+   rewrite path_of_nat_inv in Hel₂.
+   destruct el₁ as [| e₁ el₁]; [ now exfalso; apply Hnl | ].
+   unfold not_empty_path_of_path in Hel₂.
+   unfold map_empty_path_to_single in Hel₂.
+   remember (norm_list (e₁ :: el₁)) as el₄ eqn:Hel₄.
+   clear y.
+   destruct el₄ as [| e el₄]; [ now exfalso; apply Hnl | clear Hnl ].
+   subst el₂.
 bbb.
 
    generalize Hnfo; intros H.
