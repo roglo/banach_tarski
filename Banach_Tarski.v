@@ -489,6 +489,44 @@ refine
                    (@fold_right point free_elem rotate p₁ el₁) p₁) Hnl Hr)))).
 Defined.
 
+Definition titi p p₁ el el₁ Hr Hnl Hs :=
+    (@ex_intro (list free_elem)
+       (fun el0 : list free_elem =>
+        @ex point
+          (fun p₁0 : point =>
+           and (same_orbit p p₁0)
+             (and
+                (not
+                   (@eq (list free_elem) (norm_list el0)
+                      (@Datatypes.nil free_elem)))
+                (@eq point (@fold_right point free_elem rotate p₁0 el0) p₁0))))
+       el₁
+       (@ex_intro point
+          (fun p₁0 : point =>
+           and (same_orbit p p₁0)
+             (and
+                (not
+                   (@eq (list free_elem) (norm_list el₁)
+                      (@Datatypes.nil free_elem)))
+                (@eq point (@fold_right point free_elem rotate p₁0 el₁) p₁0)))
+          p₁
+          (@conj (same_orbit p p₁)
+             (and
+                (not
+                   (@eq (list free_elem) (norm_list el₁)
+                      (@Datatypes.nil free_elem)))
+                (@eq point (@fold_right point free_elem rotate p₁ el₁) p₁))
+             (@ex_intro (list free_elem)
+                (fun el0 : list free_elem =>
+                 @eq point (@fold_right point free_elem rotate p el0) p₁) el
+                Hs)
+             (@conj
+                (not
+                   (@eq (list free_elem) (norm_list el₁)
+                      (@Datatypes.nil free_elem)))
+                (@eq point (@fold_right point free_elem rotate p₁ el₁) p₁)
+                Hnl Hr)))).
+
 Definition D_of_nat_nat nf no :=
   let p₁ := fixpoint_of_nat nf in
   let el := not_empty_path_of_nat no in
@@ -644,15 +682,41 @@ enough (H : ∃ f : ℕ * ℕ → {p : point | p ∈ D}, ∀ y, ∃ nfo, f nfo =
  rename p into q.
  set (p := D_of_nat_nat nf no : point); simpl in p.
  set (x := D_of_nat_nat_in_D nf no : P p); simpl in x.
-(*
- set (y := toto q p₁ el el₁ Hnl Hr Hs).
-*)
+ set (y := titi q p₁ el el₁ Hr Hnl Hs).
  enough (H : p = q).
   subst q.
-bbb.
-
   enough (H : x = y) by (rewrite H; constructor).
  Focus 2.
+   subst p; rename q into p.
+   unfold D_of_nat_nat.
+   unfold fixpoint_of_nat.
+   unfold fixpoint_of_path.
+   remember (not_empty_path_of_path (path_of_nat nf)) as el₂ eqn:Hel₂.
+   remember (rotation_fixpoint (mat_of_path el₂) 1) as p₂ eqn:Hp₂.
+   remember (not_empty_path_of_nat no) as el₃ eqn:Hel₃.
+bbb.
+
+   generalize Hnfo; intros H.
+   eapply D_of_nat_prop in H; try eassumption; [ | reflexivity ].
+   destruct H as (Hso₂ & Hnel₂ & Hr₂).
+   rewrite Hn in Hnfo.
+   rewrite prod_nat_of_nat_inv in Hnfo.
+   injection Hnfo; clear Hnfo; intros H1 H2.
+   move H1 at top; move H2 at top.
+   subst nf' no'.
+   rewrite Hno in Hel₃.
+   unfold not_empty_path_of_nat in Hel₃.
+   rewrite path_of_nat_inv in Hel₃.
+   rewrite Hnf in Hel₂.
+   rewrite path_of_nat_inv in Hel₂.
+   clear Hso₂.
+   destruct el₁ as [| e₁ el₁]; [ now exfalso; apply Hnl | ].
+   unfold not_empty_path_of_path in Hel₂.
+   unfold map_empty_path_to_single in Hel₂.
+   remember (norm_list (e₁ :: el₁)) as el₄ eqn:Hel₄.
+   clear y.
+   destruct el₄ as [| e el₄]; [ now exfalso; apply Hnl | clear Hnl ].
+   subst el₂.
 
 bbb.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
