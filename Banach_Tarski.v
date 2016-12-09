@@ -662,7 +662,7 @@ Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable.
 unfold FinFun.Surjective.
-(**)
+(*
 enough (H : ∃ f : ℕ * ℕ → {p : point | p ∈ D}, ∀ y, ∃ nfo, f nfo = y).
  destruct H as (f & Hf).
  exists (λ n, f (prod_nat_of_nat n)).
@@ -706,6 +706,8 @@ enough (H : ∃ f : ℕ * ℕ → {p : point | p ∈ D}, ∀ y, ∃ nfo, f nfo =
    clear y.
    destruct el₄ as [| e el₄]; [ now exfalso; apply Hnl | clear Hnl ].
    subst el₂.
+subst P.
+simpl in x.
 bbb.
 
    generalize Hnfo; intros H.
@@ -731,6 +733,7 @@ bbb.
    subst el₂.
 
 bbb.
+*)
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 intros (p, Hp).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
