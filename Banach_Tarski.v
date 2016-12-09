@@ -668,6 +668,26 @@ Focus 2.
  rewrite Hno in Hel₃.
  unfold not_empty_path_of_nat in Hel₃.
  rewrite path_of_nat_inv in Hel₃.
+ rewrite Hnf in Hel₂.
+ rewrite path_of_nat_inv in Hel₂.
+ clear Hso₂.
+ destruct el₁ as [| e₁ el₁]; [ now exfalso; apply Hnl | ].
+ unfold not_empty_path_of_path in Hel₂.
+ unfold map_empty_path_to_single in Hel₂.
+ remember (norm_list (e₁ :: el₁)) as el₄ eqn:Hel₄.
+ clear y.
+ destruct el₄ as [| e el₄]; [ now exfalso; apply Hnl | clear Hnl ].
+ subst el₂.
+ subst el₃.
+
+bbb.
+
+ destruct el as [| e₁ el].
+  simpl in Hs; subst p.
+  unfold not_empty_path_of_path in Hel₃; simpl in Hel₃.
+  subst el₃; simpl.
+
+
 bbb.
 
  unfold prod_nat_of_nat in Hnfo.
