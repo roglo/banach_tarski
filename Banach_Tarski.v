@@ -549,40 +549,54 @@ Theorem path_of_nat_inv : ∀ el, path_of_nat (nat_of_path el) = el.
 Proof.
 intros el.
 unfold path_of_nat, nat_of_path.
-destruct el as [| e₁ el]; [ easy | simpl ].
+induction el as [| e₁ el]; [ easy | simpl ].
 rewrite Nat.add_comm.
 rewrite Nat.mod_add; [ | easy ].
 rewrite Nat.div_add; [ | easy ].
+rewrite nat_of_free_elem_div_4, Nat.add_0_l.
 f_equal; [ now destruct e₁ as (t, d); destruct t, d | ].
+destruct el as [| e₂ el]; [ easy | ].
+simpl in IHel.
+rewrite Nat.add_comm in IHel.
+rewrite Nat.mod_add in IHel; [ | easy ].
+rewrite Nat.div_add in IHel; [ | easy ].
+rewrite nat_of_free_elem_div_4, Nat.add_0_l in IHel.
+injection IHel; clear IHel; intros Hel He₂.
+simpl; rewrite <- Nat.add_succ_comm; simpl.
+rewrite Nat.add_comm.
+rewrite Nat.mod_add; [ | easy ].
+rewrite Nat.div_add; [ | easy ].
+rewrite nat_of_free_elem_div_4, Nat.add_0_l.
+rewrite He₂; f_equal.
+remember (nat_of_path_aux el) as n eqn:Hn; symmetry in Hn.
+destruct n; [ easy | ].
+rewrite <- Hel.
+apply path_of_nat_aux_enough_iter.
+ apply Nat.lt_lt_add_l.
+ do 3 apply Nat.lt_lt_succ_r.
+ rewrite Nat.mul_add_distr_r.
+ apply Nat.lt_lt_add_l.
+ remember 4 as four; simpl; subst four.
+ rewrite Nat.mul_add_distr_r.
+ destruct n; [ apply Nat.lt_0_succ | ].
+ apply Nat.lt_lt_add_l.
+ remember 4 as four; simpl; subst four.
+ rewrite Nat.mul_add_distr_r.
+ rewrite <- Nat.mul_assoc.
+ apply Nat.lt_le_trans with (m := (4 * 4 + n)%nat).
+  simpl; apply -> Nat.succ_lt_mono.
+  do 14 apply Nat.lt_lt_succ_r.
+  apply Nat.lt_succ_diag_r.
 
-bbb.
-intros el.
-unfold path_of_nat, nat_of_path.
-destruct el as [| e₁ el]; [ easy | simpl ].
-remember (nat_of_path_aux el * 4 + nat_of_free_elem e₁)%nat as n eqn:Hn.
-symmetry in Hn.
-destruct n.
- apply Nat.eq_add_0 in Hn; simpl.
- destruct Hn as (H4, H1).
- apply Nat.eq_mul_0 in H4.
- destruct H4 as [H4| H4]; [ | easy ].
- destruct el; [ | easy ].
- now destruct e₁ as (t, d); destruct t, d.
+  apply Nat.add_le_mono; [ easy | ].
+  rewrite Nat.mul_comm; simpl.
+  apply Nat.le_add_r.
 
- destruct n.
-  rewrite Nat.add_comm in Hn; simpl.
-  remember (nat_of_free_elem e₁) as n eqn:Hnn.
-  symmetry in Hnn.
-  destruct n; [ now destruct el | simpl in Hn ].
-  apply Nat.succ_inj in Hn.
-  apply Nat.eq_add_0 in Hn.
-  destruct Hn as (Hn, Hel); subst n.
-  apply Nat.eq_mul_0 in Hel.
-  destruct Hel as [Hel| Hel]; [ | easy ].
-  destruct el; [ | easy ].
-  now destruct e₁ as (t, d); destruct t, d.
-
-bbb.
+ apply Nat.lt_lt_add_l.
+ rewrite Nat.mul_comm; simpl.
+ rewrite <- Nat.add_succ_l.
+ apply Nat.lt_lt_add_r, Nat.lt_succ_diag_r.
+Qed.
 
 (*
 Compute (path_of_nat (nat_of_path [])).
@@ -654,7 +668,7 @@ enough (H : p = q).
  subst q; unfold toto in y; fold y.
  enough (H : x = y) by (rewrite H; constructor).
 Focus 2.
- subst p.
+ subst p; rename q into p.
  unfold D_of_nat.
  unfold D_of_prod_nat.
  remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
@@ -675,10 +689,9 @@ Focus 2.
  subst nf' no'.
  rewrite Hno in Hel₃.
  unfold not_empty_path_of_nat in Hel₃.
-SearchAbout nat_of_path.
-Check path_of_nat_inv.
-(* end of path_of_nat_inv; return to previous *)
  rewrite path_of_nat_inv in Hel₃.
+bbb.
+
  unfold prod_nat_of_nat in Hnfo.
  remember Nat.pow as f.
  injection Hnfo; clear Hnfo; intros Hno' Hnf'; subst f.
