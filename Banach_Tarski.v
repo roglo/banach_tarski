@@ -678,8 +678,6 @@ Focus 2.
  clear y.
  destruct el₄ as [| e el₄]; [ now exfalso; apply Hnl | clear Hnl ].
  subst el₂.
- subst el₃.
-
 bbb.
 
  destruct el as [| e₁ el].
