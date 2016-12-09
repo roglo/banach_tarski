@@ -520,7 +520,7 @@ Theorem D_of_prod_nat_in_D : ∀ nn, D_of_prod_nat nn ∈ D.
 Proof.
 intros (nf, no).
 apply D_of_nat_nat_in_D.
-Qed.
+Defined.
 
 Theorem D_of_nat_in_D : ∀ n, D_of_nat n ∈ D.
 Proof.
@@ -624,13 +624,35 @@ Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable.
 unfold FinFun.Surjective.
-enough (H : ∃ f : ℕ → ℕ → {p : point | p ∈ D}, ∀ y, ∃ nf no, f nf no = y).
+(**)
+enough (H : ∃ f : ℕ * ℕ → {p : point | p ∈ D}, ∀ y, ∃ nfo, f nfo = y).
  destruct H as (f & Hf).
- exists (λ n, let '(nf, no) := prod_nat_of_nat n in f nf no).
- intros y; specialize (Hf y) as (nf & no & Hf).
- exists (nat_of_prod_nat (nf, no)).
- rewrite <- Hf.
- now rewrite prod_nat_of_nat_inv.
+ exists (λ n, f (prod_nat_of_nat n)).
+ intros y; specialize (Hf y) as (nfo & Hf); rewrite <- Hf.
+ exists (nat_of_prod_nat nfo).
+ now destruct nfo; rewrite prod_nat_of_nat_inv.
+
+ exists (λ nfo, exist _ (D_of_prod_nat nfo) (D_of_prod_nat_in_D nfo)).
+ intros (p, Hp).
+ destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
+ remember (nat_of_path el₁) as nf eqn:Hnf.
+ remember (nat_of_path el) as no eqn:Hno.
+ exists (nf, no).
+ unfold D_of_prod_nat, D_of_prod_nat_in_D.
+ apply EqdepFacts.eq_dep_eq_sig.
+ set (P := λ p : point, @setp point D p).
+ rename p into q.
+ set (p := D_of_nat_nat nf no : point); simpl in p.
+ set (x := D_of_nat_nat_in_D nf no : P p); simpl in x.
+(*
+ set (y := toto q p₁ el el₁ Hnl Hr Hs).
+*)
+ enough (H : p = q).
+  subst q.
+bbb.
+
+  enough (H : x = y) by (rewrite H; constructor).
+ Focus 2.
 
 bbb.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
