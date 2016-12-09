@@ -624,6 +624,15 @@ Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable.
 unfold FinFun.Surjective.
+enough (H : ∃ f : ℕ → ℕ → {p : point | p ∈ D}, ∀ y, ∃ nf no, f nf no = y).
+ destruct H as (f & Hf).
+ exists (λ n, let '(nf, no) := prod_nat_of_nat n in f nf no).
+ intros y; specialize (Hf y) as (nf & no & Hf).
+ exists (nat_of_prod_nat (nf, no)).
+ rewrite <- Hf.
+ now rewrite prod_nat_of_nat_inv.
+
+bbb.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 intros (p, Hp).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
