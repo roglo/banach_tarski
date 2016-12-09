@@ -790,6 +790,8 @@ Focus 2.
  enough (H : p₁ = p₂).
   move H at top; subst p₂; clear Hr₂.
   subst el₃.
+  apply rotate_rev_path in Hs.
+  (* c'est bizarre, ça... c'est à l'envers... *)
 bbb.
 
  subst el₂.
