@@ -792,6 +792,12 @@ simpl in Hso.
 subst nf no.
 simpl in Hso.
 unfold D_of_nat_nat in Hso.
+remember (S (nat_of_path_aux el₁ * 4 + nat_of_free_elem e₁)) as n eqn:Hn.
+assert (H : not_empty_path_of_nat (nat_of_path el) = el₃).
+ unfold not_empty_path_of_nat.
+ now rewrite path_of_nat_inv.
+
+ rewrite H in Hso; clear H.
 bbb.
 
  destruct el as [| e₁ el].
