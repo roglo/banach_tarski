@@ -783,6 +783,16 @@ Focus 2.
  clear y.
  destruct el₄ as [| e el₄]; [ now exfalso; apply Hnl | clear Hnl ].
  subst el₂.
+ rewrite rotate_rotate_norm, <- Hel₄ in Hr.
+ move Hr at bottom.
+ move Hr₂ at bottom.
+ (* two fixpoints with the same path: should be equal... *)
+ enough (H : p₁ = p₂).
+  move H at top; subst p₂; clear Hr₂.
+  subst el₃.
+bbb.
+
+ subst el₂.
 subst P; simpl in x.
 destruct x as (el₂ & p₃ & Hso & Hnl & Hr₁).
 subst n.
@@ -798,6 +808,12 @@ assert (H : not_empty_path_of_nat (nat_of_path el) = el₃).
  now rewrite path_of_nat_inv.
 
  rewrite H in Hso; clear H.
+ assert (H : n = nat_of_path (e₁ :: el₁)) by easy.
+ rewrite H in Hso; clear H.
+ unfold fixpoint_of_nat in Hso.
+ rewrite path_of_nat_inv in Hso.
+ unfold fixpoint_of_path in Hso.
+
 bbb.
 
  destruct el as [| e₁ el].
