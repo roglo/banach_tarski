@@ -739,8 +739,8 @@ intros (p, Hp).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path el) as no eqn:Hno.
-exists (nat_of_prod_nat (nf, no)).
 remember (nat_of_prod_nat (nf, no)) as n eqn:Hn.
+exists n.
 apply EqdepFacts.eq_dep_eq_sig.
 set (P := λ p : point, @setp point D p).
 rename p into q.
@@ -783,6 +783,16 @@ Focus 2.
  clear y.
  destruct el₄ as [| e el₄]; [ now exfalso; apply Hnl | clear Hnl ].
  subst el₂.
+subst P; simpl in x.
+destruct x as (el₂ & p₃ & Hso & Hnl & Hr₁).
+subst n.
+unfold D_of_nat in Hso.
+rewrite prod_nat_of_nat_inv in Hso.
+simpl in Hso.
+subst nf no.
+simpl in Hso.
+unfold D_of_nat_nat in Hso.
+Print not_empty_path_of_nat.
 bbb.
 
  destruct el as [| e₁ el].
