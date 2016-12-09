@@ -525,11 +525,6 @@ Qed.
 Theorem D_of_nat_in_D : ∀ n, D_of_nat n ∈ D.
 Proof.
 intros n.
-unfold D_of_nat.
-unfold D_of_prod_nat.
-remember (prod_nat_of_nat n) as nfo eqn:Hnfo.
-symmetry in Hnfo.
-destruct nfo as (nf, no).
 apply D_of_nat_nat_in_D.
 Defined.
 
