@@ -691,7 +691,7 @@ destruct el₂; [ | easy ].
 now apply rev_path_is_nil in Hel₂.
 Qed.
 
-Theorem surjective_nat_nat_surjective_nat :
+Theorem surjective_prod_nat_surjective_nat :
   (∃ g : ℕ * ℕ → {p : point | p ∈ D}, FinFun.Surjective g)
   → ∃ f : ℕ → {p : point | p ∈ D}, FinFun.Surjective f.
 Proof.
@@ -707,7 +707,7 @@ Qed.
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable.
-apply surjective_nat_nat_surjective_nat.
+apply surjective_prod_nat_surjective_nat.
 exists (λ nfo, exist _ (D_of_prod_nat nfo) (D_of_prod_nat_in_D nfo)).
 unfold FinFun.Surjective.
 intros (p, Hp).
