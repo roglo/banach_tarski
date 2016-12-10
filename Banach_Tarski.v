@@ -698,16 +698,7 @@ unfold FinFun.Surjective.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 intros (p, Hp).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
-(**)
- remember (norm_list el) as el₅ eqn:Hel₅.
- symmetry in Hel₅.
- destruct el₅ as [| e₅ el₅].
-  generalize Hs; intros H.
-  rewrite rotate_rotate_norm in Hs.
-  rewrite Hel₅ in Hs; simpl in Hs.
-  subst p; rename H into Hs.
-bbb.
-
+fold (toto p p₁ el el₁ Hnl Hr Hs).
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
 remember (nat_of_prod_nat (nf, no)) as n eqn:Hn.
@@ -757,6 +748,17 @@ Focus 2.
  rewrite rotate_rotate_norm, <- Hel₄ in Hr.
  move Hr at bottom.
  move Hr₂ at bottom.
+ subst el₃.
+ rewrite rotate_rotate_norm in Hs.
+ rewrite rotate_rotate_norm.
+ rewrite norm_list_not_empty_path.
+ rewrite <- rev_path_norm_list.
+ remember (norm_list el) as el₅ eqn:Hel₅.
+ symmetry in Hel₅.
+ destruct el₅ as [| e₅ el₅].
+  simpl in Hs; simpl.
+  subst p.
+bbb.
  (* two fixpoints with the same path: should be equal... *)
  enough (H : p₁ = p₂).
   move H at top; subst p₂; clear Hr₂.
@@ -780,6 +782,16 @@ destruct el₆ as [| e₆ el₆].
  rewrite Nat.mul_1_r in Hn.
  do 2 rewrite Nat.add_0_r in Hn.
  subst n.
+unfold D_of_nat in x.
+unfold D_of_prod_nat in x.
+unfold prod_nat_of_nat in x.
+rewrite Nat.sqrt_square in x.
+rewrite Nat.pow_2_r in x.
+rewrite Nat.sub_diag in x.
+rewrite Nat.sub_0_r in x.
+unfold D_of_nat_nat in x.
+remember fixpoint_of_nat as f; simpl in x; subst f.
+
 
 bbb.
 
