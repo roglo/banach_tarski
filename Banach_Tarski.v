@@ -758,20 +758,45 @@ Focus 2.
  (* two fixpoints with the same path: should be equal... *)
  enough (H : p₁ = p₂).
   move H at top; subst p₂; clear Hr₂.
-unfold nat_of_path in Hno.
-remember (not_empty_path_of_path (rev_path el)) as el₆ eqn:Hel₆.
-symmetry in Hel₆.
-destruct el₆ as [| e₆ el₆].
- remember (rev_path el) as rel eqn:Hrel.
- symmetry in Hrel.
- destruct rel as [| re rel]; [ easy | ].
- unfold not_empty_path_of_path in Hel₆.
- simpl in Hel₆.
- remember (norm_list rel) as el₇ eqn:Hel₇.
- symmetry in Hel₇.
- destruct el₇ as [| e₇ el₇]; [ easy | ].
- now destruct (letter_opp_dec re e₇) as [H| H]; destruct el₇.
+  unfold nat_of_path in Hno.
+  remember (not_empty_path_of_path (rev_path el)) as el₆ eqn:Hel₆.
+  symmetry in Hel₆.
+  destruct el₆ as [| e₆ el₆].
+   remember (rev_path el) as rel eqn:Hrel.
+   symmetry in Hrel.
+   destruct rel as [| re rel]; [ easy | ].
+   unfold not_empty_path_of_path in Hel₆.
+   simpl in Hel₆.
+   remember (norm_list rel) as el₇ eqn:Hel₇.
+   symmetry in Hel₇.
+   destruct el₇ as [| e₇ el₇]; [ easy | ].
+   now destruct (letter_opp_dec re e₇) as [H| H]; destruct el₇.
 
+   remember (rev_path el) as rel eqn:Hrel.
+   symmetry in Hrel.
+   destruct rel as [| re rel].
+    unfold not_empty_path_of_path in Hel₆.
+    simpl in Hel₆.
+    injection Hel₆; clear Hel₆; intros; subst e₆ el₆.
+    simpl in Hno; subst no.
+    apply rev_path_is_nil in Hrel; subst el.
+    simpl in Hs; subst p; simpl.
+    subst P; simpl in x.
+    subst n.
+    unfold D_of_nat in x.
+    rewrite prod_nat_of_nat_inv in x.
+    destruct x as (el & p₂ & Hso & Hnl & Hr₁).
+    simpl in Hso.
+    unfold D_of_nat_nat in Hso.
+    remember fixpoint_of_nat as f; simpl in Hso; subst f.
+    unfold fixpoint_of_nat in Hso.
+    subst nf.
+    rewrite path_of_nat_inv in Hso.
+    unfold fixpoint_of_path in Hso.
+    unfold not_empty_path_of_path in Hso.
+    rewrite <- Hel₄ in Hso.
+    unfold map_empty_path_to_single in Hso.
+    rewrite <- Hp₂ in Hso.
 bbb.
 
  apply rev_path_is_nil in Hel₆.
