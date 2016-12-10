@@ -658,6 +658,39 @@ Compute (nat_of_path (path_of_nat 12)).
 Compute (nat_of_path (path_of_nat 13)).
 *)
 
+Theorem norm_list_not_empty_path : ∀ el,
+  norm_list (not_empty_path_of_path el) =
+  not_empty_path_of_path (norm_list el).
+Proof.
+intros.
+unfold not_empty_path_of_path.
+unfold map_empty_path_to_single.
+rewrite norm_list_idemp.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁ el₁]; [ easy | ].
+rewrite <- Hel₁.
+apply norm_list_idemp.
+Qed.
+
+Theorem not_empty_rev_path : ∀ el,
+  norm_list el ≠ []
+  → not_empty_path_of_path (rev_path el) =
+    rev_path (not_empty_path_of_path el).
+Proof.
+intros * Hn.
+unfold not_empty_path_of_path.
+unfold map_empty_path_to_single.
+rewrite <- rev_path_norm_list.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁ el₁]; [ now exfalso; apply Hn | ].
+remember (rev_path (e₁ :: el₁)) as el₂ eqn:Hel₂.
+symmetry in Hel₂.
+destruct el₂; [ | easy ].
+now apply rev_path_is_nil in Hel₂.
+Qed.
+
 Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable.
@@ -665,8 +698,18 @@ unfold FinFun.Surjective.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 intros (p, Hp).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
+(**)
+ remember (norm_list el) as el₅ eqn:Hel₅.
+ symmetry in Hel₅.
+ destruct el₅ as [| e₅ el₅].
+  generalize Hs; intros H.
+  rewrite rotate_rotate_norm in Hs.
+  rewrite Hel₅ in Hs; simpl in Hs.
+  subst p; rename H into Hs.
+bbb.
+
 remember (nat_of_path el₁) as nf eqn:Hnf.
-remember (nat_of_path el) as no eqn:Hno.
+remember (nat_of_path (rev_path el)) as no eqn:Hno.
 remember (nat_of_prod_nat (nf, no)) as n eqn:Hn.
 exists n.
 apply EqdepFacts.eq_dep_eq_sig.
@@ -718,8 +761,29 @@ Focus 2.
  enough (H : p₁ = p₂).
   move H at top; subst p₂; clear Hr₂.
   subst el₃.
-  apply rotate_rev_path in Hs.
-  (* c'est bizarre, ça... c'est à l'envers... *)
+  rewrite rotate_rotate_norm in Hs.
+  rewrite rotate_rotate_norm.
+  rewrite norm_list_not_empty_path.
+  rewrite <- rev_path_norm_list.
+  remember (norm_list el) as el₅ eqn:Hel₅.
+  symmetry in Hel₅.
+  destruct el₅ as [| e₅ el₅].
+   simpl in Hs; simpl.
+   subst p.
+unfold nat_of_path in Hno.
+remember (rev_path el) as el₆ eqn:Hel₆.
+symmetry in Hel₆.
+destruct el₆ as [| e₆ el₆].
+ apply rev_path_is_nil in Hel₆.
+ subst el no.
+ simpl in Hn.
+ rewrite Nat.mul_1_r in Hn.
+ do 2 rewrite Nat.add_0_r in Hn.
+ subst n.
+
+bbb.
+
+   rewrite not_empty_rev_path.
 bbb.
 
  subst el₂.
