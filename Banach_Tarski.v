@@ -700,7 +700,8 @@ intros (p, Hp).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 fold (toto p p₁ el el₁ Hnl Hr Hs).
 remember (nat_of_path el₁) as nf eqn:Hnf.
-remember (nat_of_path (rev_path el)) as no eqn:Hno.
+bbb.
+remember (nat_of_path (not_empty_path_of_path (rev_path el))) as no eqn:Hno.
 remember (nat_of_prod_nat (nf, no)) as n eqn:Hn.
 exists n.
 apply EqdepFacts.eq_dep_eq_sig.
@@ -749,33 +750,26 @@ Focus 2.
  move Hr at bottom.
  move Hr₂ at bottom.
  subst el₃.
+(*
  rewrite rotate_rotate_norm in Hs.
  rewrite rotate_rotate_norm.
  rewrite norm_list_not_empty_path.
  rewrite <- rev_path_norm_list.
- remember (norm_list el) as el₅ eqn:Hel₅.
- symmetry in Hel₅.
- destruct el₅ as [| e₅ el₅].
-  simpl in Hs; simpl.
-  subst p.
-bbb.
+*)
  (* two fixpoints with the same path: should be equal... *)
  enough (H : p₁ = p₂).
   move H at top; subst p₂; clear Hr₂.
-  subst el₃.
-  rewrite rotate_rotate_norm in Hs.
-  rewrite rotate_rotate_norm.
-  rewrite norm_list_not_empty_path.
-  rewrite <- rev_path_norm_list.
-  remember (norm_list el) as el₅ eqn:Hel₅.
-  symmetry in Hel₅.
-  destruct el₅ as [| e₅ el₅].
-   simpl in Hs; simpl.
-   subst p.
 unfold nat_of_path in Hno.
-remember (rev_path el) as el₆ eqn:Hel₆.
+remember (not_empty_path_of_path (rev_path el)) as el₆ eqn:Hel₆.
 symmetry in Hel₆.
 destruct el₆ as [| e₆ el₆].
+ remember (rev_path el) as rel eqn:Hrel.
+ symmetry in Hrel.
+ destruct rel as [| re rel]; [ easy | ].
+ unfold not_empty_path_of_path in Hel₆.
+ simpl in Hel₆.
+bbb.
+
  apply rev_path_is_nil in Hel₆.
  subst el no.
  simpl in Hn.
