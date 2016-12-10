@@ -695,12 +695,16 @@ Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable.
 unfold FinFun.Surjective.
+Print D_of_nat.
+Print D_of_nat_nat.
+Print not_empty_path_of_nat.
+Print path_of_nat.
+Print map_empty_path_to_single.
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 intros (p, Hp).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 fold (toto p p₁ el el₁ Hnl Hr Hs).
 remember (nat_of_path el₁) as nf eqn:Hnf.
-bbb.
 remember (nat_of_path (not_empty_path_of_path (rev_path el))) as no eqn:Hno.
 remember (nat_of_prod_nat (nf, no)) as n eqn:Hn.
 exists n.
