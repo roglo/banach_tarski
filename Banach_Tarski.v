@@ -728,7 +728,6 @@ Theorem D_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
 apply surj_prop_prod_nat_surj_prop_nat.
-Print D_of_prod_nat.
 exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
 intros p Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
@@ -741,6 +740,7 @@ do 2 rewrite path_of_nat_inv.
 apply rotate_rev_path in Hs.
 rewrite <- Hs; f_equal.
 unfold fixpoint_of_path.
+bbb.
 
 Theorem glop : ∀ m₁ m₂ k,
   (k ≠ 0)%R

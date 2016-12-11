@@ -11,9 +11,6 @@ Require Import Reals Nsatz.
 
 Require Import Misc Words Normalize Reverse Matrix Pset.
 
-(*
-Definition same_orbit x y := {el : list free_elem | fold_right rotate x el = y}.
-*)
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
