@@ -527,21 +527,17 @@ Definition titi p p₁ el el₁ Hr Hnl Hs :=
                 (@eq point (@fold_right point free_elem rotate p₁ el₁) p₁)
                 Hnl Hr)))).
 
-Definition D_of_nat_nat nf no :=
+Definition D_of_prod_nat '(nf, no) :=
   let p₁ := fixpoint_of_nat nf in
   let el := not_empty_path_of_nat no in
   fold_right rotate p₁ el.
 
-Definition D_of_prod_nat '(nf, no) :=
-  D_of_nat_nat nf no.
-
 Definition D_of_nat n :=
  D_of_prod_nat (prod_nat_of_nat n).
 
-Theorem D_of_nat_nat_in_D : ∀ nf no, D_of_nat_nat nf no ∈ D.
+Theorem D_of_nat_nat_in_D : ∀ nf no, D_of_prod_nat (nf, no) ∈ D.
 Proof.
 intros nf no.
-unfold D_of_nat_nat.
 remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
 remember (not_empty_path_of_nat no) as el eqn:Hel.
 remember (fold_right rotate p₁ el) as p eqn:Hp.
@@ -551,7 +547,14 @@ unfold fixpoint_of_nat in Hp₁.
 unfold fixpoint_of_path in Hp₁.
 rewrite <- Hel₁ in Hp₁.
 eapply D_of_nat_prop with (no := no); try eassumption.
-symmetry; apply prod_nat_of_nat_inv.
+ symmetry; apply prod_nat_of_nat_inv.
+
+ subst p₁; simpl; rewrite <- Hp.
+bbb.
+ unfold fixpoint_of_nat, fixpoint_of_path.
+ rewrite <- Hel, <- Hp.
+ symmetry.
+
 Defined.
 
 Theorem D_of_prod_nat_in_D : ∀ nn, D_of_prod_nat nn ∈ D.
@@ -691,11 +694,23 @@ destruct el₂; [ | easy ].
 now apply rev_path_is_nil in Hel₂.
 Qed.
 
-Theorem surjective_prod_nat_surjective_nat :
-  (∃ g : ℕ * ℕ → {p : point | p ∈ D}, FinFun.Surjective g)
-  → ∃ f : ℕ → {p : point | p ∈ D}, FinFun.Surjective f.
+Theorem surj_prop_prod_nat_surj_prop_nat : ∀ A P,
+  (∃ g : ℕ * ℕ -> A, ∀ a : A, P a → ∃ nn : ℕ * ℕ, g nn = a)
+  → ∃ f : ℕ → A, ∀ a : A, P a → ∃ n : ℕ, f n = a.
 Proof.
-intros (g & Hg).
+intros * (g & Hg).
+exists (λ n, g (prod_nat_of_nat n)).
+intros a Ha.
+specialize (Hg a Ha) as (nfo & Hg); subst a.
+exists (nat_of_prod_nat nfo); destruct nfo.
+now rewrite prod_nat_of_nat_inv.
+Qed.
+
+Theorem surjective_prod_nat_surjective_nat : ∀ A,
+  (∃ g : ℕ * ℕ → A, FinFun.Surjective g)
+  → ∃ f : ℕ → A, FinFun.Surjective f.
+Proof.
+intros * (g & Hg).
 exists (λ n, g (prod_nat_of_nat n)).
 intros p.
 specialize (Hg p) as (nfo & Hg).
@@ -712,8 +727,17 @@ unfold FinFun.Surjective.
 exists (λ nfo, exist _ (D_of_prod_nat nfo) (D_of_prod_nat_in_D nfo)).
 intros (p, Hp).
 (* problem: nothing proves that Hp = D_of_prod_nat_in_D something *)
+Abort.
+
+Theorem D_is_countable :
+  ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
+Proof.
+apply surj_prop_prod_nat_surj_prop_nat.
+exists D_of_prod_nat; intros p Hp.
+Print D_of_nat_nat.
 bbb.
 
+(* old proof of old D_is_countable *)
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
 unfold FinFun.Surjective.
 intros (p, Hp).
