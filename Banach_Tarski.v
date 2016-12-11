@@ -708,8 +708,10 @@ Theorem D_is_countable : is_countable {p : point | p ∈ D}.
 Proof.
 unfold is_countable.
 apply surjective_prod_nat_surjective_nat.
+unfold FinFun.Surjective.
 exists (λ nfo, exist _ (D_of_prod_nat nfo) (D_of_prod_nat_in_D nfo)).
 intros (p, Hp).
+(* problem: nothing proves that Hp = D_of_prod_nat_in_D something *)
 bbb.
 
 exists (λ n, exist _ (D_of_nat n) (D_of_nat_in_D n)).
