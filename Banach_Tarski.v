@@ -728,15 +728,32 @@ Theorem D_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
 apply surj_prop_prod_nat_surj_prop_nat.
-exists D_of_prod_nat; intros p Hp.
+Print D_of_prod_nat.
+exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
+intros p Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
 exists (nf, no); simpl.
 subst nf no.
 unfold fixpoint_of_nat.
-unfold not_empty_path_of_nat.
 do 2 rewrite path_of_nat_inv.
+apply rotate_rev_path in Hs.
+rewrite <- Hs.
+f_equal.
+bbb.
+
+ remember (norm_list el) as el₂ eqn:Hel₂.
+ symmetry in Hel₂.
+ destruct el₂ as [| e₂ el₂].
+  Focus 2.
+  SearchAbout not_empty_path_of_path.
+  rewrite not_empty_rev_path; [ | now intros H; rewrite Hel₂ in H ].
+  f_equal.
+  unfold not_empty_path_of_path.
+  unfold map_empty_path_to_single.
+  rewrite Hel₂ at 1.
+
 bbb.
 
 (* old proof of old D_is_countable *)
