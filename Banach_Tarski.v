@@ -709,7 +709,6 @@ Proof.
 unfold is_countable.
 apply surjective_prod_nat_surjective_nat.
 exists (λ nfo, exist _ (D_of_prod_nat nfo) (D_of_prod_nat_in_D nfo)).
-unfold FinFun.Surjective.
 intros (p, Hp).
 bbb.
 
