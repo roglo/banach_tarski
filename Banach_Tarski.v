@@ -739,8 +739,36 @@ unfold fixpoint_of_nat.
 do 2 rewrite path_of_nat_inv.
 apply rotate_rev_path in Hs.
 rewrite <- Hs; f_equal.
+(* actually, there are two possible fixpoints p₁ and -p₁ *)
+bbb.
+
+clear -Hnl Hr.
+revert p₁ Hr.
+induction el₁ as [| e₁ el₁]; intros; [ now exfalso; apply Hnl | ].
+simpl in Hr.
+unfold fixpoint_of_path; simpl.
+unfold not_empty_path_of_path; simpl.
+remember (norm_list el₁) as el₂ eqn:Hel₂.
+symmetry in Hel₂.
+destruct el₂ as [| e₂ el₂].
+ simpl.
+ unfold mat_of_path; simpl.
+ rewrite mat_mul_id_r.
+ rewrite rotate_rotate_norm, Hel₂ in Hr.
+ simpl in Hr.
+ unfold rotate in Hr.
+ destruct p₁ as (x, y, z).
+ simpl in Hr.
+ unfold rotation_fixpoint; simpl.
+ do 3 rewrite Rmult_1_l.
+ injection Hr; clear Hr; intros Hz Hy Hx.
+ f_equal.
+ destruct e₁ as (t, d); destruct t, d; simpl in *.
+
 unfold fixpoint_of_path.
 (* actually, there are two possible fixpoints p₁ and -p₁ *)
+
+
 bbb.
 
 Theorem glop : ∀ m₁ m₂ k,
