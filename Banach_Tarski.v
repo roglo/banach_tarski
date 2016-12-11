@@ -760,8 +760,11 @@ do 2 rewrite Rmult_assoc in H1, H2, H3.
 apply Rmult_eq_reg_l in H1; [ | easy ].
 apply Rmult_eq_reg_l in H2; [ | easy ].
 apply Rmult_eq_reg_l in H3; [ | easy ].
-destruct m₁, m₂; simpl in *.
-
+enough (H : r₁ = r₂).
+ move H at top; subst r₂.
+ apply Rmult_eq_reg_l in H1.
+ apply Rmult_eq_reg_l in H2.
+ apply Rmult_eq_reg_l in H3.
 bbb.
 
  remember (norm_list el) as el₂ eqn:Hel₂.
