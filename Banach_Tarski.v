@@ -740,6 +740,28 @@ unfold fixpoint_of_nat.
 do 2 rewrite path_of_nat_inv.
 apply rotate_rev_path in Hs.
 rewrite <- Hs; f_equal.
+unfold fixpoint_of_path.
+
+Theorem glop : ∀ m₁ m₂ k,
+  (k ≠ 0)%R
+  → rotation_fixpoint m₁ k = rotation_fixpoint m₂ k
+  → m₁ = m₂.
+Proof.
+intros * Hk Hm.
+unfold rotation_fixpoint in Hm.
+remember
+ (√ ((a₃₂ m₁ - a₂₃ m₁)² + (a₁₃ m₁ - a₃₁ m₁)² + (a₂₁ m₁ - a₁₂ m₁)²)) as r₁.
+remember
+ (√ ((a₃₂ m₂ - a₂₃ m₂)² + (a₁₃ m₂ - a₃₁ m₂)² + (a₂₁ m₂ - a₁₂ m₂)²)) as r₂.
+injection Hm; clear Hm; intros H2 H1 H3; move H2 after H1.
+do 2 rewrite Rmult_div in H1, H2, H3.
+unfold Rdiv in H1, H2, H3.
+do 2 rewrite Rmult_assoc in H1, H2, H3.
+apply Rmult_eq_reg_l in H1; [ | easy ].
+apply Rmult_eq_reg_l in H2; [ | easy ].
+apply Rmult_eq_reg_l in H3; [ | easy ].
+destruct m₁, m₂; simpl in *.
+
 bbb.
 
  remember (norm_list el) as el₂ eqn:Hel₂.
