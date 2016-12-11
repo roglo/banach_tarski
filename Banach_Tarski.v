@@ -533,11 +533,12 @@ Definition D_of_prod_nat '(nf, no) :=
   fold_right rotate p₁ el.
 
 Definition D_of_nat n :=
- D_of_prod_nat (prod_nat_of_nat n).
+  D_of_prod_nat (prod_nat_of_nat n).
 
 Theorem D_of_nat_nat_in_D : ∀ nf no, D_of_prod_nat (nf, no) ∈ D.
 Proof.
 intros nf no.
+simpl.
 remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
 remember (not_empty_path_of_nat no) as el eqn:Hel.
 remember (fold_right rotate p₁ el) as p eqn:Hp.
@@ -547,14 +548,7 @@ unfold fixpoint_of_nat in Hp₁.
 unfold fixpoint_of_path in Hp₁.
 rewrite <- Hel₁ in Hp₁.
 eapply D_of_nat_prop with (no := no); try eassumption.
- symmetry; apply prod_nat_of_nat_inv.
-
- subst p₁; simpl; rewrite <- Hp.
-bbb.
- unfold fixpoint_of_nat, fixpoint_of_path.
- rewrite <- Hel, <- Hp.
- symmetry.
-
+symmetry; apply prod_nat_of_nat_inv.
 Defined.
 
 Theorem D_of_prod_nat_in_D : ∀ nn, D_of_prod_nat nn ∈ D.
@@ -734,7 +728,7 @@ Theorem D_is_countable :
 Proof.
 apply surj_prop_prod_nat_surj_prop_nat.
 exists D_of_prod_nat; intros p Hp.
-Print D_of_nat_nat.
+Print D_of_prod_nat.
 bbb.
 
 (* old proof of old D_is_countable *)
