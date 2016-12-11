@@ -720,6 +720,7 @@ apply surjective_prod_nat_surjective_nat.
 unfold FinFun.Surjective.
 exists (λ nfo, exist _ (D_of_prod_nat nfo) (D_of_prod_nat_in_D nfo)).
 intros (p, Hp).
+
 (* problem: nothing proves that Hp = D_of_prod_nat_in_D something *)
 Abort.
 
@@ -728,7 +729,14 @@ Theorem D_is_countable :
 Proof.
 apply surj_prop_prod_nat_surj_prop_nat.
 exists D_of_prod_nat; intros p Hp.
-Print D_of_prod_nat.
+destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
+remember (nat_of_path el₁) as nf eqn:Hnf.
+remember (nat_of_path (rev_path el)) as no eqn:Hno.
+exists (nf, no); simpl.
+subst nf no.
+unfold fixpoint_of_nat.
+unfold not_empty_path_of_nat.
+do 2 rewrite path_of_nat_inv.
 bbb.
 
 (* old proof of old D_is_countable *)
