@@ -739,8 +739,7 @@ subst nf no.
 unfold fixpoint_of_nat.
 do 2 rewrite path_of_nat_inv.
 apply rotate_rev_path in Hs.
-rewrite <- Hs.
-f_equal.
+rewrite <- Hs; f_equal.
 bbb.
 
  remember (norm_list el) as el₂ eqn:Hel₂.
