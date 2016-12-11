@@ -739,6 +739,9 @@ unfold fixpoint_of_nat.
 do 2 rewrite path_of_nat_inv.
 apply rotate_rev_path in Hs.
 rewrite <- Hs; f_equal.
+unfold fixpoint_of_path.
+SearchAbout rotation_fixpoint.
+About matrix_fixpoint_ok.
 (* actually, there are two possible fixpoints p₁ and -p₁ *)
 bbb.
 
