@@ -382,104 +382,30 @@ Definition radius '(P x y z) := √ (x² + y² + z²).
 Theorem matrix_fixpoint_ok : ∀ m p k,
   is_rotation_matrix m
   → p = rotation_fixpoint m k
-  ↔ mat_vec_mul m p = p ∧ radius p = Rabs k.
+  → mat_vec_mul m p = p.
 Proof.
-intros m p k Hrm.
-split.
- intros Hn.
- subst p.
- unfold rotation_fixpoint.
- remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
- split.
-  setoid_rewrite Rmult_div.
-  remember (k / r)%R as kr.
-  unfold is_rotation_matrix in Hrm.
-  destruct Hrm as (Ht & Hd).
-  unfold mat_det in Hd.
-  unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
-  injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-  simpl.
-  setoid_rewrite fold_Rsqr in H₁.
-  setoid_rewrite fold_Rsqr in H₅.
-  setoid_rewrite fold_Rsqr in H₉.
-  move H₉ after H₁; move H₅ after H₁.
-  move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
-  clear H₄ H₇ H₈; move H₆ after H₂.
-  move Hd before H₉.
-  rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
-  rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
-  clear Heqr Heqkr; f_equal; nsatz.
-
-  assert (Hr : (r ≠ 0)%R).
-   unfold is_rotation_matrix in Hrm.
-   destruct Hrm as (Ht & Hd).
-   unfold mat_det in Hd.
-   unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
-   injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-   setoid_rewrite fold_Rsqr in H₁.
-   setoid_rewrite fold_Rsqr in H₅.
-   setoid_rewrite fold_Rsqr in H₉.
-   intros Hr; rewrite Heqr in Hr.
-   apply sqrt_lem_0 in Hr; [ | | lra ].
-    symmetry in Hr; rewrite Rmult_0_r in Hr; clear Heqr.
-bbb.
-
-    do 3 rewrite Rsqr_pow2 in Hr.
-rewrite Rsqr_sqr in Hr.
-
-  unfold radius.
-  apply sqrt_lem_1; [ | apply Rabs_pos | ].
-   apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
-   apply Rplus_le_le_0_compat; apply Rle_0_sqr.
-
-   unfold Rdiv.
-   do 6 rewrite Rsqr_mult.
-   do 3 rewrite Rmult_assoc.
-   do 2 rewrite <- Rmult_plus_distr_l.
-   rewrite <- Rabs_mult.
-   rewrite fold_Rsqr.
-   rewrite Rsqr_pow2, <- RPow_abs, pow2_abs.
-   setoid_rewrite <- Rmult_1_r at 1.
-   apply Rmult_eq_compat_l; symmetry.
-   do 2 rewrite <- Rmult_plus_distr_r.
-   subst r.
-   remember (((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²))%R as r2.
-   destruct (Req_dec r2 0) as [H1| H1].
-bbb.
-
-   rewrite Rsqr_inv.
-    rewrite Rsqr_sqrt.
-     rewrite Rinv_r; [ easy | ].
-     subst r2.
-
-
-
-bbb.
-
-
- intros Hm.
- unfold mat_vec_mul in Hm.
- destruct p as (x, y, z).
- injection Hm; clear Hm; intros Hz Hy Hx.
- move Hx after Hy; move Hz after Hy.
- unfold rotation_fixpoint.
- remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
- setoid_rewrite Rmult_div.
- remember (k / r)%R as kr.
- unfold is_rotation_matrix in Hrm.
- destruct Hrm as (Ht & Hd).
- unfold mat_det in Hd.
- unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
- injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
- setoid_rewrite fold_Rsqr in H₁.
- setoid_rewrite fold_Rsqr in H₅.
- setoid_rewrite fold_Rsqr in H₉.
- move H₉ after H₁; move H₅ after H₁.
- move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
- clear H₄ H₇ H₈; move H₆ after H₂.
- move Hd before H₉.
-Print rotation_fixpoint.
-
+intros m p k Hrm Hn.
+subst p.
+unfold rotation_fixpoint.
+remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+setoid_rewrite Rmult_div.
+remember (k / r)%R as kr.
+unfold is_rotation_matrix in Hrm.
+destruct Hrm as (Ht & Hd).
+unfold mat_det in Hd.
+unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
+injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+simpl.
+setoid_rewrite fold_Rsqr in H₁.
+setoid_rewrite fold_Rsqr in H₅.
+setoid_rewrite fold_Rsqr in H₉.
+move H₉ after H₁; move H₅ after H₁.
+move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
+clear H₄ H₇ H₈; move H₆ after H₂.
+move Hd before H₉.
+rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
+rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
+clear Heqr Heqkr; f_equal; nsatz.
 Qed.
 
 Theorem rotate_vec_mul : ∀ el p,
@@ -827,6 +753,7 @@ unfold fixpoint_of_nat.
 do 2 rewrite path_of_nat_inv.
 apply rotate_rev_path in Hs.
 rewrite <- Hs; f_equal.
+bbb.
 unfold fixpoint_of_path.
 SearchAbout rotation_fixpoint.
 About matrix_fixpoint_ok.
