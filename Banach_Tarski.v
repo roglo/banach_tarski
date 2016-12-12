@@ -349,10 +349,24 @@ intros n.
 apply not_eq_sym, Hp.
 Qed.
 
+Definition neg_point x y z :=
+  if Rlt_dec x 0 then true
+  else if Rgt_dec x 0 then false
+  else if Rlt_dec y 0 then true
+  else if Rgt_dec y 0 then false
+  else if Rlt_dec z 0 then true
+  else if Rgt_dec z 0 then false
+  else true.
+
+Definition select_fixpoint x y z :=
+  if neg_point x y z then (-x, -y, -z)%R
+  else (x, y, z).
+
 Definition rotation_fixpoint (m : matrix) k :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
   let z := (a₂₁ m - a₁₂ m)%R in
+  let '(x, y, z) := select_fixpoint x y z in
   let r := √ (x² + y² + z²) in
   P (k * x / r) (k * y / r) (k * z / r).
 
@@ -387,6 +401,10 @@ Proof.
 intros m p k Hrm Hn.
 subst p.
 unfold rotation_fixpoint.
+remember (select_fixpoint (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m))
+  as q eqn:Hq.
+symmetry in Hq.
+destruct q as ((x, y), z).
 remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
 setoid_rewrite Rmult_div.
 remember (k / r)%R as kr.
@@ -405,7 +423,12 @@ clear H₄ H₇ H₈; move H₆ after H₂.
 move Hd before H₉.
 rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
 rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
-clear Heqr Heqkr; f_equal; nsatz.
+move Hq at bottom.
+unfold select_fixpoint in Hq.
+clear Heqr Heqkr.
+destruct (neg_point (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m)).
+ injection Hq; clear Hq; intros; f_equal; nsatz.
+ injection Hq; clear Hq; intros; f_equal; nsatz.
 Qed.
 
 Theorem rotate_vec_mul : ∀ el p,
