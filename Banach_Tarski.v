@@ -336,6 +336,19 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  now symmetry in Hn.
 Qed.
 
+Theorem sphere_set_not_countable :
+  ∀ f : ℕ → point, ∃ p : point, p ∈ sphere ∧ ∀ n : ℕ, f n ≠ p.
+Proof.
+intros f.
+specialize
+ (Cantor_gen ℕ ℕ point (setp sphere) id ter_bin_of_point id_nat
+    ter_bin_of_sphere_surj f) as (p, Hp).
+exists p.
+split; [ apply (Hp O) | ].
+intros n.
+apply not_eq_sym, Hp.
+Qed.
+
 Definition rotation_fixpoint (m : matrix) k :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
@@ -724,7 +737,7 @@ intros (p, Hp).
 (* problem: nothing proves that Hp = D_of_prod_nat_in_D something *)
 Abort.
 
-Theorem D_is_countable :
+Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
 apply surj_prop_prod_nat_surj_prop_nat.
@@ -1013,9 +1026,17 @@ Theorem equidec_sphere_with_and_without_fixpoints :
   equidecomposable sphere sphere_but_fixpoints.
 Proof.
 intros.
-assert (∃ p₁, p₁ ∈ sphere ∖ D).
+assert (H : ∃ p₁, p₁ ∈ sphere ∖ D).
  unfold "∈", "∖".
- SearchAbout D.
+ specialize D_set_is_countable as (f, Hdnc).
+ specialize (sphere_set_not_countable f) as (p & Hps & Hp).
+ exists p.
+ split; [ easy | ].
+ intros H; specialize (Hdnc p H) as (n, Hdnc).
+ revert Hdnc; apply Hp.
+
+ destruct H as (p₁ & Hp₁s & Hp₁nd).
+
 bbb.
 
 assert (∃ p₁, p₁ ∉ D).
