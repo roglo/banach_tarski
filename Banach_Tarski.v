@@ -366,13 +366,13 @@ Definition select_fixpoint '(P x y z) :=
 
 Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
 
-Definition radius '(P x y z) := √ (x² + y² + z²).
+Definition vec_norm '(P x y z) := √ (x² + y² + z²).
 
 Definition rotation_unit_eigenvec (m : matrix) :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
   let z := (a₂₁ m - a₁₂ m)%R in
-  let r := radius (P x y z) in
+  let r := vec_norm (P x y z) in
   P (x / r) (y / r) (z / r).
 
 Definition rotation_fixpoint (m : matrix) k :=
@@ -429,15 +429,13 @@ clear Hr Heqkr.
 f_equal; nsatz.
 Qed.
 
-Theorem matrix_fixpoints_ok : ∀ M V r,
+Theorem matrix_fixpoints_ok : ∀ M V,
   is_rotation_matrix M
   → mat_vec_mul M V = V
-  → r = radius V
-  → V = rotation_fixpoint M r ∨ V = rotation_fixpoint M (-r).
+  → V = mul_const_vec (vec_norm V) (rotation_unit_eigenvec M) ∧
+    V = mul_const_vec (- vec_norm V) (rotation_unit_eigenvec M).
 Proof.
-intros * Hrm Hm Hrad.
-unfold rotation_fixpoint.
-subst r.
+intros * Hrm Hm.
 remember (rotation_unit_eigenvec M) as ev eqn:Hev.
 symmetry in Hev.
 destruct ev as (ex, ey, ez).
@@ -446,14 +444,14 @@ injection Hev; clear Hev; intros; subst ex ey ez.
 remember (a₃₂ M - a₂₃ M)%R as ex eqn:Hex.
 remember (a₁₃ M - a₃₁ M)%R as ey eqn:Hey.
 remember (a₂₁ M - a₁₂ M)%R as ez eqn:Hez.
-fold (radius (P ex ey ez)).
+fold (vec_norm (P ex ey ez)).
 remember (P ex ey ez) as ev eqn:Hev.
-remember (radius ev) as re eqn:Hre.
+remember (vec_norm ev) as re eqn:Hre.
 move ey before ex; move ez before ey.
 move ev before V.
 unfold mul_const_vec.
 do 3 rewrite <- Ropp_mult_distr_l.
-remember (radius V) as r eqn:Hr.
+remember (vec_norm V) as r eqn:Hr.
 replace (r * (ex / re))%R with (ex * (r / re))%R by lra.
 replace (r * (ey / re))%R with (ey * (r / re))%R by lra.
 replace (r * (ez / re))%R with (ez * (r / re))%R by lra.
