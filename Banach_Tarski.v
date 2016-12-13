@@ -739,6 +739,14 @@ destruct (Bool.bool_dec b b₁) as [Hbe| Hbne].
  unfold rotation_fixpoint; rewrite <- Hev.
  unfold select_fixpoint.
  rewrite Hev, <- Hev, Hbe.
+ remember (neg_point p₁) as b eqn:Hb.
+ symmetry in Hb; symmetry.
+ destruct b.
+  do 3 rewrite Rmult_1_l.
+  do 3 rewrite <- Rsqr_neg.
+  remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+  destruct p₁ as (x₁, y₁, z₁).
+  f_equal.
 
 bbb.
 
