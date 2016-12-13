@@ -436,7 +436,7 @@ Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
 Theorem matrix_fixpoints_ok : ∀ M V,
   is_rotation_matrix M
   → mat_vec_mul M V = V
-  → cos_rot_angle M ≠ 1%R ∧ cos_rot_angle M ≠ -1%R
+  → cos_rot_angle M ≠ 1%R ∧ cos_rot_angle M ≠ (-1)%R
   → V = mul_const_vec (vec_norm V) (rotation_unit_eigenvec M) ∨
     V = mul_const_vec (- vec_norm V) (rotation_unit_eigenvec M).
 Proof.
@@ -464,6 +464,32 @@ remember (r / re)%R as k eqn:Hk.
 setoid_rewrite Rmult_comm.
 unfold cos_rot_angle in Ha1, Ha2.
 unfold mat_trace in Ha1, Ha2.
+unfold is_rotation_matrix in Hrm.
+destruct Hrm as (Ht & Hd).
+unfold mat_det in Hd.
+unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
+injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+setoid_rewrite fold_Rsqr in H₁.
+setoid_rewrite fold_Rsqr in H₅.
+setoid_rewrite fold_Rsqr in H₉.
+move H₉ after H₁; move H₅ after H₁.
+move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
+clear H₄ H₇ H₈; move H₆ after H₂.
+move Hd before H₉.
+rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
+rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
+assert (H : (a₁₁ M + a₂₂ M + a₃₃ M ≠ 3)%R) by lra.
+clear Ha1; rename H into Ha1.
+assert (H : (a₁₁ M + a₂₂ M + a₃₃ M)%R ≠ (-1)%R) by lra.
+clear Ha2; rename H into Ha2.
+unfold mat_vec_mul in Hm.
+destruct V as (x, y, z).
+injection Hm; clear Hm; intros Hz Hy Hx.
+move Hz after Hy; move Hx after Hy.
+subst re r.
+rewrite Hev in Hk.
+simpl in Hk.
+
 bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
