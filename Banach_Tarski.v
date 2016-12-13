@@ -768,10 +768,10 @@ apply surj_prop_prod_nat_surj_prop_nat.
 exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
 intros p Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
-remember (nat_of_path el₁) as nf eqn:Hnf.
-remember (nat_of_path (rev_path el)) as no eqn:Hno.
-exists (nf, no); simpl.
-subst nf no.
+remember (nat_of_path el₁) as nf₁ eqn:Hnf.
+remember (nat_of_path (rev_path el)) as no₁ eqn:Hno.
+exists (nf₁, no₁); simpl.
+subst nf₁ no₁.
 unfold fixpoint_of_nat.
 do 2 rewrite path_of_nat_inv.
 apply rotate_rev_path in Hs.
