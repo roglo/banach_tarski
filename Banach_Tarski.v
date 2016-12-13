@@ -429,13 +429,18 @@ clear Hr Heqkr.
 f_equal; nsatz.
 Qed.
 
+(* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
+Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
+Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
+
 Theorem matrix_fixpoints_ok : ∀ M V,
   is_rotation_matrix M
   → mat_vec_mul M V = V
+  → cos_rot_angle M ≠ 1%R ∧ cos_rot_angle M ≠ -1%R
   → V = mul_const_vec (vec_norm V) (rotation_unit_eigenvec M) ∧
     V = mul_const_vec (- vec_norm V) (rotation_unit_eigenvec M).
 Proof.
-intros * Hrm Hm.
+intros * Hrm Hm Ha.
 remember (rotation_unit_eigenvec M) as ev eqn:Hev.
 symmetry in Hev.
 destruct ev as (ex, ey, ez).
@@ -457,6 +462,8 @@ replace (r * (ey / re))%R with (ey * (r / re))%R by lra.
 replace (r * (ez / re))%R with (ez * (r / re))%R by lra.
 remember (r / re)%R as k eqn:Hk.
 setoid_rewrite Rmult_comm.
+unfold cos_rot_angle in Ha.
+unfold mat_trace in Ha.
 bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
