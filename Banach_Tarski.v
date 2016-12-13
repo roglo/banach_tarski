@@ -454,6 +454,8 @@ do 3 rewrite <- Ropp_mult_distr_l.
 replace (r * (ex / re))%R with (ex * (r / re))%R by lra.
 replace (r * (ey / re))%R with (ey * (r / re))%R by lra.
 replace (r * (ez / re))%R with (ez * (r / re))%R by lra.
+remember (r / re)%R as k eqn:Hk.
+setoid_rewrite Rmult_comm.
 bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
