@@ -364,11 +364,13 @@ Definition select_fixpoint '(P x y z) :=
   else P x y z.
 *)
 
+Definition radius '(P x y z) := √ (x² + y² + z²).
+
 Definition rotation_unit_eigenvec (m : matrix) :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
   let z := (a₂₁ m - a₁₂ m)%R in
-  let r := √ (x² + y² + z²) in
+  let r := radius (P x y z) in
   P (x / r) (y / r) (z / r).
 
 Definition rotation_fixpoint (m : matrix) k :=
@@ -383,8 +385,6 @@ Definition fixpoint_of_path el :=
 
 Definition fixpoint_of_nat n :=
   fixpoint_of_path (path_of_nat n).
-
-Definition radius '(P x y z) := √ (x² + y² + z²).
 
 Theorem matrix_all_fixpoints_ok : ∀ m p k,
   is_rotation_matrix m
@@ -443,6 +443,14 @@ split.
  remember (rotation_unit_eigenvec m) as ev eqn:Hev.
  symmetry in Hev.
  destruct ev as (ex, ey, ez).
+ unfold rotation_unit_eigenvec in Hev.
+ injection Hev; clear Hev; intros; subst ex ey ez.
+ remember (a₃₂ m - a₂₃ m)%R as ex eqn:Hex.
+ remember (a₁₃ m - a₃₁ m)%R as ey eqn:Hey.
+ remember (a₂₁ m - a₁₂ m)%R as ez eqn:Hez.
+ fold (radius (P ex ey ez)).
+ remember (P ex ey ez) as ev eqn:Hev.
+ remember (radius ev) as re eqn:Hre.
 bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
