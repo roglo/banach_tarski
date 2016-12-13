@@ -428,38 +428,32 @@ clear Hr Heqkr.
 f_equal; nsatz.
 Qed.
 
-Theorem matrix_fixpoints_ok : ∀ m p r,
-  is_rotation_matrix m
-  → r = radius p
-  → p = rotation_fixpoint m r ∨ p = rotation_fixpoint m (-r)
-  ↔ mat_vec_mul m p = p.
+Theorem matrix_fixpoints_ok : ∀ M V r,
+  is_rotation_matrix M
+  → r = radius V
+  → mat_vec_mul M V = V
+  → V = rotation_fixpoint M r ∨ V = rotation_fixpoint M (-r).
 Proof.
-intros * Hrm Hrad.
-split.
- intros Hp; destruct Hp; eapply matrix_all_fixpoints_ok; eassumption.
-
- intros Hm.
- unfold rotation_fixpoint.
- remember (rotation_unit_eigenvec m) as ev eqn:Hev.
- symmetry in Hev.
- destruct ev as (ex, ey, ez).
- unfold rotation_unit_eigenvec in Hev.
- injection Hev; clear Hev; intros; subst ex ey ez.
- remember (a₃₂ m - a₂₃ m)%R as ex eqn:Hex.
- remember (a₁₃ m - a₃₁ m)%R as ey eqn:Hey.
- remember (a₂₁ m - a₁₂ m)%R as ez eqn:Hez.
- fold (radius (P ex ey ez)).
- remember (P ex ey ez) as ev eqn:Hev.
- remember (radius ev) as re eqn:Hre.
- move Hrad before Hre.
- move ey before ex; move ez before ey.
- move re before r; move ev before p.
- rename m into M.
- rename p into V.
- do 3 rewrite <- Ropp_mult_distr_l.
- replace (r * (ex / re))%R with (ex * (r / re))%R by lra.
- replace (r * (ey / re))%R with (ey * (r / re))%R by lra.
- replace (r * (ez / re))%R with (ez * (r / re))%R by lra.
+intros * Hrm Hrad Hm.
+unfold rotation_fixpoint.
+remember (rotation_unit_eigenvec M) as ev eqn:Hev.
+symmetry in Hev.
+destruct ev as (ex, ey, ez).
+unfold rotation_unit_eigenvec in Hev.
+injection Hev; clear Hev; intros; subst ex ey ez.
+remember (a₃₂ M - a₂₃ M)%R as ex eqn:Hex.
+remember (a₁₃ M - a₃₁ M)%R as ey eqn:Hey.
+remember (a₂₁ M - a₁₂ M)%R as ez eqn:Hez.
+fold (radius (P ex ey ez)).
+remember (P ex ey ez) as ev eqn:Hev.
+remember (radius ev) as re eqn:Hre.
+move Hrad before Hre.
+move ey before ex; move ez before ey.
+move re before r; move ev before V.
+do 3 rewrite <- Ropp_mult_distr_l.
+replace (r * (ex / re))%R with (ex * (r / re))%R by lra.
+replace (r * (ey / re))%R with (ey * (r / re))%R by lra.
+replace (r * (ez / re))%R with (ez * (r / re))%R by lra.
 bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
