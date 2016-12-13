@@ -349,7 +349,7 @@ intros n.
 apply not_eq_sym, Hp.
 Qed.
 
-Definition neg_point x y z :=
+Definition neg_point '(P x y z) :=
   if Rlt_dec x 0 then true
   else if Rgt_dec x 0 then false
   else if Rlt_dec y 0 then true
@@ -358,35 +358,23 @@ Definition neg_point x y z :=
   else if Rgt_dec z 0 then false
   else true.
 
-Definition select_fixpoint x y z :=
-  if neg_point x y z then (-x, -y, -z)%R
-  else (x, y, z).
+Definition select_fixpoint '(P x y z) :=
+  if neg_point (P x y z) then P (-x) (-y) (-z)
+  else P x y z.
 
 Definition rotation_fixpoint (m : matrix) k :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
   let z := (a₂₁ m - a₁₂ m)%R in
-  let '(x, y, z) := select_fixpoint x y z in
+  let 'P x y z := select_fixpoint (P x y z) in
   let r := √ (x² + y² + z²) in
   P (k * x / r) (k * y / r) (k * z / r).
 
 Definition mat_of_path el :=
   List.fold_right mat_mul mat_id (map mat_of_elem el).
 
-Definition map_empty_path_to_single el :=
-  match el with
-  | [] => ạ :: []
-  | _ => el
-  end.
-
-Definition not_empty_path_of_path el :=
-  map_empty_path_to_single (norm_list el).
-
-Definition not_empty_path_of_nat n :=
-  not_empty_path_of_path (path_of_nat n).
-
 Definition fixpoint_of_path el :=
-  rotation_fixpoint (mat_of_path (not_empty_path_of_path el)) 1.
+  rotation_fixpoint (mat_of_path el) 1.
 
 Definition fixpoint_of_nat n :=
   fixpoint_of_path (path_of_nat n).
@@ -401,11 +389,11 @@ Proof.
 intros m p k Hrm Hn.
 subst p.
 unfold rotation_fixpoint.
-remember (select_fixpoint (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m))
-  as q eqn:Hq.
+remember (P (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m)) as ev eqn:Hev.
+remember (select_fixpoint ev) as q eqn:Hq.
 symmetry in Hq.
-destruct q as ((x, y), z).
-remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+destruct q as (x, y, z).
+remember (√ (x² + y² + z²)) as r.
 setoid_rewrite Rmult_div.
 remember (k / r)%R as kr.
 unfold is_rotation_matrix in Hrm.
@@ -426,7 +414,11 @@ rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
 move Hq at bottom.
 unfold select_fixpoint in Hq.
 clear Heqr Heqkr.
-destruct (neg_point (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m)).
+destruct ev as (x₁, y₁, z₁).
+remember (neg_point (P x₁ y₁ z₁)) as b eqn:Hb.
+injection Hev; clear Hev; intros; subst x₁ y₁ z₁.
+clear Hb.
+destruct b.
  injection Hq; clear Hq; intros; f_equal; nsatz.
  injection Hq; clear Hq; intros; f_equal; nsatz.
 Qed.
@@ -454,26 +446,17 @@ Qed.
 
 Theorem D_of_nat_prop : ∀ n nf no p p₁ el el₁,
   (nf, no) = prod_nat_of_nat n
-  → el₁ = not_empty_path_of_path (path_of_nat nf)
+  → el₁ = path_of_nat nf
   → p₁ = rotation_fixpoint (mat_of_path el₁) 1
-  → el = not_empty_path_of_nat no
+  → el = path_of_nat no
   → p = fold_right rotate p₁ el
-  → same_orbit p p₁ ∧ norm_list el₁ ≠ [] ∧ fold_right rotate p₁ el₁ = p₁.
+  → same_orbit p p₁ ∧ fold_right rotate p₁ el₁ = p₁.
 Proof.
 intros * Hnfo Hel₁ Hp₁ Hel Hp.
-split; [ | split ].
+split.
  exists (rev_path el).
  symmetry in Hp; apply rotate_rev_path in Hp; apply Hp.
 
- rewrite Hel₁.
- unfold not_empty_path_of_path.
- unfold map_empty_path_to_single.
- remember (norm_list (path_of_nat nf)) as nel eqn:Hnel.
- symmetry in Hnel.
- destruct nel as [| e₁ nel]; [ intros H; discriminate H | ].
- rewrite <- Hnel, norm_list_idemp, Hnel; intros H; discriminate H.
-
- unfold fixpoint_of_path in Hp₁.
  apply matrix_fixpoint_ok in Hp₁.
   unfold mat_of_path in Hp₁.
   rewrite <- rotate_vec_mul in Hp₁;
@@ -568,38 +551,46 @@ Definition titi p p₁ el el₁ Hr Hnl Hs :=
 
 Definition D_of_prod_nat '(nf, no) :=
   let p₁ := fixpoint_of_nat nf in
-  let el := not_empty_path_of_nat no in
+  let el := path_of_nat no in
   fold_right rotate p₁ el.
 
 Definition D_of_nat n :=
   D_of_prod_nat (prod_nat_of_nat n).
 
-Theorem D_of_nat_nat_in_D : ∀ nf no, D_of_prod_nat (nf, no) ∈ D.
+Theorem D_of_nat_nat_in_D : ∀ nf no,
+  norm_list (path_of_nat nf) ≠ []
+  → D_of_prod_nat (nf, no) ∈ D.
 Proof.
-intros nf no.
-simpl.
+intros * Hnl; simpl.
 remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
-remember (not_empty_path_of_nat no) as el eqn:Hel.
+remember (path_of_nat no) as el eqn:Hel.
 remember (fold_right rotate p₁ el) as p eqn:Hp.
-remember (not_empty_path_of_path (path_of_nat nf)) as el₁ eqn:Hel₁.
+remember (path_of_nat nf) as el₁ eqn:Hel₁.
 exists el₁, p₁.
-unfold fixpoint_of_nat in Hp₁.
-unfold fixpoint_of_path in Hp₁.
-rewrite <- Hel₁ in Hp₁.
-eapply D_of_nat_prop with (no := no); try eassumption.
-symmetry; apply prod_nat_of_nat_inv.
+remember (nat_of_prod_nat (nf, no)) as n eqn:Hn.
+assert (Hnfo : (nf, no) = prod_nat_of_nat n).
+ now rewrite Hn, prod_nat_of_nat_inv.
+
+ unfold fixpoint_of_nat in Hp₁.
+ unfold fixpoint_of_path in Hp₁.
+ rewrite <- Hel₁ in Hp₁.
+ now eapply D_of_nat_prop in Hnfo; try eassumption.
 Defined.
 
-Theorem D_of_prod_nat_in_D : ∀ nn, D_of_prod_nat nn ∈ D.
+Theorem D_of_prod_nat_in_D : ∀ nn,
+  norm_list (path_of_nat (fst nn)) ≠ []
+  → D_of_prod_nat nn ∈ D.
 Proof.
-intros (nf, no).
-apply D_of_nat_nat_in_D.
+intros (nf, no) Hnl.
+now apply D_of_nat_nat_in_D.
 Defined.
 
-Theorem D_of_nat_in_D : ∀ n, D_of_nat n ∈ D.
+Theorem D_of_nat_in_D : ∀ n, 
+  norm_list (path_of_nat (Nat.sqrt n - (n - Nat.sqrt n ^ 2))) ≠ []
+  → D_of_nat n ∈ D.
 Proof.
-intros n.
-apply D_of_nat_nat_in_D.
+intros n Hnl.
+now apply D_of_nat_nat_in_D.
 Defined.
 
 Fixpoint nat_of_path_aux el :=
@@ -694,39 +685,6 @@ Compute (nat_of_path (path_of_nat 12)).
 Compute (nat_of_path (path_of_nat 13)).
 *)
 
-Theorem norm_list_not_empty_path : ∀ el,
-  norm_list (not_empty_path_of_path el) =
-  not_empty_path_of_path (norm_list el).
-Proof.
-intros.
-unfold not_empty_path_of_path.
-unfold map_empty_path_to_single.
-rewrite norm_list_idemp.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁ el₁]; [ easy | ].
-rewrite <- Hel₁.
-apply norm_list_idemp.
-Qed.
-
-Theorem not_empty_rev_path : ∀ el,
-  norm_list el ≠ []
-  → not_empty_path_of_path (rev_path el) =
-    rev_path (not_empty_path_of_path el).
-Proof.
-intros * Hn.
-unfold not_empty_path_of_path.
-unfold map_empty_path_to_single.
-rewrite <- rev_path_norm_list.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁ el₁]; [ now exfalso; apply Hn | ].
-remember (rev_path (e₁ :: el₁)) as el₂ eqn:Hel₂.
-symmetry in Hel₂.
-destruct el₂; [ | easy ].
-now apply rev_path_is_nil in Hel₂.
-Qed.
-
 Theorem surj_prop_prod_nat_surj_prop_nat : ∀ A P,
   (∃ g : ℕ * ℕ -> A, ∀ a : A, P a → ∃ nn : ℕ * ℕ, g nn = a)
   → ∃ f : ℕ → A, ∀ a : A, P a → ∃ n : ℕ, f n = a.
@@ -752,17 +710,6 @@ exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
 Qed.
 
-Theorem D_is_countable : is_countable {p : point | p ∈ D}.
-Proof.
-unfold is_countable.
-apply surjective_prod_nat_surjective_nat.
-unfold FinFun.Surjective.
-exists (λ nfo, exist _ (D_of_prod_nat nfo) (D_of_prod_nat_in_D nfo)).
-intros (p, Hp).
-
-(* problem: nothing proves that Hp = D_of_prod_nat_in_D something *)
-Abort.
-
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
@@ -773,19 +720,27 @@ destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 remember (nat_of_path el₁) as nf₁ eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no₁ eqn:Hno.
 remember (fixpoint_of_nat nf₁) as p₂ eqn:Hp₂.
-remember (mat_of_path (not_empty_path_of_path (path_of_nat nf₁))) as m eqn:Hm.
-remember (neg_point (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m)) as b.
+remember (mat_of_path (path_of_nat nf₁)) as m eqn:Hm.
+remember (P (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m)) as ev eqn:Hev.
+remember (neg_point ev) as b.
 rename Heqb into Hb.
-destruct p₁ as (x₁, y₁, z₁).
-remember (neg_point x₁ y₁ z₁) as b₁ eqn:Hb₁.
+remember (neg_point p₁) as b₁ eqn:Hb₁.
 destruct (Bool.bool_dec b b₁) as [Hbe| Hbne].
  subst b b₁.
  exists (nf₁, no₁); simpl.
  subst nf₁ no₁.
+ rewrite path_of_nat_inv in Hm.
  unfold fixpoint_of_nat.
  do 2 rewrite path_of_nat_inv.
  apply rotate_rev_path in Hs.
  rewrite <- Hs; f_equal.
+ move Hr at bottom.
+ unfold fixpoint_of_path; rewrite <- Hm.
+ unfold rotation_fixpoint; rewrite <- Hev.
+ unfold select_fixpoint.
+ rewrite Hev, <- Hev, Hbe.
+
+bbb.
 
 Theorem toto : ∀ el x y z,
   fixpoint_of_path el = P x y z
