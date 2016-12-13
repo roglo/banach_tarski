@@ -451,6 +451,15 @@ split.
  fold (radius (P ex ey ez)).
  remember (P ex ey ez) as ev eqn:Hev.
  remember (radius ev) as re eqn:Hre.
+ move Hrad before Hre.
+ move ey before ex; move ez before ey.
+ move re before r; move ev before p.
+ rename m into M.
+ rename p into V.
+ do 3 rewrite <- Ropp_mult_distr_l.
+ replace (r * (ex / re))%R with (ex * (r / re))%R by lra.
+ replace (r * (ey / re))%R with (ey * (r / re))%R by lra.
+ replace (r * (ez / re))%R with (ez * (r / re))%R by lra.
 bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
