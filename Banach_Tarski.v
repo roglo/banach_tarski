@@ -349,6 +349,7 @@ intros n.
 apply not_eq_sym, Hp.
 Qed.
 
+(*
 Definition neg_point '(P x y z) :=
   if Rlt_dec x 0 then true
   else if Rgt_dec x 0 then false
@@ -361,14 +362,18 @@ Definition neg_point '(P x y z) :=
 Definition select_fixpoint '(P x y z) :=
   if neg_point (P x y z) then P (-x) (-y) (-z)
   else P x y z.
+*)
 
-Definition rotation_fixpoint (m : matrix) k :=
+Definition rotation_unit_eigenvec (m : matrix) :=
   let x := (a₃₂ m - a₂₃ m)%R in
   let y := (a₁₃ m - a₃₁ m)%R in
   let z := (a₂₁ m - a₁₂ m)%R in
-  let 'P x y z := select_fixpoint (P x y z) in
   let r := √ (x² + y² + z²) in
-  P (k * x / r) (k * y / r) (k * z / r).
+  P (x / r) (y / r) (z / r).
+
+Definition rotation_fixpoint (m : matrix) k :=
+  let 'P x y z := rotation_unit_eigenvec m in
+  P (k * x) (k * y) (k * z).
 
 Definition mat_of_path el :=
   List.fold_right mat_mul mat_id (map mat_of_elem el).
@@ -381,21 +386,21 @@ Definition fixpoint_of_nat n :=
 
 Definition radius '(P x y z) := √ (x² + y² + z²).
 
-Theorem matrix_fixpoint_ok : ∀ m p k,
+Theorem matrix_all_fixpoints_ok : ∀ m p k,
   is_rotation_matrix m
   → p = rotation_fixpoint m k
   → mat_vec_mul m p = p.
 Proof.
-intros m p k Hrm Hn.
+intros * Hrm Hn.
 subst p.
 unfold rotation_fixpoint.
-remember (P (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m)) as ev eqn:Hev.
-remember (select_fixpoint ev) as q eqn:Hq.
-symmetry in Hq.
-destruct q as (x, y, z).
-remember (√ (x² + y² + z²)) as r.
-setoid_rewrite Rmult_div.
-remember (k / r)%R as kr.
+remember (rotation_unit_eigenvec m) as ev eqn:Hev.
+unfold rotation_unit_eigenvec in Hev.
+remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+rename Heqr into Hr.
+destruct ev as (x, y, z).
+injection Hev; clear Hev; intros Hz Hy Hx.
+move Hx after Hy; move Hz after Hy.
 unfold is_rotation_matrix in Hrm.
 destruct Hrm as (Ht & Hd).
 unfold mat_det in Hd.
@@ -411,17 +416,34 @@ clear H₄ H₇ H₈; move H₆ after H₂.
 move Hd before H₉.
 rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
 rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
-move Hq at bottom.
-unfold select_fixpoint in Hq.
-clear Heqr Heqkr.
-destruct ev as (x₁, y₁, z₁).
-remember (neg_point (P x₁ y₁ z₁)) as b eqn:Hb.
-injection Hev; clear Hev; intros; subst x₁ y₁ z₁.
-clear Hb.
-destruct b.
- injection Hq; clear Hq; intros; f_equal; nsatz.
- injection Hq; clear Hq; intros; f_equal; nsatz.
+replace (k * x)%R with (x * k)%R by apply Rmult_comm.
+replace (k * y)%R with (y * k)%R by apply Rmult_comm.
+replace (k * z)%R with (z * k)%R by apply Rmult_comm.
+subst x y z.
+progress repeat rewrite <- Rmult_div.
+unfold Rdiv.
+progress repeat rewrite Rmult_assoc.
+remember (k * / r)%R as kr.
+clear Hr Heqkr.
+f_equal; nsatz.
 Qed.
+
+Theorem matrix_fixpoints_ok : ∀ m p r,
+  is_rotation_matrix m
+  → r = radius p
+  → p = rotation_fixpoint m r ∨ p = rotation_fixpoint m (-r)
+  ↔ mat_vec_mul m p = p.
+Proof.
+intros * Hrm Hrad.
+split.
+ intros Hp; destruct Hp; eapply matrix_all_fixpoints_ok; eassumption.
+
+ intros Hm.
+ unfold rotation_fixpoint.
+ remember (rotation_unit_eigenvec m) as ev eqn:Hev.
+ symmetry in Hev.
+ destruct ev as (ex, ey, ez).
+bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el
