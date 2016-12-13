@@ -364,6 +364,8 @@ Definition select_fixpoint '(P x y z) :=
   else P x y z.
 *)
 
+Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
+
 Definition radius '(P x y z) := √ (x² + y² + z²).
 
 Definition rotation_unit_eigenvec (m : matrix) :=
@@ -374,8 +376,7 @@ Definition rotation_unit_eigenvec (m : matrix) :=
   P (x / r) (y / r) (z / r).
 
 Definition rotation_fixpoint (m : matrix) k :=
-  let 'P x y z := rotation_unit_eigenvec m in
-  P (k * x) (k * y) (k * z).
+  mul_const_vec k (rotation_unit_eigenvec m).
 
 Definition mat_of_path el :=
   List.fold_right mat_mul mat_id (map mat_of_elem el).
@@ -450,6 +451,7 @@ remember (radius ev) as re eqn:Hre.
 move Hrad before Hre.
 move ey before ex; move ez before ey.
 move re before r; move ev before V.
+unfold mul_const_vec.
 do 3 rewrite <- Ropp_mult_distr_l.
 replace (r * (ex / re))%R with (ex * (r / re))%R by lra.
 replace (r * (ey / re))%R with (ey * (r / re))%R by lra.
