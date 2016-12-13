@@ -482,6 +482,7 @@ split; [ | split ].
   apply mat_of_path_is_rotation_matrix.
 Qed.
 
+(*
 Theorem toto : ∀ (p p₁ : point) (el el₁ : list free_elem),
   norm_list el₁ ≠ []
   → fold_right rotate p₁ el₁ = p₁
@@ -563,6 +564,7 @@ Definition titi p p₁ el el₁ Hr Hnl Hs :=
                       (@Datatypes.nil free_elem)))
                 (@eq point (@fold_right point free_elem rotate p₁ el₁) p₁)
                 Hnl Hr)))).
+*)
 
 Definition D_of_prod_nat '(nf, no) :=
   let p₁ := fixpoint_of_nat nf in
@@ -770,15 +772,28 @@ intros p Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 remember (nat_of_path el₁) as nf₁ eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no₁ eqn:Hno.
-exists (nf₁, no₁); simpl.
-subst nf₁ no₁.
-unfold fixpoint_of_nat.
-do 2 rewrite path_of_nat_inv.
-apply rotate_rev_path in Hs.
-rewrite <- Hs; f_equal.
-(* actually, there are two possible fixpoints p₁ and -p₁;
-   our p₁, equal to fold_right rotate p₁ el₁, could be the
-   bad one; therefore not provable *)
+remember (fixpoint_of_nat nf₁) as p₂ eqn:Hp₂.
+remember (mat_of_path (not_empty_path_of_path (path_of_nat nf₁))) as m eqn:Hm.
+remember (neg_point (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m)) as b.
+rename Heqb into Hb.
+destruct p₁ as (x₁, y₁, z₁).
+remember (neg_point x₁ y₁ z₁) as b₁ eqn:Hb₁.
+destruct (Bool.bool_dec b b₁) as [Hbe| Hbne].
+ subst b b₁.
+ exists (nf₁, no₁); simpl.
+ subst nf₁ no₁.
+ unfold fixpoint_of_nat.
+ do 2 rewrite path_of_nat_inv.
+ apply rotate_rev_path in Hs.
+ rewrite <- Hs; f_equal.
+
+Theorem toto : ∀ el x y z,
+  fixpoint_of_path el = P x y z
+  → fixpoint_of_path (rev_path el) = P (-x) (-y) (-z).
+Proof.
+intros * Hel.
+unfold fixpoint_of_path in Hel |-*.
+unfold rotation_fixpoint in Hel |-*.
 bbb.
 
 clear -Hnl Hr.
