@@ -489,7 +489,7 @@ move Hz after Hy; move Hx after Hy.
 subst re r.
 rewrite Hev in Hk.
 simpl in Hk.
-bbb.
+Admitted.
 
 Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el
@@ -788,7 +788,7 @@ remember (nat_of_path el₁) as nf₁ eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no₁ eqn:Hno.
 remember (fixpoint_of_nat nf₁) as p₂ eqn:Hp₂.
 remember (mat_of_path (path_of_nat nf₁)) as m eqn:Hm.
-remember (P (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m)) as ev eqn:Hev.
+remember (P (a₂₃ m - a₃₂ m) (a₃₁ m - a₁₃ m) (a₁₂ m - a₂₁ m)) as ev eqn:Hev.
 remember (neg_point ev) as b.
 rename Heqb into Hb.
 remember (neg_point p₁) as b₁ eqn:Hb₁.
@@ -810,7 +810,7 @@ destruct (Bool.bool_dec b b₁) as [Hbe| Hbne].
  destruct v as (x, y, z).
  do 3 rewrite Rmult_1_l.
  unfold rotation_unit_eigenvec in Hv.
- remember (vec_norm (P (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m))) as r.
+ remember (vec_norm (P (a₂₃ m - a₃₂ m) (a₃₁ m - a₁₃ m) (a₁₂ m - a₂₁ m))) as r.
  injection Hv; clear Hv; intros Hz Hy Hx.
  move Hx after Hy; move Hz after Hy.
  destruct ev as (ex, ey, ez).
