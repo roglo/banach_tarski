@@ -784,6 +784,15 @@ apply surj_prop_prod_nat_surj_prop_nat.
 exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
 intros p Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
+Check matrix_fixpoints_ok.
+SearchAbout is_rotation_matrix.
+bbb.
+
+mat_of_path_is_rotation_matrix:
+  ∀ el : list free_elem, is_rotation_matrix (mat_of_path el)
+
+bbb.
+
 remember (nat_of_path el₁) as nf₁ eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no₁ eqn:Hno.
 remember (fixpoint_of_nat nf₁) as p₂ eqn:Hp₂.
@@ -819,6 +828,7 @@ destruct (Bool.bool_dec b b₁) as [Hbe| Hbne].
  rewrite <- Hex in Hx; rewrite <- Hey in Hy; rewrite <- Hez in Hz.
  subst x y z.
  rewrite <- Hex, <- Hey, <- Hez in Heqr.
+Check matrix_fixpoints_ok.
 
 bbb.
 
