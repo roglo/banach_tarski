@@ -369,9 +369,9 @@ Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
 Definition vec_norm '(P x y z) := √ (x² + y² + z²).
 
 Definition rotation_unit_eigenvec (m : matrix) :=
-  let x := (a₃₂ m - a₂₃ m)%R in
-  let y := (a₁₃ m - a₃₁ m)%R in
-  let z := (a₂₁ m - a₁₂ m)%R in
+  let x := (a₂₃ m - a₃₂ m)%R in
+  let y := (a₃₁ m - a₁₃ m)%R in
+  let z := (a₁₂ m - a₂₁ m)%R in
   let r := vec_norm (P x y z) in
   P (x / r) (y / r) (z / r).
 
