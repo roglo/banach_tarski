@@ -349,7 +349,6 @@ intros n.
 apply not_eq_sym, Hp.
 Qed.
 
-(*
 Definition neg_point '(P x y z) :=
   if Rlt_dec x 0 then true
   else if Rgt_dec x 0 then false
@@ -359,6 +358,7 @@ Definition neg_point '(P x y z) :=
   else if Rgt_dec z 0 then false
   else true.
 
+(*
 Definition select_fixpoint '(P x y z) :=
   if neg_point (P x y z) then P (-x) (-y) (-z)
   else P x y z.
@@ -489,8 +489,7 @@ move Hz after Hy; move Hx after Hy.
 subst re r.
 rewrite Hev in Hk.
 simpl in Hk.
-
-bbb.
+Abort.
 
 Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el
@@ -526,10 +525,9 @@ split.
  exists (rev_path el).
  symmetry in Hp; apply rotate_rev_path in Hp; apply Hp.
 
- apply matrix_fixpoint_ok in Hp₁.
+ apply matrix_all_fixpoints_ok in Hp₁.
   unfold mat_of_path in Hp₁.
-  rewrite <- rotate_vec_mul in Hp₁;
-  apply Hp₁.
+  rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
 
   apply mat_of_path_is_rotation_matrix.
 Qed.
@@ -805,17 +803,22 @@ destruct (Bool.bool_dec b b₁) as [Hbe| Hbne].
  rewrite <- Hs; f_equal.
  move Hr at bottom.
  unfold fixpoint_of_path; rewrite <- Hm.
- unfold rotation_fixpoint; rewrite <- Hev.
- unfold select_fixpoint.
- rewrite Hev, <- Hev, Hbe.
- remember (neg_point p₁) as b eqn:Hb.
- symmetry in Hb; symmetry.
- destruct b.
-  do 3 rewrite Rmult_1_l.
-  do 3 rewrite <- Rsqr_neg.
-  remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
-  destruct p₁ as (x₁, y₁, z₁).
-  f_equal.
+ unfold rotation_fixpoint.
+ unfold mul_const_vec.
+ remember (rotation_unit_eigenvec m) as v eqn:Hv.
+ symmetry in Hv.
+ destruct v as (x, y, z).
+ do 3 rewrite Rmult_1_l.
+ unfold rotation_unit_eigenvec in Hv.
+ remember (vec_norm (P (a₃₂ m - a₂₃ m) (a₁₃ m - a₃₁ m) (a₂₁ m - a₁₂ m))) as r.
+ injection Hv; clear Hv; intros Hz Hy Hx.
+ move Hx after Hy; move Hz after Hy.
+ destruct ev as (ex, ey, ez).
+ injection Hev; clear Hev; intros Hez Hey Hex.
+ move Hex after Hey; move Hez after Hey.
+ rewrite <- Hex in Hx; rewrite <- Hey in Hy; rewrite <- Hez in Hz.
+ subst x y z.
+ rewrite <- Hex, <- Hey, <- Hez in Heqr.
 
 bbb.
 
