@@ -489,7 +489,7 @@ move Hz after Hy; move Hx after Hy.
 subst re r.
 rewrite Hev in Hk.
 simpl in Hk.
-Admitted.
+bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el
