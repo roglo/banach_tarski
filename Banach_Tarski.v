@@ -349,10 +349,13 @@ intros n.
 apply not_eq_sym, Hp.
 Qed.
 
-Definition mkzmat := @mkmat ℤ.
+Require Import QArith.
+Notation "'ℚ'" := Q.
 
-Definition zmat_mul m₁ m₂ :=
-  mkzmat
+Definition mkqmat := @mkmat ℚ.
+
+Definition qmat_mul m₁ m₂ :=
+  mkqmat
     (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
     (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
     (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
@@ -363,23 +366,62 @@ Definition zmat_mul m₁ m₂ :=
     (a₃₁ m₁ * a₁₂ m₂ + a₃₂ m₁ * a₂₂ m₂ + a₃₃ m₁ * a₃₂ m₂)
     (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
 
-Delimit Scope zmat_scope with zmat.
-Notation "m₁ * m₂" := (zmat_mul m₁ m₂) : zmat_scope.
+Delimit Scope qmat_scope with qmat.
+Notation "m₁ * m₂" := (qmat_mul m₁ m₂) : qmat_scope.
 
-Definition Trv₁₂ a := mkzmat 1 a 0 0 1 0 0 0 1.
-Definition Trv₁₃ a := mkzmat 1 0 a 0 1 0 0 0 1.
-Definition Trv₂₁ a := mkzmat 1 0 0 a 1 0 0 0 1.
-Definition Trv₂₃ a := mkzmat 1 0 0 0 1 a 0 0 1.
+Definition Trv₁₂ a := mkqmat 1 a 0 0 1 0 0 0 1.
+Definition Trv₁₃ a := mkqmat 1 0 a 0 1 0 0 0 1.
+Definition Trv₂₁ a := mkqmat 1 0 0 a 1 0 0 0 1.
+Definition Trv₂₃ a := mkqmat 1 0 0 0 1 a 0 0 1.
+Definition Trv₃₁ a := mkqmat 1 0 0 0 1 0 a 0 1.
+Definition Trv₃₂ a := mkqmat 1 0 0 0 1 0 0 a 1.
 
-Definition Dil₁ a := mkzmat a 0 0 0 1 0 0 0 1.
-Definition Dil₂ a := mkzmat 1 0 0 0 a 0 0 0 1.
-Definition Dil₃ a := mkzmat 1 0 0 0 1 0 0 0 a.
+Definition Dil₁ a := mkqmat a 0 0 0 1 0 0 0 1.
+Definition Dil₂ a := mkqmat 1 0 0 0 a 0 0 0 1.
+Definition Dil₃ a := mkqmat 1 0 0 0 1 0 0 0 a.
 
-Definition mat_swap₁₂ := (Dil₂ (-1) * Trv₁₂ 1 * Trv₂₁ (-1) * Trv₁₂ 1)%zmat.
+Definition Z2Q := inject_Z.
 
-Definition nmat_ex := mkzmat 1 2 3 4 5 6 7 8 9.
+Definition mat_swap₁₂ :=
+  (Dil₂ (-1 # 1) * Trv₁₂ 1 * Trv₂₁ (-1 # 1) * Trv₁₂ 1)%qmat.
+Definition mat_swap₂₃ :=
+  (Dil₃ (-1 # 1) * Trv₂₃ 1 * Trv₃₂ (-1 # 1) * Trv₂₃ 1)%qmat.
+Definition mat_swap₃₁ :=
+  (Dil₁ (-1 # 1) * Trv₃₁ 1 * Trv₁₃ (-1 # 1) * Trv₃₁ 1)%qmat.
 
-Compute (mat_swap₁₂ * nmat_ex)%zmat.
+Definition nmat_ex :=
+  mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
+
+Compute (mat_swap₁₂ * nmat_ex)%qmat.
+Compute (mat_swap₂₃ * nmat_ex)%qmat.
+Compute (mat_swap₃₁ * nmat_ex)%qmat.
+
+bbb.
+
+Definition gauss_jordan m :=
+  (* for k = 1 ... min(m,n): *)
+  let k := 1 in
+  (* Find the k-th pivot: *)
+  (* i_max  := argmax (i = k ... m, abs(A[i, k])) *)
+  let i_max := argmax 1 abs 
+
+
+(*
+for k = 1 ... min(m,n):
+   Find the k-th pivot:
+   i_max  := argmax (i = k ... m, abs(A[i, k]))
+   if A[i_max, k] = 0
+     error "Matrix is singular!"
+   swap rows(k, i_max)
+   Do for all rows below pivot:
+   for i = k + 1 ... m:
+     f := A[i, k] / A[k, k]
+     Do for all remaining elements in current row:
+     for j = k + 1 ... n:
+       A[i, j]  := A[i, j] - A[k, j] * f
+     Fill lower triangular matrix with zeros:
+     A[i, k]  := 0
+*)
 
 bbb.
 
