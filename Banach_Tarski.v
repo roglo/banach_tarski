@@ -428,38 +428,32 @@ Compute (mat_ex * Trv 1 2 (-20 # 1))%qmat.
 Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
 
 Definition gauss_jordan m :=
-  (* for k = 1 ... min(m,n): *)
-  let k := 1 in
-  (* Find the k-th pivot: *)
-  (* i_max  := argmax (i = k ... m, abs(A[i, k])) *)
   let i_max :=
     if Qlt_le_dec (Qabs (mt 1 1 m)) (Qabs (mt 2 1 m)) then
       if Qlt_le_dec (Qabs (mt 2 1 m)) (Qabs (mt 3 1 m)) then 3 else 2
     else
       if Qlt_le_dec (Qabs (mt 1 1 m)) (Qabs (mt 3 1 m)) then 3 else 1%nat
   in
-  (* if A[i_max, k] = 0 error "Matrix is singular!" *)
   if Qeq_dec (mt i_max 1 m) 0 then m
   else
-    (* swap rows(k, i_max) *)
     let m := (mat_swap 1 i_max * m)%qmat in
-    (* Do for all rows below pivot: *)
-    (* for i = k + 1 ... m: *)
-    let i := 2 in
-    (* f := A[i, k] / A[k, k] *)
-    let f := mt 2 1 m / mt 1 1 m in
-    (* Do for all remaining elements in current row: *)
-    (* for j = k + 1 ... n: *)
-    (* A[i, j]  := A[i, j] - A[k, j] * f *)
-    let m := (m * Trv 1 2 (- f))%qmat in
-    (* Fill lower triangular matrix with zeros: *)
-    (* A[i, k]  := 0 *)
-(*
-    let m := (m * Dil 1 0)%qmat in
-*)
+    let m := (Dil 1 (/ mt 1 1 m) * m)%qmat in
     m.
 
 Compute (gauss_jordan mat_ex).
+bbb.
+
+     = {|
+       a₁₁ := 7 # 1;
+       a₁₂ := 8 # 1;
+       a₁₃ := 9 # 1;
+       a₂₁ := 4 # 1;
+       a₂₂ := 5 # 1;
+       a₂₃ := 6 # 1;
+       a₃₁ := 1;
+       a₃₂ := 2 # 1;
+       a₃₃ := 3 # 1 |}
+     : matrix ℚ
 
 (*
 for k = 1 ... min(m,n):
