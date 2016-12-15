@@ -11,10 +11,22 @@ Require Import Reals Psatz.
 Require Import Words Normalize Reverse MiscReals.
 
 Inductive point := P : ℝ → ℝ → ℝ → point.
-Record matrix := mkmat
-  { a₁₁ : ℝ; a₁₂ : ℝ; a₁₃ : ℝ;
-    a₂₁ : ℝ; a₂₂ : ℝ; a₂₃ : ℝ;
-    a₃₁ : ℝ; a₃₂ : ℝ; a₃₃ : ℝ }.
+Record matrix A := mkmat
+  { a₁₁ : A; a₁₂ : A; a₁₃ : A;
+    a₂₁ : A; a₂₂ : A; a₂₃ : A;
+    a₃₁ : A; a₃₂ : A; a₃₃ : A }.
+Arguments a₁₁ [A] _.
+Arguments a₁₂ [A] _.
+Arguments a₁₃ [A] _.
+Arguments a₂₁ [A] _.
+Arguments a₂₂ [A] _.
+Arguments a₂₃ [A] _.
+Arguments a₃₁ [A] _.
+Arguments a₃₂ [A] _.
+Arguments a₃₃ [A] _.
+Arguments mkmat [A] _ _ _ _ _ _ _ _ _.
+
+Definition mkrmat := @mkmat ℝ.
 
 Definition mat_vec_mul mat '(P x y z) :=
   P (a₁₁ mat * x + a₁₂ mat * y + a₁₃ mat * z)
@@ -24,24 +36,24 @@ Definition mat_vec_mul mat '(P x y z) :=
 (* https://en.wikipedia.org/wiki/Rotation_matrix
    #Rotation_matrix_from_axis_and_angle *)
 Definition rot_mat_of_axis_cos '(P x y z) cosθ :=
-  let sinθ := √ (1 - cosθ²) in mkmat
+  let sinθ := √ (1 - cosθ²) in mkrmat
   (cosθ+x²*(1-cosθ))    (x*y*(1-cosθ)-z*sinθ) (x*z*(1-cosθ)+y*sinθ)
   (y*x*(1-cosθ)+z*sinθ) (cosθ+y²*(1-cosθ))    (y*z*(1-cosθ)-x*sinθ)
   (z*x*(1-cosθ)-y*sinθ) (z*y*(1-cosθ)+x*sinθ) (cosθ+z²*(1-cosθ)).
 
-Definition rot_x := mkmat
+Definition rot_x := mkrmat
   1         0         0
   0         (1/3)     (-2*√2/3)
   0         (2*√2/3)  (1/3).
-Definition rot_inv_x := mkmat
+Definition rot_inv_x := mkrmat
   1         0         0
   0         (1/3)     (2*√2/3)
   0         (-2*√2/3) (1/3).
-Definition rot_z := mkmat
+Definition rot_z := mkrmat
   (1/3)     (-2*√2/3) 0
   (2*√2/3)  (1/3)     0
   0         0         1.
-Definition rot_inv_z := mkmat
+Definition rot_inv_z := mkrmat
   (1/3)     (2*√2/3)  0
   (-2*√2/3) (1/3)     0
   0         0         1.
@@ -69,7 +81,7 @@ Definition mat_of_elem e :=
 Definition rotate e pt := mat_vec_mul (mat_of_elem e) pt.
 
 Definition mat_mul m₁ m₂ :=
-  mkmat
+  mkrmat
     (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
     (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
     (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
@@ -81,7 +93,7 @@ Definition mat_mul m₁ m₂ :=
     (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
 
 Definition mat_id :=
-  mkmat
+  mkrmat
     1 0 0
     0 1 0
     0 0 1.
@@ -336,7 +348,7 @@ easy.
 Qed.
 
 Definition mat_transp m :=
-  mkmat 
+  mkrmat
    (a₁₁ m) (a₂₁ m) (a₃₁ m)
    (a₁₂ m) (a₂₂ m) (a₃₂ m)
    (a₁₃ m) (a₂₃ m) (a₃₃ m).

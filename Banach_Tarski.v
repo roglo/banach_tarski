@@ -358,24 +358,18 @@ Definition neg_point '(P x y z) :=
   else if Rgt_dec z 0 then false
   else true.
 
-(*
-Definition select_fixpoint '(P x y z) :=
-  if neg_point (P x y z) then P (-x) (-y) (-z)
-  else P x y z.
-*)
-
 Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
 
 Definition vec_norm '(P x y z) := √ (x² + y² + z²).
 
-Definition rotation_unit_eigenvec (m : matrix) :=
+Definition rotation_unit_eigenvec (m : matrix ℝ) :=
   let x := (a₂₃ m - a₃₂ m)%R in
   let y := (a₃₁ m - a₁₃ m)%R in
   let z := (a₁₂ m - a₂₁ m)%R in
   let r := vec_norm (P x y z) in
   P (x / r) (y / r) (z / r).
 
-Definition rotation_fixpoint (m : matrix) k :=
+Definition rotation_fixpoint (m : matrix ℝ) k :=
   mul_const_vec k (rotation_unit_eigenvec m).
 
 Definition mat_of_path el :=
@@ -531,90 +525,6 @@ split.
 
   apply mat_of_path_is_rotation_matrix.
 Qed.
-
-(*
-Theorem toto : ∀ (p p₁ : point) (el el₁ : list free_elem),
-  norm_list el₁ ≠ []
-  → fold_right rotate p₁ el₁ = p₁
-  → fold_right rotate p el = p₁
-  → p ∈ D.
-Proof.
-intros * Hnl Hr Hs.
-refine
-    (@ex_intro (list free_elem)
-       (fun el0 : list free_elem =>
-        @ex point
-          (fun p₁0 : point =>
-           and (same_orbit p p₁0)
-             (and
-                (not
-                   (@eq (list free_elem) (norm_list el0)
-                      (@Datatypes.nil free_elem)))
-                (@eq point
-                   (@fold_right point free_elem rotate p₁0 el0) p₁0)))) el₁
-       (@ex_intro point
-          (fun p₁0 : point =>
-           and (same_orbit p p₁0)
-             (and
-                (not
-                   (@eq (list free_elem) (norm_list el₁)
-                      (@Datatypes.nil free_elem)))
-                (@eq point (@fold_right point free_elem rotate p₁0 el₁) p₁0))) p₁
-          (@conj (same_orbit p p₁)
-             (and
-                (not
-                   (@eq (list free_elem) (norm_list el₁)
-                      (@Datatypes.nil free_elem)))
-                (@eq point (@fold_right point free_elem rotate p₁ el₁) p₁))
-             (@ex_intro (list free_elem)
-                (fun el0 : list free_elem =>
-                 @eq point (@fold_right point free_elem rotate p el0) p₁) el Hs)
-             (@conj
-                (not
-                   (@eq (list free_elem) (norm_list el₁)
-                      (@Datatypes.nil free_elem)))
-                (@eq point
-                   (@fold_right point free_elem rotate p₁ el₁) p₁) Hnl Hr)))).
-Defined.
-
-Definition titi p p₁ el el₁ Hr Hnl Hs :=
-    (@ex_intro (list free_elem)
-       (fun el0 : list free_elem =>
-        @ex point
-          (fun p₁0 : point =>
-           and (same_orbit p p₁0)
-             (and
-                (not
-                   (@eq (list free_elem) (norm_list el0)
-                      (@Datatypes.nil free_elem)))
-                (@eq point (@fold_right point free_elem rotate p₁0 el0) p₁0))))
-       el₁
-       (@ex_intro point
-          (fun p₁0 : point =>
-           and (same_orbit p p₁0)
-             (and
-                (not
-                   (@eq (list free_elem) (norm_list el₁)
-                      (@Datatypes.nil free_elem)))
-                (@eq point (@fold_right point free_elem rotate p₁0 el₁) p₁0)))
-          p₁
-          (@conj (same_orbit p p₁)
-             (and
-                (not
-                   (@eq (list free_elem) (norm_list el₁)
-                      (@Datatypes.nil free_elem)))
-                (@eq point (@fold_right point free_elem rotate p₁ el₁) p₁))
-             (@ex_intro (list free_elem)
-                (fun el0 : list free_elem =>
-                 @eq point (@fold_right point free_elem rotate p el0) p₁) el
-                Hs)
-             (@conj
-                (not
-                   (@eq (list free_elem) (norm_list el₁)
-                      (@Datatypes.nil free_elem)))
-                (@eq point (@fold_right point free_elem rotate p₁ el₁) p₁)
-                Hnl Hr)))).
-*)
 
 Definition D_of_prod_nat '(nf, no) :=
   let p₁ := fixpoint_of_nat nf in
