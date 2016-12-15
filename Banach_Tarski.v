@@ -404,12 +404,22 @@ Definition mat_swap₂₃ :=
 Definition mat_swap₃₁ :=
   (Dil₁ (-1 # 1) * Trv 3 1 1 * Trv 1 3 (-1 # 1) * Trv 3 1 1)%qmat.
 
+Definition mat_swap i j :=
+  match i with
+  | 1%nat =>
+      match j with 1%nat => qmat_id | 2 => mat_swap₁₂ | _ => mat_swap₃₁ end
+  | 2 =>
+      match j with 1%nat => mat_swap₁₂ | 2 => qmat_id | _ => mat_swap₂₃ end
+  | _ =>
+      match j with 1%nat => mat_swap₃₁ | 2 => mat_swap₂₃ | _ => qmat_id end
+  end.
+
 Definition mat_ex :=
   mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
 
-Compute (mat_swap₁₂ * mat_ex)%qmat.
-Compute (mat_swap₂₃ * mat_ex)%qmat.
-Compute (mat_swap₃₁ * mat_ex)%qmat.
+Compute (mat_swap 1 2 * mat_ex)%qmat.
+Compute (mat_swap 2 3 * mat_ex)%qmat.
+Compute (mat_swap 3 1 * mat_ex)%qmat.
 
 Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
 
@@ -428,13 +438,7 @@ Definition gauss_jordan m :=
   if Qeq_dec (mt i_max 1 m) 0 then m
   else
     (* swap rows(k, i_max) *)
-    let m :=
-      match i_max with
-      | 2%nat => (mat_swap₁₂ * m)%qmat
-      | 3%nat => (mat_swap₃₁ * m)%qmat
-      | _ => m
-      end
-    in
+    let m := (mat_swap 1 i_max * m)%qmat in
     (* Do for all rows below pivot: *)
     (* for i = k + 1 ... m: *)
     let i := 2%nat in
