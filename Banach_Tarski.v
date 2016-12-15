@@ -354,6 +354,8 @@ Notation "'ℚ'" := Q.
 
 Definition mkqmat := @mkmat ℚ.
 
+Definition qmat_id := mkqmat 1 0 0 0 1 0 0 0 1.
+
 Definition qmat_mul m₁ m₂ :=
   mkqmat
     (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
@@ -376,18 +378,31 @@ Definition Trv₂₃ a := mkqmat 1 0 0 0 1 a 0 0 1.
 Definition Trv₃₁ a := mkqmat 1 0 0 0 1 0 a 0 1.
 Definition Trv₃₂ a := mkqmat 1 0 0 0 1 0 0 a 1.
 
+Definition Trv i j :=
+  match i with
+  | 1%nat => match j with 2 => Trv₁₂ | 3 => Trv₁₃ | _ => λ _, qmat_id end
+  | 2%nat => match j with 3 => Trv₂₃ | 1%nat => Trv₂₁ | _ => λ _, qmat_id end
+  | _ => match j with 1%nat => Trv₃₁ | 2 => Trv₃₂ | _ => λ _, qmat_id end
+  end.
+
 Definition Dil₁ a := mkqmat a 0 0 0 1 0 0 0 1.
 Definition Dil₂ a := mkqmat 1 0 0 0 a 0 0 0 1.
 Definition Dil₃ a := mkqmat 1 0 0 0 1 0 0 0 a.
 
-Definition Z2Q := inject_Z.
+Definition mt i j :=
+  match i with
+  | 1%nat => match j with 1%nat => a₁₁ | 2 => a₁₂ | _ => a₁₃ end
+  | 2%nat => match j with 1%nat => a₂₁ | 2 => a₂₂ | _ => a₂₃ end
+  | _ => match j with 1%nat => a₃₁ | 2 => a₃₂ | _ => a₃₃ end
+  end.
+Arguments mt i%nat j%nat [A] m.
 
 Definition mat_swap₁₂ :=
-  (Dil₂ (-1 # 1) * Trv₁₂ 1 * Trv₂₁ (-1 # 1) * Trv₁₂ 1)%qmat.
+  (Dil₂ (-1 # 1) * Trv 1 2 1 * Trv 2 1 (-1 # 1) * Trv 1 2 1)%qmat.
 Definition mat_swap₂₃ :=
-  (Dil₃ (-1 # 1) * Trv₂₃ 1 * Trv₃₂ (-1 # 1) * Trv₂₃ 1)%qmat.
+  (Dil₃ (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat.
 Definition mat_swap₃₁ :=
-  (Dil₁ (-1 # 1) * Trv₃₁ 1 * Trv₁₃ (-1 # 1) * Trv₃₁ 1)%qmat.
+  (Dil₁ (-1 # 1) * Trv 3 1 1 * Trv 1 3 (-1 # 1) * Trv 3 1 1)%qmat.
 
 Definition mat_ex :=
   mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
@@ -398,23 +413,19 @@ Compute (mat_swap₃₁ * mat_ex)%qmat.
 
 Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
 
-SearchAbout ({ (_ == _)%Q } + { _ }).
-
 Definition gauss_jordan m :=
   (* for k = 1 ... min(m,n): *)
   let k := 1 in
   (* Find the k-th pivot: *)
   (* i_max  := argmax (i = k ... m, abs(A[i, k])) *)
-  let '(i_max, m_i_max) :=
-    if Qlt_le_dec (Qabs (a₁₁ m)) (Qabs (a₂₁ m)) then
-      if Qlt_le_dec (Qabs (a₂₁ m)) (Qabs (a₃₁ m)) then (3, a₃₁ m)
-      else (2, a₂₁ m)
+  let i_max :=
+    if Qlt_le_dec (Qabs (mt 1 1 m)) (Qabs (mt 2 1 m)) then
+      if Qlt_le_dec (Qabs (mt 2 1 m)) (Qabs (mt 3 1 m)) then 3 else 2
     else
-      if Qlt_le_dec (Qabs (a₁₁ m)) (Qabs (a₃₁ m)) then (3, a₃₁ m)
-      else (1%nat, a₁₁ m)
+      if Qlt_le_dec (Qabs (mt 1 1 m)) (Qabs (mt 3 1 m)) then 3 else 1%nat
   in
   (* if A[i_max, k] = 0 error "Matrix is singular!" *)
-  if Qeq_dec m_i_max 0 then m
+  if Qeq_dec (mt i_max 1 m) 0 then m
   else
     (* swap rows(k, i_max) *)
     let m :=
@@ -428,7 +439,7 @@ Definition gauss_jordan m :=
     (* for i = k + 1 ... m: *)
     let i := 2%nat in
     (* f := A[i, k] / A[k, k] *)
-    let f := a₂₁ m / a₁₁ m in
+    let f := mt 2 1 m / mt 1 1 m in
     (* Do for all remaining elements in current row: *)
     (* for j = k + 1 ... n: *)
     (* ... *)
