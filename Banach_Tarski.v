@@ -389,6 +389,8 @@ Definition Dil₁ a := mkqmat a 0 0 0 1 0 0 0 1.
 Definition Dil₂ a := mkqmat 1 0 0 0 a 0 0 0 1.
 Definition Dil₃ a := mkqmat 1 0 0 0 1 0 0 0 a.
 
+Definition Dil i := match i with 1%nat => Dil₁ | 2 => Dil₂ | _ => Dil₃ end.
+
 Definition mt i j :=
   match i with
   | 1%nat => match j with 1%nat => a₁₁ | 2 => a₁₂ | _ => a₁₃ end
@@ -421,6 +423,8 @@ Compute (mat_swap 1 2 * mat_ex)%qmat.
 Compute (mat_swap 2 3 * mat_ex)%qmat.
 Compute (mat_swap 3 1 * mat_ex)%qmat.
 
+Compute (mat_ex * Trv 1 2 (-20 # 1))%qmat.
+
 Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
 
 Definition gauss_jordan m :=
@@ -446,8 +450,13 @@ Definition gauss_jordan m :=
     let f := mt 2 1 m / mt 1 1 m in
     (* Do for all remaining elements in current row: *)
     (* for j = k + 1 ... n: *)
-    let j := 2 in
     (* A[i, j]  := A[i, j] - A[k, j] * f *)
+    let m := (m * Trv 1 2 (- f))%qmat in
+    (* Fill lower triangular matrix with zeros: *)
+    (* A[i, k]  := 0 *)
+(*
+    let m := (m * Dil 1 0)%qmat in
+*)
     m.
 
 Compute (gauss_jordan mat_ex).
