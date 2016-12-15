@@ -349,6 +349,40 @@ intros n.
 apply not_eq_sym, Hp.
 Qed.
 
+Definition mkzmat := @mkmat ℤ.
+
+Definition zmat_mul m₁ m₂ :=
+  mkzmat
+    (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
+    (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
+    (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
+    (a₂₁ m₁ * a₁₁ m₂ + a₂₂ m₁ * a₂₁ m₂ + a₂₃ m₁ * a₃₁ m₂)
+    (a₂₁ m₁ * a₁₂ m₂ + a₂₂ m₁ * a₂₂ m₂ + a₂₃ m₁ * a₃₂ m₂)
+    (a₂₁ m₁ * a₁₃ m₂ + a₂₂ m₁ * a₂₃ m₂ + a₂₃ m₁ * a₃₃ m₂)
+    (a₃₁ m₁ * a₁₁ m₂ + a₃₂ m₁ * a₂₁ m₂ + a₃₃ m₁ * a₃₁ m₂)
+    (a₃₁ m₁ * a₁₂ m₂ + a₃₂ m₁ * a₂₂ m₂ + a₃₃ m₁ * a₃₂ m₂)
+    (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
+
+Delimit Scope zmat_scope with zmat.
+Notation "m₁ * m₂" := (zmat_mul m₁ m₂) : zmat_scope.
+
+Definition Trv₁₂ a := mkzmat 1 a 0 0 1 0 0 0 1.
+Definition Trv₁₃ a := mkzmat 1 0 a 0 1 0 0 0 1.
+Definition Trv₂₁ a := mkzmat 1 0 0 a 1 0 0 0 1.
+Definition Trv₂₃ a := mkzmat 1 0 0 0 1 a 0 0 1.
+
+Definition Dil₁ a := mkzmat a 0 0 0 1 0 0 0 1.
+Definition Dil₂ a := mkzmat 1 0 0 0 a 0 0 0 1.
+Definition Dil₃ a := mkzmat 1 0 0 0 1 0 0 0 a.
+
+Definition mat_swap₁₂ := (Dil₂ (-1) * Trv₁₂ 1 * Trv₂₁ (-1) * Trv₁₂ 1)%zmat.
+
+Definition nmat_ex := mkzmat 1 2 3 4 5 6 7 8 9.
+
+Compute (mat_swap₁₂ * nmat_ex)%zmat.
+
+bbb.
+
 Definition neg_point '(P x y z) :=
   if Rlt_dec x 0 then true
   else if Rgt_dec x 0 then false
