@@ -438,6 +438,7 @@ Definition gauss_jordan m :=
   else
     let m := (mat_swap 1 i_max * m)%qmat in
     let m := (Dil 1 (/ mt 1 1 m) * m)%qmat in
+    let m := (Trv 2 1 (- mt 1 1 m) * m)%qmat in
     m.
 
 Compute (gauss_jordan mat_ex).
