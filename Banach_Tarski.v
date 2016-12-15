@@ -441,12 +441,13 @@ Definition gauss_jordan m :=
     let m := (mat_swap 1 i_max * m)%qmat in
     (* Do for all rows below pivot: *)
     (* for i = k + 1 ... m: *)
-    let i := 2%nat in
+    let i := 2 in
     (* f := A[i, k] / A[k, k] *)
     let f := mt 2 1 m / mt 1 1 m in
     (* Do for all remaining elements in current row: *)
     (* for j = k + 1 ... n: *)
-    (* ... *)
+    let j := 2 in
+    (* A[i, j]  := A[i, j] - A[k, j] * f *)
     m.
 
 Compute (gauss_jordan mat_ex).
