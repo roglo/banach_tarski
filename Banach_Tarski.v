@@ -389,22 +389,52 @@ Definition mat_swap₂₃ :=
 Definition mat_swap₃₁ :=
   (Dil₁ (-1 # 1) * Trv₃₁ 1 * Trv₁₃ (-1 # 1) * Trv₃₁ 1)%qmat.
 
-Definition nmat_ex :=
+Definition mat_ex :=
   mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
 
-Compute (mat_swap₁₂ * nmat_ex)%qmat.
-Compute (mat_swap₂₃ * nmat_ex)%qmat.
-Compute (mat_swap₃₁ * nmat_ex)%qmat.
+Compute (mat_swap₁₂ * mat_ex)%qmat.
+Compute (mat_swap₂₃ * mat_ex)%qmat.
+Compute (mat_swap₃₁ * mat_ex)%qmat.
 
-bbb.
+Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
+
+SearchAbout ({ (_ == _)%Q } + { _ }).
 
 Definition gauss_jordan m :=
   (* for k = 1 ... min(m,n): *)
   let k := 1 in
   (* Find the k-th pivot: *)
   (* i_max  := argmax (i = k ... m, abs(A[i, k])) *)
-  let i_max := argmax 1 abs 
+  let '(i_max, m_i_max) :=
+    if Qlt_le_dec (Qabs (a₁₁ m)) (Qabs (a₂₁ m)) then
+      if Qlt_le_dec (Qabs (a₂₁ m)) (Qabs (a₃₁ m)) then (3, a₃₁ m)
+      else (2, a₂₁ m)
+    else
+      if Qlt_le_dec (Qabs (a₁₁ m)) (Qabs (a₃₁ m)) then (3, a₃₁ m)
+      else (1%nat, a₁₁ m)
+  in
+  (* if A[i_max, k] = 0 error "Matrix is singular!" *)
+  if Qeq_dec m_i_max 0 then m
+  else
+    (* swap rows(k, i_max) *)
+    let m :=
+      match i_max with
+      | 2%nat => (mat_swap₁₂ * m)%qmat
+      | 3%nat => (mat_swap₃₁ * m)%qmat
+      | _ => m
+      end
+    in
+    (* Do for all rows below pivot: *)
+    (* for i = k + 1 ... m: *)
+    let i := 2%nat in
+    (* f := A[i, k] / A[k, k] *)
+    let f := a₂₁ m / a₁₁ m in
+    (* Do for all remaining elements in current row: *)
+    (* for j = k + 1 ... n: *)
+    (* ... *)
+    m.
 
+Compute (gauss_jordan mat_ex).
 
 (*
 for k = 1 ... min(m,n):
