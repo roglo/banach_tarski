@@ -371,59 +371,58 @@ Definition qmat_mul m₁ m₂ :=
 Delimit Scope qmat_scope with qmat.
 Notation "m₁ * m₂" := (qmat_mul m₁ m₂) : qmat_scope.
 
-Definition Trv₁₂ a := mkqmat 1 a 0 0 1 0 0 0 1.
-Definition Trv₁₃ a := mkqmat 1 0 a 0 1 0 0 0 1.
-Definition Trv₂₁ a := mkqmat 1 0 0 a 1 0 0 0 1.
-Definition Trv₂₃ a := mkqmat 1 0 0 0 1 a 0 0 1.
-Definition Trv₃₁ a := mkqmat 1 0 0 0 1 0 a 0 1.
-Definition Trv₃₂ a := mkqmat 1 0 0 0 1 0 0 a 1.
-
-Definition Trv i j :=
+Definition Trv i j a :=
   match i with
-  | 1%nat => match j with 2 => Trv₁₂ | 3 => Trv₁₃ | _ => λ _, qmat_id end
-  | 2%nat => match j with 3 => Trv₂₃ | 1%nat => Trv₂₁ | _ => λ _, qmat_id end
-  | _ => match j with 1%nat => Trv₃₁ | 2 => Trv₃₂ | _ => λ _, qmat_id end
+  | 1%nat =>
+      match j with
+      | 1%nat => qmat_id
+      | 2 => mkqmat 1 a 0 0 1 0 0 0 1
+      | _ => mkqmat 1 0 a 0 1 0 0 0 1
+      end
+  | 2%nat =>
+      match j with
+      | 1%nat => mkqmat 1 0 0 a 1 0 0 0 1
+      | 2 => qmat_id
+      | _ => mkqmat 1 0 0 0 1 a 0 0 1
+      end
+  | _ =>
+      match j with
+      | 1%nat => mkqmat 1 0 0 0 1 0 a 0 1
+      | 2 => mkqmat 1 0 0 0 1 0 0 a 1
+      | _ => qmat_id
+      end
   end.
 
-Definition Dil₁ a := mkqmat a 0 0 0 1 0 0 0 1.
-Definition Dil₂ a := mkqmat 1 0 0 0 a 0 0 0 1.
-Definition Dil₃ a := mkqmat 1 0 0 0 1 0 0 0 a.
-
-Definition Dil i := match i with 1%nat => Dil₁ | 2 => Dil₂ | _ => Dil₃ end.
-
-Definition mt i j :=
+Definition Dil i a :=
   match i with
-  | 1%nat => match j with 1%nat => a₁₁ | 2 => a₁₂ | _ => a₁₃ end
-  | 2%nat => match j with 1%nat => a₂₁ | 2 => a₂₂ | _ => a₂₃ end
-  | _ => match j with 1%nat => a₃₁ | 2 => a₃₂ | _ => a₃₃ end
+  | 1%nat => mkqmat a 0 0 0 1 0 0 0 1
+  | 2 => mkqmat 1 0 0 0 a 0 0 0 1
+  | _ => mkqmat 1 0 0 0 1 0 0 0 a
   end.
-Arguments mt i%nat j%nat [A] m.
-
-Definition mat_swap₁₂ :=
-  (Dil₂ (-1 # 1) * Trv 1 2 1 * Trv 2 1 (-1 # 1) * Trv 1 2 1)%qmat.
-Definition mat_swap₂₃ :=
-  (Dil₃ (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat.
-Definition mat_swap₃₁ :=
-  (Dil₁ (-1 # 1) * Trv 3 1 1 * Trv 1 3 (-1 # 1) * Trv 3 1 1)%qmat.
 
 Definition mat_swap i j :=
   match i with
   | 1%nat =>
-      match j with 1%nat => qmat_id | 2 => mat_swap₁₂ | _ => mat_swap₃₁ end
+      match j with
+      | 1%nat => qmat_id
+      | 2 => (Dil 2 (-1 # 1) * Trv 1 2 1 * Trv 2 1 (-1 # 1) * Trv 1 2 1)%qmat
+      | _ => (Dil 1 (-1 # 1) * Trv 3 1 1 * Trv 1 3 (-1 # 1) * Trv 3 1 1)%qmat
+      end
   | 2 =>
-      match j with 1%nat => mat_swap₁₂ | 2 => qmat_id | _ => mat_swap₂₃ end
+      match j with
+      | 1%nat =>
+          (Dil 2 (-1 # 1) * Trv 1 2 1 * Trv 2 1 (-1 # 1) * Trv 1 2 1)%qmat
+      | 2 => qmat_id
+      | _ => (Dil 3 (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat
+      end
   | _ =>
-      match j with 1%nat => mat_swap₃₁ | 2 => mat_swap₂₃ | _ => qmat_id end
+      match j with
+      | 1%nat =>
+          (Dil 1 (-1 # 1) * Trv 3 1 1 * Trv 1 3 (-1 # 1) * Trv 3 1 1)%qmat
+      | 2 => (Dil 3 (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat
+      | _ => qmat_id
+      end
   end.
-
-Definition mat_ex :=
-  mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
-
-Compute (mat_swap 1 2 * mat_ex)%qmat.
-Compute (mat_swap 2 3 * mat_ex)%qmat.
-Compute (mat_swap 3 1 * mat_ex)%qmat.
-
-Compute (mat_ex * Trv 1 2 (-20 # 1))%qmat.
 
 Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
 
@@ -446,23 +445,28 @@ Definition gauss_jordan m :=
     if Qeq_dec (mt i_max 2 m) 0 then m
     else
       let m := (mat_swap 2 i_max * m)%qmat in
-      let m := (Dil 1 (/ mt 2 2 m) * m)%qmat in
-      m.
+      let m := (Dil 2 (/ mt 2 2 m) * m)%qmat in
+      let m := (Trv 1 2 (- mt 1 2 m) * m)%qmat in
+      let m := (Trv 3 2 (- mt 3 2 m) * m)%qmat in
+      mat_map Qred m.
+
+Definition mat_ex :=
+  mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
+Definition mat_ex2 :=
+  mkqmat (2#1) (-1#1) 0 (-1#1) (2#1) (-1#1) 0 (-1#1) (2#1).
+Definition mat_ex3 :=
+  mkqmat (1#1) (3#1) (1#1) (1#1) (1#1) (-1#1) (3#1) (11#1) (5#1).
+
+(*
+Compute (mat_swap 1 2 * mat_ex)%qmat.
+Compute (mat_swap 2 3 * mat_ex)%qmat.
+Compute (mat_swap 3 1 * mat_ex)%qmat.
+*)
 
 Compute (gauss_jordan mat_ex).
+Compute (gauss_jordan mat_ex2).
+Compute (gauss_jordan mat_ex3).
 bbb.
-
-     = {|
-       a₁₁ := 7 # 1;
-       a₁₂ := 8 # 1;
-       a₁₃ := 9 # 1;
-       a₂₁ := 4 # 1;
-       a₂₂ := 5 # 1;
-       a₂₃ := 6 # 1;
-       a₃₁ := 1;
-       a₃₂ := 2 # 1;
-       a₃₃ := 3 # 1 |}
-     : matrix ℚ
 
 (*
 for k = 1 ... min(m,n):

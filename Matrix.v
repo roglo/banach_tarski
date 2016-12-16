@@ -26,6 +26,20 @@ Arguments a₃₂ [A] _.
 Arguments a₃₃ [A] _.
 Arguments mkmat [A] _ _ _ _ _ _ _ _ _.
 
+Definition mat_map {A B} (f : A → B) m :=
+  mkmat
+    (f (a₁₁ m)) (f (a₁₂ m)) (f (a₁₃ m))
+    (f (a₂₁ m)) (f (a₂₂ m)) (f (a₂₃ m))
+    (f (a₃₁ m)) (f (a₃₂ m)) (f (a₃₃ m)).
+
+Definition mt i j :=
+  match i with
+  | 1%nat => match j with 1%nat => a₁₁ | 2 => a₁₂ | _ => a₁₃ end
+  | 2%nat => match j with 1%nat => a₂₁ | 2 => a₂₂ | _ => a₂₃ end
+  | _ => match j with 1%nat => a₃₁ | 2 => a₃₂ | _ => a₃₃ end
+  end.
+Arguments mt i%nat j%nat [A] m.
+
 Definition mkrmat := @mkmat ℝ.
 
 Definition mat_vec_mul mat '(P x y z) :=
