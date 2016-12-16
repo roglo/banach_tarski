@@ -436,22 +436,24 @@ Fixpoint argmax_loop it m i k :=
 
 Definition argmax m k := argmax_loop 3 m k k.
 
-Fixpoint cancel_but_loop it k m i :=
-  match it with
+Fixpoint cancel_but_loop four_minus_i k m :=
+  match four_minus_i with
   | O => m
-  | S it' =>
+  | S fmi =>
+      let i := (4 - four_minus_i)%nat in
       let m :=
         if eq_nat_dec i k then m else (Trv i k (- mt i k m) * m)%qmat
       in
-      cancel_but_loop it' k m (S i)
+      cancel_but_loop fmi k m
   end.
 
-Definition cancel_but k m := cancel_but_loop 3 k m 1%nat.
+Definition cancel_but := cancel_but_loop 3.
 
-Fixpoint gauss_jordan_loop it m k :=
-  match it with
+Fixpoint gauss_jordan_loop four_minus_k m :=
+  match four_minus_k with
   | O => m
-  | S it' =>
+  | S fmk =>
+      let k := (4 - four_minus_k)%nat in
       let i_max := argmax m k in
       if Qeq_dec (mt i_max k m) 0 then m
       else
@@ -459,10 +461,10 @@ Fixpoint gauss_jordan_loop it m k :=
         let m := (Dil k (/ mt k k m) * m)%qmat in
         let m := cancel_but k m in
         let m := mat_map Qred m in
-        gauss_jordan_loop it' m (S k)
+        gauss_jordan_loop fmk m
   end.
 
-Definition gauss_jordan m := gauss_jordan_loop 3 m 1%nat.
+Definition gauss_jordan := gauss_jordan_loop 3.
 
 Definition mat_ex :=
   mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
