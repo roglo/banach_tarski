@@ -426,7 +426,7 @@ Definition mat_swap i j :=
 
 Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
 
-Definition gauss_jordan_nred m :=
+Definition gauss_jordan m :=
   let i_max :=
     if Qlt_le_dec (Qabs (mt 1 1 m)) (Qabs (mt 2 1 m)) then
       if Qlt_le_dec (Qabs (mt 2 1 m)) (Qabs (mt 3 1 m)) then 3 else 2
@@ -439,6 +439,7 @@ Definition gauss_jordan_nred m :=
     let m := (Dil 1 (/ mt 1 1 m) * m)%qmat in
     let m := (Trv 2 1 (- mt 2 1 m) * m)%qmat in
     let m := (Trv 3 1 (- mt 3 1 m) * m)%qmat in
+    let m := mat_map Qred m in
     let i_max :=
       if Qlt_le_dec (Qabs (mt 2 2 m)) (Qabs (mt 3 2 m)) then 3 else 2
     in
@@ -448,15 +449,14 @@ Definition gauss_jordan_nred m :=
       let m := (Dil 2 (/ mt 2 2 m) * m)%qmat in
       let m := (Trv 1 2 (- mt 1 2 m) * m)%qmat in
       let m := (Trv 3 2 (- mt 3 2 m) * m)%qmat in
+      let m := mat_map Qred m in
       let i_max := 3 in
       if Qeq_dec (mt i_max 3 m) 0 then m
       else
         let m := (Dil 3 (/ mt 3 3 m) * m)%qmat in
         let m := (Trv 1 3 (- mt 1 3 m) * m)%qmat in
         let m := (Trv 2 3 (- mt 2 3 m) * m)%qmat in
-        m.
-
-Definition gauss_jordan m := mat_map Qred (gauss_jordan_nred m).
+        mat_map Qred m.
 
 Definition mat_ex :=
   mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
@@ -464,6 +464,8 @@ Definition mat_ex2 :=
   mkqmat (2#1) (-1#1) 0 (-1#1) (2#1) (-1#1) 0 (-1#1) (2#1).
 Definition mat_ex3 :=
   mkqmat (1#1) (3#1) (1#1) (1#1) (1#1) (-1#1) (3#1) (11#1) (5#1).
+Definition mat_ex4 :=
+  mkqmat (2#1) (1#1) (-1#1) (-3#1) (-1#1) (2#1) (-2#1) (1#1) (2#1).
 
 (*
 Compute (mat_swap 1 2 * mat_ex)%qmat.
@@ -474,6 +476,7 @@ Compute (mat_swap 3 1 * mat_ex)%qmat.
 Compute (gauss_jordan mat_ex).
 Compute (gauss_jordan mat_ex2).
 Compute (gauss_jordan mat_ex3).
+Compute (gauss_jordan mat_ex4).
 bbb.
 
 (*
