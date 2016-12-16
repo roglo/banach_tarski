@@ -406,21 +406,25 @@ Definition mat_swap i j :=
       match j with
       | 1%nat => qmat_id
       | 2 => (Dil 2 (-1 # 1) * Trv 1 2 1 * Trv 2 1 (-1 # 1) * Trv 1 2 1)%qmat
-      | _ => (Dil 1 (-1 # 1) * Trv 3 1 1 * Trv 1 3 (-1 # 1) * Trv 3 1 1)%qmat
+      | _ => (Dil 3 (-1 # 1) * Trv 1 3 1 * Trv 3 1 (-1 # 1) * Trv 1 3 1)%qmat
       end
   | 2 =>
       match j with
       | 1%nat =>
-          (Dil 2 (-1 # 1) * Trv 1 2 1 * Trv 2 1 (-1 # 1) * Trv 1 2 1)%qmat
-      | 2 => qmat_id
-      | _ => (Dil 3 (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat
+          (Dil 1 (-1 # 1) * Trv 2 1 1 * Trv 1 2 (-1 # 1) * Trv 2 1 1)%qmat
+      | 2 =>
+          qmat_id
+      | _ =>
+          (Dil 3 (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat
       end
   | _ =>
       match j with
       | 1%nat =>
-          (Dil 1 (-1 # 1) * Trv 3 1 1 * Trv 1 3 (-1 # 1) * Trv 3 1 1)%qmat
-      | 2 => (Dil 3 (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat
-      | _ => qmat_id
+          (Dil 1 (-1 # 1) * Trv 1 3 1 * Trv 3 1 (-1 # 1) * Trv 1 3 1)%qmat
+      | 2 =>
+          (Dil 3 (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat
+      | _ =>
+          qmat_id
       end
   end.
 
