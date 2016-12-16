@@ -426,37 +426,43 @@ Definition mat_swap i j :=
 
 Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
 
-Definition gauss_jordan m :=
-  let i_max :=
-    if Qlt_le_dec (Qabs (mt 1 1 m)) (Qabs (mt 2 1 m)) then
-      if Qlt_le_dec (Qabs (mt 2 1 m)) (Qabs (mt 3 1 m)) then 3 else 2
-    else
-      if Qlt_le_dec (Qabs (mt 1 1 m)) (Qabs (mt 3 1 m)) then 3 else 1%nat
-  in
-  if Qeq_dec (mt i_max 1 m) 0 then m
-  else
-    let m := (mat_swap 1 i_max * m)%qmat in
-    let m := (Dil 1 (/ mt 1 1 m) * m)%qmat in
-    let m := (Trv 2 1 (- mt 2 1 m) * m)%qmat in
-    let m := (Trv 3 1 (- mt 3 1 m) * m)%qmat in
-    let m := mat_map Qred m in
-    let i_max :=
-      if Qlt_le_dec (Qabs (mt 2 2 m)) (Qabs (mt 3 2 m)) then 3 else 2
-    in
-    if Qeq_dec (mt i_max 2 m) 0 then m
-    else
-      let m := (mat_swap 2 i_max * m)%qmat in
-      let m := (Dil 2 (/ mt 2 2 m) * m)%qmat in
-      let m := (Trv 1 2 (- mt 1 2 m) * m)%qmat in
-      let m := (Trv 3 2 (- mt 3 2 m) * m)%qmat in
-      let m := mat_map Qred m in
-      let i_max := 3 in
-      if Qeq_dec (mt i_max 3 m) 0 then m
+Fixpoint argmax_loop it m i k :=
+  match it with
+  | O => O
+  | S it' =>
+      let i_max := if eq_nat_dec i 3 then 3 else argmax_loop it' m (S i) k in
+      if Qlt_le_dec (Qabs (mt i k m)) (Qabs (mt i_max k m)) then i_max else i
+  end.
+
+Definition argmax m k := argmax_loop 3 m k k.
+
+Fixpoint cancel_but_loop it k m i :=
+  match it with
+  | O => m
+  | S it' =>
+      let m :=
+        if eq_nat_dec i k then m else (Trv i k (- mt i k m) * m)%qmat
+      in
+      cancel_but_loop it' k m (S i)
+  end.
+
+Definition cancel_but k m := cancel_but_loop 3 k m 1%nat.
+
+Fixpoint gauss_jordan_loop it m k :=
+  match it with
+  | O => m
+  | S it' =>
+      let i_max := argmax m k in
+      if Qeq_dec (mt i_max k m) 0 then m
       else
-        let m := (Dil 3 (/ mt 3 3 m) * m)%qmat in
-        let m := (Trv 1 3 (- mt 1 3 m) * m)%qmat in
-        let m := (Trv 2 3 (- mt 2 3 m) * m)%qmat in
-        mat_map Qred m.
+        let m := (mat_swap k i_max * m)%qmat in
+        let m := (Dil k (/ mt k k m) * m)%qmat in
+        let m := cancel_but k m in
+        let m := mat_map Qred m in
+        gauss_jordan_loop it' m (S k)
+  end.
+
+Definition gauss_jordan m := gauss_jordan_loop 3 m 1%nat.
 
 Definition mat_ex :=
   mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
