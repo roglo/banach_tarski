@@ -489,7 +489,6 @@ Compute (gauss_jordan mat_ex).
 Compute (gauss_jordan mat_ex2).
 Compute (gauss_jordan mat_ex3).
 Compute (gauss_jordan mat_ex4).
-bbb.
 
 (*
 for k = 1 ... min(m,n):
@@ -507,8 +506,6 @@ for k = 1 ... min(m,n):
      Fill lower triangular matrix with zeros:
      A[i, k]  := 0
 *)
-
-bbb.
 
 Definition neg_point '(P x y z) :=
   if Rlt_dec x 0 then true
@@ -644,7 +641,7 @@ move Hz after Hy; move Hx after Hy.
 subst re r.
 rewrite Hev in Hk.
 simpl in Hk.
-Admitted.
+Abort.
 
 Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el
