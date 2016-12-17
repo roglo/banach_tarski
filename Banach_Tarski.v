@@ -507,7 +507,7 @@ for k = 1 ... min(m,n):
      A[i, k]  := 0
 *)
 
-Definition neg_point '(P x y z) :=
+Definition is_neg_point '(P x y z) :=
   if Rlt_dec x 0 then true
   else if Rgt_dec x 0 then false
   else if Rlt_dec y 0 then true
@@ -515,6 +515,8 @@ Definition neg_point '(P x y z) :=
   else if Rlt_dec z 0 then true
   else if Rgt_dec z 0 then false
   else true.
+
+Definition neg_point '(P x y z) := P (-x) (-y) (-z).
 
 Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
 
@@ -875,17 +877,23 @@ exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
 Qed.
 
+Definition fixpoint_of_bool_prod_nat '(b, nf, no) :=
+  let p := rotation_fixpoint (mat_of_path (path_of_nat nf)) 1 in
+  let p₁ :=
+    if is_neg_point p then if (b : bool) then p else neg_point p
+    else if b then neg_point p else p
+  in
+  fold_right rotate p₁ (path_of_nat no).
+
+Definition bool_prod_nat_of_fixpoint p :=
+...
+
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
 apply surj_prod_nat_surj_nat.
 apply surj_bool_prod_nat_surj_prod_nat.
-exists
-  (λ '(b, nf, no),
-   fold_right rotate
-     (rotation_fixpoint (mat_of_path (path_of_nat nf))
-        (if (b : bool) then 1 else -1))
-     (path_of_nat no)).
+exists fixpoint_of_bool_prod_nat.
 intros p Hp.
 bbb
 
