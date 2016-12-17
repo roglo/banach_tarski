@@ -880,7 +880,13 @@ Theorem D_set_is_countable :
 Proof.
 apply surj_prod_nat_surj_nat.
 apply surj_bool_prod_nat_surj_prod_nat.
-
+exists
+  (λ '(b, nf, no),
+   fold_right rotate
+     (rotation_fixpoint (mat_of_path (path_of_nat nf))
+        (if (b : bool) then 1 else -1))
+     (path_of_nat no)).
+intros p Hp.
 bbb
 
 exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
