@@ -820,7 +820,7 @@ Compute (nat_of_path (path_of_nat 12)).
 Compute (nat_of_path (path_of_nat 13)).
 *)
 
-Theorem surj_prop_prod_nat_surj_prop_nat : ∀ A P,
+Theorem surj_prod_nat_surj_nat : ∀ A P,
   (∃ g : ℕ * ℕ -> A, ∀ a : A, P a → ∃ nn : ℕ * ℕ, g nn = a)
   → ∃ f : ℕ → A, ∀ a : A, P a → ∃ n : ℕ, f n = a.
 Proof.
@@ -830,6 +830,36 @@ intros a Ha.
 specialize (Hg a Ha) as (nfo & Hg); subst a.
 exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
+Qed.
+
+Definition bool_prod_nat_of_prod_nat '(n₁, n₂) : bool * ℕ * ℕ :=
+  (if n₁ mod 2 then false else true, (n₁ / 2)%nat, n₂).
+
+Definition prod_nat_of_bool_prod_nat '(b, n₁, n₂) : ℕ * ℕ :=
+  ((2 * n₁ + Nat.b2n b)%nat, n₂).
+
+Theorem bool_prod_nat_of_prod_nat_inv : ∀ bnn,
+  bool_prod_nat_of_prod_nat (prod_nat_of_bool_prod_nat bnn) = bnn.
+Proof.
+intros ((b & n₁) & n₂); simpl; f_equal.
+rewrite Nat.add_0_r.
+rewrite nat_add_diag_mul_2.
+rewrite Nat.add_comm, Nat.mul_comm.
+rewrite Nat.mod_add; [ | easy ].
+rewrite Nat.div_add; [ | easy ].
+now destruct b.
+Qed.
+
+Theorem surj_bool_prod_nat_surj_prod_nat : ∀ A P,
+  (∃ g : bool * ℕ * ℕ -> A, ∀ a, P a → ∃ bnn, g bnn = a)
+  → ∃ f : ℕ * ℕ → A, ∀ a, P a → ∃ nn, f nn = a.
+Proof.
+intros * (g & Hg).
+exists (λ nn, g (bool_prod_nat_of_prod_nat nn)).
+intros a Ha.
+specialize (Hg a Ha) as (bnn, Hg).
+exists (prod_nat_of_bool_prod_nat bnn).
+now rewrite bool_prod_nat_of_prod_nat_inv.
 Qed.
 
 Theorem surjective_prod_nat_surjective_nat : ∀ A,
@@ -848,8 +878,10 @@ Qed.
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
-apply surj_prop_prod_nat_surj_prop_nat.
-bbb.
+apply surj_prod_nat_surj_nat.
+apply surj_bool_prod_nat_surj_prod_nat.
+
+bbb
 
 exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
 intros p Hp.
