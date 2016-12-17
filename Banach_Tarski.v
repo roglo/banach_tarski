@@ -890,6 +890,8 @@ Theorem D_set_is_countable :
 Proof.
 apply surj_prod_nat_surj_nat.
 apply surj_bool_prod_nat_surj_prod_nat.
+
+bbb.
 exists fixpoint_of_bool_prod_nat.
 intros p Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
