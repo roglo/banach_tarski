@@ -885,9 +885,6 @@ Definition fixpoint_of_bool_prod_nat '(b, nf, no) :=
   in
   fold_right rotate p₁ (path_of_nat no).
 
-Definition bool_prod_nat_of_fixpoint p :=
-...
-
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
@@ -895,6 +892,7 @@ apply surj_prod_nat_surj_nat.
 apply surj_bool_prod_nat_surj_prod_nat.
 exists fixpoint_of_bool_prod_nat.
 intros p Hp.
+destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 bbb
 
 exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
