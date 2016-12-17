@@ -893,9 +893,19 @@ apply surj_bool_prod_nat_surj_prod_nat.
 exists fixpoint_of_bool_prod_nat.
 intros p Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
-remember (nat_of_path el₁) as nf₁ eqn:Hnf.
-remember (nat_of_path (rev_path el)) as no₁ eqn:Hno.
-bbb
+remember (if is_neg_point p₁ then true else false) as b eqn:Hb.
+remember (nat_of_path el₁) as nf eqn:Hnf.
+remember (nat_of_path (rev_path el)) as no eqn:Hno.
+exists (b, nf, no).
+simpl.
+remember (mat_of_path (path_of_nat nf)) as m eqn:Hm.
+unfold rotation_fixpoint.
+unfold rotation_unit_eigenvec.
+simpl.
+remember (√ ((a₂₃ m - a₃₂ m)² + (a₃₁ m - a₁₃ m)² + (a₁₂ m - a₂₁ m)²)) as r.
+do 3 rewrite Rmult_1_l.
+
+bbb.
 
 exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
 intros p Hp.
