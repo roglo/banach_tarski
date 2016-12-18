@@ -915,10 +915,18 @@ remember (is_neg_point (rotation_fixpoint (mat_of_path el₁) 1)) as b₁.
 rename Heqb₁ into Hb₁.
 move Hb before Hb₁.
 symmetry in Hb, Hb₁.
+remember (mat_of_path el₁) as m eqn:Hm.
 destruct b₁, b.
  rewrite <- Hs; f_equal.
-SearchAbout rotation_fixpoint.
-Check matrix_all_fixpoints_ok.
+ remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
+ symmetry.
+ apply matrix_all_fixpoints_ok in Hp₂.
+  move Hp₂ at bottom; move Hr before Hp₂.
+  rewrite Hr.
+  remember (is_neg_point p₁) as b₂ eqn:Hb₂.
+  symmetry in Hb₂.
+  destruct b₂; [ | easy ].
+  move Hb₂ before Hb₁.
 bbb.
 simpl.
 remember (mat_of_path (path_of_nat nf)) as m eqn:Hm.
