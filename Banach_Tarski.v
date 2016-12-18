@@ -916,6 +916,9 @@ rename Heqb₁ into Hb₁.
 move Hb before Hb₁.
 symmetry in Hb, Hb₁.
 destruct b₁, b.
+ rewrite <- Hs; f_equal.
+SearchAbout rotation_fixpoint.
+Check matrix_all_fixpoints_ok.
 bbb.
 simpl.
 remember (mat_of_path (path_of_nat nf)) as m eqn:Hm.
