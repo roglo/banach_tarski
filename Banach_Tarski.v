@@ -916,17 +916,31 @@ rename Heqb₁ into Hb₁.
 move Hb before Hb₁.
 symmetry in Hb, Hb₁.
 remember (mat_of_path el₁) as m eqn:Hm.
+remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
+symmetry; rewrite <- Hs; f_equal.
+apply matrix_all_fixpoints_ok in Hp₂.
+move Hp₂ at bottom; move Hr before Hp₂.
+rewrite Hr.
+remember (is_neg_point p₁) as b₂ eqn:Hb₂.
+symmetry in Hb₂.
+move Hb₂ before Hb₁.
 destruct b₁, b.
- rewrite <- Hs; f_equal.
- remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
- symmetry.
- apply matrix_all_fixpoints_ok in Hp₂.
-  move Hp₂ at bottom; move Hr before Hp₂.
-  rewrite Hr.
-  remember (is_neg_point p₁) as b₂ eqn:Hb₂.
-  symmetry in Hb₂.
   destruct b₂; [ | easy ].
-  move Hb₂ before Hb₁.
+
+Theorem glop : ∀ m p₁ p₂,
+  is_rotation_matrix m
+  → is_neg_point p₁ = true
+  → is_neg_point p₂ = true
+  → mat_vec_mul m p₁ = p₁
+  → mat_vec_mul m p₂ = p₂
+  → p₁ = p₂.
+Proof.
+intros * Hm Hb₁ Hb₂ Hp₁ Hp₂.
+bbb.
+
+(* return to theorem *)
+  eapply glop; try eassumption.
+
 bbb.
 simpl.
 remember (mat_of_path (path_of_nat nf)) as m eqn:Hm.
