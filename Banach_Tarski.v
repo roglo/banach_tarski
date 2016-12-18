@@ -885,20 +885,28 @@ Definition fixpoint_of_bool_prod_nat '(b, nf, no) :=
   in
   fold_right rotate p₁ (path_of_nat no).
 
+(*
+Theorem D_set_is_countable :
+  ∃ R : ℕ → point → Prop, ∀ p : point, p ∈ D → ∃ n : ℕ, R n p.
+Proof.
+bbb.
+*)
+
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
 apply surj_prod_nat_surj_nat.
 apply surj_bool_prod_nat_surj_prod_nat.
-
-bbb.
 exists fixpoint_of_bool_prod_nat.
 intros p Hp.
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
+rewrite rotate_vec_mul in Hr.
 remember (if is_neg_point p₁ then true else false) as b eqn:Hb.
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
 exists (b, nf, no).
+unfold fixpoint_of_bool_prod_nat.
+bbb.
 simpl.
 remember (mat_of_path (path_of_nat nf)) as m eqn:Hm.
 unfold rotation_fixpoint.
