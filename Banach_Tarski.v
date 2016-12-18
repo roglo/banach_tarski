@@ -929,13 +929,14 @@ destruct b₁, b.
 
 Theorem glop : ∀ m p₁ p₂,
   is_rotation_matrix m
+  → m ≠ mat_id
   → is_neg_point p₁ = true
   → is_neg_point p₂ = true
   → mat_vec_mul m p₁ = p₁
   → mat_vec_mul m p₂ = p₂
   → p₁ = p₂.
 Proof.
-intros * Hm Hb₁ Hb₂ Hp₁ Hp₂.
+intros * Hm Hnid Hb₁ Hb₂ Hp₁ Hp₂.
 bbb.
 
 (* return to theorem *)
