@@ -115,6 +115,19 @@ Definition mat_id :=
 Delimit Scope mat_scope with mat.
 Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
 
+Theorem eq_point_dec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }.
+Proof.
+intros (x₁, y₁, z₁) (x₂, y₂, z₂).
+destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
+ destruct (Req_dec y₁ y₂) as [H₁| H₁]; [ subst y₂ | right ].
+  destruct (Req_dec z₁ z₂) as [H₁| H₁]; [ now subst z₂; left | right ].
+  now intros H; injection H; intros.
+
+ now intros H; injection H; intros.
+
+now intros H; injection H; intros.
+Qed.
+
 Theorem mat_mul_id_l : ∀ m, mat_mul mat_id m = m.
 Proof.
 intros m.

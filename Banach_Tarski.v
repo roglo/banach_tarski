@@ -485,10 +485,12 @@ Compute (mat_swap 2 3 * mat_ex)%qmat.
 Compute (mat_swap 3 1 * mat_ex)%qmat.
 *)
 
+(*
 Compute (gauss_jordan mat_ex).
 Compute (gauss_jordan mat_ex2).
 Compute (gauss_jordan mat_ex3).
 Compute (gauss_jordan mat_ex4).
+*)
 
 (*
 for k = 1 ... min(m,n):
@@ -885,12 +887,13 @@ Definition fixpoint_of_bool_prod_nat '(b, nf, no) :=
   in
   fold_right rotate p₁ (path_of_nat no).
 
-(*
-Theorem D_set_is_countable :
-  ∃ R : ℕ → point → Prop, ∀ p : point, p ∈ D → ∃ n : ℕ, R n p.
+Theorem is_neg_point_0 : is_neg_point (P 0 0 0) = true.
 Proof.
-bbb.
-*)
+simpl.
+destruct (Rlt_dec 0 0) as [H₁| H₁]; [ easy | clear H₁ ].
+destruct (Rgt_dec 0 0) as [H₁| H₁]; [ | easy ].
+now apply Rgt_irrefl in H₁.
+Qed.
 
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
@@ -904,39 +907,64 @@ rewrite rotate_vec_mul in Hr.
 remember (if is_neg_point p₁ then true else false) as b eqn:Hb.
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
-exists (b, nf, no).
-unfold fixpoint_of_bool_prod_nat.
-rewrite Hno, path_of_nat_inv.
-rewrite Hnf, path_of_nat_inv.
 fold (mat_of_path el₁) in Hr.
 apply rotate_rev_path in Hs.
-rewrite <- Hr in Hs.
-remember (is_neg_point (rotation_fixpoint (mat_of_path el₁) 1)) as b₁.
-rename Heqb₁ into Hb₁.
-move Hb before Hb₁.
-symmetry in Hb, Hb₁.
-remember (mat_of_path el₁) as m eqn:Hm.
-remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
-symmetry; rewrite <- Hs; f_equal.
-apply matrix_all_fixpoints_ok in Hp₂.
-move Hp₂ at bottom; move Hr before Hp₂.
-rewrite Hr.
-remember (is_neg_point p₁) as b₂ eqn:Hb₂.
-symmetry in Hb₂.
-move Hb₂ before Hb₁.
-destruct b₁, b.
-  destruct b₂; [ | easy ].
+destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
+ move H₁ at top; subst p₁.
+ exists (true, O, no).
+ unfold fixpoint_of_bool_prod_nat.
+ rewrite Hno, path_of_nat_inv.
+ unfold path_of_nat.
+ remember (mat_of_path []) as m eqn:Hm.
+ unfold mat_of_path in Hm.
+ simpl in Hm; subst m.
+ remember (rotation_fixpoint mat_id 1) as p₂ eqn:Hp₂.
+ unfold rotation_fixpoint in Hp₂.
+ simpl in Hp₂.
+ rewrite Rminus_0_r in Hp₂.
+ unfold Rdiv in Hp₂; rewrite Rmult_0_l in Hp₂.
+ rewrite Rmult_0_r in Hp₂.
+ now subst p₂; rewrite is_neg_point_0.
+
+ exists (b, nf, no).
+ unfold fixpoint_of_bool_prod_nat.
+ rewrite Hno, path_of_nat_inv.
+ rewrite Hnf, path_of_nat_inv.
+ rewrite <- Hr in Hs.
+ remember (is_neg_point (rotation_fixpoint (mat_of_path el₁) 1)) as b₁.
+ rename Heqb₁ into Hb₁.
+ move Hb before Hb₁.
+ symmetry in Hb, Hb₁.
+ remember (mat_of_path el₁) as m eqn:Hm.
+ remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
+Print rotation_fixpoint.
+(* should eliminate case when p₂ = 0 here or before *)
+
+bbb.
+ symmetry; rewrite <- Hs; f_equal.
+ apply matrix_all_fixpoints_ok in Hp₂.
+ move Hp₂ at bottom; move Hr before Hp₂.
+ rewrite Hr.
+ remember (is_neg_point p₁) as b₂ eqn:Hb₂.
+ symmetry in Hb₂.
+ move Hb₂ before Hb₁.
+ destruct b₁, b.
+   destruct b₂; [ | easy ].
+(* shit; I cannot prove that p₂ ≠ 0 *)
+bbb.
 
 Theorem glop : ∀ m p₁ p₂,
   is_rotation_matrix m
   → m ≠ mat_id
+  → p₁ ≠ P 0 0 0
+  → p₂ ≠ P 0 0 0
   → is_neg_point p₁ = true
   → is_neg_point p₂ = true
   → mat_vec_mul m p₁ = p₁
   → mat_vec_mul m p₂ = p₂
   → p₁ = p₂.
 Proof.
-intros * Hm Hnid Hb₁ Hb₂ Hp₁ Hp₂.
+intros * Hm Hnid Hn₁ Hn₂ Hb₁ Hb₂ Hp₁ Hp₂.
 bbb.
 
 (* return to theorem *)
