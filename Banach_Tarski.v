@@ -906,6 +906,16 @@ remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
 exists (b, nf, no).
 unfold fixpoint_of_bool_prod_nat.
+rewrite Hno, path_of_nat_inv.
+rewrite Hnf, path_of_nat_inv.
+fold (mat_of_path el₁) in Hr.
+apply rotate_rev_path in Hs.
+rewrite <- Hr in Hs.
+remember (is_neg_point (rotation_fixpoint (mat_of_path el₁) 1)) as b₁.
+rename Heqb₁ into Hb₁.
+move Hb before Hb₁.
+symmetry in Hb, Hb₁.
+destruct b₁, b.
 bbb.
 simpl.
 remember (mat_of_path (path_of_nat nf)) as m eqn:Hm.
