@@ -895,6 +895,25 @@ destruct (Rgt_dec 0 0) as [H₁| H₁]; [ | easy ].
 now apply Rgt_irrefl in H₁.
 Qed.
 
+Lemma mat_of_path_app : ∀ el₁ el₂,
+  mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
+Proof.
+intros.
+revert el₁.
+induction el₂ as [| e₂ el₂]; intros.
+ unfold mat_of_path at 3; simpl.
+ rewrite app_nil_r.
+ now rewrite mat_mul_id_r.
+
+ rewrite cons_comm_app, app_assoc, IHel₂.
+ unfold mat_of_path; simpl.
+ rewrite map_app, fold_right_app; simpl.
+ rewrite mat_mul_assoc; f_equal.
+ rewrite mat_mul_id_r; clear.
+ induction el₁ as [| e₁]; [ now rewrite mat_mul_id_l | ].
+ now simpl; rewrite IHel₁, mat_mul_assoc.
+Qed.
+
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
@@ -1000,27 +1019,13 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
        allow this value: but it is to be proven *)
     assert (Ht : m = mat_transp m) by (now destruct m; simpl in *; subst).
     assert (Hmm : (m * m = mat_id)%mat) by (rewrite Ht at 2; apply Hrm).
+    rewrite Hm in Hmm.
+    rewrite <- mat_of_path_app in Hmm.
+    unfold mat_of_path in Hmm.
+    exfalso; apply Hnl; clear - Hmm.
+    induction el₁ as [| e₁ el₁]; [ easy | ].
+    simpl in Hmm.
 
-Lemma glop : ∀ el₁ el₂,
-  mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
-Proof.
-intros.
-revert el₁.
-induction el₂ as [| e₂ el₂]; intros.
- unfold mat_of_path at 3; simpl.
- rewrite app_nil_r.
- now rewrite mat_mul_id_r.
-
- rewrite cons_comm_app, app_assoc, IHel₂.
- unfold mat_of_path; simpl.
- rewrite map_app, fold_right_app; simpl.
- rewrite mat_mul_assoc; f_equal.
- rewrite mat_mul_id_r.
-
-bbb.
-  (* return to theorem *)
-  rewrite Hm in Hmm.
-  rewrite <- glop in Hmm.
 bbb.
 
    (* case p₂ ≠ 0 *)
