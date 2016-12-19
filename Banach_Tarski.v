@@ -945,6 +945,22 @@ rewrite <- is_normal.
 now do 2 rewrite app_nil_r.
 Qed.
 
+Theorem rev_norm_path_eq_path : ∀ el,
+  norm_list el = el
+  → rev_path el = el
+  → el = [].
+Proof.
+intros * Hn Hr.
+remember (length el) as len eqn:Hlen.
+symmetry in Hlen.
+revert el Hn Hr Hlen.
+induction len; intros; [ now apply length_zero_iff_nil in Hlen; subst el | ].
+destruct el as [| e₁ el]; [ easy | exfalso ].
+simpl in Hlen.
+apply Nat.succ_inj in Hlen.
+rewrite rev_path_cons, rev_path_single in Hr.
+bbb.
+
 Theorem rev_path_eq_path : ∀ el,
   rev_path (norm_list el) = norm_list el
   → norm_list el = [].
@@ -954,6 +970,27 @@ remember (norm_list el) as el₁ eqn:Hel₁.
 assert (H : norm_list el₁ = el₁) by (subst el₁; apply norm_list_idemp).
 clear el Hel₁.
 rename el₁ into el; rename H into Hn.
+bbb.
+
+induction el as [| e₁ el]; [ easy | exfalso ].
+simpl in Hn.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₂ el₂].
+ injection Hn; clear Hn; intros; subst el.
+ injection Hel; apply no_fixpoint_negf.
+
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  apply letter_opp_negf in H₁; subst e₁.
+  now subst el₂; apply norm_list_no_start in Hel₁.
+
+  apply H₁; clear H₁.
+  apply letter_opp_negf.
+  injection Hn; clear Hn; intros; subst el.
+  rewrite rev_path_cons, rev_path_single in Hel.
+  rewrite <- Hel₁ in Hel.
+  rewrite rev_path_norm_list in Hel.
+  rewrite rev_path_cons, rev_path_single in Hel.
 
 bbb.
 
