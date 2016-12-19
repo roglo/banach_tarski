@@ -950,17 +950,39 @@ Theorem rev_path_eq_path : ∀ el,
   → norm_list el = [].
 Proof.
 intros el Hel.
+destruct el as [| e₁ el]; [ easy | ].
+simpl in Hel; simpl.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₂ el₂]; [ exfalso | ].
+ rewrite rev_path_single in Hel.
+ injection Hel; clear Hel; intros H.
+ now apply no_fixpoint_negf in H.
+
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+  apply letter_opp_negf in H₁; subst e₁.
+  destruct el₂ as [| e₃ el₃]; [ easy | exfalso ].
+  rewrite rev_path_cons, rev_path_single in Hel.
+bbb.
+
+intros el Hel.
 remember (norm_list el) as el₁ eqn:Hel₁.
 symmetry in Hel₁.
 remember (length el₁) as len eqn:Hlen.
 symmetry in Hlen.
 revert el el₁ Hel Hel₁ Hlen.
-induction len; intros.
+destruct len; intros.
  now apply length_zero_iff_nil in Hlen.
 
  destruct el₁ as [| e₁ el₁]; [ easy | exfalso ].
  simpl in Hlen.
  apply Nat.succ_inj in Hlen.
+ destruct el₁ as [| e₂ el₂].
+  rewrite rev_path_single in Hel.
+  injection Hel; clear Hel; intros H.
+  now apply no_fixpoint_negf in H.
+
+  simpl in Hlen.
 
 bbb.
 
