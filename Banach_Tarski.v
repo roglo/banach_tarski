@@ -950,6 +950,11 @@ Theorem rev_path_eq_path : ∀ el,
   → norm_list el = [].
 Proof.
 intros el Hel.
+remember (norm_list el) as el₁ eqn:Hel₁.
+assert (H : norm_list el₁ = el₁) by (subst el₁; apply norm_list_idemp).
+clear el Hel₁.
+rename el₁ into el; rename H into Hn.
+
 bbb.
 
 destruct el as [| e₁ el]; [ easy | ].
