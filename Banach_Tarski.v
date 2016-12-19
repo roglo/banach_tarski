@@ -1434,11 +1434,42 @@ Qed.
 
 (* end of thing about non empty paths *)
 
+Theorem norm_list_normal_l : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = norm_list (norm_list el₁ ++ el₂).
+Proof.
+intros.
+replace el₁ with ([] ++ el₁) by easy.
+rewrite <- app_assoc.
+now rewrite <- is_normal.
+Qed.
+
+Theorem norm_list_normal_r : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = norm_list (el₁ ++ norm_list el₂).
+Proof.
+intros.
+replace el₂ with (el₂ ++ []) by apply app_nil_r.
+rewrite <- is_normal.
+now do 2 rewrite app_nil_r.
+Qed.
+
 Theorem norm_list_app_diag_is_nil : ∀ el,
   norm_list (el ++ el) = []
   → norm_list el = [].
 Proof.
 intros el Hel.
+rewrite norm_list_normal_l in Hel.
+rewrite norm_list_normal_r in Hel.
+apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
+remember (norm_list el) as el₁.
+clear el Heqel₁; rename el₁ into el.
+symmetry in Hel.
+bbb.
+
+unfold rev_path in Hel.
+rewrite map_rev in Hel.
+induction el₁ as [| e el]; [ easy | exfalso ].
+simpl in Hel.
+
 bbb.
 
 induction el as [| e₁ el₁]; [ easy | ].
