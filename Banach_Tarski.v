@@ -926,6 +926,70 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
  rewrite Rmult_0_r in Hp₂.
  now subst p₂; rewrite is_neg_point_0.
 
+ remember (mat_of_path el₁) as m eqn:Hm.
+ remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
+ destruct (eq_point_dec p₂ (P 0 0 0)) as [H₂| H₂].
+  unfold rotation_fixpoint in Hp₂.
+  simpl in Hp₂.
+  do 3 rewrite Rmult_1_l in Hp₂.
+  remember (a₂₃ m - a₃₂ m)%R as x eqn:Hx.
+  remember (a₃₁ m - a₁₃ m)%R as y eqn:Hy.
+  remember (a₁₂ m - a₂₁ m)%R as z eqn:Hz.
+  remember (√ (x² + y² + z²)) as r eqn:Hr₁.
+  subst p₂; injection H₂; clear H₂; intros Hz₁ Hy₁ Hx₁.
+  move Hx₁ after Hy₁; move Hz₁ after Hy₁.
+  unfold Rdiv in Hx₁, Hy₁, Hz₁.
+  apply Rmult_integral in Hx₁.
+  apply Rmult_integral in Hy₁.
+  apply Rmult_integral in Hz₁.
+  assert (H₀ : (x = 0 ∧ y = 0 ∧ z = 0)%R).
+   destruct Hx₁ as [Hx₁| Hx₁].
+    split; [ easy | rewrite Hx₁ in Hr₁ ].
+    destruct Hy₁ as [Hy₁| Hy₁].
+     split; [ easy | rewrite Hy₁ in Hr₁ ].
+     destruct Hz₁ as [Hz₁| Hz₁]; [ easy | ].
+     destruct (Req_dec z 0) as [H₂| H₂]; [ easy | ].
+     rewrite Rsqr_pow2 in Hr₁.
+     rewrite pow_ne_zero in Hr₁; [ | easy ].
+     do 2 rewrite Rplus_0_l in Hr₁.
+     rewrite Rsqr_pow2 in Hr₁.
+     exfalso; revert Hz₁; apply Rinv_neq_0_compat.
+     intros H; rewrite Hr₁ in H.
+     apply sqrt_eq_0 in H; [ now revert H; apply pow_nonzero | ].
+     apply pow2_ge_0.
+
+     destruct (Req_dec r 0) as [H₂| H₂].
+      rewrite Rsqr_pow2 in Hr₁.
+      rewrite pow_ne_zero in Hr₁; [ | easy ].
+      rewrite Rplus_0_l in Hr₁.
+      rewrite Hr₁ in H₂.
+      apply sqrt_eq_0 in H₂; [ now apply Rplus_sqr_eq_0 in H₂ | ].
+      apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+
+      now apply Rinv_neq_0_compat in Hy₁.
+
+    destruct (Req_dec r 0) as [H₂| H₂].
+     rewrite Hr₁ in H₂.
+     apply sqrt_eq_0 in H₂.
+      apply Rplus_eq_R0 in H₂.
+       destruct H₂ as (H₂, H₃).
+       apply Rplus_sqr_eq_0 in H₂.
+       now apply Rsqr_eq_0 in H₃.
+
+       apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+
+       apply Rle_0_sqr.
+
+      apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+      apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+
+     now apply Rinv_neq_0_compat in Hx₁.
+
+   clear r Hr₁ Hx₁ Hy₁ Hz₁.
+   move H₀ at top; destruct H₀ as (H₂ & H₃ & H₄); subst x y z.
+   symmetry in Hx, Hy, Hz.
+(* then tr(m) = m; then rotation = 0 or 180° *)
+bbb.
  exists (b, nf, no).
  unfold fixpoint_of_bool_prod_nat.
  rewrite Hno, path_of_nat_inv.
@@ -937,10 +1001,6 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
  symmetry in Hb, Hb₁.
  remember (mat_of_path el₁) as m eqn:Hm.
  remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
-Print rotation_fixpoint.
-(* should eliminate case when p₂ = 0 here or before *)
-
-bbb.
  symmetry; rewrite <- Hs; f_equal.
  apply matrix_all_fixpoints_ok in Hp₂.
  move Hp₂ at bottom; move Hr before Hp₂.
