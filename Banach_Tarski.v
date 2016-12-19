@@ -946,13 +946,26 @@ now do 2 rewrite app_nil_r.
 Qed.
 
 Theorem rev_path_eq_path : ∀ el,
-  rev_path el = el
-  → el = [].
+  rev_path (norm_list el) = norm_list el
+  → norm_list el = [].
 Proof.
 intros el Hel.
+remember (length (norm_list el)) as len eqn:Hlen.
+symmetry in Hlen.
+revert el Hel Hlen.
+induction len; intros.
+ now apply length_zero_iff_nil in Hlen.
+
+ remember (norm_list el) as el₁ eqn:Hel₁.
+ symmetry in Hel₁.
+ destruct el₁ as [| e₁ el₁]; [ easy | exfalso ].
+ simpl in Hlen.
+ apply Nat.succ_inj in Hlen.
+
+bbb.
+
 unfold rev_path in Hel.
 rewrite map_rev in Hel.
-bbb.
 destruct el as [| e el]; [ easy | exfalso ].
 simpl in Hel.
 rewrite map_app in Hel.
@@ -995,6 +1008,8 @@ intros el Hel.
 rewrite norm_list_normal_l in Hel.
 rewrite norm_list_normal_r in Hel.
 apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
+bbb.
+
 remember (norm_list el) as el₁.
 clear el Heqel₁; rename el₁ into el.
 symmetry in Hel.
