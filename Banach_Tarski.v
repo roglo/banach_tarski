@@ -1022,13 +1022,12 @@ Theorem glop : ∀ m p₁ p₂,
   → m ≠ mat_id
   → p₁ ≠ P 0 0 0
   → p₂ ≠ P 0 0 0
-  → is_neg_point p₁ = true
-  → is_neg_point p₂ = true
+  → is_neg_point p₁ = is_neg_point p₂
   → mat_vec_mul m p₁ = p₁
   → mat_vec_mul m p₂ = p₂
   → p₁ = p₂.
 Proof.
-intros * Hm Hnid Hn₁ Hn₂ Hb₁ Hb₂ Hp₁ Hp₂.
+intros * Hm Hnid Hn Hb₁ Hb₂ Hp₁ Hp₂.
 bbb.
 
     (* return to theorem *)
