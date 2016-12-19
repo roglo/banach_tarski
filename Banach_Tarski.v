@@ -1452,6 +1452,50 @@ rewrite <- is_normal.
 now do 2 rewrite app_nil_r.
 Qed.
 
+Theorem rev_path_eq_path : ∀ el,
+  rev_path el = el
+  → el = [].
+Proof.
+intros el Hel.
+unfold rev_path in Hel.
+rewrite map_rev in Hel.
+bbb.
+destruct el as [| e el]; [ easy | exfalso ].
+simpl in Hel.
+rewrite map_app in Hel.
+simpl in Hel.
+remember (rev el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁ el₁].
+ injection Hel; clear Hel; intros H1 H2; subst el.
+ now apply no_fixpoint_negf in H2.
+
+ simpl in Hel.
+ injection Hel; clear Hel; intros H1 H2; subst e el.
+ rewrite negf_involutive in Hel₁.
+ rewrite rev_app_distr in Hel₁.
+ simpl in Hel₁.
+ injection Hel₁; clear Hel₁; intros Hel.
+ clear e₁.
+1 subgoal, subgoal 1 (ID 857)
+  
+  el₁ : list free_elem
+  Hel : rev (map negf el₁) = el₁
+  ============================
+  False
+
+
+bbb.
+
+unfold rev_path in Hel.
+rewrite map_rev in Hel.
+induction el as [| e el]; [ easy | exfalso ].
+simpl in Hel.
+rewrite map_app in Hel.
+rewrite map_rev in IHel.
+simpl in Hel.
+bbb.
+
 Theorem norm_list_app_diag_is_nil : ∀ el,
   norm_list (el ++ el) = []
   → norm_list el = [].
@@ -1463,6 +1507,7 @@ apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
 remember (norm_list el) as el₁.
 clear el Heqel₁; rename el₁ into el.
 symmetry in Hel.
+
 bbb.
 
 unfold rev_path in Hel.
