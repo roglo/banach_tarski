@@ -1017,12 +1017,20 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
     assert (Hmm : (m * m = mat_id)%mat) by (rewrite Ht at 2; apply Hrm).
     rewrite Hm in Hmm.
     rewrite <- mat_of_path_app in Hmm.
+bbb.
+
 Theorem mat_of_path_eq_id : ∀ el,
   mat_of_path el = mat_id
   → norm_list el = [].
 Proof.
 intros * Hel.
 unfold mat_of_path in Hel.
+Admitted. Show.
+
+apply mat_of_path_eq_id in Hmm.
+apply norm_list_app_is_nil in Hmm.
+vvv.
+
 induction el as [| e el ]; [ easy | ].
 simpl in Hel; simpl.
 remember (norm_list el) as el₁ eqn:Hel₁.
