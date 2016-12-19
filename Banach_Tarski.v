@@ -1001,6 +1001,26 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
     assert (Ht : m = mat_transp m) by (now destruct m; simpl in *; subst).
     assert (Hmm : (m * m = mat_id)%mat) by (rewrite Ht at 2; apply Hrm).
 
+Lemma glop : ∀ el₁ el₂,
+  mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
+Proof.
+intros.
+revert el₁.
+induction el₂ as [| e₂ el₂]; intros.
+ unfold mat_of_path at 3; simpl.
+ rewrite app_nil_r.
+ now rewrite mat_mul_id_r.
+
+ rewrite cons_comm_app, app_assoc, IHel₂.
+ unfold mat_of_path; simpl.
+ rewrite map_app, fold_right_app; simpl.
+ rewrite mat_mul_assoc; f_equal.
+ rewrite mat_mul_id_r.
+
+bbb.
+  (* return to theorem *)
+  rewrite Hm in Hmm.
+  rewrite <- glop in Hmm.
 bbb.
 
    (* case p₂ ≠ 0 *)
