@@ -951,6 +951,42 @@ Theorem rev_norm_path_eq_path : ∀ el,
   → el = [].
 Proof.
 intros * Hn Hr.
+destruct el as [| e₁ el]; [ easy | exfalso ].
+destruct el as [| e₂ el]; [ injection Hr; apply no_fixpoint_negf | ].
+destruct el as [| e₃ el].
+ injection Hr; clear Hr; intros H₁ H₂.
+ subst e₂; clear H₂.
+ now apply norm_list_no_start in Hn.
+
+ destruct el as [| e₄ el].
+  injection Hr; clear Hr; intros H₁ H₂ H₃.
+  now apply no_fixpoint_negf in H₂.
+
+  destruct el as [| e₅ el].
+   injection Hr; clear Hr; intros H₁ H₂ H₃ H₄.
+   subst e₄ e₃; clear H₃ H₄.
+   rewrite app_of_cons in Hn.
+   now apply norm_list_no_consec in Hn.
+
+   destruct el as [| e₆ el].
+    injection Hr; clear Hr; intros H₁ H₂ H₃ H₄ H₅.
+    now apply no_fixpoint_negf in H₃.
+
+    destruct el as [| e₇ el].
+     injection Hr; clear Hr; intros H₁ H₂ H₃ H₄ H₅ H₆.
+     subst e₆ e₅ e₄; clear H₄ H₅ H₆.
+     rewrite app_of_cons in Hn.
+     remember (e₁ :: []) as el₁.
+     rewrite app_of_cons in Hn.
+     rewrite app_assoc in Hn.
+     now apply norm_list_no_consec in Hn.
+
+     destruct el as [| e₈ el].
+      injection Hr; clear Hr; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇.
+      now apply no_fixpoint_negf in H₄.
+
+bbb.
+intros * Hn Hr.
 remember (length el) as len eqn:Hlen.
 symmetry in Hlen.
 revert el Hn Hr Hlen.
