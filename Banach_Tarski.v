@@ -988,7 +988,13 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
    clear r Hr₁ Hx₁ Hy₁ Hz₁.
    move H₀ at top; destruct H₀ as (H₂ & H₃ & H₄); subst x y z.
    symmetry in Hx, Hy, Hz.
-(* then tr(m) = m; then rotation = 0 or 180° *)
+   apply Rminus_diag_uniq in Hx.
+   apply Rminus_diag_uniq in Hy.
+   apply Rminus_diag_uniq in Hz.
+   (* then tr(m) = m; then rotation = 0 or 180° *)
+   (* cannot be 0 because N(el₁) would be [] *)
+   (* for 180° not possible either because paths rotations should not
+      allow this value: but it is to be proven *)
 bbb.
  exists (b, nf, no).
  unfold fixpoint_of_bool_prod_nat.
