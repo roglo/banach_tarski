@@ -64,6 +64,11 @@ rewrite Rmult_comm, Rmult_assoc; f_equal.
 now apply sqrt_sqrt.
 Qed.
 
+Theorem Rdiv_0_l : ∀ x, (0 / x = 0)%R.
+Proof.
+intros x; unfold Rdiv; apply Rmult_0_l.
+Qed.
+
 Theorem Rdiv_1_r : ∀ x, (x / 1)%R = x.
 Proof. intros x; lra. Qed.
 
