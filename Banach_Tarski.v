@@ -1013,19 +1013,60 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
     apply Rminus_diag_uniq in Hx.
     apply Rminus_diag_uniq in Hy.
     apply Rminus_diag_uniq in Hz.
-    (* then tr(m) = m; then rotation = 0 or 180° *)
-    (* cannot be 0 because N(el₁) would be [] *)
-    (* for 180° not possible either because paths rotations should not
-       allow this value: but it is to be proven *)
     assert (Ht : m = mat_transp m) by (now destruct m; simpl in *; subst).
     assert (Hmm : (m * m = mat_id)%mat) by (rewrite Ht at 2; apply Hrm).
     rewrite Hm in Hmm.
     rewrite <- mat_of_path_app in Hmm.
+Theorem mat_of_path_eq_id : ∀ el,
+  mat_of_path el = mat_id
+  → norm_list el = [].
+Proof.
+intros * Hel.
+unfold mat_of_path in Hel.
+induction el as [| e el ]; [ easy | ].
+simpl in Hel; simpl.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+destruct el₁ as [| e₁ el₁].
+ exfalso.
+
+bbb.
+
     unfold mat_of_path in Hmm.
     exfalso; apply Hnl; clear - Hmm.
+
+bbb.
     induction el₁ as [| e₁ el₁]; [ easy | ].
     simpl in Hmm.
+    destruct el₁ as [| e₂ el₁].
+     exfalso.
+     simpl in Hmm, IHel₁.
+     rewrite mat_mul_id_r in Hmm.
+     clear IHel₁.
+     destruct e₁ as (t, d); destruct t, d; simpl in Hmm.
+      injection Hmm; intros H; intros.
+      rewrite Rmult_0_l, Rplus_0_l in H.
+      clear - H; unfold Rdiv in H.
+      do 2 rewrite <- Rmult_assoc in H.
+      rewrite Rmult5_sqrt2_sqrt5 in H; lra.
 
+      injection Hmm; intros H; intros.
+      rewrite Rmult_0_l, Rplus_0_l in H.
+      clear - H; unfold Rdiv in H.
+      do 2 rewrite <- Rmult_assoc in H.
+      rewrite Rmult5_sqrt2_sqrt5 in H; lra.
+
+      injection Hmm; intros.
+      rewrite Rmult_0_l, Rplus_0_r in H3.
+      clear - H3; unfold Rdiv in H3.
+      do 2 rewrite <- Rmult_assoc in H3.
+      rewrite Rmult5_sqrt2_sqrt5 in H3; lra.
+
+      injection Hmm; intros.
+      rewrite Rmult_0_l, Rplus_0_r in H3.
+      clear - H3; unfold Rdiv in H3.
+      do 2 rewrite <- Rmult_assoc in H3.
+      rewrite Rmult5_sqrt2_sqrt5 in H3; lra.
 bbb.
 
    (* case p₂ ≠ 0 *)
