@@ -996,7 +996,8 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
    (* for 180° not possible either because paths rotations should not
       allow this value: but it is to be proven *)
 
-  Focus 2.
+bbb.
+  (* case p₂ ≠ 0 *)
   exists (b, nf, no).
   unfold fixpoint_of_bool_prod_nat.
   rewrite Hno, path_of_nat_inv.
@@ -1016,8 +1017,7 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
    move Hb₂ before Hb₁.
    destruct b₁, b.
     destruct b₂; [ | easy ].
-
-Theorem glop : ∀ m p₁ p₂,
+Theorem fixpoint_unicity : ∀ m p₁ p₂,
   is_rotation_matrix m
   → m ≠ mat_id
   → p₁ ≠ P 0 0 0
@@ -1029,9 +1029,8 @@ Theorem glop : ∀ m p₁ p₂,
 Proof.
 intros * Hm Hnid Hn Hb₁ Hb₂ Hp₁ Hp₂.
 bbb.
-
     (* return to theorem *)
-    eapply glop; try eassumption.
+    eapply fixpoint_unicity; try eassumption.
      rewrite Hm; apply mat_of_path_is_rotation_matrix.
 
      intros H.
