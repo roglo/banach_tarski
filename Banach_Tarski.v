@@ -1434,6 +1434,58 @@ Qed.
 
 (* end of thing about non empty paths *)
 
+Theorem norm_list_app_diag_is_nil : ∀ el,
+  norm_list (el ++ el) = []
+  → norm_list el = [].
+Proof.
+intros el Hel.
+bbb.
+
+induction el as [| e₁ el₁]; [ easy | ].
+simpl in H.
+remember (norm_list (el₁ ++ e₁ :: el₁)) as el eqn:Hel.
+symmetry in Hel.
+destruct el as [| e el]; [ easy | ].
+destruct (letter_opp_dec e₁ e) as [H₁| H₁]; [ | easy ].
+subst el.
+apply letter_opp_negf in H₁.
+subst e₁; simpl.
+remember (norm_list el₁) as el₂ eqn:Hel₂.
+symmetry in Hel₂.
+destruct el₂ as [| e₂ el₂]; [ exfalso | ].
+ replace el₁ with ([] ++ el₁) in Hel at 1 by easy.
+ rewrite <- app_assoc in Hel.
+ rewrite <- is_normal, Hel₂ in Hel.
+ do 2 rewrite app_nil_l in Hel.
+ rewrite app_of_cons in Hel.
+ replace el₁ with (el₁ ++ []) in Hel by apply app_nil_r.
+ rewrite <- is_normal, Hel₂ in Hel.
+ simpl in Hel.
+ destruct e as (t, d); now destruct t, d.
+
+ destruct (letter_opp_dec (negf e) e₂) as [H₁| H₁].
+  apply letter_opp_sym in H₁.
+  apply letter_opp_negf in H₁.
+  rewrite negf_involutive in H₁; subst e₂.
+ replace el₁ with ([] ++ el₁) in Hel at 1 by easy.
+ rewrite <- app_assoc in Hel.
+ rewrite <- is_normal, Hel₂ in Hel.
+ rewrite app_nil_l in Hel.
+ remember (e :: el₂) as el₃.
+ rewrite app_of_cons in Hel; subst el₃.
+ replace el₁ with (el₁ ++ []) in Hel by apply app_nil_r.
+ rewrite app_assoc in Hel.
+ rewrite <- is_normal, Hel₂ in Hel.
+ rewrite app_nil_r in Hel.
+ rewrite <- app_assoc in Hel.
+ rewrite <- app_of_cons in Hel.
+ rewrite norm_list_cancel_in2 in Hel.
+ simpl in Hel.
+ remember (norm_list (el₂ ++ el₂)) as el₃ eqn:Hel₃.
+ symmetry in Hel₃.
+ destruct el₃ as [| e₃ el₃].
+bbb.
+
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
@@ -1539,7 +1591,7 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
     rewrite <- mat_of_path_app in Hmm.
     exfalso; revert Hmm.
     apply matrix_of_non_empty_path_is_not_identity.
-
+Check norm_list_app_diag_is_nil.
 bbb.
 
 Theorem mat_of_path_eq_id : ∀ el,
