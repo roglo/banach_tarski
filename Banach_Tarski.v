@@ -950,14 +950,14 @@ Theorem rev_path_eq_path : ∀ el,
   → norm_list el = [].
 Proof.
 intros el Hel.
-remember (length (norm_list el)) as len eqn:Hlen.
+remember (norm_list el) as el₁ eqn:Hel₁.
+symmetry in Hel₁.
+remember (length el₁) as len eqn:Hlen.
 symmetry in Hlen.
-revert el Hel Hlen.
+revert el el₁ Hel Hel₁ Hlen.
 induction len; intros.
  now apply length_zero_iff_nil in Hlen.
 
- remember (norm_list el) as el₁ eqn:Hel₁.
- symmetry in Hel₁.
  destruct el₁ as [| e₁ el₁]; [ easy | exfalso ].
  simpl in Hlen.
  apply Nat.succ_inj in Hlen.
