@@ -995,29 +995,27 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
    (* cannot be 0 because N(el₁) would be [] *)
    (* for 180° not possible either because paths rotations should not
       allow this value: but it is to be proven *)
-bbb.
- exists (b, nf, no).
- unfold fixpoint_of_bool_prod_nat.
- rewrite Hno, path_of_nat_inv.
- rewrite Hnf, path_of_nat_inv.
- rewrite <- Hr in Hs.
- remember (is_neg_point (rotation_fixpoint (mat_of_path el₁) 1)) as b₁.
- rename Heqb₁ into Hb₁.
- move Hb before Hb₁.
- symmetry in Hb, Hb₁.
- remember (mat_of_path el₁) as m eqn:Hm.
- remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
- symmetry; rewrite <- Hs; f_equal.
- apply matrix_all_fixpoints_ok in Hp₂.
- move Hp₂ at bottom; move Hr before Hp₂.
- rewrite Hr.
- remember (is_neg_point p₁) as b₂ eqn:Hb₂.
- symmetry in Hb₂.
- move Hb₂ before Hb₁.
- destruct b₁, b.
-   destruct b₂; [ | easy ].
-(* shit; I cannot prove that p₂ ≠ 0 *)
-bbb.
+
+  Focus 2.
+  exists (b, nf, no).
+  unfold fixpoint_of_bool_prod_nat.
+  rewrite Hno, path_of_nat_inv.
+  rewrite Hnf, path_of_nat_inv.
+  rewrite <- Hm, <- Hp₂.
+  rewrite <- Hr in Hs.
+  remember (is_neg_point p₂) as b₁.
+  rename Heqb₁ into Hb₁.
+  move Hb before Hb₁.
+  symmetry in Hb, Hb₁.
+  symmetry; rewrite <- Hs; f_equal.
+  apply matrix_all_fixpoints_ok in Hp₂.
+   move Hp₂ at bottom; move Hr before Hp₂.
+   rewrite Hr.
+   remember (is_neg_point p₁) as b₂ eqn:Hb₂.
+   symmetry in Hb₂.
+   move Hb₂ before Hb₁.
+   destruct b₁, b.
+    destruct b₂; [ | easy ].
 
 Theorem glop : ∀ m p₁ p₂,
   is_rotation_matrix m
@@ -1033,9 +1031,35 @@ Proof.
 intros * Hm Hnid Hn₁ Hn₂ Hb₁ Hb₂ Hp₁ Hp₂.
 bbb.
 
-(* return to theorem *)
-  eapply glop; try eassumption.
+    (* return to theorem *)
+    eapply glop; try eassumption.
+     rewrite Hm; apply mat_of_path_is_rotation_matrix.
 
+     intros H.
+     rewrite Hm in H.
+     unfold mat_of_path in H.
+     clear -Hnl H.
+(* seems subtile... *)
+bbb.
+
+     induction el₁ as [| e₁ el₁]; [ now apply Hnl | ].
+     simpl in H.
+     remember (norm_list el₁) as el eqn:Hel.
+      symmetry in Hel.
+      destruct el as [| e el].
+       destruct el₁ as [| e₂ el₁].
+        simpl in H.
+        rewrite mat_mul_id_r in H.
+        unfold mat_id in H.
+        destruct e₁ as (t, d); destruct t, d; simpl in H.
+         injection H; clear H; intros; lra.
+         injection H; clear H; intros; lra.
+         injection H; clear H; intros; lra.
+         injection H; clear H; intros; lra.
+
+        simpl in H.
+
+SearchAbout mat_of_path.
 bbb.
 simpl.
 remember (mat_of_path (path_of_nat nf)) as m eqn:Hm.
