@@ -950,6 +950,8 @@ Theorem rev_path_eq_path : ∀ el,
   → norm_list el = [].
 Proof.
 intros el Hel.
+bbb.
+
 destruct el as [| e₁ el]; [ easy | ].
 simpl in Hel; simpl.
 remember (norm_list el) as el₁ eqn:Hel₁.
@@ -959,7 +961,7 @@ destruct el₁ as [| e₂ el₂]; [ exfalso | ].
  injection Hel; clear Hel; intros H.
  now apply no_fixpoint_negf in H.
 
- destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
+ destruct (letter_opp_dec e₁ e₂) as [H₁| H₁]; [ | exfalso ].
   apply letter_opp_negf in H₁; subst e₁.
   destruct el₂ as [| e₃ el₃]; [ easy | exfalso ].
   rewrite rev_path_cons, rev_path_single in Hel.
