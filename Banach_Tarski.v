@@ -927,24 +927,6 @@ induction el₂ as [| e₂ el₂]; intros.
  now simpl; rewrite IHel₁, mat_mul_assoc.
 Qed.
 
-Theorem norm_list_normal_l : ∀ el₁ el₂,
-  norm_list (el₁ ++ el₂) = norm_list (norm_list el₁ ++ el₂).
-Proof.
-intros.
-replace el₁ with ([] ++ el₁) by easy.
-rewrite <- app_assoc.
-now rewrite <- is_normal.
-Qed.
-
-Theorem norm_list_normal_r : ∀ el₁ el₂,
-  norm_list (el₁ ++ el₂) = norm_list (el₁ ++ norm_list el₂).
-Proof.
-intros.
-replace el₂ with (el₂ ++ []) by apply app_nil_r.
-rewrite <- is_normal.
-now do 2 rewrite app_nil_r.
-Qed.
-
 Theorem rev_norm_path_eq_path : ∀ el,
   norm_list el = el
   → rev_path el = el

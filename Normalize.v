@@ -185,6 +185,24 @@ destruct el as [| e].
   easy.
 Qed.
 
+Theorem norm_list_normal_l : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = norm_list (norm_list el₁ ++ el₂).
+Proof.
+intros.
+replace el₁ with ([] ++ el₁) by easy.
+rewrite <- app_assoc.
+now rewrite <- is_normal.
+Qed.
+
+Theorem norm_list_normal_r : ∀ el₁ el₂,
+  norm_list (el₁ ++ el₂) = norm_list (el₁ ++ norm_list el₂).
+Proof.
+intros.
+replace el₂ with (el₂ ++ []) by apply app_nil_r.
+rewrite <- is_normal.
+now do 2 rewrite app_nil_r.
+Qed.
+
 Theorem norm_list_idemp : ∀ el, norm_list (norm_list el) = norm_list el.
 Proof.
 intros el.
