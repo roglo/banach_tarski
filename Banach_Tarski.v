@@ -1032,7 +1032,6 @@ apply in_split in H.
 destruct H as (l₁ & l₂ & Hll).
 assert (length l₁ < S c)%nat.
 
-
 assert (Hsc : (S c < length (e₁ :: el))%nat).
  rewrite Hc; simpl.
 
