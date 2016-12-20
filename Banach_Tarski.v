@@ -966,6 +966,33 @@ destruct (lt_dec i (length el)) as [Hi| Hi].
  now rewrite rev_path_length, <- Hi, Nat.sub_diag.
 Qed.
 
+Theorem nth_in_split : ∀ A (n : ℕ) (l : list A) (d : A),
+  (n < length l)%nat
+  → ∃ l1 l2 : list A, l = l1 ++ List.nth n l d :: l2.
+Proof.
+intros * Hn.
+now apply in_split, nth_In.
+Qed.
+
+Theorem nth_in_consec_split : ∀ A (n : ℕ) (l : list A) (d₁ d₂ : A),
+  (S n < length l)%nat
+  → ∃ l1 l2 : list A,
+    l = l1 ++ List.nth n l d₁ :: List.nth (S n) l d₂ :: l2.
+Proof.
+intros * Hn.
+revert n Hn.
+induction l as [| x l]; intros; [ now apply Nat.nlt_0_r in Hn | ].
+simpl in Hn.
+apply Nat.succ_lt_mono in Hn.
+destruct n.
+ destruct l as [| y l]; [ now apply Nat.nlt_0_r in Hn | ].
+ now exists [], l.
+
+ apply IHl in Hn.
+ destruct Hn as (l1 & l2 & Hn).
+ now exists (x :: l1), l2; simpl; f_equal.
+Qed.
+
 Theorem rev_norm_path_eq_path : ∀ el,
   norm_list el = el
   → rev_path el = el
@@ -1023,16 +1050,11 @@ destruct (zerop (length el mod 2)) as [Hel| Hel].
    rewrite Hc in H; simpl in H.
    rewrite Nat.add_0_r, Nat.add_sub in H; subst el₂.
    rename H into Hlen.
-   pose proof @nth_In _ (S c) (e₁ :: el) ạ Hlt.
-   apply in_split in H.
+   pose proof nth_in_consec_split free_elem c (e₁ :: el) ạ⁻¹ ạ Hlt.
    destruct H as (l₁ & l₂ & Hll).
-   assert (Hlt' : (c < length (e₁ :: el))%nat).
-    now apply Nat.lt_succ_l.
-
-    pose proof @nth_In _ c (e₁ :: el) ạ⁻¹ Hlt'.
-    apply in_split in H.
-    destruct H as (l₃ & l₄ & Hll').
-bbb.
+   rewrite Hlen, <- Hn in Hll.
+   now apply norm_list_no_consec in Hll.
+Qed.
 
 Theorem rev_path_eq_path : ∀ el,
   rev_path (norm_list el) = norm_list el
@@ -1043,101 +1065,8 @@ remember (norm_list el) as el₁ eqn:Hel₁.
 assert (H : norm_list el₁ = el₁) by (subst el₁; apply norm_list_idemp).
 clear el Hel₁.
 rename el₁ into el; rename H into Hn.
-bbb.
-
-induction el as [| e₁ el]; [ easy | exfalso ].
-simpl in Hn.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₂ el₂].
- injection Hn; clear Hn; intros; subst el.
- injection Hel; apply no_fixpoint_negf.
-
- destruct (letter_opp_dec e₁ e₂) as [H₁| H₁].
-  apply letter_opp_negf in H₁; subst e₁.
-  now subst el₂; apply norm_list_no_start in Hel₁.
-
-  apply H₁; clear H₁.
-  apply letter_opp_negf.
-  injection Hn; clear Hn; intros; subst el.
-  rewrite rev_path_cons, rev_path_single in Hel.
-  rewrite <- Hel₁ in Hel.
-  rewrite rev_path_norm_list in Hel.
-  rewrite rev_path_cons, rev_path_single in Hel.
-
-bbb.
-
-destruct el as [| e₁ el]; [ easy | ].
-simpl in Hel; simpl.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₂ el₂]; [ exfalso | ].
- rewrite rev_path_single in Hel.
- injection Hel; clear Hel; intros H.
- now apply no_fixpoint_negf in H.
-
- destruct (letter_opp_dec e₁ e₂) as [H₁| H₁]; [ | exfalso ].
-  apply letter_opp_negf in H₁; subst e₁.
-  destruct el₂ as [| e₃ el₃]; [ easy | exfalso ].
-  rewrite rev_path_cons, rev_path_single in Hel.
-bbb.
-
-intros el Hel.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-remember (length el₁) as len eqn:Hlen.
-symmetry in Hlen.
-revert el el₁ Hel Hel₁ Hlen.
-destruct len; intros.
- now apply length_zero_iff_nil in Hlen.
-
- destruct el₁ as [| e₁ el₁]; [ easy | exfalso ].
- simpl in Hlen.
- apply Nat.succ_inj in Hlen.
- destruct el₁ as [| e₂ el₂].
-  rewrite rev_path_single in Hel.
-  injection Hel; clear Hel; intros H.
-  now apply no_fixpoint_negf in H.
-
-  simpl in Hlen.
-
-bbb.
-
-unfold rev_path in Hel.
-rewrite map_rev in Hel.
-destruct el as [| e el]; [ easy | exfalso ].
-simpl in Hel.
-rewrite map_app in Hel.
-simpl in Hel.
-remember (rev el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁ el₁].
- injection Hel; clear Hel; intros H1 H2; subst el.
- now apply no_fixpoint_negf in H2.
-
- simpl in Hel.
- injection Hel; clear Hel; intros H1 H2; subst e el.
- rewrite negf_involutive in Hel₁.
- rewrite rev_app_distr in Hel₁.
- simpl in Hel₁.
- injection Hel₁; clear Hel₁; intros Hel.
- clear e₁.
-1 subgoal, subgoal 1 (ID 857)
-  
-  el₁ : list free_elem
-  Hel : rev (map negf el₁) = el₁
-  ============================
-  False
-bbb.
-
-unfold rev_path in Hel.
-rewrite map_rev in Hel.
-induction el as [| e el]; [ easy | exfalso ].
-simpl in Hel.
-rewrite map_app in Hel.
-rewrite map_rev in IHel.
-simpl in Hel.
-bbb.
+now apply rev_norm_path_eq_path.
+Qed.
 
 Theorem norm_list_app_diag_is_nil : ∀ el,
   norm_list (el ++ el) = []
@@ -1147,64 +1076,8 @@ intros el Hel.
 rewrite norm_list_normal_l in Hel.
 rewrite norm_list_normal_r in Hel.
 apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
-bbb.
-
-remember (norm_list el) as el₁.
-clear el Heqel₁; rename el₁ into el.
-symmetry in Hel.
-bbb.
-
-unfold rev_path in Hel.
-rewrite map_rev in Hel.
-induction el₁ as [| e el]; [ easy | exfalso ].
-simpl in Hel.
-
-bbb.
-
-induction el as [| e₁ el₁]; [ easy | ].
-simpl in H.
-remember (norm_list (el₁ ++ e₁ :: el₁)) as el eqn:Hel.
-symmetry in Hel.
-destruct el as [| e el]; [ easy | ].
-destruct (letter_opp_dec e₁ e) as [H₁| H₁]; [ | easy ].
-subst el.
-apply letter_opp_negf in H₁.
-subst e₁; simpl.
-remember (norm_list el₁) as el₂ eqn:Hel₂.
-symmetry in Hel₂.
-destruct el₂ as [| e₂ el₂]; [ exfalso | ].
- replace el₁ with ([] ++ el₁) in Hel at 1 by easy.
- rewrite <- app_assoc in Hel.
- rewrite <- is_normal, Hel₂ in Hel.
- do 2 rewrite app_nil_l in Hel.
- rewrite app_of_cons in Hel.
- replace el₁ with (el₁ ++ []) in Hel by apply app_nil_r.
- rewrite <- is_normal, Hel₂ in Hel.
- simpl in Hel.
- destruct e as (t, d); now destruct t, d.
-
- destruct (letter_opp_dec (negf e) e₂) as [H₁| H₁].
-  apply letter_opp_sym in H₁.
-  apply letter_opp_negf in H₁.
-  rewrite negf_involutive in H₁; subst e₂.
- replace el₁ with ([] ++ el₁) in Hel at 1 by easy.
- rewrite <- app_assoc in Hel.
- rewrite <- is_normal, Hel₂ in Hel.
- rewrite app_nil_l in Hel.
- remember (e :: el₂) as el₃.
- rewrite app_of_cons in Hel; subst el₃.
- replace el₁ with (el₁ ++ []) in Hel by apply app_nil_r.
- rewrite app_assoc in Hel.
- rewrite <- is_normal, Hel₂ in Hel.
- rewrite app_nil_r in Hel.
- rewrite <- app_assoc in Hel.
- rewrite <- app_of_cons in Hel.
- rewrite norm_list_cancel_in2 in Hel.
- simpl in Hel.
- remember (norm_list (el₂ ++ el₂)) as el₃ eqn:Hel₃.
- symmetry in Hel₃.
- destruct el₃ as [| e₃ el₃].
-bbb.
+now apply rev_path_eq_path.
+Qed.
 
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
@@ -1311,68 +1184,9 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
     rewrite <- mat_of_path_app in Hmm.
     exfalso; revert Hmm.
     apply matrix_of_non_empty_path_is_not_identity.
-Check norm_list_app_diag_is_nil.
-bbb.
+    intros H; apply Hnl.
+    now apply norm_list_app_diag_is_nil.
 
-Theorem mat_of_path_eq_id : ∀ el,
-  mat_of_path el = mat_id
-  → norm_list el = [].
-Proof.
-intros * Hel.
-unfold mat_of_path in Hel.
-Admitted. Show.
-
-apply mat_of_path_eq_id in Hmm.
-apply norm_list_app_is_nil in Hmm.
-vvv.
-
-induction el as [| e el ]; [ easy | ].
-simpl in Hel; simpl.
-remember (norm_list el) as el₁ eqn:Hel₁.
-symmetry in Hel₁.
-destruct el₁ as [| e₁ el₁].
- exfalso.
-
-bbb.
-
-    unfold mat_of_path in Hmm.
-    exfalso; apply Hnl; clear - Hmm.
-
-bbb.
-    induction el₁ as [| e₁ el₁]; [ easy | ].
-    simpl in Hmm.
-    destruct el₁ as [| e₂ el₁].
-     exfalso.
-     simpl in Hmm, IHel₁.
-     rewrite mat_mul_id_r in Hmm.
-     clear IHel₁.
-     destruct e₁ as (t, d); destruct t, d; simpl in Hmm.
-      injection Hmm; intros H; intros.
-      rewrite Rmult_0_l, Rplus_0_l in H.
-      clear - H; unfold Rdiv in H.
-      do 2 rewrite <- Rmult_assoc in H.
-      rewrite Rmult5_sqrt2_sqrt5 in H; lra.
-
-      injection Hmm; intros H; intros.
-      rewrite Rmult_0_l, Rplus_0_l in H.
-      clear - H; unfold Rdiv in H.
-      do 2 rewrite <- Rmult_assoc in H.
-      rewrite Rmult5_sqrt2_sqrt5 in H; lra.
-
-      injection Hmm; intros.
-      rewrite Rmult_0_l, Rplus_0_r in H3.
-      clear - H3; unfold Rdiv in H3.
-      do 2 rewrite <- Rmult_assoc in H3.
-      rewrite Rmult5_sqrt2_sqrt5 in H3; lra.
-
-      injection Hmm; intros.
-      rewrite Rmult_0_l, Rplus_0_r in H3.
-      clear - H3; unfold Rdiv in H3.
-      do 2 rewrite <- Rmult_assoc in H3.
-      rewrite Rmult5_sqrt2_sqrt5 in H3; lra.
-bbb.
-
-   (* case p₂ ≠ 0 *)
    exists (b, nf, no).
    unfold fixpoint_of_bool_prod_nat.
    rewrite Hno, path_of_nat_inv.
