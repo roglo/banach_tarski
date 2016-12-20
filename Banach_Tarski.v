@@ -972,6 +972,68 @@ Theorem rev_norm_path_eq_path : ∀ el,
   → el = [].
 Proof.
 intros * Hn Hr.
+destruct el as [| e₁ el]; [ easy | exfalso ].
+destruct (zerop (length el mod 2)) as [Hel| Hel].
+ apply Nat.mod_divides in Hel; [ | easy ].
+ destruct Hel as (c, Hc).
+  assert (Hlt : (c < length (e₁ :: el))%nat).
+   simpl; rewrite Hc; simpl.
+   rewrite Nat.add_0_r.
+   apply Nat.lt_succ_r, Nat.le_add_r.
+
+   pose proof rev_path_nth (e₁ :: el) c Hlt as H.
+   rewrite Hr in H; simpl in H.
+   symmetry in H.
+   replace (length el - c)%nat with c in H.
+    destruct c; [ now apply no_fixpoint_negf in H | ].
+    simpl in Hlt.
+    apply Nat.succ_lt_mono in Hlt.
+    erewrite nth_indep in H; [ now apply no_fixpoint_negf in H | ].
+    rewrite Hc; simpl; rewrite Nat.add_0_r.
+    apply Nat.lt_succ_r, Nat.le_add_r.
+
+    rewrite Hc; simpl.
+    now rewrite Nat.add_0_r, Nat.add_sub.
+
+ bbb.
+ enough (Hlen : (length (e₁ :: el) mod 2 = 0)%nat).
+  apply Nat.mod_divides in Hlen; [ | easy ].
+  destruct Hlen as (c, Hc).
+  enough (Hlt : (c < length (e₁ :: el))%nat).
+   pose proof rev_path_nth (e₁ :: el) c Hlt as H.
+   rewrite Hr in H; simpl in H.
+   replace (length el - c
+
+ remember (length el) as m eqn:Hm.
+ symmetry in Hm.
+ assert (Hlt : (S (m / 2) < length (e₁ :: el))%nat).
+  simpl; subst m.
+  apply -> Nat.succ_lt_mono.
+  apply Nat.div_lt_upper_bound; [ easy | ].
+  simpl; rewrite Nat.add_0_r.
+  destruct (length el); [ now apply Nat.nlt_0_r in Hel | simpl ].
+  apply -> Nat.succ_lt_mono.
+  rewrite <- Nat.add_succ_comm.
+  apply Nat.lt_succ_r, Nat.le_add_r.
+
+  pose proof rev_path_nth (e₁ :: el) (S (m / 2)) Hlt as H.
+  rewrite Hr in H; simpl in H.
+  symmetry in H.
+  replace (length el - S (m / 2))%nat with (m / 2)%nat in H.
+Focus 2.
+rewrite Hm.
+
+
+   destruct (m / 2)%nat.
+
+; [ now apply no_fixpoint_negf in H | ].
+   erewrite nth_indep in H; [ now apply no_fixpoint_negf in H | ].
+   simpl in Hlt.
+   now apply Nat.succ_lt_mono in Hlt.
+   rewrite Hm.
+
+
+
 bbb.
 
 intros * Hn Hr.
