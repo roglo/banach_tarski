@@ -927,11 +927,64 @@ induction el₂ as [| e₂ el₂]; intros.
  now simpl; rewrite IHel₁, mat_mul_assoc.
 Qed.
 
+Theorem rev_path_length : ∀ el, length (rev_path el) = length el.
+Proof.
+intros.
+induction el as [| e el]; [ easy | simpl ].
+rewrite rev_path_cons, rev_path_single.
+rewrite app_length; simpl.
+now rewrite Nat.add_1_r, IHel.
+Qed.
+
+Theorem rev_path_nth : ∀ el i,
+  List.nth i (rev_path el) ạ = negf (List.nth (length el - S i) el ạ⁻¹).
+Proof.
+intros el i.
+revert i.
+induction el as [| e el]; intros; [ now simpl; rewrite match_id | ].
+rewrite rev_path_cons, rev_path_single.
+destruct (lt_dec i (length el)) as [Hi| Hi].
+ rewrite app_nth1; [ | now rewrite rev_path_length ].
+ rewrite IHel; simpl; f_equal.
+ remember (length el - i)%nat as n eqn:Hn.
+ symmetry in Hn.
+ destruct n.
+  apply Nat.sub_0_le in Hn.
+  apply Nat.lt_succ_r in Hn.
+  now apply Nat.nle_gt in Hn.
+
+  f_equal; apply Nat.succ_inj.
+  now rewrite <- Hn, <- Nat.sub_succ_l.
+
+ apply Nat.nlt_ge in Hi.
+ rewrite app_nth2; [ | now rewrite rev_path_length ].
+ rewrite rev_path_length.
+ remember Nat.sub as f; simpl; subst f.
+ remember (i - length el)%nat as n eqn:Hn.
+ symmetry in Hn.
+ destruct n.
+  f_equal; simpl.
+  apply Nat.sub_0_le in Hn.
+  apply Nat.le_antisymm in Hn; [ | easy ].
+  now rewrite Hn, Nat.sub_diag.
+
+bbb.
+  rewrite match_id; simpl.
+  remember (length el - i)%nat as m eqn:Hm.
+  symmetry in Hm.
+  destruct m.
+   apply Nat.sub_0_le in Hm.
+bbb.
+
 Theorem rev_norm_path_eq_path : ∀ el,
   norm_list el = el
   → rev_path el = el
   → el = [].
 Proof.
+intros * Hn Hr.
+bbb.
+
+
 intros * Hn Hr.
 destruct el as [| e₁ el]; [ easy | exfalso ].
 destruct el as [| e₂ el]; [ injection Hr; apply no_fixpoint_negf | ].
