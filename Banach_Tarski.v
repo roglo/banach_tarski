@@ -957,22 +957,22 @@ destruct (lt_dec i (length el)) as [Hi| Hi].
   now rewrite <- Hn, <- Nat.sub_succ_l.
 
  apply Nat.nlt_ge in Hi.
- rewrite app_nth2; [ | now rewrite rev_path_length ].
- rewrite rev_path_length.
- remember Nat.sub as f; simpl; subst f.
- remember (i - length el)%nat as n eqn:Hn.
- symmetry in Hn.
- destruct n.
-  f_equal; simpl.
-  apply Nat.sub_0_le in Hn.
-  apply Nat.le_antisymm in Hn; [ | easy ].
-  now rewrite Hn, Nat.sub_diag.
+ destruct (eq_nat_dec i (length el)) as [Hel| Hel].
+  rewrite app_nth2; [ simpl | now rewrite rev_path_length ].
+  now rewrite rev_path_length, <- Hel, Nat.sub_diag; simpl.
 
-  rewrite match_id; simpl.
-  remember (length el - i)%nat as m eqn:Hm.
-  symmetry in Hm.
-  destruct m.
-   apply Nat.sub_0_le in Hm.
+  rewrite nth_overflow.
+   simpl.
+   remember (length el - i)%nat as n eqn:Hn.
+   symmetry in Hn.
+   destruct n.
+    apply Nat.sub_0_le in Hn.
+bbb.
+
+Focus 2.
+rewrite app_length; simpl.
+rewrite rev_path_length, Nat.add_1_r.
+
 bbb.
 
 Theorem rev_norm_path_eq_path : ∀ el,
