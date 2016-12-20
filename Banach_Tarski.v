@@ -1016,11 +1016,25 @@ destruct (zerop (length el mod 2)) as [Hel| Hel].
    apply Nat.lt_succ_r; rewrite Nat.add_comm.
    apply Nat.le_add_r.
 
-   apply rev_path_nth in Hlt.
-   rewrite Hr in Hlt.
-   remember (e₁ :: el) as el₂; simpl in Hlt.
-   rewrite Hc in Hlt; simpl in Hlt.
-   rewrite Nat.add_0_r, Nat.add_sub in Hlt; subst el₂.
+   generalize Hlt; intros H.
+   apply rev_path_nth in H.
+   rewrite Hr in H.
+   remember (e₁ :: el) as el₂; simpl in H.
+   rewrite Hc in H; simpl in H.
+   rewrite Nat.add_0_r, Nat.add_sub in H; subst el₂.
+   rename H into Hlen.
+bbb.
+
+SearchAbout (_ ++ _ :: _).
+pose proof @nth_In free_elem (S c) (e₁ :: el) ạ Hlt.
+Check in_split.
+apply in_split in H.
+destruct H as (l₁ & l₂ & Hll).
+assert (length l₁ < S c)%nat.
+
+
+assert (Hsc : (S c < length (e₁ :: el))%nat).
+ rewrite Hc; simpl.
 
 bbb.
    simpl in Hlt, Hc.
