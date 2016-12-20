@@ -995,6 +995,57 @@ destruct (zerop (length el mod 2)) as [Hel| Hel].
     rewrite Hc; simpl.
     now rewrite Nat.add_0_r, Nat.add_sub.
 
+ assert (He : (length (e₁ :: el) mod 2 = 0)%nat).
+  simpl.
+  rewrite <- Nat.add_1_r.
+  rewrite <- Nat.add_mod_idemp_l; [ | easy ].
+  remember (length el mod 2) as m eqn:Hm.
+  destruct m; [ easy | ].
+  destruct m; [ easy | ].
+  assert (H : (2 ≠ 0)%nat) by easy.
+  apply (Nat.mod_upper_bound (length el)) in H.
+  rewrite <- Hm in H.
+  do 2 apply Nat.succ_lt_mono in H.
+  now apply Nat.nlt_0_r in H.
+
+  apply Nat.mod_divides in He; [ | easy ].
+  destruct He as (c, Hc).
+  destruct c; [ easy | ].
+  assert (Hlt : (S c < length (e₁ :: el))%nat).
+   rewrite Hc; simpl; rewrite Nat.add_0_r.
+   apply Nat.lt_succ_r; rewrite Nat.add_comm.
+   apply Nat.le_add_r.
+
+   apply rev_path_nth in Hlt.
+   rewrite Hr in Hlt.
+   remember (e₁ :: el) as el₂; simpl in Hlt.
+   rewrite Hc in Hlt; simpl in Hlt.
+   rewrite Nat.add_0_r, Nat.add_sub in Hlt; subst el₂.
+
+bbb.
+   simpl in Hlt, Hc.
+   apply Nat.succ_inj in Hc.
+   rewrite Nat.add_0_r in Hc.
+   rewrite Hc in Hlt.
+   rewrite Nat.add_sub in Hlt.
+   destruct el as [| e₂ el]; [ easy | ].
+   destruct c.
+    simpl in Hlt; subst e₂.
+    now apply norm_list_no_start in Hn.
+
+bbb.
+    simpl in Hlt.
+    destruct c.
+     simpl in Hel, Hc.
+     destruct el as [| e₃ el]; [ easy | ].
+     simpl in Hlt; subst e₃.
+     rewrite app_of_cons in Hn at 2.
+     now apply norm_list_no_consec in Hn.
+
+bbb.
+
+
+
  assert (Hlt : (length el / 2 < length (e₁ :: el))%nat).
   simpl.
 Focus 2.
