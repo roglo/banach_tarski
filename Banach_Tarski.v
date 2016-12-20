@@ -937,15 +937,16 @@ now rewrite Nat.add_1_r, IHel.
 Qed.
 
 Theorem rev_path_nth : ∀ el i,
-  List.nth i (rev_path el) ạ = negf (List.nth (length el - S i) el ạ⁻¹).
+  (i < length el)%nat
+  → List.nth i (rev_path el) ạ = negf (List.nth (length el - S i) el ạ⁻¹).
 Proof.
-intros el i.
-revert i.
+intros el i Hlen.
+revert i Hlen.
 induction el as [| e el]; intros; [ now simpl; rewrite match_id | ].
 rewrite rev_path_cons, rev_path_single.
 destruct (lt_dec i (length el)) as [Hi| Hi].
  rewrite app_nth1; [ | now rewrite rev_path_length ].
- rewrite IHel; simpl; f_equal.
+ rewrite IHel; simpl; [ f_equal | easy ].
  remember (length el - i)%nat as n eqn:Hn.
  symmetry in Hn.
  destruct n.
@@ -957,23 +958,13 @@ destruct (lt_dec i (length el)) as [Hi| Hi].
   now rewrite <- Hn, <- Nat.sub_succ_l.
 
  apply Nat.nlt_ge in Hi.
- destruct (eq_nat_dec i (length el)) as [Hel| Hel].
-  rewrite app_nth2; [ simpl | now rewrite rev_path_length ].
-  now rewrite rev_path_length, <- Hel, Nat.sub_diag; simpl.
-
-  rewrite nth_overflow.
-   simpl.
-   remember (length el - i)%nat as n eqn:Hn.
-   symmetry in Hn.
-   destruct n.
-    apply Nat.sub_0_le in Hn.
-bbb.
-
-Focus 2.
-rewrite app_length; simpl.
-rewrite rev_path_length, Nat.add_1_r.
-
-bbb.
+ simpl in Hlen; unfold lt in Hlen.
+ apply Nat.succ_le_mono in Hlen.
+ apply Nat.le_antisymm in Hi; [ | easy ].
+ rewrite Hi.
+ rewrite app_nth2; [ simpl | now rewrite rev_path_length; unfold ge ].
+ now rewrite rev_path_length, <- Hi, Nat.sub_diag.
+Qed.
 
 Theorem rev_norm_path_eq_path : ∀ el,
   norm_list el = el
@@ -982,7 +973,6 @@ Theorem rev_norm_path_eq_path : ∀ el,
 Proof.
 intros * Hn Hr.
 bbb.
-
 
 intros * Hn Hr.
 destruct el as [| e₁ el]; [ easy | exfalso ].
