@@ -995,6 +995,27 @@ destruct (zerop (length el mod 2)) as [Hel| Hel].
     rewrite Hc; simpl.
     now rewrite Nat.add_0_r, Nat.add_sub.
 
+ assert (Hlt : (length el / 2 < length (e₁ :: el))%nat).
+  simpl.
+Focus 2.
+  pose proof rev_path_nth (e₁ :: el) (length el / 2) Hlt as H.
+  rewrite Hr in H; simpl in H.
+  assert (He : (length el - length el / 2 = S (length el / 2))%nat).
+   Focus 2.
+   rewrite He in H.
+   remember (length el / 2)%nat as m eqn:Hm.
+   symmetry in Hm.
+   destruct m.
+
+ bbb.
+ enough (Hlen : (length (e₁ :: el) mod 2 = 0)%nat).
+  assert (2 ≠ 0)%nat as H by easy.
+  apply Nat.mod_upper_bound with (a := length el) in H; simpl.
+  remember (length el mod 2) as m eqn:Hm.
+  destruct m; [ now apply Nat.nlt_0_r in Hel | simpl ].
+  destruct m.
+  simpl.
+
  bbb.
  enough (Hlen : (length (e₁ :: el) mod 2 = 0)%nat).
   apply Nat.mod_divides in Hlen; [ | easy ].
