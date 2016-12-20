@@ -1023,149 +1023,15 @@ destruct (zerop (length el mod 2)) as [Hel| Hel].
    rewrite Hc in H; simpl in H.
    rewrite Nat.add_0_r, Nat.add_sub in H; subst el₂.
    rename H into Hlen.
-bbb.
+   pose proof @nth_In _ (S c) (e₁ :: el) ạ Hlt.
+   apply in_split in H.
+   destruct H as (l₁ & l₂ & Hll).
+   assert (Hlt' : (c < length (e₁ :: el))%nat).
+    now apply Nat.lt_succ_l.
 
-SearchAbout (_ ++ _ :: _).
-pose proof @nth_In free_elem (S c) (e₁ :: el) ạ Hlt.
-Check in_split.
-apply in_split in H.
-destruct H as (l₁ & l₂ & Hll).
-assert (length l₁ < S c)%nat.
-
-assert (Hsc : (S c < length (e₁ :: el))%nat).
- rewrite Hc; simpl.
-
-bbb.
-   simpl in Hlt, Hc.
-   apply Nat.succ_inj in Hc.
-   rewrite Nat.add_0_r in Hc.
-   rewrite Hc in Hlt.
-   rewrite Nat.add_sub in Hlt.
-   destruct el as [| e₂ el]; [ easy | ].
-   destruct c.
-    simpl in Hlt; subst e₂.
-    now apply norm_list_no_start in Hn.
-
-bbb.
-    simpl in Hlt.
-    destruct c.
-     simpl in Hel, Hc.
-     destruct el as [| e₃ el]; [ easy | ].
-     simpl in Hlt; subst e₃.
-     rewrite app_of_cons in Hn at 2.
-     now apply norm_list_no_consec in Hn.
-
-bbb.
-
-
-
- assert (Hlt : (length el / 2 < length (e₁ :: el))%nat).
-  simpl.
-Focus 2.
-  pose proof rev_path_nth (e₁ :: el) (length el / 2) Hlt as H.
-  rewrite Hr in H; simpl in H.
-  assert (He : (length el - length el / 2 = S (length el / 2))%nat).
-   Focus 2.
-   rewrite He in H.
-   remember (length el / 2)%nat as m eqn:Hm.
-   symmetry in Hm.
-   destruct m.
-
- bbb.
- enough (Hlen : (length (e₁ :: el) mod 2 = 0)%nat).
-  assert (2 ≠ 0)%nat as H by easy.
-  apply Nat.mod_upper_bound with (a := length el) in H; simpl.
-  remember (length el mod 2) as m eqn:Hm.
-  destruct m; [ now apply Nat.nlt_0_r in Hel | simpl ].
-  destruct m.
-  simpl.
-
- bbb.
- enough (Hlen : (length (e₁ :: el) mod 2 = 0)%nat).
-  apply Nat.mod_divides in Hlen; [ | easy ].
-  destruct Hlen as (c, Hc).
-  enough (Hlt : (c < length (e₁ :: el))%nat).
-   pose proof rev_path_nth (e₁ :: el) c Hlt as H.
-   rewrite Hr in H; simpl in H.
-   replace (length el - c
-
- remember (length el) as m eqn:Hm.
- symmetry in Hm.
- assert (Hlt : (S (m / 2) < length (e₁ :: el))%nat).
-  simpl; subst m.
-  apply -> Nat.succ_lt_mono.
-  apply Nat.div_lt_upper_bound; [ easy | ].
-  simpl; rewrite Nat.add_0_r.
-  destruct (length el); [ now apply Nat.nlt_0_r in Hel | simpl ].
-  apply -> Nat.succ_lt_mono.
-  rewrite <- Nat.add_succ_comm.
-  apply Nat.lt_succ_r, Nat.le_add_r.
-
-  pose proof rev_path_nth (e₁ :: el) (S (m / 2)) Hlt as H.
-  rewrite Hr in H; simpl in H.
-  symmetry in H.
-  replace (length el - S (m / 2))%nat with (m / 2)%nat in H.
-Focus 2.
-rewrite Hm.
-
-
-   destruct (m / 2)%nat.
-
-; [ now apply no_fixpoint_negf in H | ].
-   erewrite nth_indep in H; [ now apply no_fixpoint_negf in H | ].
-   simpl in Hlt.
-   now apply Nat.succ_lt_mono in Hlt.
-   rewrite Hm.
-
-
-
-bbb.
-
-intros * Hn Hr.
-destruct el as [| e₁ el]; [ easy | exfalso ].
-destruct el as [| e₂ el]; [ injection Hr; apply no_fixpoint_negf | ].
-destruct el as [| e₃ el].
- injection Hr; clear Hr; intros H₁ H₂.
- subst e₂; clear H₂.
- now apply norm_list_no_start in Hn.
-
- destruct el as [| e₄ el].
-  injection Hr; clear Hr; intros H₁ H₂ H₃.
-  now apply no_fixpoint_negf in H₂.
-
-  destruct el as [| e₅ el].
-   injection Hr; clear Hr; intros H₁ H₂ H₃ H₄.
-   subst e₄ e₃; clear H₃ H₄.
-   rewrite app_of_cons in Hn.
-   now apply norm_list_no_consec in Hn.
-
-   destruct el as [| e₆ el].
-    injection Hr; clear Hr; intros H₁ H₂ H₃ H₄ H₅.
-    now apply no_fixpoint_negf in H₃.
-
-    destruct el as [| e₇ el].
-     injection Hr; clear Hr; intros H₁ H₂ H₃ H₄ H₅ H₆.
-     subst e₆ e₅ e₄; clear H₄ H₅ H₆.
-     rewrite app_of_cons in Hn.
-     remember (e₁ :: []) as el₁.
-     rewrite app_of_cons in Hn.
-     rewrite app_assoc in Hn.
-     now apply norm_list_no_consec in Hn.
-
-     destruct el as [| e₈ el].
-      injection Hr; clear Hr; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇.
-      now apply no_fixpoint_negf in H₄.
-
-bbb.
-intros * Hn Hr.
-remember (length el) as len eqn:Hlen.
-symmetry in Hlen.
-revert el Hn Hr Hlen.
-induction len; intros; [ now apply length_zero_iff_nil in Hlen; subst el | ].
-destruct el as [| e₁ el]; [ easy | exfalso ].
-simpl in Hlen.
-apply Nat.succ_inj in Hlen.
-rewrite rev_path_cons, rev_path_single in Hr.
+    pose proof @nth_In _ c (e₁ :: el) ạ⁻¹ Hlt'.
+    apply in_split in H.
+    destruct H as (l₃ & l₄ & Hll').
 bbb.
 
 Theorem rev_path_eq_path : ∀ el,
