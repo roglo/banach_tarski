@@ -968,7 +968,6 @@ destruct (lt_dec i (length el)) as [Hi| Hi].
   apply Nat.le_antisymm in Hn; [ | easy ].
   now rewrite Hn, Nat.sub_diag.
 
-bbb.
   rewrite match_id; simpl.
   remember (length el - i)%nat as m eqn:Hm.
   symmetry in Hm.
