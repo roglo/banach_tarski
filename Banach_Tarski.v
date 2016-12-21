@@ -543,6 +543,49 @@ Definition fixpoint_of_path r el :=
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
+Theorem rotation_fixpoint_on_sphere_ray : ∀ r m,
+  m ≠ mat_transp m
+  → rotation_fixpoint m r ∈ sphere_ray r.
+Proof.
+intros * Hm.
+unfold rotation_fixpoint; simpl.
+remember (a₂₃ m - a₃₂ m)%R as x eqn:Hx.
+remember (a₃₁ m - a₁₃ m)%R as y eqn:Hy.
+remember (a₁₂ m - a₂₁ m)%R as z eqn:Hz.
+remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+assert (Hrnz : (r₁ ≠ 0)%R).
+ intros H; apply Hm; clear Hm; subst r₁.
+ apply sqrt_eq_0 in H.
+  apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
+   destruct H as (H₁, H₂).
+   apply Rplus_sqr_eq_0 in H₁.
+   apply Rsqr_eq_0 in H₂.
+   move H₁ at top; move H₂ at top; destruct H₁; subst x y z.
+   unfold mat_transp.
+   destruct m; simpl in *; simpl.
+   unfold mkrmat; f_equal; lra.
+
+   apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+
+   apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+   apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+
+ rewrite Rsqr_div; [ | easy ].
+ rewrite Rsqr_div; [ | easy ].
+ rewrite Rsqr_div; [ | easy ].
+ unfold Rdiv.
+ do 2 rewrite <- Rmult_plus_distr_r; subst r₁.
+ rewrite Rsqr_sqrt.
+  rewrite Rinv_r; [ apply Rmult_1_r | ].
+  intros H; apply Hrnz; clear Hrnz; rewrite H.
+  apply sqrt_0.
+
+  apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+  apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+Qed.
+
 Theorem matrix_all_fixpoints_ok : ∀ m p k,
   is_rotation_matrix m
   → p = rotation_fixpoint m k
@@ -1128,39 +1171,11 @@ remember (rotation_fixpoint m r) as p₂ eqn:Hp₂.
 assert (Hrm : is_rotation_matrix m).
  rewrite Hm; apply mat_of_path_is_rotation_matrix.
 
- generalize Hp₂; intros Hsr₂.
+ pose proof rotation_fixpoint_on_sphere_ray r m as Hsr₂.
+bbb.
  apply matrix_all_fixpoints_ok in Hsr₂; [ | easy ].
 
-Theorem rotation_fixpoint_on_sphere_ray : ∀ r m,
-  rotation_fixpoint m r ∈ sphere_ray r².
-Proof.
-intros.
-unfold rotation_fixpoint; simpl.
-remember (a₂₃ m - a₃₂ m)%R as x eqn:Hx.
-remember (a₃₁ m - a₁₃ m)%R as y eqn:Hy.
-remember (a₁₂ m - a₂₁ m)%R as z eqn:Hz.
-remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Rsqr_div.
-rewrite Rsqr_div.
-rewrite Rsqr_div.
-unfold Rdiv.
-do 2 rewrite <- Rmult_plus_distr_r.
-subst r₁.
-rewrite Rsqr_sqrt, Rinv_r.
 bbb.
-
-Check on_sphere_ray_after_rotation.
- eapply on_sphere_ray_after_rotation in Hsr₂.
-
-Theorem on_sphere_ray_after_rotation : ∀ p m r,
-  p ∈ sphere_ray r
-  → is_rotation_matrix m
-  → mat_vec_mul m p ∈ sphere_ray r.
-
-bbb.
-*)
 
 (*
  destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].

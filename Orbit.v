@@ -11,6 +11,8 @@ Require Import Reals Nsatz.
 
 Require Import Misc Words Normalize Reverse Matrix Pset.
 
+Notation "'√'" := sqrt.
+
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
@@ -78,7 +80,7 @@ Qed.
 
 Definition orbit_selector := choice_function same_orbit.
 
-Definition sphere_ray r := mkset (λ '(P x y z), (x² + y² + z² = r)%R).
+Definition sphere_ray r := mkset (λ '(P x y z), (x² + y² + z² = r²)%R).
 Definition sphere := mkset (λ '(P x y z), (x² + y² + z² <= 1)%R).
 
 Definition D :=
@@ -116,13 +118,17 @@ intros * His Hrm.
 destruct p as (x, y, z).
 remember (P x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : p ∈ sphere_ray r) by now subst p.
-pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
-unfold sphere in His.
-unfold sphere_ray in H.
-unfold sphere.
-subst p; simpl in *.
-now rewrite H, <- Hos.
+assert (Hos : p ∈ sphere_ray (√ r)).
+ subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
+ apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+ apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+
+ pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
+ unfold sphere in His.
+ unfold sphere_ray in H.
+ unfold sphere.
+ subst p; simpl in *.
+ now rewrite H, <- Hos.
 Qed.
 
 Theorem in_sphere_after_rotate : ∀ p e,
