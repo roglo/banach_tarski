@@ -11,7 +11,7 @@ Require Import Reals Psatz Nsatz.
 
 Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
-Require Import Countable QCountable RnCountable NotEmptyPath.
+Require Import Countable QCountable RnCountable (*NotEmptyPath*).
 
 Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
@@ -656,6 +656,7 @@ induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
 rewrite IHel, mat_vec_mul_assoc; reflexivity.
 Qed.
 
+(*
 Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
   norm_list el ≠ []
   → mat_of_path el ≠ mat_id.
@@ -668,6 +669,7 @@ rewrite rotate_vec_mul.
 fold (mat_of_path el); rewrite H.
 apply mat_vec_mul_id.
 Qed.
+*)
 
 Theorem mat_of_path_is_rotation_matrix : ∀ el,
  is_rotation_matrix (mat_of_path el).
@@ -1082,15 +1084,23 @@ Qed.
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
   is_rotation_matrix M
   → M ≠ mat_id
-  → V₁ ≠ P 0 0 0
-  → V₂ ≠ P 0 0 0
+  → vec_norm V₁ = vec_norm V₂
   → is_neg_point V₁ = is_neg_point V₂
   → mat_vec_mul M V₁ = V₁
   → mat_vec_mul M V₂ = V₂
   → V₁ = V₂.
 Proof.
-intros * Hm Hnid Hn Hb₁ Hb₂ Hp₁ Hp₂.
-bbb.
+intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
+Abort.
+
+(* warning: the set D is countable only for points *on* the sphere, i.e.
+   having the same distance to the origin! what are countable are rays,
+   actually *)
+
+(* then the specific tests of equality to P 0 0 0 are not required *)
+
+(* then matrix_of_non_empty_path_is_not_identity is perhaps not required!
+   that would eliminate NotEmptyPath.v *)
 
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
@@ -1106,27 +1116,28 @@ remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
 fold (mat_of_path el₁) in Hr.
 apply rotate_rev_path in Hs.
-destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
- move H₁ at top; subst p₁.
- exists (true, O, no).
- unfold fixpoint_of_bool_prod_nat.
- rewrite Hno, path_of_nat_inv.
- unfold path_of_nat.
- remember (mat_of_path []) as m eqn:Hm.
- unfold mat_of_path in Hm.
- simpl in Hm; subst m.
- remember (rotation_fixpoint mat_id 1) as p₂ eqn:Hp₂.
- unfold rotation_fixpoint in Hp₂.
- simpl in Hp₂.
- rewrite Rminus_0_r in Hp₂.
- unfold Rdiv in Hp₂; rewrite Rmult_0_l in Hp₂.
- rewrite Rmult_0_r in Hp₂.
- now subst p₂; rewrite is_neg_point_0.
+remember (mat_of_path el₁) as m eqn:Hm.
+remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
+assert (Hrm : is_rotation_matrix m).
+ rewrite Hm; apply mat_of_path_is_rotation_matrix.
 
- remember (mat_of_path el₁) as m eqn:Hm.
- remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
- assert (Hrm : is_rotation_matrix m).
-  rewrite Hm; apply mat_of_path_is_rotation_matrix.
+(*
+ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
+  move H₁ at top; subst p₁.
+  exists (true, O, no).
+  unfold fixpoint_of_bool_prod_nat.
+  rewrite Hno, path_of_nat_inv.
+  unfold path_of_nat.
+  remember (mat_of_path []) as m eqn:Hm.
+  unfold mat_of_path in Hm.
+  simpl in Hm; subst m.
+  remember (rotation_fixpoint mat_id 1) as p₂ eqn:Hp₂.
+  unfold rotation_fixpoint in Hp₂.
+  simpl in Hp₂.
+  rewrite Rminus_0_r in Hp₂.
+  unfold Rdiv in Hp₂; rewrite Rmult_0_l in Hp₂.
+  rewrite Rmult_0_r in Hp₂.
+  now subst p₂; rewrite is_neg_point_0.
 
   destruct (eq_point_dec p₂ (P 0 0 0)) as [H₂| H₂].
    unfold rotation_fixpoint in Hp₂.
@@ -1199,6 +1210,7 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
     apply matrix_of_non_empty_path_is_not_identity.
     intros H; apply Hnl.
     now apply norm_list_app_diag_is_nil.
+*)
 
    exists (b, nf, no).
    unfold fixpoint_of_bool_prod_nat.
@@ -1211,20 +1223,22 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
    move Hb before Hb₁.
    symmetry in Hb, Hb₁.
    symmetry; rewrite <- Hs; f_equal.
-   apply matrix_all_fixpoints_ok in Hp₂.
-    move Hp₂ at bottom; move Hr before Hp₂.
-    rewrite Hr.
-    remember (is_neg_point p₁) as b₂ eqn:Hb₂.
-    symmetry in Hb₂.
-    move Hb₂ before Hb₁.
-    destruct b₁, b.
-     destruct b₂; [ | easy ].
-     rewrite <- Hb₁ in Hb₂.
+   apply matrix_all_fixpoints_ok in Hp₂; [ | easy ].
+   move Hp₂ at bottom; move Hr before Hp₂.
+   rewrite Hr.
+   remember (is_neg_point p₁) as b₂ eqn:Hb₂.
+   symmetry in Hb₂.
+   move Hb₂ before Hb₁.
+   destruct b₁, b.
+    destruct b₂; [ | easy ].
+    rewrite <- Hb₁ in Hb₂.
+bbb.
      eapply fixpoint_unicity; try eassumption.
-     intros H.
-     rewrite Hm in H.
-     unfold mat_of_path in H.
-     clear -Hnl H.
+bbb.
+      intros H.
+      rewrite Hm in H.
+      unfold mat_of_path in H.
+      clear -Hnl H.
 (* seems subtile... *)
 bbb.
 
