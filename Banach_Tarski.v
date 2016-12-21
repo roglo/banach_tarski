@@ -1171,6 +1171,9 @@ remember (rotation_fixpoint m r) as p₂ eqn:Hp₂.
 assert (Hrm : is_rotation_matrix m).
  rewrite Hm; apply mat_of_path_is_rotation_matrix.
 
+ destruct (rmat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
+bbb.
+
  pose proof rotation_fixpoint_on_sphere_ray r m as Hsr₂.
 bbb.
 (*

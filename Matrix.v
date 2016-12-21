@@ -128,6 +128,30 @@ destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
 now intros H; injection H; intros.
 Qed.
 
+Theorem rmat_eq_dec : ∀ m₁ m₂ : matrix ℝ, { m₁ = m₂ } + { m₁ ≠ m₂ }.
+Proof.
+intros.
+destruct (Req_dec (a₁₁ m₁) (a₁₁ m₂)) as [H₁₁| H₁₁].
+ destruct (Req_dec (a₁₂ m₁) (a₁₂ m₂)) as [H₁₂| H₁₂].
+  destruct (Req_dec (a₁₃ m₁) (a₁₃ m₂)) as [H₁₃| H₁₃].
+   destruct (Req_dec (a₂₁ m₁) (a₂₁ m₂)) as [H₂₁| H₂₁].
+    destruct (Req_dec (a₂₂ m₁) (a₂₂ m₂)) as [H₂₂| H₂₂].
+     destruct (Req_dec (a₂₃ m₁) (a₂₃ m₂)) as [H₂₃| H₂₃].
+      destruct (Req_dec (a₃₁ m₁) (a₃₁ m₂)) as [H₃₁| H₃₁].
+       destruct (Req_dec (a₃₂ m₁) (a₃₂ m₂)) as [H₃₂| H₃₂].
+        destruct (Req_dec (a₃₃ m₁) (a₃₃ m₂)) as [H₃₃| H₃₃].
+         now left; destruct m₁, m₂; simpl in *; subst.
+         now right; intros H; subst m₁; apply H₃₃.
+        now right; intros H; subst m₁; apply H₃₂.
+       now right; intros H; subst m₁; apply H₃₁.
+      now right; intros H; subst m₁; apply H₂₃.
+     now right; intros H; subst m₁; apply H₂₂.
+    now right; intros H; subst m₁; apply H₂₁.
+   now right; intros H; subst m₁; apply H₁₃.
+  now right; intros H; subst m₁; apply H₁₂.
+ now right; intros H; subst m₁; apply H₁₁.
+Qed.
+
 Theorem mat_mul_id_l : ∀ m, mat_mul mat_id m = m.
 Proof.
 intros m.
