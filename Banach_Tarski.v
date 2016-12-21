@@ -1197,7 +1197,7 @@ assert (Hrm : is_rotation_matrix m).
    rewrite <- Hb₁ in Hb₂.
 bbb.
    eapply fixpoint_unicity; try eassumption.
-bbb.
+
       intros H.
       rewrite Hm in H.
       unfold mat_of_path in H.
