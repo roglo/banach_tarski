@@ -522,8 +522,6 @@ Definition neg_point '(P x y z) := P (-x) (-y) (-z).
 
 Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
 
-Definition vec_norm '(P x y z) := √ (x² + y² + z²).
-
 Definition rotation_unit_eigenvec (m : matrix ℝ) :=
   let x := (a₂₃ m - a₃₂ m)%R in
   let y := (a₃₁ m - a₁₃ m)%R in
@@ -557,33 +555,21 @@ do 3 rewrite Rsqr_mult.
 do 2 rewrite <- Rmult_plus_distr_l.
 assert (Hrnz : (r₁ ≠ 0)%R).
  intros H; apply Hm; clear Hm; subst r₁.
- apply sqrt_eq_0 in H.
-  apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
-   destruct H as (H₁, H₂).
-   apply Rplus_sqr_eq_0 in H₁.
-   apply Rsqr_eq_0 in H₂.
-   move H₁ at top; move H₂ at top; destruct H₁; subst x y z.
-   unfold mat_transp.
-   destruct m; simpl in *; simpl.
-   unfold mkrmat; f_equal; lra.
-
-   apply Rplus_le_le_0_compat; apply Rle_0_sqr.
-
-   apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
-   apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+ apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in H.
+ unfold mat_transp.
+ destruct m; simpl in *; simpl.
+ unfold mkrmat; f_equal; lra.
 
  rewrite Rsqr_div; [ | easy ].
  rewrite Rsqr_div; [ | easy ].
  rewrite Rsqr_div; [ | easy ].
  unfold Rdiv.
  do 2 rewrite <- Rmult_plus_distr_r; subst r₁.
- rewrite Rsqr_sqrt.
-  rewrite Rinv_r; [ apply Rmult_1_r | ].
-  intros H; apply Hrnz; clear Hrnz; rewrite H.
-  apply sqrt_0.
-
-  apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
-  apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+ rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+ rewrite Rinv_r; [ apply Rmult_1_r | ].
+ intros H; apply Hrnz; clear Hrnz; rewrite H.
+ apply sqrt_0.
 Qed.
 
 Theorem matrix_all_fixpoints_ok : ∀ m p k,
@@ -1132,7 +1118,23 @@ Theorem fixpoint_unicity : ∀ M V₁ V₂,
   → V₁ = V₂.
 Proof.
 intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
-bbb.
+destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
+ rewrite Hv₁ in Hvn.
+ unfold vec_norm in Hvn at 1.
+ rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
+ rewrite sqrt_0 in Hvn.
+ symmetry in Hvn.
+ apply vec_norm_zero in Hvn.
+ now rewrite Hvn, Hv₁.
+
+ destruct (eq_point_dec V₂ (P 0 0 0)) as [Hv₂| Hv₂].
+  rewrite Hv₂ in Hvn.
+  unfold vec_norm in Hvn at 2.
+  rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
+  rewrite sqrt_0 in Hvn.
+  now apply vec_norm_zero in Hvn.
+
+  bbb.
 
 Theorem D_set_is_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,

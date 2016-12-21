@@ -12,6 +12,7 @@ Require Import Reals Nsatz.
 Require Import Misc Words Normalize Reverse Matrix Pset.
 
 Notation "'√'" := sqrt.
+Notation "x '≤' y" := (Rle x y) : R_scope.
 
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
@@ -82,6 +83,7 @@ Definition orbit_selector := choice_function same_orbit.
 
 Definition sphere_ray r := mkset (λ '(P x y z), (x² + y² + z² = r²)%R).
 Definition sphere := mkset (λ '(P x y z), (x² + y² + z² <= 1)%R).
+Definition vec_norm '(P x y z) := √ (x² + y² + z²).
 
 Definition D :=
   mkset
@@ -109,6 +111,37 @@ injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 nsatz.
 Qed.
 
+Theorem nonneg_sqr_vec_norm : ∀ x y z, (0 ≤ x² + y² + z²)%R.
+Proof.
+intros.
+apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+Qed.
+
+Theorem sqr_vec_norm_eq_0 : ∀ x y z,
+  (x² + y² + z²)%R = 0%R
+  → x = 0%R ∧ y = 0%R ∧ z = 0%R.
+Proof.
+intros * H.
+apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
+ destruct H as (H₁, H₂).
+ apply Rplus_sqr_eq_0 in H₁.
+ apply Rsqr_eq_0 in H₂.
+ move H₁ at top; move H₂ at top; destruct H₁; subst x y z.
+ now split; [ | split ].
+
+ apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+Qed.
+
+Theorem vec_norm_zero : ∀ V, vec_norm V = 0%R → V = P 0 0 0.
+Proof.
+intros * HV.
+destruct V as (x, y, z); simpl in HV.
+apply sqrt_eq_0 in HV; [ | apply nonneg_sqr_vec_norm ].
+apply sqr_vec_norm_eq_0 in HV.
+now destruct HV as (Hx & Hy & Hz); subst.
+Qed.
+
 Theorem in_sphere_after_rotation : ∀ p m,
   p ∈ sphere
   → is_rotation_matrix m
@@ -120,8 +153,7 @@ remember (P x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
 assert (Hos : p ∈ sphere_ray (√ r)).
  subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
- apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
- apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+ apply nonneg_sqr_vec_norm.
 
  pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
  unfold sphere in His.
