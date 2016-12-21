@@ -1108,6 +1108,28 @@ apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
 now apply rev_path_eq_path.
 Qed.
 
+Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
+  (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R.
+Definition vec_cross_mul '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
+  P (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
+
+Notation "∥ V ∥" := (vec_norm V) (at level 0, V at level 0, format "∥ V ∥").
+Notation "V₁ • V₂" := (vec_dot_mul V₁ V₂) (at level 40, left associativity).
+Notation "V₁ × V₂" := (vec_cross_mul V₁ V₂) (at level 40, left associativity).
+
+Theorem mat_vec_mul_cross_distr : ∀ M U V,
+  is_rotation_matrix M
+  → mat_vec_mul M (U × V) = mat_vec_mul M U × mat_vec_mul M V.
+Proof.
+intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
+unfold mat_mul, mat_id in Ht; simpl in Ht.
+injection Ht; clear Ht; intros.
+unfold mat_det in Hd.
+f_equal; nsatz.
+Qed.
+
+bbb.
+
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
   is_rotation_matrix M
   → M ≠ mat_id
@@ -1135,15 +1157,6 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
   now apply vec_norm_zero in Hvn.
 
   destruct (eq_point_dec V₁ V₂) as [Hvv| Hvv]; [ easy | exfalso ].
-
-Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
-  (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R.
-Definition vec_cross_mul '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
-  P (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
-Notation "∥ V ∥" := (vec_norm V) (at level 0, V at level 0, format "∥ V ∥").
-Notation "V₁ • V₂" := (vec_dot_mul V₁ V₂) (at level 40, left associativity).
-Notation "V₁ × V₂" := (vec_cross_mul V₁ V₂) (at level 40, left associativity).
-
   assert
     (∃ V'₂,
      mat_vec_mul M V'₂ = V'₂ ∧ ∥ V'₂ ∥ = ∥ V₁ ∥ ∧
