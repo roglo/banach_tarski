@@ -1108,6 +1108,8 @@ apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
 now apply rev_path_eq_path.
 Qed.
 
+Definition vec_add '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
+  P (u₁ + v₁) (u₂ + v₂) (u₃ + v₃).
 Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
   (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R.
 Definition vec_cross_mul '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
@@ -1163,6 +1165,16 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
     (∃ V'₂,
      mat_vec_mul M V'₂ = V'₂ ∧ ∥ V'₂ ∥ = ∥ V₁ ∥ ∧
      vec_dot_mul V₁ V'₂ = 0)%R.
+   remember (√ (V₁ • V₁ * (V₁ • V₁ + V₂ • V₂))) as r eqn:Hr.
+   remember (- (V₁ • V₂) / r)%R as a eqn:Ha.
+   remember (V₁ • V₁ / r)%R as b eqn:Hb.
+   exists (vec_add (mul_const_vec a V₁) (mul_const_vec b V₂)).
+   split.
+    unfold vec_add; simpl.
+    unfold mul_const_vec; simpl.
+    destruct V₁ as (x₁, y₁, z₁).
+    destruct V₂ as (x₂, y₂, z₂); simpl.
+    f_equal.
 bbb.
 
 Theorem D_set_is_countable : ∀ r,
