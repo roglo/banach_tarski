@@ -1173,10 +1173,6 @@ assert (Hrm : is_rotation_matrix m).
 
  pose proof rotation_fixpoint_on_sphere_ray r m as Hsr₂.
 bbb.
- apply matrix_all_fixpoints_ok in Hsr₂; [ | easy ].
-
-bbb.
-
 (*
  destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
   move H₁ at top; subst p₁.
@@ -1202,7 +1198,7 @@ bbb.
    remember (a₂₃ m - a₃₂ m)%R as x eqn:Hx.
    remember (a₃₁ m - a₁₃ m)%R as y eqn:Hy.
    remember (a₁₂ m - a₂₁ m)%R as z eqn:Hz.
-   remember (√ (x² + y² + z²)) as r eqn:Hr₁.
+   remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
    subst p₂; injection H₂; clear H₂; intros Hz₁ Hy₁ Hx₁.
    move Hx₁ after Hy₁; move Hz₁ after Hy₁.
    unfold Rdiv in Hx₁, Hy₁, Hz₁.
