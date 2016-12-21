@@ -1079,15 +1079,15 @@ apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
 now apply rev_path_eq_path.
 Qed.
 
-Theorem fixpoint_unicity : ∀ m p₁ p₂,
-  is_rotation_matrix m
-  → m ≠ mat_id
-  → p₁ ≠ P 0 0 0
-  → p₂ ≠ P 0 0 0
-  → is_neg_point p₁ = is_neg_point p₂
-  → mat_vec_mul m p₁ = p₁
-  → mat_vec_mul m p₂ = p₂
-  → p₁ = p₂.
+Theorem fixpoint_unicity : ∀ M V₁ V₂,
+  is_rotation_matrix M
+  → M ≠ mat_id
+  → V₁ ≠ P 0 0 0
+  → V₂ ≠ P 0 0 0
+  → is_neg_point V₁ = is_neg_point V₂
+  → mat_vec_mul M V₁ = V₁
+  → mat_vec_mul M V₂ = V₂
+  → V₁ = V₂.
 Proof.
 intros * Hm Hnid Hn Hb₁ Hb₂ Hp₁ Hp₂.
 bbb.
