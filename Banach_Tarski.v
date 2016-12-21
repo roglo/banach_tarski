@@ -1091,7 +1091,7 @@ Theorem fixpoint_unicity : ∀ M V₁ V₂,
   → V₁ = V₂.
 Proof.
 intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
-Abort.
+bbb.
 
 (* warning: the set D is countable only for points *on* the sphere, i.e.
    having the same distance to the origin! what are countable are rays,
