@@ -537,11 +537,11 @@ Definition rotation_fixpoint (m : matrix ℝ) k :=
 Definition mat_of_path el :=
   List.fold_right mat_mul mat_id (map mat_of_elem el).
 
-Definition fixpoint_of_path el :=
-  rotation_fixpoint (mat_of_path el) 1.
+Definition fixpoint_of_path r el :=
+  rotation_fixpoint (mat_of_path el) r.
 
-Definition fixpoint_of_nat n :=
-  fixpoint_of_path (path_of_nat n).
+Definition fixpoint_of_nat r n :=
+  fixpoint_of_path r (path_of_nat n).
 
 Theorem matrix_all_fixpoints_ok : ∀ m p k,
   is_rotation_matrix m
@@ -683,10 +683,10 @@ induction el as [| e el].
  apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
 Qed.
 
-Theorem D_of_nat_prop : ∀ n nf no p p₁ el el₁,
+Theorem D_of_nat_prop : ∀ r n nf no p p₁ el el₁,
   (nf, no) = prod_nat_of_nat n
   → el₁ = path_of_nat nf
-  → p₁ = rotation_fixpoint (mat_of_path el₁) 1
+  → p₁ = rotation_fixpoint (mat_of_path el₁) r
   → el = path_of_nat no
   → p = fold_right rotate p₁ el
   → same_orbit p p₁ ∧ fold_right rotate p₁ el₁ = p₁.
@@ -703,20 +703,20 @@ split.
   apply mat_of_path_is_rotation_matrix.
 Qed.
 
-Definition D_of_prod_nat '(nf, no) :=
-  let p₁ := fixpoint_of_nat nf in
+Definition D_of_prod_nat r '(nf, no) :=
+  let p₁ := fixpoint_of_nat r nf in
   let el := path_of_nat no in
   fold_right rotate p₁ el.
 
-Definition D_of_nat n :=
-  D_of_prod_nat (prod_nat_of_nat n).
+Definition D_of_nat r n :=
+  D_of_prod_nat r (prod_nat_of_nat n).
 
-Theorem D_of_nat_nat_in_D : ∀ nf no,
+Theorem D_of_nat_nat_in_D : ∀ r nf no,
   norm_list (path_of_nat nf) ≠ []
-  → D_of_prod_nat (nf, no) ∈ D.
+  → D_of_prod_nat r (nf, no) ∈ D.
 Proof.
 intros * Hnl; simpl.
-remember (fixpoint_of_nat nf) as p₁ eqn:Hp₁.
+remember (fixpoint_of_nat r nf) as p₁ eqn:Hp₁.
 remember (path_of_nat no) as el eqn:Hel.
 remember (fold_right rotate p₁ el) as p eqn:Hp.
 remember (path_of_nat nf) as el₁ eqn:Hel₁.
@@ -731,19 +731,19 @@ assert (Hnfo : (nf, no) = prod_nat_of_nat n).
  now eapply D_of_nat_prop in Hnfo; try eassumption.
 Defined.
 
-Theorem D_of_prod_nat_in_D : ∀ nn,
+Theorem D_of_prod_nat_in_D : ∀ r nn,
   norm_list (path_of_nat (fst nn)) ≠ []
-  → D_of_prod_nat nn ∈ D.
+  → D_of_prod_nat r nn ∈ D.
 Proof.
-intros (nf, no) Hnl.
+intros r (nf, no) Hnl.
 now apply D_of_nat_nat_in_D.
 Defined.
 
-Theorem D_of_nat_in_D : ∀ n, 
+Theorem D_of_nat_in_D : ∀ r n, 
   norm_list (path_of_nat (Nat.sqrt n - (n - Nat.sqrt n ^ 2))) ≠ []
-  → D_of_nat n ∈ D.
+  → D_of_nat r n ∈ D.
 Proof.
-intros n Hnl.
+intros * Hnl.
 now apply D_of_nat_nat_in_D.
 Defined.
 
@@ -894,8 +894,8 @@ exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
 Qed.
 
-Definition fixpoint_of_bool_prod_nat '(b, nf, no) :=
-  let p := rotation_fixpoint (mat_of_path (path_of_nat nf)) 1 in
+Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
+  let p := rotation_fixpoint (mat_of_path (path_of_nat nf)) r in
   let p₁ :=
     if is_neg_point p then if (b : bool) then p else neg_point p
     else if b then neg_point p else p
@@ -1091,7 +1091,7 @@ Theorem fixpoint_unicity : ∀ M V₁ V₂,
   → V₁ = V₂.
 Proof.
 intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
-bbb.
+Abort. (* à voir *)
 
 (* warning: the set D is countable only for points *on* the sphere, i.e.
    having the same distance to the origin! what are countable are rays,
@@ -1102,24 +1102,65 @@ bbb.
 (* then matrix_of_non_empty_path_is_not_identity is perhaps not required!
    that would eliminate NotEmptyPath.v *)
 
-Theorem D_set_is_countable :
-  ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
+Theorem D_set_is_countable : ∀ r,
+  ∃ f : ℕ → point, ∀ p : point,
+  p ∈ D ∩ sphere_ray r → ∃ n : ℕ, f n = p.
 Proof.
+intros r.
 apply surj_prod_nat_surj_nat.
 apply surj_bool_prod_nat_surj_prod_nat.
-exists fixpoint_of_bool_prod_nat.
-intros p Hp.
+exists (fixpoint_of_bool_prod_nat r).
+intros p (Hp & Hsr).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 rewrite rotate_vec_mul in Hr.
 remember (if is_neg_point p₁ then true else false) as b eqn:Hb.
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
 fold (mat_of_path el₁) in Hr.
+pose proof mat_of_path_is_rotation_matrix el as H.
+generalize Hsr; intros Hsr₁.
+eapply on_sphere_ray_after_rotation in Hsr₁; [ clear H | apply H ].
+unfold mat_of_path in Hsr₁.
+rewrite <- rotate_vec_mul, Hs in Hsr₁.
 apply rotate_rev_path in Hs.
 remember (mat_of_path el₁) as m eqn:Hm.
-remember (rotation_fixpoint m 1) as p₂ eqn:Hp₂.
+remember (rotation_fixpoint m r) as p₂ eqn:Hp₂.
 assert (Hrm : is_rotation_matrix m).
  rewrite Hm; apply mat_of_path_is_rotation_matrix.
+
+ generalize Hp₂; intros Hsr₂.
+ apply matrix_all_fixpoints_ok in Hsr₂; [ | easy ].
+
+Theorem rotation_fixpoint_on_sphere_ray : ∀ r m,
+  rotation_fixpoint m r ∈ sphere_ray r².
+Proof.
+intros.
+unfold rotation_fixpoint; simpl.
+remember (a₂₃ m - a₃₂ m)%R as x eqn:Hx.
+remember (a₃₁ m - a₁₃ m)%R as y eqn:Hy.
+remember (a₁₂ m - a₂₁ m)%R as z eqn:Hz.
+remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+rewrite Rsqr_div.
+rewrite Rsqr_div.
+rewrite Rsqr_div.
+unfold Rdiv.
+do 2 rewrite <- Rmult_plus_distr_r.
+subst r₁.
+rewrite Rsqr_sqrt, Rinv_r.
+bbb.
+
+Check on_sphere_ray_after_rotation.
+ eapply on_sphere_ray_after_rotation in Hsr₂.
+
+Theorem on_sphere_ray_after_rotation : ∀ p m r,
+  p ∈ sphere_ray r
+  → is_rotation_matrix m
+  → mat_vec_mul m p ∈ sphere_ray r.
+
+bbb.
+*)
 
 (*
  destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
