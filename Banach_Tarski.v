@@ -1079,6 +1079,19 @@ apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
 now apply rev_path_eq_path.
 Qed.
 
+Theorem fixpoint_unicity : ∀ m p₁ p₂,
+  is_rotation_matrix m
+  → m ≠ mat_id
+  → p₁ ≠ P 0 0 0
+  → p₂ ≠ P 0 0 0
+  → is_neg_point p₁ = is_neg_point p₂
+  → mat_vec_mul m p₁ = p₁
+  → mat_vec_mul m p₂ = p₂
+  → p₁ = p₂.
+Proof.
+intros * Hm Hnid Hn Hb₁ Hb₂ Hp₁ Hp₂.
+bbb.
+
 Theorem D_set_is_countable :
   ∃ f : ℕ → point, ∀ p : point, p ∈ D → ∃ n : ℕ, f n = p.
 Proof.
@@ -1206,19 +1219,6 @@ destruct (eq_point_dec p₁ (P 0 0 0)) as [H₁| H₁].
     move Hb₂ before Hb₁.
     destruct b₁, b.
      destruct b₂; [ | easy ].
-Theorem fixpoint_unicity : ∀ m p₁ p₂,
-  is_rotation_matrix m
-  → m ≠ mat_id
-  → p₁ ≠ P 0 0 0
-  → p₂ ≠ P 0 0 0
-  → is_neg_point p₁ = is_neg_point p₂
-  → mat_vec_mul m p₁ = p₁
-  → mat_vec_mul m p₂ = p₂
-  → p₁ = p₂.
-Proof.
-intros * Hm Hnid Hn Hb₁ Hb₂ Hp₁ Hp₂.
-bbb.
-     (* return to theorem *)
      rewrite <- Hb₁ in Hb₂.
      eapply fixpoint_unicity; try eassumption.
      intros H.
