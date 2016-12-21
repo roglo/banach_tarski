@@ -1123,12 +1123,14 @@ Theorem mat_vec_mul_cross_distr : ∀ M U V,
 Proof.
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
-injection Ht; clear Ht; intros.
+injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 unfold mat_det in Hd.
-f_equal; nsatz.
+destruct M; simpl in *.
+f_equal.
+ clear H₁ H₂ H₃ H₄ H₅ H₆; nsatz.
+ clear H₁ H₂ H₃ H₇ H₈ H₉; nsatz.
+ clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
 Qed.
-
-bbb.
 
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
   is_rotation_matrix M
