@@ -66,6 +66,7 @@ Definition mul_const_mat k (M : matrix ℝ) :=
 
 Delimit Scope vec_scope with vec.
 Notation "0" := (P 0 0 0) : vec_scope.
+Notation "k ⁎ V" := (mul_const_vec k V) (at level 40) : vec_scope.
 Notation "M * V" := (mat_vec_mul M V) : vec_scope.
 Notation "U + V" := (vec_add U V) : vec_scope.
 Notation "U • V" := (vec_dot_mul U V) (at level 40, left associativity).
