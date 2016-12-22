@@ -83,8 +83,8 @@ Definition orbit_selector := choice_function same_orbit.
 
 Definition sphere_ray r := mkset (λ '(P x y z), (x² + y² + z² = r²)%R).
 Definition sphere := mkset (λ '(P x y z), (x² + y² + z² <= 1)%R).
-Definition vec_norm '(P x y z) := √ (x² + y² + z²).
 
+Definition vec_norm '(P x y z) := √ (x² + y² + z²).
 Notation "∥ V ∥" := (vec_norm V) (at level 0, V at level 0, format "∥ V ∥").
 
 Definition D :=
