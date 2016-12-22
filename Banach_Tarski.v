@@ -1353,6 +1353,20 @@ destruct (Rlt_dec x 0) as [Hx| Hx].
   destruct (Rgt_dec (-x) 0) as [Hx'| Hx']; [ easy | ].
   apply Ropp_lt_contravar in Hx.
   now rewrite Ropp_0 in Hx.
+
+ apply Rnot_lt_le in Hx.
+ destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
+  apply Ropp_lt_contravar in Hx'.
+  rewrite Ropp_0, Ropp_involutive in Hx'.
+  now destruct (Rgt_dec x 0).
+
+  apply Rnot_lt_le in Hx'.
+  apply Ropp_le_contravar in Hx'.
+  rewrite Ropp_0, Ropp_involutive in Hx'.
+  apply Rle_antisym in Hx'; [ subst x | easy ].
+  rewrite Ropp_0; clear Hx.
+  destruct (Rgt_dec 0 0) as [Hx| Hx]; [ now apply Rgt_irrefl in Hx | ].
+  clear Hx.
 bbb.
      rewrite is_neg_point_neg_point in Hn.
      now symmetry in Hn; apply no_fixpoint_negb in Hn.
