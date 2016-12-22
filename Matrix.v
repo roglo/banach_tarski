@@ -557,3 +557,11 @@ split; [ easy | ].
 rewrite mat_det_mul, Hd1, Hd2.
 apply Rmult_1_r.
 Qed.
+About mul_const_vec.
+
+Theorem mul_const_vec_assoc : ∀ a b V,
+  mul_const_vec a (mul_const_vec b V) = mul_const_vec (a * b) V.
+Proof.
+intros a b (x, y, z); simpl.
+now do 3 rewrite Rmult_assoc.
+Qed.

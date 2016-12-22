@@ -1313,6 +1313,17 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
     simpl in Hab.
     injection Hab; clear Hab; intros Hz Hy Hx.
     move Hx after Hy; move Hz after Hy.
+    apply Rplus_opp_r_uniq in Hx.
+    apply Rplus_opp_r_uniq in Hy.
+    apply Rplus_opp_r_uniq in Hz.
+    rewrite Hx, Hy, Hz in HbV₂.
+    replace (- ax₁)%R with (-1 * ax₁)%R in HbV₂ by lra.
+    replace (- ay₁)%R with (-1 * ay₁)%R in HbV₂ by lra.
+    replace (- az₁)%R with (-1 * az₁)%R in HbV₂ by lra.
+    fold (mul_const_vec (-1) (P ax₁ ay₁ az₁)) in HbV₂.
+    rewrite <- HaV₁ in HbV₂.
+    rewrite mul_const_vec_assoc in HbV₂.
+    replace (-1 * a)%R with (-a)%R in HbV₂ by lra.
 
 bbb.
 
