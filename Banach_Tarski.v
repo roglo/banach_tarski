@@ -518,15 +518,6 @@ Definition is_neg_point '(P x y z) :=
   else if Rgt_dec z 0 then false
   else true.
 
-Definition neg_point '(P x y z) := P (-x) (-y) (-z).
-
-Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
-Definition mul_const_mat k (M : matrix ℝ) :=
-  mkrmat
-    (k * a₁₁ M) (k * a₁₂ M) (k * a₁₃ M)
-    (k * a₂₁ M) (k * a₂₂ M) (k * a₂₃ M)
-    (k * a₃₁ M) (k * a₃₂ M) (k * a₃₃ M).
-
 Definition rotation_unit_eigenvec (m : matrix ℝ) :=
   let x := (a₂₃ m - a₃₂ m)%R in
   let y := (a₃₁ m - a₁₃ m)%R in
@@ -1113,16 +1104,6 @@ apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
 now apply rev_path_eq_path.
 Qed.
 
-Definition vec_add '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
-  P (u₁ + v₁) (u₂ + v₂) (u₃ + v₃).
-Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
-  (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R.
-Definition vec_cross_mul '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
-  P (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
-
-Notation "V₁ • V₂" := (vec_dot_mul V₁ V₂) (at level 40, left associativity).
-Notation "V₁ × V₂" := (vec_cross_mul V₁ V₂) (at level 40, left associativity).
-
 Theorem mat_vec_mul_cross_distr : ∀ M U V,
   is_rotation_matrix M
   → mat_vec_mul M (U × V) = mat_vec_mul M U × mat_vec_mul M V.
@@ -1169,15 +1150,37 @@ rewrite mat_vec_mul_const_mat.
 now rewrite HV.
 Qed.
 
-Theorem vec_norm_eq_0 : ∀ U, ∥U∥ = 0%R ↔ U = 0%vec.
+Theorem vec_norm_eq_0 : ∀ V, ∥V∥ = 0%R ↔ V = 0%vec.
 Proof.
-bbb.
+intros.
+split; intros HV.
+ destruct V as (v₁, v₂, v₃); simpl in HV.
+ apply sqrt_eq_0 in HV; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in HV.
+ now destruct HV as (H₁ & H₂ & H₃); subst.
+
+ destruct V as (v₁, v₂, v₃); simpl.
+ injection HV; clear HV; intros; subst.
+ rewrite Rsqr_0, Rplus_0_r, Rplus_0_r.
+ apply sqrt_0.
+Qed.
 
 Theorem vec_cross_mul_eq_0 : ∀ U V,
-  U × V = P 0 0 0 ↔
-  ∃ a b, vec_add (mul_const_vec a U) (mul_const_vec b V) = P 0 0 0.
+  U × V = 0%vec
+  → ∃ a b, vec_add (mul_const_vec a U) (mul_const_vec b V) = 0%vec.
 Proof.
-bbb.
+intros U V HUV.
+destruct U as (u₁, u₂, u₃).
+destruct V as (v₁, v₂, v₃).
+simpl in HUV; simpl.
+injection HUV; clear HUV; intros H₃ H₂ H₁.
+move H₁ after H₂; move H₃ after H₂.
+apply Rminus_diag_uniq in H₁.
+apply Rminus_diag_uniq in H₂.
+apply Rminus_diag_uniq in H₃.
+exists v₂, (- u₂)%R.
+f_equal; lra.
+Qed.
 
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
   is_rotation_matrix M
@@ -1214,7 +1217,7 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
 
    assert (HVV : ∥(V₁ × V₂)∥ ≠ 0%R).
     intros H; apply vec_norm_eq_0 in H.
-    apply vec_cross_mul_eq_0 in H.
+    specialize (vec_cross_mul_eq_0 _ _ H) as (a & b & Hab).
 bbb.
 
 bbb.

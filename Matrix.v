@@ -43,14 +43,32 @@ Definition mkrmat := @mkmat ℝ.
 
 Inductive point := P : ℝ → ℝ → ℝ → point.
 
+Definition neg_point '(P x y z) := P (-x) (-y) (-z).
+
 Definition mat_vec_mul mat '(P x y z) :=
   P (a₁₁ mat * x + a₁₂ mat * y + a₁₃ mat * z)
     (a₂₁ mat * x + a₂₂ mat * y + a₂₃ mat * z)
     (a₃₁ mat * x + a₃₂ mat * y + a₃₃ mat * z).
 
+Definition vec_add '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
+  P (u₁ + v₁) (u₂ + v₂) (u₃ + v₃).
+Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
+  (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R.
+Definition vec_cross_mul '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
+  P (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
+Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
+Definition mul_const_mat k (M : matrix ℝ) :=
+  mkrmat
+    (k * a₁₁ M) (k * a₁₂ M) (k * a₁₃ M)
+    (k * a₂₁ M) (k * a₂₂ M) (k * a₂₃ M)
+    (k * a₃₁ M) (k * a₃₂ M) (k * a₃₃ M).
+
 Delimit Scope vec_scope with vec.
 Notation "0" := (P 0 0 0) : vec_scope.
 Notation "M * V" := (mat_vec_mul M V) : vec_scope.
+Notation "U + V" := (vec_add U V) : vec_scope.
+Notation "U • V" := (vec_dot_mul U V) (at level 40, left associativity).
+Notation "U × V" := (vec_cross_mul U V) (at level 40, left associativity).
 
 (* https://en.wikipedia.org/wiki/Rotation_matrix
    #Rotation_matrix_from_axis_and_angle *)
