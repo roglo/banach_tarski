@@ -10,7 +10,6 @@ Require Import Reals Psatz.
 
 Require Import Words Normalize Reverse MiscReals.
 
-Inductive point := P : ℝ → ℝ → ℝ → point.
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
     a₂₁ : A; a₂₂ : A; a₂₃ : A;
@@ -41,6 +40,8 @@ Definition mt i j :=
 Arguments mt i%nat j%nat [A] m.
 
 Definition mkrmat := @mkmat ℝ.
+
+Inductive point := P : ℝ → ℝ → ℝ → point.
 
 Definition mat_vec_mul mat '(P x y z) :=
   P (a₁₁ mat * x + a₁₂ mat * y + a₁₃ mat * z)
