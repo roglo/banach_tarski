@@ -1343,6 +1343,16 @@ Theorem is_neg_point_neg_point : ∀ V,
   is_neg_point (neg_point V) = negb (is_neg_point V).
 Proof.
 intros (x, y, z); simpl.
+destruct (Rlt_dec x 0) as [Hx| Hx].
+ destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
+  apply Ropp_lt_contravar in Hx'.
+  rewrite Ropp_0, Ropp_involutive in Hx'.
+  now apply Rlt_le, Rle_not_lt in Hx'.
+
+  clear Hx'.
+  destruct (Rgt_dec (-x) 0) as [Hx'| Hx']; [ easy | ].
+  apply Ropp_lt_contravar in Hx.
+  now rewrite Ropp_0 in Hx.
 bbb.
      rewrite is_neg_point_neg_point in Hn.
      now symmetry in Hn; apply no_fixpoint_negb in Hn.
