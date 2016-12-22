@@ -1203,6 +1203,11 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
    now rewrite Hp₁, Hp₂.
 
    assert (HVV : ∥(V₁ × V₂)∥ ≠ 0%R).
+bbb.
+   unfold vec_cross_mul.
+   destruct V₁ as (x₁, y₁, z₁).
+   destruct V₂ as (x₂, y₂, z₂).
+   simpl.
 
 bbb.
 
@@ -1221,7 +1226,6 @@ bbb.
 
       rewrite Rmult_1_r.
       rewrite sqrt_Rsqr; [ easy | apply vec_norm_nonneg ].
-
 
       destruct V₁ as (x₁, y₁, z₁).
       destruct V₂ as (x₂, y₂, z₂).
