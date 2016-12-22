@@ -521,6 +521,11 @@ Definition is_neg_point '(P x y z) :=
 Definition neg_point '(P x y z) := P (-x) (-y) (-z).
 
 Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
+Definition mul_const_mat k (M : matrix ℝ) :=
+  mkrmat
+    (k * a₁₁ M) (k * a₁₂ M) (k * a₁₃ M)
+    (k * a₂₁ M) (k * a₂₂ M) (k * a₂₃ M)
+    (k * a₃₁ M) (k * a₃₂ M) (k * a₃₃ M).
 
 Definition rotation_unit_eigenvec (m : matrix ℝ) :=
   let x := (a₂₃ m - a₃₂ m)%R in
@@ -1115,7 +1120,6 @@ Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
 Definition vec_cross_mul '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
   P (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
 
-Notation "∥ V ∥" := (vec_norm V) (at level 0, V at level 0, format "∥ V ∥").
 Notation "V₁ • V₂" := (vec_dot_mul V₁ V₂) (at level 40, left associativity).
 Notation "V₁ × V₂" := (vec_cross_mul V₁ V₂) (at level 40, left associativity).
 
@@ -1132,6 +1136,27 @@ f_equal.
  clear H₁ H₂ H₃ H₄ H₅ H₆; nsatz.
  clear H₁ H₂ H₃ H₇ H₈ H₉; nsatz.
  clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
+Qed.
+
+Theorem mul_const_vec_cross_distr_l : ∀ k U V,
+  mul_const_vec k (U × V) = mul_const_vec k U × V.
+Proof.
+intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
+f_equal; ring.
+Qed.
+
+Theorem mat_const_vec_mul : ∀ M V k,
+  mat_vec_mul (mul_const_mat k M) V = mat_vec_mul M (mul_const_vec k V).
+Proof.
+intros.
+destruct V as (x, y, z); simpl; f_equal; ring.
+Qed.
+
+Theorem mat_vec_mul_const_mat : ∀ M V k,
+  mat_vec_mul (mul_const_mat k M) V = mul_const_vec k (mat_vec_mul M V).
+Proof.
+intros.
+destruct V as (x, y, z); simpl; f_equal; ring.
 Qed.
 
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
@@ -1161,6 +1186,52 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
   now apply vec_norm_zero in Hvn.
 
   destruct (eq_point_dec V₁ V₂) as [Hvv| Hvv]; [ easy | exfalso ].
+  remember (mul_const_vec (∥V₁∥ / ∥(V₁ × V₂)∥)%R (V₁ × V₂)) as V₃ eqn:HV₃.
+  assert (Hp₃ : mat_vec_mul M V₃ = V₃).
+   subst V₃; rewrite <- mat_const_vec_mul.
+   remember (∥V₁∥ / ∥(V₁ × V₂)∥)%R as r eqn:Hr.
+   rewrite mat_vec_mul_cross_distr.
+   do 2 rewrite mat_vec_mul_const_mat.
+   rewrite Hp₁, Hp₂.
+   rewrite mul_const_vec_cross_distr_l.
+   f_equal.
+(* shit *)
+bbb.
+
+  assert (Hvn' : ∥V₃∥ = ∥V₁∥).
+   subst V₃; remember (V₁ × V₂) as VV.
+   unfold mul_const_vec.
+   destruct VV as (x, y, z); simpl.
+   unfold Rdiv; do 6 rewrite Rsqr_mult.
+   setoid_rewrite Rmult_shuffle0.
+   do 2 rewrite <- Rmult_plus_distr_r.
+   do 2 rewrite <- Rmult_plus_distr_l.
+   rewrite Rsqr_inv.
+    rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+    rewrite Rmult_assoc.
+    rewrite Rinv_r.
+     rewrite Rmult_1_r.
+     rewrite sqrt_Rsqr; [ easy | apply vec_norm_nonneg ].
+
+     destruct V₁ as (x₁, y₁, z₁).
+     destruct V₂ as (x₂, y₂, z₂).
+     injection HeqVV; clear HeqVV; intros Hz Hy Hx.
+     subst x y z.
+
+bbb.
+
+
+   rewrite <- Rmult_plus_distr_l.
+   simpl.
+
+
+   subst V₃; unfold vec_norm, mul_const_vec, "×"; simpl.
+   destruct V₁ as (x₁, y₁, z₁).
+   destruct V₂ as (x₂, y₂, z₂).
+   f_equal.
+
+
+
   assert
     (∃ V'₂,
      mat_vec_mul M V'₂ = V'₂ ∧ ∥ V'₂ ∥ = ∥ V₁ ∥ ∧
