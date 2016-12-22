@@ -1169,80 +1169,103 @@ Theorem vec_cross_mul_eq_0 : ∀ U V,
   U ≠ 0%vec
   → V ≠ 0%vec
   → U × V = 0%vec
-  ↔ ∃ a b,
+  → ∃ a b,
     a ≠ 0%R ∧ b ≠ 0%R ∧
     vec_add (mul_const_vec a U) (mul_const_vec b V) = 0%vec.
 Proof.
-intros * HU HV.
-split.
- intros HUV.
- destruct U as (u₁, u₂, u₃).
- destruct V as (v₁, v₂, v₃).
- simpl in HUV; simpl.
- injection HUV; clear HUV; intros H₃ H₂ H₁.
- move H₁ after H₂; move H₃ after H₂.
- apply Rminus_diag_uniq in H₁.
- apply Rminus_diag_uniq in H₂.
- apply Rminus_diag_uniq in H₃.
- destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
-  subst u₁; rewrite Rmult_0_l in H₃; symmetry in H₃.
-  apply Rmult_integral in H₃.
-  destruct H₃ as [H₃| H₃]; [ subst u₂ | subst v₁ ].
-   rewrite Rmult_0_l in H₁; symmetry in H₁.
+intros * HU HV HUV.
+destruct U as (u₁, u₂, u₃).
+destruct V as (v₁, v₂, v₃).
+simpl in HUV; simpl.
+injection HUV; clear HUV; intros H₃ H₂ H₁.
+move H₁ after H₂; move H₃ after H₂.
+apply Rminus_diag_uniq in H₁.
+apply Rminus_diag_uniq in H₂.
+apply Rminus_diag_uniq in H₃.
+destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
+ subst u₁; rewrite Rmult_0_l in H₃; symmetry in H₃.
+ apply Rmult_integral in H₃.
+ destruct H₃ as [H₃| H₃]; [ subst u₂ | subst v₁ ].
+  rewrite Rmult_0_l in H₁; symmetry in H₁.
+  apply Rmult_integral in H₁.
+  destruct H₁ as [H₁| H₁]; [ now subst u₃ | subst v₂ ].
+  rewrite Rmult_0_l in H₂.
+  apply Rmult_integral in H₂.
+  destruct H₂ as [H₂| H₂]; [ now subst u₃ | subst v₁ ].
+  exists v₃, (- u₃)%R.
+  split; [ now intros H; apply HV; f_equal | ].
+  split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
+  f_equal; lra.
+
+  destruct (Req_dec u₂ 0) as [Hu₂| Hu₂].
+   subst u₂; rewrite Rmult_0_l in H₁; symmetry in H₁.
    apply Rmult_integral in H₁.
    destruct H₁ as [H₁| H₁]; [ now subst u₃ | subst v₂ ].
-   rewrite Rmult_0_l in H₂.
-   apply Rmult_integral in H₂.
-   destruct H₂ as [H₂| H₂]; [ now subst u₃ | subst v₁ ].
    exists v₃, (- u₃)%R.
    split; [ now intros H; apply HV; f_equal | ].
    split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
    f_equal; lra.
 
-   destruct (Req_dec u₂ 0) as [Hu₂| Hu₂].
-    subst u₂; rewrite Rmult_0_l in H₁; symmetry in H₁.
+   destruct (Req_dec u₃ 0) as [Hu₃| Hu₃].
+    subst u₃; rewrite Rmult_0_l in H₁.
     apply Rmult_integral in H₁.
-    destruct H₁ as [H₁| H₁]; [ now subst u₃ | subst v₂ ].
-    exists v₃, (- u₃)%R.
+    destruct H₁ as [H₁| H₁]; [ easy | subst v₃ ].
+    exists v₂, (-u₂)%R.
     split; [ now intros H; apply HV; f_equal | ].
     split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
     f_equal; lra.
 
-    destruct (Req_dec u₃ 0) as [Hu₃| Hu₃].
-     subst u₃; rewrite Rmult_0_l in H₁.
+    destruct (Req_dec v₂ 0) as [Hv₂| Hv₂].
+     subst v₂; rewrite Rmult_0_r in H₁.
      apply Rmult_integral in H₁.
-     destruct H₁ as [H₁| H₁]; [ easy | subst v₃ ].
-     exists v₂, (-u₂)%R.
-     split; [ now intros H; apply HV; f_equal | ].
-     split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
-     f_equal; lra.
+     now destruct H₁; subst.
 
-     destruct (Req_dec v₂ 0) as [Hv₂| Hv₂].
-      subst v₂; rewrite Rmult_0_r in H₁.
-      apply Rmult_integral in H₁.
-      now destruct H₁; subst.
+     exists v₂, (- u₂)%R.
+     split; [ easy | ].
+     split; [ now apply Ropp_neq_0_compat | ].
+     f_equal; [ lra | lra | ].
+     rewrite Rmult_comm, <- H₁; lra.
 
-      exists v₂, (- u₂)%R.
-      split; [ easy | ].
-      split; [ now apply Ropp_neq_0_compat | ].
-      f_equal; [ lra | lra | ].
-      rewrite Rmult_comm, <- H₁; lra.
+ destruct (Req_dec v₁ 0) as [Hv₁| Hv₁].
+  subst v₁; rewrite Rmult_0_r in H₃.
+  apply Rmult_integral in H₃.
+  destruct H₃ as [H₃| H₃]; [ easy | subst v₂ ].
+  rewrite Rmult_0_r in H₂; symmetry in H₂.
+  apply Rmult_integral in H₂.
+  now destruct H₂; subst.
 
-  destruct (Req_dec v₁ 0) as [Hv₁| Hv₁].
-   subst v₁; rewrite Rmult_0_r in H₃.
-   apply Rmult_integral in H₃.
-   destruct H₃ as [H₃| H₃]; [ easy | subst v₂ ].
-   rewrite Rmult_0_r in H₂; symmetry in H₂.
-   apply Rmult_integral in H₂.
-   now destruct H₂; subst.
+  exists v₁, (- u₁)%R.
+  split; [ easy | ].
+  split; [ now apply Ropp_neq_0_compat | ].
+  f_equal; lra.
+Qed.
 
-   exists v₁, (- u₁)%R.
-   split; [ easy | ].
-   split; [ now apply Ropp_neq_0_compat | ].
-   f_equal; lra.
-
+(* reverse could be completed if required one day
  intros (a & b & Ha & Hb & Hab).
-bbb.
+ destruct U as (u₁, u₂, u₃).
+ destruct V as (v₁, v₂, v₃); simpl in Hab; simpl.
+ injection Hab; clear Hab; intros H₃ H₂ H₁.
+ move H₁ after H₂; move H₃ after H₂.
+ f_equal.
+  apply Rplus_opp_r_uniq in H₂.
+  assert (Hv₂ : (v₂ = - (a * u₂) / b)%R).
+   rewrite <- H₂, Rmult_div.
+   unfold Rdiv; rewrite Rinv_r; [ | easy ].
+   now rewrite Rmult_1_l.
+
+   subst v₂.
+   rewrite Ropp_mult_distr_l.
+   unfold Rdiv.
+   do 2 rewrite <- Rmult_assoc.
+   rewrite Rmult_shuffle0, Rmult_comm.
+   unfold Rminus.
+   rewrite Ropp_mult_distr_l.
+   rewrite <- Rmult_plus_distr_r.
+   destruct (Req_dec u₂ 0) as [Hu₂| Hu₂].
+    now subst u₂; rewrite Rmult_0_r.
+
+    apply Rmult_eq_0_compat_r.
+*)
 
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
   is_rotation_matrix M
@@ -1272,21 +1295,24 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
 
   destruct (eq_point_dec V₁ V₂) as [Hvv| Hvv]; [ easy | exfalso ].
   remember (mul_const_vec (∥V₁∥ / ∥(V₁ × V₂)∥)%R (V₁ × V₂)) as V₃ eqn:HV₃.
+  move V₃ before V₂.
   assert (Hp₃ : mat_vec_mul M V₃ = V₃).
    subst V₃; apply mat_eigenvec_mul_const.
    rewrite mat_vec_mul_cross_distr; [ | easy ].
    now rewrite Hp₁, Hp₂.
 
+   move Hp₃ before Hp₂.
    assert (HVV : ∥(V₁ × V₂)∥ ≠ 0%R).
     intros H; apply vec_norm_eq_0 in H.
-    specialize (vec_cross_mul_eq_0 _ _ H) as (a & b & Hab).
-bbb.
-
-bbb.
-   unfold vec_cross_mul.
-   destruct V₁ as (x₁, y₁, z₁).
-   destruct V₂ as (x₂, y₂, z₂).
-   simpl.
+    apply vec_cross_mul_eq_0 in H; [ | easy | easy ].
+    destruct H as (a & b & Ha & Hb & Hab).
+    remember (mul_const_vec a V₁) as aV₁ eqn:HaV₁; symmetry in HaV₁.
+    remember (mul_const_vec b V₂) as bV₂ eqn:HbV₂; symmetry in HbV₂.
+    destruct aV₁ as (ax₁, ay₁, az₁).
+    destruct bV₂ as (bx₂, by₂, bz₂).
+    simpl in Hab.
+    injection Hab; clear Hab; intros Hz Hy Hx.
+    move Hx after Hy; move Hz after Hy.
 
 bbb.
 
