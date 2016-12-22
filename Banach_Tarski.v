@@ -1166,21 +1166,83 @@ split; intros HV.
 Qed.
 
 Theorem vec_cross_mul_eq_0 : ∀ U V,
-  U × V = 0%vec
-  → ∃ a b, vec_add (mul_const_vec a U) (mul_const_vec b V) = 0%vec.
+  U ≠ 0%vec
+  → V ≠ 0%vec
+  → U × V = 0%vec
+  ↔ ∃ a b,
+    a ≠ 0%R ∧ b ≠ 0%R ∧
+    vec_add (mul_const_vec a U) (mul_const_vec b V) = 0%vec.
 Proof.
-intros U V HUV.
-destruct U as (u₁, u₂, u₃).
-destruct V as (v₁, v₂, v₃).
-simpl in HUV; simpl.
-injection HUV; clear HUV; intros H₃ H₂ H₁.
-move H₁ after H₂; move H₃ after H₂.
-apply Rminus_diag_uniq in H₁.
-apply Rminus_diag_uniq in H₂.
-apply Rminus_diag_uniq in H₃.
-exists v₂, (- u₂)%R.
-f_equal; lra.
-Qed.
+intros * HU HV.
+split.
+ intros HUV.
+ destruct U as (u₁, u₂, u₃).
+ destruct V as (v₁, v₂, v₃).
+ simpl in HUV; simpl.
+ injection HUV; clear HUV; intros H₃ H₂ H₁.
+ move H₁ after H₂; move H₃ after H₂.
+ apply Rminus_diag_uniq in H₁.
+ apply Rminus_diag_uniq in H₂.
+ apply Rminus_diag_uniq in H₃.
+ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
+  subst u₁; rewrite Rmult_0_l in H₃; symmetry in H₃.
+  apply Rmult_integral in H₃.
+  destruct H₃ as [H₃| H₃]; [ subst u₂ | subst v₁ ].
+   rewrite Rmult_0_l in H₁; symmetry in H₁.
+   apply Rmult_integral in H₁.
+   destruct H₁ as [H₁| H₁]; [ now subst u₃ | subst v₂ ].
+   rewrite Rmult_0_l in H₂.
+   apply Rmult_integral in H₂.
+   destruct H₂ as [H₂| H₂]; [ now subst u₃ | subst v₁ ].
+   exists v₃, (- u₃)%R.
+   split; [ now intros H; apply HV; f_equal | ].
+   split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
+   f_equal; lra.
+
+   destruct (Req_dec u₂ 0) as [Hu₂| Hu₂].
+    subst u₂; rewrite Rmult_0_l in H₁; symmetry in H₁.
+    apply Rmult_integral in H₁.
+    destruct H₁ as [H₁| H₁]; [ now subst u₃ | subst v₂ ].
+    exists v₃, (- u₃)%R.
+    split; [ now intros H; apply HV; f_equal | ].
+    split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
+    f_equal; lra.
+
+    destruct (Req_dec u₃ 0) as [Hu₃| Hu₃].
+     subst u₃; rewrite Rmult_0_l in H₁.
+     apply Rmult_integral in H₁.
+     destruct H₁ as [H₁| H₁]; [ easy | subst v₃ ].
+     exists v₂, (-u₂)%R.
+     split; [ now intros H; apply HV; f_equal | ].
+     split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
+     f_equal; lra.
+
+     destruct (Req_dec v₂ 0) as [Hv₂| Hv₂].
+      subst v₂; rewrite Rmult_0_r in H₁.
+      apply Rmult_integral in H₁.
+      now destruct H₁; subst.
+
+      exists v₂, (- u₂)%R.
+      split; [ easy | ].
+      split; [ now apply Ropp_neq_0_compat | ].
+      f_equal; [ lra | lra | ].
+      rewrite Rmult_comm, <- H₁; lra.
+
+  destruct (Req_dec v₁ 0) as [Hv₁| Hv₁].
+   subst v₁; rewrite Rmult_0_r in H₃.
+   apply Rmult_integral in H₃.
+   destruct H₃ as [H₃| H₃]; [ easy | subst v₂ ].
+   rewrite Rmult_0_r in H₂; symmetry in H₂.
+   apply Rmult_integral in H₂.
+   now destruct H₂; subst.
+
+   exists v₁, (- u₁)%R.
+   split; [ easy | ].
+   split; [ now apply Ropp_neq_0_compat | ].
+   f_equal; lra.
+
+ intros (a & b & Ha & Hb & Hab).
+bbb.
 
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
   is_rotation_matrix M
