@@ -1283,7 +1283,7 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
  rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
  rewrite sqrt_0 in Hvn.
  symmetry in Hvn.
- apply vec_norm_zero in Hvn.
+ apply vec_norm_eq_0 in Hvn.
  now rewrite Hvn, Hv₁.
 
  destruct (eq_point_dec V₂ (P 0 0 0)) as [Hv₂| Hv₂].
@@ -1291,7 +1291,7 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
   unfold vec_norm in Hvn at 2.
   rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
   rewrite sqrt_0 in Hvn.
-  now apply vec_norm_zero in Hvn.
+  now apply vec_norm_eq_0 in Hvn.
 
   destruct (eq_point_dec V₁ V₂) as [Hvv| Hvv]; [ easy | exfalso ].
   remember (mul_const_vec (∥V₁∥ / ∥(V₁ × V₂)∥)%R (V₁ × V₂)) as V₃ eqn:HV₃.
@@ -1324,7 +1324,30 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
     rewrite <- HaV₁ in HbV₂.
     rewrite mul_const_vec_assoc in HbV₂.
     replace (-1 * a)%R with (-a)%R in HbV₂ by lra.
+    apply mul_const_vec_div in HbV₂; [ | easy ].
+    rewrite HbV₂ in Hvn.
+    rewrite vec_norm_mul_const_vec in Hvn.
+    replace (∥V₁∥) with (1 * ∥V₁∥)%R in Hvn at 1 by lra.
+    apply Rmult_eq_reg_r in Hvn; [ | now intros H; apply Hv₁, vec_norm_eq_0 ].
+    symmetry in Hvn.
+    apply Rabs_or in Hvn.
+    destruct Hvn as [Hvn| Hvn]; rewrite Hvn in HbV₂.
+     now rewrite mul_const_vec_1 in HbV₂; symmetry in HbV₂.
 
+     destruct V₁ as (x, y, z); simpl in HbV₂.
+     do 3 rewrite <- Ropp_mult_distr_l in HbV₂.
+     do 3 rewrite Rmult_1_l in HbV₂.
+     fold (neg_point (P x y z)) in HbV₂.
+     rewrite HbV₂ in Hn.
+Theorem is_neg_point_neg_point : ∀ V,
+  is_neg_point (neg_point V) = negb (is_neg_point V).
+Proof.
+intros (x, y, z); simpl.
+bbb.
+     rewrite is_neg_point_neg_point in Hn.
+     now symmetry in Hn; apply no_fixpoint_negb in Hn.
+
+    move HVV before Hvn.
 bbb.
 
    assert (Hvn' : ∥V₃∥ = ∥V₁∥).

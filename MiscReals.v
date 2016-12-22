@@ -303,12 +303,10 @@ rewrite Rminus_Int_part1 in H.
  apply Rle_ge, frac_part_interv.
 Qed.
 
-(* useless since there is theorem 'base_fp' in Coq library
-Theorem frac_part_in_0_1 : ∀ x, (0 <= frac_part x)%R ∧ (frac_part x < 1)%R.
+Theorem Rabs_or : ∀ x y, Rabs x = y → x = y ∨ x = (- y)%R.
 Proof.
-intros x.
-pose proof base_fp x as H.
-destruct H as (H1, H2).
-now apply Rge_le in H1.
+intros * Hxy; subst y.
+unfold Rabs.
+destruct (Rcase_abs x) as [H₁| H₁]; [ right | now left ].
+symmetry; apply Ropp_involutive.
 Qed.
-*)

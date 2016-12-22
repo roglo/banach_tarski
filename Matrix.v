@@ -50,6 +50,7 @@ Definition mat_vec_mul mat '(P x y z) :=
     (a₂₁ mat * x + a₂₂ mat * y + a₂₃ mat * z)
     (a₃₁ mat * x + a₃₂ mat * y + a₃₃ mat * z).
 
+Definition vec_norm '(P x y z) := √ (x² + y² + z²).
 Definition vec_add '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
   P (u₁ + v₁) (u₂ + v₂) (u₃ + v₃).
 Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
@@ -69,6 +70,7 @@ Notation "M * V" := (mat_vec_mul M V) : vec_scope.
 Notation "U + V" := (vec_add U V) : vec_scope.
 Notation "U • V" := (vec_dot_mul U V) (at level 40, left associativity).
 Notation "U × V" := (vec_cross_mul U V) (at level 40, left associativity).
+Notation "∥ V ∥" := (vec_norm V) (at level 0, V at level 0, format "∥ V ∥").
 
 (* https://en.wikipedia.org/wiki/Rotation_matrix
    #Rotation_matrix_from_axis_and_angle *)
@@ -557,11 +559,57 @@ split; [ easy | ].
 rewrite mat_det_mul, Hd1, Hd2.
 apply Rmult_1_r.
 Qed.
-About mul_const_vec.
 
 Theorem mul_const_vec_assoc : ∀ a b V,
   mul_const_vec a (mul_const_vec b V) = mul_const_vec (a * b) V.
 Proof.
 intros a b (x, y, z); simpl.
 now do 3 rewrite Rmult_assoc.
+Qed.
+
+Theorem mul_const_vec_div : ∀ a b U V,
+  a ≠ 0%R
+  → mul_const_vec a U = mul_const_vec b V
+  → U = mul_const_vec (b / a) V.
+Proof.
+intros * Ha Hm.
+destruct U as (u₁, u₂, u₃).
+destruct V as (v₁, v₂, v₃).
+simpl in Hm; simpl.
+injection Hm; clear Hm; intros H₃ H₂ H₁.
+unfold Rdiv; setoid_rewrite Rmult_shuffle0.
+rewrite <- H₁, <- H₂, <- H₃.
+setoid_rewrite Rmult_shuffle0.
+rewrite Rinv_r; [ | easy ].
+now do 3 rewrite Rmult_1_l.
+Qed.
+
+Theorem vec_norm_nonneg : ∀ V, (0 ≤ ∥V∥)%R.
+Proof.
+intros (x, y, z); simpl.
+apply sqrt_pos.
+Qed.
+
+Theorem nonneg_sqr_vec_norm : ∀ x y z, (0 ≤ x² + y² + z²)%R.
+Proof.
+intros.
+apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+Qed.
+
+Theorem vec_norm_mul_const_vec : ∀ a V,
+  ∥(mul_const_vec a V)∥ = (Rabs a * ∥V∥)%R.
+Proof.
+intros a (x, y, z); simpl.
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+rewrite sqrt_mult; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
+now rewrite sqrt_Rsqr_abs.
+Qed.
+
+Theorem mul_const_vec_1 : ∀ V, mul_const_vec 1 V = V.
+Proof.
+intros (x, y, z).
+unfold mul_const_vec.
+now do 3 rewrite Rmult_1_l.
 Qed.
