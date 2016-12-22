@@ -1188,10 +1188,10 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
  destruct H₃ as [H₃| H₃]; [ subst u₂ | subst v₁ ].
   rewrite Rmult_0_l in H₁; symmetry in H₁.
   apply Rmult_integral in H₁.
-  destruct H₁ as [H₁| H₁]; [ now subst u₃ | subst v₂ ].
+  destruct H₁ as [H₁| H₁]; [ now exfalso; subst u₃; apply HU | subst v₂ ].
   rewrite Rmult_0_l in H₂.
   apply Rmult_integral in H₂.
-  destruct H₂ as [H₂| H₂]; [ now subst u₃ | subst v₁ ].
+  destruct H₂ as [H₂| H₂]; [ now exfalso; subst u₃; apply HU | subst v₁ ].
   exists v₃, (- u₃)%R.
   split; [ now intros H; apply HV; f_equal | ].
   split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
@@ -1200,7 +1200,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
   destruct (Req_dec u₂ 0) as [Hu₂| Hu₂].
    subst u₂; rewrite Rmult_0_l in H₁; symmetry in H₁.
    apply Rmult_integral in H₁.
-   destruct H₁ as [H₁| H₁]; [ now subst u₃ | subst v₂ ].
+   destruct H₁ as [H₁| H₁]; [ now exfalso; subst u₃; apply HU | subst v₂ ].
    exists v₃, (- u₃)%R.
    split; [ now intros H; apply HV; f_equal | ].
    split; [ now apply Ropp_neq_0_compat; intros H; apply HU; f_equal | ].
@@ -1218,7 +1218,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
     destruct (Req_dec v₂ 0) as [Hv₂| Hv₂].
      subst v₂; rewrite Rmult_0_r in H₁.
      apply Rmult_integral in H₁.
-     now destruct H₁; subst.
+     destruct H₁ as [H₁| H₁]; [ easy | now exfalso; subst v₃; apply HV ].
 
      exists v₂, (- u₂)%R.
      split; [ easy | ].
@@ -1232,7 +1232,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
   destruct H₃ as [H₃| H₃]; [ easy | subst v₂ ].
   rewrite Rmult_0_r in H₂; symmetry in H₂.
   apply Rmult_integral in H₂.
-  now destruct H₂; subst.
+  destruct H₂ as [H₂| H₂]; [ easy | now exfalso; subst v₃; apply HV ].
 
   exists v₁, (- u₁)%R.
   split; [ easy | ].
