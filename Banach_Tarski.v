@@ -509,15 +509,6 @@ for k = 1 ... min(m,n):
      A[i, k]  := 0
 *)
 
-Definition is_neg_point '(P x y z) :=
-  if Rlt_dec x 0 then true
-  else if Rgt_dec x 0 then false
-  else if Rlt_dec y 0 then true
-  else if Rgt_dec y 0 then false
-  else if Rlt_dec z 0 then true
-  else if Rgt_dec z 0 then false
-  else true.
-
 Definition rotation_unit_eigenvec (m : matrix ℝ) :=
   let x := (a₂₃ m - a₃₂ m)%R in
   let y := (a₃₁ m - a₁₃ m)%R in
@@ -925,14 +916,6 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
   in
   fold_right rotate p₁ (path_of_nat no).
 
-Theorem is_neg_point_0 : is_neg_point (P 0 0 0) = true.
-Proof.
-simpl.
-destruct (Rlt_dec 0 0) as [H₁| H₁]; [ easy | clear H₁ ].
-destruct (Rgt_dec 0 0) as [H₁| H₁]; [ | easy ].
-now apply Rgt_irrefl in H₁.
-Qed.
-
 Lemma mat_of_path_app : ∀ el₁ el₂,
   mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
 Proof.
@@ -1339,99 +1322,37 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
      do 3 rewrite Rmult_1_l in HbV₂.
      fold (neg_point (P x y z)) in HbV₂.
      rewrite HbV₂ in Hn.
-Theorem is_neg_point_neg_point : ∀ V,
-  is_neg_point (neg_point V) = negb (is_neg_point V).
-Proof.
-intros (x, y, z); simpl.
-destruct (Rlt_dec x 0) as [Hx| Hx].
- destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
-  apply Ropp_lt_contravar in Hx'.
-  rewrite Ropp_0, Ropp_involutive in Hx'.
-  now apply Rlt_le, Rle_not_lt in Hx'.
-
-  clear Hx'.
-  destruct (Rgt_dec (-x) 0) as [Hx'| Hx']; [ easy | ].
-  apply Ropp_lt_contravar in Hx.
-  now rewrite Ropp_0 in Hx.
-
- apply Rnot_lt_le in Hx.
- destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
-  apply Ropp_lt_contravar in Hx'.
-  rewrite Ropp_0, Ropp_involutive in Hx'.
-  now destruct (Rgt_dec x 0).
-
-  apply Rnot_lt_le in Hx'.
-  apply Ropp_le_contravar in Hx'.
-  rewrite Ropp_0, Ropp_involutive in Hx'.
-  apply Rle_antisym in Hx'; [ subst x | easy ].
-  rewrite Ropp_0; clear Hx.
-  destruct (Rgt_dec 0 0) as [Hx| Hx]; [ now apply Rgt_irrefl in Hx | ].
-  clear Hx.
-  destruct (Rlt_dec y 0) as [Hy| Hy].
-   destruct (Rlt_dec (-y) 0) as [Hy'| Hy'].
-    apply Ropp_lt_contravar in Hy'.
-    rewrite Ropp_0, Ropp_involutive in Hy'.
-    now apply Rlt_le, Rle_not_lt in Hy'.
-
-    clear Hy'.
-    destruct (Rgt_dec (-y) 0) as [Hy'| Hy']; [ easy | ].
-    apply Ropp_lt_contravar in Hy.
-    now rewrite Ropp_0 in Hy.
-
-   apply Rnot_lt_le in Hy.
-   destruct (Rlt_dec (-y) 0) as [Hy'| Hy'].
-    apply Ropp_lt_contravar in Hy'.
-    rewrite Ropp_0, Ropp_involutive in Hy'.
-    now destruct (Rgt_dec y 0).
-
-    apply Rnot_lt_le in Hy'.
-    apply Ropp_le_contravar in Hy'.
-    rewrite Ropp_0, Ropp_involutive in Hy'.
-    apply Rle_antisym in Hy'; [ subst y | easy ].
-    rewrite Ropp_0; clear Hy.
-    destruct (Rgt_dec 0 0) as [Hy| Hy]; [ now apply Rgt_irrefl in Hy | ].
-    clear Hy.
-bbb.
-     rewrite is_neg_point_neg_point in Hn.
+     rewrite is_neg_point_neg_point in Hn; [ | easy ].
      now symmetry in Hn; apply no_fixpoint_negb in Hn.
 
     move HVV before Hvn.
-bbb.
-
-   assert (Hvn' : ∥V₃∥ = ∥V₁∥).
-    subst V₃; remember (V₁ × V₂) as VV.
-    unfold mul_const_vec.
-    destruct VV as (x, y, z); simpl.
-    unfold Rdiv; do 6 rewrite Rsqr_mult.
-    setoid_rewrite Rmult_shuffle0.
-    do 2 rewrite <- Rmult_plus_distr_r.
-    do 2 rewrite <- Rmult_plus_distr_l.
-    rewrite Rsqr_inv.
+    assert (Hvn' : ∥V₃∥ = ∥V₁∥).
+     subst V₃; remember (V₁ × V₂) as VV.
+     unfold mul_const_vec.
+     destruct VV as (x, y, z); simpl in HVV; simpl.
+     unfold Rdiv; do 6 rewrite Rsqr_mult.
+     setoid_rewrite Rmult_shuffle0.
+     do 2 rewrite <- Rmult_plus_distr_r.
+     do 2 rewrite <- Rmult_plus_distr_l.
+     rewrite Rsqr_inv; [ | easy ].
      rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
      rewrite Rmult_assoc.
      rewrite Rinv_r.
-
       rewrite Rmult_1_r.
       rewrite sqrt_Rsqr; [ easy | apply vec_norm_nonneg ].
 
-      destruct V₁ as (x₁, y₁, z₁).
-      destruct V₂ as (x₂, y₂, z₂).
-      injection HeqVV; clear HeqVV; intros Hz Hy Hx.
-      subst x y z.
+      intros H; apply HVV; rewrite H.
+      apply sqrt_0.
 
+     move Hvn' before Hvn.
 bbb.
-
-
    rewrite <- Rmult_plus_distr_l.
    simpl.
-
 
    subst V₃; unfold vec_norm, mul_const_vec, "×"; simpl.
    destruct V₁ as (x₁, y₁, z₁).
    destruct V₂ as (x₂, y₂, z₂).
    f_equal.
-
-
 
   assert
     (∃ V'₂,

@@ -97,6 +97,15 @@ Definition rot_inv_z := mkrmat
   (-2*√2/3) (1/3)     0
   0         0         1.
 
+Definition is_neg_point '(P x y z) :=
+  if Rlt_dec x 0 then true
+  else if Rgt_dec x 0 then false
+  else if Rlt_dec y 0 then true
+  else if Rgt_dec y 0 then false
+  else if Rlt_dec z 0 then true
+  else if Rgt_dec z 0 then false
+  else true.
+
 Theorem rot_x_means_rot_x : rot_x = rot_mat_of_axis_cos (P 1 0 0) (1/3).
 Proof.
 unfold rot_x; simpl.
@@ -612,4 +621,89 @@ Proof.
 intros (x, y, z).
 unfold mul_const_vec.
 now do 3 rewrite Rmult_1_l.
+Qed.
+
+Theorem is_neg_point_0 : is_neg_point (P 0 0 0) = true.
+Proof.
+simpl.
+destruct (Rlt_dec 0 0) as [H₁| H₁]; [ easy | clear H₁ ].
+destruct (Rgt_dec 0 0) as [H₁| H₁]; [ | easy ].
+now apply Rgt_irrefl in H₁.
+Qed.
+
+Theorem is_neg_point_neg_point : ∀ V,
+  V ≠ 0%vec
+  → is_neg_point (neg_point V) = negb (is_neg_point V).
+Proof.
+intros (x, y, z) HV; simpl.
+destruct (Rlt_dec x 0) as [Hx| Hx].
+ destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
+  apply Ropp_lt_contravar in Hx'.
+  rewrite Ropp_0, Ropp_involutive in Hx'.
+  now apply Rlt_le, Rle_not_lt in Hx'.
+
+  clear Hx'.
+  destruct (Rgt_dec (-x) 0) as [Hx'| Hx']; [ easy | ].
+  apply Ropp_lt_contravar in Hx.
+  now rewrite Ropp_0 in Hx.
+
+ apply Rnot_lt_le in Hx.
+ destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
+  apply Ropp_lt_contravar in Hx'.
+  rewrite Ropp_0, Ropp_involutive in Hx'.
+  now destruct (Rgt_dec x 0).
+
+  apply Rnot_lt_le in Hx'.
+  apply Ropp_le_contravar in Hx'.
+  rewrite Ropp_0, Ropp_involutive in Hx'.
+  apply Rle_antisym in Hx'; [ subst x | easy ].
+  rewrite Ropp_0; clear Hx.
+  destruct (Rgt_dec 0 0) as [Hx| Hx]; [ now apply Rgt_irrefl in Hx | ].
+  clear Hx.
+  destruct (Rlt_dec y 0) as [Hy| Hy].
+   destruct (Rlt_dec (-y) 0) as [Hy'| Hy'].
+    apply Ropp_lt_contravar in Hy'.
+    rewrite Ropp_0, Ropp_involutive in Hy'.
+    now apply Rlt_le, Rle_not_lt in Hy'.
+
+    clear Hy'.
+    destruct (Rgt_dec (-y) 0) as [Hy'| Hy']; [ easy | ].
+    apply Ropp_lt_contravar in Hy.
+    now rewrite Ropp_0 in Hy.
+
+   apply Rnot_lt_le in Hy.
+   destruct (Rlt_dec (-y) 0) as [Hy'| Hy'].
+    apply Ropp_lt_contravar in Hy'.
+    rewrite Ropp_0, Ropp_involutive in Hy'.
+    now destruct (Rgt_dec y 0).
+
+    apply Rnot_lt_le in Hy'.
+    apply Ropp_le_contravar in Hy'.
+    rewrite Ropp_0, Ropp_involutive in Hy'.
+    apply Rle_antisym in Hy'; [ subst y | easy ].
+    rewrite Ropp_0; clear Hy.
+    destruct (Rgt_dec 0 0) as [Hy| Hy]; [ now apply Rgt_irrefl in Hy | ].
+    clear Hy.
+    destruct (Rlt_dec z 0) as [Hz| Hz].
+     destruct (Rlt_dec (-z) 0) as [Hz'| Hz'].
+      apply Ropp_lt_contravar in Hz'.
+      rewrite Ropp_0, Ropp_involutive in Hz'.
+      now apply Rlt_le, Rle_not_lt in Hz'.
+
+      clear Hz'.
+      destruct (Rgt_dec (-z) 0) as [Hz'| Hz']; [ easy | ].
+      apply Ropp_lt_contravar in Hz.
+      now rewrite Ropp_0 in Hz.
+
+     apply Rnot_lt_le in Hz.
+     destruct (Rlt_dec (-z) 0) as [Hz'| Hz'].
+      apply Ropp_lt_contravar in Hz'.
+      rewrite Ropp_0, Ropp_involutive in Hz'.
+      now destruct (Rgt_dec z 0).
+
+      apply Rnot_lt_le in Hz'.
+      apply Ropp_le_contravar in Hz'.
+      rewrite Ropp_0, Ropp_involutive in Hz'.
+      apply Rle_antisym in Hz'; [ subst z | easy ].
+      now exfalso; apply HV.
 Qed.
