@@ -1186,16 +1186,51 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
   now apply vec_norm_zero in Hvn.
 
   destruct (eq_point_dec V₁ V₂) as [Hvv| Hvv]; [ easy | exfalso ].
+Theorem glop : ∀ M V,
+  mat_vec_mul M V = V
+  → ∀ k, mat_vec_mul M (mul_const_vec k V) = mul_const_vec k V.
+Proof.
+intros * HV k.
+rewrite <- mat_const_vec_mul.
+rewrite mat_vec_mul_const_mat.
+now rewrite HV.
+Qed.
+(**)
   remember (mul_const_vec (∥V₁∥ / ∥(V₁ × V₂)∥)%R (V₁ × V₂)) as V₃ eqn:HV₃.
   assert (Hp₃ : mat_vec_mul M V₃ = V₃).
+(*
+subst V₃.
+rewrite glop; [ easy | ].
+rewrite mat_vec_mul_cross_distr; [ | easy ].
+now rewrite Hp₁, Hp₂.
+là, ça marche...
+*)
    subst V₃; rewrite <- mat_const_vec_mul.
    remember (∥V₁∥ / ∥(V₁ × V₂)∥)%R as r eqn:Hr.
+Check mat_vec_mul_cross_distr.
+(* actually (mul_const_mat r M) is *not* a rotation matrix! *)
+(* because its determinant is r³, not 1 *)
+(* therefore mat_vec_mul_cross_distr cannot apply *)
+bbb.
    rewrite mat_vec_mul_cross_distr.
    do 2 rewrite mat_vec_mul_const_mat.
    rewrite Hp₁, Hp₂.
    rewrite mul_const_vec_cross_distr_l.
-   f_equal.
+unfold mul_const_vec.
+   destruct V₁ as (x₁, y₁, z₁).
+   destruct V₂ as (x₂, y₂, z₂).
+simpl.
+f_equal.
+simpl in Hr.
 (* shit *)
+
+bbb.
+(*
+  remember (V₁ × V₂) as V₃ eqn:HV₃.
+  assert (Hp₃ : mat_vec_mul M V₃ = V₃).
+   subst V₃; rewrite mat_vec_mul_cross_distr; [ | easy ].
+   now rewrite Hp₁, Hp₂.
+*)
 bbb.
 
   assert (Hvn' : ∥V₃∥ = ∥V₁∥).
