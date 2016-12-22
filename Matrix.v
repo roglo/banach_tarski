@@ -48,6 +48,10 @@ Definition mat_vec_mul mat '(P x y z) :=
     (a₂₁ mat * x + a₂₂ mat * y + a₂₃ mat * z)
     (a₃₁ mat * x + a₃₂ mat * y + a₃₃ mat * z).
 
+Delimit Scope vec_scope with vec.
+Notation "0" := (P 0 0 0) : vec_scope.
+Notation "M * V" := (mat_vec_mul M V) : vec_scope.
+
 (* https://en.wikipedia.org/wiki/Rotation_matrix
    #Rotation_matrix_from_axis_and_angle *)
 Definition rot_mat_of_axis_cos '(P x y z) cosθ :=

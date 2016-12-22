@@ -1169,6 +1169,16 @@ rewrite mat_vec_mul_const_mat.
 now rewrite HV.
 Qed.
 
+Theorem vec_norm_eq_0 : ∀ U, ∥U∥ = 0%R ↔ U = 0%vec.
+Proof.
+bbb.
+
+Theorem vec_cross_mul_eq_0 : ∀ U V,
+  U × V = P 0 0 0 ↔
+  ∃ a b, vec_add (mul_const_vec a U) (mul_const_vec b V) = P 0 0 0.
+Proof.
+bbb.
+
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
   is_rotation_matrix M
   → M ≠ mat_id
@@ -1203,6 +1213,10 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
    now rewrite Hp₁, Hp₂.
 
    assert (HVV : ∥(V₁ × V₂)∥ ≠ 0%R).
+    intros H; apply vec_norm_eq_0 in H.
+    apply vec_cross_mul_eq_0 in H.
+bbb.
+
 bbb.
    unfold vec_cross_mul.
    destruct V₁ as (x₁, y₁, z₁).
