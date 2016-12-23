@@ -1385,6 +1385,7 @@ bbb.
     destruct V₂ as (x₂, y₂, z₂); simpl.
     f_equal.
 bbb.
+*)
 
 Theorem D_set_is_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
@@ -1445,14 +1446,16 @@ assert (Hrm : is_rotation_matrix m).
   destruct b₁, b.
    destruct b₂; [ | easy ].
    rewrite <- Hb₁ in Hb₂.
-bbb.
    eapply fixpoint_unicity; try eassumption.
+    intros H; rewrite Hm in H.
+    now apply matrix_of_non_empty_path_is_not_identity in Hnl.
 
-      intros H.
-      rewrite Hm in H.
-      unfold mat_of_path in H.
-      clear -Hnl H.
-(* seems subtile... *)
+    destruct p₁ as (x₁, y₁, z₁).
+    destruct p₂ as (x₂, y₂, z₂).
+    simpl in Hsr₁, Hsr₂; simpl.
+    now rewrite Hsr₁, Hsr₂.
+
+   destruct b₂; [ easy | ].
 bbb.
 
      induction el₁ as [| e₁ el₁]; [ now apply Hnl | ].
