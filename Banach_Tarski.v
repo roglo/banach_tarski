@@ -1345,8 +1345,14 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
       apply sqrt_0.
 
      move Hvn' before Hvn.
-     assert (∀ p, ∃ a b c, p = (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃)%vec).
-      intros p.
+     assert (∀ V, ∃ a b c, V = (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃)%vec).
+      intros.
+      exists (V • V₁), (V • V₂), (V • V₃).
+      destruct V as (x, y, z).
+      destruct V₁ as (x₁, y₁, z₁).
+      destruct V₂ as (x₂, y₂, z₂).
+      destruct V₃ as (x₃, y₃, z₃).
+      simpl; f_equal.
 bbb.
    rewrite <- Rmult_plus_distr_l.
    simpl.
