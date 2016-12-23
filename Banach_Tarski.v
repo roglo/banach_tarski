@@ -1270,6 +1270,29 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
       apply sqrt_0.
 
      move Hvn' before Hvn.
+     assert (Hfree2 : ∀ a b, (a ⁎ V₁ + b ⁎ V₂ = 0 → a = 0%R ∧ b = 0%R)%vec).
+      intros * Hab.
+      destruct V₁ as (x₁, y₁, z₁).
+      destruct V₂ as (x₂, y₂, z₂).
+      simpl in Hab.
+      injection Hab; clear Hab; intros Hz Hy Hx.
+      move Hx after Hy; move Hz after Hy.
+      clear -Hvn Hn Hv₁ Hv₂ Hvv Hx Hy Hz.
+      simpl in Hvn.
+bbb.
+
+     assert
+       (Hfree3 : ∀ a b c,
+        (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃ = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
+      intros * Habc.
+      destruct V₁ as (x₁, y₁, z₁).
+      destruct V₂ as (x₂, y₂, z₂).
+      destruct V₃ as (x₃, y₃, z₃).
+      simpl in Habc.
+      injection Habc; clear Habc; intros Hz Hy Hx.
+      move Hx after Hy; move Hz after Hy.
+
+bbb.
      assert (∀ V, (M * V)%vec = V).
       intros V.
       enough (∀ V, ∃ a b c, V = (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃)%vec).
