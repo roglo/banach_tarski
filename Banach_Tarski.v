@@ -492,23 +492,6 @@ Compute (gauss_jordan mat_ex3).
 Compute (gauss_jordan mat_ex4).
 *)
 
-(*
-for k = 1 ... min(m,n):
-   Find the k-th pivot:
-   i_max  := argmax (i = k ... m, abs(A[i, k]))
-   if A[i_max, k] = 0
-     error "Matrix is singular!"
-   swap rows(k, i_max)
-   Do for all rows below pivot:
-   for i = k + 1 ... m:
-     f := A[i, k] / A[k, k]
-     Do for all remaining elements in current row:
-     for j = k + 1 ... n:
-       A[i, j]  := A[i, j] - A[k, j] * f
-     Fill lower triangular matrix with zeros:
-     A[i, k]  := 0
-*)
-
 Definition rotation_unit_eigenvec (m : matrix ℝ) :=
   let x := (a₂₃ m - a₃₂ m)%R in
   let y := (a₃₁ m - a₁₃ m)%R in
@@ -604,64 +587,6 @@ Qed.
 (* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
 Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
-
-Theorem matrix_fixpoints_ok : ∀ M V,
-  is_rotation_matrix M
-  → mat_vec_mul M V = V
-  → cos_rot_angle M ≠ 1%R ∧ cos_rot_angle M ≠ (-1)%R
-  → V = mul_const_vec (vec_norm V) (rotation_unit_eigenvec M) ∨
-    V = mul_const_vec (- vec_norm V) (rotation_unit_eigenvec M).
-Proof.
-intros * Hrm Hm (Ha1, Ha2).
-remember (rotation_unit_eigenvec M) as ev eqn:Hev.
-symmetry in Hev.
-destruct ev as (ex, ey, ez).
-unfold rotation_unit_eigenvec in Hev.
-injection Hev; clear Hev; intros; subst ex ey ez.
-remember (a₃₂ M - a₂₃ M)%R as ex eqn:Hex.
-remember (a₁₃ M - a₃₁ M)%R as ey eqn:Hey.
-remember (a₂₁ M - a₁₂ M)%R as ez eqn:Hez.
-fold (vec_norm (P ex ey ez)).
-remember (P ex ey ez) as ev eqn:Hev.
-remember (vec_norm ev) as re eqn:Hre.
-move ey before ex; move ez before ey.
-move ev before V.
-unfold mul_const_vec.
-do 3 rewrite <- Ropp_mult_distr_l.
-remember (vec_norm V) as r eqn:Hr.
-replace (r * (ex / re))%R with (ex * (r / re))%R by lra.
-replace (r * (ey / re))%R with (ey * (r / re))%R by lra.
-replace (r * (ez / re))%R with (ez * (r / re))%R by lra.
-remember (r / re)%R as k eqn:Hk.
-setoid_rewrite Rmult_comm.
-unfold cos_rot_angle in Ha1, Ha2.
-unfold mat_trace in Ha1, Ha2.
-unfold is_rotation_matrix in Hrm.
-destruct Hrm as (Ht & Hd).
-unfold mat_det in Hd.
-unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
-injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-setoid_rewrite fold_Rsqr in H₁.
-setoid_rewrite fold_Rsqr in H₅.
-setoid_rewrite fold_Rsqr in H₉.
-move H₉ after H₁; move H₅ after H₁.
-move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
-clear H₄ H₇ H₈; move H₆ after H₂.
-move Hd before H₉.
-rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
-rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
-assert (H : (a₁₁ M + a₂₂ M + a₃₃ M ≠ 3)%R) by lra.
-clear Ha1; rename H into Ha1.
-assert (H : (a₁₁ M + a₂₂ M + a₃₃ M)%R ≠ (-1)%R) by lra.
-clear Ha2; rename H into Ha2.
-unfold mat_vec_mul in Hm.
-destruct V as (x, y, z).
-injection Hm; clear Hm; intros Hz Hy Hx.
-move Hz after Hy; move Hx after Hy.
-subst re r.
-rewrite Hev in Hk.
-simpl in Hk.
-Abort.
 
 Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el
