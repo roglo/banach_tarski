@@ -1196,7 +1196,7 @@ destruct (Req_dec a 0) as [Ha| Ha].
  apply Rmult_integral in Hx; destruct Hx as [Hx| Hx]; [ easy | ].
  apply Rmult_integral in Hy; destruct Hy as [Hy| Hy]; [ easy | ].
  apply Rmult_integral in Hz; destruct Hz as [Hz| Hz]; [ easy | ].
- now subst.
+ now exfalso; subst; apply Hv₂.
 
  destruct (Req_dec b 0) as [Hb| Hb].
   subst b; split; [ | easy ].
@@ -1204,7 +1204,7 @@ destruct (Req_dec a 0) as [Ha| Ha].
   apply Rmult_integral in Hx; destruct Hx as [Hx| Hx]; [ easy | ].
   apply Rmult_integral in Hy; destruct Hy as [Hy| Hy]; [ easy | ].
   apply Rmult_integral in Hz; destruct Hz as [Hz| Hz]; [ easy | ].
-  now subst.
+  now exfalso; subst; apply Hv₁.
 
   exfalso.
   apply Rplus_opp_r_uniq in Hx.
@@ -1230,7 +1230,7 @@ destruct (Req_dec a 0) as [Ha| Ha].
    apply Rabs_or in Hvn.
    destruct Hvn as [ Hvn | Hvn ].
     rewrite Hvn in Hvv.
-    now do 3 rewrite Rmult_1_l in Hvv.
+    now do 3 rewrite Rmult_1_l in Hvv; apply Hvv.
 
     rewrite Hvn in Hn.
     do 3 rewrite <- Ropp_mult_distr_l in Hn.
