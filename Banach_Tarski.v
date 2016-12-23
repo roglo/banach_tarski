@@ -1355,9 +1355,13 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
        destruct H₁; subst a b.
        do 2 rewrite mul_const_vec_0_l in Habc.
        do 2 rewrite vec_add_0_l in Habc.
-bbb.
+       apply eq_mul_const_vec_0 in Habc.
        split; [ easy | ].
        split; [ easy | ].
+       destruct Habc as [Habc | Habc]; [ easy | ].
+       rewrite HV₃ in Habc.
+       apply eq_mul_const_vec_0 in Habc.
+       destruct Habc as [Habc| Habc].
 bbb.
 
       destruct V₁ as (x₁, y₁, z₁).

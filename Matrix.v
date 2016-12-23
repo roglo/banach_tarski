@@ -636,6 +636,19 @@ intros (x, y, z); simpl.
 now do 3 rewrite Rplus_0_l.
 Qed.
 
+Theorem eq_mul_const_vec_0 : ∀ a V, (a ⁎ V = 0 → a = 0%R ∨ V = 0)%vec.
+Proof.
+intros a (x, y, z) HV; simpl in HV; simpl.
+injection HV; intros Hz Hy Hx.
+apply Rmult_integral in Hx.
+apply Rmult_integral in Hy.
+apply Rmult_integral in Hz.
+destruct Hx as [Hx| Hx]; [ now left | subst x ].
+destruct Hy as [Hy| Hy]; [ now left | subst y ].
+destruct Hz as [Hz| Hz]; [ now left | subst z ].
+now right.
+Qed.
+
 Theorem mul_const_vec_0_l : ∀ V, (0 ⁎ V = 0)%vec.
 Proof.
 intros (x, y, z); simpl.
