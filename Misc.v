@@ -352,14 +352,14 @@ assert (He : equiv _ R).
   now intros b c [Hbc| Hbc]; [ left; symmetry | right ].
 
  destruct (TTCA bool R He) as (f & Hx & Hxy).
+ subst R; simpl in Hx, Hxy.
  destruct (Bool.bool_dec (f false) (f true)) as [H| H].
   destruct (Hx true) as [Ht| Ht]; [ | now left ].
   destruct (Hx false) as [Hf| Hf]; [ | now left ].
   now rewrite <- Ht, <- Hf in H.
 
   right; intros H₁; apply H.
-  apply Hxy; unfold R.
-  now right.
+  now apply Hxy; right.
 Qed.
 
 Record choice_function {A} (R : A → A → Prop) f := mkcf
