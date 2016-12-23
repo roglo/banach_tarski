@@ -228,6 +228,19 @@ unfold mat_vec_mul.
 simpl; f_equal; lra.
 Qed.
 
+Theorem  mat_vec_add_cross_distr : ∀ M U V, (M * (U + V) = M * U + M * V)%vec.
+Proof.
+intros.
+destruct U as (u₁, u₂, u₃).
+destruct V as (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem  mat_vec_mul_const_distr : ∀ M k V, (M * (k ⁎ V) = k ⁎ (M * V))%vec.
+Proof.
+intros.
+destruct V as (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
 Theorem rot_rot_inv_x : ∀ pt,
   mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
 Proof.
