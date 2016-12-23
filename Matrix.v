@@ -630,6 +630,18 @@ rewrite sqrt_mult; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
 now rewrite sqrt_Rsqr_abs.
 Qed.
 
+Theorem vec_add_0_l : ∀ V, (0 + V = V)%vec.
+Proof.
+intros (x, y, z); simpl.
+now do 3 rewrite Rplus_0_l.
+Qed.
+
+Theorem mul_const_vec_0_l : ∀ V, (0 ⁎ V = 0)%vec.
+Proof.
+intros (x, y, z); simpl.
+now do 3 rewrite Rmult_0_l.
+Qed.
+
 Theorem mul_const_vec_1 : ∀ V, mul_const_vec 1 V = V.
 Proof.
 intros (x, y, z).

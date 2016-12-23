@@ -1342,12 +1342,24 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
      move Hvn' before Hvn.
      assert (Hfree2 : ∀ a b, (a ⁎ V₁ + b ⁎ V₂ = 0 → a = 0%R ∧ b = 0%R)%vec).
       now apply free_family_diff_norm_vec.
+
+      assert
+        (Hfree3 : ∀ a b c,
+         (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃ = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
+      intros * Habc.
+      remember (a ⁎ V₁ + b ⁎ V₂)%vec as V eqn:Hv.
+      symmetry in Hv.
+      destruct (eq_point_dec V 0%vec) as [H₁| H₁].
+       subst V.
+       apply Hfree2 in H₁.
+       destruct H₁; subst a b.
+       do 2 rewrite mul_const_vec_0_l in Habc.
+       do 2 rewrite vec_add_0_l in Habc.
+bbb.
+       split; [ easy | ].
+       split; [ easy | ].
 bbb.
 
-     assert
-       (Hfree3 : ∀ a b c,
-        (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃ = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
-      intros * Habc.
       destruct V₁ as (x₁, y₁, z₁).
       destruct V₂ as (x₂, y₂, z₂).
       destruct V₃ as (x₃, y₃, z₃).
