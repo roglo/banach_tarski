@@ -205,6 +205,17 @@ subst vv; f_equal.
 destruct pu; apply uip_nat.
 Qed.
 
+Theorem eq_mat_eq_list : ∀ A m n (M₁ M₂ : matrix' A m n),
+  M₁ = M₂ ↔ mat A m n M₁ = mat A m n M₂.
+Proof.
+split; [ now intros; subst | ].
+intros HMM.
+destruct M₁ as (m₁, p₁).
+destruct M₂ as (m₂, p₂); simpl in HMM.
+subst m₂; f_equal.
+destruct p₁; apply uip_nat.
+Qed.
+
 Theorem eq_vec_dec : ∀ U V : vector ℝ 3, { U = V } + { U ≠ V }.
 Proof.
 intros.
@@ -234,15 +245,35 @@ destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
  now right; intros H; subst V; apply Hx.
 Qed.
 
-Theorem rmat_eq_dec : ∀ m₁ m₂ : matrix' ℝ 3 3, { m₁ = m₂ } + { m₁ ≠ m₂ }.
+Theorem rmat_eq_dec' : ∀ M₁ M₂ : matrix' ℝ 3 3, { M₁ = M₂ } + { M₁ ≠ M₂ }.
 Proof.
 intros.
 remember (@mat_vec_el ℝ 3 3 0%R) as mve eqn:Hmve.
-destruct (eq_vec_dec (mve m₁ 1) (mve m₂ 1)) as [H₁| H₁].
- destruct (eq_vec_dec (mve m₁ 2) (mve m₂ 2)) as [H₂| H₂].
-  destruct (eq_vec_dec (mve m₁ 3) (mve m₂ 3)) as [H₃| H₃].
+destruct (eq_vec_dec (mve M₁ 1) (mve M₂ 1)) as [H₁| H₁].
+ destruct (eq_vec_dec (mve M₁ 2) (mve M₂ 2)) as [H₂| H₂].
+  destruct (eq_vec_dec (mve M₁ 3) (mve M₂ 3)) as [H₃| H₃].
    left.
-Abort. (* to be completed *)
+   destruct M₁ as (m₁, p₁).
+   destruct M₂ as (m₂, p₂).
+   subst mve.
+   unfold mat_vec_el in *; simpl in *.
+   destruct m₁; [ easy | ].
+   destruct m₁; [ easy | ].
+   destruct m₁; [ easy | ].
+   destruct m₁; [ | easy ].
+   destruct m₂; [ easy | ].
+   destruct m₂; [ easy | ].
+   destruct m₂; [ easy | ].
+   destruct m₂; [ | easy ].
+   simpl in *; subst.
+   now apply eq_mat_eq_list.
+
+   now right; intros H; subst M₂; apply H₃.
+
+  now right; intros H; subst M₂; apply H₂.
+
+ now right; intros H; subst M₂; apply H₁.
+Qed.
 
 (* end of new implementation *)
 
