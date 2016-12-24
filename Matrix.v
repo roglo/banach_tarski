@@ -12,47 +12,46 @@ Require Import Words Normalize Reverse MiscReals.
 
 (* starting a new implementation *)
 
+Delimit Scope vec_scope' with vec'.
+Delimit Scope mat_scope' with mat'.
+
 Record vector A n := mkvec
   { vec : list A;
     vprop : length vec = n }.
 
 Record matrix' A m n := mkmat'
-  { mat : list (vector A n);
-    mprop : length mat = m }.
+  { mat : vector (vector A n) m }.
 
-Theorem vprop_map : ∀ A B (f : A → B) n V, length (map f (vec A n V)) = n.
+Arguments vec [A] [n] _%vec'.
+Arguments mat [A] [m] [n] _%mat'.
+
+Theorem vprop_map {A B} : ∀ (f : A → B) n (V : vector A n),
+  length (map f (vec V)) = n.
 Proof.
-intros A B f n (v, p); simpl.
+intros f n (v, p); simpl.
 now rewrite map_length.
 Qed.
 
-Definition vec_map A B n (f : A → B) V :=
-  mkvec B n (map f (vec A n V)) (vprop_map A B f n V).
-
-Theorem mprop_map : ∀ A B (f : A → B) m n M,
-  length (map (vec_map A B n f) (mat A m n M)) = m.
-Proof.
-intros A B f m n (ma, pr); simpl.
-now rewrite map_length.
-Qed.
+Definition vec_map {A B n} (f : A → B) V :=
+  mkvec B n (map f (vec V)) (vprop_map f n V).
 
 Definition mat_map' A B m n (f : A → B) M :=
-  mkmat' B m n (map (vec_map A B n f) (mat A m n M)) (mprop_map A B f m n M).
+  mkmat' B m n (vec_map (vec_map f) (mat M)).
 
-Definition vec_el {A n} d V i := List.nth (pred i) (vec A n V) d.
-
-Definition mat_vec_el {A m n} d M i :=
-  List.nth (pred i) (mat A m n M)
-    (mkvec A n (repeat d n) (repeat_length d n)).
+Definition vec_el {A n} d (V : vector A n) i :=
+  List.nth (pred i) (vec V) d.
 
 Definition mat_el {A m n} d (M : matrix' A m n) i j :=
-  let V := List.nth (pred i) (map (vec A n) (mat A m n M)) (repeat d n) in
-  List.nth (pred j) V d.
+  vec_el d
+    (vec_el (mkvec A n (repeat d n) (repeat_length d n)) (mat M) i)
+    (pred j).
 
 Import ListNotations.
 
 Definition mkrvec (a b c : ℝ) :=
   mkvec _ 3 [a; b; c] eq_refl.
+
+bbb.
 
 Definition mkrmat' (a b c d e f g h i : ℝ) :=
   mkmat' _ 3 _ [mkrvec a b c; mkrvec d e f; mkrvec g h i] eq_refl.
@@ -97,7 +96,6 @@ Definition mul_const_mat' k M :=
     (k * m₂₁ M) (k * m₂₂ M) (k * m₂₃ M)
     (k * m₃₁ M) (k * m₃₂ M) (k * m₃₃ M).
 
-Delimit Scope vec_scope' with vec'.
 Notation "0" := (mkrvec 0 0 0) : vec_scope'.
 Notation "k ⁎ V" := (mul_const_vec' k V) (at level 40) : vec_scope'.
 Notation "M * V" := (mat_vec_mul' M V) : vec_scope'.
@@ -163,7 +161,6 @@ Definition mat_id' :=
     0 1 0
     0 0 1.
 
-Delimit Scope mat_scope' with mat'.
 Notation "m₁ * m₂" := (mat_mul' m₁ m₂) : mat_scope'.
 
 (* P.M. Pédrot's code *)
