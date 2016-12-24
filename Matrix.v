@@ -39,9 +39,13 @@ Qed.
 Definition mat_map' A B m n (f : A → B) M :=
   mkmat' B m n (map (vec_map A B n f) (mat A m n M)) (mprop_map A B f m n M).
 
-Definition vecel {A n} d V i := List.nth (pred i) (vec A n V) d.
+Definition vec_el {A n} d V i := List.nth (pred i) (vec A n V) d.
 
-Definition matel {A m n} d (M : matrix' A m n) i j :=
+Definition mat_vec_el {A m n} d M i :=
+  List.nth (pred i) (mat A m n M)
+    (mkvec A n (repeat d n) (repeat_length d n)).
+
+Definition mat_el {A m n} d (M : matrix' A m n) i j :=
   let V := List.nth (pred i) (map (vec A n) (mat A m n M)) (repeat d n) in
   List.nth (pred j) V d.
 
@@ -53,21 +57,21 @@ Definition mkrvec (a b c : ℝ) :=
 Definition mkrmat' (a b c d e f g h i : ℝ) :=
   mkmat' _ 3 _ [mkrvec a b c; mkrvec d e f; mkrvec g h i] eq_refl.
 
-Definition rvecel (V : vector ℝ 3) := vecel 0%R V.
-Definition rmatel (M : matrix' ℝ 3 3) := matel 0%R M.
+Definition rvec_el (V : vector ℝ 3) := vec_el 0%R V.
+Definition rmat_el (M : matrix' ℝ 3 3) := mat_el 0%R M.
 
-Definition m₁₁ M := rmatel M 1 1.
-Definition m₁₂ M := rmatel M 1 2.
-Definition m₁₃ M := rmatel M 1 3.
-Definition m₂₁ M := rmatel M 2 1.
-Definition m₂₂ M := rmatel M 2 2.
-Definition m₂₃ M := rmatel M 2 3.
-Definition m₃₁ M := rmatel M 3 1.
-Definition m₃₂ M := rmatel M 3 2.
-Definition m₃₃ M := rmatel M 3 3.
-Definition xv V := rvecel V 1.
-Definition yv V := rvecel V 2.
-Definition zv V := rvecel V 3.
+Definition m₁₁ M := rmat_el M 1 1.
+Definition m₁₂ M := rmat_el M 1 2.
+Definition m₁₃ M := rmat_el M 1 3.
+Definition m₂₁ M := rmat_el M 2 1.
+Definition m₂₂ M := rmat_el M 2 2.
+Definition m₂₃ M := rmat_el M 2 3.
+Definition m₃₁ M := rmat_el M 3 1.
+Definition m₃₂ M := rmat_el M 3 2.
+Definition m₃₃ M := rmat_el M 3 3.
+Definition xv V := rvec_el V 1.
+Definition yv V := rvec_el V 2.
+Definition zv V := rvec_el V 3.
 
 Definition mat_vec_mul' (M : matrix' ℝ 3 3) (V : vector ℝ 3) :=
   mkrvec
@@ -220,7 +224,7 @@ destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
    destruct vv as [| v₃ vv]; [ easy | ].
    destruct vv; [ | easy ].
    unfold xv in Hx; unfold yv in Hy; unfold zv in Hz.
-   unfold rvecel, vecel in Hx, Hy, Hz; simpl in Hx, Hy, Hz.
+   unfold rvec_el, vec_el in Hx, Hy, Hz; simpl in Hx, Hy, Hz.
    now subst.
 
    now right; intros H; subst V; apply Hz.
@@ -229,6 +233,16 @@ destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
 
  now right; intros H; subst V; apply Hx.
 Qed.
+
+Theorem rmat_eq_dec : ∀ m₁ m₂ : matrix' ℝ 3 3, { m₁ = m₂ } + { m₁ ≠ m₂ }.
+Proof.
+intros.
+remember (@mat_vec_el ℝ 3 3 0%R) as mve eqn:Hmve.
+destruct (eq_vec_dec (mve m₁ 1) (mve m₂ 1)) as [H₁| H₁].
+ destruct (eq_vec_dec (mve m₁ 2) (mve m₂ 2)) as [H₂| H₂].
+  destruct (eq_vec_dec (mve m₁ 3) (mve m₂ 3)) as [H₃| H₃].
+   left.
+Abort. (* to be completed *)
 
 (* end of new implementation *)
 
