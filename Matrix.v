@@ -61,20 +61,54 @@ Definition rot_x' := mkrmat'
 Definition rvecel (V : vector ℝ 3) := vecel 0%R V.
 Definition rmatel (M : matrix' ℝ 3 3) := matel 0%R M.
 
+Definition m₁₁ M := rmatel M 1 1.
+Definition m₁₂ M := rmatel M 1 2.
+Definition m₁₃ M := rmatel M 1 3.
+Definition m₂₁ M := rmatel M 2 1.
+Definition m₂₂ M := rmatel M 2 2.
+Definition m₂₃ M := rmatel M 2 3.
+Definition m₃₁ M := rmatel M 3 1.
+Definition m₃₂ M := rmatel M 3 2.
+Definition m₃₃ M := rmatel M 3 3.
+Definition xv V := rvecel V 1.
+Definition yv V := rvecel V 2.
+Definition zv V := rvecel V 3.
+
 Definition mat_vec_mul' (M : matrix' ℝ 3 3) (V : vector ℝ 3) :=
   mkrvec
-    (rmatel M 1 1 * rvecel V 1 + rmatel M 1 2 * rvecel V 2 +
-     rmatel M 1 3 * rvecel V 3)%R
-    (rmatel M 2 1 * rvecel V 1 + rmatel M 2 2 * rvecel V 2 +
-     rmatel M 2 3 * rvecel V 3)%R
-    (rmatel M 3 1 * rvecel V 1 + rmatel M 3 2 * rvecel V 2 +
-     rmatel M 3 3 * rvecel V 3)%R.
+    (m₁₁ M * xv V + m₁₂ M * yv V + m₁₃ M * zv V)
+    (m₂₁ M * xv V + m₂₂ M * yv V + m₂₃ M * zv V)
+    (m₃₁ M * xv V + m₃₂ M * yv V + m₃₃ M * zv V).
 
-Definition vec_norm' (V : vector _ 3) :=
-  √ ((rvecel V 1)² + (rvecel V 2)² + (rvecel V 3)²).
-Definition vec_add' (U V : vector ℝ 3) :=
-  mkrvec (rvecel U 1 * rvecel V 1) (rvecel U 2 * rvecel V 2)
-    (rvecel U 3 * rvecel V 3).
+Definition vec_norm' V :=
+  √ ((xv V)² + (yv V)² + (zv V)²).
+Definition vec_add' U V :=
+  mkrvec (xv U * xv V) (yv U * yv V) (zv U * zv V).
+Definition vec_dot_mul' U V :=
+  (xv U * xv V + yv U * yv V + zv U * zv V)%R.
+Definition vec_cross_mul' U V :=
+  mkrvec
+    (yv U * zv V - zv U * yv V)
+    (zv U * xv V - xv U * zv V)
+    (xv U * yv V - yv U * xv V).
+Definition mul_const_vec' k V := mkrvec (k * xv V) (k * yv V) (k * zv V).
+Definition mul_const_mat' k M :=
+  mkrmat'
+    (k * m₁₁ M) (k * m₁₂ M) (k * m₁₃ M)
+    (k * m₂₁ M) (k * m₂₂ M) (k * m₂₃ M)
+    (k * m₃₁ M) (k * m₃₂ M) (k * m₃₃ M).
+
+Delimit Scope vec_scope' with vec'.
+Notation "0" := (mkrvec 0 0 0) : vec_scope'.
+Notation "k ⁎ V" := (mul_const_vec' k V) (at level 40) : vec_scope'.
+Notation "M * V" := (mat_vec_mul' M V) : vec_scope'.
+Notation "U + V" := (vec_add' U V) : vec_scope'.
+Notation "U • V" := (vec_dot_mul' U V) (at level 40, left associativity) :
+  vec_scope'.
+Notation "U × V" := (vec_cross_mul' U V) (at level 40, left associativity) :
+  vec_scope'.
+Notation "∥ V ∥" := (vec_norm' V) (at level 0, V at level 0, format "∥ V ∥") :
+  vec_scope'.
 
 (* end of new implementation *)
 
