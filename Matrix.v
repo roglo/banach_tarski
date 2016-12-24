@@ -45,19 +45,18 @@ Definition matel {A m n} d (M : matrix' A m n) i j :=
   let V := List.nth i (map (vec A n) (mat A m n M)) (repeat d n) in
   List.nth j V d.
 
-(*
 Import ListNotations.
 
-Theorem glop : ∀ (a b c : ℝ), length [a; b; c] = 3.
-Proof. easy. Qed.
+Definition mkrvec (a b c : ℝ) :=
+  mkvec _ 3 [a; b; c] eq_refl.
 
-Definition rot_x' := mkmat' ℝ 3 3
-  [mkvec ℝ 3 ([1; 0; 0])%R (glop 1 0 0);
-   mkvec ℝ 3 ([0; 1/3; -2*√2/3])%R (glop 0 (1/3) (-2*√2/3));
-   mkvec ℝ 3 ([0; 2*√2/3; 1/3])%R (glop 0 (2*√2/3) (1/3))].
+Definition mkrmat' (a b c d e f g h i : ℝ) :=
+  mkmat' _ 3 _ [mkrvec a b c; mkrvec d e f; mkrvec g h i] eq_refl.
 
-Print rot_x.
-*)
+Definition rot_x' := mkrmat'
+  1         0         0
+  0         (1/3)     (-2*√2/3)
+  0         (2*√2/3)  (1/3).
 
 (* end of new implementation *)
 
