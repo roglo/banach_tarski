@@ -10,6 +10,57 @@ Require Import Reals Psatz.
 
 Require Import Words Normalize Reverse MiscReals.
 
+(* starting a new implementation *)
+
+Record vector A n := mkvec
+  { vec : list A;
+    vprop : length vec = n }.
+
+Record matrix' A m n := mkmat'
+  { mat : list (vector A n);
+    mprop : length mat = m }.
+
+Theorem vprop_map : ∀ A B (f : A → B) n V, length (map f (vec A n V)) = n.
+Proof.
+intros A B f n (v, p); simpl.
+now rewrite map_length.
+Qed.
+
+Definition vec_map A B n (f : A → B) V :=
+  mkvec B n (map f (vec A n V)) (vprop_map A B f n V).
+
+Theorem mprop_map : ∀ A B (f : A → B) m n M,
+  length (map (vec_map A B n f) (mat A m n M)) = m.
+Proof.
+intros A B f m n (ma, pr); simpl.
+now rewrite map_length.
+Qed.
+
+Definition mat_map' A B m n (f : A → B) M :=
+  mkmat' B m n (map (vec_map A B n f) (mat A m n M)) (mprop_map A B f m n M).
+
+Definition vecel {A n} d V i := List.nth i (vec A n V) d.
+
+Definition matel {A m n} d (M : matrix' A m n) i j :=
+  let V := List.nth i (map (vec A n) (mat A m n M)) (repeat d n) in
+  List.nth j V d.
+
+(*
+Import ListNotations.
+
+Theorem glop : ∀ (a b c : ℝ), length [a; b; c] = 3.
+Proof. easy. Qed.
+
+Definition rot_x' := mkmat' ℝ 3 3
+  [mkvec ℝ 3 ([1; 0; 0])%R (glop 1 0 0);
+   mkvec ℝ 3 ([0; 1/3; -2*√2/3])%R (glop 0 (1/3) (-2*√2/3));
+   mkvec ℝ 3 ([0; 2*√2/3; 1/3])%R (glop 0 (2*√2/3) (1/3))].
+
+Print rot_x.
+*)
+
+(* end of new implementation *)
+
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
     a₂₁ : A; a₂₂ : A; a₂₃ : A;
