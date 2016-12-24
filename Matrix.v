@@ -22,6 +22,8 @@ Record vector A n := mkvec
 Record matrix' A m n := mkmat'
   { mat : vector (vector A n) m }.
 
+Arguments mkvec [A] [n] _ _.
+Arguments mkmat' [A] [m] [n] _.
 Arguments vec [A] [n] _%vec'.
 Arguments mat [A] [m] [n] _%mat'.
 
@@ -33,28 +35,26 @@ now rewrite map_length.
 Qed.
 
 Definition vec_map {A B n} (f : A → B) V :=
-  mkvec B n (map f (vec V)) (vprop_map f n V).
+  mkvec (map f (vec V)) (vprop_map f n V).
 
-Definition mat_map' A B m n (f : A → B) M :=
-  mkmat' B m n (vec_map (vec_map f) (mat M)).
+Definition mat_map' A B m n (f : A → B) (M : matrix' A m n) :=
+  mkmat' (vec_map (vec_map f) (mat M)).
 
 Definition vec_el {A n} d (V : vector A n) i :=
   List.nth (pred i) (vec V) d.
 
 Definition mat_el {A m n} d (M : matrix' A m n) i j :=
   vec_el d
-    (vec_el (mkvec A n (repeat d n) (repeat_length d n)) (mat M) i)
+    (vec_el (mkvec (repeat d n) (repeat_length d n)) (mat M) i)
     (pred j).
 
 Import ListNotations.
 
-Definition mkrvec (a b c : ℝ) :=
-  mkvec _ 3 [a; b; c] eq_refl.
+Definition mkrvec (a b c : ℝ) : vector ℝ 3 :=
+  mkvec [a; b; c] eq_refl.
 
-bbb.
-
-Definition mkrmat' (a b c d e f g h i : ℝ) :=
-  mkmat' _ 3 _ [mkrvec a b c; mkrvec d e f; mkrvec g h i] eq_refl.
+Definition mkrmat' (a b c d e f g h i : ℝ) : matrix' ℝ 3 3 :=
+  mkmat' (mkvec [mkrvec a b c; mkrvec d e f; mkrvec g h i] eq_refl).
 
 Definition rvec_el (V : vector ℝ 3) := vec_el 0%R V.
 Definition rmat_el (M : matrix' ℝ 3 3) := mat_el 0%R M.
@@ -191,7 +191,7 @@ Qed.
 (* end P.M. Pédrot's code *)
 
 Theorem eq_vec_eq_list : ∀ A n (U V : vector A n),
-  U = V ↔ vec A n U = vec A n V.
+  U = V ↔ vec U = vec V.
 Proof.
 intros.
 split; [ now intros; subst | ].
@@ -203,14 +203,13 @@ destruct pu; apply uip_nat.
 Qed.
 
 Theorem eq_mat_eq_list : ∀ A m n (M₁ M₂ : matrix' A m n),
-  M₁ = M₂ ↔ mat A m n M₁ = mat A m n M₂.
+  M₁ = M₂ ↔ mat M₁ = mat M₂.
 Proof.
 split; [ now intros; subst | ].
 intros HMM.
-destruct M₁ as (m₁, p₁).
-destruct M₂ as (m₂, p₂); simpl in HMM.
-subst m₂; f_equal.
-destruct p₁; apply uip_nat.
+destruct M₁ as (m₁).
+destruct M₂ as (m₂).
+now simpl in HMM; subst.
 Qed.
 
 Theorem eq_vec_dec : ∀ U V : vector ℝ 3, { U = V } + { U ≠ V }.
@@ -242,9 +241,33 @@ destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
  now right; intros H; subst V; apply Hx.
 Qed.
 
+Check vec_el.
+
+bbb.
+
+Definition mat_vec_el {A m n} d (M : matrix' A m n) (i : nat) :=
+  vec_el
+  (@mkvec A n (repeat d n) (repeat_length d n)).
+
+Print mat_vec_el.
+
+
+  List.nth (pred i) (mat M)
+
+Definition mat_vec_el {A m n} d M i :=
+  List.nth (pred i) (mat M)
+    (mkvec A n (repeat d n) (repeat_length d n)).
+
 Theorem rmat_eq_dec' : ∀ M₁ M₂ : matrix' ℝ 3 3, { M₁ = M₂ } + { M₁ ≠ M₂ }.
 Proof.
 intros.
+bbb.
+
+Print vec_el.
+Check (@vec_el _ _ _ (mat M₁) 1).
+remember (@vec_el _ 3 0%R) as mve eqn:Hmve.
+destruct (eq_vec_dec (mve (mat M₁) 1) (vec_el (mat M₂) 1)) as [H₁| H₁].
+
 remember (@mat_vec_el ℝ 3 3 0%R) as mve eqn:Hmve.
 destruct (eq_vec_dec (mve M₁ 1) (mve M₂ 1)) as [H₁| H₁].
  destruct (eq_vec_dec (mve M₁ 2) (mve M₂ 2)) as [H₂| H₂].
