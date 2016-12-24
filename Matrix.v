@@ -162,18 +162,6 @@ Definition mat_id' :=
 Delimit Scope mat_scope' with mat'.
 Notation "m₁ * m₂" := (mat_mul' m₁ m₂) : mat_scope'.
 
-Theorem eq_vec_dec : ∀ U V : vector ℝ 3, { U = V } + { U ≠ V }.
-Proof.
-intros.
-destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
- destruct (Req_dec (yv U) (yv V)) as [Hy| Hy].
-  destruct (Req_dec (zv U) (zv V)) as [Hz| Hz].
-   left.
-   destruct U as (vu, pu).
-   destruct V as (vv, pv); simpl in Hx, Hy, Hz.
-   unfold xv in Hx; unfold yv in Hy; unfold zv in Hz.
-   unfold rvecel, vecel in Hx, Hy, Hz; simpl in Hx, Hy, Hz.
-
 (* P.M. Pédrot's code *)
 
 Definition inj {n m} (p : n = m) : S n = S m.
@@ -210,9 +198,22 @@ intros HUV.
 destruct U as (vu, pu).
 destruct V as (vv, pv); simpl in HUV; simpl.
 subst vv; f_equal.
-(*
-apply uip_nat.
-*) Abort.
+destruct pu; apply uip_nat.
+Qed.
+
+Theorem eq_vec_dec : ∀ U V : vector ℝ 3, { U = V } + { U ≠ V }.
+Proof.
+intros.
+destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
+ destruct (Req_dec (yv U) (yv V)) as [Hy| Hy].
+  destruct (Req_dec (zv U) (zv V)) as [Hz| Hz].
+   left.
+   apply eq_vec_list.
+   destruct U as (vu, pu).
+   destruct V as (vv, pv); simpl in Hx, Hy, Hz; simpl.
+   unfold xv in Hx; unfold yv in Hy; unfold zv in Hz.
+   unfold rvecel, vecel in Hx, Hy, Hz; simpl in Hx, Hy, Hz.
+Abort. (* to be completed *)
 
 (* end of new implementation *)
 
