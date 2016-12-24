@@ -39,11 +39,11 @@ Qed.
 Definition mat_map' A B m n (f : A → B) M :=
   mkmat' B m n (map (vec_map A B n f) (mat A m n M)) (mprop_map A B f m n M).
 
-Definition vecel {A n} d V i := List.nth i (vec A n V) d.
+Definition vecel {A n} d V i := List.nth (pred i) (vec A n V) d.
 
 Definition matel {A m n} d (M : matrix' A m n) i j :=
-  let V := List.nth i (map (vec A n) (mat A m n M)) (repeat d n) in
-  List.nth j V d.
+  let V := List.nth (pred i) (map (vec A n) (mat A m n M)) (repeat d n) in
+  List.nth (pred j) V d.
 
 Import ListNotations.
 
@@ -57,6 +57,15 @@ Definition rot_x' := mkrmat'
   1         0         0
   0         (1/3)     (-2*√2/3)
   0         (2*√2/3)  (1/3).
+
+Definition mat_vec_mul' (M : matrix' ℝ 3 3) (V : vector ℝ 3) :=
+  mkrvec
+    (matel 0 M 1 1 * vecel 0 V 1 + matel 0 M 1 2 * vecel 0 V 2 +
+     matel 0 M 1 3 * vecel 0 V 3)%R
+    (matel 0 M 2 1 * vecel 0 V 1 + matel 0 M 2 2 * vecel 0 V 2 +
+     matel 0 M 2 3 * vecel 0 V 3)%R
+    (matel 0 M 3 1 * vecel 0 V 1 + matel 0 M 3 2 * vecel 0 V 2 +
+     matel 0 M 3 3 * vecel 0 V 3)%R.
 
 (* end of new implementation *)
 
