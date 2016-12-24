@@ -58,14 +58,23 @@ Definition rot_x' := mkrmat'
   0         (1/3)     (-2*√2/3)
   0         (2*√2/3)  (1/3).
 
+Definition rvecel (V : vector ℝ 3) := vecel 0%R V.
+Definition rmatel (M : matrix' ℝ 3 3) := matel 0%R M.
+
 Definition mat_vec_mul' (M : matrix' ℝ 3 3) (V : vector ℝ 3) :=
   mkrvec
-    (matel 0 M 1 1 * vecel 0 V 1 + matel 0 M 1 2 * vecel 0 V 2 +
-     matel 0 M 1 3 * vecel 0 V 3)%R
-    (matel 0 M 2 1 * vecel 0 V 1 + matel 0 M 2 2 * vecel 0 V 2 +
-     matel 0 M 2 3 * vecel 0 V 3)%R
-    (matel 0 M 3 1 * vecel 0 V 1 + matel 0 M 3 2 * vecel 0 V 2 +
-     matel 0 M 3 3 * vecel 0 V 3)%R.
+    (rmatel M 1 1 * rvecel V 1 + rmatel M 1 2 * rvecel V 2 +
+     rmatel M 1 3 * rvecel V 3)%R
+    (rmatel M 2 1 * rvecel V 1 + rmatel M 2 2 * rvecel V 2 +
+     rmatel M 2 3 * rvecel V 3)%R
+    (rmatel M 3 1 * rvecel V 1 + rmatel M 3 2 * rvecel V 2 +
+     rmatel M 3 3 * rvecel V 3)%R.
+
+Definition vec_norm' (V : vector _ 3) :=
+  √ ((rvecel V 1)² + (rvecel V 2)² + (rvecel V 3)²).
+Definition vec_add' (U V : vector ℝ 3) :=
+  mkrvec (rvecel U 1 * rvecel V 1) (rvecel U 2 * rvecel V 2)
+    (rvecel U 3 * rvecel V 3).
 
 (* end of new implementation *)
 
