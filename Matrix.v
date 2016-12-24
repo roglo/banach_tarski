@@ -189,7 +189,7 @@ Qed.
 
 (* end P.M. Pédrot's code *)
 
-Theorem eq_vec_list : ∀ A n (U V : vector A n),
+Theorem eq_vec_eq_list : ∀ A n (U V : vector A n),
   U = V ↔ vec A n U = vec A n V.
 Proof.
 intros.
@@ -208,12 +208,27 @@ destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
  destruct (Req_dec (yv U) (yv V)) as [Hy| Hy].
   destruct (Req_dec (zv U) (zv V)) as [Hz| Hz].
    left.
-   apply eq_vec_list.
+   apply eq_vec_eq_list.
    destruct U as (vu, pu).
    destruct V as (vv, pv); simpl in Hx, Hy, Hz; simpl.
+   destruct vu as [| u₁ vu]; [ easy | ].
+   destruct vu as [| u₂ vu]; [ easy | ].
+   destruct vu as [| u₃ vu]; [ easy | ].
+   destruct vu; [ | easy ].
+   destruct vv as [| v₁ vv]; [ easy | ].
+   destruct vv as [| v₂ vv]; [ easy | ].
+   destruct vv as [| v₃ vv]; [ easy | ].
+   destruct vv; [ | easy ].
    unfold xv in Hx; unfold yv in Hy; unfold zv in Hz.
    unfold rvecel, vecel in Hx, Hy, Hz; simpl in Hx, Hy, Hz.
-Abort. (* to be completed *)
+   now subst.
+
+   now right; intros H; subst V; apply Hz.
+
+  now right; intros H; subst V; apply Hy.
+
+ now right; intros H; subst V; apply Hx.
+Qed.
 
 (* end of new implementation *)
 
