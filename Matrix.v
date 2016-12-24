@@ -53,11 +53,6 @@ Definition mkrvec (a b c : ℝ) :=
 Definition mkrmat' (a b c d e f g h i : ℝ) :=
   mkmat' _ 3 _ [mkrvec a b c; mkrvec d e f; mkrvec g h i] eq_refl.
 
-Definition rot_x' := mkrmat'
-  1         0         0
-  0         (1/3)     (-2*√2/3)
-  0         (2*√2/3)  (1/3).
-
 Definition rvecel (V : vector ℝ 3) := vecel 0%R V.
 Definition rmatel (M : matrix' ℝ 3 3) := matel 0%R M.
 
@@ -109,6 +104,115 @@ Notation "U × V" := (vec_cross_mul' U V) (at level 40, left associativity) :
   vec_scope'.
 Notation "∥ V ∥" := (vec_norm' V) (at level 0, V at level 0, format "∥ V ∥") :
   vec_scope'.
+
+Definition rot_x' := mkrmat'
+  1         0         0
+  0         (1/3)     (-2*√2/3)
+  0         (2*√2/3)  (1/3).
+Definition rot_inv_x' := mkrmat'
+  1         0         0
+  0         (1/3)     (2*√2/3)
+  0         (-2*√2/3) (1/3).
+Definition rot_z' := mkrmat'
+  (1/3)     (-2*√2/3) 0
+  (2*√2/3)  (1/3)     0
+  0         0         1.
+Definition rot_inv_z' := mkrmat'
+  (1/3)     (2*√2/3)  0
+  (-2*√2/3) (1/3)     0
+  0         0         1.
+
+Definition is_neg_vec V :=
+  if Rlt_dec (xv V) 0 then true
+  else if Rgt_dec (xv V) 0 then false
+  else if Rlt_dec (yv V) 0 then true
+  else if Rgt_dec (yv V) 0 then false
+  else if Rlt_dec (zv V) 0 then true
+  else if Rgt_dec (zv V) 0 then false
+  else true.
+
+Definition mat_of_elem' e :=
+  match e with
+  | ạ => rot_x'
+  | ạ⁻¹ => rot_inv_x'
+  | ḅ => rot_z'
+  | ḅ⁻¹ => rot_inv_z'
+  end.
+
+Definition rotate' e pt := mat_vec_mul' (mat_of_elem' e) pt.
+
+Definition mat_mul' m₁ m₂ :=
+  mkrmat'
+    (m₁₁ m₁ * m₁₁ m₂ + m₁₂ m₁ * m₂₁ m₂ + m₁₃ m₁ * m₃₁ m₂)
+    (m₁₁ m₁ * m₁₂ m₂ + m₁₂ m₁ * m₂₂ m₂ + m₁₃ m₁ * m₃₂ m₂)
+    (m₁₁ m₁ * m₁₃ m₂ + m₁₂ m₁ * m₂₃ m₂ + m₁₃ m₁ * m₃₃ m₂)
+    (m₂₁ m₁ * m₁₁ m₂ + m₂₂ m₁ * m₂₁ m₂ + m₂₃ m₁ * m₃₁ m₂)
+    (m₂₁ m₁ * m₁₂ m₂ + m₂₂ m₁ * m₂₂ m₂ + m₂₃ m₁ * m₃₂ m₂)
+    (m₂₁ m₁ * m₁₃ m₂ + m₂₂ m₁ * m₂₃ m₂ + m₂₃ m₁ * m₃₃ m₂)
+    (m₃₁ m₁ * m₁₁ m₂ + m₃₂ m₁ * m₂₁ m₂ + m₃₃ m₁ * m₃₁ m₂)
+    (m₃₁ m₁ * m₁₂ m₂ + m₃₂ m₁ * m₂₂ m₂ + m₃₃ m₁ * m₃₂ m₂)
+    (m₃₁ m₁ * m₁₃ m₂ + m₃₂ m₁ * m₂₃ m₂ + m₃₃ m₁ * m₃₃ m₂).
+
+Definition mat_id' :=
+  mkrmat'
+    1 0 0
+    0 1 0
+    0 0 1.
+
+Delimit Scope mat_scope' with mat'.
+Notation "m₁ * m₂" := (mat_mul' m₁ m₂) : mat_scope'.
+
+Theorem eq_vec_dec : ∀ U V : vector ℝ 3, { U = V } + { U ≠ V }.
+Proof.
+intros.
+destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
+ destruct (Req_dec (yv U) (yv V)) as [Hy| Hy].
+  destruct (Req_dec (zv U) (zv V)) as [Hz| Hz].
+   left.
+   destruct U as (vu, pu).
+   destruct V as (vv, pv); simpl in Hx, Hy, Hz.
+   unfold xv in Hx; unfold yv in Hy; unfold zv in Hz.
+   unfold rvecel, vecel in Hx, Hy, Hz; simpl in Hx, Hy, Hz.
+
+(* P.M. Pédrot's code *)
+
+Definition inj {n m} (p : n = m) : S n = S m.
+Proof. now destruct p. Defined.
+
+Lemma uip_nat : ∀ (n : nat) (p q : n = n), p = q.
+Proof.
+induction n.
+ destruct p; intros q.
+ now refine (match q in _ = m with eq_refl => _ end).
+
+ destruct p; intros q.
+ refine (
+   match q in _ = m return
+     match m return ∀ (q : S n = m), Type with
+     | 0 => fun _ => unit
+     | S i => fun q => ∀ (p : n = i), inj p = q
+     end q
+   with
+   | eq_refl => _
+   end eq_refl).
+ intros p.
+ now rewrite (IHn p eq_refl).
+Qed.
+
+(* end P.M. Pédrot's code *)
+
+Theorem eq_vec_list : ∀ A n (U V : vector A n),
+  U = V ↔ vec A n U = vec A n V.
+Proof.
+intros.
+split; [ now intros; subst | ].
+intros HUV.
+destruct U as (vu, pu).
+destruct V as (vv, pv); simpl in HUV; simpl.
+subst vv; f_equal.
+(*
+apply uip_nat.
+*) Abort.
 
 (* end of new implementation *)
 
