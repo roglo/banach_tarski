@@ -1396,6 +1396,27 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
           do 3 rewrite Rmult_0_l in H₁.
           now exfalso; apply H₁.
 
+          destruct (Req_dec x₁ 0) as [Hx₁| Hx₁].
+           subst x₁.
+           rewrite Rmult_0_l, Rminus_0_r in Hy.
+           rewrite Rmult_0_l, Rminus_0_l in Hz.
+           destruct (Req_dec y₁ 0) as [Hy₁| Hy₁].
+            subst y₁.
+            rewrite Rmult_0_l, Rminus_0_l in Hx.
+            rewrite Rmult_0_l, Ropp_0, Rmult_0_r, Rmult_0_r in Hz.
+            rewrite Rplus_0_r in Hz.
+            apply Rmult_integral in Hz.
+            destruct Hz as [Hz| Hz]; [ easy | subst z₂ ].
+            rewrite Rmult_0_r in Hv.
+            destruct (Req_dec z₁ 0) as [Hz₁| Hz₁].
+             now subst z₁; exfalso; apply Hv₁.
+
+             destruct (Req_dec x₂ 0) as [Hx₂| Hx₂].
+              subst x₂.
+              do 3 rewrite Rmult_0_r in Hy.
+              rewrite Rplus_0_r in Hy.
+              apply Rmult_integral in Hy.
+              destruct Hy as [Hy| Hy]; [ easy | subst y₂ ].
 bbb.
         symmetry in Habc.
 Theorem vec_add_comm : ∀ U V, (U + V)%vec = (V + U)%vec.
