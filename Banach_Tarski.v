@@ -1414,7 +1414,14 @@ simpl in Hn.
             rewrite <- Ropp_mult_distr_r in Hx.
             rewrite fold_Rminus in Hx.
             apply Rminus_diag_uniq in Hx.
+            apply Rmult_eq_compat_r with (r := y₂) in Hx.
+            apply Rmult_eq_compat_r with (r := x₂) in Hy.
+            rewrite Rmult_0_l in Hy.
+            rewrite Rmult_plus_distr_r in Hy.
+            rewrite Rmult_shuffle0 in Hy.
             rewrite Hx in Hy.
+            do 6 rewrite Rmult_assoc in Hy.
+            rewrite <- Rmult_plus_distr_l in Hy.
 *)
             destruct (Req_dec z₁ 0) as [Hz₁| Hz₁].
              now subst z₁; exfalso; apply Hv₁.
