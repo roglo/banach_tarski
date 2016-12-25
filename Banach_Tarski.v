@@ -1391,6 +1391,7 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
          subst a.
          rewrite Rmult_0_l, Rplus_0_l in Hx, Hy, Hz.
          do 3 rewrite Rmult_0_l, Rplus_0_l in Hv.
+simpl in Hn.
          destruct (Req_dec b 0) as [Hb| Hb].
           subst b; rewrite <- Hv in H₁.
           do 3 rewrite Rmult_0_l in H₁.
@@ -1408,6 +1409,13 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
             apply Rmult_integral in Hz.
             destruct Hz as [Hz| Hz]; [ easy | subst z₂ ].
             rewrite Rmult_0_r in Hv.
+(*
+            rewrite <- Ropp_mult_distr_r in Hx.
+            rewrite <- Ropp_mult_distr_r in Hx.
+            rewrite fold_Rminus in Hx.
+            apply Rminus_diag_uniq in Hx.
+            rewrite Hx in Hy.
+*)
             destruct (Req_dec z₁ 0) as [Hz₁| Hz₁].
              now subst z₁; exfalso; apply Hv₁.
 
@@ -1417,6 +1425,25 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
               rewrite Rplus_0_r in Hy.
               apply Rmult_integral in Hy.
               destruct Hy as [Hy| Hy]; [ easy | subst y₂ ].
+              now rewrite Rmult_0_r in Hv; symmetry in Hv.
+
+              destruct (Req_dec y₂ 0) as [Hy₂| Hy₂].
+               subst y₂.
+               rewrite Rmult_0_r, Ropp_0 in Hx.
+               do 2 rewrite Rmult_0_r in Hx.
+               rewrite Rplus_0_r in Hx.
+               apply Rmult_integral in Hx.
+               now destruct Hx.
+
+               destruct (Rlt_dec 0 0) as [H₂| H₂].
+                now apply Rlt_irrefl in H₂.
+
+                destruct (Rgt_dec 0 0) as [H₃| H₃].
+                 now apply Rgt_irrefl in H₃.
+
+                 destruct (Rlt_dec z₁ 0) as [H₄| H₄].
+                  destruct (Rlt_dec x₂ 0) as [H₅| H₅].
+
 bbb.
         symmetry in Habc.
 Theorem vec_add_comm : ∀ U V, (U + V)%vec = (V + U)%vec.
