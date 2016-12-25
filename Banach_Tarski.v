@@ -1362,7 +1362,55 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
        rewrite HV₃ in Habc.
        apply eq_mul_const_vec_0 in Habc.
        destruct Habc as [Habc| Habc].
+        exfalso.
+        apply Rmult_eq_compat_r with (r := ∥(V₁ × V₂)∥) in Habc.
+        unfold Rdiv in Habc.
+        rewrite Rmult_assoc in Habc.
+        rewrite Rinv_l in Habc; [ | easy ].
+        rewrite Rmult_1_r, Rmult_0_l in Habc.
+        now apply vec_norm_eq_0 in Habc.
+
+        now apply vec_norm_eq_0 in Habc.
+
+       assert (Hc: (c ≠ 0)%R).
+        intros Hc; subst c.
+        rewrite mul_const_vec_0_l in Habc.
+        now rewrite vec_add_0_r in Habc.
+
+        remember (∥V₁∥ / ∥(V₁ × V₂)∥)%R as k eqn:Hk.
+        rewrite HV₃ in Habc.
+        unfold vec_cross_mul in Habc.
+        destruct V₁ as (x₁, y₁, z₁).
+        destruct V₂ as (x₂, y₂, z₂).
+        simpl in Habc.
+        rewrite <- Hv in Habc.
+        simpl in Habc.
+        injection Habc; clear Habc; intros Hz Hy Hx.
+        simpl in Hv.
+        destruct (Req_dec a 0) as [Ha| Ha].
+         subst a.
+         rewrite Rmult_0_l, Rplus_0_l in Hx, Hy, Hz.
+         do 3 rewrite Rmult_0_l, Rplus_0_l in Hv.
+         destruct (Req_dec b 0) as [Hb| Hb].
+          subst b; rewrite <- Hv in H₁.
+          do 3 rewrite Rmult_0_l in H₁.
+          now exfalso; apply H₁.
+
 bbb.
+        symmetry in Habc.
+Theorem vec_add_comm : ∀ U V, (U + V)%vec = (V + U)%vec.
+Proof.
+intros.
+destruct U as (u₁, u₂, u₃).
+destruct V as (v₁, v₂, v₃); simpl.
+f_equal; lra.
+Qed.
+        rewrite vec_add_comm in Habc.
+        apply vec_sub_move_r in Habc.
+        unfold vec_sub in Habc.
+        rewrite vec_add_0_l in Habc.
+bbb.
+
 
       destruct V₁ as (x₁, y₁, z₁).
       destruct V₂ as (x₂, y₂, z₂).

@@ -241,52 +241,31 @@ destruct (Req_dec (xv U) (xv V)) as [Hx| Hx].
  now right; intros H; subst V; apply Hx.
 Qed.
 
-Check vec_el.
-
-bbb.
-
-Definition mat_vec_el {A m n} d (M : matrix' A m n) (i : nat) :=
-  vec_el
-  (@mkvec A n (repeat d n) (repeat_length d n)).
-
-Print mat_vec_el.
-
-
-  List.nth (pred i) (mat M)
-
-Definition mat_vec_el {A m n} d M i :=
-  List.nth (pred i) (mat M)
-    (mkvec A n (repeat d n) (repeat_length d n)).
-
-Theorem rmat_eq_dec' : ∀ M₁ M₂ : matrix' ℝ 3 3, { M₁ = M₂ } + { M₁ ≠ M₂ }.
+Theorem eq_mat_dec : ∀ M₁ M₂ : matrix' ℝ 3 3, { M₁ = M₂ } + { M₁ ≠ M₂ }.
 Proof.
 intros.
-bbb.
-
-Print vec_el.
-Check (@vec_el _ _ _ (mat M₁) 1).
-remember (@vec_el _ 3 0%R) as mve eqn:Hmve.
-destruct (eq_vec_dec (mve (mat M₁) 1) (vec_el (mat M₂) 1)) as [H₁| H₁].
-
-remember (@mat_vec_el ℝ 3 3 0%R) as mve eqn:Hmve.
-destruct (eq_vec_dec (mve M₁ 1) (mve M₂ 1)) as [H₁| H₁].
- destruct (eq_vec_dec (mve M₁ 2) (mve M₂ 2)) as [H₂| H₂].
-  destruct (eq_vec_dec (mve M₁ 3) (mve M₂ 3)) as [H₃| H₃].
+remember (mkvec (repeat 0%R 3) (repeat_length 0%R 3)) as dv eqn:Hdv.
+remember (@vec_el _ 3 dv) as ve eqn:Hv.
+destruct (eq_vec_dec (ve (mat M₁) 1) (ve (mat M₂) 1)) as [H₁| H₁].
+ destruct (eq_vec_dec (ve (mat M₁) 2) (ve (mat M₂) 2)) as [H₂| H₂].
+  destruct (eq_vec_dec (ve (mat M₁) 3) (ve (mat M₂) 3)) as [H₃| H₃].
    left.
-   destruct M₁ as (m₁, p₁).
-   destruct M₂ as (m₂, p₂).
-   subst mve.
-   unfold mat_vec_el in *; simpl in *.
-   destruct m₁; [ easy | ].
-   destruct m₁; [ easy | ].
-   destruct m₁; [ easy | ].
-   destruct m₁; [ | easy ].
-   destruct m₂; [ easy | ].
-   destruct m₂; [ easy | ].
-   destruct m₂; [ easy | ].
-   destruct m₂; [ | easy ].
-   simpl in *; subst.
-   now apply eq_mat_eq_list.
+   destruct M₁ as ((vm₁, pm₁)).
+   destruct M₂ as ((vm₂, pm₂)); f_equal.
+   subst ve; simpl in *.
+   apply eq_vec_eq_list; simpl.
+   unfold vec_el in H₁; simpl in H₁.
+   unfold vec_el in H₂; simpl in H₂.
+   unfold vec_el in H₃; simpl in H₃.
+   destruct vm₁ as [| v₁₁ vm₁]; [ easy | ].
+   destruct vm₁ as [| v₁₂ vm₁]; [ easy | ].
+   destruct vm₁ as [| v₁₃ vm₁]; [ easy | ].
+   destruct vm₁ as [| v₁₄ vm₁]; [ | easy ].
+   destruct vm₂ as [| v₂₁ vm₂]; [ easy | ].
+   destruct vm₂ as [| v₂₂ vm₂]; [ easy | ].
+   destruct vm₂ as [| v₂₃ vm₂]; [ easy | ].
+   destruct vm₂ as [| v₂₄ vm₂]; [ | easy ].
+   now simpl in *; subst.
 
    now right; intros H; subst M₂; apply H₃.
 
@@ -294,6 +273,28 @@ destruct (eq_vec_dec (mve M₁ 1) (mve M₂ 1)) as [H₁| H₁].
 
  now right; intros H; subst M₂; apply H₁.
 Qed.
+
+Theorem mat_mul_id_l : ∀ m, (mat_id' * m)%mat' = m.
+Proof.
+intros m.
+unfold mat_mul', mat_id'; simpl.
+progress repeat rewrite Rmult_1_l.
+progress repeat rewrite Rmult_0_l.
+progress repeat rewrite Rplus_0_l.
+progress repeat rewrite Rplus_0_r.
+destruct m; unfold mkrmat'; simpl; f_equal.
+apply eq_vec_eq_list; simpl.
+destruct mat0 as (vv, vp); simpl.
+destruct vv as [| v₁ vv]; [ easy | ].
+destruct vv as [| v₂ vv]; [ easy | ].
+destruct vv as [| v₃ vv]; [ easy | ].
+destruct vv as [| v₄ vv]; [ | easy ].
+f_equal.
+unfold m₁₁, m₂₁, m₁₂, m₂₂, m₁₃, m₂₃; simpl.
+unfold rmat_el; simpl.
+unfold mat_el; simpl.
+unfold vec_el; simpl.
+Abort. (* ça déconne... faut voir *)
 
 (* end of new implementation *)
 
@@ -338,8 +339,10 @@ Definition mat_vec_mul mat '(P x y z) :=
     (a₃₁ mat * x + a₃₂ mat * y + a₃₃ mat * z).
 
 Definition vec_norm '(P x y z) := √ (x² + y² + z²).
+Definition vec_opp '(P x y z) := P (-x) (-y) (-z).
 Definition vec_add '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
   P (u₁ + v₁) (u₂ + v₂) (u₃ + v₃).
+Definition vec_sub U V := vec_add U (vec_opp V).
 Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
   (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R.
 Definition vec_cross_mul '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
@@ -356,6 +359,8 @@ Notation "0" := (P 0 0 0) : vec_scope.
 Notation "k ⁎ V" := (mul_const_vec k V) (at level 40) : vec_scope.
 Notation "M * V" := (mat_vec_mul M V) : vec_scope.
 Notation "U + V" := (vec_add U V) : vec_scope.
+Notation "U - V" := (vec_sub U V) : vec_scope.
+Notation "- V" := (vec_opp V) : vec_scope.
 Notation "U • V" := (vec_dot_mul U V) (at level 40, left associativity).
 Notation "U × V" := (vec_cross_mul U V) (at level 40, left associativity).
 Notation "∥ V ∥" := (vec_norm V) (at level 0, V at level 0, format "∥ V ∥").
@@ -923,6 +928,12 @@ intros (x, y, z); simpl.
 now do 3 rewrite Rplus_0_l.
 Qed.
 
+Theorem vec_add_0_r : ∀ V, (V + 0 = V)%vec.
+Proof.
+intros (x, y, z); simpl.
+now do 3 rewrite Rplus_0_r.
+Qed.
+
 Theorem eq_mul_const_vec_0 : ∀ a V, (a ⁎ V = 0 → a = 0%R ∨ V = 0)%vec.
 Proof.
 intros a (x, y, z) HV; simpl in HV; simpl.
@@ -1032,4 +1043,44 @@ destruct (Rlt_dec x 0) as [Hx| Hx].
       rewrite Ropp_0, Ropp_involutive in Hz'.
       apply Rle_antisym in Hz'; [ subst z | easy ].
       now exfalso; apply HV.
+Qed.
+
+Theorem vec_add_assoc : ∀ U V W, (U + (V + W))%vec = (U + V + W)%vec.
+Proof.
+intros.
+destruct U as (u₁, u₂, u₃).
+destruct V as (v₁, v₂, v₃).
+destruct W as (w₁, w₂, w₃).
+simpl; f_equal; lra.
+Qed.
+
+Theorem vec_add_opp_l : ∀ V, (vec_opp V + V = 0)%vec.
+Proof.
+intros.
+destruct V as (v₁, v₂, v₃); simpl.
+f_equal; lra.
+Qed.
+
+Theorem vec_add_opp_r : ∀ V, (V + vec_opp V = 0)%vec.
+Proof.
+intros.
+destruct V as (v₁, v₂, v₃); simpl.
+f_equal; lra.
+Qed.
+
+Theorem vec_sub_move_r : ∀ U V W, (U - V)%vec = W ↔ U = (W + V)%vec.
+Proof.
+intros.
+split; intros H.
+ rewrite <- H.
+ unfold vec_sub.
+ rewrite <- vec_add_assoc.
+ rewrite vec_add_opp_l.
+ now rewrite vec_add_0_r.
+
+ rewrite H.
+ unfold vec_sub.
+ rewrite <- vec_add_assoc.
+ rewrite vec_add_opp_r.
+ now rewrite vec_add_0_r.
 Qed.
