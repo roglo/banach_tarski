@@ -1405,6 +1405,7 @@ assert (d ≠ 0)%R.
 
 bbb.
 *)
+(*
       intros * Habc.
 clear Hfree2.
       destruct V₁ as (x₁, y₁, z₁).
@@ -1458,33 +1459,8 @@ clear Hfree2.
          remember (x₁ * y₂ - y₁ * x₂)%R as rr₃ eqn:Hrr₃.
          remember (√ (rr₁² + rr₂² + rr₃²)) as rr eqn:Hrr.
          injection HV₃; clear HV₃; intros Hz Hy Hx.
-
 bbb.
-        do 3 rewrite Rsqr_mult in Hvn.
-        do 2 rewrite <- Rmult_plus_distr_l in Hvn.
-        rewrite sqrt_mult_alt in Hvn; [ | apply Rle_0_sqr ].
-bbb.
-        rewrite <- Rmult_1_l in Hvn at 1.
-        apply Rmult_eq_reg_r in Hvn.
-   symmetry in Hvn.
-   rewrite sqrt_Rsqr_abs in Hvn.
-   apply Rabs_or in Hvn.
-   destruct Hvn as [ Hvn | Hvn ].
-    rewrite Hvn in Hvv.
-    now do 3 rewrite Rmult_1_l in Hvv; apply Hvv.
-
-    rewrite Hvn in Hn.
-    do 3 rewrite <- Ropp_mult_distr_l in Hn.
-    do 3 rewrite Rmult_1_l in Hn.
-    fold (neg_point (P x₁ y₁ z₁)) in Hn.
-    rewrite is_neg_point_neg_point in Hn; [ | easy ].
-    now symmetry in Hn; apply no_fixpoint_negb in Hn.
-
-   intros H; apply Hv₁.
-   apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-   apply sqr_vec_norm_eq_0 in H.
-   now destruct H as (Hx & Hy & Hz); subst.
-bbb.
+*)
       intros * Habc.
       remember (a ⁎ V₁ + b ⁎ V₂)%vec as V eqn:Hv.
       symmetry in Hv.
