@@ -1347,6 +1347,24 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
         (Hfree3 : ∀ a b c,
          (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃ = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
       intros * Habc.
+destruct V₁ as (v₁₁, v₁₂, v₁₃).
+destruct V₂ as (v₂₁, v₂₂, v₂₃).
+destruct V₃ as (v₃₁, v₃₂, v₃₃).
+set (B := mkrmat v₁₁ v₁₂ v₁₃ v₁₁ v₁₂ v₁₃ v₁₁ v₁₂ v₁₃).
+remember (mat_det B) as d eqn:Hd.
+symmetry in Hd.
+assert (d ≠ 0)%R.
+ intros H; rewrite H in Hd; clear H.
+ unfold mat_det, B in Hd.
+ simpl in Hd.
+ remember is_neg_point as f; simpl in *; subst f.
+ remember (√ (v₁₁² + v₁₂² + v₁₃²)) as r eqn:Hr.
+ symmetry in Hvn'.
+ remember (√
+             ((v₁₂ * v₂₃ - v₁₃ * v₂₂)² + (v₁₃ * v₂₁ - v₁₁ * v₂₃)² +
+              (v₁₁ * v₂₂ - v₁₂ * v₂₁)²)) as rr.
+bbb.
+      intros * Habc.
       remember (a ⁎ V₁ + b ⁎ V₂)%vec as V eqn:Hv.
       symmetry in Hv.
       destruct (eq_point_dec V 0%vec) as [H₁| H₁].
