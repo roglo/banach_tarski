@@ -1521,6 +1521,35 @@ simpl in Hn.
                now exfalso; apply Hv₂.
 
               idtac.
+              destruct (Req_dec x₂ 0) as [Hx₂| Hx₂].
+               subst x₂.
+               rewrite Rmult_0_r, Rplus_0_l in Hx.
+               apply Rmult_integral in Hx.
+               destruct Hx as [Hx| Hx]; [ easy | ].
+               apply Rmult_integral in Hx.
+               destruct Hx as [Hx| Hx].
+                subst k.
+                rewrite Rmult_0_l in Hk; symmetry in Hk.
+                apply sqrt_eq_0 in Hk.
+                 apply Rplus_sqr_eq_0 in Hk.
+                 now destruct Hk.
+
+                 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+
+                destruct (Req_dec z₂ 0) as [Hz₂| Hz₂].
+                 subst z₂.
+                 rewrite Rmult_0_r, Rminus_0_l in Hx.
+                 apply RMicromega.Ropp_0 in Hx.
+                 apply Rmult_integral in Hx.
+                 now destruct Hx.
+
+                 rewrite Rmult_0_r, Ropp_0 in Hz.
+                 do 2 rewrite Rmult_0_r in Hz.
+                 rewrite Rplus_0_r in Hz.
+                 apply Rmult_integral in Hz.
+                 now destruct Hz.
+
+               idtac.
 bbb.
               rewrite Rmult_0_r, Rminus_0_r in Hx.
 bbb.
