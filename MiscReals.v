@@ -310,3 +310,12 @@ unfold Rabs.
 destruct (Rcase_abs x) as [H₁| H₁]; [ right | now left ].
 symmetry; apply Ropp_involutive.
 Qed.
+
+Theorem Rabs_eq_0 : ∀ x, Rabs x = 0%R → x = 0%R.
+Proof.
+intros * Hx.
+unfold Rabs in Hx.
+destruct (Rcase_abs x); [ | easy ].
+apply Ropp_eq_0_compat in Hx.
+now rewrite Ropp_involutive in Hx.
+Qed.
