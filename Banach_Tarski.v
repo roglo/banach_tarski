@@ -1354,8 +1354,10 @@ set (B := mkrmat v₁₁ v₁₂ v₁₃ v₁₁ v₁₂ v₁₃ v₁₁ v₁₂
 remember (mat_det B) as d eqn:Hd.
 symmetry in Hd.
 assert (d ≠ 0)%R.
+ clear Hfree2 a b c Habc.
  intros H; rewrite H in Hd; clear H.
  unfold mat_det, B in Hd.
+ clear B.
  simpl in Hd.
  remember is_neg_point as f; simpl in *; subst f.
  remember (√ (v₁₁² + v₁₂² + v₁₃²)) as r eqn:Hr.
@@ -1363,6 +1365,41 @@ assert (d ≠ 0)%R.
  remember (√
              ((v₁₂ * v₂₃ - v₁₃ * v₂₂)² + (v₁₃ * v₂₁ - v₁₁ * v₂₃)² +
               (v₁₁ * v₂₂ - v₁₂ * v₂₁)²)) as rr.
+ injection Hp₁; clear Hp₁; intros.
+ injection Hp₂; clear Hp₂; intros.
+ injection Hp₃; clear Hp₃; intros.
+ injection HV₃; clear HV₃; intros.
+ remember (r/rr)%R as k eqn:Hk.
+ assert (0 < k)%R.
+  subst k.
+  apply Rmult_lt_reg_r with (r := rr).
+   enough (0 ≤ rr)%R by lra.
+   rewrite Heqrr.
+   apply sqrt_pos.
+
+   unfold Rdiv.
+   rewrite Rmult_assoc.
+   rewrite Rinv_l; [ | easy ].
+   rewrite Rmult_0_l, Rmult_1_r.
+   assert (0 ≤ r)%R by (rewrite Hr; apply sqrt_pos).
+   enough (r ≠ 0)%R by lra.
+   intros HH; move HH at top; subst r; apply Hv₁.
+   symmetry in Hr.
+   apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
+   apply sqr_vec_norm_eq_0 in Hr.
+   now destruct Hr; destruct H13; subst.
+
+  clear r rr Hr Hvn Hvn' Heqrr HVV Hk.
+  unfold is_rotation_matrix in Hm.
+  destruct Hm as (Ht, Hm).
+  unfold mat_det in Hm.
+  unfold mat_id in Hnid.
+  destruct M; simpl in *.
+  unfold mat_transp in Ht; simpl in Ht.
+  unfold mat_id in Ht; simpl in Ht.
+  injection Ht; clear Ht; intros.
+  unfold mkrmat in Hnid.
+
 bbb.
       intros * Habc.
       remember (a ⁎ V₁ + b ⁎ V₂)%vec as V eqn:Hv.
