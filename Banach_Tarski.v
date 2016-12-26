@@ -1394,7 +1394,6 @@ bbb.
       destruct V₃ as (x₃, y₃, z₃).
       simpl in Habc.
       injection Habc; clear Habc; intros Hz Hy Hx.
-      move Hx after Hy; move Hz after Hy.
       simpl in Hvn.
       destruct (Req_dec a 0) as [Ha| Ha].
        subst a; split; [ easy | ].
@@ -1410,20 +1409,33 @@ bbb.
         now apply vec_norm_eq_0 in Hvn'.
 
         exfalso.
-        rewrite Rplus_comm in Hx, Hy, Hz.
-        apply Rplus_opp_r_uniq in Hx.
-        apply Rplus_opp_r_uniq in Hy.
-        apply Rplus_opp_r_uniq in Hz.
-        apply Rmult_eq_compat_r with (r := (/ b)%R) in Hx.
-        apply Rmult_eq_compat_r with (r := (/ b)%R) in Hy.
-        apply Rmult_eq_compat_r with (r := (/ b)%R) in Hz.
-        rewrite Rmult_shuffle0, Rinv_r in Hx; [ | easy ].
-        rewrite Rmult_shuffle0, Rinv_r in Hy; [ | easy ].
-        rewrite Rmult_shuffle0, Rinv_r in Hz; [ | easy ].
-        rewrite Rmult_1_l, fold_Rdiv in Hx, Hy, Hz.
-        rewrite Ropp_mult_distr_l in Hx, Hy, Hz.
-        rewrite Rmult_div in Hx, Hy, Hz.
-        subst x₂ y₂ z₂.
+        destruct (Req_dec c 0) as [Hc| Hc].
+         subst c.
+         rewrite Rmult_0_l, Rplus_0_r in Hx, Hy, Hz.
+         apply Rmult_integral in Hx.
+         apply Rmult_integral in Hy.
+         apply Rmult_integral in Hz.
+         destruct Hx as [| Hx]; [ easy | ].
+         destruct Hy as [| Hy]; [ easy | ].
+         destruct Hz as [| Hz]; [ easy | ].
+         now subst x₂ y₂ z₂; apply Hv₂.
+         apply Rplus_opp_r_uniq in Hx.
+         apply Rplus_opp_r_uniq in Hy.
+         apply Rplus_opp_r_uniq in Hz.
+         apply Rmult_eq_compat_r with (r := (/ c)%R) in Hx.
+         apply Rmult_eq_compat_r with (r := (/ c)%R) in Hy.
+         apply Rmult_eq_compat_r with (r := (/ c)%R) in Hz.
+         rewrite Rmult_shuffle0, Rinv_r in Hx; [ | easy ].
+         rewrite Rmult_shuffle0, Rinv_r in Hy; [ | easy ].
+         rewrite Rmult_shuffle0, Rinv_r in Hz; [ | easy ].
+         rewrite Rmult_1_l, fold_Rdiv in Hx, Hy, Hz.
+         rewrite Ropp_mult_distr_l in Hx, Hy, Hz.
+         rewrite Rmult_div in Hx, Hy, Hz.
+         subst x₃ y₃ z₃.
+(* voir HV₃ *)
+SearchAbout (P (_ * _)).
+SearchAbout mul_const_vec.
+bbb.
         do 3 rewrite Rsqr_mult in Hvn.
         do 2 rewrite <- Rmult_plus_distr_l in Hvn.
         rewrite sqrt_mult_alt in Hvn; [ | apply Rle_0_sqr ].
