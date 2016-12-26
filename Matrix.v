@@ -355,6 +355,9 @@ Definition mul_const_mat k (M : matrix ℝ) :=
     (k * a₃₁ M) (k * a₃₂ M) (k * a₃₃ M).
 
 Delimit Scope vec_scope with vec.
+
+Arguments vec_norm _%vec.
+
 Notation "0" := (P 0 0 0) : vec_scope.
 Notation "k ⁎ V" := (mul_const_vec k V) (at level 40) : vec_scope.
 Notation "M * V" := (mat_vec_mul M V) : vec_scope.
@@ -920,6 +923,43 @@ do 3 rewrite Rsqr_mult.
 do 2 rewrite <- Rmult_plus_distr_l.
 rewrite sqrt_mult; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
 now rewrite sqrt_Rsqr_abs.
+Qed.
+
+Theorem sqr_vec_norm_eq_0 : ∀ x y z,
+  (x² + y² + z²)%R = 0%R
+  → x = 0%R ∧ y = 0%R ∧ z = 0%R.
+Proof.
+intros * H.
+apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
+ destruct H as (H₁, H₂).
+ apply Rplus_sqr_eq_0 in H₁.
+ apply Rsqr_eq_0 in H₂.
+ move H₁ at top; move H₂ at top; destruct H₁; subst x y z.
+ now split; [ | split ].
+
+ apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+Qed.
+
+Theorem vec_norm_0 : ∥0∥ = 0%R.
+Proof.
+simpl; rewrite Rsqr_0.
+do 2 rewrite Rplus_0_l.
+apply sqrt_0.
+Qed.
+
+Theorem vec_norm_eq_0 : ∀ V, ∥V∥ = 0%R ↔ V = 0%vec.
+Proof.
+intros.
+split; intros HV.
+ destruct V as (v₁, v₂, v₃); simpl in HV.
+ apply sqrt_eq_0 in HV; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in HV.
+ now destruct HV as (H₁ & H₂ & H₃); subst.
+
+ destruct V as (v₁, v₂, v₃); simpl.
+ injection HV; clear HV; intros; subst.
+ rewrite Rsqr_0, Rplus_0_r, Rplus_0_r.
+ apply sqrt_0.
 Qed.
 
 Theorem vec_add_0_l : ∀ V, (0 + V = V)%vec.

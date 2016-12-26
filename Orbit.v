@@ -110,21 +110,6 @@ injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 nsatz.
 Qed.
 
-Theorem sqr_vec_norm_eq_0 : ∀ x y z,
-  (x² + y² + z²)%R = 0%R
-  → x = 0%R ∧ y = 0%R ∧ z = 0%R.
-Proof.
-intros * H.
-apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
- destruct H as (H₁, H₂).
- apply Rplus_sqr_eq_0 in H₁.
- apply Rsqr_eq_0 in H₂.
- move H₁ at top; move H₂ at top; destruct H₁; subst x y z.
- now split; [ | split ].
-
- apply Rplus_le_le_0_compat; apply Rle_0_sqr.
-Qed.
-
 Theorem in_sphere_after_rotation : ∀ p m,
   p ∈ sphere
   → is_rotation_matrix m
