@@ -1452,7 +1452,82 @@ simpl in Hn.
              destruct Hy; subst x₂ y₂.
              now exfalso; apply Hv₂.
 
-            idtac.
+            destruct (Req_dec z₁ 0) as [Hz₁| Hz₁].
+             subst z₁.
+             rewrite Rmult_0_l, Rminus_0_r in Hx.
+             rewrite <- Ropp_mult_distr_r in Hz.
+             rewrite <- Ropp_mult_distr_r in Hz.
+             rewrite fold_Rminus in Hz.
+             apply Rminus_diag_uniq in Hz.
+             apply Rmult_eq_compat_r with (r := x₂) in Hz.
+             apply Rmult_eq_compat_r with (r := z₂) in Hx.
+             rewrite Rmult_0_l in Hx.
+             rewrite Rmult_plus_distr_r in Hx.
+             rewrite Rmult_shuffle0 in Hz.
+             rewrite Hz in Hx.
+             do 6 rewrite Rmult_assoc in Hx.
+             rewrite <- Rmult_plus_distr_l in Hx.
+             apply Rmult_integral in Hx.
+             destruct Hx as [Hx| Hx]; [ easy | ].
+             rewrite <- Rmult_plus_distr_l in Hx.
+             apply Rmult_integral in Hx.
+             destruct Hx as [Hx| Hx].
+              move Hx at top; subst k.
+              remember (∥(P 0 y₁ 0 × P x₂ y₂ z₂)∥) as u eqn:Hu.
+              apply Rmult_eq_compat_r with (r := u) in Hk.
+              unfold Rdiv in Hk.
+              rewrite Rmult_0_l, Rmult_assoc in Hk.
+              rewrite Rinv_l in Hk; [ | easy ].
+              rewrite Rmult_1_r in Hk.
+              simpl in Hk.
+              rewrite Rsqr_0 in Hk.
+              rewrite Rplus_0_l, Rplus_0_r in Hk.
+              symmetry in Hk; apply sqrt_eq_0 in Hk; [ | apply Rle_0_sqr ].
+              apply Rsqr_0_uniq in Hk.
+              now subst y₁; exfalso; apply Hv₁.
+
+              rewrite <- Rmult_plus_distr_l in Hx.
+              apply Rmult_integral in Hx.
+              destruct Hx as [| Hx]; [ easy | ].
+              fold (Rsqr x₂) in Hx.
+              fold (Rsqr z₂) in Hx.
+              apply Rplus_sqr_eq_0 in Hx.
+              destruct Hx; subst x₂ z₂.
+              simpl in HVV.
+              setoid_rewrite Rmult_0_r in HVV.
+              setoid_rewrite Rmult_0_l in HVV.
+              rewrite Rminus_0_r in HVV.
+              rewrite Rsqr_0 in HVV.
+              do 2 rewrite Rplus_0_r in HVV.
+              rewrite sqrt_0 in HVV.
+              now exfalso; apply HVV.
+
+             destruct (Req_dec y₂ 0) as [Hy₂| Hy₂].
+              subst y₂.
+              rewrite Rmult_0_r, Rplus_0_l in Hy.
+bbb.
+             remember (∥(P 0 0 z₁ × P x₂ y₂ 0)∥) as u eqn:Hu.
+             apply Rmult_eq_compat_r with (r := u) in Hk.
+             unfold Rdiv in Hk.
+             rewrite Rmult_0_l, Rmult_assoc in Hk.
+             rewrite Rinv_l in Hk; [ | easy ].
+             rewrite Rmult_1_r in Hk.
+             simpl in Hk.
+             rewrite Rsqr_0 in Hk.
+             do 2 rewrite Rplus_0_l in Hk.
+             symmetry in Hk; apply sqrt_eq_0 in Hk; [ | apply Rle_0_sqr ].
+             apply Rsqr_0_uniq in Hk.
+             now subst z₁; exfalso; apply Hv₁.
+
+             rewrite <- Rmult_plus_distr_l in Hy.
+             apply Rmult_integral in Hy.
+             destruct Hy as [| Hy]; [ now subst z₁; exfalso; apply Hv₁ | ].
+             fold (Rsqr x₂) in Hy.
+             fold (Rsqr y₂) in Hy.
+             apply Rplus_sqr_eq_0 in Hy.
+             destruct Hy; subst x₂ y₂.
+             now exfalso; apply Hv₂.
+
 bbb.
             destruct (Req_dec z₁ 0) as [Hz₁| Hz₁].
              now subst z₁; exfalso; apply Hv₁.
