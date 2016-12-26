@@ -1406,6 +1406,7 @@ assert (d ≠ 0)%R.
 bbb.
 *)
       intros * Habc.
+clear Hfree2.
       destruct V₁ as (x₁, y₁, z₁).
       destruct V₂ as (x₂, y₂, z₂).
       destruct V₃ as (x₃, y₃, z₃).
@@ -1436,6 +1437,7 @@ bbb.
          destruct Hy as [| Hy]; [ easy | ].
          destruct Hz as [| Hz]; [ easy | ].
          now subst x₂ y₂ z₂; apply Hv₂.
+
          apply Rplus_opp_r_uniq in Hx.
          apply Rplus_opp_r_uniq in Hy.
          apply Rplus_opp_r_uniq in Hz.
@@ -1449,9 +1451,14 @@ bbb.
          rewrite Ropp_mult_distr_l in Hx, Hy, Hz.
          rewrite Rmult_div in Hx, Hy, Hz.
          subst x₃ y₃ z₃.
-(* voir HV₃ *)
-SearchAbout (P (_ * _)).
-SearchAbout mul_const_vec.
+         simpl in HV₃.
+         remember (√ (x₁² + y₁² + z₁²)) as r eqn:Hr.
+         remember (y₁ * z₂ - z₁ * y₂)%R as rr₁ eqn:Hrr₁.
+         remember (z₁ * x₂ - x₁ * z₂)%R as rr₂ eqn:Hrr₂.
+         remember (x₁ * y₂ - y₁ * x₂)%R as rr₃ eqn:Hrr₃.
+         remember (√ (rr₁² + rr₂² + rr₃²)) as rr eqn:Hrr.
+         injection HV₃; clear HV₃; intros Hz Hy Hx.
+
 bbb.
         do 3 rewrite Rsqr_mult in Hvn.
         do 2 rewrite <- Rmult_plus_distr_l in Hvn.
