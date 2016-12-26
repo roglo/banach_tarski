@@ -1346,7 +1346,8 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
       assert
         (Hfree3 : ∀ a b c,
          (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃ = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
-      intros * Habc.
+(*
+intros * Habc.
 destruct V₁ as (v₁₁, v₁₂, v₁₃).
 destruct V₂ as (v₂₁, v₂₂, v₂₃).
 destruct V₃ as (v₃₁, v₃₂, v₃₃).
@@ -1401,6 +1402,7 @@ assert (d ≠ 0)%R.
   unfold mkrmat in Hnid.
 
 bbb.
+*)
       intros * Habc.
       remember (a ⁎ V₁ + b ⁎ V₂)%vec as V eqn:Hv.
       symmetry in Hv.
