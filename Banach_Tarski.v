@@ -1391,9 +1391,6 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
          subst a.
          rewrite Rmult_0_l, Rplus_0_l in Hx, Hy, Hz.
          do 3 rewrite Rmult_0_l, Rplus_0_l in Hv.
-(*
-simpl in Hn.
-*)
          destruct (Req_dec b 0) as [Hb| Hb].
           subst b; rewrite <- Hv in H₁.
           do 3 rewrite Rmult_0_l in H₁.
