@@ -1328,6 +1328,23 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
      assert (Hfree2 : ∀ a b, (a ⁎ V₁ + b ⁎ V₂ = 0 → a = 0%R ∧ b = 0%R)%vec).
       now apply free_family_diff_norm_vec.
 
+(*
+      assert (Hgen : ∀ V, ∃ x y z, V = (x ⁎ V₁ + y ⁎ V₂ + z ⁎ V₃)%vec).
+       intros (v₁, v₂, v₃).
+       destruct V₁ as (v₁₁, v₁₂, v₁₃).
+       destruct V₂ as (v₂₁, v₂₂, v₂₃).
+       destruct V₃ as (v₃₁, v₃₂, v₃₃).
+       simpl.
+       remember (mkrmat v₁₁ v₂₁ v₃₁ v₁₂ v₂₂ v₃₂ v₁₃ v₂₃ v₃₃) as Mv eqn:Hv.
+       remember (mkrmat v₁ v₂₁ v₃₁ v₂ v₂₂ v₃₂ v₃ v₂₃ v₃₃) as Mx eqn:Hmx.
+       remember (mkrmat v₁₁ v₁ v₃₁ v₁₂ v₂ v₃₂ v₁₃ v₃ v₃₃) as My eqn:Hmy.
+       remember (mkrmat v₁₁ v₂₁ v₃ v₁₂ v₂₂ v₂ v₁₃ v₂₃ v₃) as Mz eqn:Hmz.
+       exists (mat_det Mx / mat_det Mv)%R.
+       exists (mat_det My / mat_det Mv)%R.
+       exists (mat_det Mz / mat_det Mv)%R.
+       f_equal.
+       unfold mat_det; subst Mv Mx My Mz; simpl.
+*)
       assert
         (Hfree3 : ∀ a b c,
          (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃ = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
