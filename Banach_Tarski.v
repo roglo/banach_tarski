@@ -1387,6 +1387,13 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
         simpl in Habc.
         injection Habc; clear Habc; intros Hz Hy Hx.
         simpl in Hv.
+        remember (∥(P x₁ y₁ z₁ × P x₂ y₂ z₂)∥) as u eqn:Hu.
+        apply Rmult_eq_compat_r with (r := u) in Hk.
+        unfold Rdiv in Hk.
+        rewrite Rmult_assoc in Hk.
+        rewrite Rinv_l in Hk; [ | easy ].
+        rewrite Rmult_1_r in Hk.
+        simpl in Hk.
         destruct (Req_dec a 0) as [Ha| Ha].
          subst a.
          rewrite Rmult_0_l, Rplus_0_l in Hx, Hy, Hz.
@@ -1396,13 +1403,6 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
           do 3 rewrite Rmult_0_l in H₁.
           now exfalso; apply H₁.
 
-          remember (∥(P x₁ y₁ z₁ × P x₂ y₂ z₂)∥) as u eqn:Hu.
-          apply Rmult_eq_compat_r with (r := u) in Hk.
-          unfold Rdiv in Hk.
-          rewrite Rmult_assoc in Hk.
-          rewrite Rinv_l in Hk; [ | easy ].
-          rewrite Rmult_1_r in Hk.
-          simpl in Hk.
           destruct (Req_dec x₁ 0) as [Hx₁| Hx₁].
            subst x₁.
            rewrite Rsqr_0, Rplus_0_l in Hk.
