@@ -1496,21 +1496,22 @@ simpl in Hn.
               rewrite sqrt_0 in HVV.
               now exfalso; apply HVV.
 
-             destruct (Req_dec y₂ 0) as [Hy₂| Hy₂].
+             assert (Hkz : (k ≠ 0)%R).
+              intros H; subst k.
+              rewrite Rmult_0_l in Hk; symmetry in Hk.
+              apply sqrt_eq_0 in Hk.
+               apply Rplus_sqr_eq_0 in Hk.
+               now destruct Hk.
+
+               apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+
+              destruct (Req_dec y₂ 0) as [Hy₂| Hy₂].
               subst y₂.
               rewrite Rmult_0_r, Rplus_0_l in Hy.
               apply Rmult_integral in Hy.
               destruct Hy as [| Hy]; [ easy | ].
               apply Rmult_integral in Hy.
-              destruct Hy as [Hy| Hy].
-               subst k.
-               rewrite Rmult_0_l in Hk; symmetry in Hk.
-               apply sqrt_eq_0 in Hk.
-                apply Rplus_sqr_eq_0 in Hk.
-                now destruct Hk.
-
-                apply Rplus_le_le_0_compat; apply Rle_0_sqr.
-
+               destruct Hy as [Hy| Hy]; [ easy | ].
                apply Rmult_integral in Hy.
                destruct Hy; [ easy | subst x₂ ].
                rewrite Rmult_0_r, Ropp_0 in Hz.
@@ -1520,36 +1521,134 @@ simpl in Hn.
                destruct Hz; [ easy | subst z₂ ].
                now exfalso; apply Hv₂.
 
-              idtac.
               destruct (Req_dec x₂ 0) as [Hx₂| Hx₂].
                subst x₂.
                rewrite Rmult_0_r, Rplus_0_l in Hx.
                apply Rmult_integral in Hx.
                destruct Hx as [Hx| Hx]; [ easy | ].
                apply Rmult_integral in Hx.
-               destruct Hx as [Hx| Hx].
-                subst k.
-                rewrite Rmult_0_l in Hk; symmetry in Hk.
-                apply sqrt_eq_0 in Hk.
-                 apply Rplus_sqr_eq_0 in Hk.
-                 now destruct Hk.
+               destruct Hx as [Hx| Hx]; [ easy | ].
+               destruct (Req_dec z₂ 0) as [Hz₂| Hz₂].
+                subst z₂.
+                rewrite Rmult_0_r, Rminus_0_l in Hx.
+                apply RMicromega.Ropp_0 in Hx.
+                apply Rmult_integral in Hx.
+                now destruct Hx.
 
-                 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+                rewrite Rmult_0_r, Ropp_0 in Hz.
+                do 2 rewrite Rmult_0_r in Hz.
+                rewrite Rplus_0_r in Hz.
+                apply Rmult_integral in Hz.
+                now destruct Hz.
 
-                destruct (Req_dec z₂ 0) as [Hz₂| Hz₂].
-                 subst z₂.
-                 rewrite Rmult_0_r, Rminus_0_l in Hx.
-                 apply RMicromega.Ropp_0 in Hx.
-                 apply Rmult_integral in Hx.
-                 now destruct Hx.
+               destruct (Req_dec z₂ 0) as [Hz₂| Hz₂].
+                subst z₂.
+                rewrite Rmult_0_r, Rplus_0_l in Hz.
+                apply Rmult_integral in Hz.
+                destruct Hz as [Hz| Hz]; [ easy | ].
+                apply Rmult_integral in Hz.
+                destruct Hz as [Hz| Hz]; [ easy | ].
+                apply RMicromega.Ropp_0 in Hz.
+                apply Rmult_integral in Hz.
+                now destruct Hz.
 
-                 rewrite Rmult_0_r, Ropp_0 in Hz.
-                 do 2 rewrite Rmult_0_r in Hz.
-                 rewrite Rplus_0_r in Hz.
-                 apply Rmult_integral in Hz.
-                 now destruct Hz.
+                do 2 rewrite <- Ropp_mult_distr_r in Hz.
+                rewrite fold_Rminus in Hz.
+                apply Rminus_diag_uniq in Hz.
+                apply Rmult_eq_compat_r with (r := y₂) in Hz.
+                apply Rmult_eq_compat_r with (r := z₂) in Hy.
+                rewrite Rmult_0_l in Hy.
+                rewrite Rmult_plus_distr_r in Hy.
+                rewrite Rmult_shuffle0 in Hz.
+                rewrite Hz in Hy.
+                do 6 rewrite Rmult_assoc in Hy.
+                rewrite <- Rmult_plus_distr_l in Hy.
+                apply Rmult_integral in Hy.
+                destruct Hy as [Hy| Hy]; [ easy | ].
+                rewrite <- Rmult_plus_distr_l in Hy.
+                apply Rmult_integral in Hy.
+                destruct Hy as [Hy| Hy]; [ easy | ].
+                setoid_rewrite Rmult_comm in Hy.
+                setoid_rewrite Rmult_assoc in Hy.
+                rewrite <- Rmult_plus_distr_l in Hy.
+                apply Rmult_integral in Hy.
+                destruct Hy as [Hy| Hy]; [ easy | ].
+                rewrite Rplus_comm in Hy.
+                apply Rplus_opp_r_uniq in Hy.
+                do 2 rewrite <- Rmult_assoc in Hz.
+                symmetry in Hz.
+                rewrite Rmult_shuffle0 in Hz.
+                rewrite Rmult_comm, Rmult_assoc in Hz.
+                rewrite Rmult_comm in Hy.
+                rewrite Hy in Hz.
+                replace (z₂ * z₁)%R with (z₁ * z₂)%R in Hz by lra.
+                rewrite Ropp_mult_distr_l in Hz.
+                do 3 rewrite <- Rmult_assoc in Hz.
+                rewrite <- Ropp_mult_distr_r in Hz.
+                apply Rmult_eq_reg_r in Hz; [ | easy ].
+                apply Rmult_eq_compat_r with (r := x₂) in Hz.
+                apply Rmult_eq_compat_r with (r := y₂) in Hx.
+                rewrite Rmult_0_l in Hx.
+                rewrite Rmult_plus_distr_r in Hx.
+                symmetry in Hz; rewrite Rmult_shuffle0 in Hz.
+                rewrite Hz in Hx.
+                assert
+                   (H :
+                      (c * (k *
+                       ((- x₂ * z₁) * x₂ + ((y₁ * z₂ - z₁ * y₂) * y₂))))%R
+                      = 0%R)
+                   by lra.
+                 apply Rmult_integral in H.
+                 destruct H as [H| H]; [ easy | ].
+                 apply Rmult_integral in H.
+                 destruct H as [H| H]; [ easy | ].
+                 assert (H₂ : (y₁ * y₂ * z₂ = z₁ * (x₂² + y₂²))%R)
+                   by (unfold Rsqr; lra).
+                 clear H.
+                 rewrite Hy in H₂.
+                 rewrite Ropp_mult_distr_l in H₂.
+                 rewrite Rmult_shuffle0 in H₂.
+                 rewrite Rmult_comm in H₂.
+                 apply Rmult_eq_reg_l in H₂; [ | easy ].
+                 rewrite <- Ropp_mult_distr_l in H₂.
+                 fold (Rsqr z₂) in H₂.
+                 assert (H :(x₂² + y₂² + z₂² = 0)%R) by lra.
+                 apply sqr_vec_norm_eq_0 in H.
+                 now destruct H.
 
-               idtac.
+           idtac.
+bbb.
+
+                 do 2 rewrite Rmult_assoc in Hx.
+                 rewrite Ropp_mult_distr_l in Hx.
+                 rewrite Rmult_comm in Hx.
+                 do 3 rewrite <- Rmult_assoc in Hx.
+
+
+bbb.
+
+             rewrite <- Rmult_plus_distr_l in Hx.
+             apply Rmult_integral in Hx.
+             destruct Hx as [Hx| Hx].
+              move Hx at top; subst k.
+              rewrite Rmult_0_l in Hk.
+              now apply Rabs_eq_0 in Hk.
+
+              rewrite <- Rmult_plus_distr_l in Hx.
+              apply Rmult_integral in Hx.
+              destruct Hx as [| Hx]; [ easy | ].
+              fold (Rsqr x₂) in Hx.
+              fold (Rsqr z₂) in Hx.
+              apply Rplus_sqr_eq_0 in Hx.
+              destruct Hx; subst x₂ z₂.
+              subst u; simpl in HVV.
+              setoid_rewrite Rmult_0_r in HVV.
+              setoid_rewrite Rmult_0_l in HVV.
+              rewrite Rminus_0_r in HVV.
+              rewrite Rsqr_0 in HVV.
+              do 2 rewrite Rplus_0_r in HVV.
+              rewrite sqrt_0 in HVV.
+              now exfalso; apply HVV.
 bbb.
               rewrite Rmult_0_r, Rminus_0_r in Hx.
 bbb.
