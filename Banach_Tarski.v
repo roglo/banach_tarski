@@ -1893,6 +1893,74 @@ bbb.
                 rewrite Rplus_0_r in Hx.
                 apply Rmult_integral in Hx.
                 now destruct Hx.
+
+                apply Rmult_eq_compat_r with (r := y₂) in Hx.
+                apply Rmult_eq_compat_r with (r := x₂) in Hy.
+                rewrite Rmult_0_l in Hx, Hy.
+                rewrite Rmult_plus_distr_r in Hx, Hy.
+                rewrite Rmult_shuffle0, Rplus_comm in Hy.
+                apply Rplus_opp_r_uniq in Hy.
+                rewrite Hy in Hx.
+                rewrite Ropp_mult_distr_r in Hx.
+                do 4 rewrite Rmult_assoc in Hx.
+                rewrite <- Rmult_plus_distr_l in Hx.
+                apply Rmult_integral in Hx.
+                destruct Hx as [Hx| Hx]; [ easy | ].
+                rewrite <- Rmult_plus_distr_l in Hx.
+                apply Rmult_integral in Hx.
+                destruct Hx as [Hx| Hx]; [ easy | ].
+                unfold Rminus in Hx.
+                rewrite Rmult_plus_distr_r in Hx.
+                do 2 rewrite <- Ropp_mult_distr_r in Hx.
+                do 2 rewrite <- Ropp_mult_distr_l in Hx.
+                rewrite Ropp_involutive in Hx.
+                rewrite Rplus_comm in Hx.
+                rewrite <- Rplus_assoc in Hx.
+                do 2 rewrite Rmult_assoc in Hx.
+                setoid_rewrite Ropp_mult_distr_r in Hx.
+                rewrite <- Rmult_plus_distr_l in Hx.
+                rewrite <- Ropp_plus_distr in Hx.
+                rewrite <- Ropp_mult_distr_r in Hx.
+                rewrite Rmult_shuffle0 in Hx.
+                do 2 rewrite fold_Rsqr in Hx.
+                apply Rplus_opp_r_uniq in Hx.
+                rewrite Ropp_involutive in Hx.
+                rewrite Rmult_comm in Hx.
+                symmetry in Hx; rewrite Rplus_comm in Hx.
+                apply Rmult_eq_compat_r with (r := z₂) in Hy.
+                apply Rmult_eq_compat_r with (r := (x₂ * y₂)%R) in Hz.
+                rewrite Rmult_0_l in Hz.
+                rewrite Rmult_plus_distr_r in Hz.
+                rewrite Rmult_shuffle0 in Hz.
+                do 2 rewrite <- Rmult_assoc in Hz.
+                rewrite Hy in Hz.
+                rewrite Ropp_mult_distr_r in Hz.
+                do 7 rewrite Rmult_assoc in Hz.
+                do 2 rewrite <- Rmult_plus_distr_l in Hz.
+                apply Rmult_integral in Hz.
+                destruct Hz as [| Hz]; [ easy | ].
+                apply Rmult_integral in Hz.
+                destruct Hz as [| Hz]; [ easy | ].
+                ring_simplify in Hz.
+                do 3 rewrite <- Rsqr_pow2 in Hz.
+                rewrite Rplus_comm, <- Rplus_assoc in Hz.
+                rewrite Rplus_comm, <- Rplus_assoc in Hz.
+                do 2 rewrite <- Ropp_mult_distr_l in Hz.
+                rewrite fold_Rminus in Hz.
+                apply Rminus_diag_uniq in Hz.
+                replace (x₁ * x₂)%R with (x₂ * x₁)%R in Hz by apply Rmult_comm.
+                rewrite <- Rmult_plus_distr_l in Hz.
+                rewrite Rplus_comm in Hz.
+                rewrite  Rmult_assoc in Hz.
+                unfold Rsqr in Hz at 3.
+                symmetry in Hz.
+                rewrite Rmult_assoc, Rmult_comm in Hz.
+                do 2 rewrite Rmult_assoc in Hz.
+                apply Rmult_eq_reg_l in Hz; [ | easy ].
+                rewrite <- Rmult_assoc, Rmult_shuffle0 in Hz.
+                rewrite Rmult_assoc in Hz.
+                symmetry in Hz.
+                move Hz before Hx.
 bbb.
 
                  do 2 rewrite Rmult_assoc in Hx.
