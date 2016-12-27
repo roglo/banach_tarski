@@ -1861,7 +1861,8 @@ bbb.
                apply Rplus_sqr_eq_0 in Hz.
                now destruct Hz.
 
-            idtac.
+            destruct (Req_dec y₁ 0) as [Hy₁| Hy₁].
+             subst y₁.
 bbb.
 
                  do 2 rewrite Rmult_assoc in Hx.
