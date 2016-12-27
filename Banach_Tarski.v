@@ -1863,6 +1863,36 @@ bbb.
 
             destruct (Req_dec y₁ 0) as [Hy₁| Hy₁].
              subst y₁.
+             rewrite Rmult_0_l, Rminus_0_l in Hx.
+             rewrite Rmult_0_l, Rminus_0_r in Hz.
+             destruct (Req_dec y₂ 0) as [Hy₂| Hy₂].
+              subst y₂.
+              do 3 rewrite Rmult_0_r in Hz.
+              rewrite Rplus_0_r in Hz.
+              apply Rmult_integral in Hz.
+              destruct Hz; [ easy | subst z₂ ].
+              rewrite Rmult_0_r, Ropp_0 in Hx.
+              do 2 rewrite Rmult_0_r in Hx.
+              rewrite Rplus_0_r in Hx.
+              apply Rmult_integral in Hx.
+              now destruct Hx.
+              destruct (Req_dec z₂ 0) as [Hz₂| Hz₂].
+               subst z₂.
+               rewrite Rmult_0_r, Rplus_0_l in Hz.
+               apply Rmult_integral in Hz.
+               destruct Hz as [| Hz]; [ easy | ].
+               apply Rmult_integral in Hz.
+               destruct Hz as [| Hz]; [ easy | ].
+               apply Rmult_integral in Hz.
+               now destruct Hz.
+
+               destruct (Req_dec z₁ 0) as [Hz₁| Hz₁].
+                subst z₁.
+                rewrite Rmult_0_l, Ropp_0 in Hx.
+                do 2 rewrite Rmult_0_r in Hx.
+                rewrite Rplus_0_r in Hx.
+                apply Rmult_integral in Hx.
+                now destruct Hx.
 bbb.
 
                  do 2 rewrite Rmult_assoc in Hx.
