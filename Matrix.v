@@ -318,10 +318,11 @@ f_equal; unfold m₁₁, m₁₂, m₁₃, m₂₁, m₂₂, m₂₃, m₃₁, m
   now destruct vv₃.
 Qed.
 
+(*
 Theorem mat_mul_id_r' : ∀ m, mat_mul' m mat_id' = m.
 Proof.
 intros m.
-Abort. (* to do *)
+*)
 
 (* end of new implementation *)
 
