@@ -48,6 +48,24 @@ Definition mat_el {A m n} d (M : matrix' A m n) i j :=
 
 Import ListNotations.
 
+(*
+Definition mat_vec_mul_g A m n d add mul (M : matrix' _ m n)
+    (V : vector A n) :=
+  @mkvec A n
+    [add
+       (add (mul (mat_el d M 1 1) (vec_el d V 1))
+            (mul (mat_el d M 1 2) (vec_el d V 2)))
+       (mul (mat_el d M 1 3) (vec_el d V 3));
+     add
+       (add (mul (mat_el d M 2 1) (vec_el d V 1))
+            (mul (mat_el d M 2 2) (vec_el d V 2)))
+       (mul (mat_el d M 2 3) (vec_el d V 3));
+     add
+       (add (mul (mat_el d M 3 1) (vec_el d V 1))
+            (mul (mat_el d M 3 2) (vec_el d V 2)))
+       (mul (mat_el d M 3 3) (vec_el d V 3))].
+*)
+
 Definition mkrvec (a b c : ℝ) : vector ℝ 3 :=
   mkvec [a; b; c] eq_refl.
 
