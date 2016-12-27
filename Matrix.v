@@ -44,9 +44,7 @@ Definition vec_el {A n} d (V : vector A n) i :=
   List.nth (pred i) (vec V) d.
 
 Definition mat_el {A m n} d (M : matrix' A m n) i j :=
-  vec_el d
-    (vec_el (mkvec (repeat d n) (repeat_length d n)) (mat M) i)
-    (pred j).
+  vec_el d (vec_el (mkvec (repeat d n) (repeat_length d n)) (mat M) i) j.
 
 Import ListNotations.
 
@@ -274,7 +272,7 @@ destruct (eq_vec_dec (ve (mat M₁) 1) (ve (mat M₂) 1)) as [H₁| H₁].
  now right; intros H; subst M₂; apply H₁.
 Qed.
 
-Theorem mat_mul_id_l : ∀ m, (mat_id' * m)%mat' = m.
+Theorem mat_mul_id_l' : ∀ m, (mat_id' * m)%mat' = m.
 Proof.
 intros m.
 unfold mat_mul', mat_id'; simpl.
@@ -289,12 +287,36 @@ destruct vv as [| v₁ vv]; [ easy | ].
 destruct vv as [| v₂ vv]; [ easy | ].
 destruct vv as [| v₃ vv]; [ easy | ].
 destruct vv as [| v₄ vv]; [ | easy ].
-f_equal.
-unfold m₁₁, m₂₁, m₁₂, m₂₂, m₁₃, m₂₃; simpl.
-unfold rmat_el; simpl.
-unfold mat_el; simpl.
-unfold vec_el; simpl.
-Abort. (* ça déconne... faut voir *)
+f_equal; unfold m₁₁, m₁₂, m₁₃, m₂₁, m₂₂, m₂₃, m₃₁, m₃₂, m₃₃; simpl.
+ unfold rmat_el; simpl.
+ unfold mat_el; simpl.
+ unfold vec_el; simpl.
+ destruct v₁ as (vv₁, pv₁); simpl.
+ apply eq_vec_eq_list; simpl.
+ destruct vv₁ as [| x₁ vv₁]; [ easy | ].
+ destruct vv₁ as [| x₂ vv₁]; [ easy | ].
+ destruct vv₁ as [| x₃ vv₁]; [ easy | ].
+ now destruct vv₁.
+
+ unfold rmat_el; simpl.
+ unfold mat_el; simpl.
+ unfold vec_el; simpl.
+ f_equal.
+  destruct v₂ as (vv₂, pv₂); simpl.
+  apply eq_vec_eq_list; simpl.
+  destruct vv₂ as [| x₁ vv₂]; [ easy | ].
+  destruct vv₂ as [| x₂ vv₂]; [ easy | ].
+  destruct vv₂ as [| x₃ vv₂]; [ easy | ].
+  now destruct vv₂.
+
+  f_equal.
+  destruct v₃ as (vv₃, pv₃); simpl.
+  apply eq_vec_eq_list; simpl.
+  destruct vv₃ as [| x₁ vv₃]; [ easy | ].
+  destruct vv₃ as [| x₂ vv₃]; [ easy | ].
+  destruct vv₃ as [| x₃ vv₃]; [ easy | ].
+  now destruct vv₃.
+Qed.
 
 (* end of new implementation *)
 
