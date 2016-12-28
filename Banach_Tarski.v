@@ -1583,6 +1583,62 @@ destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  now apply nonzero_cross_mul.
 
  subst V₃.
+ destruct V₁ as (x₁, y₁, z₁).
+ destruct V₂ as (x₂, y₂, z₂).
+ simpl in Hab.
+ injection Hab; clear Hab; intros Hz Hy Hx.
+ rewrite Rplus_comm in Hx, Hy, Hz.
+ apply Rplus_opp_r_uniq in Hx.
+ apply Rplus_opp_r_uniq in Hy.
+ apply Rplus_opp_r_uniq in Hz.
+ apply Rmult_eq_compat_r with (r := (/ a)%R) in Hx.
+ apply Rmult_eq_compat_r with (r := (/ a)%R) in Hy.
+ apply Rmult_eq_compat_r with (r := (/ a)%R) in Hz.
+ rewrite Rmult_shuffle0 in Hx, Hy, Hz.
+ rewrite Rinv_r in Hx; [ | easy ].
+ rewrite Rinv_r in Hy; [ | easy ].
+ rewrite Rinv_r in Hz; [ | easy ].
+ rewrite Rmult_1_l in Hx, Hy, Hz.
+ rewrite Ropp_mult_distr_l, Rmult_shuffle0 in Hx, Hy, Hz.
+ rewrite fold_Rdiv in Hx, Hy, Hz.
+ remember (- b / a)%R as k eqn:Hk.
+bbb.
+
+ rewrite Hx in Hz.
+ rewrite Hy in Hz at 2.
+ do 2 rewrite Rmult_assoc in Hz.
+ rewrite <- Rmult_minus_distr_l in Hz.
+ rewrite <- Rmult_assoc in Hz.
+ rewrite fold_Rsqr in Hz.
+ unfold Rdiv in Hz.
+ rewrite <- Ropp_mult_distr_l, fold_Rdiv in Hz.
+ rewrite <- Rsqr_neg in Hz.
+
+bbb.
+
+ simpl in Hn.
+ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
+  destruct (Rlt_dec x₂ 0) as [Hx₂| Hx₂]; [ clear Hn |  ].
+bbb.
+   apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hz.
+   symmetry in Hz.
+   rewrite Rmult_assoc in Hz.
+   rewrite Rinv_r in Hz; [  | lra ].
+   rewrite Rmult_1_r in Hz.
+   rewrite Rmult_shuffle0, fold_Rdiv in Hz.
+   apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hy.
+   rewrite Rmult_assoc in Hy.
+   rewrite Rinv_r in Hy; [  | lra ].
+   rewrite Rmult_1_r in Hy.
+   rewrite Rmult_shuffle0, fold_Rdiv in Hy.
+   subst y₁ z₁; clear Hx.
+   replace x₁ with (x₁ / x₂ * x₂)%R in Hvn at 1.
+    replace x₁ with (x₁ / x₂ * x₂)%R in Hvv at 1.
+     remember (x₁ / x₂)%R as k eqn:Hk .
+     rewrite vec_mul_diag in Hvn, Hvv.
+     simpl in Hvn.
+     do 3 rewrite Rsqr_mult in Hvn.
+     do 2 rewrite <- Rmult_plus_distr_l in Hvn.
 bbb.
 
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
