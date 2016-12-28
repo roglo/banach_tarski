@@ -1300,8 +1300,64 @@ destruct (Req_dec a 0) as [Ha| Ha].
      apply Rle_antisym in Hy₁; [ move Hy₁ at top; subst y₁ | easy ].
      now apply Hv₁.
 
-   idtac.
-   destruct Hz as [Hz| Hz]; [ subst y₁ | ].
+   clear Hz.
+(**)
+   simpl in Hn.
+   destruct (Rlt_dec 0 0) as [H| H]; [ lra | clear H ].
+   destruct (Rgt_dec 0 0) as [H| H]; [ lra | clear H ].
+   destruct (Rlt_dec y₁ 0) as [Hly₁| Hly₁].
+    destruct (Rlt_dec y₂ 0) as [Hly₂| Hly₂].
+     simpl in Hvn.
+     rewrite Rsqr_0 in Hvn.
+     do 2 rewrite Rplus_0_l in Hvn.
+     apply sqrt_inj in Hvn; try apply nonneg_plus_sqr.
+     destruct (Req_dec z₂ 0) as [Hz₂| Hz₂].
+      subst z₂.
+      rewrite Rmult_0_r in Hx; symmetry in Hx.
+      apply Rmult_integral in Hx.
+      destruct Hx; [ subst z₁ | now subst y₂; apply Hv₂ ].
+      rewrite Rsqr_0 in Hvn.
+      do 2 rewrite Rplus_0_r in Hvn.
+      setoid_rewrite Rsqr_neg in Hvn.
+      apply Rsqr_inj in Hvn; [ | lra | lra ].
+      apply Ropp_eq_compat in Hvn.
+      do 2 rewrite Ropp_involutive in Hvn; subst y₂.
+      now apply Hvv.
+
+      apply Rmult_eq_compat_r with (r := (z₂²)%R) in Hvn.
+      rewrite Rmult_plus_distr_r in Hvn.
+      rewrite <- Rsqr_mult, Hx, Rsqr_mult in Hvn.
+      rewrite <- Rmult_plus_distr_l, Rmult_comm in Hvn.
+      destruct (Req_dec (y₂² + z₂²) 0) as [Hyz| Hyz].
+       apply Rplus_sqr_eq_0 in Hyz.
+       destruct Hyz; subst.
+       now apply Hv₂.
+
+       apply Rmult_eq_reg_l in Hvn; [ | easy ].
+       apply Rsqr_eq_abs_0 in Hvn.
+       unfold Rabs in Hvn.
+       destruct (Rcase_abs z₁) as [Hc₁| Hc₁].
+        destruct (Rcase_abs z₂) as [Hc₂| Hc₂].
+         apply Ropp_eq_compat in Hvn.
+         do 2 rewrite Ropp_involutive in Hvn; subst z₂.
+         rewrite Rmult_comm in Hx.
+         apply Rmult_eq_reg_l in Hx; [ subst y₂ | easy ].
+         now apply Hvv.
+
+         idtac.
+
+bbb.
+     
+
+
+     apply Rmult_eq_compat_r with (r := (/ y₁)%R) in Hx.
+     rewrite Rmult_shuffle0 in Hx.
+     rewrite Rinv_r in Hx; [ | lra ].
+     rewrite Rmult_1_l in Hx.
+     subst z₂.
+
+bbb.
+   destruct (Req_dec y₁ 0) as [Hy₁| Hy₁]; [ subst y₁ | ].
     rewrite Rmult_0_l in Hx; symmetry in Hx.
     apply Rmult_integral in Hx.
     destruct Hx as [Hx| Hx]; [ now subst z₁; apply Hv₁ | subst y₂ ].
@@ -1339,6 +1395,7 @@ destruct (Req_dec a 0) as [Ha| Ha].
       apply Rle_antisym in Hlz₁; [ subst z₁ | easy ].
       now apply Hv₂.
 
+    idtac.
 bbb.
 
  remember (P x₁ y₁ z₁) as V₁ eqn:HV₁.
