@@ -1246,7 +1246,7 @@ destruct V₂ as (x₂, y₂, z₂).
 simpl in Hab.
 injection Hab; clear Hab; intros Hz Hy Hx.
 move Hx after Hy; move Hz after Hy.
-destruct (Req_dec a 0) as [Ha| Ha].
+destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  subst a; split; [ easy | ].
  rewrite Rmult_0_l, Rplus_0_l in Hx, Hy, Hz.
  apply Rmult_integral in Hx; destruct Hx as [Hx| Hx]; [ easy | ].
