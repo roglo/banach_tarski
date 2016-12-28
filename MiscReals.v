@@ -319,3 +319,12 @@ destruct (Rcase_abs x); [ | easy ].
 apply Ropp_eq_0_compat in Hx.
 now rewrite Ropp_involutive in Hx.
 Qed.
+
+Theorem Rabs_eq_Rabs : ∀ x y, Rabs x = Rabs y → x = y ∨ x = (- y)%R.
+Proof.
+intros * Hxy.
+unfold Rabs in Hxy.
+destruct (Rcase_abs x) as [Hx| Hx].
+ destruct (Rcase_abs y); lra.
+ destruct (Rcase_abs y); lra.
+Qed.

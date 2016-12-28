@@ -1230,7 +1230,7 @@ destruct (Req_dec a 0) as [Ha| Ha].
    now destruct H as (Hx & Hy & Hz); subst.
 Qed.
 
-Theorem glop : ∀ V₁ V₂ V₃,
+Theorem vect_and_cross_mul_are_free_family : ∀ V₁ V₂ V₃,
   ∥V₁∥ = ∥V₂∥
   → is_neg_point V₁ = is_neg_point V₂
   → V₁ ≠ 0%vec
@@ -1238,203 +1238,6 @@ Theorem glop : ∀ V₁ V₂ V₃,
   → V₁ ≠ V₂
   → V₃ = V₁ × V₂
   → ∀ a b : ℝ, (a ⁎ V₁ + b ⁎ V₃)%vec = 0%vec → a = 0%R ∧ b = 0%R.
-Proof.
-(*
-intros * Hvn Hn Hv₁ Hv₂ Hvv Hv₃ * Hab.
-subst V₃.
-destruct V₁ as (x₁, y₁, z₁).
-destruct V₂ as (x₂, y₂, z₂).
-simpl in Hab.
-injection Hab; clear Hab; intros Hz Hy Hx.
-move Hx after Hy; move Hz after Hy.
-destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
- subst a; split; [ easy | ].
- rewrite Rmult_0_l, Rplus_0_l in Hx, Hy, Hz.
- apply Rmult_integral in Hx; destruct Hx as [Hx| Hx]; [ easy | ].
- apply Rmult_integral in Hy; destruct Hy as [Hy| Hy]; [ easy | ].
- apply Rmult_integral in Hz; destruct Hz as [Hz| Hz]; [ easy | exfalso ].
- apply Rminus_diag_uniq in Hx.
- apply Rminus_diag_uniq in Hy.
- apply Rminus_diag_uniq in Hz.
-(**)
-simpl in Hn.
-destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
-destruct (Rlt_dec x₂ 0) as [Hx₂| Hx₂]; [ clear Hn | ].
-apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hz.
-symmetry in Hz.
-rewrite Rmult_assoc in Hz.
-rewrite Rinv_r in Hz; [ | lra ].
-rewrite Rmult_1_r in Hz.
-rewrite Rmult_shuffle0, fold_Rdiv in Hz.
-apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hy.
-rewrite Rmult_assoc in Hy.
-rewrite Rinv_r in Hy; [ | lra ].
-rewrite Rmult_1_r in Hy.
-rewrite Rmult_shuffle0, fold_Rdiv in Hy.
-subst y₁ z₁; clear Hx.
-replace x₁ with (x₁ / x₂ * x₂)%R in Hvn at 1.
-replace x₁ with (x₁ / x₂ * x₂)%R in Hvv at 1.
-remember (x₁ / x₂)%R as k eqn:Hk.
-rewrite vec_mul_diag in Hvn, Hvv.
-simpl in Hvn.
-do 3 rewrite Rsqr_mult in Hvn.
-do 2 rewrite <- Rmult_plus_distr_l in Hvn.
-rewrite sqrt_mult in Hvn; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
-rewrite <- Rmult_1_l in Hvn.
-apply Rmult_eq_reg_r in Hvn.
-rewrite sqrt_Rsqr_abs in Hvn.
-apply Rabs_or in Hvn.
-destruct Hvn as [Hvn| Hvn]; subst k.
-rewrite Hvn in Hvv.
-rewrite mul_const_vec_1 in Hvv.
-now apply Hvv.
-apply Rmult_eq_compat_r with (r := x₂) in Hvn.
-unfold Rdiv in Hvn.
-rewrite Rmult_assoc in Hvn.
-rewrite Rinv_l in Hvn; [ | lra ].
-rewrite <- Ropp_mult_distr_l in Hvn.
-rewrite Rmult_1_r, Rmult_1_l in Hvn.
-subst x₁; lra.
-intros H.
-apply sqrt_eq_0 in H.
-apply sqr_vec_norm_eq_0 in H; lra.
-apply nonneg_sqr_vec_norm.
-unfold Rdiv.
-rewrite Rmult_assoc.
-rewrite Rinv_l; [ | lra ].
-now rewrite Rmult_1_r.
-unfold Rdiv.
-rewrite Rmult_assoc.
-rewrite Rinv_l; [ | lra ].
-now rewrite Rmult_1_r.
-destruct (Rgt_dec x₂ 0) as [Hgx₂| Hgx₂]; [ easy | ].
-apply Rnot_lt_le in Hx₂.
-apply Rnot_lt_le in Hgx₂.
-apply Rle_antisym in Hx₂; [ subst x₂ | easy ].
-rewrite Rmult_0_r in Hy, Hz; symmetry in Hy.
-apply Rmult_integral in Hy.
-apply Rmult_integral in Hz.
-destruct Hy as [| Hy]; [ lra | ].
-destruct Hz as [| Hz]; [ lra | ].
-now subst y₂ z₂; apply Hv₂.
-destruct (Rgt_dec x₁ 0) as [Hgx₁| Hgx₁].
-destruct (Rlt_dec x₂ 0) as [Hlx₂| Hlx₂]; [ easy | ].
-destruct (Rgt_dec x₂ 0) as [Hgx₂| Hgx₂]; [ clear Hn | ].
-apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hz.
-symmetry in Hz.
-rewrite Rmult_assoc in Hz.
-rewrite Rinv_r in Hz; [ | lra ].
-rewrite Rmult_1_r in Hz.
-rewrite Rmult_shuffle0, fold_Rdiv in Hz.
-apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hy.
-rewrite Rmult_assoc in Hy.
-rewrite Rinv_r in Hy; [ | lra ].
-rewrite Rmult_1_r in Hy.
-rewrite Rmult_shuffle0, fold_Rdiv in Hy.
-subst y₁ z₁; clear Hx.
-replace x₁ with (x₁ / x₂ * x₂)%R in Hvn at 1.
-replace x₁ with (x₁ / x₂ * x₂)%R in Hvv at 1.
-remember (x₁ / x₂)%R as k eqn:Hk.
-rewrite vec_mul_diag in Hvn, Hvv.
-simpl in Hvn.
-do 3 rewrite Rsqr_mult in Hvn.
-do 2 rewrite <- Rmult_plus_distr_l in Hvn.
-rewrite sqrt_mult in Hvn; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
-rewrite <- Rmult_1_l in Hvn.
-apply Rmult_eq_reg_r in Hvn.
-rewrite sqrt_Rsqr_abs in Hvn.
-apply Rabs_or in Hvn.
-destruct Hvn as [Hvn| Hvn]; subst k.
-rewrite Hvn in Hvv.
-rewrite mul_const_vec_1 in Hvv.
-now apply Hvv.
-apply Rmult_eq_compat_r with (r := x₂) in Hvn.
-unfold Rdiv in Hvn.
-rewrite Rmult_assoc in Hvn.
-rewrite Rinv_l in Hvn; [ | lra ].
-rewrite <- Ropp_mult_distr_l in Hvn.
-rewrite Rmult_1_r, Rmult_1_l in Hvn.
-subst x₁; lra.
-intros H.
-apply sqrt_eq_0 in H.
-apply sqr_vec_norm_eq_0 in H; lra.
-apply nonneg_sqr_vec_norm.
-unfold Rdiv.
-rewrite Rmult_assoc.
-rewrite Rinv_l; [ | lra ].
-now rewrite Rmult_1_r.
-unfold Rdiv.
-rewrite Rmult_assoc.
-rewrite Rinv_l; [ | lra ].
-now rewrite Rmult_1_r.
-apply Rnot_lt_le in Hlx₂.
-apply Rnot_gt_le in Hgx₂.
-apply Rle_antisym in Hlx₂; [ subst x₂ | easy ].
-rewrite Rmult_0_r in Hy; symmetry in Hy.
-rewrite Rmult_0_r in Hz.
-apply Rmult_integral in Hy.
-apply Rmult_integral in Hz.
-destruct Hy; [ lra | subst z₂ ].
-destruct Hz; [ lra | subst y₂ ].
-now apply Hv₂.
-apply Rnot_lt_le in Hx₁.
-apply Rnot_gt_le in Hgx₁.
-apply Rle_antisym in Hx₁; [ subst x₁ | easy ].
-rewrite Rmult_0_l in Hy.
-rewrite Rmult_0_l in Hz; symmetry in Hz.
-apply Rmult_integral in Hy.
-apply Rmult_integral in Hz.
-destruct (Rlt_dec x₂ 0) as [Hlx₂| Hlx₂].
-destruct Hy; [ subst z₁ | lra ].
-destruct Hz; [ subst y₁ | lra ].
-now apply Hv₁.
-destruct (Rgt_dec x₂ 0) as [Hgx₂| Hgx₂].
-destruct Hy; [ subst z₁ | lra ].
-destruct Hz; [ subst y₁ | lra ].
-now apply Hv₁.
-apply Rnot_lt_le in Hlx₂.
-apply Rnot_gt_le in Hgx₂.
-apply Rle_antisym in Hlx₂; [ subst x₂ | easy ].
-clear Hy Hz.
-destruct (Rlt_dec y₁ 0) as [Hly₁| Hly₁].
-destruct (Rgt_dec y₁ 0) as [Hgy₁| Hgy₁]; [ lra | ].
-apply Rmult_eq_compat_l with (r := (/ y₁)%R) in Hx.
-do 2 rewrite <- Rmult_assoc in Hx.
-rewrite Rinv_l in Hx; [ | lra ].
-rewrite Rmult_1_l, Rmult_comm, <- Rmult_assoc in Hx.
-rewrite fold_Rdiv in Hx.
-subst z₂.
-replace y₂ with (y₂ / y₁ * y₁)%R in Hvn at 1.
-replace y₂ with (y₂ / y₁ * y₁)%R in Hvv at 1.
-replace 0%R with (y₂ / y₁ * 0)%R in Hvn at 2.
-replace 0%R with (y₂ / y₁ * 0)%R in Hvv at 2.
-remember (y₂ / y₁)%R as k eqn:Hk.
-rewrite vec_mul_diag in Hvn, Hvv.
-simpl in Hvn.
-do 3 rewrite Rsqr_mult in Hvn.
-do 2 rewrite <- Rmult_plus_distr_l in Hvn.
-rewrite sqrt_mult in Hvn; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
-symmetry in Hvn.
-rewrite <- Rmult_1_l in Hvn.
-apply Rmult_eq_reg_r in Hvn.
-rewrite sqrt_Rsqr_abs in Hvn.
-apply Rabs_or in Hvn.
-destruct Hvn as [Hvn| Hvn]; subst k.
-rewrite Hvn in Hvv.
-rewrite mul_const_vec_1 in Hvv.
-now apply Hvv.
-apply Rmult_eq_compat_r with (r := y₁) in Hvn.
-unfold Rdiv in Hvn.
-rewrite Rmult_assoc in Hvn.
-rewrite Rinv_l in Hvn; [ | lra ].
-rewrite <- Ropp_mult_distr_l in Hvn.
-rewrite Rmult_1_r, Rmult_1_l in Hvn.
-subst y₂.
-destruct (Rlt_dec (-y₁) 0) as [Hly₂| Hly₂]; [ lra | ].
-destruct (Rgt_dec (-y₁) 0) as [Hgy₂| Hgy₂]; [ easy | lra ].
-
-Show Script.
-*)
 Proof.
 intros * Hvn Hn Hv₁ Hv₂ Hvv Hv₃ * Hab.
 subst V₃.
@@ -1672,6 +1475,140 @@ destruct (Req_dec a 0) as [Ha| Ha]; [  | exfalso ].
        rewrite Rmult_assoc.
        rewrite Rinv_l; [  | lra ].
        now rewrite Rmult_1_r.
+
+   destruct (Rgt_dec y₁ 0) as [Hgy₁| Hgy₁].
+    apply Rmult_eq_compat_l with (r := (/ y₁)%R) in Hx.
+    do 2 rewrite <- Rmult_assoc in Hx.
+    rewrite Rinv_l in Hx; [  | lra ].
+    rewrite Rmult_1_l, Rmult_comm, <- Rmult_assoc in Hx.
+    rewrite fold_Rdiv in Hx.
+    subst z₂.
+    replace y₂ with (y₂ / y₁ * y₁)%R in Hvn at 1.
+     replace y₂ with (y₂ / y₁ * y₁)%R in Hvv at 1.
+      replace 0%R with (y₂ / y₁ * 0)%R in Hvn at 2 by lra.
+      replace 0%R with (y₂ / y₁ * 0)%R in Hvv at 2 by lra.
+      remember (y₂ / y₁)%R as k eqn:Hk .
+      rewrite vec_mul_diag in Hvn, Hvv.
+      simpl in Hvn.
+      do 3 rewrite Rsqr_mult in Hvn.
+      do 2 rewrite <- Rmult_plus_distr_l in Hvn.
+      rewrite sqrt_mult in Hvn.
+       symmetry in Hvn.
+       rewrite <- Rmult_1_l in Hvn.
+       apply Rmult_eq_reg_r in Hvn.
+        rewrite sqrt_Rsqr_abs in Hvn.
+        apply Rabs_or in Hvn.
+        destruct Hvn as [Hvn| Hvn]; subst k.
+         rewrite Hvn in Hvv.
+         rewrite mul_const_vec_1 in Hvv.
+         now apply Hvv.
+
+         apply Rmult_eq_compat_r with (r := y₁) in Hvn.
+         unfold Rdiv in Hvn.
+         rewrite Rmult_assoc in Hvn.
+         rewrite Rinv_l in Hvn; [  | lra ].
+         rewrite <- Ropp_mult_distr_l in Hvn.
+         rewrite Rmult_1_r, Rmult_1_l in Hvn.
+         subst y₂.
+         destruct (Rlt_dec (- y₁) 0) as [Hly₂| Hly₂]; [ easy | lra ].
+
+        intros H.
+        apply sqrt_eq_0 in H.
+         apply sqr_vec_norm_eq_0 in H; lra.
+
+         apply nonneg_sqr_vec_norm.
+
+       apply Rle_0_sqr.
+       
+       apply nonneg_sqr_vec_norm.
+
+      unfold Rdiv.
+      rewrite Rmult_assoc.
+      rewrite Rinv_l; [  | lra ].
+      now rewrite Rmult_1_r.
+
+     unfold Rdiv.
+     rewrite Rmult_assoc.
+     rewrite Rinv_l; [  | lra ].
+     now rewrite Rmult_1_r.
+
+    apply Rnot_lt_le in Hly₁.
+    apply Rnot_gt_le in Hgy₁.
+    apply Rle_antisym in Hly₁; [ subst y₁ | easy ].
+    rewrite Rmult_0_l in Hx; symmetry in Hx.
+    apply Rmult_integral in Hx.
+    destruct Hx as [Hx| Hx]; [ now subst z₁; apply Hv₁ | subst y₂ ].
+    destruct (Rlt_dec 0 0) as [H| H]; [ lra | clear H ].
+    destruct (Rgt_dec 0 0) as [H| H]; [ lra | clear H ].
+    destruct (Rlt_dec z₁ 0) as [Hlz₁| Hlz₁].
+     destruct (Rlt_dec z₂ 0) as [Hlz₂| Hlz₂]; [ clear Hn | ].
+      simpl in Hvn.
+      rewrite Rsqr_0 in Hvn.
+      do 3 rewrite Rplus_0_l in Hvn.
+      do 2 rewrite sqrt_Rsqr_abs in Hvn.
+      apply Rabs_eq_Rabs in Hvn.
+      destruct Hvn; subst z₁; [ now apply Hvv | lra ].
+
+      destruct (Rgt_dec z₂ 0) as [Hgz₂| Hgz₂]; [ easy | ].
+      apply Rnot_lt_le in Hlz₂.
+      apply Rnot_gt_le in Hgz₂.
+      apply Rle_antisym in Hlz₂; [ subst z₂ | easy ].
+      now apply Hv₂.
+
+     destruct (Rgt_dec z₁ 0) as [Hgz₁| Hgz₁].
+      destruct (Rlt_dec z₂ 0) as [Hlz₂| Hlz₂]; [ easy | ].
+      destruct (Rgt_dec z₂ 0) as [Hgz₂| Hgz₂]; [ | easy ].
+      simpl in Hvn.
+      rewrite Rsqr_0 in Hvn.
+      do 3 rewrite Rplus_0_l in Hvn.
+      do 2 rewrite sqrt_Rsqr_abs in Hvn.
+      apply Rabs_eq_Rabs in Hvn.
+      destruct Hvn; subst z₁; [ now apply Hvv | lra ].
+
+      apply Rnot_lt_le in Hlz₁.
+      apply Rnot_gt_le in Hgz₁.
+      apply Rle_antisym in Hlz₁; [ subst z₁ | easy ].
+      now apply Hv₁.
+
+ idtac.
+bbb.
+      unfold Rabs in Hvn.
+      destruct (Rlt_dec y₁ 0) as [Hy₁| Hy₁].
+       destruct (Rcase_abs y₁) as [H| H]; [ | now apply Rge_not_lt in H ].
+       clear H.
+       destruct (Rlt_dec y₂ 0) as [Hly₂| Hly₂].
+        destruct (Rcase_abs y₂) as [H| H]; [ | now apply Rge_not_lt in H ].
+        clear H.
+        apply Ropp_eq_compat in Hvn.
+        do 2 rewrite Ropp_involutive in Hvn; subst y₂.
+        now apply Hvv.
+
+        destruct (Rgt_dec y₂ 0) as [Hgy₂| Hgy₂]; [ easy | ].
+        apply Rnot_lt_le in Hly₂.
+        apply Rnot_gt_le in Hgy₂.
+        apply Rle_antisym in Hly₂; [ subst y₂ | easy ].
+        now apply Hv₂.
+
+       destruct (Rcase_abs y₁) as [H| H]; [ now apply Rge_not_lt in H | ].
+       destruct (Rgt_dec y₁ 0) as [Hgy₁| Hgy₁]; [ clear H Hy₁ | ].
+        destruct (Rlt_dec y₂ 0) as [Hly₂| Hly₂]; [ easy | ].
+        destruct (Rcase_abs y₂) as [H| H]; [ easy | subst y₂ ].
+        now apply Hvv.
+
+        apply Rnot_lt_le in Hy₁.
+        apply Rnot_gt_le in Hgy₁.
+        apply Rle_antisym in Hy₁; [ move Hy₁ at top; subst y₁ | easy ].
+        now apply Hv₁.
+
+      clear Hz.
+   (**)
+      simpl in Hn.
+      destruct (Rlt_dec 0 0) as [H| H]; [ lra | clear H ].
+      destruct (Rgt_dec 0 0) as [H| H]; [ lra | clear H ].
+      destruct (Rlt_dec y₁ 0) as [Hly₁| Hly₁].
+       destruct (Rlt_dec y₂ 0) as [Hly₂| Hly₂].
+        simpl in Hvn.
+        rewrite Rsqr_0 in Hvn.
 bbb.
 
 subst y₂; lra.
