@@ -1180,3 +1180,16 @@ split; intros H.
  rewrite vec_add_opp_r.
  now rewrite vec_add_0_r.
 Qed.
+
+Theorem vec_cross_mul_integral : ∀ a V, (a ⁎ V = 0)%vec → a = 0%R ∨ V = 0%vec.
+Proof.
+intros a (x, y, z) HaV; simpl in HaV.
+injection HaV; clear HaV; intros Hz Hy Hx.
+apply Rmult_integral in Hx.
+apply Rmult_integral in Hy.
+apply Rmult_integral in Hz.
+destruct Hx as [Hx| Hx]; [ now left | subst x ].
+destruct Hy as [Hy| Hy]; [ now left | subst y ].
+destruct Hz as [Hz| Hz]; [ now left | subst z ].
+now right.
+Qed.
