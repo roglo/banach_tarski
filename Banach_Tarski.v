@@ -1305,7 +1305,15 @@ destruct (Req_dec a 0) as [Ha| Ha].
     rewrite Rmult_0_l in Hx; symmetry in Hx.
     apply Rmult_integral in Hx.
     destruct Hx as [Hx| Hx]; [ now subst z₁; apply Hv₁ | subst y₂ ].
-
+    simpl in Hvn.
+    rewrite Rsqr_0 in Hvn.
+    do 3 rewrite Rplus_0_l in Hvn.
+    do 2 rewrite sqrt_Rsqr_abs in Hvn.
+    unfold Rabs in Hvn.
+    simpl in Hn.
+    destruct (Rlt_dec 0 0) as [H₁| H₁]; [ lra | clear H₁ ].
+    destruct (Rgt_dec 0 0) as [H₁| H₁]; [ lra | clear H₁ ].
+    destruct (Rlt_dec z₁ 0) as [Hlz₁| Hlz₁].
 bbb.
 
  remember (P x₁ y₁ z₁) as V₁ eqn:HV₁.
