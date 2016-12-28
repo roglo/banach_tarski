@@ -1485,7 +1485,9 @@ destruct (Req_dec a 0) as [Ha| Ha].
        apply Rle_antisym in Hlz₁; [ subst z₁ | easy ].
        now apply Hv₁.
 
-  idtac.
+  simpl in Hn.
+  destruct (Rlt_dec x₁ 0) as [Hlx₁| Hlx₁].
+   destruct (Rlt_dec x₂ 0) as [Hlx₂| Hlx₂].
 bbb.
 
       destruct (Rgt_dec z₂ 0) as [Hgz₂| Hgy₂]; [ easy | ].
