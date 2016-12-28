@@ -1602,6 +1602,9 @@ destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  rewrite Ropp_mult_distr_l, Rmult_shuffle0 in Hx, Hy, Hz.
  rewrite fold_Rdiv in Hx, Hy, Hz.
  remember (- b / a)%R as k eqn:Hk.
+ simpl in Hn.
+ destruct (Rlt_dec x₁ 0) as [Hlx₁| Hlx₁].
+  destruct (Rlt_dec x₂ 0) as [Hlx₂| Hlx₂]; [ clear Hn | ].
 bbb.
 
  rewrite Hx in Hz.
