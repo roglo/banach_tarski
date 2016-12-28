@@ -1314,6 +1314,31 @@ destruct (Req_dec a 0) as [Ha| Ha].
     destruct (Rlt_dec 0 0) as [H₁| H₁]; [ lra | clear H₁ ].
     destruct (Rgt_dec 0 0) as [H₁| H₁]; [ lra | clear H₁ ].
     destruct (Rlt_dec z₁ 0) as [Hlz₁| Hlz₁].
+     destruct (Rlt_dec z₂ 0) as [Hlz₂| Hlz₂].
+      destruct (Rcase_abs z₁) as [H| H]; [ clear H | lra ].
+      destruct (Rcase_abs z₂) as [H| H]; [ clear H | lra ].
+      apply Ropp_eq_compat in Hvn.
+      do 2 rewrite Ropp_involutive in Hvn; subst z₂.
+      now apply Hvv.
+
+      destruct (Rgt_dec z₂ 0) as [Hgz₂| Hgz₂]; [ easy | ].
+      apply Rnot_lt_le in Hlz₂.
+      apply Rnot_gt_le in Hgz₂.
+      apply Rle_antisym in Hlz₂; [ subst z₂ | easy ].
+      now apply Hv₂.
+
+     destruct (Rgt_dec z₁ 0) as [Hgz₁| Hgz₁].
+      destruct (Rlt_dec z₂ 0) as [Hlz₂| Hlz₂]; [ easy | ].
+      destruct (Rgt_dec z₂ 0) as [Hgz₂| Hgz₂]; [ | easy ].
+      destruct (Rcase_abs z₁) as [H| H]; [ lra | clear H ].
+      destruct (Rcase_abs z₂) as [H| H]; [ lra | subst z₂ ].
+      now apply Hvv.
+
+      apply Rnot_lt_le in Hlz₁.
+      apply Rnot_gt_le in Hgz₁.
+      apply Rle_antisym in Hlz₁; [ subst z₁ | easy ].
+      now apply Hv₂.
+
 bbb.
 
  remember (P x₁ y₁ z₁) as V₁ eqn:HV₁.
