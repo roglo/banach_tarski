@@ -1582,6 +1582,7 @@ destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  revert Hab; rewrite Hv₃.
  now apply nonzero_cross_mul.
 
+ subst V₃.
 bbb.
 
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
