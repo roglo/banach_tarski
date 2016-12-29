@@ -1559,6 +1559,34 @@ Theorem vec_cross_mul_are_free_family : ∀ U V,
     → a = 0%R ∧ b = 0%R ∧ c = 0%R.
 Proof.
 intros * Hvn Hn HU HV HUV * Hab.
+destruct (Req_dec c 0) as [Hc| Hc]; [ | exfalso ].
+ subst c.
+ rewrite vec_const_mul_0_l in Hab.
+ rewrite vec_add_0_r in Hab.
+ now apply free_family_diff_norm_vec in Hab.
+
+ destruct U as (u₁, u₂, u₃).
+ destruct V as (v₁, v₂, v₃).
+ simpl in Hab.
+ injection Hab; clear Hab; intros H₃ H₂ H₁.
+ apply Rmult_eq_compat_r with (r := (/ c)%R) in H₁.
+ apply Rmult_eq_compat_r with (r := (/ c)%R) in H₂.
+ apply Rmult_eq_compat_r with (r := (/ c)%R) in H₃.
+ rewrite Rmult_0_l in H₁, H₂, H₃.
+ rewrite Rmult_plus_distr_r in H₁, H₂, H₃.
+ rewrite Rmult_shuffle0 in H₁, H₂, H₃.
+ rewrite Rinv_r in H₁; [ | easy ].
+ rewrite Rinv_r in H₂; [ | easy ].
+ rewrite Rinv_r in H₃; [ | easy ].
+ rewrite Rmult_1_l in H₁, H₂, H₃.
+ rewrite Rmult_plus_distr_r in H₁, H₂, H₃.
+ rewrite Rmult_shuffle0 in H₁, H₂, H₃.
+ rewrite fold_Rdiv in H₁, H₂, H₃.
+ rewrite Rmult_shuffle0 in H₁, H₂, H₃.
+ rewrite fold_Rdiv in H₁, H₂, H₃.
+
+bbb.
+intros * Hvn Hn HU HV HUV * Hab.
 destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  subst a; split; [ easy |  ].
  rewrite vec_const_mul_0_l in Hab.
