@@ -1112,13 +1112,13 @@ Qed.
 
 Theorem free_family_diff_norm_vec : ∀ U V,
   ∥U∥ = ∥V∥
-  → is_neg_point U = is_neg_point V
   → U ≠ V
+  → is_neg_point U = is_neg_point V
   → U ≠ 0%vec
   → V ≠ 0%vec
   → ∀ a b : ℝ, (a ⁎ U + b ⁎ V)%vec = 0%vec → a = 0%R ∧ b = 0%R.
 Proof.
-intros * Hvn Hn Hvv Hv₁ Hv₂ * Hab.
+intros * Hvn Hvv Hn Hv₁ Hv₂ * Hab.
 destruct U as (x₁, y₁, z₁).
 destruct V as (x₂, y₂, z₂).
 simpl in Hab.
