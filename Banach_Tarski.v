@@ -1651,6 +1651,7 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
       assert
         (Hfree3 : ∀ a b c,
          (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃ = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
+Check vect_and_cross_mul_are_free_family.
 bbb.
 (*
 intros * Habc.
