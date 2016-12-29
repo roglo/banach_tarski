@@ -105,18 +105,18 @@ Definition vec_cross_mul' U V :=
     (yv U * zv V - zv U * yv V)
     (zv U * xv V - xv U * zv V)
     (xv U * yv V - yv U * xv V).
-Definition mul_const_vec' k V := mkrvec (k * xv V) (k * yv V) (k * zv V).
-Definition mul_const_mat' k M :=
+Definition vec_const_mul' k V := mkrvec (k * xv V) (k * yv V) (k * zv V).
+Definition mat_const_mul' k M :=
   mkrmat'
     (k * m₁₁ M) (k * m₁₂ M) (k * m₁₃ M)
     (k * m₂₁ M) (k * m₂₂ M) (k * m₂₃ M)
     (k * m₃₁ M) (k * m₃₂ M) (k * m₃₃ M).
 
 Notation "0" := (mkrvec 0 0 0) : vec_scope'.
-Notation "k ⁎ V" := (mul_const_vec' k V) (at level 40) : vec_scope'.
+Notation "k ⁎ V" := (vec_const_mul' k V) (at level 40) : vec_scope'.
 Notation "M * V" := (mat_vec_mul' M V) : vec_scope'.
 Notation "U + V" := (vec_add' U V) : vec_scope'.
-Notation "U • V" := (vec_dot_mul' U V) (at level 45, left associativity) :
+Notation "U · V" := (vec_dot_mul' U V) (at level 45, left associativity) :
   vec_scope'.
 Notation "U × V" := (vec_cross_mul' U V) (at level 40, left associativity) :
   vec_scope'.
@@ -393,8 +393,8 @@ Definition vec_dot_mul '(P x₁ y₁ z₁) '(P x₂ y₂ z₂) :=
   (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R.
 Definition vec_cross_mul '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) :=
   P (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
-Definition mul_const_vec k '(P x y z) := P (k * x) (k * y) (k * z).
-Definition mul_const_mat k (M : matrix ℝ) :=
+Definition vec_const_mul k '(P x y z) := P (k * x) (k * y) (k * z).
+Definition mat_const_mul k (M : matrix ℝ) :=
   mkrmat
     (k * a₁₁ M) (k * a₁₂ M) (k * a₁₃ M)
     (k * a₂₁ M) (k * a₂₂ M) (k * a₂₃ M)
@@ -403,14 +403,17 @@ Definition mul_const_mat k (M : matrix ℝ) :=
 Delimit Scope vec_scope with vec.
 
 Arguments vec_norm _%vec.
+Arguments vec_add _%vec _%vec.
+Arguments vec_dot_mul _%vec _%vec.
+Arguments vec_cross_mul _%vec _%vec.
 
 Notation "0" := (P 0 0 0) : vec_scope.
-Notation "k ⁎ V" := (mul_const_vec k V) (at level 40) : vec_scope.
+Notation "k ⁎ V" := (vec_const_mul k V) (at level 40).
 Notation "M * V" := (mat_vec_mul M V) : vec_scope.
 Notation "U + V" := (vec_add U V) : vec_scope.
 Notation "U - V" := (vec_sub U V) : vec_scope.
 Notation "- V" := (vec_opp V) : vec_scope.
-Notation "U • V" := (vec_dot_mul U V) (at level 45, left associativity).
+Notation "U · V" := (vec_dot_mul U V) (at level 45, left associativity).
 Notation "U × V" := (vec_cross_mul U V) (at level 40, left associativity).
 Notation "∥ V ∥" := (vec_norm V) (at level 0, V at level 0, format "∥ V ∥").
 
@@ -928,17 +931,17 @@ rewrite mat_det_mul, Hd1, Hd2.
 apply Rmult_1_r.
 Qed.
 
-Theorem mul_const_vec_assoc : ∀ a b V,
-  mul_const_vec a (mul_const_vec b V) = mul_const_vec (a * b) V.
+Theorem vec_const_mul_assoc : ∀ a b V,
+  vec_const_mul a (vec_const_mul b V) = vec_const_mul (a * b) V.
 Proof.
 intros a b (x, y, z); simpl.
 now do 3 rewrite Rmult_assoc.
 Qed.
 
-Theorem mul_const_vec_div : ∀ a b U V,
+Theorem vec_const_mul_div : ∀ a b U V,
   a ≠ 0%R
-  → mul_const_vec a U = mul_const_vec b V
-  → U = mul_const_vec (b / a) V.
+  → vec_const_mul a U = vec_const_mul b V
+  → U = vec_const_mul (b / a) V.
 Proof.
 intros * Ha Hm.
 destruct U as (u₁, u₂, u₃).
@@ -971,8 +974,8 @@ apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
-Theorem vec_norm_mul_const_vec : ∀ a V,
-  ∥(mul_const_vec a V)∥ = (Rabs a * ∥V∥)%R.
+Theorem vec_norm_vec_const_mul : ∀ a V,
+  ∥(vec_const_mul a V)∥ = (Rabs a * ∥V∥)%R.
 Proof.
 intros a (x, y, z); simpl.
 do 3 rewrite Rsqr_mult.
@@ -1030,7 +1033,7 @@ intros (x, y, z); simpl.
 now do 3 rewrite Rplus_0_r.
 Qed.
 
-Theorem eq_mul_const_vec_0 : ∀ a V, (a ⁎ V = 0 → a = 0%R ∨ V = 0)%vec.
+Theorem eq_vec_const_mul_0 : ∀ a V, (a ⁎ V = 0 → a = 0%R ∨ V = 0)%vec.
 Proof.
 intros a (x, y, z) HV; simpl in HV; simpl.
 injection HV; intros Hz Hy Hx.
@@ -1043,16 +1046,22 @@ destruct Hz as [Hz| Hz]; [ now left | subst z ].
 now right.
 Qed.
 
-Theorem mul_const_vec_0_l : ∀ V, (0 ⁎ V = 0)%vec.
+Theorem vec_const_mul_0_l : ∀ V, (0 ⁎ V = 0)%vec.
 Proof.
 intros (x, y, z); simpl.
 now do 3 rewrite Rmult_0_l.
 Qed.
 
-Theorem mul_const_vec_1 : ∀ V, mul_const_vec 1 V = V.
+Theorem vec_const_mul_0_r : ∀ a, (a ⁎ 0 = 0)%vec.
+Proof.
+intros x; simpl.
+now rewrite Rmult_0_r.
+Qed.
+
+Theorem vec_const_mul_1 : ∀ V, vec_const_mul 1 V = V.
 Proof.
 intros (x, y, z).
-unfold mul_const_vec.
+unfold vec_const_mul.
 now do 3 rewrite Rmult_1_l.
 Qed.
 
@@ -1192,4 +1201,49 @@ destruct Hx as [Hx| Hx]; [ now left | subst x ].
 destruct Hy as [Hy| Hy]; [ now left | subst y ].
 destruct Hz as [Hz| Hz]; [ now left | subst z ].
 now right.
+Qed.
+
+Theorem vec_const_mul_cross_distr_l : ∀ k U V,
+  vec_const_mul k (U × V) = vec_const_mul k U × V.
+Proof.
+intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
+f_equal; ring.
+Qed.
+
+Theorem mat_const_vec_mul : ∀ M V k,
+  mat_vec_mul (mat_const_mul k M) V = mat_vec_mul M (vec_const_mul k V).
+Proof.
+intros.
+destruct V as (x, y, z); simpl; f_equal; ring.
+Qed.
+
+Theorem mat_vec_mat_const_mul : ∀ M V k,
+  mat_vec_mul (mat_const_mul k M) V = vec_const_mul k (mat_vec_mul M V).
+Proof.
+intros.
+destruct V as (x, y, z); simpl; f_equal; ring.
+Qed.
+
+Theorem vec_dot_cross_mul : ∀ U V, U · (U × V) = 0%R.
+Proof.
+intros.
+destruct U, V; simpl; lra.
+Qed.
+
+Theorem vec_dot_mul_0_r : ∀ V, (V · 0)%vec = 0%R.
+Proof.
+intros (x, y, z); simpl.
+do 3 rewrite Rmult_0_r.
+now do 2 rewrite Rplus_0_r.
+Qed.
+
+Theorem vec_dot_mul_add_distr_l : ∀ U V W,
+  U · (V + W) = (U · V + U · W)%R.
+Proof.
+intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
+Qed.
+
+Theorem Rmult_vec_dot_mul_distr_r : ∀ a U V, (a * (U · V))%R = U · a ⁎ V.
+Proof.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.

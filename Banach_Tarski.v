@@ -500,7 +500,7 @@ Definition rotation_unit_eigenvec (m : matrix ℝ) :=
   P (x / r) (y / r) (z / r).
 
 Definition rotation_fixpoint (m : matrix ℝ) k :=
-  mul_const_vec k (rotation_unit_eigenvec m).
+  vec_const_mul k (rotation_unit_eigenvec m).
 
 Definition mat_of_path el :=
   List.fold_right mat_mul mat_id (map mat_of_elem el).
@@ -1027,34 +1027,13 @@ f_equal.
  clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
 Qed.
 
-Theorem mul_const_vec_cross_distr_l : ∀ k U V,
-  mul_const_vec k (U × V) = mul_const_vec k U × V.
-Proof.
-intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
-f_equal; ring.
-Qed.
-
-Theorem mat_const_vec_mul : ∀ M V k,
-  mat_vec_mul (mul_const_mat k M) V = mat_vec_mul M (mul_const_vec k V).
-Proof.
-intros.
-destruct V as (x, y, z); simpl; f_equal; ring.
-Qed.
-
-Theorem mat_vec_mul_const_mat : ∀ M V k,
-  mat_vec_mul (mul_const_mat k M) V = mul_const_vec k (mat_vec_mul M V).
-Proof.
-intros.
-destruct V as (x, y, z); simpl; f_equal; ring.
-Qed.
-
 Theorem mat_eigenvec_mul_const : ∀ M V,
   mat_vec_mul M V = V
-  → ∀ k, mat_vec_mul M (mul_const_vec k V) = mul_const_vec k V.
+  → ∀ k, mat_vec_mul M (vec_const_mul k V) = vec_const_mul k V.
 Proof.
 intros * HV k.
 rewrite <- mat_const_vec_mul.
-rewrite mat_vec_mul_const_mat.
+rewrite mat_vec_mat_const_mul.
 now rewrite HV.
 Qed.
 
@@ -1062,9 +1041,7 @@ Theorem vec_cross_mul_eq_0 : ∀ U V,
   U ≠ 0%vec
   → V ≠ 0%vec
   → U × V = 0%vec
-  → ∃ a b,
-    a ≠ 0%R ∧ b ≠ 0%R ∧
-    vec_add (mul_const_vec a U) (mul_const_vec b V) = 0%vec.
+  → ∃ a b, a ≠ 0%R ∧ b ≠ 0%R ∧ (a ⁎ U + b ⁎ V = 0)%vec.
 Proof.
 intros * HU HV HUV.
 destruct U as (u₁, u₂, u₃).
@@ -1132,33 +1109,6 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
   split; [ now apply Ropp_neq_0_compat | ].
   f_equal; lra.
 Qed.
-
-(* reverse could be completed if required one day
- intros (a & b & Ha & Hb & Hab).
- destruct U as (u₁, u₂, u₃).
- destruct V as (v₁, v₂, v₃); simpl in Hab; simpl.
- injection Hab; clear Hab; intros H₃ H₂ H₁.
- move H₁ after H₂; move H₃ after H₂.
- f_equal.
-  apply Rplus_opp_r_uniq in H₂.
-  assert (Hv₂ : (v₂ = - (a * u₂) / b)%R).
-   rewrite <- H₂, Rmult_div.
-   unfold Rdiv; rewrite Rinv_r; [ | easy ].
-   now rewrite Rmult_1_l.
-
-   subst v₂.
-   rewrite Ropp_mult_distr_l.
-   unfold Rdiv.
-   do 2 rewrite <- Rmult_assoc.
-   rewrite Rmult_shuffle0, Rmult_comm.
-   unfold Rminus.
-   rewrite Ropp_mult_distr_l.
-   rewrite <- Rmult_plus_distr_r.
-   destruct (Req_dec u₂ 0) as [Hu₂| Hu₂].
-    now subst u₂; rewrite Rmult_0_r.
-
-    apply Rmult_eq_0_compat_r.
-*)
 
 Theorem free_family_diff_norm_vec : ∀ V₁ V₂,
   ∥V₁∥ = ∥V₂∥
@@ -1276,7 +1226,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
       apply Rabs_or in Hvn.
       destruct Hvn as [Hvn| Hvn]; subst k.
        rewrite Hvn in Hvv.
-       rewrite mul_const_vec_1 in Hvv.
+       rewrite vec_const_mul_1 in Hvv.
        now apply Hvv.
 
        apply Rmult_eq_compat_r with (r := x₂) in Hvn.
@@ -1347,7 +1297,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
        apply Rabs_or in Hvn.
        destruct Hvn as [Hvn| Hvn]; subst k.
         rewrite Hvn in Hvv.
-        rewrite mul_const_vec_1 in Hvv.
+        rewrite vec_const_mul_1 in Hvv.
         now (apply Hvv).
 
         apply Rmult_eq_compat_r with (r := x₂) in Hvn.
@@ -1435,7 +1385,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
          apply Rabs_or in Hvn.
          destruct Hvn as [Hvn| Hvn]; subst k.
           rewrite Hvn in Hvv.
-          rewrite mul_const_vec_1 in Hvv.
+          rewrite vec_const_mul_1 in Hvv.
           now apply Hvv.
 
           apply Rmult_eq_compat_r with (r := y₁) in Hvn.
@@ -1492,7 +1442,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
        apply Rabs_or in Hvn.
        destruct Hvn as [Hvn| Hvn]; subst k.
         rewrite Hvn in Hvv.
-        rewrite mul_const_vec_1 in Hvv.
+        rewrite vec_const_mul_1 in Hvv.
         now apply Hvv.
 
         apply Rmult_eq_compat_r with (r := y₁) in Hvn.
@@ -1563,10 +1513,6 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
      now apply Hv₁.
 Qed.
 
-Theorem glop : ∀ V₁ V₂, V₁ • V₁ × V₂ = 0%R.
-Proof.
-bbb.
-
 Theorem vect_and_cross_mul_are_free_family : ∀ V₁ V₂ V₃,
   ∥V₁∥ = ∥V₂∥
   → is_neg_point V₁ = is_neg_point V₂
@@ -1579,14 +1525,26 @@ Proof.
 intros * Hvn Hn Hv₁ Hv₂ Hvv Hv₃ * Hab.
 destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  subst a; split; [ easy |  ].
- rewrite mul_const_vec_0_l in Hab.
+ rewrite vec_const_mul_0_l in Hab.
  rewrite vec_add_0_l in Hab.
  apply vec_cross_mul_integral in Hab.
  destruct Hab as [| Hab]; [ easy | exfalso ].
  revert Hab; rewrite Hv₃.
  now apply nonzero_cross_mul.
 
+ apply (f_equal (vec_dot_mul V₁)) in Hab.
+ rewrite vec_dot_mul_0_r in Hab.
+ rewrite vec_dot_mul_add_distr_l in Hab.
+ do 2 rewrite <- Rmult_vec_dot_mul_distr_r in Hab.
  subst V₃.
+ rewrite vec_dot_cross_mul in Hab.
+ rewrite Rmult_0_r, Rplus_0_r in Hab.
+ apply Rmult_integral in Hab.
+ destruct Hab as [| Hab]; [ easy | ].
+Theorem vec_dot_mul_diag : ∀ V, V · V = (∥V∥²)%R.
+Proof.
+
+bbb.
  destruct V₁ as (x₁, y₁, z₁).
  destruct V₂ as (x₂, y₂, z₂).
  simpl in Hab.
@@ -1678,7 +1636,7 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
   now apply vec_norm_eq_0 in Hvn.
 
   destruct (eq_point_dec V₁ V₂) as [Hvv| Hvv]; [ easy | exfalso ].
-  remember (mul_const_vec (∥V₁∥ / ∥(V₁ × V₂)∥)%R (V₁ × V₂)) as V₃ eqn:HV₃.
+  remember (vec_const_mul (∥V₁∥ / ∥(V₁ × V₂)∥)%R (V₁ × V₂)) as V₃ eqn:HV₃.
   move V₃ before V₂.
   assert (Hp₃ : mat_vec_mul M V₃ = V₃).
    subst V₃; apply mat_eigenvec_mul_const.
@@ -1690,8 +1648,8 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
     intros H; apply vec_norm_eq_0 in H.
     apply vec_cross_mul_eq_0 in H; [ | easy | easy ].
     destruct H as (a & b & Ha & Hb & Hab).
-    remember (mul_const_vec a V₁) as aV₁ eqn:HaV₁; symmetry in HaV₁.
-    remember (mul_const_vec b V₂) as bV₂ eqn:HbV₂; symmetry in HbV₂.
+    remember (vec_const_mul a V₁) as aV₁ eqn:HaV₁; symmetry in HaV₁.
+    remember (vec_const_mul b V₂) as bV₂ eqn:HbV₂; symmetry in HbV₂.
     destruct aV₁ as (ax₁, ay₁, az₁).
     destruct bV₂ as (bx₂, by₂, bz₂).
     simpl in Hab.
@@ -1704,19 +1662,19 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
     replace (- ax₁)%R with (-1 * ax₁)%R in HbV₂ by lra.
     replace (- ay₁)%R with (-1 * ay₁)%R in HbV₂ by lra.
     replace (- az₁)%R with (-1 * az₁)%R in HbV₂ by lra.
-    fold (mul_const_vec (-1) (P ax₁ ay₁ az₁)) in HbV₂.
+    fold (vec_const_mul (-1) (P ax₁ ay₁ az₁)) in HbV₂.
     rewrite <- HaV₁ in HbV₂.
-    rewrite mul_const_vec_assoc in HbV₂.
+    rewrite vec_const_mul_assoc in HbV₂.
     replace (-1 * a)%R with (-a)%R in HbV₂ by lra.
-    apply mul_const_vec_div in HbV₂; [ | easy ].
+    apply vec_const_mul_div in HbV₂; [ | easy ].
     rewrite HbV₂ in Hvn.
-    rewrite vec_norm_mul_const_vec in Hvn.
+    rewrite vec_norm_vec_const_mul in Hvn.
     replace (∥V₁∥) with (1 * ∥V₁∥)%R in Hvn at 1 by lra.
     apply Rmult_eq_reg_r in Hvn; [ | now intros H; apply Hv₁, vec_norm_eq_0 ].
     symmetry in Hvn.
     apply Rabs_or in Hvn.
     destruct Hvn as [Hvn| Hvn]; rewrite Hvn in HbV₂.
-     now rewrite mul_const_vec_1 in HbV₂; symmetry in HbV₂.
+     now rewrite vec_const_mul_1 in HbV₂; symmetry in HbV₂.
 
      destruct V₁ as (x, y, z); simpl in HbV₂.
      do 3 rewrite <- Ropp_mult_distr_l in HbV₂.
@@ -1729,7 +1687,7 @@ destruct (eq_point_dec V₁ (P 0 0 0)) as [Hv₁| Hv₁].
     move HVV before Hvn.
     assert (Hvn' : ∥V₃∥ = ∥V₁∥).
      subst V₃; remember (V₁ × V₂) as VV.
-     unfold mul_const_vec.
+     unfold vec_const_mul.
      destruct VV as (x, y, z); simpl in HVV; simpl.
      unfold Rdiv; do 6 rewrite Rsqr_mult.
      setoid_rewrite Rmult_shuffle0.
@@ -1889,14 +1847,14 @@ bbb.
        subst V.
        apply Hfree2 in H₁.
        destruct H₁; subst a b.
-       do 2 rewrite mul_const_vec_0_l in Habc.
+       do 2 rewrite vec_const_mul_0_l in Habc.
        do 2 rewrite vec_add_0_l in Habc.
-       apply eq_mul_const_vec_0 in Habc.
+       apply eq_vec_const_mul_0 in Habc.
        split; [ easy | ].
        split; [ easy | ].
        destruct Habc as [Habc | Habc]; [ easy | ].
        rewrite HV₃ in Habc.
-       apply eq_mul_const_vec_0 in Habc.
+       apply eq_vec_const_mul_0 in Habc.
        destruct Habc as [Habc| Habc].
         exfalso.
         apply Rmult_eq_compat_r with (r := ∥(V₁ × V₂)∥) in Habc.
@@ -1910,7 +1868,7 @@ bbb.
 
        assert (Hc: (c ≠ 0)%R).
         intros Hc; subst c.
-        rewrite mul_const_vec_0_l in Habc.
+        rewrite vec_const_mul_0_l in Habc.
         now rewrite vec_add_0_r in Habc.
 
         exfalso.
@@ -2505,7 +2463,7 @@ bbb.
        now rewrite Hp₁, Hp₂, Hp₃.
 
        clear V; intros V.
-       exists (V • V₁), (V • V₂), (V • V₃).
+       exists (V · V₁), (V · V₂), (V · V₃).
        destruct V as (x, y, z).
        destruct V₁ as (x₁, y₁, z₁).
        destruct V₂ as (x₂, y₂, z₂).
@@ -2515,7 +2473,7 @@ bbb.
    rewrite <- Rmult_plus_distr_l.
    simpl.
 
-   subst V₃; unfold vec_norm, mul_const_vec, "×"; simpl.
+   subst V₃; unfold vec_norm, vec_const_mul, "×"; simpl.
    destruct V₁ as (x₁, y₁, z₁).
    destruct V₂ as (x₂, y₂, z₂).
    f_equal.
@@ -2524,13 +2482,13 @@ bbb.
     (∃ V'₂,
      mat_vec_mul M V'₂ = V'₂ ∧ ∥ V'₂ ∥ = ∥ V₁ ∥ ∧
      vec_dot_mul V₁ V'₂ = 0)%R.
-   remember (√ (V₁ • V₁ * (V₁ • V₁ + V₂ • V₂))) as r eqn:Hr.
-   remember (- (V₁ • V₂) / r)%R as a eqn:Ha.
-   remember (V₁ • V₁ / r)%R as b eqn:Hb.
-   exists (vec_add (mul_const_vec a V₁) (mul_const_vec b V₂)).
+   remember (√ (V₁ · V₁ * (V₁ · V₁ + V₂ · V₂))) as r eqn:Hr.
+   remember (- (V₁ · V₂) / r)%R as a eqn:Ha.
+   remember (V₁ · V₁ / r)%R as b eqn:Hb.
+   exists (vec_add (vec_const_mul a V₁) (vec_const_mul b V₂)).
    split.
     unfold vec_add; simpl.
-    unfold mul_const_vec; simpl.
+    unfold vec_const_mul; simpl.
     destruct V₁ as (x₁, y₁, z₁).
     destruct V₂ as (x₂, y₂, z₂); simpl.
     f_equal.
@@ -2676,7 +2634,7 @@ destruct (Bool.bool_dec b b₁) as [Hbe| Hbne].
  move Hr at bottom.
  unfold fixpoint_of_path; rewrite <- Hm.
  unfold rotation_fixpoint.
- unfold mul_const_vec.
+ unfold vec_const_mul.
  remember (rotation_unit_eigenvec m) as v eqn:Hv.
  symmetry in Hv.
  destruct v as (x, y, z).
