@@ -1550,6 +1550,20 @@ destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  now apply Hv₁.
 Qed.
 
+Theorem vec_cross_mul_are_free_family : ∀ V₁ V₂ V₃,
+  ∥V₁∥ = ∥V₂∥
+  → is_neg_point V₁ = is_neg_point V₂
+  → V₁ ≠ 0%vec
+  → V₂ ≠ 0%vec
+  → V₁ ≠ V₂
+  → V₃ = V₁ × V₂
+  → ∀ a b c : ℝ,
+    (a ⁎ V₁ + b ⁎ V₂ + c ⁎ V₃)%vec = 0%vec
+    → a = 0%R ∧ b = 0%R ∧ c = 0%R.
+Proof.
+intros * Hvn Hn Hv₁ Hv₂ Hvv Hv₃ * Hab.
+bbb.
+
 Theorem fixpoint_unicity : ∀ M V₁ V₂,
   is_rotation_matrix M
   → M ≠ mat_id
