@@ -116,7 +116,7 @@ Notation "0" := (mkrvec 0 0 0) : vec_scope'.
 Notation "k ⁎ V" := (mul_const_vec' k V) (at level 40) : vec_scope'.
 Notation "M * V" := (mat_vec_mul' M V) : vec_scope'.
 Notation "U + V" := (vec_add' U V) : vec_scope'.
-Notation "U • V" := (vec_dot_mul' U V) (at level 40, left associativity) :
+Notation "U • V" := (vec_dot_mul' U V) (at level 45, left associativity) :
   vec_scope'.
 Notation "U × V" := (vec_cross_mul' U V) (at level 40, left associativity) :
   vec_scope'.
@@ -410,7 +410,7 @@ Notation "M * V" := (mat_vec_mul M V) : vec_scope.
 Notation "U + V" := (vec_add U V) : vec_scope.
 Notation "U - V" := (vec_sub U V) : vec_scope.
 Notation "- V" := (vec_opp V) : vec_scope.
-Notation "U • V" := (vec_dot_mul U V) (at level 40, left associativity).
+Notation "U • V" := (vec_dot_mul U V) (at level 45, left associativity).
 Notation "U × V" := (vec_cross_mul U V) (at level 40, left associativity).
 Notation "∥ V ∥" := (vec_norm V) (at level 0, V at level 0, format "∥ V ∥").
 

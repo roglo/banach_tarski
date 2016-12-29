@@ -1563,6 +1563,10 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
      now apply Hv₁.
 Qed.
 
+Theorem glop : ∀ V₁ V₂, V₁ • V₁ × V₂ = 0%R.
+Proof.
+bbb.
+
 Theorem vect_and_cross_mul_are_free_family : ∀ V₁ V₂ V₃,
   ∥V₁∥ = ∥V₂∥
   → is_neg_point V₁ = is_neg_point V₂
