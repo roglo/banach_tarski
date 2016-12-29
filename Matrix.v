@@ -1247,3 +1247,11 @@ Theorem Rmult_vec_dot_mul_distr_r : ∀ a U V, (a * (U · V))%R = U · a ⁎ V.
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
+
+Theorem vec_dot_mul_diag : ∀ V, V · V = (∥V∥²)%R.
+Proof.
+intros (x, y, z); simpl.
+do 3 rewrite fold_Rsqr.
+rewrite Rsqr_sqrt; [ easy | ].
+apply nonneg_sqr_vec_norm.
+Qed.
