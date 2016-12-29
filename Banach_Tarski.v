@@ -1513,30 +1513,28 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
      now apply Hv₁.
 Qed.
 
-Theorem vect_and_cross_mul_are_free_family : ∀ U V W,
+Theorem vect_and_cross_mul_are_free_family : ∀ U V,
   ∥U∥ = ∥V∥
   → is_neg_point U = is_neg_point V
   → U ≠ 0%vec
   → V ≠ 0%vec
   → U ≠ V
-  → W = U × V
-  → ∀ a b : ℝ, (a ⁎ U + b ⁎ W)%vec = 0%vec → a = 0%R ∧ b = 0%R.
+  → ∀ a b : ℝ, (a ⁎ U + b ⁎ (U × V))%vec = 0%vec → a = 0%R ∧ b = 0%R.
 Proof.
-intros * Hvn Hn Hv₁ Hv₂ Hvv Hv₃ * Hab.
+intros * Hvn Hn Hv₁ Hv₂ Hvv * Hab.
 destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  subst a; split; [ easy |  ].
  rewrite vec_const_mul_0_l in Hab.
  rewrite vec_add_0_l in Hab.
  apply vec_cross_mul_integral in Hab.
  destruct Hab as [| Hab]; [ easy | exfalso ].
- revert Hab; rewrite Hv₃.
+ revert Hab.
  now apply nonzero_cross_mul.
 
  apply (f_equal (vec_dot_mul U)) in Hab.
  rewrite vec_dot_mul_0_r in Hab.
  rewrite vec_dot_mul_add_distr_l in Hab.
  do 2 rewrite <- Rmult_vec_dot_mul_distr_r in Hab.
- subst W.
  rewrite vec_dot_cross_mul in Hab.
  rewrite Rmult_0_r, Rplus_0_r in Hab.
  apply Rmult_integral in Hab.
@@ -1550,18 +1548,26 @@ destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  now apply Hv₁.
 Qed.
 
-Theorem vec_cross_mul_are_free_family : ∀ U V W,
+Theorem vec_cross_mul_are_free_family : ∀ U V,
   ∥U∥ = ∥V∥
   → is_neg_point U = is_neg_point V
   → U ≠ 0%vec
   → V ≠ 0%vec
   → U ≠ V
-  → W = U × V
   → ∀ a b c : ℝ,
-    (a ⁎ U + b ⁎ V + c ⁎ W)%vec = 0%vec
+    (a ⁎ U + b ⁎ V + c ⁎ (U × V))%vec = 0%vec
     → a = 0%R ∧ b = 0%R ∧ c = 0%R.
 Proof.
-intros * Hvn Hn HU HV HUV HW * Hab.
+intros * Hvn Hn HU HV HUV * Hab.
+destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
+ subst a; split; [ easy |  ].
+ rewrite vec_const_mul_0_l in Hab.
+ rewrite vec_add_0_l in Hab.
+ rewrite vec_cross_mul_anticomm in Hab.
+ rewrite <- vec_opp_const_mul_distr_r in Hab.
+ rewrite vec_opp_const_mul_distr_l in Hab.
+ apply vect_and_cross_mul_are_free_family in Hab; try easy; [ lra | ].
+ now intros H; apply HUV; symmetry.
 bbb.
 
 Theorem fixpoint_unicity : ∀ M U V,

@@ -1261,3 +1261,28 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 f_equal; lra.
 Qed.
+
+Theorem vec_dot_mul_comm : ∀ U V, U · V = V · U.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
+Qed.
+
+Theorem vec_cross_mul_anticomm : ∀ U V, (U × V = - (V × U))%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_opp_dot_mul_distr_r : ∀ U V, (- (U · V))%R = U · - V.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
+Qed.
+
+Theorem vec_opp_const_mul_distr_l : ∀ a V, (- (a ⁎ V) = - a ⁎ V)%vec.
+Proof.
+intros a (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_opp_const_mul_distr_r : ∀ a V, (- (a ⁎ V) = a ⁎ - V)%vec.
+Proof.
+intros a (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
