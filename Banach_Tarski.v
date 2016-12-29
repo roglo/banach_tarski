@@ -1550,6 +1550,43 @@ destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
  now apply Hv₁.
 Qed.
 
+Theorem glop : ∀ U V W,
+  (∀ a b, (a ⁎ U + b ⁎ V = 0)%vec → (a = 0 ∧ b = 0)%R)
+  → (∀ a b, (a ⁎ V + b ⁎ W = 0)%vec → (a = 0 ∧ b = 0)%R)
+  → (∀ a b, (a ⁎ W + b ⁎ U = 0)%vec → (a = 0 ∧ b = 0)%R)
+  → ∀ a b c : ℝ,
+    (a ⁎ U + b ⁎ V + c ⁎ W)%vec = 0%vec
+    → a = 0%R ∧ b = 0%R ∧ c = 0%R.
+Proof.
+intros * HUV HVW HWU a b c HUVW.
+destruct (Req_dec a 0) as [Ha| Ha].
+ subst a.
+ rewrite vec_const_mul_0_l, vec_add_0_l in HUVW.
+ apply HVW in HUVW.
+ destruct HUVW; subst; easy.
+
+ destruct (Req_dec b 0) as [Hb| Hb].
+  subst b.
+  rewrite vec_const_mul_0_l, vec_add_0_r in HUVW.
+  rewrite vec_add_comm in HUVW.
+  apply HWU in HUVW.
+  destruct HUVW; subst; easy.
+
+  destruct (Req_dec c 0) as [Hc| Hc].
+   subst c.
+   rewrite vec_const_mul_0_l, vec_add_0_r in HUVW.
+   apply HUV in HUVW.
+   destruct HUVW; subst; easy.
+
+   exfalso.
+   destruct U as (u₁, u₂, u₃).
+   destruct V as (v₁, v₂, v₃).
+   destruct W as (w₁, w₂, w₃).
+   simpl in *.
+   injection HUVW; clear HUVW; intros H₃ H₂ H₁.
+
+bbb.
+
 Theorem vec_cross_mul_are_free_family : ∀ V₁ V₂ V₃,
   ∥V₁∥ = ∥V₂∥
   → is_neg_point V₁ = is_neg_point V₂

@@ -1255,3 +1255,9 @@ do 3 rewrite fold_Rsqr.
 rewrite Rsqr_sqrt; [ easy | ].
 apply nonneg_sqr_vec_norm.
 Qed.
+
+Theorem vec_add_comm : ∀ U V, (U + V = V + U)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
+f_equal; lra.
+Qed.
