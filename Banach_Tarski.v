@@ -1600,18 +1600,6 @@ destruct (Req_dec a 0) as [Ha| Ha].
    rewrite fold_Rdiv in H₁, H₂, H₃.
    rewrite Rmult_shuffle0 in H₁, H₂, H₃.
    rewrite fold_Rdiv in H₁, H₂, H₃.
-
-bbb.
-intros * Hvn Hn HU HV HUV * Hab.
-destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
- subst a; split; [ easy |  ].
- rewrite vec_const_mul_0_l in Hab.
- rewrite vec_add_0_l in Hab.
- rewrite vec_cross_mul_anticomm in Hab.
- rewrite <- vec_opp_const_mul_distr_r in Hab.
- rewrite vec_opp_const_mul_distr_l in Hab.
- apply vect_and_cross_mul_are_free_family in Hab; try easy; [ lra | ].
- now intros H; apply HUV; symmetry.
 bbb.
 
 Theorem fixpoint_unicity : ∀ M U V,
@@ -1830,6 +1818,7 @@ clear Hfree2.
          injection HW; clear HW; intros Hz Hy Hx.
 bbb.
 *)
+(*
       intros * Habc.
       remember (a ⁎ U + b ⁎ V)%vec as V eqn:Hv.
       symmetry in Hv.
@@ -2083,6 +2072,7 @@ rename Hk into Hkbidon.
                  now destruct H.
 
            idtac.
+*)
 (*
            apply Rmult_eq_compat_r with (r := y₂) in Hx.
            apply Rmult_eq_compat_r with (r := x₂) in Hy.
@@ -2121,6 +2111,7 @@ rename Hk into Hkbidon.
            symmetry in Hx; rewrite Rplus_comm in Hx.
 bbb.
 *)
+(*
            clear Hv₁.
            destruct (Req_dec x₂ 0) as [Hx₂| Hx₂].
             subst x₂.
