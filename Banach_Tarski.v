@@ -1649,12 +1649,23 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
         (a ⁎ U + b ⁎ V + c ⁎ W = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
       intros * H; subst W.
       rewrite vec_const_mul_assoc in H.
-      apply vec_cross_mul_are_free_family in H.
+      apply vec_cross_mul_are_free_family in H; try easy.
       destruct H as (Ha & Hb & Hc).
       split; [ easy | ].
       split; [ easy | ].
       apply Rmult_integral in Hc.
       destruct Hc as [| Hc]; [ easy | ].
+      apply (f_equal (Rmult ∥(U × V)∥)) in Hc.
+      rewrite Rmult_0_r in Hc.
+      unfold Rdiv in Hc.
+      rewrite Rmult_comm, Rmult_assoc in Hc.
+      rewrite Rinv_l in Hc.
+       rewrite Rmult_1_r in Hc.
+       now apply vec_norm_eq_0 in Hc.
+
+       intros H.
+       apply vec_norm_eq_0 in H.
+       now apply nonzero_cross_mul in H.
 bbb.
 (*
 intros * Habc.
