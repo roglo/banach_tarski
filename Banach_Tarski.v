@@ -1559,60 +1559,30 @@ Theorem vec_cross_mul_are_free_family : ∀ U V,
     → a = 0%R ∧ b = 0%R ∧ c = 0%R.
 Proof.
 intros * Hvn Hn HU HV HUV * Hab.
-apply (f_equal (vec_dot_mul (U × V))) in Hab.
-rewrite vec_dot_mul_0_r in Hab.
-do 2 rewrite vec_dot_mul_add_distr_l in Hab.
-do 2 rewrite <- Rmult_vec_dot_mul_distr_r in Hab.
-rewrite vec_cross_dot_mul, Rmult_0_r, Rplus_0_l in Hab.
-rewrite vec_cross_mul_anticomm in Hab.
-SearchAbout (- _ · _)%vec.
+generalize Hab; intros H.
+apply (f_equal (vec_dot_mul (U × V))) in H.
+rewrite vec_dot_mul_0_r in H.
+do 2 rewrite vec_dot_mul_add_distr_l in H.
+do 2 rewrite <- Rmult_vec_dot_mul_distr_r in H.
+rewrite vec_cross_dot_mul, Rmult_0_r, Rplus_0_l in H.
+rewrite vec_cross_mul_anticomm in H.
+rewrite <- vec_opp_dot_mul_distr_l in H.
+rewrite vec_cross_dot_mul, Ropp_0, Rmult_0_r, Rplus_0_l in H.
+rewrite <- Rmult_vec_dot_mul_distr_r in H.
+rewrite <- vec_opp_dot_mul_distr_l in H.
+rewrite <- vec_opp_dot_mul_distr_r in H.
+rewrite Ropp_involutive in H.
+rewrite vec_dot_mul_diag in H.
+apply Rmult_integral in H.
+destruct H as [| H]; [ subst c | ].
+ rewrite vec_const_mul_0_l, vec_add_0_r in Hab.
+ now apply free_family_diff_norm_vec in Hab.
 
-Theorem vec_opp_dot_mul_distr : ∀ U V, (- (U · V) = - U · V)%R.
-
-bbb.
-intros * Hvn Hn HU HV HUV * Hab.
-destruct (Req_dec a 0) as [Ha| Ha].
- subst a.
- rewrite vec_const_mul_0_l in Hab.
- rewrite vec_add_0_l in Hab.
- rewrite vec_cross_mul_anticomm in Hab.
- rewrite <- vec_opp_const_mul_distr_r in Hab.
- rewrite vec_opp_const_mul_distr_l in Hab.
- apply vect_and_cross_mul_are_free_family in Hab; try easy; [ lra | ].
- intros H; apply HUV; easy.
-
- destruct (Req_dec b 0) as [Hb| Hb].
-  subst b.
-  rewrite vec_const_mul_0_l in Hab.
-  rewrite vec_add_0_r in Hab.
-  now apply vect_and_cross_mul_are_free_family in Hab.
-
-  destruct (Req_dec c 0) as [Hc| Hc]; [ | exfalso ].
-   subst c.
-   rewrite vec_const_mul_0_l in Hab.
-   rewrite vec_add_0_r in Hab.
-   now apply free_family_diff_norm_vec in Hab.
-
-   destruct U as (u₁, u₂, u₃).
-   destruct V as (v₁, v₂, v₃).
-   simpl in Hab.
-   injection Hab; clear Hab; intros H₃ H₂ H₁.
-   apply Rmult_eq_compat_r with (r := (/ c)%R) in H₁.
-   apply Rmult_eq_compat_r with (r := (/ c)%R) in H₂.
-   apply Rmult_eq_compat_r with (r := (/ c)%R) in H₃.
-   rewrite Rmult_0_l in H₁, H₂, H₃.
-   rewrite Rmult_plus_distr_r in H₁, H₂, H₃.
-   rewrite Rmult_shuffle0 in H₁, H₂, H₃.
-   rewrite Rinv_r in H₁; [ | easy ].
-   rewrite Rinv_r in H₂; [ | easy ].
-   rewrite Rinv_r in H₃; [ | easy ].
-   rewrite Rmult_1_l in H₁, H₂, H₃.
-   rewrite Rmult_plus_distr_r in H₁, H₂, H₃.
-   rewrite Rmult_shuffle0 in H₁, H₂, H₃.
-   rewrite fold_Rdiv in H₁, H₂, H₃.
-   rewrite Rmult_shuffle0 in H₁, H₂, H₃.
-   rewrite fold_Rdiv in H₁, H₂, H₃.
-bbb.
+ apply Rsqr_eq_0 in H.
+ apply vec_norm_eq_0 in H.
+ apply nonzero_cross_mul in H; try easy.
+ now intros H₁; apply HUV.
+Qed.
 
 Theorem fixpoint_unicity : ∀ M U V,
   is_rotation_matrix M
@@ -1709,13 +1679,17 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
       apply sqrt_0.
 
      move Hvn' before Hvn.
-     assert (Hfree2 : ∀ a b, (a ⁎ U + b ⁎ V = 0 → a = 0%R ∧ b = 0%R)%vec).
-      now apply free_family_diff_norm_vec.
-
-      assert
-        (Hfree3 : ∀ a b c,
-         (a ⁎ U + b ⁎ V + c ⁎ W = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
-Check vect_and_cross_mul_are_free_family.
+     assert
+       (Hfree3 : ∀ a b c,
+        (a ⁎ U + b ⁎ V + c ⁎ W = 0 → a = 0%R ∧ b = 0%R ∧ c = 0%R)%vec).
+      intros * H; subst W.
+      rewrite vec_const_mul_assoc in H.
+      apply vec_cross_mul_are_free_family in H.
+      destruct H as (Ha & Hb & Hc).
+      split; [ easy | ].
+      split; [ easy | ].
+      apply Rmult_integral in Hc.
+      destruct Hc as [| Hc]; [ easy | ].
 bbb.
 (*
 intros * Habc.
