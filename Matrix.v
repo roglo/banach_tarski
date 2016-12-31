@@ -931,8 +931,7 @@ rewrite mat_det_mul, Hd1, Hd2.
 apply Rmult_1_r.
 Qed.
 
-Theorem vec_const_mul_assoc : ∀ a b V,
-  vec_const_mul a (vec_const_mul b V) = vec_const_mul (a * b) V.
+Theorem vec_const_mul_assoc : ∀ a b V, a ⁎ (b ⁎ V) = (a * b) ⁎ V.
 Proof.
 intros a b (x, y, z); simpl.
 now do 3 rewrite Rmult_assoc.
@@ -940,8 +939,8 @@ Qed.
 
 Theorem vec_const_mul_div : ∀ a b U V,
   a ≠ 0%R
-  → vec_const_mul a U = vec_const_mul b V
-  → U = vec_const_mul (b / a) V.
+  → a ⁎ U = b ⁎ V
+  → U = (b / a) ⁎ V.
 Proof.
 intros * Ha Hm.
 destruct U as (u₁, u₂, u₃).
@@ -1296,4 +1295,10 @@ Qed.
 Theorem vec_opp_const_mul_distr_r : ∀ a V, (- (a ⁎ V) = a ⁎ - V)%vec.
 Proof.
 intros a (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_const_mul_add_distr_l : ∀ a U V,
+  (a ⁎ (U + V) = a ⁎ U + a ⁎ V)%vec.
+Proof.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
