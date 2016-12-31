@@ -1675,6 +1675,7 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
        setoid_rewrite Rmult_comm.
        do 3 rewrite <- vec_const_mul_assoc.
        do 2 rewrite <- vec_const_mul_add_distr_l.
+(* Hmmm... I think it works only on orthonormal bases *)
 bbb.
 
 Theorem vec_dot_mul_mul : ∀ U V, ((U · V) ⁎ V = (V · V) ⁎ U)%vec.
