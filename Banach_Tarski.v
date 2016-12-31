@@ -1513,41 +1513,6 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
      now apply Hv₁.
 Qed.
 
-Theorem vect_and_cross_mul_are_free_family : ∀ U V,
-  ∥U∥ = ∥V∥
-  → is_neg_point U = is_neg_point V
-  → U ≠ 0%vec
-  → V ≠ 0%vec
-  → U ≠ V
-  → ∀ a b : ℝ, (a ⁎ U + b ⁎ (U × V))%vec = 0%vec → a = 0%R ∧ b = 0%R.
-Proof.
-intros * Hvn Hn Hv₁ Hv₂ Hvv * Hab.
-destruct (Req_dec a 0) as [Ha| Ha]; [ | exfalso ].
- subst a; split; [ easy |  ].
- rewrite vec_const_mul_0_l in Hab.
- rewrite vec_add_0_l in Hab.
- apply vec_cross_mul_integral in Hab.
- destruct Hab as [| Hab]; [ easy | exfalso ].
- revert Hab.
- now apply nonzero_cross_mul.
-
- apply (f_equal (vec_dot_mul U)) in Hab.
- rewrite vec_dot_mul_0_r in Hab.
- rewrite vec_dot_mul_add_distr_l in Hab.
- do 2 rewrite <- Rmult_vec_dot_mul_distr_r in Hab.
- rewrite vec_dot_cross_mul in Hab.
- rewrite Rmult_0_r, Rplus_0_r in Hab.
- apply Rmult_integral in Hab.
- destruct Hab as [| Hab]; [ easy | ].
- rewrite vec_dot_mul_diag in Hab.
- destruct U as (x₁, y₁, z₁); simpl in Hab.
- apply Rsqr_0_uniq in Hab.
- apply sqrt_eq_0 in Hab; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hab.
- destruct Hab as (Hx & Hy & Hz); subst x₁ y₁ z₁.
- now apply Hv₁.
-Qed.
-
 Theorem vec_cross_mul_are_free_family : ∀ U V,
   ∥U∥ = ∥V∥
   → is_neg_point U = is_neg_point V
