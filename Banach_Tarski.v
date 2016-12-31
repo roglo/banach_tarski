@@ -1663,8 +1663,7 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
        rewrite Rmult_1_r in Hc.
        now apply vec_norm_eq_0 in Hc.
 
-       intros H.
-       apply vec_norm_eq_0 in H.
+       intros H; apply vec_norm_eq_0 in H.
        now apply nonzero_cross_mul in H.
 
       assert (Hgen3 : ∀ X, ∃ a b c, (X = (a ⁎ U + b ⁎ V + c ⁎ W)%vec)).
