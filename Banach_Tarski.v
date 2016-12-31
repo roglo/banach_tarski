@@ -1559,6 +1559,18 @@ Theorem vec_cross_mul_are_free_family : ∀ U V,
     → a = 0%R ∧ b = 0%R ∧ c = 0%R.
 Proof.
 intros * Hvn Hn HU HV HUV * Hab.
+apply (f_equal (vec_dot_mul (U × V))) in Hab.
+rewrite vec_dot_mul_0_r in Hab.
+do 2 rewrite vec_dot_mul_add_distr_l in Hab.
+do 2 rewrite <- Rmult_vec_dot_mul_distr_r in Hab.
+rewrite vec_cross_dot_mul, Rmult_0_r, Rplus_0_l in Hab.
+rewrite vec_cross_mul_anticomm in Hab.
+SearchAbout (- _ · _)%vec.
+
+Theorem vec_opp_dot_mul_distr : ∀ U V, (- (U · V) = - U · V)%R.
+
+bbb.
+intros * Hvn Hn HU HV HUV * Hab.
 destruct (Req_dec a 0) as [Ha| Ha].
  subst a.
  rewrite vec_const_mul_0_l in Hab.

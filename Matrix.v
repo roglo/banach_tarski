@@ -1230,6 +1230,12 @@ intros.
 destruct U, V; simpl; lra.
 Qed.
 
+Theorem vec_cross_dot_mul : ∀ U V, U × V · U = 0%R.
+Proof.
+intros.
+destruct U, V; simpl; lra.
+Qed.
+
 Theorem vec_dot_mul_0_r : ∀ V, (V · 0)%vec = 0%R.
 Proof.
 intros (x, y, z); simpl.
@@ -1272,7 +1278,12 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_opp_dot_mul_distr_r : ∀ U V, (- (U · V))%R = U · - V.
+Theorem vec_opp_dot_mul_distr_l : ∀ U V, (- (U · V) = - U · V)%R.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
+Qed.
+
+Theorem vec_opp_dot_mul_distr_r : ∀ U V, (- (U · V) = U · - V)%R.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
