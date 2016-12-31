@@ -1669,6 +1669,7 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
 
       assert (Hgen3 : ∀ X, ∃ a b c, (X = (a ⁎ U + b ⁎ V + c ⁎ W)%vec)).
        intros X.
+bbb.
        remember (√ (U · U + V · V + W · W)) as r eqn:Hr.
        exists ((X · U) / r)%R, ((X · V) / r)%R, ((X · W) / r)%R.
        unfold Rdiv.
