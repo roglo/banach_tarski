@@ -1675,17 +1675,42 @@ Theorem zero_det_lin_dep : ∀ U V W,
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) Hd.
 unfold mat_det, mat_of_vec in Hd; simpl in Hd; simpl.
-bbb.
+Abort.
 
 Corollary lin_ind_non_zero_det : ∀ U V W,
   (∀ a b c, (a ⁎ U + b ⁎ V + c ⁎ W = 0)%vec → a = 0%R ∧ b = 0%R ∧ c = 0%R)
   → mat_det (mat_of_vec U V W) ≠ 0%R.
 Proof.
 intros * Hi H.
+Abort. (*
 specialize (zero_det_lin_dep _ _ _ H) as (a & b & c & Habc & Hz).
 specialize (Hi a b c Habc) as (Hza & Hzb & Hzc); subst.
 now destruct Hz as [Hz| [Hz| Hz]]; apply Hz.
 Qed.
+*)
+
+Theorem lin_ind_non_zero_det : ∀ U V W,
+  (∀ a b c, (a ⁎ U + b ⁎ V + c ⁎ W = 0)%vec → a = 0%R ∧ b = 0%R ∧ c = 0%R)
+  → mat_det (mat_of_vec U V W) ≠ 0%R.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) Hi Hd.
+unfold mat_det, mat_of_vec in Hd; simpl in Hd; simpl in Hi.
+assert
+  (Hi' : ∀ a b c : ℝ,
+   (a * u₁ + b * v₁ + c * w₁ = 0)%R
+   → (a * u₂ + b * v₂ + c * w₂ = 0)%R
+   → (a * u₃ + b * v₃ + c * w₃ = 0)%R
+   → a = 0%R ∧ b = 0%R ∧ c = 0%R).
+ intros * H₁ H₂ H₃.
+ assert
+   (HP :
+    P (a * u₁ + b * v₁ + c * w₁) (a * u₂ + b * v₂ + c * w₂)
+      (a * u₃ + b * v₃ + c * w₃) = 0%vec).
+  now rewrite H₁, H₂, H₃.
+
+  now specialize (Hi a b c HP).
+
+ clear Hi; rename Hi' into Hi; move Hi after Hd.
 
 bbb.
 
