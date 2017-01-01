@@ -1666,6 +1666,29 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
        intros H; apply vec_norm_eq_0 in H.
        now apply nonzero_cross_mul in H.
 
+Definition mat_of_vec '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) '(P w₁ w₂ w₃) :=
+  mkrmat u₁ v₁ w₁ u₂ v₂ w₂ u₃ v₃ w₃.
+
+Theorem zero_det_lin_dep : ∀ U V W,
+  mat_det (mat_of_vec U V W) = 0%R
+  → ∃ a b c, (a ⁎ U + b ⁎ V + c ⁎ W = 0)%vec ∧ (a ≠ 0%R ∨ b ≠ 0%R ∨ c ≠ 0%R).
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) Hd.
+unfold mat_det, mat_of_vec in Hd; simpl in Hd; simpl.
+bbb.
+
+Corollary lin_ind_non_zero_det : ∀ U V W,
+  (∀ a b c, (a ⁎ U + b ⁎ V + c ⁎ W = 0)%vec → a = 0%R ∧ b = 0%R ∧ c = 0%R)
+  → mat_det (mat_of_vec U V W) ≠ 0%R.
+Proof.
+intros * Hi H.
+specialize (zero_det_lin_dep _ _ _ H) as (a & b & c & Habc & Hz).
+specialize (Hi a b c Habc) as (Hza & Hzb & Hzc); subst.
+now destruct Hz as [Hz| [Hz| Hz]]; apply Hz.
+Qed.
+
+bbb.
+
       assert (Hgen3 : ∀ X, ∃ a b c, (X = (a ⁎ U + b ⁎ V + c ⁎ W)%vec)).
        intros X.
        assert (Hknz : (∥U∥ / ∥(U×V)∥ ≠ 0)%R).
