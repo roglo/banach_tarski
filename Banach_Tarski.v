@@ -1666,21 +1666,29 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
        intros H; apply vec_norm_eq_0 in H.
        now apply nonzero_cross_mul in H.
 
-Fixpoint lin_comb cl Vl :=
-  match cl with
+Fixpoint lin_comb cl Vl {struct Vl} :=
+  match Vl with
   | [] => 0%vec
-  | c :: cl' =>
-      match Vl with
+  | V :: Vl' =>
+      match cl with
       | [] => 0%vec
-      | V :: Vl' => (c ⁎ V + lin_comb cl' Vl')%vec
+      | c :: cl' => (c ⁎ V + lin_comb cl' Vl')%vec
       end
   end.
 
+(*
 Definition is_free_vec_fam Vl :=
   ∀ cl,
   length cl = length Vl
   → lin_comb cl Vl = 0%vec
   → ∀ c, List.In c cl → c = 0%R.
+*)
+
+Definition is_dep_vec_fam Vl :=
+  ∃ cl,
+  length cl = length Vl
+  ∧ lin_comb cl Vl = 0%vec
+  ∧ ∃ c, List.In c cl → c = 0%R.
 
 Definition is_gen_vec_fam Vl :=
   ∀ X, ∃ cl, X = lin_comb cl Vl.
@@ -1694,10 +1702,39 @@ exists (0%R :: cl); simpl.
 now rewrite vec_const_mul_0_l, vec_add_0_l.
 Qed.
 
-Theorem gen_vec_fam_not_free_one_more : ∀ n,
+Theorem gen_vec_fam_dep_one_more : ∀ n,
   (∃ Vl, length Vl = n ∧ is_gen_vec_fam Vl)
-  → ∀ Vl, length Vl = S n → ¬ is_free_vec_fam Vl.
+  → ∀ Vl, length Vl = S n → is_dep_vec_fam Vl.
 Proof.
+intros n (Vg & Hleng & Hg) Vl Hlen.
+revert Vl Vg Hleng Hlen Hg.
+induction n; intros.
+ destruct Vg; [ clear Hleng | easy ].
+ unfold is_gen_vec_fam in Hg; simpl in Hg.
+ specialize (Hg (P 1 0 0)).
+ destruct Hg as (cl, Hg).
+ destruct cl; injection Hg; intros; lra.
+
+ destruct Vg as [| V Vg]; [ easy | simpl in Hleng ].
+ apply Nat.succ_inj in Hleng.
+ destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
+ apply Nat.succ_inj in Hlen.
+ unfold is_gen_vec_fam in Hg; simpl in Hg.
+ unfold is_dep_vec_fam; simpl.
+ specialize (Hg V₁) as (cl & Hg).
+ destruct cl as [| c cl].
+  subst V₁.
+bbb.
+
+ exists ((-1)%R :: cl).
+ simpl; split.
+
+Print lin_comb.
+bbb.
+
+ unfold is_free_vec_fam in Hf; simpl in Hf.
+
+bbb.
 intros n (Vg & Hleng & Hg) Vl Hlen Hf.
 revert Vl Vg Hleng Hlen Hg Hf.
 induction n; intros.
