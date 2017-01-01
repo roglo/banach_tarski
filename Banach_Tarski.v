@@ -1600,6 +1600,79 @@ destruct cl₁ as [| c₁ cl₁].
  apply vec_add_comm.
 Qed.
 
+Theorem lin_comb_const_mul : ∀ a cl Vl,
+  a ⁎ lin_comb cl Vl = lin_comb (map (Rmult a) cl) Vl.
+Proof.
+intros.
+revert a cl.
+induction Vl as [| V Vl]; intros; simpl; [ f_equal; lra | ].
+destruct cl as [| c cl]; simpl; [ f_equal; lra | ].
+rewrite vec_const_mul_add_distr_l.
+rewrite vec_const_mul_assoc.
+now rewrite IHVl.
+Qed.
+
+Theorem comb_lin_cons : ∀ U V Vl c cl,
+  U = lin_comb (c :: cl) (V :: Vl)
+  → c ≠ 0%R
+  → ∃ dl, V = lin_comb dl (U :: Vl).
+Proof.
+intros * HU Hc.
+exists ((/c)%R :: map (λ ci, (- ci / c)%R) cl).
+simpl in HU; simpl; subst U.
+rewrite vec_const_mul_add_distr_l.
+rewrite vec_const_mul_assoc.
+rewrite Rinv_l; [ | easy ].
+rewrite vec_const_mul_1_l.
+rewrite <- vec_add_assoc.
+rewrite lin_comb_const_mul.
+rewrite lin_comb_add.
+Theorem map2_map_l : ∀ A B C D (f : A → B → C) (g : D → A) l1 l2,
+  map2 f (map g l1) l2 = map2 (λ a b, f (g a) b) l1 l2.
+Proof.
+intros.
+revert l2.
+induction l1 as [| a l1]; intros; [ easy | simpl ].
+destruct l2 as [| b l2]; [ easy | simpl ].
+now rewrite IHl1.
+Qed.
+
+Theorem map2_map_r : ∀ A B C D (f : A → B → C) (g : D → B) l1 l2,
+  map2 f l1 (map g l2) = map2 (λ a b, f a (g b)) l1 l2.
+Proof.
+intros.
+revert l2.
+induction l1 as [| a l1]; intros; [ easy | simpl ].
+destruct l2 as [| b l2]; [ easy | simpl ].
+now rewrite IHl1.
+Qed.
+
+Theorem map2_const_l : ∀ A B C (f : A → B → C) l1 l2 c,
+  length l1 = length l2
+  → (∀ a b, List.In (a, b) (list_prod l1 l2) → f a b = c)
+  → map2 f l1 l2 = repeat c (length l1).
+Proof.
+intros * Hlen Hf.
+revert l2 Hlen Hf.
+induction l1 as [| a l1]; intros; [ easy | simpl ].
+destruct l2 as [| b l2]; [ easy | ].
+simpl in Hlen, Hf; simpl.
+apply Nat.succ_inj in Hlen.
+
+bbb.
+
+rewrite map2_map_l.
+rewrite map2_map_r.
+rewrite map2_const_l with (c := 0%R).
+induction cl as [| c₁ cl].
+ simpl.
+Theorem lin_comb_nil_l : ∀ Vl, lin_comb [] Vl = 0%vec.
+Proof.
+Admitted. Show.
+ now rewrite lin_comb_nil_l, vec_add_0_r.
+
+bbb.
+
 Theorem gen_vec_fam_dep_one_more : ∀ n,
   (∃ Vl, length Vl = n ∧ is_gen_vec_fam Vl)
   → ∀ Vl, length Vl = S n → is_dep_vec_fam Vl.
@@ -1619,22 +1692,6 @@ induction n; intros.
  apply Nat.succ_inj in Hlen.
  pose proof Hg V₁ as H.
  destruct H as (cl & HV₁).
-Theorem comb_lin_cons : ∀ U V Vl c cl,
-  U = lin_comb (c :: cl) (V :: Vl)
-  → c ≠ 0%R
-  → ∃ dl, V = lin_comb dl (U :: Vl).
-Proof.
-intros * HU Hc.
-exists ((/c)%R :: map (λ ci, (- ci / c)%R) cl).
-simpl in HU; simpl; subst U.
-rewrite vec_const_mul_add_distr_l.
-rewrite vec_const_mul_assoc.
-rewrite Rinv_l; [ | easy ].
-rewrite vec_const_mul_1_l.
-Inspect 1.
-rewrite <- vec_add_assoc.
-bbb.
-rewrite lin_comb_add.
 
 bbb.
 intros * HU Hc.
