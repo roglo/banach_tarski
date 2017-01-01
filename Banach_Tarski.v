@@ -1684,6 +1684,9 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
          unfold Rdiv.
          rewrite Rmult_assoc.
          rewrite Rinv_l; [ now rewrite Rmult_1_r | easy ].
+         exists (/ ∥(X × V)∥² * (X · (U × V)))%R.
+         rewrite <- vec_const_mul_assoc.
+(* mouais, chuis pas sûr *)
 bbb.
 
 Theorem exists_comm : ∀ A B P,
