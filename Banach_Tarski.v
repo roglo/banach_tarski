@@ -1612,6 +1612,16 @@ rewrite vec_const_mul_assoc.
 now rewrite IHVl.
 Qed.
 
+Theorem lin_comb_repeat_0 : ∀ len Vl, lin_comb (repeat 0%R len) Vl = 0%vec.
+Proof.
+intros len Vl.
+revert len.
+induction Vl as [| V Vl]; intros; [ easy | simpl ].
+destruct len; simpl; [ easy | ].
+rewrite vec_const_mul_0_l, vec_add_0_l.
+apply IHVl.
+Qed.
+
 Theorem comb_lin_cons : ∀ U V Vl c cl,
   U = lin_comb (c :: cl) (V :: Vl)
   → c ≠ 0%R
@@ -1626,18 +1636,23 @@ rewrite Rinv_l; [ | easy ].
 rewrite vec_const_mul_1_l.
 rewrite <- vec_add_assoc.
 rewrite lin_comb_const_mul.
-rewrite lin_comb_add.
-rewrite map2_map_l.
-rewrite map2_map_r.
-rewrite map2_const_l with (c := 0%R).
-induction cl as [| c₁ cl].
- simpl.
-Theorem lin_comb_nil_l : ∀ Vl, lin_comb [] Vl = 0%vec.
-Proof.
-Admitted. Show.
- now rewrite lin_comb_nil_l, vec_add_0_r.
+rewrite lin_comb_add; [ | now do 2 rewrite map_length ].
+rewrite map2_map_l, map2_map_r.
+rewrite map2_const_l with (c := 0%R); [ | easy | ].
+ now rewrite lin_comb_repeat_0, vec_add_0_r.
 
-bbb.
+ intros a b Hin.
+ unfold Rdiv.
+ rewrite Rmult_comm, <- Rmult_plus_distr_r.
+ apply Rmult_eq_reg_r with (r := c); [ | easy ].
+ rewrite Rmult_assoc.
+ rewrite Rinv_l; [ | easy ].
+ rewrite Rmult_1_r, Rmult_0_l, fold_Rminus.
+ apply Rminus_diag_eq.
+ induction cl as [| c₁ cl]; [ easy | simpl in Hin ].
+ destruct Hin as [Hin| Hin]; [ now injection Hin; intros; subst a b | ].
+ now apply IHcl.
+Qed.
 
 Theorem gen_vec_fam_dep_one_more : ∀ n,
   (∃ Vl, length Vl = n ∧ is_gen_vec_fam Vl)
@@ -1658,6 +1673,19 @@ induction n; intros.
  apply Nat.succ_inj in Hlen.
  pose proof Hg V₁ as H.
  destruct H as (cl & HV₁).
+ destruct cl as [| c cl].
+  simpl in HV₁; subst V₁.
+  unfold is_dep_vec_fam.
+  exists (repeat 0%R (S (length Vl))); simpl.
+  rewrite repeat_length, lin_comb_repeat_0.
+  rewrite Rmult_0_l, Rplus_0_r.
+  split; [ easy | ].
+  split; [ easy | ].
+  now exists 0%R; intros.
+
+  apply comb_lin_cons in HV₁.
+  destruct HV₁ as (dl, HV); clear cl.
+  unfold is_dep_vec_fam.
 
 bbb.
 intros * HU Hc.
