@@ -413,3 +413,40 @@ Fixpoint map2 {A B C} (f : A → B → C) l1 l2 :=
       | b :: u => f a b :: map2 f t u
       end
   end.
+
+Theorem map2_map_l : ∀ A B C D (f : A → B → C) (g : D → A) l1 l2,
+  map2 f (map g l1) l2 = map2 (λ a b, f (g a) b) l1 l2.
+Proof.
+intros.
+revert l2.
+induction l1 as [| a l1]; intros; [ easy | simpl ].
+destruct l2 as [| b l2]; [ easy | simpl ].
+now rewrite IHl1.
+Qed.
+
+Theorem map2_map_r : ∀ A B C D (f : A → B → C) (g : D → B) l1 l2,
+  map2 f l1 (map g l2) = map2 (λ a b, f a (g b)) l1 l2.
+Proof.
+intros.
+revert l2.
+induction l1 as [| a l1]; intros; [ easy | simpl ].
+destruct l2 as [| b l2]; [ easy | simpl ].
+now rewrite IHl1.
+Qed.
+
+Theorem map2_const_l : ∀ A B C (f : A → B → C) l1 l2 c,
+  length l1 = length l2
+  → (∀ a b, List.In (a, b) (combine l1 l2) → f a b = c)
+  → map2 f l1 l2 = repeat c (length l1).
+Proof.
+intros * Hlen Hf.
+revert l2 Hlen Hf.
+induction l1 as [| a l1]; intros; [ easy | simpl ].
+destruct l2 as [| b l2]; [ easy | ].
+simpl in Hlen, Hf; simpl.
+apply Nat.succ_inj in Hlen.
+f_equal; [ apply Hf; now left | ].
+apply IHl1; [ easy | ].
+intros a' b' Ha'b'.
+now apply Hf; right.
+Qed.

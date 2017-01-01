@@ -1627,40 +1627,6 @@ rewrite vec_const_mul_1_l.
 rewrite <- vec_add_assoc.
 rewrite lin_comb_const_mul.
 rewrite lin_comb_add.
-Theorem map2_map_l : ∀ A B C D (f : A → B → C) (g : D → A) l1 l2,
-  map2 f (map g l1) l2 = map2 (λ a b, f (g a) b) l1 l2.
-Proof.
-intros.
-revert l2.
-induction l1 as [| a l1]; intros; [ easy | simpl ].
-destruct l2 as [| b l2]; [ easy | simpl ].
-now rewrite IHl1.
-Qed.
-
-Theorem map2_map_r : ∀ A B C D (f : A → B → C) (g : D → B) l1 l2,
-  map2 f l1 (map g l2) = map2 (λ a b, f a (g b)) l1 l2.
-Proof.
-intros.
-revert l2.
-induction l1 as [| a l1]; intros; [ easy | simpl ].
-destruct l2 as [| b l2]; [ easy | simpl ].
-now rewrite IHl1.
-Qed.
-
-Theorem map2_const_l : ∀ A B C (f : A → B → C) l1 l2 c,
-  length l1 = length l2
-  → (∀ a b, List.In (a, b) (list_prod l1 l2) → f a b = c)
-  → map2 f l1 l2 = repeat c (length l1).
-Proof.
-intros * Hlen Hf.
-revert l2 Hlen Hf.
-induction l1 as [| a l1]; intros; [ easy | simpl ].
-destruct l2 as [| b l2]; [ easy | ].
-simpl in Hlen, Hf; simpl.
-apply Nat.succ_inj in Hlen.
-
-bbb.
-
 rewrite map2_map_l.
 rewrite map2_map_r.
 rewrite map2_const_l with (c := 0%R).
