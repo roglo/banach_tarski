@@ -1676,6 +1676,9 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
         rewrite Rinv_l in H; [ | easy ].
         rewrite Rmult_1_r in H.
         now apply vec_norm_eq_0 in H.
+
+        move Hknz before HW.
+bbb.
         enough (H : ∃ c a b, (X = (a ⁎ U + b ⁎ V + c ⁎ (U × V))%vec)).
          destruct H as (c & a & b & H).
          remember (∥U∥ / ∥(U×V)∥)%R as k eqn:Hk.
@@ -1684,6 +1687,7 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
          unfold Rdiv.
          rewrite Rmult_assoc.
          rewrite Rinv_l; [ now rewrite Rmult_1_r | easy ].
+bbb.
          exists (/ ∥(X × V)∥² * (X · (U × V)))%R.
          rewrite <- vec_const_mul_assoc.
 (* mouais, chuis pas sûr *)
