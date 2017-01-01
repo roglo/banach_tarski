@@ -1559,11 +1559,33 @@ Fixpoint lin_comb cl Vl {struct Vl} :=
       end
   end.
 
+Definition is_indep_vec_fam Vl :=
+  ∀ cl,
+  length cl = length Vl
+  → lin_comb cl Vl = 0%vec
+  → ∀ c, List.In c cl → c = 0%R.
+
 Definition is_dep_vec_fam Vl :=
   ∃ cl,
   length cl = length Vl
   ∧ lin_comb cl Vl = 0%vec
-  ∧ ∃ c, List.In c cl → c = 0%R.
+  ∧ ∃ c, List.In c cl ∧ c ≠ 0%R.
+
+Theorem is_indep_not_is_dep : ∀ Vl, is_indep_vec_fam Vl ↔ ¬ is_dep_vec_fam Vl.
+Proof.
+intros Vl.
+unfold is_indep_vec_fam, is_dep_vec_fam.
+split; intros H.
+ intros (cl & Hlen & Hlc & c & Hi & Hc).
+ now specialize (H cl Hlen Hlc c Hi).
+
+ intros cl Hlen Hlc c Hi.
+ destruct (Req_dec c 0) as [Hc| Hc]; [ easy | exfalso; apply H; clear H ].
+ exists cl.
+ split; [ easy | ].
+ split; [ easy | ].
+ now exists c.
+Qed.
 
 Definition is_gen_vec_fam Vl :=
   ∀ X, ∃ cl, X = lin_comb cl Vl.
@@ -1671,6 +1693,11 @@ induction n; intros.
  apply Nat.succ_inj in Hleng.
  destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
  apply Nat.succ_inj in Hlen.
+(**)
+unfold is_gen_vec_fam in Hg.
+unfold is_dep_vec_fam.
+
+bbb.
  pose proof Hg V₁ as H.
  destruct H as (cl & HV₁).
  destruct cl as [| c cl].
