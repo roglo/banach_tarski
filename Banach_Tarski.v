@@ -1668,6 +1668,41 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
 
       assert (Hgen3 : ∀ X, ∃ a b c, (X = (a ⁎ U + b ⁎ V + c ⁎ W)%vec)).
        intros X.
+       assert (Hknz : (∥U∥ / ∥(U×V)∥ ≠ 0)%R).
+        intros H.
+        apply Rmult_eq_compat_r with (r := ∥(U × V)∥) in H.
+        unfold Rdiv in H.
+        rewrite Rmult_0_l, Rmult_assoc in H.
+        rewrite Rinv_l in H; [ | easy ].
+        rewrite Rmult_1_r in H.
+        now apply vec_norm_eq_0 in H.
+        enough (H : ∃ c a b, (X = (a ⁎ U + b ⁎ V + c ⁎ (U × V))%vec)).
+         destruct H as (c & a & b & H).
+         remember (∥U∥ / ∥(U×V)∥)%R as k eqn:Hk.
+         exists a, b, (c / k)%R; subst k W.
+         rewrite vec_const_mul_assoc.
+         unfold Rdiv.
+         rewrite Rmult_assoc.
+         rewrite Rinv_l; [ now rewrite Rmult_1_r | easy ].
+bbb.
+
+Theorem exists_comm : ∀ A B P,
+  (∃ (a : A) (b : B), P a b) → (∃ (b : B) (a : A), P a b).
+Proof.
+intros * (a & b & Hab).
+now exists b, a.
+Qed.
+Theorem exists_shuffle0 : ∀ A B C P,
+  (∃ (a : A) (b : B) (c : C), P a b c) → (∃ a c b, P a b c).
+Proof.
+intros * (a & b & c & Habc).
+now exists a, c, b.
+Qed.
+       apply exists_shuffle0, exists_comm.
+
+
+       enough (∃ a b c, (X = (a ⁎ U + b ⁎ V + c ⁎ W)%vec)).
+        intros X.
 bbb.
        remember (√ (U · U + V · V + W · W)) as r eqn:Hr.
        exists ((X · U) / r)%R, ((X · V) / r)%R, ((X · W) / r)%R.
