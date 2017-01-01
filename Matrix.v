@@ -1057,7 +1057,7 @@ intros x; simpl.
 now rewrite Rmult_0_r.
 Qed.
 
-Theorem vec_const_mul_1 : ∀ V, vec_const_mul 1 V = V.
+Theorem vec_const_mul_1_l : ∀ V, 1 ⁎ V = V.
 Proof.
 intros (x, y, z).
 unfold vec_const_mul.
@@ -1301,4 +1301,10 @@ Theorem vec_const_mul_add_distr_l : ∀ a U V,
   (a ⁎ (U + V) = a ⁎ U + a ⁎ V)%vec.
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_const_mul_add_distr_r : ∀ a b V,
+  ((a + b) ⁎ V = a ⁎ V + b ⁎ V)%vec.
+Proof.
+intros a b (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.

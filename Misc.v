@@ -403,3 +403,13 @@ induction la as [| a la]; intros.
  apply Permutation_app_tail.
  apply Permutation_app_comm.
 Qed.
+
+Fixpoint map2 {A B C} (f : A → B → C) l1 l2 :=
+  match l1 with
+  | [] => []
+  | a :: t =>
+      match l2 with
+      | [] => []
+      | b :: u => f a b :: map2 f t u
+      end
+  end.

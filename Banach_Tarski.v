@@ -1226,7 +1226,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
       apply Rabs_or in Hvn.
       destruct Hvn as [Hvn| Hvn]; subst k.
        rewrite Hvn in Hvv.
-       rewrite vec_const_mul_1 in Hvv.
+       rewrite vec_const_mul_1_l in Hvv.
        now apply Hvv.
 
        apply Rmult_eq_compat_r with (r := x₂) in Hvn.
@@ -1297,7 +1297,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
        apply Rabs_or in Hvn.
        destruct Hvn as [Hvn| Hvn]; subst k.
         rewrite Hvn in Hvv.
-        rewrite vec_const_mul_1 in Hvv.
+        rewrite vec_const_mul_1_l in Hvv.
         now (apply Hvv).
 
         apply Rmult_eq_compat_r with (r := x₂) in Hvn.
@@ -1385,7 +1385,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
          apply Rabs_or in Hvn.
          destruct Hvn as [Hvn| Hvn]; subst k.
           rewrite Hvn in Hvv.
-          rewrite vec_const_mul_1 in Hvv.
+          rewrite vec_const_mul_1_l in Hvv.
           now apply Hvv.
 
           apply Rmult_eq_compat_r with (r := y₁) in Hvn.
@@ -1442,7 +1442,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
        apply Rabs_or in Hvn.
        destruct Hvn as [Hvn| Hvn]; subst k.
         rewrite Hvn in Hvv.
-        rewrite vec_const_mul_1 in Hvv.
+        rewrite vec_const_mul_1_l in Hvv.
         now apply Hvv.
 
         apply Rmult_eq_compat_r with (r := y₁) in Hvn.
@@ -1549,6 +1549,154 @@ destruct H as [| H]; [ subst c | ].
  now intros H₁; apply HUV.
 Qed.
 
+Fixpoint lin_comb cl Vl {struct Vl} :=
+  match Vl with
+  | [] => 0%vec
+  | V :: Vl' =>
+      match cl with
+      | [] => 0%vec
+      | c :: cl' => (c ⁎ V + lin_comb cl' Vl')%vec
+      end
+  end.
+
+Definition is_dep_vec_fam Vl :=
+  ∃ cl,
+  length cl = length Vl
+  ∧ lin_comb cl Vl = 0%vec
+  ∧ ∃ c, List.In c cl → c = 0%R.
+
+Definition is_gen_vec_fam Vl :=
+  ∀ X, ∃ cl, X = lin_comb cl Vl.
+
+Theorem gen_fam_succ : ∀ Vg V, is_gen_vec_fam Vg → is_gen_vec_fam (V :: Vg).
+Proof.
+intros * Hg U.
+unfold is_gen_vec_fam in Hg.
+specialize (Hg U) as (cl, H).
+exists (0%R :: cl); simpl.
+now rewrite vec_const_mul_0_l, vec_add_0_l.
+Qed.
+
+Theorem lin_comb_add : ∀ cl₁ cl₂ Vl,
+  length cl₁ = length cl₂
+  → (lin_comb cl₁ Vl + lin_comb cl₂ Vl)%vec =
+     lin_comb (map2 Rplus cl₁ cl₂) Vl.
+Proof.
+intros * Hlen.
+revert cl₁ cl₂ Hlen.
+induction Vl as [| V Vl]; intros; simpl; [ f_equal; lra | ].
+destruct cl₁ as [| c₁ cl₁].
+ rewrite vec_add_0_l; simpl.
+ now destruct cl₂.
+
+ destruct cl₂ as [| c₂ cl₂]; [ easy | ].
+ simpl in Hlen; simpl.
+ apply Nat.succ_inj in Hlen.
+ rewrite vec_add_assoc.
+ rewrite vec_const_mul_add_distr_r.
+ do 3 rewrite <- vec_add_assoc; f_equal.
+ rewrite <- IHVl; [ | easy ].
+ do 2 rewrite vec_add_assoc; f_equal.
+ apply vec_add_comm.
+Qed.
+
+Theorem gen_vec_fam_dep_one_more : ∀ n,
+  (∃ Vl, length Vl = n ∧ is_gen_vec_fam Vl)
+  → ∀ Vl, length Vl = S n → is_dep_vec_fam Vl.
+Proof.
+intros n (Vg & Hleng & Hg) Vl Hlen.
+revert Vl Vg Hleng Hlen Hg.
+induction n; intros.
+ destruct Vg; [ clear Hleng | easy ].
+ unfold is_gen_vec_fam in Hg; simpl in Hg.
+ specialize (Hg (P 1 0 0)).
+ destruct Hg as (cl, Hg).
+ destruct cl; injection Hg; intros; lra.
+
+ destruct Vg as [| V Vg]; [ easy | simpl in Hleng ].
+ apply Nat.succ_inj in Hleng.
+ destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
+ apply Nat.succ_inj in Hlen.
+ pose proof Hg V₁ as H.
+ destruct H as (cl & HV₁).
+Theorem comb_lin_cons : ∀ U V Vl c cl,
+  U = lin_comb (c :: cl) (V :: Vl)
+  → c ≠ 0%R
+  → ∃ dl, V = lin_comb dl (U :: Vl).
+Proof.
+intros * HU Hc.
+exists ((/c)%R :: map (λ ci, (- ci / c)%R) cl).
+simpl in HU; simpl; subst U.
+rewrite vec_const_mul_add_distr_l.
+rewrite vec_const_mul_assoc.
+rewrite Rinv_l; [ | easy ].
+rewrite vec_const_mul_1_l.
+Inspect 1.
+rewrite <- vec_add_assoc.
+bbb.
+rewrite lin_comb_add.
+
+bbb.
+intros * HU Hc.
+simpl in HU.
+revert U V c cl HU Hc.
+induction Vl as [| V₁ Vl]; intros.
+ simpl in HU.
+ rewrite vec_add_0_r in HU; subst U.
+ exists ((/c)%R :: []); simpl.
+ rewrite vec_add_0_r.
+ rewrite vec_const_mul_assoc.
+ rewrite Rinv_l; [ | easy ].
+ now rewrite vec_const_mul_1_l.
+
+ exists ((/c)%R :: map (λ ci, (- ci / c)%R) cl).
+
+bbb.
+
+bbb.
+ unfold is_gen_vec_fam in Hg; simpl in Hg.
+ unfold is_dep_vec_fam; simpl.
+ specialize (Hg V₁) as (cl & Hg).
+ destruct cl as [| c cl].
+  subst V₁.
+bbb.
+
+ exists ((-1)%R :: cl).
+ simpl; split.
+
+Print lin_comb.
+bbb.
+
+ unfold is_free_vec_fam in Hf; simpl in Hf.
+
+bbb.
+intros n (Vg & Hleng & Hg) Vl Hlen Hf.
+revert Vl Vg Hleng Hlen Hg Hf.
+induction n; intros.
+ destruct Vg; [ | easy ].
+ clear Hleng.
+ unfold is_gen_vec_fam in Hg; simpl in Hg.
+ specialize (Hg (P 1 0 0)).
+ destruct Hg as (cl, Hg).
+ destruct cl; injection Hg; intros; lra.
+
+ destruct Vg as [| V Vg]; [ easy | simpl in Hleng ].
+ apply Nat.succ_inj in Hleng.
+ destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
+ apply Nat.succ_inj in Hlen.
+ unfold is_gen_vec_fam in Hg; simpl in Hg.
+ unfold is_free_vec_fam in Hf; simpl in Hf.
+bbb.
+
+Theorem free_vec_fam_succ : ∀ V Vl,
+  is_free_vec_fam (V :: Vl) → is_free_vec_fam Vl.
+Proof.
+Admitted. Show.
+ apply free_vec_fam_succ in Hf.
+ revert Hf; eapply IHn; try eassumption.
+
+bbb.
+
 Theorem fixpoint_unicity : ∀ M U V,
   is_rotation_matrix M
   → M ≠ mat_id
@@ -1614,7 +1762,7 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
     symmetry in Hvn.
     apply Rabs_or in Hvn.
     destruct Hvn as [Hvn| Hvn]; rewrite Hvn in HbV.
-     now rewrite vec_const_mul_1 in HbV; symmetry in HbV.
+     now rewrite vec_const_mul_1_l in HbV; symmetry in HbV.
 
      destruct U as (x, y, z); simpl in HbV.
      do 3 rewrite <- Ropp_mult_distr_l in HbV.
@@ -1666,101 +1814,6 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
        intros H; apply vec_norm_eq_0 in H.
        now apply nonzero_cross_mul in H.
 
-Fixpoint lin_comb cl Vl {struct Vl} :=
-  match Vl with
-  | [] => 0%vec
-  | V :: Vl' =>
-      match cl with
-      | [] => 0%vec
-      | c :: cl' => (c ⁎ V + lin_comb cl' Vl')%vec
-      end
-  end.
-
-(*
-Definition is_free_vec_fam Vl :=
-  ∀ cl,
-  length cl = length Vl
-  → lin_comb cl Vl = 0%vec
-  → ∀ c, List.In c cl → c = 0%R.
-*)
-
-Definition is_dep_vec_fam Vl :=
-  ∃ cl,
-  length cl = length Vl
-  ∧ lin_comb cl Vl = 0%vec
-  ∧ ∃ c, List.In c cl → c = 0%R.
-
-Definition is_gen_vec_fam Vl :=
-  ∀ X, ∃ cl, X = lin_comb cl Vl.
-
-Theorem gen_fam_succ : ∀ Vg V, is_gen_vec_fam Vg → is_gen_vec_fam (V :: Vg).
-Proof.
-intros * Hg U.
-unfold is_gen_vec_fam in Hg.
-specialize (Hg U) as (cl, H).
-exists (0%R :: cl); simpl.
-now rewrite vec_const_mul_0_l, vec_add_0_l.
-Qed.
-
-Theorem gen_vec_fam_dep_one_more : ∀ n,
-  (∃ Vl, length Vl = n ∧ is_gen_vec_fam Vl)
-  → ∀ Vl, length Vl = S n → is_dep_vec_fam Vl.
-Proof.
-intros n (Vg & Hleng & Hg) Vl Hlen.
-revert Vl Vg Hleng Hlen Hg.
-induction n; intros.
- destruct Vg; [ clear Hleng | easy ].
- unfold is_gen_vec_fam in Hg; simpl in Hg.
- specialize (Hg (P 1 0 0)).
- destruct Hg as (cl, Hg).
- destruct cl; injection Hg; intros; lra.
-
- destruct Vg as [| V Vg]; [ easy | simpl in Hleng ].
- apply Nat.succ_inj in Hleng.
- destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
- apply Nat.succ_inj in Hlen.
- unfold is_gen_vec_fam in Hg; simpl in Hg.
- unfold is_dep_vec_fam; simpl.
- specialize (Hg V₁) as (cl & Hg).
- destruct cl as [| c cl].
-  subst V₁.
-bbb.
-
- exists ((-1)%R :: cl).
- simpl; split.
-
-Print lin_comb.
-bbb.
-
- unfold is_free_vec_fam in Hf; simpl in Hf.
-
-bbb.
-intros n (Vg & Hleng & Hg) Vl Hlen Hf.
-revert Vl Vg Hleng Hlen Hg Hf.
-induction n; intros.
- destruct Vg; [ | easy ].
- clear Hleng.
- unfold is_gen_vec_fam in Hg; simpl in Hg.
- specialize (Hg (P 1 0 0)).
- destruct Hg as (cl, Hg).
- destruct cl; injection Hg; intros; lra.
-
- destruct Vg as [| V Vg]; [ easy | simpl in Hleng ].
- apply Nat.succ_inj in Hleng.
- destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
- apply Nat.succ_inj in Hlen.
- unfold is_gen_vec_fam in Hg; simpl in Hg.
- unfold is_free_vec_fam in Hf; simpl in Hf.
-bbb.
-
-Theorem free_vec_fam_succ : ∀ V Vl,
-  is_free_vec_fam (V :: Vl) → is_free_vec_fam Vl.
-Proof.
-Admitted. Show.
- apply free_vec_fam_succ in Hf.
- revert Hf; eapply IHn; try eassumption.
-
-bbb.
       idtac.
 bbb.
       assert
