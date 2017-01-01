@@ -1668,11 +1668,24 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
 
 Definition mat_of_vec '(P u₁ u₂ u₃) '(P v₁ v₂ v₃) '(P w₁ w₂ w₃) :=
   mkrmat u₁ v₁ w₁ u₂ v₂ w₂ u₃ v₃ w₃.
+Arguments mat_of_vec _%vec _%vec _%vec.
+
+Theorem mat_det_add_id : ∀ U V W k,
+  mat_det (mat_of_vec U V W) =
+  mat_det (mat_of_vec (U + k ⁎ V) V W).
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) k; simpl.
+unfold mat_det, mkrmat; simpl; ring.
+Qed.
 
 Theorem zero_det_lin_dep : ∀ U V W,
   mat_det (mat_of_vec U V W) = 0%R
   → ∃ a b c, (a ⁎ U + b ⁎ V + c ⁎ W = 0)%vec ∧ (a ≠ 0%R ∨ b ≠ 0%R ∨ c ≠ 0%R).
 Proof.
+intros * Hd.
+Check mat_det_add_id.
+bbb.
+
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) Hd.
 unfold mat_det, mat_of_vec in Hd; simpl in Hd; simpl.
 Abort.
@@ -1693,6 +1706,10 @@ Theorem lin_ind_non_zero_det : ∀ U V W,
   (∀ a b c, (a ⁎ U + b ⁎ V + c ⁎ W = 0)%vec → a = 0%R ∧ b = 0%R ∧ c = 0%R)
   → mat_det (mat_of_vec U V W) ≠ 0%R.
 Proof.
+intros * Habc Hd.
+Check mat_det_add_id.
+
+bbb.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) Hi Hd.
 unfold mat_det, mat_of_vec in Hd; simpl in Hd; simpl in Hi.
 assert
