@@ -1571,7 +1571,8 @@ Definition is_dep_vec_fam Vl :=
   ∧ lin_comb cl Vl = 0%vec
   ∧ ∃ c, List.In c cl ∧ c ≠ 0%R.
 
-Theorem is_indep_not_is_dep : ∀ Vl, is_indep_vec_fam Vl ↔ ¬ is_dep_vec_fam Vl.
+Theorem is_indep_iff_not_is_dep : ∀ Vl,
+  is_indep_vec_fam Vl ↔ ¬ is_dep_vec_fam Vl.
 Proof.
 intros Vl.
 unfold is_indep_vec_fam, is_dep_vec_fam.
@@ -1585,6 +1586,12 @@ split; intros H.
  split; [ easy | ].
  split; [ easy | ].
  now exists c.
+Qed.
+
+Theorem is_dep_not_is_indep : ∀ Vl, is_dep_vec_fam Vl → ¬ is_indep_vec_fam Vl.
+Proof.
+intros Vl.
+intros H; now intros Hi; apply is_indep_iff_not_is_dep in Hi.
 Qed.
 
 Definition is_gen_vec_fam Vl :=
@@ -1693,21 +1700,20 @@ induction n; intros.
  apply Nat.succ_inj in Hleng.
  destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
  apply Nat.succ_inj in Hlen.
-(**)
-unfold is_gen_vec_fam in Hg.
-unfold is_dep_vec_fam.
-
-bbb.
- pose proof Hg V₁ as H.
+ pose proof (Hg V₁) as H.
  destruct H as (cl & HV₁).
  destruct cl as [| c cl].
   simpl in HV₁; subst V₁.
   unfold is_dep_vec_fam.
+
+bbb.
   exists (repeat 0%R (S (length Vl))); simpl.
   rewrite repeat_length, lin_comb_repeat_0.
   rewrite Rmult_0_l, Rplus_0_r.
   split; [ easy | ].
   split; [ easy | ].
+bbb.
+
   now exists 0%R; intros.
 
   apply comb_lin_cons in HV₁.
