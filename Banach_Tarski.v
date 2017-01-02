@@ -1594,6 +1594,20 @@ intros Vl.
 intros H; now intros Hi; apply is_indep_iff_not_is_dep in Hi.
 Qed.
 
+Theorem is_dep_vec_fam_cons : ∀ V VL, is_dep_vec_fam VL → is_dep_vec_fam (V :: VL).
+Proof.
+intros * (cl & Hlen & HV & c & Hc & Hnzc).
+exists (0%R :: cl); simpl.
+rewrite vec_const_mul_0_l, vec_add_0_l.
+split; [ now f_equal | ].
+split; [ easy | ].
+exists c.
+now split; [ right | ].
+Qed.
+
+Theorem lin_comb_nil_l : ∀ VL, lin_comb [] VL = 0%vec.
+Proof. now intros; destruct VL. Qed.
+
 Definition is_gen_vec_fam Vl :=
   ∀ X, ∃ cl, X = lin_comb cl Vl.
 
@@ -1604,6 +1618,21 @@ unfold is_gen_vec_fam in Hg.
 specialize (Hg U) as (cl, H).
 exists (0%R :: cl); simpl.
 now rewrite vec_const_mul_0_l, vec_add_0_l.
+Qed.
+
+Theorem gen_fam_cons_0 : ∀ VL, is_gen_vec_fam (0%vec :: VL) → is_gen_vec_fam VL.
+Proof.
+intros * HV.
+unfold is_gen_vec_fam in HV.
+intros U.
+specialize (HV U) as (cl & HV).
+destruct cl as [| c₁ cl].
+ simpl in HV; subst U.
+ now exists []; rewrite lin_comb_nil_l.
+
+ subst U; exists cl; simpl.
+ destruct (lin_comb cl VL).
+ f_equal; lra.
 Qed.
 
 Theorem lin_comb_add : ∀ cl₁ cl₂ Vl,
@@ -1651,7 +1680,7 @@ rewrite vec_const_mul_0_l, vec_add_0_l.
 apply IHVl.
 Qed.
 
-Theorem comb_lin_cons : ∀ U V Vl c cl,
+Theorem lin_comb_cons : ∀ U V Vl c cl,
   U = lin_comb (c :: cl) (V :: Vl)
   → c ≠ 0%R
   → ∃ dl, V = lin_comb dl (U :: Vl).
@@ -1683,6 +1712,10 @@ rewrite map2_const_l with (c := 0%R); [ | easy | ].
  now apply IHcl.
 Qed.
 
+Definition xcoord '(P x y z) := x.
+Definition ycoord '(P x y z) := y.
+Definition zcoord '(P x y z) := z.
+
 Theorem gen_vec_fam_dep_one_more : ∀ n,
   (∃ Vl, length Vl = n ∧ is_gen_vec_fam Vl)
   → ∀ Vl, length Vl = S n → is_dep_vec_fam Vl.
@@ -1700,6 +1733,16 @@ induction n; intros.
  apply Nat.succ_inj in Hleng.
  destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
  apply Nat.succ_inj in Hlen.
+ destruct (Req_dec (xcoord U₁) 0) as [Hx₁| Hx₁].
+  destruct (Req_dec (ycoord U₁) 0) as [Hy₁| Hy₁].
+   destruct (Req_dec (zcoord U₁) 0) as [Hz₁| Hz₁].
+    assert (U₁ = 0%vec) by now destruct U₁; simpl in *; subst.
+    rewrite H in Hg.
+    apply gen_fam_cons_0 in Hg.
+    apply is_dep_vec_fam_cons.
+    now apply IHn with (Ug := Ug).
+
+bbb.
  (* searching for the recursion scheme *)
  destruct n.
   destruct Ug; [ clear Hleng | easy ].
