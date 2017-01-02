@@ -1687,7 +1687,8 @@ Theorem gen_vec_fam_dep_one_more : ∀ n,
   (∃ Vl, length Vl = n ∧ is_gen_vec_fam Vl)
   → ∀ Vl, length Vl = S n → is_dep_vec_fam Vl.
 Proof.
-intros n (Vg & Hleng & Hg) Vl Hlen.
+intros n (Ug & Hleng & Hg) Vl Hlen.
+unfold is_dep_vec_fam.
 bbb.
 
 intros n (Vg & Hleng & Hg) Vl Hlen.
