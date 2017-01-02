@@ -1782,6 +1782,14 @@ induction n; intros.
       split; [ f_equal; lra | ].
       exists 1%R; split; [ now right; right; left | lra ].
 
+      simpl in HV₁.
+      destruct cl₁ as [| c₁₂ cl₁].
+       rewrite vec_add_0_r in HV₁; subst V₁.
+       simpl in HV₂.
+       destruct cl₂ as [| c₂₂ cl₂].
+        rewrite vec_add_0_r in HV₂; subst V₂.
+        exists [(-c₂)%R; c₁; 0%R].
+
 bbb.
      rewrite vec_add_0_r in HV₂; subst V₂.
      destruct (Req_dec c₁ 0) as [Hc₁| Hc₁].
