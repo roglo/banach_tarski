@@ -1780,6 +1780,14 @@ induction n; intros.
      split; [ f_equal; lra | ].
      exists 1%R; split; [ now right; left | lra ].
 
+     destruct cl₃ as [| c₃ cl₃].
+      simpl in HV₃; subst V₃.
+      exists [0%R; 0%R; 1%R].
+      split; [ easy | simpl ].
+      do 2 rewrite vec_const_mul_0_l, vec_add_0_l.
+      split; [ f_equal; lra | ].
+      exists 1%R; split; [ now right; right; left | lra ].
+
 bbb.
      rewrite vec_add_0_r in HV₂; subst V₂.
      destruct (Req_dec c₁ 0) as [Hc₁| Hc₁].
