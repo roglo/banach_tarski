@@ -1717,7 +1717,6 @@ induction n; intros.
    split; [ f_equal; lra | ].
    exists 1%R; split; [ now left | lra ].
 
-bbb.
    simpl in HV₁; rewrite vec_add_0_r in HV₁; subst V₁.
    destruct cl₂ as [| c₂ cl₂].
     simpl in HV₂; subst V₂.
@@ -1767,34 +1766,21 @@ bbb.
    pose proof Hg V₃ as H₃; destruct H₃ as (cl₃, HV₃).
    destruct cl₁ as [| c₁ cl₁].
     simpl in HV₁; subst V₁.
-    destruct cl₂ as [| c₂ cl₂].
-     simpl in HV₂; subst V₂.
-     destruct cl₃ as [| c₃ cl₃].
-      simpl in HV₃; subst V₃.
-      exists [1%R; 0%R; 0%R].
-      split; [ easy | ].
-      simpl; rewrite Rmult_0_r.
-      split; [ f_equal; lra | ].
-      exists 1%R; split; [ now left | lra ].
-bbb.
-     simpl in HV₂.
-     rewrite vec_add_0_r in HV₂; subst V₂.
-     exists [1%R; 0%R].
-     split; [ easy | ].
-     simpl; rewrite vec_const_mul_0_l, vec_add_0_r.
-     split; [ f_equal; lra | ].
-     exists 1%R; split; [ now left | lra ].
+    exists [1%R; 0%R; 0%R].
+    split; [ easy | simpl ].
+    do 2 rewrite vec_const_mul_0_l, vec_add_0_l.
+    split; [ f_equal; lra | ].
+    exists 1%R; split; [ now left | lra ].
 
-    simpl in HV₁; rewrite vec_add_0_r in HV₁; subst V₁.
     destruct cl₂ as [| c₂ cl₂].
      simpl in HV₂; subst V₂.
-     exists [0%R; 1%R].
-     split; [ easy | ].
-     simpl; rewrite vec_const_mul_0_l, vec_add_0_l.
+     exists [0%R; 1%R; 0%R].
+     split; [ easy | simpl ].
+     do 2 rewrite vec_const_mul_0_l, vec_add_0_l.
      split; [ f_equal; lra | ].
      exists 1%R; split; [ now right; left | lra ].
 
-     simpl in HV₂.
+bbb.
      rewrite vec_add_0_r in HV₂; subst V₂.
      destruct (Req_dec c₁ 0) as [Hc₁| Hc₁].
       subst c₁.
