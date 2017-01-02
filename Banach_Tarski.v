@@ -1696,7 +1696,7 @@ induction n; intros.
  destruct Hg as (cl, Hg).
  destruct cl; injection Hg; intros; lra.
 
- destruct Ug as [| U Ug]; [ easy | simpl in Hleng ].
+ destruct Ug as [| U₁ Ug]; [ easy | simpl in Hleng ].
  apply Nat.succ_inj in Hleng.
  destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
  apply Nat.succ_inj in Hlen.
@@ -1711,22 +1711,13 @@ induction n; intros.
   pose proof Hg V₂ as H₂; destruct H₂ as (cl₂, HV₂).
   destruct cl₁ as [| c₁ cl₁].
    simpl in HV₁; subst V₁.
-   destruct cl₂ as [| c₂ cl₂].
-    simpl in HV₂; subst V₂.
-    exists [1%R; 1%R].
-    split; [ easy | ].
-    simpl; rewrite Rmult_0_r; do 2 rewrite Rplus_0_r.
-    split; [ easy | ].
-    exists 1%R; split; [ now left | lra ].
+   exists [1%R; 0%R].
+   split; [ easy | simpl ].
+   rewrite vec_const_mul_0_l, vec_add_0_l.
+   split; [ f_equal; lra | ].
+   exists 1%R; split; [ now left | lra ].
 
-    simpl in HV₂.
-    rewrite vec_add_0_r in HV₂; subst V₂.
-    exists [1%R; 0%R].
-    split; [ easy | ].
-    simpl; rewrite vec_const_mul_0_l, vec_add_0_r.
-    split; [ f_equal; lra | ].
-    exists 1%R; split; [ now left | lra ].
-
+bbb.
    simpl in HV₁; rewrite vec_add_0_r in HV₁; subst V₁.
    destruct cl₂ as [| c₂ cl₂].
     simpl in HV₂; subst V₂.
@@ -1763,7 +1754,74 @@ induction n; intros.
      exists c₁.
      split; [ now right; left | easy ].
 
-  idtac.
+  destruct n.
+   destruct Ug as [| U₂ Ug]; [ easy | ].
+   destruct Ug; [ clear Hleng | easy ].
+   destruct Vl as [| V₂ Vl ]; [ easy | ].
+   destruct Vl as [| V₃ Vl ]; [ easy | ].
+   destruct Vl; [ clear Hlen | easy ].
+   unfold is_gen_vec_fam in Hg.
+   unfold is_dep_vec_fam.
+   pose proof Hg V₁ as H₁; destruct H₁ as (cl₁, HV₁).
+   pose proof Hg V₂ as H₂; destruct H₂ as (cl₂, HV₂).
+   pose proof Hg V₃ as H₃; destruct H₃ as (cl₃, HV₃).
+   destruct cl₁ as [| c₁ cl₁].
+    simpl in HV₁; subst V₁.
+    destruct cl₂ as [| c₂ cl₂].
+     simpl in HV₂; subst V₂.
+     destruct cl₃ as [| c₃ cl₃].
+      simpl in HV₃; subst V₃.
+      exists [1%R; 0%R; 0%R].
+      split; [ easy | ].
+      simpl; rewrite Rmult_0_r.
+      split; [ f_equal; lra | ].
+      exists 1%R; split; [ now left | lra ].
+bbb.
+     simpl in HV₂.
+     rewrite vec_add_0_r in HV₂; subst V₂.
+     exists [1%R; 0%R].
+     split; [ easy | ].
+     simpl; rewrite vec_const_mul_0_l, vec_add_0_r.
+     split; [ f_equal; lra | ].
+     exists 1%R; split; [ now left | lra ].
+
+    simpl in HV₁; rewrite vec_add_0_r in HV₁; subst V₁.
+    destruct cl₂ as [| c₂ cl₂].
+     simpl in HV₂; subst V₂.
+     exists [0%R; 1%R].
+     split; [ easy | ].
+     simpl; rewrite vec_const_mul_0_l, vec_add_0_l.
+     split; [ f_equal; lra | ].
+     exists 1%R; split; [ now right; left | lra ].
+
+     simpl in HV₂.
+     rewrite vec_add_0_r in HV₂; subst V₂.
+     destruct (Req_dec c₁ 0) as [Hc₁| Hc₁].
+      subst c₁.
+      exists [1%R; 0%R].
+      split; [ easy | simpl ].
+      do 2 rewrite vec_const_mul_0_l.
+      rewrite vec_const_mul_0_r.
+      do 2 rewrite vec_add_0_l.
+      split; [ easy | ].
+      exists 1%R.
+      split; [ now left | lra ].
+
+      exists [(-c₂)%R; c₁].
+      split; [ easy | simpl ].
+      rewrite vec_add_0_r.
+      do 2 rewrite vec_const_mul_assoc.
+      rewrite <- vec_const_mul_add_distr_r.
+      rewrite Rmult_comm, Rplus_comm.
+      rewrite <- Ropp_mult_distr_r.
+      rewrite fold_Rminus.
+      rewrite Rminus_diag_eq; [ | easy ].
+      rewrite vec_const_mul_0_l.
+      split; [ easy | ].
+      exists c₁.
+      split; [ now right; left | easy ].
+
+   idtac.
 bbb.
 
   apply comb_lin_cons in HV₁.
