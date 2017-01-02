@@ -1688,6 +1688,9 @@ Theorem gen_vec_fam_dep_one_more : ∀ n,
   → ∀ Vl, length Vl = S n → is_dep_vec_fam Vl.
 Proof.
 intros n (Vg & Hleng & Hg) Vl Hlen.
+bbb.
+
+intros n (Vg & Hleng & Hg) Vl Hlen.
 revert Vl Vg Hleng Hlen Hg.
 induction n; intros.
  destruct Vg; [ clear Hleng | easy ].
@@ -1700,21 +1703,7 @@ induction n; intros.
  apply Nat.succ_inj in Hleng.
  destruct Vl as [| V₁ Vl]; [ easy | simpl in Hlen ].
  apply Nat.succ_inj in Hlen.
- pose proof (Hg V₁) as H.
- destruct H as (cl & HV₁).
- destruct cl as [| c cl].
-  simpl in HV₁; subst V₁.
-  unfold is_dep_vec_fam.
-
 bbb.
-  exists (repeat 0%R (S (length Vl))); simpl.
-  rewrite repeat_length, lin_comb_repeat_0.
-  rewrite Rmult_0_l, Rplus_0_r.
-  split; [ easy | ].
-  split; [ easy | ].
-bbb.
-
-  now exists 0%R; intros.
 
   apply comb_lin_cons in HV₁.
   destruct HV₁ as (dl, HV); clear cl.
