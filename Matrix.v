@@ -1308,3 +1308,8 @@ Theorem vec_const_mul_add_distr_r : ∀ a b V,
 Proof.
 intros a b (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
+
+Theorem vec_add_shuffle0 : ∀ U V W, (U + V + W = U + W + V)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.

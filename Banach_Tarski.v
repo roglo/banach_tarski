@@ -1785,44 +1785,64 @@ induction n; intros.
       simpl in HV₁.
       destruct cl₁ as [| c₁₂ cl₁].
        rewrite vec_add_0_r in HV₁; subst V₁.
-       simpl in HV₂.
-       destruct cl₂ as [| c₂₂ cl₂].
-        rewrite vec_add_0_r in HV₂; subst V₂.
-        exists [(-c₂)%R; c₁; 0%R].
+       destruct (Req_dec c₁ 0) as [H₁| H₁].
+        subst c₁.
+        exists [1%R; 0%R; 0%R].
+        split; [ easy | simpl ].
+        do 3 rewrite vec_const_mul_0_l.
+        rewrite vec_const_mul_0_r.
+        do 3 rewrite vec_add_0_r.
+        split; [ easy | exists 1%R; lra ].
 
-bbb.
-     rewrite vec_add_0_r in HV₂; subst V₂.
-     destruct (Req_dec c₁ 0) as [Hc₁| Hc₁].
-      subst c₁.
-      exists [1%R; 0%R].
-      split; [ easy | simpl ].
-      do 2 rewrite vec_const_mul_0_l.
-      rewrite vec_const_mul_0_r.
-      do 2 rewrite vec_add_0_l.
-      split; [ easy | ].
-      exists 1%R.
-      split; [ now left | lra ].
+        simpl in HV₂.
+        destruct cl₂ as [| c₂₂ cl₂].
+         rewrite vec_add_0_r in HV₂; subst V₂.
+         exists [(-c₂)%R; c₁; 0%R].
+         split; [ easy | simpl ].
+         rewrite vec_const_mul_0_l.
+         do 2 rewrite vec_add_0_r.
+         do 2 rewrite vec_const_mul_assoc.
+         rewrite <- vec_const_mul_add_distr_r.
+         replace (- c₂ * c₁ + c₁ * c₂)%R with 0%R by lra.
+         rewrite vec_const_mul_0_l.
+         split; [ easy | exists c₁; lra ].
 
-      exists [(-c₂)%R; c₁].
-      split; [ easy | simpl ].
-      rewrite vec_add_0_r.
-      do 2 rewrite vec_const_mul_assoc.
-      rewrite <- vec_const_mul_add_distr_r.
-      rewrite Rmult_comm, Rplus_comm.
-      rewrite <- Ropp_mult_distr_r.
-      rewrite fold_Rminus.
-      rewrite Rminus_diag_eq; [ | easy ].
-      rewrite vec_const_mul_0_l.
-      split; [ easy | ].
-      exists c₁.
-      split; [ now right; left | easy ].
+         rewrite vec_add_0_r in HV₂; subst V₂.
+         simpl in HV₃.
+         destruct cl₃ as [| c₃₂ cl₃].
+          rewrite vec_add_0_r in HV₃; subst V₃.
+          exists [(-c₃)%R; 0%R; c₁].
+          split; [ easy | simpl ].
+          rewrite vec_const_mul_0_l.
+          rewrite vec_add_0_l, vec_add_0_r.
+          do 2 rewrite vec_const_mul_assoc.
+          rewrite <- vec_const_mul_add_distr_r.
+          replace (- c₃ * c₁ + c₁ * c₃)%R with 0%R by lra.
+          rewrite vec_const_mul_0_l.
+          split; [ easy | exists c₁; lra ].
 
-   idtac.
-bbb.
-
-  apply comb_lin_cons in HV₁.
-  destruct HV₁ as (dl, HV); clear cl.
-  unfold is_dep_vec_fam.
+          rewrite vec_add_0_r in HV₃; subst V₃.
+          exists [(c₂ * c₃₂ - c₃ * c₂₂)%R; (c₁ * -c₃₂)%R; (c₁ * c₂₂)%R].
+          split; [ easy | simpl ].
+          rewrite vec_add_0_r.
+          do 2 rewrite vec_const_mul_add_distr_l.
+          do 5 rewrite vec_const_mul_assoc.
+          do 3 rewrite vec_add_assoc.
+          rewrite <- vec_const_mul_add_distr_r.
+          rewrite vec_add_shuffle0.
+          rewrite vec_add_comm.
+          do 2 rewrite vec_add_assoc.
+          rewrite <- vec_const_mul_add_distr_r.
+          rewrite <- vec_add_assoc.
+          rewrite <- vec_const_mul_add_distr_r.
+          rewrite <- Rplus_assoc.
+          replace
+            (c₁ * c₂₂ * c₃ + (c₂ * c₃₂ - c₃ * c₂₂) * c₁ + c₁ * - c₃₂ * c₂)%R
+            with 0%R by lra.
+          replace (c₁ * - c₃₂ * c₂₂ + c₁ * c₂₂ * c₃₂)%R with 0%R by lra.
+          do 2 rewrite vec_const_mul_0_l; rewrite vec_add_0_r.
+          split; [ easy | ].
+(* merde, il fallait que je teste c₂₂ ou c₃₂ nuls ou pas d'abord ! *)
 
 bbb.
 intros * HU Hc.
