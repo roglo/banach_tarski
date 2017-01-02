@@ -1689,6 +1689,7 @@ Theorem gen_vec_fam_dep_one_more : ∀ n,
 Proof.
 intros n (Ug & Hleng & Hg) Vl Hlen.
 unfold is_dep_vec_fam.
+Abort. (* à continuer...
 bbb.
 
 intros n (Vg & Hleng & Hg) Vl Hlen.
@@ -1770,6 +1771,7 @@ Admitted. Show.
  revert Hf; eapply IHn; try eassumption.
 
 bbb.
+*)
 
 Theorem fixpoint_unicity : ∀ M U V,
   is_rotation_matrix M
@@ -1927,7 +1929,9 @@ bbb.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) Hd.
 unfold mat_det, mat_of_vec in Hd; simpl in Hd; simpl.
 Abort.
+*)
 
+(*
 Corollary lin_ind_non_zero_det : ∀ U V W,
   (∀ a b c, (a ⁎ U + b ⁎ V + c ⁎ W = 0)%vec → a = 0%R ∧ b = 0%R ∧ c = 0%R)
   → mat_det (mat_of_vec U V W) ≠ 0%R.
@@ -1938,7 +1942,6 @@ specialize (zero_det_lin_dep _ _ _ H) as (a & b & c & Habc & Hz).
 specialize (Hi a b c Habc) as (Hza & Hzb & Hzc); subst.
 now destruct Hz as [Hz| [Hz| Hz]]; apply Hz.
 Qed.
-*)
 
 Theorem lin_ind_non_zero_det : ∀ U V W,
   (∀ a b c, (a ⁎ U + b ⁎ V + c ⁎ W = 0)%vec → a = 0%R ∧ b = 0%R ∧ c = 0%R)
@@ -1993,6 +1996,7 @@ bbb.
 bbb.
          exists (/ ∥(X × V)∥² * (X · (U × V)))%R.
          rewrite <- vec_const_mul_assoc.
+*)
 (* mouais, chuis pas sûr *)
 bbb.
 
@@ -2034,6 +2038,7 @@ rewrite glop.
 
 SearchAbout ((_ · _) ⁎ _).
 bbb.
+*)
 (*
 intros * Habc.
 destruct U as (v₁₁, v₁₂, v₁₃).
