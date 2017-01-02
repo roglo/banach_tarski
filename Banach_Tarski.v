@@ -1715,29 +1715,26 @@ induction n; intros.
     simpl in HV₂; subst V₂.
     exists [1%R; 1%R].
     split; [ easy | ].
-    split.
-     now simpl; rewrite Rmult_0_r; do 2 rewrite Rplus_0_r.
-
-     exists 1%R; split; [ now left | lra ].
+    simpl; rewrite Rmult_0_r; do 2 rewrite Rplus_0_r.
+    split; [ easy | ].
+    exists 1%R; split; [ now left | lra ].
 
     simpl in HV₂.
     rewrite vec_add_0_r in HV₂; subst V₂.
     exists [1%R; 0%R].
     split; [ easy | ].
-    split.
-     simpl; rewrite vec_const_mul_0_l, vec_add_0_r; f_equal; lra.
-
-     exists 1%R; split; [ now left | lra ].
+    simpl; rewrite vec_const_mul_0_l, vec_add_0_r.
+    split; [ f_equal; lra | ].
+    exists 1%R; split; [ now left | lra ].
 
    simpl in HV₁; rewrite vec_add_0_r in HV₁; subst V₁.
    destruct cl₂ as [| c₂ cl₂].
     simpl in HV₂; subst V₂.
     exists [0%R; 1%R].
     split; [ easy | ].
-    split.
-     simpl; rewrite vec_const_mul_0_l, vec_add_0_l; f_equal; lra.
-
-     exists 1%R; split; [ now right; left | lra ].
+    simpl; rewrite vec_const_mul_0_l, vec_add_0_l.
+    split; [ f_equal; lra | ].
+    exists 1%R; split; [ now right; left | lra ].
 
     simpl in HV₂.
     rewrite vec_add_0_r in HV₂; subst V₂.
