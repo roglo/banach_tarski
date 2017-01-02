@@ -1742,8 +1742,28 @@ induction n; intros.
     apply is_dep_vec_fam_cons.
     now apply IHn with (Ug := Ug).
 
+    destruct U₁ as (x₁, y₁, z₁).
+    simpl in Hx₁, Hy₁, Hz₁; subst x₁ y₁.
+Definition vec_shift_z U V := (V - zcoord V / zcoord U ⁎ U)%vec.
+Definition vec_shift_z' '(P x y z) '(P x₁ y₁ z₁) :=
+  P (x₁ - z₁ / z * x) (y₁ - z₁ / z * y) 0.
+Theorem vec_shift_z_z' : ∀ U V, zcoord U ≠ 0%R →
+  vec_shift_z U V = vec_shift_z' U V.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) HU; simpl in HU; simpl.
+f_equal; unfold Rdiv; rewrite Rmult_assoc.
+rewrite Rinv_l; [ lra | easy ].
+Qed.
+
+Theorem is_gen_vec_fam_shift_z : ∀ V VL,
+  zcoord V ≠ 0%R
+  → is_gen_vec_fam (V :: VL)
+  → is_gen_vec_fam (map (vec_shift_z V) VL).
+Proof.
+intros * Hz HV.
+
 bbb.
- (* searching for the recursion scheme *)
+ (* old: searching for the recursion scheme *)
  destruct n.
   destruct Ug; [ clear Hleng | easy ].
   destruct Vl as [| V₂ Vl ]; [ easy | ].
