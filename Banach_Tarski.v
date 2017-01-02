@@ -1717,31 +1717,27 @@ induction n; intros.
    split; [ f_equal; lra | ].
    exists 1%R; split; [ now left | lra ].
 
-   simpl in HV₁; rewrite vec_add_0_r in HV₁; subst V₁.
-   destruct cl₂ as [| c₂ cl₂].
-    simpl in HV₂; subst V₂.
-    exists [0%R; 1%R].
-    split; [ easy | ].
-    simpl; rewrite vec_const_mul_0_l, vec_add_0_l.
-    split; [ f_equal; lra | ].
-    exists 1%R; split; [ now right; left | lra ].
+   destruct (Req_dec c₁ 0) as [Hc₁| Hc₁].
+    subst c₁.
+    simpl in HV₁; rewrite vec_add_0_r in HV₁; subst V₁.
+    rewrite vec_const_mul_0_l.
+    exists [1%R; 0%R].
+    split; [ easy | simpl ].
+    rewrite vec_const_mul_0_l, vec_add_0_l.
+    split; [ f_equal; lra | exists 1%R; lra ].
 
-    simpl in HV₂.
-    rewrite vec_add_0_r in HV₂; subst V₂.
-    destruct (Req_dec c₁ 0) as [Hc₁| Hc₁].
-     subst c₁.
-     exists [1%R; 0%R].
-     split; [ easy | simpl ].
-     do 2 rewrite vec_const_mul_0_l.
-     rewrite vec_const_mul_0_r.
-     do 2 rewrite vec_add_0_l.
+    destruct cl₂ as [| c₂ cl₂].
+     simpl in HV₂; subst V₂.
+     exists [0%R; 1%R].
      split; [ easy | ].
-     exists 1%R.
-     split; [ now left | lra ].
+     simpl; rewrite vec_const_mul_0_l, vec_add_0_l.
+     split; [ f_equal; lra | exists 1%R; lra ].
 
      exists [(-c₂)%R; c₁].
      split; [ easy | simpl ].
      rewrite vec_add_0_r.
+     subst V₁ V₂; simpl.
+     do 2 rewrite vec_add_0_r.
      do 2 rewrite vec_const_mul_assoc.
      rewrite <- vec_const_mul_add_distr_r.
      rewrite Rmult_comm, Rplus_comm.
@@ -1749,9 +1745,7 @@ induction n; intros.
      rewrite fold_Rminus.
      rewrite Rminus_diag_eq; [ | easy ].
      rewrite vec_const_mul_0_l.
-     split; [ easy | ].
-     exists c₁.
-     split; [ now right; left | easy ].
+     split; [ easy | exists c₁; lra ].
 
   destruct n.
    destruct Ug as [| U₂ Ug]; [ easy | ].
