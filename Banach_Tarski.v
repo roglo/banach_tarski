@@ -1566,8 +1566,7 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃) (x₁, x₂, x₃).
 simpl; f_equal; ring.
 Qed.
 
-bbb.
-
+(*
 Fixpoint lin_comb cl Vl {struct Vl} :=
   match Vl with
   | [] => 0%vec
@@ -2080,6 +2079,7 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
      now symmetry in Hn; apply no_fixpoint_negb in Hn.
 
     move HVV before Hvn.
+bbb.
     assert (Hvn' : ∥W∥ = ∥U∥).
      subst W; remember (U × V) as VV.
      unfold vec_const_mul.
