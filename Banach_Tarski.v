@@ -2242,7 +2242,33 @@ assert (Hrm : is_rotation_matrix m).
     do 6 rewrite <- Ropp_plus_distr.
     injection Hp₂; clear Hp₂; intros Hz Hy Hx.
     now rewrite Hx, Hy, Hz.
-bbb.
+
+   destruct b₂; [ | easy ].
+   replace true with (negb false) in Hb₂ by easy.
+   rewrite <- Hb₁ in Hb₂.
+   eapply fixpoint_unicity; try eassumption.
+    intros H; rewrite Hm in H.
+    now apply matrix_of_non_empty_path_is_not_identity in Hnl.
+
+    destruct p₁ as (x₁, y₁, z₁).
+    destruct p₂ as (x₂, y₂, z₂).
+    simpl in Hsr₁, Hsr₂; simpl.
+    do 3 rewrite <- Rsqr_neg.
+    now rewrite Hsr₁, Hsr₂.
+
+    rewrite Hb₂.
+    rewrite is_neg_point_neg_point; [ easy | ].
+    intros H; subst p₂; simpl in Hb₁.
+    destruct (Rlt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
+    destruct (Rgt_dec 0 0) as [H1| H1]; [ now lra | easy ].
+
+    destruct p₂ as (x, y, z).
+    simpl in Hp₂; simpl.
+    do 9 rewrite <- Ropp_mult_distr_r.
+    do 6 rewrite <- Ropp_plus_distr.
+    injection Hp₂; clear Hp₂; intros Hz Hy Hx.
+    now rewrite Hx, Hy, Hz.
+
    destruct b₂; [ easy | ].
    rewrite <- Hb₁ in Hb₂.
    eapply fixpoint_unicity; try eassumption.
@@ -2253,96 +2279,9 @@ bbb.
     destruct p₂ as (x₂, y₂, z₂).
     simpl in Hsr₁, Hsr₂; simpl.
     now rewrite Hsr₁, Hsr₂.
+Qed.
 
-bbb.
-
-     induction el₁ as [| e₁ el₁]; [ now apply Hnl | ].
-     simpl in H.
-     remember (norm_list el₁) as el eqn:Hel.
-      symmetry in Hel.
-      destruct el as [| e el].
-       destruct el₁ as [| e₂ el₁].
-        simpl in H.
-        rewrite mat_mul_id_r in H.
-        unfold mat_id in H.
-        destruct e₁ as (t, d); destruct t, d; simpl in H.
-         injection H; clear H; intros; lra.
-         injection H; clear H; intros; lra.
-         injection H; clear H; intros; lra.
-         injection H; clear H; intros; lra.
-
-        simpl in H.
-
-SearchAbout mat_of_path.
-bbb.
-simpl.
-remember (mat_of_path (path_of_nat nf)) as m eqn:Hm.
-unfold rotation_fixpoint.
-unfold rotation_unit_eigenvec.
-simpl.
-remember (√ ((a₂₃ m - a₃₂ m)² + (a₃₁ m - a₁₃ m)² + (a₁₂ m - a₂₁ m)²)) as r.
-do 3 rewrite Rmult_1_l.
-
-bbb.
-
-exists (λ '(nf, no), fold_right rotate (fixpoint_of_nat nf) (path_of_nat no)).
-intros p Hp.
-destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
-remember (nat_of_path el₁) as nf₁ eqn:Hnf.
-remember (nat_of_path (rev_path el)) as no₁ eqn:Hno.
-(* it can be (no₁, nf₁) if neg_point(p₁) = neg_point(ev);
-   otherwise... I don't know! *)
-Print fixpoint_of_nat.
-bbb.
-
-Check matrix_fixpoints_ok.
-SearchAbout is_rotation_matrix.
-SearchAbout (nat * nat → point).
-Check D_of_prod_nat.
-bbb.
-
-mat_of_path_is_rotation_matrix:
-  ∀ el : list free_elem, is_rotation_matrix (mat_of_path el)
-
-bbb.
-
-remember (fixpoint_of_nat nf₁) as p₂ eqn:Hp₂.
-remember (mat_of_path (path_of_nat nf₁)) as m eqn:Hm.
-remember (P (a₂₃ m - a₃₂ m) (a₃₁ m - a₁₃ m) (a₁₂ m - a₂₁ m)) as ev eqn:Hev.
-remember (neg_point ev) as b.
-rename Heqb into Hb.
-remember (neg_point p₁) as b₁ eqn:Hb₁.
-destruct (Bool.bool_dec b b₁) as [Hbe| Hbne].
- subst b b₁.
- exists (nf₁, no₁); simpl.
- subst nf₁ no₁.
- rewrite path_of_nat_inv in Hm.
- unfold fixpoint_of_nat.
- do 2 rewrite path_of_nat_inv.
- apply rotate_rev_path in Hs.
- rewrite <- Hs; f_equal.
- move Hr at bottom.
- unfold fixpoint_of_path; rewrite <- Hm.
- unfold rotation_fixpoint.
- unfold vec_const_mul.
- remember (rotation_unit_eigenvec m) as v eqn:Hv.
- symmetry in Hv.
- destruct v as (x, y, z).
- do 3 rewrite Rmult_1_l.
- unfold rotation_unit_eigenvec in Hv.
- remember (vec_norm (P (a₂₃ m - a₃₂ m) (a₃₁ m - a₁₃ m) (a₁₂ m - a₂₁ m))) as r.
- injection Hv; clear Hv; intros Hz Hy Hx.
- move Hx after Hy; move Hz after Hy.
- destruct ev as (ex, ey, ez).
- injection Hev; clear Hev; intros Hez Hey Hex.
- move Hex after Hey; move Hez after Hey.
- rewrite <- Hex in Hx; rewrite <- Hey in Hy; rewrite <- Hez in Hz.
- subst x y z.
- rewrite <- Hex, <- Hey, <- Hez in Heqr.
-Check matrix_fixpoints_ok.
-
-bbb.
-
+(*
 Theorem toto : ∀ el x y z,
   fixpoint_of_path el = P x y z
   → fixpoint_of_path (rev_path el) = P (-x) (-y) (-z).
@@ -2380,7 +2319,9 @@ unfold fixpoint_of_path.
 
 
 bbb.
+*)
 
+(*
 Theorem glop : ∀ m₁ m₂ k,
   (k ≠ 0)%R
   → rotation_fixpoint m₁ k = rotation_fixpoint m₂ k
@@ -2611,6 +2552,7 @@ unfold D in Hp; simpl in Hp.
 destruct Hp as (el & p₁ & Hs & Hn & Hr).
 bbb.
 SearchAbout FinFun.Surjective.
+*)
 
 (* using Cantor_gen, we could prove that ℝ ∖ a countable set contains at
    least one element; if D is countable, ℝ ∖ D countains at least one
@@ -2622,6 +2564,9 @@ Proof.
 intros.
 assert (H : ∃ p₁, p₁ ∈ sphere ∖ D).
  unfold "∈", "∖".
+Check D_set_is_countable.
+bbb.
+
  specialize D_set_is_countable as (f, Hdnc).
  specialize (sphere_set_not_countable f) as (p & Hps & Hp).
  exists p.
