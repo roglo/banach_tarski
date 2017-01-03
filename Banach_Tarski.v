@@ -1566,20 +1566,20 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃) (x₁, x₂, x₃).
 simpl; f_equal; ring.
 Qed.
 
-Theorem vec_couple_and_cross_is_base : ∀ U V X a b c,
+Theorem vec_couple_and_cross_is_base : ∀ U V X,
   (U × V · U × V) ≠ 0%R
-  → a = (((X · U) * (V · V) - (X · V) * (U · V)) / (U × V · U × V))%R
-  → b = (((X · V) * (U · U) - (X · U) * (U · V)) / (U × V · U × V))%R
-  → c = ((X · (U × V)) / (U × V · U × V))%R
-  → X = (a ⁎ U + b ⁎ V + c ⁎ (U × V))%vec.
+  → ∃ a b c, X = (a ⁎ U + b ⁎ V + c ⁎ (U × V))%vec.
 Proof.
-intros * HUV Ha Hb Hc.
+intros * HUV.
 remember (U × V · U × V) as r eqn:Hr.
+exists (((X · U) * (V · V) - (X · V) * (U · V)) / r)%R.
+exists (((X · V) * (U · U) - (X · U) * (U · V)) / r)%R.
+exists ((X · (U × V)) / r)%R.
 apply (vec_const_mul_eq_reg_l r); [ | easy ].
 do 2 rewrite vec_const_mul_add_distr_l.
 do 3 rewrite vec_const_mul_assoc.
 setoid_rewrite Rmult_comm.
-subst a b c; unfold Rdiv.
+unfold Rdiv.
 do 3 rewrite Rmult_assoc.
 rewrite Rinv_l; [ | easy ].
 do 3 rewrite Rmult_1_r; subst r.
@@ -2052,10 +2052,15 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
   destruct (eq_point_dec U V) as [Hvv| Hvv]; [ easy | exfalso ].
   remember (vec_const_mul (∥U∥ / ∥(U × V)∥)%R (U × V)) as W eqn:HW.
   move W before V.
+(*
   assert (Hp₃ : mat_vec_mul M W = W).
    subst W; apply mat_eigenvec_mul_const.
    rewrite mat_vec_mul_cross_distr; [ | easy ].
    now rewrite Hp₁, Hp₂.
+*)
+  assert (Hp₃ : (M * (U × V) = U × V)%vec).
+   apply mat_vec_mul_cross_distr with (U := U) (V := V) in Hm.
+   now rewrite Hp₁, Hp₂ in Hm.
 
    move Hp₃ before Hp₂.
    assert (HVV : ∥(U × V)∥ ≠ 0%R).
@@ -2099,7 +2104,21 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
      now symmetry in Hn; apply no_fixpoint_negb in Hn.
 
     move HVV before Hvn.
-Inspect 1.
+    assert (HMX : ∀ X, (M * X)%vec = X).
+     assert (HUV : U × V · U × V ≠ 0%R).
+      rewrite vec_dot_mul_diag.
+      intros HUV; apply HVV.
+      now apply Rsqr_eq_0 in HUV.
+
+      intros X.
+      specialize (vec_couple_and_cross_is_base U V X HUV).
+      intros (a & b & c & HX).
+      subst X.
+      do 2 rewrite mat_vec_mul_add_distr_l.
+      do 3 rewrite mat_vec_mul_const_distr.
+      now rewrite Hp₁, Hp₂, Hp₃.
+
+     move HMX before Hp₃.
 bbb.
     assert (Hvn' : ∥W∥ = ∥U∥).
      subst W; remember (U × V) as VV.

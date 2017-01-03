@@ -573,7 +573,7 @@ unfold mat_vec_mul.
 simpl; f_equal; lra.
 Qed.
 
-Theorem  mat_vec_add_cross_distr : ∀ M U V, (M * (U + V) = M * U + M * V)%vec.
+Theorem  mat_vec_mul_add_distr_l : ∀ M U V, (M * (U + V) = M * U + M * V)%vec.
 Proof.
 intros.
 destruct U as (u₁, u₂, u₃).
