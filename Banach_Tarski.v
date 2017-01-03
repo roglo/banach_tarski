@@ -2223,6 +2223,18 @@ assert (Hrm : is_rotation_matrix m).
 
     rewrite Hb₂.
     rewrite is_neg_point_neg_point; [ easy | ].
+    intros H; subst p₂; simpl in Hb₂.
+    destruct (Rlt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
+    destruct (Rgt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
+    simpl in Hsr₂.
+    rewrite Rsqr_0 in Hsr₂; symmetry in Hsr₂.
+    do 2 rewrite Rplus_0_l in Hsr₂.
+    apply Rsqr_eq_0 in Hsr₂; subst r.
+    simpl in Hsr₁; rewrite Rsqr_0 in Hsr₁.
+    destruct p₁ as (x, y, z).
+    apply sqr_vec_norm_eq_0 in Hsr₁.
+    destruct Hsr₁ as (H1 & H2 & H3); subst x y z.
+    now rewrite Hb₁ in Hb₂.
 bbb.
    destruct b₂; [ easy | ].
    rewrite <- Hb₁ in Hb₂.
