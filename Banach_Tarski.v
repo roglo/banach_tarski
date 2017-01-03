@@ -1549,18 +1549,14 @@ destruct H as [| H]; [ subst c | ].
  now intros H₁; apply HUV.
 Qed.
 
-Theorem vec_mul_sqr_sub_sqr_dot : ∀ U V u₁ u₂ u₃ v₁ v₂ v₃,
-  U = P u₁ u₂ u₃
-  → V = P v₁ v₂ v₃
-  → ((U · U) * (V · V) - (U · V)² =
-     (u₁ * v₂ - u₂ * v₁)² +
-     (u₂ * v₃ - u₃ * v₂)² +
-     (u₃ * v₁ - u₁ * v₃)²)%R.
+Theorem vec_dot_sqr_cros_mul : ∀ U V,
+  ((U × V) · (U × V) = (U · U) * (V · V) - (U · V)²)%R.
 Proof.
-intros * HU HV.
-subst U V; simpl.
-do 4 rewrite Rsqr_pow2; ring.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
+rewrite Rsqr_pow2; ring.
 Qed.
+
+bbb.
 
 Fixpoint lin_comb cl Vl {struct Vl} :=
   match Vl with
