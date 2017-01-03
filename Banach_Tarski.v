@@ -1556,6 +1556,16 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 rewrite Rsqr_pow2; ring.
 Qed.
 
+Theorem vec_couple_and_cross_is_base : ∀ U V X,
+  (U × V · U × V) ⁎ X =
+   (((X · U) * (V · V) - (X · V) * (U · V)) ⁎ U +
+    ((X · V) * (U · U) - (X · U) * (U · V)) ⁎ V +
+    (X · (U × V)) ⁎ (U × V))%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (x₁, x₂, x₃).
+simpl; f_equal; ring.
+Qed.
+
 bbb.
 
 Fixpoint lin_comb cl Vl {struct Vl} :=
