@@ -2235,6 +2235,13 @@ assert (Hrm : is_rotation_matrix m).
     apply sqr_vec_norm_eq_0 in Hsr₁.
     destruct Hsr₁ as (H1 & H2 & H3); subst x y z.
     now rewrite Hb₁ in Hb₂.
+
+    destruct p₂ as (x, y, z).
+    simpl in Hp₂; simpl.
+    do 9 rewrite <- Ropp_mult_distr_r.
+    do 6 rewrite <- Ropp_plus_distr.
+    injection Hp₂; clear Hp₂; intros Hz Hy Hx.
+    now rewrite Hx, Hy, Hz.
 bbb.
    destruct b₂; [ easy | ].
    rewrite <- Hb₁ in Hb₂.
