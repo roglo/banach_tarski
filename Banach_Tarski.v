@@ -2023,13 +2023,25 @@ Admitted. Show.
 bbb.
 *)
 
+(*
+Theorem fixpoint_unicity2 : ∀ M U V,
+  is_rotation_matrix M
+  → M ≠ mat_id
+  → ∥U∥ = ∥V∥
+  → is_neg_point U = negb (is_neg_point V)
+  → (M * U)%vec = U
+  → (M * V)%vec = V
+  → U = neg_point V.
+Proof.
+*)
+
 Theorem fixpoint_unicity : ∀ M U V,
   is_rotation_matrix M
   → M ≠ mat_id
-  → vec_norm U = vec_norm V
+  → ∥U∥ = ∥V∥
   → is_neg_point U = is_neg_point V
-  → mat_vec_mul M U = U
-  → mat_vec_mul M V = V
+  → (M * U)%vec = U
+  → (M * V)%vec = V
   → U = V.
 Proof.
 intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
@@ -2197,6 +2209,32 @@ assert (Hrm : is_rotation_matrix m).
     now rewrite Hsr₁, Hsr₂.
 
    destruct b₂; [ easy | ].
+   replace false with (negb true) in Hb₂ by easy.
+   rewrite <- Hb₁ in Hb₂.
+   eapply fixpoint_unicity; try eassumption.
+    intros H; rewrite Hm in H.
+    now apply matrix_of_non_empty_path_is_not_identity in Hnl.
+
+    destruct p₁ as (x₁, y₁, z₁).
+    destruct p₂ as (x₂, y₂, z₂).
+    simpl in Hsr₁, Hsr₂; simpl.
+    do 3 rewrite <- Rsqr_neg.
+    now rewrite Hsr₁, Hsr₂.
+
+    rewrite Hb₂.
+    rewrite is_neg_point_neg_point; [ easy | ].
+bbb.
+   destruct b₂; [ easy | ].
+   rewrite <- Hb₁ in Hb₂.
+   eapply fixpoint_unicity; try eassumption.
+    intros H; rewrite Hm in H.
+    now apply matrix_of_non_empty_path_is_not_identity in Hnl.
+
+    destruct p₁ as (x₁, y₁, z₁).
+    destruct p₂ as (x₂, y₂, z₂).
+    simpl in Hsr₁, Hsr₂; simpl.
+    now rewrite Hsr₁, Hsr₂.
+
 bbb.
 
      induction el₁ as [| e₁ el₁]; [ now apply Hnl | ].
