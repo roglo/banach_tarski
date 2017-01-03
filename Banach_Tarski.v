@@ -1556,7 +1556,7 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 rewrite Rsqr_pow2; ring.
 Qed.
 
-Theorem vec_couple_and_cross_is_base : ∀ U V X,
+Theorem vec_couple_and_cross_formula : ∀ U V X,
   (U × V · U × V) ⁎ X =
    (((X · U) * (V · V) - (X · V) * (U · V)) ⁎ U +
     ((X · V) * (U · U) - (X · U) * (U · V)) ⁎ V +
@@ -1564,6 +1564,26 @@ Theorem vec_couple_and_cross_is_base : ∀ U V X,
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (x₁, x₂, x₃).
 simpl; f_equal; ring.
+Qed.
+
+Theorem vec_couple_and_cross_is_base : ∀ U V X a b c,
+  (U × V · U × V) ≠ 0%R
+  → a = (((X · U) * (V · V) - (X · V) * (U · V)) / (U × V · U × V))%R
+  → b = (((X · V) * (U · U) - (X · U) * (U · V)) / (U × V · U × V))%R
+  → c = ((X · (U × V)) / (U × V · U × V))%R
+  → X = (a ⁎ U + b ⁎ V + c ⁎ (U × V))%vec.
+Proof.
+intros * HUV Ha Hb Hc.
+remember (U × V · U × V) as r eqn:Hr.
+apply (vec_const_mul_eq_reg_l r); [ | easy ].
+do 2 rewrite vec_const_mul_add_distr_l.
+do 3 rewrite vec_const_mul_assoc.
+setoid_rewrite Rmult_comm.
+subst a b c; unfold Rdiv.
+do 3 rewrite Rmult_assoc.
+rewrite Rinv_l; [ | easy ].
+do 3 rewrite Rmult_1_r; subst r.
+apply vec_couple_and_cross_formula.
 Qed.
 
 (*
@@ -2079,6 +2099,7 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
      now symmetry in Hn; apply no_fixpoint_negb in Hn.
 
     move HVV before Hvn.
+Inspect 1.
 bbb.
     assert (Hvn' : ∥W∥ = ∥U∥).
      subst W; remember (U × V) as VV.

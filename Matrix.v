@@ -406,6 +406,7 @@ Arguments vec_norm _%vec.
 Arguments vec_add _%vec _%vec.
 Arguments vec_dot_mul _%vec _%vec.
 Arguments vec_cross_mul _%vec _%vec.
+Arguments vec_const_mul _%R _%vec.
 
 Notation "0" := (P 0 0 0) : vec_scope.
 Notation "k ⁎ V" := (vec_const_mul k V) (at level 40).
@@ -1312,4 +1313,15 @@ Qed.
 Theorem vec_add_shuffle0 : ∀ U V W, (U + V + W = U + W + V)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_const_mul_eq_reg_l : ∀ a U V, a ⁎ U = a ⁎ V → a ≠ 0%R → U = V.
+Proof.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃) HaUV Ha.
+simpl in HaUV.
+injection HaUV; clear HaUV; intros H₃ H₂ H₁.
+apply Rmult_eq_reg_l in H₁; [ | easy ].
+apply Rmult_eq_reg_l in H₂; [ | easy ].
+apply Rmult_eq_reg_l in H₃; [ | easy ].
+now subst.
 Qed.
