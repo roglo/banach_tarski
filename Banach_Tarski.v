@@ -1858,7 +1858,21 @@ Theorem rotation_around_not_countable : ∀ p,
   ∀ f : ℕ → _, ∃ M, M ∈ rotation_around p ∧ ∀ n, f n ≠ M.
 Proof.
 intros.
+specialize
+ (Cantor_gen ℕ ℕ (matrix ℝ) (setp (rotation_around p)) id).
+
+Print ter_bin_of_point.
+
 bbb.
+specialize
+ (Cantor_gen ℕ ℕ (matrix ℝ) (setp (rotation_around p)) id
+    (ter_bin_of_point r) id_nat
+    (ter_bin_of_ball_surj r Hr) f) as (p, Hp).
+exists p.
+split; [ apply (Hp O) | ].
+intros n.
+apply not_eq_sym, Hp.
+Qed.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
