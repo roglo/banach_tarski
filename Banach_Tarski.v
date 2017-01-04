@@ -302,6 +302,7 @@ Theorem ter_bin_of_sphere_surj : ∀ r (u : ℕ → bool),
 Proof.
 intros.
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hr & Hn).
+bbb.
 exists (P s (√ (r² - s²)) 0); simpl.
 split; [ | easy ].
 rewrite Rsqr_sqrt.
