@@ -329,18 +329,22 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  specialize (Hnn n).
  now rewrite Hn in Hnn; apply Hnn.
 
-bbb.
  specialize
-  (Cantor_gen ℕ ℕ point (setp sphere) id (ter_bin_of_point 1) id_nat
+  (Cantor_gen ℕ ℕ point (setp (sphere_ray 1)) id (ter_bin_of_point 1) id_nat
      (ter_bin_of_sphere_surj 1 Rlt_0_1)).
  intros H.
  specialize (H (λ n, proj1_sig (f n))) as (p, H).
  exists p.
- split; [ apply (H O) | ].
- intros n Hn.
- specialize (H n).
- destruct H.
- now symmetry in Hn.
+ split.
+  specialize (H O) as (Hs, _).
+  destruct p as (x, y, z).
+  simpl in Hs; simpl; rewrite Hs.
+  rewrite Rsqr_1; apply Rle_refl.
+
+  intros n Hn.
+  specialize (H n).
+  destruct H.
+  now symmetry in Hn.
 Qed.
 
 Theorem sphere_set_not_countable : ∀ r,
@@ -348,7 +352,7 @@ Theorem sphere_set_not_countable : ∀ r,
 Proof.
 intros r f.
 specialize
- (Cantor_gen ℕ ℕ point (setp (sphere_ray r)) id ter_bin_of_point id_nat).
+ (Cantor_gen ℕ ℕ point (setp (sphere_ray r)) id (ter_bin_of_point r) id_nat).
 bbb.
 
 specialize
