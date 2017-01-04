@@ -317,6 +317,16 @@ replace 1%R with (1 ^ 2)%R by lra.
 apply pow_incr; lra.
 Qed.
 
+Theorem in_sphere_ray_in_sphere : ∀ r p, (0 ≤ r ≤ 1)%R →
+  p ∈ sphere_ray r
+  → p ∈ sphere.
+Proof.
+intros r (x, y, z) Hr Hs; simpl in Hs; simpl; rewrite Hs.
+replace 1%R with (1²)%R by apply Rsqr_1.
+SearchAbout (_ ² <= _)%R.
+apply Rsqr_incr_1; [ easy | easy | lra ].
+Qed.
+
 Theorem sphere_not_countable : ¬ (is_countable {p : point | p ∈ sphere}).
 Proof.
 intros H.
@@ -337,9 +347,8 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  exists p.
  split.
   specialize (H O) as (Hs, _).
-  destruct p as (x, y, z).
-  simpl in Hs; simpl; rewrite Hs.
-  rewrite Rsqr_1; apply Rle_refl.
+  apply in_sphere_ray_in_sphere with (r := 1); [ | easy ].
+  split; [ apply Rle_0_1 | apply Rle_refl ].
 
   intros n Hn.
   specialize (H n).
@@ -347,17 +356,13 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
   now symmetry in Hn.
 Qed.
 
-Theorem sphere_set_not_countable : ∀ r,
+Theorem sphere_set_not_countable : ∀ r, (0 < r)%R →
   ∀ f : ℕ → point, ∃ p : point, p ∈ sphere_ray r ∧ ∀ n : ℕ, f n ≠ p.
 Proof.
-intros r f.
+intros * Hr *.
 specialize
- (Cantor_gen ℕ ℕ point (setp (sphere_ray r)) id (ter_bin_of_point r) id_nat).
-bbb.
-
-specialize
- (Cantor_gen ℕ ℕ point (setp (sphere_ray r)) id ter_bin_of_point id_nat
-    ter_bin_of_sphere_surj f) as (p, Hp).
+ (Cantor_gen ℕ ℕ point (setp (sphere_ray r)) id (ter_bin_of_point r) id_nat
+    (ter_bin_of_sphere_surj r Hr) f) as (p, Hp).
 exists p.
 split; [ apply (Hp O) | ].
 intros n.
@@ -2567,16 +2572,19 @@ Proof.
 intros.
 assert (H : ∃ p₁, p₁ ∈ sphere ∖ D).
  unfold "∈", "∖".
- specialize D_set_is_countable as (f, Hdnc).
- specialize (sphere_set_not_countable f) as (p & Hps & Hp).
+ specialize (D_set_is_countable 1) as (f, Hdnc).
+ specialize (sphere_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
  exists p.
- split; [ easy | ].
-bbb.
- intros H; specialize (Hdnc p H) as (n, Hdnc).
- revert Hdnc; apply Hp.
+ split.
+  apply in_sphere_ray_in_sphere in Hps; [ easy | ].
+  split; [ apply Rle_0_1 | apply Rle_refl ].
+
+  intros HD.
+  assert (H : p ∈ D ∩ sphere_ray 1) by easy.
+  specialize (Hdnc p H) as (n, Hdnc).
+  revert Hdnc; apply Hp.
 
  destruct H as (p₁ & Hp₁s & Hp₁nd).
-
 bbb.
 
 assert (∃ p₁, p₁ ∉ D).
