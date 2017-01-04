@@ -1854,24 +1854,42 @@ Qed.
 Definition rotation_around p :=
   mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
 
+Definition ter_bin_of_rotation M := ter_bin_of_frac_part (mat_trace M / 3).
+
+Theorem ter_bin_of_rotation_surj : ∀ p (u : ℕ → bool),
+  ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
+Proof.
+intros.
+specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
+bbb.
+
+exists (P (s * r) (r * √ (1 - s²)) 0); simpl.
+unfold Rdiv; rewrite Rmult_assoc.
+rewrite Rinv_r; [ | lra ].
+rewrite Rmult_1_r.
+split; [ | easy ].
+do 2 rewrite Rsqr_mult.
+rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; lra | ].
+rewrite Rsqr_pow2.
+apply Rplus_le_reg_r with (r := (s ^ 2)%R).
+unfold Rminus; rewrite Rplus_assoc, Rplus_opp_l.
+rewrite Rplus_0_l, Rplus_0_r.
+replace 1%R with (1 ^ 2)%R by lra.
+apply pow_incr; lra.
+Qed.
+
 Theorem rotation_around_not_countable : ∀ p,
   ∀ f : ℕ → _, ∃ M, M ∈ rotation_around p ∧ ∀ n, f n ≠ M.
 Proof.
 intros.
 specialize
- (Cantor_gen ℕ ℕ (matrix ℝ) (setp (rotation_around p)) id).
-
-Print ter_bin_of_point.
-
-bbb.
-specialize
  (Cantor_gen ℕ ℕ (matrix ℝ) (setp (rotation_around p)) id
-    (ter_bin_of_point r) id_nat
-    (ter_bin_of_ball_surj r Hr) f) as (p, Hp).
-exists p.
-split; [ apply (Hp O) | ].
+    ter_bin_of_rotation id_nat
+    (ter_bin_of_rotation_surj p) f) as (M, HM).
+exists M.
+split; [ apply (HM O) | ].
 intros n.
-apply not_eq_sym, Hp.
+apply not_eq_sym, HM.
 Qed.
 
 Theorem equidec_ball_with_and_without_fixpoints :
