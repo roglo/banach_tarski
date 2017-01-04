@@ -1854,11 +1854,9 @@ Qed.
 Definition rotation_around p := mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
 
 Theorem rotation_around_not_countable : ∀ p,
-  ¬ is_countable {M : matrix ℝ | M ∈ rotation_around p}.
+  ∀ f : ℕ → _, ∃ M, M ∈ rotation_around p ∧ ∀ n, f n ≠ M.
 Proof.
-intros p H.
-unfold is_countable in H.
-destruct H as (f, Hf).
+intros.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
