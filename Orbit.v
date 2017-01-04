@@ -81,8 +81,8 @@ Qed.
 
 Definition orbit_selector := choice_function same_orbit.
 
-Definition sphere_ray r := mkset (λ '(P x y z), (x² + y² + z² = r²)%R).
-Definition sphere := mkset (λ '(P x y z), (x² + y² + z² <= 1)%R).
+Definition sphere r := mkset (λ '(P x y z), (x² + y² + z² = r²)%R).
+Definition ball := mkset (λ '(P x y z), (x² + y² + z² <= 1)%R).
 
 Definition D :=
   mkset
@@ -91,17 +91,17 @@ Definition D :=
 
 Arguments D : simpl never.
 
-Definition sphere_but_fixpoints := sphere ∖ D.
+Definition ball_but_fixpoints := ball ∖ D.
 
-Theorem on_sphere_ray_after_rotation : ∀ p m r,
-  p ∈ sphere_ray r
+Theorem on_sphere_after_rotation : ∀ p m r,
+  p ∈ sphere r
   → is_rotation_matrix m
-  → mat_vec_mul m p ∈ sphere_ray r.
+  → mat_vec_mul m p ∈ sphere r.
 Proof.
 intros * His Hm.
 destruct p as (x, y, z).
-unfold sphere_ray in His; simpl in His.
-unfold sphere_ray; simpl.
+unfold sphere in His; simpl in His.
+unfold sphere; simpl.
 unfold is_rotation_matrix in Hm.
 destruct Hm as (Hm, Hd).
 unfold mat_det in Hd.
@@ -110,33 +110,33 @@ injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 nsatz.
 Qed.
 
-Theorem in_sphere_after_rotation : ∀ p m,
-  p ∈ sphere
+Theorem in_ball_after_rotation : ∀ p m,
+  p ∈ ball
   → is_rotation_matrix m
-  → mat_vec_mul m p ∈ sphere.
+  → mat_vec_mul m p ∈ ball.
 Proof.
 intros * His Hrm.
 destruct p as (x, y, z).
 remember (P x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : p ∈ sphere_ray (√ r)).
+assert (Hos : p ∈ sphere (√ r)).
  subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
  apply nonneg_sqr_vec_norm.
 
- pose proof on_sphere_ray_after_rotation _ _ _ Hos Hrm as H.
- unfold sphere in His.
- unfold sphere_ray in H.
- unfold sphere.
+ pose proof on_sphere_after_rotation _ _ _ Hos Hrm as H.
+ unfold ball in His.
+ unfold sphere in H.
+ unfold ball.
  subst p; simpl in *.
  now rewrite H, <- Hos.
 Qed.
 
-Theorem in_sphere_after_rotate : ∀ p e,
-  p ∈ sphere
-  → rotate e p ∈ sphere.
+Theorem in_ball_after_rotate : ∀ p e,
+  p ∈ ball
+  → rotate e p ∈ ball.
 Proof.
 intros * His.
-apply in_sphere_after_rotation; [ easy | ].
+apply in_ball_after_rotation; [ easy | ].
 apply rotate_is_rotation_matrix.
 Qed.
 

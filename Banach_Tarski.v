@@ -13,7 +13,7 @@ Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 Require Import Countable QCountable RnCountable NotEmptyPath.
 
-Theorem Rno_intersect_spheres_x3_x6 : ∀ x y z,
+Theorem Rno_intersect_balls_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
   → ((x - 6)² + y² + z² <= 1)%R
   → False.
@@ -34,8 +34,8 @@ destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
 Qed.
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
-  equidecomposable sphere_but_fixpoints
-    (xtransl 3 sphere_but_fixpoints ∪ xtransl 6 sphere_but_fixpoints)%S.
+  equidecomposable ball_but_fixpoints
+    (xtransl 3 ball_but_fixpoints ∪ xtransl 6 ball_but_fixpoints)%S.
 Proof.
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
 destruct H as (f & Hu & Hm).
@@ -68,8 +68,8 @@ split.
    unfold empty_set; simpl.
    destruct H₁ as (H₁, H₃).
    destruct H₂ as (H₂, H₄).
-   unfold sphere in H₁, H₂.
-   now apply (Rno_intersect_spheres_x3_x6 x y z).
+   unfold ball in H₁, H₂.
+   now apply (Rno_intersect_balls_x3_x6 x y z).
 
   constructor; [ now exists (Xtransl 3) | ].
   constructor; [ now exists (Comb (Xtransl 3) (Rot ạ)) | ].
@@ -125,24 +125,24 @@ rewrite xtransl_xtransl, Rplus_opp_l.
 now rewrite xtransl_0, HEF₁.
 Qed.
 
-Theorem separated_spheres_without_fixpoints :
-  (xtransl 3 sphere_but_fixpoints ∩ xtransl 6 sphere_but_fixpoints = ∅)%S.
+Theorem separated_balls_without_fixpoints :
+  (xtransl 3 ball_but_fixpoints ∩ xtransl 6 ball_but_fixpoints = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6); simpl | easy ].
-unfold sphere_but_fixpoints in H3, H6.
+unfold ball_but_fixpoints in H3, H6.
 simpl in H3, H6.
 destruct H3 as (H3, _).
 destruct H6 as (H6, _).
-now apply (Rno_intersect_spheres_x3_x6 x y z).
+now apply (Rno_intersect_balls_x3_x6 x y z).
 Qed.
 
-Theorem separated_spheres :
-  (xtransl 3 sphere ∩ xtransl 6 sphere = ∅)%S.
+Theorem separated_balls :
+  (xtransl 3 ball ∩ xtransl 6 ball = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6) | easy ].
-unfold sphere in H3, H6.
+unfold ball in H3, H6.
 simpl in H3, H6.
-now apply (Rno_intersect_spheres_x3_x6 x y z).
+now apply (Rno_intersect_balls_x3_x6 x y z).
 Qed.
 
 Definition nat_of_free_elem e : nat :=
@@ -297,8 +297,8 @@ Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 Definition ter_bin_of_point r '(P x y z) := ter_bin_of_frac_part (x / r).
 
-Theorem ter_bin_of_sphere_surj : ∀ r, (0 < r)%R → ∀ (u : ℕ → bool),
-  ∃ p : point, p ∈ sphere_ray r ∧ (∀ n, ter_bin_of_point r p n = u n).
+Theorem ter_bin_of_ball_surj : ∀ r, (0 < r)%R → ∀ (u : ℕ → bool),
+  ∃ p : point, p ∈ sphere r ∧ (∀ n, ter_bin_of_point r p n = u n).
 Proof.
 intros * Hr *.
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
@@ -317,22 +317,21 @@ replace 1%R with (1 ^ 2)%R by lra.
 apply pow_incr; lra.
 Qed.
 
-Theorem in_sphere_ray_in_sphere : ∀ r p, (0 ≤ r ≤ 1)%R →
-  p ∈ sphere_ray r
-  → p ∈ sphere.
+Theorem in_sphere_in_ball : ∀ r p, (0 ≤ r ≤ 1)%R →
+  p ∈ sphere r
+  → p ∈ ball.
 Proof.
 intros r (x, y, z) Hr Hs; simpl in Hs; simpl; rewrite Hs.
 replace 1%R with (1²)%R by apply Rsqr_1.
-SearchAbout (_ ² <= _)%R.
 apply Rsqr_incr_1; [ easy | easy | lra ].
 Qed.
 
-Theorem sphere_not_countable : ¬ (is_countable {p : point | p ∈ sphere}).
+Theorem ball_not_countable : ¬ (is_countable {p : point | p ∈ ball}).
 Proof.
 intros H.
 unfold is_countable in H.
 destruct H as (f, Hf).
-enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
+enough (Hcontr : ∃ a, a ∈ ball ∧ ∀ n, proj1_sig (f n) ≠ a).
  destruct Hcontr as (a & Ha & Hnn).
  specialize (Hf (exist _ a Ha)).
  destruct Hf as (n, Hn).
@@ -340,14 +339,14 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  now rewrite Hn in Hnn; apply Hnn.
 
  specialize
-  (Cantor_gen ℕ ℕ point (setp (sphere_ray 1)) id (ter_bin_of_point 1) id_nat
-     (ter_bin_of_sphere_surj 1 Rlt_0_1)).
+  (Cantor_gen ℕ ℕ point (setp (sphere 1)) id (ter_bin_of_point 1) id_nat
+     (ter_bin_of_ball_surj 1 Rlt_0_1)).
  intros H.
  specialize (H (λ n, proj1_sig (f n))) as (p, H).
  exists p.
  split.
   specialize (H O) as (Hs, _).
-  apply in_sphere_ray_in_sphere with (r := 1); [ | easy ].
+  apply in_sphere_in_ball with (r := 1); [ | easy ].
   split; [ apply Rle_0_1 | apply Rle_refl ].
 
   intros n Hn.
@@ -356,13 +355,13 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
   now symmetry in Hn.
 Qed.
 
-Theorem sphere_set_not_countable : ∀ r, (0 < r)%R →
-  ∀ f : ℕ → point, ∃ p : point, p ∈ sphere_ray r ∧ ∀ n : ℕ, f n ≠ p.
+Theorem ball_set_not_countable : ∀ r, (0 < r)%R →
+  ∀ f : ℕ → point, ∃ p : point, p ∈ sphere r ∧ ∀ n : ℕ, f n ≠ p.
 Proof.
 intros * Hr *.
 specialize
- (Cantor_gen ℕ ℕ point (setp (sphere_ray r)) id (ter_bin_of_point r) id_nat
-    (ter_bin_of_sphere_surj r Hr) f) as (p, Hp).
+ (Cantor_gen ℕ ℕ point (setp (sphere r)) id (ter_bin_of_point r) id_nat
+    (ter_bin_of_ball_surj r Hr) f) as (p, Hp).
 exists p.
 split; [ apply (Hp O) | ].
 intros n.
@@ -531,9 +530,9 @@ Definition fixpoint_of_path r el :=
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
-Theorem rotation_fixpoint_on_sphere_ray : ∀ r m,
+Theorem rotation_fixpoint_on_sphere : ∀ r m,
   m ≠ mat_transp m
-  → rotation_fixpoint m r ∈ sphere_ray r.
+  → rotation_fixpoint m r ∈ sphere r.
 Proof.
 intros * Hm.
 unfold rotation_fixpoint; simpl.
@@ -2150,7 +2149,7 @@ Qed.
 
 Theorem D_set_is_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
-  p ∈ D ∩ sphere_ray r → ∃ n : ℕ, f n = p.
+  p ∈ D ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
 apply surj_prod_nat_surj_nat.
@@ -2165,7 +2164,7 @@ remember (nat_of_path (rev_path el)) as no eqn:Hno.
 fold (mat_of_path el₁) in Hr.
 pose proof mat_of_path_is_rotation_matrix el as H.
 generalize Hsr; intros Hsr₁.
-eapply on_sphere_ray_after_rotation in Hsr₁; [ clear H | apply H ].
+eapply on_sphere_after_rotation in Hsr₁; [ clear H | apply H ].
 unfold mat_of_path in Hsr₁.
 rewrite <- rotate_vec_mul, Hs in Hsr₁.
 apply rotate_rev_path in Hs.
@@ -2183,7 +2182,7 @@ assert (Hrm : is_rotation_matrix m).
   intros H; apply Hnl.
   now apply norm_list_app_diag_is_nil.
 
-  pose proof rotation_fixpoint_on_sphere_ray r m Hmt as Hsr₂.
+  pose proof rotation_fixpoint_on_sphere r m Hmt as Hsr₂.
   rewrite <- Hp₂ in Hsr₂.
   move p₁ before p; move p₂ before p₁.
   move Hsr₁ before Hsr; move Hsr₂ before Hsr₁.
@@ -2566,21 +2565,21 @@ SearchAbout FinFun.Surjective.
    least one element; and if D is countable, ℝ ∖ D countains at least one
    element *)
 
-Theorem equidec_sphere_with_and_without_fixpoints :
-  equidecomposable sphere sphere_but_fixpoints.
+Theorem equidec_ball_with_and_without_fixpoints :
+  equidecomposable ball ball_but_fixpoints.
 Proof.
 intros.
-assert (H : ∃ p₁, p₁ ∈ sphere ∖ D).
+assert (H : ∃ p₁, p₁ ∈ ball ∖ D).
  unfold "∈", "∖".
  specialize (D_set_is_countable 1) as (f, Hdnc).
- specialize (sphere_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
+ specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
  exists p.
  split.
-  apply in_sphere_ray_in_sphere in Hps; [ easy | ].
+  apply in_sphere_in_ball in Hps; [ easy | ].
   split; [ apply Rle_0_1 | apply Rle_refl ].
 
   intros HD.
-  assert (H : p ∈ D ∩ sphere_ray 1) by easy.
+  assert (H : p ∈ D ∩ sphere 1) by easy.
   specialize (Hdnc p H) as (n, Hdnc).
   revert Hdnc; apply Hp.
 
@@ -2601,24 +2600,24 @@ assert (∃ p₁ θ, ∀ p n, p ∈ D → p ∉ rotate_set p₁ (INR n * θ) D).
 bbb.
 
 Theorem Banach_Tarski_paradox :
-  equidecomposable sphere (xtransl 3 sphere ∪ xtransl 6 sphere)%S.
+  equidecomposable ball (xtransl 3 ball ∪ xtransl 6 ball)%S.
 Proof.
-transitivity sphere_but_fixpoints.
- apply equidec_sphere_with_and_without_fixpoints.
+transitivity ball_but_fixpoints.
+ apply equidec_ball_with_and_without_fixpoints.
 
  etransitivity.
   apply Banach_Tarski_paradox_but_fixpoints.
 
   apply equidec_union.
-   apply separated_spheres_without_fixpoints.
+   apply separated_balls_without_fixpoints.
 
-   apply separated_spheres.
-
-   apply equidec_transl; symmetry.
-   apply equidec_sphere_with_and_without_fixpoints.
+   apply separated_balls.
 
    apply equidec_transl; symmetry.
-   apply equidec_sphere_with_and_without_fixpoints.
+   apply equidec_ball_with_and_without_fixpoints.
+
+   apply equidec_transl; symmetry.
+   apply equidec_ball_with_and_without_fixpoints.
 Qed.
 
 Check Banach_Tarski_paradox.
