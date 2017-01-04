@@ -2023,18 +2023,6 @@ Admitted. Show.
 bbb.
 *)
 
-(*
-Theorem fixpoint_unicity2 : ∀ M U V,
-  is_rotation_matrix M
-  → M ≠ mat_id
-  → ∥U∥ = ∥V∥
-  → is_neg_point U = negb (is_neg_point V)
-  → (M * U)%vec = U
-  → (M * V)%vec = V
-  → U = neg_point V.
-Proof.
-*)
-
 Theorem fixpoint_unicity : ∀ M U V,
   is_rotation_matrix M
   → M ≠ mat_id
@@ -2555,7 +2543,7 @@ SearchAbout FinFun.Surjective.
 *)
 
 (* using Cantor_gen, we could prove that ℝ ∖ a countable set contains at
-   least one element; if D is countable, ℝ ∖ D countains at least one
+   least one element; and if D is countable, ℝ ∖ D countains at least one
    element *)
 
 Theorem equidec_sphere_with_and_without_fixpoints :
@@ -2564,13 +2552,11 @@ Proof.
 intros.
 assert (H : ∃ p₁, p₁ ∈ sphere ∖ D).
  unfold "∈", "∖".
-Check D_set_is_countable.
-bbb.
-
  specialize D_set_is_countable as (f, Hdnc).
  specialize (sphere_set_not_countable f) as (p & Hps & Hp).
  exists p.
  split; [ easy | ].
+bbb.
  intros H; specialize (Hdnc p H) as (n, Hdnc).
  revert Hdnc; apply Hp.
 
