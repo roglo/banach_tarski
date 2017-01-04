@@ -2584,6 +2584,12 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D).
   revert Hdnc; apply Hp.
 
  destruct H as (p₁ & Hp₁s & Hp₁nd).
+ assert
+   (H : ∃ R₀,
+    is_rotation_matrix R₀
+    → (R₀ * p₁ = p₁)%vec
+    → ∀ n p p', p ∈ D → p' ∈ D
+    → ((R₀ ^ n)%mat * p ≠ p')%vec).
 bbb.
 
 assert (∃ p₁, p₁ ∉ D).

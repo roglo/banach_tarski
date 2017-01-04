@@ -379,10 +379,10 @@ Inductive point := P : ℝ → ℝ → ℝ → point.
 
 Definition neg_point '(P x y z) := P (-x) (-y) (-z).
 
-Definition mat_vec_mul mat '(P x y z) :=
-  P (a₁₁ mat * x + a₁₂ mat * y + a₁₃ mat * z)
-    (a₂₁ mat * x + a₂₂ mat * y + a₂₃ mat * z)
-    (a₃₁ mat * x + a₃₂ mat * y + a₃₃ mat * z).
+Definition mat_vec_mul M '(P x y z) :=
+  P (a₁₁ M * x + a₁₂ M * y + a₁₃ M * z)
+    (a₂₁ M * x + a₂₂ M * y + a₂₃ M * z)
+    (a₃₁ M * x + a₃₂ M * y + a₃₃ M * z).
 
 Definition vec_norm '(P x y z) := √ (x² + y² + z²).
 Definition vec_opp '(P x y z) := P (-x) (-y) (-z).
@@ -492,8 +492,18 @@ Definition mat_id :=
     0 1 0
     0 0 1.
 
+Fixpoint mat_pow M n :=
+  match n with
+  | O => mat_id
+  | S n' => mat_mul M (mat_pow M n')
+  end.
+
 Delimit Scope mat_scope with mat.
 Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
+Notation "M ^ n" := (mat_pow M n) : mat_scope.
+
+Arguments mat_pow M%mat n%nat.
+Arguments mat_vec_mul _%mat _%vec.
 
 Theorem eq_point_dec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }.
 Proof.
