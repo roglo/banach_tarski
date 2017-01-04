@@ -1851,7 +1851,8 @@ assert (Hrm : is_rotation_matrix m).
     now rewrite Hsr₁, Hsr₂.
 Qed.
 
-Definition rotation_around p := mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
+Definition rotation_around p :=
+  mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
 
 Theorem rotation_around_not_countable : ∀ p,
   ∀ f : ℕ → _, ∃ M, M ∈ rotation_around p ∧ ∀ n, f n ≠ M.
