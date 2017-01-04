@@ -295,21 +295,24 @@ Qed.
 
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
-Definition ter_bin_of_point '(P x y z) := ter_bin_of_frac_part x.
+Definition ter_bin_of_point r '(P x y z) := ter_bin_of_frac_part (x / r).
 
-Theorem ter_bin_of_sphere_surj : ∀ r (u : ℕ → bool),
-  ∃ p : point, p ∈ sphere_ray r ∧ (∀ n, ter_bin_of_point p n = u n).
+Theorem ter_bin_of_sphere_surj : ∀ r, (0 < r)%R → ∀ (u : ℕ → bool),
+  ∃ p : point, p ∈ sphere_ray r ∧ (∀ n, ter_bin_of_point r p n = u n).
 Proof.
-intros.
-specialize (ter_bin_of_frac_part_surj u); intros (s & Hr & Hn).
-bbb.
-exists (P s (√ (r² - s²)) 0); simpl.
+intros * Hr *.
+specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
+exists (P (s * r) (r * √ (1 - s²)) 0); simpl.
+unfold Rdiv; rewrite Rmult_assoc.
+rewrite Rinv_r; [ | lra ].
+rewrite Rmult_1_r.
 split; [ | easy ].
-rewrite Rsqr_sqrt.
-bbb.
-do 4 rewrite Rsqr_pow2.
-rewrite pow_i; [ | apply Nat.lt_0_succ ].
-do 2 rewrite Rplus_0_r.
+do 2 rewrite Rsqr_mult.
+rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; lra | ].
+rewrite Rsqr_pow2.
+apply Rplus_le_reg_r with (r := (s ^ 2)%R).
+unfold Rminus; rewrite Rplus_assoc, Rplus_opp_l.
+rewrite Rplus_0_l, Rplus_0_r.
 replace 1%R with (1 ^ 2)%R by lra.
 apply pow_incr; lra.
 Qed.
@@ -326,9 +329,10 @@ enough (Hcontr : ∃ a, a ∈ sphere ∧ ∀ n, proj1_sig (f n) ≠ a).
  specialize (Hnn n).
  now rewrite Hn in Hnn; apply Hnn.
 
+bbb.
  specialize
-  (Cantor_gen ℕ ℕ point (setp sphere) id ter_bin_of_point id_nat
-     ter_bin_of_sphere_surj).
+  (Cantor_gen ℕ ℕ point (setp sphere) id (ter_bin_of_point 1) id_nat
+     (ter_bin_of_sphere_surj 1 Rlt_0_1)).
  intros H.
  specialize (H (λ n, proj1_sig (f n))) as (p, H).
  exists p.
