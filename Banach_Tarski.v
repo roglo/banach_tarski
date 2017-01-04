@@ -1851,11 +1851,15 @@ assert (Hrm : is_rotation_matrix m).
     now rewrite Hsr₁, Hsr₂.
 Qed.
 
-(* using Cantor_gen, we could prove that ℝ ∖ a countable set contains at
-   least one element; and if D is countable, ℝ ∖ D countains at least one
-   element *)
-
 Definition rotation_around p := mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
+
+Theorem rotation_around_not_countable : ∀ p,
+  ¬ is_countable {M : matrix ℝ | M ∈ rotation_around p}.
+Proof.
+intros p H.
+unfold is_countable in H.
+destruct H as (f, Hf).
+bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
