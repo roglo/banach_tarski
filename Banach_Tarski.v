@@ -297,13 +297,12 @@ Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
 Definition ter_bin_of_point '(P x y z) := ter_bin_of_frac_part x.
 
-Theorem ter_bin_of_sphere_surj : ∀ r (u : ℕ → bool),
-  ∃ p : point, p ∈ sphere_ray r ∧ (∀ n, ter_bin_of_point p n = u n).
+Theorem ter_bin_of_sphere_surj : ∀ (u : ℕ → bool),
+  ∃ p : point, p ∈ sphere ∧ (∀ n, ter_bin_of_point p n = u n).
 Proof.
 intros.
-specialize (ter_bin_of_frac_part_surj u); intros (s & Hr & Hn).
-bbb.
-exists (P r 0 0); simpl in Hr; simpl.
+specialize (ter_bin_of_frac_part_surj u); intros (r & Hr & Hn).
+exists (P r 0 0); simpl.
 split; [ | easy ].
 do 2 rewrite Rsqr_pow2.
 rewrite pow_i; [ | apply Nat.lt_0_succ ].
@@ -342,8 +341,12 @@ Theorem sphere_set_not_countable : ∀ r,
 Proof.
 intros r f.
 specialize
+ (Cantor_gen ℕ ℕ point (setp (sphere_ray r)) id ter_bin_of_point id_nat).
+bbb.
+
+specialize
  (Cantor_gen ℕ ℕ point (setp (sphere_ray r)) id ter_bin_of_point id_nat
-    (ter_bin_of_sphere_surj r) f) as (p, Hp).
+    ter_bin_of_sphere_surj f) as (p, Hp).
 exists p.
 split; [ apply (Hp O) | ].
 intros n.
