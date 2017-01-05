@@ -1861,15 +1861,16 @@ Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
 Definition matrix_of_axis_cos_sin_angle '(P ux uy uz) c s :=
+  let r₂ := (ux² + uy² + uz²)%R in
   mkrmat
-    (ux²*(1-c)+c) (ux*uy*(1-c)-uz*s) (ux*uz*(1-c)+uy*s)
-    (ux*uy*(1-c)+uz*s) (uy²*(1-c)+c) (uy*uz*(1-c)-ux*s)
-    (ux*uz*(1-c)-uy*s) (uy*uz*(1-c)+ux*s) (uz²*(1-c)+c).
+    ((ux²*(1-c)+c)/r₂) ((ux*uy*(1-c)-uz*s)/r₂) ((ux*uz*(1-c)+uy*s)/r₂)
+    ((ux*uy*(1-c)+uz*s)/r₂) ((uy²*(1-c)+c)/r₂) ((uy*uz*(1-c)-ux*s)/r₂)
+    ((ux*uz*(1-c)-uy*s)/r₂) ((uy*uz*(1-c)+ux*s)/r₂) ((uz²*(1-c)+c)/r₂).
 
-Theorem ter_bin_of_rotation_surj : ∀ p (u : ℕ → bool),
+Theorem ter_bin_of_rotation_surj : ∀ p, ∥p∥ ≠ 0%R → ∀ (u : ℕ → bool),
   ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
 Proof.
-intros.
+intros * Hp *.
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
 remember (2 * s - 1)%R as cosθ eqn:Hcosθ.
 remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
@@ -1878,16 +1879,29 @@ exists (matrix_of_axis_cos_sin_angle p cosθ sinθ).
 split.
  split.
   split.
-   (* I must first say that x²+y²+z²=1 *)
-bbb.
-
-   destruct p as (x, y, z).
+   destruct p as (x, y, z); simpl in Hp.
    unfold matrix_of_axis_cos_sin_angle.
-(**)
-   unfold mat_transp; simpl.
-   unfold mat_mul; simpl.
-   unfold mat_id; simpl.
+   unfold mat_transp, mat_mul, mat_id; simpl.
+   remember (x² + y² + z²)%R as r₂ eqn:Hr₂.
+   assert (Hrnz : r₂ ≠ 0%R) by (intros H; apply Hp; rewrite H; apply sqrt_0).
    f_equal.
+    unfold Rdiv.
+    setoid_rewrite Rmult_shuffle0.
+    do 3 rewrite <- Rmult_assoc.
+    do 4 rewrite <- Rmult_plus_distr_r.
+    apply Rmult_eq_reg_r with (r := r₂); [ | easy ].
+    rewrite Rmult_assoc, Rinv_l; [ | easy ].
+    rewrite Rmult_1_r.
+    apply Rmult_eq_reg_r with (r := r₂); [ | easy ].
+    rewrite Rmult_assoc, Rinv_l; [ | easy ].
+    rewrite Rmult_1_r, Rmult_1_l.
+    subst r₂; ring_simplify.
+    do 8 rewrite <- Rsqr_pow2.
+    replace (sinθ²)%R with (1 - cosθ²)%R.
+    do 7 rewrite Rsqr_pow2.
+bbb.
+    ring.
+
 Focus 2.
     rewrite Rsqr_pow2.
     ring_simplify.
