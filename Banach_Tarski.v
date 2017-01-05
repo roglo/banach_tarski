@@ -1880,6 +1880,20 @@ split.
   split.
    destruct p as (x, y, z).
    unfold matrix_of_axis_cos_sin_angle.
+(**)
+   unfold mat_transp; simpl.
+   unfold mat_mul; simpl.
+   unfold mat_id; simpl.
+   f_equal.
+    rewrite Rsqr_pow2.
+    ring_simplify.
+    do 5 rewrite <- Rsqr_pow2.
+    replace (sinθ²)%R with (1 - cosθ²)%R.
+    repeat rewrite Rsqr_pow2.
+    ring_simplify.
+    repeat rewrite <- Rsqr_pow2.
+    (* seems not working... *)
+bbb.
    subst cosθ sinθ; simpl.
    unfold mat_transp; simpl.
    unfold mat_mul; simpl.
