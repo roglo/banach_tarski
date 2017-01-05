@@ -1918,6 +1918,14 @@ split.
        intros H; apply sqr_vec_norm_eq_0 in H.
        destruct H as (Hx & Hy & Hz); subst xp yp zp.
        now apply Hp.
+
+      intros H; rewrite Hr in H.
+      apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+      apply sqr_vec_norm_eq_0 in H.
+      destruct H as (Hx & Hy & Hz); subst xp yp zp.
+      now apply Hp.
+
+     idtac.
 bbb.
 
 Theorem rotation_around_not_countable : ∀ p,
