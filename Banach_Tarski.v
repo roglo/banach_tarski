@@ -1931,10 +1931,9 @@ split.
      rewrite Rplus_assoc, Rplus_opp_l.
      rewrite Rplus_0_l, Rplus_0_r.
      replace 1%R with (1 ^ 2)%R at 4 by lra.
-     apply pow_incr.
-     split; [ | lra ].
-     rewrite fold_Rminus.
-(* merde c'est faux *)
+     apply pow_maj_Rabs, Rabs_le; lra.
+
+    idtac.
 bbb.
 
 Theorem rotation_around_not_countable : ∀ p,
