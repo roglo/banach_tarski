@@ -1875,6 +1875,23 @@ remember (2 * s - 1)%R as cosθ eqn:Hcosθ.
 remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
 (* mmm... problem of sign of sin above! how do we know it? *)
 exists (matrix_of_axis_cos_sin_angle p cosθ sinθ).
+split.
+ split.
+  split.
+   destruct p as (x, y, z).
+   unfold matrix_of_axis_cos_sin_angle.
+   subst cosθ sinθ; simpl.
+   unfold mat_transp; simpl.
+   unfold mat_mul; simpl.
+   unfold mat_id; simpl.
+   f_equal.
+    do 2 rewrite Rsqr_pow2.
+    ring_simplify.
+    do 6 rewrite <- Rsqr_pow2.
+    rewrite Rsqr_sqrt.
+    do 5 rewrite Rsqr_pow2.
+    ring_simplify.
+    (* seems not working... *)
 bbb.
 
 exists (P (s * r) (r * √ (1 - s²)) 0); simpl.
