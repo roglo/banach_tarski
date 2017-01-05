@@ -1866,7 +1866,7 @@ Definition matrix_of_axis_cos_sin_angle '(P ux uy uz) c s :=
     (ux*uy*(1-c)+uz*s) (uy²*(1-c)+c) (uy*uz*(1-c)-ux*s)
     (ux*uz*(1-c)-uy*s) (uy*uz*(1-c)+ux*s) (uz²*(1-c)+c).
 
-Theorem ter_bin_of_rotation_surj : ∀ p, ∥p∥ = 1%R → ∀ (u : ℕ → bool),
+Theorem ter_bin_of_rotation_surj : ∀ p, p ≠ 0%vec → ∀ (u : ℕ → bool),
   ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
 Proof.
 intros * Hp *.
@@ -1874,21 +1874,50 @@ specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
 remember (2 * s - 1)%R as cosθ eqn:Hcosθ.
 remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
 (* mmm... problem of sign of sin above! how do we know it? *)
-exists (matrix_of_axis_cos_sin_angle p cosθ sinθ).
+destruct p as (xp, yp, zp).
+remember (√ (xp² + yp² + zp²))%R as r eqn:Hr.
+remember (P (xp / r) (yp / r) (zp / r)) as q eqn:Hq.
+exists (matrix_of_axis_cos_sin_angle q cosθ sinθ).
 split.
  split.
   split.
-   destruct p as (x, y, z); simpl in Hp.
+   destruct q as (x, y, z); simpl in Hq.
    unfold matrix_of_axis_cos_sin_angle.
    unfold mat_transp, mat_mul, mat_id; simpl.
    f_equal.
     ring_simplify.
     repeat rewrite <- Rsqr_pow2.
     replace (sinθ²)%R with (1 - cosθ²)%R.
-    repeat rewrite Rsqr_pow2.
-    ring_simplify.
-    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R.
-     ring.
+     repeat rewrite Rsqr_pow2.
+     replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
+     injection Hq; clear Hq; intros; subst x y z.
+     unfold Rdiv.
+     do 3 rewrite Rpow_mult_distr.
+     rewrite <- Rinv_pow.
+      apply Rmult_eq_reg_r with (r := (r ^ 2)%R).
+       unfold Rminus.
+       do 2 rewrite Rmult_plus_distr_r.
+       do 2 rewrite Ropp_mult_distr_l.
+       do 3 rewrite Rmult_assoc.
+       rewrite Rinv_l.
+        rewrite Rmult_1_l.
+        do 3 rewrite Rmult_1_r.
+        rewrite Hr.
+        rewrite <- Rsqr_pow2.
+        rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
+        apply nonneg_sqr_vec_norm.
+
+        rewrite Hr, <- Rsqr_pow2.
+        rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+        intros H; apply sqr_vec_norm_eq_0 in H.
+        destruct H as (Hx & Hy & Hz); subst xp yp zp.
+        now apply Hp.
+
+       rewrite Hr, <- Rsqr_pow2.
+       rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+       intros H; apply sqr_vec_norm_eq_0 in H.
+       destruct H as (Hx & Hy & Hz); subst xp yp zp.
+       now apply Hp.
 bbb.
 
 Theorem rotation_around_not_countable : ∀ p,
