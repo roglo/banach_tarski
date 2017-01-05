@@ -1933,7 +1933,21 @@ split.
      replace 1%R with (1 ^ 2)%R at 4 by lra.
      apply pow_maj_Rabs, Rabs_le; lra.
 
-    idtac.
+    admit.
+    admit.
+    admit.
+    admit.
+    admit.
+    admit.
+    admit.
+    admit.
+    admit.
+
+    destruct q as (x, y, z); simpl.
+    injection Hq; clear Hq; intros; subst x y z.
+    do 3 rewrite Rsqr_pow2.
+    f_equal.
+     ring_simplify.
 bbb.
 
 Theorem rotation_around_not_countable : ∀ p,
