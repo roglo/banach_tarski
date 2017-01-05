@@ -1878,6 +1878,9 @@ exists (matrix_of_axis_cos_sin_angle p cosθ sinθ).
 split.
  split.
   split.
+   (* I must first say that x²+y²+z²=1 *)
+bbb.
+
    destruct p as (x, y, z).
    unfold matrix_of_axis_cos_sin_angle.
 (**)
@@ -1885,13 +1888,19 @@ split.
    unfold mat_mul; simpl.
    unfold mat_id; simpl.
    f_equal.
+Focus 2.
     rewrite Rsqr_pow2.
     ring_simplify.
-    do 5 rewrite <- Rsqr_pow2.
+    do 4 rewrite <- Rsqr_pow2.
     replace (sinθ²)%R with (1 - cosθ²)%R.
     repeat rewrite Rsqr_pow2.
     ring_simplify.
     repeat rewrite <- Rsqr_pow2.
+replace (z²)%R with (1 - x² - y²)%R.
+repeat rewrite Rsqr_pow2.
+ring_simplify.
+bbb.
+
     (* seems not working... *)
 bbb.
    subst cosθ sinθ; simpl.
