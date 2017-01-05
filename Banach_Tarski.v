@@ -1861,13 +1861,12 @@ Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
 Definition matrix_of_axis_cos_sin_angle '(P ux uy uz) c s :=
-  let r₂ := (ux² + uy² + uz²)%R in
   mkrmat
-    ((ux²*(1-c)+c)/r₂) ((ux*uy*(1-c)-uz*s)/r₂) ((ux*uz*(1-c)+uy*s)/r₂)
-    ((ux*uy*(1-c)+uz*s)/r₂) ((uy²*(1-c)+c)/r₂) ((uy*uz*(1-c)-ux*s)/r₂)
-    ((ux*uz*(1-c)-uy*s)/r₂) ((uy*uz*(1-c)+ux*s)/r₂) ((uz²*(1-c)+c)/r₂).
+    (ux²*(1-c)+c) (ux*uy*(1-c)-uz*s) (ux*uz*(1-c)+uy*s)
+    (ux*uy*(1-c)+uz*s) (uy²*(1-c)+c) (uy*uz*(1-c)-ux*s)
+    (ux*uz*(1-c)-uy*s) (uy*uz*(1-c)+ux*s) (uz²*(1-c)+c).
 
-Theorem ter_bin_of_rotation_surj : ∀ p, ∥p∥ ≠ 0%R → ∀ (u : ℕ → bool),
+Theorem ter_bin_of_rotation_surj : ∀ p, ∥p∥ = 1%R → ∀ (u : ℕ → bool),
   ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
 Proof.
 intros * Hp *.
@@ -1882,69 +1881,15 @@ split.
    destruct p as (x, y, z); simpl in Hp.
    unfold matrix_of_axis_cos_sin_angle.
    unfold mat_transp, mat_mul, mat_id; simpl.
-   remember (x² + y² + z²)%R as r₂ eqn:Hr₂.
-   assert (Hrnz : r₂ ≠ 0%R) by (intros H; apply Hp; rewrite H; apply sqrt_0).
    f_equal.
-    unfold Rdiv.
-    setoid_rewrite Rmult_shuffle0.
-    do 3 rewrite <- Rmult_assoc.
-    do 4 rewrite <- Rmult_plus_distr_r.
-    apply Rmult_eq_reg_r with (r := r₂); [ | easy ].
-    rewrite Rmult_assoc, Rinv_l; [ | easy ].
-    rewrite Rmult_1_r.
-    apply Rmult_eq_reg_r with (r := r₂); [ | easy ].
-    rewrite Rmult_assoc, Rinv_l; [ | easy ].
-    rewrite Rmult_1_r, Rmult_1_l.
-    subst r₂; ring_simplify.
-    do 8 rewrite <- Rsqr_pow2.
-    replace (sinθ²)%R with (1 - cosθ²)%R.
-    do 7 rewrite Rsqr_pow2.
-bbb.
-    ring.
-
-Focus 2.
-    rewrite Rsqr_pow2.
     ring_simplify.
-    do 4 rewrite <- Rsqr_pow2.
+    repeat rewrite <- Rsqr_pow2.
     replace (sinθ²)%R with (1 - cosθ²)%R.
     repeat rewrite Rsqr_pow2.
     ring_simplify.
-    repeat rewrite <- Rsqr_pow2.
-replace (z²)%R with (1 - x² - y²)%R.
-repeat rewrite Rsqr_pow2.
-ring_simplify.
+    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R.
+     ring.
 bbb.
-
-    (* seems not working... *)
-bbb.
-   subst cosθ sinθ; simpl.
-   unfold mat_transp; simpl.
-   unfold mat_mul; simpl.
-   unfold mat_id; simpl.
-   f_equal.
-    do 2 rewrite Rsqr_pow2.
-    ring_simplify.
-    do 6 rewrite <- Rsqr_pow2.
-    rewrite Rsqr_sqrt.
-    do 5 rewrite Rsqr_pow2.
-    ring_simplify.
-    (* seems not working... *)
-bbb.
-
-exists (P (s * r) (r * √ (1 - s²)) 0); simpl.
-unfold Rdiv; rewrite Rmult_assoc.
-rewrite Rinv_r; [ | lra ].
-rewrite Rmult_1_r.
-split; [ | easy ].
-do 2 rewrite Rsqr_mult.
-rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; lra | ].
-rewrite Rsqr_pow2.
-apply Rplus_le_reg_r with (r := (s ^ 2)%R).
-unfold Rminus; rewrite Rplus_assoc, Rplus_opp_l.
-rewrite Rplus_0_l, Rplus_0_r.
-replace 1%R with (1 ^ 2)%R by lra.
-apply pow_incr; lra.
-Qed.
 
 Theorem rotation_around_not_countable : ∀ p,
   ∀ f : ℕ → _, ∃ M, M ∈ rotation_around p ∧ ∀ n, f n ≠ M.
