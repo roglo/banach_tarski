@@ -1854,7 +1854,11 @@ Qed.
 Definition rotation_around p :=
   mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
 
-Definition ter_bin_of_rotation M := ter_bin_of_frac_part (mat_trace M / 3).
+(* We know, from theory of linear algebra, that tr(M) = 1 + 2 cos θ.
+   Therefore, when θ varies from 0 to 2π, tr(M) varies between -1 and 3.
+   Then (tr(M)+1)/4 varies from 0 to 1. *)
+Definition ter_bin_of_rotation M :=
+  ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
 Theorem ter_bin_of_rotation_surj : ∀ p (u : ℕ → bool),
   ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
