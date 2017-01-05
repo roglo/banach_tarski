@@ -1860,11 +1860,18 @@ Definition rotation_around p :=
 Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
+Definition matrix_of_axis_cos_sin_angle '(P ux uy uz) c s :=
+  mkrmat
+    (ux²*(1-c)/c) (ux*uy*(1 - c)-uz*s).
+
 Theorem ter_bin_of_rotation_surj : ∀ p (u : ℕ → bool),
   ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
 Proof.
 intros.
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
+remember (2 * s - 1)%R as cosθ eqn:Hcosθ.
+remember (...) as sinθ eqn:Hsinθ.
+exixts (matrix_of_axis_cos_sin_angle p cosθ sinθ.
 bbb.
 
 exists (P (s * r) (r * √ (1 - s²)) 0); simpl.
