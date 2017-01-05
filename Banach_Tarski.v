@@ -1925,7 +1925,16 @@ split.
       destruct H as (Hx & Hy & Hz); subst xp yp zp.
       now apply Hp.
 
-     idtac.
+     rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
+     rewrite Hcosθ, Rsqr_pow2.
+     eapply Rplus_le_reg_r; unfold Rminus.
+     rewrite Rplus_assoc, Rplus_opp_l.
+     rewrite Rplus_0_l, Rplus_0_r.
+     replace 1%R with (1 ^ 2)%R at 4 by lra.
+     apply pow_incr.
+     split; [ | lra ].
+     rewrite fold_Rminus.
+(* merde c'est faux *)
 bbb.
 
 Theorem rotation_around_not_countable : ∀ p,
