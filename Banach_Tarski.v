@@ -1913,8 +1913,7 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    unfold mat_transp, mat_mul, mat_id; simpl.
    f_equal;
      ring_simplify;
-     repeat rewrite <- Rsqr_pow2;
-     rewrite Hsc;
+     do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc;
      repeat rewrite Rsqr_pow2;
      replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; ring.
 bbb.
