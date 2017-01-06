@@ -1899,87 +1899,24 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    apply nonneg_sqr_vec_norm.
 
  destruct H as (Hrnz & Hr2nz & Hrxyz).
- split.
-  destruct q as (x, y, z); simpl in Hq.
-  unfold matrix_of_axis_cos_sin_angle.
-  unfold mat_transp, mat_mul, mat_id; simpl.
-  f_equal;
-   ring_simplify;
-   repeat rewrite <- Rsqr_pow2;
-   rewrite Hsc;
-   repeat rewrite Rsqr_pow2.
+ destruct q as (x, y, z); simpl in Hq.
+ assert (Hrxyz2 : (1 - x ^ 2 - y ^ 2 = z ^ 2)%R).
+  injection Hq; clear Hq; intros; subst x y z.
+  unfold Rdiv.
+  do 3 rewrite Rpow_mult_distr.
+  rewrite <- Hrxyz; ring_simplify.
+  rewrite <- Rinv_pow; [ | easy ].
+  now rewrite Rinv_l.
 
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
-
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
-
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
-
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
-
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
-
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
-
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
-
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
-
-   replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-   injection Hq; clear Hq; intros; subst x y z.
-   unfold Rdiv.
-   do 3 rewrite Rpow_mult_distr.
-   rewrite <- Hrxyz; ring_simplify.
-   rewrite <- Rinv_pow; [ | easy ].
-   now rewrite Rinv_l.
+  split.
+   unfold matrix_of_axis_cos_sin_angle.
+   unfold mat_transp, mat_mul, mat_id; simpl.
+   f_equal;
+     ring_simplify;
+     repeat rewrite <- Rsqr_pow2;
+     rewrite Hsc;
+     repeat rewrite Rsqr_pow2;
+     replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; ring.
 bbb.
 
 Theorem ter_bin_of_rotation_surj : ∀ p, p ≠ 0%vec → ∀ (u : ℕ → bool),
