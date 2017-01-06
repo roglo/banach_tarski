@@ -2055,6 +2055,14 @@ Definition rotation_keeping_point_in_D p₁ :=
     (λ R, R ∈ rotation_around p₁ ∧
      ∃ n p p', p ∈ D ∧ p' ∈ D ∧ ((R ^ n)%mat * p)%vec = p').
 
+(* perhaps, instead of proving that "rotation_keeping_point_in_D p₁"
+   is countable, I could try to prove that this set is included in
+   the set of all matrices mapping some point in D to some point
+   in D; since D is countable, this set is countable; and since
+   "rotation_keeping_point_in_D p₁" is included in it, it is
+   countable too *)
+bbb.
+
 Definition rotation_keeping_point_in_D_of_nat (p₁ : point) (n : ℕ) :
   {M : matrix ℝ | M ∈ rotation_keeping_point_in_D p₁}.
 Proof.
