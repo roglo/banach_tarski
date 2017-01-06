@@ -1877,77 +1877,96 @@ remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
 destruct p as (xp, yp, zp).
 remember (√ (xp² + yp² + zp²))%R as r eqn:Hr.
 remember (P (xp / r) (yp / r) (zp / r)) as q eqn:Hq.
-exists (matrix_of_axis_cos_sin_angle q cosθ sinθ).
-split.
+assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
+ split.
+  intros H; rewrite Hr in H.
+  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in H.
+  destruct H as (Hx & Hy & Hz); subst xp yp zp.
+  now apply Hp.
+
+  split.
+   rewrite Hr, <- Rsqr_pow2.
+   rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+   intros H; apply sqr_vec_norm_eq_0 in H.
+   destruct H as (Hx & Hy & Hz); subst xp yp zp.
+   now apply Hp.
+
+   rewrite Hr, <- Rsqr_pow2.
+   rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
+   apply nonneg_sqr_vec_norm.
+
+ destruct H as (Hrnz & Hr2nz & Hrxyz).
+ exists (matrix_of_axis_cos_sin_angle q cosθ sinθ).
  split.
   split.
-   destruct q as (x, y, z); simpl in Hq.
-   unfold matrix_of_axis_cos_sin_angle.
-   unfold mat_transp, mat_mul, mat_id; simpl.
-   f_equal.
-    ring_simplify.
-    repeat rewrite <- Rsqr_pow2.
-    replace (sinθ²)%R with (1 - cosθ²)%R.
-     repeat rewrite Rsqr_pow2.
-     replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-     injection Hq; clear Hq; intros; subst x y z.
-     unfold Rdiv.
-     do 3 rewrite Rpow_mult_distr.
-     rewrite <- Rinv_pow.
-      apply Rmult_eq_reg_r with (r := (r ^ 2)%R).
-       unfold Rminus.
-       do 2 rewrite Rmult_plus_distr_r.
-       do 2 rewrite Ropp_mult_distr_l.
-       do 3 rewrite Rmult_assoc.
-       rewrite Rinv_l.
-        rewrite Rmult_1_l.
-        do 3 rewrite Rmult_1_r.
-        rewrite Hr.
-        rewrite <- Rsqr_pow2.
-        rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
-        apply nonneg_sqr_vec_norm.
-
-        rewrite Hr, <- Rsqr_pow2.
-        rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-        intros H; apply sqr_vec_norm_eq_0 in H.
-        destruct H as (Hx & Hy & Hz); subst xp yp zp.
-        now apply Hp.
-
-       rewrite Hr, <- Rsqr_pow2.
-       rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-       intros H; apply sqr_vec_norm_eq_0 in H.
-       destruct H as (Hx & Hy & Hz); subst xp yp zp.
-       now apply Hp.
-
-      intros H; rewrite Hr in H.
-      apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-      apply sqr_vec_norm_eq_0 in H.
-      destruct H as (Hx & Hy & Hz); subst xp yp zp.
-      now apply Hp.
-
-     rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
-     rewrite Hcosθ, Rsqr_pow2.
-     eapply Rplus_le_reg_r; unfold Rminus.
-     rewrite Rplus_assoc, Rplus_opp_l.
-     rewrite Rplus_0_l, Rplus_0_r.
-     replace 1%R with (1 ^ 2)%R at 4 by lra.
-     apply pow_maj_Rabs, Rabs_le; lra.
-
-    admit.
-    admit.
-    admit.
-    admit.
-    admit.
-    admit.
-    admit.
-    admit.
-    admit.
-
-    destruct q as (x, y, z); simpl.
-    injection Hq; clear Hq; intros; subst x y z.
-    do 3 rewrite Rsqr_pow2.
+   split.
+    destruct q as (x, y, z); simpl in Hq.
+    unfold matrix_of_axis_cos_sin_angle.
+    unfold mat_transp, mat_mul, mat_id; simpl.
     f_equal.
      ring_simplify.
+     repeat rewrite <- Rsqr_pow2.
+     replace (sinθ²)%R with (1 - cosθ²)%R.
+      repeat rewrite Rsqr_pow2.
+      replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
+      injection Hq; clear Hq; intros; subst x y z.
+      unfold Rdiv.
+      do 3 rewrite Rpow_mult_distr.
+      rewrite <- Hrxyz; ring_simplify.
+      rewrite <- Rinv_pow; [ | easy ].
+      now rewrite Rinv_l.
+
+      rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
+      rewrite Hcosθ, Rsqr_pow2.
+      eapply Rplus_le_reg_r; unfold Rminus.
+      rewrite Rplus_assoc, Rplus_opp_l.
+      rewrite Rplus_0_l, Rplus_0_r.
+      replace 1%R with (1 ^ 2)%R at 4 by lra.
+      apply pow_maj_Rabs, Rabs_le; lra.
+
+     idtac.
+bbb.
+     admit.
+     admit.
+     admit.
+     admit.
+     admit.
+     admit.
+     admit.
+     admit.
+
+     destruct q as (x, y, z); simpl.
+     injection Hq; clear Hq; intros; subst x y z.
+     do 3 rewrite Rsqr_pow2.
+     f_equal.
+      ring_simplify.
+      unfold Rdiv; rewrite Rpow_mult_distr.
+      ring_simplify.
+      rewrite <- Rinv_pow; [ | easy ].
+      apply Rmult_eq_reg_r with (r := (r ^ 2)%R); [ | easy ].
+      unfold Rminus.
+      do 6 rewrite Rmult_plus_distr_r.
+      rewrite Rmult_shuffle0.
+      rewrite Rmult_comm.
+      rewrite Rmult_assoc.
+      rewrite Rinv_l; [ rewrite Rmult_1_r | easy ].
+      rewrite Rmult_assoc.
+      rewrite Rinv_l; [ rewrite Rmult_1_r | easy ].
+      ring_simplify.
+      rewrite Rmult_shuffle0.
+      replace (cosθ * xp * / r ^ 2 * r ^ 2)%R with (cosθ * xp)%R.
+       replace (xp * / r ^ 2 * yp ^ 2 * r ^ 2)%R with (xp * yp ^ 2)%R.
+        replace (xp * / r ^ 2 * r ^ 2)%R with xp.
+         rewrite <- Hrxyz; ring.
+
+         rewrite Rmult_assoc, Rinv_l; [ lra | easy ].
+
+        do 2 rewrite Rmult_assoc; f_equal.
+        rewrite Rmult_comm, Rmult_assoc, Rinv_r; [ lra | easy ].
+
+       do 2 rewrite Rmult_assoc; f_equal.
+       rewrite Rinv_l; [ lra | easy ].
 bbb.
 
 Theorem rotation_around_not_countable : ∀ p, p ≠ 0%vec →
