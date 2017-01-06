@@ -1950,14 +1950,14 @@ split.
      ring_simplify.
 bbb.
 
-Theorem rotation_around_not_countable : ∀ p,
+Theorem rotation_around_not_countable : ∀ p, p ≠ 0%vec →
   ∀ f : ℕ → _, ∃ M, M ∈ rotation_around p ∧ ∀ n, f n ≠ M.
 Proof.
-intros.
+intros * Hp f.
 specialize
  (Cantor_gen ℕ ℕ (matrix ℝ) (setp (rotation_around p)) id
     ter_bin_of_rotation id_nat
-    (ter_bin_of_rotation_surj p) f) as (M, HM).
+    (ter_bin_of_rotation_surj p Hp) f) as (M, HM).
 exists M.
 split; [ apply (HM O) | ].
 intros n.
