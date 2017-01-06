@@ -2050,6 +2050,15 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
+Definition rotation_keeping_point_in_D n p₁ :=
+  mkset (λ R, R ∈ rotation_around p₁ ∧ ∃ p p', ((R ^ n)%mat * p)%vec = p').
+
+Theorem rotation_keeping_point_in_D_is_countable : ∀ n p₁,
+  ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
+  M ∈ rotation_keeping_point_in_D n p₁ → ∃ n : ℕ, f n = M.
+Proof.
+intros.
+simpl.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
@@ -2075,7 +2084,15 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D).
    (H : ∃ R₁, R₁ ∈ rotation_around p₁
     → ∀ n p p', p ∈ D → p' ∈ D
     → ((R₁ ^ n)%mat * p ≠ p')%vec).
+  assert (Hp₁nz : p₁ ≠ 0%vec).
+   intros H; apply Hp₁nd; subst p₁; simpl.
+   exists (ạ :: []), 0%vec.
+   split; [ apply same_orbit_refl | ].
+   split; [ easy | simpl; f_equal; lra ].
 
+bbb.
+   specialize (rotation_keeping_point_in_D_is_countable n p₁) as (f, Hdnc).
+   specialize (rotation_around_not_countable p₁ Hp₁nz) as (R₁ & HR₁ & H).
 bbb.
 
 Theorem Banach_Tarski_paradox :
