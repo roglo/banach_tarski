@@ -1954,11 +1954,22 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
 
  unfold matrix_of_axis_cos_sin_angle; simpl.
  rewrite <- Hr.
- f_equal.
-  ring_simplify.
-  specialize (z_of_xy xp yp zp r Hr Hrnz) as Hz.
-  rewrite <- Rsqr_pow2 in Hz.
-bbb.
+ specialize (z_of_xy xp yp zp r Hr Hrnz) as Hz.
+ f_equal; ring_simplify.
+  replace (yp / r * sinθ * zp)%R with (zp / r * sinθ * yp)%R by lra.
+  replace (xp / r * (zp / r) * zp)%R with (xp * (zp / r) ^ 2)%R by lra.
+  replace (cosθ * (xp / r) * (zp / r) * zp)%R
+  with (cosθ * xp * (zp / r) ^ 2)%R by lra.
+  rewrite Rsqr_pow2, Hz; lra.
+
+  replace (xp / r * sinθ * zp)%R with (zp / r * sinθ * xp)%R by lra.
+  replace (yp / r * cosθ * (zp / r) * zp)%R with (yp * cosθ * (zp / r) ^ 2)%R
+    by lra.
+  replace (yp / r * (zp / r) * zp)%R with (yp * (zp / r) ^ 2)%R by lra.
+  rewrite Rsqr_pow2, Hz; lra.
+
+  rewrite Rsqr_pow2, Hz; lra.
+Qed.
 
 Theorem ter_bin_of_rotation_surj : ∀ p, p ≠ 0%vec → ∀ (u : ℕ → bool),
   ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
@@ -1981,7 +1992,7 @@ assert(Hsc : (sinθ² = (1 - cosθ²))%R).
   split.
    apply matrix_of_axis_angle_is_rotation_matrix; [ easy | lra ].
 
-   apply axis_of_matrix_is_eigen_vec; [ easy | lra ].
+   apply axis_of_matrix_is_eigen_vec; lra.
 
   intros n.
 bbb.
