@@ -1915,8 +1915,15 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
     ring_simplify;
     do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc;
     repeat rewrite Rsqr_pow2;
-    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; ring.
-bbb.
+    rewrite <- Hrxyz2; ring.
+
+  unfold matrix_of_axis_cos_sin_angle.
+  unfold mat_det; simpl.
+  ring_simplify.
+  do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc.
+  repeat rewrite Rsqr_pow2.
+  rewrite <- Hrxyz2; ring.
+Qed.
 
 Theorem ter_bin_of_rotation_surj : ∀ p, p ≠ 0%vec → ∀ (u : ℕ → bool),
   ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
@@ -1929,44 +1936,24 @@ remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
 destruct p as (xp, yp, zp).
 remember (√ (xp² + yp² + zp²))%R as r eqn:Hr.
 remember (P (xp / r) (yp / r) (zp / r)) as q eqn:Hq.
-assert
-  (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2 ∧
-        sinθ² = (1 - cosθ²))%R).
- split.
-  intros H; rewrite Hr in H.
-  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-  apply sqr_vec_norm_eq_0 in H.
-  destruct H as (Hx & Hy & Hz); subst xp yp zp.
-  now apply Hp.
+assert(Hsc : (sinθ² = (1 - cosθ²))%R).
+ rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
+ rewrite Hcosθ, Rsqr_pow2.
+ eapply Rplus_le_reg_r; unfold Rminus.
+ rewrite Rplus_assoc, Rplus_opp_l.
+ rewrite Rplus_0_l, Rplus_0_r.
+ replace 1%R with (1 ^ 2)%R at 4 by lra.
+ apply pow_maj_Rabs, Rabs_le; lra.
 
-  split.
-   rewrite Hr, <- Rsqr_pow2.
-   rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-   intros H; apply sqr_vec_norm_eq_0 in H.
-   destruct H as (Hx & Hy & Hz); subst xp yp zp.
-   now apply Hp.
-
-   split.
-    rewrite Hr, <- Rsqr_pow2.
-    rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
-    apply nonneg_sqr_vec_norm.
-
-    rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
-    rewrite Hcosθ, Rsqr_pow2.
-    eapply Rplus_le_reg_r; unfold Rminus.
-    rewrite Rplus_assoc, Rplus_opp_l.
-    rewrite Rplus_0_l, Rplus_0_r.
-    replace 1%R with (1 ^ 2)%R at 4 by lra.
-    apply pow_maj_Rabs, Rabs_le; lra.
-
- destruct H as (Hrnz & Hr2nz & Hrxyz & Hsc).
  exists (matrix_of_axis_cos_sin_angle q cosθ sinθ).
  split.
   split.
    replace q with (/ ∥(P xp yp zp)∥ ⁎ P xp yp zp)%vec.
     apply matrix_of_axis_angle_is_rotation_matrix; [ easy | lra ].
+
     rewrite Hq, Hr; simpl; f_equal; lra.
 
+bbb.
    destruct q as (x, y, z); simpl.
    injection Hq; clear Hq; intros; subst x y z.
    do 3 rewrite Rsqr_pow2.
