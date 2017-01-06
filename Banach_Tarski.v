@@ -1860,6 +1860,8 @@ Definition rotation_around p :=
 Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
+bbb.
+(* supposes that ux²+uy²+uz²=1; should be changed *)
 Definition matrix_of_axis_cos_sin_angle '(P ux uy uz) c s :=
   mkrmat
     (ux²*(1-c)+c) (ux*uy*(1-c)-uz*s) (ux*uz*(1-c)+uy*s)
@@ -1954,6 +1956,18 @@ assert(Hsc : (sinθ² = (1 - cosθ²))%R).
     rewrite Hq, Hr; simpl; f_equal; lra.
 
 bbb.
+Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
+  p ≠ 0%vec
+  → (sinθ² + cosθ² = 1)%R
+  → (matrix_of_axis_cos_sin_angle p cosθ sinθ * p)%vec = p.
+Admitted. Show.
+
+   assert (Hsc2 : (sinθ² + cosθ²)%R = 1%R) by lra.
+   specialize (axis_of_matrix_is_eigen_vec (P xp yp zp) cosθ sinθ Hp Hsc2).
+   intros Hm.
+
+bbb.
+
    destruct q as (x, y, z); simpl.
    injection Hq; clear Hq; intros; subst x y z.
    do 3 rewrite Rsqr_pow2.
@@ -1961,16 +1975,16 @@ bbb.
     ring_simplify.
     unfold Rdiv; rewrite Rpow_mult_distr.
     ring_simplify.
-    rewrite <- Rinv_pow; [ | easy ].
-    apply Rmult_eq_reg_r with (r := (r ^ 2)%R); [ | easy ].
+    rewrite <- Rinv_pow; [ | (* easy *) ].
+    apply Rmult_eq_reg_r with (r := (r ^ 2)%R); [ | (* easy *) ].
     unfold Rminus.
     do 6 rewrite Rmult_plus_distr_r.
      rewrite Rmult_shuffle0.
      rewrite Rmult_comm.
      rewrite Rmult_assoc.
-     rewrite Rinv_l; [ rewrite Rmult_1_r | easy ].
+     rewrite Rinv_l; [ rewrite Rmult_1_r | (* easy *) ].
      rewrite Rmult_assoc.
-     rewrite Rinv_l; [ rewrite Rmult_1_r | easy ].
+     rewrite Rinv_l; [ rewrite Rmult_1_r | (* easy *) ].
      ring_simplify.
      rewrite Rmult_shuffle0.
      replace (cosθ * xp * / r ^ 2 * r ^ 2)%R with (cosθ * xp)%R.
