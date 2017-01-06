@@ -1928,6 +1928,14 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
   rewrite <- Hrxyz2; ring.
 Qed.
 
+Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
+  p ≠ 0%vec
+  → (sinθ² + cosθ² = 1)%R
+  → (matrix_of_axis_cos_sin_angle p cosθ sinθ * p)%vec = p.
+Proof.
+intros * Hp Hsc.
+bbb.
+
 Theorem ter_bin_of_rotation_surj : ∀ p, p ≠ 0%vec → ∀ (u : ℕ → bool),
   ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
 Proof.
@@ -1935,9 +1943,6 @@ intros * Hp *.
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
 remember (2 * s - 1)%R as cosθ eqn:Hcosθ.
 remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
-destruct p as (xp, yp, zp).
-remember (√ (xp² + yp² + zp²))%R as r eqn:Hr.
-remember (P (xp / r) (yp / r) (zp / r)) as q eqn:Hq.
 assert(Hsc : (sinθ² = (1 - cosθ²))%R).
  rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
  rewrite Hcosθ, Rsqr_pow2.
@@ -1947,25 +1952,14 @@ assert(Hsc : (sinθ² = (1 - cosθ²))%R).
  replace 1%R with (1 ^ 2)%R at 4 by lra.
  apply pow_maj_Rabs, Rabs_le; lra.
 
- exists (matrix_of_axis_cos_sin_angle q cosθ sinθ).
+ exists (matrix_of_axis_cos_sin_angle p cosθ sinθ).
  split.
   split.
-   replace q with (/ ∥(P xp yp zp)∥ ⁎ P xp yp zp)%vec.
-    apply matrix_of_axis_angle_is_rotation_matrix; [ easy | lra ].
+   apply matrix_of_axis_angle_is_rotation_matrix; [ easy | lra ].
 
-    rewrite Hq, Hr; simpl; f_equal; lra.
+   apply axis_of_matrix_is_eigen_vec; [ easy | lra ].
 
-bbb.
-Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
-  p ≠ 0%vec
-  → (sinθ² + cosθ² = 1)%R
-  → (matrix_of_axis_cos_sin_angle p cosθ sinθ * p)%vec = p.
-Admitted. Show.
-
-   assert (Hsc2 : (sinθ² + cosθ²)%R = 1%R) by lra.
-   specialize (axis_of_matrix_is_eigen_vec (P xp yp zp) cosθ sinθ Hp Hsc2).
-   intros Hm.
-
+  intros n.
 bbb.
 
    destruct q as (x, y, z); simpl.
