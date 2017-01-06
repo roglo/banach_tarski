@@ -1877,7 +1877,9 @@ remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
 destruct p as (xp, yp, zp).
 remember (√ (xp² + yp² + zp²))%R as r eqn:Hr.
 remember (P (xp / r) (yp / r) (zp / r)) as q eqn:Hq.
-assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
+assert
+  (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2 ∧
+        sinθ² = (1 - cosθ²))%R).
  split.
   intros H; rewrite Hr in H.
   apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
@@ -1892,11 +1894,20 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    destruct H as (Hx & Hy & Hz); subst xp yp zp.
    now apply Hp.
 
-   rewrite Hr, <- Rsqr_pow2.
-   rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
-   apply nonneg_sqr_vec_norm.
+   split.
+    rewrite Hr, <- Rsqr_pow2.
+    rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
+    apply nonneg_sqr_vec_norm.
 
- destruct H as (Hrnz & Hr2nz & Hrxyz).
+    rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
+    rewrite Hcosθ, Rsqr_pow2.
+    eapply Rplus_le_reg_r; unfold Rminus.
+    rewrite Rplus_assoc, Rplus_opp_l.
+    rewrite Rplus_0_l, Rplus_0_r.
+    replace 1%R with (1 ^ 2)%R at 4 by lra.
+    apply pow_maj_Rabs, Rabs_le; lra.
+
+ destruct H as (Hrnz & Hr2nz & Hrxyz & Hsc).
  exists (matrix_of_axis_cos_sin_angle q cosθ sinθ).
  split.
   split.
@@ -1907,28 +1918,105 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
     f_equal.
      ring_simplify.
      repeat rewrite <- Rsqr_pow2.
-     replace (sinθ²)%R with (1 - cosθ²)%R.
-      repeat rewrite Rsqr_pow2.
-      replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
-      injection Hq; clear Hq; intros; subst x y z.
-      unfold Rdiv.
-      do 3 rewrite Rpow_mult_distr.
-      rewrite <- Hrxyz; ring_simplify.
-      rewrite <- Rinv_pow; [ | easy ].
-      now rewrite Rinv_l.
+     rewrite Hsc.
+     repeat rewrite Rsqr_pow2.
+     replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
+     injection Hq; clear Hq; intros; subst x y z.
+     unfold Rdiv.
+     do 3 rewrite Rpow_mult_distr.
+     rewrite <- Hrxyz; ring_simplify.
+     rewrite <- Rinv_pow; [ | easy ].
+     now rewrite Rinv_l.
 
-      rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
-      rewrite Hcosθ, Rsqr_pow2.
-      eapply Rplus_le_reg_r; unfold Rminus.
-      rewrite Rplus_assoc, Rplus_opp_l.
-      rewrite Rplus_0_l, Rplus_0_r.
-      replace 1%R with (1 ^ 2)%R at 4 by lra.
-      apply pow_maj_Rabs, Rabs_le; lra.
+     ring_simplify.
+     repeat rewrite <- Rsqr_pow2.
+     ring_simplify.
+     injection Hq; clear Hq; intros; subst x y z.
+     repeat rewrite Rsqr_pow2.
+     unfold Rdiv; repeat rewrite Rpow_mult_distr.
+     rewrite <- Hrxyz.
+     ring_simplify.
+     repeat rewrite Rsqr_pow2 in Hsc.
+     rewrite Hsc; ring_simplify.
+     apply Rmult_eq_reg_r with (r := (r ^ 2)%R); [ | easy ].
+     rewrite Rmult_0_l.
+     unfold Rminus.
+     do 5 rewrite Rmult_plus_distr_r.
+     replace (xp * (/ r) ^ 4 * cosθ ^ 2 * yp * r ^ 2 * r ^ 2)%R with
+       (xp * cosθ ^ 2 * yp)%R.
+      replace (- (2 * xp * (/ r) ^ 4 * cosθ * yp * r ^ 2) * r ^ 2)%R with
+        (- (2 * xp * cosθ * yp))%R.
+       replace (xp * (/ r) ^ 4 * yp * r ^ 2 * r ^ 2)%R with (xp * yp)%R.
+        replace (- (xp * (/ r) ^ 2 * cosθ ^ 2 * yp) * r ^ 2)%R with
+          (- (xp * cosθ ^ 2 * yp))%R.
+         replace (2 * xp * (/ r) ^ 2 * cosθ * yp * r ^ 2)%R with
+           (2 * xp * cosθ * yp)%R.
+          replace (- (xp * (/ r) ^ 2 * yp) * r ^ 2)%R with (- (xp * yp))%R.
+           ring.
+
+           rewrite <- Ropp_mult_distr_l; f_equal.
+           repeat rewrite Rmult_assoc; f_equal.
+           rewrite Rmult_comm, Rmult_assoc.
+           rewrite <- Rinv_pow; [ | easy ].
+           rewrite Rinv_r; [ now rewrite Rmult_1_r | easy ].
+
+          repeat rewrite Rmult_assoc; f_equal; f_equal.
+          symmetry; rewrite Rmult_comm.
+          do 2 rewrite Rmult_assoc.
+          rewrite <- Rinv_pow; [ | easy ].
+          rewrite Rinv_r; [ now rewrite Rmult_1_r | easy ].
+
+         rewrite <- Ropp_mult_distr_l; f_equal.
+         repeat rewrite Rmult_assoc; f_equal.
+         symmetry; rewrite Rmult_comm.
+         repeat rewrite Rmult_assoc.
+         rewrite <- Rinv_pow; [ | easy ].
+         rewrite Rinv_r; [ now rewrite Rmult_1_r | easy ].
+
+        repeat rewrite Rmult_assoc; f_equal.
+        rewrite Rmult_comm.
+        rewrite <- Rinv_pow; [ | easy ].
+        replace 4%nat with (2 + 2)%nat by easy.
+        rewrite pow_add.
+        rewrite Rinv_mult_distr; [ | easy | easy ].
+        repeat rewrite <- Rmult_assoc.
+        rewrite Rmult_comm.
+        repeat rewrite Rmult_assoc.
+        rewrite Rinv_r; [ rewrite Rmult_1_r | easy ].
+        rewrite Rmult_comm, Rmult_assoc.
+        rewrite Rinv_r; [ now rewrite Rmult_1_r | easy ].
+
+       rewrite <- Ropp_mult_distr_l; f_equal.
+       repeat rewrite Rmult_assoc; f_equal; f_equal.
+       symmetry; rewrite Rmult_comm.
+       rewrite Rmult_assoc; f_equal.
+       rewrite <- Rinv_pow; [ | easy ].
+       replace 4%nat with (2 + 2)%nat by easy.
+       rewrite pow_add.
+       rewrite Rinv_mult_distr; [ | easy | easy ].
+       repeat rewrite <- Rmult_assoc.
+       rewrite Rmult_comm.
+       repeat rewrite Rmult_assoc.
+       rewrite Rinv_r; [ rewrite Rmult_1_r | easy ].
+       rewrite Rmult_comm, Rmult_assoc.
+       rewrite Rinv_r; [ now rewrite Rmult_1_r | easy ].
+
+      repeat rewrite Rmult_assoc; f_equal.
+      symmetry; rewrite Rmult_comm.
+      repeat rewrite Rmult_assoc; f_equal.
+      rewrite <- Rinv_pow; [ | easy ].
+      replace 4%nat with (2 + 2)%nat by easy.
+      rewrite pow_add.
+      rewrite Rinv_mult_distr; [ | easy | easy ].
+      repeat rewrite <- Rmult_assoc.
+      rewrite Rmult_comm.
+      repeat rewrite Rmult_assoc.
+      rewrite Rinv_r; [ rewrite Rmult_1_r | easy ].
+      rewrite Rmult_comm, Rmult_assoc.
+      rewrite Rinv_r; [ now rewrite Rmult_1_r | easy ].
 
      idtac.
 bbb.
-     admit.
-     admit.
      admit.
      admit.
      admit.
