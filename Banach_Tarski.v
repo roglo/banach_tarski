@@ -1860,9 +1860,11 @@ Definition rotation_around p :=
 Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
-bbb.
-(* supposes that ux²+uy²+uz²=1; should be changed *)
-Definition matrix_of_axis_cos_sin_angle '(P ux uy uz) c s :=
+Definition matrix_of_axis_cos_sin_angle '(P x y z) c s :=
+  let r := (√ (x² + y² + z²))%R in
+  let ux := (x / r)%R in
+  let uy := (y / r)%R in
+  let uz := (z / r)%R in
   mkrmat
     (ux²*(1-c)+c) (ux*uy*(1-c)-uz*s) (ux*uz*(1-c)+uy*s)
     (ux*uy*(1-c)+uz*s) (uy²*(1-c)+c) (uy*uz*(1-c)-ux*s)
@@ -1871,16 +1873,13 @@ Definition matrix_of_axis_cos_sin_angle '(P ux uy uz) c s :=
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
   → (sinθ² + cosθ² = 1)%R
-  → is_rotation_matrix (matrix_of_axis_cos_sin_angle (/ ∥p∥ ⁎ p) cosθ sinθ).
+  → is_rotation_matrix (matrix_of_axis_cos_sin_angle p cosθ sinθ).
 Proof.
 intros * Hp Hsc.
-remember (/ ∥p∥ ⁎ p)%vec as q eqn:Hq.
 rename Hsc into Hsc1.
 assert (Hsc : (sinθ² = 1 - cosθ²)%R) by lra; clear Hsc1.
-destruct p as (xp, yp, zp); simpl in Hq.
+destruct p as (xp, yp, zp).
 remember ((√ (xp² + yp² + zp²))%R) as r eqn:Hr.
-setoid_rewrite Rmult_comm in Hq.
-do 3 rewrite fold_Rdiv in Hq.
 assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
  split.
   intros H; rewrite Hr in H.
@@ -1901,17 +1900,20 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    apply nonneg_sqr_vec_norm.
 
  destruct H as (Hrnz & Hr2nz & Hrxyz).
- destruct q as (x, y, z); simpl in Hq.
+ remember (xp / r)%R as x eqn:Hx.
+ remember (yp / r)%R as y eqn:Hy.
+ remember (zp / r)%R as z eqn:Hz.
  assert (Hrxyz2 : (1 - x ^ 2 - y ^ 2 = z ^ 2)%R).
-  injection Hq; clear Hq; intros; subst x y z.
+  subst x y z.
   unfold Rdiv.
   do 3 rewrite Rpow_mult_distr.
   rewrite <- Hrxyz; ring_simplify.
   rewrite <- Rinv_pow; [ | easy ].
   now rewrite Rinv_l.
 
+  unfold matrix_of_axis_cos_sin_angle.
+  rewrite <- Hr, <- Hx, <- Hy, <- Hz.
   split.
-   unfold matrix_of_axis_cos_sin_angle.
    unfold mat_transp, mat_mul, mat_id; simpl.
    f_equal;
     ring_simplify;
@@ -1919,7 +1921,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
     repeat rewrite Rsqr_pow2;
     rewrite <- Hrxyz2; ring.
 
-  unfold matrix_of_axis_cos_sin_angle.
   unfold mat_det; simpl.
   ring_simplify.
   do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc.
@@ -1934,7 +1935,6 @@ intros * Hp *.
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
 remember (2 * s - 1)%R as cosθ eqn:Hcosθ.
 remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
-(* mmm... problem of sign of sin above! how do we know it? *)
 destruct p as (xp, yp, zp).
 remember (√ (xp² + yp² + zp²))%R as r eqn:Hr.
 remember (P (xp / r) (yp / r) (zp / r)) as q eqn:Hq.
