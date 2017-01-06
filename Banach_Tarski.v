@@ -1870,6 +1870,34 @@ Definition matrix_of_axis_cos_sin_angle '(P x y z) c s :=
     (ux*uy*(1-c)+uz*s) (uy²*(1-c)+c) (uy*uz*(1-c)-ux*s)
     (ux*uz*(1-c)-uy*s) (uy*uz*(1-c)+ux*s) (uz²*(1-c)+c).
 
+Theorem z_of_xy : ∀ x y z r,
+  r = (√ (x² + y² + z²)%R)
+  → r ≠ 0%R
+  → ((z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2)%R.
+Proof.
+intros * Hr Hrnz.
+assert (H : (r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2)%R).
+ split.
+  rewrite <- Rsqr_pow2.
+  intros H; apply Hrnz.
+  now apply Rsqr_eq_0 in H.
+
+  rewrite Hr, <- Rsqr_pow2.
+  rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
+  apply nonneg_sqr_vec_norm.
+
+ destruct H as (Hr2nz & Hrxyz).
+ remember (x / r)%R as xr eqn:Hxr.
+ remember (y / r)%R as yr eqn:Hyr.
+ remember (z / r)%R as zr eqn:Hzr.
+ subst xr yr zr.
+ unfold Rdiv.
+ do 3 rewrite Rpow_mult_distr.
+ rewrite <- Hrxyz; ring_simplify.
+ rewrite <- Rinv_pow; [ | easy ].
+ rewrite Rinv_r; [ ring | easy ].
+Qed.
+
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
   → (sinθ² + cosθ² = 1)%R
@@ -1880,36 +1908,19 @@ rename Hsc into Hsc1.
 assert (Hsc : (sinθ² = 1 - cosθ²)%R) by lra; clear Hsc1.
 destruct p as (xp, yp, zp).
 remember ((√ (xp² + yp² + zp²))%R) as r eqn:Hr.
-assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
- split.
-  intros H; rewrite Hr in H.
-  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-  apply sqr_vec_norm_eq_0 in H.
-  destruct H as (Hx & Hy & Hz); subst xp yp zp.
-  now apply Hp.
+assert (Hrnz : (r ≠ 0)%R).
+ intros H; rewrite Hr in H.
+ apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in H.
+ destruct H as (Hx & Hy & Hz); subst xp yp zp.
+ now apply Hp.
 
-  split.
-   rewrite Hr, <- Rsqr_pow2.
-   rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-   intros H; apply sqr_vec_norm_eq_0 in H.
-   destruct H as (Hx & Hy & Hz); subst xp yp zp.
-   now apply Hp.
-
-   rewrite Hr, <- Rsqr_pow2.
-   rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
-   apply nonneg_sqr_vec_norm.
-
- destruct H as (Hrnz & Hr2nz & Hrxyz).
  remember (xp / r)%R as x eqn:Hx.
  remember (yp / r)%R as y eqn:Hy.
  remember (zp / r)%R as z eqn:Hz.
  assert (Hrxyz2 : (1 - x ^ 2 - y ^ 2 = z ^ 2)%R).
   subst x y z.
-  unfold Rdiv.
-  do 3 rewrite Rpow_mult_distr.
-  rewrite <- Hrxyz; ring_simplify.
-  rewrite <- Rinv_pow; [ | easy ].
-  now rewrite Rinv_l.
+  now symmetry; apply z_of_xy.
 
   unfold matrix_of_axis_cos_sin_angle.
   rewrite <- Hr, <- Hx, <- Hy, <- Hz.
@@ -1929,11 +1940,24 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
 Qed.
 
 Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
-  p ≠ 0%vec
-  → (sinθ² + cosθ² = 1)%R
+  (sinθ² + cosθ² = 1)%R
   → (matrix_of_axis_cos_sin_angle p cosθ sinθ * p)%vec = p.
 Proof.
-intros * Hp Hsc.
+intros (xp, yp, zp) * Hsc.
+remember ((√ (xp² + yp² + zp²))%R) as r eqn:Hr.
+destruct (Req_dec r 0) as [Hrz| Hrnz].
+ rewrite Hr in Hrz.
+ apply sqrt_eq_0 in Hrz; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hrz.
+ destruct Hrz as (Hx & Hy & Hz); subst xp yp zp.
+ now rewrite mat_vec_mul_0_r.
+
+ unfold matrix_of_axis_cos_sin_angle; simpl.
+ rewrite <- Hr.
+ f_equal.
+  ring_simplify.
+  specialize (z_of_xy xp yp zp r Hr Hrnz) as Hz.
+  rewrite <- Rsqr_pow2 in Hz.
 bbb.
 
 Theorem ter_bin_of_rotation_surj : ∀ p, p ≠ 0%vec → ∀ (u : ℕ → bool),

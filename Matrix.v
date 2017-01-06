@@ -1335,3 +1335,10 @@ apply Rmult_eq_reg_l in H₂; [ | easy ].
 apply Rmult_eq_reg_l in H₃; [ | easy ].
 now subst.
 Qed.
+
+Theorem mat_vec_mul_0_r : ∀ M, (M * 0)%vec = 0%vec.
+Proof.
+intros; simpl.
+do 9 rewrite Rmult_0_r.
+now do 2 rewrite Rplus_0_r.
+Qed.
