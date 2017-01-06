@@ -2051,14 +2051,24 @@ apply not_eq_sym, HM.
 Qed.
 
 Definition rotation_keeping_point_in_D p₁ :=
-  mkset (λ R, R ∈ rotation_around p₁ ∧ ∃ n p p', ((R ^ n)%mat * p)%vec = p').
+  mkset
+    (λ R, R ∈ rotation_around p₁ ∧
+     ∃ n p p', p ∈ D ∧ p' ∈ D ∧ ((R ^ n)%mat * p)%vec = p').
+
+Definition rotation_keeping_point_in_D_of_nat (p₁ : point) (n : ℕ) :
+  {M : matrix ℝ | M ∈ rotation_keeping_point_in_D p₁}.
+Proof.
+simpl.
+bbb.
 
 Theorem rotation_keeping_point_in_D_is_countable : ∀ p₁,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
   M ∈ rotation_keeping_point_in_D p₁ → ∃ n : ℕ, f n = M.
 Proof.
-intros.
-simpl.
+intros; simpl.
+(*
+exists (rotation_keeping_point_in_D_of_nat p₁).
+*)
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
