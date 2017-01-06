@@ -2059,7 +2059,7 @@ Theorem rotation_keeping_point_in_D_is_countable : ∀ p₁,
 Proof.
 intros.
 simpl.
-bbb.
+Admitted.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
@@ -2095,6 +2095,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D).
    exists R₁.
    split; [ easy | ].
    intros * Hp Hp'.
+   specialize (Hdnc R₁).
 bbb.
 
 Theorem Banach_Tarski_paradox :
