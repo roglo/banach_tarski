@@ -1903,11 +1903,12 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
   destruct q as (x, y, z); simpl in Hq.
   unfold matrix_of_axis_cos_sin_angle.
   unfold mat_transp, mat_mul, mat_id; simpl.
-  f_equal.
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
+  f_equal;
+   ring_simplify;
+   repeat rewrite <- Rsqr_pow2;
+   rewrite Hsc;
    repeat rewrite Rsqr_pow2.
+
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
@@ -1916,10 +1917,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    rewrite <- Rinv_pow; [ | easy ].
    now rewrite Rinv_l.
 
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
-   repeat rewrite Rsqr_pow2.
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
@@ -1928,10 +1925,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    rewrite <- Rinv_pow; [ | easy ].
    now rewrite Rinv_l.
 
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
-   repeat rewrite Rsqr_pow2.
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
@@ -1940,10 +1933,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    rewrite <- Rinv_pow; [ | easy ].
    now rewrite Rinv_l.
 
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
-   repeat rewrite Rsqr_pow2.
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
@@ -1952,10 +1941,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    rewrite <- Rinv_pow; [ | easy ].
    now rewrite Rinv_l.
 
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
-   repeat rewrite Rsqr_pow2.
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
@@ -1964,10 +1949,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    rewrite <- Rinv_pow; [ | easy ].
    now rewrite Rinv_l.
 
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
-   repeat rewrite Rsqr_pow2.
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
@@ -1976,10 +1957,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    rewrite <- Rinv_pow; [ | easy ].
    now rewrite Rinv_l.
 
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
-   repeat rewrite Rsqr_pow2.
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
@@ -1988,10 +1965,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    rewrite <- Rinv_pow; [ | easy ].
    now rewrite Rinv_l.
 
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
-   repeat rewrite Rsqr_pow2.
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
@@ -2000,10 +1973,6 @@ assert (H : (r ≠ 0 ∧ r ^ 2 ≠ 0 ∧ r ^ 2 - xp ^ 2 - yp ^ 2 = zp ^ 2)%R).
    rewrite <- Rinv_pow; [ | easy ].
    now rewrite Rinv_l.
 
-   ring_simplify.
-   repeat rewrite <- Rsqr_pow2.
-   rewrite Hsc.
-   repeat rewrite Rsqr_pow2.
    replace (z ^ 2)%R with (1 - x ^ 2 - y ^ 2)%R; [ ring | ].
    injection Hq; clear Hq; intros; subst x y z.
    unfold Rdiv.
