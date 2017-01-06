@@ -2050,12 +2050,12 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
-Definition rotation_keeping_point_in_D n p₁ :=
-  mkset (λ R, R ∈ rotation_around p₁ ∧ ∃ p p', ((R ^ n)%mat * p)%vec = p').
+Definition rotation_keeping_point_in_D p₁ :=
+  mkset (λ R, R ∈ rotation_around p₁ ∧ ∃ n p p', ((R ^ n)%mat * p)%vec = p').
 
-Theorem rotation_keeping_point_in_D_is_countable : ∀ n p₁,
+Theorem rotation_keeping_point_in_D_is_countable : ∀ p₁,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
-  M ∈ rotation_keeping_point_in_D n p₁ → ∃ n : ℕ, f n = M.
+  M ∈ rotation_keeping_point_in_D p₁ → ∃ n : ℕ, f n = M.
 Proof.
 intros.
 simpl.
@@ -2082,7 +2082,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D).
  destruct H as (p₁ & Hp₁s & Hp₁nd).
  assert
    (H : ∃ R₁, R₁ ∈ rotation_around p₁
-    → ∀ n p p', p ∈ D → p' ∈ D
+    ∧ ∀ n p p', p ∈ D → p' ∈ D
     → ((R₁ ^ n)%mat * p ≠ p')%vec).
   assert (Hp₁nz : p₁ ≠ 0%vec).
    intros H; apply Hp₁nd; subst p₁; simpl.
@@ -2090,9 +2090,11 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D).
    split; [ apply same_orbit_refl | ].
    split; [ easy | simpl; f_equal; lra ].
 
-bbb.
-   specialize (rotation_keeping_point_in_D_is_countable n p₁) as (f, Hdnc).
-   specialize (rotation_around_not_countable p₁ Hp₁nz) as (R₁ & HR₁ & H).
+   specialize (rotation_keeping_point_in_D_is_countable p₁) as (f, Hdnc).
+   specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & H).
+   exists R₁.
+   split; [ easy | ].
+   intros * Hp Hp'.
 bbb.
 
 Theorem Banach_Tarski_paradox :
