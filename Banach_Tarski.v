@@ -1995,40 +1995,46 @@ assert(Hsc : (sinθ² = (1 - cosθ²))%R).
    apply axis_of_matrix_is_eigen_vec; lra.
 
   intros n.
-bbb.
+  destruct p as (x, y, z); simpl.
+  unfold ter_bin_of_rotation.
+  unfold mat_trace; simpl.
+  remember (√ (x² + y² + z²))%R as r eqn:Hr.
+  rewrite <- Hn.
+  f_equal.
+  apply Rmult_eq_reg_r with (r := 4%R); [ | lra ].
+  unfold Rdiv; rewrite Rmult_assoc, Rinv_l; [ | lra ].
+  rewrite Rmult_1_r.
+  do 3 rewrite fold_Rdiv.
+  rename cosθ into c.
+  do 2 rewrite <- Rplus_assoc.
+  remember ((x / r)² * (1 - c))%R as xc.
+  remember ((y / r)² * (1 - c))%R as yc.
+  remember ((z / r)² * (1 - c))%R as zc.
+  replace (xc + c + yc + c + zc + c)%R with (xc + yc + zc + 3 * c)%R by ring.
+  subst xc yc zc.
+  do 2 rewrite <- Rmult_plus_distr_r.
+  replace ((x / r)² + (y / r)² + (z / r)²)%R with 1%R.
+   ring_simplify; subst c; lra.
 
-   destruct q as (x, y, z); simpl.
-   injection Hq; clear Hq; intros; subst x y z.
-   do 3 rewrite Rsqr_pow2.
-   f_equal.
-    ring_simplify.
-    unfold Rdiv; rewrite Rpow_mult_distr.
-    ring_simplify.
-    rewrite <- Rinv_pow; [ | (* easy *) ].
-    apply Rmult_eq_reg_r with (r := (r ^ 2)%R); [ | (* easy *) ].
-    unfold Rminus.
-    do 6 rewrite Rmult_plus_distr_r.
-     rewrite Rmult_shuffle0.
-     rewrite Rmult_comm.
-     rewrite Rmult_assoc.
-     rewrite Rinv_l; [ rewrite Rmult_1_r | (* easy *) ].
-     rewrite Rmult_assoc.
-     rewrite Rinv_l; [ rewrite Rmult_1_r | (* easy *) ].
-     ring_simplify.
-     rewrite Rmult_shuffle0.
-     replace (cosθ * xp * / r ^ 2 * r ^ 2)%R with (cosθ * xp)%R.
-      replace (xp * / r ^ 2 * yp ^ 2 * r ^ 2)%R with (xp * yp ^ 2)%R.
-       replace (xp * / r ^ 2 * r ^ 2)%R with xp.
-        rewrite <- Hrxyz; ring.
+   assert (Hrnz : (r ≠ 0)%R).
+    intros H; rewrite Hr in H.
+    apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+    apply sqr_vec_norm_eq_0 in H.
+    destruct H as (Hx & Hy & Hz); subst x y z.
+    now apply Hp.
 
-        rewrite Rmult_assoc, Rinv_l; [ lra | easy ].
-
-       do 2 rewrite Rmult_assoc; f_equal.
-       rewrite Rmult_comm, Rmult_assoc, Rinv_r; [ lra | easy ].
-
-      do 2 rewrite Rmult_assoc; f_equal.
-      rewrite Rinv_l; [ lra | easy ].
-bbb.
+    symmetry.
+    rewrite Rsqr_div; [ | easy ].
+    rewrite Rsqr_div; [ | easy ].
+    rewrite Rsqr_div; [ | easy ].
+    unfold Rdiv.
+    do 2 rewrite <- Rmult_plus_distr_r.
+    rewrite Hr.
+    rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+    rewrite Rinv_r; [ easy | ].
+    intros H; rewrite H in Hr.
+    now rewrite sqrt_0 in Hr.
+Qed.
 
 Theorem rotation_around_not_countable : ∀ p, p ≠ 0%vec →
   ∀ f : ℕ → _, ∃ M, M ∈ rotation_around p ∧ ∀ n, f n ≠ M.
@@ -2043,6 +2049,8 @@ split; [ apply (HM O) | ].
 intros n.
 apply not_eq_sym, HM.
 Qed.
+
+bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
