@@ -2050,32 +2050,25 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
-Definition rotation_keeping_point_in_D p₁ :=
+(* J = set of rotations mapping a point of D to some (other of same) point
+   of D. *)
+Definition J p₁ :=
   mkset
     (λ R, R ∈ rotation_around p₁ ∧
      ∃ n p p', p ∈ D ∧ p' ∈ D ∧ ((R ^ n)%mat * p)%vec = p').
 
-(* perhaps, instead of proving that "rotation_keeping_point_in_D p₁"
-   is countable, I could try to prove that this set is included in
-   the set of all matrices mapping some point in D to some point
-   in D; since D is countable, this set is countable; and since
-   "rotation_keeping_point_in_D p₁" is included in it, it is
-   countable too *)
-bbb.
-
-Definition rotation_keeping_point_in_D_of_nat (p₁ : point) (n : ℕ) :
-  {M : matrix ℝ | M ∈ rotation_keeping_point_in_D p₁}.
+Definition J_of_nat (p₁ : point) (n : ℕ) : {M : matrix ℝ | M ∈ J p₁}.
 Proof.
 simpl.
 bbb.
 
-Theorem rotation_keeping_point_in_D_is_countable : ∀ p₁,
+Theorem J_is_countable : ∀ p₁,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
-  M ∈ rotation_keeping_point_in_D p₁ → ∃ n : ℕ, f n = M.
+  M ∈ J p₁ → ∃ n : ℕ, f n = M.
 Proof.
 intros; simpl.
 (*
-exists (rotation_keeping_point_in_D_of_nat p₁).
+exists (J_of_nat p₁).
 *)
 bbb.
 
@@ -2108,12 +2101,12 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D).
    split; [ apply same_orbit_refl | ].
    split; [ easy | simpl; f_equal; lra ].
 
-   specialize (rotation_keeping_point_in_D_is_countable p₁) as (f, Hdnc).
+   specialize (J_is_countable p₁) as (f, Hdnc).
    specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
    exists R₁.
    split; [ easy | ].
    intros * Hp Hp' HRnp.
-   assert (H : R₁ ∈ rotation_keeping_point_in_D p₁).
+   assert (H : R₁ ∈ J p₁).
     split; [ easy | ].
     now exists n, p, p'.
 
