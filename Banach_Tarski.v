@@ -2057,10 +2057,17 @@ Definition J p₁ :=
     (λ R, R ∈ rotation_around p₁ ∧
      ∃ n p p', p ∈ D ∧ p' ∈ D ∧ ((R ^ n)%mat * p)%vec = p').
 
-Definition J_of_nat (p₁ : point) (n : ℕ) : {M : matrix ℝ | M ∈ J p₁}.
-Proof.
-simpl.
-bbb.
+Definition J_of_nats (p₁ : point) '(nf, no, nf', no')
+    : {M : matrix ℝ | M ∈ J p₁} :=
+  let r := ∥p₁∥ in
+  let p₂ := fixpoint_of_nat r nf in
+  let p := fold_right rotate p₂ (path_of_nat no) in
+  let p₃ := fixpoint_of_nat r nf' in
+  let p' := fold_right rotate p₃ (path_of_nat no') in
+  let cosθ := ... in
+  let sinθ := ... in
+  let M := matrix_of_axis_cos_sin_angle p₁ cosθ sinθ in
+  ...
 
 Theorem J_is_countable : ∀ p₁,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
