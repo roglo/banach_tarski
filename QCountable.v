@@ -4,13 +4,13 @@
 Require Import Utf8 QArith.
 Require Import Countable.
 
-Theorem nat_countable : is_countable nat.
+Theorem nat_is_countable : is_countable nat.
 Proof.
 exists id.
 now intros n; exists n.
 Qed.
 
-Theorem Pos_countable : is_countable positive.
+Theorem Pos_is_countable : is_countable positive.
 Proof.
 unfold is_countable.
 exists Pos.of_nat.
@@ -19,18 +19,18 @@ exists (Pos.to_nat p).
 apply Pos2Nat.id.
 Qed.
 
-Theorem unit_countable : is_countable unit.
+Theorem unit_is_countable : is_countable unit.
 Proof.
 exists (λ n, tt).
 intros a; exists O.
 now destruct a.
 Qed.
 
-Theorem Z_countable : is_countable Z.
+Theorem Z_is_countable : is_countable Z.
 Proof.
-specialize (countable_sum_types _ _ Pos_countable Pos_countable).
+specialize (countable_sum_types _ _ Pos_is_countable Pos_is_countable).
 intros Hs.
-specialize (countable_sum_types _ _ unit_countable Hs).
+specialize (countable_sum_types _ _ unit_is_countable Hs).
 intros Hc.
 set (f c := match c with inl p => Z.pos p | inr p => Z.neg p end).
 set (g c := match c with inl tt => 0%Z | inr d => f d end).
@@ -47,12 +47,13 @@ enough (H : FinFun.Surjective g).
  now destruct z.
 Qed.
 
-Theorem Q_countable : is_countable Q.
+Theorem Q_is_countable : is_countable Q.
 Proof.
 set (A := (Z * positive)%type).
 set (f x := Qmake (fst x) (snd x)).
 apply (countable_surjection A Q f).
- apply countable_product_types; [ apply Z_countable | apply Pos_countable ].
+ apply countable_product_types; [ apply Z_is_countable | ].
+ apply Pos_is_countable.
 
  unfold FinFun.Surjective, f, A; simpl.
  intros (n, d).

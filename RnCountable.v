@@ -516,7 +516,7 @@ destruct H as (x, H); exists x.
 intros n; apply H.
 Qed.
 
-Theorem R_not_countable : ¬ (is_countable R).
+Theorem R_is_not_countable : ¬ (is_countable R).
 Proof.
 intros H.
 unfold is_countable in H.
