@@ -361,6 +361,19 @@ split; intros Hx.
  apply IHEL, Hx.
 Qed. 
 
+Theorem intersection_union_distr_r : ∀ A (E F G : set A),
+  ((E ∪ F) ∩ G = (E ∩ G) ∪ (F ∩ G))%S.
+Proof.
+intros * x.
+split; intros H.
+ now destruct H as ([HE| HF] & HG); [ left | right ].
+
+ destruct H as [(HE, HG)| (HF, HG)].
+  now split; [ left | ].
+
+  now split; [ right | ].
+Qed.
+
 Add Parametric Morphism {A} : (@setp A)
 with signature set_eq ==> eq ==> iff
 as setp_morph.
