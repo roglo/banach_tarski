@@ -1853,159 +1853,34 @@ Qed.
 
 Definition sphere_sym S := mkset (λ p, neg_point p ∈ S).
 
+Theorem surj_trans : ∀ (A B C : Type) (P : B → Type) (Q : C → Type),
+  (∃ f : A → B, ∀ b : B, P b → ∃ a : A, f a = b)
+  → (∃ g : B → C, ∀ c : C, Q c → ∃ b : B, g b = c)
+  → (∃ h : A → C, ∀ c : C, Q c → ∃ a : A, h a = c).
+Proof.
+intros * (f, Hf) (g, Hg).
+exists (λ a, g (f a)).
+intros c Hc.
+specialize (Hg c Hc) as (b & Hb).
+bbb.
+specialize (Hf b Hb) as (a & Ha).
+bbb.
+
 Theorem D_set_symmetric_is_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
   p ∈ sphere_sym D ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
-apply surj_prod_nat_surj_nat.
-apply surj_bool_prod_nat_surj_prod_nat.
-exists (fixpoint_of_bool_prod_nat r).
-intros p (Hp & Hsr).
-destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
- rewrite rotate_vec_mul in Hr.
- remember (if is_neg_point p₁ then true else false) as b eqn:Hb.
- remember (nat_of_path el₁) as nf eqn:Hnf.
- remember (nat_of_path (rev_path el)) as no eqn:Hno.
- fold (mat_of_path el₁) in Hr.
- pose proof mat_of_path_is_rotation_matrix el as H.
- generalize Hsr; intros Hsr₁.
- eapply antipode_on_sphere_after_rotation in Hsr₁; [ clear H | apply H ].
- unfold mat_of_path in Hsr₁.
- rewrite <- rotate_vec_mul, Hs in Hsr₁.
- apply rotate_rev_path in Hs.
- remember (mat_of_path el₁) as m eqn:Hm.
- remember (rotation_fixpoint m r) as p₂ eqn:Hp₂.
- assert (Hrm : is_rotation_matrix m).
-  rewrite Hm; apply mat_of_path_is_rotation_matrix.
+apply surj_trans with (B := point) (P := setp (D ∩ sphere r)).
+ specialize (D_set_is_countable r) as (f, Hf).
+ exists f; intros p H.
+ now apply Hf.
 
-  destruct (rmat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
-   assert (Hmm : (m * m = mat_id)%mat) by (rewrite Hmt at 2; apply Hrm).
-   rewrite Hm in Hmm.
-   rewrite <- mat_of_path_app in Hmm.
-   exfalso; revert Hmm.
-   apply matrix_of_non_empty_path_is_not_identity.
-   intros H; apply Hnl.
-   now apply norm_list_app_diag_is_nil.
-
-   pose proof rotation_fixpoint_on_sphere r m Hmt as Hsr₂.
-   rewrite <- Hp₂ in Hsr₂.
-   move p₁ before p; move p₂ before p₁.
-   move Hsr₁ before Hsr; move Hsr₂ before Hsr₁.
-bbb.
-   exists (b, nf, no).
-   unfold fixpoint_of_bool_prod_nat.
-   rewrite Hno, path_of_nat_inv.
-   rewrite Hnf, path_of_nat_inv.
-   rewrite <- Hm, <- Hp₂.
-   rewrite <- Hr in Hs.
-   remember (is_neg_point p₂) as b₁.
-   rename Heqb₁ into Hb₁.
-   move Hb before Hb₁.
-   symmetry in Hb, Hb₁.
-bbb.
-
-  Hs : fold_right rotate (m * p₁)%vec (rev_path el) = neg_point p
-  Hb : (if is_neg_point p₁ then true else false) = b
-  Hb₁ : is_neg_point p₂ = b₁
-  ============================
-  fold_right rotate
-    (if b₁
-     then if b then p₂ else neg_point p₂
-     else if b then neg_point p₂ else p₂) (rev_path el) = p
-
-
-   symmetry; rewrite <- Hs; f_equal.
-   apply matrix_all_fixpoints_ok in Hp₂; [ | easy ].
-   move Hp₂ at bottom; move Hr before Hp₂.
-   rewrite Hr.
-   remember (is_neg_point p₁) as b₂ eqn:Hb₂.
-   symmetry in Hb₂.
-   move Hb₂ before Hb₁.
-   destruct b₁, b.
-    destruct b₂; [ | easy ].
-    rewrite <- Hb₁ in Hb₂.
-    eapply fixpoint_unicity; try eassumption.
-     intros H; rewrite Hm in H.
-     now apply matrix_of_non_empty_path_is_not_identity in Hnl.
-
-     destruct p₁ as (x₁, y₁, z₁).
-     destruct p₂ as (x₂, y₂, z₂).
-     simpl in Hsr₁, Hsr₂; simpl.
-     now rewrite Hsr₁, Hsr₂.
-
-    destruct b₂; [ easy | ].
-    replace false with (negb true) in Hb₂ by easy.
-    rewrite <- Hb₁ in Hb₂.
-    eapply fixpoint_unicity; try eassumption.
-     intros H; rewrite Hm in H.
-     now apply matrix_of_non_empty_path_is_not_identity in Hnl.
-
-     destruct p₁ as (x₁, y₁, z₁).
-     destruct p₂ as (x₂, y₂, z₂).
-     simpl in Hsr₁, Hsr₂; simpl.
-     do 3 rewrite <- Rsqr_neg.
-     now rewrite Hsr₁, Hsr₂.
-
-     rewrite Hb₂.
-     rewrite is_neg_point_neg_point; [ easy | ].
-     intros H; subst p₂; simpl in Hb₂.
-     destruct (Rlt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
-     destruct (Rgt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
-     simpl in Hsr₂.
-     rewrite Rsqr_0 in Hsr₂; symmetry in Hsr₂.
-     do 2 rewrite Rplus_0_l in Hsr₂.
-     apply Rsqr_eq_0 in Hsr₂; subst r.
-     simpl in Hsr₁; rewrite Rsqr_0 in Hsr₁.
-     destruct p₁ as (x, y, z).
-     apply sqr_vec_norm_eq_0 in Hsr₁.
-     destruct Hsr₁ as (H1 & H2 & H3); subst x y z.
-     now rewrite Hb₁ in Hb₂.
-
-     destruct p₂ as (x, y, z).
-     simpl in Hp₂; simpl.
-     do 9 rewrite <- Ropp_mult_distr_r.
-     do 6 rewrite <- Ropp_plus_distr.
-     injection Hp₂; clear Hp₂; intros Hz Hy Hx.
-     now rewrite Hx, Hy, Hz.
-
-    destruct b₂; [ | easy ].
-    replace true with (negb false) in Hb₂ by easy.
-    rewrite <- Hb₁ in Hb₂.
-    eapply fixpoint_unicity; try eassumption.
-     intros H; rewrite Hm in H.
-     now apply matrix_of_non_empty_path_is_not_identity in Hnl.
-
-     destruct p₁ as (x₁, y₁, z₁).
-     destruct p₂ as (x₂, y₂, z₂).
-     simpl in Hsr₁, Hsr₂; simpl.
-     do 3 rewrite <- Rsqr_neg.
-     now rewrite Hsr₁, Hsr₂.
-
-     rewrite Hb₂.
-     rewrite is_neg_point_neg_point; [ easy | ].
-     intros H; subst p₂; simpl in Hb₁.
-     destruct (Rlt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
-     destruct (Rgt_dec 0 0) as [H1| H1]; [ now lra | easy ].
-
-     destruct p₂ as (x, y, z).
-     simpl in Hp₂; simpl.
-     do 9 rewrite <- Ropp_mult_distr_r.
-     do 6 rewrite <- Ropp_plus_distr.
-     injection Hp₂; clear Hp₂; intros Hz Hy Hx.
-     now rewrite Hx, Hy, Hz.
-
-    destruct b₂; [ easy | ].
-    rewrite <- Hb₁ in Hb₂.
-    eapply fixpoint_unicity; try eassumption.
-     intros H; rewrite Hm in H.
-     now apply matrix_of_non_empty_path_is_not_identity in Hnl.
-
-     destruct p₁ as (x₁, y₁, z₁).
-     destruct p₂ as (x₂, y₂, z₂).
-     simpl in Hsr₁, Hsr₂; simpl.
-     now rewrite Hsr₁, Hsr₂.
-bbb.
+ exists neg_point.
+ intros c Hc.
+ exists (neg_point c).
+ apply neg_point_involutive.
+Qed.
 
 Theorem D_set_and_its_symmetric_are_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,

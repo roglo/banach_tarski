@@ -1075,6 +1075,12 @@ unfold vec_const_mul.
 now do 3 rewrite Rmult_1_l.
 Qed.
 
+Theorem neg_point_involutive : ∀ p, neg_point (neg_point p) = p.
+Proof.
+intros (x, y, z); simpl.
+now do 3 rewrite Ropp_involutive.
+Qed.
+
 Theorem is_neg_point_0 : is_neg_point (P 0 0 0) = true.
 Proof.
 simpl.
