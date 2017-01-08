@@ -809,6 +809,25 @@ exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
 Qed.
 
+Definition prod_4_nat_of_nat n :=
+  let '(n₁, n₂) := prod_nat_of_nat n in
+  let '(n₃, n₄) := prod_nat_of_nat n₁ in
+  let '(n₅, n₆) := prod_nat_of_nat n₂ in
+  (n₃, n₄, n₅, n₆).
+
+Theorem surj_prod_4_nat_surj_nat : ∀ A P,
+  (∃ g : ℕ * ℕ * ℕ * ℕ -> A, ∀ a : A, P a → ∃ nn, g nn = a)
+  → ∃ f : ℕ → A, ∀ a : A, P a → ∃ n : ℕ, f n = a.
+Proof.
+intros * (g & Hg).
+exists (λ n, g (prod_4_nat_of_nat n)).
+intros a Ha.
+specialize (Hg a Ha) as ((((n₁, n₂), n₃), n₄) & Hg); subst a.
+exists (nat_of_prod_nat (nat_of_prod_nat (n₁, n₂), nat_of_prod_nat (n₃, n₄))).
+unfold prod_4_nat_of_nat.
+now do 3 rewrite prod_nat_of_nat_inv.
+Qed.
+
 Definition bool_prod_nat_of_prod_nat '(n₁, n₂) : bool * ℕ * ℕ :=
   (if n₁ mod 2 then false else true, (n₁ / 2)%nat, n₂).
 
@@ -2154,10 +2173,9 @@ Theorem J_is_countable : ∀ p₁,
   M ∈ J p₁ → ∃ n : ℕ, f n = M.
 Proof.
 intros.
-Print J.
-(*
-exists (J_of_nat p₁).
-*)
+apply surj_prod_4_nat_surj_nat.
+exists (J_of_nats p₁).
+intros M HM.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
