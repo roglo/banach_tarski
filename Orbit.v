@@ -110,6 +110,23 @@ injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 nsatz.
 Qed.
 
+Theorem antipode_on_sphere_after_rotation : ∀ p m r,
+  p ∈ sphere r
+  → is_rotation_matrix m
+  → mat_vec_mul m (neg_point p) ∈ sphere r.
+Proof.
+intros * His Hm.
+destruct p as (x, y, z).
+unfold sphere in His; simpl in His.
+unfold sphere; simpl.
+unfold is_rotation_matrix in Hm.
+destruct Hm as (Hm, Hd).
+unfold mat_det in Hd.
+unfold mat_mul, mat_id in Hm; simpl in Hm.
+injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+nsatz.
+Qed.
+
 Theorem in_ball_after_rotation : ∀ p m,
   p ∈ ball
   → is_rotation_matrix m
