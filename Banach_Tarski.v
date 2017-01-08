@@ -1865,6 +1865,12 @@ intros r (x, y, z) Hp; simpl.
 now do 3 rewrite <- Rsqr_neg.
 Qed.
 
+Theorem neg_point_in_ball : ∀ p, p ∈ ball → neg_point p ∈ ball.
+Proof.
+intros (x, y, z) Hp; simpl.
+now do 3 rewrite <- Rsqr_neg.
+Qed.
+
 Theorem D_set_symmetry_is_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
   p ∈ sphere_sym D ∩ sphere r → ∃ n : ℕ, f n = p.
@@ -1889,11 +1895,21 @@ Theorem countable_union : ∀ A (E F : set A),
   → (∃ h : ℕ → A, ∀ a : A, a ∈ E ∪ F → ∃ n, h n = a).
 Proof.
 intros * (f & Hf) (g & Hg).
-bbb.
+exists
+  (λ n, if bool_dec (even n) true then f (Nat.div2 n) else g (Nat.div2 n)).
+intros a [Ha| Ha].
+ specialize (Hf a Ha) as (n & Hn).
+ exists (2 * n)%nat.
+ rewrite Nat.even_mul, orb_true_l.
+ now rewrite Nat.div2_double.
 
-apply surj_prod_nat_surj_nat.
-exists (λ '(nf, ng), (f nf, g ng)).
-bbb.
+ specialize (Hg a Ha) as (n & Hn).
+ exists (2 * n + 1)%nat.
+ rewrite Nat.even_add.
+ rewrite Nat.even_mul, orb_true_l, Nat.even_1.
+ remember (2 * n + 1)%nat as m; simpl; subst m.
+ now rewrite Nat.add_1_r, Nat.div2_succ_double.
+Qed.
 
 Theorem D_set_and_its_symmetric_are_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
@@ -2141,7 +2157,7 @@ intros; simpl.
 (*
 exists (J_of_nat p₁).
 *)
-Abort. (* à continuer... *)
+bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
@@ -2152,26 +2168,37 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ neg_point p₁ ∈ ball ∖ D).
  specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
  specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
  exists p.
-split.
  split.
-  apply in_sphere_in_ball in Hps; [ easy | ].
-  split; [ apply Rle_0_1 | apply Rle_refl ].
+  split.
+   apply in_sphere_in_ball in Hps; [ easy | ].
+   split; [ apply Rle_0_1 | apply Rle_refl ].
 
-  intros HD.
-  assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
-   now rewrite intersection_union_distr_r; left.
+   intros HD.
+   assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
+    now rewrite intersection_union_distr_r; left.
 
-   specialize (Hdnc p H) as (n, Hdnc).
-   revert Hdnc; apply Hp.
-bbb.
+    specialize (Hdnc p H) as (n, Hdnc).
+    revert Hdnc; apply Hp.
 
- destruct H as (p₁ & Hp₁s & Hp₁nd).
+  split.
+   apply neg_point_in_ball.
+   apply in_sphere_in_ball in Hps; [ easy | ].
+   split; [ apply Rle_0_1 | apply Rle_refl ].
+
+   intros HD.
+   assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
+    now rewrite intersection_union_distr_r; right.
+
+    specialize (Hdnc p H) as (n, Hdnc).
+    revert Hdnc; apply Hp.
+
+ destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
  assert
    (H : ∃ R₁, R₁ ∈ rotation_around p₁
     ∧ ∀ n p p', p ∈ D → p' ∈ D
     → ((R₁ ^ n)%mat * p ≠ p')%vec).
   assert (Hp₁nz : p₁ ≠ 0%vec).
-   intros H; apply Hp₁nd; subst p₁; simpl.
+   intros H; apply Hpnd; subst p₁; simpl.
    exists (ạ :: []), 0%vec.
    split; [ apply same_orbit_refl | ].
    split; [ easy | simpl; f_equal; lra ].
