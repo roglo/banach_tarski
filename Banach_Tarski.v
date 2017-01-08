@@ -2130,8 +2130,8 @@ Qed.
    of D. *)
 Definition J p₁ :=
   mkset
-    (λ R, R ∈ rotation_around p₁ ∧
-     ∃ n p p', p ∈ D ∧ p' ∈ D ∧ ((R ^ n)%mat * p)%vec = p').
+    (λ R₁, R₁ ∈ rotation_around p₁ ∧
+     ∃ n p p', p ∈ D ∧ p' ∈ D ∧ ((R₁ ^ n)%mat * p)%vec = p').
 
 Definition J_of_nats (p₁ : point) '(nf, no, nf', no'(*, n*)) : matrix ℝ :=
   let r := ∥p₁∥ in
@@ -2153,7 +2153,8 @@ Theorem J_is_countable : ∀ p₁,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
   M ∈ J p₁ → ∃ n : ℕ, f n = M.
 Proof.
-intros; simpl.
+intros.
+Print J.
 (*
 exists (J_of_nat p₁).
 *)
