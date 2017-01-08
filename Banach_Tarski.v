@@ -1853,34 +1853,22 @@ Qed.
 
 Definition sphere_sym S := mkset (λ p, neg_point p ∈ S).
 
-Theorem surj_trans : ∀ (A B C : Type) (P : B → Type) (Q : C → Type),
-  (∃ f : A → B, ∀ b : B, P b → ∃ a : A, f a = b)
-  → (∃ g : B → C, ∀ c : C, Q c → ∃ b : B, g b = c)
-  → (∃ h : A → C, ∀ c : C, Q c → ∃ a : A, h a = c).
-Proof.
-intros * (f, Hf) (g, Hg).
-exists (λ a, g (f a)).
-intros c Hc.
-specialize (Hg c Hc) as (b & Hb).
-bbb.
-specialize (Hf b Hb) as (a & Ha).
-bbb.
-
 Theorem D_set_symmetric_is_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
   p ∈ sphere_sym D ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
-apply surj_trans with (B := point) (P := setp (D ∩ sphere r)).
- specialize (D_set_is_countable r) as (f, Hf).
- exists f; intros p H.
- now apply Hf.
-
- exists neg_point.
- intros c Hc.
- exists (neg_point c).
+specialize (D_set_is_countable r) as (f, Hf).
+exists (λ n, neg_point (f n)).
+intros p Hp.
+enough (Hn : neg_point p ∈ D ∩ sphere r).
+ specialize (Hf (neg_point p) Hn) as (n & Hf).
+ exists n; rewrite Hf.
  apply neg_point_involutive.
-Qed.
+
+ destruct Hp as (Hss, Hs).
+ split.
+bbb.
 
 Theorem D_set_and_its_symmetric_are_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
