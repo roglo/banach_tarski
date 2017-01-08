@@ -2081,17 +2081,18 @@ intros; simpl.
 (*
 exists (J_of_nat p₁).
 *)
-bbb.
+Abort. (* à continuer... *)
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
 intros.
-assert (H : ∃ p₁, p₁ ∈ ball ∖ D).
+assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ neg_point p₁ ∈ ball ∖ D).
  unfold "∈", "∖".
  specialize (D_set_is_countable 1) as (f, Hdnc).
  specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
  exists p.
+bbb.
  split.
   apply in_sphere_in_ball in Hps; [ easy | ].
   split; [ apply Rle_0_1 | apply Rle_refl ].
