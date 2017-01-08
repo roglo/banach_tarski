@@ -2131,7 +2131,7 @@ Qed.
 Definition J p₁ :=
   mkset
     (λ R₁, R₁ ∈ rotation_around p₁ ∧
-     ∃ n p p', p ∈ D ∧ p' ∈ D ∧ ((R₁ ^ n)%mat * p)%vec = p').
+     ∃ p p' n, p ∈ D ∧ p' ∈ D ∧ ((R₁ ^ n)%mat * p)%vec = p').
 
 Definition J_of_nats (p₁ : point) '(nf, no, nf', no'(*, n*)) : matrix ℝ :=
   let r := ∥p₁∥ in
