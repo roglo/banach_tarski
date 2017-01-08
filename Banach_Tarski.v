@@ -1853,7 +1853,19 @@ Qed.
 
 Definition sphere_sym S := mkset (λ p, neg_point p ∈ S).
 
-Theorem D_set_symmetric_is_countable : ∀ r,
+Theorem sphere_sym_neg_point : ∀ p, p ∈ sphere_sym D → neg_point p ∈ D.
+Proof.
+intros (x, y, z) (el₁ & p₁ & Hso & Hn & Hr).
+now exists el₁, p₁.
+Qed.
+
+Theorem neg_point_in_sphere : ∀ r p, p ∈ sphere r → neg_point p ∈ sphere r.
+Proof.
+intros r (x, y, z) Hp; simpl.
+now do 3 rewrite <- Rsqr_neg.
+Qed.
+
+Theorem D_set_symmetry_is_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
   p ∈ sphere_sym D ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
@@ -1867,7 +1879,20 @@ enough (Hn : neg_point p ∈ D ∩ sphere r).
  apply neg_point_involutive.
 
  destruct Hp as (Hss, Hs).
- split.
+ split; [ now apply sphere_sym_neg_point | ].
+ now apply neg_point_in_sphere.
+Qed.
+
+Theorem countable_union : ∀ A (E F : set A),
+  (∃ f : ℕ → A, ∀ a : A, a ∈ E → ∃ n, f n = a)
+  → (∃ g : ℕ → A, ∀ a : A, a ∈ F → ∃ n, g n = a)
+  → (∃ h : ℕ → A, ∀ a : A, a ∈ E ∪ F → ∃ n, h n = a).
+Proof.
+intros * (f & Hf) (g & Hg).
+bbb.
+
+apply surj_prod_nat_surj_nat.
+exists (λ '(nf, ng), (f nf, g ng)).
 bbb.
 
 Theorem D_set_and_its_symmetric_are_countable : ∀ r,
@@ -1875,7 +1900,16 @@ Theorem D_set_and_its_symmetric_are_countable : ∀ r,
   p ∈ (D ∪ sphere_sym D) ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
-bbb
+enough
+  (∃ f, ∀ p,
+   p ∈ (D ∩ sphere r) ∪ (sphere_sym D ∩ sphere r) → ∃ n : ℕ, f n = p).
+ destruct H as (f, Hf).
+ exists f; intros p Hp; apply Hf.
+ now rewrite intersection_union_distr_r in Hp.
+
+ apply countable_union; [ apply D_set_is_countable | ].
+ apply D_set_symmetry_is_countable.
+Qed.
 
 Definition rotation_around p :=
   mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
