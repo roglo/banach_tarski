@@ -2193,6 +2193,26 @@ remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
 remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
 assert (p₂ = q₂).
+(**)
+ subst nf no nf' no'.
+ unfold fixpoint_of_nat, fixpoint_of_path in Hq₂.
+ rewrite path_of_nat_inv in Hq₂, Hq, Hq'.
+ generalize Hq₂; intros H.
+ apply matrix_all_fixpoints_ok in H.
+  unfold mat_of_path in H.
+  rewrite <- rotate_vec_mul in H.
+  move Hn₂ at bottom.
+  move Hr₂ at bottom.
+  move H at bottom.
+bbb.
+
+unfold rotation_fixpoint in Hq₂.
+unfold mat_of_path in Hq₂.
+Print rotation_unit_eigenvec.
+rewrite <- rotate_vec_mul in Hq₂.
+bbb.
+
+SearchAbout rotation_fixpoint.
  apply D_of_nat_prop with
    (nf := nf) (no := no) (el := rev_path el₂) (n := nat_of_prod_nat (nf, no))
    (p := q) in Hq₂.
@@ -2202,6 +2222,8 @@ assert (p₂ = q₂).
   move Hn₂ at bottom.
   move Hr₂ at bottom.
   move Hrq₂ at bottom.
+Print rotation_fixpoint.
+SearchAbout (fold_right rotate).
 bbb.
   clear - Hn₂ Hr₂ Hrq₂.
 bbb.
