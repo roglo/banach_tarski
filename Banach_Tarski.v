@@ -2192,13 +2192,47 @@ remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
 remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
 remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
+symmetry.
+subst nf no nf' no'.
+unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
+rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
+generalize Hq₂; intros Hs₂.
+apply matrix_all_fixpoints_ok in Hs₂.
+ 2: apply mat_of_path_is_rotation_matrix.
+ unfold mat_of_path in Hs₂.
+ rewrite <- rotate_vec_mul in Hs₂.
+
+ generalize Hq₃; intros Hs₃.
+ apply matrix_all_fixpoints_ok in Hs₃.
+  2: apply mat_of_path_is_rotation_matrix.
+  unfold mat_of_path in Hs₃.
+  rewrite <- rotate_vec_mul in Hs₃.
+  move Hn₂ at bottom.
+  move Hr₂ at bottom.
+  move Hs₂ at bottom.
+  move Hr₃ at bottom.
+  move Hs₃ at bottom.
+bbb.
+
+destruct (eq_point_dec q q') as [Heqq| Hneqq].
+ subst nf no nf' no'.
+ unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
+ rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
+ rewrite Hq, Hq' in Heqq.
+ rewrite Hq₂, Hq₃ in Heqq.
+SearchAbout (rotation_fixpoint (mat_of_path _)).
+Check matrix_all_fixpoints_ok.
+
+Print J.
+
+bbb.
 assert (p₂ = q₂).
-(**)
  subst nf no nf' no'.
  unfold fixpoint_of_nat, fixpoint_of_path in Hq₂.
  rewrite path_of_nat_inv in Hq₂, Hq, Hq'.
  generalize Hq₂; intros H.
  apply matrix_all_fixpoints_ok in H.
+  2: apply mat_of_path_is_rotation_matrix.
   unfold mat_of_path in H.
   rewrite <- rotate_vec_mul in H.
   move Hn₂ at bottom.
