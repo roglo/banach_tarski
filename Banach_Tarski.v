@@ -2179,11 +2179,27 @@ intros M HM.
 destruct HM as (Hrm & p & p' & n & Hp & Hp' & HM).
 destruct Hp as (el & p₂ & Hso₂ & Hn₂ & Hr₂).
 destruct Hp' as (el' & p₃ & Hso₃ & Hn₃& Hr₃).
-
-bbb.
-
-unfold J_of_nats.
+destruct Hso₂ as (el₂ & Hso₂).
+destruct Hso₃ as (el₃ & Hso₃).
+apply rotate_rev_path in Hso₂.
+apply rotate_rev_path in Hso₃.
+remember (nat_of_path el) as nf eqn:Hnf.
+remember (nat_of_path (rev_path el₂)) as no eqn:Hno.
+remember (nat_of_path el') as nf' eqn:Hnf'.
+remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
+exists (nf, no, nf', no'); simpl.
 remember ∥p₁∥ as r eqn:Hr.
+remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
+remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
+remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
+remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
+subst nf no nf' no'.
+unfold fixpoint_of_nat in Hq₂, Hq₃.
+rewrite path_of_nat_inv in Hq₂, Hq, Hq₃, Hq'.
+unfold fixpoint_of_path in Hq₂.
+assert (p₂ = q₂).
+ subst q₂.
+SearchAbout rotation_fixpoint.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
