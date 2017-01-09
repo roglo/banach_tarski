@@ -2145,8 +2145,7 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
-(* J = set of rotations mapping a point of D to some (other of same) point
-   of D. *)
+(* J = set of rotations mapping a point of D to some point of D. *)
 Definition J p₁ :=
   mkset
     (λ R₁, R₁ ∈ rotation_around p₁ ∧
@@ -2193,13 +2192,24 @@ remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
 remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
 remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
+assert (p₂ = q₂).
+ apply D_of_nat_prop with
+   (nf := nf) (no := no) (el := rev_path el₂) (n := nat_of_prod_nat (nf, no))
+   (p := q) in Hq₂.
+  subst nf no nf' no'.
+  rewrite path_of_nat_inv in Hq₂, Hq, Hq'.
+  destruct Hq₂ as (Hsoq₂ & Hrq₂).
+  move Hn₂ at bottom.
+  move Hr₂ at bottom.
+  move Hrq₂ at bottom.
+bbb.
+  clear - Hn₂ Hr₂ Hrq₂.
+bbb.
+
 subst nf no nf' no'.
 unfold fixpoint_of_nat in Hq₂, Hq₃.
 rewrite path_of_nat_inv in Hq₂, Hq, Hq₃, Hq'.
 unfold fixpoint_of_path in Hq₂.
-assert (p₂ = q₂).
- subst q₂.
-SearchAbout rotation_fixpoint.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
