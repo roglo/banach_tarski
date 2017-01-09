@@ -2212,6 +2212,34 @@ apply matrix_all_fixpoints_ok in Hs₂.
   move Hs₂ at bottom.
   move Hr₃ at bottom.
   move Hs₃ at bottom.
+
+Theorem glop : ∀ p₁ p₂ el,
+  ∥p₁∥ = ∥p₂∥
+  → norm_list el ≠ []
+  → fold_right rotate p₁ el = p₁
+  → fold_right rotate p₂ el = p₂
+  → p₁ = p₂.
+Proof.
+intros * Hpp Hn Hr₁ Hr₂.
+rewrite rotate_vec_mul in Hr₁, Hr₂.
+fold (mat_of_path el) in Hr₁, Hr₂.
+remember (mat_of_path el) as M eqn:HM.
+destruct (eq_point_dec p₁ p₂) as [| Hneq]; [ easy | ].
+assert (Hrm : is_rotation_matrix M).
+ subst M; apply mat_of_path_is_rotation_matrix.
+
+ assert (Hni : M ≠ mat_id).
+  now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
+
+  specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp).
+(* ah oui mais non *)
+bbb.
+
+revert p₁ p₂ Hpp Hn Hr₁ Hr₂.
+induction el as [| e₁ el]; intros; [ easy | ].
+simpl in Hr₁, Hr₂.
+destruct e₁ as (t, d); destruct t, d.
+
 bbb.
 
 destruct (eq_point_dec q q') as [Heqq| Hneqq].
