@@ -2234,7 +2234,20 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
 
    now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
 
-  destruct (eq_point_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
+  destruct (eq_point_dec p₂ 0%vec) as [Hz| Hnz].
+   subst p₂; rewrite vec_norm_0 in Hpp.
+   apply vec_norm_eq_0 in Hpp.
+   now left.
+
+   destruct (eq_point_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
+   apply neq_negb in Hnn.
+   rewrite <- is_neg_point_neg_point in Hnn; [ | easy ].
+About neg_point.
+About vec_opp.
+Print neg_point.
+Print vec_opp.
+
+bbb.
   specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni).
 
 bbb.
