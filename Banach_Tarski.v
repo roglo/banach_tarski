@@ -2176,6 +2176,14 @@ intros.
 apply surj_prod_4_nat_surj_nat.
 exists (J_of_nats p₁).
 intros M HM.
+destruct HM as (Hrm & p & p' & n & Hp & Hp' & HM).
+destruct Hp as (el & p₂ & Hso₂ & Hn₂ & Hr₂).
+destruct Hp' as (el' & p₃ & Hso₃ & Hn₃& Hr₃).
+
+bbb.
+
+unfold J_of_nats.
+remember ∥p₁∥ as r eqn:Hr.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
