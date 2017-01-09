@@ -2218,21 +2218,22 @@ Theorem glop : ∀ p₁ p₂ el,
   → norm_list el ≠ []
   → fold_right rotate p₁ el = p₁
   → fold_right rotate p₂ el = p₂
-  → p₁ = p₂.
+  → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
 Proof.
 intros * Hpp Hn Hr₁ Hr₂.
 rewrite rotate_vec_mul in Hr₁, Hr₂.
 fold (mat_of_path el) in Hr₁, Hr₂.
 remember (mat_of_path el) as M eqn:HM.
-destruct (eq_point_dec p₁ p₂) as [| Hneq]; [ easy | ].
-assert (Hrm : is_rotation_matrix M).
- subst M; apply mat_of_path_is_rotation_matrix.
+destruct (Bool.bool_dec (is_neg_point p₁) (is_neg_point p₂)) as [Hnn| Hnn].
+ destruct (eq_point_dec p₁ p₂) as [Heq| ]; [ now left | exfalso ].
+ assert (Hrm : is_rotation_matrix M).
+  subst M; apply mat_of_path_is_rotation_matrix.
 
- assert (Hni : M ≠ mat_id).
-  now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
+  assert (Hni : M ≠ mat_id).
+   now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
 
-  specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp).
-(* ah oui mais non *)
+   now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
+
 bbb.
 
 revert p₁ p₂ Hpp Hn Hr₁ Hr₂.
