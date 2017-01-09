@@ -113,7 +113,7 @@ Qed.
 Theorem antipode_on_sphere_after_rotation : ∀ p m r,
   p ∈ sphere r
   → is_rotation_matrix m
-  → mat_vec_mul m (neg_point p) ∈ sphere r.
+  → mat_vec_mul m (- p) ∈ sphere r.
 Proof.
 intros * His Hm.
 destruct p as (x, y, z).

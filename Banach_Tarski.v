@@ -874,8 +874,8 @@ Qed.
 Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
   let p := rotation_fixpoint (mat_of_path (path_of_nat nf)) r in
   let p₁ :=
-    if is_neg_point p then if (b : bool) then p else neg_point p
-    else if b then neg_point p else p
+    if is_neg_point p then if (b : bool) then p else (- p)%vec
+    else if b then (- p)%vec else p
   in
   fold_right rotate p₁ (path_of_nat no).
 
@@ -1208,7 +1208,7 @@ destruct (Req_dec a 0) as [Ha| Ha].
     rewrite Hvn in Hn.
     do 3 rewrite <- Ropp_mult_distr_l in Hn.
     do 3 rewrite Rmult_1_l in Hn.
-    fold (neg_point (P x₁ y₁ z₁)) in Hn.
+    fold (vec_opp (P x₁ y₁ z₁)) in Hn.
     rewrite is_neg_point_neg_point in Hn; [ | easy ].
     now symmetry in Hn; apply no_fixpoint_negb in Hn.
 
@@ -1693,7 +1693,7 @@ destruct (eq_point_dec U (P 0 0 0)) as [Hv₁| Hv₁].
      destruct U as (x, y, z); simpl in HbV.
      do 3 rewrite <- Ropp_mult_distr_l in HbV.
      do 3 rewrite Rmult_1_l in HbV.
-     fold (neg_point (P x y z)) in HbV.
+     fold (vec_opp (P x y z)) in HbV.
      rewrite HbV in Hn.
      rewrite is_neg_point_neg_point in Hn; [ | easy ].
      now symmetry in Hn; apply no_fixpoint_negb in Hn.
@@ -1870,21 +1870,21 @@ assert (Hrm : is_rotation_matrix m).
     now rewrite Hsr₁, Hsr₂.
 Qed.
 
-Definition sphere_sym S := mkset (λ p, neg_point p ∈ S).
+Definition sphere_sym S := mkset (λ p, (- p)%vec ∈ S).
 
-Theorem sphere_sym_neg_point : ∀ p, p ∈ sphere_sym D → neg_point p ∈ D.
+Theorem sphere_sym_neg_point : ∀ p, p ∈ sphere_sym D → (- p)%vec ∈ D.
 Proof.
 intros (x, y, z) (el₁ & p₁ & Hso & Hn & Hr).
 now exists el₁, p₁.
 Qed.
 
-Theorem neg_point_in_sphere : ∀ r p, p ∈ sphere r → neg_point p ∈ sphere r.
+Theorem neg_point_in_sphere : ∀ r p, p ∈ sphere r → (- p)%vec ∈ sphere r.
 Proof.
 intros r (x, y, z) Hp; simpl.
 now do 3 rewrite <- Rsqr_neg.
 Qed.
 
-Theorem neg_point_in_ball : ∀ p, p ∈ ball → neg_point p ∈ ball.
+Theorem neg_point_in_ball : ∀ p, p ∈ ball → (- p)%vec ∈ ball.
 Proof.
 intros (x, y, z) Hp; simpl.
 now do 3 rewrite <- Rsqr_neg.
@@ -1896,10 +1896,10 @@ Theorem D_set_symmetry_is_countable : ∀ r,
 Proof.
 intros r.
 specialize (D_set_is_countable r) as (f, Hf).
-exists (λ n, neg_point (f n)).
+exists (λ n, (- f n)%vec).
 intros p Hp.
-enough (Hn : neg_point p ∈ D ∩ sphere r).
- specialize (Hf (neg_point p) Hn) as (n & Hf).
+enough (Hn : (- p)%vec ∈ D ∩ sphere r).
+ specialize (Hf ((- p)%vec) Hn) as (n & Hf).
  exists n; rewrite Hf.
  apply neg_point_involutive.
 
@@ -2163,9 +2163,49 @@ Definition J_of_nats (p₁ : point) '(nf, no, nf', no'(*, n*)) : matrix ℝ :=
   if eq_point_dec p p' then mat_id
   else if eq_point_dec p₁ px then
     matrix_of_axis_cos_sin_angle px cosθ sinθ
-  else if eq_point_dec p₁ (neg_point px) then
+  else if eq_point_dec p₁ (- px) then
     matrix_of_axis_cos_sin_angle px cosθ (- sinθ)
   else mat_id.
+
+Theorem rotate_unicity : ∀ p₁ p₂ el,
+  ∥p₁∥ = ∥p₂∥
+  → norm_list el ≠ []
+  → fold_right rotate p₁ el = p₁
+  → fold_right rotate p₂ el = p₂
+  → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
+Proof.
+intros * Hpp Hn Hr₁ Hr₂.
+rewrite rotate_vec_mul in Hr₁, Hr₂.
+fold (mat_of_path el) in Hr₁, Hr₂.
+remember (mat_of_path el) as M eqn:HM.
+assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
+ split; [ subst M; apply mat_of_path_is_rotation_matrix | ].
+ now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
+
+ destruct H as (Hrm & Hni).
+ destruct (Bool.bool_dec (is_neg_point p₁) (is_neg_point p₂)) as [Hnn| Hnn].
+  destruct (eq_point_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
+
+   now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
+
+  destruct (eq_point_dec p₂ 0%vec) as [Hz| Hnz].
+   subst p₂; rewrite vec_norm_0 in Hpp.
+   apply vec_norm_eq_0 in Hpp.
+   now left.
+
+   destruct (eq_point_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
+   apply neq_negb in Hnn.
+   assert (Hpp2 : ∥p₁∥ = ∥(-p₂)∥).
+    rewrite Hpp; destruct p₂ as (x, y, z); simpl.
+    now do 3 rewrite <- Rsqr_neg.
+
+    rewrite <- is_neg_point_neg_point in Hnn; [ | easy ].
+    assert (Hr₂2 : (M * - p₂ = - p₂)%vec).
+     now rewrite mat_opp_vec_mul_distr_r, Hr₂.
+    
+     specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni Hpp2 Hnn Hr₁ Hr₂2).
+     easy.
+Qed.
 
 Theorem J_is_countable : ∀ p₁,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
@@ -2212,43 +2252,8 @@ apply matrix_all_fixpoints_ok in Hs₂.
   move Hs₂ at bottom.
   move Hr₃ at bottom.
   move Hs₃ at bottom.
-
-Theorem glop : ∀ p₁ p₂ el,
-  ∥p₁∥ = ∥p₂∥
-  → norm_list el ≠ []
-  → fold_right rotate p₁ el = p₁
-  → fold_right rotate p₂ el = p₂
-  → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
-Proof.
-intros * Hpp Hn Hr₁ Hr₂.
-rewrite rotate_vec_mul in Hr₁, Hr₂.
-fold (mat_of_path el) in Hr₁, Hr₂.
-remember (mat_of_path el) as M eqn:HM.
-assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
- split; [ subst M; apply mat_of_path_is_rotation_matrix | ].
- now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
-
- destruct H as (Hrm & Hni).
- destruct (Bool.bool_dec (is_neg_point p₁) (is_neg_point p₂)) as [Hnn| Hnn].
-  destruct (eq_point_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
-
-   now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
-
-  destruct (eq_point_dec p₂ 0%vec) as [Hz| Hnz].
-   subst p₂; rewrite vec_norm_0 in Hpp.
-   apply vec_norm_eq_0 in Hpp.
-   now left.
-
-   destruct (eq_point_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
-   apply neq_negb in Hnn.
-   rewrite <- is_neg_point_neg_point in Hnn; [ | easy ].
-About neg_point.
-About vec_opp.
-Print neg_point.
-Print vec_opp.
-
-bbb.
-  specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni).
+  apply rotate_unicity with (p₁ := p₂) in Hs₂; try easy.
+Focus 2.
 
 bbb.
 

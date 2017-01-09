@@ -377,8 +377,6 @@ Definition mkrmat := @mkmat ℝ.
 
 Inductive point := P : ℝ → ℝ → ℝ → point.
 
-Definition neg_point '(P x y z) := P (-x) (-y) (-z).
-
 Definition mat_vec_mul M '(P x y z) :=
   P (a₁₁ M * x + a₁₂ M * y + a₁₃ M * z)
     (a₂₁ M * x + a₂₂ M * y + a₂₃ M * z)
@@ -452,6 +450,8 @@ Definition is_neg_point '(P x y z) :=
   else if Rgt_dec z 0 then false
   else true.
 
+Arguments is_neg_point _%vec.
+
 Theorem rot_x_means_rot_x : rot_x = rot_mat_of_axis_cos (P 1 0 0) (1/3).
 Proof.
 unfold rot_x; simpl.
@@ -517,6 +517,8 @@ destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
 
 now intros H; injection H; intros.
 Qed.
+
+Arguments eq_point_dec _%vec _%vec.
 
 Theorem rmat_eq_dec : ∀ m₁ m₂ : matrix ℝ, { m₁ = m₂ } + { m₁ ≠ m₂ }.
 Proof.
@@ -1075,7 +1077,7 @@ unfold vec_const_mul.
 now do 3 rewrite Rmult_1_l.
 Qed.
 
-Theorem neg_point_involutive : ∀ p, neg_point (neg_point p) = p.
+Theorem neg_point_involutive : ∀ p, (- - p)%vec = p.
 Proof.
 intros (x, y, z); simpl.
 now do 3 rewrite Ropp_involutive.
@@ -1091,7 +1093,7 @@ Qed.
 
 Theorem is_neg_point_neg_point : ∀ V,
   V ≠ 0%vec
-  → is_neg_point (neg_point V) = negb (is_neg_point V).
+  → is_neg_point (- V) = negb (is_neg_point V).
 Proof.
 intros (x, y, z) HV; simpl.
 destruct (Rlt_dec x 0) as [Hx| Hx].
@@ -1347,4 +1349,9 @@ Proof.
 intros; simpl.
 do 9 rewrite Rmult_0_r.
 now do 2 rewrite Rplus_0_r.
+Qed.
+
+Theorem mat_opp_vec_mul_distr_r : ∀ M V, (M * - V = - (M * V))%vec.
+Proof.
+intros M (x, y, z); simpl; f_equal; lra.
 Qed.
