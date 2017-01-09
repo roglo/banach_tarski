@@ -2224,15 +2224,18 @@ intros * Hpp Hn Hr₁ Hr₂.
 rewrite rotate_vec_mul in Hr₁, Hr₂.
 fold (mat_of_path el) in Hr₁, Hr₂.
 remember (mat_of_path el) as M eqn:HM.
-destruct (Bool.bool_dec (is_neg_point p₁) (is_neg_point p₂)) as [Hnn| Hnn].
- destruct (eq_point_dec p₁ p₂) as [Heq| ]; [ now left | exfalso ].
- assert (Hrm : is_rotation_matrix M).
-  subst M; apply mat_of_path_is_rotation_matrix.
+assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
+ split; [ subst M; apply mat_of_path_is_rotation_matrix | ].
+ now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
 
-  assert (Hni : M ≠ mat_id).
-   now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
+ destruct H as (Hrm & Hni).
+ destruct (Bool.bool_dec (is_neg_point p₁) (is_neg_point p₂)) as [Hnn| Hnn].
+  destruct (eq_point_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
 
    now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
+
+  destruct (eq_point_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
+  specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni).
 
 bbb.
 
