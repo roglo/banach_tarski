@@ -2158,13 +2158,8 @@ Qed.
 Definition J p₁ :=
   mkset
     (λ R₁, R₁ ∈ rotation_around p₁ ∧
-     ∃ p p' n, p ∈ D ∧ p' ∈ D ∧ ((R₁ ^ n)%mat * p)%vec = p').
-
-(* warning: this set J is not countable, because D is not; what
-   is countable is D ∩ sphere r, for any r, not D alone; therefore
-   this definition of J should be changed. *)
-
-bbb.
+     ∃ p p' n, p ∈ D ∩ sphere ∥p₁∥ ∧ p' ∈ D ∩ sphere ∥p₁∥ ∧
+     ((R₁ ^ n)%mat * p)%vec = p').
 
 Definition J_of_nats (p₁ : point) '(nf, no, nf', no'(*, n*)) : matrix ℝ :=
   let r := ∥p₁∥ in
@@ -2231,8 +2226,8 @@ apply surj_prod_4_nat_surj_nat.
 exists (J_of_nats p₁).
 intros M HM.
 destruct HM as (Hrm & p & p' & n & Hp & Hp' & HM).
-destruct Hp as (el & p₂ & Hso₂ & Hn₂ & Hr₂).
-destruct Hp' as (el' & p₃ & Hso₃ & Hn₃& Hr₃).
+destruct Hp as ((el & p₂ & Hso₂ & Hn₂ & Hr₂) & Hp).
+destruct Hp' as ((el' & p₃ & Hso₃ & Hn₃& Hr₃) & Hp').
 destruct Hso₂ as (el₂ & Hso₂).
 destruct Hso₃ as (el₃ & Hso₃).
 apply rotate_rev_path in Hso₂.
@@ -2271,6 +2266,26 @@ apply matrix_all_fixpoints_ok in Hs₂.
 Focus 2.
    rewrite Hq₂.
    rewrite rotation_fixpoint_norm.
+    apply rotate_rev_path in Hso₂.
+    rewrite rotate_vec_mul in Hso₂.
+    rewrite rev_path_involutive in Hso₂.
+    remember (fold_right mat_mul mat_id (map mat_of_elem el₂)) as M₂ eqn:HM₂.
+    apply on_sphere_after_rotation with (m := M₂) in Hp.
+     2: subst M₂; apply mat_of_path_is_rotation_matrix.
+     rewrite Hso₂ in Hp.
+     apply on_sphere_norm; [ | easy ].
+     rewrite Hr; apply vec_norm_nonneg.
+
+    rewrite Hr; apply vec_norm_nonneg.
+bbb.
+
+   Check on_sphere_after_rotation.
+SearchAbout (fold_right rotate).
+
+bbb.
+(* return to previous *)
+   destruct p as (x, y, z); simpl in Hp.
+   destruct p₂ as (x₂, y₂, z₂); simpl in Hso₂.
 
 bbb.
 
