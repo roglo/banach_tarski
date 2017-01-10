@@ -2217,6 +2217,7 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
+(*
 Theorem twice_mat_of_path_neq_its_transp : ∀ el,
   norm_list el ≠ []
   → mat_of_path (el ++ el) ≠ mat_transp (mat_of_path (el ++ el)).
@@ -2226,33 +2227,13 @@ rewrite mat_of_path_app.
 rewrite mat_transp_mul.
 bbb.
 
-unfold mat_mul.
-simpl.
-unfold mkrmat.
-remember (mat_of_path el) as M eqn:Hm; symmetry in Hm.
-destruct M; simpl.
-intros H; injection H; clear H; intros.
-
-bbb.
-
-SearchAbout mat_of_path.
-mat_of_path_app: ∀ el₁ el₂ : list free_elem, mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat
-matrix_of_non_empty_path_is_not_identity: ∀ el : list free_elem, norm_list el ≠ [] → mat_of_path el ≠ mat_id
-bbb.
-
 Theorem mat_of_path_neq_its_transp : ∀ el,
   norm_list el ≠ []
   → mat_of_path el ≠ mat_transp (mat_of_path el).
 Proof.
 intros * Hn H.
 bbb.
-
-remember (mat_of_path el) as M eqn:Hm; symmetry in Hm.
-destruct M; simpl.
-unfold mat_transp, mkrmat in H; simpl in H.
-injection H; clear H; intros; subst; clear H1 H3 H4.
-
-bbb.
+*)
 
 Theorem J_is_countable : ∀ p₁,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
@@ -2299,6 +2280,10 @@ apply matrix_all_fixpoints_ok in Hs₂.
   move Hs₂ at bottom.
   move Hr₃ at bottom.
   move Hs₃ at bottom.
+  remember (mat_of_path el) as M₁ eqn:HM₁.
+  destruct (mat_eq_dec M₁ (mat_transp M₁)) as [Heq| Hneq].
+
+bbb.
   apply rotate_unicity with (p₁ := p₂) in Hs₂; try easy.
 Focus 2.
    rewrite Hq₂.
@@ -2315,7 +2300,6 @@ Focus 2.
 
     rewrite Hr; apply vec_norm_nonneg.
 SearchAbout mat_transp.
-Check mat_of_path_neq_its_transp.
 
 bbb.
 
