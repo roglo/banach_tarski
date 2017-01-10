@@ -617,10 +617,10 @@ Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
 
 Theorem rotate_vec_mul : ∀ el p,
-  fold_right rotate p el
-  = mat_vec_mul (fold_right mat_mul mat_id (map mat_of_elem el)) p.
+  fold_right rotate p el = mat_vec_mul (mat_of_path el) p.
 Proof.
 intros el p.
+unfold mat_of_path.
 induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
 rewrite IHel, mat_vec_mul_assoc; reflexivity.
 Qed.
@@ -664,7 +664,6 @@ split.
  symmetry in Hp; apply rotate_rev_path in Hp; apply Hp.
 
  apply matrix_all_fixpoints_ok in Hp₁.
-  unfold mat_of_path in Hp₁.
   rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
 
   apply mat_of_path_is_rotation_matrix.
@@ -1756,7 +1755,6 @@ fold (mat_of_path el₁) in Hr.
 pose proof mat_of_path_is_rotation_matrix el as H.
 generalize Hsr; intros Hsr₁.
 eapply on_sphere_after_rotation in Hsr₁; [ clear H | apply H ].
-unfold mat_of_path in Hsr₁.
 rewrite <- rotate_vec_mul, Hs in Hsr₁.
 apply rotate_rev_path in Hs.
 remember (mat_of_path el₁) as m eqn:Hm.
@@ -2264,24 +2262,30 @@ symmetry.
 subst nf no nf' no'.
 unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
 rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
+rewrite rotate_vec_mul in Hr₂, Hr₃.
 generalize Hq₂; intros Hs₂.
 apply matrix_all_fixpoints_ok in Hs₂.
  2: apply mat_of_path_is_rotation_matrix.
- unfold mat_of_path in Hs₂.
- rewrite <- rotate_vec_mul in Hs₂.
-
  generalize Hq₃; intros Hs₃.
  apply matrix_all_fixpoints_ok in Hs₃.
   2: apply mat_of_path_is_rotation_matrix.
-  unfold mat_of_path in Hs₃.
-  rewrite <- rotate_vec_mul in Hs₃.
   move Hn₂ at bottom.
   move Hr₂ at bottom.
   move Hs₂ at bottom.
   move Hr₃ at bottom.
   move Hs₃ at bottom.
+bbb.
+
+ apply matrix_all_fixpoints_ok in Hs₃.
+  2: apply mat_of_path_is_rotation_matrix.
+  unfold mat_of_path in Hs₃.
+  rewrite <- rotate_vec_mul in Hs₃.
   remember (mat_of_path el) as M₁ eqn:HM₁.
   destruct (mat_eq_dec M₁ (mat_transp M₁)) as [Heq| Hneq].
+   rewrite rotate_vec_mul in Hr₂, Hs₂.
+   unfold mat_of_path in HM₁.
+   rewrite <- HM₁ in Hr₂, Hs₂.
+   fold (mat_of_path el) in HM₁.
 
 bbb.
   apply rotate_unicity with (p₁ := p₂) in Hs₂; try easy.
