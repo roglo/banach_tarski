@@ -328,3 +328,12 @@ destruct (Rcase_abs x) as [Hx| Hx].
  destruct (Rcase_abs y); lra.
  destruct (Rcase_abs y); lra.
 Qed.
+
+Theorem sqrt_inv : ∀ x, (0 < x)%R → (√ (/ x) = / √ x)%R.
+Proof.
+intros * Hx.
+replace (/ x)%R with (1 * / x)%R by lra.
+rewrite fold_Rdiv.
+rewrite sqrt_div; [ | apply Rle_0_1 | easy ].
+rewrite sqrt_1; lra.
+Qed.

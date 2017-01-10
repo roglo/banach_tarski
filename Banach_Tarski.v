@@ -561,6 +561,15 @@ assert (Hrnz : (r₁ ≠ 0)%R).
  apply sqrt_0.
 Qed.
 
+Theorem rotation_fixpoint_norm : ∀ M r, (0 ≤ r)%R
+  → M ≠ mat_transp M
+  → ∥(rotation_fixpoint M r)∥ = r.
+Proof.
+intros * HM Hr.
+apply rotation_fixpoint_on_sphere with (r := r) in Hr.
+now apply on_sphere_norm.
+Qed.
+
 Theorem matrix_all_fixpoints_ok : ∀ m p k,
   is_rotation_matrix m
   → p = rotation_fixpoint m k
@@ -2254,7 +2263,17 @@ apply matrix_all_fixpoints_ok in Hs₂.
   move Hs₃ at bottom.
   apply rotate_unicity with (p₁ := p₂) in Hs₂; try easy.
 Focus 2.
+   rewrite Hq₂.
+   rewrite rotation_fixpoint_norm.
+bbb.
 
+unfold sqrt.
+destruct (Rcase_abs (/ x)) as [H₁| H₁].
+ apply Rinv_lt_0_compat in H₁.
+ rewrite Rinv_involutive in H₁; lra.
+
+ destruct (Rcase_abs x) as [H₂| H₂]; [ lra | ].
+ unfold Rsqrt; simpl.
 bbb.
 
 revert p₁ p₂ Hpp Hn Hr₁ Hr₂.
