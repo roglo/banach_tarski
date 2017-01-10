@@ -2294,9 +2294,18 @@ apply matrix_all_fixpoints_ok in Hq₂.
   remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
   assert (Hpq : ∥p₂∥ = ∥q₂∥).
    specialize (on_sphere_norm p r Hrnn Hp); intros Hpr.
-   apply on_sphere_after_rotation with (m := M₂) in Hp.
-    2: subst M₂; apply mat_of_path_is_rotation_matrix.
-    rewrite <- Hso₂ in Hpr.
+   rewrite HM₂ in Hso₂.
+   rewrite <- rotate_vec_mul in Hso₂.
+   apply rotate_rev_path in Hso₂.
+   rewrite rev_path_involutive in Hso₂.
+   rewrite rotate_vec_mul in Hso₂.
+   apply on_sphere_after_rotation with (m := mat_of_path el₂) in Hp.
+    2: apply mat_of_path_is_rotation_matrix.
+    rewrite Hso₂ in Hp.
+    apply on_sphere_norm in Hp; [ rewrite Hp | easy ].
+
+    specialize (on_sphere_norm q r Hrnn).
+SearchAbout q₂.
 bbb.
 
    generalize Hq₂; intros H.
