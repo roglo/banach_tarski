@@ -2178,13 +2178,11 @@ Definition J_of_nats (p₁ : point) '(nf, no, nf', no'(*, n*)) : matrix ℝ :=
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ∥p₁∥ = ∥p₂∥
   → norm_list el ≠ []
-  → fold_right rotate p₁ el = p₁
-  → fold_right rotate p₂ el = p₂
+  → (mat_of_path el * p₁)%vec = p₁
+  → (mat_of_path el * p₂)%vec = p₂
   → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
 Proof.
 intros * Hpp Hn Hr₁ Hr₂.
-rewrite rotate_vec_mul in Hr₁, Hr₂.
-fold (mat_of_path el) in Hr₁, Hr₂.
 remember (mat_of_path el) as M eqn:HM.
 assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
  split; [ subst M; apply mat_of_path_is_rotation_matrix | ].
@@ -2214,6 +2212,19 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni Hpp2 Hnn Hr₁ Hr₂2).
      easy.
 Qed.
+
+(*
+Theorem rotate_unicity : ∀ p₁ p₂ el,
+  ∥p₁∥ = ∥p₂∥
+  → norm_list el ≠ []
+  → fold_right rotate p₁ el = p₁
+  → fold_right rotate p₂ el = p₂
+  → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
+Proof.
+intros * Hpp Hn Hr₁ Hr₂.
+rewrite rotate_vec_mul in Hr₁, Hr₂.
+fold (mat_of_path el) in Hr₁, Hr₂.
+*)
 
 (*
 Theorem twice_mat_of_path_neq_its_transp : ∀ el,
@@ -2263,17 +2274,33 @@ subst nf no nf' no'.
 unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
 rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
 rewrite rotate_vec_mul in Hr₂, Hr₃.
-generalize Hq₂; intros Hs₂.
-apply matrix_all_fixpoints_ok in Hs₂.
+(*
+rotation_fixpoint = λ (m : matrix ℝ) (k : ℝ), k ⁎ rotation_unit_eigenvec m
+Hq₂ : q₂ = rotation_fixpoint (mat_of_path el) r
+*)
+apply matrix_all_fixpoints_ok in Hq₂.
  2: apply mat_of_path_is_rotation_matrix.
- generalize Hq₃; intros Hs₃.
- apply matrix_all_fixpoints_ok in Hs₃.
+ apply matrix_all_fixpoints_ok in Hq₃.
   2: apply mat_of_path_is_rotation_matrix.
   move Hn₂ at bottom.
   move Hr₂ at bottom.
-  move Hs₂ at bottom.
+  move Hq₂ at bottom.
   move Hr₃ at bottom.
-  move Hs₃ at bottom.
+  move Hq₃ at bottom.
+  rewrite rotate_vec_mul in Hso₂, Hso₃.
+  assert (Hrnn : (0 ≤ r)%R) by (subst r; apply vec_norm_nonneg).
+  move Hrnn before r.
+  remember (mat_of_path (rev_path el₂)) as M₂ eqn:HM₂.
+  remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
+  assert (Hpq : ∥p₂∥ = ∥q₂∥).
+   specialize (on_sphere_norm p r Hrnn Hp); intros Hpr.
+   apply on_sphere_after_rotation with (m := M₂) in Hp.
+    2: subst M₂; apply mat_of_path_is_rotation_matrix.
+    rewrite <- Hso₂ in Hpr.
+bbb.
+
+   generalize Hq₂; intros H.
+   apply rotate_unicity with (p₁ := p₂) in H; try easy.
 bbb.
 
  apply matrix_all_fixpoints_ok in Hs₃.
