@@ -2160,6 +2160,12 @@ Definition J p₁ :=
     (λ R₁, R₁ ∈ rotation_around p₁ ∧
      ∃ p p' n, p ∈ D ∧ p' ∈ D ∧ ((R₁ ^ n)%mat * p)%vec = p').
 
+(* warning: this set J is not countable, because D is not; what
+   is countable is D ∩ sphere r, for any r, not D alone; therefore
+   this definition of J should be changed. *)
+
+bbb.
+
 Definition J_of_nats (p₁ : point) '(nf, no, nf', no'(*, n*)) : matrix ℝ :=
   let r := ∥p₁∥ in
   let p₂ := fixpoint_of_nat r nf in
@@ -2265,6 +2271,7 @@ apply matrix_all_fixpoints_ok in Hs₂.
 Focus 2.
    rewrite Hq₂.
    rewrite rotation_fixpoint_norm.
+
 bbb.
 
 unfold sqrt.
