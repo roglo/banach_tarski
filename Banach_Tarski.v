@@ -2162,7 +2162,12 @@ Definition J p₁ :=
 Definition cos_add a b := (cos a * cos b - sin a * sin b)%R.
 Definition sin_add a b := (sin a * cos b + cos a * sin b)%R.
 
-(* there is no definition of arccos in Coq: what do I do? *)
+(*
+Should define these, like cos ans sin are defined in Coq
+
+arcsin(x) = Σ(n=0,∞), (2n)!/(2^2n.(n!)²).x^(2n+1)/(2n+1)
+arccos(x) = π/2-arcsin(x)
+*)
 
 bbb.
 
