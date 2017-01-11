@@ -2159,161 +2159,11 @@ Definition J p₁ :=
      ∃ p p' n, p ∈ D ∩ sphere ∥p₁∥ ∧ p' ∈ D ∩ sphere ∥p₁∥ ∧
      ((R₁ ^ n)%mat * p)%vec = p').
 
+Definition arcsin x := atan (x / sqrt (1 - x²)).
+Definition arccos x := (PI / 2 - arcsin x)%R.
+
 Definition cos_add a b := (cos a * cos b - sin a * sin b)%R.
 Definition sin_add a b := (sin a * cos b + cos a * sin b)%R.
-
-(*
-arcsin(x) = Σ(n=0,∞), (2n)!/(2^2n.(n!)²).x^(2n+1)/(2n+1)
-arccos(x) = π/2-arcsin(x)
-*)
-
-Definition arcsin_n (n : ℕ) : ℝ :=
-  INR (fact (2 * n)) / INR (4 ^ n * (fact n) ^ 2 * (2 * n + 1)).
-
-Definition arcsin_in (x l : ℝ) : Prop :=
-  infinite_sum (λ i : ℕ, arcsin_n i * x ^ i)%R l.
-
-(* not sure the following lemma is useful, because arcsin_n (S n) / arcsin_n n
-   does not converge to 1, but to 1; I should rather learn from atan in
-   Ratan.v. *)
-
-bbb.
-
-Lemma simpl_arcsin_n : ∀ n : ℕ,
-  (arcsin_n (S n) / arcsin_n n)%R =
-  (INR (4 * n ^ 2 + 4 * n + 1) / INR (4 * n ^ 2 + 10 * n + 6))%R.
-Proof.
-intros; unfold arcsin_n; replace (S n) with (n + 1)%nat; [ idtac | ring ].
-bbb.
-rewrite pow_add; unfold Rdiv; rewrite Rinv_mult_distr.
-  rewrite Rinv_involutive.
-  replace
-  ((-1) ^ n * (-1) ^ 1 * / INR (fact (2 * (n + 1) + 1)) *
-    (/ (-1) ^ n * INR (fact (2 * n + 1)))) with
-  ((-1) ^ n * / (-1) ^ n * / INR (fact (2 * (n + 1) + 1)) *
-    INR (fact (2 * n + 1)) * (-1) ^ 1); [ idtac | ring ].
-  rewrite <- Rinv_r_sym.
-  rewrite Rmult_1_l; unfold pow; rewrite Rmult_1_r;
-    replace (2 * (n + 1) + 1)%nat with (S (S (2 * n + 1))).
-  do 2 rewrite fact_simpl; do 2 rewrite mult_INR;
-    repeat rewrite Rinv_mult_distr.
-  rewrite <- (Rmult_comm (-1)); repeat rewrite Rmult_assoc;
-    rewrite <- Rinv_l_sym.
-  rewrite Rmult_1_r; replace (S (2 * n + 1)) with (2 * (n + 1))%nat.
-  repeat rewrite mult_INR; repeat rewrite Rinv_mult_distr.
-  ring.
-  apply not_O_INR; discriminate.
-  replace (n + 1)%nat with (S n); [ apply not_O_INR; discriminate | ring ].
-  apply not_O_INR; discriminate.
-  apply prod_neq_R0.
-  apply not_O_INR; discriminate.
-  replace (n + 1)%nat with (S n); [ apply not_O_INR; discriminate | ring ].
-  apply not_O_INR; discriminate.
-  replace (n + 1)%nat with (S n); [ apply not_O_INR; discriminate | ring ].
-  rewrite mult_plus_distr_l; cut (forall n:nat, S n = (n + 1)%nat).
-  intros; rewrite (H (2 * n + 1)%nat).
-  ring.
-  intros; ring.
-  apply INR_fact_neq_0.
-  apply not_O_INR; discriminate.
-  apply INR_fact_neq_0.
-  apply not_O_INR; discriminate.
-  apply prod_neq_R0; [ apply not_O_INR; discriminate | apply INR_fact_neq_0 ].
-  cut (forall n:nat, S (S n) = (n + 2)%nat);
-    [ intros; rewrite (H (2 * n + 1)%nat); ring | intros; ring ].
-  apply pow_nonzero; discrR.
-  apply INR_fact_neq_0.
-  apply pow_nonzero; discrR.
-  apply Rinv_neq_0_compat; apply INR_fact_neq_0.
-Qed.
-
-(* mmm... this lemma, copied from Coq lib for sin, seems to be false for arcsin
-   because the coefficient does not converge to 0, but to 1. The function converges
-   because of x, which has to be between -1 and 1 (excluded) *)
-
-(*
-Lemma Alembert_arcsin : Un_cv (λ n : ℕ, Rabs (arcsin_n (S n) / arcsin_n n)) 0.
-Proof.
-unfold Un_cv; intros; assert (H0 := archimed_cor1 eps H).
-elim H0; intros; exists x.
-bbb.
-  intros; rewrite simpl_sin_n; unfold R_dist; unfold Rminus;
-    rewrite Ropp_0; rewrite Rplus_0_r; rewrite Rabs_Rabsolu;
-      rewrite Rabs_Ropp; rewrite Rabs_right.
-  rewrite mult_INR; rewrite Rinv_mult_distr.
-  cut (/ INR (2 * S n) < 1)%R.
-  intro; cut (/ INR (2 * S n + 1) < eps)%R.
-  intro; rewrite <- (Rmult_1_l eps); rewrite (Rmult_comm (/ INR (2 * S n + 1)));
-    apply Rmult_gt_0_lt_compat; try assumption.
-  change (0 < / INR (2 * S n + 1))%R; apply Rinv_0_lt_compat;
-    apply lt_INR_0; replace (2 * S n + 1)%nat with (S (2 * S n));
-      [ apply lt_O_Sn | ring ].
-  apply Rlt_0_1.
-  cut (x < 2 * S n + 1)%nat.
-  intro; assert (H5 := lt_INR _ _ H4); apply Rlt_trans with (/ INR x)%R.
-  apply Rinv_lt_contravar.
-  apply Rmult_lt_0_compat.
-  apply lt_INR_0; elim H1; intros; assumption.
-  apply lt_INR_0; replace (2 * S n + 1)%nat with (S (2 * S n));
-    [ apply lt_O_Sn | ring ].
-  assumption.
-  elim H1; intros; assumption.
-  apply lt_le_trans with (S n).
-  unfold ge in H2; apply le_lt_n_Sm; assumption.
-  replace (2 * S n + 1)%nat with (S (2 * S n)); [ idtac | ring ].
-  apply le_S; apply le_n_2n.
-  apply Rmult_lt_reg_l with (INR (2 * S n)).
-  apply lt_INR_0; replace (2 * S n)%nat with (S (S (2 * n)));
-    [ apply lt_O_Sn | replace (S n) with (n + 1)%nat; [ idtac | ring ]; ring ].
-  rewrite <- Rinv_r_sym.
-  rewrite Rmult_1_r; replace 1%R with (INR 1); [ apply lt_INR | reflexivity ].
-  replace (2 * S n)%nat with (S (S (2 * n))).
-  apply lt_n_S; apply lt_O_Sn.
-  replace (S n) with (n + 1)%nat; [ ring | ring ].
-  apply not_O_INR; discriminate.
-  apply not_O_INR; discriminate.
-  apply not_O_INR; discriminate.
-  left; change (0 < / INR ((2 * S n + 1) * (2 * S n)))%R;
-    apply Rinv_0_lt_compat.
-  apply lt_INR_0.
-  replace ((2 * S n + 1) * (2 * S n))%nat with
-  (S (S (S (S (S (S (4 * (n * n) + 10 * n))))))).
-  apply lt_O_Sn.
-  apply INR_eq; repeat rewrite S_INR; rewrite plus_INR; repeat rewrite mult_INR;
-    rewrite plus_INR; rewrite mult_INR; repeat rewrite S_INR;
-      replace (INR 0) with 0%R; [ ring | reflexivity ].
-Qed.
-*)
-
-Lemma arcsin_no_R0 : ∀ n : ℕ, arcsin_n n ≠ 0%R.
-Proof.
-intros; unfold arcsin_n; unfold Rdiv.
-apply prod_neq_R0; [ apply INR_fact_neq_0 | ].
-apply Rinv_neq_0_compat, not_0_INR.
-apply Nat.neq_mul_0.
-split; [ apply Nat.neq_mul_0; split | ].
- now apply Nat.pow_nonzero.
-
- apply Nat.pow_nonzero, fact_neq_0.
-
- now intros H; apply Nat.eq_add_0 in H; destruct H.
-Qed.
-
-Lemma exist_arcsin : ∀ x : ℝ, { l : ℝ | arcsin_in x l }.
-Proof.
-intros; generalize (Alembert_C3 arcsin_n x arcsin_no_R0 Alembert_arcsin).
-bbb.
-
-(* code of exist_sin *)
-intros; generalize (Alembert_C3 sin_n x sin_no_R0 Alembert_sin).
-unfold Pser, sin_n; trivial.
-bbb.
-
-Definition arcsin (x : ℝ) : ℝ := let (a, _) := exist_arcsin (Rsqr x) in x * a.
-
-bbb.
-
-(* sin (x / 2) = √ ((1 - cos x) / 2), in [0..2π] *)
 
 Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let r := ∥p₁∥ in
@@ -2322,8 +2172,8 @@ Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
   let cosa := ((p · p') / r²)%R in
-  let cosθ := cos_add (arccos a / n) (2 * k * PI / n) in
-  let sinθ := sin_add (arccos a / n) (2 * k * PI / n) in
+  let cosθ := cos_add (arccos cosa / INR n) (2 * INR k * PI / INR n) in
+  let sinθ := sin_add (arccos cosa / INR n) (2 * INR k * PI / INR n) in
   let px := p × p' in
   if eq_point_dec p p' then mat_id
   else if eq_point_dec p₁ px then
@@ -2376,6 +2226,8 @@ Theorem J_is_countable : ∀ p₁,
 Proof.
 intros.
 apply surj_prod_4_nat_surj_nat.
+bbb.
+
 exists (J_of_nats p₁).
 intros M HM.
 destruct HM as (Hrm & p & p' & n & Hp & Hp' & HM).
