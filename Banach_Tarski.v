@@ -2159,14 +2159,22 @@ Definition J p₁ :=
      ∃ p p' n, p ∈ D ∩ sphere ∥p₁∥ ∧ p' ∈ D ∩ sphere ∥p₁∥ ∧
      ((R₁ ^ n)%mat * p)%vec = p').
 
-Definition J_of_nats (p₁ : point) '(nf, no, nf', no'(*, n*)) : matrix ℝ :=
+Definition cos_add a b := (cos a * cos b - sin a * sin b)%R.
+Definition sin_add a b := (sin a * cos b + cos a * sin b)%R.
+
+(* there is no definition of arccos in Coq: what do I do? *)
+
+bbb.
+
+Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let r := ∥p₁∥ in
   let p₂ := fixpoint_of_nat r nf in
   let p := fold_right rotate p₂ (path_of_nat no) in
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
-  let cosθ := ((p · p') / r)%R in
-  let sinθ := √ (1 - cosθ²) in
+  let a := arccos ((p · p') / r²) in
+  let cosθ := cos_add (a / n) (2 * k * PI / n) in
+  let sinθ := sin_add (a / n) (2 * k * PI / n) in
   let px := p × p' in
   if eq_point_dec p p' then mat_id
   else if eq_point_dec p₁ px then
@@ -2212,37 +2220,6 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni Hpp2 Hnn Hr₁ Hr₂2).
      easy.
 Qed.
-
-(*
-Theorem rotate_unicity : ∀ p₁ p₂ el,
-  ∥p₁∥ = ∥p₂∥
-  → norm_list el ≠ []
-  → fold_right rotate p₁ el = p₁
-  → fold_right rotate p₂ el = p₂
-  → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
-Proof.
-intros * Hpp Hn Hr₁ Hr₂.
-rewrite rotate_vec_mul in Hr₁, Hr₂.
-fold (mat_of_path el) in Hr₁, Hr₂.
-*)
-
-(*
-Theorem twice_mat_of_path_neq_its_transp : ∀ el,
-  norm_list el ≠ []
-  → mat_of_path (el ++ el) ≠ mat_transp (mat_of_path (el ++ el)).
-Proof.
-intros * Hn.
-rewrite mat_of_path_app.
-rewrite mat_transp_mul.
-bbb.
-
-Theorem mat_of_path_neq_its_transp : ∀ el,
-  norm_list el ≠ []
-  → mat_of_path el ≠ mat_transp (mat_of_path el).
-Proof.
-intros * Hn H.
-bbb.
-*)
 
 Theorem J_is_countable : ∀ p₁,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
