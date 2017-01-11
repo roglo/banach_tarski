@@ -817,23 +817,30 @@ exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
 Qed.
 
-Definition prod_4_nat_of_nat n :=
+Definition prod_6_nat_of_nat n :=
   let '(n₁, n₂) := prod_nat_of_nat n in
   let '(n₃, n₄) := prod_nat_of_nat n₁ in
   let '(n₅, n₆) := prod_nat_of_nat n₂ in
-  (n₃, n₄, n₅, n₆).
+  let '(n₇, n₈) := prod_nat_of_nat n₃ in
+  let '(n₉, n₁₀) := prod_nat_of_nat n₄ in
+  (n₅, n₆, n₇, n₈, n₉, n₁₀).
 
-Theorem surj_prod_4_nat_surj_nat : ∀ A P,
-  (∃ g : ℕ * ℕ * ℕ * ℕ -> A, ∀ a : A, P a → ∃ nn, g nn = a)
+Theorem surj_prod_6_nat_surj_nat : ∀ A P,
+  (∃ g : ℕ * ℕ * ℕ * ℕ * ℕ * ℕ -> A, ∀ a : A, P a → ∃ nn, g nn = a)
   → ∃ f : ℕ → A, ∀ a : A, P a → ∃ n : ℕ, f n = a.
 Proof.
 intros * (g & Hg).
-exists (λ n, g (prod_4_nat_of_nat n)).
+exists (λ n, g (prod_6_nat_of_nat n)).
 intros a Ha.
-specialize (Hg a Ha) as ((((n₁, n₂), n₃), n₄) & Hg); subst a.
-exists (nat_of_prod_nat (nat_of_prod_nat (n₁, n₂), nat_of_prod_nat (n₃, n₄))).
-unfold prod_4_nat_of_nat.
-now do 3 rewrite prod_nat_of_nat_inv.
+specialize (Hg a Ha) as ((((((n₅, n₆), n₇), n₈), n₉), n₁₀) & Hg); subst a.
+remember (nat_of_prod_nat (n₉, n₁₀)) as n₄.
+remember (nat_of_prod_nat (n₇, n₈)) as n₃.
+remember (nat_of_prod_nat (n₅, n₆)) as n₂.
+remember (nat_of_prod_nat (n₃, n₄)) as n₁.
+remember (nat_of_prod_nat (n₁, n₂)) as n.
+exists n; subst.
+unfold prod_6_nat_of_nat.
+now do 5 rewrite prod_nat_of_nat_inv.
 Qed.
 
 Definition bool_prod_nat_of_prod_nat '(n₁, n₂) : bool * ℕ * ℕ :=
@@ -2225,9 +2232,7 @@ Theorem J_is_countable : ∀ p₁,
   M ∈ J p₁ → ∃ n : ℕ, f n = M.
 Proof.
 intros.
-apply surj_prod_4_nat_surj_nat.
-bbb.
-
+apply surj_prod_6_nat_surj_nat.
 exists (J_of_nats p₁).
 intros M HM.
 destruct HM as (Hrm & p & p' & n & Hp & Hp' & HM).
@@ -2241,6 +2246,8 @@ remember (nat_of_path el) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el₂)) as no eqn:Hno.
 remember (nat_of_path el') as nf' eqn:Hnf'.
 remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
+bbb.
+
 exists (nf, no, nf', no'); simpl.
 remember ∥p₁∥ as r eqn:Hr.
 remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
