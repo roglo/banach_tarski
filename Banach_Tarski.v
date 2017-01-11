@@ -2174,7 +2174,8 @@ Definition arcsin_in (x l : ℝ) : Prop :=
   infinite_sum (λ i : ℕ, arcsin_n i * x ^ i)%R l.
 
 Lemma simpl_arcsin_n : ∀ n : ℕ,
-  (arcsin_n (S n) / arcsin_n n)%R = (- / INR ((2 * S n + 1) * (2 * S n)))%R.
+  (arcsin_n (S n) / arcsin_n n)%R =
+  (INR (S (2 * n) ^ 2) / INR (2 * S n * (2 * n + 3)))%R.
 Proof.
 intros; unfold arcsin_n; replace (S n) with (n + 1)%nat; [ idtac | ring ].
 bbb.
