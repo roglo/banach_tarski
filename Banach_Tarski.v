@@ -2175,7 +2175,7 @@ Definition arcsin_in (x l : ℝ) : Prop :=
 
 Lemma simpl_arcsin_n : ∀ n : ℕ,
   (arcsin_n (S n) / arcsin_n n)%R =
-  (INR (S (2 * n) ^ 2) / INR (2 * S n * (2 * n + 3)))%R.
+  (INR (4 * n ^ 2 + 4 * n + 1) / INR (4 * n ^ 2 + 10 * n + 6))%R.
 Proof.
 intros; unfold arcsin_n; replace (S n) with (n + 1)%nat; [ idtac | ring ].
 bbb.
