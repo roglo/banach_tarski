@@ -2173,6 +2173,53 @@ Definition arcsin_n (n : ℕ) : ℝ :=
 Definition arcsin_in (x l : ℝ) : Prop :=
   infinite_sum (λ i : ℕ, arcsin_n i * x ^ i)%R l.
 
+Lemma simpl_arcsin_n : ∀ n : ℕ,
+  (arcsin_n (S n) / arcsin_n n)%R = (- / INR ((2 * S n + 1) * (2 * S n)))%R.
+Proof.
+intros; unfold arcsin_n; replace (S n) with (n + 1)%nat; [ idtac | ring ].
+bbb.
+rewrite pow_add; unfold Rdiv; rewrite Rinv_mult_distr.
+  rewrite Rinv_involutive.
+  replace
+  ((-1) ^ n * (-1) ^ 1 * / INR (fact (2 * (n + 1) + 1)) *
+    (/ (-1) ^ n * INR (fact (2 * n + 1)))) with
+  ((-1) ^ n * / (-1) ^ n * / INR (fact (2 * (n + 1) + 1)) *
+    INR (fact (2 * n + 1)) * (-1) ^ 1); [ idtac | ring ].
+  rewrite <- Rinv_r_sym.
+  rewrite Rmult_1_l; unfold pow; rewrite Rmult_1_r;
+    replace (2 * (n + 1) + 1)%nat with (S (S (2 * n + 1))).
+  do 2 rewrite fact_simpl; do 2 rewrite mult_INR;
+    repeat rewrite Rinv_mult_distr.
+  rewrite <- (Rmult_comm (-1)); repeat rewrite Rmult_assoc;
+    rewrite <- Rinv_l_sym.
+  rewrite Rmult_1_r; replace (S (2 * n + 1)) with (2 * (n + 1))%nat.
+  repeat rewrite mult_INR; repeat rewrite Rinv_mult_distr.
+  ring.
+  apply not_O_INR; discriminate.
+  replace (n + 1)%nat with (S n); [ apply not_O_INR; discriminate | ring ].
+  apply not_O_INR; discriminate.
+  apply prod_neq_R0.
+  apply not_O_INR; discriminate.
+  replace (n + 1)%nat with (S n); [ apply not_O_INR; discriminate | ring ].
+  apply not_O_INR; discriminate.
+  replace (n + 1)%nat with (S n); [ apply not_O_INR; discriminate | ring ].
+  rewrite mult_plus_distr_l; cut (forall n:nat, S n = (n + 1)%nat).
+  intros; rewrite (H (2 * n + 1)%nat).
+  ring.
+  intros; ring.
+  apply INR_fact_neq_0.
+  apply not_O_INR; discriminate.
+  apply INR_fact_neq_0.
+  apply not_O_INR; discriminate.
+  apply prod_neq_R0; [ apply not_O_INR; discriminate | apply INR_fact_neq_0 ].
+  cut (forall n:nat, S (S n) = (n + 2)%nat);
+    [ intros; rewrite (H (2 * n + 1)%nat); ring | intros; ring ].
+  apply pow_nonzero; discrR.
+  apply INR_fact_neq_0.
+  apply pow_nonzero; discrR.
+  apply Rinv_neq_0_compat; apply INR_fact_neq_0.
+Qed.
+
 Lemma Alembert_arcsin : Un_cv (λ n : ℕ, Rabs (arcsin_n (S n) / arcsin_n n)) 0.
 Proof.
 unfold Un_cv; intros; assert (H0 := archimed_cor1 eps H).
