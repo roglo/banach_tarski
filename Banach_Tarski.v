@@ -2174,7 +2174,8 @@ Definition arcsin_in (x l : ℝ) : Prop :=
   infinite_sum (λ i : ℕ, arcsin_n i * x ^ i)%R l.
 
 (* not sure the following lemma is useful, because arcsin_n (S n) / arcsin_n n
-   does not converge to 1, but to 1 *)
+   does not converge to 1, but to 1; I should rather learn from atan in
+   Ratan.v. *)
 
 bbb.
 
