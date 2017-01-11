@@ -2173,6 +2173,11 @@ Definition arcsin_n (n : ℕ) : ℝ :=
 Definition arcsin_in (x l : ℝ) : Prop :=
   infinite_sum (λ i : ℕ, arcsin_n i * x ^ i)%R l.
 
+(* not sure the following lemma is useful, because arcsin_n (S n) / arcsin_n n
+   does not converge to 1, but to 1 *)
+
+bbb.
+
 Lemma simpl_arcsin_n : ∀ n : ℕ,
   (arcsin_n (S n) / arcsin_n n)%R =
   (INR (4 * n ^ 2 + 4 * n + 1) / INR (4 * n ^ 2 + 10 * n + 6))%R.
@@ -2221,6 +2226,11 @@ rewrite pow_add; unfold Rdiv; rewrite Rinv_mult_distr.
   apply Rinv_neq_0_compat; apply INR_fact_neq_0.
 Qed.
 
+(* mmm... this lemma, copied from Coq lib for sin, seems to be false for arcsin
+   because the coefficient does not converge to 0, but to 1. The function converges
+   because of x, which has to be between -1 and 1 (excluded) *)
+
+(*
 Lemma Alembert_arcsin : Un_cv (λ n : ℕ, Rabs (arcsin_n (S n) / arcsin_n n)) 0.
 Proof.
 unfold Un_cv; intros; assert (H0 := archimed_cor1 eps H).
@@ -2272,6 +2282,7 @@ bbb.
     rewrite plus_INR; rewrite mult_INR; repeat rewrite S_INR;
       replace (INR 0) with 0%R; [ ring | reflexivity ].
 Qed.
+*)
 
 Lemma arcsin_no_R0 : ∀ n : ℕ, arcsin_n n ≠ 0%R.
 Proof.
