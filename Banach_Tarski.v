@@ -2163,11 +2163,26 @@ Definition cos_add a b := (cos a * cos b - sin a * sin b)%R.
 Definition sin_add a b := (sin a * cos b + cos a * sin b)%R.
 
 (*
-Should define these, like cos ans sin are defined in Coq
-
 arcsin(x) = Σ(n=0,∞), (2n)!/(2^2n.(n!)²).x^(2n+1)/(2n+1)
 arccos(x) = π/2-arcsin(x)
 *)
+
+Definition arcsin_n (n : ℕ) : ℝ :=
+  INR (fact (2 * n)) / INR (4 ^ n * (fact n) ^ 2 * (2 * n + 1)).
+
+Definition arcsin_in (x l : ℝ) : Prop :=
+  infinite_sum (λ i : ℕ, arcsin_n i * x ^ i)%R l.
+
+Lemma exist_arcsin : ∀ x : ℝ, { l : ℝ | arcsin_in x l }.
+Proof.
+bbb.
+
+(* code of exist_sin *)
+intros; generalize (Alembert_C3 sin_n x sin_no_R0 Alembert_sin).
+unfold Pser, sin_n; trivial.
+bbb.
+
+Definition arcsin (x : ℝ) : ℝ := let (a, _) := exist_arcsin (Rsqr x) in x * a.
 
 bbb.
 
