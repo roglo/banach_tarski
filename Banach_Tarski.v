@@ -2171,9 +2171,9 @@ Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p := fold_right rotate p₂ (path_of_nat no) in
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
-  let cosa := ((p · p') / r²)%R in
-  let cosθ := cos_add (arccos cosa / INR n) (2 * INR k * PI / INR n) in
-  let sinθ := sin_add (arccos cosa / INR n) (2 * INR k * PI / INR n) in
+  let a := arccos ((p · p') / r²) in
+  let cosθ := cos_add (a / INR n) (2 * INR k * PI / INR n) in
+  let sinθ := sin_add (a / INR n) (2 * INR k * PI / INR n) in
   let px := p × p' in
   if eq_point_dec p p' then mat_id
   else if eq_point_dec p₁ px then
