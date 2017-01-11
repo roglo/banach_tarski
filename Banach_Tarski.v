@@ -2169,6 +2169,12 @@ Definition J p₁ :=
 Definition arcsin x := atan (x / sqrt (1 - x²)).
 Definition arccos x := (PI / 2 - arcsin x)%R.
 
+Theorem sin_arcsin : ∀ x, sin (arcsin x) = x.
+Proof.
+intros; unfold arcsin.
+SearchAbout atan.
+bbb.
+
 Definition cos_add a b := (cos a * cos b - sin a * sin b)%R.
 Definition sin_add a b := (sin a * cos b + cos a * sin b)%R.
 
