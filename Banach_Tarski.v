@@ -2166,6 +2166,8 @@ Definition sin_add a b := (sin a * cos b + cos a * sin b)%R.
 
 bbb.
 
+(* sin (x / 2) = √ ((1 - cos x) / 2), in [0..2π] *)
+
 Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let r := ∥p₁∥ in
   let p₂ := fixpoint_of_nat r nf in
