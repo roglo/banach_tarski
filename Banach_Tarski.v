@@ -2173,8 +2173,75 @@ Definition arcsin_n (n : ℕ) : ℝ :=
 Definition arcsin_in (x l : ℝ) : Prop :=
   infinite_sum (λ i : ℕ, arcsin_n i * x ^ i)%R l.
 
+Lemma Alembert_arcsin : Un_cv (λ n : ℕ, Rabs (arcsin_n (S n) / arcsin_n n)) 0.
+Proof.
+unfold Un_cv; intros; assert (H0 := archimed_cor1 eps H).
+elim H0; intros; exists x.
+bbb.
+  intros; rewrite simpl_sin_n; unfold R_dist; unfold Rminus;
+    rewrite Ropp_0; rewrite Rplus_0_r; rewrite Rabs_Rabsolu;
+      rewrite Rabs_Ropp; rewrite Rabs_right.
+  rewrite mult_INR; rewrite Rinv_mult_distr.
+  cut (/ INR (2 * S n) < 1)%R.
+  intro; cut (/ INR (2 * S n + 1) < eps)%R.
+  intro; rewrite <- (Rmult_1_l eps); rewrite (Rmult_comm (/ INR (2 * S n + 1)));
+    apply Rmult_gt_0_lt_compat; try assumption.
+  change (0 < / INR (2 * S n + 1))%R; apply Rinv_0_lt_compat;
+    apply lt_INR_0; replace (2 * S n + 1)%nat with (S (2 * S n));
+      [ apply lt_O_Sn | ring ].
+  apply Rlt_0_1.
+  cut (x < 2 * S n + 1)%nat.
+  intro; assert (H5 := lt_INR _ _ H4); apply Rlt_trans with (/ INR x)%R.
+  apply Rinv_lt_contravar.
+  apply Rmult_lt_0_compat.
+  apply lt_INR_0; elim H1; intros; assumption.
+  apply lt_INR_0; replace (2 * S n + 1)%nat with (S (2 * S n));
+    [ apply lt_O_Sn | ring ].
+  assumption.
+  elim H1; intros; assumption.
+  apply lt_le_trans with (S n).
+  unfold ge in H2; apply le_lt_n_Sm; assumption.
+  replace (2 * S n + 1)%nat with (S (2 * S n)); [ idtac | ring ].
+  apply le_S; apply le_n_2n.
+  apply Rmult_lt_reg_l with (INR (2 * S n)).
+  apply lt_INR_0; replace (2 * S n)%nat with (S (S (2 * n)));
+    [ apply lt_O_Sn | replace (S n) with (n + 1)%nat; [ idtac | ring ]; ring ].
+  rewrite <- Rinv_r_sym.
+  rewrite Rmult_1_r; replace 1%R with (INR 1); [ apply lt_INR | reflexivity ].
+  replace (2 * S n)%nat with (S (S (2 * n))).
+  apply lt_n_S; apply lt_O_Sn.
+  replace (S n) with (n + 1)%nat; [ ring | ring ].
+  apply not_O_INR; discriminate.
+  apply not_O_INR; discriminate.
+  apply not_O_INR; discriminate.
+  left; change (0 < / INR ((2 * S n + 1) * (2 * S n)))%R;
+    apply Rinv_0_lt_compat.
+  apply lt_INR_0.
+  replace ((2 * S n + 1) * (2 * S n))%nat with
+  (S (S (S (S (S (S (4 * (n * n) + 10 * n))))))).
+  apply lt_O_Sn.
+  apply INR_eq; repeat rewrite S_INR; rewrite plus_INR; repeat rewrite mult_INR;
+    rewrite plus_INR; rewrite mult_INR; repeat rewrite S_INR;
+      replace (INR 0) with 0%R; [ ring | reflexivity ].
+Qed.
+
+Lemma arcsin_no_R0 : ∀ n : ℕ, arcsin_n n ≠ 0%R.
+Proof.
+intros; unfold arcsin_n; unfold Rdiv.
+apply prod_neq_R0; [ apply INR_fact_neq_0 | ].
+apply Rinv_neq_0_compat, not_0_INR.
+apply Nat.neq_mul_0.
+split; [ apply Nat.neq_mul_0; split | ].
+ now apply Nat.pow_nonzero.
+
+ apply Nat.pow_nonzero, fact_neq_0.
+
+ now intros H; apply Nat.eq_add_0 in H; destruct H.
+Qed.
+
 Lemma exist_arcsin : ∀ x : ℝ, { l : ℝ | arcsin_in x l }.
 Proof.
+intros; generalize (Alembert_C3 arcsin_n x arcsin_no_R0 Alembert_arcsin).
 bbb.
 
 (* code of exist_sin *)
