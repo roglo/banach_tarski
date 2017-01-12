@@ -2245,6 +2245,7 @@ remember (nat_of_path el') as nf' eqn:Hnf'.
 remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
 remember ∥p₁∥ as r eqn:Hr.
 remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
+assert (Hrnn : (0 ≤ r)%R) by (subst r; apply vec_norm_nonneg).
 (**)
 assert (p₂ = q₂).
  subst q₂ nf.
@@ -2257,6 +2258,12 @@ SearchAbout fixpoint_of_path.
  unfold fixpoint_of_path.
 SearchAbout rotation_fixpoint.
 (* missing a theorem form Hr₂ to goal! *)
+assert (Hrp₂ : r = ∥p₂∥).
+ assert (Hrp : r = ∥p∥) by now symmetry; apply on_sphere_norm.
+ rewrite Hrp.
+SearchAbout (_ → ∥_∥ = ∥_∥).
+
+bbb.
  destruct p₂ as (x₂, y₂, z₂); simpl in Hr₂.
  injection Hr₂; clear Hr₂; intros Hz₂ Hy₂ Hx₂.
  unfold rotation_fixpoint; symmetry.
