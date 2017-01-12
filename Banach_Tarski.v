@@ -2229,7 +2229,6 @@ Theorem J_is_countable : ∀ p₁, p₁ ∉ D → (-p₁)%vec ∉ D →
   M ∈ J p₁ → ∃ n : ℕ, f n = M.
 Proof.
 intros * Hp₁ Hnp₁.
-bbb.
 apply surj_prod_6_nat_surj_nat.
 exists (J_of_nats p₁).
 intros M HM.
@@ -2246,6 +2245,23 @@ remember (nat_of_path el') as nf' eqn:Hnf'.
 remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
 remember ∥p₁∥ as r eqn:Hr.
 remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
+(**)
+assert (p₂ = q₂).
+ subst q₂ nf.
+ unfold fixpoint_of_nat.
+ rewrite path_of_nat_inv.
+ move Hr₂ at bottom.
+ rewrite rotate_vec_mul in Hr₂.
+SearchAbout fixpoint_of_path.
+ unfold fixpoint_of_path.
+SearchAbout rotation_fixpoint.
+(* missing a theorem form Hr₂ to goal! *)
+ unfold rotation_fixpoint; symmetry.
+SearchAbout rotation_unit_eigenvec.
+ unfold rotation_unit_eigenvec.
+ simpl.
+
+bbb.
 remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
 remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
