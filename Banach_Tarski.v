@@ -2269,11 +2269,11 @@ assert (Hp₂s : p₂ ∈ sphere r).
   assert (Hrp₂ : r = ∥p₂∥) by now symmetry; apply on_sphere_norm.
   unfold fixpoint_of_path.
   (* missing a theorem form Hr₂ to goal! *)
+(*
 remember (rotation_fixpoint (mat_of_path el) r) as pp.
   SearchAbout rotation_fixpoint.
   apply rotation_fixpoint_of_path in Heqpp.
-bbb.
-
+*)
   destruct p₂ as (x₂, y₂, z₂); simpl in Hr₂, Hrp₂.
   injection Hr₂; clear Hr₂; intros Hz₂ Hy₂ Hx₂.
   unfold rotation_fixpoint; symmetry.
