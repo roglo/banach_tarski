@@ -2169,15 +2169,6 @@ Definition J p₁ :=
 Definition arcsin x := atan (x / sqrt (1 - x²)).
 Definition arccos x := (PI / 2 - arcsin x)%R.
 
-Theorem sin_arcsin : ∀ x, sin (arcsin x) = x.
-Proof.
-intros; unfold arcsin.
-SearchAbout atan.
-bbb.
-
-Definition cos_add a b := (cos a * cos b - sin a * sin b)%R.
-Definition sin_add a b := (sin a * cos b + cos a * sin b)%R.
-
 Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let r := ∥p₁∥ in
   let p₂ := fixpoint_of_nat r nf in
@@ -2185,8 +2176,8 @@ Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
   let a := arccos ((p · p') / r²) in
-  let cosθ := cos_add (a / INR n) (2 * INR k * PI / INR n) in
-  let sinθ := sin_add (a / INR n) (2 * INR k * PI / INR n) in
+  let cosθ := cos (a / INR n + 2 * INR k * PI / INR n) in
+  let sinθ := sin (a / INR n + 2 * INR k * PI / INR n) in
   let px := p × p' in
   if eq_point_dec p p' then mat_id
   else if eq_point_dec p₁ px then
