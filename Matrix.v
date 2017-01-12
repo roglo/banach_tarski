@@ -520,7 +520,7 @@ Qed.
 
 Arguments eq_point_dec _%vec _%vec.
 
-Theorem rmat_eq_dec : ∀ m₁ m₂ : matrix ℝ, { m₁ = m₂ } + { m₁ ≠ m₂ }.
+Theorem mat_eq_dec : ∀ m₁ m₂ : matrix ℝ, { m₁ = m₂ } + { m₁ ≠ m₂ }.
 Proof.
 intros.
 destruct (Req_dec (a₁₁ m₁) (a₁₁ m₂)) as [H₁₁| H₁₁].
@@ -1354,28 +1354,4 @@ Qed.
 Theorem mat_opp_vec_mul_distr_r : ∀ M V, (M * - V = - (M * V))%vec.
 Proof.
 intros M (x, y, z); simpl; f_equal; lra.
-Qed.
-
-Theorem mat_eq_dec : ∀ M₁ M₂ : matrix ℝ, { M₁ = M₂ } + { M₁ ≠ M₂ }.
-Proof.
-intros M₁ M₂.
-destruct (Req_dec (a₁₁ M₁) (a₁₁ M₂)) as [H₁₁| H₁₁].
- destruct (Req_dec (a₁₂ M₁) (a₁₂ M₂)) as [H₁₂| H₁₂].
-  destruct (Req_dec (a₁₃ M₁) (a₁₃ M₂)) as [H₁₃| H₁₃].
-   destruct (Req_dec (a₂₁ M₁) (a₂₁ M₂)) as [H₂₁| H₂₁].
-    destruct (Req_dec (a₂₂ M₁) (a₂₂ M₂)) as [H₂₂| H₂₂].
-     destruct (Req_dec (a₂₃ M₁) (a₂₃ M₂)) as [H₂₃| H₂₃].
-      destruct (Req_dec (a₃₁ M₁) (a₃₁ M₂)) as [H₃₁| H₃₁].
-       destruct (Req_dec (a₃₂ M₁) (a₃₂ M₂)) as [H₃₂| H₃₂].
-        destruct (Req_dec (a₃₃ M₁) (a₃₃ M₂)) as [H₃₃| H₃₃].
-         now left; destruct M₁, M₂; simpl in *; subst.
-         now right; intros H; subst M₁; apply H₃₃.
-        now right; intros H; subst M₁; apply H₃₂.
-       now right; intros H; subst M₁; apply H₃₁.
-      now right; intros H; subst M₁; apply H₂₃.
-     now right; intros H; subst M₁; apply H₂₂.
-    now right; intros H; subst M₁; apply H₂₁.
-   now right; intros H; subst M₁; apply H₁₃.
-  now right; intros H; subst M₁; apply H₁₂.
- now right; intros H; subst M₁; apply H₁₁.
 Qed.
