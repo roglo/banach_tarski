@@ -1761,7 +1761,6 @@ exists (fixpoint_of_bool_prod_nat r).
 intros p (Hp & Hsr).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 rewrite rotate_vec_mul in Hr.
-remember (if is_neg_point p₁ then true else false) as b eqn:Hb.
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
 fold (mat_of_path el₁) in Hr.
@@ -1772,10 +1771,10 @@ rewrite <- rotate_vec_mul, Hs in Hsr₁.
 apply rotate_rev_path in Hs.
 remember (mat_of_path el₁) as m eqn:Hm.
 remember (rotation_fixpoint m r) as p₂ eqn:Hp₂.
-assert (Hrm : is_rotation_matrix m).
- rewrite Hm; apply mat_of_path_is_rotation_matrix.
+destruct (rmat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
+ assert (Hrm : is_rotation_matrix m).
+  rewrite Hm; apply mat_of_path_is_rotation_matrix.
 
- destruct (rmat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
   assert (Hmm : (m * m = mat_id)%mat) by (rewrite Hmt at 2; apply Hrm).
   rewrite Hm in Hmm.
   rewrite <- mat_of_path_app in Hmm.
@@ -1788,20 +1787,23 @@ assert (Hrm : is_rotation_matrix m).
   rewrite <- Hp₂ in Hsr₂.
   move p₁ before p; move p₂ before p₁.
   move Hsr₁ before Hsr; move Hsr₂ before Hsr₁.
+  remember (if is_neg_point p₁ then true else false) as b eqn:Hb.
   exists (b, nf, no).
   unfold fixpoint_of_bool_prod_nat.
   rewrite Hno, path_of_nat_inv.
+  symmetry; rewrite <- Hs; f_equal.
   rewrite Hnf, path_of_nat_inv.
   rewrite <- Hm, <- Hp₂.
   rewrite <- Hr in Hs.
+  subst m b.
+clear - Hnl Hr Hsr₁ Hsr₂ Hp₂.
+  remember (if is_neg_point p₁ then true else false) as b eqn:Hb.
   remember (is_neg_point p₂) as b₁.
   rename Heqb₁ into Hb₁.
   move Hb before Hb₁.
   symmetry in Hb, Hb₁.
-  symmetry; rewrite <- Hs; f_equal.
-  apply matrix_all_fixpoints_ok in Hp₂; [ | easy ].
+  apply rotation_fixpoint_of_path in Hp₂.
   move Hp₂ at bottom; move Hr before Hp₂.
-  rewrite Hr.
   remember (is_neg_point p₁) as b₂ eqn:Hb₂.
   symmetry in Hb₂.
   move Hb₂ before Hb₁.
@@ -1809,7 +1811,9 @@ assert (Hrm : is_rotation_matrix m).
    destruct b₂; [ | easy ].
    rewrite <- Hb₁ in Hb₂.
    eapply fixpoint_unicity; try eassumption.
-    intros H; rewrite Hm in H.
+    apply mat_of_path_is_rotation_matrix.
+
+    intros H.
     now apply matrix_of_non_empty_path_is_not_identity in Hnl.
 
     destruct p₁ as (x₁, y₁, z₁).
@@ -1821,7 +1825,9 @@ assert (Hrm : is_rotation_matrix m).
    replace false with (negb true) in Hb₂ by easy.
    rewrite <- Hb₁ in Hb₂.
    eapply fixpoint_unicity; try eassumption.
-    intros H; rewrite Hm in H.
+    apply mat_of_path_is_rotation_matrix.
+
+    intros H.
     now apply matrix_of_non_empty_path_is_not_identity in Hnl.
 
     destruct p₁ as (x₁, y₁, z₁).
@@ -1856,7 +1862,9 @@ assert (Hrm : is_rotation_matrix m).
    replace true with (negb false) in Hb₂ by easy.
    rewrite <- Hb₁ in Hb₂.
    eapply fixpoint_unicity; try eassumption.
-    intros H; rewrite Hm in H.
+    apply mat_of_path_is_rotation_matrix.
+
+    intros H.
     now apply matrix_of_non_empty_path_is_not_identity in Hnl.
 
     destruct p₁ as (x₁, y₁, z₁).
@@ -1881,7 +1889,9 @@ assert (Hrm : is_rotation_matrix m).
    destruct b₂; [ easy | ].
    rewrite <- Hb₁ in Hb₂.
    eapply fixpoint_unicity; try eassumption.
-    intros H; rewrite Hm in H.
+    apply mat_of_path_is_rotation_matrix.
+
+    intros H.
     now apply matrix_of_non_empty_path_is_not_identity in Hnl.
 
     destruct p₁ as (x₁, y₁, z₁).
@@ -1889,6 +1899,8 @@ assert (Hrm : is_rotation_matrix m).
     simpl in Hsr₁, Hsr₂; simpl.
     now rewrite Hsr₁, Hsr₂.
 Qed.
+
+bbb.
 
 Definition sphere_sym S := mkset (λ p, (- p)%vec ∈ S).
 
@@ -2269,6 +2281,7 @@ assert (Hp₂s : p₂ ∈ sphere r).
   assert (Hrp₂ : r = ∥p₂∥) by now symmetry; apply on_sphere_norm.
   unfold fixpoint_of_path.
   (* missing a theorem form Hr₂ to goal! *)
+bbb.
 (*
 remember (rotation_fixpoint (mat_of_path el) r) as pp.
   SearchAbout rotation_fixpoint.
