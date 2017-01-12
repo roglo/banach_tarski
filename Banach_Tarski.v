@@ -2224,11 +2224,12 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
-Theorem J_is_countable : ∀ p₁,
+Theorem J_is_countable : ∀ p₁, p₁ ∉ D → (-p₁)%vec ∉ D →
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
   M ∈ J p₁ → ∃ n : ℕ, f n = M.
 Proof.
-intros.
+intros * Hp₁ Hnp₁.
+bbb.
 apply surj_prod_6_nat_surj_nat.
 exists (J_of_nats p₁).
 intros M HM.
@@ -2413,7 +2414,7 @@ Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
 intros.
-assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ neg_point p₁ ∈ ball ∖ D).
+assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
  unfold "∈", "∖".
  specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
  specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
@@ -2445,7 +2446,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ neg_point p₁ ∈ ball ∖ D).
  destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
  assert
    (H : ∃ R₁, R₁ ∈ rotation_around p₁
-    ∧ ∀ n p p', p ∈ D → p' ∈ D
+    ∧ ∀ n p p', p ∈ D ∩ sphere ∥p₁∥ → p' ∈ D ∩ sphere ∥p₁∥
     → ((R₁ ^ n)%mat * p ≠ p')%vec).
   assert (Hp₁nz : p₁ ≠ 0%vec).
    intros H; apply Hpnd; subst p₁; simpl.
@@ -2453,14 +2454,14 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ neg_point p₁ ∈ ball ∖ D).
    split; [ apply same_orbit_refl | ].
    split; [ easy | simpl; f_equal; lra ].
 
-   specialize (J_is_countable p₁) as (f, Hdnc).
+   specialize (J_is_countable p₁) as (f, Hdnc); [ easy | easy | ].
    specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
    exists R₁.
    split; [ easy | ].
    intros * Hp Hp' HRnp.
    assert (H : R₁ ∈ J p₁).
     split; [ easy | ].
-    now exists n, p, p'.
+    now exists p, p', n.
 
     specialize (Hdnc R₁ H) as (m, Hdnc).
     revert Hdnc; apply Hn.
