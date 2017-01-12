@@ -612,6 +612,26 @@ clear Hr Heqkr.
 f_equal; nsatz.
 Qed.
 
+Theorem mat_of_path_is_rotation_matrix : ∀ el,
+ is_rotation_matrix (mat_of_path el).
+Proof.
+intros.
+induction el as [| e el].
+ unfold mat_of_path; simpl.
+ apply mat_id_is_rotation_matrix.
+
+ unfold mat_of_path; simpl; fold (mat_of_path el).
+ apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
+Qed.
+
+Theorem rotation_fixpoint_of_path : ∀ el p k,
+  p = rotation_fixpoint (mat_of_path el) k → (mat_of_path el * p)%vec = p.
+Proof.
+intros * Hp.
+apply matrix_all_fixpoints_ok in Hp; [ easy | ].
+apply mat_of_path_is_rotation_matrix.
+Qed.
+
 (* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
 Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
@@ -638,18 +658,6 @@ fold (mat_of_path el); rewrite H.
 apply mat_vec_mul_id.
 Qed.
 
-Theorem mat_of_path_is_rotation_matrix : ∀ el,
- is_rotation_matrix (mat_of_path el).
-Proof.
-intros.
-induction el as [| e el].
- unfold mat_of_path; simpl.
- apply mat_id_is_rotation_matrix.
-
- unfold mat_of_path; simpl; fold (mat_of_path el).
- apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
-Qed.
-
 Theorem D_of_nat_prop : ∀ r n nf no p p₁ el el₁,
   (nf, no) = prod_nat_of_nat n
   → el₁ = path_of_nat nf
@@ -663,10 +671,8 @@ split.
  exists (rev_path el).
  symmetry in Hp; apply rotate_rev_path in Hp; apply Hp.
 
- apply matrix_all_fixpoints_ok in Hp₁.
-  rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
-
-  apply mat_of_path_is_rotation_matrix.
+ apply rotation_fixpoint_of_path in Hp₁.
+ rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
 Qed.
 
 Definition D_of_prod_nat r '(nf, no) :=
@@ -2262,8 +2268,12 @@ assert (Hp₂s : p₂ ∈ sphere r).
   rewrite rotate_vec_mul in Hr₂.
   assert (Hrp₂ : r = ∥p₂∥) by now symmetry; apply on_sphere_norm.
   unfold fixpoint_of_path.
+  (* missing a theorem form Hr₂ to goal! *)
+remember (rotation_fixpoint (mat_of_path el) r) as pp.
   SearchAbout rotation_fixpoint.
- (* missing a theorem form Hr₂ to goal! *)
+  apply rotation_fixpoint_of_path in Heqpp.
+bbb.
+
   destruct p₂ as (x₂, y₂, z₂); simpl in Hr₂, Hrp₂.
   injection Hr₂; clear Hr₂; intros Hz₂ Hy₂ Hx₂.
   unfold rotation_fixpoint; symmetry.
@@ -2287,6 +2297,8 @@ bbb.
 unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
 rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
 rewrite rotate_vec_mul in Hr₂, Hr₃.
+bbb.
+here: apply rotation_fixpoint_of_path.
 apply matrix_all_fixpoints_ok in Hq₂.
  2: apply mat_of_path_is_rotation_matrix.
  apply matrix_all_fixpoints_ok in Hq₃.
