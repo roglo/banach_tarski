@@ -2243,13 +2243,16 @@ remember (nat_of_path el) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el₂)) as no eqn:Hno.
 remember (nat_of_path el') as nf' eqn:Hnf'.
 remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
-exists (nf, no, nf', no', n, 1%nat); simpl.
 remember ∥p₁∥ as r eqn:Hr.
 remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
 remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
 remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
+exists (nf, no, nf', no', n, 1%nat); simpl.
 symmetry.
+rewrite <- Hr, <- Hq₂, <- Hq, <- Hq₃, <- Hq'.
+bbb.
+
 subst nf no nf' no'.
 unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
 rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
