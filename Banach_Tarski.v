@@ -2298,7 +2298,6 @@ apply matrix_all_fixpoints_ok in Hq₂.
   move Hr₃ at bottom.
   move Hq₃ at bottom.
   rewrite rotate_vec_mul in Hso₂, Hso₃.
-  assert (Hrnn : (0 ≤ r)%R) by (subst r; apply vec_norm_nonneg).
   move Hrnn before r.
   remember (mat_of_path (rev_path el₂)) as M₂ eqn:HM₂.
   remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
