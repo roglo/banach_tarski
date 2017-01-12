@@ -2281,9 +2281,9 @@ assert (Hp₂s : p₂ ∈ sphere r).
  remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
  remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
  assert (Hrnn : (0 ≤ r)%R) by (subst r; apply vec_norm_nonneg).
- assert (Hpq :
+ assert (Hpq₂ :
   p₂ =
-    if Bool.bool_dec (is_neg_point p₂) (is_neg_point q₂) then q₂
+    if bool_dec (is_neg_point p₂) (is_neg_point q₂) then q₂
     else (- q₂)%vec).
   subst q₂ nf.
   unfold fixpoint_of_nat.
@@ -2314,8 +2314,8 @@ assert (Hp₂s : p₂ ∈ sphere r).
     apply rotation_fixpoint_unicity with (p₁ := p₂) in Hq₂; try easy.
     now destruct (is_neg_point q₂), (is_neg_point p₂).
 
-  destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hpq₂| Hpq₂].
-   move Hpq at top; subst q₂; clear Hpq₂.
+  destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hpq| Hpq].
+   move Hpq₂ at top; subst q₂; clear Hpq.
    remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
 
 bbb.
