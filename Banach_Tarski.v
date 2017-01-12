@@ -2249,12 +2249,13 @@ remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
 remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
 remember (arccos ((q · q') / r²)) as a eqn:Ha.
-exists (nf, no, nf', no', n, 1%nat); simpl.
+remember (Z.to_nat (Int_part (a / (2 * PI)))) as k eqn:Hk.
+exists (nf, no, nf', no', n, k); simpl.
 symmetry.
 rewrite <- Hr, <- Hq₂, <- Hq, <- Hq₃, <- Hq', <- Ha.
-SearchAbout M.
+subst nf no nf' no' k.
 bbb.
-subst nf no nf' no'.
+
 unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
 rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
 rewrite rotate_vec_mul in Hr₂, Hr₃.
