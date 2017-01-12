@@ -2237,30 +2237,36 @@ destruct Hp as ((el & p₂ & Hso₂ & Hn₂ & Hr₂) & Hp).
 destruct Hp' as ((el' & p₃ & Hso₃ & Hn₃& Hr₃) & Hp').
 destruct Hso₂ as (el₂ & Hso₂).
 destruct Hso₃ as (el₃ & Hso₃).
-apply rotate_rev_path in Hso₂.
-apply rotate_rev_path in Hso₃.
-remember (nat_of_path el) as nf eqn:Hnf.
-remember (nat_of_path (rev_path el₂)) as no eqn:Hno.
-remember (nat_of_path el') as nf' eqn:Hnf'.
-remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
 remember ∥p₁∥ as r eqn:Hr.
-remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
-assert (Hrnn : (0 ≤ r)%R) by (subst r; apply vec_norm_nonneg).
+assert (Hp₂s : p₂ ∈ sphere r).
+ rewrite rotate_vec_mul in Hso₂.
+ rewrite <- Hso₂.
+ apply on_sphere_after_rotation; [ easy | ].
+ apply mat_of_path_is_rotation_matrix.
+
+ apply rotate_rev_path in Hso₂.
+ apply rotate_rev_path in Hso₃.
+ remember (nat_of_path el) as nf eqn:Hnf.
+ remember (nat_of_path (rev_path el₂)) as no eqn:Hno.
+ remember (nat_of_path el') as nf' eqn:Hnf'.
+ remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
+ remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
+ assert (Hrnn : (0 ≤ r)%R) by (subst r; apply vec_norm_nonneg).
 (**)
-assert (p₂ = q₂).
- subst q₂ nf.
- unfold fixpoint_of_nat.
- rewrite path_of_nat_inv.
- move Hn₂ at bottom.
- move Hr₂ at bottom.
- rewrite rotate_vec_mul in Hr₂.
-SearchAbout fixpoint_of_path.
- unfold fixpoint_of_path.
-SearchAbout rotation_fixpoint.
-(* missing a theorem form Hr₂ to goal! *)
-assert (Hrp₂ : r = ∥p₂∥).
- assert (Hrp : r = ∥p∥) by now symmetry; apply on_sphere_norm.
- rewrite Hrp.
+ assert (p₂ = q₂).
+  subst q₂ nf.
+  unfold fixpoint_of_nat.
+  rewrite path_of_nat_inv.
+  move Hn₂ at bottom.
+  move Hr₂ at bottom.
+  rewrite rotate_vec_mul in Hr₂.
+ SearchAbout fixpoint_of_path.
+  unfold fixpoint_of_path.
+ SearchAbout rotation_fixpoint.
+ (* missing a theorem form Hr₂ to goal! *)
+  assert (Hrp₂ : r = ∥p₂∥).
+   assert (Hrp : r = ∥p∥) by now symmetry; apply on_sphere_norm.
+   rewrite Hrp.
 SearchAbout (_ → ∥_∥ = ∥_∥).
 
 bbb.
