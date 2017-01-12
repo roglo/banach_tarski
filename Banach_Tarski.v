@@ -2243,9 +2243,7 @@ remember (nat_of_path el) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el₂)) as no eqn:Hno.
 remember (nat_of_path el') as nf' eqn:Hnf'.
 remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
-bbb.
-
-exists (nf, no, nf', no'); simpl.
+exists (nf, no, nf', no', n, 1%nat); simpl.
 remember ∥p₁∥ as r eqn:Hr.
 remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
 remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
@@ -2256,10 +2254,6 @@ subst nf no nf' no'.
 unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
 rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
 rewrite rotate_vec_mul in Hr₂, Hr₃.
-(*
-rotation_fixpoint = λ (m : matrix ℝ) (k : ℝ), k ⁎ rotation_unit_eigenvec m
-Hq₂ : q₂ = rotation_fixpoint (mat_of_path el) r
-*)
 apply matrix_all_fixpoints_ok in Hq₂.
  2: apply mat_of_path_is_rotation_matrix.
  apply matrix_all_fixpoints_ok in Hq₃.
@@ -2274,6 +2268,11 @@ apply matrix_all_fixpoints_ok in Hq₂.
   move Hrnn before r.
   remember (mat_of_path (rev_path el₂)) as M₂ eqn:HM₂.
   remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
+  destruct (eq_point_dec q q') as [Hqq| Hqq].
+   move Hqq at top; subst q'.
+
+vvv.
+
   assert (Hpq : ∥p₂∥ = ∥q₂∥).
    specialize (on_sphere_norm p r Hrnn Hp); intros Hpr.
    rewrite HM₂ in Hso₂.
@@ -2286,8 +2285,8 @@ apply matrix_all_fixpoints_ok in Hq₂.
     rewrite Hso₂ in Hp.
     apply on_sphere_norm in Hp; [ rewrite Hp | easy ].
 
-    specialize (on_sphere_norm q r Hrnn).
-SearchAbout q₂.
+    specialize (on_sphere_norm q₂ r Hrnn).
+SearchAbout q.
 bbb.
 
    generalize Hq₂; intros H.
