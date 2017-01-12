@@ -2314,9 +2314,15 @@ assert (Hp₂s : p₂ ∈ sphere r).
     generalize Hq₂; intros H; subst M₂.
     now apply rotation_fixpoint_unicity with (r := r) (el := el).
 
-  idtac.
+  remember (is_neg_point p₂) as bp₂ eqn:Hbp₂.
+  remember (is_neg_point q₂) as bq₂ eqn:Hbq₂.
+  symmetry in Hbp₂, Hbq₂.
+  destruct bp₂, bq₂.
+   move Hpq at top; subst q₂; clear Hbq₂.
+   remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
+
 bbb.
-remember (fold_right rotate q₂ (path_of_nat no)) as q eqn:Hq.
+remember (fold_right rotate p₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
 remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
 remember (arccos ((q · q') / r²)) as a eqn:Ha.
