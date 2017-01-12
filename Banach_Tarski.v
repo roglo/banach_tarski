@@ -2252,6 +2252,7 @@ remember (arccos ((q · q') / r²)) as a eqn:Ha.
 exists (nf, no, nf', no', n, 1%nat); simpl.
 symmetry.
 rewrite <- Hr, <- Hq₂, <- Hq, <- Hq₃, <- Hq', <- Ha.
+SearchAbout M.
 bbb.
 subst nf no nf' no'.
 unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
