@@ -2311,6 +2311,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
  remember (nat_of_path el') as nf' eqn:Hnf'.
  remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
  remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
+ remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
  assert (Hpq₂ :
   p₂ =
     if bool_dec (is_neg_point p₂) (is_neg_point q₂) then q₂
@@ -2323,7 +2324,6 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
   eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
   now subst q₂; apply fixpoint_of_path_on_sphere.
 
-  remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
   assert (Hpq₃ :
    p₃ =
      if bool_dec (is_neg_point p₃) (is_neg_point q₃) then q₃
@@ -2335,8 +2335,10 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
    eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
    now subst q₃; apply fixpoint_of_path_on_sphere.
 
-   destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hpq| Hpq].
-    move Hpq₂ at top; subst q₂; clear Hpq.
+   destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hb₂| Hb₂].
+    move Hpq₂ at top; subst q₂; clear Hb₂.
+    destruct (bool_dec (is_neg_point p₃) (is_neg_point q₃)) as [Hb₃| Hb₃].
+     move Hpq₃ at top; subst q₃; clear Hb₃.
 
 bbb.
 remember (fold_right rotate p₂ (path_of_nat no)) as q eqn:Hq.
