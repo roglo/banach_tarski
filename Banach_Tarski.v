@@ -2308,14 +2308,12 @@ assert (Hp₂s : p₂ ∈ sphere r).
   p₂ =
     if bool_dec (is_neg_point p₂) (is_neg_point q₂) then q₂
     else (- q₂)%vec).
-  assert (Hrnn : (0 ≤ r)%R) by (subst r; apply vec_norm_nonneg).
   subst nf.
   unfold fixpoint_of_nat in Hq₂.
   rewrite path_of_nat_inv in Hq₂.
   rewrite rotate_vec_mul in Hr₂.
-  clear Hn₃.
-
-  eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
+  apply eigenvec_and_fixpoint_of_path_collinear with (el := el) (r := r);
+    try assumption.
   now subst q₂; apply fixpoint_of_path_on_sphere.
 
   destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hpq| Hpq].
