@@ -2355,6 +2355,10 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
      rewrite Hso₂, Hso₃, <- Ha.
      remember (p × p') as px eqn:Hpx.
+     symmetry.
+     destruct (eq_point_dec p p') as [Hpp| Hpp].
+      move Hpp at top; subst p'.
+      clear px Hpx.
 bbb.
 remember (fold_right rotate p₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
