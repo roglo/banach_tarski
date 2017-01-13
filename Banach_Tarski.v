@@ -2235,7 +2235,8 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let a := arccos ((p · p') / r²) in
   let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
-  matrix_of_axis_cos_sin_angle (/ ∥px∥ ⁎ px) (cos θ) (sin θ).
+  if eq_point_dec px 0 then mat_id
+  else matrix_of_axis_cos_sin_angle (/ ∥px∥ ⁎ px) (cos θ) (sin θ).
 
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ∥p₁∥ = ∥p₂∥
@@ -2352,20 +2353,24 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      remember (a / INR n + 2 * INR k * PI / INR n)%R as θ eqn:Hθ.
      remember (p × p') as px eqn:Hpx.
      symmetry.
-     destruct px as (xp, yp, zp); simpl.
-     remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
-     do 3 rewrite Rsqr_mult.
-     do 2 rewrite <- Rmult_plus_distr_l.
-     destruct (Req_dec rp 0) as [Hrpz| Hrpz].
+     destruct (eq_point_dec px 0) as [Hpxz| Hpxz].
+      move Hpxz at top; subst px.
+      symmetry in Hpx.
+
       Focus 2.
+      destruct px as (xp, yp, zp); simpl.
+      remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
+      do 3 rewrite Rsqr_mult.
+      do 2 rewrite <- Rmult_plus_distr_l.
       rewrite sqrt_mult_alt.
        rewrite <- Hrp.
         rewrite sqrt_Rsqr.
-         rewrite Rinv_l; [| easy ].
-         do 3 rewrite Rdiv_1_r.
-         replace (/ rp * xp)%R with (xp / rp)%R by lra.
-         replace (/ rp * yp)%R with (yp / rp)%R by lra.
-         replace (/ rp * zp)%R with (zp / rp)%R by lra.
+         rewrite Rinv_l.
+          do 3 rewrite Rdiv_1_r.
+          replace (/ rp * xp)%R with (xp / rp)%R by lra.
+          replace (/ rp * yp)%R with (yp / rp)%R by lra.
+          replace (/ rp * zp)%R with (zp / rp)%R by lra.
+          move M at bottom.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
