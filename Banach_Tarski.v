@@ -2213,18 +2213,21 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
-(* J = set of rotations mapping a point of D to some point of D. *)
-Definition J p₁ :=
+(* J₀(r) = set of rotations R, such that for some natural number n,
+   and some P in D ∩ sphere(r), R^n(P) is also in D ∩ sphere(r). *)
+Definition J₀ r :=
   mkset
-    (λ R₁, R₁ ∈ rotation_around p₁ ∧
-     ∃ p p' n, p ∈ D ∩ sphere ∥p₁∥ ∧ p' ∈ D ∩ sphere ∥p₁∥ ∧
-     ((R₁ ^ n)%mat * p)%vec = p').
+    (λ R, is_rotation_matrix R ∧
+     ∃ p p' n, p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
+     ((R ^ n)%mat * p)%vec = p').
+
+(* J(p₁) = subset of J₀(∥p₁∥) of rotations aroung a point p₁. *)
+Definition J p₁ := mkset (λ R₁, R₁ ∈ rotation_around p₁ ∧ R₁ ∈ J₀ ∥p₁∥).
 
 Definition arcsin x := atan (x / sqrt (1 - x²)).
 Definition arccos x := (PI / 2 - arcsin x)%R.
 
-Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
-  let r := ∥p₁∥ in
+Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p₂ := fixpoint_of_nat r nf in
   let p := fold_right rotate p₂ (path_of_nat no) in
   let p₃ := fixpoint_of_nat r nf' in
@@ -2232,7 +2235,7 @@ Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let a := arccos ((p · p') / r²) in
   let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
-  matrix_of_axis_cos_sin_angle px (cos θ) (sin θ).
+  matrix_of_axis_cos_sin_angle (/ ∥px∥ ⁎ px) (cos θ) (sin θ).
 
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ∥p₁∥ = ∥p₂∥
@@ -2272,20 +2275,18 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
-Theorem J_is_countable : ∀ p₁, p₁ ∉ D → (-p₁)%vec ∉ D →
-  ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ,
-  M ∈ J p₁ → ∃ n : ℕ, f n = M.
+Theorem J₀_is_countable : ∀ r,
+  ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ, M ∈ J₀ r → ∃ n : ℕ, f n = M.
 Proof.
-intros * Hp₁ Hnp₁.
+intros r.
 apply surj_prod_6_nat_surj_nat.
-exists (J_of_nats p₁).
+exists (J₀_of_nats r).
 intros M HM.
 destruct HM as (Hrm & p & p' & n & Hp & Hp' & HM).
 destruct Hp as ((el & p₂ & Hso₂ & Hn₂ & Hr₂) & Hp).
 destruct Hp' as ((el' & p₃ & Hso₃ & Hn₃& Hr₃) & Hp').
 destruct Hso₂ as (el₂ & Hso₂).
 destruct Hso₃ as (el₃ & Hso₃).
-remember ∥p₁∥ as r eqn:Hr.
 assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
  split.
   rewrite rotate_vec_mul in Hso₂.
@@ -2339,8 +2340,8 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      remember (arccos ((p · p') / r²)) as a eqn:Ha.
      remember (Z.to_nat (Int_part (a / (2 * PI)))) as k eqn:Hk.
      exists n, k.
-     unfold J_of_nats.
-     rewrite <- Hr, <- Hq₂, <- Hq₃.
+     unfold J₀_of_nats.
+     rewrite <- Hq₂, <- Hq₃.
      do 2 rewrite rotate_vec_mul.
      rewrite Hno, path_of_nat_inv.
      rewrite Hno', path_of_nat_inv.
@@ -2353,7 +2354,6 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      destruct px as (xp, yp, zp); simpl.
      remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
      remember (a / INR n + 2 * INR k * PI / INR n)%R as θ eqn:Hθ.
-
 bbb.
 remember (fold_right rotate p₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
