@@ -530,46 +530,6 @@ Definition fixpoint_of_path r el :=
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
-Theorem rotation_fixpoint_on_sphere : ∀ r m,
-  m ≠ mat_transp m
-  → rotation_fixpoint m r ∈ sphere r.
-Proof.
-intros * Hm.
-unfold rotation_fixpoint; simpl.
-remember (a₂₃ m - a₃₂ m)%R as x eqn:Hx.
-remember (a₃₁ m - a₁₃ m)%R as y eqn:Hy.
-remember (a₁₂ m - a₂₁ m)%R as z eqn:Hz.
-remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-assert (Hrnz : (r₁ ≠ 0)%R).
- intros H; apply Hm; clear Hm; subst r₁.
- apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in H.
- unfold mat_transp.
- destruct m; simpl in *; simpl.
- unfold mkrmat; f_equal; lra.
-
- rewrite Rsqr_div; [ | easy ].
- rewrite Rsqr_div; [ | easy ].
- rewrite Rsqr_div; [ | easy ].
- unfold Rdiv.
- do 2 rewrite <- Rmult_plus_distr_r; subst r₁.
- rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
- rewrite Rinv_r; [ apply Rmult_1_r | ].
- intros H; apply Hrnz; clear Hrnz; rewrite H.
- apply sqrt_0.
-Qed.
-
-Theorem rotation_fixpoint_norm : ∀ M r, (0 ≤ r)%R
-  → M ≠ mat_transp M
-  → ∥(rotation_fixpoint M r)∥ = r.
-Proof.
-intros * HM Hr.
-apply rotation_fixpoint_on_sphere with (r := r) in Hr.
-now apply on_sphere_norm.
-Qed.
-
 Theorem matrix_all_fixpoints_ok : ∀ m p k,
   is_rotation_matrix m
   → p = rotation_fixpoint m k
@@ -900,7 +860,7 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
   in
   fold_right rotate p₁ (path_of_nat no).
 
-Lemma mat_of_path_app : ∀ el₁ el₂,
+Theorem mat_of_path_app : ∀ el₁ el₂,
   mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
 Proof.
 intros.
@@ -1069,6 +1029,68 @@ rewrite norm_list_normal_l in Hel.
 rewrite norm_list_normal_r in Hel.
 apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
 now apply rev_path_eq_path.
+Qed.
+
+Theorem rotation_fixpoint_on_sphere : ∀ r m,
+  m ≠ mat_transp m
+  → rotation_fixpoint m r ∈ sphere r.
+Proof.
+intros * Hm.
+unfold rotation_fixpoint; simpl.
+remember (a₂₃ m - a₃₂ m)%R as x eqn:Hx.
+remember (a₃₁ m - a₁₃ m)%R as y eqn:Hy.
+remember (a₁₂ m - a₂₁ m)%R as z eqn:Hz.
+remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+assert (Hrnz : (r₁ ≠ 0)%R).
+ intros H; apply Hm; clear Hm; subst r₁.
+ apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in H.
+ unfold mat_transp.
+ destruct m; simpl in *; simpl.
+ unfold mkrmat; f_equal; lra.
+
+ rewrite Rsqr_div; [ | easy ].
+ rewrite Rsqr_div; [ | easy ].
+ rewrite Rsqr_div; [ | easy ].
+ unfold Rdiv.
+ do 2 rewrite <- Rmult_plus_distr_r; subst r₁.
+ rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+ rewrite Rinv_r; [ apply Rmult_1_r | ].
+ intros H; apply Hrnz; clear Hrnz; rewrite H.
+ apply sqrt_0.
+Qed.
+
+Theorem fixpoint_of_path_on_sphere : ∀ r el,
+  norm_list el ≠ []
+  → fixpoint_of_path r el ∈ sphere r.
+Proof.
+intros * Hn.
+unfold fixpoint_of_path.
+remember (mat_of_path el) as M eqn:Hm.
+destruct (mat_eq_dec M (mat_transp M)) as [Hmt| Hmt].
+ assert (Hrm : is_rotation_matrix M).
+  subst M; apply mat_of_path_is_rotation_matrix.
+
+  assert (Hmm : (M * M = mat_id)%mat) by (rewrite Hmt at 2; apply Hrm).
+  rewrite Hm in Hmm.
+  rewrite <- mat_of_path_app in Hmm.
+  exfalso; revert Hmm.
+  apply matrix_of_non_empty_path_is_not_identity.
+  intros H; apply Hn.
+  now apply norm_list_app_diag_is_nil.
+
+ now apply rotation_fixpoint_on_sphere.
+Qed.
+
+Theorem rotation_fixpoint_norm : ∀ M r, (0 ≤ r)%R
+  → M ≠ mat_transp M
+  → ∥(rotation_fixpoint M r)∥ = r.
+Proof.
+intros * HM Hr.
+apply rotation_fixpoint_on_sphere with (r := r) in Hr.
+now apply on_sphere_norm.
 Qed.
 
 Theorem mat_vec_mul_cross_distr : ∀ M U V,
