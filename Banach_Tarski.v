@@ -2291,12 +2291,19 @@ destruct Hp' as ((el' & p₃ & Hso₃ & Hn₃& Hr₃) & Hp').
 destruct Hso₂ as (el₂ & Hso₂).
 destruct Hso₃ as (el₃ & Hso₃).
 remember ∥p₁∥ as r eqn:Hr.
-assert (Hp₂s : p₂ ∈ sphere r).
- rewrite rotate_vec_mul in Hso₂.
- rewrite <- Hso₂.
- apply on_sphere_after_rotation; [ easy | ].
- apply mat_of_path_is_rotation_matrix.
+assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
+ split.
+  rewrite rotate_vec_mul in Hso₂.
+  rewrite <- Hso₂.
+  apply on_sphere_after_rotation; [ easy | ].
+  apply mat_of_path_is_rotation_matrix.
 
+  rewrite rotate_vec_mul in Hso₃.
+  rewrite <- Hso₃.
+  apply on_sphere_after_rotation; [ easy | ].
+  apply mat_of_path_is_rotation_matrix.
+
+ destruct H as (Hp₂s, Hp₃s).
  apply rotate_rev_path in Hso₂.
  apply rotate_rev_path in Hso₃.
  remember (nat_of_path el) as nf eqn:Hnf.
@@ -2316,9 +2323,20 @@ assert (Hp₂s : p₂ ∈ sphere r).
   eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
   now subst q₂; apply fixpoint_of_path_on_sphere.
 
-  destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hpq| Hpq].
-   move Hpq₂ at top; subst q₂; clear Hpq.
-   remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
+  remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
+  assert (Hpq₃ :
+   p₃ =
+     if bool_dec (is_neg_point p₃) (is_neg_point q₃) then q₃
+     else (- q₃)%vec).
+   subst nf'.
+   unfold fixpoint_of_nat in Hq₃.
+   rewrite path_of_nat_inv in Hq₃.
+   rewrite rotate_vec_mul in Hr₃.
+   eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
+   now subst q₃; apply fixpoint_of_path_on_sphere.
+
+   destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hpq| Hpq].
+    move Hpq₂ at top; subst q₂; clear Hpq.
 
 bbb.
 remember (fold_right rotate p₂ (path_of_nat no)) as q eqn:Hq.
