@@ -2033,6 +2033,44 @@ Definition matrix_of_axis_cos_sin_angle '(P x y z) c s :=
     (ux*uy*(1-c)+uz*s) (uy²*(1-c)+c) (uy*uz*(1-c)-ux*s)
     (ux*uz*(1-c)-uy*s) (uy*uz*(1-c)+ux*s) (uz²*(1-c)+c).
 
+(* playing with quaternions... *)
+
+Record quaternion := quat { Qa : ℝ; Qv : point }.
+Arguments quat Qa%R Qv%vec.
+
+Delimit Scope quat_scope with Qn.
+
+Definition quat_add '(quat a₁ v₁) '(quat a₂ v₂) :=
+  quat (a₁ + a₂) (v₁ + v₂).
+Definition quat_mul '(quat a₁ v₁) '(quat a₂ v₂) :=
+  quat (a₁ * a₂ - v₁ · v₂) (a₁ ⁎ v₂ + a₂ ⁎ v₁ + v₁ × v₂).
+
+Definition Qi := quat 0 (P 1 0 0).
+Definition Qj := quat 0 (P 0 1 0).
+Definition Qk := quat 0 (P 0 0 1).
+
+Notation "q₁ + q₂" := (quat_add q₁ q₂) : quat_scope.
+Notation "q₁ * q₂" := (quat_mul q₁ q₂) : quat_scope.
+Notation "'qi'" := (Qi) : quat_scope.
+Notation "'qj'" := (Qj) : quat_scope.
+Notation "'qk'" := (Qk) : quat_scope.
+
+Definition qr a := quat a 0.
+
+Theorem qi_sqr : (qi * qi)%Qn = qr (-1).
+Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
+
+Theorem qj_sqr : (qj * qj)%Qn = qr (-1).
+Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
+
+Theorem qk_sqr : (qk * qk)%Qn = qr (-1).
+Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
+
+Theorem qi_qj_qk : (qi * qj * qk = qr (-1))%Qn.
+Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
+
+(* end play with quaternions. *)
+
 Theorem z_of_xy : ∀ x y z r,
   r = (√ (x² + y² + z²)%R)
   → r ≠ 0%R
