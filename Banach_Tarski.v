@@ -2069,6 +2069,61 @@ Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 Theorem qi_qj_qk : (qi * qj * qk = qr (-1))%Qn.
 Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
+Definition quat_of_mat M :=
+  let s :=
+    if Req_dec (mat_trace M) (-1) then
+      let x₀ := (a₁₁ M - a₂₂ M - a₃₃ M)%R in
+      let y₀ := (- a₁₁ M + a₂₂ M - a₃₃ M)%R in
+      let z₀ := (- a₁₁ M - a₂₂ M + a₃₃ M)%R in
+      if Rlt_dec x₀ y₀ then
+        if Rlt_dec y₀ z₀ then (* z is the biggest *)
+          ((a₂₁ M - a₁₂ M) / (2 * √ (1 + z₀)))%R
+        else (* y is the biggest *)
+          ((a₁₃ M - a₃₁ M) / (2 * √ (1 + y₀)))%R
+      else
+        if Rlt_dec x₀ z₀ then (* z is the biggest *)
+          ((a₂₁ M - a₁₂ M) / (2 * √ (1 + z₀)))%R
+        else (* x is the biggest *)
+          ((a₃₂ M - a₂₃ M) / (2 * √ (1 + x₀)))%R
+    else
+      (√ (1 + mat_trace M) / 2)%R
+  in
+  let x := ((a₃₂ M - a₂₃ M) / (4 * s))%R in
+  let y := ((a₁₃ M - a₃₁ M) / (4 * s))%R in
+  let z := ((a₂₁ M - a₁₂ M) / (4 * s))%R in
+  quat s (P x y z).
+
+Definition mat_of_quat '(quat a (P b c d)) :=
+  mkrmat
+    (a² + b² - c² - d²) (2 * b * c - 2 * a * d) (2 * a * c + 2 * b * d)
+    (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
+    (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
+
+Theorem mat_of_quat_inv : ∀ q, quat_of_mat (mat_of_quat q) = q.
+Proof.
+intros (a, (b, c, d)); simpl.
+unfold quat_of_mat, mat_of_quat; simpl.
+unfold mat_trace; simpl.
+remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
+  as t eqn:Ht.
+remember (a² + b² - c² - d² - (a² - b² + c² - d²) - (a² - b² - c² + d²))%R
+  as x₀ eqn:Hx₀.
+remember (- (a² + b² - c² - d²) + (a² - b² + c² - d²) - (a² - b² - c² + d²))%R
+  as y₀ eqn:Hy₀.
+remember (- (a² + b² - c² - d²) - (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
+  as z₀ eqn:Hz₀.
+ring_simplify in Ht.
+ring_simplify in Hx₀.
+ring_simplify in Hy₀.
+ring_simplify in Hz₀.
+destruct (Req_dec t (-1)) as [Htd| Htd].
+ destruct (Rlt_dec x₀ y₀) as [Hxy| Hxy].
+  destruct (Rlt_dec y₀ z₀) as [Hyz| Hyz].
+   f_equal.
+    field_simplify.
+    rewrite Rdiv_1_r.
+bbb.
+
 (* end play with quaternions. *)
 
 Theorem z_of_xy : ∀ x y z r,
