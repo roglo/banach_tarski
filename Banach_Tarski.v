@@ -1886,40 +1886,6 @@ destruct b₁, b.
   now rewrite Hsr₁, Hsr₂.
 Qed.
 
-(* TODO: merge with eigenvec_and_fixpoint_of_path_collinear *)
-Theorem eigenvec_and_fixpoint_of_path_collinear2 : ∀ el p q r,
-  (0 ≤ r)%R
-  → p ∈ sphere r
-  → norm_list el ≠ []
-  → (mat_of_path el * p)%vec = p
-  → q = fixpoint_of_path r el
-  → p = if bool_dec (is_neg_point p) (is_neg_point q) then q else (- q)%vec.
-Proof.
-intros * Hrnn Hps Hn Hr Hq.
-subst q.
-assert (Hrp : r = ∥p∥) by now symmetry; apply on_sphere_norm.
-unfold fixpoint_of_path.
-remember (mat_of_path el) as M eqn:Hm.
-remember (rotation_fixpoint M r) as q eqn:Hq.
-destruct (mat_eq_dec M (mat_transp M)) as [Hmt| Hmt].
- assert (Hrm : is_rotation_matrix M).
-  rewrite Hm; apply mat_of_path_is_rotation_matrix.
-
-  assert (Hmm : (M * M = mat_id)%mat) by (rewrite Hmt at 2; apply Hrm).
-  rewrite Hm in Hmm.
-  rewrite <- mat_of_path_app in Hmm.
-  exfalso; revert Hmm.
-  apply matrix_of_non_empty_path_is_not_identity.
-  intros H; apply Hn.
-  now apply norm_list_app_diag_is_nil.
-
- assert (Hqs : q ∈ sphere r).
-  now subst q; apply rotation_fixpoint_on_sphere.
-
-  generalize Hq; intros H; subst M.
-  eapply eigenvec_and_fixpoint_of_path_collinear; eassumption.
-Qed.
-
 Theorem D_set_is_countable : ∀ r,
   ∃ f : ℕ → point, ∀ p : point,
   p ∈ D ∩ sphere r → ∃ n : ℕ, f n = p.
@@ -2348,7 +2314,9 @@ assert (Hp₂s : p₂ ∈ sphere r).
   rewrite path_of_nat_inv in Hq₂.
   rewrite rotate_vec_mul in Hr₂.
   clear Hn₃.
-  eapply eigenvec_and_fixpoint_of_path_collinear2; eassumption.
+
+  eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
+  now subst q₂; apply fixpoint_of_path_on_sphere.
 
   destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hpq| Hpq].
    move Hpq₂ at top; subst q₂; clear Hpq.
