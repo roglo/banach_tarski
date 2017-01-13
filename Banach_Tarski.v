@@ -2371,6 +2371,9 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
           replace (/ rp * yp)%R with (yp / rp)%R by lra.
           replace (/ rp * zp)%R with (zp / rp)%R by lra.
           move M at bottom.
+          move Ha at bottom.
+          move Hθ at bottom.
+          move Hk at bottom.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
