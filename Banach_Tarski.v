@@ -2099,6 +2099,15 @@ Definition mat_of_quat '(quat a (P b c d)) :=
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
 
+Theorem eq_mul_div_eq : ∀ a b c, b ≠ 0%R → (a = b * c → a / b = c)%R.
+Proof.
+intros * Hb Hab.
+subst a; unfold Rdiv.
+rewrite Rmult_comm, <- Rmult_assoc.
+rewrite Rinv_l; [ | easy ].
+now rewrite Rmult_1_l.
+Qed.
+
 Theorem mat_of_quat_inv : ∀ q, quat_of_mat (mat_of_quat q) = q.
 Proof.
 intros (a, (b, c, d)); simpl.
@@ -2122,6 +2131,18 @@ destruct (Req_dec t (-1)) as [Htd| Htd].
    f_equal.
     field_simplify.
     rewrite Rdiv_1_r.
+    apply eq_mul_div_eq.
+     Focus 2.
+     apply Rsqr_inj.
+      Focus 3.
+      do 5 rewrite Rsqr_mult.
+      rewrite Rsqr_sqrt.
+      rewrite Hz₀.
+      do 5 rewrite Rsqr_pow2.
+      ring_simplify.
+      do 4 rewrite <- Rsqr_pow2.
+enough (a²+b²+c²+d²=1)%R.
+
 bbb.
 
 (* end play with quaternions. *)
