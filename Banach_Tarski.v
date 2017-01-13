@@ -2374,6 +2374,12 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
           move Ha at bottom.
           move Hθ at bottom.
           move Hk at bottom.
+          move Hp before HM.
+          move Hp' before HM.
+          rewrite Hpx in Hpxz.
+          move Hpxz after Hp'.
+          symmetry in Hpx; move Hpx at bottom.
+          move Hrp at bottom.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
