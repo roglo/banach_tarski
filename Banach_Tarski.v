@@ -2349,175 +2349,23 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      remember (mat_of_path (rev_path el₂)) as M₂ eqn:HM₂.
      remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
      rewrite Hso₂, Hso₃, <- Ha.
+     remember (a / INR n + 2 * INR k * PI / INR n)%R as θ eqn:Hθ.
      remember (p × p') as px eqn:Hpx.
      symmetry.
      destruct px as (xp, yp, zp); simpl.
      remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
-     remember (a / INR n + 2 * INR k * PI / INR n)%R as θ eqn:Hθ.
-bbb.
-remember (fold_right rotate p₂ (path_of_nat no)) as q eqn:Hq.
-remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
-remember (fold_right rotate q₃ (path_of_nat no')) as q' eqn:Hq'.
-remember (arccos ((q · q') / r²)) as a eqn:Ha.
-remember (Z.to_nat (Int_part (a / (2 * PI)))) as k eqn:Hk.
-exists (nf, no, nf', no', n, k); simpl.
-symmetry.
-rewrite <- Hr, <- Hq₂, <- Hq, <- Hq₃, <- Hq', <- Ha.
-subst nf no nf' no' k.
-bbb.
-
-unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
-rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
-rewrite rotate_vec_mul in Hr₂, Hr₃.
-bbb.
-here: apply rotation_fixpoint_of_path.
-apply matrix_all_fixpoints_ok in Hq₂.
- 2: apply mat_of_path_is_rotation_matrix.
- apply matrix_all_fixpoints_ok in Hq₃.
-  2: apply mat_of_path_is_rotation_matrix.
-  move Hn₂ at bottom.
-  move Hr₂ at bottom.
-  move Hq₂ at bottom.
-  move Hr₃ at bottom.
-  move Hq₃ at bottom.
-  rewrite rotate_vec_mul in Hso₂, Hso₃.
-  move Hrnn before r.
-  remember (mat_of_path (rev_path el₂)) as M₂ eqn:HM₂.
-  remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
-  destruct (eq_point_dec q q') as [Hqq| Hqq].
-   move Hqq at top; subst q'.
-
-vvv.
-
-  assert (Hpq : ∥p₂∥ = ∥q₂∥).
-   specialize (on_sphere_norm p r Hrnn Hp); intros Hpr.
-   rewrite HM₂ in Hso₂.
-   rewrite <- rotate_vec_mul in Hso₂.
-   apply rotate_rev_path in Hso₂.
-   rewrite rev_path_involutive in Hso₂.
-   rewrite rotate_vec_mul in Hso₂.
-   apply on_sphere_after_rotation with (m := mat_of_path el₂) in Hp.
-    2: apply mat_of_path_is_rotation_matrix.
-    rewrite Hso₂ in Hp.
-    apply on_sphere_norm in Hp; [ rewrite Hp | easy ].
-
-    specialize (on_sphere_norm q₂ r Hrnn).
-SearchAbout q.
-bbb.
-
-   generalize Hq₂; intros H.
-   apply rotate_unicity with (p₁ := p₂) in H; try easy.
-bbb.
-
- apply matrix_all_fixpoints_ok in Hs₃.
-  2: apply mat_of_path_is_rotation_matrix.
-  unfold mat_of_path in Hs₃.
-  rewrite <- rotate_vec_mul in Hs₃.
-  remember (mat_of_path el) as M₁ eqn:HM₁.
-  destruct (mat_eq_dec M₁ (mat_transp M₁)) as [Heq| Hneq].
-   rewrite rotate_vec_mul in Hr₂, Hs₂.
-   unfold mat_of_path in HM₁.
-   rewrite <- HM₁ in Hr₂, Hs₂.
-   fold (mat_of_path el) in HM₁.
-
-bbb.
-  apply rotate_unicity with (p₁ := p₂) in Hs₂; try easy.
-Focus 2.
-   rewrite Hq₂.
-   rewrite rotation_fixpoint_norm.
-    apply rotate_rev_path in Hso₂.
-    rewrite rotate_vec_mul in Hso₂.
-    rewrite rev_path_involutive in Hso₂.
-    remember (fold_right mat_mul mat_id (map mat_of_elem el₂)) as M₂ eqn:HM₂.
-    apply on_sphere_after_rotation with (m := M₂) in Hp.
-     2: subst M₂; apply mat_of_path_is_rotation_matrix.
-     rewrite Hso₂ in Hp.
-     apply on_sphere_norm; [ | easy ].
-     rewrite Hr; apply vec_norm_nonneg.
-
-    rewrite Hr; apply vec_norm_nonneg.
-SearchAbout mat_transp.
-
-bbb.
-
-   Check on_sphere_after_rotation.
-SearchAbout (fold_right rotate).
-
-bbb.
-(* return to previous *)
-   destruct p as (x, y, z); simpl in Hp.
-   destruct p₂ as (x₂, y₂, z₂); simpl in Hso₂.
-
-bbb.
-
-unfold sqrt.
-destruct (Rcase_abs (/ x)) as [H₁| H₁].
- apply Rinv_lt_0_compat in H₁.
- rewrite Rinv_involutive in H₁; lra.
-
- destruct (Rcase_abs x) as [H₂| H₂]; [ lra | ].
- unfold Rsqrt; simpl.
-bbb.
-
-revert p₁ p₂ Hpp Hn Hr₁ Hr₂.
-induction el as [| e₁ el]; intros; [ easy | ].
-simpl in Hr₁, Hr₂.
-destruct e₁ as (t, d); destruct t, d.
-
-bbb.
-
-destruct (eq_point_dec q q') as [Heqq| Hneqq].
- subst nf no nf' no'.
- unfold fixpoint_of_nat, fixpoint_of_path in Hq₂, Hq₃.
- rewrite path_of_nat_inv in Hq₂, Hq₃, Hq, Hq'.
- rewrite Hq, Hq' in Heqq.
- rewrite Hq₂, Hq₃ in Heqq.
-SearchAbout (rotation_fixpoint (mat_of_path _)).
-Check matrix_all_fixpoints_ok.
-
-Print J.
-
-bbb.
-assert (p₂ = q₂).
- subst nf no nf' no'.
- unfold fixpoint_of_nat, fixpoint_of_path in Hq₂.
- rewrite path_of_nat_inv in Hq₂, Hq, Hq'.
- generalize Hq₂; intros H.
- apply matrix_all_fixpoints_ok in H.
-  2: apply mat_of_path_is_rotation_matrix.
-  unfold mat_of_path in H.
-  rewrite <- rotate_vec_mul in H.
-  move Hn₂ at bottom.
-  move Hr₂ at bottom.
-  move H at bottom.
-bbb.
-
-unfold rotation_fixpoint in Hq₂.
-unfold mat_of_path in Hq₂.
-Print rotation_unit_eigenvec.
-rewrite <- rotate_vec_mul in Hq₂.
-bbb.
-
-SearchAbout rotation_fixpoint.
- apply D_of_nat_prop with
-   (nf := nf) (no := no) (el := rev_path el₂) (n := nat_of_prod_nat (nf, no))
-   (p := q) in Hq₂.
-  subst nf no nf' no'.
-  rewrite path_of_nat_inv in Hq₂, Hq, Hq'.
-  destruct Hq₂ as (Hsoq₂ & Hrq₂).
-  move Hn₂ at bottom.
-  move Hr₂ at bottom.
-  move Hrq₂ at bottom.
-Print rotation_fixpoint.
-SearchAbout (fold_right rotate).
-bbb.
-  clear - Hn₂ Hr₂ Hrq₂.
-bbb.
-
-subst nf no nf' no'.
-unfold fixpoint_of_nat in Hq₂, Hq₃.
-rewrite path_of_nat_inv in Hq₂, Hq, Hq₃, Hq'.
-unfold fixpoint_of_path in Hq₂.
+     do 3 rewrite Rsqr_mult.
+     do 2 rewrite <- Rmult_plus_distr_l.
+     destruct (Req_dec rp 0) as [Hrpz| Hrpz].
+      Focus 2.
+      rewrite sqrt_mult_alt.
+       rewrite <- Hrp.
+        rewrite sqrt_Rsqr.
+         rewrite Rinv_l; [| easy ].
+         do 3 rewrite Rdiv_1_r.
+         replace (/ rp * xp)%R with (xp / rp)%R by lra.
+         replace (/ rp * yp)%R with (yp / rp)%R by lra.
+         replace (/ rp * zp)%R with (zp / rp)%R by lra.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
