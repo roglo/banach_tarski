@@ -2230,15 +2230,9 @@ Definition J_of_nats (p₁ : point) '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
   let a := arccos ((p · p') / r²) in
-  let cosθ := cos (a / INR n + 2 * INR k * PI / INR n) in
-  let sinθ := sin (a / INR n + 2 * INR k * PI / INR n) in
+  let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
-  if eq_point_dec p p' then mat_id
-  else if eq_point_dec p₁ px then
-    matrix_of_axis_cos_sin_angle px cosθ sinθ
-  else if eq_point_dec p₁ (- px) then
-    matrix_of_axis_cos_sin_angle px cosθ (- sinθ)
-  else mat_id.
+  matrix_of_axis_cos_sin_angle px (cos θ) (sin θ).
 
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ∥p₁∥ = ∥p₂∥
@@ -2356,11 +2350,10 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hso₂, Hso₃, <- Ha.
      remember (p × p') as px eqn:Hpx.
      symmetry.
-     destruct (eq_point_dec p p') as [Hpp| Hpp].
-      move Hpp at top; subst p'.
-      clear px Hpx.
-      clear k Hk.
-      clear a Ha.
+     destruct px as (xp, yp, zp); simpl.
+     remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
+     remember (a / INR n + 2 * INR k * PI / INR n)%R as θ eqn:Hθ.
+
 bbb.
 remember (fold_right rotate p₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
