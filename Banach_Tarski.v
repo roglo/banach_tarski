@@ -792,13 +792,14 @@ Definition prod_6_nat_of_nat n :=
   (n₅, n₆, n₇, n₈, n₉, n₁₀).
 
 Theorem surj_prod_6_nat_surj_nat : ∀ A P,
-  (∃ g : ℕ * ℕ * ℕ * ℕ * ℕ * ℕ -> A, ∀ a : A, P a → ∃ nn, g nn = a)
+  (∃ g : ℕ * ℕ * ℕ * ℕ * ℕ * ℕ -> A, ∀ a : A, P a
+   → ∃ n₁ n₂ n₃ n₄ n₅ n₆, g (n₁, n₂, n₃, n₄, n₅, n₆) = a)
   → ∃ f : ℕ → A, ∀ a : A, P a → ∃ n : ℕ, f n = a.
 Proof.
 intros * (g & Hg).
 exists (λ n, g (prod_6_nat_of_nat n)).
 intros a Ha.
-specialize (Hg a Ha) as ((((((n₅, n₆), n₇), n₈), n₉), n₁₀) & Hg); subst a.
+specialize (Hg a Ha) as (n₅ & n₆ & n₇ & n₈ & n₉ & n₁₀ & Hg); subst a.
 remember (nat_of_prod_nat (n₉, n₁₀)) as n₄.
 remember (nat_of_prod_nat (n₇, n₈)) as n₃.
 remember (nat_of_prod_nat (n₅, n₆)) as n₂.
@@ -2337,9 +2338,23 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
 
    destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hb₂| Hb₂].
     move Hpq₂ at top; subst q₂; clear Hb₂.
+    exists nf, no.
     destruct (bool_dec (is_neg_point p₃) (is_neg_point q₃)) as [Hb₃| Hb₃].
      move Hpq₃ at top; subst q₃; clear Hb₃.
-
+     exists nf', no'.
+     remember (arccos ((p · p') / r²)) as a eqn:Ha.
+     remember (Z.to_nat (Int_part (a / (2 * PI)))) as k eqn:Hk.
+     exists n, k.
+     unfold J_of_nats.
+     rewrite <- Hr, <- Hq₂, <- Hq₃.
+     do 2 rewrite rotate_vec_mul.
+     rewrite Hno, path_of_nat_inv.
+     rewrite Hno', path_of_nat_inv.
+     rewrite rotate_vec_mul in Hso₂, Hso₃.
+     remember (mat_of_path (rev_path el₂)) as M₂ eqn:HM₂.
+     remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
+     rewrite Hso₂, Hso₃, <- Ha.
+     remember (p × p') as px eqn:Hpx.
 bbb.
 remember (fold_right rotate p₂ (path_of_nat no)) as q eqn:Hq.
 remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
