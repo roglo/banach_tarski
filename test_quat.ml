@@ -67,6 +67,11 @@ value mat_of_quat q =
             (a**2. -. b**2. -. c**2. +. d**2.)
   end.
 
+value quat_norm q =
+  match q with
+  | Quat a (P b c d) → sqrt (a**2. +. b**2. +. c**2. +. d**2.)
+  end.
+
 value rot_x = mkrmat
   1.         0.                 0.
   0.         (1./.3.)           (-.2.*.sqrt 2./.3.)

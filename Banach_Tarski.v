@@ -2049,11 +2049,14 @@ Definition Qi := quat 0 (P 1 0 0).
 Definition Qj := quat 0 (P 0 1 0).
 Definition Qk := quat 0 (P 0 0 1).
 
+Definition quat_norm '(quat a (P b c d)) := √ (a² + b² + c² + d²).
+
 Notation "q₁ + q₂" := (quat_add q₁ q₂) : quat_scope.
 Notation "q₁ * q₂" := (quat_mul q₁ q₂) : quat_scope.
 Notation "'qi'" := (Qi) : quat_scope.
 Notation "'qj'" := (Qj) : quat_scope.
 Notation "'qk'" := (Qk) : quat_scope.
+Notation "∥ q ∥" := (quat_norm q) : quat_scope.
 
 Definition qr a := quat a 0.
 
@@ -2099,9 +2102,20 @@ Definition mat_of_quat '(quat a (P b c d)) :=
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
 
-Theorem mat_of_quat_inv : ∀ q, quat_of_mat (mat_of_quat q) = q.
+Theorem nonneg_plus_4_sqr : ∀ a b c d, (0 ≤ a² + b² + c² + d²)%R.
 Proof.
-intros (a, (b, c, d)); simpl.
+intros.
+apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+Qed.
+
+Theorem mat_of_quat_inv : ∀ q, (∥q∥ = 1%R)%Qn →
+  quat_of_mat (mat_of_quat q) = q.
+Proof.
+intros (a, (b, c, d)) Hqn; simpl in Hqn; simpl.
+apply sqrt_lem_0 in Hqn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
+symmetry in Hqn; rewrite Rmult_1_r in Hqn.
 unfold quat_of_mat, mat_of_quat; simpl.
 unfold mat_trace; simpl.
 remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
@@ -2126,14 +2140,10 @@ destruct (Req_dec t (-1)) as [Htd| Htd].
      Focus 2.
      apply Rsqr_inj.
       Focus 3.
-      do 5 rewrite Rsqr_mult.
-      rewrite Rsqr_sqrt.
-      rewrite Hz₀.
-      do 5 rewrite Rsqr_pow2.
-      ring_simplify.
-      do 4 rewrite <- Rsqr_pow2.
-enough (a²+b²+c²+d²=1)%R.
-
+      assert (Ha : (a = 0)%R) by now apply Rsqr_eq_0; lra.
+      subst a.
+      do 2 rewrite Rmult_0_r.
+      now rewrite Rmult_0_l.
 bbb.
 
 (* end play with quaternions. *)
