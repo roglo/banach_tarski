@@ -2132,17 +2132,27 @@ ring_simplify in Hx₀.
 ring_simplify in Hy₀.
 ring_simplify in Hz₀.
 destruct (Req_dec t (-1)) as [Htd| Htd].
- destruct (Rlt_dec x₀ y₀) as [Hxy| Hxy].
-  destruct (Rlt_dec y₀ z₀) as [Hyz| Hyz].
-   assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
-   f_equal.
-    field; intros H; apply sqrt_eq_0 in H; lra.
-    f_equal.
-     rewrite Rmult_0_r.
-     do 2 rewrite Rmult_0_l, Rplus_0_l.
-     do 2 rewrite Rminus_0_r.
-     rewrite Rminus_diag_eq; [ | easy ].
-     rewrite Rdiv_0_l.
+ assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
+ rewrite Rmult_0_r.
+ do 3 rewrite Rmult_0_l, Rplus_0_l.
+ do 3 rewrite Rminus_0_r.
+ rewrite Rminus_diag_eq; [ | easy ].
+ rewrite Rminus_diag_eq; [ | easy ].
+ rewrite Rminus_diag_eq; [ | easy ].
+ do 4 rewrite Rdiv_0_l.
+ f_equal.
+  now destruct (Rlt_dec x₀ y₀), (Rlt_dec y₀ z₀), (Rlt_dec x₀ z₀).
+
+  rewrite Rsqr_0 in Hqn, Hx₀, Hy₀, Hz₀, Ht.
+  rewrite Ropp_0 in Hx₀, Hy₀, Hz₀.
+  rewrite Rmult_0_r in Ht.
+  rewrite Rplus_0_l in Hqn, Hx₀.
+  rewrite Rminus_0_l in Hy₀, Hz₀, Ht.
+  clear Ht Htd.
+  assert (Hx₀' : x₀ = (4 * b² - 1)%R) by lra.
+  assert (Hy₀' : y₀ = (4 * c² - 1)%R) by lra.
+  assert (Hz₀' : z₀ = (4 * d² - 1)%R) by lra.
+  clear Hx₀ Hy₀ Hz₀.
 bbb.
 
 (* end play with quaternions. *)
