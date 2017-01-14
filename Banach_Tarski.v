@@ -2073,28 +2073,20 @@ Theorem qi_qj_qk : (qi * qj * qk = qr (-1))%Qn.
 Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
 Definition quat_of_mat M :=
-  let s :=
-    if Req_dec (mat_trace M) (-1) then
-      let x₀ := (a₁₁ M - a₂₂ M - a₃₃ M)%R in
-      let y₀ := (- a₁₁ M + a₂₂ M - a₃₃ M)%R in
-      let z₀ := (- a₁₁ M - a₂₂ M + a₃₃ M)%R in
-      if Rlt_dec x₀ y₀ then
-        if Rlt_dec y₀ z₀ then (* z is the biggest *)
-          ((a₂₁ M - a₁₂ M) / (2 * √ (1 + z₀)))%R
-        else (* y is the biggest *)
-          ((a₁₃ M - a₃₁ M) / (2 * √ (1 + y₀)))%R
-      else
-        if Rlt_dec x₀ z₀ then (* z is the biggest *)
-          ((a₂₁ M - a₁₂ M) / (2 * √ (1 + z₀)))%R
-        else (* x is the biggest *)
-          ((a₃₂ M - a₂₃ M) / (2 * √ (1 + x₀)))%R
-    else
-      (√ (1 + mat_trace M) / 2)%R
-  in
-  let x := ((a₃₂ M - a₂₃ M) / (4 * s))%R in
-  let y := ((a₁₃ M - a₃₁ M) / (4 * s))%R in
-  let z := ((a₂₁ M - a₁₂ M) / (4 * s))%R in
-  quat s (P x y z).
+  if Req_dec (mat_trace M) (-1) then
+    let x₀ := (a₁₁ M - a₂₂ M - a₃₃ M)%R in
+    let y₀ := (- a₁₁ M + a₂₂ M - a₃₃ M)%R in
+    let z₀ := (- a₁₁ M - a₂₂ M + a₃₃ M)%R in
+    let x := (√ (1 + x₀) / 2)%R in
+    let y := (√ (1 + y₀) / 2)%R in
+    let z := (√ (1 + z₀) / 2)%R in
+    quat 0 (P x y z)
+  else
+    let s := (√ (1 + mat_trace M) / 2)%R in
+    let x := ((a₃₂ M - a₂₃ M) / (4 * s))%R in
+    let y := ((a₁₃ M - a₃₁ M) / (4 * s))%R in
+    let z := ((a₂₁ M - a₁₂ M) / (4 * s))%R in
+    quat s (P x y z).
 
 Definition mat_of_quat '(quat a (P b c d)) :=
   mkrmat
@@ -2133,26 +2125,32 @@ ring_simplify in Hy₀.
 ring_simplify in Hz₀.
 destruct (Req_dec t (-1)) as [Htd| Htd].
  assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
- rewrite Rmult_0_r.
- do 3 rewrite Rmult_0_l, Rplus_0_l.
- do 3 rewrite Rminus_0_r.
- rewrite Rminus_diag_eq; [ | easy ].
- rewrite Rminus_diag_eq; [ | easy ].
- rewrite Rminus_diag_eq; [ | easy ].
- do 4 rewrite Rdiv_0_l.
  f_equal.
-  now destruct (Rlt_dec x₀ y₀), (Rlt_dec y₀ z₀), (Rlt_dec x₀ z₀).
-
-  rewrite Rsqr_0 in Hqn, Hx₀, Hy₀, Hz₀, Ht.
-  rewrite Ropp_0 in Hx₀, Hy₀, Hz₀.
-  rewrite Rmult_0_r in Ht.
-  rewrite Rplus_0_l in Hqn, Hx₀.
-  rewrite Rminus_0_l in Hy₀, Hz₀, Ht.
-  clear Ht Htd.
-  assert (Hx₀' : x₀ = (4 * b² - 1)%R) by lra.
-  assert (Hy₀' : y₀ = (4 * c² - 1)%R) by lra.
-  assert (Hz₀' : z₀ = (4 * d² - 1)%R) by lra.
-  clear Hx₀ Hy₀ Hz₀.
+ rewrite Rsqr_0 in Hqn, Hx₀, Hy₀, Hz₀, Ht.
+ rewrite Ropp_0 in Hx₀, Hy₀, Hz₀.
+ rewrite Rmult_0_r in Ht.
+ rewrite Rplus_0_l in Hqn, Hx₀.
+ rewrite Rminus_0_l in Hy₀, Hz₀, Ht.
+ clear Ht Htd.
+ assert (Hx₀' : x₀ = (4 * b² - 1)%R) by lra.
+ assert (Hy₀' : y₀ = (4 * c² - 1)%R) by lra.
+ assert (Hz₀' : z₀ = (4 * d² - 1)%R) by lra.
+ clear Hx₀ Hy₀ Hz₀.
+ subst x₀ y₀ z₀.
+ do 3 rewrite Rplus_minus.
+ do 3 rewrite Rsqr_pow2.
+ replace (4 * b ^ 2)%R with ((2 * b) ^ 2)%R by lra.
+ replace (4 * c ^ 2)%R with ((2 * c) ^ 2)%R by lra.
+ replace (4 * d ^ 2)%R with ((2 * d) ^ 2)%R by lra.
+ do 3 rewrite <- Rsqr_pow2.
+ do 3 rewrite sqrt_Rsqr_abs.
+ do 3 rewrite Rabs_mult.
+ replace (Rabs 2) with (Rabs (IZR 2)) by easy.
+ rewrite Rabs_Zabs; simpl.
+ do 3 rewrite Rmult_div.
+ unfold Rdiv.
+ rewrite Rinv_r; [ | lra ].
+ do 3 rewrite Rmult_1_l.
 bbb.
 
 (* end play with quaternions. *)
