@@ -1951,6 +1951,23 @@ Definition mat_of_quat '(quat a (V b c d)) :=
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
 
+Theorem mat_of_quat_inv : ∀ M, mat_of_quat (quat_of_mat M) = M.
+Proof.
+intros.
+unfold quat_of_mat, mat_of_quat; simpl; symmetry.
+destruct (Req_dec (mat_trace M) (-1)) as [Hmt| Hmt].
+ unfold mat_trace in Hmt.
+ rewrite Rsqr_0, Rplus_0_l, Rmult_0_r.
+ do 3 rewrite Rmult_0_l, Rplus_0_l, Rminus_0_r.
+ rewrite Rminus_0_l.
+ remember (a₁₁ M - a₂₂ M - a₃₃ M)%R as x₀ eqn:Hx₀.
+ remember (- a₁₁ M + a₂₂ M - a₃₃ M)%R as y₀ eqn:Hy₀.
+ remember (- a₁₁ M - a₂₂ M + a₃₃ M)%R as z₀ eqn:Hz₀.
+ remember ((√ (1 + x₀) / 2)%R) as x eqn:Hx.
+ remember ((√ (1 + y₀) / 2)%R) as y eqn:Hy.
+ remember ((√ (1 + z₀) / 2)%R) as z eqn:Hz.
+bbb.
+
 Theorem quat_of_mat_inv : ∀ q, (∥q∥ = 1%R)%Qn → (0 ≤ Qs q)%R →
   quat_of_mat (mat_of_quat q) = q.
 Proof.
@@ -2036,7 +2053,7 @@ Focus 2.
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   now do 3 rewrite Rmult_1_l.
-Abort. (* to be continued *)
+bbb.
 
 (* end play with quaternions. *)
 
