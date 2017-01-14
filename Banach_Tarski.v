@@ -1906,6 +1906,12 @@ Definition Qi := quat 0 (V 1 0 0).
 Definition Qj := quat 0 (V 0 1 0).
 Definition Qk := quat 0 (V 0 0 1).
 
+Definition quat_const_mul k '(quat a v) := quat (a * k) (k ⁎ v).
+
+Definition quat_inv '(quat a v) :=
+  let r := (a² + v·v)%R in
+  quat_const_mul (/ r) (quat a v).
+
 Definition quat_norm '(quat a (V b c d)) := √ (a² + b² + c² + d²).
 
 Notation "q₁ + q₂" := (quat_add q₁ q₂) : quat_scope.
@@ -1913,6 +1919,7 @@ Notation "q₁ * q₂" := (quat_mul q₁ q₂) : quat_scope.
 Notation "'qi'" := (Qi) : quat_scope.
 Notation "'qj'" := (Qj) : quat_scope.
 Notation "'qk'" := (Qk) : quat_scope.
+Notation "q '⁻¹'" := (quat_inv q) (at level 1, format "q ⁻¹"): quat_scope.
 Notation "∥ q ∥" := (quat_norm q) : quat_scope.
 
 Definition qr a := quat a 0.
@@ -1950,6 +1957,10 @@ Definition mat_of_quat '(quat a (V b c d)) :=
     (a² + b² - c² - d²) (2 * b * c - 2 * a * d) (2 * a * c + 2 * b * d)
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
+
+Definition quat_rotate q v := (q * v * q⁻¹)%Qn.
+
+bbb.
 
 Theorem mat_of_quat_inv : ∀ M, is_rotation_matrix M →
   mat_of_quat (quat_of_mat M) = M.
@@ -2013,6 +2024,9 @@ destruct (Req_dec (mat_trace M) (-1)) as [Hmt| Hmt].
     destruct Hrm as (Hid, Hrm).
     injection Hid; clear Hid; intros.
 (* bonjour le merdier... *)
+rewrite Hs2.
+clear s Hs Hs2 x Hx y Hy z Hz.
+nsatz.
 
 uuu.
  rewrite Rsqr_0, Rplus_0_l, Rmult_0_r.

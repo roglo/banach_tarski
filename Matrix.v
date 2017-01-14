@@ -80,7 +80,10 @@ Notation "u - v" := (vec_sub u v) : vec_scope.
 Notation "- v" := (vec_opp v) : vec_scope.
 Notation "u · v" := (vec_dot_mul u v) (at level 45, left associativity).
 Notation "u × v" := (vec_cross_mul u v) (at level 40, left associativity).
+Notation "v ²" := (vec_dot_mul v v) : vec_scope.
 Notation "∥ v ∥" := (vec_norm v) (at level 0, v at level 0, format "∥ v ∥").
+
+Definition vos a := V a a a.
 
 (* https://en.wikipedia.org/wiki/Rotation_matrix
    #Rotation_matrix_from_axis_and_angle *)
