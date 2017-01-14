@@ -2110,7 +2110,7 @@ apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
-Theorem mat_of_quat_inv : ∀ q, (∥q∥ = 1%R)%Qn →
+Theorem quat_of_mat_inv : ∀ q, (∥q∥ = 1%R)%Qn →
   quat_of_mat (mat_of_quat q) = q.
 Proof.
 intros * Hqn.
