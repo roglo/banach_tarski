@@ -5,8 +5,8 @@ type matrix =
     a₂₁ : float; a₂₂ : float; a₂₃ : float;
     a₃₁ : float; a₃₂ : float; a₃₃ : float }.
 
-type point = [ P of float and float and float ].
-type quat = [ Quat of float and point ].
+type vector = [ V of float and float and float ].
+type quat = [ Quat of float and vector ].
 
 value a₁₁ m = m.a₁₁.
 value a₁₂ m = m.a₁₂.
@@ -29,32 +29,24 @@ value req_dec (x : float) (y : float) = x = y;
 value rlt_dec (x : float) ( y : float) = x < y;
 
 value quat_of_mat m =
-  let s =
-    if req_dec (mat_trace m) (-1.) then
-      let x₀ = (a₁₁ m -. a₂₂ m -. a₃₃ m) in
-      let y₀ = (-. a₁₁ m +. a₂₂ m -. a₃₃ m) in
-      let z₀ = (-. a₁₁ m -. a₂₂ m +. a₃₃ m) in
-      if rlt_dec x₀ y₀ then
-        if rlt_dec y₀ z₀ then (* z is the biggest *)
-          ((a₂₁ m -. a₁₂ m) /. (2. *. sqrt (1. +. z₀)))
-        else (* y is the biggest *)
-          ((a₁₃ m -. a₃₁ m) /. (2. *. sqrt (1. +. y₀)))
-      else
-        if rlt_dec x₀ z₀ then (* z is the biggest *)
-          ((a₂₁ m -. a₁₂ m) /. (2. *. sqrt (1. +. z₀)))
-        else (* x is the biggest *)
-          ((a₃₂ m -. a₂₃ m) /. (2. *. sqrt (1. +. x₀)))
-    else
-      (sqrt (1. +. mat_trace m) /. 2.)
-  in
-  let x = ((a₃₂ m -. a₂₃ m) /. (4. *. s)) in
-  let y = ((a₁₃ m -. a₃₁ m) /. (4. *. s)) in
-  let z = ((a₂₁ m -. a₁₂ m) /. (4. *. s)) in
-  Quat s (P x y z).
+  if req_dec (mat_trace m) (-1.) then
+    let x₀ = (a₁₁ m -. a₂₂ m -. a₃₃ m) in
+    let y₀ = (-. a₁₁ m +. a₂₂ m -. a₃₃ m) in
+    let z₀ = (-. a₁₁ m -. a₂₂ m +. a₃₃ m) in
+    let x = (sqrt (1. +. x₀) /. 2.) in
+    let y = (sqrt (1. +. y₀) /. 2.) in
+    let z = (sqrt (1. +. z₀) /. 2.) in
+    Quat 0. (V x y z)
+  else
+    let s = (sqrt (1. +. mat_trace m) /. 2.) in
+    let x = ((a₃₂ m -. a₂₃ m) /. (4. *. s)) in
+    let y = ((a₁₃ m -. a₃₁ m) /. (4. *. s)) in
+    let z = ((a₂₁ m -. a₁₂ m) /. (4. *. s)) in
+    Quat s (V x y z).
 
 value mat_of_quat q =
   match q with
-  | Quat a (P b c d) →
+  | Quat a (V b c d) →
       mkrmat
         (a**2. +. b**2. -. c**2. -. d**2.)
           (2. *. b *. c -. 2. *. a *. d)
@@ -69,7 +61,7 @@ value mat_of_quat q =
 
 value quat_norm q =
   match q with
-  | Quat a (P b c d) → sqrt (a**2. +. b**2. +. c**2. +. d**2.)
+  | Quat a (V b c d) → sqrt (a**2. +. b**2. +. c**2. +. d**2.)
   end.
 
 value rot_x = mkrmat
@@ -78,4 +70,21 @@ value rot_x = mkrmat
   0.         (2.*.sqrt 2./.3.)  (1./.3.).
 
 quat_of_mat rot_x;
+rot_x.
 mat_of_quat (quat_of_mat rot_x);
+
+value q₁ = Quat (sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
+q₁.
+quat_of_mat (mat_of_quat q₁).
+
+value q₂ = Quat (-.sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
+q₂.
+quat_of_mat (mat_of_quat q₂).
+
+value q₃ = Quat (sqrt (2./.3.)) (V (-. sqrt 3./.3.) 0. 0.).
+q₃.
+quat_of_mat (mat_of_quat q₃).
+
+value q₄ = Quat (-.sqrt (2./.3.)) (V (-.sqrt 3./.3.) 0. 0.).
+q₄.
+quat_of_mat (mat_of_quat q₄).
