@@ -1,4 +1,8 @@
 (* testing quaternions *)
+(*
+ocaml -I +camlp5 camlp5r.cma
+#use "test_quat.ml";
+*)
 
 type matrix =
   { a₁₁ : float; a₁₂ : float; a₁₃ : float;
