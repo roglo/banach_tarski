@@ -19,8 +19,8 @@ Arguments Z.mul _ _ : simpl nomatch.
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
-  ↔ fold_right rotate (P (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
-      P (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
+  ↔ fold_right rotate (V (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
+      V (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
     ∧ N = (n + length el)%nat.
 Proof.
 intros el x y z n a₁ b₁ c₁ N₁.
@@ -380,7 +380,7 @@ Theorem rotate_0_0_1_b_nonzero : ∀ w el el₁ d,
   → norm_list el = el
   → w = (λ p, fold_right rotate p el)
   → ∃ a b c k,
-    w (P 0 0 1) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    w (V 0 0 1) = V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hel Hn Hw.
@@ -414,7 +414,7 @@ Theorem rotate_1_0_0_b_nonzero : ∀ w el el₁ d,
   → norm_list el = el
   → w = (λ p, fold_right rotate p el)
   → ∃ a b c k,
-    w (P 1 0 0) = P (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    w (V 1 0 0) = V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros w el el₁ d Hel Hn Hw.
@@ -443,7 +443,7 @@ Qed.
 Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
   el = el₁ ++ [FE lb d]
   → norm_list el = el
-  → fold_right rotate (P 1 0 0) el ≠ P 1 0 0.
+  → fold_right rotate (V 1 0 0) el ≠ V 1 0 0.
 Proof.
 intros el el₁ d Hel Hn.
 remember (λ p, fold_right rotate p el) as w eqn:Hw.
@@ -467,7 +467,7 @@ Qed.
 Theorem rotate_0_0_1_is_diff : ∀ el el₁ d,
   el = el₁ ++ [FE la d]
   → norm_list el = el
-  → fold_right rotate (P 0 0 1) el ≠ P 0 0 1.
+  → fold_right rotate (V 0 0 1) el ≠ V 0 0 1.
 Proof.
 intros el el₁ d Hel Hn.
 remember (λ p, fold_right rotate p el) as w eqn:Hw.
@@ -502,10 +502,10 @@ rewrite rev_path_cons, rev_path_single in Hel₁.
 destruct e₁ as (t, d).
 destruct t.
  apply rotate_0_0_1_is_diff in Hel₁; [ | apply norm_list_idemp ].
- exists (P 0 0 1).
+ exists (V 0 0 1).
  now rewrite rotate_rotate_norm.
 
  apply rotate_1_0_0_is_diff in Hel₁; [ | apply norm_list_idemp ].
- exists (P 1 0 0).
+ exists (V 1 0 0).
  now rewrite rotate_rotate_norm.
 Qed.

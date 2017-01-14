@@ -26,7 +26,7 @@ Fixpoint app_gr f p :=
 Fixpoint app_gr_point f p :=
   match f with
   | Rot e => rotate (negf e) p
-  | Xtransl dx => match p with P x y z => P (x - dx) y z end
+  | Xtransl dx => match p with V x y z => V (x - dx) y z end
   | Comb g h => app_gr_point h (app_gr_point g p)
   end.
 
@@ -304,7 +304,7 @@ split; intros HEF.
   rewrite rotate_neg_rotate in H; apply H, Hp.
 
   destruct p as (x, y, z); simpl in HEF.
-  pose proof HEF (P (x + dx) y z) as H; simpl in H.
+  pose proof HEF (V (x + dx) y z) as H; simpl in H.
   unfold Rminus in H.
   rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r in H.
   apply H, Hp.
@@ -314,10 +314,10 @@ split; intros HEF.
   intros q Hq; eapply IHg1; eassumption.
 Qed.
 
-Theorem partition_group_map : ∀ (F : set point) P g,
-  is_partition F P → is_partition (app_gr g F) (map (app_gr g) P).
+Theorem partition_group_map : ∀ (F : set point) v g,
+  is_partition F v → is_partition (app_gr g F) (map (app_gr g) v).
 Proof.
-intros F P * HP.
+intros F v * HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
@@ -325,12 +325,12 @@ split.
   split.
    intros Hr.
    revert F HF Hr.
-   induction P as [| P PL]; intros; [ now apply HF in Hr | ].
+   induction v as [| v vl]; intros; [ now apply HF in Hr | ].
    simpl in HF; simpl.
    generalize Hr; intros H.
    apply HF in H; simpl in H.
    destruct H as [H| H]; [ now left | right ].
-   eapply IHPL; [ | easy | eassumption ].
+   eapply IHvl; [ | easy | eassumption ].
    intros i j Hij.
    unfold set_eq; simpl; intros y.
    assert (HSij : S i ≠ S j).
@@ -343,11 +343,11 @@ split.
 
    intros Hme.
    revert F HF.
-   induction P as [| P PL]; intros; [ easy | ].
+   induction v as [| v vl]; intros; [ easy | ].
    simpl in HF, Hme; apply HF.
    destruct Hme as [Hme| Hme]; [ now left | ].
    right; simpl.
-   apply IHPL; [ | easy | intros y; split; intros H; apply H ].
+   apply IHvl; [ | easy | intros y; split; intros H; apply H ].
    intros i j Hij y.
    assert (HSij : S i ≠ S j).
     intros HSij; now apply Hij, Nat.succ_inj.
@@ -361,7 +361,7 @@ split.
   split.
    intros Hp.
    revert F HF Hp.
-   induction P as [| P PL]; intros.
+   induction v as [| v vl]; intros.
     unfold set_eq in HF; simpl in HF.
     now apply HF in Hp.
 
@@ -369,7 +369,7 @@ split.
     generalize Hp; intros H.
     apply HF in H; simpl in H.
     destruct H as [H| H]; [ now left | right ].
-    eapply IHPL; [ | easy | eassumption ].
+    eapply IHvl; [ | easy | eassumption ].
     intros i j Hij.
     unfold set_eq; simpl; intros q.
     assert (HSij : S i ≠ S j).
@@ -382,11 +382,11 @@ split.
 
    intros Hme.
    revert F HF.
-   induction P as [| P PL]; intros; [ easy | ].
+   induction v as [| v vl]; intros; [ easy | ].
    simpl in HF, Hme; apply HF.
    destruct Hme as [Hme| Hme]; [ now left | ].
    right; simpl.
-   apply IHPL; [ | easy | intros q; split; intros H; apply H ].
+   apply IHvl; [ | easy | intros q; split; intros H; apply H ].
    intros i j Hij q.
    assert (HSij : S i ≠ S j).
     intros HSij; now apply Hij, Nat.succ_inj.
@@ -400,7 +400,7 @@ split.
   split.
    intros Hgh.
    revert F HF IHg IHh Hgh.
-   induction P as [| P PL]; intros.
+   induction v as [| v vl]; intros.
     rewrite IHh in Hgh; simpl in Hgh.
     eapply app_gr_empty_set, Hgh.
 
@@ -408,7 +408,7 @@ split.
     simpl in Hgh.
     apply group_union_distr in Hgh.
     destruct Hgh as [Hgh| Hgh]; [ now left | right ].
-    eapply IHPL.
+    eapply IHvl.
      intros i j Hij.
      unfold set_eq; simpl; intros y.
      assert (HSij : S i ≠ S j).
@@ -425,12 +425,12 @@ split.
 
      apply group_union_list_distr.
 
-     pose proof group_union_list_distr h PL.
+     pose proof group_union_list_distr h vl.
      now rewrite <- H in Hgh.
 
    intros Hgh.
    revert F HF IHg IHh Hgh.
-   induction P as [| P PL]; intros; [ easy | ].
+   induction v as [| v vl]; intros; [ easy | ].
    destruct Hgh as [Hgh| Hgh].
     rewrite IHh; simpl.
     rewrite set_eq_equiv; [ | now rewrite group_union_distr ].
@@ -454,7 +454,7 @@ split.
  apply Hpi; clear Hpi.
  split.
   clear - Hi.
-  rename P into Ql.
+  rename v into Ql.
   revert p Ql Hi.
   induction i; intros.
    destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hi | ].
@@ -466,7 +466,7 @@ split.
    now apply IHi.
 
   clear - Hj.
-  rename P into Ql.
+  rename v into Ql.
   revert p Ql Hj.
   induction j; intros.
    destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hj | ].

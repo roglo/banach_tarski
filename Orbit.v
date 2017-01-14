@@ -81,8 +81,8 @@ Qed.
 
 Definition orbit_selector := choice_function same_orbit.
 
-Definition sphere r := mkset (λ '(P x y z), (x² + y² + z² = r²)%R).
-Definition ball := mkset (λ '(P x y z), (x² + y² + z² <= 1)%R).
+Definition sphere r := mkset (λ '(V x y z), (x² + y² + z² = r²)%R).
+Definition ball := mkset (λ '(V x y z), (x² + y² + z² <= 1)%R).
 
 Definition D :=
   mkset
@@ -141,7 +141,7 @@ Theorem in_ball_after_rotation : ∀ p m,
 Proof.
 intros * His Hrm.
 destruct p as (x, y, z).
-remember (P x y z) as p eqn:HP.
+remember (V x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
 assert (Hos : p ∈ sphere (√ r)).
  subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
