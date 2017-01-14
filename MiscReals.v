@@ -337,3 +337,12 @@ rewrite fold_Rdiv.
 rewrite sqrt_div; [ | apply Rle_0_1 | easy ].
 rewrite sqrt_1; lra.
 Qed.
+
+Theorem eq_mul_div_eq : ∀ a b c, b ≠ 0%R → (a = b * c → a / b = c)%R.
+Proof.
+intros * Hb Hab.
+subst a; unfold Rdiv.
+rewrite Rmult_comm, <- Rmult_assoc.
+rewrite Rinv_l; [ | easy ].
+now rewrite Rmult_1_l.
+Qed.
