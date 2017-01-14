@@ -2134,17 +2134,15 @@ ring_simplify in Hz₀.
 destruct (Req_dec t (-1)) as [Htd| Htd].
  destruct (Rlt_dec x₀ y₀) as [Hxy| Hxy].
   destruct (Rlt_dec y₀ z₀) as [Hyz| Hyz].
+   assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
    f_equal.
-    field_simplify.
-    rewrite Rdiv_1_r.
-    apply eq_mul_div_eq.
-     Focus 2.
-     apply Rsqr_inj.
-      Focus 3.
-      assert (Ha : (a = 0)%R) by now apply Rsqr_eq_0; lra.
-      subst a.
-      do 2 rewrite Rmult_0_r.
-      now rewrite Rmult_0_l.
+    field; intros H; apply sqrt_eq_0 in H; lra.
+    f_equal.
+     rewrite Rmult_0_r.
+     do 2 rewrite Rmult_0_l, Rplus_0_l.
+     do 2 rewrite Rminus_0_r.
+     rewrite Rminus_diag_eq; [ | easy ].
+     rewrite Rdiv_0_l.
 bbb.
 
 (* end play with quaternions. *)
