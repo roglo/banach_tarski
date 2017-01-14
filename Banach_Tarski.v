@@ -1956,7 +1956,51 @@ Proof.
 intros.
 unfold quat_of_mat, mat_of_quat; simpl; symmetry.
 destruct (Req_dec (mat_trace M) (-1)) as [Hmt| Hmt].
+ Focus 2.
  unfold mat_trace in Hmt.
+ remember (√ (1 + mat_trace M) / 2)%R as s eqn:Hs.
+ remember ((a₃₂ M - a₂₃ M) / (4 * s))%R as x eqn:Hx.
+ remember ((a₁₃ M - a₃₁ M) / (4 * s))%R as y eqn:Hy.
+ remember ((a₂₁ M - a₁₂ M) / (4 * s))%R as z eqn:Hz.
+ unfold mat_trace in Hs.
+ destruct M; simpl in *; unfold mkrmat.
+ f_equal.
+  generalize Hs; intros Hs2.
+  apply (f_equal Rsqr) in Hs2.
+  unfold Rdiv in Hs2.
+  rewrite Rsqr_mult in Hs2.
+  do 3 rewrite Rsqr_pow2 in Hs2.
+  replace ((/ 2) ^ 2)%R with (/ 4)%R in Hs2 by lra.
+  do 2 rewrite <- Rsqr_pow2 in Hs2.
+  rewrite Rsqr_sqrt in Hs2.
+  rewrite Hs2, Hx, Hy, Hz.
+  unfold Rdiv.
+  do 3 rewrite Rsqr_mult.
+  rewrite Rsqr_inv.
+   rewrite Rsqr_mult.
+   do 5 rewrite Rsqr_pow2.
+   replace (4 ^ 2)%R with 16%R by lra.
+   remember 16%R as sixteen.
+   remember 4%R as four.
+   rewrite Rinv_mult_distr; [ | lra | ].
+   apply Rmult_eq_reg_r with (r := sixteen).
+
+uuu.
+ rewrite Rsqr_0, Rplus_0_l, Rmult_0_r.
+ do 3 rewrite Rmult_0_l, Rplus_0_l, Rminus_0_r.
+ rewrite Rminus_0_l.
+ remember (a₁₁ M - a₂₂ M - a₃₃ M)%R as x₀ eqn:Hx₀.
+ remember (- a₁₁ M + a₂₂ M - a₃₃ M)%R as y₀ eqn:Hy₀.
+ remember (- a₁₁ M - a₂₂ M + a₃₃ M)%R as z₀ eqn:Hz₀.
+ remember ((√ (1 + x₀) / 2)%R) as x eqn:Hx.
+ remember ((√ (1 + y₀) / 2)%R) as y eqn:Hy.
+ remember ((√ (1 + z₀) / 2)%R) as z eqn:Hz.
+ generalize Hx; intros Hx2.
+ generalize Hy; intros Hy2.
+ generalize Hz; intros Hz2.
+
+bbb.
+ (* mat_trace M = -1 *)
  rewrite Rsqr_0, Rplus_0_l, Rmult_0_r.
  do 3 rewrite Rmult_0_l, Rplus_0_l, Rminus_0_r.
  rewrite Rminus_0_l.
