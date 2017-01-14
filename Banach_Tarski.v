@@ -1951,9 +1951,10 @@ Definition mat_of_quat '(quat a (V b c d)) :=
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
 
-Theorem mat_of_quat_inv : ∀ M, mat_of_quat (quat_of_mat M) = M.
+Theorem mat_of_quat_inv : ∀ M, is_rotation_matrix M →
+  mat_of_quat (quat_of_mat M) = M.
 Proof.
-intros.
+intros * Hrm.
 unfold quat_of_mat, mat_of_quat; simpl; symmetry.
 destruct (Req_dec (mat_trace M) (-1)) as [Hmt| Hmt].
  Focus 2.
@@ -1983,7 +1984,35 @@ destruct (Req_dec (mat_trace M) (-1)) as [Hmt| Hmt].
    remember 16%R as sixteen.
    remember 4%R as four.
    rewrite Rinv_mult_distr; [ | lra | ].
-   apply Rmult_eq_reg_r with (r := sixteen).
+   do 3 rewrite <- Rmult_assoc.
+   apply Rmult_eq_reg_r with (r := (sixteen * s ^ 2)%R).
+   unfold Rminus.
+   do 9 rewrite Rmult_plus_distr_r.
+   do 3 rewrite fold_Rminus.
+   subst four sixteen.
+   do 10 rewrite fold_Rdiv.
+   do 2 rewrite <- Ropp_mult_distr_l.
+   do 2 rewrite fold_Rminus.
+   replace
+     ((1 / 4 * (16 * s ^ 2) +
+       (a₁₁ / 4 * (16 * s ^ 2) + a₂₂ / 4 * (16 * s ^ 2) +
+        a₃₃ / 4 * (16 * s ^ 2)) +
+       (a₃₂ - a₂₃) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2) -
+       (a₁₃ - a₃₁) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2) -
+       (a₂₁ - a₁₂) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2))%R) with
+     ((4 * s ^ 2 * (1 + (a₁₁ + a₂₂ + a₃₃)) +
+       (a₃₂ - a₂₃) ^ 2 * (/ s ^ 2 * s ^ 2) -
+       (a₁₃ - a₃₁) ^ 2 * (/ s ^ 2 * s ^ 2) -
+       (a₂₁ - a₁₂) ^ 2 * (/ s ^ 2 * s ^ 2))%R) by lra.
+   rewrite Rinv_l.
+    do 3 rewrite Rmult_1_r.
+    rewrite Rsqr_pow2 in Hs2.
+    replace (1 + (a₁₁ + a₂₂ + a₃₃))%R with (4 * s ^ 2)%R by lra.
+    unfold is_rotation_matrix in Hrm; simpl in Hrm.
+    unfold mat_transp, mat_det, mat_mul, mat_id, mkrmat in Hrm; simpl in Hrm.
+    destruct Hrm as (Hid, Hrm).
+    injection Hid; clear Hid; intros.
+(* bonjour le merdier... *)
 
 uuu.
  rewrite Rsqr_0, Rplus_0_l, Rmult_0_r.
