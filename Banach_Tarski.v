@@ -2094,14 +2094,6 @@ Definition mat_of_quat '(quat a (P b c d)) :=
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
 
-Theorem nonneg_plus_4_sqr : ∀ a b c d, (0 ≤ a² + b² + c² + d²)%R.
-Proof.
-intros.
-apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
-apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
-apply Rplus_le_le_0_compat; apply Rle_0_sqr.
-Qed.
-
 Theorem quat_of_mat_inv : ∀ q, (∥q∥ = 1%R)%Qn →
   quat_of_mat (mat_of_quat q) = q.
 Proof.

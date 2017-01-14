@@ -346,3 +346,11 @@ rewrite Rmult_comm, <- Rmult_assoc.
 rewrite Rinv_l; [ | easy ].
 now rewrite Rmult_1_l.
 Qed.
+
+Theorem nonneg_plus_4_sqr : ∀ a b c d, (0 ≤ a² + b² + c² + d²)%R.
+Proof.
+intros.
+apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
+apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+Qed.
