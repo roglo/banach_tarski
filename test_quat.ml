@@ -66,3 +66,11 @@ value mat_of_quat q =
           (2. *. a *. b +. 2. *. c *. d)
             (a**2. -. b**2. -. c**2. +. d**2.)
   end.
+
+value rot_x = mkrmat
+  1.         0.                 0.
+  0.         (1./.3.)           (-.2.*.sqrt 2./.3.)
+  0.         (2.*.sqrt 2./.3.)  (1./.3.).
+
+quat_of_mat rot_x;
+mat_of_quat (quat_of_mat rot_x);
