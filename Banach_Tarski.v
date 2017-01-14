@@ -1910,7 +1910,7 @@ Definition quat_const_mul k '(quat a v) := quat (a * k) (k ⁎ v).
 
 Definition quat_inv '(quat a v) :=
   let r := (a² + v·v)%R in
-  quat_const_mul (/ r) (quat a v).
+  quat_const_mul (/ r) (quat a (- v)).
 
 Definition quat_norm '(quat a (V b c d)) := √ (a² + b² + c² + d²).
 
