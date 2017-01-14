@@ -45,7 +45,7 @@ Add Parametric Relation : _ same_orbit
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
-Definition equiv_same_orbit : equiv point same_orbit :=
+Definition equiv_same_orbit : equiv vector same_orbit :=
   conj same_orbit_refl (conj same_orbit_trans same_orbit_sym).
 
 Definition not_in_fixpoints :=

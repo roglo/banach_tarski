@@ -295,10 +295,10 @@ Qed.
 
 Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
 
-Definition ter_bin_of_point r '(V x y z) := ter_bin_of_frac_part (x / r).
+Definition ter_bin_of_vec r '(V x y z) := ter_bin_of_frac_part (x / r).
 
 Theorem ter_bin_of_ball_surj : ∀ r, (0 < r)%R → ∀ (u : ℕ → bool),
-  ∃ p : point, p ∈ sphere r ∧ (∀ n, ter_bin_of_point r p n = u n).
+  ∃ p : vector, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec r p n = u n).
 Proof.
 intros * Hr *.
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
@@ -326,7 +326,7 @@ replace 1%R with (1²)%R by apply Rsqr_1.
 apply Rsqr_incr_1; [ easy | easy | lra ].
 Qed.
 
-Theorem ball_not_countable : ¬ (is_countable {p : point | p ∈ ball}).
+Theorem ball_not_countable : ¬ (is_countable {p : vector | p ∈ ball}).
 Proof.
 intros H.
 unfold is_countable in H.
@@ -339,7 +339,7 @@ enough (Hcontr : ∃ a, a ∈ ball ∧ ∀ n, proj1_sig (f n) ≠ a).
  now rewrite Hn in Hnn; apply Hnn.
 
  specialize
-  (Cantor_gen ℕ ℕ point (setp (sphere 1)) id (ter_bin_of_point 1) id_nat
+  (Cantor_gen ℕ ℕ vector (setp (sphere 1)) id (ter_bin_of_vec 1) id_nat
      (ter_bin_of_ball_surj 1 Rlt_0_1)).
  intros H.
  specialize (H (λ n, proj1_sig (f n))) as (p, H).
@@ -356,160 +356,17 @@ enough (Hcontr : ∃ a, a ∈ ball ∧ ∀ n, proj1_sig (f n) ≠ a).
 Qed.
 
 Theorem ball_set_not_countable : ∀ r, (0 < r)%R →
-  ∀ f : ℕ → point, ∃ p : point, p ∈ sphere r ∧ ∀ n : ℕ, f n ≠ p.
+  ∀ f : ℕ → vector, ∃ p : vector, p ∈ sphere r ∧ ∀ n : ℕ, f n ≠ p.
 Proof.
 intros * Hr *.
 specialize
- (Cantor_gen ℕ ℕ point (setp (sphere r)) id (ter_bin_of_point r) id_nat
+ (Cantor_gen ℕ ℕ vector (setp (sphere r)) id (ter_bin_of_vec r) id_nat
     (ter_bin_of_ball_surj r Hr) f) as (p, Hp).
 exists p.
 split; [ apply (Hp O) | ].
 intros n.
 apply not_eq_sym, Hp.
 Qed.
-
-Require Import QArith.
-Notation "'ℚ'" := Q.
-
-Definition mkqmat := @mkmat ℚ.
-
-Definition qmat_id := mkqmat 1 0 0 0 1 0 0 0 1.
-
-Definition qmat_mul m₁ m₂ :=
-  mkqmat
-    (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
-    (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
-    (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
-    (a₂₁ m₁ * a₁₁ m₂ + a₂₂ m₁ * a₂₁ m₂ + a₂₃ m₁ * a₃₁ m₂)
-    (a₂₁ m₁ * a₁₂ m₂ + a₂₂ m₁ * a₂₂ m₂ + a₂₃ m₁ * a₃₂ m₂)
-    (a₂₁ m₁ * a₁₃ m₂ + a₂₂ m₁ * a₂₃ m₂ + a₂₃ m₁ * a₃₃ m₂)
-    (a₃₁ m₁ * a₁₁ m₂ + a₃₂ m₁ * a₂₁ m₂ + a₃₃ m₁ * a₃₁ m₂)
-    (a₃₁ m₁ * a₁₂ m₂ + a₃₂ m₁ * a₂₂ m₂ + a₃₃ m₁ * a₃₂ m₂)
-    (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
-
-Delimit Scope qmat_scope with qmat.
-Notation "m₁ * m₂" := (qmat_mul m₁ m₂) : qmat_scope.
-
-Definition Trv i j a :=
-  match i with
-  | 1%nat =>
-      match j with
-      | 1%nat => qmat_id
-      | 2 => mkqmat 1 a 0 0 1 0 0 0 1
-      | _ => mkqmat 1 0 a 0 1 0 0 0 1
-      end
-  | 2%nat =>
-      match j with
-      | 1%nat => mkqmat 1 0 0 a 1 0 0 0 1
-      | 2 => qmat_id
-      | _ => mkqmat 1 0 0 0 1 a 0 0 1
-      end
-  | _ =>
-      match j with
-      | 1%nat => mkqmat 1 0 0 0 1 0 a 0 1
-      | 2 => mkqmat 1 0 0 0 1 0 0 a 1
-      | _ => qmat_id
-      end
-  end.
-
-Definition Dil i a :=
-  match i with
-  | 1%nat => mkqmat a 0 0 0 1 0 0 0 1
-  | 2 => mkqmat 1 0 0 0 a 0 0 0 1
-  | _ => mkqmat 1 0 0 0 1 0 0 0 a
-  end.
-
-Definition mat_swap i j :=
-  match i with
-  | 1%nat =>
-      match j with
-      | 1%nat => qmat_id
-      | 2 => (Dil 2 (-1 # 1) * Trv 1 2 1 * Trv 2 1 (-1 # 1) * Trv 1 2 1)%qmat
-      | _ => (Dil 3 (-1 # 1) * Trv 1 3 1 * Trv 3 1 (-1 # 1) * Trv 1 3 1)%qmat
-      end
-  | 2 =>
-      match j with
-      | 1%nat =>
-          (Dil 1 (-1 # 1) * Trv 2 1 1 * Trv 1 2 (-1 # 1) * Trv 2 1 1)%qmat
-      | 2 =>
-          qmat_id
-      | _ =>
-          (Dil 3 (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat
-      end
-  | _ =>
-      match j with
-      | 1%nat =>
-          (Dil 1 (-1 # 1) * Trv 1 3 1 * Trv 3 1 (-1 # 1) * Trv 1 3 1)%qmat
-      | 2 =>
-          (Dil 3 (-1 # 1) * Trv 2 3 1 * Trv 3 2 (-1 # 1) * Trv 2 3 1)%qmat
-      | _ =>
-          qmat_id
-      end
-  end.
-
-Definition Qabs q := if Qlt_le_dec q 0 then Qopp q else q.
-
-Fixpoint argmax_loop it m i k :=
-  match it with
-  | O => O
-  | S it' =>
-      let i_max := if eq_nat_dec i 3 then 3 else argmax_loop it' m (S i) k in
-      if Qlt_le_dec (Qabs (mt i k m)) (Qabs (mt i_max k m)) then i_max else i
-  end.
-
-Definition argmax m k := argmax_loop 3 m k k.
-
-Fixpoint cancel_but_loop four_minus_i k m :=
-  match four_minus_i with
-  | O => m
-  | S fmi =>
-      let i := (4 - four_minus_i)%nat in
-      let m :=
-        if eq_nat_dec i k then m else (Trv i k (- mt i k m) * m)%qmat
-      in
-      cancel_but_loop fmi k m
-  end.
-
-Definition cancel_but := cancel_but_loop 3.
-
-Fixpoint gauss_jordan_loop four_minus_k m :=
-  match four_minus_k with
-  | O => m
-  | S fmk =>
-      let k := (4 - four_minus_k)%nat in
-      let i_max := argmax m k in
-      if Qeq_dec (mt i_max k m) 0 then m
-      else
-        let m := (mat_swap k i_max * m)%qmat in
-        let m := (Dil k (/ mt k k m) * m)%qmat in
-        let m := cancel_but k m in
-        let m := mat_map Qred m in
-        gauss_jordan_loop fmk m
-  end.
-
-Definition gauss_jordan := gauss_jordan_loop 3.
-
-Definition mat_ex :=
-  mkqmat 1 (2#1) (3#1) (4#1) (5#1) (6#1) (7#1) (8#1) (9#1).
-Definition mat_ex2 :=
-  mkqmat (2#1) (-1#1) 0 (-1#1) (2#1) (-1#1) 0 (-1#1) (2#1).
-Definition mat_ex3 :=
-  mkqmat (1#1) (3#1) (1#1) (1#1) (1#1) (-1#1) (3#1) (11#1) (5#1).
-Definition mat_ex4 :=
-  mkqmat (2#1) (1#1) (-1#1) (-3#1) (-1#1) (2#1) (-2#1) (1#1) (2#1).
-
-(*
-Compute (mat_swap 1 2 * mat_ex)%qmat.
-Compute (mat_swap 2 3 * mat_ex)%qmat.
-Compute (mat_swap 3 1 * mat_ex)%qmat.
-*)
-
-(*
-Compute (gauss_jordan mat_ex).
-Compute (gauss_jordan mat_ex2).
-Compute (gauss_jordan mat_ex3).
-Compute (gauss_jordan mat_ex4).
-*)
 
 Definition rotation_unit_eigenvec (m : matrix ℝ) :=
   let x := (a₂₃ m - a₃₂ m)%R in
@@ -856,7 +713,7 @@ Qed.
 Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
   let p := rotation_fixpoint (mat_of_path (path_of_nat nf)) r in
   let p₁ :=
-    if is_neg_point p then if (b : bool) then p else (- p)%vec
+    if is_neg_vec p then if (b : bool) then p else (- p)%vec
     else if b then (- p)%vec else p
   in
   fold_right rotate p₁ (path_of_nat no).
@@ -1195,7 +1052,7 @@ Qed.
 Theorem free_family_diff_norm_vec : ∀ u v,
   ∥u∥ = ∥v∥
   → u ≠ v
-  → is_neg_point u = is_neg_point v
+  → is_neg_vec u = is_neg_vec v
   → u ≠ 0%vec
   → v ≠ 0%vec
   → ∀ a b : ℝ, (a ⁎ u + b ⁎ v)%vec = 0%vec → a = 0%R ∧ b = 0%R.
@@ -1253,7 +1110,7 @@ destruct (Req_dec a 0) as [Ha| Ha].
     do 3 rewrite <- Ropp_mult_distr_l in Hn.
     do 3 rewrite Rmult_1_l in Hn.
     fold (vec_opp (V x₁ y₁ z₁)) in Hn.
-    rewrite is_neg_point_neg_point in Hn; [ | easy ].
+    rewrite is_neg_vec_neg_vec in Hn; [ | easy ].
     now symmetry in Hn; apply no_fixpoint_negb in Hn.
 
    intros H; apply Hv₁.
@@ -1264,7 +1121,7 @@ Qed.
 
 Theorem nonzero_cross_mul : ∀ u v,
   ∥u∥ = ∥v∥
-  → is_neg_point u = is_neg_point v
+  → is_neg_vec u = is_neg_vec v
   → u ≠ 0%vec
   → v ≠ 0%vec
   → u ≠ v
@@ -1597,7 +1454,7 @@ Qed.
 
 Theorem vec_cross_mul_are_free_family : ∀ u v,
   ∥u∥ = ∥v∥
-  → is_neg_point u = is_neg_point v
+  → is_neg_vec u = is_neg_vec v
   → u ≠ 0%vec
   → v ≠ 0%vec
   → u ≠ v
@@ -1672,13 +1529,13 @@ Theorem fixpoint_unicity : ∀ M u v,
   is_rotation_matrix M
   → M ≠ mat_id
   → ∥u∥ = ∥v∥
-  → is_neg_point u = is_neg_point v
+  → is_neg_vec u = is_neg_vec v
   → (M * u)%vec = u
   → (M * v)%vec = v
   → u = v.
 Proof.
 intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
-destruct (eq_point_dec u (V 0 0 0)) as [Hv₁| Hv₁].
+destruct (eq_vec_dec u (V 0 0 0)) as [Hv₁| Hv₁].
  rewrite Hv₁ in Hvn.
  unfold vec_norm in Hvn at 1.
  rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
@@ -1687,14 +1544,14 @@ destruct (eq_point_dec u (V 0 0 0)) as [Hv₁| Hv₁].
  apply vec_norm_eq_0 in Hvn.
  now rewrite Hvn, Hv₁.
 
- destruct (eq_point_dec v (V 0 0 0)) as [Hv₂| Hv₂].
+ destruct (eq_vec_dec v (V 0 0 0)) as [Hv₂| Hv₂].
   rewrite Hv₂ in Hvn.
   unfold vec_norm in Hvn at 2.
   rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
   rewrite sqrt_0 in Hvn.
   now apply vec_norm_eq_0 in Hvn.
 
-  destruct (eq_point_dec u v) as [Hvv| Hvv]; [ easy | exfalso ].
+  destruct (eq_vec_dec u v) as [Hvv| Hvv]; [ easy | exfalso ].
   remember (vec_const_mul (∥u∥ / ∥(u × v)∥)%R (u × v)) as W eqn:HW.
   move W before v.
   assert (Hp₃ : (M * (u × v) = u × v)%vec).
@@ -1739,7 +1596,7 @@ destruct (eq_point_dec u (V 0 0 0)) as [Hv₁| Hv₁].
      do 3 rewrite Rmult_1_l in Hbv.
      fold (vec_opp (V x y z)) in Hbv.
      rewrite Hbv in Hn.
-     rewrite is_neg_point_neg_point in Hn; [ | easy ].
+     rewrite is_neg_vec_neg_vec in Hn; [ | easy ].
      now symmetry in Hn; apply no_fixpoint_negb in Hn.
 
     move Hvv before Hvn.
@@ -1779,17 +1636,17 @@ Theorem eigenvec_and_fixpoint_of_path_collinear : ∀ el p q r,
   → norm_list el ≠ []
   → (mat_of_path el * p)%vec = p
   → q = fixpoint_of_path r el
-  → p = if bool_dec (is_neg_point p) (is_neg_point q) then q else (- q)%vec.
+  → p = if bool_dec (is_neg_vec p) (is_neg_vec q) then q else (- q)%vec.
 Proof.
 intros el p₁ p₂ r Hsr₁ Hsr₂ Hnl Hr Hp₂.
-remember (is_neg_point p₁) as b eqn:Hb.
-remember (is_neg_point p₂) as b₁.
+remember (is_neg_vec p₁) as b eqn:Hb.
+remember (is_neg_vec p₂) as b₁.
 rename Heqb₁ into Hb₁.
 move Hb before Hb₁.
 symmetry in Hb, Hb₁.
 apply rotation_fixpoint_of_path in Hp₂.
 move Hp₂ at bottom; move Hr before Hp₂.
-remember (is_neg_point p₁) as b₂ eqn:Hb₂.
+remember (is_neg_vec p₁) as b₂ eqn:Hb₂.
 symmetry in Hb₂.
 move Hb₂ before Hb₁.
 destruct b₁, b.
@@ -1823,7 +1680,7 @@ destruct b₁, b.
 
   rewrite Hb₂.
   destruct (bool_dec false true) as [| H]; [ easy | clear H ].
-  rewrite is_neg_point_neg_point; [ easy | ].
+  rewrite is_neg_vec_neg_vec; [ easy | ].
   intros H; subst p₂; simpl in Hb₂.
   destruct (Rlt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
   destruct (Rgt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
@@ -1861,7 +1718,7 @@ destruct b₁, b.
 
   rewrite Hb₂.
   destruct (bool_dec true false) as [| H]; [ easy | clear H ].
-  rewrite is_neg_point_neg_point; [ easy | ].
+  rewrite is_neg_vec_neg_vec; [ easy | ].
   intros H; subst p₂; simpl in Hb₁.
   destruct (Rlt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
   destruct (Rgt_dec 0 0) as [H1| H1]; [ now lra | easy ].
@@ -1888,7 +1745,7 @@ destruct b₁, b.
 Qed.
 
 Theorem D_set_is_countable : ∀ r,
-  ∃ f : ℕ → point, ∀ p : point,
+  ∃ f : ℕ → vector, ∀ p : vector,
   p ∈ D ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
@@ -1924,7 +1781,7 @@ destruct (mat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
   rewrite <- Hp₂ in Hsr₂.
   move p₁ before p; move p₂ before p₁.
   move Hsr₁ before Hsr; move Hsr₂ before Hsr₁.
-  exists (is_neg_point p₁, nf, no).
+  exists (is_neg_vec p₁, nf, no).
   unfold fixpoint_of_bool_prod_nat.
   rewrite Hno, path_of_nat_inv.
   symmetry; rewrite <- Hs; f_equal.
@@ -1935,31 +1792,31 @@ destruct (mat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
   fold (fixpoint_of_path r el₁) in Hp₂.
   apply eigenvec_and_fixpoint_of_path_collinear with (p := p₁) in Hp₂;
     try assumption.
-  now destruct (is_neg_point p₁), (is_neg_point p₂).
+  now destruct (is_neg_vec p₁), (is_neg_vec p₂).
 Qed.
 
 Definition sphere_sym S := mkset (λ p, (- p)%vec ∈ S).
 
-Theorem sphere_sym_neg_point : ∀ p, p ∈ sphere_sym D → (- p)%vec ∈ D.
+Theorem sphere_sym_neg_vec : ∀ p, p ∈ sphere_sym D → (- p)%vec ∈ D.
 Proof.
 intros (x, y, z) (el₁ & p₁ & Hso & Hn & Hr).
 now exists el₁, p₁.
 Qed.
 
-Theorem neg_point_in_sphere : ∀ r p, p ∈ sphere r → (- p)%vec ∈ sphere r.
+Theorem neg_vec_in_sphere : ∀ r p, p ∈ sphere r → (- p)%vec ∈ sphere r.
 Proof.
 intros r (x, y, z) Hp; simpl.
 now do 3 rewrite <- Rsqr_neg.
 Qed.
 
-Theorem neg_point_in_ball : ∀ p, p ∈ ball → (- p)%vec ∈ ball.
+Theorem neg_vec_in_ball : ∀ p, p ∈ ball → (- p)%vec ∈ ball.
 Proof.
 intros (x, y, z) Hp; simpl.
 now do 3 rewrite <- Rsqr_neg.
 Qed.
 
 Theorem D_set_symmetry_is_countable : ∀ r,
-  ∃ f : ℕ → point, ∀ p : point,
+  ∃ f : ℕ → vector, ∀ p : vector,
   p ∈ sphere_sym D ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
@@ -1969,11 +1826,11 @@ intros p Hp.
 enough (Hn : (- p)%vec ∈ D ∩ sphere r).
  specialize (Hf ((- p)%vec) Hn) as (n & Hf).
  exists n; rewrite Hf.
- apply neg_point_involutive.
+ apply neg_vec_involutive.
 
  destruct Hp as (Hss, Hs).
- split; [ now apply sphere_sym_neg_point | ].
- now apply neg_point_in_sphere.
+ split; [ now apply sphere_sym_neg_vec | ].
+ now apply neg_vec_in_sphere.
 Qed.
 
 Theorem countable_union : ∀ A (E F : set A),
@@ -1999,7 +1856,7 @@ intros a [Ha| Ha].
 Qed.
 
 Theorem D_set_and_its_symmetric_are_countable : ∀ r,
-  ∃ f : ℕ → point, ∀ p : point,
+  ∃ f : ℕ → vector, ∀ p : vector,
   p ∈ (D ∪ sphere_sym D) ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
@@ -2035,7 +1892,7 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z) c s :=
 
 (* playing with quaternions... *)
 
-Record quaternion := quat { Qs : ℝ; Qv : point }.
+Record quaternion := quat { Qs : ℝ; Qv : vector }.
 Arguments quat Qs%R Qv%vec.
 
 Delimit Scope quat_scope with Qn.
@@ -2371,7 +2228,7 @@ Definition J₀ r :=
      ∃ p p' n, p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      ((R ^ n)%mat * p)%vec = p').
 
-(* J(p₁) = subset of J₀(∥p₁∥) of rotations aroung a point p₁. *)
+(* J(p₁) = subset of J₀(∥p₁∥) of rotations aroung a vec p₁. *)
 Definition J p₁ := mkset (λ R₁, R₁ ∈ rotation_around p₁ ∧ R₁ ∈ J₀ ∥p₁∥).
 
 Definition arcsin x := atan (x / sqrt (1 - x²)).
@@ -2385,7 +2242,7 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let a := arccos ((p · p') / r²) in
   let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
-  if eq_point_dec px 0 then mat_id
+  if eq_vec_dec px 0 then mat_id
   else matrix_of_axis_cos_sin_angle (/ ∥px∥ ⁎ px) (cos θ) (sin θ).
 
 Theorem rotate_unicity : ∀ p₁ p₂ el,
@@ -2402,23 +2259,23 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
  now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
 
  destruct H as (Hrm & Hni).
- destruct (Bool.bool_dec (is_neg_point p₁) (is_neg_point p₂)) as [Hnn| Hnn].
-  destruct (eq_point_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
+ destruct (Bool.bool_dec (is_neg_vec p₁) (is_neg_vec p₂)) as [Hnn| Hnn].
+  destruct (eq_vec_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
 
    now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
 
-  destruct (eq_point_dec p₂ 0%vec) as [Hz| Hnz].
+  destruct (eq_vec_dec p₂ 0%vec) as [Hz| Hnz].
    subst p₂; rewrite vec_norm_0 in Hpp.
    apply vec_norm_eq_0 in Hpp.
    now left.
 
-   destruct (eq_point_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
+   destruct (eq_vec_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
    apply neq_negb in Hnn.
    assert (Hpp2 : ∥p₁∥ = ∥(-p₂)∥).
     rewrite Hpp; destruct p₂ as (x, y, z); simpl.
     now do 3 rewrite <- Rsqr_neg.
 
-    rewrite <- is_neg_point_neg_point in Hnn; [ | easy ].
+    rewrite <- is_neg_vec_neg_vec in Hnn; [ | easy ].
     assert (Hr₂2 : (M * - p₂ = - p₂)%vec).
      now rewrite mat_opp_vec_mul_distr_r, Hr₂.
     
@@ -2461,7 +2318,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
  remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
  assert (Hpq₂ :
   p₂ =
-    if bool_dec (is_neg_point p₂) (is_neg_point q₂) then q₂
+    if bool_dec (is_neg_vec p₂) (is_neg_vec q₂) then q₂
     else (- q₂)%vec).
   subst nf.
   unfold fixpoint_of_nat in Hq₂.
@@ -2473,7 +2330,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
 
   assert (Hpq₃ :
    p₃ =
-     if bool_dec (is_neg_point p₃) (is_neg_point q₃) then q₃
+     if bool_dec (is_neg_vec p₃) (is_neg_vec q₃) then q₃
      else (- q₃)%vec).
    subst nf'.
    unfold fixpoint_of_nat in Hq₃.
@@ -2482,10 +2339,10 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
    eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
    now subst q₃; apply fixpoint_of_path_on_sphere.
 
-   destruct (bool_dec (is_neg_point p₂) (is_neg_point q₂)) as [Hb₂| Hb₂].
+   destruct (bool_dec (is_neg_vec p₂) (is_neg_vec q₂)) as [Hb₂| Hb₂].
     move Hpq₂ at top; subst q₂; clear Hb₂.
     exists nf, no.
-    destruct (bool_dec (is_neg_point p₃) (is_neg_point q₃)) as [Hb₃| Hb₃].
+    destruct (bool_dec (is_neg_vec p₃) (is_neg_vec q₃)) as [Hb₃| Hb₃].
      move Hpq₃ at top; subst q₃; clear Hb₃.
      exists nf', no'.
      remember (arccos ((p · p') / r²)) as a eqn:Ha.
@@ -2503,7 +2360,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      remember (a / INR n + 2 * INR k * PI / INR n)%R as θ eqn:Hθ.
      remember (p × p') as px eqn:Hpx.
      symmetry.
-     destruct (eq_point_dec px 0) as [Hpxz| Hpxz].
+     destruct (eq_vec_dec px 0) as [Hpxz| Hpxz].
       move Hpxz at top; subst px.
       symmetry in Hpx.
 
@@ -2554,7 +2411,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     revert Hdnc; apply Hp.
 
   split.
-   apply neg_point_in_ball.
+   apply neg_vec_in_ball.
    apply in_sphere_in_ball in Hps; [ easy | ].
    split; [ apply Rle_0_1 | apply Rle_refl ].
 

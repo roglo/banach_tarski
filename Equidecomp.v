@@ -240,7 +240,7 @@ split.
   rewrite union_list_app.
   simpl in Hlen3; apply Nat.succ_inj in Hlen3.
   apply union_morph.
-   pose proof union_intersection_self point E₁ (map (app_gr_inv g₁) P'F).
+   pose proof union_intersection_self vector E₁ (map (app_gr_inv g₁) P'F).
    rewrite map_map in H.
    apply H.
    assert (HEF : E₁ ⊂ app_gr_inv g₁ F).
@@ -455,7 +455,7 @@ Qed.
 
 Require Import Setoid.
 Add Parametric Morphism :
-  (λ n fl, @nth (set point → set point) n (map app_gr_inv fl) id)
+  (λ n fl, @nth (set vector → set vector) n (map app_gr_inv fl) id)
   with signature eq ==> eq ==> set_eq ==> set_eq
   as nth_map_app_gr_inv_morph.
 Proof.
@@ -585,7 +585,7 @@ assert
           rewrite intersection_comm.
           apply intersection_morph.
            rewrite app_gr_nth.
-           replace Datatypes.id with (@id (set point)) by easy.
+           replace Datatypes.id with (@id (set vector)) by easy.
            rewrite map_map.
            (* does not work, I don't know why
            rewrite <- Hhl.
@@ -623,7 +623,7 @@ assert
               now apply Nat.mod_upper_bound.
 
            rewrite app_gr_nth.
-           replace Datatypes.id with (@id (set point)) by easy.
+           replace Datatypes.id with (@id (set vector)) by easy.
            now rewrite map_map.
 
           now rewrite map_length.
@@ -663,7 +663,7 @@ assert
        now subst g'l; rewrite map_length.
 Qed.
 
-Add Parametric Relation : (set point) equidecomposable
+Add Parametric Relation : (set vector) equidecomposable
  reflexivity proved by equidec_refl
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans

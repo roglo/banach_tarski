@@ -30,9 +30,9 @@ Definition B {os : sel_model} :=
 
 Opaque M SS B.
 
-Definition rot e (E : set point) :=
+Definition rot e (E : set vector) :=
   mkset (λ p, rotate (negf e) p ∈ E).
-Definition xtransl dx (E : set point) :=
+Definition xtransl dx (E : set vector) :=
   mkset (λ '(V x y z), (V (x - dx) y z) ∈ E).
 
 Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
@@ -219,7 +219,7 @@ split.
  split.
  -intros Hnf.
   unfold union_list; simpl; unfold union.
-  destruct (eq_point_dec p (f p)) as [H₁| H₁]; [ left; now split | ].
+  destruct (eq_vec_dec p (f p)) as [H₁| H₁]; [ left; now split | ].
   right.
   pose proof Ho p as H.
   destruct H as (el, Hel).

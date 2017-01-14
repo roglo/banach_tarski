@@ -23,11 +23,11 @@ Fixpoint app_gr f p :=
   | Comb g h => app_gr g (app_gr h p)
   end.
 
-Fixpoint app_gr_point f p :=
+Fixpoint app_gr_vec f p :=
   match f with
   | Rot e => rotate (negf e) p
   | Xtransl dx => match p with V x y z => V (x - dx) y z end
-  | Comb g h => app_gr_point h (app_gr_point g p)
+  | Comb g h => app_gr_vec h (app_gr_vec g p)
   end.
 
 Fixpoint gr_inv f :=
@@ -189,7 +189,7 @@ rewrite <- Ha.
 apply app_gr_inv_l.
 Qed.
 
-Theorem app_gr_app_gr_point : ∀ g E p, p ∈ app_gr g E → app_gr_point g p ∈ E.
+Theorem app_gr_app_gr_vec : ∀ g E p, p ∈ app_gr g E → app_gr_vec g p ∈ E.
 Proof.
 intros * Hp.
 revert E p Hp.
@@ -314,7 +314,7 @@ split; intros HEF.
   intros q Hq; eapply IHg1; eassumption.
 Qed.
 
-Theorem partition_group_map : ∀ (F : set point) v g,
+Theorem partition_group_map : ∀ (F : set vector) v g,
   is_partition F v → is_partition (app_gr g F) (map (app_gr g) v).
 Proof.
 intros F v * HP.
@@ -449,7 +449,7 @@ split.
  rewrite <- app_gr_empty_set with (f := g) in H.
  do 2 rewrite map_nth in H.
  destruct H as (Hi, Hj).
- pose proof HP i j Hij (app_gr_point g p) as Hp.
+ pose proof HP i j Hij (app_gr_vec g p) as Hp.
  destruct Hp as (Hpi, _).
  apply Hpi; clear Hpi.
  split.
@@ -459,7 +459,7 @@ split.
   induction i; intros.
    destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hi | ].
    simpl in Hi; simpl.
-   now apply app_gr_app_gr_point.
+   now apply app_gr_app_gr_vec.
 
    destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hi | ].
    simpl in Hi; simpl.
@@ -471,7 +471,7 @@ split.
   induction j; intros.
    destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hj | ].
    simpl in Hj; simpl.
-   now apply app_gr_app_gr_point.
+   now apply app_gr_app_gr_vec.
 
    destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hj | ].
    simpl in Hj; simpl.

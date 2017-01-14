@@ -41,7 +41,7 @@ Arguments mt i%nat j%nat [A] m.
 
 Definition mkrmat := @mkmat ℝ.
 
-Inductive point := V : ℝ → ℝ → ℝ → point.
+Inductive vector := V : ℝ → ℝ → ℝ → vector.
 
 Definition mat_vec_mul M '(V x y z) :=
   V (a₁₁ M * x + a₁₂ M * y + a₁₃ M * z)
@@ -107,7 +107,7 @@ Definition rot_inv_z := mkrmat
   (-2*√2/3) (1/3)     0
   0         0         1.
 
-Definition is_neg_point '(V x y z) :=
+Definition is_neg_vec '(V x y z) :=
   if Rlt_dec x 0 then true
   else if Rgt_dec x 0 then false
   else if Rlt_dec y 0 then true
@@ -116,7 +116,7 @@ Definition is_neg_point '(V x y z) :=
   else if Rgt_dec z 0 then false
   else true.
 
-Arguments is_neg_point _%vec.
+Arguments is_neg_vec _%vec.
 
 Theorem rot_x_means_rot_x : rot_x = rot_mat_of_axis_cos (V 1 0 0) (1/3).
 Proof.
@@ -171,7 +171,7 @@ Notation "M ^ n" := (mat_pow M n) : mat_scope.
 Arguments mat_pow M%mat n%nat.
 Arguments mat_vec_mul _%mat _%vec.
 
-Theorem eq_point_dec : ∀ p₁ p₂ : point, { p₁ = p₂ } + { p₁ ≠ p₂ }.
+Theorem eq_vec_dec : ∀ p₁ p₂ : vector, { p₁ = p₂ } + { p₁ ≠ p₂ }.
 Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂).
 destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
@@ -184,7 +184,7 @@ destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
 now intros H; injection H; intros.
 Qed.
 
-Arguments eq_point_dec _%vec _%vec.
+Arguments eq_vec_dec _%vec _%vec.
 
 Theorem mat_eq_dec : ∀ m₁ m₂ : matrix ℝ, { m₁ = m₂ } + { m₁ ≠ m₂ }.
 Proof.
@@ -743,13 +743,13 @@ unfold vec_const_mul.
 now do 3 rewrite Rmult_1_l.
 Qed.
 
-Theorem neg_point_involutive : ∀ p, (- - p)%vec = p.
+Theorem neg_vec_involutive : ∀ p, (- - p)%vec = p.
 Proof.
 intros (x, y, z); simpl.
 now do 3 rewrite Ropp_involutive.
 Qed.
 
-Theorem is_neg_point_0 : is_neg_point (V 0 0 0) = true.
+Theorem is_neg_vec_0 : is_neg_vec (V 0 0 0) = true.
 Proof.
 simpl.
 destruct (Rlt_dec 0 0) as [H₁| H₁]; [ easy | clear H₁ ].
@@ -757,9 +757,9 @@ destruct (Rgt_dec 0 0) as [H₁| H₁]; [ | easy ].
 now apply Rgt_irrefl in H₁.
 Qed.
 
-Theorem is_neg_point_neg_point : ∀ v,
+Theorem is_neg_vec_neg_vec : ∀ v,
   v ≠ 0%vec
-  → is_neg_point (- v) = negb (is_neg_point v).
+  → is_neg_vec (- v) = negb (is_neg_vec v).
 Proof.
 intros (x, y, z) Hv; simpl.
 destruct (Rlt_dec x 0) as [Hx| Hx].
