@@ -76,19 +76,24 @@ value rot_x = mkrmat
 quat_of_mat rot_x;
 rot_x.
 mat_of_quat (quat_of_mat rot_x);
+mat_of_quat (quat_of_mat (mat_of_quat (quat_of_mat rot_x))).
 
 value q₁ = Quat (sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
 q₁.
 quat_of_mat (mat_of_quat q₁).
+quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₁))).
 
 value q₂ = Quat (-.sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
 q₂.
 quat_of_mat (mat_of_quat q₂).
+quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₂))).
 
 value q₃ = Quat (sqrt (2./.3.)) (V (-. sqrt 3./.3.) 0. 0.).
 q₃.
 quat_of_mat (mat_of_quat q₃).
+quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₃))).
 
 value q₄ = Quat (-.sqrt (2./.3.)) (V (-.sqrt 3./.3.) 0. 0.).
 q₄.
 quat_of_mat (mat_of_quat q₄).
+quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₄))).
