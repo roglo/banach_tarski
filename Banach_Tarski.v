@@ -2113,7 +2113,8 @@ Qed.
 Theorem mat_of_quat_inv : ∀ q, (∥q∥ = 1%R)%Qn →
   quat_of_mat (mat_of_quat q) = q.
 Proof.
-intros (a, (b, c, d)) Hqn; simpl in Hqn; simpl.
+intros * Hqn.
+destruct q as (a, (b, c, d)); simpl in Hqn; simpl.
 apply sqrt_lem_0 in Hqn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
 symmetry in Hqn; rewrite Rmult_1_r in Hqn.
 unfold quat_of_mat, mat_of_quat; simpl.
