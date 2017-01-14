@@ -2094,11 +2094,12 @@ Definition mat_of_quat '(quat a (P b c d)) :=
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
 
-Theorem quat_of_mat_inv : ∀ q, (∥q∥ = 1%R)%Qn →
+Theorem quat_of_mat_inv : ∀ q, (∥q∥ = 1%R)%Qn → (0 ≤ Qa q)%R →
   quat_of_mat (mat_of_quat q) = q.
 Proof.
-intros * Hqn.
+intros * Hqn Hqa.
 destruct q as (a, (b, c, d)); simpl in Hqn; simpl.
+simpl in Hqa; apply Rabs_pos_eq in Hqa.
 apply sqrt_lem_0 in Hqn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
 symmetry in Hqn; rewrite Rmult_1_r in Hqn.
 unfold quat_of_mat, mat_of_quat; simpl.
@@ -2115,6 +2116,8 @@ ring_simplify in Ht.
 ring_simplify in Hx₀.
 ring_simplify in Hy₀.
 ring_simplify in Hz₀.
+assert (Ht' : t = (4 * a² - 1)%R) by lra.
+clear Ht; rename Ht' into Ht.
 destruct (Req_dec t (-1)) as [Htd| Htd].
  assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
  f_equal.
@@ -2134,15 +2137,49 @@ destruct (Req_dec t (-1)) as [Htd| Htd].
  replace (4 * b ^ 2)%R with ((2 * b) ^ 2)%R by lra.
  replace (4 * c ^ 2)%R with ((2 * c) ^ 2)%R by lra.
  replace (4 * d ^ 2)%R with ((2 * d) ^ 2)%R by lra.
- do 3 rewrite <- Rsqr_pow2.
- do 3 rewrite sqrt_Rsqr_abs.
- do 3 rewrite Rabs_mult.
+ do 3 rewrite <- Rsqr_pow2, sqrt_Rsqr_abs, Rabs_mult.
  replace (Rabs 2) with (Rabs (IZR 2)) by easy.
  rewrite Rabs_Zabs; simpl.
  do 3 rewrite Rmult_div.
  unfold Rdiv.
  rewrite Rinv_r; [ | lra ].
  do 3 rewrite Rmult_1_l.
+
+Focus 2.
+ assert (Ha2 : (a² ≠ 0)%R) by lra.
+ assert (Ha : (a ≠ 0)%R) by now intros H; subst a; apply Ha2, Rsqr_0.
+ assert (Haa : (Rabs a ≠ 0)%R) by now apply Rabs_no_R0.
+ assert (Hta : (√ (1 + t) / 2 = Rabs a)%R).
+  rewrite Ht, Rplus_minus.
+  rewrite Rsqr_pow2.
+  replace (4 * a ^ 2)%R with ((2 * a) ^ 2)%R by lra.
+  rewrite <- Rsqr_pow2, sqrt_Rsqr_abs, Rabs_mult.
+  replace (Rabs 2) with (Rabs (IZR 2)) by easy.
+  rewrite Rabs_Zabs; simpl.
+  rewrite Rmult_div.
+  unfold Rdiv.
+  rewrite Rinv_r; [ | lra ].
+  now rewrite Rmult_1_l.
+
+  rewrite Hta.
+  f_equal; [ easy | ].
+  assert (Rpm : ∀ a b c, (a + b - (b - c) = a + c)%R) by (intros; lra).
+  do 3 rewrite Rpm.
+  replace (2 * a * b + 2 * a * b)%R with (4 * a * b)%R by lra.
+  replace (2 * a * c + 2 * a * c)%R with (4 * a * c)%R by lra.
+  replace (2 * a * d + 2 * a * d)%R with (4 * a * d)%R by lra.
+  unfold Rdiv.
+  rewrite Rinv_mult_distr; [ | lra | easy ].
+  do 3 rewrite <- Rmult_assoc.
+  replace (4 * a * b * / 4)%R with (a * b)%R by lra.
+  replace (4 * a * c * / 4)%R with (a * c)%R by lra.
+  replace (4 * a * d * / 4)%R with (a * d)%R by lra.
+  rewrite Hqa.
+  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
+  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
+  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
+  now do 3 rewrite Rmult_1_l.
+
 bbb.
 
 (* end play with quaternions. *)
