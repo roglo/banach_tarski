@@ -1966,6 +1966,35 @@ destruct (Req_dec (mat_trace M) (-1)) as [Hmt| Hmt].
  remember ((√ (1 + x₀) / 2)%R) as x eqn:Hx.
  remember ((√ (1 + y₀) / 2)%R) as y eqn:Hy.
  remember ((√ (1 + z₀) / 2)%R) as z eqn:Hz.
+ generalize Hx; intros Hx2.
+ generalize Hy; intros Hy2.
+ generalize Hz; intros Hz2.
+ apply (f_equal Rsqr) in Hx2.
+ apply (f_equal Rsqr) in Hy2.
+ apply (f_equal Rsqr) in Hz2.
+ unfold Rdiv in Hx2, Hy2, Hz2.
+ rewrite Rsqr_mult in Hx2, Hy2, Hz2.
+ do 3 rewrite Rsqr_pow2 in Hx2, Hy2, Hz2.
+ replace ((/ 2) ^ 2)%R with (/ 4)%R in Hx2, Hy2, Hz2 by lra.
+ do 2 rewrite <- Rsqr_pow2 in Hx2, Hy2, Hz2.
+ rewrite fold_Rdiv in Hx2, Hy2, Hz2.
+ rewrite Rsqr_sqrt in Hx2.
+  rewrite Rsqr_sqrt in Hy2.
+   rewrite Rsqr_sqrt in Hz2.
+    rewrite Hx2, Hy2, Hz2.
+    destruct M; simpl in *; unfold mkrmat.
+    subst x₀ y₀ z₀.
+    f_equal; try lra.
+     rewrite Hx, Hy.
+     remember (1 + (a₁₁ - a₂₂ - a₃₃))%R as x₁.
+     remember (1 + (- a₁₁ + a₂₂ - a₃₃))%R as y₁.
+     replace (2 * (√ x₁ / 2) * (√ y₁ / 2))%R with (√ x₁ * √ y₁ / 2)%R by lra.
+     rewrite <- sqrt_mult_alt.
+     remember (x₁ * y₁)%R as xy eqn:Hxy.
+     rewrite Heqx₁, Heqy₁ in Hxy.
+     ring_simplify in Hxy.
+     do 3 rewrite <- Rsqr_pow2 in Hxy.
+(* seems not to work... *)
 bbb.
 
 Theorem quat_of_mat_inv : ∀ q, (∥q∥ = 1%R)%Qn → (0 ≤ Qs q)%R →
