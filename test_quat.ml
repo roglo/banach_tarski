@@ -79,6 +79,19 @@ value is_rotation_matrix m =
   mat_eq (mat_mul m (mat_transp m)) mat_id &&
   eq_float (mat_det m) 1.0.
 
+value quat_norm {re = a; im = v} =
+  match v with
+  | V b c d → sqrt (a**2. +. b**2. +. c**2. +. d**2.)
+  end.
+
+value quat_unit {re = a; im = v} =
+  match v with
+  | V b c d →
+      let r = sqrt (a**2. +. b**2. +. c**2. +. d**2.) in
+      let a = a/.r and b = b/.r and c = c/.r and d = d/.r in
+      quat a (V b c d)
+  end.
+
 value quat_of_mat m =
   if not (is_rotation_matrix m) then
     invalid_arg "quat_of_mat: not a rotation matrix"
@@ -97,11 +110,10 @@ value quat_of_mat m =
     let z = ((a₂₁ m -. a₁₂ m) /. (4. *. s)) in
     quat s (V x y z).
 
-value mat_of_quat {re = a; im = v} =
+value mat_of_quat h =
+  let {re = a; im = v} = quat_unit h in
   match v with
   | V b c d →
-      let r = sqrt (a**2. +. b**2. +. c**2. +. d**2.) in
-      let a = a/.r and b = b/.r and c = c/.r and d = d/.r in
       mkrmat
         (a**2. +. b**2. -. c**2. -. d**2.)
           (2. *. b *. c -. 2. *. a *. d)
@@ -112,11 +124,6 @@ value mat_of_quat {re = a; im = v} =
         (2. *. b *. d -. 2. *. a *. c)
           (2. *. a *. b +. 2. *. c *. d)
             (a**2. -. b**2. -. c**2. +. d**2.)
-  end.
-
-value quat_norm {re = a; im = v} =
-  match v with
-  | V b c d → sqrt (a**2. +. b**2. +. c**2. +. d**2.)
   end.
 
 value rot_x = mkrmat
