@@ -1913,7 +1913,7 @@ Definition quat_norm '(quat a (V b c d)) := √ (a² + b² + c² + d²).
 Definition quat_conj q := quat (Re q) (- Im q).
 
 Definition quat_inv '(quat a v) :=
-  let r := (a² + v·v)%R in
+  let r := (a² + v²%vec)%R in
   quat_const_mul (/ r) (quat_conj (quat a v)).
 
 Notation "h₁ + h₂" := (quat_add h₁ h₂) : quat_scope.
