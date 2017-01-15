@@ -1892,8 +1892,8 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z) c s :=
 
 (* playing with quaternions... *)
 
-Record ℍ := quat { Qs : ℝ; Qv : vector }.
-Arguments quat Qs%R Qv%vec.
+Record ℍ := quat { Re : ℝ; Im : vector }.
+Arguments quat Re%R Im%vec.
 
 Delimit Scope quat_scope with Qn.
 
