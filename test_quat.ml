@@ -58,6 +58,12 @@ value mat_id =
     0. 1. 0.
     0. 0. 1.;
 
+value mat_sym =
+  mkrmat
+    1. 0.    0.
+    0. (-1.) 0.
+    0. 0.    (-1.);
+
 value mat_det m =
   a₁₁ m *. (a₂₂ m *. a₃₃ m -. a₃₂ m *. a₂₃ m) +.
   a₁₂ m *. (a₂₃ m *. a₃₁ m -. a₃₃ m *. a₂₁ m) +.
