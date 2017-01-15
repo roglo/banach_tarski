@@ -132,22 +132,18 @@ mat_of_quat (quat_of_mat (mat_of_quat (quat_of_mat rot_x))).
 value q₁ = quat (sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
 q₁.
 quat_of_mat (mat_of_quat q₁).
-quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₁))).
 
 value q₂ = quat (-.sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
 q₂.
 quat_of_mat (mat_of_quat q₂).
-quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₂))).
 
 value q₃ = quat (sqrt (2./.3.)) (V (-. sqrt 3./.3.) 0. 0.).
 q₃.
 quat_of_mat (mat_of_quat q₃).
-quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₃))).
 
 value q₄ = quat (-.sqrt (2./.3.)) (V (-.sqrt 3./.3.) 0. 0.).
 q₄.
 quat_of_mat (mat_of_quat q₄).
-quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₄))).
 
 (* case of quaternion with norm ≠ from 1 *)
 value h = quat 0. (V 1. 2. 3.);
