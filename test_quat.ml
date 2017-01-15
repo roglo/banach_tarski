@@ -10,7 +10,7 @@ type matrix =
     a₃₁ : float; a₃₂ : float; a₃₃ : float }.
 
 type vector = [ V of float and float and float ].
-type quat = [ Quat of float and vector ].
+type quat = { re : float; im : vector }.
 
 value a₁₁ m = m.a₁₁.
 value a₁₂ m = m.a₁₂.
@@ -22,6 +22,8 @@ value a₃₁ m = m.a₃₁.
 value a₃₂ m = m.a₃₂.
 value a₃₃ m = m.a₃₃.
 
+value quat a v = {re = a; im = v}.
+
 value mkrmat a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃ =
   {a₁₁ = a₁₁; a₁₂ = a₁₂; a₁₃ = a₁₃; 
    a₂₁ = a₂₁; a₂₂ = a₂₂; a₂₃ = a₂₃; 
@@ -32,25 +34,72 @@ value mat_trace m = a₁₁ m +. a₂₂ m +. a₃₃ m.
 value req_dec (x : float) (y : float) = x = y;
 value rlt_dec (x : float) ( y : float) = x < y;
 
+value mat_mul m₁ m₂ =
+  mkrmat
+    (a₁₁ m₁ *. a₁₁ m₂ +. a₁₂ m₁ *. a₂₁ m₂ +. a₁₃ m₁ *. a₃₁ m₂)
+    (a₁₁ m₁ *. a₁₂ m₂ +. a₁₂ m₁ *. a₂₂ m₂ +. a₁₃ m₁ *. a₃₂ m₂)
+    (a₁₁ m₁ *. a₁₃ m₂ +. a₁₂ m₁ *. a₂₃ m₂ +. a₁₃ m₁ *. a₃₃ m₂)
+    (a₂₁ m₁ *. a₁₁ m₂ +. a₂₂ m₁ *. a₂₁ m₂ +. a₂₃ m₁ *. a₃₁ m₂)
+    (a₂₁ m₁ *. a₁₂ m₂ +. a₂₂ m₁ *. a₂₂ m₂ +. a₂₃ m₁ *. a₃₂ m₂)
+    (a₂₁ m₁ *. a₁₃ m₂ +. a₂₂ m₁ *. a₂₃ m₂ +. a₂₃ m₁ *. a₃₃ m₂)
+    (a₃₁ m₁ *. a₁₁ m₂ +. a₃₂ m₁ *. a₂₁ m₂ +. a₃₃ m₁ *. a₃₁ m₂)
+    (a₃₁ m₁ *. a₁₂ m₂ +. a₃₂ m₁ *. a₂₂ m₂ +. a₃₃ m₁ *. a₃₂ m₂)
+    (a₃₁ m₁ *. a₁₃ m₂ +. a₃₂ m₁ *. a₂₃ m₂ +. a₃₃ m₁ *. a₃₃ m₂).
+
+value mat_transp m =
+  mkrmat
+   (a₁₁ m) (a₂₁ m) (a₃₁ m)
+   (a₁₂ m) (a₂₂ m) (a₃₂ m)
+   (a₁₃ m) (a₂₃ m) (a₃₃ m).
+
+value mat_id =
+  mkrmat
+    1. 0. 0.
+    0. 1. 0.
+    0. 0. 1.;
+
+value mat_det m =
+  a₁₁ m *. (a₂₂ m *. a₃₃ m -. a₃₂ m *. a₂₃ m) +.
+  a₁₂ m *. (a₂₃ m *. a₃₁ m -. a₃₃ m *. a₂₁ m) +.
+  a₁₃ m *. (a₂₁ m *. a₃₂ m -. a₃₁ m *. a₂₂ m).
+
+value eps = 1e-10.
+
+value eq_float x y = abs_float (x -. y) <= eps.
+
+value mat_eq m₁ m₂ =
+  eq_float m₁.a₁₁ m₂.a₁₁ && eq_float m₁.a₁₂ m₂.a₁₂ &&
+  eq_float m₁.a₁₃ m₂.a₁₃ &&
+  eq_float m₁.a₂₁ m₂.a₂₁ && eq_float m₁.a₂₂ m₂.a₂₂ &&
+  eq_float m₁.a₂₃ m₂.a₂₃ &&
+  eq_float m₁.a₃₁ m₂.a₃₁ && eq_float m₁.a₃₂ m₂.a₃₂ &&
+  eq_float m₁.a₃₃ m₂.a₃₃.
+
+value is_rotation_matrix m =
+  mat_eq (mat_mul m (mat_transp m)) mat_id &&
+  eq_float (mat_det m) 1.0.
+
 value quat_of_mat m =
-  if req_dec (mat_trace m) (-1.) then
+  if not (is_rotation_matrix m) then
+    invalid_arg "quat_of_mat: not a rotation matrix"
+  else if req_dec (mat_trace m) (-1.) then
     let x₀ = (a₁₁ m -. a₂₂ m -. a₃₃ m) in
     let y₀ = (-. a₁₁ m +. a₂₂ m -. a₃₃ m) in
     let z₀ = (-. a₁₁ m -. a₂₂ m +. a₃₃ m) in
     let x = (sqrt (1. +. x₀) /. 2.) in
     let y = (sqrt (1. +. y₀) /. 2.) in
     let z = (sqrt (1. +. z₀) /. 2.) in
-    Quat 0. (V x y z)
+    quat 0. (V x y z)
   else
     let s = (sqrt (1. +. mat_trace m) /. 2.) in
     let x = ((a₃₂ m -. a₂₃ m) /. (4. *. s)) in
     let y = ((a₁₃ m -. a₃₁ m) /. (4. *. s)) in
     let z = ((a₂₁ m -. a₁₂ m) /. (4. *. s)) in
-    Quat s (V x y z).
+    quat s (V x y z).
 
-value mat_of_quat q =
-  match q with
-  | Quat a (V b c d) →
+value mat_of_quat {re = a; im = v} =
+  match v with
+  | V b c d →
       mkrmat
         (a**2. +. b**2. -. c**2. -. d**2.)
           (2. *. b *. c -. 2. *. a *. d)
@@ -63,9 +112,9 @@ value mat_of_quat q =
             (a**2. -. b**2. -. c**2. +. d**2.)
   end.
 
-value quat_norm q =
-  match q with
-  | Quat a (V b c d) → sqrt (a**2. +. b**2. +. c**2. +. d**2.)
+value quat_norm {re = a; im = v} =
+  match v with
+  | V b c d → sqrt (a**2. +. b**2. +. c**2. +. d**2.)
   end.
 
 value rot_x = mkrmat
@@ -78,22 +127,27 @@ rot_x.
 mat_of_quat (quat_of_mat rot_x);
 mat_of_quat (quat_of_mat (mat_of_quat (quat_of_mat rot_x))).
 
-value q₁ = Quat (sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
+value q₁ = quat (sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
 q₁.
 quat_of_mat (mat_of_quat q₁).
 quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₁))).
 
-value q₂ = Quat (-.sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
+value q₂ = quat (-.sqrt (2./.3.)) (V (sqrt 3./.3.) 0. 0.).
 q₂.
 quat_of_mat (mat_of_quat q₂).
 quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₂))).
 
-value q₃ = Quat (sqrt (2./.3.)) (V (-. sqrt 3./.3.) 0. 0.).
+value q₃ = quat (sqrt (2./.3.)) (V (-. sqrt 3./.3.) 0. 0.).
 q₃.
 quat_of_mat (mat_of_quat q₃).
 quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₃))).
 
-value q₄ = Quat (-.sqrt (2./.3.)) (V (-.sqrt 3./.3.) 0. 0.).
+value q₄ = quat (-.sqrt (2./.3.)) (V (-.sqrt 3./.3.) 0. 0.).
 q₄.
 quat_of_mat (mat_of_quat q₄).
 quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₄))).
+
+(* fails "not a rotation matrix", but the problem is perhaps in
+   the definition of mat_of_quat which should normalize the
+   quaternion. *)
+quat_of_mat (mat_of_quat (quat 0. (V 1. 2. 3.)));
