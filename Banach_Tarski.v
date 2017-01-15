@@ -2074,7 +2074,73 @@ Definition vec_le '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
 
 Notation "u '≤' v" := (vec_le u v) : vec_scope.
 
-Theorem quat_of_mat_inv : ∀ h,
+Theorem quat_of_mat_inv1 : ∀ h,
+  (∥h∥ = 1%R)%H
+  → (0 < Re h)%R
+  → quat_of_mat (mat_of_quat h) = h.
+Proof.
+intros * Hhn Hrp.
+destruct h as (a, (b, c, d)); simpl in Hrp; simpl.
+apply sqrt_lem_0 in Hhn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
+symmetry in Hhn; rewrite Rmult_1_r in Hhn.
+unfold quat_of_mat, mat_of_quat; simpl.
+unfold mat_trace; simpl.
+remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
+  as t eqn:Ht.
+remember (a² + b² - c² - d² - (a² - b² + c² - d²) - (a² - b² - c² + d²))%R
+  as x₀ eqn:Hx₀.
+remember (- (a² + b² - c² - d²) + (a² - b² + c² - d²) - (a² - b² - c² + d²))%R
+  as y₀ eqn:Hy₀.
+remember (- (a² + b² - c² - d²) - (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
+  as z₀ eqn:Hz₀.
+ring_simplify in Ht.
+ring_simplify in Hx₀.
+ring_simplify in Hy₀.
+ring_simplify in Hz₀.
+assert (Ht' : t = (4 * a² - 1)%R) by lra.
+clear Ht; rename Ht' into Ht.
+destruct (Req_dec t (-1)) as [Htd| Htd].
+ assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
+ now apply Rlt_irrefl in Hrp.
+
+ assert (Ha2 : (a² ≠ 0)%R) by lra.
+ assert (Ha : (a ≠ 0)%R) by now intros H; subst a; apply Ha2, Rsqr_0.
+ assert (Haa : (Rabs a ≠ 0)%R) by now apply Rabs_no_R0.
+ assert (Hta : (√ (1 + t) / 2 = Rabs a)%R).
+  rewrite Ht, Rplus_minus.
+  rewrite Rsqr_pow2.
+  replace (4 * a ^ 2)%R with ((2 * a) ^ 2)%R by lra.
+  rewrite <- Rsqr_pow2, sqrt_Rsqr_abs, Rabs_mult.
+  replace (Rabs 2) with (Rabs (IZR 2)) by easy.
+  rewrite Rabs_Zabs; simpl.
+  rewrite Rmult_div.
+  unfold Rdiv.
+  rewrite Rinv_r; [ | lra ].
+  now rewrite Rmult_1_l.
+
+  rewrite Hta.
+  apply Rlt_le in Hrp.
+  apply Rabs_pos_eq in Hrp.
+  f_equal; [ easy | ].
+  assert (Rpm : ∀ a b c, (a + b - (b - c) = a + c)%R) by (intros; lra).
+  do 3 rewrite Rpm.
+  replace (2 * a * b + 2 * a * b)%R with (4 * a * b)%R by lra.
+  replace (2 * a * c + 2 * a * c)%R with (4 * a * c)%R by lra.
+  replace (2 * a * d + 2 * a * d)%R with (4 * a * d)%R by lra.
+  unfold Rdiv.
+  rewrite Rinv_mult_distr; [ | lra | easy ].
+  do 3 rewrite <- Rmult_assoc.
+  replace (4 * a * b * / 4)%R with (a * b)%R by lra.
+  replace (4 * a * c * / 4)%R with (a * c)%R by lra.
+  replace (4 * a * d * / 4)%R with (a * d)%R by lra.
+  rewrite Hrp.
+  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
+  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
+  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
+  now do 3 rewrite Rmult_1_l.
+Qed.
+
+Theorem quat_of_mat_inv2 : ∀ h,
   (∥h∥ = 1%R)%H
   → (0 ≤ Re h)%R
   → (0 ≤ Im h)%vec
