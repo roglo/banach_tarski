@@ -99,14 +99,24 @@ value quat_unit {re = a; im = v} =
 value quat_of_mat m =
   if not (is_rotation_matrix m) then
     invalid_arg "quat_of_mat: not a rotation matrix"
-  else if req_dec (mat_trace m) (-1.) then
-    let x₀ = (a₁₁ m -. a₂₂ m -. a₃₃ m) in
-    let y₀ = (-. a₁₁ m +. a₂₂ m -. a₃₃ m) in
-    let z₀ = (-. a₁₁ m -. a₂₂ m +. a₃₃ m) in
-    let x = sqrt (1. +. x₀) /. 2. in
-    let y = sqrt (1. +. y₀) /. 2. in
-    let z = sqrt (1. +. z₀) /. 2. in
-    quat 0. (V x y z)
+  else if rlt_dec (mat_trace m) 0. then
+(*
+    if rlt_dec (a₂₂ m) (a₁₁ m) && rlt_dec (a₃₃ m) (a₁₁ m) then
+      let s = sqrt (1.0 +. a₁₁ m -. a₂₂ m -. a₃₃ m) *. 2. in
+      let x = 1. /. (2. *. s) in
+      let y = (a₁₃ m -. a₃₁ m) /. s in
+      let z = (a₂₁ m -. a₁₂ m) /. s in
+      let w = (a₂₃ m -. a₃₂ m) /. s in
+      quat w (V x y z)
+    else
+*)
+      let x₀ = (a₁₁ m -. a₂₂ m -. a₃₃ m) in
+      let y₀ = (-. a₁₁ m +. a₂₂ m -. a₃₃ m) in
+      let z₀ = (-. a₁₁ m -. a₂₂ m +. a₃₃ m) in
+      let x = sqrt (1. +. x₀) /. 2. in
+      let y = sqrt (1. +. y₀) /. 2. in
+      let z = sqrt (1. +. z₀) /. 2. in
+      quat 0. (V x y z)
   else
     let s = sqrt (1. +. mat_trace m) /. 2. in
     let x = (a₃₂ m -. a₂₃ m) /. (4. *. s) in
