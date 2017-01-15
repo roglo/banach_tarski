@@ -103,15 +103,15 @@ value quat_of_mat m =
     let x₀ = (a₁₁ m -. a₂₂ m -. a₃₃ m) in
     let y₀ = (-. a₁₁ m +. a₂₂ m -. a₃₃ m) in
     let z₀ = (-. a₁₁ m -. a₂₂ m +. a₃₃ m) in
-    let x = (sqrt (1. +. x₀) /. 2.) in
-    let y = (sqrt (1. +. y₀) /. 2.) in
-    let z = (sqrt (1. +. z₀) /. 2.) in
+    let x = sqrt (1. +. x₀) /. 2. in
+    let y = sqrt (1. +. y₀) /. 2. in
+    let z = sqrt (1. +. z₀) /. 2. in
     quat 0. (V x y z)
   else
-    let s = (sqrt (1. +. mat_trace m) /. 2.) in
-    let x = ((a₃₂ m -. a₂₃ m) /. (4. *. s)) in
-    let y = ((a₁₃ m -. a₃₁ m) /. (4. *. s)) in
-    let z = ((a₂₁ m -. a₁₂ m) /. (4. *. s)) in
+    let s = sqrt (1. +. mat_trace m) /. 2. in
+    let x = (a₃₂ m -. a₂₃ m) /. (4. *. s) in
+    let y = (a₁₃ m -. a₃₁ m) /. (4. *. s) in
+    let z = (a₂₁ m -. a₁₂ m) /. (4. *. s) in
     quat s (V x y z).
 
 value mat_of_quat h =
