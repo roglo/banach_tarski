@@ -100,6 +100,8 @@ value quat_of_mat m =
 value mat_of_quat {re = a; im = v} =
   match v with
   | V b c d →
+      let r = sqrt (a**2. +. b**2. +. c**2. +. d**2.) in
+      let a = a/.r and b = b/.r and c = c/.r and d = d/.r in
       mkrmat
         (a**2. +. b**2. -. c**2. -. d**2.)
           (2. *. b *. c -. 2. *. a *. d)
@@ -147,7 +149,7 @@ q₄.
 quat_of_mat (mat_of_quat q₄).
 quat_of_mat (mat_of_quat (quat_of_mat (mat_of_quat q₄))).
 
-(* fails "not a rotation matrix", but the problem is perhaps in
-   the definition of mat_of_quat which should normalize the
-   quaternion. *)
-quat_of_mat (mat_of_quat (quat 0. (V 1. 2. 3.)));
+(* case of quaternion with norm ≠ from 1 *)
+value h = quat 0. (V 1. 2. 3.);
+h.
+quat_of_mat (mat_of_quat h).
