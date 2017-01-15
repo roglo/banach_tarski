@@ -63,9 +63,7 @@ value mat_det m =
   a₁₂ m *. (a₂₃ m *. a₃₁ m -. a₃₃ m *. a₂₁ m) +.
   a₁₃ m *. (a₂₁ m *. a₃₂ m -. a₃₁ m *. a₂₂ m).
 
-value eps = 1e-10.
-
-value eq_float x y = abs_float (x -. y) <= eps.
+value eq_float x y = abs_float (x -. y) <= epsilon_float.
 
 value mat_eq m₁ m₂ =
   eq_float m₁.a₁₁ m₂.a₁₁ && eq_float m₁.a₁₂ m₂.a₁₂ &&
