@@ -1962,8 +1962,6 @@ Definition mat_of_quat '(quat a (V b c d)) :=
 
 Definition quat_rotate h v := (h * v * h⁻¹)%H.
 
-bbb.
-
 Theorem mat_of_quat_inv : ∀ M, is_rotation_matrix M →
   mat_of_quat (quat_of_mat M) = M.
 Proof.
@@ -2028,23 +2026,8 @@ destruct (Req_dec (mat_trace M) (-1)) as [Hmt| Hmt].
 (* bonjour le merdier... *)
 rewrite Hs2.
 clear s Hs Hs2 x Hx y Hy z Hz.
-nsatz.
+Abort. (*
 
-uuu.
- rewrite Rsqr_0, Rplus_0_l, Rmult_0_r.
- do 3 rewrite Rmult_0_l, Rplus_0_l, Rminus_0_r.
- rewrite Rminus_0_l.
- remember (a₁₁ M - a₂₂ M - a₃₃ M)%R as x₀ eqn:Hx₀.
- remember (- a₁₁ M + a₂₂ M - a₃₃ M)%R as y₀ eqn:Hy₀.
- remember (- a₁₁ M - a₂₂ M + a₃₃ M)%R as z₀ eqn:Hz₀.
- remember ((√ (1 + x₀) / 2)%R) as x eqn:Hx.
- remember ((√ (1 + y₀) / 2)%R) as y eqn:Hy.
- remember ((√ (1 + z₀) / 2)%R) as z eqn:Hz.
- generalize Hx; intros Hx2.
- generalize Hy; intros Hy2.
- generalize Hz; intros Hz2.
-
-bbb.
  (* mat_trace M = -1 *)
  rewrite Rsqr_0, Rplus_0_l, Rmult_0_r.
  do 3 rewrite Rmult_0_l, Rplus_0_l, Rminus_0_r.
@@ -2084,16 +2067,23 @@ bbb.
      ring_simplify in Hxy.
      do 3 rewrite <- Rsqr_pow2 in Hxy.
 (* seems not to work... *)
-bbb.
+*)
 
-Theorem quat_of_mat_inv : ∀ h, (∥h∥ = 1%R)%H → (0 ≤ Re h)%R →
-  quat_of_mat (mat_of_quat h) = h.
+Definition vec_le '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
+  (u₁ ≤ v₁ ∧ u₂ ≤ v₂ ∧ u₃ ≤ v₃)%R.
+
+Notation "u '≤' v" := (vec_le u v) : vec_scope.
+
+Theorem quat_of_mat_inv : ∀ h,
+  (∥h∥ = 1%R)%H
+  → (0 ≤ Re h)%R
+  → (0 ≤ Im h)%vec
+  → quat_of_mat (mat_of_quat h) = h.
 Proof.
-intros * Hqn Hqa.
-destruct q as (a, (b, c, d)); simpl in Hqn; simpl.
-simpl in Hqa; apply Rabs_pos_eq in Hqa.
-apply sqrt_lem_0 in Hqn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
-symmetry in Hqn; rewrite Rmult_1_r in Hqn.
+intros * Hhn Hrp Hvp.
+destruct h as (a, (b, c, d)); simpl in Hrp, Hvp; simpl.
+apply sqrt_lem_0 in Hhn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
+symmetry in Hhn; rewrite Rmult_1_r in Hhn.
 unfold quat_of_mat, mat_of_quat; simpl.
 unfold mat_trace; simpl.
 remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
@@ -2113,10 +2103,10 @@ clear Ht; rename Ht' into Ht.
 destruct (Req_dec t (-1)) as [Htd| Htd].
  assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
  f_equal.
- rewrite Rsqr_0 in Hqn, Hx₀, Hy₀, Hz₀, Ht.
+ rewrite Rsqr_0 in Hhn, Hx₀, Hy₀, Hz₀, Ht.
  rewrite Ropp_0 in Hx₀, Hy₀, Hz₀.
  rewrite Rmult_0_r in Ht.
- rewrite Rplus_0_l in Hqn, Hx₀.
+ rewrite Rplus_0_l in Hhn, Hx₀.
  rewrite Rminus_0_l in Hy₀, Hz₀, Ht.
  clear Ht Htd.
  assert (Hx₀' : x₀ = (4 * b² - 1)%R) by lra.
@@ -2136,8 +2126,12 @@ destruct (Req_dec t (-1)) as [Htd| Htd].
  unfold Rdiv.
  rewrite Rinv_r; [ | lra ].
  do 3 rewrite Rmult_1_l.
+ destruct Hvp as (Hbp & Hcp & Hdp).
+ apply Rabs_pos_eq in Hbp.
+ apply Rabs_pos_eq in Hcp.
+ apply Rabs_pos_eq in Hdp.
+ now rewrite Hbp, Hcp, Hdp.
 
-Focus 2.
  assert (Ha2 : (a² ≠ 0)%R) by lra.
  assert (Ha : (a ≠ 0)%R) by now intros H; subst a; apply Ha2, Rsqr_0.
  assert (Haa : (Rabs a ≠ 0)%R) by now apply Rabs_no_R0.
@@ -2154,6 +2148,7 @@ Focus 2.
   now rewrite Rmult_1_l.
 
   rewrite Hta.
+  apply Rabs_pos_eq in Hrp.
   f_equal; [ easy | ].
   assert (Rpm : ∀ a b c, (a + b - (b - c) = a + c)%R) by (intros; lra).
   do 3 rewrite Rpm.
@@ -2166,12 +2161,12 @@ Focus 2.
   replace (4 * a * b * / 4)%R with (a * b)%R by lra.
   replace (4 * a * c * / 4)%R with (a * c)%R by lra.
   replace (4 * a * d * / 4)%R with (a * d)%R by lra.
-  rewrite Hqa.
+  rewrite Hrp.
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   now do 3 rewrite Rmult_1_l.
-bbb.
+Qed.
 
 (* end play with quaternions. *)
 
@@ -2522,6 +2517,14 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
           move Hpxz after Hp'.
           symmetry in Hpx; move Hpx at bottom.
           move Hrp at bottom.
+          destruct M; simpl in *.
+          unfold mkrmat; f_equal.
+           unfold is_rotation_matrix, mat_transp in Hrm; simpl in Hrm.
+           unfold mat_id, mat_det, mkrmat in Hrm; simpl in Hrm.
+           destruct Hrm as (Hrm & Hdet).
+           injection Hrm; clear Hrm.
+           intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
