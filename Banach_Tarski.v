@@ -1895,7 +1895,7 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z) c s :=
 Record ℍ := quat { Re : ℝ; Im : vector }.
 Arguments quat Re%R Im%vec.
 
-Delimit Scope quat_scope with Qn.
+Delimit Scope quat_scope with H.
 
 Definition quat_add '(quat a₁ v₁) '(quat a₂ v₂) :=
   quat (a₁ + a₂) (v₁ + v₂).
@@ -1916,28 +1916,27 @@ Definition quat_inv '(quat a v) :=
   let r := (a² + v·v)%R in
   quat_const_mul (/ r) (quat_conj (quat a v)).
 
+Notation "h₁ + h₂" := (quat_add h₁ h₂) : quat_scope.
+Notation "h₁ * h₂" := (quat_mul h₁ h₂) : quat_scope.
+Notation "'hi'" := (Qi) : quat_scope.
+Notation "'hj'" := (Qj) : quat_scope.
+Notation "'hk'" := (Qk) : quat_scope.
+Notation "h '⁻¹'" := (quat_inv h) (at level 1, format "h ⁻¹"): quat_scope.
+Notation "∥ h ∥" := (quat_norm h) : quat_scope.
 
-Notation "q₁ + q₂" := (quat_add q₁ q₂) : quat_scope.
-Notation "q₁ * q₂" := (quat_mul q₁ q₂) : quat_scope.
-Notation "'qi'" := (Qi) : quat_scope.
-Notation "'qj'" := (Qj) : quat_scope.
-Notation "'qk'" := (Qk) : quat_scope.
-Notation "q '⁻¹'" := (quat_inv q) (at level 1, format "q ⁻¹"): quat_scope.
-Notation "∥ q ∥" := (quat_norm q) : quat_scope.
+Definition hr a := quat a 0.
 
-Definition qr a := quat a 0.
+Theorem hi_sqr : (hi * hi)%H = hr (-1).
+Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
-Theorem qi_sqr : (qi * qi)%Qn = qr (-1).
-Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
+Theorem hj_sqr : (hj * hj)%H = hr (-1).
+Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
-Theorem qj_sqr : (qj * qj)%Qn = qr (-1).
-Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
+Theorem hk_shr : (hk * hk)%H = hr (-1).
+Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
-Theorem qk_sqr : (qk * qk)%Qn = qr (-1).
-Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
-
-Theorem qi_qj_qk : (qi * qj * qk = qr (-1))%Qn.
-Proof. unfold qr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
+Theorem hi_hj_hk : (hi * hj * hk = hr (-1))%H.
+Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
 Definition quat_of_mat M :=
   if Req_dec (mat_trace M) (-1) then
@@ -1961,7 +1960,7 @@ Definition mat_of_quat '(quat a (V b c d)) :=
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
 
-Definition quat_rotate q v := (q * v * q⁻¹)%Qn.
+Definition quat_rotate h v := (h * v * h⁻¹)%H.
 
 bbb.
 
@@ -2087,8 +2086,8 @@ bbb.
 (* seems not to work... *)
 bbb.
 
-Theorem quat_of_mat_inv : ∀ q, (∥q∥ = 1%R)%Qn → (0 ≤ Qs q)%R →
-  quat_of_mat (mat_of_quat q) = q.
+Theorem quat_of_mat_inv : ∀ h, (∥h∥ = 1%R)%H → (0 ≤ Re h)%R →
+  quat_of_mat (mat_of_quat h) = h.
 Proof.
 intros * Hqn Hqa.
 destruct q as (a, (b, c, d)); simpl in Hqn; simpl.
