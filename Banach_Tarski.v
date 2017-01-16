@@ -368,12 +368,30 @@ intros n.
 apply not_eq_sym, Hp.
 Qed.
 
-Definition rotation_unit_eigenvec (m : matrix ℝ) :=
-  let x := (a₂₃ m - a₃₂ m)%R in
-  let y := (a₃₁ m - a₁₃ m)%R in
-  let z := (a₁₂ m - a₂₁ m)%R in
-  let r := vec_norm (V x y z) in
-  V (x / r) (y / r) (z / r).
+Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
+
+Definition rotation_unit_eigenvec (M : matrix ℝ) :=
+  let x := (a₂₃ M - a₃₂ M)%R in
+  let y := (a₃₁ M - a₁₃ M)%R in
+  let z := (a₁₂ M - a₂₁ M)%R in
+  let r := ∥(V x y z)∥ in
+  if Req_dec r 0 then
+    if and_dec (Rlt_dec (a₂₂ M) (a₁₁ M)) (Rlt_dec (a₃₃ M) (a₁₁ M)) then
+      let x₁ := sqrt ((a₁₁ M + 1) / 2)%R in
+      let y₁ := (a₁₂ M / (2 * x₁))%R in
+      let z₁ := (a₁₃ M / (2 * x₁))%R in
+      V x₁ y₁ z₁
+    else if Rlt_dec (a₃₃ M) (a₂₂ M) then
+      let y₁ := sqrt ((a₂₂ M + 1) / 2)%R in
+      let x₁ := (a₂₃ M / (2 * y₁))%R in
+      let z₁ := (a₁₃ M / (2 * y₁))%R in
+      V x₁ y₁ z₁
+    else
+      let z₁ := sqrt ((a₃₃ M + 1) / 2)%R in
+      let x₁ := (a₂₃ M / (2 * z₁))%R in
+      let y₁ := (a₁₂ M / (2 * z₁))%R in
+      V x₁ y₁ z₁
+  else V (x / r) (y / r) (z / r).
 
 Definition rotation_fixpoint (m : matrix ℝ) k :=
   vec_const_mul k (rotation_unit_eigenvec m).
@@ -387,11 +405,84 @@ Definition fixpoint_of_path r el :=
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
-Theorem matrix_all_fixpoints_ok : ∀ m p k,
-  is_rotation_matrix m
-  → p = rotation_fixpoint m k
-  → mat_vec_mul m p = p.
+Theorem matrix_all_fixpoints_ok : ∀ M p k,
+  is_rotation_matrix M
+  → p = rotation_fixpoint M k
+  → mat_vec_mul M p = p.
 Proof.
+intros * Hrm Hn.
+subst p.
+unfold rotation_fixpoint.
+remember (rotation_unit_eigenvec M) as ev eqn:Hev.
+unfold rotation_unit_eigenvec in Hev.
+remember (a₂₃ M - a₃₂ M)%R as x₀ eqn:Hx₀.
+remember (a₃₁ M - a₁₃ M)%R as y₀ eqn:Hy₀.
+remember (a₁₂ M - a₂₁ M)%R as z₀ eqn:Hz₀.
+remember ∥(V x₀ y₀ z₀)∥ as r eqn:Hr.
+destruct (Req_dec r 0) as [Hrz| Hrnz].
+ move Hrz at top; subst r.
+ symmetry in Hr.
+ apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr.
+ destruct Hr as (H1 & H2 & H3); subst x₀ y₀ z₀.
+ apply Rminus_diag_uniq in H1.
+ apply Rminus_diag_uniq in H2.
+ apply Rminus_diag_uniq in H3.
+ remember (Rlt_dec (a₂₂ M) (a₁₁ M)) as P eqn:HP.
+ remember (Rlt_dec (a₃₃ M) (a₁₁ M)) as Q eqn:HQ.
+ destruct (and_dec P Q) as [(H₁, H₂)| HPQ]; subst P Q.
+  destruct ev as (x, y, z).
+  injection Hev; clear Hev; intros Hz Hy Hx.
+  rewrite <- Hx in Hy, Hz; subst y z.
+  simpl; f_equal.
+   ring_simplify.
+   apply Rmult_eq_reg_r with (r := (2 * x)%R).
+   field_simplify.
+    do 2 rewrite Rdiv_1_r.
+    subst x.
+    do 3 rewrite <- Rsqr_pow2.
+    rewrite Rsqr_sqrt.
+    do 2 rewrite Rsqr_pow2.
+    field_simplify.
+    do 2 rewrite Rdiv_1_r.
+    rewrite <- Rmult_plus_distr_r, Rmult_comm.
+    do 2 rewrite <- Rmult_plus_distr_l.
+
+bbb.
+ (* case r ≠ 0 *)
+ destruct ev as (x, y, z).
+ injection Hev; clear Hev; intros Hz Hy Hx.
+ move Hx after Hy; move Hz after Hy.
+ unfold is_rotation_matrix in Hrm.
+ destruct Hrm as (Ht & Hd).
+ unfold mat_det in Hd.
+ unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
+ injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+ simpl.
+ setoid_rewrite fold_Rsqr in H₁.
+ setoid_rewrite fold_Rsqr in H₅.
+ setoid_rewrite fold_Rsqr in H₉.
+ move H₉ after H₁; move H₅ after H₁.
+ move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
+ clear H₄ H₇ H₈; move H₆ after H₂.
+ move Hd before H₉.
+ rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
+ rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
+ replace (k * x)%R with (x * k)%R by apply Rmult_comm.
+ replace (k * y)%R with (y * k)%R by apply Rmult_comm.
+ replace (k * z)%R with (z * k)%R by apply Rmult_comm.
+ subst x y z.
+ progress repeat rewrite <- Rmult_div.
+ unfold Rdiv.
+ progress repeat rewrite Rmult_assoc.
+ remember (k * / r)%R as kr.
+ clear Hr Heqkr.
+ f_equal; nsatz.
+Qed.
+bbb.
+remember (√ ((a₃₂ m - a₂₃ m)² + (a₁₃ m - a₃₁ m)² + (a₂₁ m - a₁₂ m)²)) as r.
+
+bbb.
 intros * Hrm Hn.
 subst p.
 unfold rotation_fixpoint.
@@ -1909,6 +2000,24 @@ remember (a₂₃ M - a₃₂ M)%R as x₀ eqn:Hx₀.
 remember (a₃₁ M - a₁₃ M)%R as y₀ eqn:Hy₀.
 remember (a₁₂ M - a₂₁ M)%R as z₀ eqn:Hz₀.
 remember (√ (x₀² + y₀² + z₀²))%R as r eqn:Hr.
+destruct (Req_dec r 0) as [Hrz| Hrnz].
+ move Hrz at top; subst r.
+ symmetry in Hr.
+ apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr.
+ destruct Hr as (H1 & H2 & H3); subst x₀ y₀ z₀.
+ apply Rminus_diag_uniq in H1.
+ apply Rminus_diag_uniq in H2.
+ apply Rminus_diag_uniq in H3.
+About  rotation_unit_eigenvec.
+bbb.
+
+ unfold mat_det in Hdet.
+ rewrite H1, H2, H3 in Hdet.
+ ring_simplify in Hdet.
+
+
+bbb.
 assert (x² + y² + z² = 1)%R.
  subst x y z; unfold Rdiv.
  do 3 rewrite Rsqr_mult.
