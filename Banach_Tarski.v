@@ -370,6 +370,12 @@ Qed.
 
 Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
 
+(* see
+http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/
+https://www.geometrictools.com/Documentation/RotationIssues.pdf
+which give different solutions, perhaps contradictory,
+perhaps all false.
+*)
 Definition rotation_unit_eigenvec (M : matrix ℝ) :=
   let x := (a₂₃ M - a₃₂ M)%R in
   let y := (a₃₁ M - a₁₃ M)%R in
@@ -466,11 +472,12 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
      with (k * (a₁₁ - a₂₂ - a₃₃ + 1))%R
        by lra.
      f_equal.
-bbb.
-     with
-       (k * (a₁₁² - a₁₁ * a₂₂ - a₁₁ * a₃₃ + a₁₁ + 2 * a₁₂² + 2 * a₁₃²))%R
-     by lra.
-
+     rewrite H1, H2, H3 in *.
+     ring_simplify in H11; ring_simplify in H12; ring_simplify in H13.
+     ring_simplify in H21; ring_simplify in H22; ring_simplify in H23.
+     ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
+     repeat rewrite <- Rsqr_pow2 in *.
+(* I think rotation_unit_eigenvec is false *)
 bbb.
 
      unfold Rminus.
