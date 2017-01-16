@@ -370,12 +370,6 @@ Qed.
 
 Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
 
-(* see
-http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/
-https://www.geometrictools.com/Documentation/RotationIssues.pdf
-which give different solutions, perhaps contradictory,
-perhaps all false.
-*)
 Definition rotation_unit_eigenvec (M : matrix ℝ) :=
   let x := (a₃₂ M - a₂₃ M)%R in
   let y := (a₁₃ M - a₃₁ M)%R in
@@ -383,7 +377,7 @@ Definition rotation_unit_eigenvec (M : matrix ℝ) :=
   let r := ∥(V x y z)∥ in
   if Req_dec r 0 then
     if and_dec (Rlt_dec (a₂₂ M) (a₁₁ M)) (Rlt_dec (a₃₃ M) (a₁₁ M)) then
-      let x₁ := (sqrt (a₁₁ M - a₂₂ M - a₃₃ M + 1) / 2)%R in
+      let x₁ := sqrt ((a₁₁ M + 1) / 2) in
       let y₁ := (a₁₂ M / (2 * x₁))%R in
       let z₁ := (a₃₁ M / (2 * x₁))%R in
       V x₁ y₁ z₁
@@ -456,64 +450,24 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   rewrite <- Hx in Hy, Hz; subst y z.
   simpl; f_equal.
    ring_simplify.
-   apply Rmult_eq_reg_r with (r := (4 * x)%R).
+   apply Rmult_eq_reg_r with (r := (2 * x)%R).
    field_simplify.
+    do 2 rewrite Rdiv_1_r.
     subst x.
     rewrite <- Rsqr_pow2.
-    rewrite Rsqr_div; [ | lra ].
     rewrite Rsqr_sqrt.
-     rewrite Rsqr_pow2.
      field_simplify.
-     rewrite Rdiv_1_r.
-     rewrite <- Rsqr_pow2.
-     replace (a₁₁ * k - k * a₂₂ - k * a₃₃ + k)%R
-     with (k * (a₁₁ - a₂₂ - a₃₃ + 1))%R by lra.
-     rewrite Rsqr_pow2.
-     replace
-       ((8 * a₁₁ ^ 2 * k - 8 * a₁₁ * k * a₂₂ - 8 * a₁₁ * k * a₃₃ + 8 * a₁₁ * k + 16 * k * a₁₂ ^ 2 + 16 * k * a₃₁ ^2) / 8)%R
-     with
-       (k * (a₁₁ * (a₁₁ - a₂₂ - a₃₃ + 1) + 2 * (a₁₂ ^ 2 + a₃₁ ^2)))%R
-     by lra.
-     f_equal.
-     progress repeat rewrite <- Rsqr_pow2.
-
-(* I think rotation_unit_eigenvec is false *)
-bbb.
-
-     unfold Rminus.
-     do 3 rewrite Ropp_mult_distr_r.
-
-
-bbb.
-
-     rewrite Rplus_comm.
-     do 2 rewrite <- Rplus_assoc.
-     rewrite Rplus_shuffle0, Rplus_comm; f_equal.
-     rewrite Rmult_comm.
-     rewrite <- Rmult_plus_distr_r, Rmult_comm.
-     rewrite <- Rmult_plus_distr_l.
+     do 2 rewrite Rdiv_1_r.
      do 3 rewrite <- Rsqr_pow2.
-     destruct Hrm as (Hrm, Hdet).
-     unfold mat_det in Hdet.
-     rewrite H1, H2, H3 in Hdet.
-     destruct M; simpl in *.
-     unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
-     injection Hrm; clear Hrm.
-     intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-     nsatz.
+     replace (a₁₁² * k + a₁₁ * k + k * a₁₂² + k * a₃₁²)%R
+     with (a₁₁ * k + k * (a₁₁² + a₁₂² + a₃₁²))%R by lra.
+     now rewrite H11, Rmult_1_r.
 
      apply Rmult_le_reg_r with (r := 2%R); [ lra | ].
      unfold Rdiv; rewrite Rmult_0_l, Rmult_assoc.
      rewrite Rinv_l; [ rewrite Rmult_1_r | lra ].
-     destruct Hrm as (Hrm, Hdet).
-     unfold mat_det in Hdet.
-     rewrite H1, H2, H3 in Hdet.
-     destruct M; simpl in *.
-     unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
-     injection Hrm; clear Hrm.
-     intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-(* nsatz does not work; rotation_unit_eigenvec must be false *)
 bbb.
+
  (* case r ≠ 0 *)
  destruct ev as (x, y, z).
  injection Hev; clear Hev; intros Hz Hy Hx.
