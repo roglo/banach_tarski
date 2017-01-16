@@ -460,8 +460,15 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
          16 * k * a₁₂² + 16 * k * a₁₃²)
           / 8)%R
      with
-       ((a₁₁² * k - a₁₁ * k * a₂₂ - a₁₁ * k * a₃₃ + a₁₁ * k +
-         2 * k * a₁₂² + 2 * k * a₁₃²))%R
+       (k * (a₁₁² - a₁₁ * a₂₂ - a₁₁ * a₃₃ + a₁₁ + 2 * a₁₂² + 2 * a₁₃²))%R
+     by lra.
+     replace (a₁₁ * k - k * a₂₂ - k * a₃₃ + k)%R
+     with (k * (a₁₁ - a₂₂ - a₃₃ + 1))%R
+       by lra.
+     f_equal.
+bbb.
+     with
+       (k * (a₁₁² - a₁₁ * a₂₂ - a₁₁ * a₃₃ + a₁₁ + 2 * a₁₂² + 2 * a₁₃²))%R
      by lra.
 
 bbb.
