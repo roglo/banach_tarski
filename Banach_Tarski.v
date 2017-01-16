@@ -452,7 +452,36 @@ intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
 ring_simplify in H11; ring_simplify in H12; ring_simplify in H13.
 ring_simplify in H21; ring_simplify in H22; ring_simplify in H23.
 ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
+assert (Ha : (a₁₁² ≤ 1 ∧ a₂₂² ≤ 1 ∧ a₃₃² ≤ 1)%R).
+ split; [ | split ].
+  apply Rplus_le_reg_r with (r := (a₁₂² + a₁₃²)%R).
+  rewrite <- Rplus_assoc.
+  do 3 rewrite <- Rsqr_pow2 in H11; rewrite H11.
+  replace 1%R with (1 + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
 
+  apply Rplus_le_reg_l with (r := (a₂₁²)%R).
+  apply Rplus_le_reg_r with (r := (a₂₃²)%R).
+  do 3 rewrite <- Rsqr_pow2 in H22; rewrite H22.
+  rewrite Rplus_shuffle0, Rplus_comm.
+  replace 1%R with (1 + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+  apply Rplus_le_reg_l with (r := (a₃₁² + a₃₂²)%R).
+  do 3 rewrite <- Rsqr_pow2 in H33; rewrite H33.
+  replace 1%R with (0 + 1)%R at 1 by lra.
+  apply Rplus_le_compat_r, nonneg_plus_sqr.
+
+ destruct Ha as (Ha₁ & Ha₂ & Ha₃).
+ split.
+
+bbb.
+  (* case ... ≤ 3 (ok) *)
+  replace 1%R with (1 ^ 2)%R in Ha₁, Ha₂, Ha₃ by lra.
+  rewrite <- Rsqr_pow2 in Ha₁, Ha₂, Ha₃.
+  apply Rsqr_incr_0_var in Ha₁; [ | lra ].
+  apply Rsqr_incr_0_var in Ha₂; [ | lra ].
+  apply Rsqr_incr_0_var in Ha₃; lra.
 bbb.
  (* continuing matrix_all_fixpoints_ok *)
  destruct M; simpl in *.
