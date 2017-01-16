@@ -446,17 +446,17 @@ assert (Ha : (a₁₁² ≤ 1 ∧ a₂₂² ≤ 1 ∧ a₃₃² ≤ 1)%R).
   apply Rplus_le_compat_r, nonneg_plus_sqr.
 
  destruct Ha as (Ha₁ & Ha₂ & Ha₃).
- split.
-
+ replace 1%R with (1 ^ 2)%R in Ha₁, Ha₂, Ha₃ by lra.
+ rewrite <- Rsqr_pow2 in Ha₁, Ha₂, Ha₃.
+ generalize Ha₁, Ha₂, Ha₃; intros Ha₁' Ha₂' Ha₃'.
+ apply Rsqr_incr_0_var in Ha₁; [ | lra ].
+ apply Rsqr_incr_0_var in Ha₂; [ | lra ].
+ apply Rsqr_incr_0_var in Ha₃; [ | lra ].
+ apply Rsqr_neg_pos_le_0 in Ha₁'; [ | lra ].
+ apply Rsqr_neg_pos_le_0 in Ha₂'; [ | lra ].
+ apply Rsqr_neg_pos_le_0 in Ha₃'; [ | lra ].
+ split; [ | lra ].
 bbb.
-  (* case ... ≤ 3 (ok) *)
-  replace 1%R with (1 ^ 2)%R in Ha₁, Ha₂, Ha₃ by lra.
-  rewrite <- Rsqr_pow2 in Ha₁, Ha₂, Ha₃.
-  apply Rsqr_incr_0_var in Ha₁; [ | lra ].
-  apply Rsqr_incr_0_var in Ha₂; [ | lra ].
-  apply Rsqr_incr_0_var in Ha₃; lra.
-bbb.
-
 
 Theorem matrix_all_fixpoints_ok : ∀ M p k,
   is_rotation_matrix M
