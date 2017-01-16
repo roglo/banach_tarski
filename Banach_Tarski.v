@@ -407,6 +407,10 @@ Definition fixpoint_of_path r el :=
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
+(* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
+Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
+Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
+
 Theorem matrix_all_fixpoints_ok : ∀ M p k,
   is_rotation_matrix M
   → p = rotation_fixpoint M k
@@ -433,6 +437,24 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  destruct Hrm as (Hrm, Hdet).
  unfold mat_det in Hdet.
  rewrite H1, H2, H3 in Hdet.
+(**)
+Theorem mat_trace_interv : ∀ M,
+  is_rotation_matrix M
+  → (-1 ≤ mat_trace M ≤ 3)%R.
+Proof.
+intros * (Hrm & Hdet).
+unfold mat_trace.
+unfold mat_det in Hdet.
+destruct M; simpl in *.
+unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
+injection Hrm; clear Hrm.
+intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+ring_simplify in H11; ring_simplify in H12; ring_simplify in H13.
+ring_simplify in H21; ring_simplify in H22; ring_simplify in H23.
+ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
+
+bbb.
+ (* continuing matrix_all_fixpoints_ok *)
  destruct M; simpl in *.
  unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
  injection Hrm; clear Hrm.
@@ -558,10 +580,6 @@ intros * Hp.
 apply matrix_all_fixpoints_ok in Hp; [ easy | ].
 apply mat_of_path_is_rotation_matrix.
 Qed.
-
-(* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
-Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
-Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
 
 Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el = mat_vec_mul (mat_of_path el) p.
