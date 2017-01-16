@@ -377,16 +377,15 @@ which give different solutions, perhaps contradictory,
 perhaps all false.
 *)
 Definition rotation_unit_eigenvec (M : matrix ℝ) :=
-  let x := (a₂₃ M - a₃₂ M)%R in
-  let y := (a₃₁ M - a₁₃ M)%R in
-  let z := (a₁₂ M - a₂₁ M)%R in
+  let x := (a₃₂ M - a₂₃ M)%R in
+  let y := (a₁₃ M - a₃₁ M)%R in
+  let z := (a₂₁ M - a₁₂ M)%R in
   let r := ∥(V x y z)∥ in
   if Req_dec r 0 then
     if and_dec (Rlt_dec (a₂₂ M) (a₁₁ M)) (Rlt_dec (a₃₃ M) (a₁₁ M)) then
       let x₁ := (sqrt (a₁₁ M - a₂₂ M - a₃₃ M + 1) / 2)%R in
-      (* some fixes, au hasard... voir si ça donne... *)
-      let y₁ := (a₁₃ M / (2 * x₁))%R in
-      let z₁ := (a₁₂ M / (2 * x₁))%R in
+      let y₁ := (a₁₂ M / (2 * x₁))%R in
+      let z₁ := (a₃₁ M / (2 * x₁))%R in
       V x₁ y₁ z₁
     else if Rlt_dec (a₃₃ M) (a₂₂ M) then
       (* à revoir *)
@@ -424,9 +423,9 @@ subst p.
 unfold rotation_fixpoint.
 remember (rotation_unit_eigenvec M) as ev eqn:Hev.
 unfold rotation_unit_eigenvec in Hev.
-remember (a₂₃ M - a₃₂ M)%R as x₀ eqn:Hx₀.
-remember (a₃₁ M - a₁₃ M)%R as y₀ eqn:Hy₀.
-remember (a₁₂ M - a₂₁ M)%R as z₀ eqn:Hz₀.
+remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
+remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
+remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
 remember ∥(V x₀ y₀ z₀)∥ as r eqn:Hr.
 destruct (Req_dec r 0) as [Hrz| Hrnz].
  move Hrz at top; subst r.
@@ -469,12 +468,14 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
      rewrite <- Rsqr_pow2.
      replace (a₁₁ * k - k * a₂₂ - k * a₃₃ + k)%R
      with (k * (a₁₁ - a₂₂ - a₃₃ + 1))%R by lra.
+     rewrite Rsqr_pow2.
      replace
-       ((8 * a₁₁² * k - 8 * a₁₁ * k * a₂₂ - 8 * a₁₁ * k * a₃₃ + 8 * a₁₁ * k + 32 * k * a₂₁ * a₁₃) / 8)%R
+       ((8 * a₁₁ ^ 2 * k - 8 * a₁₁ * k * a₂₂ - 8 * a₁₁ * k * a₃₃ + 8 * a₁₁ * k + 16 * k * a₁₂ ^ 2 + 16 * k * a₃₁ ^2) / 8)%R
      with
-       (k * (a₁₁² - a₁₁ * a₂₂ - a₁₁ * a₃₃ + a₁₁ + 4 * a₂₁ * a₁₃))%R
+       (k * (a₁₁ * (a₁₁ - a₂₂ - a₃₃ + 1) + 2 * (a₁₂ ^ 2 + a₃₁ ^2)))%R
      by lra.
      f_equal.
+     progress repeat rewrite <- Rsqr_pow2.
 
 (* I think rotation_unit_eigenvec is false *)
 bbb.
@@ -2047,7 +2048,12 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
 
 Definition axis_cos_sin_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
+(*
   let sinθ := sqrt (1 - cosθ²) in
+*)
+  (* à vérifier *)
+  let sinθ := ((a₁₂ - a₂₁) / 2)%R in
+(**)
   (rotation_unit_eigenvec M, cosθ, sinθ).
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
