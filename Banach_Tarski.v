@@ -442,12 +442,36 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
     subst x.
     do 3 rewrite <- Rsqr_pow2.
     rewrite Rsqr_sqrt.
-    do 2 rewrite Rsqr_pow2.
-    field_simplify.
-    do 2 rewrite Rdiv_1_r.
-    rewrite <- Rmult_plus_distr_r, Rmult_comm.
-    do 2 rewrite <- Rmult_plus_distr_l.
+     do 2 rewrite Rsqr_pow2.
+     field_simplify.
+     do 2 rewrite Rdiv_1_r.
+     rewrite Rplus_comm.
+     do 2 rewrite <- Rplus_assoc.
+     rewrite Rplus_shuffle0, Rplus_comm; f_equal.
+     rewrite Rmult_comm.
+     rewrite <- Rmult_plus_distr_r, Rmult_comm.
+     rewrite <- Rmult_plus_distr_l.
+     do 3 rewrite <- Rsqr_pow2.
+     destruct Hrm as (Hrm, Hdet).
+     unfold mat_det in Hdet.
+     rewrite H1, H2, H3 in Hdet.
+     destruct M; simpl in *.
+     unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
+     injection Hrm; clear Hrm.
+     intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+     nsatz.
 
+     apply Rmult_le_reg_r with (r := 2%R); [ lra | ].
+     unfold Rdiv; rewrite Rmult_0_l, Rmult_assoc.
+     rewrite Rinv_l; [ rewrite Rmult_1_r | lra ].
+     destruct Hrm as (Hrm, Hdet).
+     unfold mat_det in Hdet.
+     rewrite H1, H2, H3 in Hdet.
+     destruct M; simpl in *.
+     unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
+     injection Hrm; clear Hrm.
+     intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+(* nsatz does not work; rotation_unit_eigenvec must be false *)
 bbb.
  (* case r ≠ 0 *)
  destruct ev as (x, y, z).

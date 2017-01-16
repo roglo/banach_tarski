@@ -34,6 +34,13 @@ Proof. intros; now fold (Rsqr x). Qed.
 Theorem Rmult_div : ∀ x y z, (x * y / z = x / z * y)%R.
 Proof. intros; lra. Qed.
 
+Theorem Rplus_shuffle0 : ∀ n m p : ℝ, (n + m + p)%R = (n + p + m)%R.
+Proof.
+intros.
+rewrite Rplus_comm, <- Rplus_assoc.
+f_equal; apply Rplus_comm.
+Qed.
+
 Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
 Proof.
 intros.
