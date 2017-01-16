@@ -411,33 +411,6 @@ Definition fixpoint_of_nat r n :=
 Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
 
-Theorem matrix_all_fixpoints_ok : ∀ M p k,
-  is_rotation_matrix M
-  → p = rotation_fixpoint M k
-  → mat_vec_mul M p = p.
-Proof.
-intros * Hrm Hn.
-subst p.
-unfold rotation_fixpoint.
-remember (rotation_unit_eigenvec M) as ev eqn:Hev.
-unfold rotation_unit_eigenvec in Hev.
-remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
-remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
-remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
-remember ∥(V x₀ y₀ z₀)∥ as r eqn:Hr.
-destruct (Req_dec r 0) as [Hrz| Hrnz].
- move Hrz at top; subst r.
- symmetry in Hr.
- apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hr.
- destruct Hr as (H1 & H2 & H3); subst x₀ y₀ z₀.
- apply Rminus_diag_uniq in H1.
- apply Rminus_diag_uniq in H2.
- apply Rminus_diag_uniq in H3.
- destruct Hrm as (Hrm, Hdet).
- unfold mat_det in Hdet.
- rewrite H1, H2, H3 in Hdet.
-(**)
 Theorem mat_trace_interv : ∀ M,
   is_rotation_matrix M
   → (-1 ≤ mat_trace M ≤ 3)%R.
@@ -483,7 +456,37 @@ bbb.
   apply Rsqr_incr_0_var in Ha₂; [ | lra ].
   apply Rsqr_incr_0_var in Ha₃; lra.
 bbb.
- (* continuing matrix_all_fixpoints_ok *)
+
+
+Theorem matrix_all_fixpoints_ok : ∀ M p k,
+  is_rotation_matrix M
+  → p = rotation_fixpoint M k
+  → mat_vec_mul M p = p.
+Proof.
+intros * Hrm Hn.
+subst p.
+unfold rotation_fixpoint.
+remember (rotation_unit_eigenvec M) as ev eqn:Hev.
+unfold rotation_unit_eigenvec in Hev.
+remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
+remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
+remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
+remember ∥(V x₀ y₀ z₀)∥ as r eqn:Hr.
+destruct (Req_dec r 0) as [Hrz| Hrnz].
+ move Hrz at top; subst r.
+ symmetry in Hr.
+ apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr.
+ destruct Hr as (H1 & H2 & H3); subst x₀ y₀ z₀.
+ apply Rminus_diag_uniq in H1.
+ apply Rminus_diag_uniq in H2.
+ apply Rminus_diag_uniq in H3.
+ destruct Hrm as (Hrm, Hdet).
+ unfold mat_det in Hdet.
+ rewrite H1, H2, H3 in Hdet.
+(**)
+Check mat_trace_interv.
+bbb.
  destruct M; simpl in *.
  unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
  injection Hrm; clear Hrm.
