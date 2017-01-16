@@ -377,17 +377,19 @@ Definition rotation_unit_eigenvec (M : matrix ℝ) :=
   let r := ∥(V x y z)∥ in
   if Req_dec r 0 then
     if and_dec (Rlt_dec (a₂₂ M) (a₁₁ M)) (Rlt_dec (a₃₃ M) (a₁₁ M)) then
-      let x₁ := sqrt ((a₁₁ M + 1) / 2)%R in
+      let x₁ := (sqrt (a₁₁ M - a₂₂ M - a₃₃ M + 1) / 2)%R in
       let y₁ := (a₁₂ M / (2 * x₁))%R in
       let z₁ := (a₁₃ M / (2 * x₁))%R in
       V x₁ y₁ z₁
     else if Rlt_dec (a₃₃ M) (a₂₂ M) then
-      let y₁ := sqrt ((a₂₂ M + 1) / 2)%R in
+      (* à revoir *)
+      let y₁ := sqrt ((a₂₂ M + 1) / 2) in
       let x₁ := (a₂₃ M / (2 * y₁))%R in
       let z₁ := (a₁₃ M / (2 * y₁))%R in
       V x₁ y₁ z₁
     else
-      let z₁ := sqrt ((a₃₃ M + 1) / 2)%R in
+      (* à revoir *)
+      let z₁ := sqrt ((a₃₃ M + 1) / 2) in
       let x₁ := (a₂₃ M / (2 * z₁))%R in
       let y₁ := (a₁₂ M / (2 * z₁))%R in
       V x₁ y₁ z₁
@@ -428,23 +430,48 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  apply Rminus_diag_uniq in H1.
  apply Rminus_diag_uniq in H2.
  apply Rminus_diag_uniq in H3.
- remember (Rlt_dec (a₂₂ M) (a₁₁ M)) as P eqn:HP.
- remember (Rlt_dec (a₃₃ M) (a₁₁ M)) as Q eqn:HQ.
+ destruct Hrm as (Hrm, Hdet).
+ unfold mat_det in Hdet.
+ rewrite H1, H2, H3 in Hdet.
+ destruct M; simpl in *.
+ unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
+ injection Hrm; clear Hrm.
+ intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+ remember (Rlt_dec a₂₂ a₁₁) as P eqn:HP.
+ remember (Rlt_dec a₃₃ a₁₁) as Q eqn:HQ.
  destruct (and_dec P Q) as [(H₁, H₂)| HPQ]; subst P Q.
   destruct ev as (x, y, z).
   injection Hev; clear Hev; intros Hz Hy Hx.
   rewrite <- Hx in Hy, Hz; subst y z.
   simpl; f_equal.
    ring_simplify.
-   apply Rmult_eq_reg_r with (r := (2 * x)%R).
+   apply Rmult_eq_reg_r with (r := (4 * x)%R).
    field_simplify.
-    do 2 rewrite Rdiv_1_r.
     subst x.
     do 3 rewrite <- Rsqr_pow2.
+    rewrite Rsqr_div; [ | lra ].
     rewrite Rsqr_sqrt.
-     do 2 rewrite Rsqr_pow2.
+     do 3 rewrite Rsqr_pow2.
      field_simplify.
-     do 2 rewrite Rdiv_1_r.
+     rewrite Rdiv_1_r.
+     do 3 rewrite <- Rsqr_pow2.
+     replace
+       ((8 * a₁₁² * k - 8 * a₁₁ * k * a₂₂ - 8 * a₁₁ * k * a₃₃ + 8 * a₁₁ * k +
+         16 * k * a₁₂² + 16 * k * a₁₃²)
+          / 8)%R
+     with
+       ((a₁₁² * k - a₁₁ * k * a₂₂ - a₁₁ * k * a₃₃ + a₁₁ * k +
+         2 * k * a₁₂² + 2 * k * a₁₃²))%R
+     by lra.
+
+bbb.
+
+     unfold Rminus.
+     do 3 rewrite Ropp_mult_distr_r.
+
+
+bbb.
+
      rewrite Rplus_comm.
      do 2 rewrite <- Rplus_assoc.
      rewrite Rplus_shuffle0, Rplus_comm; f_equal.
