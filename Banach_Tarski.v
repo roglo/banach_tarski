@@ -384,8 +384,9 @@ Definition rotation_unit_eigenvec (M : matrix ℝ) :=
   if Req_dec r 0 then
     if and_dec (Rlt_dec (a₂₂ M) (a₁₁ M)) (Rlt_dec (a₃₃ M) (a₁₁ M)) then
       let x₁ := (sqrt (a₁₁ M - a₂₂ M - a₃₃ M + 1) / 2)%R in
-      let y₁ := (a₁₂ M / (2 * x₁))%R in
-      let z₁ := (a₁₃ M / (2 * x₁))%R in
+      (* some fixes, au hasard... voir si ça donne... *)
+      let y₁ := (a₁₃ M / (2 * x₁))%R in
+      let z₁ := (a₁₂ M / (2 * x₁))%R in
       V x₁ y₁ z₁
     else if Rlt_dec (a₃₃ M) (a₂₂ M) then
       (* à revoir *)
@@ -443,6 +444,11 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
  injection Hrm; clear Hrm.
  intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+ rewrite H1, H2, H3 in *.
+ ring_simplify in H11; ring_simplify in H12; ring_simplify in H13.
+ ring_simplify in H21; ring_simplify in H22; ring_simplify in H23.
+ ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
+ repeat rewrite <- Rsqr_pow2 in *.
  remember (Rlt_dec a₂₂ a₁₁) as P eqn:HP.
  remember (Rlt_dec a₃₃ a₁₁) as Q eqn:HQ.
  destruct (and_dec P Q) as [(H₁, H₂)| HPQ]; subst P Q.
@@ -454,29 +460,22 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
    apply Rmult_eq_reg_r with (r := (4 * x)%R).
    field_simplify.
     subst x.
-    do 3 rewrite <- Rsqr_pow2.
+    rewrite <- Rsqr_pow2.
     rewrite Rsqr_div; [ | lra ].
     rewrite Rsqr_sqrt.
-     do 3 rewrite Rsqr_pow2.
+     rewrite Rsqr_pow2.
      field_simplify.
      rewrite Rdiv_1_r.
-     do 3 rewrite <- Rsqr_pow2.
-     replace
-       ((8 * a₁₁² * k - 8 * a₁₁ * k * a₂₂ - 8 * a₁₁ * k * a₃₃ + 8 * a₁₁ * k +
-         16 * k * a₁₂² + 16 * k * a₁₃²)
-          / 8)%R
-     with
-       (k * (a₁₁² - a₁₁ * a₂₂ - a₁₁ * a₃₃ + a₁₁ + 2 * a₁₂² + 2 * a₁₃²))%R
-     by lra.
+     rewrite <- Rsqr_pow2.
      replace (a₁₁ * k - k * a₂₂ - k * a₃₃ + k)%R
-     with (k * (a₁₁ - a₂₂ - a₃₃ + 1))%R
-       by lra.
+     with (k * (a₁₁ - a₂₂ - a₃₃ + 1))%R by lra.
+     replace
+       ((8 * a₁₁² * k - 8 * a₁₁ * k * a₂₂ - 8 * a₁₁ * k * a₃₃ + 8 * a₁₁ * k + 32 * k * a₂₁ * a₁₃) / 8)%R
+     with
+       (k * (a₁₁² - a₁₁ * a₂₂ - a₁₁ * a₃₃ + a₁₁ + 4 * a₂₁ * a₁₃))%R
+     by lra.
      f_equal.
-     rewrite H1, H2, H3 in *.
-     ring_simplify in H11; ring_simplify in H12; ring_simplify in H13.
-     ring_simplify in H21; ring_simplify in H22; ring_simplify in H23.
-     ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
-     repeat rewrite <- Rsqr_pow2 in *.
+
 (* I think rotation_unit_eigenvec is false *)
 bbb.
 
