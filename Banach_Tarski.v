@@ -1880,7 +1880,7 @@ Definition rotation_around p :=
 Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
-Definition matrix_of_axis_cos_sin_angle '(V x y z) c s :=
+Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
   let r := (√ (x² + y² + z²))%R in
   let ux := (x / r)%R in
   let uy := (y / r)%R in
@@ -1889,6 +1889,38 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z) c s :=
     (ux²*(1-c)+c) (ux*uy*(1-c)-uz*s) (ux*uz*(1-c)+uy*s)
     (ux*uy*(1-c)+uz*s) (uy²*(1-c)+c) (uy*uz*(1-c)-ux*s)
     (ux*uz*(1-c)-uy*s) (uy*uz*(1-c)+ux*s) (uz²*(1-c)+c).
+
+Definition axis_cos_sin_angle_of_matrix M :=
+  let cosθ := ((mat_trace M - 1) / 2)%R in
+  let sinθ := sqrt (1 - cosθ²) in
+  (rotation_unit_eigenvec M, cosθ, sinθ).
+
+Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
+  is_rotation_matrix M
+  → M ≠ mat_id
+  → matrix_of_axis_cos_sin_angle (axis_cos_sin_angle_of_matrix M) = M.
+Proof.
+intros M (Hrm, Hdet) Hid.
+unfold matrix_of_axis_cos_sin_angle, axis_cos_sin_angle_of_matrix.
+remember (rotation_unit_eigenvec M) as axis eqn:Hax.
+destruct axis as (x, y, z).
+injection Hax; clear Hax; intros Hz Hy Hx.
+remember (a₂₃ M - a₃₂ M)%R as x₀ eqn:Hx₀.
+remember (a₃₁ M - a₁₃ M)%R as y₀ eqn:Hy₀.
+remember (a₁₂ M - a₂₁ M)%R as z₀ eqn:Hz₀.
+remember (√ (x₀² + y₀² + z₀²))%R as r eqn:Hr.
+assert (x² + y² + z² = 1)%R.
+ subst x y z; unfold Rdiv.
+ do 3 rewrite Rsqr_mult.
+ rewrite Rsqr_inv.
+  apply Rmult_eq_reg_r with (r := (r²)%R).
+  do 2 rewrite Rmult_plus_distr_r.
+  do 3 rewrite Rmult_assoc.
+  rewrite Rinv_l.
+   do 3 rewrite Rmult_1_r; rewrite Rmult_1_l; subst r.
+   rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+
+bbb.
 
 (* playing with quaternions... *)
 
