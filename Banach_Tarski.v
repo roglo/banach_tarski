@@ -574,6 +574,15 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
     with (a₂₃ * a₃₂ * (/ a₃₃ * a₃₃) - a₂₂ * a₃₃)%R in Hv by lra.
     rewrite Rinv_l in Hv; [ | lra ].
     rewrite Rmult_1_r, Rmult_1_l in Hv.
+    rewrite Rsqr_mult in H22.
+    apply Rmult_eq_compat_r with (r := (a₃₃²)%R) in H22.
+    rewrite Rplus_assoc in H22.
+    rewrite Rmult_plus_distr_r in H22.
+    rewrite Rmult_assoc in H22.
+    rewrite <- Rsqr_mult in H22.
+    rewrite Rinv_l in H22.
+    rewrite Rsqr_1 in H22.
+    rewrite Rmult_1_r, Rmult_1_l in H22.
 
 bbb.
  ring_simplify in Hdet.
