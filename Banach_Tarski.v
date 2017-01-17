@@ -411,12 +411,96 @@ Definition fixpoint_of_nat r n :=
 Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
 
+Theorem skew_sym_matrix_sqr_coeff_le_1 : ∀ M,
+  (M * mat_transp M)%mat = mat_id
+  → (((a₁₁ M)² ≤ 1 ∧ (a₁₂ M)² ≤ 1 ∧ (a₁₃ M)² ≤ 1) ∧
+     ((a₂₁ M)² ≤ 1 ∧ (a₂₂ M)² ≤ 1 ∧ (a₂₃ M)² ≤ 1) ∧
+     ((a₃₁ M)² ≤ 1 ∧ (a₃₂ M)² ≤ 1 ∧ (a₃₃ M)² ≤ 1))%R.
+Proof.
+intros * Hrm.
+injection Hrm; clear Hrm.
+destruct M; simpl.
+intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+ring_simplify in H11; ring_simplify in H12; ring_simplify in H13.
+ring_simplify in H21; ring_simplify in H22; ring_simplify in H23.
+ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
+clear H21 H31 H32.
+do 3 rewrite <- Rsqr_pow2 in H11, H22, H33.
+split; [ | split ].
+ rewrite <- H11.
+ split; [ | split ].
+  rewrite Rplus_assoc.
+  replace (a₁₁²)%R with (a₁₁² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+  rewrite Rplus_shuffle0, Rplus_comm.
+  replace (a₁₂²)%R with (a₁₂² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+  rewrite Rplus_comm.
+  replace (a₁₃²)%R with (a₁₃² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+ rewrite <- H22.
+ split; [ | split ].
+  rewrite Rplus_assoc.
+  replace (a₂₁²)%R with (a₂₁² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+  rewrite Rplus_shuffle0, Rplus_comm.
+  replace (a₂₂²)%R with (a₂₂² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+  rewrite Rplus_comm.
+  replace (a₂₃²)%R with (a₂₃² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+ rewrite <- H33.
+ split; [ | split ].
+  rewrite Rplus_assoc.
+  replace (a₃₁²)%R with (a₃₁² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+  rewrite Rplus_shuffle0, Rplus_comm.
+  replace (a₃₂²)%R with (a₃₂² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+
+  rewrite Rplus_comm.
+  replace (a₃₃²)%R with (a₃₃² + 0)%R at 1 by lra.
+  apply Rplus_le_compat_l, nonneg_plus_sqr.
+Qed.
+
+Theorem Rsqr_le_1_interv : ∀ x, (x² ≤ 1 → -1 ≤ x ≤ 1)%R.
+Proof.
+intros * Hx.
+replace 1%R with (1 ^ 2)%R in Hx by lra.
+rewrite <- Rsqr_pow2 in Hx.
+split; [ apply Rsqr_neg_pos_le_0; lra | ].
+apply Rsqr_incr_0_var; lra.
+Qed.
+
 Theorem mat_trace_interv : ∀ M,
   is_rotation_matrix M
   → (-1 ≤ mat_trace M ≤ 3)%R.
 Proof.
 intros * (Hrm & Hdet).
+Inspect 2.
+specialize (skew_sym_matrix_sqr_coeff_le_1 _ Hrm) as Ha.
+destruct Ha as (Ha₁ & Ha₂ & Ha₃).
+destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
+destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
+destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
+apply Rsqr_le_1_interv in Ha₁₁.
+apply Rsqr_le_1_interv in Ha₁₂.
+apply Rsqr_le_1_interv in Ha₁₃.
+apply Rsqr_le_1_interv in Ha₂₁.
+apply Rsqr_le_1_interv in Ha₂₂.
+apply Rsqr_le_1_interv in Ha₂₃.
+apply Rsqr_le_1_interv in Ha₃₁.
+apply Rsqr_le_1_interv in Ha₃₂.
+apply Rsqr_le_1_interv in Ha₃₃.
 unfold mat_trace.
+split; [ | lra ].
 unfold mat_det in Hdet.
 destruct M; simpl in *.
 unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
@@ -426,102 +510,70 @@ ring_simplify in H11; ring_simplify in H12; ring_simplify in H13.
 ring_simplify in H21; ring_simplify in H22; ring_simplify in H23.
 ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
 clear H21 H31 H32.
-assert (Ha : (a₁₁² ≤ 1 ∧ a₂₂² ≤ 1 ∧ a₃₃² ≤ 1)%R).
- split; [ | split ].
-  apply Rplus_le_reg_r with (r := (a₁₂² + a₁₃²)%R).
-  rewrite <- Rplus_assoc.
-  do 3 rewrite <- Rsqr_pow2 in H11; rewrite H11.
-  replace 1%R with (1 + 0)%R at 1 by lra.
-  apply Rplus_le_compat_l, nonneg_plus_sqr.
+progress repeat rewrite <- Rsqr_pow2 in *.
+rewrite Rplus_assoc in Hdet.
+remember (a₁₂ * (a₂₃ * a₃₁ - a₃₃ * a₂₁))%R as u eqn:Hu.
+remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂))%R as v eqn:Hv.
+remember (u + v)%R as w eqn:Hw; subst u v.
+apply Rplus_eq_compat_r with (r := (- w)%R) in Hdet.
+rewrite Rplus_assoc, fold_Rminus in Hdet.
+replace (w - w)%R with 0%R in Hdet by lra.
+rewrite Rplus_0_r, fold_Rminus in Hdet.
+destruct (Req_dec w 1%R) as [Hw1| Hw1].
+ move Hw1 at top; subst w.
+ replace (1 - 1)%R with 0%R in Hdet by lra.
+ symmetry in Hw.
+ apply Rmult_integral in Hdet.
+ destruct Hdet as [Hdet| Hdet].
+  subst a₁₁; clear Ha₁₁.
+  rewrite Rsqr_0, Rplus_0_l in H11.
+  rewrite Rmult_0_l, Rplus_0_l in H12, H13.
+  rewrite Rplus_0_l.
+  remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂))%R as v eqn:Hv.
+  apply Rplus_eq_compat_r with (r := (- v)%R) in Hw.
+  rewrite Rplus_assoc, fold_Rminus in Hw.
+  replace (v - v)%R with 0%R in Hw by lra.
+  rewrite Rplus_0_r, fold_Rminus in Hw.
+  destruct (Req_dec v 1%R) as [Hv1| Hv1].
+   move Hv1 at top; subst v.
+   replace (1 - 1)%R with 0%R in Hw by lra.
+   symmetry in Hv.
+   apply Rmult_integral in Hw.
+   destruct Hw as [Hw| Hw].
+    subst a₁₂.
+    rewrite Rsqr_0, Rplus_0_l in H11.
+    rewrite Rmult_0_l, Rplus_0_l in H12, H13.
+    apply Rmult_integral in H12.
+    destruct H12 as [H12| H12]; [ rewrite H12, Rsqr_0 in H11; lra | ].
+    subst a₂₃.
+    apply Rmult_integral in H13.
+    destruct H13 as [H13| H13]; [ rewrite H13, Rsqr_0 in H11; lra | ].
+    subst a₃₃; lra.
 
-  apply Rplus_le_reg_l with (r := (a₂₁²)%R).
-  apply Rplus_le_reg_r with (r := (a₂₃²)%R).
-  do 3 rewrite <- Rsqr_pow2 in H22; rewrite H22.
-  rewrite Rplus_shuffle0, Rplus_comm.
-  replace 1%R with (1 + 0)%R at 1 by lra.
-  apply Rplus_le_compat_l, nonneg_plus_sqr.
-
-  apply Rplus_le_reg_l with (r := (a₃₁² + a₃₂²)%R).
-  do 3 rewrite <- Rsqr_pow2 in H33; rewrite H33.
-  replace 1%R with (0 + 1)%R at 1 by lra.
-  apply Rplus_le_compat_r, nonneg_plus_sqr.
-
- destruct Ha as (Ha₁ & Ha₂ & Ha₃).
- replace 1%R with (1 ^ 2)%R in Ha₁, Ha₂, Ha₃ by lra.
- rewrite <- Rsqr_pow2 in Ha₁, Ha₂, Ha₃.
- generalize Ha₁, Ha₂, Ha₃; intros Ha₁' Ha₂' Ha₃'.
- apply Rsqr_incr_0_var in Ha₁; [ | lra ].
- apply Rsqr_incr_0_var in Ha₂; [ | lra ].
- apply Rsqr_incr_0_var in Ha₃; [ | lra ].
- apply Rsqr_neg_pos_le_0 in Ha₁'; [ | lra ].
- apply Rsqr_neg_pos_le_0 in Ha₂'; [ | lra ].
- apply Rsqr_neg_pos_le_0 in Ha₃'; [ | lra ].
- split; [ | lra ].
- progress repeat rewrite <- Rsqr_pow2 in *.
-(**)
- rewrite Rplus_assoc in Hdet.
- remember (a₁₂ * (a₂₃ * a₃₁ - a₃₃ * a₂₁))%R as u eqn:Hu.
- remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂))%R as v eqn:Hv.
- remember (u + v)%R as w eqn:Hw; subst u v.
- apply Rplus_eq_compat_r with (r := (- w)%R) in Hdet.
- rewrite Rplus_assoc, fold_Rminus in Hdet.
- replace (w - w)%R with 0%R in Hdet by lra.
- rewrite Rplus_0_r, fold_Rminus in Hdet.
- destruct (Req_dec w 1%R) as [Hw1| Hw1].
-  move Hw1 at top; subst w.
-  replace (1 - 1)%R with 0%R in Hdet by lra.
-  symmetry in Hw.
-  apply Rmult_integral in Hdet.
-  destruct Hdet as [Hdet| Hdet].
-   subst a₁₁; clear Ha₁ Ha₁'.
-   rewrite Rsqr_0, Rplus_0_l in H11.
-   rewrite Rmult_0_l, Rplus_0_l in H12, H13.
-   rewrite Rplus_0_l.
-   remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂))%R as v eqn:Hv.
-   apply Rplus_eq_compat_r with (r := (- v)%R) in Hw.
-   rewrite Rplus_assoc, fold_Rminus in Hw.
-   replace (v - v)%R with 0%R in Hw by lra.
-   rewrite Rplus_0_r, fold_Rminus in Hw.
-   destruct (Req_dec v 1%R) as [Hv1| Hv1].
-    move Hv1 at top; subst v.
-    replace (1 - 1)%R with 0%R in Hw by lra.
-    symmetry in Hv.
-    apply Rmult_integral in Hw.
-    destruct Hw as [Hw| Hw].
-     subst a₁₂.
-     rewrite Rsqr_0, Rplus_0_l in H11.
-     rewrite Rmult_0_l, Rplus_0_l in H12, H13.
-     apply Rmult_integral in H12.
-     destruct H12 as [H12| H12]; [ rewrite H12, Rsqr_0 in H11; lra | ].
-     subst a₂₃.
-     apply Rmult_integral in H13.
-     destruct H13 as [H13| H13]; [ rewrite H13, Rsqr_0 in H11; lra | ].
-     subst a₃₃; lra.
-
-     apply Rminus_diag_uniq in Hw.
-     destruct (Rlt_dec a₂₂ 0) as [Ha22| Ha22]; [ clear Ha₂ | lra ].
-     destruct (Rlt_dec a₃₃ 0) as [Ha33| Ha33]; [ clear Ha₃ | lra ].
-     apply Rmult_eq_compat_r with (r := (/ a₃₃)%R) in Hw.
-     symmetry in Hw; rewrite Rmult_shuffle0 in Hw.
-     rewrite Rinv_r in Hw; [ rewrite Rmult_1_l in Hw | lra ].
-     subst a₂₁.
-     replace (a₂₃ * a₃₁ * / a₃₃ * a₃₂ - a₃₁ * a₂₂)%R
-     with (a₃₁ * (a₂₃ * / a₃₃ * a₃₂ - a₂₂))%R in Hv by lra.
-     rewrite <- Rmult_assoc in Hv.
-     ring_simplify in H23.
-     apply Rmult_eq_compat_r with (r := a₃₃) in H23.
-     do 2 rewrite Rmult_plus_distr_r in H23.
-     rewrite Rmult_assoc in H23.
-     rewrite Rinv_l in H23; [ rewrite Rmult_1_r in H23 | lra ].
-     ring_simplify in H23.
-     rewrite <- Rmult_plus_distr_l in H23.
-     do 2 rewrite <- Rsqr_pow2 in H23.
-     apply Rmult_eq_compat_r with (r := a₃₃) in Hv.
-     rewrite Rmult_assoc in Hv.
-     replace ((a₂₃ * / a₃₃ * a₃₂ - a₂₂) * a₃₃)%R
-     with (a₂₃ * a₃₂ * (/ a₃₃ * a₃₃) - a₂₂ * a₃₃)%R in Hv by lra.
-     rewrite Rinv_l in Hv; [ | lra ].
-     rewrite Rmult_1_r, Rmult_1_l in Hv.
+    apply Rminus_diag_uniq in Hw.
+    destruct (Rlt_dec a₂₂ 0) as [Ha22| Ha22]; [ | lra ].
+    destruct (Rlt_dec a₃₃ 0) as [Ha33| Ha33]; [ | lra ].
+    apply Rmult_eq_compat_r with (r := (/ a₃₃)%R) in Hw.
+    symmetry in Hw; rewrite Rmult_shuffle0 in Hw.
+    rewrite Rinv_r in Hw; [ rewrite Rmult_1_l in Hw | lra ].
+    subst a₂₁.
+    replace (a₂₃ * a₃₁ * / a₃₃ * a₃₂ - a₃₁ * a₂₂)%R
+    with (a₃₁ * (a₂₃ * / a₃₃ * a₃₂ - a₂₂))%R in Hv by lra.
+    rewrite <- Rmult_assoc in Hv.
+    ring_simplify in H23.
+    apply Rmult_eq_compat_r with (r := a₃₃) in H23.
+    do 2 rewrite Rmult_plus_distr_r in H23.
+    rewrite Rmult_assoc in H23.
+    rewrite Rinv_l in H23; [ rewrite Rmult_1_r in H23 | lra ].
+    ring_simplify in H23.
+    rewrite <- Rmult_plus_distr_l in H23.
+    do 2 rewrite <- Rsqr_pow2 in H23.
+    apply Rmult_eq_compat_r with (r := a₃₃) in Hv.
+    rewrite Rmult_assoc in Hv.
+    replace ((a₂₃ * / a₃₃ * a₃₂ - a₂₂) * a₃₃)%R
+    with (a₂₃ * a₃₂ * (/ a₃₃ * a₃₃) - a₂₂ * a₃₃)%R in Hv by lra.
+    rewrite Rinv_l in Hv; [ | lra ].
+    rewrite Rmult_1_r, Rmult_1_l in Hv.
 
 bbb.
  ring_simplify in Hdet.
