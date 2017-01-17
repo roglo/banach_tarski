@@ -456,7 +456,13 @@ assert (Ha : (a₁₁² ≤ 1 ∧ a₂₂² ≤ 1 ∧ a₃₃² ≤ 1)%R).
  apply Rsqr_neg_pos_le_0 in Ha₂'; [ | lra ].
  apply Rsqr_neg_pos_le_0 in Ha₃'; [ | lra ].
  split; [ | lra ].
-bbb.
+ progress repeat rewrite <- Rsqr_pow2 in *.
+ ring_simplify in Hdet.
+ assert (Hdet' :
+   (a₁₁ * a₂₂ * a₃₃ + a₃₂ * a₂₁ * a₁₃ + a₂₃ * a₁₂ * a₃₁ =
+    a₁₁ * a₃₂ * a₂₃ + a₂₂ * a₃₁ * a₁₃ + a₃₃ * a₁₂ * a₂₁ + 1)%R) by lra.
+ clear Hdet; rename Hdet' into Hdet.
+Abort. (* don't know how to prove that; it is true by how? *)
 
 Theorem matrix_all_fixpoints_ok : ∀ M p k,
   is_rotation_matrix M
@@ -484,9 +490,6 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  destruct Hrm as (Hrm, Hdet).
  unfold mat_det in Hdet.
  rewrite H1, H2, H3 in Hdet.
-(**)
-Check mat_trace_interv.
-bbb.
  destruct M; simpl in *.
  unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
  injection Hrm; clear Hrm.
@@ -520,6 +523,9 @@ bbb.
      apply Rmult_le_reg_r with (r := 2%R); [ lra | ].
      unfold Rdiv; rewrite Rmult_0_l, Rmult_assoc.
      rewrite Rinv_l; [ rewrite Rmult_1_r | lra ].
+clear H31 H21 H32.
+ring_simplify in Hdet.
+do 3 rewrite <- Rsqr_pow2 in Hdet.
 bbb.
 
  (* case r ≠ 0 *)
