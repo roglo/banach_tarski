@@ -499,6 +499,7 @@ assert (Ha : (a₁₁² ≤ 1 ∧ a₂₂² ≤ 1 ∧ a₃₃² ≤ 1)%R).
      subst a₃₃; lra.
 
      apply Rminus_diag_uniq in Hw.
+     destruct (Rlt_dec a₂₂ 0) as [Ha22| Ha22]; [ clear Ha₂ | lra ].
      destruct (Rlt_dec a₃₃ 0) as [Ha33| Ha33]; [ clear Ha₃ | lra ].
      apply Rmult_eq_compat_r with (r := (/ a₃₃)%R) in Hw.
      symmetry in Hw; rewrite Rmult_shuffle0 in Hw.
@@ -515,6 +516,12 @@ assert (Ha : (a₁₁² ≤ 1 ∧ a₂₂² ≤ 1 ∧ a₃₃² ≤ 1)%R).
      ring_simplify in H23.
      rewrite <- Rmult_plus_distr_l in H23.
      do 2 rewrite <- Rsqr_pow2 in H23.
+     apply Rmult_eq_compat_r with (r := a₃₃) in Hv.
+     rewrite Rmult_assoc in Hv.
+     replace ((a₂₃ * / a₃₃ * a₃₂ - a₂₂) * a₃₃)%R
+     with (a₂₃ * a₃₂ * (/ a₃₃ * a₃₃) - a₂₂ * a₃₃)%R in Hv by lra.
+     rewrite Rinv_l in Hv; [ | lra ].
+     rewrite Rmult_1_r, Rmult_1_l in Hv.
 
 bbb.
  ring_simplify in Hdet.
