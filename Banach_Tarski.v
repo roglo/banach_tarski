@@ -704,6 +704,30 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
     assert (H' : (x = 0)%R) by lra.
     move H' at top; subst x; clear H.
     symmetry in Hx; apply sqrt_eq_0 in Hx; lra.
+
+   ring_simplify.
+   apply Rmult_eq_reg_r with (r := (2 * x)%R).
+    field_simplify.
+     do 2 rewrite Rdiv_1_r.
+     subst x.
+     rewrite <- Rsqr_pow2.
+     rewrite Rsqr_sqrt; [ | lra ].
+     field_simplify.
+     do 2 rewrite Rdiv_1_r.
+     replace (a₁₂ * k * a₁₁ + a₁₂ * k * a₂₂ + a₁₂ * k + k * a₂₃ * a₃₁)%R
+     with (a₁₂ * k + k * (a₁₁ * a₁₂ + a₁₂ * a₂₂ + a₃₁ * a₂₃))%R by lra.
+     now rewrite H12, Rmult_0_r, Rplus_0_r.
+
+     intros H; move H at top; subst x.
+     symmetry in Hx; apply sqrt_eq_0 in Hx; lra.
+
+     intros H; move H at top; subst x.
+     symmetry in Hx; apply sqrt_eq_0 in Hx; lra.
+
+    intros H.
+    assert (H' : (x = 0)%R) by lra.
+    move H' at top; subst x; clear H.
+    symmetry in Hx; apply sqrt_eq_0 in Hx; lra.
 bbb.
 
  (* case r ≠ 0 *)
