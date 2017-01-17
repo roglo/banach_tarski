@@ -479,12 +479,13 @@ split; [ apply Rsqr_neg_pos_le_0; lra | ].
 apply Rsqr_incr_0_var; lra.
 Qed.
 
-Theorem mat_trace_interv : ∀ M,
-  is_rotation_matrix M
-  → (-1 ≤ mat_trace M ≤ 3)%R.
+Theorem skew_sym_matrix_coeff_interv : ∀ M,
+  (M * mat_transp M)%mat = mat_id
+  → ((-1 ≤ a₁₁ M ≤ 1 ∧ -1 ≤ a₁₂ M ≤ 1 ∧ -1 ≤ a₁₃ M ≤ 1) ∧
+     (-1 ≤ a₂₁ M ≤ 1 ∧ -1 ≤ a₂₂ M ≤ 1 ∧ -1 ≤ a₂₃ M ≤ 1) ∧
+     (-1 ≤ a₃₁ M ≤ 1 ∧ -1 ≤ a₃₂ M ≤ 1 ∧ -1 ≤ a₃₃ M ≤ 1))%R.
 Proof.
-intros * (Hrm & Hdet).
-Inspect 2.
+intros * Hrm.
 specialize (skew_sym_matrix_sqr_coeff_le_1 _ Hrm) as Ha.
 destruct Ha as (Ha₁ & Ha₂ & Ha₃).
 destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
@@ -499,6 +500,19 @@ apply Rsqr_le_1_interv in Ha₂₃.
 apply Rsqr_le_1_interv in Ha₃₁.
 apply Rsqr_le_1_interv in Ha₃₂.
 apply Rsqr_le_1_interv in Ha₃₃.
+easy.
+Qed.
+
+Theorem mat_trace_interv : ∀ M,
+  is_rotation_matrix M
+  → (-1 ≤ mat_trace M ≤ 3)%R.
+Proof.
+intros * (Hrm & Hdet).
+specialize (skew_sym_matrix_coeff_interv _ Hrm) as Ha.
+destruct Ha as (Ha₁ & Ha₂ & Ha₃).
+destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
+destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
+destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
 unfold mat_trace.
 split; [ | lra ].
 unfold mat_det in Hdet.
@@ -646,20 +660,11 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  apply Rminus_diag_uniq in H2.
  apply Rminus_diag_uniq in H3.
  destruct Hrm as (Hrm, Hdet).
- specialize (skew_sym_matrix_sqr_coeff_le_1 M Hrm) as Ha.
+ specialize (skew_sym_matrix_coeff_interv _ Hrm) as Ha.
  destruct Ha as (Ha₁ & Ha₂ & Ha₃).
  destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
  destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
  destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
- apply Rsqr_le_1_interv in Ha₁₁.
- apply Rsqr_le_1_interv in Ha₁₂.
- apply Rsqr_le_1_interv in Ha₁₃.
- apply Rsqr_le_1_interv in Ha₂₁.
- apply Rsqr_le_1_interv in Ha₂₂.
- apply Rsqr_le_1_interv in Ha₂₃.
- apply Rsqr_le_1_interv in Ha₃₁.
- apply Rsqr_le_1_interv in Ha₃₂.
- apply Rsqr_le_1_interv in Ha₃₃.
  unfold mat_det in Hdet.
  rewrite H1, H2, H3 in Hdet.
  destruct M; simpl in *.
