@@ -580,9 +580,34 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
     rewrite Rmult_plus_distr_r in H22.
     rewrite Rmult_assoc in H22.
     rewrite <- Rsqr_mult in H22.
-    rewrite Rinv_l in H22.
+    rewrite Rinv_l in H22; [ | lra ].
     rewrite Rsqr_1 in H22.
     rewrite Rmult_1_r, Rmult_1_l in H22.
+    assert (H : ((a₂₃ * a₃₁)² = a₃₃² * (1 - (a₂₂² + a₂₃²)))%R) by lra.
+    clear H22; rename H into H22; move H22 before H11.
+    destruct (Req_dec (a₂₂² + a₂₃²) 1) as [Haa| Haa].
+     rewrite Haa in H22.
+     rewrite Rminus_diag_eq in H22; [ | easy ].
+     rewrite Rmult_0_r in H22.
+     apply Rsqr_eq_0 in H22.
+     apply Rmult_integral in H22.
+     destruct H22 as [H22| H22].
+      subst a₂₃; clear Ha₂₁ Ha₂₃.
+      rewrite Rmult_0_l, Rplus_0_l in H23.
+      apply Rmult_integral in H23.
+      destruct H23 as [H23| H23].
+       apply Rmult_integral in H23.
+       destruct H23; lra.
+
+       subst a₃₂.
+       rewrite Rmult_0_r, Rplus_0_l in H13.
+       apply Rmult_integral in H13.
+       destruct H13; [ | lra ].
+       subst a₁₃.
+       do 2 rewrite Rmult_0_l in Hv; lra.
+
+      subst a₃₁.
+      rewrite Rmult_0_r, Rmult_0_l in Hv; lra.
 
 bbb.
  ring_simplify in Hdet.
