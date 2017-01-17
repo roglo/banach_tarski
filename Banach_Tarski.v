@@ -388,8 +388,8 @@ Definition rotation_unit_eigenvec (M : matrix ℝ) :=
       V x₁ y₁ z₁
     else
       let z₁ := sqrt ((a₃₃ M + 1) / 2) in
-      let x₁ := (a₂₃ M / (2 * z₁))%R in
-      let y₁ := (a₁₂ M / (2 * z₁))%R in
+      let x₁ := (a₃₁ M / (2 * z₁))%R in
+      let y₁ := (a₂₃ M / (2 * z₁))%R in
       V x₁ y₁ z₁
   else V (x / r) (y / r) (z / r).
 
@@ -804,35 +804,57 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
        rewrite <- Rsqr_pow2, Rsqr_sqrt; [ | lra ].
        field_simplify.
        do 2 rewrite Rdiv_1_r.
-bbb.
-       replace (a₁₁ * k * a₁₂ + k * a₁₂ * a₂₂ + k * a₁₂ + k * a₃₁ * a₂₃)%R
-       with (k * a₁₂ + k * (a₁₁ * a₁₂ + a₁₂ * a₂₂ + a₃₁ * a₂₃))%R by lra.
-       now rewrite H12, Rmult_0_r, Rplus_0_r.
+       replace (a₁₁ * k * a₃₁ + k * a₃₁ * a₃₃ + k * a₃₁ + k * a₁₂ * a₂₃)%R
+       with (k * a₃₁ + k * (a₁₁ * a₃₁ + a₃₁ * a₃₃ + a₁₂ * a₂₃))%R by lra.
+       now rewrite H13, Rmult_0_r, Rplus_0_r.
 
        ring_simplify.
-       apply Rmult_eq_reg_r with (r := (2 * y)%R); [ | easy ].
+       apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
+       field_simplify; [ | easy | easy ].
+       do 2 rewrite Rdiv_1_r; subst z.
+       rewrite <- Rsqr_pow2.
+       rewrite Rsqr_sqrt; [ | lra ].
+       field_simplify.
+       do 2 rewrite Rdiv_1_r.
+       replace (a₁₂ * k * a₃₁ + k * a₃₃ * a₂₃ + k * a₂₃ * a₂₂ + k * a₂₃)%R
+       with (k * a₂₃ + k * (a₁₂ * a₃₁ + a₂₂ * a₂₃ + a₂₃ * a₃₃))%R by lra.
+       now rewrite H23, Rmult_0_r, Rplus_0_r.
+
+       ring_simplify.
+       apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
        field_simplify; [ | easy ].
-       do 2 rewrite Rdiv_1_r; subst y.
+       do 2 rewrite Rdiv_1_r; subst z.
        do 3 rewrite <- Rsqr_pow2.
        rewrite Rsqr_sqrt; [ | lra ].
        field_simplify.
        do 2 rewrite Rdiv_1_r.
        rewrite <- Rsqr_pow2.
-       replace (a₁₂² * k + k * a₂₂² + k * a₂₂ + k * a₂₃²)%R
-       with (k * a₂₂ + k * (a₁₂² + a₂₂² + a₂₃²))%R by lra.
-       now rewrite H22, Rmult_1_r.
+       replace (a₃₁² * k + k * a₃₃² + k * a₃₃ + k * a₂₃²)%R
+       with (k * a₃₃ + k * (a₃₁² + a₂₃² + a₃₃²))%R by lra.
+       now rewrite H33, Rmult_1_r.
 
-       ring_simplify.
-       apply Rmult_eq_reg_r with (r := (2 * y)%R); [ | easy ].
-       field_simplify; [ | easy | easy ].
-       do 2 rewrite Rdiv_1_r; subst y.
-       rewrite <- Rsqr_pow2.
-       rewrite Rsqr_sqrt; [ | lra ].
-       field_simplify.
-       do 2 rewrite Rdiv_1_r.
-       replace (a₃₁ * k * a₁₂ + k * a₂₂ * a₂₃ + k * a₂₃ * a₃₃ + k * a₂₃)%R
-       with (k * a₂₃ + k * (a₁₂ * a₃₁ + a₂₂ * a₂₃ + a₂₃ * a₃₃))%R by lra.
-       now rewrite H23, Rmult_0_r, Rplus_0_r.
+     assert (H : a₂₂ = a₃₃) by lra.
+     move H at top; subst a₃₃.
+     clear Haa Hbb Ha₃₃.
+     assert (H : (a₁₂² = a₃₁²)%R) by lra.
+     clear H33.
+     rewrite <- H in H11.
+     ring_simplify in H11.
+     destruct ev as (x, y, z).
+     injection Hev; clear Hev; intros Hz Hy Hx.
+     rewrite <- Hz in Hx, Hy; subst x y.
+     simpl; f_equal.
+      ring_simplify.
+bbb.
+      apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
+      field_simplify; [ | easy | easy ].
+      do 2 rewrite Rdiv_1_r; subst z.
+      rewrite <- Rsqr_pow2, Rsqr_sqrt; [ | lra ].
+      field_simplify.
+      do 2 rewrite Rdiv_1_r.
+      replace (a₁₁ * k * a₃₁ + k * a₃₁ * a₃₃ + k * a₃₁ + k * a₁₂ * a₂₃)%R
+      with (k * a₃₁ + k * (a₁₁ * a₃₁ + a₃₁ * a₃₃ + a₁₂ * a₂₃))%R by lra.
+      now rewrite H13, Rmult_0_r, Rplus_0_r.
 bbb.
 
  (* case r ≠ 0 *)
