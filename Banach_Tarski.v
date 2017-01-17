@@ -609,6 +609,10 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
       subst a₃₁.
       rewrite Rmult_0_r, Rmult_0_l in Hv; lra.
 
+     idtac.
+Abort. (* chais pas...
+let truc est vrai, pourtant, mais chais pas comment le démontrer.
+
 bbb.
  ring_simplify in Hdet.
  assert (Hdet' :
@@ -616,6 +620,7 @@ bbb.
     a₁₁ * a₃₂ * a₂₃ + a₂₂ * a₃₁ * a₁₃ + a₃₃ * a₁₂ * a₂₁ + 1)%R) by lra.
  clear Hdet; rename Hdet' into Hdet.
 bbb.
+*)
 
 Theorem matrix_all_fixpoints_ok : ∀ M p k,
   is_rotation_matrix M
@@ -641,6 +646,20 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  apply Rminus_diag_uniq in H2.
  apply Rminus_diag_uniq in H3.
  destruct Hrm as (Hrm, Hdet).
+ specialize (skew_sym_matrix_sqr_coeff_le_1 M Hrm) as Ha.
+ destruct Ha as (Ha₁ & Ha₂ & Ha₃).
+ destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
+ destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
+ destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
+ apply Rsqr_le_1_interv in Ha₁₁.
+ apply Rsqr_le_1_interv in Ha₁₂.
+ apply Rsqr_le_1_interv in Ha₁₃.
+ apply Rsqr_le_1_interv in Ha₂₁.
+ apply Rsqr_le_1_interv in Ha₂₂.
+ apply Rsqr_le_1_interv in Ha₂₃.
+ apply Rsqr_le_1_interv in Ha₃₁.
+ apply Rsqr_le_1_interv in Ha₃₂.
+ apply Rsqr_le_1_interv in Ha₃₃.
  unfold mat_det in Hdet.
  rewrite H1, H2, H3 in Hdet.
  destruct M; simpl in *.
@@ -661,11 +680,11 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   simpl; f_equal.
    ring_simplify.
    apply Rmult_eq_reg_r with (r := (2 * x)%R).
-   field_simplify.
-    do 2 rewrite Rdiv_1_r.
-    subst x.
-    rewrite <- Rsqr_pow2.
-    rewrite Rsqr_sqrt.
+    field_simplify.
+     do 2 rewrite Rdiv_1_r.
+     subst x.
+     rewrite <- Rsqr_pow2.
+     rewrite Rsqr_sqrt; [ | lra ].
      field_simplify.
      do 2 rewrite Rdiv_1_r.
      do 3 rewrite <- Rsqr_pow2.
@@ -673,12 +692,13 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
      with (a₁₁ * k + k * (a₁₁² + a₁₂² + a₃₁²))%R by lra.
      now rewrite H11, Rmult_1_r.
 
-     apply Rmult_le_reg_r with (r := 2%R); [ lra | ].
-     unfold Rdiv; rewrite Rmult_0_l, Rmult_assoc.
-     rewrite Rinv_l; [ rewrite Rmult_1_r | lra ].
-clear H31 H21 H32.
-ring_simplify in Hdet.
-do 3 rewrite <- Rsqr_pow2 in Hdet.
+     intros H; move H at top; subst x.
+     symmetry in Hx; apply sqrt_eq_0 in Hx; lra.
+
+    intros H.
+    assert (H' : (x = 0)%R) by lra.
+    move H' at top; subst x; clear H.
+    symmetry in Hx; apply sqrt_eq_0 in Hx; lra.
 bbb.
 
  (* case r ≠ 0 *)

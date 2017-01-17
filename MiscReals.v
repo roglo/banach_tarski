@@ -79,6 +79,15 @@ Qed.
 Theorem Rdiv_1_r : ∀ x, (x / 1)%R = x.
 Proof. intros x; lra. Qed.
 
+Theorem Rdiv_eq_0 : ∀ x y, (y ≠ 0 → x / y = 0 → x = 0)%R.
+Proof.
+intros * Hy Hxy.
+apply Rmult_eq_compat_r with (r := y) in Hxy.
+unfold Rdiv in Hxy.
+rewrite Rmult_assoc in Hxy.
+rewrite Rinv_l in Hxy; lra.
+Qed.
+
 Theorem up_0 : (up 0 = 1)%Z.
 Proof.
 pose proof archimed 0 as H.
