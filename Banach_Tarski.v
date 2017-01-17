@@ -425,6 +425,7 @@ intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
 ring_simplify in H11; ring_simplify in H12; ring_simplify in H13.
 ring_simplify in H21; ring_simplify in H22; ring_simplify in H23.
 ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
+clear H21 H31 H32.
 assert (Ha : (a₁₁² ≤ 1 ∧ a₂₂² ≤ 1 ∧ a₃₃² ≤ 1)%R).
  split; [ | split ].
   apply Rplus_le_reg_r with (r := (a₁₂² + a₁₃²)%R).
@@ -457,12 +458,55 @@ assert (Ha : (a₁₁² ≤ 1 ∧ a₂₂² ≤ 1 ∧ a₃₃² ≤ 1)%R).
  apply Rsqr_neg_pos_le_0 in Ha₃'; [ | lra ].
  split; [ | lra ].
  progress repeat rewrite <- Rsqr_pow2 in *.
+(**)
+ rewrite Rplus_assoc in Hdet.
+ remember (a₁₂ * (a₂₃ * a₃₁ - a₃₃ * a₂₁))%R as u eqn:Hu.
+ remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂))%R as v eqn:Hv.
+ remember (u + v)%R as w eqn:Hw; subst u v.
+ apply Rplus_eq_compat_r with (r := (- w)%R) in Hdet.
+ rewrite Rplus_assoc, fold_Rminus in Hdet.
+ replace (w - w)%R with 0%R in Hdet by lra.
+ rewrite Rplus_0_r, fold_Rminus in Hdet.
+ destruct (Req_dec w 1%R) as [Hw1| Hw1].
+  move Hw1 at top; subst w.
+  replace (1 - 1)%R with 0%R in Hdet by lra.
+  symmetry in Hw.
+  apply Rmult_integral in Hdet.
+  destruct Hdet as [Hdet| Hdet].
+   subst a₁₁; clear Ha₁ Ha₁'.
+   rewrite Rsqr_0, Rplus_0_l in H11.
+   rewrite Rmult_0_l, Rplus_0_l in H12, H13.
+   rewrite Rplus_0_l.
+   remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂))%R as v eqn:Hv.
+   apply Rplus_eq_compat_r with (r := (- v)%R) in Hw.
+   rewrite Rplus_assoc, fold_Rminus in Hw.
+   replace (v - v)%R with 0%R in Hw by lra.
+   rewrite Rplus_0_r, fold_Rminus in Hw.
+   destruct (Req_dec v 1%R) as [Hv1| Hv1].
+    move Hv1 at top; subst v.
+    replace (1 - 1)%R with 0%R in Hw by lra.
+    symmetry in Hv.
+    apply Rmult_integral in Hw.
+    destruct Hw as [Hw| Hw].
+     subst a₁₂.
+     rewrite Rsqr_0, Rplus_0_l in H11.
+     rewrite Rmult_0_l, Rplus_0_l in H12, H13.
+     apply Rmult_integral in H12.
+     destruct H12 as [H12| H12]; [ rewrite H12, Rsqr_0 in H11; lra | ].
+     subst a₂₃.
+     apply Rmult_integral in H13.
+     destruct H13 as [H13| H13]; [ rewrite H13, Rsqr_0 in H11; lra | ].
+     subst a₃₃; lra.
+
+     idtac.
+
+bbb.
  ring_simplify in Hdet.
  assert (Hdet' :
    (a₁₁ * a₂₂ * a₃₃ + a₃₂ * a₂₁ * a₁₃ + a₂₃ * a₁₂ * a₃₁ =
     a₁₁ * a₃₂ * a₂₃ + a₂₂ * a₃₁ * a₁₃ + a₃₃ * a₁₂ * a₂₁ + 1)%R) by lra.
  clear Hdet; rename Hdet' into Hdet.
-Abort. (* don't know how to prove that; it is true by how? *)
+bbb.
 
 Theorem matrix_all_fixpoints_ok : ∀ M p k,
   is_rotation_matrix M
