@@ -1032,7 +1032,18 @@ Theorem eigenvec_normalized : ∀ M k v,
   (M * (k ⁎ v) = k ⁎ v)%vec
   → (M * (k ⁎ vec_normalize v) = k ⁎ vec_normalize v)%vec.
 Proof.
-bbb.
+intros M k (x, y, z) Hv.
+unfold vec_normalize.
+remember ∥(V x y z)∥ as r eqn:Hr.
+unfold Rdiv.
+setoid_rewrite Rmult_comm.
+rewrite vec_mul_diag.
+rewrite vec_const_mul_assoc.
+setoid_rewrite Rmult_comm.
+rewrite <- vec_const_mul_assoc.
+rewrite mat_vec_mul_const_distr.
+now rewrite Hv.
+Qed.
 
 Theorem matrix_all_fixpoints_ok : ∀ M p k,
   is_rotation_matrix M
@@ -1045,13 +1056,7 @@ unfold rotation_unit_eigenvec in Hn.
 subst p.
 apply eigenvec_normalized.
 now apply matrix_eigenvec_ok with (k := k).
-bbb.
-
-remember (∥p∥) as r eqn:Hr.
-destruct p as (x, y, z).
-remember (V (x / r) (y / r) (z / r)) as q eqn:Hq.
-specialize (matrix_eigenvec_ok M q k Hrm).
-bbb.
+Qed.
 
 Theorem mat_of_path_is_rotation_matrix : ∀ el,
  is_rotation_matrix (mat_of_path el).
@@ -1536,6 +1541,7 @@ destruct (Req_dec r₁ 0) as [Hrz| Hrz].
   remember (√ ((a₁₁ m + 1) / 2))%R as x₁ eqn:Hx₁.
   remember (a₁₂ m / (2 * x₁))%R as y₁ eqn:Hy₁.
   remember (a₃₁ m / (2 * x₁))%R as z₁ eqn:Hz₁.
+bbb.
   do 3 rewrite Rsqr_pow2.
   replace ((r * x₁) ^ 2 + (r * y₁) ^ 2 + (r * z₁) ^ 2)%R
   with (r ^ 2 * (x₁ ^ 2 + y₁ ^ 2 + z₁ ^ 2))%R by lra.
