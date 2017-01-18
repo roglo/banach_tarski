@@ -1049,7 +1049,7 @@ Theorem bool_prod_nat_of_prod_nat_inv : ∀ bnn,
 Proof.
 intros ((b & n₁) & n₂); simpl; f_equal.
 rewrite Nat.add_0_r.
-rewrite nat_add_diag_mul_2.
+replace (n₁ + n₁)%nat with (2 * n₁)%nat by now simpl; rewrite Nat.add_0_r.
 rewrite Nat.add_comm, Nat.mul_comm.
 rewrite Nat.mod_add; [ | easy ].
 rewrite Nat.div_add; [ | easy ].
