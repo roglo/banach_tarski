@@ -1016,8 +1016,6 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  f_equal; nsatz.
 Qed.
 
-bbb.
-
 Theorem mat_of_path_is_rotation_matrix : ∀ el,
  is_rotation_matrix (mat_of_path el).
 Proof.
@@ -1475,15 +1473,53 @@ now apply rev_path_eq_path.
 Qed.
 
 Theorem rotation_fixpoint_on_sphere : ∀ r m,
-  m ≠ mat_transp m
-  → rotation_fixpoint m r ∈ sphere r.
+   m ≠ mat_transp m
+   → rotation_fixpoint m r ∈ sphere r.
 Proof.
 intros * Hm.
 unfold rotation_fixpoint; simpl.
-remember (a₂₃ m - a₃₂ m)%R as x eqn:Hx.
-remember (a₃₁ m - a₁₃ m)%R as y eqn:Hy.
-remember (a₁₂ m - a₂₁ m)%R as z eqn:Hz.
+unfold rotation_unit_eigenvec; simpl.
+remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
+remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
+remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
 remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
+destruct (Req_dec r₁ 0) as [Hrz| Hrz].
+ move Hrz at top; subst r₁.
+ symmetry in Hr₁.
+ apply sqrt_eq_0 in Hr₁; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr₁.
+ destruct Hr₁ as (H1 & H2 & H3); subst x y z.
+ apply Rminus_diag_uniq in H1.
+ apply Rminus_diag_uniq in H2.
+ apply Rminus_diag_uniq in H3.
+ remember (Rlt_dec (a₂₂ m) (a₁₁ m)) as P eqn:HP.
+ remember (Rlt_dec (a₃₃ m) (a₁₁ m)) as Q eqn:HQ.
+ destruct (and_dec P Q) as [HPQ| HPQ]; subst P Q.
+  simpl.
+  remember (√ ((a₁₁ m + 1) / 2))%R as x₁ eqn:Hx₁.
+  remember (a₁₂ m / (2 * x₁))%R as y₁ eqn:Hy₁.
+  remember (a₃₁ m / (2 * x₁))%R as z₁ eqn:Hz₁.
+  do 3 rewrite Rsqr_pow2.
+  replace ((r * x₁) ^ 2 + (r * y₁) ^ 2 + (r * z₁) ^ 2)%R
+  with (r ^ 2 * (x₁ ^ 2 + y₁ ^ 2 + z₁ ^ 2))%R by lra.
+  do 4 rewrite <- Rsqr_pow2.
+  enough (x₁² + y₁² + z₁² = 1)%R by now rewrite H, Rmult_1_r.
+  subst y₁ z₁.
+  apply Rmult_eq_reg_r with (r := ((2 * x₁)²)%R).
+   do 2 rewrite Rmult_plus_distr_r.
+   remember (2 * x₁)%R as xx eqn:Hxx.
+   unfold Rdiv.
+   do 2 rewrite Rsqr_mult.
+   do 2 rewrite Rmult_assoc.
+   rewrite Rsqr_inv.
+    rewrite Rinv_l.
+     do 2 rewrite Rmult_1_r.
+     rewrite Rmult_1_l.
+     subst xx.
+
+bbb.
+
+(* case r ≠ 0 *)
 do 3 rewrite Rsqr_mult.
 do 2 rewrite <- Rmult_plus_distr_l.
 assert (Hrnz : (r₁ ≠ 0)%R).
