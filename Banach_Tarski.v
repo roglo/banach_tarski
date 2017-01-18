@@ -370,32 +370,37 @@ Qed.
 
 Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
 
-Definition rotation_unit_eigenvec (M : matrix ℝ) :=
+Definition rotation_eigenvec (M : matrix ℝ) :=
   let x := (a₃₂ M - a₂₃ M)%R in
   let y := (a₁₃ M - a₃₁ M)%R in
   let z := (a₂₁ M - a₁₂ M)%R in
-  let r := ∥(V x y z)∥ in
-  if Req_dec r 0 then
+  if Req_dec (x² + y² + z²) 0 then
     if and_dec (Rlt_dec (a₂₂ M) (a₁₁ M)) (Rlt_dec (a₃₃ M) (a₁₁ M)) then
       let x₁ := sqrt ((a₁₁ M + 1) / 2) in
       let y₁ := (a₁₂ M / (2 * x₁))%R in
       let z₁ := (a₃₁ M / (2 * x₁))%R in
-      let r₁ := ∥(V x₁ y₁ z₁)∥ in
-      V (x₁ / r₁) (y₁ / r₁) (z₁ / r₁)
+      V x₁ y₁ z₁
     else if Rlt_dec (a₃₃ M) (a₂₂ M) then
       let y₁ := sqrt ((a₂₂ M + 1) / 2) in
       let x₁ := (a₁₂ M / (2 * y₁))%R in
       let z₁ := (a₂₃ M / (2 * y₁))%R in
       let r₁ := ∥(V x₁ y₁ z₁)∥ in
-      V (x₁ / r₁) (y₁ / r₁) (z₁ / r₁)
+      V x₁ y₁ z₁
     else
       let z₁ := sqrt ((a₃₃ M + 1) / 2) in
       let x₁ := (a₃₁ M / (2 * z₁))%R in
       let y₁ := (a₂₃ M / (2 * z₁))%R in
       let r₁ := ∥(V x₁ y₁ z₁)∥ in
-      V (x₁ / r₁) (y₁ / r₁) (z₁ / r₁)
+      V x₁ y₁ z₁
   else
-    V (x / r) (y / r) (z / r).
+    V x y z.
+
+Definition rotation_unit_eigenvec (M : matrix ℝ) :=
+  match rotation_eigenvec M with
+  | V x y z =>
+      let r := ∥(V x y z)∥ in
+      V (x / r) (y / r) (z / r)
+  end.
 
 Definition rotation_fixpoint (m : matrix ℝ) k :=
   vec_const_mul k (rotation_unit_eigenvec m).
@@ -644,6 +649,9 @@ Theorem matrix_all_fixpoints_ok : ∀ M p k,
   → mat_vec_mul M p = p.
 Proof.
 intros * Hrm Hn.
+Print rotation_fixpoint.
+bbb.
+
 subst p.
 unfold rotation_fixpoint.
 remember (rotation_unit_eigenvec M) as ev eqn:Hev.
