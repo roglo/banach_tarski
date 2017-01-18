@@ -1034,6 +1034,12 @@ Theorem matrix_all_fixpoints_ok : ∀ M p k,
   → mat_vec_mul M p = p.
 Proof.
 intros * Hrm Hn.
+unfold rotation_fixpoint in Hn.
+unfold rotation_unit_eigenvec in Hn.
+remember (∥p∥) as r eqn:Hr.
+destruct p as (x, y, z).
+remember (V (x / r) (y / r) (z / r)) as q eqn:Hq.
+specialize (matrix_eigenvec_ok M q k Hrm).
 bbb.
 
 Theorem mat_of_path_is_rotation_matrix : ∀ el,
