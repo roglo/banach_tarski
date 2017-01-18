@@ -1561,75 +1561,30 @@ apply (f_equal Rsqr) in Hn.
  rewrite Rsqr_sqrt in Hn; [ | apply nonneg_sqr_vec_norm ].
  now rewrite Hn, Rsqr_1.
 
- unfold rotation_eigenvec.
+ unfold rotation_eigenvec; simpl.
+ remember (a₃₂ M - a₂₃ M)%R as x eqn:Hx.
+ remember (a₁₃ M - a₃₁ M)%R as y eqn:Hy.
+ remember (a₂₁ M - a₁₂ M)%R as z eqn:Hz.
+ remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
+ destruct (Req_dec r₁ 0) as [Hrz| Hrz].
+  exfalso; apply Hm; clear Hm.
+  move Hrz at top; subst r₁.
+  symmetry in Hr₁.
+  apply sqrt_eq_0 in Hr₁; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in Hr₁.
+  destruct Hr₁ as (H1 & H2 & H3); subst x y z.
+  apply Rminus_diag_uniq in H1.
+  apply Rminus_diag_uniq in H2.
+  apply Rminus_diag_uniq in H3.
+  unfold mat_transp, mkrmat.
+  destruct M; simpl in *.
+  now subst.
 
-bbb.
-intros * Hm.
-remember setp as f.
-unfold rotation_fixpoint; simpl.
-unfold rotation_unit_eigenvec; simpl.
-subst f.
-remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
-remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
-remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
-remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
-destruct (Req_dec r₁ 0) as [Hrz| Hrz].
- move Hrz at top; subst r₁.
- symmetry in Hr₁.
- apply sqrt_eq_0 in Hr₁; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hr₁.
- destruct Hr₁ as (H1 & H2 & H3); subst x y z.
- apply Rminus_diag_uniq in H1.
- apply Rminus_diag_uniq in H2.
- apply Rminus_diag_uniq in H3.
- remember (Rlt_dec (a₂₂ m) (a₁₁ m)) as P eqn:HP.
- remember (Rlt_dec (a₃₃ m) (a₁₁ m)) as Q eqn:HQ.
- destruct (and_dec P Q) as [HPQ| HPQ]; subst P Q.
-  simpl.
-  remember (√ ((a₁₁ m + 1) / 2))%R as x₁ eqn:Hx₁.
-  remember (a₁₂ m / (2 * x₁))%R as y₁ eqn:Hy₁.
-  remember (a₃₁ m / (2 * x₁))%R as z₁ eqn:Hz₁.
-bbb.
-  do 3 rewrite Rsqr_pow2.
-  replace ((r * x₁) ^ 2 + (r * y₁) ^ 2 + (r * z₁) ^ 2)%R
-  with (r ^ 2 * (x₁ ^ 2 + y₁ ^ 2 + z₁ ^ 2))%R by lra.
-  do 4 rewrite <- Rsqr_pow2.
-  enough (x₁² + y₁² + z₁² = 1)%R by now rewrite H, Rmult_1_r.
-  subst y₁ z₁.
-  apply Rmult_eq_reg_r with (r := ((2 * x₁)²)%R).
-   do 2 rewrite Rmult_plus_distr_r.
-   remember (2 * x₁)%R as xx eqn:Hxx.
-   unfold Rdiv.
-   do 2 rewrite Rsqr_mult.
-   do 2 rewrite Rmult_assoc.
-   rewrite Rsqr_inv.
-    rewrite Rinv_l.
-     do 2 rewrite Rmult_1_r.
-     rewrite Rmult_1_l.
-     subst xx.
-
-bbb.
-
-(* case r ≠ 0 *)
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-assert (Hrnz : (r₁ ≠ 0)%R).
- intros H; apply Hm; clear Hm; subst r₁.
- apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in H.
- unfold mat_transp.
- destruct m; simpl in *; simpl.
- unfold mkrmat; f_equal; lra.
-
- rewrite Rsqr_div; [ | easy ].
- rewrite Rsqr_div; [ | easy ].
- rewrite Rsqr_div; [ | easy ].
- unfold Rdiv.
- do 2 rewrite <- Rmult_plus_distr_r; subst r₁.
- rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
- rewrite Rinv_r; [ apply Rmult_1_r | ].
- intros H; apply Hrnz; clear Hrnz; rewrite H.
- apply sqrt_0.
+  intros H.
+  injection H; clear H; intros H3 H2 H1.
+  clear Hx Hy Hz; subst x y z.
+  rewrite Rsqr_0, Rplus_0_l, Rplus_0_l in Hr₁.
+  now rewrite sqrt_0 in Hr₁.
 Qed.
 
 Theorem fixpoint_of_path_on_sphere : ∀ r el,
@@ -2608,7 +2563,7 @@ Definition axis_cos_sin_angle_of_matrix M :=
   let sinθ := sqrt (1 - cosθ²) in
 *)
   (* à vérifier *)
-  let sinθ := ((a₁₂ - a₂₁) / 2)%R in
+  let sinθ := ((a₁₂ M - a₂₁ M) / 2)%R in
 (**)
   (rotation_unit_eigenvec M, cosθ, sinθ).
 
@@ -2621,6 +2576,8 @@ intros M (Hrm, Hdet) Hid.
 unfold matrix_of_axis_cos_sin_angle, axis_cos_sin_angle_of_matrix.
 remember (rotation_unit_eigenvec M) as axis eqn:Hax.
 destruct axis as (x, y, z).
+bbb.
+
 injection Hax; clear Hax; intros Hz Hy Hx.
 remember (a₂₃ M - a₃₂ M)%R as x₀ eqn:Hx₀.
 remember (a₃₁ M - a₁₃ M)%R as y₀ eqn:Hy₀.
