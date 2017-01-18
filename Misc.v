@@ -162,72 +162,19 @@ intros A P a l H.
 inversion H; now split.
 Qed.
 
-Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
-  ¬Forall2 R [] (x :: l).
-Proof.
-intros A B * H.
-inversion H.
-Qed.
-
-Theorem Forall2_cons_nil : ∀ A B (R : A → B → Prop) x l,
-  ¬Forall2 R (x :: l) [].
-Proof.
-intros A B * H.
-inversion H.
-Qed.
-
-Theorem Forall2_cons_cons : ∀ A B (R : A → B → Prop) x y l l',
-  Forall2 R (x :: l) (y :: l')
-  → R x y ∧ Forall2 R l l'.
-Proof.
-intros A B * H.
-inversion H; subst.
-now split.
-Qed.
-
 Theorem Forall2_Forall_combine : ∀ A B f (l1 : list A) (l2 : list B),
   Forall2 f l1 l2
   ↔ Forall (λ '(x, y), f x y) (combine l1 l2) ∧ length l1 = length l2.
 Proof.
-intros.
-split; intros HF.
- revert l2 HF.
- induction l1 as [| x1 l1]; intros.
-  destruct l2 as [| x2 l2]; [ | now apply Forall2_nil_cons in HF ].
-  split; [ constructor | easy ].
-
-  destruct l2 as [| x2 l2]; [ now apply Forall2_cons_nil in HF | simpl ].
-  apply Forall2_cons_cons in HF.
-  destruct HF as (Hf, HF).
-  split.
-   constructor; [ easy | now apply IHl1 ].
-
-   f_equal.
-   clear -HF.
-   revert l2 HF.
-   induction l1 as [| x1 l1]; intros.
-    destruct l2 as [| x2 l2]; [ easy | ].
-    now apply Forall2_nil_cons in HF.
-
-    destruct l2 as [| x2 l2].
-     now apply Forall2_cons_nil in HF.
-
-     apply Forall2_cons_cons in HF.
-     destruct HF as (Hf, HF).
-     simpl; f_equal; now apply IHl1.
-
- destruct HF as (HF, Hlen).
- revert l2 HF Hlen.
- induction l1 as [| x1 l1]; intros.
-  destruct l2 as [| x2 l2]; [ constructor | easy ].
-
-  destruct l2 as [| x2 l2]; [ easy | ].
-  simpl in Hlen; apply Nat.succ_inj in Hlen.
-  simpl in HF.
-  apply Forall_inv2 in HF.
-  destruct HF as (Hf, HF).
-  constructor; [ easy | ].
-  now apply IHl1.
+  induction l1, l2.
+  all: split; [ intros HF | intros (HF, ?) ]; simpl.
+  1-6: easy.
+  all: inversion HF.
+  - assert (Forall (λ '(x, y), f x y) (combine l1 l2)) by now apply IHl1.
+    assert (length l1 = length l2) by now apply IHl1.
+    auto.
+  - assert (Forall2 f l1 l2) by (apply IHl1; auto).
+    auto.
 Qed.
 
 Theorem flat_map_nil_fun : ∀ A B (f : A → list B) l,
@@ -318,22 +265,15 @@ Theorem bool_dec_negb_r : ∀ b,
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
 Proof. intros b; now destruct b. Qed.
 
-Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
- symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
+Require Import RelationClasses.
+Instance Forall2_sym: ∀ A (R : A → A → Prop),
+ Symmetric R → Symmetric (Forall2 R).
 Proof.
-intros * Hs HF.
-revert l2 HF.
-induction l1 as [| x]; intros.
- destruct l2 as [| y]; [ constructor | ].
- now apply Forall2_nil_cons in HF.
-
- destruct l2 as [| y].
-  now apply Forall2_cons_nil in HF.
-
-  apply Forall2_cons_cons in HF.
-  destruct HF as (HR & HF).
-  constructor; [ now apply Hs | ].
-  now apply IHl1.
+intros ** l1.
+induction l1; intros [] HF.
+1-3: easy.
+inversion HF.
+constructor; auto.
 Qed.
 
 (* Type-theoretical Choice Axiom *)
