@@ -677,7 +677,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  remember (Rlt_dec a₂₂ a₁₁) as P eqn:HP.
  remember (Rlt_dec a₃₃ a₁₁) as Q eqn:HQ.
  destruct (and_dec P Q) as [(H₁, H₂)| HPQ]; subst P Q.
-  destruct ev as (x, y, z).
+  destruct ev as (x, y, z); simpl.
   injection Hev; clear Hev; intros Hz Hy Hx.
   rewrite <- Hx in Hy, Hz; subst y z.
   assert (H : (x ≠ 0 ∧ 2 * x ≠ 0)%R).
@@ -691,7 +691,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
     symmetry in Hx; apply sqrt_eq_0 in Hx; lra.
 
    destruct H as (Hxz, H2xz).
-   clear - Ha₁₁ H11 H12 H13 Hx Hxz H2xz; simpl.
+   clear - Ha₁₁ H11 H12 H13 Hx Hxz H2xz.
    f_equal.
     ring_simplify.
     apply Rmult_eq_reg_r with (r := (2 * x)%R); [ | easy ].
@@ -733,7 +733,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   destruct HPQ as [HPQ| HPQ].
    apply Rnot_lt_le in HPQ.
    destruct (Rlt_dec a₃₃ a₂₂) as [Haa| Haa].
-    destruct ev as (x, y, z).
+    destruct ev as (x, y, z); simpl.
     injection Hev; clear Hev; intros Hz Hy Hx.
     rewrite <- Hy in Hx, Hz; subst x z.
     assert (H : (y ≠ 0 ∧ 2 * y ≠ 0)%R).
@@ -747,7 +747,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
       symmetry in Hy; apply sqrt_eq_0 in Hy; lra.
 
      destruct H as (Hyz, H2yz).
-     clear - Hy Hyz H2yz Ha₂₂ H12 H22 H23; simpl.
+     clear - Hy Hyz H2yz Ha₂₂ H12 H22 H23.
      f_equal.
       ring_simplify.
       apply Rmult_eq_reg_r with (r := (2 * y)%R); [ | easy ].
@@ -787,7 +787,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
 
     apply Rnot_lt_le in Haa.
     destruct (Rlt_dec a₂₂ a₃₃) as [Hbb| Hbb].
-     destruct ev as (x, y, z).
+     destruct ev as (x, y, z); simpl.
      injection Hev; clear Hev; intros Hz Hy Hx.
      rewrite <- Hz in Hx, Hy; subst x y.
      assert (H : (z ≠ 0 ∧ 2 * z ≠ 0)%R).
@@ -801,7 +801,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
        symmetry in Hz; apply sqrt_eq_0 in Hz; lra.
 
       destruct H as (Hzz, H2zz).
-      clear - Ha₃₃ H13 H23 H33 Hz Hzz H2zz; simpl.
+      clear - Ha₃₃ H13 H23 H33 Hz Hzz H2zz.
       f_equal.
        ring_simplify.
        apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
@@ -846,7 +846,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
      clear H33.
      rewrite <- HH in H11.
      ring_simplify in H11.
-     destruct ev as (x, y, z).
+     destruct ev as (x, y, z); simpl.
      injection Hev; clear Hev; intros Hz Hy Hx.
      rewrite <- Hz in Hx, Hy; subst x y; simpl.
      subst a₃₂ a₁₃ a₂₁.
@@ -863,7 +863,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
         symmetry in Hz; apply sqrt_eq_0 in Hz; lra.
 
        destruct H as (Hzz, H2zz).
-       clear - Ha₂₂ H22 H13 H23 HH Hz Hzz H2zz; simpl.
+       clear - Ha₂₂ H22 H13 H23 HH Hz Hzz H2zz.
        f_equal.
         ring_simplify.
         apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
