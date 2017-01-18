@@ -3,7 +3,7 @@
 
 (* Equidecomposability *)
 
-Require Import Utf8 List Relations.
+Require Import Utf8 List Relations RelationClasses.
 Import ListNotations.
 Require Import Reals.Rdefinitions.
 
@@ -32,7 +32,7 @@ intros E F (P₁ & P₂ & HP₁ & HP₂ & HEF).
 exists P₂, P₁.
 split; [ easy | ].
 split; [ easy | ].
-apply Forall2_sym; [ | easy ].
+enough (Symmetric (λ S₁ S₂, ∃ g, (app_gr g S₁ = S₂)%S)) by now symmetry.
 clear -HEF.
 intros E F (g & Hg).
 exists (gr_inv g); rewrite <- Hg.
