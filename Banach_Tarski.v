@@ -2562,7 +2562,10 @@ Definition axis_cos_sin_angle_of_matrix M :=
 (*
   let sinθ := sqrt (1 - cosθ²) in
 *)
-  (* à vérifier *)
+  (* according to
+     https://www.geometrictools.com/Documentation/RotationIssues.pdf
+     section 2.2 Matrix to Axis-Angle, if I interpret well;
+     but seems too good: to be verified *)
   let sinθ := ((a₁₂ M - a₂₁ M) / 2)%R in
 (**)
   (rotation_unit_eigenvec M, cosθ, sinθ).
