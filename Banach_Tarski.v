@@ -380,18 +380,22 @@ Definition rotation_unit_eigenvec (M : matrix ℝ) :=
       let x₁ := sqrt ((a₁₁ M + 1) / 2) in
       let y₁ := (a₁₂ M / (2 * x₁))%R in
       let z₁ := (a₃₁ M / (2 * x₁))%R in
-      V x₁ y₁ z₁
+      let r₁ := ∥(V x₁ y₁ z₁)∥ in
+      V (x₁ / r₁) (y₁ / r₁) (z₁ / r₁)
     else if Rlt_dec (a₃₃ M) (a₂₂ M) then
       let y₁ := sqrt ((a₂₂ M + 1) / 2) in
       let x₁ := (a₁₂ M / (2 * y₁))%R in
       let z₁ := (a₂₃ M / (2 * y₁))%R in
-      V x₁ y₁ z₁
+      let r₁ := ∥(V x₁ y₁ z₁)∥ in
+      V (x₁ / r₁) (y₁ / r₁) (z₁ / r₁)
     else
       let z₁ := sqrt ((a₃₃ M + 1) / 2) in
       let x₁ := (a₃₁ M / (2 * z₁))%R in
       let y₁ := (a₂₃ M / (2 * z₁))%R in
-      V x₁ y₁ z₁
-  else V (x / r) (y / r) (z / r).
+      let r₁ := ∥(V x₁ y₁ z₁)∥ in
+      V (x₁ / r₁) (y₁ / r₁) (z₁ / r₁)
+  else
+    V (x / r) (y / r) (z / r).
 
 Definition rotation_fixpoint (m : matrix ℝ) k :=
   vec_const_mul k (rotation_unit_eigenvec m).
@@ -679,6 +683,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  destruct (and_dec P Q) as [(H₁, H₂)| HPQ]; subst P Q.
   destruct ev as (x, y, z); simpl.
   injection Hev; clear Hev; intros Hz Hy Hx.
+bbb.
   rewrite <- Hx in Hy, Hz; subst y z.
   assert (H : (x ≠ 0 ∧ 2 * x ≠ 0)%R).
    split.
