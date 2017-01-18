@@ -953,26 +953,21 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
          field_simplify.
          do 2 rewrite Rdiv_1_r.
          replace (a₁₂ * k * a₃₁ + 2 * k * a₁₁ * a₂₃ + k * a₂₃)%R
-         with (k * a₂₃ + k * (a₁₂ * a₃₁ + 2 * a₁₁ * a₂₃))%R by lra.
+         with (k * a₂₃ + k * (a₁₂ * a₃₁ + 2 * a₂₃ * a₁₁))%R by lra.
          symmetry in HH.
          apply Rsqr_eq in HH.
          destruct HH as [HH| HH].
           move HH at top; subst a₃₁.
           clear H13.
-          ring_simplify in H12.
-bbb.
-          rewrite H12; lra.
+          rewrite fold_Rsqr.
+          ring_simplify in H32.
+          rewrite <- Rsqr_pow2 in H32; rewrite H32; lra.
 
           move HH at top; subst a₃₁.
-          ring_simplify in H12.
-          do 2 rewrite <- Ropp_mult_distr_r.
-          apply Rminus_diag_uniq in H12.
-          rewrite H12; lra.
-bbb.
-
-         replace (a₁₂ * k * a₃₁ + 2 * k * a₂₂ * a₂₃ + k * a₂₃)%R
-         with (k * a₂₃ + k * (a₁₂ * a₃₁ + a₂₂ * a₂₃ + a₂₃ * a₂₂))%R by lra.
-         now rewrite H23, Rmult_0_r, Rplus_0_r.
+          rewrite <- Ropp_mult_distr_r.
+          rewrite fold_Rsqr.
+          ring_simplify in H32.
+          rewrite <- Rsqr_pow2 in H32; rewrite H32; lra.
 
          ring_simplify.
          apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
@@ -983,12 +978,12 @@ bbb.
          field_simplify.
          do 2 rewrite Rdiv_1_r.
          rewrite <- Rsqr_pow2.
-         replace (a₃₁² * k + k * a₂₂² + k * a₂₂ + k * a₂₃²)%R
-         with (k * a₂₂ + k * (a₃₁² + a₂₂² + a₂₃²))%R by lra.
-         rewrite <- HH.
-         now rewrite H22, Rmult_1_r.
+         replace (a₃₁² * k + k * a₁₁² + k * a₁₁ + k * a₂₃²)%R
+         with (k * a₁₁ + k * (a₃₁² + a₁₁² + a₂₃²))%R by lra.
+         rewrite <- HH, H22; lra.
 
-
+   apply Rnot_lt_le in HPQ.
+   destruct (Rlt_dec a₃₃ a₂₂) as [Haa| Haa].
 bbb.
        ring_simplify in H11.
 
