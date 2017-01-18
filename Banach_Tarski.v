@@ -731,7 +731,9 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   move H22 before H11; move H33 before H22.
   replace (a₂₃ * a₃₁)%R with (a₃₁ * a₂₃)%R in H12 by lra.
   destruct HPQ as [HPQ| HPQ].
+   (* same as below! *)
    apply Rnot_lt_le in HPQ.
+   subst a₃₂ a₁₃ a₂₁.
    destruct (Rlt_dec a₃₃ a₂₂) as [Haa| Haa].
     destruct ev as (x, y, z); simpl.
     injection Hev; clear Hev; intros Hz Hy Hx.
@@ -849,7 +851,6 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
      destruct ev as (x, y, z); simpl.
      injection Hev; clear Hev; intros Hz Hy Hx.
      rewrite <- Hz in Hx, Hy; subst x y; simpl.
-     subst a₃₂ a₁₃ a₂₁.
      destruct (Rlt_dec a₁₁ a₂₂) as [Haa| Haa].
       move Haa before HPQ; clear HPQ.
       assert (H : (z ≠ 0 ∧ 2 * z ≠ 0)%R).
