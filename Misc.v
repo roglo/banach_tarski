@@ -181,11 +181,12 @@ Theorem flat_map_nil_fun : ∀ A B (f : A → list B) l,
  Forall (λ x, f x = []) l
  → flat_map f l = [].
 Proof.
-intros * HF.
-induction l as [| x l]; [ easy | simpl ].
-apply Forall_inv2 in HF.
-destruct HF as (Hx, HF).
-rewrite IHl; [ now rewrite Hx | easy ].
+  intros * HF.
+  induction l.
+  - easy.
+  - now_show (f a ++ flat_map f l = []).
+    assert (f a = [] ∧ Forall (λ x : A, f x = []) l) as (->, ?) by now inversion HF.
+    auto.
 Qed.
 
 Theorem app_repeat_diag : ∀ A (e : A) n,
