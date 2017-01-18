@@ -396,12 +396,12 @@ Definition rotation_eigenvec (M : matrix ℝ) :=
   else
     V x y z.
 
+Definition vec_normalize '(V x y z) :=
+  let r := ∥(V x y z)∥ in
+  V (x / r) (y / r) (z / r).
+
 Definition rotation_unit_eigenvec (M : matrix ℝ) :=
-  match rotation_eigenvec M with
-  | V x y z =>
-      let r := ∥(V x y z)∥ in
-      V (x / r) (y / r) (z / r)
-  end.
+  vec_normalize (rotation_eigenvec M).
 
 Definition rotation_fixpoint (m : matrix ℝ) k :=
   vec_const_mul k (rotation_unit_eigenvec m).
@@ -1028,6 +1028,12 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  f_equal; nsatz.
 Qed.
 
+Theorem eigenvec_normalized : ∀ M k v,
+  (M * (k ⁎ v) = k ⁎ v)%vec
+  → (M * (k ⁎ vec_normalize v) = k ⁎ vec_normalize v)%vec.
+Proof.
+bbb.
+
 Theorem matrix_all_fixpoints_ok : ∀ M p k,
   is_rotation_matrix M
   → p = rotation_fixpoint M k
@@ -1036,6 +1042,11 @@ Proof.
 intros * Hrm Hn.
 unfold rotation_fixpoint in Hn.
 unfold rotation_unit_eigenvec in Hn.
+subst p.
+apply eigenvec_normalized.
+now apply matrix_eigenvec_ok with (k := k).
+bbb.
+
 remember (∥p∥) as r eqn:Hr.
 destruct p as (x, y, z).
 remember (V (x / r) (y / r) (z / r)) as q eqn:Hq.
