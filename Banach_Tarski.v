@@ -726,6 +726,9 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
     with (a₃₁ * k + k * (a₁₁ * a₃₁ + a₃₁ * a₃₃ + a₁₂ * a₂₃))%R by lra.
     now rewrite H13, Rmult_0_r, Rplus_0_r.
 
+  clear H21 H31 H32.
+  move H22 before H11; move H33 before H22.
+  replace (a₂₃ * a₃₁)%R with (a₃₁ * a₂₃)%R in H12 by lra.
   destruct HPQ as [HPQ| HPQ].
    apply Rnot_lt_le in HPQ.
    destruct (Rlt_dec a₃₃ a₂₂) as [Haa| Haa].
@@ -953,21 +956,21 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
          field_simplify.
          do 2 rewrite Rdiv_1_r.
          replace (a₁₂ * k * a₃₁ + 2 * k * a₁₁ * a₂₃ + k * a₂₃)%R
-         with (k * a₂₃ + k * (a₁₂ * a₃₁ + 2 * a₂₃ * a₁₁))%R by lra.
+         with (k * a₂₃ + k * (a₁₂ * a₃₁ + 2 * a₁₁ * a₂₃))%R by lra.
          symmetry in HH.
          apply Rsqr_eq in HH.
          destruct HH as [HH| HH].
           move HH at top; subst a₃₁.
           clear H13.
           rewrite fold_Rsqr.
-          ring_simplify in H32.
-          rewrite <- Rsqr_pow2 in H32; rewrite H32; lra.
+          ring_simplify in H23.
+          rewrite <- Rsqr_pow2 in H23; rewrite H23; lra.
 
           move HH at top; subst a₃₁.
           rewrite <- Ropp_mult_distr_r.
           rewrite fold_Rsqr.
-          ring_simplify in H32.
-          rewrite <- Rsqr_pow2 in H32; rewrite H32; lra.
+          ring_simplify in H23.
+          rewrite <- Rsqr_pow2 in H23; rewrite H23; lra.
 
          ring_simplify.
          apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
@@ -984,20 +987,6 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
 
    apply Rnot_lt_le in HPQ.
    destruct (Rlt_dec a₃₃ a₂₂) as [Haa| Haa].
-bbb.
-       ring_simplify in H11.
-
-      f_equal.
-       ring_simplify.
-       apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
-       field_simplify; [ | easy | easy ].
-       do 2 rewrite Rdiv_1_r; subst z.
-       rewrite <- Rsqr_pow2, Rsqr_sqrt; [ | lra ].
-       field_simplify.
-       do 2 rewrite Rdiv_1_r.
-       replace (a₁₁ * k * a₃₁ + k * a₃₁ * a₂₂ + k * a₃₁ + k * a₁₂ * a₂₃)%R
-       with (k * a₃₁ + k * (a₁₁ * a₃₁ + a₃₁ * a₂₂ + a₁₂ * a₂₃))%R by lra.
-       now rewrite H13, Rmult_0_r, Rplus_0_r.
 bbb.
 
  (* case r ≠ 0 *)
