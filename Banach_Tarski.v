@@ -2620,6 +2620,47 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
     assert (H33 : a₃₃ M = (-1)%R) by lra.
     assert (H22 : a₂₂ M = (-1)%R) by lra.
     assert (H11 : a₁₁ M = (-1)%R) by lra.
+    (* so the trace is equal to -3 which is not possible; the problem
+       is that I failed to prove it :-) *)
+    exfalso.
+    unfold mat_det in Hdet.
+    rewrite H11, H22, H33, H1, H2, H3 in Hdet.
+    ring_simplify in Hdet.
+    do 3 rewrite <- Rsqr_pow2 in Hdet.
+    unfold mat_mul in Hrm.
+    simpl in Hrm.
+    rewrite H1, H2, H3, H11, H22, H33 in Hrm.
+    unfold mat_id, mkrmat in Hrm.
+    injection Hrm; clear Hrm; intros; simpl in *.
+    ring_simplify in H.
+    ring_simplify in H0.
+    ring_simplify in H4.
+    ring_simplify in H5.
+    ring_simplify in H6.
+    ring_simplify in H7.
+    ring_simplify in H8.
+    ring_simplify in H9.
+    ring_simplify in H10.
+    repeat rewrite <- Rsqr_pow2 in *.
+    apply Rplus_eq_compat_r with (r := (-1)%R) in H10.
+    apply Rplus_eq_compat_r with (r := (-1)%R) in H6.
+    ring_simplify in H10.
+    ring_simplify in H6.
+    assert ((a₁₂ M)² = 0)%R by lra.
+    assert ((a₃₁ M)² = 0)%R by lra.
+    assert ((a₂₃ M)² = 0)%R by lra.
+    rewrite H12, H13, H14 in Hdet.
+    ring_simplify in Hdet.
+    apply Rsqr_eq_0 in H12.
+    rewrite H12 in Hdet; lra.
+
+  injection Hv; clear Hv; intros.
+  clear Hx₀ Hy₀ Hz₀; subst x₀ y₀ z₀.
+  rewrite Rsqr_0 in Hr₀.
+  do 2 rewrite Rplus_0_r in Hr₀.
+  now rewrite sqrt_0 in Hr₀.
+
+ rewrite Hx, Hy, Hz in Hr.
 bbb.
 
 (* playing with quaternions... *)
