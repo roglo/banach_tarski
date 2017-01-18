@@ -2576,6 +2576,13 @@ intros M (Hrm, Hdet) Hid.
 unfold matrix_of_axis_cos_sin_angle, axis_cos_sin_angle_of_matrix.
 remember (rotation_unit_eigenvec M) as axis eqn:Hax.
 destruct axis as (x, y, z).
+unfold rotation_unit_eigenvec in Hax.
+remember (rotation_eigenvec M) as v eqn:Hv.
+destruct v as (x₀, y₀, z₀).
+simpl in Hax.
+injection Hax; clear Hax; intros Hz Hy Hx.
+remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
+
 bbb.
 
 injection Hax; clear Hax; intros Hz Hy Hx.
