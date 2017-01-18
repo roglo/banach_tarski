@@ -927,8 +927,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
         move H' at top; subst z; clear H.
         symmetry in Hz; apply sqrt_eq_0 in Hz; lra.
 
-clear.
-bbb.
+        clear - Ha₁₁ H22 H12 H23 HH Hz Hzz H2zz.
         f_equal.
          ring_simplify.
          apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
@@ -943,7 +942,6 @@ bbb.
          apply Rsqr_eq in HH.
          destruct HH as [HH| HH].
           move HH at top; subst a₃₁.
-          clear H13.
           ring_simplify in H12.
           rewrite H12; lra.
 
@@ -967,7 +965,6 @@ bbb.
          apply Rsqr_eq in HH.
          destruct HH as [HH| HH].
           move HH at top; subst a₃₁.
-          clear H13.
           rewrite fold_Rsqr.
           ring_simplify in H23.
           rewrite <- Rsqr_pow2 in H23; rewrite H23; lra.
