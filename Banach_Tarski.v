@@ -1028,7 +1028,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  f_equal; nsatz.
 Qed.
 
-Theorem eigenvec_normalized : ∀ M k v,
+Theorem normalized_eigenvec : ∀ M k v,
   (M * (k ⁎ v) = k ⁎ v)%vec
   → (M * (k ⁎ vec_normalize v) = k ⁎ vec_normalize v)%vec.
 Proof.
@@ -1054,7 +1054,7 @@ intros * Hrm Hn.
 unfold rotation_fixpoint in Hn.
 unfold rotation_unit_eigenvec in Hn.
 subst p.
-apply eigenvec_normalized.
+apply normalized_eigenvec.
 now apply matrix_eigenvec_ok with (k := k).
 Qed.
 
@@ -1514,13 +1514,61 @@ apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
 now apply rev_path_eq_path.
 Qed.
 
-Theorem rotation_fixpoint_on_sphere : ∀ r m,
-   m ≠ mat_transp m
-   → rotation_fixpoint m r ∈ sphere r.
+Theorem normalized_vec_normalize : ∀ v, v ≠ 0%vec → ∥(vec_normalize v)∥ = 1%R.
+Proof.
+intros (x, y, z) Hv; simpl.
+remember (√ (x² + y² + z²)) as r eqn:Hr.
+destruct (Req_dec r 0) as [Hrz| Hrnz].
+ rewrite Hrz in Hr; symmetry in Hr.
+ apply (f_equal Rsqr) in Hrz.
+ apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr.
+ exfalso; apply Hv; f_equal; lra.
+
+ rewrite Rsqr_div; [ | easy ].
+ rewrite Rsqr_div; [ | easy ].
+ rewrite Rsqr_div; [ | easy ].
+ unfold Rdiv.
+ do 2 rewrite <- Rmult_plus_distr_r.
+ rewrite sqrt_mult_alt; [ | apply nonneg_sqr_vec_norm ].
+ rewrite <- Hr.
+ rewrite <- Rsqr_inv; [ | easy ].
+ rewrite sqrt_Rsqr; [ now rewrite Rinv_r | ].
+ enough (H : (0 < r)%R) by now apply Rlt_le, Rinv_0_lt_compat.
+ rewrite Hr; apply sqrt_lt_R0.
+ apply (f_equal Rsqr) in Hr.
+ rewrite Rsqr_sqrt in Hr; [ | apply nonneg_sqr_vec_norm ].
+ rewrite <- Hr.
+ now apply Rlt_0_sqr.
+Qed.
+
+Theorem rotation_fixpoint_on_sphere : ∀ r M,
+   M ≠ mat_transp M
+   → rotation_fixpoint M r ∈ sphere r.
 Proof.
 intros * Hm.
 unfold rotation_fixpoint; simpl.
 unfold rotation_unit_eigenvec; simpl.
+unfold vec_const_mul.
+remember (vec_normalize (rotation_eigenvec M)) as v eqn:Hv.
+destruct v as (v₁, v₂, v₃).
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+enough (H : (v₁² + v₂² + v₃² = 1)%R) by (rewrite H; lra).
+specialize (normalized_vec_normalize (rotation_eigenvec M)) as Hn.
+rewrite <- Hv in Hn; simpl in Hn.
+apply (f_equal Rsqr) in Hn.
+ rewrite Rsqr_sqrt in Hn; [ | apply nonneg_sqr_vec_norm ].
+ now rewrite Hn, Rsqr_1.
+
+ unfold rotation_eigenvec.
+
+bbb.
+intros * Hm.
+remember setp as f.
+unfold rotation_fixpoint; simpl.
+unfold rotation_unit_eigenvec; simpl.
+subst f.
 remember (a₃₂ m - a₂₃ m)%R as x eqn:Hx.
 remember (a₁₃ m - a₃₁ m)%R as y eqn:Hy.
 remember (a₂₁ m - a₁₂ m)%R as z eqn:Hz.
