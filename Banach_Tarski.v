@@ -691,7 +691,8 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
     symmetry in Hx; apply sqrt_eq_0 in Hx; lra.
 
    destruct H as (Hxz, H2xz).
-   simpl; f_equal.
+   clear - Ha₁₁ H11 H12 H13 Hx Hxz H2xz; simpl.
+   f_equal.
     ring_simplify.
     apply Rmult_eq_reg_r with (r := (2 * x)%R); [ | easy ].
     field_simplify; [ | easy ].
@@ -746,7 +747,8 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
       symmetry in Hy; apply sqrt_eq_0 in Hy; lra.
 
      destruct H as (Hyz, H2yz).
-     simpl; f_equal.
+     clear - Hy Hyz H2yz Ha₂₂ H12 H22 H23; simpl.
+     f_equal.
       ring_simplify.
       apply Rmult_eq_reg_r with (r := (2 * y)%R); [ | easy ].
       field_simplify; [ | easy | easy ].
@@ -799,7 +801,8 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
        symmetry in Hz; apply sqrt_eq_0 in Hz; lra.
 
       destruct H as (Hzz, H2zz).
-      simpl; f_equal.
+      clear - Ha₃₃ H13 H23 H33 Hz Hzz H2zz; simpl.
+      f_equal.
        ring_simplify.
        apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
        field_simplify; [ | easy | easy ].
@@ -860,7 +863,8 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
         symmetry in Hz; apply sqrt_eq_0 in Hz; lra.
 
        destruct H as (Hzz, H2zz).
-       simpl; f_equal.
+       clear - Ha₂₂ H22 H13 H23 HH Hz Hzz H2zz; simpl.
+       f_equal.
         ring_simplify.
         apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
         field_simplify; [ | easy | easy ].
@@ -923,7 +927,9 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
         move H' at top; subst z; clear H.
         symmetry in Hz; apply sqrt_eq_0 in Hz; lra.
 
-        simpl; f_equal.
+clear.
+bbb.
+        f_equal.
          ring_simplify.
          apply Rmult_eq_reg_r with (r := (2 * z)%R); [ | easy ].
          field_simplify; [ | easy | easy ].
