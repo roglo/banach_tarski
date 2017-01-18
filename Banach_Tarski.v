@@ -374,7 +374,8 @@ Definition rotation_eigenvec (M : matrix ℝ) :=
   let x := (a₃₂ M - a₂₃ M)%R in
   let y := (a₁₃ M - a₃₁ M)%R in
   let z := (a₂₁ M - a₁₂ M)%R in
-  if Req_dec (x² + y² + z²) 0 then
+  let r := ∥(V x y z)∥ in
+  if Req_dec r 0 then
     if and_dec (Rlt_dec (a₂₂ M) (a₁₁ M)) (Rlt_dec (a₃₃ M) (a₁₁ M)) then
       let x₁ := sqrt ((a₁₁ M + 1) / 2) in
       let y₁ := (a₁₂ M / (2 * x₁))%R in
@@ -643,19 +644,15 @@ bbb.
 bbb.
 *)
 
-Theorem matrix_all_fixpoints_ok : ∀ M p k,
+Theorem matrix_eigenvec_ok : ∀ M p k,
   is_rotation_matrix M
-  → p = rotation_fixpoint M k
+  → p = k ⁎ rotation_eigenvec M
   → mat_vec_mul M p = p.
 Proof.
 intros * Hrm Hn.
-Print rotation_fixpoint.
-bbb.
-
 subst p.
-unfold rotation_fixpoint.
-remember (rotation_unit_eigenvec M) as ev eqn:Hev.
-unfold rotation_unit_eigenvec in Hev.
+remember (rotation_eigenvec M) as ev eqn:Hev.
+unfold rotation_eigenvec in Hev.
 remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
 remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
 remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
@@ -691,7 +688,6 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  destruct (and_dec P Q) as [(H₁, H₂)| HPQ]; subst P Q.
   destruct ev as (x, y, z); simpl.
   injection Hev; clear Hev; intros Hz Hy Hx.
-bbb.
   rewrite <- Hx in Hy, Hz; subst y z.
   assert (H : (x ≠ 0 ∧ 2 * x ≠ 0)%R).
    split.
@@ -1021,13 +1017,24 @@ bbb.
  replace (k * y)%R with (y * k)%R by apply Rmult_comm.
  replace (k * z)%R with (z * k)%R by apply Rmult_comm.
  subst x y z.
+(*
  progress repeat rewrite <- Rmult_div.
  unfold Rdiv.
  progress repeat rewrite Rmult_assoc.
  remember (k * / r)%R as kr.
  clear Hr Heqkr.
+*)
+ clear r Hr Hrnz.
  f_equal; nsatz.
 Qed.
+
+Theorem matrix_all_fixpoints_ok : ∀ M p k,
+  is_rotation_matrix M
+  → p = rotation_fixpoint M k
+  → mat_vec_mul M p = p.
+Proof.
+intros * Hrm Hn.
+bbb.
 
 Theorem mat_of_path_is_rotation_matrix : ∀ el,
  is_rotation_matrix (mat_of_path el).
