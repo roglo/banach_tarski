@@ -450,3 +450,11 @@ apply IHl1; [ easy | ].
 intros a' b' Ha'b'.
 now apply Hf; right.
 Qed.
+
+Theorem nth_in_split : ∀ A (n : nat) (l : list A) (d : A),
+  (n < length l)%nat
+  → ∃ l1 l2 : list A, l = l1 ++ List.nth n l d :: l2.
+Proof.
+intros * Hn.
+now apply in_split, nth_In.
+Qed.

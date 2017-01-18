@@ -1401,14 +1401,6 @@ destruct (lt_dec i (length el)) as [Hi| Hi].
  now rewrite rev_path_length, <- Hi, Nat.sub_diag.
 Qed.
 
-Theorem nth_in_split : ∀ A (n : ℕ) (l : list A) (d : A),
-  (n < length l)%nat
-  → ∃ l1 l2 : list A, l = l1 ++ List.nth n l d :: l2.
-Proof.
-intros * Hn.
-now apply in_split, nth_In.
-Qed.
-
 Theorem nth_in_consec_split : ∀ A (n : ℕ) (l : list A) (d₁ d₂ : A),
   (S n < length l)%nat
   → ∃ l1 l2 : list A,
@@ -2575,7 +2567,7 @@ Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
   → M ≠ mat_id
   → matrix_of_axis_cos_sin_angle (axis_cos_sin_angle_of_matrix M) = M.
 Proof.
-intros M (Hrm, Hdet) Hid.
+intros M (Hrm, Hdet) Hid; symmetry.
 unfold matrix_of_axis_cos_sin_angle, axis_cos_sin_angle_of_matrix.
 remember (rotation_unit_eigenvec M) as axis eqn:Hax.
 destruct axis as (x, y, z).
@@ -2585,43 +2577,49 @@ destruct v as (x₀, y₀, z₀).
 simpl in Hax.
 injection Hax; clear Hax; intros Hz Hy Hx.
 remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
+remember (√ (x² + y² + z²))%R as r eqn:Hr.
+destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
+ move Hr₀z at top; subst r₀.
+ symmetry in Hr₀.
+ apply sqrt_eq_0 in Hr₀; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr₀.
+ destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
+ clear Hx Hy Hz.
+ symmetry in Hv.
+ unfold rotation_eigenvec in Hv; simpl in Hv.
+ remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
+ remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
+ remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
+ remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
+ destruct (Req_dec r₀ 0) as [H₁| H₁].
+  move H₁ at top; subst r₀.
+  symmetry in Hr₀.
+  apply sqrt_eq_0 in Hr₀; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in Hr₀.
+  destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
+  apply Rminus_diag_uniq in H1.
+  apply Rminus_diag_uniq in H2.
+  apply Rminus_diag_uniq in H3.
+  rewrite H3.
+  replace (a₁₂ M - a₁₂ M)%R with 0%R by lra.
+  rewrite Rdiv_0_l.
+  do 3 rewrite Rmult_0_r, Rminus_0_r, Rplus_0_r.
+  remember (Rlt_dec (a₂₂ M) (a₁₁ M)) as P eqn:HP.
+  remember (Rlt_dec (a₃₃ M) (a₁₁ M)) as Q eqn:HQ.
+  specialize (skew_sym_matrix_coeff_interv M Hrm) as Hai.
+  destruct (and_dec P Q) as [HPQ| HPQ]; subst P Q.
+   injection Hv; clear Hv; intros Hz'₁ Hy'₁ Hx'₁.
+   apply sqrt_eq_0 in Hx'₁; lra.
 
-bbb.
+   destruct (Rlt_dec (a₃₃ M) (a₂₂ M)) as [H₂| H₂].
+    injection Hv; clear Hv; intros Hz'₁ Hy'₁ Hx'₁.
+    apply sqrt_eq_0 in Hy'₁; lra.
 
-injection Hax; clear Hax; intros Hz Hy Hx.
-remember (a₂₃ M - a₃₂ M)%R as x₀ eqn:Hx₀.
-remember (a₃₁ M - a₁₃ M)%R as y₀ eqn:Hy₀.
-remember (a₁₂ M - a₂₁ M)%R as z₀ eqn:Hz₀.
-remember (√ (x₀² + y₀² + z₀²))%R as r eqn:Hr.
-destruct (Req_dec r 0) as [Hrz| Hrnz].
- move Hrz at top; subst r.
- symmetry in Hr.
- apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hr.
- destruct Hr as (H1 & H2 & H3); subst x₀ y₀ z₀.
- apply Rminus_diag_uniq in H1.
- apply Rminus_diag_uniq in H2.
- apply Rminus_diag_uniq in H3.
-About  rotation_unit_eigenvec.
-bbb.
-
- unfold mat_det in Hdet.
- rewrite H1, H2, H3 in Hdet.
- ring_simplify in Hdet.
-
-
-bbb.
-assert (x² + y² + z² = 1)%R.
- subst x y z; unfold Rdiv.
- do 3 rewrite Rsqr_mult.
- rewrite Rsqr_inv.
-  apply Rmult_eq_reg_r with (r := (r²)%R).
-  do 2 rewrite Rmult_plus_distr_r.
-  do 3 rewrite Rmult_assoc.
-  rewrite Rinv_l.
-   do 3 rewrite Rmult_1_r; rewrite Rmult_1_l; subst r.
-   rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
-
+    injection Hv; clear Hv; intros Hz'₁ Hy'₁ Hx'₁.
+    apply sqrt_eq_0 in Hz'₁; [ | lra ].
+    assert (H33 : a₃₃ M = (-1)%R) by lra.
+    assert (H22 : a₂₂ M = (-1)%R) by lra.
+    assert (H11 : a₁₁ M = (-1)%R) by lra.
 bbb.
 
 (* playing with quaternions... *)
