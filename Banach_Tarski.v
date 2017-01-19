@@ -2535,9 +2535,14 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
     (ux*uz*(1-c)-uy*s) (uy*uz*(1-c)+ux*s) (uz²*(1-c)+c).
 
 Definition axis_cos_sin_angle_of_matrix M :=
+  let v := rotation_unit_axis M in
   let cosθ := ((mat_trace M - 1) / 2)%R in
-  let sinθ := sqrt (1 - cosθ²) in
-  (rotation_unit_axis M, cosθ, sinθ).
+  let sinθ :=
+    let M' := matrix_of_axis_cos_sin_angle (v, 0, 1) in
+    let cosθ' := ((mat_trace (M * M') - 1) / 2)%R in
+    (- cosθ')%R
+  in
+  (v, cosθ, sinθ).
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
   (v ≠ 0)%vec
@@ -2582,6 +2587,18 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  rewrite Htr in Hc.
  replace c with cosθ by lra.
  clear c Hc.
+ f_equal.
+  Focus 2.
+  symmetry; simpl.
+  remember (vec_normalize (rotation_axis M)) as u eqn:Hu.
+  symmetry in Hu.
+  destruct u as (u₁, u₂, u₃).
+  unfold mat_trace, mkrmat; simpl.
+  progress repeat rewrite Rplus_0_r.
+  progress repeat rewrite Rminus_0_r.
+  progress repeat rewrite Rmult_1_r.
+  remember (√ (u₁² + u₂² + u₃²)) as ru eqn:Hru.
+  rewrite HM; simpl.
 bbb.
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
