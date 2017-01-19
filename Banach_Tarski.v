@@ -2524,21 +2524,24 @@ Definition rotation_around p :=
 Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
+Definition matrix_of_unit_axis_cos_sin_angle '(V x y z, c, s) :=
+  mkrmat
+    (x²*(1-c)+c) (x*y*(1-c)-z*s) (x*z*(1-c)+y*s)
+    (x*y*(1-c)+z*s) (y²*(1-c)+c) (y*z*(1-c)-x*s)
+    (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
+
 Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
   let r := (√ (x² + y² + z²))%R in
   let ux := (x / r)%R in
   let uy := (y / r)%R in
   let uz := (z / r)%R in
-  mkrmat
-    (ux²*(1-c)+c) (ux*uy*(1-c)-uz*s) (ux*uz*(1-c)+uy*s)
-    (ux*uy*(1-c)+uz*s) (uy²*(1-c)+c) (uy*uz*(1-c)-ux*s)
-    (ux*uz*(1-c)-uy*s) (uy*uz*(1-c)+ux*s) (uz²*(1-c)+c).
+  matrix_of_unit_axis_cos_sin_angle (V ux uy uz, c, s).
 
 Definition axis_cos_sin_angle_of_matrix M :=
   let v := rotation_unit_axis M in
   let cosθ := ((mat_trace M - 1) / 2)%R in
   let sinθ :=
-    let M' := matrix_of_axis_cos_sin_angle (v, 0, 1) in
+    let M' := matrix_of_unit_axis_cos_sin_angle (v, 0, 1) in
     let cosθ' := ((mat_trace (M * M') - 1) / 2)%R in
     (- cosθ')%R
   in
@@ -2591,18 +2594,16 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   Focus 2.
   symmetry; simpl.
   remember (vec_normalize (rotation_axis M)) as u eqn:Hu.
-  symmetry in Hu.
   destruct u as (u₁, u₂, u₃).
   unfold mat_trace, mkrmat; simpl.
   progress repeat rewrite Rplus_0_r.
   progress repeat rewrite Rminus_0_r.
   progress repeat rewrite Rmult_1_r.
-  remember (√ (u₁² + u₂² + u₃²)) as ru eqn:Hru.
+bbb.
   subst M xr yr zr; simpl.
   remember (x / r)%R as xr eqn:Hxr.
   remember (y / r)%R as yr eqn:Hyr.
   remember (z / r)%R as zr eqn:Hzr.
-
 bbb.
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
