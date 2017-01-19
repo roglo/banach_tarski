@@ -2598,7 +2598,11 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   progress repeat rewrite Rminus_0_r.
   progress repeat rewrite Rmult_1_r.
   remember (√ (u₁² + u₂² + u₃²)) as ru eqn:Hru.
-  rewrite HM; simpl.
+  subst M xr yr zr; simpl.
+  remember (x / r)%R as xr eqn:Hxr.
+  remember (y / r)%R as yr eqn:Hyr.
+  remember (z / r)%R as zr eqn:Hzr.
+
 bbb.
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
