@@ -2599,8 +2599,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   progress repeat rewrite Rplus_0_r.
   progress repeat rewrite Rminus_0_r.
   progress repeat rewrite Rmult_1_r.
-bbb.
-  subst M xr yr zr; simpl.
+  subst xr yr zr; simpl.
   remember (x / r)%R as xr eqn:Hxr.
   remember (y / r)%R as yr eqn:Hyr.
   remember (z / r)%R as zr eqn:Hzr.
