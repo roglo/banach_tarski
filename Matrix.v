@@ -143,17 +143,17 @@ Definition mat_of_elem e :=
 
 Definition rotate e pt := mat_vec_mul (mat_of_elem e) pt.
 
-Definition mat_mul m₁ m₂ :=
+Definition mat_mul M₁ M₂ :=
   mkrmat
-    (a₁₁ m₁ * a₁₁ m₂ + a₁₂ m₁ * a₂₁ m₂ + a₁₃ m₁ * a₃₁ m₂)
-    (a₁₁ m₁ * a₁₂ m₂ + a₁₂ m₁ * a₂₂ m₂ + a₁₃ m₁ * a₃₂ m₂)
-    (a₁₁ m₁ * a₁₃ m₂ + a₁₂ m₁ * a₂₃ m₂ + a₁₃ m₁ * a₃₃ m₂)
-    (a₂₁ m₁ * a₁₁ m₂ + a₂₂ m₁ * a₂₁ m₂ + a₂₃ m₁ * a₃₁ m₂)
-    (a₂₁ m₁ * a₁₂ m₂ + a₂₂ m₁ * a₂₂ m₂ + a₂₃ m₁ * a₃₂ m₂)
-    (a₂₁ m₁ * a₁₃ m₂ + a₂₂ m₁ * a₂₃ m₂ + a₂₃ m₁ * a₃₃ m₂)
-    (a₃₁ m₁ * a₁₁ m₂ + a₃₂ m₁ * a₂₁ m₂ + a₃₃ m₁ * a₃₁ m₂)
-    (a₃₁ m₁ * a₁₂ m₂ + a₃₂ m₁ * a₂₂ m₂ + a₃₃ m₁ * a₃₂ m₂)
-    (a₃₁ m₁ * a₁₃ m₂ + a₃₂ m₁ * a₂₃ m₂ + a₃₃ m₁ * a₃₃ m₂).
+    (a₁₁ M₁ * a₁₁ M₂ + a₁₂ M₁ * a₂₁ M₂ + a₁₃ M₁ * a₃₁ M₂)
+    (a₁₁ M₁ * a₁₂ M₂ + a₁₂ M₁ * a₂₂ M₂ + a₁₃ M₁ * a₃₂ M₂)
+    (a₁₁ M₁ * a₁₃ M₂ + a₁₂ M₁ * a₂₃ M₂ + a₁₃ M₁ * a₃₃ M₂)
+    (a₂₁ M₁ * a₁₁ M₂ + a₂₂ M₁ * a₂₁ M₂ + a₂₃ M₁ * a₃₁ M₂)
+    (a₂₁ M₁ * a₁₂ M₂ + a₂₂ M₁ * a₂₂ M₂ + a₂₃ M₁ * a₃₂ M₂)
+    (a₂₁ M₁ * a₁₃ M₂ + a₂₂ M₁ * a₂₃ M₂ + a₂₃ M₁ * a₃₃ M₂)
+    (a₃₁ M₁ * a₁₁ M₂ + a₃₂ M₁ * a₂₁ M₂ + a₃₃ M₁ * a₃₁ M₂)
+    (a₃₁ M₁ * a₁₂ M₂ + a₃₂ M₁ * a₂₂ M₂ + a₃₃ M₁ * a₃₂ M₂)
+    (a₃₁ M₁ * a₁₃ M₂ + a₃₂ M₁ * a₂₃ M₂ + a₃₃ M₁ * a₃₃ M₂).
 
 Definition mat_id :=
   mkrmat
@@ -170,10 +170,12 @@ Fixpoint mat_pow M n :=
 Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 
 Delimit Scope mat_scope with mat.
-Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
+Notation "m₁ * m₂" := (mat_mul m₁ m₂) (at level 40, left associativity) :
+  mat_scope.
 Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
 Arguments mat_pow M%mat n%nat.
+Arguments mat_mul M₁%mat M₂%mat.
 Arguments mat_vec_mul _%mat _%vec.
 Arguments mat_trace M%mat.
 
@@ -1030,3 +1032,14 @@ Qed.
 
 Theorem mat_trace_comm : ∀ A B, mat_trace (A * B) = mat_trace (B * A).
 Proof. intros. unfold mat_trace; simpl; lra. Qed.
+
+Theorem mat_trace_change_basis : ∀ A A' B,
+  (A' * A = mat_id)%mat
+  → mat_trace (A * B * A')%mat = mat_trace B.
+Proof.
+intros * HAA.
+rewrite mat_trace_comm.
+rewrite mat_mul_assoc.
+rewrite HAA.
+now rewrite mat_mul_id_l.
+Qed.
