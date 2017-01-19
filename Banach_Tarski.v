@@ -370,6 +370,7 @@ Qed.
 
 Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
 
+(* non-nul vector belonging to the axis of rotation *)
 Definition rotation_axis (M : matrix ℝ) :=
   let x := (a₃₂ M - a₂₃ M)%R in
   let y := (a₁₃ M - a₃₁ M)%R in
@@ -1016,13 +1017,6 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  replace (k * y)%R with (y * k)%R by apply Rmult_comm.
  replace (k * z)%R with (z * k)%R by apply Rmult_comm.
  subst x y z.
-(*
- progress repeat rewrite <- Rmult_div.
- unfold Rdiv.
- progress repeat rewrite Rmult_assoc.
- remember (k * / r)%R as kr.
- clear Hr Heqkr.
-*)
  clear r Hr Hrnz.
  f_equal; nsatz.
 Qed.
