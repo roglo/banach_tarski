@@ -370,7 +370,7 @@ Qed.
 
 Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
 
-Definition rotation_eigenvec (M : matrix ℝ) :=
+Definition rotation_axis (M : matrix ℝ) :=
   let x := (a₃₂ M - a₂₃ M)%R in
   let y := (a₁₃ M - a₃₁ M)%R in
   let z := (a₂₁ M - a₁₂ M)%R in
@@ -400,11 +400,11 @@ Definition vec_normalize '(V x y z) :=
   let r := ∥(V x y z)∥ in
   V (x / r) (y / r) (z / r).
 
-Definition rotation_unit_eigenvec (M : matrix ℝ) :=
-  vec_normalize (rotation_eigenvec M).
+Definition rotation_unit_axis (M : matrix ℝ) :=
+  vec_normalize (rotation_axis M).
 
 Definition rotation_fixpoint (m : matrix ℝ) k :=
-  vec_const_mul k (rotation_unit_eigenvec m).
+  vec_const_mul k (rotation_unit_axis m).
 
 Definition mat_of_path el :=
   List.fold_right mat_mul mat_id (map mat_of_elem el).
@@ -643,15 +643,15 @@ bbb.
 bbb.
 *)
 
-Theorem matrix_eigenvec_ok : ∀ M p k,
+Theorem matrix_axis_ok : ∀ M p k,
   is_rotation_matrix M
-  → p = k ⁎ rotation_eigenvec M
+  → p = k ⁎ rotation_axis M
   → mat_vec_mul M p = p.
 Proof.
 intros * Hrm Hn.
 subst p.
-remember (rotation_eigenvec M) as ev eqn:Hev.
-unfold rotation_eigenvec in Hev.
+remember (rotation_axis M) as ev eqn:Hev.
+unfold rotation_axis in Hev.
 remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
 remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
 remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
@@ -1027,7 +1027,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  f_equal; nsatz.
 Qed.
 
-Theorem normalized_eigenvec : ∀ M k v,
+Theorem normalized_axis : ∀ M k v,
   (M * (k ⁎ v) = k ⁎ v)%vec
   → (M * (k ⁎ vec_normalize v) = k ⁎ vec_normalize v)%vec.
 Proof.
@@ -1051,10 +1051,10 @@ Theorem matrix_all_fixpoints_ok : ∀ M p k,
 Proof.
 intros * Hrm Hn.
 unfold rotation_fixpoint in Hn.
-unfold rotation_unit_eigenvec in Hn.
+unfold rotation_unit_axis in Hn.
 subst p.
-apply normalized_eigenvec.
-now apply matrix_eigenvec_ok with (k := k).
+apply normalized_axis.
+now apply matrix_axis_ok with (k := k).
 Qed.
 
 Theorem mat_of_path_is_rotation_matrix : ∀ el,
@@ -1531,20 +1531,20 @@ Theorem rotation_fixpoint_on_sphere : ∀ r M,
 Proof.
 intros * Hm.
 unfold rotation_fixpoint; simpl.
-unfold rotation_unit_eigenvec; simpl.
+unfold rotation_unit_axis; simpl.
 unfold vec_const_mul.
-remember (vec_normalize (rotation_eigenvec M)) as v eqn:Hv.
+remember (vec_normalize (rotation_axis M)) as v eqn:Hv.
 destruct v as (v₁, v₂, v₃).
 do 3 rewrite Rsqr_mult.
 do 2 rewrite <- Rmult_plus_distr_l.
 enough (H : (v₁² + v₂² + v₃² = 1)%R) by (rewrite H; lra).
-specialize (normalized_vec_normalize (rotation_eigenvec M)) as Hn.
+specialize (normalized_vec_normalize (rotation_axis M)) as Hn.
 rewrite <- Hv in Hn; simpl in Hn.
 apply (f_equal Rsqr) in Hn.
  rewrite Rsqr_sqrt in Hn; [ | apply nonneg_sqr_vec_norm ].
  now rewrite Hn, Rsqr_1.
 
- unfold rotation_eigenvec; simpl.
+ unfold rotation_axis; simpl.
  remember (a₃₂ M - a₂₃ M)%R as x eqn:Hx.
  remember (a₁₃ M - a₃₁ M)%R as y eqn:Hy.
  remember (a₂₁ M - a₁₂ M)%R as z eqn:Hz.
@@ -1616,7 +1616,7 @@ f_equal.
  clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
 Qed.
 
-Theorem mat_eigenvec_mul_const : ∀ M v,
+Theorem mat_axis_mul_const : ∀ M v,
   mat_vec_mul M v = v
   → ∀ k, mat_vec_mul M (vec_const_mul k v) = vec_const_mul k v.
 Proof.
@@ -2280,7 +2280,7 @@ destruct (eq_vec_dec u (V 0 0 0)) as [Hv₁| Hv₁].
      now apply Hnid.
 Qed.
 
-Theorem eigenvec_and_fixpoint_of_path_collinear : ∀ el p q r,
+Theorem axis_and_fixpoint_of_path_collinear : ∀ el p q r,
   p ∈ sphere r
   → q ∈ sphere r
   → norm_list el ≠ []
@@ -2440,7 +2440,7 @@ destruct (mat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
   rewrite <- Hr in Hs.
   subst m.
   fold (fixpoint_of_path r el₁) in Hp₂.
-  apply eigenvec_and_fixpoint_of_path_collinear with (p := p₁) in Hp₂;
+  apply axis_and_fixpoint_of_path_collinear with (p := p₁) in Hp₂;
     try assumption.
   now destruct (is_neg_vec p₁), (is_neg_vec p₂).
 Qed.
@@ -2543,7 +2543,7 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
 Definition axis_cos_sin_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
   let sinθ := sqrt (1 - cosθ²) in
-  (rotation_unit_eigenvec M, cosθ, sinθ).
+  (rotation_unit_axis M, cosθ, sinθ).
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ acs,
   axis_cos_sin_angle_of_matrix (matrix_of_axis_cos_sin_angle acs) = acs.
@@ -2565,10 +2565,10 @@ Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
 Proof.
 intros M (Hrm, Hdet) Hid; symmetry.
 unfold matrix_of_axis_cos_sin_angle, axis_cos_sin_angle_of_matrix.
-remember (rotation_unit_eigenvec M) as axis eqn:Hax.
+remember (rotation_unit_axis M) as axis eqn:Hax.
 destruct axis as (x, y, z).
-unfold rotation_unit_eigenvec in Hax.
-remember (rotation_eigenvec M) as v eqn:Hv.
+unfold rotation_unit_axis in Hax.
+remember (rotation_axis M) as v eqn:Hv.
 destruct v as (x₀, y₀, z₀).
 simpl in Hax.
 injection Hax; clear Hax; intros Hz Hy Hx.
@@ -2582,7 +2582,7 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
  clear Hx Hy Hz.
  symmetry in Hv.
- unfold rotation_eigenvec in Hv; simpl in Hv.
+ unfold rotation_axis in Hv; simpl in Hv.
  remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
  remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
  remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
@@ -2674,7 +2674,7 @@ bbb.
  remember (mat_trace M) as tr eqn:Htr.
  remember ((tr - 1) / 2)%R as c eqn:Hc.
 (**)
- unfold rotation_eigenvec in Hv.
+ unfold rotation_axis in Hv.
  remember (a₃₂ M - a₂₃ M)%R as x₁ eqn:Hx₁.
  remember (a₁₃ M - a₃₁ M)%R as y₁ eqn:Hy₁.
  remember (a₂₁ M - a₁₂ M)%R as z₁ eqn:Hz₁.
@@ -2693,7 +2693,7 @@ bbb.
  destruct M; simpl in *.
  injection Hrm; clear Hrm.
  intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
- unfold rotation_eigenvec in Hv; simpl in Hv.
+ unfold rotation_axis in Hv; simpl in Hv.
  remember (a₃₂ - a₂₃)%R as x₁ eqn:Hx₁.
  remember (a₁₃ - a₃₁)%R as y₁ eqn:Hy₁.
  remember (a₂₁ - a₁₂)%R as z₁ eqn:Hz₁.
@@ -3349,7 +3349,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
   rewrite path_of_nat_inv in Hq₂.
   rewrite rotate_vec_mul in Hr₂.
   clear Hn₃.
-  eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
+  eapply axis_and_fixpoint_of_path_collinear; try eassumption.
   now subst q₂; apply fixpoint_of_path_on_sphere.
 
   assert (Hpq₃ :
@@ -3360,7 +3360,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
    unfold fixpoint_of_nat in Hq₃.
    rewrite path_of_nat_inv in Hq₃.
    rewrite rotate_vec_mul in Hr₃.
-   eapply eigenvec_and_fixpoint_of_path_collinear; try eassumption.
+   eapply axis_and_fixpoint_of_path_collinear; try eassumption.
    now subst q₃; apply fixpoint_of_path_on_sphere.
 
    destruct (bool_dec (is_neg_vec p₂) (is_neg_vec q₂)) as [Hb₂| Hb₂].
