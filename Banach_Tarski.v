@@ -2539,17 +2539,49 @@ Definition axis_cos_sin_angle_of_matrix M :=
   let sinθ := sqrt (1 - cosθ²) in
   (rotation_unit_axis M, cosθ, sinθ).
 
-Theorem matrix_of_axis_cos_sin_angle_inv : ∀ acs,
-  axis_cos_sin_angle_of_matrix (matrix_of_axis_cos_sin_angle acs) = acs.
+Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
+  (v ≠ 0)%vec
+  → axis_cos_sin_angle_of_matrix (matrix_of_axis_cos_sin_angle (v, c, s)) =
+      (v, c, s).
 Proof.
-intros.
+intros v cosθ sinθ Hv.
+remember (v, cosθ, sinθ) as acs eqn:Hacs.
+destruct v as (x, y, z).
 unfold axis_cos_sin_angle_of_matrix.
 remember (matrix_of_axis_cos_sin_angle acs) as M eqn:HM.
+unfold rotation_unit_axis.
 remember (mat_trace M) as tr eqn:Htr.
 remember ((tr - 1) / 2)%R as c eqn:Hc.
-destruct acs as (((x, y, z), cosθ), sinθ).
-f_equal; [ f_equal | ].
+subst acs; simpl in HM.
+remember (√ (x² + y² + z²))%R as r eqn:Hr.
+rewrite HM in Htr; unfold mkrmat, mat_trace in Htr; simpl in Htr.
+do 2 rewrite <- Rplus_assoc in Htr.
+remember ((x / r)²)%R as xr eqn:Hxr.
+remember ((y / r)²)%R as yr eqn:Hyr.
+remember ((z / r)²)%R as zr eqn:Hzr.
+replace
+  (xr * (1 - cosθ) + cosθ + yr * (1 - cosθ) + cosθ + zr * (1 - cosθ) + cosθ)%R
+with ((xr + yr + zr) * (1 - cosθ) + 3 * cosθ)%R in Htr by lra.
+rewrite Hxr, Hyr, Hzr in Htr.
+destruct (Req_dec r 0) as [Hrz| Hrnz].
+ move Hrz at top; subst r.
+ symmetry in Hr.
+ apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr.
+ now destruct Hr as (H1 & H2 & H3); subst x y z.
 
+ rewrite Rsqr_div in Htr; [ | easy ].
+ rewrite Rsqr_div in Htr; [ | easy ].
+ rewrite Rsqr_div in Htr; [ | easy ].
+ do 2 rewrite <- Rdiv_plus_distr in Htr.
+ rewrite Hr in Htr.
+ rewrite Rsqr_sqrt in Htr; [ | apply nonneg_sqr_vec_norm ].
+ rewrite Rdiv_same in Htr; [ | now intros H; rewrite H, sqrt_0 in Hr ].
+ rewrite Rmult_1_l in Htr.
+ replace (1 - cosθ + 3 * cosθ)%R with (1 + 2 * cosθ)%R in Htr by lra.
+ rewrite Htr in Hc.
+ replace c with cosθ by lra.
+ clear c Hc.
 bbb.
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
