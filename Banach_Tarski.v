@@ -2678,6 +2678,23 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  remember (a₂₁ - a₁₂)%R as z₁ eqn:Hz₁.
  remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
  destruct (Req_dec r₁ 0) as [Hr₁z| Hr₁nz].
+  move Hr₁z at top; subst r₁.
+  symmetry in Hr₁.
+  apply sqrt_eq_0 in Hr₁; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in Hr₁.
+  move Hr₁ at top; destruct Hr₁ as (H1 & H2 & H3); subst x₁ y₁ z₁.
+  symmetry in Hx₁, Hy₁, Hz₁.
+  apply Rminus_diag_uniq in Hx₁.
+  apply Rminus_diag_uniq in Hy₁.
+  apply Rminus_diag_uniq in Hz₁.
+  move Hx₁ at top; subst a₃₂.
+  move Hy₁ at top; subst a₁₃.
+  move Hz₁ at top; subst a₂₁.
+  destruct (and_dec (Rlt_dec a₂₂ a₁₁) (Rlt_dec a₃₃ a₁₁)) as [HPQ| HPQ].
+   injection Hv; clear Hv; intros H3 H2 H1.
+   rewrite <- H1 in H2, H3.
+   f_equal.
+    rewrite Hc, Htr.
 bbb.
 
 (* playing with quaternions... *)
