@@ -2604,6 +2604,23 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   remember (y / r)%R as yr eqn:Hyr.
   remember (z / r)%R as zr eqn:Hzr.
 bbb.
+  rewrite HM; simpl.
+  rename cosθ into c.
+  unfold Rminus.
+  do 9 rewrite Rmult_plus_distr_r.
+  do 18 rewrite Rmult_plus_distr_l.
+  progress repeat rewrite Rmult_1_r.
+  progress repeat rewrite <- Ropp_mult_distr_r.
+  progress repeat rewrite <- Ropp_mult_distr_l.
+  progress repeat rewrite Rmult_plus_distr_r.
+  progress repeat rewrite fold_Rminus.
+  progress repeat rewrite <- Ropp_mult_distr_l.
+  progress repeat rewrite fold_Rminus.
+  unfold Rminus.
+  progress repeat rewrite <- Rplus_assoc.
+  progress repeat rewrite <- Rmult_assoc.
+  progress repeat rewrite fold_Rminus.
+bbb.
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
   is_rotation_matrix M
