@@ -30,35 +30,29 @@ Qed.
 
 Theorem nat_neq_le_lt : ∀ x y : nat, x ≠ y → x ≤ y → x < y.
 Proof.
-intros * Hnxy Hxy.
-apply le_lt_eq_dec in Hxy.
-destruct Hxy as [Hle| Heq]; [ easy | ].
-now exfalso; apply Hnxy.
+intros * ? Hxy%le_lt_eq_dec; tauto.
 Qed.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
 Proof.
-intros.
-destruct x, y; try easy; exfalso; now apply H.
+now intros [] [].
 Qed.
 
 Theorem negb_neq : ∀ b₁ b₂, negb b₁ ≠ b₂ → b₁ = b₂.
 Proof.
-intros b₁ b₂ H.
-destruct b₁, b₂; try easy; exfalso; now apply H.
+now intros [] [].
 Qed.
 
 Theorem negb_eq_eq : ∀ b₁ b₂, negb b₁ = negb b₂ → b₁ = b₂.
 Proof.
-intros b₁ b₂ Hn.
-now destruct b₁, b₂.
+now intros [] [].
 Qed.
 
 Theorem Pos2Nat_nonzero : ∀ p, Pos.to_nat p ≠ O.
 Proof.
 intros p Hp.
-specialize (Pos2Nat.is_pos p); intros H.
-now rewrite Hp in H.
+specialize (Pos2Nat.is_pos p).
+now rewrite Hp.
 Qed.
 
 Theorem Pos_lt_1_xO : ∀ p, (1 < xO p)%positive.
