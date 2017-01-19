@@ -2590,7 +2590,16 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  rewrite Htr in Hc.
  replace c with cosθ by lra.
  clear c tr Hc Htr.
- f_equal.
+ f_equal; [ f_equal | ].
+  unfold rotation_axis; simpl.
+  remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
+  remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
+  remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
+  remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
+  destruct (Req_dec r₀ 0) as [H₁| H₁].
+
+bbb.
+  (* sinθ *)
   Focus 2.
   symmetry; simpl.
   remember (vec_normalize (rotation_axis M)) as u eqn:Hu.
