@@ -1520,18 +1520,10 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  rewrite Rsqr_div; [ | easy ].
  rewrite Rsqr_div; [ | easy ].
  rewrite Rsqr_div; [ | easy ].
- unfold Rdiv.
- do 2 rewrite <- Rmult_plus_distr_r.
- rewrite sqrt_mult_alt; [ | apply nonneg_sqr_vec_norm ].
- rewrite <- Hr.
- rewrite <- Rsqr_inv; [ | easy ].
- rewrite sqrt_Rsqr; [ now rewrite Rinv_r | ].
- enough (H : (0 < r)%R) by now apply Rlt_le, Rinv_0_lt_compat.
- rewrite Hr; apply sqrt_lt_R0.
- apply (f_equal Rsqr) in Hr.
- rewrite Rsqr_sqrt in Hr; [ | apply nonneg_sqr_vec_norm ].
- rewrite <- Hr.
- now apply Rlt_0_sqr.
+ do 2 rewrite <- Rdiv_plus_distr.
+ rewrite sqrt_div_alt; [ | now apply Rlt_0_sqr ].
+ rewrite Hr, sqrt_Rsqr; [ | apply sqrt_pos ].
+ rewrite Rdiv_same; [ easy | now subst r ].
 Qed.
 
 Theorem rotation_fixpoint_on_sphere : ∀ r M,
@@ -2661,6 +2653,17 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   now rewrite sqrt_0 in Hr₀.
 
  rewrite Hx, Hy, Hz in Hr.
+ rewrite Rsqr_div in Hr; [ | lra ].
+ rewrite Rsqr_div in Hr; [ | lra ].
+ rewrite Rsqr_div in Hr; [ | lra ].
+ do 2 rewrite <- Rdiv_plus_distr in Hr.
+ rewrite sqrt_div_alt in Hr; [ | now apply Rlt_0_sqr ].
+ rewrite <- Hr₀ in Hr.
+ rewrite sqrt_Rsqr in Hr; [ | rewrite Hr₀; apply sqrt_pos ].
+ rewrite Rdiv_same in Hr; [ | easy ].
+ subst r.
+ do 3 rewrite Rdiv_1_r.
+
 bbb.
 
 (* playing with quaternions... *)

@@ -88,6 +88,13 @@ rewrite Rmult_assoc in Hxy.
 rewrite Rinv_l in Hxy; lra.
 Qed.
 
+Theorem Rdiv_same : ∀ x, x ≠ 0%R → (x / x = 1)%R.
+Proof.
+intros.
+unfold Rdiv.
+now rewrite Rinv_r.
+Qed.
+
 Theorem up_0 : (up 0 = 1)%Z.
 Proof.
 pose proof archimed 0 as H.
