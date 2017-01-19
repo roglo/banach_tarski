@@ -170,8 +170,7 @@ Fixpoint mat_pow M n :=
 Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 
 Delimit Scope mat_scope with mat.
-Notation "m₁ * m₂" := (mat_mul m₁ m₂) (at level 40, left associativity) :
-  mat_scope.
+Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
 Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
 Arguments mat_pow M%mat n%nat.
