@@ -2664,6 +2664,7 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  subst r.
  do 3 rewrite Rdiv_1_r.
  remember (mat_trace M) as tr eqn:Htr.
+ remember ((tr - 1) / 2)%R as c eqn:Hc.
  unfold mat_trace in Htr.
  unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
  unfold mat_det in Hdet.
@@ -2671,8 +2672,12 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  destruct M; simpl in *.
  injection Hrm; clear Hrm.
  intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
- f_equal.
-
+ unfold rotation_eigenvec in Hv; simpl in Hv.
+ remember (a₃₂ - a₂₃)%R as x₁ eqn:Hx₁.
+ remember (a₁₃ - a₃₁)%R as y₁ eqn:Hy₁.
+ remember (a₂₁ - a₁₂)%R as z₁ eqn:Hz₁.
+ remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
+ destruct (Req_dec r₁ 0) as [Hr₁z| Hr₁nz].
 bbb.
 
 (* playing with quaternions... *)
