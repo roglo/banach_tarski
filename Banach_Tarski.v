@@ -416,7 +416,6 @@ Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
 (* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
-Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
 
 Theorem ortho_matrix_sqr_coeff_le_1 : ∀ M,

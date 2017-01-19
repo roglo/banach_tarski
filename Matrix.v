@@ -167,12 +167,15 @@ Fixpoint mat_pow M n :=
   | S n' => mat_mul M (mat_pow M n')
   end.
 
+Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
+
 Delimit Scope mat_scope with mat.
 Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
 Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
 Arguments mat_pow M%mat n%nat.
 Arguments mat_vec_mul _%mat _%vec.
+Arguments mat_trace M%mat.
 
 Theorem eq_vec_dec : ∀ p₁ p₂ : vector, { p₁ = p₂ } + { p₁ ≠ p₂ }.
 Proof.
@@ -1024,3 +1027,6 @@ Theorem mat_opp_vec_mul_distr_r : ∀ M v, (M * - v = - (M * v))%vec.
 Proof.
 intros M (x, y, z); simpl; f_equal; lra.
 Qed.
+
+Theorem mat_trace_comm : ∀ A B, mat_trace (A * B) = mat_trace (B * A).
+Proof. intros. unfold mat_trace; simpl; lra. Qed.
