@@ -2663,6 +2663,15 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  rewrite Rdiv_same in Hr; [ | easy ].
  subst r.
  do 3 rewrite Rdiv_1_r.
+ remember (mat_trace M) as tr eqn:Htr.
+ unfold mat_trace in Htr.
+ unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
+ unfold mat_det in Hdet.
+ unfold mkrmat.
+ destruct M; simpl in *.
+ injection Hrm; clear Hrm.
+ intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+ f_equal.
 
 bbb.
 
