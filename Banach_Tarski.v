@@ -2543,15 +2543,15 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
 
 Definition axis_cos_sin_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
-(*
+(**)
   let sinθ := sqrt (1 - cosθ²) in
-*)
+(*
   (* according to
      https://www.geometrictools.com/Documentation/RotationIssues.pdf
      section 2.2 Matrix to Axis-Angle, if I interpret well;
      but seems too good: to be verified *)
   let sinθ := ((a₁₂ M - a₂₁ M) / 2)%R in
-(**)
+*)
   (rotation_unit_eigenvec M, cosθ, sinθ).
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
@@ -2592,6 +2592,10 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   apply Rminus_diag_uniq in H1.
   apply Rminus_diag_uniq in H2.
   apply Rminus_diag_uniq in H3.
+  remember (mat_trace M) as tr eqn:Htr.
+  remember ((tr - 1) / 2)%R as c eqn:Hc.
+  unfold mat_trace in Htr.
+bbb.
   rewrite H3.
   replace (a₁₂ M - a₁₂ M)%R with 0%R by lra.
   rewrite Rdiv_0_l.
