@@ -419,7 +419,7 @@ Definition fixpoint_of_nat r n :=
 Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
 Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
 
-Theorem skew_sym_matrix_sqr_coeff_le_1 : ∀ M,
+Theorem ortho_matrix_sqr_coeff_le_1 : ∀ M,
   (M * mat_transp M)%mat = mat_id
   → (((a₁₁ M)² ≤ 1 ∧ (a₁₂ M)² ≤ 1 ∧ (a₁₃ M)² ≤ 1) ∧
      ((a₂₁ M)² ≤ 1 ∧ (a₂₂ M)² ≤ 1 ∧ (a₂₃ M)² ≤ 1) ∧
@@ -487,14 +487,14 @@ split; [ apply Rsqr_neg_pos_le_0; lra | ].
 apply Rsqr_incr_0_var; lra.
 Qed.
 
-Theorem skew_sym_matrix_coeff_interv : ∀ M,
+Theorem ortho_matrix_coeff_interv : ∀ M,
   (M * mat_transp M)%mat = mat_id
   → ((-1 ≤ a₁₁ M ≤ 1 ∧ -1 ≤ a₁₂ M ≤ 1 ∧ -1 ≤ a₁₃ M ≤ 1) ∧
      (-1 ≤ a₂₁ M ≤ 1 ∧ -1 ≤ a₂₂ M ≤ 1 ∧ -1 ≤ a₂₃ M ≤ 1) ∧
      (-1 ≤ a₃₁ M ≤ 1 ∧ -1 ≤ a₃₂ M ≤ 1 ∧ -1 ≤ a₃₃ M ≤ 1))%R.
 Proof.
 intros * Hrm.
-specialize (skew_sym_matrix_sqr_coeff_le_1 _ Hrm) as Ha.
+specialize (ortho_matrix_sqr_coeff_le_1 _ Hrm) as Ha.
 destruct Ha as (Ha₁ & Ha₂ & Ha₃).
 destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
 destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
@@ -516,7 +516,7 @@ Theorem mat_trace_interv : ∀ M,
   → (-1 ≤ mat_trace M ≤ 3)%R.
 Proof.
 intros * (Hrm & Hdet).
-specialize (skew_sym_matrix_coeff_interv _ Hrm) as Ha.
+specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
 destruct Ha as (Ha₁ & Ha₂ & Ha₃).
 destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
 destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
@@ -667,7 +667,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  apply Rminus_diag_uniq in H2.
  apply Rminus_diag_uniq in H3.
  destruct Hrm as (Hrm, Hdet).
- specialize (skew_sym_matrix_coeff_interv _ Hrm) as Ha.
+ specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
  destruct Ha as (Ha₁ & Ha₂ & Ha₃).
  destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
  destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
@@ -2606,7 +2606,7 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   do 3 rewrite Rmult_0_r, Rminus_0_r, Rplus_0_r.
   remember (Rlt_dec (a₂₂ M) (a₁₁ M)) as P eqn:HP.
   remember (Rlt_dec (a₃₃ M) (a₁₁ M)) as Q eqn:HQ.
-  specialize (skew_sym_matrix_coeff_interv M Hrm) as Hai.
+  specialize (ortho_matrix_coeff_interv M Hrm) as Hai.
   destruct (and_dec P Q) as [HPQ| HPQ]; subst P Q.
    injection Hv; clear Hv; intros Hz'₁ Hy'₁ Hx'₁.
    apply sqrt_eq_0 in Hx'₁; lra.
