@@ -1044,15 +1044,16 @@ Definition bool_prod_nat_of_prod_nat '(n₁, n₂) : bool * ℕ * ℕ :=
 Definition prod_nat_of_bool_prod_nat '(b, n₁, n₂) : ℕ * ℕ :=
   ((2 * n₁ + Nat.b2n b)%nat, n₂).
 
+Require Import Ring.
 Theorem bool_prod_nat_of_prod_nat_inv : ∀ bnn,
   bool_prod_nat_of_prod_nat (prod_nat_of_bool_prod_nat bnn) = bnn.
 Proof.
 intros ((b & n₁) & n₂); simpl; f_equal.
-rewrite Nat.add_0_r.
-replace (n₁ + n₁)%nat with (2 * n₁)%nat by now simpl; rewrite Nat.add_0_r.
-rewrite Nat.add_comm, Nat.mul_comm.
-rewrite Nat.mod_add; [ | easy ].
-rewrite Nat.div_add; [ | easy ].
+replace (n₁ + (n₁ + 0) + Nat.b2n b)%nat with (Nat.b2n b + n₁ * 2)%nat by ring.
+replace ((Nat.b2n b + n₁ * 2) mod 2)%nat with ((Nat.b2n b) mod 2)%nat
+    by now symmetry; apply Nat.mod_add.
+replace ((Nat.b2n b + n₁ * 2) / 2)%nat with (Nat.b2n b / 2 + n₁)%nat
+    by now symmetry; apply Nat.div_add.
 now destruct b.
 Qed.
 
