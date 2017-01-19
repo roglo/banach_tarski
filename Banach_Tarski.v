@@ -2665,6 +2665,17 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  do 3 rewrite Rdiv_1_r.
  remember (mat_trace M) as tr eqn:Htr.
  remember ((tr - 1) / 2)%R as c eqn:Hc.
+(**)
+ unfold rotation_eigenvec in Hv.
+ remember (a₃₂ M - a₂₃ M)%R as x₁ eqn:Hx₁.
+ remember (a₁₃ M - a₃₁ M)%R as y₁ eqn:Hy₁.
+ remember (a₂₁ M - a₁₂ M)%R as z₁ eqn:Hz₁.
+ destruct (Req_dec ∥(V x₁ y₁ z₁)∥ 0) as [Hr₁z| Hr₁nz].
+Focus 2.
+  injection Hv; clear Hv; intros H1 H2 H3.
+  move H1 at top; move H2 at top; move H3 at top; subst x₁ y₁ z₁.
+  clear Hr₁nz.
+
 bbb.
 
  unfold mat_trace in Htr.
