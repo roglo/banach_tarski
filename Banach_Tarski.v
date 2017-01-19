@@ -2665,6 +2665,8 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  do 3 rewrite Rdiv_1_r.
  remember (mat_trace M) as tr eqn:Htr.
  remember ((tr - 1) / 2)%R as c eqn:Hc.
+bbb.
+
  unfold mat_trace in Htr.
  unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
  unfold mat_det in Hdet.
@@ -2697,7 +2699,7 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
     rewrite Hc, Htr.
 bbb.
 
-(* playing with quaternions... *)
+(* playing with quaternions, just for fun... *)
 
 Record ℍ := quat { Re : ℝ; Im : vector }.
 Arguments quat Re%R Im%vec.
