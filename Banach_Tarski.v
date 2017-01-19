@@ -2589,7 +2589,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  replace (1 - cosθ + 3 * cosθ)%R with (1 + 2 * cosθ)%R in Htr by lra.
  rewrite Htr in Hc.
  replace c with cosθ by lra.
- clear c Hc.
+ clear c tr Hc Htr.
  f_equal.
   Focus 2.
   symmetry; simpl.
