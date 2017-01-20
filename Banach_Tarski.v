@@ -370,32 +370,17 @@ Qed.
 
 Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
 
-(* non-nul vector belonging to the axis of rotation *)
+(* Non-nul vector belonging to the axis of rotation.
+   Works for rotations angles different from 0 and π,
+   i.e. transpositor ≠ 0 (a "transpositor" is a name I
+   give to a vector which is nul iff the matrix is equal
+   to its transpose; this name is inspired from the
+   name "commutator") *)
 Definition rotation_axis (M : matrix ℝ) :=
   let x := (a₃₂ M - a₂₃ M)%R in
   let y := (a₁₃ M - a₃₁ M)%R in
   let z := (a₂₁ M - a₁₂ M)%R in
-  let r := ∥(V x y z)∥ in
-  if Req_dec r 0 then
-    if and_dec (Rlt_dec (a₂₂ M) (a₁₁ M)) (Rlt_dec (a₃₃ M) (a₁₁ M)) then
-      let x₁ := sqrt ((a₁₁ M + 1) / 2) in
-      let y₁ := (a₁₂ M / (2 * x₁))%R in
-      let z₁ := (a₃₁ M / (2 * x₁))%R in
-      V x₁ y₁ z₁
-    else if Rlt_dec (a₃₃ M) (a₂₂ M) then
-      let y₁ := sqrt ((a₂₂ M + 1) / 2) in
-      let x₁ := (a₁₂ M / (2 * y₁))%R in
-      let z₁ := (a₂₃ M / (2 * y₁))%R in
-      let r₁ := ∥(V x₁ y₁ z₁)∥ in
-      V x₁ y₁ z₁
-    else
-      let z₁ := sqrt ((a₃₃ M + 1) / 2) in
-      let x₁ := (a₃₁ M / (2 * z₁))%R in
-      let y₁ := (a₂₃ M / (2 * z₁))%R in
-      let r₁ := ∥(V x₁ y₁ z₁)∥ in
-      V x₁ y₁ z₁
-  else
-    V x y z.
+  V x y z.
 
 Definition vec_normalize '(V x y z) :=
   let r := ∥(V x y z)∥ in
@@ -646,9 +631,36 @@ bbb.
 
 Theorem matrix_axis_ok : ∀ M p k,
   is_rotation_matrix M
+  → M ≠ mat_transp M
   → p = k ⁎ rotation_axis M
   → mat_vec_mul M p = p.
 Proof.
+intros * Hrm Hm Hn.
+subst p.
+remember (rotation_axis M) as ev eqn:Hev.
+unfold rotation_axis in Hev.
+remember (a₃₂ M - a₂₃ M)%R as x eqn:Hx.
+remember (a₁₃ M - a₃₁ M)%R as y eqn:Hy.
+remember (a₂₁ M - a₁₂ M)%R as z eqn:Hz.
+destruct (eq_vec_dec ev 0) as [Hvz| Hvnz].
+ subst ev.
+ injection Hvz; clear Hvz; intros H1 H2 H3.
+ move H1 at top; move H2 at top; move H3 at top; subst x y z.
+ symmetry in Hx, Hy, Hz.
+ apply Rminus_diag_uniq in Hx.
+ apply Rminus_diag_uniq in Hy.
+ apply Rminus_diag_uniq in Hz.
+ exfalso; apply Hm; clear Hm.
+ unfold mat_transp, mkrmat.
+ destruct M; simpl in Hx, Hy, Hz |-*.
+ now subst; f_equal.
+bbb.
+
+remember ∥(V x₀ y₀ z₀)∥ as r eqn:Hr.
+destruct (Req_dec r 0) as [Hrz| Hrnz].
+ move Hrz at top; subst r.
+
+bbb.
 intros * Hrm Hn.
 subst p.
 remember (rotation_axis M) as ev eqn:Hev.
