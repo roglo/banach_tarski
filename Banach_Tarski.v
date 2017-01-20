@@ -828,13 +828,16 @@ assert (Hr : is_rotation_matrix M).
   apply matrix_of_non_empty_path_is_not_identity.
   rewrite <- Hnel.
   intros H.
+SearchAbout (norm_list _ ++ norm_list _).
+bbb.
   apply norm_list_app_is_nil in H.
    rewrite Hnel in H; symmetry in H.
    rewrite <- Hnel in H.
    rewrite rev_path_norm_list in H.
+SearchAbout rev_path.
+
 SearchAbout (norm_list (rev_path _)).
 bbb.
-
    now apply rev_path_same_is_nil in H.
 
    now rewrite norm_list_idemp.
