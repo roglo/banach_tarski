@@ -792,12 +792,61 @@ destruct nel as [| e₁ nel].
   now rewrite IHel.
 Qed.
 
+Theorem rev_path_norm_list_norm_list : ∀ el,
+  rev_path (norm_list el) = norm_list el
+  → norm_list el = [].
+Proof.
+intros * Hr.
+destruct (norm_list_dec el) as [Hel| Hel].
+ induction el as [| e₁ el]; [ easy | exfalso ].
+ simpl in Hr, Hel.
+ remember (norm_list el) as nel eqn:Hnel.
+ destruct nel as [| e₂ nel].
+  injection Hr; apply no_fixpoint_negf.
+
+  destruct (letter_opp_dec e₁ e₂) as [Hee| Hee].
+   apply letter_opp_sym in Hee.
+   apply letter_opp_negf in Hee; subst e₂.
+   symmetry in Hnel; rewrite Hel in Hnel.
+   now apply norm_list_no_start2 in Hnel.
+
+   injection Hel; clear Hel; intros Hel.
+   rewrite rev_path_cons, rev_path_single in Hr.
+   rewrite Hel in Hr.
+   rewrite Hel in Hnel; symmetry in Hnel.
+   rewrite Hel in IHel.
+   enough (el = []) by now subst el.
+   apply IHel; [ | easy ].
+
+bbb.
+intros * Hr.
+destruct el as [| e₁ el]; [ easy | ].
+simpl in Hr; simpl.
+remember (norm_list el) as nel eqn:Hnel.
+symmetry in Hnel.
+destruct nel as [| e₂ nel].
+ rewrite rev_path_single in Hr.
+ injection Hr; clear Hr; intros H.
+ now apply no_fixpoint_negf in H.
+
+ destruct (letter_opp_dec e₁ e₂) as [Hee| Hee].
+  apply letter_opp_sym in Hee.
+  apply letter_opp_negf in Hee; subst e₂.
+  destruct nel as [| e₂ nel]; [ easy | exfalso ].
+
+bbb.
+intros * Hr.
+remember (norm_list el) as nel eqn:Hnel.
+symmetry in Hnel.
+revert el Hnel.
+induction nel as [| e nel]; intros; [ easy | exfalso ].
+rewrite rev_path_cons in Hr.
+bbb.
 (*
 Theorem rev_path_same_is_nil : ∀ el, rev_path el = el → el = [].
 Proof.
 intros * Hr.
 induction el as [| e el]; [ easy | exfalso ].
-bbb.
 *)
 
 Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
@@ -828,9 +877,9 @@ assert (Hr : is_rotation_matrix M).
   apply matrix_of_non_empty_path_is_not_identity.
   rewrite <- Hnel.
   intros H.
-SearchAbout (norm_list _ ++ norm_list _).
-bbb.
   apply norm_list_app_is_nil in H.
+
+bbb.
    rewrite Hnel in H; symmetry in H.
    rewrite <- Hnel in H.
    rewrite rev_path_norm_list in H.
