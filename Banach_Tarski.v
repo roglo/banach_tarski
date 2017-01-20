@@ -727,7 +727,9 @@ Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
 Theorem mat_of_path_is_not_rotation_π : ∀ el,
   ¬ is_a_rotation_π (mat_of_path el).
 Proof.
-intros el.
+intros el H.
+unfold is_a_rotation_π in H.
+destruct H as (Hmt, Hid).
 bbb.
 
 (* if mat_of_path_is_not_rotation_π above is ok, the hypothesis below
