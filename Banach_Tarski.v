@@ -797,6 +797,30 @@ Theorem rev_path_norm_list_norm_list : ∀ el,
   → norm_list el = [].
 Proof.
 intros * Hr.
+induction el as [| e₁ el]; intros; [ easy | ].
+simpl in Hr.
+remember (norm_list el) as nel eqn:Hnel.
+symmetry in Hnel.
+destruct nel as [| e₂ nel].
+ exfalso; injection Hr; apply no_fixpoint_negf.
+
+ simpl; rewrite Hnel.
+ destruct (letter_opp_dec e₁ e₂) as [Hee| Hee]; [ | exfalso ].
+  apply letter_opp_sym in Hee.
+  apply letter_opp_negf in Hee; subst e₂.
+  apply norm_list_is_cons in Hnel.
+  clear IHel.
+  rewrite <- Hnel in Hr |-*.
+
+bbb.
+intros * Hr.
+remember (norm_list el) as nel eqn:Hnel.
+symmetry in Hnel.
+revert el Hnel.
+induction nel as [| e₁ nel]; intros; [ easy | exfalso ].
+
+bbb.
+intros * Hr.
 destruct (norm_list_dec el) as [Hel| Hel].
  induction el as [| e₁ el]; [ easy | exfalso ].
  simpl in Hr, Hel.
@@ -818,6 +842,10 @@ destruct (norm_list_dec el) as [Hel| Hel].
    enough (el = []) by now subst el.
    apply IHel; [ | easy ].
    clear - Hnel Hr.
+
+Focus 2.
+destruct Hel as (el₁ & t & d & el₂ & Hel).
+SearchAbout (norm_list (_ ++ _)).
 
 bbb.
 intros * Hr.
