@@ -392,9 +392,6 @@ Definition rotation_unit_axis (M : matrix ℝ) :=
 Definition rotation_fixpoint (m : matrix ℝ) k :=
   vec_const_mul k (rotation_unit_axis m).
 
-Definition mat_of_path el :=
-  List.fold_right mat_mul mat_id (map mat_of_elem el).
-
 Definition fixpoint_of_path r el :=
   rotation_fixpoint (mat_of_path el) r.
 
@@ -722,15 +719,6 @@ induction el as [| e el].
  apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
 Qed.
 
-Theorem rotate_vec_mul : ∀ el p,
-  fold_right rotate p el = mat_vec_mul (mat_of_path el) p.
-Proof.
-intros el p.
-unfold mat_of_path.
-induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
-rewrite IHel, mat_vec_mul_assoc; reflexivity.
-Qed.
-
 Theorem mat_of_path_app : ∀ el₁ el₂,
   mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
 Proof.
@@ -766,6 +754,17 @@ Qed.
 Theorem mat_of_path_cons : ∀ e el,
    mat_of_path (e :: el) = (mat_of_elem e * mat_of_path el)%mat.
 Proof. easy. Qed.
+
+Theorem mat_of_elem_negf_mul_l : ∀ e,
+  (mat_of_elem (negf e) * mat_of_elem e)%mat = mat_id.
+Proof.
+intros (t, d); simpl.
+destruct t, d; simpl.
+ apply rot_rot_inv_x.
+ apply rot_inv_rot_x.
+ apply rot_rot_inv_z.
+ apply rot_inv_rot_z.
+Qed.
 
 Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
 
@@ -806,13 +805,7 @@ destruct nel as [| e₁ nel].
   rewrite <- IHel.
   rewrite mat_of_path_cons.
   rewrite mat_mul_assoc.
-
-Theorem mat_of_elem_negf_mul_l : ∀ e,
-  (mat_of_elem (negf e) * mat_of_elem e)%mat = mat_id.
-Proof.
-intros (t, d); simpl.
-destruct t, d; simpl.
-About rot_rot_inv_x.
+  now rewrite mat_of_elem_negf_mul_l, mat_mul_id_l.
 bbb.
 
    destruct Hr as (Hrm, Hdet).

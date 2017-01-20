@@ -285,144 +285,70 @@ rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
 f_equal; lra.
 Qed.
 
-(*
-Theorem rot_rot_inv_x : ∀ pt,
-  mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
+Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
-intros.
-unfold mat_vec_mul; simpl.
-destruct pt as (x, y, z).
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite Rplus_0_l.
-f_equal.
- field_simplify; simpl.
- unfold Rdiv.
- progress repeat rewrite Rmult_1_r.
- progress repeat rewrite RMicromega.Rinv_1.
- rewrite sqrt_sqrt; [ | lra ].
- field_simplify; simpl.
- unfold Rdiv.
- now field_simplify.
-
- unfold Rdiv.
- field_simplify; simpl.
- progress repeat rewrite Rmult_1_r.
- rewrite sqrt_sqrt; [ | lra ].
- field_simplify; simpl.
- unfold Rdiv.
- now field_simplify.
-Qed.
-*)
-
-Theorem rot_inv_rot_x : ∀ pt,
-  mat_vec_mul rot_inv_x (mat_vec_mul rot_x pt) = pt.
-Proof.
-intros.
-unfold mat_vec_mul; simpl.
-destruct pt as (x, y, z).
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite Rplus_0_l.
-f_equal.
- field_simplify; simpl.
- unfold Rdiv.
- progress repeat rewrite Rmult_1_r.
- progress repeat rewrite RMicromega.Rinv_1.
- rewrite sqrt_sqrt; [ | lra ].
- field_simplify; simpl.
- unfold Rdiv.
- now field_simplify.
-
- unfold Rdiv.
- field_simplify; simpl.
- progress repeat rewrite Rmult_1_r.
- rewrite sqrt_sqrt; [ | lra ].
- field_simplify; simpl.
- unfold Rdiv.
- now field_simplify.
+unfold mat_mul, mat_id, mkrmat; simpl.
+unfold Rdiv.
+progress repeat rewrite <- Rmult_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+f_equal; lra.
 Qed.
 
-Theorem rot_rot_inv_z : ∀ pt,
-  mat_vec_mul rot_z (mat_vec_mul rot_inv_z pt) = pt.
+Theorem rot_rot_inv_z : (rot_z * rot_inv_z)%mat = mat_id.
 Proof.
-intros.
-unfold mat_vec_mul; simpl.
-destruct pt as (x, y, z).
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite Rplus_0_l.
-f_equal.
- field_simplify; simpl.
- unfold Rdiv.
- progress repeat rewrite Rmult_1_r.
- progress repeat rewrite RMicromega.Rinv_1.
- rewrite sqrt_sqrt; [ | lra ].
- field_simplify; simpl.
- unfold Rdiv.
- now field_simplify.
-
- unfold Rdiv.
- field_simplify; simpl.
- progress repeat rewrite Rmult_1_r.
- rewrite sqrt_sqrt; [ | lra ].
- field_simplify; simpl.
- unfold Rdiv.
- now field_simplify.
+unfold mat_mul, mat_id, mkrmat; simpl.
+unfold Rdiv.
+progress repeat rewrite <- Rmult_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+f_equal; lra.
 Qed.
 
-Theorem rot_inv_rot_z : ∀ pt,
-  mat_vec_mul rot_inv_z (mat_vec_mul rot_z pt) = pt.
+Theorem rot_inv_rot_z : (rot_inv_z * rot_z)%mat = mat_id.
 Proof.
-intros.
-unfold mat_vec_mul; simpl.
-destruct pt as (x, y, z).
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite Rplus_0_l.
-f_equal.
- field_simplify; simpl.
- unfold Rdiv.
- progress repeat rewrite Rmult_1_r.
- progress repeat rewrite RMicromega.Rinv_1.
- rewrite sqrt_sqrt; [ | lra ].
- field_simplify; simpl.
- unfold Rdiv.
- now field_simplify.
+unfold mat_mul, mat_id, mkrmat; simpl.
+unfold Rdiv.
+progress repeat rewrite <- Rmult_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+f_equal; lra.
+Qed.
 
- unfold Rdiv.
- field_simplify; simpl.
- progress repeat rewrite Rmult_1_r.
- rewrite sqrt_sqrt; [ | lra ].
- field_simplify; simpl.
- unfold Rdiv.
- now field_simplify.
+Definition mat_of_path el :=
+  List.fold_right mat_mul mat_id (map mat_of_elem el).
+
+Theorem rotate_vec_mul : ∀ el p,
+  fold_right rotate p el = mat_vec_mul (mat_of_path el) p.
+Proof.
+intros el p.
+unfold mat_of_path.
+induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
+rewrite IHel, mat_vec_mul_assoc; reflexivity.
 Qed.
 
 Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.
 Proof.
 intros (t, d) p; simpl.
+unfold rotate; simpl.
+rewrite <- mat_vec_mul_assoc.
 destruct t, d; simpl.
- apply rot_inv_rot_x.
-(* interruption: je vais boire un pot chez Dupont. *)
-bbb.
- apply rot_rot_inv_x.
- apply rot_inv_rot_z.
- apply rot_rot_inv_z.
+ now rewrite rot_inv_rot_x, mat_vec_mul_id.
+ now rewrite rot_rot_inv_x, mat_vec_mul_id.
+ now rewrite rot_inv_rot_z, mat_vec_mul_id.
+ now rewrite rot_rot_inv_z, mat_vec_mul_id.
 Qed.
 
 Theorem rotate_neg_rotate : ∀ e p, rotate (negf e) (rotate e p) = p.
 Proof.
 intros (t, d) p; simpl.
+unfold rotate; simpl.
+rewrite <- mat_vec_mul_assoc.
 destruct t, d; simpl.
- apply rot_rot_inv_x.
- apply rot_inv_rot_x.
- apply rot_rot_inv_z.
- apply rot_inv_rot_z.
+ now rewrite rot_rot_inv_x, mat_vec_mul_id.
+ now rewrite rot_inv_rot_x, mat_vec_mul_id.
+ now rewrite rot_rot_inv_z, mat_vec_mul_id.
+ now rewrite rot_inv_rot_z, mat_vec_mul_id.
 Qed.
 
 Theorem app_path_rev_path : ∀ p el,
