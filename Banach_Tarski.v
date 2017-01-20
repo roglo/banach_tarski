@@ -766,6 +766,32 @@ destruct t, d; simpl.
  apply rot_inv_rot_z.
 Qed.
 
+Theorem mat_of_path_norm : ∀ el,
+  mat_of_path (norm_list el) = mat_of_path el.
+Proof.
+intros.
+induction el as [| e el]; [ easy | simpl ].
+remember (norm_list el) as nel eqn:Hnel.
+symmetry in Hnel.
+destruct nel as [| e₁ nel].
+ unfold mat_of_path in IHel at 1.
+ simpl in IHel; symmetry.
+ rewrite mat_of_path_cons.
+ now rewrite <- IHel.
+
+ destruct (letter_opp_dec e e₁) as [He| He].
+  apply letter_opp_negf in He; subst e.
+  rewrite mat_of_path_cons.
+  rewrite <- IHel.
+  rewrite mat_of_path_cons.
+  rewrite mat_mul_assoc.
+  now rewrite mat_of_elem_negf_mul_l, mat_mul_id_l.
+
+  rewrite mat_of_path_cons; symmetry.
+  rewrite mat_of_path_cons; symmetry.
+  now rewrite IHel.
+Qed.
+
 Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
 
 Theorem mat_of_path_is_not_rotation_π : ∀ el,
@@ -784,28 +810,11 @@ assert (Hr : is_rotation_matrix M).
   rewrite Hmt at 2.
   now destruct Hr.
 
-  assert (Hn : norm_list el ≠ []).
-   intros H.
-Theorem glop : ∀ el, mat_of_path (norm_list el) = mat_of_path el.
-Proof.
-intros.
-induction el as [| e el]; [ easy | ].
-simpl.
-remember (norm_list el) as nel eqn:Hnel.
-symmetry in Hnel.
-destruct nel as [| e₁ nel].
- unfold mat_of_path in IHel at 1.
- simpl in IHel; symmetry.
- rewrite mat_of_path_cons.
- now rewrite <- IHel.
+  rewrite <- mat_of_path_norm in HM.
+  remember (norm_list el) as nel eqn:Hnel.
+  symmetry in Hnel.
+  destruct nel as [| e nel]; [ easy | ].
 
- destruct (letter_opp_dec e e₁) as [He| He].
-  apply letter_opp_negf in He; subst e.
-  rewrite mat_of_path_cons.
-  rewrite <- IHel.
-  rewrite mat_of_path_cons.
-  rewrite mat_mul_assoc.
-  now rewrite mat_of_elem_negf_mul_l, mat_mul_id_l.
 bbb.
 
    destruct Hr as (Hrm, Hdet).
