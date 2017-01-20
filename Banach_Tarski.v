@@ -814,7 +814,19 @@ assert (Hr : is_rotation_matrix M).
   remember (norm_list el) as nel eqn:Hnel.
   symmetry in Hnel.
   destruct nel as [| e nel]; [ easy | ].
-Check matrix_of_non_empty_path_is_not_identity.
+  rewrite HM in HMI.
+  rewrite <- mat_of_path_app in HMI.
+  exfalso; revert HMI.
+  apply matrix_of_non_empty_path_is_not_identity.
+  rewrite <- Hnel.
+(*
+  rewrite <- norm_list_normal_l.
+  rewrite <- norm_list_normal_r.
+*)
+  intros H.
+  apply norm_list_app_is_nil in H.
+  rewrite Hnel in H.
+SearchAbout (norm_list (_ ++ _)).
 bbb.
 
    destruct Hr as (Hrm, Hdet).
