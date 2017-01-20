@@ -817,6 +817,7 @@ destruct (norm_list_dec el) as [Hel| Hel].
    rewrite Hel in IHel.
    enough (el = []) by now subst el.
    apply IHel; [ | easy ].
+   clear - Hnel Hr.
 
 bbb.
 intros * Hr.
