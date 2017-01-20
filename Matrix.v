@@ -275,6 +275,17 @@ Theorem vec_mul_diag : ∀ x y z k,
   V (k * x) (k * y) (k * z) = (k ⁎ V x y z)%vec.
 Proof. easy. Qed.
 
+Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
+Proof.
+unfold mat_mul, mat_id, mkrmat; simpl.
+unfold Rdiv.
+progress repeat rewrite <- Rmult_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
+f_equal; lra.
+Qed.
+
+(*
 Theorem rot_rot_inv_x : ∀ pt,
   mat_vec_mul rot_x (mat_vec_mul rot_inv_x pt) = pt.
 Proof.
@@ -303,6 +314,7 @@ f_equal.
  unfold Rdiv.
  now field_simplify.
 Qed.
+*)
 
 Theorem rot_inv_rot_x : ∀ pt,
   mat_vec_mul rot_inv_x (mat_vec_mul rot_x pt) = pt.
@@ -396,6 +408,8 @@ Proof.
 intros (t, d) p; simpl.
 destruct t, d; simpl.
  apply rot_inv_rot_x.
+(* interruption: je vais boire un pot chez Dupont. *)
+bbb.
  apply rot_rot_inv_x.
  apply rot_inv_rot_z.
  apply rot_rot_inv_z.

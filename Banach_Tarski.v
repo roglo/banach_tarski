@@ -750,6 +750,23 @@ induction el₂ as [| e₂ el₂]; intros.
  now simpl; rewrite IHel₁, mat_mul_assoc.
 Qed.
 
+Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
+  norm_list el ≠ []
+  → mat_of_path el ≠ mat_id.
+Proof.
+intros * Hn.
+apply rotate_non_empty_path_is_not_identity in Hn.
+destruct Hn as (p, Hp).
+intros H; apply Hp; clear Hp.
+rewrite rotate_vec_mul.
+fold (mat_of_path el); rewrite H.
+apply mat_vec_mul_id.
+Qed.
+
+Theorem mat_of_path_cons : ∀ e el,
+   mat_of_path (e :: el) = (mat_of_elem e * mat_of_path el)%mat.
+Proof. easy. Qed.
+
 Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
 
 Theorem mat_of_path_is_not_rotation_π : ∀ el,
@@ -768,8 +785,46 @@ assert (Hr : is_rotation_matrix M).
   rewrite Hmt at 2.
   now destruct Hr.
 
+  assert (Hn : norm_list el ≠ []).
+   intros H.
+Theorem glop : ∀ el, mat_of_path (norm_list el) = mat_of_path el.
+Proof.
+intros.
+induction el as [| e el]; [ easy | ].
+simpl.
+remember (norm_list el) as nel eqn:Hnel.
+symmetry in Hnel.
+destruct nel as [| e₁ nel].
+ unfold mat_of_path in IHel at 1.
+ simpl in IHel; symmetry.
+ rewrite mat_of_path_cons.
+ now rewrite <- IHel.
+
+ destruct (letter_opp_dec e e₁) as [He| He].
+  apply letter_opp_negf in He; subst e.
+  rewrite mat_of_path_cons.
+  rewrite <- IHel.
+  rewrite mat_of_path_cons.
+  rewrite mat_mul_assoc.
+
+Theorem mat_of_elem_negf_mul_l : ∀ e,
+  (mat_of_elem (negf e) * mat_of_elem e)%mat = mat_id.
+Proof.
+intros (t, d); simpl.
+destruct t, d; simpl.
+About rot_rot_inv_x.
+bbb.
+
+   destruct Hr as (Hrm, Hdet).
+SearchAbout mat_vec_mul.
+   rewrite HM,  <- rotate_vec_mul in Hrm.
+   unfold mat_of_path in HM.
+bbb.
+
   rewrite HM in HMI.
   rewrite <- mat_of_path_app in HMI.
+  specialize (matrix_of_non_empty_path_is_not_identity el).
+bbb.
   unfold mat_of_path in HMI.
 bbb.
 
@@ -802,19 +857,6 @@ destruct (mat_eq_dec M mat_id) as [Hid| Hid].
 Qed.
 
 bbb.
-
-Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
-  norm_list el ≠ []
-  → mat_of_path el ≠ mat_id.
-Proof.
-intros * Hn.
-apply rotate_non_empty_path_is_not_identity in Hn.
-destruct Hn as (p, Hp).
-intros H; apply Hp; clear Hp.
-rewrite rotate_vec_mul.
-fold (mat_of_path el); rewrite H.
-apply mat_vec_mul_id.
-Qed.
 
 Theorem D_of_nat_prop : ∀ r n nf no p p₁ el el₁,
   (nf, no) = prod_nat_of_nat n
