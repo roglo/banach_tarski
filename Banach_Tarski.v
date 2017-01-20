@@ -792,6 +792,14 @@ destruct nel as [| e₁ nel].
   now rewrite IHel.
 Qed.
 
+(*
+Theorem rev_path_same_is_nil : ∀ el, rev_path el = el → el = [].
+Proof.
+intros * Hr.
+induction el as [| e el]; [ easy | exfalso ].
+bbb.
+*)
+
 Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
 
 Theorem mat_of_path_is_not_rotation_π : ∀ el,
@@ -819,37 +827,20 @@ assert (Hr : is_rotation_matrix M).
   exfalso; revert HMI.
   apply matrix_of_non_empty_path_is_not_identity.
   rewrite <- Hnel.
-(*
-  rewrite <- norm_list_normal_l.
-  rewrite <- norm_list_normal_r.
-*)
   intros H.
   apply norm_list_app_is_nil in H.
-  rewrite Hnel in H.
-SearchAbout (norm_list (_ ++ _)).
+   rewrite Hnel in H; symmetry in H.
+   rewrite <- Hnel in H.
+   rewrite rev_path_norm_list in H.
+SearchAbout (norm_list (rev_path _)).
 bbb.
 
-   destruct Hr as (Hrm, Hdet).
-SearchAbout mat_vec_mul.
-   rewrite HM,  <- rotate_vec_mul in Hrm.
-   unfold mat_of_path in HM.
-bbb.
+   now apply rev_path_same_is_nil in H.
 
-  rewrite HM in HMI.
-  rewrite <- mat_of_path_app in HMI.
-  specialize (matrix_of_non_empty_path_is_not_identity el).
-bbb.
-  unfold mat_of_path in HMI.
-bbb.
+   now rewrite norm_list_idemp.
 
-unfold mat_transp, mkrmat in Hmt.
-unfold mat_id, mkrmat.
-destruct M; simpl in *.
-injection Hmt; clear Hmt; intros.
-subst; clear H1 H3 H4.
-unfold mat_of_path in HM.
-f_equal.
-bbb.
+   now rewrite norm_list_idemp.
+Qed.
 
 (* if mat_of_path_is_not_rotation_π above is ok, the hypothesis below
    can be removed *)
