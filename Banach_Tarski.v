@@ -722,6 +722,34 @@ induction el as [| e el].
  apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
 Qed.
 
+Theorem rotate_vec_mul : ∀ el p,
+  fold_right rotate p el = mat_vec_mul (mat_of_path el) p.
+Proof.
+intros el p.
+unfold mat_of_path.
+induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
+rewrite IHel, mat_vec_mul_assoc; reflexivity.
+Qed.
+
+Theorem mat_of_path_app : ∀ el₁ el₂,
+  mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
+Proof.
+intros.
+revert el₁.
+induction el₂ as [| e₂ el₂]; intros.
+ unfold mat_of_path at 3; simpl.
+ rewrite app_nil_r.
+ now rewrite mat_mul_id_r.
+
+ rewrite cons_comm_app, app_assoc, IHel₂.
+ unfold mat_of_path; simpl.
+ rewrite map_app, fold_right_app; simpl.
+ rewrite mat_mul_assoc; f_equal.
+ rewrite mat_mul_id_r; clear.
+ induction el₁ as [| e₁]; [ now rewrite mat_mul_id_l | ].
+ now simpl; rewrite IHel₁, mat_mul_assoc.
+Qed.
+
 Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
 
 Theorem mat_of_path_is_not_rotation_π : ∀ el,
@@ -730,6 +758,28 @@ Proof.
 intros el H.
 unfold is_a_rotation_π in H.
 destruct H as (Hmt, Hid).
+remember (mat_of_path el) as M eqn:HM.
+apply Hid; clear Hid.
+assert (Hr : is_rotation_matrix M).
+ subst M.
+ apply mat_of_path_is_rotation_matrix.
+
+ assert (HMI : (M * M = mat_id)%mat).
+  rewrite Hmt at 2.
+  now destruct Hr.
+
+  rewrite HM in HMI.
+  rewrite <- mat_of_path_app in HMI.
+  unfold mat_of_path in HMI.
+bbb.
+
+unfold mat_transp, mkrmat in Hmt.
+unfold mat_id, mkrmat.
+destruct M; simpl in *.
+injection Hmt; clear Hmt; intros.
+subst; clear H1 H3 H4.
+unfold mat_of_path in HM.
+f_equal.
 bbb.
 
 (* if mat_of_path_is_not_rotation_π above is ok, the hypothesis below
@@ -752,15 +802,6 @@ destruct (mat_eq_dec M mat_id) as [Hid| Hid].
 Qed.
 
 bbb.
-
-Theorem rotate_vec_mul : ∀ el p,
-  fold_right rotate p el = mat_vec_mul (mat_of_path el) p.
-Proof.
-intros el p.
-unfold mat_of_path.
-induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
-rewrite IHel, mat_vec_mul_assoc; reflexivity.
-Qed.
 
 Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
   norm_list el ≠ []
@@ -1019,25 +1060,6 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
     else if b then (- p)%vec else p
   in
   fold_right rotate p₁ (path_of_nat no).
-
-Theorem mat_of_path_app : ∀ el₁ el₂,
-  mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
-Proof.
-intros.
-revert el₁.
-induction el₂ as [| e₂ el₂]; intros.
- unfold mat_of_path at 3; simpl.
- rewrite app_nil_r.
- now rewrite mat_mul_id_r.
-
- rewrite cons_comm_app, app_assoc, IHel₂.
- unfold mat_of_path; simpl.
- rewrite map_app, fold_right_app; simpl.
- rewrite mat_mul_assoc; f_equal.
- rewrite mat_mul_id_r; clear.
- induction el₁ as [| e₁]; [ now rewrite mat_mul_id_l | ].
- now simpl; rewrite IHel₁, mat_mul_assoc.
-Qed.
 
 Theorem rev_path_length : ∀ el, length (rev_path el) = length el.
 Proof.
