@@ -814,7 +814,7 @@ assert (Hr : is_rotation_matrix M).
   remember (norm_list el) as nel eqn:Hnel.
   symmetry in Hnel.
   destruct nel as [| e nel]; [ easy | ].
-
+Check matrix_of_non_empty_path_is_not_identity.
 bbb.
 
    destruct Hr as (Hrm, Hdet).
