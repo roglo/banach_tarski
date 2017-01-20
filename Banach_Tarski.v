@@ -797,6 +797,13 @@ Theorem rev_path_norm_list_norm_list : ∀ el,
   → norm_list el = [].
 Proof.
 intros * Hr.
+remember (norm_list el) as nel eqn:Hnel.
+symmetry in Hnel.
+destruct nel as [| e₁ nel]; [ easy | exfalso ].
+rewrite <- Hnel in Hr.
+
+bbb.
+intros * Hr.
 induction el as [| e₁ el]; intros; [ easy | ].
 simpl in Hr.
 remember (norm_list el) as nel eqn:Hnel.
