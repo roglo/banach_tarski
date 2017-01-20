@@ -722,14 +722,34 @@ induction el as [| e el].
  apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
 Qed.
 
-Theorem rotation_fixpoint_of_path : ∀ el p k,
-  p = rotation_fixpoint (mat_of_path el) k → (mat_of_path el * p)%vec = p.
+Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
+
+Theorem mat_of_path_is_not_rotation_π : ∀ el,
+  ¬ is_a_rotation_π (mat_of_path el).
 Proof.
-intros * Hp.
-apply matrix_all_fixpoints_ok in Hp; [ easy | | ].
-apply mat_of_path_is_rotation_matrix.
+intros el.
 bbb.
+
+(* if mat_of_path_is_not_rotation_π above is ok, the hypothesis below
+   can be removed *)
+Theorem rotation_fixpoint_of_path : ∀ el p k,
+  p = rotation_fixpoint (mat_of_path el) k
+  → ¬ is_a_rotation_π (mat_of_path el)
+  → (mat_of_path el * p)%vec = p.
+Proof.
+intros * Hp Hmt.
+remember (mat_of_path el) as M eqn:HM.
+destruct (mat_eq_dec M mat_id) as [Hid| Hid].
+ now rewrite Hid, mat_vec_mul_id.
+
+ subst M.
+ apply matrix_all_fixpoints_ok in Hp; [ easy | | ].
+  apply mat_of_path_is_rotation_matrix.
+
+  now intros H; apply Hmt.
 Qed.
+
+bbb.
 
 Theorem rotate_vec_mul : ∀ el p,
   fold_right rotate p el = mat_vec_mul (mat_of_path el) p.
@@ -766,8 +786,10 @@ split.
  exists (rev_path el).
  symmetry in Hp; apply rotate_rev_path in Hp; apply Hp.
 
- apply rotation_fixpoint_of_path in Hp₁.
- rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
+ eapply rotation_fixpoint_of_path in Hp₁; [ | easy |  ].
+  rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
+
+bbb.
 Qed.
 
 Definition D_of_prod_nat r '(nf, no) :=
