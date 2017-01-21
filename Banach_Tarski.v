@@ -846,8 +846,6 @@ destruct (mat_eq_dec M mat_id) as [Hid| Hid].
   now intros H; apply Hmt.
 Qed.
 
-bbb.
-
 Theorem D_of_nat_prop : ∀ r n nf no p p₁ el el₁,
   (nf, no) = prod_nat_of_nat n
   → el₁ = path_of_nat nf
@@ -861,10 +859,8 @@ split.
  exists (rev_path el).
  symmetry in Hp; apply rotate_rev_path in Hp; apply Hp.
 
- eapply rotation_fixpoint_of_path in Hp₁; [ | easy |  ].
-  rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
-
-bbb.
+ eapply rotation_fixpoint_of_path in Hp₁.
+ rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
 Qed.
 
 Definition D_of_prod_nat r '(nf, no) :=
@@ -1125,6 +1121,8 @@ remember (vec_normalize (rotation_axis M)) as v eqn:Hv.
 destruct v as (v₁, v₂, v₃).
 do 3 rewrite Rsqr_mult.
 do 2 rewrite <- Rmult_plus_distr_l.
+bbb.
+
 enough (H : (v₁² + v₂² + v₃² = 1)%R) by (rewrite H; lra).
 specialize (normalized_vec_normalize (rotation_axis M)) as Hn.
 rewrite <- Hv in Hn; simpl in Hn.
