@@ -2141,6 +2141,46 @@ subst acs; simpl.
 simpl in HM.
 destruct v as (x, y, z).
 remember (√ (x² + y² + z²)) as r eqn:Hr.
+rewrite HM; unfold mkrmat ; simpl.
+unfold mat_trace in Htr.
+rewrite HM in Htr; unfold mkrmat in Htr; simpl in Htr.
+rename cosθ into c₁.
+remember (x / r)%R as x₁ eqn:Hx₁.
+remember (y / r)%R as y₁ eqn:Hy₁.
+remember (z / r)%R as z₁ eqn:Hz₁.
+do 2 rewrite <- Rplus_assoc in Htr.
+replace (x₁² * (1 - c₁) + c₁ + y₁² * (1 - c₁) + c₁ + z₁² * (1 - c₁) + c₁)%R
+with ((x₁² + y₁² + z₁²) * (1 - c₁) + 3 * c₁)%R in Htr by lra.
+assert (Hrnz : r ≠ 0%R).
+ intros H; move H at top; subst r.
+ symmetry in Hr.
+ apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr.
+ now destruct Hr as (H1 & H2 & H3); subst x y z.
+
+ assert (Hr₁ : (x₁² + y₁² + z₁² = 1)%R).
+  rewrite Hx₁, Hy₁, Hz₁.
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  do 2 rewrite <- Rdiv_plus_distr.
+  rewrite Hr.
+  rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+  rewrite Rdiv_same; [ easy | ].
+  intros H; rewrite H in Hr.
+  now rewrite sqrt_0 in Hr.
+
+  rewrite Hr₁ in Htr.
+  ring_simplify in Htr.
+  rewrite Htr in Hc.
+  assert (H : c = c₁) by lra.
+  move H at top; subst c₁; clear Hc.
+bbb.
+
+ring_simplify in Htr.
+rewrite Htr in Hc.
+ring_simplify in Hc.
+
 bbb.
 
 intros v cosθ sinθ Hv.
