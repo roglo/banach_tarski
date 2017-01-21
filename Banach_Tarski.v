@@ -2180,6 +2180,7 @@ assert (Hrnz : r ≠ 0%R).
   rewrite <- H in Hs.
   rewrite sqrt_Rsqr in Hs; [ | easy ].
   move Hs at top; subst sinθ; clear H.
+  f_equal; f_equal.
 bbb.
 
   apply (f_equal Rsqr) in Hs.
