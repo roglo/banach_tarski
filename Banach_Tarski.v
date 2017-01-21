@@ -2121,13 +2121,8 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
 Definition axis_cos_sin_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
   let sinθ := √ (1 - cosθ²) in
-(*
-  let v := rotation_axis M in
-  (v, cosθ, sinθ).
-*)
   let v := (/ (2 * sinθ) ⁎ rotation_axis M)%vec in
   (v, cosθ, sinθ).
-(**)
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
   (v ≠ 0)%vec
