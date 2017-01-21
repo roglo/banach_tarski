@@ -5,7 +5,7 @@
    - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
 (* Coq v8.6 *)
 
-Require Import Utf8 List Relations NPeano Wf_nat.
+Require Import Utf8 List Relations NPeano Wf_nat Compare_dec.
 Import ListNotations.
 Require Import Misc Words Normalize.
 
@@ -185,4 +185,148 @@ destruct (norm_list_dec (el₁ ++ el₂)) as [H₁| H₁].
   rewrite Hel₂, <- rev_path_norm_list, Hel₁ in H.
   rewrite H₃, H₄, H, rev_path_app.
   easy.
+Qed.
+
+Theorem rev_path_length : ∀ el, length (rev_path el) = length el.
+Proof.
+intros.
+induction el as [| e el]; [ easy | simpl ].
+rewrite rev_path_cons, rev_path_single.
+rewrite app_length; simpl.
+now rewrite Nat.add_1_r, IHel.
+Qed.
+
+Theorem rev_path_nth : ∀ el i,
+  (i < length el)%nat
+  → List.nth i (rev_path el) ạ = negf (List.nth (length el - S i) el ạ⁻¹).
+Proof.
+intros el i Hlen.
+revert i Hlen.
+induction el as [| e el]; intros; [ now simpl; rewrite match_id | ].
+rewrite rev_path_cons, rev_path_single.
+destruct (lt_dec i (length el)) as [Hi| Hi].
+ rewrite app_nth1; [ | now rewrite rev_path_length ].
+ rewrite IHel; simpl; [ f_equal | easy ].
+ remember (length el - i)%nat as n eqn:Hn.
+ symmetry in Hn.
+ destruct n.
+  apply Nat.sub_0_le in Hn.
+  apply Nat.lt_succ_r in Hn.
+  now apply Nat.nle_gt in Hn.
+
+  f_equal; apply Nat.succ_inj.
+  now rewrite <- Hn, <- Nat.sub_succ_l.
+
+ apply Nat.nlt_ge in Hi.
+ simpl in Hlen; unfold lt in Hlen.
+ apply Nat.succ_le_mono in Hlen.
+ apply Nat.le_antisymm in Hi; [ | easy ].
+ rewrite Hi.
+ rewrite app_nth2; [ simpl | now rewrite rev_path_length; unfold ge ].
+ now rewrite rev_path_length, <- Hi, Nat.sub_diag.
+Qed.
+
+Theorem nth_in_consec_split : ∀ A (n : nat) (l : list A) (d₁ d₂ : A),
+  (S n < length l)%nat
+  → ∃ l1 l2 : list A,
+    l = l1 ++ List.nth n l d₁ :: List.nth (S n) l d₂ :: l2.
+Proof.
+intros * Hn.
+revert n Hn.
+induction l as [| x l]; intros; [ now apply Nat.nlt_0_r in Hn | ].
+simpl in Hn.
+apply Nat.succ_lt_mono in Hn.
+destruct n.
+ destruct l as [| y l]; [ now apply Nat.nlt_0_r in Hn | ].
+ now exists [], l.
+
+ apply IHl in Hn.
+ destruct Hn as (l1 & l2 & Hn).
+ now exists (x :: l1), l2; simpl; f_equal.
+Qed.
+
+Theorem rev_norm_path_eq_path : ∀ el,
+  norm_list el = el
+  → rev_path el = el
+  → el = [].
+Proof.
+intros * Hn Hr.
+destruct el as [| e₁ el]; [ easy | exfalso ].
+destruct (zerop (length el mod 2)) as [Hel| Hel].
+ apply Nat.mod_divides in Hel; [ | easy ].
+ destruct Hel as (c, Hc).
+  assert (Hlt : (c < length (e₁ :: el))%nat).
+   simpl; rewrite Hc; simpl.
+   rewrite Nat.add_0_r.
+   apply Nat.lt_succ_r, Nat.le_add_r.
+
+   pose proof rev_path_nth (e₁ :: el) c Hlt as H.
+   rewrite Hr in H; simpl in H.
+   symmetry in H.
+   replace (length el - c)%nat with c in H.
+    destruct c; [ now apply no_fixpoint_negf in H | ].
+    simpl in Hlt.
+    apply Nat.succ_lt_mono in Hlt.
+    erewrite nth_indep in H; [ now apply no_fixpoint_negf in H | ].
+    rewrite Hc; simpl; rewrite Nat.add_0_r.
+    apply Nat.lt_succ_r, Nat.le_add_r.
+
+    rewrite Hc; simpl.
+    now rewrite Nat.add_0_r, Nat.add_sub.
+
+ assert (He : (length (e₁ :: el) mod 2 = 0)%nat).
+  simpl.
+  rewrite <- Nat.add_1_r.
+  rewrite <- Nat.add_mod_idemp_l; [ | easy ].
+  remember (length el mod 2) as m eqn:Hm.
+  destruct m; [ easy | ].
+  destruct m; [ easy | ].
+  assert (H : (2 ≠ 0)%nat) by easy.
+  apply (Nat.mod_upper_bound (length el)) in H.
+  rewrite <- Hm in H.
+  do 2 apply Nat.succ_lt_mono in H.
+  now apply Nat.nlt_0_r in H.
+
+  apply Nat.mod_divides in He; [ | easy ].
+  destruct He as (c, Hc).
+  destruct c; [ easy | ].
+  assert (Hlt : (S c < length (e₁ :: el))%nat).
+   rewrite Hc; simpl; rewrite Nat.add_0_r.
+   apply Nat.lt_succ_r; rewrite Nat.add_comm.
+   apply Nat.le_add_r.
+
+   generalize Hlt; intros H.
+   apply rev_path_nth in H.
+   rewrite Hr in H.
+   remember (e₁ :: el) as el₂; simpl in H.
+   rewrite Hc in H; simpl in H.
+   rewrite Nat.add_0_r, Nat.add_sub in H; subst el₂.
+   rename H into Hlen.
+   pose proof nth_in_consec_split free_elem c (e₁ :: el) ạ⁻¹ ạ Hlt.
+   destruct H as (l₁ & l₂ & Hll).
+   rewrite Hlen, <- Hn in Hll.
+   now apply norm_list_no_consec in Hll.
+Qed.
+
+Theorem rev_path_eq_path : ∀ el,
+  rev_path (norm_list el) = norm_list el
+  → norm_list el = [].
+Proof.
+intros el Hel.
+remember (norm_list el) as el₁ eqn:Hel₁.
+assert (H : norm_list el₁ = el₁) by (subst el₁; apply norm_list_idemp).
+clear el Hel₁.
+rename el₁ into el; rename H into Hn.
+now apply rev_norm_path_eq_path.
+Qed.
+
+Theorem norm_list_app_diag_is_nil : ∀ el,
+  norm_list (el ++ el) = []
+  → norm_list el = [].
+Proof.
+intros el Hel.
+rewrite norm_list_normal_l in Hel.
+rewrite norm_list_normal_r in Hel.
+apply norm_list_app_is_nil in Hel; try now rewrite norm_list_idemp.
+now apply rev_path_eq_path.
 Qed.
