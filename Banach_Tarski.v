@@ -2119,37 +2119,46 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
   matrix_of_unit_axis_cos_sin_angle (V ux uy uz, c, s).
 
 Definition axis_cos_sin_angle_of_matrix M :=
-  let v := rotation_unit_axis M in
   let cosθ := ((mat_trace M - 1) / 2)%R in
-  let sinθ :=
-    let M' := matrix_of_unit_axis_cos_sin_angle (v, 0, 1) in
-    let cosθ' := ((mat_trace (M * M') - 1) / 2)%R in
-    (- cosθ')%R
-  in
+  let sinθ := √ (1 - cosθ²) in
+  let v := (/ sinθ ⁎ rotation_axis M)%vec in
   (v, cosθ, sinθ).
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
   (v ≠ 0)%vec
+  → s ≠ 0%R
   → axis_cos_sin_angle_of_matrix (matrix_of_axis_cos_sin_angle (v, c, s)) =
       (v, c, s).
 Proof.
-intros v cosθ sinθ Hv.
+intros v cosθ sinθ Hvnz Hsnz.
+remember (v, cosθ, sinθ) as acs eqn:Hacs.
+unfold axis_cos_sin_angle_of_matrix.
+remember (matrix_of_axis_cos_sin_angle acs) as M eqn:HM.
+remember (mat_trace M) as tr eqn:Htr.
+remember ((tr - 1) / 2)%R as c eqn:Hc.
+remember (√ (1 - c²))%R as s eqn:Hs.
+subst acs; simpl.
+simpl in HM.
+destruct v as (x, y, z).
+remember (√ (x² + y² + z²)) as r eqn:Hr.
 bbb.
 
+intros v cosθ sinθ Hv.
 remember (v, cosθ, sinθ) as acs eqn:Hacs.
 destruct v as (x, y, z).
 unfold axis_cos_sin_angle_of_matrix.
 remember (matrix_of_axis_cos_sin_angle acs) as M eqn:HM.
-unfold rotation_unit_axis.
+unfold rotation_axis.
 remember (mat_trace M) as tr eqn:Htr.
 remember ((tr - 1) / 2)%R as c eqn:Hc.
 subst acs; simpl in HM.
 remember (√ (x² + y² + z²))%R as r eqn:Hr.
 rewrite HM in Htr; unfold mkrmat, mat_trace in Htr; simpl in Htr.
 do 2 rewrite <- Rplus_assoc in Htr.
-remember ((x / r)²)%R as xr eqn:Hxr.
-remember ((y / r)²)%R as yr eqn:Hyr.
-remember ((z / r)²)%R as zr eqn:Hzr.
+simpl.
+remember (x / r)%R as xr eqn:Hxr.
+remember (y / r)%R as yr eqn:Hyr.
+remember (z / r)%R as zr eqn:Hzr.
 replace
   (xr * (1 - cosθ) + cosθ + yr * (1 - cosθ) + cosθ + zr * (1 - cosθ) + cosθ)%R
 with ((xr + yr + zr) * (1 - cosθ) + 3 * cosθ)%R in Htr by lra.
@@ -2160,6 +2169,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
  apply sqr_vec_norm_eq_0 in Hr.
  now destruct Hr as (H1 & H2 & H3); subst x y z.
+*)
 
  rewrite Rsqr_div in Htr; [ | easy ].
  rewrite Rsqr_div in Htr; [ | easy ].
