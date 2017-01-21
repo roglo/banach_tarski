@@ -2121,17 +2121,18 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
 Definition axis_cos_sin_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
   let sinθ := √ (1 - cosθ²) in
-  let v := (/ (2 * sinθ) ⁎ rotation_axis M)%vec in
+  let v := rotation_axis M in
   (v, cosθ, sinθ).
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
-  (v ≠ 0)%vec
-  → (0 < s)%R
+  (0 < s)%R
+  → ∥v∥ = (2 * s)%R
   → (s² + c² = 1)%R
   → axis_cos_sin_angle_of_matrix (matrix_of_axis_cos_sin_angle (v, c, s)) =
       (v, c, s).
 Proof.
-intros v cosθ sinθ Hvnz Hsp Hsc.
+intros v cosθ sinθ Hsp Hvs Hsc.
+assert (Hvnz : (v ≠ 0)%vec) by (intros H; rewrite H, vec_norm_0 in Hvs; lra).
 remember (v, cosθ, sinθ) as acs eqn:Hacs.
 unfold axis_cos_sin_angle_of_matrix.
 remember (matrix_of_axis_cos_sin_angle acs) as M eqn:HM.
@@ -2182,93 +2183,19 @@ assert (Hrnz : r ≠ 0%R).
   rewrite sqrt_Rsqr in Hs; [ | lra ].
   move Hs at top; subst sinθ; clear H.
   f_equal; f_equal; symmetry.
-  f_equal; ring_simplify.
-   rewrite Rmult_comm.
-   do 2 rewrite <- Rmult_assoc.
-   replace (s * 2)%R with (2 * s)%R by lra.
-   rewrite Rinv_r; [ | lra ].
-   rewrite Rmult_1_l.
-bbb.
+  simpl in Hvs.
+  rewrite <- Hr in Hvs.
+  f_equal; ring_simplify; rewrite Rmult_shuffle0, <- Hvs.
+   rewrite Hx₁; unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
+   rewrite Rinv_l; [ lra | easy ].
 
-intros v cosθ sinθ Hv.
-remember (v, cosθ, sinθ) as acs eqn:Hacs.
-destruct v as (x, y, z).
-unfold axis_cos_sin_angle_of_matrix.
-remember (matrix_of_axis_cos_sin_angle acs) as M eqn:HM.
-unfold rotation_axis.
-remember (mat_trace M) as tr eqn:Htr.
-remember ((tr - 1) / 2)%R as c eqn:Hc.
-subst acs; simpl in HM.
-remember (√ (x² + y² + z²))%R as r eqn:Hr.
-rewrite HM in Htr; unfold mkrmat, mat_trace in Htr; simpl in Htr.
-do 2 rewrite <- Rplus_assoc in Htr.
-simpl.
-remember (x / r)%R as xr eqn:Hxr.
-remember (y / r)%R as yr eqn:Hyr.
-remember (z / r)%R as zr eqn:Hzr.
-replace
-  (xr * (1 - cosθ) + cosθ + yr * (1 - cosθ) + cosθ + zr * (1 - cosθ) + cosθ)%R
-with ((xr + yr + zr) * (1 - cosθ) + 3 * cosθ)%R in Htr by lra.
-rewrite Hxr, Hyr, Hzr in Htr.
-destruct (Req_dec r 0) as [Hrz| Hrnz].
- move Hrz at top; subst r.
- symmetry in Hr.
- apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hr.
- now destruct Hr as (H1 & H2 & H3); subst x y z.
-*)
+   rewrite Hy₁; unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
+   rewrite Rinv_l; [ lra | easy ].
 
- rewrite Rsqr_div in Htr; [ | easy ].
- rewrite Rsqr_div in Htr; [ | easy ].
- rewrite Rsqr_div in Htr; [ | easy ].
- do 2 rewrite <- Rdiv_plus_distr in Htr.
- rewrite Hr in Htr.
- rewrite Rsqr_sqrt in Htr; [ | apply nonneg_sqr_vec_norm ].
- rewrite Rdiv_same in Htr; [ | now intros H; rewrite H, sqrt_0 in Hr ].
- rewrite Rmult_1_l in Htr.
- replace (1 - cosθ + 3 * cosθ)%R with (1 + 2 * cosθ)%R in Htr by lra.
- rewrite Htr in Hc.
- replace c with cosθ by lra.
- clear c tr Hc Htr.
- f_equal; [ f_equal | ].
-  unfold rotation_axis; simpl.
-  remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
-  remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
-  remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
-  remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
-  destruct (Req_dec r₀ 0) as [H₁| H₁].
+   rewrite Hz₁; unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
+   rewrite Rinv_l; [ lra | easy ].
+Qed.
 
-bbb.
-  (* sinθ *)
-  Focus 2.
-  symmetry; simpl.
-  remember (vec_normalize (rotation_axis M)) as u eqn:Hu.
-  destruct u as (u₁, u₂, u₃).
-  unfold mat_trace, mkrmat; simpl.
-  progress repeat rewrite Rplus_0_r.
-  progress repeat rewrite Rminus_0_r.
-  progress repeat rewrite Rmult_1_r.
-  subst xr yr zr; simpl.
-  remember (x / r)%R as xr eqn:Hxr.
-  remember (y / r)%R as yr eqn:Hyr.
-  remember (z / r)%R as zr eqn:Hzr.
-bbb.
-  rewrite HM; simpl.
-  rename cosθ into c.
-  unfold Rminus.
-  do 9 rewrite Rmult_plus_distr_r.
-  do 18 rewrite Rmult_plus_distr_l.
-  progress repeat rewrite Rmult_1_r.
-  progress repeat rewrite <- Ropp_mult_distr_r.
-  progress repeat rewrite <- Ropp_mult_distr_l.
-  progress repeat rewrite Rmult_plus_distr_r.
-  progress repeat rewrite fold_Rminus.
-  progress repeat rewrite <- Ropp_mult_distr_l.
-  progress repeat rewrite fold_Rminus.
-  unfold Rminus.
-  progress repeat rewrite <- Rplus_assoc.
-  progress repeat rewrite <- Rmult_assoc.
-  progress repeat rewrite fold_Rminus.
 bbb.
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
