@@ -2126,7 +2126,7 @@ Definition axis_cos_sin_angle_of_matrix M :=
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
   (v ≠ 0)%vec
-  → (0 ≤ s)%R
+  → (0 < s)%R
   → (s² + c² = 1)%R
   → axis_cos_sin_angle_of_matrix (matrix_of_axis_cos_sin_angle (v, c, s)) =
       (v, c, s).
@@ -2178,9 +2178,12 @@ assert (Hrnz : r ≠ 0%R).
   move H at top; subst c₁; clear Hc.
   assert (H : (sinθ² = 1 - c²)%R) by lra.
   rewrite <- H in Hs.
-  rewrite sqrt_Rsqr in Hs; [ | easy ].
+  rewrite sqrt_Rsqr in Hs; [ | lra ].
   move Hs at top; subst sinθ; clear H.
-  f_equal; f_equal.
+  f_equal; f_equal; symmetry.
+  f_equal; ring_simplify; rewrite Rmult_shuffle0.
+   rewrite Rmult_comm, Rmult_assoc, Rinv_l; [ | lra ].
+   ring_simplify.
 bbb.
 
   apply (f_equal Rsqr) in Hs.
