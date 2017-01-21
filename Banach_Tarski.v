@@ -2121,12 +2121,13 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
 Definition axis_cos_sin_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
   let sinθ := √ (1 - cosθ²) in
+(*
   let v := rotation_axis M in
   (v, cosθ, sinθ).
-(*
+*)
   let v := (/ (2 * sinθ) ⁎ rotation_axis M)%vec in
   (v, cosθ, sinθ).
-*)
+(**)
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
   (v ≠ 0)%vec
@@ -2186,22 +2187,12 @@ assert (Hrnz : r ≠ 0%R).
   rewrite sqrt_Rsqr in Hs; [ | lra ].
   move Hs at top; subst sinθ; clear H.
   f_equal; f_equal; symmetry.
-  f_equal; ring_simplify; rewrite Rmult_shuffle0.
-bbb.
-   rewrite Rmult_comm, Rmult_assoc, Rinv_l; [ | lra ].
-   field_simplify; do 2 rewrite Rdiv_1_r.
-bbb.
-
-  apply (f_equal Rsqr) in Hs.
-  rewrite Rsqr_sqrt in Hs.
-   assert (H: (s² = sinθ²)%R) by lra.
-   clear Hs; rename H into Hs.
-bbb.
-
-ring_simplify in Htr.
-rewrite Htr in Hc.
-ring_simplify in Hc.
-
+  f_equal; ring_simplify.
+   rewrite Rmult_comm.
+   do 2 rewrite <- Rmult_assoc.
+   replace (s * 2)%R with (2 * s)%R by lra.
+   rewrite Rinv_r; [ | lra ].
+   rewrite Rmult_1_l.
 bbb.
 
 intros v cosθ sinθ Hv.
