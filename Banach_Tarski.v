@@ -2121,12 +2121,12 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
 Definition axis_cos_sin_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
   let sinθ := √ (1 - cosθ²) in
-  let v := rotation_axis M in
+  let v := rotation_unit_axis M in
   (v, cosθ, sinθ).
 
 Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
   (0 < s)%R
-  → ∥v∥ = (2 * s)%R
+  → ∥v∥ = 1%R
   → (s² + c² = 1)%R
   → axis_cos_sin_angle_of_matrix (matrix_of_axis_cos_sin_angle (v, c, s)) =
       (v, c, s).
@@ -2142,58 +2142,49 @@ remember (√ (1 - c²))%R as s eqn:Hs.
 subst acs; simpl.
 simpl in HM.
 destruct v as (x, y, z).
-remember (√ (x² + y² + z²)) as r eqn:Hr.
-unfold rotation_axis.
+simpl in Hvs.
+rewrite Hvs in HM.
+progress repeat rewrite Rdiv_1_r in HM.
+unfold rotation_unit_axis, rotation_axis; simpl.
 rewrite HM; unfold mkrmat ; simpl.
 unfold mat_trace in Htr.
 rewrite HM in Htr; unfold mkrmat in Htr; simpl in Htr.
 rename cosθ into c₁.
-remember (x / r)%R as x₁ eqn:Hx₁.
-remember (y / r)%R as y₁ eqn:Hy₁.
-remember (z / r)%R as z₁ eqn:Hz₁.
 do 2 rewrite <- Rplus_assoc in Htr.
-replace (x₁² * (1 - c₁) + c₁ + y₁² * (1 - c₁) + c₁ + z₁² * (1 - c₁) + c₁)%R
-with ((x₁² + y₁² + z₁²) * (1 - c₁) + 3 * c₁)%R in Htr by lra.
-assert (Hrnz : r ≠ 0%R).
- intros H; move H at top; subst r.
- symmetry in Hr.
- apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hr.
- now destruct Hr as (H1 & H2 & H3); subst x y z.
+replace (x² * (1 - c₁) + c₁ + y² * (1 - c₁) + c₁ + z² * (1 - c₁) + c₁)%R
+with ((x² + y² + z²) * (1 - c₁) + 3 * c₁)%R in Htr by lra.
+assert (Hv2s : (x² + y² + z² = 1)%R).
+ apply (f_equal Rsqr) in Hvs.
+ rewrite Rsqr_sqrt in Hvs; [ | apply nonneg_sqr_vec_norm ].
+ rewrite Hvs; apply Rsqr_1.
 
- assert (Hr₁ : (x₁² + y₁² + z₁² = 1)%R).
-  rewrite Hx₁, Hy₁, Hz₁.
-  rewrite Rsqr_div; [ | easy ].
-  rewrite Rsqr_div; [ | easy ].
-  rewrite Rsqr_div; [ | easy ].
-  do 2 rewrite <- Rdiv_plus_distr.
-  rewrite Hr.
-  rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-  rewrite Rdiv_same; [ easy | ].
-  intros H; rewrite H in Hr.
-  now rewrite sqrt_0 in Hr.
-
-  rewrite Hr₁ in Htr.
-  ring_simplify in Htr.
-  rewrite Htr in Hc.
-  assert (H : c = c₁) by lra.
-  move H at top; subst c₁; clear Hc.
-  assert (H : (sinθ² = 1 - c²)%R) by lra.
-  rewrite <- H in Hs.
-  rewrite sqrt_Rsqr in Hs; [ | lra ].
-  move Hs at top; subst sinθ; clear H.
-  f_equal; f_equal; symmetry.
-  simpl in Hvs.
-  rewrite <- Hr in Hvs.
-  f_equal; ring_simplify; rewrite Rmult_shuffle0, <- Hvs.
-   rewrite Hx₁; unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
-   rewrite Rinv_l; [ lra | easy ].
-
-   rewrite Hy₁; unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
-   rewrite Rinv_l; [ lra | easy ].
-
-   rewrite Hz₁; unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
-   rewrite Rinv_l; [ lra | easy ].
+ rewrite Hv2s, Rmult_1_l in Htr.
+ ring_simplify in Htr.
+ rewrite Htr in Hc.
+ assert (H : c = c₁) by lra.
+ move H at top; subst c₁; clear Hc.
+ assert (H : (sinθ² = 1 - c²)%R) by lra.
+ rewrite <- H in Hs.
+ rewrite sqrt_Rsqr in Hs; [ | lra ].
+ move Hs at top; subst sinθ; clear H.
+ f_equal; f_equal; symmetry.
+ replace (y * z * (1 - c) + x * s - (y * z * (1 - c) - x * s))%R
+ with (2 * x * s)%R by lra.
+ replace (x * z * (1 - c) + y * s - (x * z * (1 - c) - y * s))%R
+ with (2 * y * s)%R by lra.
+ replace (x * y * (1 - c) + z * s - (x * y * (1 - c) - z * s))%R
+ with (2 * z * s)%R by lra.
+ progress repeat rewrite Rsqr_mult.
+ progress repeat rewrite <- Rmult_plus_distr_r.
+ progress repeat rewrite <- Rmult_plus_distr_l.
+ rewrite Hv2s, Rmult_1_r.
+ rewrite <- Rsqr_mult.
+ rewrite sqrt_Rsqr; [ | lra ].
+ replace (2 * x * s / (2 * s))%R with ((2 * s) * / (2 * s) * x)%R by lra.
+ replace (2 * y * s / (2 * s))%R with ((2 * s) * / (2 * s) * y)%R by lra.
+ replace (2 * z * s / (2 * s))%R with ((2 * s) * / (2 * s) * z)%R by lra.
+ rewrite Rinv_r; [ | lra ].
+ f_equal; lra.
 Qed.
 
 bbb.
