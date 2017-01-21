@@ -2121,7 +2121,7 @@ Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
 Definition axis_cos_sin_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
   let sinθ := √ (1 - cosθ²) in
-  let v := rotation_unit_axis M in
+  let v := rotation_axis M in
   (v, cosθ, sinθ).
 (*
   let v := (/ (2 * sinθ) ⁎ rotation_axis M)%vec in
@@ -2139,10 +2139,6 @@ intros v cosθ sinθ Hvnz Hsp Hsc.
 remember (v, cosθ, sinθ) as acs eqn:Hacs.
 unfold axis_cos_sin_angle_of_matrix.
 remember (matrix_of_axis_cos_sin_angle acs) as M eqn:HM.
-unfold rotation_unit_axis, vec_normalize.
-remember (rotation_axis M) as a eqn:Ha.
-destruct a as (xa, ya, za); simpl.
-remember (√ (xa² + ya² + za²)) as ra eqn:Hra.
 remember (mat_trace M) as tr eqn:Htr.
 remember ((tr - 1) / 2)%R as c eqn:Hc.
 remember (√ (1 - c²))%R as s eqn:Hs.
@@ -2150,9 +2146,7 @@ subst acs; simpl.
 simpl in HM.
 destruct v as (x, y, z).
 remember (√ (x² + y² + z²)) as r eqn:Hr.
-unfold Rdiv.
-setoid_rewrite Rmult_comm.
-rewrite vec_mul_diag, Ha; simpl.
+unfold rotation_axis.
 rewrite HM; unfold mkrmat ; simpl.
 unfold mat_trace in Htr.
 rewrite HM in Htr; unfold mkrmat in Htr; simpl in Htr.
