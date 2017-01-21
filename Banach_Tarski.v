@@ -1115,45 +1115,34 @@ Theorem rotation_fixpoint_on_sphere : ∀ r M,
 Proof.
 intros * Hm.
 unfold rotation_fixpoint; simpl.
-unfold rotation_unit_axis; simpl.
-unfold vec_const_mul.
-remember (vec_normalize (rotation_axis M)) as v eqn:Hv.
-destruct v as (v₁, v₂, v₃).
 do 3 rewrite Rsqr_mult.
 do 2 rewrite <- Rmult_plus_distr_l.
-bbb.
+remember (a₃₂ M - a₂₃ M)%R as x eqn:Hx.
+remember (a₁₃ M - a₃₁ M)%R as y eqn:Hy.
+remember (a₂₁ M - a₁₂ M)%R as z eqn:Hz.
+remember (x² + y² + z²)%R as r₁ eqn:Hr₁.
+destruct (Req_dec r₁ 0) as [Hrz| Hrz].
+ move Hrz at top; subst r₁; symmetry in Hr₁.
+ apply sqr_vec_norm_eq_0 in Hr₁.
+ destruct Hr₁ as (H1 & H2 & H3); subst x y z.
+ apply Rminus_diag_uniq in H1.
+ apply Rminus_diag_uniq in H2.
+ apply Rminus_diag_uniq in H3.
+ unfold mat_transp, mkrmat.
+ destruct M; simpl in *.
+ now subst.
 
-enough (H : (v₁² + v₂² + v₃² = 1)%R) by (rewrite H; lra).
-specialize (normalized_vec_normalize (rotation_axis M)) as Hn.
-rewrite <- Hv in Hn; simpl in Hn.
-apply (f_equal Rsqr) in Hn.
- rewrite Rsqr_sqrt in Hn; [ | apply nonneg_sqr_vec_norm ].
- now rewrite Hn, Rsqr_1.
+ destruct (Req_dec (√ r₁) 0) as [Hsrz| Hsrz].
+  apply sqrt_eq_0 in Hsrz; [ easy | ].
+  rewrite Hr₁; apply nonneg_sqr_vec_norm.
 
- unfold rotation_axis; simpl.
- remember (a₃₂ M - a₂₃ M)%R as x eqn:Hx.
- remember (a₁₃ M - a₃₁ M)%R as y eqn:Hy.
- remember (a₂₁ M - a₁₂ M)%R as z eqn:Hz.
- remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
- destruct (Req_dec r₁ 0) as [Hrz| Hrz].
-  exfalso; apply Hm; clear Hm.
-  move Hrz at top; subst r₁.
-  symmetry in Hr₁.
-  apply sqrt_eq_0 in Hr₁; [ | apply nonneg_sqr_vec_norm ].
-  apply sqr_vec_norm_eq_0 in Hr₁.
-  destruct Hr₁ as (H1 & H2 & H3); subst x y z.
-  apply Rminus_diag_uniq in H1.
-  apply Rminus_diag_uniq in H2.
-  apply Rminus_diag_uniq in H3.
-  unfold mat_transp, mkrmat.
-  destruct M; simpl in *.
-  now subst.
-
-  intros H.
-  injection H; clear H; intros H3 H2 H1.
-  clear Hx Hy Hz; subst x y z.
-  rewrite Rsqr_0, Rplus_0_l, Rplus_0_l in Hr₁.
-  now rewrite sqrt_0 in Hr₁.
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  do 2 rewrite <- Rdiv_plus_distr.
+  rewrite Rsqr_sqrt; [ | subst r₁; apply nonneg_sqr_vec_norm ].
+  rewrite <- Hr₁.
+  rewrite Rdiv_same; [ now rewrite Rmult_1_r | easy ].
 Qed.
 
 Theorem fixpoint_of_path_on_sphere : ∀ r el,
@@ -2145,6 +2134,8 @@ Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
       (v, c, s).
 Proof.
 intros v cosθ sinθ Hv.
+bbb.
+
 remember (v, cosθ, sinθ) as acs eqn:Hacs.
 destruct v as (x, y, z).
 unfold axis_cos_sin_angle_of_matrix.
