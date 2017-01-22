@@ -2199,153 +2199,49 @@ unfold rotation_unit_axis in Hax.
 remember (rotation_axis M) as v eqn:Hv.
 destruct v as (x₀, y₀, z₀).
 simpl in Hax.
-injection Hax; clear Hax; intros Hz Hy Hx.
+injection Hax; clear Hax; intros Hz Hy Hx; simpl.
 remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
 remember (√ (x² + y² + z²))%R as r eqn:Hr.
-bbb.
-
+remember ((mat_trace M - 1) / 2)%R as tr eqn:Htr.
+unfold mat_trace in Htr.
+unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
+unfold mat_det in Hdet.
+unfold mat_transp, mkrmat in Hntr.
+unfold mkrmat.
+destruct M; simpl in *.
+injection Hrm; clear Hrm.
+intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+unfold rotation_axis in Hv; simpl in Hv.
+injection Hv; clear Hv; intros Hz' Hy' Hx'.
 destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  move Hr₀z at top; subst r₀.
  symmetry in Hr₀.
  apply sqrt_eq_0 in Hr₀; [ | apply nonneg_sqr_vec_norm ].
  apply sqr_vec_norm_eq_0 in Hr₀.
- destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
- clear Hx Hy Hz.
- symmetry in Hv.
- unfold rotation_axis in Hv; simpl in Hv.
- remember (a₃₂ M - a₂₃ M)%R as x₀ eqn:Hx₀.
- remember (a₁₃ M - a₃₁ M)%R as y₀ eqn:Hy₀.
- remember (a₂₁ M - a₁₂ M)%R as z₀ eqn:Hz₀.
- remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
- destruct (Req_dec r₀ 0) as [H₁| H₁].
-  move H₁ at top; subst r₀.
-  symmetry in Hr₀.
-  apply sqrt_eq_0 in Hr₀; [ | apply nonneg_sqr_vec_norm ].
-  apply sqr_vec_norm_eq_0 in Hr₀.
-  destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
-  apply Rminus_diag_uniq in H1.
-  apply Rminus_diag_uniq in H2.
-  apply Rminus_diag_uniq in H3.
-  remember (mat_trace M) as tr eqn:Htr.
-  remember ((tr - 1) / 2)%R as c eqn:Hc.
-  unfold mat_trace in Htr.
-bbb.
-  rewrite H3.
-  replace (a₁₂ M - a₁₂ M)%R with 0%R by lra.
-  rewrite Rdiv_0_l.
-  do 3 rewrite Rmult_0_r, Rminus_0_r, Rplus_0_r.
-  remember (Rlt_dec (a₂₂ M) (a₁₁ M)) as P eqn:HP.
-  remember (Rlt_dec (a₃₃ M) (a₁₁ M)) as Q eqn:HQ.
-  specialize (ortho_matrix_coeff_interv M Hrm) as Hai.
-  destruct (and_dec P Q) as [HPQ| HPQ]; subst P Q.
-   injection Hv; clear Hv; intros Hz'₁ Hy'₁ Hx'₁.
-   apply sqrt_eq_0 in Hx'₁; lra.
+ move Hr₀ at top; destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
+ symmetry in Hx', Hy', Hz'.
+ apply Rminus_diag_uniq in Hx'.
+ apply Rminus_diag_uniq in Hy'.
+ apply Rminus_diag_uniq in Hz'.
+ move Hx' at top; subst a₃₂.
+ move Hy' at top; subst a₁₃.
+ move Hz' at top; subst a₂₁.
+ easy.
 
-   destruct (Rlt_dec (a₃₃ M) (a₂₂ M)) as [H₂| H₂].
-    injection Hv; clear Hv; intros Hz'₁ Hy'₁ Hx'₁.
-    apply sqrt_eq_0 in Hy'₁; lra.
+ assert (Hr1 : r = 1%R).
+  rewrite Hr, Hx, Hy, Hz.
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  do 2 rewrite <- Rdiv_plus_distr.
+  rewrite sqrt_div; [ | apply nonneg_sqr_vec_norm | now apply Rlt_0_sqr ].
+  rewrite <- Hr₀.
+  rewrite sqrt_Rsqr; [ | rewrite Hr₀; apply sqrt_pos ].
+  rewrite Rdiv_same; [ easy | lra ].
 
-    injection Hv; clear Hv; intros Hz'₁ Hy'₁ Hx'₁.
-    apply sqrt_eq_0 in Hz'₁; [ | lra ].
-    assert (H33 : a₃₃ M = (-1)%R) by lra.
-    assert (H22 : a₂₂ M = (-1)%R) by lra.
-    assert (H11 : a₁₁ M = (-1)%R) by lra.
-    (* so the trace is equal to -3 which is not possible; the problem
-       is that I failed to prove it :-) *)
-    exfalso.
-    unfold mat_det in Hdet.
-    rewrite H11, H22, H33, H1, H2, H3 in Hdet.
-    ring_simplify in Hdet.
-    do 3 rewrite <- Rsqr_pow2 in Hdet.
-    unfold mat_mul in Hrm.
-    simpl in Hrm.
-    rewrite H1, H2, H3, H11, H22, H33 in Hrm.
-    unfold mat_id, mkrmat in Hrm.
-    injection Hrm; clear Hrm; intros; simpl in *.
-    ring_simplify in H.
-    ring_simplify in H0.
-    ring_simplify in H4.
-    ring_simplify in H5.
-    ring_simplify in H6.
-    ring_simplify in H7.
-    ring_simplify in H8.
-    ring_simplify in H9.
-    ring_simplify in H10.
-    repeat rewrite <- Rsqr_pow2 in *.
-    apply Rplus_eq_compat_r with (r := (-1)%R) in H10.
-    apply Rplus_eq_compat_r with (r := (-1)%R) in H6.
-    ring_simplify in H10.
-    ring_simplify in H6.
-    assert ((a₁₂ M)² = 0)%R by lra.
-    assert ((a₃₁ M)² = 0)%R by lra.
-    assert ((a₂₃ M)² = 0)%R by lra.
-    rewrite H12, H13, H14 in Hdet.
-    ring_simplify in Hdet.
-    apply Rsqr_eq_0 in H12.
-    rewrite H12 in Hdet; lra.
-
-  injection Hv; clear Hv; intros.
-  clear Hx₀ Hy₀ Hz₀; subst x₀ y₀ z₀.
-  rewrite Rsqr_0 in Hr₀.
-  do 2 rewrite Rplus_0_r in Hr₀.
-  now rewrite sqrt_0 in Hr₀.
-
- rewrite Hx, Hy, Hz in Hr.
- rewrite Rsqr_div in Hr; [ | lra ].
- rewrite Rsqr_div in Hr; [ | lra ].
- rewrite Rsqr_div in Hr; [ | lra ].
- do 2 rewrite <- Rdiv_plus_distr in Hr.
- rewrite sqrt_div_alt in Hr; [ | now apply Rlt_0_sqr ].
- rewrite <- Hr₀ in Hr.
- rewrite sqrt_Rsqr in Hr; [ | rewrite Hr₀; apply sqrt_pos ].
- rewrite Rdiv_same in Hr; [ | easy ].
- subst r.
- do 3 rewrite Rdiv_1_r.
- remember (mat_trace M) as tr eqn:Htr.
- remember ((tr - 1) / 2)%R as c eqn:Hc.
-(**)
- unfold rotation_axis in Hv.
- remember (a₃₂ M - a₂₃ M)%R as x₁ eqn:Hx₁.
- remember (a₁₃ M - a₃₁ M)%R as y₁ eqn:Hy₁.
- remember (a₂₁ M - a₁₂ M)%R as z₁ eqn:Hz₁.
- destruct (Req_dec ∥(V x₁ y₁ z₁)∥ 0) as [Hr₁z| Hr₁nz].
-Focus 2.
-  injection Hv; clear Hv; intros H1 H2 H3.
-  move H1 at top; move H2 at top; move H3 at top; subst x₁ y₁ z₁.
-  clear Hr₁nz.
-
-bbb.
-
- unfold mat_trace in Htr.
- unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
- unfold mat_det in Hdet.
- unfold mkrmat.
- destruct M; simpl in *.
- injection Hrm; clear Hrm.
- intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
- unfold rotation_axis in Hv; simpl in Hv.
- remember (a₃₂ - a₂₃)%R as x₁ eqn:Hx₁.
- remember (a₁₃ - a₃₁)%R as y₁ eqn:Hy₁.
- remember (a₂₁ - a₁₂)%R as z₁ eqn:Hz₁.
- remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
- destruct (Req_dec r₁ 0) as [Hr₁z| Hr₁nz].
-  move Hr₁z at top; subst r₁.
-  symmetry in Hr₁.
-  apply sqrt_eq_0 in Hr₁; [ | apply nonneg_sqr_vec_norm ].
-  apply sqr_vec_norm_eq_0 in Hr₁.
-  move Hr₁ at top; destruct Hr₁ as (H1 & H2 & H3); subst x₁ y₁ z₁.
-  symmetry in Hx₁, Hy₁, Hz₁.
-  apply Rminus_diag_uniq in Hx₁.
-  apply Rminus_diag_uniq in Hy₁.
-  apply Rminus_diag_uniq in Hz₁.
-  move Hx₁ at top; subst a₃₂.
-  move Hy₁ at top; subst a₁₃.
-  move Hz₁ at top; subst a₂₁.
-  destruct (and_dec (Rlt_dec a₂₂ a₁₁) (Rlt_dec a₃₃ a₁₁)) as [HPQ| HPQ].
-   injection Hv; clear Hv; intros H3 H2 H1.
-   rewrite <- H1 in H2, H3.
-   f_equal.
-    rewrite Hc, Htr.
+  move Hr1 at top; subst r.
+  progress repeat rewrite Rdiv_1_r.
+  f_equal.
 bbb.
 
 (* playing with quaternions, just for fun... *)
