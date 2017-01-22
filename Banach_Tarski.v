@@ -2245,9 +2245,10 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   destruct H as (Hr₀2 & Hr1).
   move Hr1 at top; subst r.
   progress repeat rewrite Rdiv_1_r.
+  clear Hr Hntr H23 H13 H12 H11.
+  subst x y z c.
   f_equal.
-   rewrite Hx, Rsqr_div; [ | easy ].
-   rewrite Hc.
+   rewrite Rsqr_div; [ | easy ].
    apply Rmult_eq_reg_r with (r := (2 * r₀²)%R); [ | lra ].
    symmetry.
    rewrite Rmult_plus_distr_r.
@@ -2258,10 +2259,9 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
    rewrite Rinv_r; [ | easy ].
    rewrite Rmult_1_r, Hr₀.
    rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-   rewrite Hx', Hy', Hz', Htr.
+   subst x₀ y₀ z₀ tr.
    ring_simplify.
-   clear c Hc tr Htr x y z Hx Hy Hz Hr Hx' Hy' Hz' r₀ Hr₀ Hr₀nz Hntr Hr₀2.
-   clear H23 H13 H12 H11.
+   clear r₀ Hr₀ Hr₀nz Hr₀2.
    Time nsatz.
 bbb.
 
