@@ -2186,14 +2186,12 @@ assert (Hv2s : (x² + y² + z² = 1)%R).
  f_equal; lra.
 Qed.
 
-bbb.
-
-Theorem matrix_of_axis_angle_inv : ∀ M,
+Theorem axis_angle_of_matrix_inv : ∀ M,
   is_rotation_matrix M
-  → M ≠ mat_id
+  → M ≠ mat_transp M
   → matrix_of_axis_angle (axis_angle_of_matrix M) = M.
 Proof.
-intros M (Hrm, Hdet) Hid; symmetry.
+intros M (Hrm, Hdet) Hntr; symmetry.
 unfold matrix_of_axis_angle, axis_angle_of_matrix.
 remember (rotation_unit_axis M) as axis eqn:Hax.
 destruct axis as (x, y, z).
@@ -2204,6 +2202,8 @@ simpl in Hax.
 injection Hax; clear Hax; intros Hz Hy Hx.
 remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
 remember (√ (x² + y² + z²))%R as r eqn:Hr.
+bbb.
+
 destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  move Hr₀z at top; subst r₀.
  symmetry in Hr₀.
