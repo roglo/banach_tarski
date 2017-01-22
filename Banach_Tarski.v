@@ -505,8 +505,6 @@ destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
 destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
 unfold mat_trace.
 split; [ | lra ].
-bbb.
-
 unfold mat_det in Hdet.
 destruct M; simpl in *.
 unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
@@ -616,7 +614,7 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
       rewrite Rmult_0_r, Rmult_0_l in Hv; lra.
 
      idtac.
-bbb.
+Abort.
 (* chais pas...
 let truc est vrai, pourtant, mais chais pas comment le démontrer.
 
@@ -2292,7 +2290,8 @@ apply Rsqr_le_abs_1.
 replace (Rabs 2)%R with 2%R; [ now apply Rabs_le | ].
 unfold Rabs.
 destruct (Rcase_abs 2); [ lra | easy ].
-bbb.
+Abort.
+(* requires to first prove that -1 ≤ tr ≤ 3 *)
 
 (* playing with quaternions, just for fun... *)
 
@@ -2671,7 +2670,7 @@ Qed.
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
   → (sinθ² + cosθ² = 1)%R
-  → is_rotation_matrix (matrix_of_axis_angle p cosθ sinθ).
+  → is_rotation_matrix (matrix_of_axis_angle (p, cosθ, sinθ)).
 Proof.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
@@ -2711,7 +2710,7 @@ Qed.
 
 Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
   (sinθ² + cosθ² = 1)%R
-  → (matrix_of_axis_angle p cosθ sinθ * p)%vec = p.
+  → (matrix_of_axis_angle (p, cosθ, sinθ) * p)%vec = p.
 Proof.
 intros (xp, yp, zp) * Hsc.
 remember ((√ (xp² + yp² + zp²))%R) as r eqn:Hr.
@@ -2757,7 +2756,7 @@ assert(Hsc : (sinθ² = (1 - cosθ²))%R).
  replace 1%R with (1 ^ 2)%R at 4 by lra.
  apply pow_maj_Rabs, Rabs_le; lra.
 
- exists (matrix_of_axis_angle p cosθ sinθ).
+ exists (matrix_of_axis_angle (p, cosθ, sinθ)).
  split.
   split.
    apply matrix_of_axis_angle_is_rotation_matrix; [ easy | lra ].
@@ -2843,7 +2842,7 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
   if eq_vec_dec px 0 then mat_id
-  else matrix_of_axis_angle (/ ∥px∥ ⁎ px) (cos θ) (sin θ).
+  else matrix_of_axis_angle (px, cos θ, sin θ).
 
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ∥p₁∥ = ∥p₂∥
