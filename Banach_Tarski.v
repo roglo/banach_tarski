@@ -2230,7 +2230,8 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  move Hz' at top; subst a₂₁.
  easy.
 
- assert (Hr1 : r = 1%R).
+ assert (H : (r₀² ≠ 0 ∧ r = 1)%R).
+  split; [ now intros H; apply Hr₀nz; apply Rsqr_eq_0 in H | ].
   rewrite Hr, Hx, Hy, Hz.
   rewrite Rsqr_div; [ | easy ].
   rewrite Rsqr_div; [ | easy ].
@@ -2241,25 +2242,27 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   rewrite sqrt_Rsqr; [ | rewrite Hr₀; apply sqrt_pos ].
   rewrite Rdiv_same; [ easy | lra ].
 
+  destruct H as (Hr₀2 & Hr1).
   move Hr1 at top; subst r.
   progress repeat rewrite Rdiv_1_r.
   f_equal.
    rewrite Hx, Rsqr_div; [ | easy ].
    rewrite Hc.
-   apply Rmult_eq_reg_r with (r := (2 * r₀²)%R).
-    symmetry.
-    rewrite Rmult_plus_distr_r.
-    replace (x₀² / r₀² * (1 - (tr - 1) / 2) * (2 * r₀²))%R
-    with (x₀² * (3 - tr) * (r₀² * / r₀²))%R by lra.
-    replace ((tr - 1) / 2 * (2 * r₀²))%R
-    with ((tr - 1) * r₀²)%R by lra.
-    rewrite Rinv_r.
-     rewrite Rmult_1_r.
-     rewrite Hr₀.
-     rewrite Rsqr_sqrt.
-     rewrite Hx', Hy', Hz', Htr.
-     ring_simplify.
-     Time nsatz.
+   apply Rmult_eq_reg_r with (r := (2 * r₀²)%R); [ | lra ].
+   symmetry.
+   rewrite Rmult_plus_distr_r.
+   replace (x₀² / r₀² * (1 - (tr - 1) / 2) * (2 * r₀²))%R
+   with (x₀² * (3 - tr) * (r₀² * / r₀²))%R by lra.
+   replace ((tr - 1) / 2 * (2 * r₀²))%R
+   with ((tr - 1) * r₀²)%R by lra.
+   rewrite Rinv_r; [ | easy ].
+   rewrite Rmult_1_r, Hr₀.
+   rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Hx', Hy', Hz', Htr.
+   ring_simplify.
+   clear c Hc tr Htr x y z Hx Hy Hz Hr Hx' Hy' Hz' r₀ Hr₀ Hr₀nz Hntr Hr₀2.
+   clear H23 H13 H12 H11.
+   Time nsatz.
 bbb.
 
     replace (x₀² / r₀² * (1 - tr) * r₀²)%R
