@@ -2202,11 +2202,13 @@ simpl in Hax.
 injection Hax; clear Hax; intros Hz Hy Hx; simpl.
 remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
 remember (√ (x² + y² + z²))%R as r eqn:Hr.
-remember ((mat_trace M - 1) / 2)%R as tr eqn:Htr.
-unfold mat_trace in Htr.
+remember (mat_trace M) as tr eqn:Htr.
+remember ((tr - 1) / 2)%R as c eqn:Hc.
+unfold mat_trace in Hc.
 unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
 unfold mat_det in Hdet.
 unfold mat_transp, mkrmat in Hntr.
+unfold mat_trace in Htr; simpl in Htr.
 unfold mkrmat.
 destruct M; simpl in *.
 injection Hrm; clear Hrm.
@@ -2242,6 +2244,30 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   move Hr1 at top; subst r.
   progress repeat rewrite Rdiv_1_r.
   f_equal.
+   rewrite Hx, Rsqr_div; [ | easy ].
+   rewrite Hc.
+   apply Rmult_eq_reg_r with (r := (2 * r₀²)%R).
+    symmetry.
+    rewrite Rmult_plus_distr_r.
+    replace (x₀² / r₀² * (1 - (tr - 1) / 2) * (2 * r₀²))%R
+    with (x₀² * (3 - tr) * (r₀² * / r₀²))%R by lra.
+    replace ((tr - 1) / 2 * (2 * r₀²))%R
+    with ((tr - 1) * r₀²)%R by lra.
+    rewrite Rinv_r.
+     rewrite Rmult_1_r.
+     rewrite Hr₀.
+     rewrite Rsqr_sqrt.
+     rewrite Hx', Hy', Hz', Htr.
+     ring_simplify.
+     Time nsatz.
+bbb.
+
+    replace (x₀² / r₀² * (1 - tr) * r₀²)%R
+    with (x₀² * (1 - tr) * (r₀² * / r₀²))%R by lra.
+    rewrite Rinv_r.
+     rewrite Rmult_1_r, Hr₀.
+     rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+     rewrite Hx', Hy', Hz'.
 bbb.
 
 (* playing with quaternions, just for fun... *)
