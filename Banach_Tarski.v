@@ -2262,19 +2262,23 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
    clear r₀ Hr₀ Hr₀nz Hr₀2.
    Time nsatz.
 
-   apply Rmult_eq_reg_l with (r := (2 * r₀²)%R); [ | lra ].
+   apply Rmult_eq_reg_l with (r := (4 * r₀²)%R); [ | lra ].
    rewrite Rmult_minus_distr_l.
    do 3 rewrite <- Rmult_assoc.
-bbb.
-   replace (x₀² / r₀² * (1 - (tr - 1) / 2) * (2 * r₀²))%R
-   with (x₀² * (3 - tr) * (r₀² * / r₀²))%R by lra.
-   replace ((tr - 1) / 2 * (2 * r₀²))%R
-   with ((tr - 1) * r₀²)%R by lra.
-   rewrite Rinv_r; [ rewrite Rmult_1_r, Hr₀ | easy ].
-   rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-   subst x₀ y₀ z₀ tr; ring_simplify.
-   clear r₀ Hr₀ Hr₀nz Hr₀2.
-   Time nsatz.
+   do 2 rewrite Rsqr_pow2.
+   replace (4 * r₀ ^ 2 * (x₀ / r₀) * (y₀ / r₀))%R
+   with (4 * x₀ * y₀ * (r₀ / r₀) * (r₀ / r₀))%R by lra.
+   replace (4 * r₀ ^ 2 * (z₀ / r₀))%R
+   with (4 * r₀ * z₀ * (r₀ / r₀))%R by lra.
+   rewrite Rdiv_same; [ do 3 rewrite Rmult_1_r | lra ].
+   replace (1 - ((tr - 1) / 2) ^ 2)%R with ((4 - (tr - 1) ^ 2) / 4)%R
+     by lra.
+   rewrite sqrt_div; [ | | lra ].
+Focus 2.
+ring_simplify.
+enough (-1 ≤ tr ≤ 3)%R.
+(* big problem: false even with this hypothesis *)
+lra.
 
 bbb.
 
