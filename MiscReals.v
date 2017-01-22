@@ -385,3 +385,6 @@ intros.
 unfold Rminus.
 rewrite Rmult_plus_distr_r; lra.
 Qed.
+
+Theorem Rminus_plus: ∀ x y, (x - y + y = x)%R.
+Proof. intros; lra. Qed.

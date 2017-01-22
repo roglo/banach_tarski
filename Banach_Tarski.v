@@ -2245,7 +2245,7 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   destruct H as (Hr₀2 & Hr1).
   move Hr1 at top; subst r.
   progress repeat rewrite Rdiv_1_r.
-  clear Hr Hntr H23 H13 H12 H11.
+  clear H23 H13 H12 H11.
   subst x y z c.
   rewrite Rsqr_div; [ | easy ].
   symmetry.
@@ -2259,7 +2259,7 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
    rewrite Rinv_r; [ rewrite Rmult_1_r, Hr₀ | easy ].
    rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
    subst x₀ y₀ z₀ tr; ring_simplify.
-   clear r₀ Hr₀ Hr₀nz Hr₀2.
+   clear r₀ Hr Hr₀ Hr₀nz Hr₀2 Hntr.
    Time nsatz.
 
    apply Rmult_eq_reg_l with (r := (4 * r₀²)%R); [ | lra ].
@@ -2275,19 +2275,20 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
      by lra.
    rewrite sqrt_div; [ | | lra ].
 Focus 2.
-ring_simplify.
 enough (-1 ≤ tr ≤ 3)%R.
-(* big problem: false even with this hypothesis *)
-lra.
-
-bbb.
-
-    replace (x₀² / r₀² * (1 - tr) * r₀²)%R
-    with (x₀² * (1 - tr) * (r₀² * / r₀²))%R by lra.
-    rewrite Rinv_r.
-     rewrite Rmult_1_r, Hr₀.
-     rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-     rewrite Hx', Hy', Hz'.
+assert (-2 ≤ tr - 1 ≤ 2)%R by lra.
+remember (tr - 1)%R as a.
+clear -H0.
+rewrite <- Rsqr_pow2.
+apply Rplus_le_reg_r with (r := (a²)%R).
+rewrite Rplus_0_l.
+rewrite Rminus_plus.
+replace 4%R with (2 ^ 2)%R by lra.
+rewrite <- Rsqr_pow2.
+apply Rsqr_le_abs_1.
+replace (Rabs 2)%R with 2%R; [ now apply Rabs_le | ].
+unfold Rabs.
+destruct (Rcase_abs 2); [ lra | easy ].
 bbb.
 
 (* playing with quaternions, just for fun... *)
