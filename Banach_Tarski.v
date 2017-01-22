@@ -2247,11 +2247,10 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   progress repeat rewrite Rdiv_1_r.
   clear Hr Hntr H23 H13 H12 H11.
   subst x y z c.
+  rewrite Rsqr_div; [ | easy ].
   f_equal.
-   rewrite Rsqr_div; [ | easy ].
    apply Rmult_eq_reg_r with (r := (2 * r₀²)%R); [ | lra ].
-   symmetry.
-   rewrite Rmult_plus_distr_r.
+   symmetry; rewrite Rmult_plus_distr_r.
    replace (x₀² / r₀² * (1 - (tr - 1) / 2) * (2 * r₀²))%R
    with (x₀² * (3 - tr) * (r₀² * / r₀²))%R by lra.
    replace ((tr - 1) / 2 * (2 * r₀²))%R
