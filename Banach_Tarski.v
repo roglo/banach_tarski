@@ -505,6 +505,8 @@ destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
 destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
 unfold mat_trace.
 split; [ | lra ].
+bbb.
+
 unfold mat_det in Hdet.
 destruct M; simpl in *.
 unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
@@ -614,7 +616,8 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
       rewrite Rmult_0_r, Rmult_0_l in Hv; lra.
 
      idtac.
-Abort. (* chais pas...
+bbb.
+(* chais pas...
 let truc est vrai, pourtant, mais chais pas comment le démontrer.
 
 bbb.
