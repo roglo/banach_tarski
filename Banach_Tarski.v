@@ -2105,37 +2105,36 @@ Definition rotation_around p :=
 Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
-Definition matrix_of_unit_axis_cos_sin_angle '(V x y z, c, s) :=
+Definition matrix_of_unit_axis_angle '(V x y z, c, s) :=
   mkrmat
     (x²*(1-c)+c) (x*y*(1-c)-z*s) (x*z*(1-c)+y*s)
     (x*y*(1-c)+z*s) (y²*(1-c)+c) (y*z*(1-c)-x*s)
     (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
 
-Definition matrix_of_axis_cos_sin_angle '(V x y z, c, s) :=
+Definition matrix_of_axis_angle '(V x y z, c, s) :=
   let r := (√ (x² + y² + z²))%R in
   let ux := (x / r)%R in
   let uy := (y / r)%R in
   let uz := (z / r)%R in
-  matrix_of_unit_axis_cos_sin_angle (V ux uy uz, c, s).
+  matrix_of_unit_axis_angle (V ux uy uz, c, s).
 
-Definition axis_cos_sin_angle_of_matrix M :=
+Definition axis_angle_of_matrix M :=
   let cosθ := ((mat_trace M - 1) / 2)%R in
   let sinθ := √ (1 - cosθ²) in
   let v := rotation_unit_axis M in
   (v, cosθ, sinθ).
 
-Theorem matrix_of_axis_cos_sin_angle_inv : ∀ v c s,
+Theorem matrix_of_axis_angle_inv : ∀ v c s,
   (0 < s)%R
   → ∥v∥ = 1%R
   → (s² + c² = 1)%R
-  → axis_cos_sin_angle_of_matrix (matrix_of_axis_cos_sin_angle (v, c, s)) =
-      (v, c, s).
+  → axis_angle_of_matrix (matrix_of_axis_angle (v, c, s)) = (v, c, s).
 Proof.
 intros v cosθ sinθ Hsp Hvs Hsc.
 assert (Hvnz : (v ≠ 0)%vec) by (intros H; rewrite H, vec_norm_0 in Hvs; lra).
 remember (v, cosθ, sinθ) as acs eqn:Hacs.
-unfold axis_cos_sin_angle_of_matrix.
-remember (matrix_of_axis_cos_sin_angle acs) as M eqn:HM.
+unfold axis_angle_of_matrix.
+remember (matrix_of_axis_angle acs) as M eqn:HM.
 remember (mat_trace M) as tr eqn:Htr.
 remember ((tr - 1) / 2)%R as c eqn:Hc.
 remember (√ (1 - c²))%R as s eqn:Hs.
@@ -2189,13 +2188,13 @@ Qed.
 
 bbb.
 
-Theorem matrix_of_axis_cos_sin_angle_inv : ∀ M,
+Theorem matrix_of_axis_angle_inv : ∀ M,
   is_rotation_matrix M
   → M ≠ mat_id
-  → matrix_of_axis_cos_sin_angle (axis_cos_sin_angle_of_matrix M) = M.
+  → matrix_of_axis_angle (axis_angle_of_matrix M) = M.
 Proof.
 intros M (Hrm, Hdet) Hid; symmetry.
-unfold matrix_of_axis_cos_sin_angle, axis_cos_sin_angle_of_matrix.
+unfold matrix_of_axis_angle, axis_angle_of_matrix.
 remember (rotation_unit_axis M) as axis eqn:Hax.
 destruct axis as (x, y, z).
 unfold rotation_unit_axis in Hax.
@@ -2726,7 +2725,7 @@ Qed.
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
   → (sinθ² + cosθ² = 1)%R
-  → is_rotation_matrix (matrix_of_axis_cos_sin_angle p cosθ sinθ).
+  → is_rotation_matrix (matrix_of_axis_angle p cosθ sinθ).
 Proof.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
@@ -2747,7 +2746,7 @@ assert (Hrnz : (r ≠ 0)%R).
   subst x y z.
   now symmetry; apply z_of_xy.
 
-  unfold matrix_of_axis_cos_sin_angle.
+  unfold matrix_of_axis_angle.
   rewrite <- Hr, <- Hx, <- Hy, <- Hz.
   split.
    unfold mat_transp, mat_mul, mat_id; simpl.
@@ -2766,7 +2765,7 @@ Qed.
 
 Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
   (sinθ² + cosθ² = 1)%R
-  → (matrix_of_axis_cos_sin_angle p cosθ sinθ * p)%vec = p.
+  → (matrix_of_axis_angle p cosθ sinθ * p)%vec = p.
 Proof.
 intros (xp, yp, zp) * Hsc.
 remember ((√ (xp² + yp² + zp²))%R) as r eqn:Hr.
@@ -2777,7 +2776,7 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  destruct Hrz as (Hx & Hy & Hz); subst xp yp zp.
  now rewrite mat_vec_mul_0_r.
 
- unfold matrix_of_axis_cos_sin_angle; simpl.
+ unfold matrix_of_axis_angle; simpl.
  rewrite <- Hr.
  specialize (z_of_xy xp yp zp r Hr Hrnz) as Hz.
  f_equal; ring_simplify.
@@ -2812,7 +2811,7 @@ assert(Hsc : (sinθ² = (1 - cosθ²))%R).
  replace 1%R with (1 ^ 2)%R at 4 by lra.
  apply pow_maj_Rabs, Rabs_le; lra.
 
- exists (matrix_of_axis_cos_sin_angle p cosθ sinθ).
+ exists (matrix_of_axis_angle p cosθ sinθ).
  split.
   split.
    apply matrix_of_axis_angle_is_rotation_matrix; [ easy | lra ].
@@ -2898,7 +2897,7 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
   if eq_vec_dec px 0 then mat_id
-  else matrix_of_axis_cos_sin_angle (/ ∥px∥ ⁎ px) (cos θ) (sin θ).
+  else matrix_of_axis_angle (/ ∥px∥ ⁎ px) (cos θ) (sin θ).
 
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ∥p₁∥ = ∥p₂∥
