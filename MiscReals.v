@@ -377,3 +377,11 @@ apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
 apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
+
+Theorem Rmult_minus_distr_r : ∀ r1 r2 r3,
+  ((r1 - r2) * r3)%R = (r1 * r3 - r2 * r3)%R.
+Proof.
+intros.
+unfold Rminus.
+rewrite Rmult_plus_distr_r; lra.
+Qed.
