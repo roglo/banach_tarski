@@ -2833,32 +2833,10 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
  specialize (Rle_0_sqr x) as Hs.
  apply sqrt_eq_0 in H; lra.
 
- assert (Hca : ∀ x, cos (atan x) ≠ 0%R).
-  intros y Hy.
-  specialize (cos_eq_0_0 _ Hy) as (k, Hay).
+ assert (Hca : ∀ x, (0 < cos (atan x))%R).
+  intros y.
   specialize (atan_bound y) as (Hlta, Halt).
-  rewrite Hay in Hlta, Halt.
-  destruct k as [| k| k]; [ lra | | ].
-   assert (H : (IZR (Z.pos k) * PI < PI)%R) by lra.
-   apply Rmult_lt_compat_r with (r := (/ PI)%R) in H.
-    rewrite Rmult_assoc in H.
-    rewrite Rinv_r in H; [ | apply PI_neq0 ].
-    rewrite Rmult_1_r in H.
-    replace 1%R with (IZR 1) in H by lra.
-    apply lt_IZR in H; lia.
-
-    apply Rinv_0_lt_compat, PI_RGT_0.
-
-   assert (H : (- PI < IZR (Z.neg k) * PI)%R) by lra.
-   apply Rmult_lt_compat_r with (r := (/ PI)%R) in H.
-    rewrite <- Ropp_mult_distr_l in H.
-    rewrite Rmult_assoc in H.
-    rewrite Rinv_r in H; [ | apply PI_neq0 ].
-    rewrite Rmult_1_r in H.
-    replace (-1)%R with (IZR (-1)) in H by lra.
-    apply lt_IZR in H; lia.
-
-    apply Rinv_0_lt_compat, PI_RGT_0.
+  apply cos_gt_0; [ lra | easy ].
 
   apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
   rewrite <- Rinv_div, Rinv_l; [ | easy ].
@@ -2866,12 +2844,14 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
   assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
   subst x.
   destruct (Req_dec (cos y) 0) as [Hc| Hc].
-   exfalso; rewrite Hy in Hc; revert Hc.
-   apply Hca.
+   specialize (Hca (tan y)) as H.
+   rewrite <- Hy, Hc in H.
+   now apply Rlt_irrefl in H.
 
+bbb.
    assert (Hcp : (0 < Rabs (cos y))%R) by now apply Rabs_pos_lt.
    unfold tan.
-   rewrite Rsqr_div; [ | easy ].
+   rewrite Rsqr_div; [ | ].
    apply Rmult_eq_reg_r with (r := Rabs (cos y)); [ | lra ].
    replace (Rabs (cos y)) with (√ (cos y)²) by apply sqrt_Rsqr_abs.
    rewrite Rmult_shuffle0, Rmult_assoc.
