@@ -2819,8 +2819,8 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
-Definition arcsin x := atan (x / sqrt (1 - x²)).
-Definition arccos x := (PI / 2 - arcsin x)%R.
+Definition asin x := atan (x / sqrt (1 - x²)).
+Definition acos x := (PI / 2 - asin x)%R.
 
 Theorem Rinv_div : ∀ x, (/ x = 1 / x)%R.
 Proof. intros; lra. Qed.
@@ -2843,31 +2843,31 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
    apply Rmult_lt_compat_r with (r := (/ PI)%R) in H.
     rewrite Rmult_assoc in H.
     rewrite Rinv_r in H; [ | apply PI_neq0 ].
-
     rewrite Rmult_1_r in H.
     replace 1%R with (IZR 1) in H by lra.
-    apply lt_IZR, Zlt_not_le in H.
-    apply H; clear H.
-SearchAbout (1 <= Z.pos _)%Z.
+    apply lt_IZR in H; lia.
+
+    apply Rinv_0_lt_compat, PI_RGT_0.
+
+   assert (H : (- PI < IZR (Z.neg k) * PI)%R) by lra.
+   apply Rmult_lt_compat_r with (r := (/ PI)%R) in H.
+    rewrite <- Ropp_mult_distr_l in H.
+    rewrite Rmult_assoc in H.
+    rewrite Rinv_r in H; [ | apply PI_neq0 ].
+    rewrite Rmult_1_r in H.
+    replace (-1)%R with (IZR (-1)) in H by lra.
+    apply lt_IZR in H; lia.
+
+    apply Rinv_0_lt_compat, PI_RGT_0.
+
+  apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
+  rewrite <- Rinv_div, Rinv_l; [ | easy ].
 bbb.
-
-   assert (H : (0 < IZR (Z.pos k) * PI + PI)%R) by lra.
-   clear Hlta; rename H into Hlta.
-  clear Halt; rename H into Halt.
-
-   simpl in Halt.
-
-  destruct (Z_zerop k) as [Hk| Hk]; [ subst k; lra | ].
-  destruct (Z_lt_le_dec k 0) as [Hkneg| Hkpos].
-
-bbb.
- apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
- rewrite <- Rinv_div, Rinv_l; [ | easy ].
- remember (atan x) as y eqn:Hy.
- assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
- subst x.
- destruct (Req_dec (cos y) 0) as [Hc| Hc].
-  exfalso.
+  remember (atan x) as y eqn:Hy.
+  assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
+  subst x.
+  destruct (Req_dec (cos y) 0) as [Hc| Hc].
+   exfalso.
 bbb.
 
 Theorem sin_atan : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
@@ -2888,10 +2888,10 @@ bbb.
 rewrite Rdiv_div.
 bbb.
 
-Theorem sin_arcsin : ∀ x, sin (arcsin x) = x.
+Theorem sin_asin : ∀ x, sin (asin x) = x.
 Proof.
 intros.
-unfold arcsin.
+unfold asin.
 bbb.
 
 assert (Hs : ∀ x, ((sin x)² = (tan x)² / (1 + (tan x)²))%R).
@@ -2910,10 +2910,10 @@ bbb.
  apply Rsqr_inj in Hs; [ easy | | ].
 bbb.
 
-Theorem cos_arccos : ∀ x, cos (arccos x) = x.
+Theorem cos_acos : ∀ x, cos (acos x) = x.
 Proof.
 intros.
-unfold arccos; rewrite cos_shift.
+unfold acos; rewrite cos_shift.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
@@ -2932,7 +2932,7 @@ Definition J₁_of_nats r '(nf, no, nf', no', n, k) : (vector * ℝ * ℝ) :=
   let p := fold_right rotate p₂ (path_of_nat no) in
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
-  let a := arccos ((p · p') / r²) in
+  let a := acos ((p · p') / r²) in
   let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
   (px, cos θ, sin θ).
@@ -2953,7 +2953,7 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p := fold_right rotate p₂ (path_of_nat no) in
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
-  let a := arccos ((p · p') / r²) in
+  let a := acos ((p · p') / r²) in
   let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
   if eq_vec_dec px 0 then mat_id
@@ -3057,7 +3057,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
     destruct (bool_dec (is_neg_vec p₃) (is_neg_vec q₃)) as [Hb₃| Hb₃].
      move Hpq₃ at top; subst q₃; clear Hb₃.
      exists nf', no'.
-     remember (arccos ((p · p') / r²)) as a eqn:Ha.
+     remember (acos ((p · p') / r²)) as a eqn:Ha.
      remember (Z.to_nat (Int_part (a / (2 * PI)))) as k eqn:Hk.
      exists n, k.
      unfold J₁_of_nats.
@@ -3125,7 +3125,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
     destruct (bool_dec (is_neg_vec p₃) (is_neg_vec q₃)) as [Hb₃| Hb₃].
      move Hpq₃ at top; subst q₃; clear Hb₃.
      exists nf', no'.
-     remember (arccos ((p · p') / r²)) as a eqn:Ha.
+     remember (acos ((p · p') / r²)) as a eqn:Ha.
      remember (Z.to_nat (Int_part (a / (2 * PI)))) as k eqn:Hk.
      exists n, k.
      unfold J₀_of_nats.
