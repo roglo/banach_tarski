@@ -2822,6 +2822,39 @@ Qed.
 Definition arcsin x := atan (x / sqrt (1 - x²)).
 Definition arccos x := (PI / 2 - arcsin x)%R.
 
+Theorem sin_arcsin : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
+Proof.
+intros.
+bbb.
+
+Theorem sin_arcsin : ∀ x, sin (arcsin x) = x.
+Proof.
+intros.
+unfold arcsin.
+bbb.
+
+assert (Hs : ∀ x, ((sin x)² = (tan x)² / (1 + (tan x)²))%R).
+
+bbb.
+ (* if Hs proved *)
+ specialize (Hs (atan (x / √ (1 - x²)))).
+ rewrite atan_right_inv in Hs.
+ rewrite Rsqr_div in Hs.
+ rewrite Rsqr_sqrt in Hs.
+ rewrite Rdiv_div in Hs.
+ rewrite Rmult_plus_distr_l in Hs.
+ rewrite Rmult_1_r in Hs.
+ rewrite Rmult_div_r in Hs.
+ rewrite Rminus_plus, Rdiv_1_r in Hs.
+ apply Rsqr_inj in Hs; [ easy | | ].
+bbb.
+
+Theorem cos_arccos : ∀ x, cos (arccos x) = x.
+Proof.
+intros.
+unfold arccos; rewrite cos_shift.
+bbb.
+
 (* J₁(r) = set of rotations given by its axis and its angle, such that
    for some natural number n, and some p in D ∩ sphere(r), R^n(p) is
    also in D ∩ sphere(r). *)

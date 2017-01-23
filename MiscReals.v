@@ -388,3 +388,17 @@ Qed.
 
 Theorem Rminus_plus: ∀ x y, (x - y + y = x)%R.
 Proof. intros; lra. Qed.
+
+Theorem Rdiv_div : ∀ x y z, y ≠ 0%R → z ≠ 0%R → (x / y / z = x / (y * z))%R.
+Proof.
+intros * Hy Hz.
+unfold Rdiv.
+rewrite Rinv_mult_distr; [ lra | easy | easy ].
+Qed.
+
+Theorem Rmult_div_r : ∀ x y, y ≠ 0%R → (y * (x / y) = x)%R.
+Proof.
+intros * Hy.
+unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
+rewrite Rinv_l; [ lra | easy ].
+Qed.
