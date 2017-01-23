@@ -2822,9 +2822,42 @@ Qed.
 Definition arcsin x := atan (x / sqrt (1 - x²)).
 Definition arccos x := (PI / 2 - arcsin x)%R.
 
+Theorem Rinv_div : ∀ x, (/ x = 1 / x)%R.
+Proof. intros; lra. Qed.
+
+Theorem cos_atan : ∀ x, cos (atan x) = (1 / √ (1 + x²))%R.
+Proof.
+intros.
+assert (Hs : (√ (1 + x²) ≠ 0)%R).
+ intros H.
+ specialize (Rle_0_sqr x) as Hs.
+ apply sqrt_eq_0 in H; lra.
+
+ apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
+ rewrite <- Rinv_div, Rinv_l; [ | easy ].
+ remember (atan x) as y eqn:Hy.
+ assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
+ subst x.
+bbb.
+ destruct (Req_dec (cos y) 0) as [Hc| Hc].
+bbb.
+
 Theorem sin_atan : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
 Proof.
 intros.
+destruct (Req_dec (cos (atan x)) 0) as [Hc| Hc].
+SearchAbout (cos (atan _)).
+bbb.
+
+remember (atan x) as y eqn:Hy.
+assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
+subst x.
+unfold tan.
+ rewrite Hc.
+ unfold tan in Hy.
+bbb.
+
+rewrite Rdiv_div.
 bbb.
 
 Theorem sin_arcsin : ∀ x, sin (arcsin x) = x.
