@@ -295,19 +295,11 @@ Proof. intros b; now destruct b. Qed.
 Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
 Proof.
-intros * Hs HF.
-revert l2 HF.
-induction l1 as [| x]; intros.
- destruct l2 as [| y]; [ constructor | ].
- now apply Forall2_nil_cons in HF.
-
- destruct l2 as [| y].
-  now apply Forall2_cons_nil in HF.
-
-  apply Forall2_cons_cons in HF.
-  destruct HF as (HR & HF).
-  constructor; [ now apply Hs | ].
-  now apply IHl1.
+intros * Hs HF; revert l2 HF.
+induction l1; intros; [ now destruct l2 | ].
+destruct l2; [ now apply Forall2_cons_nil in HF | ].
+apply Forall2_cons_cons in HF.
+now constructor; [ apply Hs | apply IHl1 ].
 Qed.
 
 (* Type-theoretical Choice Axiom *)

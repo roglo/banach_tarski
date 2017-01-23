@@ -2836,7 +2836,8 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
  assert (Hca : ∀ x, cos (atan x) ≠ 0%R).
   intros y Hy.
   specialize (cos_eq_0_0 _ Hy) as (k, Hay).
-  specialize (atan_bound y) as Hab.
+  specialize (atan_bound y) as (Hlta, Halt).
+  rewrite Hay in Hlta, Halt.
 
 bbb.
  apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
