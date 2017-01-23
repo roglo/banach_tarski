@@ -2862,12 +2862,25 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
 
   apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
   rewrite <- Rinv_div, Rinv_l; [ | easy ].
-bbb.
   remember (atan x) as y eqn:Hy.
   assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
   subst x.
   destruct (Req_dec (cos y) 0) as [Hc| Hc].
-   exfalso.
+   exfalso; rewrite Hy in Hc; revert Hc.
+   apply Hca.
+
+   assert (Hcp : (0 < Rabs (cos y))%R) by now apply Rabs_pos_lt.
+   unfold tan.
+   rewrite Rsqr_div; [ | easy ].
+   apply Rmult_eq_reg_r with (r := Rabs (cos y)); [ | lra ].
+   replace (Rabs (cos y)) with (√ (cos y)²) by apply sqrt_Rsqr_abs.
+   rewrite Rmult_shuffle0, Rmult_assoc.
+   rewrite <- sqrt_mult_alt; [ | apply Rle_0_sqr ].
+   rewrite Rmult_plus_distr_l, Rmult_1_r.
+   rewrite Rmult_div_r; [ | intros H; apply Rsqr_eq_0 in H; lra ].
+   rewrite Rplus_comm, sin2_cos2.
+   rewrite sqrt_1, Rmult_1_r, Rmult_1_l.
+(* rats !!! *)
 bbb.
 
 Theorem sin_atan : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
