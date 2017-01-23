@@ -2838,6 +2838,27 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
   specialize (cos_eq_0_0 _ Hy) as (k, Hay).
   specialize (atan_bound y) as (Hlta, Halt).
   rewrite Hay in Hlta, Halt.
+  destruct k as [| k| k]; [ lra | | ].
+   assert (H : (IZR (Z.pos k) * PI < PI)%R) by lra.
+   apply Rmult_lt_compat_r with (r := (/ PI)%R) in H.
+    rewrite Rmult_assoc in H.
+    rewrite Rinv_r in H; [ | apply PI_neq0 ].
+
+    rewrite Rmult_1_r in H.
+    replace 1%R with (IZR 1) in H by lra.
+    apply lt_IZR, Zlt_not_le in H.
+    apply H; clear H.
+SearchAbout (1 <= Z.pos _)%Z.
+bbb.
+
+   assert (H : (0 < IZR (Z.pos k) * PI + PI)%R) by lra.
+   clear Hlta; rename H into Hlta.
+  clear Halt; rename H into Halt.
+
+   simpl in Halt.
+
+  destruct (Z_zerop k) as [Hk| Hk]; [ subst k; lra | ].
+  destruct (Z_lt_le_dec k 0) as [Hkneg| Hkpos].
 
 bbb.
  apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
