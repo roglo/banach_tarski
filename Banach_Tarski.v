@@ -2819,6 +2819,9 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
+Definition arcsin x := atan (x / sqrt (1 - x²)).
+Definition arccos x := (PI / 2 - arcsin x)%R.
+
 (* J₁(r) = set of rotations given by its axis and its angle, such that
    for some natural number n, and some p in D ∩ sphere(r), R^n(p) is
    also in D ∩ sphere(r). *)
@@ -2830,6 +2833,16 @@ Definition J₁ r :=
      ∃ p p' n, p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      ((R ^ n)%mat * p)%vec = p').
 
+Definition J₁_of_nats r '(nf, no, nf', no', n, k) : (vector * ℝ * ℝ) :=
+  let p₂ := fixpoint_of_nat r nf in
+  let p := fold_right rotate p₂ (path_of_nat no) in
+  let p₃ := fixpoint_of_nat r nf' in
+  let p' := fold_right rotate p₃ (path_of_nat no') in
+  let a := arccos ((p · p') / r²) in
+  let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
+  let px := p × p' in
+  (px, cos θ, sin θ).
+
 (* J₀(r) = set of rotations R, such that for some natural number n,
    and some p in D ∩ sphere(r), R^n(p) is also in D ∩ sphere(r). *)
 Definition J₀ r :=
@@ -2840,9 +2853,6 @@ Definition J₀ r :=
 
 (* J(p₁) = subset of J₀(∥p₁∥) of rotations aroung a vec p₁. *)
 Definition J p₁ := mkset (λ R₁, R₁ ∈ rotation_around p₁ ∧ R₁ ∈ J₀ ∥p₁∥).
-
-Definition arcsin x := atan (x / sqrt (1 - x²)).
-Definition arccos x := (PI / 2 - arcsin x)%R.
 
 Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p₂ := fixpoint_of_nat r nf in
@@ -2897,6 +2907,66 @@ Theorem J₁_is_countable : ∀ r,
   ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
 Proof.
 intros r.
+apply surj_prod_6_nat_surj_nat.
+exists (J₁_of_nats r).
+intros ((v, c), s) Hv.
+destruct Hv as (Hvn & Hcs & p & p' & n & Hp & Hp' & Hv).
+remember (matrix_of_axis_angle (v, c, s)) as M eqn:HM.
+destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
+destruct Hp' as ((el' & p₃ & (el₃ & Hso₃) & Hn₃& Hr₃) & Hp').
+assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
+ split.
+  rewrite rotate_vec_mul in Hso₂.
+  rewrite <- Hso₂.
+  apply on_sphere_after_rotation; [ easy | ].
+  apply mat_of_path_is_rotation_matrix.
+
+  rewrite rotate_vec_mul in Hso₃.
+  rewrite <- Hso₃.
+  apply on_sphere_after_rotation; [ easy | ].
+  apply mat_of_path_is_rotation_matrix.
+
+ destruct H as (Hp₂s, Hp₃s).
+ apply rotate_rev_path in Hso₂.
+ apply rotate_rev_path in Hso₃.
+ remember (nat_of_path el) as nf eqn:Hnf.
+ remember (nat_of_path (rev_path el₂)) as no eqn:Hno.
+ remember (nat_of_path el') as nf' eqn:Hnf'.
+ remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
+ remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
+ remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
+ assert (Hpq₂ :
+  p₂ =
+    if bool_dec (is_neg_vec p₂) (is_neg_vec q₂) then q₂
+    else (- q₂)%vec).
+  subst nf.
+  unfold fixpoint_of_nat in Hq₂.
+  rewrite path_of_nat_inv in Hq₂.
+  rewrite rotate_vec_mul in Hr₂.
+  clear Hn₃.
+  eapply axis_and_fixpoint_of_path_collinear; try eassumption.
+  now subst q₂; apply fixpoint_of_path_on_sphere.
+  assert (Hpq₃ :
+   p₃ =
+     if bool_dec (is_neg_vec p₃) (is_neg_vec q₃) then q₃
+     else (- q₃)%vec).
+   subst nf'.
+   unfold fixpoint_of_nat in Hq₃.
+   rewrite path_of_nat_inv in Hq₃.
+   rewrite rotate_vec_mul in Hr₃.
+   eapply axis_and_fixpoint_of_path_collinear; try eassumption.
+   now subst q₃; apply fixpoint_of_path_on_sphere.
+
+   destruct (bool_dec (is_neg_vec p₂) (is_neg_vec q₂)) as [Hb₂| Hb₂].
+    move Hpq₂ at top; subst q₂; clear Hb₂.
+    exists nf, no.
+    destruct (bool_dec (is_neg_vec p₃) (is_neg_vec q₃)) as [Hb₃| Hb₃].
+     move Hpq₃ at top; subst q₃; clear Hb₃.
+     exists nf', no'.
+     remember (arccos ((p · p') / r²)) as a eqn:Ha.
+     remember (Z.to_nat (Int_part (a / (2 * PI)))) as k eqn:Hk.
+     exists n, k.
+     unfold J₁_of_nats.
 bbb.
 
 Theorem J₀_is_countable : ∀ r,
