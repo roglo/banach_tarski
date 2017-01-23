@@ -2822,7 +2822,7 @@ Qed.
 Definition arcsin x := atan (x / sqrt (1 - x²)).
 Definition arccos x := (PI / 2 - arcsin x)%R.
 
-Theorem sin_arcsin : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
+Theorem sin_atan : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
 Proof.
 intros.
 bbb.
