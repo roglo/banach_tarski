@@ -2819,6 +2819,17 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
+(* J₁(r) = set of rotations given by its axis and its angle, such that
+   for some natural number n, and some p in D ∩ sphere(r), R^n(p) is
+   also in D ∩ sphere(r). *)
+Definition J₁ r :=
+  mkset
+    (λ '(axis, cosθ, sinθ),
+     ∥axis∥ = 1%R ∧ (cosθ² + sinθ² = 1)%R ∧
+     let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
+     ∃ p p' n, p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
+     ((R ^ n)%mat * p)%vec = p').
+
 (* J₀(r) = set of rotations R, such that for some natural number n,
    and some p in D ∩ sphere(r), R^n(p) is also in D ∩ sphere(r). *)
 Definition J₀ r :=
@@ -2881,6 +2892,12 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni Hpp2 Hnn Hr₁ Hr₂2).
      easy.
 Qed.
+
+Theorem J₁_is_countable : ∀ r,
+  ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
+Proof.
+intros r.
+bbb.
 
 Theorem J₀_is_countable : ∀ r,
   ∃ f : ℕ → matrix ℝ, ∀ M : matrix ℝ, M ∈ J₀ r → ∃ n : ℕ, f n = M.
