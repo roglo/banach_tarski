@@ -2843,64 +2843,49 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
   remember (atan x) as y eqn:Hy.
   assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
   subst x.
-  destruct (Req_dec (cos y) 0) as [Hc| Hc].
-   specialize (Hca (tan y)) as H.
-   rewrite <- Hy, Hc in H.
-   now apply Rlt_irrefl in H.
-
-bbb.
-   assert (Hcp : (0 < Rabs (cos y))%R) by now apply Rabs_pos_lt.
-   unfold tan.
-   rewrite Rsqr_div; [ | ].
-   apply Rmult_eq_reg_r with (r := Rabs (cos y)); [ | lra ].
-   replace (Rabs (cos y)) with (√ (cos y)²) by apply sqrt_Rsqr_abs.
-   rewrite Rmult_shuffle0, Rmult_assoc.
-   rewrite <- sqrt_mult_alt; [ | apply Rle_0_sqr ].
-   rewrite Rmult_plus_distr_l, Rmult_1_r.
-   rewrite Rmult_div_r; [ | intros H; apply Rsqr_eq_0 in H; lra ].
-   rewrite Rplus_comm, sin2_cos2.
-   rewrite sqrt_1, Rmult_1_r, Rmult_1_l.
-(* rats !!! *)
-bbb.
+  specialize (Hca (tan y)); rewrite <- Hy in Hca.
+  unfold tan.
+  rewrite Rsqr_div; [ | lra ].
+  replace (cos y) with (√ (cos y)²) at 1 by (apply sqrt_Rsqr; lra).
+  rewrite <- sqrt_mult_alt; [ | apply Rle_0_sqr ].
+  rewrite Rmult_plus_distr_l, Rmult_1_r.
+  rewrite Rmult_div_r; [ | intros H; apply Rsqr_eq_0 in H; lra ].
+  rewrite Rplus_comm, sin2_cos2.
+  apply sqrt_1.
+Qed.
 
 Theorem sin_atan : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
 Proof.
 intros.
-destruct (Req_dec (cos (atan x)) 0) as [Hc| Hc].
-SearchAbout (cos (atan _)).
-bbb.
-
+unfold Rdiv.
+rewrite Rinv_div, <- cos_atan.
 remember (atan x) as y eqn:Hy.
 assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
-subst x.
-unfold tan.
- rewrite Hc.
- unfold tan in Hy.
-bbb.
+subst x; unfold tan.
+rewrite <- Rmult_div.
+unfold Rdiv; rewrite Rmult_assoc.
+rewrite Rinv_r; [ lra | ].
+intros H; rewrite Hy in H.
+rewrite cos_atan in H.
+unfold Rdiv in H.
+apply Rmult_integral in H.
+destruct H; [ lra | ].
+apply Rinv_neq_0_compat in H; [ easy | ].
+clear H; intros H.
+apply sqrt_eq_0 in H.
+ enough (Ht : (0 ≤ (tan y)²)%R) by lra.
+ apply Rle_0_sqr.
 
-rewrite Rdiv_div.
-bbb.
+ replace 1%R with (1 ^ 2)%R by lra.
+ rewrite <- Rsqr_pow2.
+ apply nonneg_plus_sqr.
+Qed.
 
 Theorem sin_asin : ∀ x, sin (asin x) = x.
 Proof.
 intros.
 unfold asin.
-bbb.
-
-assert (Hs : ∀ x, ((sin x)² = (tan x)² / (1 + (tan x)²))%R).
-
-bbb.
- (* if Hs proved *)
- specialize (Hs (atan (x / √ (1 - x²)))).
- rewrite atan_right_inv in Hs.
- rewrite Rsqr_div in Hs.
- rewrite Rsqr_sqrt in Hs.
- rewrite Rdiv_div in Hs.
- rewrite Rmult_plus_distr_l in Hs.
- rewrite Rmult_1_r in Hs.
- rewrite Rmult_div_r in Hs.
- rewrite Rminus_plus, Rdiv_1_r in Hs.
- apply Rsqr_inj in Hs; [ easy | | ].
+rewrite sin_atan.
 bbb.
 
 Theorem cos_acos : ∀ x, cos (acos x) = x.
