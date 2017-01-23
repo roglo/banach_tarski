@@ -2881,11 +2881,31 @@ apply sqrt_eq_0 in H.
  apply nonneg_plus_sqr.
 Qed.
 
-Theorem sin_asin : ∀ x, sin (asin x) = x.
+Theorem sin_asin : ∀ x, (-1 < x < 1)%R → sin (asin x) = x.
 Proof.
-intros.
+intros * Hx.
 unfold asin.
+remember (x / √ (1 - x²))%R as y eqn:Hy.
 rewrite sin_atan.
+apply Rmult_eq_reg_r with (r := √ (1 + y²)).
+ unfold Rdiv; rewrite Rmult_assoc.
+ rewrite Rinv_l.
+  rewrite Rmult_1_r.
+  assert (Hxy : (x = y * √ (1 - x²))%R).
+   rewrite Hy.
+   unfold Rdiv; rewrite Rmult_assoc.
+   rewrite Rinv_l; [ lra | ].
+   replace 1%R with (1 ^ 2)%R by lra.
+   rewrite <- Rsqr_pow2.
+   rewrite <- Rsqr_plus_minus.
+   intros H.
+   apply sqrt_eq_0 in H.
+    apply Rmult_integral in H.
+    destruct H; lra.
+
+    apply Rmult_le_pos; lra.
+
+   rewrite Hxy.
 bbb.
 
 Theorem cos_acos : ∀ x, cos (acos x) = x.
