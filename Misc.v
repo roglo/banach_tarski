@@ -189,45 +189,19 @@ Theorem Forall2_Forall_combine : ∀ A B f (l1 : list A) (l2 : list B),
   Forall2 f l1 l2
   ↔ Forall (λ '(x, y), f x y) (combine l1 l2) ∧ length l1 = length l2.
 Proof.
-intros.
-split; intros HF.
- revert l2 HF.
- induction l1 as [| x1 l1]; intros.
-  destruct l2 as [| x2 l2]; [ | now apply Forall2_nil_cons in HF ].
-  split; [ constructor | easy ].
+intros; revert l2.
+induction l1, l2.
+all: split; [ intros HF | intros (HF, H) ]; simpl.
+ 1-6: easy.
 
-  destruct l2 as [| x2 l2]; [ now apply Forall2_cons_nil in HF | simpl ].
-  apply Forall2_cons_cons in HF.
-  destruct HF as (Hf, HF).
-  split.
-   constructor; [ easy | now apply IHl1 ].
+ apply Forall2_cons_cons in HF.
+ split; [ | now f_equal; apply IHl1 ].
+ constructor; [ easy | now apply IHl1 ].
 
-   f_equal.
-   clear -HF.
-   revert l2 HF.
-   induction l1 as [| x1 l1]; intros.
-    destruct l2 as [| x2 l2]; [ easy | ].
-    now apply Forall2_nil_cons in HF.
-
-    destruct l2 as [| x2 l2].
-     now apply Forall2_cons_nil in HF.
-
-     apply Forall2_cons_cons in HF.
-     destruct HF as (Hf, HF).
-     simpl; f_equal; now apply IHl1.
-
- destruct HF as (HF, Hlen).
- revert l2 HF Hlen.
- induction l1 as [| x1 l1]; intros.
-  destruct l2 as [| x2 l2]; [ constructor | easy ].
-
-  destruct l2 as [| x2 l2]; [ easy | ].
-  simpl in Hlen; apply Nat.succ_inj in Hlen.
-  simpl in HF.
-  apply Forall_inv2 in HF.
-  destruct HF as (Hf, HF).
-  constructor; [ easy | ].
-  now apply IHl1.
+ simpl in HF; apply Forall_inv2 in HF.
+ constructor; [ easy | ].
+ simpl in H; apply Nat.succ_inj in H.
+ now apply IHl1; split.
 Qed.
 
 Theorem flat_map_nil_fun : ∀ A B (f : A → list B) l,
