@@ -2838,8 +2838,8 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
  remember (atan x) as y eqn:Hy.
  assert (Hx : x = tan y) by (now subst y; rewrite atan_right_inv).
  subst x.
-bbb.
  destruct (Req_dec (cos y) 0) as [Hc| Hc].
+  exfalso.
 bbb.
 
 Theorem sin_atan : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
