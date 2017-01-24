@@ -2905,7 +2905,15 @@ Theorem matrix_pow : ∀ v c s n,
   let s' := sin (asin c * INR n) in
   (matrix_of_axis_angle (v, c, s) ^ n = matrix_of_axis_angle (v, c', s'))%mat.
 Proof.
-intros.
+intros; subst c' s'.
+induction n.
+ destruct v as (x, y, z); simpl.
+ unfold mat_id, mkrmat; symmetry.
+ do 2 rewrite Rmult_0_r.
+ rewrite cos_0, sin_0.
+ f_equal; lra.
+
+ destruct v as (x, y, z); simpl.
 bbb.
 
 Theorem J₁_is_countable : ∀ r,
