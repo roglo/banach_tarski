@@ -2979,7 +2979,8 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       destruct p as (xp, yp, zp).
       destruct p' as (xp', yp', zp').
       injection Hv; clear Hv; intros Hzp Hyp Hxp.
-      simpl.
+      simpl in Ha, H; simpl.
+      simpl in Hp'.
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
