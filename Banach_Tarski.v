@@ -2900,6 +2900,14 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
+Theorem matrix_pow : ∀ v c s n,
+  let c' := cos (acos c * INR n) in
+  let s' := sin (asin c * INR n) in
+  (matrix_of_axis_angle (v, c, s) ^ n = matrix_of_axis_angle (v, c', s'))%mat.
+Proof.
+intros.
+bbb.
+
 Theorem J₁_is_countable : ∀ r,
   ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
 Proof.
@@ -2969,7 +2977,15 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hno', path_of_nat_inv.
      rewrite Hso₂, Hso₃.
      rewrite cos_plus, sin_plus.
-     remember (acos ((p · p') / r²) / INR n)%R as θ eqn:Hθ.
+     rewrite <- Ha.
+     remember (a / INR n)%R as θ eqn:Hθ.
+rewrite HM in Hv.
+rewrite matrix_pow in Hv.
+
+bbb.
+     simpl in HM.
+     destruct v as (x, y, z).
+     remember (√ (x² + y² + z²)) as r₁ eqn:Hr₁.
 bbb.
 
 Theorem J₀_is_countable : ∀ r,
