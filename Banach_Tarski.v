@@ -2819,7 +2819,7 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
-Definition asin x := atan (x / sqrt (1 - x²)).
+Definition asin x := atan (x / √ (1 - x²)).
 Definition acos x := (PI / 2 - asin x)%R.
 
 Theorem Rinv_div : ∀ x, (/ x = 1 / x)%R.
@@ -2887,25 +2887,42 @@ intros * Hx.
 unfold asin.
 remember (x / √ (1 - x²))%R as y eqn:Hy.
 rewrite sin_atan.
-apply Rmult_eq_reg_r with (r := √ (1 + y²)).
- unfold Rdiv; rewrite Rmult_assoc.
- rewrite Rinv_l.
-  rewrite Rmult_1_r.
-  assert (Hxy : (x = y * √ (1 - x²))%R).
-   rewrite Hy.
-   unfold Rdiv; rewrite Rmult_assoc.
-   rewrite Rinv_l; [ lra | ].
-   replace 1%R with (1 ^ 2)%R by lra.
-   rewrite <- Rsqr_pow2.
-   rewrite <- Rsqr_plus_minus.
-   intros H.
-   apply sqrt_eq_0 in H.
-    apply Rmult_integral in H.
-    destruct H; lra.
+assert (H1x : (0 < 1 - x²)%R).
+ replace 1%R with (1²)%R by apply Rsqr_1.
+ rewrite <- Rsqr_plus_minus.
+ apply Rmult_lt_0_compat; lra.
 
-    apply Rmult_le_pos; lra.
+ assert (Hsp : (0 < √ (1 - x²))%R).
+  apply Rsqr_incrst_0; [ | lra | apply sqrt_pos ].
+  rewrite Rsqr_sqrt; [ now rewrite Rsqr_0 | lra ].
 
-   rewrite Hxy.
+  assert (Hs : (0 ≤ x ↔ 0 ≤ y)%R).
+   split; intros H; subst y.
+    apply Rmult_le_reg_r with (r := √ (1 - x²)); [ lra | ].
+    unfold Rdiv; rewrite Rmult_0_l, Rmult_assoc.
+    rewrite Rinv_l; lra.
+
+    apply Rmult_le_compat_r with (r := √ (1 - x²)) in H; [ | lra ].
+    unfold Rdiv in H; rewrite Rmult_0_l, Rmult_assoc in H.
+    rewrite Rinv_l in H; lra.
+
+   apply (f_equal Rsqr) in Hy.
+   rewrite Rsqr_div in Hy; [ | lra ].
+   rewrite Rsqr_sqrt in Hy; [ | lra ].
+   apply Rmult_eq_compat_r with (r := (1 - x²)%R) in Hy.
+   unfold Rdiv in Hy; rewrite Rmult_assoc in Hy.
+   rewrite Rinv_l in Hy; [ rewrite Rmult_1_r in Hy | lra ].
+   rewrite Rmult_minus_distr_l, Rmult_1_r in Hy.
+   assert (H : (y² = x² * (1 + y²))%R) by lra.
+   apply Rmult_eq_compat_r with (r := (/ (1 + y²))%R) in H.
+   rewrite Rmult_assoc in H.
+   rewrite Rinv_r in H.
+    rewrite Rmult_1_r in H.
+    replace (/ (1 + y²))%R with ((/ √ (1 + y²))²)%R in H.
+     rewrite <- Rsqr_mult in H.
+     apply Rsqr_eq in H.
+     destruct H as [H| H]; [ easy | exfalso ].
+clear - Hs H.
 bbb.
 
 Theorem cos_acos : ∀ x, cos (acos x) = x.
