@@ -2901,11 +2901,13 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
 Qed.
 
 Theorem matrix_pow : ∀ v c s n,
-  let c' := cos (INR n * acos c) in
-  let s' := sin (INR n * asin c) in
-  (matrix_of_axis_angle (v, c, s) ^ n = matrix_of_axis_angle (v, c', s'))%mat.
+  (c² + s² = 1)%R
+  → (-1 < c < 1)%R
+  → let c' := cos (INR n * acos c) in
+    let s' := sin (INR n * asin c) in
+    (matrix_of_axis_angle (v, c, s) ^ n = matrix_of_axis_angle (v, c', s'))%mat.
 Proof.
-intros; subst c' s'.
+intros * Hcs Hc *; subst c' s'.
 induction n.
  destruct v as (x, y, z); simpl.
  unfold mat_id, mkrmat; symmetry.
@@ -2915,6 +2917,25 @@ induction n.
 
  rewrite mat_pow_succ, IHn.
  destruct v as (x, y, z).
+ unfold mat_mul.
+ remember (S n) as sn; simpl; subst sn.
+ remember (√ (x² + y² + z²)) as r eqn:Hr.
+ remember (x / r)%R as x₁ eqn:Hx₁.
+ remember (y / r)%R as y₁ eqn:Hy₁.
+ remember (z / r)%R as z₁ eqn:Hz₁.
+ remember (INR n * acos c)%R as a eqn:Ha.
+ remember (INR n * asin c)%R as b eqn:Hb.
+ remember (INR (S n) * acos c)%R as a' eqn:Ha'.
+ remember (INR (S n) * asin c)%R as b' eqn:Hb'.
+ move b before a; move a' before b; move b' before a'.
+ rewrite S_INR in Ha', Hb'.
+ rewrite Rmult_plus_distr_r, Rmult_1_l in Ha', Hb'.
+ rewrite <- Ha in Ha'; rewrite <- Hb in Hb'.
+ subst a' b'.
+ rewrite cos_plus, sin_plus.
+ rewrite sin_asin; [ | easy ].
+ rewrite cos_acos; [ | easy ].
+ unfold mkrmat; f_equal.
 bbb.
 
 Theorem J₁_is_countable : ∀ r,
