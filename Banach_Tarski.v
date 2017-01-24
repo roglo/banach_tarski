@@ -2901,19 +2901,20 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
 Qed.
 
 Theorem matrix_pow : ∀ v c s n,
-  let c' := cos (acos c * INR n) in
-  let s' := sin (asin c * INR n) in
+  let c' := cos (INR n * acos c) in
+  let s' := sin (INR n * asin c) in
   (matrix_of_axis_angle (v, c, s) ^ n = matrix_of_axis_angle (v, c', s'))%mat.
 Proof.
 intros; subst c' s'.
 induction n.
  destruct v as (x, y, z); simpl.
  unfold mat_id, mkrmat; symmetry.
- do 2 rewrite Rmult_0_r.
+ do 2 rewrite Rmult_0_l.
  rewrite cos_0, sin_0.
  f_equal; lra.
 
- destruct v as (x, y, z); simpl.
+ destruct v as (x, y, z).
+ remember (S n) as sn; simpl; subst sn.
 bbb.
 
 Theorem J₁_is_countable : ∀ r,
