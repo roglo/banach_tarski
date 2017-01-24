@@ -2901,13 +2901,14 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
 Qed.
 
 Theorem matrix_pow : ∀ v c s n,
-  (c² + s² = 1)%R
+  ∥v∥ = 1%R
+  → (c² + s² = 1)%R
   → (-1 < c < 1)%R
   → let c' := cos (INR n * acos c) in
     let s' := sin (INR n * asin c) in
     (matrix_of_axis_angle (v, c, s) ^ n = matrix_of_axis_angle (v, c', s'))%mat.
 Proof.
-intros * Hcs Hc *; subst c' s'.
+intros * Hv Hcs Hc *; subst c' s'.
 induction n.
  destruct v as (x, y, z); simpl.
  unfold mat_id, mkrmat; symmetry.
@@ -2917,12 +2918,11 @@ induction n.
 
  rewrite mat_pow_succ, IHn.
  destruct v as (x, y, z).
+ simpl in Hv.
  unfold mat_mul.
  remember (S n) as sn; simpl; subst sn.
- remember (√ (x² + y² + z²)) as r eqn:Hr.
- remember (x / r)%R as x₁ eqn:Hx₁.
- remember (y / r)%R as y₁ eqn:Hy₁.
- remember (z / r)%R as z₁ eqn:Hz₁.
+ rewrite Hv.
+ do 3 rewrite Rdiv_1_r.
  remember (INR n * acos c)%R as a eqn:Ha.
  remember (INR n * asin c)%R as b eqn:Hb.
  remember (INR (S n) * acos c)%R as a' eqn:Ha'.
