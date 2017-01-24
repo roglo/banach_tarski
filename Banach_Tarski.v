@@ -2819,6 +2819,67 @@ intros n.
 apply not_eq_sym, HM.
 Qed.
 
+Theorem rotate_unicity : ∀ p₁ p₂ el,
+  ∥p₁∥ = ∥p₂∥
+  → norm_list el ≠ []
+  → (mat_of_path el * p₁)%vec = p₁
+  → (mat_of_path el * p₂)%vec = p₂
+  → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
+Proof.
+intros * Hpp Hn Hr₁ Hr₂.
+remember (mat_of_path el) as M eqn:HM.
+assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
+ split; [ subst M; apply mat_of_path_is_rotation_matrix | ].
+ now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
+
+ destruct H as (Hrm & Hni).
+ destruct (Bool.bool_dec (is_neg_vec p₁) (is_neg_vec p₂)) as [Hnn| Hnn].
+  destruct (eq_vec_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
+
+   now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
+
+  destruct (eq_vec_dec p₂ 0%vec) as [Hz| Hnz].
+   subst p₂; rewrite vec_norm_0 in Hpp.
+   apply vec_norm_eq_0 in Hpp.
+   now left.
+
+   destruct (eq_vec_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
+   apply neq_negb in Hnn.
+   assert (Hpp2 : ∥p₁∥ = ∥(-p₂)∥).
+    rewrite Hpp; destruct p₂ as (x, y, z); simpl.
+    now do 3 rewrite <- Rsqr_neg.
+
+    rewrite <- is_neg_vec_neg_vec in Hnn; [ | easy ].
+    assert (Hr₂2 : (M * - p₂ = - p₂)%vec).
+     now rewrite mat_opp_vec_mul_distr_r, Hr₂.
+
+     specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni Hpp2 Hnn Hr₁ Hr₂2).
+     easy.
+Qed.
+
+(* J₁(r) = set of rotations given by its axis and its angle, such that
+   for some p in D ∩ sphere(r), R(p) is also in D ∩ sphere(r). *)
+Definition J₁ r :=
+  mkset
+    (λ '(axis, cosθ, sinθ),
+     ∥axis∥ = 1%R ∧ (cosθ² + sinθ² = 1)%R ∧
+     let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
+     ∃ p p', p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
+     (R * p)%vec = p').
+
+Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
+  let p₂ := fixpoint_of_nat r nf in
+  let p := fold_right rotate p₂ (path_of_nat no) in
+  let p₃ := fixpoint_of_nat r nf' in
+  let p' := fold_right rotate p₃ (path_of_nat no') in
+  let θ := acos ((p · p') / r²) in
+  let px := p × p' in
+  (px, cos θ, sin θ).
+
+bbb.
+
+(* previous version with R^n instead of R, but difficult to prove... *)
+
 (* J₁(r) = set of rotations given by its axis and its angle, such that
    for some natural number n, and some p in D ∩ sphere(r), R^n(p) is
    also in D ∩ sphere(r). *)
@@ -2861,44 +2922,6 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let px := p × p' in
   if eq_vec_dec px 0 then mat_id
   else matrix_of_axis_angle (px, cos θ, sin θ).
-
-Theorem rotate_unicity : ∀ p₁ p₂ el,
-  ∥p₁∥ = ∥p₂∥
-  → norm_list el ≠ []
-  → (mat_of_path el * p₁)%vec = p₁
-  → (mat_of_path el * p₂)%vec = p₂
-  → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
-Proof.
-intros * Hpp Hn Hr₁ Hr₂.
-remember (mat_of_path el) as M eqn:HM.
-assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
- split; [ subst M; apply mat_of_path_is_rotation_matrix | ].
- now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
-
- destruct H as (Hrm & Hni).
- destruct (Bool.bool_dec (is_neg_vec p₁) (is_neg_vec p₂)) as [Hnn| Hnn].
-  destruct (eq_vec_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
-
-   now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
-
-  destruct (eq_vec_dec p₂ 0%vec) as [Hz| Hnz].
-   subst p₂; rewrite vec_norm_0 in Hpp.
-   apply vec_norm_eq_0 in Hpp.
-   now left.
-
-   destruct (eq_vec_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
-   apply neq_negb in Hnn.
-   assert (Hpp2 : ∥p₁∥ = ∥(-p₂)∥).
-    rewrite Hpp; destruct p₂ as (x, y, z); simpl.
-    now do 3 rewrite <- Rsqr_neg.
-
-    rewrite <- is_neg_vec_neg_vec in Hnn; [ | easy ].
-    assert (Hr₂2 : (M * - p₂ = - p₂)%vec).
-     now rewrite mat_opp_vec_mul_distr_r, Hr₂.
-    
-     specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni Hpp2 Hnn Hr₁ Hr₂2).
-     easy.
-Qed.
 
 Theorem matrix_pow : ∀ v c s n,
   ∥v∥ = 1%R
