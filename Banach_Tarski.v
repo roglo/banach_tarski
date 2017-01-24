@@ -2913,8 +2913,8 @@ induction n.
  rewrite cos_0, sin_0.
  f_equal; lra.
 
+ rewrite mat_pow_succ, IHn.
  destruct v as (x, y, z).
- remember (S n) as sn; simpl; subst sn.
 bbb.
 
 Theorem J₁_is_countable : ∀ r,

@@ -976,3 +976,6 @@ rewrite mat_mul_assoc.
 rewrite HAA.
 now rewrite mat_mul_id_l.
 Qed.
+
+Theorem mat_pow_succ : ∀ M n, (M ^ S n)%mat = (M * M ^ n)%mat.
+Proof. easy. Qed.
