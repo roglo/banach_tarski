@@ -586,12 +586,6 @@ intros (x, y, z); simpl.
 apply sqrt_pos.
 Qed.
 
-Theorem nonneg_plus_sqr : ∀ x y, (0 ≤ x² + y²)%R.
-Proof.
-intros.
-apply Rplus_le_le_0_compat; apply Rle_0_sqr.
-Qed.
-
 Theorem nonneg_sqr_vec_norm : ∀ x y z, (0 ≤ x² + y² + z²)%R.
 Proof.
 intros.
