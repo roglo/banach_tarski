@@ -1012,6 +1012,29 @@ exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
 Qed.
 
+Definition prod_4_nat_of_nat n :=
+  let '(n₁, n₂) := prod_nat_of_nat n in
+  let '(n₃, n₄) := prod_nat_of_nat n₁ in
+  let '(n₅, n₆) := prod_nat_of_nat n₂ in
+  (n₃, n₄, n₅, n₆).
+
+Theorem surj_prod_4_nat_surj_nat : ∀ A V,
+  (∃ g : ℕ * ℕ * ℕ * ℕ -> A, ∀ a : A, V a
+   → ∃ n₁ n₂ n₃ n₄, g (n₁, n₂, n₃, n₄) = a)
+  → ∃ f : ℕ → A, ∀ a : A, V a → ∃ n : ℕ, f n = a.
+Proof.
+intros * (g & Hg).
+exists (λ n, g (prod_4_nat_of_nat n)).
+intros a Ha.
+specialize (Hg a Ha) as (n₃ & n₄ & n₅ & n₆ & Hg); subst a.
+remember (nat_of_prod_nat (n₅, n₆)) as n₂.
+remember (nat_of_prod_nat (n₃, n₄)) as n₁.
+remember (nat_of_prod_nat (n₁, n₂)) as n.
+exists n; subst.
+unfold prod_4_nat_of_nat.
+now do 3 rewrite prod_nat_of_nat_inv.
+Qed.
+
 Definition prod_6_nat_of_nat n :=
   let '(n₁, n₂) := prod_nat_of_nat n in
   let '(n₃, n₄) := prod_nat_of_nat n₁ in
@@ -2876,6 +2899,87 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
   let px := p × p' in
   (px, cos θ, sin θ).
 
+Theorem J₁_is_countable : ∀ r,
+  ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
+Proof.
+intros r.
+apply surj_prod_4_nat_surj_nat.
+exists (J₁_of_nats r).
+intros ((v, c), s) Hv.
+destruct Hv as (Hvn & Hcs & p & p' & Hp & Hp' & Hv).
+remember (matrix_of_axis_angle (v, c, s)) as M eqn:HM.
+destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
+destruct Hp' as ((el' & p₃ & (el₃ & Hso₃) & Hn₃& Hr₃) & Hp').
+assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
+ split.
+  rewrite rotate_vec_mul in Hso₂.
+  rewrite <- Hso₂.
+  apply on_sphere_after_rotation; [ easy | ].
+  apply mat_of_path_is_rotation_matrix.
+
+  rewrite rotate_vec_mul in Hso₃.
+  rewrite <- Hso₃.
+  apply on_sphere_after_rotation; [ easy | ].
+  apply mat_of_path_is_rotation_matrix.
+
+ destruct H as (Hp₂s, Hp₃s).
+ apply rotate_rev_path in Hso₂.
+ apply rotate_rev_path in Hso₃.
+ remember (nat_of_path el) as nf eqn:Hnf.
+ remember (nat_of_path (rev_path el₂)) as no eqn:Hno.
+ remember (nat_of_path el') as nf' eqn:Hnf'.
+ remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
+ remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
+ remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
+ assert (Hpq₂ :
+  p₂ =
+    if bool_dec (is_neg_vec p₂) (is_neg_vec q₂) then q₂
+    else (- q₂)%vec).
+  subst nf.
+  unfold fixpoint_of_nat in Hq₂.
+  rewrite path_of_nat_inv in Hq₂.
+  rewrite rotate_vec_mul in Hr₂.
+  clear Hn₃.
+  eapply axis_and_fixpoint_of_path_collinear; try eassumption.
+  now subst q₂; apply fixpoint_of_path_on_sphere.
+
+  assert (Hpq₃ :
+   p₃ =
+     if bool_dec (is_neg_vec p₃) (is_neg_vec q₃) then q₃
+     else (- q₃)%vec).
+   subst nf'.
+   unfold fixpoint_of_nat in Hq₃.
+   rewrite path_of_nat_inv in Hq₃.
+   rewrite rotate_vec_mul in Hr₃.
+   eapply axis_and_fixpoint_of_path_collinear; try eassumption.
+   now subst q₃; apply fixpoint_of_path_on_sphere.
+
+   destruct (bool_dec (is_neg_vec p₂) (is_neg_vec q₂)) as [Hb₂| Hb₂].
+    move Hpq₂ at top; subst q₂; clear Hb₂.
+    exists nf, no.
+    destruct (bool_dec (is_neg_vec p₃) (is_neg_vec q₃)) as [Hb₃| Hb₃].
+     move Hpq₃ at top; subst q₃; clear Hb₃.
+     exists nf', no'.
+     remember (acos ((p · p') / r²)) as a eqn:Ha.
+     unfold J₁_of_nats.
+     rewrite <- Hq₂, <- Hq₃.
+     rewrite Hno, path_of_nat_inv.
+     rewrite Hno', path_of_nat_inv.
+     rewrite Hso₂, Hso₃.
+     enough (-1 < (p · p') / r² < 1)%R.
+      rewrite cos_acos; [ | easy ].
+      rewrite <- Ha.
+      rewrite HM in Hv.
+      simpl in Hv.
+      destruct v as (x, y, z).
+      simpl in Hvn.
+      rewrite Hvn in Hv.
+      do 3 rewrite Rdiv_1_r in Hv.
+      unfold mat_vec_mul in Hv; simpl in Hv.
+      destruct p as (xp, yp, zp).
+      destruct p' as (xp', yp', zp').
+      injection Hv; clear Hv; intros Hzp Hyp Hxp.
+      simpl.
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
