@@ -2964,6 +2964,12 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      remember (Z.to_nat (Int_part (a / (2 * PI)))) as k eqn:Hk.
      exists n, k.
      unfold J₁_of_nats.
+     rewrite <- Hq₂, <- Hq₃.
+     rewrite Hno, path_of_nat_inv.
+     rewrite Hno', path_of_nat_inv.
+     rewrite Hso₂, Hso₃.
+     rewrite cos_plus, sin_plus.
+     remember (acos ((p · p') / r²) / INR n)%R as θ eqn:Hθ.
 bbb.
 
 Theorem J₀_is_countable : ∀ r,
