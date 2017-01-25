@@ -2963,9 +2963,9 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
 
    destruct (bool_dec (is_neg_vec p₂) (is_neg_vec q₂)) as [Hb₂| Hb₂].
     move Hpq₂ at top; subst q₂; clear Hb₂.
-    exists nf, no.
     destruct (bool_dec (is_neg_vec p₃) (is_neg_vec q₃)) as [Hb₃| Hb₃].
      move Hpq₃ at top; subst q₃; clear Hb₃.
+     exists nf, no.
      exists nf', no'.
      remember (acos ((p · p') / r²)) as a eqn:Ha.
      unfold J₁_of_nats.
