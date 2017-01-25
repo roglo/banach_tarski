@@ -2902,7 +2902,12 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
 Theorem Cauchy_Schwarz_inequality : ∀ u v, (u · v ≤ ∥u∥ * ∥v∥)%R.
 Proof.
 intros.
-destruct (vec_zerop v).
+destruct (vec_zerop v) as [Hv| Hv].
+ subst v; rewrite vec_dot_mul_0_r, vec_norm_0, Rmult_0_r; lra.
+
+ destruct (Req_dec (u · v) 0) as [Huv| Huv].
+  rewrite Huv; apply Rmult_le_pos; apply vec_norm_nonneg.
+
 bbb.
 
 Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
