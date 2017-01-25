@@ -3003,7 +3003,18 @@ apply Rmult_eq_reg_r with (r := (r²)%R).
      zp² * z²)%R
     by lra.
   simpl in Hp; rewrite Hp.
-  ring_simplify.
+  progress repeat rewrite Rsqr_pow2.
+  replace
+    (c * r ^ 2 - xp ^ 2 * x ^ 2 * c + xp ^ 2 * x ^ 2 -
+     2 * xp * c * x * y * yp - 2 * xp * c * x * z * zp +
+     2 * xp * x * y * yp + 2 * xp * x * z * zp -
+     2 * c * y * z * yp * zp - c * yp ^ 2 * y ^ 2 - c * zp ^ 2 * z ^ 2 +
+     2 * y * z * yp * zp + yp ^ 2 * y ^ 2 + zp ^ 2 * z ^ 2)%R
+  with
+    (c * r ^ 2 + (xp * x + yp * y + zp * z) ^ 2 * (1 - c))%R
+    by lra.
+  progress repeat rewrite <- Rsqr_pow2.
+
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
