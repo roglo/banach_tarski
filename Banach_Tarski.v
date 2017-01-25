@@ -2895,9 +2895,11 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
   let p := fold_right rotate p₂ (path_of_nat no) in
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
-  let θ := acos ((p · p') / r²) in
-  let px := p × p' in
-  (px, cos θ, sin θ).
+  if vec_eq_dec p p' then (0%vec, 1%R, 0%R)
+  else
+    let θ := acos ((p · p') / r²) in
+    let px := p × p' in
+    (px, cos θ, sin θ).
 
 Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
   ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
@@ -2973,26 +2975,31 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hno, path_of_nat_inv.
      rewrite Hno', path_of_nat_inv.
      rewrite Hso₂, Hso₃.
-     assert (Hpp : (-1 ≤ (p · p') / r² ≤ 1)%R).
-      apply Rabs_le.
-      rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
-      rewrite Rabs_sqr.
-      destruct p as (x, y, z).
-      destruct p' as (x', y', z'); simpl.
-      simpl in Hvn, Hp, Hp'.
-      apply Rmult_le_reg_r with (r := (r²)%R); [ now apply Rlt_0_sqr | ].
-      rewrite Rmult_1_l.
-      rewrite Rmult_div_same; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
-      clear - Hr Hp Hp'.
-      specialize (Cauchy_Schwarz_inequality (V x y z) (V x' y' z')) as H.
-      simpl in H.
-      rewrite Hp, Hp' in H.
-      rewrite Rsqr_sqrt in H; [ | apply Rle_0_sqr ].
-      rewrite fold_Rsqr in H.
-      apply Rsqr_le_abs_0 in H.
-      now rewrite Rabs_sqr in H.
+     destruct (vec_eq_dec p p') as [Hepp | Hepp].
+      move Hepp at top; subst p'; clear Hp'.
 
-     (* problem : Hpp above is proven with ≤, not < *)
+bbb.
+(* below, since p ≠ p', we should be able to prove that the ≤ could be < *)
+      assert (Hpp : (-1 ≤ (p · p') / r² ≤ 1)%R).
+       apply Rabs_le.
+       rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
+       rewrite Rabs_sqr.
+       destruct p as (x, y, z).
+       destruct p' as (x', y', z'); simpl.
+       simpl in Hvn, Hp, Hp'.
+       apply Rmult_le_reg_r with (r := (r²)%R); [ now apply Rlt_0_sqr | ].
+       rewrite Rmult_1_l.
+       rewrite Rmult_div_same; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
+       clear - Hr Hp Hp'.
+       specialize (Cauchy_Schwarz_inequality (V x y z) (V x' y' z')) as H.
+       simpl in H.
+       rewrite Hp, Hp' in H.
+       rewrite Rsqr_sqrt in H; [ | apply Rle_0_sqr ].
+       rewrite fold_Rsqr in H.
+       apply Rsqr_le_abs_0 in H.
+       now rewrite Rabs_sqr in H.
+
+bbb.
      enough (Hpp' : (-1 < (p · p') / r² < 1)%R).
       rewrite cos_acos; [ | easy ].
       rewrite <- Ha.
