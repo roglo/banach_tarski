@@ -2899,6 +2899,11 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
   let px := p × p' in
   (px, cos θ, sin θ).
 
+Theorem Cauchy_Schwarz_inequality : ∀ u v, (u · v ≤ ∥u∥ * ∥v∥)%R.
+Proof.
+intros.
+bbb.
+
 Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
   ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
 Proof.
@@ -2984,6 +2989,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       rewrite Rmult_1_l.
       rewrite Rmult_div_same; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
       clear - Hr Hp Hp'.
+(* this is a version of Cauchy-Schartz inequality *)
 bbb.
 
      enough (Hpp : (-1 < (p · p') / r² < 1)%R).
