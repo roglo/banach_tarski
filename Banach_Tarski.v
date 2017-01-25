@@ -2966,7 +2966,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hno, path_of_nat_inv.
      rewrite Hno', path_of_nat_inv.
      rewrite Hso₂, Hso₃.
-     enough (-1 < (p · p') / r² < 1)%R.
+     enough (Hpp : (-1 < (p · p') / r² < 1)%R).
       rewrite cos_acos; [ | easy ].
       rewrite <- Ha.
       rewrite HM in Hv.
@@ -2979,8 +2979,31 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       destruct p as (xp, yp, zp).
       destruct p' as (xp', yp', zp').
       injection Hv; clear Hv; intros Hzp Hyp Hxp.
-      simpl in Ha, H; simpl.
-      simpl in Hp'.
+      simpl in Ha, Hpp, Hp'; simpl.
+      f_equal; [ f_equal | ].
+(* on s'attaque au cosinus *)
+Focus 2.
+apply Rmult_eq_reg_r with (r := (r²)%R).
+ rewrite Rmult_div_same.
+  rewrite <- Hxp, <- Hyp, <- Hzp.
+  ring_simplify.
+  progress repeat rewrite <- Rsqr_pow2.
+  replace
+    (- xp² * x² * c + xp² * x² + xp² * c - 2 * xp * c * x * y * yp -
+     2 * xp * c * x * z * zp + 2 * xp * x * y * yp + 2 * xp * x * z * zp -
+     2 * c * y * z * yp * zp - c * yp² * y² + c * yp² -
+     c * zp² * z² + c * zp² + 2 * y * z * yp * zp + yp² * y² +
+     zp² * z²)%R
+  with
+    (c * (xp² + yp² + zp²) - xp² * x² * c + xp² * x² -
+     2 * xp * c * x * y * yp - 2 * xp * c * x * z * zp +
+     2 * xp * x * y * yp + 2 * xp * x * z * zp -
+     2 * c * y * z * yp * zp - c * yp² * y² -
+     c * zp² * z² + 2 * y * z * yp * zp + yp² * y² +
+     zp² * z²)%R
+    by lra.
+  simpl in Hp; rewrite Hp.
+  ring_simplify.
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
