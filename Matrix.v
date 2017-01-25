@@ -563,6 +563,13 @@ rewrite mat_det_mul, Hd1, Hd2.
 apply Rmult_1_r.
 Qed.
 
+Theorem vec_const_dot_assoc : ∀ a u v, (a ⁎ u) · v = (a * (u · v))%R.
+Proof.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
+do 3 rewrite Rmult_assoc.
+now do 2 rewrite <- Rmult_plus_distr_l.
+Qed.
+
 Theorem vec_const_mul_assoc : ∀ a b v, a ⁎ (b ⁎ v) = (a * b) ⁎ v.
 Proof.
 intros a b (x, y, z); simpl.
@@ -880,6 +887,16 @@ Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
 Qed.
 
+Theorem vec_dot_mul_add_distr_r : ∀ u v w, (u + v) · w = (u · w + v · w)%R.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; lra.
+Qed.
+
+Theorem vec_dot_mul_sub_distr_r : ∀ u v w, (u - v) · w = (u · w - v · w)%R.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; lra.
+Qed.
+
 Theorem Rmult_vec_dot_mul_distr_r : ∀ a u v, (a * (u · v))%R = u · a ⁎ v.
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
@@ -985,3 +1002,10 @@ Qed.
 
 Theorem mat_pow_succ : ∀ M n, (M ^ S n)%mat = (M * M ^ n)%mat.
 Proof. easy. Qed.
+
+Theorem vec_sqr_eq_0 : ∀ v, (v² = 0%R → v = 0)%vec.
+Proof.
+intros (x, y, z) Hv; simpl in Hv |-*.
+apply sqr_vec_norm_eq_0 in Hv.
+now destruct Hv as (H1 & H2 & H3); subst.
+Qed.

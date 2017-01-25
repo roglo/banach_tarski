@@ -2908,6 +2908,13 @@ destruct (vec_zerop v) as [Hv| Hv].
  destruct (Req_dec (u · v) 0) as [Huv| Huv].
   rewrite Huv; apply Rmult_le_pos; apply vec_norm_nonneg.
 
+  remember (u - ((u · v) / (v · v) ⁎ v))%vec as z eqn:Hz.
+  assert (Hzv : z · v = 0%R).
+   subst z.
+   rewrite vec_dot_mul_sub_distr_r.
+   rewrite vec_const_dot_assoc.
+   rewrite Rmult_div_same; [ | now intros H; apply Hv, vec_sqr_eq_0 ].
+   now apply Rminus_diag_eq.
 bbb.
 
 Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
