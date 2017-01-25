@@ -2969,7 +2969,6 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      move Hpq₃ at top; subst q₃; clear Hb₃.
      exists nf, no.
      exists nf', no'.
-     remember (acos ((p · p') / r²)) as a eqn:Ha.
      unfold J₁_of_nats.
      rewrite <- Hq₂, <- Hq₃.
      rewrite Hno, path_of_nat_inv.
@@ -2977,9 +2976,11 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hso₂, Hso₃.
      destruct (vec_eq_dec p p') as [Hepp | Hepp].
       move Hepp at top; subst p'; clear Hp'.
+(* M p = p, therefore either p ∈ axis or M = id *)
 
 bbb.
 (* below, since p ≠ p', we should be able to prove that the ≤ could be < *)
+      remember (acos ((p · p') / r²)) as a eqn:Ha.
       assert (Hpp : (-1 ≤ (p · p') / r² ≤ 1)%R).
        apply Rabs_le.
        rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
