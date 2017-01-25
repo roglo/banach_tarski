@@ -2899,75 +2899,6 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
   let px := p × p' in
   (px, cos θ, sin θ).
 
-Theorem Cauchy_Schwarz_inequality : ∀ u v, (u · v ≤ ∥u∥ * ∥v∥)%R.
-Proof.
-intros.
-destruct (vec_zerop v) as [Hv| Hv].
- subst v; rewrite vec_dot_mul_0_r, vec_norm_0, Rmult_0_r; lra.
-
- destruct (Req_dec (u · v) 0) as [Huv| Huv].
-  rewrite Huv; apply Rmult_le_pos; apply vec_norm_nonneg.
-
-  remember ((u · v) / v²%vec)%R as a eqn:Ha.
-  remember (a ⁎ v) as v' eqn:Hv'.
-  remember (u - v')%vec as z eqn:Hz.
-  assert (Hzv : z · v = 0%R).
-   subst z v'.
-   rewrite vec_dot_mul_sub_distr_r.
-   rewrite vec_const_dot_assoc.
-   rewrite Ha.
-   rewrite Rmult_div_same; [ | now intros H; apply Hv, vec_sqr_eq_0 ].
-   now apply Rminus_diag_eq.
-
-   assert (Hzv' : z · v' = 0%R).
-    subst v'.
-    rewrite <- Rmult_vec_dot_mul_distr_r, Hzv.
-    now rewrite Rmult_0_r.
-
-    remember (v' + z)%vec as u' eqn:Hu'.
-    assert ((u'²)%vec = (v'²)%vec + (z²)%vec).
-     subst u' z.
-bbb.
-
-    assert ((u²)%vec + (v'²)%vec = (z²)%vec)%R.
-     subst z.
-     clear -Hzv'.
-     destruct u as (u₁, u₂, u₃).
-     destruct v' as (v₁, v₂, v₃); simpl in Hzv'; simpl.
-     progress repeat rewrite fold_Rminus in Hzv'.
-     progress repeat rewrite fold_Rsqr.
-     progress repeat rewrite <- Rplus_assoc.
-     progress repeat rewrite fold_Rminus.
-     progress repeat rewrite Rsqr_pow2.
-     ring_simplify.
-     progress repeat rewrite <- Rsqr_pow2.
-     replace
-       (u₁² - 2 * u₁ * v₁ + u₂² - 2 * u₂ * v₂ + u₃² - 2 * u₃ * v₃ +
-        v₁² + v₂² + v₃²)%R
-     with
-       (u₁² + u₂² + u₃² - 2 * u₁ * v₁ - 2 * u₂ * v₂ - 2 * u₃ * v₃ +
-        v₁² + v₂² + v₃²)%R
-       by lra.
-     unfold Rminus.
-     progress repeat rewrite Rplus_assoc.
-     f_equal; f_equal; f_equal.
-     symmetry.
-bbb.
-     rewrite Rplus_comm.
-
-
-     ring_simplify in Hzv'.
-     progress repeat rewrite <- Rsqr_pow2 in Hzv'.
-
-
-bbb.
-
-     ring_simplify; f_equal.
-     unfold Rminus.
-     progress repeat rewrite Rplus_assoc; f_equal.
-
-bbb.
-
 Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
   ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
 Proof.
@@ -3053,9 +2984,16 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       rewrite Rmult_1_l.
       rewrite Rmult_div_same; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
       clear - Hr Hp Hp'.
-(* this is a version of Cauchy-Schartz inequality *)
-bbb.
+      specialize (Cauchy_Schwarz_inequality (V x y z) (V x' y' z')) as H.
+      simpl in H.
+      rewrite Hp, Hp' in H.
+      rewrite Rsqr_sqrt in H; [ | apply Rle_0_sqr ].
+      rewrite fold_Rsqr in H.
+      apply Rsqr_le_abs_0 in H.
+      now rewrite Rabs_sqr in H.
 
+bbb.
+     (* problem : Hpp above is proven with ≤, not < *)
      enough (Hpp : (-1 < (p · p') / r² < 1)%R).
       rewrite cos_acos; [ | easy ].
       rewrite <- Ha.

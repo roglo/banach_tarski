@@ -1009,3 +1009,43 @@ intros (x, y, z) Hv; simpl in Hv |-*.
 apply sqr_vec_norm_eq_0 in Hv.
 now destruct Hv as (H1 & H2 & H3); subst.
 Qed.
+
+Theorem Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
+rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+unfold Rsqr at 1.
+ring_simplify.
+progress repeat rewrite <- Rsqr_pow2.
+replace
+  (u₁² * v₁² + 2 * u₁ * v₁ * u₂ * v₂ + 2 * u₁ * v₁ * u₃ * v₃ + u₂² * v₂² +
+   2 * u₂ * v₂ * u₃ * v₃ + u₃² * v₃²)%R
+with
+  (u₁² * v₁² + u₂² * v₂² + u₃² * v₃² +
+   (2 * (u₁ * v₂) * (u₂ * v₁) +
+    (2 * (u₁ * v₃) * (u₃ * v₁) + 2 * (u₂ * v₃) * (u₃ * v₂))))%R
+  by lra.
+replace
+  (u₁² * v₁² + u₁² * v₂² + u₁² * v₃² + u₂² * v₁² + u₂² * v₂² + u₂² * v₃² +
+   u₃² * v₁² + u₃² * v₂² + u₃² * v₃²)%R
+with
+  (u₁² * v₁² + u₂² * v₂² + u₃² * v₃² +
+   ((u₁² * v₂² + u₂² * v₁²) +
+    ((u₁² * v₃² + u₃² * v₁²) +
+     (u₂² * v₃² + u₃² * v₂²))))%R
+  by lra.
+apply Rplus_le_compat_l.
+progress repeat rewrite <- Rsqr_mult.
+assert (Hxy : ∀ x y, (2 * x * y ≤ x² + y²)%R).
+ intros.
+ apply Rplus_le_reg_r with (r := (- (2 * x * y))%R).
+ do 2 rewrite fold_Rminus.
+ rewrite Rminus_diag_eq; [ | easy ].
+ do 2 rewrite Rsqr_pow2.
+ replace (x ^ 2 + y ^ 2 - 2 * x * y)%R with ((x - y) ^ 2)%R by lra.
+ apply pow2_ge_0.
+
+ apply Rplus_le_compat; [ apply Hxy | ].
+ apply Rplus_le_compat; apply Hxy.
+Qed.
