@@ -2992,9 +2992,8 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       apply Rsqr_le_abs_0 in H.
       now rewrite Rabs_sqr in H.
 
-bbb.
      (* problem : Hpp above is proven with ≤, not < *)
-     enough (Hpp : (-1 < (p · p') / r² < 1)%R).
+     enough (Hpp' : (-1 < (p · p') / r² < 1)%R).
       rewrite cos_acos; [ | easy ].
       rewrite <- Ha.
       rewrite HM in Hv.
@@ -3002,12 +3001,15 @@ bbb.
       destruct v as (x, y, z).
       simpl in Hvn.
       rewrite Hvn in Hv.
+bbb.
+(*
       do 3 rewrite Rdiv_1_r in Hv.
+*)
       unfold mat_vec_mul in Hv; simpl in Hv.
       destruct p as (xp, yp, zp).
       destruct p' as (xp', yp', zp').
       injection Hv; clear Hv; intros Hzp Hyp Hxp.
-      simpl in Ha, Hpp, Hp'; simpl.
+      simpl in Ha, Hpp', Hp'; simpl.
       f_equal; [ f_equal | ].
 (* on s'attaque au cosinus *)
 Focus 2.
