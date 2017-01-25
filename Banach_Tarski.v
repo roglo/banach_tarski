@@ -3014,7 +3014,8 @@ apply Rmult_eq_reg_r with (r := (r²)%R).
     (c * r ^ 2 + (xp * x + yp * y + zp * z) ^ 2 * (1 - c))%R
     by lra.
   progress repeat rewrite <- Rsqr_pow2.
-
+  (* indeed, v is supposed to be p × p' (with a constant); and, in
+     that case p · v = 0 *)
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
