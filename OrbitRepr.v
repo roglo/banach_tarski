@@ -219,7 +219,7 @@ split.
  split.
  -intros Hnf.
   unfold union_list; simpl; unfold union.
-  destruct (eq_vec_dec p (f p)) as [H₁| H₁]; [ left; now split | ].
+  destruct (vec_eq_dec p (f p)) as [H₁| H₁]; [ left; now split | ].
   right.
   pose proof Ho p as H.
   destruct H as (el, Hel).

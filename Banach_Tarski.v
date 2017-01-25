@@ -640,7 +640,7 @@ unfold rotation_axis in Hev.
 remember (a₃₂ M - a₂₃ M)%R as x eqn:Hx.
 remember (a₁₃ M - a₃₁ M)%R as y eqn:Hy.
 remember (a₂₁ M - a₁₂ M)%R as z eqn:Hz.
-destruct (eq_vec_dec ev 0) as [Hvz| Hvnz].
+destruct (vec_zerop ev) as [Hvz| Hvnz].
  subst ev.
  injection Hvz; clear Hvz; intros H1 H2 H3.
  move H1 at top; move H2 at top; move H3 at top; subst x y z.
@@ -1784,7 +1784,7 @@ Theorem fixpoint_unicity : ∀ M u v,
   → u = v.
 Proof.
 intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
-destruct (eq_vec_dec u (V 0 0 0)) as [Hv₁| Hv₁].
+destruct (vec_zerop u) as [Hv₁| Hv₁].
  rewrite Hv₁ in Hvn.
  unfold vec_norm in Hvn at 1.
  rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
@@ -1793,14 +1793,14 @@ destruct (eq_vec_dec u (V 0 0 0)) as [Hv₁| Hv₁].
  apply vec_norm_eq_0 in Hvn.
  now rewrite Hvn, Hv₁.
 
- destruct (eq_vec_dec v (V 0 0 0)) as [Hv₂| Hv₂].
+ destruct (vec_zerop v) as [Hv₂| Hv₂].
   rewrite Hv₂ in Hvn.
   unfold vec_norm in Hvn at 2.
   rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
   rewrite sqrt_0 in Hvn.
   now apply vec_norm_eq_0 in Hvn.
 
-  destruct (eq_vec_dec u v) as [Hvv| Hvv]; [ easy | exfalso ].
+  destruct (vec_eq_dec u v) as [Hvv| Hvv]; [ easy | exfalso ].
   remember (vec_const_mul (∥u∥ / ∥(u × v)∥)%R (u × v)) as W eqn:HW.
   move W before v.
   assert (Hp₃ : (M * (u × v) = u × v)%vec).
@@ -2857,16 +2857,16 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
 
  destruct H as (Hrm & Hni).
  destruct (Bool.bool_dec (is_neg_vec p₁) (is_neg_vec p₂)) as [Hnn| Hnn].
-  destruct (eq_vec_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
+  destruct (vec_eq_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
 
    now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
 
-  destruct (eq_vec_dec p₂ 0%vec) as [Hz| Hnz].
+  destruct (vec_zerop p₂) as [Hz| Hnz].
    subst p₂; rewrite vec_norm_0 in Hpp.
    apply vec_norm_eq_0 in Hpp.
    now left.
 
-   destruct (eq_vec_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
+   destruct (vec_eq_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
    apply neq_negb in Hnn.
    assert (Hpp2 : ∥p₁∥ = ∥(-p₂)∥).
     rewrite Hpp; destruct p₂ as (x, y, z); simpl.
@@ -2902,6 +2902,7 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
 Theorem Cauchy_Schwarz_inequality : ∀ u v, (u · v ≤ ∥u∥ * ∥v∥)%R.
 Proof.
 intros.
+destruct (vec_zerop v).
 bbb.
 
 Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
@@ -3086,7 +3087,7 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let a := acos ((p · p') / r²) in
   let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
   let px := p × p' in
-  if eq_vec_dec px 0 then mat_id
+  if vec_zerop px then mat_id
   else matrix_of_axis_angle (px, cos θ, sin θ).
 
 Theorem matrix_pow : ∀ v c s n,
@@ -3284,7 +3285,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      remember (a / INR n + 2 * INR k * PI / INR n)%R as θ eqn:Hθ.
      remember (p × p') as px eqn:Hpx.
      symmetry.
-     destruct (eq_vec_dec px 0) as [Hpxz| Hpxz].
+     destruct (vec_zerop px) as [Hpxz| Hpxz].
       move Hpxz at top; subst px.
       symmetry in Hpx.
 

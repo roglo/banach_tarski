@@ -178,7 +178,7 @@ Arguments mat_mul M₁%mat M₂%mat.
 Arguments mat_vec_mul _%mat _%vec.
 Arguments mat_trace M%mat.
 
-Theorem eq_vec_dec : ∀ p₁ p₂ : vector, { p₁ = p₂ } + { p₁ ≠ p₂ }.
+Theorem vec_eq_dec : ∀ u v : vector, { u = v } + { u ≠ v }.
 Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂).
 destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
@@ -191,7 +191,13 @@ destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
 now intros H; injection H; intros.
 Qed.
 
-Arguments eq_vec_dec _%vec _%vec.
+Arguments vec_eq_dec _%vec _%vec.
+
+Theorem vec_zerop : ∀ v : vector, { v = 0%vec } + { v ≠ 0%vec }.
+Proof.
+intros.
+now specialize (vec_eq_dec v 0).
+Qed.
 
 Theorem mat_eq_dec : ∀ m₁ m₂ : matrix ℝ, { m₁ = m₂ } + { m₁ ≠ m₂ }.
 Proof.
