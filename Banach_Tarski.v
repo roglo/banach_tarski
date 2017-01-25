@@ -2931,6 +2931,13 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
  remember (nat_of_path (rev_path el₃)) as no' eqn:Hno'.
  remember (fixpoint_of_nat r nf) as q₂ eqn:Hq₂.
  remember (fixpoint_of_nat r nf') as q₃ eqn:Hq₃.
+ move no before nf; move nf' before no; move no' before nf'.
+ move el after p; move el' before el.
+ move el₂ before el'; move el₃ before el₂.
+ move p₃ before p₂; move q₂ before p₃; move q₃ before q₂.
+ move Hn₂ after Hso₂; move Hn₃ before Hn₂.
+ move Hso₃ before Hso₂; move Hr₃ before Hr₂.
+ move Hp' before Hp; move Hp₂s before Hp'; move Hp₃s before Hp₂s.
  assert (Hpq₂ :
   p₂ =
     if bool_dec (is_neg_vec p₂) (is_neg_vec q₂) then q₂
@@ -3014,8 +3021,8 @@ apply Rmult_eq_reg_r with (r := (r²)%R).
     (c * r ^ 2 + (xp * x + yp * y + zp * z) ^ 2 * (1 - c))%R
     by lra.
   progress repeat rewrite <- Rsqr_pow2.
-  (* indeed, v is supposed to be p × p' (with a constant); and, in
-     that case p · v = 0 *)
+  (* indeed, if p ≠ ± p', v is supposed to be p × p' (with a constant);
+     and, in that case p · v = 0 *)
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
