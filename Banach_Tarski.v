@@ -2885,7 +2885,7 @@ Qed.
 Definition J₁ r :=
   mkset
     (λ '(axis, cosθ, sinθ),
-     ∥axis∥ = 1%R ∧ (cosθ² + sinθ² = 1)%R ∧
+     ∥axis∥ = r ∧ (cosθ² + sinθ² = 1)%R ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
      ∃ p p', p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
@@ -2899,10 +2899,10 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
   let px := p × p' in
   (px, cos θ, sin θ).
 
-Theorem J₁_is_countable : ∀ r,
+Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
   ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
 Proof.
-intros r.
+intros r Hr.
 apply surj_prod_4_nat_surj_nat.
 exists (J₁_of_nats r).
 intros ((v, c), s) Hv.
@@ -2973,6 +2973,19 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hno, path_of_nat_inv.
      rewrite Hno', path_of_nat_inv.
      rewrite Hso₂, Hso₃.
+     assert (Hpp : (-1 < (p · p') / r² < 1)%R).
+      apply Rabs_lt.
+      rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
+      rewrite Rabs_sqr.
+      destruct p as (x, y, z).
+      destruct p' as (x', y', z'); simpl.
+      simpl in Hvn, Hp, Hp'.
+      clear - Hr Hp Hp'.
+      apply Rmult_lt_reg_r with (r := (r²)%R); [ now apply Rlt_0_sqr | ].
+      rewrite Rmult_1_l.
+      rewrite Rmult_div_same; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
+bbb.
+
      enough (Hpp : (-1 < (p · p') / r² < 1)%R).
       rewrite cos_acos; [ | easy ].
       rewrite <- Ha.
