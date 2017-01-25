@@ -2908,13 +2908,64 @@ destruct (vec_zerop v) as [Hv| Hv].
  destruct (Req_dec (u · v) 0) as [Huv| Huv].
   rewrite Huv; apply Rmult_le_pos; apply vec_norm_nonneg.
 
-  remember (u - ((u · v) / (v · v) ⁎ v))%vec as z eqn:Hz.
+  remember ((u · v) / v²%vec)%R as a eqn:Ha.
+  remember (a ⁎ v) as v' eqn:Hv'.
+  remember (u - v')%vec as z eqn:Hz.
   assert (Hzv : z · v = 0%R).
-   subst z.
+   subst z v'.
    rewrite vec_dot_mul_sub_distr_r.
    rewrite vec_const_dot_assoc.
+   rewrite Ha.
    rewrite Rmult_div_same; [ | now intros H; apply Hv, vec_sqr_eq_0 ].
    now apply Rminus_diag_eq.
+
+   assert (Hzv' : z · v' = 0%R).
+    subst v'.
+    rewrite <- Rmult_vec_dot_mul_distr_r, Hzv.
+    now rewrite Rmult_0_r.
+
+    remember (v' + z)%vec as u' eqn:Hu'.
+    assert ((u'²)%vec = (v'²)%vec + (z²)%vec).
+     subst u' z.
+bbb.
+
+    assert ((u²)%vec + (v'²)%vec = (z²)%vec)%R.
+     subst z.
+     clear -Hzv'.
+     destruct u as (u₁, u₂, u₃).
+     destruct v' as (v₁, v₂, v₃); simpl in Hzv'; simpl.
+     progress repeat rewrite fold_Rminus in Hzv'.
+     progress repeat rewrite fold_Rsqr.
+     progress repeat rewrite <- Rplus_assoc.
+     progress repeat rewrite fold_Rminus.
+     progress repeat rewrite Rsqr_pow2.
+     ring_simplify.
+     progress repeat rewrite <- Rsqr_pow2.
+     replace
+       (u₁² - 2 * u₁ * v₁ + u₂² - 2 * u₂ * v₂ + u₃² - 2 * u₃ * v₃ +
+        v₁² + v₂² + v₃²)%R
+     with
+       (u₁² + u₂² + u₃² - 2 * u₁ * v₁ - 2 * u₂ * v₂ - 2 * u₃ * v₃ +
+        v₁² + v₂² + v₃²)%R
+       by lra.
+     unfold Rminus.
+     progress repeat rewrite Rplus_assoc.
+     f_equal; f_equal; f_equal.
+     symmetry.
+bbb.
+     rewrite Rplus_comm.
+
+
+     ring_simplify in Hzv'.
+     progress repeat rewrite <- Rsqr_pow2 in Hzv'.
+
+
+bbb.
+
+     ring_simplify; f_equal.
+     unfold Rminus.
+     progress repeat rewrite Rplus_assoc; f_equal.
+
 bbb.
 
 Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
