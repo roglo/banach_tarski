@@ -2973,19 +2973,17 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hno, path_of_nat_inv.
      rewrite Hno', path_of_nat_inv.
      rewrite Hso₂, Hso₃.
-     assert (Hpp : (-1 < (p · p') / r² < 1)%R).
-      apply Rabs_lt.
+     assert (Hpp : (-1 ≤ (p · p') / r² ≤ 1)%R).
+      apply Rabs_le.
       rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
       rewrite Rabs_sqr.
       destruct p as (x, y, z).
       destruct p' as (x', y', z'); simpl.
       simpl in Hvn, Hp, Hp'.
-      apply Rmult_lt_reg_r with (r := (r²)%R); [ now apply Rlt_0_sqr | ].
+      apply Rmult_le_reg_r with (r := (r²)%R); [ now apply Rlt_0_sqr | ].
       rewrite Rmult_1_l.
       rewrite Rmult_div_same; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
       clear - Hr Hp Hp'.
-      (* I likely need a hypothesis that p and p' are not colinear, because
-         p = p' = (r,0,0) is a counterexample *)
 bbb.
 
      enough (Hpp : (-1 < (p · p') / r² < 1)%R).
