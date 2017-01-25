@@ -360,11 +360,16 @@ destruct (Rcase_abs x) as [Hx| Hx].
  destruct (Rcase_abs y); lra.
 Qed.
 
-Theorem Rabs_lt : ∀ x y, (Rabs x < y)%R → (- y < x < y)%R.
+Theorem Rabs_lt : ∀ x y, (Rabs x < y)%R ↔ (- y < x < y)%R.
 Proof.
-intros * Hxy.
-unfold Rabs in Hxy.
-destruct (Rcase_abs x); lra.
+intros; split.
+ intros Hxy.
+ unfold Rabs in Hxy.
+ destruct (Rcase_abs x); lra.
+
+ intros (Hyx, Hxy).
+ unfold Rabs.
+ destruct (Rcase_abs x); [ lra | easy ].
 Qed.
 
 Theorem Rabs_div : ∀ x y, y ≠ 0%R → Rabs (x / y) = (Rabs x / Rabs y)%R.
