@@ -2585,7 +2585,6 @@ ring_simplify in Hz₀.
 assert (Ht' : t = (4 * a² - 1)%R) by lra.
 clear Ht; rename Ht' into Ht.
 destruct (Req_dec t (-1)) as [Htd| Htd].
-bbb.
  assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
  f_equal.
  rewrite Rsqr_0 in Hhn, Hx₀, Hy₀, Hz₀, Ht.
@@ -2599,6 +2598,7 @@ bbb.
  assert (Hz₀' : z₀ = (4 * d² - 1)%R) by lra.
  clear Hx₀ Hy₀ Hz₀.
  subst x₀ y₀ z₀.
+bbb.
  do 3 rewrite Rplus_minus.
  do 3 rewrite Rsqr_pow2.
  replace (4 * b ^ 2)%R with ((2 * b) ^ 2)%R by lra.
