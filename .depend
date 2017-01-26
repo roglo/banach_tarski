@@ -1,13 +1,15 @@
 Banach_Tarski.vio: Banach_Tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio GroupTransf.vio Equidecomp.vio Countable.vio QCountable.vio RnCountable.vio NotEmptyPath.vio
 Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified: Banach_Tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo GroupTransf.vo Equidecomp.vo Countable.vo QCountable.vo RnCountable.vo NotEmptyPath.vo
+CauchySchwarz.vio: CauchySchwarz.v
+CauchySchwarz.vo CauchySchwarz.glob CauchySchwarz.v.beautified: CauchySchwarz.v
 Countable.vio: Countable.v Misc.vio
 Countable.vo Countable.glob Countable.v.beautified: Countable.v Misc.vo
 Equidecomp.vio: Equidecomp.v Misc.vio Matrix.vio Pset.vio Partition.vio OrbitRepr.vio GroupTransf.vio
 Equidecomp.vo Equidecomp.glob Equidecomp.v.beautified: Equidecomp.v Misc.vo Matrix.vo Pset.vo Partition.vo OrbitRepr.vo GroupTransf.vo
 GroupTransf.vio: GroupTransf.v Misc.vio Words.vio MiscReals.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio
 GroupTransf.vo GroupTransf.glob GroupTransf.v.beautified: GroupTransf.v Misc.vo Words.vo MiscReals.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo
-Matrix.vio: Matrix.v Words.vio Normalize.vio Reverse.vio MiscReals.vio
-Matrix.vo Matrix.glob Matrix.v.beautified: Matrix.v Words.vo Normalize.vo Reverse.vo MiscReals.vo
+Matrix.vio: Matrix.v Words.vio Normalize.vio Reverse.vio MiscReals.vio CauchySchwarz.vio
+Matrix.vo Matrix.glob Matrix.v.beautified: Matrix.v Words.vo Normalize.vo Reverse.vo MiscReals.vo CauchySchwarz.vo
 Misc.vio: Misc.v
 Misc.vo Misc.glob Misc.v.beautified: Misc.v
 MiscReals.vio: MiscReals.v Misc.vio Words.vio Normalize.vio Reverse.vio
