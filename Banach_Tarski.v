@@ -2364,21 +2364,13 @@ Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 Theorem hi_hj_hk : (hi * hj * hk = hr (-1))%H.
 Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
+(* works for angle ≠ π *)
 Definition quat_of_mat M :=
-  if Req_dec (mat_trace M) (-1) then
-    let x₀ := (a₁₁ M - a₂₂ M - a₃₃ M)%R in
-    let y₀ := (- a₁₁ M + a₂₂ M - a₃₃ M)%R in
-    let z₀ := (- a₁₁ M - a₂₂ M + a₃₃ M)%R in
-    let x := (√ (1 + x₀) / 2)%R in
-    let y := (√ (1 + y₀) / 2)%R in
-    let z := (√ (1 + z₀) / 2)%R in
-    quat 0 (V x y z)
-  else
-    let s := (√ (1 + mat_trace M) / 2)%R in
-    let x := ((a₃₂ M - a₂₃ M) / (4 * s))%R in
-    let y := ((a₁₃ M - a₃₁ M) / (4 * s))%R in
-    let z := ((a₂₁ M - a₁₂ M) / (4 * s))%R in
-    quat s (V x y z).
+  let s := (√ (1 + mat_trace M) / 2)%R in
+  let x := ((a₃₂ M - a₂₃ M) / (4 * s))%R in
+  let y := ((a₁₃ M - a₃₁ M) / (4 * s))%R in
+  let z := ((a₂₁ M - a₁₂ M) / (4 * s))%R in
+  quat s (V x y z).
 
 Definition mat_of_quat '(quat a (V b c d)) :=
   mkrmat
@@ -2388,67 +2380,67 @@ Definition mat_of_quat '(quat a (V b c d)) :=
 
 Definition quat_rotate h v := (h * v * h⁻¹)%H.
 
-Theorem mat_of_quat_inv : ∀ M, is_rotation_matrix M →
-  mat_of_quat (quat_of_mat M) = M.
+Theorem mat_of_quat_inv : ∀ M,
+  is_rotation_matrix M
+  → mat_trace M ≠ -1%R
+  → mat_of_quat (quat_of_mat M) = M.
 Proof.
-intros * Hrm.
+intros * Hrm Hmt.
 unfold quat_of_mat, mat_of_quat; simpl; symmetry.
-destruct (Req_dec (mat_trace M) (-1)) as [Hmt| Hmt].
- Focus 2.
- unfold mat_trace in Hmt.
- remember (√ (1 + mat_trace M) / 2)%R as s eqn:Hs.
- remember ((a₃₂ M - a₂₃ M) / (4 * s))%R as x eqn:Hx.
- remember ((a₁₃ M - a₃₁ M) / (4 * s))%R as y eqn:Hy.
- remember ((a₂₁ M - a₁₂ M) / (4 * s))%R as z eqn:Hz.
- unfold mat_trace in Hs.
- destruct M; simpl in *; unfold mkrmat.
- f_equal.
-  generalize Hs; intros Hs2.
-  apply (f_equal Rsqr) in Hs2.
-  unfold Rdiv in Hs2.
-  rewrite Rsqr_mult in Hs2.
-  do 3 rewrite Rsqr_pow2 in Hs2.
-  replace ((/ 2) ^ 2)%R with (/ 4)%R in Hs2 by lra.
-  do 2 rewrite <- Rsqr_pow2 in Hs2.
-  rewrite Rsqr_sqrt in Hs2.
-  rewrite Hs2, Hx, Hy, Hz.
-  unfold Rdiv.
-  do 3 rewrite Rsqr_mult.
-  rewrite Rsqr_inv.
-   rewrite Rsqr_mult.
-   do 5 rewrite Rsqr_pow2.
-   replace (4 ^ 2)%R with 16%R by lra.
-   remember 16%R as sixteen.
-   remember 4%R as four.
-   rewrite Rinv_mult_distr; [ | lra | ].
-   do 3 rewrite <- Rmult_assoc.
-   apply Rmult_eq_reg_r with (r := (sixteen * s ^ 2)%R).
-   unfold Rminus.
-   do 9 rewrite Rmult_plus_distr_r.
-   do 3 rewrite fold_Rminus.
-   subst four sixteen.
-   do 10 rewrite fold_Rdiv.
-   do 2 rewrite <- Ropp_mult_distr_l.
-   do 2 rewrite fold_Rminus.
-   replace
-     ((1 / 4 * (16 * s ^ 2) +
-       (a₁₁ / 4 * (16 * s ^ 2) + a₂₂ / 4 * (16 * s ^ 2) +
-        a₃₃ / 4 * (16 * s ^ 2)) +
-       (a₃₂ - a₂₃) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2) -
-       (a₁₃ - a₃₁) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2) -
-       (a₂₁ - a₁₂) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2))%R) with
-     ((4 * s ^ 2 * (1 + (a₁₁ + a₂₂ + a₃₃)) +
-       (a₃₂ - a₂₃) ^ 2 * (/ s ^ 2 * s ^ 2) -
-       (a₁₃ - a₃₁) ^ 2 * (/ s ^ 2 * s ^ 2) -
-       (a₂₁ - a₁₂) ^ 2 * (/ s ^ 2 * s ^ 2))%R) by lra.
-   rewrite Rinv_l.
-    do 3 rewrite Rmult_1_r.
-    rewrite Rsqr_pow2 in Hs2.
-    replace (1 + (a₁₁ + a₂₂ + a₃₃))%R with (4 * s ^ 2)%R by lra.
-    unfold is_rotation_matrix in Hrm; simpl in Hrm.
-    unfold mat_transp, mat_det, mat_mul, mat_id, mkrmat in Hrm; simpl in Hrm.
-    destruct Hrm as (Hid, Hrm).
-    injection Hid; clear Hid; intros.
+unfold mat_trace in Hmt.
+remember (√ (1 + mat_trace M) / 2)%R as s eqn:Hs.
+remember ((a₃₂ M - a₂₃ M) / (4 * s))%R as x eqn:Hx.
+remember ((a₁₃ M - a₃₁ M) / (4 * s))%R as y eqn:Hy.
+remember ((a₂₁ M - a₁₂ M) / (4 * s))%R as z eqn:Hz.
+unfold mat_trace in Hs.
+destruct M; simpl in *; unfold mkrmat.
+f_equal.
+ generalize Hs; intros Hs2.
+ apply (f_equal Rsqr) in Hs2.
+ unfold Rdiv in Hs2.
+ rewrite Rsqr_mult in Hs2.
+ do 3 rewrite Rsqr_pow2 in Hs2.
+ replace ((/ 2) ^ 2)%R with (/ 4)%R in Hs2 by lra.
+ do 2 rewrite <- Rsqr_pow2 in Hs2.
+ rewrite Rsqr_sqrt in Hs2.
+ rewrite Hs2, Hx, Hy, Hz.
+ unfold Rdiv.
+ do 3 rewrite Rsqr_mult.
+ rewrite Rsqr_inv.
+  rewrite Rsqr_mult.
+  do 5 rewrite Rsqr_pow2.
+  replace (4 ^ 2)%R with 16%R by lra.
+  remember 16%R as sixteen.
+  remember 4%R as four.
+  rewrite Rinv_mult_distr; [ | lra | ].
+  do 3 rewrite <- Rmult_assoc.
+  apply Rmult_eq_reg_r with (r := (sixteen * s ^ 2)%R).
+  unfold Rminus.
+  do 9 rewrite Rmult_plus_distr_r.
+  do 3 rewrite fold_Rminus.
+  subst four sixteen.
+  do 10 rewrite fold_Rdiv.
+  do 2 rewrite <- Ropp_mult_distr_l.
+  do 2 rewrite fold_Rminus.
+  replace
+    ((1 / 4 * (16 * s ^ 2) +
+      (a₁₁ / 4 * (16 * s ^ 2) + a₂₂ / 4 * (16 * s ^ 2) +
+       a₃₃ / 4 * (16 * s ^ 2)) +
+      (a₃₂ - a₂₃) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2) -
+      (a₁₃ - a₃₁) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2) -
+      (a₂₁ - a₁₂) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2))%R) with
+    ((4 * s ^ 2 * (1 + (a₁₁ + a₂₂ + a₃₃)) +
+      (a₃₂ - a₂₃) ^ 2 * (/ s ^ 2 * s ^ 2) -
+      (a₁₃ - a₃₁) ^ 2 * (/ s ^ 2 * s ^ 2) -
+      (a₂₁ - a₁₂) ^ 2 * (/ s ^ 2 * s ^ 2))%R) by lra.
+  rewrite Rinv_l.
+   do 3 rewrite Rmult_1_r.
+   rewrite Rsqr_pow2 in Hs2.
+   replace (1 + (a₁₁ + a₂₂ + a₃₃))%R with (4 * s ^ 2)%R by lra.
+   unfold is_rotation_matrix in Hrm; simpl in Hrm.
+   unfold mat_transp, mat_det, mat_mul, mat_id, mkrmat in Hrm; simpl in Hrm.
+   destruct Hrm as (Hid, Hrm).
+   injection Hid; clear Hid; intros.
 (* bonjour le merdier... *)
 rewrite Hs2.
 clear s Hs Hs2 x Hx y Hy z Hz.
@@ -2895,7 +2887,7 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
   let p := fold_right rotate p₂ (path_of_nat no) in
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
-  if vec_eq_dec p p' then (0%vec, 1%R, 0%R)
+  if vec_eq_dec p p' then (p, 1%R, 0%R)
   else
     let θ := acos ((p · p') / r²) in
     let px := p × p' in
@@ -2976,6 +2968,8 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hso₂, Hso₃.
      destruct (vec_eq_dec p p') as [Hepp | Hepp].
       move Hepp at top; subst p'; clear Hp'.
+bbb.
+
 (* M p = p, therefore either p ∈ axis or M = id *)
 Check fixpoint_unicity.
 generalize Hso₂; intros H.
