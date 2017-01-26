@@ -2585,38 +2585,9 @@ ring_simplify in Hz₀.
 assert (Ht' : t = (4 * a² - 1)%R) by lra.
 clear Ht; rename Ht' into Ht.
 destruct (Req_dec t (-1)) as [Htd| Htd].
- assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
- f_equal.
- rewrite Rsqr_0 in Hhn, Hx₀, Hy₀, Hz₀, Ht.
- rewrite Ropp_0 in Hx₀, Hy₀, Hz₀.
- rewrite Rmult_0_r in Ht.
- rewrite Rplus_0_l in Hhn, Hx₀.
- rewrite Rminus_0_l in Hy₀, Hz₀, Ht.
- clear Ht Htd.
- assert (Hx₀' : x₀ = (4 * b² - 1)%R) by lra.
- assert (Hy₀' : y₀ = (4 * c² - 1)%R) by lra.
- assert (Hz₀' : z₀ = (4 * d² - 1)%R) by lra.
- clear Hx₀ Hy₀ Hz₀.
- subst x₀ y₀ z₀.
-bbb.
- do 3 rewrite Rplus_minus.
- do 3 rewrite Rsqr_pow2.
- replace (4 * b ^ 2)%R with ((2 * b) ^ 2)%R by lra.
- replace (4 * c ^ 2)%R with ((2 * c) ^ 2)%R by lra.
- replace (4 * d ^ 2)%R with ((2 * d) ^ 2)%R by lra.
- do 3 rewrite <- Rsqr_pow2, sqrt_Rsqr_abs, Rabs_mult.
- replace (Rabs 2) with (Rabs (IZR 2)) by easy.
- rewrite Rabs_Zabs; simpl.
- do 3 rewrite Rmult_div.
- unfold Rdiv.
- rewrite Rinv_r; [ | lra ].
- do 3 rewrite Rmult_1_l.
- destruct Hvp as (Hbp & Hcp & Hdp).
- apply Rabs_pos_eq in Hbp.
- apply Rabs_pos_eq in Hcp.
- apply Rabs_pos_eq in Hdp.
- now rewrite Hbp, Hcp, Hdp.
-
+ (* here case with trace = -1, i.e. angle = π, not yet treated; I have to
+    think of it. Going to next case. *)
+Focus 2.
  assert (Ha2 : (a² ≠ 0)%R) by lra.
  assert (Ha : (a ≠ 0)%R) by now intros H; subst a; apply Ha2, Rsqr_0.
  assert (Haa : (Rabs a ≠ 0)%R) by now apply Rabs_no_R0.
@@ -2651,7 +2622,7 @@ bbb.
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   now do 3 rewrite Rmult_1_l.
-Qed.
+Abort.
 
 (* end play with quaternions. *)
 
