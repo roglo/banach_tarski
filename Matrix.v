@@ -1010,46 +1010,6 @@ apply sqr_vec_norm_eq_0 in Hv.
 now destruct Hv as (H1 & H2 & H3); subst.
 Qed.
 
-Theorem Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-unfold Rsqr at 1.
-ring_simplify.
-progress repeat rewrite <- Rsqr_pow2.
-replace
-  (u₁² * v₁² + 2 * u₁ * v₁ * u₂ * v₂ + 2 * u₁ * v₁ * u₃ * v₃ + u₂² * v₂² +
-   2 * u₂ * v₂ * u₃ * v₃ + u₃² * v₃²)%R
-with
-  (u₁² * v₁² + u₂² * v₂² + u₃² * v₃² +
-   (2 * (u₁ * v₂) * (u₂ * v₁) +
-    (2 * (u₁ * v₃) * (u₃ * v₁) + 2 * (u₂ * v₃) * (u₃ * v₂))))%R
-  by lra.
-replace
-  (u₁² * v₁² + u₁² * v₂² + u₁² * v₃² + u₂² * v₁² + u₂² * v₂² + u₂² * v₃² +
-   u₃² * v₁² + u₃² * v₂² + u₃² * v₃²)%R
-with
-  (u₁² * v₁² + u₂² * v₂² + u₃² * v₃² +
-   ((u₁² * v₂² + u₂² * v₁²) +
-    ((u₁² * v₃² + u₃² * v₁²) +
-     (u₂² * v₃² + u₃² * v₂²))))%R
-  by lra.
-apply Rplus_le_compat_l.
-progress repeat rewrite <- Rsqr_mult.
-assert (Hxy : ∀ x y, (2 * x * y ≤ x² + y²)%R).
- intros.
- apply Rplus_le_reg_r with (r := (- (2 * x * y))%R).
- do 2 rewrite fold_Rminus.
- rewrite Rminus_diag_eq; [ | easy ].
- do 2 rewrite Rsqr_pow2.
- replace (x ^ 2 + y ^ 2 - 2 * x * y)%R with ((x - y) ^ 2)%R by lra.
- apply pow2_ge_0.
-
- apply Rplus_le_compat; [ apply Hxy | ].
- apply Rplus_le_compat; apply Hxy.
-Qed.
-
 (* Cauchy-Schwarz in any dimension *)
 
 Import ListNotations.
@@ -1125,4 +1085,56 @@ destruct (Rle_dec (2 * u₁ * v₁ * dot_mul ul vl) 0) as [Hneg| Hpos].
   apply Rplus_le_le_0_compat.
    apply Rmult_le_pos; [ apply Rle_0_sqr | apply Rle_0_sqr_dot_mul ].
    apply Rmult_le_pos; [ apply Rle_0_sqr | apply Rle_0_sqr_dot_mul ].
+Qed.
+
+(* Cauchy-Schwarz inequality with vectors. *)
+
+Definition list_of_vec '(V x y z) := [x; y; z].
+Definition vec_of_list v :=
+  match v with
+  | [x; y; z] => V x y z
+  | _ => 0%vec
+  end.
+
+Theorem vec_dot_mul_of_dot_mul : ∀ ul vl,
+  length ul = 3
+  → length vl = 3
+  → dot_mul ul vl = (vec_of_list ul · vec_of_list vl).
+Proof.
+intros * Hlu Hlv.
+unfold vec_of_list.
+destruct ul as [| u₁ ul]; [ easy | ].
+destruct ul as [| u₂ ul]; [ easy | ].
+destruct ul as [| u₃ ul]; [ easy | ].
+destruct ul; [ | easy ].
+destruct vl as [| v₁ vl]; [ easy | ].
+destruct vl as [| v₂ vl]; [ easy | ].
+destruct vl as [| v₃ vl]; [ easy | ].
+destruct vl; [ | easy ].
+simpl; lra.
+Qed.
+
+Theorem length_list_of_vec : ∀ v, length (list_of_vec v) = 3.
+Proof. now intros (x, y, z). Qed.
+
+Theorem vec_of_list_inv : ∀ v, vec_of_list (list_of_vec v) = v.
+Proof. now intros (x, y, z). Qed.
+
+Theorem Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
+Proof.
+intros.
+remember (list_of_vec u) as ul eqn:Hul.
+remember (list_of_vec v) as vl eqn:Hvl.
+specialize (Cauchy_Schwarz_inequality_gen ul vl) as H.
+specialize (length_list_of_vec u) as Hlu.
+specialize (length_list_of_vec v) as Hlv.
+rewrite <- Hul in Hlu.
+rewrite <- Hvl in Hlv.
+rewrite vec_dot_mul_of_dot_mul in H; [ | easy | easy ].
+rewrite vec_dot_mul_of_dot_mul in H; [ | easy | easy ].
+rewrite Hul, Hvl in H.
+do 2 rewrite vec_of_list_inv in H.
+rewrite vec_dot_mul_of_dot_mul in H; [ | now subst | now subst ].
+rewrite vec_of_list_inv in H.
+now do 2 rewrite vec_dot_mul_diag in H.
 Qed.
