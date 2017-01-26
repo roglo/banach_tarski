@@ -2977,6 +2977,29 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      destruct (vec_eq_dec p p') as [Hepp | Hepp].
       move Hepp at top; subst p'; clear Hp'.
 (* M p = p, therefore either p ∈ axis or M = id *)
+Check fixpoint_unicity.
+generalize Hso₂; intros H.
+apply rotate_rev_path in H.
+rewrite rev_path_involutive in H.
+rewrite <- Hso₃ in H.
+rewrite <-fold_right_app in H.
+rewrite <- Hr₃ in H.
+rewrite <-fold_right_app in H.
+apply rotate_rev_path in Hso₃.
+rewrite rev_path_involutive in Hso₃.
+rewrite <- Hso₃ in H.
+rewrite <-fold_right_app in H.
+rewrite <- Hso₂ in H.
+rewrite <-fold_right_app in H.
+progress repeat rewrite <- app_assoc in H.
+
+Theorem unicity_fixpoint_path : ∀ p el₁ el₂,
+  p ≠ 0%vec
+  → (mat_of_path el₁ * p)%vec = p
+  → (mat_of_path el₂ * p)%vec = p
+  → norm_list el₁ = norm_list el₂.
+Proof.
+intros * Hp H1 H2.
 
 bbb.
 (* below, since p ≠ p', we should be able to prove that the ≤ could be < *)
