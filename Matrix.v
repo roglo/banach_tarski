@@ -1050,7 +1050,7 @@ assert (Hxy : ∀ x y, (2 * x * y ≤ x² + y²)%R).
  apply Rplus_le_compat; apply Hxy.
 Qed.
 
-(* Cauchy-Schwartz in any dimension *)
+(* Cauchy-Schwarz in any dimension *)
 
 Import ListNotations.
 
@@ -1122,7 +1122,6 @@ destruct (Rle_dec (2 * u₁ * v₁ * dot_mul ul vl) 0) as [Hneg| Hpos].
     progress repeat rewrite <- Rsqr_pow2.
     lra.
 
-  idtac.
   apply Rplus_le_le_0_compat.
    apply Rmult_le_pos; [ apply Rle_0_sqr | apply Rle_0_sqr_dot_mul ].
    apply Rmult_le_pos; [ apply Rle_0_sqr | apply Rle_0_sqr_dot_mul ].
