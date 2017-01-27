@@ -2956,7 +2956,16 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       apply Rsqr_le_abs_0 in H.
       now rewrite Rabs_sqr in H.
 
-      (* since p ≠ p', we should be able to prove that the ≤ could be < *)
+      assert (Hpp1 : ((p · p') / r² ≠ 1)%R).
+       intros H.
+       apply Rmult_eq_compat_r with (r := (r²)%R) in H.
+       rewrite Rmult_div_same in H; [ | now intros P; apply Rsqr_eq_0 in P ].
+       rewrite Rmult_1_l in H.
+       apply Hpp.
+       clear - Hp Hp' H.
+       destruct p as (x, y, z).
+       destruct p' as (x', y', z').
+       simpl in Hp, Hp', H.
 bbb.
      enough (Hpp' : (-1 < (p · p') / r² < 1)%R).
       rewrite cos_acos; [ | easy ].
