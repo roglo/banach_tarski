@@ -135,14 +135,12 @@ now rewrite Rminus_diag_eq.
 Qed.
 
 Theorem Lagrange_identity : ∀ (u v : list R),
-  length u = length v
-  → (dot_mul u u * dot_mul v v - (dot_mul u v)² = sqr_sum_det u v)%R.
+  (dot_mul u u * dot_mul v v - (dot_mul u v)² = sqr_sum_det u v)%R.
 Proof.
-intros * Huv.
+intros.
 unfold sqr_sum_det.
 remember (length u) as len eqn:Hlen; symmetry in Hlen.
-symmetry in Huv.
-revert u v Huv Hlen.
+revert u v Hlen.
 induction len; intros; simpl.
  apply length_zero_iff_nil in Hlen; subst u; simpl.
  rewrite Rmult_0_l, Rsqr_0, Rminus_0_r; lra.
@@ -156,7 +154,6 @@ induction len; intros; simpl.
   rewrite sqr_sum_det_ij_nil_r, Rplus_0_l.
   rewrite sqr_sum_det_i_nil_r; lra.
 
-  simpl in Huv; apply Nat.succ_inj in Huv.
   unfold Rsqr.
   replace
     ((u₁ * u₁ + dot_mul u u) * (v₁ * v₁ + dot_mul v v) -
@@ -166,7 +163,7 @@ induction len; intros; simpl.
      (u₁ * u₁ * dot_mul v v + v₁ * v₁ * dot_mul u u -
       2 * u₁ * v₁ * dot_mul u v))%R
     by lra.
-  rewrite <- Rsqr_pow2, IHlen; [ | easy | easy ].
+  rewrite <- Rsqr_pow2, IHlen; [ | easy ].
   subst len2; simpl.
   rewrite small_det_same, Rsqr_0, Rplus_0_l.
   apply Rmult_eq_reg_r with (r := 2%R); [ | lra ].
