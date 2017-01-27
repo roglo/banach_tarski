@@ -96,7 +96,7 @@ Fixpoint sqr_sum_det_i u v i :=
   | S i' => (sqr_sum_det_ij u v i' (length u) + sqr_sum_det_i u v i')%R
   end.
 
-Definition sqr_sum_det u v := sqr_sum_det_i u v (length u).
+Definition sqr_sum_det u v := (sqr_sum_det_i u v (length u) / 2)%R.
 
 Theorem nth_nil : ∀ A (d : A) n, nth n [] d = d.
 Proof.
@@ -127,24 +127,52 @@ induction i; simpl; [ easy | ].
 now rewrite sqr_sum_det_ij_nil_r, IHi, Rplus_0_r.
 Qed.
 
-Theorem Lagrange_identity : ∀ (u v : list R),
-  (dot_mul u u * dot_mul v v - (dot_mul u v)² = sqr_sum_det u v)%R.
+Theorem small_det_same : ∀ u v i, small_det u v i i = 0%R.
 Proof.
 intros.
+unfold small_det.
+now rewrite Rminus_diag_eq.
+Qed.
+
+Theorem Lagrange_identity : ∀ (u v : list R),
+  length u = length v
+  → (dot_mul u u * dot_mul v v - (dot_mul u v)² = sqr_sum_det u v)%R.
+Proof.
+intros * Huv.
 unfold sqr_sum_det.
 remember (length u) as len eqn:Hlen; symmetry in Hlen.
-revert u v Hlen.
+symmetry in Huv.
+revert u v Huv Hlen.
 induction len; intros; simpl.
  apply length_zero_iff_nil in Hlen; subst u; simpl.
- now rewrite Rmult_0_l, Rsqr_0, Rminus_0_r.
+ rewrite Rmult_0_l, Rsqr_0, Rminus_0_r; lra.
 
  destruct u as [| u₁ u]; [ easy | simpl in Hlen ].
  apply Nat.succ_inj in Hlen.
  remember (length (u₁ :: u)) as len2 eqn:Hlen2; simpl.
  simpl in Hlen2; rewrite Hlen in Hlen2.
- destruct v as [| v₁ v].
-  simpl.
+ destruct v as [| v₁ v]; simpl.
   rewrite Rmult_0_r, Rsqr_0, Rminus_0_r.
   rewrite sqr_sum_det_ij_nil_r, Rplus_0_l.
-  now rewrite sqr_sum_det_i_nil_r.
+  rewrite sqr_sum_det_i_nil_r; lra.
+
+  simpl in Huv; apply Nat.succ_inj in Huv.
+  unfold Rsqr.
+  replace
+    ((u₁ * u₁ + dot_mul u u) * (v₁ * v₁ + dot_mul v v) -
+     (u₁ * v₁ + dot_mul u v) * (u₁ * v₁ + dot_mul u v))%R
+  with
+    (dot_mul u u * dot_mul v v - (dot_mul u v) ^ 2 +
+     (u₁ * u₁ * dot_mul v v + v₁ * v₁ * dot_mul u u -
+      2 * u₁ * v₁ * dot_mul u v))%R
+    by lra.
+  rewrite <- Rsqr_pow2, IHlen; [ | easy | easy ].
+  subst len2; simpl.
+  rewrite small_det_same, Rsqr_0, Rplus_0_l.
+  apply Rmult_eq_reg_r with (r := 2%R); [ | lra ].
+  rewrite Rmult_plus_distr_r.
+  unfold Rdiv.
+  rewrite Rmult_assoc, Rinv_l; [ rewrite Rmult_1_r | lra ].
+  symmetry.
+  rewrite Rmult_assoc, Rinv_l; [ rewrite Rmult_1_r | lra ].
 bbb.
