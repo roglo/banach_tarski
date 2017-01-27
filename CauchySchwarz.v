@@ -80,3 +80,71 @@ destruct (Rle_dec (2 * u₁ * v₁ * dot_mul ul vl) 0) as [Hneg| Hpos].
 Qed.
 
 Check Cauchy_Schwarz_inequality.
+
+Definition small_det u v i j :=
+  (nth i u 0%R * nth j v 0%R - nth j u 0%R * nth i v 0%R)%R.
+
+Fixpoint sqr_sum_det_ij u v i j :=
+  match j with
+  | O => 0%R
+  | S j' => ((small_det u v i j')² + sqr_sum_det_ij u v i j')%R
+  end.
+
+Fixpoint sqr_sum_det_i u v i :=
+  match i with
+  | 0 => 0%R
+  | S i' => (sqr_sum_det_ij u v i' (length u) + sqr_sum_det_i u v i')%R
+  end.
+
+Definition sqr_sum_det u v := sqr_sum_det_i u v (length u).
+
+Theorem nth_nil : ∀ A (d : A) n, nth n [] d = d.
+Proof.
+intros.
+rewrite nth_overflow; [ easy | apply Nat.le_0_l ].
+Qed.
+
+Theorem small_det_nil_r : ∀ u i j, small_det u [] i j = 0%R.
+Proof.
+intros.
+unfold small_det.
+do 2 rewrite nth_nil, Rmult_0_r.
+now rewrite Rminus_0_r.
+Qed.
+
+Theorem sqr_sum_det_ij_nil_r : ∀ u i j, sqr_sum_det_ij u [] i j = 0%R.
+Proof.
+intros.
+induction j; simpl; [ easy | ].
+rewrite IHj, Rplus_0_r.
+now rewrite small_det_nil_r, Rsqr_0.
+Qed.
+
+Theorem sqr_sum_det_i_nil_r :  ∀ u i, sqr_sum_det_i u [] i = 0%R.
+Proof.
+intros.
+induction i; simpl; [ easy | ].
+now rewrite sqr_sum_det_ij_nil_r, IHi, Rplus_0_r.
+Qed.
+
+Theorem Lagrange_identity : ∀ (u v : list R),
+  (dot_mul u u * dot_mul v v - (dot_mul u v)² = sqr_sum_det u v)%R.
+Proof.
+intros.
+unfold sqr_sum_det.
+remember (length u) as len eqn:Hlen; symmetry in Hlen.
+revert u v Hlen.
+induction len; intros; simpl.
+ apply length_zero_iff_nil in Hlen; subst u; simpl.
+ now rewrite Rmult_0_l, Rsqr_0, Rminus_0_r.
+
+ destruct u as [| u₁ u]; [ easy | simpl in Hlen ].
+ apply Nat.succ_inj in Hlen.
+ remember (length (u₁ :: u)) as len2 eqn:Hlen2; simpl.
+ simpl in Hlen2; rewrite Hlen in Hlen2.
+ destruct v as [| v₁ v].
+  simpl.
+  rewrite Rmult_0_r, Rsqr_0, Rminus_0_r.
+  rewrite sqr_sum_det_ij_nil_r, Rplus_0_l.
+  now rewrite sqr_sum_det_i_nil_r.
+bbb.
