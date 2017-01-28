@@ -5,6 +5,8 @@ Require Import Utf8 List Reals Psatz.
 Import ListNotations.
 
 Notation "x '≤' y" := (Rle x y) : R_scope.
+Notation "x ≤ y < z" := (x <= y ∧ y < z)%nat (at level 70, y at next level).
+Notation "x ≤ y ≤ z" := (x <= y ∧ y ≤ z)%nat (at level 70, y at next level).
 
 Fixpoint dot_mul u v :=
   match u with
@@ -95,6 +97,42 @@ Notation "'Σ' ( i = b , e ) , g" := (summation b e (λ i, g))
 Notation "u .[ i ]" := (List.nth (pred i) u 0%R)
   (at level 1, format "'[' u '[' .[ i ] ']' ']'").
 
+Theorem summation_aux_compat : ∀ g h b₁ b₂ len,
+  (∀ i, 0 ≤ i < len → (g (b₁ + i)%nat = h (b₂ + i)%nat)%R)
+  → (summation_aux b₁ len g = summation_aux b₂ len h)%R.
+Proof.
+intros g h b₁ b₂ len Hgh.
+revert b₁ b₂ Hgh.
+induction len; intros; [ easy | simpl ].
+erewrite IHlen.
+ f_equal.
+ assert (0 ≤ 0 < S len) as H.
+  split; [ easy | apply Nat.lt_0_succ ].
+
+  apply Hgh in H.
+  now do 2 rewrite Nat.add_0_r in H.
+
+ intros i Hi.
+ do 2 rewrite Nat.add_succ_l, <- Nat.add_succ_r.
+ apply Hgh.
+ split; [ apply Nat.le_0_l | ].
+ apply lt_n_S.
+ now destruct Hi.
+Qed.
+
+Theorem summation_compat : ∀ g h b k,
+  (∀ i, b ≤ i ≤ k → (g i = h i)%R)
+  → (Σ (i = b, k), g i = Σ (i = b, k), h i)%R.
+Proof.
+intros g h b k Hgh.
+apply summation_aux_compat.
+intros i (_, Hi).
+apply Hgh.
+split; [ apply Nat.le_add_r | idtac ].
+apply Nat.lt_add_lt_sub_r, le_S_n in Hi.
+rewrite Nat.add_comm; assumption.
+Qed.
+
 Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
   let n := length a in
   (Σ (i = 1, n), (a.[i] * c.[i]) * Σ (j = 1, n), (b.[j] * d.[j]) =
@@ -114,9 +152,28 @@ remember
    ((a.[i] * b.[j] - a.[j] * b.[i]) * (c.[i] * d.[j] - c.[j] * d.[i])))%R
 as z eqn:Hz.
 apply Rplus_eq_reg_r with (r := (- y)%R).
-replace (x + - y)%R with (x - y)%R by lra.
 replace (y + z + - y)%R with z by lra.
+replace (x + - y)%R with (x - y)%R by lra.
+replace z with
+  (Σ (i = 1, n), Σ (j = i + 1, n),
+     (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i]) +
+   Σ (i = 1, n), (a.[i]*c.[i]*b.[i]*d.[i]) -
+   Σ (i = 1, n), Σ (j = i + 1, n),
+     (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]) -
+   Σ (i = 1, n), (a.[i]*d.[i]*b.[i]*c.[i]))%R.
+ Focus 2.
+ subst z; symmetry.
+ erewrite summation_compat.
+  Focus 2.
+  intros i Hi.
+  set
+    (h i j :=
+       (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i]-
+        a.[i]*d.[i]*b.[j]*c.[j]-a.[j]*d.[j]*b.[i]*c.[i])%R).
+  apply summation_compat with (h := h i).
+  intros j Hj; subst h; simpl; lra.
 
+  simpl.
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
