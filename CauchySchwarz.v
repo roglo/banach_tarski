@@ -91,7 +91,7 @@ Fixpoint summation_aux b len g :=
 
 Definition summation b e g := summation_aux b (S e - b) g.
 
-Notation "'Σ' ( i = b , e ) , g" := (summation b e (λ i, g))
+Notation "'Σ' ( i = b , e ) , g" := (summation b e (λ i, (g)%R))
   (at level 0, i at level 0, b at level 60, e at level 60, g at level 20).
 
 Notation "u .[ i ]" := (List.nth (pred i) u 0%R)
@@ -131,6 +131,13 @@ apply Hgh.
 split; [ apply Nat.le_add_r | idtac ].
 apply Nat.lt_add_lt_sub_r, le_S_n in Hi.
 now rewrite Nat.add_comm.
+Qed.
+
+Theorem summation_empty : ∀ g b k, (k < b)%nat → (Σ (i = b, k), (g i) = 0%R).
+Proof.
+intros.
+unfold summation.
+now replace (S k - b)%nat with O by lia.
 Qed.
 
 Theorem summation_only_one : ∀ g n, (Σ (i = n, n), g i = g n)%R.
@@ -287,77 +294,51 @@ as y eqn:Hy.
 remember
   (Σ (i = 1, n),
    Σ (j = i + 1, n),
-   ((a.[i] * b.[j] - a.[j] * b.[i]) * (c.[i] * d.[j] - c.[j] * d.[i])))%R
+   ((a.[i] * b.[j] - a.[j] * b.[i]) * (c.[i] * d.[j] - c.[j] * d.[i])))
 as z eqn:Hz.
 apply Rplus_eq_reg_r with (r := (- y)%R).
 replace (y + z + - y)%R with z by lra.
 replace (x + - y)%R with (x - y)%R by lra.
-replace z with
-  ((Σ (i = 1, n), Σ (j = i + 1, n),
-     (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i]) +
-    Σ (i = 1, n), (a.[i]*c.[i]*b.[i]*d.[i])) -
-   (Σ (i = 1, n), Σ (j = i + 1, n),
-     (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]) +
-    Σ (i = 1, n), (a.[i]*d.[i]*b.[i]*c.[i])))%R.
+remember
+  (Σ (i = 1, n), Σ (j = i + 1, n),
+   (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i]))
+  as u₁.
+remember
+  (Σ (i = 1, n), Σ (j = i + 1, n),
+   (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))
+  as u₂.
+remember (Σ (i = 1, n), (a.[i]*c.[i]*b.[i]*d.[i])) as v₁.
+remember (Σ (i = 1, n), (a.[i]*d.[i]*b.[i]*c.[i])) as v₂.
+replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
  Focus 2.
- subst z; symmetry.
- set (h i :=
-   (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
-    Σ (j = i + 1, n), (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))%R).
- rewrite summation_compat with (h := h).
-  Focus 2.
-  intros i Hi; subst h; simpl.
-  rewrite <- summation_sub_distr.
+ assert (Hvv : v₁ = v₂).
+  subst v₁ v₂.
   apply summation_compat.
-  intros j Hj; lra.
+  intros i Hi; lra.
 
-  subst h; simpl.
-  replace
-    (Σ (i = 1, n),
-      Σ (j = i + 1, n),
-      (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]) +
-      Σ (i = 1, n), (a.[i] * c.[i] * b.[i] * d.[i]))%R
-  with
-    (Σ (i = 1, n), Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j]))%R.
-   replace
-     (Σ (i = 1, n),
-      Σ (j = i + 1, n),
-      (a.[i] * d.[i] * b.[j] * c.[j] + a.[j] * d.[j] * b.[i] * c.[i]) +
-      Σ (i = 1, n), (a.[i] * d.[i] * b.[i] * c.[i]))%R
-   with
-     (Σ (i = 1, n), Σ (j = 1, n), (a.[i] * d.[i] * b.[j] * c.[j]))%R.
-Focus 2.
-rewrite <- summation_add_distr.
-apply summation_compat.
-intros i (Hi, Hin).
-rewrite Nat.add_1_r.
-destruct n; [ lia | ].
-destruct n.
- replace i with 1%nat by lia.
- unfold summation; simpl.
- now rewrite Rplus_0_r, Rplus_0_l.
-bbb.
+  replace ((u₁ + v₁) - (u₂ + v₂))%R with (u₁ - u₂)%R by lra.
+  subst u₁ u₂; clear v₁ v₂ Heqv₁ Heqv₂ Hvv.
+  subst z; symmetry.
+  set (h i :=
+    (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
+     Σ (j = i + 1, n), (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))%R).
+  rewrite summation_compat with (h := h).
+   subst h; simpl.
+   now rewrite <- summation_sub_distr.
 
-    rewrite summation_sub_distr.
-    f_equal.
-    apply summation_compat.
-    intros i Hi.
-    rewrite Nat.add_1_r.
-    subst n; remember (length a) as n eqn:Hn.
-    clear - Hi.
-    destruct Hi as (Hi, Hin).
-    revert i Hi Hin.
-    induction n; intros; [ lia | ].
-    do 2 rewrite summation_succ_succ.
-    destruct i; [ lia | ].
-destruct i.
-simpl.
-(* rats, not good! *)
-bbb.
-rewrite summation_split_first.
-rewrite IHn.
-bbb.
-    rewrite summation_shift.
+   intros i Hi; subst h; simpl.
+   rewrite <- summation_sub_distr.
+   apply summation_compat.
+   intros j Hj; lra.
+
+ f_equal.
+  subst x u₁ v₁; clear.
+  destruct n; [ unfold summation; simpl; lra | ].
+  destruct n; simpl.
+   do 4 rewrite summation_only_one.
+   rewrite summation_empty; [ lra | lia ].
+
+   destruct n; simpl.
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
