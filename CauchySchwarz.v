@@ -89,11 +89,22 @@ Fixpoint summation_aux b len g :=
 
 Definition summation b e g := summation_aux b (S e - b) g.
 
-Notation "'Σ' ( i = b , e ) , g" := (summation b e (λ i, (g)))
-  (at level 0, i at level 0, b at level 60, e at level 60, g at level 40).
+Notation "'Σ' ( i = b , e ) , g" := (summation b e (λ i, g))
+  (at level 0, i at level 0, b at level 60, e at level 60, g at level 20).
 
 Notation "u .[ i ]" := (List.nth (pred i) u 0%R)
   (at level 1, format "'[' u '[' .[ i ] ']' ']'").
+
+Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
+  let n := length a in
+  (Σ (i = 1, n), (a.[i] * c.[i]) * Σ (j = 1, n), (b.[j] * d.[j]) =
+   Σ (i = 1, n), (a.[i] * d.[i]) * Σ (j = 1, n), (b.[j] * c.[j]) +
+   Σ (i = 1, n), Σ (j = i + 1, n),
+     ((a.[i] * b.[j] - a.[j] * b.[i]) *
+      (c.[i] * d.[j] - c.[j] * d.[i])))%R.
+Proof.
+intros.
+bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
   let n := length a in
