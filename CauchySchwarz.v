@@ -299,6 +299,8 @@ as z eqn:Hz.
 apply Rplus_eq_reg_r with (r := (- y)%R).
 replace (y + z + - y)%R with z by lra.
 replace (x + - y)%R with (x - y)%R by lra.
+(**)
+symmetry.
 remember
   (Σ (i = 1, n), Σ (j = i + 1, n),
    (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i]))
@@ -316,9 +318,25 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   apply summation_compat.
   intros i Hi; lra.
 
+  symmetry.
   replace ((u₁ + v₁) - (u₂ + v₂))%R with (u₁ - u₂)%R by lra.
   subst u₁ u₂; clear v₁ v₂ Heqv₁ Heqv₂ Hvv.
-  subst z; symmetry.
+  subst z.
+  rewrite <- summation_sub_distr.
+  apply summation_compat.
+  intros i (Hi, Hin).
+  rewrite <- summation_sub_distr.
+  apply summation_compat.
+  intros j (Hj, Hjn); lra.
+
+ remember (Σ (i = 1, n), Σ (j = 1, n), (a.[i]*c.[i]*b.[j]*d.[j])) as r.
+ replace (u₁ + v₁)%R with r.
+  Focus 2.
+  subst r u₁ v₁.
+  rewrite <- summation_add_distr.
+  apply summation_compat.
+  intros i (Hi, Hin).
+bbb.
   set (h i :=
     (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
      Σ (j = i + 1, n), (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))%R).
@@ -331,6 +349,7 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
    apply summation_compat.
    intros j Hj; lra.
 
+bbb.
  f_equal.
   subst x u₁ v₁; clear.
   induction n; [ unfold summation; simpl; lra | ].
