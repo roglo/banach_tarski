@@ -158,6 +158,21 @@ induction len; intros.
  now rewrite Rplus_assoc, Nat.add_succ_r.
 Qed.
 
+Theorem summation_aux_succ_first : ∀ g b len,
+  summation_aux b (S len) g = (g b + summation_aux (S b) len g)%R.
+Proof. easy. Qed.
+
+Theorem summation_split_first : ∀ g b k,
+  b ≤ k
+  → Σ (i = b, k), g i = (g b + Σ (i = S b, k), g i)%R.
+Proof.
+intros g b k Hbk.
+unfold summation.
+rewrite Nat.sub_succ.
+rewrite <- summation_aux_succ_first.
+now rewrite <- Nat.sub_succ_l.
+Qed.
+
 Theorem summation_split_last : ∀ g b k,
   (b ≤ S k)
   → (Σ (i = b, S k), g i = Σ (i = b, k), g i + g (S k))%R.
@@ -244,6 +259,18 @@ f_equal.
 now rewrite summation_opp_distr.
 Qed.
 
+Theorem summation_succ_succ : ∀ b k g,
+  (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%R.
+Proof.
+intros b k g.
+unfold summation.
+rewrite Nat.sub_succ.
+remember (S k - b)%nat as len; clear Heqlen.
+revert b.
+induction len; intros; [ easy | simpl ].
+now rewrite IHlen.
+Qed.
+
 Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
   let n := length a in
   (Σ (i = 1, n), (a.[i] * c.[i]) * Σ (j = 1, n), (b.[j] * d.[j]) =
@@ -303,6 +330,22 @@ replace z with
     f_equal.
     apply summation_compat.
     intros i Hi.
+    rewrite Nat.add_1_r.
+    subst n; remember (length a) as n eqn:Hn.
+    clear - Hi.
+    destruct Hi as (Hi, Hin).
+    revert i Hi Hin.
+    induction n; intros; [ lia | ].
+    do 2 rewrite summation_succ_succ.
+    destruct i; [ lia | ].
+destruct i.
+simpl.
+(* rats, not good! *)
+bbb.
+rewrite summation_split_first.
+rewrite IHn.
+bbb.
+    rewrite summation_shift.
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
