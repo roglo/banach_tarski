@@ -266,12 +266,12 @@ apply Rplus_eq_reg_r with (r := (- y)%R).
 replace (y + z + - y)%R with z by lra.
 replace (x + - y)%R with (x - y)%R by lra.
 replace z with
-  (Σ (i = 1, n), Σ (j = i + 1, n),
+  ((Σ (i = 1, n), Σ (j = i + 1, n),
      (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i]) +
-   Σ (i = 1, n), (a.[i]*c.[i]*b.[i]*d.[i]) -
-   Σ (i = 1, n), Σ (j = i + 1, n),
-     (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]) -
-   Σ (i = 1, n), (a.[i]*d.[i]*b.[i]*c.[i]))%R.
+    Σ (i = 1, n), (a.[i]*c.[i]*b.[i]*d.[i])) -
+   (Σ (i = 1, n), Σ (j = i + 1, n),
+     (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]) +
+    Σ (i = 1, n), (a.[i]*d.[i]*b.[i]*c.[i])))%R.
  Focus 2.
  subst z; symmetry.
  set (h i :=
@@ -284,6 +284,25 @@ replace z with
   apply summation_compat.
   intros j Hj; lra.
 
+  subst h; simpl.
+  replace
+    (Σ (i = 1, n),
+      Σ (j = i + 1, n),
+      (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]) +
+      Σ (i = 1, n), (a.[i] * c.[i] * b.[i] * d.[i]))%R
+  with
+    (Σ (i = 1, n), Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j]))%R.
+   replace
+     (Σ (i = 1, n),
+      Σ (j = i + 1, n),
+      (a.[i] * d.[i] * b.[j] * c.[j] + a.[j] * d.[j] * b.[i] * c.[i]) +
+      Σ (i = 1, n), (a.[i] * d.[i] * b.[i] * c.[i]))%R
+   with
+     (Σ (i = 1, n), Σ (j = 1, n), (a.[i] * d.[i] * b.[j] * c.[j]))%R.
+    rewrite summation_sub_distr.
+    f_equal.
+    apply summation_compat.
+    intros i Hi.
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
