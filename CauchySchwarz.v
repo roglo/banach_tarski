@@ -81,66 +81,29 @@ Qed.
 
 Check Cauchy_Schwarz_inequality.
 
-Definition small_det u v i j :=
-  (nth i u 0%R * nth j v 0%R - nth j u 0%R * nth i v 0%R)%R.
-
-Fixpoint sqr_sum_det_ij f (u v : list R) (i j : nat) :=
-  match j with
+Fixpoint summation_aux b len g :=
+  match len with
   | O => 0%R
-  | S j' => ((f u v i j')² + sqr_sum_det_ij f u v i j')%R
+  | S len₁ => (g b + summation_aux (S b) len₁ g)%R
   end.
 
-Fixpoint sqr_sum_det_i f u v i :=
-  match i with
-  | 0 => 0%R
-  | S i' => (sqr_sum_det_ij f u v i' (length u) + sqr_sum_det_i f u v i')%R
-  end.
+Definition summation b e g := summation_aux b (S e - b) g.
 
-Definition gen_sqr_sum_det f u v := (sqr_sum_det_i f u v (length u) / 2)%R.
+Notation "'Σ' ( i = b , e ) , g" := (summation b e (λ i, (g)))
+  (at level 0, i at level 0, b at level 60, e at level 60, g at level 40).
 
-Definition sqr_sum_det := gen_sqr_sum_det small_det.
+Notation "u .[ i ]" := (List.nth (pred i) u 0%R)
+  (at level 1, format "'[' u '[' .[ i ] ']' ']'").
 
-Theorem nth_nil : ∀ A (d : A) n, nth n [] d = d.
+Theorem Lagrange_identity : ∀ (a b : list R),
+  let n := length a in
+  ((Σ (k = 1, n), a.[k]²) * (Σ (k = 1, n), b.[k]²) -
+     (Σ (k = 1, n), a.[k] * b.[k])² =
+   Σ (i = 1, n), Σ (j = i + 1, n), (a.[i] * b.[j] - a.[j] * b.[i])²)%R.
 Proof.
 intros.
-rewrite nth_overflow; [ easy | apply Nat.le_0_l ].
-Qed.
+bbb.
 
-Theorem small_det_nil_r : ∀ u i j, small_det u [] i j = 0%R.
-Proof.
-intros.
-unfold small_det.
-do 2 rewrite nth_nil, Rmult_0_r.
-now rewrite Rminus_0_r.
-Qed.
-
-Theorem sqr_sum_det_ij_nil_r : ∀ u i j,
-  sqr_sum_det_ij small_det u [] i j = 0%R.
-Proof.
-intros.
-induction j; simpl; [ easy | ].
-rewrite IHj, Rplus_0_r.
-now rewrite small_det_nil_r, Rsqr_0.
-Qed.
-
-Theorem sqr_sum_det_i_nil_r :  ∀ u i, sqr_sum_det_i small_det u [] i = 0%R.
-Proof.
-intros.
-induction i; simpl; [ easy | ].
-now rewrite sqr_sum_det_ij_nil_r, IHi, Rplus_0_r.
-Qed.
-
-Theorem small_det_same : ∀ u v i, small_det u v i i = 0%R.
-Proof.
-intros.
-unfold small_det.
-now rewrite Rminus_diag_eq.
-Qed.
-
-Theorem Lagrange_identity : ∀ (u v : list R),
-  (dot_mul u u * dot_mul v v - (dot_mul u v)² = sqr_sum_det u v)%R.
-Proof.
-intros.
 unfold sqr_sum_det.
 remember (length u) as len eqn:Hlen; symmetry in Hlen.
 unfold gen_sqr_sum_det.
