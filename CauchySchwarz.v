@@ -333,12 +333,33 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
 
  f_equal.
   subst x u₁ v₁; clear.
-  destruct n; [ unfold summation; simpl; lra | ].
-  destruct n; simpl.
+  induction n; [ unfold summation; simpl; lra | ].
+  rewrite summation_split_last; [ | lia ].
+  rewrite summation_split_last; [ | lia ].
+  rewrite summation_split_last; [ | lia ].
+  rewrite Rmult_plus_distr_r, Rmult_plus_distr_l.
+  rewrite IHn.
+  remember
+    (Σ (i = 1, n),
+     Σ (j = i + 1, n),
+     (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]) +
+     Σ (i = 1, n), (a.[i] * c.[i] * b.[i] * d.[i]))%R as x eqn:Hx.
+  remember
+    (Σ (i = 1, n),
+     Σ (j = i + 1, S n),
+     (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]))
+    as y eqn:Hy.
+  assert (Hxy : x = y).
+   subst x y.
+
+bbb.
+   rewrite Hxy.
+   do 2 rewrite Rplus_assoc.
+   f_equal.
+bbb.
+  induction n; simpl.
    do 4 rewrite summation_only_one.
    rewrite summation_empty; [ lra | lia ].
-
-   destruct n; simpl.
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
