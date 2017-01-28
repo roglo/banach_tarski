@@ -193,16 +193,9 @@ destruct (le_dec b k) as [Hbk| Hbk].
    rewrite Nat.sub_diag; simpl.
    now do 3 rewrite Rplus_0_l.
 
-   assert (H : (b < S k)%nat) by lia.
+   assert (H : (b ≤ k)%nat) by lia.
    clear Hbk; rename H into Hbk.
-   apply Nat.succ_le_mono in Hbk.
-   rewrite IHk; [ | easy ].
-   do 2 rewrite <- Rplus_assoc.
-   apply Rplus_eq_compat_r.
-   rewrite Rplus_comm.
-   rewrite <- Rplus_assoc.
-   apply Rplus_eq_compat_r.
-   now rewrite Rplus_comm.
+   rewrite IHk; [ lra | easy ].
 
  unfold summation.
  apply Nat.nle_gt in Hbk.
@@ -210,11 +203,35 @@ destruct (le_dec b k) as [Hbk| Hbk].
  now rewrite Rplus_0_r.
 Qed.
 
-Theorem summation_opp_distr : ∀ g h b k,
-  (- Σ (i = b, k), g i = Σ (i = b, k), (- h i))%R.
+Theorem summation_opp_distr : ∀ g b k,
+  (- Σ (i = b, k), g i = Σ (i = b, k), (- g i))%R.
 Proof.
 intros.
-bbb.
+destruct (le_dec b k) as [Hbk| Hbk].
+ revert b Hbk.
+ induction k; intros.
+  destruct b.
+   now do 2 rewrite summation_only_one.
+
+   unfold summation; simpl; lra.
+
+  rewrite summation_split_last; [ | easy ].
+  rewrite summation_split_last; [ | easy ].
+  rewrite Ropp_plus_distr.
+  destruct (eq_nat_dec b (S k)) as [H₂| H₂].
+   subst b.
+   unfold summation; simpl.
+   rewrite Nat.sub_diag; simpl; lra.
+
+   assert (H : (b ≤ k)%nat) by lia.
+   clear Hbk; rename H into Hbk.
+   now rewrite IHk.
+
+ unfold summation.
+ apply Nat.nle_gt in Hbk.
+ replace (S k - b) with O by lia; simpl.
+ now rewrite Ropp_0.
+Qed.
 
 Theorem summation_sub_distr : ∀ g h b k,
   (Σ (i = b, k), (g i - h i) =
@@ -224,8 +241,8 @@ intros g h b k.
 unfold Rminus.
 rewrite summation_add_distr.
 f_equal.
-rewrite summation_opp_distr.
-bbb.
+now rewrite summation_opp_distr.
+Qed.
 
 Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
   let n := length a in
