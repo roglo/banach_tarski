@@ -326,6 +326,18 @@ replace z with
       Σ (i = 1, n), (a.[i] * d.[i] * b.[i] * c.[i]))%R
    with
      (Σ (i = 1, n), Σ (j = 1, n), (a.[i] * d.[i] * b.[j] * c.[j]))%R.
+Focus 2.
+rewrite <- summation_add_distr.
+apply summation_compat.
+intros i (Hi, Hin).
+rewrite Nat.add_1_r.
+destruct n; [ lia | ].
+destruct n.
+ replace i with 1%nat by lia.
+ unfold summation; simpl.
+ now rewrite Rplus_0_r, Rplus_0_l.
+bbb.
+
     rewrite summation_sub_distr.
     f_equal.
     apply summation_compat.
