@@ -130,7 +130,85 @@ intros i (_, Hi).
 apply Hgh.
 split; [ apply Nat.le_add_r | idtac ].
 apply Nat.lt_add_lt_sub_r, le_S_n in Hi.
-rewrite Nat.add_comm; assumption.
+now rewrite Nat.add_comm.
+Qed.
+
+Theorem summation_only_one : ∀ g n, (Σ (i = n, n), g i = g n)%R.
+Proof.
+intros g n.
+unfold summation.
+rewrite Nat.sub_succ_l; [ | easy ].
+rewrite Nat.sub_diag; simpl.
+now rewrite Rplus_0_r.
+Qed.
+
+Theorem summation_aux_succ_last : ∀ g b len,
+  (summation_aux b (S len) g =
+   summation_aux b len g + g (b + len)%nat)%R.
+Proof.
+intros g b len.
+revert b.
+induction len; intros.
+ simpl.
+ now rewrite Rplus_0_l, Rplus_0_r, Nat.add_0_r.
+
+ remember (S len) as x; simpl; subst x.
+ rewrite IHlen.
+ simpl.
+ now rewrite Rplus_assoc, Nat.add_succ_r.
+Qed.
+
+Theorem summation_split_last : ∀ g b k,
+  (b ≤ S k)
+  → (Σ (i = b, S k), g i = Σ (i = b, k), g i + g (S k))%R.
+Proof.
+intros g b k Hbk.
+unfold summation.
+rewrite Nat.sub_succ_l; [ | easy ].
+rewrite summation_aux_succ_last.
+rewrite Nat.add_sub_assoc; [ idtac | assumption ].
+rewrite Nat.add_comm, Nat.add_sub.
+reflexivity.
+Qed.
+
+Theorem summation_add_distr : ∀ g h b k,
+  (Σ (i = b, k), (g i + h i) =
+   Σ (i = b, k), g i + Σ (i = b, k), h i)%R.
+Proof.
+intros g h b k.
+destruct (le_dec b k) as [Hbk| Hbk].
+ revert b Hbk.
+ induction k; intros.
+  destruct b.
+   now do 3 rewrite summation_only_one.
+
+   now unfold summation; simpl; rewrite Rplus_0_r.
+
+  rewrite summation_split_last; [ idtac | easy ].
+  rewrite summation_split_last; [ idtac | easy ].
+  rewrite summation_split_last; [ idtac | easy ].
+  destruct (eq_nat_dec b (S k)) as [H₂| H₂].
+   subst b.
+   unfold summation; simpl.
+   rewrite Nat.sub_diag; simpl.
+   now do 3 rewrite Rplus_0_l.
+
+bbb.
+   apply Nat_le_neq_lt in Hbk; [ idtac | assumption ].
+   apply Nat.succ_le_mono in Hbk.
+   rewrite IHk; [ idtac | assumption ].
+   do 2 rewrite <- rng_add_assoc.
+   apply rng_add_compat_l.
+   rewrite rng_add_comm.
+   rewrite <- rng_add_assoc.
+   apply rng_add_compat_l.
+   rewrite rng_add_comm.
+   reflexivity.
+
+ unfold summation.
+ apply Nat.nle_gt in Hbk.
+ replace (S k - b) with O by omega; simpl.
+ rewrite rng_add_0_r; reflexivity.
 Qed.
 
 Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
@@ -163,6 +241,15 @@ replace z with
    Σ (i = 1, n), (a.[i]*d.[i]*b.[i]*c.[i]))%R.
  Focus 2.
  subst z; symmetry.
+(**)
+ set (h i :=
+   (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
+    Σ (j = i + 1, n), (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))%R).
+ rewrite summation_compat with (h := h).
+  Focus 2.
+  intros i Hi; subst h; simpl.
+
+bbb.
  erewrite summation_compat.
   Focus 2.
   intros i Hi.
@@ -174,6 +261,16 @@ replace z with
   intros j Hj; subst h; simpl; lra.
 
   simpl.
+  set (h i :=
+    (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
+     Σ (j = i + 1, n), (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))%R).
+  rewrite summation_compat with (h := h).
+   Focus 2.
+   intros i Hi; subst h; simpl.
+bbb.
+
+  simpl.
+  erewrite summation_compat.
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
