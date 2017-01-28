@@ -104,6 +104,19 @@ Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
       (c.[i] * d.[j] - c.[j] * d.[i])))%R.
 Proof.
 intros.
+remember (Σ (i = 1, n), (a.[i] * c.[i]) * Σ (j = 1, n), (b.[j] * d.[j]))%R
+as x eqn:Hx.
+remember (Σ (i = 1, n), (a.[i] * d.[i]) * Σ (j = 1, n), (b.[j] * c.[j]))%R
+as y eqn:Hy.
+remember
+  (Σ (i = 1, n),
+   Σ (j = i + 1, n),
+   ((a.[i] * b.[j] - a.[j] * b.[i]) * (c.[i] * d.[j] - c.[j] * d.[i])))%R
+as z eqn:Hz.
+apply Rplus_eq_reg_r with (r := (- y)%R).
+replace (x + - y)%R with (x - y)%R by lra.
+replace (y + z + - y)%R with z by lra.
+
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
