@@ -349,8 +349,14 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
      Σ (j = i + 1, S n),
      (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]))
     as y eqn:Hy.
+bbb.
   assert (Hxy : x = y).
    subst x y.
+   rewrite <- summation_add_distr.
+   apply summation_compat.
+   intros i (Hi, Hin).
+   rewrite summation_split_last; [ | lia ].
+   f_equal.
 
 bbb.
    rewrite Hxy.
