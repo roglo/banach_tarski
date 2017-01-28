@@ -193,23 +193,39 @@ destruct (le_dec b k) as [Hbk| Hbk].
    rewrite Nat.sub_diag; simpl.
    now do 3 rewrite Rplus_0_l.
 
-bbb.
-   apply Nat_le_neq_lt in Hbk; [ idtac | assumption ].
+   assert (H : (b < S k)%nat) by lia.
+   clear Hbk; rename H into Hbk.
    apply Nat.succ_le_mono in Hbk.
-   rewrite IHk; [ idtac | assumption ].
-   do 2 rewrite <- rng_add_assoc.
-   apply rng_add_compat_l.
-   rewrite rng_add_comm.
-   rewrite <- rng_add_assoc.
-   apply rng_add_compat_l.
-   rewrite rng_add_comm.
-   reflexivity.
+   rewrite IHk; [ | easy ].
+   do 2 rewrite <- Rplus_assoc.
+   apply Rplus_eq_compat_r.
+   rewrite Rplus_comm.
+   rewrite <- Rplus_assoc.
+   apply Rplus_eq_compat_r.
+   now rewrite Rplus_comm.
 
  unfold summation.
  apply Nat.nle_gt in Hbk.
- replace (S k - b) with O by omega; simpl.
- rewrite rng_add_0_r; reflexivity.
+ replace (S k - b) with O by lia; simpl.
+ now rewrite Rplus_0_r.
 Qed.
+
+Theorem summation_opp_distr : ∀ g h b k,
+  (- Σ (i = b, k), g i = Σ (i = b, k), (- h i))%R.
+Proof.
+intros.
+bbb.
+
+Theorem summation_sub_distr : ∀ g h b k,
+  (Σ (i = b, k), (g i - h i) =
+   Σ (i = b, k), g i - Σ (i = b, k), h i)%R.
+Proof.
+intros g h b k.
+unfold Rminus.
+rewrite summation_add_distr.
+f_equal.
+rewrite summation_opp_distr.
+bbb.
 
 Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
   let n := length a in
@@ -241,36 +257,16 @@ replace z with
    Σ (i = 1, n), (a.[i]*d.[i]*b.[i]*c.[i]))%R.
  Focus 2.
  subst z; symmetry.
-(**)
  set (h i :=
    (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
     Σ (j = i + 1, n), (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))%R).
  rewrite summation_compat with (h := h).
   Focus 2.
   intros i Hi; subst h; simpl.
+  rewrite <- summation_sub_distr.
+  apply summation_compat.
+  intros j Hj; lra.
 
-bbb.
- erewrite summation_compat.
-  Focus 2.
-  intros i Hi.
-  set
-    (h i j :=
-       (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i]-
-        a.[i]*d.[i]*b.[j]*c.[j]-a.[j]*d.[j]*b.[i]*c.[i])%R).
-  apply summation_compat with (h := h i).
-  intros j Hj; subst h; simpl; lra.
-
-  simpl.
-  set (h i :=
-    (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
-     Σ (j = i + 1, n), (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))%R).
-  rewrite summation_compat with (h := h).
-   Focus 2.
-   intros i Hi; subst h; simpl.
-bbb.
-
-  simpl.
-  erewrite summation_compat.
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
