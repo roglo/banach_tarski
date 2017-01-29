@@ -532,6 +532,42 @@ apply summation_aux_le_compat; intros i Hi.
 apply Hfg; lia.
 Qed.
 
+Theorem all_0_summation_aux_0 : ∀ g b len,
+  (∀ i, (b ≤ i < b + len) → (g i = 0)%R)
+  → (summation_aux b len (λ i, g i) = 0)%R.
+Proof.
+intros g b len H.
+revert b H.
+induction len; intros; [ easy | simpl ].
+rewrite H; [ idtac | split; auto ].
+ rewrite Rplus_0_l, IHlen; [ easy | ].
+ intros i (Hbi, Hib); apply H.
+ rewrite Nat.add_succ_r, <- Nat.add_succ_l.
+ split; [ now apply Nat.lt_le_incl | easy ].
+
+ rewrite Nat.add_succ_r.
+ apply le_n_S, le_plus_l.
+Qed.
+
+Theorem all_0_summation_0 : ∀ g i₁ i₂,
+  (∀ i, i₁ ≤ i ≤ i₂ → (g i = 0)%R)
+  → (Σ (i = i₁, i₂), (g i) = 0)%R.
+Proof.
+intros g i₁ i₂ H.
+apply all_0_summation_aux_0.
+intros i (H₁, H₂).
+apply H.
+split; [ easy | ].
+destruct (le_dec i₁ (S i₂)) as [H₃| H₃].
+ rewrite Nat.add_sub_assoc in H₂; [ | easy ].
+ rewrite minus_plus in H₂.
+ now apply le_S_n.
+
+ apply not_le_minus_0 in H₃.
+ rewrite H₃, Nat.add_0_r in H₂.
+ now apply Nat.nle_gt in H₂.
+Qed.
+
 Theorem Cauchy_Schwarz_inequality2 : ∀ (u v : list R) n,
   ((Σ (k = 1, n), (u.[k] * v.[k]))² ≤
    Σ (k = 1, n), (u.[k]²) * Σ (k = 1, n), (v.[k]²))%R.
@@ -571,13 +607,21 @@ Theorem dot_mul_summation : ∀ u v,
 Proof.
 intros.
 revert v.
-induction u as [| u₁ u]; intros; simpl.
- rewrite summation_empty; [ easy | lia ].
+induction u as [| u₁ u]; intros.
+ simpl; rewrite summation_empty; [ easy | lia ].
 
+ simpl.
  destruct v as [| v₁ v].
-  rewrite summation_all
-  rewrite nth_overflow.
+  rewrite all_0_summation_0; [ easy | intros i Hi; simpl ].
+  destruct (pred i); lra.
 
+  rewrite IHu; simpl.
+  rewrite summation_split_last; [ simpl | lia ].
+  remember (length u) as n eqn:Hn.
+  symmetry in Hn.
+  destruct n.
+   rewrite summation_empty; [ | lia ].
+   rewrite summation_empty; [ lra | lia ].
 bbb.
 
 Theorem Cauchy_Schwarz_inequality3 : ∀ (u v : list R),
