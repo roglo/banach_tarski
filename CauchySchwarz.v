@@ -476,6 +476,9 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
    lra.
 Qed.
 
+Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%R.
+Proof. intros. now fold (Rminus x y). Qed.
+
 Theorem Lagrange_identity : ∀ (a b : list R) n,
   ((Σ (k = 1, n), a.[k]²) * (Σ (k = 1, n), b.[k]²) -
      (Σ (k = 1, n), (a.[k] * b.[k]))² =
@@ -492,40 +495,12 @@ assert (Ha : ∀ a,
  rewrite <- Ha in H.
  rewrite <- Ha in H.
  rewrite H.
-bbb.
-
-unfold sqr_sum_det.
-remember (length u) as len eqn:Hlen; symmetry in Hlen.
-unfold gen_sqr_sum_det.
-revert u v Hlen.
-induction len; intros; simpl.
- apply length_zero_iff_nil in Hlen; subst u; simpl.
- rewrite Rmult_0_l, Rsqr_0, Rminus_0_r; lra.
-
- destruct u as [| u₁ u]; [ easy | simpl in Hlen ].
- apply Nat.succ_inj in Hlen.
- remember (length (u₁ :: u)) as len2 eqn:Hlen2; simpl.
- simpl in Hlen2; rewrite Hlen in Hlen2.
- destruct v as [| v₁ v]; simpl.
-  rewrite Rmult_0_r, Rsqr_0, Rminus_0_r.
-  rewrite sqr_sum_det_i_nil_r; lra.
-
+ unfold Rminus.
+ rewrite Rplus_shuffle0.
+ replace (Σ (j = 1, n), (b.[j] * a.[j])) with (Σ (i = 1, n), (a.[i] * b.[i])).
   unfold Rsqr.
-  replace
-    ((u₁ * u₁ + dot_mul u u) * (v₁ * v₁ + dot_mul v v) -
-     (u₁ * v₁ + dot_mul u v) * (u₁ * v₁ + dot_mul u v))%R
-  with
-    (dot_mul u u * dot_mul v v - (dot_mul u v) ^ 2 +
-     (u₁ * u₁ * dot_mul v v + v₁ * v₁ * dot_mul u u -
-      2 * u₁ * v₁ * dot_mul u v))%R
-    by lra.
-  rewrite <- Rsqr_pow2, IHlen; [ | easy ].
-  subst len2; simpl; rewrite Hlen.
-  rewrite small_det_same, Rsqr_0, Rplus_0_l.
-  apply Rmult_eq_reg_r with (r := 2%R); [ | lra ].
-  rewrite Rmult_plus_distr_r.
-  unfold Rdiv.
-  rewrite Rmult_assoc, Rinv_l; [ rewrite Rmult_1_r | lra ].
-  symmetry.
-  rewrite Rmult_assoc, Rinv_l; [ rewrite Rmult_1_r | lra ].
-bbb.
+  now rewrite fold_Rminus, Rminus_diag_eq, Rplus_0_l.
+
+  apply summation_compat; intros.
+  apply Rmult_comm.
+Qed.
