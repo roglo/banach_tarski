@@ -610,10 +610,15 @@ revert v.
 induction u as [| u₁ u]; intros.
  simpl; rewrite summation_empty; [ easy | lia ].
 
- simpl.
  destruct v as [| v₁ v].
   rewrite all_0_summation_0; [ easy | intros i Hi; simpl ].
   destruct (pred i); lra.
+
+  remember nth as f; simpl; subst f.
+  rewrite summation_split_first; [ f_equal | lia ].
+bbb.
+
+  rewrite IHu.
 
   rewrite IHu; simpl.
   rewrite summation_split_last; [ simpl | lia ].
@@ -622,6 +627,11 @@ induction u as [| u₁ u]; intros.
   destruct n.
    rewrite summation_empty; [ | lia ].
    rewrite summation_empty; [ lra | lia ].
+
+   symmetry.
+   rewrite summation_split_first; [ simpl | lia ].
+   rewrite Rplus_assoc; f_equal.
+
 bbb.
 
 Theorem Cauchy_Schwarz_inequality3 : ∀ (u v : list R),
