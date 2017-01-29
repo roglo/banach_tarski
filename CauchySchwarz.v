@@ -519,4 +519,17 @@ rewrite H.
 apply Rplus_le_reg_r with (r := (-x)%R).
 rewrite Rplus_assoc, Rplus_opp_r.
 rewrite Rplus_0_r.
+(**)
+clear.
+induction n.
+ rewrite summation_empty; [ lra | lia ].
+
+ eapply Rle_trans; [ apply IHn | ].
+ rewrite summation_split_last; [ | lia ].
+Search (_ ≤ _ + _ → _)%R.
+
+bbb.
+unfold summation.
+rewrite Nat.sub_succ, Nat.sub_0_r.
+clear.
 vvv.
