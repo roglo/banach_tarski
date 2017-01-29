@@ -301,6 +301,15 @@ rewrite Rmult_plus_distr_r.
 now rewrite IHlen.
 Qed.
 
+Theorem summation_mul_distr_l : ∀ f b k a,
+  (a * Σ (i = b, k), (f i))%R =
+  Σ (i = b, k), (a * f i).
+Proof.
+intros.
+rewrite Rmult_comm, summation_mul_distr_r.
+apply summation_compat; intros; apply Rmult_comm.
+Qed.
+
 Theorem summation_summation_mul_distr : ∀ f g b k,
   (Σ (i = b, k), (f i) * Σ (i = b, k), (g i))%R =
   Σ (i = b, k), Σ (j = b, k), (f i * g j).
@@ -329,14 +338,14 @@ induction k; intros.
   do 2 rewrite Rplus_assoc; f_equal.
   rewrite Rplus_comm, Rplus_assoc.
   f_equal; [ apply summation_mul_distr_r | ].
+  rewrite Rplus_comm; f_equal.
+  apply summation_mul_distr_l.
 
-bbb.
-  rewrite <- Rplus_assoc, Rplus_comm.
-  do 2 rewrite <- Rplus_assoc.
-  replace (f (S k) * g (S k) + Σ (i = b, k), Σ (j = b, k), (f i * g j))%R
-  with (Σ (i = b, k), Σ (j = b, k), (f i * g j) + f (S k) * g (S k))%R
-    by apply Rplus_comm.
-bbb.
+  apply Nat.nle_gt in Hbk.
+  rewrite summation_empty; [ | lia ].
+  rewrite summation_empty; [ | lia ].
+  rewrite summation_empty; [ lra | lia ].
+Qed.
 
 Theorem summation_succ_succ : ∀ b k g,
   (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%R.
@@ -465,17 +474,7 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
    apply summation_compat; intros i Hi.
    apply summation_compat; intros j Hj.
    lra.
-bbb.
-
-   induction n.
-    rewrite summation_empty; [ | lia ].
-    rewrite summation_empty; [ lra | lia ].
-
-    rewrite summation_split_last; [ | lia ].
-    rewrite summation_split_last; [ | lia ].
-    rewrite summation_split_last; [ | lia ].
-    rewrite summation_split_last; [ | lia ].
-
+Qed.
 
 bbb.
 
