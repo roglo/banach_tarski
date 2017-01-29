@@ -615,7 +615,7 @@ induction n.
 Qed.
 
 Theorem dot_mul_summation : ∀ u v,
-  dot_mul u v = Σ (i = 1, length u), (u.[i] * v.[i]).
+  dot_mul u v = Σ (i = 1, min (length u) (length v)), (u.[i] * v.[i]).
 Proof.
 intros.
 revert v.
@@ -628,7 +628,8 @@ induction u as [| u₁ u]; intros.
 
   remember nth as f; simpl; subst f.
   rewrite summation_split_first; [ f_equal | lia ].
-  destruct (length u).
+  remember (min (length u) (length v)) as n eqn:Hn.
+  destruct n.
    rewrite IHu.
    rewrite summation_empty; [ | lia ].
    rewrite summation_empty; [ easy | lia ].
@@ -637,6 +638,7 @@ induction u as [| u₁ u]; intros.
    simpl; rewrite Nat.sub_0_r.
    rewrite IHu.
    rewrite summation_shift; [ | lia ].
+   rewrite <-Hn.
    now simpl; rewrite Nat.sub_0_r.
 Qed.
 
@@ -644,12 +646,16 @@ Theorem Cauchy_Schwarz_inequality3 : ∀ (u v : list R),
   ((dot_mul u v)² ≤ dot_mul u u * dot_mul v v)%R.
 Proof.
 intros.
-specialize (Cauchy_Schwarz_inequality2 u v (length u)) as H.
+remember (min (length u) (length v)) as n eqn:Hn.
+specialize (Cauchy_Schwarz_inequality2 u v n) as H.
 do 3 rewrite dot_mul_summation.
+rewrite <- Hn.
+rewrite min_l; [ | lia ].
+rewrite min_l; [ | lia ].
 eapply Rle_trans; [ apply H | ].
 unfold Rsqr.
-apply Rmult_le_compat; [ | | lra | ].
- clear H; induction (length u) as [| len].
+apply Rmult_le_compat; [ | | | ].
+ clear Hn H; induction n as [| len].
   rewrite summation_empty; [ lra | lia ].
 
   rewrite summation_split_last; [ | lia ].
@@ -661,7 +667,7 @@ apply Rmult_le_compat; [ | | lra | ].
   fold (Rsqr (u.[S len])).
   apply Rle_0_sqr.
 
- clear H; induction (length u) as [| len].
+ clear Hn H; induction n as [| len].
   rewrite summation_empty; [ lra | lia ].
 
   rewrite summation_split_last; [ | lia ].
