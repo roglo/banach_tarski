@@ -565,3 +565,25 @@ induction n.
  rewrite Rplus_opp_l, Rplus_0_l.
  apply Rle_0_sqr.
 Qed.
+
+Theorem dot_mul_summation : ∀ u v,
+  dot_mul u v = Σ (i = 1, length u), (u.[i] * v.[i]).
+Proof.
+intros.
+revert v.
+induction u as [| u₁ u]; intros; simpl.
+ rewrite summation_empty; [ easy | lia ].
+
+ destruct v as [| v₁ v].
+  rewrite summation_all
+  rewrite nth_overflow.
+
+bbb.
+
+Theorem Cauchy_Schwarz_inequality3 : ∀ (u v : list R),
+  ((dot_mul u v)² ≤ dot_mul u u * dot_mul v v)%R.
+Proof.
+intros.
+specialize (Cauchy_Schwarz_inequality2 u v (length u)) as H.
+rewrite dot_mul_summation.
+bbb.
