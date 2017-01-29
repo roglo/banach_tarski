@@ -288,7 +288,20 @@ induction len₁; intros; simpl.
  rewrite <- IHlen₂; lra.
 Qed.
 
-Theorem summation_mul_distr : ∀ f g b k,
+Theorem summation_mul_distr_r : ∀ f b k a,
+  (Σ (i = b, k), (f i) * a)%R =
+  Σ (i = b, k), (f i * a).
+Proof.
+intros.
+unfold summation.
+remember (S k - b) as len eqn:Hlen.
+clear; revert b.
+induction len; intros; simpl; [ lra | ].
+rewrite Rmult_plus_distr_r.
+now rewrite IHlen.
+Qed.
+
+Theorem summation_summation_mul_distr : ∀ f g b k,
   (Σ (i = b, k), (f i) * Σ (i = b, k), (g i))%R =
   Σ (i = b, k), Σ (j = b, k), (f i * g j).
 Proof.
@@ -314,6 +327,8 @@ induction k; intros.
   rewrite summation_swap; symmetry.
   rewrite summation_split_last; [ | easy ].
   do 2 rewrite Rplus_assoc; f_equal.
+  rewrite Rplus_comm, Rplus_assoc.
+  f_equal; [ apply summation_mul_distr_r | ].
 
 bbb.
   rewrite <- Rplus_assoc, Rplus_comm.
@@ -441,12 +456,12 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
     rewrite summation_split_last; [ easy | lia ].
 
   f_equal; subst; rewrite <- H.
-   rewrite summation_mul_distr.
+   rewrite summation_summation_mul_distr.
    apply summation_compat; intros i Hi.
    apply summation_compat; intros j Hj.
    lra.
 
-   rewrite summation_mul_distr.
+   rewrite summation_summation_mul_distr.
    apply summation_compat; intros i Hi.
    apply summation_compat; intros j Hj.
    lra.
