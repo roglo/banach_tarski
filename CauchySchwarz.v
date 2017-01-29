@@ -365,6 +365,7 @@ destruct (eq_nat_dec i n) as [Hien| Hien].
  symmetry; rewrite Rplus_comm.
  rewrite summation_empty; [ | lia ].
  rewrite Rmult_0_r, Rplus_0_l.
+ (* something is wrong somewhere *)
 bbb.
 
 revert i Hi Hin.
