@@ -278,6 +278,13 @@ induction len; intros; [ easy | simpl ].
 now rewrite IHlen.
 Qed.
 
+Theorem Rplus_shuffle0 : ∀ n m p : R, (n + m + p)%R = (n + p + m)%R.
+Proof.
+intros.
+rewrite Rplus_comm, <- Rplus_assoc.
+f_equal; apply Rplus_comm.
+Qed.
+
 Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
   let n := length a in
   (Σ (i = 1, n), (a.[i] * c.[i]) * Σ (j = 1, n), (b.[j] * d.[j]) =
@@ -336,6 +343,19 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   rewrite <- summation_add_distr.
   apply summation_compat.
   intros i (Hi, Hin).
+  rewrite summation_add_distr.
+  replace (Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j])) with
+    (a.[i] * c.[i] * Σ (j = 1, n), (b.[j] * d.[j]))%R.
+   replace (Σ (j = i + 1, n), (a.[i] * c.[i] * b.[j] * d.[j]))
+   with (a.[i] * c.[i] * Σ (j = i + 1, n), (b.[j] * d.[j]))%R.
+    replace (Σ (j = i + 1, n), (a.[j] * c.[j] * b.[i] * d.[i]))
+    with (b.[i] * d.[i] * Σ (j = i + 1, n), (a.[j] * c.[j]))%R.
+     rewrite Rplus_shuffle0.
+     do 5 rewrite Rmult_assoc.
+     do 2 rewrite <- Rmult_plus_distr_l.
+     rewrite Nat.add_1_r.
+     replace (Σ (j = S i, n), (b.[j] * d.[j]) + b.[i] * d.[i])%R
+     with (Σ (j = i, n), (b.[j] * d.[j])).
 bbb.
   set (h i :=
     (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
