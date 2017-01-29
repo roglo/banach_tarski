@@ -336,7 +336,6 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   apply summation_compat.
   intros j (Hj, Hjn); lra.
 
-bbb.
  remember (Σ (i = 1, n), Σ (j = 1, n), (a.[i]*c.[i]*b.[j]*d.[j])) as r.
  replace (u₁ + v₁)%R with r.
   Focus 2.
@@ -356,7 +355,31 @@ bbb.
      do 2 rewrite <- Rmult_plus_distr_l.
      rewrite Nat.add_1_r.
      replace (Σ (j = S i, n), (b.[j] * d.[j]) + b.[i] * d.[i])%R
-     with (Σ (j = i, n), (b.[j] * d.[j])).
+     with (b.[i] * d.[i] + Σ (j = S i, n), (b.[j] * d.[j]))%R by lra.
+     remember (λ j, (b.[j] * d.[j])%R) as h.
+     replace (b.[i] * d.[i])%R with (h i) by (subst h; simpl; easy).
+     rewrite <- summation_split_first; subst h; simpl.
+do 3 rewrite <- Rmult_assoc.
+destruct (eq_nat_dec i n) as [Hien| Hien].
+ subst i.
+ symmetry; rewrite Rplus_comm.
+ rewrite summation_empty; [ | lia ].
+ rewrite Rmult_0_r, Rplus_0_l.
+bbb.
+
+revert i Hi Hin.
+induction n; intros; [ lia | ].
+destruct (eq_nat_dec i (S n)) as [Hisn| Hisn].
+ subst i.
+ symmetry; rewrite Rplus_comm.
+ rewrite summation_empty; [ | lia ].
+ rewrite Rmult_0_r, Rplus_0_l.
+bbb.
+
+rewrite summation_split_last; [ | lia ].
+rewrite Rmult_plus_distr_l.
+rewrite IHn; [ | easy | ].
+
 bbb.
   set (h i :=
     (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
