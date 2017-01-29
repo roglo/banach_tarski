@@ -341,157 +341,46 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   Focus 2.
   subst r u₁ v₁.
   rewrite <- summation_add_distr.
-clear.
-induction n.
- rewrite summation_empty; [ | lia ].
- rewrite summation_empty; [ lra | lia ].
-
- rewrite summation_split_last; [ | lia ].
- rewrite summation_split_last; [ | lia ].
- rewrite summation_split_last; [ | lia ].
- replace (Σ (i = 1, n), Σ (j = 1, S n), (a.[i] * c.[i] * b.[j] * d.[j]))
- with
-   (Σ (i = 1, n), Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j]) +
-    Σ (i = 1, n), (a.[i] * c.[i] * b.[S n] * d.[S n]))%R.
-  Focus 2.
-  rewrite <- summation_add_distr.
-  apply summation_compat; intros i (Hi, Hin).
-  rewrite summation_split_last; [ easy | lia ].
-
-  rewrite IHn.
-  do 2 rewrite <- Rplus_assoc; f_equal.
-  rewrite summation_add_distr; symmetry.
-  rewrite summation_add_distr; symmetry.
-  replace
-    (Σ (i = 1, n),
-     Σ (j = i + 1, S n),
-      (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]))
-  with
-    (Σ (i = 1, n),
-     (Σ (j = i + 1, n),
-        (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]) +
-     (a.[i] * c.[i] * b.[S n] * d.[S n] +
-      a.[S n] * c.[S n] * b.[i] * d.[i]))).
-   Focus 2.
-   apply summation_compat; intros i (Hi, Hin).
-   rewrite summation_split_last; [ easy | lia ].
-
-   rewrite summation_add_distr.
-   do 4 rewrite Rplus_assoc; f_equal.
-   symmetry; rewrite Rplus_comm.
-   rewrite Rplus_assoc; f_equal.
-   rewrite Rplus_comm.
-bbb.
-  rewrite Rplus_assoc.
-  do 2 rewrite <- summation_add_distr.
-bbb.
-  (* this summation_compat was wrong *)
-  apply summation_compat.
-  intros i (Hi, Hin).
-destruct n.
-rewrite summation_empty; [ | lia ].
-rewrite summation_empty; [ | lia ].
-rewrite summation_empty; [ | lia ].
-lra.
-bbb.
-  rewrite summation_add_distr.
-destruct n.
-do 2 rewrite summation_only_one.
-rewrite summation_only_one.
-rewrite summation_empty; [ | lia ].
-rewrite summation_only_one; lra.
-destruct n.
-unfold summation; simpl.
-lra.
-destruct n.
-unfold summation; simpl.
-lra.
-  replace (Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j])) with
-    (a.[i] * c.[i] * Σ (j = 1, n), (b.[j] * d.[j]))%R.
-   replace (Σ (j = i + 1, n), (a.[i] * c.[i] * b.[j] * d.[j]))
-   with (a.[i] * c.[i] * Σ (j = i + 1, n), (b.[j] * d.[j]))%R.
-    replace (Σ (j = i + 1, n), (a.[j] * c.[j] * b.[i] * d.[i]))
-    with (b.[i] * d.[i] * Σ (j = i + 1, n), (a.[j] * c.[j]))%R.
-     rewrite Rplus_shuffle0.
-     do 5 rewrite Rmult_assoc.
-     do 2 rewrite <- Rmult_plus_distr_l.
-     rewrite Nat.add_1_r.
-     replace (Σ (j = S i, n), (b.[j] * d.[j]) + b.[i] * d.[i])%R
-     with (b.[i] * d.[i] + Σ (j = S i, n), (b.[j] * d.[j]))%R by lra.
-     remember (λ j, (b.[j] * d.[j])%R) as h.
-     replace (b.[i] * d.[i])%R with (h i) by (subst h; simpl; easy).
-     rewrite <- summation_split_first; subst h; simpl.
-do 3 rewrite <- Rmult_assoc.
-destruct (eq_nat_dec i n) as [Hien| Hien].
- subst i.
- symmetry; rewrite Rplus_comm.
- rewrite summation_empty; [ | lia ].
- rewrite Rmult_0_r, Rplus_0_l.
- (* something is wrong somewhere *)
-bbb.
-
-revert i Hi Hin.
-induction n; intros; [ lia | ].
-destruct (eq_nat_dec i (S n)) as [Hisn| Hisn].
- subst i.
- symmetry; rewrite Rplus_comm.
- rewrite summation_empty; [ | lia ].
- rewrite Rmult_0_r, Rplus_0_l.
-bbb.
-
-rewrite summation_split_last; [ | lia ].
-rewrite Rmult_plus_distr_l.
-rewrite IHn; [ | easy | ].
-
-bbb.
-  set (h i :=
-    (Σ (j = i + 1, n), (a.[i]*c.[i]*b.[j]*d.[j]+a.[j]*c.[j]*b.[i]*d.[i])-
-     Σ (j = i + 1, n), (a.[i]*d.[i]*b.[j]*c.[j]+a.[j]*d.[j]*b.[i]*c.[i]))%R).
-  rewrite summation_compat with (h := h).
-   subst h; simpl.
-   now rewrite <- summation_sub_distr.
-
-   intros i Hi; subst h; simpl.
-   rewrite <- summation_sub_distr.
-   apply summation_compat.
-   intros j Hj; lra.
-
-bbb.
- f_equal.
-  subst x u₁ v₁; clear.
-  induction n; [ unfold summation; simpl; lra | ].
-  rewrite summation_split_last; [ | lia ].
-  rewrite summation_split_last; [ | lia ].
-  rewrite summation_split_last; [ | lia ].
-  rewrite Rmult_plus_distr_r, Rmult_plus_distr_l.
-  rewrite IHn.
-  remember
-    (Σ (i = 1, n),
-     Σ (j = i + 1, n),
-     (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]) +
-     Σ (i = 1, n), (a.[i] * c.[i] * b.[i] * d.[i]))%R as x eqn:Hx.
-  remember
-    (Σ (i = 1, n),
-     Σ (j = i + 1, S n),
-     (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]))
-    as y eqn:Hy.
-bbb.
-  assert (Hxy : x = y).
-   subst x y.
-   rewrite <- summation_add_distr.
-   apply summation_compat.
-   intros i (Hi, Hin).
-   rewrite summation_split_last; [ | lia ].
-   f_equal.
-
-bbb.
-   rewrite Hxy.
-   do 2 rewrite Rplus_assoc.
-   f_equal.
-bbb.
-  induction n; simpl.
-   do 4 rewrite summation_only_one.
+  clear.
+  induction n.
+   rewrite summation_empty; [ | lia ].
    rewrite summation_empty; [ lra | lia ].
+
+   rewrite summation_split_last; [ | lia ].
+   rewrite summation_split_last; [ | lia ].
+   rewrite summation_split_last; [ | lia ].
+   replace (Σ (i = 1, n), Σ (j = 1, S n), (a.[i] * c.[i] * b.[j] * d.[j]))
+   with
+     (Σ (i = 1, n), Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j]) +
+      Σ (i = 1, n), (a.[i] * c.[i] * b.[S n] * d.[S n]))%R.
+    rewrite IHn.
+    do 2 rewrite <- Rplus_assoc; f_equal.
+    rewrite summation_add_distr; symmetry.
+    rewrite summation_add_distr; symmetry.
+    replace
+      (Σ (i = 1, n),
+       Σ (j = i + 1, S n),
+        (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]))
+    with
+      (Σ (i = 1, n),
+       (Σ (j = i + 1, n),
+          (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]) +
+       (a.[i] * c.[i] * b.[S n] * d.[S n] +
+        a.[S n] * c.[S n] * b.[i] * d.[i]))).
+     rewrite summation_add_distr.
+     do 4 rewrite Rplus_assoc; f_equal.
+     symmetry; rewrite Rplus_comm.
+     rewrite Rplus_assoc; f_equal.
+     rewrite summation_empty; [ | lia ].
+     rewrite Rplus_0_l.
+     now rewrite summation_add_distr.
+
+     apply summation_compat; intros i (Hi, Hin).
+     rewrite summation_split_last; [ easy | lia ].
+
+    rewrite <- summation_add_distr.
+    apply summation_compat; intros i (Hi, Hin).
+    rewrite summation_split_last; [ easy | lia ].
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
