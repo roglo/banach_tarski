@@ -335,11 +335,14 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   apply summation_compat.
   intros j (Hj, Hjn); lra.
 
- remember (Σ (i = 1, n), Σ (j = 1, n), (a.[i]*c.[i]*b.[j]*d.[j])) as r.
- replace (u₁ + v₁)%R with r.
-  Focus 2.
-  subst r u₁ v₁.
-  clear.
+ assert
+   (H : ∀ a b c d n,
+    Σ (i = 1, n), Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j]) =
+   (Σ (i = 1, n),
+    Σ (j = i + 1, n),
+    (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]) +
+    Σ (i = 1, n), (a.[i] * c.[i] * b.[i] * d.[i]))%R).
+  clear; intros.
   rewrite <- summation_add_distr.
   induction n.
    rewrite summation_empty; [ | lia ].
@@ -380,6 +383,8 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
     rewrite <- summation_add_distr.
     apply summation_compat; intros i (Hi, Hin).
     rewrite summation_split_last; [ easy | lia ].
+
+  f_equal; subst; rewrite <- H.
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
