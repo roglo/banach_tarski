@@ -97,7 +97,7 @@ Notation "'Σ' ( i = b , e ) , g" := (summation b e (λ i, (g)%R))
 Notation "u .[ i ]" := (List.nth (pred i) u 0%R)
   (at level 1, format "'[' u '[' .[ i ] ']' ']'").
 
-Theorem summation_aux_compat : ∀ g h b₁ b₂ len,
+Theorem summation_aux_eq_compat : ∀ g h b₁ b₂ len,
   (∀ i, 0 ≤ i < len → (g (b₁ + i)%nat = h (b₂ + i)%nat)%R)
   → (summation_aux b₁ len g = summation_aux b₂ len h)%R.
 Proof.
@@ -120,12 +120,12 @@ erewrite IHlen.
  now destruct Hi.
 Qed.
 
-Theorem summation_compat : ∀ g h b k,
+Theorem summation_eq_compat : ∀ g h b k,
   (∀ i, b ≤ i ≤ k → (g i = h i)%R)
   → (Σ (i = b, k), (g i) = Σ (i = b, k), (h i))%R.
 Proof.
 intros g h b k Hgh.
-apply summation_aux_compat.
+apply summation_aux_eq_compat.
 intros i (_, Hi).
 apply Hgh.
 split; [ apply Nat.le_add_r | idtac ].
@@ -307,7 +307,7 @@ Theorem summation_mul_distr_l : ∀ f b k a,
 Proof.
 intros.
 rewrite Rmult_comm, summation_mul_distr_r.
-apply summation_compat; intros; apply Rmult_comm.
+apply summation_eq_compat; intros; apply Rmult_comm.
 Qed.
 
 Theorem summation_summation_mul_distr : ∀ f g b k,
@@ -440,27 +440,27 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
      rewrite Rplus_0_l.
      now rewrite summation_add_distr.
 
-     apply summation_compat; intros i (Hi, Hin).
+     apply summation_eq_compat; intros i (Hi, Hin).
      rewrite summation_split_last; [ easy | lia ].
 
     rewrite <- summation_add_distr.
-    apply summation_compat; intros i (Hi, Hin).
+    apply summation_eq_compat; intros i (Hi, Hin).
     rewrite summation_split_last; [ easy | lia ].
 
   f_equal; subst; rewrite <- H.
    rewrite summation_summation_mul_distr.
-   apply summation_compat; intros i Hi.
-   apply summation_compat; intros j Hj.
+   apply summation_eq_compat; intros i Hi.
+   apply summation_eq_compat; intros j Hj.
    lra.
 
    rewrite summation_summation_mul_distr.
-   apply summation_compat; intros i Hi.
-   apply summation_compat; intros j Hj.
+   apply summation_eq_compat; intros i Hi.
+   apply summation_eq_compat; intros j Hj.
    lra.
 
  assert (Hvv : v₁ = v₂).
   subst v₁ v₂.
-  apply summation_compat.
+  apply summation_eq_compat.
   intros i Hi; lra.
 
   symmetry.
@@ -468,10 +468,10 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   subst u₁ u₂; clear v₁ v₂ Heqv₁ Heqv₂ Hvv.
   subst z.
   rewrite <- summation_sub_distr.
-  apply summation_compat.
+  apply summation_eq_compat.
   intros i (Hi, Hin).
   rewrite <- summation_sub_distr.
-  apply summation_compat.
+  apply summation_eq_compat.
   intros j (Hj, Hjn); lra.
 
 Qed.
@@ -489,7 +489,7 @@ specialize (Binet_Cauchy_identity a b a b n) as H.
 assert (Ha : ∀ a,
   (Σ (k = 1, n), ((a.[k])²))%R = (Σ (k = 1, n), (a.[k] * a.[k]))%R).
  clear; intros.
- apply summation_compat; intros.
+ apply summation_eq_compat; intros.
  now fold (Rsqr a.[i]).
 
  rewrite <- Ha in H.
@@ -501,9 +501,42 @@ assert (Ha : ∀ a,
   unfold Rsqr.
   now rewrite fold_Rminus, Rminus_diag_eq, Rplus_0_l.
 
-  apply summation_compat; intros.
+  apply summation_eq_compat; intros.
   apply Rmult_comm.
 Qed.
+
+Theorem summation_aux_le_compat : ∀ g h b₁ b₂ len,
+  (∀ i, 0 ≤ i < len → (g (b₁ + i)%nat ≤ h (b₂ + i)%nat)%R)
+  → (summation_aux b₁ len g ≤ summation_aux b₂ len h)%R.
+Proof.
+intros g h b₁ b₂ len Hgh.
+bbb.
+revert b₁ b₂ Hgh.
+induction len; intros; [ easy | simpl ].
+erewrite IHlen.
+ f_equal.
+ assert (0 ≤ 0 < S len) as H.
+  split; [ easy | apply Nat.lt_0_succ ].
+
+  apply Hgh in H.
+  now do 2 rewrite Nat.add_0_r in H.
+
+ intros i Hi.
+ do 2 rewrite Nat.add_succ_l, <- Nat.add_succ_r.
+ apply Hgh.
+ split; [ apply Nat.le_0_l | ].
+ apply lt_n_S.
+ now destruct Hi.
+Qed.
+
+Theorem summation_le_compat : ∀ b k f g,
+  (∀ i, (b ≤ i ≤ k) → (f i ≤ g i)%R)
+  → (Σ (i = b, k), (f i) ≤ Σ (i = b, k), (g i))%R.
+Proof.
+intros * Hfg.
+unfold summation.
+
+bbb.
 
 Theorem Cauchy_Schwarz_inequality2 : ∀ (u v : list R) n,
   ((Σ (k = 1, n), (u.[k] * v.[k]))² ≤
@@ -519,17 +552,16 @@ rewrite H.
 apply Rplus_le_reg_r with (r := (-x)%R).
 rewrite Rplus_assoc, Rplus_opp_r.
 rewrite Rplus_0_r.
-(**)
 clear.
 induction n.
  rewrite summation_empty; [ lra | lia ].
 
  eapply Rle_trans; [ apply IHn | ].
  rewrite summation_split_last; [ | lia ].
-Search (_ ≤ _ + _ → _)%R.
-
+ remember (Σ (j = S n + 1, S n), ((u.[S n] * v.[j] + - (u.[j] * v.[S n]))²))%R
+  as r eqn:Hr.
+ rewrite summation_empty in Hr; [ | lia ].
+ subst r; rewrite Rplus_0_r.
+ apply summation_le_compat; intros.
+ rewrite summation_split_last; [ | lia ].
 bbb.
-unfold summation.
-rewrite Nat.sub_succ, Nat.sub_0_r.
-clear.
-vvv.
