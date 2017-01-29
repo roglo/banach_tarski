@@ -360,6 +360,27 @@ induction n.
 
   rewrite IHn.
   do 2 rewrite <- Rplus_assoc; f_equal.
+  rewrite summation_add_distr; symmetry.
+  rewrite summation_add_distr; symmetry.
+  replace
+    (Σ (i = 1, n),
+     Σ (j = i + 1, S n),
+      (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]))
+  with
+    (Σ (i = 1, n),
+     (Σ (j = i + 1, n),
+        (a.[i] * c.[i] * b.[j] * d.[j] + a.[j] * c.[j] * b.[i] * d.[i]) +
+     (a.[i] * c.[i] * b.[S n] * d.[S n] +
+      a.[S n] * c.[S n] * b.[i] * d.[i]))).
+   Focus 2.
+   apply summation_compat; intros i (Hi, Hin).
+   rewrite summation_split_last; [ easy | lia ].
+
+   rewrite summation_add_distr.
+   do 4 rewrite Rplus_assoc; f_equal.
+   symmetry; rewrite Rplus_comm.
+   rewrite Rplus_assoc; f_equal.
+   rewrite Rplus_comm.
 bbb.
   rewrite Rplus_assoc.
   do 2 rewrite <- summation_add_distr.
