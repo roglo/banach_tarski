@@ -398,23 +398,6 @@ remember
 remember (Σ (i = 1, n), (a.[i]*c.[i]*b.[i]*d.[i])) as v₁.
 remember (Σ (i = 1, n), (a.[i]*d.[i]*b.[i]*c.[i])) as v₂.
 replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
- Focus 2.
- assert (Hvv : v₁ = v₂).
-  subst v₁ v₂.
-  apply summation_compat.
-  intros i Hi; lra.
-
-  symmetry.
-  replace ((u₁ + v₁) - (u₂ + v₂))%R with (u₁ - u₂)%R by lra.
-  subst u₁ u₂; clear v₁ v₂ Heqv₁ Heqv₂ Hvv.
-  subst z.
-  rewrite <- summation_sub_distr.
-  apply summation_compat.
-  intros i (Hi, Hin).
-  rewrite <- summation_sub_distr.
-  apply summation_compat.
-  intros j (Hj, Hjn); lra.
-
  assert
    (H : ∀ a b c d n,
     Σ (i = 1, n), Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j]) =
@@ -474,6 +457,23 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
    apply summation_compat; intros i Hi.
    apply summation_compat; intros j Hj.
    lra.
+
+ assert (Hvv : v₁ = v₂).
+  subst v₁ v₂.
+  apply summation_compat.
+  intros i Hi; lra.
+
+  symmetry.
+  replace ((u₁ + v₁) - (u₂ + v₂))%R with (u₁ - u₂)%R by lra.
+  subst u₁ u₂; clear v₁ v₂ Heqv₁ Heqv₂ Hvv.
+  subst z.
+  rewrite <- summation_sub_distr.
+  apply summation_compat.
+  intros i (Hi, Hin).
+  rewrite <- summation_sub_distr.
+  apply summation_compat.
+  intros j (Hj, Hjn); lra.
+
 Qed.
 
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%R.
@@ -504,3 +504,8 @@ assert (Ha : ∀ a,
   apply summation_compat; intros.
   apply Rmult_comm.
 Qed.
+
+Theorem Cauchy_Schwarz_inequality2 : ∀ (u v : list R),
+  ((dot_mul u v)² ≤ dot_mul u u * dot_mul v v)%R.
+Proof.
+vvv.
