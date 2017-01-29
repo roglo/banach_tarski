@@ -558,4 +558,10 @@ induction n.
  subst r; rewrite Rplus_0_r.
  apply summation_le_compat; intros.
  rewrite summation_split_last; [ | lia ].
-bbb.
+ remember (Σ (j = i + 1, n), ((u.[i] * v.[j] + - (u.[j] * v.[i]))²)) as r
+  eqn:Hr.
+ apply Rplus_le_reg_l with (r := (-r)%R).
+ rewrite <- Rplus_assoc.
+ rewrite Rplus_opp_l, Rplus_0_l.
+ apply Rle_0_sqr.
+Qed.
