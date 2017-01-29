@@ -266,6 +266,28 @@ f_equal.
 now rewrite summation_opp_distr.
 Qed.
 
+Theorem summation_swap : ∀ b₁ k₁ b₂ k₂ f,
+  Σ (i = b₁, k₁), Σ (j = b₂, k₂), f i j =
+  Σ (j = b₂, k₂), Σ (i = b₁, k₁), f i j.
+Proof.
+intros.
+unfold summation.
+remember (S k₁ - b₁) as len₁ eqn:Hlen₁.
+remember (S k₂ - b₂) as len₂ eqn:Hlen₂.
+clear Hlen₁ Hlen₂; clear.
+revert b₁ b₂ len₂.
+induction len₁; intros; simpl.
+ revert b₂.
+ induction len₂; intros; [ easy | simpl ].
+ rewrite <- IHlen₂; lra.
+
+ rewrite IHlen₁.
+ clear.
+ revert b₁ b₂ len₁.
+ induction len₂; intros; simpl; [ lra | ].
+ rewrite <- IHlen₂; lra.
+Qed.
+
 Theorem summation_mul_distr : ∀ f g b k,
   (Σ (i = b, k), (f i) * Σ (i = b, k), (g i))%R =
   Σ (i = b, k), Σ (j = b, k), (f i * g j).
@@ -286,8 +308,19 @@ induction k; intros.
   rewrite summation_split_last; [ idtac | easy ].
   rewrite summation_split_last; [ idtac | easy ].
   rewrite Rmult_plus_distr_l.
-  rewrite Rmult_plus_distr_r.
+  do 2 rewrite Rmult_plus_distr_r.
   rewrite IHk.
+  rewrite summation_swap; symmetry.
+  rewrite summation_swap; symmetry.
+  rewrite summation_split_last; [ | easy ].
+  do 2 rewrite Rplus_assoc; f_equal.
+
+bbb.
+  rewrite <- Rplus_assoc, Rplus_comm.
+  do 2 rewrite <- Rplus_assoc.
+  replace (f (S k) * g (S k) + Σ (i = b, k), Σ (j = b, k), (f i * g j))%R
+  with (Σ (i = b, k), Σ (j = b, k), (f i * g j) + f (S k) * g (S k))%R
+    by apply Rplus_comm.
 bbb.
 
 Theorem summation_succ_succ : ∀ b k g,
