@@ -568,6 +568,18 @@ destruct (le_dec i₁ (S i₂)) as [H₃| H₃].
  now apply Nat.nle_gt in H₂.
 Qed.
 
+Theorem summation_shift : ∀ b g k,
+  b ≤ k
+  → (Σ (i = b, k), (g i) =
+     Σ (i = 0, k - b), (g (b + i)%nat))%R.
+Proof.
+intros b g k Hbk.
+unfold summation.
+rewrite Nat.sub_0_r.
+rewrite Nat.sub_succ_l; [ idtac | assumption ].
+now apply summation_aux_eq_compat; intros j Hj.
+Qed.
+
 Theorem Cauchy_Schwarz_inequality2 : ∀ (u v : list R) n,
   ((Σ (k = 1, n), (u.[k] * v.[k]))² ≤
    Σ (k = 1, n), (u.[k]²) * Σ (k = 1, n), (v.[k]²))%R.
@@ -616,28 +628,48 @@ induction u as [| u₁ u]; intros.
 
   remember nth as f; simpl; subst f.
   rewrite summation_split_first; [ f_equal | lia ].
-bbb.
-
-  rewrite IHu.
-
-  rewrite IHu; simpl.
-  rewrite summation_split_last; [ simpl | lia ].
-  remember (length u) as n eqn:Hn.
-  symmetry in Hn.
-  destruct n.
+  destruct (length u).
+   rewrite IHu.
    rewrite summation_empty; [ | lia ].
-   rewrite summation_empty; [ lra | lia ].
+   rewrite summation_empty; [ easy | lia ].
 
-   symmetry.
-   rewrite summation_split_first; [ simpl | lia ].
-   rewrite Rplus_assoc; f_equal.
-
-bbb.
+   rewrite summation_shift; [ | lia ].
+   simpl; rewrite Nat.sub_0_r.
+   rewrite IHu.
+   rewrite summation_shift; [ | lia ].
+   now simpl; rewrite Nat.sub_0_r.
+Qed.
 
 Theorem Cauchy_Schwarz_inequality3 : ∀ (u v : list R),
   ((dot_mul u v)² ≤ dot_mul u u * dot_mul v v)%R.
 Proof.
 intros.
 specialize (Cauchy_Schwarz_inequality2 u v (length u)) as H.
-rewrite dot_mul_summation.
+do 3 rewrite dot_mul_summation.
+eapply Rle_trans; [ apply H | ].
+unfold Rsqr.
+apply Rmult_le_compat; [ | | lra | ].
+ clear H; induction (length u) as [| len].
+  rewrite summation_empty; [ lra | lia ].
+
+  rewrite summation_split_last; [ | lia ].
+  eapply Rle_trans; [ apply IHlen | ].
+  eapply Rplus_le_reg_l.
+  rewrite Rplus_opp_l.
+  rewrite <- Rplus_assoc.
+  rewrite Rplus_opp_l, Rplus_0_l.
+  fold (Rsqr (u.[S len])).
+  apply Rle_0_sqr.
+
+ clear H; induction (length u) as [| len].
+  rewrite summation_empty; [ lra | lia ].
+
+  rewrite summation_split_last; [ | lia ].
+  eapply Rle_trans; [ apply IHlen | ].
+  eapply Rplus_le_reg_l.
+  rewrite Rplus_opp_l.
+  rewrite <- Rplus_assoc.
+  rewrite Rplus_opp_l, Rplus_0_l.
+  fold (Rsqr (u.[S len])).
+  apply Rle_0_sqr.
 bbb.
