@@ -92,7 +92,7 @@ Fixpoint summation_aux b len g :=
 Definition summation b e g := summation_aux b (S e - b) g.
 
 Notation "'Σ' ( i = b , e ) , g" := (summation b e (λ i, (g)%R))
-  (at level 0, i at level 0, b at level 60, e at level 60, g at level 20).
+  (at level 0, i at level 0, b at level 60, e at level 60, g at level 0).
 
 Notation "u .[ i ]" := (List.nth (pred i) u 0%R)
   (at level 1, format "'[' u '[' .[ i ] ']' ']'").
@@ -122,7 +122,7 @@ Qed.
 
 Theorem summation_compat : ∀ g h b k,
   (∀ i, b ≤ i ≤ k → (g i = h i)%R)
-  → (Σ (i = b, k), g i = Σ (i = b, k), h i)%R.
+  → (Σ (i = b, k), (g i) = Σ (i = b, k), (h i))%R.
 Proof.
 intros g h b k Hgh.
 apply summation_aux_compat.
@@ -140,7 +140,7 @@ unfold summation.
 now replace (S k - b)%nat with O by lia.
 Qed.
 
-Theorem summation_only_one : ∀ g n, (Σ (i = n, n), g i = g n)%R.
+Theorem summation_only_one : ∀ g n, (Σ (i = n, n), (g i) = g n)%R.
 Proof.
 intros g n.
 unfold summation.
@@ -171,7 +171,7 @@ Proof. easy. Qed.
 
 Theorem summation_split_first : ∀ g b k,
   b ≤ k
-  → Σ (i = b, k), g i = (g b + Σ (i = S b, k), g i)%R.
+  → Σ (i = b, k), (g i) = (g b + Σ (i = S b, k), (g i))%R.
 Proof.
 intros g b k Hbk.
 unfold summation.
@@ -182,7 +182,7 @@ Qed.
 
 Theorem summation_split_last : ∀ g b k,
   (b ≤ S k)
-  → (Σ (i = b, S k), g i = Σ (i = b, k), g i + g (S k))%R.
+  → (Σ (i = b, S k), (g i) = Σ (i = b, k), (g i) + g (S k))%R.
 Proof.
 intros g b k Hbk.
 unfold summation.
@@ -195,7 +195,7 @@ Qed.
 
 Theorem summation_add_distr : ∀ g h b k,
   (Σ (i = b, k), (g i + h i) =
-   Σ (i = b, k), g i + Σ (i = b, k), h i)%R.
+   Σ (i = b, k), (g i) + Σ (i = b, k), (h i))%R.
 Proof.
 intros g h b k.
 destruct (le_dec b k) as [Hbk| Hbk].
@@ -226,7 +226,7 @@ destruct (le_dec b k) as [Hbk| Hbk].
 Qed.
 
 Theorem summation_opp_distr : ∀ g b k,
-  (- Σ (i = b, k), g i = Σ (i = b, k), (- g i))%R.
+  (- Σ (i = b, k), (g i) = Σ (i = b, k), (- g i))%R.
 Proof.
 intros.
 destruct (le_dec b k) as [Hbk| Hbk].
@@ -257,7 +257,7 @@ Qed.
 
 Theorem summation_sub_distr : ∀ g h b k,
   (Σ (i = b, k), (g i - h i) =
-   Σ (i = b, k), g i - Σ (i = b, k), h i)%R.
+   Σ (i = b, k), (g i) - Σ (i = b, k), (h i))%R.
 Proof.
 intros g h b k.
 unfold Rminus.
@@ -267,8 +267,8 @@ now rewrite summation_opp_distr.
 Qed.
 
 Theorem summation_swap : ∀ b₁ k₁ b₂ k₂ f,
-  Σ (i = b₁, k₁), Σ (j = b₂, k₂), f i j =
-  Σ (j = b₂, k₂), Σ (i = b₁, k₁), f i j.
+  Σ (i = b₁, k₁), Σ (j = b₂, k₂), (f i j) =
+  Σ (j = b₂, k₂), Σ (i = b₁, k₁), (f i j).
 Proof.
 intros.
 unfold summation.
@@ -348,7 +348,7 @@ induction k; intros.
 Qed.
 
 Theorem summation_succ_succ : ∀ b k g,
-  (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%R.
+  (Σ (i = S b, S k), (g i) = Σ (i = b, k), (g (S i)))%R.
 Proof.
 intros b k g.
 unfold summation.
@@ -480,14 +480,14 @@ Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%R.
 Proof. intros. now fold (Rminus x y). Qed.
 
 Theorem Lagrange_identity : ∀ (a b : list R) n,
-  ((Σ (k = 1, n), a.[k]²) * (Σ (k = 1, n), b.[k]²) -
+  ((Σ (k = 1, n), (a.[k]²)) * (Σ (k = 1, n), (b.[k]²)) -
      (Σ (k = 1, n), (a.[k] * b.[k]))² =
-   Σ (i = 1, n), Σ (j = i + 1, n), (a.[i] * b.[j] - a.[j] * b.[i])²)%R.
+   Σ (i = 1, n), Σ (j = i + 1, n), ((a.[i] * b.[j] - a.[j] * b.[i])²))%R.
 Proof.
 intros.
 specialize (Binet_Cauchy_identity a b a b n) as H.
 assert (Ha : ∀ a,
-  (Σ (k = 1, n), (a.[k])²)%R = (Σ (k = 1, n), (a.[k] * a.[k]))%R).
+  (Σ (k = 1, n), ((a.[k])²))%R = (Σ (k = 1, n), (a.[k] * a.[k]))%R).
  clear; intros.
  apply summation_compat; intros.
  now fold (Rsqr a.[i]).
@@ -505,7 +505,18 @@ assert (Ha : ∀ a,
   apply Rmult_comm.
 Qed.
 
-Theorem Cauchy_Schwarz_inequality2 : ∀ (u v : list R),
-  ((dot_mul u v)² ≤ dot_mul u u * dot_mul v v)%R.
+Theorem Cauchy_Schwarz_inequality2 : ∀ (u v : list R) n,
+  ((Σ (k = 1, n), (u.[k] * v.[k]))² ≤
+   Σ (k = 1, n), (u.[k]²) * Σ (k = 1, n), (v.[k]²))%R.
 Proof.
+intros.
+specialize (Lagrange_identity u v n) as H.
+remember ((Σ (k = 1, n), (u.[k] * v.[k]))²)%R as x eqn:Hx.
+apply Rplus_eq_compat_r with (r := x) in H.
+unfold Rminus in H.
+rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r in H.
+rewrite H.
+apply Rplus_le_reg_r with (r := (-x)%R).
+rewrite Rplus_assoc, Rplus_opp_r.
+rewrite Rplus_0_r.
 vvv.
