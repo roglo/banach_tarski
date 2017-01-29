@@ -476,15 +476,22 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
    lra.
 Qed.
 
-bbb.
-
-Theorem Lagrange_identity : ∀ (a b : list R),
-  let n := length a in
+Theorem Lagrange_identity : ∀ (a b : list R) n,
   ((Σ (k = 1, n), a.[k]²) * (Σ (k = 1, n), b.[k]²) -
-     (Σ (k = 1, n), a.[k] * b.[k])² =
+     (Σ (k = 1, n), (a.[k] * b.[k]))² =
    Σ (i = 1, n), Σ (j = i + 1, n), (a.[i] * b.[j] - a.[j] * b.[i])²)%R.
 Proof.
 intros.
+specialize (Binet_Cauchy_identity a b a b n) as H.
+assert (Ha : ∀ a,
+  (Σ (k = 1, n), (a.[k])²)%R = (Σ (k = 1, n), (a.[k] * a.[k]))%R).
+ clear; intros.
+ apply summation_compat; intros.
+ now fold (Rsqr a.[i]).
+
+ rewrite <- Ha in H.
+ rewrite <- Ha in H.
+ rewrite H.
 bbb.
 
 unfold sqr_sum_det.
