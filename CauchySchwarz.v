@@ -266,6 +266,30 @@ f_equal.
 now rewrite summation_opp_distr.
 Qed.
 
+Theorem summation_mul_distr : ∀ f g b k,
+  (Σ (i = b, k), (f i) * Σ (i = b, k), (g i))%R =
+  Σ (i = b, k), Σ (j = b, k), (f i * g j).
+Proof.
+intros.
+revert b.
+induction k; intros.
+ destruct b.
+  now do 4 rewrite summation_only_one.
+
+  rewrite summation_empty; [ | lia ].
+  rewrite summation_empty; [ | lia ].
+  rewrite summation_empty; [ lra | lia ].
+
+ destruct (le_dec b (S k)) as [Hbk| Hbk].
+  rewrite summation_split_last; [ idtac | easy ].
+  rewrite summation_split_last; [ idtac | easy ].
+  rewrite summation_split_last; [ idtac | easy ].
+  rewrite summation_split_last; [ idtac | easy ].
+  rewrite Rmult_plus_distr_l.
+  rewrite Rmult_plus_distr_r.
+  rewrite IHk.
+bbb.
+
 Theorem summation_succ_succ : ∀ b k g,
   (Σ (i = S b, S k), g i = Σ (i = b, k), g (S i))%R.
 Proof.
@@ -305,7 +329,6 @@ as z eqn:Hz.
 apply Rplus_eq_reg_r with (r := (- y)%R).
 replace (y + z + - y)%R with z by lra.
 replace (x + - y)%R with (x - y)%R by lra.
-(**)
 symmetry.
 remember
   (Σ (i = 1, n), Σ (j = i + 1, n),
@@ -385,6 +408,27 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
     rewrite summation_split_last; [ easy | lia ].
 
   f_equal; subst; rewrite <- H.
+   rewrite summation_mul_distr.
+   apply summation_compat; intros i Hi.
+   apply summation_compat; intros j Hj.
+   lra.
+
+   rewrite summation_mul_distr.
+   apply summation_compat; intros i Hi.
+   apply summation_compat; intros j Hj.
+   lra.
+bbb.
+
+   induction n.
+    rewrite summation_empty; [ | lia ].
+    rewrite summation_empty; [ lra | lia ].
+
+    rewrite summation_split_last; [ | lia ].
+    rewrite summation_split_last; [ | lia ].
+    rewrite summation_split_last; [ | lia ].
+    rewrite summation_split_last; [ | lia ].
+
+
 bbb.
 
 Theorem Lagrange_identity : ∀ (a b : list R),
