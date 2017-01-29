@@ -510,23 +510,16 @@ Theorem summation_aux_le_compat : ∀ g h b₁ b₂ len,
   → (summation_aux b₁ len g ≤ summation_aux b₂ len h)%R.
 Proof.
 intros g h b₁ b₂ len Hgh.
-bbb.
 revert b₁ b₂ Hgh.
-induction len; intros; [ easy | simpl ].
-erewrite IHlen.
- f_equal.
- assert (0 ≤ 0 < S len) as H.
-  split; [ easy | apply Nat.lt_0_succ ].
+induction len; intros; simpl; [ lra | ].
+apply Rplus_le_compat.
+ assert (H : 0 ≤ 0 < S len) by lia.
+ apply Hgh in H.
+ now do 2 rewrite Nat.add_0_r in H.
 
-  apply Hgh in H.
-  now do 2 rewrite Nat.add_0_r in H.
-
- intros i Hi.
- do 2 rewrite Nat.add_succ_l, <- Nat.add_succ_r.
- apply Hgh.
- split; [ apply Nat.le_0_l | ].
- apply lt_n_S.
- now destruct Hi.
+ apply IHlen; intros i Hi.
+ do 2 rewrite Nat.add_succ_comm.
+ apply Hgh; lia.
 Qed.
 
 Theorem summation_le_compat : ∀ b k f g,
@@ -535,8 +528,9 @@ Theorem summation_le_compat : ∀ b k f g,
 Proof.
 intros * Hfg.
 unfold summation.
-
-bbb.
+apply summation_aux_le_compat; intros i Hi.
+apply Hfg; lia.
+Qed.
 
 Theorem Cauchy_Schwarz_inequality2 : ∀ (u v : list R) n,
   ((Σ (k = 1, n), (u.[k] * v.[k]))² ≤
