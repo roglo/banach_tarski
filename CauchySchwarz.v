@@ -285,8 +285,7 @@ rewrite Rplus_comm, <- Rplus_assoc.
 f_equal; apply Rplus_comm.
 Qed.
 
-Theorem Binet_Cauchy_identity : ∀ (a b c d : list R),
-  let n := length a in
+Theorem Binet_Cauchy_identity : ∀ (a b c d : list R) n,
   (Σ (i = 1, n), (a.[i] * c.[i]) * Σ (j = 1, n), (b.[j] * d.[j]) =
    Σ (i = 1, n), (a.[i] * d.[i]) * Σ (j = 1, n), (b.[j] * c.[j]) +
    Σ (i = 1, n), Σ (j = i + 1, n),
@@ -340,8 +339,8 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
  replace (u₁ + v₁)%R with r.
   Focus 2.
   subst r u₁ v₁.
-  rewrite <- summation_add_distr.
   clear.
+  rewrite <- summation_add_distr.
   induction n.
    rewrite summation_empty; [ | lia ].
    rewrite summation_empty; [ lra | lia ].
