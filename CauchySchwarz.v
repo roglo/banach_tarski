@@ -336,6 +336,7 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   apply summation_compat.
   intros j (Hj, Hjn); lra.
 
+bbb.
  remember (Σ (i = 1, n), Σ (j = 1, n), (a.[i]*c.[i]*b.[j]*d.[j])) as r.
  replace (u₁ + v₁)%R with r.
   Focus 2.
