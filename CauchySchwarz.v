@@ -341,9 +341,28 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   Focus 2.
   subst r u₁ v₁.
   rewrite <- summation_add_distr.
+bbb.
+  (* this summation_compat is wrong *)
   apply summation_compat.
   intros i (Hi, Hin).
+destruct n.
+rewrite summation_empty; [ | lia ].
+rewrite summation_empty; [ | lia ].
+rewrite summation_empty; [ | lia ].
+lra.
+bbb.
   rewrite summation_add_distr.
+destruct n.
+do 2 rewrite summation_only_one.
+rewrite summation_only_one.
+rewrite summation_empty; [ | lia ].
+rewrite summation_only_one; lra.
+destruct n.
+unfold summation; simpl.
+lra.
+destruct n.
+unfold summation; simpl.
+lra.
   replace (Σ (j = 1, n), (a.[i] * c.[i] * b.[j] * d.[j])) with
     (a.[i] * c.[i] * Σ (j = 1, n), (b.[j] * d.[j]))%R.
    replace (Σ (j = i + 1, n), (a.[i] * c.[i] * b.[j] * d.[j]))
