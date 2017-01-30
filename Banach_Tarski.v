@@ -2844,7 +2844,7 @@ Definition J₁ r :=
     (λ '(axis, cosθ, sinθ),
      ∥axis∥ = r ∧ (cosθ² + sinθ² = 1)%R ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
-     ∃ p p', p ≠ p' ∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
+     ∃ p p', p × p' ≠ 0%vec ∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
 Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
@@ -2930,7 +2930,6 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hno', path_of_nat_inv.
      rewrite Hso₂, Hso₃.
      remember (acos ((p · p') / r²)) as a eqn:Ha.
-(**)
      assert (Hppi : (-1 < (p · p') / r² < 1)%R).
       apply Rabs_lt.
       rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
@@ -2956,55 +2955,20 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       assert (H1 : (p ≠ 0)%vec) by now intros H; rewrite H, vec_norm_0 in Hp.
       assert (H2 : (p' ≠ 0)%vec) by now intros H; rewrite H, vec_norm_0 in Hp'.
       intros H.
-      apply vec_norm_eq_0 in H.
-      apply vec_cross_mul_eq_0 in H; [ | easy | easy ].
-bbb.
-     assert (Hppi : (-1 ≤ (p · p') / r² ≤ 1)%R).
-      apply Rabs_le.
-      rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
-      rewrite Rabs_sqr.
-      destruct p as (x, y, z).
-      destruct p' as (x', y', z'); simpl.
-      simpl in Hvn, Hp, Hp'.
-      apply Rmult_le_reg_r with (r := (r²)%R); [ now apply Rlt_0_sqr | ].
-      rewrite Rmult_1_l.
-      rewrite Rmult_div_same; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
-      clear - Hr Hp Hp'.
-      specialize (vec_Cauchy_Schwarz_inequality (V x y z) (V x' y' z')) as H.
-      simpl in H.
-      rewrite Hp, Hp' in H.
-      rewrite Rsqr_sqrt in H; [ | apply Rle_0_sqr ].
-      rewrite fold_Rsqr in H.
-      apply Rsqr_le_abs_0 in H.
-      now rewrite Rabs_sqr in H.
+      now apply vec_norm_eq_0 in H.
 
-      assert (Hpp1 : ((p · p') / r² ≠ 1)%R).
-       intros H.
-       apply Rmult_eq_compat_r with (r := (r²)%R) in H.
-       rewrite Rmult_div_same in H; [ | now intros P; apply Rsqr_eq_0 in P ].
-       rewrite Rmult_1_l in H.
-       destruct p as (x, y, z).
-       destruct p' as (x', y', z').
-       simpl in Hp, Hp', H.
-(* perhaps I should look at Lagrange's identity. *)
-bbb.
-     enough (Hpp' : (-1 < (p · p') / r² < 1)%R).
+      rewrite Ha at 1.
       rewrite cos_acos; [ | easy ].
-      rewrite <- Ha.
       rewrite HM in Hv.
       simpl in Hv.
       destruct v as (x, y, z).
       simpl in Hvn.
       rewrite Hvn in Hv.
-bbb.
-(*
-      do 3 rewrite Rdiv_1_r in Hv.
-*)
       unfold mat_vec_mul in Hv; simpl in Hv.
       destruct p as (xp, yp, zp).
       destruct p' as (xp', yp', zp').
       injection Hv; clear Hv; intros Hzp Hyp Hxp.
-      simpl in Ha, Hpp', Hp'; simpl.
+      simpl in Ha, Hp'; simpl.
       f_equal; [ f_equal | ].
 (* on s'attaque au cosinus *)
 Focus 2.
@@ -3013,6 +2977,7 @@ apply Rmult_eq_reg_r with (r := (r²)%R).
   rewrite <- Hxp, <- Hyp, <- Hzp.
   ring_simplify.
   progress repeat rewrite <- Rsqr_pow2.
+bbb.
   replace
     (- xp² * x² * c + xp² * x² + xp² * c - 2 * xp * c * x * y * yp -
      2 * xp * c * x * z * zp + 2 * xp * x * y * yp + 2 * xp * x * z * zp -
