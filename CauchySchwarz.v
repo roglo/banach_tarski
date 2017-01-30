@@ -667,3 +667,5 @@ apply Rmult_le_compat; [ | | | ].
  apply summation_nonneg; intros i Hi.
  apply Rle_0_sqr.
 Qed.
+
+Check Cauchy_Schwarz_inequality.
