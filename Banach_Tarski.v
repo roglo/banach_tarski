@@ -2972,12 +2972,30 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       f_equal; [ f_equal | ].
 (* on s'attaque au cosinus *)
 Focus 2.
-apply Rmult_eq_reg_r with (r := (r²)%R).
- rewrite Rmult_div_same.
-  rewrite <- Hxp, <- Hyp, <- Hzp.
-  ring_simplify.
-  progress repeat rewrite <- Rsqr_pow2.
+assert (Hr2 : (r² ≠ 0)%R) by now intros H; apply Rsqr_eq_0 in H.
+apply Rmult_eq_reg_r with (r := (r²)%R); [ | easy ].
+rewrite Rmult_div_same; [ | easy ].
+rewrite <- Hxp, <- Hyp, <- Hzp.
+progress repeat rewrite Rsqr_pow2.
+field_simplify; [ | easy ].
+rewrite Rdiv_1_r.
+apply Rmult_eq_reg_r with (r := (r²)%R); [ | easy ].
+progress repeat rewrite <- Rsqr_pow2.
+rewrite Rmult_div_same; [ | easy ].
+ring_simplify.
+simpl in Hp.
+replace
+  (- xp² * x² * c + xp² * x² + xp² * c * r² + c * r² * yp² + c * r² * zp² -
+   2 * c * xp * x * y * yp - 2 * c * xp * x * z * zp -
+   2 * c * y * yp * z * zp - c * yp² * y² - c * zp² * z²)%R
+with
+  (c * (r² * (xp² + yp² + zp²)) + c * (- xp² * x² -
+   2 * xp * x * y * yp - 2 * xp * x * z * zp -
+   2 * y * yp * z * zp - yp² * y² - zp² * z²) + xp² * x²)%R
+by lra.
+rewrite Hp.
 bbb.
+
   replace
     (- xp² * x² * c + xp² * x² + xp² * c - 2 * xp * c * x * y * yp -
      2 * xp * c * x * z * zp + 2 * xp * x * y * yp + 2 * xp * x * z * zp -
