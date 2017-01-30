@@ -123,7 +123,6 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   rewrite <- summation_sub_distr.
   apply summation_eq_compat.
   intros j (Hj, Hjn); lra.
-
 Qed.
 
 Theorem Lagrange_identity : ∀ (a b : list R) n,
@@ -185,5 +184,3 @@ induction n.
  rewrite Rplus_opp_l, Rplus_0_l.
  apply Rle_0_sqr.
 Qed.
-
-Check Cauchy_Schwarz_inequality.
