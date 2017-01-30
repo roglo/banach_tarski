@@ -6,16 +6,6 @@ Import ListNotations.
 
 Require Import SummationR.
 
-Fixpoint dot_mul u v :=
-  match u with
-  | [] => 0%R
-  | u₁ :: ul =>
-      match v with
-      | [] => 0%R
-      | v₁ :: vl => (u₁ * v₁ + dot_mul ul vl)%R
-      end
-  end.
-
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%R.
 Proof. intros. now fold (Rminus x y). Qed.
 
@@ -162,7 +152,7 @@ assert (Ha : ∀ a,
   apply Rmult_comm.
 Qed.
 
-Theorem Cauchy_Schwarz_inequality2 : ∀ (u v : list R) n,
+Theorem Cauchy_Schwarz_inequality : ∀ (u v : list R) n,
   ((Σ (k = 1, n), (u.[k] * v.[k]))² ≤
    Σ (k = 1, n), (u.[k]²) * Σ (k = 1, n), (v.[k]²))%R.
 Proof.
@@ -193,72 +183,6 @@ induction n.
  apply Rplus_le_reg_l with (r := (-r)%R).
  rewrite <- Rplus_assoc.
  rewrite Rplus_opp_l, Rplus_0_l.
- apply Rle_0_sqr.
-Qed.
-
-Theorem dot_mul_summation : ∀ u v n,
-  (min (length u) (length v) ≤ n)
-  → dot_mul u v = Σ (i = 1, n), (u.[i] * v.[i]).
-Proof.
-intros * Hn.
-revert v n Hn.
-induction u as [| u₁ u]; intros.
- rewrite all_0_summation_0; [ easy | ].
- intros i Hi; simpl.
- destruct (pred i); lra.
-
- destruct v as [| v₁ v].
-  rewrite all_0_summation_0; [ easy | intros i Hi; simpl ].
-  destruct (pred i); lra.
-
-  simpl in Hn.
-  remember nth as f; simpl; subst f.
-  rewrite summation_split_first; [ f_equal | lia ].
-  destruct n; [ lia | ].
-  apply Nat.succ_le_mono in Hn.
-  destruct n.
-   rewrite summation_empty; [ | lia ].
-   apply Nat.le_0_r in Hn.
-   now destruct u, v.
-
-   rewrite summation_shift; [ | lia ].
-   rewrite IHu with (n := S n); [ | easy ].
-   rewrite summation_shift; [ easy | lia ].
-Qed.
-
-Theorem Cauchy_Schwarz_inequality : ∀ (u v : list R),
-  ((dot_mul u v)² ≤ dot_mul u u * dot_mul v v)%R.
-Proof.
-intros.
-remember (min (length u) (length v)) as n eqn:Hn.
-specialize (Cauchy_Schwarz_inequality2 u v n) as H.
-rewrite dot_mul_summation with (n := n); [ | lia ].
-rewrite dot_mul_summation with (n := length u); [ | lia ].
-rewrite dot_mul_summation with (n := length v); [ | lia ].
-eapply Rle_trans; [ apply H | ].
-apply Rmult_le_compat.
- apply summation_nonneg; intros; apply Rle_0_sqr.
-
- apply summation_nonneg; intros; apply Rle_0_sqr.
-
- clear H.
- assert (H : ∃ a, length u = n + a) by (exists (length u - n); lia).
- destruct H as (a, H); rewrite H.
- rewrite summation_ub_add; [ | lia ].
- eapply Rplus_le_reg_l.
- rewrite <- Rplus_assoc.
- do 2 rewrite Rplus_opp_l; rewrite Rplus_0_l.
- apply summation_nonneg; intros i Hi.
- apply Rle_0_sqr.
-
- clear H.
- assert (H : ∃ a, length v = n + a) by (exists (length v - n); lia).
- destruct H as (a, H); rewrite H.
- rewrite summation_ub_add; [ | lia ].
- eapply Rplus_le_reg_l.
- rewrite <- Rplus_assoc.
- do 2 rewrite Rplus_opp_l; rewrite Rplus_0_l.
- apply summation_nonneg; intros i Hi.
  apply Rle_0_sqr.
 Qed.
 

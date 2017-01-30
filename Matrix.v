@@ -9,6 +9,7 @@ Require Import Utf8 List.
 Require Import Reals Psatz.
 
 Require Import Words Normalize Reverse MiscReals.
+Require Import SummationR.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -1022,6 +1023,17 @@ Definition vec_of_list v :=
   | _ => 0%vec
   end.
 
+(* useless intermediate definition: should be removed *)
+Fixpoint dot_mul u v :=
+  match u with
+  | [] => 0%R
+  | u₁ :: ul =>
+      match v with
+      | [] => 0%R
+      | v₁ :: vl => (u₁ * v₁ + dot_mul ul vl)%R
+      end
+  end.
+
 Theorem vec_dot_mul_of_dot_mul : ∀ ul vl,
   length ul = 3
   → length vl = 3
@@ -1046,29 +1058,63 @@ Proof. now intros (x, y, z). Qed.
 Theorem vec_of_list_inv : ∀ v, vec_of_list (list_of_vec v) = v.
 Proof. now intros (x, y, z). Qed.
 
+Theorem dot_mul_summation : ∀ u v n,
+  (min (length u) (length v) ≤ n)
+  → dot_mul u v = Σ (i = 1, n), (u.[i] * v.[i]).
+Proof.
+intros * Hn.
+revert v n Hn.
+induction u as [| u₁ u]; intros.
+ rewrite all_0_summation_0; [ easy | ].
+ intros i Hi; simpl.
+ destruct (pred i); lra.
+
+ destruct v as [| v₁ v].
+  rewrite all_0_summation_0; [ easy | intros i Hi; simpl ].
+  destruct (pred i); lra.
+
+  simpl in Hn.
+  remember nth as f; simpl; subst f.
+  rewrite summation_split_first; [ f_equal | lia ].
+  destruct n; [ lia | ].
+  apply Nat.succ_le_mono in Hn.
+  destruct n.
+   rewrite summation_empty; [ | lia ].
+   apply Nat.le_0_r in Hn.
+   now destruct u, v.
+
+   rewrite summation_shift; [ | lia ].
+   rewrite IHu with (n := S n); [ | easy ].
+   rewrite summation_shift; [ easy | lia ].
+Qed.
+
 Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
 Proof.
 intros.
 remember (list_of_vec u) as ul eqn:Hul.
 remember (list_of_vec v) as vl eqn:Hvl.
-(*
-Require Import SummationR.
-remember (min (length ul) (length vl)) as n eqn:Hn.
-specialize (Cauchy_Schwarz_inequality2 ul vl n) as H; subst n.
+remember (max (length ul) (length vl)) as n eqn:Hn.
+specialize (Cauchy_Schwarz_inequality ul vl n) as H; subst n.
 unfold Rsqr in H at 2 3.
 rewrite <- dot_mul_summation in H.
-Check dot_mul_summation.
-*)
-specialize (Cauchy_Schwarz_inequality ul vl) as H.
-specialize (length_list_of_vec u) as Hlu.
-specialize (length_list_of_vec v) as Hlv.
-rewrite <- Hul in Hlu.
-rewrite <- Hvl in Hlv.
-rewrite vec_dot_mul_of_dot_mul in H; [ | easy | easy ].
-rewrite vec_dot_mul_of_dot_mul in H; [ | easy | easy ].
-rewrite Hul, Hvl in H.
-do 2 rewrite vec_of_list_inv in H.
-rewrite vec_dot_mul_of_dot_mul in H; [ | now subst | now subst ].
-rewrite vec_of_list_inv in H.
-now do 2 rewrite vec_dot_mul_diag in H.
+ rewrite <- dot_mul_summation in H.
+  rewrite <- dot_mul_summation in H.
+   specialize (length_list_of_vec u) as Hlu.
+   specialize (length_list_of_vec v) as Hlv.
+   rewrite <- Hul in Hlu.
+   rewrite <- Hvl in Hlv.
+   rewrite vec_dot_mul_of_dot_mul in H; [ | easy | easy ].
+   rewrite vec_dot_mul_of_dot_mul in H; [ | easy | easy ].
+   rewrite Hul, Hvl in H.
+   do 2 rewrite vec_of_list_inv in H.
+   rewrite vec_dot_mul_of_dot_mul in H; [ | now subst | now subst ].
+   rewrite vec_of_list_inv in H.
+   now do 2 rewrite vec_dot_mul_diag in H.
+
+   rewrite Nat.min_id; apply Nat.le_max_r.
+
+  rewrite Nat.min_id; apply Nat.le_max_l.
+  destruct (Nat.min_dec (length ul) (length vl)) as [Hm| Hm]; rewrite Hm.
+   apply Nat.le_max_l.
+   apply Nat.le_max_r.
 Qed.
