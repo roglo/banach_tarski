@@ -1737,17 +1737,6 @@ destruct H as [| H]; [ subst c | ].
  now intros H₁; apply Huv.
 Qed.
 
-(* too strange that this is, I did not know that, a proof of
-   Lagrange's identity! in two lines!!! *)
-Theorem vec_dot_sqr_cros_mul : ∀ u v,
-  ((u × v) · (u × v) = (u · u) * (v · v) - (u · v)²)%R.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
-rewrite Rsqr_pow2; ring.
-Qed.
-
-bbb.
-
 Theorem vec_couple_and_cross_formula : ∀ u v X,
   (u × v · u × v) ⁎ X =
    (((X · u) * (v · v) - (X · v) * (u · v)) ⁎ u +
@@ -2960,7 +2949,15 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       rewrite Hp, Hp'.
       fold (Rsqr (r²)).
       enough (0 < (p × p')²%vec)%R by lra.
-Search (_ × _)%vec.
+      rewrite vec_dot_mul_diag.
+      apply Rlt_0_sqr.
+      clear H.
+      symmetry in Hp, Hp'.
+      assert (H1 : (p ≠ 0)%vec) by now intros H; rewrite H, vec_norm_0 in Hp.
+      assert (H2 : (p' ≠ 0)%vec) by now intros H; rewrite H, vec_norm_0 in Hp'.
+      intros H.
+      apply vec_norm_eq_0 in H.
+      apply vec_cross_mul_eq_0 in H; [ | easy | easy ].
 bbb.
      assert (Hppi : (-1 ≤ (p · p') / r² ≤ 1)%R).
       apply Rabs_le.
