@@ -642,6 +642,44 @@ induction u as [| u₁ u]; intros.
    now simpl; rewrite Nat.sub_0_r.
 Qed.
 
+Theorem summation_aux_ub_add : ∀ g b k₁ k₂,
+  (summation_aux b (k₁ + k₂) g =
+   summation_aux b k₁ g + summation_aux (b + k₁) k₂ g)%R.
+Proof.
+intros g b k₁ k₂.
+revert b k₁.
+induction k₂; intros.
+ simpl.
+ now rewrite Nat.add_0_r, Rplus_0_r.
+
+ rewrite Nat.add_succ_r, <- Nat.add_succ_l.
+ rewrite IHk₂; simpl.
+ rewrite <- Nat.add_succ_r.
+ rewrite <- Rplus_assoc.
+ apply Rplus_eq_compat_r.
+ clear k₂ IHk₂.
+ revert b.
+ induction k₁; intros; simpl.
+  rewrite Nat.add_0_r.
+  apply Rplus_comm.
+
+  rewrite Rplus_assoc.
+  rewrite IHk₁.
+  rewrite Nat.add_succ_r, <- Nat.add_succ_l; reflexivity.
+Qed.
+
+Theorem summation_ub_add : ∀ g b k₁ k₂,
+  b ≤ S k₁
+  → (Σ (i = b, k₁ + k₂), (g i) =
+     Σ (i = b, k₁), (g i) + Σ (i = S k₁, k₁ + k₂), (g i))%R.
+Proof.
+intros g b k₁ k₂ Hbk.
+unfold summation.
+replace (S (k₁ + k₂) - b) with (S k₁ - b + k₂) by lia.
+rewrite summation_aux_ub_add; f_equal.
+f_equal; lia.
+Qed.
+
 Theorem Cauchy_Schwarz_inequality3 : ∀ (u v : list R),
   ((dot_mul u v)² ≤ dot_mul u u * dot_mul v v)%R.
 Proof.
@@ -678,4 +716,12 @@ apply Rmult_le_compat; [ | | | ].
   rewrite Rplus_opp_l, Rplus_0_l.
   fold (Rsqr (u.[S len])).
   apply Rle_0_sqr.
+
+ clear H.
+ assert (∃ a, length u = n + a) by (exists (length u - n); lia).
+ destruct H as (a, H); rewrite H.
+ rewrite summation_ub_add; [ | lia ].
+ eapply Rplus_le_reg_l.
+ rewrite <- Rplus_assoc.
+ rewrite Rplus_opp_l, Rplus_0_l.
 bbb.
