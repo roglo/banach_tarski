@@ -129,7 +129,7 @@ Definition sqr_cross_mul n u v :=
    Σ (i = 1, n), Σ (j = i + 1, n), ((u.[i] * v.[j] - u.[j] * v.[i])²).
 
 Theorem Lagrange_identity : ∀ n a b,
-  (dot_mul n a a * dot_mul n b b - (dot_mul n a b)²)%R = sqr_cross_mul n a b.
+  (dot_mul n a a * dot_mul n b b = (dot_mul n a b)² + sqr_cross_mul n a b)%R.
 Proof.
 intros.
 specialize (Binet_Cauchy_identity a b a b n) as H.
@@ -138,15 +138,10 @@ fold (dot_mul n b b) in H.
 fold (dot_mul n a b) in H.
 fold (dot_mul n b a) in H.
 rewrite H; clear H.
-replace (dot_mul n b a) with (dot_mul n a b).
- unfold Rsqr, Rminus.
- rewrite Rplus_shuffle0.
- rewrite fold_Rminus.
- rewrite Rminus_diag_eq; [ | easy ].
- now rewrite Rplus_0_l.
-
- apply summation_eq_compat; intros.
- apply Rmult_comm.
+unfold Rsqr.
+f_equal; f_equal.
+apply summation_eq_compat; intros.
+apply Rmult_comm.
 Qed.
 
 Theorem Lagrange_identity_bis : ∀ n (a b : list R),
