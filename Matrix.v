@@ -1046,6 +1046,14 @@ Qed.
 
 Theorem vec_Lagrange_identity : ∀ u v, (∥u∥² * ∥v∥² - (u · v)²)%R = (u × v)²%vec.
 Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃).
+simpl.
+rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+unfold Rsqr; lra.
+Qed.
+
+(*
 intros.
 remember (list_of_vec u) as ul eqn:Hul.
 remember (list_of_vec v) as vl eqn:Hvl.
@@ -1066,9 +1074,18 @@ destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
 unfold Rsqr; simpl; lra.
 Qed.
+*)
 
 Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
 Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃).
+simpl.
+rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+bbb.
+
+unfold Rsqr; lra.
+
 intros.
 apply Rplus_le_reg_r with (r := (- (u · v)²)%R).
 do 2 rewrite fold_Rminus.
