@@ -1051,6 +1051,14 @@ Proof.
 intros.
 remember (list_of_vec u) as ul eqn:Hul.
 remember (list_of_vec v) as vl eqn:Hvl.
+(*
+Require Import SummationR.
+remember (min (length ul) (length vl)) as n eqn:Hn.
+specialize (Cauchy_Schwarz_inequality2 ul vl n) as H; subst n.
+unfold Rsqr in H at 2 3.
+rewrite <- dot_mul_summation in H.
+Check dot_mul_summation.
+*)
 specialize (Cauchy_Schwarz_inequality ul vl) as H.
 specialize (length_list_of_vec u) as Hlu.
 specialize (length_list_of_vec v) as Hlv.
