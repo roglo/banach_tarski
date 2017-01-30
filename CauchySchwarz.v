@@ -125,6 +125,15 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   intros j (Hj, Hjn); lra.
 Qed.
 
+(*
+Definition dot_mul n u v := Σ (k = 1, n), (u.[k] * v.[k]).
+
+Theorem vec_Lagrange_identity : ∀ n u v,
+  (dot_mul n u u * dot_mul n v v - (dot_mul n u v)²)%R = (u × v)²%vec.
+Proof.
+bbb.
+*)
+
 Theorem Lagrange_identity : ∀ (a b : list R) n,
   ((Σ (k = 1, n), (a.[k]²)) * (Σ (k = 1, n), (b.[k]²)) -
      (Σ (k = 1, n), (a.[k] * b.[k]))² =
