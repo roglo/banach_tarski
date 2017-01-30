@@ -1,6 +1,5 @@
 (* Cauchy-Schwarz in any dimension *)
 (* Compiled with Coq 8.6 *)
-
 Require Import Utf8 List Reals Psatz.
 Import ListNotations.
 
@@ -125,16 +124,32 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   intros j (Hj, Hjn); lra.
 Qed.
 
-(*
 Definition dot_mul n u v := Σ (k = 1, n), (u.[k] * v.[k]).
+Definition sqr_cross_mul n u v :=
+   Σ (i = 1, n), Σ (j = i + 1, n), ((u.[i] * v.[j] - u.[j] * v.[i])²).
 
-Theorem vec_Lagrange_identity : ∀ n u v,
-  (dot_mul n u u * dot_mul n v v - (dot_mul n u v)²)%R = (u × v)²%vec.
+Theorem Lagrange_identity : ∀ n a b,
+  (dot_mul n a a * dot_mul n b b - (dot_mul n a b)²)%R = sqr_cross_mul n a b.
 Proof.
-bbb.
-*)
+intros.
+specialize (Binet_Cauchy_identity a b a b n) as H.
+fold (dot_mul n a a) in H.
+fold (dot_mul n b b) in H.
+fold (dot_mul n a b) in H.
+fold (dot_mul n b a) in H.
+rewrite H; clear H.
+replace (dot_mul n b a) with (dot_mul n a b).
+ unfold Rsqr, Rminus.
+ rewrite Rplus_shuffle0.
+ rewrite fold_Rminus.
+ rewrite Rminus_diag_eq; [ | easy ].
+ now rewrite Rplus_0_l.
 
-Theorem Lagrange_identity : ∀ (a b : list R) n,
+ apply summation_eq_compat; intros.
+ apply Rmult_comm.
+Qed.
+
+Theorem Lagrange_identity_bis : ∀ n (a b : list R),
   ((Σ (k = 1, n), (a.[k]²)) * (Σ (k = 1, n), (b.[k]²)) -
      (Σ (k = 1, n), (a.[k] * b.[k]))² =
    Σ (i = 1, n), Σ (j = i + 1, n), ((a.[i] * b.[j] - a.[j] * b.[i])²))%R.
@@ -165,7 +180,7 @@ Theorem Cauchy_Schwarz_inequality : ∀ (u v : list R) n,
    Σ (k = 1, n), (u.[k]²) * Σ (k = 1, n), (v.[k]²))%R.
 Proof.
 intros.
-specialize (Lagrange_identity u v n) as H.
+specialize (Lagrange_identity_bis n u v) as H.
 remember ((Σ (k = 1, n), (u.[k] * v.[k]))²)%R as x eqn:Hx.
 apply Rplus_eq_compat_r with (r := x) in H.
 unfold Rminus in H.
