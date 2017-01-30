@@ -233,25 +233,13 @@ intros.
 remember (min (length u) (length v)) as n eqn:Hn.
 specialize (Cauchy_Schwarz_inequality2 u v n) as H.
 rewrite dot_mul_summation with (n := n); [ | lia ].
-rewrite dot_mul_summation with (n := n); [ | ].
-Search (min _ _ = _).
-2: rewrite Nat.min_id.
-bbb.
-
-Search (min _ _ ≤ _)%nat.
-
-do 3 rewrite dot_mul_summation.
-rewrite <- Hn.
-rewrite min_l; [ | lia ].
-rewrite min_l; [ | lia ].
+rewrite dot_mul_summation with (n := length u); [ | lia ].
+rewrite dot_mul_summation with (n := length v); [ | lia ].
 eapply Rle_trans; [ apply H | ].
-unfold Rsqr.
-apply Rmult_le_compat; [ | | | ].
- apply summation_nonneg; intros i Hi.
- apply Rle_0_sqr.
+apply Rmult_le_compat.
+ apply summation_nonneg; intros; apply Rle_0_sqr.
 
- apply summation_nonneg; intros i Hi.
- apply Rle_0_sqr.
+ apply summation_nonneg; intros; apply Rle_0_sqr.
 
  clear H.
  assert (H : ∃ a, length u = n + a) by (exists (length u - n); lia).
@@ -259,7 +247,7 @@ apply Rmult_le_compat; [ | | | ].
  rewrite summation_ub_add; [ | lia ].
  eapply Rplus_le_reg_l.
  rewrite <- Rplus_assoc.
- rewrite Rplus_opp_l, Rplus_0_l.
+ do 2 rewrite Rplus_opp_l; rewrite Rplus_0_l.
  apply summation_nonneg; intros i Hi.
  apply Rle_0_sqr.
 
@@ -269,7 +257,7 @@ apply Rmult_le_compat; [ | | | ].
  rewrite summation_ub_add; [ | lia ].
  eapply Rplus_le_reg_l.
  rewrite <- Rplus_assoc.
- rewrite Rplus_opp_l, Rplus_0_l.
+ do 2 rewrite Rplus_opp_l; rewrite Rplus_0_l.
  apply summation_nonneg; intros i Hi.
  apply Rle_0_sqr.
 Qed.
