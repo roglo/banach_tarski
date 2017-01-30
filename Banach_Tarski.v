@@ -1737,12 +1737,16 @@ destruct H as [| H]; [ subst c | ].
  now intros H₁; apply Huv.
 Qed.
 
+(* too strange that this is, I did not know that, a proof of
+   Lagrange's identity! in two lines!!! *)
 Theorem vec_dot_sqr_cros_mul : ∀ u v,
   ((u × v) · (u × v) = (u · u) * (v · v) - (u · v)²)%R.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 rewrite Rsqr_pow2; ring.
 Qed.
+
+bbb.
 
 Theorem vec_couple_and_cross_formula : ∀ u v X,
   (u × v · u × v) ⁎ X =
@@ -2937,6 +2941,27 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hno', path_of_nat_inv.
      rewrite Hso₂, Hso₃.
      remember (acos ((p · p') / r²)) as a eqn:Ha.
+(**)
+     assert (Hppi : (-1 < (p · p') / r² < 1)%R).
+      apply Rabs_lt.
+      rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
+      rewrite Rabs_sqr.
+      apply Rmult_lt_reg_r with (r := (r²)%R); [ now apply Rlt_0_sqr | ].
+      unfold Rdiv; rewrite Rmult_assoc.
+      rewrite Rinv_l; [ | now intros H; apply Rsqr_eq_0 in H ].
+      rewrite Rmult_1_r, Rmult_1_l.
+      rewrite <- Rabs_sqr.
+      apply Rsqr_lt_abs_0.
+      replace (p · p')²%R with (∥p∥² * ∥p'∥² - (p × p')²%vec)%R
+       by (rewrite <- vec_Lagrange_identity; lra).
+      assert (H : (0 ≤ r)%R) by (rewrite <- Hvn; apply vec_norm_nonneg).
+      apply on_sphere_norm in Hp; [ | easy ].
+      apply on_sphere_norm in Hp'; [ | easy ].
+      rewrite Hp, Hp'.
+      fold (Rsqr (r²)).
+      enough (0 < (p × p')²%vec)%R by lra.
+Search (_ × _)%vec.
+bbb.
      assert (Hppi : (-1 ≤ (p · p') / r² ≤ 1)%R).
       apply Rabs_le.
       rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
