@@ -1044,14 +1044,13 @@ destruct v; [ | easy ].
 unfold summation; simpl; lra.
 Qed.
 
-Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
+Theorem vec_Lagrange_identity : ∀ u v, (∥u∥² * ∥v∥² - (u · v)²)%R = (u × v)²%vec.
 Proof.
 intros.
 remember (list_of_vec u) as ul eqn:Hul.
 remember (list_of_vec v) as vl eqn:Hvl.
-remember (max (length ul) (length vl)) as n eqn:Hn.
-specialize (Cauchy_Schwarz_inequality ul vl 3) as H; subst n.
-unfold Rsqr in H at 2 3.
+specialize (Lagrange_identity ul vl 3) as H.
+unfold Rsqr in H at 1 2 3.
 assert (Hlu : length ul = 3) by now subst ul; destruct u.
 assert (Hlv : length vl = 3) by now subst vl; destruct v.
 rewrite summation_dot_mul in H; [ | easy | easy ].
@@ -1059,7 +1058,22 @@ rewrite summation_dot_mul in H; [ | easy | easy ].
 rewrite summation_dot_mul in H; [ | easy | easy ].
 subst ul vl.
 do 2 rewrite vec_of_list_inv in H.
-now do 2 rewrite vec_dot_mul_diag in H.
+do 2 rewrite vec_dot_mul_diag in H.
+rewrite fold_Rsqr in H; rewrite H.
+unfold summation; simpl.
+unfold vec_cross_mul; simpl.
+destruct u as (u₁, u₂, u₃).
+destruct v as (v₁, v₂, v₃).
+unfold Rsqr; simpl; lra.
 Qed.
 
-Check vec_Cauchy_Schwarz_inequality.
+Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
+Proof.
+intros.
+apply Rplus_le_reg_r with (r := (- (u · v)²)%R).
+do 2 rewrite fold_Rminus.
+rewrite Rminus_diag_eq; [ | easy ].
+rewrite vec_Lagrange_identity.
+rewrite vec_dot_mul_diag.
+apply Rle_0_sqr.
+Qed.
