@@ -9,7 +9,6 @@ Require Import Utf8 List.
 Require Import Reals Psatz.
 
 Require Import Words Normalize Reverse MiscReals.
-Require Import SummationR.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -1013,38 +1012,8 @@ Qed.
 
 (* Cauchy-Schwarz inequality with vectors. *)
 
-Import ListNotations.
-Require Import CauchySchwarz.
-
-Definition list_of_vec '(V x y z) := [x; y; z].
-Definition vec_of_list v :=
-  match v with
-  | [x; y; z] => V x y z
-  | _ => 0%vec
-  end.
-
-Theorem vec_of_list_inv : ∀ v, vec_of_list (list_of_vec v) = v.
-Proof. now intros (x, y, z). Qed.
-
-Theorem summation_dot_mul : ∀ u v,
-  length u = 3
-  → length v = 3
-  → Σ (i = 1, 3), (u.[i] * v.[i]) = vec_of_list u · vec_of_list v.
-Proof.
-intros * Hlu Hlv.
-unfold vec_of_list.
-destruct u as [| u₁ u]; [ easy | ].
-destruct u as [| u₂ u]; [ easy | ].
-destruct u as [| u₃ u]; [ easy | ].
-destruct u; [ | easy ].
-destruct v as [| v₁ v]; [ easy | ].
-destruct v as [| v₂ v]; [ easy | ].
-destruct v as [| v₃ v]; [ easy | ].
-destruct v; [ | easy ].
-unfold summation; simpl; lra.
-Qed.
-
-Theorem vec_Lagrange_identity : ∀ u v, (∥u∥² * ∥v∥² - (u · v)²)%R = (u × v)²%vec.
+Theorem vec_Lagrange_identity : ∀ u v,
+  (∥u∥² * ∥v∥² - (u · v)²)%R = (u × v)²%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃).
 simpl.
@@ -1052,45 +1021,13 @@ rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
 rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
 unfold Rsqr; lra.
 Qed.
-
-(*
-intros.
-remember (list_of_vec u) as ul eqn:Hul.
-remember (list_of_vec v) as vl eqn:Hvl.
-specialize (Lagrange_identity ul vl 3) as H.
-unfold Rsqr in H at 1 2 3.
-assert (Hlu : length ul = 3) by now subst ul; destruct u.
-assert (Hlv : length vl = 3) by now subst vl; destruct v.
-rewrite summation_dot_mul in H; [ | easy | easy ].
-rewrite summation_dot_mul in H; [ | easy | easy ].
-rewrite summation_dot_mul in H; [ | easy | easy ].
-subst ul vl.
-do 2 rewrite vec_of_list_inv in H.
-do 2 rewrite vec_dot_mul_diag in H.
-rewrite fold_Rsqr in H; rewrite H.
-unfold summation; simpl.
-unfold vec_cross_mul; simpl.
-destruct u as (u₁, u₂, u₃).
-destruct v as (v₁, v₂, v₃).
-unfold Rsqr; simpl; lra.
-Qed.
-*)
 
 Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
 Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃).
-simpl.
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-bbb.
-
-unfold Rsqr; lra.
-
 intros.
-apply Rplus_le_reg_r with (r := (- (u · v)²)%R).
-do 2 rewrite fold_Rminus.
-rewrite Rminus_diag_eq; [ | easy ].
-rewrite vec_Lagrange_identity.
+apply Rplus_le_reg_r with (r := (-(u · v)²)%R).
+rewrite Rplus_opp_r.
+rewrite fold_Rminus, vec_Lagrange_identity.
 rewrite vec_dot_mul_diag.
 apply Rle_0_sqr.
 Qed.
