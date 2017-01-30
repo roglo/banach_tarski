@@ -196,32 +196,34 @@ induction n.
  apply Rle_0_sqr.
 Qed.
 
-Theorem dot_mul_summation : ∀ u v,
-  dot_mul u v = Σ (i = 1, min (length u) (length v)), (u.[i] * v.[i]).
+Theorem dot_mul_summation : ∀ u v n,
+  (min (length u) (length v) ≤ n)
+  → dot_mul u v = Σ (i = 1, n), (u.[i] * v.[i]).
 Proof.
-intros.
-revert v.
+intros * Hn.
+revert v n Hn.
 induction u as [| u₁ u]; intros.
- simpl; rewrite summation_empty; [ easy | lia ].
+ rewrite all_0_summation_0; [ easy | ].
+ intros i Hi; simpl.
+ destruct (pred i); lra.
 
  destruct v as [| v₁ v].
   rewrite all_0_summation_0; [ easy | intros i Hi; simpl ].
   destruct (pred i); lra.
 
+  simpl in Hn.
   remember nth as f; simpl; subst f.
   rewrite summation_split_first; [ f_equal | lia ].
-  remember (min (length u) (length v)) as n eqn:Hn.
+  destruct n; [ lia | ].
+  apply Nat.succ_le_mono in Hn.
   destruct n.
-   rewrite IHu.
    rewrite summation_empty; [ | lia ].
-   rewrite summation_empty; [ easy | lia ].
+   apply Nat.le_0_r in Hn.
+   now destruct u, v.
 
    rewrite summation_shift; [ | lia ].
-   simpl; rewrite Nat.sub_0_r.
-   rewrite IHu.
-   rewrite summation_shift; [ | lia ].
-   rewrite <-Hn.
-   now simpl; rewrite Nat.sub_0_r.
+   rewrite IHu with (n := S n); [ | easy ].
+   rewrite summation_shift; [ easy | lia ].
 Qed.
 
 Theorem Cauchy_Schwarz_inequality : ∀ (u v : list R),
@@ -230,6 +232,14 @@ Proof.
 intros.
 remember (min (length u) (length v)) as n eqn:Hn.
 specialize (Cauchy_Schwarz_inequality2 u v n) as H.
+rewrite dot_mul_summation with (n := n); [ | lia ].
+rewrite dot_mul_summation with (n := n); [ | ].
+Search (min _ _ = _).
+2: rewrite Nat.min_id.
+bbb.
+
+Search (min _ _ ≤ _)%nat.
+
 do 3 rewrite dot_mul_summation.
 rewrite <- Hn.
 rewrite min_l; [ | lia ].
