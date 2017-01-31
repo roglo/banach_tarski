@@ -2861,7 +2861,26 @@ split.
  replace (r / vr * vx)%R with (r * vx * / vr)%R by lra.
  replace (r / vr * vy)%R with (r * vy * / vr)%R by lra.
  replace (r / vr * vz)%R with (r * vz * / vr)%R by lra.
- do 3 rewrite Rsqr_mult.
+ do 6 rewrite Rsqr_mult.
+ do 2 rewrite <- Rmult_plus_distr_r.
+ do 2 rewrite <- Rmult_plus_distr_l.
+ apply (f_equal Rsqr) in Hvr.
+ assert (Hrz : (vr ≠ 0)%R).
+  intros H; rewrite H in *; clear H.
+  symmetry in Hvr.
+  rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
+  rewrite Rsqr_0 in Hvr.
+  apply sqr_vec_norm_eq_0 in Hvr.
+  destruct Hvr as (H1 & H2 & H3).
+  now rewrite H1, H2, H3 in Hpp.
+
+  rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
+  rewrite <- Hvr, Rmult_assoc.
+  rewrite Rsqr_inv; [ | easy ].
+  rewrite Rinv_r; [ lra | ].
+  intros H; apply Hrz.
+  now apply Rsqr_eq_0 in H.
+
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
