@@ -2911,6 +2911,10 @@ split; [ | split ].
  intros H; do 2 apply Rsqr_eq_0 in H; lra.
 
  split; [ | split ].
+  simpl.
+  remember (r ⁎ a) as v eqn:Hv.
+  destruct v as (xv, yv, zv).
+  remember (√ (xv² + yv² + zv²)) as rv eqn:Hrv.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
