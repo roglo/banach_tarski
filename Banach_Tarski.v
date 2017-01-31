@@ -2850,6 +2850,18 @@ Theorem glop : ∀ r p₁ p₂,
 Proof.
 intros * Hp₁ Hp₂ Hpp.
 exists (r / ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec.
+remember ((p₁ · p₂) / r)%R as c eqn:Hc.
+remember (√ (1 - c²)) as s eqn:Hs.
+exists c, s.
+split.
+ simpl.
+ remember (p₁ × p₂) as v eqn:Hv.
+ destruct v as (vx, vy, vz); simpl.
+ remember (√ (vx² + vy² + vz²)) as vr eqn:Hvr.
+ replace (r / vr * vx)%R with (r * vx * / vr)%R by lra.
+ replace (r / vr * vy)%R with (r * vy * / vr)%R by lra.
+ replace (r / vr * vz)%R with (r * vz * / vr)%R by lra.
+ do 3 rewrite Rsqr_mult.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
