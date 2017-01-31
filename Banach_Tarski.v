@@ -2837,6 +2837,12 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
+Definition axis_angle_of_couple p₁ p₂ :=
+  let a := (/ ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec in
+  let c := ((p₁ · p₂) / ∥p₁∥)%R in
+  let s := √ (1 - c²) in
+  (a, c, s).
+
 Theorem glop : ∀ r p₁ p₂,
   p₁ ∈ sphere r
   → p₂ ∈ sphere r
@@ -2849,11 +2855,10 @@ Theorem glop : ∀ r p₁ p₂,
     (matrix_of_axis_angle (a, c, s) * p₁ ≠ p₂)%vec.
 Proof.
 intros * Hp₁ Hp₂ Hpp.
-exists (r / ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec.
-remember ((p₁ · p₂) / r)%R as c eqn:Hc.
-remember (√ (1 - c²)) as s eqn:Hs.
-exists c, s.
+specialize (axis_angle_of_couple p₁ p₂) as ((a, c), s).
+exists (r ⁎ a)%vec, c, s.
 split.
+bbb.
  simpl.
  remember (p₁ × p₂) as v eqn:Hv.
  destruct v as (vx, vy, vz); simpl.
