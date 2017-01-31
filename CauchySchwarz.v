@@ -15,14 +15,19 @@ rewrite Rplus_comm, <- Rplus_assoc.
 f_equal; apply Rplus_comm.
 Qed.
 
+Definition dot_mul n a b := Σ (k = 1, n), (a.[k] * b.[k]).
+Definition sqr_cross_mul n a b :=
+   Σ (i = 1, n), Σ (j = i + 1, n), ((a.[i] * b.[j] - a.[j] * b.[i])²).
+
 Theorem Binet_Cauchy_identity : ∀ (a b c d : list R) n,
-  (Σ (i = 1, n), (a.[i] * c.[i]) * Σ (j = 1, n), (b.[j] * d.[j]) =
-   Σ (i = 1, n), (a.[i] * d.[i]) * Σ (j = 1, n), (b.[j] * c.[j]) +
+  (dot_mul n a c * dot_mul n b d =
+   dot_mul n a d * dot_mul n b c +
    Σ (i = 1, n), Σ (j = i + 1, n),
      ((a.[i] * b.[j] - a.[j] * b.[i]) *
       (c.[i] * d.[j] - c.[j] * d.[i])))%R.
 Proof.
 intros.
+unfold dot_mul.
 remember (Σ (i = 1, n), (a.[i] * c.[i]) * Σ (j = 1, n), (b.[j] * d.[j]))%R
 as x eqn:Hx.
 remember (Σ (i = 1, n), (a.[i] * d.[i]) * Σ (j = 1, n), (b.[j] * c.[j]))%R
@@ -124,10 +129,6 @@ replace z with ((u₁ + v₁) - (u₂ + v₂))%R.
   intros j (Hj, Hjn); lra.
 Qed.
 
-Definition dot_mul n u v := Σ (k = 1, n), (u.[k] * v.[k]).
-Definition sqr_cross_mul n u v :=
-   Σ (i = 1, n), Σ (j = i + 1, n), ((u.[i] * v.[j] - u.[j] * v.[i])²).
-
 Theorem Lagrange_identity : ∀ n a b,
   (dot_mul n a a * dot_mul n b b = (dot_mul n a b)² + sqr_cross_mul n a b)%R.
 Proof.
@@ -151,6 +152,7 @@ Theorem Lagrange_identity_bis : ∀ n (a b : list R),
 Proof.
 intros.
 specialize (Binet_Cauchy_identity a b a b n) as H.
+unfold dot_mul in H.
 assert (Ha : ∀ a,
   (Σ (k = 1, n), ((a.[k])²))%R = (Σ (k = 1, n), (a.[k] * a.[k]))%R).
  clear; intros.
