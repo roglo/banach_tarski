@@ -3001,12 +3001,15 @@ simpl in Hp.
 simpl in Hppi.
 destruct (Req_dec r 1) as [Hr1| Hr1].
  rewrite Hr1 in *; clear Hr1.
+ apply (f_equal Rsqr) in Hvn.
+ rewrite Rsqr_sqrt in Hvn.
  replace 1²%R with 1%R in * by now rewrite Rsqr_1.
  progress repeat rewrite Rmult_1_l in *.
  progress repeat rewrite Rmult_1_r in *.
  unfold Rsqr in *.
  rewrite Rdiv_1_r in Hppi.
- clear - Hp Hp' Hxp Hyp Hzp Hppi Hcs.
+ unfold vec_cross_mul in Hpp.
+ clear - Hvn Hp Hp' Hxp Hyp Hzp Hppi Hcs.
 
 bbb.
 (* works not *)
