@@ -2837,6 +2837,19 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
+Theorem glop : ∀ r p₁ p₂,
+  p₁ ∈ sphere r
+  → p₂ ∈ sphere r
+  → p₁ × p₂ ≠ 0%vec
+  → ∃ a c s,
+    a ∈ sphere r ∧ (c² + s² = 1)%R ∧
+    (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec ∧
+    ∀ a' c' s', a' × a ≠ 0%vec ∧
+    a' ∈ sphere r ∧ (c'² + s'² = 1)%R ∧
+    (matrix_of_axis_angle (a, c, s) * p₁ ≠ p₂)%vec.
+Proof.
+bbb.
+
 (* J₁(r) = set of rotations given by its axis and its angle, such that
    for some p in D ∩ sphere(r), R(p) is also in D ∩ sphere(r). *)
 Definition J₁ r :=
