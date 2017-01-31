@@ -2839,7 +2839,7 @@ Qed.
 
 Definition axis_angle_of_couple p₁ p₂ :=
   let a := (/ ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec in
-  let c := ((p₁ · p₂) / ∥p₁∥)%R in
+  let c := ((p₁ · p₂) / (∥p₁∥ * ∥p₂∥))%R in
   let s := √ (1 - c²) in
   (a, c, s).
 
@@ -2861,7 +2861,7 @@ unfold axis_angle_of_couple in H.
 destruct acs as ((a & c) & s).
 injection H; clear H; intros Hs Hc Ha.
 exists (r ⁎ a)%vec, c, s.
-split.
+split; [ | split ].
  simpl.
  rewrite Ha; clear a Ha.
  remember (p₁ × p₂) as v eqn:Hv.
@@ -2890,23 +2890,27 @@ split.
   intros H; apply Hrz.
   now apply Rsqr_eq_0 in H.
 
- split.
-  rewrite <- Hc in Hs.
-  rewrite Hs; clear s Hs.
-  rewrite Rsqr_sqrt; [ lra | ].
-  enough (c² ≤ 1)%R by lra.
-  rewrite Hc; clear c Hc.
-  simpl in Hp₁, Hp₂.
-  destruct p₁ as (x₁, y₁, z₁).
-  destruct p₂ as (x₂, y₂, z₂); simpl.
-  rewrite Hp₁.
-  rewrite sqrt_Rsqr; [ | lra ].
-  rewrite Rsqr_div; [ | lra ].
-  apply Rmult_le_reg_r with (r := r²%R); [ apply Rlt_0_sqr; lra | ].
-  rewrite Rmult_div_same; [ | intros H; apply Rsqr_eq_0 in H; lra ].
-  rewrite Rmult_1_l.
-  clear - Hp₁ Hp₂.
+ rewrite <- Hc in Hs.
+ rewrite Hs; clear s Hs.
+ rewrite Rsqr_sqrt; [ lra | ].
+ enough (c² ≤ 1)%R by lra.
+ rewrite Hc; clear c Hc.
+ simpl in Hp₁, Hp₂.
+ specialize (vec_Cauchy_Schwarz_inequality p₁ p₂) as Hcs.
+ destruct p₁ as (x₁, y₁, z₁).
+ destruct p₂ as (x₂, y₂, z₂); simpl in Hcs; simpl.
+ rewrite Hp₁, Hp₂ in Hcs |-*.
+ rewrite sqrt_Rsqr in Hcs; [ | lra ].
+ rewrite sqrt_Rsqr; [ | lra ].
+ rewrite fold_Rsqr.
+ rewrite Rsqr_div; [ | intros H; apply Rsqr_eq_0 in H; lra ].
+ apply Rmult_le_reg_r with (r := (r²)%R); [ apply Rlt_0_sqr; lra | ].
+ apply Rmult_le_reg_r with (r := (r²)%R); [ apply Rlt_0_sqr; lra | ].
+ rewrite Rmult_assoc.
+ rewrite Rmult_div_same; [ lra | ].
+ intros H; do 2 apply Rsqr_eq_0 in H; lra.
 
+ split; [ | split ].
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
