@@ -2975,61 +2975,34 @@ Focus 2.
 assert (Hr2 : (r² ≠ 0)%R) by now intros H; apply Rsqr_eq_0 in H.
 apply Rmult_eq_reg_r with (r := (r²)%R); [ | easy ].
 rewrite Rmult_div_same; [ | easy ].
-rewrite <- Hxp, <- Hyp, <- Hzp.
-progress repeat rewrite Rsqr_pow2.
-field_simplify; [ | easy ].
-rewrite Rdiv_1_r.
-apply Rmult_eq_reg_r with (r := (r²)%R); [ | easy ].
-progress repeat rewrite <- Rsqr_pow2.
-rewrite Rmult_div_same; [ | easy ].
-ring_simplify.
+(**)
+rewrite Rsqr_div in Hxp; [ | easy ].
+progress repeat rewrite Rsqr_pow2 in Hxp.
+field_simplify in Hxp.
+apply Rmult_eq_compat_r with (r := (r ^ 2)%R) in Hxp.
+progress repeat rewrite <- Rsqr_pow2 in Hxp.
+rewrite Rmult_div_same in Hxp; [ | easy ].
+rewrite Rdiv_1_r in Hxp.
+rewrite Rsqr_div in Hyp; [ | easy ].
+progress repeat rewrite Rsqr_pow2 in Hyp.
+field_simplify in Hyp.
+apply Rmult_eq_compat_r with (r := (r ^ 2)%R) in Hyp.
+progress repeat rewrite <- Rsqr_pow2 in Hyp.
+rewrite Rmult_div_same in Hyp; [ | easy ].
+rewrite Rdiv_1_r in Hyp.
+rewrite Rsqr_div in Hzp; [ | easy ].
+progress repeat rewrite Rsqr_pow2 in Hzp.
+field_simplify in Hzp.
+apply Rmult_eq_compat_r with (r := (r ^ 2)%R) in Hzp.
+progress repeat rewrite <- Rsqr_pow2 in Hzp.
+rewrite Rmult_div_same in Hzp; [ | easy ].
+rewrite Rdiv_1_r in Hzp.
 simpl in Hp.
-replace
-  (- xp² * x² * c + xp² * x² + xp² * c * r² + c * r² * yp² + c * r² * zp² -
-   2 * c * xp * x * y * yp - 2 * c * xp * x * z * zp -
-   2 * c * y * yp * z * zp - c * yp² * y² - c * zp² * z²)%R
-with
-  (c * (r² * (xp² + yp² + zp²)) + c * (- xp² * x² -
-   2 * xp * x * y * yp - 2 * xp * x * z * zp -
-   2 * y * yp * z * zp - yp² * y² - zp² * z²) + xp² * x²)%R
-by lra.
-rewrite Hp.
-apply Rplus_eq_reg_r with (r := (- (c * (r² * r²)))%R).
-rewrite Rplus_comm.
-progress repeat rewrite <- Rplus_assoc.
-rewrite Rplus_opp_l, Rplus_0_l.
-rewrite <- Rsqr_pow2.
-rewrite Rplus_opp_r.
+simpl in Hppi.
+clear - Hp Hp' Hxp Hyp Hzp.
 bbb.
-
-  replace
-    (- xp² * x² * c + xp² * x² + xp² * c - 2 * xp * c * x * y * yp -
-     2 * xp * c * x * z * zp + 2 * xp * x * y * yp + 2 * xp * x * z * zp -
-     2 * c * y * z * yp * zp - c * yp² * y² + c * yp² -
-     c * zp² * z² + c * zp² + 2 * y * z * yp * zp + yp² * y² +
-     zp² * z²)%R
-  with
-    (c * (xp² + yp² + zp²) - xp² * x² * c + xp² * x² -
-     2 * xp * c * x * y * yp - 2 * xp * c * x * z * zp +
-     2 * xp * x * y * yp + 2 * xp * x * z * zp -
-     2 * c * y * z * yp * zp - c * yp² * y² -
-     c * zp² * z² + 2 * y * z * yp * zp + yp² * y² +
-     zp² * z²)%R
-    by lra.
-  simpl in Hp; rewrite Hp.
-  progress repeat rewrite Rsqr_pow2.
-  replace
-    (c * r ^ 2 - xp ^ 2 * x ^ 2 * c + xp ^ 2 * x ^ 2 -
-     2 * xp * c * x * y * yp - 2 * xp * c * x * z * zp +
-     2 * xp * x * y * yp + 2 * xp * x * z * zp -
-     2 * c * y * z * yp * zp - c * yp ^ 2 * y ^ 2 - c * zp ^ 2 * z ^ 2 +
-     2 * y * z * yp * zp + yp ^ 2 * y ^ 2 + zp ^ 2 * z ^ 2)%R
-  with
-    (c * r ^ 2 + (xp * x + yp * y + zp * z) ^ 2 * (1 - c))%R
-    by lra.
-  progress repeat rewrite <- Rsqr_pow2.
-  (* indeed, if p ≠ ± p', v is supposed to be p × p' (with a constant);
-     and, in that case p · v = 0 *)
+(* works not *)
+nsatz.
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
