@@ -19,6 +19,21 @@ Definition dot_mul n a b := Σ (k = 1, n), (a.[k] * b.[k]).
 Definition sqr_cross_mul n a b :=
    Σ (i = 1, n), Σ (j = i + 1, n), ((a.[i] * b.[j] - a.[j] * b.[i])²).
 
+(*
+vec_cross_mul =
+λ '(V u₁ u₂ u₃) '(V v₁ v₂ v₃),
+V (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁)
+     : vector → vector → vector
+V (u.[2] * v.[3] - u.[3] * v.[2])
+  (u.[3] * v.[1] - u.[1] * v.[3])
+  (u.[1] * v.[2] - u.[2] * v.[1])
+(12 21) (13 31) (14 41) (23 32) (24 42) (34 43)
+
+(12 21) (13 31) (14 41)
+(23 32) (24 42)
+(34 43)
+*)
+
 Theorem Binet_Cauchy_identity : ∀ (a b c d : list R) n,
   (dot_mul n a c * dot_mul n b d =
    dot_mul n a d * dot_mul n b c +
