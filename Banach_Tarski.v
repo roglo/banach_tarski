@@ -2994,6 +2994,12 @@ with
    2 * y * yp * z * zp - yp² * y² - zp² * z²) + xp² * x²)%R
 by lra.
 rewrite Hp.
+apply Rplus_eq_reg_r with (r := (- (c * (r² * r²)))%R).
+rewrite Rplus_comm.
+progress repeat rewrite <- Rplus_assoc.
+rewrite Rplus_opp_l, Rplus_0_l.
+rewrite <- Rsqr_pow2.
+rewrite Rplus_opp_r.
 bbb.
 
   replace
