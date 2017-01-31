@@ -2913,8 +2913,20 @@ split; [ | split ].
  split; [ | split ].
   simpl.
   remember (r ⁎ a) as v eqn:Hv.
+  remember (p₁ × p₂) as pp eqn:Hcm.
   destruct v as (xv, yv, zv).
+  destruct p₁ as (x₁, y₁, z₁).
+  destruct p₂ as (x₂, y₂, z₂); simpl in *.
+  destruct pp as (xp, yp, zp).
+  subst a; simpl in Hv.
   remember (√ (xv² + yv² + zv²)) as rv eqn:Hrv.
+  remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
+  remember (√ (x₂² + y₂² + z₂²)) as r₂ eqn:Hr₂.
+  remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
+  injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
+  injection Hv; clear Hv; intros Hzv Hyv Hxv.
+  move r₂ before r₁; move rv before rp.
+  f_equal.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
