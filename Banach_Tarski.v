@@ -2848,6 +2848,8 @@ Theorem glop : ∀ r p₁ p₂,
     a' ∈ sphere r ∧ (c'² + s'² = 1)%R ∧
     (matrix_of_axis_angle (a, c, s) * p₁ ≠ p₂)%vec.
 Proof.
+intros * Hp₁ Hp₂ Hpp.
+exists (r / ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
