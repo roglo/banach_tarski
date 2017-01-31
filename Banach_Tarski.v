@@ -2999,7 +2999,15 @@ rewrite Rmult_div_same in Hzp; [ | easy ].
 rewrite Rdiv_1_r in Hzp.
 simpl in Hp.
 simpl in Hppi.
-clear - Hp Hp' Hxp Hyp Hzp.
+destruct (Req_dec r 1) as [Hr1| Hr1].
+ rewrite Hr1 in *; clear Hr1.
+ replace 1²%R with 1%R in * by now rewrite Rsqr_1.
+ progress repeat rewrite Rmult_1_l in *.
+ progress repeat rewrite Rmult_1_r in *.
+ unfold Rsqr in *.
+ rewrite Rdiv_1_r in Hppi.
+ clear - Hp Hp' Hxp Hyp Hzp Hppi Hcs.
+
 bbb.
 (* works not *)
 nsatz.
