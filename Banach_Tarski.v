@@ -2919,10 +2919,43 @@ split; [ | split ].
   destruct p₂ as (x₂, y₂, z₂); simpl in *.
   destruct pp as (xp, yp, zp).
   subst a; simpl in Hv.
-  remember (√ (xv² + yv² + zv²)) as rv eqn:Hrv.
   remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
   remember (√ (x₂² + y₂² + z₂²)) as r₂ eqn:Hr₂.
   remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
+  assert (Hrpz : rp ≠ 0%R).
+   intros H; rewrite H in Hrp; symmetry in Hrp.
+   apply sqrt_eq_0 in Hrp; [ | apply nonneg_sqr_vec_norm ].
+   apply sqr_vec_norm_eq_0 in Hrp.
+   destruct Hrp as (H1 & H2 & H3).
+   now rewrite H1, H2, H3 in Hpp.
+
+   assert (Hrv : √ (xv² + yv² + zv²) = r).
+    injection Hv; clear Hv; intros Hzv Hyv Hxv.
+    rewrite Hxv, Hyv, Hzv.
+    progress repeat rewrite Rsqr_mult.
+    replace
+      (r² * ((/ rp)² * xp²) + r² * ((/ rp)² * yp²) + r² * ((/ rp)² * zp²))%R
+    with (r² * (/ rp)² * (xp² + yp² +  zp²))%R by lra.
+    rewrite sqrt_mult_alt.
+     rewrite sqrt_mult_alt; [ | apply Rle_0_sqr ].
+     rewrite <- Hrp.
+     rewrite sqrt_Rsqr; [ | lra ].
+     rewrite sqrt_Rsqr.
+      rewrite Rmult_assoc.
+      rewrite Rinv_l; [ now rewrite Rmult_1_r | easy ].
+
+bbb.
+      rewrite Hrp.
+      rewrite <- sqrt_inv; [ apply sqrt_pos | ].
+bbb.
+      apply Rlt_le, Rinv_0_lt_compat.
+      rewrite Hrp.
+Search (_ → 0 < / _)%R.
+      apply Rmult_le_reg_r with (r := rp).
+Search (_ ≠ 0 → _)%R.
+Search (0 < _ + _)%R.
+
+  remember (√ (xv² + yv² + zv²)) as rv eqn:Hrv.
   injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
   injection Hv; clear Hv; intros Hzv Hyv Hxv.
   move r₂ before r₁; move rv before rp.
