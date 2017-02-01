@@ -2843,6 +2843,18 @@ Definition axis_angle_of_couple p₁ p₂ :=
   let s := (∥(p₁ × p₂)∥ / (∥p₁∥ * ∥p₂∥))%R in
   (a, c, s).
 
+Theorem rotation_between_2_points : ∀ r p₁ p₂ a c s,
+  (0 < r)%R
+  → p₁ ∈ sphere r
+  → p₂ ∈ sphere r
+  → p₁ × p₂ ≠ 0%vec
+  → axis_angle_of_couple p₁ p₂ = (a, c, s)
+  → a ∈ sphere r ∧ (c² + s² = 1)%R ∧
+    (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec.
+Proof.
+intros * Hr Hp₁ Hp₂ Hpp Hacs.
+bbb.
+
 Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
   (0 < r)%R
   → p₁ ∈ sphere r
