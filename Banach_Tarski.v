@@ -2843,7 +2843,7 @@ Definition axis_angle_of_couple p₁ p₂ :=
   let s := (∥(p₁ × p₂)∥ / (∥p₁∥ * ∥p₂∥))%R in
   (a, c, s).
 
-Theorem glop : ∀ r p₁ p₂,
+Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
   (0 < r)%R
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
@@ -2982,12 +2982,36 @@ assert (Hcs : (c² + s² = 1)%R).
      rewrite Hxp, Hyp, Hzp in Hu.
      ring_simplify in Hu; subst u.
      rewrite Rmult_0_r, Rplus_0_l.
+     rewrite fold_Rsqr in Hc, Hs.
      f_equal.
-     apply Rmult_eq_reg_r with (r := rp); [ | easy ].
-     rewrite Rmult_plus_distr_r.
-     repeat rewrite Rmult_assoc.
-     rewrite Rinv_l; [ | easy ].
-     rewrite Rmult_1_r.
+      assert (Hr2 : (r² ≠ 0)%R) by (intros H; apply Rsqr_eq_0 in H; lra).
+      apply Rmult_eq_reg_r with (r := rp); [ | easy ].
+      rewrite Rmult_plus_distr_r.
+      repeat rewrite Rmult_assoc.
+      rewrite Rinv_l; [ | easy ].
+      rewrite Rmult_1_r.
+      apply Rmult_eq_reg_r with (r := r²%R); [ | easy ].
+      rewrite Rmult_plus_distr_r.
+      remember (c * (x₁ * rp) * r²)%R as u eqn:Hu.
+      rewrite Rmult_shuffle0 in Hu.
+      rewrite Hc in Hu.
+      rewrite Rmult_div_same in Hu; [ | easy ].
+      subst u.
+      remember (s * (yp * z₁ - zp * y₁) * r²)%R as u eqn:Hu.
+      rewrite Rmult_shuffle0 in Hu.
+      rewrite Hs in Hu.
+      rewrite Rmult_div_same in Hu; [ | easy ].
+      rewrite Rmult_comm in Hu; subst u.
+      rewrite <- Rmult_assoc.
+      rewrite <- Rmult_plus_distr_r.
+      rewrite Rmult_shuffle0.
+      f_equal.
+      rewrite Hyp, Hzp.
+      ring_simplify.
+      do 3 rewrite <- Rsqr_pow2.
+      rewrite Rmult_comm.
+      do 2 rewrite <- Rmult_plus_distr_l.
+      now rewrite Hp₁.
 bbb.
      enough (rp * (x₂ - c * x₁) = s * (yp * z₁ - zp * y₁))%R by lra.
      destruct (Rle_dec 0 (rp * (x₂ - c * x₁))) as [H₁| H₁].
