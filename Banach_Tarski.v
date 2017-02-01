@@ -2944,64 +2944,47 @@ split; [ | split ].
       rewrite Rmult_assoc.
       rewrite Rinv_l; [ now rewrite Rmult_1_r | easy ].
 
-bbb.
-      rewrite Hrp.
-      rewrite <- sqrt_inv; [ apply sqrt_pos | ].
-bbb.
       apply Rlt_le, Rinv_0_lt_compat.
-      rewrite Hrp.
-Search (_ → 0 < / _)%R.
-      apply Rmult_le_reg_r with (r := rp).
-Search (_ ≠ 0 → _)%R.
-Search (0 < _ + _)%R.
+      enough (0 ≤ rp)%R by lra.
+      rewrite Hrp; apply sqrt_pos.
 
-  remember (√ (xv² + yv² + zv²)) as rv eqn:Hrv.
-  injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
-  injection Hv; clear Hv; intros Hzv Hyv Hxv.
-  move r₂ before r₁; move rv before rp.
-  rewrite Hxv, Hyv, Hzv in Hrv.
-  progress repeat rewrite Rsqr_mult in Hrv.
-  replace
-    (r² * ((/ rp)² * xp²) + r² * ((/ rp)² * yp²) + r² * ((/ rp)² * zp²))%R
-  with (r² * (/ rp)² * (xp² + yp² +  zp²))%R in Hrv by lra.
-  rewrite sqrt_mult_alt in Hrv.
-   rewrite sqrt_mult_alt in Hrv; [ | apply Rle_0_sqr ].
-   rewrite <- Hrp in Hrv.
-   rewrite sqrt_Rsqr in Hrv; [ | lra ].
-   rewrite sqrt_Rsqr in Hrv.
-    rewrite Rmult_assoc in Hrv.
-    rewrite Rinv_l in Hrv.
-     rewrite Rmult_1_r in Hrv; subst rv.
-     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hxv.
-     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hyv.
-     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hzv.
-     rewrite Rmult_shuffle0 in Hxv, Hyv, Hzv.
-     rewrite Rinv_r in Hxv.
-     rewrite Rinv_r in Hyv.
-     rewrite Rinv_r in Hzv.
-     rewrite Rmult_1_l, fold_Rdiv in Hxv, Hyv, Hzv.
-     rewrite Hxv, Hyv, Hzv.
-     progress repeat rewrite Rsqr_mult.
-     unfold Rsqr.
-     replace
-       ((/ rp * / rp * (xp * xp) * (1 - c) + c) * x₁ +
-        (/ rp * xp * (/ rp * yp) * (1 - c) - / rp * zp * s) * y₁ +
-        (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁)%R
-     with
-       (/ rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-        c * x₁ + s * (yp * z₁ - zp * y₁) * / rp)%R
-       by lra.
-     remember (xp * x₁ + yp * y₁ + zp * z₁)%R as u eqn:Hu.
-     rewrite Hxp, Hyp, Hzp in Hu.
-     ring_simplify in Hu; subst u.
-     rewrite Rmult_0_r, Rplus_0_l.
-     f_equal.
-      apply Rmult_eq_reg_r with (r := rp).
-      rewrite Rmult_plus_distr_r.
-      repeat rewrite Rmult_assoc.
-      rewrite Rinv_l.
-      rewrite Rmult_1_r.
-      (* trois milliards de kilomètres de formules de merde *)
+     rewrite <- Rsqr_mult.
+     apply Rle_0_sqr.
+
+    rewrite Hrv.
+    injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
+    injection Hv; clear Hv; intros Hzv Hyv Hxv.
+    move r₂ before r₁.
+    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hxv.
+    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hyv.
+    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hzv.
+    rewrite Rmult_shuffle0 in Hxv, Hyv, Hzv.
+    rewrite Rinv_r in Hxv; [ | lra ].
+    rewrite Rinv_r in Hyv; [ | lra ].
+    rewrite Rinv_r in Hzv; [ | lra ].
+    rewrite Rmult_1_l, fold_Rdiv in Hxv, Hyv, Hzv.
+    rewrite Hxv, Hyv, Hzv.
+    progress repeat rewrite Rsqr_mult.
+    unfold Rsqr.
+    replace
+      ((/ rp * / rp * (xp * xp) * (1 - c) + c) * x₁ +
+       (/ rp * xp * (/ rp * yp) * (1 - c) - / rp * zp * s) * y₁ +
+       (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁)%R
+    with
+    (/ rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+     c * x₁ + s * (yp * z₁ - zp * y₁) * / rp)%R
+      by lra.
+    remember (xp * x₁ + yp * y₁ + zp * z₁)%R as u eqn:Hu.
+    rewrite Hxp, Hyp, Hzp in Hu.
+    ring_simplify in Hu; subst u.
+    rewrite Rmult_0_r, Rplus_0_l.
+    f_equal.
+    apply Rmult_eq_reg_r with (r := rp); [ | easy ].
+    rewrite Rmult_plus_distr_r.
+    repeat rewrite Rmult_assoc.
+    rewrite Rinv_l; [ | easy ].
+    rewrite Rmult_1_r.
+    (* trois milliards de kilomètres de formules de merde *)
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
