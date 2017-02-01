@@ -2851,9 +2851,10 @@ Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
   → ∃ a c s,
     a ∈ sphere r ∧ (c² + s² = 1)%R ∧
     (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec ∧
-    ∀ a' c' s', a' × a ≠ 0%vec ∧
+    ∀ a' c' s',
     a' ∈ sphere r ∧ (c'² + s'² = 1)%R ∧
-    (matrix_of_axis_angle (a, c, s) * p₁ ≠ p₂)%vec.
+    (matrix_of_axis_angle (a, c, s) * p₁ ≠ p₂)%vec
+    → a = a' ∧ c = c' ∧ s = s'.
 Proof.
 intros * Hr Hp₁ Hp₂ Hpp.
 remember (axis_angle_of_couple p₁ p₂) as acs eqn:H.
@@ -3079,6 +3080,8 @@ assert (Hcs : (c² + s² = 1)%R).
       do 2 rewrite <- Rmult_plus_distr_r.
       rewrite Rmult_comm.
       now rewrite Hp₁.
+
+   intros * (Ha' & Hcs' & H').
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
