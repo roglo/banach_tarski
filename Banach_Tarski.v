@@ -2926,7 +2926,20 @@ split; [ | split ].
   injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
   injection Hv; clear Hv; intros Hzv Hyv Hxv.
   move r₂ before r₁; move rv before rp.
-  f_equal.
+  rewrite Hxv, Hyv, Hzv in Hrv.
+  progress repeat rewrite Rsqr_mult in Hrv.
+  replace
+    (r² * ((/ rp)² * xp²) + r² * ((/ rp)² * yp²) + r² * ((/ rp)² * zp²))%R
+  with (r² * (/ rp)² * (xp² + yp² +  zp²))%R in Hrv by lra.
+  rewrite sqrt_mult_alt in Hrv.
+   rewrite sqrt_mult_alt in Hrv; [ | apply Rle_0_sqr ].
+   rewrite <- Hrp in Hrv.
+   rewrite sqrt_Rsqr in Hrv; [ | lra ].
+   rewrite sqrt_Rsqr in Hrv.
+    rewrite Rmult_assoc in Hrv.
+    rewrite Rinv_l in Hrv.
+     rewrite Rmult_1_r in Hrv; subst rv.
+
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
