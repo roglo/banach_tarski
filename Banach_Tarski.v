@@ -2992,7 +2992,8 @@ assert (Hcs : (c² + s² = 1)%R).
        do 2 rewrite Rsqr_mult.
        rewrite Hrp, Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
        rewrite Hs, Rsqr_sqrt.
-        (* trois milliards de kilomètres de putain de formules de merde *)
+       apply Rmult_eq_reg_r with (r := (r₁ * r₂)²%R).
+       (* trois milliards de kilomètres de putain de formules de merde *)
 bbb.
         (* 0 ≤ 1 - c² *)
         rewrite <- Hcs, Rplus_comm.
