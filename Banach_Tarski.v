@@ -3085,7 +3085,7 @@ Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
     (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec ∧
     ∀ a' c' s',
     a' ∈ sphere r ∧ (c'² + s'² = 1)%R ∧
-    (matrix_of_axis_angle (a, c, s) * p₁ ≠ p₂)%vec
+    (matrix_of_axis_angle (a', c', s') * p₁ ≠ p₂)%vec
     → a = a' ∧ c = c' ∧ s = s'.
 Proof.
 intros * Hr Hp₁ Hp₂ Hpp.
