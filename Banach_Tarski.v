@@ -2862,35 +2862,7 @@ destruct acs as ((a & c) & s).
 injection H; clear H; intros Hs Hc Ha.
 rewrite <- Hc in Hs.
 exists (r ⁎ a)%vec, c, s.
-split; [ | split ].
- simpl.
- rewrite Ha; clear a Ha.
- remember (p₁ × p₂) as v eqn:Hv.
- destruct v as (vx, vy, vz); simpl.
- remember (√ (vx² + vy² + vz²)) as vr eqn:Hvr.
- replace (r * (/ vr * vx))%R with (r * vx * / vr)%R by lra.
- replace (r * (/ vr * vy))%R with (r * vy * / vr)%R by lra.
- replace (r * (/ vr * vz))%R with (r * vz * / vr)%R by lra.
- do 6 rewrite Rsqr_mult.
- do 2 rewrite <- Rmult_plus_distr_r.
- do 2 rewrite <- Rmult_plus_distr_l.
- apply (f_equal Rsqr) in Hvr.
- assert (Hrz : (vr ≠ 0)%R).
-  intros H; rewrite H in *; clear H.
-  symmetry in Hvr.
-  rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
-  rewrite Rsqr_0 in Hvr.
-  apply sqr_vec_norm_eq_0 in Hvr.
-  destruct Hvr as (H1 & H2 & H3).
-  now rewrite H1, H2, H3 in Hpp.
-
-  rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
-  rewrite <- Hvr, Rmult_assoc.
-  rewrite Rsqr_inv; [ | easy ].
-  rewrite Rinv_r; [ lra | ].
-  intros H; apply Hrz.
-  now apply Rsqr_eq_0 in H.
-
+assert (Hcs : (c² + s² = 1)%R).
  rewrite Hs; clear s Hs.
  rewrite Rsqr_sqrt; [ lra | ].
  enough (c² ≤ 1)%R by lra.
@@ -2910,81 +2882,122 @@ split; [ | split ].
  rewrite Rmult_div_same; [ lra | ].
  intros H; do 2 apply Rsqr_eq_0 in H; lra.
 
- split; [ | split ].
+ split; [ | split ]; [ | easy | ].
   simpl.
-  remember (r ⁎ a) as v eqn:Hv.
-  remember (p₁ × p₂) as pp eqn:Hcm.
-  destruct v as (xv, yv, zv).
-  destruct p₁ as (x₁, y₁, z₁).
-  destruct p₂ as (x₂, y₂, z₂); simpl in *.
-  destruct pp as (xp, yp, zp).
-  subst a; simpl in Hv.
-  remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
-  remember (√ (x₂² + y₂² + z₂²)) as r₂ eqn:Hr₂.
-  remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
-  assert (Hrpz : rp ≠ 0%R).
-   intros H; rewrite H in Hrp; symmetry in Hrp.
-   apply sqrt_eq_0 in Hrp; [ | apply nonneg_sqr_vec_norm ].
-   apply sqr_vec_norm_eq_0 in Hrp.
-   destruct Hrp as (H1 & H2 & H3).
+  rewrite Ha; clear a Ha.
+  remember (p₁ × p₂) as v eqn:Hv.
+  destruct v as (vx, vy, vz); simpl.
+  remember (√ (vx² + vy² + vz²)) as vr eqn:Hvr.
+  replace (r * (/ vr * vx))%R with (r * vx * / vr)%R by lra.
+  replace (r * (/ vr * vy))%R with (r * vy * / vr)%R by lra.
+  replace (r * (/ vr * vz))%R with (r * vz * / vr)%R by lra.
+  do 6 rewrite Rsqr_mult.
+  do 2 rewrite <- Rmult_plus_distr_r.
+  do 2 rewrite <- Rmult_plus_distr_l.
+  apply (f_equal Rsqr) in Hvr.
+  assert (Hrz : (vr ≠ 0)%R).
+   intros H; rewrite H in *; clear H.
+   symmetry in Hvr.
+   rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_0 in Hvr.
+   apply sqr_vec_norm_eq_0 in Hvr.
+   destruct Hvr as (H1 & H2 & H3).
    now rewrite H1, H2, H3 in Hpp.
 
-   assert (Hrv : √ (xv² + yv² + zv²) = r).
-    injection Hv; clear Hv; intros Hzv Hyv Hxv.
-    rewrite Hxv, Hyv, Hzv.
-    progress repeat rewrite Rsqr_mult.
-    replace
-      (r² * ((/ rp)² * xp²) + r² * ((/ rp)² * yp²) + r² * ((/ rp)² * zp²))%R
-    with (r² * (/ rp)² * (xp² + yp² +  zp²))%R by lra.
-    rewrite sqrt_mult_alt.
-     rewrite sqrt_mult_alt; [ | apply Rle_0_sqr ].
-     rewrite <- Hrp.
-     rewrite sqrt_Rsqr; [ | lra ].
-     rewrite sqrt_Rsqr.
-      rewrite Rmult_assoc.
-      rewrite Rinv_l; [ now rewrite Rmult_1_r | easy ].
+   rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
+   rewrite <- Hvr, Rmult_assoc.
+   rewrite Rsqr_inv; [ | easy ].
+   rewrite Rinv_r; [ lra | ].
+   intros H; apply Hrz.
+   now apply Rsqr_eq_0 in H.
 
-      apply Rlt_le, Rinv_0_lt_compat.
-      enough (0 ≤ rp)%R by lra.
-      rewrite Hrp; apply sqrt_pos.
+  split.
+   simpl.
+   remember (r ⁎ a) as v eqn:Hv.
+   remember (p₁ × p₂) as pp eqn:Hcm.
+   destruct v as (xv, yv, zv).
+   destruct p₁ as (x₁, y₁, z₁).
+   destruct p₂ as (x₂, y₂, z₂); simpl in *.
+   destruct pp as (xp, yp, zp).
+   subst a; simpl in Hv.
+   remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
+   remember (√ (x₂² + y₂² + z₂²)) as r₂ eqn:Hr₂.
+   remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
+   assert (Hrpz : rp ≠ 0%R).
+    intros H; rewrite H in Hrp; symmetry in Hrp.
+    apply sqrt_eq_0 in Hrp; [ | apply nonneg_sqr_vec_norm ].
+    apply sqr_vec_norm_eq_0 in Hrp.
+    destruct Hrp as (H1 & H2 & H3).
+    now rewrite H1, H2, H3 in Hpp.
 
-     rewrite <- Rsqr_mult.
-     apply Rle_0_sqr.
+    assert (Hrv : √ (xv² + yv² + zv²) = r).
+     injection Hv; clear Hv; intros Hzv Hyv Hxv.
+     rewrite Hxv, Hyv, Hzv.
+     progress repeat rewrite Rsqr_mult.
+     replace
+       (r² * ((/ rp)² * xp²) + r² * ((/ rp)² * yp²) + r² * ((/ rp)² * zp²))%R
+     with (r² * (/ rp)² * (xp² + yp² +  zp²))%R by lra.
+     rewrite sqrt_mult_alt.
+      rewrite sqrt_mult_alt; [ | apply Rle_0_sqr ].
+      rewrite <- Hrp.
+      rewrite sqrt_Rsqr; [ | lra ].
+      rewrite sqrt_Rsqr.
+       rewrite Rmult_assoc.
+       rewrite Rinv_l; [ now rewrite Rmult_1_r | easy ].
 
-    rewrite Hrv.
-    injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
-    injection Hv; clear Hv; intros Hzv Hyv Hxv.
-    move r₂ before r₁.
-    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hxv.
-    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hyv.
-    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hzv.
-    rewrite Rmult_shuffle0 in Hxv, Hyv, Hzv.
-    rewrite Rinv_r in Hxv; [ | lra ].
-    rewrite Rinv_r in Hyv; [ | lra ].
-    rewrite Rinv_r in Hzv; [ | lra ].
-    rewrite Rmult_1_l, fold_Rdiv in Hxv, Hyv, Hzv.
-    rewrite Hxv, Hyv, Hzv.
-    progress repeat rewrite Rsqr_mult.
-    unfold Rsqr.
-    replace
-      ((/ rp * / rp * (xp * xp) * (1 - c) + c) * x₁ +
-       (/ rp * xp * (/ rp * yp) * (1 - c) - / rp * zp * s) * y₁ +
-       (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁)%R
-    with
-    (/ rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-     c * x₁ + s * (yp * z₁ - zp * y₁) * / rp)%R
-      by lra.
-    remember (xp * x₁ + yp * y₁ + zp * z₁)%R as u eqn:Hu.
-    rewrite Hxp, Hyp, Hzp in Hu.
-    ring_simplify in Hu; subst u.
-    rewrite Rmult_0_r, Rplus_0_l.
-    f_equal.
-    apply Rmult_eq_reg_r with (r := rp); [ | easy ].
-    rewrite Rmult_plus_distr_r.
-    repeat rewrite Rmult_assoc.
-    rewrite Rinv_l; [ | easy ].
-    rewrite Rmult_1_r.
-    (* trois milliards de kilomètres de formules de merde *)
+       apply Rlt_le, Rinv_0_lt_compat.
+       enough (0 ≤ rp)%R by lra.
+       rewrite Hrp; apply sqrt_pos.
+
+      rewrite <- Rsqr_mult.
+      apply Rle_0_sqr.
+
+     rewrite Hrv.
+     injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
+     injection Hv; clear Hv; intros Hzv Hyv Hxv.
+     move r₂ before r₁.
+     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hxv.
+     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hyv.
+     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hzv.
+     rewrite Rmult_shuffle0 in Hxv, Hyv, Hzv.
+     rewrite Rinv_r in Hxv; [ | lra ].
+     rewrite Rinv_r in Hyv; [ | lra ].
+     rewrite Rinv_r in Hzv; [ | lra ].
+     rewrite Rmult_1_l, fold_Rdiv in Hxv, Hyv, Hzv.
+     rewrite Hxv, Hyv, Hzv.
+     progress repeat rewrite Rsqr_mult.
+     unfold Rsqr.
+     replace
+       ((/ rp * / rp * (xp * xp) * (1 - c) + c) * x₁ +
+        (/ rp * xp * (/ rp * yp) * (1 - c) - / rp * zp * s) * y₁ +
+        (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁)%R
+     with
+     (/ rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+      c * x₁ + s * (yp * z₁ - zp * y₁) * / rp)%R
+       by lra.
+     remember (xp * x₁ + yp * y₁ + zp * z₁)%R as u eqn:Hu.
+     rewrite Hxp, Hyp, Hzp in Hu.
+     ring_simplify in Hu; subst u.
+     rewrite Rmult_0_r, Rplus_0_l.
+     f_equal.
+     apply Rmult_eq_reg_r with (r := rp); [ | easy ].
+     rewrite Rmult_plus_distr_r.
+     repeat rewrite Rmult_assoc.
+     rewrite Rinv_l; [ | easy ].
+     rewrite Rmult_1_r.
+     enough (rp * (x₂ - c * x₁) = s * (yp * z₁ - zp * y₁))%R by lra.
+     destruct (Rle_dec 0 (rp * (x₂ - c * x₁))) as [H₁| H₁].
+      destruct (Rle_dec 0 (s * (yp * z₁ - zp * y₁))) as [H₂| H₂].
+       apply Rsqr_inj; [ easy | easy | ].
+       do 2 rewrite Rsqr_mult.
+       rewrite Hrp, Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+       rewrite Hs, Rsqr_sqrt.
+        (* trois milliards de kilomètres de putain de formules de merde *)
+bbb.
+        (* 0 ≤ 1 - c² *)
+        rewrite <- Hcs, Rplus_comm.
+        enough (0 ≤ s²)%R by lra.
+        apply Rle_0_sqr.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
