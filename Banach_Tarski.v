@@ -2840,7 +2840,7 @@ Qed.
 Definition axis_angle_of_couple p₁ p₂ :=
   let a := (/ ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec in
   let c := ((p₁ · p₂) / (∥p₁∥ * ∥p₂∥))%R in
-  let s := √ (1 - c²) in
+  let s := (∥(p₁ × p₂)∥ / (∥p₁∥ * ∥p₂∥))%R in
   (a, c, s).
 
 Theorem glop : ∀ r p₁ p₂,
@@ -2860,27 +2860,26 @@ remember (axis_angle_of_couple p₁ p₂) as acs eqn:H.
 unfold axis_angle_of_couple in H.
 destruct acs as ((a & c) & s).
 injection H; clear H; intros Hs Hc Ha.
-rewrite <- Hc in Hs.
 exists (r ⁎ a)%vec, c, s.
 assert (Hcs : (c² + s² = 1)%R).
- rewrite Hs; clear s Hs.
- rewrite Rsqr_sqrt; [ lra | ].
- enough (c² ≤ 1)%R by lra.
- rewrite Hc; clear c Hc.
- simpl in Hp₁, Hp₂.
- specialize (vec_Cauchy_Schwarz_inequality p₁ p₂) as Hcs.
- destruct p₁ as (x₁, y₁, z₁).
- destruct p₂ as (x₂, y₂, z₂); simpl in Hcs; simpl.
- rewrite Hp₁, Hp₂ in Hcs |-*.
- rewrite sqrt_Rsqr in Hcs; [ | lra ].
- rewrite sqrt_Rsqr; [ | lra ].
- rewrite fold_Rsqr.
- rewrite Rsqr_div; [ | intros H; apply Rsqr_eq_0 in H; lra ].
- apply Rmult_le_reg_r with (r := (r²)%R); [ apply Rlt_0_sqr; lra | ].
- apply Rmult_le_reg_r with (r := (r²)%R); [ apply Rlt_0_sqr; lra | ].
- rewrite Rmult_assoc.
- rewrite Rmult_div_same; [ lra | ].
- intros H; do 2 apply Rsqr_eq_0 in H; lra.
+ assert (H : (∥p₁∥ * ∥p₂∥ ≠ 0)%R).
+  apply on_sphere_norm in Hp₁; [ | lra ].
+  apply on_sphere_norm in Hp₂; [ | lra ].
+  rewrite Hp₁, Hp₂.
+  intros H; apply Rsqr_eq_0 in H; lra.
+
+  rewrite Hc, Hs.
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  rewrite <- Rdiv_plus_distr.
+  rewrite <- vec_dot_mul_diag.
+  rewrite <- vec_Lagrange_identity.
+  rewrite Rplus_minus.
+  rewrite Rsqr_mult.
+  rewrite Rdiv_same; [ easy | ].
+  rewrite <- Rsqr_mult.
+  intros HH; apply H.
+  now apply Rsqr_eq_0 in HH.
 
  split; [ | split ]; [ | easy | ].
   simpl.
@@ -2918,14 +2917,12 @@ assert (Hcs : (c² + s² = 1)%R).
    destruct v as (xv, yv, zv).
    destruct p₁ as (x₁, y₁, z₁).
    destruct p₂ as (x₂, y₂, z₂); simpl in *.
-   rewrite Hp₁, Hp₂ in Hc.
+   rewrite Hp₁, Hp₂ in Hs, Hc.
+   rewrite sqrt_Rsqr in Hs; [ | lra ].
    rewrite sqrt_Rsqr in Hc; [ | lra ].
    destruct pp as (xp, yp, zp).
+   simpl in Hs.
    subst a; simpl in Hv.
-(*
-   remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
-   remember (√ (x₂² + y₂² + z₂²)) as r₂ eqn:Hr₂.
-*)
    remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
    assert (Hrpz : rp ≠ 0%R).
     intros H; rewrite H in Hrp; symmetry in Hrp.
@@ -2991,6 +2988,7 @@ assert (Hcs : (c² + s² = 1)%R).
      repeat rewrite Rmult_assoc.
      rewrite Rinv_l; [ | easy ].
      rewrite Rmult_1_r.
+bbb.
      enough (rp * (x₂ - c * x₁) = s * (yp * z₁ - zp * y₁))%R by lra.
      destruct (Rle_dec 0 (rp * (x₂ - c * x₁))) as [H₁| H₁].
       destruct (Rle_dec 0 (s * (yp * z₁ - zp * y₁))) as [H₂| H₂].
