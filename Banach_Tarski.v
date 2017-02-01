@@ -2956,9 +2956,6 @@ assert (Hcs : (c² + s² = 1)%R).
      rewrite Hrv.
      injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
      injection Hv; clear Hv; intros Hzv Hyv Hxv.
-(*
-     move r₂ before r₁.
-*)
      apply Rmult_eq_compat_r with (r := (/ r)%R) in Hxv.
      apply Rmult_eq_compat_r with (r := (/ r)%R) in Hyv.
      apply Rmult_eq_compat_r with (r := (/ r)%R) in Hzv.
@@ -2976,15 +2973,28 @@ assert (Hcs : (c² + s² = 1)%R).
         (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁)%R
      with
      (/ rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-      c * x₁ + s * (yp * z₁ - zp * y₁) * / rp)%R
-       by lra.
+      c * x₁ + s * (yp * z₁ - zp * y₁) * / rp)%R by lra.
+     replace
+       ((/ rp * xp * (/ rp * yp) * (1 - c) + / rp * zp * s) * x₁ +
+        (/ rp * / rp * (yp * yp) * (1 - c) + c) * y₁ +
+        (/ rp * yp * (/ rp * zp) * (1 - c) - / rp * xp * s) * z₁)%R
+     with
+     (/ rp * / rp * yp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+      c * y₁ + s * (zp * x₁ - xp * z₁) * / rp)%R by lra.
+     replace
+       ((/ rp * xp * (/ rp * zp) * (1 - c) - / rp * yp * s) * x₁ +
+        (/ rp * yp * (/ rp * zp) * (1 - c) + / rp * xp * s) * y₁ +
+        (/ rp * / rp * (zp * zp) * (1 - c) + c) * z₁)%R
+     with
+     (/ rp * / rp * zp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+      c * z₁ + s * (xp * y₁ - yp * x₁) * / rp)%R by lra.
      remember (xp * x₁ + yp * y₁ + zp * z₁)%R as u eqn:Hu.
      rewrite Hxp, Hyp, Hzp in Hu.
      ring_simplify in Hu; subst u.
-     rewrite Rmult_0_r, Rplus_0_l.
+     do 3 rewrite Rmult_0_r, Rplus_0_l.
      rewrite fold_Rsqr in Hc, Hs.
+     assert (Hr2 : (r² ≠ 0)%R) by (intros H; apply Rsqr_eq_0 in H; lra).
      f_equal.
-      assert (Hr2 : (r² ≠ 0)%R) by (intros H; apply Rsqr_eq_0 in H; lra).
       apply Rmult_eq_reg_r with (r := rp); [ | easy ].
       rewrite Rmult_plus_distr_r.
       repeat rewrite Rmult_assoc.
@@ -3012,28 +3022,6 @@ assert (Hcs : (c² + s² = 1)%R).
       rewrite Rmult_comm.
       do 2 rewrite <- Rmult_plus_distr_l.
       now rewrite Hp₁.
-bbb.
-     enough (rp * (x₂ - c * x₁) = s * (yp * z₁ - zp * y₁))%R by lra.
-     destruct (Rle_dec 0 (rp * (x₂ - c * x₁))) as [H₁| H₁].
-      destruct (Rle_dec 0 (s * (yp * z₁ - zp * y₁))) as [H₂| H₂].
-       apply Rsqr_inj; [ easy | easy | ].
-       do 2 rewrite Rsqr_mult.
-       rewrite Hrp, Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-       rewrite Hs, Rsqr_sqrt.
-bbb.
-remember (yp * z₁ - zp * y₁)%R as u eqn:Hu.
-rewrite Hyp, Hzp in Hu.
-ring_simplify in Hu.
-progress repeat rewrite <- Rsqr_pow2 in Hu.
-bbb.
-
-        apply Rmult_eq_reg_r with (r := (r * r)²%R).
-        (* trois milliards de kilomètres de putain de formules de merde *)
-bbb.
-        (* 0 ≤ 1 - c² *)
-        rewrite <- Hcs, Rplus_comm.
-        enough (0 ≤ s²)%R by lra.
-        apply Rle_0_sqr.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
