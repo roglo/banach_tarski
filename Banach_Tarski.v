@@ -2860,6 +2860,7 @@ remember (axis_angle_of_couple p₁ p₂) as acs eqn:H.
 unfold axis_angle_of_couple in H.
 destruct acs as ((a & c) & s).
 injection H; clear H; intros Hs Hc Ha.
+rewrite <- Hc in Hs.
 exists (r ⁎ a)%vec, c, s.
 split; [ | split ].
  simpl.
@@ -2890,7 +2891,6 @@ split; [ | split ].
   intros H; apply Hrz.
   now apply Rsqr_eq_0 in H.
 
- rewrite <- Hc in Hs.
  rewrite Hs; clear s Hs.
  rewrite Rsqr_sqrt; [ lra | ].
  enough (c² ≤ 1)%R by lra.
@@ -2939,7 +2939,35 @@ split; [ | split ].
     rewrite Rmult_assoc in Hrv.
     rewrite Rinv_l in Hrv.
      rewrite Rmult_1_r in Hrv; subst rv.
-
+     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hxv.
+     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hyv.
+     apply Rmult_eq_compat_r with (r := (/ r)%R) in Hzv.
+     rewrite Rmult_shuffle0 in Hxv, Hyv, Hzv.
+     rewrite Rinv_r in Hxv.
+     rewrite Rinv_r in Hyv.
+     rewrite Rinv_r in Hzv.
+     rewrite Rmult_1_l, fold_Rdiv in Hxv, Hyv, Hzv.
+     rewrite Hxv, Hyv, Hzv.
+     progress repeat rewrite Rsqr_mult.
+     unfold Rsqr.
+     replace
+       ((/ rp * / rp * (xp * xp) * (1 - c) + c) * x₁ +
+        (/ rp * xp * (/ rp * yp) * (1 - c) - / rp * zp * s) * y₁ +
+        (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁)%R
+     with
+       (/ rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+        c * x₁ + s * (yp * z₁ - zp * y₁) * / rp)%R
+       by lra.
+     remember (xp * x₁ + yp * y₁ + zp * z₁)%R as u eqn:Hu.
+     rewrite Hxp, Hyp, Hzp in Hu.
+     ring_simplify in Hu; subst u.
+     rewrite Rmult_0_r, Rplus_0_l.
+     f_equal.
+      apply Rmult_eq_reg_r with (r := rp).
+      rewrite Rmult_plus_distr_r.
+      repeat rewrite Rmult_assoc.
+      rewrite Rinv_l.
+      rewrite Rmult_1_r.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
