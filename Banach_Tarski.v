@@ -2968,6 +2968,7 @@ split; [ | split ].
       repeat rewrite Rmult_assoc.
       rewrite Rinv_l.
       rewrite Rmult_1_r.
+      (* trois milliards de kilomètres de formules de merde *)
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
