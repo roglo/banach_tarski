@@ -2918,10 +2918,14 @@ assert (Hcs : (c² + s² = 1)%R).
    destruct v as (xv, yv, zv).
    destruct p₁ as (x₁, y₁, z₁).
    destruct p₂ as (x₂, y₂, z₂); simpl in *.
+   rewrite Hp₁, Hp₂ in Hc.
+   rewrite sqrt_Rsqr in Hc; [ | lra ].
    destruct pp as (xp, yp, zp).
    subst a; simpl in Hv.
+(*
    remember (√ (x₁² + y₁² + z₁²)) as r₁ eqn:Hr₁.
    remember (√ (x₂² + y₂² + z₂²)) as r₂ eqn:Hr₂.
+*)
    remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
    assert (Hrpz : rp ≠ 0%R).
     intros H; rewrite H in Hrp; symmetry in Hrp.
@@ -2955,7 +2959,9 @@ assert (Hcs : (c² + s² = 1)%R).
      rewrite Hrv.
      injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
      injection Hv; clear Hv; intros Hzv Hyv Hxv.
+(*
      move r₂ before r₁.
+*)
      apply Rmult_eq_compat_r with (r := (/ r)%R) in Hxv.
      apply Rmult_eq_compat_r with (r := (/ r)%R) in Hyv.
      apply Rmult_eq_compat_r with (r := (/ r)%R) in Hzv.
@@ -2992,8 +2998,15 @@ assert (Hcs : (c² + s² = 1)%R).
        do 2 rewrite Rsqr_mult.
        rewrite Hrp, Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
        rewrite Hs, Rsqr_sqrt.
-       apply Rmult_eq_reg_r with (r := (r₁ * r₂)²%R).
-       (* trois milliards de kilomètres de putain de formules de merde *)
+bbb.
+remember (yp * z₁ - zp * y₁)%R as u eqn:Hu.
+rewrite Hyp, Hzp in Hu.
+ring_simplify in Hu.
+progress repeat rewrite <- Rsqr_pow2 in Hu.
+bbb.
+
+        apply Rmult_eq_reg_r with (r := (r * r)²%R).
+        (* trois milliards de kilomètres de putain de formules de merde *)
 bbb.
         (* 0 ≤ 1 - c² *)
         rewrite <- Hcs, Rplus_comm.
