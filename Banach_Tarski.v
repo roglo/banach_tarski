@@ -2843,26 +2843,24 @@ Definition axis_angle_of_couple p₁ p₂ :=
   let s := (∥(p₁ × p₂)∥ / (∥p₁∥ * ∥p₂∥))%R in
   (a, c, s).
 
-Theorem rotation_between_2_points : ∀ r p₁ p₂ a c s v,
+Theorem rotation_between_2_points : ∀ r p₁ p₂ a c s,
   (0 < r)%R
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
   → p₁ × p₂ ≠ 0%vec
   → axis_angle_of_couple p₁ p₂ = (a, c, s)
-  → v = (r ⁎ a)%vec
-  → v ∈ sphere r ∧ (c² + s² = 1)%R ∧
-    (matrix_of_axis_angle (v, c, s) * p₁ = p₂)%vec.
+  → a ∈ sphere 1 ∧ (c² + s² = 1)%R ∧
+    (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec.
 Proof.
-intros * Hr Hp₁ Hp₂ Hpp Hacs Hv.
+intros * Hr Hp₁ Hp₂ Hpp Hacs.
 symmetry in Hacs; injection Hacs; clear Hacs.
-intros Hs Hc Ha; subst v.
+intros Hs Hc Ha.
 assert (Hcs : (c² + s² = 1)%R).
  assert (H : (∥p₁∥ * ∥p₂∥ ≠ 0)%R).
   apply on_sphere_norm in Hp₁; [ | lra ].
   apply on_sphere_norm in Hp₂; [ | lra ].
   rewrite Hp₁, Hp₂.
   intros H; apply Rsqr_eq_0 in H; lra.
-
   rewrite Hc, Hs.
   rewrite Rsqr_div; [ | easy ].
   rewrite Rsqr_div; [ | easy ].
@@ -2885,8 +2883,7 @@ assert (Hcs : (c² + s² = 1)%R).
   replace (r * (/ vr * vx))%R with (r * vx * / vr)%R by lra.
   replace (r * (/ vr * vy))%R with (r * vy * / vr)%R by lra.
   replace (r * (/ vr * vz))%R with (r * vz * / vr)%R by lra.
-  do 6 rewrite Rsqr_mult.
-  do 2 rewrite <- Rmult_plus_distr_r.
+  do 3 rewrite Rsqr_mult.
   do 2 rewrite <- Rmult_plus_distr_l.
   apply (f_equal Rsqr) in Hvr.
   assert (Hrz : (vr ≠ 0)%R).
@@ -2899,16 +2896,15 @@ assert (Hcs : (c² + s² = 1)%R).
    now rewrite H1, H2, H3 in Hpp.
 
    rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
-   rewrite <- Hvr, Rmult_assoc.
+   rewrite <- Hvr.
    rewrite Rsqr_inv; [ | easy ].
-   rewrite Rinv_r; [ lra | ].
+   rewrite Rinv_l; [ now rewrite Rsqr_1 | ].
    intros H; apply Hrz.
    now apply Rsqr_eq_0 in H.
 
   simpl.
-  remember (r ⁎ a) as v eqn:Hv.
   remember (p₁ × p₂) as pp eqn:Hcm.
-  destruct v as (xv, yv, zv).
+  destruct a as (xa, ya, za).
   destruct p₁ as (x₁, y₁, z₁).
   destruct p₂ as (x₂, y₂, z₂); simpl in *.
   rewrite Hp₁, Hp₂ in Hs, Hc.
@@ -2916,7 +2912,7 @@ assert (Hcs : (c² + s² = 1)%R).
   rewrite sqrt_Rsqr in Hc; [ | lra ].
   destruct pp as (xp, yp, zp).
   simpl in Hs.
-  subst a; simpl in Hv.
+  simpl in Ha.
   remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
   assert (Hrpz : rp ≠ 0%R).
    intros H; rewrite H in Hrp; symmetry in Hrp.
@@ -2925,40 +2921,22 @@ assert (Hcs : (c² + s² = 1)%R).
    destruct Hrp as (H1 & H2 & H3).
    now rewrite H1, H2, H3 in Hpp.
 
-   assert (Hrv : √ (xv² + yv² + zv²) = r).
-    injection Hv; clear Hv; intros Hzv Hyv Hxv.
-    rewrite Hxv, Hyv, Hzv.
+   injection Ha; clear Ha; intros Hza Hya Hxa.
+   assert (Hra : √ (xa² + ya² + za²) = 1%R).
+    rewrite Hxa, Hya, Hza.
     progress repeat rewrite Rsqr_mult.
-    replace
-      (r² * ((/ rp)² * xp²) + r² * ((/ rp)² * yp²) + r² * ((/ rp)² * zp²))%R
-    with (r² * (/ rp)² * (xp² + yp² +  zp²))%R by lra.
-    rewrite sqrt_mult_alt.
-     rewrite sqrt_mult_alt; [ | apply Rle_0_sqr ].
-     rewrite <- Hrp.
-     rewrite sqrt_Rsqr; [ | lra ].
-     rewrite sqrt_Rsqr.
-      rewrite Rmult_assoc.
-      rewrite Rinv_l; [ now rewrite Rmult_1_r | easy ].
+    do 2 rewrite <- Rmult_plus_distr_l.
+    rewrite sqrt_mult_alt; [ | apply Rle_0_sqr ].
+    rewrite <- Hrp.
+    rewrite sqrt_Rsqr; [ now rewrite Rinv_l | ].
+    apply Rlt_le, Rinv_0_lt_compat.
+    enough (0 ≤ rp)%R by lra.
+    rewrite Hrp; apply sqrt_pos.
 
-      apply Rlt_le, Rinv_0_lt_compat.
-      enough (0 ≤ rp)%R by lra.
-      rewrite Hrp; apply sqrt_pos.
-
-     rewrite <- Rsqr_mult.
-     apply Rle_0_sqr.
-
-    rewrite Hrv.
+    rewrite Hra.
+    do 3 rewrite Rdiv_1_r.
     injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
-    injection Hv; clear Hv; intros Hzv Hyv Hxv.
-    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hxv.
-    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hyv.
-    apply Rmult_eq_compat_r with (r := (/ r)%R) in Hzv.
-    rewrite Rmult_shuffle0 in Hxv, Hyv, Hzv.
-    rewrite Rinv_r in Hxv; [ | lra ].
-    rewrite Rinv_r in Hyv; [ | lra ].
-    rewrite Rinv_r in Hzv; [ | lra ].
-    rewrite Rmult_1_l, fold_Rdiv in Hxv, Hyv, Hzv.
-    rewrite Hxv, Hyv, Hzv.
+    rewrite Hxa, Hya, Hza.
     progress repeat rewrite Rsqr_mult.
     unfold Rsqr.
     replace
@@ -3081,20 +3059,21 @@ Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
   → p₂ ∈ sphere r
   → p₁ × p₂ ≠ 0%vec
   → ∃ a c s,
-    a ∈ sphere r ∧ (c² + s² = 1)%R ∧
+    a ∈ sphere 1 ∧ (c² + s² = 1)%R ∧
     (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec ∧
     ∀ a' c' s',
-    a' ∈ sphere r ∧ (c'² + s'² = 1)%R ∧
+    a' ∈ sphere 1 ∧ (c'² + s'² = 1)%R ∧
     (matrix_of_axis_angle (a', c', s') * p₁ ≠ p₂)%vec
-    → a = a' ∧ c = c' ∧ s = s'.
+    → a = a' ∧ c = c' ∧ s = s' ∨
+      a = (-a')%vec ∧ c = c' ∧ s = (- s')%R.
 Proof.
 intros * Hr Hp₁ Hp₂ Hpp.
 remember (axis_angle_of_couple p₁ p₂) as acs eqn:H.
 destruct acs as ((a & c) & s).
 symmetry in H.
-eapply rotation_between_2_points in H; try eassumption; [ | easy ].
+eapply rotation_between_2_points in H; try eassumption.
 destruct H as (Ha & Hcs & Hm).
-exists (r ⁎ a)%vec, c, s.
+exists a, c, s.
 split; [ easy | ].
 split; [ easy | ].
 split; [ easy | ].
