@@ -3092,6 +3092,28 @@ f_equal; ring_simplify.
  ring.
 Qed.
 
+(* If a rotation in ℝ³ is identity for some point, then:
+   - either it is the identity rotation
+   - or the point belongs to the axis
+*)
+Theorem rot_is_id_for_pt : ∀ M v,
+  is_rotation_matrix M
+  → (M * v = v)%vec
+  → M = mat_id ∨
+    ∀ a c s, axis_angle_of_matrix M = (a, c, s) → a × v = 0%vec.
+Proof.
+intros * Hrm HM.
+destruct v as (x, y, z).
+destruct M; simpl in *.
+destruct Hrm as (Hrm, Hdet).
+unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
+unfold mat_det in Hdet; simpl in Hdet.
+injection Hrm; clear Hrm.
+intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+clear H21 H31 H32.
+injection HM; clear HM; intros Hz Hy Hx.
+bbb.
+
 Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
   (0 < r)%R
   → p₁ ∈ sphere r
@@ -3120,11 +3142,6 @@ intros * (Ha' & Hcs' & H').
 apply matrix_of_axis_angle_opp in H'; [ | easy | easy ].
 rewrite <- H' in Hm.
 rewrite <- mat_vec_mul_assoc in Hm.
-(* I could try to prove that:
-   If a rotation in ℝ³ is identity for some point, then:
-   - either it is the identity rotation
-   - or the point belongs to the axis
-*)
 bbb.
 
 unfold mat_mul in Hm.
