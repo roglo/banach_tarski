@@ -3117,7 +3117,32 @@ split; [ easy | ].
 split; [ easy | ].
 split; [ easy | ].
 intros * (Ha' & Hcs' & H').
-Search matrix_of_axis_angle.
+apply matrix_of_axis_angle_opp in H'; [ | easy | easy ].
+rewrite <- H' in Hm.
+rewrite <- mat_vec_mul_assoc in Hm.
+bbb.
+
+unfold mat_mul in Hm.
+simpl in Hm.
+destruct a as (xa, ya, za).
+destruct a' as (xa', ya', za').
+simpl in Hm.
+simpl in Ha, Ha'.
+rewrite Rsqr_1 in Ha, Ha'.
+rewrite Ha, Ha' in Hm.
+rewrite sqrt_1 in Hm.
+progress repeat rewrite Rdiv_1_r in Hm.
+destruct p₂ as (x₂, y₂, z₂).
+simpl in Hm.
+injection Hm; clear Hm; intros Hz₂ Hy₂ Hx₂.
+ring_simplify in Hx₂.
+progress repeat rewrite Rsqr_pow2 in Ha, Ha'.
+progress repeat rewrite Rsqr_pow2 in Hcs, Hcs'.
+progress repeat rewrite Rsqr_pow2 in Hx₂.
+repeat replace (za' ^ 2)%R with (1 - xa' ^ 2 - ya' ^ 2)%R in Hx₂ by lra.
+ring_simplify in Hx₂.
+progress replace (s' ^ 2)%R with (1 - c' ^ 2)%R in Hx₂ by lra.
+
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
