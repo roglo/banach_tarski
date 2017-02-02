@@ -3053,6 +3053,34 @@ assert (Hcs : (c² + s² = 1)%R).
      now rewrite Hp₁.
 Qed.
 
+Theorem matrix_of_axis_angle_opp : ∀ p₁ p₂ a c s,
+  (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec
+  → (matrix_of_axis_angle (a, c, (-s)%R) * p₂ = p₁)%vec.
+Proof.
+intros * Hacs.
+bbb.
+subst p₂; simpl.
+destruct a as (ax, ay, az).
+remember (√ (ax² + ay² + az²)) as ar eqn:Har.
+unfold mat_vec_mul; simpl.
+destruct p₁ as (x₁, y₁, z₁).
+simpl.
+f_equal.
+ unfold Rsqr.
+ field_simplify.
+ rewrite Rdiv_1_r.
+ apply Rmult_eq_reg_r with (r := (ar ^ 4)%R).
+ rewrite Rmult_div_same.
+ ring_simplify.
+ progress repeat replace (ar ^ 4)%R with ((ar ^ 2) ^ 2)%R by lra.
+ rewrite Har.
+ progress repeat rewrite <- Rsqr_pow2.
+ rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+ progress repeat rewrite Rsqr_pow2.
+ ring_simplify.
+ clear.
+bbb.
+
 Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
   (0 < r)%R
   → p₁ ∈ sphere r
@@ -3063,7 +3091,7 @@ Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
     (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec ∧
     ∀ a' c' s',
     a' ∈ sphere 1 ∧ (c'² + s'² = 1)%R ∧
-    (matrix_of_axis_angle (a', c', s') * p₁ ≠ p₂)%vec
+    (matrix_of_axis_angle (a', c', s') * p₁ = p₂)%vec
     → a = a' ∧ c = c' ∧ s = s' ∨
       a = (-a')%vec ∧ c = c' ∧ s = (- s')%R.
 Proof.
@@ -3078,6 +3106,7 @@ split; [ easy | ].
 split; [ easy | ].
 split; [ easy | ].
 intros * (Ha' & Hcs' & H').
+Search matrix_of_axis_angle.
 bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
