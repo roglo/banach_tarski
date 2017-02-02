@@ -3053,33 +3053,44 @@ assert (Hcs : (c² + s² = 1)%R).
      now rewrite Hp₁.
 Qed.
 
+Notation "r ³" := (Rpow_def.pow r 3) (at level 1, format "r ³") : R_scope.
+Notation "r ⁴" := (Rpow_def.pow r 4) (at level 1, format "r ⁴") : R_scope.
+
 Theorem matrix_of_axis_angle_opp : ∀ p₁ p₂ a c s,
-  (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec
+  a ∈ sphere 1
+  → (c² + s² = 1)%R
+  → (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec
   → (matrix_of_axis_angle (a, c, (-s)%R) * p₂ = p₁)%vec.
 Proof.
-intros * Hacs.
-bbb.
+intros * Ha Hcs Hacs.
 subst p₂; simpl.
-destruct a as (ax, ay, az).
-remember (√ (ax² + ay² + az²)) as ar eqn:Har.
-unfold mat_vec_mul; simpl.
-destruct p₁ as (x₁, y₁, z₁).
-simpl.
-f_equal.
- unfold Rsqr.
- field_simplify.
- rewrite Rdiv_1_r.
- apply Rmult_eq_reg_r with (r := (ar ^ 4)%R).
- rewrite Rmult_div_same.
- ring_simplify.
- progress repeat replace (ar ^ 4)%R with ((ar ^ 2) ^ 2)%R by lra.
- rewrite Har.
- progress repeat rewrite <- Rsqr_pow2.
- rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+destruct a as (ax, ay, az); simpl in Ha.
+rewrite Rsqr_1 in Ha; rewrite Ha.
+rewrite sqrt_1.
+do 3 rewrite Rdiv_1_r.
+rewrite <- mat_vec_mul_assoc.
+unfold mat_mul; simpl.
+unfold mkrmat; simpl.
+destruct p₁ as (x₁, y₁, z₁); simpl.
+f_equal; ring_simplify.
+ rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
  progress repeat rewrite Rsqr_pow2.
- ring_simplify.
- clear.
-bbb.
+ replace (s ^ 2)%R with (1 - c ^ 2)%R by lra.
+ replace (az ^ 2)%R with (1 - ax ^ 2 - ay ^ 2)%R by lra.
+ ring.
+
+ rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
+ progress repeat rewrite Rsqr_pow2.
+ replace (s ^ 2)%R with (1 - c ^ 2)%R by lra.
+ replace (az ^ 2)%R with (1 - ax ^ 2 - ay ^ 2)%R by lra.
+ ring.
+
+ rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
+ progress repeat rewrite Rsqr_pow2.
+ replace (s ^ 2)%R with (1 - c ^ 2)%R by lra.
+ replace (az ^ 2)%R with (1 - ax ^ 2 - ay ^ 2)%R by lra.
+ ring.
+Qed.
 
 Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
   (0 < r)%R
