@@ -3092,17 +3092,14 @@ f_equal; ring_simplify.
  ring.
 Qed.
 
-(* If a rotation in ℝ³ is identity for some point, then:
-   - either it is the identity rotation
-   - or the point belongs to the axis
-*)
 Theorem rot_is_id_for_pt : ∀ M v,
   is_rotation_matrix M
   → (M * v = v)%vec
-  → M = mat_id ∨
-    ∀ a c s, axis_angle_of_matrix M = (a, c, s) → a × v = 0%vec.
+  → M ≠ mat_transp M
+  → ∀ a c s, axis_angle_of_matrix M = (a, c, s) → a × v = 0%vec.
 Proof.
-intros * Hrm HM.
+intros * Hrm Hmv Hmt a c s Ha.
+bbb.
 destruct (mat_eq_dec M mat_id) as [Hmi| Hmi]; [ now left | right ].
 intros a c s Ha.
 destruct v as (x, y, z).
