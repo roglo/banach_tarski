@@ -3120,6 +3120,11 @@ intros * (Ha' & Hcs' & H').
 apply matrix_of_axis_angle_opp in H'; [ | easy | easy ].
 rewrite <- H' in Hm.
 rewrite <- mat_vec_mul_assoc in Hm.
+(* I could try to prove that:
+   If a rotation in ℝ³ is identity for some point, then:
+   - either it is the identity rotation
+   - or the point belongs to the axis
+*)
 bbb.
 
 unfold mat_mul in Hm.
