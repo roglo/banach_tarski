@@ -2839,6 +2839,16 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
+(* Given an axis (a point p) and two points p₁ and p₂, there is at least
+   one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
+   p₂ are not in the same latitude (p being the north pole), one if they
+   are. *)
+Theorem glop : ∀ p p₁ p₂ c s c' s',
+  (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
+  → (matrix_of_axis_angle (p, c' s') * p₁ = p₂)%vec
+  → c = c' ∧ s = s'.
+Proof.
+
 bbb.
 
 (* below: partially true, therefore false; indeed, there is a rotation
