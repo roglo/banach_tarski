@@ -2851,23 +2851,45 @@ Definition latitude p p₁ := (p · p₁).
 Theorem one_rotation_max : ∀ r p p₁ p₂ c s c' s',
   (0 < r)%R
   → p ∈ sphere r
+  → p₁ ∈ sphere r
+  → p₂ ∈ sphere r
+  → (c² + s² = 1)%R
+  → (c'² + s'² = 1)%R
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
   → (matrix_of_axis_angle (p, c', s') * p₁ = p₂)%vec
   → c = c' ∧ s = s'.
 Proof.
-intros * Hr Hp Hm Hm'.
+intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
 destruct (Req_dec (latitude p p₁) (latitude p p₂)) as [Hll| Hll].
  unfold latitude in Hll.
  destruct p as (xp, yp, zp).
  destruct p₁ as (x₁, y₁, z₁).
  destruct p₂ as (x₂, y₂, z₂).
- simpl in Hll, Hm, Hm', Hp.
+ simpl in Hll, Hm, Hm', Hp, Hp₁, Hp₂.
  rewrite Hp in Hm, Hm'.
  rewrite sqrt_Rsqr in Hm; [ | lra ].
  rewrite sqrt_Rsqr in Hm'; [ | lra ].
  injection Hm; clear Hm; intros Hz1 Hy1 Hx1.
  injection Hm'; clear Hm'; intros Hz2 Hy2 Hx2.
  symmetry in Hx1, Hy1, Hz1, Hx2, Hy2, Hz2.
+ enough (r = 1%R). (* just to simplify the proof, to see *)
+ subst r; clear Hr.
+ rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+ do 3 rewrite Rdiv_1_r in Hx1, Hy1, Hz1, Hx2, Hy2, Hz2.
+split.
+unfold Rsqr in *.
+bbb.
+
+nsatz.
+
+bbb.
+ rewrite Hx2 in Hx1.
+ ring_simplify in Hx1.
+ unfold Rsqr in Hx1.
+ assert
+   (H :
+     ((c - c') * (xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁) +
+      (s - s') * (y₁ * zp - yp * z₁))%R = 0%R) by lra.
 
 bbb.
 
