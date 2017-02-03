@@ -2844,6 +2844,36 @@ Qed.
    that p and p₁ beling to the sphere of ray r. *)
 Definition latitude p p₁ := (p · p₁).
 
+Theorem glop : ∀ r p p₁ p₂ c s,
+  (0 < r)%R
+  → p ∈ sphere r
+  → p₁ ∈ sphere r
+  → p₂ ∈ sphere r
+  → c = (/r² * (p₁ · p₂))%R
+  → s = (/r² * ∥(p₁ × p₂)∥)%R
+  → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
+Proof.
+intros * Hr Hp Hp₁ Hp₂ Hc Hs.
+subst; simpl.
+destruct p as (x, y, z); simpl in Hp.
+rewrite Hp.
+rewrite sqrt_Rsqr; [ | lra ].
+rewrite Rsqr_div; [ | lra ].
+rewrite Rsqr_div; [ | lra ].
+rewrite Rsqr_div; [ | lra ].
+enough (r = 1%R). (* just to simplify the proof, to see *)
+subst r; clear Hr.
+simpl in Hp₁, Hp₂.
+rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+rewrite Rsqr_1.
+do 6 rewrite Rdiv_1_r.
+rewrite Rinv_1.
+progress repeat rewrite Rmult_1_l.
+destruct p₁ as (x₁, y₁, z₁).
+destruct p₂ as (x₂, y₂, z₂); simpl.
+f_equal.
+bbb.
+
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
    p₂ are not in the same latitude (p being the north pole), one if they
