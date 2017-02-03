@@ -3196,6 +3196,8 @@ remember (axis_angle_of_matrix (M * M')) as acs' eqn:Hacs'.
 symmetry in Hacs'.
 destruct acs' as ((aa', cc'), ss').
 eapply rot_is_id_for_pt in H; try eassumption.
+unfold axis_angle_of_matrix in Hacs'.
+injection Hacs'; clear Hacs'; intros Hss' Hcc' Haa'.
 bbb.
 
 unfold mat_mul in Hm.
