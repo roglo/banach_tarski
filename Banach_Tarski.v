@@ -2839,6 +2839,15 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
+bbb.
+
+(* below: partially true, therefore false; indeed, there is a rotation
+   transforming a point p₁ into a point p₂ (with axis equal to p₁ × p₂),
+   but there are an uncountable set of axis transforming p₁ into p₂:
+   just consider the plan separating symmetrically p₁ and p₂. Any point
+   in the intersection of this plan and the sphere can be an axis of
+   a possible rotation between p₁ and p₂ *)
+
 Definition axis_angle_of_couple p₁ p₂ :=
   let a := (/ ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec in
   let c := ((p₁ · p₂) / (∥p₁∥ * ∥p₂∥))%R in
