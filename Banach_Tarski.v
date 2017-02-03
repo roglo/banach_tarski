@@ -2141,6 +2141,8 @@ Definition axis_angle_of_matrix M :=
   let v := rotation_unit_axis M in
   (v, cosθ, sinθ).
 
+Arguments axis_angle_of_matrix M%mat.
+
 Theorem matrix_of_axis_angle_inv : ∀ v c s,
   (0 < s)%R
   → ∥v∥ = 1%R
@@ -3190,8 +3192,10 @@ remember (matrix_of_axis_angle (a, c, s)) as M eqn:HM.
 remember (matrix_of_axis_angle (a', c', (-s')%R)) as M' eqn:HM'.
 move M' before M.
 generalize Hm; intros H.
-eapply rot_is_id_for_pt in H.
-
+remember (axis_angle_of_matrix (M * M')) as acs' eqn:Hacs'.
+symmetry in Hacs'.
+destruct acs' as ((aa', cc'), ss').
+eapply rot_is_id_for_pt in H; try eassumption.
 bbb.
 
 unfold mat_mul in Hm.
