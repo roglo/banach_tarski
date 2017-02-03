@@ -3099,18 +3099,16 @@ Theorem rot_is_id_for_pt : ∀ M v,
   → ∀ a c s, axis_angle_of_matrix M = (a, c, s) → a × v = 0%vec.
 Proof.
 intros * Hrm Hmv Hmt a c s Ha.
-bbb.
-destruct (mat_eq_dec M mat_id) as [Hmi| Hmi]; [ now left | right ].
-intros a c s Ha.
 destruct v as (x, y, z).
 destruct M; simpl in *.
 destruct Hrm as (Hrm, Hdet).
 unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
 unfold mat_det in Hdet; simpl in Hdet.
+unfold mat_transp, mkrmat in Hmt; simpl in Hmt.
 injection Hrm; clear Hrm.
 intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
 clear H21 H31 H32.
-injection HM; clear HM; intros Hz Hy Hx.
+injection Hmv; clear Hmv; intros Hz Hy Hx.
 unfold axis_angle_of_matrix in Ha; simpl in Ha.
 unfold rotation_unit_axis, mat_trace in Ha; simpl in Ha.
 injection Ha; clear Ha; intros Hs Hc Ha.
@@ -3126,24 +3124,39 @@ destruct (Req_dec r 0) as [Hrz| Hrz].
  apply Rminus_diag_uniq in H1.
  apply Rminus_diag_uniq in H2.
  apply Rminus_diag_uniq in H3.
- subst a₃₂ a₁₃ a₂₁.
- (* perhaps I should exclude rotations by π, too; would be simpler... *)
+ now subst a₃₂ a₁₃ a₂₁.
 
-bbb.
- (* case r ≠ 0 *)
- unfold Rsqr in Hr; ring_simplify in Hr.
- progress repeat rewrite <- Rsqr_pow2 in Hr.
- f_equal.
-  rewrite <- Hya, <- Hza.
-  apply Rmult_eq_reg_r with (r := √ r).
-  rewrite Rmult_0_l.
-  rewrite Rmult_minus_distr_r.
-  rewrite Rmult_shuffle0, Rmult_div_same.
-  rewrite Rmult_shuffle0, Rmult_div_same.
-  clear - Hdet H11 H12 H13 H22 H23 Hx Hy Hz.
-  Time nsatz.
+ assert (Hsq : √ r ≠ 0).
+  intros H; apply Hrz, sqrt_eq_0; [ | easy ].
+  rewrite Hr; apply nonneg_sqr_vec_norm.
 
-bbb.
+  unfold Rsqr in Hr; ring_simplify in Hr.
+  progress repeat rewrite <- Rsqr_pow2 in Hr.
+  f_equal.
+   rewrite <- Hya, <- Hza.
+   apply Rmult_eq_reg_r with (r := √ r); [ | easy ].
+   rewrite Rmult_0_l, Rmult_minus_distr_r.
+   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
+   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
+   clear - Hdet H11 H12 H13 H22 H23 Hx Hy Hz.
+   Time nsatz.
+
+   rewrite <- Hza, <- Hxa.
+   apply Rmult_eq_reg_r with (r := √ r); [ | easy ].
+   rewrite Rmult_0_l, Rmult_minus_distr_r.
+   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
+   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
+   clear - Hdet H11 H12 H13 H22 H23 Hx Hy Hz.
+   Time nsatz.
+
+   rewrite <- Hxa, <- Hya.
+   apply Rmult_eq_reg_r with (r := √ r); [ | easy ].
+   rewrite Rmult_0_l, Rmult_minus_distr_r.
+   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
+   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
+   clear - Hdet H11 H12 H13 H22 H23 Hx Hy Hz.
+   Time nsatz.
+Qed.
 
 Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
   (0 < r)%R
@@ -3173,6 +3186,12 @@ intros * (Ha' & Hcs' & H').
 apply matrix_of_axis_angle_opp in H'; [ | easy | easy ].
 rewrite <- H' in Hm.
 rewrite <- mat_vec_mul_assoc in Hm.
+remember (matrix_of_axis_angle (a, c, s)) as M eqn:HM.
+remember (matrix_of_axis_angle (a', c', (-s')%R)) as M' eqn:HM'.
+move M' before M.
+generalize Hm; intros H.
+eapply rot_is_id_for_pt in H.
+
 bbb.
 
 unfold mat_mul in Hm.
