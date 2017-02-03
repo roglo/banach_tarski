@@ -2876,6 +2876,8 @@ destruct (Req_dec (latitude p p₁) (latitude p p₂)) as [Hll| Hll].
  subst r; clear Hr.
  rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
  do 3 rewrite Rdiv_1_r in Hx1, Hy1, Hz1, Hx2, Hy2, Hz2.
+bbb.
+
 split.
 unfold Rsqr in *.
 bbb.
