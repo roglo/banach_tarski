@@ -2839,15 +2839,35 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      easy.
 Qed.
 
-(* Given an axis (a point p) and two points p₁ and p₂, there is at least
+(* latitude of p₁ relative to p, p being the north pole;
+   equal to the dot product and between -r and r, supposing
+   that p and p₁ beling to the sphere of ray r. *)
+Definition latitude p p₁ := (p · p₁).
+
+(* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
    p₂ are not in the same latitude (p being the north pole), one if they
    are. *)
-Theorem glop : ∀ p p₁ p₂ c s c' s',
-  (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
-  → (matrix_of_axis_angle (p, c' s') * p₁ = p₂)%vec
+Theorem one_rotation_max : ∀ r p p₁ p₂ c s c' s',
+  (0 < r)%R
+  → p ∈ sphere r
+  → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
+  → (matrix_of_axis_angle (p, c', s') * p₁ = p₂)%vec
   → c = c' ∧ s = s'.
 Proof.
+intros * Hr Hp Hm Hm'.
+destruct (Req_dec (latitude p p₁) (latitude p p₂)) as [Hll| Hll].
+ unfold latitude in Hll.
+ destruct p as (xp, yp, zp).
+ destruct p₁ as (x₁, y₁, z₁).
+ destruct p₂ as (x₂, y₂, z₂).
+ simpl in Hll, Hm, Hm', Hp.
+ rewrite Hp in Hm, Hm'.
+ rewrite sqrt_Rsqr in Hm; [ | lra ].
+ rewrite sqrt_Rsqr in Hm'; [ | lra ].
+ injection Hm; clear Hm; intros Hz1 Hy1 Hx1.
+ injection Hm'; clear Hm'; intros Hz2 Hy2 Hx2.
+ symmetry in Hx1, Hy1, Hz1, Hx2, Hy2, Hz2.
 
 bbb.
 
