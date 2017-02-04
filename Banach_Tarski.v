@@ -2879,6 +2879,12 @@ f_equal.
  rewrite Rmult_div_same.
  ring_simplify.
  progress repeat rewrite <- Rsqr_pow2.
+ subst c s.
+ replace (- xp² * (/ r² * (q₁ · q₂)) * x₁ * r²)%R
+ with (- xp² * (q₁ · q₂) * x₁ * (/ r² * r²))%R by lra.
+ replace (xp * (/ r² * (q₁ · q₂)) * r² * yp * y₁)%R
+ with (xp * (q₁ · q₂) * yp * y₁ * (/ r² * r²))%R by lra.
+
 bbb.
 
 destruct q₁ as (x₃, y₃, z₃).
