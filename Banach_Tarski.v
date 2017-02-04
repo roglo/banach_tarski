@@ -2854,6 +2854,9 @@ Theorem glop : ∀ r p p₁ p₂ c s,
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hc Hs.
+(* not sure that c and s are correct *)
+(* I have to think of it *)
+bbb.
 subst; simpl.
 destruct p as (xp, yp, zp); simpl in Hp.
 rewrite Hp.
@@ -2869,8 +2872,13 @@ rewrite Rsqr_1.
 do 6 rewrite Rdiv_1_r.
 rewrite Rinv_1.
 progress repeat rewrite Rmult_1_l.
+remember (p₁ × p₂) as q eqn:Hq.
 destruct p₁ as (x₁, y₁, z₁).
 destruct p₂ as (x₂, y₂, z₂); simpl.
+simpl in Hq.
+destruct q as (xq, yq, zq); simpl.
+injection Hq; clear Hq; intros Hzq Hyq Hxq.
+remember (xq² + yq² + zq²)%R as rq eqn:Hrq.
 f_equal.
  progress repeat rewrite Rsqr_pow2.
  ring_simplify.
