@@ -2844,19 +2844,21 @@ Qed.
    that p and p₁ beling to the sphere of ray r. *)
 Definition latitude p p₁ := (p · p₁).
 
-Theorem glop : ∀ r p p₁ p₂ c s,
+Theorem glop : ∀ r p p₁ p₂ q₁ q₂ c s,
   (0 < r)%R
   → p ∈ sphere r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
   → latitude p p₁ = latitude p p₂
-  → c = (/r² * (p₁ · p₂))%R
-  → s = (/r² * ∥(p₁ × p₂)∥)%R
+  → q₁ = (p × p₁)
+  → q₂ = (p × p₂)
+  → q₁ ≠ 0%vec
+  → q₂ ≠ 0%vec
+  → c = (/r² * (q₁ · q₂))%R
+  → s = (/r² * ∥(q₁ × q₂)∥)%R
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
 Proof.
-intros * Hr Hp Hp₁ Hp₂ Hll Hc Hs.
-(* not sure that c and s are correct *)
-(* I have to think of it *)
+intros * Hr Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
 bbb.
 subst; simpl.
 destruct p as (xp, yp, zp); simpl in Hp.
