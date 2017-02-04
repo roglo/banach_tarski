@@ -13,6 +13,9 @@ Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 Require Import Countable QCountable RnCountable NotEmptyPath.
 
+Notation "r ³" := (Rpow_def.pow r 3) (at level 1, format "r ³") : R_scope.
+Notation "r ⁴" := (Rpow_def.pow r 4) (at level 1, format "r ⁴") : R_scope.
+
 Theorem Rno_intersect_balls_x3_x6 : ∀ x y z,
   ((x - 3)² + y² + z² <= 1)%R
   → ((x - 6)² + y² + z² <= 1)%R
@@ -2867,6 +2870,15 @@ rewrite sqrt_Rsqr; [ | lra ].
 rewrite Rsqr_div; [ | lra ].
 rewrite Rsqr_div; [ | lra ].
 rewrite Rsqr_div; [ | lra ].
+f_equal.
+ field_simplify.
+ rewrite Rdiv_1_r.
+ apply Rmult_eq_reg_r with (r := r⁴%R).
+ progress repeat rewrite Rsqr_pow2.
+ replace (r ^ 2 * r ^ 2)%R with r⁴%R by lra.
+ rewrite Rmult_div_same.
+ ring_simplify.
+ progress repeat rewrite <- Rsqr_pow2.
 bbb.
 
 destruct q₁ as (x₃, y₃, z₃).
@@ -3174,9 +3186,6 @@ assert (Hcs : (c² + s² = 1)%R).
      rewrite Rmult_comm.
      now rewrite Hp₁.
 Qed.
-
-Notation "r ³" := (Rpow_def.pow r 3) (at level 1, format "r ³") : R_scope.
-Notation "r ⁴" := (Rpow_def.pow r 4) (at level 1, format "r ⁴") : R_scope.
 
 Theorem matrix_of_axis_angle_opp : ∀ p₁ p₂ a c s,
   a ∈ sphere 1
