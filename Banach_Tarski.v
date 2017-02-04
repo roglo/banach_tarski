@@ -2884,7 +2884,30 @@ f_equal.
  with (- xp² * (q₁ · q₂) * x₁ * (/ r² * r²))%R by lra.
  replace (xp * (/ r² * (q₁ · q₂)) * r² * yp * y₁)%R
  with (xp * (q₁ · q₂) * yp * y₁ * (/ r² * r²))%R by lra.
-
+ replace (xp * (/ r² * (q₁ · q₂)) * r² * zp * z₁)%R
+ with (xp * (q₁ · q₂) * zp * z₁ * (/ r² * r²))%R by lra.
+ replace (/ r² * (q₁ · q₂) * x₁ * r⁴)%R
+ with (r ^ 2 * (q₁ · q₂) * x₁ * (/ r² * r ^ 2))%R by lra.
+ replace (r³ * yp * z₁ * (/ r² * ∥(q₁ × q₂)∥))%R
+ with (r * yp * z₁ * ∥(q₁ × q₂)∥ * (/ r² * r ^ 2))%R by lra.
+ replace (r³ * y₁ * zp * (/ r² * ∥(q₁ × q₂)∥))%R
+ with (r * y₁ * zp * ∥(q₁ × q₂)∥ * (/ r² * r ^ 2))%R by lra.
+ rewrite <- Rsqr_pow2.
+ rewrite Rinv_l.
+ progress repeat rewrite Rmult_1_r.
+ ring_simplify.
+ remember (q₁ · q₂) as dq eqn:Hdq.
+ rewrite Hq₁, Hq₂ in Hdq; simpl in Hdq.
+ remember (q₁ × q₂) as cq eqn:Hcq.
+ rewrite Hq₁, Hq₂ in Hcq; simpl in Hcq.
+ destruct cq as (cx, cy, cz).
+ unfold vec_norm.
+ injection Hcq; clear Hcq; intros Hcz Hcy Hcx.
+ remember (cx² + cy² + cz²)%R as rx eqn:Hrx.
+ subst cx cy cz.
+ progress repeat rewrite Rsqr_pow2 in Hrx.
+ ring_simplify in Hrx.
+ progress repeat rewrite <- Rsqr_pow2 in Hrx.
 bbb.
 
 destruct q₁ as (x₃, y₃, z₃).
