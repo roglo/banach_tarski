@@ -2859,6 +2859,8 @@ Theorem glop : ∀ r p p₁ p₂ q₁ q₂ c s,
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
+subst q₁ q₂.
+bbb.
 subst c s; simpl.
 destruct p as (xp, yp, zp); simpl in Hp.
 rewrite Hp.
