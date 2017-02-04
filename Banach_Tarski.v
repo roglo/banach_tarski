@@ -2855,7 +2855,7 @@ Theorem glop : ∀ r p p₁ p₂ c s,
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hc Hs.
 subst; simpl.
-destruct p as (x, y, z); simpl in Hp.
+destruct p as (xp, yp, zp); simpl in Hp.
 rewrite Hp.
 rewrite sqrt_Rsqr; [ | lra ].
 rewrite Rsqr_div; [ | lra ].
@@ -2872,6 +2872,9 @@ progress repeat rewrite Rmult_1_l.
 destruct p₁ as (x₁, y₁, z₁).
 destruct p₂ as (x₂, y₂, z₂); simpl.
 f_equal.
+ progress repeat rewrite Rsqr_pow2.
+ ring_simplify.
+ progress repeat rewrite <- Rsqr_pow2.
 bbb.
 
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
