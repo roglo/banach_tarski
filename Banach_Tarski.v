@@ -2888,7 +2888,7 @@ f_equal.
    (xp * (rq - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
     c * x₁ + yp * s * z₁ - zp * s * y₁)%R
    by lra.
-
+ rewrite Hll.
 bbb.
 destruct q₁ as (xq₁, yq₁, zq₁).
 destruct q₂ as (xq₂, yq₂, zq₂).
