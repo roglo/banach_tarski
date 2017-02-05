@@ -2901,7 +2901,7 @@ f_equal.
  field_simplify.
  do 2 rewrite Rdiv_1_r.
  unfold Rsqr.
- replace
+ progress replace
    (xp * xp * rq * x₁ - xp * xp * c * x₁ + rq * xp * yp * y₁ +
     rq * xp * zp * z₁ + c * x₁ - c * xp * yp * y₁ - c * xp * zp * z₁ +
     yp * s * z₁ - zp * s * y₁)%R
@@ -2913,9 +2913,8 @@ f_equal.
  move c before rq; move s before c.
  rewrite Hq₁, Hq₂ in Hc.
  simpl in Hc.
-bbb.
  unfold Rsqr in Hp.
- replace
+ progress replace
    (xp * (rq - c) * (xp * x₂ + yp * y₂ + zp * z₂) +
     c * x₁ + s * (yp * z₁ - zp * y₁))%R
  with
@@ -2926,6 +2925,19 @@ bbb.
  replace (xp * xp)%R with (1 - yp * yp - zp * zp)%R by lra.
  replace ((1 - yp * yp - zp * zp) * (rq - c) * x₂)%R
  with (rq * x₂ - c * x₂ - (yp * yp + zp * zp) * (rq - c) * x₂)%R by lra.
+ apply Rplus_eq_reg_l with (r := (- (rq * x₂))%R).
+ rewrite Rplus_opp_l.
+ unfold Rminus.
+ do 5 rewrite <- Rplus_assoc.
+ rewrite Rplus_opp_l, Rplus_0_l.
+ progress repeat rewrite fold_Rminus.
+ progress replace
+   (- (c * x₂) - (yp * yp + zp * zp) * (rq - c) * x₂ +
+    xp * (rq - c) * (yp * y₂ + zp * z₂) + c * x₁)%R
+ with
+   (c * (x₁ - x₂) +
+    (rq - c) * (xp * (yp * y₂ + zp * z₂) - (yp * yp + zp * zp) * x₂))%R
+   by lra.
 
 bbb.
 destruct q₁ as (xq₁, yq₁, zq₁).
