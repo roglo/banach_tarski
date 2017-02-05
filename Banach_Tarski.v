@@ -2844,7 +2844,7 @@ Qed.
 
 (* latitude of p₁ relative to p, p being the north pole;
    equal to the dot product and between -r and r, supposing
-   that p and p₁ beling to the sphere of ray r. *)
+   that p and p₁ belong to the sphere of ray r. *)
 Definition latitude p p₁ := (p · p₁).
 
 Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
@@ -2886,10 +2886,12 @@ f_equal.
     yp * s * z₁ - zp * s * y₁)%R
  with
    (xp * (rq - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-    c * x₁ + yp * s * z₁ - zp * s * y₁)%R
+    c * x₁ + s * (yp * z₁ - zp * y₁))%R
    by lra.
  rewrite Hll.
  move c before rq; move s before c.
+ rewrite Hq₁, Hq₂ in Hc.
+ simpl in Hc.
 
 bbb.
 destruct q₁ as (xq₁, yq₁, zq₁).
