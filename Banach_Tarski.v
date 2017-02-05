@@ -2847,17 +2847,26 @@ Qed.
    that p and p₁ belong to the sphere of ray r. *)
 Definition latitude p p₁ := (p · p₁).
 
-Theorem glop : ∀ p p₁ p₂ c s,
+Theorem rotation_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
-  → latitude p p₁ ≠ latitude p p₂
-  → (matrix_of_axis_angle (p, c, s) * p₁ ≠ p₂)%vec.
+  → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
+  → latitude p p₁ = latitude p p₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Hll.
-intros Hm; apply Hll; clear Hll.
+intros * Hp Hp₁ Hp₂ Hm.
 unfold latitude.
-bbb.
+destruct p as (x, y, z).
+simpl in Hp; rewrite Rsqr_1 in Hp.
+simpl in Hm; rewrite Hp, sqrt_1 in Hm.
+do 3 rewrite Rdiv_1_r in Hm.
+destruct p₁ as (x₁, y₁, z₁).
+destruct p₂ as (x₂, y₂, z₂).
+simpl in Hp₁, Hp₂; rewrite Rsqr_1 in Hp₁, Hp₂.
+simpl in Hm.
+injection Hm; clear Hm; intros Hz Hy Hx.
+simpl; nsatz.
+Qed.
 
 Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
   p ∈ sphere 1
