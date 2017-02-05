@@ -2847,6 +2847,56 @@ Qed.
    that p and p₁ beling to the sphere of ray r. *)
 Definition latitude p p₁ := (p · p₁).
 
+Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
+  → latitude p p₁ = latitude p p₂
+  → q₁ = (p × p₁)
+  → q₂ = (p × p₂)
+  → q₁ ≠ 0%vec
+  → q₂ ≠ 0%vec
+  → c = (/ (∥q₁∥ * ∥q₂∥) * (q₁ · q₂))%R
+  → s = (/ (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥)%R
+  → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
+Proof.
+intros * Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
+destruct p as (xp, yp, zp); simpl in Hp.
+destruct p₁ as (x₁, y₁, z₁).
+destruct p₂ as (x₂, y₂, z₂); simpl in *.
+rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+rewrite Hp, sqrt_1.
+do 3 rewrite Rdiv_1_r.
+remember (∥q₁∥ * ∥q₂∥)%R as rq eqn:Hrq.
+subst c s.
+remember (q₁ · q₂) as c eqn:Hc.
+remember ∥(q₁ × q₂)∥ as s eqn:Hs.
+specialize (vec_Lagrange_identity q₁ q₂) as Hli.
+rewrite <- Rsqr_mult in Hli.
+rewrite vec_dot_mul_diag in Hli.
+rewrite <- Hrq, <- Hc, <- Hs in Hli.
+f_equal.
+ apply Rmult_eq_reg_r with (r := rq).
+ field_simplify.
+ do 2 rewrite Rdiv_1_r.
+ unfold Rsqr.
+ replace
+   (xp * xp * rq * x₁ - xp * xp * c * x₁ + rq * xp * yp * y₁ +
+    rq * xp * zp * z₁ + c * x₁ - c * xp * yp * y₁ - c * xp * zp * z₁ +
+    yp * s * z₁ - zp * s * y₁)%R
+ with
+   (xp * (rq - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+    c * x₁ + yp * s * z₁ - zp * s * y₁)%R
+   by lra.
+
+bbb.
+destruct q₁ as (xq₁, yq₁, zq₁).
+destruct q₂ as (xq₂, yq₂, zq₂).
+simpl in Hc, Hs.
+rewrite <- sqrt_mult_alt in Hc; [ | apply nonneg_sqr_vec_norm ].
+rewrite <- sqrt_mult_alt in Hs; [ | apply nonneg_sqr_vec_norm ].
+bbb.
+
 Theorem glop : ∀ r p p₁ p₂ q₁ q₂ c s,
   (0 < r)%R
   → p ∈ sphere r
@@ -2857,8 +2907,8 @@ Theorem glop : ∀ r p p₁ p₂ q₁ q₂ c s,
   → q₂ = (p × p₂)
   → q₁ ≠ 0%vec
   → q₂ ≠ 0%vec
-  → c = (/r² * (q₁ · q₂))%R
-  → s = (/r² * ∥(q₁ × q₂)∥)%R
+  → c = (/ (∥q₁∥ * ∥q₂∥) * (q₁ · q₂))%R
+  → s = (/ (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥)%R
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
