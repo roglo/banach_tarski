@@ -2892,6 +2892,18 @@ f_equal.
  move c before rq; move s before c.
  rewrite Hq₁, Hq₂ in Hc.
  simpl in Hc.
+ unfold Rsqr in Hp.
+ replace
+   (xp * (rq - c) * (xp * x₂ + yp * y₂ + zp * z₂) +
+    c * x₁ + s * (yp * z₁ - zp * y₁))%R
+ with
+   (xp * xp * (rq - c) * x₂ +
+    xp * (rq - c) * (yp * y₂ + zp * z₂) +
+    c * x₁ + s * (yp * z₁ - zp * y₁))%R
+   by lra.
+ replace (xp * xp)%R with (1 - yp * yp - zp * zp)%R by lra.
+ replace ((1 - yp * yp - zp * zp) * (rq - c) * x₂)%R
+ with (rq * x₂ - c * x₂ - (yp * yp + zp * zp) * (rq - c) * x₂)%R by lra.
 
 bbb.
 destruct q₁ as (xq₁, yq₁, zq₁).
