@@ -2889,6 +2889,8 @@ f_equal.
     c * x₁ + yp * s * z₁ - zp * s * y₁)%R
    by lra.
  rewrite Hll.
+ move c before rq; move s before c.
+
 bbb.
 destruct q₁ as (xq₁, yq₁, zq₁).
 destruct q₂ as (xq₂, yq₂, zq₂).
