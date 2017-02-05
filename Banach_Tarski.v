@@ -2879,6 +2879,48 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
   → q₂ ≠ 0%vec
   → c = (/ (∥q₁∥ * ∥q₂∥) * (q₁ · q₂))%R
   → s = (/ (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥)%R
+  → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
+Proof.
+intros * Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
+destruct p as (xp, yp, zp); simpl in Hp.
+destruct p₁ as (x₁, y₁, z₁).
+destruct p₂ as (x₂, y₂, z₂); simpl in *.
+rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+rewrite Hp, sqrt_1.
+do 3 rewrite Rdiv_1_r.
+remember (∥q₁∥ * ∥q₂∥)%R as rq eqn:Hrq.
+subst c s.
+remember (q₁ · q₂) as c eqn:Hc.
+remember ∥(q₁ × q₂)∥ as s eqn:Hs.
+specialize (vec_Lagrange_identity q₁ q₂) as Hli.
+rewrite <- Rsqr_mult in Hli.
+rewrite vec_dot_mul_diag in Hli.
+rewrite <- Hrq, <- Hc, <- Hs in Hli.
+rewrite Hq₁, Hq₂; simpl.
+f_equal.
+ apply Rmult_eq_reg_r with (r := rq).
+ field_simplify.
+ do 2 rewrite Rdiv_1_r.
+ rewrite Rsqr_pow2.
+ ring_simplify.
+ progress repeat rewrite <- Rsqr_pow2.
+ replace zp²%R with (1 - xp² - yp²)%R by lra.
+ progress repeat rewrite Rsqr_pow2.
+ ring_simplify.
+ progress repeat rewrite <- Rsqr_pow2.
+bbb.
+
+Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
+  → latitude p p₁ = latitude p p₂
+  → q₁ = (p × p₁)
+  → q₂ = (p × p₂)
+  → q₁ ≠ 0%vec
+  → q₂ ≠ 0%vec
+  → c = (/ (∥q₁∥ * ∥q₂∥) * (q₁ · q₂))%R
+  → s = (/ (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥)%R
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
