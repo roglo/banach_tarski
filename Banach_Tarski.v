@@ -2876,11 +2876,24 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
   → a = latitude p p₂
   → q₁ = (p₁ - a ⁎ p)%vec
   → q₂ = (p₂ - a ⁎ p)%vec
-  → c = q₁ · q₂
-  → s = ∥(q₁ × q₂)∥%R
+  → c = ((q₁ · q₂) / a)%R
+  → s = (∥(q₁ × q₂)∥ / a)%R
   → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
+assert (Hqa₁ : q₁ ∈ sphere (1 - a²)).
+ destruct q₁ as (xq, yq, zq); simpl.
+ unfold latitude in Ha₁; simpl in Ha₁.
+ destruct p as (x, y, z).
+ destruct p₁ as (x₁, y₁, z₁).
+ simpl in Hp, Hp₁; simpl.
+ simpl in Hq₁.
+ do 3 rewrite fold_Rminus in Hq₁.
+ simpl in Ha₁.
+ injection Hq₁; clear Hq₁; intros Hzq Hyq Hxq.
+ rewrite Hxq, Hyq, Hzq; simpl.
+bbb.
+
 destruct p as (xp, yp, zp); simpl in Hp.
 destruct p₁ as (x₁, y₁, z₁).
 destruct p₂ as (x₂, y₂, z₂); simpl in *.
