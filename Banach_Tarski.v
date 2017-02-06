@@ -2882,6 +2882,8 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
 assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
+clear - Hp Hp₁ Ha₁ Hq₁.
+bbb.
  destruct q₁ as (xq, yq, zq); simpl.
  unfold latitude in Ha₁; simpl in Ha₁.
  destruct p as (x, y, z).
@@ -2906,7 +2908,6 @@ assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
  do 2 rewrite <- Rmult_plus_distr_l.
  rewrite Hp, Rmult_1_r.
  rewrite Rsqr_sqrt; [ unfold Rsqr; lra | ].
- clear -Hp Hp₁ Ha₁.
  rewrite fold_Rsqr.
  specialize (vec_Lagrange_identity (V x y z) (V x₁ y₁ z₁)) as H.
  remember (V x y z × V x₁ y₁ z₁) as c eqn:Hc.
