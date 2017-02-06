@@ -2881,17 +2881,33 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
-assert (Hqa₁ : q₁ ∈ sphere (1 - a²)).
+assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
  destruct q₁ as (xq, yq, zq); simpl.
  unfold latitude in Ha₁; simpl in Ha₁.
  destruct p as (x, y, z).
  destruct p₁ as (x₁, y₁, z₁).
  simpl in Hp, Hp₁; simpl.
+ rewrite Rsqr_1 in Hp, Hp₁.
  simpl in Hq₁.
  do 3 rewrite fold_Rminus in Hq₁.
  simpl in Ha₁.
  injection Hq₁; clear Hq₁; intros Hzq Hyq Hxq.
  rewrite Hxq, Hyq, Hzq; simpl.
+ unfold Rsqr; simpl.
+ ring_simplify.
+ progress repeat rewrite <- Rsqr_pow2.
+ replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
+ ring_simplify.
+ replace (-2 * x₁ * a * x - 2 * a * y₁ * y - 2 * a * z₁ * z)%R
+ with (-2 * a * (x * x₁ + y * y₁ + z * z₁))%R
+   by lra.
+ rewrite <- Ha₁.
+ do 3 rewrite Rplus_assoc; rewrite Rplus_comm.
+ do 2 rewrite <- Rplus_assoc.
+ do 2 rewrite <- Rmult_plus_distr_l.
+ rewrite Hp, Rmult_1_r.
+ rewrite Rsqr_sqrt; [ unfold Rsqr; lra | ].
+
 bbb.
 
 destruct p as (xp, yp, zp); simpl in Hp.
