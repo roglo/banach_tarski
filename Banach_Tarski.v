@@ -2873,21 +2873,39 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
   → latitude p p₁ = latitude p p₂
-  → q₁ = (p₁ × p)
-  → q₂ = (p₂ × p)
-  → q₁ ≠ 0%vec
-  → q₂ ≠ 0%vec
-  → c = (/ (∥q₁∥ * ∥q₂∥) * (q₁ · q₂))%R
-  → s = (/ (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥)%R
+  → q₁ = (/ ∥ (p₁ × p)∥ ⁎ (p₁ × p))%vec
+  → q₂ = (/ ∥ (p₂ × p)∥ ⁎ (p₂ × p))%vec
+  → p₁ × p ≠ 0%vec
+  → p₂ × p ≠ 0%vec
+  → c = q₁ · q₂
+  → s = ∥(q₁ × q₂)∥%R
   → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
-destruct p as (xp, yp, zp); simpl in Hp.
-destruct p₁ as (x₁, y₁, z₁).
-destruct p₂ as (x₂, y₂, z₂); simpl in *.
-rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
-rewrite Hp, sqrt_1.
-do 3 rewrite Rdiv_1_r.
+assert (H : q₁ ∈ sphere 1 ∧ q₂ ∈ sphere 1).
+ specialize (normalized_vector (p₁ × p) q₁ Hq₁nz Hq₁) as H₁.
+ specialize (normalized_vector (p₂ × p) q₂ Hq₂nz Hq₂) as H₂.
+ apply on_sphere_norm in H₁; [ | lra ].
+ apply on_sphere_norm in H₂; [ | lra ].
+ easy.
+
+ destruct H as (Hq₁s, Hq₂s).
+ specialize (vec_Lagrange_identity q₁ q₂) as Hli.
+ destruct q₁ as (xq₁, yq₁, zq₁).
+ destruct q₂ as (xq₂, yq₂, zq₂).
+ simpl in Hq₁s, Hq₂s.
+ rewrite Rsqr_1 in Hq₁s, Hq₂s.
+ simpl in Hli.
+ rewrite Hq₁s, Hq₂s in Hli.
+ rewrite sqrt_1, Rsqr_1, Rmult_1_l in Hli.
+bbb.
+
+ destruct p as (xp, yp, zp); simpl in Hp.
+ destruct p₁ as (x₁, y₁, z₁).
+ destruct p₂ as (x₂, y₂, z₂); simpl in *.
+ rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+ rewrite Hp, sqrt_1.
+ do 3 rewrite Rdiv_1_r.
 remember (∥q₁∥ * ∥q₂∥)%R as rq eqn:Hrq.
 subst c s.
 remember (q₁ · q₂) as c eqn:Hc.

@@ -598,3 +598,10 @@ intros * Hx.
 unfold acos; rewrite cos_shift.
 now apply sin_asin.
 Qed.
+
+Theorem Rneq_le_lt : ∀ x y, (x ≠ y → x ≤ y → x < y)%R.
+Proof.
+intros * Hnxy Hxy.
+apply Rnot_le_lt; intros H.
+now apply Rle_antisym in H.
+Qed.

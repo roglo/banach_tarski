@@ -1010,6 +1010,30 @@ apply sqr_vec_norm_eq_0 in Hv.
 now destruct Hv as (H1 & H2 & H3); subst.
 Qed.
 
+Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = / ∥u∥ ⁎ u → ∥v∥ = 1%R.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) Hu Hv.
+simpl in Hv; simpl.
+injection Hv; clear Hv; intros H₃ H₂ H₁.
+remember (√ (u₁² + u₂² + u₃²)) as ur eqn:Hur.
+assert (H : ur ≠ 0%R).
+ intros H; subst ur.
+ apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in H.
+ destruct H as (H1 & H2 & H3).
+ now subst.
+
+ subst v₁ v₂ v₃.
+ do 3 rewrite Rsqr_mult.
+ do 2 rewrite <- Rmult_plus_distr_l.
+ rewrite sqrt_mult; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
+ rewrite <- Hur.
+ rewrite sqrt_Rsqr; [ now rewrite Rinv_l | ].
+ apply Rlt_le, Rinv_0_lt_compat.
+ apply Rneq_le_lt; [ now intros HH; apply H | ].
+ rewrite Hur; apply sqrt_pos.
+Qed.
+
 (* Cauchy-Schwarz inequality with vectors. *)
 
 Theorem vec_Lagrange_identity : ∀ u v,

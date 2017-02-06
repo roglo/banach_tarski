@@ -93,11 +93,15 @@ Arguments D : simpl never.
 
 Definition ball_but_fixpoints := ball ∖ D.
 
-Theorem on_sphere_norm : ∀ p r, (0 ≤ r)%R → p ∈ sphere r → ∥p∥ = r.
+Theorem on_sphere_norm : ∀ p r, (0 ≤ r)%R → p ∈ sphere r ↔ ∥p∥ = r.
 Proof.
-intros (x, y, z) r Hr Hp; simpl in Hp; simpl.
-rewrite Hp.
-now apply sqrt_Rsqr.
+intros (x, y, z) r Hr; simpl.
+split; intros Hp.
+ now rewrite Hp; apply sqrt_Rsqr.
+
+ apply (f_equal Rsqr) in Hp.
+ rewrite Rsqr_sqrt in Hp; [ easy | ].
+ apply nonneg_sqr_vec_norm.
 Qed.
 
 Theorem on_sphere_after_rotation : ∀ p m r,
