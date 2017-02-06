@@ -2885,8 +2885,42 @@ destruct p as (xp, yp, zp); simpl in Hp.
 destruct p₁ as (x₁, y₁, z₁).
 destruct p₂ as (x₂, y₂, z₂); simpl in *.
 rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+do 3 rewrite fold_Rminus in Hq₁, Hq₂.
 rewrite Hp, sqrt_1.
 do 3 rewrite Rdiv_1_r.
+subst q₁ q₂; simpl in Hc, Hs.
+bbb.
+
+remember ((x₁ - a * xp) * (x₂ - a * xp))%R as u eqn:Hu.
+rewrite Ha₁ in Hu at 1.
+rewrite Ha₂ in Hu.
+ring_simplify in Hu.
+repeat rewrite <- Rsqr_pow2 in Hu.
+ring_simplify in Hu.
+replace zp²%R with (1 - xp² - yp²)%R in Hu by lra.
+ring_simplify in Hu.
+progress repeat rewrite Rsqr_pow2 in Hu.
+replace ((xp ^ 2) ^ 2)%R with xp⁴%R in Hu by lra.
+ring_simplify in Hu.
+
+bbb.
+unfold Rsqr in Hp.
+rewrite Ha₁ in Hc at 1 3 5.
+rewrite Ha₂ in Hc.
+ring_simplify in Hc.
+progress repeat rewrite <- Rsqr_pow2 in Hc.
+remember s²%R as ss eqn:Hss.
+rewrite Hs in Hss.
+rewrite Rsqr_sqrt in Hss; [ | apply nonneg_sqr_vec_norm ].
+progress repeat rewrite Rsqr_pow2 in Hss.
+ring_simplify in Hss.
+progress repeat rewrite <- Rsqr_pow2 in Hss.
+rewrite Ha₁ in Hs at 1 3 5 7 9 11.
+rewrite Ha₂ in Hs.
+progress repeat rewrite Rsqr_pow2 in Hs.
+ring_simplify in Hs.
+progress repeat rewrite <- Rsqr_pow2 in Hs.
+
 bbb.
 
 (* false, I think *)
