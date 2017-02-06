@@ -2916,10 +2916,13 @@ f_equal.
    (xp² * s * x₁ - s * x₁ + s * xp * yp * y₁ + s * xp * z₁ * zp +
     yp * z₁ * c - yp * rq * z₂ - y₁ * zp * c + zp * rq * y₂)%R
  with
-   (s * (xp² * x₁ - x₁ + xp * (yp * y₁ + zp * z₁)) +
+   (s * (x₁ * xp² + (yp * y₁ + zp * z₁) * xp - x₁) +
     c * (yp * z₁ - y₁ * zp) + rq * (zp * y₂ - yp * z₂))%R
  by lra.
-
+ unfold Rsqr; rewrite <- Rmult_assoc.
+ rewrite <- Rmult_plus_distr_r, <- Rplus_assoc.
+ replace (x₁ * xp)%R with (xp * x₁)%R by lra.
+ rewrite Hll.
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
