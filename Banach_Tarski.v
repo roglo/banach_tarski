@@ -2908,6 +2908,10 @@ f_equal.
  progress repeat rewrite Rsqr_pow2.
  ring_simplify.
  progress repeat rewrite <- Rsqr_pow2.
+ apply Rplus_eq_reg_r with (r := (- (yp * rq * z₂ - zp * rq * y₂)%R)).
+ rewrite Rplus_opp_r.
+ rewrite fold_Rminus.
+ ring_simplify.
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
