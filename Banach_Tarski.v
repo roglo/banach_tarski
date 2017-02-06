@@ -2873,8 +2873,8 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
   → latitude p p₁ = latitude p p₂
-  → q₁ = (p × p₁)
-  → q₂ = (p × p₂)
+  → q₁ = (p₁ × p)
+  → q₂ = (p₂ × p)
   → q₁ ≠ 0%vec
   → q₂ ≠ 0%vec
   → c = (/ (∥q₁∥ * ∥q₂∥) * (q₁ · q₂))%R
@@ -2908,20 +2908,19 @@ f_equal.
  progress repeat rewrite Rsqr_pow2.
  ring_simplify.
  progress repeat rewrite <- Rsqr_pow2.
- apply Rplus_eq_reg_r with (r := (- (yp * rq * z₂ - zp * rq * y₂)%R)).
+ apply Rplus_eq_reg_r with (r := (- (- yp * rq * z₂ + zp * rq * y₂)%R)).
  rewrite Rplus_opp_r.
  rewrite fold_Rminus.
  ring_simplify.
- replace
-   (xp² * s * x₁ - s * x₁ + s * xp * yp * y₁ + s * xp * z₁ * zp +
-    yp * z₁ * c - yp * rq * z₂ - y₁ * zp * c + zp * rq * y₂)%R
+ progress repeat rewrite Rsqr_pow2.
+ progress replace
+   (- xp ^ 2 * s * x₁ + s * x₁ - s * xp * y₁ * yp - s * xp * zp * z₁ +
+    y₁ * zp * c - yp * z₁ * c + yp * rq * z₂ - zp * rq * y₂)%R
  with
-   (s * (x₁ * xp² + (yp * y₁ + zp * z₁) * xp - x₁) +
-    c * (yp * z₁ - y₁ * zp) + rq * (zp * y₂ - yp * z₂))%R
+   (s * (x₁ - xp * (xp * x₁ + y₁ * yp  + zp * z₁)) +
+    c * (y₁ * zp - yp * z₁) + rq * (yp * z₂ - zp * y₂))%R
  by lra.
- unfold Rsqr; rewrite <- Rmult_assoc.
- rewrite <- Rmult_plus_distr_r, <- Rplus_assoc.
- replace (x₁ * xp)%R with (xp * x₁)%R by lra.
+ replace (y₁ * yp)%R with (yp * y₁)%R by lra.
  rewrite Hll.
 bbb.
 
