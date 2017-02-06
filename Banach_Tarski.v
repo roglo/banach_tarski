@@ -2907,6 +2907,7 @@ assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
  do 2 rewrite <- Rmult_plus_distr_l.
  rewrite Hp, Rmult_1_r.
  rewrite Rsqr_sqrt; [ unfold Rsqr; lra | ].
+ clear -Hp Hp₁ Ha₁.
 
 bbb.
 
