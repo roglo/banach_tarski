@@ -2889,6 +2889,8 @@ do 3 rewrite fold_Rminus in Hq₁, Hq₂.
 rewrite Hp, sqrt_1.
 do 3 rewrite Rdiv_1_r.
 subst q₁ q₂; simpl in Hc, Hs.
+(* BTW: what about the sign of s? defined like that,
+   it is always positive *)
 bbb.
 
 remember ((x₁ - a * xp) * (x₂ - a * xp))%R as u eqn:Hu.
