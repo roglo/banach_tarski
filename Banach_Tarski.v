@@ -2868,6 +2868,22 @@ injection Hm; clear Hm; intros Hz Hy Hx.
 simpl; nsatz.
 Qed.
 
+Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
+  → a = latitude p p₁
+  → a = latitude p p₂
+  → q₁ = (p₁ - a ⁎ p)%vec
+  → q₂ = (p₂ - a ⁎ p)%vec
+  → c = q₁ · q₂
+  → s = ∥(q₁ × q₂)∥%R
+  → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
+Proof.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
+bbb.
+
+(* false, I think *)
 Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
