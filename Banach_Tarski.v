@@ -2899,8 +2899,7 @@ assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
  replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
  ring_simplify.
  replace (-2 * x₁ * a * x - 2 * a * y₁ * y - 2 * a * z₁ * z)%R
- with (-2 * a * (x * x₁ + y * y₁ + z * z₁))%R
-   by lra.
+ with (-2 * a * (x * x₁ + y * y₁ + z * z₁))%R by lra.
  rewrite <- Ha₁.
  do 3 rewrite Rplus_assoc; rewrite Rplus_comm.
  do 2 rewrite <- Rplus_assoc.
@@ -2908,7 +2907,16 @@ assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
  rewrite Hp, Rmult_1_r.
  rewrite Rsqr_sqrt; [ unfold Rsqr; lra | ].
  clear -Hp Hp₁ Ha₁.
-
+ rewrite fold_Rsqr.
+ specialize (vec_Lagrange_identity (V x y z) (V x₁ y₁ z₁)) as H.
+ remember (V x y z × V x₁ y₁ z₁) as c eqn:Hc.
+ simpl in H.
+ rewrite Hp, Hp₁ in H.
+ rewrite sqrt_1, Rsqr_1, Rmult_1_l in H.
+ rewrite <- Ha₁ in H.
+ rewrite H; clear H.
+ rewrite vec_dot_mul_diag.
+ apply Rle_0_sqr.
 bbb.
 
 destruct p as (xp, yp, zp); simpl in Hp.
