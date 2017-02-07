@@ -2902,6 +2902,7 @@ assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
    now rewrite Rmult_1_r, Rminus_diag_eq.
 
    rewrite Hpq, vec_norm_vec_const_mul, Rsqr_mult, <- Rsqr_abs in H.
+   generalize Hp; intros Hpv.
    apply on_sphere_norm in Hp; [ | lra ].
    rewrite Hp, Rsqr_1, Rmult_1_r in H.
    rewrite vec_const_dot_assoc in H.
@@ -2921,7 +2922,24 @@ assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
     rewrite H, Hq₁.
     destruct p as (x, y, z).
     destruct p₁ as (x₁, y₁, z₁); simpl; f_equal.
+    simpl in Hpv; rewrite Rsqr_1 in Hpv.
     progress repeat rewrite fold_Rminus.
+bbb.
+    unfold Rsqr; ring_simplify.
+    progress repeat rewrite <- Rsqr_pow2.
+(*
+    simpl in Hp₁; rewrite Rsqr_1 in Hp₁.
+    replace z²%R with (1 - x² - y²)%R by lra.
+    replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
+    ring_simplify.
+*)
+    replace
+      (y² * z₁² + y² * x₁² - 2 * y * z₁ * z * y₁ - 2 * y * y₁ * x₁ * x +
+       z₁² * x² - 2 * z₁ * z * x₁ * x + z² * y₁² + z² * x₁² + y₁² * x²)%R
+    with
+      (y² * (z₁² + x₁²) - 2 * y * z₁ * z * y₁ - 2 * y * y₁ * x₁ * x +
+       z₁² * x² - 2 * z₁ * z * x₁ * x + z² * y₁² + z² * x₁² + y₁² * x²)%R
+      by lra.
 
 bbb.
  destruct q₁ as (xq, yq, zq); simpl.
