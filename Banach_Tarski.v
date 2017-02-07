@@ -2942,10 +2942,16 @@ assert (Hcs : (c² + s² = 1)%R).
  do 3 rewrite <- Rsqr_mult, fold_Rdiv in H.
  rewrite <- Hc, <- Hs in H.
  rewrite Rdiv_same in H; [ rewrite Rsqr_1 in H; lra | lra ].
+
+ destruct p as (xp, yp, zp).
+ destruct q₁ as (xq₁, yq₁, zq₁).
+ destruct q₂ as (xq₂, yq₂, zq₂); simpl.
+ simpl in Hp; rewrite Rsqr_1 in Hp; rewrite Hp.
+ rewrite sqrt_1; do 3 rewrite Rdiv_1_r.
+ f_equal.
 bbb.
 
 bbb.
-destruct p as (xp, yp, zp); simpl in Hp.
 destruct p₁ as (x₁, y₁, z₁).
 destruct p₂ as (x₂, y₂, z₂); simpl in *.
 rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
