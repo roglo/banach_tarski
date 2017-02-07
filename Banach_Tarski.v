@@ -2868,6 +2868,51 @@ injection Hm; clear Hm; intros Hz Hy Hx.
 simpl; nsatz.
 Qed.
 
+
+Theorem latitude_sphere : ∀ p p₁ q₁ a,
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → a = latitude p p₁
+  → q₁ = (p₁ - a ⁎ p)%vec
+  → q₁ ∈ sphere (√ (1 - a²)).
+Proof.
+intros * Hp Hp₁ Ha₁ Hq₁.
+destruct q₁ as (xq, yq, zq); simpl.
+unfold latitude in Ha₁; simpl in Ha₁.
+destruct p as (x, y, z).
+destruct p₁ as (x₁, y₁, z₁).
+simpl in Hp, Hp₁; simpl.
+rewrite Rsqr_1 in Hp, Hp₁.
+simpl in Hq₁.
+do 3 rewrite fold_Rminus in Hq₁.
+simpl in Ha₁.
+injection Hq₁; clear Hq₁; intros Hzq Hyq Hxq.
+rewrite Hxq, Hyq, Hzq; simpl.
+unfold Rsqr; simpl.
+ring_simplify.
+progress repeat rewrite <- Rsqr_pow2.
+replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
+ring_simplify.
+progress replace (-2 * x₁ * a * x - 2 * a * y₁ * y - 2 * a * z₁ * z)%R
+with (-2 * a * (x * x₁ + y * y₁ + z * z₁))%R by lra.
+rewrite <- Ha₁.
+do 3 rewrite Rplus_assoc; rewrite Rplus_comm.
+do 2 rewrite <- Rplus_assoc.
+do 2 rewrite <- Rmult_plus_distr_l.
+rewrite Hp, Rmult_1_r.
+rewrite Rsqr_sqrt; [ unfold Rsqr; lra | ].
+rewrite fold_Rsqr.
+specialize (vec_Lagrange_identity (V x y z) (V x₁ y₁ z₁)) as H.
+remember (V x y z × V x₁ y₁ z₁) as c eqn:Hc.
+simpl in H.
+rewrite Hp, Hp₁ in H.
+rewrite sqrt_1, Rsqr_1, Rmult_1_l in H.
+rewrite <- Ha₁ in H.
+rewrite H; clear H.
+rewrite vec_dot_mul_diag.
+apply Rle_0_sqr.
+Qed.
+
 Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -2881,103 +2926,8 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
-assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
- clear - Hp Hp₁ Ha₁ Hq₁.
- specialize (vec_Lagrange_identity (p₁ - q₁) q₁) as H.
- apply on_sphere_norm; [ apply sqrt_pos | ].
- assert (Hpq : (p₁ - q₁ = a ⁎ p)%vec).
-  now rewrite Hq₁, vec_sub_sub_distr, vec_sub_diag, vec_add_0_l.
-
-  assert (Hpq₁ : p · q₁ = 0%R).
-   rewrite Hq₁.
-   rewrite vec_dot_mul_sub_distr_l.
-   destruct p as (x, y, z).
-   destruct p₁ as (x₁, y₁, z₁); simpl in Hp, Ha₁; simpl.
-   rewrite Rsqr_1 in Hp.
-   rewrite <- Ha₁.
-   setoid_rewrite Rmult_comm.
-   do 3 rewrite Rmult_assoc.
-   do 2 rewrite <- Rmult_plus_distr_l.
-   unfold Rsqr in Hp; rewrite Hp.
-   now rewrite Rmult_1_r, Rminus_diag_eq.
-
-   rewrite Hpq, vec_norm_vec_const_mul, Rsqr_mult, <- Rsqr_abs in H.
-   generalize Hp; intros Hpv.
-   apply on_sphere_norm in Hp; [ | lra ].
-   rewrite Hp, Rsqr_1, Rmult_1_r in H.
-   rewrite vec_const_dot_assoc in H.
-   rewrite <- vec_const_mul_cross_distr_l in H.
-   rewrite vec_sqr_const_mul in H.
-   rewrite Hpq₁, Rmult_0_r, Rsqr_0, Rminus_0_r in H.
-   destruct (Req_dec a 0) as [Ha| Ha].
-    rewrite Ha in *; clear a Ha.
-    rewrite vec_const_mul_0_l, vec_sub_0_r in Hq₁.
-    rewrite Hq₁, Rsqr_0, Rminus_0_r, sqrt_1.
-    apply on_sphere_norm in Hp₁; [ easy | lra ].
-
-    assert (Haa : (a² ≠ 0)%R) by now intros HH; apply Ha, Rsqr_eq_0.
-    apply Rmult_eq_reg_l in H; [ | easy ].
-    rewrite vec_dot_mul_diag in H.
-    apply Rsqr_inj in H; try apply vec_norm_nonneg.
-    rewrite H, Hq₁.
-    destruct p as (x, y, z).
-    destruct p₁ as (x₁, y₁, z₁); simpl; f_equal.
-    simpl in Hpv; rewrite Rsqr_1 in Hpv.
-    progress repeat rewrite fold_Rminus.
-bbb.
-    unfold Rsqr; ring_simplify.
-    progress repeat rewrite <- Rsqr_pow2.
-(*
-    simpl in Hp₁; rewrite Rsqr_1 in Hp₁.
-    replace z²%R with (1 - x² - y²)%R by lra.
-    replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
-    ring_simplify.
-*)
-    replace
-      (y² * z₁² + y² * x₁² - 2 * y * z₁ * z * y₁ - 2 * y * y₁ * x₁ * x +
-       z₁² * x² - 2 * z₁ * z * x₁ * x + z² * y₁² + z² * x₁² + y₁² * x²)%R
-    with
-      (y² * (z₁² + x₁²) - 2 * y * z₁ * z * y₁ - 2 * y * y₁ * x₁ * x +
-       z₁² * x² - 2 * z₁ * z * x₁ * x + z² * y₁² + z² * x₁² + y₁² * x²)%R
-      by lra.
-
-bbb.
- destruct q₁ as (xq, yq, zq); simpl.
- unfold latitude in Ha₁; simpl in Ha₁.
- destruct p as (x, y, z).
- destruct p₁ as (x₁, y₁, z₁).
- simpl in Hp, Hp₁; simpl.
- rewrite Rsqr_1 in Hp, Hp₁.
- simpl in Hq₁.
- do 3 rewrite fold_Rminus in Hq₁.
- simpl in Ha₁.
- injection Hq₁; clear Hq₁; intros Hzq Hyq Hxq.
- rewrite Hxq, Hyq, Hzq; simpl.
- unfold Rsqr; simpl.
- ring_simplify.
- progress repeat rewrite <- Rsqr_pow2.
- replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
- ring_simplify.
- replace (-2 * x₁ * a * x - 2 * a * y₁ * y - 2 * a * z₁ * z)%R
- with (-2 * a * (x * x₁ + y * y₁ + z * z₁))%R by lra.
- rewrite <- Ha₁.
- do 3 rewrite Rplus_assoc; rewrite Rplus_comm.
- do 2 rewrite <- Rplus_assoc.
- do 2 rewrite <- Rmult_plus_distr_l.
- rewrite Hp, Rmult_1_r.
- rewrite Rsqr_sqrt; [ unfold Rsqr; lra | ].
- rewrite fold_Rsqr.
- specialize (vec_Lagrange_identity (V x y z) (V x₁ y₁ z₁)) as H.
- remember (V x y z × V x₁ y₁ z₁) as c eqn:Hc.
- simpl in H.
- rewrite Hp, Hp₁ in H.
- rewrite sqrt_1, Rsqr_1, Rmult_1_l in H.
- rewrite <- Ha₁ in H.
- rewrite H; clear H.
- rewrite vec_dot_mul_diag.
- apply Rle_0_sqr.
-bbb.
-
+assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))) by now apply (latitude_sphere p p₁).
+assert (Hqa₂ : q₂ ∈ sphere (√ (1 - a²))) by now apply (latitude_sphere p p₂).
 destruct p as (xp, yp, zp); simpl in Hp.
 destruct p₁ as (x₁, y₁, z₁).
 destruct p₂ as (x₂, y₂, z₂); simpl in *.
