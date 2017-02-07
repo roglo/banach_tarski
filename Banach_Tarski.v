@@ -2951,6 +2951,9 @@ assert (Hcs : (c² + s² = 1)%R).
  do 3 rewrite fold_Rminus in Hq₁, Hq₂.
  rewrite Hp, sqrt_1; do 3 rewrite Rdiv_1_r.
  rewrite Hq₁, Hq₂; simpl.
+ rewrite Rsqr_sqrt in Hqa₁, Hqa₂; [ | lra | lra ].
+ rewrite Hq₁ in Hqa₁.
+ rewrite Hq₂ in Hqa₂.
  f_equal.
 bbb.
 
