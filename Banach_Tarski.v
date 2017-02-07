@@ -2944,6 +2944,17 @@ assert (Hcs : (c² + s² = 1)%R).
  rewrite Rdiv_same in H; [ rewrite Rsqr_1 in H; lra | lra ].
 
  destruct p as (xp, yp, zp).
+ destruct p₁ as (xp₁, yp₁, zp₁).
+ destruct p₂ as (xp₂, yp₂, zp₂).
+ simpl in *.
+ rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+ do 3 rewrite fold_Rminus in Hq₁, Hq₂.
+ rewrite Hp, sqrt_1; do 3 rewrite Rdiv_1_r.
+ rewrite Hq₁, Hq₂; simpl.
+ f_equal.
+bbb.
+
+ destruct p as (xp, yp, zp).
  destruct q₁ as (xq₁, yq₁, zq₁).
  destruct q₂ as (xq₂, yq₂, zq₂); simpl.
  simpl in Hp; rewrite Rsqr_1 in Hp; rewrite Hp.
