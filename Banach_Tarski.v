@@ -2928,6 +2928,15 @@ Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
 assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))) by now apply (latitude_sphere p p₁).
 assert (Hqa₂ : q₂ ∈ sphere (√ (1 - a²))) by now apply (latitude_sphere p p₂).
+assert (H : (c² + s² = 1)%R).
+ specialize (vec_Lagrange_identity q₁ q₂) as H.
+ rewrite vec_dot_mul_diag in H.
+ apply on_sphere_norm in Hqa₁; [ | apply sqrt_pos ].
+ apply on_sphere_norm in Hqa₂; [ | apply sqrt_pos ].
+ rewrite Hqa₁, Hqa₂ in H.
+ rewrite Rsqr_sqrt in H.
+(* probably fix the division by a in c and s; maybe another value *)
+bbb.
 destruct p as (xp, yp, zp); simpl in Hp.
 destruct p₁ as (x₁, y₁, z₁).
 destruct p₂ as (x₂, y₂, z₂); simpl in *.
@@ -2936,10 +2945,11 @@ do 3 rewrite fold_Rminus in Hq₁, Hq₂.
 rewrite Hp, sqrt_1.
 do 3 rewrite Rdiv_1_r.
 subst q₁ q₂; simpl in Hc, Hs.
-(* BTW: what about the sign of s? defined like that,
-   it is always positive *)
-bbb.
+simpl.
+f_equal.
 
+
+bbb.
 remember ((x₁ - a * xp) * (x₂ - a * xp))%R as u eqn:Hu.
 rewrite Ha₁ in Hu at 1.
 rewrite Ha₂ in Hu.
