@@ -797,18 +797,33 @@ destruct w as (w₁, w₂, w₃).
 simpl; f_equal; lra.
 Qed.
 
-Theorem vec_add_opp_l : ∀ v, (vec_opp v + v = 0)%vec.
+Theorem vec_add_opp_diag_l : ∀ v, (- v + v = 0)%vec.
 Proof.
-intros.
-destruct v as (v₁, v₂, v₃); simpl.
-f_equal; lra.
+intros (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_add_opp_r : ∀ v, (v + vec_opp v = 0)%vec.
+Theorem vec_add_opp_diag_r : ∀ v, (v + - v = 0)%vec.
 Proof.
-intros.
-destruct v as (v₁, v₂, v₃); simpl.
-f_equal; lra.
+intros (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_sub_diag : ∀ v, (v - v = 0)%vec.
+intros (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_add_sub_distr : ∀ u v w, (u + (v - w) = u + v - w)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_sub_add_distr : ∀ u v w, (u - (v + w) = u - v - w)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_sub_sub_distr : ∀ u v w, (u - (v - w) = u - v + w)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
 Qed.
 
 Theorem vec_sub_move_r : ∀ u v w, (u - v)%vec = w ↔ u = (w + v)%vec.
@@ -818,13 +833,13 @@ split; intros H.
  rewrite <- H.
  unfold vec_sub.
  rewrite <- vec_add_assoc.
- rewrite vec_add_opp_l.
+ rewrite vec_add_opp_diag_l.
  now rewrite vec_add_0_r.
 
  rewrite H.
  unfold vec_sub.
  rewrite <- vec_add_assoc.
- rewrite vec_add_opp_r.
+ rewrite vec_add_opp_diag_r.
  now rewrite vec_add_0_r.
 Qed.
 
@@ -922,6 +937,16 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
 
 Theorem vec_cross_mul_anticomm : ∀ u v, (u × v = - (v × u))%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_opp_add_distr : ∀ u v, (- (u + v) = - u - v)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_opp_sub_distr : ∀ u v, (- (u - v) = - u + v)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
@@ -1045,6 +1070,8 @@ rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
 rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
 unfold Rsqr; lra.
 Qed.
+
+Arguments vec_Lagrange_identity u%vec v%vec.
 
 Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
 Proof.

@@ -2883,6 +2883,16 @@ Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
 assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
 clear - Hp Hp₁ Ha₁ Hq₁.
+(**)
+ specialize (vec_Lagrange_identity (p₁ - q₁) q₁) as H.
+ apply on_sphere_norm; [ apply sqrt_pos | ].
+ assert (Hpq : (p₁ - q₁ = a ⁎ p)%vec).
+  now rewrite Hq₁, vec_sub_sub_distr, vec_sub_diag, vec_add_0_l.
+
+  rewrite Hpq, vec_norm_vec_const_mul, Rsqr_mult, <- Rsqr_abs in H.
+  apply on_sphere_norm in Hp; [ | lra ].
+  rewrite Hp, Rsqr_1, Rmult_1_r in H.
+
 bbb.
  destruct q₁ as (xq, yq, zq); simpl.
  unfold latitude in Ha₁; simpl in Ha₁.
