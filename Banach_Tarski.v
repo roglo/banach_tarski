@@ -2882,16 +2882,46 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
 assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))).
-clear - Hp Hp₁ Ha₁ Hq₁.
-(**)
+ clear - Hp Hp₁ Ha₁ Hq₁.
  specialize (vec_Lagrange_identity (p₁ - q₁) q₁) as H.
  apply on_sphere_norm; [ apply sqrt_pos | ].
  assert (Hpq : (p₁ - q₁ = a ⁎ p)%vec).
   now rewrite Hq₁, vec_sub_sub_distr, vec_sub_diag, vec_add_0_l.
 
-  rewrite Hpq, vec_norm_vec_const_mul, Rsqr_mult, <- Rsqr_abs in H.
-  apply on_sphere_norm in Hp; [ | lra ].
-  rewrite Hp, Rsqr_1, Rmult_1_r in H.
+  assert (Hpq₁ : p · q₁ = 0%R).
+   rewrite Hq₁.
+   rewrite vec_dot_mul_sub_distr_l.
+   destruct p as (x, y, z).
+   destruct p₁ as (x₁, y₁, z₁); simpl in Hp, Ha₁; simpl.
+   rewrite Rsqr_1 in Hp.
+   rewrite <- Ha₁.
+   setoid_rewrite Rmult_comm.
+   do 3 rewrite Rmult_assoc.
+   do 2 rewrite <- Rmult_plus_distr_l.
+   unfold Rsqr in Hp; rewrite Hp.
+   now rewrite Rmult_1_r, Rminus_diag_eq.
+
+   rewrite Hpq, vec_norm_vec_const_mul, Rsqr_mult, <- Rsqr_abs in H.
+   apply on_sphere_norm in Hp; [ | lra ].
+   rewrite Hp, Rsqr_1, Rmult_1_r in H.
+   rewrite vec_const_dot_assoc in H.
+   rewrite <- vec_const_mul_cross_distr_l in H.
+   rewrite vec_sqr_const_mul in H.
+   rewrite Hpq₁, Rmult_0_r, Rsqr_0, Rminus_0_r in H.
+   destruct (Req_dec a 0) as [Ha| Ha].
+    rewrite Ha in *; clear a Ha.
+    rewrite vec_const_mul_0_l, vec_sub_0_r in Hq₁.
+    rewrite Hq₁, Rsqr_0, Rminus_0_r, sqrt_1.
+    apply on_sphere_norm in Hp₁; [ easy | lra ].
+
+    assert (Haa : (a² ≠ 0)%R) by now intros HH; apply Ha, Rsqr_eq_0.
+    apply Rmult_eq_reg_l in H; [ | easy ].
+    rewrite vec_dot_mul_diag in H.
+    apply Rsqr_inj in H; try apply vec_norm_nonneg.
+    rewrite H, Hq₁.
+    destruct p as (x, y, z).
+    destruct p₁ as (x₁, y₁, z₁); simpl; f_equal.
+    progress repeat rewrite fold_Rminus.
 
 bbb.
  destruct q₁ as (xq, yq, zq); simpl.

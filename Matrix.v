@@ -655,14 +655,22 @@ Qed.
 
 Theorem vec_add_0_l : ∀ v, (0 + v = v)%vec.
 Proof.
-intros (x, y, z); simpl.
-now do 3 rewrite Rplus_0_l.
+intros (x, y, z); simpl; f_equal; lra.
 Qed.
 
 Theorem vec_add_0_r : ∀ v, (v + 0 = v)%vec.
 Proof.
-intros (x, y, z); simpl.
-now do 3 rewrite Rplus_0_r.
+intros (x, y, z); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_sub_0_l : ∀ v, (0 - v = - v)%vec.
+Proof.
+intros (x, y, z); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_sub_0_r : ∀ v, (v - 0 = v)%vec.
+Proof.
+intros (x, y, z); simpl; f_equal; lra.
 Qed.
 
 Theorem eq_vec_const_mul_0 : ∀ a v, (a ⁎ v = 0 → a = 0%R ∨ v = 0)%vec.
@@ -902,6 +910,12 @@ Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
 Qed.
 
+Theorem vec_dot_mul_sub_distr_l : ∀ u v w,
+  u · (v - w) = (u · v - u · w)%R.
+Proof.
+intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
+Qed.
+
 Theorem vec_dot_mul_add_distr_r : ∀ u v w, (u + v) · w = (u · w + v · w)%R.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; lra.
@@ -1033,6 +1047,11 @@ Proof.
 intros (x, y, z) Hv; simpl in Hv |-*.
 apply sqr_vec_norm_eq_0 in Hv.
 now destruct Hv as (H1 & H2 & H3); subst.
+Qed.
+
+Theorem vec_sqr_const_mul : ∀ a v, (a ⁎ v)²%vec = (a² * v²%vec)%R.
+Proof.
+intros a (v₁, v₂, v₃); simpl; unfold Rsqr; lra.
 Qed.
 
 Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = / ∥u∥ ⁎ u → ∥v∥ = 1%R.
