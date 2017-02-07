@@ -2919,23 +2919,31 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
   → p₂ ∈ sphere 1
   → a = latitude p p₁
   → a = latitude p p₂
+  → (a² < 1)%R
   → q₁ = (p₁ - a ⁎ p)%vec
   → q₂ = (p₂ - a ⁎ p)%vec
-  → c = ((q₁ · q₂) / a)%R
-  → s = (∥(q₁ × q₂)∥ / a)%R
+  → c = ((q₁ · q₂) / (1 - a²))%R
+  → s = (∥(q₁ × q₂)∥ / (1 - a²))%R
   → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hq₁ Hq₂ Hc Hs.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hq₁ Hq₂ Hc Hs.
 assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))) by now apply (latitude_sphere p p₁).
 assert (Hqa₂ : q₂ ∈ sphere (√ (1 - a²))) by now apply (latitude_sphere p p₂).
-assert (H : (c² + s² = 1)%R).
+assert (Hcs : (c² + s² = 1)%R).
  specialize (vec_Lagrange_identity q₁ q₂) as H.
  rewrite vec_dot_mul_diag in H.
  apply on_sphere_norm in Hqa₁; [ | apply sqrt_pos ].
  apply on_sphere_norm in Hqa₂; [ | apply sqrt_pos ].
  rewrite Hqa₁, Hqa₂ in H.
- rewrite Rsqr_sqrt in H.
-(* probably fix the division by a in c and s; maybe another value *)
+ rewrite Rsqr_sqrt in H; [ | lra ].
+ rewrite fold_Rsqr in H.
+ apply Rmult_eq_compat_r with (r := (/ (1 - a²))²%R) in H.
+ rewrite Rmult_minus_distr_r in H.
+ do 3 rewrite <- Rsqr_mult, fold_Rdiv in H.
+ rewrite <- Hc, <- Hs in H.
+ rewrite Rdiv_same in H; [ rewrite Rsqr_1 in H; lra | lra ].
+bbb.
+
 bbb.
 destruct p as (xp, yp, zp); simpl in Hp.
 destruct p₁ as (x₁, y₁, z₁).

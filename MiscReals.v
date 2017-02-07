@@ -34,6 +34,9 @@ Proof. intros; now fold (Rsqr x). Qed.
 Theorem Rmult_div : ∀ x y z, (x * y / z = x / z * y)%R.
 Proof. intros; lra. Qed.
 
+Theorem Rdiv_mult : ∀ x y z, (x * (y / z) = x * y / z)%R.
+Proof. intros; lra. Qed.
+
 Theorem Rmult_div_same : ∀ x y, (y ≠ 0 → x / y * y = x)%R.
 Proof.
 intros * Hy.
