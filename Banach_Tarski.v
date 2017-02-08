@@ -2928,6 +2928,10 @@ Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
+assert (H : (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec).
+
+bbb.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
 assert (Hqa₁ : ∥v₁∥ = √ (1 - a²)) by now apply (latitude_norm p p₁).
 assert (Hqa₂ : ∥v₂∥ = √ (1 - a²)) by now apply (latitude_norm p p₂).
 assert (Hcs : (c² + s² = 1)%R).
