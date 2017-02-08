@@ -2953,14 +2953,56 @@ assert (Hcs : (c² + s² = 1)%R).
  rewrite Hp, sqrt_1; do 3 rewrite Rdiv_1_r.
  rewrite Hq₁, Hq₂; simpl.
  f_equal.
-  (* trying here to make (c * (1 - a²)) appear to replace it with (q₁ · q₂).
-     the problem is that s still remains and s contains a square root and
-     I don't know how to make it disappear *)
-  apply Rmult_eq_reg_r with (r := (1 - a²)%R); [ | lra ].
-  do 2 rewrite Rmult_plus_distr_r.
-  replace ((xp² * (1 - c) + c) * (xp₁ - a * xp) * (1 - a²))%R
-  with ((xp² * (1 - a²) + c * (1 - a²) * (1 - xp²)) * (xp₁ - a * xp))%R
+  rewrite Rplus_assoc.
+  replace
+    ((xp * yp * (1 - c) - zp * s) * (yp₁ - a * yp) +
+     (xp * zp * (1 - c) + yp * s) * (zp₁ - a * zp))%R
+  with
+    ((xp * yp * (1 - c)) * (yp₁ - a * yp) +
+     (xp * zp * (1 - c)) * (zp₁ - a * zp) -
+     (zp * (yp₁ - a * yp) - yp * (zp₁ - a * zp)) * s)%R
     by lra.
+  unfold Rminus; do 2 rewrite <- Rplus_assoc.
+  progress repeat rewrite fold_Rminus.
+  remember ((zp * (yp₁ - a * yp) - yp * (zp₁ - a * zp)) * s)%R as u eqn:Hu.
+  remember (xp₂ - a * xp)%R as v eqn:Hv.
+  apply Rplus_eq_reg_r with (r := (u - v)%R).
+  rewrite Rplus_minus.
+  unfold Rminus; rewrite Rplus_assoc.
+  replace (- u + (u + - v))%R with (- v)%R by lra.
+  progress repeat rewrite fold_Rminus.
+  subst u v.
+  apply Rmult_eq_reg_r with (r := (1 - a²)%R); [ | lra ].
+  do 5 rewrite Rmult_assoc.
+  replace (s * (1 - a²))%R with ∥(q₁ × q₂)∥.
+  rewrite Rmult_plus_distr_r.
+  rewrite Rmult_minus_distr_r.
+  do 3 rewrite Rmult_plus_distr_r.
+  remember (xp₁ - a * xp)%R as u₁.
+  remember (yp₁ - a * yp)%R as u₂.
+  remember (zp₁ - a * zp)%R as u₃.
+  replace
+    (xp² * (1 - c) * u₁ * (1 - a²) +
+     c * u₁ * (1 - a²) +
+     xp * (yp * ((1 - c) * u₂)) * (1 - a²) +
+     xp * (zp * ((1 - c) * u₃)) * (1 - a²))%R
+  with
+    ((xp² * (1 - a²) - xp² * (c * (1 - a²))) * u₁ +
+     u₁ * (c * (1 - a²)) +
+     xp * yp * u₂ * (1 - a²) - xp * yp * u₂ * (c * (1 - a²)) +
+     xp * zp * u₃ * (1 - a²) - xp * zp * u₃ * (c * (1 - a²)))%R
+    by lra.
+  replace (c * (1 - a²))%R with (q₁ · q₂).
+  apply Rsqr_inj.
+  Focus 3.
+  rewrite Rsqr_mult.
+  rewrite <- vec_dot_mul_diag.
+  rewrite Hq₁, Hq₂; simpl.
+  remember (xp₂ - a * xp)%R as v₁.
+  remember (yp₂ - a * yp)%R as v₂.
+  remember (zp₂ - a * zp)%R as v₃.
+  eapply Rplus_eq_reg_r.
+  symmetry; rewrite Rplus_opp_r; symmetry.
 bbb.
 
  destruct p as (xp, yp, zp).
