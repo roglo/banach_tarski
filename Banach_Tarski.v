@@ -3005,6 +3005,12 @@ assert (Hcs : (c² + s² = 1)%R).
   move y₁ before x₁; move z₁ before y₁.
   move x₂ before z₁; move y₂ before x₂; move z₂ before y₂.
   move Hv₁ before z₂; move Hv₂ before Hv₁.
+remember (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R as xyz eqn:Hxyz.
+remember (y₁ * z₂ - z₁ * y₂)%R as X eqn:HX.
+remember (z₁ * x₂ - x₁ * z₂)%R as Y eqn:HY.
+remember (x₁ * y₂ - y₁ * x₂)%R as Z eqn:HZ.
+move Y before X; move Z before Y.
+progress repeat rewrite fold_Rsqr.
 bbb.
 
  destruct p as (xp, yp, zp).
