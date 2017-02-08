@@ -2953,7 +2953,7 @@ assert (Hcs : (c² + s² = 1)%R).
  rewrite Hv₁, Hv₂; simpl.
  f_equal.
   rewrite Rplus_assoc.
-  replace
+  progress replace
     ((xp * yp * (1 - c) - zp * s) * (yp₁ - a * yp) +
      (xp * zp * (1 - c) + yp * s) * (zp₁ - a * zp))%R
   with
