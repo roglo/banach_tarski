@@ -2942,7 +2942,6 @@ assert (Hcs : (c² + s² = 1)%R).
  rewrite <- Hc, <- Hs in H.
  rewrite Rdiv_same in H; [ rewrite Rsqr_1 in H; lra | lra ].
 
- clear Hqa₁ Hqa₂.
  destruct p as (xp, yp, zp).
  destruct p₁ as (xp₁, yp₁, zp₁).
  destruct p₂ as (xp₂, yp₂, zp₂).
