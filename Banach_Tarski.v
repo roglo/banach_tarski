@@ -2982,6 +2982,7 @@ assert (Hcs : (c² + s² = 1)%R).
     rewrite <- Ropp_mult_distr_l.
     rewrite Rplus_opp_l, Rplus_0_r, Rplus_0_l.
     rewrite fold_Rminus.
+bbb.
 (**)
 apply Rsqr_inj.
 Focus 3.
@@ -2990,6 +2991,9 @@ replace s²%R with (1 - c²)%R by lra.
 apply Rminus_diag_uniq.
 unfold Rsqr; ring_simplify.
 progress repeat rewrite <- Rsqr_pow2.
+replace z₁²%R with (b² - x₁² - y₁²)%R by lra.
+replace z₂²%R with (b² - x₂² - y₂²)%R by lra.
+ring_simplify.
 
 bbb.
     apply Rmult_eq_reg_r with (r := b²%R).
