@@ -2928,10 +2928,6 @@ Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
-assert (H : (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec).
-
-bbb.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
 assert (Hqa₁ : ∥v₁∥ = √ (1 - a²)) by now apply (latitude_norm p p₁).
 assert (Hqa₂ : ∥v₂∥ = √ (1 - a²)) by now apply (latitude_norm p p₂).
 assert (Hcs : (c² + s² = 1)%R).
@@ -2945,6 +2941,30 @@ assert (Hcs : (c² + s² = 1)%R).
  do 3 rewrite <- Rsqr_mult, fold_Rdiv in H.
  rewrite <- Hc, <- Hs in H.
  rewrite Rdiv_same in H; [ rewrite Rsqr_1 in H; lra | lra ].
+
+(**)
+ assert (H : (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec).
+  remember (√ (1 - a²))%R as b eqn:Hb.
+  apply (f_equal Rsqr) in Hb.
+  rewrite Rsqr_sqrt in Hb; [ | lra ].
+  rewrite <- Hb in Hc, Hs.
+  assert (Hbz : (0 < b²)%R) by lra.
+  rewrite <- Rsqr_0 in Hbz.
+  apply Rsqr_incrst_0 in Hbz; [ | lra | ].
+   clear a p₁ p₂ Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hb Hv₁ Hv₂.
+   destruct p as (xp, yp, zp).
+   destruct v₁ as (x₁, y₁, z₁).
+   destruct v₂ as (x₂, y₂, z₂); simpl in *.
+   rewrite Rsqr_1 in Hp.
+   rewrite Hp, sqrt_1; do 3 rewrite Rdiv_1_r.
+   f_equal.
+
+bbb.
+
+bbb.
+   rewrite <- Hqa₁; apply vec_norm_nonneg.
+bbb.
+
 
  destruct p as (xp, yp, zp).
  destruct p₁ as (xp₁, yp₁, zp₁).
