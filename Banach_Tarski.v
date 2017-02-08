@@ -2981,6 +2981,8 @@ assert (Hcs : (c² + s² = 1)%R).
     rewrite Rplus_assoc.
     rewrite <- Ropp_mult_distr_l.
     rewrite Rplus_opp_l, Rplus_0_r, Rplus_0_l.
+    rewrite fold_Rminus.
+bbb.
     apply Rmult_eq_reg_r with (r := b²%R).
      rewrite Rmult_plus_distr_r.
      rewrite <- Ropp_mult_distr_l, fold_Rminus.
