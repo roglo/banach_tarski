@@ -2943,6 +2943,7 @@ assert (Hcs : (c² + s² = 1)%R).
  rewrite <- Hc, <- Hs in H.
  rewrite Rdiv_same in H; [ rewrite Rsqr_1 in H; lra | lra ].
 
+ clear Hqa₁ Hqa₂.
  destruct p as (xp, yp, zp).
  destruct p₁ as (xp₁, yp₁, zp₁).
  destruct p₂ as (xp₂, yp₂, zp₂).
@@ -2951,10 +2952,15 @@ assert (Hcs : (c² + s² = 1)%R).
  do 3 rewrite fold_Rminus in Hq₁, Hq₂.
  rewrite Hp, sqrt_1; do 3 rewrite Rdiv_1_r.
  rewrite Hq₁, Hq₂; simpl.
- rewrite Rsqr_sqrt in Hqa₁, Hqa₂; [ | lra | lra ].
- rewrite Hq₁ in Hqa₁.
- rewrite Hq₂ in Hqa₂.
  f_equal.
+  (* trying here to make (c * (1 - a²)) appear to replace it with (q₁ · q₂).
+     the problem is that s still remains and s contains a square root and
+     I don't know how to make it disappear *)
+  apply Rmult_eq_reg_r with (r := (1 - a²)%R); [ | lra ].
+  do 2 rewrite Rmult_plus_distr_r.
+  replace ((xp² * (1 - c) + c) * (xp₁ - a * xp) * (1 - a²))%R
+  with ((xp² * (1 - a²) + c * (1 - a²) * (1 - xp²)) * (xp₁ - a * xp))%R
+    by lra.
 bbb.
 
  destruct p as (xp, yp, zp).
