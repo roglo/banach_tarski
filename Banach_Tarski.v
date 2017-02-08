@@ -3002,6 +3002,9 @@ assert (Hcs : (c² + s² = 1)%R).
   eapply Rplus_eq_reg_r.
   symmetry; rewrite Rplus_opp_r; symmetry.
   rewrite fold_Rminus.
+  move y₁ before x₁; move z₁ before y₁.
+  move x₂ before z₁; move y₂ before x₂; move z₂ before y₂.
+  move Hv₁ before z₂; move Hv₂ before Hv₁.
 bbb.
 
  destruct p as (xp, yp, zp).
