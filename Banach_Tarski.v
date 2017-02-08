@@ -2869,25 +2869,26 @@ simpl; nsatz.
 Qed.
 
 
-Theorem latitude_sphere : ∀ p p₁ q₁ a,
+Theorem latitude_norm : ∀ p p₁ v a,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → a = latitude p p₁
-  → q₁ = (p₁ - a ⁎ p)%vec
-  → q₁ ∈ sphere (√ (1 - a²)).
+  → v = (p₁ - a ⁎ p)%vec
+  → ∥v∥ = √ (1 - a²).
 Proof.
-intros * Hp Hp₁ Ha₁ Hq₁.
-destruct q₁ as (xq, yq, zq); simpl.
+intros * Hp Hp₁ Ha₁ Hv.
+apply on_sphere_norm; [ apply sqrt_pos | ].
+destruct v as (xv, yv, zv); simpl.
 unfold latitude in Ha₁; simpl in Ha₁.
 destruct p as (x, y, z).
 destruct p₁ as (x₁, y₁, z₁).
 simpl in Hp, Hp₁; simpl.
 rewrite Rsqr_1 in Hp, Hp₁.
-simpl in Hq₁.
-do 3 rewrite fold_Rminus in Hq₁.
+simpl in Hv.
+do 3 rewrite fold_Rminus in Hv.
 simpl in Ha₁.
-injection Hq₁; clear Hq₁; intros Hzq Hyq Hxq.
-rewrite Hxq, Hyq, Hzq; simpl.
+injection Hv; clear Hv; intros Hzq Hyq Hxv.
+rewrite Hxv, Hyq, Hzq; simpl.
 unfold Rsqr; simpl.
 ring_simplify.
 progress repeat rewrite <- Rsqr_pow2.
@@ -2913,27 +2914,25 @@ rewrite vec_dot_mul_diag.
 apply Rle_0_sqr.
 Qed.
 
-Theorem glop : ∀ p p₁ p₂ q₁ q₂ a c s,
+Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
   → a = latitude p p₁
   → a = latitude p p₂
   → (a² < 1)%R
-  → q₁ = (p₁ - a ⁎ p)%vec
-  → q₂ = (p₂ - a ⁎ p)%vec
-  → c = ((q₁ · q₂) / (1 - a²))%R
-  → s = (∥(q₁ × q₂)∥ / (1 - a²))%R
-  → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
+  → v₁ = (p₁ - a ⁎ p)%vec
+  → v₂ = (p₂ - a ⁎ p)%vec
+  → c = ((v₁ · v₂) / (1 - a²))%R
+  → s = (∥(v₁ × v₂)∥ / (1 - a²))%R
+  → (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hq₁ Hq₂ Hc Hs.
-assert (Hqa₁ : q₁ ∈ sphere (√ (1 - a²))) by now apply (latitude_sphere p p₁).
-assert (Hqa₂ : q₂ ∈ sphere (√ (1 - a²))) by now apply (latitude_sphere p p₂).
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
+assert (Hqa₁ : ∥v₁∥ = √ (1 - a²)) by now apply (latitude_norm p p₁).
+assert (Hqa₂ : ∥v₂∥ = √ (1 - a²)) by now apply (latitude_norm p p₂).
 assert (Hcs : (c² + s² = 1)%R).
- specialize (vec_Lagrange_identity q₁ q₂) as H.
+ specialize (vec_Lagrange_identity v₁ v₂) as H.
  rewrite vec_dot_mul_diag in H.
- apply on_sphere_norm in Hqa₁; [ | apply sqrt_pos ].
- apply on_sphere_norm in Hqa₂; [ | apply sqrt_pos ].
  rewrite Hqa₁, Hqa₂ in H.
  rewrite Rsqr_sqrt in H; [ | lra ].
  rewrite fold_Rsqr in H.
@@ -2949,9 +2948,9 @@ assert (Hcs : (c² + s² = 1)%R).
  destruct p₂ as (xp₂, yp₂, zp₂).
  simpl in *.
  rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
- do 3 rewrite fold_Rminus in Hq₁, Hq₂.
+ do 3 rewrite fold_Rminus in Hv₁, Hv₂.
  rewrite Hp, sqrt_1; do 3 rewrite Rdiv_1_r.
- rewrite Hq₁, Hq₂; simpl.
+ rewrite Hv₁, Hv₂; simpl.
  f_equal.
   rewrite Rplus_assoc.
   replace
@@ -2974,35 +2973,36 @@ assert (Hcs : (c² + s² = 1)%R).
   subst u v.
   apply Rmult_eq_reg_r with (r := (1 - a²)%R); [ | lra ].
   do 5 rewrite Rmult_assoc.
-  replace (s * (1 - a²))%R with ∥(q₁ × q₂)∥.
+  replace (s * (1 - a²))%R with ∥(v₁ × v₂)∥.
   rewrite Rmult_plus_distr_r.
   rewrite Rmult_minus_distr_r.
   do 3 rewrite Rmult_plus_distr_r.
-  remember (xp₁ - a * xp)%R as u₁.
-  remember (yp₁ - a * yp)%R as u₂.
-  remember (zp₁ - a * zp)%R as u₃.
-  replace
-    (xp² * (1 - c) * u₁ * (1 - a²) +
-     c * u₁ * (1 - a²) +
-     xp * (yp * ((1 - c) * u₂)) * (1 - a²) +
-     xp * (zp * ((1 - c) * u₃)) * (1 - a²))%R
+  remember (xp₁ - a * xp)%R as x₁.
+  remember (yp₁ - a * yp)%R as y₁.
+  remember (zp₁ - a * zp)%R as z₁.
+  progress replace
+    (xp² * (1 - c) * x₁ * (1 - a²) +
+     c * x₁ * (1 - a²) +
+     xp * (yp * ((1 - c) * y₁)) * (1 - a²) +
+     xp * (zp * ((1 - c) * z₁)) * (1 - a²))%R
   with
-    ((xp² * (1 - a²) - xp² * (c * (1 - a²))) * u₁ +
-     u₁ * (c * (1 - a²)) +
-     xp * yp * u₂ * (1 - a²) - xp * yp * u₂ * (c * (1 - a²)) +
-     xp * zp * u₃ * (1 - a²) - xp * zp * u₃ * (c * (1 - a²)))%R
+    ((xp² * (1 - a²) - xp² * (c * (1 - a²))) * x₁ +
+     x₁ * (c * (1 - a²)) +
+     xp * yp * y₁ * (1 - a²) - xp * yp * y₁ * (c * (1 - a²)) +
+     xp * zp * z₁ * (1 - a²) - xp * zp * z₁ * (c * (1 - a²)))%R
     by lra.
-  replace (c * (1 - a²))%R with (q₁ · q₂).
+  replace (c * (1 - a²))%R with (v₁ · v₂).
   apply Rsqr_inj.
   Focus 3.
   rewrite Rsqr_mult.
   rewrite <- vec_dot_mul_diag.
-  rewrite Hq₁, Hq₂; simpl.
-  remember (xp₂ - a * xp)%R as v₁.
-  remember (yp₂ - a * yp)%R as v₂.
-  remember (zp₂ - a * zp)%R as v₃.
+  rewrite Hv₁, Hv₂; simpl.
+  remember (xp₂ - a * xp)%R as x₂.
+  remember (yp₂ - a * yp)%R as y₂.
+  remember (zp₂ - a * zp)%R as z₂.
   eapply Rplus_eq_reg_r.
   symmetry; rewrite Rplus_opp_r; symmetry.
+  rewrite fold_Rminus.
 bbb.
 
  destruct p as (xp, yp, zp).
