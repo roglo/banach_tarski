@@ -2957,8 +2957,47 @@ assert (Hcs : (c² + s² = 1)%R).
    destruct v₂ as (x₂, y₂, z₂); simpl in *.
    rewrite Rsqr_1 in Hp.
    rewrite Hp, sqrt_1; do 3 rewrite Rdiv_1_r.
+   apply (f_equal Rsqr) in Hqa₁.
+   apply (f_equal Rsqr) in Hqa₂.
+   rewrite Rsqr_sqrt in Hqa₁; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hqa₂; [ | apply nonneg_sqr_vec_norm ].
+   assert (Hpv₁ : (xp * x₁ + yp * y₁ + zp * z₁ = 0)%R).
+   Focus 2.
    f_equal.
-
+    unfold Rsqr.
+    progress replace
+      ((xp * xp * (1 - c) + c) * x₁ + (xp * yp * (1 - c) - zp * s) * y₁ +
+       (xp * zp * (1 - c) + yp * s) * z₁)%R
+    with
+      (xp * (xp * x₁ + yp * y₁ + zp * z₁) +
+       (x₁ - xp * (xp * x₁ + yp * y₁ + zp * z₁)) * c +
+       - (zp * y₁ - yp * z₁) * s)%R
+     by lra.
+    rewrite Hpv₁, Rmult_0_r, Rplus_0_l, Rminus_0_r.
+    apply Rplus_eq_reg_r with (r := -x₂%R).
+    rewrite Rplus_opp_r.
+    rewrite Rplus_shuffle0.
+    apply Rplus_eq_reg_r with (r := ((zp * y₁ - yp * z₁) * s)%R).
+    rewrite Rplus_assoc.
+    rewrite <- Ropp_mult_distr_l.
+    rewrite Rplus_opp_l, Rplus_0_r, Rplus_0_l.
+    apply Rmult_eq_reg_r with (r := b²%R).
+     rewrite Rmult_plus_distr_r.
+     rewrite <- Ropp_mult_distr_l, fold_Rminus.
+     do 2 rewrite Rmult_assoc.
+     rewrite Hc, Hs.
+     unfold Rdiv.
+     do 2 rewrite Rmult_assoc.
+     rewrite Rinv_l.
+      do 2 rewrite Rmult_1_r.
+      apply Rsqr_inj.
+      Focus 3.
+       rewrite Rsqr_mult.
+       rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+       clear - Hp Hqa₁ Hqa₂ Hpv₁.
+       apply Rminus_diag_uniq.
+bbb.
+       unfold Rsqr in *.
 bbb.
 
 bbb.
