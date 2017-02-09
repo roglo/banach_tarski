@@ -2918,8 +2918,8 @@ Theorem glip : ∀ p v₁ v₂ c s,
   p ∈ sphere 1
   → ∥v₁∥ = 1%R
   → ∥v₂∥ = 1%R
-  → p × v₁ = 0%vec
-  → p × v₂ = 0%vec
+  → p · v₁ = 0%R
+  → p · v₂ = 0%R
   → c = (v₁ · v₂)
   → s = ∥(v₁ × v₂)∥
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
@@ -2944,17 +2944,11 @@ assert (Hcs : (c² + s² = 1)%R).
  rewrite Rsqr_sqrt in Hv₁; [ | apply nonneg_sqr_vec_norm ].
  rewrite Rsqr_sqrt in Hv₂; [ | apply nonneg_sqr_vec_norm ].
  rewrite Rsqr_1 in Hv₁, Hv₂.
- injection Hp₁; clear Hp₁; intros H₃ H₂ H₁.
- injection Hp₂; clear Hp₂; intros H₆ H₅ H₄.
- apply Rminus_diag_uniq in H₁.
- apply Rminus_diag_uniq in H₂.
- apply Rminus_diag_uniq in H₃.
- apply Rminus_diag_uniq in H₄.
- apply Rminus_diag_uniq in H₅.
- apply Rminus_diag_uniq in H₆.
  f_equal.
   clear Hs.
   unfold Rsqr in *.
+  (* nsatz does not work; formula is perhaps false; perhaps a problem with
+     the sign of s *)
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
