@@ -2918,11 +2918,13 @@ Theorem glip : ∀ p v₁ v₂ c s,
   p ∈ sphere 1
   → ∥v₁∥ = 1%R
   → ∥v₂∥ = 1%R
+  → p × v₁ = 0%vec
+  → p × v₂ = 0%vec
   → c = (v₁ · v₂)
   → s = ∥(v₁ × v₂)∥
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
-intros * Hp Hv₁ Hv₂ Hc Hs.
+intros * Hp Hv₁ Hv₂ Hp₁ Hp₂ Hc Hs.
 assert (Hcs : (c² + s² = 1)%R).
  specialize (vec_Lagrange_identity v₁ v₂) as H.
  rewrite vec_dot_mul_diag in H.
@@ -2936,14 +2938,23 @@ assert (Hcs : (c² + s² = 1)%R).
  simpl in Hp; rewrite Rsqr_1 in Hp.
  rewrite Hp, sqrt_1.
  do 3 rewrite Rdiv_1_r.
- simpl in Hc, Hs.
- simpl in Hv₁, Hv₂.
+ simpl in Hv₁, Hv₂, Hp₁, Hp₂, Hc, Hs.
  apply (f_equal Rsqr) in Hv₁.
  apply (f_equal Rsqr) in Hv₂.
  rewrite Rsqr_sqrt in Hv₁; [ | apply nonneg_sqr_vec_norm ].
  rewrite Rsqr_sqrt in Hv₂; [ | apply nonneg_sqr_vec_norm ].
  rewrite Rsqr_1 in Hv₁, Hv₂.
+ injection Hp₁; clear Hp₁; intros H₃ H₂ H₁.
+ injection Hp₂; clear Hp₂; intros H₆ H₅ H₄.
+ apply Rminus_diag_uniq in H₁.
+ apply Rminus_diag_uniq in H₂.
+ apply Rminus_diag_uniq in H₃.
+ apply Rminus_diag_uniq in H₄.
+ apply Rminus_diag_uniq in H₅.
+ apply Rminus_diag_uniq in H₆.
  f_equal.
+  clear Hs.
+  unfold Rsqr in *.
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
