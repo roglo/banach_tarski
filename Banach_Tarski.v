@@ -2982,19 +2982,33 @@ assert (Hcs : (c² + s² = 1)%R).
     rewrite <- Ropp_mult_distr_l.
     rewrite Rplus_opp_l, Rplus_0_r, Rplus_0_l.
     rewrite fold_Rminus.
-bbb.
 (**)
 apply Rsqr_inj.
 Focus 3.
 rewrite Rsqr_mult.
 replace s²%R with (1 - c²)%R by lra.
 apply Rminus_diag_uniq.
+remember (zp * y₁ - yp * z₁)²%R as u eqn:Hu.
 unfold Rsqr; ring_simplify.
 progress repeat rewrite <- Rsqr_pow2.
+replace (x₁² * c² - 2 * x₁ * c * x₂ + c² * u + x₂² - u)%R
+with ((x₁² + u) * c² - 2 * x₁ * x₂ * c + (x₂² - u))%R
+by lra.
+apply Rmult_eq_reg_r with (r := b⁴%R).
+rewrite Rmult_0_l.
+unfold Rminus.
+do 2 rewrite Rmult_plus_distr_r.
+rewrite <- Ropp_mult_distr_l.
+do 2 rewrite fold_Rminus.
+do 2 rewrite Rmult_assoc.
+
+bbb.
+
 replace z₁²%R with (b² - x₁² - y₁²)%R by lra.
 replace z₂²%R with (b² - x₂² - y₂²)%R by lra.
 ring_simplify.
 
+bbb.
 bbb.
     apply Rmult_eq_reg_r with (r := b²%R).
      rewrite Rmult_plus_distr_r.
