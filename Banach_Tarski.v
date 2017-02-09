@@ -2915,40 +2915,60 @@ apply Rle_0_sqr.
 Qed.
 
 Theorem glip : ∀ p v₁ v₂ c s,
-  p ∈ sphere 1
-  → ∥v₁∥ = 1%R
+  ∥v₁∥ = 1%R
   → ∥v₂∥ = 1%R
-  → p · v₁ = 0%R
-  → p · v₂ = 0%R
+  → p = v₁ × v₂
+  → p ≠ 0%vec
   → c = (v₁ · v₂)
-  → s = ∥(v₁ × v₂)∥
+  → s = ∥p∥
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
-intros * Hp Hv₁ Hv₂ Hp₁ Hp₂ Hc Hs.
+intros * Hv₁ Hv₂ Hp Hpz Hc Hs.
 assert (Hcs : (c² + s² = 1)%R).
  specialize (vec_Lagrange_identity v₁ v₂) as H.
  rewrite vec_dot_mul_diag in H.
  rewrite Hv₁, Hv₂ in H.
  rewrite Rsqr_1, Rmult_1_r in H.
- rewrite <- Hc, <- Hs in H; lra.
+ rewrite <- Hc, <- Hp, <- Hs in H; lra.
 
  destruct p as (xp, yp, zp).
  destruct v₁ as (x₁, y₁, z₁).
  destruct v₂ as (x₂, y₂, z₂); simpl.
- simpl in Hp; rewrite Rsqr_1 in Hp.
- rewrite Hp, sqrt_1.
- do 3 rewrite Rdiv_1_r.
- simpl in Hv₁, Hv₂, Hp₁, Hp₂, Hc, Hs.
+ simpl in Hp.
+ injection Hp; clear Hp; intros Hzp Hyp Hxp.
+ simpl in Hv₁, Hv₂, Hc, Hs.
  apply (f_equal Rsqr) in Hv₁.
  apply (f_equal Rsqr) in Hv₂.
  rewrite Rsqr_sqrt in Hv₁; [ | apply nonneg_sqr_vec_norm ].
  rewrite Rsqr_sqrt in Hv₂; [ | apply nonneg_sqr_vec_norm ].
  rewrite Rsqr_1 in Hv₁, Hv₂.
- f_equal.
-  clear Hs.
-  unfold Rsqr in *.
-  (* nsatz does not work; formula is perhaps false; perhaps a problem with
-     the sign of s *)
+ rewrite <- Hs.
+ assert (Hsz : s ≠ 0%R).
+  intros H; rewrite Hs in H.
+  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in H.
+  destruct H as (H1 & H2 & H3).
+  now rewrite H1, H2, H3 in Hpz.
+
+  rewrite Rmult_div_same; [ | easy ].
+  rewrite Rmult_div_same; [ | easy ].
+  rewrite Rmult_div_same; [ | easy ].
+  f_equal.
+   apply Rmult_eq_reg_r with (r := s²%R).
+   unfold Rsqr; field_simplify; [ f_equal | easy ].
+   progress repeat rewrite <- Rsqr_pow2.
+   replace s²%R with (1 - c²)%R by lra.
+   clear s Hs Hcs Hsz.
+   subst.
+   unfold Rsqr.
+   ring_simplify.
+   progress repeat rewrite <- Rsqr_pow2.
+   progress replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
+   progress replace z₂²%R with (1 - x₂² - y₂²)%R by lra.
+   unfold Rsqr.
+   ring_simplify.
+   progress repeat rewrite <- Rsqr_pow2.
+   (* mon cul, ouais *)
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
