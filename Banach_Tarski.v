@@ -2914,6 +2914,23 @@ rewrite vec_dot_mul_diag.
 apply Rle_0_sqr.
 Qed.
 
+Theorem glip : ∀ p v₁ v₂ c s,
+  p ∈ sphere 1
+  → ∥v₁∥ = 1%R
+  → ∥v₂∥ = 1%R
+  → c = (v₁ · v₂)
+  → s = ∥(v₁ × v₂)∥
+  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
+Proof.
+intros * Hp Hv₁ Hv₂ Hc Hs.
+assert (Hcs : (c² + s² = 1)%R).
+ specialize (vec_Lagrange_identity v₁ v₂) as H.
+ rewrite vec_dot_mul_diag in H.
+ rewrite Hv₁, Hv₂ in H.
+ rewrite Rsqr_1, Rmult_1_r in H.
+ rewrite <- Hc, <- Hs in H; lra.
+bbb.
+
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -2952,6 +2969,7 @@ assert (Hcs : (c² + s² = 1)%R).
   rewrite <- Rsqr_0 in Hbz.
   apply Rsqr_incrst_0 in Hbz; [ | lra | ].
    clear a p₁ p₂ Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hb Hv₁ Hv₂.
+bbb.
    destruct p as (xp, yp, zp).
    destruct v₁ as (x₁, y₁, z₁).
    destruct v₂ as (x₂, y₂, z₂); simpl in *.
@@ -3001,7 +3019,13 @@ do 2 rewrite Rmult_plus_distr_r.
 rewrite <- Ropp_mult_distr_l.
 do 2 rewrite fold_Rminus.
 do 2 rewrite Rmult_assoc.
-
+progress repeat rewrite Rsqr_pow2.
+replace (c ^ 2 * b⁴)%R with ((c * b ^ 2) ^ 2)%R by lra.
+replace (c * b⁴)%R with (b ^ 2 * (c * b ^ 2))%R by lra.
+progress repeat rewrite <- Rsqr_pow2.
+rewrite Hc.
+rewrite Rmult_div_same.
+ring_simplify.
 bbb.
 
 replace z₁²%R with (b² - x₁² - y₁²)%R by lra.
