@@ -2929,6 +2929,21 @@ assert (Hcs : (c² + s² = 1)%R).
  rewrite Hv₁, Hv₂ in H.
  rewrite Rsqr_1, Rmult_1_r in H.
  rewrite <- Hc, <- Hs in H; lra.
+
+ destruct p as (xp, yp, zp).
+ destruct v₁ as (x₁, y₁, z₁).
+ destruct v₂ as (x₂, y₂, z₂); simpl.
+ simpl in Hp; rewrite Rsqr_1 in Hp.
+ rewrite Hp, sqrt_1.
+ do 3 rewrite Rdiv_1_r.
+ simpl in Hc, Hs.
+ simpl in Hv₁, Hv₂.
+ apply (f_equal Rsqr) in Hv₁.
+ apply (f_equal Rsqr) in Hv₂.
+ rewrite Rsqr_sqrt in Hv₁; [ | apply nonneg_sqr_vec_norm ].
+ rewrite Rsqr_sqrt in Hv₂; [ | apply nonneg_sqr_vec_norm ].
+ rewrite Rsqr_1 in Hv₁, Hv₂.
+ f_equal.
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
