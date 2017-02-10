@@ -3026,13 +3026,30 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  now rewrite Rinv_l.
 
  assert (Hvvz : v₁ × v₂ ≠ 0%vec).
-  intros H.
-  apply vec_cross_mul_eq_0 in H.
-  destruct H as (d & e & Hd & He & Hde).
-  rewrite Hv₁, Hv₂ in Hde.
-  (* pfff... fatigant *)
-bbb.
   rewrite Hv₁, Hv₂; intros H.
+  rewrite <- vec_const_mul_cross_distr_l in H.
+  rewrite <- vec_const_mul_cross_distr_r in H.
+(*
+  rewrite vec_const_mul_assoc in H.
+  rewrite fold_Rsqr in H.
+  rewrite Rsqr_inv in H.
+*)
+  apply eq_vec_const_mul_0 in H.
+  destruct H as [H| H].
+   apply Rinv_neq_0_compat in H; [ easy | ].
+   clear H; intros H.
+   apply sqrt_eq_0 in H; lra.
+
+   apply eq_vec_const_mul_0 in H.
+   destruct H as [H| H].
+    apply Rinv_neq_0_compat in H; [ easy | ].
+    clear H; intros H.
+    apply sqrt_eq_0 in H; lra.
+
+    rewrite vec_cross_mul_sub_distr_l in H.
+    do 2 rewrite vec_cross_mul_sub_distr_r in H.
+bbb.
+
   destruct p as (xp, yp, zp).
   destruct p₁ as (x₁, y₁, z₁).
   destruct p₂ as (x₂, y₂, z₂); simpl.

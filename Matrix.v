@@ -851,21 +851,13 @@ split; intros H.
  now rewrite vec_add_0_r.
 Qed.
 
-Theorem vec_cross_mul_integral : ∀ a v, (a ⁎ v = 0)%vec → a = 0%R ∨ v = 0%vec.
+Theorem vec_const_mul_cross_distr_l : ∀ k u v, k ⁎ (u × v) = (k ⁎ u) × v.
 Proof.
-intros a (x, y, z) Hav; simpl in Hav.
-injection Hav; clear Hav; intros Hz Hy Hx.
-apply Rmult_integral in Hx.
-apply Rmult_integral in Hy.
-apply Rmult_integral in Hz.
-destruct Hx as [Hx| Hx]; [ now left | subst x ].
-destruct Hy as [Hy| Hy]; [ now left | subst y ].
-destruct Hz as [Hz| Hz]; [ now left | subst z ].
-now right.
+intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
+f_equal; ring.
 Qed.
 
-Theorem vec_const_mul_cross_distr_l : ∀ k u v,
-  vec_const_mul k (u × v) = vec_const_mul k u × v.
+Theorem vec_const_mul_cross_distr_r : ∀ k u v, k ⁎ (u × v) = u × (k ⁎ v).
 Proof.
 intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 f_equal; ring.
