@@ -2914,7 +2914,7 @@ rewrite vec_dot_mul_diag.
 apply Rle_0_sqr.
 Qed.
 
-Theorem glip : ∀ p v₁ v₂ c s,
+Theorem rotate_matrix_of_two_vectors : ∀ p v₁ v₂ c s,
   ∥v₁∥ = 1%R
   → ∥v₂∥ = 1%R
   → p = v₁ × v₂
@@ -2954,21 +2954,26 @@ assert (Hcs : (c² + s² = 1)%R).
   rewrite Rmult_div_same; [ | easy ].
   rewrite Rmult_div_same; [ | easy ].
   f_equal.
-   apply Rmult_eq_reg_r with (r := s²%R).
-   unfold Rsqr; field_simplify; [ f_equal | easy ].
-   progress repeat rewrite <- Rsqr_pow2.
-   replace s²%R with (1 - c²)%R by lra.
-   clear s Hs Hcs Hsz.
-   subst.
-   unfold Rsqr.
+   rewrite Rsqr_div; [ | easy ].
+   unfold Rsqr, Rdiv.
+   rewrite Rinv_mult_distr; [ | lra | lra ].
+   do 4 rewrite fold_Rdiv.
+   progress replace
+     ((xp * xp * (/ s / s) * (1 - c) + c) * x₁ +
+      (xp / s * (yp / s) * (1 - c) - zp) * y₁ +
+      (xp / s * (zp / s) * (1 - c) + yp) * z₁)%R
+   with
+   (xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
+    c * x₁ - zp * y₁ + yp * z₁)%R
+     by lra.
+   assert (H : (xp * x₁ + yp * y₁ + zp * z₁ = 0)%R) by (subst; lra).
+   rewrite H, Rmult_0_r, Rmult_0_l, Rplus_0_l; clear H.
+   rewrite Hc, Hyp, Hzp.
+   do 3 rewrite Rsqr_pow2 in Hv₁.
    ring_simplify.
-   progress repeat rewrite <- Rsqr_pow2.
-   progress replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
-   progress replace z₂²%R with (1 - x₂² - y₂²)%R by lra.
-   unfold Rsqr.
-   apply Rminus_diag_uniq.
-   ring_simplify.
-   progress repeat rewrite <- Rsqr_pow2.
+   rewrite Rmult_comm.
+   do 2 rewrite <- Rmult_plus_distr_l.
+   now rewrite Hv₁, Rmult_1_r.
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
