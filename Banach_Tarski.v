@@ -3007,13 +3007,14 @@ Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   → a = latitude p p₁
   → a = latitude p p₂
   → (a² < 1)%R
+  → p₁ × p₂ ≠ 0%vec
   → v₁ = / √ (1 - a²)%R ⁎ (p₁ - a ⁎ p)%vec
   → v₂ = / √ (1 - a²)%R ⁎ (p₂ - a ⁎ p)%vec
   → c = (v₁ · v₂)
-  → s = ∥p∥
+  → s = ∥(v₁ × v₂)∥
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hc Hs.
 assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  assert (H : √ (1 - a²) ≠ 0%R) by (intros H; apply sqrt_eq_0 in H; lra).
  eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
@@ -3024,8 +3025,12 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
- specialize (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂).
- (* oui, non, faut voir... *)
+ assert (Hvvz : v₁ × v₂ ≠ 0%vec).
+  rewrite Hv₁, Hv₂.
+bbb.
+ specialize
+   (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂
+      eq_refl Hvvz).
 bbb.
 
  assert (Hpvv : p = v₁ × v₂).
