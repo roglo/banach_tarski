@@ -2974,7 +2974,15 @@ assert (Hcs : (c² + s² = 1)%R).
   with
     (yp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
      zp * x₁ + c * y₁ - xp * z₁)%R by lra.
+  replace
+    ((xp / s * (zp / s) * (1 - c) - yp) * x₁ +
+     (yp / s * (zp / s) * (1 - c) + xp) * y₁ +
+     (zp * zp * (/ s / s) * (1 - c) + c) * z₁)%R
+  with
+    (zp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
+     - yp * x₁ + xp * y₁ + c * z₁)%R by lra.
   rewrite H, Rmult_0_r, Rmult_0_l, Rplus_0_l; clear H.
+  do 2 rewrite Rmult_0_r, Rmult_0_l, Rplus_0_l.
   rewrite Hc, Hyp, Hzp.
   do 3 rewrite Rsqr_pow2 in Hv₁.
   f_equal.
@@ -2984,10 +2992,14 @@ assert (Hcs : (c² + s² = 1)%R).
    now rewrite Hv₁, Rmult_1_r.
 
    ring_simplify.
-   rewrite Rplus_assoc, <- Rmult_plus_distr_r.
+   rewrite Rmult_comm, <- Rmult_plus_distr_l.
    replace (x₁ ^ 2 + y₁ ^ 2)%R with (1 - z₁ ^ 2)%R by lra.
    now rewrite Hxp; ring_simplify.
-bbb.
+
+   ring_simplify.
+   replace (z₁ ^ 2)%R with (1 - x₁ ^ 2 - y₁ ^ 2)%R by lra.
+   now rewrite Hxp; ring_simplify.
+Qed.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
@@ -3003,6 +3015,8 @@ Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
+bbb.
+
 assert (Hqa₁ : ∥v₁∥ = √ (1 - a²)) by now apply (latitude_norm p p₁).
 assert (Hqa₂ : ∥v₂∥ = √ (1 - a²)) by now apply (latitude_norm p p₂).
 assert (Hcs : (c² + s² = 1)%R).
