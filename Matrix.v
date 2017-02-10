@@ -955,6 +955,30 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
+Theorem vec_cross_mul_add_distr_l : ∀ u v w,
+  (u × (v + w) = u × v + u × w)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_cross_mul_add_distr_r : ∀ u v w,
+  ((u + v) × w = u × w + v × w)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_cross_mul_sub_distr_l : ∀ u v w,
+  (u × (v - w) = u × v - u × w)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_cross_mul_sub_distr_r : ∀ u v w,
+  ((u - v) × w = u × w - v × w)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.
+
 Theorem vec_opp_add_distr : ∀ u v, (- (u + v) = - u - v)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
@@ -993,6 +1017,18 @@ Qed.
 
 Theorem vec_const_mul_add_distr_r : ∀ a b v,
   ((a + b) ⁎ v = a ⁎ v + b ⁎ v)%vec.
+Proof.
+intros a b (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_const_mul_sub_distr_l : ∀ a u v,
+  (a ⁎ (u - v) = a ⁎ u - a ⁎ v)%vec.
+Proof.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_const_mul_sub_distr_r : ∀ a b v,
+  ((a - b) ⁎ v = a ⁎ v - b ⁎ v)%vec.
 Proof.
 intros a b (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.

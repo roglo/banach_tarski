@@ -3026,7 +3026,24 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  now rewrite Rinv_l.
 
  assert (Hvvz : v₁ × v₂ ≠ 0%vec).
-  rewrite Hv₁, Hv₂.
+  intros H.
+  apply vec_cross_mul_eq_0 in H.
+  destruct H as (d & e & Hd & He & Hde).
+  rewrite Hv₁, Hv₂ in Hde.
+  (* pfff... fatigant *)
+bbb.
+  rewrite Hv₁, Hv₂; intros H.
+  destruct p as (xp, yp, zp).
+  destruct p₁ as (x₁, y₁, z₁).
+  destruct p₂ as (x₂, y₂, z₂); simpl.
+
+  do 2 rewrite vec_const_mul_sub_distr_l.
+  rewrite vec_cross_mul_sub_distr_l.
+  do 2 rewrite vec_cross_mul_sub_distr_r.
+bbb.
+
+rewrite vec_cross_mul_sub_distr_l.
+
 bbb.
  specialize
    (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂
