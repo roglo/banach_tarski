@@ -3001,6 +3001,35 @@ assert (Hcs : (c² + s² = 1)%R).
    now rewrite Hxp; ring_simplify.
 Qed.
 
+Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
+  → a = latitude p p₁
+  → a = latitude p p₂
+  → (a² < 1)%R
+  → v₁ = / √ (1 - a²)%R ⁎ (p₁ - a ⁎ p)%vec
+  → ∥v₂∥ = 1%R
+  → p = v₁ × v₂
+  → p ≠ 0%vec
+  → c = (v₁ · v₂)
+  → s = ∥p∥
+  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
+Proof.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hpvv Hpz Hc Hs.
+assert (Hnv1 : ∥v₁∥ = 1%R).
+ rewrite Hv₁.
+ destruct p as (xp, yp, zp).
+ destruct p₁ as (x₁, y₁, z₁); simpl.
+ do 3 rewrite Rsqr_mult.
+ rewrite Rsqr_inv.
+  rewrite Rsqr_sqrt; [ | lra ].
+  do 2 rewrite <- Rmult_plus_distr_l.
+bbb.
+
+assert (Hcs : (c² + s² = 1)%R).
+bbb.
+
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -3015,6 +3044,7 @@ Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
+
 bbb.
 
 assert (Hqa₁ : ∥v₁∥ = √ (1 - a²)) by now apply (latitude_norm p p₁).
