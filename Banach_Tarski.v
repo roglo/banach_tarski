@@ -3024,6 +3024,10 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
+ specialize (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂).
+ (* oui, non, faut voir... *)
+bbb.
+
  assert (Hpvv : p = v₁ × v₂).
 (* ah bin non c'est pas ça *)
 bbb.
@@ -3033,7 +3037,6 @@ bbb.
   rewrite Hv₁, Hv₂; simpl.
 
   Inspect 1.
-  specialize (rotate_matrix_of_two_vectors p v₁ v₂ c s Hnv₁ Hnv₂).
 
   assert (Hcs : (c² + s² = 1)%R).
 bbb.
