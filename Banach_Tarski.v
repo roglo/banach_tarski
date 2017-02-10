@@ -3047,7 +3047,26 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
     apply sqrt_eq_0 in H; lra.
 
     rewrite vec_cross_mul_sub_distr_l in H.
-    do 2 rewrite vec_cross_mul_sub_distr_r in H.
+    rewrite vec_cross_mul_sub_distr_r in H.
+    rewrite <- vec_const_mul_cross_distr_l in H.
+    rewrite <- vec_const_mul_cross_distr_r in H.
+    rewrite vec_cross_mul_sub_distr_r in H.
+    rewrite vec_const_mul_sub_distr_l in H.
+    rewrite <- vec_const_mul_cross_distr_l in H.
+    rewrite <- vec_const_mul_sub_distr_l in H.
+    rewrite vec_cross_mul_diag in H.
+    rewrite vec_const_mul_0_r in H.
+    rewrite vec_sub_0_r in H.
+    unfold vec_sub in H.
+    rewrite <- vec_add_assoc in H.
+    do 2 rewrite vec_opp_const_mul_distr_l in H.
+    rewrite <- vec_const_mul_add_distr_l in H.
+    replace (p₁ × p) with (- (p × p₁))%vec in H.
+    2: symmetry; apply vec_cross_mul_anticomm.
+    rewrite <- vec_opp_const_mul_distr_l in H.
+    do 2 rewrite fold_vec_sub in H.
+    rewrite <- vec_cross_mul_sub_distr_l in H.
+    (* bof, pas convainquant, tout ça... *)
 bbb.
 
   destruct p as (xp, yp, zp).

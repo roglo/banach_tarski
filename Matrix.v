@@ -673,6 +673,9 @@ Proof.
 intros (x, y, z); simpl; f_equal; lra.
 Qed.
 
+Theorem fold_vec_sub : ∀ u v, (u + - v = u - v)%vec.
+Proof. intros; easy. Qed.
+
 Theorem eq_vec_const_mul_0 : ∀ a v, (a ⁎ v = 0 → a = 0%R ∨ v = 0)%vec.
 Proof.
 intros a (x, y, z) Hv; simpl in Hv; simpl.
@@ -969,6 +972,11 @@ Theorem vec_cross_mul_sub_distr_r : ∀ u v w,
   ((u - v) × w = u × w - v × w)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_cross_mul_diag : ∀ v, v × v = 0%vec.
+Proof.
+intros (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
 Theorem vec_opp_add_distr : ∀ u v, (- (u + v) = - u - v)%vec.
