@@ -403,6 +403,14 @@ destruct (Rcase_abs x²) as [Hx| Hx]; [ | easy ].
 exfalso; apply Rlt_not_le in Hx; apply Hx, Rle_0_sqr.
 Qed.
 
+Theorem Rabs_sqrt : ∀ x, Rabs (√ x) = √ x.
+Proof.
+intros.
+unfold Rabs.
+destruct (Rcase_abs (√ x)) as [Hx| Hx]; [ exfalso | easy ].
+apply Rlt_not_le in Hx; apply Hx, sqrt_pos.
+Qed.
+
 Theorem sqrt_inv : ∀ x, (0 < x)%R → (√ (/ x) = / √ x)%R.
 Proof.
 intros * Hx.

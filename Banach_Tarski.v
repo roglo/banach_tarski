@@ -2868,7 +2868,6 @@ injection Hm; clear Hm; intros Hz Hy Hx.
 simpl; nsatz.
 Qed.
 
-
 Theorem latitude_norm : ∀ p p₁ v a,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -3015,7 +3014,17 @@ Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
-assert (Hnv1 : ∥v₁∥ = 1%R).
+assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
+ assert (H : √ (1 - a²) ≠ 0%R) by (intros H; apply sqrt_eq_0 in H; lra).
+ eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
+ eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
+ rewrite Hv₁, Hv₂.
+ do 2 rewrite vec_norm_vec_const_mul.
+ rewrite Rabs_Rinv; [ | easy ].
+ rewrite Rabs_sqrt, Ha₁, Ha₂.
+ now rewrite Rinv_l.
+
+bbb.
  rewrite Hv₁.
  destruct p as (xp, yp, zp).
  destruct p₁ as (x₁, y₁, z₁); simpl.
