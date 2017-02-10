@@ -2966,9 +2966,9 @@ assert (Hcs : (c² + s² = 1)%R).
    progress replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
    progress replace z₂²%R with (1 - x₂² - y₂²)%R by lra.
    unfold Rsqr.
+   apply Rminus_diag_uniq.
    ring_simplify.
    progress repeat rewrite <- Rsqr_pow2.
-   (* mon cul, ouais *)
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
