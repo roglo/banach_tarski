@@ -3009,14 +3009,12 @@ Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   → a = latitude p p₂
   → (a² < 1)%R
   → v₁ = / √ (1 - a²)%R ⁎ (p₁ - a ⁎ p)%vec
-  → ∥v₂∥ = 1%R
-  → p = v₁ × v₂
-  → p ≠ 0%vec
+  → v₂ = / √ (1 - a²)%R ⁎ (p₂ - a ⁎ p)%vec
   → c = (v₁ · v₂)
   → s = ∥p∥
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hpvv Hpz Hc Hs.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
 assert (Hnv1 : ∥v₁∥ = 1%R).
  rewrite Hv₁.
  destruct p as (xp, yp, zp).
@@ -3025,6 +3023,31 @@ assert (Hnv1 : ∥v₁∥ = 1%R).
  rewrite Rsqr_inv.
   rewrite Rsqr_sqrt; [ | lra ].
   do 2 rewrite <- Rmult_plus_distr_l.
+  apply Rsqr_inj; [ | lra | ].
+  Focus 2.
+  rewrite Rsqr_1.
+  rewrite Rsqr_sqrt.
+  apply Rmult_eq_reg_l with (r := (1 - a²)%R); [ | lra ].
+  rewrite <- Rmult_assoc.
+  rewrite Rinv_r; [ | lra ].
+  rewrite Rmult_1_l, Rmult_1_r.
+  do 3 rewrite fold_Rminus.
+  simpl in Hp, Hp₁.
+  rewrite Rsqr_1 in Hp, Hp₁.
+  enough (Hxyz : (x₁ * xp + y₁ * yp + z₁ * zp = 0)%R).
+  unfold Rsqr; ring_simplify.
+  progress repeat rewrite <- Rsqr_pow2.
+  replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
+  ring_simplify.
+  replace
+    (-2 * x₁ * a * xp - 2 * a * y₁ * yp - 2 * a * z₁ * zp +
+     a² * xp² + a² * yp² + a² * zp² + 1)%R
+  with
+    (-2 * a * (x₁ * xp + y₁ * yp + z₁ * zp) +
+     a² * (xp² + yp² + zp²) + 1)%R by lra.
+  rewrite Hp, Hxyz.
+  rewrite Rmult_0_r, Rplus_0_l, Rmult_1_r.
+  (* y a quequ' chose qui cloche là-d'dans *)
 bbb.
 
 assert (Hcs : (c² + s² = 1)%R).
