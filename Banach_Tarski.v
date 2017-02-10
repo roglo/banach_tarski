@@ -3024,43 +3024,18 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
+ assert (Hpvv : p = v₁ × v₂).
+(* ah bin non c'est pas ça *)
 bbb.
- rewrite Hv₁.
- destruct p as (xp, yp, zp).
- destruct p₁ as (x₁, y₁, z₁); simpl.
-(**)
-simpl in Hv₁.
-do 3 rewrite fold_Rminus in Hv₁.
- do 3 rewrite Rsqr_mult.
- rewrite Rsqr_inv.
-  rewrite Rsqr_sqrt; [ | lra ].
-  do 2 rewrite <- Rmult_plus_distr_l.
-  apply Rsqr_inj; [ | lra | ].
-  Focus 2.
-  rewrite Rsqr_1.
-  rewrite Rsqr_sqrt.
-  apply Rmult_eq_reg_l with (r := (1 - a²)%R); [ | lra ].
-  rewrite <- Rmult_assoc.
-  rewrite Rinv_r; [ | ].
-  rewrite Rmult_1_l, Rmult_1_r.
-  do 3 rewrite fold_Rminus.
-  simpl in Hp, Hp₁.
-  rewrite Rsqr_1 in Hp, Hp₁.
-  enough (Hxyz : (x₁ * xp + y₁ * yp + z₁ * zp = a)%R).
-  unfold Rsqr; ring_simplify.
-  progress repeat rewrite <- Rsqr_pow2.
-  replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
-  ring_simplify.
-  replace
-    (-2 * x₁ * a * xp - 2 * a * y₁ * yp - 2 * a * z₁ * zp +
-     a² * xp² + a² * yp² + a² * zp² + 1)%R
-  with
-    (-2 * a * (x₁ * xp + y₁ * yp + z₁ * zp) +
-     a² * (xp² + yp² + zp²) + 1)%R by lra.
-  rewrite Hp, Hxyz, Rmult_assoc, fold_Rsqr; lra.
-bbb.
+  destruct p as (xp, yp, zp).
+  destruct p₁ as (x₁, y₁, z₁).
+  destruct p₂ as (x₂, y₂, z₂).
+  rewrite Hv₁, Hv₂; simpl.
 
-assert (Hcs : (c² + s² = 1)%R).
+  Inspect 1.
+  specialize (rotate_matrix_of_two_vectors p v₁ v₂ c s Hnv₁ Hnv₂).
+
+  assert (Hcs : (c² + s² = 1)%R).
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
