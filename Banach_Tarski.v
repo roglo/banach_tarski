@@ -2953,27 +2953,40 @@ assert (Hcs : (c² + s² = 1)%R).
   rewrite Rmult_div_same; [ | easy ].
   rewrite Rmult_div_same; [ | easy ].
   rewrite Rmult_div_same; [ | easy ].
+  assert (H : (xp * x₁ + yp * y₁ + zp * z₁ = 0)%R) by (subst; lra).
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | easy ].
+  unfold Rsqr, Rdiv.
+  rewrite Rinv_mult_distr; [ | lra | lra ].
+  do 4 rewrite fold_Rdiv.
+  progress replace
+    ((xp * xp * (/ s / s) * (1 - c) + c) * x₁ +
+     (xp / s * (yp / s) * (1 - c) - zp) * y₁ +
+     (xp / s * (zp / s) * (1 - c) + yp) * z₁)%R
+  with
+    (xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
+     c * x₁ - zp * y₁ + yp * z₁)%R by lra.
+  progress replace
+    ((xp / s * (yp / s) * (1 - c) + zp) * x₁ +
+     (yp * yp * (/ s / s) * (1 - c) + c) * y₁ +
+     (yp / s * (zp / s) * (1 - c) - xp) * z₁)%R
+  with
+    (yp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
+     zp * x₁ + c * y₁ - xp * z₁)%R by lra.
+  rewrite H, Rmult_0_r, Rmult_0_l, Rplus_0_l; clear H.
+  rewrite Hc, Hyp, Hzp.
+  do 3 rewrite Rsqr_pow2 in Hv₁.
   f_equal.
-   rewrite Rsqr_div; [ | easy ].
-   unfold Rsqr, Rdiv.
-   rewrite Rinv_mult_distr; [ | lra | lra ].
-   do 4 rewrite fold_Rdiv.
-   progress replace
-     ((xp * xp * (/ s / s) * (1 - c) + c) * x₁ +
-      (xp / s * (yp / s) * (1 - c) - zp) * y₁ +
-      (xp / s * (zp / s) * (1 - c) + yp) * z₁)%R
-   with
-   (xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
-    c * x₁ - zp * y₁ + yp * z₁)%R
-     by lra.
-   assert (H : (xp * x₁ + yp * y₁ + zp * z₁ = 0)%R) by (subst; lra).
-   rewrite H, Rmult_0_r, Rmult_0_l, Rplus_0_l; clear H.
-   rewrite Hc, Hyp, Hzp.
-   do 3 rewrite Rsqr_pow2 in Hv₁.
    ring_simplify.
    rewrite Rmult_comm.
    do 2 rewrite <- Rmult_plus_distr_l.
    now rewrite Hv₁, Rmult_1_r.
+
+   ring_simplify.
+   rewrite Rplus_assoc, <- Rmult_plus_distr_r.
+   replace (x₁ ^ 2 + y₁ ^ 2)%R with (1 - z₁ ^ 2)%R by lra.
+   now rewrite Hxp; ring_simplify.
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
