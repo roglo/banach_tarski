@@ -3088,6 +3088,8 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  now rewrite Rinv_l.
 
  assert (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
+  rewrite Hv₁, Hv₂.
+  remember (/ √ (1 - a²))%R as b eqn:Hb.
 
 bbb.
   (* ∃ k, p = k ⁎ (v₁ × v₂) *)
