@@ -3000,6 +3000,35 @@ assert (Hcs : (c² + s² = 1)%R).
    now rewrite Hxp; ring_simplify.
 Qed.
 
+Theorem rotate_matrix_of_two_vectors2 : ∀ p v₁ v₂ c s k,
+  ∥v₁∥ = 1%R
+  → ∥v₂∥ = 1%R
+  → p = k ⁎ (v₁ × v₂)
+  → p ≠ 0%vec
+  → c = (v₁ · v₂)
+  → s = ∥(/ k ⁎ p)∥
+  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
+Proof.
+intros * Hv₁ Hv₂ Hp Hpz Hc Hs.
+assert (Hk : k ≠ 0%R) by (now intros H; rewrite H, vec_const_mul_0_l in Hp).
+assert (Hkp : / k ⁎ p = v₁ × v₂).
+ rewrite Hp; rewrite vec_const_mul_assoc.
+ rewrite Rinv_l; [ | easy ].
+ now rewrite vec_const_mul_1_l.
+
+ assert (Hkpz : / k ⁎ p ≠ 0%vec).
+  rewrite Hkp; intros H; rewrite H in Hp.
+  now rewrite vec_const_mul_0_r in Hp.
+
+  specialize
+    (rotate_matrix_of_two_vectors (/ k ⁎ p) v₁ v₂ c s Hv₁ Hv₂ Hkp Hkpz Hc Hs)
+    as H.
+Search matrix_of_axis_angle.
+bbb.
+  destruct p as (xp, yp, zp).
+  simpl in H; simpl.
+bbb.
+
 Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
