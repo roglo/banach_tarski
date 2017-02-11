@@ -3087,7 +3087,10 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
- enough (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
+ assert (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
+
+bbb.
+  (* ∃ k, p = k ⁎ (v₁ × v₂) *)
   rewrite matrix_mul_axis with (k := (/ k)%R).
   apply rotate_matrix_of_two_vectors; try easy.
 bbb.
