@@ -3000,6 +3000,39 @@ assert (Hcs : (c² + s² = 1)%R).
    now rewrite Hxp; ring_simplify.
 Qed.
 
+Theorem matrix_mul_axis : ∀ p c s k,
+  (0 < k)%R
+  → matrix_of_axis_angle (p, c, s) = matrix_of_axis_angle (k ⁎ p, c, s).
+Proof.
+intros * Hk.
+destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
+ now subst p; simpl; rewrite Rmult_0_r.
+
+ destruct p as (xp, yp, zp); simpl.
+ remember (√ ((k * xp)² + (k * yp)² + (k * zp)²))%R as a eqn:Ha.
+ do 3 rewrite Rsqr_mult in Ha.
+ do 2 rewrite <- Rmult_plus_distr_l in Ha.
+ rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
+ rewrite sqrt_Rsqr in Ha; [ | lra ].
+ remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
+ assert (Hx : ∀ x, (k * x / a = x / b)%R).
+  assert (Hbz : b ≠ 0%R).
+   subst b; intros H.
+   apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+   apply sqr_vec_norm_eq_0 in H.
+   destruct H as (H1 & H2 & H3).
+   now rewrite H1, H2, H3 in Hpz.
+
+   intros x; subst a; unfold Rdiv.
+   rewrite Rinv_mult_distr; [ | lra | easy ].
+   rewrite <- Rmult_assoc.
+   replace (k * x * / k)%R with (/ k * k * x)%R by lra.
+   rewrite Rinv_l; lra.
+
+  now do 3 rewrite Hx.
+Qed.
+
+(* not sure this lemma is required *)
 Theorem rotate_matrix_of_two_vectors_with_mul_axis : ∀ p v₁ v₂ c s k,
   (0 ≤ k)%R
   → ∥v₁∥ = 1%R
@@ -3011,48 +3044,22 @@ Theorem rotate_matrix_of_two_vectors_with_mul_axis : ∀ p v₁ v₂ c s k,
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
 intros * Hknn Hv₁ Hv₂ Hp Hpz Hc Hs.
-assert (Hk : k ≠ 0%R) by (now intros H; rewrite H, vec_const_mul_0_l in Hp).
-assert (Hkp : / k ⁎ p = v₁ × v₂).
- rewrite Hp; rewrite vec_const_mul_assoc.
- rewrite Rinv_l; [ | easy ].
- now rewrite vec_const_mul_1_l.
+destruct (Req_dec k 0) as [Hkz| Hkz].
+ now rewrite Hkz, vec_const_mul_0_l in Hp.
 
- assert (Hkpz : / k ⁎ p ≠ 0%vec).
-  rewrite Hkp; intros H; rewrite H in Hp.
-  now rewrite vec_const_mul_0_r in Hp.
+ rewrite matrix_mul_axis with (k := (/ k)%R).
+  apply (f_equal (vec_const_mul (/ k))) in Hp.
+  rewrite vec_const_mul_assoc in Hp.
+  rewrite Rinv_l in Hp; [ | easy ].
+  rewrite vec_const_mul_1_l in Hp.
+  apply rotate_matrix_of_two_vectors; try assumption.
+  intros H.
+  apply eq_vec_const_mul_0 in H.
+  destruct H as [H| H]; [ | easy ].
+  now apply Rinv_neq_0_compat in H.
 
-  specialize
-    (rotate_matrix_of_two_vectors (/ k ⁎ p) v₁ v₂ c s Hv₁ Hv₂ Hkp Hkpz Hc Hs)
-    as H.
-  destruct p as (xp, yp, zp).
-  simpl in H.
-  remember (√ ((/ k * xp)² + (/ k * yp)² + (/ k * zp)²))%R as a eqn:Ha.
-  do 3 rewrite Rsqr_mult in Ha.
-  do 2 rewrite <- Rmult_plus_distr_l in Ha.
-  assert (Hikz : (/ k ≠ 0)%R) by now apply Rinv_neq_0_compat.
-  rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
-  assert (Hki : (0 ≤ / k)%R).
-   apply Rmult_le_reg_r with (r := k); [ lra | ].
-   rewrite Rinv_l; [ lra | easy ].
-
-   rewrite sqrt_Rsqr in Ha; [ | easy ].
-   simpl; remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
-   assert (Hx : ∀ x, (/ k * x / a = x / b)%R).
-    assert (Hbz : b ≠ 0%R).
-     subst b;  clear H; intros H.
-     apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-     apply sqr_vec_norm_eq_0 in H.
-     destruct H as (H1 & H2 & H3).
-     now rewrite H1, H2, H3 in Hpz.
-
-     intros x; subst a; unfold Rdiv.
-     rewrite Rinv_mult_distr; [ | easy | easy ].
-     rewrite Rinv_involutive; [ | easy ].
-     rewrite <- Rmult_assoc.
-     replace (/ k * x * k)%R with (/ k * k * x)%R by lra.
-     rewrite Rinv_l; [ lra | easy ].
-
-    now do 3 rewrite Hx in H; simpl.
+  apply Rmult_lt_reg_r with (r := k); [ lra | ].
+  rewrite Rinv_l; [ lra | easy ].
 Qed.
 
 Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
