@@ -3000,8 +3000,9 @@ assert (Hcs : (c² + s² = 1)%R).
    now rewrite Hxp; ring_simplify.
 Qed.
 
-Theorem rotate_matrix_of_two_vectors2 : ∀ p v₁ v₂ c s k,
-  ∥v₁∥ = 1%R
+Theorem rotate_matrix_of_two_vectors_with_mul_axis : ∀ p v₁ v₂ c s k,
+  (0 ≤ k)%R
+  → ∥v₁∥ = 1%R
   → ∥v₂∥ = 1%R
   → p = k ⁎ (v₁ × v₂)
   → p ≠ 0%vec
@@ -3009,7 +3010,7 @@ Theorem rotate_matrix_of_two_vectors2 : ∀ p v₁ v₂ c s k,
   → s = ∥(/ k ⁎ p)∥
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
-intros * Hv₁ Hv₂ Hp Hpz Hc Hs.
+intros * Hknn Hv₁ Hv₂ Hp Hpz Hc Hs.
 assert (Hk : k ≠ 0%R) by (now intros H; rewrite H, vec_const_mul_0_l in Hp).
 assert (Hkp : / k ⁎ p = v₁ × v₂).
  rewrite Hp; rewrite vec_const_mul_assoc.
@@ -3025,11 +3026,34 @@ assert (Hkp : / k ⁎ p = v₁ × v₂).
     as H.
   destruct p as (xp, yp, zp).
   simpl in H.
-  remember ((/ k * xp)² + (/ k * yp)² + (/ k * zp)²)%R as u eqn:Hu.
-  do 3 rewrite Rsqr_mult in Hu.
-  do 2 rewrite <- Rmult_plus_distr_l in Hu.
+  remember (√ ((/ k * xp)² + (/ k * yp)² + (/ k * zp)²))%R as a eqn:Ha.
+  do 3 rewrite Rsqr_mult in Ha.
+  do 2 rewrite <- Rmult_plus_distr_l in Ha.
+  assert (Hikz : (/ k ≠ 0)%R) by now apply Rinv_neq_0_compat.
+  rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
+  assert (Hki : (0 ≤ / k)%R).
+   apply Rmult_le_reg_r with (r := k); [ lra | ].
+   rewrite Rinv_l; [ lra | easy ].
 
-bbb.
+   rewrite sqrt_Rsqr in Ha; [ | easy ].
+   simpl; remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
+   assert (Hx : ∀ x, (/ k * x / a = x / b)%R).
+    assert (Hbz : b ≠ 0%R).
+     subst b;  clear H; intros H.
+     apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+     apply sqr_vec_norm_eq_0 in H.
+     destruct H as (H1 & H2 & H3).
+     now rewrite H1, H2, H3 in Hpz.
+
+     intros x; subst a; unfold Rdiv.
+     rewrite Rinv_mult_distr; [ | easy | easy ].
+     rewrite Rinv_involutive; [ | easy ].
+     rewrite <- Rmult_assoc.
+     replace (/ k * x * k)%R with (/ k * k * x)%R by lra.
+     rewrite Rinv_l; [ lra | easy ].
+
+    now do 3 rewrite Hx in H; simpl.
+Qed.
 
 Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
@@ -3056,7 +3080,10 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
-Check rotate_matrix_of_two_vectors.
+Check rotate_matrix_of_two_vectors_with_mul_axis.
+ specialize
+   (rotate_matrix_of_two_vectors_with_mul_axis).
+bbb.
  specialize
    (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂
       eq_refl).
