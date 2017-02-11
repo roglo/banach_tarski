@@ -3023,10 +3023,12 @@ assert (Hkp : / k ⁎ p = v₁ × v₂).
   specialize
     (rotate_matrix_of_two_vectors (/ k ⁎ p) v₁ v₂ c s Hv₁ Hv₂ Hkp Hkpz Hc Hs)
     as H.
-Search matrix_of_axis_angle.
-bbb.
   destruct p as (xp, yp, zp).
-  simpl in H; simpl.
+  simpl in H.
+  remember ((/ k * xp)² + (/ k * yp)² + (/ k * zp)²)%R as u eqn:Hu.
+  do 3 rewrite Rsqr_mult in Hu.
+  do 2 rewrite <- Rmult_plus_distr_l in Hu.
+
 bbb.
 
 Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
