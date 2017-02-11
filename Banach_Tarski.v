@@ -3025,15 +3025,17 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
+Check rotate_matrix_of_two_vectors.
+bbb.
+ specialize
+   (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂
+      eq_refl).
+bbb.
+(*
  assert (Hvvz : v₁ × v₂ ≠ 0%vec).
   rewrite Hv₁, Hv₂; intros H.
   rewrite <- vec_const_mul_cross_distr_l in H.
   rewrite <- vec_const_mul_cross_distr_r in H.
-(*
-  rewrite vec_const_mul_assoc in H.
-  rewrite fold_Rsqr in H.
-  rewrite Rsqr_inv in H.
-*)
   apply eq_vec_const_mul_0 in H.
   destruct H as [H| H].
    apply Rinv_neq_0_compat in H; [ easy | ].
@@ -3081,9 +3083,7 @@ bbb.
 rewrite vec_cross_mul_sub_distr_l.
 
 bbb.
- specialize
-   (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂
-      eq_refl Hvvz).
+*)
 bbb.
 
  assert (Hpvv : p = v₁ × v₂).
