@@ -3026,7 +3026,6 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  now rewrite Rinv_l.
 
 Check rotate_matrix_of_two_vectors.
-bbb.
  specialize
    (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂
       eq_refl).
