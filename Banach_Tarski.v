@@ -3087,13 +3087,9 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
-Check rotate_matrix_of_two_vectors_with_mul_axis.
- specialize
-   (rotate_matrix_of_two_vectors_with_mul_axis).
-bbb.
- specialize
-   (rotate_matrix_of_two_vectors (v₁ × v₂) v₁ v₂ c s Hnv₁ Hnv₂
-      eq_refl).
+ enough (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
+  rewrite matrix_mul_axis with (k := (/ k)%R).
+  apply rotate_matrix_of_two_vectors; try easy.
 bbb.
 (*
  assert (Hvvz : v₁ × v₂ ≠ 0%vec).
