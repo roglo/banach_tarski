@@ -3102,9 +3102,27 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
- assert (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
-  rewrite Hv₁, Hv₂.
+ assert (Hvvp : (v₁ × v₂) × p = 0%vec).
+  rewrite vec_double_cross_mul, Hv₁, Hv₂.
   remember (/ √ (1 - a²))%R as b eqn:Hb.
+  do 2 rewrite vec_const_dot_assoc.
+  do 2 rewrite vec_dot_mul_sub_distr_r.
+  rewrite Ha₁ at 1; rewrite Ha₂ at 2.
+  unfold latitude.
+  do 2 rewrite vec_const_dot_assoc.
+  rewrite vec_dot_mul_diag.
+  apply on_sphere_norm in Hp; [ | lra ].
+  rewrite Hp, Rsqr_1.
+  do 2 rewrite Rmult_1_r.
+  rewrite vec_dot_mul_comm, Rminus_diag_eq; [ | easy ].
+  rewrite vec_dot_mul_comm, Rminus_diag_eq; [ | easy ].
+  rewrite Rmult_0_r.
+  do 2 rewrite vec_const_mul_0_l.
+  now rewrite vec_sub_0_r.
+
+  assert (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
+   rewrite Hv₁, Hv₂.
+   remember (/ √ (1 - a²))%R as b eqn:Hb.
 bbb.
 
   (* when proved ∃ k, p = k ⁎ (v₁ × v₂) *)
