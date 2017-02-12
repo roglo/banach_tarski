@@ -3102,13 +3102,16 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
- unfold latitude in Ha₁, Ha₂.
- specialize
-   (rotate_matrix_of_two_vectors_with_mul_axis p v₁ v₂ c s) as H.
-bbb.
  assert (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
   rewrite Hv₁, Hv₂.
   remember (/ √ (1 - a²))%R as b eqn:Hb.
+bbb.
+
+  (* when proved ∃ k, p = k ⁎ (v₁ × v₂) *)
+  unfold latitude in Ha₁, Ha₂.
+  specialize
+    (rotate_matrix_of_two_vectors_with_mul_axis p v₁ v₂ c s) as H.
+bbb.
 
 bbb.
   (* ∃ k, p = k ⁎ (v₁ × v₂) *)
