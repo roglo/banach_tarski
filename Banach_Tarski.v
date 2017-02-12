@@ -3085,9 +3085,9 @@ Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   → a = latitude p p₂
   → (a² < 1)%R
   → p₁ × p₂ ≠ 0%vec
-  → v₁ = / √ (1 - a²)%R ⁎ (p₁ - a ⁎ p)%vec
-  → v₂ = / √ (1 - a²)%R ⁎ (p₂ - a ⁎ p)%vec
-  → c = (v₁ · v₂)
+  → v₁ = (/ √ (1 - a²) ⁎ (p₁ - a ⁎ p))%vec
+  → v₂ = (/ √ (1 - a²) ⁎ (p₂ - a ⁎ p))%vec
+  → c = v₁ · v₂
   → s = ∥(v₁ × v₂)∥
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
@@ -3102,6 +3102,10 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
+ unfold latitude in Ha₁, Ha₂.
+ specialize
+   (rotate_matrix_of_two_vectors_with_mul_axis p v₁ v₂ c s) as H.
+bbb.
  assert (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
   rewrite Hv₁, Hv₂.
   remember (/ √ (1 - a²))%R as b eqn:Hb.
