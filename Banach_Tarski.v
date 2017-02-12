@@ -3062,6 +3062,21 @@ destruct (Req_dec k 0) as [Hkz| Hkz].
   rewrite Rinv_l; [ lra | easy ].
 Qed.
 
+Theorem vec_cross_mul_cross_mul : ∀ u v,
+  u · v = 0%R
+  → ∥v∥ = 1%R
+  → (u × v) × v = (- u)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) Huv Hv; simpl in Huv, Hv; simpl.
+apply (f_equal Rsqr) in Hv.
+rewrite Rsqr_1 in Hv.
+rewrite Rsqr_sqrt in Hv; [ | apply nonneg_sqr_vec_norm ].
+f_equal; ring_simplify.
+ do 2 rewrite <- Rsqr_pow2; nsatz.
+ do 2 rewrite <- Rsqr_pow2; nsatz.
+ do 2 rewrite <- Rsqr_pow2; nsatz.
+Qed.
+
 Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
