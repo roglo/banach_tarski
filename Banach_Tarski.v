@@ -3120,10 +3120,14 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
   do 2 rewrite vec_const_mul_0_l.
   now rewrite vec_sub_0_r.
 
-  assert (∃ k, p = k ⁎ (v₁ × v₂)) as (k, Hk).
-   rewrite Hv₁, Hv₂.
-   remember (/ √ (1 - a²))%R as b eqn:Hb.
+  apply vec_cross_mul_eq_0 in Hvvp.
+  destruct Hvvp as (d & e & Hd & He & Hde).
+  apply (f_equal (λ u, vec_sub u (d ⁎ (v₁ × v₂)))) in Hde.
+Search (_ + _ - _ = _)%vec.
 bbb.
+  rewrite vec_sub_add_distr in Hde.
+  rewrite vec_sub_diag, vec_sub_0_l, vec_sub_0_r in Hde.
+  rewrite
 
   (* when proved ∃ k, p = k ⁎ (v₁ × v₂) *)
   unfold latitude in Ha₁, Ha₂.

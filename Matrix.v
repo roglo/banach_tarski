@@ -837,6 +837,30 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
 Qed.
 
+Theorem vec_add_cancel_l : ∀ u v w, (u + v = u + w)%vec → v = w.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
+injection H; intros; subst; f_equal; lra.
+Qed.
+
+Theorem vec_add_cancel_r : ∀ u v w, (u + w = v + w)%vec → u = v.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
+injection H; intros; subst; f_equal; lra.
+Qed.
+
+Theorem vec_sub_cancel_l : ∀ u v w, (u - v = u - w)%vec → v = w.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
+injection H; intros; subst; f_equal; lra.
+Qed.
+
+Theorem vec_sub_cancel_r : ∀ u v w, (u - w = v - w)%vec → u = v.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
+injection H; intros; subst; f_equal; lra.
+Qed.
+
 Theorem vec_sub_move_r : ∀ u v w, (u - v)%vec = w ↔ u = (w + v)%vec.
 Proof.
 intros.
