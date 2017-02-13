@@ -3109,14 +3109,17 @@ destruct (Req_dec k 0) as [Hkz| Hkz].
   rewrite Rinv_l in Hp; [ | easy ].
   rewrite vec_const_mul_1_l in Hp.
   apply rotate_matrix_of_two_vectors; try assumption.
-  intros H.
-  apply eq_vec_const_mul_0 in H.
-  destruct H as [H| H]; [ | easy ].
-  now apply Rinv_neq_0_compat in H.
+   intros H.
+   apply eq_vec_const_mul_0 in H.
+   destruct H as [H| H]; [ | easy ].
+   now apply Rinv_neq_0_compat in H.
 
-bbb.
-  apply Rmult_lt_reg_r with (r := k); [ lra | ].
-  rewrite Rinv_l; [ lra | easy ].
+   unfold Rsign.
+   destruct (Rle_dec 0 (/ k)) as [Hik| Hik]; [ now rewrite Rmult_1_l | ].
+   exfalso; apply Hik, Rlt_le.
+   apply Rinv_0_lt_compat; lra.
+
+  now apply Rinv_neq_0_compat.
 Qed.
 
 Theorem vec_cross_mul_cross_mul : ∀ u v,
