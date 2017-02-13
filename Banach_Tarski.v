@@ -3166,6 +3166,47 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
 
      apply Rnot_le_lt in Hkn.
      rewrite matrix_mul_axis with (k := (/ k)%R); [ | easy ].
+     apply (f_equal (vec_const_mul (/ k))) in Hde.
+     rewrite vec_const_mul_assoc in Hde.
+     rewrite Rinv_l in Hde; [ | easy ].
+     rewrite vec_const_mul_1_l in Hde.
+     apply rotate_matrix_of_two_vectors; try assumption.
+      intros H.
+      apply eq_vec_const_mul_0 in H.
+      destruct H as [H| H]; [ | easy ].
+      now apply Rinv_neq_0_compat in H.
+
+      unfold Rsign.
+      destruct (Rle_dec 0 (/ k)) as [Hik| Hik].
+       apply Rle_not_lt in Hik.
+       exfalso; apply Hik.
+       now apply Rinv_lt_0_compat.
+
+rewrite Hs, <- Hde.
+rewrite <- Rmult_vec_dot_mul_distr_r.
+unfold Rsign.
+destruct (Rle_dec 0 (/ k * p²%vec)) as [H| H].
+ exfalso.
+bbb.
+
+Search (0 ≤ _ * _ → _)%R.
+ apply Rmult_le_pos in H.
+
+ apply Rle_not_lt in H.
+ exfalso; apply H.
+
+       rewrite Rmult_1_l, Hs, <- Hde.
+       rewrite <- Rmult_vec_dot_mul_distr_r.
+       unfold Rsign.
+       destruct (Rle_dec 0 (/ k * p²%vec)) as [H| H].
+        now rewrite Rmult_1_l.
+
+        exfalso; apply H.
+        rewrite vec_dot_mul_diag.
+        apply Rmult_le_pos; [ easy | apply Rle_0_sqr ].
+
+       exfalso; apply Hik, Rlt_le.
+       apply Rinv_0_lt_compat; lra.
 bbb.
 (*
  assert (Hvvz : v₁ × v₂ ≠ 0%vec).
