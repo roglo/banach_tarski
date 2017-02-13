@@ -3208,6 +3208,16 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
 
     idtac.
 bbb.
+    rewrite Hvv in Hs.
+    rewrite vec_norm_0, Rmult_0_r in Hs.
+    subst s.
+    replace c with 1%R.
+    destruct p as (xp, yp, zp); simpl.
+    rewrite Rminus_diag_eq; [ | easy ].
+    progress repeat rewrite Rmult_0_r.
+    progress repeat rewrite Rplus_0_l.
+    rewrite Rminus_0_r.
+bbb.
     rewrite Hv₁, Hv₂; intros H.
     rewrite <- vec_const_mul_cross_distr_l in H.
     rewrite <- vec_const_mul_cross_distr_r in H.
