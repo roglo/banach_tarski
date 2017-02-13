@@ -3056,38 +3056,6 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
     f_equal; lra.
 Qed.
 
-Theorem prev_matrix_mul_axis : ∀ p c s k,
-  (0 < k)%R
-  → matrix_of_axis_angle (p, c, s) = matrix_of_axis_angle (k ⁎ p, c, s).
-Proof.
-intros * Hk.
-destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
- now subst p; simpl; rewrite Rmult_0_r.
-
- destruct p as (xp, yp, zp); simpl.
- remember (√ ((k * xp)² + (k * yp)² + (k * zp)²))%R as a eqn:Ha.
- do 3 rewrite Rsqr_mult in Ha.
- do 2 rewrite <- Rmult_plus_distr_l in Ha.
- rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
- rewrite sqrt_Rsqr in Ha; [ | lra ].
- remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
- assert (Hx : ∀ x, (k * x / a = x / b)%R).
-  assert (Hbz : b ≠ 0%R).
-   subst b; intros H.
-   apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-   apply sqr_vec_norm_eq_0 in H.
-   destruct H as (H1 & H2 & H3).
-   now rewrite H1, H2, H3 in Hpz.
-
-   intros x; subst a; unfold Rdiv.
-   rewrite Rinv_mult_distr; [ | lra | easy ].
-   rewrite <- Rmult_assoc.
-   replace (k * x * / k)%R with (/ k * k * x)%R by lra.
-   rewrite Rinv_l; lra.
-
-  now do 3 rewrite Hx.
-Qed.
-
 (* not sure this lemma is important *)
 Theorem rotate_matrix_of_two_vectors_with_mul_axis : ∀ p v₁ v₂ c s k,
   (0 ≤ k)%R
@@ -3194,12 +3162,28 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
   apply vec_const_mul_div in Hde; [ | easy ].
   unfold latitude in Ha₁, Ha₂.
   remember (- d / e)%R as k eqn:Hk.
-  destruct (Rle_dec 0 k) as [Hkp| Hkn].
-   eapply rotate_matrix_of_two_vectors_with_mul_axis; try eassumption.
+  assert (Hpz : p ≠ 0%vec).
+   intros H; rewrite H in Hp; simpl in Hp.
+   rewrite Rsqr_0, Rsqr_1 in Hp; lra.
 
-   (* case k < 0 *)
-   Focus 3.
-   apply Rnot_le_lt in Hkn.
+   destruct (Rle_dec 0 k) as [Hkp| Hkn].
+    eapply rotate_matrix_of_two_vectors_with_mul_axis; try eassumption.
+    rewrite Hs, Hde.
+    rewrite vec_const_mul_assoc.
+    rewrite Rinv_l.
+     rewrite vec_const_mul_1_l.
+     rewrite vec_const_dot_assoc.
+     rewrite vec_dot_mul_diag.
+     unfold Rsign.
+     destruct (Rle_dec 0 (k * ∥(v₁ × v₂)∥²)) as [H| H].
+      now rewrite Rmult_1_l.
+
+      exfalso; apply H.
+      apply Rmult_le_pos; [ easy | apply Rle_0_sqr ].
+
+     now intros H; rewrite H, vec_const_mul_0_l in Hde.
+
+    apply Rnot_le_lt in Hkn.
 
 bbb.
 (*
