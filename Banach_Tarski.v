@@ -3127,15 +3127,12 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
   rewrite vec_opp_const_mul_distr_l in Hde.
   apply vec_const_mul_div in Hde; [ | easy ].
   unfold latitude in Ha₁, Ha₂.
-  specialize
-    (rotate_matrix_of_two_vectors_with_mul_axis p v₁ v₂ c s (- d / e)) as H.
-  (* merde, y a des histoires de signes *)
-bbb.
+  remember (- d / e)%R as k eqn:Hk.
+  destruct (Rle_dec 0 k) as [Hkp| Hkn].
+   eapply rotate_matrix_of_two_vectors_with_mul_axis; try eassumption.
 
-bbb.
-  (* ∃ k, p = k ⁎ (v₁ × v₂) *)
-  rewrite matrix_mul_axis with (k := (/ k)%R).
-  apply rotate_matrix_of_two_vectors; try easy.
+   (* case k < 0 *)
+   Focus 3.
 bbb.
 (*
  assert (Hvvz : v₁ × v₂ ≠ 0%vec).
@@ -3187,22 +3184,7 @@ bbb.
 bbb.
 
 rewrite vec_cross_mul_sub_distr_l.
-
-bbb.
 *)
-bbb.
-
- assert (Hpvv : p = v₁ × v₂).
-(* ah bin non c'est pas ça *)
-bbb.
-  destruct p as (xp, yp, zp).
-  destruct p₁ as (x₁, y₁, z₁).
-  destruct p₂ as (x₂, y₂, z₂).
-  rewrite Hv₁, Hv₂; simpl.
-
-  Inspect 1.
-
-  assert (Hcs : (c² + s² = 1)%R).
 bbb.
 
 Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
