@@ -3056,40 +3056,6 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
     f_equal; lra.
 Qed.
 
-(* not sure this lemma is important *)
-Theorem rotate_matrix_of_two_vectors_with_mul_axis : ∀ p v₁ v₂ c s k,
-  (0 ≤ k)%R
-  → ∥v₁∥ = 1%R
-  → ∥v₂∥ = 1%R
-  → p = k ⁎ (v₁ × v₂)
-  → p ≠ 0%vec
-  → c = (v₁ · v₂)
-  → s = ∥(/ k ⁎ p)∥
-  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
-Proof.
-intros * Hknn Hv₁ Hv₂ Hp Hpz Hc Hs.
-destruct (Req_dec k 0) as [Hkz| Hkz].
- now rewrite Hkz, vec_const_mul_0_l in Hp.
-
- rewrite matrix_mul_axis with (k := (/ k)%R).
-  apply (f_equal (vec_const_mul (/ k))) in Hp.
-  rewrite vec_const_mul_assoc in Hp.
-  rewrite Rinv_l in Hp; [ | easy ].
-  rewrite vec_const_mul_1_l in Hp.
-  apply rotate_matrix_of_two_vectors; try assumption.
-   intros H.
-   apply eq_vec_const_mul_0 in H.
-   destruct H as [H| H]; [ | easy ].
-   now apply Rinv_neq_0_compat in H.
-
-   unfold Rsign.
-   destruct (Rle_dec 0 (/ k)) as [Hik| Hik]; [ now rewrite Rmult_1_l | ].
-   exfalso; apply Hik, Rlt_le.
-   apply Rinv_0_lt_compat; lra.
-
-  now apply Rinv_neq_0_compat.
-Qed.
-
 Theorem vec_cross_mul_cross_mul : ∀ u v,
   u · v = 0%R
   → ∥v∥ = 1%R
@@ -3166,25 +3132,40 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
    intros H; rewrite H in Hp; simpl in Hp.
    rewrite Rsqr_0, Rsqr_1 in Hp; lra.
 
-   destruct (Rle_dec 0 k) as [Hkp| Hkn].
-    eapply rotate_matrix_of_two_vectors_with_mul_axis; try eassumption.
-    rewrite Hs, Hde.
-    rewrite vec_const_mul_assoc.
-    rewrite Rinv_l.
-     rewrite vec_const_mul_1_l.
-     rewrite vec_const_dot_assoc.
-     rewrite vec_dot_mul_diag.
-     unfold Rsign.
-     destruct (Rle_dec 0 (k * ∥(v₁ × v₂)∥²)) as [H| H].
-      now rewrite Rmult_1_l.
+   assert (Hkz : k ≠ 0%R).
+    intros H; rewrite H in Hde.
+    now rewrite vec_const_mul_0_l in Hde.
 
-      exfalso; apply H.
-      apply Rmult_le_pos; [ easy | apply Rle_0_sqr ].
+    assert (Hikz : (/ k ≠ 0)%R) by now apply Rinv_neq_0_compat.
+    destruct (Rle_dec 0 k) as [Hkp| Hkn].
+     rewrite matrix_mul_axis with (k := (/ k)%R); [ | easy ].
+     apply (f_equal (vec_const_mul (/ k))) in Hde.
+     rewrite vec_const_mul_assoc in Hde.
+     rewrite Rinv_l in Hde; [ | easy ].
+     rewrite vec_const_mul_1_l in Hde.
+     apply rotate_matrix_of_two_vectors; try assumption.
+      intros H.
+      apply eq_vec_const_mul_0 in H.
+      destruct H as [H| H]; [ | easy ].
+      now apply Rinv_neq_0_compat in H.
 
-     now intros H; rewrite H, vec_const_mul_0_l in Hde.
+      unfold Rsign.
+      destruct (Rle_dec 0 (/ k)) as [Hik| Hik].
+       rewrite Rmult_1_l, Hs, <- Hde.
+       rewrite <- Rmult_vec_dot_mul_distr_r.
+       unfold Rsign.
+       destruct (Rle_dec 0 (/ k * p²%vec)) as [H| H].
+        now rewrite Rmult_1_l.
 
-    apply Rnot_le_lt in Hkn.
+        exfalso; apply H.
+        rewrite vec_dot_mul_diag.
+        apply Rmult_le_pos; [ easy | apply Rle_0_sqr ].
 
+       exfalso; apply Hik, Rlt_le.
+       apply Rinv_0_lt_compat; lra.
+
+     apply Rnot_le_lt in Hkn.
+     rewrite matrix_mul_axis with (k := (/ k)%R); [ | easy ].
 bbb.
 (*
  assert (Hvvz : v₁ × v₂ ≠ 0%vec).
