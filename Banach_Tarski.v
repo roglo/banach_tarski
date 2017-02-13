@@ -3000,7 +3000,48 @@ assert (Hcs : (c² + s² = 1)%R).
    now rewrite Hxp; ring_simplify.
 Qed.
 
+Definition Rsign x := if Rle_dec 0 x then 1%R else (-1)%R.
+
 Theorem matrix_mul_axis : ∀ p c s k,
+  k ≠ 0%R
+  → matrix_of_axis_angle (p, c, s) =
+    matrix_of_axis_angle (k ⁎ p, c, (Rsign k * s)%R).
+Proof.
+intros * Hk.
+destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
+ subst p; simpl; rewrite Rmult_0_r.
+ rewrite Rsqr_0; do 2 rewrite Rplus_0_l.
+ rewrite Rdiv_0_l, Rsqr_0.
+ now do 5 rewrite Rmult_0_l.
+
+ destruct p as (xp, yp, zp); simpl.
+ remember (√ ((k * xp)² + (k * yp)² + (k * zp)²))%R as a eqn:Ha.
+ do 3 rewrite Rsqr_mult in Ha.
+ do 2 rewrite <- Rmult_plus_distr_l in Ha.
+ rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
+ remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
+ unfold Rsign.
+ destruct (Rle_dec 0 k) as [Hkp| Hkn].
+  rewrite Rmult_1_l.
+  rewrite sqrt_Rsqr in Ha; [ | lra ].
+  assert (Hx : ∀ x, (k * x / a = x / b)%R).
+   assert (Hbz : b ≠ 0%R).
+    subst b; intros H.
+    apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+    apply sqr_vec_norm_eq_0 in H.
+    destruct H as (H1 & H2 & H3).
+    now rewrite H1, H2, H3 in Hpz.
+
+    intros x; subst a; unfold Rdiv.
+    rewrite Rinv_mult_distr; [ | lra | easy ].
+    rewrite <- Rmult_assoc.
+    progress replace (k * x * / k)%R with (/ k * k * x)%R by lra.
+    rewrite Rinv_l; lra.
+
+   now do 3 rewrite Hx.
+bbb.
+
+Theorem prev_matrix_mul_axis : ∀ p c s k,
   (0 < k)%R
   → matrix_of_axis_angle (p, c, s) = matrix_of_axis_angle (k ⁎ p, c, s).
 Proof.
@@ -3133,6 +3174,12 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
 
    (* case k < 0 *)
    Focus 3.
+Inspect 3.
+   (* probably the sign of s must be the sign of k; therefore s must
+      be defined differently and matrix_mul_axis could be redefined
+      with s or -s according to the sign of k *)
+   apply Rnot_le_lt in Hkn.
+
 bbb.
 (*
  assert (Hvvz : v₁ × v₂ ≠ 0%vec).
