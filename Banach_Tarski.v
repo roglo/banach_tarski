@@ -3020,26 +3020,41 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
  do 2 rewrite <- Rmult_plus_distr_l in Ha.
  rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
  remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
- unfold Rsign.
- destruct (Rle_dec 0 k) as [Hkp| Hkn].
-  rewrite Rmult_1_l.
-  rewrite sqrt_Rsqr in Ha; [ | lra ].
-  assert (Hx : ∀ x, (k * x / a = x / b)%R).
-   assert (Hbz : b ≠ 0%R).
-    subst b; intros H.
-    apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-    apply sqr_vec_norm_eq_0 in H.
-    destruct H as (H1 & H2 & H3).
-    now rewrite H1, H2, H3 in Hpz.
+ assert (Hbz : b ≠ 0%R).
+  subst b; intros H.
+  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in H.
+  destruct H as (H1 & H2 & H3).
+  now rewrite H1, H2, H3 in Hpz.
 
+  unfold Rsign.
+  destruct (Rle_dec 0 k) as [Hkp| Hkn].
+   rewrite Rmult_1_l.
+   rewrite sqrt_Rsqr in Ha; [ | lra ].
+   assert (Hx : ∀ x, (k * x / a = x / b)%R).
     intros x; subst a; unfold Rdiv.
     rewrite Rinv_mult_distr; [ | lra | easy ].
     rewrite <- Rmult_assoc.
     progress replace (k * x * / k)%R with (/ k * k * x)%R by lra.
     rewrite Rinv_l; lra.
 
-   now do 3 rewrite Hx.
-bbb.
+    now do 3 rewrite Hx.
+
+   apply Rnot_le_lt in Hkn.
+   rewrite sqrt_Rsqr_abs in Ha.
+   unfold Rabs in Ha.
+   destruct (Rcase_abs k) as [H| H]; [ clear H | lra ].
+   assert (Hx : ∀ x, (k * x / a = - (x / b))%R).
+    intros x; subst a; unfold Rdiv.
+    rewrite Rinv_mult_distr; [ | lra | easy ].
+    rewrite <- Rmult_assoc.
+    rewrite <- Ropp_inv_permute; [ | easy ].
+    progress replace (k * x * - / k)%R with (/ k * k * - x)%R by lra.
+    rewrite Rinv_l; lra.
+
+    do 3 rewrite Hx, <- Rsqr_neg.
+    f_equal; lra.
+Qed.
 
 Theorem prev_matrix_mul_axis : ∀ p c s k,
   (0 < k)%R
@@ -3073,7 +3088,7 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
   now do 3 rewrite Hx.
 Qed.
 
-(* not sure this lemma is required *)
+(* not sure this lemma is important *)
 Theorem rotate_matrix_of_two_vectors_with_mul_axis : ∀ p v₁ v₂ c s k,
   (0 ≤ k)%R
   → ∥v₁∥ = 1%R
@@ -3099,6 +3114,7 @@ destruct (Req_dec k 0) as [Hkz| Hkz].
   destruct H as [H| H]; [ | easy ].
   now apply Rinv_neq_0_compat in H.
 
+bbb.
   apply Rmult_lt_reg_r with (r := k); [ lra | ].
   rewrite Rinv_l; [ lra | easy ].
 Qed.
