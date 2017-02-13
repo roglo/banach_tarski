@@ -3122,17 +3122,14 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
 
   apply vec_cross_mul_eq_0 in Hvvp.
   destruct Hvvp as (d & e & Hd & He & Hde).
-  apply (f_equal (λ u, vec_sub u (d ⁎ (v₁ × v₂)))) in Hde.
-Search (_ + _ - _ = _)%vec.
-bbb.
-  rewrite vec_sub_add_distr in Hde.
-  rewrite vec_sub_diag, vec_sub_0_l, vec_sub_0_r in Hde.
-  rewrite
-
-  (* when proved ∃ k, p = k ⁎ (v₁ × v₂) *)
+  apply vec_add_move_l in Hde.
+  rewrite vec_sub_0_l in Hde.
+  rewrite vec_opp_const_mul_distr_l in Hde.
+  apply vec_const_mul_div in Hde; [ | easy ].
   unfold latitude in Ha₁, Ha₂.
   specialize
-    (rotate_matrix_of_two_vectors_with_mul_axis p v₁ v₂ c s) as H.
+    (rotate_matrix_of_two_vectors_with_mul_axis p v₁ v₂ c s (- d / e)) as H.
+  (* merde, y a des histoires de signes *)
 bbb.
 
 bbb.

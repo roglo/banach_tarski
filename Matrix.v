@@ -837,6 +837,18 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
 Qed.
 
+Theorem vec_add_move_l : ∀ u v w, (u + v = w ↔ v = w - u)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl.
+split; intros H; injection H; intros; subst; f_equal; lra.
+Qed.
+
+Theorem vec_add_move_r : ∀ u v w, (u + v = w ↔ u = w - v)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl.
+split; intros H; injection H; intros; subst; f_equal; lra.
+Qed.
+
 Theorem vec_add_cancel_l : ∀ u v w, (u + v = u + w)%vec → v = w.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
