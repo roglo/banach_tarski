@@ -3137,6 +3137,11 @@ f_equal; ring_simplify.
  do 2 rewrite <- Rsqr_pow2; nsatz.
 Qed.
 
+Definition rot_sin_cos p u v :=
+  let s := (Rsign (p · (u × v)) * ∥(u × v)∥)%R in
+  let c := u · v in
+  (s, c).
+
 Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -3147,11 +3152,12 @@ Theorem toto : ∀ p p₁ p₂ v₁ v₂ a c s,
   → p₁ × p₂ ≠ 0%vec
   → v₁ = (/ √ (1 - a²) ⁎ (p₁ - a ⁎ p))%vec
   → v₂ = (/ √ (1 - a²) ⁎ (p₂ - a ⁎ p))%vec
-  → c = v₁ · v₂
-  → s = ∥(v₁ × v₂)∥
+  → (s, c) = rot_sin_cos p v₁ v₂
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hc Hs.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
+unfold rot_sin_cos in Hcs.
+injection Hcs; clear Hcs; intros Hc Hs.
 assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
  assert (H : √ (1 - a²) ≠ 0%R) by (intros H; apply sqrt_eq_0 in H; lra).
  eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
@@ -3193,10 +3199,6 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
 
    (* case k < 0 *)
    Focus 3.
-Inspect 3.
-   (* probably the sign of s must be the sign of k; therefore s must
-      be defined differently and matrix_mul_axis could be redefined
-      with s or -s according to the sign of k *)
    apply Rnot_le_lt in Hkn.
 
 bbb.
