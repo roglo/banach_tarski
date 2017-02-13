@@ -3124,7 +3124,20 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
    intros H; rewrite H in Hp; simpl in Hp.
    rewrite Rsqr_0, Rsqr_1 in Hp; lra.
 
-   apply vec_cross_mul_eq_0 in Hvvp; [ | | easy ].
+   destruct (vec_eq_dec (v₁ × v₂) 0) as [Hvv| Hvv].
+(*
+    rewrite Hvv in Hs.
+    rewrite vec_norm_0, Rmult_0_r in Hs; subst s.
+    destruct p as (xp, yp, zp); simpl.
+    do 3 rewrite Rmult_0_r, Rminus_0_r, Rplus_0_r.
+    simpl in Hp; rewrite Rsqr_1 in Hp; rewrite Hp.
+    rewrite sqrt_1.
+    do 3 rewrite Rdiv_1_r.
+    destruct v₁ as (x₁, y₁, z₁).
+    destruct v₂ as (x₂, y₂, z₂); simpl in*.
+*)
+    Focus 2.
+    apply vec_cross_mul_eq_0 in Hvvp; [ | easy | easy ].
     destruct Hvvp as (d & e & Hd & He & Hde).
     apply vec_add_move_l in Hde.
     rewrite vec_sub_0_l in Hde.
