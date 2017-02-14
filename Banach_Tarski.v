@@ -3222,6 +3222,32 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
      do 6 rewrite Rmult_0_r.
      rewrite Rplus_0_l; fold mat_id.
      rewrite mat_vec_mul_id.
+     rewrite Hc in Hli.
+     clear - Hnv₁ Hnv₂ Hvv Hli.
+     destruct v₁ as (x₁, y₁, z₁).
+     destruct v₂ as (x₂, y₂, z₂).
+     simpl in Hnv₁, Hnv₂, Hvv, Hli.
+     apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+     apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+     rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+     injection Hvv; clear Hvv; intros H3 H2 H1.
+     f_equal; nsatz.
+
+     replace (1 - -1) with 2 by lra.
+     rewrite Hc in Hli.
+     destruct v₁ as (x₁, y₁, z₁).
+     destruct v₂ as (x₂, y₂, z₂).
+     simpl in Hnv₁, Hnv₂, Hvv, Hli.
+     apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+     apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+     rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+     injection Hvv; clear Hvv; intros H3 H2 H1.
+     simpl in Hvvp; simpl.
+     injection Hvvp; clear Hvvp; intros H6 H5 H4.
+     f_equal.
+unfold Rsqr in *.
+unfold latitude in Ha₁, Ha₂.
+
 bbb.
 
     rewrite vec_sqr_0 in Hli.
