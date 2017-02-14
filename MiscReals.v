@@ -15,6 +15,8 @@ Notation "'ℝ'" := R.
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
 
+Notation "x '≤' y" := (le x y) : nat_scope.
+
 Notation "'√'" := sqrt.
 Notation "x '≤' y" := (Rle x y) : R_scope.
 Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
@@ -22,22 +24,24 @@ Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
 Notation "x '≤' y '≤' z" := (Rle x y ∧ Rle y z)
  (at level 70, y at next level) : R_scope.
 
-Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%R.
+Open Scope R_scope.
+
+Theorem fold_Rminus : ∀ x y, x + - y = x - y.
 Proof. intros. now fold (Rminus x y). Qed.
 
-Theorem fold_Rdiv : ∀ x y, (x * / y = x / y)%R.
+Theorem fold_Rdiv : ∀ x y, x * / y = x / y.
 Proof. intros; now fold (Rdiv x y). Qed.
 
-Theorem fold_Rsqr : ∀ x, (x * x = x²)%R.
+Theorem fold_Rsqr : ∀ x, x * x = x².
 Proof. intros; now fold (Rsqr x). Qed.
 
-Theorem Rmult_div : ∀ x y z, (x * y / z = x / z * y)%R.
+Theorem Rmult_div : ∀ x y z, x * y / z = x / z * y.
 Proof. intros; lra. Qed.
 
-Theorem Rdiv_mult : ∀ x y z, (x * (y / z) = x * y / z)%R.
+Theorem Rdiv_mult : ∀ x y z, x * (y / z) = x * y / z.
 Proof. intros; lra. Qed.
 
-Theorem Rmult_div_same : ∀ x y, (y ≠ 0 → x / y * y = x)%R.
+Theorem Rmult_div_same : ∀ x y, y ≠ 0 → x / y * y = x.
 Proof.
 intros * Hy.
 unfold Rdiv.
@@ -45,14 +49,14 @@ rewrite Rmult_assoc.
 rewrite Rinv_l; [ lra | easy ].
 Qed.
 
-Theorem Rplus_shuffle0 : ∀ n m p : ℝ, (n + m + p)%R = (n + p + m)%R.
+Theorem Rplus_shuffle0 : ∀ n m p : ℝ, n + m + p = n + p + m.
 Proof.
 intros.
 rewrite Rplus_comm, <- Rplus_assoc.
 f_equal; apply Rplus_comm.
 Qed.
 
-Theorem Rmult_shuffle0 : ∀ n m p : ℝ, (n * m * p)%R = (n * p * m)%R.
+Theorem Rmult_shuffle0 : ∀ n m p : ℝ, n * m * p = n * p * m.
 Proof.
 intros.
 rewrite Rmult_comm, <- Rmult_assoc.
@@ -72,8 +76,8 @@ destruct (Rle_dec x y) as [H₁| H₁].
  apply H₁, Rle_refl.
 Qed.
 
-Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 <= b)%R →
-  (a * √ b * c * d * √ b)%R = (a * b * c * d)%R.
+Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, 0 <= b →
+  a * √ b * c * d * √ b = a * b * c * d.
 Proof.
 intros a b c d Hb.
 rewrite Rmult_comm, <- Rmult_assoc; f_equal.
@@ -82,15 +86,15 @@ rewrite Rmult_comm, Rmult_assoc; f_equal.
 now apply sqrt_sqrt.
 Qed.
 
-Theorem Rdiv_0_l : ∀ x, (0 / x = 0)%R.
+Theorem Rdiv_0_l : ∀ x, 0 / x = 0.
 Proof.
 intros x; unfold Rdiv; apply Rmult_0_l.
 Qed.
 
-Theorem Rdiv_1_r : ∀ x, (x / 1)%R = x.
+Theorem Rdiv_1_r : ∀ x, x / 1 = x.
 Proof. intros x; lra. Qed.
 
-Theorem Rdiv_eq_0 : ∀ x y, (y ≠ 0 → x / y = 0 → x = 0)%R.
+Theorem Rdiv_eq_0 : ∀ x y, y ≠ 0 → x / y = 0 → x = 0.
 Proof.
 intros * Hy Hxy.
 apply Rmult_eq_compat_r with (r := y) in Hxy.
@@ -99,7 +103,7 @@ rewrite Rmult_assoc in Hxy.
 rewrite Rinv_l in Hxy; lra.
 Qed.
 
-Theorem Rdiv_same : ∀ x, x ≠ 0%R → (x / x = 1)%R.
+Theorem Rdiv_same : ∀ x, x ≠ 0 → x / x = 1.
 Proof.
 intros.
 unfold Rdiv.
@@ -128,7 +132,7 @@ assert (H : (0 <= z)%Z).
  eapply Rlt_le_trans; [ eassumption | lra ].
 Qed.
 
-Theorem Int_part_le_compat : ∀ x y, (x <= y)%R → (Int_part x <= Int_part y)%Z.
+Theorem Int_part_le_compat : ∀ x y, x <= y → (Int_part x <= Int_part y)%Z.
 Proof.
 intros * Hxy.
 destruct (Z_le_gt_dec (Int_part x) (Int_part y)) as [| Hlt]; [ easy | ].
@@ -140,7 +144,7 @@ destruct Hx as (Hx1, Hx2).
 destruct Hy as (Hy1, Hy2).
 remember (IZR (Int_part x)) as a eqn:Ha.
 remember (IZR (Int_part y)) as b eqn:Hb.
-assert (Hab : (0 < a - b < 1)%R).
+assert (Hab : 0 < a - b < 1).
  split.
   apply Rplus_lt_reg_r with (r := b).
   now rewrite Rplus_0_l, Rplus_comm, Rplus_minus.
@@ -157,8 +161,8 @@ assert (Hab : (0 < a - b < 1)%R).
 
  rewrite Ha, Hb in Hab.
  rewrite Z_R_minus in Hab.
- replace 0%R with (IZR 0) in Hab by lra.
- replace 1%R with (IZR 1) in Hab by lra.
+ replace 0 with (IZR 0) in Hab by lra.
+ replace 1 with (IZR 1) in Hab by lra.
  destruct Hab as (H1, H2).
  apply lt_IZR in H1.
  apply lt_IZR in H2.
@@ -170,7 +174,7 @@ assert (Hab : (0 < a - b < 1)%R).
 Qed.
 
 Theorem Int_part_close_to_1 : ∀ r n,
-  (INR n / INR (n + 1) <= r < 1)%R
+  INR n / INR (n + 1) <= r < 1
   → Int_part (r * (INR (n + 1))) = Z.of_nat n.
 Proof.
 intros * (Hnr, Hr1).
@@ -186,7 +190,7 @@ apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1.
  apply Rplus_le_lt_0_compat; [ apply pos_INR | lra ].
 
  rewrite Rmult_1_l in Hr1.
- remember (r * INR (n + 1))%R as x eqn:Hx.
+ remember (r * INR (n + 1)) as x eqn:Hx.
  rewrite plus_INR in Hr1; simpl in Hr1.
  rewrite INR_IZR_INZ in Hnr.
  rewrite INR_IZR_INZ in Hr1.
@@ -198,18 +202,18 @@ apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1.
  now apply Rplus_le_compat_r.
 Qed.
 
-Theorem Int_part_is_0 : ∀ x, (0 <= x < 1)%R → Int_part x = 0%Z.
+Theorem Int_part_is_0 : ∀ x, 0 <= x < 1 → Int_part x = 0%Z.
 Proof.
 intros * Hx.
-assert ((INR 0 / INR (0 + 1) <= x < 1)%R) by (now simpl; lra).
+assert (INR 0 / INR (0 + 1) <= x < 1) by (now simpl; lra).
 pose proof Int_part_close_to_1 x 0 H as H1.
 now simpl in H1; rewrite Rmult_1_r in H1.
 Qed.
 
 Theorem frac_part_mult_for_0 : ∀ x y,
-  frac_part x = 0%R
-  → frac_part y = 0%R
-  → frac_part (x * y) = 0%R.
+  frac_part x = 0
+  → frac_part y = 0
+  → frac_part (x * y) = 0.
 Proof.
 intros * Hx Hy.
 apply fp_nat in Hy.
@@ -225,7 +229,7 @@ destruct i; simpl; [ rewrite Rmult_0_r; apply fp_R0 | | ].
  induction n; simpl; [ rewrite Ropp_0, Rmult_0_r; apply fp_R0 | ].
  destruct n.
   rewrite <- Ropp_mult_distr_r, Rmult_1_r.
-  replace (- x)%R with (0 - x)%R by lra.
+  replace (- x) with (0 - x) by lra.
   rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
   rewrite Rminus_diag_eq; [ easy | apply fp_R0 ].
 
@@ -233,18 +237,18 @@ destruct i; simpl; [ rewrite Rmult_0_r; apply fp_R0 | | ].
   rewrite plus_frac_part2.
    rewrite IHn, Rplus_0_l.
    rewrite <- Ropp_mult_distr_r, Rmult_1_r.
-   replace (- x)%R with (0 - x)%R by lra.
+   replace (- x) with (0 - x) by lra.
    rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
    rewrite Rminus_diag_eq; [ easy | apply fp_R0 ].
 
    rewrite IHn, Rplus_0_l.
    rewrite <- Ropp_mult_distr_r, Rmult_1_r.
-   replace (- x)%R with (0 - x)%R by lra.
+   replace (- x) with (0 - x) by lra.
    rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
    rewrite fp_R0, Rminus_diag_eq; [ lra | easy ].
 Qed.
 
-Theorem pow_INR : ∀ n k, INR (n ^ k) = (INR n ^ k)%R.
+Theorem pow_INR : ∀ n k, INR (n ^ k) = INR n ^ k.
 Proof.
 intros.
 induction k; [ easy | ].
@@ -252,7 +256,7 @@ simpl; rewrite mult_INR.
 now rewrite IHk.
 Qed.
 
-Theorem frac_part_INR : ∀ n, frac_part (INR n) = 0%R.
+Theorem frac_part_INR : ∀ n, frac_part (INR n) = 0.
 Proof.
 intros.
 unfold frac_part.
@@ -271,7 +275,7 @@ destruct (Z_le_dec 0 z) as [Hz| Hz].
 
  apply Z.nle_gt in Hz.
  destruct z as [| p| p]; [ easy | easy | ].
- replace (IZR (Z.neg p)) with (0 + IZR (Z.neg p))%R by lra; simpl.
+ replace (IZR (Z.neg p)) with (0 + IZR (Z.neg p)) by lra; simpl.
  rewrite fold_Rminus.
  rewrite Rminus_Int_part1.
   rewrite Int_part_is_0; [ | lra ].
@@ -281,20 +285,23 @@ destruct (Z_le_dec 0 z) as [Hz| Hz].
   rewrite fp_R0, frac_part_INR; lra.
 Qed.
 
-Theorem frac_part_IZR : ∀ z, (frac_part (IZR z) = 0)%R.
+Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0.
 Proof.
 intros.
 unfold frac_part.
 rewrite Int_part_IZR; lra.
 Qed.
 
-Theorem fp_R1 : frac_part 1 = 0%R.
+Theorem fp_R1 : frac_part 1 = 0.
 Proof.
-replace 1%R with (INR 1) by easy.
+replace 1 with (INR 1) by easy.
 apply frac_part_INR.
 Qed.
 
-Theorem Rpow_div_sub : ∀ x i j, (x ≠ 0)%R → j ≤ i → (x ^ i / x ^ j = x ^ (i - j))%R.
+Theorem Rpow_div_sub : ∀ x i j,
+  x ≠ 0
+  → (j ≤ i)%nat
+  → x ^ i / x ^ j = x ^ (i - j).
 Proof.
 intros * Hx Hij.
 unfold Rdiv.
@@ -302,32 +309,32 @@ replace i with ((i - j) + j)%nat at 1 by now rewrite Nat.sub_add.
 now symmetry; apply pow_RN_plus.
 Qed.
 
-Theorem frac_part_pow : ∀ x i, frac_part x = 0%R → frac_part (x ^ i) = 0%R.
+Theorem frac_part_pow : ∀ x i, frac_part x = 0 → frac_part (x ^ i) = 0.
 Proof.
 intros * Hx.
 induction i; [ apply fp_R1 | simpl ].
 now apply frac_part_mult_for_0.
 Qed.
 
-Theorem frac_part_self : ∀ x, (0 <= x < 1)%R → frac_part x = x.
+Theorem frac_part_self : ∀ x, 0 <= x < 1 → frac_part x = x.
 Proof.
 intros * Hx.
 unfold frac_part.
 rewrite Int_part_is_0; [ lra | easy ].
 Qed.
 
-Theorem frac_part_interv : ∀ x, (0 ≤ frac_part x < 1)%R.
+Theorem frac_part_interv : ∀ x, 0 ≤ frac_part x < 1.
 Proof.
 intros.
 unfold frac_part.
 specialize (base_Int_part x); intros Hx; lra.
 Qed.
 
-Theorem Int_part_interv : ∀ z x, (IZR z ≤ x < IZR (z + 1))%R → Int_part x = z.
+Theorem Int_part_interv : ∀ z x, IZR z ≤ x < IZR (z + 1) → Int_part x = z.
 Proof.
 intros * (Hzx, Hxz).
 rewrite plus_IZR in Hxz; simpl in Hxz.
-assert (H : (0 ≤ x - IZR z < 1)%R) by lra.
+assert (H : 0 ≤ x - IZR z < 1) by lra.
 apply Int_part_is_0 in H.
 rewrite Rminus_Int_part1 in H.
  rewrite Int_part_IZR in H.
@@ -337,7 +344,7 @@ rewrite Rminus_Int_part1 in H.
  apply Rle_ge, frac_part_interv.
 Qed.
 
-Theorem Rabs_or : ∀ x y, Rabs x = y → x = y ∨ x = (- y)%R.
+Theorem Rabs_or : ∀ x y, Rabs x = y → x = y ∨ x = - y.
 Proof.
 intros * Hxy; subst y.
 unfold Rabs.
@@ -345,7 +352,7 @@ destruct (Rcase_abs x) as [H₁| H₁]; [ right | now left ].
 symmetry; apply Ropp_involutive.
 Qed.
 
-Theorem Rabs_eq_0 : ∀ x, Rabs x = 0%R → x = 0%R.
+Theorem Rabs_eq_0 : ∀ x, Rabs x = 0 → x = 0.
 Proof.
 intros * Hx.
 unfold Rabs in Hx.
@@ -354,7 +361,7 @@ apply Ropp_eq_0_compat in Hx.
 now rewrite Ropp_involutive in Hx.
 Qed.
 
-Theorem Rabs_eq_Rabs : ∀ x y, Rabs x = Rabs y → x = y ∨ x = (- y)%R.
+Theorem Rabs_eq_Rabs : ∀ x y, Rabs x = Rabs y → x = y ∨ x = - y.
 Proof.
 intros * Hxy.
 unfold Rabs in Hxy.
@@ -363,7 +370,7 @@ destruct (Rcase_abs x) as [Hx| Hx].
  destruct (Rcase_abs y); lra.
 Qed.
 
-Theorem Rabs_lt : ∀ x y, (Rabs x < y)%R ↔ (- y < x < y)%R.
+Theorem Rabs_lt : ∀ x y, Rabs x < y ↔ - y < x < y.
 Proof.
 intros; split.
  intros Hxy.
@@ -375,7 +382,7 @@ intros; split.
  destruct (Rcase_abs x); [ lra | easy ].
 Qed.
 
-Theorem Rabs_le : ∀ x y, (Rabs x ≤ y)%R ↔ (- y ≤ x ≤ y)%R.
+Theorem Rabs_le : ∀ x y, Rabs x ≤ y ↔ - y ≤ x ≤ y.
 Proof.
 intros; split.
  intros Hxy.
@@ -387,7 +394,7 @@ intros; split.
  destruct (Rcase_abs x); [ lra | easy ].
 Qed.
 
-Theorem Rabs_div : ∀ x y, y ≠ 0%R → Rabs (x / y) = (Rabs x / Rabs y)%R.
+Theorem Rabs_div : ∀ x y, y ≠ 0 → Rabs (x / y) = Rabs x / Rabs y.
 Proof.
 intros * Hy.
 unfold Rdiv.
@@ -395,7 +402,7 @@ rewrite Rabs_mult; f_equal.
 now apply Rabs_Rinv.
 Qed.
 
-Theorem Rabs_sqr : ∀ x, Rabs (x²) = (x²)%R.
+Theorem Rabs_sqr : ∀ x, Rabs (x²) = x².
 Proof.
 intros.
 unfold Rabs.
@@ -411,16 +418,16 @@ destruct (Rcase_abs (√ x)) as [Hx| Hx]; [ exfalso | easy ].
 apply Rlt_not_le in Hx; apply Hx, sqrt_pos.
 Qed.
 
-Theorem sqrt_inv : ∀ x, (0 < x)%R → (√ (/ x) = / √ x)%R.
+Theorem sqrt_inv : ∀ x, 0 < x → √ (/ x) = / √ x.
 Proof.
 intros * Hx.
-replace (/ x)%R with (1 * / x)%R by lra.
+replace (/ x) with (1 * / x) by lra.
 rewrite fold_Rdiv.
 rewrite sqrt_div; [ | apply Rle_0_1 | easy ].
 rewrite sqrt_1; lra.
 Qed.
 
-Theorem eq_mul_div_eq : ∀ a b c, b ≠ 0%R → (a = b * c → a / b = c)%R.
+Theorem eq_mul_div_eq : ∀ a b c, b ≠ 0 → a = b * c → a / b = c.
 Proof.
 intros * Hb Hab.
 subst a; unfold Rdiv.
@@ -429,7 +436,7 @@ rewrite Rinv_l; [ | easy ].
 now rewrite Rmult_1_l.
 Qed.
 
-Theorem nonneg_plus_4_sqr : ∀ a b c d, (0 ≤ a² + b² + c² + d²)%R.
+Theorem nonneg_plus_4_sqr : ∀ a b c d, 0 ≤ a² + b² + c² + d².
 Proof.
 intros.
 apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
@@ -438,51 +445,51 @@ apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
 Theorem Rmult_minus_distr_r : ∀ r1 r2 r3,
-  ((r1 - r2) * r3)%R = (r1 * r3 - r2 * r3)%R.
+  (r1 - r2) * r3 = r1 * r3 - r2 * r3.
 Proof.
 intros.
 unfold Rminus.
 rewrite Rmult_plus_distr_r; lra.
 Qed.
 
-Theorem Rminus_plus: ∀ x y, (x - y + y = x)%R.
+Theorem Rminus_plus: ∀ x y, x - y + y = x.
 Proof. intros; lra. Qed.
 
-Theorem Rdiv_div : ∀ x y z, y ≠ 0%R → z ≠ 0%R → (x / y / z = x / (y * z))%R.
+Theorem Rdiv_div : ∀ x y z, y ≠ 0 → z ≠ 0 → x / y / z = x / (y * z).
 Proof.
 intros * Hy Hz.
 unfold Rdiv.
 rewrite Rinv_mult_distr; [ lra | easy | easy ].
 Qed.
 
-Theorem Rmult_div_r : ∀ x y, y ≠ 0%R → (y * (x / y) = x)%R.
+Theorem Rmult_div_r : ∀ x y, y ≠ 0 → y * (x / y) = x.
 Proof.
 intros * Hy.
 unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
 rewrite Rinv_l; [ lra | easy ].
 Qed.
 
-Theorem Rinv_div : ∀ x, (/ x = 1 / x)%R.
+Theorem Rinv_div : ∀ x, / x = 1 / x.
 Proof. intros; lra. Qed.
 
-Theorem nonneg_plus_sqr : ∀ x y, (0 ≤ x² + y²)%R.
+Theorem nonneg_plus_sqr : ∀ x y, 0 ≤ x² + y².
 Proof.
 intros.
 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
 Definition asin x := atan (x / √ (1 - x²)).
-Definition acos x := (PI / 2 - asin x)%R.
+Definition acos x := PI / 2 - asin x.
 
-Theorem cos_atan : ∀ x, cos (atan x) = (1 / √ (1 + x²))%R.
+Theorem cos_atan : ∀ x, cos (atan x) = 1 / √ (1 + x²).
 Proof.
 intros.
-assert (Hs : (√ (1 + x²) ≠ 0)%R).
+assert (Hs : √ (1 + x²) ≠ 0).
  intros H.
  specialize (Rle_0_sqr x) as Hs.
  apply sqrt_eq_0 in H; lra.
 
- assert (Hca : ∀ x, (0 < cos (atan x))%R).
+ assert (Hca : ∀ x, 0 < cos (atan x)).
   intros y.
   specialize (atan_bound y) as (Hlta, Halt).
   apply cos_gt_0; [ lra | easy ].
@@ -503,7 +510,7 @@ assert (Hs : (√ (1 + x²) ≠ 0)%R).
   apply sqrt_1.
 Qed.
 
-Theorem sin_atan : ∀ x, sin (atan x) = (x / √ (1 + x²))%R.
+Theorem sin_atan : ∀ x, sin (atan x) = x / √ (1 + x²).
 Proof.
 intros.
 unfold Rdiv.
@@ -522,40 +529,40 @@ destruct H; [ lra | ].
 apply Rinv_neq_0_compat in H; [ easy | ].
 clear H; intros H.
 apply sqrt_eq_0 in H.
- enough (Ht : (0 ≤ (tan y)²)%R) by lra.
+ enough (Ht : 0 ≤ (tan y)²) by lra.
  apply Rle_0_sqr.
 
- replace 1%R with (1 ^ 2)%R by lra.
+ replace 1 with (1 ^ 2) by lra.
  rewrite <- Rsqr_pow2.
  apply nonneg_plus_sqr.
 Qed.
 
-Theorem sin_asin : ∀ x, (-1 < x < 1)%R → sin (asin x) = x.
+Theorem sin_asin : ∀ x, -1 < x < 1 → sin (asin x) = x.
 Proof.
 intros * Hx.
 unfold asin.
-remember (x / √ (1 - x²))%R as y eqn:Hy.
+remember (x / √ (1 - x²)) as y eqn:Hy.
 rewrite sin_atan.
 destruct (Req_dec x 0) as [Hxz| Hxz].
  subst x; rewrite Rdiv_0_l in Hy; subst y.
  now rewrite Rdiv_0_l.
 
- assert (H1x : (0 < 1 - x²)%R).
-  replace 1%R with (1²)%R by apply Rsqr_1.
+ assert (H1x : 0 < 1 - x²).
+  replace 1 with 1² by apply Rsqr_1.
   rewrite <- Rsqr_plus_minus.
   apply Rmult_lt_0_compat; lra.
 
-  assert (Hsp : (0 < √ (1 - x²))%R).
+  assert (Hsp : 0 < √ (1 - x²)).
    apply Rsqr_incrst_0; [ | lra | apply sqrt_pos ].
    rewrite Rsqr_sqrt; [ now rewrite Rsqr_0 | lra ].
 
-   assert (Hyz : (y ≠ 0)%R).
+   assert (Hyz : y ≠ 0).
     intros H; apply Hxz; subst y.
     apply Rmult_eq_compat_r with (r := √ (1 - x²)) in H.
     unfold Rdiv in H; rewrite Rmult_assoc, Rmult_0_l in H.
     rewrite Rinv_l in H; lra.
 
-    assert (Hxy : (0 ≤ x * y)%R).
+    assert (Hxy : 0 ≤ x * y).
      subst y; unfold Rdiv; rewrite <- Rmult_assoc.
      rewrite fold_Rsqr.
      apply Rmult_le_pos; [ apply Rle_0_sqr | ].
@@ -565,22 +572,22 @@ destruct (Req_dec x 0) as [Hxz| Hxz].
      apply (f_equal Rsqr) in Hy.
      rewrite Rsqr_div in Hy; [ | lra ].
      rewrite Rsqr_sqrt in Hy; [ | lra ].
-     apply Rmult_eq_compat_r with (r := (1 - x²)%R) in Hy.
+     apply Rmult_eq_compat_r with (r := 1 - x²) in Hy.
      unfold Rdiv in Hy; rewrite Rmult_assoc in Hy.
      rewrite Rinv_l in Hy; [ rewrite Rmult_1_r in Hy | lra ].
      rewrite Rmult_minus_distr_l, Rmult_1_r in Hy.
-     assert (H : (y² = x² * (1 + y²))%R) by lra.
-     apply Rmult_eq_compat_r with (r := (/ (1 + y²))%R) in H.
+     assert (H : y² = x² * (1 + y²)) by lra.
+     apply Rmult_eq_compat_r with (r := / (1 + y²)) in H.
      rewrite Rmult_assoc in H.
-     assert (H1y : (0 < 1 + y²)%R).
+     assert (H1y : 0 < 1 + y²).
       apply Rplus_lt_le_0_compat; [ lra | apply Rle_0_sqr ].
 
-      assert (Hsy : (0 < √ (1 + y²))%R).
+      assert (Hsy : 0 < √ (1 + y²)).
        apply Rsqr_incrst_0; [ | lra | apply sqrt_pos ].
        rewrite Rsqr_sqrt; [ now rewrite Rsqr_0 | lra ].
 
        rewrite Rinv_r in H; [ | lra ].
-       replace (/ (1 + y²))%R with ((/ √ (1 + y²))²)%R in H.
+       replace (/ (1 + y²)) with (/ √ (1 + y²))² in H.
         rewrite <- Rsqr_mult in H.
         rewrite Rmult_1_r in H.
         apply Rsqr_eq in H.
@@ -590,7 +597,7 @@ destruct (Req_dec x 0) as [Hxz| Hxz].
         rewrite <- H in Hxy.
         rewrite <- Ropp_mult_distr_l in Hxy.
         rewrite Rmult_comm, <- Rmult_assoc, fold_Rsqr in Hxy.
-        replace 0%R with (-0)%R in Hxy by apply Ropp_0.
+        replace 0 with (-0) in Hxy by apply Ropp_0.
         apply Ropp_le_cancel in Hxy.
         apply Rmult_le_compat_r with (r := √ (1 + y²)) in Hxy; [ | lra ].
         rewrite Rmult_assoc, Rmult_0_l in Hxy.
@@ -603,14 +610,14 @@ destruct (Req_dec x 0) as [Hxz| Hxz].
         rewrite Rsqr_sqrt; [ easy | lra ].
 Qed.
 
-Theorem cos_acos : ∀ x, (-1 < x < 1)%R → cos (acos x) = x.
+Theorem cos_acos : ∀ x, -1 < x < 1 → cos (acos x) = x.
 Proof.
 intros * Hx.
 unfold acos; rewrite cos_shift.
 now apply sin_asin.
 Qed.
 
-Theorem Rneq_le_lt : ∀ x y, (x ≠ y → x ≤ y → x < y)%R.
+Theorem Rneq_le_lt : ∀ x y, x ≠ y → x ≤ y → x < y.
 Proof.
 intros * Hnxy Hxy.
 apply Rnot_le_lt; intros H.

@@ -17,8 +17,8 @@ Notation "r ³" := (Rpow_def.pow r 3) (at level 1, format "r ³") : R_scope.
 Notation "r ⁴" := (Rpow_def.pow r 4) (at level 1, format "r ⁴") : R_scope.
 
 Theorem Rno_intersect_balls_x3_x6 : ∀ x y z,
-  ((x - 3)² + y² + z² <= 1)%R
-  → ((x - 6)² + y² + z² <= 1)%R
+  (x - 3)² + y² + z² <= 1
+  → (x - 6)² + y² + z² <= 1
   → False.
 Proof.
 intros x y z H3 H6.
@@ -189,8 +189,8 @@ Theorem nat_of_free_elem_div_4 : ∀ e, (nat_of_free_elem e / 4 = 0)%nat.
 Proof. intros (t, d); now destruct t, d. Qed.
 
 Theorem path_of_nat_aux_enough_iter : ∀ m n p,
-  m < n
- → m < p
+  (m < n)%nat
+  → (m < p)%nat
   → path_of_nat_aux n m = path_of_nat_aux p m.
 Proof.
 intros * Hmn Hmp.
@@ -198,7 +198,7 @@ revert m p Hmn Hmp.
 induction n; intros; [ easy | ].
 destruct p; [ easy | ].
 simpl; f_equal.
-remember (m / 4) as q eqn:Hq; symmetry in Hq.
+remember (m / 4)%nat as q eqn:Hq; symmetry in Hq.
 destruct q; [ easy | ].
 destruct m; [ easy | ].
 apply Nat.succ_lt_mono in Hmn.
@@ -209,7 +209,7 @@ destruct (lt_dec q n) as [Hqn| Hqn].
  apply Nat.succ_le_mono in Hqp.
  rewrite <- Hq in Hqp.
  apply Nat.succ_lt_mono in Hmp.
- assert (H : S m < S m / 4) by (eapply Nat.lt_le_trans; eassumption).
+ assert (H : (S m < S m / 4)%nat) by (eapply Nat.lt_le_trans; eassumption).
  apply Nat.nle_gt in H.
  exfalso; apply H; clear.
  remember (S m) as n; clear m Heqn.
@@ -225,7 +225,7 @@ destruct (lt_dec q n) as [Hqn| Hqn].
  apply Nat.nlt_ge in Hqn.
  apply Nat.succ_le_mono in Hqn.
  rewrite <- Hq in Hqn.
- assert (H : m < S m / 4).
+ assert (H : (m < S m / 4)%nat).
   eapply lt_trans; [ eapply Hmn | assumption ].
 
   exfalso; clear - H.
@@ -239,7 +239,7 @@ destruct (lt_dec q n) as [Hqn| Hqn].
 Qed.
 
 Theorem path_of_nat_aux_cons : ∀ e p q, (q < p)%nat →
-  ∃ m n : ℕ, n < m ∧ path_of_nat_aux m n = e :: path_of_nat_aux p q.
+  ∃ m n : ℕ, (n < m)%nat ∧ path_of_nat_aux m n = e :: path_of_nat_aux p q.
 Proof.
 intros * Hqp.
 remember (nat_of_free_elem e) as r eqn:Hr.
@@ -296,11 +296,11 @@ enough (Hn : ∃ n, path_of_nat (S n) = e :: el).
  apply Nat.lt_succ_diag_r.
 Qed.
 
-Definition unit_interv := mkset (λ x, (0 <= x < 1)%R).
+Definition unit_interv := mkset (λ x, 0 <= x < 1).
 
 Definition ter_bin_of_vec r '(V x y z) := ter_bin_of_frac_part (x / r).
 
-Theorem ter_bin_of_ball_surj : ∀ r, (0 < r)%R → ∀ (u : ℕ → bool),
+Theorem ter_bin_of_ball_surj : ∀ r, 0 < r → ∀ (u : ℕ → bool),
   ∃ p : vector, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec r p n = u n).
 Proof.
 intros * Hr *.
@@ -313,19 +313,19 @@ split; [ | easy ].
 do 2 rewrite Rsqr_mult.
 rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; lra | ].
 rewrite Rsqr_pow2.
-apply Rplus_le_reg_r with (r := (s ^ 2)%R).
+apply Rplus_le_reg_r with (r := s ^ 2).
 unfold Rminus; rewrite Rplus_assoc, Rplus_opp_l.
 rewrite Rplus_0_l, Rplus_0_r.
-replace 1%R with (1 ^ 2)%R by lra.
+replace 1 with (1 ^ 2) by lra.
 apply pow_incr; lra.
 Qed.
 
-Theorem in_sphere_in_ball : ∀ r p, (0 ≤ r ≤ 1)%R →
+Theorem in_sphere_in_ball : ∀ r p, 0 ≤ r ≤ 1 →
   p ∈ sphere r
   → p ∈ ball.
 Proof.
 intros r (x, y, z) Hr Hs; simpl in Hs; simpl; rewrite Hs.
-replace 1%R with (1²)%R by apply Rsqr_1.
+replace 1 with 1² by apply Rsqr_1.
 apply Rsqr_incr_1; [ easy | easy | lra ].
 Qed.
 
@@ -358,7 +358,7 @@ enough (Hcontr : ∃ a, a ∈ ball ∧ ∀ n, proj1_sig (f n) ≠ a).
   now symmetry in Hn.
 Qed.
 
-Theorem ball_set_not_countable : ∀ r, (0 < r)%R →
+Theorem ball_set_not_countable : ∀ r, 0 < r →
   ∀ f : ℕ → vector, ∃ p : vector, p ∈ sphere r ∧ ∀ n : ℕ, f n ≠ p.
 Proof.
 intros * Hr *.
@@ -380,9 +380,9 @@ Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
    to its transpose; this name is inspired from the
    name "commutator") *)
 Definition rotation_axis (M : matrix ℝ) :=
-  let x := (a₃₂ M - a₂₃ M)%R in
-  let y := (a₁₃ M - a₃₁ M)%R in
-  let z := (a₂₁ M - a₁₂ M)%R in
+  let x := a₃₂ M - a₂₃ M in
+  let y := a₁₃ M - a₃₁ M in
+  let z := a₂₁ M - a₁₂ M in
   V x y z.
 
 Definition vec_normalize '(V x y z) :=
@@ -402,13 +402,13 @@ Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
 (* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
-Definition cos_rot_angle M := ((mat_trace M - 1) / 2)%R.
+Definition cos_rot_angle M := (mat_trace M - 1) / 2.
 
 Theorem ortho_matrix_sqr_coeff_le_1 : ∀ M,
   (M * mat_transp M)%mat = mat_id
-  → (((a₁₁ M)² ≤ 1 ∧ (a₁₂ M)² ≤ 1 ∧ (a₁₃ M)² ≤ 1) ∧
+  → ((a₁₁ M)² ≤ 1 ∧ (a₁₂ M)² ≤ 1 ∧ (a₁₃ M)² ≤ 1) ∧
      ((a₂₁ M)² ≤ 1 ∧ (a₂₂ M)² ≤ 1 ∧ (a₂₃ M)² ≤ 1) ∧
-     ((a₃₁ M)² ≤ 1 ∧ (a₃₂ M)² ≤ 1 ∧ (a₃₃ M)² ≤ 1))%R.
+     ((a₃₁ M)² ≤ 1 ∧ (a₃₂ M)² ≤ 1 ∧ (a₃₃ M)² ≤ 1).
 Proof.
 intros * Hrm.
 injection Hrm; clear Hrm.
@@ -423,50 +423,50 @@ split; [ | split ].
  rewrite <- H11.
  split; [ | split ].
   rewrite Rplus_assoc.
-  replace (a₁₁²)%R with (a₁₁² + 0)%R at 1 by lra.
+  replace a₁₁² with (a₁₁² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 
   rewrite Rplus_shuffle0, Rplus_comm.
-  replace (a₁₂²)%R with (a₁₂² + 0)%R at 1 by lra.
+  replace a₁₂² with (a₁₂² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 
   rewrite Rplus_comm.
-  replace (a₁₃²)%R with (a₁₃² + 0)%R at 1 by lra.
+  replace a₁₃² with (a₁₃² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 
  rewrite <- H22.
  split; [ | split ].
   rewrite Rplus_assoc.
-  replace (a₂₁²)%R with (a₂₁² + 0)%R at 1 by lra.
+  replace a₂₁² with (a₂₁² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 
   rewrite Rplus_shuffle0, Rplus_comm.
-  replace (a₂₂²)%R with (a₂₂² + 0)%R at 1 by lra.
+  replace a₂₂² with (a₂₂² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 
   rewrite Rplus_comm.
-  replace (a₂₃²)%R with (a₂₃² + 0)%R at 1 by lra.
+  replace a₂₃² with (a₂₃² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 
  rewrite <- H33.
  split; [ | split ].
   rewrite Rplus_assoc.
-  replace (a₃₁²)%R with (a₃₁² + 0)%R at 1 by lra.
+  replace a₃₁² with (a₃₁² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 
   rewrite Rplus_shuffle0, Rplus_comm.
-  replace (a₃₂²)%R with (a₃₂² + 0)%R at 1 by lra.
+  replace a₃₂² with (a₃₂² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 
   rewrite Rplus_comm.
-  replace (a₃₃²)%R with (a₃₃² + 0)%R at 1 by lra.
+  replace a₃₃² with (a₃₃² + 0) at 1 by lra.
   apply Rplus_le_compat_l, nonneg_plus_sqr.
 Qed.
 
-Theorem Rsqr_le_1_interv : ∀ x, (x² ≤ 1 → -1 ≤ x ≤ 1)%R.
+Theorem Rsqr_le_1_interv : ∀ x, x² ≤ 1 → -1 ≤ x ≤ 1.
 Proof.
 intros * Hx.
-replace 1%R with (1 ^ 2)%R in Hx by lra.
+replace 1 with (1 ^ 2) in Hx by lra.
 rewrite <- Rsqr_pow2 in Hx.
 split; [ apply Rsqr_neg_pos_le_0; lra | ].
 apply Rsqr_incr_0_var; lra.
@@ -474,9 +474,9 @@ Qed.
 
 Theorem ortho_matrix_coeff_interv : ∀ M,
   (M * mat_transp M)%mat = mat_id
-  → ((-1 ≤ a₁₁ M ≤ 1 ∧ -1 ≤ a₁₂ M ≤ 1 ∧ -1 ≤ a₁₃ M ≤ 1) ∧
+  → (-1 ≤ a₁₁ M ≤ 1 ∧ -1 ≤ a₁₂ M ≤ 1 ∧ -1 ≤ a₁₃ M ≤ 1) ∧
      (-1 ≤ a₂₁ M ≤ 1 ∧ -1 ≤ a₂₂ M ≤ 1 ∧ -1 ≤ a₂₃ M ≤ 1) ∧
-     (-1 ≤ a₃₁ M ≤ 1 ∧ -1 ≤ a₃₂ M ≤ 1 ∧ -1 ≤ a₃₃ M ≤ 1))%R.
+     (-1 ≤ a₃₁ M ≤ 1 ∧ -1 ≤ a₃₂ M ≤ 1 ∧ -1 ≤ a₃₃ M ≤ 1).
 Proof.
 intros * Hrm.
 specialize (ortho_matrix_sqr_coeff_le_1 _ Hrm) as Ha.
@@ -498,7 +498,7 @@ Qed.
 
 Theorem mat_trace_interv : ∀ M,
   is_rotation_matrix M
-  → (-1 ≤ mat_trace M ≤ 3)%R.
+  → -1 ≤ mat_trace M ≤ 3.
 Proof.
 intros * (Hrm & Hdet).
 specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
@@ -519,16 +519,16 @@ ring_simplify in H31; ring_simplify in H32; ring_simplify in H33.
 clear H21 H31 H32.
 progress repeat rewrite <- Rsqr_pow2 in *.
 rewrite Rplus_assoc in Hdet.
-remember (a₁₂ * (a₂₃ * a₃₁ - a₃₃ * a₂₁))%R as u eqn:Hu.
-remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂))%R as v eqn:Hv.
-remember (u + v)%R as w eqn:Hw; subst u v.
-apply Rplus_eq_compat_r with (r := (- w)%R) in Hdet.
+remember (a₁₂ * (a₂₃ * a₃₁ - a₃₃ * a₂₁)) as u eqn:Hu.
+remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂)) as v eqn:Hv.
+remember (u + v) as w eqn:Hw; subst u v.
+apply Rplus_eq_compat_r with (r := - w) in Hdet.
 rewrite Rplus_assoc, fold_Rminus in Hdet.
-replace (w - w)%R with 0%R in Hdet by lra.
+replace (w - w) with 0 in Hdet by lra.
 rewrite Rplus_0_r, fold_Rminus in Hdet.
-destruct (Req_dec w 1%R) as [Hw1| Hw1].
+destruct (Req_dec w 1) as [Hw1| Hw1].
  move Hw1 at top; subst w.
- replace (1 - 1)%R with 0%R in Hdet by lra.
+ replace (1 - 1) with 0 in Hdet by lra.
  symmetry in Hw.
  apply Rmult_integral in Hdet.
  destruct Hdet as [Hdet| Hdet].
@@ -536,14 +536,14 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
   rewrite Rsqr_0, Rplus_0_l in H11.
   rewrite Rmult_0_l, Rplus_0_l in H12, H13.
   rewrite Rplus_0_l.
-  remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂))%R as v eqn:Hv.
-  apply Rplus_eq_compat_r with (r := (- v)%R) in Hw.
+  remember (a₁₃ * (a₂₁ * a₃₂ - a₃₁ * a₂₂)) as v eqn:Hv.
+  apply Rplus_eq_compat_r with (r := - v) in Hw.
   rewrite Rplus_assoc, fold_Rminus in Hw.
-  replace (v - v)%R with 0%R in Hw by lra.
+  replace (v - v) with 0 in Hw by lra.
   rewrite Rplus_0_r, fold_Rminus in Hw.
-  destruct (Req_dec v 1%R) as [Hv1| Hv1].
+  destruct (Req_dec v 1) as [Hv1| Hv1].
    move Hv1 at top; subst v.
-   replace (1 - 1)%R with 0%R in Hw by lra.
+   replace (1 - 1) with 0 in Hw by lra.
    symmetry in Hv.
    apply Rmult_integral in Hw.
    destruct Hw as [Hw| Hw].
@@ -560,12 +560,12 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
     apply Rminus_diag_uniq in Hw.
     destruct (Rlt_dec a₂₂ 0) as [Ha22| Ha22]; [ | lra ].
     destruct (Rlt_dec a₃₃ 0) as [Ha33| Ha33]; [ | lra ].
-    apply Rmult_eq_compat_r with (r := (/ a₃₃)%R) in Hw.
+    apply Rmult_eq_compat_r with (r := / a₃₃) in Hw.
     symmetry in Hw; rewrite Rmult_shuffle0 in Hw.
     rewrite Rinv_r in Hw; [ rewrite Rmult_1_l in Hw | lra ].
     subst a₂₁.
-    replace (a₂₃ * a₃₁ * / a₃₃ * a₃₂ - a₃₁ * a₂₂)%R
-    with (a₃₁ * (a₂₃ * / a₃₃ * a₃₂ - a₂₂))%R in Hv by lra.
+    replace (a₂₃ * a₃₁ * / a₃₃ * a₃₂ - a₃₁ * a₂₂)
+    with (a₃₁ * (a₂₃ * / a₃₃ * a₃₂ - a₂₂)) in Hv by lra.
     rewrite <- Rmult_assoc in Hv.
     ring_simplify in H23.
     apply Rmult_eq_compat_r with (r := a₃₃) in H23.
@@ -577,12 +577,12 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
     do 2 rewrite <- Rsqr_pow2 in H23.
     apply Rmult_eq_compat_r with (r := a₃₃) in Hv.
     rewrite Rmult_assoc in Hv.
-    replace ((a₂₃ * / a₃₃ * a₃₂ - a₂₂) * a₃₃)%R
-    with (a₂₃ * a₃₂ * (/ a₃₃ * a₃₃) - a₂₂ * a₃₃)%R in Hv by lra.
+    replace ((a₂₃ * / a₃₃ * a₃₂ - a₂₂) * a₃₃)
+    with (a₂₃ * a₃₂ * (/ a₃₃ * a₃₃) - a₂₂ * a₃₃) in Hv by lra.
     rewrite Rinv_l in Hv; [ | lra ].
     rewrite Rmult_1_r, Rmult_1_l in Hv.
     rewrite Rsqr_mult in H22.
-    apply Rmult_eq_compat_r with (r := (a₃₃²)%R) in H22.
+    apply Rmult_eq_compat_r with (r := a₃₃²) in H22.
     rewrite Rplus_assoc in H22.
     rewrite Rmult_plus_distr_r in H22.
     rewrite Rmult_assoc in H22.
@@ -590,7 +590,7 @@ destruct (Req_dec w 1%R) as [Hw1| Hw1].
     rewrite Rinv_l in H22; [ | lra ].
     rewrite Rsqr_1 in H22.
     rewrite Rmult_1_r, Rmult_1_l in H22.
-    assert (H : ((a₂₃ * a₃₁)² = a₃₃² * (1 - (a₂₂² + a₂₃²)))%R) by lra.
+    assert (H : (a₂₃ * a₃₁)² = a₃₃² * (1 - (a₂₂² + a₂₃²))) by lra.
     clear H22; rename H into H22; move H22 before H11.
     destruct (Req_dec (a₂₂² + a₂₃²) 1) as [Haa| Haa].
      rewrite Haa in H22.
@@ -624,8 +624,8 @@ let truc est vrai, pourtant, mais chais pas comment le démontrer.
 bbb.
  ring_simplify in Hdet.
  assert (Hdet' :
-   (a₁₁ * a₂₂ * a₃₃ + a₃₂ * a₂₁ * a₁₃ + a₂₃ * a₁₂ * a₃₁ =
-    a₁₁ * a₃₂ * a₂₃ + a₂₂ * a₃₁ * a₁₃ + a₃₃ * a₁₂ * a₂₁ + 1)%R) by lra.
+   a₁₁ * a₂₂ * a₃₃ + a₃₂ * a₂₁ * a₁₃ + a₂₃ * a₁₂ * a₃₁ =
+    a₁₁ * a₃₂ * a₂₃ + a₂₂ * a₃₁ * a₁₃ + a₃₃ * a₁₂ * a₂₁ + 1) by lra.
  clear Hdet; rename Hdet' into Hdet.
 bbb.
 *)
@@ -640,9 +640,9 @@ intros * Hrm Hm Hn.
 subst p.
 remember (rotation_axis M) as ev eqn:Hev.
 unfold rotation_axis in Hev.
-remember (a₃₂ M - a₂₃ M)%R as x eqn:Hx.
-remember (a₁₃ M - a₃₁ M)%R as y eqn:Hy.
-remember (a₂₁ M - a₁₂ M)%R as z eqn:Hz.
+remember (a₃₂ M - a₂₃ M) as x eqn:Hx.
+remember (a₁₃ M - a₃₁ M) as y eqn:Hy.
+remember (a₂₁ M - a₁₂ M) as z eqn:Hz.
 destruct (vec_zerop ev) as [Hvz| Hvnz].
  subst ev.
  injection Hvz; clear Hvz; intros H1 H2 H3.
@@ -672,9 +672,9 @@ destruct (vec_zerop ev) as [Hvz| Hvnz].
  rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
  rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
  subst ev; simpl.
- replace (k * x)%R with (x * k)%R by apply Rmult_comm.
- replace (k * y)%R with (y * k)%R by apply Rmult_comm.
- replace (k * z)%R with (z * k)%R by apply Rmult_comm.
+ replace (k * x) with (x * k) by apply Rmult_comm.
+ replace (k * y) with (y * k) by apply Rmult_comm.
+ replace (k * z) with (z * k) by apply Rmult_comm.
  subst x y z.
  clear Hm Hvnz.
  f_equal; nsatz.
@@ -954,11 +954,11 @@ apply path_of_nat_aux_enough_iter.
  do 3 apply Nat.lt_lt_succ_r.
  rewrite Nat.mul_add_distr_r.
  apply Nat.lt_lt_add_l.
- remember 4 as four; simpl; subst four.
+ remember 4%nat as four; simpl; subst four.
  rewrite Nat.mul_add_distr_r.
  destruct n; [ apply Nat.lt_0_succ | ].
  apply Nat.lt_lt_add_l.
- remember 4 as four; simpl; subst four.
+ remember 4%nat as four; simpl; subst four.
  rewrite Nat.mul_add_distr_r.
  rewrite <- Nat.mul_assoc.
  apply Nat.lt_le_trans with (m := (4 * 4 + n)%nat).
@@ -1116,7 +1116,7 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
   in
   fold_right rotate p₁ (path_of_nat no).
 
-Theorem normalized_vec_normalize : ∀ v, v ≠ 0%vec → ∥(vec_normalize v)∥ = 1%R.
+Theorem normalized_vec_normalize : ∀ v, v ≠ 0%vec → ∥(vec_normalize v)∥ = 1.
 Proof.
 intros (x, y, z) Hv; simpl.
 remember (√ (x² + y² + z²)) as r eqn:Hr.
@@ -1144,10 +1144,10 @@ intros * Hm.
 unfold rotation_fixpoint; simpl.
 do 3 rewrite Rsqr_mult.
 do 2 rewrite <- Rmult_plus_distr_l.
-remember (a₃₂ M - a₂₃ M)%R as x eqn:Hx.
-remember (a₁₃ M - a₃₁ M)%R as y eqn:Hy.
-remember (a₂₁ M - a₁₂ M)%R as z eqn:Hz.
-remember (x² + y² + z²)%R as r₁ eqn:Hr₁.
+remember (a₃₂ M - a₂₃ M) as x eqn:Hx.
+remember (a₁₃ M - a₃₁ M) as y eqn:Hy.
+remember (a₂₁ M - a₁₂ M) as z eqn:Hz.
+remember (x² + y² + z²) as r₁ eqn:Hr₁.
 destruct (Req_dec r₁ 0) as [Hrz| Hrz].
  move Hrz at top; subst r₁; symmetry in Hr₁.
  apply sqr_vec_norm_eq_0 in Hr₁.
@@ -1194,7 +1194,7 @@ destruct (mat_eq_dec M (mat_transp M)) as [Hmt| Hmt].
  now apply rotation_fixpoint_on_sphere.
 Qed.
 
-Theorem rotation_fixpoint_norm : ∀ M r, (0 ≤ r)%R
+Theorem rotation_fixpoint_norm : ∀ M r, 0 ≤ r
   → M ≠ mat_transp M
   → ∥(rotation_fixpoint M r)∥ = r.
 Proof.
@@ -1232,7 +1232,7 @@ Theorem vec_cross_mul_eq_0 : ∀ u v,
   u ≠ 0%vec
   → v ≠ 0%vec
   → u × v = 0%vec
-  → ∃ a b, a ≠ 0%R ∧ b ≠ 0%R ∧ (a ⁎ u + b ⁎ v = 0)%vec.
+  → ∃ a b, a ≠ 0 ∧ b ≠ 0 ∧ (a ⁎ u + b ⁎ v = 0)%vec.
 Proof.
 intros * Hu Hv Huv.
 destruct u as (u₁, u₂, u₃).
@@ -1253,7 +1253,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
   rewrite Rmult_0_l in H₂.
   apply Rmult_integral in H₂.
   destruct H₂ as [H₂| H₂]; [ now exfalso; subst u₃; apply Hu | subst v₁ ].
-  exists v₃, (- u₃)%R.
+  exists v₃, (- u₃).
   split; [ now intros H; apply Hv; f_equal | ].
   split; [ now apply Ropp_neq_0_compat; intros H; apply Hu; f_equal | ].
   f_equal; lra.
@@ -1262,7 +1262,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
    subst u₂; rewrite Rmult_0_l in H₁; symmetry in H₁.
    apply Rmult_integral in H₁.
    destruct H₁ as [H₁| H₁]; [ now exfalso; subst u₃; apply Hu | subst v₂ ].
-   exists v₃, (- u₃)%R.
+   exists v₃, (- u₃).
    split; [ now intros H; apply Hv; f_equal | ].
    split; [ now apply Ropp_neq_0_compat; intros H; apply Hu; f_equal | ].
    f_equal; lra.
@@ -1271,7 +1271,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
     subst u₃; rewrite Rmult_0_l in H₁.
     apply Rmult_integral in H₁.
     destruct H₁ as [H₁| H₁]; [ easy | subst v₃ ].
-    exists v₂, (-u₂)%R.
+    exists v₂, (- u₂).
     split; [ now intros H; apply Hv; f_equal | ].
     split; [ now apply Ropp_neq_0_compat; intros H; apply Hu; f_equal | ].
     f_equal; lra.
@@ -1281,7 +1281,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
      apply Rmult_integral in H₁.
      destruct H₁ as [H₁| H₁]; [ easy | now exfalso; subst v₃; apply Hv ].
 
-     exists v₂, (- u₂)%R.
+     exists v₂, (- u₂).
      split; [ easy | ].
      split; [ now apply Ropp_neq_0_compat | ].
      f_equal; [ lra | lra | ].
@@ -1295,7 +1295,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
   apply Rmult_integral in H₂.
   destruct H₂ as [H₂| H₂]; [ easy | now exfalso; subst v₃; apply Hv ].
 
-  exists v₁, (- u₁)%R.
+  exists v₁, (- u₁).
   split; [ easy | ].
   split; [ now apply Ropp_neq_0_compat | ].
   f_equal; lra.
@@ -1307,7 +1307,7 @@ Theorem free_family_diff_norm_vec : ∀ u v,
   → is_neg_vec u = is_neg_vec v
   → u ≠ 0%vec
   → v ≠ 0%vec
-  → ∀ a b : ℝ, (a ⁎ u + b ⁎ v)%vec = 0%vec → a = 0%R ∧ b = 0%R.
+  → ∀ a b : ℝ, (a ⁎ u + b ⁎ v)%vec = 0%vec → a = 0 ∧ b = 0.
 Proof.
 intros * Hvn Hvv Hn Hv₁ Hv₂ * Hab.
 destruct u as (x₁, y₁, z₁).
@@ -1336,9 +1336,9 @@ destruct (Req_dec a 0) as [Ha| Ha].
   apply Rplus_opp_r_uniq in Hx.
   apply Rplus_opp_r_uniq in Hy.
   apply Rplus_opp_r_uniq in Hz.
-  apply Rmult_eq_compat_r with (r := (/ b)%R) in Hx.
-  apply Rmult_eq_compat_r with (r := (/ b)%R) in Hy.
-  apply Rmult_eq_compat_r with (r := (/ b)%R) in Hz.
+  apply Rmult_eq_compat_r with (r := / b) in Hx.
+  apply Rmult_eq_compat_r with (r := / b) in Hy.
+  apply Rmult_eq_compat_r with (r := / b) in Hz.
   rewrite Rmult_shuffle0, Rinv_r in Hx; [ | easy ].
   rewrite Rmult_shuffle0, Rinv_r in Hy; [ | easy ].
   rewrite Rmult_shuffle0, Rinv_r in Hz; [ | easy ].
@@ -1391,21 +1391,21 @@ apply Rminus_diag_uniq in Hz.
 simpl in Hn.
 destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
  destruct (Rlt_dec x₂ 0) as [Hx₂| Hx₂]; [ clear Hn |  ].
-  apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hz.
+  apply Rmult_eq_compat_r with (r := / x₂) in Hz.
   symmetry in Hz.
   rewrite Rmult_assoc in Hz.
   rewrite Rinv_r in Hz; [  | lra ].
   rewrite Rmult_1_r in Hz.
   rewrite Rmult_shuffle0, fold_Rdiv in Hz.
-  apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hy.
+  apply Rmult_eq_compat_r with (r := / x₂) in Hy.
   rewrite Rmult_assoc in Hy.
   rewrite Rinv_r in Hy; [  | lra ].
   rewrite Rmult_1_r in Hy.
   rewrite Rmult_shuffle0, fold_Rdiv in Hy.
   subst y₁ z₁; clear Hx.
-  replace x₁ with (x₁ / x₂ * x₂)%R in Hvn at 1.
-   replace x₁ with (x₁ / x₂ * x₂)%R in Hvv at 1.
-    remember (x₁ / x₂)%R as k eqn:Hk .
+  replace x₁ with (x₁ / x₂ * x₂) in Hvn at 1.
+   replace x₁ with (x₁ / x₂ * x₂) in Hvv at 1.
+    remember (x₁ / x₂) as k eqn:Hk .
     rewrite vec_mul_diag in Hvn, Hvv.
     simpl in Hvn.
     do 3 rewrite Rsqr_mult in Hvn.
@@ -1462,21 +1462,21 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
  destruct (Rgt_dec x₁ 0) as [Hgx₁| Hgx₁].
   destruct (Rlt_dec x₂ 0) as [Hlx₂| Hlx₂]; [ easy |  ].
   destruct (Rgt_dec x₂ 0) as [Hgx₂| Hgx₂]; [ clear Hn |  ].
-   apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hz.
+   apply Rmult_eq_compat_r with (r := / x₂) in Hz.
    symmetry in Hz.
    rewrite Rmult_assoc in Hz.
    rewrite Rinv_r in Hz; [  | lra ].
    rewrite Rmult_1_r in Hz.
    rewrite Rmult_shuffle0, fold_Rdiv in Hz.
-   apply Rmult_eq_compat_r with (r := (/ x₂)%R) in Hy.
+   apply Rmult_eq_compat_r with (r := / x₂) in Hy.
    rewrite Rmult_assoc in Hy.
    rewrite Rinv_r in Hy; [  | lra ].
    rewrite Rmult_1_r in Hy.
    rewrite Rmult_shuffle0, fold_Rdiv in Hy.
    subst y₁ z₁; clear Hx.
-   replace x₁ with (x₁ / x₂ * x₂)%R in Hvn at 1.
-    replace x₁ with (x₁ / x₂ * x₂)%R in Hvv at 1.
-     remember (x₁ / x₂)%R as k eqn:Hk .
+   replace x₁ with (x₁ / x₂ * x₂) in Hvn at 1.
+    replace x₁ with (x₁ / x₂ * x₂) in Hvv at 1.
+     remember (x₁ / x₂) as k eqn:Hk .
      rewrite vec_mul_diag in Hvn, Hvv.
      simpl in Hvn.
      do 3 rewrite Rsqr_mult in Hvn.
@@ -1553,17 +1553,17 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
     clear Hy Hz.
     destruct (Rlt_dec y₁ 0) as [Hly₁| Hly₁].
      destruct (Rgt_dec y₁ 0) as [Hgy₁| Hgy₁]; [ lra |  ].
-     apply Rmult_eq_compat_l with (r := (/ y₁)%R) in Hx.
+     apply Rmult_eq_compat_l with (r := / y₁) in Hx.
      do 2 rewrite <- Rmult_assoc in Hx.
      rewrite Rinv_l in Hx; [  | lra ].
      rewrite Rmult_1_l, Rmult_comm, <- Rmult_assoc in Hx.
      rewrite fold_Rdiv in Hx.
      subst z₂.
-     replace y₂ with (y₂ / y₁ * y₁)%R in Hvn at 1.
-      replace y₂ with (y₂ / y₁ * y₁)%R in Hvv at 1.
-       replace 0%R with (y₂ / y₁ * 0)%R in Hvn at 2 by lra.
-       replace 0%R with (y₂ / y₁ * 0)%R in Hvv at 2 by lra.
-       remember (y₂ / y₁)%R as k eqn:Hk .
+     replace y₂ with (y₂ / y₁ * y₁) in Hvn at 1.
+      replace y₂ with (y₂ / y₁ * y₁) in Hvv at 1.
+       replace 0 with (y₂ / y₁ * 0) in Hvn at 2 by lra.
+       replace 0 with (y₂ / y₁ * 0) in Hvv at 2 by lra.
+       remember (y₂ / y₁) as k eqn:Hk .
        rewrite vec_mul_diag in Hvn, Hvv.
        simpl in Hvn.
        do 3 rewrite Rsqr_mult in Hvn.
@@ -1610,17 +1610,17 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
       now rewrite Rmult_1_r.
 
   destruct (Rgt_dec y₁ 0) as [Hgy₁| Hgy₁].
-   apply Rmult_eq_compat_l with (r := (/ y₁)%R) in Hx.
+   apply Rmult_eq_compat_l with (r := / y₁) in Hx.
    do 2 rewrite <- Rmult_assoc in Hx.
    rewrite Rinv_l in Hx; [  | lra ].
    rewrite Rmult_1_l, Rmult_comm, <- Rmult_assoc in Hx.
    rewrite fold_Rdiv in Hx.
    subst z₂.
-   replace y₂ with (y₂ / y₁ * y₁)%R in Hvn at 1.
-    replace y₂ with (y₂ / y₁ * y₁)%R in Hvv at 1.
-     replace 0%R with (y₂ / y₁ * 0)%R in Hvn at 2 by lra.
-     replace 0%R with (y₂ / y₁ * 0)%R in Hvv at 2 by lra.
-     remember (y₂ / y₁)%R as k eqn:Hk .
+   replace y₂ with (y₂ / y₁ * y₁) in Hvn at 1.
+    replace y₂ with (y₂ / y₁ * y₁) in Hvv at 1.
+     replace 0 with (y₂ / y₁ * 0) in Hvn at 2 by lra.
+     replace 0 with (y₂ / y₁ * 0) in Hvv at 2 by lra.
+     remember (y₂ / y₁) as k eqn:Hk .
      rewrite vec_mul_diag in Hvn, Hvv.
      simpl in Hvn.
      do 3 rewrite Rsqr_mult in Hvn.
@@ -1712,7 +1712,7 @@ Theorem vec_cross_mul_are_free_family : ∀ u v,
   → u ≠ v
   → ∀ a b c : ℝ,
     (a ⁎ u + b ⁎ v + c ⁎ (u × v))%vec = 0%vec
-    → a = 0%R ∧ b = 0%R ∧ c = 0%R.
+    → a = 0 ∧ b = 0 ∧ c = 0.
 Proof.
 intros * Hvn Hn Hu Hv Huv * Hab.
 generalize Hab; intros H.
@@ -1751,14 +1751,14 @@ simpl; f_equal; ring.
 Qed.
 
 Theorem vec_couple_and_cross_is_base : ∀ u v X,
-  (u × v · u × v) ≠ 0%R
+  (u × v · u × v) ≠ 0
   → ∃ a b c, X = (a ⁎ u + b ⁎ v + c ⁎ (u × v))%vec.
 Proof.
 intros * Huv.
 remember (u × v · u × v) as r eqn:Hr.
-exists (((X · u) * (v · v) - (X · v) * (u · v)) / r)%R.
-exists (((X · v) * (u · u) - (X · u) * (u · v)) / r)%R.
-exists ((X · (u × v)) / r)%R.
+exists (((X · u) * (v · v) - (X · v) * (u · v)) / r).
+exists (((X · v) * (u · u) - (X · u) * (u · v)) / r).
+exists ((X · (u × v)) / r).
 apply (vec_const_mul_eq_reg_l r); [ | easy ].
 do 2 rewrite vec_const_mul_add_distr_l.
 do 3 rewrite vec_const_mul_assoc.
@@ -1797,14 +1797,14 @@ destruct (vec_zerop u) as [Hv₁| Hv₁].
   now apply vec_norm_eq_0 in Hvn.
 
   destruct (vec_eq_dec u v) as [Hvv| Hvv]; [ easy | exfalso ].
-  remember (vec_const_mul (∥u∥ / ∥(u × v)∥)%R (u × v)) as W eqn:HW.
+  remember ((∥u∥ / ∥(u × v)∥) ⁎ (u × v)) as W eqn:HW.
   move W before v.
   assert (Hp₃ : (M * (u × v) = u × v)%vec).
    apply mat_vec_mul_cross_distr with (u := u) (v := v) in Hm.
    now rewrite Hp₁, Hp₂ in Hm.
 
    move Hp₃ before Hp₂.
-   assert (Hucv : ∥(u × v)∥ ≠ 0%R).
+   assert (Hucv : ∥(u × v)∥ ≠ 0).
     intros H; apply vec_norm_eq_0 in H.
     apply vec_cross_mul_eq_0 in H; [ | easy | easy ].
     destruct H as (a & b & Ha & Hb & Hab).
@@ -1819,17 +1819,17 @@ destruct (vec_zerop u) as [Hv₁| Hv₁].
     apply Rplus_opp_r_uniq in Hy.
     apply Rplus_opp_r_uniq in Hz.
     rewrite Hx, Hy, Hz in Hbv.
-    replace (- ax₁)%R with (-1 * ax₁)%R in Hbv by lra.
-    replace (- ay₁)%R with (-1 * ay₁)%R in Hbv by lra.
-    replace (- az₁)%R with (-1 * az₁)%R in Hbv by lra.
+    replace (- ax₁) with (-1 * ax₁) in Hbv by lra.
+    replace (- ay₁) with (-1 * ay₁) in Hbv by lra.
+    replace (- az₁) with (-1 * az₁) in Hbv by lra.
     fold (vec_const_mul (-1) (V ax₁ ay₁ az₁)) in Hbv.
     rewrite <- Hau in Hbv.
     rewrite vec_const_mul_assoc in Hbv.
-    replace (-1 * a)%R with (-a)%R in Hbv by lra.
+    replace (-1 * a) with (-a) in Hbv by lra.
     apply vec_const_mul_div in Hbv; [ | easy ].
     rewrite Hbv in Hvn.
     rewrite vec_norm_vec_const_mul in Hvn.
-    replace (∥u∥) with (1 * ∥u∥)%R in Hvn at 1 by lra.
+    replace ∥u∥ with (1 * ∥u∥) in Hvn at 1 by lra.
     apply Rmult_eq_reg_r in Hvn; [ | now intros H; apply Hv₁, vec_norm_eq_0 ].
     symmetry in Hvn.
     apply Rabs_or in Hvn.
@@ -1846,7 +1846,7 @@ destruct (vec_zerop u) as [Hv₁| Hv₁].
 
     move Hvv before Hvn.
     assert (HMX : ∀ X, (M * X)%vec = X).
-     assert (Huv : u × v · u × v ≠ 0%R).
+     assert (Huv : u × v · u × v ≠ 0).
       rewrite vec_dot_mul_diag.
       intros Huv; apply Hvv.
       now apply Rsqr_eq_0 in Huv.
@@ -2132,14 +2132,14 @@ Definition matrix_of_unit_axis_angle '(V x y z, c, s) :=
     (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
 
 Definition matrix_of_axis_angle '(V x y z, c, s) :=
-  let r := (√ (x² + y² + z²))%R in
-  let ux := (x / r)%R in
-  let uy := (y / r)%R in
-  let uz := (z / r)%R in
+  let r := √ (x² + y² + z²) in
+  let ux := x / r in
+  let uy := y / r in
+  let uz := z / r in
   matrix_of_unit_axis_angle (V ux uy uz, c, s).
 
 Definition axis_angle_of_matrix M :=
-  let cosθ := ((mat_trace M - 1) / 2)%R in
+  let cosθ := (mat_trace M - 1) / 2 in
   let sinθ := √ (1 - cosθ²) in
   let v := rotation_unit_axis M in
   (v, cosθ, sinθ).
@@ -2147,9 +2147,9 @@ Definition axis_angle_of_matrix M :=
 Arguments axis_angle_of_matrix M%mat.
 
 Theorem matrix_of_axis_angle_inv : ∀ v c s,
-  (0 < s)%R
-  → ∥v∥ = 1%R
-  → (s² + c² = 1)%R
+  0 < s
+  → ∥v∥ = 1
+  → s² + c² = 1
   → axis_angle_of_matrix (matrix_of_axis_angle (v, c, s)) = (v, c, s).
 Proof.
 intros v cosθ sinθ Hsp Hvs Hsc.
@@ -2158,8 +2158,8 @@ remember (v, cosθ, sinθ) as acs eqn:Hacs.
 unfold axis_angle_of_matrix.
 remember (matrix_of_axis_angle acs) as M eqn:HM.
 remember (mat_trace M) as tr eqn:Htr.
-remember ((tr - 1) / 2)%R as c eqn:Hc.
-remember (√ (1 - c²))%R as s eqn:Hs.
+remember ((tr - 1) / 2) as c eqn:Hc.
+remember (√ (1 - c²)) as s eqn:Hs.
 subst acs; simpl.
 simpl in HM.
 destruct v as (x, y, z).
@@ -2172,9 +2172,9 @@ unfold mat_trace in Htr.
 rewrite HM in Htr; unfold mkrmat in Htr; simpl in Htr.
 rename cosθ into c₁.
 do 2 rewrite <- Rplus_assoc in Htr.
-replace (x² * (1 - c₁) + c₁ + y² * (1 - c₁) + c₁ + z² * (1 - c₁) + c₁)%R
-with ((x² + y² + z²) * (1 - c₁) + 3 * c₁)%R in Htr by lra.
-assert (Hv2s : (x² + y² + z² = 1)%R).
+replace (x² * (1 - c₁) + c₁ + y² * (1 - c₁) + c₁ + z² * (1 - c₁) + c₁)
+with ((x² + y² + z²) * (1 - c₁) + 3 * c₁) in Htr by lra.
+assert (Hv2s : x² + y² + z² = 1).
  apply (f_equal Rsqr) in Hvs.
  rewrite Rsqr_sqrt in Hvs; [ | apply nonneg_sqr_vec_norm ].
  rewrite Hvs; apply Rsqr_1.
@@ -2184,26 +2184,26 @@ assert (Hv2s : (x² + y² + z² = 1)%R).
  rewrite Htr in Hc.
  assert (H : c = c₁) by lra.
  move H at top; subst c₁; clear Hc.
- assert (H : (sinθ² = 1 - c²)%R) by lra.
+ assert (H : sinθ² = 1 - c²) by lra.
  rewrite <- H in Hs.
  rewrite sqrt_Rsqr in Hs; [ | lra ].
  move Hs at top; subst sinθ; clear H.
  f_equal; f_equal; symmetry.
- replace (y * z * (1 - c) + x * s - (y * z * (1 - c) - x * s))%R
- with (2 * x * s)%R by lra.
- replace (x * z * (1 - c) + y * s - (x * z * (1 - c) - y * s))%R
- with (2 * y * s)%R by lra.
- replace (x * y * (1 - c) + z * s - (x * y * (1 - c) - z * s))%R
- with (2 * z * s)%R by lra.
+ replace (y * z * (1 - c) + x * s - (y * z * (1 - c) - x * s))
+ with (2 * x * s) by lra.
+ replace (x * z * (1 - c) + y * s - (x * z * (1 - c) - y * s))
+ with (2 * y * s) by lra.
+ replace (x * y * (1 - c) + z * s - (x * y * (1 - c) - z * s))
+ with (2 * z * s) by lra.
  progress repeat rewrite Rsqr_mult.
  progress repeat rewrite <- Rmult_plus_distr_r.
  progress repeat rewrite <- Rmult_plus_distr_l.
  rewrite Hv2s, Rmult_1_r.
  rewrite <- Rsqr_mult.
  rewrite sqrt_Rsqr; [ | lra ].
- replace (2 * x * s / (2 * s))%R with ((2 * s) * / (2 * s) * x)%R by lra.
- replace (2 * y * s / (2 * s))%R with ((2 * s) * / (2 * s) * y)%R by lra.
- replace (2 * z * s / (2 * s))%R with ((2 * s) * / (2 * s) * z)%R by lra.
+ replace (2 * x * s / (2 * s)) with ((2 * s) * / (2 * s) * x) by lra.
+ replace (2 * y * s / (2 * s)) with ((2 * s) * / (2 * s) * y) by lra.
+ replace (2 * z * s / (2 * s)) with ((2 * s) * / (2 * s) * z) by lra.
  rewrite Rinv_r; [ | lra ].
  f_equal; lra.
 Qed.
@@ -2222,10 +2222,10 @@ remember (rotation_axis M) as v eqn:Hv.
 destruct v as (x₀, y₀, z₀).
 simpl in Hax.
 injection Hax; clear Hax; intros Hz Hy Hx; simpl.
-remember (√ (x₀² + y₀² + z₀²))%R as r₀ eqn:Hr₀.
-remember (√ (x² + y² + z²))%R as r eqn:Hr.
+remember (√ (x₀² + y₀² + z₀²)) as r₀ eqn:Hr₀.
+remember (√ (x² + y² + z²)) as r eqn:Hr.
 remember (mat_trace M) as tr eqn:Htr.
-remember ((tr - 1) / 2)%R as c eqn:Hc.
+remember ((tr - 1) / 2) as c eqn:Hc.
 unfold mat_trace in Hc.
 unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
 unfold mat_det in Hdet.
@@ -2252,7 +2252,7 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  move Hz' at top; subst a₂₁.
  easy.
 
- assert (H : (r₀² ≠ 0 ∧ r = 1)%R).
+ assert (H : r₀² ≠ 0 ∧ r = 1).
   split; [ now intros H; apply Hr₀nz; apply Rsqr_eq_0 in H | ].
   rewrite Hr, Hx, Hy, Hz.
   rewrite Rsqr_div; [ | easy ].
@@ -2272,43 +2272,43 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   rewrite Rsqr_div; [ | easy ].
   symmetry.
   f_equal.
-   apply Rmult_eq_reg_r with (r := (2 * r₀²)%R); [ | lra ].
+   apply Rmult_eq_reg_r with (r := 2 * r₀²); [ | lra ].
    rewrite Rmult_plus_distr_r.
-   replace (x₀² / r₀² * (1 - (tr - 1) / 2) * (2 * r₀²))%R
-   with (x₀² * (3 - tr) * (r₀² * / r₀²))%R by lra.
-   replace ((tr - 1) / 2 * (2 * r₀²))%R
-   with ((tr - 1) * r₀²)%R by lra.
+   replace (x₀² / r₀² * (1 - (tr - 1) / 2) * (2 * r₀²))
+   with (x₀² * (3 - tr) * (r₀² * / r₀²)) by lra.
+   replace ((tr - 1) / 2 * (2 * r₀²))
+   with ((tr - 1) * r₀²) by lra.
    rewrite Rinv_r; [ rewrite Rmult_1_r, Hr₀ | easy ].
    rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
    subst x₀ y₀ z₀ tr; ring_simplify.
    clear r₀ Hr Hr₀ Hr₀nz Hr₀2 Hntr.
    Time nsatz.
 
-   apply Rmult_eq_reg_l with (r := (4 * r₀²)%R); [ | lra ].
+   apply Rmult_eq_reg_l with (r := 4 * r₀²); [ | lra ].
    rewrite Rmult_minus_distr_l.
    do 3 rewrite <- Rmult_assoc.
    do 2 rewrite Rsqr_pow2.
-   replace (4 * r₀ ^ 2 * (x₀ / r₀) * (y₀ / r₀))%R
-   with (4 * x₀ * y₀ * (r₀ / r₀) * (r₀ / r₀))%R by lra.
-   replace (4 * r₀ ^ 2 * (z₀ / r₀))%R
-   with (4 * r₀ * z₀ * (r₀ / r₀))%R by lra.
+   replace (4 * r₀ ^ 2 * (x₀ / r₀) * (y₀ / r₀))
+   with (4 * x₀ * y₀ * (r₀ / r₀) * (r₀ / r₀)) by lra.
+   replace (4 * r₀ ^ 2 * (z₀ / r₀))
+   with (4 * r₀ * z₀ * (r₀ / r₀)) by lra.
    rewrite Rdiv_same; [ do 3 rewrite Rmult_1_r | lra ].
-   replace (1 - ((tr - 1) / 2) ^ 2)%R with ((4 - (tr - 1) ^ 2) / 4)%R
+   replace (1 - ((tr - 1) / 2) ^ 2) with ((4 - (tr - 1) ^ 2) / 4)
      by lra.
    rewrite sqrt_div; [ | | lra ].
 Focus 2.
-enough (-1 ≤ tr ≤ 3)%R.
-assert (-2 ≤ tr - 1 ≤ 2)%R by lra.
-remember (tr - 1)%R as a.
+enough (-1 ≤ tr ≤ 3).
+assert (-2 ≤ tr - 1 ≤ 2) by lra.
+remember (tr - 1) as a.
 clear -H0.
 rewrite <- Rsqr_pow2.
-apply Rplus_le_reg_r with (r := (a²)%R).
+apply Rplus_le_reg_r with (r := a²).
 rewrite Rplus_0_l.
 rewrite Rminus_plus.
-replace 4%R with (2 ^ 2)%R by lra.
+replace 4 with (2 ^ 2) by lra.
 rewrite <- Rsqr_pow2.
 apply Rsqr_le_abs_1.
-replace (Rabs 2)%R with 2%R; [ now apply Rabs_le | ].
+replace (Rabs 2) with 2; [ now apply Rabs_le | ].
 unfold Rabs.
 destruct (Rcase_abs 2); [ lra | easy ].
 Abort.
@@ -2337,7 +2337,7 @@ Definition quat_norm '(quat a (V b c d)) := √ (a² + b² + c² + d²).
 Definition quat_conj q := quat (Re q) (- Im q).
 
 Definition quat_inv '(quat a v) :=
-  let r := (a² + v²%vec)%R in
+  let r := a² + v²%vec in
   quat_const_mul (/ r) (quat_conj (quat a v)).
 
 Notation "h₁ + h₂" := (quat_add h₁ h₂) : quat_scope.
@@ -2364,10 +2364,10 @@ Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
 (* works for angle ≠ π *)
 Definition quat_of_mat M :=
-  let s := (√ (1 + mat_trace M) / 2)%R in
-  let x := ((a₃₂ M - a₂₃ M) / (4 * s))%R in
-  let y := ((a₁₃ M - a₃₁ M) / (4 * s))%R in
-  let z := ((a₂₁ M - a₁₂ M) / (4 * s))%R in
+  let s := √ (1 + mat_trace M) / 2 in
+  let x := (a₃₂ M - a₂₃ M) / (4 * s) in
+  let y := (a₁₃ M - a₃₁ M) / (4 * s) in
+  let z := (a₂₁ M - a₁₂ M) / (4 * s) in
   quat s (V x y z).
 
 Definition mat_of_quat '(quat a (V b c d)) :=
@@ -2380,16 +2380,16 @@ Definition quat_rotate h v := (h * v * h⁻¹)%H.
 
 Theorem mat_of_quat_inv : ∀ M,
   is_rotation_matrix M
-  → mat_trace M ≠ -1%R
+  → mat_trace M ≠ -1
   → mat_of_quat (quat_of_mat M) = M.
 Proof.
 intros * Hrm Hmt.
 unfold quat_of_mat, mat_of_quat; simpl; symmetry.
 unfold mat_trace in Hmt.
-remember (√ (1 + mat_trace M) / 2)%R as s eqn:Hs.
-remember ((a₃₂ M - a₂₃ M) / (4 * s))%R as x eqn:Hx.
-remember ((a₁₃ M - a₃₁ M) / (4 * s))%R as y eqn:Hy.
-remember ((a₂₁ M - a₁₂ M) / (4 * s))%R as z eqn:Hz.
+remember (√ (1 + mat_trace M) / 2) as s eqn:Hs.
+remember ((a₃₂ M - a₂₃ M) / (4 * s)) as x eqn:Hx.
+remember ((a₁₃ M - a₃₁ M) / (4 * s)) as y eqn:Hy.
+remember ((a₂₁ M - a₁₂ M) / (4 * s)) as z eqn:Hz.
 unfold mat_trace in Hs.
 destruct M; simpl in *; unfold mkrmat.
 f_equal.
@@ -2398,7 +2398,7 @@ f_equal.
  unfold Rdiv in Hs2.
  rewrite Rsqr_mult in Hs2.
  do 3 rewrite Rsqr_pow2 in Hs2.
- replace ((/ 2) ^ 2)%R with (/ 4)%R in Hs2 by lra.
+ replace ((/ 2) ^ 2) with (/ 4) in Hs2 by lra.
  do 2 rewrite <- Rsqr_pow2 in Hs2.
  rewrite Rsqr_sqrt in Hs2.
  rewrite Hs2, Hx, Hy, Hz.
@@ -2407,12 +2407,12 @@ f_equal.
  rewrite Rsqr_inv.
   rewrite Rsqr_mult.
   do 5 rewrite Rsqr_pow2.
-  replace (4 ^ 2)%R with 16%R by lra.
-  remember 16%R as sixteen.
-  remember 4%R as four.
+  replace (4 ^ 2) with 16 by lra.
+  remember 16 as sixteen.
+  remember 4 as four.
   rewrite Rinv_mult_distr; [ | lra | ].
   do 3 rewrite <- Rmult_assoc.
-  apply Rmult_eq_reg_r with (r := (sixteen * s ^ 2)%R).
+  apply Rmult_eq_reg_r with (r := sixteen * s ^ 2).
   unfold Rminus.
   do 9 rewrite Rmult_plus_distr_r.
   do 3 rewrite fold_Rminus.
@@ -2421,20 +2421,20 @@ f_equal.
   do 2 rewrite <- Ropp_mult_distr_l.
   do 2 rewrite fold_Rminus.
   replace
-    ((1 / 4 * (16 * s ^ 2) +
+    (1 / 4 * (16 * s ^ 2) +
       (a₁₁ / 4 * (16 * s ^ 2) + a₂₂ / 4 * (16 * s ^ 2) +
        a₃₃ / 4 * (16 * s ^ 2)) +
       (a₃₂ - a₂₃) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2) -
       (a₁₃ - a₃₁) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2) -
-      (a₂₁ - a₁₂) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2))%R) with
-    ((4 * s ^ 2 * (1 + (a₁₁ + a₂₂ + a₃₃)) +
+      (a₂₁ - a₁₂) ^ 2 / 16 / s ^ 2 * (16 * s ^ 2)) with
+    (4 * s ^ 2 * (1 + (a₁₁ + a₂₂ + a₃₃)) +
       (a₃₂ - a₂₃) ^ 2 * (/ s ^ 2 * s ^ 2) -
       (a₁₃ - a₃₁) ^ 2 * (/ s ^ 2 * s ^ 2) -
-      (a₂₁ - a₁₂) ^ 2 * (/ s ^ 2 * s ^ 2))%R) by lra.
+      (a₂₁ - a₁₂) ^ 2 * (/ s ^ 2 * s ^ 2)) by lra.
   rewrite Rinv_l.
    do 3 rewrite Rmult_1_r.
    rewrite Rsqr_pow2 in Hs2.
-   replace (1 + (a₁₁ + a₂₂ + a₃₃))%R with (4 * s ^ 2)%R by lra.
+   replace (1 + (a₁₁ + a₂₂ + a₃₃)) with (4 * s ^ 2) by lra.
    unfold is_rotation_matrix in Hrm; simpl in Hrm.
    unfold mat_transp, mat_det, mat_mul, mat_id, mkrmat in Hrm; simpl in Hrm.
    destruct Hrm as (Hid, Hrm).
@@ -2448,12 +2448,12 @@ Abort. (*
  rewrite Rsqr_0, Rplus_0_l, Rmult_0_r.
  do 3 rewrite Rmult_0_l, Rplus_0_l, Rminus_0_r.
  rewrite Rminus_0_l.
- remember (a₁₁ M - a₂₂ M - a₃₃ M)%R as x₀ eqn:Hx₀.
- remember (- a₁₁ M + a₂₂ M - a₃₃ M)%R as y₀ eqn:Hy₀.
- remember (- a₁₁ M - a₂₂ M + a₃₃ M)%R as z₀ eqn:Hz₀.
- remember ((√ (1 + x₀) / 2)%R) as x eqn:Hx.
- remember ((√ (1 + y₀) / 2)%R) as y eqn:Hy.
- remember ((√ (1 + z₀) / 2)%R) as z eqn:Hz.
+ remember a₁₁ M - a₂₂ M - a₃₃ M as x₀ eqn:Hx₀.
+ remember - a₁₁ M + a₂₂ M - a₃₃ M as y₀ eqn:Hy₀.
+ remember - a₁₁ M - a₂₂ M + a₃₃ M as z₀ eqn:Hz₀.
+ remember (√ (1 + x₀) / 2) as x eqn:Hx.
+ remember (√ (1 + y₀) / 2) as y eqn:Hy.
+ remember (√ (1 + z₀) / 2) as z eqn:Hz.
  generalize Hx; intros Hx2.
  generalize Hy; intros Hy2.
  generalize Hz; intros Hz2.
@@ -2463,7 +2463,7 @@ Abort. (*
  unfold Rdiv in Hx2, Hy2, Hz2.
  rewrite Rsqr_mult in Hx2, Hy2, Hz2.
  do 3 rewrite Rsqr_pow2 in Hx2, Hy2, Hz2.
- replace ((/ 2) ^ 2)%R with (/ 4)%R in Hx2, Hy2, Hz2 by lra.
+ replace (/ 2) ^ 2 with / 4 in Hx2, Hy2, Hz2 by lra.
  do 2 rewrite <- Rsqr_pow2 in Hx2, Hy2, Hz2.
  rewrite fold_Rdiv in Hx2, Hy2, Hz2.
  rewrite Rsqr_sqrt in Hx2.
@@ -2474,11 +2474,11 @@ Abort. (*
     subst x₀ y₀ z₀.
     f_equal; try lra.
      rewrite Hx, Hy.
-     remember (1 + (a₁₁ - a₂₂ - a₃₃))%R as x₁.
-     remember (1 + (- a₁₁ + a₂₂ - a₃₃))%R as y₁.
-     replace (2 * (√ x₁ / 2) * (√ y₁ / 2))%R with (√ x₁ * √ y₁ / 2)%R by lra.
+     remember 1 + (a₁₁ - a₂₂ - a₃₃) as x₁.
+     remember 1 + (- a₁₁ + a₂₂ - a₃₃) as y₁.
+     replace 2 * (√ x₁ / 2) * (√ y₁ / 2) with √ x₁ * √ y₁ / 2 by lra.
      rewrite <- sqrt_mult_alt.
-     remember (x₁ * y₁)%R as xy eqn:Hxy.
+     remember x₁ * y₁ as xy eqn:Hxy.
      rewrite Heqx₁, Heqy₁ in Hxy.
      ring_simplify in Hxy.
      do 3 rewrite <- Rsqr_pow2 in Hxy.
@@ -2486,13 +2486,13 @@ Abort. (*
 *)
 
 Definition vec_le '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
-  (u₁ ≤ v₁ ∧ u₂ ≤ v₂ ∧ u₃ ≤ v₃)%R.
+  u₁ ≤ v₁ ∧ u₂ ≤ v₂ ∧ u₃ ≤ v₃.
 
 Notation "u '≤' v" := (vec_le u v) : vec_scope.
 
 Theorem quat_of_mat_inv1 : ∀ h,
-  (∥h∥ = 1%R)%H
-  → (0 < Re h)%R
+  (∥h∥ = 1)%H
+  → 0 < Re h
   → quat_of_mat (mat_of_quat h) = h.
 Proof.
 intros * Hhn Hrp.
@@ -2501,31 +2501,31 @@ apply sqrt_lem_0 in Hhn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
 symmetry in Hhn; rewrite Rmult_1_r in Hhn.
 unfold quat_of_mat, mat_of_quat; simpl.
 unfold mat_trace; simpl.
-remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
+remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))
   as t eqn:Ht.
-remember (a² + b² - c² - d² - (a² - b² + c² - d²) - (a² - b² - c² + d²))%R
+remember (a² + b² - c² - d² - (a² - b² + c² - d²) - (a² - b² - c² + d²))
   as x₀ eqn:Hx₀.
-remember (- (a² + b² - c² - d²) + (a² - b² + c² - d²) - (a² - b² - c² + d²))%R
+remember (- (a² + b² - c² - d²) + (a² - b² + c² - d²) - (a² - b² - c² + d²))
   as y₀ eqn:Hy₀.
-remember (- (a² + b² - c² - d²) - (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
+remember (- (a² + b² - c² - d²) - (a² - b² + c² - d²) + (a² - b² - c² + d²))
   as z₀ eqn:Hz₀.
 ring_simplify in Ht.
 ring_simplify in Hx₀.
 ring_simplify in Hy₀.
 ring_simplify in Hz₀.
-assert (Ht' : t = (4 * a² - 1)%R) by lra.
+assert (Ht' : t = 4 * a² - 1) by lra.
 clear Ht; rename Ht' into Ht.
 destruct (Req_dec t (-1)) as [Htd| Htd].
- assert (Ha : (a = 0)%R) by (now apply Rsqr_eq_0; lra); subst a.
+ assert (Ha : a = 0) by (now apply Rsqr_eq_0; lra); subst a.
  now apply Rlt_irrefl in Hrp.
 
- assert (Ha2 : (a² ≠ 0)%R) by lra.
- assert (Ha : (a ≠ 0)%R) by now intros H; subst a; apply Ha2, Rsqr_0.
- assert (Haa : (Rabs a ≠ 0)%R) by now apply Rabs_no_R0.
- assert (Hta : (√ (1 + t) / 2 = Rabs a)%R).
+ assert (Ha2 : a² ≠ 0) by lra.
+ assert (Ha : a ≠ 0) by now intros H; subst a; apply Ha2, Rsqr_0.
+ assert (Haa : Rabs a ≠ 0) by now apply Rabs_no_R0.
+ assert (Hta : √ (1 + t) / 2 = Rabs a).
   rewrite Ht, Rplus_minus.
   rewrite Rsqr_pow2.
-  replace (4 * a ^ 2)%R with ((2 * a) ^ 2)%R by lra.
+  replace (4 * a ^ 2) with ((2 * a) ^ 2) by lra.
   rewrite <- Rsqr_pow2, sqrt_Rsqr_abs, Rabs_mult.
   replace (Rabs 2) with (Rabs (IZR 2)) by easy.
   rewrite Rabs_Zabs; simpl.
@@ -2538,17 +2538,17 @@ destruct (Req_dec t (-1)) as [Htd| Htd].
   apply Rlt_le in Hrp.
   apply Rabs_pos_eq in Hrp.
   f_equal; [ easy | ].
-  assert (Rpm : ∀ a b c, (a + b - (b - c) = a + c)%R) by (intros; lra).
+  assert (Rpm : ∀ a b c, a + b - (b - c) = a + c) by (intros; lra).
   do 3 rewrite Rpm.
-  replace (2 * a * b + 2 * a * b)%R with (4 * a * b)%R by lra.
-  replace (2 * a * c + 2 * a * c)%R with (4 * a * c)%R by lra.
-  replace (2 * a * d + 2 * a * d)%R with (4 * a * d)%R by lra.
+  replace (2 * a * b + 2 * a * b) with (4 * a * b) by lra.
+  replace (2 * a * c + 2 * a * c) with (4 * a * c) by lra.
+  replace (2 * a * d + 2 * a * d) with (4 * a * d) by lra.
   unfold Rdiv.
   rewrite Rinv_mult_distr; [ | lra | easy ].
   do 3 rewrite <- Rmult_assoc.
-  replace (4 * a * b * / 4)%R with (a * b)%R by lra.
-  replace (4 * a * c * / 4)%R with (a * c)%R by lra.
-  replace (4 * a * d * / 4)%R with (a * d)%R by lra.
+  replace (4 * a * b * / 4) with (a * b) by lra.
+  replace (4 * a * c * / 4) with (a * c) by lra.
+  replace (4 * a * d * / 4) with (a * d) by lra.
   rewrite Hrp.
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
@@ -2557,8 +2557,8 @@ destruct (Req_dec t (-1)) as [Htd| Htd].
 Qed.
 
 Theorem quat_of_mat_inv2 : ∀ h,
-  (∥h∥ = 1%R)%H
-  → (0 ≤ Re h)%R
+  (∥h∥ = 1)%H
+  → 0 ≤ Re h
   → (0 ≤ Im h)%vec
   → quat_of_mat (mat_of_quat h) = h.
 Proof.
@@ -2568,31 +2568,31 @@ apply sqrt_lem_0 in Hhn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
 symmetry in Hhn; rewrite Rmult_1_r in Hhn.
 unfold quat_of_mat, mat_of_quat; simpl.
 unfold mat_trace; simpl.
-remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
+remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))
   as t eqn:Ht.
-remember (a² + b² - c² - d² - (a² - b² + c² - d²) - (a² - b² - c² + d²))%R
+remember (a² + b² - c² - d² - (a² - b² + c² - d²) - (a² - b² - c² + d²))
   as x₀ eqn:Hx₀.
-remember (- (a² + b² - c² - d²) + (a² - b² + c² - d²) - (a² - b² - c² + d²))%R
+remember (- (a² + b² - c² - d²) + (a² - b² + c² - d²) - (a² - b² - c² + d²))
   as y₀ eqn:Hy₀.
-remember (- (a² + b² - c² - d²) - (a² - b² + c² - d²) + (a² - b² - c² + d²))%R
+remember (- (a² + b² - c² - d²) - (a² - b² + c² - d²) + (a² - b² - c² + d²))
   as z₀ eqn:Hz₀.
 ring_simplify in Ht.
 ring_simplify in Hx₀.
 ring_simplify in Hy₀.
 ring_simplify in Hz₀.
-assert (Ht' : t = (4 * a² - 1)%R) by lra.
+assert (Ht' : t = 4 * a² - 1) by lra.
 clear Ht; rename Ht' into Ht.
 destruct (Req_dec t (-1)) as [Htd| Htd].
  (* here case with trace = -1, i.e. angle = π, not yet treated; I have to
     think of it. Going to next case. *)
 Focus 2.
- assert (Ha2 : (a² ≠ 0)%R) by lra.
- assert (Ha : (a ≠ 0)%R) by now intros H; subst a; apply Ha2, Rsqr_0.
- assert (Haa : (Rabs a ≠ 0)%R) by now apply Rabs_no_R0.
- assert (Hta : (√ (1 + t) / 2 = Rabs a)%R).
+ assert (Ha2 : a² ≠ 0) by lra.
+ assert (Ha : a ≠ 0) by now intros H; subst a; apply Ha2, Rsqr_0.
+ assert (Haa : Rabs a ≠ 0) by now apply Rabs_no_R0.
+ assert (Hta : √ (1 + t) / 2 = Rabs a).
   rewrite Ht, Rplus_minus.
   rewrite Rsqr_pow2.
-  replace (4 * a ^ 2)%R with ((2 * a) ^ 2)%R by lra.
+  replace (4 * a ^ 2) with ((2 * a) ^ 2) by lra.
   rewrite <- Rsqr_pow2, sqrt_Rsqr_abs, Rabs_mult.
   replace (Rabs 2) with (Rabs (IZR 2)) by easy.
   rewrite Rabs_Zabs; simpl.
@@ -2604,17 +2604,17 @@ Focus 2.
   rewrite Hta.
   apply Rabs_pos_eq in Hrp.
   f_equal; [ easy | ].
-  assert (Rpm : ∀ a b c, (a + b - (b - c) = a + c)%R) by (intros; lra).
+  assert (Rpm : ∀ a b c, a + b - (b - c) = a + c) by (intros; lra).
   do 3 rewrite Rpm.
-  replace (2 * a * b + 2 * a * b)%R with (4 * a * b)%R by lra.
-  replace (2 * a * c + 2 * a * c)%R with (4 * a * c)%R by lra.
-  replace (2 * a * d + 2 * a * d)%R with (4 * a * d)%R by lra.
+  replace (2 * a * b + 2 * a * b) with (4 * a * b) by lra.
+  replace (2 * a * c + 2 * a * c) with (4 * a * c) by lra.
+  replace (2 * a * d + 2 * a * d) with (4 * a * d) by lra.
   unfold Rdiv.
   rewrite Rinv_mult_distr; [ | lra | easy ].
   do 3 rewrite <- Rmult_assoc.
-  replace (4 * a * b * / 4)%R with (a * b)%R by lra.
-  replace (4 * a * c * / 4)%R with (a * c)%R by lra.
-  replace (4 * a * d * / 4)%R with (a * d)%R by lra.
+  replace (4 * a * b * / 4) with (a * b) by lra.
+  replace (4 * a * c * / 4) with (a * c) by lra.
+  replace (4 * a * d * / 4) with (a * d) by lra.
   rewrite Hrp.
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
@@ -2625,12 +2625,12 @@ Abort.
 (* end play with quaternions. *)
 
 Theorem z_of_xy : ∀ x y z r,
-  r = (√ (x² + y² + z²)%R)
-  → r ≠ 0%R
-  → ((z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2)%R.
+  r = √ (x² + y² + z²)
+  → r ≠ 0
+  → (z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2.
 Proof.
 intros * Hr Hrnz.
-assert (H : (r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2)%R).
+assert (H : r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2).
  split.
   rewrite <- Rsqr_pow2.
   intros H; apply Hrnz.
@@ -2641,9 +2641,9 @@ assert (H : (r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2)%R).
   apply nonneg_sqr_vec_norm.
 
  destruct H as (Hr2nz & Hrxyz).
- remember (x / r)%R as xr eqn:Hxr.
- remember (y / r)%R as yr eqn:Hyr.
- remember (z / r)%R as zr eqn:Hzr.
+ remember (x / r) as xr eqn:Hxr.
+ remember (y / r) as yr eqn:Hyr.
+ remember (z / r) as zr eqn:Hzr.
  subst xr yr zr.
  unfold Rdiv.
  do 3 rewrite Rpow_mult_distr.
@@ -2654,25 +2654,25 @@ Qed.
 
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
-  → (sinθ² + cosθ² = 1)%R
+  → sinθ² + cosθ² = 1
   → is_rotation_matrix (matrix_of_axis_angle (p, cosθ, sinθ)).
 Proof.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
-assert (Hsc : (sinθ² = 1 - cosθ²)%R) by lra; clear Hsc1.
+assert (Hsc : sinθ² = 1 - cosθ²) by lra; clear Hsc1.
 destruct p as (xp, yp, zp).
-remember ((√ (xp² + yp² + zp²))%R) as r eqn:Hr.
-assert (Hrnz : (r ≠ 0)%R).
+remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
+assert (Hrnz : r ≠ 0).
  intros H; rewrite Hr in H.
  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
  apply sqr_vec_norm_eq_0 in H.
  destruct H as (Hx & Hy & Hz); subst xp yp zp.
  now apply Hp.
 
- remember (xp / r)%R as x eqn:Hx.
- remember (yp / r)%R as y eqn:Hy.
- remember (zp / r)%R as z eqn:Hz.
- assert (Hrxyz2 : (1 - x ^ 2 - y ^ 2 = z ^ 2)%R).
+ remember (xp / r) as x eqn:Hx.
+ remember (yp / r) as y eqn:Hy.
+ remember (zp / r) as z eqn:Hz.
+ assert (Hrxyz2 : 1 - x ^ 2 - y ^ 2 = z ^ 2).
   subst x y z.
   now symmetry; apply z_of_xy.
 
@@ -2694,11 +2694,11 @@ assert (Hrnz : (r ≠ 0)%R).
 Qed.
 
 Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
-  (sinθ² + cosθ² = 1)%R
+  sinθ² + cosθ² = 1
   → (matrix_of_axis_angle (p, cosθ, sinθ) * p)%vec = p.
 Proof.
 intros (xp, yp, zp) * Hsc.
-remember ((√ (xp² + yp² + zp²))%R) as r eqn:Hr.
+remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
 destruct (Req_dec r 0) as [Hrz| Hrnz].
  rewrite Hr in Hrz.
  apply sqrt_eq_0 in Hrz; [ | apply nonneg_sqr_vec_norm ].
@@ -2710,16 +2710,16 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
  rewrite <- Hr.
  specialize (z_of_xy xp yp zp r Hr Hrnz) as Hz.
  f_equal; ring_simplify.
-  replace (yp / r * sinθ * zp)%R with (zp / r * sinθ * yp)%R by lra.
-  replace (xp / r * (zp / r) * zp)%R with (xp * (zp / r) ^ 2)%R by lra.
-  replace (cosθ * (xp / r) * (zp / r) * zp)%R
-  with (cosθ * xp * (zp / r) ^ 2)%R by lra.
+  replace (yp / r * sinθ * zp) with (zp / r * sinθ * yp) by lra.
+  replace (xp / r * (zp / r) * zp) with (xp * (zp / r) ^ 2) by lra.
+  replace (cosθ * (xp / r) * (zp / r) * zp)
+  with (cosθ * xp * (zp / r) ^ 2) by lra.
   rewrite Rsqr_pow2, Hz; lra.
 
-  replace (xp / r * sinθ * zp)%R with (zp / r * sinθ * xp)%R by lra.
-  replace (yp / r * cosθ * (zp / r) * zp)%R with (yp * cosθ * (zp / r) ^ 2)%R
+  replace (xp / r * sinθ * zp) with (zp / r * sinθ * xp) by lra.
+  replace (yp / r * cosθ * (zp / r) * zp) with (yp * cosθ * (zp / r) ^ 2)
     by lra.
-  replace (yp / r * (zp / r) * zp)%R with (yp * (zp / r) ^ 2)%R by lra.
+  replace (yp / r * (zp / r) * zp) with (yp * (zp / r) ^ 2) by lra.
   rewrite Rsqr_pow2, Hz; lra.
 
   rewrite Rsqr_pow2, Hz; lra.
@@ -2730,15 +2730,15 @@ Theorem ter_bin_of_rotation_surj : ∀ p, p ≠ 0%vec → ∀ (u : ℕ → bool)
 Proof.
 intros * Hp *.
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
-remember (2 * s - 1)%R as cosθ eqn:Hcosθ.
-remember (√ (1 - cosθ²))%R as sinθ eqn:Hsinθ.
-assert(Hsc : (sinθ² = (1 - cosθ²))%R).
+remember (2 * s - 1) as cosθ eqn:Hcosθ.
+remember (√ (1 - cosθ²)) as sinθ eqn:Hsinθ.
+assert (Hsc : sinθ² = (1 - cosθ²)).
  rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
  rewrite Hcosθ, Rsqr_pow2.
  eapply Rplus_le_reg_r; unfold Rminus.
  rewrite Rplus_assoc, Rplus_opp_l.
  rewrite Rplus_0_l, Rplus_0_r.
- replace 1%R with (1 ^ 2)%R at 4 by lra.
+ replace 1 with (1 ^ 2) at 4 by lra.
  apply pow_maj_Rabs, Rabs_le; lra.
 
  exists (matrix_of_axis_angle (p, cosθ, sinθ)).
@@ -2752,25 +2752,25 @@ assert(Hsc : (sinθ² = (1 - cosθ²))%R).
   destruct p as (x, y, z); simpl.
   unfold ter_bin_of_rotation.
   unfold mat_trace; simpl.
-  remember (√ (x² + y² + z²))%R as r eqn:Hr.
+  remember (√ (x² + y² + z²)) as r eqn:Hr.
   rewrite <- Hn.
   f_equal.
-  apply Rmult_eq_reg_r with (r := 4%R); [ | lra ].
+  apply Rmult_eq_reg_r with (r := 4); [ | lra ].
   unfold Rdiv; rewrite Rmult_assoc, Rinv_l; [ | lra ].
   rewrite Rmult_1_r.
   do 3 rewrite fold_Rdiv.
   rename cosθ into c.
   do 2 rewrite <- Rplus_assoc.
-  remember ((x / r)² * (1 - c))%R as xc.
-  remember ((y / r)² * (1 - c))%R as yc.
-  remember ((z / r)² * (1 - c))%R as zc.
-  replace (xc + c + yc + c + zc + c)%R with (xc + yc + zc + 3 * c)%R by ring.
+  remember ((x / r)² * (1 - c)) as xc.
+  remember ((y / r)² * (1 - c)) as yc.
+  remember ((z / r)² * (1 - c)) as zc.
+  replace (xc + c + yc + c + zc + c) with (xc + yc + zc + 3 * c) by ring.
   subst xc yc zc.
   do 2 rewrite <- Rmult_plus_distr_r.
-  replace ((x / r)² + (y / r)² + (z / r)²)%R with 1%R.
+  replace ((x / r)² + (y / r)² + (z / r)²) with 1.
    ring_simplify; subst c; lra.
 
-   assert (Hrnz : (r ≠ 0)%R).
+   assert (Hrnz : r ≠ 0).
     intros H; rewrite Hr in H.
     apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
     apply sqr_vec_norm_eq_0 in H.
@@ -2891,10 +2891,10 @@ rewrite Hxv, Hyq, Hzq; simpl.
 unfold Rsqr; simpl.
 ring_simplify.
 progress repeat rewrite <- Rsqr_pow2.
-replace z₁²%R with (1 - x₁² - y₁²)%R by lra.
+replace z₁² with (1 - x₁² - y₁²) by lra.
 ring_simplify.
-progress replace (-2 * x₁ * a * x - 2 * a * y₁ * y - 2 * a * z₁ * z)%R
-with (-2 * a * (x * x₁ + y * y₁ + z * z₁))%R by lra.
+progress replace (-2 * x₁ * a * x - 2 * a * y₁ * y - 2 * a * z₁ * z)
+with (-2 * a * (x * x₁ + y * y₁ + z * z₁)) by lra.
 rewrite <- Ha₁.
 do 3 rewrite Rplus_assoc; rewrite Rplus_comm.
 do 2 rewrite <- Rplus_assoc.
@@ -2914,8 +2914,8 @@ apply Rle_0_sqr.
 Qed.
 
 Theorem rotate_matrix_of_two_vectors : ∀ p v₁ v₂ c s,
-  ∥v₁∥ = 1%R
-  → ∥v₂∥ = 1%R
+  ∥v₁∥ = 1
+  → ∥v₂∥ = 1
   → p = v₁ × v₂
   → p ≠ 0%vec
   → c = (v₁ · v₂)
@@ -2923,7 +2923,7 @@ Theorem rotate_matrix_of_two_vectors : ∀ p v₁ v₂ c s,
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
 intros * Hv₁ Hv₂ Hp Hpz Hc Hs.
-assert (Hcs : (c² + s² = 1)%R).
+assert (Hcs : c² + s² = 1).
  specialize (vec_Lagrange_identity v₁ v₂) as H.
  rewrite vec_dot_mul_diag in H.
  rewrite Hv₁, Hv₂ in H.
@@ -2942,7 +2942,7 @@ assert (Hcs : (c² + s² = 1)%R).
  rewrite Rsqr_sqrt in Hv₂; [ | apply nonneg_sqr_vec_norm ].
  rewrite Rsqr_1 in Hv₁, Hv₂.
  rewrite <- Hs.
- assert (Hsz : s ≠ 0%R).
+ assert (Hsz : s ≠ 0).
   intros H; rewrite Hs in H.
   apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
   apply sqr_vec_norm_eq_0 in H.
@@ -2952,7 +2952,7 @@ assert (Hcs : (c² + s² = 1)%R).
   rewrite Rmult_div_same; [ | easy ].
   rewrite Rmult_div_same; [ | easy ].
   rewrite Rmult_div_same; [ | easy ].
-  assert (H : (xp * x₁ + yp * y₁ + zp * z₁ = 0)%R) by (subst; lra).
+  assert (H : xp * x₁ + yp * y₁ + zp * z₁ = 0) by (subst; lra).
   rewrite Rsqr_div; [ | easy ].
   rewrite Rsqr_div; [ | easy ].
   rewrite Rsqr_div; [ | easy ].
@@ -2962,24 +2962,24 @@ assert (Hcs : (c² + s² = 1)%R).
   progress replace
     ((xp * xp * (/ s / s) * (1 - c) + c) * x₁ +
      (xp / s * (yp / s) * (1 - c) - zp) * y₁ +
-     (xp / s * (zp / s) * (1 - c) + yp) * z₁)%R
+     (xp / s * (zp / s) * (1 - c) + yp) * z₁)
   with
     (xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
-     c * x₁ - zp * y₁ + yp * z₁)%R by lra.
+     c * x₁ - zp * y₁ + yp * z₁) by lra.
   progress replace
     ((xp / s * (yp / s) * (1 - c) + zp) * x₁ +
      (yp * yp * (/ s / s) * (1 - c) + c) * y₁ +
-     (yp / s * (zp / s) * (1 - c) - xp) * z₁)%R
+     (yp / s * (zp / s) * (1 - c) - xp) * z₁)
   with
     (yp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
-     zp * x₁ + c * y₁ - xp * z₁)%R by lra.
+     zp * x₁ + c * y₁ - xp * z₁) by lra.
   replace
     ((xp / s * (zp / s) * (1 - c) - yp) * x₁ +
      (yp / s * (zp / s) * (1 - c) + xp) * y₁ +
-     (zp * zp * (/ s / s) * (1 - c) + c) * z₁)%R
+     (zp * zp * (/ s / s) * (1 - c) + c) * z₁)
   with
     (zp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) * (/ s / s) +
-     - yp * x₁ + xp * y₁ + c * z₁)%R by lra.
+     - yp * x₁ + xp * y₁ + c * z₁) by lra.
   rewrite H, Rmult_0_r, Rmult_0_l, Rplus_0_l; clear H.
   do 2 rewrite Rmult_0_r, Rmult_0_l, Rplus_0_l.
   rewrite Hc, Hyp, Hzp.
@@ -2992,20 +2992,20 @@ assert (Hcs : (c² + s² = 1)%R).
 
    ring_simplify.
    rewrite Rmult_comm, <- Rmult_plus_distr_l.
-   replace (x₁ ^ 2 + y₁ ^ 2)%R with (1 - z₁ ^ 2)%R by lra.
+   replace (x₁ ^ 2 + y₁ ^ 2) with (1 - z₁ ^ 2) by lra.
    now rewrite Hxp; ring_simplify.
 
    ring_simplify.
-   replace (z₁ ^ 2)%R with (1 - x₁ ^ 2 - y₁ ^ 2)%R by lra.
+   replace (z₁ ^ 2) with (1 - x₁ ^ 2 - y₁ ^ 2) by lra.
    now rewrite Hxp; ring_simplify.
 Qed.
 
-Definition Rsign x := if Rle_dec 0 x then 1%R else (-1)%R.
+Definition Rsign x := if Rle_dec 0 x then 1 else -1.
 
 Theorem matrix_mul_axis : ∀ p c s k,
-  k ≠ 0%R
+  k ≠ 0
   → matrix_of_axis_angle (p, c, s) =
-    matrix_of_axis_angle (k ⁎ p, c, (Rsign k * s)%R).
+    matrix_of_axis_angle (k ⁎ p, c, Rsign k * s).
 Proof.
 intros * Hk.
 destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
@@ -3015,12 +3015,12 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
  now do 5 rewrite Rmult_0_l.
 
  destruct p as (xp, yp, zp); simpl.
- remember (√ ((k * xp)² + (k * yp)² + (k * zp)²))%R as a eqn:Ha.
+ remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
  do 3 rewrite Rsqr_mult in Ha.
  do 2 rewrite <- Rmult_plus_distr_l in Ha.
  rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
  remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
- assert (Hbz : b ≠ 0%R).
+ assert (Hbz : b ≠ 0).
   subst b; intros H.
   apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
   apply sqr_vec_norm_eq_0 in H.
@@ -3031,11 +3031,11 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
   destruct (Rle_dec 0 k) as [Hkp| Hkn].
    rewrite Rmult_1_l.
    rewrite sqrt_Rsqr in Ha; [ | lra ].
-   assert (Hx : ∀ x, (k * x / a = x / b)%R).
+   assert (Hx : ∀ x, k * x / a = x / b).
     intros x; subst a; unfold Rdiv.
     rewrite Rinv_mult_distr; [ | lra | easy ].
     rewrite <- Rmult_assoc.
-    progress replace (k * x * / k)%R with (/ k * k * x)%R by lra.
+    progress replace (k * x * / k) with (/ k * k * x) by lra.
     rewrite Rinv_l; lra.
 
     now do 3 rewrite Hx.
@@ -3044,12 +3044,12 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
    rewrite sqrt_Rsqr_abs in Ha.
    unfold Rabs in Ha.
    destruct (Rcase_abs k) as [H| H]; [ clear H | lra ].
-   assert (Hx : ∀ x, (k * x / a = - (x / b))%R).
+   assert (Hx : ∀ x, k * x / a = - (x / b)).
     intros x; subst a; unfold Rdiv.
     rewrite Rinv_mult_distr; [ | lra | easy ].
     rewrite <- Rmult_assoc.
     rewrite <- Ropp_inv_permute; [ | easy ].
-    progress replace (k * x * - / k)%R with (/ k * k * - x)%R by lra.
+    progress replace (k * x * - / k) with (/ k * k * - x) by lra.
     rewrite Rinv_l; lra.
 
     do 3 rewrite Hx, <- Rsqr_neg.
@@ -3057,8 +3057,8 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
 Qed.
 
 Theorem vec_cross_mul_cross_mul : ∀ u v,
-  u · v = 0%R
-  → ∥v∥ = 1%R
+  u · v = 0
+  → ∥v∥ = 1
   → (u × v) × v = (- u)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) Huv Hv; simpl in Huv, Hv; simpl.
@@ -3072,7 +3072,7 @@ f_equal; ring_simplify.
 Qed.
 
 Definition rot_sin_cos p u v :=
-  let s := (Rsign (p · (u × v)) * ∥(u × v)∥)%R in
+  let s := Rsign (p · (u × v)) * ∥(u × v)∥ in
   let c := u · v in
   (s, c).
 
@@ -3082,7 +3082,7 @@ Theorem rot_proj_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   → p₂ ∈ sphere 1
   → a = latitude p p₁
   → a = latitude p p₂
-  → (a² < 1)%R
+  → a² < 1
   → p₁ × p₂ ≠ 0%vec
   → v₁ = (/ √ (1 - a²) ⁎ (p₁ - a ⁎ p))%vec
   → v₂ = (/ √ (1 - a²) ⁎ (p₂ - a ⁎ p))%vec
@@ -3092,8 +3092,8 @@ Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
 unfold rot_sin_cos in Hcs.
 injection Hcs; clear Hcs; intros Hc Hs.
-assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
- assert (H : √ (1 - a²) ≠ 0%R) by (intros H; apply sqrt_eq_0 in H; lra).
+assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
+ assert (H : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
  eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
  eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
  rewrite Hv₁, Hv₂.
@@ -3104,7 +3104,7 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
 
  assert (Hvvp : (v₁ × v₂) × p = 0%vec).
   rewrite vec_double_cross_mul, Hv₁, Hv₂.
-  remember (/ √ (1 - a²))%R as b eqn:Hb.
+  remember (/ √ (1 - a²)) as b eqn:Hb.
   do 2 rewrite vec_const_dot_assoc.
   do 2 rewrite vec_dot_mul_sub_distr_r.
   rewrite Ha₁ at 1; rewrite Ha₂ at 2.
@@ -3144,14 +3144,14 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
     rewrite vec_opp_const_mul_distr_l in Hde.
     apply vec_const_mul_div in Hde; [ | easy ].
     unfold latitude in Ha₁, Ha₂.
-    remember (- d / e)%R as k eqn:Hk.
-    assert (Hkz : k ≠ 0%R).
+    remember (- d / e) as k eqn:Hk.
+    assert (Hkz : k ≠ 0).
      intros H; rewrite H in Hde.
      now rewrite vec_const_mul_0_l in Hde.
 
-     assert (Hikz : (/ k ≠ 0)%R) by now apply Rinv_neq_0_compat.
+     assert (Hikz : / k ≠ 0) by now apply Rinv_neq_0_compat.
      destruct (Rle_dec 0 k) as [Hkp| Hkn].
-      rewrite matrix_mul_axis with (k := (/ k)%R); [ | easy ].
+      rewrite matrix_mul_axis with (k := / k); [ | easy ].
       apply (f_equal (vec_const_mul (/ k))) in Hde.
       rewrite vec_const_mul_assoc in Hde.
       rewrite Rinv_l in Hde; [ | easy ].
@@ -3178,7 +3178,7 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
         apply Rinv_0_lt_compat; lra.
 
       apply Rnot_le_lt in Hkn.
-      rewrite matrix_mul_axis with (k := (/ k)%R); [ | easy ].
+      rewrite matrix_mul_axis with (k := / k); [ | easy ].
       apply (f_equal (vec_const_mul (/ k))) in Hde.
       rewrite vec_const_mul_assoc in Hde.
       rewrite Rinv_l in Hde; [ | easy ].
@@ -3208,10 +3208,11 @@ assert (∥v₁∥ = 1%R ∧ ∥v₂∥ = 1%R) as (Hnv₁, Hnv₂).
 
     idtac.
 bbb.
+(*
     rewrite Hvv in Hs.
     rewrite vec_norm_0, Rmult_0_r in Hs.
     subst s.
-    replace c with 1%R.
+    replace c with 1.
     destruct p as (xp, yp, zp); simpl.
     rewrite Rminus_diag_eq; [ | easy ].
     progress repeat rewrite Rmult_0_r.
@@ -3275,26 +3276,25 @@ Theorem glop : ∀ p p₁ p₂ v₁ v₂ a c s,
   → p₂ ∈ sphere 1
   → a = latitude p p₁
   → a = latitude p p₂
-  → (a² < 1)%R
+  → a² < 1
   → v₁ = (p₁ - a ⁎ p)%vec
   → v₂ = (p₂ - a ⁎ p)%vec
-  → c = ((v₁ · v₂) / (1 - a²))%R
-  → s = (∥(v₁ × v₂)∥ / (1 - a²))%R
+  → c = (v₁ · v₂) / (1 - a²)
+  → s = ∥(v₁ × v₂)∥ / (1 - a²)
   → (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hv₁ Hv₂ Hc Hs.
-
 bbb.
 
 assert (Hqa₁ : ∥v₁∥ = √ (1 - a²)) by now apply (latitude_norm p p₁).
 assert (Hqa₂ : ∥v₂∥ = √ (1 - a²)) by now apply (latitude_norm p p₂).
-assert (Hcs : (c² + s² = 1)%R).
+assert (Hcs : c² + s² = 1).
  specialize (vec_Lagrange_identity v₁ v₂) as H.
  rewrite vec_dot_mul_diag in H.
  rewrite Hqa₁, Hqa₂ in H.
  rewrite Rsqr_sqrt in H; [ | lra ].
  rewrite fold_Rsqr in H.
- apply Rmult_eq_compat_r with (r := (/ (1 - a²))²%R) in H.
+ apply Rmult_eq_compat_r with (r := (/ (1 - a²))²) in H.
  rewrite Rmult_minus_distr_r in H.
  do 3 rewrite <- Rsqr_mult, fold_Rdiv in H.
  rewrite <- Hc, <- Hs in H.
@@ -3302,11 +3302,11 @@ assert (Hcs : (c² + s² = 1)%R).
 
 (**)
  assert (H : (matrix_of_axis_angle (p, c, s) * v₁ = v₂)%vec).
-  remember (√ (1 - a²))%R as b eqn:Hb.
+  remember (√ (1 - a²) as b eqn:Hb.
   apply (f_equal Rsqr) in Hb.
   rewrite Rsqr_sqrt in Hb; [ | lra ].
   rewrite <- Hb in Hc, Hs.
-  assert (Hbz : (0 < b²)%R) by lra.
+  assert (Hbz : 0 < b²) by lra.
   rewrite <- Rsqr_0 in Hbz.
   apply Rsqr_incrst_0 in Hbz; [ | lra | ].
    clear a p₁ p₂ Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hb Hv₁ Hv₂.
@@ -3320,23 +3320,23 @@ bbb.
    apply (f_equal Rsqr) in Hqa₂.
    rewrite Rsqr_sqrt in Hqa₁; [ | apply nonneg_sqr_vec_norm ].
    rewrite Rsqr_sqrt in Hqa₂; [ | apply nonneg_sqr_vec_norm ].
-   assert (Hpv₁ : (xp * x₁ + yp * y₁ + zp * z₁ = 0)%R).
+   assert (Hpv₁ : xp * x₁ + yp * y₁ + zp * z₁ = 0).
    Focus 2.
    f_equal.
     unfold Rsqr.
     progress replace
-      ((xp * xp * (1 - c) + c) * x₁ + (xp * yp * (1 - c) - zp * s) * y₁ +
-       (xp * zp * (1 - c) + yp * s) * z₁)%R
+      (xp * xp * (1 - c) + c) * x₁ + (xp * yp * (1 - c) - zp * s) * y₁ +
+       (xp * zp * (1 - c) + yp * s) * z₁
     with
-      (xp * (xp * x₁ + yp * y₁ + zp * z₁) +
+      xp * (xp * x₁ + yp * y₁ + zp * z₁) +
        (x₁ - xp * (xp * x₁ + yp * y₁ + zp * z₁)) * c +
-       - (zp * y₁ - yp * z₁) * s)%R
+       - (zp * y₁ - yp * z₁) * s
      by lra.
     rewrite Hpv₁, Rmult_0_r, Rplus_0_l, Rminus_0_r.
-    apply Rplus_eq_reg_r with (r := -x₂%R).
+    apply Rplus_eq_reg_r with (r := -x₂).
     rewrite Rplus_opp_r.
     rewrite Rplus_shuffle0.
-    apply Rplus_eq_reg_r with (r := ((zp * y₁ - yp * z₁) * s)%R).
+    apply Rplus_eq_reg_r with (r := (zp * y₁ - yp * z₁) * s).
     rewrite Rplus_assoc.
     rewrite <- Ropp_mult_distr_l.
     rewrite Rplus_opp_l, Rplus_0_r, Rplus_0_l.
@@ -3345,15 +3345,15 @@ bbb.
 apply Rsqr_inj.
 Focus 3.
 rewrite Rsqr_mult.
-replace s²%R with (1 - c²)%R by lra.
+replace s² with (1 - c²) by lra.
 apply Rminus_diag_uniq.
-remember (zp * y₁ - yp * z₁)²%R as u eqn:Hu.
+remember (zp * y₁ - yp * z₁)² as u eqn:Hu.
 unfold Rsqr; ring_simplify.
 progress repeat rewrite <- Rsqr_pow2.
-replace (x₁² * c² - 2 * x₁ * c * x₂ + c² * u + x₂² - u)%R
-with ((x₁² + u) * c² - 2 * x₁ * x₂ * c + (x₂² - u))%R
+replace (x₁² * c² - 2 * x₁ * c * x₂ + c² * u + x₂² - u
+with (x₁² + u) * c² - 2 * x₁ * x₂ * c + (x₂² - u)
 by lra.
-apply Rmult_eq_reg_r with (r := b⁴%R).
+apply Rmult_eq_reg_r with (r := b⁴).
 rewrite Rmult_0_l.
 unfold Rminus.
 do 2 rewrite Rmult_plus_distr_r.
@@ -3361,21 +3361,21 @@ rewrite <- Ropp_mult_distr_l.
 do 2 rewrite fold_Rminus.
 do 2 rewrite Rmult_assoc.
 progress repeat rewrite Rsqr_pow2.
-replace (c ^ 2 * b⁴)%R with ((c * b ^ 2) ^ 2)%R by lra.
-replace (c * b⁴)%R with (b ^ 2 * (c * b ^ 2))%R by lra.
+replace (c ^ 2 * b⁴) with ((c * b ^ 2) ^ 2) by lra.
+replace (c * b⁴) with (b ^ 2 * (c * b ^ 2)) by lra.
 progress repeat rewrite <- Rsqr_pow2.
 rewrite Hc.
 rewrite Rmult_div_same.
 ring_simplify.
 bbb.
 
-replace z₁²%R with (b² - x₁² - y₁²)%R by lra.
-replace z₂²%R with (b² - x₂² - y₂²)%R by lra.
+replace z₁² with (b² - x₁² - y₁²) by lra.
+replace z₂² with (b² - x₂² - y₂²) by lra.
 ring_simplify.
 
 bbb.
 bbb.
-    apply Rmult_eq_reg_r with (r := b²%R).
+    apply Rmult_eq_reg_r with (r := b²).
      rewrite Rmult_plus_distr_r.
      rewrite <- Ropp_mult_distr_l, fold_Rminus.
      do 2 rewrite Rmult_assoc.
@@ -3410,62 +3410,62 @@ bbb.
  f_equal.
   rewrite Rplus_assoc.
   progress replace
-    ((xp * yp * (1 - c) - zp * s) * (yp₁ - a * yp) +
-     (xp * zp * (1 - c) + yp * s) * (zp₁ - a * zp))%R
+    (xp * yp * (1 - c) - zp * s) * (yp₁ - a * yp) +
+     (xp * zp * (1 - c) + yp * s) * (zp₁ - a * zp)
   with
-    ((xp * yp * (1 - c)) * (yp₁ - a * yp) +
+    (xp * yp * (1 - c)) * (yp₁ - a * yp) +
      (xp * zp * (1 - c)) * (zp₁ - a * zp) -
-     (zp * (yp₁ - a * yp) - yp * (zp₁ - a * zp)) * s)%R
+     (zp * (yp₁ - a * yp) - yp * (zp₁ - a * zp)) * s
     by lra.
   unfold Rminus; do 2 rewrite <- Rplus_assoc.
   progress repeat rewrite fold_Rminus.
-  remember ((zp * (yp₁ - a * yp) - yp * (zp₁ - a * zp)) * s)%R as u eqn:Hu.
-  remember (xp₂ - a * xp)%R as v eqn:Hv.
-  apply Rplus_eq_reg_r with (r := (u - v)%R).
+  remember ((zp * (yp₁ - a * yp) - yp * (zp₁ - a * zp)) * s as u eqn:Hu.
+  remember (xp₂ - a * xp as v eqn:Hv.
+  apply Rplus_eq_reg_r with (r := u - v).
   rewrite Rplus_minus.
   unfold Rminus; rewrite Rplus_assoc.
-  replace (- u + (u + - v))%R with (- v)%R by lra.
+  replace (- u + (u + - v)) with (- v) by lra.
   progress repeat rewrite fold_Rminus.
   subst u v.
-  apply Rmult_eq_reg_r with (r := (1 - a²)%R); [ | lra ].
+  apply Rmult_eq_reg_r with (r := 1 - a²); [ | lra ].
   do 5 rewrite Rmult_assoc.
-  replace (s * (1 - a²))%R with ∥(v₁ × v₂)∥.
+  replace (s * (1 - a²) with ∥(v₁ × v₂)∥.
   rewrite Rmult_plus_distr_r.
   rewrite Rmult_minus_distr_r.
   do 3 rewrite Rmult_plus_distr_r.
-  remember (xp₁ - a * xp)%R as x₁.
-  remember (yp₁ - a * yp)%R as y₁.
-  remember (zp₁ - a * zp)%R as z₁.
+  remember (xp₁ - a * xp as x₁.
+  remember (yp₁ - a * yp as y₁.
+  remember (zp₁ - a * zp as z₁.
   progress replace
-    (xp² * (1 - c) * x₁ * (1 - a²) +
+    xp² * (1 - c) * x₁ * (1 - a²) +
      c * x₁ * (1 - a²) +
      xp * (yp * ((1 - c) * y₁)) * (1 - a²) +
-     xp * (zp * ((1 - c) * z₁)) * (1 - a²))%R
+     xp * (zp * ((1 - c) * z₁)) * (1 - a²)
   with
-    ((xp² * (1 - a²) - xp² * (c * (1 - a²))) * x₁ +
+    (xp² * (1 - a²) - xp² * (c * (1 - a²))) * x₁ +
      x₁ * (c * (1 - a²)) +
      xp * yp * y₁ * (1 - a²) - xp * yp * y₁ * (c * (1 - a²)) +
-     xp * zp * z₁ * (1 - a²) - xp * zp * z₁ * (c * (1 - a²)))%R
+     xp * zp * z₁ * (1 - a²) - xp * zp * z₁ * (c * (1 - a²))
     by lra.
-  replace (c * (1 - a²))%R with (v₁ · v₂).
+  replace (c * (1 - a²) with (v₁ · v₂).
   apply Rsqr_inj.
   Focus 3.
   rewrite Rsqr_mult.
   rewrite <- vec_dot_mul_diag.
   rewrite Hv₁, Hv₂; simpl.
-  remember (xp₂ - a * xp)%R as x₂.
-  remember (yp₂ - a * yp)%R as y₂.
-  remember (zp₂ - a * zp)%R as z₂.
+  remember (xp₂ - a * xp as x₂.
+  remember (yp₂ - a * yp as y₂.
+  remember (zp₂ - a * zp as z₂.
   eapply Rplus_eq_reg_r.
   symmetry; rewrite Rplus_opp_r; symmetry.
   rewrite fold_Rminus.
   move y₁ before x₁; move z₁ before y₁.
   move x₂ before z₁; move y₂ before x₂; move z₂ before y₂.
   move Hv₁ before z₂; move Hv₂ before Hv₁.
-remember (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R as xyz eqn:Hxyz.
-remember (y₁ * z₂ - z₁ * y₂)%R as X eqn:HX.
-remember (z₁ * x₂ - x₁ * z₂)%R as Y eqn:HY.
-remember (x₁ * y₂ - y₁ * x₂)%R as Z eqn:HZ.
+remember (x₁ * x₂ + y₁ * y₂ + z₁ * z₂ as xyz eqn:Hxyz.
+remember (y₁ * z₂ - z₁ * y₂ as X eqn:HX.
+remember (z₁ * x₂ - x₁ * z₂ as Y eqn:HY.
+remember (x₁ * y₂ - y₁ * x₂ as Z eqn:HZ.
 move Y before X; move Z before Y.
 progress repeat rewrite fold_Rsqr.
 bbb.
@@ -3491,16 +3491,16 @@ f_equal.
 
 
 bbb.
-remember ((x₁ - a * xp) * (x₂ - a * xp))%R as u eqn:Hu.
+remember ((x₁ - a * xp) * (x₂ - a * xp) as u eqn:Hu.
 rewrite Ha₁ in Hu at 1.
 rewrite Ha₂ in Hu.
 ring_simplify in Hu.
 repeat rewrite <- Rsqr_pow2 in Hu.
 ring_simplify in Hu.
-replace zp²%R with (1 - xp² - yp²)%R in Hu by lra.
+replace zp² with (1 - xp² - yp² in Hu) by lra.
 ring_simplify in Hu.
 progress repeat rewrite Rsqr_pow2 in Hu.
-replace ((xp ^ 2) ^ 2)%R with xp⁴%R in Hu by lra.
+replace ((xp ^ 2) ^ 2) with xp⁴ in Hu) by lra.
 ring_simplify in Hu.
 
 bbb.
@@ -3509,7 +3509,7 @@ rewrite Ha₁ in Hc at 1 3 5.
 rewrite Ha₂ in Hc.
 ring_simplify in Hc.
 progress repeat rewrite <- Rsqr_pow2 in Hc.
-remember s²%R as ss eqn:Hss.
+remember s² as ss eqn:Hss.
 rewrite Hs in Hss.
 rewrite Rsqr_sqrt in Hss; [ | apply nonneg_sqr_vec_norm ].
 progress repeat rewrite Rsqr_pow2 in Hss.
@@ -3522,6 +3522,7 @@ ring_simplify in Hs.
 progress repeat rewrite <- Rsqr_pow2 in Hs.
 
 bbb.
+*)
 
 (* false, I think *)
 Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
@@ -3534,7 +3535,7 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
   → p₁ × p ≠ 0%vec
   → p₂ × p ≠ 0%vec
   → c = q₁ · q₂
-  → s = ∥(q₁ × q₂)∥%R
+  → s = ∥(q₁ × q₂)∥
   → (matrix_of_axis_angle (p, c, s) * q₁ = q₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
@@ -3562,7 +3563,7 @@ bbb.
  rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
  rewrite Hp, sqrt_1.
  do 3 rewrite Rdiv_1_r.
-remember (∥q₁∥ * ∥q₂∥)%R as rq eqn:Hrq.
+remember (∥q₁∥ * ∥q₂∥ as rq eqn:Hrq.
 subst c s.
 remember (q₁ · q₂) as c eqn:Hc.
 remember ∥(q₁ × q₂)∥ as s eqn:Hs.
@@ -3578,23 +3579,23 @@ f_equal.
  rewrite Rsqr_pow2.
  ring_simplify.
  progress repeat rewrite <- Rsqr_pow2.
- replace zp²%R with (1 - xp² - yp²)%R by lra.
+ replace zp² with (1 - xp² - yp²) by lra.
  progress repeat rewrite Rsqr_pow2.
  ring_simplify.
  progress repeat rewrite <- Rsqr_pow2.
- apply Rplus_eq_reg_r with (r := (- (- yp * rq * z₂ + zp * rq * y₂)%R)).
+ apply Rplus_eq_reg_r with (r := (- - yp * rq * z₂ + zp * rq * y₂)).
  rewrite Rplus_opp_r.
  rewrite fold_Rminus.
  ring_simplify.
  progress repeat rewrite Rsqr_pow2.
  progress replace
-   (- xp ^ 2 * s * x₁ + s * x₁ - s * xp * y₁ * yp - s * xp * zp * z₁ +
-    y₁ * zp * c - yp * z₁ * c + yp * rq * z₂ - zp * rq * y₂)%R
+   - xp ^ 2 * s * x₁ + s * x₁ - s * xp * y₁ * yp - s * xp * zp * z₁ +
+    y₁ * zp * c - yp * z₁ * c + yp * rq * z₂ - zp * rq * y₂
  with
-   (s * (x₁ - xp * (xp * x₁ + y₁ * yp  + zp * z₁)) +
-    c * (y₁ * zp - yp * z₁) + rq * (yp * z₂ - zp * y₂))%R
+   s * (x₁ - xp * (xp * x₁ + y₁ * yp  + zp * z₁)) +
+    c * (y₁ * zp - yp * z₁) + rq * (yp * z₂ - zp * y₂)
  by lra.
- replace (y₁ * yp)%R with (yp * y₁)%R by lra.
+ replace (y₁ * yp) with (yp * y₁) by lra.
  rewrite Hll.
 bbb.
 
@@ -3607,8 +3608,8 @@ Theorem glop : ∀ p p₁ p₂ q₁ q₂ c s,
   → q₂ = (p × p₂)
   → q₁ ≠ 0%vec
   → q₂ ≠ 0%vec
-  → c = (/ (∥q₁∥ * ∥q₂∥) * (q₁ · q₂))%R
-  → s = (/ (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥)%R
+  → c = / (∥q₁∥ * ∥q₂∥) * (q₁ · q₂)
+  → s = / (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
 Proof.
 intros * Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
@@ -3618,7 +3619,7 @@ destruct p₂ as (x₂, y₂, z₂); simpl in *.
 rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
 rewrite Hp, sqrt_1.
 do 3 rewrite Rdiv_1_r.
-remember (∥q₁∥ * ∥q₂∥)%R as rq eqn:Hrq.
+remember (∥q₁∥ * ∥q₂∥ as rq eqn:Hrq.
 subst c s.
 remember (q₁ · q₂) as c eqn:Hc.
 remember ∥(q₁ × q₂)∥ as s eqn:Hs.
@@ -3632,12 +3633,12 @@ f_equal.
  do 2 rewrite Rdiv_1_r.
  unfold Rsqr.
  progress replace
-   (xp * xp * rq * x₁ - xp * xp * c * x₁ + rq * xp * yp * y₁ +
+   xp * xp * rq * x₁ - xp * xp * c * x₁ + rq * xp * yp * y₁ +
     rq * xp * zp * z₁ + c * x₁ - c * xp * yp * y₁ - c * xp * zp * z₁ +
-    yp * s * z₁ - zp * s * y₁)%R
+    yp * s * z₁ - zp * s * y₁
  with
-   (xp * (rq - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-    c * x₁ + s * (yp * z₁ - zp * y₁))%R
+   xp * (rq - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+    c * x₁ + s * (yp * z₁ - zp * y₁)
    by lra.
  rewrite Hll.
  move c before rq; move s before c.
@@ -3645,28 +3646,28 @@ f_equal.
  simpl in Hc.
  unfold Rsqr in Hp.
  progress replace
-   (xp * (rq - c) * (xp * x₂ + yp * y₂ + zp * z₂) +
-    c * x₁ + s * (yp * z₁ - zp * y₁))%R
+   xp * (rq - c) * (xp * x₂ + yp * y₂ + zp * z₂) +
+    c * x₁ + s * (yp * z₁ - zp * y₁)
  with
-   (xp * xp * (rq - c) * x₂ +
+   xp * xp * (rq - c) * x₂ +
     xp * (rq - c) * (yp * y₂ + zp * z₂) +
-    c * x₁ + s * (yp * z₁ - zp * y₁))%R
+    c * x₁ + s * (yp * z₁ - zp * y₁)
    by lra.
- replace (xp * xp)%R with (1 - yp * yp - zp * zp)%R by lra.
- replace ((1 - yp * yp - zp * zp) * (rq - c) * x₂)%R
- with (rq * x₂ - c * x₂ - (yp * yp + zp * zp) * (rq - c) * x₂)%R by lra.
- apply Rplus_eq_reg_l with (r := (- (rq * x₂))%R).
+ replace (xp * xp) with (1 - yp * yp - zp * zp) by lra.
+ replace ((1 - yp * yp - zp * zp) * (rq - c) * x₂
+ with rq * x₂ - c * x₂ - (yp * yp + zp * zp) * (rq - c) * x₂) by lra.
+ apply Rplus_eq_reg_l with (r := - (rq * x₂)).
  rewrite Rplus_opp_l.
  unfold Rminus.
  do 5 rewrite <- Rplus_assoc.
  rewrite Rplus_opp_l, Rplus_0_l.
  progress repeat rewrite fold_Rminus.
  progress replace
-   (- (c * x₂) - (yp * yp + zp * zp) * (rq - c) * x₂ +
-    xp * (rq - c) * (yp * y₂ + zp * z₂) + c * x₁)%R
+   - (c * x₂) - (yp * yp + zp * zp) * (rq - c) * x₂ +
+    xp * (rq - c) * (yp * y₂ + zp * z₂) + c * x₁
  with
-   (c * (x₁ - x₂) +
-    (rq - c) * (xp * (yp * y₂ + zp * z₂) - (yp * yp + zp * zp) * x₂))%R
+   c * (x₁ - x₂) +
+    (rq - c) * (xp * (yp * y₂ + zp * z₂) - (yp * yp + zp * zp) * x₂)
    by lra.
 
 bbb.
@@ -3678,7 +3679,7 @@ rewrite <- sqrt_mult_alt in Hs; [ | apply nonneg_sqr_vec_norm ].
 bbb.
 
 Theorem glop : ∀ r p p₁ p₂ q₁ q₂ c s,
-  (0 < r)%R
+  0 < r
   → p ∈ sphere r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
@@ -3687,8 +3688,8 @@ Theorem glop : ∀ r p p₁ p₂ q₁ q₂ c s,
   → q₂ = (p × p₂)
   → q₁ ≠ 0%vec
   → q₂ ≠ 0%vec
-  → c = (/ (∥q₁∥ * ∥q₂∥) * (q₁ · q₂))%R
-  → s = (/ (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥)%R
+  → c = / (∥q₁∥ * ∥q₂∥) * (q₁ · q₂)
+  → s = / (∥q₁∥ * ∥q₂∥) * ∥(q₁ × q₂)∥
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hll Hq₁ Hq₂ Hq₁nz Hq₂nz Hc Hs.
@@ -3703,25 +3704,25 @@ rewrite Rsqr_div; [ | lra ].
 f_equal.
  field_simplify.
  rewrite Rdiv_1_r.
- apply Rmult_eq_reg_r with (r := r⁴%R).
+ apply Rmult_eq_reg_r with (r := r⁴).
  progress repeat rewrite Rsqr_pow2.
- replace (r ^ 2 * r ^ 2)%R with r⁴%R by lra.
+ replace (r ^ 2 * r ^ 2 with r⁴) by lra.
  rewrite Rmult_div_same.
  ring_simplify.
  progress repeat rewrite <- Rsqr_pow2.
  subst c s.
- replace (- xp² * (/ r² * (q₁ · q₂)) * x₁ * r²)%R
- with (- xp² * (q₁ · q₂) * x₁ * (/ r² * r²))%R by lra.
- replace (xp * (/ r² * (q₁ · q₂)) * r² * yp * y₁)%R
- with (xp * (q₁ · q₂) * yp * y₁ * (/ r² * r²))%R by lra.
- replace (xp * (/ r² * (q₁ · q₂)) * r² * zp * z₁)%R
- with (xp * (q₁ · q₂) * zp * z₁ * (/ r² * r²))%R by lra.
- replace (/ r² * (q₁ · q₂) * x₁ * r⁴)%R
- with (r ^ 2 * (q₁ · q₂) * x₁ * (/ r² * r ^ 2))%R by lra.
- replace (r³ * yp * z₁ * (/ r² * ∥(q₁ × q₂)∥))%R
- with (r * yp * z₁ * ∥(q₁ × q₂)∥ * (/ r² * r ^ 2))%R by lra.
- replace (r³ * y₁ * zp * (/ r² * ∥(q₁ × q₂)∥))%R
- with (r * y₁ * zp * ∥(q₁ × q₂)∥ * (/ r² * r ^ 2))%R by lra.
+ replace (- xp² * (/ r² * (q₁ · q₂)) * x₁ * r²
+ with - xp² * (q₁ · q₂) * x₁ * (/ r² * r²)) by lra.
+ replace (xp * (/ r² * (q₁ · q₂)) * r² * yp * y₁
+ with xp * (q₁ · q₂) * yp * y₁ * (/ r² * r²)) by lra.
+ replace (xp * (/ r² * (q₁ · q₂)) * r² * zp * z₁
+ with xp * (q₁ · q₂) * zp * z₁ * (/ r² * r²)) by lra.
+ replace (/ r² * (q₁ · q₂) * x₁ * r⁴
+ with r ^ 2 * (q₁ · q₂) * x₁ * (/ r² * r ^ 2)) by lra.
+ replace (r³ * yp * z₁ * (/ r² * ∥(q₁ × q₂)∥)
+ with r * yp * z₁ * ∥(q₁ × q₂)∥ * (/ r² * r ^ 2)) by lra.
+ replace (r³ * y₁ * zp * (/ r² * ∥(q₁ × q₂)∥)
+ with r * y₁ * zp * ∥(q₁ × q₂)∥ * (/ r² * r ^ 2)) by lra.
  rewrite <- Rsqr_pow2.
  rewrite Rinv_l.
  progress repeat rewrite Rmult_1_r.
@@ -3733,7 +3734,7 @@ f_equal.
  destruct cq as (cx, cy, cz).
  unfold vec_norm.
  injection Hcq; clear Hcq; intros Hcz Hcy Hcx.
- remember (cx² + cy² + cz²)%R as rx eqn:Hrx.
+ remember (cx² + cy² + cz² as rx eqn:Hrx.
  subst cx cy cz.
  progress repeat rewrite Rsqr_pow2 in Hrx.
  ring_simplify in Hrx.
@@ -3754,7 +3755,7 @@ rewrite sqrt_Rsqr; [ | lra ].
 rewrite Rsqr_div; [ | lra ].
 rewrite Rsqr_div; [ | lra ].
 rewrite Rsqr_div; [ | lra ].
-enough (r = 1%R). (* just to simplify the proof, to see *)
+enough (r = 1). (* just to simplify the proof, to see *)
 subst r; clear Hr.
 simpl in Hp₁, Hp₂.
 rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
@@ -3777,12 +3778,12 @@ bbb.
    p₂ are not in the same latitude (p being the north pole), one if they
    are. *)
 Theorem one_rotation_max : ∀ r p p₁ p₂ c s c' s',
-  (0 < r)%R
+  0 < r
   → p ∈ sphere r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
-  → (c² + s² = 1)%R
-  → (c'² + s'² = 1)%R
+  → c² + s² = 1
+  → c'² + s'² = 1
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
   → (matrix_of_axis_angle (p, c', s') * p₁ = p₂)%vec
   → c = c' ∧ s = s'.
@@ -3800,7 +3801,7 @@ destruct (Req_dec (latitude p p₁) (latitude p p₂)) as [Hll| Hll].
  injection Hm; clear Hm; intros Hz1 Hy1 Hx1.
  injection Hm'; clear Hm'; intros Hz2 Hy2 Hx2.
  symmetry in Hx1, Hy1, Hz1, Hx2, Hy2, Hz2.
- enough (r = 1%R). (* just to simplify the proof, to see *)
+ enough (r = 1). (* just to simplify the proof, to see *)
  subst r; clear Hr.
  rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
  do 3 rewrite Rdiv_1_r in Hx1, Hy1, Hz1, Hx2, Hy2, Hz2.
@@ -3818,8 +3819,8 @@ bbb.
  unfold Rsqr in Hx1.
  assert
    (H :
-     ((c - c') * (xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁) +
-      (s - s') * (y₁ * zp - yp * z₁))%R = 0%R) by lra.
+     (c - c') * (xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁) +
+      (s - s') * (y₁ * zp - yp * z₁) = 0) by lra.
 
 bbb.
 
@@ -3832,24 +3833,24 @@ bbb.
 
 Definition axis_angle_of_couple p₁ p₂ :=
   let a := (/ ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec in
-  let c := ((p₁ · p₂) / (∥p₁∥ * ∥p₂∥))%R in
-  let s := (∥(p₁ × p₂)∥ / (∥p₁∥ * ∥p₂∥))%R in
+  let c := (p₁ · p₂) / (∥p₁∥ * ∥p₂∥) in
+  let s := ∥(p₁ × p₂)∥ / (∥p₁∥ * ∥p₂∥) in
   (a, c, s).
 
 Theorem rotation_between_2_points : ∀ r p₁ p₂ a c s,
-  (0 < r)%R
+  0 < r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
   → p₁ × p₂ ≠ 0%vec
   → axis_angle_of_couple p₁ p₂ = (a, c, s)
-  → a ∈ sphere 1 ∧ (c² + s² = 1)%R ∧
+  → a ∈ sphere 1 ∧ c² + s² = 1 ∧
     (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec.
 Proof.
 intros * Hr Hp₁ Hp₂ Hpp Hacs.
 symmetry in Hacs; injection Hacs; clear Hacs.
 intros Hs Hc Ha.
-assert (Hcs : (c² + s² = 1)%R).
- assert (H : (∥p₁∥ * ∥p₂∥ ≠ 0)%R).
+assert (Hcs : c² + s² = 1).
+ assert (H : ∥p₁∥ * ∥p₂∥ ≠ 0).
   apply on_sphere_norm in Hp₁; [ | lra ].
   apply on_sphere_norm in Hp₂; [ | lra ].
   rewrite Hp₁, Hp₂.
@@ -3873,13 +3874,13 @@ assert (Hcs : (c² + s² = 1)%R).
   remember (p₁ × p₂) as v eqn:Hv.
   destruct v as (vx, vy, vz); simpl.
   remember (√ (vx² + vy² + vz²)) as vr eqn:Hvr.
-  replace (r * (/ vr * vx))%R with (r * vx * / vr)%R by lra.
-  replace (r * (/ vr * vy))%R with (r * vy * / vr)%R by lra.
-  replace (r * (/ vr * vz))%R with (r * vz * / vr)%R by lra.
+  replace (r * (/ vr * vx)) with (r * vx * / vr) by lra.
+  replace (r * (/ vr * vy)) with (r * vy * / vr) by lra.
+  replace (r * (/ vr * vz)) with (r * vz * / vr) by lra.
   do 3 rewrite Rsqr_mult.
   do 2 rewrite <- Rmult_plus_distr_l.
   apply (f_equal Rsqr) in Hvr.
-  assert (Hrz : (vr ≠ 0)%R).
+  assert (Hrz : vr ≠ 0).
    intros H; rewrite H in *; clear H.
    symmetry in Hvr.
    rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
@@ -3907,7 +3908,7 @@ assert (Hcs : (c² + s² = 1)%R).
   simpl in Hs.
   simpl in Ha.
   remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
-  assert (Hrpz : rp ≠ 0%R).
+  assert (Hrpz : rp ≠ 0).
    intros H; rewrite H in Hrp; symmetry in Hrp.
    apply sqrt_eq_0 in Hrp; [ | apply nonneg_sqr_vec_norm ].
    apply sqr_vec_norm_eq_0 in Hrp.
@@ -3915,7 +3916,7 @@ assert (Hcs : (c² + s² = 1)%R).
    now rewrite H1, H2, H3 in Hpp.
 
    injection Ha; clear Ha; intros Hza Hya Hxa.
-   assert (Hra : √ (xa² + ya² + za²) = 1%R).
+   assert (Hra : √ (xa² + ya² + za²) = 1).
     rewrite Hxa, Hya, Hza.
     progress repeat rewrite Rsqr_mult.
     do 2 rewrite <- Rmult_plus_distr_l.
@@ -3923,7 +3924,7 @@ assert (Hcs : (c² + s² = 1)%R).
     rewrite <- Hrp.
     rewrite sqrt_Rsqr; [ now rewrite Rinv_l | ].
     apply Rlt_le, Rinv_0_lt_compat.
-    enough (0 ≤ rp)%R by lra.
+    enough 0 ≤ rp) by lra.
     rewrite Hrp; apply sqrt_pos.
 
     rewrite Hra.
@@ -3933,46 +3934,46 @@ assert (Hcs : (c² + s² = 1)%R).
     progress repeat rewrite Rsqr_mult.
     unfold Rsqr.
     replace
-      ((/ rp * / rp * (xp * xp) * (1 - c) + c) * x₁ +
+      (/ rp * / rp * (xp * xp) * (1 - c) + c) * x₁ +
        (/ rp * xp * (/ rp * yp) * (1 - c) - / rp * zp * s) * y₁ +
-       (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁)%R
+       (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁
     with
-    (/ rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-     c * x₁ + s * (yp * z₁ - zp * y₁) * / rp)%R by lra.
+    / rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+     c * x₁ + s * (yp * z₁ - zp * y₁) * / rp) by lra.
     replace
-      ((/ rp * xp * (/ rp * yp) * (1 - c) + / rp * zp * s) * x₁ +
+      (/ rp * xp * (/ rp * yp) * (1 - c) + / rp * zp * s) * x₁ +
        (/ rp * / rp * (yp * yp) * (1 - c) + c) * y₁ +
-       (/ rp * yp * (/ rp * zp) * (1 - c) - / rp * xp * s) * z₁)%R
+       (/ rp * yp * (/ rp * zp) * (1 - c) - / rp * xp * s) * z₁
     with
-    (/ rp * / rp * yp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-     c * y₁ + s * (zp * x₁ - xp * z₁) * / rp)%R by lra.
+    / rp * / rp * yp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+     c * y₁ + s * (zp * x₁ - xp * z₁) * / rp) by lra.
     replace
-      ((/ rp * xp * (/ rp * zp) * (1 - c) - / rp * yp * s) * x₁ +
+      (/ rp * xp * (/ rp * zp) * (1 - c) - / rp * yp * s) * x₁ +
        (/ rp * yp * (/ rp * zp) * (1 - c) + / rp * xp * s) * y₁ +
-       (/ rp * / rp * (zp * zp) * (1 - c) + c) * z₁)%R
+       (/ rp * / rp * (zp * zp) * (1 - c) + c) * z₁
     with
-    (/ rp * / rp * zp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-     c * z₁ + s * (xp * y₁ - yp * x₁) * / rp)%R by lra.
-    remember (xp * x₁ + yp * y₁ + zp * z₁)%R as u eqn:Hu.
+    / rp * / rp * zp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
+     c * z₁ + s * (xp * y₁ - yp * x₁) * / rp) by lra.
+    remember (xp * x₁ + yp * y₁ + zp * z₁ as u eqn:Hu.
     rewrite Hxp, Hyp, Hzp in Hu.
     ring_simplify in Hu; subst u.
     do 3 rewrite Rmult_0_r, Rplus_0_l.
     rewrite fold_Rsqr in Hc, Hs.
-    assert (Hr2 : (r² ≠ 0)%R) by (intros H; apply Rsqr_eq_0 in H; lra).
+    assert (Hr2 : r² ≠ 0) by (intros H; apply Rsqr_eq_0 in H; lra).
     f_equal.
      apply Rmult_eq_reg_r with (r := rp); [ | easy ].
      rewrite Rmult_plus_distr_r.
      repeat rewrite Rmult_assoc.
      rewrite Rinv_l; [ | easy ].
      rewrite Rmult_1_r.
-     apply Rmult_eq_reg_r with (r := r²%R); [ | easy ].
+     apply Rmult_eq_reg_r with (r := r²); [ | easy ].
      rewrite Rmult_plus_distr_r.
-     remember (c * (x₁ * rp) * r²)%R as u eqn:Hu.
+     remember (c * (x₁ * rp) * r² as u eqn:Hu.
      rewrite Rmult_shuffle0 in Hu.
      rewrite Hc in Hu.
      rewrite Rmult_div_same in Hu; [ | easy ].
      subst u.
-     remember (s * (yp * z₁ - zp * y₁) * r²)%R as u eqn:Hu.
+     remember (s * (yp * z₁ - zp * y₁) * r² as u eqn:Hu.
      rewrite Rmult_shuffle0 in Hu.
      rewrite Hs in Hu.
      rewrite Rmult_div_same in Hu; [ | easy ].
@@ -3993,14 +3994,14 @@ assert (Hcs : (c² + s² = 1)%R).
      repeat rewrite Rmult_assoc.
      rewrite Rinv_l; [ | easy ].
      rewrite Rmult_1_r.
-     apply Rmult_eq_reg_r with (r := r²%R); [ | easy ].
+     apply Rmult_eq_reg_r with (r := r²); [ | easy ].
      rewrite Rmult_plus_distr_r.
-     remember (c * (y₁ * rp) * r²)%R as u eqn:Hu.
+     remember (c * (y₁ * rp) * r² as u eqn:Hu.
      rewrite Rmult_shuffle0 in Hu.
      rewrite Hc in Hu.
      rewrite Rmult_div_same in Hu; [ | easy ].
      subst u.
-     remember (s * (zp * x₁ - xp * z₁) * r²)%R as u eqn:Hu.
+     remember (s * (zp * x₁ - xp * z₁) * r² as u eqn:Hu.
      rewrite Rmult_shuffle0 in Hu.
      rewrite Hs in Hu.
      rewrite Rmult_div_same in Hu; [ | easy ].
@@ -4022,14 +4023,14 @@ assert (Hcs : (c² + s² = 1)%R).
      repeat rewrite Rmult_assoc.
      rewrite Rinv_l; [ | easy ].
      rewrite Rmult_1_r.
-     apply Rmult_eq_reg_r with (r := r²%R); [ | easy ].
+     apply Rmult_eq_reg_r with (r := r²); [ | easy ].
      rewrite Rmult_plus_distr_r.
-     remember (c * (z₁ * rp) * r²)%R as u eqn:Hu.
+     remember (c * (z₁ * rp) * r² as u eqn:Hu.
      rewrite Rmult_shuffle0 in Hu.
      rewrite Hc in Hu.
      rewrite Rmult_div_same in Hu; [ | easy ].
      subst u.
-     remember (s * (xp * y₁ - yp * x₁) * r²)%R as u eqn:Hu.
+     remember (s * (xp * y₁ - yp * x₁) * r² as u eqn:Hu.
      rewrite Rmult_shuffle0 in Hu.
      rewrite Hs in Hu.
      rewrite Rmult_div_same in Hu; [ | easy ].
@@ -4048,9 +4049,9 @@ Qed.
 
 Theorem matrix_of_axis_angle_opp : ∀ p₁ p₂ a c s,
   a ∈ sphere 1
-  → (c² + s² = 1)%R
+  → c² + s² = 1
   → (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec
-  → (matrix_of_axis_angle (a, c, (-s)%R) * p₂ = p₁)%vec.
+  → (matrix_of_axis_angle (a, c, -s) * p₂ = p₁)%vec.
 Proof.
 intros * Ha Hcs Hacs.
 subst p₂; simpl.
@@ -4065,20 +4066,20 @@ destruct p₁ as (x₁, y₁, z₁); simpl.
 f_equal; ring_simplify.
  rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
  progress repeat rewrite Rsqr_pow2.
- replace (s ^ 2)%R with (1 - c ^ 2)%R by lra.
- replace (az ^ 2)%R with (1 - ax ^ 2 - ay ^ 2)%R by lra.
+ replace (s ^ 2) with (1 - c ^ 2) by lra.
+ replace (az ^ 2) with (1 - ax ^ 2 - ay ^ 2) by lra.
  ring.
 
  rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
  progress repeat rewrite Rsqr_pow2.
- replace (s ^ 2)%R with (1 - c ^ 2)%R by lra.
- replace (az ^ 2)%R with (1 - ax ^ 2 - ay ^ 2)%R by lra.
+ replace (s ^ 2) with (1 - c ^ 2) by lra.
+ replace (az ^ 2) with (1 - ax ^ 2 - ay ^ 2) by lra.
  ring.
 
  rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
  progress repeat rewrite Rsqr_pow2.
- replace (s ^ 2)%R with (1 - c ^ 2)%R by lra.
- replace (az ^ 2)%R with (1 - ax ^ 2 - ay ^ 2)%R by lra.
+ replace (s ^ 2) with (1 - c ^ 2) by lra.
+ replace (az ^ 2) with (1 - ax ^ 2 - ay ^ 2) by lra.
  ring.
 Qed.
 
@@ -4105,7 +4106,7 @@ injection Ha; clear Ha; intros Hs Hc Ha.
 destruct a as (xa, ya, za); simpl.
 injection Ha; clear Ha; intros Hza Hya Hxa.
 rewrite Hc in Hs.
-remember ((a₃₂ - a₂₃)² + (a₁₃ - a₃₁)² + (a₂₁ - a₁₂)²)%R as r eqn:Hr.
+remember ((a₃₂ - a₂₃)² + (a₁₃ - a₃₁)² + (a₂₁ - a₁₂)² as r eqn:Hr.
 destruct (Req_dec r 0) as [Hrz| Hrz].
  rewrite Hrz in Hr; clear r Hxa Hya Hza Hrz.
  symmetry in Hr.
@@ -4149,18 +4150,18 @@ destruct (Req_dec r 0) as [Hrz| Hrz].
 Qed.
 
 Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
-  (0 < r)%R
+  0 < r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
   → p₁ × p₂ ≠ 0%vec
   → ∃ a c s,
-    a ∈ sphere 1 ∧ (c² + s² = 1)%R ∧
+    a ∈ sphere 1 ∧ c² + s² = 1 ∧
     (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec ∧
     ∀ a' c' s',
-    a' ∈ sphere 1 ∧ (c'² + s'² = 1)%R ∧
+    a' ∈ sphere 1 ∧ c'² + s'² = 1 ∧
     (matrix_of_axis_angle (a', c', s') * p₁ = p₂)%vec
     → a = a' ∧ c = c' ∧ s = s' ∨
-      a = (-a')%vec ∧ c = c' ∧ s = (- s')%R.
+      a = (-a')%vec ∧ c = c' ∧ s = - s'.
 Proof.
 intros * Hr Hp₁ Hp₂ Hpp.
 remember (axis_angle_of_couple p₁ p₂) as acs eqn:H.
@@ -4177,7 +4178,7 @@ apply matrix_of_axis_angle_opp in H'; [ | easy | easy ].
 rewrite <- H' in Hm.
 rewrite <- mat_vec_mul_assoc in Hm.
 remember (matrix_of_axis_angle (a, c, s)) as M eqn:HM.
-remember (matrix_of_axis_angle (a', c', (-s')%R)) as M' eqn:HM'.
+remember (matrix_of_axis_angle (a', c', -s')) as M' eqn:HM'.
 move M' before M.
 generalize Hm; intros H.
 remember (axis_angle_of_matrix (M * M')) as acs' eqn:Hacs'.
@@ -4205,9 +4206,9 @@ ring_simplify in Hx₂.
 progress repeat rewrite Rsqr_pow2 in Ha, Ha'.
 progress repeat rewrite Rsqr_pow2 in Hcs, Hcs'.
 progress repeat rewrite Rsqr_pow2 in Hx₂.
-repeat replace (za' ^ 2)%R with (1 - xa' ^ 2 - ya' ^ 2)%R in Hx₂ by lra.
+repeat replace (za' ^ 2) with (1 - xa' ^ 2 - ya' ^ 2 in Hx₂) by lra.
 ring_simplify in Hx₂.
-progress replace (s' ^ 2)%R with (1 - c' ^ 2)%R in Hx₂ by lra.
+progress replace (s' ^ 2) with (1 - c' ^ 2 in Hx₂ by lra.
 
 bbb.
 
@@ -4216,7 +4217,7 @@ bbb.
 Definition J₁ r :=
   mkset
     (λ '(axis, cosθ, sinθ),
-     ∥axis∥ = r ∧ (cosθ² + sinθ² = 1)%R ∧
+     ∥axis∥ = r ∧ cosθ² + sinθ² = 1 ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
      ∃ p p', p × p' ≠ 0%vec ∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
@@ -4230,7 +4231,7 @@ Definition J₁_of_nats r '(nf, no, nf', no') : (vector * ℝ * ℝ) :=
   let px := p × p' in
   (px, cos θ, sin θ).
 
-Theorem J₁_is_countable : ∀ r, r ≠ 0%R →
+Theorem J₁_is_countable : ∀ r, r ≠ 0 →
   ∃ f : ℕ → vector * ℝ * ℝ, ∀ acs, acs ∈ J₁ r → ∃ n : ℕ, f n = acs.
 Proof.
 intros r Hr.
@@ -4304,24 +4305,24 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hno', path_of_nat_inv.
      rewrite Hso₂, Hso₃.
      remember (acos ((p · p') / r²)) as a eqn:Ha.
-     assert (Hppi : (-1 < (p · p') / r² < 1)%R).
+     assert (Hppi : -1 < (p · p') / r² < 1).
       apply Rabs_lt.
       rewrite Rabs_div; [ | now intros H; apply Hr; apply Rsqr_eq_0 ].
       rewrite Rabs_sqr.
-      apply Rmult_lt_reg_r with (r := (r²)%R); [ now apply Rlt_0_sqr | ].
+      apply Rmult_lt_reg_r with (r := r²); [ now apply Rlt_0_sqr | ].
       unfold Rdiv; rewrite Rmult_assoc.
       rewrite Rinv_l; [ | now intros H; apply Rsqr_eq_0 in H ].
       rewrite Rmult_1_r, Rmult_1_l.
       rewrite <- Rabs_sqr.
       apply Rsqr_lt_abs_0.
-      replace (p · p')²%R with (∥p∥² * ∥p'∥² - (p × p')²%vec)%R
+      replace (p · p')² with ∥p∥² * ∥p'∥² - (p × p')²%vec
        by (rewrite <- vec_Lagrange_identity; lra).
-      assert (H : (0 ≤ r)%R) by (rewrite <- Hvn; apply vec_norm_nonneg).
+      assert (H : 0 ≤ r) by (rewrite <- Hvn; apply vec_norm_nonneg).
       apply on_sphere_norm in Hp; [ | easy ].
       apply on_sphere_norm in Hp'; [ | easy ].
       rewrite Hp, Hp'.
       fold (Rsqr (r²)).
-      enough (0 < (p × p')²%vec)%R by lra.
+      enough 0 < (p × p')²%vec) by lra.
       rewrite vec_dot_mul_diag.
       apply Rlt_0_sqr.
       clear H.
@@ -4346,28 +4347,28 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       f_equal; [ f_equal | ].
 (* on s'attaque au cosinus *)
 Focus 2.
-assert (Hr2 : (r² ≠ 0)%R) by now intros H; apply Rsqr_eq_0 in H.
-apply Rmult_eq_reg_r with (r := (r²)%R); [ | easy ].
+assert (Hr2 : r² ≠ 0) by now intros H; apply Rsqr_eq_0 in H.
+apply Rmult_eq_reg_r with (r := r²); [ | easy ].
 rewrite Rmult_div_same; [ | easy ].
 (**)
 rewrite Rsqr_div in Hxp; [ | easy ].
 progress repeat rewrite Rsqr_pow2 in Hxp.
 field_simplify in Hxp.
-apply Rmult_eq_compat_r with (r := (r ^ 2)%R) in Hxp.
+apply Rmult_eq_compat_r with (r := r ^ 2) in Hxp.
 progress repeat rewrite <- Rsqr_pow2 in Hxp.
 rewrite Rmult_div_same in Hxp; [ | easy ].
 rewrite Rdiv_1_r in Hxp.
 rewrite Rsqr_div in Hyp; [ | easy ].
 progress repeat rewrite Rsqr_pow2 in Hyp.
 field_simplify in Hyp.
-apply Rmult_eq_compat_r with (r := (r ^ 2)%R) in Hyp.
+apply Rmult_eq_compat_r with (r := r ^ 2) in Hyp.
 progress repeat rewrite <- Rsqr_pow2 in Hyp.
 rewrite Rmult_div_same in Hyp; [ | easy ].
 rewrite Rdiv_1_r in Hyp.
 rewrite Rsqr_div in Hzp; [ | easy ].
 progress repeat rewrite Rsqr_pow2 in Hzp.
 field_simplify in Hzp.
-apply Rmult_eq_compat_r with (r := (r ^ 2)%R) in Hzp.
+apply Rmult_eq_compat_r with (r := r ^ 2) in Hzp.
 progress repeat rewrite <- Rsqr_pow2 in Hzp.
 rewrite Rmult_div_same in Hzp; [ | easy ].
 rewrite Rdiv_1_r in Hzp.
@@ -4377,7 +4378,7 @@ destruct (Req_dec r 1) as [Hr1| Hr1].
  rewrite Hr1 in *; clear Hr1.
  apply (f_equal Rsqr) in Hvn.
  rewrite Rsqr_sqrt in Hvn.
- replace 1²%R with 1%R in * by now rewrite Rsqr_1.
+ replace 1² with 1 in * by now rewrite Rsqr_1.
  progress repeat rewrite Rmult_1_l in *.
  progress repeat rewrite Rmult_1_r in *.
  unfold Rsqr in *.
@@ -4398,7 +4399,7 @@ bbb.
 Definition J₁ r :=
   mkset
     (λ '(axis, cosθ, sinθ),
-     ∥axis∥ = 1%R ∧ (cosθ² + sinθ² = 1)%R ∧
+     ∥axis∥ = 1 ∧ cosθ² + sinθ² = 1 ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
      ∃ p p' n, p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      ((R ^ n)%mat * p)%vec = p').
@@ -4409,7 +4410,7 @@ Definition J₁_of_nats r '(nf, no, nf', no', n, k) : (vector * ℝ * ℝ) :=
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
   let a := acos ((p · p') / r²) in
-  let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
+  let θ := a / INR n + 2 * INR k * PI / INR n in
   let px := p × p' in
   (px, cos θ, sin θ).
 
@@ -4430,15 +4431,15 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p₃ := fixpoint_of_nat r nf' in
   let p' := fold_right rotate p₃ (path_of_nat no') in
   let a := acos ((p · p') / r²) in
-  let θ := (a / INR n + 2 * INR k * PI / INR n)%R in
+  let θ := a / INR n + 2 * INR k * PI / INR n in
   let px := p × p' in
   if vec_zerop px then mat_id
   else matrix_of_axis_angle (px, cos θ, sin θ).
 
 Theorem matrix_pow : ∀ v c s n,
-  ∥v∥ = 1%R
-  → (c² + s² = 1)%R
-  → (-1 < c < 1)%R
+  ∥v∥ = 1
+  → c² + s² = 1
+  → -1 < c < 1
   → let c' := cos (INR n * acos c) in
     let s' := sin (INR n * asin c) in
     (matrix_of_axis_angle (v, c, s) ^ n = matrix_of_axis_angle (v, c', s'))%mat.
@@ -4458,10 +4459,10 @@ induction n.
  remember (S n) as sn; simpl; subst sn.
  rewrite Hv.
  do 3 rewrite Rdiv_1_r.
- remember (INR n * acos c)%R as a eqn:Ha.
- remember (INR n * asin c)%R as b eqn:Hb.
- remember (INR (S n) * acos c)%R as a' eqn:Ha'.
- remember (INR (S n) * asin c)%R as b' eqn:Hb'.
+ remember (INR n * acos c as a eqn:Ha.
+ remember (INR n * asin c as b eqn:Hb.
+ remember (INR (S n) * acos c as a' eqn:Ha'.
+ remember (INR (S n) * asin c as b' eqn:Hb'.
  move b before a; move a' before b; move b' before a'.
  rewrite S_INR in Ha', Hb'.
  rewrite Rmult_plus_distr_r, Rmult_1_l in Ha', Hb'.
@@ -4543,7 +4544,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      rewrite Hso₂, Hso₃.
      rewrite cos_plus, sin_plus.
      rewrite <- Ha.
-     remember (a / INR n)%R as θ eqn:Hθ.
+     remember (a / INR n as θ eqn:Hθ.
 rewrite HM in Hv.
 rewrite matrix_pow in Hv.
 
@@ -4627,7 +4628,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
      remember (mat_of_path (rev_path el₂)) as M₂ eqn:HM₂.
      remember (mat_of_path (rev_path el₃)) as M₃ eqn:HM₃.
      rewrite Hso₂, Hso₃, <- Ha.
-     remember (a / INR n + 2 * INR k * PI / INR n)%R as θ eqn:Hθ.
+     remember (a / INR n + 2 * INR k * PI / INR n as θ eqn:Hθ.
      remember (p × p') as px eqn:Hpx.
      symmetry.
      destruct (vec_zerop px) as [Hpxz| Hpxz].
@@ -4644,9 +4645,9 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
         rewrite sqrt_Rsqr.
          rewrite Rinv_l.
           do 3 rewrite Rdiv_1_r.
-          replace (/ rp * xp)%R with (xp / rp)%R by lra.
-          replace (/ rp * yp)%R with (yp / rp)%R by lra.
-          replace (/ rp * zp)%R with (zp / rp)%R by lra.
+          replace (/ rp * xp) with (xp / rp) by lra.
+          replace (/ rp * yp) with (yp / rp) by lra.
+          replace (/ rp * zp) with (zp / rp) by lra.
           move M at bottom.
           move Ha at bottom.
           move Hθ at bottom.
