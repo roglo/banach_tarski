@@ -3258,7 +3258,12 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
       apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
-      clear Hvv Hli Hnv₂.
+      clear Hvv Hli Hnv₂ Hvvp.
+      simpl; f_equal.
+       unfold Rsqr.
+       rewrite Rmult_minus_distr_r, Rmult_1_l.
+       replace (xp * xp * 2 * x₁ - x₁ + xp * yp * 2 * y₁ + xp * zp * 2 * z₁)
+       with (2 * xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁) by lra.
 
 bbb.
 
