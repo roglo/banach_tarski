@@ -54,7 +54,7 @@ Definition vec_add '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
   V (u₁ + v₁) (u₂ + v₂) (u₃ + v₃).
 Definition vec_sub u v := vec_add u (vec_opp v).
 Definition vec_dot_mul '(V x₁ y₁ z₁) '(V x₂ y₂ z₂) :=
-  (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%R.
+  x₁ * x₂ + y₁ * y₂ + z₁ * z₂.
 Definition vec_cross_mul '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
   V (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
 Definition vec_const_mul k '(V x y z) := V (k * x) (k * y) (k * z).
@@ -126,10 +126,10 @@ Proof.
 unfold rot_x; simpl.
 setoid_rewrite Rsqr_pow2.
 f_equal; try lra; ring_simplify.
- replace (1 - (1 / 3) ^ 2)%R with (2 * (2 / 3) ^ 2)%R by field.
+ replace (1 - (1 / 3) ^ 2) with (2 * (2 / 3) ^ 2) by field.
  rewrite sqrt_mult; [ rewrite sqrt_pow2; lra | lra | lra ].
 
- replace (1 - (1 / 3) ^ 2)%R with (2 * (2 / 3) ^ 2)%R by field.
+ replace (1 - (1 / 3) ^ 2) with (2 * (2 / 3) ^ 2) by field.
  rewrite sqrt_mult; [ rewrite sqrt_pow2; lra | lra | lra ].
 Qed.
 
@@ -167,7 +167,7 @@ Fixpoint mat_pow M n :=
   | S n' => mat_mul M (mat_pow M n')
   end.
 
-Definition mat_trace M := (a₁₁ M + a₂₂ M + a₃₃ M)%R.
+Definition mat_trace M := a₁₁ M + a₂₂ M + a₃₃ M.
 
 Delimit Scope mat_scope with mat.
 Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
@@ -433,9 +433,9 @@ Definition mat_transp m :=
    (a₁₃ m) (a₂₃ m) (a₃₃ m).
 
 Definition mat_det m :=
-  (a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m) +
-   a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
-   a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%R.
+  a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m) +
+  a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
+  a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m).
 
 Arguments mat_transp m%mat.
 Arguments mat_det m%mat.
@@ -458,7 +458,7 @@ unfold mat_mul; simpl; f_equal; ring.
 Qed.
 
 Theorem mat_det_mul : ∀ m₁ m₂,
-  mat_det (m₁ * m₂) = (mat_det m₂ * mat_det m₁)%R.
+  mat_det (m₁ * m₂) = mat_det m₂ * mat_det m₁.
 Proof.
 intros m₁ m₂.
 unfold mat_det; simpl; ring.
@@ -466,7 +466,7 @@ Qed.
 
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
-  mat_det A = 1%R.
+  mat_det A = 1.
 
 Arguments is_rotation_matrix A%mat.
 
@@ -563,7 +563,7 @@ rewrite mat_det_mul, Hd1, Hd2.
 apply Rmult_1_r.
 Qed.
 
-Theorem vec_const_dot_assoc : ∀ a u v, (a ⁎ u) · v = (a * (u · v))%R.
+Theorem vec_const_dot_assoc : ∀ a u v, (a ⁎ u) · v = a * (u · v).
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 do 3 rewrite Rmult_assoc.
@@ -577,7 +577,7 @@ now do 3 rewrite Rmult_assoc.
 Qed.
 
 Theorem vec_const_mul_div : ∀ a b u v,
-  a ≠ 0%R
+  a ≠ 0
   → a ⁎ u = b ⁎ v
   → u = (b / a) ⁎ v.
 Proof.
@@ -593,13 +593,13 @@ rewrite Rinv_r; [ | easy ].
 now do 3 rewrite Rmult_1_l.
 Qed.
 
-Theorem vec_norm_nonneg : ∀ v, (0 ≤ ∥v∥)%R.
+Theorem vec_norm_nonneg : ∀ v, 0 ≤ ∥v∥.
 Proof.
 intros (x, y, z); simpl.
 apply sqrt_pos.
 Qed.
 
-Theorem nonneg_sqr_vec_norm : ∀ x y z, (0 ≤ x² + y² + z²)%R.
+Theorem nonneg_sqr_vec_norm : ∀ x y z, 0 ≤ x² + y² + z².
 Proof.
 intros.
 apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
@@ -607,7 +607,7 @@ apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
 Theorem vec_norm_vec_const_mul : ∀ a v,
-  ∥(vec_const_mul a v)∥ = (Rabs a * ∥v∥)%R.
+  ∥(vec_const_mul a v)∥ = Rabs a * ∥v∥.
 Proof.
 intros a (x, y, z); simpl.
 do 3 rewrite Rsqr_mult.
@@ -617,8 +617,8 @@ now rewrite sqrt_Rsqr_abs.
 Qed.
 
 Theorem sqr_vec_norm_eq_0 : ∀ x y z,
-  (x² + y² + z²)%R = 0%R
-  → x = 0%R ∧ y = 0%R ∧ z = 0%R.
+  x² + y² + z² = 0
+  → x = 0 ∧ y = 0 ∧ z = 0.
 Proof.
 intros * H.
 apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
@@ -631,14 +631,14 @@ apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
  apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
-Theorem vec_norm_0 : ∥0∥ = 0%R.
+Theorem vec_norm_0 : ∥0∥ = 0.
 Proof.
 simpl; rewrite Rsqr_0.
 do 2 rewrite Rplus_0_l.
 apply sqrt_0.
 Qed.
 
-Theorem vec_norm_eq_0 : ∀ v, ∥v∥ = 0%R ↔ v = 0%vec.
+Theorem vec_norm_eq_0 : ∀ v, ∥v∥ = 0 ↔ v = 0%vec.
 Proof.
 intros.
 split; intros Hv.
@@ -916,19 +916,19 @@ intros.
 destruct v as (x, y, z); simpl; f_equal; ring.
 Qed.
 
-Theorem vec_dot_cross_mul : ∀ u v, u · (u × v) = 0%R.
+Theorem vec_dot_cross_mul : ∀ u v, u · (u × v) = 0.
 Proof.
 intros.
 destruct u, v; simpl; lra.
 Qed.
 
-Theorem vec_cross_dot_mul : ∀ u v, u × v · u = 0%R.
+Theorem vec_cross_dot_mul : ∀ u v, u × v · u = 0.
 Proof.
 intros.
 destruct u, v; simpl; lra.
 Qed.
 
-Theorem vec_dot_mul_0_r : ∀ v, (v · 0)%vec = 0%R.
+Theorem vec_dot_mul_0_r : ∀ v, (v · 0)%vec = 0.
 Proof.
 intros (x, y, z); simpl.
 do 3 rewrite Rmult_0_r.
@@ -936,33 +936,33 @@ now do 2 rewrite Rplus_0_r.
 Qed.
 
 Theorem vec_dot_mul_add_distr_l : ∀ u v w,
-  u · (v + w) = (u · v + u · w)%R.
+  u · (v + w) = u · v + u · w.
 Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
 Qed.
 
 Theorem vec_dot_mul_sub_distr_l : ∀ u v w,
-  u · (v - w) = (u · v - u · w)%R.
+  u · (v - w) = u · v - u · w.
 Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
 Qed.
 
-Theorem vec_dot_mul_add_distr_r : ∀ u v w, (u + v) · w = (u · w + v · w)%R.
+Theorem vec_dot_mul_add_distr_r : ∀ u v w, (u + v) · w = u · w + v · w.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; lra.
 Qed.
 
-Theorem vec_dot_mul_sub_distr_r : ∀ u v w, (u - v) · w = (u · w - v · w)%R.
+Theorem vec_dot_mul_sub_distr_r : ∀ u v w, (u - v) · w = u · w - v · w.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; lra.
 Qed.
 
-Theorem Rmult_vec_dot_mul_distr_r : ∀ a u v, (a * (u · v))%R = u · a ⁎ v.
+Theorem Rmult_vec_dot_mul_distr_r : ∀ a u v, a * (u · v) = u · a ⁎ v.
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
 
-Theorem vec_dot_mul_diag : ∀ v, v · v = (∥v∥²)%R.
+Theorem vec_dot_mul_diag : ∀ v, v · v = ∥v∥².
 Proof.
 intros (x, y, z); simpl.
 do 3 rewrite fold_Rsqr.
@@ -1031,12 +1031,12 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_opp_dot_mul_distr_l : ∀ u v, (- (u · v) = - u · v)%R.
+Theorem vec_opp_dot_mul_distr_l : ∀ u v, - (u · v) = - u · v.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
 
-Theorem vec_opp_dot_mul_distr_r : ∀ u v, (- (u · v) = u · - v)%R.
+Theorem vec_opp_dot_mul_distr_r : ∀ u v, - (u · v) = u · - v.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
@@ -1080,7 +1080,7 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_const_mul_eq_reg_l : ∀ a u v, a ⁎ u = a ⁎ v → a ≠ 0%R → u = v.
+Theorem vec_const_mul_eq_reg_l : ∀ a u v, a ⁎ u = a ⁎ v → a ≠ 0 → u = v.
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃) Hauv Ha.
 simpl in Hauv.
@@ -1120,6 +1120,9 @@ Qed.
 Theorem mat_pow_succ : ∀ M n, (M ^ S n)%mat = (M * M ^ n)%mat.
 Proof. easy. Qed.
 
+Theorem vec_sqr_0 : 0²%vec = 0.
+Proof. simpl; lra. Qed.
+
 Theorem vec_sqr_eq_0 : ∀ v, (v² = 0%R → v = 0)%vec.
 Proof.
 intros (x, y, z) Hv; simpl in Hv |-*.
@@ -1127,18 +1130,18 @@ apply sqr_vec_norm_eq_0 in Hv.
 now destruct Hv as (H1 & H2 & H3); subst.
 Qed.
 
-Theorem vec_sqr_const_mul : ∀ a v, (a ⁎ v)²%vec = (a² * v²%vec)%R.
+Theorem vec_sqr_const_mul : ∀ a v, (a ⁎ v)²%vec = a² * v²%vec.
 Proof.
 intros a (v₁, v₂, v₃); simpl; unfold Rsqr; lra.
 Qed.
 
-Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = / ∥u∥ ⁎ u → ∥v∥ = 1%R.
+Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = / ∥u∥ ⁎ u → ∥v∥ = 1.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) Hu Hv.
 simpl in Hv; simpl.
 injection Hv; clear Hv; intros H₃ H₂ H₁.
 remember (√ (u₁² + u₂² + u₃²)) as ur eqn:Hur.
-assert (H : ur ≠ 0%R).
+assert (H : ur ≠ 0).
  intros H; subst ur.
  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
  apply sqr_vec_norm_eq_0 in H.
@@ -1159,7 +1162,7 @@ Qed.
 (* Cauchy-Schwarz inequality with vectors. *)
 
 Theorem vec_Lagrange_identity : ∀ u v,
-  (∥u∥² * ∥v∥² - (u · v)²)%R = (u × v)²%vec.
+  ∥u∥² * ∥v∥² - (u · v)² = (u × v)²%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃).
 simpl.
@@ -1170,10 +1173,10 @@ Qed.
 
 Arguments vec_Lagrange_identity u%vec v%vec.
 
-Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ∥u∥² * ∥v∥²)%R.
+Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, (u · v)² ≤ ∥u∥² * ∥v∥².
 Proof.
 intros.
-apply Rplus_le_reg_r with (r := (-(u · v)²)%R).
+apply Rplus_le_reg_r with (r := -(u · v)²).
 rewrite Rplus_opp_r.
 rewrite fold_Rminus, vec_Lagrange_identity.
 rewrite vec_dot_mul_diag.

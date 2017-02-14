@@ -3206,18 +3206,16 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
         apply Rlt_0_sqr.
         now intros H1; apply vec_norm_eq_0 in H1.
 
-    idtac.
-bbb.
-(*
     rewrite Hvv in Hs.
     rewrite vec_norm_0, Rmult_0_r in Hs.
     subst s.
-    replace c with 1.
     destruct p as (xp, yp, zp); simpl.
-    rewrite Rminus_diag_eq; [ | easy ].
-    progress repeat rewrite Rmult_0_r.
-    progress repeat rewrite Rplus_0_l.
-    rewrite Rminus_0_r.
+    do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r.
+    specialize (vec_Lagrange_identity v₁ v₂) as Hli.
+    rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1 in Hli.
+bbb.
+
+    rewrite vec_sqr_0 in Hli.
 bbb.
     rewrite Hv₁, Hv₂; intros H.
     rewrite <- vec_const_mul_cross_distr_l in H.
