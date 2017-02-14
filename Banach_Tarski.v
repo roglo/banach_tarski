@@ -3264,6 +3264,33 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
 
 Qed.
 
+Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
+  0 < r
+  → p ∈ sphere r
+  → p₁ ∈ sphere r
+  → p₂ ∈ sphere r
+  → a = latitude p p₁
+  → a = latitude p p₂
+  → a² < r²
+  → p₁ × p₂ ≠ 0%vec
+  → v₁ = (/ √ (r² - a²) ⁎ (p₁ - a ⁎ p))%vec
+  → v₂ = (/ √ (r² - a²) ⁎ (p₂ - a ⁎ p))%vec
+  → (s, c) = rot_sin_cos p v₁ v₂
+  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
+Proof.
+intros * Hr Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
+assert (Hir : 0 < / r) by now apply Rinv_0_lt_compat.
+assert (Hrp : / r ⁎ p ∈ sphere 1).
+ apply on_sphere_norm in Hp; [ | lra ].
+ apply on_sphere_norm; [ lra | ].
+ rewrite vec_norm_vec_const_mul, Hp.
+ rewrite Rabs_right; [ | lra ].
+ rewrite Rinv_l; [ easy | lra ].
+
+ specialize
+   (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
+      (/ r ⁎ v₁) (/ r ⁎ v₂) a c s Hrp).
+
 bbb.
 
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
