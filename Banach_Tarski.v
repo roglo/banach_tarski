@@ -3259,9 +3259,12 @@ unfold Rsqr in *.
 replace ((xp * xp * 2 + -1) * x₁ + xp * yp * 2 * y₁ + xp * zp * 2 * z₁)
 with (2 * xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁)
 by lra.
-apply Rminus_diag_uniq in H4.
-apply Rminus_diag_uniq in H5.
-apply Rminus_diag_uniq in H6.
+rewrite H2, H3 in H4; clear H4.
+rewrite H1, H3 in H5; clear H5.
+rewrite H2, H1 in H6; clear H6.
+apply Rminus_diag_uniq in H1.
+apply Rminus_diag_uniq in H2.
+apply Rminus_diag_uniq in H3.
 
 bbb.
 
