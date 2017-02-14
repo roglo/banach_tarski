@@ -3247,6 +3247,21 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
      f_equal.
 unfold Rsqr in *.
 unfold latitude in Ha₁, Ha₂.
+destruct p₁ as (xp₁, yp₁, zp₁).
+destruct p₂ as (xp₂, yp₂, zp₂).
+simpl in *.
+rewrite Rsqr_1 in Hp₁, Hp₂.
+injection Hv₁; clear Hv₁; intros Hz₁ Hy₁ Hx₁.
+injection Hv₂; clear Hv₂; intros Hz₂ Hy₂ Hx₂.
+remember (/ √ (1 - a * a)) as b eqn:Hb.
+rewrite fold_Rminus in Hx₁, Hy₁, Hz₁, Hx₂, Hy₂, Hz₂.
+unfold Rsqr in *.
+replace ((xp * xp * 2 + -1) * x₁ + xp * yp * 2 * y₁ + xp * zp * 2 * z₁)
+with (2 * xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁)
+by lra.
+apply Rminus_diag_uniq in H4.
+apply Rminus_diag_uniq in H5.
+apply Rminus_diag_uniq in H6.
 
 bbb.
 
