@@ -3207,12 +3207,21 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
         now intros H1; apply vec_norm_eq_0 in H1.
 
     rewrite Hvv in Hs.
-    rewrite vec_norm_0, Rmult_0_r in Hs.
-    subst s.
+    rewrite vec_norm_0, Rmult_0_r in Hs; subst s.
     destruct p as (xp, yp, zp); simpl.
+    simpl in Hp; rewrite Rsqr_1 in Hp; rewrite Hp.
+    rewrite sqrt_1; do 3 rewrite Rdiv_1_r.
     do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r.
     specialize (vec_Lagrange_identity v₁ v₂) as Hli.
-    rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1 in Hli.
+    rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0, <- Hc in Hli.
+    apply Rminus_diag_uniq in Hli; symmetry in Hli.
+    replace 1 with 1² in Hli by apply Rsqr_1.
+    apply Rsqr_eq in Hli.
+    destruct Hli as [Hli| Hli]; rewrite Hli.
+     rewrite Rminus_diag_eq; [ | easy ].
+     do 6 rewrite Rmult_0_r.
+     rewrite Rplus_0_l; fold mat_id.
+     rewrite mat_vec_mul_id.
 bbb.
 
     rewrite vec_sqr_0 in Hli.
