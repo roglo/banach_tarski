@@ -3235,29 +3235,34 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
 
      replace (1 - -1) with 2 by lra.
      do 3 rewrite fold_Rminus.
-(**)
-assert (Hv₁₂ : v₁ = (-v₂)%vec).
- rewrite Hc in Hli.
- destruct v₁ as (x₁, y₁, z₁).
- destruct v₂ as (x₂, y₂, z₂).
- simpl in Hnv₁, Hnv₂, Hli.
- apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
- apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
- rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
- unfold vec_opp.
- clear - Hnv₁ Hnv₂ Hli.
-f_equal.
-unfold Rsqr in *.
+     assert (Hv₁₂ : v₂ = (-v₁)%vec).
+      rewrite Hc in Hli.
+      destruct v₁ as (x₁, y₁, z₁).
+      destruct v₂ as (x₂, y₂, z₂).
+      simpl in Hnv₁, Hnv₂, Hli.
+      apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+      apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+      rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+      unfold vec_opp.
+      clear - Hnv₁ Hnv₂ Hli.
+      assert (H : (x₁ + x₂)² + (y₁ + y₂)² + (z₁ + z₂)² = 0) by nsatz.
+      apply sqr_vec_norm_eq_0 in H.
+      f_equal; lra.
+
+      rewrite Hc in Hli.
+      destruct v₁ as (x₁, y₁, z₁).
+      destruct v₂ as (x₂, y₂, z₂).
+      simpl in Hnv₁, Hnv₂, Hvv, Hli, Hv₁₂.
+      injection Hv₁₂; clear Hv₁₂; intros Hz₂ Hy₂ Hx₂.
+      subst x₂ y₂ z₂.
+      apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+      apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+      rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+      clear Hvv Hli Hnv₂.
 
 bbb.
-     rewrite Hc in Hli.
-     destruct v₁ as (x₁, y₁, z₁).
-     destruct v₂ as (x₂, y₂, z₂).
-     simpl in Hnv₁, Hnv₂, Hvv, Hli.
-     apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
-     apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
-     rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
-     injection Hvv; clear Hvv; intros H3 H2 H1.
+
+      injection Hvv; clear Hvv; intros H3 H2 H1.
      simpl in Hvvp; simpl.
      injection Hvvp; clear Hvvp; intros H6 H5 H4.
      f_equal.
