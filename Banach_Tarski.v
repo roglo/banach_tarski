@@ -3206,65 +3206,77 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
         apply Rlt_0_sqr.
         now intros H1; apply vec_norm_eq_0 in H1.
 
-    rewrite Hvv in Hs.
-    rewrite vec_norm_0, Rmult_0_r in Hs; subst s.
-    destruct p as (xp, yp, zp); simpl.
-    simpl in Hp; rewrite Rsqr_1 in Hp; rewrite Hp.
-    rewrite sqrt_1; do 3 rewrite Rdiv_1_r.
-    do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r.
-    specialize (vec_Lagrange_identity v₁ v₂) as Hli.
-    rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0, <- Hc in Hli.
-    apply Rminus_diag_uniq in Hli; symmetry in Hli.
-    replace 1 with 1² in Hli by apply Rsqr_1.
-    apply Rsqr_eq in Hli.
-    destruct Hli as [Hli| Hli]; rewrite Hli.
-     rewrite Rminus_diag_eq; [ | easy ].
-     do 6 rewrite Rmult_0_r.
-     rewrite Rplus_0_l; fold mat_id.
-     rewrite mat_vec_mul_id.
-     rewrite Hc in Hli.
-     clear - Hnv₁ Hnv₂ Hvv Hli.
-     destruct v₁ as (x₁, y₁, z₁).
-     destruct v₂ as (x₂, y₂, z₂).
-     simpl in Hnv₁, Hnv₂, Hvv, Hli.
-     apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
-     apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
-     rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
-     injection Hvv; clear Hvv; intros H3 H2 H1.
-     f_equal; nsatz.
+    assert (Hpv : p · v₁ = 0).
+     rewrite Hv₁.
+     remember (/ √ (1 - a²)) as b eqn:Hb.
+     rewrite Ha₁; unfold latitude.
+     rewrite <- Rmult_vec_dot_mul_distr_r.
+     rewrite vec_dot_mul_sub_distr_l.
+     rewrite <- Rmult_vec_dot_mul_distr_r.
+     apply on_sphere_norm in Hp; [ | lra ].
+     rewrite vec_dot_mul_diag, Hp, Rsqr_1, Rmult_1_r.
+     now rewrite Rminus_diag_eq, Rmult_0_r.
 
-     replace (1 - -1) with 2 by lra.
-     do 3 rewrite fold_Rminus.
-     assert (Hv₁₂ : v₂ = (-v₁)%vec).
+     rewrite Hvv in Hs.
+     rewrite vec_norm_0, Rmult_0_r in Hs; subst s.
+     destruct p as (xp, yp, zp); simpl.
+     simpl in Hp; rewrite Rsqr_1 in Hp; rewrite Hp.
+     rewrite sqrt_1; do 3 rewrite Rdiv_1_r.
+     do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r.
+     specialize (vec_Lagrange_identity v₁ v₂) as Hli.
+     rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0, <- Hc in Hli.
+     apply Rminus_diag_uniq in Hli; symmetry in Hli.
+     replace 1 with 1² in Hli by apply Rsqr_1.
+     apply Rsqr_eq in Hli.
+     destruct Hli as [Hli| Hli]; rewrite Hli.
+      rewrite Rminus_diag_eq; [ | easy ].
+      do 6 rewrite Rmult_0_r.
+      rewrite Rplus_0_l; fold mat_id.
+      rewrite mat_vec_mul_id.
       rewrite Hc in Hli.
+      clear - Hnv₁ Hnv₂ Hvv Hli.
       destruct v₁ as (x₁, y₁, z₁).
       destruct v₂ as (x₂, y₂, z₂).
-      simpl in Hnv₁, Hnv₂, Hli.
+      simpl in Hnv₁, Hnv₂, Hvv, Hli.
       apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
-      unfold vec_opp.
-      clear - Hnv₁ Hnv₂ Hli.
-      assert (H : (x₁ + x₂)² + (y₁ + y₂)² + (z₁ + z₂)² = 0) by nsatz.
-      apply sqr_vec_norm_eq_0 in H.
-      f_equal; lra.
+      injection Hvv; clear Hvv; intros H3 H2 H1.
+      f_equal; nsatz.
 
-      rewrite Hc in Hli.
-      destruct v₁ as (x₁, y₁, z₁).
-      destruct v₂ as (x₂, y₂, z₂).
-      simpl in Hnv₁, Hnv₂, Hvv, Hli, Hv₁₂.
-      injection Hv₁₂; clear Hv₁₂; intros Hz₂ Hy₂ Hx₂.
-      subst x₂ y₂ z₂.
-      apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
-      apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
-      rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
-      clear Hvv Hli Hnv₂ Hvvp.
-      simpl; f_equal.
-       unfold Rsqr.
-       rewrite Rmult_minus_distr_r, Rmult_1_l.
-       replace (xp * xp * 2 * x₁ - x₁ + xp * yp * 2 * y₁ + xp * zp * 2 * z₁)
-       with (2 * xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁) by lra.
+      replace (1 - -1) with 2 by lra.
+      do 3 rewrite fold_Rminus.
+      assert (Hv₁₂ : v₂ = (-v₁)%vec).
+       rewrite Hc in Hli.
+       destruct v₁ as (x₁, y₁, z₁).
+       destruct v₂ as (x₂, y₂, z₂).
+       simpl in Hnv₁, Hnv₂, Hli.
+       apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+       unfold vec_opp.
+       clear - Hnv₁ Hnv₂ Hli.
+       assert (H : (x₁ + x₂)² + (y₁ + y₂)² + (z₁ + z₂)² = 0) by nsatz.
+       apply sqr_vec_norm_eq_0 in H.
+       f_equal; lra.
 
+       rewrite Hc in Hli.
+       destruct v₁ as (x₁, y₁, z₁).
+       destruct v₂ as (x₂, y₂, z₂).
+       simpl in Hnv₁, Hnv₂, Hvv, Hli, Hv₁₂.
+       injection Hv₁₂; clear Hv₁₂; intros Hz₂ Hy₂ Hx₂.
+       subst x₂ y₂ z₂.
+       apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+       clear Hvv Hli Hnv₂ Hvvp.
+       simpl in Hpv.
+       simpl; f_equal.
+        unfold Rsqr.
+        rewrite Rmult_minus_distr_r, Rmult_1_l.
+        replace (xp * xp * 2 * x₁ - x₁ + xp * yp * 2 * y₁ + xp * zp * 2 * z₁)
+        with (2 * xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁) by lra.
+        rewrite Hpv.
 bbb.
 
       injection Hvv; clear Hvv; intros H3 H2 H1.
