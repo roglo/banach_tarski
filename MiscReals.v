@@ -23,6 +23,8 @@ Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
  (at level 70, y at next level) : R_scope.
 Notation "x '≤' y '≤' z" := (Rle x y ∧ Rle y z)
  (at level 70, y at next level) : R_scope.
+Notation "x '<' y '≤' z" := (Rlt x y ∧ Rle y z)
+ (at level 70, y at next level) : R_scope.
 
 Open Scope R_scope.
 

@@ -3234,6 +3234,22 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
      f_equal; nsatz.
 
      replace (1 - -1) with 2 by lra.
+     do 3 rewrite fold_Rminus.
+(**)
+assert (Hv₁₂ : v₁ = (-v₂)%vec).
+ rewrite Hc in Hli.
+ destruct v₁ as (x₁, y₁, z₁).
+ destruct v₂ as (x₂, y₂, z₂).
+ simpl in Hnv₁, Hnv₂, Hli.
+ apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+ apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+ rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+ unfold vec_opp.
+ clear - Hnv₁ Hnv₂ Hli.
+f_equal.
+unfold Rsqr in *.
+
+bbb.
      rewrite Hc in Hli.
      destruct v₁ as (x₁, y₁, z₁).
      destruct v₂ as (x₂, y₂, z₂).
@@ -3256,7 +3272,8 @@ injection Hv₂; clear Hv₂; intros Hz₂ Hy₂ Hx₂.
 remember (/ √ (1 - a * a)) as b eqn:Hb.
 rewrite fold_Rminus in Hx₁, Hy₁, Hz₁, Hx₂, Hy₂, Hz₂.
 unfold Rsqr in *.
-replace ((xp * xp * 2 + -1) * x₁ + xp * yp * 2 * y₁ + xp * zp * 2 * z₁)
+progress replace
+  ((xp * xp * 2 - 1) * x₁ + xp * yp * 2 * y₁ + xp * zp * 2 * z₁)
 with (2 * xp * (xp * x₁ + yp * y₁ + zp * z₁) - x₁)
 by lra.
 rewrite H2, H3 in H4; clear H4.
@@ -3265,6 +3282,8 @@ rewrite H2, H1 in H6; clear H6.
 apply Rminus_diag_uniq in H1.
 apply Rminus_diag_uniq in H2.
 apply Rminus_diag_uniq in H3.
+enough (0 < b ≤ 1).
+enough (x₁ = -x₂ ∧ y₁ = -y₂ ∧ z₁ = -z₂) as (Hxx & Hyy & Hzz).
 
 bbb.
 
