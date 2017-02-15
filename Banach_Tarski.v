@@ -3105,11 +3105,11 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
  assert (Hvvp : (v₁ × v₂) × p = 0%vec).
   rewrite vec_double_cross_mul, Hv₁, Hv₂.
   remember (/ √ (1 - a²)) as b eqn:Hb.
-  do 2 rewrite vec_const_dot_assoc.
+  do 2 rewrite <- Rmult_vec_dot_mul_distr_l.
   do 2 rewrite vec_dot_mul_sub_distr_r.
   rewrite Ha₁ at 1; rewrite Ha₂ at 2.
   unfold latitude.
-  do 2 rewrite vec_const_dot_assoc.
+  do 2 rewrite <- Rmult_vec_dot_mul_distr_l.
   rewrite vec_dot_mul_diag.
   apply on_sphere_norm in Hp; [ | lra ].
   rewrite Hp, Rsqr_1.
@@ -3271,7 +3271,7 @@ Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   → p₂ ∈ sphere r
   → a = latitude p p₁
   → a = latitude p p₂
-  → a² < r²
+  → a < r²
   → p₁ × p₂ ≠ 0%vec
   → v₁ = (/ √ (r² - a²) ⁎ (p₁ - a ⁎ p))%vec
   → v₂ = (/ √ (r² - a²) ⁎ (p₂ - a ⁎ p))%vec
@@ -3288,9 +3288,39 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
  rewrite Rabs_right; [ | lra ].
  rewrite Rinv_l; [ easy | lra ].
 
- specialize
-   (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
-      (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)).
+ assert
+   (Hrla : ∀ p₁, a = latitude p p₁ → a / r² = latitude (/ r ⁎ p) (/ r ⁎ p₁)).
+  clear - Hr; intros * Ha₁.
+  rewrite Ha₁; unfold latitude.
+  rewrite <- Rmult_vec_dot_mul_distr_l.
+  rewrite <- Rmult_vec_dot_mul_distr_r.
+  unfold Rsqr, Rdiv; rewrite Rinv_mult_distr; lra.
+
+  assert (Hai2 : (a / r²)² < 1).
+   rewrite Rsqr_div; [ | intros H; apply Rsqr_eq_0 in H; lra ].
+   apply Rmult_lt_reg_r with (r := (r²)²).
+    apply Rlt_0_sqr; intros H; apply Rsqr_eq_0 in H; lra.
+
+    rewrite Rmult_div_same.
+     rewrite Rmult_1_l.
+bbb.
+    rewrite Rmult_div_same; [ now rewrite Rmult_1_l | ].
+    intros H; do 2 apply Rsqr_eq_0 in H; lra.
+
+   specialize
+     (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
+        (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r²) c s (Hrp p Hp) (Hrp p₁ Hp₁)
+        (Hrp p₂ Hp₂) (Hrla p₁ Ha₁) (Hrla p₂ Ha₂)).
+
+
+Search (_² = 0).
+
+
+Search (_ / _)².
+
+rewrite <- Rsqr_1.
+
+apply Rsqr_lt_abs_1.
 
 bbb.
 

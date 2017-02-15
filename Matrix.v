@@ -563,13 +563,6 @@ rewrite mat_det_mul, Hd1, Hd2.
 apply Rmult_1_r.
 Qed.
 
-Theorem vec_const_dot_assoc : ∀ a u v, (a ⁎ u) · v = a * (u · v).
-Proof.
-intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
-do 3 rewrite Rmult_assoc.
-now do 2 rewrite <- Rmult_plus_distr_l.
-Qed.
-
 Theorem vec_const_mul_assoc : ∀ a b v, a ⁎ (b ⁎ v) = (a * b) ⁎ v.
 Proof.
 intros a b (x, y, z); simpl.
@@ -955,6 +948,11 @@ Qed.
 Theorem vec_dot_mul_sub_distr_r : ∀ u v w, (u - v) · w = u · w - v · w.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; lra.
+Qed.
+
+Theorem Rmult_vec_dot_mul_distr_l : ∀ a u v, a * (u · v) = a ⁎ u · v.
+Proof.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
 
 Theorem Rmult_vec_dot_mul_distr_r : ∀ a u v, a * (u · v) = u · a ⁎ v.
