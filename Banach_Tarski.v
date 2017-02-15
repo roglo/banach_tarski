@@ -2843,11 +2843,8 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
 Qed.
 
 (* latitude of p₁ relative to p, p being the north pole;
-   equal to the dot product and between -r and r, supposing
-   that p and p₁ belong to the sphere of ray r. *)
-Definition latitude p p₁ := (p · p₁).
-
-bbb. (* perhaps latitude above is between -r² and r², not -r and r... *)
+   equal to the dot product and between -1 and 1. *)
+Definition latitude p p₁ := (p · p₁) / (∥p∥ * ∥p₁∥).
 
 Theorem rotation_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
@@ -2857,7 +2854,6 @@ Theorem rotation_same_latitude : ∀ p p₁ p₂ c s,
   → latitude p p₁ = latitude p p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Hm.
-unfold latitude.
 destruct p as (x, y, z).
 simpl in Hp; rewrite Rsqr_1 in Hp.
 simpl in Hm; rewrite Hp, sqrt_1 in Hm.
@@ -2867,7 +2863,9 @@ destruct p₂ as (x₂, y₂, z₂).
 simpl in Hp₁, Hp₂; rewrite Rsqr_1 in Hp₁, Hp₂.
 simpl in Hm.
 injection Hm; clear Hm; intros Hz Hy Hx.
-simpl; nsatz.
+unfold latitude; simpl.
+rewrite Hp, Hp₁, Hp₂, sqrt_1; f_equal.
+nsatz.
 Qed.
 
 Theorem latitude_norm : ∀ p p₁ v a,
@@ -2897,6 +2895,7 @@ replace z₁² with (1 - x₁² - y₁²) by lra.
 ring_simplify.
 progress replace (-2 * x₁ * a * x - 2 * a * y₁ * y - 2 * a * z₁ * z)
 with (-2 * a * (x * x₁ + y * y₁ + z * z₁)) by lra.
+rewrite Hp, Hp₁, sqrt_1, Rmult_1_l, Rdiv_1_r in Ha₁.
 rewrite <- Ha₁.
 do 3 rewrite Rplus_assoc; rewrite Rplus_comm.
 do 2 rewrite <- Rplus_assoc.
@@ -3116,6 +3115,7 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
   apply on_sphere_norm in Hp; [ | lra ].
   rewrite Hp, Rsqr_1.
   do 2 rewrite Rmult_1_r.
+bbb.
   rewrite vec_dot_mul_comm, Rminus_diag_eq; [ | easy ].
   rewrite vec_dot_mul_comm, Rminus_diag_eq; [ | easy ].
   rewrite Rmult_0_r.
