@@ -3115,7 +3115,9 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
   apply on_sphere_norm in Hp; [ | lra ].
   rewrite Hp, Rsqr_1.
   do 2 rewrite Rmult_1_r.
-bbb.
+  apply on_sphere_norm in Hp₁; [ | lra ].
+  apply on_sphere_norm in Hp₂; [ | lra ].
+  rewrite Hp₁, Hp₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
   rewrite vec_dot_mul_comm, Rminus_diag_eq; [ | easy ].
   rewrite vec_dot_mul_comm, Rminus_diag_eq; [ | easy ].
   rewrite Rmult_0_r.
@@ -3135,7 +3137,9 @@ bbb.
      rewrite vec_dot_mul_sub_distr_l.
      rewrite <- Rmult_vec_dot_mul_distr_r.
      apply on_sphere_norm in Hp; [ | lra ].
-     rewrite vec_dot_mul_diag, Hp, Rsqr_1, Rmult_1_r.
+     apply on_sphere_norm in Hp₁; [ | lra ].
+     rewrite vec_dot_mul_diag, Hp, Hp₁, Rsqr_1.
+     rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
      now rewrite Rminus_diag_eq, Rmult_0_r.
 
      rewrite Hvv in Hs.
@@ -3273,10 +3277,10 @@ Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   → p₂ ∈ sphere r
   → a = latitude p p₁
   → a = latitude p p₂
-  → a² < r²
+  → a² < 1
   → p₁ × p₂ ≠ 0%vec
-  → v₁ = (/ √ (r² - a²) ⁎ (p₁ - a ⁎ p))%vec
-  → v₂ = (/ √ (r² - a²) ⁎ (p₂ - a ⁎ p))%vec
+  → v₁ = (/ √ (1 - a²) ⁎ (p₁ - a ⁎ p))%vec
+  → v₂ = (/ √ (1 - a²) ⁎ (p₂ - a ⁎ p))%vec
   → (s, c) = rot_sin_cos p v₁ v₂
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
