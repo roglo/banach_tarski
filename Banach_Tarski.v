@@ -2847,6 +2847,8 @@ Qed.
    that p and p₁ belong to the sphere of ray r. *)
 Definition latitude p p₁ := (p · p₁).
 
+bbb. (* perhaps latitude above is between -r² and r², not -r and r... *)
+
 Theorem rotation_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -3289,11 +3291,12 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
  rewrite Rinv_l; [ easy | lra ].
 
  assert
-   (Hrla : ∀ p₁, a = latitude p p₁ → a / r² = latitude (/ r ⁎ p) (/ r ⁎ p₁)).
+   (Hrla : ∀ p₁, a = latitude p p₁ → a / r = latitude (/ r ⁎ p) (/ r ⁎ p₁)).
   clear - Hr; intros * Ha₁.
   rewrite Ha₁; unfold latitude.
   rewrite <- Rmult_vec_dot_mul_distr_l.
   rewrite <- Rmult_vec_dot_mul_distr_r.
+bbb.
   unfold Rsqr, Rdiv; rewrite Rinv_mult_distr; lra.
 
 (*
