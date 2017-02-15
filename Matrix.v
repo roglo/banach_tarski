@@ -921,6 +921,11 @@ intros.
 destruct u, v; simpl; lra.
 Qed.
 
+Theorem vec_dot_mul_0_l : ∀ v, 0 · v = 0.
+Proof.
+intros (x₁, y₁, z₁); simpl; lra.
+Qed.
+
 Theorem vec_dot_mul_0_r : ∀ v, (v · 0)%vec = 0.
 Proof.
 intros (x, y, z); simpl.

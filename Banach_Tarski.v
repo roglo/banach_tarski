@@ -3276,9 +3276,33 @@ Theorem latitude_mul : ∀ r u v,
 Proof.
 intros * Hr.
 unfold latitude.
-rewrite <- Rmult_vec_dot_mul_distr_l.
-rewrite <- Rmult_vec_dot_mul_distr_r.
-rewrite <- Rmult_assoc.
+destruct (vec_eq_dec u 0) as [Hu| Hu].
+ rewrite Hu.
+ rewrite vec_const_mul_0_r.
+ now do 2 rewrite vec_dot_mul_0_l, Rdiv_0_l.
+
+ destruct (vec_eq_dec v 0) as [Hv| Hv].
+  rewrite Hv.
+  rewrite vec_const_mul_0_r.
+  now do 2 rewrite vec_dot_mul_0_r, Rdiv_0_l.
+
+  rewrite <- Rmult_vec_dot_mul_distr_l.
+  rewrite <- Rmult_vec_dot_mul_distr_r.
+  do 2 rewrite vec_norm_vec_const_mul.
+  do 2 rewrite <- Rmult_assoc.
+  replace (Rabs r * ∥u∥ * Rabs r) with (Rabs r * Rabs r * ∥u∥) by lra.
+  rewrite <- Rabs_mult, fold_Rsqr, Rabs_sqr.
+  rewrite Rmult_assoc; unfold Rdiv.
+  assert (Hr2 : r² ≠ 0) by (intros H; apply Rsqr_eq_0 in H; lra).
+  rewrite Rinv_mult_distr; [ | easy | ].
+   rewrite <- Rmult_assoc.
+   replace (r² * (u · v) * / r²) with (r² * / r² * (u · v)) by lra.
+   now rewrite Rinv_r; [ rewrite Rmult_1_l | ].
+
+   intros H; apply Rmult_integral in H.
+   destruct H as [H| H]; now apply vec_norm_eq_0 in H.
+Qed.
+
 bbb.
 
 Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
