@@ -3271,10 +3271,10 @@ Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   → p₂ ∈ sphere r
   → a = latitude p p₁
   → a = latitude p p₂
-  → a² < r⁴
+  → a² < r²
   → p₁ × p₂ ≠ 0%vec
-  → v₁ = (/ √ (r⁴ - a²) ⁎ (p₁ - a ⁎ p))%vec
-  → v₂ = (/ √ (r⁴ - a²) ⁎ (p₂ - a ⁎ p))%vec
+  → v₁ = (/ √ (r² - a²) ⁎ (p₁ - a ⁎ p))%vec
+  → v₂ = (/ √ (r² - a²) ⁎ (p₂ - a ⁎ p))%vec
   → (s, c) = rot_sin_cos p v₁ v₂
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
@@ -3296,6 +3296,7 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
   rewrite <- Rmult_vec_dot_mul_distr_r.
   unfold Rsqr, Rdiv; rewrite Rinv_mult_distr; lra.
 
+(*
   assert (Hai2 : (a / r²)² < 1).
    rewrite Rsqr_div; [ | intros H; apply Rsqr_eq_0 in H; lra ].
    apply Rmult_lt_reg_r with (r := (r²)²).
@@ -3330,11 +3331,12 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
      rewrite vec_const_mul_1_l.
 (* it is going to fail! *)
 bbb.
+*)
 
      specialize
        (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
-          (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r²) c s (Hrp p Hp) (Hrp p₁ Hp₁)
-          (Hrp p₂ Hp₂) (Hrla p₁ Ha₁) (Hrla p₂ Ha₂) Hai2 Hrppz
+          (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r) c s (Hrp p Hp) (Hrp p₁ Hp₁)
+          (Hrp p₂ Hp₂)). (Hrla p₁ Ha₁) (Hrla p₂ Ha₂)). Hai2 Hrppz
           (Hrv v₁ p₁ Hv₁)).
 
 bbb.
