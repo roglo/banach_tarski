@@ -3270,6 +3270,17 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
 
 Qed.
 
+Theorem latitude_mul : ∀ r u v,
+  r ≠ 0
+  → latitude (r ⁎ u) (r ⁎ v) = latitude u v.
+Proof.
+intros * Hr.
+unfold latitude.
+rewrite <- Rmult_vec_dot_mul_distr_l.
+rewrite <- Rmult_vec_dot_mul_distr_r.
+rewrite <- Rmult_assoc.
+bbb.
+
 Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   0 < r
   → p ∈ sphere r
@@ -3294,16 +3305,17 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
  rewrite Rabs_right; [ | lra ].
  rewrite Rinv_l; [ easy | lra ].
 
+bbb.
  assert
-   (Hrla : ∀ p₁, a = latitude p p₁ → a / r = latitude (/ r ⁎ p) (/ r ⁎ p₁)).
+   (Hrla : ∀ p₁, a = latitude p p₁ → a = latitude (/ r ⁎ p) (/ r ⁎ p₁)).
   clear - Hr; intros * Ha₁.
   rewrite Ha₁; unfold latitude.
   rewrite <- Rmult_vec_dot_mul_distr_l.
   rewrite <- Rmult_vec_dot_mul_distr_r.
 bbb.
+(*
   unfold Rsqr, Rdiv; rewrite Rinv_mult_distr; lra.
 
-(*
   assert (Hai2 : (a / r²)² < 1).
    rewrite Rsqr_div; [ | intros H; apply Rsqr_eq_0 in H; lra ].
    apply Rmult_lt_reg_r with (r := (r²)²).
@@ -3342,7 +3354,7 @@ bbb.
 
      specialize
        (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
-          (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r) c s (Hrp p Hp) (Hrp p₁ Hp₁)
+          (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
           (Hrp p₂ Hp₂)). (Hrla p₁ Ha₁) (Hrla p₂ Ha₂)). Hai2 Hrppz
           (Hrv v₁ p₁ Hv₁)).
 
