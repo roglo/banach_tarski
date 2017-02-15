@@ -3271,10 +3271,10 @@ Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   → p₂ ∈ sphere r
   → a = latitude p p₁
   → a = latitude p p₂
-  → a < r²
+  → a² < r⁴
   → p₁ × p₂ ≠ 0%vec
-  → v₁ = (/ √ (r² - a²) ⁎ (p₁ - a ⁎ p))%vec
-  → v₂ = (/ √ (r² - a²) ⁎ (p₂ - a ⁎ p))%vec
+  → v₁ = (/ √ (r⁴ - a²) ⁎ (p₁ - a ⁎ p))%vec
+  → v₂ = (/ √ (r⁴ - a²) ⁎ (p₂ - a ⁎ p))%vec
   → (s, c) = rot_sin_cos p v₁ v₂
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
@@ -3301,34 +3301,14 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
    apply Rmult_lt_reg_r with (r := (r²)²).
     apply Rlt_0_sqr; intros H; apply Rsqr_eq_0 in H; lra.
 
-    rewrite Rmult_div_same.
-     rewrite Rmult_1_l.
-     apply Rsqr_lt_abs_1.
-     rewrite Rabs_sqr.
-     unfold Rabs.
-     destruct (Rcase_abs a) as [Hca| Hca]; [ | easy ].
-     rewrite Ha₁; unfold latitude.
-     destruct p as (xp, yp, zp).
-     destruct p₁ as (xp₁, yp₁, zp₁); simpl.
-     simpl in Hp, Hp₁.
-bbb.
-    rewrite Rmult_div_same; [ now rewrite Rmult_1_l | ].
-    intros H; do 2 apply Rsqr_eq_0 in H; lra.
+    rewrite Rmult_div_same; [ rewrite Rmult_1_l; unfold Rsqr at 2 3; lra | ].
+    unfold Rsqr; intros H; apply Rmult_integral in H.
+    destruct H as [H| H]; apply Rmult_integral in H; lra.
 
    specialize
      (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
         (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r²) c s (Hrp p Hp) (Hrp p₁ Hp₁)
-        (Hrp p₂ Hp₂) (Hrla p₁ Ha₁) (Hrla p₂ Ha₂)).
-
-
-Search (_² = 0).
-
-
-Search (_ / _)².
-
-rewrite <- Rsqr_1.
-
-apply Rsqr_lt_abs_1.
+        (Hrp p₂ Hp₂) (Hrla p₁ Ha₁) (Hrla p₂ Ha₂) Hai2).
 
 bbb.
 
