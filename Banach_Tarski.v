@@ -3313,10 +3313,29 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
     destruct H as [H| H]; [ | easy ].
     apply Rmult_integral in H; lra.
 
-    specialize
-      (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
-         (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r²) c s (Hrp p Hp) (Hrp p₁ Hp₁)
-         (Hrp p₂ Hp₂) (Hrla p₁ Ha₁) (Hrla p₂ Ha₂) Hai2 Hrppz).
+    assert
+      (Hrv : ∀ vi pi,
+       vi = / √ (r⁴ - a²) ⁎ (pi - a ⁎ p)
+       → / r ⁎ vi = / √ (1 - (a / r²)²) ⁎ (/ r ⁎ pi - (a / r²) ⁎ (/ r ⁎ p))).
+     intros * Hvi.
+     apply vec_const_mul_eq_reg_l with (a := r); [ | lra ].
+     rewrite vec_const_mul_assoc, Rinv_r; [ | lra ].
+     rewrite vec_const_mul_1_l.
+     rewrite vec_const_mul_assoc.
+     rewrite Rmult_comm.
+     rewrite <- vec_const_mul_assoc.
+     rewrite vec_const_mul_sub_distr_l.
+     rewrite vec_const_mul_assoc.
+     rewrite Rinv_r; [ | lra ].
+     rewrite vec_const_mul_1_l.
+(* it is going to fail! *)
+bbb.
+
+     specialize
+       (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
+          (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r²) c s (Hrp p Hp) (Hrp p₁ Hp₁)
+          (Hrp p₂ Hp₂) (Hrla p₁ Ha₁) (Hrla p₂ Ha₂) Hai2 Hrppz
+          (Hrv v₁ p₁ Hv₁)).
 
 bbb.
 
