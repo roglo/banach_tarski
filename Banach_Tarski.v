@@ -3303,6 +3303,9 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
 
     rewrite Rmult_div_same.
      rewrite Rmult_1_l.
+     apply Rsqr_lt_abs_1.
+     rewrite Rabs_sqr.
+     rewrite Ha₁; unfold latitude.
 bbb.
     rewrite Rmult_div_same; [ now rewrite Rmult_1_l | ].
     intros H; do 2 apply Rsqr_eq_0 in H; lra.
