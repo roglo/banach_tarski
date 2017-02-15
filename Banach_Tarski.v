@@ -3279,9 +3279,9 @@ Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
+assert (Hir : 0 < / r) by now apply Rinv_0_lt_compat.
 assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
- clear - Hr; intros p Hp.
- assert (Hir : 0 < / r) by now apply Rinv_0_lt_compat.
+ clear - Hir Hr; intros p Hp.
  apply on_sphere_norm in Hp; [ | lra ].
  apply on_sphere_norm; [ lra | ].
  rewrite vec_norm_vec_const_mul, Hp.
@@ -3305,10 +3305,18 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
     unfold Rsqr; intros H; apply Rmult_integral in H.
     destruct H as [H| H]; apply Rmult_integral in H; lra.
 
-   specialize
-     (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
-        (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r²) c s (Hrp p Hp) (Hrp p₁ Hp₁)
-        (Hrp p₂ Hp₂) (Hrla p₁ Ha₁) (Hrla p₂ Ha₂) Hai2).
+   assert (Hrppz : ((/ r ⁎ p₁) × (/ r ⁎ p₂) ≠ 0%vec)).
+    rewrite <- vec_const_mul_cross_distr_l.
+    rewrite <- vec_const_mul_cross_distr_r.
+    rewrite vec_const_mul_assoc.
+    intros H; apply eq_vec_const_mul_0 in H.
+    destruct H as [H| H]; [ | easy ].
+    apply Rmult_integral in H; lra.
+
+    specialize
+      (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
+         (/ r ⁎ v₁) (/ r ⁎ v₂) (a / r²) c s (Hrp p Hp) (Hrp p₁ Hp₁)
+         (Hrp p₂ Hp₂) (Hrla p₁ Ha₁) (Hrla p₂ Ha₂) Hai2 Hrppz).
 
 bbb.
 
