@@ -3336,31 +3336,29 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
   intros H; apply eq_vec_const_mul_0 in H.
   destruct H as [H| H]; [ | easy ].
   apply Rmult_integral in H; lra.
-(*
-    assert
-      (Hrv : ∀ vi pi,
-       vi = / √ (r⁴ - a²) ⁎ (pi - a ⁎ p)
-       → / r ⁎ vi = / √ (1 - (a / r²)²) ⁎ (/ r ⁎ pi - (a / r²) ⁎ (/ r ⁎ p))).
-     intros * Hvi.
-     apply vec_const_mul_eq_reg_l with (a := r); [ | lra ].
-     rewrite vec_const_mul_assoc, Rinv_r; [ | lra ].
-     rewrite vec_const_mul_1_l.
-     rewrite vec_const_mul_assoc.
-     rewrite Rmult_comm.
-     rewrite <- vec_const_mul_assoc.
-     rewrite vec_const_mul_sub_distr_l.
-     rewrite vec_const_mul_assoc.
-     rewrite Rinv_r; [ | lra ].
-     rewrite vec_const_mul_1_l.
-(* it is going to fail! *)
-bbb.
-*)
 
-  specialize
-    (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
-       (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
-       (Hrp p₂ Hp₂) Ha₁ Ha₂ Ha2 Hrppz).
+  assert
+    (Hrv : ∀ vi pi,
+     vi = / √ (1 - a²) ⁎ (pi - a ⁎ p)
+     → / r ⁎ vi = / √ (1 - a²) ⁎ (/ r ⁎ pi - a ⁎ (/ r ⁎ p))).
+   intros * Hvi.
+   apply vec_const_mul_eq_reg_l with (a := r); [ | lra ].
+   rewrite vec_const_mul_assoc, Rinv_r; [ | lra ].
+   rewrite vec_const_mul_1_l, vec_const_mul_assoc, Rmult_comm.
+   rewrite <- vec_const_mul_assoc.
+   rewrite vec_const_mul_sub_distr_l.
+   rewrite vec_const_mul_assoc.
+   rewrite Rinv_r; [ | lra ].
+   rewrite vec_const_mul_1_l.
+   do 2 rewrite vec_const_mul_assoc.
+   rewrite Rmult_shuffle0.
+   rewrite Rinv_r; [ | lra ].
+   now rewrite Rmult_1_l.
 
+   specialize
+     (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
+        (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
+        (Hrp p₂ Hp₂) Ha₁ Ha₂ Ha2 Hrppz (Hrv v₁ p₁ Hv₁) (Hrv v₂ p₂ Hv₂)).
 bbb.
 
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
