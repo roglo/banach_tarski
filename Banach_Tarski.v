@@ -3304,10 +3304,51 @@ destruct (vec_eq_dec u 0) as [Hu| Hu].
    destruct H as [H| H]; now apply vec_norm_eq_0 in H.
 Qed.
 
+Theorem Rsign_mul_pos_l : ∀ x y, 0 < x → Rsign (x * y) = Rsign y.
+Proof.
+intros * Hx.
+unfold Rsign.
+destruct (Rle_dec 0 (x * y)) as [Hxy| Hxy].
+ destruct (Rle_dec 0 y) as [Hy| Hy]; [ easy | ].
+ exfalso; apply Hy.
+ apply Rmult_le_reg_l with (r := x); [ easy | ].
+ now rewrite Rmult_0_r.
+
+ destruct (Rle_dec 0 y) as [Hy| Hy]; [ | easy ].
+ exfalso; apply Hxy.
+ replace 0 with (x * 0) by lra.
+ apply Rmult_le_compat_l; [ lra | easy ].
+Qed.
+
 Theorem rot_sin_cos_mul : ∀ k p u v,
-  rot_sin_cos (k ⁎ p) (k ⁎ u) (k ⁎ v) = rot_sin_cos p u v.
+  0 < k
+  → rot_sin_cos (k ⁎ p) (k ⁎ u) (k ⁎ v) = rot_sin_cos p u v.
+Proof.
+intros * Hk.
+unfold rot_sin_cos.
+f_equal.
+ rewrite <- vec_const_mul_cross_distr_l.
+ rewrite <- vec_const_mul_cross_distr_r.
+ do 2 rewrite <- Rdiv_mult; f_equal.
+  rewrite <- Rmult_vec_dot_mul_distr_l.
+  do 2 rewrite <- Rmult_vec_dot_mul_distr_r.
+  rewrite Rsign_mul_pos_l; [ | easy ].
+  rewrite Rsign_mul_pos_l; [ | easy ].
+  now rewrite Rsign_mul_pos_l.
+
+  do 4 rewrite vec_norm_vec_const_mul.
+  do 2 rewrite <- Rmult_assoc.
+  replace (Rabs k * ∥u∥ * Rabs k) with (Rabs k * Rabs k * ∥u∥) by lra.
+  do 3 rewrite Rmult_assoc.
+
+Theorem Rdiv_mult_simpl_l : ∀ x y z, (x * y) / (x * z) = y / z.
 Proof.
 intros.
+bbb.
+
+rewrite Rdiv_mult_simpl_l.
+rewrite Rdiv_mult_simpl_l.
+
 bbb.
 
 Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
