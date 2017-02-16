@@ -984,6 +984,16 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
 
+Theorem vec_cross_mul_0_l : ∀ v, 0 × v = 0%vec.
+Proof.
+intros (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_cross_mul_0_r : ∀ v, v × 0 = 0%vec.
+Proof.
+intros (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
 Theorem vec_cross_mul_anticomm : ∀ u v, (u × v = - (v × u))%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.

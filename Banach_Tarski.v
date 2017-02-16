@@ -3320,30 +3320,6 @@ destruct (Rle_dec 0 (x * y)) as [Hxy| Hxy].
  apply Rmult_le_compat_l; [ lra | easy ].
 Qed.
 
-Theorem Rdiv_mult_simpl_l : ∀ x y z,
-  x ≠ 0
-  → z ≠ 0
-  → (x * y) / (x * z) = y / z.
-Proof.
-intros * Hx Hz.
-unfold Rdiv.
-rewrite Rinv_mult_distr; [ | easy | easy ].
-rewrite <- Rmult_assoc.
-f_equal; rewrite Rmult_shuffle0.
-rewrite Rinv_r; [ | easy ].
-now rewrite Rmult_1_l.
-Qed.
-
-Theorem vec_cross_mul_0_l : ∀ v, 0 × v = 0%vec.
-Proof.
-intros (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_cross_mul_0_r : ∀ v, v × 0 = 0%vec.
-Proof.
-intros (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
 Theorem rot_sin_cos_mul : ∀ k p u v,
   0 < k
   → rot_sin_cos (k ⁎ p) (k ⁎ u) (k ⁎ v) = rot_sin_cos p u v.
@@ -3361,8 +3337,13 @@ destruct (vec_eq_dec u 0) as [Hu| Hu].
 
  destruct (vec_eq_dec v 0) as [Hv| Hv].
   subst v.
+  rewrite vec_const_mul_0_r, vec_cross_mul_0_r, vec_dot_mul_0_r.
+  rewrite vec_norm_0, Rmult_0_r.
+  rewrite Rdiv_0_l, vec_dot_mul_0_r.
+  rewrite Rdiv_0_l, vec_cross_mul_0_r.
+  rewrite vec_norm_0, Rmult_0_r, Rdiv_0_l.
+  now rewrite vec_dot_mul_0_r, Rdiv_0_l.
 
-bbb.
   f_equal.
    rewrite <- vec_const_mul_cross_distr_l.
    rewrite <- vec_const_mul_cross_distr_r.
@@ -3380,7 +3361,31 @@ bbb.
     rewrite Rdiv_mult_simpl_l.
      rewrite Rdiv_mult_simpl_l; [ easy | | ].
       unfold Rabs; destruct (Rcase_abs k); lra.
-bbb.
+
+      intros H; apply Rmult_integral in H.
+      destruct H as [H| H]; now apply vec_norm_eq_0 in H.
+
+     unfold Rabs; destruct (Rcase_abs k); lra.
+
+     intros H; apply Rmult_integral in H.
+     destruct H as [H| H]; [ apply Rabs_eq_0 in H; lra | ].
+     apply Rmult_integral in H.
+     destruct H as [H| H]; now apply vec_norm_eq_0 in H.
+
+   rewrite <- Rmult_vec_dot_mul_distr_l.
+   rewrite <- Rmult_vec_dot_mul_distr_r.
+   do 2 rewrite vec_norm_vec_const_mul.
+   do 2 rewrite <- Rmult_assoc.
+   replace (Rabs k * ∥u∥ * Rabs k) with (Rabs k * Rabs k * ∥u∥) by lra.
+   rewrite <- Rabs_mult.
+   fold (Rsqr k); rewrite Rabs_sqr.
+   rewrite Rmult_assoc.
+   rewrite Rdiv_mult_simpl_l; [ easy | | ].
+    intros H; apply Rsqr_eq_0 in H; lra.
+
+    intros H; apply Rmult_integral in H.
+    destruct H as [H| H]; now apply vec_norm_eq_0 in H.
+Qed.
 
 Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   0 < r
@@ -3434,13 +3439,12 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
    rewrite Rinv_r; [ | lra ].
    now rewrite Rmult_1_l.
 
+   rewrite <- rot_sin_cos_mul with (k := / r) in Hcs; [ | easy ].
    specialize
      (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
         (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
-        (Hrp p₂ Hp₂) Ha₁ Ha₂ Ha2 Hrppz (Hrv v₁ p₁ Hv₁) (Hrv v₂ p₂ Hv₂)).
-bbb.
-   assert ((s, c) = rot_sin_cos (/ r ⁎ p) (/ r ⁎ v₁) (/ r ⁎ v₂)).
-now rewrite rot_sin_cos_mul.
+        (Hrp p₂ Hp₂) Ha₁ Ha₂ Ha2 Hrppz (Hrv v₁ p₁ Hv₁) (Hrv v₂ p₂ Hv₂)
+        Hcs) as Hsl.
 
 bbb.
 

@@ -65,6 +65,20 @@ rewrite Rmult_comm, <- Rmult_assoc.
 f_equal; apply Rmult_comm.
 Qed.
 
+Theorem Rdiv_mult_simpl_l : ∀ x y z,
+  x ≠ 0
+  → z ≠ 0
+  → (x * y) / (x * z) = y / z.
+Proof.
+intros * Hx Hz.
+unfold Rdiv.
+rewrite Rinv_mult_distr; [ | easy | easy ].
+rewrite <- Rmult_assoc.
+f_equal; rewrite Rmult_shuffle0.
+rewrite Rinv_r; [ | easy ].
+now rewrite Rmult_1_l.
+Qed.
+
 Theorem Req_dec : ∀ x y : ℝ, { x = y } + { x ≠ y }.
 Proof.
 intros x y.
