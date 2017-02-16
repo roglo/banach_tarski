@@ -3453,8 +3453,6 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
    now rewrite Rmult_1_l.
 Qed.
 
-bbb.
-
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
    p₂ are not in the same latitude (p being the north pole), one if they
@@ -3471,6 +3469,15 @@ Theorem one_rotation_max : ∀ r p p₁ p₂ c s c' s',
   → c = c' ∧ s = s'.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
+remember (matrix_of_axis_angle (p, c, s)) as M eqn:HM.
+remember (matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
+move M' before M; move HM' before HM.
+remember ((M - M')%mat * p₁)%vec as q eqn:Hq.
+generalize Hq; intros H.
+rewrite mat_vec_mul_sub_distr_r in H.
+rewrite Hm, Hm', vec_sub_diag in H.
+rewrite H in Hq; clear q H; symmetry in Hq.
+bbb.
 destruct (Req_dec (latitude p p₁) (latitude p p₂)) as [Hll| Hll].
  unfold latitude in Hll.
  destruct p as (xp, yp, zp).

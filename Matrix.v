@@ -41,6 +41,20 @@ Arguments mt i%nat j%nat [A] m.
 
 Definition mkrmat := @mkmat ℝ.
 
+Definition mat_add M₁ M₂ :=
+  mkrmat
+    (a₁₁ M₁ + a₁₁ M₂) (a₁₂ M₁ + a₁₂ M₂) (a₁₃ M₁ + a₁₃ M₂)
+    (a₂₁ M₁ + a₂₁ M₂) (a₂₂ M₁ + a₂₂ M₂) (a₂₃ M₁ + a₂₃ M₂)
+    (a₃₁ M₁ + a₃₁ M₂) (a₃₂ M₁ + a₃₂ M₂) (a₃₃ M₁ + a₃₃ M₂).
+
+Definition mat_opp M :=
+  mkrmat
+    (- a₁₁ M) (- a₁₂ M) (- a₁₃ M)
+    (- a₂₁ M) (- a₂₂ M) (- a₂₃ M)
+    (- a₃₁ M) (- a₃₂ M) (- a₃₃ M).
+
+Definition mat_sub M₁ M₂ := mat_add M₁ (mat_opp M₂).
+
 Inductive vector := V : ℝ → ℝ → ℝ → vector.
 
 Definition mat_vec_mul M '(V x y z) :=
@@ -170,12 +184,15 @@ Fixpoint mat_pow M n :=
 Definition mat_trace M := a₁₁ M + a₂₂ M + a₃₃ M.
 
 Delimit Scope mat_scope with mat.
-Notation "m₁ * m₂" := (mat_mul m₁ m₂) : mat_scope.
+Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
+Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.
+Notation "M₁ * M₂" := (mat_mul M₁ M₂) : mat_scope.
+Notation "- M" := (mat_opp M) : mat_scope.
 Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
 Arguments mat_pow M%mat n%nat.
 Arguments mat_mul M₁%mat M₂%mat.
-Arguments mat_vec_mul _%mat _%vec.
+Arguments mat_vec_mul M%mat _%vec.
 Arguments mat_trace M%mat.
 
 Theorem vec_eq_dec : ∀ u v : vector, { u = v } + { u ≠ v }.
@@ -269,6 +286,18 @@ Proof.
 intros.
 destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem mat_vec_mul_add_distr_r : ∀ M₁ M₂ v,
+  ((M₁ + M₂)%mat * v = M₁ * v + M₂ * v)%vec.
+Proof.
+intros; destruct M₁, M₂, v; simpl; f_equal; lra.
+Qed.
+
+Theorem mat_vec_mul_sub_distr_r : ∀ M₁ M₂ v,
+  ((M₁ - M₂)%mat * v = M₁ * v - M₂ * v)%vec.
+Proof.
+intros; destruct M₁, M₂, v; simpl; f_equal; lra.
 Qed.
 
 Theorem  mat_vec_mul_const_distr : ∀ M k v, (M * (k ⁎ v) = k ⁎ (M * v))%vec.
