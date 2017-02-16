@@ -3073,8 +3073,8 @@ f_equal; ring_simplify.
 Qed.
 
 Definition rot_sin_cos p u v :=
-  let s := Rsign (p · (u × v)) * ∥(u × v)∥ in
-  let c := u · v in
+  let s := Rsign (p · (u × v)) * ∥(u × v)∥ / (∥u∥ * ∥v∥) in
+  let c := (u · v) / (∥u∥ * ∥v∥) in
   (s, c).
 
 Theorem sphere_1_rot_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
@@ -3103,6 +3103,7 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
+ rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r in Hs, Hc.
  assert (Hvvp : (v₁ × v₂) × p = 0%vec).
   rewrite vec_double_cross_mul, Hv₁, Hv₂.
   remember (/ √ (1 - a²)) as b eqn:Hb.
@@ -3270,9 +3271,9 @@ assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
 
 Qed.
 
-Theorem latitude_mul : ∀ r u v,
-  r ≠ 0
-  → latitude (r ⁎ u) (r ⁎ v) = latitude u v.
+Theorem latitude_mul : ∀ k u v,
+  k ≠ 0
+  → latitude (k ⁎ u) (k ⁎ v) = latitude u v.
 Proof.
 intros * Hr.
 unfold latitude.
@@ -3290,18 +3291,24 @@ destruct (vec_eq_dec u 0) as [Hu| Hu].
   rewrite <- Rmult_vec_dot_mul_distr_r.
   do 2 rewrite vec_norm_vec_const_mul.
   do 2 rewrite <- Rmult_assoc.
-  replace (Rabs r * ∥u∥ * Rabs r) with (Rabs r * Rabs r * ∥u∥) by lra.
+  replace (Rabs k * ∥u∥ * Rabs k) with (Rabs k * Rabs k * ∥u∥) by lra.
   rewrite <- Rabs_mult, fold_Rsqr, Rabs_sqr.
   rewrite Rmult_assoc; unfold Rdiv.
-  assert (Hr2 : r² ≠ 0) by (intros H; apply Rsqr_eq_0 in H; lra).
+  assert (Hr2 : k² ≠ 0) by (intros H; apply Rsqr_eq_0 in H; lra).
   rewrite Rinv_mult_distr; [ | easy | ].
    rewrite <- Rmult_assoc.
-   replace (r² * (u · v) * / r²) with (r² * / r² * (u · v)) by lra.
+   replace (k² * (u · v) * / k²) with (k² * / k² * (u · v)) by lra.
    now rewrite Rinv_r; [ rewrite Rmult_1_l | ].
 
    intros H; apply Rmult_integral in H.
    destruct H as [H| H]; now apply vec_norm_eq_0 in H.
 Qed.
+
+Theorem rot_sin_cos_mul : ∀ k p u v,
+  rot_sin_cos (k ⁎ p) (k ⁎ u) (k ⁎ v) = rot_sin_cos p u v.
+Proof.
+intros.
+bbb.
 
 Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   0 < r
@@ -3327,8 +3334,8 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
  rewrite Rabs_right; [ | lra ].
  rewrite Rinv_l; [ easy | lra ].
 
- rewrite <- latitude_mul with (r := / r) in Ha₁; [ | lra ].
- rewrite <- latitude_mul with (r := / r) in Ha₂; [ | lra ].
+ rewrite <- latitude_mul with (k := / r) in Ha₁; [ | lra ].
+ rewrite <- latitude_mul with (k := / r) in Ha₂; [ | lra ].
  assert (Hrppz : ((/ r ⁎ p₁) × (/ r ⁎ p₂) ≠ 0%vec)).
   rewrite <- vec_const_mul_cross_distr_l.
   rewrite <- vec_const_mul_cross_distr_r.
@@ -3359,6 +3366,10 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
      (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
         (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
         (Hrp p₂ Hp₂) Ha₁ Ha₂ Ha2 Hrppz (Hrv v₁ p₁ Hv₁) (Hrv v₂ p₂ Hv₂)).
+bbb.
+   assert ((s, c) = rot_sin_cos (/ r ⁎ p) (/ r ⁎ v₁) (/ r ⁎ v₂)).
+now rewrite rot_sin_cos_mul.
+
 bbb.
 
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
