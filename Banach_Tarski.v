@@ -3320,35 +3320,66 @@ destruct (Rle_dec 0 (x * y)) as [Hxy| Hxy].
  apply Rmult_le_compat_l; [ lra | easy ].
 Qed.
 
+Theorem Rdiv_mult_simpl_l : ∀ x y z,
+  x ≠ 0
+  → z ≠ 0
+  → (x * y) / (x * z) = y / z.
+Proof.
+intros * Hx Hz.
+unfold Rdiv.
+rewrite Rinv_mult_distr; [ | easy | easy ].
+rewrite <- Rmult_assoc.
+f_equal; rewrite Rmult_shuffle0.
+rewrite Rinv_r; [ | easy ].
+now rewrite Rmult_1_l.
+Qed.
+
+Theorem vec_cross_mul_0_l : ∀ v, 0 × v = 0%vec.
+Proof.
+intros (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
+Theorem vec_cross_mul_0_r : ∀ v, v × 0 = 0%vec.
+Proof.
+intros (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
 Theorem rot_sin_cos_mul : ∀ k p u v,
   0 < k
   → rot_sin_cos (k ⁎ p) (k ⁎ u) (k ⁎ v) = rot_sin_cos p u v.
 Proof.
 intros * Hk.
 unfold rot_sin_cos.
-f_equal.
- rewrite <- vec_const_mul_cross_distr_l.
- rewrite <- vec_const_mul_cross_distr_r.
- do 2 rewrite <- Rdiv_mult; f_equal.
-  rewrite <- Rmult_vec_dot_mul_distr_l.
-  do 2 rewrite <- Rmult_vec_dot_mul_distr_r.
-  rewrite Rsign_mul_pos_l; [ | easy ].
-  rewrite Rsign_mul_pos_l; [ | easy ].
-  now rewrite Rsign_mul_pos_l.
+destruct (vec_eq_dec u 0) as [Hu| Hu].
+ subst u.
+ rewrite vec_const_mul_0_r, vec_cross_mul_0_l, vec_dot_mul_0_r.
+ rewrite vec_norm_0, Rmult_0_r.
+ rewrite Rdiv_0_l, vec_dot_mul_0_l.
+ rewrite Rdiv_0_l, vec_cross_mul_0_l.
+ rewrite vec_norm_0, Rmult_0_r, Rdiv_0_l.
+ now rewrite vec_dot_mul_0_l, Rdiv_0_l.
 
-  do 4 rewrite vec_norm_vec_const_mul.
-  do 2 rewrite <- Rmult_assoc.
-  replace (Rabs k * ∥u∥ * Rabs k) with (Rabs k * Rabs k * ∥u∥) by lra.
-  do 3 rewrite Rmult_assoc.
+ destruct (vec_eq_dec v 0) as [Hv| Hv].
+  subst v.
 
-Theorem Rdiv_mult_simpl_l : ∀ x y z, (x * y) / (x * z) = y / z.
-Proof.
-intros.
 bbb.
+  f_equal.
+   rewrite <- vec_const_mul_cross_distr_l.
+   rewrite <- vec_const_mul_cross_distr_r.
+   do 2 rewrite <- Rdiv_mult; f_equal.
+    rewrite <- Rmult_vec_dot_mul_distr_l.
+    do 2 rewrite <- Rmult_vec_dot_mul_distr_r.
+    rewrite Rsign_mul_pos_l; [ | easy ].
+    rewrite Rsign_mul_pos_l; [ | easy ].
+    now rewrite Rsign_mul_pos_l.
 
-rewrite Rdiv_mult_simpl_l.
-rewrite Rdiv_mult_simpl_l.
-
+    do 4 rewrite vec_norm_vec_const_mul.
+    do 2 rewrite <- Rmult_assoc.
+    replace (Rabs k * ∥u∥ * Rabs k) with (Rabs k * Rabs k * ∥u∥) by lra.
+    do 3 rewrite Rmult_assoc.
+    rewrite Rdiv_mult_simpl_l.
+     rewrite Rdiv_mult_simpl_l; [ easy | | ].
+      unfold Rabs; destruct (Rcase_abs k); lra.
 bbb.
 
 Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
