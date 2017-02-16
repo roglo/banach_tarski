@@ -3303,8 +3303,6 @@ destruct (vec_eq_dec u 0) as [Hu| Hu].
    destruct H as [H| H]; now apply vec_norm_eq_0 in H.
 Qed.
 
-bbb.
-
 Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   0 < r
   → p ∈ sphere r
@@ -3329,34 +3327,16 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
  rewrite Rabs_right; [ | lra ].
  rewrite Rinv_l; [ easy | lra ].
 
-bbb.
- assert
-   (Hrla : ∀ p₁, a = latitude p p₁ → a = latitude (/ r ⁎ p) (/ r ⁎ p₁)).
-  clear - Hr; intros * Ha₁.
-  rewrite Ha₁; unfold latitude.
-  rewrite <- Rmult_vec_dot_mul_distr_l.
-  rewrite <- Rmult_vec_dot_mul_distr_r.
-bbb.
+ rewrite <- latitude_mul with (r := / r) in Ha₁; [ | lra ].
+ rewrite <- latitude_mul with (r := / r) in Ha₂; [ | lra ].
+ assert (Hrppz : ((/ r ⁎ p₁) × (/ r ⁎ p₂) ≠ 0%vec)).
+  rewrite <- vec_const_mul_cross_distr_l.
+  rewrite <- vec_const_mul_cross_distr_r.
+  rewrite vec_const_mul_assoc.
+  intros H; apply eq_vec_const_mul_0 in H.
+  destruct H as [H| H]; [ | easy ].
+  apply Rmult_integral in H; lra.
 (*
-  unfold Rsqr, Rdiv; rewrite Rinv_mult_distr; lra.
-
-  assert (Hai2 : (a / r²)² < 1).
-   rewrite Rsqr_div; [ | intros H; apply Rsqr_eq_0 in H; lra ].
-   apply Rmult_lt_reg_r with (r := (r²)²).
-    apply Rlt_0_sqr; intros H; apply Rsqr_eq_0 in H; lra.
-
-    rewrite Rmult_div_same; [ rewrite Rmult_1_l; unfold Rsqr at 2 3; lra | ].
-    unfold Rsqr; intros H; apply Rmult_integral in H.
-    destruct H as [H| H]; apply Rmult_integral in H; lra.
-
-   assert (Hrppz : ((/ r ⁎ p₁) × (/ r ⁎ p₂) ≠ 0%vec)).
-    rewrite <- vec_const_mul_cross_distr_l.
-    rewrite <- vec_const_mul_cross_distr_r.
-    rewrite vec_const_mul_assoc.
-    intros H; apply eq_vec_const_mul_0 in H.
-    destruct H as [H| H]; [ | easy ].
-    apply Rmult_integral in H; lra.
-
     assert
       (Hrv : ∀ vi pi,
        vi = / √ (r⁴ - a²) ⁎ (pi - a ⁎ p)
@@ -3376,11 +3356,10 @@ bbb.
 bbb.
 *)
 
-     specialize
-       (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
-          (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
-          (Hrp p₂ Hp₂)). (Hrla p₁ Ha₁) (Hrla p₂ Ha₂)). Hai2 Hrppz
-          (Hrv v₁ p₁ Hv₁)).
+  specialize
+    (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
+       (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
+       (Hrp p₂ Hp₂) Ha₁ Ha₂ Ha2 Hrppz).
 
 bbb.
 
