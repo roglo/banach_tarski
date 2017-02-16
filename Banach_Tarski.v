@@ -3445,6 +3445,13 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
         (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
         (Hrp p₂ Hp₂) Ha₁ Ha₂ Ha2 Hrppz (Hrv v₁ p₁ Hv₁) (Hrv v₂ p₂ Hv₂)
         Hcs) as Hsl.
+   rewrite mat_vec_mul_const_distr in Hsl.
+   apply vec_const_mul_eq_reg_l in Hsl; [ | lra ].
+   rewrite matrix_mul_axis with (k := / r); [ | lra ].
+   unfold Rsign.
+   destruct (Rle_dec 0 (/ r)) as [Hrz| Hrz]; [ | lra ].
+   now rewrite Rmult_1_l.
+Qed.
 
 bbb.
 
