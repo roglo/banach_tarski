@@ -3490,6 +3490,13 @@ do 12 rewrite fold_Rminus in Hq.
 remember (xp / r) as x eqn:Hx.
 remember (yp / r) as y eqn:Hy.
 remember (zp / r) as z eqn:Hz.
+destruct p₁ as (xp₁, yp₁, zp₁); simpl in Hq.
+injection Hq; clear Hq; intros H3 H2 H1.
+ring_simplify in H1.
+ring_simplify in H2.
+ring_simplify in H3.
+bbb.
+
 replace (x² * (1 - c) + c - x² * (1 - c') - c') with
 ((c - c') * (1 - x²)) in Hq by lra.
 replace (y² * (1 - c) + c - y² * (1 - c') - c') with
@@ -3502,6 +3509,7 @@ progress replace  (x * z * (1 - c) + y * s - x * z * (1 - c') - y * s')
 with  (- x * z * (c - c') + y * (s - s')) in Hq by lra.
 progress replace (x * y * (1 - c) + z * s - x * y * (1 - c') - z * s')
 with (- x * y * (c - c') + z * (s - s')) in Hq by lra.
+
 
 bbb.
 destruct (Req_dec (latitude p p₁) (latitude p p₂)) as [Hll| Hll].
