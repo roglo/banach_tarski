@@ -3462,6 +3462,7 @@ generalize HMM'; intros H.
 apply (f_equal (mat_mul M')) in H.
 rewrite mat_mul_assoc in H.
 rewrite mat_mul_id_r in H.
+remember (M' * M)%mat as A eqn:HA.
 
 Theorem glop : ∀ A B, (A * B = B → A = mat_id)%mat.
 Proof.
