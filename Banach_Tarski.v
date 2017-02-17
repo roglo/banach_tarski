@@ -3458,9 +3458,31 @@ Theorem mat_mul_id_comm : ∀ M M',
   → (M' * M)%mat = mat_id.
 Proof.
 intros * HMM'.
+generalize HMM'; intros H.
+apply (f_equal (mat_mul M')) in H.
+rewrite mat_mul_assoc in H.
+rewrite mat_mul_id_r in H.
+
+Theorem glop : ∀ A B, (A * B = B → A = mat_id)%mat.
+Proof.
+intros * HAB.
+(* I must add a condition on B *)
+bbb.
+unfold mat_mul, mkrmat in HAB.
+unfold mat_id, mkrmat.
+destruct A, B; simpl in *.
+injection HAB; clear HAB; intros.
+f_equal.
+
+bbb.
+intros * HMM'.
 unfold mat_mul, mat_id, mkrmat in *; simpl in *.
 injection HMM'; clear HMM'; intros H1 H2 H3 H4 H5 H6 H7 H8 H9.
+setoid_rewrite Rmult_comm.
 f_equal.
+remember (a₁₁ M * a₁₁ M') as x₁₁.
+remember (a₂₁ M * a₁₂ M') as x₂₁.
+remember (a₃₁ M * a₁₃ M') as x₃₁.
 bbb.
 Time f_equal; nsatz. (* 3.8 s *)
 Qed.
