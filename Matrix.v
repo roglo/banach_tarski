@@ -479,6 +479,11 @@ intros m₁ m₂.
 unfold mat_transp, mat_mul; simpl; f_equal; ring.
 Qed.
 
+Theorem mat_transp_involutive : ∀ M, mat_transp (mat_transp M) = M.
+Proof.
+now intros; unfold mat_transp; destruct M.
+Qed.
+
 Theorem mat_mul_assoc : ∀ m₁ m₂ m₃,
   (m₁ * (m₂ * m₃) = m₁ * m₂ * m₃)%mat.
 Proof.

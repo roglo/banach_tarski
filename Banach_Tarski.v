@@ -3469,38 +3469,23 @@ Theorem one_rotation_max : ∀ r p p₁ p₂ c s c' s',
   → c = c' ∧ s = s'.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
-(* todo:
-   1/ do rot_same_latitude for p₁,p₂ (from v₁,v₂)
-   2/ do rotation_same_latitude for any ray
-   3/ en déduire M*p₁=p₂ ↔ lat(p₁)=lat(p₂)
-   4/ en déduire unicity of rotation (Hmmm... is it enough?)
- *)
+remember (matrix_of_axis_angle (p, c, s)) as M eqn:HM.
+remember (matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
+move M' before M; move HM' before HM.
+assert ((mat_transp M * M')%mat * p₁ = p₁)%vec.
+
 bbb.
-Search matrix_of_axis_angle.
-Check rotation_same_latitude.
-rotation_same_latitude
-     : ∀ (p p₁ p₂ : vector) (c s : ℝ),
-       p ∈ sphere 1
-       → p₁ ∈ sphere 1
-         → p₂ ∈ sphere 1
-           → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
-             → latitude p p₁ = latitude p p₂
 
-Check sphere_1_rot_same_latitude.
-sphere_1_rot_same_latitude
-     : ∀ (p p₁ p₂ v₁ v₂ : vector) (a c s : ℝ),
-       p ∈ sphere 1
-       → p₁ ∈ sphere 1
-         → p₂ ∈ sphere 1
-           → a = latitude p p₁
-             → a = latitude p p₂
-               → a² < 1
-                 → p₁ × p₂ ≠ 0%vec
-                   → v₁ = / √ (1 - a²) ⁎ (p₁ - a ⁎ p)
-                     → v₂ = / √ (1 - a²) ⁎ (p₂ - a ⁎ p)
-                       → (s, c) = rot_sin_cos p v₁ v₂
-                         → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂
+Print mat_transp.
+Print is_rotation_matrix.
+is_rotation_matrix = λ A : matrix ℝ, (A * mat_transp A)%mat = mat_id ∧ mat_det A = 1
+     : matrix ℝ → Prop
 
+Argument scope is [mat_scope]
+
+Search (_ * _ = _)%vec.
+
+bbb.
 intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
 remember (matrix_of_axis_angle (p, c, s)) as M eqn:HM.
 remember (matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
