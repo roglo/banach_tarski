@@ -3485,7 +3485,9 @@ Theorem rotation_transp_is_rotation : ∀ M,
   is_rotation_matrix M → is_rotation_matrix (mat_transp M).
 Proof.
 intros M HM.
-
+destruct HM as (Htr, Hdet).
+split.
+ rewrite mat_transp_involutive.
 bbb.
 
 Print mat_transp.
