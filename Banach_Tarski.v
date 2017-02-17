@@ -3453,6 +3453,18 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
    now rewrite Rmult_1_l.
 Qed.
 
+Theorem mat_mul_id_comm : ∀ M M',
+  (M * M')%mat = mat_id
+  → (M' * M)%mat = mat_id.
+Proof.
+intros * HMM'.
+unfold mat_mul, mat_id, mkrmat in *; simpl in *.
+injection HMM'; clear HMM'; intros H1 H2 H3 H4 H5 H6 H7 H8 H9.
+f_equal.
+bbb.
+Time f_equal; nsatz. (* 3.8 s *)
+Qed.
+
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
    p₂ are not in the same latitude (p being the north pole), one if they
@@ -3480,6 +3492,7 @@ assert ((mat_transp M * M')%mat * p₁ = p₁)%vec.
  rewrite <- HM₁.
  assert (H : is_rotation_matrix M₁).
 Search (is_rotation_matrix (mat_transp _)).
+bbb.
 
 Theorem rotation_transp_is_rotation : ∀ M,
   is_rotation_matrix M → is_rotation_matrix (mat_transp M).
@@ -3487,7 +3500,16 @@ Proof.
 intros M HM.
 destruct HM as (Htr, Hdet).
 split.
+ clear Hdet.
  rewrite mat_transp_involutive.
+ unfold mat_transp, mat_mul, mat_id, mkrmat in *; simpl in *.
+ injection Htr; clear Htr; intros H1 H2 H3 H4 H5 H6 H7 H8 H9.
+ progress repeat rewrite fold_Rsqr in *.
+ Time f_equal; nsatz.
+
+ clear Htr.
+ unfold mat_det in Hdet; simpl in Hdet.
+ unfold mat_det, mat_transp; simpl; lra.
 bbb.
 
 Print mat_transp.
