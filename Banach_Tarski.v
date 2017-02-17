@@ -3477,6 +3477,32 @@ generalize Hq; intros H.
 rewrite mat_vec_mul_sub_distr_r in H.
 rewrite Hm, Hm', vec_sub_diag in H.
 rewrite H in Hq; clear q H; symmetry in Hq.
+rewrite HM, HM' in Hq; simpl in Hq.
+destruct p as (xp, yp, zp); simpl in Hq.
+simpl in Hp.
+rewrite Hp in Hq.
+rewrite sqrt_Rsqr in Hq; [ | lra ].
+unfold mat_sub, mat_opp, mat_add in Hq; simpl in Hq.
+do 6 rewrite Ropp_plus_distr in Hq.
+do 3 rewrite Ropp_minus_distr in Hq.
+do 6 rewrite <- Rplus_assoc in Hq.
+do 12 rewrite fold_Rminus in Hq.
+remember (xp / r) as x eqn:Hx.
+remember (yp / r) as y eqn:Hy.
+remember (zp / r) as z eqn:Hz.
+replace (x² * (1 - c) + c - x² * (1 - c') - c') with
+((c - c') * (1 - x²)) in Hq by lra.
+replace (y² * (1 - c) + c - y² * (1 - c') - c') with
+((c - c') * (1 - y²)) in Hq by lra.
+replace (z² * (1 - c) + c - z² * (1 - c') - c') with
+((c - c') * (1 - z²)) in Hq by lra.
+progress replace  (x * y * (1 - c) - z * s + (z * s' - x * y * (1 - c')))
+with  (- x * y * (c - c') - z * (s - s')) in Hq by lra.
+progress replace  (x * z * (1 - c) + y * s - x * z * (1 - c') - y * s')
+with  (- x * z * (c - c') + y * (s - s')) in Hq by lra.
+progress replace (x * y * (1 - c) + z * s - x * y * (1 - c') - z * s')
+with (- x * y * (c - c') + z * (s - s')) in Hq by lra.
+
 bbb.
 destruct (Req_dec (latitude p p₁) (latitude p p₂)) as [Hll| Hll].
  unfold latitude in Hll.
