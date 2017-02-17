@@ -3473,6 +3473,18 @@ remember (matrix_of_axis_angle (p, c, s)) as M eqn:HM.
 remember (matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
 move M' before M; move HM' before HM.
 assert ((mat_transp M * M')%mat * p₁ = p₁)%vec.
+ rewrite mat_vec_mul_assoc, Hm', <- Hm.
+ rewrite <- mat_vec_mul_assoc.
+ remember (mat_transp M) as M₁ eqn:HM₁.
+ replace M with (mat_transp (mat_transp M)) by apply mat_transp_involutive.
+ rewrite <- HM₁.
+ assert (H : is_rotation_matrix M₁).
+Search (is_rotation_matrix (mat_transp _)).
+
+Theorem rotation_transp_is_rotation : ∀ M,
+  is_rotation_matrix M → is_rotation_matrix (mat_transp M).
+Proof.
+intros M HM.
 
 bbb.
 
