@@ -3483,6 +3483,20 @@ destruct (Req_dec (mat_det M) 0) as [Hd| Hd].
  now rewrite mat_const_mul_1_l.
 Qed.
 
+Theorem rotation_transp_is_rotation : ∀ M,
+  is_rotation_matrix M → is_rotation_matrix (mat_transp M).
+Proof.
+intros M HM.
+destruct HM as (Htr, Hdet).
+split.
+ rewrite mat_transp_involutive.
+ now apply mat_mul_id_comm.
+
+ clear Htr.
+ unfold mat_det in Hdet; simpl in Hdet.
+ unfold mat_det, mat_transp; simpl; lra.
+Qed.
+
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
    p₂ are not in the same latitude (p being the north pole), one if they
@@ -3492,8 +3506,8 @@ Theorem one_rotation_max : ∀ r p p₁ p₂ c s c' s',
   → p ∈ sphere r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
-  → c² + s² = 1
-  → c'² + s'² = 1
+  → s² + c² = 1
+  → s'² + c'² = 1
   → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
   → (matrix_of_axis_angle (p, c', s') * p₁ = p₂)%vec
   → c = c' ∧ s = s'.
@@ -3502,34 +3516,20 @@ intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
 remember (matrix_of_axis_angle (p, c, s)) as M eqn:HM.
 remember (matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
 move M' before M; move HM' before HM.
-assert ((mat_transp M * M')%mat * p₁ = p₁)%vec.
-bbb.
-
+assert (H : ((mat_transp M * M')%mat * p₁ = p₁)%vec).
  rewrite mat_vec_mul_assoc, Hm', <- Hm.
  rewrite <- mat_vec_mul_assoc.
  remember (mat_transp M) as M₁ eqn:HM₁.
  replace M with (mat_transp (mat_transp M)) by apply mat_transp_involutive.
  rewrite <- HM₁.
- assert (H : is_rotation_matrix M₁).
-Search (is_rotation_matrix (mat_transp _)).
-bbb.
+ assert (is_rotation_matrix M₁) as (Htr, Hdet).
+  rewrite HM₁, HM; apply rotation_transp_is_rotation.
+  apply matrix_of_axis_angle_is_rotation_matrix; [ | easy ].
+  intros H; rewrite H in Hp; simpl in Hp.
+  rewrite Rsqr_0, Rplus_0_l, Rplus_0_l in Hp.
+  symmetry in Hp; apply Rsqr_eq_0 in Hp; lra.
 
-Theorem rotation_transp_is_rotation : ∀ M,
-  is_rotation_matrix M → is_rotation_matrix (mat_transp M).
-Proof.
-intros M HM.
-destruct HM as (Htr, Hdet).
-split.
- clear Hdet.
- rewrite mat_transp_involutive.
- unfold mat_transp, mat_mul, mat_id, mkrmat in *; simpl in *.
- injection Htr; clear Htr; intros H1 H2 H3 H4 H5 H6 H7 H8 H9.
- progress repeat rewrite fold_Rsqr in *.
- Time f_equal; nsatz.
-
- clear Htr.
- unfold mat_det in Hdet; simpl in Hdet.
- unfold mat_det, mat_transp; simpl; lra.
+  now rewrite Htr, mat_vec_mul_id.
 bbb.
 
 Print mat_transp.
