@@ -187,6 +187,7 @@ Delimit Scope mat_scope with mat.
 Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
 Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.
 Notation "M₁ * M₂" := (mat_mul M₁ M₂) : mat_scope.
+Notation "k ⁎ M" := (mat_const_mul k M) : mat_scope.
 Notation "- M" := (mat_opp M) : mat_scope.
 Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
@@ -240,7 +241,7 @@ destruct (Req_dec (a₁₁ m₁) (a₁₁ m₂)) as [H₁₁| H₁₁].
  now right; intros H; subst m₁; apply H₁₁.
 Qed.
 
-Theorem mat_mul_id_l : ∀ m, mat_mul mat_id m = m.
+Theorem mat_mul_id_l : ∀ m, (mat_id * m)%mat = m.
 Proof.
 intros m.
 unfold mat_mul, mat_id; simpl.
@@ -251,7 +252,7 @@ progress repeat rewrite Rplus_0_r.
 now destruct m.
 Qed.
 
-Theorem mat_mul_id_r : ∀ m, mat_mul m mat_id = m.
+Theorem mat_mul_id_r : ∀ m, (m * mat_id)%mat = m.
 Proof.
 intros m.
 unfold mat_mul, mat_id; simpl.
@@ -262,7 +263,7 @@ progress repeat rewrite Rplus_0_r.
 now destruct m.
 Qed.
 
-Theorem mat_vec_mul_id : ∀ p, mat_vec_mul mat_id p = p.
+Theorem mat_vec_mul_id : ∀ p, (mat_id * p)%vec = p.
 Proof.
 intros (x, y, z).
 unfold mat_vec_mul; simpl.
@@ -273,8 +274,26 @@ progress repeat rewrite Rplus_0_r.
 easy.
 Qed.
 
+Theorem mat_const_mul_distr_l : ∀ k M₁ M₂,
+  (k ⁎ (M₁ * M₂) = (k ⁎ M₁) * M₂)%mat.
+Proof.
+intros.
+unfold mat_const_mul, mat_mul.
+destruct M₁, M₂; simpl.
+f_equal; lra.
+Qed.
+
+Theorem mat_const_mul_distr_r : ∀ k M₁ M₂,
+  (k ⁎ (M₁ * M₂) = M₁ * (k ⁎ M₂))%mat.
+Proof.
+intros.
+unfold mat_const_mul, mat_mul.
+destruct M₁, M₂; simpl.
+f_equal; lra.
+Qed.
+
 Theorem mat_vec_mul_assoc : ∀ m₁ m₂ p,
-  mat_vec_mul (m₁ * m₂)%mat p = mat_vec_mul m₁ (mat_vec_mul m₂ p).
+  ((m₁ * m₂)%mat * p = m₁ * (m₂ * p))%vec.
 Proof.
 intros m₁ m₂ (x, y, z).
 unfold mat_vec_mul.

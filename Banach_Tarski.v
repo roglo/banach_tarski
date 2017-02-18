@@ -3453,10 +3453,63 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
    now rewrite Rmult_1_l.
 Qed.
 
+Definition vec_inv M '(V x y z) :=
+  V (mat_det (mkrmat x (a₁₂ M) (a₁₃ M) y (a₂₂ M) (a₂₃ M) z (a₃₂ M) (a₃₃ M)))
+    (mat_det (mkrmat (a₁₁ M) x (a₁₃ M) (a₂₁ M) y (a₂₃ M) (a₃₁ M) z (a₃₃ M)))
+    (mat_det (mkrmat (a₁₁ M) (a₁₂ M) x (a₂₁ M) (a₂₂ M) y (a₃₁ M) (a₃₂ M) z)).
+
+Theorem vec_inv_is_root : ∀ M v, (M * vec_inv M v = mat_det M ⁎ v)%vec.
+Proof.
+intros M v.
+unfold mat_vec_mul, mat_vec_mul, vec_inv, mat_det, mkrmat; simpl.
+destruct v as (x, y, z); simpl.
+f_equal; lra.
+Qed.
+
+Definition mat_inv M :=
+  let '(V b₁₁ b₂₁ b₃₁) := vec_inv M (V 1 0 0) in
+  let '(V b₁₂ b₂₂ b₃₂) := vec_inv M (V 0 1 0) in
+  let '(V b₁₃ b₂₃ b₃₃) := vec_inv M (V 0 0 1) in
+  mkrmat b₁₁ b₁₂ b₁₃ b₂₁ b₂₂ b₂₃ b₃₁ b₃₂ b₃₃.
+
+Theorem mat_mul_inv_l : ∀ M, (mat_inv M * M = mat_det M ⁎ mat_id)%mat.
+Proof.
+intros.
+destruct M; simpl.
+unfold mat_mul; simpl.
+unfold mat_det; simpl.
+unfold mat_const_mul; simpl.
+f_equal; lra.
+Qed.
+
+Theorem mat_mul_inv_r : ∀ M, (M * mat_inv M = mat_det M ⁎ mat_id)%mat.
+Proof.
+intros.
+destruct M; simpl.
+unfold mat_mul; simpl.
+unfold mat_det; simpl.
+unfold mat_const_mul; simpl.
+f_equal; lra.
+Qed.
+
 Theorem mat_mul_id_comm : ∀ M M',
   (M * M')%mat = mat_id
   → (M' * M)%mat = mat_id.
 Proof.
+intros * HMM'.
+generalize HMM'; intros H.
+apply (f_equal (mat_mul (mat_inv M))) in H.
+rewrite mat_mul_id_r in H.
+rewrite mat_mul_assoc in H.
+rewrite mat_mul_inv_l in H.
+rewrite <- mat_const_mul_distr_l in H.
+rewrite mat_mul_id_l in H.
+bbb.
+
+generalize HMM'; intros H.
+apply (f_equal (mat_mul M')) in H.
+
+
 (*
 intros * HMM'.
 generalize HMM'; intros H.
