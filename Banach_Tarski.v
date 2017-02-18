@@ -3483,8 +3483,6 @@ destruct (Req_dec (mat_det M) 0) as [Hd| Hd].
  now rewrite mat_const_mul_1_l.
 Qed.
 
-bbb.
-
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
    p₂ are not in the same latitude (p being the north pole), one if they
@@ -3505,6 +3503,8 @@ remember (matrix_of_axis_angle (p, c, s)) as M eqn:HM.
 remember (matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
 move M' before M; move HM' before HM.
 assert ((mat_transp M * M')%mat * p₁ = p₁)%vec.
+bbb.
+
  rewrite mat_vec_mul_assoc, Hm', <- Hm.
  rewrite <- mat_vec_mul_assoc.
  remember (mat_transp M) as M₁ eqn:HM₁.
