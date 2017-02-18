@@ -3530,16 +3530,33 @@ assert (H : ((mat_transp M * M')%mat * p₁ = p₁)%vec).
   symmetry in Hp; apply Rsqr_eq_0 in Hp; lra.
 
   now rewrite Htr, mat_vec_mul_id.
+
+Theorem glop : ∀ M axis c s v,
+  axis ∈ sphere 1
+  → s² + c² = 1
+  → axis × v ≠ 0%vec
+  → M = matrix_of_axis_angle (axis, c, s)
+  → (M * v = v)%vec
+  → M = mat_id.
+Proof.
+intros * Ha Hsc Hv HM Hmv.
 bbb.
 
-Print mat_transp.
-Print is_rotation_matrix.
-is_rotation_matrix = λ A : matrix ℝ, (A * mat_transp A)%mat = mat_id ∧ mat_det A = 1
-     : matrix ℝ → Prop
-
-Argument scope is [mat_scope]
-
-Search (_ * _ = _)%vec.
+intros * Ha Hsc Hv HM Hmv.
+unfold mat_vec_mul in Hmv.
+unfold mat_id, mkrmat.
+destruct axis as (xa, ya, za).
+destruct v as (xv, yv, zv).
+simpl in HM.
+simpl in Ha.
+rewrite Rsqr_1 in Ha.
+rewrite Ha, sqrt_1 in HM.
+progress repeat rewrite Rdiv_1_r in HM.
+injection Hmv; clear Hmv; intros.
+destruct M; simpl in *.
+unfold mkrmat in HM.
+injection HM; clear HM; intros.
+f_equal.
 
 bbb.
 intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
