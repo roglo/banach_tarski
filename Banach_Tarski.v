@@ -3453,45 +3453,6 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
    now rewrite Rmult_1_l.
 Qed.
 
-Definition vec_inv M '(V x y z) :=
-  V (mat_det (mkrmat x (a₁₂ M) (a₁₃ M) y (a₂₂ M) (a₂₃ M) z (a₃₂ M) (a₃₃ M)))
-    (mat_det (mkrmat (a₁₁ M) x (a₁₃ M) (a₂₁ M) y (a₂₃ M) (a₃₁ M) z (a₃₃ M)))
-    (mat_det (mkrmat (a₁₁ M) (a₁₂ M) x (a₂₁ M) (a₂₂ M) y (a₃₁ M) (a₃₂ M) z)).
-
-Theorem vec_inv_is_root : ∀ M v, (M * vec_inv M v = mat_det M ⁎ v)%vec.
-Proof.
-intros M v.
-unfold mat_vec_mul, mat_vec_mul, vec_inv, mat_det, mkrmat; simpl.
-destruct v as (x, y, z); simpl.
-f_equal; lra.
-Qed.
-
-Definition mat_inv M :=
-  let '(V b₁₁ b₂₁ b₃₁) := vec_inv M (V 1 0 0) in
-  let '(V b₁₂ b₂₂ b₃₂) := vec_inv M (V 0 1 0) in
-  let '(V b₁₃ b₂₃ b₃₃) := vec_inv M (V 0 0 1) in
-  mkrmat b₁₁ b₁₂ b₁₃ b₂₁ b₂₂ b₂₃ b₃₁ b₃₂ b₃₃.
-
-Theorem mat_mul_inv_l : ∀ M, (mat_inv M * M = mat_det M ⁎ mat_id)%mat.
-Proof.
-intros.
-destruct M; simpl.
-unfold mat_mul; simpl.
-unfold mat_det; simpl.
-unfold mat_const_mul; simpl.
-f_equal; lra.
-Qed.
-
-Theorem mat_mul_inv_r : ∀ M, (M * mat_inv M = mat_det M ⁎ mat_id)%mat.
-Proof.
-intros.
-destruct M; simpl.
-unfold mat_mul; simpl.
-unfold mat_det; simpl.
-unfold mat_const_mul; simpl.
-f_equal; lra.
-Qed.
-
 Theorem mat_mul_id_comm : ∀ M M',
   (M * M')%mat = mat_id
   → (M' * M)%mat = mat_id.
@@ -3504,44 +3465,25 @@ rewrite mat_mul_assoc in H.
 rewrite mat_mul_inv_l in H.
 rewrite <- mat_const_mul_distr_l in H.
 rewrite mat_mul_id_l in H.
-bbb.
+apply (f_equal mat_det) in HMM'.
+rewrite mat_det_id in HMM'.
+rewrite mat_det_mul_distr in HMM'.
+destruct (Req_dec (mat_det M) 0) as [Hd| Hd].
+ rewrite Hd, Rmult_0_l in HMM'; lra.
 
-generalize HMM'; intros H.
-apply (f_equal (mat_mul M')) in H.
-
-
-(*
-intros * HMM'.
-generalize HMM'; intros H.
-apply (f_equal (mat_mul M')) in H.
-rewrite mat_mul_assoc in H.
-rewrite mat_mul_id_r in H.
-remember (M' * M)%mat as A eqn:HA.
-
-Theorem glop : ∀ A B, (A * B = B → A = mat_id)%mat.
-Proof.
-intros * HAB.
-(* I must add a condition on B *)
-bbb.
-unfold mat_mul, mkrmat in HAB.
-unfold mat_id, mkrmat.
-destruct A, B; simpl in *.
-injection HAB; clear HAB; intros.
-f_equal.
-
-bbb.
-*)
-intros * HMM'.
-unfold mat_mul, mat_id, mkrmat in *; simpl in *.
-injection HMM'; clear HMM'; intros H1 H2 H3 H4 H5 H6 H7 H8 H9.
-setoid_rewrite Rmult_comm.
-f_equal.
-remember (a₁₁ M * a₁₁ M') as x₁₁.
-remember (a₂₁ M * a₁₂ M') as x₂₁.
-remember (a₃₁ M * a₁₃ M') as x₃₁.
-bbb.
-Time f_equal; nsatz. (* 3.8 s *)
+ apply (f_equal (mat_const_mul (/ mat_det M))) in H.
+ rewrite mat_const_mul_assoc in H.
+ rewrite Rinv_l in H; [ | easy ].
+ rewrite mat_const_mul_1_l in H.
+ rewrite H.
+ rewrite <- mat_const_mul_distr_l.
+ rewrite mat_mul_inv_l.
+ rewrite mat_const_mul_assoc.
+ rewrite Rinv_l; [ | easy ].
+ now rewrite mat_const_mul_1_l.
 Qed.
+
+bbb.
 
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
