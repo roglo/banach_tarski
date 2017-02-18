@@ -3457,6 +3457,7 @@ Theorem mat_mul_id_comm : ∀ M M',
   (M * M')%mat = mat_id
   → (M' * M)%mat = mat_id.
 Proof.
+(*
 intros * HMM'.
 generalize HMM'; intros H.
 apply (f_equal (mat_mul M')) in H.
@@ -3476,6 +3477,7 @@ injection HAB; clear HAB; intros.
 f_equal.
 
 bbb.
+*)
 intros * HMM'.
 unfold mat_mul, mat_id, mkrmat in *; simpl in *.
 injection HMM'; clear HMM'; intros H1 H2 H3 H4 H5 H6 H7 H8 H9.
