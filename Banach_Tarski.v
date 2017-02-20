@@ -3459,10 +3459,10 @@ Theorem mat_mul_id_comm : ∀ M M',
 Proof.
 intros * HMM'.
 generalize HMM'; intros H.
-apply (f_equal (mat_mul (mat_inv M))) in H.
+apply (f_equal (mat_mul (mat_compl M))) in H.
 rewrite mat_mul_id_r in H.
 rewrite mat_mul_assoc in H.
-rewrite mat_mul_inv_l in H.
+rewrite mat_mul_compl_l in H.
 rewrite <- mat_const_mul_distr_l in H.
 rewrite mat_mul_id_l in H.
 apply (f_equal mat_det) in HMM'.
@@ -3477,7 +3477,7 @@ destruct (Req_dec (mat_det M) 0) as [Hd| Hd].
  rewrite mat_const_mul_1_l in H.
  rewrite H.
  rewrite <- mat_const_mul_distr_l.
- rewrite mat_mul_inv_l.
+ rewrite mat_mul_compl_l.
  rewrite mat_const_mul_assoc.
  rewrite Rinv_l; [ | easy ].
  now rewrite mat_const_mul_1_l.
