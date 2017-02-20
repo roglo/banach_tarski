@@ -1240,13 +1240,13 @@ destruct v as (x, y, z); simpl.
 f_equal; lra.
 Qed.
 
-Definition mat_inv M :=
+Definition mat_compl M :=
   let '(V b₁₁ b₂₁ b₃₁) := vec_inv M (V 1 0 0) in
   let '(V b₁₂ b₂₂ b₃₂) := vec_inv M (V 0 1 0) in
   let '(V b₁₃ b₂₃ b₃₃) := vec_inv M (V 0 0 1) in
   mkrmat b₁₁ b₁₂ b₁₃ b₂₁ b₂₂ b₂₃ b₃₁ b₃₂ b₃₃.
 
-Theorem mat_mul_inv_l : ∀ M, (mat_inv M * M = mat_det M ⁎ mat_id)%mat.
+Theorem mat_mul_compl_l : ∀ M, (mat_compl M * M = mat_det M ⁎ mat_id)%mat.
 Proof.
 intros.
 destruct M; simpl.
@@ -1256,7 +1256,7 @@ unfold mat_const_mul; simpl.
 f_equal; lra.
 Qed.
 
-Theorem mat_mul_inv_r : ∀ M, (M * mat_inv M = mat_det M ⁎ mat_id)%mat.
+Theorem mat_mul_compl_r : ∀ M, (M * mat_compl M = mat_det M ⁎ mat_id)%mat.
 Proof.
 intros.
 destruct M; simpl.
