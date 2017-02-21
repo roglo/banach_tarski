@@ -3540,9 +3540,6 @@ Theorem glop : ∀ M axis c s v,
   → M = mat_id.
 Proof.
 intros * Ha Hsc Hv HM Hmv.
-bbb.
-
-intros * Ha Hsc Hv HM Hmv.
 unfold mat_vec_mul in Hmv.
 unfold mat_id, mkrmat.
 destruct axis as (xa, ya, za).
