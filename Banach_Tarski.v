@@ -3540,20 +3540,33 @@ Theorem glop : ∀ M axis c s v,
   → M = mat_id.
 Proof.
 intros * Ha Hsc Hv HM Hmv.
-unfold mat_vec_mul in Hmv.
-unfold mat_id, mkrmat.
-destruct axis as (xa, ya, za).
-destruct v as (xv, yv, zv).
-simpl in HM.
-simpl in Ha.
-rewrite Rsqr_1 in Ha.
-rewrite Ha, sqrt_1 in HM.
-progress repeat rewrite Rdiv_1_r in HM.
-injection Hmv; clear Hmv; intros.
-destruct M; simpl in *.
-unfold mkrmat in HM.
-injection HM; clear HM; intros.
-f_equal.
+assert (Hrm : is_rotation_matrix M).
+ subst M; apply matrix_of_axis_angle_is_rotation_matrix; [ | easy ].
+ intros H; rewrite H in Ha; simpl in Ha.
+ rewrite Rsqr_0, Rsqr_1 in Ha; lra.
+
+ destruct Hrm as (Htr, Hdet).
+ unfold mat_vec_mul in Hmv.
+ unfold mat_id, mkrmat.
+ destruct axis as (xa, ya, za).
+ destruct v as (xv, yv, zv).
+ simpl in HM.
+ simpl in Ha.
+ rewrite Rsqr_1 in Ha.
+ rewrite Ha, sqrt_1 in HM.
+ progress repeat rewrite Rdiv_1_r in HM.
+ injection Hmv; clear Hmv; intros.
+ unfold mat_mul, mat_transp, mat_id, mkrmat in Htr; simpl in Htr.
+ injection Htr; clear Htr; intros.
+ unfold mat_det in Hdet.
+ destruct M; simpl in *.
+ unfold mkrmat in HM.
+ injection HM; clear HM; intros.
+ f_equal.
+  unfold Rsqr in *.
+bbb.
+  (* polynomia not in the ideal *)
+  Time nsatz.
 
 bbb.
 intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
