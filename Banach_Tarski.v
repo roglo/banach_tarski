@@ -3758,12 +3758,21 @@ Qed.
    r = ∥axis∥. *)
 Definition J₁ axis :=
   mkset
-    (λ '(cosθ, sinθ),
-     cosθ² + sinθ² = 1 ∧
+    (λ '(sinθ, cosθ),
+     sinθ² + cosθ² = 1 ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
      let r := ∥axis∥ in
      ∃ p p', p × p' ≠ 0%vec ∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
+
+Definition J₁_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
+  let r := ∥axis∥ in
+  let p₀ := fixpoint_of_nat r nf in
+  let p := fold_right rotate p₀ (path_of_nat no) in
+  let p'₀ := fixpoint_of_nat r nf' in
+  let p' := fold_right rotate p'₀ (path_of_nat no') in
+  rot_sin_cos axis p p'.
+
 bbb.
 
 (* old version *)
