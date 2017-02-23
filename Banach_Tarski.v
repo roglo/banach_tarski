@@ -3886,8 +3886,10 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       injection Hv; clear Hv; intros Hzp Hyp Hxp.
       simpl in Ha, Hp'; simpl.
       f_equal; [ f_equal | ].
-(* on s'attaque au cosinus *)
+bbb.
+
 Focus 2.
+(* le cosinus *)
 assert (Hr2 : r² ≠ 0) by now intros H; apply Rsqr_eq_0 in H.
 apply Rmult_eq_reg_r with (r := r²); [ | easy ].
 rewrite Rmult_div_same; [ | easy ].
