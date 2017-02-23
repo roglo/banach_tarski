@@ -3773,6 +3773,10 @@ Definition J₁_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
   let p' := fold_right rotate p'₀ (path_of_nat no') in
   rot_sin_cos axis p p'.
 
+Theorem J₁_is_countable : ∀ axis,
+  ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₁ axis → ∃ n : ℕ, f n = acs.
+Proof.
+intros axis.
 bbb.
 
 (* old version *)
