@@ -3753,6 +3753,20 @@ destruct (Req_dec r 0) as [Hrz| Hrz].
    Time nsatz.
 Qed.
 
+(* J₁(axis) = set of angles of rotation around the axis, such that
+   for some p in D ∩ sphere(r), R(p) is also in D ∩ sphere(r) where
+   r = ∥axis∥. *)
+Definition J₁ axis :=
+  mkset
+    (λ '(cosθ, sinθ),
+     cosθ² + sinθ² = 1 ∧
+     let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
+     let r := ∥axis∥ in
+     ∃ p p', p × p' ≠ 0%vec ∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
+     (R * p)%vec = p').
+bbb.
+
+(* old version *)
 (* J₁(r) = set of rotations given by its axis and its angle, such that
    for some p in D ∩ sphere(r), R(p) is also in D ∩ sphere(r). *)
 Definition J₁ r :=
