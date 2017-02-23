@@ -3497,6 +3497,7 @@ split.
  unfold mat_det, mat_transp; simpl; lra.
 Qed.
 
+(*
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and
    p₂ are not in the same latitude (p being the north pole), one if they
@@ -3565,7 +3566,7 @@ assert (Hrm : is_rotation_matrix M).
  f_equal.
   unfold Rsqr in *.
 bbb.
-  (* polynomia not in the ideal *)
+  (* polynomial not in the ideal *)
   Time nsatz.
 
 bbb.
@@ -3648,235 +3649,13 @@ bbb.
       (s - s') * (y₁ * zp - yp * z₁) = 0) by lra.
 
 bbb.
-
-(* below: partially true, therefore false; indeed, there is a rotation
-   transforming a point p₁ into a point p₂ (with axis equal to p₁ × p₂),
-   but there are an uncountable set of axis transforming p₁ into p₂:
-   just consider the plan separating symmetrically p₁ and p₂. Any point
-   in the intersection of this plan and the sphere can be an axis of
-   a possible rotation between p₁ and p₂ *)
-
-Definition axis_angle_of_couple p₁ p₂ :=
-  let a := (/ ∥(p₁ × p₂)∥ ⁎ (p₁ × p₂))%vec in
-  let c := (p₁ · p₂) / (∥p₁∥ * ∥p₂∥) in
-  let s := ∥(p₁ × p₂)∥ / (∥p₁∥ * ∥p₂∥) in
-  (a, c, s).
-
-Theorem rotation_between_2_points : ∀ r p₁ p₂ a c s,
-  0 < r
-  → p₁ ∈ sphere r
-  → p₂ ∈ sphere r
-  → p₁ × p₂ ≠ 0%vec
-  → axis_angle_of_couple p₁ p₂ = (a, c, s)
-  → a ∈ sphere 1 ∧ c² + s² = 1 ∧
-    (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec.
-Proof.
-intros * Hr Hp₁ Hp₂ Hpp Hacs.
-symmetry in Hacs; injection Hacs; clear Hacs.
-intros Hs Hc Ha.
-assert (Hcs : c² + s² = 1).
- assert (H : ∥p₁∥ * ∥p₂∥ ≠ 0).
-  apply on_sphere_norm in Hp₁; [ | lra ].
-  apply on_sphere_norm in Hp₂; [ | lra ].
-  rewrite Hp₁, Hp₂.
-  intros H; apply Rsqr_eq_0 in H; lra.
-  rewrite Hc, Hs.
-  rewrite Rsqr_div; [ | easy ].
-  rewrite Rsqr_div; [ | easy ].
-  rewrite <- Rdiv_plus_distr.
-  rewrite <- vec_dot_mul_diag.
-  rewrite <- vec_Lagrange_identity.
-  rewrite Rplus_minus.
-  rewrite Rsqr_mult.
-  rewrite Rdiv_same; [ easy | ].
-  rewrite <- Rsqr_mult.
-  intros HH; apply H.
-  now apply Rsqr_eq_0 in HH.
-
- split; [ | split ]; [ | easy | ].
-  simpl.
-  rewrite Ha; clear a Ha.
-  remember (p₁ × p₂) as v eqn:Hv.
-  destruct v as (vx, vy, vz); simpl.
-  remember (√ (vx² + vy² + vz²)) as vr eqn:Hvr.
-  replace (r * (/ vr * vx)) with (r * vx * / vr) by lra.
-  replace (r * (/ vr * vy)) with (r * vy * / vr) by lra.
-  replace (r * (/ vr * vz)) with (r * vz * / vr) by lra.
-  do 3 rewrite Rsqr_mult.
-  do 2 rewrite <- Rmult_plus_distr_l.
-  apply (f_equal Rsqr) in Hvr.
-  assert (Hrz : vr ≠ 0).
-   intros H; rewrite H in *; clear H.
-   symmetry in Hvr.
-   rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
-   rewrite Rsqr_0 in Hvr.
-   apply sqr_vec_norm_eq_0 in Hvr.
-   destruct Hvr as (H1 & H2 & H3).
-   now rewrite H1, H2, H3 in Hpp.
-
-   rewrite Rsqr_sqrt in Hvr; [ | apply nonneg_sqr_vec_norm ].
-   rewrite <- Hvr.
-   rewrite Rsqr_inv; [ | easy ].
-   rewrite Rinv_l; [ now rewrite Rsqr_1 | ].
-   intros H; apply Hrz.
-   now apply Rsqr_eq_0 in H.
-
-  simpl.
-  remember (p₁ × p₂) as pp eqn:Hcm.
-  destruct a as (xa, ya, za).
-  destruct p₁ as (x₁, y₁, z₁).
-  destruct p₂ as (x₂, y₂, z₂); simpl in *.
-  rewrite Hp₁, Hp₂ in Hs, Hc.
-  rewrite sqrt_Rsqr in Hs; [ | lra ].
-  rewrite sqrt_Rsqr in Hc; [ | lra ].
-  destruct pp as (xp, yp, zp).
-  simpl in Hs.
-  simpl in Ha.
-  remember (√ (xp² + yp² + zp²)) as rp eqn:Hrp.
-  assert (Hrpz : rp ≠ 0).
-   intros H; rewrite H in Hrp; symmetry in Hrp.
-   apply sqrt_eq_0 in Hrp; [ | apply nonneg_sqr_vec_norm ].
-   apply sqr_vec_norm_eq_0 in Hrp.
-   destruct Hrp as (H1 & H2 & H3).
-   now rewrite H1, H2, H3 in Hpp.
-
-   injection Ha; clear Ha; intros Hza Hya Hxa.
-   assert (Hra : √ (xa² + ya² + za²) = 1).
-    rewrite Hxa, Hya, Hza.
-    progress repeat rewrite Rsqr_mult.
-    do 2 rewrite <- Rmult_plus_distr_l.
-    rewrite sqrt_mult_alt; [ | apply Rle_0_sqr ].
-    rewrite <- Hrp.
-    rewrite sqrt_Rsqr; [ now rewrite Rinv_l | ].
-    apply Rlt_le, Rinv_0_lt_compat.
-    enough 0 ≤ rp) by lra.
-    rewrite Hrp; apply sqrt_pos.
-
-    rewrite Hra.
-    do 3 rewrite Rdiv_1_r.
-    injection Hcm; clear Hcm; intros Hzp Hyp Hxp.
-    rewrite Hxa, Hya, Hza.
-    progress repeat rewrite Rsqr_mult.
-    unfold Rsqr.
-    replace
-      (/ rp * / rp * (xp * xp) * (1 - c) + c) * x₁ +
-       (/ rp * xp * (/ rp * yp) * (1 - c) - / rp * zp * s) * y₁ +
-       (/ rp * xp * (/ rp * zp) * (1 - c) + / rp * yp * s) * z₁
-    with
-    / rp * / rp * xp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-     c * x₁ + s * (yp * z₁ - zp * y₁) * / rp) by lra.
-    replace
-      (/ rp * xp * (/ rp * yp) * (1 - c) + / rp * zp * s) * x₁ +
-       (/ rp * / rp * (yp * yp) * (1 - c) + c) * y₁ +
-       (/ rp * yp * (/ rp * zp) * (1 - c) - / rp * xp * s) * z₁
-    with
-    / rp * / rp * yp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-     c * y₁ + s * (zp * x₁ - xp * z₁) * / rp) by lra.
-    replace
-      (/ rp * xp * (/ rp * zp) * (1 - c) - / rp * yp * s) * x₁ +
-       (/ rp * yp * (/ rp * zp) * (1 - c) + / rp * xp * s) * y₁ +
-       (/ rp * / rp * (zp * zp) * (1 - c) + c) * z₁
-    with
-    / rp * / rp * zp * (1 - c) * (xp * x₁ + yp * y₁ + zp * z₁) +
-     c * z₁ + s * (xp * y₁ - yp * x₁) * / rp) by lra.
-    remember (xp * x₁ + yp * y₁ + zp * z₁ as u eqn:Hu.
-    rewrite Hxp, Hyp, Hzp in Hu.
-    ring_simplify in Hu; subst u.
-    do 3 rewrite Rmult_0_r, Rplus_0_l.
-    rewrite fold_Rsqr in Hc, Hs.
-    assert (Hr2 : r² ≠ 0) by (intros H; apply Rsqr_eq_0 in H; lra).
-    f_equal.
-     apply Rmult_eq_reg_r with (r := rp); [ | easy ].
-     rewrite Rmult_plus_distr_r.
-     repeat rewrite Rmult_assoc.
-     rewrite Rinv_l; [ | easy ].
-     rewrite Rmult_1_r.
-     apply Rmult_eq_reg_r with (r := r²); [ | easy ].
-     rewrite Rmult_plus_distr_r.
-     remember (c * (x₁ * rp) * r² as u eqn:Hu.
-     rewrite Rmult_shuffle0 in Hu.
-     rewrite Hc in Hu.
-     rewrite Rmult_div_same in Hu; [ | easy ].
-     subst u.
-     remember (s * (yp * z₁ - zp * y₁) * r² as u eqn:Hu.
-     rewrite Rmult_shuffle0 in Hu.
-     rewrite Hs in Hu.
-     rewrite Rmult_div_same in Hu; [ | easy ].
-     rewrite Rmult_comm in Hu; subst u.
-     rewrite <- Rmult_assoc.
-     rewrite <- Rmult_plus_distr_r.
-     rewrite Rmult_shuffle0.
-     f_equal.
-     rewrite Hyp, Hzp.
-     ring_simplify.
-     do 3 rewrite <- Rsqr_pow2.
-     rewrite Rmult_comm.
-     do 2 rewrite <- Rmult_plus_distr_l.
-     now rewrite Hp₁.
-
-     apply Rmult_eq_reg_r with (r := rp); [ | easy ].
-     rewrite Rmult_plus_distr_r.
-     repeat rewrite Rmult_assoc.
-     rewrite Rinv_l; [ | easy ].
-     rewrite Rmult_1_r.
-     apply Rmult_eq_reg_r with (r := r²); [ | easy ].
-     rewrite Rmult_plus_distr_r.
-     remember (c * (y₁ * rp) * r² as u eqn:Hu.
-     rewrite Rmult_shuffle0 in Hu.
-     rewrite Hc in Hu.
-     rewrite Rmult_div_same in Hu; [ | easy ].
-     subst u.
-     remember (s * (zp * x₁ - xp * z₁) * r² as u eqn:Hu.
-     rewrite Rmult_shuffle0 in Hu.
-     rewrite Hs in Hu.
-     rewrite Rmult_div_same in Hu; [ | easy ].
-     rewrite Rmult_comm in Hu; subst u.
-     rewrite <- Rmult_assoc.
-     rewrite <- Rmult_plus_distr_r.
-     rewrite Rmult_shuffle0.
-     f_equal.
-     rewrite Hzp, Hxp.
-     ring_simplify.
-     do 3 rewrite <- Rsqr_pow2.
-     rewrite <- Rmult_plus_distr_r.
-     rewrite Rmult_comm.
-     rewrite <- Rmult_plus_distr_l.
-     now rewrite Hp₁.
-
-     apply Rmult_eq_reg_r with (r := rp); [ | easy ].
-     rewrite Rmult_plus_distr_r.
-     repeat rewrite Rmult_assoc.
-     rewrite Rinv_l; [ | easy ].
-     rewrite Rmult_1_r.
-     apply Rmult_eq_reg_r with (r := r²); [ | easy ].
-     rewrite Rmult_plus_distr_r.
-     remember (c * (z₁ * rp) * r² as u eqn:Hu.
-     rewrite Rmult_shuffle0 in Hu.
-     rewrite Hc in Hu.
-     rewrite Rmult_div_same in Hu; [ | easy ].
-     subst u.
-     remember (s * (xp * y₁ - yp * x₁) * r² as u eqn:Hu.
-     rewrite Rmult_shuffle0 in Hu.
-     rewrite Hs in Hu.
-     rewrite Rmult_div_same in Hu; [ | easy ].
-     rewrite Rmult_comm in Hu; subst u.
-     rewrite <- Rmult_assoc.
-     rewrite <- Rmult_plus_distr_r.
-     rewrite Rmult_shuffle0.
-     f_equal.
-     rewrite Hxp, Hyp.
-     ring_simplify.
-     do 3 rewrite <- Rsqr_pow2.
-     do 2 rewrite <- Rmult_plus_distr_r.
-     rewrite Rmult_comm.
-     now rewrite Hp₁.
-Qed.
+*)
 
 Theorem matrix_of_axis_angle_opp : ∀ p₁ p₂ a c s,
   a ∈ sphere 1
   → c² + s² = 1
   → (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec
-  → (matrix_of_axis_angle (a, c, -s) * p₂ = p₁)%vec.
+  → (matrix_of_axis_angle (a, c, (-s)%R) * p₂ = p₁)%vec.
 Proof.
 intros * Ha Hcs Hacs.
 subst p₂; simpl.
@@ -3931,7 +3710,7 @@ injection Ha; clear Ha; intros Hs Hc Ha.
 destruct a as (xa, ya, za); simpl.
 injection Ha; clear Ha; intros Hza Hya Hxa.
 rewrite Hc in Hs.
-remember ((a₃₂ - a₂₃)² + (a₁₃ - a₃₁)² + (a₂₁ - a₁₂)² as r eqn:Hr.
+remember ((a₃₂ - a₂₃)² + (a₁₃ - a₃₁)² + (a₂₁ - a₁₂)²) as r eqn:Hr.
 destruct (Req_dec r 0) as [Hrz| Hrz].
  rewrite Hrz in Hr; clear r Hxa Hya Hza Hrz.
  symmetry in Hr.
@@ -3973,69 +3752,6 @@ destruct (Req_dec r 0) as [Hrz| Hrz].
    clear - Hdet H11 H12 H13 H22 H23 Hx Hy Hz.
    Time nsatz.
 Qed.
-
-Theorem unicity_rotation_between_2_points : ∀ r p₁ p₂,
-  0 < r
-  → p₁ ∈ sphere r
-  → p₂ ∈ sphere r
-  → p₁ × p₂ ≠ 0%vec
-  → ∃ a c s,
-    a ∈ sphere 1 ∧ c² + s² = 1 ∧
-    (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec ∧
-    ∀ a' c' s',
-    a' ∈ sphere 1 ∧ c'² + s'² = 1 ∧
-    (matrix_of_axis_angle (a', c', s') * p₁ = p₂)%vec
-    → a = a' ∧ c = c' ∧ s = s' ∨
-      a = (-a')%vec ∧ c = c' ∧ s = - s'.
-Proof.
-intros * Hr Hp₁ Hp₂ Hpp.
-remember (axis_angle_of_couple p₁ p₂) as acs eqn:H.
-destruct acs as ((a & c) & s).
-symmetry in H.
-eapply rotation_between_2_points in H; try eassumption.
-destruct H as (Ha & Hcs & Hm).
-exists a, c, s.
-split; [ easy | ].
-split; [ easy | ].
-split; [ easy | ].
-intros * (Ha' & Hcs' & H').
-apply matrix_of_axis_angle_opp in H'; [ | easy | easy ].
-rewrite <- H' in Hm.
-rewrite <- mat_vec_mul_assoc in Hm.
-remember (matrix_of_axis_angle (a, c, s)) as M eqn:HM.
-remember (matrix_of_axis_angle (a', c', -s')) as M' eqn:HM'.
-move M' before M.
-generalize Hm; intros H.
-remember (axis_angle_of_matrix (M * M')) as acs' eqn:Hacs'.
-symmetry in Hacs'.
-destruct acs' as ((aa', cc'), ss').
-eapply rot_is_id_for_pt in H; try eassumption.
-unfold axis_angle_of_matrix in Hacs'.
-injection Hacs'; clear Hacs'; intros Hss' Hcc' Haa'.
-bbb.
-
-unfold mat_mul in Hm.
-simpl in Hm.
-destruct a as (xa, ya, za).
-destruct a' as (xa', ya', za').
-simpl in Hm.
-simpl in Ha, Ha'.
-rewrite Rsqr_1 in Ha, Ha'.
-rewrite Ha, Ha' in Hm.
-rewrite sqrt_1 in Hm.
-progress repeat rewrite Rdiv_1_r in Hm.
-destruct p₂ as (x₂, y₂, z₂).
-simpl in Hm.
-injection Hm; clear Hm; intros Hz₂ Hy₂ Hx₂.
-ring_simplify in Hx₂.
-progress repeat rewrite Rsqr_pow2 in Ha, Ha'.
-progress repeat rewrite Rsqr_pow2 in Hcs, Hcs'.
-progress repeat rewrite Rsqr_pow2 in Hx₂.
-repeat replace (za' ^ 2) with (1 - xa' ^ 2 - ya' ^ 2 in Hx₂) by lra.
-ring_simplify in Hx₂.
-progress replace (s' ^ 2) with (1 - c' ^ 2 in Hx₂ by lra.
-
-bbb.
 
 (* J₁(r) = set of rotations given by its axis and its angle, such that
    for some p in D ∩ sphere(r), R(p) is also in D ∩ sphere(r). *)
@@ -4140,14 +3856,14 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       rewrite Rmult_1_r, Rmult_1_l.
       rewrite <- Rabs_sqr.
       apply Rsqr_lt_abs_0.
-      replace (p · p')² with ∥p∥² * ∥p'∥² - (p × p')²%vec
+      replace (p · p')² with (∥p∥² * ∥p'∥² - (p × p')²%vec)
        by (rewrite <- vec_Lagrange_identity; lra).
       assert (H : 0 ≤ r) by (rewrite <- Hvn; apply vec_norm_nonneg).
       apply on_sphere_norm in Hp; [ | easy ].
       apply on_sphere_norm in Hp'; [ | easy ].
       rewrite Hp, Hp'.
       fold (Rsqr (r²)).
-      enough 0 < (p × p')²%vec) by lra.
+      enough (0 < (p × p')²%vec) by lra.
       rewrite vec_dot_mul_diag.
       apply Rlt_0_sqr.
       clear H.
