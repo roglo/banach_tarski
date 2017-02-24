@@ -3789,6 +3789,14 @@ move el'₀ before el₀; move el before el'₀; move el' before el.
 move p'₀ before p₀.
 move Hso' before Hso; move Hn' before Hn; move Hp'₀ before Hp₀.
 move Hp₀ after Hso; move Hp'₀ before Hp₀.
+apply rotate_rev_path in Hso.
+apply rotate_rev_path in Hso'.
+remember (nat_of_path el₀) as nf eqn:Hnf.
+remember (nat_of_path (rev_path el)) as no eqn:Hno.
+remember (nat_of_path el'₀) as nf' eqn:Hnf'.
+remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
+move no before nf; move nf' before nf; move no' before no.
+unfold J₁_of_nats.
 vvv.
 
 destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
