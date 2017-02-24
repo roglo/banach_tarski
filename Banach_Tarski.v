@@ -3783,8 +3783,12 @@ intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hpp & Hp & Hp' & Hv).
 remember ‖axis‖ as r eqn:Hr.
 remember (matrix_of_axis_angle (axis, c, s)) as M eqn:HM.
-destruct Hp as ((el & p₀ & Hp₀) & Hp).
-destruct Hp' as ((el' & p'₀ & Hp'₀) & Hp').
+destruct Hp as ((el₀ & p₀ & (el & Hso) & Hn & Hp₀) & Hp).
+destruct Hp' as ((el'₀ & p'₀ & (el' & Hso') & Hn' & Hp'₀) & Hp').
+move el'₀ before el₀; move el before el'₀; move el' before el.
+move p'₀ before p₀.
+move Hso' before Hso; move Hn' before Hn; move Hp'₀ before Hp₀.
+move Hp₀ after Hso; move Hp'₀ before Hp₀.
 vvv.
 
 destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
