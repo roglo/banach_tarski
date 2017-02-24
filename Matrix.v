@@ -95,7 +95,7 @@ Notation "- v" := (vec_opp v) : vec_scope.
 Notation "u · v" := (vec_dot_mul u v) (at level 45, left associativity).
 Notation "u × v" := (vec_cross_mul u v) (at level 40, no associativity).
 Notation "v ²" := (vec_dot_mul v v) : vec_scope.
-Notation "∥ v ∥" := (vec_norm v) (at level 0, v at level 0, format "∥ v ∥").
+Notation "‖ v ‖" := (vec_norm v) (at level 0, v at level 0, format "‖ v ‖").
 
 Definition vos a := V a a a.
 
@@ -639,7 +639,7 @@ rewrite Rinv_r; [ | easy ].
 now do 3 rewrite Rmult_1_l.
 Qed.
 
-Theorem vec_norm_nonneg : ∀ v, 0 ≤ ∥v∥.
+Theorem vec_norm_nonneg : ∀ v, 0 ≤ ‖v‖.
 Proof.
 intros (x, y, z); simpl.
 apply sqrt_pos.
@@ -653,7 +653,7 @@ apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
 Theorem vec_norm_vec_const_mul : ∀ a v,
-  ∥(vec_const_mul a v)∥ = Rabs a * ∥v∥.
+  ‖(vec_const_mul a v)‖ = Rabs a * ‖v‖.
 Proof.
 intros a (x, y, z); simpl.
 do 3 rewrite Rsqr_mult.
@@ -677,14 +677,14 @@ apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
  apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
-Theorem vec_norm_0 : ∥0∥ = 0.
+Theorem vec_norm_0 : ‖0‖ = 0.
 Proof.
 simpl; rewrite Rsqr_0.
 do 2 rewrite Rplus_0_l.
 apply sqrt_0.
 Qed.
 
-Theorem vec_norm_eq_0 : ∀ v, ∥v∥ = 0 ↔ v = 0%vec.
+Theorem vec_norm_eq_0 : ∀ v, ‖v‖ = 0 ↔ v = 0%vec.
 Proof.
 intros.
 split; intros Hv.
@@ -1018,7 +1018,7 @@ Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
 
-Theorem vec_dot_mul_diag : ∀ v, v · v = ∥v∥².
+Theorem vec_dot_mul_diag : ∀ v, v · v = ‖v‖².
 Proof.
 intros (x, y, z); simpl.
 do 3 rewrite fold_Rsqr.
@@ -1201,7 +1201,7 @@ Proof.
 intros a (v₁, v₂, v₃); simpl; unfold Rsqr; lra.
 Qed.
 
-Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = / ∥u∥ ⁎ u → ∥v∥ = 1.
+Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = / ‖u‖ ⁎ u → ‖v‖ = 1.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) Hu Hv.
 simpl in Hv; simpl.
@@ -1290,7 +1290,7 @@ Qed.
 (* Cauchy-Schwarz inequality with vectors. *)
 
 Theorem vec_Lagrange_identity : ∀ u v,
-  ∥u∥² * ∥v∥² - (u · v)² = (u × v)²%vec.
+  ‖u‖² * ‖v‖² - (u · v)² = (u × v)²%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃).
 simpl.
@@ -1301,7 +1301,7 @@ Qed.
 
 Arguments vec_Lagrange_identity u%vec v%vec.
 
-Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, (u · v)² ≤ ∥u∥² * ∥v∥².
+Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, (u · v)² ≤ ‖u‖² * ‖v‖².
 Proof.
 intros.
 apply Rplus_le_reg_r with (r := -(u · v)²).

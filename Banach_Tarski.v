@@ -386,7 +386,7 @@ Definition rotation_axis (M : matrix ℝ) :=
   V x y z.
 
 Definition vec_normalize '(V x y z) :=
-  let r := ∥(V x y z)∥ in
+  let r := ‖(V x y z)‖ in
   V (x / r) (y / r) (z / r).
 
 Definition rotation_unit_axis (M : matrix ℝ) :=
@@ -686,7 +686,7 @@ Theorem normalized_axis : ∀ M k v,
 Proof.
 intros M k (x, y, z) Hv.
 unfold vec_normalize.
-remember ∥(V x y z)∥ as r eqn:Hr.
+remember ‖(V x y z)‖ as r eqn:Hr.
 unfold Rdiv.
 setoid_rewrite Rmult_comm.
 rewrite vec_mul_diag.
@@ -1116,7 +1116,7 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
   in
   fold_right rotate p₁ (path_of_nat no).
 
-Theorem normalized_vec_normalize : ∀ v, v ≠ 0%vec → ∥(vec_normalize v)∥ = 1.
+Theorem normalized_vec_normalize : ∀ v, v ≠ 0%vec → ‖(vec_normalize v)‖ = 1.
 Proof.
 intros (x, y, z) Hv; simpl.
 remember (√ (x² + y² + z²)) as r eqn:Hr.
@@ -1196,7 +1196,7 @@ Qed.
 
 Theorem rotation_fixpoint_norm : ∀ M r, 0 ≤ r
   → M ≠ mat_transp M
-  → ∥(rotation_fixpoint M r)∥ = r.
+  → ‖(rotation_fixpoint M r)‖ = r.
 Proof.
 intros * HM Hr.
 apply rotation_fixpoint_on_sphere with (r := r) in Hr.
@@ -1302,7 +1302,7 @@ destruct (Req_dec u₁ 0) as [Hu₁| Hu₁].
 Qed.
 
 Theorem free_family_diff_norm_vec : ∀ u v,
-  ∥u∥ = ∥v∥
+  ‖u‖ = ‖v‖
   → u ≠ v
   → is_neg_vec u = is_neg_vec v
   → u ≠ 0%vec
@@ -1372,7 +1372,7 @@ destruct (Req_dec a 0) as [Ha| Ha].
 Qed.
 
 Theorem nonzero_cross_mul : ∀ u v,
-  ∥u∥ = ∥v∥
+  ‖u‖ = ‖v‖
   → is_neg_vec u = is_neg_vec v
   → u ≠ 0%vec
   → v ≠ 0%vec
@@ -1705,7 +1705,7 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
 Qed.
 
 Theorem vec_cross_mul_are_free_family : ∀ u v,
-  ∥u∥ = ∥v∥
+  ‖u‖ = ‖v‖
   → is_neg_vec u = is_neg_vec v
   → u ≠ 0%vec
   → v ≠ 0%vec
@@ -1773,7 +1773,7 @@ Qed.
 Theorem fixpoint_unicity : ∀ M u v,
   is_rotation_matrix M
   → M ≠ mat_id
-  → ∥u∥ = ∥v∥
+  → ‖u‖ = ‖v‖
   → is_neg_vec u = is_neg_vec v
   → (M * u)%vec = u
   → (M * v)%vec = v
@@ -1797,14 +1797,14 @@ destruct (vec_zerop u) as [Hv₁| Hv₁].
   now apply vec_norm_eq_0 in Hvn.
 
   destruct (vec_eq_dec u v) as [Hvv| Hvv]; [ easy | exfalso ].
-  remember ((∥u∥ / ∥(u × v)∥) ⁎ (u × v)) as W eqn:HW.
+  remember ((‖u‖ / ‖(u × v)‖) ⁎ (u × v)) as W eqn:HW.
   move W before v.
   assert (Hp₃ : (M * (u × v) = u × v)%vec).
    apply mat_vec_mul_cross_distr with (u := u) (v := v) in Hm.
    now rewrite Hp₁, Hp₂ in Hm.
 
    move Hp₃ before Hp₂.
-   assert (Hucv : ∥(u × v)∥ ≠ 0).
+   assert (Hucv : ‖(u × v)‖ ≠ 0).
     intros H; apply vec_norm_eq_0 in H.
     apply vec_cross_mul_eq_0 in H; [ | easy | easy ].
     destruct H as (a & b & Ha & Hb & Hab).
@@ -1829,7 +1829,7 @@ destruct (vec_zerop u) as [Hv₁| Hv₁].
     apply vec_const_mul_div in Hbv; [ | easy ].
     rewrite Hbv in Hvn.
     rewrite vec_norm_vec_const_mul in Hvn.
-    replace ∥u∥ with (1 * ∥u∥) in Hvn at 1 by lra.
+    replace ‖u‖ with (1 * ‖u‖) in Hvn at 1 by lra.
     apply Rmult_eq_reg_r in Hvn; [ | now intros H; apply Hv₁, vec_norm_eq_0 ].
     symmetry in Hvn.
     apply Rabs_or in Hvn.
@@ -2148,7 +2148,7 @@ Arguments axis_angle_of_matrix M%mat.
 
 Theorem matrix_of_axis_angle_inv : ∀ v c s,
   0 < s
-  → ∥v∥ = 1
+  → ‖v‖ = 1
   → s² + c² = 1
   → axis_angle_of_matrix (matrix_of_axis_angle (v, c, s)) = (v, c, s).
 Proof.
@@ -2346,7 +2346,7 @@ Notation "'hi'" := (Qi) : quat_scope.
 Notation "'hj'" := (Qj) : quat_scope.
 Notation "'hk'" := (Qk) : quat_scope.
 Notation "h '⁻¹'" := (quat_inv h) (at level 1, format "h ⁻¹"): quat_scope.
-Notation "∥ h ∥" := (quat_norm h) : quat_scope.
+Notation "‖ h ‖" := (quat_norm h) : quat_scope.
 
 Definition hr a := quat a 0.
 
@@ -2491,7 +2491,7 @@ Definition vec_le '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
 Notation "u '≤' v" := (vec_le u v) : vec_scope.
 
 Theorem quat_of_mat_inv1 : ∀ h,
-  (∥h∥ = 1)%H
+  (‖h‖ = 1)%H
   → 0 < Re h
   → quat_of_mat (mat_of_quat h) = h.
 Proof.
@@ -2557,7 +2557,7 @@ destruct (Req_dec t (-1)) as [Htd| Htd].
 Qed.
 
 Theorem quat_of_mat_inv2 : ∀ h,
-  (∥h∥ = 1)%H
+  (‖h‖ = 1)%H
   → 0 ≤ Re h
   → (0 ≤ Im h)%vec
   → quat_of_mat (mat_of_quat h) = h.
@@ -2805,7 +2805,7 @@ apply not_eq_sym, HM.
 Qed.
 
 Theorem rotate_unicity : ∀ p₁ p₂ el,
-  ∥p₁∥ = ∥p₂∥
+  ‖p₁‖ = ‖p₂‖
   → norm_list el ≠ []
   → (mat_of_path el * p₁)%vec = p₁
   → (mat_of_path el * p₂)%vec = p₂
@@ -2830,7 +2830,7 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
 
    destruct (vec_eq_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
    apply neq_negb in Hnn.
-   assert (Hpp2 : ∥p₁∥ = ∥(-p₂)∥).
+   assert (Hpp2 : ‖p₁‖ = ‖(-p₂)‖).
     rewrite Hpp; destruct p₂ as (x, y, z); simpl.
     now do 3 rewrite <- Rsqr_neg.
 
@@ -2844,7 +2844,7 @@ Qed.
 
 (* latitude of p₁ relative to p, p being the north pole;
    equal to the dot product and between -1 and 1. *)
-Definition latitude p p₁ := (p · p₁) / (∥p∥ * ∥p₁∥).
+Definition latitude p p₁ := (p · p₁) / (‖p‖ * ‖p₁‖).
 
 Theorem rotation_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
@@ -2873,7 +2873,7 @@ Theorem latitude_norm : ∀ p p₁ v a,
   → p₁ ∈ sphere 1
   → a = latitude p p₁
   → v = (p₁ - a ⁎ p)%vec
-  → ∥v∥ = √ (1 - a²).
+  → ‖v‖ = √ (1 - a²).
 Proof.
 intros * Hp Hp₁ Ha₁ Hv.
 apply on_sphere_norm; [ apply sqrt_pos | ].
@@ -2915,12 +2915,12 @@ apply Rle_0_sqr.
 Qed.
 
 Theorem rotate_matrix_of_two_vectors : ∀ p v₁ v₂ c s,
-  ∥v₁∥ = 1
-  → ∥v₂∥ = 1
+  ‖v₁‖ = 1
+  → ‖v₂‖ = 1
   → p = v₁ × v₂
   → p ≠ 0%vec
   → c = (v₁ · v₂)
-  → s = ∥p∥
+  → s = ‖p‖
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
 intros * Hv₁ Hv₂ Hp Hpz Hc Hs.
@@ -3059,7 +3059,7 @@ Qed.
 
 Theorem vec_cross_mul_cross_mul : ∀ u v,
   u · v = 0
-  → ∥v∥ = 1
+  → ‖v‖ = 1
   → (u × v) × v = (- u)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) Huv Hv; simpl in Huv, Hv; simpl.
@@ -3073,8 +3073,8 @@ f_equal; ring_simplify.
 Qed.
 
 Definition rot_sin_cos p u v :=
-  let s := Rsign (p · (u × v)) * ∥(u × v)∥ / (∥u∥ * ∥v∥) in
-  let c := (u · v) / (∥u∥ * ∥v∥) in
+  let s := Rsign (p · (u × v)) * ‖(u × v)‖ / (‖u‖ * ‖v‖) in
+  let c := (u · v) / (‖u‖ * ‖v‖) in
   (s, c).
 
 Theorem sphere_1_rot_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
@@ -3093,7 +3093,7 @@ Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
 unfold rot_sin_cos in Hcs.
 injection Hcs; clear Hcs; intros Hc Hs.
-assert (∥v₁∥ = 1 ∧ ∥v₂∥ = 1) as (Hnv₁, Hnv₂).
+assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
  assert (H : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
  eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
  eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
@@ -3291,7 +3291,7 @@ destruct (vec_eq_dec u 0) as [Hu| Hu].
   rewrite <- Rmult_vec_dot_mul_distr_r.
   do 2 rewrite vec_norm_vec_const_mul.
   do 2 rewrite <- Rmult_assoc.
-  replace (Rabs k * ∥u∥ * Rabs k) with (Rabs k * Rabs k * ∥u∥) by lra.
+  replace (Rabs k * ‖u‖ * Rabs k) with (Rabs k * Rabs k * ‖u‖) by lra.
   rewrite <- Rabs_mult, fold_Rsqr, Rabs_sqr.
   rewrite Rmult_assoc; unfold Rdiv.
   assert (Hr2 : k² ≠ 0) by (intros H; apply Rsqr_eq_0 in H; lra).
@@ -3356,7 +3356,7 @@ destruct (vec_eq_dec u 0) as [Hu| Hu].
 
     do 4 rewrite vec_norm_vec_const_mul.
     do 2 rewrite <- Rmult_assoc.
-    replace (Rabs k * ∥u∥ * Rabs k) with (Rabs k * Rabs k * ∥u∥) by lra.
+    replace (Rabs k * ‖u‖ * Rabs k) with (Rabs k * Rabs k * ‖u‖) by lra.
     do 3 rewrite Rmult_assoc.
     rewrite Rdiv_mult_simpl_l.
      rewrite Rdiv_mult_simpl_l; [ easy | | ].
@@ -3376,7 +3376,7 @@ destruct (vec_eq_dec u 0) as [Hu| Hu].
    rewrite <- Rmult_vec_dot_mul_distr_r.
    do 2 rewrite vec_norm_vec_const_mul.
    do 2 rewrite <- Rmult_assoc.
-   replace (Rabs k * ∥u∥ * Rabs k) with (Rabs k * Rabs k * ∥u∥) by lra.
+   replace (Rabs k * ‖u‖ * Rabs k) with (Rabs k * Rabs k * ‖u‖) by lra.
    rewrite <- Rabs_mult.
    fold (Rsqr k); rewrite Rabs_sqr.
    rewrite Rmult_assoc.
@@ -3755,18 +3755,18 @@ Qed.
 
 (* J₁(axis) = set of angles of rotation around the axis, such that
    for some p in D ∩ sphere(r), R(p) is also in D ∩ sphere(r) where
-   r = ∥axis∥. *)
+   r = ‖axis‖. *)
 Definition J₁ axis :=
   mkset
     (λ '(sinθ, cosθ),
      sinθ² + cosθ² = 1 ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
-     let r := ∥axis∥ in
+     let r := ‖axis‖ in
      ∃ p p', p × p' ≠ 0%vec ∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
 Definition J₁_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
-  let r := ∥axis∥ in
+  let r := ‖axis‖ in
   let p₀ := fixpoint_of_nat r nf in
   let p := fold_right rotate p₀ (path_of_nat no) in
   let p'₀ := fixpoint_of_nat r nf' in
@@ -3789,7 +3789,7 @@ bbb.
 Definition J₁ r :=
   mkset
     (λ '(axis, cosθ, sinθ),
-     ∥axis∥ = r ∧ cosθ² + sinθ² = 1 ∧
+     ‖axis‖ = r ∧ cosθ² + sinθ² = 1 ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
      ∃ p p', p × p' ≠ 0%vec ∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
@@ -3887,7 +3887,7 @@ assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
       rewrite Rmult_1_r, Rmult_1_l.
       rewrite <- Rabs_sqr.
       apply Rsqr_lt_abs_0.
-      replace (p · p')² with (∥p∥² * ∥p'∥² - (p × p')²%vec)
+      replace (p · p')² with (‖p‖² * ‖p'‖² - (p × p')²%vec)
        by (rewrite <- vec_Lagrange_identity; lra).
       assert (H : 0 ≤ r) by (rewrite <- Hvn; apply vec_norm_nonneg).
       apply on_sphere_norm in Hp; [ | easy ].
@@ -3973,7 +3973,7 @@ bbb.
 Definition J₁ r :=
   mkset
     (λ '(axis, cosθ, sinθ),
-     ∥axis∥ = 1 ∧ cosθ² + sinθ² = 1 ∧
+     ‖axis‖ = 1 ∧ cosθ² + sinθ² = 1 ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
      ∃ p p' n, p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      ((R ^ n)%mat * p)%vec = p').
@@ -3996,8 +3996,8 @@ Definition J₀ r :=
      ∃ p p' n, p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      ((R ^ n)%mat * p)%vec = p').
 
-(* J(p₁) = subset of J₀(∥p₁∥) of rotations aroung a vec p₁. *)
-Definition J p₁ := mkset (λ R₁, R₁ ∈ rotation_around p₁ ∧ R₁ ∈ J₀ ∥p₁∥).
+(* J(p₁) = subset of J₀(‖p₁‖) of rotations aroung a vec p₁. *)
+Definition J p₁ := mkset (λ R₁, R₁ ∈ rotation_around p₁ ∧ R₁ ∈ J₀ ‖p₁‖).
 
 Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   let p₂ := fixpoint_of_nat r nf in
@@ -4011,7 +4011,7 @@ Definition J₀_of_nats r '(nf, no, nf', no', n, k) : matrix ℝ :=
   else matrix_of_axis_angle (px, cos θ, sin θ).
 
 Theorem matrix_pow : ∀ v c s n,
-  ∥v∥ = 1
+  ‖v‖ = 1
   → c² + s² = 1
   → -1 < c < 1
   → let c' := cos (INR n * acos c) in
@@ -4278,7 +4278,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
  destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
  assert
    (H : ∃ R₁, R₁ ∈ rotation_around p₁
-    ∧ ∀ n p p', p ∈ D ∩ sphere ∥p₁∥ → p' ∈ D ∩ sphere ∥p₁∥
+    ∧ ∀ n p p', p ∈ D ∩ sphere ‖p₁‖ → p' ∈ D ∩ sphere ‖p₁‖
     → ((R₁ ^ n)%mat * p ≠ p')%vec).
   assert (Hp₁nz : p₁ ≠ 0%vec).
    intros H; apply Hpnd; subst p₁; simpl.
