@@ -3780,7 +3780,16 @@ intros axis.
 apply surj_prod_4_nat_surj_nat.
 exists (J₁_of_nats axis).
 intros (s, c) Ha.
-simpl.
+destruct Ha as (Hcs & p & p' & Hpp & Hp & Hp' & Hv).
+remember ‖axis‖ as r eqn:Hr.
+remember (matrix_of_axis_angle (axis, c, s)) as M eqn:HM.
+destruct Hp as ((el & p₀ & Hp₀) & Hp).
+destruct Hp' as ((el' & p'₀ & Hp'₀) & Hp').
+vvv.
+
+destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
+destruct Hp' as ((el' & p₃ & (el₃ & Hso₃) & Hn₃& Hr₃) & Hp').
+assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
 bbb.
 
 (* old version *)
