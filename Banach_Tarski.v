@@ -3777,6 +3777,10 @@ Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₁ axis → ∃ n : ℕ, f n = acs.
 Proof.
 intros axis.
+apply surj_prod_4_nat_surj_nat.
+exists (J₁_of_nats axis).
+intros (s, c) Ha.
+simpl.
 bbb.
 
 (* old version *)
