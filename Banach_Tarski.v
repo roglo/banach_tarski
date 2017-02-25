@@ -3797,6 +3797,11 @@ remember (nat_of_path el'₀) as nf' eqn:Hnf'.
 remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
 move no before nf; move nf' before nf; move no' before no.
 unfold J₁_of_nats.
+exists nf, no, nf', no'.
+subst nf no nf' no'.
+unfold fixpoint_of_nat.
+do 4 rewrite path_of_nat_inv.
+rewrite <- Hr.
 vvv.
 
 destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
