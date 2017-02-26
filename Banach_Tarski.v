@@ -3825,6 +3825,7 @@ assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
   destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
    move Hpq at top; subst q'; clear Hb.
    rewrite rotate_vec_mul, Hso'.
+subst M; clear - Hcs Hpp Hp Hp' Hv.
 bbb.
    unfold rot_sin_cos.
    apply on_sphere_norm in Hp; [ | subst r; apply vec_norm_nonneg ].
