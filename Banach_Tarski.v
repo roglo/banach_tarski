@@ -3810,30 +3810,23 @@ assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
  do 4 rewrite path_of_nat_inv.
  rewrite <- Hr.
  rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
- assert (Hfp₀ : fixpoint_of_path r el₀ ∈ sphere r).
-  now apply fixpoint_of_path_on_sphere.
+ remember (fixpoint_of_path r el₀) as q eqn:Hq.
+ generalize Hq; intros Hpq.
+ apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
+   try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
+ destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
+  move Hpq at top; subst q; clear Hb.
+  rewrite rotate_vec_mul, Hso.
 
-  specialize
-    (axis_and_fixpoint_of_path_collinear el₀ p₀ (fixpoint_of_path r el₀) r
-       Hp₀s Hfp₀ Hn Hp₀ eq_refl) as Dp₀.
+  remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
+  generalize Hq'; intros Hpq.
+  apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq;
+    try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
+  destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
+   move Hpq at top; subst q'; clear Hb.
+   rewrite rotate_vec_mul, Hso'.
+Search rot_sin_cos.
 
-Check (bool_dec (is_neg_vec p₀) (is_neg_vec (fixpoint_of_path r el₀))).
-bbb.
-Theorem toto : ∀ u v c,
-  (u = if c then v else (- v)%vec)
-  → v = if c then u else (- u)%vec.
-
-bbb.
-
-  assert (p₀ = fixpoint_of_path r el₀).
-   remember (fixpoint_of_path r el₀) as q.
-   destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [H| H]; [ easy | ].
-   exfalso; apply H; clear H.
-vvv.
-
-destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
-destruct Hp' as ((el' & p₃ & (el₃ & Hso₃) & Hn₃& Hr₃) & Hp').
-assert (H : p₂ ∈ sphere r ∧ p₃ ∈ sphere r).
 bbb.
 
 (* old version *)
