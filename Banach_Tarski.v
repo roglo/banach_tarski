@@ -3816,6 +3816,19 @@ assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
   specialize
     (axis_and_fixpoint_of_path_collinear el₀ p₀ (fixpoint_of_path r el₀) r
        Hp₀s Hfp₀ Hn Hp₀ eq_refl) as Dp₀.
+
+Check (bool_dec (is_neg_vec p₀) (is_neg_vec (fixpoint_of_path r el₀))).
+bbb.
+Theorem toto : ∀ u v c,
+  (u = if c then v else (- v)%vec)
+  → v = if c then u else (- u)%vec.
+
+bbb.
+
+  assert (p₀ = fixpoint_of_path r el₀).
+   remember (fixpoint_of_path r el₀) as q.
+   destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [H| H]; [ easy | ].
+   exfalso; apply H; clear H.
 vvv.
 
 destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
