@@ -3789,19 +3789,33 @@ move el'₀ before el₀; move el before el'₀; move el' before el.
 move p'₀ before p₀.
 move Hso' before Hso; move Hn' before Hn; move Hp'₀ before Hp₀.
 move Hp₀ after Hso; move Hp'₀ before Hp₀.
-apply rotate_rev_path in Hso.
-apply rotate_rev_path in Hso'.
-remember (nat_of_path el₀) as nf eqn:Hnf.
-remember (nat_of_path (rev_path el)) as no eqn:Hno.
-remember (nat_of_path el'₀) as nf' eqn:Hnf'.
-remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
-move no before nf; move nf' before nf; move no' before no.
-unfold J₁_of_nats.
-exists nf, no, nf', no'.
-subst nf no nf' no'.
-unfold fixpoint_of_nat.
-do 4 rewrite path_of_nat_inv.
-rewrite <- Hr.
+assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
+ rewrite <- Hso, <- Hso'; do 2 rewrite rotate_vec_mul.
+ split.
+ 1, 2 : apply on_sphere_after_rotation; [ easy | ].
+ 1, 2 : apply mat_of_path_is_rotation_matrix.
+
+ destruct H as (Hp₀s, Hp'₀s).
+ apply rotate_rev_path in Hso.
+ apply rotate_rev_path in Hso'.
+ remember (nat_of_path el₀) as nf eqn:Hnf.
+ remember (nat_of_path (rev_path el)) as no eqn:Hno.
+ remember (nat_of_path el'₀) as nf' eqn:Hnf'.
+ remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
+ move no before nf; move nf' before nf; move no' before no.
+ unfold J₁_of_nats.
+ exists nf, no, nf', no'.
+ subst nf no nf' no'.
+ unfold fixpoint_of_nat.
+ do 4 rewrite path_of_nat_inv.
+ rewrite <- Hr.
+ rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
+ assert (Hfp₀ : fixpoint_of_path r el₀ ∈ sphere r).
+  now apply fixpoint_of_path_on_sphere.
+
+  specialize
+    (axis_and_fixpoint_of_path_collinear el₀ p₀ (fixpoint_of_path r el₀) r
+       Hp₀s Hfp₀ Hn Hp₀ eq_refl) as Dp₀.
 vvv.
 
 destruct Hp as ((el & p₂ & (el₂ & Hso₂) & Hn₂ & Hr₂) & Hp).
