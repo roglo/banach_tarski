@@ -3825,7 +3825,16 @@ assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
   destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
    move Hpq at top; subst q'; clear Hb.
    rewrite rotate_vec_mul, Hso'.
-subst M; clear - Hcs Hpp Hp Hp' Hv.
+assert (Ha : axis ∈ sphere r).
+ rewrite Hr.
+ destruct axis as (x, y, z); simpl.
+ rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+
+ subst M; clear - Ha Hcs Hpp Hp Hp' Hv.
+ move r after s; move Hcs before Hpp; move Ha after Hp.
+ move Hpp after Hp'; move Hcs before Hv.
+ move p before axis; move p' before axis.
+
 bbb.
    unfold rot_sin_cos.
    apply on_sphere_norm in Hp; [ | subst r; apply vec_norm_nonneg ].
