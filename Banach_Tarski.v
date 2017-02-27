@@ -3773,6 +3773,18 @@ Definition J₁_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
   let p' := fold_right rotate p'₀ (path_of_nat no') in
   rot_sin_cos axis p p'.
 
+Theorem pouet : ∀ axis p p' r s c,
+  axis ∈ sphere r
+  → p ∈ sphere r
+  → p' ∈ sphere r
+  → p × p' ≠ 0%vec
+  → s² + c² = 1
+  → (matrix_of_axis_angle (axis, c, s) * p)%vec = p'
+  → rot_sin_cos axis p p' = (s, c).
+Proof.
+intros * Ha Hp Hp' Hpp Hcs Hv.
+bbb.
+
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₁ axis → ∃ n : ℕ, f n = acs.
 Proof.
