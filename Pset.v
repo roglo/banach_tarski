@@ -200,6 +200,9 @@ split; intros H.
   right; now right.
 Qed.
 
+Theorem in_intersection : ∀ A (E F : set A) x, x ∈ E ∩ F ↔ x ∈ E ∧ x ∈ F.
+Proof. intros; split; intros H; easy. Qed.
+
 Theorem intersection_shuffle0 : ∀ A (E F G : set A),
   (E ∩ F ∩ G = E ∩ G ∩ F)%S.
 Proof.
