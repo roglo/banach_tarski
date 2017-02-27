@@ -2846,7 +2846,7 @@ Qed.
    equal to the dot product and between -1 and 1. *)
 Definition latitude p p₁ := (p · p₁) / (‖p‖ * ‖p₁‖).
 
-Theorem rotation_same_latitude : ∀ p p₁ p₂ c s,
+Theorem sphere_1_rotation_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
@@ -2867,6 +2867,113 @@ unfold latitude; simpl.
 rewrite Hp, Hp₁, Hp₂, sqrt_1; f_equal.
 nsatz.
 Qed.
+
+Theorem on_sphere_on_unit_sphere : ∀ r p,
+  0 < r
+  → p ∈ sphere r
+  → / r ⁎ p ∈ sphere 1.
+Proof.
+intros * Hr Hp.
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm; [ lra | ].
+rewrite vec_norm_vec_const_mul, Hp.
+rewrite Rabs_right.
+ rewrite Rinv_l; [ easy | lra ].
+
+ apply Rinv_0_lt_compat in Hr; lra.
+Qed.
+
+Definition Rsign x := if Rle_dec 0 x then 1 else -1.
+
+Theorem matrix_mul_axis : ∀ p c s k,
+  k ≠ 0
+  → matrix_of_axis_angle (p, c, s) =
+    matrix_of_axis_angle (k ⁎ p, c, Rsign k * s).
+Proof.
+intros * Hk.
+destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
+ subst p; simpl; rewrite Rmult_0_r.
+ rewrite Rsqr_0; do 2 rewrite Rplus_0_l.
+ rewrite Rdiv_0_l, Rsqr_0.
+ now do 5 rewrite Rmult_0_l.
+
+ destruct p as (xp, yp, zp); simpl.
+ remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
+ do 3 rewrite Rsqr_mult in Ha.
+ do 2 rewrite <- Rmult_plus_distr_l in Ha.
+ rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
+ remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
+ assert (Hbz : b ≠ 0).
+  subst b; intros H.
+  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in H.
+  destruct H as (H1 & H2 & H3).
+  now rewrite H1, H2, H3 in Hpz.
+
+  unfold Rsign.
+  destruct (Rle_dec 0 k) as [Hkp| Hkn].
+   rewrite Rmult_1_l.
+   rewrite sqrt_Rsqr in Ha; [ | lra ].
+   assert (Hx : ∀ x, k * x / a = x / b).
+    intros x; subst a; unfold Rdiv.
+    rewrite Rinv_mult_distr; [ | lra | easy ].
+    rewrite <- Rmult_assoc.
+    progress replace (k * x * / k) with (/ k * k * x) by lra.
+    rewrite Rinv_l; lra.
+
+    now do 3 rewrite Hx.
+
+   apply Rnot_le_lt in Hkn.
+   rewrite sqrt_Rsqr_abs in Ha.
+   unfold Rabs in Ha.
+   destruct (Rcase_abs k) as [H| H]; [ clear H | lra ].
+   assert (Hx : ∀ x, k * x / a = - (x / b)).
+    intros x; subst a; unfold Rdiv.
+    rewrite Rinv_mult_distr; [ | lra | easy ].
+    rewrite <- Rmult_assoc.
+    rewrite <- Ropp_inv_permute; [ | easy ].
+    progress replace (k * x * - / k) with (/ k * k * - x) by lra.
+    rewrite Rinv_l; lra.
+
+    do 3 rewrite Hx, <- Rsqr_neg.
+    f_equal; lra.
+Qed.
+
+Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
+Proof.
+intros * Hx.
+unfold Rsign.
+destruct (Rle_dec 0 x); [ easy | lra ].
+Qed.
+
+Theorem rotation_same_latitude : ∀ r p p₁ p₂ c s,
+  0 < r
+  → p ∈ sphere r
+  → p₁ ∈ sphere r
+  → p₂ ∈ sphere r
+  → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
+  → latitude p p₁ = latitude p p₂.
+Proof.
+intros * Hr Hp Hp₁ Hp₂ Hm.
+apply on_sphere_on_unit_sphere in Hp; [ | easy ].
+apply on_sphere_on_unit_sphere in Hp₁; [ | easy ].
+apply on_sphere_on_unit_sphere in Hp₂; [ | easy ].
+assert
+  (Hmm :
+     ((matrix_of_axis_angle (/ r ⁎ p, c, s) * (/ r ⁎ p₁))%vec = / r ⁎ p₂)).
+ rewrite matrix_mul_axis with (k := r); [ | lra ].
+ rewrite vec_const_mul_assoc.
+ rewrite Rinv_r; [ rewrite vec_const_mul_1_l | lra ].
+ rewrite Rsign_of_pos; [ rewrite Rmult_1_l | easy ].
+
+bbb.
+
+specialize
+  (sphere_1_rotation_same_latitude (/ r ⁎ p) (/ r ⁎ p₁) (/ r ⁎ p₂) c s Hp
+     Hp₁ Hp₂).
+Search matrix_of_axis_angle.
+
+bbb.
 
 Theorem latitude_norm : ∀ p p₁ v a,
   p ∈ sphere 1
@@ -2999,62 +3106,6 @@ assert (Hcs : c² + s² = 1).
    ring_simplify.
    replace (z₁ ^ 2) with (1 - x₁ ^ 2 - y₁ ^ 2) by lra.
    now rewrite Hxp; ring_simplify.
-Qed.
-
-Definition Rsign x := if Rle_dec 0 x then 1 else -1.
-
-Theorem matrix_mul_axis : ∀ p c s k,
-  k ≠ 0
-  → matrix_of_axis_angle (p, c, s) =
-    matrix_of_axis_angle (k ⁎ p, c, Rsign k * s).
-Proof.
-intros * Hk.
-destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
- subst p; simpl; rewrite Rmult_0_r.
- rewrite Rsqr_0; do 2 rewrite Rplus_0_l.
- rewrite Rdiv_0_l, Rsqr_0.
- now do 5 rewrite Rmult_0_l.
-
- destruct p as (xp, yp, zp); simpl.
- remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
- do 3 rewrite Rsqr_mult in Ha.
- do 2 rewrite <- Rmult_plus_distr_l in Ha.
- rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
- remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
- assert (Hbz : b ≠ 0).
-  subst b; intros H.
-  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-  apply sqr_vec_norm_eq_0 in H.
-  destruct H as (H1 & H2 & H3).
-  now rewrite H1, H2, H3 in Hpz.
-
-  unfold Rsign.
-  destruct (Rle_dec 0 k) as [Hkp| Hkn].
-   rewrite Rmult_1_l.
-   rewrite sqrt_Rsqr in Ha; [ | lra ].
-   assert (Hx : ∀ x, k * x / a = x / b).
-    intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult_distr; [ | lra | easy ].
-    rewrite <- Rmult_assoc.
-    progress replace (k * x * / k) with (/ k * k * x) by lra.
-    rewrite Rinv_l; lra.
-
-    now do 3 rewrite Hx.
-
-   apply Rnot_le_lt in Hkn.
-   rewrite sqrt_Rsqr_abs in Ha.
-   unfold Rabs in Ha.
-   destruct (Rcase_abs k) as [H| H]; [ clear H | lra ].
-   assert (Hx : ∀ x, k * x / a = - (x / b)).
-    intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult_distr; [ | lra | easy ].
-    rewrite <- Rmult_assoc.
-    rewrite <- Ropp_inv_permute; [ | easy ].
-    progress replace (k * x * - / k) with (/ k * k * - x) by lra.
-    rewrite Rinv_l; lra.
-
-    do 3 rewrite Hx, <- Rsqr_neg.
-    f_equal; lra.
 Qed.
 
 Theorem vec_cross_mul_cross_mul : ∀ u v,
@@ -3402,15 +3453,10 @@ Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
-assert (Hir : 0 < / r) by now apply Rinv_0_lt_compat.
 assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
- clear - Hir Hr; intros p Hp.
- apply on_sphere_norm in Hp; [ | lra ].
- apply on_sphere_norm; [ lra | ].
- rewrite vec_norm_vec_const_mul, Hp.
- rewrite Rabs_right; [ | lra ].
- rewrite Rinv_l; [ easy | lra ].
+ now intros q Hq; apply on_sphere_on_unit_sphere.
 
+ assert (Hir : 0 < / r) by now apply Rinv_0_lt_compat.
  rewrite <- latitude_mul with (k := / r) in Ha₁; [ | lra ].
  rewrite <- latitude_mul with (k := / r) in Ha₂; [ | lra ].
  assert (Hrppz : ((/ r ⁎ p₁) × (/ r ⁎ p₂) ≠ 0%vec)).
@@ -3787,6 +3833,7 @@ unfold rot_sin_cos.
 apply on_sphere_norm in Hp; [ | lra ].
 apply on_sphere_norm in Hp'; [ | lra ].
 rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
+Abort. (*
 bbb.
 
 unfold matrix_of_axis_angle in Hv.
@@ -3810,6 +3857,7 @@ do 2 rewrite Rdiv_1_r.
 f_equal.
 Focus 2.
 bbb.
+*)
 
 Theorem pouet : ∀ axis p p' r s c,
   0 < r
@@ -3822,20 +3870,7 @@ Theorem pouet : ∀ axis p p' r s c,
   → rot_sin_cos axis p p' = (s, c).
 Proof.
 intros * Hr Ha Hp Hp' Hpp Hcs Hv.
-destruct axis, p, p'; simpl in *.
-rewrite Ha in Hv.
-rewrite sqrt_Rsqr in Hv; [ | lra ].
-injection Hv; clear Hv; intros.
-unfold rot_sin_cos; simpl.
-rewrite Hp, Hp'.
-rewrite sqrt_Rsqr; [ | lra ].
-fold (Rsqr r).
-f_equal.
-Focus 2.
-apply Rmult_eq_reg_r with (r := r²).
-rewrite Rmult_div_same.
-
-bbb.
+Abort.
 
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₁ axis → ∃ n : ℕ, f n = acs.
@@ -3845,6 +3880,11 @@ apply surj_prod_4_nat_surj_nat.
 exists (J₁_of_nats axis).
 intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hpp & Hp & Hp' & Hv).
+assert (Hll : latitude axis p = latitude axis p').
+ eapply rotation_same_latitude.
+
+bbb.
+
 remember ‖axis‖ as r eqn:Hr.
 remember (matrix_of_axis_angle (axis, c, s)) as M eqn:HM.
 destruct Hp as ((el₀ & p₀ & (el & Hso) & Hn & Hp₀) & Hp).
