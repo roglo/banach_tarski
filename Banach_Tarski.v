@@ -3762,7 +3762,7 @@ Definition J₁ axis :=
      sinθ² + cosθ² = 1 ∧
      let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
      let r := ‖axis‖ in
-     ∃ p p', p × p' ≠ 0%vec ∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
+     ∃ p p', p ≠ p'∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
 Definition J₁_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
@@ -3777,7 +3777,7 @@ Theorem pouet : ∀ axis p p' r s c,
   axis ∈ sphere r
   → p ∈ sphere r
   → p' ∈ sphere r
-  → p × p' ≠ 0%vec
+  → p ≠ p'
   → s² + c² = 1
   → (matrix_of_axis_angle (axis, c, s) * p)%vec = p'
   → rot_sin_cos axis p p' = (s, c).
