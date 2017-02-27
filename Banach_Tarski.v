@@ -3773,8 +3773,31 @@ Definition J₁_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
   let p' := fold_right rotate p'₀ (path_of_nat no') in
   rot_sin_cos axis p p'.
 
+Theorem glop : ∀ axis p p' s c,
+  axis ∈ sphere 1
+  → p ∈ sphere 1
+  → p' ∈ sphere 1
+  → p ≠ p'
+  → s² + c² = 1
+  → (matrix_of_axis_angle (axis, c, s) * p)%vec = p'
+  → rot_sin_cos axis p p' = (s, c).
+Proof.
+intros * Ha Hp Hp' Hpp Hcs Hv.
+destruct axis, p, p'; simpl in *.
+rewrite Rsqr_1 in Ha, Hp, Hp'.
+rewrite Ha, sqrt_1 in Hv.
+do 3 rewrite Rdiv_1_r in Hv.
+injection Hv; clear Hv; intros.
+unfold rot_sin_cos; simpl.
+rewrite Hp, Hp', sqrt_1, Rmult_1_l.
+do 2 rewrite Rdiv_1_r.
+f_equal.
+Focus 2.
+bbb.
+
 Theorem pouet : ∀ axis p p' r s c,
-  axis ∈ sphere r
+  0 < r
+  → axis ∈ sphere r
   → p ∈ sphere r
   → p' ∈ sphere r
   → p ≠ p'
@@ -3782,7 +3805,20 @@ Theorem pouet : ∀ axis p p' r s c,
   → (matrix_of_axis_angle (axis, c, s) * p)%vec = p'
   → rot_sin_cos axis p p' = (s, c).
 Proof.
-intros * Ha Hp Hp' Hpp Hcs Hv.
+intros * Hr Ha Hp Hp' Hpp Hcs Hv.
+destruct axis, p, p'; simpl in *.
+rewrite Ha in Hv.
+rewrite sqrt_Rsqr in Hv; [ | lra ].
+injection Hv; clear Hv; intros.
+unfold rot_sin_cos; simpl.
+rewrite Hp, Hp'.
+rewrite sqrt_Rsqr; [ | lra ].
+fold (Rsqr r).
+f_equal.
+Focus 2.
+apply Rmult_eq_reg_r with (r := r²).
+rewrite Rmult_div_same.
+
 bbb.
 
 Theorem J₁_is_countable : ∀ axis,
