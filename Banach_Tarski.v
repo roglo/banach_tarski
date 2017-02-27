@@ -3783,6 +3783,22 @@ Theorem glop : ∀ axis p p' s c,
   → rot_sin_cos axis p p' = (s, c).
 Proof.
 intros * Ha Hp Hp' Hpp Hcs Hv.
+unfold rot_sin_cos.
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm in Hp'; [ | lra ].
+rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
+bbb.
+
+unfold matrix_of_axis_angle in Hv.
+destruct axis as (xa, ya, za).
+apply on_sphere_norm in Ha; [ | lra ].
+simpl in Ha; rewrite Ha in Hv.
+do 3 rewrite Rdiv_1_r in Hv.
+simpl in Hv.
+Search matrix_of_axis_angle.
+
+bbb.
+intros * Ha Hp Hp' Hpp Hcs Hv.
 destruct axis, p, p'; simpl in *.
 rewrite Rsqr_1 in Ha, Hp, Hp'.
 rewrite Ha, sqrt_1 in Hv.
