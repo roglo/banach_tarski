@@ -88,6 +88,7 @@ Arguments vec_const_mul _%R _%vec.
 
 Notation "0" := (V 0 0 0) : vec_scope.
 Notation "k ⁎ v" := (vec_const_mul k v) (at level 40).
+Notation "v ⁄ k" := (vec_const_mul (/ k) v) (at level 40).
 Notation "M * v" := (mat_vec_mul M v) : vec_scope.
 Notation "u + v" := (vec_add u v) : vec_scope.
 Notation "u - v" := (vec_sub u v) : vec_scope.

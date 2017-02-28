@@ -3954,6 +3954,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
       rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
 
       subst M; clear - Ha Haz Hcs Hpp Hr Hps Hps' Hll Hv.
+Check rot_same_latitude.
 bbb.
 (* 1/ prove that (matrix_of_axis_angle (axis, c, s), v) = v')
       where v = (p - a p)/√ (1 - a²), v' = (p - a p')/√ (1 - a²),
