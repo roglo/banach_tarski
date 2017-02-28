@@ -3819,6 +3819,7 @@ Definition J₁_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
   let p' := fold_right rotate p'₀ (path_of_nat no') in
   rot_sin_cos axis p p'.
 
+(*
 Theorem glop : ∀ axis p p' s c,
   axis ∈ sphere 1
   → p ∈ sphere 1
@@ -3833,7 +3834,6 @@ unfold rot_sin_cos.
 apply on_sphere_norm in Hp; [ | lra ].
 apply on_sphere_norm in Hp'; [ | lra ].
 rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
-Abort. (*
 bbb.
 
 unfold matrix_of_axis_angle in Hv.
@@ -3857,7 +3857,6 @@ do 2 rewrite Rdiv_1_r.
 f_equal.
 Focus 2.
 bbb.
-*)
 
 Theorem pouet : ∀ axis p p' r s c,
   0 < r
@@ -3871,6 +3870,7 @@ Theorem pouet : ∀ axis p p' r s c,
 Proof.
 intros * Hr Ha Hp Hp' Hpp Hcs Hv.
 Abort.
+*)
 
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₁ axis → ∃ n : ℕ, f n = acs.
