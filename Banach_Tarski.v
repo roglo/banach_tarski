@@ -3903,67 +3903,61 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
   enough (‖axis‖ ≠ 0) by lra.
   clear H; intros H.
   now apply vec_norm_eq_0 in H.
-bbb.
 
-remember ‖axis‖ as r eqn:Hr.
-remember (matrix_of_axis_angle (axis, c, s)) as M eqn:HM.
-destruct Hp as ((el₀ & p₀ & (el & Hso) & Hn & Hp₀) & Hp).
-destruct Hp' as ((el'₀ & p'₀ & (el' & Hso') & Hn' & Hp'₀) & Hp').
-move el'₀ before el₀; move el before el'₀; move el' before el.
-move p'₀ before p₀.
-move Hso' before Hso; move Hn' before Hn; move Hp'₀ before Hp₀.
-move Hp₀ after Hso; move Hp'₀ before Hp₀.
-assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
- rewrite <- Hso, <- Hso'; do 2 rewrite rotate_vec_mul.
- split.
- 1, 2 : apply on_sphere_after_rotation; [ easy | ].
- 1, 2 : apply mat_of_path_is_rotation_matrix.
+  remember ‖axis‖ as r eqn:Hr.
+  move r before c; move Hr before r.
+  remember (matrix_of_axis_angle (axis, c, s)) as M eqn:HM.
+  destruct Hpd as (el₀ & p₀ & (el & Hso) & Hn & Hp₀).
+  destruct Hpd' as (el'₀ & p'₀ & (el' & Hso') & Hn' & Hp'₀).
+  move el'₀ before el₀; move el before el'₀; move el' before el.
+  move p'₀ before p₀.
+  move Hso' before Hso; move Hn' before Hn; move Hp'₀ before Hp₀.
+  move Hp₀ after Hso; move Hp'₀ before Hp₀.
+  assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
+   rewrite <- Hso, <- Hso'; do 2 rewrite rotate_vec_mul.
+   split.
+   1, 2 : apply on_sphere_after_rotation; [ easy | ].
+   1, 2 : apply mat_of_path_is_rotation_matrix.
 
- destruct H as (Hp₀s, Hp'₀s).
- apply rotate_rev_path in Hso.
- apply rotate_rev_path in Hso'.
- remember (nat_of_path el₀) as nf eqn:Hnf.
- remember (nat_of_path (rev_path el)) as no eqn:Hno.
- remember (nat_of_path el'₀) as nf' eqn:Hnf'.
- remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
- move no before nf; move nf' before nf; move no' before no.
- unfold J₁_of_nats.
- exists nf, no, nf', no'.
- subst nf no nf' no'.
- unfold fixpoint_of_nat.
- do 4 rewrite path_of_nat_inv.
- rewrite <- Hr.
- rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
- remember (fixpoint_of_path r el₀) as q eqn:Hq.
- generalize Hq; intros Hpq.
- apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
-   try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
- destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
-  move Hpq at top; subst q; clear Hb.
-  rewrite rotate_vec_mul, Hso.
+   destruct H as (Hp₀s, Hp'₀s).
+   apply rotate_rev_path in Hso.
+   apply rotate_rev_path in Hso'.
+   remember (nat_of_path el₀) as nf eqn:Hnf.
+   remember (nat_of_path (rev_path el)) as no eqn:Hno.
+   remember (nat_of_path el'₀) as nf' eqn:Hnf'.
+   remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
+   move no before nf; move nf' before nf; move no' before no.
+   unfold J₁_of_nats.
+   exists nf, no, nf', no'.
+   subst nf no nf' no'.
+   unfold fixpoint_of_nat.
+   do 4 rewrite path_of_nat_inv.
+   rewrite <- Hr.
+   rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
+   remember (fixpoint_of_path r el₀) as q eqn:Hq.
+   generalize Hq; intros Hpq.
+   apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
+     try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
+   destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
+    move Hpq at top; subst q; clear Hb.
+    rewrite rotate_vec_mul, Hso.
+    remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
+    generalize Hq'; intros Hpq.
+    apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq;
+      try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
+    destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
+     move Hpq at top; subst q'; clear Hb.
+     rewrite rotate_vec_mul, Hso'.
+     assert (Ha : axis ∈ sphere r).
+      rewrite Hr.
+      destruct axis as (x, y, z); simpl.
+      rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
 
-  remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
-  generalize Hq'; intros Hpq.
-  apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq;
-    try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
-  destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
-   move Hpq at top; subst q'; clear Hb.
-   rewrite rotate_vec_mul, Hso'.
-assert (Ha : axis ∈ sphere r).
- rewrite Hr.
- destruct axis as (x, y, z); simpl.
- rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
-
- subst M; clear - Ha Hcs Hpp Hp Hp' Hv.
- move r after s; move Hcs before Hpp; move Ha after Hp.
- move Hpp after Hp'; move Hcs before Hv.
- move p before axis; move p' before axis.
-
-bbb.
-   unfold rot_sin_cos.
-   apply on_sphere_norm in Hp; [ | subst r; apply vec_norm_nonneg ].
-   apply on_sphere_norm in Hp'; [ | subst r; apply vec_norm_nonneg ].
-   rewrite Hp, Hp'.
+      subst M; clear - Ha Hcs Hpp Hr Hps Hps' Hll Hv.
+      unfold rot_sin_cos.
+      apply on_sphere_norm in Hps; [ | subst r; apply vec_norm_nonneg ].
+      apply on_sphere_norm in Hps'; [ | subst r; apply vec_norm_nonneg ].
+      rewrite Hps, Hps'.
 
 bbb.
 
