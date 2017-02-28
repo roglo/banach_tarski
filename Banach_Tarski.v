@@ -3161,6 +3161,202 @@ Definition rot_sin_cos p u v :=
   let c := (u · v) / (‖u‖ * ‖v‖) in
   (s, c).
 
+Theorem sphere_1_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
+  → a = latitude p p₁
+  → a = latitude p p₂
+  → a² < 1
+  → p₁ × p₂ ≠ 0%vec
+  → v₁ = (/ √ (1 - a²) ⁎ (p₁ - a ⁎ p))%vec
+  → v₂ = (/ √ (1 - a²) ⁎ (p₂ - a ⁎ p))%vec
+  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂
+  → (s, c) = rot_sin_cos p v₁ v₂.
+Proof.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
+bbb.
+
+unfold rot_sin_cos in Hcs.
+injection Hcs; clear Hcs; intros Hc Hs.
+assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
+ assert (H : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
+ eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
+ eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
+ rewrite Hv₁, Hv₂.
+ do 2 rewrite vec_norm_vec_const_mul.
+ rewrite Rabs_Rinv; [ | easy ].
+ rewrite Rabs_sqrt, Ha₁, Ha₂.
+ now rewrite Rinv_l.
+
+ rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r in Hs, Hc.
+ assert (Hvvp : (v₁ × v₂) × p = 0%vec).
+  rewrite vec_double_cross_mul, Hv₁, Hv₂.
+  remember (/ √ (1 - a²)) as b eqn:Hb.
+  do 2 rewrite <- Rmult_vec_dot_mul_distr_l.
+  do 2 rewrite vec_dot_mul_sub_distr_r.
+  rewrite Ha₁ at 1; rewrite Ha₂ at 2.
+  unfold latitude.
+  do 2 rewrite <- Rmult_vec_dot_mul_distr_l.
+  rewrite vec_dot_mul_diag.
+  apply on_sphere_norm in Hp; [ | lra ].
+  rewrite Hp, Rsqr_1.
+  do 2 rewrite Rmult_1_r.
+  apply on_sphere_norm in Hp₁; [ | lra ].
+  apply on_sphere_norm in Hp₂; [ | lra ].
+  rewrite Hp₁, Hp₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
+  rewrite vec_dot_mul_comm, Rminus_diag_eq; [ | easy ].
+  rewrite vec_dot_mul_comm, Rminus_diag_eq; [ | easy ].
+  rewrite Rmult_0_r.
+  do 2 rewrite vec_const_mul_0_l.
+  now rewrite vec_sub_0_r.
+
+  assert (Hpz : p ≠ 0%vec).
+   intros H; rewrite H in Hp; simpl in Hp.
+   rewrite Rsqr_0, Rsqr_1 in Hp; lra.
+
+   destruct (vec_eq_dec (v₁ × v₂) 0) as [Hvv| Hvv].
+    assert (Hpv : p · v₁ = 0).
+     rewrite Hv₁.
+     remember (/ √ (1 - a²)) as b eqn:Hb.
+     rewrite Ha₁; unfold latitude.
+     rewrite <- Rmult_vec_dot_mul_distr_r.
+     rewrite vec_dot_mul_sub_distr_l.
+     rewrite <- Rmult_vec_dot_mul_distr_r.
+     apply on_sphere_norm in Hp; [ | lra ].
+     apply on_sphere_norm in Hp₁; [ | lra ].
+     rewrite vec_dot_mul_diag, Hp, Hp₁, Rsqr_1.
+     rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
+     now rewrite Rminus_diag_eq, Rmult_0_r.
+
+     rewrite Hvv in Hs.
+     rewrite vec_norm_0, Rmult_0_r in Hs; subst s.
+     destruct p as (xp, yp, zp); simpl.
+     simpl in Hp; rewrite Rsqr_1 in Hp; rewrite Hp.
+     rewrite sqrt_1; do 3 rewrite Rdiv_1_r.
+     do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r.
+     specialize (vec_Lagrange_identity v₁ v₂) as Hli.
+     rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0, <- Hc in Hli.
+     apply Rminus_diag_uniq in Hli; symmetry in Hli.
+     replace 1 with 1² in Hli by apply Rsqr_1.
+     apply Rsqr_eq in Hli.
+     destruct Hli as [Hli| Hli]; rewrite Hli.
+      rewrite Rminus_diag_eq; [ | easy ].
+      do 6 rewrite Rmult_0_r.
+      rewrite Rplus_0_l; fold mat_id.
+      rewrite mat_vec_mul_id.
+      rewrite Hc in Hli.
+      clear - Hnv₁ Hnv₂ Hvv Hli.
+      destruct v₁ as (x₁, y₁, z₁).
+      destruct v₂ as (x₂, y₂, z₂).
+      simpl in Hnv₁, Hnv₂, Hvv, Hli.
+      apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+      apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+      rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+      injection Hvv; clear Hvv; intros H3 H2 H1.
+      f_equal; nsatz.
+
+      replace (1 - -1) with 2 by lra.
+      do 3 rewrite fold_Rminus.
+      assert (Hv₁₂ : v₂ = (-v₁)%vec).
+       rewrite Hc in Hli.
+       destruct v₁ as (x₁, y₁, z₁).
+       destruct v₂ as (x₂, y₂, z₂).
+       simpl in Hnv₁, Hnv₂, Hli.
+       apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+       unfold vec_opp.
+       clear - Hnv₁ Hnv₂ Hli.
+       assert (H : (x₁ + x₂)² + (y₁ + y₂)² + (z₁ + z₂)² = 0) by nsatz.
+       apply sqr_vec_norm_eq_0 in H.
+       f_equal; lra.
+
+       rewrite Hc in Hli.
+       destruct v₁ as (x₁, y₁, z₁).
+       destruct v₂ as (x₂, y₂, z₂).
+       simpl in Hnv₁, Hnv₂, Hvv, Hli, Hv₁₂.
+       injection Hv₁₂; clear Hv₁₂; intros Hz₂ Hy₂ Hx₂.
+       subst x₂ y₂ z₂.
+       apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+       clear Hvv Hli Hnv₂ Hvvp.
+       unfold Rsqr; simpl in Hpv; simpl.
+       rewrite Rmult_minus_distr_r, Rmult_1_l.
+       f_equal; nsatz.
+
+    apply vec_cross_mul_eq_0 in Hvvp; [ | easy | easy ].
+    destruct Hvvp as (d & e & Hd & He & Hde).
+    apply vec_add_move_l in Hde.
+    rewrite vec_sub_0_l in Hde.
+    rewrite vec_opp_const_mul_distr_l in Hde.
+    apply vec_const_mul_div in Hde; [ | easy ].
+    unfold latitude in Ha₁, Ha₂.
+    remember (- d / e) as k eqn:Hk.
+    assert (Hkz : k ≠ 0).
+     intros H; rewrite H in Hde.
+     now rewrite vec_const_mul_0_l in Hde.
+
+     assert (Hikz : / k ≠ 0) by now apply Rinv_neq_0_compat.
+     destruct (Rle_dec 0 k) as [Hkp| Hkn].
+      rewrite matrix_mul_axis with (k := / k); [ | easy ].
+      apply (f_equal (vec_const_mul (/ k))) in Hde.
+      rewrite vec_const_mul_assoc in Hde.
+      rewrite Rinv_l in Hde; [ | easy ].
+      rewrite vec_const_mul_1_l in Hde.
+      apply rotate_matrix_of_two_vectors; try assumption.
+       intros H.
+       apply eq_vec_const_mul_0 in H.
+       destruct H as [H| H]; [ | easy ].
+       now apply Rinv_neq_0_compat in H.
+
+       unfold Rsign.
+       destruct (Rle_dec 0 (/ k)) as [Hik| Hik].
+        rewrite Rmult_1_l, Hs, <- Hde.
+        rewrite <- Rmult_vec_dot_mul_distr_r.
+        unfold Rsign.
+        destruct (Rle_dec 0 (/ k * p²%vec)) as [H| H].
+         now rewrite Rmult_1_l.
+
+         exfalso; apply H.
+         rewrite vec_dot_mul_diag.
+         apply Rmult_le_pos; [ easy | apply Rle_0_sqr ].
+
+        exfalso; apply Hik, Rlt_le.
+        apply Rinv_0_lt_compat; lra.
+
+      apply Rnot_le_lt in Hkn.
+      rewrite matrix_mul_axis with (k := / k); [ | easy ].
+      apply (f_equal (vec_const_mul (/ k))) in Hde.
+      rewrite vec_const_mul_assoc in Hde.
+      rewrite Rinv_l in Hde; [ | easy ].
+      rewrite vec_const_mul_1_l in Hde.
+      apply rotate_matrix_of_two_vectors; try assumption.
+       intros H.
+       apply eq_vec_const_mul_0 in H.
+       destruct H as [H| H]; [ | easy ].
+       now apply Rinv_neq_0_compat in H.
+
+       unfold Rsign.
+       destruct (Rle_dec 0 (/ k)) as [Hik| Hik].
+        apply Rle_not_lt in Hik.
+        exfalso; apply Hik.
+        now apply Rinv_lt_0_compat.
+
+        rewrite Hs, <- Hde.
+        rewrite <- Rmult_vec_dot_mul_distr_r.
+        unfold Rsign.
+        destruct (Rle_dec 0 (/ k * p²%vec)) as [H| H]; [ | lra ].
+        exfalso.
+        apply Rnot_le_lt in Hik.
+        apply Rmult_lt_compat_r with (r := p²%vec) in Hik; [ lra | ].
+        rewrite vec_dot_mul_diag.
+        apply Rlt_0_sqr.
+        now intros H1; apply vec_norm_eq_0 in H1.
+Qed.
+bbb.
+
 Theorem sphere_1_rot_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -3352,7 +3548,6 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
         rewrite vec_dot_mul_diag.
         apply Rlt_0_sqr.
         now intros H1; apply vec_norm_eq_0 in H1.
-
 Qed.
 
 Theorem Rsign_mul_pos_l : ∀ x y, 0 < x → Rsign (x * y) = Rsign y.
