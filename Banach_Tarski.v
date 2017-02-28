@@ -3953,11 +3953,26 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
       destruct axis as (x, y, z); simpl.
       rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
 
-      subst M; clear - Ha Hcs Hpp Hr Hps Hps' Hll Hv.
+      subst M; clear - Ha Haz Hcs Hpp Hr Hps Hps' Hll Hv.
+bbb.
+(* 1/ prove that (matrix_of_axis_angle (axis, c, s), v) = v')
+      where v = (p - a p)/√ (1 - a²), v' = (p - a p')/√ (1 - a²),
+      and a = latitude axis p. See rot_same_latitude, but à l'envers
+*)
       unfold rot_sin_cos.
       apply on_sphere_norm in Hps; [ | subst r; apply vec_norm_nonneg ].
       apply on_sphere_norm in Hps'; [ | subst r; apply vec_norm_nonneg ].
       rewrite Hps, Hps'.
+      unfold latitude in Hll.
+      rewrite Hps, Hps', <- Hr in Hll.
+      apply Rmult_eq_compat_r with (r := r * r) in Hll.
+      symmetry in Hr.
+      assert (Hrr : r * r ≠ 0).
+       intros H; apply Rsqr_eq_0 in H; rewrite H in Hr.
+       now apply vec_norm_eq_0 in Hr.
+
+       rewrite Rmult_div_same in Hll; [ | easy ].
+       rewrite Rmult_div_same in Hll; [ | easy ].
 
 bbb.
 
