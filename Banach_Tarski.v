@@ -3169,16 +3169,13 @@ Theorem sphere_1_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   → a = latitude p p₂
   → a² < 1
   → p₁ × p₂ ≠ 0%vec
-  → v₁ = (/ √ (1 - a²) ⁎ (p₁ - a ⁎ p))%vec
-  → v₂ = (/ √ (1 - a²) ⁎ (p₂ - a ⁎ p))%vec
+  → v₁ = (p₁ - a ⁎ p) ⁄ √ (1 - a²)
+  → v₂ = (p₂ - a ⁎ p) ⁄ √ (1 - a²)
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂
   → (s, c) = rot_sin_cos p v₁ v₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
-bbb.
-
-unfold rot_sin_cos in Hcs.
-injection Hcs; clear Hcs; intros Hc Hs.
+unfold rot_sin_cos.
 assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
  assert (H : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
  eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
@@ -3189,7 +3186,7 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
- rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r in Hs, Hc.
+ rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r.
  assert (Hvvp : (v₁ × v₂) × p = 0%vec).
   rewrite vec_double_cross_mul, Hv₁, Hv₂.
   remember (/ √ (1 - a²)) as b eqn:Hb.
@@ -3229,12 +3226,13 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
      rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
      now rewrite Rminus_diag_eq, Rmult_0_r.
 
-     rewrite Hvv in Hs.
-     rewrite vec_norm_0, Rmult_0_r in Hs; subst s.
+     rewrite Hvv.
+     rewrite vec_norm_0, Rmult_0_r, Rdiv_1_r.
      destruct p as (xp, yp, zp); simpl.
-     simpl in Hp; rewrite Rsqr_1 in Hp; rewrite Hp.
-     rewrite sqrt_1; do 3 rewrite Rdiv_1_r.
-     do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r.
+     simpl in Hp, Hcs; rewrite Rsqr_1 in Hp; rewrite Hp in Hcs.
+     rewrite sqrt_1 in Hcs; do 3 rewrite Rdiv_1_r in Hcs.
+bbb.
+     do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r in Hcs.
      specialize (vec_Lagrange_identity v₁ v₂) as Hli.
      rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0, <- Hc in Hli.
      apply Rminus_diag_uniq in Hli; symmetry in Hli.
