@@ -2846,7 +2846,7 @@ Qed.
    equal to the dot product and between -1 and 1. *)
 Definition latitude p p₁ := (p · p₁) / (‖p‖ * ‖p₁‖).
 
-Theorem sphere_1_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
+Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
@@ -3003,7 +3003,7 @@ assert
 
  assert (Hir : / r ≠ 0) by (apply Rinv_neq_0_compat; lra).
  specialize
-   (sphere_1_rotation_implies_same_latitude (/ r ⁎ p) (/ r ⁎ p₁) (/ r ⁎ p₂) c
+   (unit_sphere_rotation_implies_same_latitude (/ r ⁎ p) (/ r ⁎ p₁) (/ r ⁎ p₂) c
       s Hp Hp₁ Hp₂ Hmm) as Hll.
  now do 2 rewrite latitude_mul in Hll.
 Qed.
@@ -3156,12 +3156,30 @@ f_equal; ring_simplify.
  do 2 rewrite <- Rsqr_pow2; nsatz.
 Qed.
 
+Theorem unit_sphere_eigenvalue_minus_1_angle_π : ∀ axis sinθ cosθ v,
+  axis ∈ sphere 1
+  → v ∈ sphere 1
+  → (matrix_of_axis_angle (axis, cosθ, sinθ) * v)%vec = (- v)%vec
+  → (sinθ, cosθ) = (0, -1).
+Proof.
+intros * Ha Hv Hmv.
+destruct axis as (xa, ya, za).
+destruct v as (x, y, z).
+simpl in *.
+rewrite Rsqr_1 in Ha, Hv.
+rewrite Ha, sqrt_1 in Hmv.
+do 3 rewrite Rdiv_1_r in Hmv.
+injection Hmv; clear Hmv; intros H3 H2 H1.
+unfold Rsqr in *.
+f_equal; nsatz.
+Qed.
+
 Definition rot_sin_cos p u v :=
   let s := Rsign (p · (u × v)) * ‖(u × v)‖ / (‖u‖ * ‖v‖) in
   let c := (u · v) / (‖u‖ * ‖v‖) in
   (s, c).
 
-Theorem sphere_1_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
+Theorem unit_sphere_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
@@ -3276,54 +3294,7 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
        move Hv₁₂ at top; subst v₂.
        clear - Hp Hnv₁ Hmv.
        apply on_sphere_norm in Hnv₁; [ | lra ].
-(* should be enough: if there is an eigenvalue of -1, it must be
-   a rotation of π, therefore sin = 0 and cos = -1. *)
-       (* lemma to write *)
-destruct p as (xp, yp, zp).
-destruct v₁ as (x₁, y₁, z₁).
-simpl in *.
-rewrite Rsqr_1 in Hp, Hnv₁.
-rewrite Hp, sqrt_1 in Hmv.
-do 3 rewrite Rdiv_1_r in Hmv.
-injection Hmv; clear Hmv; intros H3 H2 H1.
-unfold Rsqr in *.
-f_equal; nsatz.
-(* it works! to do: cleaning it up by a lemma *)
-
-bbb.
-
-       destruct v₁ as (x₁, y₁, z₁).
-       destruct v₂ as (x₂, y₂, z₂).
-       simpl in Hnv₁, Hnv₂, Hvv, Hli, Hv₁₂.
-       injection Hv₁₂; clear Hv₁₂; intros Hz₂ Hy₂ Hx₂.
-       subst x₂ y₂ z₂.
-fold (vec_opp (V x₁ y₁ z₁)) in Hmv.
-bbb.
-       apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
-       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
-       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
-       clear Hvv Hli Hnv₂ Hvvp.
-       fold (vec_opp (V x₁ y₁ z₁)) in Hv₂.
-       rewrite Hv₁ in Hv₂.
-       rewrite vec_opp_const_mul_distr_r in Hv₂.
-       apply vec_const_mul_eq_reg_l in Hv₂.
-        rewrite vec_opp_sub_distr in Hv₂.
-        apply (f_equal (λ u, (u + a ⁎ V xp yp zp)%vec)) in Hv₂.
-        rewrite <- vec_sub_sub_distr, vec_sub_diag, vec_sub_0_r in Hv₂.
-        rewrite <- vec_add_assoc in Hv₂.
-        rewrite vec_add_diag in Hv₂.
-        rewrite vec_const_mul_assoc in Hv₂.
-        apply (f_equal (λ u, (p₁ + u)%vec)) in Hv₂.
-        rewrite vec_add_assoc in Hv₂.
-        rewrite vec_add_opp_diag_r, vec_add_0_l in Hv₂.
-(* p₁ + p₂ = 2ap seems to show the the angle rotation is π;
-   v₁ is on the equator (which is normal), but its norm is 1,
-   therefore on the sphere; this should imply that p₁ is also
-   on the equator. *)
-bbb.
-       unfold Rsqr; simpl in Hpv; simpl.
-       rewrite Rmult_minus_distr_r, Rmult_1_l.
-       f_equal; nsatz.
+       now apply unit_sphere_eigenvalue_minus_1_angle_π in Hmv.
 
     apply vec_cross_mul_eq_0 in Hvvp; [ | easy | easy ].
     destruct Hvvp as (d & e & Hd & He & Hde).
@@ -3339,6 +3310,7 @@ bbb.
 
      assert (Hikz : / k ≠ 0) by now apply Rinv_neq_0_compat.
      destruct (Rle_dec 0 k) as [Hkp| Hkn].
+bbb.
       rewrite matrix_mul_axis with (k := / k); [ | easy ].
       apply (f_equal (vec_const_mul (/ k))) in Hde.
       rewrite vec_const_mul_assoc in Hde.
@@ -3396,7 +3368,7 @@ bbb.
 Qed.
 bbb.
 
-Theorem sphere_1_rot_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
+Theorem unit_sphere_rot_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
@@ -3721,7 +3693,7 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
 
    rewrite <- rot_sin_cos_mul with (k := / r) in Hcs; [ | easy ].
    specialize
-     (sphere_1_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
+     (unit_sphere_rot_same_latitude (/ r ⁎ p) (/r ⁎ p₁) (/ r ⁎ p₂)
         (/ r ⁎ v₁) (/ r ⁎ v₂) a c s (Hrp p Hp) (Hrp p₁ Hp₁)
         (Hrp p₂ Hp₂) Ha₁ Ha₂ Ha2 Hrppz (Hrv v₁ p₁ Hv₁) (Hrv v₂ p₂ Hv₂)
         Hcs) as Hsl.
