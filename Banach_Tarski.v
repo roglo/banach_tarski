@@ -3274,11 +3274,22 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
        f_equal; lra.
 
        move Hv₁₂ at top; subst v₂.
-       clear Hvvp Hvv Hli.
-       clear - Hmv Hnv₁.
+       clear - Hp Hnv₁ Hmv.
+       apply on_sphere_norm in Hnv₁; [ | lra ].
 (* should be enough: if there is an eigenvalue of -1, it must be
    a rotation of π, therefore sin = 0 and cos = -1. *)
-(* lemma to write *)
+       (* lemma to write *)
+destruct p as (xp, yp, zp).
+destruct v₁ as (x₁, y₁, z₁).
+simpl in *.
+rewrite Rsqr_1 in Hp, Hnv₁.
+rewrite Hp, sqrt_1 in Hmv.
+do 3 rewrite Rdiv_1_r in Hmv.
+injection Hmv; clear Hmv; intros H3 H2 H1.
+unfold Rsqr in *.
+f_equal; nsatz.
+(* it works! to do: cleaning it up by a lemma *)
+
 bbb.
 
        destruct v₁ as (x₁, y₁, z₁).
