@@ -3248,6 +3248,24 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
       rewrite Hc in Hli.
       clear - Hnv₁ Hnv₂ Hvv Hli.
 *)
+      assert (Hevv : v₁ = v₂).
+       clear - Hnv₁ Hnv₂ Hli Hvv.
+       destruct v₁ as (x₁, y₁, z₁).
+       destruct v₂ as (x₂, y₂, z₂).
+       simpl in *.
+       apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
+       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
+       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
+       unfold Rsqr in Hnv₁, Hnv₂.
+       injection Hvv; clear Hvv; intros H3 H2 H1.
+       f_equal; nsatz.
+
+       move Hevv at top; subst v₂; rename v₁ into v.
+       clear Hnv₂ Hvv.
+(* by Hv₁ and Hv₂, we may have p₁ = p₂.
+   If true, then contradiction with Hppz. *)
+bbb.
+
       destruct v₁ as (x₁, y₁, z₁).
       destruct v₂ as (x₂, y₂, z₂).
       simpl in Hnv₁, Hnv₂, Hvv, Hli.
