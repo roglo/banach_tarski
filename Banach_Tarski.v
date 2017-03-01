@@ -3240,14 +3240,6 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
      replace 1 with 1² in Hli by apply Rsqr_1.
      apply Rsqr_eq in Hli.
      destruct Hli as [Hli| Hli]; rewrite Hli.
-(*
-      rewrite Rminus_diag_eq; [ | easy ].
-      do 6 rewrite Rmult_0_r.
-      rewrite Rplus_0_l; fold mat_id.
-      rewrite mat_vec_mul_id.
-      rewrite Hc in Hli.
-      clear - Hnv₁ Hnv₂ Hvv Hli.
-*)
       assert (Hevv : v₁ = v₂).
        clear - Hnv₁ Hnv₂ Hli Hvv.
        destruct v₁ as (x₁, y₁, z₁).
@@ -3262,24 +3254,16 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
 
        move Hevv at top; subst v₂; rename v₁ into v.
        clear Hnv₂ Hvv.
-(* by Hv₁ and Hv₂, we may have p₁ = p₂.
-   If true, then contradiction with Hppz. *)
-bbb.
+       rewrite Hv₁ in Hv₂.
+       apply vec_const_mul_eq_reg_l in Hv₂.
+        apply vec_sub_cancel_r in Hv₂.
+        move Hv₂ at top; subst p₂; rename p₁ into p.
+        now rewrite vec_cross_mul_diag in Hppz.
 
-      destruct v₁ as (x₁, y₁, z₁).
-      destruct v₂ as (x₂, y₂, z₂).
-      simpl in Hnv₁, Hnv₂, Hvv, Hli.
-      apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
-      apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
-      rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
-      injection Hvv; clear Hvv; intros H3 H2 H1.
-bbb.
-      f_equal; nsatz.
+        apply Rinv_neq_0_compat.
+        intros H; apply sqrt_eq_0 in H; lra.
 
-      replace (1 - -1) with 2 by lra.
-      do 3 rewrite fold_Rminus.
       assert (Hv₁₂ : v₂ = (-v₁)%vec).
-       rewrite Hc in Hli.
        destruct v₁ as (x₁, y₁, z₁).
        destruct v₂ as (x₂, y₂, z₂).
        simpl in Hnv₁, Hnv₂, Hli.
@@ -3292,7 +3276,6 @@ bbb.
        apply sqr_vec_norm_eq_0 in H.
        f_equal; lra.
 
-       rewrite Hc in Hli.
        destruct v₁ as (x₁, y₁, z₁).
        destruct v₂ as (x₂, y₂, z₂).
        simpl in Hnv₁, Hnv₂, Hvv, Hli, Hv₁₂.
@@ -3302,6 +3285,12 @@ bbb.
        apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
        rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
        clear Hvv Hli Hnv₂ Hvvp.
+       fold (vec_opp (V x₁ y₁ z₁)) in Hv₂.
+       rewrite Hv₁ in Hv₂.
+       rewrite vec_opp_const_mul_distr_r in Hv₂.
+       apply vec_const_mul_eq_reg_l in Hv₂.
+assert (p₂ - p₁ = 2 * a ⁎ (V xp yp zp))%vec.
+bbb.
        unfold Rsqr; simpl in Hpv; simpl.
        rewrite Rmult_minus_distr_r, Rmult_1_l.
        f_equal; nsatz.
