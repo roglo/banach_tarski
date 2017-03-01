@@ -3174,7 +3174,7 @@ Theorem sphere_1_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂
   → (s, c) = rot_sin_cos p v₁ v₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hmv.
 unfold rot_sin_cos.
 assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
  assert (H : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
@@ -3229,22 +3229,25 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
      rewrite Hvv.
      rewrite vec_norm_0, Rmult_0_r, Rdiv_1_r.
      destruct p as (xp, yp, zp); simpl.
-     simpl in Hp, Hcs; rewrite Rsqr_1 in Hp; rewrite Hp in Hcs.
-     rewrite sqrt_1 in Hcs; do 3 rewrite Rdiv_1_r in Hcs.
-bbb.
+     simpl in Hp, Hmv; rewrite Rsqr_1 in Hp; rewrite Hp in Hmv.
+     rewrite sqrt_1 in Hmv; do 3 rewrite Rdiv_1_r in Hmv.
+(*
      do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r in Hcs.
+*)
      specialize (vec_Lagrange_identity v₁ v₂) as Hli.
-     rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0, <- Hc in Hli.
+     rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0 (*, <- Hc*) in Hli.
      apply Rminus_diag_uniq in Hli; symmetry in Hli.
      replace 1 with 1² in Hli by apply Rsqr_1.
      apply Rsqr_eq in Hli.
      destruct Hli as [Hli| Hli]; rewrite Hli.
+(*
       rewrite Rminus_diag_eq; [ | easy ].
       do 6 rewrite Rmult_0_r.
       rewrite Rplus_0_l; fold mat_id.
       rewrite mat_vec_mul_id.
       rewrite Hc in Hli.
       clear - Hnv₁ Hnv₂ Hvv Hli.
+*)
       destruct v₁ as (x₁, y₁, z₁).
       destruct v₂ as (x₂, y₂, z₂).
       simpl in Hnv₁, Hnv₂, Hvv, Hli.
@@ -3252,6 +3255,7 @@ bbb.
       apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
       rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
       injection Hvv; clear Hvv; intros H3 H2 H1.
+bbb.
       f_equal; nsatz.
 
       replace (1 - -1) with 2 by lra.
