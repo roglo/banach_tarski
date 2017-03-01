@@ -865,6 +865,9 @@ Proof.
 intros (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
+Theorem vec_add_diag : ∀ v, (v + v = 2 ⁎ v)%vec.
+Proof. intros (x, y, z); simpl. f_equal; lra. Qed.
+
 Theorem vec_sub_diag : ∀ v, (v - v = 0)%vec.
 intros (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.

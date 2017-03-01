@@ -3289,7 +3289,15 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
        rewrite Hv₁ in Hv₂.
        rewrite vec_opp_const_mul_distr_r in Hv₂.
        apply vec_const_mul_eq_reg_l in Hv₂.
-assert (p₂ - p₁ = 2 * a ⁎ (V xp yp zp))%vec.
+        rewrite vec_opp_sub_distr in Hv₂.
+        apply (f_equal (λ u, (u + a ⁎ V xp yp zp)%vec)) in Hv₂.
+        rewrite <- vec_sub_sub_distr, vec_sub_diag, vec_sub_0_r in Hv₂.
+        rewrite <- vec_add_assoc in Hv₂.
+        rewrite vec_add_diag in Hv₂.
+        rewrite vec_const_mul_assoc in Hv₂.
+        apply (f_equal (λ u, (p₁ + u)%vec)) in Hv₂.
+        rewrite vec_add_assoc in Hv₂.
+        rewrite vec_add_opp_diag_r, vec_add_0_l in Hv₂.
 bbb.
        unfold Rsqr; simpl in Hpv; simpl.
        rewrite Rmult_minus_distr_r, Rmult_1_l.
