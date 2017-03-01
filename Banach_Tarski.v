@@ -3310,8 +3310,21 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
 
      assert (Hikz : / k ≠ 0) by now apply Rinv_neq_0_compat.
      destruct (Rle_dec 0 k) as [Hkp| Hkn].
+(**)
+apply (f_equal (vec_const_mul (/ k))) in Hde.
+rewrite vec_const_mul_assoc in Hde.
+rewrite Rinv_l in Hde; [ | easy ].
+rewrite vec_const_mul_1_l in Hde; rewrite <- Hde.
+rewrite <- Rmult_vec_dot_mul_distr_r.
+unfold Rsign.
+destruct (Rle_dec 0 (/ k * p²%vec)) as [H| H].
+ rewrite Rmult_1_l, Rdiv_1_r.
+ rewrite vec_norm_vec_const_mul.
+ apply on_sphere_norm in Hp; [ | lra ].
+ rewrite Hp, Rmult_1_r.
+
 bbb.
-      rewrite matrix_mul_axis with (k := / k); [ | easy ].
+     rewrite matrix_mul_axis with (k := / k) in Hmv; [ | easy ].
       apply (f_equal (vec_const_mul (/ k))) in Hde.
       rewrite vec_const_mul_assoc in Hde.
       rewrite Rinv_l in Hde; [ | easy ].
