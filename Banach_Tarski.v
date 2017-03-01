@@ -3226,20 +3226,17 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
      rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
      now rewrite Rminus_diag_eq, Rmult_0_r.
 
-     rewrite Hvv.
-     rewrite vec_norm_0, Rmult_0_r, Rdiv_1_r.
-     destruct p as (xp, yp, zp); simpl.
-     simpl in Hp, Hmv; rewrite Rsqr_1 in Hp; rewrite Hp in Hmv.
-     rewrite sqrt_1 in Hmv; do 3 rewrite Rdiv_1_r in Hmv.
-(*
-     do 3 rewrite Rmult_0_r, Rplus_0_r, Rminus_0_r in Hcs.
-*)
      specialize (vec_Lagrange_identity v₁ v₂) as Hli.
      rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0 (*, <- Hc*) in Hli.
      apply Rminus_diag_uniq in Hli; symmetry in Hli.
      replace 1 with 1² in Hli by apply Rsqr_1.
      apply Rsqr_eq in Hli.
+     rewrite Hvv.
+     rewrite vec_norm_0, Rmult_0_r, Rdiv_1_r.
      destruct Hli as [Hli| Hli]; rewrite Hli.
+      destruct p as (xp, yp, zp); simpl.
+      simpl in Hp, Hmv; rewrite Rsqr_1 in Hp; rewrite Hp in Hmv.
+      rewrite sqrt_1 in Hmv; do 3 rewrite Rdiv_1_r in Hmv.
       assert (Hevv : v₁ = v₂).
        clear - Hnv₁ Hnv₂ Hli Hvv.
        destruct v₁ as (x₁, y₁, z₁).
@@ -3276,11 +3273,21 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
        apply sqr_vec_norm_eq_0 in H.
        f_equal; lra.
 
+       move Hv₁₂ at top; subst v₂.
+       clear Hvvp Hvv Hli.
+       clear - Hmv Hnv₁.
+(* should be enough: if there is an eigenvalue of -1, it must be
+   a rotation of π, therefore sin = 0 and cos = -1. *)
+(* lemma to write *)
+bbb.
+
        destruct v₁ as (x₁, y₁, z₁).
        destruct v₂ as (x₂, y₂, z₂).
        simpl in Hnv₁, Hnv₂, Hvv, Hli, Hv₁₂.
        injection Hv₁₂; clear Hv₁₂; intros Hz₂ Hy₂ Hx₂.
        subst x₂ y₂ z₂.
+fold (vec_opp (V x₁ y₁ z₁)) in Hmv.
+bbb.
        apply sqrt_lem_0 in Hnv₁; [ | apply nonneg_sqr_vec_norm | lra ].
        apply sqrt_lem_0 in Hnv₂; [ | apply nonneg_sqr_vec_norm | lra ].
        rewrite Rmult_1_r in Hnv₁, Hnv₂; symmetry in Hnv₁, Hnv₂.
@@ -3298,6 +3305,10 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
         apply (f_equal (λ u, (p₁ + u)%vec)) in Hv₂.
         rewrite vec_add_assoc in Hv₂.
         rewrite vec_add_opp_diag_r, vec_add_0_l in Hv₂.
+(* p₁ + p₂ = 2ap seems to show the the angle rotation is π;
+   v₁ is on the equator (which is normal), but its norm is 1,
+   therefore on the sphere; this should imply that p₁ is also
+   on the equator. *)
 bbb.
        unfold Rsqr; simpl in Hpv; simpl.
        rewrite Rmult_minus_distr_r, Rmult_1_l.
