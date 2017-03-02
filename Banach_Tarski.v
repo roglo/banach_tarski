@@ -3296,6 +3296,9 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
        apply on_sphere_norm in Hnv₁; [ | lra ].
        now apply unit_sphere_eigenvalue_minus_1_angle_π in Hmv.
 
+    clear Hvvp.
+(* did I have to divide v₁ and v₂ by √ (1 - a²)? Perhaps not! It make
+   them on the unit sphere but is it required? *)
 bbb.
 (* vec_cross_mul_eq_0 is not satisfactory: it should give the
    expression values of d and e instead of ∃ *)
@@ -3383,6 +3386,7 @@ bbb.
         now intros H1; apply vec_norm_eq_0 in H1.
 Qed.
 bbb.
+*)
 
 Theorem unit_sphere_rot_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
@@ -4033,6 +4037,11 @@ Definition J₁ axis :=
      ∃ p p', p ≠ p'∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
+bbb.
+(* mmm... not sure of this function: I think that rot_sin_cos must not
+   be applied to p and p' but to v and v' such that v = p - lat.axis and
+   v = p' - lat.axis where lat is the (common) latitude of p and p':
+   therefore should be fixed *)
 Definition J₁_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
   let r := ‖axis‖ in
   let p₀ := fixpoint_of_nat r nf in
@@ -4176,6 +4185,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
       rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
 
       subst M; clear - Ha Haz Hcs Hpp Hr Hps Hps' Hll Hv.
+unfold rot_sin_cos.
 Check rot_same_latitude.
 bbb.
 (* 1/ prove that (matrix_of_axis_angle (axis, c, s), v) = v')
