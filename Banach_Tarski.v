@@ -3289,7 +3289,7 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
         apply Rinv_neq_0_compat.
         intros H; apply sqrt_eq_0 in H; lra.
 
-      assert (Hv₁₂ : v'₂ = (-v'₁)%vec).
+      assert (Hv'₁₂ : v'₂ = (-v'₁)%vec).
        destruct v'₁ as (x₁, y₁, z₁).
        destruct v'₂ as (x₂, y₂, z₂).
        simpl in Hnv₁, Hnv₂, Hli.
@@ -3302,11 +3302,14 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
        apply sqr_vec_norm_eq_0 in H.
        f_equal; lra.
 
-       move Hv₁₂ at top; subst v₂.
-bbb.
-       clear - Hp Hnv₁ Hmv.
+       move Hv'₁₂ at top; subst v'₂.
+       rewrite Hv'₁ in Hv'₂.
+       rewrite vec_opp_const_mul_distr_r in Hv'₂.
+       apply vec_const_mul_eq_reg_l in Hv'₂.
        apply on_sphere_norm in Hnv₁; [ | lra ].
-       now apply unit_sphere_eigenvalue_minus_1_angle_π in Hmv.
+       move Hv'₂ at top; subst v₂.
+bbb.
+       apply unit_sphere_eigenvalue_minus_1_angle_π in Hmv.
 
     clear Hvvp.
 (* did I have to divide v₁ and v₂ by √ (1 - a²)? Perhaps not! It make
