@@ -3296,10 +3296,7 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
        apply on_sphere_norm in Hnv₁; [ | lra ].
        now apply unit_sphere_eigenvalue_minus_1_angle_π in Hmv.
 
-    rewrite vec_double_cross_mul in Hvvp.
-Search (_ - _ = 0)%vec.
 bbb.
-Check vec_cross_mul_eq_0.
 (* vec_cross_mul_eq_0 is not satisfactory: it should give the
    expression values of d and e instead of ∃ *)
     apply vec_cross_mul_eq_0 in Hvvp; [ | easy | easy ].
