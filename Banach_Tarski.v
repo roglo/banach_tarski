@@ -3204,7 +3204,7 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
- rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r.
+ rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
  assert (Hvvp : (v₁ × v₂) × p = 0%vec).
   rewrite vec_double_cross_mul, Hv₁, Hv₂.
   remember (/ √ (1 - a²)) as b eqn:Hb.
@@ -3250,7 +3250,7 @@ assert (‖v₁‖ = 1 ∧ ‖v₂‖ = 1) as (Hnv₁, Hnv₂).
      replace 1 with 1² in Hli by apply Rsqr_1.
      apply Rsqr_eq in Hli.
      rewrite Hvv.
-     rewrite vec_norm_0, Rmult_0_r, Rdiv_1_r.
+     rewrite vec_norm_0, Rmult_0_r.
      destruct Hli as [Hli| Hli]; rewrite Hli.
       destruct p as (xp, yp, zp); simpl.
       simpl in Hp, Hmv; rewrite Rsqr_1 in Hp; rewrite Hp in Hmv.
