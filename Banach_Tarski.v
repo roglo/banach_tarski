@@ -3306,14 +3306,18 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
        rewrite Hv'₁ in Hv'₂.
        rewrite vec_opp_const_mul_distr_r in Hv'₂.
        apply vec_const_mul_eq_reg_l in Hv'₂.
-       apply on_sphere_norm in Hnv₁; [ | lra ].
-       move Hv'₂ at top; subst v₂.
-bbb.
-       apply unit_sphere_eigenvalue_minus_1_angle_π in Hmv.
+        apply on_sphere_norm in Hnv₁; [ | lra ].
+        move Hv'₂ at top; subst v₂.
+        apply (f_equal (λ u, u ⁄ √ (1 - a²))) in Hmv.
+        rewrite <- mat_vec_mul_const_distr in Hmv.
+        rewrite <- vec_opp_const_mul_distr_r in Hmv.
+        rewrite <- Hv'₁ in Hmv.
+        now apply unit_sphere_eigenvalue_minus_1_angle_π in Hmv.
+
+        apply Rinv_neq_0_compat.
+        intros H; apply sqrt_eq_0 in H; lra.
 
     clear Hvvp.
-(* did I have to divide v₁ and v₂ by √ (1 - a²)? Perhaps not! It make
-   them on the unit sphere but is it required? *)
 bbb.
 
 (* old version *)
