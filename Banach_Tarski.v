@@ -3368,6 +3368,18 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
     rewrite Rsign_mul_distr.
     rewrite Rsign_of_pos; [ | apply Rinv_0_lt_compat; lra ].
     rewrite Rmult_1_l.
+f_equal.
+unfold Rsign.
+destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
+ exfalso.
+ rewrite vec_double_cross_mul in Hvvp.
+bbb.
+ destruct p as (xp, yp, zp).
+ destruct v₁ as (x₁, y₁, z₁).
+ destruct v₂ as (x₂, y₂, z₂).
+ simpl in Hpvv.
+
+
 bbb.
 
 (* old version *)
