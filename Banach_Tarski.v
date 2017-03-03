@@ -3376,20 +3376,29 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
     rewrite Rmult_1_l.
 f_equal.
 unfold Rsign.
-destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
- exfalso.
  specialize (vec_Lagrange_identity p (v₁ × v₂)) as H.
- rewrite Hpvv in H.
- rewrite Rsqr_0, Rminus_0_r in H.
  rewrite vec_cross_mul_assoc_r in H.
  rewrite Hpv₁, Hpv₂ in H.
  do 2 rewrite vec_const_mul_0_l in H.
- rewrite vec_sub_0_r, vec_sqr_0 in H.
+ rewrite vec_sub_0_r in H.
+ rewrite vec_sqr_0 in H.
+destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
+ exfalso.
+ rewrite Hpvv in H.
+ rewrite Rsqr_0, Rminus_0_r in H.
  apply Rmult_integral in H.
     apply on_sphere_norm in Hp; [ | lra ].
     rewrite Hp, Rsqr_1 in H.
     destruct H as [H| H]; [ lra | ].
     apply Rsqr_eq_0, vec_norm_eq_0 in H.
+    apply Hvv; rewrite Hv'₁, Hv'₂.
+    rewrite <- vec_const_mul_cross_distr_l.
+    rewrite <- vec_const_mul_cross_distr_r.
+    rewrite H.
+    now do 2 rewrite vec_const_mul_0_r.
+
+destruct (Rle_dec 0 (p · v₁ × v₂)) as [Hpvvp| Hpvvn].
+ rewrite Rmult_1_l.
 
 bbb.
 unfold latitude in Ha₁.
