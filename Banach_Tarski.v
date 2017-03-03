@@ -3389,6 +3389,7 @@ destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
     apply on_sphere_norm in Hp; [ | lra ].
     rewrite Hp, Rsqr_1 in H.
     destruct H as [H| H]; [ lra | ].
+    apply Rsqr_eq_0, vec_norm_eq_0 in H.
 
 bbb.
 unfold latitude in Ha₁.
