@@ -3376,7 +3376,15 @@ f_equal.
 unfold Rsign.
 destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
  exfalso.
-Search (_ · _ = 0).
+ specialize (vec_Lagrange_identity p (v₁ × v₂)) as H.
+ rewrite Hpvv in H.
+ rewrite Rsqr_0, Rminus_0_r in H.
+Search ((_ × _) × _).
+bbb.
+unfold latitude in Ha₁.
+ rewrite Hv₁, Hv₂ in Hpvv.
+ rewrite vec_cross_mul_sub_distr_l in Hpvv.
+ do 2 rewrite vec_cross_mul_sub_distr_r in Hpvv.
 
 bbb.
  destruct p as (xp, yp, zp).
