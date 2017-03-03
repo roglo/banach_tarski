@@ -3249,6 +3249,7 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
  now rewrite Rinv_l.
 
  rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
+(*
  assert (Hvvp : (v'₁ × v'₂) × p = 0%vec).
   subst v₁ v₂.
   rewrite vec_double_cross_mul, Hv'₁, Hv'₂.
@@ -3274,8 +3275,10 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
   assert (Hpz : p ≠ 0%vec).
    intros H; rewrite H in Hp; simpl in Hp.
    rewrite Rsqr_0, Rsqr_1 in Hp; lra.
+*)
 
-   destruct (vec_eq_dec (v'₁ × v'₂) 0) as [Hvv| Hvv].
+ destruct (vec_eq_dec (v'₁ × v'₂) 0) as [Hvv| Hvv].
+ (*
     assert (Hpv : p · v'₁ = 0).
      subst v₁ v₂.
      rewrite Hv'₁.
@@ -3289,6 +3292,7 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
      rewrite vec_dot_mul_diag, Hp, Hp₁, Rsqr_1.
      rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
      now rewrite Rminus_diag_eq, Rmult_0_r.
+*)
 
      specialize (vec_Lagrange_identity v'₁ v'₂) as Hli.
      rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0 in Hli.
@@ -3372,7 +3376,8 @@ f_equal.
 unfold Rsign.
 destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
  exfalso.
- rewrite vec_double_cross_mul in Hvvp.
+Search (_ · _ = 0).
+
 bbb.
  destruct p as (xp, yp, zp).
  destruct v₁ as (x₁, y₁, z₁).
