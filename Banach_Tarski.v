@@ -3390,7 +3390,6 @@ destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
     rewrite Hp, Rsqr_1 in H.
     destruct H as [H| H]; [ lra | ].
 
-
 bbb.
 unfold latitude in Ha₁.
  rewrite Hv₁, Hv₂ in Hpvv.
