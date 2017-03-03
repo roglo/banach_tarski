@@ -2883,7 +2883,50 @@ rewrite Rabs_right.
  apply Rinv_0_lt_compat in Hr; lra.
 Qed.
 
-Definition Rsign x := if Rle_dec 0 x then 1 else -1.
+Definition Rsign x :=
+  if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
+
+Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
+Proof.
+intros * Hx.
+unfold Rsign.
+destruct (Req_dec x 0); [ lra |  ].
+destruct (Rle_dec 0 x); [ easy | lra ].
+Qed.
+
+Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = Rsign x * Rsign y.
+Proof.
+intros.
+unfold Rsign.
+destruct (Req_dec (x * y) 0) as [Hxyz| Hxyz].
+ destruct (Req_dec x 0) as [Hx| Hx]; [ lra | ].
+ destruct (Req_dec y 0) as [Hy| Hy]; [ lra | ].
+ apply Rmult_integral in Hxyz; lra.
+
+ destruct (Req_dec x 0) as [Hxz| Hxz]; [ rewrite Hxz in Hxyz; lra | ].
+ destruct (Req_dec y 0) as [Hyz| Hyz]; [ rewrite Hyz in Hxyz; lra | ].
+ destruct (Rle_dec 0 (x * y)) as [Hxy| Hxy].
+  destruct (Rle_dec 0 x) as [Hx| Hx].
+   destruct (Rle_dec 0 y) as [Hy| Hy]; [ lra | exfalso ].
+   apply Hy; clear Hy.
+   apply Rmult_le_reg_l with (r := x); [ lra | ].
+   now rewrite Rmult_0_r.
+
+   destruct (Rle_dec 0 y) as [Hy| Hy]; [ exfalso | lra ].
+   apply Hx; clear Hx.
+   apply Rmult_le_reg_r with (r := y); [ lra | ].
+   now rewrite Rmult_0_l.
+
+  destruct (Rle_dec 0 x) as [Hx| Hx].
+   destruct (Rle_dec 0 y) as [Hy| Hy]; [ exfalso | lra ].
+   apply Hxy; clear Hxy.
+   now apply Rmult_le_pos.
+
+   destruct (Rle_dec 0 y) as [Hy| Hy]; [ lra | exfalso ].
+   apply Hxy; clear Hxy.
+   rewrite <- Rmult_opp_opp.
+   apply Rmult_le_pos; lra.
+Qed.
 
 Theorem matrix_mul_axis : ∀ p c s k,
   k ≠ 0
@@ -2911,6 +2954,7 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
   now rewrite H1, H2, H3 in Hpz.
 
   unfold Rsign.
+  destruct (Req_dec k 0) as [Hkz| Hkz]; [ lra | clear Hkz ].
   destruct (Rle_dec 0 k) as [Hkp| Hkn].
    rewrite Rmult_1_l.
    rewrite sqrt_Rsqr in Ha; [ | lra ].
@@ -2937,13 +2981,6 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
 
     do 3 rewrite Hx, <- Rsqr_neg.
     f_equal; lra.
-Qed.
-
-Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
-Proof.
-intros * Hx.
-unfold Rsign.
-destruct (Rle_dec 0 x); [ easy | lra ].
 Qed.
 
 Theorem latitude_mul : ∀ k u v,
@@ -3317,7 +3354,20 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
         apply Rinv_neq_0_compat.
         intros H; apply sqrt_eq_0 in H; lra.
 
-    clear Hvvp.
+    rewrite Hv'₁, Hv'₂.
+    rewrite <- vec_const_mul_cross_distr_l, <- vec_const_mul_cross_distr_r.
+    rewrite vec_const_mul_assoc, <- Rmult_vec_dot_mul_distr_r.
+    rewrite <- Rmult_vec_dot_mul_distr_l, <- Rmult_vec_dot_mul_distr_r.
+    rewrite <- Rmult_assoc.
+    rewrite fold_Rsqr.
+    rewrite Rsqr_inv; [ | intros H; apply sqrt_eq_0 in H; lra ].
+    rewrite Rsqr_sqrt; [ | lra ].
+    rewrite vec_norm_vec_const_mul.
+    rewrite Rabs_Rinv; [ | lra ].
+    rewrite Rabs_right; [ | lra ].
+    rewrite Rsign_mul_distr.
+    rewrite Rsign_of_pos; [ | apply Rinv_0_lt_compat; lra ].
+    rewrite Rmult_1_l.
 bbb.
 
 (* old version *)
