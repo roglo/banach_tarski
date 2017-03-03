@@ -1085,8 +1085,14 @@ Proof.
 intros (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_double_cross_mul : ∀ u v w,
+Theorem vec_cross_mul_assoc_l : ∀ u v w,
   ((u × v) × w = (u · w) ⁎ v - (v · w) ⁎ u)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; ring.
+Qed.
+
+Theorem vec_cross_mul_assoc_r : ∀ u v w,
+  (u × (v × w) = (u · w) ⁎ v - (u · v) ⁎ w)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; ring.
 Qed.

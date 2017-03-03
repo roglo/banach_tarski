@@ -3277,23 +3277,25 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
    rewrite Rsqr_0, Rsqr_1 in Hp; lra.
 *)
 
- destruct (vec_eq_dec (v'₁ × v'₂) 0) as [Hvv| Hvv].
- (*
-    assert (Hpv : p · v'₁ = 0).
-     subst v₁ v₂.
-     rewrite Hv'₁.
-     remember (/ √ (1 - a²)) as b eqn:Hb.
-     rewrite Ha₁; unfold latitude.
-     rewrite <- Rmult_vec_dot_mul_distr_r.
-     rewrite vec_dot_mul_sub_distr_l.
-     rewrite <- Rmult_vec_dot_mul_distr_r.
+   assert (p · v₁ = 0 ∧ p · v₂ = 0) as (Hpv₁, Hpv₂).
+    subst v₁ v₂.
+    do 2 rewrite vec_dot_mul_sub_distr_l.
+    rewrite <- Rmult_vec_dot_mul_distr_r.
      apply on_sphere_norm in Hp; [ | lra ].
      apply on_sphere_norm in Hp₁; [ | lra ].
+     apply on_sphere_norm in Hp₂; [ | lra ].
+    split.
+     rewrite Ha₁; unfold latitude.
      rewrite vec_dot_mul_diag, Hp, Hp₁, Rsqr_1.
      rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
-     now rewrite Rminus_diag_eq, Rmult_0_r.
-*)
+    now rewrite Rminus_diag_eq.
 
+     rewrite Ha₂; unfold latitude.
+     rewrite vec_dot_mul_diag, Hp, Hp₂, Rsqr_1.
+     rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
+    now rewrite Rminus_diag_eq.
+
+ destruct (vec_eq_dec (v'₁ × v'₂) 0) as [Hvv| Hvv].
      specialize (vec_Lagrange_identity v'₁ v'₂) as Hli.
      rewrite Hnv₁, Hnv₂, Hvv, Rsqr_1, Rmult_1_r, vec_sqr_0 in Hli.
      apply Rminus_diag_uniq in Hli; symmetry in Hli.
@@ -3379,7 +3381,16 @@ destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
  specialize (vec_Lagrange_identity p (v₁ × v₂)) as H.
  rewrite Hpvv in H.
  rewrite Rsqr_0, Rminus_0_r in H.
-Search ((_ × _) × _).
+ rewrite vec_cross_mul_assoc_r in H.
+ rewrite Hpv₁, Hpv₂ in H.
+ do 2 rewrite vec_const_mul_0_l in H.
+ rewrite vec_sub_0_r, vec_sqr_0 in H.
+ apply Rmult_integral in H.
+    apply on_sphere_norm in Hp; [ | lra ].
+    rewrite Hp, Rsqr_1 in H.
+    destruct H as [H| H]; [ lra | ].
+
+
 bbb.
 unfold latitude in Ha₁.
  rewrite Hv₁, Hv₂ in Hpvv.
