@@ -3211,7 +3211,7 @@ unfold Rsqr in *.
 f_equal; nsatz.
 Qed.
 
-Definition new_rot_sin_cos p u v :=
+Definition rot_sin_cos p u v :=
   let a := latitude p u in
   let u₁ := (u - a ⁎ p) ⁄ √ (1 - a²) in
   let v₁ := (v - a ⁎ p) ⁄ √ (1 - a²) in
@@ -3219,6 +3219,21 @@ Definition new_rot_sin_cos p u v :=
   let c := (u₁ · v₁) / (‖u₁‖ * ‖v₁‖) in
   (s, c).
 
+Theorem unit_sphere_rot_sin_cos_on_equator : ∀ p p₁ p₂ c s,
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
+  → latitude p p₁ = 0
+  → latitude p p₂ = 0
+  → p₁ × p₂ ≠ 0%vec
+  → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
+  → (s, c) = rot_sin_cos p p₁ p₂.
+Proof.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hmv.
+bbb.
+
+
+(* there, I failed *)
 Theorem unit_sphere_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -3230,10 +3245,10 @@ Theorem unit_sphere_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   → v₁ = (p₁ - a ⁎ p)%vec
   → v₂ = (p₂ - a ⁎ p)%vec
   → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂
-  → (s, c) = new_rot_sin_cos p p₁ p₂.
+  → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hmv.
-unfold new_rot_sin_cos.
+unfold rot_sin_cos.
 rewrite <- Ha₁, <- Hv₁, <- Hv₂.
 remember (v₁ ⁄ √ (1 - a²)) as v'₁ eqn:Hv'₁.
 remember (v₂ ⁄ √ (1 - a²)) as v'₂ eqn:Hv'₂.
