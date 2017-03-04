@@ -3406,6 +3406,8 @@ destruct (Rle_dec 0 (p · v₁ × v₂)) as [Hpvvp| Hpvvn].
  apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
  rewrite <-Rmult_assoc.
  rewrite Rinv_r; [ rewrite Rmult_1_l | lra ].
+bbb.
+
  clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv₁ Hnv₂ Hvv.
  destruct p as (xp, yp, zp).
  destruct v₁ as (x₁, y₁, z₁).
