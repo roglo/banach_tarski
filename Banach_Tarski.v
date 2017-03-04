@@ -3399,7 +3399,49 @@ destruct (Req_dec (p · v₁ × v₂) 0) as [Hpvv| Hpvv].
 
 destruct (Rle_dec 0 (p · v₁ × v₂)) as [Hpvvp| Hpvvn].
  rewrite Rmult_1_l.
-
+ apply on_sphere_norm in Hp; [ | lra ].
+ rewrite Hp, Rsqr_1, Rmult_1_l in H.
+ apply Rminus_diag_uniq in H.
+ apply Rsqr_inj in H; [ | apply vec_norm_nonneg | easy ].
+ apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
+ rewrite <-Rmult_assoc.
+ rewrite Rinv_r; [ rewrite Rmult_1_l | lra ].
+ clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv₁ Hnv₂ Hvv.
+ destruct p as (xp, yp, zp).
+ destruct v₁ as (x₁, y₁, z₁).
+ destruct v₂ as (x₂, y₂, z₂).
+ simpl in Hmv.
+ simpl in Hp.
+ rewrite Hp in Hmv.
+ do 3 rewrite Rdiv_1_r in Hmv.
+ rewrite H; simpl.
+ simpl in Hpvv, Hpvvp.
+ clear H.
+ destruct p₁ as (xp₁, yp₁, zp₁).
+ destruct p₂ as (xp₂, yp₂, zp₂).
+ unfold latitude in Ha₁, Ha₂.
+ simpl in Ha₁, Ha₂.
+ apply on_sphere_norm in Hp₁.
+ apply on_sphere_norm in Hp₂.
+ simpl in Hp₁, Hp₂.
+ rewrite Hp, Hp₁, Rmult_1_r, Rdiv_1_r in Ha₁.
+ rewrite Hp, Hp₂, Rmult_1_r, Rdiv_1_r in Ha₂.
+ simpl in Hv₁, Hv₂.
+ do 3 rewrite fold_Rminus in Hv₁, Hv₂.
+ apply (f_equal Rsqr) in Hp.
+ apply (f_equal Rsqr) in Hp₁.
+ apply (f_equal Rsqr) in Hp₂.
+ rewrite Rsqr_sqrt, Rsqr_1 in Hp, Hp₁, Hp₂.
+ simpl in Hpv₁, Hpv₂.
+ injection Hv₁; clear Hv₁; intros.
+ injection Hv₂; clear Hv₂; intros.
+ injection Hmv; clear Hmv; intros.
+(*
+ unfold Rsqr in *.
+ Time nsatz.
+polynomial not in the ideal
+Finished transaction in 47.267 secs (47.28u,0.s) (successful)
+*)
 bbb.
 unfold latitude in Ha₁.
  rewrite Hv₁, Hv₂ in Hpvv.
