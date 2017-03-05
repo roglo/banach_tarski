@@ -3264,6 +3264,70 @@ destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
   apply Rsqr_inj in Hlag; [ | apply vec_norm_nonneg | easy ].
   rewrite Hlag.
   apply (f_equal Rsqr) in Hlag.
+destruct (vec_eq_dec p (V 1 0 0)) as [H| H].
+subst p.
+  destruct p₁ as (xp₁, yp₁, zp₁).
+  destruct p₂ as (xp₂, yp₂, zp₂).
+  apply on_sphere_norm in Hp; [ | lra ].
+  apply on_sphere_norm in Hp₁; [ | lra ].
+  apply on_sphere_norm in Hp₂; [ | lra ].
+  simpl in *.
+  rewrite Rsqr_1 in Hp₁, Hp₂.
+  rewrite Hp, Rsqr_1, sqrt_1 in Hmv.
+  do 2 rewrite Rdiv_1_r in Hmv.
+  rewrite Rsqr_sqrt in Hlag.
+  rewrite Rsqr_1, Rsqr_0 in Hmv.
+  progress repeat rewrite Rmult_1_l in Hmv.
+  progress repeat rewrite Rmult_0_l in Hmv.
+  progress repeat rewrite Rminus_0_r in Hmv.
+  progress repeat rewrite Rmult_0_l in Hmv.
+  progress repeat rewrite Rplus_0_r in Hmv.
+  progress repeat rewrite Rmult_0_l in Hmv.
+  progress repeat rewrite Rplus_0_r in Hmv.
+  progress repeat rewrite Rplus_0_l in Hmv.
+  progress repeat rewrite Rminus_0_l in Hmv.
+  rewrite <- Ropp_mult_distr_l in Hmv.
+  rewrite fold_Rminus in Hmv.
+injection Hmv; clear Hmv; intros.
+rewrite Rminus_plus, Rmult_1_l in H1.
+move H1 at top; subst xp₂.
+clear Hp.
+rewrite Rmult_1_l, Rmult_0_l, Rmult_0_l in Ha₂.
+do 2 rewrite Rplus_0_r in Ha₂.
+subst xp₁.
+clear Ha₁.
+rewrite Rsqr_0 in *.
+rewrite Rplus_0_l in *.
+rewrite Rmult_0_r, Rmult_0_l in Hppz.
+rewrite Rmult_0_r, Rmult_0_l in Hppz.
+rewrite Rminus_0_r in Hppz.
+rewrite Rmult_1_l, Rmult_0_l, Rmult_0_l in Hzpp.
+do 2 rewrite Rplus_0_r in Hzpp.
+rewrite Rmult_1_l, Rmult_0_l, Rmult_0_l in Hppp.
+do 2 rewrite Rplus_0_r in Hppp.
+clear Hlag.
+clear Hppz.
+f_equal.
+ ring_simplify.
+bbb.
+
+unfold Rsqr in *.
+nsatz.
+
+unfold Rsqr in *.
+
+bbb.
+
+  repeat rewrite Rmult_0_r in Hmv.
+  repeat rewrite Rmult_0_l in Hmv.
+  repeat rewrite Rplus_0_r in Hmv.
+  repeat rewrite Rminus_0_r in Hmv.
+  repeat rewrite Rmult_0_r in Hmv.
+  repeat rewrite Rmult_0_l in Hmv.
+
+  injection Hmv; clear Hmv; intros.
+  ring_simplify in H.
+  f_equal.
 bbb.
   destruct p as (xp, yp, zp).
   destruct p₁ as (xp₁, yp₁, zp₁).
