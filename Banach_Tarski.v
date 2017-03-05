@@ -3264,6 +3264,8 @@ destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
   apply Rsqr_inj in Hlag; [ | apply vec_norm_nonneg | easy ].
   rewrite Hlag.
   apply (f_equal Rsqr) in Hlag.
+(* testing this case seems to work with nsatz,
+  providing that Hppz is cleared!
 destruct (vec_eq_dec p (V 1 0 0)) as [H| H].
 subst p.
   destruct p₁ as (xp₁, yp₁, zp₁).
@@ -3309,25 +3311,11 @@ clear Hlag.
 clear Hppz.
 f_equal.
  ring_simplify.
+clear Hzpp.
 unfold Rsqr in *.
-(* polynomial not in the ideal *)
-(* however, the solution is correct! *)
-bbb.
 nsatz.
-
 bbb.
-
-  repeat rewrite Rmult_0_r in Hmv.
-  repeat rewrite Rmult_0_l in Hmv.
-  repeat rewrite Rplus_0_r in Hmv.
-  repeat rewrite Rminus_0_r in Hmv.
-  repeat rewrite Rmult_0_r in Hmv.
-  repeat rewrite Rmult_0_l in Hmv.
-
-  injection Hmv; clear Hmv; intros.
-  ring_simplify in H.
-  f_equal.
-bbb.
+*)
   destruct p as (xp, yp, zp).
   destruct p₁ as (xp₁, yp₁, zp₁).
   destruct p₂ as (xp₂, yp₂, zp₂).
@@ -3341,6 +3329,13 @@ bbb.
   rewrite Rsqr_sqrt in Hlag.
   injection Hmv; clear Hmv; intros.
   f_equal.
+unfold Rsqr in *.
+clear Hzpp.
+nsatz.
+clear Hzpp.
+nsatz.
+bbb.
+
 Focus 2.
 destruct (Req_dec (yp₁ * zp₂ - zp₁ * yp₂) 0) as [H₁| H₁].
  rewrite H₁ in *.
@@ -3365,7 +3360,7 @@ bbb.
    Time nsatz.
 polynomrial not in the ideal
 bbb.
-
+*)
 
 (* there, I failed *)
 Theorem unit_sphere_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
@@ -3563,7 +3558,6 @@ destruct (Rle_dec 0 (p · v₁ × v₂)) as [Hpvvp| Hpvvn].
  do 3 rewrite Rdiv_1_r in Hmv.
  injection Hmv; clear Hmv; intros.
 bbb.
-
  clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv₁ Hnv₂ Hvv.
  destruct p as (xp, yp, zp).
  destruct v₁ as (x₁, y₁, z₁).
