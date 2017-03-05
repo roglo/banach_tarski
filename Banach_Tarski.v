@@ -3244,11 +3244,6 @@ unfold latitude in Ha₁, Ha₂.
 rewrite Hp, Hp₁ in Ha₁.
 rewrite Hp, Hp₂ in Ha₂.
 rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
-(*
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm in Hp₁; [ | lra ].
-apply on_sphere_norm in Hp₂; [ | lra ].
-*)
 specialize (vec_Lagrange_identity p (p₁ × p₂)) as Hlag.
 rewrite vec_cross_mul_assoc_r in Hlag.
 rewrite Hp, Rsqr_1, Rmult_1_l in Hlag.
@@ -3256,11 +3251,35 @@ rewrite Ha₁, Ha₂ in Hlag.
 do 2 rewrite vec_const_mul_0_l in Hlag.
 rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
 unfold Rsign.
-destruct (Req_dec (p · p₁ × p₂) 0) as [Hpvv| Hpvv].
+destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
  exfalso.
- rewrite Hpvv in Hlag.
+ rewrite Hppp in Hlag.
  rewrite Rsqr_0, Rminus_0_r in Hlag.
  now apply Rsqr_eq_0, vec_norm_eq_0 in Hlag.
+
+ destruct (Rle_dec 0 (p · p₁ × p₂)) as [Hzpp| Hzpp].
+  rewrite Rmult_1_l.
+  apply Rminus_diag_uniq in Hlag.
+  apply Rsqr_inj in Hlag; [ | apply vec_norm_nonneg | easy ].
+  rewrite Hlag.
+  apply (f_equal Rsqr) in Hlag.
+  destruct p as (xp, yp, zp).
+  destruct p₁ as (xp₁, yp₁, zp₁).
+  destruct p₂ as (xp₂, yp₂, zp₂).
+  apply on_sphere_norm in Hp; [ | lra ].
+  apply on_sphere_norm in Hp₁; [ | lra ].
+  apply on_sphere_norm in Hp₂; [ | lra ].
+  simpl in *.
+  rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+  rewrite Hp, sqrt_1 in Hmv.
+  do 3 rewrite Rdiv_1_r in Hmv.
+  rewrite Rsqr_sqrt in Hlag.
+  injection Hmv; clear Hmv; intros.
+  f_equal.
+   unfold Rsqr in *.
+bbb.
+   Time nsatz.
+polynomrial not in the ideal
 bbb.
 
 
