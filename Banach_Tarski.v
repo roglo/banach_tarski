@@ -3230,6 +3230,23 @@ Theorem unit_sphere_rot_sin_cos_on_equator : ∀ p p₁ p₂ c s,
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hmv.
+unfold rot_sin_cos.
+rewrite Ha₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
+do 2 rewrite vec_sub_0_r.
+rewrite sqrt_1, Rinv_1.
+do 2 rewrite vec_const_mul_1_l.
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm in Hp₁; [ | lra ].
+apply on_sphere_norm in Hp₂; [ | lra ].
+rewrite Hp₁, Hp₂.
+rewrite Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
+unfold latitude in Ha₁, Ha₂.
+rewrite Hp, Hp₁ in Ha₁.
+rewrite Hp, Hp₂ in Ha₂.
+rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm in Hp₁; [ | lra ].
+apply on_sphere_norm in Hp₂; [ | lra ].
 bbb.
 
 
