@@ -3309,12 +3309,11 @@ clear Hlag.
 clear Hppz.
 f_equal.
  ring_simplify.
+unfold Rsqr in *.
+(* polynomial not in the ideal *)
+(* however, the solution is correct! *)
 bbb.
-
-unfold Rsqr in *.
 nsatz.
-
-unfold Rsqr in *.
 
 bbb.
 
