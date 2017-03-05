@@ -3244,9 +3244,23 @@ unfold latitude in Ha₁, Ha₂.
 rewrite Hp, Hp₁ in Ha₁.
 rewrite Hp, Hp₂ in Ha₂.
 rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+(*
 apply on_sphere_norm in Hp; [ | lra ].
 apply on_sphere_norm in Hp₁; [ | lra ].
 apply on_sphere_norm in Hp₂; [ | lra ].
+*)
+specialize (vec_Lagrange_identity p (p₁ × p₂)) as Hlag.
+rewrite vec_cross_mul_assoc_r in Hlag.
+rewrite Hp, Rsqr_1, Rmult_1_l in Hlag.
+rewrite Ha₁, Ha₂ in Hlag.
+do 2 rewrite vec_const_mul_0_l in Hlag.
+rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
+unfold Rsign.
+destruct (Req_dec (p · p₁ × p₂) 0) as [Hpvv| Hpvv].
+ exfalso.
+ rewrite Hpvv in Hlag.
+ rewrite Rsqr_0, Rminus_0_r in Hlag.
+ now apply Rsqr_eq_0, vec_norm_eq_0 in Hlag.
 bbb.
 
 
