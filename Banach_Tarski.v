@@ -3226,10 +3226,11 @@ Theorem unit_sphere_rot_sin_cos_on_equator : ∀ p p₁ p₂ c s,
   → latitude p p₁ = 0
   → latitude p p₂ = 0
   → p₁ × p₂ ≠ 0%vec
+  → s² + c² = 1
   → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hmv.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hsc Hmv.
 unfold rot_sin_cos.
 rewrite Ha₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
 do 2 rewrite vec_sub_0_r.
@@ -3263,6 +3264,7 @@ destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
   apply Rsqr_inj in Hlag; [ | apply vec_norm_nonneg | easy ].
   rewrite Hlag.
   apply (f_equal Rsqr) in Hlag.
+bbb.
   destruct p as (xp, yp, zp).
   destruct p₁ as (xp₁, yp₁, zp₁).
   destruct p₂ as (xp₂, yp₂, zp₂).
@@ -3276,6 +3278,25 @@ destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
   rewrite Rsqr_sqrt in Hlag.
   injection Hmv; clear Hmv; intros.
   f_equal.
+Focus 2.
+destruct (Req_dec (yp₁ * zp₂ - zp₁ * yp₂) 0) as [H₁| H₁].
+ rewrite H₁ in *.
+ rewrite Rsqr_0, Rplus_0_l in Hlag.
+ rewrite Rmult_0_r, Rplus_0_l in Hlag.
+ rewrite Rmult_0_r, Rplus_0_l in Hzpp.
+ rewrite Rmult_0_r, Rplus_0_l in Hppp.
+(*
+ rewrite Rmult_0_r, Rplus_0_l.
+*)
+ destruct (Req_dec (zp₁ * xp₂ - xp₁ * zp₂) 0) as [H₂| H₂].
+  rewrite H₂ in *.
+  rewrite Rsqr_0, Rplus_0_l in Hlag.
+  rewrite Rmult_0_r, Rplus_0_l in Hlag.
+  rewrite Rmult_0_r, Rplus_0_l in Hppp.
+  rewrite Rmult_0_r, Rplus_0_l in Hzpp.
+(*
+  rewrite Rmult_0_r, Rplus_0_l.
+*)
    unfold Rsqr in *.
 bbb.
    Time nsatz.
