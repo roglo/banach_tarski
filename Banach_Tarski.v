@@ -3377,7 +3377,19 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
    destruct Hlag as [Hlag| Hlag].
     apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
 
-    idtac.
+    rewrite vec_cross_mul_sub_distr_l in Hlag.
+    do 2 rewrite vec_cross_mul_sub_distr_r in Hlag.
+    do 2 rewrite <- vec_const_mul_cross_distr_l in Hlag.
+    do 2 rewrite <- vec_const_mul_cross_distr_r in Hlag.
+    rewrite vec_cross_mul_diag in Hlag.
+    do 2 rewrite vec_const_mul_0_r in Hlag.
+    rewrite vec_sub_0_r in Hlag.
+bbb.
+    rewrite <- vec_sub_add_distr in Hlag.
+    rewrite <- vec_const_mul_add_distr_l in Hlag.
+    setoid_rewrite vec_cross_mul_anticomm in Hlag at 2.
+Search (- (_ × _))%vec.
+Search
 bbb.
 
    rewrite Rsqr_0, Rminus_0_r in Hlag.
