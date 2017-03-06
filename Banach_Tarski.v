@@ -3250,13 +3250,70 @@ Theorem unit_sphere_rot_sin_cos_on_equator : ∀ p p₁ p₂ c s,
   → latitude p p₁ = 0
   → latitude p p₂ = 0
   → p₁ × p₂ ≠ 0%vec
-  → s² + c² = 1
   → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hsc Hmv.
-clear Hsc.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hmv.
 unfold rot_sin_cos.
+rewrite Ha₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
+do 2 rewrite vec_sub_0_r.
+rewrite sqrt_1, Rinv_1.
+do 2 rewrite vec_const_mul_1_l.
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm in Hp₁; [ | lra ].
+apply on_sphere_norm in Hp₂; [ | lra ].
+rewrite Hp₁, Hp₂.
+rewrite Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
+unfold latitude in Ha₁, Ha₂.
+rewrite Hp, Hp₁ in Ha₁.
+rewrite Hp, Hp₂ in Ha₂.
+rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+specialize (vec_Lagrange_identity p (p₁ × p₂)) as Hlag.
+rewrite vec_cross_mul_assoc_r in Hlag.
+rewrite Hp, Rsqr_1, Rmult_1_l in Hlag.
+rewrite Ha₁, Ha₂ in Hlag.
+do 2 rewrite vec_const_mul_0_l in Hlag.
+rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
+unfold Rsign.
+destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
+ exfalso.
+ rewrite Hppp in Hlag.
+ rewrite Rsqr_0, Rminus_0_r in Hlag.
+ now apply Rsqr_eq_0, vec_norm_eq_0 in Hlag.
+
+ apply Rminus_diag_uniq in Hlag.
+ apply Rsqr_eq_abs_0 in Hlag.
+ rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
+ destruct (Rle_dec 0 (p · p₁ × p₂)) as [Hzpp| Hzpp].
+  rewrite Rmult_1_l.
+  rewrite Rabs_right in Hlag; [ | now apply Rle_ge ].
+  rewrite Hlag; clear Hlag Hzpp Hppp Hppz.
+  now apply simple_unit_sphere_ro_sin_cos_on_equator.
+
+  apply Rnot_le_lt in Hzpp.
+  rewrite <- Ropp_mult_distr_l, Rmult_1_l.
+  rewrite Rabs_left in Hlag; [ | easy ].
+  rewrite Hlag, Ropp_involutive; clear Hlag Hzpp Hppp Hppz.
+  now apply simple_unit_sphere_ro_sin_cos_on_equator.
+Qed.
+
+Theorem unit_sphere_rot_sin_cos : ∀ p p₁ p₂ a c s,
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
+  → latitude p p₁ = a
+  → latitude p p₂ = a
+  → p₁ × p₂ ≠ 0%vec
+  → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
+  → (s, c) = rot_sin_cos p p₁ p₂.
+Proof.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hmv.
+unfold rot_sin_cos.
+rewrite Ha₁.
+bbb.
+
+₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
+
 rewrite Ha₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
 do 2 rewrite vec_sub_0_r.
 rewrite sqrt_1, Rinv_1.
