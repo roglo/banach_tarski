@@ -3309,7 +3309,11 @@ Theorem unit_sphere_rot_sin_cos : ∀ p p₁ p₂ a c s,
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hmv.
+(*
 bbb. (* voir p₁ × p₂ ≠ 0 : mal adapté *)
+*)
+clear Hppz.
+(**)
 unfold rot_sin_cos.
 rewrite Ha₁.
 remember (p₁ - a ⁎ p)%vec as v₁ eqn:Hv₁.
@@ -3365,7 +3369,6 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
   rewrite Hlag.
   unfold Rsign.
   destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp].
-   exfalso.
    rewrite Hppp, Rabs_R0 in Hlag.
    apply vec_norm_eq_0 in Hlag.
    rewrite Hv'₁, Hv'₂ in Hlag.
@@ -3379,6 +3382,82 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
    destruct Hlag as [Hlag| Hlag].
     apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
 
+    rewrite Rmult_0_l.
+rewrite Hv₁, Hv₂ in Hlag.
+rewrite vec_cross_mul_sub_distr_l in Hlag.
+do 2 rewrite vec_cross_mul_sub_distr_r in Hlag.
+setoid_rewrite <- vec_const_mul_cross_distr_l in Hlag at 2.
+setoid_rewrite <- vec_const_mul_cross_distr_r in Hlag at 2.
+rewrite vec_cross_mul_diag in Hlag.
+do 2 rewrite vec_const_mul_0_r in Hlag.
+rewrite vec_sub_0_r in Hlag.
+setoid_rewrite vec_cross_mul_anticomm in Hlag at 2.
+rewrite vec_sub_opp_r in Hlag.
+rewrite <- vec_add_sub_distr in Hlag.
+rewrite <- vec_cross_mul_sub_distr_r in Hlag.
+rewrite <- vec_const_mul_cross_distr_r in Hlag.
+assert (H : (p₂ - p₁) × p = 0%vec).
+ assert (H : (p₂ - p₁ = v₂ - v₁)%vec).
+  rewrite Hv₁, Hv₂.
+  rewrite vec_sub_sub_distr.
+  unfold vec_sub.
+  do 2 rewrite <- vec_add_assoc.
+  f_equal.
+  rewrite vec_add_comm.
+  rewrite <- vec_add_assoc.
+  rewrite vec_add_opp_diag_r.
+  now rewrite vec_add_0_r.
+
+  rewrite H.
+bbb.
+  specialize (vec_Lagrange_identity (v₂ - v₁) p) as Hi.
+bbb.
+
+
+     clear - Hp Hp₁ Hp₂ Ha₁ Ha₂.
+     unfold latitude in Ha₁, Ha₂.
+     apply on_sphere_norm in Hp₁; [ | lra ].
+     apply on_sphere_norm in Hp₂; [ | lra ].
+     rewrite Hp₁ in Ha₁.
+     rewrite Hp₂ in Ha₂.
+     rewrite Hp, Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+     destruct p as (xp, yp, zp).
+     destruct p₁ as (xp₁, yp₁, zp₁).
+     destruct p₂ as (xp₂, yp₂, zp₂).
+     apply on_sphere_norm in Hp; [ | lra ].
+     apply on_sphere_norm in Hp₁; [ | lra ].
+     apply on_sphere_norm in Hp₂; [ | lra ].
+     simpl in *.
+     rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+     do 3 rewrite fold_Rminus.
+bbb.
+
+apply vec_cross_mul_eq_0 in Hlag.
+destruct Hlag as (d & e & Hd & He & Hde).
+
+bbb.
+    f_equal.
+     destruct p as (xp, yp, zp).
+     destruct p₁ as (xp₁, yp₁, zp₁).
+     destruct p₂ as (xp₂, yp₂, zp₂).
+     apply on_sphere_norm in Hp; [ | lra ].
+     unfold latitude in Ha₁, Ha₂.
+     simpl in *.
+     rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+     rewrite Hp, sqrt_1 in Hmv.
+     do 3 rewrite Rdiv_1_r in Hmv.
+     rewrite Hp₁ in Ha₁.
+     rewrite Hp₂ in Ha₂.
+     rewrite Hp, sqrt_1, Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+     do 3 rewrite fold_Rminus in Hv₁, Hv₂.
+     injection Hmv; clear Hmv; intros H3 H2 H1.
+     rewrite Hv₁, Hv₂ in Hlag; simpl in Hlag.
+     injection Hlag; clear Hlag; intros H6 H5 H4.
+clear - Hp Hp₁ Hp₂ Ha₁ Ha₂ H1 H2 H3 H4 H5 H6.
+bbb.
+unfold Rsqr in *.
+nsatz.
+polynomial not in the ideal
 bbb.
     rewrite vec_cross_mul_sub_distr_l in Hlag.
     do 2 rewrite vec_cross_mul_sub_distr_r in Hlag.
