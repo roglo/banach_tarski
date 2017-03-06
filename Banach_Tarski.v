@@ -3315,6 +3315,8 @@ remember (p₁ - a ⁎ p)%vec as v₁ eqn:Hv₁.
 remember (p₂ - a ⁎ p)%vec as v₂ eqn:Hv₂.
 remember (v₁ ⁄ √ (1 - a²)) as v'₁ eqn:Hv'₁.
 remember (v₂ ⁄ √ (1 - a²)) as v'₂ eqn:Hv'₂.
+move v₁ before p₂; move v₂ before v₁.
+move v'₁ before v₂; move v'₂ before v'₁.
 assert (Hsa : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
 assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
  subst v₁ v₂.
@@ -3326,6 +3328,8 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
  rewrite Rabs_Rinv; [ | easy ].
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
+
+ rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
 bbb.
 
 ₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
