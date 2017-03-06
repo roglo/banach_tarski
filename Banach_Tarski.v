@@ -3389,6 +3389,29 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
     rewrite <- vec_add_sub_distr in Hlag.
     rewrite <- vec_cross_mul_sub_distr_r in Hlag.
     rewrite <- vec_const_mul_cross_distr_r in Hlag.
+    assert (H : (p₂ - p₁) × p = 0%vec).
+     clear - Hp Hp₁ Hp₂ Ha₁ Ha₂.
+     unfold latitude in Ha₁, Ha₂.
+     apply on_sphere_norm in Hp₁; [ | lra ].
+     apply on_sphere_norm in Hp₂; [ | lra ].
+     rewrite Hp₁ in Ha₁.
+     rewrite Hp₂ in Ha₂.
+     rewrite Hp, Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+     destruct p as (xp, yp, zp).
+     destruct p₁ as (xp₁, yp₁, zp₁).
+     destruct p₂ as (xp₂, yp₂, zp₂).
+     apply on_sphere_norm in Hp; [ | lra ].
+     apply on_sphere_norm in Hp₁; [ | lra ].
+     apply on_sphere_norm in Hp₂; [ | lra ].
+     simpl in *.
+     rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+     do 3 rewrite fold_Rminus.
+f_equal.
+bbb.
+unfold Rsqr in *.
+nsatz.
+(* not in the ideal *)
+
 bbb.
 
     rewrite <- vec_sub_add_distr in Hlag.
