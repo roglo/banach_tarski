@@ -3383,6 +3383,21 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
     apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
 
     rewrite Rmult_0_l.
+Search (_ × _ = 0%vec).
+Theorem glop : ∀ u v, ‖u‖ = ‖v‖ → u × v = 0%vec → u = v ∨ u = (- v)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) Huv Huxv.
+apply (f_equal Rsqr) in Huv.
+do 2 rewrite <- vec_dot_mul_diag in Huv.
+simpl in Huv, Huxv.
+injection Huxv; clear Huxv; intros H3 H2 H1.
+bbb.
+
+(* return to main theorem *)
+apply glop in Hlag.
+destruct Hlag as [Hlag| Hlag].
+
+bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
 do 2 rewrite vec_cross_mul_sub_distr_r in Hlag.
