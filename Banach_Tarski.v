@@ -3330,6 +3330,54 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
  now rewrite Rinv_l.
 
  rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
+ assert (p · v'₁ = 0 ∧ p · v'₂ = 0) as (Hpv₁, Hpv₂).
+  subst v'₁ v'₂ v₁ v₂.
+  do 2 rewrite <- Rmult_vec_dot_mul_distr_r.
+  do 2 rewrite vec_dot_mul_sub_distr_l.
+  rewrite <- Rmult_vec_dot_mul_distr_r.
+  apply on_sphere_norm in Hp; [ | lra ].
+  apply on_sphere_norm in Hp₁; [ | lra ].
+  apply on_sphere_norm in Hp₂; [ | lra ].
+  split.
+   apply Rmult_eq_0_compat_l.
+   rewrite <- Ha₁; unfold latitude.
+   rewrite vec_dot_mul_diag, Hp, Hp₁, Rsqr_1.
+   rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
+   now rewrite Rminus_diag_eq.
+
+   apply Rmult_eq_0_compat_l.
+   rewrite <- Ha₂; unfold latitude.
+   rewrite vec_dot_mul_diag, Hp, Hp₂, Rsqr_1.
+   rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
+   now rewrite Rminus_diag_eq.
+
+  specialize (vec_Lagrange_identity p (v'₁ × v'₂)) as Hlag.
+  apply on_sphere_norm in Hp; [ | lra ].
+  rewrite Hp, Rsqr_1, Rmult_1_l in Hlag.
+  rewrite vec_cross_mul_assoc_r in Hlag.
+  rewrite Hpv₁, Hpv₂ in Hlag.
+  do 2 rewrite vec_const_mul_0_l in Hlag.
+  rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
+  apply Rminus_diag_uniq in Hlag.
+  apply Rsqr_eq_abs_0 in Hlag.
+  rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
+  rewrite Hlag.
+  unfold Rsign.
+  destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp].
+   exfalso.
+   rewrite Hppp, Rabs_R0 in Hlag.
+   rewrite Hv'₁, Hv'₂, Hv₁, Hv₂ in Hlag.
+bbb.
+   apply Hppz.
+bbb.
+
+   rewrite Rsqr_0, Rminus_0_r in Hlag.
+  now apply Rsqr_eq_0, vec_norm_eq_0 in Hlag.
+
+  apply Rminus_diag_uniq in Hlag.
+  apply Rsqr_eq_abs_0 in Hlag.
+  rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
+  destruct (Rle_dec 0 (p · p₁ × p₂)) as [Hzpp| Hzpp].
 bbb.
 
 ₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
