@@ -3396,6 +3396,8 @@ rewrite vec_sub_opp_r in Hlag.
 rewrite <- vec_add_sub_distr in Hlag.
 rewrite <- vec_cross_mul_sub_distr_r in Hlag.
 rewrite <- vec_const_mul_cross_distr_r in Hlag.
+bbb.
+
 assert (H : (p₂ - p₁) × p = 0%vec).
  assert (H : (p₂ - p₁ = v₂ - v₁)%vec).
   rewrite Hv₁, Hv₂.
