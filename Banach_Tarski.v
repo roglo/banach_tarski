@@ -3364,7 +3364,6 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
   rewrite Hlag.
   unfold Rsign.
   destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp].
-   exfalso.
    rewrite Hppp, Rabs_R0 in Hlag.
    rewrite Hv'₁, Hv'₂, Hv₁, Hv₂ in Hlag.
    rewrite <- vec_const_mul_cross_distr_l in Hlag.
