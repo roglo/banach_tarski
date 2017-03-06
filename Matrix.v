@@ -872,6 +872,11 @@ Theorem vec_sub_diag : ∀ v, (v - v = 0)%vec.
 intros (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
+Theorem vec_sub_opp_r : ∀ u v, (u - - v = u + v)%vec.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+Qed.
+
 Theorem vec_add_sub_distr : ∀ u v w, (u + (v - w) = u + v - w)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
