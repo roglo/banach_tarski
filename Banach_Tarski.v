@@ -3367,6 +3367,20 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
    exfalso.
    rewrite Hppp, Rabs_R0 in Hlag.
    rewrite Hv'₁, Hv'₂, Hv₁, Hv₂ in Hlag.
+   rewrite <- vec_const_mul_cross_distr_l in Hlag.
+   rewrite <- vec_const_mul_cross_distr_r in Hlag.
+   do 2 rewrite vec_norm_vec_const_mul in Hlag.
+   rewrite <- Rmult_assoc in Hlag.
+   rewrite <- Rabs_mult in Hlag.
+   rewrite fold_Rsqr in Hlag.
+   rewrite Rabs_sqr in Hlag.
+   rewrite Rsqr_inv in Hlag; [ | easy ].
+   rewrite Rsqr_sqrt in Hlag; [ | lra ].
+   apply Rmult_integral in Hlag.
+   destruct Hlag as [Hlag| Hlag].
+    apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
+
+    apply vec_norm_eq_0 in Hlag.
 bbb.
    apply Hppz.
 bbb.
