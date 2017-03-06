@@ -3219,6 +3219,30 @@ Definition rot_sin_cos p u v :=
   let c := (u₁ · v₁) / (‖u₁‖ * ‖v₁‖) in
   (s, c).
 
+Theorem simple_unit_sphere_ro_sin_cos_on_equator : ∀ p p₁ p₂ c s,
+  ‖p‖ = 1
+  → ‖p₁‖ = 1
+  → ‖p₂‖ = 1
+  → p · p₁ = 0
+  → p · p₂ = 0
+  → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
+  → (s, c) = (p · p₁ × p₂, p₁ · p₂).
+Proof.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hmv.
+destruct p as (xp, yp, zp).
+destruct p₁ as (xp₁, yp₁, zp₁).
+destruct p₂ as (xp₂, yp₂, zp₂).
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm in Hp₁; [ | lra ].
+apply on_sphere_norm in Hp₂; [ | lra ].
+simpl in *.
+rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+rewrite Hp, sqrt_1 in Hmv.
+do 3 rewrite Rdiv_1_r in Hmv.
+injection Hmv; clear Hmv; intros H3 H2 H1.
+Time f_equal; nsatz.
+Qed.
+
 Theorem unit_sphere_rot_sin_cos_on_equator : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -3231,6 +3255,7 @@ Theorem unit_sphere_rot_sin_cos_on_equator : ∀ p p₁ p₂ c s,
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hsc Hmv.
+clear Hsc.
 unfold rot_sin_cos.
 rewrite Ha₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
 do 2 rewrite vec_sub_0_r.
@@ -3258,111 +3283,26 @@ destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
  rewrite Rsqr_0, Rminus_0_r in Hlag.
  now apply Rsqr_eq_0, vec_norm_eq_0 in Hlag.
 
+ apply Rminus_diag_uniq in Hlag.
+ apply Rsqr_eq_abs_0 in Hlag.
+ rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
  destruct (Rle_dec 0 (p · p₁ × p₂)) as [Hzpp| Hzpp].
   rewrite Rmult_1_l.
-  apply Rminus_diag_uniq in Hlag.
-  apply Rsqr_inj in Hlag; [ | apply vec_norm_nonneg | easy ].
-  rewrite Hlag.
-  apply (f_equal Rsqr) in Hlag.
-(* testing this case seems to work with nsatz,
-  providing that Hppz is cleared!
-destruct (vec_eq_dec p (V 1 0 0)) as [H| H].
-subst p.
-  destruct p₁ as (xp₁, yp₁, zp₁).
-  destruct p₂ as (xp₂, yp₂, zp₂).
-  apply on_sphere_norm in Hp; [ | lra ].
-  apply on_sphere_norm in Hp₁; [ | lra ].
-  apply on_sphere_norm in Hp₂; [ | lra ].
-  simpl in *.
-  rewrite Rsqr_1 in Hp₁, Hp₂.
-  rewrite Hp, Rsqr_1, sqrt_1 in Hmv.
-  do 2 rewrite Rdiv_1_r in Hmv.
-  rewrite Rsqr_sqrt in Hlag.
-  rewrite Rsqr_1, Rsqr_0 in Hmv.
-  progress repeat rewrite Rmult_1_l in Hmv.
-  progress repeat rewrite Rmult_0_l in Hmv.
-  progress repeat rewrite Rminus_0_r in Hmv.
-  progress repeat rewrite Rmult_0_l in Hmv.
-  progress repeat rewrite Rplus_0_r in Hmv.
-  progress repeat rewrite Rmult_0_l in Hmv.
-  progress repeat rewrite Rplus_0_r in Hmv.
-  progress repeat rewrite Rplus_0_l in Hmv.
-  progress repeat rewrite Rminus_0_l in Hmv.
-  rewrite <- Ropp_mult_distr_l in Hmv.
-  rewrite fold_Rminus in Hmv.
-injection Hmv; clear Hmv; intros.
-rewrite Rminus_plus, Rmult_1_l in H1.
-move H1 at top; subst xp₂.
-clear Hp.
-rewrite Rmult_1_l, Rmult_0_l, Rmult_0_l in Ha₂.
-do 2 rewrite Rplus_0_r in Ha₂.
-subst xp₁.
-clear Ha₁.
-rewrite Rsqr_0 in *.
-rewrite Rplus_0_l in *.
-rewrite Rmult_0_r, Rmult_0_l in Hppz.
-rewrite Rmult_0_r, Rmult_0_l in Hppz.
-rewrite Rminus_0_r in Hppz.
-rewrite Rmult_1_l, Rmult_0_l, Rmult_0_l in Hzpp.
-do 2 rewrite Rplus_0_r in Hzpp.
-rewrite Rmult_1_l, Rmult_0_l, Rmult_0_l in Hppp.
-do 2 rewrite Rplus_0_r in Hppp.
-clear Hlag.
-clear Hppz.
-f_equal.
- ring_simplify.
-clear Hzpp.
-unfold Rsqr in *.
-nsatz.
-bbb.
-*)
-  destruct p as (xp, yp, zp).
-  destruct p₁ as (xp₁, yp₁, zp₁).
-  destruct p₂ as (xp₂, yp₂, zp₂).
-  apply on_sphere_norm in Hp; [ | lra ].
-  apply on_sphere_norm in Hp₁; [ | lra ].
-  apply on_sphere_norm in Hp₂; [ | lra ].
-  simpl in *.
-  rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
-  rewrite Hp, sqrt_1 in Hmv.
-  do 3 rewrite Rdiv_1_r in Hmv.
-  rewrite Rsqr_sqrt in Hlag.
-  injection Hmv; clear Hmv; intros.
-  f_equal.
-unfold Rsqr in *.
-clear Hzpp.
-nsatz.
-clear Hzpp.
-nsatz.
+  rewrite Rabs_right in Hlag; [ | now apply Rle_ge ].
+  rewrite Hlag; clear Hlag Hzpp Hppp Hppz.
+  now apply simple_unit_sphere_ro_sin_cos_on_equator.
+
+  apply Rnot_le_lt in Hzpp.
+  rewrite <- Ropp_mult_distr_l, Rmult_1_l.
+  rewrite Rabs_left in Hlag; [ | easy ].
+  rewrite Hlag, Ropp_involutive; clear Hlag Hzpp Hppp Hppz.
+  now apply simple_unit_sphere_ro_sin_cos_on_equator.
+Qed.
+
 bbb.
 
-Focus 2.
-destruct (Req_dec (yp₁ * zp₂ - zp₁ * yp₂) 0) as [H₁| H₁].
- rewrite H₁ in *.
- rewrite Rsqr_0, Rplus_0_l in Hlag.
- rewrite Rmult_0_r, Rplus_0_l in Hlag.
- rewrite Rmult_0_r, Rplus_0_l in Hzpp.
- rewrite Rmult_0_r, Rplus_0_l in Hppp.
-(*
- rewrite Rmult_0_r, Rplus_0_l.
-*)
- destruct (Req_dec (zp₁ * xp₂ - xp₁ * zp₂) 0) as [H₂| H₂].
-  rewrite H₂ in *.
-  rewrite Rsqr_0, Rplus_0_l in Hlag.
-  rewrite Rmult_0_r, Rplus_0_l in Hlag.
-  rewrite Rmult_0_r, Rplus_0_l in Hppp.
-  rewrite Rmult_0_r, Rplus_0_l in Hzpp.
-(*
-  rewrite Rmult_0_r, Rplus_0_l.
-*)
-   unfold Rsqr in *.
-bbb.
-   Time nsatz.
-polynomrial not in the ideal
-bbb.
-*)
-
-(* there, I failed *)
+(* there, I failed but probably due to this extra hyp Hzpp for nsatz;
+   to be tried again *)
 Theorem unit_sphere_sin_cos_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
