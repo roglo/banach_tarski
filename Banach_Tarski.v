@@ -3303,13 +3303,29 @@ Theorem unit_sphere_rot_sin_cos : ∀ p p₁ p₂ a c s,
   → p₂ ∈ sphere 1
   → latitude p p₁ = a
   → latitude p p₂ = a
+  → a² < 1
   → p₁ × p₂ ≠ 0%vec
   → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hmv.
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hmv.
 unfold rot_sin_cos.
 rewrite Ha₁.
+remember (p₁ - a ⁎ p)%vec as v₁ eqn:Hv₁.
+remember (p₂ - a ⁎ p)%vec as v₂ eqn:Hv₂.
+remember (v₁ ⁄ √ (1 - a²)) as v'₁ eqn:Hv'₁.
+remember (v₂ ⁄ √ (1 - a²)) as v'₂ eqn:Hv'₂.
+assert (Hsa : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
+assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
+ subst v₁ v₂.
+ symmetry in Ha₁, Ha₂.
+ eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
+ eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
+ rewrite Hv'₁, Hv'₂.
+ do 2 rewrite vec_norm_vec_const_mul.
+ rewrite Rabs_Rinv; [ | easy ].
+ rewrite Rabs_sqrt, Ha₁, Ha₂.
+ now rewrite Rinv_l.
 bbb.
 
 ₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
