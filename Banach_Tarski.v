@@ -3364,8 +3364,11 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
   rewrite Hlag.
   unfold Rsign.
   destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp].
+   exfalso.
    rewrite Hppp, Rabs_R0 in Hlag.
    apply vec_norm_eq_0 in Hlag.
+bbb.
+
    rewrite Hv'₁, Hv'₂, Hv₁, Hv₂ in Hlag.
    rewrite <- vec_const_mul_cross_distr_l in Hlag.
    rewrite <- vec_const_mul_cross_distr_r in Hlag.
@@ -3377,6 +3380,8 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
    destruct Hlag as [Hlag| Hlag].
     apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
 
+rewrite <- Hv₁, <- Hv₂ in Hlag.
+bbb.
     rewrite vec_cross_mul_sub_distr_l in Hlag.
     do 2 rewrite vec_cross_mul_sub_distr_r in Hlag.
     setoid_rewrite <- vec_const_mul_cross_distr_l in Hlag at 2.
