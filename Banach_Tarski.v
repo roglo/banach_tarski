@@ -3386,6 +3386,9 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
     rewrite vec_sub_0_r in Hlag.
     setoid_rewrite vec_cross_mul_anticomm in Hlag at 2.
     rewrite vec_sub_opp_r in Hlag.
+    rewrite <- vec_add_sub_distr in Hlag.
+    rewrite <- vec_cross_mul_sub_distr_r in Hlag.
+    rewrite <- vec_const_mul_cross_distr_r in Hlag.
 bbb.
 
     rewrite <- vec_sub_add_distr in Hlag.
