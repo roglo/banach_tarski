@@ -3309,6 +3309,7 @@ Theorem unit_sphere_rot_sin_cos : ∀ p p₁ p₂ a c s,
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hmv.
+bbb. (* voir p₁ × p₂ ≠ 0 : mal adapté *)
 unfold rot_sin_cos.
 rewrite Ha₁.
 remember (p₁ - a ⁎ p)%vec as v₁ eqn:Hv₁.
@@ -3367,9 +3368,7 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
    exfalso.
    rewrite Hppp, Rabs_R0 in Hlag.
    apply vec_norm_eq_0 in Hlag.
-bbb.
-
-   rewrite Hv'₁, Hv'₂, Hv₁, Hv₂ in Hlag.
+   rewrite Hv'₁, Hv'₂ in Hlag.
    rewrite <- vec_const_mul_cross_distr_l in Hlag.
    rewrite <- vec_const_mul_cross_distr_r in Hlag.
    rewrite vec_const_mul_assoc in Hlag.
@@ -3380,7 +3379,6 @@ bbb.
    destruct Hlag as [Hlag| Hlag].
     apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
 
-rewrite <- Hv₁, <- Hv₂ in Hlag.
 bbb.
     rewrite vec_cross_mul_sub_distr_l in Hlag.
     do 2 rewrite vec_cross_mul_sub_distr_r in Hlag.
