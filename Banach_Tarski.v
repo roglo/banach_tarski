@@ -3297,6 +3297,80 @@ destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
   now apply simple_unit_sphere_ro_sin_cos_on_equator.
 Qed.
 
+Theorem vec_unit_cross_mul_eq_0 : ∀ u v,
+  ‖u‖ = 1
+  → ‖v‖ = 1
+  → u × v = 0%vec
+  → u = v ∨ u = (- v)%vec.
+Proof.
+intros * Hu Hv Huxv.
+specialize (vec_Lagrange_identity u v) as H.
+rewrite Hu, Hv, Huxv, vec_sqr_0 in H.
+rewrite Rsqr_1, Rmult_1_l in H.
+apply Rminus_diag_uniq in H; symmetry in H.
+destruct u as (u₁, u₂, u₃).
+destruct v as (v₁, v₂, v₃).
+apply on_sphere_norm in Hu; [ | lra ].
+apply on_sphere_norm in Hv; [ | lra ].
+simpl in *.
+rewrite Rsqr_1 in Hu, Hv.
+injection Huxv; clear Huxv; intros H3 H2 H1.
+apply Rminus_diag_uniq in H1.
+apply Rminus_diag_uniq in H2.
+apply Rminus_diag_uniq in H3.
+replace 1 with 1² in H by apply Rsqr_1.
+apply Rsqr_eq_abs_0 in H.
+rewrite Rabs_R1 in H.
+unfold Rabs in H.
+destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
+ right; clear Ha.
+ f_equal; nsatz.
+
+ left; clear Ha.
+ f_equal; nsatz.
+Qed.
+
+Theorem vec_same_norm_cross_mul_eq_0 : ∀ u v,
+  ‖u‖ = ‖v‖
+  → u × v = 0%vec
+  → u = v ∨ u = (- v)%vec.
+Proof.
+intros * Huv Huxv.
+destruct (vec_eq_dec u 0) as [Hu| Hu].
+ rewrite Hu, vec_norm_0 in Huv; symmetry in Huv.
+ now apply vec_norm_eq_0 in Huv; subst u v; left.
+
+ remember ‖u‖ as r eqn:Hr.
+ assert (Hrz : r ≠ 0).
+  intros H; rewrite H in Hr; symmetry in Hr.
+  now apply vec_norm_eq_0 in Hr.
+
+  assert (‖(u ⁄ r)‖ = 1 ∧ ‖(v ⁄ r)‖ = 1) as (Hu1, Hv1).
+   do 2 rewrite vec_norm_vec_const_mul.
+   rewrite <- Hr, <- Huv.
+   rewrite Rabs_right; [ now split; rewrite Rinv_l | ].
+   apply Rle_ge.
+   assert (Hrp : 0 ≤ r) by (rewrite Hr; apply vec_norm_nonneg).
+   apply Rmult_le_reg_r with (r := r); [ lra | ].
+   rewrite Rmult_0_l.
+   rewrite Rinv_l; [ lra | easy ].
+
+   assert (Huvr : (u ⁄ r) × (v ⁄ r) = 0%vec).
+    rewrite <- vec_const_mul_cross_distr_l.
+    rewrite <- vec_const_mul_cross_distr_r.
+    rewrite Huxv.
+    now do 2 rewrite vec_const_mul_0_r.
+
+    specialize (vec_unit_cross_mul_eq_0 (u ⁄ r) (v ⁄ r) Hu1 Hv1 Huvr) as H.
+    destruct H as [H| H]; [ left | right ].
+     apply vec_const_mul_eq_reg_l with (a := / r); [ easy | ].
+     now apply Rinv_neq_0_compat.
+
+     rewrite vec_opp_const_mul_distr_r in H.
+     apply vec_const_mul_eq_reg_l with (a := / r); [ easy | ].
+     now apply Rinv_neq_0_compat.
+Qed.
+
 Theorem unit_sphere_rot_sin_cos : ∀ p p₁ p₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -3383,31 +3457,8 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
     apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
 
     rewrite Rmult_0_l.
-Search (_ × _ = 0%vec).
-Theorem glop : ∀ u v, ‖u‖ = ‖v‖ → u × v = 0%vec → u = v ∨ u = (- v)%vec.
-Proof.
-intros * Huv Huxv.
-specialize (vec_Lagrange_identity u v) as H.
-rewrite Huv, Huxv, vec_sqr_0, fold_Rsqr in H.
-apply Rminus_diag_uniq in H.
-apply Rsqr_eq_abs_0 in H.
-rewrite Rabs_sqr in H.
-unfold Rabs in H.
-destruct (Rcase_abs (u · v)) as [Ha| Ha].
- right.
- destruct u as (u₁, u₂, u₃).
- destruct v as (v₁, v₂, v₃).
- apply (f_equal Rsqr) in Huv.
- do 2 rewrite <- vec_dot_mul_diag in Huv.
- simpl in Huv, Ha, Huxv, H; simpl.
- injection Huxv; clear Huxv; intros H3 H2 H1.
- rewrite Rsqr_sqrt in H.
- do 6 rewrite fold_Rsqr in Huv.
-bbb.
-
-(* return to main theorem *)
-apply glop in Hlag.
-destruct Hlag as [Hlag| Hlag].
+    apply vec_same_norm_cross_mul_eq_0 in Hlag.
+    destruct Hlag as [Hlag| Hlag].
 
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
