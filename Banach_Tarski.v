@@ -3386,11 +3386,23 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
 Search (_ × _ = 0%vec).
 Theorem glop : ∀ u v, ‖u‖ = ‖v‖ → u × v = 0%vec → u = v ∨ u = (- v)%vec.
 Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) Huv Huxv.
-apply (f_equal Rsqr) in Huv.
-do 2 rewrite <- vec_dot_mul_diag in Huv.
-simpl in Huv, Huxv.
-injection Huxv; clear Huxv; intros H3 H2 H1.
+intros * Huv Huxv.
+specialize (vec_Lagrange_identity u v) as H.
+rewrite Huv, Huxv, vec_sqr_0, fold_Rsqr in H.
+apply Rminus_diag_uniq in H.
+apply Rsqr_eq_abs_0 in H.
+rewrite Rabs_sqr in H.
+unfold Rabs in H.
+destruct (Rcase_abs (u · v)) as [Ha| Ha].
+ right.
+ destruct u as (u₁, u₂, u₃).
+ destruct v as (v₁, v₂, v₃).
+ apply (f_equal Rsqr) in Huv.
+ do 2 rewrite <- vec_dot_mul_diag in Huv.
+ simpl in Huv, Ha, Huxv, H; simpl.
+ injection Huxv; clear Huxv; intros H3 H2 H1.
+ rewrite Rsqr_sqrt in H.
+ do 6 rewrite fold_Rsqr in Huv.
 bbb.
 
 (* return to main theorem *)
