@@ -3476,11 +3476,28 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
       move Hppvv at top; subst p₂.
       rewrite <- Hv'₁ in Hv'₂.
       move Hv'₂ at top; subst v'₂.
-      clear Hp₂ Ha₂ Hv₂ Hnv₂.
+      clear Hp₂ Ha₂ Hv₂ Hnv₂ Hpv₂.
       apply on_sphere_norm in Hp; [ | lra ].
+rewrite Hv'₁, Hv₁ in Hpv₁.
+rewrite <- Rmult_vec_dot_mul_distr_r in Hpv₁.
+apply Rmult_integral in Hpv₁.
+destruct Hpv₁ as [Hpv₁| Hpv₁].
+ now apply Rinv_neq_0_compat in Hsa.
+
+bbb.
+enough (‖v₁‖² = 1 - a²).
+(*
+rewrite Hv'₁ in Hnv₁.
+Search (‖(_ ⁎ _)‖).
+rewrite vec_norm_vec_const_mul in Hnv₁.
+rewrite Rabs_right in Hnv₁.
+*)
+rewrite Hv₁ in H.
       destruct p as (xp, yp, zp).
       destruct p₁ as (xp₁, yp₁, zp₁).
       unfold latitude in Ha₁; simpl in *.
+rewrite Rsqr_sqrt in H.
+do 3 rewrite fold_Rminus in H.
       rewrite Rsqr_1 in Hp, Hp₁.
       rewrite Hp, Hp₁ in Ha₁.
       rewrite Hp in Hmv.
@@ -3488,12 +3505,16 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
       rewrite Rmult_1_l, Rdiv_1_r in Ha₁.
       do 3 rewrite Rdiv_1_r in Hmv.
       do 3 rewrite fold_Rminus in Hv₁.
+      do 3 rewrite fold_Rminus in Hpv₁.
       rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
       injection Hmv; clear Hmv; intros H3 H2 H1.
       f_equal.
-clear - Hp Hp₁ Ha₁ Ha2 H1 H2 H3.
-bbb.
-clear a Ha₁ Ha2.
+clear v'₁ Hv'₁ Hnv₁ Hppp.
+(*
+clear - Hp Hp₁ Ha₁ Ha2 Hpv₁ H1 H2 H3 H.
+rewrite <- Ha₁ in Hpv₁.
+ *)
+clear Ha2 Hsa v₁ Hv₁.
 unfold Rsqr in *.
 nsatz.
 polynomial not in the ideal
