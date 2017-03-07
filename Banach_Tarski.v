@@ -3484,18 +3484,18 @@ apply Rmult_integral in Hpv₁.
 destruct Hpv₁ as [Hpv₁| Hpv₁].
  now apply Rinv_neq_0_compat in Hsa.
 
-(* seems not to work: testing below when the point is on the equator *)
+ rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
+(* the general case seems not to work: testing below when the point is on
+   the equator *)
 enough (a = 0).
 move H at top; subst a.
-clear Ha2 Hsa.
+clear Ha2 Hsa Hppp Ha₁ Hnv₁.
 rewrite vec_const_mul_0_l, vec_sub_0_r in Hv₁.
 move Hv₁ at top; subst v₁.
 rewrite Rsqr_0, Rminus_0_r, sqrt_1 in Hv'₁.
 rewrite Rinv_1, vec_const_mul_1_l in Hv'₁.
 move Hv'₁ at top; subst v'₁.
 rewrite vec_const_mul_0_l, vec_sub_0_r in Hpv₁.
-rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
-clear Hppp Ha₁ Hnv₁.
 (*
   p₁, p : vector
   c, s : ℝ
