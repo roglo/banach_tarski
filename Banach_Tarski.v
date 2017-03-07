@@ -3484,6 +3484,36 @@ apply Rmult_integral in Hpv₁.
 destruct Hpv₁ as [Hpv₁| Hpv₁].
  now apply Rinv_neq_0_compat in Hsa.
 
+(* seems not to work: testing below when the point is on the equator *)
+enough (a = 0).
+move H at top; subst a.
+clear Ha2 Hsa.
+rewrite vec_const_mul_0_l, vec_sub_0_r in Hv₁.
+move Hv₁ at top; subst v₁.
+rewrite Rsqr_0, Rminus_0_r, sqrt_1 in Hv'₁.
+rewrite Rinv_1, vec_const_mul_1_l in Hv'₁.
+move Hv'₁ at top; subst v'₁.
+rewrite vec_const_mul_0_l, vec_sub_0_r in Hpv₁.
+rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
+clear Hppp.
+unfold latitude in Ha₁.
+clear Ha₁.
+destruct p as (xp, yp, zp).
+destruct p₁ as (xp₁, yp₁, zp₁).
+apply (f_equal Rsqr) in Hnv₁.
+rewrite Rsqr_1 in Hnv₁.
+simpl in *.
+rewrite Rsqr_1 in Hp, Hp₁.
+clear Hnv₁.
+rewrite Hp in Hmv.
+rewrite sqrt_1 in Hmv.
+do 3 rewrite Rdiv_1_r in Hmv.
+injection Hmv; clear Hmv; intros H3 H2 H1.
+f_equal; nsatz.
+(* it works on the equator! *)
+
+bbb.
+(* seems not to work: testing above when the point is on the equator *)
 enough (‖v₁‖² = 1 - a²).
 (*
 rewrite Hv'₁ in Hnv₁.
