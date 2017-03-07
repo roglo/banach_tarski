@@ -3513,7 +3513,7 @@ f_equal; nsatz.
 (* it works on the equator! *)
 
 bbb.
-(* seems not to work: testing above when the point is on the equator *)
+(* seems not to work in the general case *)
 enough (‖v₁‖² = 1 - a²).
 (*
 rewrite Hv'₁ in Hnv₁.
