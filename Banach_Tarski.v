@@ -3495,16 +3495,21 @@ rewrite Rinv_1, vec_const_mul_1_l in Hv'₁.
 move Hv'₁ at top; subst v'₁.
 rewrite vec_const_mul_0_l, vec_sub_0_r in Hpv₁.
 rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
-clear Hppp.
-unfold latitude in Ha₁.
-clear Ha₁.
+clear Hppp Ha₁ Hnv₁.
+(*
+  p₁, p : vector
+  c, s : ℝ
+  Hp : p ∈ sphere 1
+  Hp₁ : p₁ ∈ sphere 1
+  Hmv : (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₁
+  Hpv₁ : p · p₁ = 0
+  ============================
+  (s, c) = (0, 1)
+*)
 destruct p as (xp, yp, zp).
 destruct p₁ as (xp₁, yp₁, zp₁).
-apply (f_equal Rsqr) in Hnv₁.
-rewrite Rsqr_1 in Hnv₁.
 simpl in *.
 rewrite Rsqr_1 in Hp, Hp₁.
-clear Hnv₁.
 rewrite Hp in Hmv.
 rewrite sqrt_1 in Hmv.
 do 3 rewrite Rdiv_1_r in Hmv.
