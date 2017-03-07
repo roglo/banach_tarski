@@ -3430,35 +3430,57 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
    rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
    now rewrite Rminus_diag_eq.
 
-  specialize (vec_Lagrange_identity p (v'₁ × v'₂)) as Hlag.
-  apply on_sphere_norm in Hp; [ | lra ].
-  rewrite Hp, Rsqr_1, Rmult_1_l in Hlag.
-  rewrite vec_cross_mul_assoc_r in Hlag.
-  rewrite Hpv₁, Hpv₂ in Hlag.
-  do 2 rewrite vec_const_mul_0_l in Hlag.
-  rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
-  apply Rminus_diag_uniq in Hlag.
-  apply Rsqr_eq_abs_0 in Hlag.
-  rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
-  rewrite Hlag.
-  unfold Rsign.
-  destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp].
-   rewrite Hppp, Rabs_R0 in Hlag.
-   apply vec_norm_eq_0 in Hlag.
-   rewrite Hv'₁, Hv'₂ in Hlag.
-   rewrite <- vec_const_mul_cross_distr_l in Hlag.
-   rewrite <- vec_const_mul_cross_distr_r in Hlag.
-   rewrite vec_const_mul_assoc in Hlag.
-   rewrite fold_Rsqr in Hlag.
-   rewrite Rsqr_inv in Hlag; [ | easy ].
-   rewrite Rsqr_sqrt in Hlag; [ | lra ].
-   apply eq_vec_const_mul_0 in Hlag.
-   destruct Hlag as [Hlag| Hlag].
-    apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
+  assert (Hppvv : (p₂ - p₁ = v₂ - v₁)%vec).
+   rewrite Hv₁, Hv₂.
+   rewrite vec_sub_sub_distr.
+   unfold vec_sub.
+   do 2 rewrite <- vec_add_assoc.
+   f_equal.
+   rewrite vec_add_comm.
+   rewrite <- vec_add_assoc.
+   rewrite vec_add_opp_diag_r.
+   now rewrite vec_add_0_r.
 
-    rewrite Rmult_0_l.
-    apply vec_same_norm_cross_mul_eq_0 in Hlag.
+   specialize (vec_Lagrange_identity p (v'₁ × v'₂)) as Hlag.
+   apply on_sphere_norm in Hp; [ | lra ].
+   rewrite Hp, Rsqr_1, Rmult_1_l in Hlag.
+   rewrite vec_cross_mul_assoc_r in Hlag.
+   rewrite Hpv₁, Hpv₂ in Hlag.
+   do 2 rewrite vec_const_mul_0_l in Hlag.
+   rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
+   apply Rminus_diag_uniq in Hlag.
+   apply Rsqr_eq_abs_0 in Hlag.
+   rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
+   rewrite Hlag.
+   unfold Rsign.
+   destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp].
+    rewrite Hppp, Rabs_R0 in Hlag.
+    apply vec_norm_eq_0 in Hlag.
+    rewrite Hv'₁, Hv'₂ in Hlag.
+    rewrite <- vec_const_mul_cross_distr_l in Hlag.
+    rewrite <- vec_const_mul_cross_distr_r in Hlag.
+    rewrite vec_const_mul_assoc in Hlag.
+    rewrite fold_Rsqr in Hlag.
+    rewrite Rsqr_inv in Hlag; [ | easy ].
+    rewrite Rsqr_sqrt in Hlag; [ | lra ].
+    apply eq_vec_const_mul_0 in Hlag.
     destruct Hlag as [Hlag| Hlag].
+     apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
+
+     rewrite Rmult_0_l.
+     apply vec_same_norm_cross_mul_eq_0 in Hlag.
+     destruct Hlag as [Hlag| Hlag].
+      rewrite Hlag, vec_sub_diag in Hppvv.
+      apply vec_sub_diag_uniq in Hppvv.
+      move Hppvv at top; subst p₂.
+bbb.
+Search matrix_of_axis_angle.
+unit_sphere_eigenvalue_minus_1_angle_π:
+  ∀ (axis : vector) (sinθ cosθ : ℝ) (v : vector),
+  axis ∈ sphere 1
+  → v ∈ sphere 1
+    → (matrix_of_axis_angle (axis, cosθ, sinθ) * v)%vec = (- v)%vec
+      → (sinθ, cosθ) = (0, -1)
 
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
