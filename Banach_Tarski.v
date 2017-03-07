@@ -3484,7 +3484,6 @@ apply Rmult_integral in Hpv₁.
 destruct Hpv₁ as [Hpv₁| Hpv₁].
  now apply Rinv_neq_0_compat in Hsa.
 
-bbb.
 enough (‖v₁‖² = 1 - a²).
 (*
 rewrite Hv'₁ in Hnv₁.
@@ -3515,8 +3514,10 @@ clear - Hp Hp₁ Ha₁ Ha2 Hpv₁ H1 H2 H3 H.
 rewrite <- Ha₁ in Hpv₁.
  *)
 clear Ha2 Hsa v₁ Hv₁.
+enough (s² + c² = 1).
 unfold Rsqr in *.
 nsatz.
+bbb.
 polynomial not in the ideal
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
