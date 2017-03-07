@@ -3470,18 +3470,33 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
      rewrite Rmult_0_l.
      apply vec_same_norm_cross_mul_eq_0 in Hlag.
      destruct Hlag as [Hlag| Hlag].
-      rewrite Hlag, vec_sub_diag in Hppvv.
+      move Hlag at top; subst v₂.
+      rewrite vec_sub_diag in Hppvv.
       apply vec_sub_diag_uniq in Hppvv.
       move Hppvv at top; subst p₂.
+      rewrite <- Hv'₁ in Hv'₂.
+      move Hv'₂ at top; subst v'₂.
+      clear Hp₂ Ha₂ Hv₂ Hnv₂.
+      apply on_sphere_norm in Hp; [ | lra ].
+      destruct p as (xp, yp, zp).
+      destruct p₁ as (xp₁, yp₁, zp₁).
+      unfold latitude in Ha₁; simpl in *.
+      rewrite Rsqr_1 in Hp, Hp₁.
+      rewrite Hp, Hp₁ in Ha₁.
+      rewrite Hp in Hmv.
+      rewrite sqrt_1 in Ha₁, Hmv.
+      rewrite Rmult_1_l, Rdiv_1_r in Ha₁.
+      do 3 rewrite Rdiv_1_r in Hmv.
+      do 3 rewrite fold_Rminus in Hv₁.
+      rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
+      injection Hmv; clear Hmv; intros H3 H2 H1.
+      f_equal.
+clear - Hp Hp₁ Ha₁ Ha2 H1 H2 H3.
 bbb.
-Search matrix_of_axis_angle.
-unit_sphere_eigenvalue_minus_1_angle_π:
-  ∀ (axis : vector) (sinθ cosθ : ℝ) (v : vector),
-  axis ∈ sphere 1
-  → v ∈ sphere 1
-    → (matrix_of_axis_angle (axis, cosθ, sinθ) * v)%vec = (- v)%vec
-      → (sinθ, cosθ) = (0, -1)
-
+clear a Ha₁ Ha2.
+unfold Rsqr in *.
+nsatz.
+polynomial not in the ideal
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
