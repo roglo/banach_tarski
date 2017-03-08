@@ -3519,8 +3519,13 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
           apply Rmult_integral in H.
           destruct H; lra.
 
-       bbb.
+       apply (f_equal vec_opp) in Hlag.
+       rewrite neg_vec_involutive in Hlag.
        move Hlag at top; subst v₂.
+       rewrite <- vec_opp_const_mul_distr_r, <- Hv'₁ in Hv'₂.
+       move Hv'₂ at top; subst v'₂.
+       rewrite <- vec_opp_dot_mul_distr_r.
+       rewrite vec_dot_mul_diag, Hnv'₁, Rsqr_1.
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
