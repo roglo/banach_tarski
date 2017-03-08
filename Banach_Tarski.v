@@ -3392,7 +3392,7 @@ remember (v₂ ⁄ √ (1 - a²)) as v'₂ eqn:Hv'₂.
 move v₁ before p₂; move v₂ before v₁.
 move v'₁ before v₂; move v'₂ before v'₁.
 assert (Hsa : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
-assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
+assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
  subst v₁ v₂.
  symmetry in Ha₁, Ha₂.
  eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
@@ -3403,7 +3403,10 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
- rewrite Hnv₁, Hnv₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
+ assert (‖v₁‖² = 1 - a²) as Hnv₁.
+bbb.
+
+ rewrite Hnv'₁, Hnv'₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
  assert (p · v'₁ = 0 ∧ p · v'₂ = 0) as (Hpv₁, Hpv₂).
   subst v'₁ v'₂ v₁ v₂.
   do 2 rewrite <- Rmult_vec_dot_mul_distr_r.
@@ -3480,7 +3483,6 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
        now apply Rinv_neq_0_compat in Hsa.
 
        rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
-enough (‖v₁‖² = 1 - a²).
 (*
 rewrite Hv'₁ in Hnv₁.
 Search (‖(_ ⁎ _)‖).
@@ -3492,7 +3494,7 @@ rewrite Hv₁ in H.
       destruct p₁ as (xp₁, yp₁, zp₁).
       unfold latitude in Ha₁; simpl in *.
 rewrite Rsqr_sqrt in H.
-do 3 rewrite fold_Rminus in H.
+ do 3 rewrite fold_Rminus in H.
       rewrite Rsqr_1 in Hp, Hp₁.
       rewrite Hp, Hp₁ in Ha₁.
       rewrite Hp in Hmv.
