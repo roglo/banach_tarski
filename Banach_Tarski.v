@@ -3518,19 +3518,19 @@ unfold Rsqr in H1.
 assert
   (H1' :
      (xp * xp₁ + yp * yp₁ + zp * zp₁) * ((1 - c) * xp) +
-     (c - 1) * xp₁ = - s * (yp * zp₁ - zp * yp₁)) by (clear - H1; lra).
+     (c - 1) * xp₁ + s * (yp * zp₁ - zp * yp₁) = 0) by (clear - H1; lra).
 clear H1; rename H1' into H1.
 unfold Rsqr in H2.
 assert
   (H2' :
      (xp * xp₁ + yp * yp₁ + zp * zp₁) * ((1 - c) * yp) +
-     (c - 1) * yp₁ = - s * (zp * xp₁ - xp * zp₁)) by (clear - H2; lra).
+     (c - 1) * yp₁ + s * (zp * xp₁ - xp * zp₁) = 0) by (clear - H2; lra).
 clear H2; rename H2' into H2.
 unfold Rsqr in H3.
 assert
   (H3' :
      (xp * xp₁ + yp * yp₁ + zp * zp₁) * ((1 - c) * zp) +
-     (c - 1) * zp₁ = - s * (xp * yp₁ - yp * xp₁)) by (clear - H3; lra).
+     (c - 1) * zp₁ + s * (xp * yp₁ - yp * xp₁) = 0) by (clear - H3; lra).
 clear H3; rename H3' into H3.
 rewrite Hpv₁, Rmult_0_l, Rplus_0_l in H1, H2, H3.
 Time f_equal; nsatz.
