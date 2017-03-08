@@ -3378,16 +3378,11 @@ Theorem unit_sphere_rot_sin_cos : ∀ p p₁ p₂ a c s,
   → latitude p p₁ = a
   → latitude p p₂ = a
   → a² < 1
-  → p₁ × p₂ ≠ 0%vec
+  → s² + c² = 1
   → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hmv.
-(*
-bbb. (* voir p₁ × p₂ ≠ 0 : mal adapté *)
-*)
-clear Hppz.
-(**)
+intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
 unfold rot_sin_cos.
 rewrite Ha₁.
 remember (p₁ - a ⁎ p)%vec as v₁ eqn:Hv₁.
@@ -3478,70 +3473,13 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv₁, Hnv₂).
       move Hv'₂ at top; subst v'₂.
       clear Hp₂ Ha₂ Hv₂ Hnv₂ Hpv₂.
       apply on_sphere_norm in Hp; [ | lra ].
-rewrite Hv'₁, Hv₁ in Hpv₁.
-rewrite <- Rmult_vec_dot_mul_distr_r in Hpv₁.
-apply Rmult_integral in Hpv₁.
-destruct Hpv₁ as [Hpv₁| Hpv₁].
- now apply Rinv_neq_0_compat in Hsa.
+      rewrite Hv'₁, Hv₁ in Hpv₁.
+      rewrite <- Rmult_vec_dot_mul_distr_r in Hpv₁.
+      apply Rmult_integral in Hpv₁.
+      destruct Hpv₁ as [Hpv₁| Hpv₁].
+       now apply Rinv_neq_0_compat in Hsa.
 
- rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
-(*
-(* the general case seems not to work: testing below when the point is on
-   the equator *)
-enough (a = 0).
-move H at top; subst a.
-clear Ha2 Hsa Hppp Ha₁ Hnv₁.
-rewrite vec_const_mul_0_l, vec_sub_0_r in Hv₁.
-move Hv₁ at top; subst v₁.
-rewrite Rsqr_0, Rminus_0_r, sqrt_1 in Hv'₁.
-rewrite Rinv_1, vec_const_mul_1_l in Hv'₁.
-move Hv'₁ at top; subst v'₁.
-rewrite vec_const_mul_0_l, vec_sub_0_r in Hpv₁.
-(*
-  p₁, p : vector
-  c, s : ℝ
-  Hp : p ∈ sphere 1
-  Hp₁ : p₁ ∈ sphere 1
-  Hmv : (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₁
-  Hpv₁ : p · p₁ = 0
-  ============================
-  (s, c) = (0, 1)
-*)
-destruct p as (xp, yp, zp).
-destruct p₁ as (xp₁, yp₁, zp₁).
-simpl in *.
-rewrite Rsqr_1 in Hp, Hp₁.
-rewrite Hp in Hmv.
-rewrite sqrt_1 in Hmv.
-do 3 rewrite Rdiv_1_r in Hmv.
-injection Hmv; clear Hmv; intros H3 H2 H1.
-unfold Rsqr in H1.
-assert
-  (H1' :
-     (xp * xp₁ + yp * yp₁ + zp * zp₁) * ((1 - c) * xp) +
-     (c - 1) * xp₁ + s * (yp * zp₁ - zp * yp₁) = 0) by (clear - H1; lra).
-clear H1; rename H1' into H1.
-unfold Rsqr in H2.
-assert
-  (H2' :
-     (xp * xp₁ + yp * yp₁ + zp * zp₁) * ((1 - c) * yp) +
-     (c - 1) * yp₁ + s * (zp * xp₁ - xp * zp₁) = 0) by (clear - H2; lra).
-clear H2; rename H2' into H2.
-unfold Rsqr in H3.
-assert
-  (H3' :
-     (xp * xp₁ + yp * yp₁ + zp * zp₁) * ((1 - c) * zp) +
-     (c - 1) * zp₁ + s * (xp * yp₁ - yp * xp₁) = 0) by (clear - H3; lra).
-clear H3; rename H3' into H3.
-rewrite Hpv₁, Rmult_0_l, Rplus_0_l in H1, H2, H3.
-Print matrix_of_unit_axis_angle.
-
-Time f_equal; nsatz.
-(* it works on the equator! *)
-
-bbb.
-*)
-(* seems not to work in the general case *)
+       rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
 enough (‖v₁‖² = 1 - a²).
 (*
 rewrite Hv'₁ in Hnv₁.
@@ -3564,15 +3502,19 @@ do 3 rewrite fold_Rminus in H.
       do 3 rewrite fold_Rminus in Hv₁.
       do 3 rewrite fold_Rminus in Hpv₁.
       injection Hmv; clear Hmv; intros H3 H2 H1.
+      assert (a² ≠ 1) by lra.
       f_equal.
-clear v'₁ Hv'₁ Hnv₁ Hppp.
-clear Ha2 Hsa.
-enough (s² + c² = 1).
-enough (a² ≠ 1).
-assert ((a² - 1) * s = 0).
-nsatz.
-apply Rmult_integral in H5.
-lra.
+       assert ((a² - 1) * s = 0).
+        clear v'₁ Hv'₁ Hv₁ Hnv₁ Hppp Ha2 Hsa; nsatz.
+
+        apply Rmult_integral in H4.
+        destruct H4; [ lra | easy ].
+
+       assert ((a² - 1) * (c - 1) = 0).
+        clear v'₁ Hv'₁ Hv₁ Hnv₁ Hppp Ha2 Hsa; nsatz.
+
+        apply Rmult_integral in H4.
+        destruct H4; lra.
 bbb.
 
 (*
