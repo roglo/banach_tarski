@@ -3514,7 +3514,15 @@ rewrite Hp in Hmv.
 rewrite sqrt_1 in Hmv.
 do 3 rewrite Rdiv_1_r in Hmv.
 injection Hmv; clear Hmv; intros H3 H2 H1.
-f_equal; nsatz.
+unfold Rsqr in H1.
+assert
+  (H1' :
+     c * (xp₁ - xp * (xp * xp₁ + yp * yp₁ + zp * zp₁)) +
+     s * (yp * zp₁ - zp * yp₁) +
+     xp * (xp * xp₁ + yp * yp₁ + zp * zp₁) = xp₁) by (clear - H1; lra).
+clear H1; rename H1' into H1.
+rewrite Hpv₁, Rmult_0_r, Rminus_0_r, Rplus_0_r in H1.
+Time f_equal; nsatz.
 (* it works on the equator! *)
 
 bbb.
