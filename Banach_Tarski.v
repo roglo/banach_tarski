@@ -3485,6 +3485,7 @@ destruct Hpv₁ as [Hpv₁| Hpv₁].
  now apply Rinv_neq_0_compat in Hsa.
 
  rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
+(*
 (* the general case seems not to work: testing below when the point is on
    the equator *)
 enough (a = 0).
@@ -3533,10 +3534,13 @@ assert
      (c - 1) * zp₁ + s * (xp * yp₁ - yp * xp₁) = 0) by (clear - H3; lra).
 clear H3; rename H3' into H3.
 rewrite Hpv₁, Rmult_0_l, Rplus_0_l in H1, H2, H3.
+Print matrix_of_unit_axis_angle.
+
 Time f_equal; nsatz.
 (* it works on the equator! *)
 
 bbb.
+*)
 (* seems not to work in the general case *)
 enough (‖v₁‖² = 1 - a²).
 (*
@@ -3559,10 +3563,18 @@ do 3 rewrite fold_Rminus in H.
       do 3 rewrite Rdiv_1_r in Hmv.
       do 3 rewrite fold_Rminus in Hv₁.
       do 3 rewrite fold_Rminus in Hpv₁.
-      rewrite vec_dot_mul_diag, Hnv₁, Rsqr_1.
       injection Hmv; clear Hmv; intros H3 H2 H1.
       f_equal.
 clear v'₁ Hv'₁ Hnv₁ Hppp.
+clear Ha2 Hsa.
+enough (s² + c² = 1).
+enough (a² ≠ 1).
+assert ((a² - 1) * s = 0).
+nsatz.
+apply Rmult_integral in H5.
+lra.
+bbb.
+
 (*
 clear - Hp Hp₁ Ha₁ Ha2 Hpv₁ H1 H2 H3 H.
 rewrite <- Ha₁ in Hpv₁.
