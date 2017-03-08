@@ -3517,11 +3517,26 @@ injection Hmv; clear Hmv; intros H3 H2 H1.
 unfold Rsqr in H1.
 assert
   (H1' :
-     c * (xp₁ - xp * (xp * xp₁ + yp * yp₁ + zp * zp₁)) +
+     c * (xp₁ - xp * (xp * xp₁ + yp * yp₁ + zp * zp₁)) - 1 * xp₁ +
      s * (yp * zp₁ - zp * yp₁) +
-     xp * (xp * xp₁ + yp * yp₁ + zp * zp₁) = xp₁) by (clear - H1; lra).
+     xp * (xp * xp₁ + yp * yp₁ + zp * zp₁) = 0) by (clear - H1; lra).
 clear H1; rename H1' into H1.
-rewrite Hpv₁, Rmult_0_r, Rminus_0_r, Rplus_0_r in H1.
+unfold Rsqr in H2.
+assert
+  (H2' :
+     c * (yp₁ - yp * (xp * xp₁ + yp * yp₁ + zp * zp₁)) - 1 * yp₁ +
+     s * (zp * xp₁ - xp * zp₁) +
+     yp * (xp * xp₁ + yp * yp₁ + zp * zp₁) = 0) by (clear - H2; lra).
+clear H2; rename H2' into H2.
+unfold Rsqr in H3.
+assert
+  (H3' :
+     c * (zp₁ - zp * (xp * xp₁ + yp * yp₁ + zp * zp₁)) - 1 * zp₁ +
+     s * (xp * yp₁ - yp * xp₁) +
+     zp * (xp * xp₁ + yp * yp₁ + zp * zp₁) = 0) by (clear - H3; lra).
+clear H3; rename H3' into H3.
+rewrite Hpv₁, Rmult_0_r, Rminus_0_r, Rplus_0_r in H1, H2, H3.
+rewrite <- Rmult_minus_distr_r in H1, H2, H3.
 Time f_equal; nsatz.
 (* it works on the equator! *)
 
