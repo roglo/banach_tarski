@@ -3547,6 +3547,11 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
         rewrite Rmult_1_l.
         rewrite Rabs_right; [ | now apply Rle_ge ].
         rewrite Rabs_right in Hlag; [ | now apply Rle_ge ].
+rewrite <- Hlag.
+apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
+rewrite <- Rmult_assoc.
+rewrite Rinv_r; [ | lra ].
+rewrite Rmult_1_l.
 
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
