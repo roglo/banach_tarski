@@ -3567,7 +3567,9 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
          rewrite <- Rsqr_neg, Rsqr_1 in Hsc.
          apply Rsqr_eq_0; lra.
 
-     idtac.
+     destruct (Rle_dec 0 (p · v'₁ × v'₂)) as [Hpvv| Hpvv].
+      rewrite Rmult_1_l.
+      rewrite Rabs_right; [ | now apply Rle_ge ].
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
