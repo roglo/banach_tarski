@@ -3526,24 +3526,29 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
        move Hv'₂ at top; subst v'₂.
        rewrite <- vec_opp_dot_mul_distr_r.
        rewrite vec_dot_mul_diag, Hnv'₁, Rsqr_1.
+bbb.
+  Hv₁ : v₁ = (p₁ - a ⁎ p)%vec
+  Hppvv : (p₂ - p₁)%vec = (- v₁ - v₁)%vec
        apply (f_equal (vec_sub p₂)) in Hppvv.
        rewrite vec_sub_sub_distr in Hppvv.
        rewrite vec_sub_diag, vec_add_0_l in Hppvv.
        rewrite vec_sub_sub_distr in Hppvv.
        rewrite vec_sub_opp_r, <- vec_add_assoc in Hppvv.
        rewrite vec_add_diag in Hppvv.
-       move Hppvv at top; subst p₁.
-       clear Hnv'₂ Hpv₂ Hppp.
-       apply (f_equal (λ v, vec_sub v v₁)) in Hv₁.
-       rewrite vec_sub_diag in Hv₁.
 bbb.
-
-       assert (Hv₁' : (p₂ + v₁ - a ⁎ p = 0)%vec).
-
+       move Hppvv at top; subst p₁.
+       clear Hv₁ Hnv'₂ Hpv₂ Hppp.
+       apply (f_equal vec_opp) in Hv₂.
+       rewrite neg_vec_involutive in Hv₂.
+       rewrite vec_opp_sub_distr in Hv₂.
+       move Hv₂ at top; subst v₁.
+bbb.
+       apply on_sphere_norm in Hp; [ | lra ].
 bbb.
        destruct p as (xp, yp, zp).
        destruct p₂ as (xp₂, yp₂, zp₂).
        unfold latitude in Ha₁; simpl in *.
+
        rewrite Rsqr_1 in Hp, Hp₁.
        rewrite Hp, Hp₁ in Ha₁.
        rewrite Hp in Hmv.
