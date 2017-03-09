@@ -3557,7 +3557,9 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
        rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
        injection Hmv; clear Hmv; intros H3 H2 H1.
        assert (H : (a² - 1) * (c + 1) = 0).
-        Time clear v'₁ Hv'₁ Hpv₁ Hnv'₁ Ha2 Hsa; nsatz.
+        clear v'₁ Hv'₁ Hpv₁ Hnv'₁ Ha2 Hsa.
+        clear Hp Hp₁ Hp₂ Ha₂ Hsc Hnv₂.
+        Time nsatz.
 
         assert (Hc : c = -1).
          apply Rmult_integral in H; destruct H; lra.
@@ -3570,6 +3572,41 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
      destruct (Rle_dec 0 (p · v'₁ × v'₂)) as [Hpvv| Hpvv].
       rewrite Rmult_1_l.
       rewrite Rabs_right; [ | now apply Rle_ge ].
+      assert (H : (1 - a²) * c - v₁ · v₂ = 0).
+       apply on_sphere_norm in Hp; [ | lra ].
+       subst v₁ v₂.
+       destruct p as (xp, yp, zp).
+       destruct p₁ as (xp₁, yp₁, zp₁).
+       destruct p₂ as (xp₂, yp₂, zp₂).
+       unfold latitude in Ha₁, Ha₂; simpl in *.
+       rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+       rewrite Hp, Hp₁ in Ha₁.
+       rewrite Hp, Hp₂ in Ha₂.
+       rewrite Hp in Hmv.
+       rewrite sqrt_1 in Ha₁, Ha₂, Hmv.
+       rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+       do 3 rewrite Rdiv_1_r in Hmv.
+       rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
+       rewrite Rsqr_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
+       clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv Hppvv.
+       injection Hmv; clear Hmv; intros H3 H2 H1.
+       injection Hppvv; clear Hppvv; intros H6 H5 H4.
+       Time nsatz.
+
+       assert (Hc : c = v'₁ · v'₂).
+        rewrite Hv'₁, Hv'₂.
+        rewrite <- Rmult_vec_dot_mul_distr_l.
+        rewrite <- Rmult_vec_dot_mul_distr_r.
+        rewrite <- Rmult_assoc.
+        rewrite fold_Rsqr.
+        rewrite Rsqr_inv; [ | easy ].
+        rewrite Rsqr_sqrt; [ | lra ].
+        apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
+        rewrite <- Rmult_assoc.
+        rewrite Rinv_r; lra.
+
+        f_equal; [ | easy ].
+
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
