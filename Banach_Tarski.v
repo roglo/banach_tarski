@@ -3403,18 +3403,24 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
  rewrite Rabs_sqrt, Ha₁, Ha₂.
  now rewrite Rinv_l.
 
- assert (‖v₁‖² = 1 - a²) as Hnv₁.
+ assert (‖v₁‖² = 1 - a² ∧ ‖v₂‖² = 1 - a²) as (Hnv₁, Hnv₂).
   rewrite Hv'₁ in Hnv'₁.
+  rewrite Hv'₂ in Hnv'₂.
   apply (f_equal Rsqr) in Hnv'₁.
-  rewrite <- vec_dot_mul_diag, Rsqr_1 in Hnv'₁.
-  rewrite vec_sqr_const_mul in Hnv'₁.
-  rewrite vec_dot_mul_diag in Hnv'₁.
+  apply (f_equal Rsqr) in Hnv'₂.
+  rewrite <- vec_dot_mul_diag, Rsqr_1 in Hnv'₁, Hnv'₂.
+  rewrite vec_sqr_const_mul in Hnv'₁, Hnv'₂.
+  rewrite vec_dot_mul_diag in Hnv'₁, Hnv'₂.
   rewrite Rsqr_inv in Hnv'₁; [ | easy ].
+  rewrite Rsqr_inv in Hnv'₂; [ | easy ].
   rewrite Rsqr_sqrt in Hnv'₁; [ | lra ].
+  rewrite Rsqr_sqrt in Hnv'₂; [ | lra ].
   apply Rmult_eq_compat_l with (r := 1 - a²) in Hnv'₁.
-  rewrite <- Rmult_assoc, Rmult_1_r in Hnv'₁.
+  apply Rmult_eq_compat_l with (r := 1 - a²) in Hnv'₂.
+  rewrite <- Rmult_assoc, Rmult_1_r in Hnv'₁, Hnv'₂.
   rewrite Rinv_r in Hnv'₁; [ | lra ].
-  now rewrite Rmult_1_l in Hnv'₁.
+  rewrite Rinv_r in Hnv'₂; [ | lra ].
+  now rewrite Rmult_1_l in Hnv'₁, Hnv'₂.
 
   rewrite Hnv'₁, Hnv'₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
   assert (p · v'₁ = 0 ∧ p · v'₂ = 0) as (Hpv₁, Hpv₂).
@@ -3476,7 +3482,9 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
       apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
 
       rewrite Rmult_0_l.
-      apply vec_same_norm_cross_mul_eq_0 in Hlag.
+      rewrite <- Hnv₁ in Hnv₂; symmetry in Hnv₂.
+      apply Rsqr_inj in Hnv₂; try apply vec_norm_nonneg.
+      apply vec_same_norm_cross_mul_eq_0 in Hlag; [ | easy ].
       destruct Hlag as [Hlag| Hlag].
        move Hlag at top; subst v₂.
        rewrite vec_sub_diag in Hppvv.
@@ -3559,6 +3567,7 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
          rewrite <- Rsqr_neg, Rsqr_1 in Hsc.
          apply Rsqr_eq_0; lra.
 
+     idtac.
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
