@@ -3499,23 +3499,26 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
       rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
       rewrite Hlag.
       unfold Rsign.
+      rewrite Hv'₁, Hv'₂ in Hlag at 1.
+      rewrite <- vec_const_mul_cross_distr_l in Hlag.
+      rewrite <- vec_const_mul_cross_distr_r in Hlag.
+      rewrite vec_const_mul_assoc in Hlag.
+      rewrite fold_Rsqr in Hlag.
+      rewrite Rsqr_inv in Hlag; [ | easy ].
+      rewrite Rsqr_sqrt in Hlag; [ | lra ].
+      rewrite vec_norm_vec_const_mul in Hlag.
+      rewrite Rabs_Rinv in Hlag; [ | lra ].
+      rewrite Rabs_right in Hlag; [ | lra ].
       destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp].
        rewrite Rmult_0_l.
        rewrite Hppp, Rabs_R0 in Hlag.
-       apply vec_norm_eq_0 in Hlag.
-       rewrite Hv'₁, Hv'₂ in Hlag.
-       rewrite <- vec_const_mul_cross_distr_l in Hlag.
-       rewrite <- vec_const_mul_cross_distr_r in Hlag.
-       rewrite vec_const_mul_assoc in Hlag.
-       rewrite fold_Rsqr in Hlag.
-       rewrite Rsqr_inv in Hlag; [ | easy ].
-       rewrite Rsqr_sqrt in Hlag; [ | lra ].
-       apply eq_vec_const_mul_0 in Hlag.
+       apply Rmult_integral in Hlag.
        destruct Hlag as [Hlag| Hlag].
         apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
 
         rewrite <- Hnv₁ in Hnv₂; symmetry in Hnv₂.
         apply Rsqr_inj in Hnv₂; try apply vec_norm_nonneg.
+        apply vec_norm_eq_0 in Hlag.
         apply vec_same_norm_cross_mul_eq_0 in Hlag; [ | easy ].
         destruct Hlag as [Hlag| Hlag].
          move Hlag at top; subst v₂.
