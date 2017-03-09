@@ -3526,6 +3526,14 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
        move Hv'₂ at top; subst v'₂.
        rewrite <- vec_opp_dot_mul_distr_r.
        rewrite vec_dot_mul_diag, Hnv'₁, Rsqr_1.
+       apply (f_equal (vec_sub p₂)) in Hppvv.
+       rewrite vec_sub_sub_distr in Hppvv.
+       rewrite vec_sub_diag, vec_add_0_l in Hppvv.
+       rewrite vec_sub_sub_distr in Hppvv.
+       rewrite vec_sub_opp_r, <- vec_add_assoc in Hppvv.
+       rewrite vec_add_diag in Hppvv.
+       move Hppvv at top; subst p₁.
+       clear Hnv'₂ Hpv₂ Hppp.
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
