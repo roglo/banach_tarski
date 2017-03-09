@@ -3505,19 +3505,16 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
         do 3 rewrite fold_Rminus in Hv₁.
         do 3 rewrite fold_Rminus in Hpv₁.
         injection Hmv; clear Hmv; intros H3 H2 H1.
-        assert (Haa : a² ≠ 1) by lra.
-        f_equal.
-         assert (H : (a² - 1) * s = 0).
-          Time clear v'₁ Hv'₁ Hv₁ Hnv'₁ Hppp Ha2 Hsa; nsatz.
+        assert (H : (a² - 1) * (c - 1) = 0).
+         Time clear v'₁ Hv'₁ Hv₁ Hnv'₁ Hppp Ha2 Hsa; nsatz.
 
-          apply Rmult_integral in H.
-          destruct H; [ lra | easy ].
+         assert (Hc : c = 1).
+          apply Rmult_integral in H; destruct H; lra.
 
-         assert (H : (a² - 1) * (c - 1) = 0).
-          Time clear v'₁ Hv'₁ Hv₁ Hnv'₁ Hppp Ha2 Hsa; nsatz.
-
-          apply Rmult_integral in H.
-          destruct H; lra.
+          f_equal; [ | easy ].
+          clear - Hsc Hc; subst c.
+          rewrite Rsqr_1 in Hsc.
+          apply Rsqr_eq_0; lra.
 
        apply (f_equal vec_opp) in Hlag.
        rewrite neg_vec_involutive in Hlag.
@@ -3526,39 +3523,42 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
        move Hv'₂ at top; subst v'₂.
        rewrite <- vec_opp_dot_mul_distr_r.
        rewrite vec_dot_mul_diag, Hnv'₁, Rsqr_1.
-bbb.
-  Hv₁ : v₁ = (p₁ - a ⁎ p)%vec
-  Hppvv : (p₂ - p₁)%vec = (- v₁ - v₁)%vec
        apply (f_equal (vec_sub p₂)) in Hppvv.
        rewrite vec_sub_sub_distr in Hppvv.
        rewrite vec_sub_diag, vec_add_0_l in Hppvv.
        rewrite vec_sub_sub_distr in Hppvv.
        rewrite vec_sub_opp_r, <- vec_add_assoc in Hppvv.
        rewrite vec_add_diag in Hppvv.
-bbb.
        move Hppvv at top; subst p₁.
        clear Hv₁ Hnv'₂ Hpv₂ Hppp.
        apply (f_equal vec_opp) in Hv₂.
        rewrite neg_vec_involutive in Hv₂.
        rewrite vec_opp_sub_distr in Hv₂.
        move Hv₂ at top; subst v₁.
-bbb.
        apply on_sphere_norm in Hp; [ | lra ].
-bbb.
        destruct p as (xp, yp, zp).
        destruct p₂ as (xp₂, yp₂, zp₂).
-       unfold latitude in Ha₁; simpl in *.
-
-       rewrite Rsqr_1 in Hp, Hp₁.
+       unfold latitude in Ha₁, Ha₂; simpl in *.
+       rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
        rewrite Hp, Hp₁ in Ha₁.
+       rewrite Hp, Hp₂ in Ha₂.
        rewrite Hp in Hmv.
-       rewrite sqrt_1 in Ha₁, Hmv.
-       rewrite Rmult_1_l, Rdiv_1_r in Ha₁.
+       rewrite sqrt_1 in Ha₁, Ha₂, Hmv.
+       rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
        do 3 rewrite Rdiv_1_r in Hmv.
-       do 3 rewrite fold_Rminus in Hv₁.
-       do 3 rewrite fold_Rminus in Hpv₁.
+       rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
        injection Hmv; clear Hmv; intros H3 H2 H1.
-       assert (Haa : a² ≠ 1) by lra.
+       assert (H : (a² - 1) * (c + 1) = 0).
+        Time clear v'₁ Hv'₁ Hpv₁ Hnv'₁ Ha2 Hsa; nsatz.
+
+        assert (Hc : c = -1).
+         apply Rmult_integral in H; destruct H; lra.
+
+         f_equal; [ | easy ].
+         clear - Hsc Hc; subst c.
+         rewrite <- Rsqr_neg, Rsqr_1 in Hsc.
+         apply Rsqr_eq_0; lra.
+
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
