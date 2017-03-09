@@ -3547,11 +3547,37 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
         rewrite Rmult_1_l.
         rewrite Rabs_right; [ | now apply Rle_ge ].
         rewrite Rabs_right in Hlag; [ | now apply Rle_ge ].
-rewrite <- Hlag.
 apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
+rewrite <- Hlag.
 rewrite <- Rmult_assoc.
 rewrite Rinv_r; [ | lra ].
 rewrite Rmult_1_l.
+bbb.
+   subst v₁ v₂.
+   destruct p as (xp, yp, zp).
+   destruct p₁ as (xp₁, yp₁, zp₁).
+   destruct p₂ as (xp₂, yp₂, zp₂).
+   apply on_sphere_norm in Hp; [ | lra ].
+   unfold latitude in Ha₁, Ha₂; simpl in *.
+   rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+   rewrite Hp, Hp₁ in Ha₁.
+   rewrite Hp, Hp₂ in Ha₂.
+   rewrite Hp in Hmv.
+   rewrite sqrt_1 in Ha₁, Ha₂, Hmv.
+   rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+   do 3 rewrite Rdiv_1_r in Hmv.
+   rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
+   injection Hmv; clear Hmv; intros H3 H2 H1.
+   clear - Ha₁ Ha₂ Hnv₁ Hnv₂ H1 H2 H3.
+Search (_² = _²).
+apply Rsqr_inj.
+Focus 3.
+rewrite Rsqr_sqrt.
+Time nsatz.
+
+   Time nsatz.
+
 
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
