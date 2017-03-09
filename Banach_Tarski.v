@@ -3534,6 +3534,26 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
        rewrite vec_add_diag in Hppvv.
        move Hppvv at top; subst p₁.
        clear Hnv'₂ Hpv₂ Hppp.
+       apply (f_equal (λ v, vec_sub v v₁)) in Hv₁.
+       rewrite vec_sub_diag in Hv₁.
+bbb.
+
+       assert (Hv₁' : (p₂ + v₁ - a ⁎ p = 0)%vec).
+
+bbb.
+       destruct p as (xp, yp, zp).
+       destruct p₂ as (xp₂, yp₂, zp₂).
+       unfold latitude in Ha₁; simpl in *.
+       rewrite Rsqr_1 in Hp, Hp₁.
+       rewrite Hp, Hp₁ in Ha₁.
+       rewrite Hp in Hmv.
+       rewrite sqrt_1 in Ha₁, Hmv.
+       rewrite Rmult_1_l, Rdiv_1_r in Ha₁.
+       do 3 rewrite Rdiv_1_r in Hmv.
+       do 3 rewrite fold_Rminus in Hv₁.
+       do 3 rewrite fold_Rminus in Hpv₁.
+       injection Hmv; clear Hmv; intros H3 H2 H1.
+       assert (Haa : a² ≠ 1) by lra.
 bbb.
 rewrite Hv₁, Hv₂ in Hlag.
 rewrite vec_cross_mul_sub_distr_l in Hlag.
