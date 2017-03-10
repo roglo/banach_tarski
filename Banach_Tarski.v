@@ -4575,6 +4575,8 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        exfalso; apply H; rewrite Hr.
        apply vec_norm_nonneg.
 
+(* proof: if p'≠p then, since they have the same latitude, p must be different
+   from axis and -axis; therefore a² ≠ 1 *)
 bbb.
 
 unfold rot_sin_cos.
