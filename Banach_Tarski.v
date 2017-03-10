@@ -4604,9 +4604,31 @@ destruct (vec_eq_dec p 0) as [Hpz| Hpnz].
   apply Rmult_eq_compat_r with (r := (‖p‖ * ‖p'‖)) in Hpp.
   rewrite Rmult_div_same in Hpp.
    rewrite Rmult_1_l in Hpp.
+   apply (f_equal Rsqr) in Hpp.
+   rewrite Rsqr_mult in Hpp.
    destruct p as (xp, yp, zp).
    destruct p' as (xp', yp', zp').
    simpl in Hpp.
+   rewrite Rsqr_sqrt in Hpp; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hpp; [ | apply nonneg_sqr_vec_norm ].
+f_equal.
+destruct (Req_dec xp 0) as [Hxp| Hxp].
+subst xp.
+destruct (Req_dec xp' 0) as [Hxp'| Hxp']; [ now subst xp' | exfalso ].
+rewrite Rsqr_0, Rmult_0_l in Hpp.
+do 2 rewrite Rplus_0_l in Hpp.
+destruct (Req_dec yp 0) as [Hyp| Hyp].
+subst yp.
+rewrite Rsqr_0, Rmult_0_l in Hpp.
+do 2 rewrite Rplus_0_l in Hpp.
+destruct (Req_dec zp 0) as [Hzp| Hzp]; [ now subst zp | ].
+clear Hpnz Hp'nz.
+rewrite Rsqr_mult in Hpp.
+assert (zp² * xp'² + zp² * yp'² = 0) by lra.
+clear Hpp.
+do 2 rewrite <- Rsqr_mult in H.
+apply Rplus_sqr_eq_0_l in H.
+apply Rmult_integral in H; lra.
 
 bbb.
 
