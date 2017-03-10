@@ -3371,7 +3371,7 @@ destruct (vec_eq_dec u 0) as [Hu| Hu].
      now apply Rinv_neq_0_compat.
 Qed.
 
-Theorem unit_sphere_rot_sin_cos : ∀ p p₁ p₂ a c s,
+Theorem unit_sphere_mat_vec_mul_rot_sin_cos : ∀ p p₁ p₂ a c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
@@ -3587,6 +3587,70 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
          rewrite Rabs_left; [ | easy ].
          now rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_involutive.
 Qed.
+
+Theorem mat_vec_mul_rot_sin_cos : ∀ r p p₁ p₂ a c s,
+  0 < r
+  → p ∈ sphere r
+  → p₁ ∈ sphere r
+  → p₂ ∈ sphere r
+  → latitude p p₁ = a
+  → latitude p p₂ = a
+  → a² < 1
+  → s² + c² = 1
+  → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
+  → (s, c) = rot_sin_cos p p₁ p₂.
+Proof.
+intros * Hr Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
+assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
+ clear - Hr; intros (x, y, z) Hp; simpl in Hp; simpl.
+ do 3 rewrite Rsqr_mult.
+ do 2 rewrite <- Rmult_plus_distr_l.
+ rewrite Hp, Rsqr_1.
+ rewrite Rsqr_inv; [ | lra ].
+ rewrite Rinv_l; [ easy | ].
+ intros H; apply Rsqr_eq_0 in H; lra.
+
+ assert (Ha : ∀ p p', latitude p p' = latitude (p ⁄ r) (p' ⁄ r)).
+  clear - Hr; intros.
+  rewrite latitude_mul; [ easy | ].
+  apply Rinv_neq_0_compat; lra.
+
+  rewrite Ha in Ha₁, Ha₂.
+  apply (f_equal (vec_const_mul (/ r))) in Hmv.
+  rewrite <- mat_vec_mul_const_distr in Hmv.
+  assert (Hir : / r ≠ 0) by (apply Rinv_neq_0_compat; lra).
+  rewrite matrix_mul_axis with (k := / r) in Hmv; [ | easy ].
+  assert (Hirp : 0 < / r) by now apply Rinv_0_lt_compat.
+  rewrite Rsign_of_pos in Hmv; [ | easy ].
+  rewrite Rmult_1_l in Hmv.
+  specialize
+    (unit_sphere_mat_vec_mul_rot_sin_cos (p ⁄ r) (p₁ ⁄ r) (p₂ ⁄ r) a c s
+       (Hpr p Hp) (Hpr p₁ Hp₁) (Hpr p₂ Hp₂) Ha₁ Ha₂ Ha2 Hsc Hmv) as H.
+  rewrite H.
+  unfold rot_sin_cos; rewrite Ha₁.
+  rewrite Ha, Ha₁.
+  remember ((p₁ - a ⁎ p) ⁄ √ (1 - a²)) as u₁ eqn:Hu₁.
+  remember ((p₂ - a ⁎ p) ⁄ √ (1 - a²)) as u₂ eqn:Hu₂.
+  remember ((p₁ ⁄ r - a ⁎ (p ⁄ r)) ⁄ √ (1 - a²)) as v₁ eqn:Hv₁.
+  remember ((p₂ ⁄ r - a ⁎ (p ⁄ r)) ⁄ √ (1 - a²)) as v₂ eqn:Hv₂.
+  move u₂ before u₁; move v₁ before u₂; move v₂ before v₁.
+  rewrite vec_const_mul_assoc in Hv₁, Hv₂.
+  rewrite Rmult_comm in Hv₁, Hv₂.
+  rewrite <- vec_const_mul_assoc in Hv₁, Hv₂.
+  rewrite <- vec_const_mul_sub_distr_l in Hv₁, Hv₂.
+  rewrite vec_const_mul_assoc in Hv₁, Hv₂.
+  rewrite Rmult_comm in Hv₁, Hv₂.
+  rewrite <- vec_const_mul_assoc in Hv₁, Hv₂.
+  rewrite <- Hu₁ in Hv₁.
+  rewrite <- Hu₂ in Hv₂.
+  subst v₁ v₂.
+  f_equal.
+   do 2 rewrite <- Rdiv_mult.
+   f_equal.
+    rewrite <- Rmult_vec_dot_mul_distr_l.
+    rewrite Rsign_mul_distr.
+    rewrite Rsign_of_pos; [ | now apply Rinv_0_lt_compat ].
+    rewrite Rmult_1_l.
 
 bbb.
 
