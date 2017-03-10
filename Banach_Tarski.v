@@ -3377,12 +3377,25 @@ Theorem unit_sphere_mat_vec_mul_rot_sin_cos : ∀ p p₁ p₂ a c s,
   → p₂ ∈ sphere 1
   → latitude p p₁ = a
   → latitude p p₂ = a
-  → a² < 1
+  → a² ≠ 1
   → s² + c² = 1
   → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
+assert (H : a² < 1).
+ enough (a² ≤ 1) by lra.
+ rewrite <- Ha₁; unfold latitude.
+ rewrite Rsqr_div.
+ apply Rmult_le_reg_r with (r := (‖p‖ * ‖p₁‖)²).
+Focus 2.
+Search (_ / _ * _).
+ rewrite Rmult_div_same.
+ rewrite Rmult_1_l, Rsqr_mult.
+ apply vec_Cauchy_Schwarz_inequality.
+Unfocus.
+bbb.
+
 unfold rot_sin_cos.
 rewrite Ha₁.
 remember (p₁ - a ⁎ p)%vec as v₁ eqn:Hv₁.
