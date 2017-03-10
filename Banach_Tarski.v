@@ -4370,11 +4370,6 @@ Definition J₀ axis :=
      ∃ p p', p ≠ p'∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
-bbb.
-(* mmm... not sure of this function: I think that rot_sin_cos must not
-   be applied to p and p' but to v and v' such that v = p - lat.axis and
-   v = p' - lat.axis where lat is the (common) latitude of p and p':
-   therefore should be fixed *)
 Definition J₀_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
   let r := ‖axis‖ in
   let p₀ := fixpoint_of_nat r nf in
@@ -4437,11 +4432,11 @@ Abort.
 *)
 
 Theorem J₁_is_countable : ∀ axis,
-  ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₁ axis → ∃ n : ℕ, f n = acs.
+  ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
 Proof.
 intros axis.
 apply surj_prod_4_nat_surj_nat.
-exists (J₁_of_nats axis).
+exists (J₀_of_nats axis).
 intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hpp & Hp & Hp' & Hv).
 apply -> in_intersection in Hp.
@@ -4491,7 +4486,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
    remember (nat_of_path el'₀) as nf' eqn:Hnf'.
    remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
    move no before nf; move nf' before nf; move no' before no.
-   unfold J₁_of_nats.
+   unfold J₀_of_nats.
    exists nf, no, nf', no'.
    subst nf no nf' no'.
    unfold fixpoint_of_nat.
@@ -4518,6 +4513,14 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
       rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
 
       subst M; clear - Ha Haz Hcs Hpp Hr Hps Hps' Hll Hv.
+      rename Ha into Hax.
+      remember (latitude axis p) as a eqn:Ha.
+      rename Hll into Ha'.
+      symmetry in Ha, Ha'; symmetry.
+      apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
+
+bbb.
+
 unfold rot_sin_cos.
 Check rot_same_latitude.
 bbb.
