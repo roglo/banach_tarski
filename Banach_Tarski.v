@@ -3669,6 +3669,36 @@ assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
     rewrite Rdiv_mult_simpl_l; [ f_equal; lra | | ].
      now intros H1; apply Rsqr_eq_0 in H1.
 
+     assert (Hsa : √ (1 - a²) ≠ 0) by (intros J; apply sqrt_eq_0 in J; lra).
+     assert (‖u₁‖ = r ∧ ‖u₂‖ = r) as (Hnu₁, Hnu₂).
+      subst u₁ u₂.
+      symmetry in Ha₁, Ha₂.
+      apply Hpr in Hp.
+      apply Hpr in Hp₁.
+      apply Hpr in Hp₂.
+      eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
+      eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
+      do 2 rewrite vec_norm_vec_const_mul.
+      rewrite vec_const_mul_assoc, Rmult_comm in Ha₁, Ha₂.
+      rewrite <- vec_const_mul_assoc in Ha₁, Ha₂.
+      rewrite <- vec_const_mul_sub_distr_l in Ha₁, Ha₂.
+      rewrite vec_norm_vec_const_mul in Ha₁, Ha₂.
+      rewrite Rabs_Rinv in Ha₁, Ha₂; [ | lra | lra ].
+      rewrite Rabs_right in Ha₁, Ha₂; [ | lra | lra ].
+      apply (f_equal (Rmult r)) in Ha₁.
+      apply (f_equal (Rmult r)) in Ha₂.
+      rewrite <- Rmult_assoc in Ha₁, Ha₂.
+      rewrite Rinv_r in Ha₁, Ha₂; [ | lra | lra ].
+      rewrite Rmult_1_l in Ha₁, Ha₂.
+      rewrite Rabs_Rinv; [ | easy ].
+      rewrite Rabs_sqrt, Ha₁, Ha₂.
+      rewrite <- Rmult_assoc, Rmult_shuffle0.
+      rewrite Rinv_l; [ lra | easy ].
+
+      rewrite Hnu₁, Hnu₂, fold_Rsqr.
+      intros J; apply Rsqr_eq_0 in J; lra.
+
+    idtac.
 bbb.
 
 (* there, I failed but probably due to this extra hyp Hzpp for nsatz;
