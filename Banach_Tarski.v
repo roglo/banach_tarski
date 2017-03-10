@@ -3547,227 +3547,40 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
         rewrite Rmult_1_l.
         rewrite Rabs_right; [ | now apply Rle_ge ].
         rewrite Rabs_right in Hlag; [ | now apply Rle_ge ].
-apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
-rewrite <- Hlag.
-rewrite <- Rmult_assoc.
-rewrite Rinv_r; [ | lra ].
-rewrite Rmult_1_l.
-bbb.
-   subst v₁ v₂.
-   destruct p as (xp, yp, zp).
-   destruct p₁ as (xp₁, yp₁, zp₁).
-   destruct p₂ as (xp₂, yp₂, zp₂).
-   apply on_sphere_norm in Hp; [ | lra ].
-   unfold latitude in Ha₁, Ha₂; simpl in *.
-   rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
-   rewrite Hp, Hp₁ in Ha₁.
-   rewrite Hp, Hp₂ in Ha₂.
-   rewrite Hp in Hmv.
-   rewrite sqrt_1 in Ha₁, Ha₂, Hmv.
-   rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
-   do 3 rewrite Rdiv_1_r in Hmv.
-   rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
-   rewrite Rsqr_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
-   injection Hmv; clear Hmv; intros H3 H2 H1.
-   clear - Ha₁ Ha₂ Hnv₁ Hnv₂ H1 H2 H3.
-Search (_² = _²).
-apply Rsqr_inj.
-Focus 3.
-rewrite Rsqr_sqrt.
-Time nsatz.
-
-   Time nsatz.
-
-
-bbb.
-rewrite Hv₁, Hv₂ in Hlag.
-rewrite vec_cross_mul_sub_distr_l in Hlag.
-do 2 rewrite vec_cross_mul_sub_distr_r in Hlag.
-setoid_rewrite <- vec_const_mul_cross_distr_l in Hlag at 2.
-setoid_rewrite <- vec_const_mul_cross_distr_r in Hlag at 2.
-rewrite vec_cross_mul_diag in Hlag.
-do 2 rewrite vec_const_mul_0_r in Hlag.
-rewrite vec_sub_0_r in Hlag.
-setoid_rewrite vec_cross_mul_anticomm in Hlag at 2.
-rewrite vec_sub_opp_r in Hlag.
-rewrite <- vec_add_sub_distr in Hlag.
-rewrite <- vec_cross_mul_sub_distr_r in Hlag.
-rewrite <- vec_const_mul_cross_distr_r in Hlag.
-bbb.
-
-assert (H : (p₂ - p₁) × p = 0%vec).
- assert (H : (p₂ - p₁ = v₂ - v₁)%vec).
-  rewrite Hv₁, Hv₂.
-  rewrite vec_sub_sub_distr.
-  unfold vec_sub.
-  do 2 rewrite <- vec_add_assoc.
-  f_equal.
-  rewrite vec_add_comm.
-  rewrite <- vec_add_assoc.
-  rewrite vec_add_opp_diag_r.
-  now rewrite vec_add_0_r.
-
-  rewrite H.
-bbb.
-  specialize (vec_Lagrange_identity (v₂ - v₁) p) as Hi.
-bbb.
-
-
-     clear - Hp Hp₁ Hp₂ Ha₁ Ha₂.
-     unfold latitude in Ha₁, Ha₂.
-     apply on_sphere_norm in Hp₁; [ | lra ].
-     apply on_sphere_norm in Hp₂; [ | lra ].
-     rewrite Hp₁ in Ha₁.
-     rewrite Hp₂ in Ha₂.
-     rewrite Hp, Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
-     destruct p as (xp, yp, zp).
-     destruct p₁ as (xp₁, yp₁, zp₁).
-     destruct p₂ as (xp₂, yp₂, zp₂).
-     apply on_sphere_norm in Hp; [ | lra ].
-     apply on_sphere_norm in Hp₁; [ | lra ].
-     apply on_sphere_norm in Hp₂; [ | lra ].
-     simpl in *.
-     rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
-     do 3 rewrite fold_Rminus.
-bbb.
-
-apply vec_cross_mul_eq_0 in Hlag.
-destruct Hlag as (d & e & Hd & He & Hde).
-
-bbb.
-    f_equal.
-     destruct p as (xp, yp, zp).
-     destruct p₁ as (xp₁, yp₁, zp₁).
-     destruct p₂ as (xp₂, yp₂, zp₂).
-     apply on_sphere_norm in Hp; [ | lra ].
-     unfold latitude in Ha₁, Ha₂.
-     simpl in *.
-     rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
-     rewrite Hp, sqrt_1 in Hmv.
-     do 3 rewrite Rdiv_1_r in Hmv.
-     rewrite Hp₁ in Ha₁.
-     rewrite Hp₂ in Ha₂.
-     rewrite Hp, sqrt_1, Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
-     do 3 rewrite fold_Rminus in Hv₁, Hv₂.
-     injection Hmv; clear Hmv; intros H3 H2 H1.
-     rewrite Hv₁, Hv₂ in Hlag; simpl in Hlag.
-     injection Hlag; clear Hlag; intros H6 H5 H4.
-clear - Hp Hp₁ Hp₂ Ha₁ Ha₂ H1 H2 H3 H4 H5 H6.
-bbb.
-unfold Rsqr in *.
-nsatz.
-polynomial not in the ideal
-bbb.
-    rewrite vec_cross_mul_sub_distr_l in Hlag.
-    do 2 rewrite vec_cross_mul_sub_distr_r in Hlag.
-    setoid_rewrite <- vec_const_mul_cross_distr_l in Hlag at 2.
-    setoid_rewrite <- vec_const_mul_cross_distr_r in Hlag at 2.
-    rewrite vec_cross_mul_diag in Hlag.
-    do 2 rewrite vec_const_mul_0_r in Hlag.
-    rewrite vec_sub_0_r in Hlag.
-    setoid_rewrite vec_cross_mul_anticomm in Hlag at 2.
-    rewrite vec_sub_opp_r in Hlag.
-    rewrite <- vec_add_sub_distr in Hlag.
-    rewrite <- vec_cross_mul_sub_distr_r in Hlag.
-    rewrite <- vec_const_mul_cross_distr_r in Hlag.
-    assert (H : (p₂ - p₁) × p = 0%vec).
-     clear - Hp Hp₁ Hp₂ Ha₁ Ha₂.
-     unfold latitude in Ha₁, Ha₂.
-     apply on_sphere_norm in Hp₁; [ | lra ].
-     apply on_sphere_norm in Hp₂; [ | lra ].
-     rewrite Hp₁ in Ha₁.
-     rewrite Hp₂ in Ha₂.
-     rewrite Hp, Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
-     destruct p as (xp, yp, zp).
-     destruct p₁ as (xp₁, yp₁, zp₁).
-     destruct p₂ as (xp₂, yp₂, zp₂).
-     apply on_sphere_norm in Hp; [ | lra ].
-     apply on_sphere_norm in Hp₁; [ | lra ].
-     apply on_sphere_norm in Hp₂; [ | lra ].
-     simpl in *.
-     rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
-     do 3 rewrite fold_Rminus.
-f_equal.
-bbb.
-unfold Rsqr in *.
-nsatz.
-(* not in the ideal *)
-
-bbb.
-
-    rewrite <- vec_sub_add_distr in Hlag.
-Search (_ - (_ + _))%vec.
-
-bbb.
-
-    rewrite <- vec_const_mul_add_distr_l in Hlag.
-bbb.
-    do 2 rewrite <- vec_const_mul_cross_distr_l in Hlag.
-    do 2 rewrite <- vec_const_mul_cross_distr_r in Hlag.
-    rewrite vec_cross_mul_diag in Hlag.
-    do 2 rewrite vec_const_mul_0_r in Hlag.
-    rewrite vec_sub_0_r in Hlag.
-bbb.
-    rewrite <- vec_sub_add_distr in Hlag.
-    rewrite <- vec_const_mul_add_distr_l in Hlag.
-    setoid_rewrite vec_cross_mul_anticomm in Hlag at 2.
-Search (- (_ × _))%vec.
-Search
-bbb.
-
-   rewrite Rsqr_0, Rminus_0_r in Hlag.
-  now apply Rsqr_eq_0, vec_norm_eq_0 in Hlag.
-
-  apply Rminus_diag_uniq in Hlag.
-  apply Rsqr_eq_abs_0 in Hlag.
-  rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
-  destruct (Rle_dec 0 (p · p₁ × p₂)) as [Hzpp| Hzpp].
-bbb.
-
-₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
-
-rewrite Ha₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
-do 2 rewrite vec_sub_0_r.
-rewrite sqrt_1, Rinv_1.
-do 2 rewrite vec_const_mul_1_l.
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm in Hp₁; [ | lra ].
-apply on_sphere_norm in Hp₂; [ | lra ].
-rewrite Hp₁, Hp₂.
-rewrite Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
-unfold latitude in Ha₁, Ha₂.
-rewrite Hp, Hp₁ in Ha₁.
-rewrite Hp, Hp₂ in Ha₂.
-rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
-specialize (vec_Lagrange_identity p (p₁ × p₂)) as Hlag.
-rewrite vec_cross_mul_assoc_r in Hlag.
-rewrite Hp, Rsqr_1, Rmult_1_l in Hlag.
-rewrite Ha₁, Ha₂ in Hlag.
-do 2 rewrite vec_const_mul_0_l in Hlag.
-rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
-unfold Rsign.
-destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
- exfalso.
- rewrite Hppp in Hlag.
- rewrite Rsqr_0, Rminus_0_r in Hlag.
- now apply Rsqr_eq_0, vec_norm_eq_0 in Hlag.
-
- apply Rminus_diag_uniq in Hlag.
- apply Rsqr_eq_abs_0 in Hlag.
- rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
- destruct (Rle_dec 0 (p · p₁ × p₂)) as [Hzpp| Hzpp].
-  rewrite Rmult_1_l.
-  rewrite Rabs_right in Hlag; [ | now apply Rle_ge ].
-  rewrite Hlag; clear Hlag Hzpp Hppp Hppz.
-  now apply simple_unit_sphere_ro_sin_cos_on_equator.
-
-  apply Rnot_le_lt in Hzpp.
-  rewrite <- Ropp_mult_distr_l, Rmult_1_l.
-  rewrite Rabs_left in Hlag; [ | easy ].
-  rewrite Hlag, Ropp_involutive; clear Hlag Hzpp Hppp Hppz.
-  now apply simple_unit_sphere_ro_sin_cos_on_equator.
-Qed.
-
+        rewrite Hv'₁, Hv'₂.
+        rewrite <- vec_const_mul_cross_distr_l.
+        rewrite <- vec_const_mul_cross_distr_r.
+        rewrite vec_const_mul_assoc.
+        rewrite fold_Rsqr.
+        rewrite Rsqr_inv; [ | easy ].
+        rewrite Rsqr_sqrt; [ | lra ].
+        apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
+        rewrite <- Rmult_vec_dot_mul_distr_r.
+        rewrite <- Rmult_assoc.
+        rewrite Rinv_r; [ | lra ].
+        rewrite Rmult_1_l.
+        clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv'₁ Hnv'₂ Hc Hpv₁ Hpv₂ Hlag Hppp Hpvv.
+        clear Ha2 Hsa Hppvv.
+        subst v₁ v₂.
+        destruct p as (xp, yp, zp).
+        destruct p₁ as (xp₁, yp₁, zp₁).
+        destruct p₂ as (xp₂, yp₂, zp₂).
+        apply on_sphere_norm in Hp; [ | lra ].
+        unfold latitude in Ha₁, Ha₂; simpl in *.
+        rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+        rewrite Hp, Hp₁ in Ha₁.
+        rewrite Hp, Hp₂ in Ha₂.
+        rewrite Hp in Hmv.
+        clear Hp₁ Hp₂ Hsc H.
+        rewrite sqrt_1 in Ha₁, Ha₂, Hmv.
+        rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+        do 3 rewrite Rdiv_1_r in Hmv.
+        rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
+        rewrite Rsqr_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
+        do 6 rewrite fold_Rminus.
+        do 3 rewrite fold_Rminus in Hnv₁, Hnv₂.
+        injection Hmv; clear Hmv; intros H3 H2 H1.
+        Time nsatz.
 bbb.
 
 (* there, I failed but probably due to this extra hyp Hzpp for nsatz;
