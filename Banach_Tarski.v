@@ -3422,25 +3422,9 @@ Theorem unit_sphere_mat_vec_mul_rot_sin_cos : ∀ p p₁ p₂ a c s,
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
-Check sqr_latitude_le_1.
-bbb.
-
 assert (H : a² < 1).
- enough (a² ≤ 1) by lra.
- apply on_sphere_norm in Hp; [ | lra ].
- apply on_sphere_norm in Hp₁; [ | lra ].
- rewrite <- Ha₁; unfold latitude.
- rewrite Rsqr_div.
-  apply Rmult_le_reg_r with (r := (‖p‖ * ‖p₁‖)²).
-   rewrite Hp, Hp₁, Rmult_1_l, Rsqr_1; lra.
-
-   rewrite Rmult_div_same.
-    rewrite Rmult_1_l, Rsqr_mult.
-    apply vec_Cauchy_Schwarz_inequality.
-
-    rewrite Hp, Hp₁, Rmult_1_l, Rsqr_1; lra.
-
-  rewrite Hp, Hp₁, Rmult_1_l; lra.
+ specialize (sqr_latitude_le_1 p p₁) as H.
+ rewrite Ha₁ in H; lra.
 
  clear Ha2; rename H into Ha2.
  unfold rot_sin_cos.
@@ -3709,69 +3693,73 @@ assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
   rewrite vec_const_mul_assoc.
   rewrite <- Rmult_vec_dot_mul_distr_r.
   rewrite fold_Rsqr.
-bbb.
-  assert (Hsa : √ (1 - a²) ≠ 0) by (intros J; apply sqrt_eq_0 in J; lra).
-  assert (‖u₁‖ = r ∧ ‖u₂‖ = r) as (Hnu₁, Hnu₂).
-   subst u₁ u₂.
-   symmetry in Ha₁, Ha₂.
-   apply Hpr in Hp.
-   apply Hpr in Hp₁.
-   apply Hpr in Hp₂.
-   eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
-   eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
-   do 2 rewrite vec_norm_vec_const_mul.
-   rewrite vec_const_mul_assoc, Rmult_comm in Ha₁, Ha₂.
-   rewrite <- vec_const_mul_assoc in Ha₁, Ha₂.
-   rewrite <- vec_const_mul_sub_distr_l in Ha₁, Ha₂.
-   rewrite vec_norm_vec_const_mul in Ha₁, Ha₂.
-   rewrite Rabs_Rinv in Ha₁, Ha₂; [ | lra | lra ].
-   rewrite Rabs_right in Ha₁, Ha₂; [ | lra | lra ].
-   apply (f_equal (Rmult r)) in Ha₁.
-   apply (f_equal (Rmult r)) in Ha₂.
-   rewrite <- Rmult_assoc in Ha₁, Ha₂.
-   rewrite Rinv_r in Ha₁, Ha₂; [ | lra | lra ].
-   rewrite Rmult_1_l in Ha₁, Ha₂.
-   rewrite Rabs_Rinv; [ | easy ].
-   rewrite Rabs_sqrt, Ha₁, Ha₂.
-   rewrite <- Rmult_assoc, Rmult_shuffle0.
-   rewrite Rinv_l; [ lra | easy ].
+  assert (H' : a² < 1).
+   specialize (sqr_latitude_le_1 (p ⁄ r) (p₁ ⁄ r)) as H'.
+   rewrite Ha₁ in H'; lra.
 
-   f_equal.
-    do 2 rewrite <- Rdiv_mult.
+   clear Ha2; rename H' into Ha2.
+   assert (Hsa : √ (1 - a²) ≠ 0) by (intros J; apply sqrt_eq_0 in J; lra).
+   assert (‖u₁‖ = r ∧ ‖u₂‖ = r) as (Hnu₁, Hnu₂).
+    subst u₁ u₂.
+    symmetry in Ha₁, Ha₂.
+    apply Hpr in Hp.
+    apply Hpr in Hp₁.
+    apply Hpr in Hp₂.
+    eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
+    eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
+    do 2 rewrite vec_norm_vec_const_mul.
+    rewrite vec_const_mul_assoc, Rmult_comm in Ha₁, Ha₂.
+    rewrite <- vec_const_mul_assoc in Ha₁, Ha₂.
+    rewrite <- vec_const_mul_sub_distr_l in Ha₁, Ha₂.
+    rewrite vec_norm_vec_const_mul in Ha₁, Ha₂.
+    rewrite Rabs_Rinv in Ha₁, Ha₂; [ | lra | lra ].
+    rewrite Rabs_right in Ha₁, Ha₂; [ | lra | lra ].
+    apply (f_equal (Rmult r)) in Ha₁.
+    apply (f_equal (Rmult r)) in Ha₂.
+    rewrite <- Rmult_assoc in Ha₁, Ha₂.
+    rewrite Rinv_r in Ha₁, Ha₂; [ | lra | lra ].
+    rewrite Rmult_1_l in Ha₁, Ha₂.
+    rewrite Rabs_Rinv; [ | easy ].
+    rewrite Rabs_sqrt, Ha₁, Ha₂.
+    rewrite <- Rmult_assoc, Rmult_shuffle0.
+    rewrite Rinv_l; [ lra | easy ].
+
     f_equal.
-     rewrite Rsign_mul_distr.
-     rewrite Rsign_of_pos; [ | now apply Rlt_0_sqr ].
-     rewrite <- Rmult_vec_dot_mul_distr_l.
-     rewrite Rsign_mul_distr.
-     rewrite Rsign_of_pos; [ | now apply Rinv_0_lt_compat ].
-     now do 2 rewrite Rmult_1_l.
+     do 2 rewrite <- Rdiv_mult.
+     f_equal.
+      rewrite Rsign_mul_distr.
+      rewrite Rsign_of_pos; [ | now apply Rlt_0_sqr ].
+      rewrite <- Rmult_vec_dot_mul_distr_l.
+      rewrite Rsign_mul_distr.
+      rewrite Rsign_of_pos; [ | now apply Rinv_0_lt_compat ].
+      now do 2 rewrite Rmult_1_l.
 
-     do 3 rewrite vec_norm_vec_const_mul.
-     rewrite Rabs_sqr.
-     rewrite Rabs_right; [ | lra ].
-     rewrite Rmult_shuffle0.
-     rewrite <- Rmult_assoc.
-     rewrite fold_Rsqr.
-     rewrite Rmult_assoc.
-     rewrite Rdiv_mult_simpl_l; [ f_equal; lra | | ].
-      now intros H1; apply Rsqr_eq_0 in H1.
+      do 3 rewrite vec_norm_vec_const_mul.
+      rewrite Rabs_sqr.
+      rewrite Rabs_right; [ | lra ].
+      rewrite Rmult_shuffle0.
+      rewrite <- Rmult_assoc.
+      rewrite fold_Rsqr.
+      rewrite Rmult_assoc.
+      rewrite Rdiv_mult_simpl_l; [ f_equal; lra | | ].
+       now intros H1; apply Rsqr_eq_0 in H1.
 
-      rewrite Hnu₁, Hnu₂, fold_Rsqr.
-      intros J; apply Rsqr_eq_0 in J; lra.
+       rewrite Hnu₁, Hnu₂, fold_Rsqr.
+       intros J; apply Rsqr_eq_0 in J; lra.
 
-     do 2 rewrite vec_norm_vec_const_mul.
-     rewrite Rabs_Rinv; [ | lra ].
-     rewrite Rabs_right; [ | lra ].
-     rewrite Rmult_shuffle0, <- Rmult_assoc, fold_Rsqr.
-     rewrite <- Rmult_vec_dot_mul_distr_l.
-     rewrite <- Rmult_vec_dot_mul_distr_r.
-     rewrite <- Rmult_assoc, fold_Rsqr.
-     rewrite Rmult_assoc.
-     rewrite Rdiv_mult_simpl_l; [ f_equal; lra | | ].
-      intros J; apply Rsqr_eq_0 in J; lra.
+      do 2 rewrite vec_norm_vec_const_mul.
+      rewrite Rabs_Rinv; [ | lra ].
+      rewrite Rabs_right; [ | lra ].
+      rewrite Rmult_shuffle0, <- Rmult_assoc, fold_Rsqr.
+      rewrite <- Rmult_vec_dot_mul_distr_l.
+      rewrite <- Rmult_vec_dot_mul_distr_r.
+      rewrite <- Rmult_assoc, fold_Rsqr.
+      rewrite Rmult_assoc.
+      rewrite Rdiv_mult_simpl_l; [ f_equal; lra | | ].
+       intros J; apply Rsqr_eq_0 in J; lra.
 
-      rewrite Hnu₁, Hnu₂, fold_Rsqr.
-      intros J; apply Rsqr_eq_0 in J; lra.
+       rewrite Hnu₁, Hnu₂, fold_Rsqr.
+       intros J; apply Rsqr_eq_0 in J; lra.
 Qed.
 
 (* commented because perhaps not useful
