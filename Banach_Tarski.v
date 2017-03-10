@@ -3644,21 +3644,30 @@ assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
   rewrite <- Hu₁ in Hv₁.
   rewrite <- Hu₂ in Hv₂.
   subst v₁ v₂.
+  rewrite <- vec_const_mul_cross_distr_l.
+  rewrite <- vec_const_mul_cross_distr_r.
+  rewrite vec_const_mul_assoc.
+  rewrite <- Rmult_vec_dot_mul_distr_r.
+  rewrite fold_Rsqr.
   f_equal.
    do 2 rewrite <- Rdiv_mult.
    f_equal.
+    rewrite Rsign_mul_distr.
+    rewrite Rsign_of_pos; [ | now apply Rlt_0_sqr ].
     rewrite <- Rmult_vec_dot_mul_distr_l.
     rewrite Rsign_mul_distr.
     rewrite Rsign_of_pos; [ | now apply Rinv_0_lt_compat ].
-    rewrite Rmult_1_l.
-    rewrite <- vec_const_mul_cross_distr_l.
-    rewrite <- vec_const_mul_cross_distr_r.
-    rewrite vec_const_mul_assoc.
-    rewrite <- Rmult_vec_dot_mul_distr_r.
+    now do 2 rewrite Rmult_1_l.
+
+    do 3 rewrite vec_norm_vec_const_mul.
+    rewrite Rabs_sqr.
+    rewrite Rabs_right; [ | lra ].
+    rewrite Rmult_shuffle0.
+    rewrite <- Rmult_assoc.
     rewrite fold_Rsqr.
-    rewrite Rsign_mul_distr.
-    rewrite Rsign_of_pos; [ now rewrite Rmult_1_l | ].
-    now apply Rlt_0_sqr.
+    rewrite Rmult_assoc.
+    rewrite Rdiv_mult_simpl_l; [ f_equal; lra | | ].
+     now intros H1; apply Rsqr_eq_0 in H1.
 
 bbb.
 
