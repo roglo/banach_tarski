@@ -4600,9 +4600,14 @@ destruct (vec_eq_dec p 0) as [Hpz| Hpnz].
   rewrite vec_dot_mul_0_r in Hpp.
   rewrite Rdiv_0_l in Hpp; lra.
 
-  destruct p as (xp, yp, zp).
-  destruct p' as (xp', yp', zp').
-  unfold latitude in Hpp; simpl in *.
+  unfold latitude in Hpp; simpl in Hpp.
+  apply Rmult_eq_compat_r with (r := (‖p‖ * ‖p'‖)) in Hpp.
+  rewrite Rmult_div_same in Hpp.
+   rewrite Rmult_1_l in Hpp.
+   destruct p as (xp, yp, zp).
+   destruct p' as (xp', yp', zp').
+   simpl in Hpp.
+
 bbb.
 
         rewrite <- Hr in Ha.
