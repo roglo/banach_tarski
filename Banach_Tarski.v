@@ -3651,6 +3651,14 @@ assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
     rewrite Rsign_mul_distr.
     rewrite Rsign_of_pos; [ | now apply Rinv_0_lt_compat ].
     rewrite Rmult_1_l.
+    rewrite <- vec_const_mul_cross_distr_l.
+    rewrite <- vec_const_mul_cross_distr_r.
+    rewrite vec_const_mul_assoc.
+    rewrite <- Rmult_vec_dot_mul_distr_r.
+    rewrite fold_Rsqr.
+    rewrite Rsign_mul_distr.
+    rewrite Rsign_of_pos; [ now rewrite Rmult_1_l | ].
+    now apply Rlt_0_sqr.
 
 bbb.
 
