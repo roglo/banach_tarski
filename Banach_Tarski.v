@@ -3543,10 +3543,7 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
          rewrite <- Rsqr_neg, Rsqr_1 in Hsc.
          apply Rsqr_eq_0; lra.
 
-       destruct (Rle_dec 0 (p · v'₁ × v'₂)) as [Hpvv| Hpvv].
-        rewrite Rmult_1_l.
-        rewrite Rabs_right; [ | now apply Rle_ge ].
-        rewrite Rabs_right in Hlag; [ | now apply Rle_ge ].
+       assert (Hs : s = p · v'₁ × v'₂).
         rewrite Hv'₁, Hv'₂.
         rewrite <- vec_const_mul_cross_distr_l.
         rewrite <- vec_const_mul_cross_distr_r.
@@ -3559,7 +3556,7 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
         rewrite <- Rmult_assoc.
         rewrite Rinv_r; [ | lra ].
         rewrite Rmult_1_l.
-        clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv'₁ Hnv'₂ Hc Hpv₁ Hpv₂ Hlag Hppp Hpvv.
+        clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv'₁ Hnv'₂ Hc Hpv₁ Hpv₂ Hlag Hppp (*Hpvv*).
         clear Ha2 Hsa Hppvv.
         subst v₁ v₂.
         destruct p as (xp, yp, zp).
@@ -3581,6 +3578,16 @@ assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂).
         do 3 rewrite fold_Rminus in Hnv₁, Hnv₂.
         injection Hmv; clear Hmv; intros H3 H2 H1.
         Time nsatz.
+
+        destruct (Rle_dec 0 (p · v'₁ × v'₂)) as [Hpvv| Hpvv].
+         rewrite Rmult_1_l.
+         now rewrite Rabs_right; [ | apply Rle_ge ].
+
+         apply Rnot_le_lt in Hpvv.
+         rewrite Rabs_left; [ | easy ].
+         now rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_involutive.
+Qed.
+
 bbb.
 
 (* there, I failed but probably due to this extra hyp Hzpp for nsatz;
