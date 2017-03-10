@@ -4577,6 +4577,21 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
 
 (* proof: if p'≠p then, since they have the same latitude, p must be different
    from axis and -axis; therefore a² ≠ 1 *)
+       assert (p ≠ axis).
+        intros H.
+        rewrite H in Ha.
+        unfold latitude in Ha.
+        rewrite vec_dot_mul_diag in Ha.
+        rewrite fold_Rsqr in Ha.
+        rewrite Rdiv_same in Ha.
+         rewrite <- Ha in Ha'.
+Theorem latitude_1 : ∀ p p', latitude p p' = 1 → p = p'.
+Proof.
+intros (xp, yp, zp) (xp', yp', zp') Hpp.
+unfold latitude in Hpp; simpl in Hpp.
+bbb.
+
+        rewrite <- Hr in Ha.
 bbb.
 
 unfold rot_sin_cos.
