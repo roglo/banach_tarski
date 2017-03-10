@@ -4518,6 +4518,13 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
       rename Hll into Ha'.
       symmetry in Ha, Ha'; symmetry.
       apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
+       assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
+       rewrite <- Hr in H.
+       apply Rdichotomy in H.
+       destruct H as [H| H]; [ | lra ].
+       apply Rlt_not_le in H.
+       exfalso; apply H; rewrite Hr.
+       apply vec_norm_nonneg.
 
 bbb.
 
