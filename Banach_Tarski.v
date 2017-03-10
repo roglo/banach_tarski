@@ -4611,6 +4611,12 @@ destruct (vec_eq_dec p 0) as [Hpz| Hpnz].
    simpl in Hpp.
    rewrite Rsqr_sqrt in Hpp; [ | apply nonneg_sqr_vec_norm ].
    rewrite Rsqr_sqrt in Hpp; [ | apply nonneg_sqr_vec_norm ].
+(*
+f_equal.
+assert ((xp² + yp² + zp²) * (xp'² + yp'² + zp'²) * (xp - xp') = 0).
+  clear Hpnz Hp'nz.
+  nsatz.
+*)
 f_equal.
 destruct (Req_dec xp 0) as [Hxp| Hxp].
 subst xp.
@@ -4629,6 +4635,36 @@ clear Hpp.
 do 2 rewrite <- Rsqr_mult in H.
 apply Rplus_sqr_eq_0_l in H.
 apply Rmult_integral in H; lra.
+clear Hpnz Hp'nz.
+unfold Rsqr in Hpp.
+ring_simplify in Hpp.
+do 5 rewrite <- Rsqr_pow2 in Hpp.
+assert ((yp * zp' - yp' * zp)² + xp'² * (zp² + yp²) = 0) by nsatz.
+clear Hpp; rename H into Hpp.
+apply Rplus_eq_R0 in Hpp.
+destruct Hpp as (H1, H2).
+apply Rmult_integral in H2.
+destruct H2 as [H2| H2].
+now apply Rsqr_eq_0 in H2.
+apply Rplus_eq_R0 in H2.
+destruct H2 as (H2, H3).
+now apply Rsqr_eq_0 in H3.
+apply Rle_0_sqr.
+apply Rle_0_sqr.
+apply Rle_0_sqr.
+apply Rmult_le_pos.
+apply Rle_0_sqr.
+apply nonneg_plus_sqr.
+
+bbb.
+
+rewrite Rsqr_mult in Hpp.
+assert (zp² * xp'² + zp² * yp'² = 0) by lra.
+clear Hpp.
+do 2 rewrite <- Rsqr_mult in H.
+apply Rplus_sqr_eq_0_l in H.
+apply Rmult_integral in H; lra.
+clear Hp'nz.
 
 bbb.
 
