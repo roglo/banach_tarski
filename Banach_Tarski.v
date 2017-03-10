@@ -4606,15 +4606,21 @@ destruct (vec_eq_dec p 0) as [Hpz| Hpnz].
    rewrite Rmult_1_l in Hpp.
    apply (f_equal Rsqr) in Hpp.
    rewrite Rsqr_mult in Hpp.
+   assert (‖p‖² ≠ 0) by now intros H; apply Rsqr_eq_0, vec_norm_eq_0 in H.
+   rename H into Hp.
+   assert (‖p'‖² ≠ 0) by now intros H; apply Rsqr_eq_0, vec_norm_eq_0 in H.
+   rename H into Hp'.
    destruct p as (xp, yp, zp).
    destruct p' as (xp', yp', zp').
-   simpl in Hpp.
+   simpl in Hpp, Hp, Hp'.
    rewrite Rsqr_sqrt in Hpp; [ | apply nonneg_sqr_vec_norm ].
    rewrite Rsqr_sqrt in Hpp; [ | apply nonneg_sqr_vec_norm ].
-(*
+   rewrite Rsqr_sqrt in Hp; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hp'; [ | apply nonneg_sqr_vec_norm ].
+   clear Hpnz Hp'nz.
 f_equal.
+bbb.
 assert ((xp² + yp² + zp²) * (xp'² + yp'² + zp'²) * (xp - xp') = 0).
-  clear Hpnz Hp'nz.
   nsatz.
 *)
 f_equal.
