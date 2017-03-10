@@ -4587,8 +4587,22 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          rewrite <- Ha in Ha'.
 Theorem latitude_1 : ∀ p p', latitude p p' = 1 → p = p'.
 Proof.
-intros (xp, yp, zp) (xp', yp', zp') Hpp.
-unfold latitude in Hpp; simpl in Hpp.
+intros * Hpp.
+destruct (vec_eq_dec p 0) as [Hpz| Hpnz].
+ subst p.
+ unfold latitude in Hpp.
+ rewrite vec_dot_mul_0_l in Hpp.
+ rewrite Rdiv_0_l in Hpp; lra.
+
+ destruct (vec_eq_dec p' 0) as [Hp'z| Hp'nz].
+  subst p'.
+  unfold latitude in Hpp.
+  rewrite vec_dot_mul_0_r in Hpp.
+  rewrite Rdiv_0_l in Hpp; lra.
+
+  destruct p as (xp, yp, zp).
+  destruct p' as (xp', yp', zp').
+  unfold latitude in Hpp; simpl in *.
 bbb.
 
         rewrite <- Hr in Ha.
