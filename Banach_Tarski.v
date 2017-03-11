@@ -4480,6 +4480,45 @@ intros * Hr Ha Hp Hp' Hpp Hcs Hv.
 Abort.
 *)
 
+Theorem unit_sphere_latitude_1 : ∀ p p',
+  p ∈ sphere 1
+  → p' ∈ sphere 1
+  → latitude p p' = 1
+  → p = p'.
+Proof.
+intros * Hp Hp' Hlat.
+unfold latitude in Hlat; simpl in Hlat.
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm in Hp'; [ | lra ].
+rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r in Hlat.
+specialize (vec_Lagrange_identity p p') as Hlag.
+rewrite Hp, Hp', Hlat, Rsqr_1, Rmult_1_l in Hlag.
+rewrite Rminus_diag_eq in Hlag; [ | easy ].
+symmetry in Hlag.
+destruct p as (xp, yp, zp).
+destruct p' as (xp', yp', zp').
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm in Hp'; [ | lra ].
+simpl in Hp, Hp', Hlat, Hlag.
+rewrite Rsqr_1 in Hp, Hp'.
+do 3 rewrite fold_Rsqr in Hlag.
+apply sqr_vec_norm_eq_0 in Hlag.
+destruct Hlag as (H3 & H2 & H1).
+apply Rminus_diag_uniq in H1.
+apply Rminus_diag_uniq in H2.
+apply Rminus_diag_uniq in H3.
+Time f_equal; nsatz.
+Qed.
+
+Theorem latitude_1 : ∀ r p p',
+  p ∈ sphere r
+  → p' ∈ sphere r
+  → latitude p p' = 1
+  → p = p'.
+Proof.
+intros * Hp Hp' Hlat.
+bbb.
+
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
 Proof.
@@ -4585,26 +4624,41 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite fold_Rsqr in Ha.
         rewrite Rdiv_same in Ha.
          rewrite <- Ha in Ha'.
-Theorem unit_sphere_latitude_1 : ∀ p p',
-  ‖p‖ = 1
-  → ‖p'‖ = 1
-  → latitude p p' = 1
-  → p = p'.
-Proof.
-intros * Hp Hp' Hlat.
-unfold latitude in Hlat; simpl in Hlat.
-rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r in Hlat.
-specialize (vec_Lagrange_identity p p') as Hlag.
-rewrite Hp, Hp', Hlat, Rsqr_1, Rmult_1_l in Hlag.
-rewrite Rminus_diag_eq in Hlag; [ | easy ].
-symmetry in Hlag.
-destruct p as (xp, yp, zp).
-destruct p' as (xp', yp', zp').
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm in Hp'; [ | lra ].
-simpl in Hp, Hp', Hlat, Hlag.
-rewrite Rsqr_1 in Hp, Hp'.
-f_equal.
+Check unit_sphere_latitude_1.
+
+bbb.
+
+
+rewrite Rsqr_0, Rmult_0_l in Hpp.
+do 2 rewrite Rplus_0_l in Hpp.
+destruct (Req_dec zp 0) as [Hzp| Hzp]; [ now subst zp | ].
+clear Hpnz Hp'nz.
+rewrite Rsqr_mult in Hpp.
+assert (zp² * xp'² + zp² * yp'² = 0) by lra.
+clear Hpp.
+do 2 rewrite <- Rsqr_mult in H.
+apply Rplus_sqr_eq_0_l in H.
+apply Rmult_integral in H; lra.
+clear Hpnz Hp'nz.
+unfold Rsqr in Hpp.
+ring_simplify in Hpp.
+do 5 rewrite <- Rsqr_pow2 in Hpp.
+assert ((yp * zp' - yp' * zp)² + xp'² * (zp² + yp²) = 0) by nsatz.
+clear Hpp; rename H into Hpp.
+apply Rplus_eq_R0 in Hpp.
+destruct Hpp as (H1, H2).
+apply Rmult_integral in H2.
+destruct H2 as [H2| H2].
+now apply Rsqr_eq_0 in H2.
+apply Rplus_eq_R0 in H2.
+destruct H2 as (H2, H3).
+now apply Rsqr_eq_0 in H3.
+apply Rle_0_sqr.
+apply Rle_0_sqr.
+apply Rle_0_sqr.
+apply Rmult_le_pos.
+apply Rle_0_sqr.
+apply nonneg_plus_sqr.
 
 bbb.
 intros * Hp Hp' Hlat.
