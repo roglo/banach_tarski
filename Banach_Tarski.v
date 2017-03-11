@@ -4682,13 +4682,8 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
 
       apply rotate_rev_path in Hso.
       apply rotate_rev_path in Hso'.
-      remember (nat_of_path el₀) as nf eqn:Hnf.
-      remember (nat_of_path (rev_path el)) as no eqn:Hno.
-      remember (nat_of_path el'₀) as nf' eqn:Hnf'.
-      remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
       remember (fixpoint_of_path r el₀) as q eqn:Hq.
       remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
-      move no before nf; move nf' before nf; move no' before no.
       rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
       generalize Hq; intros Hpq.
       apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
@@ -4701,6 +4696,11 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
         move Hpq' at top; subst q'; clear Hb.
         unfold J₀_of_nats.
+        remember (nat_of_path el₀) as nf eqn:Hnf.
+        remember (nat_of_path (rev_path el)) as no eqn:Hno.
+        remember (nat_of_path el'₀) as nf' eqn:Hnf'.
+        remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
+        move no before nf; move nf' before nf; move no' before no.
         exists nf, no, nf', no'.
         subst nf no nf' no'.
         unfold fixpoint_of_nat.
@@ -4722,6 +4722,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         apply (f_equal vec_opp) in Hpq'.
         rewrite neg_vec_involutive in Hpq'.
         move Hpq' at top; subst q'; clear Hb.
+unfold J₀_of_nats.
 bbb.
         unfold J₀_of_nats.
         exists nf, no, nf', no'.
