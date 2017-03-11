@@ -4678,18 +4678,18 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        rewrite <- vec_dot_mul_diag in H1.
        now apply vec_sqr_eq_0 in H1.
 
-     unfold J₀_of_nats.
-     exists nf, no, nf', no'.
-     subst nf no nf' no'.
-     unfold fixpoint_of_nat.
-     do 4 rewrite path_of_nat_inv.
-     rewrite <- Hr, <- Hq, <- Hq'.
      destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
       move Hpq at top; subst q; clear Hb.
-      rewrite rotate_vec_mul, Hso.
       destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
        move Hpq' at top; subst q'; clear Hb.
-       rewrite rotate_vec_mul, Hso'.
+       unfold J₀_of_nats.
+       exists nf, no, nf', no'.
+       subst nf no nf' no'.
+       unfold fixpoint_of_nat.
+       do 4 rewrite path_of_nat_inv.
+       rewrite <- Hr, <- Hq, <- Hq'.
+       do 2 rewrite rotate_vec_mul.
+       rewrite Hso, Hso'.
        subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Hll Hv Hpa Hpna.
        remember (latitude axis p) as a eqn:Ha.
        rename Hll into Ha'.
@@ -4717,6 +4717,8 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
          now rewrite Ha, neg_vec_involutive in Hpna.
 
+       idtac.
+bbb.
        apply (f_equal vec_opp) in Hpq'.
        rewrite neg_vec_involutive in Hpq'.
        move Hpq' at top; subst q'; clear Hb.
