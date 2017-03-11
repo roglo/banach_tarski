@@ -4678,23 +4678,39 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        rewrite <- vec_dot_mul_diag in H1.
        now apply vec_sqr_eq_0 in H1.
 
-     destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
-      move Hpq at top; subst q; clear Hb.
-      destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
-       move Hpq' at top; subst q'; clear Hb.
-       unfold J₀_of_nats.
-       exists nf, no, nf', no'.
-       subst nf no nf' no'.
-       unfold fixpoint_of_nat.
-       do 4 rewrite path_of_nat_inv.
-       rewrite <- Hr, <- Hq, <- Hq'.
-       do 2 rewrite rotate_vec_mul.
-       rewrite Hso, Hso'.
-       subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Hll Hv Hpa Hpna.
-       remember (latitude axis p) as a eqn:Ha.
-       rename Hll into Ha'.
-       symmetry in Ha, Ha'; symmetry.
-       apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
+     remember (latitude axis p) as a eqn:Ha.
+     rename Hll into Ha'.
+     symmetry in Ha, Ha'.
+     assert (Ha21 : a² ≠ 1).
+      intros H.
+      replace 1 with 1² in H by apply Rsqr_1.
+      apply Rsqr_eq_abs_0 in H.
+      rewrite Rabs_R1 in H.
+      apply Rabs_or in H.
+      destruct H as [H| H].
+       rewrite H in Ha.
+       apply (latitude_1 r) in Ha; [ | easy | easy ].
+       now symmetry in Ha.
+
+       rewrite H in Ha.
+       apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
+       now rewrite Ha, neg_vec_involutive in Hpna.
+
+      destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
+       move Hpq at top; subst q; clear Hb.
+       destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
+        move Hpq' at top; subst q'; clear Hb.
+        unfold J₀_of_nats.
+        exists nf, no, nf', no'.
+        subst nf no nf' no'.
+        unfold fixpoint_of_nat.
+        do 4 rewrite path_of_nat_inv.
+        rewrite <- Hr, <- Hq, <- Hq'.
+        do 2 rewrite rotate_vec_mul.
+        rewrite Hso, Hso'.
+        subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
+        symmetry.
+        apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
         assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
         rewrite <- Hr in H.
         apply Rdichotomy in H.
@@ -4702,20 +4718,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         apply Rlt_not_le in H.
         exfalso; apply H; rewrite Hr.
         apply vec_norm_nonneg.
-
-        intros H.
-        replace 1 with 1² in H by apply Rsqr_1.
-        apply Rsqr_eq_abs_0 in H.
-        rewrite Rabs_R1 in H.
-        apply Rabs_or in H.
-        destruct H as [H| H].
-         rewrite H in Ha.
-         apply (latitude_1 r) in Ha; [ | easy | easy ].
-         now symmetry in Ha.
-
-         rewrite H in Ha.
-         apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
-         now rewrite Ha, neg_vec_involutive in Hpna.
 
        idtac.
 bbb.
