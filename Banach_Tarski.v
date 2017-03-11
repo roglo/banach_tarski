@@ -4707,8 +4707,8 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
          now rewrite Ha, neg_vec_involutive in Hpna.
 
-     idtac.
-bbb.
+     apply (f_equal vec_opp) in Hpq.
+     rewrite neg_vec_involutive in Hpq.
      move Hpq at top; subst q'; clear Hb.
 bbb.
 
