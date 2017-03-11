@@ -4626,22 +4626,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
    1, 2 : apply mat_of_path_is_rotation_matrix.
 
    destruct H as (Hp₀s, Hp'₀s).
-   apply rotate_rev_path in Hso.
-   apply rotate_rev_path in Hso'.
-   remember (nat_of_path el₀) as nf eqn:Hnf.
-   remember (nat_of_path (rev_path el)) as no eqn:Hno.
-   remember (nat_of_path el'₀) as nf' eqn:Hnf'.
-   remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
-   remember (fixpoint_of_path r el₀) as q eqn:Hq.
-   remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
-   move no before nf; move nf' before nf; move no' before no.
-   rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
-   generalize Hq; intros Hpq.
-   apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
-     try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
-   generalize Hq'; intros Hpq'.
-   apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq';
-     try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
    assert (Hax : axis ∈ sphere r).
     rewrite Hr.
     destruct axis as (x, y, z); simpl.
@@ -4696,6 +4680,22 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
        now rewrite Ha, neg_vec_involutive in Hpna.
 
+      apply rotate_rev_path in Hso.
+      apply rotate_rev_path in Hso'.
+      remember (nat_of_path el₀) as nf eqn:Hnf.
+      remember (nat_of_path (rev_path el)) as no eqn:Hno.
+      remember (nat_of_path el'₀) as nf' eqn:Hnf'.
+      remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
+      remember (fixpoint_of_path r el₀) as q eqn:Hq.
+      remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
+      move no before nf; move nf' before nf; move no' before no.
+      rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
+      generalize Hq; intros Hpq.
+      apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
+        try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
+      generalize Hq'; intros Hpq'.
+      apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq';
+        try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
       destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
        move Hpq at top; subst q; clear Hb.
        destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
