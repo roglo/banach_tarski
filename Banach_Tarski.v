@@ -2846,6 +2846,8 @@ Qed.
    equal to the dot product and between -1 and 1. *)
 Definition latitude p p₁ := (p · p₁) / (‖p‖ * ‖p₁‖).
 
+Arguments latitude p%vec p₁%vec.
+
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
@@ -4559,9 +4561,13 @@ Theorem latitude_minus_1 : ∀ r p p',
 Proof.
 intros * Hp Hp' Hlat.
 apply neg_vec_in_sphere in Hp'.
-specialize (latitude_1 r p (- p')%vec Hp Hp') as H.
-Search latitude.
-bbb.
+assert (Hlat2 : latitude p (- p') = 1).
+ unfold latitude in Hlat; unfold latitude.
+ rewrite <- vec_opp_dot_mul_distr_r, vec_norm_opp, Ropp_div, Hlat.
+ apply Ropp_involutive.
+
+ now specialize (latitude_1 r p (- p')%vec Hp Hp' Hlat2).
+Qed.
 
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
@@ -4658,9 +4664,9 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        exfalso; apply H; rewrite Hr.
        apply vec_norm_nonneg.
 
-(* proof: if p'≠p then, since they have the same latitude, p must be different
-   from axis and -axis; therefore a² ≠ 1 *)
-       assert (p ≠ axis ∧ p ≠ (- axis)%vec).
+       (* proof: if p'≠p then, since they have the same latitude,
+          p must be different from axis and -axis; therefore a² ≠ 1 *)
+       assert (p ≠ axis ∧ p ≠ (- axis)%vec) as (Hpa, Hpna).
         unfold latitude in Ha.
         split; intros H; rewrite H in Ha.
          rewrite vec_dot_mul_diag in Ha.
@@ -4680,15 +4686,31 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          rewrite fold_Rsqr in Ha.
          rewrite Rdiv_same in Ha.
           rewrite <- Ha in Ha'.
-bbb.
-          apply (latitude_1 r) in Ha'; [ | easy | easy ].
-          now rewrite Ha' in H.
+          apply (latitude_minus_1 r) in Ha'; [ | easy | easy ].
+          now rewrite Ha', neg_vec_involutive in H.
 
           intros H1.
           rewrite <- vec_dot_mul_diag in H1.
           now apply vec_sqr_eq_0 in H1.
-bbb.
 
+        intros H.
+        replace 1 with 1² in H by apply Rsqr_1.
+        apply Rsqr_eq_abs_0 in H.
+        rewrite Rabs_R1 in H.
+        apply Rabs_or in H.
+        destruct H as [H| H].
+         rewrite H in Ha.
+         apply (latitude_1 r) in Ha; [ | easy | easy ].
+         now symmetry in Ha.
+
+         rewrite H in Ha.
+         apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
+         now rewrite Ha, neg_vec_involutive in Hpna.
+
+     idtac.
+bbb.
+     move Hpq at top; subst q'; clear Hb.
+bbb.
 
 rewrite Rsqr_0, Rmult_0_l in Hpp.
 do 2 rewrite Rplus_0_l in Hpp.
