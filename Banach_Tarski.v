@@ -3632,6 +3632,17 @@ assert (H : a² < 1).
           now rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_involutive.
 Qed.
 
+Theorem vec_div_in_sphere : ∀ r p, r ≠ 0 → p ∈ sphere r → p ⁄ r ∈ sphere 1.
+Proof.
+intros r (x, y, z) Hr Hp; simpl in Hp; simpl.
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+rewrite Hp, Rsqr_1.
+rewrite Rsqr_inv; [ | lra ].
+rewrite Rinv_l; [ easy | ].
+intros H; apply Rsqr_eq_0 in H; lra.
+Qed.
+
 Theorem mat_vec_mul_rot_sin_cos : ∀ r p p₁ p₂ a c s,
   0 < r
   → p ∈ sphere r
@@ -3646,13 +3657,8 @@ Theorem mat_vec_mul_rot_sin_cos : ∀ r p p₁ p₂ a c s,
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
 assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
- clear - Hr; intros (x, y, z) Hp; simpl in Hp; simpl.
- do 3 rewrite Rsqr_mult.
- do 2 rewrite <- Rmult_plus_distr_l.
- rewrite Hp, Rsqr_1.
- rewrite Rsqr_inv; [ | lra ].
- rewrite Rinv_l; [ easy | ].
- intros H; apply Rsqr_eq_0 in H; lra.
+ clear - Hr; intros.
+ apply vec_div_in_sphere; [ lra | easy ].
 
  assert (Ha : ∀ p p', latitude p p' = latitude (p ⁄ r) (p' ⁄ r)).
   clear - Hr; intros.
@@ -4517,7 +4523,33 @@ Theorem latitude_1 : ∀ r p p',
   → p = p'.
 Proof.
 intros * Hp Hp' Hlat.
-bbb.
+destruct (Req_dec r 0) as [Hr| Hr].
+ subst r.
+ unfold latitude in Hlat; simpl in Hlat.
+ apply on_sphere_norm in Hp; [ | lra ].
+ apply on_sphere_norm in Hp'; [ | lra ].
+ apply vec_norm_eq_0 in Hp.
+ apply vec_norm_eq_0 in Hp'.
+ rewrite Hp, Hp', vec_sqr_0, Rdiv_0_l in Hlat; lra.
+
+ assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
+  clear - Hr; intros.
+  now apply vec_div_in_sphere.
+
+  assert (Ha : ∀ p p', latitude p p' = latitude (p ⁄ r) (p' ⁄ r)).
+   clear - Hr; intros.
+   rewrite latitude_mul; [ easy | ].
+   apply Rinv_neq_0_compat; lra.
+
+   rewrite Ha in Hlat.
+   specialize
+     (unit_sphere_latitude_1 (p ⁄ r) (p' ⁄ r) (Hpr p Hp) (Hpr p' Hp') Hlat)
+     as H.
+   apply (f_equal (vec_const_mul r)) in H.
+   do 2 rewrite vec_const_mul_assoc in H.
+   rewrite Rinv_r in H; [ | easy ].
+   now do 2 rewrite vec_const_mul_1_l in H.
+Qed.
 
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
@@ -4624,8 +4656,12 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite fold_Rsqr in Ha.
         rewrite Rdiv_same in Ha.
          rewrite <- Ha in Ha'.
-Check unit_sphere_latitude_1.
+         apply (latitude_1 r) in Ha'; [ | easy | easy ].
+         now rewrite Ha' in H.
 
+         intros H1.
+         rewrite <- vec_dot_mul_diag in H1.
+         now apply vec_sqr_eq_0 in H1.
 bbb.
 
 
