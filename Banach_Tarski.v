@@ -4551,6 +4551,18 @@ destruct (Req_dec r 0) as [Hr| Hr].
    now do 2 rewrite vec_const_mul_1_l in H.
 Qed.
 
+Theorem latitude_minus_1 : ∀ r p p',
+  p ∈ sphere r
+  → p' ∈ sphere r
+  → latitude p p' = -1
+  → p = (- p')%vec.
+Proof.
+intros * Hp Hp' Hlat.
+apply neg_vec_in_sphere in Hp'.
+specialize (latitude_1 r p (- p')%vec Hp Hp') as H.
+Search latitude.
+bbb.
+
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
 Proof.
@@ -4648,20 +4660,33 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
 
 (* proof: if p'≠p then, since they have the same latitude, p must be different
    from axis and -axis; therefore a² ≠ 1 *)
-       assert (p ≠ axis).
-        intros H.
-        rewrite H in Ha.
+       assert (p ≠ axis ∧ p ≠ (- axis)%vec).
         unfold latitude in Ha.
-        rewrite vec_dot_mul_diag in Ha.
-        rewrite fold_Rsqr in Ha.
-        rewrite Rdiv_same in Ha.
-         rewrite <- Ha in Ha'.
-         apply (latitude_1 r) in Ha'; [ | easy | easy ].
-         now rewrite Ha' in H.
+        split; intros H; rewrite H in Ha.
+         rewrite vec_dot_mul_diag in Ha.
+         rewrite fold_Rsqr in Ha.
+         rewrite Rdiv_same in Ha.
+          rewrite <- Ha in Ha'.
+          apply (latitude_1 r) in Ha'; [ | easy | easy ].
+          now rewrite Ha' in H.
 
-         intros H1.
-         rewrite <- vec_dot_mul_diag in H1.
-         now apply vec_sqr_eq_0 in H1.
+          intros H1.
+          rewrite <- vec_dot_mul_diag in H1.
+          now apply vec_sqr_eq_0 in H1.
+
+         rewrite <- vec_opp_dot_mul_distr_r, Ropp_div in Ha.
+         rewrite vec_norm_opp in Ha.
+         rewrite vec_dot_mul_diag in Ha.
+         rewrite fold_Rsqr in Ha.
+         rewrite Rdiv_same in Ha.
+          rewrite <- Ha in Ha'.
+bbb.
+          apply (latitude_1 r) in Ha'; [ | easy | easy ].
+          now rewrite Ha' in H.
+
+          intros H1.
+          rewrite <- vec_dot_mul_diag in H1.
+          now apply vec_sqr_eq_0 in H1.
 bbb.
 
 

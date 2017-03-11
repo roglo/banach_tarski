@@ -653,6 +653,12 @@ apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
+Theorem vec_norm_opp : ∀ v, ‖(- v)‖ = ‖v‖.
+Proof.
+intros (x, y, z); simpl.
+now do 3 rewrite <- Rsqr_neg.
+Qed.
+
 Theorem vec_norm_vec_const_mul : ∀ a v,
   ‖(vec_const_mul a v)‖ = Rabs a * ‖v‖.
 Proof.
