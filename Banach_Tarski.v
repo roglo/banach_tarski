@@ -4585,9 +4585,29 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite fold_Rsqr in Ha.
         rewrite Rdiv_same in Ha.
          rewrite <- Ha in Ha'.
-Theorem latitude_1 : ∀ p p', ‖p‖ = ‖p'‖ → latitude p p' = 1 → p = p'.
+Theorem unit_sphere_latitude_1 : ∀ p p',
+  ‖p‖ = 1
+  → ‖p'‖ = 1
+  → latitude p p' = 1
+  → p = p'.
 Proof.
-intros * Hpp Hlat.
+intros * Hp Hp' Hlat.
+unfold latitude in Hlat; simpl in Hlat.
+rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r in Hlat.
+specialize (vec_Lagrange_identity p p') as Hlag.
+rewrite Hp, Hp', Hlat, Rsqr_1, Rmult_1_l in Hlag.
+rewrite Rminus_diag_eq in Hlag; [ | easy ].
+symmetry in Hlag.
+destruct p as (xp, yp, zp).
+destruct p' as (xp', yp', zp').
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm in Hp'; [ | lra ].
+simpl in Hp, Hp', Hlat, Hlag.
+rewrite Rsqr_1 in Hp, Hp'.
+f_equal.
+
+bbb.
+intros * Hp Hp' Hlat.
 destruct (vec_eq_dec p 0) as [Hpz| Hpnz].
  subst p.
  unfold latitude in Hlat.
