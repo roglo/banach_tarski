@@ -4585,6 +4585,51 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite fold_Rsqr in Ha.
         rewrite Rdiv_same in Ha.
          rewrite <- Ha in Ha'.
+Theorem latitude_1 : ∀ p p', ‖p‖ = ‖p'‖ → latitude p p' = 1 → p = p'.
+Proof.
+intros * Hpp Hlat.
+destruct (vec_eq_dec p 0) as [Hpz| Hpnz].
+ subst p.
+ unfold latitude in Hlat.
+ rewrite vec_dot_mul_0_l in Hlat.
+ rewrite Rdiv_0_l in Hlat; lra.
+
+ destruct (vec_eq_dec p' 0) as [Hp'z| Hp'nz].
+  subst p'.
+  unfold latitude in Hlat.
+  rewrite vec_dot_mul_0_r in Hlat.
+  rewrite Rdiv_0_l in Hlat; lra.
+
+  unfold latitude in Hlat; simpl in Hlat.
+  apply Rmult_eq_compat_r with (r := (‖p‖ * ‖p'‖)) in Hlat.
+  rewrite Rmult_div_same in Hlat.
+   rewrite Rmult_1_l in Hlat.
+   destruct p as (xp, yp, zp).
+   destruct p' as (xp', yp', zp').
+   simpl in Hpp, Hlat.
+   rewrite <- Hpp, fold_Rsqr in Hlat.
+   rewrite Rsqr_sqrt in Hlat; [ | apply nonneg_sqr_vec_norm ].
+   f_equal.
+clear Hpp Hpnz Hp'nz.
+nsatz.
+bbb.
+
+   apply (f_equal Rsqr) in Hlat.
+   rewrite Rsqr_mult in Hlat.
+   assert (‖p‖² ≠ 0) by now intros H; apply Rsqr_eq_0, vec_norm_eq_0 in H.
+   rename H into Hp.
+   assert (‖p'‖² ≠ 0) by now intros H; apply Rsqr_eq_0, vec_norm_eq_0 in H.
+   rename H into Hp'.
+   destruct p as (xp, yp, zp).
+   destruct p' as (xp', yp', zp').
+   simpl in Hpp, Hlat, Hp, Hp'.
+   rewrite Rsqr_sqrt in Hlat; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hlat; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hp; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hp'; [ | apply nonneg_sqr_vec_norm ].
+   clear Hpnz Hp'nz.
+bbb.
+
 Theorem latitude_1 : ∀ p p', latitude p p' = 1 → p = p'.
 Proof.
 intros * Hpp.
