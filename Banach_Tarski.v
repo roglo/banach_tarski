@@ -4719,8 +4719,30 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         exfalso; apply H; rewrite Hr.
         apply vec_norm_nonneg.
 
-       apply (f_equal vec_opp) in Hpq'.
-       rewrite neg_vec_involutive in Hpq'.
+        apply (f_equal vec_opp) in Hpq'.
+        rewrite neg_vec_involutive in Hpq'.
+        move Hpq' at top; subst q'; clear Hb.
+bbb.
+        unfold J₀_of_nats.
+        exists nf, no, nf', no'.
+        subst nf no nf' no'.
+        unfold fixpoint_of_nat.
+        do 4 rewrite path_of_nat_inv.
+        rewrite <- Hr, <- Hq, <- Hq'.
+        do 2 rewrite rotate_vec_mul.
+        rewrite mat_opp_vec_mul_distr_r.
+        rewrite Hso, Hso'.
+bbb.
+        subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
+        symmetry.
+        apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
+        assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
+        rewrite <- Hr in H.
+        apply Rdichotomy in H.
+        destruct H as [H| H]; [ | lra ].
+        apply Rlt_not_le in H.
+        exfalso; apply H; rewrite Hr.
+        apply vec_norm_nonneg.
 bbb.
 
 (* old version *)
