@@ -4604,13 +4604,20 @@ destruct (vec_eq_dec p 0) as [Hpz| Hpnz].
   apply Rmult_eq_compat_r with (r := (‖p‖ * ‖p'‖)) in Hlat.
   rewrite Rmult_div_same in Hlat.
    rewrite Rmult_1_l in Hlat.
+   specialize (vec_Lagrange_identity p p') as Hlag.
    destruct p as (xp, yp, zp).
    destruct p' as (xp', yp', zp').
-   simpl in Hpp, Hlat.
-   rewrite <- Hpp, fold_Rsqr in Hlat.
+   simpl in Hpp, Hlat, Hlag.
+   rewrite <- Hpp, fold_Rsqr in Hlat, Hlag.
    rewrite Rsqr_sqrt in Hlat; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hlag; [ | apply nonneg_sqr_vec_norm ].
+   apply (f_equal Rsqr) in Hpp.
+   rewrite Rsqr_sqrt in Hpp; [ | apply nonneg_sqr_vec_norm ].
+   rewrite Rsqr_sqrt in Hpp; [ | apply nonneg_sqr_vec_norm ].
    f_equal.
-clear Hpp Hpnz Hp'nz.
+assert ((xp² + yp² + zp²) * (xp'² + yp'² + zp'²) * (xp - xp') = 0).
+ clear Hpnz Hp'nz.
+bbb.
 nsatz.
 bbb.
 
