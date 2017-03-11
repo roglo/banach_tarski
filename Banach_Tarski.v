@@ -4569,6 +4569,15 @@ assert (Hlat2 : latitude p (- p') = 1).
  now specialize (latitude_1 r p (- p')%vec Hp Hp' Hlat2).
 Qed.
 
+Theorem latitude_opp_r : ∀ p p', latitude p (- p') = - latitude p p'.
+Proof.
+intros (x, y, z) (x', y', z'); unfold latitude; simpl.
+do 3 rewrite <- Rsqr_neg.
+do 3 rewrite <- Ropp_mult_distr_r.
+do 2 rewrite <- Ropp_plus_distr.
+now rewrite Ropp_div.
+Qed.
+
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
 Proof.
@@ -4727,7 +4736,9 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
 
         now apply neg_vec_in_sphere.
 
-Search (latitude (- _)).
+        rewrite latitude_opp_r.
+Search (- _ = _).
+Ropp_eq_compat.
 bbb.
        (* proof: if p'≠p then, since they have the same latitude,
           p must be different from axis and -axis; therefore a² ≠ 1 *)
