@@ -4632,22 +4632,22 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
    remember (nat_of_path (rev_path el)) as no eqn:Hno.
    remember (nat_of_path el'₀) as nf' eqn:Hnf'.
    remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
+   remember (fixpoint_of_path r el₀) as q eqn:Hq.
+   remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
    move no before nf; move nf' before nf; move no' before no.
    unfold J₀_of_nats.
    exists nf, no, nf', no'.
    subst nf no nf' no'.
    unfold fixpoint_of_nat.
    do 4 rewrite path_of_nat_inv.
-   rewrite <- Hr.
+   rewrite <- Hr, <- Hq, <- Hq'.
    rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
-   remember (fixpoint_of_path r el₀) as q eqn:Hq.
    generalize Hq; intros Hpq.
    apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
      try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
    destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
     move Hpq at top; subst q; clear Hb.
     rewrite rotate_vec_mul, Hso.
-    remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
     generalize Hq'; intros Hpq.
     apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq;
       try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
@@ -4738,7 +4738,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
 
         rewrite latitude_opp_r.
 Search (- _ = _).
-Ropp_eq_compat.
+Check Ropp_eq_compat.
 bbb.
        (* proof: if p'≠p then, since they have the same latitude,
           p must be different from axis and -axis; therefore a² ≠ 1 *)
