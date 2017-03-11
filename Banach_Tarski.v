@@ -4642,28 +4642,93 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
     generalize Hq'; intros Hpq.
     apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq;
       try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
-    destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
-     move Hpq at top; subst q'; clear Hb.
-     rewrite rotate_vec_mul, Hso'.
-     assert (Ha : axis ∈ sphere r).
-      rewrite Hr.
-      destruct axis as (x, y, z); simpl.
-      rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+    assert (Hax : axis ∈ sphere r).
+     rewrite Hr.
+     destruct axis as (x, y, z); simpl.
+     rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
 
-      subst M; clear - Ha Haz Hcs Hpp Hr Hps Hps' Hll Hv.
-      rename Ha into Hax.
+     assert (p ≠ axis ∧ p ≠ (- axis)%vec) as (Hpa, Hpna).
+      unfold latitude in Hax.
       remember (latitude axis p) as a eqn:Ha.
       rename Hll into Ha'.
-      symmetry in Ha, Ha'; symmetry.
-      apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
-       assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
-       rewrite <- Hr in H.
-       apply Rdichotomy in H.
-       destruct H as [H| H]; [ | lra ].
-       apply Rlt_not_le in H.
-       exfalso; apply H; rewrite Hr.
-       apply vec_norm_nonneg.
+      symmetry in Ha, Ha'.
+      unfold latitude in Ha.
+      split; intros H; rewrite H in Ha.
+       rewrite vec_dot_mul_diag in Ha.
+       rewrite fold_Rsqr in Ha.
+       rewrite Rdiv_same in Ha.
+        rewrite <- Ha in Ha'.
+        apply (latitude_1 r) in Ha'; [ | easy | easy ].
+        now rewrite Ha' in H.
 
+        intros H1.
+        rewrite <- vec_dot_mul_diag in H1.
+        now apply vec_sqr_eq_0 in H1.
+
+       rewrite <- vec_opp_dot_mul_distr_r, Ropp_div in Ha.
+       rewrite vec_norm_opp in Ha.
+       rewrite vec_dot_mul_diag in Ha.
+       rewrite fold_Rsqr in Ha.
+       rewrite Rdiv_same in Ha.
+        rewrite <- Ha in Ha'.
+        apply (latitude_minus_1 r) in Ha'; [ | easy | easy ].
+        now rewrite Ha', neg_vec_involutive in H.
+
+        intros H1.
+        rewrite <- vec_dot_mul_diag in H1.
+        now apply vec_sqr_eq_0 in H1.
+
+      destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
+       move Hpq at top; subst q'; clear Hb.
+       rewrite rotate_vec_mul, Hso'.
+       subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Hll Hv Hpa Hpna.
+       remember (latitude axis p) as a eqn:Ha.
+       rename Hll into Ha'.
+       symmetry in Ha, Ha'; symmetry.
+       apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
+        assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
+        rewrite <- Hr in H.
+        apply Rdichotomy in H.
+        destruct H as [H| H]; [ | lra ].
+        apply Rlt_not_le in H.
+        exfalso; apply H; rewrite Hr.
+        apply vec_norm_nonneg.
+
+        intros H.
+        replace 1 with 1² in H by apply Rsqr_1.
+        apply Rsqr_eq_abs_0 in H.
+        rewrite Rabs_R1 in H.
+        apply Rabs_or in H.
+        destruct H as [H| H].
+         rewrite H in Ha.
+         apply (latitude_1 r) in Ha; [ | easy | easy ].
+         now symmetry in Ha.
+
+         rewrite H in Ha.
+         apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
+         now rewrite Ha, neg_vec_involutive in Hpna.
+
+       apply (f_equal vec_opp) in Hpq.
+       rewrite neg_vec_involutive in Hpq.
+       move Hpq at top; subst q'; clear Hb.
+       rewrite rotate_vec_mul, mat_opp_vec_mul_distr_r, Hso'.
+       subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Hll Hv Hpa Hpna.
+       remember (latitude axis p) as a eqn:Ha.
+       rename Hll into Ha'.
+       symmetry in Ha, Ha'; symmetry.
+       apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
+        assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
+        rewrite <- Hr in H.
+        apply Rdichotomy in H.
+        destruct H as [H| H]; [ | lra ].
+        apply Rlt_not_le in H.
+        exfalso; apply H; rewrite Hr.
+        apply vec_norm_nonneg.
+
+        now apply neg_vec_in_sphere.
+
+Search (latitude (- _)).
+bbb.
        (* proof: if p'≠p then, since they have the same latitude,
           p must be different from axis and -axis; therefore a² ≠ 1 *)
        assert (p ≠ axis ∧ p ≠ (- axis)%vec) as (Hpa, Hpna).
@@ -4706,10 +4771,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          rewrite H in Ha.
          apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
          now rewrite Ha, neg_vec_involutive in Hpna.
-
-     apply (f_equal vec_opp) in Hpq.
-     rewrite neg_vec_involutive in Hpq.
-     move Hpq at top; subst q'; clear Hb.
 bbb.
 
 rewrite Rsqr_0, Rmult_0_l in Hpp.
