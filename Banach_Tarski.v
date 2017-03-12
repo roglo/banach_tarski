@@ -4742,17 +4742,40 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
         rewrite <- Hr, <- Hq.
+Theorem mat_of_rev_path_vec : ∀ el v,
+  (mat_of_path (rev_path el) * v = - ((- mat_of_path el)%mat * v))%vec.
+Proof.
+intros.
+Abort. (* chais pas *)
+
 Theorem mat_of_rev_path : ∀ el,
   mat_of_path (rev_path el) = (- mat_of_path el)%mat.
 Proof.
 intros.
 unfold mat_of_path.
-bbb.
+Abort. (* chais pas *)
 
 Theorem fixpoint_of_rev_path : ∀ r el,
   fixpoint_of_path r (rev_path el) = (- fixpoint_of_path r el)%vec.
 Proof.
 intros.
+remember (fixpoint_of_path r el) as p eqn:Hp.
+remember (fixpoint_of_path r (rev_path el)) as p' eqn:Hp'.
+unfold fixpoint_of_path in Hp, Hp'.
+generalize Hp; intros Hpr.
+apply rotation_fixpoint_of_path in Hpr.
+generalize Hp'; intros Hpr'.
+apply rotation_fixpoint_of_path in Hpr'.
+apply mat_of_path_fixpoint_rev_path in Hpr'.
+rewrite rev_path_involutive in Hpr'.
+Check axis_and_fixpoint_of_path_collinear.
+
+bbb.
+apply axis_and_fixpoint_of_path_collinear with (p := p') in H.
+ destruct (bool_dec (is_neg_vec p') (is_neg_vec p)) as [Hb| Hb].
+
+  move H at top; subst p'; clear Hb.
+
 unfold fixpoint_of_path.
 unfold rotation_fixpoint.
 remember (mat_of_path el) as M eqn:Hm.
