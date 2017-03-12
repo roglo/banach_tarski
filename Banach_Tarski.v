@@ -4578,6 +4578,15 @@ do 2 rewrite <- Ropp_plus_distr.
 now rewrite Ropp_div.
 Qed.
 
+Theorem mat_of_path_fixpoint_rev_path : ∀ el p,
+  (mat_of_path el * p = p → mat_of_path (rev_path el) * p = p)%vec.
+Proof.
+intros * Hmp.
+rewrite <- rotate_vec_mul in Hmp.
+apply rotate_rev_path in Hmp.
+now rewrite rotate_vec_mul in Hmp.
+Qed.
+
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
 Proof.
@@ -4722,7 +4731,53 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         apply (f_equal vec_opp) in Hpq'.
         rewrite neg_vec_involutive in Hpq'.
         move Hpq' at top; subst q'; clear Hb.
-unfold J₀_of_nats.
+        unfold J₀_of_nats.
+        remember (nat_of_path el₀) as nf eqn:Hnf.
+        remember (nat_of_path (rev_path el)) as no eqn:Hno.
+        remember (nat_of_path (rev_path el'₀)) as nf' eqn:Hnf'.
+        remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
+        move no before nf; move nf' before nf; move no' before no.
+        exists nf, no, nf', no'.
+        subst nf no nf' no'.
+        unfold fixpoint_of_nat.
+        do 4 rewrite path_of_nat_inv.
+        rewrite <- Hr, <- Hq.
+Theorem mat_of_rev_path : ∀ el,
+  mat_of_path (rev_path el) = (- mat_of_path el)%mat.
+Proof.
+intros.
+unfold mat_of_path.
+bbb.
+
+Theorem fixpoint_of_rev_path : ∀ r el,
+  fixpoint_of_path r (rev_path el) = (- fixpoint_of_path r el)%vec.
+Proof.
+intros.
+unfold fixpoint_of_path.
+unfold rotation_fixpoint.
+remember (mat_of_path el) as M eqn:Hm.
+remember (mat_of_path (rev_path el)) as M' eqn:Hm'.
+simpl; f_equal.
+unfold mat_of_path in Hm, Hm'.
+Search rev_path.
+bbb.
+        rewrite <- Hr, <- Hq, <- Hq'.
+        do 2 rewrite rotate_vec_mul.
+        rewrite Hso, Hso'.
+        subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
+        symmetry.
+        apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
+        assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
+        rewrite <- Hr in H.
+        apply Rdichotomy in H.
+        destruct H as [H| H]; [ | lra ].
+        apply Rlt_not_le in H.
+        exfalso; apply H; rewrite Hr.
+        apply vec_norm_nonneg.
+
+Theorem glip : ∀ el p,
+  (mat_of_path el * p = p → mat_of_path el * (- p) = -p)%vec.
+
 bbb.
         unfold J₀_of_nats.
         exists nf, no, nf', no'.
