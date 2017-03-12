@@ -4752,13 +4752,17 @@ Theorem mat_of_rev_path : ∀ el,
   mat_of_path (rev_path el) = (- mat_of_path el)%mat.
 Proof.
 intros.
-unfold mat_of_path.
+Check rotate_unicity.
+bbb.
+
 Abort. (* chais pas *)
 
 Theorem fixpoint_of_rev_path : ∀ r el,
-  fixpoint_of_path r (rev_path el) = (- fixpoint_of_path r el)%vec.
+  r ≠ 0
+  → norm_list el ≠ []
+  → fixpoint_of_path r (rev_path el) = (- fixpoint_of_path r el)%vec.
 Proof.
-intros.
+intros * Hr Hn.
 remember (fixpoint_of_path r el) as p eqn:Hp.
 remember (fixpoint_of_path r (rev_path el)) as p' eqn:Hp'.
 unfold fixpoint_of_path in Hp, Hp'.
@@ -4768,7 +4772,18 @@ generalize Hp'; intros Hpr'.
 apply rotation_fixpoint_of_path in Hpr'.
 apply mat_of_path_fixpoint_rev_path in Hpr'.
 rewrite rev_path_involutive in Hpr'.
-Check axis_and_fixpoint_of_path_collinear.
+generalize Hpr; intros H.
+apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
+ destruct H as [H| H]; [ | easy ].
+ exfalso; move H at top; subst p'; clear Hpr'.
+ rewrite Hp in Hp'.
+ unfold rotation_fixpoint in Hp'.
+ apply (f_equal (vec_const_mul (/ r))) in Hp'.
+ do 2 rewrite vec_const_mul_assoc in Hp'.
+ rewrite Rinv_l in Hp'; [ | easy ].
+ do 2 rewrite vec_const_mul_1_l in Hp'.
+ unfold rotation_unit_axis in Hp'.
+ unfold rotation_axis in Hp'.
 
 bbb.
 apply axis_and_fixpoint_of_path_collinear with (p := p') in H.
