@@ -4742,15 +4742,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
         rewrite <- Hr, <- Hq.
-
-Theorem mat_rot_inv : ∀ M, is_rotation_matrix M → mat_inv M = mat_transp M.
-Proof.
-intros M Hr.
-destruct Hr as (Htr, Hdet).
-unfold mat_inv; rewrite Hdet.
-rewrite Rinv_1.
-rewrite mat_const_mul_1_l.
-Search mat_compl.
+Check mat_rot_inv.
 bbb.
 
 Theorem mat_of_rev_path : ∀ el,
