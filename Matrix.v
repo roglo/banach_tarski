@@ -189,6 +189,7 @@ Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
 Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.
 Notation "M₁ * M₂" := (mat_mul M₁ M₂) : mat_scope.
 Notation "k ⁎ M" := (mat_const_mul k M) : mat_scope.
+Notation "M ⁄ k" := (mat_const_mul (/ k) M) : mat_scope.
 Notation "- M" := (mat_opp M) : mat_scope.
 Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
@@ -1273,6 +1274,8 @@ Definition mat_compl M :=
   let '(V b₁₂ b₂₂ b₃₂) := vec_inv M (V 0 1 0) in
   let '(V b₁₃ b₂₃ b₃₃) := vec_inv M (V 0 0 1) in
   mkrmat b₁₁ b₁₂ b₁₃ b₂₁ b₂₂ b₂₃ b₃₁ b₃₂ b₃₃.
+
+Definition mat_inv M := (mat_compl M ⁄ mat_det M)%mat.
 
 Theorem mat_mul_compl_l : ∀ M, (mat_compl M * M = mat_det M ⁎ mat_id)%mat.
 Proof.
