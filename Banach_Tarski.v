@@ -4764,6 +4764,15 @@ destruct el as [| e₂ el].
   rewrite mat_transp_mul.
   now destruct t₂, d₂, t₁, d₁.
 
+  destruct el as [| e₄ el].
+   unfold mat_of_path; simpl.
+   do 2 rewrite mat_mul_id_r.
+   destruct e₃ as (t₃, d₃); simpl.
+   destruct e₂ as (t₂, d₂); simpl.
+   destruct e₁ as (t₁, d₁); simpl.
+   do 2 rewrite mat_transp_mul.
+   rewrite mat_mul_assoc.
+   destruct t₃, d₃, t₂, d₂, t₁, d₁; easy.
 bbb.
 
 Theorem fixpoint_of_rev_path : ∀ r el,
