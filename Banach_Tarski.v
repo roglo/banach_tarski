@@ -4742,20 +4742,21 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
         rewrite <- Hr, <- Hq.
-Theorem mat_of_rev_path_vec : ∀ el v,
-  (mat_of_path (rev_path el) * v = - ((- mat_of_path el)%mat * v))%vec.
-Proof.
-intros.
-Abort. (* chais pas *)
 
 Theorem mat_of_rev_path : ∀ el,
-  mat_of_path (rev_path el) = (- mat_of_path el)%mat.
+  norm_list el ≠ []
+  → mat_of_path (rev_path el) = (- mat_of_path el)%mat.
 Proof.
-intros.
-Check rotate_unicity.
-bbb.
-
-Abort. (* chais pas *)
+intros * Hn.
+induction el as [| e₁ el]; [ easy | ].
+destruct el as [| e₂ el].
+ unfold mat_of_path; simpl.
+ do 2 rewrite mat_mul_id_r.
+ destruct e₁ as (t, d); simpl.
+ destruct t, d; simpl.
+  unfold rot_x, rot_inv_x; simpl.
+  unfold mkrmat; simpl.
+bbb. (* donc, c'est faux *)
 
 Theorem fixpoint_of_rev_path : ∀ r el,
   r ≠ 0
