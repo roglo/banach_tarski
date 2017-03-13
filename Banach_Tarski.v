@@ -4663,7 +4663,7 @@ apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
  remember (rotation_axis (mat_of_path el)) as ra eqn:Hra.
  remember (rotation_axis (mat_of_path (rev_path el))) as ra' eqn:Hra'.
  unfold rotation_axis in Hra, Hra'.
- rewrite mat_of_rev_path in Hra'.
+ rewrite mat_of_rev_path in Hra'; [ | easy ].
  remember (mat_of_path el) as M eqn:HM.
  assert (Hneg : ra' = (- ra)%vec).
   rewrite Hra, Hra'; clear.
@@ -4673,11 +4673,30 @@ apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
   rewrite Hneg in Hp'.
   rewrite vec_norm_opp in Hp'.
   destruct (vec_eq_dec ra 0) as [Hraz| Hraz].
+Focus 2.
+   apply (f_equal (vec_const_mul ‖ra‖)) in Hp'.
+   do 2 rewrite vec_const_mul_assoc in Hp'.
+   rewrite Rinv_r in Hp'; [ | now apply vec_norm_neq_0 ].
+   do 2 rewrite vec_const_mul_1_l in Hp'.
+   apply Hraz; clear - Hp'.
+   destruct ra as (x, y, z); simpl in Hp'.
+   injection Hp'; clear Hp'; intros.
+   f_equal; lra.
+
    move Hraz at top; subst ra.
    symmetry in Hra; injection Hra; clear Hra; intros H3 H2 H1.
+   apply Rminus_diag_uniq in H1.
+   apply Rminus_diag_uniq in H2.
+   apply Rminus_diag_uniq in H3.
    clear ra' Hra' Hneg Hp'.
    specialize (matrix_of_non_empty_path_is_not_identity el Hn) as Hel.
+   apply Hel; clear Hel.
+   rewrite <- HM.
+bbb.
 
+   destruct M; simpl in *.
+   unfold mat_id, mkrmat; simpl.
+   subst a₂₁ a₁₃ a₃₂.
 bbb.
 
 Theorem J₁_is_countable : ∀ axis,

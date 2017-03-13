@@ -707,6 +707,12 @@ split; intros Hv.
  apply sqrt_0.
 Qed.
 
+Theorem vec_norm_neq_0 : ∀ v, ‖v‖ ≠ 0 ↔ v ≠ 0%vec.
+Proof.
+intros v.
+now split; intros H1 H2; apply vec_norm_eq_0 in H2.
+Qed.
+
 Theorem vec_add_0_l : ∀ v, (0 + v = v)%vec.
 Proof.
 intros (x, y, z); simpl; f_equal; lra.
