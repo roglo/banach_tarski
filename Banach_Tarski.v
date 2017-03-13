@@ -4696,10 +4696,14 @@ Focus 2.
    rewrite <- mat_of_path_norm in HM.
    remember (norm_list el) as nel eqn:Hnel.
    assert (Hnn : norm_list nel = nel) by now rewrite Hnel, norm_list_idemp.
-bbb.
-   clear el Hn Hnel; rename nel into el.
-remember (length el) as len eqn:Hlen; symmetry in Hlen.
-revert el Hnn Hlen.
+   clear el Hnel; rename nel into el.
+   remember (length el) as len eqn:Hlen; symmetry in Hlen.
+   revert el M Hn HM Hnn Hlen H1 H2 H3.
+   induction len; intros; [ now apply length_zero_iff_nil in Hlen | ].
+   destruct el as [| e₁ el]; [ easy | ].
+   clear Hn; simpl in Hlen; apply Nat.succ_inj in Hlen.
+   apply norm_list_cons in Hnn.
+   rewrite mat_of_path_cons in HM.
 
 bbb.
    unfold rotation_fixpoint in Hp.
