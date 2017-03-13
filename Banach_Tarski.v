@@ -4703,7 +4703,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
       destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
        move Hpq at top; subst q; clear Hb.
        destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
-        move Hpq' at top; subst q'; clear Hb.
+        move Hpq' at top; subst q'.
         unfold J₀_of_nats.
         remember (nat_of_path el₀) as nf eqn:Hnf.
         remember (nat_of_path (rev_path el)) as no eqn:Hno.
