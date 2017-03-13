@@ -4633,8 +4633,6 @@ induction len; intros.
  now destruct t₁, d₁; simpl.
 Qed.
 
-bbb.
-
 Theorem fixpoint_of_rev_path : ∀ r el,
   r ≠ 0
   → norm_list el ≠ []
@@ -4665,10 +4663,21 @@ apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
  remember (rotation_axis (mat_of_path el)) as ra eqn:Hra.
  remember (rotation_axis (mat_of_path (rev_path el))) as ra' eqn:Hra'.
  unfold rotation_axis in Hra, Hra'.
-Search (mat_of_path (rev_path _)).
  rewrite mat_of_rev_path in Hra'.
-Search mat_transp.
-(* a₃₂ (mat_tramsp M) = a₂₃ M *)
+ remember (mat_of_path el) as M eqn:HM.
+ assert (Hneg : ra' = (- ra)%vec).
+  rewrite Hra, Hra'; clear.
+  destruct M; simpl.
+  f_equal; lra.
+
+  rewrite Hneg in Hp'.
+  rewrite vec_norm_opp in Hp'.
+  destruct (vec_eq_dec ra 0) as [Hraz| Hraz].
+   move Hraz at top; subst ra.
+   symmetry in Hra; injection Hra; clear Hra; intros H3 H2 H1.
+   clear ra' Hra' Hneg Hp'.
+   specialize (matrix_of_non_empty_path_is_not_identity el Hn) as Hel.
+
 bbb.
 
 Theorem J₁_is_countable : ∀ axis,
