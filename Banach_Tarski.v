@@ -4742,8 +4742,9 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
         rewrite <- Hr, <- Hq.
+assert (H : p'₀ = fixpoint_of_path r (rev_path el'₀)).
+(*
 Check mat_rot_inv.
-
 Theorem mat_of_rev_path : ∀ el,
   norm_list el ≠ []
   → mat_of_path (rev_path el) = mat_transp (mat_of_path el)%mat.
@@ -4773,7 +4774,8 @@ destruct el as [| e₂ el].
    do 2 rewrite mat_transp_mul.
    rewrite mat_mul_assoc.
    destruct t₃, d₃, t₂, d₂, t₁, d₁; easy.
-bbb.
+Admitted. Show.
+*)
 
 Theorem fixpoint_of_rev_path : ∀ r el,
   r ≠ 0
@@ -4802,8 +4804,8 @@ apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
  do 2 rewrite vec_const_mul_1_l in Hp'.
  unfold rotation_unit_axis in Hp'.
  unfold rotation_axis in Hp'.
-
 bbb.
+
 apply axis_and_fixpoint_of_path_collinear with (p := p') in H.
  destruct (bool_dec (is_neg_vec p') (is_neg_vec p)) as [Hb| Hb].
 
@@ -4816,6 +4818,10 @@ remember (mat_of_path (rev_path el)) as M' eqn:Hm'.
 simpl; f_equal.
 unfold mat_of_path in Hm, Hm'.
 Search rev_path.
+bbb.
+*)
+rewrite fixpoint_of_rev_path; [ | | easy ].
+ now rewrite <- Hq', neg_vec_involutive.
 bbb.
         rewrite <- Hr, <- Hq, <- Hq'.
         do 2 rewrite rotate_vec_mul.
