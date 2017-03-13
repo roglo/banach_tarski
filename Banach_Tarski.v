@@ -2309,15 +2309,15 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
   progress repeat rewrite Rdiv_1_r.
   clear H23 H13 H12 H11.
   subst x y z c.
-bbb.
-  rewrite Rsqr_div; [ | easy ].
+  rewrite Rsqr_div; [ | lra ].
   symmetry.
   f_equal.
    apply Rmult_eq_reg_r with (r := 2 * r₀²); [ | lra ].
-   rewrite Rmult_plus_distr_r.
-   replace (x₀² / r₀² * (1 - (tr - 1) / 2) * (2 * r₀²))
+   rewrite Rmult_plus_distr_r, Rsqr_mult.
+   rewrite Rsqr_inv; [ | lra ].
+   progress replace (/ r₀² * x₀² * (1 - (tr - 1) / 2) * (2 * r₀²))
    with (x₀² * (3 - tr) * (r₀² * / r₀²)) by lra.
-   replace ((tr - 1) / 2 * (2 * r₀²))
+   progress replace ((tr - 1) / 2 * (2 * r₀²))
    with ((tr - 1) * r₀²) by lra.
    rewrite Rinv_r; [ rewrite Rmult_1_r, Hr₀ | easy ].
    rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
@@ -2327,14 +2327,15 @@ bbb.
 
    apply Rmult_eq_reg_l with (r := 4 * r₀²); [ | lra ].
    rewrite Rmult_minus_distr_l.
-   do 3 rewrite <- Rmult_assoc.
-   do 2 rewrite Rsqr_pow2.
-   replace (4 * r₀ ^ 2 * (x₀ / r₀) * (y₀ / r₀))
+   do 6 rewrite <- Rmult_assoc.
+   do 3 rewrite Rsqr_pow2.
+   progress replace (4 * r₀ ^ 2 * / r₀ * x₀ * / r₀ * y₀)
    with (4 * x₀ * y₀ * (r₀ / r₀) * (r₀ / r₀)) by lra.
-   replace (4 * r₀ ^ 2 * (z₀ / r₀))
+   progress replace (4 * r₀ ^ 2 * / r₀ * z₀)
    with (4 * r₀ * z₀ * (r₀ / r₀)) by lra.
    rewrite Rdiv_same; [ do 3 rewrite Rmult_1_r | lra ].
-   replace (1 - ((tr - 1) / 2) ^ 2) with ((4 - (tr - 1) ^ 2) / 4)
+Abort. (*
+   progress replace  (1 - (tr - 1) ^ 2 / 2 ^ 2) with ((4 - (tr - 1) ^ 2) / 4)
      by lra.
    rewrite sqrt_div; [ | | lra ].
 Focus 2.
@@ -2353,7 +2354,7 @@ replace (Rabs 2) with 2; [ now apply Rabs_le | ].
 unfold Rabs.
 destruct (Rcase_abs 2); [ lra | easy ].
 Abort.
-(* requires to first prove that -1 ≤ tr ≤ 3 *)
+requires to first prove that -1 ≤ tr ≤ 3 *)
 
 (* playing with quaternions, just for fun... *)
 
@@ -2937,7 +2938,6 @@ destruct (Req_dec (x * y) 0) as [Hxyz| Hxyz].
   destruct (Rle_dec 0 x) as [Hx| Hx].
    destruct (Rle_dec 0 y) as [Hy| Hy]; [ lra | exfalso ].
    apply Hy; clear Hy.
-bbb.
    apply Rmult_le_reg_l with (r := x); [ lra | ].
    now rewrite Rmult_0_r.
 
@@ -3054,9 +3054,9 @@ Theorem rotation_implies_same_latitude : ∀ r p p₁ p₂ c s,
   → latitude p p₁ = latitude p p₂.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hm.
-apply on_sphere_on_unit_sphere in Hp; [ | easy ].
-apply on_sphere_on_unit_sphere in Hp₁; [ | easy ].
-apply on_sphere_on_unit_sphere in Hp₂; [ | easy ].
+apply vec_div_in_sphere in Hp; [ | lra ].
+apply vec_div_in_sphere in Hp₁; [ | lra ].
+apply vec_div_in_sphere in Hp₂; [ | lra ].
 assert
   (Hmm :
      ((matrix_of_axis_angle (/ r ⁎ p, c, s) * (/ r ⁎ p₁))%vec = / r ⁎ p₂)).
@@ -4405,6 +4405,7 @@ destruct (Req_dec r 0) as [Hrz| Hrz].
 
   unfold Rsqr in Hr; ring_simplify in Hr.
   progress repeat rewrite <- Rsqr_pow2 in Hr.
+  rewrite Rmult_comm, fold_Rdiv in Hxa, Hya, Hza.
   f_equal.
    rewrite <- Hya, <- Hza.
    apply Rmult_eq_reg_r with (r := √ r); [ | easy ].
@@ -4550,7 +4551,6 @@ destruct (Req_dec r 0) as [Hr| Hr].
  apply vec_norm_eq_0 in Hp'.
  rewrite Hp, Hp', vec_sqr_0, Rdiv_0_l in Hlat; lra.
 
-bbb.
  assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
   clear - Hr; intros.
   now apply vec_div_in_sphere.
@@ -4823,8 +4823,8 @@ apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
  unfold vec_normalize in Hp'.
  remember (rotation_axis (mat_of_path el)) as ra eqn:Hra.
  remember (rotation_axis (mat_of_path (rev_path el))) as ra' eqn:Hra'.
-Print rotation_axis.
-About vec_normalize.
+ unfold rotation_axis in Hra, Hra'.
+Search (mat_of_path (rev_path _)).
 bbb.
 
 apply axis_and_fixpoint_of_path_collinear with (p := p') in H.
