@@ -4690,8 +4690,25 @@ Focus 2.
    apply Rminus_diag_uniq in H3.
    clear ra' Hra' Hneg Hp'.
    specialize (matrix_of_non_empty_path_is_not_identity el Hn) as Hel.
+   rewrite <- HM in Hel.
+   clear p Hp Hpr r Hr.
    apply Hel; clear Hel.
-   rewrite <- HM.
+   rewrite <- mat_of_path_norm in HM.
+   remember (norm_list el) as nel eqn:Hnel.
+   assert (Hnn : norm_list nel = nel) by now rewrite Hnel, norm_list_idemp.
+bbb.
+   clear el Hn Hnel; rename nel into el.
+remember (length el) as len eqn:Hlen; symmetry in Hlen.
+revert el Hnn Hlen.
+
+bbb.
+   unfold rotation_fixpoint in Hp.
+   simpl in Hp.
+   rewrite H1, H2, H3 in Hp.
+   rewrite Rminus_diag_eq in Hp; [ | easy ].
+   rewrite Rminus_diag_eq in Hp; [ | easy ].
+   rewrite Rminus_diag_eq in Hp; [ | easy ].
+   do 2 rewrite Rmult_0_r in Hp.
 bbb.
 
    destruct M; simpl in *.
