@@ -488,6 +488,13 @@ Qed.
 Theorem Rinv_div : ∀ x, / x = 1 / x.
 Proof. intros; lra. Qed.
 
+Theorem nonneg_inv : ∀ r, 0 < r → 0 ≤ / r.
+Proof.
+intros * Hr.
+apply Rmult_le_reg_l with (r := r); [ lra | ].
+rewrite Rmult_0_r, Rinv_r; lra.
+Qed.
+
 Theorem nonneg_plus_sqr : ∀ x y, 0 ≤ x² + y².
 Proof.
 intros.

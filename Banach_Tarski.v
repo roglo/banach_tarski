@@ -1120,8 +1120,7 @@ rewrite vec_norm_vec_const_mul.
 rewrite Rabs_right; [ now rewrite Rinv_l | ].
 apply Rle_ge.
 specialize (vec_norm_nonneg v) as Hvp.
-apply Rmult_le_reg_l with (r := ‖v‖); [ lra | ].
-rewrite Rmult_0_r, Rinv_r; [ lra | easy ].
+apply nonneg_inv; lra.
 Qed.
 
 (*
@@ -1176,38 +1175,30 @@ unfold rotation_unit_axis.
 remember (rotation_axis M) as ax eqn:Hax.
 unfold vec_normalize.
 apply vec_mul_in_sphere.
-bbb.
+destruct (vec_eq_dec ax 0) as [Hz| Hz].
+ move Hz at top; subst ax; symmetry in Hax.
+ injection Hax; clear Hax; intros Hz Hy Hx.
+ apply Rminus_diag_uniq in Hx.
+ apply Rminus_diag_uniq in Hy.
+ apply Rminus_diag_uniq in Hz.
+ exfalso; apply Hm; unfold mat_transp.
+ unfold mkrmat.
+ destruct M; simpl in Hx, Hy, Hz |-*.
+ now rewrite Hx, Hy, Hz.
 
-intros * Hm.
-unfold rotation_fixpoint; simpl.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-remember (a₃₂ M - a₂₃ M) as x eqn:Hx.
-remember (a₁₃ M - a₃₁ M) as y eqn:Hy.
-remember (a₂₁ M - a₁₂ M) as z eqn:Hz.
-remember (x² + y² + z²) as r₁ eqn:Hr₁.
-destruct (Req_dec r₁ 0) as [Hrz| Hrz].
- move Hrz at top; subst r₁; symmetry in Hr₁.
- apply sqr_vec_norm_eq_0 in Hr₁.
- destruct Hr₁ as (H1 & H2 & H3); subst x y z.
- apply Rminus_diag_uniq in H1.
- apply Rminus_diag_uniq in H2.
- apply Rminus_diag_uniq in H3.
- unfold mat_transp, mkrmat.
- destruct M; simpl in *.
- now subst.
+ destruct ax as (x, y, z); simpl.
+ do 3 rewrite Rsqr_mult.
+ do 2 rewrite <- Rmult_plus_distr_l.
+ rewrite Rsqr_1, Rsqr_inv.
+  rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+  rewrite Rinv_l; [ easy | ].
+   intros H; apply sqr_vec_norm_eq_0 in H.
+   now destruct H as (H1 & H2 & H3); subst.
 
- destruct (Req_dec (√ r₁) 0) as [Hsrz| Hsrz].
-  apply sqrt_eq_0 in Hsrz; [ easy | ].
-  rewrite Hr₁; apply nonneg_sqr_vec_norm.
-
-  rewrite Rsqr_div; [ | easy ].
-  rewrite Rsqr_div; [ | easy ].
-  rewrite Rsqr_div; [ | easy ].
-  do 2 rewrite <- Rdiv_plus_distr.
-  rewrite Rsqr_sqrt; [ | subst r₁; apply nonneg_sqr_vec_norm ].
-  rewrite <- Hr₁.
-  rewrite Rdiv_same; [ now rewrite Rmult_1_r | easy ].
+  intros H.
+  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in H.
+  now destruct H as (H1 & H2 & H3); subst.
 Qed.
 
 Theorem fixpoint_of_path_on_sphere : ∀ r el,
@@ -2239,9 +2230,11 @@ assert (Hv2s : x² + y² + z² = 1).
  rewrite Hv2s, Rmult_1_r.
  rewrite <- Rsqr_mult.
  rewrite sqrt_Rsqr; [ | lra ].
- replace (2 * x * s / (2 * s)) with ((2 * s) * / (2 * s) * x) by lra.
- replace (2 * y * s / (2 * s)) with ((2 * s) * / (2 * s) * y) by lra.
- replace (2 * z * s / (2 * s)) with ((2 * s) * / (2 * s) * z) by lra.
+ setoid_rewrite Rmult_comm.
+ do 3 rewrite fold_Rdiv.
+ progress replace (2 * x * s / (2 * s)) with ((2 * s) * / (2 * s) * x) by lra.
+ progress replace (2 * y * s / (2 * s)) with ((2 * s) * / (2 * s) * y) by lra.
+ progress replace (2 * z * s / (2 * s)) with ((2 * s) * / (2 * s) * z) by lra.
  rewrite Rinv_r; [ | lra ].
  f_equal; lra.
 Qed.
@@ -2293,20 +2286,30 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
  assert (H : r₀² ≠ 0 ∧ r = 1).
   split; [ now intros H; apply Hr₀nz; apply Rsqr_eq_0 in H | ].
   rewrite Hr, Hx, Hy, Hz.
-  rewrite Rsqr_div; [ | easy ].
-  rewrite Rsqr_div; [ | easy ].
-  rewrite Rsqr_div; [ | easy ].
-  do 2 rewrite <- Rdiv_plus_distr.
-  rewrite sqrt_div; [ | apply nonneg_sqr_vec_norm | now apply Rlt_0_sqr ].
-  rewrite <- Hr₀.
-  rewrite sqrt_Rsqr; [ | rewrite Hr₀; apply sqrt_pos ].
-  rewrite Rdiv_same; [ easy | lra ].
+  do 3 rewrite Rsqr_mult.
+  rewrite Rsqr_inv; [ | easy ].
+  do 2 rewrite <- Rmult_plus_distr_l.
+  rewrite sqrt_mult; [ | | apply nonneg_sqr_vec_norm ].
+   rewrite <- Hr₀.
+   rewrite sqrt_inv.
+    rewrite sqrt_Rsqr; [ | rewrite Hr₀; apply sqrt_pos ].
+    rewrite Rinv_l; [ easy | lra ].
+
+    specialize (Rle_0_sqr r₀) as H.
+    enough (r₀² ≠ 0) by lra.
+    now clear H; intros H; apply Rsqr_eq_0 in H.
+
+   apply nonneg_inv.
+   specialize (Rle_0_sqr r₀) as H.
+   enough (r₀² ≠ 0) by lra.
+   now clear H; intros H; apply Rsqr_eq_0 in H.
 
   destruct H as (Hr₀2 & Hr1).
   move Hr1 at top; subst r.
   progress repeat rewrite Rdiv_1_r.
   clear H23 H13 H12 H11.
   subst x y z c.
+bbb.
   rewrite Rsqr_div; [ | easy ].
   symmetry.
   f_equal.
@@ -2934,6 +2937,7 @@ destruct (Req_dec (x * y) 0) as [Hxyz| Hxyz].
   destruct (Rle_dec 0 x) as [Hx| Hx].
    destruct (Rle_dec 0 y) as [Hy| Hy]; [ lra | exfalso ].
    apply Hy; clear Hy.
+bbb.
    apply Rmult_le_reg_l with (r := x); [ lra | ].
    now rewrite Rmult_0_r.
 
