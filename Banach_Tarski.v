@@ -4796,6 +4796,7 @@ generalize Hpr; intros H.
 apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
  destruct H as [H| H]; [ | easy ].
  exfalso; move H at top; subst p'; clear Hpr'.
+bbb.
  rewrite Hp in Hp'.
  unfold rotation_fixpoint in Hp'.
  apply (f_equal (vec_const_mul (/ r))) in Hp'.
