@@ -385,9 +385,7 @@ Definition rotation_axis (M : matrix ℝ) :=
   let z := a₂₁ M - a₁₂ M in
   V x y z.
 
-Definition vec_normalize '(V x y z) :=
-  let r := ‖(V x y z)‖ in
-  V (x / r) (y / r) (z / r).
+Definition vec_normalize v := v ⁄ ‖v‖.
 
 Definition rotation_unit_axis (M : matrix ℝ) :=
   vec_normalize (rotation_axis M).
@@ -687,9 +685,6 @@ Proof.
 intros M k (x, y, z) Hv.
 unfold vec_normalize.
 remember ‖(V x y z)‖ as r eqn:Hr.
-unfold Rdiv.
-setoid_rewrite Rmult_comm.
-rewrite vec_mul_diag.
 rewrite vec_const_mul_assoc.
 setoid_rewrite Rmult_comm.
 rewrite <- vec_const_mul_assoc.
@@ -1118,28 +1113,71 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
 
 Theorem normalized_vec_normalize : ∀ v, v ≠ 0%vec → ‖(vec_normalize v)‖ = 1.
 Proof.
-intros (x, y, z) Hv; simpl.
-remember (√ (x² + y² + z²)) as r eqn:Hr.
-destruct (Req_dec r 0) as [Hrz| Hrnz].
- rewrite Hrz in Hr; symmetry in Hr.
- apply (f_equal Rsqr) in Hrz.
- apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hr.
- exfalso; apply Hv; f_equal; lra.
+intros v Hv.
+assert (Hvz : ‖v‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
+unfold vec_normalize.
+rewrite vec_norm_vec_const_mul.
+rewrite Rabs_right; [ now rewrite Rinv_l | ].
+apply Rle_ge.
+specialize (vec_norm_nonneg v) as Hvp.
+apply Rmult_le_reg_l with (r := ‖v‖); [ lra | ].
+rewrite Rmult_0_r, Rinv_r; [ lra | easy ].
+Qed.
 
- rewrite Rsqr_div; [ | easy ].
- rewrite Rsqr_div; [ | easy ].
- rewrite Rsqr_div; [ | easy ].
- do 2 rewrite <- Rdiv_plus_distr.
- rewrite sqrt_div_alt; [ | now apply Rlt_0_sqr ].
- rewrite Hr, sqrt_Rsqr; [ | apply sqrt_pos ].
- rewrite Rdiv_same; [ easy | now subst r ].
+(*
+Theorem on_sphere_on_unit_sphere : ∀ r p,
+  0 < r
+  → p ∈ sphere r
+  → / r ⁎ p ∈ sphere 1.
+Proof.
+intros * Hr Hp.
+apply on_sphere_norm in Hp; [ | lra ].
+apply on_sphere_norm; [ lra | ].
+rewrite vec_norm_vec_const_mul, Hp.
+rewrite Rabs_right.
+ rewrite Rinv_l; [ easy | lra ].
+
+ apply Rinv_0_lt_compat in Hr; lra.
+Qed.
+*)
+
+Theorem vec_div_in_sphere : ∀ r p,
+  r ≠ 0
+  → p ∈ sphere r
+  → p ⁄ r ∈ sphere 1.
+Proof.
+intros r (x, y, z) Hr Hp; simpl in Hp; simpl.
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+rewrite Hp, Rsqr_1.
+rewrite Rsqr_inv; [ | lra ].
+rewrite Rinv_l; [ easy | ].
+intros H; apply Rsqr_eq_0 in H; lra.
+Qed.
+
+Theorem vec_mul_in_sphere : ∀ r p,
+  p ∈ sphere 1
+  → r ⁎ p ∈ sphere r.
+Proof.
+intros r (x, y, z) Hp; simpl in Hp; simpl.
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+rewrite Hp, Rsqr_1.
+now rewrite Rmult_1_r.
 Qed.
 
 Theorem rotation_fixpoint_on_sphere : ∀ r M,
    M ≠ mat_transp M
    → rotation_fixpoint M r ∈ sphere r.
 Proof.
+intros * Hm.
+unfold rotation_fixpoint.
+unfold rotation_unit_axis.
+remember (rotation_axis M) as ax eqn:Hax.
+unfold vec_normalize.
+apply vec_mul_in_sphere.
+bbb.
+
 intros * Hm.
 unfold rotation_fixpoint; simpl.
 do 3 rewrite Rsqr_mult.
@@ -2870,21 +2908,6 @@ rewrite Hp, Hp₁, Hp₂, sqrt_1; f_equal.
 nsatz.
 Qed.
 
-Theorem on_sphere_on_unit_sphere : ∀ r p,
-  0 < r
-  → p ∈ sphere r
-  → / r ⁎ p ∈ sphere 1.
-Proof.
-intros * Hr Hp.
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm; [ lra | ].
-rewrite vec_norm_vec_const_mul, Hp.
-rewrite Rabs_right.
- rewrite Rinv_l; [ easy | lra ].
-
- apply Rinv_0_lt_compat in Hr; lra.
-Qed.
-
 Definition Rsign x :=
   if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
 
@@ -3632,17 +3655,6 @@ assert (H : a² < 1).
           apply Rnot_le_lt in Hpvv.
           rewrite Rabs_left; [ | easy ].
           now rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_involutive.
-Qed.
-
-Theorem vec_div_in_sphere : ∀ r p, r ≠ 0 → p ∈ sphere r → p ⁄ r ∈ sphere 1.
-Proof.
-intros r (x, y, z) Hr Hp; simpl in Hp; simpl.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Hp, Rsqr_1.
-rewrite Rsqr_inv; [ | lra ].
-rewrite Rinv_l; [ easy | ].
-intros H; apply Rsqr_eq_0 in H; lra.
 Qed.
 
 Theorem mat_vec_mul_rot_sin_cos : ∀ r p p₁ p₂ a c s,
@@ -4534,6 +4546,7 @@ destruct (Req_dec r 0) as [Hr| Hr].
  apply vec_norm_eq_0 in Hp'.
  rewrite Hp, Hp', vec_sqr_0, Rdiv_0_l in Hlat; lra.
 
+bbb.
  assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
   clear - Hr; intros.
   now apply vec_div_in_sphere.
@@ -4796,7 +4809,6 @@ generalize Hpr; intros H.
 apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
  destruct H as [H| H]; [ | easy ].
  exfalso; move H at top; subst p'; clear Hpr'.
-bbb.
  rewrite Hp in Hp'.
  unfold rotation_fixpoint in Hp'.
  apply (f_equal (vec_const_mul (/ r))) in Hp'.
@@ -4804,7 +4816,11 @@ bbb.
  rewrite Rinv_l in Hp'; [ | easy ].
  do 2 rewrite vec_const_mul_1_l in Hp'.
  unfold rotation_unit_axis in Hp'.
- unfold rotation_axis in Hp'.
+ unfold vec_normalize in Hp'.
+ remember (rotation_axis (mat_of_path el)) as ra eqn:Hra.
+ remember (rotation_axis (mat_of_path (rev_path el))) as ra' eqn:Hra'.
+Print rotation_axis.
+About vec_normalize.
 bbb.
 
 apply axis_and_fixpoint_of_path_collinear with (p := p') in H.
