@@ -4969,8 +4969,8 @@ Definition J axis :=
     sinθ = sin ((asin sinθ₀ + 2 * INR k * PI) / INR n) ∧
     cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n)).
 
-Definition J_of_nats axis '(nf, no, nf', no', nk, nn) : (ℝ * ℝ) :=
-  let '(sinθ₀, cosθ₀) := J₀_of_nats axis (nf, no, nf', no') in
+Definition J_of_nats axis '(nj, nk, nn) : (ℝ * ℝ) :=
+  let '(sinθ₀, cosθ₀) := J₀_of_nats axis nj in
   let sinθ := sin ((asin sinθ₀ + 2 * INR nk * PI) / INR nn) in
   let cosθ := cos ((acos cosθ₀ + 2 * INR nk * PI) / INR nn) in
   (sinθ, cosθ).
