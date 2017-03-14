@@ -4633,65 +4633,47 @@ induction len; intros.
  now destruct t₁, d₁; simpl.
 Qed.
 
-Theorem glop : ∀ el,
+Theorem mat_of_path_neq_mat_transp : ∀ el,
   norm_list el ≠ []
   → mat_of_path el ≠ mat_transp (mat_of_path el).
 Proof.
 intros * Hn Htr.
-apply (f_equal (λ M, (M * M)%mat)) in Htr.
-rewrite <- mat_of_rev_path in Htr; [ | easy ].
-do 2 rewrite <- mat_of_path_app in Htr.
-rewrite <- rev_path_app in Htr.
+generalize Htr; intros Htr2.
+apply (f_equal (λ M, (M * M)%mat)) in Htr2.
+rewrite <- mat_of_rev_path in Htr2; [ | easy ].
+do 2 rewrite <- mat_of_path_app in Htr2.
+rewrite <- rev_path_app in Htr2.
 assert (Hnn : norm_list (el ++ el) ≠ []).
  now intros H; apply norm_list_app_diag_is_nil in H.
 
+ move Hnn before Hn.
  specialize (matrix_of_non_empty_path_is_not_identity (el ++ el) Hnn) as Hm.
-bbb.
+ rewrite mat_of_rev_path in Htr2; [ | easy ].
+ apply Hm; clear Hm.
+ rewrite mat_of_path_app.
+ rewrite Htr at 2.
+ rewrite <- mat_rot_inv; [ | apply mat_of_path_is_rotation_matrix ].
+ unfold mat_inv.
+ rewrite <- mat_const_mul_distr_r.
+ rewrite mat_mul_compl_r.
+ rewrite mat_const_mul_assoc.
+ rewrite Rinv_l; [ now rewrite mat_const_mul_1_l | ].
+ intros H.
+ specialize (mat_of_path_is_rotation_matrix el) as (Hr, Hdet).
+ lra.
+Qed.
 
 Theorem mat_of_path_neq_mat_of_rev_path : ∀ el,
   norm_list el ≠ []
   → mat_of_path el ≠ mat_of_path (rev_path el).
 Proof.
 intros * Hn Htr.
-specialize sqrt2_neq_0 as Hr2.
-destruct el as [| e₁ el]; [ easy | ].
-destruct el as [| e₂ el].
- unfold mat_of_path in Htr; simpl in Htr.
- do 2 rewrite mat_mul_id_r in Htr.
- destruct e₁ as (t₁, d₁).
- destruct t₁, d₁; simpl in Htr; injection Htr; lra.
-
- destruct el as [| e₃ el].
-  unfold mat_of_path in Htr; simpl in Htr.
-  do 2 rewrite mat_mul_id_r in Htr.
-  unfold mat_mul, mkrmat in Htr; simpl in Htr.
-  destruct e₁ as (t₁, d₁).
-  destruct e₂ as (t₂, d₂).
-  destruct t₁, d₁, t₂, d₂; simpl in Htr; try (injection Htr; lra); easy.
-
-  destruct el as [| e₄ el].
-   unfold mat_of_path in Htr; simpl in Htr.
-   do 2 rewrite mat_mul_id_r in Htr.
-   unfold mat_mul, mkrmat in Htr; simpl in Htr.
-   destruct e₁ as (t₁, d₁).
-   destruct e₂ as (t₂, d₂).
-   destruct e₃ as (t₃, d₃).
-   destruct t₁, d₁, t₂, d₂, t₃, d₃; simpl in Htr; try (injection Htr; lra); try easy.
-    injection Htr; clear Htr; intros H1 H; intros; clear - Hr2 H.
-    unfold Rdiv in H; ring_simplify in H.
-    assert (H1 : 4 * (√ 2)³ = 3 * √ 2) by lra.
-    clear H; rename H1 into H.
-    rewrite <- tech_pow_Rmult, <- Rsqr_pow2, Rsqr_sqrt in H; lra.
-
-    injection Htr; clear Htr; intros H1 H; intros; clear - Hr2 H.
-    unfold Rdiv in H; ring_simplify in H.
-    assert (H1 : 4 * (√ 2)³ = - √ 2) by lra.
-    clear H; rename H1 into H.
-    rewrite <- tech_pow_Rmult, <- Rsqr_pow2, Rsqr_sqrt in H; lra.
-bbb.
+rewrite mat_of_rev_path in Htr; [ | easy ].
+now apply mat_of_path_neq_mat_transp in Htr.
+Qed.
 
 Theorem fixpoint_of_rev_path : ∀ r el,
-  r ≠ 0
+  0 < r
   → norm_list el ≠ []
   → fixpoint_of_path r (rev_path el) = (- fixpoint_of_path r el)%vec.
 Proof.
@@ -4713,7 +4695,7 @@ apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
  unfold rotation_fixpoint in Hp'.
  apply (f_equal (vec_const_mul (/ r))) in Hp'.
  do 2 rewrite vec_const_mul_assoc in Hp'.
- rewrite Rinv_l in Hp'; [ | easy ].
+ rewrite Rinv_l in Hp'; [ | lra ].
  do 2 rewrite vec_const_mul_1_l in Hp'.
  unfold rotation_unit_axis in Hp'.
  unfold vec_normalize in Hp'.
@@ -4746,11 +4728,6 @@ Focus 2.
    apply Rminus_diag_uniq in H2.
    apply Rminus_diag_uniq in H3.
    clear ra' Hra' Hneg Hp'.
-(*
-   specialize (matrix_of_non_empty_path_is_not_identity el Hn) as Hel.
-   rewrite <- HM in Hel.
-   apply Hel; clear Hel.
-*)
    clear p Hp Hpr r Hr.
    rewrite <- mat_of_path_norm in HM.
    remember (norm_list el) as nel eqn:Hnel.
@@ -4762,9 +4739,20 @@ Focus 2.
     destruct M; simpl in H1, H2, H3; simpl.
     now rewrite H1, H2, H3.
 
-    clear H1 H2 H3.
-(* I need mat_of_path_neq_mat_of_rev_path to complete *)
-bbb.
+    rewrite HM in Htr.
+    apply mat_of_path_neq_mat_transp in Htr; [ easy | ].
+    now rewrite Hnn.
+
+ rewrite Hp, Hp'.
+ rewrite rotation_fixpoint_norm; [ | lra | ].
+  rewrite rotation_fixpoint_norm; [ easy | lra | ].
+  now apply mat_of_path_neq_mat_transp.
+
+  apply mat_of_path_neq_mat_transp.
+  rewrite <- rev_path_norm_list.
+  intros HH; apply Hn.
+  now apply rev_path_is_nil in HH.
+Qed.
 
 Theorem J₁_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
@@ -4921,24 +4909,31 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
         rewrite <- Hr, <- Hq.
-assert (H : p'₀ = fixpoint_of_path r (rev_path el'₀)).
- rewrite fixpoint_of_rev_path, <- Hq'; [ | | easy ].
- now rewrite neg_vec_involutive.
- now rewrite Hr; apply vec_norm_neq_0 in Haz.
+        assert (H : p'₀ = fixpoint_of_path r (rev_path el'₀)).
+         rewrite fixpoint_of_rev_path, <- Hq'; [ | | easy ].
+         now rewrite neg_vec_involutive.
 
- rewrite <- H.
- do 2 rewrite rotate_vec_mul.
- rewrite Hso, Hso'.
- subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
- symmetry.
- apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
- assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
- rewrite <- Hr in H.
- apply Rdichotomy in H.
- destruct H as [H| H]; [ | lra ].
- apply Rlt_not_le in H.
- exfalso; apply H; rewrite Hr.
- apply vec_norm_nonneg.
+         rewrite Hr; apply vec_norm_neq_0 in Haz.
+         now specialize (vec_norm_nonneg axis); lra.
+
+        rewrite <- H.
+        do 2 rewrite rotate_vec_mul.
+        rewrite Hso, Hso'.
+        subst M; clear - Hax Haz Hcs Hpp Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
+        symmetry.
+        apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
+        assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
+        rewrite <- Hr in H.
+        apply Rdichotomy in H.
+        destruct H as [H| H]; [ | lra ].
+        apply Rlt_not_le in H.
+        exfalso; apply H; rewrite Hr.
+        apply vec_norm_nonneg.
+
+
+       apply (f_equal vec_opp) in Hpq.
+       rewrite neg_vec_involutive in Hpq.
+       move Hpq at top; subst q; clear Hb.
 bbb.
 
 (* old version *)
