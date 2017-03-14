@@ -4638,12 +4638,19 @@ Theorem mat_of_path_neq_mat_of_rev_path : ∀ el,
   → mat_of_path el ≠ mat_of_path (rev_path el).
 Proof.
 intros * Hn Htr.
-destruct el as [| e₁ el]; [ easy | ].
-destruct el as [| e₂ el].
- unfold mat_of_path in Htr; simpl in Htr.
- do 2 rewrite mat_mul_id_r in Htr.
- destruct e₁ as (t₁, d₁).
- destruct t₁, d₁; simpl in Htr.
+assert (Hr2 : √ 2 ≠ - √ 2).
+ intros H1.
+ assert (H : 2 * √ 2 = 0) by lra.
+ apply Rmult_integral in H.
+ destruct H as [H| H]; [ lra | ].
+ now apply sqrt2_neq_0 in H.
+
+ destruct el as [| e₁ el]; [ easy | ].
+ destruct el as [| e₂ el].
+  unfold mat_of_path in Htr; simpl in Htr.
+  do 2 rewrite mat_mul_id_r in Htr.
+  destruct e₁ as (t₁, d₁).
+  destruct t₁, d₁; simpl in Htr; injection Htr; lra.
 
 bbb.
 
