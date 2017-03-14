@@ -4633,12 +4633,13 @@ induction len; intros.
  now destruct t₁, d₁; simpl.
 Qed.
 
-Theorem mat_of_non_emty_path_neq_transp : ∀ el,
+Theorem mat_of_path_neq_mat_of_rev_path : ∀ el,
   norm_list el ≠ []
-  → mat_of_path el ≠ mat_transp (mat_of_path el).
+  → mat_of_path el ≠ mat_of_path (rev_path el).
 Proof.
 intros * Hn Htr.
-rewrite <- mat_of_rev_path in Htr; [ | easy ].
+bbb.
+
 remember (length el) as len eqn:Hlen.
 symmetry in Hlen.
 revert el Hn Htr Hlen.
