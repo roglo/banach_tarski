@@ -4930,7 +4930,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         exfalso; apply H; rewrite Hr.
         apply vec_norm_nonneg.
 
-
        apply (f_equal vec_opp) in Hpq.
        rewrite neg_vec_involutive in Hpq.
        move Hpq at top; subst q; clear Hb.
