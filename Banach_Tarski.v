@@ -4641,8 +4641,41 @@ Theorem mat_of_non_emty_path_neq_transp : ∀ el M,
 Proof.
 intros * Hnn Hel HM.
 intros Htr; apply Hel; clear Hel.
-About fixpoint_unicity.
-About rotate_non_empty_path_is_not_identity.
+subst M.
+induction el as [| e₁ el]; [ easy | exfalso ].
+apply norm_list_cons in Hnn.
+rewrite mat_of_path_cons in Htr.
+rewrite mat_transp_mul in Htr.
+Search (mat_transp (mat_of_elem _)).
+bbb.
+
+ destruct el as [| e₂ el].
+  unfold mat_of_path in Htr; simpl in Htr.
+  rewrite mat_mul_id_r in Htr.
+  assert (H4 : 2 * √ 2 / 3 ≠ - 2 * √ 2 / 3).
+   intros H1.
+   assert (H : 4 * √ 2 / 3 = 0) by lra.
+   apply Rmult_integral in H.
+   destruct H as [H| H]; [ | lra ].
+   apply Rmult_integral in H.
+   destruct H as [H| H]; [ lra | ].
+   now apply sqrt2_neq_0 in H.
+
+   destruct e₁ as (t, d); simpl in Htr.
+   unfold mat_transp, mkrmat in Htr.
+   now destruct t, d; injection Htr.
+
+  destruct el as [| e₃ el].
+   unfold mat_of_path in Htr; simpl in Htr.
+   rewrite mat_mul_id_r in Htr.
+   rewrite mat_transp_mul in Htr.
+   destruct e₁ as (t₁, d₁).
+   destruct e₂ as (t₂, d₂).
+   destruct t₁, d₁, t₂, d₂; simpl in Htr.
+    unfold mat_mul in Htr; simpl in Htr.
+    injection Htr; intros.
+    clear - H.
+    rewrite Rmult_0_l, Rplus_0_l, Rplus_0_l in H.
 bbb.
 
 Theorem fixpoint_of_rev_path : ∀ r el,
