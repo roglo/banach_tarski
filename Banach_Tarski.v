@@ -4633,6 +4633,17 @@ induction len; intros.
  now destruct t₁, d₁; simpl.
 Qed.
 
+Theorem mat_of_non_emty_path_neq_transp : ∀ el M,
+  norm_list el = el
+  → el ≠ []
+  → M = mat_of_path el
+  → M ≠ mat_transp M.
+Proof.
+intros * Hnn Hel HM.
+About fixpoint_unicity.
+About rotate_non_empty_path_is_not_identity.
+bbb.
+
 Theorem fixpoint_of_rev_path : ∀ r el,
   r ≠ 0
   → norm_list el ≠ []
@@ -4689,14 +4700,27 @@ Focus 2.
    apply Rminus_diag_uniq in H2.
    apply Rminus_diag_uniq in H3.
    clear ra' Hra' Hneg Hp'.
+(*
    specialize (matrix_of_non_empty_path_is_not_identity el Hn) as Hel.
    rewrite <- HM in Hel.
-   clear p Hp Hpr r Hr.
    apply Hel; clear Hel.
+*)
+   clear p Hp Hpr r Hr.
    rewrite <- mat_of_path_norm in HM.
    remember (norm_list el) as nel eqn:Hnel.
    assert (Hnn : norm_list nel = nel) by now rewrite Hnel, norm_list_idemp.
    clear el Hnel; rename nel into el.
+   move M before el; move Hnn before Hn.
+   assert (Htr : M = mat_transp M).
+    unfold mat_transp, mkrmat.
+    destruct M; simpl in H1, H2, H3; simpl.
+    now rewrite H1, H2, H3.
+
+    clear H1 H2 H3.
+Check mat_of_non_emty_path_neq_transp.
+eapply mat_of_non_emty_path_neq_transp in Htr; eassumption.
+
+bbb.
    remember (length el) as len eqn:Hlen; symmetry in Hlen.
    revert el M Hn HM Hnn Hlen H1 H2 H3.
    induction len; intros; [ now apply length_zero_iff_nil in Hlen | ].
