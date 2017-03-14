@@ -4640,6 +4640,7 @@ Theorem mat_of_non_emty_path_neq_transp : ∀ el M,
   → M ≠ mat_transp M.
 Proof.
 intros * Hnn Hel HM.
+intros Htr; apply Hel; clear Hel.
 About fixpoint_unicity.
 About rotate_non_empty_path_is_not_identity.
 bbb.
