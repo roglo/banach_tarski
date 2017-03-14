@@ -4633,20 +4633,50 @@ induction len; intros.
  now destruct t₁, d₁; simpl.
 Qed.
 
-Theorem mat_of_non_emty_path_neq_transp : ∀ el M,
-  norm_list el = el
-  → el ≠ []
-  → M = mat_of_path el
-  → M ≠ mat_transp M.
+Theorem mat_of_non_emty_path_neq_transp : ∀ el,
+  norm_list el ≠ []
+  → mat_of_path el ≠ mat_transp (mat_of_path el).
 Proof.
-intros * Hnn Hel HM.
+intros * Hn Htr.
+rewrite <- mat_of_rev_path in Htr; [ | easy ].
+remember (length el) as len eqn:Hlen.
+symmetry in Hlen.
+revert el Hn Htr Hlen.
+induction len; intros.
+ apply length_zero_iff_nil in Hlen.
+ now rewrite Hlen in Hn.
+
+ destruct el as [| e el]; [ easy | ].
+ simpl in Hlen; apply Nat.succ_inj in Hlen.
+ rewrite mat_of_path_cons in Htr.
+ rewrite rev_path_cons, rev_path_single in Htr.
+ rewrite mat_of_path_app in Htr.
+
+bbb.
+intros * Hel Hnn Htr.
+rewrite <- Hnn in Hel.
+rewrite <- mat_of_rev_path in Htr; [ | easy ].
+rewrite Hnn in Hel.
+remember (length el) as len eqn:Hlen.
+symmetry in Hlen.
+bbb.
+revert el Hel Hnn Htr Hlen.
+induction len; intros; [ now apply length_zero_iff_nil in Hlen | ].
+destruct el as [| e el]; [ easy | ].
+clear Hel; simpl in Hlen; apply Nat.succ_inj in Hlen.
+apply norm_list_cons in Hnn.
+rewrite mat_of_path_cons in Htr.
+rewrite rev_path_cons, rev_path_single in Htr.
+rewrite mat_of_path_app in Htr.
+
+bbb.
+intros * Hel Hnn.
 intros Htr; apply Hel; clear Hel.
-subst M.
 induction el as [| e₁ el]; [ easy | exfalso ].
 apply norm_list_cons in Hnn.
 rewrite mat_of_path_cons in Htr.
 rewrite mat_transp_mul in Htr.
-Search (mat_transp (mat_of_elem _)).
+Search (mat_transp (mat_of_path _)).
 bbb.
 
  destruct el as [| e₂ el].
