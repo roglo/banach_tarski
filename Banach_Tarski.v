@@ -4633,6 +4633,19 @@ induction len; intros.
  now destruct t₁, d₁; simpl.
 Qed.
 
+Theorem glop : ∀ el,
+  norm_list el ≠ []
+  → mat_of_path el ≠ mat_transp (mat_of_path el).
+Proof.
+intros * Hn Htr.
+apply (f_equal (λ M, (M * M)%mat)) in Htr.
+rewrite <- mat_of_rev_path in Htr; [ | easy ].
+do 2 rewrite <- mat_of_path_app in Htr.
+Search (rev_path _ ++ rev_path _).
+rewrite <- rev_path_app in Htr.
+specialize (matrix_of_non_empty_path_is_not_identity (el ++ el)) as H.
+bbb.
+
 Theorem mat_of_path_neq_mat_of_rev_path : ∀ el,
   norm_list el ≠ []
   → mat_of_path el ≠ mat_of_path (rev_path el).
