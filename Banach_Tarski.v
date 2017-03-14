@@ -4641,9 +4641,11 @@ intros * Hn Htr.
 apply (f_equal (λ M, (M * M)%mat)) in Htr.
 rewrite <- mat_of_rev_path in Htr; [ | easy ].
 do 2 rewrite <- mat_of_path_app in Htr.
-Search (rev_path _ ++ rev_path _).
 rewrite <- rev_path_app in Htr.
-specialize (matrix_of_non_empty_path_is_not_identity (el ++ el)) as H.
+assert (Hnn : norm_list (el ++ el) ≠ []).
+ now intros H; apply norm_list_app_diag_is_nil in H.
+
+ specialize (matrix_of_non_empty_path_is_not_identity (el ++ el) Hnn) as Hm.
 bbb.
 
 Theorem mat_of_path_neq_mat_of_rev_path : ∀ el,
