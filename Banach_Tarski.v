@@ -4983,9 +4983,11 @@ apply surj_prod_6_nat_surj_nat.
 exists (J_of_nats axis).
 intros (s, c) Ha.
 destruct Ha as (s₀ & c₀ & n & k & Ha & Hs & Hc).
+(*
 specialize (J₀_is_countable axis) as HJ.
 destruct HJ as (fj, HJ).
 specialize (HJ (s₀, c₀) Ha) as (m, Hm).
+*)
 destruct Ha as (Hsc₀ & p & p' & (Hpp & Hp & Hp' & Hmp)).
 unfold J_of_nats.
 bbb.
