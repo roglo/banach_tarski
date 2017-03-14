@@ -4444,7 +4444,10 @@ Definition J₀ axis :=
      ∃ p p', p ≠ p'∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
-Definition J₀_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
+Definition J₀_of_nat axis n : (ℝ * ℝ) :=
+  let '(n₁, n₂) := prod_nat_of_nat n in
+  let '(nf, no) := prod_nat_of_nat n₁ in
+  let '(nf', no') := prod_nat_of_nat n₂ in
   let r := ‖axis‖ in
   let p₀ := fixpoint_of_nat r nf in
   let p := fold_right rotate p₀ (path_of_nat no) in
@@ -4705,11 +4708,7 @@ Theorem J₀_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
 Proof.
 intros axis.
-(*
-apply surj_prod_4_nat_surj_nat.
-exists (J₀_of_nats axis).
-*)
-exists (λ n, J₀_of_nats axis (prod_4_nat_of_nat n)).
+exists (J₀_of_nat axis).
 intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hpp & Hp & Hp' & Hv).
 apply -> in_intersection in Hp.
@@ -4821,14 +4820,12 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        move Hpq at top; subst q; clear Hb.
        destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
         move Hpq' at top; subst q'.
-        unfold J₀_of_nats.
+        unfold J₀_of_nat.
         remember (nat_of_path el₀) as nf eqn:Hnf.
         remember (nat_of_path (rev_path el)) as no eqn:Hno.
         remember (nat_of_path el'₀) as nf' eqn:Hnf'.
         remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
         move no before nf; move nf' before nf; move no' before no.
-(**)
-        unfold prod_4_nat_of_nat.
         remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
         remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
         remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
@@ -4836,9 +4833,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite prod_nat_of_nat_inv; subst nfo.
         rewrite prod_nat_of_nat_inv; subst nfo'.
         rewrite prod_nat_of_nat_inv.
-(*
-        exists nf, no, nf', no'.
-*)
         subst nf no nf' no'.
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
@@ -4859,14 +4853,12 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         apply (f_equal vec_opp) in Hpq'.
         rewrite neg_vec_involutive in Hpq'.
         move Hpq' at top; subst q'; clear Hb.
-        unfold J₀_of_nats.
+        unfold J₀_of_nat.
         remember (nat_of_path el₀) as nf eqn:Hnf.
         remember (nat_of_path (rev_path el)) as no eqn:Hno.
         remember (nat_of_path (rev_path el'₀)) as nf' eqn:Hnf'.
         remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
         move no before nf; move nf' before nf; move no' before no.
-(**)
-        unfold prod_4_nat_of_nat.
         remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
         remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
         remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
@@ -4874,9 +4866,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite prod_nat_of_nat_inv; subst nfo.
         rewrite prod_nat_of_nat_inv; subst nfo'.
         rewrite prod_nat_of_nat_inv.
-(*
-        exists nf, no, nf', no'.
-*)
         subst nf no nf' no'.
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
@@ -4907,14 +4896,12 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        move Hpq at top; subst q; clear Hb.
        destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
         move Hpq' at top; subst q'.
-        unfold J₀_of_nats.
+        unfold J₀_of_nat.
         remember (nat_of_path (rev_path el₀)) as nf eqn:Hnf.
         remember (nat_of_path (rev_path el)) as no eqn:Hno.
         remember (nat_of_path el'₀) as nf' eqn:Hnf'.
         remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
         move no before nf; move nf' before nf; move no' before no.
-(**)
-        unfold prod_4_nat_of_nat.
         remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
         remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
         remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
@@ -4922,9 +4909,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite prod_nat_of_nat_inv; subst nfo.
         rewrite prod_nat_of_nat_inv; subst nfo'.
         rewrite prod_nat_of_nat_inv.
-(*
-        exists nf, no, nf', no'.
-*)
         subst nf no nf' no'.
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
@@ -4953,14 +4937,12 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         apply (f_equal vec_opp) in Hpq'.
         rewrite neg_vec_involutive in Hpq'.
         move Hpq' at top; subst q'; clear Hb.
-        unfold J₀_of_nats.
+        unfold J₀_of_nat.
         remember (nat_of_path (rev_path el₀)) as nf eqn:Hnf.
         remember (nat_of_path (rev_path el)) as no eqn:Hno.
         remember (nat_of_path (rev_path el'₀)) as nf' eqn:Hnf'.
         remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
         move no before nf; move nf' before nf; move no' before no.
-(**)
-        unfold prod_4_nat_of_nat.
         remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
         remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
         remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
@@ -4968,9 +4950,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite prod_nat_of_nat_inv; subst nfo.
         rewrite prod_nat_of_nat_inv; subst nfo'.
         rewrite prod_nat_of_nat_inv.
-(*
-        exists nf, no, nf', no'.
-*)
         subst nf no nf' no'.
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
@@ -5017,7 +4996,7 @@ Definition J axis :=
     cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n)).
 
 Definition J_of_nats axis '(nj, nk, nn) : (ℝ * ℝ) :=
-  let '(sinθ₀, cosθ₀) := J₀_of_nats axis nj in
+  let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
   let sinθ := sin ((asin sinθ₀ + 2 * INR nk * PI) / INR nn) in
   let cosθ := cos ((acos cosθ₀ + 2 * INR nk * PI) / INR nn) in
   (sinθ, cosθ).
@@ -5026,6 +5005,8 @@ Theorem J_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J axis → ∃ n : ℕ, f n = acs.
 Proof.
 intros axis.
+bbb.
+
 apply surj_prod_6_nat_surj_nat.
 exists (J_of_nats axis).
 intros (s, c) Ha.
