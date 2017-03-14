@@ -4638,20 +4638,41 @@ Theorem mat_of_path_neq_mat_of_rev_path : ∀ el,
   → mat_of_path el ≠ mat_of_path (rev_path el).
 Proof.
 intros * Hn Htr.
-assert (Hr2 : √ 2 ≠ - √ 2).
- intros H1.
- assert (H : 2 * √ 2 = 0) by lra.
- apply Rmult_integral in H.
- destruct H as [H| H]; [ lra | ].
- now apply sqrt2_neq_0 in H.
+specialize sqrt2_neq_0 as Hr2.
+destruct el as [| e₁ el]; [ easy | ].
+destruct el as [| e₂ el].
+ unfold mat_of_path in Htr; simpl in Htr.
+ do 2 rewrite mat_mul_id_r in Htr.
+ destruct e₁ as (t₁, d₁).
+ destruct t₁, d₁; simpl in Htr; injection Htr; lra.
 
- destruct el as [| e₁ el]; [ easy | ].
- destruct el as [| e₂ el].
+ destruct el as [| e₃ el].
   unfold mat_of_path in Htr; simpl in Htr.
   do 2 rewrite mat_mul_id_r in Htr.
+  unfold mat_mul, mkrmat in Htr; simpl in Htr.
   destruct e₁ as (t₁, d₁).
-  destruct t₁, d₁; simpl in Htr; injection Htr; lra.
+  destruct e₂ as (t₂, d₂).
+  destruct t₁, d₁, t₂, d₂; simpl in Htr; try (injection Htr; lra); easy.
 
+  destruct el as [| e₄ el].
+   unfold mat_of_path in Htr; simpl in Htr.
+   do 2 rewrite mat_mul_id_r in Htr.
+   unfold mat_mul, mkrmat in Htr; simpl in Htr.
+   destruct e₁ as (t₁, d₁).
+   destruct e₂ as (t₂, d₂).
+   destruct e₃ as (t₃, d₃).
+   destruct t₁, d₁, t₂, d₂, t₃, d₃; simpl in Htr; try (injection Htr; lra); try easy.
+    injection Htr; clear Htr; intros H1 H; intros; clear - Hr2 H.
+    unfold Rdiv in H; ring_simplify in H.
+    assert (H1 : 4 * (√ 2)³ = 3 * √ 2) by lra.
+    clear H; rename H1 into H.
+    rewrite <- tech_pow_Rmult, <- Rsqr_pow2, Rsqr_sqrt in H; lra.
+
+    injection Htr; clear Htr; intros H1 H; intros; clear - Hr2 H.
+    unfold Rdiv in H; ring_simplify in H.
+    assert (H1 : 4 * (√ 2)³ = - √ 2) by lra.
+    clear H; rename H1 into H.
+    rewrite <- tech_pow_Rmult, <- Rsqr_pow2, Rsqr_sqrt in H; lra.
 bbb.
 
 remember (length el) as len eqn:Hlen.
