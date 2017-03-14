@@ -4638,6 +4638,13 @@ Theorem mat_of_path_neq_mat_of_rev_path : ∀ el,
   → mat_of_path el ≠ mat_of_path (rev_path el).
 Proof.
 intros * Hn Htr.
+destruct el as [| e₁ el]; [ easy | ].
+destruct el as [| e₂ el].
+ unfold mat_of_path in Htr; simpl in Htr.
+ do 2 rewrite mat_mul_id_r in Htr.
+ destruct e₁ as (t₁, d₁).
+ destruct t₁, d₁; simpl in Htr.
+
 bbb.
 
 remember (length el) as len eqn:Hlen.
