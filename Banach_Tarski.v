@@ -3511,7 +3511,7 @@ assert (H : a² < 1).
     do 3 rewrite Rdiv_1_r in Hmv.
     rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
     rewrite Rsqr_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
-    clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv (*Hppvv*).
+    clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv.
     injection Hmv; clear Hmv; intros H3 H2 H1.
     Time nsatz.
 
@@ -3629,7 +3629,7 @@ assert (H : a² < 1).
          rewrite <- Rmult_assoc.
          rewrite Rinv_r; [ | lra ].
          rewrite Rmult_1_l.
-         clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv'₁ Hnv'₂ Hc Hpv₁ Hpv₂ Hlag Hppp (*Hpvv*).
+         clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv'₁ Hnv'₂ Hc Hpv₁ Hpv₂ Hlag Hppp.
          clear Ha2 Hsa Hppvv.
          subst v₁ v₂.
          destruct p as (xp, yp, zp).
@@ -4452,59 +4452,6 @@ Definition J₀_of_nats axis '(nf, no, nf', no') : (ℝ * ℝ) :=
   let p' := fold_right rotate p'₀ (path_of_nat no') in
   rot_sin_cos axis p p'.
 
-(*
-Theorem glop : ∀ axis p p' s c,
-  axis ∈ sphere 1
-  → p ∈ sphere 1
-  → p' ∈ sphere 1
-  → p ≠ p'
-  → s² + c² = 1
-  → (matrix_of_axis_angle (axis, c, s) * p)%vec = p'
-  → rot_sin_cos axis p p' = (s, c).
-Proof.
-intros * Ha Hp Hp' Hpp Hcs Hv.
-unfold rot_sin_cos.
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm in Hp'; [ | lra ].
-rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
-bbb.
-
-unfold matrix_of_axis_angle in Hv.
-destruct axis as (xa, ya, za).
-apply on_sphere_norm in Ha; [ | lra ].
-simpl in Ha; rewrite Ha in Hv.
-do 3 rewrite Rdiv_1_r in Hv.
-simpl in Hv.
-Search matrix_of_axis_angle.
-
-bbb.
-intros * Ha Hp Hp' Hpp Hcs Hv.
-destruct axis, p, p'; simpl in *.
-rewrite Rsqr_1 in Ha, Hp, Hp'.
-rewrite Ha, sqrt_1 in Hv.
-do 3 rewrite Rdiv_1_r in Hv.
-injection Hv; clear Hv; intros.
-unfold rot_sin_cos; simpl.
-rewrite Hp, Hp', sqrt_1, Rmult_1_l.
-do 2 rewrite Rdiv_1_r.
-f_equal.
-Focus 2.
-bbb.
-
-Theorem pouet : ∀ axis p p' r s c,
-  0 < r
-  → axis ∈ sphere r
-  → p ∈ sphere r
-  → p' ∈ sphere r
-  → p ≠ p'
-  → s² + c² = 1
-  → (matrix_of_axis_angle (axis, c, s) * p)%vec = p'
-  → rot_sin_cos axis p p' = (s, c).
-Proof.
-intros * Hr Ha Hp Hp' Hpp Hcs Hv.
-Abort.
-*)
-
 Theorem unit_sphere_latitude_1 : ∀ p p',
   p ∈ sphere 1
   → p' ∈ sphere 1
@@ -5010,6 +4957,33 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         exfalso; apply H; rewrite Hr.
         apply vec_norm_nonneg.
 Qed.
+
+(* J(axis) = set of angles of rotation around the axis, such that
+   for some p in D ∩ sphere(r), for some naturals n and k,
+   R((angle+2kπ)/n) is also in D ∩ sphere(r) where r = ‖axis‖. *)
+Definition J axis :=
+  mkset
+    (λ '(sinθ, cosθ),
+    ∃ sinθ₀ cosθ₀ n k,
+    (sinθ₀, cosθ₀) ∈ J₀ axis ∧
+    sinθ = sin ((asin sinθ₀ + 2 * INR k * PI) / INR n) ∧
+    cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n)).
+
+Definition J_of_nats axis '(nf, no, nf', no', nk, nn) : (ℝ * ℝ) :=
+  let '(sinθ₀, cosθ₀) := J₀_of_nats axis (nf, no, nf', no') in
+  let sinθ := sin ((asin sinθ₀ + 2 * INR nk * PI) / INR nn) in
+  let cosθ := cos ((acos cosθ₀ + 2 * INR nk * PI) / INR nn) in
+  (sinθ, cosθ).
+
+Theorem J_is_countable : ∀ axis,
+  ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J axis → ∃ n : ℕ, f n = acs.
+Proof.
+intros axis.
+apply surj_prod_6_nat_surj_nat.
+exists (J_of_nats axis).
+intros (s, c) Ha.
+destruct Ha as (s₀ & c₀ & n & k & Ha & Hs & Hc).
+bbb.
 
 bbb.
 
