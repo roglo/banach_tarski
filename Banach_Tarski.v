@@ -4705,11 +4705,9 @@ Focus 2.
 Qed.
 
 Theorem J₀_is_countable : ∀ axis,
-  ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J₀ axis → ∃ n : ℕ, f n = acs.
+  ∀ sc, sc ∈ J₀ axis → ∃ n : ℕ, J₀_of_nat axis n = sc.
 Proof.
-intros axis.
-exists (J₀_of_nat axis).
-intros (s, c) Ha.
+intros axis (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hpp & Hp & Hp' & Hv).
 apply -> in_intersection in Hp.
 apply -> in_intersection in Hp'.
@@ -5004,17 +5002,22 @@ Definition J_of_nat axis n : (ℝ * ℝ) :=
   (sinθ, cosθ).
 
 Theorem J_is_countable : ∀ axis,
-  ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J axis → ∃ n : ℕ, f n = acs.
+  ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat axis n = sc.
 Proof.
-intros axis.
-exists (J_of_nat axis).
-intros (s, c) Ha.
+intros axis (s, c) Ha.
 destruct Ha as (s₀ & c₀ & n & k & Ha & Hs & Hc).
 specialize (J₀_is_countable axis) as HJ.
-destruct HJ as (fj, HJ).
-specialize (HJ (s₀, c₀) Ha) as (m, Hm).
+specialize (HJ (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hpp & Hp & Hp' & Hmp)).
 unfold J_of_nat.
+remember (nat_of_prod_nat (k, n)) as n₂ eqn:Hn₂.
+remember (nat_of_prod_nat (nj, n₂)) as m eqn:Hm.
+exists m; subst m n₂.
+do 2 rewrite prod_nat_of_nat_inv.
+rewrite Hnj.
+now f_equal.
+Qed.
+
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
