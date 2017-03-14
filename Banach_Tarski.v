@@ -4995,7 +4995,9 @@ Definition J axis :=
     sinθ = sin ((asin sinθ₀ + 2 * INR k * PI) / INR n) ∧
     cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n)).
 
-Definition J_of_nats axis '(nj, nk, nn) : (ℝ * ℝ) :=
+Definition J_of_nat axis n : (ℝ * ℝ) :=
+  let '(nj, n₂) := prod_nat_of_nat n in
+  let '(nk, nn) := prod_nat_of_nat n₂ in
   let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
   let sinθ := sin ((asin sinθ₀ + 2 * INR nk * PI) / INR nn) in
   let cosθ := cos ((acos cosθ₀ + 2 * INR nk * PI) / INR nn) in
@@ -5005,17 +5007,14 @@ Theorem J_is_countable : ∀ axis,
   ∃ f : ℕ → ℝ * ℝ, ∀ acs, acs ∈ J axis → ∃ n : ℕ, f n = acs.
 Proof.
 intros axis.
-bbb.
-
-apply surj_prod_6_nat_surj_nat.
-exists (J_of_nats axis).
+exists (J_of_nat axis).
 intros (s, c) Ha.
 destruct Ha as (s₀ & c₀ & n & k & Ha & Hs & Hc).
 specialize (J₀_is_countable axis) as HJ.
 destruct HJ as (fj, HJ).
 specialize (HJ (s₀, c₀) Ha) as (m, Hm).
 destruct Ha as (Hsc₀ & p & p' & (Hpp & Hp & Hp' & Hmp)).
-unfold J_of_nats.
+unfold J_of_nat.
 bbb.
 
 (* previous version with R^n instead of R, but difficult to prove... *)
