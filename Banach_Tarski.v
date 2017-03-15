@@ -5017,6 +5017,26 @@ rewrite Hnj.
 now f_equal.
 Qed.
 
+Definition J_mat axis :=
+  mkset
+    (λ R,
+     let '(v, cosθ, sinθ) := axis_angle_of_matrix R in
+     v = axis ∧
+    ∃ sinθ₀ cosθ₀ n k,
+    (sinθ₀, cosθ₀) ∈ J₀ axis ∧
+    sinθ = sin ((asin sinθ₀ + 2 * INR k * PI) / INR n) ∧
+    cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n)).
+
+Definition J_mat_of_nat axis n : matrix ℝ :=
+  let '(sinθ, cosθ) := J_of_nat axis n in
+  matrix_of_axis_angle (axis, cosθ, sinθ).
+
+Theorem J_mat_is_countable : ∀ axis,
+  ∀ M, M ∈ J_mat axis → ∃ n : ℕ, J_mat_of_nat axis n = M.
+Proof.
+intros * HM.
+bbb.
+
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
@@ -5062,11 +5082,21 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    split; [ easy | simpl; f_equal; lra ].
 
 (**)
-Theorem J_mat_is_countable : ∀ p, p ≠ 0%vec → ∀ f : ℕ → matrix ℝ,
-  ∃ M : matrix ℝ, M ∈ rotation_around p ∧ (∀ n : ℕ, f n ≠ M).
-Admitted.
-specialize (J_mat_is_countable p₁) as (f, Hdnc); [ easy | ].
-Print rotation_around.
+bbb.
+rotation_around =
+λ p : vector,
+{| setp := λ R : matrix ℝ, is_rotation_matrix R ∧ (R * p)%vec = p |}
+     : vector → set (matrix ℝ)
+
+J =
+λ axis : vector,
+{|
+setp := λ '(sinθ, cosθ),
+        ∃ (sinθ₀ cosθ₀ : ℝ) (n k : ℕ),
+        (sinθ₀, cosθ₀) ∈ J₀ axis
+        ∧ sinθ = sin ((asin sinθ₀ + 2 * INR k * PI) / INR n)
+          ∧ cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n) |}
+     : vector → set (ℝ * ℝ)
 
 bbb.
    specialize (J_is_countable p₁) as (f, Hdnc); [ easy | easy | ].
