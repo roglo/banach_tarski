@@ -494,6 +494,20 @@ apply Rsqr_le_1_interv in Ha₃₃.
 easy.
 Qed.
 
+Theorem mat_trace_large_interv : ∀ M,
+  is_rotation_matrix M
+  → -3 ≤ mat_trace M ≤ 3.
+Proof.
+intros * (Hrm & Hdet).
+specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
+destruct Ha as (Ha₁ & Ha₂ & Ha₃).
+destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
+destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
+destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
+unfold mat_trace.
+split; lra.
+Qed.
+
 Theorem mat_trace_interv : ∀ M,
   is_rotation_matrix M
   → -1 ≤ mat_trace M ≤ 3.
@@ -506,6 +520,8 @@ destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
 destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
 unfold mat_trace.
 split; [ | lra ].
+bbb.
+
 unfold mat_det in Hdet.
 destruct M; simpl in *.
 unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
@@ -4957,12 +4973,55 @@ assert (Hc : c² ≤ 1).
  apply Rsqr_neg_pos_le_0 in Hc; [ easy | lra ].
 Qed.
 
+Theorem rotation_unit_axis_neq_0 : ∀ M,
+  M ≠ mat_transp M
+  → rotation_unit_axis M ≠ 0%vec.
+Proof.
+intros M HM.
+unfold rotation_unit_axis.
+unfold vec_normalize.
+remember ‖(rotation_axis M)‖ as r eqn:Hr.
+unfold rotation_axis; simpl.
+intros Ha.
+injection Ha; clear Ha; intros H3 H2 H1.
+simpl in Hr.
+destruct (Req_dec r 0) as [Hrz| Hrz].
+ move Hrz at top; subst r.
+ symmetry in Hr.
+ apply sqrt_eq_0 in Hr; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr.
+ destruct Hr as (H6 & H5 & H4).
+ apply Rminus_diag_uniq in H4.
+ apply Rminus_diag_uniq in H5.
+ apply Rminus_diag_uniq in H6.
+ apply HM; simpl.
+ unfold mat_transp, mkrmat.
+ destruct M; simpl in *.
+ now rewrite H4, H5, H6.
+
+ apply Rinv_neq_0_compat in Hrz.
+ apply Rmult_integral in H1.
+ destruct H1 as [H1| H1]; [ easy | ].
+ apply Rmult_integral in H2.
+ destruct H2 as [H2| H2]; [ easy | ].
+ apply Rmult_integral in H3.
+ destruct H3 as [H3| H3]; [ easy | ].
+ apply Rminus_diag_uniq in H1.
+ apply Rminus_diag_uniq in H2.
+ apply Rminus_diag_uniq in H3.
+ apply HM; simpl.
+ unfold mat_transp, mkrmat.
+ destruct M; simpl in *.
+ now rewrite H1, H2, H3.
+Qed.
+
 Theorem axis_angle_of_matrix_inv : ∀ M,
   is_rotation_matrix M
   → M ≠ mat_transp M
   → matrix_of_axis_angle (axis_angle_of_matrix M) = M.
 Proof.
-intros M (Hrm, Hdet) Hntr; symmetry.
+intros M Hrm Hntr; symmetry.
+generalize Hrm; intros (Hmtr, Hdet).
 remember (matrix_of_axis_angle (axis_angle_of_matrix M)) as M' eqn:HM'.
 assert (Hmt : -1 ≤ mat_trace M').
  rewrite HM'.
@@ -4970,9 +5029,27 @@ assert (Hmt : -1 ≤ mat_trace M').
  symmetry in Hasc.
  destruct asc as ((a, s), c).
  apply mat_trace_ge_minus_1.
-Search axis_angle_of_matrix.
+  unfold axis_angle_of_matrix in Hasc.
+  injection Hasc; clear Hasc; intros Hc Hs Ha.
+  rewrite <- Ha.
+  now apply rotation_unit_axis_neq_0.
+
+  unfold axis_angle_of_matrix in Hasc.
+  injection Hasc; clear Hasc; intros Hc Hs Ha.
+  rewrite <- Hc, <- Hs.
+  rewrite Rsqr_sqrt; [ lra | ].
+  eapply Rplus_le_reg_r.
+  rewrite Rminus_plus.
+  rewrite Rplus_0_l.
+  rewrite Rsqr_div; [ | lra ].
+  apply Rmult_le_reg_r with (r := 2²); [ unfold Rsqr; lra | ].
+  rewrite Rmult_div_same; [ | unfold Rsqr; lra ].
+  rewrite Rmult_1_l.
+  specialize (mat_trace_large_interv M Hrm) as (H1, H2).
+  apply Rsqr_neg_pos_le_1; [ | lra | lra ].
 
 bbb.
+
 unfold matrix_of_axis_angle, axis_angle_of_matrix.
 remember (rotation_unit_axis M) as axis eqn:Hax.
 destruct axis as (x, y, z).
