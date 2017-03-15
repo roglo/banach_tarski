@@ -5017,8 +5017,6 @@ rewrite Hnj.
 now f_equal.
 Qed.
 
-bbb.
-
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
@@ -5063,6 +5061,14 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    split; [ apply same_orbit_refl | ].
    split; [ easy | simpl; f_equal; lra ].
 
+(**)
+Theorem J_mat_is_countable : ∀ p, p ≠ 0%vec → ∀ f : ℕ → matrix ℝ,
+  ∃ M : matrix ℝ, M ∈ rotation_around p ∧ (∀ n : ℕ, f n ≠ M).
+Admitted.
+specialize (J_mat_is_countable p₁) as (f, Hdnc); [ easy | ].
+Print rotation_around.
+
+bbb.
    specialize (J_is_countable p₁) as (f, Hdnc); [ easy | easy | ].
    specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
    exists R₁.
