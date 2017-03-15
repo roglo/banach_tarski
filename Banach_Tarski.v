@@ -5018,8 +5018,26 @@ now f_equal.
 Qed.
 
 Theorem trace_ge_minus_1 : ∀ v s c,
-  -1 ≤ mat_trace (matrix_of_axis_angle (v, s, c)).
+  ‖v‖ = 1
+  → -1 ≤ mat_trace (matrix_of_axis_angle (v, s, c)).
 Proof.
+intros * Hv.
+remember (matrix_of_axis_angle (v, s, c)) as M eqn:HM.
+unfold mat_trace.
+unfold matrix_of_axis_angle in HM.
+destruct v as (x, y, z).
+simpl in Hv.
+rewrite Hv in HM.
+do 3 rewrite Rdiv_1_r in HM.
+simpl in HM.
+unfold mkrmat in HM.
+apply (f_equal Rsqr) in Hv.
+rewrite Rsqr_sqrt in Hv.
+rewrite Rsqr_1 in Hv.
+destruct M; simpl in *.
+injection HM; clear HM; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+subst a₁₁ a₂₂ a₃₃.
+enough (-1 ≤ x² * (1 - c) + c + (y² * (1 - c) + c) + (z² * (1 - c) + c)) by lra.
 bbb.
 
 Theorem trace_ge_minus_1 : ∀ M,
