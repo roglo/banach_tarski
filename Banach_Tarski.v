@@ -2239,123 +2239,6 @@ assert (Hv2s : x² + y² + z² = 1).
  f_equal; lra.
 Qed.
 
-Theorem axis_angle_of_matrix_inv : ∀ M,
-  is_rotation_matrix M
-  → M ≠ mat_transp M
-  → matrix_of_axis_angle (axis_angle_of_matrix M) = M.
-Proof.
-intros M (Hrm, Hdet) Hntr; symmetry.
-unfold matrix_of_axis_angle, axis_angle_of_matrix.
-remember (rotation_unit_axis M) as axis eqn:Hax.
-destruct axis as (x, y, z).
-unfold rotation_unit_axis in Hax.
-remember (rotation_axis M) as v eqn:Hv.
-destruct v as (x₀, y₀, z₀).
-simpl in Hax.
-injection Hax; clear Hax; intros Hz Hy Hx; simpl.
-remember (√ (x₀² + y₀² + z₀²)) as r₀ eqn:Hr₀.
-remember (√ (x² + y² + z²)) as r eqn:Hr.
-remember (mat_trace M) as tr eqn:Htr.
-remember ((tr - 1) / 2) as c eqn:Hc.
-unfold mat_trace in Hc.
-unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
-unfold mat_det in Hdet.
-unfold mat_transp, mkrmat in Hntr.
-unfold mat_trace in Htr; simpl in Htr.
-unfold mkrmat.
-destruct M; simpl in *.
-injection Hrm; clear Hrm.
-intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-unfold rotation_axis in Hv; simpl in Hv.
-injection Hv; clear Hv; intros Hz' Hy' Hx'.
-destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
- move Hr₀z at top; subst r₀.
- symmetry in Hr₀.
- apply sqrt_eq_0 in Hr₀; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hr₀.
- move Hr₀ at top; destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
- symmetry in Hx', Hy', Hz'.
- apply Rminus_diag_uniq in Hx'.
- apply Rminus_diag_uniq in Hy'.
- apply Rminus_diag_uniq in Hz'.
- move Hx' at top; subst a₃₂.
- move Hy' at top; subst a₁₃.
- move Hz' at top; subst a₂₁.
- easy.
-
- assert (H : r₀² ≠ 0 ∧ r = 1).
-  split; [ now intros H; apply Hr₀nz; apply Rsqr_eq_0 in H | ].
-  rewrite Hr, Hx, Hy, Hz.
-  do 3 rewrite Rsqr_mult.
-  rewrite Rsqr_inv; [ | easy ].
-  do 2 rewrite <- Rmult_plus_distr_l.
-  rewrite sqrt_mult; [ | | apply nonneg_sqr_vec_norm ].
-   rewrite <- Hr₀.
-   rewrite sqrt_inv.
-    rewrite sqrt_Rsqr; [ | rewrite Hr₀; apply sqrt_pos ].
-    rewrite Rinv_l; [ easy | lra ].
-
-    specialize (Rle_0_sqr r₀) as H.
-    enough (r₀² ≠ 0) by lra.
-    now clear H; intros H; apply Rsqr_eq_0 in H.
-
-   apply nonneg_inv.
-   specialize (Rle_0_sqr r₀) as H.
-   enough (r₀² ≠ 0) by lra.
-   now clear H; intros H; apply Rsqr_eq_0 in H.
-
-  destruct H as (Hr₀2 & Hr1).
-  move Hr1 at top; subst r.
-  progress repeat rewrite Rdiv_1_r.
-  clear H23 H13 H12 H11.
-  subst x y z c.
-  rewrite Rsqr_div; [ | lra ].
-  symmetry.
-  f_equal.
-   apply Rmult_eq_reg_r with (r := 2 * r₀²); [ | lra ].
-   rewrite Rmult_plus_distr_r, Rsqr_mult.
-   rewrite Rsqr_inv; [ | lra ].
-   progress replace (/ r₀² * x₀² * (1 - (tr - 1) / 2) * (2 * r₀²))
-   with (x₀² * (3 - tr) * (r₀² * / r₀²)) by lra.
-   progress replace ((tr - 1) / 2 * (2 * r₀²))
-   with ((tr - 1) * r₀²) by lra.
-   rewrite Rinv_r; [ rewrite Rmult_1_r, Hr₀ | easy ].
-   rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-   subst x₀ y₀ z₀ tr; ring_simplify.
-   clear r₀ Hr Hr₀ Hr₀nz Hr₀2 Hntr.
-   Time nsatz.
-
-   apply Rmult_eq_reg_l with (r := 4 * r₀²); [ | lra ].
-   rewrite Rmult_minus_distr_l.
-   do 6 rewrite <- Rmult_assoc.
-   do 3 rewrite Rsqr_pow2.
-   progress replace (4 * r₀ ^ 2 * / r₀ * x₀ * / r₀ * y₀)
-   with (4 * x₀ * y₀ * (r₀ / r₀) * (r₀ / r₀)) by lra.
-   progress replace (4 * r₀ ^ 2 * / r₀ * z₀)
-   with (4 * r₀ * z₀ * (r₀ / r₀)) by lra.
-   rewrite Rdiv_same; [ do 3 rewrite Rmult_1_r | lra ].
-   replace (2 ^ 2) with 4 by lra.
-   progress replace (1 - (tr - 1) ^ 2 / 4) with ((4 - (tr - 1) ^ 2) / 4)
-     by lra.
-   rewrite sqrt_div; [ | | lra ].
-Focus 2.
-enough (-1 ≤ tr ≤ 3).
-assert (-2 ≤ tr - 1 ≤ 2) by lra.
-remember (tr - 1) as a.
-clear -H0.
-rewrite <- Rsqr_pow2.
-apply Rplus_le_reg_r with (r := a²).
-rewrite Rplus_0_l.
-rewrite Rminus_plus.
-replace 4 with (2 ^ 2) by lra.
-rewrite <- Rsqr_pow2.
-apply Rsqr_le_abs_1.
-replace (Rabs 2) with 2; [ now apply Rabs_le | ].
-unfold Rabs.
-destruct (Rcase_abs 2); [ lra | easy ].
-Abort.
-(* requires to first prove that -1 ≤ tr ≤ 3 *)
-
 (* playing with quaternions, just for fun... *)
 
 Record ℍ := quat { Re : ℝ; Im : vector }.
@@ -5017,9 +4900,9 @@ rewrite Hnj.
 now f_equal.
 Qed.
 
-Theorem trace_ge_minus_1 : ∀ v s c,
+Theorem unit_sphere_mat_trace_eq : ∀ v s c,
   ‖v‖ = 1
-  → -1 ≤ mat_trace (matrix_of_axis_angle (v, s, c)).
+  → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
 Proof.
 intros * Hv.
 remember (matrix_of_axis_angle (v, s, c)) as M eqn:HM.
@@ -5032,24 +4915,168 @@ do 3 rewrite Rdiv_1_r in HM.
 simpl in HM.
 unfold mkrmat in HM.
 apply (f_equal Rsqr) in Hv.
-rewrite Rsqr_sqrt in Hv.
+rewrite Rsqr_sqrt in Hv; [ | apply nonneg_sqr_vec_norm ].
 rewrite Rsqr_1 in Hv.
 destruct M; simpl in *.
 injection HM; clear HM; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
 subst a₁₁ a₂₂ a₃₃.
-enough (-1 ≤ x² * (1 - c) + c + (y² * (1 - c) + c) + (z² * (1 - c) + c)) by lra.
-bbb.
+Time nsatz.
+Qed.
 
-Theorem trace_ge_minus_1 : ∀ M,
-  is_rotation_matrix M
-  → -1 ≤ mat_trace M.
+Theorem mat_trace_eq : ∀ v s c,
+  v ≠ 0%vec
+  → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
 Proof.
-intros M Hrm.
-unfold mat_trace.
-destruct Hrm as (Hrm, Hdet).
-unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
-injection Hrm; clear Hrm; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+intros * Hv.
+specialize (vec_div_vec_norm v Hv) as Hvn.
+specialize (unit_sphere_mat_trace_eq (v ⁄ ‖v‖) s c Hvn) as H.
+Search (matrix_of_axis_angle (_ ⁎ _, _, _)).
+rewrite matrix_mul_axis with (k := ‖v‖) in H; [ | now apply vec_norm_neq_0 ].
+rewrite vec_const_mul_assoc in H.
+rewrite Rinv_r in H; [ | now apply vec_norm_neq_0 ].
+rewrite vec_const_mul_1_l in H.
+rewrite Rsign_of_pos in H; [ now rewrite Rmult_1_l in H | ].
+now apply vec_norm_pos.
+Qed.
+
+Theorem mat_trace_ge_minus_1 : ∀ v s c,
+  v ≠ 0%vec
+  → s² + c² = 1
+  → -1 ≤ mat_trace (matrix_of_axis_angle (v, s, c)).
+Proof.
+intros * Hv Hsc.
+rewrite mat_trace_eq; [ | easy ].
+enough (-1 ≤ c) by lra.
+assert (Hc : c² ≤ 1).
+ rewrite <- Hsc.
+ apply Rplus_le_reg_r with (r := - c²).
+ rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+ apply Rle_0_sqr.
+
+ replace 1 with 1² in Hc by apply Rsqr_1.
+ apply Rsqr_neg_pos_le_0 in Hc; [ easy | lra ].
+Qed.
+
+Theorem axis_angle_of_matrix_inv : ∀ M,
+  is_rotation_matrix M
+  → M ≠ mat_transp M
+  → matrix_of_axis_angle (axis_angle_of_matrix M) = M.
+Proof.
+intros M (Hrm, Hdet) Hntr; symmetry.
+assert (Hmt : -1 ≤ mat_trace M).
+
+bbb.
+unfold matrix_of_axis_angle, axis_angle_of_matrix.
+remember (rotation_unit_axis M) as axis eqn:Hax.
+destruct axis as (x, y, z).
+unfold rotation_unit_axis in Hax.
+remember (rotation_axis M) as v eqn:Hv.
+destruct v as (x₀, y₀, z₀).
+simpl in Hax.
+injection Hax; clear Hax; intros Hz Hy Hx; simpl.
+remember (√ (x₀² + y₀² + z₀²)) as r₀ eqn:Hr₀.
+remember (√ (x² + y² + z²)) as r eqn:Hr.
+remember (mat_trace M) as tr eqn:Htr.
+remember ((tr - 1) / 2) as c eqn:Hc.
+unfold mat_trace in Hc.
+unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
 unfold mat_det in Hdet.
+unfold mat_transp, mkrmat in Hntr.
+unfold mat_trace in Htr; simpl in Htr.
+unfold mkrmat.
+destruct M; simpl in *.
+injection Hrm; clear Hrm.
+intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+unfold rotation_axis in Hv; simpl in Hv.
+injection Hv; clear Hv; intros Hz' Hy' Hx'.
+destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
+ move Hr₀z at top; subst r₀.
+ symmetry in Hr₀.
+ apply sqrt_eq_0 in Hr₀; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in Hr₀.
+ move Hr₀ at top; destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
+ symmetry in Hx', Hy', Hz'.
+ apply Rminus_diag_uniq in Hx'.
+ apply Rminus_diag_uniq in Hy'.
+ apply Rminus_diag_uniq in Hz'.
+ move Hx' at top; subst a₃₂.
+ move Hy' at top; subst a₁₃.
+ move Hz' at top; subst a₂₁.
+ easy.
+
+ assert (H : r₀² ≠ 0 ∧ r = 1).
+  split; [ now intros H; apply Hr₀nz; apply Rsqr_eq_0 in H | ].
+  rewrite Hr, Hx, Hy, Hz.
+  do 3 rewrite Rsqr_mult.
+  rewrite Rsqr_inv; [ | easy ].
+  do 2 rewrite <- Rmult_plus_distr_l.
+  rewrite sqrt_mult; [ | | apply nonneg_sqr_vec_norm ].
+   rewrite <- Hr₀.
+   rewrite sqrt_inv.
+    rewrite sqrt_Rsqr; [ | rewrite Hr₀; apply sqrt_pos ].
+    rewrite Rinv_l; [ easy | lra ].
+
+    specialize (Rle_0_sqr r₀) as H.
+    enough (r₀² ≠ 0) by lra.
+    now clear H; intros H; apply Rsqr_eq_0 in H.
+
+   apply nonneg_inv.
+   specialize (Rle_0_sqr r₀) as H.
+   enough (r₀² ≠ 0) by lra.
+   now clear H; intros H; apply Rsqr_eq_0 in H.
+
+  destruct H as (Hr₀2 & Hr1).
+  move Hr1 at top; subst r.
+  progress repeat rewrite Rdiv_1_r.
+  clear H23 H13 H12 H11.
+  subst x y z c.
+  rewrite Rsqr_div; [ | lra ].
+  symmetry.
+  f_equal.
+   apply Rmult_eq_reg_r with (r := 2 * r₀²); [ | lra ].
+   rewrite Rmult_plus_distr_r, Rsqr_mult.
+   rewrite Rsqr_inv; [ | lra ].
+   progress replace (/ r₀² * x₀² * (1 - (tr - 1) / 2) * (2 * r₀²))
+   with (x₀² * (3 - tr) * (r₀² * / r₀²)) by lra.
+   progress replace ((tr - 1) / 2 * (2 * r₀²))
+   with ((tr - 1) * r₀²) by lra.
+   rewrite Rinv_r; [ rewrite Rmult_1_r, Hr₀ | easy ].
+   rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+   subst x₀ y₀ z₀ tr; ring_simplify.
+   clear r₀ Hr Hr₀ Hr₀nz Hr₀2 Hntr.
+   Time nsatz.
+
+   apply Rmult_eq_reg_l with (r := 4 * r₀²); [ | lra ].
+   rewrite Rmult_minus_distr_l.
+   do 6 rewrite <- Rmult_assoc.
+   do 3 rewrite Rsqr_pow2.
+   progress replace (4 * r₀ ^ 2 * / r₀ * x₀ * / r₀ * y₀)
+   with (4 * x₀ * y₀ * (r₀ / r₀) * (r₀ / r₀)) by lra.
+   progress replace (4 * r₀ ^ 2 * / r₀ * z₀)
+   with (4 * r₀ * z₀ * (r₀ / r₀)) by lra.
+   rewrite Rdiv_same; [ do 3 rewrite Rmult_1_r | lra ].
+   replace (2 ^ 2) with 4 by lra.
+   progress replace (1 - (tr - 1) ^ 2 / 4) with ((4 - (tr - 1) ^ 2) / 4)
+     by lra.
+   rewrite sqrt_div; [ | | lra ].
+Focus 2.
+enough (-1 ≤ tr ≤ 3).
+assert (-2 ≤ tr - 1 ≤ 2) by lra.
+remember (tr - 1) as a.
+clear -H0.
+rewrite <- Rsqr_pow2.
+apply Rplus_le_reg_r with (r := a²).
+rewrite Rplus_0_l.
+rewrite Rminus_plus.
+replace 4 with (2 ^ 2) by lra.
+rewrite <- Rsqr_pow2.
+apply Rsqr_le_abs_1.
+replace (Rabs 2) with 2; [ now apply Rabs_le | ].
+unfold Rabs.
+destruct (Rcase_abs 2); [ lra | easy ].
+Abort.
+(* requires to first prove that -1 ≤ tr ≤ 3 *)
+
 bbb.
 
 Definition J_mat axis :=

@@ -713,6 +713,13 @@ intros v.
 now split; intros H1 H2; apply vec_norm_eq_0 in H2.
 Qed.
 
+Theorem vec_norm_pos : ∀ v, v ≠ 0%vec → 0 < ‖v‖.
+Proof.
+intros * Hv.
+specialize (vec_norm_nonneg v) as H.
+apply vec_norm_neq_0 in Hv; lra.
+Qed.
+
 Theorem vec_add_0_l : ∀ v, (0 + v = v)%vec.
 Proof.
 intros (x, y, z); simpl; f_equal; lra.
@@ -1258,6 +1265,12 @@ assert (H : ur ≠ 0).
  apply Rlt_le, Rinv_0_lt_compat.
  apply Rneq_le_lt; [ now intros HH; apply H | ].
  rewrite Hur; apply sqrt_pos.
+Qed.
+
+Theorem vec_div_vec_norm : ∀ v, v ≠ 0%vec → ‖(v ⁄ ‖v‖)‖ = 1.
+Proof.
+intros * Hv.
+eapply normalized_vector; [ eassumption | easy ].
 Qed.
 
 (* Inversion of vectors and matrices *)
