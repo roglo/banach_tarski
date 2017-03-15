@@ -535,13 +535,154 @@ Definition axis_angle_of_matrix M :=
 
 Arguments axis_angle_of_matrix M%mat.
 
-Theorem mat_of_axis_angle_trace_interv : ∀ a s c M,
-  M = matrix_of_axis_angle (a, c, s)
-  → -1 ≤ mat_trace M ≤ 3.
+Definition Rsign x :=
+  if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
+
+Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
 Proof.
-intros * HM.
+intros * Hx.
+unfold Rsign.
+destruct (Req_dec x 0); [ lra |  ].
+destruct (Rle_dec 0 x); [ easy | lra ].
+Qed.
+
+Theorem unit_sphere_mat_trace_eq : ∀ v s c,
+  ‖v‖ = 1
+  → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
+Proof.
+intros * Hv.
+remember (matrix_of_axis_angle (v, s, c)) as M eqn:HM.
+unfold mat_trace.
+unfold matrix_of_axis_angle in HM.
+destruct v as (x, y, z).
+simpl in Hv.
+rewrite Hv in HM.
+do 3 rewrite Rdiv_1_r in HM.
+simpl in HM.
+unfold mkrmat in HM.
+apply (f_equal Rsqr) in Hv.
+rewrite Rsqr_sqrt in Hv; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rsqr_1 in Hv.
+destruct M; simpl in *.
+injection HM; clear HM; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+subst a₁₁ a₂₂ a₃₃.
+Time nsatz.
+Qed.
+
+Theorem matrix_mul_axis : ∀ p c s k,
+  k ≠ 0
+  → matrix_of_axis_angle (p, s, c) =
+    matrix_of_axis_angle (k ⁎ p, Rsign k * s, c).
+Proof.
+intros * Hk.
+destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
+ subst p; simpl; rewrite Rmult_0_r.
+ rewrite Rsqr_0; do 2 rewrite Rplus_0_l.
+ rewrite Rdiv_0_l, Rsqr_0.
+ now do 5 rewrite Rmult_0_l.
+
+ destruct p as (xp, yp, zp); simpl.
+ remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
+ do 3 rewrite Rsqr_mult in Ha.
+ do 2 rewrite <- Rmult_plus_distr_l in Ha.
+ rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
+ remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
+ assert (Hbz : b ≠ 0).
+  subst b; intros H.
+  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in H.
+  destruct H as (H1 & H2 & H3).
+  now rewrite H1, H2, H3 in Hpz.
+
+  unfold Rsign.
+  destruct (Req_dec k 0) as [Hkz| Hkz]; [ lra | clear Hkz ].
+  destruct (Rle_dec 0 k) as [Hkp| Hkn].
+   rewrite Rmult_1_l.
+   rewrite sqrt_Rsqr in Ha; [ | lra ].
+   assert (Hx : ∀ x, k * x / a = x / b).
+    intros x; subst a; unfold Rdiv.
+    rewrite Rinv_mult_distr; [ | lra | easy ].
+    rewrite <- Rmult_assoc.
+    progress replace (k * x * / k) with (/ k * k * x) by lra.
+    rewrite Rinv_l; lra.
+
+    now do 3 rewrite Hx.
+
+   apply Rnot_le_lt in Hkn.
+   rewrite sqrt_Rsqr_abs in Ha.
+   unfold Rabs in Ha.
+   destruct (Rcase_abs k) as [H| H]; [ clear H | lra ].
+   assert (Hx : ∀ x, k * x / a = - (x / b)).
+    intros x; subst a; unfold Rdiv.
+    rewrite Rinv_mult_distr; [ | lra | easy ].
+    rewrite <- Rmult_assoc.
+    rewrite <- Ropp_inv_permute; [ | easy ].
+    progress replace (k * x * - / k) with (/ k * k * - x) by lra.
+    rewrite Rinv_l; lra.
+
+    do 3 rewrite Hx, <- Rsqr_neg.
+    f_equal; lra.
+Qed.
+
+Theorem mat_trace_eq : ∀ v s c,
+  v ≠ 0%vec
+  → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
+Proof.
+intros * Hv.
+specialize (vec_div_vec_norm v Hv) as Hvn.
+specialize (unit_sphere_mat_trace_eq (v ⁄ ‖v‖) s c Hvn) as H.
+Search (matrix_of_axis_angle (_ ⁎ _, _, _)).
+rewrite matrix_mul_axis with (k := ‖v‖) in H; [ | now apply vec_norm_neq_0 ].
+rewrite vec_const_mul_assoc in H.
+rewrite Rinv_r in H; [ | now apply vec_norm_neq_0 ].
+rewrite vec_const_mul_1_l in H.
+rewrite Rsign_of_pos in H; [ now rewrite Rmult_1_l in H | ].
+now apply vec_norm_pos.
+Qed.
+
+Theorem mat_trace_ge_minus_1 : ∀ v s c,
+  v ≠ 0%vec
+  → s² + c² = 1
+  → -1 ≤ mat_trace (matrix_of_axis_angle (v, s, c)).
+Proof.
+intros * Hv Hsc.
+rewrite mat_trace_eq; [ | easy ].
+enough (-1 ≤ c) by lra.
+assert (Hc : c² ≤ 1).
+ rewrite <- Hsc.
+ apply Rplus_le_reg_r with (r := - c²).
+ rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+ apply Rle_0_sqr.
+
+ replace 1 with 1² in Hc by apply Rsqr_1.
+ apply Rsqr_neg_pos_le_0 in Hc; [ easy | lra ].
+Qed.
+
+Theorem mat_of_axis_angle_trace_interv : ∀ a s c,
+  a ≠ 0%vec
+  → s² + c² = 1
+  → -1 ≤ mat_trace (matrix_of_axis_angle (a, s, c)) ≤ 3.
+Proof.
+intros * Ha Hsc.
+rewrite mat_trace_eq; [ | easy ].
 bbb.
 
+apply vec_norm_neq_0 in Ha.
+destruct a as (x, y, z); simpl in Ha; simpl.
+unfold mat_trace; simpl.
+remember (√ (x² + y² + z²)) as r eqn:Hr.
+rewrite Rsqr_div; [ | easy ].
+rewrite Rsqr_div; [ | easy ].
+rewrite Rsqr_div; [ | easy ].
+replace
+  (x² / r² * (1 - s) + s + (y² / r² * (1 - s) + s) + (z² / r² * (1 - s) + s))
+with ((x² + y² + z²) / r² * (1 - s) + 3 * s) by lra.
+rewrite Hr.
+rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rdiv_same.
+ rewrite Rmult_1_l.
+
+bbb.
 specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
 destruct Ha as (Ha₁ & Ha₂ & Ha₃).
 destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
@@ -2827,17 +2968,6 @@ rewrite Hp, Hp₁, Hp₂, sqrt_1; f_equal.
 nsatz.
 Qed.
 
-Definition Rsign x :=
-  if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
-
-Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
-Proof.
-intros * Hx.
-unfold Rsign.
-destruct (Req_dec x 0); [ lra |  ].
-destruct (Rle_dec 0 x); [ easy | lra ].
-Qed.
-
 Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = Rsign x * Rsign y.
 Proof.
 intros.
@@ -2870,61 +3000,6 @@ destruct (Req_dec (x * y) 0) as [Hxyz| Hxyz].
    apply Hxy; clear Hxy.
    rewrite <- Rmult_opp_opp.
    apply Rmult_le_pos; lra.
-Qed.
-
-Theorem matrix_mul_axis : ∀ p c s k,
-  k ≠ 0
-  → matrix_of_axis_angle (p, s, c) =
-    matrix_of_axis_angle (k ⁎ p, Rsign k * s, c).
-Proof.
-intros * Hk.
-destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
- subst p; simpl; rewrite Rmult_0_r.
- rewrite Rsqr_0; do 2 rewrite Rplus_0_l.
- rewrite Rdiv_0_l, Rsqr_0.
- now do 5 rewrite Rmult_0_l.
-
- destruct p as (xp, yp, zp); simpl.
- remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
- do 3 rewrite Rsqr_mult in Ha.
- do 2 rewrite <- Rmult_plus_distr_l in Ha.
- rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
- remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
- assert (Hbz : b ≠ 0).
-  subst b; intros H.
-  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-  apply sqr_vec_norm_eq_0 in H.
-  destruct H as (H1 & H2 & H3).
-  now rewrite H1, H2, H3 in Hpz.
-
-  unfold Rsign.
-  destruct (Req_dec k 0) as [Hkz| Hkz]; [ lra | clear Hkz ].
-  destruct (Rle_dec 0 k) as [Hkp| Hkn].
-   rewrite Rmult_1_l.
-   rewrite sqrt_Rsqr in Ha; [ | lra ].
-   assert (Hx : ∀ x, k * x / a = x / b).
-    intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult_distr; [ | lra | easy ].
-    rewrite <- Rmult_assoc.
-    progress replace (k * x * / k) with (/ k * k * x) by lra.
-    rewrite Rinv_l; lra.
-
-    now do 3 rewrite Hx.
-
-   apply Rnot_le_lt in Hkn.
-   rewrite sqrt_Rsqr_abs in Ha.
-   unfold Rabs in Ha.
-   destruct (Rcase_abs k) as [H| H]; [ clear H | lra ].
-   assert (Hx : ∀ x, k * x / a = - (x / b)).
-    intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult_distr; [ | lra | easy ].
-    rewrite <- Rmult_assoc.
-    rewrite <- Ropp_inv_permute; [ | easy ].
-    progress replace (k * x * - / k) with (/ k * k * - x) by lra.
-    rewrite Rinv_l; lra.
-
-    do 3 rewrite Hx, <- Rsqr_neg.
-    f_equal; lra.
 Qed.
 
 Theorem latitude_mul : ∀ k u v,
@@ -4930,63 +5005,6 @@ exists m; subst m n₂.
 do 2 rewrite prod_nat_of_nat_inv.
 rewrite Hnj.
 now f_equal.
-Qed.
-
-Theorem unit_sphere_mat_trace_eq : ∀ v s c,
-  ‖v‖ = 1
-  → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
-Proof.
-intros * Hv.
-remember (matrix_of_axis_angle (v, s, c)) as M eqn:HM.
-unfold mat_trace.
-unfold matrix_of_axis_angle in HM.
-destruct v as (x, y, z).
-simpl in Hv.
-rewrite Hv in HM.
-do 3 rewrite Rdiv_1_r in HM.
-simpl in HM.
-unfold mkrmat in HM.
-apply (f_equal Rsqr) in Hv.
-rewrite Rsqr_sqrt in Hv; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_1 in Hv.
-destruct M; simpl in *.
-injection HM; clear HM; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-subst a₁₁ a₂₂ a₃₃.
-Time nsatz.
-Qed.
-
-Theorem mat_trace_eq : ∀ v s c,
-  v ≠ 0%vec
-  → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
-Proof.
-intros * Hv.
-specialize (vec_div_vec_norm v Hv) as Hvn.
-specialize (unit_sphere_mat_trace_eq (v ⁄ ‖v‖) s c Hvn) as H.
-Search (matrix_of_axis_angle (_ ⁎ _, _, _)).
-rewrite matrix_mul_axis with (k := ‖v‖) in H; [ | now apply vec_norm_neq_0 ].
-rewrite vec_const_mul_assoc in H.
-rewrite Rinv_r in H; [ | now apply vec_norm_neq_0 ].
-rewrite vec_const_mul_1_l in H.
-rewrite Rsign_of_pos in H; [ now rewrite Rmult_1_l in H | ].
-now apply vec_norm_pos.
-Qed.
-
-Theorem mat_trace_ge_minus_1 : ∀ v s c,
-  v ≠ 0%vec
-  → s² + c² = 1
-  → -1 ≤ mat_trace (matrix_of_axis_angle (v, s, c)).
-Proof.
-intros * Hv Hsc.
-rewrite mat_trace_eq; [ | easy ].
-enough (-1 ≤ c) by lra.
-assert (Hc : c² ≤ 1).
- rewrite <- Hsc.
- apply Rplus_le_reg_r with (r := - c²).
- rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
- apply Rle_0_sqr.
-
- replace 1 with 1² in Hc by apply Rsqr_1.
- apply Rsqr_neg_pos_le_0 in Hc; [ easy | lra ].
 Qed.
 
 Theorem rotation_unit_axis_neq_0 : ∀ M,
