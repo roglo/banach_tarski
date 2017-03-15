@@ -5035,6 +5035,19 @@ Theorem J_mat_is_countable : ∀ axis,
   ∀ M, M ∈ J_mat axis → ∃ n : ℕ, J_mat_of_nat axis n = M.
 Proof.
 intros * HM.
+unfold J_mat in HM.
+remember axis_angle_of_matrix as f.
+remember J₀ as K.
+simpl in HM; subst f K.
+remember (axis_angle_of_matrix M) as vcs eqn:Hvcs.
+symmetry in Hvcs.
+destruct vcs as ((v, c), s).
+destruct HM as (Hv & sinθ₀ & cosθ₀ & nn & nk & Hsc & Hs & Hc).
+specialize (J₀_is_countable _ _ Hsc) as (n, HJ₀).
+bbb.
+Check J_of_nat.
+remember (J_of_nat axis n) as sc₁ eqn:Hsc₁.
+unfold J_of_nat in Hsc₁.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
