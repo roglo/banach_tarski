@@ -5021,11 +5021,7 @@ Definition J_mat axis :=
   mkset
     (λ R,
      let '(v, cosθ, sinθ) := axis_angle_of_matrix R in
-     v = axis ∧
-    ∃ sinθ₀ cosθ₀ n k,
-    (sinθ₀, cosθ₀) ∈ J₀ axis ∧
-    sinθ = sin ((asin sinθ₀ + 2 * INR k * PI) / INR n) ∧
-    cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n)).
+     v = axis ∧ (sinθ, cosθ) ∈ J axis).
 
 Definition J_mat_of_nat axis n : matrix ℝ :=
   let '(sinθ, cosθ) := J_of_nat axis n in
@@ -5037,17 +5033,22 @@ Proof.
 intros * HM.
 unfold J_mat in HM.
 remember axis_angle_of_matrix as f.
-remember J₀ as K.
+remember J as K.
 simpl in HM; subst f K.
 remember (axis_angle_of_matrix M) as vcs eqn:Hvcs.
 symmetry in Hvcs.
 destruct vcs as ((v, c), s).
-destruct HM as (Hv & sinθ₀ & cosθ₀ & nn & nk & Hsc & Hs & Hc).
-specialize (J₀_is_countable _ _ Hsc) as (n, HJ₀).
+destruct HM as (Hv & Hscj).
+specialize (J_is_countable _ _ Hscj) as (n, HJ).
+unfold J_mat_of_nat.
+exists n.
+rewrite HJ.
+subst v; symmetry.
+apply (f_equal matrix_of_axis_angle) in Hvcs.
+Search (matrix_of_axis_angle (axis_angle_of_matrix _)).
+(* exists above but not terminated (aborted) *)
 bbb.
-Check J_of_nat.
-remember (J_of_nat axis n) as sc₁ eqn:Hsc₁.
-unfold J_of_nat in Hsc₁.
+rewrite axis_angle_of_matrix_inv in Hvcs.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
