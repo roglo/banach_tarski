@@ -4963,7 +4963,14 @@ Theorem axis_angle_of_matrix_inv : ∀ M,
   → matrix_of_axis_angle (axis_angle_of_matrix M) = M.
 Proof.
 intros M (Hrm, Hdet) Hntr; symmetry.
-assert (Hmt : -1 ≤ mat_trace M).
+remember (matrix_of_axis_angle (axis_angle_of_matrix M)) as M' eqn:HM'.
+assert (Hmt : -1 ≤ mat_trace M').
+ rewrite HM'.
+ remember (axis_angle_of_matrix M) as asc eqn:Hasc.
+ symmetry in Hasc.
+ destruct asc as ((a, s), c).
+ apply mat_trace_ge_minus_1.
+Search axis_angle_of_matrix.
 
 bbb.
 unfold matrix_of_axis_angle, axis_angle_of_matrix.
