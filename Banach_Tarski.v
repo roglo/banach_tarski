@@ -2334,8 +2334,8 @@ destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
    progress replace (4 * r₀ ^ 2 * / r₀ * z₀)
    with (4 * r₀ * z₀ * (r₀ / r₀)) by lra.
    rewrite Rdiv_same; [ do 3 rewrite Rmult_1_r | lra ].
-Abort. (*
-   progress replace  (1 - (tr - 1) ^ 2 / 2 ^ 2) with ((4 - (tr - 1) ^ 2) / 4)
+   replace (2 ^ 2) with 4 by lra.
+   progress replace (1 - (tr - 1) ^ 2 / 4) with ((4 - (tr - 1) ^ 2) / 4)
      by lra.
    rewrite sqrt_div; [ | | lra ].
 Focus 2.
@@ -2354,7 +2354,7 @@ replace (Rabs 2) with 2; [ now apply Rabs_le | ].
 unfold Rabs.
 destruct (Rcase_abs 2); [ lra | easy ].
 Abort.
-requires to first prove that -1 ≤ tr ≤ 3 *)
+(* requires to first prove that -1 ≤ tr ≤ 3 *)
 
 (* playing with quaternions, just for fun... *)
 
@@ -5046,7 +5046,7 @@ rewrite HJ.
 subst v; symmetry.
 apply (f_equal matrix_of_axis_angle) in Hvcs.
 Search (matrix_of_axis_angle (axis_angle_of_matrix _)).
-(* exists above but not terminated (aborted) *)
+(* above exists but not terminated (aborted) *)
 bbb.
 rewrite axis_angle_of_matrix_inv in Hvcs.
 bbb.
