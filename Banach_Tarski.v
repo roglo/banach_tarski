@@ -5017,6 +5017,23 @@ rewrite Hnj.
 now f_equal.
 Qed.
 
+Theorem trace_ge_minus_1 : ∀ v c s,
+  -1 ≤ mat_trace (matrix_of_axis_angle (v, c, s)).
+Proof.
+bbb.
+
+Theorem trace_ge_minus_1 : ∀ M,
+  is_rotation_matrix M
+  → -1 ≤ mat_trace M.
+Proof.
+intros M Hrm.
+unfold mat_trace.
+destruct Hrm as (Hrm, Hdet).
+unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
+injection Hrm; clear Hrm; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+unfold mat_det in Hdet.
+bbb.
+
 Definition J_mat axis :=
   mkset
     (λ R,
