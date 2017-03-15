@@ -508,6 +508,49 @@ unfold mat_trace.
 split; lra.
 Qed.
 
+(* We know, from theory of linear algebra, that tr(M) = 1 + 2 cos θ.
+   Therefore, when θ varies from 0 to 2π, tr(M) varies between -1 and 3.
+   Then (tr(M)+1)/4 varies from 0 to 1. *)
+Definition ter_bin_of_rotation M :=
+  ter_bin_of_frac_part ((mat_trace M + 1) / 4).
+
+Definition matrix_of_unit_axis_angle '(V x y z, s, c) :=
+  mkrmat
+    (x²*(1-c)+c) (x*y*(1-c)-z*s) (x*z*(1-c)+y*s)
+    (x*y*(1-c)+z*s) (y²*(1-c)+c) (y*z*(1-c)-x*s)
+    (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
+
+Definition matrix_of_axis_angle '(V x y z, s, c) :=
+  let r := √ (x² + y² + z²) in
+  let ux := x / r in
+  let uy := y / r in
+  let uz := z / r in
+  matrix_of_unit_axis_angle (V ux uy uz, s, c).
+
+Definition axis_angle_of_matrix M :=
+  let cosθ := (mat_trace M - 1) / 2 in
+  let sinθ := √ (1 - cosθ²) in
+  let v := rotation_unit_axis M in
+  (v, sinθ, cosθ).
+
+Arguments axis_angle_of_matrix M%mat.
+
+Theorem mat_of_axis_angle_trace_interv : ∀ a s c M,
+  M = matrix_of_axis_angle (a, c, s)
+  → -1 ≤ mat_trace M ≤ 3.
+Proof.
+intros * HM.
+bbb.
+
+specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
+destruct Ha as (Ha₁ & Ha₂ & Ha₃).
+destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
+destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
+destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
+unfold mat_trace.
+split; [ | lra ].
+bbb.
+
 Theorem mat_trace_interv : ∀ M,
   is_rotation_matrix M
   → -1 ≤ mat_trace M ≤ 3.
@@ -2163,33 +2206,6 @@ Qed.
 
 Definition rotation_around p :=
   mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
-
-(* We know, from theory of linear algebra, that tr(M) = 1 + 2 cos θ.
-   Therefore, when θ varies from 0 to 2π, tr(M) varies between -1 and 3.
-   Then (tr(M)+1)/4 varies from 0 to 1. *)
-Definition ter_bin_of_rotation M :=
-  ter_bin_of_frac_part ((mat_trace M + 1) / 4).
-
-Definition matrix_of_unit_axis_angle '(V x y z, s, c) :=
-  mkrmat
-    (x²*(1-c)+c) (x*y*(1-c)-z*s) (x*z*(1-c)+y*s)
-    (x*y*(1-c)+z*s) (y²*(1-c)+c) (y*z*(1-c)-x*s)
-    (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
-
-Definition matrix_of_axis_angle '(V x y z, s, c) :=
-  let r := √ (x² + y² + z²) in
-  let ux := x / r in
-  let uy := y / r in
-  let uz := z / r in
-  matrix_of_unit_axis_angle (V ux uy uz, s, c).
-
-Definition axis_angle_of_matrix M :=
-  let cosθ := (mat_trace M - 1) / 2 in
-  let sinθ := √ (1 - cosθ²) in
-  let v := rotation_unit_axis M in
-  (v, sinθ, cosθ).
-
-Arguments axis_angle_of_matrix M%mat.
 
 Theorem matrix_of_axis_angle_inv : ∀ v c s,
   0 < s
