@@ -5017,9 +5017,8 @@ rewrite Hnj.
 now f_equal.
 Qed.
 
-(*
-Theorem trace_ge_minus_1 : ∀ v c s,
-  -1 ≤ mat_trace (old_matrix_of_axis_angle (v, c, s)).
+Theorem trace_ge_minus_1 : ∀ v s c,
+  -1 ≤ mat_trace (matrix_of_axis_angle (v, s, c)).
 Proof.
 bbb.
 
@@ -5034,7 +5033,6 @@ unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
 injection Hrm; clear Hrm; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
 unfold mat_det in Hdet.
 bbb.
-*)
 
 Definition J_mat axis :=
   mkset
