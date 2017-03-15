@@ -2154,24 +2154,24 @@ Definition rotation_around p :=
 Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
 
-Definition matrix_of_unit_axis_angle '(V x y z, c, s) :=
+Definition matrix_of_unit_axis_angle '(V x y z, s, c) :=
   mkrmat
     (x²*(1-c)+c) (x*y*(1-c)-z*s) (x*z*(1-c)+y*s)
     (x*y*(1-c)+z*s) (y²*(1-c)+c) (y*z*(1-c)-x*s)
     (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
 
-Definition matrix_of_axis_angle '(V x y z, c, s) :=
+Definition matrix_of_axis_angle '(V x y z, s, c) :=
   let r := √ (x² + y² + z²) in
   let ux := x / r in
   let uy := y / r in
   let uz := z / r in
-  matrix_of_unit_axis_angle (V ux uy uz, c, s).
+  matrix_of_unit_axis_angle (V ux uy uz, s, c).
 
 Definition axis_angle_of_matrix M :=
   let cosθ := (mat_trace M - 1) / 2 in
   let sinθ := √ (1 - cosθ²) in
   let v := rotation_unit_axis M in
-  (v, cosθ, sinθ).
+  (v, sinθ, cosθ).
 
 Arguments axis_angle_of_matrix M%mat.
 
@@ -2179,17 +2179,17 @@ Theorem matrix_of_axis_angle_inv : ∀ v c s,
   0 < s
   → ‖v‖ = 1
   → s² + c² = 1
-  → axis_angle_of_matrix (matrix_of_axis_angle (v, c, s)) = (v, c, s).
+  → axis_angle_of_matrix (matrix_of_axis_angle (v, s, c)) = (v, s, c).
 Proof.
 intros v cosθ sinθ Hsp Hvs Hsc.
 assert (Hvnz : (v ≠ 0)%vec) by (intros H; rewrite H, vec_norm_0 in Hvs; lra).
-remember (v, cosθ, sinθ) as acs eqn:Hacs.
+remember (v, sinθ, cosθ) as acs2 eqn:Hacs2.
 unfold axis_angle_of_matrix.
-remember (matrix_of_axis_angle acs) as M eqn:HM.
+remember (matrix_of_axis_angle acs2) as M eqn:HM.
 remember (mat_trace M) as tr eqn:Htr.
 remember ((tr - 1) / 2) as c eqn:Hc.
 remember (√ (1 - c²)) as s eqn:Hs.
-subst acs; simpl.
+subst acs2; simpl.
 simpl in HM.
 destruct v as (x, y, z).
 simpl in Hvs.
@@ -2697,7 +2697,7 @@ Qed.
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
   → sinθ² + cosθ² = 1
-  → is_rotation_matrix (matrix_of_axis_angle (p, cosθ, sinθ)).
+  → is_rotation_matrix (matrix_of_axis_angle (p, sinθ, cosθ)).
 Proof.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
@@ -2737,7 +2737,7 @@ Qed.
 
 Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
   sinθ² + cosθ² = 1
-  → (matrix_of_axis_angle (p, cosθ, sinθ) * p)%vec = p.
+  → (matrix_of_axis_angle (p, sinθ, cosθ) * p)%vec = p.
 Proof.
 intros (xp, yp, zp) * Hsc.
 remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
@@ -2783,7 +2783,7 @@ assert (Hsc : sinθ² = (1 - cosθ²)).
  replace 1 with (1 ^ 2) at 4 by lra.
  apply pow_maj_Rabs, Rabs_le; lra.
 
- exists (matrix_of_axis_angle (p, cosθ, sinθ)).
+ exists (matrix_of_axis_angle (p, sinθ, cosθ)).
  split.
   split.
    apply matrix_of_axis_angle_is_rotation_matrix; [ easy | lra ].
@@ -2894,7 +2894,7 @@ Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
   → p₁ ∈ sphere 1
   → p₂ ∈ sphere 1
-  → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
+  → (matrix_of_axis_angle (p, s, c) * p₁ = p₂)%vec
   → latitude p p₁ = latitude p p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Hm.
@@ -2959,8 +2959,8 @@ Qed.
 
 Theorem matrix_mul_axis : ∀ p c s k,
   k ≠ 0
-  → matrix_of_axis_angle (p, c, s) =
-    matrix_of_axis_angle (k ⁎ p, c, Rsign k * s).
+  → matrix_of_axis_angle (p, s, c) =
+    matrix_of_axis_angle (k ⁎ p, Rsign k * s, c).
 Proof.
 intros * Hk.
 destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
@@ -3050,7 +3050,7 @@ Theorem rotation_implies_same_latitude : ∀ r p p₁ p₂ c s,
   → p ∈ sphere r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
-  → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
+  → (matrix_of_axis_angle (p, s, c) * p₁ = p₂)%vec
   → latitude p p₁ = latitude p p₂.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hm.
@@ -3059,7 +3059,7 @@ apply vec_div_in_sphere in Hp₁; [ | lra ].
 apply vec_div_in_sphere in Hp₂; [ | lra ].
 assert
   (Hmm :
-     ((matrix_of_axis_angle (/ r ⁎ p, c, s) * (/ r ⁎ p₁))%vec = / r ⁎ p₂)).
+     ((matrix_of_axis_angle (/ r ⁎ p, s, c) * (/ r ⁎ p₁))%vec = / r ⁎ p₂)).
  rewrite matrix_mul_axis with (k := r); [ | lra ].
  rewrite vec_const_mul_assoc.
  rewrite Rinv_r; [ rewrite vec_const_mul_1_l | lra ].
@@ -3127,7 +3127,7 @@ Theorem rotate_matrix_of_two_vectors : ∀ p v₁ v₂ c s,
   → p ≠ 0%vec
   → c = (v₁ · v₂)
   → s = ‖p‖
-  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
+  → (matrix_of_axis_angle (p, s, c) * v₁)%vec = v₂.
 Proof.
 intros * Hv₁ Hv₂ Hp Hpz Hc Hs.
 assert (Hcs : c² + s² = 1).
@@ -3225,7 +3225,7 @@ Qed.
 Theorem unit_sphere_eigenvalue_minus_1_angle_π : ∀ axis sinθ cosθ v,
   axis ∈ sphere 1
   → v ∈ sphere 1
-  → (matrix_of_axis_angle (axis, cosθ, sinθ) * v)%vec = (- v)%vec
+  → (matrix_of_axis_angle (axis, sinθ, cosθ) * v)%vec = (- v)%vec
   → (sinθ, cosθ) = (0, -1).
 Proof.
 intros * Ha Hv Hmv.
@@ -3254,7 +3254,7 @@ Theorem simple_unit_sphere_ro_sin_cos_on_equator : ∀ p p₁ p₂ c s,
   → ‖p₂‖ = 1
   → p · p₁ = 0
   → p · p₂ = 0
-  → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
+  → (matrix_of_axis_angle (p, s, c) * p₁)%vec = p₂
   → (s, c) = (p · p₁ × p₂, p₁ · p₂).
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hmv.
@@ -3279,7 +3279,7 @@ Theorem unit_sphere_rot_sin_cos_on_equator : ∀ p p₁ p₂ c s,
   → latitude p p₁ = 0
   → latitude p p₂ = 0
   → p₁ × p₂ ≠ 0%vec
-  → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
+  → (matrix_of_axis_angle (p, s, c) * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hmv.
@@ -3447,7 +3447,7 @@ Theorem unit_sphere_mat_vec_mul_rot_sin_cos : ∀ p p₁ p₂ a c s,
   → latitude p p₂ = a
   → a² ≠ 1
   → s² + c² = 1
-  → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
+  → (matrix_of_axis_angle (p, s, c) * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
@@ -3670,7 +3670,7 @@ Theorem mat_vec_mul_rot_sin_cos : ∀ r p p₁ p₂ a c s,
   → latitude p p₂ = a
   → a² ≠ 1
   → s² + c² = 1
-  → (matrix_of_axis_angle (p, c, s) * p₁)%vec = p₂
+  → (matrix_of_axis_angle (p, s, c) * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
@@ -3798,7 +3798,7 @@ Theorem unit_sphere_rot_same_latitude : ∀ p p₁ p₂ v₁ v₂ a c s,
   → v₁ = (/ √ (1 - a²) ⁎ (p₁ - a ⁎ p))%vec
   → v₂ = (/ √ (1 - a²) ⁎ (p₂ - a ⁎ p))%vec
   → (s, c) = rot_sin_cos p v₁ v₂
-  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
+  → (old_matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
 unfold rot_sin_cos in Hcs.
@@ -4081,7 +4081,7 @@ Theorem rot_same_latitude : ∀ r p p₁ p₂ v₁ v₂ a c s,
   → v₁ = (/ √ (1 - a²) ⁎ (p₁ - a ⁎ p))%vec
   → v₂ = (/ √ (1 - a²) ⁎ (p₂ - a ⁎ p))%vec
   → (s, c) = rot_sin_cos p v₁ v₂
-  → (matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
+  → (old_matrix_of_axis_angle (p, c, s) * v₁)%vec = v₂.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hppz Hv₁ Hv₂ Hcs.
 assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
@@ -4187,13 +4187,13 @@ Theorem one_rotation_max : ∀ r p p₁ p₂ c s c' s',
   → p₂ ∈ sphere r
   → s² + c² = 1
   → s'² + c'² = 1
-  → (matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
-  → (matrix_of_axis_angle (p, c', s') * p₁ = p₂)%vec
+  → (old_matrix_of_axis_angle (p, c, s) * p₁ = p₂)%vec
+  → (old_matrix_of_axis_angle (p, c', s') * p₁ = p₂)%vec
   → c = c' ∧ s = s'.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
-remember (matrix_of_axis_angle (p, c, s)) as M eqn:HM.
-remember (matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
+remember (old_matrix_of_axis_angle (p, c, s)) as M eqn:HM.
+remember (old_matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
 move M' before M; move HM' before HM.
 assert (H : ((mat_transp M * M')%mat * p₁ = p₁)%vec).
  rewrite mat_vec_mul_assoc, Hm', <- Hm.
@@ -4214,7 +4214,7 @@ Theorem glop : ∀ M axis c s v,
   axis ∈ sphere 1
   → s² + c² = 1
   → axis × v ≠ 0%vec
-  → M = matrix_of_axis_angle (axis, c, s)
+  → M = old_matrix_of_axis_angle (axis, c, s)
   → (M * v = v)%vec
   → M = mat_id.
 Proof.
@@ -4249,8 +4249,8 @@ bbb.
 
 bbb.
 intros * Hr Hp Hp₁ Hp₂ Hcs Hcs' Hm Hm'.
-remember (matrix_of_axis_angle (p, c, s)) as M eqn:HM.
-remember (matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
+remember (old_matrix_of_axis_angle (p, c, s)) as M eqn:HM.
+remember (old_matrix_of_axis_angle (p, c', s')) as M' eqn:HM'.
 move M' before M; move HM' before HM.
 remember ((M - M')%mat * p₁)%vec as q eqn:Hq.
 generalize Hq; intros H.
@@ -4332,8 +4332,8 @@ bbb.
 Theorem matrix_of_axis_angle_opp : ∀ p₁ p₂ a c s,
   a ∈ sphere 1
   → c² + s² = 1
-  → (matrix_of_axis_angle (a, c, s) * p₁ = p₂)%vec
-  → (matrix_of_axis_angle (a, c, (-s)%R) * p₂ = p₁)%vec.
+  → (matrix_of_axis_angle (a, s, c) * p₁ = p₂)%vec
+  → (matrix_of_axis_angle (a, (-s)%R, c) * p₂ = p₁)%vec.
 Proof.
 intros * Ha Hcs Hacs.
 subst p₂; simpl.
@@ -4369,9 +4369,9 @@ Theorem rot_is_id_for_pt : ∀ M v,
   is_rotation_matrix M
   → (M * v = v)%vec
   → M ≠ mat_transp M
-  → ∀ a c s, axis_angle_of_matrix M = (a, c, s) → a × v = 0%vec.
+  → ∀ a s c, axis_angle_of_matrix M = (a, s, c) → a × v = 0%vec.
 Proof.
-intros * Hrm Hmv Hmt a c s Ha.
+intros * Hrm Hmv Hmt a s c Ha.
 destruct v as (x, y, z).
 destruct M; simpl in *.
 destruct Hrm as (Hrm, Hdet).
@@ -4384,7 +4384,7 @@ clear H21 H31 H32.
 injection Hmv; clear Hmv; intros Hz Hy Hx.
 unfold axis_angle_of_matrix in Ha; simpl in Ha.
 unfold rotation_unit_axis, mat_trace in Ha; simpl in Ha.
-injection Ha; clear Ha; intros Hs Hc Ha.
+injection Ha; clear Ha; intros Hc Hs Ha.
 destruct a as (xa, ya, za); simpl.
 injection Ha; clear Ha; intros Hza Hya Hxa.
 rewrite Hc in Hs.
@@ -4439,7 +4439,7 @@ Definition J₀ axis :=
   mkset
     (λ '(sinθ, cosθ),
      sinθ² + cosθ² = 1 ∧
-     let R := matrix_of_axis_angle (axis, cosθ, sinθ) in
+     let R := matrix_of_axis_angle (axis, sinθ, cosθ) in
      let r := ‖axis‖ in
      ∃ p p', p ≠ p'∧ p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
@@ -4734,7 +4734,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
 
   remember ‖axis‖ as r eqn:Hr.
   move r before c; move Hr before r.
-  remember (matrix_of_axis_angle (axis, c, s)) as M eqn:HM.
+  remember (matrix_of_axis_angle (axis, s, c)) as M eqn:HM.
   destruct Hpd as (el₀ & p₀ & (el & Hso) & Hn & Hp₀).
   destruct Hpd' as (el'₀ & p'₀ & (el' & Hso') & Hn' & Hp'₀).
   move el'₀ before el₀; move el before el'₀; move el' before el.
@@ -5017,8 +5017,9 @@ rewrite Hnj.
 now f_equal.
 Qed.
 
+(*
 Theorem trace_ge_minus_1 : ∀ v c s,
-  -1 ≤ mat_trace (matrix_of_axis_angle (v, c, s)).
+  -1 ≤ mat_trace (old_matrix_of_axis_angle (v, c, s)).
 Proof.
 bbb.
 
@@ -5033,16 +5034,17 @@ unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
 injection Hrm; clear Hrm; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
 unfold mat_det in Hdet.
 bbb.
+*)
 
 Definition J_mat axis :=
   mkset
     (λ R,
-     let '(v, cosθ, sinθ) := axis_angle_of_matrix R in
+     let '(v, sinθ, cosθ) := axis_angle_of_matrix R in
      v = axis ∧ (sinθ, cosθ) ∈ J axis).
 
 Definition J_mat_of_nat axis n : matrix ℝ :=
   let '(sinθ, cosθ) := J_of_nat axis n in
-  matrix_of_axis_angle (axis, cosθ, sinθ).
+  matrix_of_axis_angle (axis, sinθ, cosθ).
 
 Theorem J_mat_is_countable : ∀ axis,
   ∀ M, M ∈ J_mat axis → ∃ n : ℕ, J_mat_of_nat axis n = M.
