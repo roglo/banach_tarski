@@ -773,9 +773,24 @@ split.
  destruct M; simpl in *.
  f_equal.
   injection Htr; clear Htr; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-Search a₁₁.
-clear - Hdet H11 H12 H13 H21 H31 Hc.
-
+  rewrite <- Hx.
+  rewrite Rsqr_mult.
+  apply Rmult_eq_reg_l with (r := r²).
+  rewrite Rmult_plus_distr_l.
+  do 2 rewrite <- Rmult_assoc.
+  rewrite Rsqr_inv.
+  rewrite Rinv_r.
+  rewrite Rmult_1_l.
+  rewrite Hr'.
+  rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+  assert (Hc' : a₁₁ + a₂₂ + a₃₃ - 1 = 2 * c) by lra.
+  clear - Hdet Hc' H11 H12 H13 H22 H23 H33.
+bbb.
+(* very long, but works *)
+  Time nsatz.
+(*
+Finished transaction in 145.255 secs (145.267u,0.004s) (successful)
+*)
 bbb.
 
 Theorem mat_trace_interv : ∀ M,
