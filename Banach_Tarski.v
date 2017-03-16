@@ -732,6 +732,8 @@ assert (Hrnz : r ≠ 0).
   rewrite <- Hrxyz2; ring.
 Qed.
 
+(* complicated... perhaps it works with patience...
+   I hope I don't need it...
 Theorem rotation_matrix_has_axis_angle : ∀ M,
   is_rotation_matrix M
   → M ≠ mat_transp M
@@ -932,6 +934,7 @@ bbb.
     a₁₁ * a₃₂ * a₂₃ + a₂₂ * a₃₁ * a₁₃ + a₃₃ * a₁₂ * a₂₁ + 1) by lra.
  clear Hdet; rename Hdet' into Hdet.
 bbb.
+*)
 *)
 
 Theorem matrix_axis_ok : ∀ M p k,
@@ -5099,6 +5102,9 @@ assert (Hmt : -1 ≤ mat_trace M').
  remember (axis_angle_of_matrix M) as asc eqn:Hasc.
  symmetry in Hasc.
  destruct asc as ((a, s), c).
+ apply mat_of_axis_angle_trace_interv.
+
+bbb.
  apply mat_trace_ge_minus_1.
   unfold axis_angle_of_matrix in Hasc.
   injection Hasc; clear Hasc; intros Hc Hs Ha.
