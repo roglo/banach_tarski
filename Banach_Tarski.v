@@ -640,24 +640,6 @@ rewrite Rsign_of_pos in H; [ now rewrite Rmult_1_l in H | ].
 now apply vec_norm_pos.
 Qed.
 
-Theorem mat_trace_ge_minus_1 : ∀ v s c,
-  v ≠ 0%vec
-  → s² + c² = 1
-  → -1 ≤ mat_trace (matrix_of_axis_angle (v, s, c)).
-Proof.
-intros * Hv Hsc.
-rewrite mat_trace_eq; [ | easy ].
-enough (-1 ≤ c) by lra.
-assert (Hc : c² ≤ 1).
- rewrite <- Hsc.
- apply Rplus_le_reg_r with (r := - c²).
- rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
- apply Rle_0_sqr.
-
- replace 1 with 1² in Hc by apply Rsqr_1.
- apply Rsqr_neg_pos_le_0 in Hc; [ easy | lra ].
-Qed.
-
 Theorem mat_of_axis_angle_trace_interv : ∀ a s c,
   a ≠ 0%vec
   → s² + c² = 1
@@ -665,37 +647,115 @@ Theorem mat_of_axis_angle_trace_interv : ∀ a s c,
 Proof.
 intros * Ha Hsc.
 rewrite mat_trace_eq; [ | easy ].
-bbb.
+assert (Hc : c² ≤ 1).
+ rewrite <- Hsc.
+ apply Rplus_le_reg_r with (r := - c²).
+ rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+ apply Rle_0_sqr.
 
-apply vec_norm_neq_0 in Ha.
-destruct a as (x, y, z); simpl in Ha; simpl.
-unfold mat_trace; simpl.
-remember (√ (x² + y² + z²)) as r eqn:Hr.
-rewrite Rsqr_div; [ | easy ].
-rewrite Rsqr_div; [ | easy ].
-rewrite Rsqr_div; [ | easy ].
-replace
-  (x² / r² * (1 - s) + s + (y² / r² * (1 - s) + s) + (z² / r² * (1 - s) + s))
-with ((x² + y² + z²) / r² * (1 - s) + 3 * s) by lra.
-rewrite Hr.
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rdiv_same.
- rewrite Rmult_1_l.
+ split.
+  enough (-1 ≤ c) by lra.
+  replace 1 with 1² in Hc by apply Rsqr_1.
+  apply Rsqr_neg_pos_le_0 in Hc; [ easy | lra ].
 
-bbb.
-specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
-destruct Ha as (Ha₁ & Ha₂ & Ha₃).
-destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
-destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
-destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
-unfold mat_trace.
-split; [ | lra ].
+  enough (c ≤ 1) by lra.
+  replace 1 with 1² in Hc by apply Rsqr_1.
+  apply Rsqr_incr_0_var in Hc; [ easy | lra ].
+Qed.
+
+Theorem z_of_xy : ∀ x y z r,
+  r = √ (x² + y² + z²)
+  → r ≠ 0
+  → (z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2.
+Proof.
+intros * Hr Hrnz.
+assert (H : r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2).
+ split.
+  rewrite <- Rsqr_pow2.
+  intros H; apply Hrnz.
+  now apply Rsqr_eq_0 in H.
+
+  rewrite Hr, <- Rsqr_pow2.
+  rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
+  apply nonneg_sqr_vec_norm.
+
+ destruct H as (Hr2nz & Hrxyz).
+ remember (x / r) as xr eqn:Hxr.
+ remember (y / r) as yr eqn:Hyr.
+ remember (z / r) as zr eqn:Hzr.
+ subst xr yr zr.
+ unfold Rdiv.
+ do 3 rewrite Rpow_mult_distr.
+ rewrite <- Hrxyz; ring_simplify.
+ rewrite <- Rinv_pow; [ | easy ].
+ rewrite Rinv_r; [ ring | easy ].
+Qed.
+
+Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
+  p ≠ 0%vec
+  → sinθ² + cosθ² = 1
+  → is_rotation_matrix (matrix_of_axis_angle (p, sinθ, cosθ)).
+Proof.
+intros * Hp Hsc.
+rename Hsc into Hsc1.
+assert (Hsc : sinθ² = 1 - cosθ²) by lra; clear Hsc1.
+destruct p as (xp, yp, zp).
+remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
+assert (Hrnz : r ≠ 0).
+ intros H; rewrite Hr in H.
+ apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in H.
+ destruct H as (Hx & Hy & Hz); subst xp yp zp.
+ now apply Hp.
+
+ remember (xp / r) as x eqn:Hx.
+ remember (yp / r) as y eqn:Hy.
+ remember (zp / r) as z eqn:Hz.
+ assert (Hrxyz2 : 1 - x ^ 2 - y ^ 2 = z ^ 2).
+  subst x y z.
+  now symmetry; apply z_of_xy.
+
+  unfold matrix_of_axis_angle.
+  rewrite <- Hr, <- Hx, <- Hy, <- Hz.
+  split.
+   unfold mat_transp, mat_mul, mat_id; simpl.
+   f_equal;
+    ring_simplify;
+    do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc;
+    repeat rewrite Rsqr_pow2;
+    rewrite <- Hrxyz2; ring.
+
+  unfold mat_det; simpl.
+  ring_simplify.
+  do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc.
+  repeat rewrite Rsqr_pow2.
+  rewrite <- Hrxyz2; ring.
+Qed.
+
+Theorem rotation_matrix_has_axis_angle : ∀ M,
+  is_rotation_matrix M
+  → M ≠ mat_transp M
+  → ∃ a s c, M = matrix_of_axis_angle (a, s, c) ∧ s² + c² = 1.
+Proof.
+intros * (Htr, Hdet) Hmt.
+remember (axis_angle_of_matrix M) as asc eqn:Hasc.
+symmetry in Hasc.
+destruct asc as ((a, s), c).
+exists a, s, c.
+unfold axis_angle_of_matrix in Hasc.
+(* Hmm... not sure that sin is correct: what about its sign? *)
+
 bbb.
 
 Theorem mat_trace_interv : ∀ M,
   is_rotation_matrix M
   → -1 ≤ mat_trace M ≤ 3.
 Proof.
+intros * Hrm.
+Search is_rotation_matrix.
+
+bbb.
+
 intros * (Hrm & Hdet).
 specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
 destruct Ha as (Ha₁ & Ha₂ & Ha₃).
@@ -2721,75 +2781,6 @@ Focus 2.
 Abort.
 
 (* end play with quaternions. *)
-
-Theorem z_of_xy : ∀ x y z r,
-  r = √ (x² + y² + z²)
-  → r ≠ 0
-  → (z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2.
-Proof.
-intros * Hr Hrnz.
-assert (H : r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2).
- split.
-  rewrite <- Rsqr_pow2.
-  intros H; apply Hrnz.
-  now apply Rsqr_eq_0 in H.
-
-  rewrite Hr, <- Rsqr_pow2.
-  rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
-  apply nonneg_sqr_vec_norm.
-
- destruct H as (Hr2nz & Hrxyz).
- remember (x / r) as xr eqn:Hxr.
- remember (y / r) as yr eqn:Hyr.
- remember (z / r) as zr eqn:Hzr.
- subst xr yr zr.
- unfold Rdiv.
- do 3 rewrite Rpow_mult_distr.
- rewrite <- Hrxyz; ring_simplify.
- rewrite <- Rinv_pow; [ | easy ].
- rewrite Rinv_r; [ ring | easy ].
-Qed.
-
-Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
-  p ≠ 0%vec
-  → sinθ² + cosθ² = 1
-  → is_rotation_matrix (matrix_of_axis_angle (p, sinθ, cosθ)).
-Proof.
-intros * Hp Hsc.
-rename Hsc into Hsc1.
-assert (Hsc : sinθ² = 1 - cosθ²) by lra; clear Hsc1.
-destruct p as (xp, yp, zp).
-remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
-assert (Hrnz : r ≠ 0).
- intros H; rewrite Hr in H.
- apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in H.
- destruct H as (Hx & Hy & Hz); subst xp yp zp.
- now apply Hp.
-
- remember (xp / r) as x eqn:Hx.
- remember (yp / r) as y eqn:Hy.
- remember (zp / r) as z eqn:Hz.
- assert (Hrxyz2 : 1 - x ^ 2 - y ^ 2 = z ^ 2).
-  subst x y z.
-  now symmetry; apply z_of_xy.
-
-  unfold matrix_of_axis_angle.
-  rewrite <- Hr, <- Hx, <- Hy, <- Hz.
-  split.
-   unfold mat_transp, mat_mul, mat_id; simpl.
-   f_equal;
-    ring_simplify;
-    do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc;
-    repeat rewrite Rsqr_pow2;
-    rewrite <- Hrxyz2; ring.
-
-  unfold mat_det; simpl.
-  ring_simplify.
-  do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc.
-  repeat rewrite Rsqr_pow2.
-  rewrite <- Hrxyz2; ring.
-Qed.
 
 Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
   sinθ² + cosθ² = 1
