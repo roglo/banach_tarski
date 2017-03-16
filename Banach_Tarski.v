@@ -5312,6 +5312,14 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     revert Hdnc; apply Hp.
 
  destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
+ assert
+   (H : ∃ sinθ₀ cosθ₀,
+    ∀ p p' n sinθ cosθ,
+    p ∈ D ∩ sphere ‖p₁‖ ∧
+    p' ∈ D ∩ sphere ‖p₁‖ ∧
+    sinθ = sin (asin sinθ₀ / n) ∧
+    cosθ = cos (acos cosθ₀ / n)
+    → (matrix_of_axis_angle (p₁, sinθ, cosθ) * p ≠ p')%vec).
 bbb.
 
  assert
