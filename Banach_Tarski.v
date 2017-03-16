@@ -744,6 +744,37 @@ destruct asc as ((a, s), c).
 exists a, s, c.
 unfold axis_angle_of_matrix in Hasc.
 (* Hmm... not sure that sin is correct: what about its sign? *)
+injection Hasc; clear Hasc; intros Hc Hs Ha.
+rewrite Hc in Hs.
+split.
+ rewrite <- Hs; simpl.
+ destruct a as (x, y, z).
+ remember (√ (x² + y² + z²)) as r eqn:Hr.
+ unfold rotation_unit_axis in Ha.
+ simpl in Ha.
+ remember (√ ((a₃₂ M - a₂₃ M)² + (a₁₃ M - a₃₁ M)² + (a₂₁ M - a₁₂ M)²)) as r'
+   eqn:Hr'.
+ injection Ha; clear Ha; intros Hz Hy Hx.
+ rewrite <- Hx, <- Hy, <- Hz in Hr.
+ do 3 rewrite Rsqr_mult in Hr.
+ do 2 rewrite <- Rmult_plus_distr_l in Hr.
+ rewrite sqrt_mult in Hr.
+ rewrite <- Hr' in Hr.
+ rewrite sqrt_Rsqr in Hr.
+ rewrite Rinv_l in Hr.
+ subst r.
+ do 3 rewrite Rdiv_1_r.
+ rename r' into r.
+ unfold mat_transp, mat_mul, mat_id, mkrmat in Htr.
+ unfold mat_det in Hdet.
+ unfold mat_transp, mkrmat in Hmt.
+ unfold mat_trace in Hc.
+ unfold mkrmat.
+ destruct M; simpl in *.
+ f_equal.
+  injection Htr; clear Htr; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
+Search a₁₁.
+clear - Hdet H11 H12 H13 H21 H31 Hc.
 
 bbb.
 
