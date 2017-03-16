@@ -5320,6 +5320,16 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     sinθ = sin (asin sinθ₀ / n) ∧
     cosθ = cos (acos cosθ₀ / n)
     → (matrix_of_axis_angle (p₁, sinθ, cosθ) * p ≠ p')%vec).
+  assert (Hp₁nz : p₁ ≠ 0%vec).
+   intros H; apply Hpnd; subst p₁; simpl.
+   exists (ạ :: []), 0%vec.
+   split; [ apply same_orbit_refl | ].
+   split; [ easy | simpl; f_equal; lra ].
+
+   specialize (J_is_countable p₁) as Hjc.
+Check rotation_around_not_countable.
+bbb.
+   specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
 bbb.
 
  assert
