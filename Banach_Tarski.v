@@ -5089,6 +5089,7 @@ destruct (Req_dec r 0) as [Hrz| Hrz].
  now rewrite H1, H2, H3.
 Qed.
 
+(*
 Theorem axis_angle_of_matrix_inv : ∀ M,
   is_rotation_matrix M
   → M ≠ mat_transp M
@@ -5239,6 +5240,7 @@ Abort.
 (* requires to first prove that -1 ≤ tr ≤ 3 *)
 
 bbb.
+*)
 
 Definition J_mat axis :=
   mkset
@@ -5250,6 +5252,7 @@ Definition J_mat_of_nat axis n : matrix ℝ :=
   let '(sinθ, cosθ) := J_of_nat axis n in
   matrix_of_axis_angle (axis, sinθ, cosθ).
 
+(*
 Theorem J_mat_is_countable : ∀ axis,
   ∀ M, M ∈ J_mat axis → ∃ n : ℕ, J_mat_of_nat axis n = M.
 Proof.
@@ -5273,6 +5276,7 @@ Search (matrix_of_axis_angle (axis_angle_of_matrix _)).
 bbb.
 rewrite axis_angle_of_matrix_inv in Hvcs.
 bbb.
+*)
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
@@ -5308,6 +5312,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     revert Hdnc; apply Hp.
 
  destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
+bbb.
+
  assert
    (H : ∃ R₁, R₁ ∈ rotation_around p₁
     ∧ ∀ n p p', p ∈ D ∩ sphere ‖p₁‖ → p' ∈ D ∩ sphere ‖p₁‖
