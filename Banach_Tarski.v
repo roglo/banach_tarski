@@ -5278,14 +5278,45 @@ rewrite axis_angle_of_matrix_inv in Hvcs.
 bbb.
 *)
 
+Theorem Cantor_ℕ_I : ∀ f : nat → R, ∃ x : R, 0 ≤ x ≤ 1 ∧ ∀ n : nat, x ≠ f n.
+Proof.
+intros f.
+remember
+  (λ n, let x := Rabs (f n) in
+   if Rle_dec x 1 then x else 1 / x) as g eqn:Hg.
+specialize (Cantor_ℕ_ℝ g) as (x, Hx).
+remember (let y := Rabs x in if Rle_dec y 1 then y else 1 / y) as z eqn:Hz.
+exists z.
+subst z.
+split.
+Focus 2.
+ intros n.
+ specialize (Hx n).
+ intros Hz; apply Hx; clear Hx.
+ subst g; simpl.
+ remember (Rabs x) as y eqn:Hy.
+ simpl in Hz.
+ destruct (Rle_dec y 1) as [Hyl| Hyg].
+(* suis parti en couille, faut que je réfléchisse... *)
+bbb.
+Check Cantor_gen.
+
+specialize
+  (Cantor_gen ℕ ℕ ℝ (λ x, (0 ≤ x < 1)%R) id ter_bin_of_frac_part id_nat
+     ter_bin_of_frac_part_surj).
+intros H f.
+specialize (H f).
+destruct H as (x, H); exists x.
+intros n; apply H.
+Qed.
+
 Theorem rotations_not_countable :
   ∀ f : ℕ → ℝ * ℝ, ∃ sinθ cosθ,
   ∀ n, sinθ² + cosθ² = 1 ∧ f n ≠ (sinθ, cosθ).
 Proof.
 intros f.
 specialize Cantor_ℕ_ℝ as Hr.
-assert (Hr2 : ∀ g : ℕ → ℝ * ℝ, ∃ x y : ℝ, ∀ n : ℕ, g n ≠ (x, y)).
-Focus 2.
+enough (Hr2 : ∀ g : ℕ → ℝ * ℝ, ∃ x y : ℝ, ∀ n : ℕ, g n ≠ (x, y)).
  specialize (Hr2 f) as (x, (y, Hn)).
  exists x, (√ (1 - x²)).
  intros n.
