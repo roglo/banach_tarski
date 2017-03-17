@@ -5284,6 +5284,13 @@ Theorem rotations_not_countable :
 Proof.
 intros f.
 specialize Cantor_ℕ_ℝ as Hr.
+assert (Hr2 : ∀ g : ℕ → ℝ * ℝ, ∃ x y : ℝ, ∀ n : ℕ, g n ≠ (x, y)).
+Focus 2.
+ specialize (Hr2 f) as (x, (y, Hn)).
+ exists x, (√ (1 - x²)).
+ intros n.
+ split.
+(* mais non, ça va pas, ça *)
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
