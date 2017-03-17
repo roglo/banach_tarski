@@ -5282,6 +5282,8 @@ Theorem rotations_not_countable :
   ∀ f : ℕ → ℝ * ℝ, ∃ sinθ cosθ,
   ∀ n, sinθ² + cosθ² = 1 ∧ f n ≠ (sinθ, cosθ).
 Proof.
+intros f.
+specialize Cantor_ℕ_ℝ as Hr.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
