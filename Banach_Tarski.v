@@ -5278,6 +5278,12 @@ rewrite axis_angle_of_matrix_inv in Hvcs.
 bbb.
 *)
 
+Theorem rotations_not_countable :
+  ∀ f : ℕ → ℝ * ℝ, ∃ sinθ cosθ,
+  ∀ n, sinθ² + cosθ² = 1 ∧ f n ≠ (sinθ, cosθ).
+Proof.
+bbb.
+
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
@@ -5327,7 +5333,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    split; [ easy | simpl; f_equal; lra ].
 
    specialize (J_is_countable p₁) as Hjc.
-Check rotation_around_not_countable.
+   specialize (rotations_not_countable (J_of_nat p₁)) as (sinθ, (cosθ, Hn)).
+
 bbb.
    specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
 bbb.
