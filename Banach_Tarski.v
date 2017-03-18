@@ -5281,7 +5281,7 @@ bbb.
 Theorem Cantor_ℕ_I : ∀ f : nat → R, ∃ x : R, 0 ≤ x ≤ 1 ∧ ∀ n : nat, x ≠ f n.
 Proof.
 intros f.
-Check Cantor_ℕ_ℝ.
+specialize (Cantor_ℕ_ℝ f) as (x, Hx).
 bbb.
 
 remember
