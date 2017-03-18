@@ -5285,8 +5285,8 @@ Check Cantor_ℕ_ℝ.
 bbb.
 
 remember
-  (λ n, let x := Rabs (f n) in
-   if Rle_dec x 1 then x else 1 / x) as g eqn:Hg.
+  (λ n, let y := Rabs (f n) in
+   if Rle_dec y 1 then y else 1 / y) as g eqn:Hg.
 specialize (Cantor_ℕ_ℝ g) as (x, Hx).
 subst g.
 remember (let y := Rabs x in if Rle_dec y 1 then y else 1 / y) as z eqn:Hz.
