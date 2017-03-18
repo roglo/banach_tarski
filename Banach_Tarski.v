@@ -5278,10 +5278,19 @@ rewrite axis_angle_of_matrix_inv in Hvcs.
 bbb.
 *)
 
+Definition I_of_ℝ x :=
+  if Rlt_dec x 0 then 1 / (- x + 1) / 2
+  else 1 / (x + 1) / 2 + 1 / 2.
+
 Theorem Cantor_ℕ_I : ∀ f : nat → R, ∃ x : R, 0 ≤ x ≤ 1 ∧ ∀ n : nat, x ≠ f n.
 Proof.
 intros f.
 specialize (Cantor_ℕ_ℝ f) as (x, Hx).
+exists (I_of_ℝ x).
+bbb.
+
+Check countable_surjection.
+
 bbb.
 
 remember
