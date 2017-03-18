@@ -5282,45 +5282,103 @@ Definition I_of_ℝ x :=
   if Rlt_dec x 0 then 1 / (- x + 1) / 2
   else 1 / (x + 1) / 2 + 1 / 2.
 
+Definition ℝ_of_I i :=
+  if Rlt_dec i (1 / 2) then -1 / (i * 2) + 1
+  else 1 / ((i - 1 / 2) * 2) - 1.
+
+Theorem ℝ_of_I_inv : ∀ x, ℝ_of_I (I_of_ℝ x) = x.
+Proof.
+intros.
+unfold ℝ_of_I, I_of_ℝ.
+destruct (Rlt_dec x 0) as [Hxl| Hxl].
+ destruct (Rlt_dec (1 / (- x + 1) / 2) (1 / 2)) as [Hlt| Hge].
+  rewrite Rmult_div_same; [ | lra ].
+  unfold Rdiv; rewrite Rmult_1_l.
+  rewrite Rinv_involutive; lra.
+
+  exfalso.
+  apply Rnot_lt_le in Hge.
+  apply Rmult_le_compat_r with (r := 2) in Hge; [ | lra ].
+  rewrite Rmult_div_same in Hge; [ | lra ].
+  rewrite Rmult_div_same in Hge; [ | lra ].
+  apply Rmult_le_compat_r with (r := (- x + 1)) in Hge; [ | lra ].
+  rewrite Rmult_1_l in Hge.
+  rewrite Rmult_div_same in Hge; lra.
+
+ apply Rnot_lt_le in Hxl.
+ destruct (Rlt_dec (1 / (x + 1) / 2 + 1 / 2) (1 / 2)) as [Hlt| Hge].
+  exfalso.
+  apply Rmult_lt_compat_r with (r := 2) in Hlt; [ | lra ].
+  rewrite Rmult_plus_distr_r in Hlt.
+  rewrite Rmult_div_same in Hlt; [ | lra ].
+  rewrite Rmult_div_same in Hlt; [ | lra ].
+  apply Rmult_lt_compat_r with (r := (x + 1)) in Hlt; [ | lra ].
+  rewrite Rmult_plus_distr_r in Hlt.
+  rewrite Rmult_div_same in Hlt; lra.
+
+  clear Hge.
+  rewrite Rmult_minus_distr_r.
+  rewrite Rmult_plus_distr_r.
+  rewrite Rmult_div_same; [ | lra ].
+  rewrite Rmult_div_same; [ | lra ].
+  unfold Rminus; rewrite Rplus_assoc.
+  rewrite Rplus_opp_r, Rplus_0_r.
+  rewrite fold_Rminus.
+  unfold Rdiv; do 2 rewrite Rmult_1_l.
+  rewrite Rinv_involutive; lra.
+Qed.
+
+Theorem I_of_ℝ_interv : ∀ x, 0 ≤ I_of_ℝ x ≤ 1.
+Proof.
+intros x.
+unfold I_of_ℝ.
+destruct (Rlt_dec x 0) as [Hx| Hx].
+ split.
+  apply Rmult_le_reg_r with (r := 2); [ lra | ].
+  rewrite Rmult_0_l, Rmult_div_same; [ | lra ].
+  apply Rmult_le_reg_r with (r := - x + 1); [ lra | ].
+  rewrite Rmult_0_l, Rmult_div_same; lra.
+
+  apply Rmult_le_reg_r with (r := 2); [ lra | ].
+  rewrite Rmult_div_same; [ | lra ].
+  rewrite Rmult_1_l.
+  apply Rmult_le_reg_r with (r := - x + 1); [ lra | ].
+  rewrite Rmult_div_same; lra.
+
+ split.
+  apply Rmult_le_reg_r with (r := 2); [ lra | ].
+  rewrite Rmult_plus_distr_r, Rmult_0_l.
+  rewrite Rmult_div_same; [ | lra ].
+  rewrite Rmult_div_same; [ | lra ].
+  apply Rmult_le_reg_r with (r := x + 1); [ lra | ].
+  rewrite Rmult_0_l.
+  rewrite Rmult_plus_distr_r.
+  rewrite Rmult_div_same; lra.
+
+  apply Rnot_lt_le in Hx.
+  apply Rmult_le_reg_r with (r := 2); [ lra | ].
+  rewrite Rmult_plus_distr_r.
+  rewrite Rmult_div_same; [ | lra ].
+  rewrite Rmult_div_same; [ | lra ].
+  rewrite Rmult_1_l.
+  apply Rmult_le_reg_r with (r := x + 1); [ lra | ].
+  rewrite Rmult_plus_distr_r.
+  rewrite Rmult_div_same; lra.
+Qed.
+
 Theorem Cantor_ℕ_I : ∀ f : nat → R, ∃ x : R, 0 ≤ x ≤ 1 ∧ ∀ n : nat, x ≠ f n.
 Proof.
 intros f.
-specialize (Cantor_ℕ_ℝ f) as (x, Hx).
-exists (I_of_ℝ x).
-bbb.
-
-Check countable_surjection.
-
-bbb.
-
-remember
-  (λ n, let y := Rabs (f n) in
-   if Rle_dec y 1 then y else 1 / y) as g eqn:Hg.
+remember (λ n, ℝ_of_I (f n)) as g eqn:Hg.
 specialize (Cantor_ℕ_ℝ g) as (x, Hx).
+exists (I_of_ℝ x).
+split; [ apply I_of_ℝ_interv | ].
+intros n H.
 subst g.
-remember (let y := Rabs x in if Rle_dec y 1 then y else 1 / y) as z eqn:Hz.
-exists z.
-subst z.
-split.
-Focus 2.
- intros n.
- specialize (Hx n).
- intros Hz; apply Hx; clear Hx.
- subst g; simpl.
- remember (Rabs x) as y eqn:Hy.
- simpl in Hz.
- destruct (Rle_dec y 1) as [Hyl| Hyg].
-(* suis parti en couille, faut que je réfléchisse... *)
-bbb.
-Check Cantor_gen.
-
-specialize
-  (Cantor_gen ℕ ℕ ℝ (λ x, (0 ≤ x < 1)%R) id ter_bin_of_frac_part id_nat
-     ter_bin_of_frac_part_surj).
-intros H f.
-specialize (H f).
-destruct H as (x, H); exists x.
-intros n; apply H.
+specialize (Hx n).
+rewrite <- H in Hx.
+apply Hx.
+symmetry; apply ℝ_of_I_inv.
 Qed.
 
 Theorem rotations_not_countable :
@@ -5328,6 +5386,10 @@ Theorem rotations_not_countable :
   ∀ n, sinθ² + cosθ² = 1 ∧ f n ≠ (sinθ, cosθ).
 Proof.
 intros f.
+specialize Cantor_ℕ_I as Hr.
+bbb.
+
+
 specialize Cantor_ℕ_ℝ as Hr.
 enough (Hr2 : ∀ g : ℕ → ℝ * ℝ, ∃ x y : ℝ, ∀ n : ℕ, g n ≠ (x, y)).
  specialize (Hr2 f) as (x, (y, Hn)).
