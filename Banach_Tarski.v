@@ -5281,10 +5281,14 @@ bbb.
 Theorem Cantor_ℕ_I : ∀ f : nat → R, ∃ x : R, 0 ≤ x ≤ 1 ∧ ∀ n : nat, x ≠ f n.
 Proof.
 intros f.
+Check Cantor_ℕ_ℝ.
+bbb.
+
 remember
   (λ n, let x := Rabs (f n) in
    if Rle_dec x 1 then x else 1 / x) as g eqn:Hg.
 specialize (Cantor_ℕ_ℝ g) as (x, Hx).
+subst g.
 remember (let y := Rabs x in if Rle_dec y 1 then y else 1 / y) as z eqn:Hz.
 exists z.
 subst z.
