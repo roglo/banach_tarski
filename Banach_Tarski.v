@@ -5441,8 +5441,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     ∀ p p' n sinθ cosθ,
     p ∈ D ∩ sphere ‖p₁‖ ∧
     p' ∈ D ∩ sphere ‖p₁‖ ∧
-    sinθ = sin (asin sinθ₀ / n) ∧
-    cosθ = cos (acos cosθ₀ / n)
+    sinθ = sin (asin sinθ₀ / INR n) ∧
+    cosθ = cos (acos cosθ₀ / INR n)
     → (matrix_of_axis_angle (p₁, sinθ, cosθ) * p ≠ p')%vec).
   assert (Hp₁nz : p₁ ≠ 0%vec).
    intros H; apply Hpnd; subst p₁; simpl.
@@ -5452,6 +5452,10 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
 
    specialize (J_is_countable p₁) as Hjc.
    specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
+   exists s, c.
+   intros * (Hp & Hp' & Hs & Hc) H.
+   unfold J_of_nat in Hn.
+
 bbb.
 
  assert
