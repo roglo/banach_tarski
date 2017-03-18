@@ -5381,12 +5381,17 @@ apply Hx.
 symmetry; apply ℝ_of_I_inv.
 Qed.
 
+bbb.
+Definition R_of_RR '(x, y) :=
+  x + y.
+
 Theorem rotations_not_countable :
   ∀ f : ℕ → ℝ * ℝ, ∃ sinθ cosθ,
   ∀ n, sinθ² + cosθ² = 1 ∧ f n ≠ (sinθ, cosθ).
 Proof.
 intros f.
 specialize Cantor_ℕ_I as Hr.
+specialize (Hr (λ n, R_of_RR (f n))).
 bbb.
 
 
