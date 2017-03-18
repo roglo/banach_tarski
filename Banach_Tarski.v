@@ -5381,28 +5381,26 @@ apply Hx.
 symmetry; apply ℝ_of_I_inv.
 Qed.
 
-bbb.
-Definition R_of_RR '(x, y) :=
-  x + y.
-
 Theorem rotations_not_countable :
   ∀ f : ℕ → ℝ * ℝ, ∃ sinθ cosθ,
-  ∀ n, sinθ² + cosθ² = 1 ∧ f n ≠ (sinθ, cosθ).
+  sinθ² + cosθ² = 1 ∧ ∀ n, f n ≠ (sinθ, cosθ).
 Proof.
 intros f.
 specialize Cantor_ℕ_I as Hr.
-specialize (Hr (λ n, R_of_RR (f n))).
-bbb.
+specialize (Hr (λ n, fst (f n))) as (s & Hs & Ht).
+exists s, (√ (1 - s²)).
+split.
+ rewrite Rsqr_sqrt; [ lra | ].
+ apply Rplus_le_reg_r with (r := s²).
+ rewrite Rplus_0_l, Rminus_plus.
+ replace 1 with 1² by apply Rsqr_1.
+ apply Rsqr_incr_1; [ easy | easy | lra ].
 
-
-specialize Cantor_ℕ_ℝ as Hr.
-enough (Hr2 : ∀ g : ℕ → ℝ * ℝ, ∃ x y : ℝ, ∀ n : ℕ, g n ≠ (x, y)).
- specialize (Hr2 f) as (x, (y, Hn)).
- exists x, (√ (1 - x²)).
  intros n.
- split.
-(* mais non, ça va pas, ça *)
-bbb.
+ intros H.
+ apply (Ht n).
+ now rewrite H.
+Qed.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
@@ -5453,10 +5451,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    split; [ easy | simpl; f_equal; lra ].
 
    specialize (J_is_countable p₁) as Hjc.
-   specialize (rotations_not_countable (J_of_nat p₁)) as (sinθ, (cosθ, Hn)).
-
-bbb.
-   specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
+   specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
 bbb.
 
  assert
