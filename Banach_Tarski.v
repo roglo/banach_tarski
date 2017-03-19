@@ -5436,6 +5436,13 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     revert Hdnc; apply Hp.
 
  destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
+ assert (∃ sc, sc ∉ J p₁) as ((s, c), Hsc).
+  specialize (J_is_countable p₁) as Hjc.
+  specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
+  exists (s, c); intros H.
+  specialize (Hjc _ H) as (n, Hjc).
+  now specialize (Hn n).
+bbb.
  assert
    (H : ∃ sinθ₀ cosθ₀,
     ∀ p p' n sinθ cosθ,
