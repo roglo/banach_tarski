@@ -5451,24 +5451,12 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    split.
    simpl; rewrite union_empty_r.
    split; intros H.
+    (* I need to decide whether x ∈ E or x ∉ E, which is an issue because
+       E is an infinite set of matrices (M^n for all n); so I am afraid, I
+       need excluded middle :-(, or limited principle of omniscience. I don't
+       want to use any of them, but perhaps I have to? *)
 bbb.
 Check mat_eq_dec.
-
-Theorem is_partition_subtract : ∀ A (E F : set A),
-  F ⊂ E
-  → is_partition E [F; E ∖ F].
-Proof.
-intros * HFE.
-split.
- simpl; rewrite union_empty_r.
- split; intros H.
-bbb.
-(* should use decidability of ∈: {x ∈ F} + {x ∈ F}
-   therefore cannot be for any type A; perhaps it works only with
-   ℝ *)
-  right.
-  split; [ easy | ].
-bbb.
  assert
    (H : ∃ sinθ₀ cosθ₀,
     ∀ p p' n sinθ cosθ,
