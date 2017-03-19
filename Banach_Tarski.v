@@ -5445,8 +5445,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
 
   remember (matrix_of_axis_angle (p₁, s, c)) as M eqn:HM.
   remember (mkset (λ Mn, ∃ n, Mn = (M ^ n)%mat)) as E eqn:HE.
-  remember (mkset (λ M, ∃ s c, M = matrix_of_axis_angle (p₁, s, c))) as S₂
-    eqn:HS₂.
+  remember (mkset (λ M, ∃ s c, M = matrix_of_axis_angle (p₁, s, c))) as S₂.
+  rename HeqS₂ into HS₂.
   assert (is_partition S₂ [E; S₂ ∖ E]).
 
 bbb.
