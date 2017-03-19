@@ -5463,6 +5463,23 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    remember (J₀_of_nat p₁ nj) as sc₀ eqn:Hsc₀.
    destruct sc₀ as (s₀, c₀).
    unfold J₀_of_nat in Hsc₀.
+   remember (prod_nat_of_nat nj) as n₁₂ eqn:Hn₁₂; symmetry in Hn₁₂.
+   destruct n₁₂ as (n₁, n'₂).
+   remember (prod_nat_of_nat n₁) as nfo eqn:Hnfo; symmetry in Hnfo.
+   destruct nfo as (nf, no).
+   remember (prod_nat_of_nat n'₂) as nfo' eqn:Hnfo'; symmetry in Hnfo'.
+   destruct nfo' as (nf', no').
+   remember (fixpoint_of_nat ‖p₁‖ nf) as v₁ eqn:Hv₁.
+   remember (fixpoint_of_nat ‖p₁‖ nf') as v'₁ eqn:Hv'₁.
+   remember (path_of_nat no) as el eqn:Hel.
+   remember (path_of_nat no') as el' eqn:Hel'.
+   remember (fold_right rotate v₁ el) as u₁ eqn:Hu₁.
+   remember (fold_right rotate v'₁ el') as u'₁ eqn:Hu'₁.
+   unfold rot_sin_cos in Hsc₀.
+   remember (latitude p₁ u₁) as a eqn:Ha.
+   remember (u₁ - a ⁎ p₁)%vec as w₁ eqn:Hw₁.
+   remember (u'₁ - a ⁎ p₁)%vec as w'₁ eqn:Hw'₁.
+   remember (√ (1 - a²)) as r eqn:Hr.
 
 bbb.
 
