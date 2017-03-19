@@ -5442,6 +5442,13 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
   exists (s, c); intros H.
   specialize (Hjc _ H) as (n, Hjc).
   now specialize (Hn n).
+
+  remember (matrix_of_axis_angle (p₁, s, c)) as M eqn:HM.
+  remember (mkset (λ Mn, ∃ n, Mn = (M ^ n)%mat)) as E eqn:HE.
+  remember (mkset (λ M, ∃ s c, M = matrix_of_axis_angle (p₁, s, c))) as S₂
+    eqn:HS₂.
+  assert (is_partition S₂ [E; S₂ ∖ E]).
+
 bbb.
  assert
    (H : ∃ sinθ₀ cosθ₀,
