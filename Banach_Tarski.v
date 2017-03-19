@@ -5455,6 +5455,14 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    exists s, c.
    intros * (Hp & Hp' & Hs & Hc) H.
    unfold J_of_nat in Hn.
+   specialize (Hn n).
+   remember (prod_nat_of_nat n) as nj eqn:Hnj; symmetry in Hnj.
+   destruct nj as (nj, n₂).
+   remember (prod_nat_of_nat n₂) as nkn eqn:Hnkn; symmetry in Hnkn.
+   destruct nkn as (nk, nn).
+   remember (J₀_of_nat p₁ nj) as sc₀ eqn:Hsc₀.
+   destruct sc₀ as (s₀, c₀).
+   unfold J₀_of_nat in Hsc₀.
 
 bbb.
 
