@@ -5448,7 +5448,26 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
   remember (mkset (λ M, ∃ s c, M = matrix_of_axis_angle (p₁, s, c))) as S₂.
   rename HeqS₂ into HS₂.
   assert (is_partition S₂ [E; S₂ ∖ E]).
+   split.
+   simpl; rewrite union_empty_r.
+   split; intros H.
+bbb.
+Check mat_eq_dec.
 
+Theorem is_partition_subtract : ∀ A (E F : set A),
+  F ⊂ E
+  → is_partition E [F; E ∖ F].
+Proof.
+intros * HFE.
+split.
+ simpl; rewrite union_empty_r.
+ split; intros H.
+bbb.
+(* should use decidability of ∈: {x ∈ F} + {x ∈ F}
+   therefore cannot be for any type A; perhaps it works only with
+   ℝ *)
+  right.
+  split; [ easy | ].
 bbb.
  assert
    (H : ∃ sinθ₀ cosθ₀,
