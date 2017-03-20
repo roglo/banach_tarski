@@ -5339,10 +5339,10 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     revert Hdnc; apply Hp.
 
  destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
- assert (∃ sc, sc ∉ J p₁) as ((s, c), Hsc).
+ assert (∃ s c, s² + c² = 1 ∧ (s, c) ∉ J p₁) as (s & c & Hsc & Hj).
   specialize (J_is_countable p₁ Hpnd Hqnd) as Hjc.
   specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
-  exists (s, c); intros H.
+  exists s, c; split; [ easy | intros H ].
   specialize (Hjc _ H) as (n, Hjc).
   now specialize (Hn n).
 
@@ -5350,28 +5350,60 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
   remember (sphere ‖p₁‖) as S₂ eqn:HS₂.
   remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((M ^ n)%mat * p₀)%vec))
     as E eqn:HE.
-  assert (is_partition S₂ [E; S₂ ∖ E]).
+  assert (Hpart : is_partition S₂ [E; S₂ ∖ E]).
    split.
-   simpl; rewrite union_empty_r.
-   split; intros H.
-   now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
+    simpl; rewrite union_empty_r.
+    split; intros H.
+     now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
 
-   destruct H as [H| H].
-    rename x into v.
-    rewrite HE in H; simpl in H.
-    destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
-    subst S₂ v.
-    apply on_sphere_after_rotation; [ easy | ].
-    apply mat_pow_is_rotation_matrix; rewrite HM.
-    apply matrix_of_axis_angle_is_rotation_matrix.
-    intros H; rewrite H in Hp₀.
+     rename x into v.
+     destruct H as [H| H]; [ | now destruct H ].
+     rewrite HE in H; simpl in H.
+     destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
+     subst S₂ v.
+     apply on_sphere_after_rotation; [ easy | ].
+     apply mat_pow_is_rotation_matrix; rewrite HM.
+     apply matrix_of_axis_angle_is_rotation_matrix; [ | easy ].
+     intros H; apply Hpnd; rewrite H; simpl.
+     exists (ạ :: []), 0%vec.
+     split.
+      exists (ạ :: []).
+      now rewrite rotate_vec_mul, mat_vec_mul_0_r.
 
-bbb.
+      split; [ easy | ].
+      now rewrite rotate_vec_mul, mat_vec_mul_0_r.
 
-; destruct H as (n, Hn).
-    rewrite HS₂.
-    exists (sin (INR n * asin s)), (cos (INR n * acos c)).
-    rewrite Hn, HM.
+    intros i j Hij.
+    destruct i.
+     destruct j; [ easy | ].
+     destruct j.
+      intros v.
+      now split; intros Hv; [ simpl in Hv | ].
+
+      simpl; rewrite match_id.
+      apply intersection_empty_r.
+
+     destruct j.
+      destruct i.
+       intros v.
+       now split; intros Hv; [ simpl in Hv | ].
+
+       simpl; rewrite match_id.
+       apply intersection_empty_l.
+
+      destruct i.
+       destruct j; [ easy | ].
+       simpl; rewrite match_id.
+       apply intersection_empty_r.
+
+       destruct j.
+        simpl; rewrite match_id.
+        apply intersection_empty_l.
+
+        simpl; do 2 rewrite match_id.
+        apply intersection_empty_l.
+
+   idtac.
 bbb.
 Check mat_eq_dec.
  assert
