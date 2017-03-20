@@ -5253,7 +5253,7 @@ induction n; intros.
   unfold Rsqr.
   ring_simplify.
   progress repeat rewrite <- Rsqr_pow2.
-
+Abort. (*
 bbb.
 
  do 2 rewrite Rmult_plus_distr_r.
@@ -5303,6 +5303,7 @@ Search (sin (_ * _)).
 Search (sin (acos _)).
 Search (cos (asin _)).
 bbb.
+*)
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
@@ -5315,7 +5316,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
  exists p.
  split.
   split.
-   apply in_sphere_in_ball in Hps; [ easy | ].
+   apply on_sphere_in_ball in Hps; [ easy | ].
    split; [ apply Rle_0_1 | apply Rle_refl ].
 
    intros HD.
@@ -5327,7 +5328,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
 
   split.
    apply neg_vec_in_ball.
-   apply in_sphere_in_ball in Hps; [ easy | ].
+   apply on_sphere_in_ball in Hps; [ easy | ].
    split; [ apply Rle_0_1 | apply Rle_refl ].
 
    intros HD.
@@ -5346,13 +5347,14 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
   now specialize (Hn n).
 
   remember (matrix_of_axis_angle (p₁, s, c)) as M eqn:HM.
-  remember (mkset (λ Mn, ∃ n, Mn = (M ^ n)%mat)) as E eqn:HE.
-  remember (mkset (λ M, ∃ s c, M = matrix_of_axis_angle (p₁, s, c))) as S₂.
-  rename HeqS₂ into HS₂.
+  remember (sphere ‖p₁‖) as S₂ eqn:HS₂.
+  remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((M ^ n)%mat * p₀)%vec))
+    as E eqn:HE.
   assert (is_partition S₂ [E; S₂ ∖ E]).
    split.
    simpl; rewrite union_empty_r.
    split; intros H.
+bbb.
     now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
 
     destruct H as [H| H].
