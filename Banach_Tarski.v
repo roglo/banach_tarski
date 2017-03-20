@@ -5224,10 +5224,68 @@ split.
  now rewrite H.
 Qed.
 
+Theorem unit_sphere_matrix_of_angle_power : ∀ p s c n,
+  ‖p‖ = 1
+  → (matrix_of_axis_angle (p, s, c) ^ n)%mat =
+    matrix_of_axis_angle (p, sin (INR n * asin s), cos (INR n * acos c)).
+Proof.
+intros * Hp.
+induction n; intros.
+ rewrite mat_pow_0.
+ do 2 rewrite Rmult_0_l.
+ rewrite sin_0, cos_0.
+ symmetry; apply mat_sin_cos_0.
+
+ remember (matrix_of_axis_angle (p, s, c)) as M eqn:HM.
+ rewrite mat_pow_succ.
+ rewrite S_INR.
+ destruct p as (x, y, z).
+ simpl in Hp, HM, IHn; simpl.
+ rewrite Hp in HM, IHn; rewrite Hp.
+ progress repeat rewrite Rdiv_1_r in HM, IHn.
+ progress repeat rewrite Rdiv_1_r.
+ rewrite IHn, HM.
+ unfold mat_mul; simpl.
+ f_equal.
+  progress repeat rewrite Rmult_plus_distr_r.
+  clear.
+  apply Rminus_diag_uniq.
+  unfold Rsqr.
+  ring_simplify.
+  progress repeat rewrite <- Rsqr_pow2.
+
+bbb.
+
+ do 2 rewrite Rmult_plus_distr_r.
+ do 2 rewrite Rmult_1_l.
+ rewrite sin_plus, cos_plus.
+bbb.
+
+ rewrite sin_asin, cos_acos.
+Search (sin (_ * _)).
+Search (sin (acos _)).
+Search (cos (asin _)).
+bbb.
+
+intros (x, y, z); intros * Hp.
+unfold matrix_of_axis_angle.
+simpl in Hp; rewrite Hp.
+progress repeat rewrite Rdiv_1_r.
+unfold matrix_of_unit_axis_angle.
+Search (cos (_ * _)).
+
+bbb.
+
 Theorem matrix_of_angle_power : ∀ p s c n,
   (matrix_of_axis_angle (p, s, c) ^ n)%mat =
   matrix_of_axis_angle (p, sin (INR n * asin s), cos (INR n * acos c)).
 Proof.
+intros (x, y, z); intros.
+unfold matrix_of_axis_angle.
+remember (√ (x² + y² + z²)) as r eqn:Hr.
+unfold matrix_of_unit_axis_angle.
+bbb.
+
 intros.
 revert s c.
 induction n; intros.
@@ -5235,6 +5293,15 @@ induction n; intros.
  do 2 rewrite Rmult_0_l.
  rewrite sin_0, cos_0.
  symmetry; apply mat_sin_cos_0.
+
+ rewrite S_INR.
+ do 2 rewrite Rmult_plus_distr_r.
+ do 2 rewrite Rmult_1_l.
+ rewrite sin_plus, cos_plus.
+ rewrite sin_asin, cos_acos.
+Search (sin (_ * _)).
+Search (sin (acos _)).
+Search (cos (asin _)).
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
