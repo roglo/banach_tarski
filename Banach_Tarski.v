@@ -5354,14 +5354,24 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    split.
    simpl; rewrite union_empty_r.
    split; intros H.
-bbb.
-    now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
+   now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
 
-    destruct H as [H| H].
-     rewrite HE in H; simpl in H; destruct H as (n, Hn).
-     rewrite HS₂.
-     exists (sin (INR n * asin s)), (cos (INR n * acos c)).
-     rewrite Hn, HM.
+   destruct H as [H| H].
+    rename x into v.
+    rewrite HE in H; simpl in H.
+    destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
+    subst S₂ v.
+    apply on_sphere_after_rotation; [ easy | ].
+    apply mat_pow_is_rotation_matrix; rewrite HM.
+    apply matrix_of_axis_angle_is_rotation_matrix.
+    intros H; rewrite H in Hp₀.
+
+bbb.
+
+; destruct H as (n, Hn).
+    rewrite HS₂.
+    exists (sin (INR n * asin s)), (cos (INR n * acos c)).
+    rewrite Hn, HM.
 bbb.
 Check mat_eq_dec.
  assert

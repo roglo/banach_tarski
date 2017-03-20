@@ -618,6 +618,14 @@ rewrite mat_det_mul, Hd1, Hd2.
 apply Rmult_1_r.
 Qed.
 
+Theorem mat_pow_is_rotation_matrix : ∀ M n,
+  is_rotation_matrix M → is_rotation_matrix (M ^ n).
+Proof.
+intros * HM.
+induction n; [ apply mat_id_is_rotation_matrix | simpl ].
+now apply mat_mul_is_rotation_matrix.
+Qed.
+
 Theorem vec_const_mul_assoc : ∀ a b v, a ⁎ (b ⁎ v) = (a * b) ⁎ v.
 Proof.
 intros a b (x, y, z); simpl.
