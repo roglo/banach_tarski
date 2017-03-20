@@ -5453,8 +5453,9 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    split; intros H.
     (* I need to decide whether x ∈ E or x ∉ E, which is an issue because
        E is an infinite set of matrices (M^n for all n); so I am afraid, I
-       need excluded middle :-(, or limited principle of omniscience. I don't
-       want to use any of them, but perhaps I have to? *)
+       need either decidability of membership, or excluded middle :-(, or
+       limited principle of omniscience. I don't want to use any of them, but
+       perhaps I have to? *)
 bbb.
 Check mat_eq_dec.
  assert
