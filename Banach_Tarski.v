@@ -5424,25 +5424,13 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
    split.
    simpl; rewrite union_empty_r.
    split; intros H.
-    (* I need to decide whether x ∈ E or x ∉ E, which is an issue because
-       E is an infinite set of matrices (M^n for all n); so I am afraid, I
-       need either decidability of membership, or excluded middle :-(, or
-       limited principle of omniscience. I don't want to use any of them, but
-       perhaps I have to? *)
-    rewrite HS₂ in H.
-    destruct H as (s' & c' & Hx).
-assert (x ∈ E ↔ ∃ n, s' = sin (INR n * asin s) ∧ c' = sin (INR n * acos c)).
- split; intros H.
-Focus 2.
- destruct H as (n & Hs' & Hc').
- rewrite HE; simpl.
- exists n.
- rewrite Hx, Hs', Hc', HM.
- symmetry.
-bbb.
+    now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
 
-Print J.
-Print J₀.
+    destruct H as [H| H].
+     rewrite HE in H; simpl in H; destruct H as (n, Hn).
+     rewrite HS₂.
+     exists (sin (asin (INR n * s))), (cos (acos (INR n * s))).
+     rewrite Hn, HM.
 bbb.
 Check mat_eq_dec.
  assert
