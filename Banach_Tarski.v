@@ -5375,6 +5375,28 @@ split.
  now rewrite H.
 Qed.
 
+Theorem mat_pow_0 : ∀ M, (M ^ 0)%mat = mat_id.
+Proof. intros; easy. Qed.
+
+Theorem mat_sin_cos_0 : ∀ p, matrix_of_axis_angle (p, 0, 0) = mat_id.
+Proof.
+intros (x, y, z); simpl.
+rewrite Rminus_0_r.
+progress repeat rewrite Rmult_1_r.
+progress repeat rewrite Rplus_0_r.
+bbb.
+
+Theorem matrix_of_angle_power : ∀ p s c n,
+  (matrix_of_axis_angle (p, s, c) ^ n)%mat =
+  matrix_of_axis_angle (p, INR n * s, INR n * c).
+Proof.
+intros.
+revert s c.
+induction n; intros.
+ rewrite mat_pow_0.
+ do 2 rewrite Rmult_0_l.
+bbb.
+
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
@@ -5429,7 +5451,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     destruct H as [H| H].
      rewrite HE in H; simpl in H; destruct H as (n, Hn).
      rewrite HS₂.
-     exists (sin (asin (INR n * s))), (cos (acos (INR n * s))).
+     exists (INR n * s), (INR n * c).
      rewrite Hn, HM.
 bbb.
 Check mat_eq_dec.
