@@ -5410,8 +5410,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
 
  destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
  assert (∃ sc, sc ∉ J p₁) as ((s, c), Hsc).
-bbb.
-  specialize (J_is_countable p₁ Had Hnad) as Hjc.
+  specialize (J_is_countable p₁ Hpnd Hqnd) as Hjc.
   specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
   exists (s, c); intros H.
   specialize (Hjc _ H) as (n, Hjc).
@@ -5432,6 +5431,16 @@ bbb.
        perhaps I have to? *)
     rewrite HS₂ in H.
     destruct H as (s' & c' & Hx).
+assert (x ∈ E ↔ ∃ n, s' = sin (INR n * asin s) ∧ c' = sin (INR n * acos c)).
+ split; intros H.
+Focus 2.
+ destruct H as (n & Hs' & Hc').
+ rewrite HE; simpl.
+ exists n.
+ rewrite Hx, Hs', Hc', HM.
+ symmetry.
+bbb.
+
 Print J.
 Print J₀.
 bbb.
