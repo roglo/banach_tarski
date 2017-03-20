@@ -1394,3 +1394,49 @@ Time f_equal;
    clear H22 H32; nsatz | clear H11 H31; nsatz | nsatz |
    clear H22 H32; nsatz | clear H11 H31; nsatz | nsatz ].
 Qed.
+
+(* *)
+
+(* Non-nul vector belonging to the axis of rotation.
+   Works for rotations angles different from 0 and π,
+   i.e. transpositor ≠ 0 (a "transpositor" is a name I
+   give to a vector which is nul iff the matrix is equal
+   to its transpose; this name is inspired from the
+   name "commutator") *)
+Definition rotation_axis (M : matrix ℝ) :=
+  let x := a₃₂ M - a₂₃ M in
+  let y := a₁₃ M - a₃₁ M in
+  let z := a₂₁ M - a₁₂ M in
+  V x y z.
+
+Definition vec_normalize v := v ⁄ ‖v‖.
+
+Definition rotation_unit_axis (M : matrix ℝ) :=
+  vec_normalize (rotation_axis M).
+
+Definition rotation_fixpoint (m : matrix ℝ) k :=
+  vec_const_mul k (rotation_unit_axis m).
+
+Definition matrix_of_unit_axis_angle '(V x y z, s, c) :=
+  mkrmat
+    (x²*(1-c)+c) (x*y*(1-c)-z*s) (x*z*(1-c)+y*s)
+    (x*y*(1-c)+z*s) (y²*(1-c)+c) (y*z*(1-c)-x*s)
+    (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
+
+Definition matrix_of_axis_angle '(V x y z, s, c) :=
+  let r := √ (x² + y² + z²) in
+  let ux := x / r in
+  let uy := y / r in
+  let uz := z / r in
+  matrix_of_unit_axis_angle (V ux uy uz, s, c).
+
+Definition axis_angle_of_matrix M :=
+  let cosθ := (mat_trace M - 1) / 2 in
+  let sinθ := √ (1 - cosθ²) in
+  let v := rotation_unit_axis M in
+  (v, sinθ, cosθ).
+
+Arguments axis_angle_of_matrix M%mat.
+
+(* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
+Definition cos_rot_angle M := (mat_trace M - 1) / 2.

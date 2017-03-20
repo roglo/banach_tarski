@@ -356,34 +356,11 @@ Qed.
 
 Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
 
-(* Non-nul vector belonging to the axis of rotation.
-   Works for rotations angles different from 0 and π,
-   i.e. transpositor ≠ 0 (a "transpositor" is a name I
-   give to a vector which is nul iff the matrix is equal
-   to its transpose; this name is inspired from the
-   name "commutator") *)
-Definition rotation_axis (M : matrix ℝ) :=
-  let x := a₃₂ M - a₂₃ M in
-  let y := a₁₃ M - a₃₁ M in
-  let z := a₂₁ M - a₁₂ M in
-  V x y z.
-
-Definition vec_normalize v := v ⁄ ‖v‖.
-
-Definition rotation_unit_axis (M : matrix ℝ) :=
-  vec_normalize (rotation_axis M).
-
-Definition rotation_fixpoint (m : matrix ℝ) k :=
-  vec_const_mul k (rotation_unit_axis m).
-
 Definition fixpoint_of_path r el :=
   rotation_fixpoint (mat_of_path el) r.
 
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
-
-(* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
-Definition cos_rot_angle M := (mat_trace M - 1) / 2.
 
 Theorem ortho_matrix_sqr_coeff_le_1 : ∀ M,
   (M * mat_transp M)%mat = mat_id
@@ -496,27 +473,6 @@ Qed.
    Then (tr(M)+1)/4 varies from 0 to 1. *)
 Definition ter_bin_of_rotation M :=
   ter_bin_of_frac_part ((mat_trace M + 1) / 4).
-
-Definition matrix_of_unit_axis_angle '(V x y z, s, c) :=
-  mkrmat
-    (x²*(1-c)+c) (x*y*(1-c)-z*s) (x*z*(1-c)+y*s)
-    (x*y*(1-c)+z*s) (y²*(1-c)+c) (y*z*(1-c)-x*s)
-    (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
-
-Definition matrix_of_axis_angle '(V x y z, s, c) :=
-  let r := √ (x² + y² + z²) in
-  let ux := x / r in
-  let uy := y / r in
-  let uz := z / r in
-  matrix_of_unit_axis_angle (V ux uy uz, s, c).
-
-Definition axis_angle_of_matrix M :=
-  let cosθ := (mat_trace M - 1) / 2 in
-  let sinθ := √ (1 - cosθ²) in
-  let v := rotation_unit_axis M in
-  (v, sinθ, cosθ).
-
-Arguments axis_angle_of_matrix M%mat.
 
 Theorem mat_pow_0 : ∀ M, (M ^ 0)%mat = mat_id.
 Proof. intros; easy. Qed.
@@ -940,6 +896,7 @@ intros * Hrm Hm Hn.
 subst p.
 remember (rotation_axis M) as ev eqn:Hev.
 unfold rotation_axis in Hev.
+unfold "_-_", sub_notation in Hev.
 remember (a₃₂ M - a₂₃ M) as x eqn:Hx.
 remember (a₁₃ M - a₃₁ M) as y eqn:Hy.
 remember (a₂₁ M - a₁₂ M) as z eqn:Hz.
@@ -2471,6 +2428,7 @@ simpl in Hvs.
 rewrite Hvs in HM.
 progress repeat rewrite Rdiv_1_r in HM.
 unfold rotation_unit_axis, rotation_axis; simpl.
+unfold "_-_", sub_notation.
 rewrite HM; unfold mkrmat ; simpl.
 unfold mat_trace in Htr.
 rewrite HM in Htr; unfold mkrmat in Htr; simpl in Htr.
@@ -4407,6 +4365,7 @@ clear H21 H31 H32.
 injection Hmv; clear Hmv; intros Hz Hy Hx.
 unfold axis_angle_of_matrix in Ha; simpl in Ha.
 unfold rotation_unit_axis, mat_trace in Ha; simpl in Ha.
+unfold "_-_", sub_notation in Ha.
 injection Ha; clear Ha; intros Hc Hs Ha.
 destruct a as (xa, ya, za); simpl.
 injection Ha; clear Ha; intros Hza Hya Hxa.
@@ -4675,6 +4634,7 @@ apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
  remember (rotation_axis (mat_of_path el)) as ra eqn:Hra.
  remember (rotation_axis (mat_of_path (rev_path el))) as ra' eqn:Hra'.
  unfold rotation_axis in Hra, Hra'.
+ unfold "_-_", sub_notation in Hra, Hra'.
  rewrite mat_of_rev_path in Hra'; [ | easy ].
  remember (mat_of_path el) as M eqn:HM.
  assert (Hneg : ra' = (- ra)%vec).
