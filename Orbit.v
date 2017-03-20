@@ -9,10 +9,14 @@ Require Import Utf8 List Relations.
 Import ListNotations.
 Require Import Reals Nsatz.
 
-Require Import Misc Words Normalize Reverse Matrix Pset.
+Require Import Misc MiscReals Words Normalize Reverse Matrix Pset.
 
+(*
 Notation "'√'" := sqrt.
 Notation "x '≤' y" := (Rle x y) : R_scope.
+Notation "x '≤' y '≤' z" := (Rle x y ∧ Rle y z)
+ (at level 70, y at next level) : R_scope.
+*)
 
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
