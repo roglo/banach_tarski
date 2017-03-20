@@ -668,3 +668,20 @@ Add Parametric Relation : (set vector) equidecomposable
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans
  as equidec_morph.
+
+Theorem equidec_union : ∀ E₁ E₂ F₁ F₂,
+  (E₁ ∩ F₁ = ∅)%S
+  → (E₂ ∩ F₂ = ∅)%S
+  → equidecomposable E₁ E₂
+  → equidecomposable F₁ F₂
+  → equidecomposable (E₁ ∪ F₁) (E₂ ∪ F₂).
+Proof.
+intros * HEF₁ HEF₂ HE HF.
+destruct HE as (PE₁ & PE₂ & HE₁ & HE₂ & HE).
+destruct HF as (PF₁ & PF₂ & HF₁ & HF₂ & HF).
+unfold equidecomposable.
+exists (PE₁ ++ PF₁), (PE₂ ++ PF₂).
+split; [ now apply partition_union | ].
+split; [ now apply partition_union | ].
+now apply Forall2_app.
+Qed.
