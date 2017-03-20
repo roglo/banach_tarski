@@ -535,6 +535,18 @@ Definition axis_angle_of_matrix M :=
 
 Arguments axis_angle_of_matrix M%mat.
 
+Theorem mat_pow_0 : ∀ M, (M ^ 0)%mat = mat_id.
+Proof. intros; easy. Qed.
+
+Theorem mat_sin_cos_0 : ∀ p, matrix_of_axis_angle (p, 0, 1) = mat_id.
+Proof.
+intros (x, y, z); simpl.
+rewrite Rminus_diag_eq; [ | easy ].
+progress repeat rewrite Rmult_0_r.
+unfold mat_id, mkrmat.
+f_equal; lra.
+Qed.
+
 Definition Rsign x :=
   if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
 
@@ -631,7 +643,6 @@ Proof.
 intros * Hv.
 specialize (vec_div_vec_norm v Hv) as Hvn.
 specialize (unit_sphere_mat_trace_eq (v ⁄ ‖v‖) s c Hvn) as H.
-Search (matrix_of_axis_angle (_ ⁎ _, _, _)).
 rewrite matrix_mul_axis with (k := ‖v‖) in H; [ | now apply vec_norm_neq_0 ].
 rewrite vec_const_mul_assoc in H.
 rewrite Rinv_r in H; [ | now apply vec_norm_neq_0 ].
@@ -800,7 +811,6 @@ Theorem mat_trace_interv : ∀ M,
   → -1 ≤ mat_trace M ≤ 3.
 Proof.
 intros * Hrm.
-Search is_rotation_matrix.
 
 bbb.
 
@@ -5375,26 +5385,17 @@ split.
  now rewrite H.
 Qed.
 
-Theorem mat_pow_0 : ∀ M, (M ^ 0)%mat = mat_id.
-Proof. intros; easy. Qed.
-
-Theorem mat_sin_cos_0 : ∀ p, matrix_of_axis_angle (p, 0, 0) = mat_id.
-Proof.
-intros (x, y, z); simpl.
-rewrite Rminus_0_r.
-progress repeat rewrite Rmult_1_r.
-progress repeat rewrite Rplus_0_r.
-bbb.
-
 Theorem matrix_of_angle_power : ∀ p s c n,
   (matrix_of_axis_angle (p, s, c) ^ n)%mat =
-  matrix_of_axis_angle (p, INR n * s, INR n * c).
+  matrix_of_axis_angle (p, sin (INR n * asin s), cos (INR n * acos c)).
 Proof.
 intros.
 revert s c.
 induction n; intros.
  rewrite mat_pow_0.
  do 2 rewrite Rmult_0_l.
+ rewrite sin_0, cos_0.
+ symmetry; apply mat_sin_cos_0.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
@@ -5451,7 +5452,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     destruct H as [H| H].
      rewrite HE in H; simpl in H; destruct H as (n, Hn).
      rewrite HS₂.
-     exists (INR n * s), (INR n * c).
+     exists (sin (INR n * asin s)), (cos (INR n * acos c)).
      rewrite Hn, HM.
 bbb.
 Check mat_eq_dec.
