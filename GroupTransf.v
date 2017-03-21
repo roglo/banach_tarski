@@ -25,13 +25,25 @@ Fixpoint app_gr f p :=
   | Comb g h => app_gr g (app_gr h p)
   end.
 
-bbb.
-
 Fixpoint app_gr_vec f p :=
   match f with
-  | Rot e => rotate (negf e) p
+  | Rot M Hrm => (M * p)%vec (* was rotate (negf e) p, why negf? *)
   | Xtransl dx => match p with V x y z => V (x - dx) y z end
   | Comb g h => app_gr_vec h (app_gr_vec g p)
+  end.
+
+Theorem inv_is_rotation_matrix : ∀ M,
+  is_rotation_matrix M
+  → is_rotation_matrix (mat_inv M).
+Proof.
+intros M Hrm.
+bbb.
+
+Fixpoint gr_inv f :=
+  match f with
+  | Rot M Hrm => Rot (mat_inv M) (inv_is_rotation_matrix _ Hrm)
+  | Xtransl dx => Xtransl (-dx)
+  | Comb g h => Comb (gr_inv h) (gr_inv g)
   end.
 
 Fixpoint gr_inv f :=
