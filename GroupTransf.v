@@ -292,11 +292,16 @@ Proof.
 intros.
 revert E F.
 induction g; intros.
- simpl.
-bbb.
+ apply set_map_inter_distr.
+ intros u v Huv.
+ apply (f_equal (mat_vec_mul (mat_transp M))) in Huv.
+ do 2 rewrite <- mat_vec_mul_assoc in Huv.
+ rewrite rotation_mat_mul_transp_l in Huv; [ | easy ].
+ now do 2 rewrite mat_vec_mul_id in Huv.
 
-; [ easy | now intros (x, y, z) | ].
-intros p; simpl; now rewrite IHg2, IHg1.
+ now intros (x, y, z).
+
+ intros p; simpl; now rewrite IHg2, IHg1.
 Qed.
 
 Theorem group_union_distr : ∀ g E F,
@@ -304,6 +309,7 @@ Theorem group_union_distr : ∀ g E F,
 Proof.
 intros.
 revert E F.
+bbb.
 induction g; intros; [ easy | now intros (x, y, z) | ].
 now intros p; simpl; rewrite IHg2, IHg1.
 Qed.

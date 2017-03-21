@@ -45,6 +45,22 @@ Notation "E .[ i ]" := (List.nth i E ∅)
 
 Definition set_map {A B} (f : A → B) s := mkset (λ v, ∃ u, u ∈ s ∧ f u = v).
 
+Theorem set_map_inter_distr : ∀ A B E F (f : A → B),
+  FinFun.Injective f
+  → (set_map f (E ∩ F) = set_map f E ∩ set_map f F)%S.
+Proof.
+intros * Hinj b.
+split; intros H.
+ destruct H as (a & (HaE & HaF) & Hf); simpl.
+ split; exists a; easy.
+
+ simpl in H; simpl.
+ destruct H as ((ae & HE & Hae) & (af & HF & Haf)).
+ rewrite <- Haf in Hae.
+ specialize (Hinj _ _ Hae); subst af.
+ now exists ae.
+Qed.
+
 Theorem set_eq_refl A : reflexive (set A) set_eq.
 Proof. now intros P x; split. Qed.
 
