@@ -140,6 +140,28 @@ Qed.
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
 Proof. easy. Qed.
 
+Theorem set_map_mul_transp : ∀ M E,
+  is_rotation_matrix M
+  → (set_map (mat_vec_mul (mat_transp M)) (set_map (mat_vec_mul M) E) = E)%S.
+Proof.
+intros * Hrm.
+intros p; simpl.
+split; intros H.
+ destruct H as (u & (v & Hv & Hvu) & Hu).
+ rewrite <- Hvu, <- mat_vec_mul_assoc in Hu.
+ destruct Hrm as (Htr, Hdet).
+ apply mat_mul_id_comm in Htr.
+ rewrite Htr, mat_vec_mul_id in Hu.
+ now rewrite <- Hu.
+
+ exists (M * p)%vec.
+ split; [ now exists p; split | ].
+ rewrite <- mat_vec_mul_assoc.
+ destruct Hrm as (Htr, Hdet).
+ apply mat_mul_id_comm in Htr.
+ now rewrite Htr, mat_vec_mul_id.
+Qed.
+
 Theorem app_gr_inv_l : ∀ g E,
   (app_gr_inv g (app_gr g E) = E)%S.
 Proof.
@@ -147,21 +169,7 @@ intros.
 unfold app_gr_inv.
 revert E.
 induction g as [ M Hrm | | ]; intros; simpl.
- intros p; simpl.
- split; intros H.
-  destruct H as (u & (v & Hv & Hvu) & Hu).
-  rewrite <- Hvu, <- mat_vec_mul_assoc in Hu.
-  destruct Hrm as (Htr, Hdet).
-  apply mat_mul_id_comm in Htr.
-  rewrite Htr, mat_vec_mul_id in Hu.
-  now rewrite <- Hu.
-
-  exists (M * p)%vec.
-  split; [ now exists p; split | ].
-  rewrite <- mat_vec_mul_assoc.
-  destruct Hrm as (Htr, Hdet).
-  apply mat_mul_id_comm in Htr.
-  now rewrite Htr, mat_vec_mul_id.
+ now apply set_map_mul_transp.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
@@ -181,13 +189,8 @@ intros.
 unfold app_gr_inv.
 revert E.
 induction g as [ M Hrm | | ]; intros; simpl.
-bbb.
-  ============================
-  (set_map (mat_vec_mul M) (set_map (mat_vec_mul (mat_transp M)) E) = E)%S
-bbb.
-
- intros p; simpl.
- now rewrite negf_involutive, rotate_rotate_neg.
+ apply set_map_mul_transp.
+ now apply rotation_transp_is_rotation.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
@@ -212,6 +215,7 @@ Theorem app_gr_app_gr_vec : ∀ g E p, p ∈ app_gr g E → app_gr_vec g p ∈ E
 Proof.
 intros * Hp.
 revert E p Hp.
+bbb.
 induction g; intros; [ easy | now destruct p | ].
 simpl in Hp; simpl.
 apply IHg1 in Hp.
