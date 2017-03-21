@@ -5453,7 +5453,9 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
           simpl; do 2 rewrite match_id.
           apply intersection_empty_l.
 
-     idtac.
+     constructor.
+About Gr.
+
 bbb.
   ((S₂ ∖ E) ∩ ρE = ∅)%S
 bbb.
