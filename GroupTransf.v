@@ -16,8 +16,6 @@ Inductive Gr :=
   | Xtransl : ℝ → Gr
   | Comb : Gr → Gr → Gr.
 
-Definition set_map {A B} (f : A → B) s := mkset (λ v, ∃ u, u ∈ s ∧ f u = v).
-
 Fixpoint app_gr f p :=
   match f with
   | Rot M Hrm => set_map (mat_vec_mul M) p
@@ -27,28 +25,14 @@ Fixpoint app_gr f p :=
 
 Fixpoint app_gr_vec f p :=
   match f with
-  | Rot M Hrm => (M * p)%vec (* was rotate (negf e) p, why negf? *)
+  | Rot M Hrm => (mat_transp M * p)%vec
   | Xtransl dx => match p with V x y z => V (x - dx) y z end
   | Comb g h => app_gr_vec h (app_gr_vec g p)
   end.
 
-Theorem inv_is_rotation_matrix : ∀ M,
-  is_rotation_matrix M
-  → is_rotation_matrix (mat_inv M).
-Proof.
-intros M Hrm.
-bbb.
-
 Fixpoint gr_inv f :=
   match f with
-  | Rot M Hrm => Rot (mat_inv M) (inv_is_rotation_matrix _ Hrm)
-  | Xtransl dx => Xtransl (-dx)
-  | Comb g h => Comb (gr_inv h) (gr_inv g)
-  end.
-
-Fixpoint gr_inv f :=
-  match f with
-  | Rot e => Rot (negf e)
+  | Rot M Hrm => Rot (mat_transp M) (rotation_transp_is_rotation _ Hrm)
   | Xtransl dx => Xtransl (-dx)
   | Comb g h => Comb (gr_inv h) (gr_inv g)
   end.
@@ -61,7 +45,8 @@ Theorem gr_subst : ∀ g E F,
 Proof.
 intros * HEF * HE.
 revert E F p HEF HE.
-induction g as [ e| dx | g IHg h IHh]; intros.
+induction g as [ M Hrm| dx | g IHg h IHh]; intros.
+bbb.
  apply HEF, HE.
 
  destruct p as (x, y, z).

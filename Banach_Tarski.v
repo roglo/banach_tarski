@@ -4008,50 +4008,6 @@ assert (Hrp : ∀ p, p ∈ sphere r → /r ⁎ p ∈ sphere 1).
 Qed.
 *)
 
-Theorem mat_mul_id_comm : ∀ M M',
-  (M * M')%mat = mat_id
-  → (M' * M)%mat = mat_id.
-Proof.
-intros * HMM'.
-generalize HMM'; intros H.
-apply (f_equal (mat_mul (mat_compl M))) in H.
-rewrite mat_mul_id_r in H.
-rewrite mat_mul_assoc in H.
-rewrite mat_mul_compl_l in H.
-rewrite <- mat_const_mul_distr_l in H.
-rewrite mat_mul_id_l in H.
-apply (f_equal mat_det) in HMM'.
-rewrite mat_det_id in HMM'.
-rewrite mat_det_mul_distr in HMM'.
-destruct (Req_dec (mat_det M) 0) as [Hd| Hd].
- rewrite Hd, Rmult_0_l in HMM'; lra.
-
- apply (f_equal (mat_const_mul (/ mat_det M))) in H.
- rewrite mat_const_mul_assoc in H.
- rewrite Rinv_l in H; [ | easy ].
- rewrite mat_const_mul_1_l in H.
- rewrite H.
- rewrite <- mat_const_mul_distr_l.
- rewrite mat_mul_compl_l.
- rewrite mat_const_mul_assoc.
- rewrite Rinv_l; [ | easy ].
- now rewrite mat_const_mul_1_l.
-Qed.
-
-Theorem rotation_transp_is_rotation : ∀ M,
-  is_rotation_matrix M → is_rotation_matrix (mat_transp M).
-Proof.
-intros M HM.
-destruct HM as (Htr, Hdet).
-split.
- rewrite mat_transp_involutive.
- now apply mat_mul_id_comm.
-
- clear Htr.
- unfold mat_det in Hdet; simpl in Hdet.
- unfold mat_det, mat_transp; simpl; lra.
-Qed.
-
 (*
 (* Given an axis (a point p) and two points p₁ and p₂, there is at most
    one rotation around this axis, transforming p₁ into p₂. Zero if p₁ and

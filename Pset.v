@@ -43,6 +43,8 @@ Notation "'⋃' Es" := (union_list Es) (at level 55).
 Notation "E .[ i ]" := (List.nth i E ∅)
   (at level 1, format "'[' E '[' .[ i ] ']' ']'").
 
+Definition set_map {A B} (f : A → B) s := mkset (λ v, ∃ u, u ∈ s ∧ f u = v).
+
 Theorem set_eq_refl A : reflexive (set A) set_eq.
 Proof. now intros P x; split. Qed.
 
