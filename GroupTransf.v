@@ -16,13 +16,8 @@ Inductive Gr :=
   | Xtransl : ℝ → Gr
   | Comb : Gr → Gr → Gr.
 
-Definition set_map {A B} (f : A → B) s := mkset (λ v, f v ∈ s).
+Definition set_map {A B} (f : A → B) s := mkset (λ v, ∃ u, u ∈ s ∧ f u = v).
 
-(* this is strange: I can make a set by set_map, but it does not apply the
-   function of the elements of the set: rather, it creates a set whose
-   application of the function is an element of the set; for the rotation,
-   it means that set_map applies the *inverse* rotation of all elements of
-   the set! *)
 Fixpoint app_gr f p :=
   match f with
   | Rot M Hrm => set_map (mat_vec_mul M) p
