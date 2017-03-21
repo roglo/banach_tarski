@@ -257,10 +257,7 @@ intros.
 unfold app_gr_inv.
 revert E.
 induction g as [ M Hrm | | ]; intros.
-bbb.
- intros p; simpl.
- rewrite negf_involutive.
- now rewrite rotate_rotate_neg.
+ now apply set_map_mul_transp, rotation_transp_is_rotation.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
@@ -277,10 +274,8 @@ Proof.
 intros.
 unfold app_gr_inv.
 revert E.
-induction g; intros.
- intros p; simpl.
- rewrite negf_involutive.
- now rewrite rotate_neg_rotate.
+induction g as [ M Hrm | | ]; intros.
+ now apply set_map_mul_transp.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
@@ -296,7 +291,11 @@ Theorem group_intersection_distr : ∀ g E F,
 Proof.
 intros.
 revert E F.
-induction g; intros; [ easy | now intros (x, y, z) | ].
+induction g; intros.
+ simpl.
+bbb.
+
+; [ easy | now intros (x, y, z) | ].
 intros p; simpl; now rewrite IHg2, IHg1.
 Qed.
 
