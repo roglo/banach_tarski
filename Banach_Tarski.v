@@ -5346,9 +5346,9 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
   specialize (Hjc _ H) as (n, Hjc).
   now specialize (Hn n).
 
-  remember (matrix_of_axis_angle (p₁, s, c)) as M eqn:HM.
+  remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
   remember (sphere ‖p₁‖) as S₂ eqn:HS₂.
-  remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((M ^ n)%mat * p₀)%vec))
+  remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((ρ ^ n)%mat * p₀)%vec))
     as E eqn:HE.
   assert (Hpart : is_partition S₂ [E; S₂ ∖ E]).
    split.
@@ -5362,7 +5362,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
      destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
      subst S₂ v.
      apply on_sphere_after_rotation; [ easy | ].
-     apply mat_pow_is_rotation_matrix; rewrite HM.
+     apply mat_pow_is_rotation_matrix; rewrite Hρ.
      apply matrix_of_axis_angle_is_rotation_matrix; [ | easy ].
      intros H; apply Hpnd; rewrite H; simpl.
      exists (ạ :: []), 0%vec.
@@ -5403,7 +5403,14 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         simpl; do 2 rewrite match_id.
         apply intersection_empty_l.
 
-   idtac.
+   remember (mkset (λ p, ∃ p', p' = (ρ * p)%vec)) as ρE eqn:HρE.
+   assert (equidecomposable S₂ (ρE ∪ (S₂ ∖ E))).
+    unfold equidecomposable.
+    exists [E; S₂ ∖ E], [ρE; S₂ ∖ E].
+    split; [ easy | ].
+    split.
+     split; [ now simpl; rewrite union_empty_r | ].
+     intros i j Hij.
 bbb.
 Check mat_eq_dec.
  assert
