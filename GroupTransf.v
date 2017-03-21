@@ -46,8 +46,8 @@ Proof.
 intros * HEF * HE.
 revert E F p HEF HE.
 induction g as [ M Hrm| dx | g IHg h IHh]; intros.
-bbb.
- apply HEF, HE.
+ destruct HE as (u & HuE & HMu).
+ now exists u; split; [ apply HEF | ].
 
  destruct p as (x, y, z).
  apply HEF, HE.
@@ -146,9 +146,22 @@ Proof.
 intros.
 unfold app_gr_inv.
 revert E.
-induction g; intros; simpl.
+induction g as [ M Hrm | | ]; intros; simpl.
  intros p; simpl.
- now rewrite negf_involutive, rotate_neg_rotate.
+ split; intros H.
+  destruct H as (u & (v & Hv & Hvu) & Hu).
+  rewrite <- Hvu, <- mat_vec_mul_assoc in Hu.
+  destruct Hrm as (Htr, Hdet).
+  apply mat_mul_id_comm in Htr.
+  rewrite Htr, mat_vec_mul_id in Hu.
+  now rewrite <- Hu.
+
+  exists (M * p)%vec.
+  split; [ now exists p; split | ].
+  rewrite <- mat_vec_mul_assoc.
+  destruct Hrm as (Htr, Hdet).
+  apply mat_mul_id_comm in Htr.
+  now rewrite Htr, mat_vec_mul_id.
 
  intros (x, y, z); simpl.
  unfold Rminus; rewrite Ropp_involutive.
@@ -167,7 +180,12 @@ Proof.
 intros.
 unfold app_gr_inv.
 revert E.
-induction g; intros; simpl.
+induction g as [ M Hrm | | ]; intros; simpl.
+bbb.
+  ============================
+  (set_map (mat_vec_mul M) (set_map (mat_vec_mul (mat_transp M)) E) = E)%S
+bbb.
+
  intros p; simpl.
  now rewrite negf_involutive, rotate_rotate_neg.
 
