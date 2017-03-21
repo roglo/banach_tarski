@@ -5411,15 +5411,52 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     split.
      split; [ now simpl; rewrite union_empty_r | ].
      intros i j Hij.
-     destruct i.
-      destruct j; [ easy | ].
-      destruct j.
-       simpl.
-       split; intros H.
-        simpl in H.
-        destruct H as (HxρE & HxS₂ & HxnE).
-        rewrite HρE in HxρE; simpl in HxρE.
-        destruct HxρE as (v & Hv & Hxv).
+     assert (H : (ρE ∩ (S₂ ∖ E) = ∅)%S).
+      split; intros H; [ | easy ].
+      simpl in H.
+      destruct H as (HxρE & HxS₂ & HxnE).
+      rewrite HρE in HxρE; simpl in HxρE.
+      destruct HxρE as (v & Hv & Hxv).
+      rewrite Hxv in HxnE.
+      exfalso; apply HxnE; clear HxnE.
+      rewrite HE in Hv |-*.
+      simpl in Hv; simpl.
+      destruct Hv as (p₀ & n & Hv).
+      exists p₀, (S n).
+      destruct Hv as (((el & p₂ & Hel) & Hp₀) & Hv).
+      split.
+       now split; [ exists el, p₂ | ].
+
+       rewrite Hv, <- mat_vec_mul_assoc.
+       now rewrite <- mat_pow_succ.
+
+      destruct i.
+       destruct j; [ easy | ].
+       destruct j; [ easy | ].
+       simpl; rewrite match_id.
+       apply intersection_empty_r.
+
+       destruct i.
+        destruct j; [ now rewrite intersection_comm | ].
+        destruct j; [ easy | ].
+        simpl; rewrite match_id.
+        apply intersection_empty_r.
+
+        destruct j.
+         simpl; rewrite match_id.
+         apply intersection_empty_l.
+
+         destruct j.
+          simpl; rewrite match_id.
+          apply intersection_empty_l.
+
+          simpl; do 2 rewrite match_id.
+          apply intersection_empty_l.
+
+     idtac.
+bbb.
+  ((S₂ ∖ E) ∩ ρE = ∅)%S
+bbb.
         rewrite HE in Hv; simpl in Hv.
         destruct Hv as (p₀ & n & (Hel & Hvp)).
         rewrite Hvp in Hxv.
