@@ -140,6 +140,14 @@ Qed.
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
 Proof. easy. Qed.
 
+Theorem rotation_mat_mul_transp_l : ∀ M,
+  is_rotation_matrix M →
+  (mat_transp M * M)%mat = mat_id.
+Proof.
+intros M (Htr, Hdet).
+now apply mat_mul_id_comm in Htr.
+Qed.
+
 Theorem set_map_mul_transp : ∀ M E,
   is_rotation_matrix M
   → (set_map (mat_vec_mul (mat_transp M)) (set_map (mat_vec_mul M) E) = E)%S.
@@ -149,17 +157,15 @@ intros p; simpl.
 split; intros H.
  destruct H as (u & (v & Hv & Hvu) & Hu).
  rewrite <- Hvu, <- mat_vec_mul_assoc in Hu.
- destruct Hrm as (Htr, Hdet).
- apply mat_mul_id_comm in Htr.
- rewrite Htr, mat_vec_mul_id in Hu.
+ rewrite rotation_mat_mul_transp_l in Hu; [ | easy ].
+ rewrite mat_vec_mul_id in Hu.
  now rewrite <- Hu.
 
  exists (M * p)%vec.
  split; [ now exists p; split | ].
  rewrite <- mat_vec_mul_assoc.
- destruct Hrm as (Htr, Hdet).
- apply mat_mul_id_comm in Htr.
- now rewrite Htr, mat_vec_mul_id.
+ rewrite rotation_mat_mul_transp_l; [ | easy ].
+ apply mat_vec_mul_id.
 Qed.
 
 Theorem app_gr_inv_l : ∀ g E,
@@ -215,11 +221,18 @@ Theorem app_gr_app_gr_vec : ∀ g E p, p ∈ app_gr g E → app_gr_vec g p ∈ E
 Proof.
 intros * Hp.
 revert E p Hp.
-bbb.
-induction g; intros; [ easy | now destruct p | ].
-simpl in Hp; simpl.
-apply IHg1 in Hp.
-now apply IHg2 in Hp.
+induction g as [ M Hrm | | ]; intros.
+ simpl in Hp; simpl.
+ destruct Hp as (u & Hu & Hmu).
+ rewrite <- Hmu, <- mat_vec_mul_assoc.
+ rewrite rotation_mat_mul_transp_l; [ | easy ].
+ now rewrite mat_vec_mul_id.
+
+ now destruct p.
+
+ simpl in Hp; simpl.
+ apply IHg1 in Hp.
+ now apply IHg2 in Hp.
 Qed.
 
 Theorem app_gr_empty_set : ∀ f, (app_gr f ∅ = ∅)%S.
@@ -227,10 +240,14 @@ Proof.
 intros * p.
 split; intros H; [ | easy ].
 revert p H.
-induction f; intros; try easy; [ now destruct p | ].
-simpl in H.
-eapply gr_subst in H; [ now apply IHf1 in H | ].
-split; [ apply IHf2 | easy ].
+induction f as [ M Hrm | | ]; intros.
+ now destruct H.
+
+ now destruct p.
+
+ simpl in H.
+ eapply gr_subst in H; [ now apply IHf1 in H | ].
+ split; [ apply IHf2 | easy ].
 Qed.
 
 Theorem app_gr_app_gr_inv : ∀ E g,
@@ -239,7 +256,8 @@ Proof.
 intros.
 unfold app_gr_inv.
 revert E.
-induction g; intros.
+induction g as [ M Hrm | | ]; intros.
+bbb.
  intros p; simpl.
  rewrite negf_involutive.
  now rewrite rotate_rotate_neg.
