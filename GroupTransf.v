@@ -309,9 +309,10 @@ Theorem group_union_distr : ∀ g E F,
 Proof.
 intros.
 revert E F.
-bbb.
-induction g; intros; [ easy | now intros (x, y, z) | ].
-now intros p; simpl; rewrite IHg2, IHg1.
+induction g; intros.
+ apply set_map_union_distr.
+ now intros (x, y, z).
+ now intros p; simpl; rewrite IHg2, IHg1.
 Qed.
 
 Theorem group_union_list_distr : ∀ f EL,
@@ -337,6 +338,7 @@ intros.
 split; intros HEF.
  revert E F HEF.
  induction g as [e| dx| ]; intros.
+bbb.
   intros p Hp; now apply HEF.
 
   intros (x, y, z) Hp; now apply HEF.

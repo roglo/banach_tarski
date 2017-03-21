@@ -61,6 +61,18 @@ split; intros H.
  now exists ae.
 Qed.
 
+Theorem set_map_union_distr : ∀ A B E F (f : A → B),
+  (set_map f (E ∪ F) = set_map f E ∪ set_map f F)%S.
+Proof.
+intros; intros b.
+split; intros H.
+ now destruct H as (a & [Hae| Haf] & Hf); [ left | right ]; exists a.
+
+ destruct H as [(a & Hae & Hf)| (a & Haf & Hf)].
+  now exists a; split; [ left | ].
+  now exists a; split; [ right | ].
+Qed.
+
 Theorem set_eq_refl A : reflexive (set A) set_eq.
 Proof. now intros P x; split. Qed.
 
