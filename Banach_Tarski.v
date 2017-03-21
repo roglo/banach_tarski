@@ -5403,7 +5403,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         simpl; do 2 rewrite match_id.
         apply intersection_empty_l.
 
-   remember (mkset (λ p, ∃ p', p' = (ρ * p)%vec)) as ρE eqn:HρE.
+   remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
    assert (equidecomposable S₂ (ρE ∪ (S₂ ∖ E))).
     unfold equidecomposable.
     exists [E; S₂ ∖ E], [ρE; S₂ ∖ E].
@@ -5411,6 +5411,25 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
     split.
      split; [ now simpl; rewrite union_empty_r | ].
      intros i j Hij.
+     destruct i.
+      destruct j; [ easy | ].
+      destruct j.
+       simpl.
+       split; intros H.
+        simpl in H.
+        destruct H as (HxρE & HxS₂ & HxnE).
+        rewrite HρE in HxρE; simpl in HxρE.
+        destruct HxρE as (v & Hv & Hxv).
+        rewrite HE in Hv; simpl in Hv.
+        destruct Hv as (p₀ & n & (Hel & Hvp)).
+        rewrite Hvp in Hxv.
+        rewrite <- mat_vec_mul_assoc in Hxv.
+        rewrite <- mat_pow_succ in Hxv.
+        exfalso; apply HxnE; rewrite Hxv.
+        rewrite HE.
+        exists p₀, (S n).
+        split; [ | easy ].
+
 bbb.
 Check mat_eq_dec.
  assert
