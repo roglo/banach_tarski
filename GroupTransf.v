@@ -337,9 +337,9 @@ Proof.
 intros.
 split; intros HEF.
  revert E F HEF.
- induction g as [e| dx| ]; intros.
-bbb.
-  intros p Hp; now apply HEF.
+ induction g as [M Hrm| dx| ]; intros.
+  intros u (v & Hv & Hm).
+  now exists v; split; [ apply HEF | ].
 
   intros (x, y, z) Hp; now apply HEF.
 
@@ -348,6 +348,7 @@ bbb.
  intros p Hp.
  revert p E F HEF Hp.
  induction g as [e| dx| ]; intros.
+bbb.
   pose proof HEF (rotate e p) as H; simpl in H.
   rewrite rotate_neg_rotate in H; apply H, Hp.
 
