@@ -45,6 +45,19 @@ Notation "E .[ i ]" := (List.nth i E ∅)
 
 Definition set_map {A B} (f : A → B) s := mkset (λ v, ∃ u, u ∈ s ∧ f u = v).
 
+Add Parametric Morphism {A B f} : (@set_map A B f)
+  with signature set_eq ==> set_eq
+  as set_map_morph.
+Proof.
+intros E F HEF b.
+split; intros H.
+ destruct H as (a & Ha & Hf).
+ now exists a; split; [ apply HEF in Ha | ].
+
+ destruct H as (a & Ha & Hf).
+ now exists a; split; [ apply HEF in Ha | ].
+Qed.
+
 Theorem set_map_inter_distr : ∀ A B E F (f : A → B),
   FinFun.Injective f
   → (set_map f (E ∩ F) = set_map f E ∩ set_map f F)%S.

@@ -353,13 +353,6 @@ split; intros HEF.
   intros q Hq; eapply IHg1; eassumption.
 Qed.
 
-Add Parametric Morphism {A B f} : (@set_map A B f)
-  with signature set_eq ==> set_eq
-  as set_map_morph.
-Proof.
-intros E F HEF.
-bbb.
-
 Theorem partition_group_map : ∀ (F : set vector) v g,
   is_partition F v → is_partition (app_gr g F) (map (app_gr g) v).
 Proof.
@@ -372,33 +365,26 @@ split.
    intros Hr.
    revert F HF Hr.
    induction v as [| v vl]; intros.
-    simpl in HF.
+    rewrite HF in Hr.
+    now destruct Hr.
+
+    simpl in HF; simpl.
+    generalize Hr; intros H.
 bbb.
-rewrite HF in Hr.
+    apply HF in H; simpl in H.
+    destruct H as [H| H]; [ now left | right ].
+    eapply IHvl; [ | easy | eassumption ].
+    intros i j Hij.
+    unfold set_eq; simpl; intros y.
+    assert (HSij : S i ≠ S j).
+     intros HSij; now apply Hij, Nat.succ_inj.
 
-  rewrite toto in Hr; [ | eassumption ].
-  now destruct Hr.
+     pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
+     destruct HP as (HQ, _).
+     split; [ intros (HPi, HPj) | easy ].
+     apply HQ; now split.
 
 bbb.
-    simpl in Hr.
-bbb.
-
-   induction v as [| v vl]; intros; [ now apply HF in Hr | ].
-   simpl in HF; simpl.
-   generalize Hr; intros H.
-   apply HF in H; simpl in H.
-   destruct H as [H| H]; [ now left | right ].
-   eapply IHvl; [ | easy | eassumption ].
-   intros i j Hij.
-   unfold set_eq; simpl; intros y.
-   assert (HSij : S i ≠ S j).
-    intros HSij; now apply Hij, Nat.succ_inj.
-
-    pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
-    destruct HP as (HQ, _).
-    split; [ intros (HPi, HPj) | easy ].
-    apply HQ; now split.
-
    intros Hme.
    revert F HF.
    induction v as [| v vl]; intros; [ easy | ].
