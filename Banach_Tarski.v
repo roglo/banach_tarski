@@ -5451,6 +5451,15 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         now rewrite mat_vec_mul_assoc, <- Hu.
 
         unfold J in Hj.
+        remember J₀ as a; simpl in Hj; subst a.
+        intros Hvn.
+        apply Hj; clear Hj.
+        rewrite HE in Hu.
+        remember D as d; remember intersection as b.
+        simpl in Hu; subst d b.
+        destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
+(* this θ₀ is a rotation from p₀ to v... *)
+Print J₀.
 bbb.
 Check mat_eq_dec.
  assert
