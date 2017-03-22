@@ -5436,29 +5436,19 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
        apply app_gr_ident.
 
      assert (ρE = E ∖ D)%S.
-bbb.
-
       intros v.
       split; intros H.
        rewrite HρE in H.
        destruct H as (u & Hu & Hv).
-       rewrite Hv.
        remember D as d; simpl; subst d.
        split.
-        rewrite HE in Hu; simpl in Hu.
-        destruct Hu as (p₀ & n & ((el & (p₂ & Hso & Hel)) & Hp₀) & Hu).
-        rewrite HE.
-        simpl.
-        exists u, 1%nat.
-        split; [ split | ].
-         exists el, p₂.
-bbb.
-         exists (ạ :: []), (rotate ạ u).
-         split; [ now exists (ạ :: []) | ].
-         split; [ easy | ].
-         simpl.
-
-
+        rewrite HE in Hu; rewrite HE.
+        remember D as d; remember intersection as b.
+        simpl in Hu; simpl; subst d b.
+        destruct Hu as (p₀ & n & Hp₀ & Hu).
+        exists p₀, (S n).
+        split; [ easy | simpl ].
+        now rewrite mat_vec_mul_assoc, <- Hu.
 
 bbb.
 Check mat_eq_dec.

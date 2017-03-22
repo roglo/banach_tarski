@@ -1635,3 +1635,6 @@ do 2 rewrite <- mat_vec_mul_assoc in Huv.
 rewrite rotation_mat_mul_transp_l in Huv; [ | easy ].
 now do 2 rewrite mat_vec_mul_id in Huv.
 Qed.
+
+Theorem mat_pow_1 : ∀ M, (M ^ 1)%mat = M.
+Proof. intros; apply mat_mul_id_r. Qed.
