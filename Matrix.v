@@ -371,6 +371,17 @@ rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
 f_equal; lra.
 Qed.
 
+Theorem mat_of_elem_mul_negf_r : ∀ e,
+  (mat_of_elem e * mat_of_elem (negf e) = mat_id)%mat.
+Proof.
+intros (t, d); simpl.
+destruct t, d; simpl.
+ apply rot_inv_rot_x.
+ apply rot_rot_inv_x.
+ apply rot_inv_rot_z.
+ apply rot_rot_inv_z.
+Qed.
+
 Definition mat_of_path el :=
   List.fold_right mat_mul mat_id (map mat_of_elem el).
 

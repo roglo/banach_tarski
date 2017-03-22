@@ -82,7 +82,27 @@ Proof.
 intros; intros v.
 split; intros H.
  exists (rotate (negf e) v).
- split.
+ split; [ easy | unfold rotate ].
+ rewrite <- mat_vec_mul_assoc.
+
+About mat_of_elem_mul_negf_r.
+
+bbb.
+Print Forall2.
+remember [xtransl 3 (rot ạ A₂); xtransl 6 A₃; xtransl 6 (rot ḅ A₄)] as toto.
+Require Import Datatypes.
+Set Printing All. Show.
+Check (@cons (set vector)).
+
+Add Parametric Morphism : (@cons (set vector))
+ with signature (λ v
+
+
+exfalso.
+rewrite glip in Heqtoto.
+
+
+rewrite glip.
 
 bbb.
  destruct H as (u & He & Hv).
