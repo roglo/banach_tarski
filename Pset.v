@@ -73,6 +73,20 @@ split; intros H.
   now exists a; split; [ right | ].
 Qed.
 
+Theorem in_set_map : ∀ A B x E (f : A → B),
+  x ∈ E → f x ∈ set_map f E.
+Proof. now intros * Hx; exists x. Qed.
+
+Theorem set_map_in : ∀ A B x E (f : A → B),
+  FinFun.Injective f
+  → f x ∈ set_map f E
+  → x ∈ E.
+Proof.
+intros * Hinj Hx.
+destruct Hx as (a & Ha & Hfa).
+now apply Hinj in Hfa; subst a.
+Qed.
+
 Theorem set_eq_refl A : reflexive (set A) set_eq.
 Proof. now intros P x; split. Qed.
 

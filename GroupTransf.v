@@ -140,14 +140,6 @@ Qed.
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
 Proof. easy. Qed.
 
-Theorem rotation_mat_mul_transp_l : ∀ M,
-  is_rotation_matrix M →
-  (mat_transp M * M)%mat = mat_id.
-Proof.
-intros M (Htr, Hdet).
-now apply mat_mul_id_comm in Htr.
-Qed.
-
 Theorem set_map_mul_transp : ∀ M E,
   is_rotation_matrix M
   → (set_map (mat_vec_mul (mat_transp M)) (set_map (mat_vec_mul M) E) = E)%S.
@@ -293,11 +285,7 @@ intros.
 revert E F.
 induction g; intros.
  apply set_map_inter_distr.
- intros u v Huv.
- apply (f_equal (mat_vec_mul (mat_transp M))) in Huv.
- do 2 rewrite <- mat_vec_mul_assoc in Huv.
- rewrite rotation_mat_mul_transp_l in Huv; [ | easy ].
- now do 2 rewrite mat_vec_mul_id in Huv.
+ now apply rot_mat_vec_mul_is_inj.
 
  now intros (x, y, z).
 
@@ -347,10 +335,12 @@ split; intros HEF.
 
  intros p Hp.
  revert p E F HEF Hp.
- induction g as [e| dx| ]; intros.
-bbb.
-  pose proof HEF (rotate e p) as H; simpl in H.
-  rewrite rotate_neg_rotate in H; apply H, Hp.
+ induction g as [M Hrm| dx| ]; intros.
+  simpl in HEF.
+  apply in_set_map with (f := mat_vec_mul M) in Hp.
+  specialize (HEF (mat_vec_mul M p) Hp).
+  apply set_map_in in HEF; [ easy | ].
+  now apply rot_mat_vec_mul_is_inj.
 
   destruct p as (x, y, z); simpl in HEF.
   pose proof HEF (V (x + dx) y z) as H; simpl in H.
@@ -363,6 +353,13 @@ bbb.
   intros q Hq; eapply IHg1; eassumption.
 Qed.
 
+Add Parametric Morphism {A B f} : (@set_map A B f)
+  with signature set_eq ==> set_eq
+  as set_map_morph.
+Proof.
+intros E F HEF.
+bbb.
+
 Theorem partition_group_map : ∀ (F : set vector) v g,
   is_partition F v → is_partition (app_gr g F) (map (app_gr g) v).
 Proof.
@@ -370,10 +367,22 @@ intros F v * HP.
 unfold is_partition in HP |-*.
 destruct HP as (HF, HP).
 split.
- induction g as [e| dx | g IHg h IHh ]; intros; simpl.
+ induction g as [M Hrm| dx | g IHg h IHh ]; intros; simpl.
   split.
    intros Hr.
    revert F HF Hr.
+   induction v as [| v vl]; intros.
+    simpl in HF.
+bbb.
+rewrite HF in Hr.
+
+  rewrite toto in Hr; [ | eassumption ].
+  now destruct Hr.
+
+bbb.
+    simpl in Hr.
+bbb.
+
    induction v as [| v vl]; intros; [ now apply HF in Hr | ].
    simpl in HF; simpl.
    generalize Hr; intros H.

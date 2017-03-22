@@ -1594,3 +1594,22 @@ rewrite vec_const_mul_1_l in H.
 rewrite Rsign_of_pos in H; [ now rewrite Rmult_1_l in H | ].
 now apply vec_norm_pos.
 Qed.
+
+Theorem rotation_mat_mul_transp_l : ∀ M,
+  is_rotation_matrix M →
+  (mat_transp M * M)%mat = mat_id.
+Proof.
+intros M (Htr, Hdet).
+now apply mat_mul_id_comm in Htr.
+Qed.
+
+Theorem rot_mat_vec_mul_is_inj : ∀ M,
+  is_rotation_matrix M
+  → FinFun.Injective (mat_vec_mul M).
+Proof.
+intros M Hrm u v Huv.
+apply (f_equal (mat_vec_mul (mat_transp M))) in Huv.
+do 2 rewrite <- mat_vec_mul_assoc in Huv.
+rewrite rotation_mat_mul_transp_l in Huv; [ | easy ].
+now do 2 rewrite mat_vec_mul_id in Huv.
+Qed.
