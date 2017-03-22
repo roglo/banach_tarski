@@ -4818,6 +4818,16 @@ Definition J_of_nat axis n : (ℝ * ℝ) :=
   let cosθ := cos ((acos cosθ₀ + 2 * IZR nk * PI) / INR nn) in
   (sinθ, cosθ).
 
+Theorem z_of_nat_inv : ∀ k, z_of_nat (nat_of_z k) = k.
+Proof.
+intros.
+unfold z_of_nat, nat_of_z.
+destruct (Z_lt_dec k 0) as [Hk | Hk].
+ destruct (zerop (Z.to_nat (- k * 2 - 1) mod 2)) as [Hz| Hz].
+  rewrite Zdiv.div_Zdiv; [ | easy ].
+  rewrite Z2Nat.id; [ simpl | lia ].
+bbb.
+
 Theorem J_is_countable : ∀ axis,
   axis ∉ D
   → (- axis)%vec ∉ D
@@ -4834,9 +4844,8 @@ remember (nat_of_prod_nat (nk, n)) as n₂ eqn:Hn₂.
 remember (nat_of_prod_nat (nj, n₂)) as m eqn:Hm.
 exists m; subst m n₂.
 do 2 rewrite prod_nat_of_nat_inv.
-rewrite Hnj.
-bbb.
-
+rewrite Hnj, Hk.
+rewrite z_of_nat_inv.
 now f_equal.
 Qed.
 
