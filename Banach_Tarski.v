@@ -5366,7 +5366,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
          apply intersection_empty_l.
 
     remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
-    assert (equidecomposable S₂ (ρE ∪ (S₂ ∖ E))).
+    assert (Hdec : equidecomposable S₂ (ρE ∪ (S₂ ∖ E))).
      unfold equidecomposable.
      exists [E; S₂ ∖ E], [ρE; S₂ ∖ E].
      split; [ easy | ].
@@ -5436,6 +5436,26 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
        apply app_gr_ident.
 
      assert (ρE = E ∖ D)%S.
+      intros v.
+      split; intros H.
+       rewrite HρE in H.
+       destruct H as (u & Hu & Hv).
+       rewrite Hv.
+       remember D as d; simpl; subst d.
+       split.
+        rewrite HE.
+        simpl.
+
+bbb.
+        exists u, 1%nat.
+        split; [ split | ].
+         exists (ạ :: []), (rotate ạ u).
+         split; [ now exists (ạ :: []) | ].
+         split; [ easy | ].
+         simpl.
+
+
+
 bbb.
 Check mat_eq_dec.
  assert
