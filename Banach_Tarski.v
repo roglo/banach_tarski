@@ -5450,6 +5450,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         split; [ easy | simpl ].
         now rewrite mat_vec_mul_assoc, <- Hu.
 
+        unfold J in Hj.
 bbb.
 Check mat_eq_dec.
  assert
