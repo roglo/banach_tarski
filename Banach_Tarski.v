@@ -5458,7 +5458,9 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         remember D as d; remember intersection as b.
         simpl in Hu; subst d b.
         destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
-(* this θ₀ is a rotation from p₀ to v... *)
+        rewrite Hv, Hu in Hvn.
+        rewrite <- mat_vec_mul_assoc in Hvn.
+        replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hvn by easy.
 Print J₀.
 bbb.
 Check mat_eq_dec.
