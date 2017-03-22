@@ -648,3 +648,19 @@ Proof.
 intros.
 eapply r_decomposed_2; eassumption.
 Qed.
+
+Theorem rot_set_map_mul : ∀ e E,
+  (rot e E = set_map (mat_vec_mul (mat_of_elem e)) E)%S.
+Proof.
+intros; intros v.
+split; intros H.
+ exists (rotate (negf e) v).
+ split; [ easy | unfold rotate ].
+ rewrite <- mat_vec_mul_assoc.
+ now rewrite mat_of_elem_mul_negf_r, mat_vec_mul_id.
+
+ destruct H as (u & Hu & Hv).
+ rewrite <- Hv; simpl; unfold rotate.
+ rewrite <- mat_vec_mul_assoc.
+ now rewrite mat_of_elem_mul_negf_l, mat_vec_mul_id.
+Qed.

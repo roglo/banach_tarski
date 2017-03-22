@@ -36,6 +36,8 @@ unfold Rabs in H3, H6.
 destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
 Qed.
 
+Definition rot_elem e := Rot (mat_of_elem e) (rotate_is_rotation_matrix e).
+
 Theorem Banach_Tarski_paradox_but_fixpoints :
   equidecomposable ball_but_fixpoints
     (xtransl 3 ball_but_fixpoints ∪ xtransl 6 ball_but_fixpoints)%S.
@@ -75,47 +77,12 @@ split.
    now apply (Rno_intersect_balls_x3_x6 x y z).
 
   constructor; [ now exists (Xtransl 3) | ].
-Definition rot_elem e := Rot (mat_of_elem e) (rotate_is_rotation_matrix e).
-Theorem glip : ∀ e E,
-  (rot e E = set_map (mat_vec_mul (mat_of_elem e)) E)%S.
-Proof.
-intros; intros v.
-split; intros H.
- exists (rotate (negf e) v).
- split; [ easy | unfold rotate ].
- rewrite <- mat_vec_mul_assoc.
-
-About mat_of_elem_mul_negf_r.
-
-bbb.
-Print Forall2.
-remember [xtransl 3 (rot ạ A₂); xtransl 6 A₃; xtransl 6 (rot ḅ A₄)] as toto.
-Require Import Datatypes.
-Set Printing All. Show.
-Check (@cons (set vector)).
-
-Add Parametric Morphism : (@cons (set vector))
- with signature (λ v
-
-
-exfalso.
-rewrite glip in Heqtoto.
-
-
-rewrite glip.
-
-bbb.
- destruct H as (u & He & Hv).
- rewrite <- Hv; simpl.
- unfold rotate.
- rewrite <- mat_vec_mul_assoc.
-bbb.
-  constructor; [ now exists (Comb (Xtransl 3) (rot_elem ạ)); rewrite glip | ].
-bbb.
-  constructor; [ now exists (Comb (Xtransl 3) (Rot ạ)) | ].
-  constructor; [ now exists (Xtransl 6) | ].
-  constructor; [ now exists (Comb (Xtransl 6) (Rot ḅ)) | ].
   constructor.
+   now exists (Comb (Xtransl 3) (rot_elem ạ)); rewrite rot_set_map_mul.
+
+   constructor; [ now exists (Xtransl 6) | ].
+   constructor; [ | constructor ].
+   now exists (Comb (Xtransl 6) (rot_elem ḅ)); rewrite rot_set_map_mul.
 Qed.
 
 Check Banach_Tarski_paradox_but_fixpoints.
