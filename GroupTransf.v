@@ -498,27 +498,24 @@ split.
  apply Hpi; clear Hpi.
  split.
   clear - Hi.
-bbb.
-  rename v into Ql.
-  revert p Ql Hi.
+  revert p EL Hi.
   induction i; intros.
-   destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hi | ].
+   destruct EL as [| E EL]; [ now apply app_gr_empty_set in Hi | ].
    simpl in Hi; simpl.
    now apply app_gr_app_gr_vec.
 
-   destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hi | ].
+   destruct EL as [| E EL]; [ now apply app_gr_empty_set in Hi | ].
    simpl in Hi; simpl.
    now apply IHi.
 
   clear - Hj.
-  rename v into Ql.
-  revert p Ql Hj.
+  revert p EL Hj.
   induction j; intros.
-   destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hj | ].
+   destruct EL as [| E EL]; [ now apply app_gr_empty_set in Hj | ].
    simpl in Hj; simpl.
    now apply app_gr_app_gr_vec.
 
-   destruct Ql as [| Q Ql]; [ now apply app_gr_empty_set in Hj | ].
+   destruct EL as [| E EL]; [ now apply app_gr_empty_set in Hj | ].
    simpl in Hj; simpl.
    now apply IHj.
 Qed.
