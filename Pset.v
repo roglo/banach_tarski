@@ -86,6 +86,12 @@ split; intros H.
   now exists a; split; [ right | ].
 Qed.
 
+Theorem set_map_empty : ∀ A B (f : A → B), (set_map f ∅ = ∅)%S.
+Proof.
+intros; intros b.
+now split; intros H; destruct H.
+Qed.
+
 Theorem in_set_map : ∀ A B x E (f : A → B),
   x ∈ E → f x ∈ set_map f E.
 Proof. now intros * Hx; exists x. Qed.
@@ -440,4 +446,12 @@ as setp_morph.
 Proof.
 intros E F HEF x.
 apply HEF.
+Qed.
+
+Theorem set_map_union_list_distr : ∀ A B EL (f : A → B),
+  (set_map f (⋃ EL) = ⋃ (map (set_map f) EL))%S.
+Proof.
+intros.
+induction EL as [| E EL]; [ apply set_map_empty | simpl ].
+now rewrite set_map_union_distr, IHEL.
 Qed.
