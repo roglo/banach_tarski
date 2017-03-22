@@ -649,6 +649,14 @@ unfold atan.
 destruct (pre_atan (tan x)) as (y & Hy & Hyx).
 Check tan_is_inj.
 bbb.
+Search (tan (_ + _)).
+remember (frac_part (x / PI) * PI - PI / 2) as z eqn:Hz.
+Check tan_is_inj.
+assert (Htz : tan z = tan x).
+ subst z.
+Search (tan (_ - _)).
+ rewrite tan_minus.
+bbb.
 
 Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + 2 * IZR k * PI.
 Proof.
