@@ -4799,15 +4799,23 @@ Definition J axis :=
     (λ '(sinθ, cosθ),
     ∃ sinθ₀ cosθ₀ n k,
     (sinθ₀, cosθ₀) ∈ J₀ axis ∧
-    sinθ = sin ((asin sinθ₀ + 2 * INR k * PI) / INR n) ∧
-    cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n)).
+    sinθ = sin ((asin sinθ₀ + 2 * IZR k * PI) / INR n) ∧
+    cosθ = cos ((acos cosθ₀ + 2 * IZR k * PI) / INR n)).
+
+Definition z_of_nat n :=
+  if zerop (n mod 2) then Z.of_nat (n / 2)
+  else (- Z.of_nat (S n / 2))%Z.
+
+Definition nat_of_z z :=
+  if Z_lt_dec z 0 then Z.to_nat (- z * 2 - 1) else Z.to_nat (z * 2).
 
 Definition J_of_nat axis n : (ℝ * ℝ) :=
   let '(nj, n₂) := prod_nat_of_nat n in
-  let '(nk, nn) := prod_nat_of_nat n₂ in
+  let '(nnk, nn) := prod_nat_of_nat n₂ in
+  let nk := z_of_nat nnk in
   let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
-  let sinθ := sin ((asin sinθ₀ + 2 * INR nk * PI) / INR nn) in
-  let cosθ := cos ((acos cosθ₀ + 2 * INR nk * PI) / INR nn) in
+  let sinθ := sin ((asin sinθ₀ + 2 * IZR nk * PI) / INR nn) in
+  let cosθ := cos ((acos cosθ₀ + 2 * IZR nk * PI) / INR nn) in
   (sinθ, cosθ).
 
 Theorem J_is_countable : ∀ axis,
@@ -4821,11 +4829,14 @@ specialize (J₀_is_countable axis Had Hnad) as HJ.
 specialize (HJ (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hp & Hp' & Hmp)).
 unfold J_of_nat.
-remember (nat_of_prod_nat (k, n)) as n₂ eqn:Hn₂.
+remember (nat_of_z k) as nk eqn:Hk.
+remember (nat_of_prod_nat (nk, n)) as n₂ eqn:Hn₂.
 remember (nat_of_prod_nat (nj, n₂)) as m eqn:Hm.
 exists m; subst m n₂.
 do 2 rewrite prod_nat_of_nat_inv.
 rewrite Hnj.
+bbb.
+
 now f_equal.
 Qed.
 
@@ -5463,6 +5474,15 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hvn by easy.
         remember (sin (asin s * INR (S n))) as s₀ eqn:Hs₀.
         remember (cos (acos s * INR (S n))) as c₀ eqn:Hc₀.
+Theorem asin_sin : ∀ x, ∃ k, asin (sin x) = x + 2 * IZR k * PI.
+Proof.
+intros.
+Admitted. Show.
+        exists s₀, c₀.
+        rewrite Hs₀, Hc₀.
+        specialize (asin_sin (asin s * INR (S n))) as (k, Hs).
+        rewrite Hs.
+bbb.
         exists s₀, c₀, (S n), O.
         split.
 Focus 2.
@@ -5470,6 +5490,8 @@ split.
  rewrite Hs₀.
  rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
  remember (asin s * INR (S n)) as a.
+Check sin_asin.
+
  replace (asin (sin a)) with a.
   subst a.
   rewrite Rmult_div.
