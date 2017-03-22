@@ -5443,12 +5443,15 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
        rewrite Hv.
        remember D as d; simpl; subst d.
        split.
+        rewrite HE in Hu; simpl in Hu.
+        destruct Hu as (p₀ & n & ((el & (p₂ & Hso & Hel)) & Hp₀) & Hu).
         rewrite HE.
         simpl.
-
-bbb.
         exists u, 1%nat.
         split; [ split | ].
+         exists el, p₂.
+
+bbb.
          exists (ạ :: []), (rotate ạ u).
          split; [ now exists (ạ :: []) | ].
          split; [ easy | ].
