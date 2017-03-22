@@ -4802,13 +4802,6 @@ Definition J axis :=
     sinθ = sin ((asin sinθ₀ + 2 * IZR k * PI) / INR n) ∧
     cosθ = cos ((acos cosθ₀ + 2 * IZR k * PI) / INR n)).
 
-Definition z_of_nat n :=
-  if zerop (n mod 2) then Z.of_nat (n / 2)
-  else (- Z.of_nat (S n / 2))%Z.
-
-Definition nat_of_z z :=
-  if Z_lt_dec z 0 then Z.to_nat (- z * 2 - 1) else Z.to_nat (z * 2).
-
 Definition J_of_nat axis n : (ℝ * ℝ) :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
@@ -4817,39 +4810,6 @@ Definition J_of_nat axis n : (ℝ * ℝ) :=
   let sinθ := sin ((asin sinθ₀ + 2 * IZR nk * PI) / INR nn) in
   let cosθ := cos ((acos cosθ₀ + 2 * IZR nk * PI) / INR nn) in
   (sinθ, cosθ).
-
-Theorem z_of_nat_inv : ∀ k, z_of_nat (nat_of_z k) = k.
-Proof.
-intros.
-unfold z_of_nat, nat_of_z.
-destruct (Z_lt_dec k 0) as [Hk | Hk].
- destruct (zerop (Z.to_nat (- k * 2 - 1) mod 2)) as [Hz| Hz].
-  rewrite Zdiv.div_Zdiv; [ | easy ].
-  rewrite Z2Nat.id; [ simpl | lia ].
-  rewrite Z2Nat.inj_sub in Hz; [ simpl in Hz | easy ].
-  unfold Pos.to_nat in Hz; simpl in Hz.
-  rewrite Z2Nat.inj_mul in Hz; [ simpl in Hz | lia | lia ].
-  unfold Pos.to_nat in Hz; simpl in Hz.
-  destruct k as [| k| k]; [ lia | lia | ].
-  simpl in Hz.
-  rewrite <- Nat.mod_add with (b := 1%nat) in Hz; [ | lia ].
-  rewrite Nat.mul_1_l in Hz.
-  rewrite <- Nat.add_sub_swap in Hz; [ | lia ].
-  rewrite <- Nat.add_sub_assoc in Hz; [ | lia ].
-  simpl in Hz; rewrite Nat.add_comm in Hz.
-  rewrite Nat.mod_add in Hz; [ easy | lia ].
-
-  remember (Z.to_nat (- k * 2 - 1)) as n eqn:Hn.
-  remember (n mod 2) as m eqn:Hm.
-  symmetry in Hm.
-  destruct m; [ lia | clear Hz ].
-  destruct m.
-
-bbb.
-
-  destruct (zerop (n mod 2)) as [Hnz| Hnz]; [ rewrite Hnz in Hz; lia | ].
-
-bbb.
 
 Theorem J_is_countable : ∀ axis,
   axis ∉ D

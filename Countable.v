@@ -1,7 +1,7 @@
 (* Banach-Tarski paradox. *)
 (* Coq V8.6 *)
 
-Require Import Utf8 NPeano Bool Compare_dec.
+Require Import Utf8 NPeano Bool Compare_dec ZArith Psatz.
 Require Import Misc.
 
 Definition is_countable A := ∃ f : nat → A, FinFun.Surjective f.
@@ -43,6 +43,59 @@ rewrite nat_sqrt_add in Hs.
  simpl.
  rewrite Nat.add_0_r, Nat.add_assoc, Nat.add_comm.
  apply Nat.le_add_r.
+Qed.
+
+Definition z_of_nat n :=
+  if zerop (n mod 2) then Z.of_nat (n / 2)
+  else (- Z.of_nat (S n / 2))%Z.
+
+Definition nat_of_z z :=
+  if Z_lt_dec z 0 then Z.to_nat (- z * 2 - 1) else Z.to_nat (z * 2).
+
+Theorem z_of_nat_inv : ∀ k, z_of_nat (nat_of_z k) = k.
+Proof.
+intros.
+unfold z_of_nat, nat_of_z.
+destruct (Z_lt_dec k 0) as [Hk | Hk].
+ rewrite Z2Nat.inj_sub; [ simpl | easy ].
+ unfold Pos.to_nat; simpl.
+ rewrite <- nat_mod_add_once; [ | easy ].
+ rewrite <- Nat.add_sub_swap.
+  rewrite <- Nat.add_sub_assoc; [ simpl | lia ].
+  rewrite Z2Nat.inj_mul; [ simpl | lia | easy ].
+  unfold Pos.to_nat; simpl.
+  rewrite Nat.add_comm.
+  rewrite Nat.mod_add; [ simpl | easy ].
+  rewrite <- Nat.sub_succ_l.
+   rewrite Nat.sub_succ, Nat.sub_0_r.
+   rewrite Nat.div_mul; [ | easy ].
+   rewrite Z2Nat.id; [ | lia ].
+   now rewrite Z.opp_involutive.
+
+   remember (Z.to_nat (- k)) as n eqn:Hn.
+   destruct n; [ | lia ].
+   apply (f_equal Z.of_nat) in Hn.
+   rewrite Z2Nat.id in Hn; lia.
+
+  rewrite Z2Nat.inj_mul; [ simpl | lia | easy ].
+  unfold Pos.to_nat; simpl.
+  remember (- k)%Z as l eqn:Hl.
+  apply (f_equal Z.opp) in Hl.
+  rewrite Z.opp_involutive in Hl.
+  subst k; rename l into k; f_equal.
+  assert (H : (0 < k)%Z) by lia.
+  clear Hk; rename H into Hk.
+  remember (Z.to_nat k) as n eqn:Hn.
+  destruct n; [ | lia ].
+  apply (f_equal Z.of_nat) in Hn.
+  rewrite Z2Nat.id in Hn; lia.
+
+ apply Z.le_ngt in Hk.
+ rewrite Z2Nat.inj_mul; [ simpl | easy | easy ].
+ unfold Pos.to_nat; simpl.
+ rewrite Nat.mod_mul; [ simpl | easy ].
+ rewrite Nat.div_mul; [ | easy ].
+ now rewrite Z2Nat.id.
 Qed.
 
 Theorem countable_product_types : ∀ A B,
