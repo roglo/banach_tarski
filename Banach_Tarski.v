@@ -4826,6 +4826,29 @@ destruct (Z_lt_dec k 0) as [Hk | Hk].
  destruct (zerop (Z.to_nat (- k * 2 - 1) mod 2)) as [Hz| Hz].
   rewrite Zdiv.div_Zdiv; [ | easy ].
   rewrite Z2Nat.id; [ simpl | lia ].
+  rewrite Z2Nat.inj_sub in Hz; [ simpl in Hz | easy ].
+  unfold Pos.to_nat in Hz; simpl in Hz.
+  rewrite Z2Nat.inj_mul in Hz; [ simpl in Hz | lia | lia ].
+  unfold Pos.to_nat in Hz; simpl in Hz.
+  destruct k as [| k| k]; [ lia | lia | ].
+  simpl in Hz.
+  rewrite <- Nat.mod_add with (b := 1%nat) in Hz; [ | lia ].
+  rewrite Nat.mul_1_l in Hz.
+  rewrite <- Nat.add_sub_swap in Hz; [ | lia ].
+  rewrite <- Nat.add_sub_assoc in Hz; [ | lia ].
+  simpl in Hz; rewrite Nat.add_comm in Hz.
+  rewrite Nat.mod_add in Hz; [ easy | lia ].
+
+  remember (Z.to_nat (- k * 2 - 1)) as n eqn:Hn.
+  remember (n mod 2) as m eqn:Hm.
+  symmetry in Hm.
+  destruct m; [ lia | clear Hz ].
+  destruct m.
+
+bbb.
+
+  destruct (zerop (n mod 2)) as [Hnz| Hnz]; [ rewrite Hnz in Hz; lia | ].
+
 bbb.
 
 Theorem J_is_countable : ∀ axis,
