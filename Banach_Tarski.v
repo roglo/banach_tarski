@@ -5436,6 +5436,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
        apply app_gr_ident.
 
      assert (ρE = E ∖ D)%S.
+bbb.
+
       intros v.
       split; intros H.
        rewrite HρE in H.
@@ -5450,7 +5452,6 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         exists u, 1%nat.
         split; [ split | ].
          exists el, p₂.
-
 bbb.
          exists (ạ :: []), (rotate ạ u).
          split; [ now exists (ạ :: []) | ].
