@@ -83,7 +83,6 @@ intros; intros v.
 split; intros H.
  exists (rotate (negf e) v).
  split.
-Search (rotate _ _ ∈ _).
 
 bbb.
  destruct H as (u & He & Hv).
