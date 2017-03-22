@@ -640,6 +640,38 @@ unfold acos; rewrite cos_shift.
 now apply sin_asin.
 Qed.
 
+Theorem neg_cos_atan_tan : ∀ x,
+  cos x < 0
+  → ∃ k : ℤ, atan (tan x) = - x + 2 * IZR k * PI.
+Proof.
+intros * Hc.
+unfold atan.
+destruct (pre_atan (tan x)) as (y & Hy & Hyx).
+Check tan_is_inj.
+bbb.
+
+Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + 2 * IZR k * PI.
+Proof.
+intros * Hc.
+unfold asin.
+rewrite <- cos2.
+rewrite sqrt_Rsqr_abs.
+unfold Rabs.
+destruct (Rcase_abs (cos x)) as [Ha| Ha].
+ unfold Rdiv.
+ rewrite <- Ropp_inv_permute; [ | lra ].
+ rewrite <- Ropp_mult_distr_r.
+ rewrite fold_Rdiv.
+ fold (tan x).
+ rewrite atan_opp.
+ specialize (neg_cos_atan_tan _ Ha) as H.
+ destruct H as (k, Hk).
+ rewrite Hk.
+ exists (- k)%Z.
+ rewrite opp_IZR; lra.
+bbb.
+
+
 Theorem Rneq_le_lt : ∀ x y, x ≠ y → x ≤ y → x < y.
 Proof.
 intros * Hnxy Hxy.

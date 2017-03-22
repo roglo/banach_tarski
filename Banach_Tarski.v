@@ -5466,17 +5466,21 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hvn by easy.
         remember (sin (asin s * INR (S n))) as s₀ eqn:Hs₀.
         remember (cos (acos s * INR (S n))) as c₀ eqn:Hc₀.
-Theorem asin_sin : ∀ x, ∃ k, asin (sin x) = x + 2 * IZR k * PI.
-Proof.
-intros.
-Admitted. Show.
         exists s₀, c₀.
         rewrite Hs₀, Hc₀.
         specialize (asin_sin (asin s * INR (S n))) as (k, Hs).
         rewrite Hs.
+        exists (S n), (- k)%Z.
+        rewrite opp_IZR.
+        rewrite <- Ropp_mult_distr_r.
+        rewrite <- Ropp_mult_distr_l.
+        rewrite Rplus_assoc.
+        rewrite Rplus_opp_r, Rplus_0_r.
+        rewrite Rmult_div.
+        rewrite Rmult_div_same.
+        rewrite sin_asin.
+
 bbb.
-        exists s₀, c₀, (S n), O.
-        split.
 Focus 2.
 split.
  rewrite Hs₀.
