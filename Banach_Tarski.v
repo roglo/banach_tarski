@@ -75,6 +75,16 @@ split.
    now apply (Rno_intersect_balls_x3_x6 x y z).
 
   constructor; [ now exists (Xtransl 3) | ].
+constructor.
+Definition rot_elem e := Rot (mat_of_elem e) (rotate_is_rotation_matrix e).
+exists (Comb (Xtransl 3) (rot_elem ạ)).
+simpl.
+remember (SS ạ⁻¹ ∖ B).
+unfold A₂; simpl.
+unfold rot, set_map; simpl.
+unfold rotate.
+simpl.
+bbb.
   constructor; [ now exists (Comb (Xtransl 3) (Rot ạ)) | ].
   constructor; [ now exists (Xtransl 6) | ].
   constructor; [ now exists (Comb (Xtransl 6) (Rot ḅ)) | ].
