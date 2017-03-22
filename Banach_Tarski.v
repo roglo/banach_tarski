@@ -5461,7 +5461,21 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         rewrite Hv, Hu in Hvn.
         rewrite <- mat_vec_mul_assoc in Hvn.
         replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hvn by easy.
-Print J₀.
+        remember (sin (asin s * INR (S n))) as s₀ eqn:Hs₀.
+        remember (cos (acos s * INR (S n))) as c₀ eqn:Hc₀.
+        exists s₀, c₀, (S n), O.
+        split.
+Focus 2.
+split.
+ rewrite Hs₀.
+ rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
+ remember (asin s * INR (S n)) as a.
+ replace (asin (sin a)) with a.
+  subst a.
+  rewrite Rmult_div.
+  rewrite Rmult_div_same.
+  rewrite sin_asin; [ easy | ].
+
 bbb.
 Check mat_eq_dec.
  assert
