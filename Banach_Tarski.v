@@ -5306,98 +5306,54 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
   specialize (Hjc _ H) as (n, Hjc).
   now specialize (Hn n).
 
-  remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
-  remember (sphere ‖p₁‖) as S₂ eqn:HS₂.
-  remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((ρ ^ n)%mat * p₀)%vec))
-    as E eqn:HE.
-  assert (Hpart : is_partition S₂ [E; S₂ ∖ E]).
+  assert (Hp₁z : p₁ ≠ 0%vec).
+   intros H; apply Hpnd; rewrite H; simpl.
+   exists (ạ :: []), 0%vec.
    split.
-    simpl; rewrite union_empty_r.
-    split; intros H.
-     now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
+    exists (ạ :: []).
+    now rewrite rotate_vec_mul, mat_vec_mul_0_r.
 
-     rename x into v.
-     destruct H as [H| H]; [ | now destruct H ].
-     rewrite HE in H; simpl in H.
-     destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
-     subst S₂ v.
-     apply on_sphere_after_rotation; [ easy | ].
-     apply mat_pow_is_rotation_matrix; rewrite Hρ.
-     apply matrix_of_axis_angle_is_rotation_matrix; [ | easy ].
-     intros H; apply Hpnd; rewrite H; simpl.
-     exists (ạ :: []), 0%vec.
-     split.
-      exists (ạ :: []).
-      now rewrite rotate_vec_mul, mat_vec_mul_0_r.
+    split; [ easy | ].
+    now rewrite rotate_vec_mul, mat_vec_mul_0_r.
 
-      split; [ easy | ].
-      now rewrite rotate_vec_mul, mat_vec_mul_0_r.
+   remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
+   remember (sphere ‖p₁‖) as S₂ eqn:HS₂.
+   remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((ρ ^ n)%mat * p₀)%vec))
+     as E eqn:HE.
+   assert (Hpart : is_partition S₂ [E; S₂ ∖ E]).
+    split.
+     simpl; rewrite union_empty_r.
+     split; intros H.
+      now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
 
-    intros i j Hij.
-    destruct i.
-     destruct j; [ easy | ].
-     destruct j.
-      intros v.
-      now split; intros Hv; [ simpl in Hv | ].
+      rename x into v.
+      destruct H as [H| H]; [ | now destruct H ].
+      rewrite HE in H; simpl in H.
+      destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
+      subst S₂ v.
+      apply on_sphere_after_rotation; [ easy | ].
+      apply mat_pow_is_rotation_matrix; rewrite Hρ.
+      now apply matrix_of_axis_angle_is_rotation_matrix.
 
-      simpl; rewrite match_id.
-      apply intersection_empty_r.
-
-     destruct j.
-      destruct i.
+     intros i j Hij.
+     destruct i.
+      destruct j; [ easy | ].
+      destruct j.
        intros v.
        now split; intros Hv; [ simpl in Hv | ].
 
        simpl; rewrite match_id.
-       apply intersection_empty_l.
-
-      destruct i.
-       destruct j; [ easy | ].
-       simpl; rewrite match_id.
        apply intersection_empty_r.
 
-       destruct j.
+      destruct j.
+       destruct i.
+        intros v.
+        now split; intros Hv; [ simpl in Hv | ].
+
         simpl; rewrite match_id.
         apply intersection_empty_l.
 
-        simpl; do 2 rewrite match_id.
-        apply intersection_empty_l.
-
-   remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
-   assert (equidecomposable S₂ (ρE ∪ (S₂ ∖ E))).
-    unfold equidecomposable.
-    exists [E; S₂ ∖ E], [ρE; S₂ ∖ E].
-    split; [ easy | ].
-    split.
-     split; [ now simpl; rewrite union_empty_r | ].
-     intros i j Hij.
-     assert (H : (ρE ∩ (S₂ ∖ E) = ∅)%S).
-      split; intros H; [ | easy ].
-      simpl in H.
-      destruct H as (HxρE & HxS₂ & HxnE).
-      rewrite HρE in HxρE; simpl in HxρE.
-      destruct HxρE as (v & Hv & Hxv).
-      rewrite Hxv in HxnE.
-      exfalso; apply HxnE; clear HxnE.
-      rewrite HE in Hv |-*.
-      simpl in Hv; simpl.
-      destruct Hv as (p₀ & n & Hv).
-      exists p₀, (S n).
-      destruct Hv as (((el & p₂ & Hel) & Hp₀) & Hv).
-      split.
-       now split; [ exists el, p₂ | ].
-
-       rewrite Hv, <- mat_vec_mul_assoc.
-       now rewrite <- mat_pow_succ.
-
-      destruct i.
-       destruct j; [ easy | ].
-       destruct j; [ easy | ].
-       simpl; rewrite match_id.
-       apply intersection_empty_r.
-
        destruct i.
-        destruct j; [ now rewrite intersection_comm | ].
         destruct j; [ easy | ].
         simpl; rewrite match_id.
         apply intersection_empty_r.
@@ -5406,29 +5362,80 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
          simpl; rewrite match_id.
          apply intersection_empty_l.
 
+         simpl; do 2 rewrite match_id.
+         apply intersection_empty_l.
+
+    remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
+    assert (equidecomposable S₂ (ρE ∪ (S₂ ∖ E))).
+     unfold equidecomposable.
+     exists [E; S₂ ∖ E], [ρE; S₂ ∖ E].
+     split; [ easy | ].
+     split.
+      split; [ now simpl; rewrite union_empty_r | ].
+      intros i j Hij.
+      assert (H : (ρE ∩ (S₂ ∖ E) = ∅)%S).
+       split; intros H; [ | easy ].
+       simpl in H.
+       destruct H as (HxρE & HxS₂ & HxnE).
+       rewrite HρE in HxρE; simpl in HxρE.
+       destruct HxρE as (v & Hv & Hxv).
+       rewrite Hxv in HxnE.
+       exfalso; apply HxnE; clear HxnE.
+       rewrite HE in Hv |-*.
+       simpl in Hv; simpl.
+       destruct Hv as (p₀ & n & Hv).
+       exists p₀, (S n).
+       destruct Hv as (((el & p₂ & Hel) & Hp₀) & Hv).
+       split.
+        now split; [ exists el, p₂ | ].
+
+        rewrite Hv, <- mat_vec_mul_assoc.
+        now rewrite <- mat_pow_succ.
+
+       destruct i.
+        destruct j; [ easy | ].
+        destruct j; [ easy | ].
+        simpl; rewrite match_id.
+        apply intersection_empty_r.
+
+        destruct i.
+         destruct j; [ now rewrite intersection_comm | ].
+         destruct j; [ easy | ].
+         simpl; rewrite match_id.
+         apply intersection_empty_r.
+
          destruct j.
           simpl; rewrite match_id.
           apply intersection_empty_l.
 
-          simpl; do 2 rewrite match_id.
-          apply intersection_empty_l.
+          destruct j.
+           simpl; rewrite match_id.
+           apply intersection_empty_l.
 
-     constructor.
-About Gr.
+           simpl; do 2 rewrite match_id.
+           apply intersection_empty_l.
 
-bbb.
-  ((S₂ ∖ E) ∩ ρE = ∅)%S
-bbb.
-        rewrite HE in Hv; simpl in Hv.
-        destruct Hv as (p₀ & n & (Hel & Hvp)).
-        rewrite Hvp in Hxv.
-        rewrite <- mat_vec_mul_assoc in Hxv.
-        rewrite <- mat_pow_succ in Hxv.
-        exfalso; apply HxnE; rewrite Hxv.
-        rewrite HE.
-        exists p₀, (S n).
-        split; [ | easy ].
+      constructor.
+       assert (Hρm : is_rotation_matrix ρ).
+        rewrite Hρ.
+        now apply matrix_of_axis_angle_is_rotation_matrix.
 
+        exists (Rot ρ Hρm); simpl.
+        intros v.
+        split; intros H.
+         destruct H as (u & H).
+         rewrite HρE; simpl.
+         now exists u.
+
+         rewrite HρE in H; simpl in H.
+         destruct H as (u & H); simpl.
+         now exists u.
+
+       constructor; [ | constructor ].
+       exists gr_ident.
+       apply app_gr_ident.
+
+     assert (ρE = E ∖ D)%S.
 bbb.
 Check mat_eq_dec.
  assert
