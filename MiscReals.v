@@ -783,24 +783,29 @@ Definition Rdiv_mod x y :=
 
 Definition Rmod x y := snd (Rdiv_mod x y).
 
-Theorem Rle_0_mod : ∀ x y, 0 ≤ x → 0 < y → 0 ≤ Rmod x y.
+Theorem Rle_0_mod : ∀ x y, 0 < y → 0 ≤ Rmod x y.
 Proof.
-intros * Hx Hy.
+intros * Hy.
 unfold Rmod, Rdiv_mod.
 assert (Hyz : y ≠ 0) by lra.
-
-
 specialize (euclidian_division x y Hyz) as (k & r & Hxy & Hr).
-Check euclidian_division.
-
-bbb.
-rewrite Hxy.
-rewrite Rdiv_plus_distr.
+unfold Rabs in Hr.
+unfold snd.
+destruct (Rcase_abs y) as [Hya| Hya]; [ lra | ].
+specialize (for_base_fp (x / y)) as (H1, H2).
+apply Rmult_eq_compat_r with (r := / y) in Hxy.
+do 2 rewrite fold_Rdiv in Hxy.
+rewrite Rdiv_plus_distr in Hxy.
+rewrite Rmult_div in Hxy.
+rewrite Rmult_div_same in Hxy; [ | easy ].
+apply Rmult_le_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
+rewrite Rmult_0_l.
+rewrite fold_Rdiv.
+rewrite Rdiv_minus_distr.
 rewrite Rmult_div.
 rewrite Rmult_div_same; [ | easy ].
-rewrite plus_Int_part2.
- rewrite plus_IZR.
-Abort.
+rewrite minus_IZR; simpl; lra.
+Qed.
 
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
@@ -812,8 +817,9 @@ destruct (pre_atan (tan x)) as (y & Hy & Hyx).
 remember (Rmod (x + PI / 2) PI - PI / 2) as z eqn:Hz.
 assert (Htz : tan z = tan x).
  subst z.
- unfold Rmod.
- remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as t eqn:Ht.
+ unfold Rmod, Rdiv_mod, snd.
+ destruct (Rcase_abs PI) as [HP| HP]; [ lra | ].
+ remember (IZR (up ((x + PI / 2) / PI) - 1) * PI) as t eqn:Ht.
  replace (x + PI / 2 - t - PI / 2) with (x - t) by lra.
  rewrite tan_minus; [ | lra | | | ].
   subst t; rewrite tan_ZPI.
@@ -837,6 +843,10 @@ assert (Htz : tan z = tan x).
 
  assert (Hzi : - PI / 2 < z < PI / 2).
   rewrite Hz.
+  assert (HPP : 0 < PI) by lra.
+  specialize (Rle_0_mod (x + PI / 2) PI HPP) as H.
+  split.
+bbb.
   split.
    apply Rplus_lt_reg_r with (r := PI / 2).
    rewrite Ropp_div, Rplus_opp_l.
