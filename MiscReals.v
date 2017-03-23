@@ -858,11 +858,9 @@ assert (Htz : tan z = tan x).
 
   rewrite <- Htz in Hyx.
   specialize (tan_is_inj y z Hy Hzi Hyx) as H.
-  subst y; clear Hy Hyx.
-Check tan_is_inj.
-
+  move H at top; subst z.
+  clear Hyx Hzi.
 bbb.
-*)
 
 Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + 2 * IZR k * PI.
 Proof.
