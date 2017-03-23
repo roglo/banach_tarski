@@ -79,6 +79,17 @@ rewrite Rinv_r; [ | easy ].
 now rewrite Rmult_1_l.
 Qed.
 
+Theorem Rdiv_mult_simpl_r : ∀ x y z,
+  y ≠ 0
+  → z ≠ 0
+  → (x * z) / (y * z) = x / y.
+Proof.
+intros * Hy Hz.
+specialize (Rdiv_mult_simpl_l z x y Hz Hy) as H.
+rewrite <- H.
+f_equal; lra.
+Qed.
+
 Theorem Req_dec : ∀ x y : ℝ, { x = y } + { x ≠ y }.
 Proof.
 intros x y.
@@ -640,6 +651,123 @@ unfold acos; rewrite cos_shift.
 now apply sin_asin.
 Qed.
 
+Theorem sin_Zperiod : ∀ x k, sin (x + 2 * IZR k * PI) = sin x.
+Proof.
+intros.
+destruct k as [| k| k].
+ now rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
+
+ now simpl; rewrite sin_period.
+
+ simpl; rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
+ rewrite <- sin_period with (k := Pos.to_nat k).
+ now rewrite Rminus_plus.
+Qed.
+
+Theorem cos_Zperiod : ∀ x k, cos (x + 2 * IZR k * PI) = cos x.
+Proof.
+intros.
+destruct k as [| k| k].
+ now rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
+
+ now simpl; rewrite cos_period.
+
+ simpl; rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
+ rewrite <- cos_period with (k := Pos.to_nat k).
+ now rewrite Rminus_plus.
+Qed.
+
+Theorem sin_nPI : ∀ n, sin (INR n * PI) = 0.
+Proof.
+intros.
+induction n; [ rewrite Rmult_0_l; apply sin_0 | ].
+rewrite S_INR, Rmult_plus_distr_r, Rmult_1_l, neg_sin; lra.
+Qed.
+
+Theorem cos_nPI : ∀ n, cos (INR n * PI) = (-1) ^ n.
+Proof.
+intros.
+induction n; [ now rewrite Rmult_0_l, cos_0 | ].
+rewrite S_INR, Rmult_plus_distr_r, Rmult_1_l, neg_cos, IHn.
+simpl; lra.
+Qed.
+
+Theorem sin_ZPI : ∀ z, sin (IZR z * PI) = 0.
+Proof.
+intros.
+destruct z as [| z| z]; simpl; [ now rewrite Rmult_0_l, sin_0 | | ].
+ now rewrite sin_nPI.
+
+ rewrite <- Ropp_mult_distr_l.
+ rewrite sin_neg, sin_nPI; lra.
+Qed.
+
+Theorem cos_ZPI : ∀ z, cos (IZR z * PI) = (-1) ^ Z.abs_nat z.
+Proof.
+intros.
+destruct z as [| z| z]; simpl; [ now rewrite Rmult_0_l, cos_0 | | ].
+ now rewrite cos_nPI.
+
+ rewrite <- Ropp_mult_distr_l.
+ now rewrite cos_neg, cos_nPI.
+Qed.
+
+Theorem tan_period : ∀ x k, cos x ≠ 0 → tan (x + INR k * PI) = tan x.
+Proof.
+intros * Hcz.
+destruct (eq_nat_dec (k mod 2) 0) as [Hk| Hk].
+ apply Nat.mod_divides in Hk; [ | easy ].
+ destruct Hk as (c, Hc); subst k.
+ rewrite mult_INR; simpl.
+ unfold tan.
+ now rewrite sin_period, cos_period.
+
+ destruct k; [ easy | ].
+ rewrite S_INR.
+ rewrite Rmult_plus_distr_r.
+ rewrite Rmult_1_l, <- Rplus_assoc.
+ unfold tan.
+ rewrite neg_sin, neg_cos.
+ rewrite sin_plus, cos_plus.
+ rewrite sin_nPI, cos_nPI.
+ do 2 rewrite Rmult_0_r.
+ rewrite Rplus_0_r, Rminus_0_r.
+ do 2 rewrite Ropp_mult_distr_r.
+ rewrite Rdiv_mult_simpl_r; [ easy | easy | ].
+ clear; induction k; simpl; lra.
+Qed.
+
+Theorem tan_Zperiod : ∀ x k, cos x ≠ 0 → tan (x + IZR k * PI) = tan x.
+Proof.
+intros * Hcz.
+destruct (Z_eq_dec (k mod 2) 0) as [Hk| Hk].
+ apply Zdiv.Zmod_divides in Hk; [ | easy ].
+ destruct Hk as (c, Hc); subst k.
+ rewrite mult_IZR; simpl.
+ unfold tan.
+ now rewrite sin_Zperiod, cos_Zperiod.
+
+ destruct k as [| k| k]; [ easy | now apply tan_period | ].
+ simpl; rewrite <- Ropp_mult_distr_l, fold_Rminus.
+ rewrite <- tan_period with (k := Pos.to_nat k).
+  now rewrite Rminus_plus.
+
+  rewrite cos_minus.
+  rewrite cos_nPI, sin_nPI, Rmult_0_r, Rplus_0_r.
+  intros H.
+  apply Rmult_integral in H.
+  destruct H as [H| H]; [ easy | ].
+  apply pow_nonzero in H; [ easy | lra ].
+Qed.
+
+Theorem tan_ZPI : ∀ k, tan (IZR k * PI) = 0.
+Proof.
+intros.
+assert (Hc : cos 0 ≠ 0) by (rewrite cos_0; lra).
+specialize (tan_Zperiod 0 k Hc) as H.
+now rewrite Rplus_0_l, tan_0 in H.
+Qed.
+
 Definition Rmod x y := x - IZR (Int_part (x / y)) * y.
 
 Theorem neg_cos_atan_tan : ∀ x,
@@ -656,19 +784,36 @@ assert (Htz : tan z = tan x).
  remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as t eqn:Ht.
  replace (x + PI / 2 - t - PI / 2) with (x - t) by lra.
  rewrite tan_minus; [ | lra | | | ].
-Theorem tan_period : ∀ x k, tan (x + INR k * PI) = tan x.
-Proof.
-intros.
-destruct (eq_nat_dec (k mod 2) 0) as [Hk| Hk].
- apply Nat.mod_divides in Hk; [ | easy ].
- destruct Hk as (c, Hc); subst k.
- rewrite mult_INR; simpl.
- unfold tan.
- now rewrite sin_period, cos_period.
+  subst t; rewrite tan_ZPI.
+  now rewrite Rminus_0_r, Rmult_0_r, Rplus_0_r, Rdiv_1_r.
 
- destruct k; [ easy | ].
- rewrite S_INR.
- rewrite Rmult_plus_distr_r.
+  subst t.
+  rewrite cos_ZPI.
+  apply pow_nonzero; lra.
+
+  subst t.
+  rewrite cos_minus.
+  rewrite cos_ZPI, sin_ZPI.
+  rewrite Rmult_0_r, Rplus_0_r.
+  intros H.
+  apply Rmult_integral in H.
+  destruct H as [H| H]; [ lra | ].
+  apply pow_nonzero in H; lra.
+
+  subst t.
+  rewrite tan_ZPI, Rmult_0_r, Rplus_0_r; lra.
+
+ assert (Hzi : - PI / 2 < z < PI / 2).
+  rewrite Hz.
+  split.
+   apply Rplus_lt_reg_r with (r := PI / 2).
+   rewrite Ropp_div, Rplus_opp_l.
+   rewrite Rminus_plus.
+
+   unfold Rmod.
+bbb.
+  rewrite <- Htz in Hyx.
+  specialize (tan_is_inj y z Hy Hzi) as H.
 bbb.
 
 Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + 2 * IZR k * PI.
