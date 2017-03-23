@@ -896,8 +896,7 @@ destruct (Rcase_abs (cos x)) as [Ha| Ha].
  fold (tan x).
  rewrite atan_opp.
  specialize (neg_cos_atan_tan _ Ha) as Hk.
-bbb.
- rewrite Hk.
+
 bbb.
  exists (- k)%Z.
  rewrite opp_IZR.
