@@ -781,6 +781,7 @@ Definition Rdiv_mod x y :=
   in
   (k, x - IZR k * y).
 
+Definition Rediv x y := fst (Rdiv_mod x y).
 Definition Rmod x y := snd (Rdiv_mod x y).
 
 Theorem Rmod_interv : ∀ x y, 0 < y → 0 ≤ Rmod x y < y.
@@ -803,9 +804,27 @@ split.
  specialize (archimed (x / y)); lra.
 Qed.
 
+Theorem Rmod_from_ediv : ∀ x y, Rmod x y = x - IZR (Rediv x y) * y.
+Proof.
+intros.
+unfold Rmod, Rediv, fst, snd.
+remember (Rdiv_mod x y) as rdm eqn:Hrdm.
+symmetry in Hrdm.
+destruct rdm as (q, r).
+unfold Rdiv_mod in Hrdm.
+destruct (Rcase_abs y) as [Hy| Hy].
+ remember Z.sub as f.
+ injection Hrdm; clear Hrdm; intros Hr Hq; subst f.
+ now rewrite Hq in Hr.
+
+ remember Z.sub as f.
+ injection Hrdm; clear Hrdm; intros Hr Hq; subst f.
+ now rewrite Hq in Hr.
+Qed.
+
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
-  → ∃ k : ℤ, atan (tan x) = - x + 2 * IZR k * PI.
+  → ∃ k : ℤ, atan (tan x) = x + IZR k * PI.
 Proof.
 intros * Hc.
 unfold atan.
@@ -860,7 +879,13 @@ assert (Htz : tan z = tan x).
   specialize (tan_is_inj y z Hy Hzi Hyx) as H.
   move H at top; subst z.
   clear Hyx Hzi.
-bbb.
+  rewrite Rmod_from_ediv in Hz.
+  remember (Rediv (x + PI / 2) PI) as k eqn:Hk.
+  assert (Hyx : y = x - IZR k * PI) by lra.
+  clear Hz; subst y.
+  exists (-k)%Z.
+  rewrite opp_IZR; lra.
+Qed.
 
 Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + 2 * IZR k * PI.
 Proof.
@@ -879,8 +904,11 @@ destruct (Rcase_abs (cos x)) as [Ha| Ha].
  specialize (neg_cos_atan_tan _ Ha) as H.
  destruct H as (k, Hk).
  rewrite Hk.
+bbb.
  exists (- k)%Z.
- rewrite opp_IZR; lra.
+ rewrite opp_IZR.
+
+; lra.
 bbb.
 
 
