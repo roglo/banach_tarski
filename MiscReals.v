@@ -848,9 +848,16 @@ assert (Htz : tan z = tan x).
   split.
    enough (Rmod (x + PI / 2) PI ≠ 0) by lra.
    intros Hm.
-   enough (PI < x + PI / 2 < 2 * PI).
+   unfold Rmod, Rdiv_mod, snd in Hm.
+   destruct (Rcase_abs PI) as [HPQ| HPQ]; [ lra | ].
+   enough (HP : PI / 2 < x < 3 * PI / 2).
+   specialize (archimed ((x + PI / 2) / PI)) as (H1, H2).
+bbb.
+
+   enough (HP : PI < x + PI / 2 < 2 * PI).
     unfold Rmod, Rdiv_mod, snd in Hm.
     destruct (Rcase_abs PI) as [HPI| HPI]; [ lra | ].
+
 bbb.
   split.
    apply Rplus_lt_reg_r with (r := PI / 2).
