@@ -770,6 +770,12 @@ Qed.
 
 Definition Rmod x y := x - IZR (Int_part (x / y)) * y.
 
+Theorem Rle_0_mod : ∀ x y, 0 ≤ Rmod x y.
+Proof.
+intros.
+unfold Rmod.
+bbb.
+
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
   → ∃ k : ℤ, atan (tan x) = - x + 2 * IZR k * PI.
@@ -810,6 +816,7 @@ assert (Htz : tan z = tan x).
    rewrite Ropp_div, Rplus_opp_l.
    rewrite Rminus_plus.
 
+bbb.
    unfold Rmod.
 bbb.
   rewrite <- Htz in Hyx.
