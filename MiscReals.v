@@ -783,28 +783,24 @@ Definition Rdiv_mod x y :=
 
 Definition Rmod x y := snd (Rdiv_mod x y).
 
-Theorem Rle_0_mod : ∀ x y, 0 < y → 0 ≤ Rmod x y.
+Theorem Rmod_interv : ∀ x y, 0 < y → 0 ≤ Rmod x y < y.
 Proof.
 intros * Hy.
-unfold Rmod, Rdiv_mod.
-assert (Hyz : y ≠ 0) by lra.
-specialize (euclidian_division x y Hyz) as (k & r & Hxy & Hr).
-unfold Rabs in Hr.
-unfold snd.
+unfold Rmod, Rdiv_mod, snd.
 destruct (Rcase_abs y) as [Hya| Hya]; [ lra | ].
-specialize (for_base_fp (x / y)) as (H1, H2).
-apply Rmult_eq_compat_r with (r := / y) in Hxy.
-do 2 rewrite fold_Rdiv in Hxy.
-rewrite Rdiv_plus_distr in Hxy.
-rewrite Rmult_div in Hxy.
-rewrite Rmult_div_same in Hxy; [ | easy ].
-apply Rmult_le_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
-rewrite Rmult_0_l.
-rewrite fold_Rdiv.
-rewrite Rdiv_minus_distr.
-rewrite Rmult_div.
-rewrite Rmult_div_same; [ | easy ].
-rewrite minus_IZR; simpl; lra.
+split.
+ apply Rmult_le_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
+ rewrite Rmult_0_l, fold_Rdiv, Rdiv_minus_distr, Rmult_div.
+ rewrite Rmult_div_same; [ | lra ].
+ rewrite minus_IZR; simpl.
+ specialize (archimed (x / y)); lra.
+
+ apply Rmult_lt_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
+ rewrite fold_Rdiv, fold_Rdiv, Rdiv_minus_distr, Rmult_div.
+ rewrite Rmult_div_same; [ | lra ].
+ rewrite Rdiv_same; [ | lra ].
+ rewrite minus_IZR; simpl.
+ specialize (archimed (x / y)); lra.
 Qed.
 
 Theorem neg_cos_atan_tan : ∀ x,
@@ -844,31 +840,27 @@ assert (Htz : tan z = tan x).
  assert (Hzi : - PI / 2 < z < PI / 2).
   rewrite Hz.
   assert (HPP : 0 < PI) by lra.
-  specialize (Rle_0_mod (x + PI / 2) PI HPP) as H.
-  split.
-   enough (Rmod (x + PI / 2) PI ≠ 0) by lra.
-   intros Hm.
-   unfold Rmod, Rdiv_mod, snd in Hm.
-   destruct (Rcase_abs PI) as [HPQ| HPQ]; [ lra | ].
-   enough (HP : PI / 2 < x < 3 * PI / 2).
-   specialize (archimed ((x + PI / 2) / PI)) as (H1, H2).
-bbb.
+  specialize (Rmod_interv (x + PI / 2) PI HPP) as H.
+  split; [ | lra ].
+  enough (Rmod (x + PI / 2) PI ≠ 0) by lra.
+  intros Hm.
+  unfold Rmod, Rdiv_mod, snd in Hm.
+  destruct (Rcase_abs PI) as [HPQ| HPQ]; [ lra | ].
+  fold (Int_part ((x + PI / 2) / PI)) in Hm.
+  apply Rminus_diag_uniq in Hm.
+  remember (Int_part ((x + PI / 2) / PI)) as k.
+  assert (x = IZR k * PI - PI / 2) by lra.
+  rewrite H0 in Hc.
+  rewrite cos_minus in Hc.
+  rewrite cos_ZPI, sin_ZPI in Hc.
+  rewrite Rmult_0_l, Rplus_0_r in Hc.
+  rewrite cos_PI2, Rmult_0_r in Hc; lra.
 
-   enough (HP : PI < x + PI / 2 < 2 * PI).
-    unfold Rmod, Rdiv_mod, snd in Hm.
-    destruct (Rcase_abs PI) as [HPI| HPI]; [ lra | ].
-
-bbb.
-  split.
-   apply Rplus_lt_reg_r with (r := PI / 2).
-   rewrite Ropp_div, Rplus_opp_l.
-   rewrite Rminus_plus.
-
-bbb.
-   unfold Rmod.
-bbb.
   rewrite <- Htz in Hyx.
-  specialize (tan_is_inj y z Hy Hzi) as H.
+  specialize (tan_is_inj y z Hy Hzi Hyx) as H.
+  subst y; clear Hy Hyx.
+Check tan_is_inj.
+
 bbb.
 *)
 
