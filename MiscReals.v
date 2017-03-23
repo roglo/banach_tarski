@@ -640,6 +640,8 @@ unfold acos; rewrite cos_shift.
 now apply sin_asin.
 Qed.
 
+Definition Rmod x y := x - IZR (Int_part (x / y)) * y.
+
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
   → ∃ k : ℤ, atan (tan x) = - x + 2 * IZR k * PI.
@@ -647,24 +649,26 @@ Proof.
 intros * Hc.
 unfold atan.
 destruct (pre_atan (tan x)) as (y & Hy & Hyx).
-bbb.
-remember (x - IZR (Int_part (x / PI)) * PI) as z eqn:Hz.
+remember (Rmod (x + PI / 2) PI - PI / 2) as z eqn:Hz.
 assert (Htz : tan z = tan x).
  subst z.
-Search (tan (_ - _)).
+ unfold Rmod.
+ remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as t eqn:Ht.
+ replace (x + PI / 2 - t - PI / 2) with (x - t) by lra.
  rewrite tan_minus; [ | lra | | | ].
-Print frac_part.
-Check tan_is_inj.
-Search (tan (_ + _)).
-a=bq+r
-r=a-b(a/b)
+Theorem tan_period : ∀ x k, tan (x + INR k * PI) = tan x.
+Proof.
+intros.
+destruct (eq_nat_dec (k mod 2) 0) as [Hk| Hk].
+ apply Nat.mod_divides in Hk; [ | easy ].
+ destruct Hk as (c, Hc); subst k.
+ rewrite mult_INR; simpl.
+ unfold tan.
+ now rewrite sin_period, cos_period.
 
-remember (frac_part (x / PI) * PI - PI / 2) as z eqn:Hz.
-Check tan_is_inj.
-assert (Htz : tan z = tan x).
- subst z.
-Search (tan (_ - _)).
- rewrite tan_minus.
+ destruct k; [ easy | ].
+ rewrite S_INR.
+ rewrite Rmult_plus_distr_r.
 bbb.
 
 Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + 2 * IZR k * PI.
