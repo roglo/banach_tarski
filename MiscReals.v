@@ -647,9 +647,18 @@ Proof.
 intros * Hc.
 unfold atan.
 destruct (pre_atan (tan x)) as (y & Hy & Hyx).
-Check tan_is_inj.
 bbb.
+remember (x - IZR (Int_part (x / PI)) * PI) as z eqn:Hz.
+assert (Htz : tan z = tan x).
+ subst z.
+Search (tan (_ - _)).
+ rewrite tan_minus; [ | lra | | | ].
+Print frac_part.
+Check tan_is_inj.
 Search (tan (_ + _)).
+a=bq+r
+r=a-b(a/b)
+
 remember (frac_part (x / PI) * PI - PI / 2) as z eqn:Hz.
 Check tan_is_inj.
 assert (Htz : tan z = tan x).
