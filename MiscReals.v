@@ -770,11 +770,19 @@ Qed.
 
 Definition Rmod x y := x - IZR (Int_part (x / y)) * y.
 
-Theorem Rle_0_mod : ∀ x y, 0 ≤ Rmod x y.
+Theorem Rle_0_mod : ∀ x y, 0 ≤ x → 0 < y → 0 ≤ Rmod x y.
 Proof.
-intros.
+intros * Hx Hy.
 unfold Rmod.
-bbb.
+assert (Hyz : y ≠ 0) by lra.
+specialize (euclidian_division x y Hyz) as (k & r & Hxy & Hr).
+rewrite Hxy.
+rewrite Rdiv_plus_distr.
+rewrite Rmult_div.
+rewrite Rmult_div_same; [ | easy ].
+rewrite plus_Int_part2.
+ rewrite plus_IZR.
+Abort.
 
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
