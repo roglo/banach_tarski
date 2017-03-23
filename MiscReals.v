@@ -846,6 +846,11 @@ assert (Htz : tan z = tan x).
   assert (HPP : 0 < PI) by lra.
   specialize (Rle_0_mod (x + PI / 2) PI HPP) as H.
   split.
+   enough (Rmod (x + PI / 2) PI ≠ 0) by lra.
+   intros Hm.
+   enough (PI < x + PI / 2 < 2 * PI).
+    unfold Rmod, Rdiv_mod, snd in Hm.
+    destruct (Rcase_abs PI) as [HPI| HPI]; [ lra | ].
 bbb.
   split.
    apply Rplus_lt_reg_r with (r := PI / 2).
@@ -858,6 +863,7 @@ bbb.
   rewrite <- Htz in Hyx.
   specialize (tan_is_inj y z Hy Hzi) as H.
 bbb.
+*)
 
 Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + 2 * IZR k * PI.
 Proof.
