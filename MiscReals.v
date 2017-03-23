@@ -768,14 +768,32 @@ specialize (tan_Zperiod 0 k Hc) as H.
 now rewrite Rplus_0_l, tan_0 in H.
 Qed.
 
+(*
 Definition Rmod x y := x - IZR (Int_part (x / y)) * y.
+*)
+
+Definition Rdiv_mod x y :=
+  let k :=
+    match Rcase_abs y with
+    | left _ => (1 - up (x / - y))%Z
+    | right _ => (up (x / y) - 1)%Z
+    end
+  in
+  (k, x - IZR k * y).
+
+Definition Rmod x y := snd (Rdiv_mod x y).
 
 Theorem Rle_0_mod : ∀ x y, 0 ≤ x → 0 < y → 0 ≤ Rmod x y.
 Proof.
 intros * Hx Hy.
-unfold Rmod.
+unfold Rmod, Rdiv_mod.
 assert (Hyz : y ≠ 0) by lra.
+
+
 specialize (euclidian_division x y Hyz) as (k & r & Hxy & Hr).
+Check euclidian_division.
+
+bbb.
 rewrite Hxy.
 rewrite Rdiv_plus_distr.
 rewrite Rmult_div.
