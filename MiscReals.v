@@ -824,7 +824,7 @@ Qed.
 
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
-  → ∃ k : ℤ, atan (tan x) = x + IZR k * PI.
+  → atan (tan x) = x - IZR (Rediv (x + PI / 2) PI) * PI.
 Proof.
 intros * Hc.
 unfold atan.
@@ -878,13 +878,7 @@ assert (Htz : tan z = tan x).
   rewrite <- Htz in Hyx.
   specialize (tan_is_inj y z Hy Hzi Hyx) as H.
   move H at top; subst z.
-  clear Hyx Hzi.
-  rewrite Rmod_from_ediv in Hz.
-  remember (Rediv (x + PI / 2) PI) as k eqn:Hk.
-  assert (Hyx : y = x - IZR k * PI) by lra.
-  clear Hz; subst y.
-  exists (-k)%Z.
-  rewrite opp_IZR; lra.
+  rewrite Rmod_from_ediv in Hz; lra.
 Qed.
 
 Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + 2 * IZR k * PI.
@@ -901,8 +895,8 @@ destruct (Rcase_abs (cos x)) as [Ha| Ha].
  rewrite fold_Rdiv.
  fold (tan x).
  rewrite atan_opp.
- specialize (neg_cos_atan_tan _ Ha) as H.
- destruct H as (k, Hk).
+ specialize (neg_cos_atan_tan _ Ha) as Hk.
+bbb.
  rewrite Hk.
 bbb.
  exists (- k)%Z.
