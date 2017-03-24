@@ -881,6 +881,25 @@ assert (Htz : tan z = tan x).
   rewrite Rmod_from_ediv in Hz; lra.
 Qed.
 
+Theorem asin_sin : ∀ x, cos x ≠ 0 →
+  asin (sin x) = x + PI / 2 + IZR (Rediv (x - PI / 2) PI) * PI.
+Proof.
+intros * Hc.
+unfold asin.
+rewrite <- cos2.
+rewrite sqrt_Rsqr_abs.
+unfold Rabs.
+destruct (Rcase_abs (cos x)) as [Ha| Ha].
+ unfold Rdiv.
+ rewrite <- Ropp_inv_permute; [ | lra ].
+ rewrite <- Ropp_mult_distr_r.
+ rewrite fold_Rdiv.
+ fold (tan x).
+ rewrite atan_opp.
+ specialize (neg_cos_atan_tan _ Ha) as Hk.
+ rewrite Hk.
+
+bbb.
 Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + IZR k * PI.
 Proof.
 intros * Hc.
@@ -897,6 +916,8 @@ destruct (Rcase_abs (cos x)) as [Ha| Ha].
  rewrite atan_opp.
  specialize (neg_cos_atan_tan _ Ha) as Hk.
 bbb.
+(* cos x < 0 means ∃ k, π/2+2kπ < x < 3π/2+2kπ *)
+
  exists (- k)%Z.
  rewrite opp_IZR.
 
