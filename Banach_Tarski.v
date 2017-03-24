@@ -5473,8 +5473,9 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
          rewrite atan_tan.
          remember (Rediv (asin s * INR (S n) + PI / 2) PI) as k eqn:Hk.
 rewrite <- Hs₀, <- Hc₀.
-bbb.
 exists (S n).
+bbb.
+
 exists (Z.of_nat (S n)).
 rewrite <- INR_IZR_INZ.
 rewrite Rdiv_plus_distr.
