@@ -5468,6 +5468,12 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         remember (cos (acos s * INR (S n))) as c₀ eqn:Hc₀.
         exists s₀, c₀.
         rewrite Hs₀, Hc₀.
+        rewrite asin_sin.
+         remember (Rsign (cos (asin s * INR (S n)))) as sgn eqn:Hsgn.
+         rewrite atan_tan.
+         remember (Rediv (asin s * INR (S n) + PI / 2) PI) as k eqn:Hk.
+bbb.
+
         specialize (asin_sin (asin s * INR (S n))) as (k, Hs).
         rewrite Hs.
         exists (S n), (- k)%Z.
