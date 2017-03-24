@@ -5472,13 +5472,28 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
          remember (Rsign (cos (asin s * INR (S n)))) as sgn eqn:Hsgn.
          rewrite atan_tan.
          remember (Rediv (asin s * INR (S n) + PI / 2) PI) as k eqn:Hk.
+exists (S n).
+exists (Z.of_nat (S n)).
+rewrite <- INR_IZR_INZ.
+rewrite Rdiv_plus_distr.
+replace (2 * INR (S n) * PI / INR (S n))
+with (2 * (INR (S n) / INR (S n)) * PI) by lra.
+rewrite Rdiv_same.
+ replace (2 * 1 * PI) with (2 * IZR 1 * PI) by lra.
+ rewrite sin_Zperiod.
+ rewrite Rmult_minus_distr_l.
+ rewrite Rdiv_minus_distr.
+bbb.
 exists 1%nat.
 simpl (INR 1).
 exists k. (* à réfléchir... *)
+rewrite <- Hs₀, <- Hc₀.
+do 2 rewrite Rdiv_1_r.
+rewrite sin_Zperiod.
+sss.
 unfold Rminus.
 rewrite Ropp_mult_distr_l.
 rewrite <- opp_IZR.
-do 2 rewrite Rdiv_1_r.
 rewrite sin_Zperiod.
 rewrite Rmult_plus_distr_l.
 do 2 rewrite <- Rmult_assoc.
