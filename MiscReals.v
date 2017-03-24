@@ -512,6 +512,25 @@ intros.
 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
+Definition Rsign x :=
+  if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
+
+Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
+Proof.
+intros * Hx.
+unfold Rsign.
+destruct (Req_dec x 0); [ lra |  ].
+destruct (Rle_dec 0 x); [ easy | lra ].
+Qed.
+
+Theorem Rsign_of_neg : ∀ x, x < 0 → Rsign x = -1.
+Proof.
+intros * Hx.
+unfold Rsign.
+destruct (Req_dec x 0); [ lra |  ].
+destruct (Rle_dec 0 x); [ lra | easy ].
+Qed.
+
 Definition asin x := atan (x / √ (1 - x²)).
 Definition acos x := PI / 2 - asin x.
 
@@ -822,6 +841,47 @@ destruct (Rcase_abs y) as [Hy| Hy].
  now rewrite Hq in Hr.
 Qed.
 
+Theorem up_Int_part : ∀ x, up x = (Int_part x + 1)%Z.
+Proof. intros; unfold Int_part; lia. Qed.
+
+Theorem Rediv_add : ∀ x y, y ≠ 0 → Rediv (x + y) y = (Rediv x y + 1)%Z.
+Proof.
+intros * Hyz.
+unfold Rediv, Rdiv_mod, fst.
+destruct (Rcase_abs y) as [Hy| Hy].
+ unfold Rdiv.
+ rewrite <- Ropp_inv_permute; [ | lra ].
+ rewrite <- Ropp_mult_distr_r.
+ rewrite Rmult_plus_distr_r.
+ rewrite Rinv_r; [ | lra ].
+ rewrite Ropp_plus_distr.
+ rewrite fold_Rminus.
+ rewrite <- Ropp_mult_distr_r.
+ do 2 rewrite up_Int_part.
+ ring_simplify.
+ rewrite Rminus_Int_part1.
+  rewrite Z.opp_sub_distr.
+  replace 1 with (IZR 1) by lra.
+  now rewrite Int_part_IZR.
+
+  replace 1 with (IZR 1) by lra.
+  rewrite frac_part_IZR.
+  specialize (frac_part_interv (- (x * / y))) as (Hn, Hp); lra.
+
+ rewrite Rdiv_plus_distr.
+ rewrite Rdiv_same; [ | easy ].
+ do 2 rewrite up_Int_part.
+ rewrite Z.add_simpl_r.
+ rewrite Z.sub_simpl_r.
+ rewrite plus_Int_part2.
+  replace 1 with (IZR 1) by lra.
+  now rewrite Int_part_IZR.
+
+  replace 1 with (IZR 1) at 1 by lra.
+  rewrite frac_part_IZR, Rplus_0_r.
+  apply frac_part_interv.
+Qed.
+
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
   → atan (tan x) = x - IZR (Rediv (x + PI / 2) PI) * PI.
@@ -881,12 +941,9 @@ assert (Htz : tan z = tan x).
   rewrite Rmod_from_ediv in Hz; lra.
 Qed.
 
-Theorem up_Int_part : ∀ x, up x = (Int_part x + 1)%Z.
-Proof. intros; unfold Int_part; lia. Qed.
-
 Theorem pos_cos_atan_tan : ∀ x,
   0 < cos x
-  → atan (tan x) = x + PI - IZR (Rediv (x + PI / 2) PI + 1) * PI.
+  → atan (tan x) = x - IZR (Rediv (x + PI / 2) PI) * PI.
 Proof.
 intros * Hc.
 assert (Hcp : cos (x + PI) < 0) by (rewrite neg_cos; lra).
@@ -896,51 +953,24 @@ specialize (tan_period x 1 Hcz) as Ht.
 simpl (INR _) in Ht.
 rewrite Rmult_1_l in Ht.
 rewrite Rplus_shuffle0 in H.
-
-Theorem Rediv_add : ∀ x y, Rediv (x + y) y = (Rediv x y + 1)%Z.
-Proof.
-intros.
-unfold Rediv, Rdiv_mod, fst.
-destruct (Rcase_abs y) as [Hy| Hy].
- unfold Rdiv.
- rewrite <- Ropp_inv_permute; [ | lra ].
- rewrite <- Ropp_mult_distr_r.
- rewrite Rmult_plus_distr_r.
- rewrite Rinv_r; [ | lra ].
- rewrite Ropp_plus_distr.
- rewrite fold_Rminus.
- rewrite <- Ropp_mult_distr_r.
- do 2 rewrite up_Int_part.
- ring_simplify.
- rewrite Rminus_Int_part1.
-  rewrite Z.opp_sub_distr.
-  replace 1 with (IZR 1) by lra.
-  now rewrite Int_part_IZR.
-
-  replace 1 with (IZR 1) by lra.
-  rewrite frac_part_IZR.
-  specialize (frac_part_interv (- (x * / y))) as (Hn, Hp); lra.
-bbb.
-
-now rewrite Ht in H.
+rewrite Rediv_add in H; [ | apply PI_neq0 ].
+rewrite plus_IZR in H.
+simpl (IZR _) in H.
+rewrite Ht in H; lra.
 Qed.
 
-Theorem pos_cos_atan_tan : ∀ x,
-  0 < cos x
-  → atan (tan x) = x + PI - IZR (Rediv (x + PI + PI / 2) PI) * PI.
+Theorem atan_tan : ∀ x,
+  cos x ≠ 0
+  → atan (tan x) = x - IZR (Rediv (x + PI / 2) PI) * PI.
 Proof.
-intros * Hc.
-assert (Hcp : cos (x + PI) < 0) by (rewrite neg_cos; lra).
-specialize (neg_cos_atan_tan (x + PI) Hcp) as H.
-assert (Hcz : cos x ≠ 0) by lra.
-specialize (tan_period x 1 Hcz) as Ht.
-simpl (INR _) in Ht.
-rewrite Rmult_1_l in Ht.
-now rewrite Ht in H.
+intros * Hxz.
+destruct (Rlt_dec (cos x) 0) as [Hx| Hx].
+ now apply neg_cos_atan_tan.
+
+ apply pos_cos_atan_tan; lra.
 Qed.
 
-Theorem asin_sin : ∀ x, cos x ≠ 0 →
-  asin (sin x) = - x + IZR (Rediv (x + PI / 2) PI) * PI.
+Theorem asin_sin : ∀ x, cos x ≠ 0 → asin (sin x) = Rsign (cos x) * atan (tan x).
 Proof.
 intros * Hc.
 unfold asin.
@@ -954,44 +984,11 @@ destruct (Rcase_abs (cos x)) as [Ha| Ha].
  rewrite fold_Rdiv.
  fold (tan x).
  rewrite atan_opp.
- specialize (neg_cos_atan_tan _ Ha) as Hk; lra.
+ rewrite Rsign_of_neg; [ lra | easy ].
 
  fold (tan x).
-bbb.
-
- unfold Rdiv.
- rewrite <- Ropp_inv_permute; [ | lra ].
- rewrite <- Ropp_mult_distr_r.
- rewrite fold_Rdiv.
- fold (tan x).
- rewrite atan_opp.
- specialize (neg_cos_atan_tan _ Ha) as Hk; lra.
-
-bbb.
-Theorem asin_sin : ∀ x, cos x ≠ 0 → ∃ k, asin (sin x) = x + IZR k * PI.
-Proof.
-intros * Hc.
-unfold asin.
-rewrite <- cos2.
-rewrite sqrt_Rsqr_abs.
-unfold Rabs.
-destruct (Rcase_abs (cos x)) as [Ha| Ha].
- unfold Rdiv.
- rewrite <- Ropp_inv_permute; [ | lra ].
- rewrite <- Ropp_mult_distr_r.
- rewrite fold_Rdiv.
- fold (tan x).
- rewrite atan_opp.
- specialize (neg_cos_atan_tan _ Ha) as Hk.
-bbb.
-(* cos x < 0 means ∃ k, π/2+2kπ < x < 3π/2+2kπ *)
-
- exists (- k)%Z.
- rewrite opp_IZR.
-
-; lra.
-bbb.
-
+ rewrite Rsign_of_pos; lra.
+Qed.
 
 Theorem Rneq_le_lt : ∀ x y, x ≠ y → x ≤ y → x < y.
 Proof.

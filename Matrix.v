@@ -1513,17 +1513,6 @@ Arguments axis_angle_of_matrix M%mat.
 (* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
 Definition cos_rot_angle M := (mat_trace M - 1) / 2.
 
-Definition Rsign x :=
-  if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
-
-Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
-Proof.
-intros * Hx.
-unfold Rsign.
-destruct (Req_dec x 0); [ lra |  ].
-destruct (Rle_dec 0 x); [ easy | lra ].
-Qed.
-
 Theorem unit_sphere_mat_trace_eq : ∀ v s c,
   ‖v‖ = 1
   → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
