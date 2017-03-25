@@ -996,7 +996,42 @@ destruct (Rcase_abs (cos x)) as [Ha| Ha].
  rewrite Rsign_of_pos; lra.
 Qed.
 
-Theorem acos_cos : ∀ x, acos (cos x) = atan (tan x).
+Theorem asin_cos : ∀ x, asin (cos x) = - atan (/ tan x).
+Proof.
+intros.
+unfold asin; rewrite <- sin2, sqrt_Rsqr_abs.
+unfold atan at 1.
+remember (cos x / Rabs (sin x)) as z eqn:Hz.
+destruct (pre_atan z) as (y & Hy & Hyx).
+subst z.
+unfold Rabs in Hyx.
+destruct (Rcase_abs (sin x)) as [Hx| Hx].
+ unfold Rdiv in Hyx.
+ rewrite <- Ropp_inv_permute in Hyx.
+ rewrite <- Ropp_mult_distr_r in Hyx.
+ rewrite fold_Rdiv in Hyx.
+ replace (cos x / sin x) with (/ tan x) in Hyx.
+ apply (f_equal Ropp) in Hyx.
+ rewrite Ropp_involutive in Hyx.
+ rewrite <- Hyx.
+ rewrite atan_opp.
+ rewrite Ropp_involutive.
+ rewrite atan_tan.
+bbb.
+unfold tan in Hyx.
+apply (f_equal (Rmult (cos y))) in Hyx.
+rewrite Rmult_div_r in Hyx.
+ apply (f_equal (Rmult (Rabs (sin x)))) in Hyx.
+ rewrite <- Rmult_assoc, Rmult_shuffle0 in Hyx.
+ rewrite Rmult_div_r in Hyx.
+bbb.
+apply (f_equal atan) in Hyx.
+rewrite atan_tan in Hyx.
+ unfold atan in Hyx.
+ destruct (pre_atan z) as (t & Ht & Htx).
+bbb.
+
+Theorem acos_cos : ∀ x, acos (cos x) = 42.
 Proof.
 intros.
 unfold acos.
