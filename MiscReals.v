@@ -534,6 +534,12 @@ Qed.
 Definition asin x := atan (x / √ (1 - x²)).
 Definition acos x := PI / 2 - asin x.
 
+Definition angle_of_sin_cos s c :=
+  if Rlt_dec s 0 then
+    if Rlt_dec c 0 then 2 * PI - acos c else asin s + 2 * PI
+  else
+    if Rlt_dec c 0 then acos c else asin s.
+
 Theorem cos_atan : ∀ x, cos (atan x) = 1 / √ (1 + x²).
 Proof.
 intros.
