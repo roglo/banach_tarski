@@ -515,6 +515,12 @@ Qed.
 Definition Rsign x :=
   if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
 
+Theorem Rsign_0 : Rsign 0 = 0.
+Proof.
+unfold Rsign.
+destruct (Req_dec 0 0); [ easy | lra ].
+Qed.
+
 Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
 Proof.
 intros * Hx.
@@ -529,6 +535,20 @@ intros * Hx.
 unfold Rsign.
 destruct (Req_dec x 0); [ lra |  ].
 destruct (Rle_dec 0 x); [ lra | easy ].
+Qed.
+
+Theorem Rsign_neg : ∀ x, Rsign (- x) = - Rsign x.
+Proof.
+intros.
+unfold Rsign.
+destruct (Req_dec x 0) as [Hxz| Hxz].
+ subst x; rewrite Ropp_0; simpl.
+ destruct (Req_dec 0 0); [ easy | lra ].
+
+ destruct (Req_dec (- x) 0) as [| H]; [ lra | clear H ].
+ destruct (Rle_dec 0 x) as [Hp| Hn].
+  destruct (Rle_dec 0 (- x)); [ lra | easy ].
+  destruct (Rle_dec 0 (- x)); lra.
 Qed.
 
 Definition asin x := atan (x / √ (1 - x²)).
@@ -996,40 +1016,34 @@ destruct (Rcase_abs (cos x)) as [Ha| Ha].
  rewrite Rsign_of_pos; lra.
 Qed.
 
-Theorem asin_cos : ∀ x, asin (cos x) = - atan (/ tan x).
+Theorem cos_plus_PI2 : ∀ x, cos (x + PI / 2) = - sin x.
 Proof.
 intros.
-unfold asin; rewrite <- sin2, sqrt_Rsqr_abs.
-unfold atan at 1.
-remember (cos x / Rabs (sin x)) as z eqn:Hz.
-destruct (pre_atan z) as (y & Hy & Hyx).
-subst z.
-unfold Rabs in Hyx.
-destruct (Rcase_abs (sin x)) as [Hx| Hx].
- unfold Rdiv in Hyx.
- rewrite <- Ropp_inv_permute in Hyx.
- rewrite <- Ropp_mult_distr_r in Hyx.
- rewrite fold_Rdiv in Hyx.
- replace (cos x / sin x) with (/ tan x) in Hyx.
- apply (f_equal Ropp) in Hyx.
- rewrite Ropp_involutive in Hyx.
- rewrite <- Hyx.
- rewrite atan_opp.
- rewrite Ropp_involutive.
- rewrite atan_tan.
+rewrite cos_plus, cos_PI2, sin_PI2; lra.
+Qed.
+
+Theorem asin_cos : ∀ x,
+  sin x ≠ 0
+  → asin (cos x) = Rsign (sin x) * (PI / 2 - x + IZR (Rediv x PI) * PI).
+Proof.
+intros * Hs.
+clear Hs.
+destruct (Req_dec (sin x) 0) as [Hs| Hs].
+ rewrite Hs, Rsign_0, Rmult_0_l.
 bbb.
-unfold tan in Hyx.
-apply (f_equal (Rmult (cos y))) in Hyx.
-rewrite Rmult_div_r in Hyx.
- apply (f_equal (Rmult (Rabs (sin x)))) in Hyx.
- rewrite <- Rmult_assoc, Rmult_shuffle0 in Hyx.
- rewrite Rmult_div_r in Hyx.
-bbb.
-apply (f_equal atan) in Hyx.
-rewrite atan_tan in Hyx.
- unfold atan in Hyx.
- destruct (pre_atan z) as (t & Ht & Htx).
-bbb.
+
+intros * Hs.
+assert (Hc : cos (PI / 2 + x) ≠ 0) by (rewrite Rplus_comm, cos_plus_PI2; lra).
+rewrite cos_sin, asin_sin; [ | easy ].
+rewrite cos_sin.
+replace (PI / 2 + (PI / 2 + x)) with (x + PI) by lra.
+rewrite neg_sin.
+rewrite Rsign_neg.
+rewrite atan_tan; [ | easy ].
+replace (PI / 2 + x + PI / 2) with (x + PI) by lra.
+rewrite Rediv_add; [ | apply PI_neq0 ].
+rewrite plus_IZR; simpl (IZR _); lra.
+Qed.
 
 Theorem acos_cos : ∀ x, acos (cos x) = 42.
 Proof.
