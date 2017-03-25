@@ -1024,33 +1024,16 @@ Qed.
 
 Theorem asin_cos : ∀ x,
   sin x ≠ 0
-  → asin (cos x) = Rsign (sin x) * (PI / 2 - x + IZR (Rediv x PI) * PI).
+  → asin (cos x) = - Rsign (sin x) * atan (tan (x + PI / 2)).
 Proof.
-intros * Hs.
-clear Hs.
-destruct (Req_dec (sin x) 0) as [Hs| Hs].
- rewrite Hs, Rsign_0, Rmult_0_l.
-bbb.
-
 intros * Hs.
 assert (Hc : cos (PI / 2 + x) ≠ 0) by (rewrite Rplus_comm, cos_plus_PI2; lra).
 rewrite cos_sin, asin_sin; [ | easy ].
 rewrite cos_sin.
 replace (PI / 2 + (PI / 2 + x)) with (x + PI) by lra.
-rewrite neg_sin.
-rewrite Rsign_neg.
-rewrite atan_tan; [ | easy ].
-replace (PI / 2 + x + PI / 2) with (x + PI) by lra.
-rewrite Rediv_add; [ | apply PI_neq0 ].
-rewrite plus_IZR; simpl (IZR _); lra.
+rewrite neg_sin, Rsign_neg.
+f_equal; f_equal; f_equal; lra.
 Qed.
-
-Theorem acos_cos : ∀ x, acos (cos x) = 42.
-Proof.
-intros.
-unfold acos.
-Search (asin (cos _)).
-bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
   cos x = cos (angle_of_sin_cos (sin x) (cos x)).
@@ -1059,8 +1042,11 @@ intros.
 unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
-  rewrite acos_cos.
-
+  unfold acos.
+  rewrite asin_cos; [ | lra ].
+  rewrite <- Ropp_mult_distr_l.
+  unfold Rminus at 2; rewrite Ropp_involutive.
+Search (cos (2 * PI - _)).
 bbb.
 
 Theorem Rneq_le_lt : ∀ x y, x ≠ y → x ≤ y → x < y.
