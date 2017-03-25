@@ -4797,8 +4797,8 @@ Qed.
 Definition J axis :=
   mkset
     (λ '(sinθ, cosθ),
-    ∃ sinθ₀ cosθ₀ n k,
-    (sinθ₀, cosθ₀) ∈ J₀ axis ∧
+    ∃ sinθ₀ cosθ₀, (sinθ₀, cosθ₀) ∈ J₀ axis ∧
+    ∃ n k,
     sinθ = sin ((asin sinθ₀ + 2 * IZR k * PI) / INR n) ∧
     cosθ = cos ((acos cosθ₀ + 2 * IZR k * PI) / INR n)).
 
@@ -4817,7 +4817,7 @@ Theorem J_is_countable : ∀ axis,
   → ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat axis n = sc.
 Proof.
 intros axis Had Hnad (s, c) Ha.
-destruct Ha as (s₀ & c₀ & n & k & Ha & Hs & Hc).
+destruct Ha as (s₀ & c₀ & Ha & n & k & Hs & Hc).
 specialize (J₀_is_countable axis Had Hnad) as HJ.
 specialize (HJ (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hp & Hp' & Hmp)).
@@ -5453,6 +5453,37 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         split; [ easy | simpl ].
         now rewrite mat_vec_mul_assoc, <- Hu.
 
+        intros Hvn.
+        subst v.
+        apply Hj; clear Hj; unfold J.
+        remember J₀ as a; simpl; subst a.
+        rewrite HE in Hu.
+        remember D as d; remember intersection as b.
+        simpl in Hu; subst d b.
+        destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
+        rewrite Hu in Hvn.
+        rewrite <- mat_vec_mul_assoc in Hvn.
+        replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hvn by easy.
+        remember (sin (asin s * INR (S n))) as s₀ eqn:Hs₀.
+bbb.
+(* acos c or asin s? *)
+        remember (cos (acos c * INR (S n))) as c₀ eqn:Hc₀.
+        exists s₀, c₀.
+        split.
+         split.
+          subst s₀ c₀.
+Check sin2_cos2.
+bbb.
+
+        rewrite Hs₀, Hc₀.
+        rewrite asin_sin.
+         remember (Rsign (cos (asin s * INR (S n)))) as sgn eqn:Hsgn.
+         rewrite atan_tan.
+         remember (Rediv (asin s * INR (S n) + PI / 2) PI) as k eqn:Hk.
+         rewrite <- Hs₀, <- Hc₀.
+         split.
+
+bbb.
         unfold J in Hj.
         remember J₀ as a; simpl in Hj; subst a.
         intros Hvn.
@@ -5465,7 +5496,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         rewrite <- mat_vec_mul_assoc in Hvn.
         replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hvn by easy.
         remember (sin (asin s * INR (S n))) as s₀ eqn:Hs₀.
-        remember (cos (acos s * INR (S n))) as c₀ eqn:Hc₀.
+        remember (cos (acos c * INR (S n))) as c₀ eqn:Hc₀.
         exists s₀, c₀.
         rewrite Hs₀, Hc₀.
         rewrite asin_sin.
