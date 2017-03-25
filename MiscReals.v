@@ -1042,6 +1042,11 @@ intros.
 unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
+  rewrite cos_minus.
+  rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rplus_0_r.
+  rewrite cos_acos; [ easy | ].
+  split; [ | lra ].
+bbb.
   unfold acos.
   rewrite asin_cos; [ | lra ].
   rewrite <- Ropp_mult_distr_l.
