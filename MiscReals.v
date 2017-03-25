@@ -1046,6 +1046,17 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
   rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rplus_0_r.
   rewrite cos_acos; [ easy | ].
   split; [ | lra ].
+  specialize (COS_bound x) as (H, _).
+  destruct (Req_dec (cos x) (-1)) as [H1| H1]; [ exfalso | lra ].
+  clear H Hc.
+  assert (Hs2 : 0 < (sin x)²) by (apply Rlt_0_sqr; lra).
+  specialize (sin2_cos2 x) as Hsc.
+  rewrite H1, <- Rsqr_neg, Rsqr_1 in Hsc; lra.
+
+  apply Rnot_lt_le in Hc.
+  rewrite cos_plus, cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rminus_0_r.
+Search (cos (asin _)).
+  rewrite asin_sin.
 bbb.
   unfold acos.
   rewrite asin_cos; [ | lra ].
