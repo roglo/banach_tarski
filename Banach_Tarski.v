@@ -5487,6 +5487,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
 
           rewrite Hv, Hρ, Hρ₀.
           rewrite Rmult_comm in Hs₀, Hc₀.
+Search (matrix_of_axis_angle _ * matrix_of_axis_angle _)%mat.
+Search (_ * _)%mat.
           now erewrite matrix_of_mul_angle; try eassumption.
 
 bbb.

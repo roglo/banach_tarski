@@ -1606,6 +1606,58 @@ rewrite Rsign_of_pos in H; [ now rewrite Rmult_1_l in H | ].
 now apply vec_norm_pos.
 Qed.
 
+Theorem unit_sphere_matrix_of_mul_angle : ∀ a s c θ s' c' n,
+  ‖a‖ = 1
+  → θ = angle_of_sin_cos s c
+  → s' = sin (INR n * θ)
+  → c' = cos (INR n * θ)
+  → matrix_of_axis_angle (a, s', c') =
+     (matrix_of_axis_angle (a, s, c) ^ n)%mat.
+Proof.
+intros * Ha Hθ Hs' Hc'.
+revert s' c' Hs' Hc'.
+induction n; intros.
+ simpl in Hs', Hc'; simpl.
+ rewrite Rmult_0_l in Hs', Hc'.
+ rewrite sin_0 in Hs'; rewrite cos_0 in Hc'; subst s' c'.
+ destruct a as (ax, ay, az).
+ simpl in Ha; rewrite Ha.
+ do 3 rewrite Rdiv_1_r.
+ unfold mat_id, mkrmat.
+ f_equal; lra.
+
+ rewrite S_INR in Hs', Hc'.
+ rewrite Rmult_plus_distr_r, Rmult_1_l, Rplus_comm in Hs', Hc'.
+ rewrite sin_plus in Hs'.
+ rewrite cos_plus in Hc'.
+ rename s' into s''; rename c' into c''.
+ rename Hs' into Hs''; rename Hc' into Hc''.
+ remember (sin (INR n * θ)) as s' eqn:Hs' in Hs'', Hc''.
+ remember (cos (INR n * θ)) as c' eqn:Hc' in Hs'', Hc''.
+ specialize (IHn s' c' Hs' Hc').
+ rewrite mat_pow_succ, <- IHn.
+Theorem mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
+  θ₁ = angle_of_sin_cos s₁ c₁
+  → θ₂ = angle_of_sin_cos s₂ c₂
+  → (matrix_of_axis_angle (a, s₁, c₁) *
+     matrix_of_axis_angle (a, s₂, c₂))%mat =
+     matrix_of_axis_angle (a, sin (θ₁ + θ₂), cos (θ₁ + θ₂)).
+Proof.
+Admitted. Show.
+Search (matrix_of_axis_angle _ * matrix_of_axis_angle _)%mat.
+ remember (angle_of_sin_cos s' c') as θ' eqn:Hθ'.
+ erewrite mat_mul_angle_add; [ | easy | easy ].
+ rewrite <- Hθ, <- Hθ'.
+ f_equal; f_equal; [ f_equal | ].
+  rewrite Hs'', Hs', Hc'.
+  rewrite sin_plus.
+  f_equal.
+   f_equal.
+   rewrite Hθ', Hs', Hc'.
+   apply cos_angle_of_sin_cos.
+
+bbb.
+
 Theorem matrix_of_mul_angle : ∀ a s c θ s' c' n,
   θ = angle_of_sin_cos s c
   → s' = sin (INR n * θ)

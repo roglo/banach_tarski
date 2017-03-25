@@ -996,6 +996,24 @@ destruct (Rcase_abs (cos x)) as [Ha| Ha].
  rewrite Rsign_of_pos; lra.
 Qed.
 
+Theorem acos_cos : ∀ x, acos (cos x) = atan (tan x).
+Proof.
+intros.
+unfold acos.
+Search (asin (cos _)).
+bbb.
+
+Theorem cos_angle_of_sin_cos : ∀ x,
+  cos x = cos (angle_of_sin_cos (sin x) (cos x)).
+Proof.
+intros.
+unfold angle_of_sin_cos.
+destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
+ destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
+  rewrite acos_cos.
+
+bbb.
+
 Theorem Rneq_le_lt : ∀ x y, x ≠ y → x ≤ y → x < y.
 Proof.
 intros * Hnxy Hxy.
