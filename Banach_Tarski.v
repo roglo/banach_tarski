@@ -5478,6 +5478,16 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
          split; [ easy | ].
          split.
           split; [ easy | ].
+          rewrite HS₂, Hv.
+          rewrite HS₂ in Hp₀S.
+          apply on_sphere_after_rotation; [ easy | ].
+          apply mat_pow_is_rotation_matrix.
+          rewrite Hρ.
+          now apply matrix_of_axis_angle_is_rotation_matrix.
+
+          rewrite Hv, Hρ, Hρ₀.
+          rewrite Rmult_comm in Hs₀, Hc₀.
+          now erewrite matrix_of_mul_angle; try eassumption.
 
 bbb.
 

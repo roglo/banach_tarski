@@ -1606,6 +1606,16 @@ rewrite Rsign_of_pos in H; [ now rewrite Rmult_1_l in H | ].
 now apply vec_norm_pos.
 Qed.
 
+Theorem matrix_of_mul_angle : ∀ a s c θ s' c' n,
+  θ = angle_of_sin_cos s c
+  → s' = sin (INR n * θ)
+  → c' = cos (INR n * θ)
+  → matrix_of_axis_angle (a, s', c') =
+     (matrix_of_axis_angle (a, s, c) ^ n)%mat.
+Proof.
+intros * Hθ Hs' Hc'.
+bbb.
+
 Theorem rotation_mat_mul_transp_l : ∀ M,
   is_rotation_matrix M →
   (mat_transp M * M)%mat = mat_id.
