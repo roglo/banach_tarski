@@ -4798,17 +4798,19 @@ Definition J axis :=
   mkset
     (λ '(sinθ, cosθ),
     ∃ sinθ₀ cosθ₀, (sinθ₀, cosθ₀) ∈ J₀ axis ∧
+    let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
     ∃ n k,
-    sinθ = sin ((asin sinθ₀ + 2 * IZR k * PI) / INR n) ∧
-    cosθ = cos ((acos cosθ₀ + 2 * IZR k * PI) / INR n)).
+    sinθ = sin ((θ₀ + 2 * IZR k * PI) / INR n) ∧
+    cosθ = cos ((θ₀ + 2 * IZR k * PI) / INR n)).
 
 Definition J_of_nat axis n : (ℝ * ℝ) :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
   let nk := z_of_nat nnk in
   let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
-  let sinθ := sin ((asin sinθ₀ + 2 * IZR nk * PI) / INR nn) in
-  let cosθ := cos ((acos cosθ₀ + 2 * IZR nk * PI) / INR nn) in
+  let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
+  let sinθ := sin ((θ₀ + 2 * IZR nk * PI) / INR nn) in
+  let cosθ := cos ((θ₀ + 2 * IZR nk * PI) / INR nn) in
   (sinθ, cosθ).
 
 Theorem J_is_countable : ∀ axis,
@@ -5454,25 +5456,29 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         now rewrite mat_vec_mul_assoc, <- Hu.
 
         intros Hvn.
-        subst v.
         apply Hj; clear Hj; unfold J.
         remember J₀ as a; simpl; subst a.
         rewrite HE in Hu.
         remember D as d; remember intersection as b.
         simpl in Hu; subst d b.
         destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
-        rewrite Hu in Hvn.
-        rewrite <- mat_vec_mul_assoc in Hvn.
-        replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hvn by easy.
-        remember (sin (asin s * INR (S n))) as s₀ eqn:Hs₀.
-bbb.
-(* acos c or asin s? *)
-        remember (cos (acos c * INR (S n))) as c₀ eqn:Hc₀.
+        rewrite Hu in Hv.
+        rewrite <- mat_vec_mul_assoc in Hv.
+        replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
+        remember (angle_of_sin_cos s c) as θ eqn:Hθ.
+        remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
+        remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
         exists s₀, c₀.
         split.
+         split; [ subst s₀ c₀; apply sin2_cos2 | ].
+         remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
+         remember D as d; remember sphere as sph; simpl; subst d sph.
+         rewrite <- HS₂.
+         exists p₀, v.
+         split; [ easy | ].
          split.
-          subst s₀ c₀.
-Check sin2_cos2.
+          split; [ easy | ].
+
 bbb.
 
         rewrite Hs₀, Hc₀.
