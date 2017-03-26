@@ -551,6 +551,11 @@ destruct (Req_dec x 0) as [Hxz| Hxz].
   destruct (Rle_dec 0 (- x)); lra.
 Qed.
 
+Definition atan' x y :=
+  if Req_dec y 0 then Rsign x * PI / 2 else atan (x / y).
+
+bbb.
+
 Definition asin x := atan (x / √ (1 - x²)).
 Definition acos x := PI / 2 - asin x.
 
@@ -1076,7 +1081,26 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
 
   apply Rnot_lt_le in Hc.
   rewrite cos_plus, cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rminus_0_r.
+  destruct (Req_dec (sin x) (-1)) as [Hs1| Hs1].
+   rewrite Hs1.
+   unfold asin.
+
+bbb.
+
   rewrite cos_asin.
+   specialize (sin2_cos2 x) as Hsc.
+   apply Rsqr_inj; [ easy | apply sqrt_pos | ].
+   rewrite Rsqr_sqrt; [ lra | ].
+   enough ((sin x)² ≤ 1) by lra.
+   replace 1 with 1² by apply Rsqr_1.
+   apply neg_pos_Rsqr_le; [ | lra ].
+   apply SIN_bound.
+
+   split; [ | lra ].
+   specialize (SIN_bound x) as (Hslb, _).
+   enough (H : sin x ≠ -1) by lra.
+   intros H; clear Hs Hslb.
+
 bbb.
   rewrite asin_sin.
   rewrite atan_tan.
