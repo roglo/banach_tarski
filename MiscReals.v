@@ -1143,9 +1143,12 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    rewrite Rsign_of_neg; [ | lra ].
    rewrite <- Ropp_mult_distr_l, Rmult_1_l.
    rewrite Ropp_div, cos_neg, cos_PI2.
-bbb.
+   specialize (sin2_cos2 x) as H.
+   rewrite Hs1, <- Rsqr_neg, Rsqr_1 in H.
+   assert (Hz : (cos x)² = 0) by lra.
+   now apply Rsqr_eq_0 in Hz.
 
-  rewrite cos_asin.
+   rewrite cos_asin; [ | apply SIN_bound ].
    specialize (sin2_cos2 x) as Hsc.
    apply Rsqr_inj; [ easy | apply sqrt_pos | ].
    rewrite Rsqr_sqrt; [ lra | ].
@@ -1154,21 +1157,19 @@ bbb.
    apply neg_pos_Rsqr_le; [ | lra ].
    apply SIN_bound.
 
-   split; [ | lra ].
-   specialize (SIN_bound x) as (Hslb, _).
-   enough (H : sin x ≠ -1) by lra.
-   intros H; clear Hs Hslb.
+ destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
+  rewrite cos_acos; [ easy | apply COS_bound ].
 
-bbb.
-  rewrite asin_sin.
-  rewrite atan_tan.
-bbb.
-  unfold acos.
-  rewrite asin_cos; [ | lra ].
-  rewrite <- Ropp_mult_distr_l.
-  unfold Rminus at 2; rewrite Ropp_involutive.
-Search (cos (2 * PI - _)).
-bbb.
+  rewrite cos_asin; [ | apply SIN_bound ].
+  apply Rnot_lt_le in Hc.
+  specialize (sin2_cos2 x) as Hsc.
+  apply Rsqr_inj; [ easy | apply sqrt_pos | ].
+  rewrite Rsqr_sqrt; [ lra | ].
+  enough ((sin x)² ≤ 1) by lra.
+  replace 1 with 1² by apply Rsqr_1.
+  apply Rsqr_incr_1; [ | lra | lra ].
+  apply SIN_bound.
+Qed.
 
 Theorem Rneq_le_lt : ∀ x y, x ≠ y → x ≤ y → x < y.
 Proof.
