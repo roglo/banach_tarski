@@ -49,6 +49,14 @@ Proof. intros; lra. Qed.
 Theorem Rminus_opp : ∀ x y, x - - y = x + y.
 Proof. intros; lra. Qed.
 
+Theorem Ropp_div_r : ∀ x y, y ≠ 0 → x / - y = - (x / y).
+Proof.
+intros * Hy.
+unfold Rdiv.
+rewrite <- Ropp_inv_permute; [ | easy ].
+now rewrite <- Ropp_mult_distr_r.
+Qed.
+
 Theorem Rmult_div_same : ∀ x y, y ≠ 0 → x / y * y = x.
 Proof.
 intros * Hy.
@@ -909,6 +917,9 @@ Definition Rdiv_mod x y :=
 Definition Rediv x y := fst (Rdiv_mod x y).
 Definition Rmod x y := snd (Rdiv_mod x y).
 
+Notation "x 'ediv' y" := (Rediv x y) (at level 40).
+Notation "x 'rmod' y" := (Rmod x y) (at level 40).
+
 Theorem Rmod_interv : ∀ x y, 0 < y → 0 ≤ Rmod x y < y.
 Proof.
 intros * Hy.
@@ -1150,6 +1161,23 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    rewrite Rmult_plus_distr_r.
    rewrite Rmult_1_l.
    rewrite Rmod_from_ediv.
+Search (_ / (_ * _))%nat.
+Theorem Rediv_div : ∀ x y z,
+  y ≠ 0
+  → z ≠ 0
+  → IZR (x ediv y) ediv z = x ediv (y * z).
+Proof.
+intros * Hy Hz.
+unfold Rediv, fst, Rdiv_mod.
+destruct (Rcase_abs z) as [Hzn| Hzp].
+ destruct (Rcase_abs y) as [Hyn| Hyp].
+  destruct (Rcase_abs (y * z)) as [Hyzn| Hyzp].
+   rewrite Ropp_div_r; [ | easy ].
+   rewrite Ropp_div_r; [ | easy ].
+Search (up (- _)).
+(* putain, faut que je change le up en Int_part ! *)
+bbb.
+Rediv (2 * x) y = 2 * Rediv x y
 bbb.
 
   rewrite cos_minus.
