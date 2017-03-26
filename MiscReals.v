@@ -974,8 +974,6 @@ destruct (Rcase_abs y) as [Hy| Hy].
  rewrite Ropp_plus_distr.
  rewrite fold_Rminus.
  rewrite <- Ropp_mult_distr_r.
-bbb.
- do 2 rewrite up_Int_part.
  ring_simplify.
  rewrite Rminus_Int_part1.
   rewrite Z.opp_sub_distr.
@@ -988,9 +986,6 @@ bbb.
 
  rewrite Rdiv_plus_distr.
  rewrite Rdiv_same; [ | easy ].
- do 2 rewrite up_Int_part.
- rewrite Z.add_simpl_r.
- rewrite Z.sub_simpl_r.
  rewrite plus_Int_part2.
   replace 1 with (IZR 1) by lra.
   now rewrite Int_part_IZR.
@@ -1012,7 +1007,7 @@ assert (Htz : tan z = tan x).
  subst z.
  unfold Rmod, Rdiv_mod, snd.
  destruct (Rcase_abs PI) as [HP| HP]; [ lra | ].
- remember (IZR (up ((x + PI / 2) / PI) - 1) * PI) as t eqn:Ht.
+ remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as t eqn:Ht.
  replace (x + PI / 2 - t - PI / 2) with (x - t) by lra.
  rewrite tan_minus; [ | lra | | | ].
   subst t; rewrite tan_ZPI.
@@ -1173,12 +1168,14 @@ unfold Rediv, fst, Rdiv_mod.
 destruct (Rcase_abs z) as [Hzn| Hzp].
  destruct (Rcase_abs y) as [Hyn| Hyp].
   destruct (Rcase_abs (y * z)) as [Hyzn| Hyzp].
+   exfalso.
+   apply Rlt_not_le in Hyzn; apply Hyzn; clear Hyzn.
+   rewrite <- Rmult_opp_opp.
+   apply Rmult_le_pos; lra.
+
    rewrite Ropp_div_r; [ | easy ].
    rewrite Ropp_div_r; [ | easy ].
-Search (up (- _)).
-(* putain, faut que je change le up en Int_part ! *)
-bbb.
-Rediv (2 * x) y = 2 * Rediv x y
+   rewrite opp_IZR, <- Ropp_div, Ropp_involutive.
 bbb.
 
   rewrite cos_minus.
