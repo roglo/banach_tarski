@@ -905,11 +905,13 @@ specialize (tan_Zperiod 0 k Hc) as H.
 now rewrite Rplus_0_l, tan_0 in H.
 Qed.
 
+Print Int_part.
+
 Definition Rdiv_mod x y :=
   let k :=
     match Rcase_abs y with
-    | left _ => (1 - up (x / - y))%Z
-    | right _ => (up (x / y) - 1)%Z
+    | left _ => (- Int_part (x / - y))%Z
+    | right _ => Int_part (x / y)
     end
   in
   (k, x - IZR k * y).
@@ -929,15 +931,13 @@ split.
  apply Rmult_le_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
  rewrite Rmult_0_l, fold_Rdiv, Rdiv_minus_distr, Rmult_div.
  rewrite Rmult_div_same; [ | lra ].
- rewrite minus_IZR; simpl.
- specialize (archimed (x / y)); lra.
+ specialize (base_Int_part (x / y)); lra.
 
  apply Rmult_lt_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
  rewrite fold_Rdiv, fold_Rdiv, Rdiv_minus_distr, Rmult_div.
  rewrite Rmult_div_same; [ | lra ].
  rewrite Rdiv_same; [ | lra ].
- rewrite minus_IZR; simpl.
- specialize (archimed (x / y)); lra.
+ specialize (base_Int_part (x / y)); lra.
 Qed.
 
 Theorem Rmod_from_ediv : ∀ x y, Rmod x y = x - IZR (Rediv x y) * y.
@@ -974,6 +974,7 @@ destruct (Rcase_abs y) as [Hy| Hy].
  rewrite Ropp_plus_distr.
  rewrite fold_Rminus.
  rewrite <- Ropp_mult_distr_r.
+bbb.
  do 2 rewrite up_Int_part.
  ring_simplify.
  rewrite Rminus_Int_part1.
