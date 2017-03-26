@@ -1202,10 +1202,24 @@ bbb.
   apply SIN_bound.
 Qed.
 bbb.
+*)
 
 Theorem cos_angle_of_sin_cos : ∀ x,
   cos x = cos (angle_of_sin_cos (sin x) (cos x)).
 Proof.
+intros.
+rewrite angle_of_sin_cos_inv.
+rewrite Rmod_from_ediv.
+rewrite cos_minus.
+rewrite <- Rmult_assoc.
+replace 2 with (IZR 2) by lra.
+rewrite <- mult_IZR.
+rewrite cos_ZPI, sin_ZPI, Rmult_0_r, Rplus_0_r.
+rewrite Zabs2Nat.inj_mul; simpl (Z.abs_nat 2).
+unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+now rewrite Nat.mul_comm, pow_1_even, Rmult_1_r.
+bbb.
+
 intros.
 unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
