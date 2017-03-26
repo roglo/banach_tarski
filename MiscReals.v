@@ -43,6 +43,12 @@ Proof. intros; lra. Qed.
 Theorem Rdiv_mult : ∀ x y z, x * (y / z) = x * y / z.
 Proof. intros; lra. Qed.
 
+Theorem Rminus_plus_distr : ∀ x y z, x - (y + z) = x - y - z.
+Proof. intros; lra. Qed.
+
+Theorem Rminus_opp : ∀ x y, x - - y = x + y.
+Proof. intros; lra. Qed.
+
 Theorem Rmult_div_same : ∀ x y, y ≠ 0 → x / y * y = x.
 Proof.
 intros * Hy.
@@ -1113,6 +1119,89 @@ replace (PI / 2 + (PI / 2 + x)) with (x + PI) by lra.
 rewrite neg_sin, Rsign_neg.
 f_equal; f_equal; f_equal; lra.
 Qed.
+
+Theorem acos_cos : ∀ x,
+  sin x ≠ 0
+  → acos (cos x) = Rsign (sin x) * atan (tan (x + PI / 2)) + PI / 2.
+Proof.
+intros * Hs.
+unfold acos.
+rewrite asin_cos; [ lra | easy ].
+Qed.
+
+Theorem angle_of_sin_cos_inv : ∀ x,
+  angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
+Proof.
+intros.
+unfold angle_of_sin_cos.
+destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
+ destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
+  rewrite acos_cos; [ | lra ].
+  rewrite Rsign_of_neg; [ | easy ].
+  rewrite <- Ropp_mult_distr_l, Rmult_1_l.
+  rewrite Rminus_plus_distr.
+  rewrite Rminus_opp.
+  rewrite Rplus_comm.
+  rewrite atan_tan.
+   rewrite Rplus_assoc.
+   replace (PI / 2 + PI / 2) with PI by lra.
+   rewrite Rediv_add; [ | apply PI_neq0 ].
+   rewrite plus_IZR; simpl (IZR 1).
+   rewrite Rmult_plus_distr_r.
+   rewrite Rmult_1_l.
+   rewrite Rmod_from_ediv.
+bbb.
+
+  rewrite cos_minus.
+  rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rplus_0_r.
+  rewrite cos_acos; [ easy | ].
+  split; [ | lra ].
+  specialize (COS_bound x) as (H, _).
+  destruct (Req_dec (cos x) (-1)) as [H1| H1]; [ exfalso | lra ].
+  clear H Hc.
+  assert (Hs2 : 0 < (sin x)²) by (apply Rlt_0_sqr; lra).
+  specialize (sin2_cos2 x) as Hsc.
+  rewrite H1, <- Rsqr_neg, Rsqr_1 in Hsc; lra.
+
+  apply Rnot_lt_le in Hc.
+  rewrite cos_plus, cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rminus_0_r.
+  destruct (Req_dec (sin x) (-1)) as [Hs1| Hs1].
+   rewrite Hs1.
+   unfold asin, atan'.
+   rewrite <- Rsqr_neg, Rsqr_1, Rminus_diag_eq; [ | easy ].
+   rewrite sqrt_0.
+   destruct (Req_dec 0 0) as [Hz| Hz]; [ clear Hz | lra ].
+   rewrite Rsign_of_neg; [ | lra ].
+   rewrite <- Ropp_mult_distr_l, Rmult_1_l.
+   rewrite Ropp_div, cos_neg, cos_PI2.
+   specialize (sin2_cos2 x) as H.
+   rewrite Hs1, <- Rsqr_neg, Rsqr_1 in H.
+   assert (Hz : (cos x)² = 0) by lra.
+   now apply Rsqr_eq_0 in Hz.
+
+   rewrite cos_asin; [ | apply SIN_bound ].
+   specialize (sin2_cos2 x) as Hsc.
+   apply Rsqr_inj; [ easy | apply sqrt_pos | ].
+   rewrite Rsqr_sqrt; [ lra | ].
+   enough ((sin x)² ≤ 1) by lra.
+   replace 1 with 1² by apply Rsqr_1.
+   apply neg_pos_Rsqr_le; [ | lra ].
+   apply SIN_bound.
+
+ destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
+  rewrite cos_acos; [ easy | apply COS_bound ].
+
+  rewrite cos_asin; [ | apply SIN_bound ].
+  apply Rnot_lt_le in Hc.
+  specialize (sin2_cos2 x) as Hsc.
+  apply Rsqr_inj; [ easy | apply sqrt_pos | ].
+  rewrite Rsqr_sqrt; [ lra | ].
+  enough ((sin x)² ≤ 1) by lra.
+  replace 1 with 1² by apply Rsqr_1.
+  apply Rsqr_incr_1; [ | lra | lra ].
+  apply SIN_bound.
+Qed.
+bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
   cos x = cos (angle_of_sin_cos (sin x) (cos x)).
