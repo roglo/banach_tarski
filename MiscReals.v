@@ -1234,6 +1234,21 @@ enough (2 * IZR k * PI < y < PI + 2 * IZR k * PI) by lra.
 bbb.
 *)
 
+Theorem Rediv_div : ∀ x y z,
+  y ≠ 0
+  → 0 < z
+  → IZR (x ediv y) ediv z = x ediv (y * z).
+Proof.
+intros * Hy Hz.
+unfold Rediv, fst, Rdiv_mod.
+destruct (Rcase_abs z) as [Haz| Haz]; [ lra | clear Haz ].
+destruct (Rcase_abs y) as [Hay| Hay].
+ destruct (Rcase_abs (y * z)) as [Hayz| Hayz].
+  rewrite opp_IZR.
+Search (Int_part (- _)).
+Check Int_part.
+bbb.
+
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
@@ -1254,6 +1269,9 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Rmod_from_ediv.
     rewrite plus_IZR; simpl (IZR 1).
 Search (_ ediv (_ * _)).
+replace (2 * PI) with (PI * 2) by lra.
+rewrite <- Rediv_div.
+
 bbb.
   rewrite acos_cos; [ | lra ].
   rewrite Rsign_of_neg; [ | easy ].
