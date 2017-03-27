@@ -1186,35 +1186,25 @@ Proof.
 bbb.
 *)
 
-Theorem pos_sin_interv : ∀ x, 0 < sin x → 0 < x rmod (2 * PI) < PI.
+Theorem pos_sin_interv : ∀ x, 0 < sin x → x rmod (2 * PI) < PI.
 Proof.
 intros * Hs.
-enough (Ha : 0 < asin (sin x)).
- rewrite asin_sin in Ha.
+apply Rnot_le_lt; intros Hx.
+apply Rlt_not_le in Hs; apply Hs; clear Hs.
+enough (H : sin (x rmod (2 * PI)) ≤ 0).
+ rewrite Rmod_from_ediv in H.
+ unfold Rminus in H.
+ rewrite Ropp_mult_distr_l in H.
+ rewrite <- opp_IZR in H.
+ rewrite Rmult_comm, Rmult_shuffle0 in H.
+ now rewrite sin_Zperiod in H.
 
-bbb.
-intros * Hs.
-unfold sin, exist_sin in Hs.
-unfold Alembert_C3 in Hs.
-destruct (total_order_T x² 0) as [[Hx| Hx]| Hx].
- exfalso; clear - Hx; apply Rlt_not_le in Hx; apply Hx.
- apply Rle_0_sqr.
+ apply sin_le_0; [ easy | ].
+ assert (HP : 0 < 2 * PI) by (specialize PI_RGT_0; lra).
+ specialize (Rmod_interv x (2 * PI) HP) as H; lra.
+Qed.
 
- specialize (Rsqr_eq_0 _ Hx) as Hx2; subst x; simpl in Hs.
- destruct (AlembertC3_step2 sin_n 0² Hx); lra.
-
- simpl in Hs.
- unfold AlembertC3_step1 in Hs.
-bbb.
-
-intros * Hs.
-apply asin_increasing in Hs; [ | lra | apply SIN_bound ].
-rewrite asin_sin in Hs.
- rewrite atan_tan in Hs.
- rewrite asin_0 in Hs.
- rewrite Rmod_from_ediv.
-bbb.
-
+(*
 Theorem pos_sin_interv2 : ∀ x k,
   0 < sin x
   → k = x ediv (2 * PI)
@@ -1242,6 +1232,7 @@ assert (x = y + PI) by lra.
 subst x; clear Hy.
 enough (2 * IZR k * PI < y < PI + 2 * IZR k * PI) by lra.
 bbb.
+*)
 
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
@@ -1250,6 +1241,7 @@ intros.
 unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
+bbb.
   rewrite acos_cos; [ | lra ].
   rewrite Rsign_of_neg; [ | easy ].
   rewrite <- Ropp_mult_distr_l, Rmult_1_l.
