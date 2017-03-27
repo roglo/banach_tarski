@@ -1139,9 +1139,48 @@ unfold acos.
 rewrite asin_cos; [ lra | easy ].
 Qed.
 
+Theorem asin_0 : asin 0 = 0.
+Proof.
+unfold asin, atan'.
+rewrite Rsqr_0, Rminus_0_r, sqrt_1, Rdiv_1_r, atan_0.
+destruct (Req_dec 1 0); [ lra | easy ].
+Qed.
+
+(*
+Theorem asin_increasing : ∀ x y,
+  -1 ≤ x ≤ 1
+  → -1 ≤ y ≤ 1
+  → x < y
+  → asin x < asin y.
+Proof.
+bbb.
+*)
+
 Theorem pos_sin_interv : ∀ x, 0 < sin x → 0 < x rmod (2 * PI) < PI.
 Proof.
 intros * Hs.
+
+bbb.
+intros * Hs.
+unfold sin, exist_sin in Hs.
+unfold Alembert_C3 in Hs.
+destruct (total_order_T x² 0) as [[Hx| Hx]| Hx].
+ exfalso; clear - Hx; apply Rlt_not_le in Hx; apply Hx.
+ apply Rle_0_sqr.
+
+ specialize (Rsqr_eq_0 _ Hx) as Hx2; subst x; simpl in Hs.
+ destruct (AlembertC3_step2 sin_n 0² Hx); lra.
+
+ simpl in Hs.
+ unfold AlembertC3_step1 in Hs.
+bbb.
+
+intros * Hs.
+apply asin_increasing in Hs; [ | lra | apply SIN_bound ].
+rewrite asin_sin in Hs.
+ rewrite atan_tan in Hs.
+ rewrite asin_0 in Hs.
+ rewrite Rmod_from_ediv.
 bbb.
 
 Theorem pos_sin_interv2 : ∀ x k,
