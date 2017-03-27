@@ -529,8 +529,8 @@ intros.
 apply Rplus_le_le_0_compat; apply Rle_0_sqr.
 Qed.
 
-Definition Rsign x :=
-  if Req_dec x 0 then 0 else if Rle_dec 0 x then 1 else -1.
+Definition Rsignp x := if Rle_dec 0 x then 1 else -1.
+Definition Rsign x := if Req_dec x 0 then 0 else Rsignp x.
 
 Theorem Rsign_0 : Rsign 0 = 0.
 Proof.
@@ -538,10 +538,24 @@ unfold Rsign.
 destruct (Req_dec 0 0); [ easy | lra ].
 Qed.
 
+Theorem Rsignp_of_pos : ∀ x, 0 ≤ x → Rsignp x = 1.
+Proof.
+intros * Hx.
+unfold Rsignp.
+destruct (Rle_dec 0 x); [ easy | lra ].
+Qed.
+
+Theorem Rsignp_of_neg : ∀ x, x < 0 → Rsignp x = -1.
+Proof.
+intros * Hx.
+unfold Rsignp.
+destruct (Rle_dec 0 x); [ lra | easy ].
+Qed.
+
 Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
 Proof.
 intros * Hx.
-unfold Rsign.
+unfold Rsign, Rsignp.
 destruct (Req_dec x 0); [ lra |  ].
 destruct (Rle_dec 0 x); [ easy | lra ].
 Qed.
@@ -549,7 +563,7 @@ Qed.
 Theorem Rsign_of_neg : ∀ x, x < 0 → Rsign x = -1.
 Proof.
 intros * Hx.
-unfold Rsign.
+unfold Rsign, Rsignp.
 destruct (Req_dec x 0); [ lra |  ].
 destruct (Rle_dec 0 x); [ lra | easy ].
 Qed.
@@ -557,7 +571,7 @@ Qed.
 Theorem Rsign_neg : ∀ x, Rsign (- x) = - Rsign x.
 Proof.
 intros.
-unfold Rsign.
+unfold Rsign, Rsignp.
 destruct (Req_dec x 0) as [Hxz| Hxz].
  subst x; rewrite Ropp_0; simpl.
  destruct (Req_dec 0 0); [ easy | lra ].
@@ -655,7 +669,7 @@ unfold asin.
 unfold atan'.
 destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx].
  rewrite Hsx.
- unfold Rsign.
+ unfold Rsign, Rsignp.
  destruct (Req_dec x 0) as [Hxz| Hxz].
   rewrite Hxz in Hsx.
   rewrite Rsqr_0, Rminus_0_r, sqrt_1 in Hsx; lra.
@@ -1086,29 +1100,32 @@ destruct (Rlt_dec (cos x) 0) as [Hx| Hx].
  apply pos_cos_atan_tan; lra.
 Qed.
 
-Theorem asin_sin : ∀ x, cos x ≠ 0 → asin (sin x) = Rsign (cos x) * atan (tan x).
+Theorem asin_sin : ∀ x,
+  asin (sin x) = Rsignp (cos x) * atan' (sin x) (cos x).
 Proof.
-intros * Hc.
+intros.
 unfold asin, atan'.
 rewrite <- cos2.
 rewrite sqrt_Rsqr_abs.
-destruct (Req_dec (Rabs (cos x)) 0) as [Haz| Haz].
- exfalso; apply Hc.
- unfold Rabs in Haz.
- destruct (Rcase_abs (cos x)); lra.
+destruct (Req_dec (cos x) 0) as [Haz| Haz].
+ rewrite Haz, Rabs_R0.
+ rewrite Rsignp_of_pos; [ | lra ].
+ destruct (Req_dec 0 0); lra.
 
- unfold Rabs in Haz; unfold Rabs.
- destruct (Rcase_abs (cos x)) as [Ha| Ha].
-  unfold Rdiv.
-  rewrite <- Ropp_inv_permute; [ | lra ].
-  rewrite <- Ropp_mult_distr_r.
-  rewrite fold_Rdiv.
-  fold (tan x).
-  rewrite atan_opp.
-  rewrite Rsign_of_neg; [ lra | easy ].
+ destruct (Req_dec (Rabs (cos x))) as [Hab| Hab].
+  now apply Rabs_eq_0 in Hab.
 
-  fold (tan x).
-  rewrite Rsign_of_pos; lra.
+  unfold Rabs.
+  destruct (Rcase_abs (cos x)) as [Ha| Ha].
+   unfold Rdiv.
+   rewrite Rsignp_of_neg; [ | easy ].
+   destruct (Rle_dec 0 (cos x)); [ lra | ].
+   rewrite <- Ropp_inv_permute; [ | lra ].
+   rewrite <- Ropp_mult_distr_r.
+   rewrite fold_Rdiv.
+   fold (tan x); rewrite atan_opp; lra.
+
+   rewrite Rsignp_of_pos; lra.
 Qed.
 
 Theorem cos_plus_PI2 : ∀ x, cos (x + PI / 2) = - sin x.
@@ -1123,6 +1140,8 @@ Theorem asin_cos : ∀ x,
 Proof.
 intros * Hs.
 assert (Hc : cos (PI / 2 + x) ≠ 0) by (rewrite Rplus_comm, cos_plus_PI2; lra).
+bbb.
+
 rewrite cos_sin, asin_sin; [ | easy ].
 rewrite cos_sin.
 replace (PI / 2 + (PI / 2 + x)) with (x + PI) by lra.
@@ -1159,6 +1178,8 @@ bbb.
 Theorem pos_sin_interv : ∀ x, 0 < sin x → 0 < x rmod (2 * PI) < PI.
 Proof.
 intros * Hs.
+enough (Ha : 0 < asin (sin x)).
+ rewrite asin_sin in Ha.
 
 bbb.
 intros * Hs.
