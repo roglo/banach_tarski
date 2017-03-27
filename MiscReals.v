@@ -1203,25 +1203,7 @@ Theorem neg_sin_interv : ∀ x k,
   → PI + 2 * IZR k * PI < x < 2 * PI + 2 * IZR k * PI.
 Proof.
 intros * Hs Hk.
-bbb.
-
-Theorem neg_sin_interv : ∀ x,
-  sin x < 0
-  → ∃ k : ℤ, PI + 2 * IZR k * PI < x < 2 * PI + 2 * IZR k * PI.
-
-2kΠ<x-Π<2kΠ+Π
-k=(x-Π)/2Π
-
-E((x-π)/2kΠ)=1
-
-
-bbb.
-(* Π+2kΠ < x < 2Π+2kΠ (because sin x < 0)
-   E(x/Π) = 2k+1 ⇒ left = 2kΠ
-   E(x/(2Π)) = k ⇒ right = 2kΠ
-*)
-Search (sin _ < 0).
-
+Search (sin _ < _ → _).
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
