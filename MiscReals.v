@@ -1166,24 +1166,8 @@ destruct (Req_dec (- sin x) 0) as [H1| H1].
   rewrite Rsign_of_pos; lra.
 Qed.
 
-Theorem acos_cos : ∀ x,
-  acos (cos x) = 42.
-Proof.
-intros.
-unfold acos.
-rewrite asin_cos.
-Check asin_sin.
-
-bbb.
-
-Theorem acos_cos : ∀ x,
-  sin x ≠ 0
-  → acos (cos x) = Rsign (sin x) * atan (tan (x + PI / 2)) + PI / 2.
-Proof.
-intros * Hs.
-unfold acos.
-rewrite asin_cos; [ lra | easy ].
-Qed.
+Theorem acos_cos : ∀ x, acos (cos x) = PI / 2 - asin (cos x).
+Proof. easy. Qed.
 
 Theorem asin_0 : asin 0 = 0.
 Proof.
