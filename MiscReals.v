@@ -1255,7 +1255,7 @@ Theorem glop : ∀ x,
       - IZR (Int_part x)
       - if Req_dec x (IZR (Int_part x)) then 0 else 1.
 Proof.
-Admitted. Show.
+bbb.
 
 rewrite glop.
 Search (Int_part (- _)).
