@@ -532,6 +532,12 @@ Qed.
 Definition Rsignp x := if Rle_dec 0 x then 1 else -1.
 Definition Rsign x := if Req_dec x 0 then 0 else Rsignp x.
 
+Theorem Rsignp_0 : Rsignp 0 = 1.
+Proof.
+unfold Rsignp.
+destruct (Rle_dec 0 0); [ easy | lra ].
+Qed.
+
 Theorem Rsign_0 : Rsign 0 = 0.
 Proof.
 unfold Rsign.
@@ -1135,19 +1141,40 @@ rewrite cos_plus, cos_PI2, sin_PI2; lra.
 Qed.
 
 Theorem asin_cos : ∀ x,
-  sin x ≠ 0
-  → asin (cos x) = - Rsign (sin x) * atan (tan (x + PI / 2)).
+  asin (cos x) =
+   if Req_dec (sin x) 0 then Rsign (cos x) * PI / 2
+   else - Rsign (sin x) * atan (tan (x + PI / 2)).
 Proof.
-intros * Hs.
-assert (Hc : cos (PI / 2 + x) ≠ 0) by (rewrite Rplus_comm, cos_plus_PI2; lra).
-bbb.
+intros.
+rewrite cos_sin, asin_sin.
+rewrite Rplus_comm.
+unfold atan'.
+fold (tan (x + PI / 2)).
+rewrite cos_plus_PI2.
+unfold Rsignp.
+destruct (Req_dec (- sin x) 0) as [H1| H1].
+ rewrite H1.
+ apply (f_equal Ropp) in H1.
+ rewrite Ropp_involutive, Ropp_0 in H1.
+ rewrite H1.
+ destruct (Rle_dec 0 0) as [H| H]; [ clear H | lra ].
+ destruct (Req_dec 0 0); lra.
 
-rewrite cos_sin, asin_sin; [ | easy ].
-rewrite cos_sin.
-replace (PI / 2 + (PI / 2 + x)) with (x + PI) by lra.
-rewrite neg_sin, Rsign_neg.
-f_equal; f_equal; f_equal; lra.
+ destruct (Req_dec (sin x) 0) as [Hs| Hs]; [ lra | clear H1 ].
+ destruct (Rle_dec 0 (- sin x)) as [H1| H1].
+  rewrite Rsign_of_neg; lra.
+  rewrite Rsign_of_pos; lra.
 Qed.
+
+Theorem acos_cos : ∀ x,
+  acos (cos x) = 42.
+Proof.
+intros.
+unfold acos.
+rewrite asin_cos.
+Check asin_sin.
+
+bbb.
 
 Theorem acos_cos : ∀ x,
   sin x ≠ 0
