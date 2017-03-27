@@ -1139,18 +1139,18 @@ unfold acos.
 rewrite asin_cos; [ lra | easy ].
 Qed.
 
-Theorem glop : ∀ x, 0 < sin x → 0 < x rmod (2 * PI) < PI.
+Theorem pos_sin_interv : ∀ x, 0 < sin x → 0 < x rmod (2 * PI) < PI.
 Proof.
 intros * Hs.
 bbb.
 
-Theorem pos_sin_interv : ∀ x k,
+Theorem pos_sin_interv2 : ∀ x k,
   0 < sin x
   → k = x ediv (2 * PI)
   →  2 * IZR k * PI < x < PI + 2 * IZR k * PI.
 Proof.
 intros * Hs Hk.
-specialize (glop x Hs) as H.
+specialize (pos_sin_interv x Hs) as H.
 rewrite Rmod_from_ediv in H.
 rewrite <- Hk in H; lra.
 Qed.
