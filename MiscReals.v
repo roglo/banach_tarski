@@ -1139,6 +1139,31 @@ unfold acos.
 rewrite asin_cos; [ lra | easy ].
 Qed.
 
+Theorem pos_sin_interv : ∀ x k,
+  0 < sin x
+  → k = x ediv (2 * PI)
+  →  2 * IZR k * PI < x < PI + 2 * IZR k * PI.
+Proof.
+Search (0 < sin _).
+bbb.
+
+Theorem neg_sin_interv : ∀ x k,
+  sin x < 0
+  → k = (x - PI) ediv (2 * PI)
+  → PI + 2 * IZR k * PI < x < 2 * PI + 2 * IZR k * PI.
+Proof.
+intros * Hs Hk.
+apply Ropp_lt_contravar in Hs.
+rewrite <- neg_sin, Ropp_0 in Hs.
+rewrite <- sin_Zperiod with (k := (-1)%Z) in Hs; simpl in Hs.
+replace (x + PI + 2 * -1 * PI) with (x - PI) in Hs by lra.
+remember (x - PI) as y eqn:Hy.
+replace (2 * PI) with (PI + PI) by lra.
+assert (x = y + PI) by lra.
+subst x; clear Hy.
+enough (2 * IZR k * PI < y < PI + 2 * IZR k * PI) by lra.
+bbb.
+
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
@@ -1197,13 +1222,22 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
       rewrite Rplus_simpl_r; lra.
 
     idtac.
-Theorem neg_sin_interv : ∀ x k,
-  sin x < 0
-  → k = (x - PI) ediv (2 * PI)
-  → PI + 2 * IZR k * PI < x < 2 * PI + 2 * IZR k * PI.
-Proof.
-intros * Hs Hk.
+Check neg_sin_interv.
+
+bbb.
 Search (sin _ < _ → _).
+unfold sin in Hs.
+unfold exist_sin in Hs.
+unfold Alembert_C3 in Hs.
+destruct (total_order_T x² 0) as [[Hx| Hx]| Hx].
+ exfalso; clear - Hx; apply Rlt_not_le in Hx; apply Hx.
+ apply Rle_0_sqr.
+
+ specialize (Rsqr_eq_0 _ Hx) as Hx2; subst x; simpl in Hs.
+ destruct (AlembertC3_step2 sin_n 0² Hx); lra.
+
+ simpl in Hs.
+
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
