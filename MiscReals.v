@@ -65,6 +65,9 @@ rewrite Rmult_assoc.
 rewrite Rinv_l; [ lra | easy ].
 Qed.
 
+Theorem Rplus_simpl_r : ∀ x y, x + y - y = x.
+Proof. intros; lra. Qed.
+
 Theorem Rplus_shuffle0 : ∀ n m p : ℝ, n + m + p = n + p + m.
 Proof.
 intros.
@@ -1166,8 +1169,34 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
    destruct (Rcase_abs (2 * PI)) as [HP| HP]; [ lra | clear HP ].
    enough (∃ k, PI + 2 * IZR k * PI < x < 2 * PI + 2 * IZR k * PI) as (k, Hk).
-    assert (Int_part (x / PI) = (2 * k + 1)%Z).
+    assert (H1 : IZR (2 * k + 1) ≤ x / PI < IZR (2 * k + 1 + 1)).
+     do 3 rewrite plus_IZR; simpl (IZR 1).
+     split.
+      apply Rmult_le_reg_r with (r := PI); [ lra | ].
+      rewrite mult_IZR; simpl (IZR 2).
+      rewrite Rmult_div_same; lra.
 
+      apply Rmult_lt_reg_r with (r := PI); [ lra | ].
+      rewrite mult_IZR; simpl (IZR 2).
+      rewrite Rmult_div_same; lra.
+
+     erewrite Int_part_interv; [ | eassumption ].
+     assert (H2 : IZR k ≤ x / (2 * PI) < IZR (k + 1)).
+      rewrite plus_IZR; simpl (IZR 1).
+      split.
+       apply Rmult_le_reg_r with (r := 2 * PI); [ lra | ].
+       rewrite Rmult_div_same; lra.
+
+       apply Rmult_lt_reg_r with (r := 2 * PI); [ lra | ].
+       rewrite Rmult_div_same; lra.
+
+      erewrite Int_part_interv; [ | eassumption ].
+      rewrite plus_IZR; simpl (IZR 1).
+      rewrite mult_IZR; simpl (IZR 2).
+      rewrite Rmult_plus_distr_r, Rmult_1_l.
+      rewrite Rplus_simpl_r; lra.
+
+    idtac.
 bbb.
 (* Π+2kΠ < x < 2Π+2kΠ (because sin x < 0)
    E(x/Π) = 2k+1 ⇒ left = 2kΠ
