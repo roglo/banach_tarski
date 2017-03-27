@@ -1161,6 +1161,20 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    replace (x + PI / 2 - (t + PI) + 2 * PI - PI / 2)
    with (x - (t - PI)) by lra.
    subst t; f_equal.
+   unfold Rediv, fst, Rdiv_mod.
+   specialize PI_RGT_0 as HPI.
+   destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
+   destruct (Rcase_abs (2 * PI)) as [HP| HP]; [ lra | clear HP ].
+   enough (∃ k, PI + 2 * IZR k * PI < x < 2 * PI + 2 * IZR k * PI) as (k, Hk).
+    assert (Int_part (x / PI) = (2 * k + 1)%Z).
+
+bbb.
+(* Π+2kΠ < x < 2Π+2kΠ (because sin x < 0)
+   E(x/Π) = 2k+1 ⇒ left = 2kΠ
+   E(x/(2Π)) = k ⇒ right = 2kΠ
+*)
+Search (sin _ < 0).
+
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
