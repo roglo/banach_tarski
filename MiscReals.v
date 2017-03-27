@@ -1245,6 +1245,19 @@ destruct (Rcase_abs z) as [Haz| Haz]; [ lra | clear Haz ].
 destruct (Rcase_abs y) as [Hay| Hay].
  destruct (Rcase_abs (y * z)) as [Hayz| Hayz].
   rewrite opp_IZR.
+  remember (- y) as y' eqn:Hy'.
+  assert (H : 0 < y') by lra; clear Hay; rename H into Hay.
+  rewrite Ropp_mult_distr_l, <- Hy'.
+  clear y Hy Hy' Hayz; rename y' into y; move y before x.
+Theorem glop : ∀ x,
+  0 < x
+  → IZR (Int_part (- x)) =
+      - IZR (Int_part x)
+      - if Req_dec x (IZR (Int_part x)) then 0 else 1.
+Proof.
+Admitted. Show.
+
+rewrite glop.
 Search (Int_part (- _)).
 Check Int_part.
 bbb.
