@@ -1241,6 +1241,19 @@ intros.
 unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
+  rewrite acos_cos.
+   rewrite asin_cos.
+   destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
+   rewrite <- Ropp_mult_distr_l, Rminus_opp.
+   rewrite Rsign_of_neg; [ | easy ].
+   rewrite <- Ropp_mult_distr_l, Rmult_1_l.
+   rewrite fold_Rminus.
+   rewrite atan_tan.
+    replace (x + PI / 2 + PI / 2) with (x + PI) by lra.
+    rewrite Rediv_add; [ | apply PI_neq0 ].
+    rewrite Rmod_from_ediv.
+    rewrite plus_IZR; simpl (IZR 1).
+Search (_ ediv (_ * _)).
 bbb.
   rewrite acos_cos; [ | lra ].
   rewrite Rsign_of_neg; [ | easy ].
