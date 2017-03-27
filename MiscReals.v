@@ -1157,82 +1157,16 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    rewrite Rmult_plus_distr_r.
    rewrite Rmult_1_l.
    rewrite Rmod_from_ediv.
-Search (_ / (_ * _))%nat.
-Theorem Rediv_div : ∀ x y z,
-  y ≠ 0
-  → z ≠ 0
-  → IZR (x ediv y) ediv z = x ediv (y * z).
-Proof.
-intros * Hy Hz.
-unfold Rediv, fst, Rdiv_mod.
-destruct (Rcase_abs z) as [Hzn| Hzp].
- destruct (Rcase_abs y) as [Hyn| Hyp].
-  destruct (Rcase_abs (y * z)) as [Hyzn| Hyzp].
-   exfalso.
-   apply Rlt_not_le in Hyzn; apply Hyzn; clear Hyzn.
-   rewrite <- Rmult_opp_opp.
-   apply Rmult_le_pos; lra.
-
-   rewrite Ropp_div_r; [ | easy ].
-   rewrite Ropp_div_r; [ | easy ].
-   rewrite opp_IZR, <- Ropp_div, Ropp_involutive.
+   remember (IZR (x ediv PI) * PI) as t eqn:Ht.
+   replace (x + PI / 2 - (t + PI) + 2 * PI - PI / 2)
+   with (x - (t - PI)) by lra.
+   subst t; f_equal.
 bbb.
-
-  rewrite cos_minus.
-  rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rplus_0_r.
-  rewrite cos_acos; [ easy | ].
-  split; [ | lra ].
-  specialize (COS_bound x) as (H, _).
-  destruct (Req_dec (cos x) (-1)) as [H1| H1]; [ exfalso | lra ].
-  clear H Hc.
-  assert (Hs2 : 0 < (sin x)²) by (apply Rlt_0_sqr; lra).
-  specialize (sin2_cos2 x) as Hsc.
-  rewrite H1, <- Rsqr_neg, Rsqr_1 in Hsc; lra.
-
-  apply Rnot_lt_le in Hc.
-  rewrite cos_plus, cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rminus_0_r.
-  destruct (Req_dec (sin x) (-1)) as [Hs1| Hs1].
-   rewrite Hs1.
-   unfold asin, atan'.
-   rewrite <- Rsqr_neg, Rsqr_1, Rminus_diag_eq; [ | easy ].
-   rewrite sqrt_0.
-   destruct (Req_dec 0 0) as [Hz| Hz]; [ clear Hz | lra ].
-   rewrite Rsign_of_neg; [ | lra ].
-   rewrite <- Ropp_mult_distr_l, Rmult_1_l.
-   rewrite Ropp_div, cos_neg, cos_PI2.
-   specialize (sin2_cos2 x) as H.
-   rewrite Hs1, <- Rsqr_neg, Rsqr_1 in H.
-   assert (Hz : (cos x)² = 0) by lra.
-   now apply Rsqr_eq_0 in Hz.
-
-   rewrite cos_asin; [ | apply SIN_bound ].
-   specialize (sin2_cos2 x) as Hsc.
-   apply Rsqr_inj; [ easy | apply sqrt_pos | ].
-   rewrite Rsqr_sqrt; [ lra | ].
-   enough ((sin x)² ≤ 1) by lra.
-   replace 1 with 1² by apply Rsqr_1.
-   apply neg_pos_Rsqr_le; [ | lra ].
-   apply SIN_bound.
-
- destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
-  rewrite cos_acos; [ easy | apply COS_bound ].
-
-  rewrite cos_asin; [ | apply SIN_bound ].
-  apply Rnot_lt_le in Hc.
-  specialize (sin2_cos2 x) as Hsc.
-  apply Rsqr_inj; [ easy | apply sqrt_pos | ].
-  rewrite Rsqr_sqrt; [ lra | ].
-  enough ((sin x)² ≤ 1) by lra.
-  replace 1 with 1² by apply Rsqr_1.
-  apply Rsqr_incr_1; [ | lra | lra ].
-  apply SIN_bound.
-Qed.
-bbb.
-*)
 
 Theorem cos_angle_of_sin_cos : ∀ x,
   cos x = cos (angle_of_sin_cos (sin x) (cos x)).
 Proof.
+(*
 intros.
 rewrite angle_of_sin_cos_inv.
 rewrite Rmod_from_ediv.
@@ -1245,7 +1179,7 @@ rewrite Zabs2Nat.inj_mul; simpl (Z.abs_nat 2).
 unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
 now rewrite Nat.mul_comm, pow_1_even, Rmult_1_r.
 bbb.
-
+*)
 intros.
 unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
