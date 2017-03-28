@@ -1310,7 +1310,16 @@ split.
  rewrite plus_IZR, <- H1; simpl (IZR 1).
  rewrite Rmult_plus_distr_r, Rmult_1_l.
  rewrite Ha.
-Check base_Int_part.
+bbb.
+
+Search (IZR _ + _).
+ apply Rmult_lt_reg_l with (r := t).
+Focus 2.
+rewrite Rmult_plus_distr_l.
+rewrite <- Ha.
+replace (t * (t * y) + t * y) with (t * y * (t + 1)) by lra.
+
+ Check lt_IZR.
 bbb.
    f_equal.
    rewrite Ha.
