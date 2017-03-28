@@ -1265,6 +1265,25 @@ destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
  specialize (base_Int_part x) as H; lra.
 Qed.
 
+Definition Int x := IZR (Int_part x).
+
+Theorem Int_div : ∀ x y,
+  0 < y
+  → Int x / y = Int (Int x / y)
+  → Int (x / y) = Int x / y.
+Proof.
+intros * Hy Hi.
+bbb.
+
+Theorem Int_part_div : ∀ x y t,
+  0 < y
+  → t = IZR (Int_part x) / y
+  → t = IZR (Int_part t)
+  → Int_part (x / y) = Int_part t.
+Proof.
+intros * Hy Ht Hti.
+bbb.
+
 Theorem Rediv_div : ∀ x y z,
   y ≠ 0
   → 0 < z
@@ -1291,7 +1310,7 @@ destruct (Rcase_abs y) as [Hay| Hay].
    rename a into x; rename b into y.
    move x after z; move y after z.
    apply eq_IZR; rewrite <- H1.
-   rewrite Ha; symmetry.
+   rewrite Ha.
    rename x into t; rename y into x; rename z into y.
    rewrite <- Ha, H1.
    f_equal.
