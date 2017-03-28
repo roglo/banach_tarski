@@ -1293,6 +1293,24 @@ destruct (Rcase_abs y) as [Hay| Hay].
    apply eq_IZR; rewrite <- H1.
    rewrite Ha; symmetry.
    rename x into t; rename y into x; rename z into y.
+rewrite <- Ha, H1.
+f_equal.
+apply Int_part_interv.
+apply Rmult_eq_compat_r with (r := y) in Ha.
+rewrite Rmult_div_same in Ha; [ | lra ].
+rewrite <- H1.
+split.
+ apply Rmult_le_reg_r with (r := y); [ easy | ].
+ rewrite Rmult_div_same; [ | lra ].
+ rewrite Ha.
+ apply base_Int_part.
+
+ apply Rmult_lt_reg_r with (r := y); [ easy | ].
+ rewrite Rmult_div_same; [ | lra ].
+ rewrite plus_IZR, <- H1; simpl (IZR 1).
+ rewrite Rmult_plus_distr_r, Rmult_1_l.
+ rewrite Ha.
+Check base_Int_part.
 bbb.
    f_equal.
    rewrite Ha.
