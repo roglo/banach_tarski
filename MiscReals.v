@@ -1234,6 +1234,32 @@ enough (2 * IZR k * PI < y < PI + 2 * IZR k * PI) by lra.
 bbb.
 *)
 
+Theorem glop : ∀ x,
+  0 < x
+  → IZR (Int_part (- x)) =
+      - IZR (Int_part x)
+      - if Req_dec x (IZR (Int_part x)) then 0 else 1.
+Proof.
+intros * Hx.
+destruct (Req_dec x (IZR (Int_part x))) as [Hix| Hix].
+ rewrite Rminus_0_r.
+ rewrite <- Hix, Hix at 1.
+ rewrite <- opp_IZR, Int_part_IZR, opp_IZR.
+ now rewrite <- Hix.
+Abort.
+
+Theorem Int_part_neg : ∀ x,
+  Int_part (- x) =
+    if Req_dec x (IZR (Int_part x)) then (- Int_part x)%Z
+    else (- Int_part x - 1)%Z.
+Proof.
+intros.
+destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
+ rewrite Hx at 1.
+ now rewrite <- opp_IZR, Int_part_IZR.
+
+bbb.
+
 Theorem Rediv_div : ∀ x y z,
   y ≠ 0
   → 0 < z
@@ -1249,17 +1275,10 @@ destruct (Rcase_abs y) as [Hay| Hay].
   assert (H : 0 < y') by lra; clear Hay; rename H into Hay.
   rewrite Ropp_mult_distr_l, <- Hy'.
   clear y Hy Hy' Hayz; rename y' into y; move y before x.
-Theorem glop : ∀ x,
-  0 < x
-  → IZR (Int_part (- x)) =
-      - IZR (Int_part x)
-      - if Req_dec x (IZR (Int_part x)) then 0 else 1.
-Proof.
-bbb.
-
-rewrite glop.
-Search (Int_part (- _)).
-Check Int_part.
+  rewrite Ropp_div.
+  rewrite Int_part_neg.
+  remember (IZR (Int_part (x / y)) / z) as a eqn:Ha.
+  destruct (Req_dec a (IZR (Int_part a))) as [H1| H1].
 bbb.
 
 Theorem angle_of_sin_cos_inv : ∀ x,
