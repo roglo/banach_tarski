@@ -1286,6 +1286,10 @@ destruct (Rcase_abs y) as [Hay| Hay].
   destruct (Req_dec a (IZR (Int_part a))) as [H1| H1].
    f_equal.
    rewrite <- Rdiv_div; [ | lra | lra ].
+   remember (x / y) as b eqn:Hb.
+   clear x y Hay Hb.
+   rename a into x; rename b into y.
+   move x after z; move y after z.
 bbb.
    f_equal.
    rewrite Ha.
