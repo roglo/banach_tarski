@@ -1293,31 +1293,48 @@ destruct (Rcase_abs y) as [Hay| Hay].
    apply eq_IZR; rewrite <- H1.
    rewrite Ha; symmetry.
    rename x into t; rename y into x; rename z into y.
-rewrite <- Ha, H1.
-f_equal.
-apply Int_part_interv.
-apply Rmult_eq_compat_r with (r := y) in Ha.
-rewrite Rmult_div_same in Ha; [ | lra ].
-rewrite <- H1.
-split.
- apply Rmult_le_reg_r with (r := y); [ easy | ].
- rewrite Rmult_div_same; [ | lra ].
- rewrite Ha.
- apply base_Int_part.
+   rewrite <- Ha, H1.
+   f_equal.
+(* what if t=0 ? *)
+bbb.
+   apply Int_part_interv.
+   apply Rmult_eq_compat_r with (r := y) in Ha.
+   rewrite Rmult_div_same in Ha; [ | lra ].
+   rewrite <- H1.
+   split.
+    apply Rmult_le_reg_r with (r := y); [ easy | ].
+    rewrite Rmult_div_same; [ | lra ].
+    rewrite Ha.
+    apply base_Int_part.
 
- apply Rmult_lt_reg_r with (r := y); [ easy | ].
- rewrite Rmult_div_same; [ | lra ].
- rewrite plus_IZR, <- H1; simpl (IZR 1).
- rewrite Rmult_plus_distr_r, Rmult_1_l.
- rewrite Ha.
- (* t * y = IZR (Int_part x): therefore t * y is integer, therefore, since
-    t is integer (H1),  y is integer. Not being 0 (Hz), it is at least 1.
-    qed. *)
- assert (Hty : t * y = IZR (Int_part (t * y))).
-  now rewrite Ha, Int_part_IZR.
+    apply Rmult_lt_reg_r with (r := y); [ easy | ].
+    rewrite Rmult_div_same; [ | lra ].
+    rewrite plus_IZR, <- H1; simpl (IZR 1).
+    rewrite Rmult_plus_distr_r, Rmult_1_l.
+    rewrite Ha.
+    (* t * y = IZR (Int_part x): therefore t * y is integer, therefore, since
+       t is integer (H1),  y is integer. Not being 0 (Hz), it is at least 1.
+       qed. *)
+    destruct (Req_dec t 0) as [Ht| Ht].
+     rewrite Ht, Rmult_0_l in Ha.
+     rewrite <- Ha, Rplus_0_l.
+     symmetry in Ha.
+     apply eq_IZR_R0 in Ha.
+bbb.
 
-  assert (Hy : y = IZR (Int_part y)).
-   rewrite H1 in Hty at 1.
+    assert (Hty : t * y = IZR (Int_part (t * y))).
+     now rewrite Ha, Int_part_IZR.
+
+     assert (Hy : y = IZR (Int_part y)).
+      rewrite H1 in Hty at 1.
+      rewrite Ha, Int_part_IZR in Hty.
+
+      remember (IZR (Int_part x)) as X eqn:HX.
+      assert (HTZ : t ≠ 0).
+
+      specialize (euclidian_division X T) as H.
+Search (IZR _ * _).
+
 bbb.
 
 Search (IZR _ + _).
