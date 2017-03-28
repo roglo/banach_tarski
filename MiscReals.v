@@ -1258,7 +1258,12 @@ destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
  rewrite Hx at 1.
  now rewrite <- opp_IZR, Int_part_IZR.
 
-bbb.
+ apply Int_part_interv.
+ rewrite Z.sub_simpl_r, opp_IZR.
+ unfold Z.sub; rewrite <- Z.opp_add_distr.
+ rewrite opp_IZR, plus_IZR; simpl (IZR 1).
+ specialize (base_Int_part x) as H; lra.
+Qed.
 
 Theorem Rediv_div : ∀ x y z,
   y ≠ 0
