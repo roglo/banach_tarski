@@ -1290,6 +1290,7 @@ destruct (Rcase_abs y) as [Hay| Hay].
    clear x y Hay Hb.
    rename a into x; rename b into y.
    move x after z; move y after z.
+   apply eq_IZR; rewrite <- H1.
 bbb.
    f_equal.
    rewrite Ha.
