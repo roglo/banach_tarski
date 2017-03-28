@@ -1310,6 +1310,14 @@ split.
  rewrite plus_IZR, <- H1; simpl (IZR 1).
  rewrite Rmult_plus_distr_r, Rmult_1_l.
  rewrite Ha.
+ (* t * y = IZR (Int_part x): therefore t * y is integer, therefore, since
+    t is integer (H1),  y is integer. Not being 0 (Hz), it is at least 1.
+    qed. *)
+ assert (Hty : t * y = IZR (Int_part (t * y))).
+  now rewrite Ha, Int_part_IZR.
+
+  assert (Hy : y = IZR (Int_part y)).
+   rewrite H1 in Hty at 1.
 bbb.
 
 Search (IZR _ + _).
