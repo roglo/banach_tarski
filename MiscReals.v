@@ -1286,10 +1286,17 @@ destruct (Rcase_abs y) as [Hay| Hay].
   destruct (Req_dec a (IZR (Int_part a))) as [H1| H1].
    f_equal.
    rewrite <- Rdiv_div; [ | lra | lra ].
+bbb.
    f_equal.
    rewrite Ha.
    f_equal.
-
+(*
+x = 5, y = 2, z = 1
+x/y = 2.5
+Int_part (x/y) = 2
+IZR (Int_part (x/y)) = 2 ≠ 2.5
+IZR (Int_part (x/y))/z = 2 = a
+*)
 bbb.
 
 Theorem angle_of_sin_cos_inv : ∀ x,
