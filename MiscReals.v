@@ -1284,6 +1284,12 @@ destruct (Rcase_abs y) as [Hay| Hay].
   rewrite Int_part_neg.
   remember (IZR (Int_part (x / y)) / z) as a eqn:Ha.
   destruct (Req_dec a (IZR (Int_part a))) as [H1| H1].
+   f_equal.
+   rewrite <- Rdiv_div; [ | lra | lra ].
+   f_equal.
+   rewrite Ha.
+   f_equal.
+
 bbb.
 
 Theorem angle_of_sin_cos_inv : ∀ x,
