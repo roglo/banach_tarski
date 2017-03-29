@@ -1333,9 +1333,8 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Rediv_add; [ | apply PI_neq0 ].
     rewrite Rmod_from_ediv.
     rewrite plus_IZR; simpl (IZR 1).
-Search (_ ediv (_ * _)).
-replace (2 * PI) with (PI * 2) by lra.
 bbb.
+replace (2 * PI) with (PI * 2) by lra.
 x=6PI
 x ediv (2PI) = 3
 x ediv PI = 6 ... 6 ediv 2 = 3
