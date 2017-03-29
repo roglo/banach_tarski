@@ -1294,6 +1294,10 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     apply neg_sin_interv in Hs.
     apply neg_cos_interv in Hc.
     rewrite Rmod_from_ediv in Hs, Hc.
+    remember (x // (2 * PI)) as k eqn:Hk.
+    replace (IZR k * (2 * PI)) with (2 * IZR k * PI) in Hs, Hc by lra.
+    assert (Hp : PI < x - 2 * IZR k * PI < 3 * PI / 2) by lra.
+    clear Hs Hc.
 bbb.
 rewrite <- Rediv_div.
 
