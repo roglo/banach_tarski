@@ -1336,6 +1336,12 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
 Search (_ ediv (_ * _)).
 replace (2 * PI) with (PI * 2) by lra.
 bbb.
+x=6PI
+x ediv (2PI) = 3
+x ediv PI = 6 ... 6 ediv 2 = 3
+x ediv 2 = 9 ... 9 ediv PI = 2
+
+bbb.
 rewrite <- Rediv_div.
 
 bbb.
