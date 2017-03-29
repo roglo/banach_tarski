@@ -1273,6 +1273,8 @@ Theorem Int_div : ∀ x y,
   → Int (x / y) = Int x / y.
 Proof.
 intros * Hy Hi.
+Require Import QArith.
+Search (Q → Z).
 bbb.
 
 Theorem Int_part_div : ∀ x y t,
