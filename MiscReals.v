@@ -1336,13 +1336,9 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     remember (IZR (x ediv PI)) as e eqn:He.
     replace ( 2 * PI - (PI / 2 - (x + PI / 2 - (e + 1) * PI))) with
       (x - (e - 1) * PI) by lra; subst e.
-    f_equal.
-bbb.
-x=6PI
-x ediv (2PI) = 3
-x ediv PI = 6 ... 6 ediv 2 = 3
-x ediv 2 = 9 ... 9 ediv PI = 2
-
+    rewrite <- Rmult_assoc.
+    f_equal; f_equal.
+    enough (IZR (x ediv PI) = 2 * IZR (x ediv (2 * PI)) + 1) by lra.
 bbb.
 rewrite <- Rediv_div.
 
