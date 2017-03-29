@@ -1311,78 +1311,8 @@ destruct (Rcase_abs y) as [Hay| Hay].
   remember (IZR (Int_part (x / y)) / z) as a eqn:Ha.
   destruct (Req_dec a (IZR (Int_part a))) as [H1| H1].
    f_equal.
-   rewrite <- Rdiv_div; [ | lra | lra ].
-   remember (x / y) as b eqn:Hb.
-   clear x y Hay Hb.
-   rename a into x; rename b into y.
-   move x after z; move y after z.
-   apply eq_IZR; rewrite <- H1.
-   rewrite Ha.
-   rename x into t; rename y into x; rename z into y.
-   rewrite <- Ha, H1.
-   f_equal.
-   (* counter example : x = 3/2, y = 1/2 *)
-bbb.
-   apply Int_part_interv.
-   apply Rmult_eq_compat_r with (r := y) in Ha.
-   rewrite Rmult_div_same in Ha; [ | lra ].
-   rewrite <- H1.
-   split.
-    apply Rmult_le_reg_r with (r := y); [ easy | ].
-    rewrite Rmult_div_same; [ | lra ].
-    rewrite Ha.
-    apply base_Int_part.
-
-    apply Rmult_lt_reg_r with (r := y); [ easy | ].
-    rewrite Rmult_div_same; [ | lra ].
-    rewrite plus_IZR, <- H1; simpl (IZR 1).
-    rewrite Rmult_plus_distr_r, Rmult_1_l.
-    rewrite Ha.
-    (* t * y = IZR (Int_part x): therefore t * y is integer, therefore, since
-       t is integer (H1),  y is integer. Not being 0 (Hz), it is at least 1.
-       qed. *)
-    destruct (Req_dec t 0) as [Ht| Ht].
-     rewrite Ht, Rmult_0_l in Ha.
-     rewrite <- Ha, Rplus_0_l.
-     symmetry in Ha.
-     apply eq_IZR_R0 in Ha.
-bbb.
-
-    assert (Hty : t * y = IZR (Int_part (t * y))).
-     now rewrite Ha, Int_part_IZR.
-
-     assert (Hy : y = IZR (Int_part y)).
-      rewrite H1 in Hty at 1.
-      rewrite Ha, Int_part_IZR in Hty.
-
-      remember (IZR (Int_part x)) as X eqn:HX.
-      assert (HTZ : t ≠ 0).
-
-      specialize (euclidian_division X T) as H.
-Search (IZR _ * _).
-
-bbb.
-
-Search (IZR _ + _).
- apply Rmult_lt_reg_l with (r := t).
-Focus 2.
-rewrite Rmult_plus_distr_l.
-rewrite <- Ha.
-replace (t * (t * y) + t * y) with (t * y * (t + 1)) by lra.
-
- Check lt_IZR.
-bbb.
-   f_equal.
-   rewrite Ha.
-   f_equal.
-(*
-x = 5, y = 2, z = 1
-x/y = 2.5
-Int_part (x/y) = 2
-IZR (Int_part (x/y)) = 2 ≠ 2.5
-IZR (Int_part (x/y))/z = 2 = a
-*)
-bbb.
+   (* counter example : x = 3, y = 2, z = 1/2 *)
+Abort.
 
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
@@ -1405,6 +1335,7 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite plus_IZR; simpl (IZR 1).
 Search (_ ediv (_ * _)).
 replace (2 * PI) with (PI * 2) by lra.
+bbb.
 rewrite <- Rediv_div.
 
 bbb.
