@@ -1298,6 +1298,9 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     replace (IZR k * (2 * PI)) with (2 * IZR k * PI) in Hs, Hc by lra.
     assert (Hp : PI < x - 2 * IZR k * PI < 3 * PI / 2) by lra.
     clear Hs Hc.
+    unfold Rediv, fst, Rdiv_mod.
+    destruct (Rcase_abs PI) as [HPI| HPI]; [ lra | ].
+
 bbb.
 rewrite <- Rediv_div.
 
