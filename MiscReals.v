@@ -942,7 +942,7 @@ Definition Rdiv_mod x y :=
 Definition Rediv x y := fst (Rdiv_mod x y).
 Definition Rmod x y := snd (Rdiv_mod x y).
 
-Notation "x 'ediv' y" := (Rediv x y) (at level 40).
+Notation "x '//' y" := (Rediv x y) (at level 40).
 Notation "x 'rmod' y" := (Rmod x y) (at level 40).
 
 Theorem Rmod_interv : ∀ x y, 0 < y → 0 ≤ Rmod x y < y.
@@ -1294,7 +1294,7 @@ bbb.
 Theorem Rediv_div : ∀ x y z,
   y ≠ 0
   → 0 < z
-  → IZR (x ediv y) ediv z = x ediv (y * z).
+  → IZR (x // y) // z = x // (y * z).
 Proof.
 intros * Hy Hz.
 unfold Rediv, fst, Rdiv_mod.
@@ -1333,12 +1333,12 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Rediv_add; [ | apply PI_neq0 ].
     rewrite Rmod_from_ediv.
     rewrite plus_IZR; simpl (IZR 1).
-    remember (IZR (x ediv PI)) as e eqn:He.
+    remember (IZR (x // PI)) as e eqn:He.
     replace ( 2 * PI - (PI / 2 - (x + PI / 2 - (e + 1) * PI))) with
       (x - (e - 1) * PI) by lra; subst e.
     rewrite <- Rmult_assoc.
     f_equal; f_equal.
-    enough (IZR (x ediv PI) = 2 * IZR (x ediv (2 * PI)) + 1) by lra.
+    enough (IZR (x // PI) = 2 * IZR (x // (2 * PI)) + 1) by lra.
 bbb.
 rewrite <- Rediv_div.
 
@@ -1357,7 +1357,7 @@ bbb.
    rewrite Rmult_plus_distr_r.
    rewrite Rmult_1_l.
    rewrite Rmod_from_ediv.
-   remember (IZR (x ediv PI) * PI) as t eqn:Ht.
+   remember (IZR (x // PI) * PI) as t eqn:Ht.
    replace (x + PI / 2 - (t + PI) + 2 * PI - PI / 2)
    with (x - (t - PI)) by lra.
    subst t; f_equal.
