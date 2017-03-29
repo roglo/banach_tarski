@@ -1265,55 +1265,6 @@ destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
  specialize (base_Int_part x) as H; lra.
 Qed.
 
-Definition Int x := IZR (Int_part x).
-
-(*
-Definition Int_mul_int : ∀ x k, Int (IZR k * x) / x = IZR k.
-Proof.
-intros.
-Abort.
-
-Theorem Int_div : ∀ x y,
-  0 < y
-  → Int x / y = Int (Int x / y)
-  → Int (x / y) = Int x / y.
-Proof.
-intros * Hy Hi.
-bbb.
-
-Theorem Int_part_div : ∀ x y t,
-  0 < y
-  → t = IZR (Int_part x) / y
-  → t = IZR (Int_part t)
-  → Int_part (x / y) = Int_part t.
-Proof.
-intros * Hy Ht Hti.
-bbb.
-*)
-
-Theorem Rediv_div : ∀ x y z,
-  y ≠ 0
-  → 0 < z
-  → IZR (x // y) // z = x // (y * z).
-Proof.
-intros * Hy Hz.
-unfold Rediv, fst, Rdiv_mod.
-destruct (Rcase_abs z) as [Haz| Haz]; [ lra | clear Haz ].
-destruct (Rcase_abs y) as [Hay| Hay].
- destruct (Rcase_abs (y * z)) as [Hayz| Hayz].
-  rewrite opp_IZR.
-  remember (- y) as y' eqn:Hy'.
-  assert (H : 0 < y') by lra; clear Hay; rename H into Hay.
-  rewrite Ropp_mult_distr_l, <- Hy'.
-  clear y Hy Hy' Hayz; rename y' into y; move y before x.
-  rewrite Ropp_div.
-  rewrite Int_part_neg.
-  remember (IZR (Int_part (x / y)) / z) as a eqn:Ha.
-  destruct (Req_dec a (IZR (Int_part a))) as [H1| H1].
-   f_equal.
-   (* counter example : x = 3, y = 2, z = 1/2 *)
-Abort.
-
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
