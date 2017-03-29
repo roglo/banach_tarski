@@ -1333,8 +1333,11 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Rediv_add; [ | apply PI_neq0 ].
     rewrite Rmod_from_ediv.
     rewrite plus_IZR; simpl (IZR 1).
+    remember (IZR (x ediv PI)) as e eqn:He.
+    replace ( 2 * PI - (PI / 2 - (x + PI / 2 - (e + 1) * PI))) with
+      (x - (e - 1) * PI) by lra; subst e.
+    f_equal.
 bbb.
-replace (2 * PI) with (PI * 2) by lra.
 x=6PI
 x ediv (2PI) = 3
 x ediv PI = 6 ... 6 ediv 2 = 3
