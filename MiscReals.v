@@ -1244,21 +1244,10 @@ split.
   rewrite Rmult_comm, Rmult_shuffle0 in H.
   now rewrite cos_Zperiod in H.
 
-bbb.
-  apply cos_ge_0; [ | ].
-  assert (HP : - (PI / 2) ≤ 0) by (specialize PI_RGT_0; lra).
-  eapply Rle_trans; [ apply HP | ].
-  apply Rmod_interv.
+  apply cos_ge_0_3PI2; [ lra | ].
+  apply Rlt_le, Rmod_interv.
   specialize PI_RGT_0; lra.
-
-bbb.
-intros * Hc.
-remember (x - PI / 2) as y eqn:Hy.
-assert (x = y + PI / 2) by lra; subst x; rename y into x; clear Hy.
-rewrite cos_plus_PI2 in Hc.
-assert (Hs : 0 < sin x) by lra; clear Hc.
-apply pos_sin_interv in Hs.
-bbb.
+Qed.
 
 Theorem Int_part_neg : ∀ x,
   Int_part (- x) =
@@ -1304,7 +1293,7 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     enough (IZR (x // PI) = 2 * IZR (x // (2 * PI)) + 1) by lra.
     apply neg_sin_interv in Hs.
     apply neg_cos_interv in Hc.
-    rewrite Rmod_from_ediv in Hs.
+    rewrite Rmod_from_ediv in Hs, Hc.
 bbb.
 rewrite <- Rediv_div.
 
