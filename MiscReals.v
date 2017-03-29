@@ -1176,16 +1176,6 @@ rewrite Rsqr_0, Rminus_0_r, sqrt_1, Rdiv_1_r, atan_0.
 destruct (Req_dec 1 0); [ lra | easy ].
 Qed.
 
-(*
-Theorem asin_increasing : ∀ x y,
-  -1 ≤ x ≤ 1
-  → -1 ≤ y ≤ 1
-  → x < y
-  → asin x < asin y.
-Proof.
-bbb.
-*)
-
 Theorem pos_sin_interv : ∀ x, 0 < sin x → x rmod (2 * PI) < PI.
 Proof.
 intros * Hs.
@@ -1204,49 +1194,71 @@ enough (H : sin (x rmod (2 * PI)) ≤ 0).
  specialize (Rmod_interv x (2 * PI) HP) as H; lra.
 Qed.
 
-(*
-Theorem pos_sin_interv2 : ∀ x k,
-  0 < sin x
-  → k = x ediv (2 * PI)
-  →  2 * IZR k * PI < x < PI + 2 * IZR k * PI.
+Theorem neg_sin_interv : ∀ x, sin x < 0 → PI < x rmod (2 * PI).
 Proof.
-intros * Hs Hk.
-specialize (pos_sin_interv x Hs) as H.
-rewrite Rmod_from_ediv in H.
-rewrite <- Hk in H; lra.
+intros * Hs.
+apply Rnot_le_lt; intros Hx.
+apply Rlt_not_le in Hs; apply Hs; clear Hs.
+enough (H : 0 ≤ sin (x rmod (2 * PI))).
+ rewrite Rmod_from_ediv in H.
+ unfold Rminus in H.
+ rewrite Ropp_mult_distr_l in H.
+ rewrite <- opp_IZR in H.
+ rewrite Rmult_comm, Rmult_shuffle0 in H.
+ now rewrite sin_Zperiod in H.
+
+ apply sin_ge_0; [ | easy ].
+ assert (HP : 0 < 2 * PI) by (specialize PI_RGT_0; lra).
+ specialize (Rmod_interv x (2 * PI) HP) as H; lra.
 Qed.
 
-Theorem neg_sin_interv : ∀ x k,
-  sin x < 0
-  → k = (x - PI) ediv (2 * PI)
-  → PI + 2 * IZR k * PI < x < 2 * PI + 2 * IZR k * PI.
+Theorem neg_cos_interv : ∀ x,
+  cos x < 0
+  → PI / 2 < x rmod (2 * PI) < 3 * PI / 2.
 Proof.
-intros * Hs Hk.
-apply Ropp_lt_contravar in Hs.
-rewrite <- neg_sin, Ropp_0 in Hs.
-rewrite <- sin_Zperiod with (k := (-1)%Z) in Hs; simpl in Hs.
-replace (x + PI + 2 * -1 * PI) with (x - PI) in Hs by lra.
-remember (x - PI) as y eqn:Hy.
-replace (2 * PI) with (PI + PI) by lra.
-assert (x = y + PI) by lra.
-subst x; clear Hy.
-enough (2 * IZR k * PI < y < PI + 2 * IZR k * PI) by lra.
-bbb.
-*)
+intros * Hc.
+split.
+ apply Rnot_le_lt; intros Hx.
+ apply Rlt_not_le in Hc; apply Hc; clear Hc.
+ enough (H : 0 ≤ cos (x rmod (2 * PI))).
+  rewrite Rmod_from_ediv in H.
+  unfold Rminus in H.
+  rewrite Ropp_mult_distr_l in H.
+  rewrite <- opp_IZR in H.
+  rewrite Rmult_comm, Rmult_shuffle0 in H.
+  now rewrite cos_Zperiod in H.
 
-Theorem glop : ∀ x,
-  0 < x
-  → IZR (Int_part (- x)) =
-      - IZR (Int_part x)
-      - if Req_dec x (IZR (Int_part x)) then 0 else 1.
-Proof.
-intros * Hx.
-destruct (Req_dec x (IZR (Int_part x))) as [Hix| Hix].
- rewrite Rminus_0_r.
- rewrite <- Hix, Hix at 1.
- rewrite <- opp_IZR, Int_part_IZR, opp_IZR.
- now rewrite <- Hix.
-Abort.
+  apply cos_ge_0; [ | easy ].
+  assert (HP : - (PI / 2) ≤ 0) by (specialize PI_RGT_0; lra).
+  eapply Rle_trans; [ apply HP | ].
+  apply Rmod_interv.
+  specialize PI_RGT_0; lra.
+
+ apply Rnot_le_lt; intros Hx.
+ apply Rlt_not_le in Hc; apply Hc; clear Hc.
+ enough (H : 0 ≤ cos (x rmod (2 * PI))).
+  rewrite Rmod_from_ediv in H.
+  unfold Rminus in H.
+  rewrite Ropp_mult_distr_l in H.
+  rewrite <- opp_IZR in H.
+  rewrite Rmult_comm, Rmult_shuffle0 in H.
+  now rewrite cos_Zperiod in H.
+
+bbb.
+  apply cos_ge_0; [ | ].
+  assert (HP : - (PI / 2) ≤ 0) by (specialize PI_RGT_0; lra).
+  eapply Rle_trans; [ apply HP | ].
+  apply Rmod_interv.
+  specialize PI_RGT_0; lra.
+
+bbb.
+intros * Hc.
+remember (x - PI / 2) as y eqn:Hy.
+assert (x = y + PI / 2) by lra; subst x; rename y into x; clear Hy.
+rewrite cos_plus_PI2 in Hc.
+assert (Hs : 0 < sin x) by lra; clear Hc.
+apply pos_sin_interv in Hs.
+bbb.
 
 Theorem Int_part_neg : ∀ x,
   Int_part (- x) =
@@ -1290,6 +1302,9 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite <- Rmult_assoc.
     f_equal; f_equal.
     enough (IZR (x // PI) = 2 * IZR (x // (2 * PI)) + 1) by lra.
+    apply neg_sin_interv in Hs.
+    apply neg_cos_interv in Hc.
+    rewrite Rmod_from_ediv in Hs.
 bbb.
 rewrite <- Rediv_div.
 
