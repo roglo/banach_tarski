@@ -1251,13 +1251,12 @@ Qed.
 
 Theorem Int_part_neg : ∀ x,
   Int_part (- x) =
-    if Req_dec x (IZR (Int_part x)) then (- Int_part x)%Z
-    else (- Int_part x - 1)%Z.
+    (- Int_part x - if Req_dec x (IZR (Int_part x)) then 0 else 1)%Z.
 Proof.
 intros.
 destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
  rewrite Hx at 1.
- now rewrite <- opp_IZR, Int_part_IZR.
+ now rewrite <- opp_IZR, Int_part_IZR, Z.sub_0_r.
 
  apply Int_part_interv.
  rewrite Z.sub_simpl_r, opp_IZR.
@@ -1298,6 +1297,20 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     replace (IZR k * (2 * PI)) with (2 * IZR k * PI) in Hs, Hc by lra.
     assert (Hp : PI < x - 2 * IZR k * PI < 3 * PI / 2) by lra.
     clear Hs Hc.
+
+Theorem glop : ∀ x y z,
+  x // (y * z) = 42%Z.
+Proof.
+intros.
+unfold "//", fst, Rdiv_mod.
+destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
+ rewrite Ropp_div_r; [ | lra ].
+ rewrite Int_part_neg.
+ rewrite Z.opp_sub_distr.
+ destruct (Req_dec (x / (y * z)) (IZR (Int_part (x / (y * z))))) as [H| H].
+  rewrite Z.add_0_r, Z.opp_involutive.
+
+bbb.
     unfold Rediv, fst, Rdiv_mod.
     destruct (Rcase_abs PI) as [HPI| HPI]; [ lra | ].
 
