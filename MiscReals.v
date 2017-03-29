@@ -1267,14 +1267,18 @@ Qed.
 
 Definition Int x := IZR (Int_part x).
 
+(*
+Definition Int_mul_int : ∀ x k, Int (IZR k * x) / x = IZR k.
+Proof.
+intros.
+Abort.
+
 Theorem Int_div : ∀ x y,
   0 < y
   → Int x / y = Int (Int x / y)
   → Int (x / y) = Int x / y.
 Proof.
 intros * Hy Hi.
-Require Import QArith.
-Search (Q → Z).
 bbb.
 
 Theorem Int_part_div : ∀ x y t,
@@ -1285,6 +1289,7 @@ Theorem Int_part_div : ∀ x y t,
 Proof.
 intros * Hy Ht Hti.
 bbb.
+*)
 
 Theorem Rediv_div : ∀ x y z,
   y ≠ 0
@@ -1316,7 +1321,7 @@ destruct (Rcase_abs y) as [Hay| Hay].
    rename x into t; rename y into x; rename z into y.
    rewrite <- Ha, H1.
    f_equal.
-(* what if t=0 ? *)
+   (* counter example : x = 3/2, y = 1/2 *)
 bbb.
    apply Int_part_interv.
    apply Rmult_eq_compat_r with (r := y) in Ha.
