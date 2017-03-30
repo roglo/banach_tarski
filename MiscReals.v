@@ -1321,12 +1321,23 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Z.add_0_r in Hk.
     unfold Rediv, fst, Rdiv_mod.
     destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
+    rewrite Rmult_comm in Hk.
+    rewrite <- Rdiv_div in Hk; [ | lra | lra ].
+    remember (x / PI) as y eqn:Hy.
+    apply Rmult_eq_compat_r with (r := PI) in Hy.
+    rewrite Rmult_div_same in Hy; [ | lra ].
+    subst x; rename y into x.
+    rewrite <- Rmult_minus_distr_r in Hp.
+    destruct Hp as (H1, H2).
+    replace PI with (1 * PI) in H1 at 1 by lra.
+    apply Rmult_lt_reg_r in H1; [ | lra ].
+    replace (3 * PI / 2) with ((3 / 2) * PI) in H2 by lra.
+    apply Rmult_lt_reg_r in H2; [ | specialize PI_RGT_0; lra ].
 bbb.
-    unfold Rediv, fst, Rdiv_mod.
-    destruct (Rcase_abs PI) as [HPI| HPI]; [ lra | ].
 
-bbb.
-rewrite <- Rediv_div.
+    erewrite Int_part_interv.
+Check Int_part_interv.
+    specialize (Int_part_interv (2 * k + 1) x) as H.
 
 bbb.
   rewrite acos_cos; [ | lra ].
