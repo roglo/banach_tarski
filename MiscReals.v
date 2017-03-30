@@ -1051,7 +1051,22 @@ Theorem Rediv_add_Z : ∀ x y a,
 Proof.
 intros * Hyz.
 destruct (Z_le_dec 0 a) as [Ha| Ha].
-Search (0 <= _)%Z.
+ apply IZN in Ha.
+ destruct Ha as (n, Hn); subst a.
+ rewrite <- INR_IZR_INZ.
+ now apply Rediv_add_nat.
+
+ remember (- a)%Z as b eqn:Hb.
+ assert (a = (- b)%Z) by lia; subst a; clear Hb.
+ rename b into a.
+ assert (Hb : (0 < a)%Z) by lia; clear Ha; rename Hb into Ha.
+ apply Z.lt_le_incl in Ha.
+ apply IZN in Ha.
+ destruct Ha as (n, Hn); subst a.
+ rewrite opp_IZR.
+bbb.
+ rewrite <- INR_IZR_INZ.
+ now apply Rediv_add_nat.
 bbb.
 
 Theorem Rmod_add_nat : ∀ x y n,
