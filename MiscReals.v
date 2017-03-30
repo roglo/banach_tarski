@@ -981,6 +981,47 @@ destruct (Rcase_abs y) as [Hy| Hy].
  now rewrite Hq in Hr.
 Qed.
 
+Theorem Int_part_neg : ∀ x,
+  Int_part (- x) =
+    (- Int_part x - if Req_dec x (IZR (Int_part x)) then 0 else 1)%Z.
+Proof.
+intros.
+destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
+ rewrite Hx at 1.
+ now rewrite <- opp_IZR, Int_part_IZR, Z.sub_0_r.
+
+ apply Int_part_interv.
+ rewrite Z.sub_simpl_r, opp_IZR.
+ unfold Z.sub; rewrite <- Z.opp_add_distr.
+ rewrite opp_IZR, plus_IZR; simpl (IZR 1).
+ specialize (base_Int_part x) as H; lra.
+Qed.
+
+Theorem Rmod_add : ∀ x y z,
+  z ≠ 0
+  → (x + y * z) rmod z = x rmod z.
+Proof.
+intros * Hz.
+clear Hz.
+unfold "rmod", snd, Rdiv_mod.
+destruct (Rcase_abs z) as [Hzn| Hzp].
+ do 2 rewrite opp_IZR, <- Ropp_mult_distr_l, Rminus_opp.
+ rewrite Ropp_div_r; [ | lra ].
+ rewrite Ropp_div_r; [ | lra ].
+ rewrite Rdiv_plus_distr.
+ rewrite Rmult_div, Rmult_div_same; [ | lra ].
+bbb.
+ rewrite Ropp_plus_distr.
+
+Search (Int_part (_ + _)).
+ rewrite plus_Int_part2.
+
+(*
+ rewrite Int_part_neg.
+*)
+
+bbb.
+
 Theorem up_Int_part : ∀ x, up x = (Int_part x + 1)%Z.
 Proof. intros; unfold Int_part; lia. Qed.
 
@@ -1249,22 +1290,6 @@ split.
   specialize PI_RGT_0; lra.
 Qed.
 
-Theorem Int_part_neg : ∀ x,
-  Int_part (- x) =
-    (- Int_part x - if Req_dec x (IZR (Int_part x)) then 0 else 1)%Z.
-Proof.
-intros.
-destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
- rewrite Hx at 1.
- now rewrite <- opp_IZR, Int_part_IZR, Z.sub_0_r.
-
- apply Int_part_interv.
- rewrite Z.sub_simpl_r, opp_IZR.
- unfold Z.sub; rewrite <- Z.opp_add_distr.
- rewrite opp_IZR, plus_IZR; simpl (IZR 1).
- specialize (base_Int_part x) as H; lra.
-Qed.
-
 Theorem Rediv_mul_r : ∀ x y z,
   x // (y * z) =
     (Int_part (x / (y * z)) +
@@ -1340,6 +1365,24 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
   apply Rnot_lt_le in Hc.
   rewrite asin_sin.
   destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
+  rewrite Rsignp_of_pos; [ rewrite Rmult_1_l | easy ].
+  unfold atan'.
+  destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
+   rewrite Rsign_of_neg; [ | easy ].
+   rewrite <- Ropp_mult_distr_l, Rmult_1_l.
+   apply cos_eq_0_0 in Hcz.
+   destruct Hcz as (k, Hx).
+   apply neg_sin_interv in Hs.
+   destruct (Bool.bool_dec (Z.even k) true) as [Hk| Hk].
+    apply Zeven_bool_iff in Hk.
+    apply Zeven_ex_iff in Hk.
+    destruct Hk as (m, Hm).
+    rewrite Hm in Hx; rewrite Hx in Hs.
+    rewrite mult_IZR in Hs; simpl in Hs.
+    replace (2 * IZR m * PI) with (IZR m * (2 * PI)) in Hs.
+    rewrite Rplus_comm in Hs.
+bbb.
+    rewrite Rmod_add in Hs.
 bbb.
 
     erewrite Int_part_interv.
