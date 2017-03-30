@@ -997,31 +997,6 @@ destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
  specialize (base_Int_part x) as H; lra.
 Qed.
 
-Theorem Rmod_add : ∀ x y z,
-  z ≠ 0
-  → (x + y * z) rmod z = x rmod z.
-Proof.
-intros * Hz.
-clear Hz.
-unfold "rmod", snd, Rdiv_mod.
-destruct (Rcase_abs z) as [Hzn| Hzp].
- do 2 rewrite opp_IZR, <- Ropp_mult_distr_l, Rminus_opp.
- rewrite Ropp_div_r; [ | lra ].
- rewrite Ropp_div_r; [ | lra ].
- rewrite Rdiv_plus_distr.
- rewrite Rmult_div, Rmult_div_same; [ | lra ].
-bbb.
- rewrite Ropp_plus_distr.
-
-Search (Int_part (_ + _)).
- rewrite plus_Int_part2.
-
-(*
- rewrite Int_part_neg.
-*)
-
-bbb.
-
 Theorem up_Int_part : ∀ x, up x = (Int_part x + 1)%Z.
 Proof. intros; unfold Int_part; lia. Qed.
 
@@ -1058,6 +1033,35 @@ destruct (Rcase_abs y) as [Hy| Hy].
   rewrite frac_part_IZR, Rplus_0_r.
   apply frac_part_interv.
 Qed.
+
+Theorem Rmod_add : ∀ x y z,
+  z ≠ 0
+  → (x + IZR y * z) rmod z = x rmod z.
+Proof.
+intros * Hz.
+do 2 rewrite Rmod_from_ediv.
+bbb.
+
+clear Hz.
+unfold "rmod", snd, Rdiv_mod.
+destruct (Rcase_abs z) as [Hzn| Hzp].
+ do 2 rewrite opp_IZR, <- Ropp_mult_distr_l, Rminus_opp.
+ rewrite Ropp_div_r; [ | lra ].
+ rewrite Ropp_div_r; [ | lra ].
+ rewrite Rdiv_plus_distr.
+ rewrite Rmult_div, Rmult_div_same; [ | lra ].
+bbb.
+ rewrite Ropp_plus_distr.
+
+Search (Int_part (_ + _)).
+ rewrite plus_Int_part2.
+
+(*
+ rewrite Int_part_neg.
+*)
+
+bbb.
+*)
 
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
