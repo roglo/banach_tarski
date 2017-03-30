@@ -1482,11 +1482,14 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Rmod_small; specialize PI_RGT_0; lra.
 
    fold (tan x).
-   rewrite atan_tan.
+   rewrite atan_tan; [ | easy ].
    assert (H : 0 < cos x) by lra.
    clear Hc Hcz; rename H into Hc.
    apply neg_sin_interv in Hs.
    apply pos_cos_interv in Hc.
+   remember (IZR ((x + PI / 2) // PI) * PI) as u eqn:Hu.
+   replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
+   subst u; rewrite <- Rmod_from_ediv.
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
