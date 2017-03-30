@@ -1292,47 +1292,53 @@ unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
   rewrite acos_cos.
-   rewrite asin_cos.
-   destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
-   rewrite <- Ropp_mult_distr_l, Rminus_opp.
-   rewrite Rsign_of_neg; [ | easy ].
-   rewrite <- Ropp_mult_distr_l, Rmult_1_l.
-   rewrite fold_Rminus.
-   rewrite atan_tan.
-    replace (x + PI / 2 + PI / 2) with (x + PI) by lra.
-    rewrite Rediv_add; [ | apply PI_neq0 ].
-    rewrite Rmod_from_ediv.
-    rewrite plus_IZR; simpl (IZR 1).
-    remember (IZR (x // PI)) as e eqn:He.
-    replace ( 2 * PI - (PI / 2 - (x + PI / 2 - (e + 1) * PI))) with
-      (x - (e - 1) * PI) by lra; subst e.
-    rewrite <- Rmult_assoc.
-    f_equal; f_equal.
-    enough (IZR (x // PI) = 2 * IZR (x // (2 * PI)) + 1) by lra.
-    apply neg_sin_interv in Hs.
-    apply neg_cos_interv in Hc.
-    rewrite Rmod_from_ediv in Hs, Hc.
-    remember (x // (2 * PI)) as k eqn:Hk.
-    replace (IZR k * (2 * PI)) with (2 * IZR k * PI) in Hs, Hc by lra.
-    assert (Hp : PI < x - 2 * IZR k * PI < 3 * PI / 2) by lra.
-    clear Hs Hc.
-    rewrite Rediv_mul_r in Hk.
-    destruct (Rcase_abs (2 * PI)) as [HP| HP]; [ lra | clear HP ].
-    rewrite Z.add_0_r in Hk.
-    unfold Rediv, fst, Rdiv_mod.
-    destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
-    rewrite Rmult_comm in Hk.
-    rewrite <- Rdiv_div in Hk; [ | lra | lra ].
-    remember (x / PI) as y eqn:Hy.
-    apply Rmult_eq_compat_r with (r := PI) in Hy.
-    rewrite Rmult_div_same in Hy; [ | lra ].
-    subst x; rename y into x.
-    rewrite <- Rmult_minus_distr_r in Hp.
-    destruct Hp as (H1, H2).
-    replace PI with (1 * PI) in H1 at 1 by lra.
-    apply Rmult_lt_reg_r in H1; [ | lra ].
-    replace (3 * PI / 2) with ((3 / 2) * PI) in H2 by lra.
-    apply Rmult_lt_reg_r in H2; [ | specialize PI_RGT_0; lra ].
+  rewrite asin_cos.
+  destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
+  rewrite <- Ropp_mult_distr_l, Rminus_opp.
+  rewrite Rsign_of_neg; [ | easy ].
+  rewrite <- Ropp_mult_distr_l, Rmult_1_l.
+  rewrite fold_Rminus.
+  rewrite atan_tan; [ | rewrite cos_plus_PI2; lra ].
+  replace (x + PI / 2 + PI / 2) with (x + PI) by lra.
+  rewrite Rediv_add; [ | apply PI_neq0 ].
+  rewrite Rmod_from_ediv.
+  rewrite plus_IZR; simpl (IZR 1).
+  remember (IZR (x // PI)) as e eqn:He.
+  replace ( 2 * PI - (PI / 2 - (x + PI / 2 - (e + 1) * PI))) with
+    (x - (e - 1) * PI) by lra; subst e.
+  rewrite <- Rmult_assoc.
+  f_equal; f_equal.
+  enough (IZR (x // PI) = 2 * IZR (x // (2 * PI)) + 1) by lra.
+  apply neg_sin_interv in Hs.
+  apply neg_cos_interv in Hc.
+  rewrite Rmod_from_ediv in Hs, Hc.
+  remember (x // (2 * PI)) as k eqn:Hk.
+  replace (IZR k * (2 * PI)) with (2 * IZR k * PI) in Hs, Hc by lra.
+  assert (Hp : PI < x - 2 * IZR k * PI < 3 * PI / 2) by lra.
+  clear Hs Hc.
+  rewrite Rediv_mul_r in Hk.
+  destruct (Rcase_abs (2 * PI)) as [HP| HP]; [ lra | clear HP ].
+  rewrite Z.add_0_r in Hk.
+  unfold Rediv, fst, Rdiv_mod.
+  destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
+  rewrite Rmult_comm in Hk.
+  rewrite <- Rdiv_div in Hk; [ | lra | lra ].
+  remember (x / PI) as y eqn:Hy.
+  apply Rmult_eq_compat_r with (r := PI) in Hy.
+  rewrite Rmult_div_same in Hy; [ | lra ].
+  subst x; rename y into x.
+  enough (IZR (Int_part x) = IZR 2 * IZR k + IZR 1) by lra.
+  rewrite <- mult_IZR, <- plus_IZR; f_equal.
+  apply Int_part_interv.
+  do 3 rewrite plus_IZR; rewrite mult_IZR; simpl.
+  rewrite <- Rmult_minus_distr_r in Hp.
+  destruct Hp as (H1, H2).
+  replace PI with (1 * PI) in H1 at 1 by lra.
+  apply Rmult_lt_reg_r in H1; [ | lra ].
+  replace (3 * PI / 2) with ((3 / 2) * PI) in H2 by lra.
+  apply Rmult_lt_reg_r in H2; [ lra | specialize PI_RGT_0; lra ].
+
+  apply Rnot_lt_le in Hc.
 bbb.
 
     erewrite Int_part_interv.
