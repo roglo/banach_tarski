@@ -1265,6 +1265,25 @@ destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
  specialize (base_Int_part x) as H; lra.
 Qed.
 
+Theorem Rediv_mul_r : ∀ x y z,
+  x // (y * z) =
+    (Int_part (x / (y * z)) +
+       if Rcase_abs (y * z) then
+         if Req_dec (x / (y * z)) (IZR (Int_part (x / (y * z)))) then 0
+         else 1
+       else 0)%Z.
+Proof.
+intros.
+unfold "//", fst, Rdiv_mod.
+destruct (Rcase_abs (y * z)) as [Hyz| Hyz]; [ | now rewrite Z.add_0_r ].
+rewrite Ropp_div_r; [ | lra ].
+rewrite Int_part_neg.
+rewrite Z.opp_sub_distr.
+rewrite Z.opp_involutive.
+destruct (Req_dec (x / (y * z)) (IZR (Int_part (x / (y * z))))); [ | easy ].
+now rewrite Z.add_0_r.
+Qed.
+
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
@@ -1297,19 +1316,11 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     replace (IZR k * (2 * PI)) with (2 * IZR k * PI) in Hs, Hc by lra.
     assert (Hp : PI < x - 2 * IZR k * PI < 3 * PI / 2) by lra.
     clear Hs Hc.
-
-Theorem glop : ∀ x y z,
-  x // (y * z) = 42%Z.
-Proof.
-intros.
-unfold "//", fst, Rdiv_mod.
-destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
- rewrite Ropp_div_r; [ | lra ].
- rewrite Int_part_neg.
- rewrite Z.opp_sub_distr.
- destruct (Req_dec (x / (y * z)) (IZR (Int_part (x / (y * z))))) as [H| H].
-  rewrite Z.add_0_r, Z.opp_involutive.
-
+    rewrite Rediv_mul_r in Hk.
+    destruct (Rcase_abs (2 * PI)) as [HP| HP]; [ lra | clear HP ].
+    rewrite Z.add_0_r in Hk.
+    unfold Rediv, fst, Rdiv_mod.
+    destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
 bbb.
     unfold Rediv, fst, Rdiv_mod.
     destruct (Rcase_abs PI) as [HPI| HPI]; [ lra | ].
