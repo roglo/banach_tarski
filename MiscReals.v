@@ -1045,11 +1045,13 @@ rewrite Rediv_add_1; [ | easy ].
 rewrite IHn; lia.
 Qed.
 
-Theorem Rediv_add_Z : ∀ x y n,
+Theorem Rediv_add_Z : ∀ x y a,
   y ≠ 0
-  → (x + IZR n * y) // y = (x // y + n)%Z.
+  → (x + IZR a * y) // y = (x // y + a)%Z.
 Proof.
 intros * Hyz.
+destruct (Z_le_dec 0 a) as [Ha| Ha].
+Search (0 <= _)%Z.
 bbb.
 
 Theorem Rmod_add_nat : ∀ x y n,
