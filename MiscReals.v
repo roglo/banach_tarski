@@ -1291,8 +1291,7 @@ intros.
 unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
-  rewrite acos_cos.
-  rewrite asin_cos.
+  rewrite acos_cos, asin_cos.
   destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
   rewrite <- Ropp_mult_distr_l, Rminus_opp.
   rewrite Rsign_of_neg; [ | easy ].
@@ -1339,6 +1338,8 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
   apply Rmult_lt_reg_r in H2; [ lra | specialize PI_RGT_0; lra ].
 
   apply Rnot_lt_le in Hc.
+  rewrite asin_sin.
+  destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
 bbb.
 
     erewrite Int_part_interv.
