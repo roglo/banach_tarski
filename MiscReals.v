@@ -1321,6 +1321,23 @@ enough (H : 0 ≤ sin (x rmod (2 * PI))).
  specialize (Rmod_interv x (2 * PI) HP) as H; lra.
 Qed.
 
+Theorem pos_cos_interv : ∀ x,
+  0 < cos x
+  → x rmod (2 * PI) < PI / 2 ∨ 3 * PI / 2 < x rmod (2 * PI) .
+Proof.
+intros * Hc.
+destruct (Rlt_dec (x rmod (2 * PI)) (PI / 2)) as [Hx| Hx]; [ now left | ].
+right.
+apply Rlt_not_le in Hc.
+apply Rnot_lt_le in Hx.
+apply Rnot_le_lt; intros H.
+apply Hc; clear Hc.
+rewrite Rmod_from_ediv in Hx, H.
+remember (x // (2 * PI)) as k eqn:Hk.
+rewrite <- cos_Zperiod with (k := (- k)%Z).
+apply cos_le_0; rewrite opp_IZR; lra.
+Qed.
+
 Theorem neg_cos_interv : ∀ x,
   cos x < 0
   → PI / 2 < x rmod (2 * PI) < 3 * PI / 2.
@@ -1458,6 +1475,18 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     apply Zodd_bool_iff, Zodd_ex_iff in Hk.
     destruct Hk as (m, Hm).
     rewrite Hx, Hm.
+    rewrite plus_IZR, mult_IZR; simpl.
+    replace ((2 * IZR m + 1) * PI + PI / 2) with
+      (3 * PI / 2 + IZR m * (2 * PI)) by lra.
+    rewrite Rmod_add_Z; [ | specialize PI_neq0; lra ].
+    rewrite Rmod_small; specialize PI_RGT_0; lra.
+
+   fold (tan x).
+   rewrite atan_tan.
+   assert (H : 0 < cos x) by lra.
+   clear Hc Hcz; rename H into Hc.
+   apply neg_sin_interv in Hs.
+   apply pos_cos_interv in Hc.
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
