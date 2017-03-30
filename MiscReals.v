@@ -1034,6 +1034,16 @@ destruct (Rcase_abs y) as [Hy| Hy].
   apply frac_part_interv.
 Qed.
 
+Theorem Rediv_opp_r : ∀ x y, y ≠ 0 → x // - y = (- (x // y))%Z.
+Proof.
+intros * Hyz.
+unfold "//", fst, Rdiv_mod.
+destruct (Rcase_abs (- y)) as [Hy| Hy].
+ destruct (Rcase_abs y); [ lra | now rewrite Ropp_involutive ].
+
+ destruct (Rcase_abs y); [ now rewrite Z.opp_involutive | lra ].
+Qed.
+
 Theorem Rediv_add_nat : ∀ x y n,
   y ≠ 0
   → (x + INR n * y) // y = (x // y + Z.of_nat n)%Z.
@@ -1064,9 +1074,10 @@ destruct (Z_le_dec 0 a) as [Ha| Ha].
  apply IZN in Ha.
  destruct Ha as (n, Hn); subst a.
  rewrite opp_IZR.
-bbb.
  rewrite <- INR_IZR_INZ.
- now apply Rediv_add_nat.
+ rewrite <- Ropp_mult_distr_l, Ropp_mult_distr_r.
+bbb.
+ rewrite Rediv_opp_r.
 bbb.
 
 Theorem Rmod_add_nat : ∀ x y n,
