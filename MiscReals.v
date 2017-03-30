@@ -1492,6 +1492,7 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    remember (IZR ((x + PI / 2) // PI) * PI) as u eqn:Hu.
    replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
    subst u; rewrite <- Rmod_from_ediv.
+   rewrite Rplus_comm; symmetry.
 bbb.
 x=7π/4
 x+π/2=9π/4
