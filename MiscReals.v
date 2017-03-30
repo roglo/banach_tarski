@@ -1492,7 +1492,11 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    remember (IZR ((x + PI / 2) // PI) * PI) as u eqn:Hu.
    replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
    subst u; rewrite <- Rmod_from_ediv.
-
+bbb.
+x=7π/4
+x+π/2=9π/4
+(x+π/2)mod π=π/4
+(x+π/2)mod π+3π/2=7π/4 ... works
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
