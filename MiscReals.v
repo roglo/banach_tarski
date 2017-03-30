@@ -1076,26 +1076,56 @@ destruct (Z_le_dec 0 a) as [Ha| Ha].
  rewrite opp_IZR.
  rewrite <- INR_IZR_INZ.
  rewrite <- Ropp_mult_distr_l, Ropp_mult_distr_r.
-bbb.
- rewrite Rediv_opp_r.
-bbb.
+ symmetry; rewrite <- Z.opp_involutive; symmetry.
+ rewrite <- Rediv_opp_r; [ | easy ].
+ rewrite Rediv_add_nat; [ | lra ].
+ rewrite Z.opp_add_distr.
+ rewrite Rediv_opp_r; [ | easy ].
+ now rewrite Z.opp_involutive.
+Qed.
 
 Theorem Rmod_add_nat : ∀ x y n,
   y ≠ 0
   → (x + INR n * y) rmod y = x rmod y.
 Proof.
-intros * Hz.
+intros * Hy.
 do 2 rewrite Rmod_from_ediv.
 rewrite Rediv_add_nat; [ | easy ].
 rewrite plus_IZR.
 rewrite <- INR_IZR_INZ; lra.
 Qed.
 
-Theorem Rmod_add_Z : ∀ x y n,
+Theorem Rmod_add_Z : ∀ x y a,
   y ≠ 0
-  → (x + IZR n * y) rmod y = x rmod y.
+  → (x + IZR a * y) rmod y = x rmod y.
 Proof.
-bbb.
+intros * Hy.
+rewrite Rmod_from_ediv.
+rewrite Rediv_add_Z; [ | easy ].
+rewrite plus_IZR.
+rewrite Rmult_plus_distr_r.
+remember (IZR a * y) as u.
+remember (IZR (x // y) * y) as v.
+now replace (x + u - (v + u)) with (x - v) by lra; subst u v.
+Qed.
+
+Theorem Rmod_small : ∀ x y, 0 ≤ x < y → x rmod y = x.
+Proof.
+intros * (Hx, Hxy).
+unfold Rmod, snd, Rdiv_mod.
+destruct (Rcase_abs y) as [Hyn| Hyp]; [ lra | ].
+assert (H : 0 ≤ x / y < 1).
+ split.
+  apply Rmult_le_reg_r with (r := y); [ lra | ].
+  rewrite Rmult_0_l, Rmult_div_same; [ easy | lra ].
+
+  apply Rmult_lt_reg_r with (r := y); [ lra | ].
+  rewrite Rmult_1_l, Rmult_div_same; [ easy | lra ].
+
+ apply Int_part_is_0 in H.
+ rewrite H; simpl.
+ now rewrite Rmult_0_l, Rminus_0_r.
+Qed.
 
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
@@ -1412,89 +1442,22 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    destruct Hcz as (k, Hx).
    apply neg_sin_interv in Hs.
    destruct (Bool.bool_dec (Z.even k) true) as [Hk| Hk].
-    apply Zeven_bool_iff in Hk.
-    apply Zeven_ex_iff in Hk.
+    exfalso.
+    apply Zeven_bool_iff, Zeven_ex_iff in Hk.
     destruct Hk as (m, Hm).
     rewrite Hm in Hx; rewrite Hx in Hs.
     rewrite mult_IZR in Hs; simpl in Hs.
-    replace (2 * IZR m * PI) with (IZR m * (2 * PI)) in Hs.
+    replace (2 * IZR m * PI) with (IZR m * (2 * PI)) in Hs by lra.
     rewrite Rplus_comm in Hs.
-bbb.
-    rewrite Rmod_add in Hs.
-bbb.
+    rewrite Rmod_add_Z in Hs; [ | specialize PI_neq0; lra ].
+    rewrite Rmod_small in Hs; specialize PI_RGT_0; lra.
 
-    erewrite Int_part_interv.
-Check Int_part_interv.
-    specialize (Int_part_interv (2 * k + 1) x) as H.
-
-bbb.
-  rewrite acos_cos; [ | lra ].
-  rewrite Rsign_of_neg; [ | easy ].
-  rewrite <- Ropp_mult_distr_l, Rmult_1_l.
-  rewrite Rminus_plus_distr.
-  rewrite Rminus_opp.
-  rewrite Rplus_comm.
-  rewrite atan_tan.
-   rewrite Rplus_assoc.
-   replace (PI / 2 + PI / 2) with PI by lra.
-   rewrite Rediv_add; [ | apply PI_neq0 ].
-   rewrite plus_IZR; simpl (IZR 1).
-   rewrite Rmult_plus_distr_r.
-   rewrite Rmult_1_l.
-   rewrite Rmod_from_ediv.
-   remember (IZR (x // PI) * PI) as t eqn:Ht.
-   replace (x + PI / 2 - (t + PI) + 2 * PI - PI / 2)
-   with (x - (t - PI)) by lra.
-   subst t; f_equal.
-   unfold Rediv, fst, Rdiv_mod.
-   specialize PI_RGT_0 as HPI.
-   destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
-   destruct (Rcase_abs (2 * PI)) as [HP| HP]; [ lra | clear HP ].
-   enough (∃ k, PI + 2 * IZR k * PI < x < 2 * PI + 2 * IZR k * PI) as (k, Hk).
-    assert (H1 : IZR (2 * k + 1) ≤ x / PI < IZR (2 * k + 1 + 1)).
-     do 3 rewrite plus_IZR; simpl (IZR 1).
-     split.
-      apply Rmult_le_reg_r with (r := PI); [ lra | ].
-      rewrite mult_IZR; simpl (IZR 2).
-      rewrite Rmult_div_same; lra.
-
-      apply Rmult_lt_reg_r with (r := PI); [ lra | ].
-      rewrite mult_IZR; simpl (IZR 2).
-      rewrite Rmult_div_same; lra.
-
-     erewrite Int_part_interv; [ | eassumption ].
-     assert (H2 : IZR k ≤ x / (2 * PI) < IZR (k + 1)).
-      rewrite plus_IZR; simpl (IZR 1).
-      split.
-       apply Rmult_le_reg_r with (r := 2 * PI); [ lra | ].
-       rewrite Rmult_div_same; lra.
-
-       apply Rmult_lt_reg_r with (r := 2 * PI); [ lra | ].
-       rewrite Rmult_div_same; lra.
-
-      erewrite Int_part_interv; [ | eassumption ].
-      rewrite plus_IZR; simpl (IZR 1).
-      rewrite mult_IZR; simpl (IZR 2).
-      rewrite Rmult_plus_distr_r, Rmult_1_l.
-      rewrite Rplus_simpl_r; lra.
-
-    idtac.
-Check neg_sin_interv.
-
-bbb.
-Search (sin _ < _ → _).
-unfold sin in Hs.
-unfold exist_sin in Hs.
-unfold Alembert_C3 in Hs.
-destruct (total_order_T x² 0) as [[Hx| Hx]| Hx].
- exfalso; clear - Hx; apply Rlt_not_le in Hx; apply Hx.
- apply Rle_0_sqr.
-
- specialize (Rsqr_eq_0 _ Hx) as Hx2; subst x; simpl in Hs.
- destruct (AlembertC3_step2 sin_n 0² Hx); lra.
-
- simpl in Hs.
-
+    rewrite <- Z.negb_odd in Hk.
+    apply Bool.not_true_iff_false in Hk.
+    apply Bool.negb_false_iff in Hk.
+    apply Zodd_bool_iff, Zodd_ex_iff in Hk.
+    destruct Hk as (m, Hm).
+    rewrite Hx, Hm.
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
