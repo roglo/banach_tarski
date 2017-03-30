@@ -1000,7 +1000,7 @@ Qed.
 Theorem up_Int_part : ∀ x, up x = (Int_part x + 1)%Z.
 Proof. intros; unfold Int_part; lia. Qed.
 
-Theorem Rediv_add : ∀ x y, y ≠ 0 → Rediv (x + y) y = (Rediv x y + 1)%Z.
+Theorem Rediv_add_1 : ∀ x y, y ≠ 0 → (x + y) // y = (x // y + 1)%Z.
 Proof.
 intros * Hyz.
 unfold Rediv, Rdiv_mod, fst.
@@ -1034,34 +1034,40 @@ destruct (Rcase_abs y) as [Hy| Hy].
   apply frac_part_interv.
 Qed.
 
-Theorem Rmod_add : ∀ x y z,
-  z ≠ 0
-  → (x + IZR y * z) rmod z = x rmod z.
+Theorem Rediv_add_nat : ∀ x y n,
+  y ≠ 0
+  → (x + INR n * y) // y = (x // y + Z.of_nat n)%Z.
+Proof.
+intros * Hyz.
+induction n; [ now simpl; rewrite Rmult_0_l, Rplus_0_r, Z.add_0_r | ].
+rewrite S_INR, Rmult_plus_distr_r, Rmult_1_l, <- Rplus_assoc.
+rewrite Rediv_add_1; [ | easy ].
+rewrite IHn; lia.
+Qed.
+
+Theorem Rediv_add_Z : ∀ x y n,
+  y ≠ 0
+  → (x + IZR n * y) // y = (x // y + n)%Z.
+Proof.
+intros * Hyz.
+bbb.
+
+Theorem Rmod_add_nat : ∀ x y n,
+  y ≠ 0
+  → (x + INR n * y) rmod y = x rmod y.
 Proof.
 intros * Hz.
 do 2 rewrite Rmod_from_ediv.
+rewrite Rediv_add_nat; [ | easy ].
+rewrite plus_IZR.
+rewrite <- INR_IZR_INZ; lra.
+Qed.
+
+Theorem Rmod_add_Z : ∀ x y n,
+  y ≠ 0
+  → (x + IZR n * y) rmod y = x rmod y.
+Proof.
 bbb.
-
-clear Hz.
-unfold "rmod", snd, Rdiv_mod.
-destruct (Rcase_abs z) as [Hzn| Hzp].
- do 2 rewrite opp_IZR, <- Ropp_mult_distr_l, Rminus_opp.
- rewrite Ropp_div_r; [ | lra ].
- rewrite Ropp_div_r; [ | lra ].
- rewrite Rdiv_plus_distr.
- rewrite Rmult_div, Rmult_div_same; [ | lra ].
-bbb.
- rewrite Ropp_plus_distr.
-
-Search (Int_part (_ + _)).
- rewrite plus_Int_part2.
-
-(*
- rewrite Int_part_neg.
-*)
-
-bbb.
-*)
 
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
@@ -1134,7 +1140,7 @@ specialize (tan_period x 1 Hcz) as Ht.
 simpl (INR _) in Ht.
 rewrite Rmult_1_l in Ht.
 rewrite Rplus_shuffle0 in H.
-rewrite Rediv_add in H; [ | apply PI_neq0 ].
+rewrite Rediv_add_1 in H; [ | apply PI_neq0 ].
 rewrite plus_IZR in H.
 simpl (IZR _) in H.
 rewrite Ht in H; lra.
@@ -1328,7 +1334,7 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
   rewrite fold_Rminus.
   rewrite atan_tan; [ | rewrite cos_plus_PI2; lra ].
   replace (x + PI / 2 + PI / 2) with (x + PI) by lra.
-  rewrite Rediv_add; [ | apply PI_neq0 ].
+  rewrite Rediv_add_1; [ | apply PI_neq0 ].
   rewrite Rmod_from_ediv.
   rewrite plus_IZR; simpl (IZR 1).
   remember (IZR (x // PI)) as e eqn:He.
