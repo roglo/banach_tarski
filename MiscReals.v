@@ -1546,7 +1546,18 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     unfold Rminus; rewrite Rplus_assoc.
     replace (1 + - 2) with (-1) by lra.
     rewrite fold_Rminus.
-bb.
+    replace (2 * PI) with (PI * 2) by lra.
+    rewrite <- Rdiv_div; [ | specialize PI_RGT_0; lra | lra ].
+    remember (x / PI) as y eqn:Hy.
+    replace x with (y * PI) in Hc.
+     Focus 2.
+     subst y; rewrite Rmult_div_same; [ easy | apply PI_neq0 ].
+
+     clear x Hy; rename y into x.
+     rewrite Rmult_mod_distr_r in Hc; [ | lra | apply PI_RGT_0 ].
+     replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
+     apply Rmult_lt_reg_r in Hc.
+bbb.
 
 Theorem glop : ∀ x y z,
   z < x rmod y
