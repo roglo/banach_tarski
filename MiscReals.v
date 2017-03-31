@@ -1556,7 +1556,12 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
      clear x Hy; rename y into x.
      rewrite Rmult_mod_distr_r in Hc; [ | lra | apply PI_RGT_0 ].
      replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
-     apply Rmult_lt_reg_r in Hc.
+     apply Rmult_lt_reg_r in Hc; [ | apply PI_RGT_0 ].
+     replace 2 with (IZR 2) at 2 by lra.
+     replace 1 with (IZR 1) at 3 by lra.
+     rewrite <- mult_IZR, <- minus_IZR; f_equal.
+     enough (Int_part x = (Int_part (x / 2) * 2 + 1)%Z) by lia.
+
 bbb.
 
 Theorem glop : ∀ x y z,
