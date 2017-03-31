@@ -1537,6 +1537,10 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Rdiv_div; [ easy | lra | specialize PI_neq0; lra ].
 
     rewrite Rdiv_plus_distr.
+    rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
+    replace PI with (1 * PI) at 3 by lra.
+    rewrite Rdiv_mult_simpl_r; [ | lra | specialize PI_RGT_0; lra ].
+bbb.
     rewrite plus_Int_part1.
      Focus 2.
      rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
