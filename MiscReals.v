@@ -1416,6 +1416,12 @@ destruct (Req_dec (x / (y * z)) (IZR (Int_part (x / (y * z))))); [ | easy ].
 now rewrite Z.add_0_r.
 Qed.
 
+Theorem frac_part_small : ∀ x, 0 ≤ x < 1 → frac_part x = 0.
+Proof.
+intros * (Hx0, Hx1).
+specialize (frac_part_interv x) as H.
+bbb.
+
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
@@ -1538,29 +1544,45 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
 
     rewrite Rdiv_plus_distr.
     rewrite plus_Int_part1.
-    rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
-    replace (PI / (2 * PI)) with (1 / 2).
-    rewrite (Int_part_is_0 (1 / 2)); [ | lra ].
-    rewrite Z.add_0_r.
-    rewrite minus_IZR, plus_IZR; simpl.
-    unfold Rminus; rewrite Rplus_assoc.
-    replace (1 + - 2) with (-1) by lra.
-    rewrite fold_Rminus.
-    replace (2 * PI) with (PI * 2) by lra.
-    rewrite <- Rdiv_div; [ | specialize PI_RGT_0; lra | lra ].
-    remember (x / PI) as y eqn:Hy.
-    replace x with (y * PI) in Hc.
      Focus 2.
-     subst y; rewrite Rmult_div_same; [ easy | apply PI_neq0 ].
+     rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
+     replace PI with (1 * PI) at 2 by lra.
+     rewrite Rdiv_mult_simpl_r; [ | lra | specialize PI_RGT_0; lra ].
+     rewrite frac_part_small.
+bbb.
 
-     clear x Hy; rename y into x.
-     rewrite Rmult_mod_distr_r in Hc; [ | lra | apply PI_RGT_0 ].
-     replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
-     apply Rmult_lt_reg_r in Hc; [ | apply PI_RGT_0 ].
-     replace 2 with (IZR 2) at 2 by lra.
-     replace 1 with (IZR 1) at 3 by lra.
-     rewrite <- mult_IZR, <- minus_IZR; f_equal.
-     enough (Int_part x = (2 * Int_part (x / 2) + 1)%Z) by lia.
+Rdiv_mult_simpl_r: ∀ x y z : ℝ, y ≠ 0 → z ≠ 0 → x * z / (y * z) = x / y
+Rdiv_mult_simpl_l: ∀ x y z : ℝ, x ≠ 0 → z ≠ 0 → x * y / (x * z) = y / z
+
+
+bbb.
+     rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
+     replace (PI / (2 * PI)) with (1 / 2).
+      Focus 2.
+      rewrite Rmult_comm, <- Rdiv_div; [ | specialize PI_RGT_0; lra | lra ].
+      rewrite Rdiv_same; [ easy | apply PI_neq0 ].
+
+      rewrite (Int_part_is_0 (1 / 2)); [ | lra ].
+      rewrite Z.add_0_r.
+      rewrite minus_IZR, plus_IZR; simpl.
+      unfold Rminus; rewrite Rplus_assoc.
+      replace (1 + - 2) with (-1) by lra.
+      rewrite fold_Rminus.
+      replace (2 * PI) with (PI * 2) by lra.
+      rewrite <- Rdiv_div; [ | specialize PI_RGT_0; lra | lra ].
+      remember (x / PI) as y eqn:Hy.
+      replace x with (y * PI) in Hc.
+       Focus 2.
+       subst y; rewrite Rmult_div_same; [ easy | apply PI_neq0 ].
+
+       clear x Hy; rename y into x.
+       rewrite Rmult_mod_distr_r in Hc; [ | lra | apply PI_RGT_0 ].
+       replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
+       apply Rmult_lt_reg_r in Hc; [ | apply PI_RGT_0 ].
+       replace 2 with (IZR 2) at 2 by lra.
+       replace 1 with (IZR 1) at 3 by lra.
+       rewrite <- mult_IZR, <- minus_IZR; f_equal.
+       enough (Int_part x = (2 * Int_part (x / 2) + 1)%Z) by lia.
 
 bbb.
 
