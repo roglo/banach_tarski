@@ -1560,7 +1560,7 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
      replace 2 with (IZR 2) at 2 by lra.
      replace 1 with (IZR 1) at 3 by lra.
      rewrite <- mult_IZR, <- minus_IZR; f_equal.
-     enough (Int_part x = (Int_part (x / 2) * 2 + 1)%Z) by lia.
+     enough (Int_part x = (2 * Int_part (x / 2) + 1)%Z) by lia.
 
 bbb.
 
