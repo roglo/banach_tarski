@@ -1519,6 +1519,13 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    unfold Rmod, snd, Rdiv_mod.
    destruct (Rcase_abs (2 * PI)) as [| H]; [ specialize PI_RGT_0; lra | clear H ].
    destruct (Rcase_abs PI) as [| H]; [ specialize PI_RGT_0; lra | clear H ].
+   remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as u eqn:Hu.
+   replace (3 * PI / 2 + (x + PI / 2 - u)) with (x + (2 * PI - u)) by lra.
+   subst u; unfold Rminus.
+   f_equal; rewrite fold_Rminus.
+Search (IZR (Int_part _)).
+Search (Int_part (_ / _)).
+
 bbb.
 
 Theorem glop : ∀ x y z,
