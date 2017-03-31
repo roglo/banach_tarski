@@ -1127,6 +1127,28 @@ assert (H : 0 ≤ x / y < 1).
  now rewrite Rmult_0_l, Rminus_0_r.
 Qed.
 
+Theorem Rmult_mod_distr_r : ∀ x y z,
+  y ≠ 0
+  → 0 < z
+  → (x * z) rmod (y * z) = x rmod y * z.
+Proof.
+intros * Hy Hz.
+unfold Rmod, snd, Rdiv_mod.
+destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
+ rewrite Ropp_div_r; [ | lra ].
+ rewrite Rdiv_mult_simpl_r; [ | intros H; subst; lra | lra ].
+ destruct (Rcase_abs y) as [H| H]; [ rewrite Ropp_div_r; lra | ].
+ exfalso; apply Rlt_not_le in Hyz; apply Hyz; clear Hyz.
+ apply Rmult_le_pos; lra.
+
+ destruct (Rcase_abs y) as [H| H].
+  exfalso; apply Rlt_not_le in H; apply H; clear H.
+  apply Rmult_le_reg_r with (r := z); [ easy | ].
+  rewrite Rmult_0_l; lra.
+
+  rewrite Rdiv_mult_simpl_r; [ lra | easy | lra ].
+Qed.
+
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
   → atan (tan x) = x - IZR (Rediv (x + PI / 2) PI) * PI.
@@ -1493,25 +1515,14 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
    subst u; rewrite <- Rmod_from_ediv.
    rewrite Rplus_comm; symmetry.
-Theorem Rmult_mod_distr_r : ∀ x y z, (x * z) rmod (y * z) = x rmod y * z.
-Proof.
-intros.
-unfold Rmod, snd, Rdiv_mod.
-destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
- rewrite Ropp_div_r; [ | lra ].
- rewrite Rdiv_mult_simpl_r; [ | intros H; subst; lra | intros H; subst; lra ].
- destruct (Rcase_abs y) as [Hy| Hy]; [ rewrite Ropp_div_r; lra | ].
- rewrite Int_part_neg.
- destruct (Req_dec (x / y) (IZR (Int_part (x / y)))) as [Hxy| Hxy].
-  rewrite Z.sub_0_r, Z.opp_involutive; lra.
+   remember (x / (2 * PI)) as y eqn:Hy.
+   assert (x = y * (2 * PI)).
+    rewrite Hy, Rmult_div_same; [ easy | ].
+    specialize PI_RGT_0; lra.
 
-  rewrite Z.opp_sub_distr, Z.opp_involutive.
-  rewrite plus_IZR; simpl.
-bbb.
-
-Search ((_ * _ / (_ * _))).
-Rdiv_mult_simpl_r: ∀ x y z : ℝ, y ≠ 0 → z ≠ 0 → x * z / (y * z) = x / y
-Rdiv_mult_simpl_l: ∀ x y z : ℝ, x ≠ 0 → z ≠ 0 → x * y / (x * z) = y / z
+    subst x; rename y into x; clear Hy.
+    replace (2 * PI) with (1 * (2 * PI)) at 2 by lra.
+    rewrite Rmult_mod_distr_r; [ | lra | specialize PI_RGT_0; lra ].
 
 bbb.
 x=7π/4
