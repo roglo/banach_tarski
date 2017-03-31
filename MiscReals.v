@@ -1538,7 +1538,15 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
 
     rewrite Rdiv_plus_distr.
     rewrite plus_Int_part1.
-bbb.
+    rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
+    replace (PI / (2 * PI)) with (1 / 2).
+    rewrite (Int_part_is_0 (1 / 2)); [ | lra ].
+    rewrite Z.add_0_r.
+    rewrite minus_IZR, plus_IZR; simpl.
+    unfold Rminus; rewrite Rplus_assoc.
+    replace (1 + - 2) with (-1) by lra.
+    rewrite fold_Rminus.
+bb.
 
 Theorem glop : ∀ x y z,
   z < x rmod y
