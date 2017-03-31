@@ -1515,28 +1515,55 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
    subst u; rewrite <- Rmod_from_ediv.
    rewrite Rplus_comm; symmetry.
+(**)
+   unfold Rmod, snd, Rdiv_mod.
+   destruct (Rcase_abs (2 * PI)) as [| H]; [ specialize PI_RGT_0; lra | clear H ].
+   destruct (Rcase_abs PI) as [| H]; [ specialize PI_RGT_0; lra | clear H ].
+bbb.
+
 Theorem glop : ∀ x y z,
-  z < x rmod (4 * y)
-  → x rmod (4 * y) = z + (x + y) rmod (2 * y).
+  z < x rmod y
+  → x rmod y = z + (x + y - z) rmod (y / 2).
 Proof.
+intros * Hzxy.
+unfold Rmod, snd, Rdiv_mod.
+destruct (Rcase_abs y) as [Hy| Hy].
+ rewrite Ropp_div_r; [ | lra ].
+ rewrite Int_part_neg.
+ destruct (Rcase_abs (y / 2)) as [Hy2| Hy2].
+  rewrite Ropp_div_r; [ | lra ].
+  destruct (Req_dec (x / y) (IZR (Int_part (x / y)))) as [Hxy| Hxy].
+   rewrite Z.sub_0_r, Z.opp_involutive.
+   rewrite Int_part_neg.
+   destruct (Req_dec ((x + y - z) / (y / 2)) (IZR (Int_part ((x + y - z) / (y / 2))))) as [H| H].
+    rewrite Z.sub_0_r, Z.opp_involutive.
+    rewrite <- H.
+    rewrite Rmult_div_same; [ | lra ].
+    rewrite <- Hxy.
+    rewrite Rmult_div_same; [ | lra ].
+bbb. (* faux ! *)
+
+ destruct (Req_dec (x / y0
+
+ rewrite neg_IZR.
+
+
+destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
+- rewrite Ropp_div_r; [ | lra ].
+- rewrite Rdiv_mult_simpl_r; [ | intros H; subst; lra | intros H; subst; lra ].
+- destruct (Rcase_abs y) as [Hy| Hy]; [ rewrite Ropp_div_r; lra | ].
+- rewrite Int_part_neg.
+- destruct (Req_dec (x / y) (IZR (Int_part (x / y)))) as [Hxy| Hxy].
+-  rewrite Z.sub_0_r, Z.opp_involutive; lra.
+-
+-  rewrite Z.opp_sub_distr, Z.opp_involutive.
+-  rewrite plus_IZR; simpl.
+
+
 bbb.
 
-replace (2 * PI) with (4 * (PI / 2)) by lra.
-replace PI with (2 * (PI / 2)) at 4 by lra.
-apply glop.
-replace (4 * (PI / 2)) with (2 * PI) by lra.
-lra.
-bbb.
-
-   remember (x / (2 * PI)) as y eqn:Hy.
-   assert (x = y * (2 * PI)).
-    rewrite Hy, Rmult_div_same; [ easy | ].
-    specialize PI_RGT_0; lra.
-
-    subst x; rename y into x; clear Hy.
-    replace (2 * PI) with (1 * (2 * PI)) at 2 by lra.
-    rewrite Rmult_mod_distr_r; [ | lra | specialize PI_RGT_0; lra ].
-
+erewrite glop; [ | eassumption ].
+f_equal; f_equal; lra.
 bbb.
 x=7π/4
 x+π/2=9π/4
