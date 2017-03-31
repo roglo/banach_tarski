@@ -1524,7 +1524,20 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    subst u; unfold Rminus.
    f_equal; rewrite fold_Rminus.
    apply Ropp_eq_compat.
+   rewrite <- Rmult_minus_distr_r.
+   replace 2 with (IZR 2) at 4 by easy.
+   rewrite <- minus_IZR.
+   rewrite <- Rmult_assoc.
+   f_equal.
+   replace ((x + PI / 2) / PI) with ((2 * x + PI) / (2 * PI)).
+    Focus 2.
+    do 2 rewrite Rdiv_plus_distr.
+    rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
+    f_equal.
+    rewrite Rdiv_div; [ easy | lra | specialize PI_neq0; lra ].
 
+    rewrite Rdiv_plus_distr.
+    rewrite plus_Int_part1.
 bbb.
 
 Theorem glop : ∀ x y z,
