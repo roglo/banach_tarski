@@ -1515,6 +1515,19 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
    subst u; rewrite <- Rmod_from_ediv.
    rewrite Rplus_comm; symmetry.
+Theorem glop : ∀ x y z,
+  z < x rmod (4 * y)
+  → x rmod (4 * y) = z + (x + y) rmod (2 * y).
+Proof.
+bbb.
+
+replace (2 * PI) with (4 * (PI / 2)) by lra.
+replace PI with (2 * (PI / 2)) at 4 by lra.
+apply glop.
+replace (4 * (PI / 2)) with (2 * PI) by lra.
+lra.
+bbb.
+
    remember (x / (2 * PI)) as y eqn:Hy.
    assert (x = y * (2 * PI)).
     rewrite Hy, Rmult_div_same; [ easy | ].
