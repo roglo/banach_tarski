@@ -1493,6 +1493,26 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
    subst u; rewrite <- Rmod_from_ediv.
    rewrite Rplus_comm; symmetry.
+Theorem Rmult_mod_distr_r : ∀ x y z, (x * z) rmod (y * z) = x rmod y * z.
+Proof.
+intros.
+unfold Rmod, snd, Rdiv_mod.
+destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
+ rewrite Ropp_div_r; [ | lra ].
+ rewrite Rdiv_mult_simpl_r; [ | intros H; subst; lra | intros H; subst; lra ].
+ destruct (Rcase_abs y) as [Hy| Hy]; [ rewrite Ropp_div_r; lra | ].
+ rewrite Int_part_neg.
+ destruct (Req_dec (x / y) (IZR (Int_part (x / y)))) as [Hxy| Hxy].
+  rewrite Z.sub_0_r, Z.opp_involutive; lra.
+
+  rewrite Z.opp_sub_distr, Z.opp_involutive.
+  rewrite plus_IZR; simpl.
+bbb.
+
+Search ((_ * _ / (_ * _))).
+Rdiv_mult_simpl_r: ∀ x y z : ℝ, y ≠ 0 → z ≠ 0 → x * z / (y * z) = x / y
+Rdiv_mult_simpl_l: ∀ x y z : ℝ, x ≠ 0 → z ≠ 0 → x * y / (x * z) = y / z
+
 bbb.
 x=7π/4
 x+π/2=9π/4
