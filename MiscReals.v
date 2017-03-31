@@ -1540,9 +1540,15 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
     replace PI with (1 * PI) at 3 by lra.
     rewrite Rdiv_mult_simpl_r; [ | lra | specialize PI_RGT_0; lra ].
+    destruct (Rlt_dec (frac_part (x / PI)) (1 / 2)) as [Hx12| Hx12].
+     rewrite plus_Int_part2.
+      Focus 2.
+      rewrite Rplus_comm; rewrite frac_part_small; lra.
+      setoid_rewrite Int_part_is_0 at 3; [ | lra ].
+      rewrite Z.add_0_r.
 bbb.
-    rewrite plus_Int_part1.
-     Focus 2.
+
+
      rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
      replace PI with (1 * PI) at 2 by lra.
      rewrite Rdiv_mult_simpl_r; [ | lra | specialize PI_RGT_0; lra ].
