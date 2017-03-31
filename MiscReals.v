@@ -360,7 +360,7 @@ induction i; [ apply fp_R1 | simpl ].
 now apply frac_part_mult_for_0.
 Qed.
 
-Theorem frac_part_self : ∀ x, 0 <= x < 1 → frac_part x = x.
+Theorem frac_part_small : ∀ x, 0 <= x < 1 → frac_part x = x.
 Proof.
 intros * Hx.
 unfold frac_part.
@@ -1416,12 +1416,6 @@ destruct (Req_dec (x / (y * z)) (IZR (Int_part (x / (y * z))))); [ | easy ].
 now rewrite Z.add_0_r.
 Qed.
 
-Theorem frac_part_small : ∀ x, 0 ≤ x < 1 → frac_part x = 0.
-Proof.
-intros * (Hx0, Hx1).
-specialize (frac_part_interv x) as H.
-bbb.
-
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
@@ -1548,7 +1542,11 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
      rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
      replace PI with (1 * PI) at 2 by lra.
      rewrite Rdiv_mult_simpl_r; [ | lra | specialize PI_RGT_0; lra ].
-     rewrite frac_part_small.
+     rewrite Rplus_comm, frac_part_small; [ rewrite Rplus_comm | lra ].
+     unfold Rmod, snd, Rdiv_mod in Hc.
+     destruct (Rcase_abs (2 * PI)) as [| H]; [ specialize PI_RGT_0; lra | ].
+     assert (Hx : 3 * PI / 2 < x).
+      eapply Rlt_le_trans; [ eassumption | ].
 bbb.
 
 Rdiv_mult_simpl_r: ∀ x y z : ℝ, y ≠ 0 → z ≠ 0 → x * z / (y * z) = x / y
