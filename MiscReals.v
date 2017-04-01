@@ -1545,6 +1545,15 @@ exfalso.
 unfold Rmod, snd, Rdiv_mod in Hc.
 destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
 unfold frac_part in Hx12.
+replace (2 * PI) with (PI * 2) in Hc at 1 by lra.
+rewrite <- Rdiv_div in Hc; [ | lra | lra ].
+remember (x / PI) as y eqn:Hy.
+replace x with (y * PI) in Hc by (subst y; rewrite Rmult_div_same; lra).
+clear x Hy; rename y into x.
+replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
+rewrite <- Rmult_assoc in Hc.
+rewrite <- Rmult_minus_distr_r in Hc.
+apply Rmult_lt_reg_r in Hc; [ | easy ].
 bbb.
      rewrite plus_Int_part2.
       Focus 2.
