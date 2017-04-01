@@ -1544,6 +1544,7 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
 exfalso.
 unfold Rmod, snd, Rdiv_mod in Hc.
 destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
+unfold frac_part in Hx12.
 bbb.
      rewrite plus_Int_part2.
       Focus 2.
