@@ -1420,6 +1420,8 @@ Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
 intros.
+specialize PI_RGT_0 as HPI_GT_0.
+specialize PI_neq0 as HPI_NZ.
 unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
@@ -1467,7 +1469,7 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
   replace PI with (1 * PI) in H1 at 1 by lra.
   apply Rmult_lt_reg_r in H1; [ | lra ].
   replace (3 * PI / 2) with ((3 / 2) * PI) in H2 by lra.
-  apply Rmult_lt_reg_r in H2; [ lra | specialize PI_RGT_0; lra ].
+  apply Rmult_lt_reg_r in H2; lra.
 
   apply Rnot_lt_le in Hc.
   rewrite asin_sin.
@@ -1488,8 +1490,8 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite mult_IZR in Hs; simpl in Hs.
     replace (2 * IZR m * PI) with (IZR m * (2 * PI)) in Hs by lra.
     rewrite Rplus_comm in Hs.
-    rewrite Rmod_add_Z in Hs; [ | specialize PI_neq0; lra ].
-    rewrite Rmod_small in Hs; specialize PI_RGT_0; lra.
+    rewrite Rmod_add_Z in Hs; [ | lra ].
+    rewrite Rmod_small in Hs; lra.
 
     rewrite <- Z.negb_odd in Hk.
     apply Bool.not_true_iff_false in Hk.
@@ -1500,8 +1502,8 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite plus_IZR, mult_IZR; simpl.
     replace ((2 * IZR m + 1) * PI + PI / 2) with
       (3 * PI / 2 + IZR m * (2 * PI)) by lra.
-    rewrite Rmod_add_Z; [ | specialize PI_neq0; lra ].
-    rewrite Rmod_small; specialize PI_RGT_0; lra.
+    rewrite Rmod_add_Z; [ | lra ].
+    rewrite Rmod_small; lra.
 
    fold (tan x).
    rewrite atan_tan; [ | easy ].
@@ -1509,16 +1511,15 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    clear Hc Hcz; rename H into Hc.
    apply neg_sin_interv in Hs.
    apply pos_cos_interv in Hc.
-   destruct Hc as [Hc| Hc]; [ specialize PI_RGT_0; lra | ].
-   clear Hs.
+   destruct Hc as [Hc| Hc]; [ lra | clear Hs ].
    remember (IZR ((x + PI / 2) // PI) * PI) as u eqn:Hu.
    replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
    subst u; rewrite <- Rmod_from_ediv.
    rewrite Rplus_comm; symmetry.
 (**)
    unfold Rmod, snd, Rdiv_mod.
-   destruct (Rcase_abs (2 * PI)) as [| H]; [ specialize PI_RGT_0; lra | clear H ].
-   destruct (Rcase_abs PI) as [| H]; [ specialize PI_RGT_0; lra | clear H ].
+   destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
+   destruct (Rcase_abs PI) as [| H]; [ lra | clear H ].
    remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as u eqn:Hu.
    replace (3 * PI / 2 + (x + PI / 2 - u)) with (x - (u - 2 * PI)) by lra.
    subst u; unfold Rminus.
@@ -1532,17 +1533,17 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    replace ((x + PI / 2) / PI) with ((2 * x + PI) / (2 * PI)).
     Focus 2.
     do 2 rewrite Rdiv_plus_distr.
-    rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
+    rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
     f_equal.
-    rewrite Rdiv_div; [ easy | lra | specialize PI_neq0; lra ].
-
+    rewrite Rdiv_div; [ easy | lra | lra ].
     rewrite Rdiv_plus_distr.
-    rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
+    rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
     replace PI with (1 * PI) at 3 by lra.
-    rewrite Rdiv_mult_simpl_r; [ | lra | specialize PI_RGT_0; lra ].
+    rewrite Rdiv_mult_simpl_r; [ | lra | lra ].
     destruct (Rlt_dec (frac_part (x / PI)) (1 / 2)) as [Hx12| Hx12].
 exfalso.
-
+unfold Rmod, snd, Rdiv_mod in Hc.
+destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
 bbb.
      rewrite plus_Int_part2.
       Focus 2.
