@@ -1555,6 +1555,12 @@ rewrite <- Rmult_assoc in Hc.
 rewrite <- Rmult_minus_distr_r in Hc.
 apply Rmult_lt_reg_r in Hc; [ | easy ].
 bbb.
+fold (frac_part x) in Hx12.
+replace x with (x / 2 + x / 2) in Hc at 1 by lra.
+unfold Rminus in Hc; rewrite Rplus_assoc in Hc.
+rewrite fold_Rminus in Hc.
+fold (frac_part (x / 2)) in Hc.
+bbb.
      rewrite plus_Int_part2.
       Focus 2.
       rewrite Rplus_comm; rewrite frac_part_small; lra.
