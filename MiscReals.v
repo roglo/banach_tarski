@@ -1558,6 +1558,8 @@ fold (frac_part x) in Hx12.
 replace x with ((x / 2) * 2) in Hc at 1 by lra.
 rewrite <- Rmult_minus_distr_r in Hc.
 fold (frac_part (x / 2)) in Hc.
+assert (Hx34 : 3 / 4 < frac_part (x / 2)) by lra.
+clear Hc.
 bbb.
 unfold Rminus in Hc; rewrite Rplus_assoc in Hc.
 rewrite fold_Rminus in Hc.
