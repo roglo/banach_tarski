@@ -1463,6 +1463,42 @@ destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx].
  rewrite plus_Int_part1; [ lia | lra ].
 Qed.
 
+Theorem pow_1_abs_nat_odd : ∀ n, (-1) ^ Z.abs_nat (2 * n + 1) = -1.
+Proof.
+intros n.
+destruct n as [| n| n].
+ rewrite Z.mul_0_r, Z.add_0_l.
+ simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+ now rewrite pow_1.
+
+ rewrite Zabs2Nat.inj_add; [ | lia | lia ].
+ rewrite Zabs2Nat.inj_mul.
+ simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+ now rewrite Nat.add_1_r, pow_1_odd.
+
+bbb.
+ replace (2 * Z.neg n + 1)%Z with (Z.neg (2 * n) + Z.pos 1)%Z by lia.
+ rewrite Pos2Z.add_neg_pos.
+ unfold Z.abs_nat.
+ remember (Z.pos_sub 1 (2 * n)) as m eqn:Hm.
+ destruct m as [| m| m].
+  rewrite <- Pos2Z.add_neg_pos in Hm.
+bbb.
+ rewrite <- Z.pos_sub_opp.
+ rewrite Z_pos_sub_gt.
+
+bbb.
+Z.pos_sub_opp: ∀ p q : positive, (- Z.pos_sub p q)%Z = Z.pos_sub q p
+
+ rewrite Z.add_1_r.
+Search (Z.abs_nat (Z.succ _)).
+bbb.
+
+Zabs2Nat.inj_neg: ∀ p : positive, Z.abs_nat (Z.neg p) = Pos.to_nat p
+Zabs2Nat.inj_succ: ∀ n : ℤ, (0 <= n)%Z → Z.abs_nat (Z.succ n) = S (Z.abs_nat n)
+Zabs2Nat.inj_mul:
+  ∀ n m : ℤ, Z.abs_nat (n * m) = (Z.abs_nat n * Z.abs_nat m)%nat
+
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
@@ -1641,6 +1677,10 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     apply Bool.negb_false_iff in Hk.
     apply Zodd_bool_iff, Zodd_ex_iff in Hk.
     destruct Hk as (m, Hk).
+bbb.
+rewrite Hk at 1.
+rewrite pow_1_abs_nat_odd.
+
 bbb.
     destruct m as [| m| m].
      rewrite Z.mul_0_r, Z.add_0_l in Hk; rewrite Hk.
