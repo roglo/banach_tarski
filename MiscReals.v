@@ -246,12 +246,19 @@ apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1.
  now apply Rplus_le_compat_r.
 Qed.
 
-Theorem Int_part_is_0 : ∀ x, 0 <= x < 1 → Int_part x = 0%Z.
+Theorem Int_part_small : ∀ x, 0 <= x < 1 → Int_part x = 0%Z.
 Proof.
 intros * Hx.
 assert (INR 0 / INR (0 + 1) <= x < 1) by (now simpl; lra).
 pose proof Int_part_close_to_1 x 0 H as H1.
 now simpl in H1; rewrite Rmult_1_r in H1.
+Qed.
+
+Theorem frac_part_small : ∀ x, 0 <= x < 1 → frac_part x = x.
+Proof.
+intros * Hx.
+unfold frac_part.
+rewrite Int_part_small; [ lra | easy ].
 Qed.
 
 Theorem frac_part_mult_for_0 : ∀ x y,
@@ -322,7 +329,7 @@ destruct (Z_le_dec 0 z) as [Hz| Hz].
  replace (IZR (Z.neg p)) with (0 + IZR (Z.neg p)) by lra; simpl.
  rewrite fold_Rminus.
  rewrite Rminus_Int_part1.
-  rewrite Int_part_is_0; [ | lra ].
+  rewrite Int_part_small; [ | lra ].
   simpl; rewrite Int_part_INR.
   now rewrite positive_nat_Z.
 
@@ -360,13 +367,6 @@ induction i; [ apply fp_R1 | simpl ].
 now apply frac_part_mult_for_0.
 Qed.
 
-Theorem frac_part_small : ∀ x, 0 <= x < 1 → frac_part x = x.
-Proof.
-intros * Hx.
-unfold frac_part.
-rewrite Int_part_is_0; [ lra | easy ].
-Qed.
-
 Theorem frac_part_interv : ∀ x, 0 ≤ frac_part x < 1.
 Proof.
 intros.
@@ -379,7 +379,7 @@ Proof.
 intros * (Hzx, Hxz).
 rewrite plus_IZR in Hxz; simpl in Hxz.
 assert (H : 0 ≤ x - IZR z < 1) by lra.
-apply Int_part_is_0 in H.
+apply Int_part_small in H.
 rewrite Rminus_Int_part1 in H.
  rewrite Int_part_IZR in H.
  now apply -> Z.sub_move_0_r in H.
@@ -1122,7 +1122,7 @@ assert (H : 0 ≤ x / y < 1).
   apply Rmult_lt_reg_r with (r := y); [ lra | ].
   rewrite Rmult_1_l, Rmult_div_same; [ easy | lra ].
 
- apply Int_part_is_0 in H.
+ apply Int_part_small in H.
  rewrite H; simpl.
  now rewrite Rmult_0_l, Rminus_0_r.
 Qed.
@@ -1428,6 +1428,18 @@ destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx].
  apply plus_frac_part1; lra.
 Qed.
 
+Theorem Int_part_double : ∀ x,
+  Int_part (2 * x) =
+    (2 * Int_part x + if Rlt_dec (frac_part x) (1 / 2) then 0 else 1)%Z.
+Proof.
+intros.
+rewrite double.
+destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx].
+ rewrite plus_Int_part2; [ lia | lra ].
+
+ rewrite plus_Int_part1; [ lia | lra ].
+Qed.
+
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
 Proof.
@@ -1528,7 +1540,6 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
    subst u; rewrite <- Rmod_from_ediv.
    rewrite Rplus_comm; symmetry.
-(**)
    unfold Rmod, snd, Rdiv_mod.
    destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
    destruct (Rcase_abs PI) as [| H]; [ lra | clear H ].
@@ -1543,11 +1554,6 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
    rewrite <- Rmult_assoc.
    f_equal.
    replace ((x + PI / 2) / PI) with ((2 * x + PI) / (2 * PI)).
-    Focus 2.
-    do 2 rewrite Rdiv_plus_distr.
-    rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
-    f_equal.
-    rewrite Rdiv_div; [ easy | lra | lra ].
     rewrite Rdiv_plus_distr.
     rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
     replace PI with (1 * PI) at 3 by lra.
@@ -1577,111 +1583,21 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
      rewrite frac_part_double in Hx12.
      destruct (Rlt_dec (frac_part x) (1 / 2)); lra.
 
-     apply Rnot_lt_le in Hx12.
      assert (H : frac_part (1 / 2) = 1 / 2) by (apply frac_part_small; lra).
      rewrite plus_Int_part1; [ clear H | lra ].
-     rewrite frac_part_double in Hx12.
+     rewrite frac_part_double in Hx12; rewrite Int_part_double.
      destruct (Rlt_dec (frac_part x) (1 / 2)) as [| H]; [ lra | clear H ].
-bbb.
+     replace 2 with (IZR 2) at 1 by lra.
+     rewrite <- mult_IZR; f_equal.
+     enough (Int_part (1 / 2) = 0%Z) by lia.
+     apply Int_part_small; lra.
 
-     exfalso.
-     rewrite frac_part_double in Hx12.
-     destruct (Rlt_dec (frac_part x) (1 / 2)); lra.
-bbb.
+    do 2 rewrite Rdiv_plus_distr.
+    rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
+    f_equal.
+    rewrite Rdiv_div; [ easy | lra | lra ].
 
-     rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
-     replace PI with (1 * PI) at 2 by lra.
-     rewrite Rdiv_mult_simpl_r; [ | lra | specialize PI_RGT_0; lra ].
-     rewrite Rplus_comm, frac_part_small; [ rewrite Rplus_comm | lra ].
-     unfold Rmod, snd, Rdiv_mod in Hc.
-     destruct (Rcase_abs (2 * PI)) as [| H]; [ specialize PI_RGT_0; lra | ].
-     assert (Hx : 3 * PI / 2 < x).
-      eapply Rlt_le_trans; [ eassumption | ].
-bbb.
-
-Rdiv_mult_simpl_r: ∀ x y z : ℝ, y ≠ 0 → z ≠ 0 → x * z / (y * z) = x / y
-Rdiv_mult_simpl_l: ∀ x y z : ℝ, x ≠ 0 → z ≠ 0 → x * y / (x * z) = y / z
-
-
-bbb.
-     rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
-     replace (PI / (2 * PI)) with (1 / 2).
-      Focus 2.
-      rewrite Rmult_comm, <- Rdiv_div; [ | specialize PI_RGT_0; lra | lra ].
-      rewrite Rdiv_same; [ easy | apply PI_neq0 ].
-
-      rewrite (Int_part_is_0 (1 / 2)); [ | lra ].
-      rewrite Z.add_0_r.
-      rewrite minus_IZR, plus_IZR; simpl.
-      unfold Rminus; rewrite Rplus_assoc.
-      replace (1 + - 2) with (-1) by lra.
-      rewrite fold_Rminus.
-      replace (2 * PI) with (PI * 2) by lra.
-      rewrite <- Rdiv_div; [ | specialize PI_RGT_0; lra | lra ].
-      remember (x / PI) as y eqn:Hy.
-      replace x with (y * PI) in Hc.
-       Focus 2.
-       subst y; rewrite Rmult_div_same; [ easy | apply PI_neq0 ].
-
-       clear x Hy; rename y into x.
-       rewrite Rmult_mod_distr_r in Hc; [ | lra | apply PI_RGT_0 ].
-       replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
-       apply Rmult_lt_reg_r in Hc; [ | apply PI_RGT_0 ].
-       replace 2 with (IZR 2) at 2 by lra.
-       replace 1 with (IZR 1) at 3 by lra.
-       rewrite <- mult_IZR, <- minus_IZR; f_equal.
-       enough (Int_part x = (2 * Int_part (x / 2) + 1)%Z) by lia.
-
-bbb.
-
-Theorem glop : ∀ x y z,
-  z < x rmod y
-  → x rmod y = z + (x + y - z) rmod (y / 2).
-Proof.
-intros * Hzxy.
-unfold Rmod, snd, Rdiv_mod.
-destruct (Rcase_abs y) as [Hy| Hy].
- rewrite Ropp_div_r; [ | lra ].
- rewrite Int_part_neg.
- destruct (Rcase_abs (y / 2)) as [Hy2| Hy2].
-  rewrite Ropp_div_r; [ | lra ].
-  destruct (Req_dec (x / y) (IZR (Int_part (x / y)))) as [Hxy| Hxy].
-   rewrite Z.sub_0_r, Z.opp_involutive.
-   rewrite Int_part_neg.
-   destruct (Req_dec ((x + y - z) / (y / 2)) (IZR (Int_part ((x + y - z) / (y / 2))))) as [H| H].
-    rewrite Z.sub_0_r, Z.opp_involutive.
-    rewrite <- H.
-    rewrite Rmult_div_same; [ | lra ].
-    rewrite <- Hxy.
-    rewrite Rmult_div_same; [ | lra ].
-bbb. (* faux ! *)
-
- destruct (Req_dec (x / y0
-
- rewrite neg_IZR.
-
-
-destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
-- rewrite Ropp_div_r; [ | lra ].
-- rewrite Rdiv_mult_simpl_r; [ | intros H; subst; lra | intros H; subst; lra ].
-- destruct (Rcase_abs y) as [Hy| Hy]; [ rewrite Ropp_div_r; lra | ].
-- rewrite Int_part_neg.
-- destruct (Req_dec (x / y) (IZR (Int_part (x / y)))) as [Hxy| Hxy].
--  rewrite Z.sub_0_r, Z.opp_involutive; lra.
--
--  rewrite Z.opp_sub_distr, Z.opp_involutive.
--  rewrite plus_IZR; simpl.
-
-
-bbb.
-
-erewrite glop; [ | eassumption ].
-f_equal; f_equal; lra.
-bbb.
-x=7π/4
-x+π/2=9π/4
-(x+π/2)mod π=π/4
-(x+π/2)mod π+3π/2=7π/4 ... works
+  idtac.
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
