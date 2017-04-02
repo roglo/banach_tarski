@@ -8,7 +8,7 @@
 Require Import Utf8 List.
 Require Import Reals Psatz Nsatz.
 
-Require Import Words Normalize Reverse MiscReals.
+Require Import Words Normalize Reverse MiscReals MiscTrigo.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -1561,7 +1561,7 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
   destruct H as (H1 & H2 & H3).
   now rewrite H1, H2, H3 in Hpz.
 
-  unfold Rsign.
+  unfold Rsign, Rsignp.
   destruct (Req_dec k 0) as [Hkz| Hkz]; [ lra | clear Hkz ].
   destruct (Rle_dec 0 k) as [Hkp| Hkn].
    rewrite Rmult_1_l.
