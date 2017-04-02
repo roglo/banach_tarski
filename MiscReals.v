@@ -1552,28 +1552,39 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
     replace PI with (1 * PI) at 3 by lra.
     rewrite Rdiv_mult_simpl_r; [ | lra | lra ].
-    destruct (Rlt_dec (frac_part (x / PI)) (1 / 2)) as [Hx12| Hx12].
+    unfold Rmod, snd, Rdiv_mod in Hc.
+    destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
+    replace (2 * PI) with (PI * 2) in Hc at 1 by lra.
+    replace (2 * PI) with (PI * 2) by lra.
+    rewrite <- Rdiv_div in Hc; [ | lra | lra ].
+    rewrite <- Rdiv_div; [ | lra | lra ].
+    remember (x / PI) as y eqn:Hy.
+    replace x with (y * PI) in Hc by (subst y; rewrite Rmult_div_same; lra).
+    clear x Hy; rename y into x.
+    replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
+    rewrite <- Rmult_assoc in Hc.
+    rewrite <- Rmult_minus_distr_r in Hc.
+    apply Rmult_lt_reg_r in Hc; [ | easy ].
+    replace x with ((x / 2) * 2) in Hc at 1 by lra.
+    rewrite <- Rmult_minus_distr_r in Hc.
+    fold (frac_part (x / 2)) in Hc.
+    remember (x / 2) as y eqn:Hy.
+    replace x with (2 * y) by lra.
+    clear x Hy; rename y into x.
+    assert (Hx34 : 3 / 4 < frac_part x) by lra; clear Hc.
+    destruct (Rlt_dec (frac_part (2 * x)) (1 / 2)) as [Hx12| Hx12].
      exfalso.
-     unfold Rmod, snd, Rdiv_mod in Hc.
-     destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
-     replace (2 * PI) with (PI * 2) in Hc at 1 by lra.
-     rewrite <- Rdiv_div in Hc; [ | lra | lra ].
-     remember (x / PI) as y eqn:Hy.
-     replace x with (y * PI) in Hc by (subst y; rewrite Rmult_div_same; lra).
-     clear x Hy; rename y into x.
-     replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
-     rewrite <- Rmult_assoc in Hc.
-     rewrite <- Rmult_minus_distr_r in Hc.
-     apply Rmult_lt_reg_r in Hc; [ | easy ].
-     fold (frac_part x) in Hx12.
-     replace x with ((x / 2) * 2) in Hc at 1 by lra.
-     rewrite <- Rmult_minus_distr_r in Hc.
-     fold (frac_part (x / 2)) in Hc.
-     assert (Hx34 : 3 / 4 < frac_part (x / 2)) by lra.
-     clear Hc.
-     remember (x / 2) as y eqn:Hy.
-     replace x with (2 * y) in Hx12 by lra.
-     clear x Hy; rename y into x.
+     rewrite frac_part_double in Hx12.
+     destruct (Rlt_dec (frac_part x) (1 / 2)); lra.
+
+     apply Rnot_lt_le in Hx12.
+     assert (H : frac_part (1 / 2) = 1 / 2) by (apply frac_part_small; lra).
+     rewrite plus_Int_part1; [ clear H | lra ].
+     rewrite frac_part_double in Hx12.
+     destruct (Rlt_dec (frac_part x) (1 / 2)) as [| H]; [ lra | clear H ].
+bbb.
+
+     exfalso.
      rewrite frac_part_double in Hx12.
      destruct (Rlt_dec (frac_part x) (1 / 2)); lra.
 bbb.
