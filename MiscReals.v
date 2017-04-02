@@ -1476,28 +1476,15 @@ destruct n as [| n| n].
  simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
  now rewrite Nat.add_1_r, pow_1_odd.
 
-bbb.
- replace (2 * Z.neg n + 1)%Z with (Z.neg (2 * n) + Z.pos 1)%Z by lia.
- rewrite Pos2Z.add_neg_pos.
- unfold Z.abs_nat.
- remember (Z.pos_sub 1 (2 * n)) as m eqn:Hm.
- destruct m as [| m| m].
-  rewrite <- Pos2Z.add_neg_pos in Hm.
-bbb.
- rewrite <- Z.pos_sub_opp.
- rewrite Z_pos_sub_gt.
-
-bbb.
-Z.pos_sub_opp: ∀ p q : positive, (- Z.pos_sub p q)%Z = Z.pos_sub q p
-
- rewrite Z.add_1_r.
-Search (Z.abs_nat (Z.succ _)).
-bbb.
-
-Zabs2Nat.inj_neg: ∀ p : positive, Z.abs_nat (Z.neg p) = Pos.to_nat p
-Zabs2Nat.inj_succ: ∀ n : ℤ, (0 <= n)%Z → Z.abs_nat (Z.succ n) = S (Z.abs_nat n)
-Zabs2Nat.inj_mul:
-  ∀ n m : ℤ, Z.abs_nat (n * m) = (Z.abs_nat n * Z.abs_nat m)%nat
+ rewrite <- Pos2Z.opp_pos, <- Zopp_mult_distr_r, <- Z.opp_sub_distr.
+ rewrite <- Zabs_N_nat, Zabs2N.inj_opp, Zabs_N_nat.
+ rewrite Zabs2Nat.inj_sub; [ | lia ].
+ simpl (Z.abs_nat 1); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+ rewrite <- Rpow_div_sub; [ | lra | lia ].
+ rewrite pow_1, Zabs2Nat.inj_mul.
+ simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+ rewrite pow_1_even, Ropp_div_r; lra.
+Qed.
 
 Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = Rmod x (2 * PI).
@@ -1677,31 +1664,9 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     apply Bool.negb_false_iff in Hk.
     apply Zodd_bool_iff, Zodd_ex_iff in Hk.
     destruct Hk as (m, Hk).
-bbb.
-rewrite Hk at 1.
-rewrite pow_1_abs_nat_odd.
-
-bbb.
-    destruct m as [| m| m].
-     rewrite Z.mul_0_r, Z.add_0_l in Hk; rewrite Hk.
-     simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-     rewrite pow_1, Rsign_of_neg; [ | lra ].
-     rewrite Rmod_small; lra.
-
-     rewrite Hk.
-     rewrite Zabs2Nat.inj_add; [ | lia | lia ].
-     rewrite Zabs2Nat.inj_mul.
-     simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-     rewrite Nat.add_1_r, pow_1_odd.
-     rewrite Rsign_of_neg; [ | lra ].
-     replace (2 * Z.pos m + 1)%Z with (1 + Z.pos m * 2)%Z by lia.
-     rewrite plus_IZR, mult_IZR.
-     simpl (IZR _).
-     rewrite Rmult_plus_distr_r, Rmult_1_l, Rmult_assoc.
-     rewrite Rmod_add_nat; [ | lra ].
-     rewrite Rmod_small; lra.
-Search ((-1) ^ _).
-
+    rewrite Hk at 1.
+    rewrite pow_1_abs_nat_odd.
+    rewrite Rsign_of_neg; [ | lra ].
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
