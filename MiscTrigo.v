@@ -764,6 +764,16 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     rewrite Hk at 1.
     rewrite pow_1_abs_nat_odd.
     rewrite Rsign_of_neg; [ | lra ].
+    rewrite Z.add_comm, Z.mul_comm in Hk.
+    rewrite Hk, plus_IZR, mult_IZR; simpl.
+    rewrite Rmult_plus_distr_r, Rmult_1_l, Rmult_assoc.
+    rewrite Rmod_add_Z; [ | lra ].
+    rewrite Rmod_small; lra.
+
+   assert (H : 0 < sin x) by lra; clear Hs Hsnz; rename H into Hs.
+   move Hs after Hc.
+   rewrite Rsign_of_pos; [ | easy ].
+   rewrite atan_tan; [ | rewrite cos_plus_PI2; lra ].
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
