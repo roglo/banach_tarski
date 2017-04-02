@@ -1653,6 +1653,12 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
      simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
      rewrite Nat.add_1_r, pow_1_odd.
      rewrite Rsign_of_neg; [ | lra ].
+     replace (2 * Z.pos m + 1)%Z with (1 + Z.pos m * 2)%Z by lia.
+     rewrite plus_IZR, mult_IZR.
+     simpl (IZR _).
+     rewrite Rmult_plus_distr_r, Rmult_1_l, Rmult_assoc.
+     rewrite Rmod_add_nat; [ | lra ].
+     rewrite Rmod_small; lra.
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
