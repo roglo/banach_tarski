@@ -1641,12 +1641,18 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     apply Bool.negb_false_iff in Hk.
     apply Zodd_bool_iff, Zodd_ex_iff in Hk.
     destruct Hk as (m, Hk).
-bbb.
     destruct m as [| m| m].
-     rewrite Z.mul_0_r, Z.add_0_l in Hm; rewrite Hm.
+     rewrite Z.mul_0_r, Z.add_0_l in Hk; rewrite Hk.
      simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
      rewrite pow_1, Rsign_of_neg; [ | lra ].
      rewrite Rmod_small; lra.
+
+     rewrite Hk.
+     rewrite Zabs2Nat.inj_add; [ | lia | lia ].
+     rewrite Zabs2Nat.inj_mul.
+     simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+     rewrite Nat.add_1_r, pow_1_odd.
+     rewrite Rsign_of_neg; [ | lra ].
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
