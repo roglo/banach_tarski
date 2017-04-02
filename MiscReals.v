@@ -1109,6 +1109,29 @@ remember (IZR (x // y) * y) as v.
 now replace (x + u - (v + u)) with (x - v) by lra; subst u v.
 Qed.
 
+Theorem Int_part_0 : Int_part 0 = 0%Z.
+Proof. rewrite Int_part_small; [ easy | lra ]. Qed.
+
+Theorem Rmod_0_l : ∀ x, 0 rmod x = 0.
+Proof.
+intros x.
+unfold Rmod, snd, Rdiv_mod.
+do 2 rewrite Rdiv_0_l.
+rewrite Int_part_0, Z.opp_0.
+destruct (Rcase_abs x); lra.
+Qed.
+
+Theorem Rmod_mul_same : ∀ x a, (IZR a * x) rmod x = 0.
+Proof.
+intros.
+destruct (Req_dec x 0) as [Hx| Hx].
+ rewrite Hx, Rmult_0_r; apply Rmod_0_l.
+
+ specialize (Rmod_add_Z 0 x a Hx) as H.
+ rewrite Rplus_0_l in H; rewrite H.
+ apply Rmod_0_l.
+Qed.
+
 Theorem Rmod_small : ∀ x y, 0 ≤ x < y → x rmod y = x.
 Proof.
 intros * (Hx, Hxy).
@@ -1597,7 +1620,33 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
     f_equal.
     rewrite Rdiv_div; [ easy | lra | lra ].
 
-  idtac.
+ apply Rnot_lt_le in Hs.
+ destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
+  rewrite acos_cos, asin_cos.
+  destruct (Req_dec (sin x) 0) as [Hsz| Hsnz].
+   specialize (sin_eq_0_0 _ Hsz) as (k, Hk); subst x.
+   rewrite cos_ZPI.
+   destruct (Bool.bool_dec (Z.even k) true) as [Hk| Hk].
+    apply Zeven_bool_iff, Zeven_ex_iff in Hk.
+    destruct Hk as (m, Hm).
+    rewrite Hm; rewrite Zabs2Nat.inj_mul.
+    simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+    rewrite pow_1_even; rewrite Rsign_of_pos; [ | lra ].
+    rewrite Rmult_1_l, mult_IZR; simpl (IZR 2).
+    rewrite Rmult_shuffle0, Rmult_comm.
+    rewrite Rmod_mul_same; lra.
+
+    rewrite <- Z.negb_odd in Hk.
+    apply Bool.not_true_iff_false in Hk.
+    apply Bool.negb_false_iff in Hk.
+    apply Zodd_bool_iff, Zodd_ex_iff in Hk.
+    destruct Hk as (m, Hk).
+bbb.
+    destruct m as [| m| m].
+     rewrite Z.mul_0_r, Z.add_0_l in Hm; rewrite Hm.
+     simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+     rewrite pow_1, Rsign_of_neg; [ | lra ].
+     rewrite Rmod_small; lra.
 bbb.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
