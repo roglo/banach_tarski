@@ -1556,7 +1556,6 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
      exfalso.
      unfold Rmod, snd, Rdiv_mod in Hc.
      destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
-     unfold frac_part in Hx12.
      replace (2 * PI) with (PI * 2) in Hc at 1 by lra.
      rewrite <- Rdiv_div in Hc; [ | lra | lra ].
      remember (x / PI) as y eqn:Hy.
@@ -1576,18 +1575,8 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
      replace x with (2 * y) in Hx12 by lra.
      clear x Hy; rename y into x.
      rewrite frac_part_double in Hx12.
-
+     destruct (Rlt_dec (frac_part x) (1 / 2)); lra.
 bbb.
-unfold Rminus in Hc; rewrite Rplus_assoc in Hc.
-rewrite fold_Rminus in Hc.
-bbb.
-     rewrite plus_Int_part2.
-      Focus 2.
-      rewrite Rplus_comm; rewrite frac_part_small; lra.
-      setoid_rewrite Int_part_is_0 at 3; [ | lra ].
-      rewrite Z.add_0_r.
-bbb.
-
 
      rewrite Rdiv_mult_simpl_l; [ | lra | specialize PI_RGT_0; lra ].
      replace PI with (1 * PI) at 2 by lra.
