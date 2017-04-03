@@ -797,6 +797,23 @@ destruct (Req_dec (sin x) 0) as [Hsz| Hsnz].
  move Hs after Hc.
  rewrite Rsign_of_pos; [ | easy ].
  rewrite atan_tan; [ | rewrite cos_plus_PI2; lra ].
+ replace (x + PI / 2 + PI / 2) with (x + PI) by lra.
+ rewrite Rediv_add_1; [ | apply PI_neq0 ].
+ rewrite Rmod_from_ediv.
+ rewrite plus_IZR; simpl (IZR 1).
+ remember (IZR (x // PI)) as e eqn:He.
+ replace (PI / 2 - -1 * (x + PI / 2 - (e + 1) * PI)) with (x - e * PI) by lra.
+ subst e.
+ rewrite <- Rmult_assoc.
+ f_equal; f_equal.
+bbb.
+enough (IZR (x // PI) = 2 * IZR (x // (2 * PI)) + 1) by lra.
+apply neg_sin_interv in Hs.
+apply neg_cos_interv in Hc.
+rewrite Rmod_from_ediv in Hs, Hc.
+remember (x // (2 * PI)) as k eqn:Hk.
+replace (IZR k * (2 * PI)) with (2 * IZR k * PI) in Hs, Hc by lra.
+assert (Hp : PI < x - 2 * IZR k * PI < 3 * PI / 2) by lra.
 bbb.
 
 Theorem angle_of_sin_cos_inv : ∀ x,
