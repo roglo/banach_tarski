@@ -5473,6 +5473,18 @@ rewrite <- Ropp_mult_distr_l, fold_Rminus.
 rewrite Rmult_1_l.
 rewrite atan_tan.
 split.
+specialize PI_RGT_0 as HPI_GT_0.
+specialize PI_neq0 as HPI_NZ.
+rewrite Rplus_assoc.
+replace (PI / 2 + PI / 2) with PI by lra.
+rewrite Rediv_add_1; [ | lra ].
+replace
+  (2 * PI - (PI / 2 - (θ * INR (S n) + PI / 2 - IZR ((θ * INR (S n)) // PI + 1) * PI)) +
+   2 * IZR k * PI)
+with
+  (θ * INR (S n) - IZR ((θ * INR (S n)) // PI + 1) * PI + 2 * (IZR k + 1) * PI)
+by lra.
+
 bbb. (* grosse fatigue *)
          exists (S n), 0%Z; simpl (IZR 0).
          rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
