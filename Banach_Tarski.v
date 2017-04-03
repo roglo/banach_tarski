@@ -9,7 +9,8 @@ Require Import Utf8 List Relations NPeano Wf_nat.
 Import ListNotations.
 Require Import Reals Psatz Nsatz.
 
-Require Import Misc Words Normalize Reverse MiscReals Matrix Pset Orbit.
+Require Import Misc Words Normalize Reverse MiscReals MiscTrigo.
+Require Import Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 Require Import Countable QCountable RnCountable NotEmptyPath.
 
@@ -3151,7 +3152,7 @@ rewrite Ha₁, Ha₂ in Hlag.
 do 2 rewrite vec_const_mul_0_l in Hlag.
 rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
 apply Rminus_diag_uniq in Hlag.
-unfold Rsign.
+unfold Rsign, Rsignp.
 destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
  exfalso.
  rewrite Hppp in Hlag.
@@ -3418,7 +3419,7 @@ assert (H : a² < 1).
        apply Rsqr_eq_abs_0 in Hlag.
        rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
        rewrite Hlag.
-       unfold Rsign.
+       unfold Rsign, Rsignp.
        rewrite Hv'₁, Hv'₂ in Hlag at 1.
        rewrite <- vec_const_mul_cross_distr_l in Hlag.
        rewrite <- vec_const_mul_cross_distr_r in Hlag.
@@ -5453,10 +5454,9 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
 
           rewrite Hv, Hρ, Hρ₀.
           rewrite Rmult_comm in Hs₀, Hc₀.
-Search (matrix_of_axis_angle _ * matrix_of_axis_angle _)%mat.
-Search (_ * _)%mat.
           now erewrite matrix_of_mul_angle; try eassumption.
 
+         idtac.
 bbb.
 
         rewrite Hs₀, Hc₀.
