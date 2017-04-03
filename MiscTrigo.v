@@ -493,6 +493,24 @@ rewrite Rsqr_0, Rminus_0_r, sqrt_1, Rdiv_1_r, atan_0.
 destruct (Req_dec 1 0); [ lra | easy ].
 Qed.
 
+Theorem nonneg_sin_interv : ∀ x, 0 ≤ sin x → x rmod (2 * PI) ≤ PI.
+Proof.
+intros * Hs.
+apply Rnot_lt_le; intros Hx.
+apply Rle_not_lt in Hs; apply Hs; clear Hs.
+enough (H : sin (x rmod (2 * PI)) < 0).
+ rewrite Rmod_from_ediv in H.
+ unfold Rminus in H.
+ rewrite Ropp_mult_distr_l in H.
+ rewrite <- opp_IZR in H.
+ rewrite Rmult_comm, Rmult_shuffle0 in H.
+ now rewrite sin_Zperiod in H.
+
+ apply sin_lt_0; [ easy | ].
+ assert (HP : 0 < 2 * PI) by (specialize PI_RGT_0; lra).
+ specialize (Rmod_interv x (2 * PI) HP) as H; lra.
+Qed.
+
 Theorem pos_sin_interv : ∀ x, 0 < sin x → x rmod (2 * PI) < PI.
 Proof.
 intros * Hs.
@@ -894,31 +912,17 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
   assert (H : 0 < cos x) by lra.
   clear Hc Hcz; rename H into Hc.
   move Hc before Hs.
-bbb.
-  apply pos_sin_interv in Hs.
+  apply nonneg_sin_interv in Hs.
   apply pos_cos_interv in Hc.
-  destruct Hc as [Hc| Hc]; [ lra | clear Hs ].
-  remember (IZR ((x + PI / 2) // PI) * PI) as u eqn:Hu.
-  replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
-  subst u; rewrite <- Rmod_from_ediv.
-  rewrite Rplus_comm; symmetry.
-  unfold Rmod, snd, Rdiv_mod.
+  destruct Hc as [Hc| Hc]; [ clear Hs | lra ].
+  unfold Rediv, Rmod, fst, snd, Rdiv_mod.
   destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
   destruct (Rcase_abs PI) as [| H]; [ lra | clear H ].
-  remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as u eqn:Hu.
-  replace (3 * PI / 2 + (x + PI / 2 - u)) with (x - (u - 2 * PI)) by lra.
-  subst u; unfold Rminus.
-  f_equal; rewrite fold_Rminus.
-  apply Ropp_eq_compat.
-  rewrite <- Rmult_minus_distr_r.
-  replace 2 with (IZR 2) at 4 by easy.
-  rewrite <- minus_IZR.
-  rewrite <- Rmult_assoc.
   f_equal.
   replace ((x + PI / 2) / PI) with ((2 * x + PI) / (2 * PI)).
    rewrite Rdiv_plus_distr.
    rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
-   replace PI with (1 * PI) at 3 by lra.
+   replace PI with (1 * PI) at 2 by lra.
    rewrite Rdiv_mult_simpl_r; [ | lra | lra ].
    unfold Rmod, snd, Rdiv_mod in Hc.
    destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
@@ -929,7 +933,7 @@ bbb.
    remember (x / PI) as y eqn:Hy.
    replace x with (y * PI) in Hc by (subst y; rewrite Rmult_div_same; lra).
    clear x Hy; rename y into x.
-   replace (3 * PI / 2) with ((3 / 2) * PI) in Hc by lra.
+   replace (PI / 2) with ((1 / 2) * PI) in Hc by lra.
    rewrite <- Rmult_assoc in Hc.
    rewrite <- Rmult_minus_distr_r in Hc.
    apply Rmult_lt_reg_r in Hc; [ | easy ].
@@ -939,20 +943,23 @@ bbb.
    remember (x / 2) as y eqn:Hy.
    replace x with (2 * y) by lra.
    clear x Hy; rename y into x.
-   assert (Hx34 : 3 / 4 < frac_part x) by lra; clear Hc.
+   rewrite <- Rmult_assoc, Rmult_shuffle0; f_equal.
+   replace 2 with (IZR 2) at 3 by lra.
+   rewrite <- mult_IZR; f_equal.
+   assert (Hx : frac_part x < 1 / 4) by lra; clear Hc.
    destruct (Rlt_dec (frac_part (2 * x)) (1 / 2)) as [Hx12| Hx12].
-    exfalso.
-    rewrite frac_part_double in Hx12.
-    destruct (Rlt_dec (frac_part x) (1 / 2)); lra.
+    rewrite plus_Int_part2.
+     rewrite Z.add_comm.
+     rewrite Int_part_small; [ | lra ].
+     rewrite Z.add_0_l.
+     rewrite Int_part_double.
+     destruct (Rlt_dec (frac_part x) (1 / 2)); [ lia | lra ].
 
-    assert (H : frac_part (1 / 2) = 1 / 2) by (apply frac_part_small; lra).
-    rewrite plus_Int_part1; [ clear H | lra ].
-    rewrite frac_part_double in Hx12; rewrite Int_part_double.
-    destruct (Rlt_dec (frac_part x) (1 / 2)) as [| H]; [ lra | clear H ].
-    replace 2 with (IZR 2) at 1 by lra.
-    rewrite <- mult_IZR; f_equal.
-    enough (Int_part (1 / 2) = 0%Z) by lia.
-    apply Int_part_small; lra.
+     rewrite Rplus_comm, frac_part_small; lra.
+     rewrite frac_part_double in Hx12.
+
+    apply Rnot_lt_le in Hx12.
+    destruct (Rlt_dec (frac_part x) (1 / 2)); lra.
 
    do 2 rewrite Rdiv_plus_distr.
    rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
@@ -977,12 +984,11 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
 
   apply Rnot_lt_le in Hc.
   now apply pos_sin_pos_cos_angle_of_sin_cos_inv.
-bbb.
+Qed.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
   cos x = cos (angle_of_sin_cos (sin x) (cos x)).
 Proof.
-(*
 intros.
 rewrite angle_of_sin_cos_inv.
 rewrite Rmod_from_ediv.
@@ -994,58 +1000,4 @@ rewrite cos_ZPI, sin_ZPI, Rmult_0_r, Rplus_0_r.
 rewrite Zabs2Nat.inj_mul; simpl (Z.abs_nat 2).
 unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
 now rewrite Nat.mul_comm, pow_1_even, Rmult_1_r.
-bbb.
-*)
-intros.
-unfold angle_of_sin_cos.
-destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
- destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
-  rewrite cos_minus.
-  rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rplus_0_r.
-  rewrite cos_acos; [ easy | ].
-  split; [ | lra ].
-  specialize (COS_bound x) as (H, _).
-  destruct (Req_dec (cos x) (-1)) as [H1| H1]; [ exfalso | lra ].
-  clear H Hc.
-  assert (Hs2 : 0 < (sin x)²) by (apply Rlt_0_sqr; lra).
-  specialize (sin2_cos2 x) as Hsc.
-  rewrite H1, <- Rsqr_neg, Rsqr_1 in Hsc; lra.
-
-  apply Rnot_lt_le in Hc.
-  rewrite cos_plus, cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rminus_0_r.
-  destruct (Req_dec (sin x) (-1)) as [Hs1| Hs1].
-   rewrite Hs1.
-   unfold asin, atan'.
-   rewrite <- Rsqr_neg, Rsqr_1, Rminus_diag_eq; [ | easy ].
-   rewrite sqrt_0.
-   destruct (Req_dec 0 0) as [Hz| Hz]; [ clear Hz | lra ].
-   rewrite Rsign_of_neg; [ | lra ].
-   rewrite <- Ropp_mult_distr_l, Rmult_1_l.
-   rewrite Ropp_div, cos_neg, cos_PI2.
-   specialize (sin2_cos2 x) as H.
-   rewrite Hs1, <- Rsqr_neg, Rsqr_1 in H.
-   assert (Hz : (cos x)² = 0) by lra.
-   now apply Rsqr_eq_0 in Hz.
-
-   rewrite cos_asin; [ | apply SIN_bound ].
-   specialize (sin2_cos2 x) as Hsc.
-   apply Rsqr_inj; [ easy | apply sqrt_pos | ].
-   rewrite Rsqr_sqrt; [ lra | ].
-   enough ((sin x)² ≤ 1) by lra.
-   replace 1 with 1² by apply Rsqr_1.
-   apply neg_pos_Rsqr_le; [ | lra ].
-   apply SIN_bound.
-
- destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
-  rewrite cos_acos; [ easy | apply COS_bound ].
-
-  rewrite cos_asin; [ | apply SIN_bound ].
-  apply Rnot_lt_le in Hc.
-  specialize (sin2_cos2 x) as Hsc.
-  apply Rsqr_inj; [ easy | apply sqrt_pos | ].
-  rewrite Rsqr_sqrt; [ lra | ].
-  enough ((sin x)² ≤ 1) by lra.
-  replace 1 with 1² by apply Rsqr_1.
-  apply Rsqr_incr_1; [ | lra | lra ].
-  apply SIN_bound.
 Qed.
