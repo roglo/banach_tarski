@@ -2859,40 +2859,6 @@ rewrite Hp, Hp₁, Hp₂, sqrt_1; f_equal.
 nsatz.
 Qed.
 
-Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = Rsign x * Rsign y.
-Proof.
-intros.
-unfold Rsign.
-destruct (Req_dec (x * y) 0) as [Hxyz| Hxyz].
- destruct (Req_dec x 0) as [Hx| Hx]; [ lra | ].
- destruct (Req_dec y 0) as [Hy| Hy]; [ lra | ].
- apply Rmult_integral in Hxyz; lra.
-
- destruct (Req_dec x 0) as [Hxz| Hxz]; [ rewrite Hxz in Hxyz; lra | ].
- destruct (Req_dec y 0) as [Hyz| Hyz]; [ rewrite Hyz in Hxyz; lra | ].
- destruct (Rle_dec 0 (x * y)) as [Hxy| Hxy].
-  destruct (Rle_dec 0 x) as [Hx| Hx].
-   destruct (Rle_dec 0 y) as [Hy| Hy]; [ lra | exfalso ].
-   apply Hy; clear Hy.
-   apply Rmult_le_reg_l with (r := x); [ lra | ].
-   now rewrite Rmult_0_r.
-
-   destruct (Rle_dec 0 y) as [Hy| Hy]; [ exfalso | lra ].
-   apply Hx; clear Hx.
-   apply Rmult_le_reg_r with (r := y); [ lra | ].
-   now rewrite Rmult_0_l.
-
-  destruct (Rle_dec 0 x) as [Hx| Hx].
-   destruct (Rle_dec 0 y) as [Hy| Hy]; [ exfalso | lra ].
-   apply Hxy; clear Hxy.
-   now apply Rmult_le_pos.
-
-   destruct (Rle_dec 0 y) as [Hy| Hy]; [ lra | exfalso ].
-   apply Hxy; clear Hxy.
-   rewrite <- Rmult_opp_opp.
-   apply Rmult_le_pos; lra.
-Qed.
-
 Theorem latitude_mul : ∀ k u v,
   k ≠ 0
   → latitude (k ⁎ u) (k ⁎ v) = latitude u v.
