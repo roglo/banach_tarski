@@ -1720,7 +1720,23 @@ Theorem matrix_of_mul_angle : ∀ a s c θ s' c' n,
      (matrix_of_axis_angle (a, s, c) ^ n)%mat.
 Proof.
 intros * Ha Hsc Hθ Hs' Hc'.
-bbb.
+assert (Haz : ‖a‖ ≠ 0) by now apply vec_norm_neq_0.
+assert (Haiz : / ‖a‖ ≠ 0) by now apply Rinv_neq_0_compat.
+assert (Hap : 0 < ‖a‖) by (specialize (vec_norm_nonneg a); lra).
+assert (Haa : ‖(a ⁄ ‖a‖)‖ = 1) by now apply vec_div_vec_norm.
+eapply unit_sphere_matrix_of_mul_angle in Haa; try eassumption.
+remember (vec_const_mul (/ ‖a‖) a) as b eqn:Hb.
+remember (matrix_of_axis_angle (b, s, c)) as M eqn:HM.
+remember (matrix_of_axis_angle (b, s', c')) as M' eqn:HM'.
+rewrite matrix_mul_axis with (k := ‖a‖) in HM, HM'; [ | easy | easy ].
+rewrite Rsign_of_pos in HM, HM'; [ | easy | easy ].
+rewrite Rmult_1_l in HM, HM'.
+rewrite Hb in HM, HM'.
+rewrite vec_const_mul_assoc in HM, HM'.
+rewrite Rinv_r in HM, HM'; [ | easy | easy ].
+rewrite vec_const_mul_1_l in HM, HM'.
+now rewrite HM, HM' in Haa.
+Qed.
 
 Theorem rotation_mat_mul_transp_l : ∀ M,
   is_rotation_matrix M →
