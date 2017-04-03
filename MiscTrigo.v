@@ -601,17 +601,14 @@ split.
   specialize PI_RGT_0; lra.
 Qed.
 
-Theorem neg_sin_neg_cos_angle_of_sin_cos_inv : ∀ x,
+Theorem neg_sin_neg_cos_2PI_acos_cos : ∀ x,
   sin x < 0
   → cos x < 0
-  → angle_of_sin_cos (sin x) (cos x) = x rmod (2 * PI).
+  → 2 * PI - acos (cos x) = x rmod (2 * PI).
 Proof.
 intros * Hs Hc.
 specialize PI_RGT_0 as HPI_GT_0.
 specialize PI_neq0 as HPI_NZ.
-unfold angle_of_sin_cos.
-destruct (Rlt_dec (sin x) 0) as [H| ]; [ clear H | lra ].
-destruct (Rlt_dec (cos x) 0) as [H| ]; [ clear H | lra ].
 rewrite acos_cos, asin_cos.
 destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
 rewrite <- Ropp_mult_distr_l, Rminus_opp.
@@ -659,10 +656,10 @@ replace (3 * PI / 2) with ((3 / 2) * PI) in H2 by lra.
 apply Rmult_lt_reg_r in H2; lra.
 Qed.
 
-Theorem neg_sin_pos_cos_angle_of_sin_cos_inv : ∀ x,
+Theorem neg_sin_pos_cos_asin_sin_2PI : ∀ x,
   sin x < 0
   → 0 ≤ cos x
-  → angle_of_sin_cos (sin x) (cos x) = x rmod (2 * PI).
+  → asin (sin x) + 2 * PI = x rmod (2 * PI).
 Proof.
 intros * Hs Hc.
 specialize PI_RGT_0 as HPI_GT_0.
@@ -671,9 +668,6 @@ unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [H| ]; [ clear H | lra ].
 destruct (Rlt_dec (cos x) 0) as [| H]; [ lra | clear H ].
 rewrite asin_sin.
-(*
-destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
-*)
 rewrite Rsignp_of_pos; [ rewrite Rmult_1_l | easy ].
 unfold atan'.
 destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
@@ -774,17 +768,14 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
   rewrite Rdiv_div; [ easy | lra | lra ].
 Qed.
 
-Theorem pos_sin_neg_cos_angle_of_sin_cos_inv : ∀ x,
+Theorem pos_sin_neg_cos_acos_cos : ∀ x,
   0 ≤ sin x
   → cos x < 0
-  → angle_of_sin_cos (sin x) (cos x) = x rmod (2 * PI).
+  → acos (cos x) = x rmod (2 * PI).
 Proof.
 intros * Hs Hc.
 specialize PI_RGT_0 as HPI_GT_0.
 specialize PI_neq0 as HPI_NZ.
-unfold angle_of_sin_cos.
-destruct (Rlt_dec (sin x) 0) as [| H]; [ lra | clear H ].
-destruct (Rlt_dec (cos x) 0) as [H| ]; [ clear H | lra ].
 rewrite acos_cos, asin_cos.
 destruct (Req_dec (sin x) 0) as [Hsz| Hsnz].
  specialize (sin_eq_0_0 _ Hsz) as (k, Hk); subst x.
@@ -856,17 +847,14 @@ destruct (Req_dec (sin x) 0) as [Hsz| Hsnz].
  apply Rmult_lt_reg_r in H2; lra.
 Qed.
 
-Theorem pos_sin_pos_cos_angle_of_sin_cos_inv : ∀ x,
+Theorem pos_sin_pos_cos_asin_sin : ∀ x,
   0 ≤ sin x
   → 0 ≤ cos x
-  → angle_of_sin_cos (sin x) (cos x) = x rmod (2 * PI).
+  → asin (sin x) = x rmod (2 * PI).
 Proof.
 intros * Hs Hc.
 specialize PI_RGT_0 as HPI_GT_0.
 specialize PI_neq0 as HPI_NZ.
-unfold angle_of_sin_cos.
-destruct (Rlt_dec (sin x) 0) as [| H]; [ lra | clear H ].
-destruct (Rlt_dec (cos x) 0) as [| H]; [ lra | clear H ].
 rewrite asin_sin.
 rewrite Rsignp_of_pos; [ rewrite Rmult_1_l | easy ].
 unfold atan'.
@@ -971,19 +959,20 @@ Theorem angle_of_sin_cos_inv : ∀ x,
   angle_of_sin_cos (sin x) (cos x) = x rmod (2 * PI).
 Proof.
 intros.
+unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
-  now apply neg_sin_neg_cos_angle_of_sin_cos_inv.
+  now apply neg_sin_neg_cos_2PI_acos_cos.
 
   apply Rnot_lt_le in Hc.
-  now apply neg_sin_pos_cos_angle_of_sin_cos_inv.
+  now apply neg_sin_pos_cos_asin_sin_2PI.
 
  apply Rnot_lt_le in Hs.
  destruct (Rlt_dec (cos x) 0) as [Hc| Hc].
-  now apply pos_sin_neg_cos_angle_of_sin_cos_inv.
+  now apply pos_sin_neg_cos_acos_cos.
 
   apply Rnot_lt_le in Hc.
-  now apply pos_sin_pos_cos_angle_of_sin_cos_inv.
+  now apply pos_sin_pos_cos_asin_sin.
 Qed.
 
 Theorem cos_angle_of_sin_cos : ∀ x,
