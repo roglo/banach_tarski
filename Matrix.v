@@ -1711,13 +1711,15 @@ induction n; intros.
 Qed.
 
 Theorem matrix_of_mul_angle : ∀ a s c θ s' c' n,
-  θ = angle_of_sin_cos s c
+  a ≠ 0%vec
+  → s² + c² = 1
+  → θ = angle_of_sin_cos s c
   → s' = sin (INR n * θ)
   → c' = cos (INR n * θ)
   → matrix_of_axis_angle (a, s', c') =
      (matrix_of_axis_angle (a, s, c) ^ n)%mat.
 Proof.
-intros * Hθ Hs' Hc'.
+intros * Ha Hsc Hθ Hs' Hc'.
 bbb.
 
 Theorem rotation_mat_mul_transp_l : ∀ M,
