@@ -364,7 +364,7 @@ destruct (pre_atan (tan x)) as (y & Hy & Hyx).
 remember ((x + PI / 2) rmod PI - PI / 2) as z eqn:Hz.
 assert (Htz : tan z = tan x).
  subst z.
- unfold Rmod, Rdiv_mod, snd.
+ unfold Rmod, Rediv_mod, snd.
  destruct (Rcase_abs PI) as [HP| HP]; [ lra | ].
  remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as t eqn:Ht.
  replace (x + PI / 2 - t - PI / 2) with (x - t) by lra.
@@ -395,7 +395,7 @@ assert (Htz : tan z = tan x).
   split; [ | lra ].
   enough ((x + PI / 2) rmod PI ≠ 0) by lra.
   intros Hm.
-  unfold Rmod, Rdiv_mod, snd in Hm.
+  unfold Rmod, Rediv_mod, snd in Hm.
   destruct (Rcase_abs PI) as [HPQ| HPQ]; [ lra | ].
   fold (Int_part ((x + PI / 2) / PI)) in Hm.
   apply Rminus_diag_uniq in Hm.
@@ -655,7 +655,7 @@ clear Hs Hc.
 rewrite Rediv_mul_r in Hk.
 destruct (Rcase_abs (2 * PI)) as [HP| HP]; [ lra | clear HP ].
 rewrite Z.add_0_r in Hk.
-unfold Rediv, fst, Rdiv_mod.
+unfold Rediv, fst, Rediv_mod.
 destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
 rewrite Rmult_comm in Hk.
 rewrite <- Rdiv_div in Hk; [ | lra | lra ].
@@ -729,7 +729,7 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
  replace (x - u + 2 * PI) with (x + PI / 2 - u + 3 * PI / 2) by lra.
  subst u; rewrite <- Rmod_from_ediv.
  rewrite Rplus_comm; symmetry.
- unfold Rmod, snd, Rdiv_mod.
+ unfold Rmod, snd, Rediv_mod.
  destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
  destruct (Rcase_abs PI) as [| H]; [ lra | clear H ].
  remember (IZR (Int_part ((x + PI / 2) / PI)) * PI) as u eqn:Hu.
@@ -747,7 +747,7 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
   rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
   replace PI with (1 * PI) at 3 by lra.
   rewrite Rdiv_mult_simpl_r; [ | lra | lra ].
-  unfold Rmod, snd, Rdiv_mod in Hc.
+  unfold Rmod, snd, Rediv_mod in Hc.
   destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
   replace (2 * PI) with (PI * 2) in Hc at 1 by lra.
   replace (2 * PI) with (PI * 2) by lra.
@@ -846,7 +846,7 @@ destruct (Req_dec (sin x) 0) as [Hsz| Hsnz].
  rewrite Rediv_mul_r in Hk.
  destruct (Rcase_abs (2 * PI)) as [HP| HP]; [ lra | clear HP ].
  rewrite Z.add_0_r in Hk.
- unfold Rediv, fst, Rdiv_mod.
+ unfold Rediv, fst, Rediv_mod.
  destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
  rewrite Rmult_comm in Hk.
  rewrite <- Rdiv_div in Hk; [ | lra | lra ].
@@ -922,7 +922,7 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
   apply nonneg_sin_interv in Hs.
   apply pos_cos_interv in Hc.
   destruct Hc as [Hc| Hc]; [ clear Hs | lra ].
-  unfold Rediv, Rmod, fst, snd, Rdiv_mod.
+  unfold Rediv, Rmod, fst, snd, Rediv_mod.
   destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
   destruct (Rcase_abs PI) as [| H]; [ lra | clear H ].
   f_equal.
@@ -931,7 +931,7 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
    rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
    replace PI with (1 * PI) at 2 by lra.
    rewrite Rdiv_mult_simpl_r; [ | lra | lra ].
-   unfold Rmod, snd, Rdiv_mod in Hc.
+   unfold Rmod, snd, Rediv_mod in Hc.
    destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
    replace (2 * PI) with (PI * 2) in Hc at 1 by lra.
    replace (2 * PI) with (PI * 2) by lra.

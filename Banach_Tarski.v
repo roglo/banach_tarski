@@ -4960,54 +4960,21 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
           rewrite Rmult_comm in Hs₀, Hc₀.
           now erewrite matrix_of_mul_angle; try eassumption.
 
-          exists (S n).
-rewrite Hc₀, Hs₀.
-rewrite angle_of_sin_cos_inv.
-remember (θ * INR (S n)) as θn eqn:Hθn.
-bbb.
-remember (- INR (S n) * θ // (2 * PI)) as k eqn:Hk.
-exists k.
-unfold angle_of_sin_cos.
-destruct (Rlt_dec s₀ 0) as [Hs| Hs].
-destruct (Rlt_dec c₀ 0) as [Hc| Hc].
-rewrite Hc₀.
-rewrite acos_cos.
-rewrite asin_cos.
-rewrite <- Hs₀, <- Hc₀.
-destruct (Req_dec s₀ 0) as [H| H]; [ lra | clear H ].
-rewrite Rsign_of_neg; [ | easy ].
-rewrite <- Ropp_mult_distr_l, Rminus_opp.
-rewrite <- Ropp_mult_distr_l, fold_Rminus.
-rewrite Rmult_1_l.
-rewrite atan_tan.
-split.
-specialize PI_RGT_0 as HPI_GT_0.
-specialize PI_neq0 as HPI_NZ.
-rewrite Rplus_assoc.
-replace (PI / 2 + PI / 2) with PI by lra.
-rewrite Rediv_add_1; [ | lra ].
-replace
-  (2 * PI - (PI / 2 - (θ * INR (S n) + PI / 2 - IZR ((θ * INR (S n)) // PI + 1) * PI)) +
-   2 * IZR k * PI)
-with
-  (θ * INR (S n) - IZR ((θ * INR (S n)) // PI + 1) * PI + 2 * (IZR k + 1) * PI)
-by lra.
+          rewrite Hc₀, Hs₀.
+          rewrite angle_of_sin_cos_inv.
+          remember ((θ * INR (S n)) // (2 * PI)) as k eqn:Hk.
+          exists (S n), k.
+          replace ((θ * INR (S n)) rmod (2 * PI) + 2 * IZR k * PI)
+          with (2 * PI * IZR k + (θ * INR (S n)) rmod (2 * PI)) by lra.
+          rewrite Hk.
+          rewrite <- Rdiv_mod; [ | specialize PI_neq0; lra ].
+          rewrite Rmult_div.
+          rewrite Rmult_div_same.
+          2: now replace 0 with (INR 0) by easy; apply not_INR.
+          rewrite Hθ.
+          now rewrite sin_angle_of_sin_cos, cos_angle_of_sin_cos.
 
-bbb. (* grosse fatigue *)
-         exists (S n), 0%Z; simpl (IZR 0).
-         rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
-         rewrite Hs₀, Hc₀.
-         rewrite angle_of_sin_cos_inv.
-bbb.
-
-        rewrite Hs₀, Hc₀.
-        rewrite asin_sin.
-         remember (Rsign (cos (asin s * INR (S n)))) as sgn eqn:Hsgn.
-         rewrite atan_tan.
-         remember (Rediv (asin s * INR (S n) + PI / 2) PI) as k eqn:Hk.
-         rewrite <- Hs₀, <- Hc₀.
-         split.
-
+       idtac.
 bbb.
         unfold J in Hj.
         remember J₀ as a; simpl in Hj; subst a.

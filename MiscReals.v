@@ -640,7 +640,7 @@ enough (x² ≤ y²) by lra.
 apply Rsqr_incr_1; lra.
 Qed.
 
-Definition Rdiv_mod x y :=
+Definition Rediv_mod x y :=
   let k :=
     match Rcase_abs y with
     | left _ => (- Int_part (x / - y))%Z
@@ -649,8 +649,8 @@ Definition Rdiv_mod x y :=
   in
   (k, x - IZR k * y).
 
-Definition Rediv x y := fst (Rdiv_mod x y).
-Definition Rmod x y := snd (Rdiv_mod x y).
+Definition Rediv x y := fst (Rediv_mod x y).
+Definition Rmod x y := snd (Rediv_mod x y).
 
 Notation "x '//' y" := (Rediv x y) (at level 40).
 Notation "x 'rmod' y" := (Rmod x y) (at level 40).
@@ -658,7 +658,7 @@ Notation "x 'rmod' y" := (Rmod x y) (at level 40).
 Theorem Rmod_interv : ∀ x y, 0 < y → 0 ≤ x rmod y < y.
 Proof.
 intros * Hy.
-unfold Rmod, Rdiv_mod, snd.
+unfold Rmod, Rediv_mod, snd.
 destruct (Rcase_abs y) as [Hya| Hya]; [ lra | ].
 split.
  apply Rmult_le_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
@@ -677,10 +677,10 @@ Theorem Rmod_from_ediv : ∀ x y, x rmod y = x - IZR (x // y) * y.
 Proof.
 intros.
 unfold Rmod, Rediv, fst, snd.
-remember (Rdiv_mod x y) as rdm eqn:Hrdm.
+remember (Rediv_mod x y) as rdm eqn:Hrdm.
 symmetry in Hrdm.
 destruct rdm as (q, r).
-unfold Rdiv_mod in Hrdm.
+unfold Rediv_mod in Hrdm.
 destruct (Rcase_abs y) as [Hy| Hy].
  remember Z.sub as f.
  injection Hrdm; clear Hrdm; intros Hr Hq; subst f.
@@ -713,7 +713,7 @@ Proof. intros; unfold Int_part; lia. Qed.
 Theorem Rediv_add_1 : ∀ x y, y ≠ 0 → (x + y) // y = (x // y + 1)%Z.
 Proof.
 intros * Hyz.
-unfold Rediv, Rdiv_mod, fst.
+unfold Rediv, Rediv_mod, fst.
 destruct (Rcase_abs y) as [Hy| Hy].
  unfold Rdiv.
  rewrite <- Ropp_inv_permute; [ | lra ].
@@ -747,7 +747,7 @@ Qed.
 Theorem Rediv_opp_r : ∀ x y, y ≠ 0 → x // - y = (- (x // y))%Z.
 Proof.
 intros * Hyz.
-unfold "//", fst, Rdiv_mod.
+unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (- y)) as [Hy| Hy].
  destruct (Rcase_abs y); [ lra | now rewrite Ropp_involutive ].
 
@@ -825,7 +825,7 @@ Proof. rewrite Int_part_small; [ easy | lra ]. Qed.
 Theorem Rmod_0_l : ∀ x, 0 rmod x = 0.
 Proof.
 intros x.
-unfold Rmod, snd, Rdiv_mod.
+unfold Rmod, snd, Rediv_mod.
 do 2 rewrite Rdiv_0_l.
 rewrite Int_part_0, Z.opp_0.
 destruct (Rcase_abs x); lra.
@@ -845,7 +845,7 @@ Qed.
 Theorem Rmod_small : ∀ x y, 0 ≤ x < y → x rmod y = x.
 Proof.
 intros * (Hx, Hxy).
-unfold Rmod, snd, Rdiv_mod.
+unfold Rmod, snd, Rediv_mod.
 destruct (Rcase_abs y) as [Hyn| Hyp]; [ lra | ].
 assert (H : 0 ≤ x / y < 1).
  split.
@@ -866,7 +866,7 @@ Theorem Rmult_mod_distr_r : ∀ x y z,
   → (x * z) rmod (y * z) = x rmod y * z.
 Proof.
 intros * Hy Hz.
-unfold Rmod, snd, Rdiv_mod.
+unfold Rmod, snd, Rediv_mod.
 destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
  rewrite Ropp_div_r; [ | lra ].
  rewrite Rdiv_mult_simpl_r; [ | intros H; subst; lra | lra ].
@@ -891,7 +891,7 @@ Theorem Rediv_mul_r : ∀ x y z,
        else 0)%Z.
 Proof.
 intros.
-unfold "//", fst, Rdiv_mod.
+unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (y * z)) as [Hyz| Hyz]; [ | now rewrite Z.add_0_r ].
 rewrite Ropp_div_r; [ | lra ].
 rewrite Int_part_neg.
@@ -946,4 +946,11 @@ destruct n as [| n| n].
  rewrite pow_1, Zabs2Nat.inj_mul.
  simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
  rewrite pow_1_even, Ropp_div_r; lra.
+Qed.
+
+Theorem Rdiv_mod : ∀ x y, y ≠ 0 → x = y * IZR (x // y) + x rmod y.
+Proof.
+intros x y Hy.
+rewrite Rmod_from_ediv.
+lra.
 Qed.
