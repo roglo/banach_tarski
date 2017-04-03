@@ -5456,7 +5456,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
           rewrite Rmult_comm in Hs₀, Hc₀.
           now erewrite matrix_of_mul_angle; try eassumption.
 
-exists (S n).
+          exists (S n).
+bbb.
 remember (- INR (S n) * θ // (2 * PI)) as k eqn:Hk.
 exists k.
 unfold angle_of_sin_cos.
