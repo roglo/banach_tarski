@@ -199,10 +199,29 @@ destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx].
           rewrite Rsqr_sqrt; [ easy | lra ].
 Qed.
 
+Theorem cos_sin_acos : ∀ x,
+  -1 ≤ x ≤ 1
+  → cos (acos x) = x ∧ sin (acos x) = √ (1 - x²).
+Proof.
+intros * Hx.
+unfold acos.
+rewrite cos_minus, sin_minus.
+rewrite cos_PI2, sin_PI2.
+do 2 rewrite Rmult_0_l, Rmult_1_l.
+rewrite Rplus_0_l, Rminus_0_r.
+now apply sin_cos_asin.
+Qed.
+
 Theorem sin_asin : ∀ x, -1 ≤ x ≤ 1 → sin (asin x) = x.
 Proof.
 intros * Hx.
 now apply sin_cos_asin.
+Qed.
+
+Theorem sin_acos : ∀ x, -1 ≤ x ≤ 1 → sin (acos x) = √ (1 - x²).
+Proof.
+intros * Hx.
+now apply cos_sin_acos.
 Qed.
 
 Theorem cos_asin : ∀ x, -1 ≤ x ≤ 1 → cos (asin x) = √ (1 - x²).
@@ -975,18 +994,83 @@ destruct (Rlt_dec (sin x) 0) as [Hs| Hs].
   now apply pos_sin_pos_cos_asin_sin.
 Qed.
 
-Theorem cos_angle_of_sin_cos : ∀ x,
+Theorem pre_sin_bound : ∀ s c, s² + c² = 1 → -1 ≤ s ≤ 1.
+Proof.
+intros s c Hsc.
+assert (H : s² ≤ 1).
+ enough (H : s² + 0 ≤ 1) by lra.
+ rewrite <- Hsc.
+ apply Rplus_le_compat_l, Rle_0_sqr.
+
+ rewrite <- Rsqr_1 in H.
+ apply Rsqr_le_abs_0 in H.
+ rewrite Rabs_R1 in H.
+ now apply Rabs_le in H.
+Qed.
+
+Theorem pre_cos_bound : ∀ s c, s² + c² = 1 → -1 ≤ c ≤ 1.
+Proof.
+intros s c Hsc.
+rewrite Rplus_comm in Hsc.
+now apply pre_sin_bound in Hsc.
+Qed.
+
+Theorem sin_angle_of_sin_cos : ∀ s c, s² + c² = 1 → sin (angle_of_sin_cos s c) = s.
+Proof.
+intros * Hsc.
+unfold angle_of_sin_cos.
+destruct (Rlt_dec s 0) as [Hs| Hs].
+ destruct (Rlt_dec c 0) as [Hc| Hc].
+  rewrite sin_minus.
+  rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rminus_0_l.
+  rewrite sin_acos; [ | now apply pre_cos_bound in Hsc ].
+  replace (1 - c²) with s² by lra.
+  rewrite Rsqr_neg, <- Ropp_involutive; f_equal.
+  rewrite sqrt_Rsqr; [ easy | lra ].
+
+  rewrite sin_plus.
+  rewrite cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rplus_0_r.
+  rewrite sin_asin; [ easy | now apply pre_sin_bound in Hsc ].
+
+ destruct (Rlt_dec c 0) as [Hc| Hc].
+  rewrite sin_acos; [ | now apply pre_cos_bound in Hsc ].
+  replace (1 - c²) with s² by lra.
+  rewrite sqrt_Rsqr; [ easy | lra ].
+
+  rewrite sin_asin; [ easy | now apply pre_sin_bound in Hsc ].
+Qed.
+
+Theorem cos_angle_of_sin_cos : ∀ s c, s² + c² = 1 → cos (angle_of_sin_cos s c) = c.
+Proof.
+intros * Hsc.
+unfold angle_of_sin_cos.
+destruct (Rlt_dec s 0) as [Hs| Hs].
+ destruct (Rlt_dec c 0) as [Hc| Hc].
+  rewrite cos_minus.
+  rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rplus_0_r.
+  apply cos_acos.
+  now apply pre_cos_bound in Hsc.
+
+  rewrite cos_plus.
+  rewrite cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rminus_0_r.
+  rewrite cos_asin; [ | now apply pre_sin_bound in Hsc ].
+  replace (1 - s²) with c² by lra.
+  apply Rnot_lt_le in Hc.
+  now rewrite sqrt_Rsqr.
+
+ destruct (Rlt_dec c 0) as [Hc| Hc].
+  rewrite cos_acos; [ easy | ].
+  now apply pre_cos_bound in Hsc.
+
+  rewrite cos_asin; [ | now apply pre_sin_bound in Hsc ].
+  replace (1 - s²) with c² by lra.
+  apply Rnot_lt_le in Hc.
+  now rewrite sqrt_Rsqr.
+Qed.
+
+Theorem cos_angle_of_sin_cos_sin_cos : ∀ x,
   cos x = cos (angle_of_sin_cos (sin x) (cos x)).
 Proof.
 intros.
-rewrite angle_of_sin_cos_inv.
-rewrite Rmod_from_ediv.
-rewrite cos_minus.
-rewrite <- Rmult_assoc.
-replace 2 with (IZR 2) by lra.
-rewrite <- mult_IZR.
-rewrite cos_ZPI, sin_ZPI, Rmult_0_r, Rplus_0_r.
-rewrite Zabs2Nat.inj_mul; simpl (Z.abs_nat 2).
-unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-now rewrite Nat.mul_comm, pow_1_even, Rmult_1_r.
+rewrite cos_angle_of_sin_cos; [ easy | apply sin2_cos2 ].
 Qed.

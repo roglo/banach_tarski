@@ -1614,7 +1614,15 @@ Theorem mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
      matrix_of_axis_angle (a, sin (θ₁ + θ₂), cos (θ₁ + θ₂)).
 Proof.
 intros * Hθ₁ Hθ₂.
-Search angle_of_sin_cos.
+unfold mat_mul; simpl.
+destruct a as (ax, ay, az); simpl.
+remember (√ (ax² + ay² + az²)) as r eqn:Hr.
+f_equal.
+ rewrite cos_plus.
+ rewrite Hθ₁, Hθ₂.
+ rewrite cos_angle_of_sin_cos.
+ rewrite cos_angle_of_sin_cos.
+ rewrite sin_angle_of_sin_cos.
 bbb.
 
 Theorem unit_sphere_matrix_of_mul_angle : ∀ a s c θ s' c' n,
