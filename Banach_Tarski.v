@@ -5456,6 +5456,24 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
           rewrite Rmult_comm in Hs₀, Hc₀.
           now erewrite matrix_of_mul_angle; try eassumption.
 
+exists (S n).
+remember (- INR (S n) * θ // (2 * PI)) as k eqn:Hk.
+exists k.
+unfold angle_of_sin_cos.
+destruct (Rlt_dec s₀ 0) as [Hs| Hs].
+destruct (Rlt_dec c₀ 0) as [Hc| Hc].
+rewrite Hc₀.
+rewrite acos_cos.
+rewrite asin_cos.
+rewrite <- Hs₀, <- Hc₀.
+destruct (Req_dec s₀ 0) as [H| H]; [ lra | clear H ].
+rewrite Rsign_of_neg; [ | easy ].
+rewrite <- Ropp_mult_distr_l, Rminus_opp.
+rewrite <- Ropp_mult_distr_l, fold_Rminus.
+rewrite Rmult_1_l.
+rewrite atan_tan.
+split.
+bbb. (* grosse fatigue *)
          exists (S n), 0%Z; simpl (IZR 0).
          rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
          rewrite Hs₀, Hc₀.
