@@ -1607,22 +1607,37 @@ now apply vec_norm_pos.
 Qed.
 
 Theorem mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
-  θ₁ = angle_of_sin_cos s₁ c₁
+  s₁² + c₁² = 1
+  → s₂² + c₂² = 1
+  → θ₁ = angle_of_sin_cos s₁ c₁
   → θ₂ = angle_of_sin_cos s₂ c₂
   → (matrix_of_axis_angle (a, s₁, c₁) *
      matrix_of_axis_angle (a, s₂, c₂))%mat =
      matrix_of_axis_angle (a, sin (θ₁ + θ₂), cos (θ₁ + θ₂)).
 Proof.
-intros * Hθ₁ Hθ₂.
+intros * Hsc₁ Hsc₂ Hθ₁ Hθ₂.
 unfold mat_mul; simpl.
 destruct a as (ax, ay, az); simpl.
 remember (√ (ax² + ay² + az²)) as r eqn:Hr.
 f_equal.
  rewrite cos_plus.
  rewrite Hθ₁, Hθ₂.
- rewrite cos_angle_of_sin_cos.
- rewrite cos_angle_of_sin_cos.
- rewrite sin_angle_of_sin_cos.
+ rewrite cos_angle_of_sin_cos; [ | easy ].
+ rewrite cos_angle_of_sin_cos; [ | easy ].
+ rewrite sin_angle_of_sin_cos; [ | easy ].
+ rewrite sin_angle_of_sin_cos; [ | easy ].
+enough (r = 1).
+rewrite H.
+rewrite Rdiv_1_r.
+rewrite H in Hr.
+apply (f_equal Rsqr) in Hr.
+rewrite Rsqr_1 in Hr.
+rewrite Rsqr_sqrt in Hr.
+bbb.
+
+ring_simplify.
+rewrite <- Rsqr_pow2.
+clear - Hsc₁ Hsc₂ Hr.
 bbb.
 
 Theorem unit_sphere_matrix_of_mul_angle : ∀ a s c θ s' c' n,
