@@ -337,7 +337,7 @@ Qed.
 
 Theorem neg_cos_atan_tan : ∀ x,
   cos x < 0
-  → atan (tan x) = x - IZR (Rediv (x + PI / 2) PI) * PI.
+  → atan (tan x) = x - IZR ((x + PI / 2) // PI) * PI.
 Proof.
 intros * Hc.
 unfold atan.
@@ -396,7 +396,7 @@ Qed.
 
 Theorem pos_cos_atan_tan : ∀ x,
   0 < cos x
-  → atan (tan x) = x - IZR (Rediv (x + PI / 2) PI) * PI.
+  → atan (tan x) = x - IZR ((x + PI / 2) // PI) * PI.
 Proof.
 intros * Hc.
 assert (Hcp : cos (x + PI) < 0) by (rewrite neg_cos; lra).
@@ -414,7 +414,7 @@ Qed.
 
 Theorem atan_tan : ∀ x,
   cos x ≠ 0
-  → atan (tan x) = x - IZR (Rediv (x + PI / 2) PI) * PI.
+  → atan (tan x) = x - IZR ((x + PI / 2) // PI) * PI.
 Proof.
 intros * Hxz.
 destruct (Rlt_dec (cos x) 0) as [Hx| Hx].

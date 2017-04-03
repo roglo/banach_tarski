@@ -621,7 +621,7 @@ Definition Rmod x y := snd (Rdiv_mod x y).
 Notation "x '//' y" := (Rediv x y) (at level 40).
 Notation "x 'rmod' y" := (Rmod x y) (at level 40).
 
-Theorem Rmod_interv : ∀ x y, 0 < y → 0 ≤ Rmod x y < y.
+Theorem Rmod_interv : ∀ x y, 0 < y → 0 ≤ x rmod y < y.
 Proof.
 intros * Hy.
 unfold Rmod, Rdiv_mod, snd.
@@ -639,7 +639,7 @@ split.
  specialize (base_Int_part (x / y)); lra.
 Qed.
 
-Theorem Rmod_from_ediv : ∀ x y, Rmod x y = x - IZR (Rediv x y) * y.
+Theorem Rmod_from_ediv : ∀ x y, x rmod y = x - IZR (x // y) * y.
 Proof.
 intros.
 unfold Rmod, Rediv, fst, snd.
