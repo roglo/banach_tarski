@@ -5456,7 +5456,10 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
           rewrite Rmult_comm in Hs₀, Hc₀.
           now erewrite matrix_of_mul_angle; try eassumption.
 
-         idtac.
+         exists (S n), 0%Z; simpl (IZR 0).
+         rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
+         rewrite Hs₀, Hc₀.
+         rewrite angle_of_sin_cos_inv.
 bbb.
 
         rewrite Hs₀, Hc₀.
