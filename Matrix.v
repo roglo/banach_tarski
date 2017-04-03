@@ -1619,25 +1619,24 @@ intros * Hsc₁ Hsc₂ Hθ₁ Hθ₂.
 unfold mat_mul; simpl.
 destruct a as (ax, ay, az); simpl.
 remember (√ (ax² + ay² + az²)) as r eqn:Hr.
+rewrite cos_plus, sin_plus.
+rewrite Hθ₁, Hθ₂.
+rewrite cos_angle_of_sin_cos; [ | easy ].
+rewrite cos_angle_of_sin_cos; [ | easy ].
+rewrite sin_angle_of_sin_cos; [ | easy ].
+rewrite sin_angle_of_sin_cos; [ | easy ].
 f_equal.
- rewrite cos_plus.
- rewrite Hθ₁, Hθ₂.
- rewrite cos_angle_of_sin_cos; [ | easy ].
- rewrite cos_angle_of_sin_cos; [ | easy ].
- rewrite sin_angle_of_sin_cos; [ | easy ].
- rewrite sin_angle_of_sin_cos; [ | easy ].
+bbb.
+
 enough (r = 1).
 rewrite H.
-rewrite Rdiv_1_r.
+repeat rewrite Rdiv_1_r.
 rewrite H in Hr.
 apply (f_equal Rsqr) in Hr.
 rewrite Rsqr_1 in Hr.
 rewrite Rsqr_sqrt in Hr.
-bbb.
-
-ring_simplify.
-rewrite <- Rsqr_pow2.
 clear - Hsc₁ Hsc₂ Hr.
+Time nsatz.
 bbb.
 
 Theorem unit_sphere_matrix_of_mul_angle : ∀ a s c θ s' c' n,
