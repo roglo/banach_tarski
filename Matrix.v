@@ -1757,5 +1757,109 @@ rewrite rotation_mat_mul_transp_l in Huv; [ | easy ].
 now do 2 rewrite mat_vec_mul_id in Huv.
 Qed.
 
+Theorem mat_pow_0 : ∀ M, (M ^ 0)%mat = mat_id.
+Proof. intros; easy. Qed.
+
 Theorem mat_pow_1 : ∀ M, (M ^ 1)%mat = M.
 Proof. intros; apply mat_mul_id_r. Qed.
+
+Theorem mat_sin_cos_0 : ∀ p, matrix_of_axis_angle (p, 0, 1) = mat_id.
+Proof.
+intros (x, y, z); simpl.
+rewrite Rminus_diag_eq; [ | easy ].
+progress repeat rewrite Rmult_0_r.
+unfold mat_id, mkrmat.
+f_equal; lra.
+Qed.
+
+Theorem mat_of_axis_angle_trace_interv : ∀ a s c,
+  a ≠ 0%vec
+  → s² + c² = 1
+  → -1 ≤ mat_trace (matrix_of_axis_angle (a, s, c)) ≤ 3.
+Proof.
+intros * Ha Hsc.
+rewrite mat_trace_eq; [ | easy ].
+assert (Hc : c² ≤ 1).
+ rewrite <- Hsc.
+ apply Rplus_le_reg_r with (r := - c²).
+ rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+ apply Rle_0_sqr.
+
+ split.
+  enough (-1 ≤ c) by lra.
+  replace 1 with 1² in Hc by apply Rsqr_1.
+  apply Rsqr_neg_pos_le_0 in Hc; [ easy | lra ].
+
+  enough (c ≤ 1) by lra.
+  replace 1 with 1² in Hc by apply Rsqr_1.
+  apply Rsqr_incr_0_var in Hc; [ easy | lra ].
+Qed.
+
+Theorem z_of_xy : ∀ x y z r,
+  r = √ (x² + y² + z²)
+  → r ≠ 0
+  → (z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2.
+Proof.
+intros * Hr Hrnz.
+assert (H : r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2).
+ split.
+  rewrite <- Rsqr_pow2.
+  intros H; apply Hrnz.
+  now apply Rsqr_eq_0 in H.
+
+  rewrite Hr, <- Rsqr_pow2.
+  rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
+  apply nonneg_sqr_vec_norm.
+
+ destruct H as (Hr2nz & Hrxyz).
+ remember (x / r) as xr eqn:Hxr.
+ remember (y / r) as yr eqn:Hyr.
+ remember (z / r) as zr eqn:Hzr.
+ subst xr yr zr.
+ unfold Rdiv.
+ do 3 rewrite Rpow_mult_distr.
+ rewrite <- Hrxyz; ring_simplify.
+ rewrite <- Rinv_pow; [ | easy ].
+ rewrite Rinv_r; [ ring | easy ].
+Qed.
+
+Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
+  p ≠ 0%vec
+  → sinθ² + cosθ² = 1
+  → is_rotation_matrix (matrix_of_axis_angle (p, sinθ, cosθ)).
+Proof.
+intros * Hp Hsc.
+rename Hsc into Hsc1.
+assert (Hsc : sinθ² = 1 - cosθ²) by lra; clear Hsc1.
+destruct p as (xp, yp, zp).
+remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
+assert (Hrnz : r ≠ 0).
+ intros H; rewrite Hr in H.
+ apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+ apply sqr_vec_norm_eq_0 in H.
+ destruct H as (Hx & Hy & Hz); subst xp yp zp.
+ now apply Hp.
+
+ remember (xp / r) as x eqn:Hx.
+ remember (yp / r) as y eqn:Hy.
+ remember (zp / r) as z eqn:Hz.
+ assert (Hrxyz2 : 1 - x ^ 2 - y ^ 2 = z ^ 2).
+  subst x y z.
+  now symmetry; apply z_of_xy.
+
+  unfold matrix_of_axis_angle.
+  rewrite <- Hr, <- Hx, <- Hy, <- Hz.
+  split.
+   unfold mat_transp, mat_mul, mat_id; simpl.
+   f_equal;
+    ring_simplify;
+    do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc;
+    repeat rewrite Rsqr_pow2;
+    rewrite <- Hrxyz2; ring.
+
+  unfold mat_det; simpl.
+  ring_simplify.
+  do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc.
+  repeat rewrite Rsqr_pow2.
+  rewrite <- Hrxyz2; ring.
+Qed.
