@@ -4961,6 +4961,9 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
           now erewrite matrix_of_mul_angle; try eassumption.
 
           exists (S n).
+rewrite Hc₀, Hs₀.
+rewrite angle_of_sin_cos_inv.
+remember (θ * INR (S n)) as θn eqn:Hθn.
 bbb.
 remember (- INR (S n) * θ // (2 * PI)) as k eqn:Hk.
 exists k.
