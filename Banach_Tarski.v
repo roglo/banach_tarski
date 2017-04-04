@@ -5055,13 +5055,33 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
        now rewrite HSD in Hdec.
 Qed.
 
+Definition ball_but_center :=
+  mkset (λ p, p ∈ ball ∧ p ≠ 0%vec).
+Definition ball_but_center_but_fixpoints :=
+  mkset (λ p, p ∈ ball_but_fixpoints ∧ p ≠ 0%vec).
+
+Theorem equidec_ball_but_center_with_and_without_fixpoints :
+  equidecomposable ball_but_center ball_but_center_but_fixpoints.
+Proof.
+unfold equidecomposable.
+specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
+destruct H as (EL₁ & EL₂ & HEL₁ & HEL₂ & Ha).
+remember (map (λ E, mkset (λ p, p ⁄ ‖p‖ ∈ E)) EL₁) as EL'₁ eqn:HEL'₁.
+remember (map (λ E, mkset (λ p, p ⁄ ‖p‖ ∈ E)) EL₂) as EL'₂ eqn:HEL'₂.
+exists EL'₁, EL'₂.
+split.
+ subst EL'₁.
+ unfold ball_but_center.
+ split.
+  intros v.
+  split; intros Hv.
+   destruct Hv as (Hr, Hv).
+   destruct HEL₁ as (Hs₁ & HEL₁).
+bbb.
+
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
-unfold equidecomposable.
-unfold ball_but_fixpoints.
-specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
-destruct H as (EL₁ & EL₂ & HEL₁ & HEL₂ & Ha).
 bbb.
 (*
 assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
