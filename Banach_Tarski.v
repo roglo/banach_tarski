@@ -5009,6 +5009,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         now destruct (EM (v ∈ E)); [ left | right ].
 
        rewrite HSD in Hdec.
+       unfold equidecomposable.
+       destruct Hdec as (EL & FL & Hdec).
 bbb.
    specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
    exists R₁.
