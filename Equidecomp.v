@@ -667,7 +667,7 @@ Add Parametric Relation : (set vector) equidecomposable
  reflexivity proved by equidec_refl
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans
- as equidec_morph.
+ as equidec_rel.
 
 Theorem equidec_union : ∀ E₁ E₂ F₁ F₂,
   (E₁ ∩ F₁ = ∅)%S
@@ -684,4 +684,21 @@ exists (PE₁ ++ PF₁), (PE₂ ++ PF₂).
 split; [ now apply partition_union | ].
 split; [ now apply partition_union | ].
 now apply Forall2_app.
+Qed.
+
+Add Parametric Morphism : equidecomposable
+with signature set_eq ==> set_eq ==> iff
+as equidec_morph.
+Proof.
+intros E E' HE F F' HF.
+split; intros H.
+ destruct H as (EL & FL & HEL & HFL & HA).
+ rewrite HE in HEL; rewrite HF in HFL.
+ exists EL, FL.
+ now split; [ | split ].
+
+ destruct H as (EL & FL & HEL & HFL & HA).
+ rewrite <- HE in HEL; rewrite <- HF in HFL.
+ exists EL, FL.
+ now split; [ | split ].
 Qed.

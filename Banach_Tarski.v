@@ -4976,6 +4976,9 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
 
        idtac.
 bbb.
+rewrite H in Hdec.
+
+bbb.
         unfold J in Hj.
         remember J₀ as a; simpl in Hj; subst a.
         intros Hvn.
