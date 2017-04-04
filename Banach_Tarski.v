@@ -4746,12 +4746,12 @@ split.
  now rewrite H.
 Qed.
 
-Theorem equidec_sphere_with_and_without_fixpoints : ∀ r S₂,
+Theorem equidec_sphere_with_and_without_fixpoints : ∀ r,
   0 < r
-  → S₂ = sphere r
-  → equidecomposable S₂ (S₂ ∖ D).
+  → equidecomposable (sphere r) (sphere r ∖ D).
 Proof.
-intros * Hr HS₂.
+intros r Hr.
+remember (sphere r) as S₂ eqn:HS₂.
 assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
  specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
  specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
@@ -5058,8 +5058,12 @@ Qed.
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
-intros.
+unfold equidecomposable.
+unfold ball_but_fixpoints.
+specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
+destruct H as (EL₁ & EL₂ & HEL₁ & HEL₂ & Ha).
 bbb.
+(*
 assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
  unfold "∈", "∖".
  specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
@@ -5326,6 +5330,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
        rewrite HSD in Hdec.
        unfold equidecomposable.
        destruct Hdec as (EL & FL & Hdec).
+*)
 bbb.
    specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
    exists R₁.
