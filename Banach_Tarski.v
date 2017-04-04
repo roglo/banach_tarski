@@ -4741,12 +4741,55 @@ split.
  now rewrite H.
 Qed.
 
-Theorem equidec_sphere_with_and_without_fixpoints : ∀ p₁ S₂,
-  p₁ ≠ 0%vec
-  → S₂ = sphere ‖p₁‖
+Theorem equidec_sphere_with_and_without_fixpoints : ∀ r S₂,
+  r ≠ 0
+  → S₂ = sphere r
   → equidecomposable S₂ (S₂ ∖ D).
 Proof.
-intros * Hp₁ HS₂.
+intros * Hr HS₂.
+assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
+ specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
+ specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
+ exists (r ⁎ p).
+ split.
+  split; [ now subst S₂; apply vec_mul_in_sphere | ].
+  intros HD.
+  assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
+   rewrite intersection_union_distr_r; left.
+   split; [ | easy ].
+   destruct HD as (el & p₁ & Hso & Hnl & Hel).
+   rewrite rotate_vec_mul in Hel.
+   exists el, (p₁ ⁄ r).
+   split.
+    destruct Hso as (el₁ & Hel₁).
+    rewrite rotate_vec_mul in Hel₁.
+    exists el₁.
+    rewrite rotate_vec_mul, <- Hel₁.
+    rewrite mat_vec_mul_const_distr.
+    rewrite vec_const_mul_assoc.
+    rewrite Rinv_l; [ | easy ].
+    now rewrite vec_const_mul_1_l.
+
+    split; [ easy | ].
+    rewrite rotate_vec_mul.
+    rewrite mat_vec_mul_const_distr.
+    now f_equal.
+
+   specialize (Hdnc p H) as (n, Hdnc).
+   revert Hdnc; apply Hp.
+
+  split.
+bbb.
+   apply neg_vec_in_ball.
+   apply on_sphere_in_ball in Hps; [ easy | ].
+   split; [ apply Rle_0_1 | apply Rle_refl ].
+
+   intros HD.
+   assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
+    now rewrite intersection_union_distr_r; right.
+
+    specialize (Hdnc p H) as (n, Hdnc).
+    revert Hdnc; apply Hp.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
