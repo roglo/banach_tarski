@@ -4741,6 +4741,14 @@ split.
  now rewrite H.
 Qed.
 
+Theorem equidec_sphere_with_and_without_fixpoints : ∀ p₁ S₂,
+  p₁ ≠ 0%vec
+  → S₂ = sphere ‖p₁‖
+  → equidecomposable S₂ (S₂ ∖ D).
+Proof.
+intros * Hp₁ HS₂.
+bbb.
+
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
