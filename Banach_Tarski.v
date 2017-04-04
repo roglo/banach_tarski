@@ -5103,10 +5103,33 @@ split.
 
    split.
     destruct HEL₁ as (Hs₁ & HEL₁).
-    clear - Hf Hs₁ Hv.
-    assert (H : ∀ E, List.In E EL₁ → ∀ p, p ∈ f E → p ∈ ball).
-     intros E HE p Hp.
-     rewrite Hf in Hp; simpl in Hp.
+    assert (HE : ∀ E, List.In E EL₁ → E ⊂ sphere 1).
+     clear - Hf Hs₁ Hv.
+     intros E HE.
+     rewrite Hs₁.
+     clear - HE.
+     revert E HE.
+     induction EL₁ as [| E₁ EL₁ ]; intros; [ easy | ].
+     simpl in HE; simpl.
+     destruct HE as [HE| HE]; [ now left; subst E₁ | ].
+     intros p Hp; right; revert Hp.
+     now apply IHEL₁.
+
+     assert (Hp : ∀ E, List.In E EL₁ → ∀ p, p ∈ f E → p ∈ ball).
+      intros E HE₁ p Hp.
+      rewrite Hf in Hp; simpl in Hp.
+      apply HE in HE₁.
+      apply HE₁ in Hp.
+      apply vec_mul_in_sphere with (r := ‖p‖) in Hp.
+      rewrite vec_const_mul_assoc in Hp.
+      destruct (Req_dec ‖p‖ 0) as [Hpz| Hpz].
+       destruct p as (x, y, z); simpl in Hpz; simpl.
+       apply sqrt_eq_0 in Hpz; [ | apply nonneg_sqr_vec_norm ].
+       rewrite Hpz; lra.
+
+       rewrite Rinv_r in Hp; [ | easy ].
+       rewrite vec_const_mul_1_l in Hp.
+       apply on_sphere_in_ball in Hp; [ easy | ].
 bbb.
 
 (* return *)
