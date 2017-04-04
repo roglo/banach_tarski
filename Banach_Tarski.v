@@ -4975,12 +4975,19 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
           now rewrite sin_angle_of_sin_cos, cos_angle_of_sin_cos.
 
        destruct H as (Hv & HnD).
-       rewrite HE in Hv; simpl in Hv.
+       rewrite HE in Hv.
+       destruct Hv as (u & n & Hu & Hv).
        rewrite HρE; simpl.
-       destruct Hv as (u & n & Hel & Hv).
-bbb.
-rewrite H in Hdec.
+       destruct n.
+        simpl in Hv; rewrite mat_vec_mul_id in Hv; rewrite Hv in HnD.
+        now destruct Hu.
 
+        exists ((ρ ^ n)%mat * u)%vec.
+        rewrite <- mat_vec_mul_assoc.
+        split; [ | easy ].
+        now rewrite HE; exists u, n.
+
+      rewrite H in Hdec.
 bbb.
         unfold J in Hj.
         remember J₀ as a; simpl in Hj; subst a.
