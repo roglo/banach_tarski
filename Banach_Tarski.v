@@ -5055,6 +5055,19 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
        now rewrite HSD in Hdec.
 Qed.
 
+Theorem in_unit_sphere : ∀ v, v ≠ 0%vec → v ⁄ ‖v‖ ∈ sphere 1.
+Proof.
+intros (x, y, z) Hv; simpl.
+apply vec_norm_neq_0 in Hv; simpl in Hv.
+do 3 rewrite Rsqr_mult.
+do 2 rewrite <- Rmult_plus_distr_l.
+rewrite Rsqr_inv; [ | easy ].
+rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rsqr_1, Rinv_l; [ easy | ].
+intros H; apply Hv; rewrite H.
+apply sqrt_0.
+Qed.
+
 Definition ball_but_center :=
   mkset (λ p, p ∈ ball ∧ p ≠ 0%vec).
 Definition ball_but_center_but_fixpoints :=
@@ -5077,6 +5090,25 @@ split.
   split; intros Hv.
    destruct Hv as (Hr, Hv).
    destruct HEL₁ as (Hs₁ & HEL₁).
+   specialize (in_unit_sphere v Hv) as Hvu.
+   rewrite Hs₁ in Hvu.
+   clear - Hvu.
+   revert v Hvu.
+   induction EL₁ as [| E₁ EL]; intros; [ easy | ].
+   simpl in Hvu; simpl.
+   destruct Hvu as [Hvu| Hvu]; [ now left | right ].
+   now apply IHEL.
+
+   split.
+    destruct HEL₁ as (Hs₁ & HEL₁).
+    clear - Hs₁ Hv.
+bbb.
+    revert v Hv.
+    induction EL₁ as [| E₁ EL]; intros; [ easy | ].
+    simpl in Hv.
+    destruct Hv as [Hv| Hv].
+     destruct v as (x, y, z); simpl in Hv; simpl.
+     simpl in Hs₁.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
