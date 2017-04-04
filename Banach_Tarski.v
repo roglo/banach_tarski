@@ -4988,160 +4988,28 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
         now rewrite HE; exists u, n.
 
       rewrite H in Hdec.
+      assert (HSD : ((E ∖ D) ∪ (S₂ ∖ E) = S₂ ∖ D)%S).
+       intros v; split; intros Hv.
+        destruct Hv as [(HvE, HvD)| (HvS, HvE)].
+         split; [ | easy ].
+         rewrite HE in HvE.
+         destruct HvE as (u & n & (HuD & HuS) & Hv).
+         rewrite HS₂ in HuS; rewrite HS₂, Hv.
+         apply on_sphere_after_rotation; [ easy | ].
+         apply mat_pow_is_rotation_matrix; rewrite Hρ.
+         now apply matrix_of_axis_angle_is_rotation_matrix.
+
+         split; [ easy | ].
+         intros Hv; apply HvE; clear HvE.
+         rewrite HE; exists v, 0%nat.
+         split; [ now split | ].
+         now rewrite mat_pow_0, mat_vec_mul_id.
+
+        destruct Hv as (HvS & HvD).
+        now destruct (EM (v ∈ E)); [ left | right ].
+
+       rewrite HSD in Hdec.
 bbb.
-        unfold J in Hj.
-        remember J₀ as a; simpl in Hj; subst a.
-        intros Hvn.
-        apply Hj; clear Hj.
-        rewrite HE in Hu.
-        remember D as d; remember intersection as b.
-        simpl in Hu; subst d b.
-        destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
-        rewrite Hv, Hu in Hvn.
-        rewrite <- mat_vec_mul_assoc in Hvn.
-        replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hvn by easy.
-        remember (sin (asin s * INR (S n))) as s₀ eqn:Hs₀.
-        remember (cos (acos c * INR (S n))) as c₀ eqn:Hc₀.
-        exists s₀, c₀.
-        rewrite Hs₀, Hc₀.
-        rewrite asin_sin.
-         remember (Rsign (cos (asin s * INR (S n)))) as sgn eqn:Hsgn.
-         rewrite atan_tan.
-         remember (Rediv (asin s * INR (S n) + PI / 2) PI) as k eqn:Hk.
-rewrite <- Hs₀, <- Hc₀.
-exists (S n).
-bbb.
-
-exists (Z.of_nat (S n)).
-rewrite <- INR_IZR_INZ.
-rewrite Rdiv_plus_distr.
-replace (2 * INR (S n) * PI / INR (S n))
-with (2 * (INR (S n) / INR (S n)) * PI) by lra.
-rewrite Rdiv_same.
- replace (2 * 1 * PI) with (2 * IZR 1 * PI) by lra.
- rewrite sin_Zperiod.
- rewrite Rmult_minus_distr_l.
- rewrite Rdiv_minus_distr.
-bbb.
-exists 1%nat.
-simpl (INR 1).
-exists k. (* à réfléchir... *)
-rewrite <- Hs₀, <- Hc₀.
-do 2 rewrite Rdiv_1_r.
-rewrite sin_Zperiod.
-sss.
-unfold Rminus.
-rewrite Ropp_mult_distr_l.
-rewrite <- opp_IZR.
-rewrite sin_Zperiod.
-rewrite Rmult_plus_distr_l.
-do 2 rewrite <- Rmult_assoc.
-bbb.
-
-        specialize (asin_sin (asin s * INR (S n))) as (k, Hs).
-        rewrite Hs.
-        exists (S n), (- k)%Z.
-        rewrite opp_IZR.
-        rewrite <- Ropp_mult_distr_r.
-        rewrite <- Ropp_mult_distr_l.
-        rewrite Rplus_assoc.
-        rewrite Rplus_opp_r, Rplus_0_r.
-        rewrite Rmult_div.
-        rewrite Rmult_div_same.
-        rewrite sin_asin.
-
-bbb.
-Focus 2.
-split.
- rewrite Hs₀.
- rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
- remember (asin s * INR (S n)) as a.
-Check sin_asin.
-
- replace (asin (sin a)) with a.
-  subst a.
-  rewrite Rmult_div.
-  rewrite Rmult_div_same.
-  rewrite sin_asin; [ easy | ].
-
-bbb.
-Check mat_eq_dec.
- assert
-   (H : ∃ sinθ₀ cosθ₀,
-    ∀ p p' n sinθ cosθ,
-    p ∈ D ∩ sphere ‖p₁‖ ∧
-    p' ∈ D ∩ sphere ‖p₁‖ ∧
-    sinθ = sin (asin sinθ₀ / INR n) ∧
-    cosθ = cos (acos cosθ₀ / INR n)
-    → (matrix_of_axis_angle (p₁, sinθ, cosθ) * p ≠ p')%vec).
-  assert (Hp₁nz : p₁ ≠ 0%vec).
-   intros H; apply Hpnd; subst p₁; simpl.
-   exists (ạ :: []), 0%vec.
-   split; [ apply same_orbit_refl | ].
-   split; [ easy | simpl; f_equal; lra ].
-
-   specialize (J_is_countable p₁) as Hjc.
-   specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
-   exists s, c.
-   intros * (Hp & Hp' & Hs & Hc) H.
-   unfold J_of_nat in Hn.
-   specialize (Hn n).
-   remember (prod_nat_of_nat n) as nj eqn:Hnj; symmetry in Hnj.
-   destruct nj as (nj, n₂).
-   remember (prod_nat_of_nat n₂) as nkn eqn:Hnkn; symmetry in Hnkn.
-   destruct nkn as (nk, nn).
-   remember (J₀_of_nat p₁ nj) as sc₀ eqn:Hsc₀.
-   destruct sc₀ as (s₀, c₀).
-   unfold J₀_of_nat in Hsc₀.
-   remember (prod_nat_of_nat nj) as n₁₂ eqn:Hn₁₂; symmetry in Hn₁₂.
-   destruct n₁₂ as (n₁, n'₂).
-   remember (prod_nat_of_nat n₁) as nfo eqn:Hnfo; symmetry in Hnfo.
-   destruct nfo as (nf, no).
-   remember (prod_nat_of_nat n'₂) as nfo' eqn:Hnfo'; symmetry in Hnfo'.
-   destruct nfo' as (nf', no').
-   remember (fixpoint_of_nat ‖p₁‖ nf) as v₁ eqn:Hv₁.
-   remember (fixpoint_of_nat ‖p₁‖ nf') as v'₁ eqn:Hv'₁.
-   remember (path_of_nat no) as el eqn:Hel.
-   remember (path_of_nat no') as el' eqn:Hel'.
-   remember (fold_right rotate v₁ el) as u₁ eqn:Hu₁.
-   remember (fold_right rotate v'₁ el') as u'₁ eqn:Hu'₁.
-   unfold rot_sin_cos in Hsc₀.
-   remember (latitude p₁ u₁) as a eqn:Ha.
-   remember (u₁ - a ⁎ p₁)%vec as w₁ eqn:Hw₁.
-   remember (u'₁ - a ⁎ p₁)%vec as w'₁ eqn:Hw'₁.
-   remember (√ (1 - a²)) as r eqn:Hr.
-
-bbb.
-
- assert
-   (H : ∃ R₁, R₁ ∈ rotation_around p₁
-    ∧ ∀ n p p', p ∈ D ∩ sphere ‖p₁‖ → p' ∈ D ∩ sphere ‖p₁‖
-    → ((R₁ ^ n)%mat * p ≠ p')%vec).
-  assert (Hp₁nz : p₁ ≠ 0%vec).
-   intros H; apply Hpnd; subst p₁; simpl.
-   exists (ạ :: []), 0%vec.
-   split; [ apply same_orbit_refl | ].
-   split; [ easy | simpl; f_equal; lra ].
-
-(**)
-bbb.
-rotation_around =
-λ p : vector,
-{| setp := λ R : matrix ℝ, is_rotation_matrix R ∧ (R * p)%vec = p |}
-     : vector → set (matrix ℝ)
-
-J =
-λ axis : vector,
-{|
-setp := λ '(sinθ, cosθ),
-        ∃ (sinθ₀ cosθ₀ : ℝ) (n k : ℕ),
-        (sinθ₀, cosθ₀) ∈ J₀ axis
-        ∧ sinθ = sin ((asin sinθ₀ + 2 * INR k * PI) / INR n)
-          ∧ cosθ = cos ((acos cosθ₀ + 2 * INR k * PI) / INR n) |}
-     : vector → set (ℝ * ℝ)
-
-bbb.
-   specialize (J_is_countable p₁) as (f, Hdnc); [ easy | easy | ].
    specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
    exists R₁.
    split; [ easy | ].
