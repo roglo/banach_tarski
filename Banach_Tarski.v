@@ -4974,7 +4974,10 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
           rewrite Hθ.
           now rewrite sin_angle_of_sin_cos, cos_angle_of_sin_cos.
 
-       idtac.
+       destruct H as (Hv & HnD).
+       rewrite HE in Hv; simpl in Hv.
+       rewrite HρE; simpl.
+       destruct Hv as (u & n & Hel & Hv).
 bbb.
 rewrite H in Hdec.
 
