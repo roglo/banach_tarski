@@ -5079,8 +5079,9 @@ Proof.
 unfold equidecomposable.
 specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
 destruct H as (EL₁ & EL₂ & HEL₁ & HEL₂ & Ha).
-remember (map (λ E, mkset (λ p, p ⁄ ‖p‖ ∈ E)) EL₁) as EL'₁ eqn:HEL'₁.
-remember (map (λ E, mkset (λ p, p ⁄ ‖p‖ ∈ E)) EL₂) as EL'₂ eqn:HEL'₂.
+remember (λ E, mkset (λ p, p ⁄ ‖p‖ ∈ E)) as f eqn:Hf.
+remember (map f EL₁) as EL'₁ eqn:HEL'₁.
+remember (map f EL₂) as EL'₂ eqn:HEL'₂.
 exists EL'₁, EL'₂.
 split.
  subst EL'₁.
@@ -5092,16 +5093,35 @@ split.
    destruct HEL₁ as (Hs₁ & HEL₁).
    specialize (in_unit_sphere v Hv) as Hvu.
    rewrite Hs₁ in Hvu.
-   clear - Hvu.
+   clear - Hf Hvu.
    revert v Hvu.
    induction EL₁ as [| E₁ EL]; intros; [ easy | ].
    simpl in Hvu; simpl.
+   subst f; simpl.
    destruct Hvu as [Hvu| Hvu]; [ now left | right ].
    now apply IHEL.
 
    split.
     destruct HEL₁ as (Hs₁ & HEL₁).
-    clear - Hs₁ Hv.
+    clear - Hf Hs₁ Hv.
+    assert (H : ∀ E, List.In E EL₁ → ∀ p, p ∈ f E → p ∈ ball).
+     intros E HE p Hp.
+     rewrite Hf in Hp; simpl in Hp.
+bbb.
+
+(* return *)
+clear Hs₁.
+revert v Hv.
+induction EL₁ as [| E₁ EL]; intros; [ easy | ].
+simpl in Hv.
+destruct Hv as [Hv| Hv].
+ eapply H; [ now left | easy ].
+
+ apply IHEL; [ | easy ].
+ intros E HE p Hp.
+ eapply H; [ | eassumption ].
+ now right.
+
 bbb.
     revert v Hv.
     induction EL₁ as [| E₁ EL]; intros; [ easy | ].
