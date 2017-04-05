@@ -5138,24 +5138,6 @@ split.
 
  split.
   subst EL'₂.
-(*
-enough ((ball_but_center_but_fixpoints = ball_but_center ∖ D)%S).
-rewrite H.
-split.
-intros v.
-split; intros Hv.
-destruct Hv as ((Hr & Hv) & HvD).
-destruct HEL₂ as (Hs₂ & HEL₂).
-specialize (in_unit_sphere v Hv) as Hvu.
-assert (v ⁄ ‖v‖ ∈ sphere 1 ∖ D).
-split; [ easy | ].
-intros Hvv; apply HvD.
-simpl in Hvv; simpl.
-destruct Hvv as (el & u & Hvv).
-exists el, (‖v‖ ⁎ u).
-split.
-bbb.
-*)
   unfold ball_but_center_but_fixpoints, ball_but_fixpoints.
   split.
    intros v.
@@ -5163,30 +5145,75 @@ bbb.
     destruct Hv as ((Hr & HrD) & Hv).
     destruct HEL₂ as (Hs₂ & HEL₂).
     specialize (in_unit_sphere v Hv) as Hvu.
-assert (Hvv : v ⁄ ‖v‖ ∈ sphere 1 ∖ D).
-split; [ easy | ].
-intros Hvv; apply HrD.
-destruct Hvv as (el & u & (Hso & Hvv)).
-simpl.
-bbb.
-exists el, (‖v‖ ⁎ u).
-split.
-apply same_orbit_sym.
-destruct Hso as (el₁ & Hso).
-exists el₁.
-rewrite rotate_vec_mul in Hso |-*.
-rewrite <- Hso.
+    assert (Hvv : v ⁄ ‖v‖ ∈ sphere 1 ∖ D).
+     split; [ easy | ].
+     intros Hvv; apply HrD.
+     destruct Hvv as (el & u & (Hso & Hnl & Hru)); simpl.
+     exists el, (‖v‖ ⁎ u).
+     split.
+      destruct Hso as (el₁ & Hso).
+      exists el₁.
+      rewrite rotate_vec_mul in Hso |-*.
+      rewrite mat_vec_mul_const_distr in Hso.
+      rewrite <- Hso, vec_const_mul_assoc.
+      rewrite Rinv_r; [ | now apply vec_norm_neq_0 ].
+      now rewrite vec_const_mul_1_l.
 
-rewrite mat_vec_mul_const_distr in Hso |-*.
-bbb.
+      split; [ easy | ].
+      rewrite rotate_vec_mul in Hru |-*.
+      rewrite mat_vec_mul_const_distr.
+      now f_equal.
 
-(*
-    rewrite Hs₂ in Hvu.
-*)
-    clear - Hf Hs₂ Hvu Hv Hr.
-    revert v Hvu Hv Hr.
-    induction EL₂ as [| E₁ EL]; intros.
-     simpl in Hs₂.
+     rewrite Hs₂ in Hvv.
+     clear - Hf Hvv Hv Hr.
+     revert v Hvv Hv Hr.
+     induction EL₂ as [| E₁ EL]; intros; [ easy | ].
+     simpl in Hvv; simpl.
+     subst f; simpl.
+     destruct Hvv as [Hvv| Hvv].
+      left; split; [ | easy ].
+      split; [ now apply vec_norm_pos | ].
+      destruct v as (x, y, z); simpl in Hr; simpl.
+      apply Rsqr_incr_0; [ | apply sqrt_pos | lra ].
+      rewrite Rsqr_1, Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+
+      now right; apply IHEL.
+
+    split.
+     destruct HEL₂ as (Hs₂ & HEL₂).
+     clear - Hv Hf.
+     revert v Hv.
+     induction EL₂ as [| E EL]; intros; [ easy | ].
+     simpl in Hv.
+     destruct Hv as [Hv| Hv]; [ | now apply IHEL ].
+     rewrite Hf in Hv; simpl in Hv.
+     destruct Hv as (Hvz & Hv).
+     destruct Hvz as (Hv0, Hv1).
+bbb.
+     apply on_sphere_in_ball with (r := ‖v‖); [ lra | ].
+     apply on_sphere_norm; [ lra | easy ].
+
+     clear - Hf Hv.
+     induction EL₁ as [| E₁ EL₁]; [ easy | simpl in Hv ].
+     destruct Hv as [Hv| Hv]; [ | now apply IHEL₁ ].
+     rewrite Hf in Hv; simpl in Hv.
+     apply vec_norm_neq_0; lra.
+
+  intros i j Hij.
+  destruct HEL₁ as (Hs₁ & HEL₁).
+  specialize (HEL₁ _ _ Hij).
+  intros v; split; [ intros Hv | easy ].
+  destruct Hv as (Hvi, Hvj).
+  specialize (HEL₁ (v ⁄ ‖v‖)); simpl in HEL₁; simpl.
+  apply HEL₁.
+  assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
+  now rewrite <- He, map_nth, Hf in Hvi, Hvj; simpl in Hvi, Hvj.
+
+bbb.
+     clear - Hs₂ Hvv Hv Hr.
+     revert v Hvv Hv Hr.
+     induction EL₂ as [| E₁ EL]; intros.
+      simpl in Hs₂.
 Focus 2.
 simpl in Hs₂.
 
