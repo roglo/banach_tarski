@@ -75,6 +75,7 @@ split.
    destruct H₁ as (H₁, H₃).
    destruct H₂ as (H₂, H₄).
    unfold ball in H₁, H₂.
+bbb.
    now apply (Rno_intersect_balls_x3_x6 x y z).
 
   constructor; [ now exists (Xtransl 3) | ].
@@ -5079,11 +5080,117 @@ Proof.
 unfold equidecomposable.
 specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
 destruct H as (EL₁ & EL₂ & HEL₁ & HEL₂ & Ha).
+remember (λ E, mkset (λ p, 0 < ‖p‖ ≤ 1 ∧ p ⁄ ‖p‖ ∈ E)) as f eqn:Hf.
+remember (map f EL₁) as EL'₁ eqn:HEL'₁.
+remember (map f EL₂) as EL'₂ eqn:HEL'₂.
+exists EL'₁, EL'₂.
+split.
+ subst EL'₁.
+ unfold ball_but_center.
+ split.
+  intros v.
+  split; intros Hv.
+   destruct Hv as (Hr, Hv).
+   destruct HEL₁ as (Hs₁ & HEL₁).
+   specialize (in_unit_sphere v Hv) as Hvu.
+   rewrite Hs₁ in Hvu.
+   clear - Hf Hvu Hv Hr.
+   revert v Hvu Hv Hr.
+   induction EL₁ as [| E₁ EL]; intros; [ easy | ].
+   simpl in Hvu; simpl.
+   subst f; simpl.
+   destruct Hvu as [Hvu| Hvu].
+    left; split; [ | easy ].
+    split; [ now apply vec_norm_pos | ].
+    destruct v as (x, y, z); simpl in Hr; simpl.
+    apply Rsqr_incr_0; [ | apply sqrt_pos | lra ].
+    rewrite Rsqr_1, Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+
+    now right; apply IHEL.
+
+   split.
+    destruct HEL₁ as (Hs₁ & HEL₁).
+    clear - Hv Hf.
+    revert v Hv.
+    induction EL₁ as [| E₁ EL₁]; intros; [ easy | ].
+    simpl in Hv.
+    destruct Hv as [Hv| Hv].
+     rewrite Hf in Hv; simpl in Hv.
+     destruct Hv as (Hvz & Hv).
+     destruct Hvz as (Hv0, Hv1).
+About ball.
+bbbb.
+     destruct v as (x, y, z); simpl in Hv1; simpl.
+
+bbb.
+     assert (Hp : ∀ E, List.In E EL₁ → ∀ p, p ∈ f E → p ∈ ball).
+      intros E HE₁ p Hp.
+      rewrite Hf in Hp; simpl in Hp.
+      apply HE in HE₁.
+      apply HE₁ in Hp.
+      apply vec_mul_in_sphere with (r := ‖p‖) in Hp.
+      rewrite vec_const_mul_assoc in Hp.
+      destruct (Req_dec ‖p‖ 0) as [Hpz| Hpz].
+       destruct p as (x, y, z); simpl in Hpz; simpl.
+       apply sqrt_eq_0 in Hpz; [ | apply nonneg_sqr_vec_norm ].
+       rewrite Hpz; lra.
+
+       rewrite Rinv_r in Hp; [ | easy ].
+       rewrite vec_const_mul_1_l in Hp.
+       apply on_sphere_in_ball in Hp; [ easy | ].
+bbb.
+
+bbb.
+unfold equidecomposable.
+specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
+destruct H as (EL₁ & EL₂ & HEL₁ & HEL₂ & Ha).
 remember (λ E, mkset (λ p, ∃ q r, q ∈ E ∧ 0 < r ≤ 1 ∧ p = r ⁎ q)) as f eqn:Hf.
 remember (map f EL₁) as EL'₁ eqn:HEL'₁.
 remember (map f EL₂) as EL'₂ eqn:HEL'₂.
 exists EL'₁, EL'₂.
 split.
+ subst EL'₁.
+ unfold ball_but_center.
+ split.
+  intros v.
+  split; intros Hv.
+   destruct Hv as (Hr, Hv).
+   destruct HEL₁ as (Hs₁ & HEL₁).
+   specialize (in_unit_sphere v Hv) as Hvu.
+   rewrite Hs₁ in Hvu.
+   clear - Hf Hvu Hv.
+   revert v Hvu Hv.
+   induction EL₁ as [| E₁ EL]; intros; [ easy | ].
+   simpl in Hvu; simpl.
+   subst f; simpl.
+   destruct Hvu as [Hvu| Hvu].
+    left.
+bbb.
+
+   destruct Hvu as [Hvu| Hvu]; [ now left | right ].
+   now apply IHEL.
+
+   split.
+    destruct HEL₁ as (Hs₁ & HEL₁).
+    assert (HE : ∀ E, List.In E EL₁ → E ⊂ sphere 1).
+     clear - Hf Hs₁ Hv.
+     intros E HE.
+     rewrite Hs₁.
+     clear - HE.
+     revert E HE.
+     induction EL₁ as [| E₁ EL₁ ]; intros; [ easy | ].
+     simpl in HE; simpl.
+     destruct HE as [HE| HE]; [ now left; subst E₁ | ].
+     intros p Hp; right; revert Hp.
+     now apply IHEL₁.
+
+     clear - Hv HE Hf.
+     revert v Hv.
+     induction EL₁ as [| E₁ EL₁]; intros; [ easy | ].
+     simpl in Hv.
+     destruct Hv as [Hv| Hv].
+      rewrite Hf in Hv; simpl in Hv.
+      destruct Hv as (Hvz & Hv).
 
 bbb.
 remember (λ E, mkset (λ p, p ≠ 0%vec ∧ p ⁄ ‖p‖ ∈ E)) as f eqn:Hf.
