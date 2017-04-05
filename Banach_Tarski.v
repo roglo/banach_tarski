@@ -5079,6 +5079,13 @@ Proof.
 unfold equidecomposable.
 specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
 destruct H as (EL₁ & EL₂ & HEL₁ & HEL₂ & Ha).
+remember (λ E, mkset (λ p, ∃ q r, q ∈ E ∧ 0 < r ≤ 1 ∧ p = r ⁎ q)) as f eqn:Hf.
+remember (map f EL₁) as EL'₁ eqn:HEL'₁.
+remember (map f EL₂) as EL'₂ eqn:HEL'₂.
+exists EL'₁, EL'₂.
+split.
+
+bbb.
 remember (λ E, mkset (λ p, p ≠ 0%vec ∧ p ⁄ ‖p‖ ∈ E)) as f eqn:Hf.
 remember (map f EL₁) as EL'₁ eqn:HEL'₁.
 remember (map f EL₂) as EL'₂ eqn:HEL'₂.
