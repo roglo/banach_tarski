@@ -5181,7 +5181,9 @@ split.
 
     split.
      destruct HEL₂ as (Hs₂ & HEL₂).
-     clear - Hv Hf.
+bbb.
+     assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
+     clear - He Hv Hf.
      revert v Hv.
      induction EL₂ as [| E EL]; intros; [ easy | ].
      simpl in Hv.
@@ -5189,6 +5191,11 @@ split.
      rewrite Hf in Hv; simpl in Hv.
      destruct Hv as (Hvz & Hv).
      destruct Hvz as (Hv0, Hv1).
+     split.
+      destruct v as (x, y, z); simpl.
+      simpl in Hv1.
+      apply Rsqr_incr_1 in Hv1; [ | apply sqrt_pos | lra ].
+      rewrite Rsqr_1, Rsqr_sqrt in Hv1; [ easy | apply nonneg_sqr_vec_norm ].
 bbb.
      apply on_sphere_in_ball with (r := ‖v‖); [ lra | ].
      apply on_sphere_norm; [ lra | easy ].
