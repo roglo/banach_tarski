@@ -18,11 +18,15 @@ Notation "r ³" := (Rpow_def.pow r 3) (at level 1, format "r ³") : R_scope.
 Notation "r ⁴" := (Rpow_def.pow r 4) (at level 1, format "r ⁴") : R_scope.
 
 Theorem Rno_intersect_balls_x3_x6 : ∀ x y z,
-  (x - 3)² + y² + z² <= 1
-  → (x - 6)² + y² + z² <= 1
+  √ ((x - 3)² + y² + z²) <= 1
+  → √ ((x - 6)² + y² + z²) <= 1
   → False.
 Proof.
 intros x y z H3 H6.
+apply Rsqr_incr_1 in H3; [ | apply sqrt_pos | lra ].
+apply Rsqr_incr_1 in H6; [ | apply sqrt_pos | lra ].
+rewrite Rsqr_1, Rsqr_sqrt in H3; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rsqr_1, Rsqr_sqrt in H6; [ | apply nonneg_sqr_vec_norm ].
 apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
 apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
 apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
@@ -70,12 +74,10 @@ split.
 
    unfold intersection, set_eq; intros (x, y, z).
    split; [ intros (H₁, H₂) | easy ].
-   simpl in H₁, H₂.
    unfold empty_set; simpl.
    destruct H₁ as (H₁, H₃).
    destruct H₂ as (H₂, H₄).
-   unfold ball in H₁, H₂.
-bbb.
+   unfold ball in H₁, H₂; simpl in H₁, H₂.
    now apply (Rno_intersect_balls_x3_x6 x y z).
 
   constructor; [ now exists (Xtransl 3) | ].
@@ -300,22 +302,25 @@ rewrite Rinv_r; [ | lra ].
 rewrite Rmult_1_r.
 split; [ | easy ].
 do 2 rewrite Rsqr_mult.
-rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; lra | ].
-rewrite Rsqr_pow2.
-apply Rplus_le_reg_r with (r := s ^ 2).
-unfold Rminus; rewrite Rplus_assoc, Rplus_opp_l.
-rewrite Rplus_0_l, Rplus_0_r.
-replace 1 with (1 ^ 2) by lra.
-apply pow_incr; lra.
+rewrite Rsqr_sqrt.
+ apply Rsqr_inj; [ apply sqrt_pos | lra | ].
+ rewrite Rsqr_0, Rplus_0_r.
+ rewrite Rsqr_sqrt; [ lra | ].
+ ring_simplify; apply Rle_0_sqr.
+
+ rewrite Rsqr_pow2.
+ apply Rplus_le_reg_r with (r := s ^ 2).
+ unfold Rminus; rewrite Rplus_assoc, Rplus_opp_l.
+ rewrite Rplus_0_l, Rplus_0_r.
+ replace 1 with (1 ^ 2) by lra.
+ apply pow_incr; lra.
 Qed.
 
 Theorem on_sphere_in_ball : ∀ r p, 0 ≤ r ≤ 1 →
   p ∈ sphere r
   → p ∈ ball.
 Proof.
-intros r (x, y, z) Hr Hs; simpl in Hs; simpl; rewrite Hs.
-replace 1 with 1² by apply Rsqr_1.
-apply Rsqr_incr_1; [ easy | easy | lra ].
+intros r p Hr Hs; simpl in Hs; simpl; now rewrite Hs.
 Qed.
 
 Theorem ball_not_countable : ¬ (is_countable {p : vector | p ∈ ball}).
@@ -998,36 +1003,34 @@ Theorem vec_div_in_sphere : ∀ r p,
   → p ∈ sphere r
   → p ⁄ r ∈ sphere 1.
 Proof.
-intros r (x, y, z) Hr Hp; simpl in Hp; simpl.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Hp, Rsqr_1.
-rewrite Rsqr_inv; [ | lra ].
-rewrite Rinv_l; [ easy | ].
-intros H; apply Rsqr_eq_0 in H; lra.
+intros r v Hr Hp; simpl in Hp; simpl.
+rewrite <- Hp in Hr |-*.
+apply vec_div_vec_norm.
+now apply vec_norm_neq_0 in Hr.
 Qed.
 
 Theorem vec_mul_in_sphere : ∀ r p,
-  p ∈ sphere 1
+  0 ≤ r
+  → p ∈ sphere 1
   → r ⁎ p ∈ sphere r.
 Proof.
-intros r (x, y, z) Hp; simpl in Hp; simpl.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Hp, Rsqr_1.
-now rewrite Rmult_1_r.
+intros * Hr Hp; simpl in Hp; simpl.
+rewrite vec_norm_vec_const_mul.
+rewrite Rabs_right; [ | lra ].
+rewrite Hp; lra.
 Qed.
 
 Theorem rotation_fixpoint_on_sphere : ∀ r M,
-   M ≠ mat_transp M
+   0 ≤ r
+   → M ≠ mat_transp M
    → rotation_fixpoint M r ∈ sphere r.
 Proof.
-intros * Hm.
+intros * Hr Hm.
 unfold rotation_fixpoint.
 unfold rotation_unit_axis.
 remember (rotation_axis M) as ax eqn:Hax.
 unfold vec_normalize.
-apply vec_mul_in_sphere.
+apply vec_mul_in_sphere; [ easy | ].
 destruct (vec_eq_dec ax 0) as [Hz| Hz].
  move Hz at top; subst ax; symmetry in Hax.
  injection Hax; clear Hax; intros Hz Hy Hx.
@@ -1039,26 +1042,15 @@ destruct (vec_eq_dec ax 0) as [Hz| Hz].
  destruct M; simpl in Hx, Hy, Hz |-*.
  now rewrite Hx, Hy, Hz.
 
- destruct ax as (x, y, z); simpl.
- do 3 rewrite Rsqr_mult.
- do 2 rewrite <- Rmult_plus_distr_l.
- rewrite Rsqr_1, Rsqr_inv.
-  rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-  rewrite Rinv_l; [ easy | ].
-   intros H; apply sqr_vec_norm_eq_0 in H.
-   now destruct H as (H1 & H2 & H3); subst.
-
-  intros H.
-  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-  apply sqr_vec_norm_eq_0 in H.
-  now destruct H as (H1 & H2 & H3); subst.
+ apply vec_div_in_sphere; [ now apply vec_norm_neq_0 | easy ].
 Qed.
 
 Theorem fixpoint_of_path_on_sphere : ∀ r el,
-  norm_list el ≠ []
+  0 ≤ r
+  → norm_list el ≠ []
   → fixpoint_of_path r el ∈ sphere r.
 Proof.
-intros * Hn.
+intros * Hr Hn.
 unfold fixpoint_of_path.
 remember (mat_of_path el) as M eqn:Hm.
 destruct (mat_eq_dec M (mat_transp M)) as [Hmt| Hmt].
@@ -1080,8 +1072,8 @@ Theorem rotation_fixpoint_norm : ∀ M r, 0 ≤ r
   → M ≠ mat_transp M
   → ‖(rotation_fixpoint M r)‖ = r.
 Proof.
-intros * HM Hr.
-apply rotation_fixpoint_on_sphere with (r := r) in Hr.
+intros * Hr HM.
+apply rotation_fixpoint_on_sphere with (r := r) in HM; [ | easy ].
 now apply on_sphere_norm.
 Qed.
 
@@ -1814,6 +1806,7 @@ destruct b₁, b.
   simpl in Hsr₂.
   rewrite Rsqr_0 in Hsr₂; symmetry in Hsr₂.
   do 2 rewrite Rplus_0_l in Hsr₂.
+bbb.
   apply Rsqr_eq_0 in Hsr₂; subst r.
   simpl in Hsr₁; rewrite Rsqr_0 in Hsr₁.
   destruct p₁ as (x, y, z).
