@@ -85,13 +85,8 @@ Qed.
 
 Definition orbit_selector := choice_function same_orbit.
 
-(*
 Definition sphere r := mkset (λ '(V x y z), (x² + y² + z² = r²)%R).
 Definition ball := mkset (λ '(V x y z), (x² + y² + z² <= 1)%R).
-*)
-Definition sphere r := mkset (λ p, ‖p‖ = r).
-Definition ball := mkset (λ p, ‖p‖ ≤ 1).
-(**)
 
 Definition D :=
   mkset
@@ -103,7 +98,15 @@ Arguments D : simpl never.
 Definition ball_but_fixpoints := ball ∖ D.
 
 Theorem on_sphere_norm : ∀ p r, (0 ≤ r)%R → p ∈ sphere r ↔ ‖p‖ = r.
-Proof. now intros p r Hr. Qed.
+Proof.
+intros (x, y, z) r Hr; simpl.
+split; intros Hp.
+ now rewrite Hp; apply sqrt_Rsqr.
+
+ apply (f_equal Rsqr) in Hp.
+ rewrite Rsqr_sqrt in Hp; [ easy | ].
+ apply nonneg_sqr_vec_norm.
+Qed.
 
 Theorem on_sphere_after_rotation : ∀ p m r,
   p ∈ sphere r
@@ -119,12 +122,7 @@ destruct Hm as (Hm, Hd).
 unfold mat_det in Hd.
 unfold mat_mul, mat_id in Hm; simpl in Hm.
 injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-rewrite <- His.
-apply Rsqr_inj; [ apply sqrt_pos | apply sqrt_pos | ].
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-clear r His.
-Time nsatz.
+nsatz.
 Qed.
 
 Theorem antipode_on_sphere_after_rotation : ∀ p m r,
@@ -141,12 +139,7 @@ destruct Hm as (Hm, Hd).
 unfold mat_det in Hd.
 unfold mat_mul, mat_id in Hm; simpl in Hm.
 injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-rewrite <- His.
-apply Rsqr_inj; [ apply sqrt_pos | apply sqrt_pos | ].
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-clear r His.
-Time nsatz.
+nsatz.
 Qed.
 
 Theorem in_ball_after_rotation : ∀ p m,
@@ -158,13 +151,16 @@ intros * His Hrm.
 destruct p as (x, y, z).
 remember (V x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : p ∈ sphere (√ r)) by now subst p; simpl; rewrite Hr.
-pose proof on_sphere_after_rotation _ _ _ Hos Hrm as H.
-unfold ball in His.
-unfold sphere in H.
-unfold ball.
-subst p; simpl in *.
-now rewrite H, <- Hos.
+assert (Hos : p ∈ sphere (√ r)).
+ subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
+ apply nonneg_sqr_vec_norm.
+
+ pose proof on_sphere_after_rotation _ _ _ Hos Hrm as H.
+ unfold ball in His.
+ unfold sphere in H.
+ unfold ball.
+ subst p; simpl in *.
+ now rewrite H, <- Hos.
 Qed.
 
 Theorem in_ball_after_rotate : ∀ p e,
