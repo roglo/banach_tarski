@@ -5113,11 +5113,20 @@ split.
     revert v Hv.
     induction EL₁ as [| E₁ EL₁]; intros; [ easy | ].
     simpl in Hv.
-    destruct Hv as [Hv| Hv].
-     rewrite Hf in Hv; simpl in Hv.
-     destruct Hv as (Hvz & Hv).
-     destruct Hvz as (Hv0, Hv1).
-About ball.
+    destruct Hv as [Hv| Hv]; [ | now apply IHEL₁ ].
+    rewrite Hf in Hv; simpl in Hv.
+    destruct Hv as (Hvz & Hv).
+    destruct Hvz as (Hv0, Hv1).
+    apply on_sphere_in_ball with (r := ‖v‖); [ lra | ].
+    apply on_sphere_norm; [ lra | easy ].
+
+    clear - Hf Hv.
+    induction EL₁ as [| E₁ EL₁]; [ easy | simpl in Hv ].
+    destruct Hv as [Hv| Hv]; [ | now apply IHEL₁ ].
+    rewrite Hf in Hv; simpl in Hv.
+    apply vec_norm_neq_0; lra.
+
+  idtac.
 bbb.
 unfold equidecomposable.
 specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
