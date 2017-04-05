@@ -5138,6 +5138,24 @@ split.
 
  split.
   subst EL'₂.
+(*
+enough ((ball_but_center_but_fixpoints = ball_but_center ∖ D)%S).
+rewrite H.
+split.
+intros v.
+split; intros Hv.
+destruct Hv as ((Hr & Hv) & HvD).
+destruct HEL₂ as (Hs₂ & HEL₂).
+specialize (in_unit_sphere v Hv) as Hvu.
+assert (v ⁄ ‖v‖ ∈ sphere 1 ∖ D).
+split; [ easy | ].
+intros Hvv; apply HvD.
+simpl in Hvv; simpl.
+destruct Hvv as (el & u & Hvv).
+exists el, (‖v‖ ⁎ u).
+split.
+bbb.
+*)
   unfold ball_but_center_but_fixpoints, ball_but_fixpoints.
   split.
    intros v.
@@ -5145,10 +5163,37 @@ split.
     destruct Hv as ((Hr & HrD) & Hv).
     destruct HEL₂ as (Hs₂ & HEL₂).
     specialize (in_unit_sphere v Hv) as Hvu.
+assert (Hvv : v ⁄ ‖v‖ ∈ sphere 1 ∖ D).
+split; [ easy | ].
+intros Hvv; apply HrD.
+destruct Hvv as (el & u & (Hso & Hvv)).
+simpl.
 bbb.
+exists el, (‖v‖ ⁎ u).
+split.
+apply same_orbit_sym.
+destruct Hso as (el₁ & Hso).
+exists el₁.
+rewrite rotate_vec_mul in Hso |-*.
+rewrite <- Hso.
+
+rewrite mat_vec_mul_const_distr in Hso |-*.
+bbb.
+
+(*
     rewrite Hs₂ in Hvu.
-    clear - Hf Hvu Hv Hr.
+*)
+    clear - Hf Hs₂ Hvu Hv Hr.
     revert v Hvu Hv Hr.
+    induction EL₂ as [| E₁ EL]; intros.
+     simpl in Hs₂.
+Focus 2.
+simpl in Hs₂.
+
+simpl in Hvu; simpl.
+subst f; simpl.
+
+bbb.
     induction EL₂ as [| E₁ EL]; intros; [ easy | ].
     simpl in Hvu; simpl.
     subst f; simpl.
