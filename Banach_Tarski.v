@@ -5195,7 +5195,20 @@ split.
       apply Rsqr_incr_1 in Hv1; [ | apply sqrt_pos | lra ].
       rewrite Rsqr_1, Rsqr_sqrt in Hv1; [ easy | apply nonneg_sqr_vec_norm ].
 
-      idtac.
+      assert (Hmf : (f (sphere 1 ∖ D) = f (⋃ EL₂))%S).
+       intros u.
+       split; intros Hu.
+        rewrite Hf in Hu.
+        remember (sphere 1 ∖ D) as d; simpl in Hu; subst d.
+        rewrite Hf; simpl.
+        now rewrite Hs₂ in Hu.
+
+        rewrite Hf in Hu; simpl in Hu.
+        rewrite Hf.
+        remember (sphere 1 ∖ D) as d; simpl; subst d.
+        now rewrite Hs₂.
+
+       assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
 bbb.
      apply on_sphere_in_ball with (r := ‖v‖); [ lra | ].
      apply on_sphere_norm; [ lra | easy ].
