@@ -5133,6 +5133,64 @@ split.
   destruct Hv as (Hvi, Hvj).
   specialize (HEL₁ (v ⁄ ‖v‖)); simpl in HEL₁; simpl.
   apply HEL₁.
+  assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
+  now rewrite <- He, map_nth, Hf in Hvi, Hvj; simpl in Hvi, Hvj.
+
+ split.
+  subst EL'₂.
+  unfold ball_but_center_but_fixpoints, ball_but_fixpoints.
+  split.
+   intros v.
+   split; intros Hv.
+    destruct Hv as ((Hr & HrD) & Hv).
+    destruct HEL₂ as (Hs₂ & HEL₂).
+    specialize (in_unit_sphere v Hv) as Hvu.
+bbb.
+    rewrite Hs₂ in Hvu.
+    clear - Hf Hvu Hv Hr.
+    revert v Hvu Hv Hr.
+    induction EL₂ as [| E₁ EL]; intros; [ easy | ].
+    simpl in Hvu; simpl.
+    subst f; simpl.
+    destruct Hvu as [Hvu| Hvu].
+     left; split; [ | easy ].
+     split; [ now apply vec_norm_pos | ].
+     destruct v as (x, y, z); simpl in Hr; simpl.
+     apply Rsqr_incr_0; [ | apply sqrt_pos | lra ].
+     rewrite Rsqr_1, Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+
+     now right; apply IHEL.
+
+    split.
+     destruct HEL₁ as (Hs₁ & HEL₁).
+     clear - Hv Hf.
+     revert v Hv.
+     induction EL₁ as [| E₁ EL₁]; intros; [ easy | ].
+     simpl in Hv.
+     destruct Hv as [Hv| Hv]; [ | now apply IHEL₁ ].
+     rewrite Hf in Hv; simpl in Hv.
+     destruct Hv as (Hvz & Hv).
+     destruct Hvz as (Hv0, Hv1).
+     apply on_sphere_in_ball with (r := ‖v‖); [ lra | ].
+     apply on_sphere_norm; [ lra | easy ].
+
+     clear - Hf Hv.
+     induction EL₁ as [| E₁ EL₁]; [ easy | simpl in Hv ].
+     destruct Hv as [Hv| Hv]; [ | now apply IHEL₁ ].
+     rewrite Hf in Hv; simpl in Hv.
+     apply vec_norm_neq_0; lra.
+
+   intros i j Hij.
+   destruct HEL₁ as (Hs₁ & HEL₁).
+   specialize (HEL₁ _ _ Hij).
+   intros v; split; [ intros Hv | easy ].
+   destruct Hv as (Hvi, Hvj).
+   specialize (HEL₁ (v ⁄ ‖v‖)); simpl in HEL₁; simpl.
+   apply HEL₁.
+   assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
+   now rewrite <- He, map_nth, Hf in Hvi, Hvj; simpl in Hvi, Hvj.
+
+ split.
 
 bbb.
 unfold equidecomposable.
