@@ -5126,7 +5126,14 @@ split.
     rewrite Hf in Hv; simpl in Hv.
     apply vec_norm_neq_0; lra.
 
-  idtac.
+  intros i j Hij.
+  destruct HEL₁ as (Hs₁ & HEL₁).
+  specialize (HEL₁ _ _ Hij).
+  intros v; split; [ intros Hv | easy ].
+  destruct Hv as (Hvi, Hvj).
+  specialize (HEL₁ (v ⁄ ‖v‖)); simpl in HEL₁; simpl.
+  apply HEL₁.
+
 bbb.
 unfold equidecomposable.
 specialize (equidec_sphere_with_and_without_fixpoints 1 Rlt_0_1) as H.
