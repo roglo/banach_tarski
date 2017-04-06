@@ -5328,6 +5328,7 @@ split.
          now simpl in Hv.
 
          assert (H : xtransl r E₁ ⊂ sphere 1) by now intros u Hu; apply HAL₂.
+bbb.
          clear HAL₂; rename H into HAL₂; move HAL₂ before HAL₁.
          exfalso; clear - HAL₁ HAL₂ Hr Hv.
 bbb.
