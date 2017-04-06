@@ -5264,6 +5264,8 @@ split.
    assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
    now rewrite <- He, map_nth, Hf in Hvi, Hvj; simpl in Hvi, Hvj.
 
+  idtac.
+bbb.
   clear HEL₁ HEL₂.
   subst EL'₁ EL'₂.
   revert EL₂ Ha.
