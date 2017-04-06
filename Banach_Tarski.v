@@ -5248,29 +5248,21 @@ split.
         apply Rinv_neq_0_compat; lra.
 
      idtac.
-bbb.
-  Hv : v ⁄ ‖v‖ ∉ D
-  ============================
-  v ∉ D
-bbb.
-     apply on_sphere_in_ball with (r := ‖v‖); [ lra | ].
-     apply on_sphere_norm; [ lra | easy ].
-
      clear - Hf Hv.
-     induction EL₁ as [| E₁ EL₁]; [ easy | simpl in Hv ].
-     destruct Hv as [Hv| Hv]; [ | now apply IHEL₁ ].
+     induction EL₂ as [| E EL]; [ easy | ].
+     destruct Hv as [Hv| Hv]; [ | apply IHEL, Hv ].
      rewrite Hf in Hv; simpl in Hv.
      apply vec_norm_neq_0; lra.
 
-  intros i j Hij.
-  destruct HEL₁ as (Hs₁ & HEL₁).
-  specialize (HEL₁ _ _ Hij).
-  intros v; split; [ intros Hv | easy ].
-  destruct Hv as (Hvi, Hvj).
-  specialize (HEL₁ (v ⁄ ‖v‖)); simpl in HEL₁; simpl.
-  apply HEL₁.
-  assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
-  now rewrite <- He, map_nth, Hf in Hvi, Hvj; simpl in Hvi, Hvj.
+   intros i j Hij.
+   destruct HEL₂ as (Hs₂ & HEL₂).
+   specialize (HEL₂ _ _ Hij).
+   intros v; split; [ intros Hv | easy ].
+   destruct Hv as (Hvi, Hvj).
+   specialize (HEL₂ (v ⁄ ‖v‖)); simpl in HEL₂; simpl.
+   apply HEL₂.
+   assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
+   now rewrite <- He, map_nth, Hf in Hvi, Hvj; simpl in Hvi, Hvj.
 
 bbb.
      clear - Hs₂ Hvv Hv Hr.
