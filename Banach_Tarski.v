@@ -5295,6 +5295,36 @@ split.
      constructor.
       apply Forall_inv in HAL₁.
       apply Forall_inv in HAL₂.
+      exists g; intros v.
+      split; intros Hv.
+      rewrite Hf in Hv |-*; simpl in Hv |-*.
+      destruct g as [M HM| r | ].
+       simpl in Hg, Hv; simpl.
+       rewrite <- Hg; simpl.
+       destruct Hv as (u & (Hu & Hue) & Hmu).
+       assert (Hnu : ‖(M * u)‖ = ‖u‖).
+        clear - HM.
+        destruct u as (x, y, z); simpl; f_equal.
+        destruct HM as (Htr & Hdet).
+        destruct M; simpl in *.
+        unfold mat_mul, mat_id, mkrmat in Htr; simpl in Htr.
+        unfold mat_det in Hdet; simpl in Hdet.
+        injection Htr; clear Htr; intros.
+        Time nsatz.
+
+        split; [ now rewrite <- Hmu, Hnu | ].
+        exists (u ⁄ ‖u‖).
+        split; [ easy | ].
+        rewrite mat_vec_mul_const_distr.
+        rewrite Hmu; f_equal; f_equal.
+        now rewrite <- Hmu.
+
+       destruct v as (xv, yv, zv).
+       simpl in Hv; simpl.
+       destruct Hv as (Hv1 & Hv2).
+       apply HAL₁ in Hv2.
+       remember (√ ((xv - r)² + yv² + zv²)) as r2 eqn:Hr2.
+       split.
 bbb.
 
 (* return *)
