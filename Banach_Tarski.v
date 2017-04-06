@@ -5264,17 +5264,44 @@ split.
    assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
    now rewrite <- He, map_nth, Hf in Hvi, Hvj; simpl in Hvi, Hvj.
 
-  idtac.
-bbb.
-  clear HEL₁ HEL₂.
-  subst EL'₁ EL'₂.
-  revert EL₂ Ha.
-  induction EL₁ as [| E₁ EL₁]; intros.
-   now destruct EL₂ as [| E₂ EL₂]; [ | apply Forall2_nil_cons in Ha ].
+  assert (HAL₁ : Forall (λ E, E ⊂ sphere 1) EL₁).
+   clear - HEL₁.
+   destruct HEL₁ as (HU, HI).
+   apply Forall_forall; intros E HE.
+   rewrite HU; clear - HE.
+   induction EL₁ as [| E₁ EL]; [ easy | simpl in HE ].
+   destruct HE as [HE| HE]; [ now subst E₁; left | ].
+   intros v Hv; right; revert v Hv.
+   apply IHEL, HE.
 
-   induction EL₂ as [| E₂ EL₂]; [ now apply Forall2_cons_nil in Ha | simpl ].
-   apply Forall2_cons_cons in Ha; destruct Ha as ((g & Hg) & Ha).
-   constructor; [ | apply IHEL₁, Ha ].
+   assert (HAL₂ : Forall (λ E, E ⊂ sphere 1 ∖ D) EL₂).
+    clear - HEL₂.
+    destruct HEL₂ as (HU, HI).
+    apply Forall_forall; intros E HE.
+    rewrite HU; clear - HE.
+    induction EL₂ as [| E₁ EL]; [ easy | simpl in HE ].
+    destruct HE as [HE| HE]; [ now subst E₁; left | ].
+    right; revert H.
+    apply IHEL, HE.
+
+    clear HEL₁ HEL₂.
+    subst EL'₁ EL'₂.
+    revert EL₂ Ha HAL₁ HAL₂.
+    induction EL₁ as [| E₁ EL₁]; intros.
+     now destruct EL₂ as [| E₂ EL₂]; [ | apply Forall2_nil_cons in Ha ].
+
+     destruct EL₂ as [| E₂ EL₂]; [ now apply Forall2_cons_nil in Ha | simpl ].
+     apply Forall2_cons_cons in Ha; destruct Ha as ((g & Hg) & Ha).
+     constructor.
+      apply Forall_inv in HAL₁.
+      apply Forall_inv in HAL₂.
+bbb.
+
+(* return *)
+Focus 2.
+      apply Forall_inv2 in HAL₁.
+      apply Forall_inv2 in HAL₂.
+      now apply IHEL₁.
 bbb.
    exists g; intros v.
    split; intros Hv.
