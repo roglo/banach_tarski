@@ -5276,9 +5276,9 @@ split.
     exists g; intros v.
     split; intros Hv.
      rewrite Hf in Hv |-*; simpl in Hv |-*.
-     rewrite <- Hg.
      destruct g as [M HM| r | ].
       simpl in Hg, Hv; simpl.
+      rewrite <- Hg; simpl.
       destruct Hv as (u & (Hu & Hue) & Hmu).
       assert (Hnu : ‖(M * u)‖ = ‖u‖).
        clear - HM.
@@ -5297,7 +5297,11 @@ split.
        rewrite Hmu; f_equal; f_equal.
        now rewrite <- Hmu.
 
-      idtac.
+      simpl in Hg.
+      destruct v as (xv, yv, zv).
+      simpl in Hv; simpl.
+      destruct Hv as (Hv1 & Hv2).
+      split.
 bbb.
 
 (* return *)
