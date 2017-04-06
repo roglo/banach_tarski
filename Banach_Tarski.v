@@ -5297,34 +5297,53 @@ split.
       apply Forall_inv in HAL₂.
       exists g; intros v.
       split; intros Hv.
-      rewrite Hf in Hv |-*; simpl in Hv |-*.
-      destruct g as [M HM| r | ].
-       simpl in Hg, Hv; simpl.
-       rewrite <- Hg; simpl.
-       destruct Hv as (u & (Hu & Hue) & Hmu).
-       assert (Hnu : ‖(M * u)‖ = ‖u‖).
-        clear - HM.
-        destruct u as (x, y, z); simpl; f_equal.
-        destruct HM as (Htr & Hdet).
-        destruct M; simpl in *.
-        unfold mat_mul, mat_id, mkrmat in Htr; simpl in Htr.
-        unfold mat_det in Hdet; simpl in Hdet.
-        injection Htr; clear Htr; intros.
-        Time nsatz.
+       rewrite Hf in Hv |-*; simpl in Hv |-*.
+       destruct g as [M HM| r | ].
+        simpl in Hg, Hv; simpl.
+        rewrite <- Hg; simpl.
+        destruct Hv as (u & (Hu & Hue) & Hmu).
+        assert (Hnu : ‖(M * u)‖ = ‖u‖).
+         clear - HM.
+         destruct u as (x, y, z); simpl; f_equal.
+         destruct HM as (Htr & Hdet).
+         destruct M; simpl in *.
+         unfold mat_mul, mat_id, mkrmat in Htr; simpl in Htr.
+         unfold mat_det in Hdet; simpl in Hdet.
+         injection Htr; clear Htr; intros.
+         Time nsatz.
 
-        split; [ now rewrite <- Hmu, Hnu | ].
-        exists (u ⁄ ‖u‖).
-        split; [ easy | ].
-        rewrite mat_vec_mul_const_distr.
-        rewrite Hmu; f_equal; f_equal.
-        now rewrite <- Hmu.
+         split; [ now rewrite <- Hmu, Hnu | ].
+         exists (u ⁄ ‖u‖).
+         split; [ easy | ].
+         rewrite mat_vec_mul_const_distr.
+         rewrite Hmu; f_equal; f_equal.
+         now rewrite <- Hmu.
 
-       destruct v as (xv, yv, zv).
-       simpl in Hv; simpl.
-       destruct Hv as (Hv1 & Hv2).
-       apply HAL₁ in Hv2.
-       remember (√ ((xv - r)² + yv² + zv²)) as r2 eqn:Hr2.
-       split.
+        exfalso.
+        simpl in Hg.
+        rewrite <- Hg in HAL₂.
+bbb.
+        destruct v as (xv, yv, zv).
+        simpl in Hv; simpl.
+        destruct Hv as (Hv1 & Hv2).
+        apply HAL₁ in Hv2.
+        remember (√ ((xv - r)² + yv² + zv²)) as r2 eqn:Hr2.
+        split.
+clear Hv2.
+apply (f_equal Rsqr) in Hr2.
+rewrite Rsqr_sqrt in Hr2; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rsqr_minus in Hr2.
+replace (xv² + yv² + zv²) with (r2² + 2 * xv * r - r²) by lra.
+simpl in Hg.
+(*
+         simpl in Hv2.
+         do 3 rewrite Rsqr_mult in Hv2.
+         do 2 rewrite <- Rmult_plus_distr_l in Hv2.
+         apply (f_equal Rsqr) in Hr2.
+         rewrite Rsqr_sqrt in Hr2; [ | apply nonneg_sqr_vec_norm ].
+         rewrite Rsqr_inv in Hv2; [ | lra ].
+         rewrite <- Hr2 in Hv2.
+*)
 bbb.
 
 (* return *)
