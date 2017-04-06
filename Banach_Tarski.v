@@ -5264,6 +5264,26 @@ split.
    assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
    now rewrite <- He, map_nth, Hf in Hvi, Hvj; simpl in Hvi, Hvj.
 
+  clear HEL₁ HEL₂.
+  subst EL'₁ EL'₂.
+  revert EL₂ Ha.
+  induction EL₁ as [| E₁ EL₁]; intros.
+   now destruct EL₂ as [| E₂ EL₂]; [ | apply Forall2_nil_cons in Ha ].
+
+   destruct EL₂ as [| E₂ EL₂]; [ now apply Forall2_cons_nil in Ha | simpl ].
+   apply Forall2_cons_cons in Ha; destruct Ha as ((g & Hg) & Ha).
+   constructor.
+    exists g; intros v.
+    split; intros Hv.
+     rewrite Hf in Hv |-*; simpl in Hv |-*.
+     rewrite <- Hg.
+     destruct g as [M HM| | ].
+      simpl in Hg, Hv; simpl.
+      destruct Hv as (u & (Hu & Hue) & Hmu).
+      split.
+       rewrite <- Hmu.
+Search (‖(_ * _)‖).
+
 bbb.
      clear - Hs₂ Hvv Hv Hr.
      revert v Hvv Hv Hr.
