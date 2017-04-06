@@ -5270,38 +5270,39 @@ split.
   induction EL₁ as [| E₁ EL₁]; intros.
    now destruct EL₂ as [| E₂ EL₂]; [ | apply Forall2_nil_cons in Ha ].
 
-   destruct EL₂ as [| E₂ EL₂]; [ now apply Forall2_cons_nil in Ha | simpl ].
+   induction EL₂ as [| E₂ EL₂]; [ now apply Forall2_cons_nil in Ha | simpl ].
    apply Forall2_cons_cons in Ha; destruct Ha as ((g & Hg) & Ha).
-   constructor.
-    exists g; intros v.
-    split; intros Hv.
-     rewrite Hf in Hv |-*; simpl in Hv |-*.
-     destruct g as [M HM| r | ].
-      simpl in Hg, Hv; simpl.
-      rewrite <- Hg; simpl.
-      destruct Hv as (u & (Hu & Hue) & Hmu).
-      assert (Hnu : ‖(M * u)‖ = ‖u‖).
-       clear - HM.
-       destruct u as (x, y, z); simpl; f_equal.
-       destruct HM as (Htr & Hdet).
-       destruct M; simpl in *.
-       unfold mat_mul, mat_id, mkrmat in Htr; simpl in Htr.
-       unfold mat_det in Hdet; simpl in Hdet.
-       injection Htr; clear Htr; intros.
-       Time nsatz.
+   constructor; [ | apply IHEL₁, Ha ].
+bbb.
+   exists g; intros v.
+   split; intros Hv.
+    rewrite Hf in Hv |-*; simpl in Hv |-*.
+    destruct g as [M HM| r | ].
+     simpl in Hg, Hv; simpl.
+     rewrite <- Hg; simpl.
+     destruct Hv as (u & (Hu & Hue) & Hmu).
+     assert (Hnu : ‖(M * u)‖ = ‖u‖).
+      clear - HM.
+      destruct u as (x, y, z); simpl; f_equal.
+      destruct HM as (Htr & Hdet).
+      destruct M; simpl in *.
+      unfold mat_mul, mat_id, mkrmat in Htr; simpl in Htr.
+      unfold mat_det in Hdet; simpl in Hdet.
+      injection Htr; clear Htr; intros.
+      Time nsatz.
 
-       split; [ now rewrite <- Hmu, Hnu | ].
-       exists (u ⁄ ‖u‖).
-       split; [ easy | ].
-       rewrite mat_vec_mul_const_distr.
-       rewrite Hmu; f_equal; f_equal.
-       now rewrite <- Hmu.
+      split; [ now rewrite <- Hmu, Hnu | ].
+      exists (u ⁄ ‖u‖).
+      split; [ easy | ].
+      rewrite mat_vec_mul_const_distr.
+      rewrite Hmu; f_equal; f_equal.
+      now rewrite <- Hmu.
 
-      simpl in Hg.
-      destruct v as (xv, yv, zv).
-      simpl in Hv; simpl.
-      destruct Hv as (Hv1 & Hv2).
-      split.
+     simpl in Hg.
+     destruct v as (xv, yv, zv).
+     simpl in Hv; simpl.
+     destruct Hv as (Hv1 & Hv2).
+     split.
 bbb.
 
 (* return *)
