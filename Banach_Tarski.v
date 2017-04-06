@@ -5319,31 +5319,21 @@ split.
          rewrite Hmu; f_equal; f_equal.
          now rewrite <- Hmu.
 
-        exfalso.
         simpl in Hg.
         rewrite <- Hg in HAL₂.
+        destruct (Req_dec r 0) as [Hr| Hr].
+         subst r.
+         rewrite xtransl_0 in Hg; rewrite <- Hg.
+         rewrite Xtransl_0 in Hv.
+         now simpl in Hv.
+
+         assert (H : xtransl r E₁ ⊂ sphere 1) by now intros u Hu; apply HAL₂.
+         clear HAL₂; rename H into HAL₂; move HAL₂ before HAL₁.
+         exfalso; clear - HAL₁ HAL₂ Hr Hv.
 bbb.
-        destruct v as (xv, yv, zv).
-        simpl in Hv; simpl.
-        destruct Hv as (Hv1 & Hv2).
-        apply HAL₁ in Hv2.
-        remember (√ ((xv - r)² + yv² + zv²)) as r2 eqn:Hr2.
-        split.
-clear Hv2.
-apply (f_equal Rsqr) in Hr2.
-rewrite Rsqr_sqrt in Hr2; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_minus in Hr2.
-replace (xv² + yv² + zv²) with (r2² + 2 * xv * r - r²) by lra.
-simpl in Hg.
-(*
-         simpl in Hv2.
-         do 3 rewrite Rsqr_mult in Hv2.
-         do 2 rewrite <- Rmult_plus_distr_l in Hv2.
-         apply (f_equal Rsqr) in Hr2.
-         rewrite Rsqr_sqrt in Hr2; [ | apply nonneg_sqr_vec_norm ].
-         rewrite Rsqr_inv in Hv2; [ | lra ].
-         rewrite <- Hr2 in Hv2.
-*)
+
+Search (_ ⊂ _ ∖ _).
+
 bbb.
 
 (* return *)

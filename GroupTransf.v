@@ -64,6 +64,9 @@ intros; intros (x, y, z); simpl.
 now unfold Rminus; rewrite Ropp_0, Rplus_0_r.
 Qed.
 
+Theorem Xtransl_0 : ∀ E, (app_gr (Xtransl 0) E = E)%S.
+Proof. now intros E; simpl; rewrite xtransl_0. Qed.
+
 Theorem xtransl_xtransl : ∀ E dx dy,
   (xtransl dx (xtransl dy E) = xtransl (dx + dy) E)%S.
 Proof.
