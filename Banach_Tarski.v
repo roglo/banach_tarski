@@ -5068,6 +5068,24 @@ intros H; apply Hv; rewrite H.
 apply sqrt_0.
 Qed.
 
+Theorem vec_const_mul_in_D : ∀ v r, r ≠ 0 → v ∈ D → r ⁎ v ∈ D.
+Proof.
+intros * Hr Hv.
+destruct Hv as (el & u & (Hso & Hnl & Hru)); simpl.
+exists el, (r ⁎ u).
+split.
+ destruct Hso as (el₁ & Hso).
+ exists el₁.
+ rewrite rotate_vec_mul in Hso |-*.
+ rewrite mat_vec_mul_const_distr.
+ now f_equal.
+
+ split; [ easy | ].
+ rewrite rotate_vec_mul in Hru |-*.
+ rewrite mat_vec_mul_const_distr.
+ now f_equal.
+Qed.
+
 Definition ball_but_center :=
   mkset (λ p, p ∈ ball ∧ p ≠ 0%vec).
 Definition ball_but_center_but_fixpoints :=
@@ -5147,22 +5165,12 @@ split.
     specialize (in_unit_sphere v Hv) as Hvu.
     assert (Hvv : v ⁄ ‖v‖ ∈ sphere 1 ∖ D).
      split; [ easy | ].
-     intros Hvv; apply HrD.
-     destruct Hvv as (el & u & (Hso & Hnl & Hru)); simpl.
-     exists el, (‖v‖ ⁎ u).
-     split.
-      destruct Hso as (el₁ & Hso).
-      exists el₁.
-      rewrite rotate_vec_mul in Hso |-*.
-      rewrite mat_vec_mul_const_distr in Hso.
-      rewrite <- Hso, vec_const_mul_assoc.
-      rewrite Rinv_r; [ | now apply vec_norm_neq_0 ].
-      now rewrite vec_const_mul_1_l.
-
-      split; [ easy | ].
-      rewrite rotate_vec_mul in Hru |-*.
-      rewrite mat_vec_mul_const_distr.
-      now f_equal.
+     intros H; apply HrD.
+     apply vec_norm_neq_0 in Hv.
+     apply (vec_const_mul_in_D _ ‖v‖) in H; [ | easy ].
+     rewrite vec_const_mul_assoc in H.
+     rewrite Rinv_r in H; [ | easy ].
+     now rewrite vec_const_mul_1_l in H.
 
      rewrite Hs₂ in Hvv.
      clear - Hf Hvv Hv Hr.
@@ -5209,6 +5217,41 @@ split.
         now rewrite Hs₂.
 
        assert (He : (f ∅ = ∅)%S) by now rewrite Hf; intros u; simpl.
+       assert (Hfu : (f (⋃ EL₂) = ⋃ map f EL₂)%S).
+        intros u.
+        split; intros H.
+         clear - Hf He H.
+         induction EL₂ as [| E EL]; [ now simpl in H; rewrite He in H | ].
+         simpl in H; simpl.
+         rewrite Hf in H; simpl in H.
+         destruct H as (Hvi & Hu).
+         destruct Hu as [Hu| Hu]; [ now left; rewrite Hf; simpl | ].
+         now right; apply IHEL; rewrite Hf; simpl.
+
+         clear - Hf He H.
+         induction EL₂ as [| E EL]; [ easy | ].
+         simpl in H; simpl.
+         destruct H as [Hv| Hv].
+          rewrite Hf in Hv |-*; simpl in Hv |-*.
+          now split; [ | left ].
+
+          specialize (IHEL Hv).
+          rewrite Hf in IHEL |-*; simpl in IHEL |-*.
+          split; [ easy | now right ].
+
+        rewrite <- Hfu in Hv.
+        rewrite Hf in Hv; simpl in Hv.
+        rewrite <- Hs₂ in Hv.
+        destruct Hv as (Hvi & _ & Hv).
+        intros H; apply Hv.
+        apply (vec_const_mul_in_D _ (/ ‖v‖)) in H; [ easy | ].
+        apply Rinv_neq_0_compat; lra.
+
+     idtac.
+bbb.
+  Hv : v ⁄ ‖v‖ ∉ D
+  ============================
+  v ∉ D
 bbb.
      apply on_sphere_in_ball with (r := ‖v‖); [ lra | ].
      apply on_sphere_norm; [ lra | easy ].
