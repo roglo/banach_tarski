@@ -5085,13 +5085,12 @@ Qed.
 
 Definition ball_but_center :=
   mkset (λ p, p ∈ ball ∧ p ≠ 0%vec).
-Definition ball_but_center_but_fixpoints :=
-  mkset (λ p, p ∈ ball_but_fixpoints ∧ p ≠ 0%vec).
 
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
-  equidecomposable ball_but_center ball_but_center_but_fixpoints.
+  equidecomposable ball_but_center (ball_but_center ∖ D).
 Proof.
 remember (sphere 1) as S₂ eqn:HS₂.
+remember ball_but_center as S₃ eqn:HS₃.
 assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
  specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
  specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
@@ -5151,11 +5150,10 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
     split; [ easy | ].
     now rewrite rotate_vec_mul, mat_vec_mul_0_r.
 
-bbb.
    remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
-   remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((ρ ^ n)%mat * p₀)%vec))
+   remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₃ ∧ p = ((ρ ^ n)%mat * p₀)%vec))
      as E eqn:HE.
-   assert (Hpart : is_partition S₂ [E; S₂ ∖ E]).
+   assert (Hpart : is_partition S₃ [E; S₃ ∖ E]).
     split.
      simpl; rewrite union_empty_r.
      split; intros H.
@@ -5165,7 +5163,8 @@ bbb.
       destruct H as [H| H]; [ | now destruct H ].
       rewrite HE in H; simpl in H.
       destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
-      subst S₂ v.
+      subst S₃ v.
+bbb.
       apply on_sphere_after_rotation; [ easy | ].
       apply mat_pow_is_rotation_matrix; rewrite Hρ.
       now apply matrix_of_axis_angle_is_rotation_matrix.
