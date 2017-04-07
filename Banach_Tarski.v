@@ -5119,27 +5119,19 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
    apply sphere_sym_neg_vec in HD.
    destruct HD as (el & p₁ & Hso & Hnl & Hel).
    rewrite rotate_vec_mul in Hel.
-bbb.
-   exists el, (p₁ ⁄ r).
+   exists el, p₁.
    split.
     destruct Hso as (el₁ & Hel₁).
     rewrite rotate_vec_mul in Hel₁.
     exists el₁.
-    rewrite rotate_vec_mul, <- Hel₁.
-    rewrite vec_opp_const_mul_distr_r.
-    rewrite mat_vec_mul_const_distr.
-    rewrite vec_const_mul_assoc.
-    rewrite Rinv_l; [ | lra ].
-    now rewrite vec_const_mul_1_l.
+    now rewrite rotate_vec_mul, <- Hel₁.
 
     split; [ easy | ].
     rewrite rotate_vec_mul.
-    rewrite mat_vec_mul_const_distr.
     now f_equal.
 
    specialize (Hdnc p H) as (n, Hdnc).
    revert Hdnc; apply Hp.
-bbb.
 
  destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
  assert (∃ s c, s² + c² = 1 ∧ (s, c) ∉ J p₁) as (s & c & Hsc & Hj).
@@ -5159,6 +5151,7 @@ bbb.
     split; [ easy | ].
     now rewrite rotate_vec_mul, mat_vec_mul_0_r.
 
+bbb.
    remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
    remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((ρ ^ n)%mat * p₀)%vec))
      as E eqn:HE.
