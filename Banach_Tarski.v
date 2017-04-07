@@ -4746,6 +4746,15 @@ split.
  now rewrite H.
 Qed.
 
+Definition equidecomposable_with E₁ E₂ P₁ P₂ gl :=
+  is_partition E₁ P₁
+  ∧ is_partition E₂ P₂
+  ∧ ∀ i,
+     (0 <= i < length gl)%nat
+     → (app_gr (List.nth i gl gr_ident) P₁.[i] = P₂.[i])%S.
+
+bbb.
+
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ r,
   0 < r
   → equidecomposable (sphere r) (sphere r ∖ D).
@@ -4834,9 +4843,6 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
     now rewrite rotate_vec_mul, mat_vec_mul_0_r.
 
    remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
-(*
-   remember (sphere ‖p₁‖) as S₂ eqn:HS₂.
-*)
    remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((ρ ^ n)%mat * p₀)%vec))
      as E eqn:HE.
    assert (Hpart : is_partition S₂ [E; S₂ ∖ E]).
