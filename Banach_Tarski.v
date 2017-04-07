@@ -4749,8 +4749,10 @@ Qed.
 Definition equidecomposable_with E₁ E₂ P₁ P₂ gl :=
   is_partition E₁ P₁
   ∧ is_partition E₂ P₂
+  ∧ length P₁ = length gl
+  ∧ length P₂ = length gl
   ∧ ∀ i,
-     (0 <= i < length gl)%nat
+     (i < length gl)%nat
      → (app_gr (List.nth i gl gr_ident) P₁.[i] = P₂.[i])%S.
 
 bbb.
