@@ -5352,6 +5352,9 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
          remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
          remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
          exists s₀, c₀.
+Print J₀.
+(* I must make a version of J₀ for the ball, not only for the sphere *)
+bbb.
          split.
           split; [ subst s₀ c₀; apply sin2_cos2 | ].
           remember (matrix_of_axis_angle (p'₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
