@@ -4746,6 +4746,29 @@ split.
  now rewrite H.
 Qed.
 
+Print equidecomposable.
+
+Definition equidecomposable_with E₁ E₂ P₁ P₂ :=
+  is_partition E₁ P₁
+  ∧ is_partition E₂ P₂
+  ∧ length P₁ = length P₂
+  ∧ ∃ gl, ∀ i,
+     (i < length P₁)%nat
+     → (app_gr (List.nth i gl gr_ident) P₁.[i] = P₂.[i])%S.
+
+Theorem equidec_wih_sphere_with_and_without_fixpoints : ∀ r, 0 < r →
+  ∀ p₁ s c ρ E ρE,
+  p₁ ∈ sphere r ∖ D ∧ (- p₁)%vec ∈ sphere r ∖ D
+  → s² + c² = 1 ∧ (s, c) ∉ J p₁
+  → ρ = matrix_of_axis_angle (p₁, s, c)
+  → E = mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ sphere r ∧ p = ((ρ ^ n)%mat * p₀)%vec)
+  → ρE = mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)
+  → equidecomposable_with (sphere r) (sphere r ∖ D)
+       [E; sphere r ∖ E] [ρE; sphere r ∖ E].
+Proof.
+intros * Hr * Hp₁ Hsc Hρ HE HρE.
+bbb.
+
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ r,
   0 < r
   → equidecomposable (sphere r) (sphere r ∖ D).
@@ -5354,6 +5377,7 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
          exists s₀, c₀.
 Print J₀.
 (* I must make a version of J₀ for the ball, not only for the sphere *)
+(* pfff.... *)
 bbb.
          split.
           split; [ subst s₀ c₀; apply sin2_cos2 | ].
