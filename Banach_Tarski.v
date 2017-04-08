@@ -5085,30 +5085,50 @@ Qed.
 
 Definition ball_but_center := ball ∖ mkset (λ p, p = 0%vec).
 
-Theorem on_ball_but_center_after_rotation : ∀ p M,
+Theorem sphere_ball_but_center : ∀ p,
+   (∃ r, 0 < r ≤ 1 ∧ p ∈ sphere r) ↔ p ∈ ball_but_center.
+Proof.
+intros (x, y, z); simpl.
+split.
+ intros (r & Hr & Hs); rewrite Hs.
+ replace 1 with 1² by apply Rsqr_1.
+ split.
+  apply Rsqr_incr_1; [ easy | lra | lra ].
+
+  intros H; injection H; clear H; intros Hz Hy Hx.
+  subst x y z; rewrite Rsqr_0 in Hs.
+  do 2 rewrite Rplus_0_r in Hs.
+  symmetry in Hs; apply Rsqr_eq_0 in Hs; lra.
+
+ intros (Hle & Hnz).
+ exists (√ (x² + y² + z²)).
+ split.
+  split.
+   apply Rnot_le_lt; intros H1.
+   specialize (sqrt_pos (x² + y² + z²)) as H2.
+   apply Rle_antisym in H2; [ | easy ].
+   apply sqrt_eq_0 in H2; [ | apply nonneg_sqr_vec_norm ].
+   apply sqr_vec_norm_eq_0 in H2.
+   now destruct H2 as (Hx & Hy & Hz); subst x y z.
+
+   apply sqrt_le_1_alt in Hle.
+   now rewrite sqrt_1 in Hle.
+
+  rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+Qed.
+
+Theorem in_ball_but_center_after_rotation : ∀ p M,
   p ∈ ball_but_center
   → is_rotation_matrix M
   → mat_vec_mul M p ∈ ball_but_center.
 Proof.
 intros * His HM.
-destruct p as (x, y, z).
-unfold ball_but_center in His; simpl in His.
-unfold ball_but_center; simpl.
-unfold is_rotation_matrix in HM.
-destruct HM as (Htr, Hdet).
-unfold mat_det in Hdet.
-unfold mat_mul, mat_id in Htr; simpl in Htr.
-injection Htr; clear Htr; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-destruct His as (Hle, Hnz).
-split.
- Focus 2.
- intros H; apply Hnz; clear Hnz.
- injection H; clear H; intros Hz Hy Hx.
- clear H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉ Hle.
- Time f_equal; nsatz.
-
-bbb.
- nsatz.
+apply sphere_ball_but_center in His.
+destruct His as (r & Hr & Hs).
+apply sphere_ball_but_center.
+exists r.
+split; [ easy | ].
+now apply on_sphere_after_rotation.
 Qed.
 
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
@@ -5189,9 +5209,7 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
       rewrite HE in H; simpl in H.
       destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
       subst S₃ v.
-About on_sphere_after_rotation.
-bbb.
-      apply on_sphere_after_rotation; [ easy | ].
+      apply in_ball_but_center_after_rotation; [ easy | ].
       apply mat_pow_is_rotation_matrix; rewrite Hρ.
       now apply matrix_of_axis_angle_is_rotation_matrix.
 
@@ -5226,14 +5244,14 @@ bbb.
          apply intersection_empty_l.
 
     remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
-    assert (Hdec : equidecomposable S₂ (ρE ∪ (S₂ ∖ E))).
+    assert (Hdec : equidecomposable S₃ (ρE ∪ (S₃ ∖ E))).
      unfold equidecomposable.
-     exists [E; S₂ ∖ E], [ρE; S₂ ∖ E].
+     exists [E; S₃ ∖ E], [ρE; S₃ ∖ E].
      split; [ easy | ].
      split.
       split; [ now simpl; rewrite union_empty_r | ].
       intros i j Hij.
-      assert (H : (ρE ∩ (S₂ ∖ E) = ∅)%S).
+      assert (H : (ρE ∩ (S₃ ∖ E) = ∅)%S).
        split; intros H; [ | easy ].
        simpl in H.
        destruct H as (HxρE & HxS₂ & HxnE).
@@ -5328,9 +5346,18 @@ bbb.
          split; [ subst s₀ c₀; apply sin2_cos2 | ].
          remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
          remember D as d; remember sphere as sph; simpl; subst d sph.
+(*
          assert (Hpr : ‖p₁‖ = r) by now apply on_sphere_norm; [ lra | subst ].
          rewrite Hpr, <- HS₂.
+*)
+assert (Hpr : ‖p₁‖ = ‖p₀‖).
+apply on_sphere_norm; [ apply vec_norm_nonneg | ].
+bbb.
+
          exists p₀, v.
+split.
+ split; [ easy | ].
+bbb.
          split; [ easy | ].
          split.
           split; [ easy | ].
