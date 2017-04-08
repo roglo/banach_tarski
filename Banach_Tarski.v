@@ -4746,12 +4746,10 @@ split.
  now rewrite H.
 Qed.
 
-Print equidecomposable.
-
 Definition equidecomposable_with E₁ E₂ P₁ P₂ :=
-  is_partition E₁ P₁
+  length P₁ = length P₂
+  ∧ is_partition E₁ P₁
   ∧ is_partition E₂ P₂
-  ∧ length P₁ = length P₂
   ∧ ∃ gl, ∀ i,
      (i < length P₁)%nat
      → (app_gr (List.nth i gl gr_ident) P₁.[i] = P₂.[i])%S.
@@ -4766,7 +4764,61 @@ Theorem equidec_wih_sphere_with_and_without_fixpoints : ∀ r, 0 < r →
   → equidecomposable_with (sphere r) (sphere r ∖ D)
        [E; sphere r ∖ E] [ρE; sphere r ∖ E].
 Proof.
-intros * Hr * Hp₁ Hsc Hρ HE HρE.
+intros * Hr * ((Hp₁s & Hp₁d) & (Hnp₁s & Hnp₁d))  Hsc Hρ HE HρE.
+unfold equidecomposable_with.
+assert (Hp₁z : p₁ ≠ 0%vec).
+ intros H; rewrite H in Hp₁s; simpl in Hp₁s.
+ rewrite Rsqr_0, Rplus_0_l, Rplus_0_l in Hp₁s.
+ symmetry in Hp₁s; apply Rsqr_eq_0 in Hp₁s; lra.
+
+ split; [ easy | ].
+ split.
+  split.
+   simpl; rewrite union_empty_r.
+   split; intros H.
+    now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
+
+    rename x into v.
+    destruct H as [H| H]; [ | now destruct H ].
+    rewrite HE in H; simpl in H.
+    destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
+    subst v.
+    apply on_sphere_after_rotation; [ easy | ].
+    apply mat_pow_is_rotation_matrix; rewrite Hρ.
+    now apply matrix_of_axis_angle_is_rotation_matrix.
+
+   intros i j Hij.
+   destruct i.
+    destruct j; [ easy | ].
+    destruct j.
+     intros v.
+     now split; intros Hv; [ simpl in Hv | ].
+
+     simpl; rewrite match_id.
+     apply intersection_empty_r.
+
+    destruct j.
+     destruct i.
+      intros v.
+      now split; intros Hv; [ simpl in Hv | ].
+
+      simpl; rewrite match_id.
+      apply intersection_empty_l.
+
+     destruct i.
+      destruct j; [ easy | ].
+      simpl; rewrite match_id.
+      apply intersection_empty_r.
+
+      destruct j.
+       simpl; rewrite match_id.
+       apply intersection_empty_l.
+
+       simpl; do 2 rewrite match_id.
+       apply intersection_empty_l.
+
+  split.
+
 bbb.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ r,
