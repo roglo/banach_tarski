@@ -5336,25 +5336,31 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
         rewrite Hu in Hv.
         rewrite <- mat_vec_mul_assoc in Hv.
         replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
-Print matrix_of_axis_angle.
-(* should change p₁ into p₁⁄‖p₁‖⁎‖p₀‖ in Hρ to ensure equality on norms;
-   possible because the norms of p₀ and p₁ are non nul;
-   make a lemma to prove it *)
-bbb.
-        apply Hj; clear Hj; unfold J.
-        remember J₀ as a; simpl; subst a.
-        remember (angle_of_sin_cos s c) as θ eqn:Hθ.
-        remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
-        remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
-        exists s₀, c₀.
-        split.
-         split; [ subst s₀ c₀; apply sin2_cos2 | ].
-         remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
-         remember D as d; remember sphere as sph; simpl; subst d sph.
+        assert (Hpp : 0 < ‖p₀‖ / ‖p₁‖).
+         apply Rdiv_lt_0_compat; apply vec_norm_pos; [ | easy ].
+         intros H.
+         rewrite HS₃ in Hp₀S.
+         now unfold ball_but_center in Hp₀S; simpl in Hp₀S.
+
+         rewrite matrix_mul_axis with (k := ‖p₀‖ / ‖p₁‖) in Hρ; [ | lra ].
+         rewrite Rsign_of_pos in Hρ; [ | easy ].
+         rewrite Rmult_1_l in Hρ.
+         remember ((‖p₀‖ / ‖p₁‖) ⁎ p₁)%vec as p'₁ eqn:Hp'₁.
+         apply Hj; clear Hj; unfold J.
+         remember J₀ as a; simpl; subst a.
+         remember (angle_of_sin_cos s c) as θ eqn:Hθ.
+         remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
+         remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
+         exists s₀, c₀.
+         split.
+          split; [ subst s₀ c₀; apply sin2_cos2 | ].
+          remember (matrix_of_axis_angle (p'₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
+          remember D as d; remember sphere as sph; simpl; subst d sph.
 (*
          assert (Hpr : ‖p₁‖ = r) by now apply on_sphere_norm; [ lra | subst ].
          rewrite Hpr, <- HS₂.
 *)
+(*
 assert (Hpr : ‖p₀‖ = ‖p₁‖).
 apply on_sphere_norm; [ apply vec_norm_nonneg | ].
 Search p₀.
