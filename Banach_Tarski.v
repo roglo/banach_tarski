@@ -5329,8 +5329,6 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
         now rewrite mat_vec_mul_assoc, <- Hu.
 
         intros Hvn.
-        apply Hj; clear Hj; unfold J.
-        remember J₀ as a; simpl; subst a.
         rewrite HE in Hu.
         remember D as d; remember intersection as b.
         simpl in Hu; subst d b.
@@ -5338,6 +5336,13 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
         rewrite Hu in Hv.
         rewrite <- mat_vec_mul_assoc in Hv.
         replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
+Print matrix_of_axis_angle.
+(* should change p₁ into p₁⁄‖p₁‖⁎‖p₀‖ in Hρ to ensure equality on norms;
+   possible because the norms of p₀ and p₁ are non nul;
+   make a lemma to prove it *)
+bbb.
+        apply Hj; clear Hj; unfold J.
+        remember J₀ as a; simpl; subst a.
         remember (angle_of_sin_cos s c) as θ eqn:Hθ.
         remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
         remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
@@ -5350,10 +5355,12 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
          assert (Hpr : ‖p₁‖ = r) by now apply on_sphere_norm; [ lra | subst ].
          rewrite Hpr, <- HS₂.
 *)
-assert (Hpr : ‖p₁‖ = ‖p₀‖).
+assert (Hpr : ‖p₀‖ = ‖p₁‖).
 apply on_sphere_norm; [ apply vec_norm_nonneg | ].
+Search p₀.
+Search p₁.
 bbb.
-
+*)
          exists p₀, v.
 split.
  split; [ easy | ].
