@@ -5083,8 +5083,33 @@ split.
  now f_equal.
 Qed.
 
-Definition ball_but_center :=
-  mkset (λ p, p ∈ ball ∧ p ≠ 0%vec).
+Definition ball_but_center := ball ∖ mkset (λ p, p = 0%vec).
+
+Theorem on_ball_but_center_after_rotation : ∀ p M,
+  p ∈ ball_but_center
+  → is_rotation_matrix M
+  → mat_vec_mul M p ∈ ball_but_center.
+Proof.
+intros * His HM.
+destruct p as (x, y, z).
+unfold ball_but_center in His; simpl in His.
+unfold ball_but_center; simpl.
+unfold is_rotation_matrix in HM.
+destruct HM as (Htr, Hdet).
+unfold mat_det in Hdet.
+unfold mat_mul, mat_id in Htr; simpl in Htr.
+injection Htr; clear Htr; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+destruct His as (Hle, Hnz).
+split.
+ Focus 2.
+ intros H; apply Hnz; clear Hnz.
+ injection H; clear H; intros Hz Hy Hx.
+ clear H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉ Hle.
+ Time f_equal; nsatz.
+
+bbb.
+ nsatz.
+Qed.
 
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
   equidecomposable ball_but_center (ball_but_center ∖ D).
@@ -5164,6 +5189,7 @@ assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
       rewrite HE in H; simpl in H.
       destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
       subst S₃ v.
+About on_sphere_after_rotation.
 bbb.
       apply on_sphere_after_rotation; [ easy | ].
       apply mat_pow_is_rotation_matrix; rewrite Hρ.
