@@ -5268,10 +5268,15 @@ assert (Hp₁z : p₁ ≠ 0%vec).
         split; [ subst s₀ c₀; apply sin2_cos2 | ].
         remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
         remember D as d; remember sphere as sph; simpl; subst d sph.
-bbb.
+(*
         assert (Hpr : ‖p₁‖ = r) by now apply on_sphere_norm; [ lra | subst ].
         rewrite Hpr.
+*)
         exists p₀, v.
+        split.
+         split; [ now destruct Hp₀d | ].
+bbb.
+
         split; [ easy | ].
         split.
          split; [ easy | ].
