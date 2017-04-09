@@ -5052,7 +5052,64 @@ assert (H : ∃ p₁, p₁ ∈ sphere r ∖ D ∧ (- p₁)%vec ∈ sphere r ∖ 
     revert Hdnc; apply Hp.
 
  destruct H as (p₁ & Hp & Hq).
-Inspect 1.
+ assert (∃ s c, s² + c² = 1 ∧ (s, c) ∉ J p₁) as (s & c & Hsc & Hj).
+  destruct Hp as (Hps, Hpnd).
+  destruct Hq as (Hqs, Hqnd).
+  specialize (J_is_countable p₁ Hpnd Hqnd) as Hjc.
+  specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
+  exists s, c; split; [ easy | intros H ].
+  specialize (Hjc _ H) as (n, Hjc).
+  now specialize (Hn n).
+
+  remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
+  remember
+    (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ sphere r ∧ p = ((ρ ^ n)%mat * p₀)%vec))
+    as E eqn:HE.
+  remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
+  specialize
+    (equidec_wih_sphere_with_and_without_fixpoints r Hr p₁ s c ρ E ρE Hp Hq
+       Hsc Hj Hρ HE HρE)
+    as H.
+
+Theorem forall_Forall2 : ∀ A B (R : A → B → Prop) l l' d d',
+  (∀ i, (i < length l)%nat → R (List.nth i l d) (List.nth i l' d'))
+  → Forall2 R l l'.
+Proof.
+intros * Hfa.
+revert l' Hfa.
+induction l as [| x l]; intros.
+ destruct l' as [| x' l']; [ constructor | ].
+bbb.
+
+Theorem equidec_with_equidec : ∀ E₁ E₂ P₁ P₂,
+  equidecomposable_with E₁ E₂ P₁ P₂
+  → equidecomposable E₁ E₂.
+Proof.
+intros * Heq.
+exists P₁, P₂.
+destruct Heq as (Hlen & H₁ & H₂ & (gl & Hgl)).
+split; [ easy | ].
+split; [ easy | ].
+apply forall_Forall2 with (d := ∅) (d' := ∅).
+intros i Hilen.
+specialize (Hgl i Hilen).
+now exists (List.nth i gl gr_ident).
+
+bbb.
+
+revert E₁ P₂ Hlen H₁ H₂ Hgl.
+induction P₁ as [| F₁ FL₁]; intros.
+ destruct P₂ as [| F₂ FL₂]; [ constructor | easy ].
+
+ destruct P₂ as [| F₂ FL₂]; [ easy | constructor ].
+  specialize (Hgl O (Nat.lt_0_succ (length FL₁))); simpl in Hgl.
+  now exists (List.nth 0 gl gr_ident).
+
+  simpl in Hlen.
+  apply Nat.succ_inj in Hlen.
+  eapply IHFL₁; try eassumption.
+
+
 bbb.
 
 intros r Hr.
