@@ -5272,6 +5272,7 @@ assert (Hp₁z : p₁ ≠ 0%vec).
         assert (Hpr : ‖p₁‖ = r) by now apply on_sphere_norm; [ lra | subst ].
         rewrite Hpr.
 *)
+bbb.
         exists p₀, v.
         split.
          split; [ now destruct Hp₀d | ].
