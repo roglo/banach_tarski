@@ -5160,6 +5160,53 @@ Theorem equidec_with_ball_but_center_with_and_without_fixpoints :
 Proof.
 intros * (Hp₁s & Hp₁d) (Hnp₁s & Hnp₁d) Hsc Hj Hρ HE HρE.
 split; [ easy | ].
+split.
+ split.
+  simpl; rewrite union_empty_r.
+  intros v; split; intros H.
+   now destruct (EM (v ∈ E)) as [Hi| Hni]; [ left | right ].
+
+   destruct H as [H| H]; [ | now destruct H ].
+   remember ball as b; remember center as ce.
+   rewrite HE in H; simpl in H; subst b ce.
+   destruct H as (p₀ & n & (((el & p & Hso & Hnl & Hel) & Hb) & Hp₀) & Hv).
+   assert (Hpbc : p₀ ∈ ball ∖ center) by now split.
+   clear Hb Hp₀.
+   subst v.
+bbb.
+   apply on_sphere_after_rotation; [ easy | ].
+   apply mat_pow_is_rotation_matrix; rewrite Hρ.
+   now apply matrix_of_axis_angle_is_rotation_matrix.
+
+  intros i j Hij.
+  destruct i.
+   destruct j; [ easy | ].
+   destruct j.
+    intros v.
+    now split; intros Hv; [ simpl in Hv | ].
+
+    simpl; rewrite match_id.
+    apply intersection_empty_r.
+
+   destruct j.
+    destruct i.
+     intros v.
+     now split; intros Hv; [ simpl in Hv | ].
+
+     simpl; rewrite match_id.
+     apply intersection_empty_l.
+
+    destruct i.
+     destruct j; [ easy | ].
+     simpl; rewrite match_id.
+     apply intersection_empty_r.
+
+     destruct j.
+      simpl; rewrite match_id.
+      apply intersection_empty_l.
+
+      simpl; do 2 rewrite match_id.
+      apply intersection_empty_l.
 bbb.
 
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
