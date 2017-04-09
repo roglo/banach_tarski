@@ -4756,15 +4756,17 @@ Definition equidecomposable_with E₁ E₂ P₁ P₂ :=
 
 Theorem equidec_wih_sphere_with_and_without_fixpoints : ∀ r, 0 < r →
   ∀ p₁ s c ρ E ρE,
-  p₁ ∈ sphere r ∖ D ∧ (- p₁)%vec ∈ sphere r ∖ D
-  → s² + c² = 1 ∧ (s, c) ∉ J p₁
+  p₁ ∈ sphere r ∖ D
+  → (- p₁)%vec ∈ sphere r ∖ D
+  → s² + c² = 1
+  → (s, c) ∉ J p₁
   → ρ = matrix_of_axis_angle (p₁, s, c)
   → E = mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ sphere r ∧ p = ((ρ ^ n)%mat * p₀)%vec)
   → ρE = mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)
   → equidecomposable_with (sphere r) (sphere r ∖ D)
        [E; sphere r ∖ E] [ρE; sphere r ∖ E].
 Proof.
-intros * Hr * ((Hp₁s & Hp₁d) & (Hnp₁s & Hnp₁d)) (Hsc & Hj) Hρ HE HρE.
+intros * Hr * (Hp₁s & Hp₁d) (Hnp₁s & Hnp₁d) Hsc Hj Hρ HE HρE.
 unfold equidecomposable_with.
 assert (Hp₁z : p₁ ≠ 0%vec).
  intros H; rewrite H in Hp₁s; simpl in Hp₁s.
@@ -4987,9 +4989,73 @@ Theorem equidec_sphere_with_and_without_fixpoints : ∀ r,
   → equidecomposable (sphere r) (sphere r ∖ D).
 Proof.
 intros r Hr.
+assert (H : ∃ p₁, p₁ ∈ sphere r ∖ D ∧ (- p₁)%vec ∈ sphere r ∖ D).
+ specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
+ specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
+ exists (r ⁎ p).
+ split.
+  split; [ now apply vec_mul_in_sphere | ].
+  intros HD.
+  assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
+   rewrite intersection_union_distr_r; left.
+   split; [ | easy ].
+   destruct HD as (el & p₁ & Hso & Hnl & Hel).
+   rewrite rotate_vec_mul in Hel.
+   exists el, (p₁ ⁄ r).
+   split.
+    destruct Hso as (el₁ & Hel₁).
+    rewrite rotate_vec_mul in Hel₁.
+    exists el₁.
+    rewrite rotate_vec_mul, <- Hel₁.
+    rewrite mat_vec_mul_const_distr.
+    rewrite vec_const_mul_assoc.
+    rewrite Rinv_l; [ | lra ].
+    now rewrite vec_const_mul_1_l.
+
+    split; [ easy | ].
+    rewrite rotate_vec_mul.
+    rewrite mat_vec_mul_const_distr.
+    now f_equal.
+
+   specialize (Hdnc p H) as (n, Hdnc).
+   revert Hdnc; apply Hp.
+
+  split.
+   apply neg_vec_in_sphere.
+   now apply vec_mul_in_sphere.
+
+   intros HD.
+   assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
+    rewrite intersection_union_distr_r; right.
+    split; [ | easy ].
+    apply sphere_sym_neg_vec in HD.
+    destruct HD as (el & p₁ & Hso & Hnl & Hel).
+    rewrite rotate_vec_mul in Hel.
+    exists el, (p₁ ⁄ r).
+    split.
+     destruct Hso as (el₁ & Hel₁).
+     rewrite rotate_vec_mul in Hel₁.
+     exists el₁.
+     rewrite rotate_vec_mul, <- Hel₁.
+     rewrite vec_opp_const_mul_distr_r.
+     rewrite mat_vec_mul_const_distr.
+     rewrite vec_const_mul_assoc.
+     rewrite Rinv_l; [ | lra ].
+     now rewrite vec_const_mul_1_l.
+
+     split; [ easy | ].
+     rewrite rotate_vec_mul.
+     rewrite mat_vec_mul_const_distr.
+     now f_equal.
+
+    specialize (Hdnc p H) as (n, Hdnc).
+    revert Hdnc; apply Hp.
+
+ destruct H as (p₁ & Hp & Hq).
 Inspect 1.
 bbb.
 
+intros r Hr.
 remember (sphere r) as S₂ eqn:HS₂.
 assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
  specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
