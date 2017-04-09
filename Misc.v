@@ -185,6 +185,28 @@ inversion H; subst.
 now split.
 Qed.
 
+Theorem forall_Forall2 : ∀ A B (R : A → B → Prop) l l' d d',
+  length l = length l'
+  → (∀ i, (i < length l)%nat → R (List.nth i l d) (List.nth i l' d'))
+  → Forall2 R l l'.
+Proof.
+intros * Hlen Hfa.
+revert l' Hlen Hfa.
+induction l as [| x l]; intros.
+ destruct l' as [| x' l']; [ constructor | easy ].
+
+ destruct l' as [| x' l']; [ easy | constructor ].
+  now specialize (Hfa O (Nat.lt_0_succ (length l))); simpl in Hfa.
+
+  simpl in Hlen; apply Nat.succ_inj in Hlen.
+  apply IHl; [ easy | ].
+  intros i Hilen.
+  assert (S i < length (x :: l))%nat as H.
+   now simpl; apply -> Nat.succ_lt_mono.
+
+   now specialize (Hfa (S i) H); simpl in Hfa.
+Qed.
+
 Theorem Forall2_Forall_combine : ∀ A B f (l1 : list A) (l2 : list B),
   Forall2 f l1 l2
   ↔ Forall (λ '(x, y), f x y) (combine l1 l2) ∧ length l1 = length l2.
