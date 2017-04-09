@@ -4960,13 +4960,36 @@ assert (Hp₁z : p₁ ≠ 0%vec).
 
           simpl; do 2 rewrite match_id.
           apply intersection_empty_l.
-bbb.
+
+   assert (Hρm : is_rotation_matrix ρ).
+    rewrite Hρ.
+    now apply matrix_of_axis_angle_is_rotation_matrix.
+
+    exists [Rot ρ Hρm; gr_ident].
+    intros i Hilen.
+    simpl in Hilen.
+    destruct i.
+     simpl; intros v.
+     split; intros H.
+      destruct H as (u & H).
+      rewrite HρE; simpl.
+      now exists u.
+
+      rewrite HρE in H; simpl in H.
+      destruct H as (u & H); simpl.
+      now exists u.
+
+     destruct i; [ now simpl; rewrite xtransl_0 | lia ].
+Qed.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ r,
   0 < r
   → equidecomposable (sphere r) (sphere r ∖ D).
 Proof.
 intros r Hr.
+Inspect 1.
+bbb.
+
 remember (sphere r) as S₂ eqn:HS₂.
 assert (H : ∃ p₁, p₁ ∈ S₂ ∖ D ∧ (- p₁)%vec ∈ S₂ ∖ D).
  specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
