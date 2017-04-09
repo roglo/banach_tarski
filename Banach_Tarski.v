@@ -5144,6 +5144,24 @@ split; [ easy | ].
 now apply on_sphere_after_rotation.
 Qed.
 
+Theorem equidec_with_ball_but_center_with_and_without_fixpoints :
+  ∀ p₁ s c ρ E ρE,
+  p₁ ∈ sphere 1 ∖ D
+  → (- p₁)%vec ∈ sphere 1 ∖ D
+  → s² + c² = 1
+  → (s, c) ∉ J p₁
+  → ρ = matrix_of_axis_angle (p₁, s, c)
+  → E =
+      mkset
+        (λ p, ∃ p₀ n, p₀ ∈ D ∩ ball ∖ center ∧ p = ((ρ ^ n)%mat * p₀)%vec)
+  → ρE = mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)
+  → equidecomposable_with (ball ∖ center) (ball ∖ center ∖ D)
+       [E; ball ∖ center ∖ E] [ρE; ball ∖ center ∖ E].
+Proof.
+intros * (Hp₁s & Hp₁d) (Hnp₁s & Hnp₁d) Hsc Hj Hρ HE HρE.
+split; [ easy | ].
+bbb.
+
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
   equidecomposable (ball ∖ center) (ball ∖ center ∖ D).
 Proof.
