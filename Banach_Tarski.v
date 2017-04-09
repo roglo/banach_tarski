@@ -5096,10 +5096,10 @@ split.
  now f_equal.
 Qed.
 
-Definition ball_but_center := ball ∖ mkset (λ p, p = 0%vec).
+Definition center := mkset (λ p, p = 0%vec).
 
 Theorem sphere_ball_but_center : ∀ p,
-   (∃ r, 0 < r ≤ 1 ∧ p ∈ sphere r) ↔ p ∈ ball_but_center.
+   (∃ r, 0 < r ≤ 1 ∧ p ∈ sphere r) ↔ p ∈ ball ∖ center.
 Proof.
 intros (x, y, z); simpl.
 split.
@@ -5131,9 +5131,9 @@ split.
 Qed.
 
 Theorem in_ball_but_center_after_rotation : ∀ p M,
-  p ∈ ball_but_center
+  p ∈ ball ∖ center
   → is_rotation_matrix M
-  → mat_vec_mul M p ∈ ball_but_center.
+  → mat_vec_mul M p ∈ ball ∖ center.
 Proof.
 intros * His HM.
 apply sphere_ball_but_center in His.
@@ -5145,7 +5145,7 @@ now apply on_sphere_after_rotation.
 Qed.
 
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
-  equidecomposable ball_but_center (ball_but_center ∖ D).
+  equidecomposable (ball ∖ center) (ball ∖ center ∖ D).
 Proof.
 bbb.
 
