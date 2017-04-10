@@ -5548,62 +5548,104 @@ intros; intros x; split; intros H.
   now split; [ right | ].
 Qed.
 
+Theorem set_subtract_intersection_distr_r : ∀ A (E F G : set A),
+  ((E ∩ F) ∖ G = (E ∖ G) ∩ (F ∖ G))%S.
+Proof.
+intros; intros x; split; intros H.
+ now destruct H as ((HE & HF) & HG); split.
+
+ destruct H as ((HE, HG1), (HF, HG2)).
+ now split; [ split | ].
+Qed.
+
+Theorem set_intersection_subtract_distr_l : ∀ A (E F G : set A),
+  (E ∩ (F ∖ G) = (E ∩ F) ∖ (E ∩ G))%S.
+Proof.
+intros; intros x; split; intros H.
+ destruct H as (HE & HF & HG).
+ now split; [ | intros (_, H) ].
+
+ destruct H as ((HE1 & HF) & HEG).
+ split; [ easy | ].
+ split; [ easy | ].
+ now intros H; apply HEG.
+Qed.
+
+Theorem set_intersection_subtract_distr_r : ∀ A (E F G : set A),
+  ((E ∖ F) ∩ G = (E ∩ G) ∖ (F ∩ G))%S.
+Proof.
+intros; intros x; split; intros H.
+ destruct H as ((HE & HF) & HG).
+ now split; [ | intros (HF', HG') ].
+
+ destruct H as ((HE, HG), HFG).
+ split; [ | easy ].
+ now split; [ | intros H; apply HFG; split ].
+Qed.
+
+Theorem is_partition_subtract : ∀ A (E F : set A) EL,
+  is_partition E EL
+  → is_partition (E ∖ F) (map (λ G, G ∖ F) EL).
+Proof.
+intros * (HUE & Hij).
+split.
+ rewrite HUE; clear.
+ induction EL as [| E₁ EL]; [ apply subtract_empty_l | simpl ].
+ rewrite <- IHEL.
+ apply set_union_subtract_distr_r.
+
+ intros i j Hnij.
+ specialize (Hij _ _ Hnij).
+ clear - Hij Hnij.
+ revert i j Hij Hnij.
+ induction EL as [| E₁ EL]; intros.
+  simpl; do 2 rewrite match_id.
+  apply intersection_empty_l.
+
+  simpl in Hij; simpl.
+  destruct i.
+   destruct j; [ easy | ].
+   destruct EL as [| E₂ EL].
+    simpl; rewrite match_id.
+    apply intersection_empty_r.
+
+    simpl in Hij; simpl.
+    destruct j.
+     rewrite <- set_subtract_intersection_distr_r, Hij.
+     apply subtract_empty_l.
+
+     remember (λ E, E ∖ F) as f eqn:Hf.
+     assert (Hfe : (f ∅ = ∅)%S) by now subst f; rewrite subtract_empty_l.
+     rewrite <- Hfe, map_nth; subst f.
+     rewrite set_intersection_subtract_distr_l.
+     rewrite set_intersection_subtract_distr_r.
+     rewrite Hij.
+     now do 3 rewrite subtract_empty_l.
+
+   destruct j.
+    remember (λ E, E ∖ F) as f eqn:Hf.
+    assert (Hfe : (f ∅ = ∅)%S) by now subst f; rewrite subtract_empty_l.
+    rewrite <- Hfe, map_nth; subst f.
+    rewrite set_intersection_subtract_distr_l.
+    rewrite set_intersection_subtract_distr_r.
+    rewrite Hij.
+    now do 3 rewrite subtract_empty_l.
+
+    now apply IHEL; [ | apply Nat.succ_inj_wd_neg ].
+Qed.
+
 Add Parametric Morphism : subtract
 with signature equidecomposable ==> set_eq ==> equidecomposable
 as subtract_morph_equidec_l.
 Proof.
 intros E F HEF E' F' HEF'.
+rewrite <- HEF'; clear F' HEF'.
+rename E' into G; move G before F.
 destruct HEF as (EL & FL & HPE & HPF & HEF).
-exists (map (λ E₁, E₁ ∖ E') EL).
-exists (map (λ F₁, F₁ ∖ F') FL).
-split.
- destruct HPE as (HUE & Hij).
- split.
-  rewrite HUE; clear.
-  induction EL as [| E₁ EL]; [ apply subtract_empty_l | simpl ].
-  rewrite <- IHEL.
-  apply set_union_subtract_distr_r.
-
-  intros i j Hnij.
-  specialize (Hij _ _ Hnij).
-  clear - Hij Hnij.
-  revert i j Hij Hnij.
-  induction EL as [| E₁ EL]; intros.
-   simpl; do 2 rewrite match_id.
-   apply intersection_empty_l.
-
-   simpl in Hij; simpl.
-   destruct i.
-    destruct j; [ easy | ].
-    destruct EL as [| E₂ EL].
-     simpl; rewrite match_id.
-     apply intersection_empty_r.
-
-     simpl in Hij, IHEL; simpl.
-     destruct j.
-bbb.
-      rewrite intersection_sub
-
-    destruct j.
-
-
-  clear - Hij Hnij.
-  induction EL as [| E₁ EL].
-   simpl; do 2 rewrite match_id.
-   apply intersection_empty_l.
-
-   simpl.
-   destruct i.
-    destruct j; [ easy | ].
-    destruct j.
-
-
-bbb.
-
-(* return *)
-   rewrite subtract_empty_l.
-
-
+exists (map (λ E₁, E₁ ∖ G) EL).
+exists (map (λ F₁, F₁ ∖ G) FL).
+split; [ now apply is_partition_subtract | ].
+split; [ now apply is_partition_subtract | ].
 bbb.
 
 Theorem equidec_sub_compat_l : ∀ E F G,
