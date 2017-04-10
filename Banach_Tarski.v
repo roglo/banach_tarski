@@ -40,8 +40,8 @@ Qed.
 Definition rot_elem e := Rot (mat_of_elem e) (rotate_is_rotation_matrix e).
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
-  equidecomposable ball_but_fixpoints
-    (xtransl 3 ball_but_fixpoints ∪ xtransl 6 ball_but_fixpoints)%S.
+  equidecomposable (ball ∖ D)
+    (xtransl 3 (ball ∖ D) ∪ xtransl 6 (ball ∖ D))%S.
 Proof.
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
 destruct H as (f & Hu & Hm).
@@ -117,10 +117,9 @@ now rewrite xtransl_0, HEF₁.
 Qed.
 
 Theorem separated_balls_without_fixpoints :
-  (xtransl 3 ball_but_fixpoints ∩ xtransl 6 ball_but_fixpoints = ∅)%S.
+  (xtransl 3 (ball ∖ D) ∩ xtransl 6 (ball ∖ D) = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6); simpl | easy ].
-unfold ball_but_fixpoints in H3, H6.
 simpl in H3, H6.
 destruct H3 as (H3, _).
 destruct H6 as (H6, _).
@@ -5697,20 +5696,16 @@ unfold equidecomposable.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
-  equidecomposable ball ball_but_fixpoints.
+  equidecomposable ball (ball ∖ D).
 Proof.
-unfold ball_but_fixpoints.
 rewrite equidec_ball_ball_but_center at 1.
 rewrite equidec_ball_but_center_with_and_without_fixpoints.
 rewrite set_subtract_sub_swap.
 
 bbb.
 
-unfold ball_but_fixpoints.
 rewrite equidec_ball_ball_but_center at 1.
 rewrite equidec_ball_but_center_with_and_without_fixpoints.
-unfold ball_but_fixpoints.
-unfold ball_but_fixpoints.
 apply equidec_sub_compat_l.
 symmetry.
 apply equidec_ball_ball_but_center.
@@ -6001,7 +5996,7 @@ bbb.
 Theorem Banach_Tarski_paradox :
   equidecomposable ball (xtransl 3 ball ∪ xtransl 6 ball)%S.
 Proof.
-transitivity ball_but_fixpoints.
+transitivity (ball ∖ D).
  apply equidec_ball_with_and_without_fixpoints.
 
  etransitivity.

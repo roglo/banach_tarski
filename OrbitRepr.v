@@ -18,15 +18,15 @@ Definition orbit_by_seq_of e {os : sel_model} :=
   mkset (λ p, ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p).
 
 Definition M {os : sel_model} :=
-  mkset (λ p, p ∈ ball_but_fixpoints ∧ p = os_fun p).
+  mkset (λ p, p ∈ ball ∖ D ∧ p = os_fun p).
 Definition SS {os : sel_model} e :=
   mkset
     (λ p,
-     p ∈ ball_but_fixpoints ∧
+     p ∈ ball ∖ D ∧
      ∃ el el₁,
        norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p).
 Definition B {os : sel_model} :=
-  mkset (λ p, p ∈ ball_but_fixpoints ∧ p ∈ orbit_by_seq_of ạ⁻¹).
+  mkset (λ p, p ∈ ball ∖ D ∧ p ∈ orbit_by_seq_of ạ⁻¹).
 
 Opaque M SS B.
 
@@ -42,7 +42,7 @@ intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
 rewrite <- He in Hs.
-unfold ball_but_fixpoints in Hinf; simpl in Hinf.
+simpl in Hinf.
 destruct Hinf as (Hle1 & Hinf).
 apply Hinf; clear Hinf.
 exists el, p.
@@ -211,7 +211,7 @@ Qed.
 Theorem r_decomposed_5 :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition ball_but_fixpoints [M; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
+  → is_partition (ball ∖ D) [M; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros f (Hoe, Ho) os Hos; subst os.
 split.
@@ -366,7 +366,7 @@ Qed.
 Theorem r_decomposed_4 :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition ball_but_fixpoints
+  → is_partition (ball ∖ D)
       [M ∪ SS ạ ∪ B; SS ạ⁻¹ ∖ B; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros f HoeHo os Hos.
@@ -387,7 +387,7 @@ Theorem r_decomposed_2 :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → ∀ e,
-    is_partition ball_but_fixpoints [SS e; rot e (SS (negf e))].
+    is_partition (ball ∖ D) [SS e; rot e (SS (negf e))].
 Proof.
 intros f (Hoe, Ho) os Hos e; subst os.
 split.
@@ -501,7 +501,7 @@ Qed.
 Theorem r_decomposed_2_a :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition ball_but_fixpoints [M ∪ SS ạ ∪ B; rot ạ (SS ạ⁻¹ ∖ B)].
+  → is_partition (ball ∖ D) [M ∪ SS ạ ∪ B; rot ạ (SS ạ⁻¹ ∖ B)].
 Proof.
 intros f (Hoe, Ho) os Hos.
 split.
@@ -643,7 +643,7 @@ Qed.
 Theorem r_decomposed_2_b :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition ball_but_fixpoints [SS ḅ; rot ḅ (SS ḅ⁻¹)].
+  → is_partition (ball ∖ D) [SS ḅ; rot ḅ (SS ḅ⁻¹)].
 Proof.
 intros.
 eapply r_decomposed_2; eassumption.

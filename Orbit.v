@@ -88,8 +88,6 @@ Definition D :=
 
 Arguments D : simpl never.
 
-Definition ball_but_fixpoints := ball ∖ D.
-
 Theorem on_sphere_norm : ∀ p r, (0 ≤ r)%R → p ∈ sphere r ↔ ‖p‖ = r.
 Proof.
 intros (x, y, z) r Hr; simpl.
