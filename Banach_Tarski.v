@@ -5689,6 +5689,14 @@ intros; intros x; split; intros Hx.
  now destruct Hx as ((HE & HF) & HG).
 Qed.
 
+Theorem equidec_ball_ball_but_point : ∀ E,
+  E = mkset (λ p, p = V 0 0 1)
+  → equidecomposable ball (ball ∖ E).
+Proof.
+intros * HE.
+unfold equidecomposable.
+bbb.
+
 Theorem equidec_ball_ball_but_center :
   equidecomposable ball (ball ∖ center).
 Proof.
