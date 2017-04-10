@@ -5532,13 +5532,104 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball �
       now apply equidec_with_equidec in H.
 Qed.
 
-Inspect 1.
+Theorem  subtract_empty_l : ∀ A (E : set A), (∅ ∖ E = ∅)%S.
+Proof.
+intros; intros a; now simpl; split; intros H.
+Qed.
 
+Theorem set_union_subtract_distr_r : ∀ A (E F G : set A),
+  ((E ∪ F) ∖ G = (E ∖ G) ∪ (F ∖ G))%S.
+Proof.
+intros; intros x; split; intros H.
+ now destruct H as ([HE| HF], HG); simpl; [ left | right ].
+
+ destruct H as [(HE, HG)| (HF, HG)].
+  now split; [ left | ].
+  now split; [ right | ].
+Qed.
+
+Add Parametric Morphism : subtract
+with signature equidecomposable ==> set_eq ==> equidecomposable
+as subtract_morph_equidec_l.
+Proof.
+intros E F HEF E' F' HEF'.
+destruct HEF as (EL & FL & HPE & HPF & HEF).
+exists (map (λ E₁, E₁ ∖ E') EL).
+exists (map (λ F₁, F₁ ∖ F') FL).
+split.
+ destruct HPE as (HUE & Hij).
+ split.
+  rewrite HUE; clear.
+  induction EL as [| E₁ EL]; [ apply subtract_empty_l | simpl ].
+  rewrite <- IHEL.
+  apply set_union_subtract_distr_r.
+
+  intros i j Hnij.
+  specialize (Hij _ _ Hnij).
+  clear - Hij Hnij.
+  revert i j Hij Hnij.
+  induction EL as [| E₁ EL]; intros.
+   simpl; do 2 rewrite match_id.
+   apply intersection_empty_l.
+
+   simpl in Hij; simpl.
+   destruct i.
+    destruct j; [ easy | ].
+    destruct EL as [| E₂ EL].
+     simpl; rewrite match_id.
+     apply intersection_empty_r.
+
+     simpl in Hij, IHEL; simpl.
+     destruct j.
+bbb.
+      rewrite intersection_sub
+
+    destruct j.
+
+
+  clear - Hij Hnij.
+  induction EL as [| E₁ EL].
+   simpl; do 2 rewrite match_id.
+   apply intersection_empty_l.
+
+   simpl.
+   destruct i.
+    destruct j; [ easy | ].
+    destruct j.
+
+
+bbb.
+
+(* return *)
+   rewrite subtract_empty_l.
+
+
+bbb.
+
+Theorem equidec_sub_compat_l : ∀ E F G,
+  equidecomposable E F
+  → equidecomposable (E ∖ G) (F ∖ G).
+Proof.
+intros * Heq.
+now rewrite Heq.
+bbb.
+
+Theorem equidec_ball_ball_but_center :
+  equidecomposable ball (ball ∖ center).
+Proof.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
+unfold ball_but_fixpoints.
+rewrite equidec_ball_ball_but_center at 1.
+rewrite equidec_ball_but_center_with_and_without_fixpoints.
+unfold ball_but_fixpoints.
+unfold ball_but_fixpoints.
+apply equidec_sub_compat_l.
+symmetry.
+apply equidec_ball_ball_but_center.
 bbb.
 (*
 assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
