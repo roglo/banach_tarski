@@ -5159,137 +5159,142 @@ Theorem equidec_with_ball_but_center_with_and_without_fixpoints :
        [E; ball ∖ center ∖ E] [ρE; ball ∖ center ∖ E].
 Proof.
 intros * (Hp₁s & Hp₁d) (Hnp₁s & Hnp₁d) Hsc Hj Hρ HE HρE.
-assert (Hp₁z : p₁ ≠ 0%vec).
- intros H; rewrite H in Hp₁s; simpl in Hp₁s.
- rewrite Rsqr_0, Rplus_0_l, Rplus_0_l in Hp₁s.
- symmetry in Hp₁s; apply Rsqr_eq_0 in Hp₁s; lra.
-
- split; [ easy | ].
+assert (Hp₁ : ‖p₁‖ = 1) by (apply on_sphere_norm in Hp₁s; [ easy | lra ]).
+assert (Hp₁z : p₁ ≠ 0%vec) by (apply vec_norm_neq_0; lra).
+split; [ easy | ].
+split.
  split.
-  split.
-   simpl; rewrite union_empty_r.
-   intros v; split; intros H.
-    now destruct (EM (v ∈ E)) as [Hi| Hni]; [ left | right ].
+  simpl; rewrite union_empty_r.
+  intros v; split; intros H.
+   now destruct (EM (v ∈ E)) as [Hi| Hni]; [ left | right ].
 
-    destruct H as [H| H]; [ | now destruct H ].
-    remember ball as b; remember center as ce.
-    rewrite HE in H; simpl in H; subst b ce.
-    destruct H as (p₀ & n & (((el & p & Hso & Hnl & Hel) & Hb) & Hp₀) & Hv).
-    assert (Hpbc : p₀ ∈ ball ∖ center) by now split.
-    clear Hb Hp₀.
-    subst v.
-    apply in_ball_but_center_after_rotation; [ easy | ].
-    apply mat_pow_is_rotation_matrix; rewrite Hρ.
-    now apply matrix_of_axis_angle_is_rotation_matrix.
+   destruct H as [H| H]; [ | now destruct H ].
+   remember ball as b; remember center as ce.
+   rewrite HE in H; simpl in H; subst b ce.
+   destruct H as (p₀ & n & (((el & p & Hso & Hnl & Hel) & Hb) & Hp₀) & Hv).
+   assert (Hpbc : p₀ ∈ ball ∖ center) by now split.
+   clear Hb Hp₀.
+   subst v.
+   apply in_ball_but_center_after_rotation; [ easy | ].
+   apply mat_pow_is_rotation_matrix; rewrite Hρ.
+   now apply matrix_of_axis_angle_is_rotation_matrix.
 
-   intros i j Hij.
-   destruct i.
-    destruct j; [ easy | ].
-    destruct j.
+  intros i j Hij.
+  destruct i.
+   destruct j; [ easy | ].
+   destruct j.
+    intros v.
+    now split; intros Hv; [ simpl in Hv | ].
+
+    simpl; rewrite match_id.
+    apply intersection_empty_r.
+
+   destruct j.
+    destruct i.
      intros v.
      now split; intros Hv; [ simpl in Hv | ].
 
      simpl; rewrite match_id.
+     apply intersection_empty_l.
+
+    destruct i.
+     destruct j; [ easy | ].
+     simpl; rewrite match_id.
      apply intersection_empty_r.
 
-    destruct j.
-     destruct i.
-      intros v.
-      now split; intros Hv; [ simpl in Hv | ].
-
+     destruct j.
       simpl; rewrite match_id.
       apply intersection_empty_l.
 
-     destruct i.
-      destruct j; [ easy | ].
-      simpl; rewrite match_id.
-      apply intersection_empty_r.
+      simpl; do 2 rewrite match_id.
+      apply intersection_empty_l.
 
-      destruct j.
-       simpl; rewrite match_id.
-       apply intersection_empty_l.
+ split.
+  assert (HSD : ((E ∖ D) ∪ (ball ∖ center ∖ E) = ball ∖ center ∖ D)%S).
+   intros v; split; intros Hv.
+    destruct Hv as [(HvE, HvD)| (HvS, HvE)].
+     split; [ | easy ].
+     rewrite HE in HvE.
+     destruct HvE as (u & n & ((HuD & HuB) & HuS) & Hv).
+     rewrite Hv.
+     apply in_ball_but_center_after_rotation; [ easy | ].
+     apply mat_pow_is_rotation_matrix; rewrite Hρ.
+     now apply matrix_of_axis_angle_is_rotation_matrix.
 
-       simpl; do 2 rewrite match_id.
-       apply intersection_empty_l.
+     split; [ easy | ].
+     intros Hv; apply HvE; clear HvE.
+     rewrite HE; exists v, 0%nat.
+     destruct HvS as (Hvb & Hvc).
+     split; [ now split | ].
+     now rewrite mat_pow_0, mat_vec_mul_id.
 
-  split.
-   assert (HSD : ((E ∖ D) ∪ (ball ∖ center ∖ E) = ball ∖ center ∖ D)%S).
-    intros v; split; intros Hv.
-     destruct Hv as [(HvE, HvD)| (HvS, HvE)].
-      split; [ | easy ].
-      rewrite HE in HvE.
-      destruct HvE as (u & n & ((HuD & HuB) & HuS) & Hv).
-      rewrite Hv.
-      apply in_ball_but_center_after_rotation; [ easy | ].
-      apply mat_pow_is_rotation_matrix; rewrite Hρ.
-      now apply matrix_of_axis_angle_is_rotation_matrix.
+    destruct Hv as (HvS & HvD).
+    now destruct (EM (v ∈ E)); [ left | right ].
 
-      split; [ easy | ].
-      intros Hv; apply HvE; clear HvE.
-      rewrite HE; exists v, 0%nat.
-      destruct HvS as (Hvb & Hvc).
-      split; [ now split | ].
-      now rewrite mat_pow_0, mat_vec_mul_id.
+   rewrite <- HSD.
+   assert (HED : (ρE = E ∖ D)%S).
+    intros v.
+    split; intros H.
+     rewrite HρE in H.
+     destruct H as (u & Hu & Hv).
+     remember D as d; simpl; subst d.
+     split.
+      rewrite HE in Hu; rewrite HE.
+      remember D as d; remember intersection as b.
+      simpl in Hu; simpl; subst d b.
+      destruct Hu as (p₀ & n & Hp₀ & Hu).
+      exists p₀, (S n).
+      split; [ easy | simpl ].
+      now rewrite mat_vec_mul_assoc, <- Hu.
 
-     destruct Hv as (HvS & HvD).
-     now destruct (EM (v ∈ E)); [ left | right ].
-
-    rewrite <- HSD.
-    assert (HED : (ρE = E ∖ D)%S).
-     intros v.
-     split; intros H.
-      rewrite HρE in H.
-      destruct H as (u & Hu & Hv).
-      remember D as d; simpl; subst d.
+      intros Hvn.
+      apply Hj; clear Hj; unfold J.
+      remember J₀ as a; simpl; subst a.
+      rewrite HE in Hu.
+      remember D as d; remember intersection as b.
+      simpl in Hu; subst d b.
+      destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
+      rewrite Hu in Hv.
+      rewrite <- mat_vec_mul_assoc in Hv.
+      replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
+      remember (angle_of_sin_cos s c) as θ eqn:Hθ.
+      remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
+      remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
+      exists s₀, c₀.
       split.
-       rewrite HE in Hu; rewrite HE.
-       remember D as d; remember intersection as b.
-       simpl in Hu; simpl; subst d b.
-       destruct Hu as (p₀ & n & Hp₀ & Hu).
-       exists p₀, (S n).
-       split; [ easy | simpl ].
-       now rewrite mat_vec_mul_assoc, <- Hu.
-
-       intros Hvn.
-       apply Hj; clear Hj; unfold J.
-       remember J₀ as a; simpl; subst a.
-       rewrite HE in Hu.
-       remember D as d; remember intersection as b.
-       simpl in Hu; subst d b.
-       destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
-       rewrite Hu in Hv.
-       rewrite <- mat_vec_mul_assoc in Hv.
-       replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
-       remember (angle_of_sin_cos s c) as θ eqn:Hθ.
-       remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
-       remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
-       exists s₀, c₀.
+       split; [ subst s₀ c₀; apply sin2_cos2 | ].
+       remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
+       remember D as d; remember sphere as sph; simpl; subst d sph.
+       exists (p₀ ⁄ ‖p₀‖), (v ⁄ ‖p₀‖).
        split.
-        split; [ subst s₀ c₀; apply sin2_cos2 | ].
-        remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
-        remember D as d; remember sphere as sph; simpl; subst d sph.
-(*
-        assert (Hpr : ‖p₁‖ = r) by now apply on_sphere_norm; [ lra | subst ].
-        rewrite Hpr.
-*)
-bbb.
-        exists p₀, v.
         split.
-         split; [ now destruct Hp₀d | ].
-bbb.
+         destruct Hp₀d as (Hp₀d, Hp₀b).
+         apply vec_const_mul_in_D; [ | easy ].
+         now apply Rinv_neq_0_compat, vec_norm_neq_0.
 
-        split; [ easy | ].
+         rewrite Hp₁.
+         apply vec_div_in_sphere; [ now apply vec_norm_neq_0 | ].
+         apply in_its_sphere.
+
         split.
-         split; [ easy | ].
-         rewrite Hv.
-         apply on_sphere_after_rotation; [ easy | ].
-         apply mat_pow_is_rotation_matrix.
-         rewrite Hρ.
-         now apply matrix_of_axis_angle_is_rotation_matrix.
+         split.
+          apply vec_const_mul_in_D; [ | easy ].
+          now apply Rinv_neq_0_compat, vec_norm_neq_0.
 
+          rewrite Hp₁.
+          apply vec_div_in_sphere; [ now apply vec_norm_neq_0 | ].
+          rewrite Hv.
+          apply on_sphere_after_rotation; [ apply in_its_sphere | ].
+          apply mat_pow_is_rotation_matrix; rewrite Hρ.
+          now apply matrix_of_axis_angle_is_rotation_matrix.
+
+         rewrite mat_vec_mul_const_distr; f_equal.
          rewrite Hv, Hρ, Hρ₀.
          rewrite Rmult_comm in Hs₀, Hc₀.
          now erewrite matrix_of_mul_angle; try eassumption.
+
+       idtac.
+bbb.
 
          rewrite Hc₀, Hs₀.
          rewrite angle_of_sin_cos_inv.

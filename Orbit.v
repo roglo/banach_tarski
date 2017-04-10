@@ -11,13 +11,6 @@ Require Import Reals Nsatz.
 
 Require Import Misc MiscReals Words Normalize Reverse Matrix Pset.
 
-(*
-Notation "'√'" := sqrt.
-Notation "x '≤' y" := (Rle x y) : R_scope.
-Notation "x '≤' y '≤' z" := (Rle x y ∧ Rle y z)
- (at level 70, y at next level) : R_scope.
-*)
-
 Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
@@ -106,6 +99,13 @@ split; intros Hp.
  apply (f_equal Rsqr) in Hp.
  rewrite Rsqr_sqrt in Hp; [ easy | ].
  apply nonneg_sqr_vec_norm.
+Qed.
+
+Theorem in_its_sphere : ∀ v, v ∈ sphere ‖v‖.
+Proof.
+intros (x, y, z); simpl.
+rewrite Rsqr_sqrt; [ easy | ].
+apply nonneg_sqr_vec_norm.
 Qed.
 
 Theorem on_sphere_after_rotation : ∀ p m r,
