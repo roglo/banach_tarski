@@ -5634,6 +5634,7 @@ split.
     now apply IHEL; [ | apply Nat.succ_inj_wd_neg ].
 Qed.
 
+(* not sure it it true: problem with the transformation...
 Add Parametric Morphism : subtract
 with signature equidecomposable ==> set_eq ==> equidecomposable
 as subtract_morph_equidec_l.
@@ -5646,6 +5647,30 @@ exists (map (λ E₁, E₁ ∖ G) EL).
 exists (map (λ F₁, F₁ ∖ G) FL).
 split; [ now apply is_partition_subtract | ].
 split; [ now apply is_partition_subtract | ].
+revert E F HPE HPF.
+induction HEF as [| E₁ F₁ EL FL HEF]; intros; [ constructor | simpl ].
+constructor.
+ destruct HEF as (g, HEF).
+ exists g.
+
+Theorem group_subtract_distr : ∀ g E F,
+  (app_gr g (E ∖ F) = app_gr g E ∖ app_gr g F)%S.
+Proof.
+intros.
+revert E F.
+induction g; intros.
+Check set_map_inter_distr.
+(*
+ apply set_map_inter_distr.
+ now apply rot_mat_vec_mul_is_inj.
+
+ now intros (x, y, z).
+
+ intros p; simpl; now rewrite IHg2, IHg1.
+*)
+Admitted. Show.
+ rewrite group_subtract_distr.
+rewrite HEF.
 bbb.
 
 Theorem equidec_sub_compat_l : ∀ E F G,
@@ -5655,15 +5680,32 @@ Proof.
 intros * Heq.
 now rewrite Heq.
 bbb.
+*)
+
+Theorem set_subtract_sub_swap : ∀ A (E F G : set A),
+  (E ∖ F ∖ G = E ∖ G ∖ F)%S.
+Proof.
+intros; intros x; split; intros Hx.
+ now destruct Hx as ((HE & HF) & HG).
+ now destruct Hx as ((HE & HF) & HG).
+Qed.
 
 Theorem equidec_ball_ball_but_center :
   equidecomposable ball (ball ∖ center).
 Proof.
+unfold equidecomposable.
 bbb.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball ball_but_fixpoints.
 Proof.
+unfold ball_but_fixpoints.
+rewrite equidec_ball_ball_but_center at 1.
+rewrite equidec_ball_but_center_with_and_without_fixpoints.
+rewrite set_subtract_sub_swap.
+
+bbb.
+
 unfold ball_but_fixpoints.
 rewrite equidec_ball_ball_but_center at 1.
 rewrite equidec_ball_but_center_with_and_without_fixpoints.
