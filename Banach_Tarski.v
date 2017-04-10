@@ -4745,6 +4745,49 @@ split.
  now rewrite H.
 Qed.
 
+Theorem is_partition_subtract : ∀ A (E F : set A),
+  F ⊂ E
+  → is_partition E [F; E ∖ F].
+Proof.
+intros * HF.
+split.
+ simpl; rewrite union_empty_r.
+ intros v; split; intros H.
+  now destruct (EM (v ∈ F)) as [Hi| Hni]; [ left | right ].
+
+  now destruct H as [H| H]; [ apply HF | destruct H ].
+
+ intros i j Hij.
+ destruct i.
+  destruct j; [ easy | ].
+  destruct j.
+   intros v.
+   now split; intros Hv; [ simpl in Hv | ].
+
+   simpl; rewrite match_id.
+   apply intersection_empty_r.
+
+  destruct j.
+   destruct i.
+    intros v.
+    now split; intros Hv; [ simpl in Hv | ].
+
+    simpl; rewrite match_id.
+    apply intersection_empty_l.
+
+   destruct i.
+    destruct j; [ easy | ].
+    simpl; rewrite match_id.
+    apply intersection_empty_r.
+
+    destruct j.
+     simpl; rewrite match_id.
+     apply intersection_empty_l.
+
+     simpl; do 2 rewrite match_id.
+     apply intersection_empty_l.
+Qed.
+
 Theorem equidec_wih_sphere_with_and_without_fixpoints : ∀ r, 0 < r →
   ∀ p₁ s c ρ E ρE,
   p₁ ∈ sphere r ∖ D
@@ -4766,49 +4809,14 @@ assert (Hp₁z : p₁ ≠ 0%vec).
 
  split; [ easy | ].
  split.
-  split.
-   simpl; rewrite union_empty_r.
-   split; intros H.
-    now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
-
-    rename x into v.
-    destruct H as [H| H]; [ | now destruct H ].
-    rewrite HE in H; simpl in H.
-    destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
-    subst v.
-    apply on_sphere_after_rotation; [ easy | ].
-    apply mat_pow_is_rotation_matrix; rewrite Hρ.
-    now apply matrix_of_axis_angle_is_rotation_matrix.
-
-   intros i j Hij.
-   destruct i.
-    destruct j; [ easy | ].
-    destruct j.
-     intros v.
-     now split; intros Hv; [ simpl in Hv | ].
-
-     simpl; rewrite match_id.
-     apply intersection_empty_r.
-
-    destruct j.
-     destruct i.
-      intros v.
-      now split; intros Hv; [ simpl in Hv | ].
-
-      simpl; rewrite match_id.
-      apply intersection_empty_l.
-
-     destruct i.
-      destruct j; [ easy | ].
-      simpl; rewrite match_id.
-      apply intersection_empty_r.
-
-      destruct j.
-       simpl; rewrite match_id.
-       apply intersection_empty_l.
-
-       simpl; do 2 rewrite match_id.
-       apply intersection_empty_l.
+  apply is_partition_subtract.
+  rewrite HE.
+  intros p Hp; simpl in Hp.
+  destruct Hp as (p₀ & n & Hp & Hq).
+  rewrite Hq.
+  apply on_sphere_after_rotation; [ easy | ].
+  apply mat_pow_is_rotation_matrix; rewrite Hρ.
+  now apply matrix_of_axis_angle_is_rotation_matrix.
 
   split.
    assert (HSD : ((E ∖ D) ∪ (sphere r ∖ E) = sphere r ∖ D)%S).
@@ -5166,51 +5174,14 @@ assert (Hp₁ : ‖p₁‖ = 1) by (apply on_sphere_norm in Hp₁s; [ easy | lra
 assert (Hp₁z : p₁ ≠ 0%vec) by (apply vec_norm_neq_0; lra).
 split; [ easy | ].
 split.
- split.
-  simpl; rewrite union_empty_r.
-  intros v; split; intros H.
-   now destruct (EM (v ∈ E)) as [Hi| Hni]; [ left | right ].
-
-   destruct H as [H| H]; [ | now destruct H ].
-   remember ball as b; remember center as ce.
-   rewrite HE in H; simpl in H; subst b ce.
-   destruct H as (p₀ & n & (((el & p & Hso & Hnl & Hel) & Hb) & Hp₀) & Hv).
-   assert (Hpbc : p₀ ∈ ball ∖ center) by now split.
-   clear Hb Hp₀.
-   subst v.
-   apply in_ball_but_center_after_rotation; [ easy | ].
-   apply mat_pow_is_rotation_matrix; rewrite Hρ.
-   now apply matrix_of_axis_angle_is_rotation_matrix.
-
-  intros i j Hij.
-  destruct i.
-   destruct j; [ easy | ].
-   destruct j.
-    intros v.
-    now split; intros Hv; [ simpl in Hv | ].
-
-    simpl; rewrite match_id.
-    apply intersection_empty_r.
-
-   destruct j.
-    destruct i.
-     intros v.
-     now split; intros Hv; [ simpl in Hv | ].
-
-     simpl; rewrite match_id.
-     apply intersection_empty_l.
-
-    destruct i.
-     destruct j; [ easy | ].
-     simpl; rewrite match_id.
-     apply intersection_empty_r.
-
-     destruct j.
-      simpl; rewrite match_id.
-      apply intersection_empty_l.
-
-      simpl; do 2 rewrite match_id.
-      apply intersection_empty_l.
+ apply is_partition_subtract.
+ rewrite HE.
+ intros p Hp; simpl in Hp.
+ destruct Hp as (p₀ & n & Hp & Hq).
+ rewrite Hq.
+ apply in_ball_but_center_after_rotation; [ easy | ].
+ apply mat_pow_is_rotation_matrix; rewrite Hρ.
+ now apply matrix_of_axis_angle_is_rotation_matrix.
 
  split.
   assert (HSD : ((E ∖ D) ∪ (ball ∖ center ∖ E) = ball ∖ center ∖ D)%S).
@@ -5582,7 +5553,7 @@ intros; intros x; split; intros H.
  now split; [ | intros H; apply HFG; split ].
 Qed.
 
-Theorem is_partition_subtract : ∀ A (E F : set A) EL,
+Theorem is_partition_subtract_all : ∀ A (E F : set A) EL,
   is_partition E EL
   → is_partition (E ∖ F) (map (λ G, G ∖ F) EL).
 Proof.
@@ -5690,11 +5661,26 @@ intros; intros x; split; intros Hx.
 Qed.
 
 Theorem equidec_ball_ball_but_point : ∀ E,
-  E = mkset (λ p, p = V 0 0 1)
+  E = mkset (λ p, p = V 1 0 0)
   → equidecomposable ball (ball ∖ E).
 Proof.
 intros * HE.
-unfold equidecomposable.
+remember (V 1 0 0) as p₀ eqn:Hp₀.
+remember (mkset (λ p, ∃ n, ((rot_z ^ n)%mat * p₀)%vec = p)) as F eqn:HF.
+remember (mkset (λ p, ∃ n, ((rot_z ^ S n)%mat * p₀)%vec = p)) as rF eqn:HrF.
+exists [F; ball ∖ F].
+exists [rF; ball ∖ F].
+split.
+ apply is_partition_subtract.
+ rewrite HF.
+ intros v Hv; simpl in Hv.
+ destruct Hv as (n & Hv).
+ rewrite <- Hv, Hp₀.
+ apply in_ball_after_rotation; [ simpl; rewrite Rsqr_0, Rsqr_1; lra | ].
+ apply mat_pow_is_rotation_matrix.
+ apply rot_z_is_rotation_matrix.
+
+ split.
 bbb.
 
 Theorem equidec_ball_ball_but_center :
