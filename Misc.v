@@ -225,7 +225,6 @@ Qed.
 Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
   ∃ f : A → A, (∀ x : A, R x (f x)) ∧ (∀ x y, R x y → f x = f y).
 
-(* TTCA implies excluded middle: do you believe that? Diaconescu! *)
 Theorem EM : ∀ P, P ∨ ¬P.
 Proof.
 intros P.

@@ -345,37 +345,6 @@ apply normalized_axis.
 now apply matrix_axis_ok with (k := k).
 Qed.
 
-Theorem mat_of_path_is_rotation_matrix : ∀ el,
- is_rotation_matrix (mat_of_path el).
-Proof.
-intros.
-induction el as [| e el].
- unfold mat_of_path; simpl.
- apply mat_id_is_rotation_matrix.
-
- unfold mat_of_path; simpl; fold (mat_of_path el).
- apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
-Qed.
-
-Theorem mat_of_path_app : ∀ el₁ el₂,
-  mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
-Proof.
-intros.
-revert el₁.
-induction el₂ as [| e₂ el₂]; intros.
- unfold mat_of_path at 3; simpl.
- rewrite app_nil_r.
- now rewrite mat_mul_id_r.
-
- rewrite cons_comm_app, app_assoc, IHel₂.
- unfold mat_of_path; simpl.
- rewrite map_app, fold_right_app; simpl.
- rewrite mat_mul_assoc; f_equal.
- rewrite mat_mul_id_r; clear.
- induction el₁ as [| e₁]; [ now rewrite mat_mul_id_l | ].
- now simpl; rewrite IHel₁, mat_mul_assoc.
-Qed.
-
 Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
   norm_list el ≠ []
   → mat_of_path el ≠ mat_id.

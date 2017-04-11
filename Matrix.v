@@ -8,7 +8,7 @@
 Require Import Utf8 List.
 Require Import Reals Psatz Nsatz.
 
-Require Import Words Normalize Reverse MiscReals MiscTrigo.
+Require Import Words Normalize Reverse Misc MiscReals MiscTrigo.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -580,6 +580,37 @@ Proof.
 intros * HM.
 induction n; [ apply mat_id_is_rotation_matrix | simpl ].
 now apply mat_mul_is_rotation_matrix.
+Qed.
+
+Theorem mat_of_path_is_rotation_matrix : ∀ el,
+ is_rotation_matrix (mat_of_path el).
+Proof.
+intros.
+induction el as [| e el].
+ unfold mat_of_path; simpl.
+ apply mat_id_is_rotation_matrix.
+
+ unfold mat_of_path; simpl; fold (mat_of_path el).
+ apply mat_mul_is_rotation_matrix; [ apply rotate_is_rotation_matrix | easy ].
+Qed.
+
+Theorem mat_of_path_app : ∀ el₁ el₂,
+  mat_of_path (el₁ ++ el₂) = (mat_of_path el₁ * mat_of_path el₂)%mat.
+Proof.
+intros.
+revert el₁.
+induction el₂ as [| e₂ el₂]; intros.
+ unfold mat_of_path at 3; simpl.
+ rewrite app_nil_r.
+ now rewrite mat_mul_id_r.
+
+ rewrite cons_comm_app, app_assoc, IHel₂.
+ unfold mat_of_path; simpl.
+ rewrite map_app, fold_right_app; simpl.
+ rewrite mat_mul_assoc; f_equal.
+ rewrite mat_mul_id_r; clear.
+ induction el₁ as [| e₁]; [ now rewrite mat_mul_id_l | ].
+ now simpl; rewrite IHel₁, mat_mul_assoc.
 Qed.
 
 Theorem vec_const_mul_assoc : ∀ a b v, a ⁎ (b ⁎ v) = (a * b) ⁎ v.
