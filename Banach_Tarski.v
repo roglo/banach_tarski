@@ -3573,11 +3573,11 @@ destruct Hp' as (Hpd' & Hps').
 destruct (vec_eq_dec axis 0) as [Haz| Haz].
  rewrite Haz in Had.
  rewrite Haz in Hps; simpl in Hps.
- rewrite Rsqr_0, Rplus_0_l, Rplus_0_l, sqrt_0, Rsqr_0 in Hps (*, Hps'*).
+ rewrite Rsqr_0, Rplus_0_l, Rplus_0_l, sqrt_0, Rsqr_0 in Hps.
  destruct p as (xp, yp, zp).
  apply sqr_vec_norm_eq_0 in Hps.
  destruct Hps as (Hxp & Hyp & Hzp).
- now subst xp yp zp (*xp' yp' zp'*).
+ now subst xp yp zp.
 
  assert (Hll : latitude axis p = latitude axis p').
   eapply rotation_implies_same_latitude; try eassumption.
@@ -3893,158 +3893,6 @@ destruct (Req_dec r 0) as [Hrz| Hrz].
  now rewrite H1, H2, H3.
 Qed.
 
-(*
-Theorem axis_angle_of_matrix_inv : ∀ M,
-  is_rotation_matrix M
-  → M ≠ mat_transp M
-  → matrix_of_axis_angle (axis_angle_of_matrix M) = M.
-Proof.
-intros M Hrm Hntr; symmetry.
-generalize Hrm; intros (Hmtr, Hdet).
-remember (matrix_of_axis_angle (axis_angle_of_matrix M)) as M' eqn:HM'.
-assert (Hmt : -1 ≤ mat_trace M').
- rewrite HM'.
- remember (axis_angle_of_matrix M) as asc eqn:Hasc.
- symmetry in Hasc.
- destruct asc as ((a, s), c).
- apply mat_of_axis_angle_trace_interv.
-
-bbb.
- apply mat_trace_ge_minus_1.
-  unfold axis_angle_of_matrix in Hasc.
-  injection Hasc; clear Hasc; intros Hc Hs Ha.
-  rewrite <- Ha.
-  now apply rotation_unit_axis_neq_0.
-
-  unfold axis_angle_of_matrix in Hasc.
-  injection Hasc; clear Hasc; intros Hc Hs Ha.
-  rewrite <- Hc, <- Hs.
-  rewrite Rsqr_sqrt; [ lra | ].
-  eapply Rplus_le_reg_r.
-  rewrite Rminus_plus.
-  rewrite Rplus_0_l.
-  rewrite Rsqr_div; [ | lra ].
-  apply Rmult_le_reg_r with (r := 2²); [ unfold Rsqr; lra | ].
-  rewrite Rmult_div_same; [ | unfold Rsqr; lra ].
-  rewrite Rmult_1_l.
-  specialize (mat_trace_large_interv M Hrm) as (H1, H2).
-  apply Rsqr_neg_pos_le_1; [ | lra | lra ].
-
-bbb.
-
-unfold matrix_of_axis_angle, axis_angle_of_matrix.
-remember (rotation_unit_axis M) as axis eqn:Hax.
-destruct axis as (x, y, z).
-unfold rotation_unit_axis in Hax.
-remember (rotation_axis M) as v eqn:Hv.
-destruct v as (x₀, y₀, z₀).
-simpl in Hax.
-injection Hax; clear Hax; intros Hz Hy Hx; simpl.
-remember (√ (x₀² + y₀² + z₀²)) as r₀ eqn:Hr₀.
-remember (√ (x² + y² + z²)) as r eqn:Hr.
-remember (mat_trace M) as tr eqn:Htr.
-remember ((tr - 1) / 2) as c eqn:Hc.
-unfold mat_trace in Hc.
-unfold mat_transp, mat_id, mat_mul, mkrmat in Hrm.
-unfold mat_det in Hdet.
-unfold mat_transp, mkrmat in Hntr.
-unfold mat_trace in Htr; simpl in Htr.
-unfold mkrmat.
-destruct M; simpl in *.
-injection Hrm; clear Hrm.
-intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-unfold rotation_axis in Hv; simpl in Hv.
-injection Hv; clear Hv; intros Hz' Hy' Hx'.
-destruct (Req_dec r₀ 0) as [Hr₀z| Hr₀nz].
- move Hr₀z at top; subst r₀.
- symmetry in Hr₀.
- apply sqrt_eq_0 in Hr₀; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hr₀.
- move Hr₀ at top; destruct Hr₀ as (H1 & H2 & H3); subst x₀ y₀ z₀.
- symmetry in Hx', Hy', Hz'.
- apply Rminus_diag_uniq in Hx'.
- apply Rminus_diag_uniq in Hy'.
- apply Rminus_diag_uniq in Hz'.
- move Hx' at top; subst a₃₂.
- move Hy' at top; subst a₁₃.
- move Hz' at top; subst a₂₁.
- easy.
-
- assert (H : r₀² ≠ 0 ∧ r = 1).
-  split; [ now intros H; apply Hr₀nz; apply Rsqr_eq_0 in H | ].
-  rewrite Hr, Hx, Hy, Hz.
-  do 3 rewrite Rsqr_mult.
-  rewrite Rsqr_inv; [ | easy ].
-  do 2 rewrite <- Rmult_plus_distr_l.
-  rewrite sqrt_mult; [ | | apply nonneg_sqr_vec_norm ].
-   rewrite <- Hr₀.
-   rewrite sqrt_inv.
-    rewrite sqrt_Rsqr; [ | rewrite Hr₀; apply sqrt_pos ].
-    rewrite Rinv_l; [ easy | lra ].
-
-    specialize (Rle_0_sqr r₀) as H.
-    enough (r₀² ≠ 0) by lra.
-    now clear H; intros H; apply Rsqr_eq_0 in H.
-
-   apply nonneg_inv.
-   specialize (Rle_0_sqr r₀) as H.
-   enough (r₀² ≠ 0) by lra.
-   now clear H; intros H; apply Rsqr_eq_0 in H.
-
-  destruct H as (Hr₀2 & Hr1).
-  move Hr1 at top; subst r.
-  progress repeat rewrite Rdiv_1_r.
-  clear H23 H13 H12 H11.
-  subst x y z c.
-  rewrite Rsqr_div; [ | lra ].
-  symmetry.
-  f_equal.
-   apply Rmult_eq_reg_r with (r := 2 * r₀²); [ | lra ].
-   rewrite Rmult_plus_distr_r, Rsqr_mult.
-   rewrite Rsqr_inv; [ | lra ].
-   progress replace (/ r₀² * x₀² * (1 - (tr - 1) / 2) * (2 * r₀²))
-   with (x₀² * (3 - tr) * (r₀² * / r₀²)) by lra.
-   progress replace ((tr - 1) / 2 * (2 * r₀²))
-   with ((tr - 1) * r₀²) by lra.
-   rewrite Rinv_r; [ rewrite Rmult_1_r, Hr₀ | easy ].
-   rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-   subst x₀ y₀ z₀ tr; ring_simplify.
-   clear r₀ Hr Hr₀ Hr₀nz Hr₀2 Hntr.
-   Time nsatz.
-
-   apply Rmult_eq_reg_l with (r := 4 * r₀²); [ | lra ].
-   rewrite Rmult_minus_distr_l.
-   do 6 rewrite <- Rmult_assoc.
-   do 3 rewrite Rsqr_pow2.
-   progress replace (4 * r₀ ^ 2 * / r₀ * x₀ * / r₀ * y₀)
-   with (4 * x₀ * y₀ * (r₀ / r₀) * (r₀ / r₀)) by lra.
-   progress replace (4 * r₀ ^ 2 * / r₀ * z₀)
-   with (4 * r₀ * z₀ * (r₀ / r₀)) by lra.
-   rewrite Rdiv_same; [ do 3 rewrite Rmult_1_r | lra ].
-   replace (2 ^ 2) with 4 by lra.
-   progress replace (1 - (tr - 1) ^ 2 / 4) with ((4 - (tr - 1) ^ 2) / 4)
-     by lra.
-   rewrite sqrt_div; [ | | lra ].
-Focus 2.
-enough (-1 ≤ tr ≤ 3).
-assert (-2 ≤ tr - 1 ≤ 2) by lra.
-remember (tr - 1) as a.
-clear -H0.
-rewrite <- Rsqr_pow2.
-apply Rplus_le_reg_r with (r := a²).
-rewrite Rplus_0_l.
-rewrite Rminus_plus.
-replace 4 with (2 ^ 2) by lra.
-rewrite <- Rsqr_pow2.
-apply Rsqr_le_abs_1.
-replace (Rabs 2) with 2; [ now apply Rabs_le | ].
-unfold Rabs.
-destruct (Rcase_abs 2); [ lra | easy ].
-Abort.
-(* requires to first prove that -1 ≤ tr ≤ 3 *)
-
-bbb.
-*)
 
 Definition J_mat axis :=
   mkset
@@ -4055,32 +3903,6 @@ Definition J_mat axis :=
 Definition J_mat_of_nat axis n : matrix ℝ :=
   let '(sinθ, cosθ) := J_of_nat axis n in
   matrix_of_axis_angle (axis, sinθ, cosθ).
-
-(*
-Theorem J_mat_is_countable : ∀ axis,
-  ∀ M, M ∈ J_mat axis → ∃ n : ℕ, J_mat_of_nat axis n = M.
-Proof.
-intros * HM.
-unfold J_mat in HM.
-remember axis_angle_of_matrix as f.
-remember J as K.
-simpl in HM; subst f K.
-remember (axis_angle_of_matrix M) as vcs eqn:Hvcs.
-symmetry in Hvcs.
-destruct vcs as ((v, c), s).
-destruct HM as (Hv & Hscj).
-specialize (J_is_countable _ _ Hscj) as (n, HJ).
-unfold J_mat_of_nat.
-exists n.
-rewrite HJ.
-subst v; symmetry.
-apply (f_equal matrix_of_axis_angle) in Hvcs.
-Search (matrix_of_axis_angle (axis_angle_of_matrix _)).
-(* above exists but not terminated (aborted) *)
-bbb.
-rewrite axis_angle_of_matrix_inv in Hvcs.
-bbb.
-*)
 
 Definition I_of_ℝ x :=
   if Rlt_dec x 0 then 1 / (- x + 1) / 2
@@ -4893,12 +4715,6 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball �
      (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ ball ∖ center ∧ p = ((ρ ^ n)%mat * p₀)%vec))
      as E eqn:HE.
    remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
-(*
-  specialize
-    (equidec_wih_sphere_with_and_without_fixpoints r Hr p₁ s c ρ E ρE Hp Hq
-       Hsc Hj Hρ HE HρE)
-    as H.
-*)
    assert (Hp' : p'₁ ∈ sphere 1 ∖ D).
     split.
      rewrite Hp'₁.
@@ -5073,53 +4889,6 @@ split.
     now apply IHEL; [ | apply Nat.succ_inj_wd_neg ].
 Qed.
 
-(* not sure it it true: problem with the transformation...
-Add Parametric Morphism : subtract
-with signature equidecomposable ==> set_eq ==> equidecomposable
-as subtract_morph_equidec_l.
-Proof.
-intros E F HEF E' F' HEF'.
-rewrite <- HEF'; clear F' HEF'.
-rename E' into G; move G before F.
-destruct HEF as (EL & FL & HPE & HPF & HEF).
-exists (map (λ E₁, E₁ ∖ G) EL).
-exists (map (λ F₁, F₁ ∖ G) FL).
-split; [ now apply is_partition_subtract | ].
-split; [ now apply is_partition_subtract | ].
-revert E F HPE HPF.
-induction HEF as [| E₁ F₁ EL FL HEF]; intros; [ constructor | simpl ].
-constructor.
- destruct HEF as (g, HEF).
- exists g.
-
-Theorem group_subtract_distr : ∀ g E F,
-  (app_gr g (E ∖ F) = app_gr g E ∖ app_gr g F)%S.
-Proof.
-intros.
-revert E F.
-induction g; intros.
-Check set_map_inter_distr.
-(*
- apply set_map_inter_distr.
- now apply rot_mat_vec_mul_is_inj.
-
- now intros (x, y, z).
-
- intros p; simpl; now rewrite IHg2, IHg1.
-*)
- rewrite group_subtract_distr.
-rewrite HEF.
-bbb.
-
-Theorem equidec_sub_compat_l : ∀ E F G,
-  equidecomposable E F
-  → equidecomposable (E ∖ G) (F ∖ G).
-Proof.
-intros * Heq.
-now rewrite Heq.
-bbb.
-*)
-
 Theorem set_subtract_sub_swap : ∀ A (E F G : set A),
   (E ∖ F ∖ G = E ∖ G ∖ F)%S.
 Proof.
@@ -5292,86 +5061,6 @@ Proof.
 rewrite <- equidec_ball_but_1_0_0_ball_but_center.
 apply equidec_ball_ball_but_1_0_0.
 Qed.
-
-Theorem equidec_ball_but_fixpoint_but_point_itself_but_center : ∀ p,
-  p ≠ 0%vec
-  → p ∉ D
-  → equidecomposable (ball ∖ D ∖ set_of_vec p) (ball ∖ D ∖ center).
-Proof.
-intros * Hpnz Hp.
-remember (set_of_vec p) as E eqn:HE.
-exists [center; ball ∖ D ∖ E ∖ center].
-exists [E; ball ∖ D ∖ center ∖ E].
-split.
- apply is_partition_subtract.
-Abort. (*
-(* problem: seems that center ∈ D,
-   therefore
-     ball ∖ D ∖ center = ball ∖ D
-     ball ∖ D ∖ E ∖ center = ball ∖ D ∖ E *)
-vvv.
-  equidecomposable_with (ball ∖ center) (ball ∖ center ∖ D)
-    [E; ball ∖ center ∖ E] [ρE; ball ∖ center ∖ E].
-bbb.
- intros q Hq; subst E.
- simpl in Hq; subst q; simpl.
- split; [ | now intros H; rewrite H in Hpnz ].
- split; [ rewrite Rsqr_0; lra | ].
- intros (el & p₁ & Hso & Hnl & Hr).
- unfold same_orbit in Hso.
- destruct Hso as (el₁, Hso).
- rewrite rotate_vec_mul in Hso.
- rewrite mat_vec_mul_0_r in Hso.
- subst p₁.
-bbb.
-
-  injection H; clear H; intros H; lra.
-
-  split.
-   apply is_partition_subtract.
-   intros p Hp; subst E.
-   simpl in Hp; subst p; simpl.
-   split; [ rewrite Rsqr_0, Rsqr_1; lra | ].
-   intros H; simpl in H.
-   injection H; clear H; intros H; lra.
-
-   constructor.
-    exists (Transl (V 1 0 0)).
-    intros (x, y, z); subst E; simpl.
-    split; intros Hv.
-     injection Hv; clear Hv; intros Hz Hy Hx.
-     rewrite Ropp_0 in Hy, Hz; rewrite Rplus_0_r in Hy, Hz.
-     subst y z; f_equal; lra.
-
-     injection Hv; clear Hv; intros Hz Hy Hx.
-     subst x y z; f_equal; lra.
-
-     constructor; [ | constructor ].
-     exists gr_ident.
-     rewrite set_subtract_sub_swap.
-     apply app_gr_ident.
-bbb.
-*)
-
-(*
-Theorem equidec_ball_but_fixpoint_itself_but_1_0_0 :
-  equidecomposable (ball ∖ D) ((ball ∖ D) ∖ set_of_vec (V 1 0 0)).
-Proof.
-bbb.
-*)
-
-(* I need a point on the sphere that does not belong to D *)
-Theorem equidec_ball_but_fixpoint_itself_but_center :
-  equidecomposable (ball ∖ D) ((ball ∖ D) ∖ center).
-Proof.
-(*
-rewrite <- equidec_ball_but_fixpoint_but_1_0_0_itself_but_center.
-apply equidec_ball_but_fixpoint_itself_but_1_0_0.
-*)
-(* problem : center ∈ D; this theorem is trivial *)
-Abort. (*
-bbb.
-*)
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball (ball ∖ D).
