@@ -254,3 +254,46 @@ unfold is_partition.
 rewrite <- HEF.
 now split.
 Qed.
+
+Theorem is_partition_subtract : ∀ A (E F : set A),
+  F ⊂ E
+  → is_partition E [F; E ∖ F].
+Proof.
+intros * HF.
+split.
+ simpl; rewrite union_empty_r.
+ intros v; split; intros H.
+  now destruct (EM (v ∈ F)) as [Hi| Hni]; [ left | right ].
+
+  now destruct H as [H| H]; [ apply HF | destruct H ].
+
+ intros i j Hij.
+ destruct i.
+  destruct j; [ easy | ].
+  destruct j.
+   intros v.
+   now split; intros Hv; [ simpl in Hv | ].
+
+   simpl; rewrite match_id.
+   apply intersection_empty_r.
+
+  destruct j.
+   destruct i.
+    intros v.
+    now split; intros Hv; [ simpl in Hv | ].
+
+    simpl; rewrite match_id.
+    apply intersection_empty_l.
+
+   destruct i.
+    destruct j; [ easy | ].
+    simpl; rewrite match_id.
+    apply intersection_empty_r.
+
+    destruct j.
+     simpl; rewrite match_id.
+     apply intersection_empty_l.
+
+     simpl; do 2 rewrite match_id.
+     apply intersection_empty_l.
+Qed.

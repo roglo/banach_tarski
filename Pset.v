@@ -381,3 +381,16 @@ intros.
 induction EL as [| E EL]; [ apply set_map_empty | simpl ].
 now rewrite set_map_union_distr, IHEL.
 Qed.
+
+Theorem  subtract_empty_l : ∀ A (E : set A), (∅ ∖ E = ∅)%S.
+Proof.
+intros; intros a; now simpl; split; intros H.
+Qed.
+
+Theorem set_subtract_sub_swap : ∀ A (E F G : set A),
+  (E ∖ F ∖ G = E ∖ G ∖ F)%S.
+Proof.
+intros; intros x; split; intros Hx.
+ now destruct Hx as ((HE & HF) & HG).
+ now destruct Hx as ((HE & HF) & HG).
+Qed.

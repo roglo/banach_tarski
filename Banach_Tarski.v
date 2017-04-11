@@ -2276,49 +2276,6 @@ split.
  now rewrite H.
 Qed.
 
-Theorem is_partition_subtract : ∀ A (E F : set A),
-  F ⊂ E
-  → is_partition E [F; E ∖ F].
-Proof.
-intros * HF.
-split.
- simpl; rewrite union_empty_r.
- intros v; split; intros H.
-  now destruct (EM (v ∈ F)) as [Hi| Hni]; [ left | right ].
-
-  now destruct H as [H| H]; [ apply HF | destruct H ].
-
- intros i j Hij.
- destruct i.
-  destruct j; [ easy | ].
-  destruct j.
-   intros v.
-   now split; intros Hv; [ simpl in Hv | ].
-
-   simpl; rewrite match_id.
-   apply intersection_empty_r.
-
-  destruct j.
-   destruct i.
-    intros v.
-    now split; intros Hv; [ simpl in Hv | ].
-
-    simpl; rewrite match_id.
-    apply intersection_empty_l.
-
-   destruct i.
-    destruct j; [ easy | ].
-    simpl; rewrite match_id.
-    apply intersection_empty_r.
-
-    destruct j.
-     simpl; rewrite match_id.
-     apply intersection_empty_l.
-
-     simpl; do 2 rewrite match_id.
-     apply intersection_empty_l.
-Qed.
-
 Theorem vec_const_mul_in_D : ∀ v r, r ≠ 0 → v ∈ D → r ⁎ v ∈ D.
 Proof.
 intros * Hr Hv.
@@ -2731,29 +2688,6 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball �
         (equidec_with_ball_but_center_with_and_without_fixpoints p'₁ s c ρ E
            ρE Hp' Hnp' Hsc Hj' Hρ HE HρE) as H.
       now apply equidec_with_equidec in H.
-Qed.
-
-Theorem  subtract_empty_l : ∀ A (E : set A), (∅ ∖ E = ∅)%S.
-Proof.
-intros; intros a; now simpl; split; intros H.
-Qed.
-
-Theorem set_subtract_sub_swap : ∀ A (E F G : set A),
-  (E ∖ F ∖ G = E ∖ G ∖ F)%S.
-Proof.
-intros; intros x; split; intros Hx.
- now destruct Hx as ((HE & HF) & HG).
- now destruct Hx as ((HE & HF) & HG).
-Qed.
-
-Theorem mat_of_path_elem_pow : ∀ e n,
-  (mat_of_path [e] ^ n)%mat = mat_of_path (repeat e n).
-Proof.
-intros.
-induction n; [ easy | simpl ].
-rewrite IHn; simpl.
-unfold mat_of_path; simpl.
-now rewrite mat_mul_id_r.
 Qed.
 
 Theorem equidec_ball_ball_but_1_0_0 :

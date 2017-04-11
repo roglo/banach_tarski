@@ -618,3 +618,13 @@ assert (Hnn : norm_list (el ++ el) ≠ []).
  specialize (mat_of_path_is_rotation_matrix el) as (Hr, Hdet).
  lra.
 Qed.
+
+Theorem mat_of_path_elem_pow : ∀ e n,
+  (mat_of_path [e] ^ n)%mat = mat_of_path (repeat e n).
+Proof.
+intros.
+induction n; [ easy | simpl ].
+rewrite IHn; simpl.
+unfold mat_of_path; simpl.
+now rewrite mat_mul_id_r.
+Qed.
