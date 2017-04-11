@@ -279,15 +279,6 @@ apply Ropp_eq_0_compat in Hx.
 now rewrite Ropp_involutive in Hx.
 Qed.
 
-Theorem Rabs_eq_Rabs : ∀ x y, Rabs x = Rabs y → x = y ∨ x = - y.
-Proof.
-intros * Hxy.
-unfold Rabs in Hxy.
-destruct (Rcase_abs x) as [Hx| Hx].
- destruct (Rcase_abs y); lra.
- destruct (Rcase_abs y); lra.
-Qed.
-
 Theorem Rabs_lt : ∀ x y, Rabs x < y ↔ - y < x < y.
 Proof.
 intros; split.

@@ -4,8 +4,6 @@
 Require Import Utf8 NPeano Bool Compare_dec ZArith Psatz.
 Require Import Misc.
 
-Definition is_countable A := ∃ f : nat → A, FinFun.Surjective f.
-
 Definition prod_nat_of_nat n :=
   let s := Nat.sqrt n in
   (s - (n - s ^ 2), n - s ^ 2)%nat.

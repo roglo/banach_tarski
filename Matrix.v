@@ -287,10 +287,6 @@ intros.
 destruct v as (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_mul_diag : ∀ x y z k,
-  V (k * x) (k * y) (k * z) = (k ⁎ V x y z)%vec.
-Proof. easy. Qed.
-
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
 unfold mat_mul, mat_id, mkrmat; simpl.
