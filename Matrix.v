@@ -759,22 +759,6 @@ Proof.
 intros (x, y, z); simpl; f_equal; lra.
 Qed.
 
-Theorem fold_vec_sub : ∀ u v, (u + - v = u - v)%vec.
-Proof. intros; easy. Qed.
-
-Theorem eq_vec_const_mul_0 : ∀ a v, (a ⁎ v = 0 → a = 0%R ∨ v = 0)%vec.
-Proof.
-intros a (x, y, z) Hv; simpl in Hv; simpl.
-injection Hv; intros Hz Hy Hx.
-apply Rmult_integral in Hx.
-apply Rmult_integral in Hy.
-apply Rmult_integral in Hz.
-destruct Hx as [Hx| Hx]; [ now left | subst x ].
-destruct Hy as [Hy| Hy]; [ now left | subst y ].
-destruct Hz as [Hz| Hz]; [ now left | subst z ].
-now right.
-Qed.
-
 Theorem vec_const_mul_0_l : ∀ v, (0 ⁎ v = 0)%vec.
 Proof.
 intros (x, y, z); simpl.

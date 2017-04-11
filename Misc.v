@@ -101,20 +101,9 @@ Proof. easy. Qed.
 Theorem app_of_cons : ∀ A (e : A) el, e :: el = [e] ++ el.
 Proof. easy. Qed.
 
-Theorem fold_right_cons : ∀ A B f (x : A) (y : B) l,
-  fold_right f x (y :: l) = f y (fold_right f x l).
-Proof. easy. Qed.
-
 Theorem fold_right_single : ∀ A B (f : A → B → B) x y,
   fold_right f x [y] = f y x.
 Proof. easy. Qed.
-
-Theorem fold_right_map : ∀ A B C (f : B → A → A) (a : A) (l : list C) g,
-  fold_right (λ b a, f (g b) a) a l = fold_right f a (map g l).
-Proof.
-intros.
-induction l as [| c l]; [ easy | now simpl; f_equal ].
-Qed.
 
 Theorem list_prod_nil_r : ∀ A B (l : list A),
   list_prod l ([] : list B) = [].
@@ -160,13 +149,6 @@ Theorem Forall_inv2 : ∀ A (P : A → Prop) a l,
 Proof.
 intros A P a l H.
 inversion H; now split.
-Qed.
-
-Theorem Forall2_nil_cons : ∀ A B (R : A → B → Prop) x l,
-  ¬Forall2 R [] (x :: l).
-Proof.
-intros A B * H.
-inversion H.
 Qed.
 
 Theorem Forall2_cons_nil : ∀ A B (R : A → B → Prop) x l,
@@ -314,7 +296,7 @@ Theorem bool_dec_negb_r : ∀ b,
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
 Proof. intros b; now destruct b. Qed.
 
-Theorem Forall2_sym: ∀ A (R : A → A → Prop) l1 l2,
+Theorem Forall2_sym : ∀ A (R : A → A → Prop) l1 l2,
  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
 Proof.
 intros * Hs HF; revert l2 HF.

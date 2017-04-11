@@ -190,10 +190,6 @@ intros E F HEF E' F' HE'F'.
 split; intros HEE' x HF; apply HE'F', HEE', HEF, HF.
 Qed.
 
-Theorem fold_set_eq : ∀ A (P Q : set A),
-  (∀ x, x ∈ P ↔ x ∈ Q) = (P = Q)%S.
-Proof. easy. Qed.
-
 Theorem set_eq_equiv {A} : ∀ (E F : set A),
   (E = F)%S
   → ∀ p, p ∈ E ↔ p ∈ F.
