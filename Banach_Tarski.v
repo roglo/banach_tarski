@@ -88,8 +88,6 @@ split.
    now exists (Comb (Transl (V 6 0 0)) (rot_elem ḅ)); rewrite rot_set_map_mul.
 Qed.
 
-Check Banach_Tarski_paradox_but_fixpoints.
-
 Theorem equidec_transl : ∀ d E F,
   equidecomposable E F
   → equidecomposable (transl d E) (transl d F).
@@ -5849,7 +5847,6 @@ exists [center; ball ∖ D ∖ E ∖ center].
 exists [E; ball ∖ D ∖ center ∖ E].
 split.
  apply is_partition_subtract.
-Print D.
 Abort. (*
 (* problem: seems that center ∈ D,
    therefore
