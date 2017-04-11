@@ -314,7 +314,7 @@ destruct (vec_zerop ev) as [Hvz| Hvnz].
  replace (k * z) with (z * k) by apply Rmult_comm.
  subst x y z.
  clear Hm Hvnz.
- f_equal; nsatz.
+ Time f_equal; nsatz.
 Qed.
 
 Theorem normalized_axis : ∀ M k v,
@@ -579,9 +579,9 @@ injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 unfold mat_det in Hd.
 destruct M; simpl in *.
 f_equal.
- clear H₁ H₂ H₃ H₄ H₅ H₆; nsatz.
- clear H₁ H₂ H₃ H₇ H₈ H₉; nsatz.
- clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
+ Time clear H₁ H₂ H₃ H₄ H₅ H₆; nsatz.
+ Time clear H₁ H₂ H₃ H₇ H₈ H₉; nsatz.
+ Time clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
 Qed.
 
 Theorem vec_cross_mul_eq_0 : ∀ u v,
@@ -1095,7 +1095,7 @@ simpl in Hm.
 injection Hm; clear Hm; intros Hz Hy Hx.
 unfold latitude; simpl.
 rewrite Hp, Hp₁, Hp₂, sqrt_1; f_equal.
-nsatz.
+Time nsatz.
 Qed.
 
 Theorem latitude_mul : ∀ k u v,
@@ -1241,10 +1241,10 @@ rewrite Rabs_R1 in H.
 unfold Rabs in H.
 destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
  right; clear Ha.
- f_equal; nsatz.
+ Time f_equal; nsatz.
 
  left; clear Ha.
- f_equal; nsatz.
+ Time f_equal; nsatz.
 Qed.
 
 Theorem vec_same_norm_cross_mul_eq_0 : ∀ u v,
