@@ -431,20 +431,6 @@ apply Rsqr_le_1_interv in Ha₃₃.
 easy.
 Qed.
 
-Theorem mat_trace_large_interv : ∀ M,
-  is_rotation_matrix M
-  → -3 ≤ mat_trace M ≤ 3.
-Proof.
-intros * (Hrm & Hdet).
-specialize (ortho_matrix_coeff_interv _ Hrm) as Ha.
-destruct Ha as (Ha₁ & Ha₂ & Ha₃).
-destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
-destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
-destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
-unfold mat_trace.
-split; lra.
-Qed.
-
 (* We know, from theory of linear algebra, that tr(M) = 1 + 2 cos θ.
    Therefore, when θ varies from 0 to 2π, tr(M) varies between -1 and 3.
    Then (tr(M)+1)/4 varies from 0 to 1. *)
@@ -3065,42 +3051,6 @@ assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
 
        rewrite Hnu₁, Hnu₂, fold_Rsqr.
        intros J; apply Rsqr_eq_0 in J; lra.
-Qed.
-
-Theorem matrix_of_axis_angle_opp : ∀ p₁ p₂ a c s,
-  a ∈ sphere 1
-  → c² + s² = 1
-  → (matrix_of_axis_angle (a, s, c) * p₁ = p₂)%vec
-  → (matrix_of_axis_angle (a, (-s)%R, c) * p₂ = p₁)%vec.
-Proof.
-intros * Ha Hcs Hacs.
-subst p₂; simpl.
-destruct a as (ax, ay, az); simpl in Ha.
-rewrite Rsqr_1 in Ha; rewrite Ha.
-rewrite sqrt_1.
-do 3 rewrite Rdiv_1_r.
-rewrite <- mat_vec_mul_assoc.
-unfold mat_mul; simpl.
-unfold mkrmat; simpl.
-destruct p₁ as (x₁, y₁, z₁); simpl.
-f_equal; ring_simplify.
- rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
- progress repeat rewrite Rsqr_pow2.
- replace (s ^ 2) with (1 - c ^ 2) by lra.
- replace (az ^ 2) with (1 - ax ^ 2 - ay ^ 2) by lra.
- ring.
-
- rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
- progress repeat rewrite Rsqr_pow2.
- replace (s ^ 2) with (1 - c ^ 2) by lra.
- replace (az ^ 2) with (1 - ax ^ 2 - ay ^ 2) by lra.
- ring.
-
- rewrite Rsqr_pow2 in Ha, Ha, Ha, Hcs, Hcs.
- progress repeat rewrite Rsqr_pow2.
- replace (s ^ 2) with (1 - c ^ 2) by lra.
- replace (az ^ 2) with (1 - ax ^ 2 - ay ^ 2) by lra.
- ring.
 Qed.
 
 Theorem rot_is_id_for_pt : ∀ M v,

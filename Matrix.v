@@ -303,18 +303,6 @@ destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem mat_vec_mul_add_distr_r : ∀ M₁ M₂ v,
-  ((M₁ + M₂)%mat * v = M₁ * v + M₂ * v)%vec.
-Proof.
-intros; destruct M₁, M₂, v; simpl; f_equal; lra.
-Qed.
-
-Theorem mat_vec_mul_sub_distr_r : ∀ M₁ M₂ v,
-  ((M₁ - M₂)%mat * v = M₁ * v - M₂ * v)%vec.
-Proof.
-intros; destruct M₁, M₂, v; simpl; f_equal; lra.
-Qed.
-
 Theorem  mat_vec_mul_const_distr : ∀ M k v, (M * (k ⁎ v) = k ⁎ (M * v))%vec.
 Proof.
 intros.
@@ -973,20 +961,6 @@ intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 f_equal; ring.
 Qed.
 
-Theorem mat_const_vec_mul : ∀ M v k,
-  mat_vec_mul (mat_const_mul k M) v = mat_vec_mul M (vec_const_mul k v).
-Proof.
-intros.
-destruct v as (x, y, z); simpl; f_equal; ring.
-Qed.
-
-Theorem mat_vec_mat_const_mul : ∀ M v k,
-  mat_vec_mul (mat_const_mul k M) v = vec_const_mul k (mat_vec_mul M v).
-Proof.
-intros.
-destruct v as (x, y, z); simpl; f_equal; ring.
-Qed.
-
 Theorem vec_dot_cross_mul : ∀ u v, u · (u × v) = 0.
 Proof.
 intros.
@@ -1202,17 +1176,6 @@ Qed.
 
 Theorem mat_trace_comm : ∀ A B, mat_trace (A * B) = mat_trace (B * A).
 Proof. intros. unfold mat_trace; simpl; lra. Qed.
-
-Theorem mat_trace_change_basis : ∀ A A' B,
-  (A' * A = mat_id)%mat
-  → mat_trace (A * B * A')%mat = mat_trace B.
-Proof.
-intros * HAA.
-rewrite mat_trace_comm.
-rewrite mat_mul_assoc.
-rewrite HAA.
-now rewrite mat_mul_id_l.
-Qed.
 
 Theorem mat_pow_succ : ∀ M n, (M ^ S n)%mat = (M * M ^ n)%mat.
 Proof. easy. Qed.
@@ -1589,37 +1552,6 @@ rewrite sin_angle_of_sin_cos; [ | easy ].
 Time f_equal; nsatz.
 Qed.
 
-Theorem mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
-  a ≠ 0%vec
-  → s₁² + c₁² = 1
-  → s₂² + c₂² = 1
-  → θ₁ = angle_of_sin_cos s₁ c₁
-  → θ₂ = angle_of_sin_cos s₂ c₂
-  → (matrix_of_axis_angle (a, s₁, c₁) *
-     matrix_of_axis_angle (a, s₂, c₂))%mat =
-     matrix_of_axis_angle (a, sin (θ₁ + θ₂), cos (θ₁ + θ₂)).
-Proof.
-intros * Ha Hsc₁ Hsc₂ Hθ₁ Hθ₂.
-assert (Haz : ‖a‖ ≠ 0) by now apply vec_norm_neq_0.
-assert (Haiz : / ‖a‖ ≠ 0) by now apply Rinv_neq_0_compat.
-assert (Hap : 0 < ‖a‖) by (specialize (vec_norm_nonneg a); lra).
-assert (Haa : ‖(a ⁄ ‖a‖)‖ = 1) by now apply vec_div_vec_norm.
-eapply unit_sphere_mat_mul_angle_add with (s₁ := s₁) (θ₂ := θ₂) in Haa;
-  try eassumption.
-remember (vec_const_mul (/ ‖a‖) a) as b eqn:Hb.
-remember (matrix_of_axis_angle (b, s₁, c₁)) as M₁ eqn:HM₁.
-remember (matrix_of_axis_angle (b, s₂, c₂)) as M₂ eqn:HM₂.
-remember (matrix_of_axis_angle (b, sin (θ₁ + θ₂), cos (θ₁ + θ₂))) as M eqn:HM.
-rewrite matrix_mul_axis with (k := ‖a‖) in HM₁, HM₂, HM; try easy.
-rewrite Rsign_of_pos in HM₁, HM₂, HM; [ | easy | easy | easy ].
-rewrite Rmult_1_l in HM₁, HM₂, HM.
-rewrite Hb in HM₁, HM₂, HM.
-rewrite vec_const_mul_assoc in HM₁, HM₂, HM.
-rewrite Rinv_r in HM₁, HM₂, HM; [ | easy | easy | easy ].
-rewrite vec_const_mul_1_l in HM₁, HM₂, HM.
-now rewrite HM₁, HM₂, HM in Haa.
-Qed.
-
 Theorem unit_sphere_matrix_of_mul_angle : ∀ a s c θ s' c' n,
   ‖a‖ = 1
   → s² + c² = 1
@@ -1718,38 +1650,6 @@ Proof. intros; easy. Qed.
 
 Theorem mat_pow_1 : ∀ M, (M ^ 1)%mat = M.
 Proof. intros; apply mat_mul_id_r. Qed.
-
-Theorem mat_sin_cos_0 : ∀ p, matrix_of_axis_angle (p, 0, 1) = mat_id.
-Proof.
-intros (x, y, z); simpl.
-rewrite Rminus_diag_eq; [ | easy ].
-progress repeat rewrite Rmult_0_r.
-unfold mat_id, mkrmat.
-f_equal; lra.
-Qed.
-
-Theorem mat_of_axis_angle_trace_interv : ∀ a s c,
-  a ≠ 0%vec
-  → s² + c² = 1
-  → -1 ≤ mat_trace (matrix_of_axis_angle (a, s, c)) ≤ 3.
-Proof.
-intros * Ha Hsc.
-rewrite mat_trace_eq; [ | easy ].
-assert (Hc : c² ≤ 1).
- rewrite <- Hsc.
- apply Rplus_le_reg_r with (r := - c²).
- rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
- apply Rle_0_sqr.
-
- split.
-  enough (-1 ≤ c) by lra.
-  replace 1 with 1² in Hc by apply Rsqr_1.
-  apply Rsqr_neg_pos_le_0 in Hc; [ easy | lra ].
-
-  enough (c ≤ 1) by lra.
-  replace 1 with 1² in Hc by apply Rsqr_1.
-  apply Rsqr_incr_0_var in Hc; [ easy | lra ].
-Qed.
 
 Theorem z_of_xy : ∀ x y z r,
   r = √ (x² + y² + z²)
