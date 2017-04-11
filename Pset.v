@@ -264,15 +264,6 @@ split; intros H.
  split; [ now split | easy ].
 Qed.
 
-Theorem union_is_empty : ∀ A (E F : set A),
-  (E ∪ F = ∅)%S → (E = ∅)%S ∧ (F = ∅)%S.
-Proof.
-intros * HEF.
-split; intros x.
- split; [ intros Hx; apply HEF; now left | easy ].
- split; [ intros Hx; apply HEF; now right | easy ].
-Qed.
-
 Theorem union_list_app : ∀ A (P₁ P₂ : list (set A)),
   (⋃ (P₁ ++ P₂) = (⋃ P₁) ∪ (⋃ P₂))%S.
 Proof.

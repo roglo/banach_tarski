@@ -266,12 +266,6 @@ Definition fixpoint_of_path r el :=
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
-(* We know, from theory of linear algebra, that tr(M) = 1 + 2 cos θ.
-   Therefore, when θ varies from 0 to 2π, tr(M) varies between -1 and 3.
-   Then (tr(M)+1)/4 varies from 0 to 1. *)
-Definition ter_bin_of_rotation M :=
-  ter_bin_of_frac_part ((mat_trace M + 1) / 4).
-
 Theorem matrix_axis_ok : ∀ M p k,
   is_rotation_matrix M
   → M ≠ mat_transp M
@@ -566,20 +560,6 @@ specialize (Hg a Ha) as (nfo & Hg); subst a.
 exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
 Qed.
-
-Definition prod_4_nat_of_nat n :=
-  let '(n₁, n₂) := prod_nat_of_nat n in
-  let '(n₃, n₄) := prod_nat_of_nat n₁ in
-  let '(n₅, n₆) := prod_nat_of_nat n₂ in
-  (n₃, n₄, n₅, n₆).
-
-Definition prod_6_nat_of_nat n :=
-  let '(n₁, n₂) := prod_nat_of_nat n in
-  let '(n₃, n₄) := prod_nat_of_nat n₁ in
-  let '(n₅, n₆) := prod_nat_of_nat n₂ in
-  let '(n₇, n₈) := prod_nat_of_nat n₃ in
-  let '(n₉, n₁₀) := prod_nat_of_nat n₄ in
-  (n₅, n₆, n₇, n₈, n₉, n₁₀).
 
 Definition bool_prod_nat_of_prod_nat '(n₁, n₂) : bool * ℕ * ℕ :=
   (if n₁ mod 2 then false else true, (n₁ / 2)%nat, n₂).
@@ -1202,42 +1182,6 @@ destruct (Rlt_dec x₁ 0) as [Hx₁| Hx₁].
      now apply Hv₁.
 Qed.
 
-Theorem vec_cross_mul_are_free_family : ∀ u v,
-  ‖u‖ = ‖v‖
-  → is_neg_vec u = is_neg_vec v
-  → u ≠ 0%vec
-  → v ≠ 0%vec
-  → u ≠ v
-  → ∀ a b c : ℝ,
-    (a ⁎ u + b ⁎ v + c ⁎ (u × v))%vec = 0%vec
-    → a = 0 ∧ b = 0 ∧ c = 0.
-Proof.
-intros * Hvn Hn Hu Hv Huv * Hab.
-generalize Hab; intros H.
-apply (f_equal (vec_dot_mul (u × v))) in H.
-rewrite vec_dot_mul_0_r in H.
-do 2 rewrite vec_dot_mul_add_distr_l in H.
-do 2 rewrite <- Rmult_vec_dot_mul_distr_r in H.
-rewrite vec_cross_dot_mul, Rmult_0_r, Rplus_0_l in H.
-rewrite vec_cross_mul_anticomm in H.
-rewrite <- vec_opp_dot_mul_distr_l in H.
-rewrite vec_cross_dot_mul, Ropp_0, Rmult_0_r, Rplus_0_l in H.
-rewrite <- Rmult_vec_dot_mul_distr_r in H.
-rewrite <- vec_opp_dot_mul_distr_l in H.
-rewrite <- vec_opp_dot_mul_distr_r in H.
-rewrite Ropp_involutive in H.
-rewrite vec_dot_mul_diag in H.
-apply Rmult_integral in H.
-destruct H as [| H]; [ subst c | ].
- rewrite vec_const_mul_0_l, vec_add_0_r in Hab.
- now apply free_family_diff_norm_vec in Hab.
-
- apply Rsqr_eq_0 in H.
- apply vec_norm_eq_0 in H.
- apply nonzero_cross_mul in H; try easy.
- now intros H₁; apply Huv.
-Qed.
-
 Theorem vec_couple_and_cross_formula : ∀ u v X,
   (u × v · u × v) ⁎ X =
    (((X · u) * (v · v) - (X · v) * (u · v)) ⁎ u +
@@ -1613,9 +1557,6 @@ enough
  apply D_set_symmetry_is_countable.
 Qed.
 
-Definition rotation_around p :=
-  mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
-
 (* playing with quaternions, just for fun... *)
 
 Record ℍ := quat { Re : ℝ; Im : vector }.
@@ -1656,38 +1597,6 @@ Definition vec_le '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
 Notation "u '≤' v" := (vec_le u v) : vec_scope.
 
 (* end play with quaternions. *)
-
-Theorem axis_of_matrix_is_eigen_vec : ∀ p cosθ sinθ,
-  sinθ² + cosθ² = 1
-  → (matrix_of_axis_angle (p, sinθ, cosθ) * p)%vec = p.
-Proof.
-intros (xp, yp, zp) * Hsc.
-remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
-destruct (Req_dec r 0) as [Hrz| Hrnz].
- rewrite Hr in Hrz.
- apply sqrt_eq_0 in Hrz; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hrz.
- destruct Hrz as (Hx & Hy & Hz); subst xp yp zp.
- now rewrite mat_vec_mul_0_r.
-
- unfold matrix_of_axis_angle; simpl.
- rewrite <- Hr.
- specialize (z_of_xy xp yp zp r Hr Hrnz) as Hz.
- f_equal; ring_simplify.
-  replace (yp / r * sinθ * zp) with (zp / r * sinθ * yp) by lra.
-  replace (xp / r * (zp / r) * zp) with (xp * (zp / r) ^ 2) by lra.
-  replace (cosθ * (xp / r) * (zp / r) * zp)
-  with (cosθ * xp * (zp / r) ^ 2) by lra.
-  rewrite Rsqr_pow2, Hz; lra.
-
-  replace (xp / r * sinθ * zp) with (zp / r * sinθ * xp) by lra.
-  replace (yp / r * cosθ * (zp / r) * zp) with (yp * cosθ * (zp / r) ^ 2)
-    by lra.
-  replace (yp / r * (zp / r) * zp) with (yp * (zp / r) ^ 2) by lra.
-  rewrite Rsqr_pow2, Hz; lra.
-
-  rewrite Rsqr_pow2, Hz; lra.
-Qed.
 
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ‖p₁‖ = ‖p₂‖
@@ -1863,21 +1772,6 @@ rewrite vec_dot_mul_diag.
 apply Rle_0_sqr.
 Qed.
 
-Theorem vec_cross_mul_cross_mul : ∀ u v,
-  u · v = 0
-  → ‖v‖ = 1
-  → (u × v) × v = (- u)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) Huv Hv; simpl in Huv, Hv; simpl.
-apply (f_equal Rsqr) in Hv.
-rewrite Rsqr_1 in Hv.
-rewrite Rsqr_sqrt in Hv; [ | apply nonneg_sqr_vec_norm ].
-f_equal; ring_simplify.
- do 2 rewrite <- Rsqr_pow2; nsatz.
- do 2 rewrite <- Rsqr_pow2; nsatz.
- do 2 rewrite <- Rsqr_pow2; nsatz.
-Qed.
-
 Definition rot_sin_cos p u v :=
   let a := latitude p u in
   let u₁ := (u - a ⁎ p) ⁄ √ (1 - a²) in
@@ -1885,30 +1779,6 @@ Definition rot_sin_cos p u v :=
   let s := Rsign (p · (u₁ × v₁)) * ‖(u₁ × v₁)‖ / (‖u₁‖ * ‖v₁‖) in
   let c := (u₁ · v₁) / (‖u₁‖ * ‖v₁‖) in
   (s, c).
-
-Theorem simple_unit_sphere_ro_sin_cos_on_equator : ∀ p p₁ p₂ c s,
-  ‖p‖ = 1
-  → ‖p₁‖ = 1
-  → ‖p₂‖ = 1
-  → p · p₁ = 0
-  → p · p₂ = 0
-  → (matrix_of_axis_angle (p, s, c) * p₁)%vec = p₂
-  → (s, c) = (p · p₁ × p₂, p₁ · p₂).
-Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hmv.
-destruct p as (xp, yp, zp).
-destruct p₁ as (xp₁, yp₁, zp₁).
-destruct p₂ as (xp₂, yp₂, zp₂).
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm in Hp₁; [ | lra ].
-apply on_sphere_norm in Hp₂; [ | lra ].
-simpl in *.
-rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
-rewrite Hp, sqrt_1 in Hmv.
-do 3 rewrite Rdiv_1_r in Hmv.
-injection Hmv; clear Hmv; intros H3 H2 H1.
-Time f_equal; nsatz.
-Qed.
 
 Theorem vec_unit_cross_mul_eq_0 : ∀ u v,
   ‖u‖ = 1

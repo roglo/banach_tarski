@@ -706,11 +706,6 @@ Proof.
 intros (x, y, z); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_sub_0_l : ∀ v, (0 - v = - v)%vec.
-Proof.
-intros (x, y, z); simpl; f_equal; lra.
-Qed.
-
 Theorem vec_sub_0_r : ∀ v, (v - 0 = v)%vec.
 Proof.
 intros (x, y, z); simpl; f_equal; lra.
@@ -904,12 +899,6 @@ intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 f_equal; ring.
 Qed.
 
-Theorem vec_dot_cross_mul : ∀ u v, u · (u × v) = 0.
-Proof.
-intros.
-destruct u, v; simpl; lra.
-Qed.
-
 Theorem vec_cross_dot_mul : ∀ u v, u × v · u = 0.
 Proof.
 intros.
@@ -940,16 +929,6 @@ Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
 Qed.
 
-Theorem vec_dot_mul_add_distr_r : ∀ u v w, (u + v) · w = u · w + v · w.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; lra.
-Qed.
-
-Theorem vec_dot_mul_sub_distr_r : ∀ u v w, (u - v) · w = u · w - v · w.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; lra.
-Qed.
-
 Theorem Rmult_vec_dot_mul_distr_l : ∀ a u v, a * (u · v) = a ⁎ u · v.
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
@@ -974,75 +953,15 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 f_equal; lra.
 Qed.
 
-Theorem vec_dot_mul_comm : ∀ u v, u · v = v · u.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
-Qed.
-
-Theorem vec_cross_mul_0_l : ∀ v, 0 × v = 0%vec.
-Proof.
-intros (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_cross_mul_0_r : ∀ v, v × 0 = 0%vec.
-Proof.
-intros (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
 Theorem vec_cross_mul_anticomm : ∀ u v, (u × v = - (v × u))%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_cross_mul_add_distr_l : ∀ u v w,
-  (u × (v + w) = u × v + u × w)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_cross_mul_add_distr_r : ∀ u v w,
-  ((u + v) × w = u × w + v × w)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_cross_mul_sub_distr_l : ∀ u v w,
-  (u × (v - w) = u × v - u × w)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_cross_mul_sub_distr_r : ∀ u v w,
-  ((u - v) × w = u × w - v × w)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_cross_mul_diag : ∀ v, v × v = 0%vec.
-Proof.
-intros (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_cross_mul_assoc_l : ∀ u v w,
-  ((u × v) × w = (u · w) ⁎ v - (v · w) ⁎ u)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; ring.
 Qed.
 
 Theorem vec_cross_mul_assoc_r : ∀ u v w,
   (u × (v × w) = (u · w) ⁎ v - (u · v) ⁎ w)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; ring.
-Qed.
-
-Theorem vec_opp_add_distr : ∀ u v, (- (u + v) = - u - v)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_opp_sub_distr : ∀ u v, (- (u - v) = - u + v)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
 Theorem vec_opp_dot_mul_distr_l : ∀ u v, - (u · v) = - u · v.
@@ -1106,13 +1025,6 @@ Proof. easy. Qed.
 Theorem vec_sqr_0 : 0²%vec = 0.
 Proof. simpl; lra. Qed.
 
-Theorem vec_sqr_eq_0 : ∀ v, (v² = 0%R → v = 0)%vec.
-Proof.
-intros (x, y, z) Hv; simpl in Hv |-*.
-apply sqr_vec_norm_eq_0 in Hv.
-now destruct Hv as (H1 & H2 & H3); subst.
-Qed.
-
 Theorem vec_sqr_const_mul : ∀ a v, (a ⁎ v)²%vec = a² * v²%vec.
 Proof.
 intros a (v₁, v₂, v₃); simpl; unfold Rsqr; lra.
@@ -1154,14 +1066,6 @@ Definition vec_inv M '(V x y z) :=
   V (mat_det (mkrmat x (a₁₂ M) (a₁₃ M) y (a₂₂ M) (a₂₃ M) z (a₃₂ M) (a₃₃ M)))
     (mat_det (mkrmat (a₁₁ M) x (a₁₃ M) (a₂₁ M) y (a₂₃ M) (a₃₁ M) z (a₃₃ M)))
     (mat_det (mkrmat (a₁₁ M) (a₁₂ M) x (a₂₁ M) (a₂₂ M) y (a₃₁ M) (a₃₂ M) z)).
-
-Theorem vec_inv_is_root : ∀ M v, (M * vec_inv M v = mat_det M ⁎ v)%vec.
-Proof.
-intros M v.
-unfold mat_vec_mul, mat_vec_mul, vec_inv, mat_det, mkrmat; simpl.
-destruct v as (x, y, z); simpl.
-f_equal; lra.
-Qed.
 
 Definition mat_compl M :=
   let '(V b₁₁ b₂₁ b₃₁) := vec_inv M (V 1 0 0) in
