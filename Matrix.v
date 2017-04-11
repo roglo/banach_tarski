@@ -92,8 +92,6 @@ Notation "u × v" := (vec_cross_mul u v) (at level 40, no associativity).
 Notation "v ²" := (vec_dot_mul v v) : vec_scope.
 Notation "‖ v ‖" := (vec_norm v) (at level 0, v at level 0, format "‖ v ‖").
 
-Definition vos a := V a a a.
-
 Definition rot_x := mkrmat
   1         0         0
   0         (1/3)     (-2*√2/3)
@@ -848,43 +846,9 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_sub_add_distr : ∀ u v w, (u - (v + w) = u - v - w)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
-Qed.
-
 Theorem vec_sub_sub_distr : ∀ u v w, (u - (v - w) = u - v + w)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_sub_cancel_l : ∀ u v w, (u - v = u - w)%vec → v = w.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
-injection H; intros; subst; f_equal; lra.
-Qed.
-
-Theorem vec_sub_cancel_r : ∀ u v w, (u - w = v - w)%vec → u = v.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
-injection H; intros; subst; f_equal; lra.
-Qed.
-
-Theorem vec_sub_move_r : ∀ u v w, (u - v)%vec = w ↔ u = (w + v)%vec.
-Proof.
-intros.
-split; intros H.
- rewrite <- H.
- unfold vec_sub.
- rewrite <- vec_add_assoc.
- rewrite vec_add_opp_diag_l.
- now rewrite vec_add_0_r.
-
- rewrite H.
- unfold vec_sub.
- rewrite <- vec_add_assoc.
- rewrite vec_add_opp_diag_r.
- now rewrite vec_add_0_r.
 Qed.
 
 Theorem vec_const_mul_cross_distr_l : ∀ k u v, k ⁎ (u × v) = (k ⁎ u) × v.
@@ -899,12 +863,6 @@ intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 f_equal; ring.
 Qed.
 
-Theorem vec_cross_dot_mul : ∀ u v, u × v · u = 0.
-Proof.
-intros.
-destruct u, v; simpl; lra.
-Qed.
-
 Theorem vec_dot_mul_0_l : ∀ v, 0 · v = 0.
 Proof.
 intros (x₁, y₁, z₁); simpl; lra.
@@ -915,12 +873,6 @@ Proof.
 intros (x, y, z); simpl.
 do 3 rewrite Rmult_0_r.
 now do 2 rewrite Rplus_0_r.
-Qed.
-
-Theorem vec_dot_mul_add_distr_l : ∀ u v w,
-  u · (v + w) = u · v + u · w.
-Proof.
-intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
 Qed.
 
 Theorem vec_dot_mul_sub_distr_l : ∀ u v w,
@@ -953,20 +905,10 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 f_equal; lra.
 Qed.
 
-Theorem vec_cross_mul_anticomm : ∀ u v, (u × v = - (v × u))%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
 Theorem vec_cross_mul_assoc_r : ∀ u v w,
   (u × (v × w) = (u · w) ⁎ v - (u · v) ⁎ w)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; ring.
-Qed.
-
-Theorem vec_opp_dot_mul_distr_l : ∀ u v, - (u · v) = - u · v.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
 Qed.
 
 Theorem vec_opp_dot_mul_distr_r : ∀ u v, - (u · v) = u · - v.

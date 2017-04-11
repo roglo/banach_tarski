@@ -1,5 +1,5 @@
-Banach_Tarski.vio: Banach_Tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio MiscTrigo.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio GroupTransf.vio Equidecomp.vio Countable.vio QCountable.vio RnCountable.vio NotEmptyPath.vio
-Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified: Banach_Tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo MiscTrigo.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo GroupTransf.vo Equidecomp.vo Countable.vo QCountable.vo RnCountable.vo NotEmptyPath.vo
+Banach_Tarski.vio: Banach_Tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio MiscTrigo.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio GroupTransf.vio Equidecomp.vio Countable.vio RnCountable.vio NotEmptyPath.vio
+Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified: Banach_Tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo MiscTrigo.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo GroupTransf.vo Equidecomp.vo Countable.vo RnCountable.vo NotEmptyPath.vo
 Countable.vio: Countable.v Misc.vio
 Countable.vo Countable.glob Countable.v.beautified: Countable.v Misc.vo
 Equidecomp.vio: Equidecomp.v Misc.vio Matrix.vio Pset.vio Partition.vio OrbitRepr.vio GroupTransf.vio
@@ -26,8 +26,8 @@ Partition.vio: Partition.v Pset.vio
 Partition.vo Partition.glob Partition.v.beautified: Partition.v Pset.vo
 Pset.vio: Pset.v Misc.vio
 Pset.vo Pset.glob Pset.v.beautified: Pset.v Misc.vo
-QCountable.vio: QCountable.v Countable.vio
-QCountable.vo QCountable.glob QCountable.v.beautified: QCountable.v Countable.vo
+QCountable.vio: QCountable.v
+QCountable.vo QCountable.glob QCountable.v.beautified: QCountable.v
 Reverse.vio: Reverse.v Misc.vio Words.vio Normalize.vio
 Reverse.vo Reverse.glob Reverse.v.beautified: Reverse.v Misc.vo Words.vo Normalize.vo
 RnCountable.vio: RnCountable.v MiscReals.vio Countable.vio

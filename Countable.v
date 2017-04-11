@@ -98,40 +98,6 @@ destruct (Z_lt_dec k 0) as [Hk | Hk].
  now rewrite Z2Nat.id.
 Qed.
 
-Theorem countable_sum_types : ∀ A B,
-  is_countable A
-  → is_countable B
-  → is_countable (A + B).
-Proof.
-intros * (fa, Ha) (fb, Hb).
-unfold is_countable.
-exists (λ n, if zerop (n mod 2) then inl (fa (n / 2)) else inr (fb (n / 2))).
-intros [a| b].
- specialize (Ha a) as (n, Ha).
- exists (n * 2)%nat; subst a.
- rewrite Nat.mod_mul; [ simpl | easy ].
- now rewrite Nat.div_mul.
-
- specialize (Hb b) as (n, Hb).
- exists (n * 2 + 1)%nat; subst b.
- rewrite Nat.add_comm, Nat.mod_add; [ simpl | easy ].
- now rewrite <- Nat.add_1_l, Nat.div_add.
-Qed.
-
-Theorem countable_surjection : ∀ A B (f : A → B),
-  is_countable A
-  → FinFun.Surjective f
-  → is_countable B.
-Proof.
-intros * (fa, HA) Hf.
-unfold FinFun.Surjective in Hf.
-exists (λ n, f (fa n)).
-intros b.
-specialize (Hf b) as (a, Hf).
-specialize (HA a) as (n, HA).
-now subst; exists n.
-Qed.
-
 (* Rémi Nollet's code, modified *)
 
 Theorem Cantor : ∀ E (F : E → (E → bool)), ∃ f : E → bool, ∀ x, f x ≠ F x x.
