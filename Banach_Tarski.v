@@ -5787,19 +5787,22 @@ split.
    apply app_gr_ident.
 Qed.
 
-Inspect 1.
-
 Theorem equidec_ball_but_1_0_0_ball_but_center :
   equidecomposable (ball ∖ set_of_vec (V 1 0 0)) (ball ∖ center).
 Proof.
-unfold equidecomposable.
+remember (set_of_vec (V 1 0 0)) as E eqn:HE.
+exists [center; ball ∖ E ∖ center].
+exists [E; ball ∖ E ∖ center].
+split.
+ apply is_partition_subtract.
 bbb.
 
 Theorem equidec_ball_ball_but_center :
   equidecomposable ball (ball ∖ center).
 Proof.
-unfold equidecomposable.
-bbb.
+rewrite <- equidec_ball_but_1_0_0_ball_but_center.
+apply equidec_ball_ball_but_1_0_0.
+Qed.
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball (ball ∖ D).
