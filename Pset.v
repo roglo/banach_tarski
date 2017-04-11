@@ -273,32 +273,6 @@ split; intros x.
  split; [ intros Hx; apply HEF; now right | easy ].
 Qed.
 
-Theorem union_list_is_empty_iff : ∀ A (EL : list (set A)),
-  (⋃ EL = ∅)%S ↔ Forall (λ E, (E = ∅)%S) EL.
-Proof.
-intros *.
-split; intros HEL.
- apply Forall_forall; intros E HE.
- revert E HE.
- induction EL as [| E₁ EL]; intros; [ easy | ].
- simpl in HEL, HE.
- apply union_is_empty in HEL.
- destruct HEL as (HE₁, HEL).
- destruct HE as [HE| HE]; [ now subst E₁ | ].
- apply IHEL, HE; apply HEL.
-
- rewrite Forall_forall in HEL.
- split; [ intros Hx; simpl | easy ].
- revert x Hx.
- induction EL as [| E₁ EL]; intros; [ easy | ].
- simpl in Hx.
- destruct Hx as [Hx| Hx].
-  apply HEL in Hx; [ easy | now left ].
-
-  eapply IHEL; [ | eassumption ].
-  intros E HE; apply HEL; now right.
-Qed.
-
 Theorem union_list_app : ∀ A (P₁ P₂ : list (set A)),
   (⋃ (P₁ ++ P₂) = (⋃ P₁) ∪ (⋃ P₂))%S.
 Proof.
@@ -367,31 +341,6 @@ destruct (lt_dec i (length P₁)) as [H₁| H₁].
  now rewrite app_nth1.
 
  rewrite app_nth2; [ easy | now apply Nat.nlt_ge ].
-Qed.
-
-Theorem union_list_intersection : ∀ A (S : set A) SL x,
-  x ∈ S
-  → x ∈ ⋃ SL
-  → x ∈ ⋃ map (intersection S) SL.
-Proof.
-intros A P QL * HP HQL.
-induction QL as [| Q QL]; intros; [ easy | simpl ].
-destruct HQL as [HQ| HQL]; [ left; now split | right ].
-apply IHQL, HQL.
-Qed.
-
-Theorem union_list_all_included : ∀ A (E : set A) EL,
-  (E = ⋃ EL)%S → Forall (λ Ei, Ei ⊂ E) EL.
-Proof.
-intros * HE.
-apply Forall_forall.
-intros F HF.
-rewrite HE.
-clear - HF.
-revert F HF.
-induction EL as [| E EL]; intros; [ easy | ].
-destruct HF as [HF| HF]; [ left; now subst E | ].
-right; eapply IHEL; eassumption.
 Qed.
 
 Theorem union_intersection_self : ∀ A (E : set A) EL,

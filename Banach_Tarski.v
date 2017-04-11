@@ -225,8 +225,6 @@ destruct (lt_dec q n) as [Hqn| Hqn].
   apply Nat.le_add_r.
 Qed.
 
-Definition unit_interv := mkset (λ x, 0 <= x < 1).
-
 Definition ter_bin_of_vec r '(V x y z) := ter_bin_of_frac_part (x / r).
 
 Theorem ter_bin_of_ball_surj : ∀ r, 0 < r → ∀ (u : ℕ → bool),
@@ -575,23 +573,6 @@ Definition prod_4_nat_of_nat n :=
   let '(n₅, n₆) := prod_nat_of_nat n₂ in
   (n₃, n₄, n₅, n₆).
 
-Theorem surj_prod_4_nat_surj_nat : ∀ A V,
-  (∃ g : ℕ * ℕ * ℕ * ℕ -> A, ∀ a : A, V a
-   → ∃ n₁ n₂ n₃ n₄, g (n₁, n₂, n₃, n₄) = a)
-  → ∃ f : ℕ → A, ∀ a : A, V a → ∃ n : ℕ, f n = a.
-Proof.
-intros * (g & Hg).
-exists (λ n, g (prod_4_nat_of_nat n)).
-intros a Ha.
-specialize (Hg a Ha) as (n₃ & n₄ & n₅ & n₆ & Hg); subst a.
-remember (nat_of_prod_nat (n₅, n₆)) as n₂.
-remember (nat_of_prod_nat (n₃, n₄)) as n₁.
-remember (nat_of_prod_nat (n₁, n₂)) as n.
-exists n; subst.
-unfold prod_4_nat_of_nat.
-now do 3 rewrite prod_nat_of_nat_inv.
-Qed.
-
 Definition prod_6_nat_of_nat n :=
   let '(n₁, n₂) := prod_nat_of_nat n in
   let '(n₃, n₄) := prod_nat_of_nat n₁ in
@@ -599,25 +580,6 @@ Definition prod_6_nat_of_nat n :=
   let '(n₇, n₈) := prod_nat_of_nat n₃ in
   let '(n₉, n₁₀) := prod_nat_of_nat n₄ in
   (n₅, n₆, n₇, n₈, n₉, n₁₀).
-
-Theorem surj_prod_6_nat_surj_nat : ∀ A V,
-  (∃ g : ℕ * ℕ * ℕ * ℕ * ℕ * ℕ -> A, ∀ a : A, V a
-   → ∃ n₁ n₂ n₃ n₄ n₅ n₆, g (n₁, n₂, n₃, n₄, n₅, n₆) = a)
-  → ∃ f : ℕ → A, ∀ a : A, V a → ∃ n : ℕ, f n = a.
-Proof.
-intros * (g & Hg).
-exists (λ n, g (prod_6_nat_of_nat n)).
-intros a Ha.
-specialize (Hg a Ha) as (n₅ & n₆ & n₇ & n₈ & n₉ & n₁₀ & Hg); subst a.
-remember (nat_of_prod_nat (n₉, n₁₀)) as n₄.
-remember (nat_of_prod_nat (n₇, n₈)) as n₃.
-remember (nat_of_prod_nat (n₅, n₆)) as n₂.
-remember (nat_of_prod_nat (n₃, n₄)) as n₁.
-remember (nat_of_prod_nat (n₁, n₂)) as n.
-exists n; subst.
-unfold prod_6_nat_of_nat.
-now do 5 rewrite prod_nat_of_nat_inv.
-Qed.
 
 Definition bool_prod_nat_of_prod_nat '(n₁, n₂) : bool * ℕ * ℕ :=
   (if n₁ mod 2 then false else true, (n₁ / 2)%nat, n₂).
@@ -647,19 +609,6 @@ intros a Ha.
 specialize (Hg a Ha) as (bnn, Hg).
 exists (prod_nat_of_bool_prod_nat bnn).
 now rewrite bool_prod_nat_of_prod_nat_inv.
-Qed.
-
-Theorem surjective_prod_nat_surjective_nat : ∀ A,
-  (∃ g : ℕ * ℕ → A, FinFun.Surjective g)
-  → ∃ f : ℕ → A, FinFun.Surjective f.
-Proof.
-intros * (g & Hg).
-exists (λ n, g (prod_nat_of_nat n)).
-intros p.
-specialize (Hg p) as (nfo & Hg).
-subst p.
-exists (nat_of_prod_nat nfo); destruct nfo.
-now rewrite prod_nat_of_nat_inv.
 Qed.
 
 Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
@@ -1740,71 +1689,6 @@ destruct (Req_dec r 0) as [Hrz| Hrnz].
   rewrite Rsqr_pow2, Hz; lra.
 Qed.
 
-Theorem ter_bin_of_rotation_surj : ∀ p, p ≠ 0%vec → ∀ (u : ℕ → bool),
-  ∃ M, M ∈ rotation_around p ∧ (∀ n : ℕ, ter_bin_of_rotation M n = u n).
-Proof.
-intros * Hp *.
-specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
-remember (2 * s - 1) as cosθ eqn:Hcosθ.
-remember (√ (1 - cosθ²)) as sinθ eqn:Hsinθ.
-assert (Hsc : sinθ² = (1 - cosθ²)).
- rewrite Hsinθ, Rsqr_sqrt; [ easy | ].
- rewrite Hcosθ, Rsqr_pow2.
- eapply Rplus_le_reg_r; unfold Rminus.
- rewrite Rplus_assoc, Rplus_opp_l.
- rewrite Rplus_0_l, Rplus_0_r.
- replace 1 with (1 ^ 2) at 4 by lra.
- apply pow_maj_Rabs, Rabs_le; lra.
-
- exists (matrix_of_axis_angle (p, sinθ, cosθ)).
- split.
-  split.
-   apply matrix_of_axis_angle_is_rotation_matrix; [ easy | lra ].
-
-   apply axis_of_matrix_is_eigen_vec; lra.
-
-  intros n.
-  destruct p as (x, y, z); simpl.
-  unfold ter_bin_of_rotation.
-  unfold mat_trace; simpl.
-  remember (√ (x² + y² + z²)) as r eqn:Hr.
-  rewrite <- Hn.
-  f_equal.
-  apply Rmult_eq_reg_r with (r := 4); [ | lra ].
-  unfold Rdiv; rewrite Rmult_assoc, Rinv_l; [ | lra ].
-  rewrite Rmult_1_r.
-  do 3 rewrite fold_Rdiv.
-  rename cosθ into c.
-  do 2 rewrite <- Rplus_assoc.
-  remember ((x / r)² * (1 - c)) as xc.
-  remember ((y / r)² * (1 - c)) as yc.
-  remember ((z / r)² * (1 - c)) as zc.
-  replace (xc + c + yc + c + zc + c) with (xc + yc + zc + 3 * c) by ring.
-  subst xc yc zc.
-  do 2 rewrite <- Rmult_plus_distr_r.
-  replace ((x / r)² + (y / r)² + (z / r)²) with 1.
-   ring_simplify; subst c; lra.
-
-   assert (Hrnz : r ≠ 0).
-    intros H; rewrite Hr in H.
-    apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
-    apply sqr_vec_norm_eq_0 in H.
-    destruct H as (Hx & Hy & Hz); subst x y z.
-    now apply Hp.
-
-    symmetry.
-    rewrite Rsqr_div; [ | easy ].
-    rewrite Rsqr_div; [ | easy ].
-    rewrite Rsqr_div; [ | easy ].
-    unfold Rdiv.
-    do 2 rewrite <- Rmult_plus_distr_r.
-    rewrite Hr.
-    rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-    rewrite Rinv_r; [ easy | ].
-    intros H; rewrite H in Hr.
-    now rewrite sqrt_0 in Hr.
-Qed.
-
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ‖p₁‖ = ‖p₂‖
   → norm_list el ≠ []
@@ -1994,24 +1878,6 @@ f_equal; ring_simplify.
  do 2 rewrite <- Rsqr_pow2; nsatz.
 Qed.
 
-Theorem unit_sphere_eigenvalue_minus_1_angle_π : ∀ axis sinθ cosθ v,
-  axis ∈ sphere 1
-  → v ∈ sphere 1
-  → (matrix_of_axis_angle (axis, sinθ, cosθ) * v)%vec = (- v)%vec
-  → (sinθ, cosθ) = (0, -1).
-Proof.
-intros * Ha Hv Hmv.
-destruct axis as (xa, ya, za).
-destruct v as (x, y, z).
-simpl in *.
-rewrite Rsqr_1 in Ha, Hv.
-rewrite Ha, sqrt_1 in Hmv.
-do 3 rewrite Rdiv_1_r in Hmv.
-injection Hmv; clear Hmv; intros H3 H2 H1.
-unfold Rsqr in *.
-f_equal; nsatz.
-Qed.
-
 Definition rot_sin_cos p u v :=
   let a := latitude p u in
   let u₁ := (u - a ⁎ p) ⁄ √ (1 - a²) in
@@ -2042,60 +1908,6 @@ rewrite Hp, sqrt_1 in Hmv.
 do 3 rewrite Rdiv_1_r in Hmv.
 injection Hmv; clear Hmv; intros H3 H2 H1.
 Time f_equal; nsatz.
-Qed.
-
-Theorem unit_sphere_rot_sin_cos_on_equator : ∀ p p₁ p₂ c s,
-  p ∈ sphere 1
-  → p₁ ∈ sphere 1
-  → p₂ ∈ sphere 1
-  → latitude p p₁ = 0
-  → latitude p p₂ = 0
-  → p₁ × p₂ ≠ 0%vec
-  → (matrix_of_axis_angle (p, s, c) * p₁)%vec = p₂
-  → (s, c) = rot_sin_cos p p₁ p₂.
-Proof.
-intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Hppz Hmv.
-unfold rot_sin_cos.
-rewrite Ha₁, vec_const_mul_0_l, Rsqr_0, Rminus_0_r.
-do 2 rewrite vec_sub_0_r.
-rewrite sqrt_1, Rinv_1.
-do 2 rewrite vec_const_mul_1_l.
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm in Hp₁; [ | lra ].
-apply on_sphere_norm in Hp₂; [ | lra ].
-rewrite Hp₁, Hp₂.
-rewrite Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
-unfold latitude in Ha₁, Ha₂.
-rewrite Hp, Hp₁ in Ha₁.
-rewrite Hp, Hp₂ in Ha₂.
-rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
-specialize (vec_Lagrange_identity p (p₁ × p₂)) as Hlag.
-rewrite vec_cross_mul_assoc_r in Hlag.
-rewrite Hp, Rsqr_1, Rmult_1_l in Hlag.
-rewrite Ha₁, Ha₂ in Hlag.
-do 2 rewrite vec_const_mul_0_l in Hlag.
-rewrite vec_sub_0_r, vec_sqr_0 in Hlag.
-apply Rminus_diag_uniq in Hlag.
-unfold Rsign, Rsignp.
-destruct (Req_dec (p · p₁ × p₂) 0) as [Hppp| Hppp].
- exfalso.
- rewrite Hppp in Hlag.
- rewrite Rsqr_0 in Hlag.
- now apply Rsqr_eq_0, vec_norm_eq_0 in Hlag.
-
- apply Rsqr_eq_abs_0 in Hlag.
- rewrite Rabs_right in Hlag; [ | apply Rle_ge, vec_norm_nonneg ].
- destruct (Rle_dec 0 (p · p₁ × p₂)) as [Hzpp| Hzpp].
-  rewrite Rmult_1_l.
-  rewrite Rabs_right in Hlag; [ | now apply Rle_ge ].
-  rewrite Hlag; clear Hlag Hzpp Hppp Hppz.
-  now apply simple_unit_sphere_ro_sin_cos_on_equator.
-
-  apply Rnot_le_lt in Hzpp.
-  rewrite <- Ropp_mult_distr_l, Rmult_1_l.
-  rewrite Rabs_left in Hlag; [ | easy ].
-  rewrite Hlag, Ropp_involutive; clear Hlag Hzpp Hppp Hppz.
-  now apply simple_unit_sphere_ro_sin_cos_on_equator.
 Qed.
 
 Theorem vec_unit_cross_mul_eq_0 : ∀ u v,

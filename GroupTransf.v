@@ -69,9 +69,6 @@ intros; intros (x, y, z); simpl.
 now rewrite Ropp_0; do 3 rewrite Rplus_0_r.
 Qed.
 
-Theorem Transl_0 : ∀ E, (app_gr (Transl 0) E = E)%S.
-Proof. now intros E; simpl; rewrite transl_0. Qed.
-
 Theorem transl_transl : ∀ E d₁ d₂,
   (transl d₁ (transl d₂ E) = transl (d₁ + d₂) E)%S.
 Proof.

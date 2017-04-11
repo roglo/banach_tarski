@@ -142,28 +142,6 @@ unfold Rdiv.
 now rewrite Rinv_r.
 Qed.
 
-Theorem up_0 : (up 0 = 1)%Z.
-Proof.
-pose proof archimed 0 as H.
-rewrite Rminus_0_r in H.
-remember (up 0) as z eqn:Hz; clear Hz.
-destruct H as (H₁, H₂).
-assert (H : (0 <= z)%Z).
- apply le_IZR; simpl.
- eapply Rle_trans; [ apply Rlt_le; eassumption | apply Rle_refl ].
-
- apply IZN in H.
- destruct H as (n, H); subst z.
- rewrite <- INR_IZR_INZ in H₁, H₂.
- destruct n; [ now apply Rlt_irrefl in H₁ | ].
- destruct n; [ easy | exfalso ].
- apply Rle_not_lt in H₂; apply H₂.
- remember (S n) as sn; simpl; subst sn; clear.
- induction n; [ simpl; lra | ].
- remember (S n) as sn; simpl; subst sn.
- eapply Rlt_le_trans; [ eassumption | lra ].
-Qed.
-
 Theorem Int_part_close_to_1 : ∀ r n,
   INR n / INR (n + 1) <= r < 1
   → Int_part (r * (INR (n + 1))) = Z.of_nat n.
@@ -535,9 +513,6 @@ destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx].
  rewrite opp_IZR, plus_IZR; simpl (IZR 1).
  specialize (base_Int_part x) as H; lra.
 Qed.
-
-Theorem up_Int_part : ∀ x, up x = (Int_part x + 1)%Z.
-Proof. intros; unfold Int_part; lia. Qed.
 
 Theorem Rediv_add_1 : ∀ x y, y ≠ 0 → (x + y) // y = (x // y + 1)%Z.
 Proof.

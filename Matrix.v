@@ -701,11 +701,6 @@ specialize (vec_norm_nonneg v) as H.
 apply vec_norm_neq_0 in Hv; lra.
 Qed.
 
-Theorem vec_add_0_l : ∀ v, (0 + v = v)%vec.
-Proof.
-intros (x, y, z); simpl; f_equal; lra.
-Qed.
-
 Theorem vec_add_0_r : ∀ v, (v + 0 = v)%vec.
 Proof.
 intros (x, y, z); simpl; f_equal; lra.
@@ -842,9 +837,6 @@ Proof.
 intros (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_add_diag : ∀ v, (v + v = 2 ⁎ v)%vec.
-Proof. intros (x, y, z); simpl. f_equal; lra. Qed.
-
 Theorem vec_sub_diag : ∀ v, (v - v = 0)%vec.
 intros (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
@@ -861,11 +853,6 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_add_sub_distr : ∀ u v w, (u + (v - w) = u + v - w)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
-Qed.
-
 Theorem vec_sub_add_distr : ∀ u v w, (u - (v + w) = u - v - w)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
@@ -874,30 +861,6 @@ Qed.
 Theorem vec_sub_sub_distr : ∀ u v w, (u - (v - w) = u - v + w)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_add_move_l : ∀ u v w, (u + v = w ↔ v = w - u)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl.
-split; intros H; injection H; intros; subst; f_equal; lra.
-Qed.
-
-Theorem vec_add_move_r : ∀ u v w, (u + v = w ↔ u = w - v)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl.
-split; intros H; injection H; intros; subst; f_equal; lra.
-Qed.
-
-Theorem vec_add_cancel_l : ∀ u v w, (u + v = u + w)%vec → v = w.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
-injection H; intros; subst; f_equal; lra.
-Qed.
-
-Theorem vec_add_cancel_r : ∀ u v w, (u + w = v + w)%vec → u = v.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃) H; simpl.
-injection H; intros; subst; f_equal; lra.
 Qed.
 
 Theorem vec_sub_cancel_l : ∀ u v w, (u - v = u - w)%vec → v = w.
@@ -1108,27 +1071,10 @@ Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
-Theorem vec_const_mul_add_distr_r : ∀ a b v,
-  ((a + b) ⁎ v = a ⁎ v + b ⁎ v)%vec.
-Proof.
-intros a b (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
 Theorem vec_const_mul_sub_distr_l : ∀ a u v,
   (a ⁎ (u - v) = a ⁎ u - a ⁎ v)%vec.
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_const_mul_sub_distr_r : ∀ a b v,
-  ((a - b) ⁎ v = a ⁎ v - b ⁎ v)%vec.
-Proof.
-intros a b (v₁, v₂, v₃); simpl; f_equal; lra.
-Qed.
-
-Theorem vec_add_shuffle0 : ∀ u v w, (u + v + w = u + w + v)%vec.
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
 Qed.
 
 Theorem vec_const_mul_eq_reg_l : ∀ a u v, a ⁎ u = a ⁎ v → a ≠ 0 → u = v.
@@ -1408,29 +1354,6 @@ Definition axis_angle_of_matrix M :=
   (v, sinθ, cosθ).
 
 Arguments axis_angle_of_matrix M%mat.
-
-Theorem unit_sphere_mat_trace_eq : ∀ v s c,
-  ‖v‖ = 1
-  → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
-Proof.
-intros * Hv.
-remember (matrix_of_axis_angle (v, s, c)) as M eqn:HM.
-unfold mat_trace.
-unfold matrix_of_axis_angle in HM.
-destruct v as (x, y, z).
-simpl in Hv.
-rewrite Hv in HM.
-do 3 rewrite Rdiv_1_r in HM.
-simpl in HM.
-unfold mkrmat in HM.
-apply (f_equal Rsqr) in Hv.
-rewrite Rsqr_sqrt in Hv; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_1 in Hv.
-destruct M; simpl in *.
-injection HM; clear HM; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-subst.
-Time nsatz.
-Qed.
 
 Theorem matrix_mul_axis : ∀ p c s k,
   k ≠ 0
