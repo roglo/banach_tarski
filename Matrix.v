@@ -25,14 +25,6 @@ Arguments a₃₂ [A] _.
 Arguments a₃₃ [A] _.
 Arguments mkmat [A] _ _ _ _ _ _ _ _ _.
 
-Definition mt i j :=
-  match i with
-  | 1%nat => match j with 1%nat => a₁₁ | 2 => a₁₂ | _ => a₁₃ end
-  | 2%nat => match j with 1%nat => a₂₁ | 2 => a₂₂ | _ => a₂₃ end
-  | _ => match j with 1%nat => a₃₁ | 2 => a₃₂ | _ => a₃₃ end
-  end.
-Arguments mt i%nat j%nat [A] m.
-
 Definition mkrmat := @mkmat ℝ.
 
 Definition mat_add M₁ M₂ :=
@@ -154,8 +146,6 @@ Fixpoint mat_pow M n :=
   | S n' => mat_mul M (mat_pow M n')
   end.
 
-Definition mat_trace M := a₁₁ M + a₂₂ M + a₃₃ M.
-
 Delimit Scope mat_scope with mat.
 Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
 Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.
@@ -168,7 +158,6 @@ Notation "M ^ n" := (mat_pow M n) : mat_scope.
 Arguments mat_pow M%mat n%nat.
 Arguments mat_mul M₁%mat M₂%mat.
 Arguments mat_vec_mul M%mat _%vec.
-Arguments mat_trace M%mat.
 
 Theorem vec_eq_dec : ∀ u v : vector, { u = v } + { u ≠ v }.
 Proof.
