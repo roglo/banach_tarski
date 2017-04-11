@@ -311,15 +311,6 @@ replace 1 with (1 ^ 2) by lra.
 apply pow_incr; lra.
 Qed.
 
-Theorem on_sphere_in_ball : ∀ r p, 0 ≤ r ≤ 1 →
-  p ∈ sphere r
-  → p ∈ ball.
-Proof.
-intros r (x, y, z) Hr Hs; simpl in Hs; simpl; rewrite Hs.
-replace 1 with 1² by apply Rsqr_1.
-apply Rsqr_incr_1; [ easy | easy | lra ].
-Qed.
-
 Theorem ball_set_not_countable : ∀ r, 0 < r →
   ∀ f : ℕ → vector, ∃ p : vector, p ∈ sphere r ∧ ∀ n : ℕ, f n ≠ p.
 Proof.
@@ -832,18 +823,6 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
     else if b then (- p)%vec else p
   in
   fold_right rotate p₁ (path_of_nat no).
-
-Theorem normalized_vec_normalize : ∀ v, v ≠ 0%vec → ‖(vec_normalize v)‖ = 1.
-Proof.
-intros v Hv.
-assert (Hvz : ‖v‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
-unfold vec_normalize.
-rewrite vec_norm_vec_const_mul.
-rewrite Rabs_right; [ now rewrite Rinv_l | ].
-apply Rle_ge.
-specialize (vec_norm_nonneg v) as Hvp.
-apply nonneg_inv; lra.
-Qed.
 
 Theorem vec_div_in_sphere : ∀ r p,
   r ≠ 0
@@ -1783,12 +1762,6 @@ intros r (x, y, z) Hp; simpl.
 now do 3 rewrite <- Rsqr_neg.
 Qed.
 
-Theorem neg_vec_in_ball : ∀ p, p ∈ ball → (- p)%vec ∈ ball.
-Proof.
-intros (x, y, z) Hp; simpl.
-now do 3 rewrite <- Rsqr_neg.
-Qed.
-
 Theorem D_set_symmetry_is_countable : ∀ r,
   ∃ f : ℕ → vector, ∀ p : vector,
   p ∈ sphere_sym D ∩ sphere r → ∃ n : ℕ, f n = p.
@@ -1847,71 +1820,6 @@ Qed.
 
 Definition rotation_around p :=
   mkset (λ R, is_rotation_matrix R ∧ (R * p = p)%vec).
-
-Theorem matrix_of_axis_angle_inv : ∀ v c s,
-  0 < s
-  → ‖v‖ = 1
-  → s² + c² = 1
-  → axis_angle_of_matrix (matrix_of_axis_angle (v, s, c)) = (v, s, c).
-Proof.
-intros v cosθ sinθ Hsp Hvs Hsc.
-assert (Hvnz : (v ≠ 0)%vec) by (intros H; rewrite H, vec_norm_0 in Hvs; lra).
-remember (v, sinθ, cosθ) as acs2 eqn:Hacs2.
-unfold axis_angle_of_matrix.
-remember (matrix_of_axis_angle acs2) as M eqn:HM.
-remember (mat_trace M) as tr eqn:Htr.
-remember ((tr - 1) / 2) as c eqn:Hc.
-remember (√ (1 - c²)) as s eqn:Hs.
-subst acs2; simpl.
-simpl in HM.
-destruct v as (x, y, z).
-simpl in Hvs.
-rewrite Hvs in HM.
-progress repeat rewrite Rdiv_1_r in HM.
-unfold rotation_unit_axis, rotation_axis; simpl.
-unfold "_-_", sub_notation.
-rewrite HM; unfold mkrmat ; simpl.
-unfold mat_trace in Htr.
-rewrite HM in Htr; unfold mkrmat in Htr; simpl in Htr.
-rename cosθ into c₁.
-do 2 rewrite <- Rplus_assoc in Htr.
-replace (x² * (1 - c₁) + c₁ + y² * (1 - c₁) + c₁ + z² * (1 - c₁) + c₁)
-with ((x² + y² + z²) * (1 - c₁) + 3 * c₁) in Htr by lra.
-assert (Hv2s : x² + y² + z² = 1).
- apply (f_equal Rsqr) in Hvs.
- rewrite Rsqr_sqrt in Hvs; [ | apply nonneg_sqr_vec_norm ].
- rewrite Hvs; apply Rsqr_1.
-
- rewrite Hv2s, Rmult_1_l in Htr.
- ring_simplify in Htr.
- rewrite Htr in Hc.
- assert (H : c = c₁) by lra.
- move H at top; subst c₁; clear Hc.
- assert (H : sinθ² = 1 - c²) by lra.
- rewrite <- H in Hs.
- rewrite sqrt_Rsqr in Hs; [ | lra ].
- move Hs at top; subst sinθ; clear H.
- f_equal; f_equal; symmetry.
- replace (y * z * (1 - c) + x * s - (y * z * (1 - c) - x * s))
- with (2 * x * s) by lra.
- replace (x * z * (1 - c) + y * s - (x * z * (1 - c) - y * s))
- with (2 * y * s) by lra.
- replace (x * y * (1 - c) + z * s - (x * y * (1 - c) - z * s))
- with (2 * z * s) by lra.
- progress repeat rewrite Rsqr_mult.
- progress repeat rewrite <- Rmult_plus_distr_r.
- progress repeat rewrite <- Rmult_plus_distr_l.
- rewrite Hv2s, Rmult_1_r.
- rewrite <- Rsqr_mult.
- rewrite sqrt_Rsqr; [ | lra ].
- setoid_rewrite Rmult_comm.
- do 3 rewrite fold_Rdiv.
- progress replace (2 * x * s / (2 * s)) with ((2 * s) * / (2 * s) * x) by lra.
- progress replace (2 * y * s / (2 * s)) with ((2 * s) * / (2 * s) * y) by lra.
- progress replace (2 * z * s / (2 * s)) with ((2 * s) * / (2 * s) * z) by lra.
- rewrite Rinv_r; [ | lra ].
- f_equal; lra.
-Qed.
 
 (* playing with quaternions, just for fun... *)
 
@@ -2033,72 +1941,6 @@ destruct (Req_dec t (-1)) as [Htd| Htd].
   rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
   now do 3 rewrite Rmult_1_l.
 Qed.
-
-Theorem quat_of_mat_inv2 : ∀ h,
-  (‖h‖ = 1)%H
-  → 0 ≤ Re h
-  → (0 ≤ Im h)%vec
-  → quat_of_mat (mat_of_quat h) = h.
-Proof.
-intros * Hhn Hrp Hvp.
-destruct h as (a, (b, c, d)); simpl in Hrp, Hvp; simpl.
-apply sqrt_lem_0 in Hhn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
-symmetry in Hhn; rewrite Rmult_1_r in Hhn.
-unfold quat_of_mat, mat_of_quat; simpl.
-unfold mat_trace; simpl.
-remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))
-  as t eqn:Ht.
-remember (a² + b² - c² - d² - (a² - b² + c² - d²) - (a² - b² - c² + d²))
-  as x₀ eqn:Hx₀.
-remember (- (a² + b² - c² - d²) + (a² - b² + c² - d²) - (a² - b² - c² + d²))
-  as y₀ eqn:Hy₀.
-remember (- (a² + b² - c² - d²) - (a² - b² + c² - d²) + (a² - b² - c² + d²))
-  as z₀ eqn:Hz₀.
-ring_simplify in Ht.
-ring_simplify in Hx₀.
-ring_simplify in Hy₀.
-ring_simplify in Hz₀.
-assert (Ht' : t = 4 * a² - 1) by lra.
-clear Ht; rename Ht' into Ht.
-destruct (Req_dec t (-1)) as [Htd| Htd].
- (* here case with trace = -1, i.e. angle = π, not yet treated; I have to
-    think of it. Going to next case. *)
-Focus 2.
- assert (Ha2 : a² ≠ 0) by lra.
- assert (Ha : a ≠ 0) by now intros H; subst a; apply Ha2, Rsqr_0.
- assert (Haa : Rabs a ≠ 0) by now apply Rabs_no_R0.
- assert (Hta : √ (1 + t) / 2 = Rabs a).
-  rewrite Ht, Rplus_minus.
-  rewrite Rsqr_pow2.
-  replace (4 * a ^ 2) with ((2 * a) ^ 2) by lra.
-  rewrite <- Rsqr_pow2, sqrt_Rsqr_abs, Rabs_mult.
-  replace (Rabs 2) with (Rabs (IZR 2)) by easy.
-  rewrite Rabs_Zabs; simpl.
-  rewrite Rmult_div.
-  unfold Rdiv.
-  rewrite Rinv_r; [ | lra ].
-  now rewrite Rmult_1_l.
-
-  rewrite Hta.
-  apply Rabs_pos_eq in Hrp.
-  f_equal; [ easy | ].
-  assert (Rpm : ∀ a b c, a + b - (b - c) = a + c) by (intros; lra).
-  do 3 rewrite Rpm.
-  replace (2 * a * b + 2 * a * b) with (4 * a * b) by lra.
-  replace (2 * a * c + 2 * a * c) with (4 * a * c) by lra.
-  replace (2 * a * d + 2 * a * d) with (4 * a * d) by lra.
-  unfold Rdiv.
-  rewrite Rinv_mult_distr; [ | lra | easy ].
-  do 3 rewrite <- Rmult_assoc.
-  replace (4 * a * b * / 4) with (a * b) by lra.
-  replace (4 * a * c * / 4) with (a * c) by lra.
-  replace (4 * a * d * / 4) with (a * d) by lra.
-  rewrite Hrp.
-  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
-  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
-  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
-  now do 3 rewrite Rmult_1_l.
-Abort.
 
 (* end play with quaternions. *)
 
@@ -3291,15 +3133,6 @@ assert (Hnn : norm_list (el ++ el) ≠ []).
  intros H.
  specialize (mat_of_path_is_rotation_matrix el) as (Hr, Hdet).
  lra.
-Qed.
-
-Theorem mat_of_path_neq_mat_of_rev_path : ∀ el,
-  norm_list el ≠ []
-  → mat_of_path el ≠ mat_of_path (rev_path el).
-Proof.
-intros * Hn Htr.
-rewrite mat_of_rev_path in Htr; [ | easy ].
-now apply mat_of_path_neq_mat_transp in Htr.
 Qed.
 
 Theorem fixpoint_of_rev_path : ∀ r el,

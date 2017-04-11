@@ -34,14 +34,6 @@ replace b with (1 * b) at 1 by apply Nat.mul_1_l.
 now apply Nat.mod_add.
 Qed.
 
-Theorem nat_neq_le_lt : ∀ x y : nat, x ≠ y → x ≤ y → x < y.
-Proof.
-intros * Hnxy Hxy.
-apply le_lt_eq_dec in Hxy.
-destruct Hxy as [Hle| Heq]; [ easy | ].
-now exfalso; apply Hnxy.
-Qed.
-
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
 Proof.
 intros.
@@ -207,18 +199,6 @@ induction l as [| y] using rev_ind; intros; [ now exists x, [] | ].
 now exists y, (x :: l).
 Qed.
 
-Theorem nth_firstn : ∀ A (l : list A) i n d,
-  i < n
-  → nth i (firstn n l) d =  nth i l d.
-Proof.
-intros * Hin.
-revert i n Hin.
-induction l as [| x l]; intros; [ now destruct n, i | simpl ].
-destruct n, i; try easy.
-apply Nat.succ_lt_mono in Hin; simpl.
-now apply IHl.
-Qed.
-
 Theorem split_app_eq : ∀ A (el₁ el₂ el₃ el₄ : list A),
   el₁ ++ el₂ = el₃ ++ el₄
   → { ∃ el, el₃ = el₁ ++ el ∧ el₂ = el ++ el₄ } +
@@ -353,11 +333,3 @@ Fixpoint map2 {A B C} (f : A → B → C) l1 l2 :=
       | b :: u => f a b :: map2 f t u
       end
   end.
-
-Theorem nth_in_split : ∀ A (n : nat) (l : list A) (d : A),
-  (n < length l)%nat
-  → ∃ l1 l2 : list A, l = l1 ++ List.nth n l d :: l2.
-Proof.
-intros * Hn.
-now apply in_split, nth_In.
-Qed.

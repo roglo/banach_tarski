@@ -332,23 +332,3 @@ destruct Hn as [(el, (H₁, H₂))| (el, (H₁, H₂))].
    destruct H₂; subst el el'.
    now split.
 Qed.  
-
-Theorem norm_list_is_nil_between : ∀ e el,
-  norm_list (negf e :: el ++ [e]) = [] ↔ norm_list el = [].
-Proof.
-assert (H : ∀ e el, norm_list el = [] → norm_list (negf e :: el ++ [e]) = []).
- intros e el Hn.
- rewrite app_of_cons, <- is_normal, Hn, app_nil_l.
- remember norm_list as f; simpl; subst f.
- now rewrite norm_list_cancel2.
-
- intros e el.
- split; intros Hn; [ | now apply H ].
- apply H with (e := negf e) in Hn.
- rewrite negf_involutive in Hn.
- remember norm_list as f; simpl in Hn; subst f.
- rewrite norm_list_cancel in Hn.
- rewrite <- app_assoc in Hn; simpl in Hn.
- rewrite norm_list_cancel_in, app_nil_r in Hn.
- easy.
-Qed.

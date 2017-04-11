@@ -1174,9 +1174,6 @@ Proof.
 intros M (x, y, z); simpl; f_equal; lra.
 Qed.
 
-Theorem mat_trace_comm : ∀ A B, mat_trace (A * B) = mat_trace (B * A).
-Proof. intros. unfold mat_trace; simpl; lra. Qed.
-
 Theorem mat_pow_succ : ∀ M n, (M ^ S n)%mat = (M * M ^ n)%mat.
 Proof. easy. Qed.
 
@@ -1510,21 +1507,6 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
     f_equal; lra.
 Qed.
 
-Theorem mat_trace_eq : ∀ v s c,
-  v ≠ 0%vec
-  → mat_trace (matrix_of_axis_angle (v, s, c)) = 1 + 2 * c.
-Proof.
-intros * Hv.
-specialize (vec_div_vec_norm v Hv) as Hvn.
-specialize (unit_sphere_mat_trace_eq (v ⁄ ‖v‖) s c Hvn) as H.
-rewrite matrix_mul_axis with (k := ‖v‖) in H; [ | now apply vec_norm_neq_0 ].
-rewrite vec_const_mul_assoc in H.
-rewrite Rinv_r in H; [ | now apply vec_norm_neq_0 ].
-rewrite vec_const_mul_1_l in H.
-rewrite Rsign_of_pos in H; [ now rewrite Rmult_1_l in H | ].
-now apply vec_norm_pos.
-Qed.
-
 Theorem unit_sphere_mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
   ‖a‖ = 1
   → s₁² + c₁² = 1
@@ -1647,9 +1629,6 @@ Qed.
 
 Theorem mat_pow_0 : ∀ M, (M ^ 0)%mat = mat_id.
 Proof. intros; easy. Qed.
-
-Theorem mat_pow_1 : ∀ M, (M ^ 1)%mat = M.
-Proof. intros; apply mat_mul_id_r. Qed.
 
 Theorem z_of_xy : ∀ x y z r,
   r = √ (x² + y² + z²)

@@ -4,12 +4,6 @@
 Require Import Utf8 QArith.
 Require Import Countable.
 
-Theorem nat_is_countable : is_countable nat.
-Proof.
-exists id.
-now intros n; exists n.
-Qed.
-
 Theorem Pos_is_countable : is_countable positive.
 Proof.
 unfold is_countable.
