@@ -966,16 +966,6 @@ f_equal.
  clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
 Qed.
 
-Theorem mat_axis_mul_const : ∀ M v,
-  mat_vec_mul M v = v
-  → ∀ k, mat_vec_mul M (vec_const_mul k v) = vec_const_mul k v.
-Proof.
-intros * Hv k.
-rewrite <- mat_const_vec_mul.
-rewrite mat_vec_mat_const_mul.
-now rewrite Hv.
-Qed.
-
 Theorem vec_cross_mul_eq_0 : ∀ u v,
   u ≠ 0%vec
   → v ≠ 0%vec
@@ -3285,15 +3275,6 @@ assert (Hlat2 : latitude p (- p') = 1).
  now specialize (latitude_1 r p (- p')%vec Hp Hp' Hlat2).
 Qed.
 
-Theorem latitude_opp_r : ∀ p p', latitude p (- p') = - latitude p p'.
-Proof.
-intros (x, y, z) (x', y', z'); unfold latitude; simpl.
-do 3 rewrite <- Rsqr_neg.
-do 3 rewrite <- Ropp_mult_distr_r.
-do 2 rewrite <- Ropp_plus_distr.
-now rewrite Ropp_div.
-Qed.
-
 Theorem mat_of_path_fixpoint_rev_path : ∀ el p,
   (mat_of_path el * p = p → mat_of_path (rev_path el) * p = p)%vec.
 Proof.
@@ -3786,17 +3767,6 @@ destruct (Req_dec r 0) as [Hrz| Hrz].
  destruct M; simpl in *.
  now rewrite H1, H2, H3.
 Qed.
-
-
-Definition J_mat axis :=
-  mkset
-    (λ R,
-     let '(v, sinθ, cosθ) := axis_angle_of_matrix R in
-     v = axis ∧ (sinθ, cosθ) ∈ J axis).
-
-Definition J_mat_of_nat axis n : matrix ℝ :=
-  let '(sinθ, cosθ) := J_of_nat axis n in
-  matrix_of_axis_angle (axis, sinθ, cosθ).
 
 Definition I_of_ℝ x :=
   if Rlt_dec x 0 then 1 / (- x + 1) / 2
@@ -4428,57 +4398,6 @@ intros; intros x; split; intros H.
  destruct H as ((HE, HG), HFG).
  split; [ | easy ].
  now split; [ | intros H; apply HFG; split ].
-Qed.
-
-Theorem is_partition_subtract_all : ∀ A (E F : set A) EL,
-  is_partition E EL
-  → is_partition (E ∖ F) (map (λ G, G ∖ F) EL).
-Proof.
-intros * (HUE & Hij).
-split.
- rewrite HUE; clear.
- induction EL as [| E₁ EL]; [ apply subtract_empty_l | simpl ].
- rewrite <- IHEL.
- apply set_union_subtract_distr_r.
-
- intros i j Hnij.
- specialize (Hij _ _ Hnij).
- clear - Hij Hnij.
- revert i j Hij Hnij.
- induction EL as [| E₁ EL]; intros.
-  simpl; do 2 rewrite match_id.
-  apply intersection_empty_l.
-
-  simpl in Hij; simpl.
-  destruct i.
-   destruct j; [ easy | ].
-   destruct EL as [| E₂ EL].
-    simpl; rewrite match_id.
-    apply intersection_empty_r.
-
-    simpl in Hij; simpl.
-    destruct j.
-     rewrite <- set_subtract_intersection_distr_r, Hij.
-     apply subtract_empty_l.
-
-     remember (λ E, E ∖ F) as f eqn:Hf.
-     assert (Hfe : (f ∅ = ∅)%S) by now subst f; rewrite subtract_empty_l.
-     rewrite <- Hfe, map_nth; subst f.
-     rewrite set_intersection_subtract_distr_l.
-     rewrite set_intersection_subtract_distr_r.
-     rewrite Hij.
-     now do 3 rewrite subtract_empty_l.
-
-   destruct j.
-    remember (λ E, E ∖ F) as f eqn:Hf.
-    assert (Hfe : (f ∅ = ∅)%S) by now subst f; rewrite subtract_empty_l.
-    rewrite <- Hfe, map_nth; subst f.
-    rewrite set_intersection_subtract_distr_l.
-    rewrite set_intersection_subtract_distr_r.
-    rewrite Hij.
-    now do 3 rewrite subtract_empty_l.
-
-    now apply IHEL; [ | apply Nat.succ_inj_wd_neg ].
 Qed.
 
 Theorem set_subtract_sub_swap : ∀ A (E F G : set A),

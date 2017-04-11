@@ -105,36 +105,6 @@ Theorem fold_right_single : ∀ A B (f : A → B → B) x y,
   fold_right f x [y] = f y x.
 Proof. easy. Qed.
 
-Theorem list_prod_nil_r : ∀ A B (l : list A),
-  list_prod l ([] : list B) = [].
-Proof.
-intros A B l.
-now induction l.
-Qed.
-
-Theorem list_prod_map : ∀ A B C D (f : A → B) (g : C → D) l l',
-  list_prod (map f l) (map g l') =
-  map (λ '(x, x'), (f x, g x')) (list_prod l l').
-Proof.
-intros.
-revert l'.
-induction l as [| x l]; intros; [ easy | simpl ].
-rewrite map_app.
-f_equal; [ | apply IHl ].
-rewrite map_map.
-induction l' as [| x' l']; [ easy | now simpl; rewrite IHl' ].
-Qed.
-
-Theorem list_prod_map_l : ∀ A B C (f : A → B) l (l' : list C),
-  list_prod (map f l) l' =
-  map (λ '(x, x'), (f x, x')) (list_prod l l').
-Proof.
-intros.
-revert l'.
-induction l as [| x l]; intros; [ easy | simpl; rewrite map_app ].
-f_equal; [ now rewrite map_map | apply IHl ].
-Qed.
-
 Theorem combine_map : ∀ A B C D (f : A → B) (g : C → D) l l',
   combine (map f l) (map g l') = map (λ '(x, y), (f x, g y)) (combine l l').
 Proof.
@@ -383,43 +353,6 @@ Fixpoint map2 {A B C} (f : A → B → C) l1 l2 :=
       | b :: u => f a b :: map2 f t u
       end
   end.
-
-Theorem map2_map_l : ∀ A B C D (f : A → B → C) (g : D → A) l1 l2,
-  map2 f (map g l1) l2 = map2 (λ a b, f (g a) b) l1 l2.
-Proof.
-intros.
-revert l2.
-induction l1 as [| a l1]; intros; [ easy | simpl ].
-destruct l2 as [| b l2]; [ easy | simpl ].
-now rewrite IHl1.
-Qed.
-
-Theorem map2_map_r : ∀ A B C D (f : A → B → C) (g : D → B) l1 l2,
-  map2 f l1 (map g l2) = map2 (λ a b, f a (g b)) l1 l2.
-Proof.
-intros.
-revert l2.
-induction l1 as [| a l1]; intros; [ easy | simpl ].
-destruct l2 as [| b l2]; [ easy | simpl ].
-now rewrite IHl1.
-Qed.
-
-Theorem map2_const_l : ∀ A B C (f : A → B → C) l1 l2 c,
-  length l1 = length l2
-  → (∀ a b, List.In (a, b) (combine l1 l2) → f a b = c)
-  → map2 f l1 l2 = repeat c (length l1).
-Proof.
-intros * Hlen Hf.
-revert l2 Hlen Hf.
-induction l1 as [| a l1]; intros; [ easy | simpl ].
-destruct l2 as [| b l2]; [ easy | ].
-simpl in Hlen, Hf; simpl.
-apply Nat.succ_inj in Hlen.
-f_equal; [ apply Hf; now left | ].
-apply IHl1; [ easy | ].
-intros a' b' Ha'b'.
-now apply Hf; right.
-Qed.
 
 Theorem nth_in_split : ∀ A (n : nat) (l : list A) (d : A),
   (n < length l)%nat
