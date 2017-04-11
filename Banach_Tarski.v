@@ -362,8 +362,6 @@ intros n.
 apply not_eq_sym, Hp.
 Qed.
 
-Definition and_dec {A B C D} P Q := Sumbool.sumbool_and A B C D P Q.
-
 Definition fixpoint_of_path r el :=
   rotation_fixpoint (mat_of_path el) r.
 

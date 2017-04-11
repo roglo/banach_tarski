@@ -312,42 +312,6 @@ apply summation_aux_le_compat; intros i Hi.
 apply Hfg; lia.
 Qed.
 
-Theorem all_0_summation_aux_0 : ∀ g b len,
-  (∀ i, (b ≤ i < b + len) → (g i = 0)%R)
-  → (summation_aux b len (λ i, g i) = 0)%R.
-Proof.
-intros g b len H.
-revert b H.
-induction len; intros; [ easy | simpl ].
-rewrite H; [ idtac | split; auto ].
- rewrite Rplus_0_l, IHlen; [ easy | ].
- intros i (Hbi, Hib); apply H.
- rewrite Nat.add_succ_r, <- Nat.add_succ_l.
- split; [ now apply Nat.lt_le_incl | easy ].
-
- rewrite Nat.add_succ_r.
- apply le_n_S, le_plus_l.
-Qed.
-
-Theorem all_0_summation_0 : ∀ g i₁ i₂,
-  (∀ i, i₁ ≤ i ≤ i₂ → (g i = 0)%R)
-  → (Σ (i = i₁, i₂), (g i) = 0)%R.
-Proof.
-intros g i₁ i₂ H.
-apply all_0_summation_aux_0.
-intros i (H₁, H₂).
-apply H.
-split; [ easy | ].
-destruct (le_dec i₁ (S i₂)) as [H₃| H₃].
- rewrite Nat.add_sub_assoc in H₂; [ | easy ].
- rewrite minus_plus in H₂.
- now apply le_S_n.
-
- apply not_le_minus_0 in H₃.
- rewrite H₃, Nat.add_0_r in H₂.
- now apply Nat.nle_gt in H₂.
-Qed.
-
 Theorem summation_shift : ∀ b g k,
   b ≤ k
   → (Σ (i = b, k), (g i) =
