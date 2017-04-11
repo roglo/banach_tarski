@@ -1496,3 +1496,12 @@ destruct nel as [| e₁ nel].
   rewrite mat_of_path_cons; symmetry.
   now rewrite IHel.
 Qed.
+
+Theorem mat_of_path_fixpoint_rev_path : ∀ el p,
+  (mat_of_path el * p = p → mat_of_path (rev_path el) * p = p)%vec.
+Proof.
+intros * Hmp.
+rewrite <- rotate_vec_mul in Hmp.
+apply rotate_rev_path in Hmp.
+now rewrite rotate_vec_mul in Hmp.
+Qed.
