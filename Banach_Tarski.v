@@ -172,10 +172,6 @@ Definition path_of_nat n :=
   | S n' => path_of_nat_aux n n'
   end.
 
-Theorem free_elem_of_nat_nat_of_free_elem_mod_4 : ∀ e,
-  free_elem_of_nat (nat_of_free_elem e mod 4) = e.
-Proof. intros (t, d); now destruct t, d. Qed.
-
 Theorem nat_of_free_elem_div_4 : ∀ e, (nat_of_free_elem e / 4 = 0)%nat.
 Proof. intros (t, d); now destruct t, d. Qed.
 

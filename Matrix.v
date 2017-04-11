@@ -94,14 +94,6 @@ Notation "‖ v ‖" := (vec_norm v) (at level 0, v at level 0, format "‖ v �
 
 Definition vos a := V a a a.
 
-(* https://en.wikipedia.org/wiki/Rotation_matrix
-   #Rotation_matrix_from_axis_and_angle *)
-Definition rot_mat_of_axis_cos '(V x y z) cosθ :=
-  let sinθ := √ (1 - cosθ²) in mkrmat
-  (cosθ+x²*(1-cosθ))    (x*y*(1-cosθ)-z*sinθ) (x*z*(1-cosθ)+y*sinθ)
-  (y*x*(1-cosθ)+z*sinθ) (cosθ+y²*(1-cosθ))    (y*z*(1-cosθ)-x*sinθ)
-  (z*x*(1-cosθ)-y*sinθ) (z*y*(1-cosθ)+x*sinθ) (cosθ+z²*(1-cosθ)).
-
 Definition rot_x := mkrmat
   1         0         0
   0         (1/3)     (-2*√2/3)

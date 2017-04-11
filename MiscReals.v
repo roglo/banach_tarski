@@ -350,15 +350,6 @@ destruct (Rcase_abs (√ x)) as [Hx| Hx]; [ exfalso | easy ].
 apply Rlt_not_le in Hx; apply Hx, sqrt_pos.
 Qed.
 
-Theorem sqrt_inv : ∀ x, 0 < x → √ (/ x) = / √ x.
-Proof.
-intros * Hx.
-replace (/ x) with (1 * / x) by lra.
-rewrite fold_Rdiv.
-rewrite sqrt_div; [ | apply Rle_0_1 | easy ].
-rewrite sqrt_1; lra.
-Qed.
-
 Theorem Rmult_minus_distr_r : ∀ r1 r2 r3,
   (r1 - r2) * r3 = r1 * r3 - r2 * r3.
 Proof.
