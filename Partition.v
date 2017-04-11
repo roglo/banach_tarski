@@ -8,7 +8,7 @@
 Require Import Utf8 List NPeano Compare_dec Setoid.
 Import ListNotations.
 
-Require Import Pset.
+Require Import Misc Pset.
 
 Definition is_partition {A} (E : set A) (Ep : list (set A)) :=
   (E = ⋃ Ep)%S ∧
@@ -81,10 +81,9 @@ Theorem is_partition_union_subtract :
   ∀ A (F : set A) P₁ P₂ Pl (B : set A),
   is_partition F (P₁ :: P₂ :: Pl)
   → (B ⊂ P₂)%S
-  → (∀ x, Decidable.decidable (x ∈ B))
   → is_partition F (P₁ ∪ B :: P₂ ∖ B :: Pl)%S.
 Proof.
-intros A F P₁ P₂ Pl B Hp HB HBdec.
+intros A F P₁ P₂ Pl B Hp HB.
 destruct Hp as (Hu & Hi).
 split.
  unfold union_list, union, subtract, set_eq in Hu |-*.
@@ -96,7 +95,7 @@ split.
   pose proof H₁ H as H₃.
   destruct H₃ as [H₃| H₃]; [ left; now left | ].
   destruct H₃ as [H₃| H₃]; [ | right; now right ].
-  destruct (HBdec x) as [H₄| H₄]; [ left; now right | ].
+  destruct (EM (x ∈ B)) as [H₄| H₄]; [ left; now right | ].
   right; left; now split.
 
   apply Hu.

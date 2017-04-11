@@ -371,14 +371,12 @@ intros f HoeHo os Hos.
 pose proof r_decomposed_5 f HoeHo os Hos as H.
 destruct HoeHo as (Hoe, Ho).
 eapply is_partition_group_first_2_together in H.
-apply is_partition_union_subtract; [ easy | | ].
- intros p bm; subst os.
- destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
- split; [ easy | ].
- exists (repeat ạ⁻¹ (S n)), (repeat ạ⁻¹ n).
- split; [ apply norm_list_repeat | easy ].
-
- intros p; apply EM.
+apply is_partition_union_subtract; [ easy | ].
+intros p bm; subst os.
+destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
+split; [ easy | ].
+exists (repeat ạ⁻¹ (S n)), (repeat ạ⁻¹ n).
+split; [ apply norm_list_repeat | easy ].
 Qed.
 
 Theorem r_decomposed_2 :
