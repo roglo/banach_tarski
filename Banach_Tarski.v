@@ -1154,47 +1154,6 @@ enough
  apply D_set_symmetry_is_countable.
 Qed.
 
-(* playing with quaternions, just for fun... *)
-
-Record ℍ := quat { Re : ℝ; Im : vector }.
-Arguments quat Re%R Im%vec.
-
-Delimit Scope quat_scope with H.
-
-Definition quat_add '(quat a₁ v₁) '(quat a₂ v₂) :=
-  quat (a₁ + a₂) (v₁ + v₂).
-Definition quat_mul '(quat a₁ v₁) '(quat a₂ v₂) :=
-  quat (a₁ * a₂ - v₁ · v₂) (a₁ ⁎ v₂ + a₂ ⁎ v₁ + v₁ × v₂).
-
-Definition Qi := quat 0 (V 1 0 0).
-Definition Qj := quat 0 (V 0 1 0).
-Definition Qk := quat 0 (V 0 0 1).
-
-Definition quat_const_mul k '(quat a v) := quat (a * k) (k ⁎ v).
-
-Definition quat_norm '(quat a (V b c d)) := √ (a² + b² + c² + d²).
-
-Definition quat_conj q := quat (Re q) (- Im q).
-
-Definition quat_inv '(quat a v) :=
-  let r := a² + v²%vec in
-  quat_const_mul (/ r) (quat_conj (quat a v)).
-
-Notation "h₁ + h₂" := (quat_add h₁ h₂) : quat_scope.
-Notation "h₁ * h₂" := (quat_mul h₁ h₂) : quat_scope.
-Notation "'hi'" := (Qi) : quat_scope.
-Notation "'hj'" := (Qj) : quat_scope.
-Notation "'hk'" := (Qk) : quat_scope.
-Notation "h '⁻¹'" := (quat_inv h) (at level 1, format "h ⁻¹"): quat_scope.
-Notation "‖ h ‖" := (quat_norm h) : quat_scope.
-
-Definition vec_le '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
-  u₁ ≤ v₁ ∧ u₂ ≤ v₂ ∧ u₃ ≤ v₃.
-
-Notation "u '≤' v" := (vec_le u v) : vec_scope.
-
-(* end play with quaternions. *)
-
 Theorem rotate_unicity : ∀ p₁ p₂ el,
   ‖p₁‖ = ‖p₂‖
   → norm_list el ≠ []
