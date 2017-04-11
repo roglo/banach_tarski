@@ -40,16 +40,3 @@ enough (H : FinFun.Surjective g).
     | 0%Z => inl tt | Z.pos p => inr (inl p) | Z.neg p => inr (inr p) end).
  now destruct z.
 Qed.
-
-Theorem Q_is_countable : is_countable Q.
-Proof.
-set (A := (Z * positive)%type).
-set (f x := Qmake (fst x) (snd x)).
-apply (countable_surjection A Q f).
- apply countable_product_types; [ apply Z_is_countable | ].
- apply Pos_is_countable.
-
- unfold FinFun.Surjective, f, A; simpl.
- intros (n, d).
- now exists (n, d).
-Qed.

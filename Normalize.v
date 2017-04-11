@@ -125,15 +125,6 @@ induction el as [| (t₁, d₁)]; intros.
    now rewrite letter_dec_diag, bool_dec_negb_r.
 Qed.
 
-Theorem norm_list_cancel2 : ∀ el e,
-  norm_list (negf e :: e :: el) = norm_list el.
-Proof.
-intros el e.
-pose proof norm_list_cancel el (negf e) as H.
-rewrite negf_involutive in H.
-easy.
-Qed.
-
 Theorem norm_list_cancel_in : ∀ el₁ el₂ e,
   norm_list (el₁ ++ e :: negf e :: el₂) =
   norm_list (el₁ ++ el₂).

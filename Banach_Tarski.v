@@ -270,23 +270,6 @@ induction el as [| e₁]; intros.
  now apply path_of_nat_aux_cons.
 Qed.
 
-Theorem paths_are_countable : is_countable (list free_elem).
-Proof.
-unfold is_countable; simpl.
-exists path_of_nat.
-intros el.
-destruct el as [| e el]; [ now exists O | ].
-enough (Hn : ∃ n, path_of_nat (S n) = e :: el).
- destruct Hn as (n, Hn).
- now exists (S n).
-
- pose proof path_of_nat_aux_is_cons e el.
- destruct H as (m & n & Hmn & H).
- exists n; unfold path_of_nat.
- rewrite path_of_nat_aux_enough_iter with (p := m); try easy.
- apply Nat.lt_succ_diag_r.
-Qed.
-
 Definition unit_interv := mkset (λ x, 0 <= x < 1).
 
 Definition ter_bin_of_vec r '(V x y z) := ter_bin_of_frac_part (x / r).
@@ -396,30 +379,6 @@ replace 1 with (1 ^ 2) in Hx by lra.
 rewrite <- Rsqr_pow2 in Hx.
 split; [ apply Rsqr_neg_pos_le_0; lra | ].
 apply Rsqr_incr_0_var; lra.
-Qed.
-
-Theorem ortho_matrix_coeff_interv : ∀ M,
-  (M * mat_transp M)%mat = mat_id
-  → (-1 ≤ a₁₁ M ≤ 1 ∧ -1 ≤ a₁₂ M ≤ 1 ∧ -1 ≤ a₁₃ M ≤ 1) ∧
-     (-1 ≤ a₂₁ M ≤ 1 ∧ -1 ≤ a₂₂ M ≤ 1 ∧ -1 ≤ a₂₃ M ≤ 1) ∧
-     (-1 ≤ a₃₁ M ≤ 1 ∧ -1 ≤ a₃₂ M ≤ 1 ∧ -1 ≤ a₃₃ M ≤ 1).
-Proof.
-intros * Hrm.
-specialize (ortho_matrix_sqr_coeff_le_1 _ Hrm) as Ha.
-destruct Ha as (Ha₁ & Ha₂ & Ha₃).
-destruct Ha₁ as (Ha₁₁ & Ha₁₂ & Ha₁₃).
-destruct Ha₂ as (Ha₂₁ & Ha₂₂ & Ha₂₃).
-destruct Ha₃ as (Ha₃₁ & Ha₃₂ & Ha₃₃).
-apply Rsqr_le_1_interv in Ha₁₁.
-apply Rsqr_le_1_interv in Ha₁₂.
-apply Rsqr_le_1_interv in Ha₁₃.
-apply Rsqr_le_1_interv in Ha₂₁.
-apply Rsqr_le_1_interv in Ha₂₂.
-apply Rsqr_le_1_interv in Ha₂₃.
-apply Rsqr_le_1_interv in Ha₃₁.
-apply Rsqr_le_1_interv in Ha₃₂.
-apply Rsqr_le_1_interv in Ha₃₃.
-easy.
 Qed.
 
 (* We know, from theory of linear algebra, that tr(M) = 1 + 2 cos θ.
@@ -1869,78 +1828,10 @@ Definition mat_of_quat '(quat a (V b c d)) :=
     (2 * a * d + 2 * b * c) (a² - b² + c² - d²) (2 * c * d - 2 * a * b)
     (2 * b * d - 2 * a * c) (2 * a * b + 2 * c * d) (a² - b² - c² + d²).
 
-Definition quat_rotate h v := (h * v * h⁻¹)%H.
-
 Definition vec_le '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
   u₁ ≤ v₁ ∧ u₂ ≤ v₂ ∧ u₃ ≤ v₃.
 
 Notation "u '≤' v" := (vec_le u v) : vec_scope.
-
-Theorem quat_of_mat_inv1 : ∀ h,
-  (‖h‖ = 1)%H
-  → 0 < Re h
-  → quat_of_mat (mat_of_quat h) = h.
-Proof.
-intros * Hhn Hrp.
-destruct h as (a, (b, c, d)); simpl in Hrp; simpl.
-apply sqrt_lem_0 in Hhn; [ | apply nonneg_plus_4_sqr | apply Rle_0_1 ].
-symmetry in Hhn; rewrite Rmult_1_r in Hhn.
-unfold quat_of_mat, mat_of_quat; simpl.
-unfold mat_trace; simpl.
-remember (a² + b² - c² - d² + (a² - b² + c² - d²) + (a² - b² - c² + d²))
-  as t eqn:Ht.
-remember (a² + b² - c² - d² - (a² - b² + c² - d²) - (a² - b² - c² + d²))
-  as x₀ eqn:Hx₀.
-remember (- (a² + b² - c² - d²) + (a² - b² + c² - d²) - (a² - b² - c² + d²))
-  as y₀ eqn:Hy₀.
-remember (- (a² + b² - c² - d²) - (a² - b² + c² - d²) + (a² - b² - c² + d²))
-  as z₀ eqn:Hz₀.
-ring_simplify in Ht.
-ring_simplify in Hx₀.
-ring_simplify in Hy₀.
-ring_simplify in Hz₀.
-assert (Ht' : t = 4 * a² - 1) by lra.
-clear Ht; rename Ht' into Ht.
-destruct (Req_dec t (-1)) as [Htd| Htd].
- assert (Ha : a = 0) by (now apply Rsqr_eq_0; lra); subst a.
- now apply Rlt_irrefl in Hrp.
-
- assert (Ha2 : a² ≠ 0) by lra.
- assert (Ha : a ≠ 0) by now intros H; subst a; apply Ha2, Rsqr_0.
- assert (Haa : Rabs a ≠ 0) by now apply Rabs_no_R0.
- assert (Hta : √ (1 + t) / 2 = Rabs a).
-  rewrite Ht, Rplus_minus.
-  rewrite Rsqr_pow2.
-  replace (4 * a ^ 2) with ((2 * a) ^ 2) by lra.
-  rewrite <- Rsqr_pow2, sqrt_Rsqr_abs, Rabs_mult.
-  replace (Rabs 2) with (Rabs (IZR 2)) by easy.
-  rewrite Rabs_Zabs; simpl.
-  rewrite Rmult_div.
-  unfold Rdiv.
-  rewrite Rinv_r; [ | lra ].
-  now rewrite Rmult_1_l.
-
-  rewrite Hta.
-  apply Rlt_le in Hrp.
-  apply Rabs_pos_eq in Hrp.
-  f_equal; [ easy | ].
-  assert (Rpm : ∀ a b c, a + b - (b - c) = a + c) by (intros; lra).
-  do 3 rewrite Rpm.
-  replace (2 * a * b + 2 * a * b) with (4 * a * b) by lra.
-  replace (2 * a * c + 2 * a * c) with (4 * a * c) by lra.
-  replace (2 * a * d + 2 * a * d) with (4 * a * d) by lra.
-  unfold Rdiv.
-  rewrite Rinv_mult_distr; [ | lra | easy ].
-  do 3 rewrite <- Rmult_assoc.
-  replace (4 * a * b * / 4) with (a * b) by lra.
-  replace (4 * a * c * / 4) with (a * c) by lra.
-  replace (4 * a * d * / 4) with (a * d) by lra.
-  rewrite Hrp.
-  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
-  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
-  rewrite Rmult_shuffle0, Rinv_r; [ | easy ].
-  now do 3 rewrite Rmult_1_l.
-Qed.
 
 (* end play with quaternions. *)
 

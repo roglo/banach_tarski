@@ -138,15 +138,6 @@ Qed.
 Theorem Rdiv_1_r : ∀ x, x / 1 = x.
 Proof. intros x; lra. Qed.
 
-Theorem Rdiv_eq_0 : ∀ x y, y ≠ 0 → x / y = 0 → x = 0.
-Proof.
-intros * Hy Hxy.
-apply Rmult_eq_compat_r with (r := y) in Hxy.
-unfold Rdiv in Hxy.
-rewrite Rmult_assoc in Hxy.
-rewrite Rinv_l in Hxy; lra.
-Qed.
-
 Theorem Rdiv_same : ∀ x, x ≠ 0 → x / x = 1.
 Proof.
 intros.
@@ -346,14 +337,6 @@ intros; split.
  destruct (Rcase_abs x); [ lra | easy ].
 Qed.
 
-Theorem Rabs_div : ∀ x y, y ≠ 0 → Rabs (x / y) = Rabs x / Rabs y.
-Proof.
-intros * Hy.
-unfold Rdiv.
-rewrite Rabs_mult; f_equal.
-now apply Rabs_Rinv.
-Qed.
-
 Theorem Rabs_sqr : ∀ x, Rabs (x²) = x².
 Proof.
 intros.
@@ -414,13 +397,6 @@ Qed.
 
 Theorem Rinv_div : ∀ x, / x = 1 / x.
 Proof. intros; lra. Qed.
-
-Theorem nonneg_inv : ∀ r, 0 < r → 0 ≤ / r.
-Proof.
-intros * Hr.
-apply Rmult_le_reg_l with (r := r); [ lra | ].
-rewrite Rmult_0_r, Rinv_r; lra.
-Qed.
 
 Theorem nonneg_plus_sqr : ∀ x y, 0 ≤ x² + y².
 Proof.

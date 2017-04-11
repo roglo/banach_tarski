@@ -59,34 +59,6 @@ specialize (Pos2Nat.is_pos p); intros H.
 now rewrite Hp in H.
 Qed.
 
-Theorem Pos_lt_1_xO : ∀ p, (1 < xO p)%positive.
-Proof.
-intros.
-rewrite <- Pos.add_diag.
-apply Pos.le_lt_trans with (m := p); [ apply Pos.le_1_l | ].
-apply Pos.lt_add_diag_r.
-Qed.
-
-Theorem Pos_lt_1_xI : ∀ p, (1 < xI p)%positive.
-Proof.
-intros p.
-rewrite Pos.xI_succ_xO; apply Pos.lt_1_succ.
-Qed.
-
-Theorem Pos2Nat_eq_1 : ∀ p, Pos.to_nat p = 1%nat → p = xH.
-Proof.
-intros.
-destruct p; [ | | easy ].
- rewrite Pos2Nat.inj_xI in H.
- apply Nat.succ_inj in H.
- apply Nat.eq_mul_0 in H.
- destruct H; [ easy | exfalso; revert H; apply Pos2Nat_nonzero ].
-
- rewrite Pos2Nat.inj_xO in H.
- apply Nat.eq_mul_1 in H.
- now destruct H.
-Qed.
-
 Theorem cons_comm_app : ∀ A (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
 Proof. easy. Qed.
 
@@ -287,21 +259,6 @@ Record choice_function {A} (R : A → A → Prop) f := mkcf
     cf_repr_membership : ∀ x, R x (f x) }.
 
 Require Import Permutation.
-
-Theorem Permutation_cons_nil : ∀ A l (x : A),
-  ¬ Permutation (x :: l) [].
-Proof.
-intros * H.
-now apply Permutation_sym, Permutation_nil_cons in H.
-Qed.
-
-Theorem Permutation_cons_exist : ∀ A (x : A) l l',
-  Permutation (x :: l) l'
-  → ∃ l₁ l₂ : list A, l' = l₁ ++ x :: l₂.
-Proof.
-intros * HP.
-apply Permutation_in with (x := x) in HP; [ now apply in_split | now left ].
-Qed.
 
 Theorem Permutation_flat_map_map : ∀ A B C (f : A → B → C) la lb,
   Permutation
