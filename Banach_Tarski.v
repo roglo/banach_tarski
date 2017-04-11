@@ -5839,11 +5839,65 @@ apply equidec_ball_ball_but_1_0_0.
 Qed.
 
 Theorem equidec_ball_but_fixpoint_but_point_itself_but_center : ∀ p,
-  p ∉ D
+  p ≠ 0%vec
+  → p ∉ D
   → equidecomposable (ball ∖ D ∖ set_of_vec p) (ball ∖ D ∖ center).
 Proof.
-intros * Hp.
+intros * Hpnz Hp.
+remember (set_of_vec p) as E eqn:HE.
+exists [center; ball ∖ D ∖ E ∖ center].
+exists [E; ball ∖ D ∖ center ∖ E].
+split.
+ apply is_partition_subtract.
+Print D.
+Abort. (*
+(* problem: seems that center ∈ D,
+   therefore
+     ball ∖ D ∖ center = ball ∖ D
+     ball ∖ D ∖ E ∖ center = ball ∖ D ∖ E *)
+vvv.
+  equidecomposable_with (ball ∖ center) (ball ∖ center ∖ D)
+    [E; ball ∖ center ∖ E] [ρE; ball ∖ center ∖ E].
 bbb.
+ intros q Hq; subst E.
+ simpl in Hq; subst q; simpl.
+ split; [ | now intros H; rewrite H in Hpnz ].
+ split; [ rewrite Rsqr_0; lra | ].
+ intros (el & p₁ & Hso & Hnl & Hr).
+ unfold same_orbit in Hso.
+ destruct Hso as (el₁, Hso).
+ rewrite rotate_vec_mul in Hso.
+ rewrite mat_vec_mul_0_r in Hso.
+ subst p₁.
+bbb.
+
+  injection H; clear H; intros H; lra.
+
+  split.
+   apply is_partition_subtract.
+   intros p Hp; subst E.
+   simpl in Hp; subst p; simpl.
+   split; [ rewrite Rsqr_0, Rsqr_1; lra | ].
+   intros H; simpl in H.
+   injection H; clear H; intros H; lra.
+
+   constructor.
+    exists (Transl (V 1 0 0)).
+    intros (x, y, z); subst E; simpl.
+    split; intros Hv.
+     injection Hv; clear Hv; intros Hz Hy Hx.
+     rewrite Ropp_0 in Hy, Hz; rewrite Rplus_0_r in Hy, Hz.
+     subst y z; f_equal; lra.
+
+     injection Hv; clear Hv; intros Hz Hy Hx.
+     subst x y z; f_equal; lra.
+
+     constructor; [ | constructor ].
+     exists gr_ident.
+     rewrite set_subtract_sub_swap.
+     apply app_gr_ident.
+bbb.
+*)
 
 (*
 Theorem equidec_ball_but_fixpoint_itself_but_1_0_0 :
@@ -5860,7 +5914,10 @@ Proof.
 rewrite <- equidec_ball_but_fixpoint_but_1_0_0_itself_but_center.
 apply equidec_ball_but_fixpoint_itself_but_1_0_0.
 *)
+(* problem : center ∈ D; this theorem is trivial *)
+Abort. (*
 bbb.
+*)
 
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball (ball ∖ D).
@@ -5868,7 +5925,18 @@ Proof.
 rewrite equidec_ball_ball_but_center at 1.
 rewrite equidec_ball_but_center_with_and_without_fixpoints.
 rewrite set_subtract_sub_swap.
-bbb.
+enough (HD : ((ball ∖ D) ∖ center = ball ∖ D)%S) by now rewrite HD.
+intros p; split; intros Hp; [ now destruct Hp | ].
+split; [ easy | ].
+destruct Hp as (Hpb, HpD).
+intros H; apply HpD.
+simpl in H; subst p; simpl.
+exists (ạ :: []), 0%vec.
+split; [ easy | ].
+split; [ easy | ].
+rewrite rotate_vec_mul.
+apply mat_vec_mul_0_r.
+Qed.
 
 Theorem Banach_Tarski_paradox :
   equidecomposable ball (transl (V 3 0 0) ball ∪ transl (V 6 0 0) ball)%S.
