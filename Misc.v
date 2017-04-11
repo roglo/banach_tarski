@@ -52,13 +52,6 @@ intros b₁ b₂ Hn.
 now destruct b₁, b₂.
 Qed.
 
-Theorem Pos2Nat_nonzero : ∀ p, Pos.to_nat p ≠ O.
-Proof.
-intros p Hp.
-specialize (Pos2Nat.is_pos p); intros H.
-now rewrite Hp in H.
-Qed.
-
 Theorem cons_comm_app : ∀ A (x : A) l l', l ++ x :: l' = l ++ [x] ++ l'.
 Proof. easy. Qed.
 

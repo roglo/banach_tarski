@@ -515,21 +515,3 @@ specialize (H f).
 destruct H as (x, H); exists x.
 intros n; apply H.
 Qed.
-
-Theorem R_is_not_countable : ¬ (is_countable R).
-Proof.
-intros H.
-unfold is_countable in H.
-destruct H as (f, Hf).
-assert (Hcontr : ∃ a, ∀ n, f n ≠ a).
- clear; simpl.
- specialize (Cantor_ℕ_ℝ f); intros (x & Hf).
- exists x.
- intros n; specialize (Hf n).
- now intros H; apply Hf.
-
- destruct Hcontr as (a & Ha).
- specialize (Hf a).
- destruct Hf as (n & Hf).
- now apply (Ha n).
-Qed.

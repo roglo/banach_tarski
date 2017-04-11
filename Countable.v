@@ -98,26 +98,6 @@ destruct (Z_lt_dec k 0) as [Hk | Hk].
  now rewrite Z2Nat.id.
 Qed.
 
-Theorem countable_product_types : ∀ A B,
-  is_countable A
-  → is_countable B
-  → is_countable (A * B).
-Proof.
-intros * (fa, HA) (fb, HB).
-unfold is_countable.
-exists (λ n, let (i, j) := prod_nat_of_nat n in (fa i, fb j)).
-intros (a, b).
-specialize (HA a) as (na, Hna).
-specialize (HB b) as (nb, Hnb).
-subst a b.
-exists (nat_of_prod_nat (na, nb)).
-remember (prod_nat_of_nat (nat_of_prod_nat (na, nb))) as ij eqn:Hij.
-symmetry in Hij.
-destruct ij as (i, j).
-rewrite prod_nat_of_nat_inv in Hij.
-now injection Hij; intros; subst.
-Qed.
-
 Theorem countable_sum_types : ∀ A B,
   is_countable A
   → is_countable B

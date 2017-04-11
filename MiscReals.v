@@ -362,14 +362,6 @@ rewrite sqrt_div; [ | apply Rle_0_1 | easy ].
 rewrite sqrt_1; lra.
 Qed.
 
-Theorem nonneg_plus_4_sqr : ∀ a b c d, 0 ≤ a² + b² + c² + d².
-Proof.
-intros.
-apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
-apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
-apply Rplus_le_le_0_compat; apply Rle_0_sqr.
-Qed.
-
 Theorem Rmult_minus_distr_r : ∀ r1 r2 r3,
   (r1 - r2) * r3 = r1 * r3 - r2 * r3.
 Proof.
@@ -378,7 +370,7 @@ unfold Rminus.
 rewrite Rmult_plus_distr_r; lra.
 Qed.
 
-Theorem Rminus_plus: ∀ x y, x - y + y = x.
+Theorem Rminus_plus : ∀ x y, x - y + y = x.
 Proof. intros; lra. Qed.
 
 Theorem Rdiv_div : ∀ x y z, y ≠ 0 → z ≠ 0 → x / y / z = x / (y * z).
@@ -669,17 +661,6 @@ destruct (Z_le_dec 0 a) as [Ha| Ha].
  now rewrite Z.opp_involutive.
 Qed.
 
-Theorem Rmod_add_nat : ∀ x y n,
-  y ≠ 0
-  → (x + INR n * y) rmod y = x rmod y.
-Proof.
-intros * Hy.
-do 2 rewrite Rmod_from_ediv.
-rewrite Rediv_add_nat; [ | easy ].
-rewrite plus_IZR.
-rewrite <- INR_IZR_INZ; lra.
-Qed.
-
 Theorem Rmod_add_Z : ∀ x y a,
   y ≠ 0
   → (x + IZR a * y) rmod y = x rmod y.
@@ -733,28 +714,6 @@ assert (H : 0 ≤ x / y < 1).
  apply Int_part_small in H.
  rewrite H; simpl.
  now rewrite Rmult_0_l, Rminus_0_r.
-Qed.
-
-Theorem Rmult_mod_distr_r : ∀ x y z,
-  y ≠ 0
-  → 0 < z
-  → (x * z) rmod (y * z) = x rmod y * z.
-Proof.
-intros * Hy Hz.
-unfold Rmod, snd, Rediv_mod.
-destruct (Rcase_abs (y * z)) as [Hyz| Hyz].
- rewrite Ropp_div_r; [ | lra ].
- rewrite Rdiv_mult_simpl_r; [ | intros H; subst; lra | lra ].
- destruct (Rcase_abs y) as [H| H]; [ rewrite Ropp_div_r; lra | ].
- exfalso; apply Rlt_not_le in Hyz; apply Hyz; clear Hyz.
- apply Rmult_le_pos; lra.
-
- destruct (Rcase_abs y) as [H| H].
-  exfalso; apply Rlt_not_le in H; apply H; clear H.
-  apply Rmult_le_reg_r with (r := z); [ easy | ].
-  rewrite Rmult_0_l; lra.
-
-  rewrite Rdiv_mult_simpl_r; [ lra | easy | lra ].
 Qed.
 
 Theorem Rediv_mul_r : ∀ x y z,
