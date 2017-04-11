@@ -826,33 +826,6 @@ apply path_of_nat_aux_enough_iter.
  apply Nat.lt_lt_add_r, Nat.lt_succ_diag_r.
 Qed.
 
-(*
-Compute (path_of_nat (nat_of_path [])).
-Compute (path_of_nat (nat_of_path [ạ])).
-Compute (path_of_nat (nat_of_path [ạ⁻¹])).
-Compute (path_of_nat (nat_of_path [ḅ])).
-Compute (path_of_nat (nat_of_path [ḅ⁻¹])).
-Compute (path_of_nat (nat_of_path [ạ; ạ])).
-Compute (path_of_nat (nat_of_path [ạ; ạ⁻¹])).
-Compute (path_of_nat (nat_of_path [ạ; ḅ])).
-Compute (path_of_nat (nat_of_path [ạ; ḅ⁻¹])).
-
-Compute (nat_of_path (path_of_nat 0)).
-Compute (nat_of_path (path_of_nat 1)).
-Compute (nat_of_path (path_of_nat 2)).
-Compute (nat_of_path (path_of_nat 3)).
-Compute (nat_of_path (path_of_nat 4)).
-Compute (nat_of_path (path_of_nat 5)).
-Compute (nat_of_path (path_of_nat 6)).
-Compute (nat_of_path (path_of_nat 7)).
-Compute (nat_of_path (path_of_nat 8)).
-Compute (nat_of_path (path_of_nat 9)).
-Compute (nat_of_path (path_of_nat 10)).
-Compute (nat_of_path (path_of_nat 11)).
-Compute (nat_of_path (path_of_nat 12)).
-Compute (nat_of_path (path_of_nat 13)).
-*)
-
 Theorem surj_prod_nat_surj_nat : ∀ A V,
   (∃ g : ℕ * ℕ -> A, ∀ a : A, V a → ∃ nn : ℕ * ℕ, g nn = a)
   → ∃ f : ℕ → A, ∀ a : A, V a → ∃ n : ℕ, f n = a.
