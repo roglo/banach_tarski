@@ -5838,17 +5838,14 @@ rewrite <- equidec_ball_but_1_0_0_ball_but_center.
 apply equidec_ball_ball_but_1_0_0.
 Qed.
 
-(*
-Theorem equidec_ball_but_fixpoint_but_1_0_0_itself_but_center :
-  equidecomposable (ball ∖ D ∖ set_of_vec (V 1 0 0)) (ball ∖ D ∖ center).
+Theorem equidec_ball_but_fixpoint_but_point_itself_but_center : ∀ p,
+  p ∉ D
+  → equidecomposable (ball ∖ D ∖ set_of_vec p) (ball ∖ D ∖ center).
 Proof.
-assert (V 1 0 0 ∉ D).
- intros H.
- simpl in H.
- destruct H as (el & p₁ & Hso & Hnl & Hr).
-(* I think it is wrong, i.e. that V 1 0 0 indeed belongs to D *)
+intros * Hp.
 bbb.
 
+(*
 Theorem equidec_ball_but_fixpoint_itself_but_1_0_0 :
   equidecomposable (ball ∖ D) ((ball ∖ D) ∖ set_of_vec (V 1 0 0)).
 Proof.
