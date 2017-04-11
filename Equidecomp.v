@@ -21,9 +21,7 @@ exists (E :: []), (E :: []).
 split; [ apply is_partition_single | ].
 split; [ apply is_partition_single | ].
 constructor; [ | constructor ].
-exists (Xtransl 0); unfold set_eq; simpl.
-unfold xtransl; intros (x, y, z).
-now rewrite RIneq.Rminus_0_r.
+exists gr_ident; apply app_gr_ident.
 Qed.
 
 Theorem equidec_sym : symmetric _ equidecomposable.

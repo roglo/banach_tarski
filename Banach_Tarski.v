@@ -41,7 +41,7 @@ Definition rot_elem e := Rot (mat_of_elem e) (rotate_is_rotation_matrix e).
 
 Theorem Banach_Tarski_paradox_but_fixpoints :
   equidecomposable (ball ∖ D)
-    (xtransl 3 (ball ∖ D) ∪ xtransl 6 (ball ∖ D))%S.
+    (transl (V 3 0 0) (ball ∖ D) ∪ transl (V 6 0 0) (ball ∖ D))%S.
 Proof.
 pose proof TTCA _ same_orbit equiv_same_orbit as H.
 destruct H as (f & Hu & Hm).
@@ -54,8 +54,8 @@ set (A₃ := SS ḅ).
 set (A₄ := SS ḅ⁻¹).
 exists [A₁; A₂; A₃; A₄].
 exists
-  (map (xtransl 3) [A₁; rot ạ A₂] ++
-   map (xtransl 6) [A₃; rot ḅ A₄]); simpl.
+  (map (transl (V 3 0 0)) [A₁; rot ạ A₂] ++
+   map (transl (V 6 0 0)) [A₃; rot ḅ A₄]); simpl.
 split.
  subst A₁ A₂ A₃ A₄.
  eapply r_decomposed_4; now try eassumption.
@@ -63,8 +63,8 @@ split.
  split.
   pose proof r_decomposed_2_a f Hosf os Hos as Ha.
   pose proof r_decomposed_2_b f Hosf os Hos as Hb.
-  eapply partition_group_map with (g := Xtransl 3) in Ha; try eassumption.
-  eapply partition_group_map with (g := Xtransl 6) in Hb; try eassumption.
+  eapply partition_group_map with (g := Transl (V 3 0 0)) in Ha; try eassumption.
+  eapply partition_group_map with (g := Transl (V 6 0 0)) in Hb; try eassumption.
   eapply partition_union in Hb; [ | | apply Ha ].
    apply Hb.
 
@@ -75,29 +75,31 @@ split.
    destruct H₁ as (H₁, H₃).
    destruct H₂ as (H₂, H₄).
    unfold ball in H₁, H₂.
+   rewrite Ropp_0 in H₁, H₂; do 2 rewrite Rplus_0_r in H₁, H₂.
+   rewrite fold_Rminus in H₁, H₂.
    now apply (Rno_intersect_balls_x3_x6 x y z).
 
-  constructor; [ now exists (Xtransl 3) | ].
+  constructor; [ now exists (Transl (V 3 0 0)) | ].
   constructor.
-   now exists (Comb (Xtransl 3) (rot_elem ạ)); rewrite rot_set_map_mul.
+   now exists (Comb (Transl (V 3 0 0)) (rot_elem ạ)); rewrite rot_set_map_mul.
 
-   constructor; [ now exists (Xtransl 6) | ].
+   constructor; [ now exists (Transl (V 6 0 0)) | ].
    constructor; [ | constructor ].
-   now exists (Comb (Xtransl 6) (rot_elem ḅ)); rewrite rot_set_map_mul.
+   now exists (Comb (Transl (V 6 0 0)) (rot_elem ḅ)); rewrite rot_set_map_mul.
 Qed.
 
 Check Banach_Tarski_paradox_but_fixpoints.
 
-Theorem equidec_transl : ∀ dx E F,
+Theorem equidec_transl : ∀ d E F,
   equidecomposable E F
-  → equidecomposable (xtransl dx E) (xtransl dx F).
+  → equidecomposable (transl d E) (transl d F).
 Proof.
 intros * HEF.
 destruct HEF as (PE & PF & HPE & HPF & HEF).
 unfold equidecomposable.
-exists (map (xtransl dx) PE), (map (xtransl dx) PF).
-split; [ apply (partition_group_map E PE (Xtransl dx) HPE) | ].
-split; [ apply (partition_group_map F PF (Xtransl dx) HPF) | ].
+exists (map (transl d) PE), (map (transl d) PF).
+split; [ apply (partition_group_map E PE (Transl d) HPE) | ].
+split; [ apply (partition_group_map F PF (Transl d) HPF) | ].
 apply Forall2_Forall_combine in HEF.
 destruct HEF as (HEF, Hlen).
 apply Forall2_Forall_combine.
@@ -111,27 +113,31 @@ destruct HEF₁ as ((E₂ & F₂) & Hp & HEF₁).
 injection Hp; clear Hp; intros; subst E₁ F₁.
 apply HEF in HEF₁.
 destruct HEF₁ as (g, HEF₁).
-exists (Comb (Xtransl dx) (Comb g (Xtransl (-dx)))); simpl.
-rewrite xtransl_xtransl, Rplus_opp_l.
-now rewrite xtransl_0, HEF₁.
+exists (Comb (Transl d) (Comb g (Transl (-d)))); simpl.
+rewrite transl_transl, vec_add_opp_diag_l.
+now rewrite transl_0, HEF₁.
 Qed.
 
 Theorem separated_balls_without_fixpoints :
-  (xtransl 3 (ball ∖ D) ∩ xtransl 6 (ball ∖ D) = ∅)%S.
+  (transl (V 3 0 0) (ball ∖ D) ∩ transl (V 6 0 0) (ball ∖ D) = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6); simpl | easy ].
 simpl in H3, H6.
 destruct H3 as (H3, _).
 destruct H6 as (H6, _).
+rewrite Ropp_0 in H3, H6; do 2 rewrite Rplus_0_r in H3, H6.
+rewrite fold_Rminus in H3, H6.
 now apply (Rno_intersect_balls_x3_x6 x y z).
 Qed.
 
 Theorem separated_balls :
-  (xtransl 3 ball ∩ xtransl 6 ball = ∅)%S.
+  (transl (V 3 0 0) ball ∩ transl (V 6 0 0) ball = ∅)%S.
 Proof.
 intros * (x, y, z); split; [ intros (H3, H6) | easy ].
 unfold ball in H3, H6.
 simpl in H3, H6.
+rewrite Ropp_0 in H3, H6; do 2 rewrite Rplus_0_r in H3, H6.
+rewrite fold_Rminus in H3, H6.
 now apply (Rno_intersect_balls_x3_x6 x y z).
 Qed.
 
@@ -4985,7 +4991,7 @@ assert (Hp₁z : p₁ ≠ 0%vec).
       destruct H as (u & H); simpl.
       now exists u.
 
-     destruct i; [ now simpl; rewrite xtransl_0 | lia ].
+     destruct i; [ now simpl; rewrite transl_0 | lia ].
 Qed.
 
 Theorem equidec_sphere_with_and_without_fixpoints : ∀ r,
@@ -5370,7 +5376,7 @@ split.
      destruct H as (u & H); simpl.
      now exists u.
 
-    destruct i; [ now simpl; rewrite xtransl_0 | lia ].
+    destruct i; [ now simpl; rewrite transl_0 | lia ].
 Qed.
 
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
@@ -5809,10 +5815,11 @@ split.
   injection H; clear H; intros H; lra.
 
   constructor.
-   exists (Xtransl 1).
+   exists (Transl (V 1 0 0)).
    intros (x, y, z); subst E; simpl.
    split; intros Hv.
     injection Hv; clear Hv; intros Hz Hy Hx.
+    rewrite Ropp_0 in Hy, Hz; rewrite Rplus_0_r in Hy, Hz.
     subst y z; f_equal; lra.
 
     injection Hv; clear Hv; intros Hz Hy Hx.
@@ -5867,7 +5874,7 @@ rewrite set_subtract_sub_swap.
 bbb.
 
 Theorem Banach_Tarski_paradox :
-  equidecomposable ball (xtransl 3 ball ∪ xtransl 6 ball)%S.
+  equidecomposable ball (transl (V 3 0 0) ball ∪ transl (V 6 0 0) ball)%S.
 Proof.
 transitivity (ball ∖ D).
  apply equidec_ball_with_and_without_fixpoints.
