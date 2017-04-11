@@ -106,7 +106,7 @@ induction PE as [| E₁ PE]; intros.
       apply IHl, Hx.
 
      rewrite Hf in Hx; [ | now left ].
-     now rewrite intersection_empty_r in Hx.
+     now rewrite set_inter_empty_r in Hx.
 
     rewrite nat_mod_add_once; [ | easy ].
     rewrite nat_div_add_once; [ | easy ].
@@ -138,7 +138,7 @@ induction PF as [| F₁ PF]; intros.
   apply IHfl.
   intros f₂ Hf₂; now apply Hf; right.
 
-  now rewrite Hj, intersection_empty_r.
+  now rewrite Hj, set_inter_empty_r.
 
  simpl.
  destruct (lt_dec i (length fl)) as [Hi| Hi].
@@ -188,7 +188,7 @@ induction PF as [| F₁ PF]; intros.
     apply length_zero_iff_nil in Hlen.
     apply length_zero_iff_nil in HlfP.
     subst PE fl; simpl.
-    now do 2 rewrite intersection_empty_l.
+    now do 2 rewrite set_inter_empty_l.
 
     subst len.
     generalize Hi; intros H.
@@ -235,10 +235,10 @@ split.
 
   destruct gl as [| g₁ gl]; [ easy | ].
   rewrite HPEU; simpl.
-  rewrite union_list_app.
+  rewrite set_union_list_app.
   simpl in Hlen3; apply Nat.succ_inj in Hlen3.
-  apply union_morph.
-   pose proof union_intersection_self vector E₁ (map (app_gr_inv g₁) P'F).
+  apply set_union_morph.
+   pose proof set_union_inter_self vector E₁ (map (app_gr_inv g₁) P'F).
    rewrite map_map in H.
    apply H.
    assert (HEF : E₁ ⊂ app_gr_inv g₁ F).
@@ -252,7 +252,7 @@ split.
     now left.
 
     apply included_group with (g := gr_inv g₁) in HUP'F.
-    rewrite group_union_list_distr in HUP'F.
+    rewrite group_set_union_list_distr in HUP'F.
     rewrite fold_app_gr_inv in HUP'F.
     eapply included_trans; eassumption.
 
@@ -276,10 +276,10 @@ split.
     subst fl.
     destruct gl as [| g₁ gl].
      simpl; unfold id at 2; simpl.
-     now do 2 rewrite intersection_empty_r.
+     now do 2 rewrite set_inter_empty_r.
 
      simpl; unfold app_gr_inv, Nat.div; rewrite app_gr_empty_set.
-     now do 2 rewrite intersection_empty_r.
+     now do 2 rewrite set_inter_empty_r.
 
     destruct HPE as (HPEU, HPEI).
     destruct HP'F as (HP'FU, HP'FI).
@@ -294,24 +294,24 @@ split.
       pose proof map_nth app_gr_inv gl gr_ident (i / S len) as Hi.
       destruct (lt_dec (i / S len) (length gl)) as [Hil| Hil].
        rewrite nth_indep with (d' := id) in Hi.
-        rewrite Hi, intersection_shuffle0.
-        rewrite intersection_assoc, <- intersection_assoc.
-        unfold app_gr_inv; rewrite <- group_intersection_distr.
+        rewrite Hi, set_inter_shuffle0.
+        rewrite set_inter_assoc, <- set_inter_assoc.
+        unfold app_gr_inv; rewrite <- group_set_inter_distr.
         apply not_eq_sym in Hm.
         rewrite HP'FI; [ | easy ].
         rewrite app_gr_empty_set.
-        apply intersection_empty_r.
+        apply set_inter_empty_r.
 
         now rewrite map_length.
 
        apply Nat.nlt_ge in Hil.
        rewrite Hlen3 in Hil.
        rewrite nth_overflow; [ | easy ].
-       now do 2 rewrite intersection_empty_l.
+       now do 2 rewrite set_inter_empty_l.
 
-     rewrite intersection_shuffle0, intersection_assoc.
+     rewrite set_inter_shuffle0, set_inter_assoc.
      rewrite HPEI; [ | easy ].
-     now do 2 rewrite intersection_empty_l.
+     now do 2 rewrite set_inter_empty_l.
 
    now subst fl; rewrite map_length.
 
@@ -356,8 +356,8 @@ split.
  induction Hpe; [ easy | | | ].
   now simpl; rewrite IHHpe.
 
-  simpl; rewrite union_comm, <- union_assoc.
-  apply union_morph; [ easy | apply union_comm ].
+  simpl; rewrite set_union_comm, <- set_union_assoc.
+  apply set_union_morph; [ easy | apply set_union_comm ].
 
   etransitivity; eassumption.
 
@@ -578,10 +578,10 @@ assert
         rewrite HPE', HPG'.
         rewrite partition_combine_nth; [ | easy | | ].
          rewrite partition_combine_swi_nth; [ | easy | | ].
-          do 2 rewrite group_intersection_distr.
+          do 2 rewrite group_set_inter_distr.
           rewrite Hlen2, Hgl.
-          rewrite intersection_comm.
-          apply intersection_morph.
+          rewrite set_inter_comm.
+          apply set_inter_morph.
            rewrite app_gr_nth.
            replace Datatypes.id with (@id (set vector)) by easy.
            rewrite map_map.
@@ -667,7 +667,7 @@ Add Parametric Relation : (set vector) equidecomposable
  transitivity proved by equidec_trans
  as equidec_rel.
 
-Theorem equidec_union : ∀ E₁ E₂ F₁ F₂,
+Theorem equidec_set_union : ∀ E₁ E₂ F₁ F₂,
   (E₁ ∩ F₁ = ∅)%S
   → (E₂ ∩ F₂ = ∅)%S
   → equidecomposable E₁ E₂

@@ -216,7 +216,7 @@ split.
 *intros p.
  split.
  -intros Hnf.
-  unfold union_list; simpl; unfold union.
+  unfold set_union_list; simpl; unfold set_union.
   destruct (vec_eq_dec p (f p)) as [H₁| H₁]; [ left; now split | ].
   right.
   pose proof Ho p as H.
@@ -247,7 +247,7 @@ split.
     now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
  -intros Hul.
-  unfold union_list in Hul; simpl in Hul; unfold union in Hul.
+  unfold set_union_list in Hul; simpl in Hul; unfold set_union in Hul.
   destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
   +destruct Hul as (Hnf, Hul); simpl in Hul.
    now apply Hnf.
@@ -371,7 +371,7 @@ intros f HoeHo os Hos.
 pose proof r_decomposed_5 f HoeHo os Hos as H.
 destruct HoeHo as (Hoe, Ho).
 eapply is_partition_group_first_2_together in H.
-apply is_partition_union_subtract; [ easy | ].
+apply is_partition_union_sub; [ easy | ].
 intros p bm; subst os.
 destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
 split; [ easy | ].
@@ -390,7 +390,7 @@ split.
 *intros p.
  split.
  -intros Hnf.
-  unfold union_list; simpl; unfold union.
+  unfold set_union_list; simpl; unfold set_union.
   pose proof Ho p as H.
   apply same_orbit_sym in H.
   destruct H as (el, Hel).
@@ -507,7 +507,7 @@ split.
 
   split.
   -intros Hnf.
-   unfold union_list; simpl; unfold union.
+   unfold set_union_list; simpl; unfold set_union.
    pose proof Ho p as H.
    apply same_orbit_sym in H.
    destruct H as (el, Hel).
@@ -624,12 +624,12 @@ split.
   destruct i; [ simpl in Hi | ].
    destruct j; [ exfalso; now apply Hij | clear Hij ].
    destruct j; [ simpl in Hj | now destruct j ].
-   eapply decompose_2a_contrad_case; unfold union; try eassumption.
+   eapply decompose_2a_contrad_case; unfold set_union; try eassumption.
    now split.
 
    destruct i; [ simpl in Hi | now destruct i ].
    destruct j.
-    eapply decompose_2a_contrad_case; unfold union; try eassumption.
+    eapply decompose_2a_contrad_case; unfold set_union; try eassumption.
     now split.
 
     destruct j; [ now apply Hij | clear Hij ].

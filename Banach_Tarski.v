@@ -68,7 +68,7 @@ split.
   eapply partition_union in Hb; [ | | apply Ha ].
    apply Hb.
 
-   unfold intersection, set_eq; intros (x, y, z).
+   unfold set_inter, set_eq; intros (x, y, z).
    split; [ intros (H₁, H₂) | easy ].
    simpl in H₁, H₂.
    unfold empty_set; simpl.
@@ -1026,7 +1026,7 @@ enough
    p ∈ (D ∩ sphere r) ∪ (sphere_sym D ∩ sphere r) → ∃ n : ℕ, f n = p).
  destruct H as (f, Hf).
  exists f; intros p Hp; apply Hf.
- now rewrite intersection_union_distr_r in Hp.
+ now rewrite set_inter_union_distr_r in Hp.
 
  apply countable_union; [ apply D_set_is_countable | ].
  apply D_set_symmetry_is_countable.
@@ -1867,8 +1867,8 @@ Theorem J₀_is_countable : ∀ axis,
 Proof.
 intros axis Had Hnad (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
-apply -> in_intersection in Hp.
-apply -> in_intersection in Hp'.
+apply -> in_set_inter in Hp.
+apply -> in_set_inter in Hp'.
 destruct Hp as (Hpd & Hps).
 destruct Hp' as (Hpd' & Hps').
 destruct (vec_eq_dec axis 0) as [Haz| Haz].
@@ -2368,7 +2368,7 @@ assert (Hp₁ : ‖p₁‖ = 1) by (apply on_sphere_norm in Hp₁s; [ easy | lra
 assert (Hp₁z : p₁ ≠ 0%vec) by (apply vec_norm_neq_0; lra).
 split; [ easy | ].
 split.
- apply is_partition_subtract.
+ apply is_partition_sub.
  rewrite HE.
  intros p Hp; simpl in Hp.
  destruct Hp as (p₀ & n & Hp & Hq).
@@ -2408,7 +2408,7 @@ split.
      remember D as d; simpl; subst d.
      split.
       rewrite HE in Hu; rewrite HE.
-      remember D as d; remember intersection as b.
+      remember D as d; remember set_inter as b.
       simpl in Hu; simpl; subst d b.
       destruct Hu as (p₀ & n & Hp₀ & Hu).
       exists p₀, (S n).
@@ -2419,7 +2419,7 @@ split.
       apply Hj; clear Hj; unfold J.
       remember J₀ as a; simpl; subst a.
       rewrite HE in Hu.
-      remember D as d; remember intersection as b.
+      remember D as d; remember set_inter as b.
       simpl in Hu; subst d b.
       destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
       rewrite Hu in Hv.
@@ -2490,7 +2490,7 @@ split.
       now rewrite HE; exists u, n.
 
    rewrite <- HED.
-   split; [ now simpl; rewrite union_empty_r | ].
+   split; [ now simpl; rewrite set_union_empty_r | ].
    intros i j Hij.
    assert (H : (ρE ∩ (ball ∖ center ∖ E) = ∅)%S).
     intros u.
@@ -2519,24 +2519,24 @@ split.
       destruct j; [ easy | ].
       destruct j; [ easy | ].
       simpl; rewrite match_id.
-      apply intersection_empty_r.
+      apply set_inter_empty_r.
 
       destruct i.
-       destruct j; [ now rewrite intersection_comm | ].
+       destruct j; [ now rewrite set_inter_comm | ].
        destruct j; [ easy | ].
        simpl; rewrite match_id.
-       apply intersection_empty_r.
+       apply set_inter_empty_r.
 
        destruct j.
         simpl; rewrite match_id.
-        apply intersection_empty_l.
+        apply set_inter_empty_l.
 
         destruct j.
          simpl; rewrite match_id.
-         apply intersection_empty_l.
+         apply set_inter_empty_l.
 
          simpl; do 2 rewrite match_id.
-         apply intersection_empty_l.
+         apply set_inter_empty_l.
 
   assert (Hρm : is_rotation_matrix ρ).
    rewrite Hρ.
@@ -2573,7 +2573,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball �
 
    intros HD.
    assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
-    rewrite intersection_union_distr_r; left.
+    rewrite set_inter_union_distr_r; left.
     split; [ | easy ].
     destruct HD as (el & p₁ & Hso & Hnl & Hel).
     now exists el, p₁.
@@ -2588,7 +2588,7 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball �
 
    intros HD.
    assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
-    rewrite intersection_union_distr_r; right.
+    rewrite set_inter_union_distr_r; right.
     split; [ | easy ].
     destruct HD as (el & p₁ & Hso & Hnl & Hel).
     now exists el, p₁.
@@ -2700,7 +2700,7 @@ remember (mkset (λ p, ∃ n, ((rot_z ^ S n)%mat * p₀)%vec = p)) as rF eqn:HrF
 exists [F; ball ∖ F].
 exists [rF; ball ∖ F].
 split.
- apply is_partition_subtract.
+ apply is_partition_sub.
  rewrite HF.
  intros v Hv; simpl in Hv.
  destruct Hv as (n & Hv).
@@ -2806,7 +2806,7 @@ remember (set_of_vec (V 1 0 0)) as E eqn:HE.
 exists [center; ball ∖ E ∖ center].
 exists [E; ball ∖ center ∖ E].
 split.
- apply is_partition_subtract.
+ apply is_partition_sub.
  intros p Hp; subst E.
  simpl in Hp; subst p; simpl.
  split; [ rewrite Rsqr_0; lra | ].
@@ -2814,7 +2814,7 @@ split.
  injection H; clear H; intros H; lra.
 
  split.
-  apply is_partition_subtract.
+  apply is_partition_sub.
   intros p Hp; subst E.
   simpl in Hp; subst p; simpl.
   split; [ rewrite Rsqr_0, Rsqr_1; lra | ].
@@ -2834,7 +2834,7 @@ split.
 
     constructor; [ | constructor ].
     exists gr_ident.
-    rewrite set_subtract_sub_swap.
+    rewrite set_sub_sub_swap.
     apply app_gr_ident.
 Qed.
 
@@ -2850,7 +2850,7 @@ Theorem equidec_ball_with_and_without_fixpoints :
 Proof.
 rewrite equidec_ball_ball_but_center at 1.
 rewrite equidec_ball_but_center_with_and_without_fixpoints.
-rewrite set_subtract_sub_swap.
+rewrite set_sub_sub_swap.
 enough (HD : ((ball ∖ D) ∖ center = ball ∖ D)%S) by now rewrite HD.
 intros p; split; intros Hp; [ now destruct Hp | ].
 split; [ easy | ].
@@ -2873,7 +2873,7 @@ transitivity (ball ∖ D).
  etransitivity.
   apply Banach_Tarski_paradox_but_fixpoints.
 
-  apply equidec_union.
+  apply equidec_set_union.
    apply separated_balls_without_fixpoints.
 
    apply separated_balls.

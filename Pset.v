@@ -13,21 +13,21 @@ Notation "x '∈' E" := (setp E x) (at level 60).
 Notation "x '∉' E" := (¬ setp E x) (at level 60).
 Notation "'∅'" := (empty_set).
 
-Definition intersection {A} (E₁ E₂ : set A) :=
+Definition set_inter {A} (E₁ E₂ : set A) :=
   mkset (λ x, x ∈ E₁ ∧ x ∈ E₂).
-Definition union {A} (E₁ E₂ : set A) :=
+Definition set_union {A} (E₁ E₂ : set A) :=
   mkset (λ x, x ∈ E₁ ∨ x ∈ E₂).
-Definition union_list {A} (Ei : list (set A)) :=
-  fold_right union ∅ Ei.
-Definition subtract {A} (E₁ E₂ : set A) :=
+Definition set_union_list {A} (Ei : list (set A)) :=
+  fold_right set_union ∅ Ei.
+Definition set_sub {A} (E₁ E₂ : set A) :=
   mkset (λ x, x ∈ E₁ ∧ x ∉ E₂).
-Definition included {A} (E₁ E₂ : set A) :=
+Definition set_incl {A} (E₁ E₂ : set A) :=
   ∀ x, x ∈ E₁ → x ∈ E₂.
 
-Arguments intersection : simpl never.
-Arguments union : simpl never.
-Arguments subtract : simpl never.
-Arguments included : simpl never.
+Arguments set_inter : simpl never.
+Arguments set_union : simpl never.
+Arguments set_sub : simpl never.
+Arguments set_incl : simpl never.
 
 Delimit Scope set_scope with S.
 
@@ -35,11 +35,11 @@ Definition set_eq {A} (E₁ E₂ : set A) := ∀ x, x ∈ E₁ ↔ x ∈ E₂.
 
 Notation "E₁ = E₂" := (set_eq E₁ E₂) : set_scope.
 Notation "E₁ ≠ E₂" := (¬ set_eq E₁ E₂) : set_scope.
-Notation "E₁ '∩' E₂" := (intersection E₁ E₂) (at level 40).
-Notation "E₁ '∪' E₂" := (union E₁ E₂) (at level 50).
-Notation "E₁ '∖' E₂" := (subtract E₁ E₂) (at level 50).
-Notation "E₁ '⊂' E₂" := (included E₁ E₂) (at level 60).
-Notation "'⋃' Es" := (union_list Es) (at level 55).
+Notation "E₁ '∩' E₂" := (set_inter E₁ E₂) (at level 40).
+Notation "E₁ '∪' E₂" := (set_union E₁ E₂) (at level 50).
+Notation "E₁ '∖' E₂" := (set_sub E₁ E₂) (at level 50).
+Notation "E₁ '⊂' E₂" := (set_incl E₁ E₂) (at level 60).
+Notation "'⋃' Es" := (set_union_list Es) (at level 55).
 Notation "E .[ i ]" := (List.nth i E ∅)
   (at level 1, format "'[' E '[' .[ i ] ']' ']'").
 
@@ -133,26 +133,26 @@ Add Parametric Relation A : (set A) (@set_eq A)
 Theorem eq_set_eq : ∀ A (x y : set A), x = y → (x = y)%S.
 Proof. intros; now subst x. Qed.
 
-Theorem included_trans A : transitive _ (@included A).
+Theorem included_trans A : transitive _ (@set_incl A).
 Proof.
 intros E F G HEF HFG x Hx.
 apply HFG, HEF, Hx.
 Qed.
 
-Add Parametric Morphism {A} : (@intersection A)
+Add Parametric Morphism {A} : (@set_inter A)
   with signature set_eq ==> set_eq ==> set_eq
-  as intersection_morph.
+  as set_inter_morph.
 Proof.
 intros E E' HE F F' HF.
-unfold intersection; intros p.
+unfold set_inter; intros p.
 split; intros (H₁, H₂).
  now split; [ apply HE | apply HF ].
  now split; [ apply HE | apply HF ].
 Qed.
 
-Add Parametric Morphism {A} : (@union A)
+Add Parametric Morphism {A} : (@set_union A)
   with signature set_eq ==> set_eq ==> set_eq
-  as union_morph.
+  as set_union_morph.
 Proof.
 intros E E' HE F F' HF.
 intros p.
@@ -161,18 +161,18 @@ split.
  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
 Qed.
 
-Add Parametric Morphism {A} : (@subtract A)
+Add Parametric Morphism {A} : (@set_sub A)
   with signature set_eq ==> set_eq ==> set_eq
-  as subtract_morph.
+  as set_sub_morph.
 Proof.
 intros E E' HE F F' HF.
-unfold subtract; intros p.
+unfold set_sub; intros p.
 split; intros (H₁, H₂).
  split; [ now apply HE | intros H; now apply H₂, HF ].
  split; [ now apply HE | intros H; now apply H₂, HF ].
 Qed.
 
-Add Parametric Morphism {A} : (@included A)
+Add Parametric Morphism {A} : (@set_incl A)
   with signature set_eq ==> set_eq ==> iff
   as included_morph.
 Proof.
@@ -185,7 +185,7 @@ Theorem set_eq_equiv {A} : ∀ (E F : set A),
   → ∀ p, p ∈ E ↔ p ∈ F.
 Proof. intros s * HEF; apply HEF. Qed.
 
-Theorem union_empty_r : ∀ A (F : set A),
+Theorem set_union_empty_r : ∀ A (F : set A),
   (F ∪ ∅ = F)%S.
 Proof.
 intros * x.
@@ -193,35 +193,35 @@ split; intros H; [ | now left ].
 now destruct H.
 Qed.
 
-Theorem intersection_empty_l : ∀ A (F : set A),
+Theorem set_inter_empty_l : ∀ A (F : set A),
   (∅ ∩ F = ∅)%S.
 Proof.
 intros * x.
 split; intros H; [ now destruct H as (H, _) | easy ].
 Qed.
 
-Theorem intersection_empty_r : ∀ A (F : set A),
+Theorem set_inter_empty_r : ∀ A (F : set A),
   (F ∩ ∅ = ∅)%S.
 Proof.
 intros * x.
 split; intros H; [ now destruct H as (_, H) | easy ].
 Qed.
 
-Theorem intersection_comm : ∀ A (E F : set A),
+Theorem set_inter_comm : ∀ A (E F : set A),
   (E ∩ F = F ∩ E)%S.
 Proof.
 intros; intros x.
 split; intros H; destruct H as (HE & HF); now split.
 Qed.
 
-Theorem union_comm : ∀ A (E F : set A),
+Theorem set_union_comm : ∀ A (E F : set A),
   (E ∪ F = F ∪ E)%S.
 Proof.
 intros; intros x.
 now split; intros [HE| HF]; [ right | left | right | left ] .
 Qed.
 
-Theorem intersection_assoc : ∀ A (E F G : set A),
+Theorem set_inter_assoc : ∀ A (E F G : set A),
   (E ∩ (F ∩ G) = (E ∩ F) ∩ G)%S.
 Proof.
 intros; intros x.
@@ -233,7 +233,7 @@ split; intros H.
  split; [ easy | now split ].
 Qed.
 
-Theorem union_assoc : ∀ A (E F G : set A),
+Theorem set_union_assoc : ∀ A (E F G : set A),
   (E ∪ (F ∪ G) = (E ∪ F) ∪ G)%S.
 Proof.
 intros; intros x.
@@ -249,10 +249,10 @@ split; intros H.
   right; now right.
 Qed.
 
-Theorem in_intersection : ∀ A (E F : set A) x, x ∈ E ∩ F ↔ x ∈ E ∧ x ∈ F.
+Theorem in_set_inter : ∀ A (E F : set A) x, x ∈ E ∩ F ↔ x ∈ E ∧ x ∈ F.
 Proof. intros; split; intros H; easy. Qed.
 
-Theorem intersection_shuffle0 : ∀ A (E F G : set A),
+Theorem set_inter_shuffle0 : ∀ A (E F G : set A),
   (E ∩ F ∩ G = E ∩ G ∩ F)%S.
 Proof.
 intros; intros x.
@@ -264,22 +264,22 @@ split; intros H.
  split; [ now split | easy ].
 Qed.
 
-Theorem union_list_app : ∀ A (P₁ P₂ : list (set A)),
+Theorem set_union_list_app : ∀ A (P₁ P₂ : list (set A)),
   (⋃ (P₁ ++ P₂) = (⋃ P₁) ∪ (⋃ P₂))%S.
 Proof.
 intros.
 revert P₁.
 induction P₂ as [| Q]; intros.
  rewrite app_nil_r; simpl.
- now rewrite union_empty_r.
+ now rewrite set_union_empty_r.
 
  rewrite cons_comm_app, app_assoc; simpl.
  rewrite IHP₂.
- unfold union_list; simpl; rewrite union_assoc.
+ unfold set_union_list; simpl; rewrite set_union_assoc.
  intros x.
  split; intros H.
   destruct H as [H| H]; [ left | now right ].
-  unfold union_list in H.
+  unfold set_union_list in H.
   rewrite fold_right_app in H.
   simpl in H.
   clear - H.
@@ -294,7 +294,7 @@ induction P₂ as [| Q]; intros.
    now right.
 
   destruct H as [H| H]; [ left | now right ].
-  unfold union_list.
+  unfold set_union_list.
   rewrite fold_right_app; simpl.
   clear - H.
   induction P₁ as [| R P₁].
@@ -327,16 +327,16 @@ Theorem nth_set_app : ∀ A (P₁ P₂ : list (set A)) i,
   if lt_dec i (length P₁) then P₁.[i] else P₂.[i-length P₁].
 Proof.
 intros.
-unfold union, set_eq; simpl; intros.
+unfold set_union, set_eq; simpl; intros.
 destruct (lt_dec i (length P₁)) as [H₁| H₁].
  now rewrite app_nth1.
 
  rewrite app_nth2; [ easy | now apply Nat.nlt_ge ].
 Qed.
 
-Theorem union_intersection_self : ∀ A (E : set A) EL,
+Theorem set_union_inter_self : ∀ A (E : set A) EL,
   E ⊂ ⋃ EL
-  → (E = ⋃ map (intersection E) EL)%S.
+  → (E = ⋃ map (set_inter E) EL)%S.
 Proof.
 intros * HEL x.
 split; intros Hx.
@@ -353,7 +353,7 @@ split; intros Hx.
  apply IHEL, Hx.
 Qed. 
 
-Theorem intersection_union_distr_r : ∀ A (E F G : set A),
+Theorem set_inter_union_distr_r : ∀ A (E F G : set A),
   ((E ∪ F) ∩ G = (E ∩ G) ∪ (F ∩ G))%S.
 Proof.
 intros * x.
@@ -382,12 +382,12 @@ induction EL as [| E EL]; [ apply set_map_empty | simpl ].
 now rewrite set_map_union_distr, IHEL.
 Qed.
 
-Theorem  subtract_empty_l : ∀ A (E : set A), (∅ ∖ E = ∅)%S.
+Theorem  set_sub_empty_l : ∀ A (E : set A), (∅ ∖ E = ∅)%S.
 Proof.
 intros; intros a; now simpl; split; intros H.
 Qed.
 
-Theorem set_subtract_sub_swap : ∀ A (E F G : set A),
+Theorem set_sub_sub_swap : ∀ A (E F G : set A),
   (E ∖ F ∖ G = E ∖ G ∖ F)%S.
 Proof.
 intros; intros x; split; intros Hx.

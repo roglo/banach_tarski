@@ -280,7 +280,7 @@ induction g as [ M Hrm | | ]; intros.
  apply IHg2.
 Qed.
 
-Theorem group_intersection_distr : ∀ g E F,
+Theorem group_set_inter_distr : ∀ g E F,
   (app_gr g (E ∩ F) = app_gr g E ∩ app_gr g F)%S.
 Proof.
 intros.
@@ -294,7 +294,7 @@ induction g; intros.
  intros p; simpl; now rewrite IHg2, IHg1.
 Qed.
 
-Theorem group_union_distr : ∀ g E F,
+Theorem group_set_union_distr : ∀ g E F,
   (app_gr g (E ∪ F) = app_gr g E ∪ app_gr g F)%S.
 Proof.
 intros.
@@ -305,7 +305,7 @@ induction g; intros.
  now intros p; simpl; rewrite IHg2, IHg1.
 Qed.
 
-Theorem group_union_list_distr : ∀ f EL,
+Theorem group_set_union_list_distr : ∀ f EL,
   (app_gr f (⋃ EL) = ⋃ map (app_gr f) EL)%S.
 Proof.
 intros.
@@ -313,7 +313,7 @@ induction EL as [| E₁ EL].
  intros x; rewrite app_gr_empty_set; now split.
 
  intros x; simpl.
- rewrite group_union_distr.
+ rewrite group_set_union_distr.
  split; intros Hx.
   destruct Hx as [Hx| Hx]; [ now left | ].
   right; now apply IHEL.
@@ -455,7 +455,7 @@ split.
 
     rewrite IHh in Hgh.
     simpl in Hgh.
-    apply group_union_distr in Hgh.
+    apply group_set_union_distr in Hgh.
     destruct Hgh as [Hgh| Hgh]; [ now left | right ].
     eapply IHEL; [ | easy | | | ].
      intros i j Hij.
@@ -468,11 +468,11 @@ split.
       split; [ intros (HPi, HPj) | easy ].
       apply HQ; now split.
 
-     apply group_union_list_distr.
+     apply group_set_union_list_distr.
 
-     apply group_union_list_distr.
+     apply group_set_union_list_distr.
 
-     pose proof group_union_list_distr h EL.
+     pose proof group_set_union_list_distr h EL.
      now rewrite <- H in Hgh.
 
    intros Hgh.
@@ -480,15 +480,15 @@ split.
    induction EL as [| E ELl]; intros; [ easy | ].
    destruct Hgh as [Hgh| Hgh].
     rewrite IHh; simpl.
-    rewrite set_eq_equiv; [ | now rewrite group_union_distr ].
+    rewrite set_eq_equiv; [ | now rewrite group_set_union_distr ].
     now left.
 
     rewrite HF; simpl.
-    rewrite set_eq_equiv; [ | now rewrite group_union_distr ].
-    rewrite set_eq_equiv; [ | now rewrite group_union_distr ].
+    rewrite set_eq_equiv; [ | now rewrite group_set_union_distr ].
+    rewrite set_eq_equiv; [ | now rewrite group_set_union_distr ].
     right.
-    rewrite group_union_list_distr.
-    rewrite set_eq_equiv; [ | now rewrite group_union_list_distr ].
+    rewrite group_set_union_list_distr.
+    rewrite set_eq_equiv; [ | now rewrite group_set_union_list_distr ].
     now rewrite map_map.
 
  intros i j Hij p.

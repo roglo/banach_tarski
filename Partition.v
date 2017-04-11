@@ -22,7 +22,7 @@ Proof.
 intros * Hp.
 destruct Hp as (Hu & Hi).
 split.
- unfold union_list, union, set_eq in Hu |-*.
+ unfold set_union_list, set_union, set_eq in Hu |-*.
  simpl in Hu |-*.
  intros x.
  pose proof Hu x as H₁.
@@ -39,45 +39,45 @@ split.
 
  intros i j Hij.
  destruct i.
-  unfold intersection, set_eq; simpl.
+  unfold set_inter, set_eq; simpl.
   intros x.
   split; [ | easy ].
   intros (H₁, H₂).
   destruct j; [ now apply Hij | clear Hij ].
   destruct H₁ as [H₁| H₁].
    eapply Hi with (i := O) (j := S (S j)); [ easy | ].
-   unfold intersection; simpl.
+   unfold set_inter; simpl.
    split; eassumption.
 
    eapply Hi with (i := 1%nat) (j := S (S j)); [ easy | ].
-   unfold intersection; simpl.
+   unfold set_inter; simpl.
    split; eassumption.
 
-  unfold intersection, union, set_eq; simpl.
+  unfold set_inter, set_union, set_eq; simpl.
   intros x.
   split; [ | easy ].
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
     eapply Hi with (i := O) (j := S (S i)); [ easy | ].
-    unfold intersection; simpl.
+    unfold set_inter; simpl.
     split; eassumption.
 
     eapply Hi with (i := 1%nat) (j := S (S i)).
      easy.
 
-     unfold intersection; simpl.
+     unfold set_inter; simpl.
      split; eassumption.
 
   apply Hi with (i := S (S i)) (j := S (S j)) (x := x).
    intros H; apply Hij.
    now apply Nat.succ_inj.
 
-   unfold intersection; simpl.
+   unfold set_inter; simpl.
    now split.
 Qed.
 
-Theorem is_partition_union_subtract :
+Theorem is_partition_union_sub :
   ∀ A (F : set A) P₁ P₂ Pl (B : set A),
   is_partition F (P₁ :: P₂ :: Pl)
   → (B ⊂ P₂)%S
@@ -86,7 +86,7 @@ Proof.
 intros A F P₁ P₂ Pl B Hp HB.
 destruct Hp as (Hu & Hi).
 split.
- unfold union_list, union, subtract, set_eq in Hu |-*.
+ unfold set_union_list, set_union, set_sub, set_eq in Hu |-*.
  simpl in Hu |-*.
  intros x.
  split; intros H.
@@ -108,32 +108,32 @@ split.
 
  intros i j Hij.
  destruct i.
-  unfold intersection, union, subtract, set_eq; simpl.
+  unfold set_inter, set_union, set_sub, set_eq; simpl.
   intros x.
   split; [ | easy ].
   intros (H₁, H₂).
   destruct j; [ now apply Hij | clear Hij ].
   destruct H₁ as [H₁| H₁].
    eapply Hi with (i := O) (j := S j); [ easy | ].
-   unfold intersection; simpl.
+   unfold set_inter; simpl.
    split; [ eassumption | ].
    destruct j; [ now destruct H₂ | easy ].
 
    eapply Hi with (i := 1%nat) (j := S j).
     destruct j; [ now destruct H₂ | easy ].
 
-    unfold intersection; simpl.
+    unfold set_inter; simpl.
     split; [ apply HB; eassumption | ].
     destruct j; [ now destruct H₂ | easy ].
 
-  unfold intersection, union, subtract, set_eq; simpl.
+  unfold set_inter, set_union, set_sub, set_eq; simpl.
   intros x.
   split; [ | easy ].
   intros (H₁ & H₂).
   destruct j.
    destruct H₂ as [H₂| H₂].
     eapply Hi with (i := O) (j := S i); [ easy | ].
-    unfold intersection; simpl.
+    unfold set_inter; simpl.
     split; [ eassumption | ].
     destruct i; [ now destruct H₁ | easy ].
 
@@ -141,14 +141,14 @@ split.
      destruct i; [ | easy ].
      now destruct H₁.
 
-     unfold intersection; simpl.
+     unfold set_inter; simpl.
      split; [ apply HB; eassumption | ].
      destruct i; [ now apply HB | easy ].
 
   apply Hi with (i := S i) (j := S j) (x := x).
    intros H; now apply Hij.
 
-   unfold intersection; simpl.
+   unfold set_inter; simpl.
    split.
     destruct i; [ now destruct H₁ | easy ].
 
@@ -166,7 +166,7 @@ intros * HFF HF₁ HF₂.
 destruct HF₁ as (HF₁ & HP₁).
 destruct HF₂ as (HF₂ & HP₂).
 split.
- rewrite union_list_app.
+ rewrite set_union_list_app.
  transitivity (F₁ ∪ ⋃ P₂).
   intros x.
   split; intros H.
@@ -184,7 +184,7 @@ split.
    now apply HF₁.
 
  intros * Hij.
- unfold intersection, set_eq; simpl.
+ unfold set_inter, set_eq; simpl.
  intros x.
  split; intros H; [ | easy ].
  destruct H as (H₁, H₂).
@@ -233,7 +233,7 @@ Qed.
 Theorem is_partition_single : ∀ A (E : set A), is_partition E [E].
 Proof.
 intros.
-split; [ symmetry; now eapply union_empty_r | ].
+split; [ symmetry; now eapply set_union_empty_r | ].
 intros * Hij.
 destruct i.
  destruct j; [ exfalso; now apply Hij | ].
@@ -255,13 +255,13 @@ rewrite <- HEF.
 now split.
 Qed.
 
-Theorem is_partition_subtract : ∀ A (E F : set A),
+Theorem is_partition_sub : ∀ A (E F : set A),
   F ⊂ E
   → is_partition E [F; E ∖ F].
 Proof.
 intros * HF.
 split.
- simpl; rewrite union_empty_r.
+ simpl; rewrite set_union_empty_r.
  intros v; split; intros H.
   now destruct (EM (v ∈ F)) as [Hi| Hni]; [ left | right ].
 
@@ -275,7 +275,7 @@ split.
    now split; intros Hv; [ simpl in Hv | ].
 
    simpl; rewrite match_id.
-   apply intersection_empty_r.
+   apply set_inter_empty_r.
 
   destruct j.
    destruct i.
@@ -283,17 +283,17 @@ split.
     now split; intros Hv; [ simpl in Hv | ].
 
     simpl; rewrite match_id.
-    apply intersection_empty_l.
+    apply set_inter_empty_l.
 
    destruct i.
     destruct j; [ easy | ].
     simpl; rewrite match_id.
-    apply intersection_empty_r.
+    apply set_inter_empty_r.
 
     destruct j.
      simpl; rewrite match_id.
-     apply intersection_empty_l.
+     apply set_inter_empty_l.
 
      simpl; do 2 rewrite match_id.
-     apply intersection_empty_l.
+     apply set_inter_empty_l.
 Qed.
