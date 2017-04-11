@@ -509,3 +509,53 @@ destruct t.
  exists (V 1 0 0).
  now rewrite rotate_rotate_norm.
 Qed.
+
+Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
+  norm_list el ≠ []
+  → mat_of_path el ≠ mat_id.
+Proof.
+intros * Hn.
+apply rotate_non_empty_path_is_not_identity in Hn.
+destruct Hn as (p, Hp).
+intros H; apply Hp; clear Hp.
+rewrite rotate_vec_mul.
+fold (mat_of_path el); rewrite H.
+apply mat_vec_mul_id.
+Qed.
+
+Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
+
+Theorem mat_of_path_is_not_rotation_π : ∀ el,
+  ¬ is_a_rotation_π (mat_of_path el).
+Proof.
+intros el H.
+unfold is_a_rotation_π in H.
+destruct H as (Hmt, Hid).
+remember (mat_of_path el) as M eqn:HM.
+apply Hid; clear Hid.
+assert (Hr : is_rotation_matrix M).
+ subst M.
+ apply mat_of_path_is_rotation_matrix.
+
+ assert (HMI : (M * M = mat_id)%mat).
+  rewrite Hmt at 2.
+  now destruct Hr.
+
+  rewrite <- mat_of_path_norm in HM.
+  remember (norm_list el) as nel eqn:Hnel.
+  symmetry in Hnel.
+  destruct nel as [| e nel]; [ easy | ].
+  rewrite HM in HMI.
+  rewrite <- mat_of_path_app in HMI.
+  exfalso; revert HMI.
+  apply matrix_of_non_empty_path_is_not_identity.
+  rewrite <- Hnel.
+  intros H.
+  apply norm_list_app_is_nil in H.
+   symmetry in H; apply rev_path_eq_path in H.
+   now rewrite Hnel in H.
+
+   now rewrite norm_list_idemp.
+
+   now rewrite norm_list_idemp.
+Qed.

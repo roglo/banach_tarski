@@ -1455,3 +1455,44 @@ assert (Hrnz : r ≠ 0).
   repeat rewrite Rsqr_pow2.
   rewrite <- Hrxyz2; ring.
 Qed.
+
+Theorem mat_of_path_cons : ∀ e el,
+   mat_of_path (e :: el) = (mat_of_elem e * mat_of_path el)%mat.
+Proof. easy. Qed.
+
+Theorem mat_of_elem_negf_mul_l : ∀ e,
+  (mat_of_elem (negf e) * mat_of_elem e)%mat = mat_id.
+Proof.
+intros (t, d); simpl.
+destruct t, d; simpl.
+ apply rot_rot_inv_x.
+ apply rot_inv_rot_x.
+ apply rot_rot_inv_z.
+ apply rot_inv_rot_z.
+Qed.
+
+Theorem mat_of_path_norm : ∀ el,
+  mat_of_path (norm_list el) = mat_of_path el.
+Proof.
+intros.
+induction el as [| e el]; [ easy | simpl ].
+remember (norm_list el) as nel eqn:Hnel.
+symmetry in Hnel.
+destruct nel as [| e₁ nel].
+ unfold mat_of_path in IHel at 1.
+ simpl in IHel; symmetry.
+ rewrite mat_of_path_cons.
+ now rewrite <- IHel.
+
+ destruct (letter_opp_dec e e₁) as [He| He].
+  apply letter_opp_negf in He; subst e.
+  rewrite mat_of_path_cons.
+  rewrite <- IHel.
+  rewrite mat_of_path_cons.
+  rewrite mat_mul_assoc.
+  now rewrite mat_of_elem_negf_mul_l, mat_mul_id_l.
+
+  rewrite mat_of_path_cons; symmetry.
+  rewrite mat_of_path_cons; symmetry.
+  now rewrite IHel.
+Qed.
