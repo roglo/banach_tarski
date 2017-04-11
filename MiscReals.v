@@ -65,9 +65,6 @@ rewrite Rmult_assoc.
 rewrite Rinv_l; [ lra | easy ].
 Qed.
 
-Theorem Rplus_simpl_r : ∀ x y, x + y - y = x.
-Proof. intros; lra. Qed.
-
 Theorem Rplus_shuffle0 : ∀ n m p : ℝ, n + m + p = n + p + m.
 Proof.
 intros.
@@ -399,18 +396,6 @@ Qed.
 Definition Rsignp x := if Rle_dec 0 x then 1 else -1.
 Definition Rsign x := if Req_dec x 0 then 0 else Rsignp x.
 
-Theorem Rsignp_0 : Rsignp 0 = 1.
-Proof.
-unfold Rsignp.
-destruct (Rle_dec 0 0); [ easy | lra ].
-Qed.
-
-Theorem Rsign_0 : Rsign 0 = 0.
-Proof.
-unfold Rsign.
-destruct (Req_dec 0 0); [ easy | lra ].
-Qed.
-
 Theorem Rsignp_of_pos : ∀ x, 0 ≤ x → Rsignp x = 1.
 Proof.
 intros * Hx.
@@ -439,20 +424,6 @@ intros * Hx.
 unfold Rsign, Rsignp.
 destruct (Req_dec x 0); [ lra |  ].
 destruct (Rle_dec 0 x); [ lra | easy ].
-Qed.
-
-Theorem Rsign_neg : ∀ x, Rsign (- x) = - Rsign x.
-Proof.
-intros.
-unfold Rsign, Rsignp.
-destruct (Req_dec x 0) as [Hxz| Hxz].
- subst x; rewrite Ropp_0; simpl.
- destruct (Req_dec 0 0); [ easy | lra ].
-
- destruct (Req_dec (- x) 0) as [| H]; [ lra | clear H ].
- destruct (Rle_dec 0 x) as [Hp| Hn].
-  destruct (Rle_dec 0 (- x)); [ lra | easy ].
-  destruct (Rle_dec 0 (- x)); lra.
 Qed.
 
 Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = Rsign x * Rsign y.

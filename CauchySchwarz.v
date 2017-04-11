@@ -14,6 +14,3 @@ intros.
 rewrite Rplus_comm, <- Rplus_assoc.
 f_equal; apply Rplus_comm.
 Qed.
-
-Definition sqr_cross_mul n a b :=
-   Σ (i = 1, n), Σ (j = i + 1, n), ((a.[i] * b.[j] - a.[j] * b.[i])²).

@@ -229,29 +229,6 @@ destruct (lt_dec q n) as [Hqn| Hqn].
   apply Nat.le_add_r.
 Qed.
 
-Theorem path_of_nat_aux_cons : ∀ e p q, (q < p)%nat →
-  ∃ m n : ℕ, (n < m)%nat ∧ path_of_nat_aux m n = e :: path_of_nat_aux p q.
-Proof.
-intros * Hqp.
-remember (nat_of_free_elem e) as r eqn:Hr.
-exists (S (r + S q * 4)), (r + S q * 4)%nat.
-split; [ apply Nat.lt_succ_diag_r | ].
-remember (S q) as sq; simpl; subst sq.
-rewrite Nat.mod_add; [ | easy ].
-rewrite Nat.div_add; [ | easy ].
-rewrite <- Nat.add_succ_comm.
-remember (S q * 4)%nat as qq; simpl; subst qq.
-rewrite Hr, free_elem_of_nat_nat_of_free_elem_mod_4.
-f_equal.
-rewrite nat_of_free_elem_div_4, Nat.add_0_l.
-apply path_of_nat_aux_enough_iter; [ | easy ].
-eapply Nat.lt_trans; [ apply Nat.lt_succ_diag_r | ].
-rewrite Nat.mul_comm, Nat.add_comm; simpl.
-do 4 rewrite <- Nat.add_succ_l.
-rewrite <- Nat.add_assoc.
-apply Nat.lt_add_pos_r, Nat.lt_0_succ.
-Qed.
-
 Definition unit_interv := mkset (λ x, 0 <= x < 1).
 
 Definition ter_bin_of_vec r '(V x y z) := ter_bin_of_frac_part (x / r).
@@ -294,15 +271,6 @@ Definition fixpoint_of_path r el :=
 
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
-
-Theorem Rsqr_le_1_interv : ∀ x, x² ≤ 1 → -1 ≤ x ≤ 1.
-Proof.
-intros * Hx.
-replace 1 with (1 ^ 2) in Hx by lra.
-rewrite <- Rsqr_pow2 in Hx.
-split; [ apply Rsqr_neg_pos_le_0; lra | ].
-apply Rsqr_incr_0_var; lra.
-Qed.
 
 (* We know, from theory of linear algebra, that tr(M) = 1 + 2 cos θ.
    Therefore, when θ varies from 0 to 2π, tr(M) varies between -1 and 3.
@@ -2594,74 +2562,6 @@ assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1).
        intros J; apply Rsqr_eq_0 in J; lra.
 Qed.
 
-Theorem rot_is_id_for_pt : ∀ M v,
-  is_rotation_matrix M
-  → (M * v = v)%vec
-  → M ≠ mat_transp M
-  → ∀ a s c, axis_angle_of_matrix M = (a, s, c) → a × v = 0%vec.
-Proof.
-intros * Hrm Hmv Hmt a s c Ha.
-destruct v as (x, y, z).
-destruct M; simpl in *.
-destruct Hrm as (Hrm, Hdet).
-unfold mat_mul, mat_transp, mat_id, mkrmat in Hrm; simpl in Hrm.
-unfold mat_det in Hdet; simpl in Hdet.
-unfold mat_transp, mkrmat in Hmt; simpl in Hmt.
-injection Hrm; clear Hrm.
-intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-clear H21 H31 H32.
-injection Hmv; clear Hmv; intros Hz Hy Hx.
-unfold axis_angle_of_matrix in Ha; simpl in Ha.
-unfold rotation_unit_axis, mat_trace in Ha; simpl in Ha.
-unfold "_-_", sub_notation in Ha.
-injection Ha; clear Ha; intros Hc Hs Ha.
-destruct a as (xa, ya, za); simpl.
-injection Ha; clear Ha; intros Hza Hya Hxa.
-rewrite Hc in Hs.
-remember ((a₃₂ - a₂₃)² + (a₁₃ - a₃₁)² + (a₂₁ - a₁₂)²) as r eqn:Hr.
-destruct (Req_dec r 0) as [Hrz| Hrz].
- rewrite Hrz in Hr; clear r Hxa Hya Hza Hrz.
- symmetry in Hr.
- apply sqr_vec_norm_eq_0 in Hr.
- destruct Hr as (H1 & H2 & H3).
- apply Rminus_diag_uniq in H1.
- apply Rminus_diag_uniq in H2.
- apply Rminus_diag_uniq in H3.
- now subst a₃₂ a₁₃ a₂₁.
-
- assert (Hsq : √ r ≠ 0).
-  intros H; apply Hrz, sqrt_eq_0; [ | easy ].
-  rewrite Hr; apply nonneg_sqr_vec_norm.
-
-  unfold Rsqr in Hr; ring_simplify in Hr.
-  progress repeat rewrite <- Rsqr_pow2 in Hr.
-  rewrite Rmult_comm, fold_Rdiv in Hxa, Hya, Hza.
-  f_equal.
-   rewrite <- Hya, <- Hza.
-   apply Rmult_eq_reg_r with (r := √ r); [ | easy ].
-   rewrite Rmult_0_l, Rmult_minus_distr_r.
-   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
-   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
-   clear - Hdet H11 H12 H13 H22 H23 Hx Hy Hz.
-   Time nsatz.
-
-   rewrite <- Hza, <- Hxa.
-   apply Rmult_eq_reg_r with (r := √ r); [ | easy ].
-   rewrite Rmult_0_l, Rmult_minus_distr_r.
-   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
-   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
-   clear - Hdet H11 H12 H13 H22 H23 Hx Hy Hz.
-   Time nsatz.
-
-   rewrite <- Hxa, <- Hya.
-   apply Rmult_eq_reg_r with (r := √ r); [ | easy ].
-   rewrite Rmult_0_l, Rmult_minus_distr_r.
-   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
-   rewrite Rmult_shuffle0, Rmult_div_same; [ | easy ].
-   clear - Hdet H11 H12 H13 H22 H23 Hx Hy Hz.
-   Time nsatz.
-Qed.
-
 (* J₀(axis) = set of angles of rotation around the axis, such that
    for some p in D ∩ sphere(r), R(p) is also in D ∩ sphere(r) where
    r = ‖axis‖. *)
@@ -3792,52 +3692,6 @@ Qed.
 Theorem  subtract_empty_l : ∀ A (E : set A), (∅ ∖ E = ∅)%S.
 Proof.
 intros; intros a; now simpl; split; intros H.
-Qed.
-
-Theorem set_union_subtract_distr_r : ∀ A (E F G : set A),
-  ((E ∪ F) ∖ G = (E ∖ G) ∪ (F ∖ G))%S.
-Proof.
-intros; intros x; split; intros H.
- now destruct H as ([HE| HF], HG); simpl; [ left | right ].
-
- destruct H as [(HE, HG)| (HF, HG)].
-  now split; [ left | ].
-  now split; [ right | ].
-Qed.
-
-Theorem set_subtract_intersection_distr_r : ∀ A (E F G : set A),
-  ((E ∩ F) ∖ G = (E ∖ G) ∩ (F ∖ G))%S.
-Proof.
-intros; intros x; split; intros H.
- now destruct H as ((HE & HF) & HG); split.
-
- destruct H as ((HE, HG1), (HF, HG2)).
- now split; [ split | ].
-Qed.
-
-Theorem set_intersection_subtract_distr_l : ∀ A (E F G : set A),
-  (E ∩ (F ∖ G) = (E ∩ F) ∖ (E ∩ G))%S.
-Proof.
-intros; intros x; split; intros H.
- destruct H as (HE & HF & HG).
- now split; [ | intros (_, H) ].
-
- destruct H as ((HE1 & HF) & HEG).
- split; [ easy | ].
- split; [ easy | ].
- now intros H; apply HEG.
-Qed.
-
-Theorem set_intersection_subtract_distr_r : ∀ A (E F G : set A),
-  ((E ∖ F) ∩ G = (E ∩ G) ∖ (F ∩ G))%S.
-Proof.
-intros; intros x; split; intros H.
- destruct H as ((HE & HF) & HG).
- now split; [ | intros (HF', HG') ].
-
- destruct H as ((HE, HG), HFG).
- split; [ | easy ].
- now split; [ | intros H; apply HFG; split ].
 Qed.
 
 Theorem set_subtract_sub_swap : ∀ A (E F G : set A),

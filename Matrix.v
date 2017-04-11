@@ -130,18 +130,6 @@ Definition is_neg_vec '(V x y z) :=
 
 Arguments is_neg_vec _%vec.
 
-Theorem rot_x_means_rot_x : rot_x = rot_mat_of_axis_cos (V 1 0 0) (1/3).
-Proof.
-unfold rot_x; simpl.
-setoid_rewrite Rsqr_pow2.
-f_equal; try lra; ring_simplify.
- replace (1 - (1 / 3) ^ 2) with (2 * (2 / 3) ^ 2) by field.
- rewrite sqrt_mult; [ rewrite sqrt_pow2; lra | lra | lra ].
-
- replace (1 - (1 / 3) ^ 2) with (2 * (2 / 3) ^ 2) by field.
- rewrite sqrt_mult; [ rewrite sqrt_pow2; lra | lra | lra ].
-Qed.
-
 Definition mat_of_elem e :=
   match e with
   | ạ => rot_x

@@ -153,18 +153,6 @@ apply in_ball_after_rotation; [ easy | ].
 apply rotate_is_rotation_matrix.
 Qed.
 
-Theorem same_orbit_rotate : ∀ e p₁ p₂,
-  same_orbit p₁ p₂
-  → same_orbit (rotate e p₁) (rotate e p₂).
-Proof.
-intros * Hso.
-destruct Hso as (el, Hr).
-exists (e :: el ++ [negf e]); simpl.
-rewrite fold_right_app; simpl.
-rewrite rotate_neg_rotate.
-now f_equal.
-Qed.
-
 Theorem no_fixpoint_after_rotate : ∀ p e, p ∉ D → rotate e p ∉ D.
 Proof.
 intros * His Hr; apply His; clear His.
