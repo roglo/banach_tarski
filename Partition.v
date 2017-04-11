@@ -246,14 +246,6 @@ destruct i.
  now destruct i.
 Qed.
 
-Theorem is_partition_empty : ∀ A (E : set A),
-  is_partition E [] → (E = ∅)%S.
-Proof.
-intros * HP.
-destruct HP as (HE & _).
-easy.
-Qed.
-
 Add Parametric Morphism {A} : (@is_partition A)
  with signature set_eq ==> eq ==> iff
  as is_partition_morph.

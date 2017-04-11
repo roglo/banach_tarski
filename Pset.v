@@ -139,16 +139,6 @@ intros E F G HEF HFG x Hx.
 apply HFG, HEF, Hx.
 Qed.
 
-Theorem included_in_empty : ∀ A (E : set A),
-  E ⊂ ∅
-  → (E = ∅)%S.
-Proof.
-intros * HE.
-intros x.
-split; intros Hx; [ | easy ].
-now apply HE in Hx.
-Qed.
-
 Add Parametric Morphism {A} : (@intersection A)
   with signature set_eq ==> set_eq ==> set_eq
   as intersection_morph.

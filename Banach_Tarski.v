@@ -669,28 +669,6 @@ destruct (mat_eq_dec M mat_id) as [Hid| Hid].
   now intros H; apply Hmt.
 Qed.
 
-Theorem D_of_nat_prop : ∀ r n nf no p p₁ el el₁,
-  (nf, no) = prod_nat_of_nat n
-  → el₁ = path_of_nat nf
-  → p₁ = rotation_fixpoint (mat_of_path el₁) r
-  → el = path_of_nat no
-  → p = fold_right rotate p₁ el
-  → same_orbit p p₁ ∧ fold_right rotate p₁ el₁ = p₁.
-Proof.
-intros * Hnfo Hel₁ Hp₁ Hel Hp.
-split.
- exists (rev_path el).
- symmetry in Hp; apply rotate_rev_path in Hp; apply Hp.
-
- eapply rotation_fixpoint_of_path in Hp₁.
- rewrite <- rotate_vec_mul in Hp₁; apply Hp₁.
-Qed.
-
-Definition D_of_prod_nat r '(nf, no) :=
-  let p₁ := fixpoint_of_nat r nf in
-  let el := path_of_nat no in
-  fold_right rotate p₁ el.
-
 Fixpoint nat_of_path_aux el :=
   match el with
   | e :: el' => S (nat_of_path_aux el' * 4 + nat_of_free_elem e)
@@ -1992,20 +1970,6 @@ Notation "'hj'" := (Qj) : quat_scope.
 Notation "'hk'" := (Qk) : quat_scope.
 Notation "h '⁻¹'" := (quat_inv h) (at level 1, format "h ⁻¹"): quat_scope.
 Notation "‖ h ‖" := (quat_norm h) : quat_scope.
-
-Definition hr a := quat a 0.
-
-Theorem hi_sqr : (hi * hi)%H = hr (-1).
-Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
-
-Theorem hj_sqr : (hj * hj)%H = hr (-1).
-Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
-
-Theorem hk_shr : (hk * hk)%H = hr (-1).
-Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
-
-Theorem hi_hj_hk : (hi * hj * hk = hr (-1))%H.
-Proof. unfold hr; simpl; f_equal; [ lra | f_equal; lra ]. Qed.
 
 (* works for angle ≠ π *)
 Definition quat_of_mat M :=
@@ -3999,19 +3963,6 @@ split.
 
      simpl; do 2 rewrite match_id.
      apply intersection_empty_l.
-Qed.
-
-Theorem in_unit_sphere : ∀ v, v ≠ 0%vec → v ⁄ ‖v‖ ∈ sphere 1.
-Proof.
-intros (x, y, z) Hv; simpl.
-apply vec_norm_neq_0 in Hv; simpl in Hv.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Rsqr_inv; [ | easy ].
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_1, Rinv_l; [ easy | ].
-intros H; apply Hv; rewrite H.
-apply sqrt_0.
 Qed.
 
 Theorem vec_const_mul_in_D : ∀ v r, r ≠ 0 → v ∈ D → r ⁎ v ∈ D.

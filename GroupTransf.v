@@ -212,14 +212,6 @@ induction g as [ M Hrm | | ]; intros; simpl.
   rewrite IHg2; apply IHg1, H.
 Qed.
 
-Theorem inv_app_gr : ∀ g E F,
-  (app_gr g E = F)%S → (app_gr_inv g F = E)%S.
-Proof.
-intros * Ha.
-rewrite <- Ha.
-apply app_gr_inv_l.
-Qed.
-
 Theorem app_gr_app_gr_vec : ∀ g E p, p ∈ app_gr g E → app_gr_vec g p ∈ E.
 Proof.
 intros * Hp.

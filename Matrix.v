@@ -784,14 +784,6 @@ intros (x, y, z); simpl.
 now do 3 rewrite Ropp_involutive.
 Qed.
 
-Theorem is_neg_vec_0 : is_neg_vec (V 0 0 0) = true.
-Proof.
-simpl.
-destruct (Rlt_dec 0 0) as [H₁| H₁]; [ easy | clear H₁ ].
-destruct (Rgt_dec 0 0) as [H₁| H₁]; [ | easy ].
-now apply Rgt_irrefl in H₁.
-Qed.
-
 Theorem is_neg_vec_neg_vec : ∀ v,
   v ≠ 0%vec
   → is_neg_vec (- v) = negb (is_neg_vec v).

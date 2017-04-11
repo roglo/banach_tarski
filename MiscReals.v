@@ -176,47 +176,6 @@ assert (H : (0 <= z)%Z).
  eapply Rlt_le_trans; [ eassumption | lra ].
 Qed.
 
-Theorem Int_part_le_compat : ∀ x y, x <= y → (Int_part x <= Int_part y)%Z.
-Proof.
-intros * Hxy.
-destruct (Z_le_gt_dec (Int_part x) (Int_part y)) as [| Hlt]; [ easy | ].
-exfalso; apply Z.gt_lt in Hlt.
-apply IZR_lt in Hlt.
-pose proof base_Int_part x as Hx.
-pose proof base_Int_part y as Hy.
-destruct Hx as (Hx1, Hx2).
-destruct Hy as (Hy1, Hy2).
-remember (IZR (Int_part x)) as a eqn:Ha.
-remember (IZR (Int_part y)) as b eqn:Hb.
-assert (Hab : 0 < a - b < 1).
- split.
-  apply Rplus_lt_reg_r with (r := b).
-  now rewrite Rplus_0_l, Rplus_comm, Rplus_minus.
-
-  eapply Rle_lt_trans.
-   apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
-
-   eapply Rle_lt_trans.
-    apply Rplus_le_compat; [ eassumption | apply Rle_refl ].
-
-    apply Rgt_lt, Ropp_lt_contravar in Hy2.
-    rewrite Ropp_minus_distr in Hy2.
-    now rewrite Ropp_involutive in Hy2.
-
- rewrite Ha, Hb in Hab.
- rewrite Z_R_minus in Hab.
- replace 0 with (IZR 0) in Hab by lra.
- replace 1 with (IZR 1) in Hab by lra.
- destruct Hab as (H1, H2).
- apply lt_IZR in H1.
- apply lt_IZR in H2.
- remember (Int_part x - Int_part y)%Z as z.
- clear -H1 H2.
- rewrite Z.one_succ in H2.
- apply Zlt_succ_le in H2.
- now apply Zle_not_lt in H2.
-Qed.
-
 Theorem Int_part_close_to_1 : ∀ r n,
   INR n / INR (n + 1) <= r < 1
   → Int_part (r * (INR (n + 1))) = Z.of_nat n.
@@ -259,44 +218,6 @@ Proof.
 intros * Hx.
 unfold frac_part.
 rewrite Int_part_small; [ lra | easy ].
-Qed.
-
-Theorem frac_part_mult_for_0 : ∀ x y,
-  frac_part x = 0
-  → frac_part y = 0
-  → frac_part (x * y) = 0.
-Proof.
-intros * Hx Hy.
-apply fp_nat in Hy.
-destruct Hy as (i, Hy); subst y.
-destruct i; simpl; [ rewrite Rmult_0_r; apply fp_R0 | | ].
- remember (Pos.to_nat p) as n eqn:Hn; clear p Hn.
- induction n; simpl; [ rewrite Rmult_0_r; apply fp_R0 | ].
- destruct n; [ now rewrite Rmult_1_r | ].
- rewrite Rmult_plus_distr_l, Rmult_1_r.
- rewrite plus_frac_part2; rewrite Hx, IHn; lra.
-
- remember (Pos.to_nat p) as n eqn:Hn; clear p Hn.
- induction n; simpl; [ rewrite Ropp_0, Rmult_0_r; apply fp_R0 | ].
- destruct n.
-  rewrite <- Ropp_mult_distr_r, Rmult_1_r.
-  replace (- x) with (0 - x) by lra.
-  rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
-  rewrite Rminus_diag_eq; [ easy | apply fp_R0 ].
-
-  rewrite Ropp_plus_distr, Rmult_plus_distr_l.
-  rewrite plus_frac_part2.
-   rewrite IHn, Rplus_0_l.
-   rewrite <- Ropp_mult_distr_r, Rmult_1_r.
-   replace (- x) with (0 - x) by lra.
-   rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
-   rewrite Rminus_diag_eq; [ easy | apply fp_R0 ].
-
-   rewrite IHn, Rplus_0_l.
-   rewrite <- Ropp_mult_distr_r, Rmult_1_r.
-   replace (- x) with (0 - x) by lra.
-   rewrite Rminus_fp1; rewrite Hx; [ | rewrite fp_R0; lra ].
-   rewrite fp_R0, Rminus_diag_eq; [ lra | easy ].
 Qed.
 
 Theorem pow_INR : ∀ n k, INR (n ^ k) = INR n ^ k.
@@ -343,12 +264,6 @@ unfold frac_part.
 rewrite Int_part_IZR; lra.
 Qed.
 
-Theorem fp_R1 : frac_part 1 = 0.
-Proof.
-replace 1 with (INR 1) by easy.
-apply frac_part_INR.
-Qed.
-
 Theorem Rpow_div_sub : ∀ x i j,
   x ≠ 0
   → (j ≤ i)%nat
@@ -358,13 +273,6 @@ intros * Hx Hij.
 unfold Rdiv.
 replace i with ((i - j) + j)%nat at 1 by now rewrite Nat.sub_add.
 now symmetry; apply pow_RN_plus.
-Qed.
-
-Theorem frac_part_pow : ∀ x i, frac_part x = 0 → frac_part (x ^ i) = 0.
-Proof.
-intros * Hx.
-induction i; [ apply fp_R1 | simpl ].
-now apply frac_part_mult_for_0.
 Qed.
 
 Theorem frac_part_interv : ∀ x, 0 ≤ frac_part x < 1.
