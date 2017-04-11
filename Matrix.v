@@ -1288,6 +1288,7 @@ rewrite cos_angle_of_sin_cos; [ | easy ].
 rewrite cos_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
+clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
 Time f_equal; nsatz.
 Qed.
 
