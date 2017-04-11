@@ -11,6 +11,9 @@ Require Import Reals Nsatz Psatz.
 Require Import Misc Words MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr.
 
+Definition xtransl dx (E : set vector) :=
+  mkset (λ '(V x y z), (V (x - dx) y z) ∈ E).
+
 Inductive Gr :=
   | Rot : ∀ M, is_rotation_matrix M → Gr
   | Xtransl : ℝ → Gr

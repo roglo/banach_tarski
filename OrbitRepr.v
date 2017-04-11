@@ -32,8 +32,6 @@ Opaque M SS B.
 
 Definition rot e (E : set vector) :=
   mkset (λ p, rotate (negf e) p ∈ E).
-Definition xtransl dx (E : set vector) :=
-  mkset (λ '(V x y z), (V (x - dx) y z) ∈ E).
 
 Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
   ∀ e p, p ∈ M → p ∈ SS e → False.
