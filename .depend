@@ -1,7 +1,7 @@
 Banach_Tarski.vio: Banach_Tarski.v Misc.vio Words.vio Normalize.vio Reverse.vio MiscReals.vio MiscTrigo.vio Matrix.vio Pset.vio Orbit.vio Partition.vio OrbitRepr.vio GroupTransf.vio Equidecomp.vio Countable.vio QCountable.vio RnCountable.vio NotEmptyPath.vio
 Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified: Banach_Tarski.v Misc.vo Words.vo Normalize.vo Reverse.vo MiscReals.vo MiscTrigo.vo Matrix.vo Pset.vo Orbit.vo Partition.vo OrbitRepr.vo GroupTransf.vo Equidecomp.vo Countable.vo QCountable.vo RnCountable.vo NotEmptyPath.vo
-CauchySchwarz.vio: CauchySchwarz.v SummationR.vio
-CauchySchwarz.vo CauchySchwarz.glob CauchySchwarz.v.beautified: CauchySchwarz.v SummationR.vo
+CauchySchwarz.vio: CauchySchwarz.v
+CauchySchwarz.vo CauchySchwarz.glob CauchySchwarz.v.beautified: CauchySchwarz.v
 Countable.vio: Countable.v Misc.vio
 Countable.vo Countable.glob Countable.v.beautified: Countable.v Misc.vo
 Equidecomp.vio: Equidecomp.v Misc.vio Matrix.vio Pset.vio Partition.vio OrbitRepr.vio GroupTransf.vio
@@ -34,7 +34,5 @@ Reverse.vio: Reverse.v Misc.vio Words.vio Normalize.vio
 Reverse.vo Reverse.glob Reverse.v.beautified: Reverse.v Misc.vo Words.vo Normalize.vo
 RnCountable.vio: RnCountable.v MiscReals.vio Countable.vio
 RnCountable.vo RnCountable.glob RnCountable.v.beautified: RnCountable.v MiscReals.vo Countable.vo
-SummationR.vio: SummationR.v
-SummationR.vo SummationR.glob SummationR.v.beautified: SummationR.v
 Words.vio: Words.v Misc.vio
 Words.vo Words.glob Words.v.beautified: Words.v Misc.vo
