@@ -11,38 +11,38 @@ Require Import Reals Nsatz Psatz.
 Require Import Misc Words MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr.
 
-Definition transl '(V dx dy dz) transl d (E : set vector) :=
-  mkset (λ '(V x y z), (V (x - dx) (y - dy) (z - dz)) ∈ E).
-
-bbb.
+Definition transl d (E : set vector) := mkset (λ v, (v - d)%vec ∈ E).
+Arguments transl d%vec E%S.
 
 Inductive Gr :=
   | Rot : ∀ M, is_rotation_matrix M → Gr
-  | Transl : ℝ → ℝ → ℝ → Gr
+  | Transl : vector → Gr
   | Comb : Gr → Gr → Gr.
+
+Arguments Transl _%vec.
 
 Fixpoint app_gr f p :=
   match f with
   | Rot M Hrm => set_map (mat_vec_mul M) p
-  | Transl dx dy dz => xtransl dx dy dz p
+  | Transl d => transl d p
   | Comb g h => app_gr g (app_gr h p)
   end.
 
 Fixpoint app_gr_vec f p :=
   match f with
   | Rot M Hrm => (mat_transp M * p)%vec
-  | Xtransl dx => match p with V x y z => V (x - dx) y z end
+  | Transl d => (p - d)%vec
   | Comb g h => app_gr_vec h (app_gr_vec g p)
   end.
 
 Fixpoint gr_inv f :=
   match f with
   | Rot M Hrm => Rot (mat_transp M) (rotation_transp_is_rotation _ Hrm)
-  | Xtransl dx => Xtransl (-dx)
+  | Transl d => Transl (-d)
   | Comb g h => Comb (gr_inv h) (gr_inv g)
   end.
 
-Definition gr_ident := Xtransl 0.
+Definition gr_ident := Transl 0.
 Definition app_gr_inv g := app_gr (gr_inv g).
 
 Theorem gr_subst : ∀ g E F,
@@ -63,29 +63,30 @@ induction g as [ M Hrm| dx | g IHg h IHh]; intros.
  eapply IHh; [ symmetry; eassumption | eassumption ].
 Qed.
 
-Theorem xtransl_0 : ∀ E, (xtransl 0 E = E)%S.
+Theorem transl_0 : ∀ E, (transl 0 E = E)%S.
 Proof.
 intros; intros (x, y, z); simpl.
-now unfold Rminus; rewrite Ropp_0, Rplus_0_r.
+now rewrite Ropp_0; do 3 rewrite Rplus_0_r.
 Qed.
 
-Theorem Xtransl_0 : ∀ E, (app_gr (Xtransl 0) E = E)%S.
-Proof. now intros E; simpl; rewrite xtransl_0. Qed.
+Theorem Transl_0 : ∀ E, (app_gr (Transl 0) E = E)%S.
+Proof. now intros E; simpl; rewrite transl_0. Qed.
 
-Theorem xtransl_xtransl : ∀ E dx dy,
-  (xtransl dx (xtransl dy E) = xtransl (dx + dy) E)%S.
+Theorem transl_transl : ∀ E d₁ d₂,
+  (transl d₁ (transl d₂ E) = transl (d₁ + d₂) E)%S.
 Proof.
-intros; intros (x, y, z); simpl.
-now replace (x - dx - dy)%R with (x - (dx + dy))%R by lra.
+intros E (dx₁, dy₁, dz₁) (dx₂, dy₂, dz₂) (x, y, z); simpl.
+do 9 rewrite fold_Rminus.
+now do 3 rewrite Rminus_plus_distr.
 Qed.
 
 Theorem app_gr_ident : ∀ E, (app_gr gr_ident E = E)%S.
 Proof.
 intros.
 unfold gr_ident; simpl.
-unfold xtransl; simpl.
+unfold transl; simpl.
 intros (x, y, z); simpl.
-now rewrite Rminus_0_r.
+now do 3 rewrite fold_Rminus, Rminus_0_r.
 Qed.
 
 Theorem app_gr_nth : ∀ E fl i,
@@ -117,7 +118,7 @@ Qed.
 Theorem gr_inv_ident : gr_inv gr_ident = gr_ident.
 Proof.
 unfold gr_ident; simpl.
-f_equal; apply Ropp_0.
+now rewrite Ropp_0.
 Qed.
 
 Add Parametric Morphism : app_gr
@@ -138,9 +139,9 @@ split; intros H; [ eapply gr_subst; eassumption | ].
 symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
-Add Parametric Morphism : xtransl
+Add Parametric Morphism : transl
   with signature eq ==> set_eq ==> set_eq
-  as xtransl_morph.
+  as transl_morph.
 Proof.
 intros dx E F HEF (x, y, z); simpl; now rewrite HEF.
 Qed.
@@ -178,8 +179,9 @@ induction g as [ M Hrm | | ]; intros; simpl.
  now apply set_map_mul_transp.
 
  intros (x, y, z); simpl.
- unfold Rminus; rewrite Ropp_involutive.
- now rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+ rewrite neg_vec_involutive.
+ destruct v as (xv, yv, zv); simpl.
+ now do 3 rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
 
  intros p.
  split; intros H.
@@ -199,8 +201,9 @@ induction g as [ M Hrm | | ]; intros; simpl.
  now apply rotation_transp_is_rotation.
 
  intros (x, y, z); simpl.
- unfold Rminus; rewrite Ropp_involutive.
- now rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
+ rewrite vec_sub_opp_r.
+ destruct v as (xv, yv, zv); simpl.
+ now do 3 rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
 
  intros p.
  split; intros H.
@@ -260,8 +263,9 @@ induction g as [ M Hrm | | ]; intros.
  now apply set_map_mul_transp, rotation_transp_is_rotation.
 
  intros (x, y, z); simpl.
- unfold Rminus; rewrite Ropp_involutive.
- now replace (x + - r + r)%R with x by lra.
+ rewrite vec_sub_opp_r.
+ destruct v as (xv, yv, zv); simpl.
+ now do 3 rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
 
  simpl.
  rewrite IHg2.
@@ -278,8 +282,9 @@ induction g as [ M Hrm | | ]; intros.
  now apply set_map_mul_transp.
 
  intros (x, y, z); simpl.
- unfold Rminus; rewrite Ropp_involutive.
- now replace (x + r + - r)%R with x by lra.
+ rewrite neg_vec_involutive.
+ destruct v as (xv, yv, zv); simpl.
+ now do 3 rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
 
  simpl.
  rewrite IHg1.
@@ -343,7 +348,7 @@ split; intros HEF.
 
  intros p Hp.
  revert p E F HEF Hp.
- induction g as [M Hrm| dx| ]; intros.
+ induction g as [M Hrm| d| ]; intros.
   simpl in HEF.
   apply in_set_map with (f := mat_vec_mul M) in Hp.
   specialize (HEF (mat_vec_mul M p) Hp).
@@ -351,9 +356,10 @@ split; intros HEF.
   now apply rot_mat_vec_mul_is_inj.
 
   destruct p as (x, y, z); simpl in HEF.
-  pose proof HEF (V (x + dx) y z) as H; simpl in H.
+  destruct d as (dx, dy, dz).
+  pose proof HEF (V (x + dx) (y + dy) (z + dz)) as H; simpl in H.
   unfold Rminus in H.
-  rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r in H.
+  do 3 rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r in H.
   apply H, Hp.
 
   simpl in HEF.

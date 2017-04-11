@@ -176,13 +176,6 @@ assert (H : (0 <= z)%Z).
  eapply Rlt_le_trans; [ eassumption | lra ].
 Qed.
 
-Theorem Ropp_IZR_Zneg : ∀ x, - (IZR (Zneg x)) = IZR (Zpos x).
-Proof.
-intros.
-unfold IZR; simpl.
-apply Ropp_involutive.
-Qed.
-
 Theorem Int_part_le_compat : ∀ x y, x <= y → (Int_part x <= Int_part y)%Z.
 Proof.
 intros * Hxy.
@@ -208,7 +201,7 @@ assert (Hab : 0 < a - b < 1).
 
     apply Rgt_lt, Ropp_lt_contravar in Hy2.
     rewrite Ropp_minus_distr in Hy2.
-    now rewrite Ropp_IZR_Zneg in Hy2.
+    now rewrite Ropp_involutive in Hy2.
 
  rewrite Ha, Hb in Hab.
  rewrite Z_R_minus in Hab.
