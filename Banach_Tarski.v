@@ -951,23 +951,6 @@ specialize (vec_norm_nonneg v) as Hvp.
 apply nonneg_inv; lra.
 Qed.
 
-(*
-Theorem on_sphere_on_unit_sphere : ∀ r p,
-  0 < r
-  → p ∈ sphere r
-  → / r ⁎ p ∈ sphere 1.
-Proof.
-intros * Hr Hp.
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm; [ lra | ].
-rewrite vec_norm_vec_const_mul, Hp.
-rewrite Rabs_right.
- rewrite Rinv_l; [ easy | lra ].
-
- apply Rinv_0_lt_compat in Hr; lra.
-Qed.
-*)
-
 Theorem vec_div_in_sphere : ∀ r p,
   r ≠ 0
   → p ∈ sphere r
