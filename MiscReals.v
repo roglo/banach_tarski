@@ -471,15 +471,6 @@ rewrite sqrt_div; [ | apply Rle_0_1 | easy ].
 rewrite sqrt_1; lra.
 Qed.
 
-Theorem eq_mul_div_eq : ∀ a b c, b ≠ 0 → a = b * c → a / b = c.
-Proof.
-intros * Hb Hab.
-subst a; unfold Rdiv.
-rewrite Rmult_comm, <- Rmult_assoc.
-rewrite Rinv_l; [ | easy ].
-now rewrite Rmult_1_l.
-Qed.
-
 Theorem nonneg_plus_4_sqr : ∀ a b c d, 0 ≤ a² + b² + c² + d².
 Proof.
 intros.

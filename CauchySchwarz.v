@@ -171,37 +171,3 @@ assert (Ha : ∀ a,
   apply summation_eq_compat; intros.
   apply Rmult_comm.
 Qed.
-
-Theorem Cauchy_Schwarz_inequality : ∀ (u v : list R) n,
-  ((Σ (k = 1, n), (u.[k] * v.[k]))² ≤
-   Σ (k = 1, n), (u.[k]²) * Σ (k = 1, n), (v.[k]²))%R.
-Proof.
-intros.
-specialize (Lagrange_identity_bis n u v) as H.
-remember ((Σ (k = 1, n), (u.[k] * v.[k]))²)%R as x eqn:Hx.
-apply Rplus_eq_compat_r with (r := x) in H.
-unfold Rminus in H.
-rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r in H.
-rewrite H.
-apply Rplus_le_reg_r with (r := (-x)%R).
-rewrite Rplus_assoc, Rplus_opp_r.
-rewrite Rplus_0_r.
-clear.
-induction n.
- rewrite summation_empty; [ lra | lia ].
-
- eapply Rle_trans; [ apply IHn | ].
- rewrite summation_split_last; [ | lia ].
- remember (Σ (j = S n + 1, S n), ((u.[S n] * v.[j] + - (u.[j] * v.[S n]))²))%R
-  as r eqn:Hr.
- rewrite summation_empty in Hr; [ | lia ].
- subst r; rewrite Rplus_0_r.
- apply summation_le_compat; intros.
- rewrite summation_split_last; [ | lia ].
- remember (Σ (j = i + 1, n), ((u.[i] * v.[j] + - (u.[j] * v.[i]))²)) as r
-  eqn:Hr.
- apply Rplus_le_reg_l with (r := (-r)%R).
- rewrite <- Rplus_assoc.
- rewrite Rplus_opp_l, Rplus_0_l.
- apply Rle_0_sqr.
-Qed.

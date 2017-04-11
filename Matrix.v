@@ -429,17 +429,6 @@ destruct t, d; simpl.
  now rewrite rot_inv_rot_z, mat_vec_mul_id.
 Qed.
 
-Theorem app_path_rev_path : ∀ p el,
-  fold_right rotate p (rev_path el ++ el) = p.
-Proof.
-intros.
-revert p.
-induction el as [| e] using rev_ind; intros; [ easy | simpl ].
-rewrite rev_path_app; simpl.
-rewrite app_assoc, fold_right_app; simpl.
-rewrite IHel; apply rotate_neg_rotate.
-Qed.
-
 Theorem rotate_cancel_in : ∀ el₁ el₂ e p,
   fold_right rotate p (el₁ ++ e :: negf e :: el₂) =
   fold_right rotate p (el₁ ++ el₂).
@@ -1509,9 +1498,6 @@ Definition axis_angle_of_matrix M :=
   (v, sinθ, cosθ).
 
 Arguments axis_angle_of_matrix M%mat.
-
-(* https://en.wikipedia.org/wiki/Rotation_matrix#Determining_the_angle *)
-Definition cos_rot_angle M := (mat_trace M - 1) / 2.
 
 Theorem unit_sphere_mat_trace_eq : ∀ v s c,
   ‖v‖ = 1

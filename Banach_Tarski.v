@@ -320,35 +320,6 @@ replace 1 with 1² by apply Rsqr_1.
 apply Rsqr_incr_1; [ easy | easy | lra ].
 Qed.
 
-Theorem ball_not_countable : ¬ (is_countable {p : vector | p ∈ ball}).
-Proof.
-intros H.
-unfold is_countable in H.
-destruct H as (f, Hf).
-enough (Hcontr : ∃ a, a ∈ ball ∧ ∀ n, proj1_sig (f n) ≠ a).
- destruct Hcontr as (a & Ha & Hnn).
- specialize (Hf (exist _ a Ha)).
- destruct Hf as (n, Hn).
- specialize (Hnn n).
- now rewrite Hn in Hnn; apply Hnn.
-
- specialize
-  (Cantor_gen ℕ ℕ vector (setp (sphere 1)) id (ter_bin_of_vec 1) id_nat
-     (ter_bin_of_ball_surj 1 Rlt_0_1)).
- intros H.
- specialize (H (λ n, proj1_sig (f n))) as (p, H).
- exists p.
- split.
-  specialize (H O) as (Hs, _).
-  apply on_sphere_in_ball with (r := 1); [ | easy ].
-  split; [ apply Rle_0_1 | apply Rle_refl ].
-
-  intros n Hn.
-  specialize (H n).
-  destruct H.
-  now symmetry in Hn.
-Qed.
-
 Theorem ball_set_not_countable : ∀ r, 0 < r →
   ∀ f : ℕ → vector, ∃ p : vector, p ∈ sphere r ∧ ∀ n : ℕ, f n ≠ p.
 Proof.
@@ -741,22 +712,6 @@ assert (Hnfo : (nf, no) = prod_nat_of_nat n).
  unfold fixpoint_of_path in Hp₁.
  rewrite <- Hel₁ in Hp₁.
  now eapply D_of_nat_prop in Hnfo; try eassumption.
-Defined.
-
-Theorem D_of_prod_nat_in_D : ∀ r nn,
-  norm_list (path_of_nat (fst nn)) ≠ []
-  → D_of_prod_nat r nn ∈ D.
-Proof.
-intros r (nf, no) Hnl.
-now apply D_of_nat_nat_in_D.
-Defined.
-
-Theorem D_of_nat_in_D : ∀ r n, 
-  norm_list (path_of_nat (Nat.sqrt n - (n - Nat.sqrt n ^ 2))) ≠ []
-  → D_of_nat r n ∈ D.
-Proof.
-intros * Hnl.
-now apply D_of_nat_nat_in_D.
 Defined.
 
 Fixpoint nat_of_path_aux el :=
@@ -4267,95 +4222,6 @@ assert (Hp₁z : p₁ ≠ 0%vec).
       now exists u.
 
      destruct i; [ now simpl; rewrite transl_0 | lia ].
-Qed.
-
-Theorem equidec_sphere_with_and_without_fixpoints : ∀ r,
-  0 < r
-  → equidecomposable (sphere r) (sphere r ∖ D).
-Proof.
-intros r Hr.
-assert (H : ∃ p₁, p₁ ∈ sphere r ∖ D ∧ (- p₁)%vec ∈ sphere r ∖ D).
- specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
- specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
- exists (r ⁎ p).
- split.
-  split; [ now apply vec_mul_in_sphere | ].
-  intros HD.
-  assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
-   rewrite intersection_union_distr_r; left.
-   split; [ | easy ].
-   destruct HD as (el & p₁ & Hso & Hnl & Hel).
-   rewrite rotate_vec_mul in Hel.
-   exists el, (p₁ ⁄ r).
-   split.
-    destruct Hso as (el₁ & Hel₁).
-    rewrite rotate_vec_mul in Hel₁.
-    exists el₁.
-    rewrite rotate_vec_mul, <- Hel₁.
-    rewrite mat_vec_mul_const_distr.
-    rewrite vec_const_mul_assoc.
-    rewrite Rinv_l; [ | lra ].
-    now rewrite vec_const_mul_1_l.
-
-    split; [ easy | ].
-    rewrite rotate_vec_mul.
-    rewrite mat_vec_mul_const_distr.
-    now f_equal.
-
-   specialize (Hdnc p H) as (n, Hdnc).
-   revert Hdnc; apply Hp.
-
-  split.
-   apply neg_vec_in_sphere.
-   now apply vec_mul_in_sphere.
-
-   intros HD.
-   assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
-    rewrite intersection_union_distr_r; right.
-    split; [ | easy ].
-    apply sphere_sym_neg_vec in HD.
-    destruct HD as (el & p₁ & Hso & Hnl & Hel).
-    rewrite rotate_vec_mul in Hel.
-    exists el, (p₁ ⁄ r).
-    split.
-     destruct Hso as (el₁ & Hel₁).
-     rewrite rotate_vec_mul in Hel₁.
-     exists el₁.
-     rewrite rotate_vec_mul, <- Hel₁.
-     rewrite vec_opp_const_mul_distr_r.
-     rewrite mat_vec_mul_const_distr.
-     rewrite vec_const_mul_assoc.
-     rewrite Rinv_l; [ | lra ].
-     now rewrite vec_const_mul_1_l.
-
-     split; [ easy | ].
-     rewrite rotate_vec_mul.
-     rewrite mat_vec_mul_const_distr.
-     now f_equal.
-
-    specialize (Hdnc p H) as (n, Hdnc).
-    revert Hdnc; apply Hp.
-
- destruct H as (p₁ & Hp & Hq).
- assert (∃ s c, s² + c² = 1 ∧ (s, c) ∉ J p₁) as (s & c & Hsc & Hj).
-  destruct Hp as (Hps, Hpnd).
-  destruct Hq as (Hqs, Hqnd).
-  specialize (J_is_countable p₁ Hpnd Hqnd) as Hjc.
-  specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
-  exists s, c; split; [ easy | intros H ].
-  specialize (Hjc _ H) as (n, Hjc).
-  now specialize (Hn n).
-
-  remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
-  remember
-    (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ sphere r ∧ p = ((ρ ^ n)%mat * p₀)%vec))
-    as E eqn:HE.
-  remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
-  specialize
-    (equidec_wih_sphere_with_and_without_fixpoints r Hr p₁ s c ρ E ρE Hp Hq
-       Hsc Hj Hρ HE HρE)
-    as H.
-  now apply equidec_with_equidec in H.
 Qed.
 
 Theorem in_unit_sphere : ∀ v, v ≠ 0%vec → v ⁄ ‖v‖ ∈ sphere 1.

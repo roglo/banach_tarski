@@ -505,13 +505,6 @@ Qed.
 Theorem acos_cos : ∀ x, acos (cos x) = PI / 2 - asin (cos x).
 Proof. easy. Qed.
 
-Theorem asin_0 : asin 0 = 0.
-Proof.
-unfold asin, atan'.
-rewrite Rsqr_0, Rminus_0_r, sqrt_1, Rdiv_1_r, atan_0.
-destruct (Req_dec 1 0); [ lra | easy ].
-Qed.
-
 Theorem nonneg_sin_interv : ∀ x, 0 ≤ sin x → x rmod (2 * PI) ≤ PI.
 Proof.
 intros * Hs.
@@ -1066,11 +1059,4 @@ destruct (Rlt_dec s 0) as [Hs| Hs].
   replace (1 - s²) with c² by lra.
   apply Rnot_lt_le in Hc.
   now rewrite sqrt_Rsqr.
-Qed.
-
-Theorem cos_angle_of_sin_cos_sin_cos : ∀ x,
-  cos x = cos (angle_of_sin_cos (sin x) (cos x)).
-Proof.
-intros.
-rewrite cos_angle_of_sin_cos; [ easy | apply sin2_cos2 ].
 Qed.
