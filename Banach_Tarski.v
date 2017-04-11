@@ -5792,10 +5792,38 @@ Theorem equidec_ball_but_1_0_0_ball_but_center :
 Proof.
 remember (set_of_vec (V 1 0 0)) as E eqn:HE.
 exists [center; ball ∖ E ∖ center].
-exists [E; ball ∖ E ∖ center].
+exists [E; ball ∖ center ∖ E].
 split.
  apply is_partition_subtract.
-bbb.
+ intros p Hp; subst E.
+ simpl in Hp; subst p; simpl.
+ split; [ rewrite Rsqr_0; lra | ].
+ intros H; simpl in H.
+ injection H; clear H; intros H; lra.
+
+ split.
+  apply is_partition_subtract.
+  intros p Hp; subst E.
+  simpl in Hp; subst p; simpl.
+  split; [ rewrite Rsqr_0, Rsqr_1; lra | ].
+  intros H; simpl in H.
+  injection H; clear H; intros H; lra.
+
+  constructor.
+   exists (Xtransl 1).
+   intros (x, y, z); subst E; simpl.
+   split; intros Hv.
+    injection Hv; clear Hv; intros Hz Hy Hx.
+    subst y z; f_equal; lra.
+
+    injection Hv; clear Hv; intros Hz Hy Hx.
+    subst x y z; f_equal; lra.
+
+    constructor; [ | constructor ].
+    exists gr_ident.
+    rewrite set_subtract_sub_swap.
+    apply app_gr_ident.
+Qed.
 
 Theorem equidec_ball_ball_but_center :
   equidecomposable ball (ball ∖ center).
@@ -5810,296 +5838,6 @@ Proof.
 rewrite equidec_ball_ball_but_center at 1.
 rewrite equidec_ball_but_center_with_and_without_fixpoints.
 rewrite set_subtract_sub_swap.
-
-bbb.
-
-rewrite equidec_ball_ball_but_center at 1.
-rewrite equidec_ball_but_center_with_and_without_fixpoints.
-apply equidec_sub_compat_l.
-symmetry.
-apply equidec_ball_ball_but_center.
-bbb.
-(*
-assert (H : ∃ p₁, p₁ ∈ ball ∖ D ∧ (-p₁)%vec ∈ ball ∖ D).
- unfold "∈", "∖".
- specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
- specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
- exists p.
- split.
-  split.
-   apply on_sphere_in_ball in Hps; [ easy | ].
-   split; [ apply Rle_0_1 | apply Rle_refl ].
-
-   intros HD.
-   assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
-    now rewrite intersection_union_distr_r; left.
-
-    specialize (Hdnc p H) as (n, Hdnc).
-    revert Hdnc; apply Hp.
-
-  split.
-   apply neg_vec_in_ball.
-   apply on_sphere_in_ball in Hps; [ easy | ].
-   split; [ apply Rle_0_1 | apply Rle_refl ].
-
-   intros HD.
-   assert (H : p ∈ (D ∪ sphere_sym D) ∩ sphere 1).
-    now rewrite intersection_union_distr_r; right.
-
-    specialize (Hdnc p H) as (n, Hdnc).
-    revert Hdnc; apply Hp.
-
- destruct H as (p₁ & (Hpb & Hpnd) & (Hqb & Hqnd)).
- assert (∃ s c, s² + c² = 1 ∧ (s, c) ∉ J p₁) as (s & c & Hsc & Hj).
-  specialize (J_is_countable p₁ Hpnd Hqnd) as Hjc.
-  specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
-  exists s, c; split; [ easy | intros H ].
-  specialize (Hjc _ H) as (n, Hjc).
-  now specialize (Hn n).
-
-  assert (Hp₁z : p₁ ≠ 0%vec).
-   intros H; apply Hpnd; rewrite H; simpl.
-   exists (ạ :: []), 0%vec.
-   split.
-    exists (ạ :: []).
-    now rewrite rotate_vec_mul, mat_vec_mul_0_r.
-
-    split; [ easy | ].
-    now rewrite rotate_vec_mul, mat_vec_mul_0_r.
-
-   remember (matrix_of_axis_angle (p₁, s, c)) as ρ eqn:Hρ.
-   remember (sphere ‖p₁‖) as S₂ eqn:HS₂.
-   remember (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ S₂ ∧ p = ((ρ ^ n)%mat * p₀)%vec))
-     as E eqn:HE.
-   assert (Hpart : is_partition S₂ [E; S₂ ∖ E]).
-    split.
-     simpl; rewrite union_empty_r.
-     split; intros H.
-      now destruct (EM (x ∈ E)) as [Hi| Hni]; [ left | right ].
-
-      rename x into v.
-      destruct H as [H| H]; [ | now destruct H ].
-      rewrite HE in H; simpl in H.
-      destruct H as (p₀ & n & ((el & p & Hso & Hnl & Hel) & Hp₀) & Hv).
-      subst S₂ v.
-      apply on_sphere_after_rotation; [ easy | ].
-      apply mat_pow_is_rotation_matrix; rewrite Hρ.
-      now apply matrix_of_axis_angle_is_rotation_matrix.
-
-     intros i j Hij.
-     destruct i.
-      destruct j; [ easy | ].
-      destruct j.
-       intros v.
-       now split; intros Hv; [ simpl in Hv | ].
-
-       simpl; rewrite match_id.
-       apply intersection_empty_r.
-
-      destruct j.
-       destruct i.
-        intros v.
-        now split; intros Hv; [ simpl in Hv | ].
-
-        simpl; rewrite match_id.
-        apply intersection_empty_l.
-
-       destruct i.
-        destruct j; [ easy | ].
-        simpl; rewrite match_id.
-        apply intersection_empty_r.
-
-        destruct j.
-         simpl; rewrite match_id.
-         apply intersection_empty_l.
-
-         simpl; do 2 rewrite match_id.
-         apply intersection_empty_l.
-
-    remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
-    assert (Hdec : equidecomposable S₂ (ρE ∪ (S₂ ∖ E))).
-     unfold equidecomposable.
-     exists [E; S₂ ∖ E], [ρE; S₂ ∖ E].
-     split; [ easy | ].
-     split.
-      split; [ now simpl; rewrite union_empty_r | ].
-      intros i j Hij.
-      assert (H : (ρE ∩ (S₂ ∖ E) = ∅)%S).
-       split; intros H; [ | easy ].
-       simpl in H.
-       destruct H as (HxρE & HxS₂ & HxnE).
-       rewrite HρE in HxρE; simpl in HxρE.
-       destruct HxρE as (v & Hv & Hxv).
-       rewrite Hxv in HxnE.
-       exfalso; apply HxnE; clear HxnE.
-       rewrite HE in Hv |-*.
-       simpl in Hv; simpl.
-       destruct Hv as (p₀ & n & Hv).
-       exists p₀, (S n).
-       destruct Hv as (((el & p₂ & Hel) & Hp₀) & Hv).
-       split.
-        now split; [ exists el, p₂ | ].
-
-        rewrite Hv, <- mat_vec_mul_assoc.
-        now rewrite <- mat_pow_succ.
-
-       destruct i.
-        destruct j; [ easy | ].
-        destruct j; [ easy | ].
-        simpl; rewrite match_id.
-        apply intersection_empty_r.
-
-        destruct i.
-         destruct j; [ now rewrite intersection_comm | ].
-         destruct j; [ easy | ].
-         simpl; rewrite match_id.
-         apply intersection_empty_r.
-
-         destruct j.
-          simpl; rewrite match_id.
-          apply intersection_empty_l.
-
-          destruct j.
-           simpl; rewrite match_id.
-           apply intersection_empty_l.
-
-           simpl; do 2 rewrite match_id.
-           apply intersection_empty_l.
-
-      constructor.
-       assert (Hρm : is_rotation_matrix ρ).
-        rewrite Hρ.
-        now apply matrix_of_axis_angle_is_rotation_matrix.
-
-        exists (Rot ρ Hρm); simpl.
-        intros v.
-        split; intros H.
-         destruct H as (u & H).
-         rewrite HρE; simpl.
-         now exists u.
-
-         rewrite HρE in H; simpl in H.
-         destruct H as (u & H); simpl.
-         now exists u.
-
-       constructor; [ | constructor ].
-       exists gr_ident.
-       apply app_gr_ident.
-
-     assert (ρE = E ∖ D)%S.
-      intros v.
-      split; intros H.
-       rewrite HρE in H.
-       destruct H as (u & Hu & Hv).
-       remember D as d; simpl; subst d.
-       split.
-        rewrite HE in Hu; rewrite HE.
-        remember D as d; remember intersection as b.
-        simpl in Hu; simpl; subst d b.
-        destruct Hu as (p₀ & n & Hp₀ & Hu).
-        exists p₀, (S n).
-        split; [ easy | simpl ].
-        now rewrite mat_vec_mul_assoc, <- Hu.
-
-        intros Hvn.
-        apply Hj; clear Hj; unfold J.
-        remember J₀ as a; simpl; subst a.
-        rewrite HE in Hu.
-        remember D as d; remember intersection as b.
-        simpl in Hu; subst d b.
-        destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
-        rewrite Hu in Hv.
-        rewrite <- mat_vec_mul_assoc in Hv.
-        replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
-        remember (angle_of_sin_cos s c) as θ eqn:Hθ.
-        remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
-        remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
-        exists s₀, c₀.
-        split.
-         split; [ subst s₀ c₀; apply sin2_cos2 | ].
-         remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
-         remember D as d; remember sphere as sph; simpl; subst d sph.
-         rewrite <- HS₂.
-         exists p₀, v.
-         split; [ easy | ].
-         split.
-          split; [ easy | ].
-          rewrite HS₂, Hv.
-          rewrite HS₂ in Hp₀S.
-          apply on_sphere_after_rotation; [ easy | ].
-          apply mat_pow_is_rotation_matrix.
-          rewrite Hρ.
-          now apply matrix_of_axis_angle_is_rotation_matrix.
-
-          rewrite Hv, Hρ, Hρ₀.
-          rewrite Rmult_comm in Hs₀, Hc₀.
-          now erewrite matrix_of_mul_angle; try eassumption.
-
-          rewrite Hc₀, Hs₀.
-          rewrite angle_of_sin_cos_inv.
-          remember ((θ * INR (S n)) // (2 * PI)) as k eqn:Hk.
-          exists (S n), k.
-          replace ((θ * INR (S n)) rmod (2 * PI) + 2 * IZR k * PI)
-          with (2 * PI * IZR k + (θ * INR (S n)) rmod (2 * PI)) by lra.
-          rewrite Hk.
-          rewrite <- Rdiv_mod; [ | specialize PI_neq0; lra ].
-          rewrite Rmult_div.
-          rewrite Rmult_div_same.
-          2: now replace 0 with (INR 0) by easy; apply not_INR.
-          rewrite Hθ.
-          now rewrite sin_angle_of_sin_cos, cos_angle_of_sin_cos.
-
-       destruct H as (Hv & HnD).
-       rewrite HE in Hv.
-       destruct Hv as (u & n & Hu & Hv).
-       rewrite HρE; simpl.
-       destruct n.
-        simpl in Hv; rewrite mat_vec_mul_id in Hv; rewrite Hv in HnD.
-        now destruct Hu.
-
-        exists ((ρ ^ n)%mat * u)%vec.
-        rewrite <- mat_vec_mul_assoc.
-        split; [ | easy ].
-        now rewrite HE; exists u, n.
-
-      rewrite H in Hdec.
-      assert (HSD : ((E ∖ D) ∪ (S₂ ∖ E) = S₂ ∖ D)%S).
-       intros v; split; intros Hv.
-        destruct Hv as [(HvE, HvD)| (HvS, HvE)].
-         split; [ | easy ].
-         rewrite HE in HvE.
-         destruct HvE as (u & n & (HuD & HuS) & Hv).
-         rewrite HS₂ in HuS; rewrite HS₂, Hv.
-         apply on_sphere_after_rotation; [ easy | ].
-         apply mat_pow_is_rotation_matrix; rewrite Hρ.
-         now apply matrix_of_axis_angle_is_rotation_matrix.
-
-         split; [ easy | ].
-         intros Hv; apply HvE; clear HvE.
-         rewrite HE; exists v, 0%nat.
-         split; [ now split | ].
-         now rewrite mat_pow_0, mat_vec_mul_id.
-
-        destruct Hv as (HvS & HvD).
-        now destruct (EM (v ∈ E)); [ left | right ].
-
-       rewrite HSD in Hdec.
-       unfold equidecomposable.
-       destruct Hdec as (EL & FL & Hdec).
-*)
-bbb.
-   specialize (rotation_around_not_countable p₁ Hp₁nz f) as (R₁ & HR₁ & Hn).
-   exists R₁.
-   split; [ easy | ].
-   intros * Hp Hp' HRnp.
-   assert (H : R₁ ∈ J p₁).
-    split; [ easy | ].
-    now exists p, p', n.
-
-    specialize (Hdnc R₁ H) as (m, Hdnc).
-    revert Hdnc; apply Hn.
-
-  destruct H as (R₁ & HR₁ & HR₁nkeep).
 bbb.
 
 Theorem Banach_Tarski_paradox :
