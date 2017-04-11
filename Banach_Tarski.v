@@ -4788,6 +4788,11 @@ split.
      apply intersection_empty_l.
 Qed.
 
+(* ρE below could be defined as
+  mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ sphere r ∧ p = ((ρ ^ S n)%mat * p₀)%vec)
+  as I did in theorem equidec_ball_ball_but_point below.
+  Perhaps the proofs could be simple?
+  At least they would be different. *)
 Theorem equidec_wih_sphere_with_and_without_fixpoints : ∀ r, 0 < r →
   ∀ p₁ s c ρ E ρE,
   p₁ ∈ sphere r ∖ D
@@ -5103,7 +5108,10 @@ split.
  now f_equal.
 Qed.
 
-Definition center := mkset (λ p, p = 0%vec).
+Definition set_of_vec (v : vector) := mkset (λ u, u = v).
+Arguments set_of_vec v%vec.
+
+Definition center := set_of_vec 0.
 
 Theorem sphere_ball_but_center : ∀ p,
    (∃ r, 0 < r ≤ 1 ∧ p ∈ sphere r) ↔ p ∈ ball ∖ center.
@@ -5660,12 +5668,21 @@ intros; intros x; split; intros Hx.
  now destruct Hx as ((HE & HF) & HG).
 Qed.
 
-Theorem equidec_ball_ball_but_point : ∀ E,
-  E = mkset (λ p, p = V 1 0 0)
-  → equidecomposable ball (ball ∖ E).
+Theorem mat_of_path_elem_pow : ∀ e n,
+  (mat_of_path [e] ^ n)%mat = mat_of_path (repeat e n).
 Proof.
-intros * HE.
+intros.
+induction n; [ easy | simpl ].
+rewrite IHn; simpl.
+unfold mat_of_path; simpl.
+now rewrite mat_mul_id_r.
+Qed.
+
+Theorem equidec_ball_ball_but_1_0_0 :
+  equidecomposable ball (ball ∖ set_of_vec (V 1 0 0)).
+Proof.
 remember (V 1 0 0) as p₀ eqn:Hp₀.
+remember (set_of_vec p₀) as E eqn:HE.
 remember (mkset (λ p, ∃ n, ((rot_z ^ n)%mat * p₀)%vec = p)) as F eqn:HF.
 remember (mkset (λ p, ∃ n, ((rot_z ^ S n)%mat * p₀)%vec = p)) as rF eqn:HrF.
 exists [F; ball ∖ F].
@@ -5690,81 +5707,92 @@ split.
     intros HvE.
     rewrite HE in HvE; simpl in HvE.
     move HvE at top; subst v.
-bbb.
-    apply Hj; clear Hj; unfold J.
-    remember J₀ as a; simpl; subst a.
-    rewrite HE in Hu.
-    remember D as d; remember intersection as b.
-    simpl in Hu; subst d b.
-    destruct Hu as (p₀ & n & (Hp₀d & Hp₀S) & Hu).
-    rewrite Hu in Hv.
-    rewrite <- mat_vec_mul_assoc in Hv.
-    replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
-    remember (angle_of_sin_cos s c) as θ eqn:Hθ.
-    remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
-    remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
-    exists s₀, c₀.
-bbb.
+    rewrite <- mat_pow_succ in Hv.
+    replace rot_z with (mat_of_elem ḅ) in Hv by easy.
+    replace (mat_of_elem ḅ) with (mat_of_path [ḅ]) in Hv
+      by apply mat_mul_id_r.
+    rewrite mat_of_path_elem_pow in Hv.
+    rewrite <- rotate_vec_mul in Hv.
+    revert Hv; rewrite Hp₀.
+    eapply rotate_1_0_0_is_diff with (el₁ := repeat ḅ n) (d := false).
+     now rewrite app_repeat_diag.
 
-     split.
-      split; [ subst s₀ c₀; apply sin2_cos2 | ].
-      remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
-      remember D as d; remember sphere as sph; simpl; subst d sph.
-      exists (p₀ ⁄ ‖p₀‖), (v ⁄ ‖p₀‖).
-      split.
-       split.
-        destruct Hp₀d as (Hp₀d, Hp₀b).
-        apply vec_const_mul_in_D; [ | easy ].
-        now apply Rinv_neq_0_compat, vec_norm_neq_0.
+     apply norm_list_repeat.
 
-        rewrite Hp₁.
-        apply vec_div_in_sphere; [ now apply vec_norm_neq_0 | ].
-        apply in_its_sphere.
+    rewrite HF in H; rewrite HrF; simpl in H; simpl.
+    destruct H as ((n & Hv) & HvnE).
+    destruct n; [ | now exists n].
+    rewrite mat_pow_0, mat_vec_mul_id in Hv; subst v.
+    now rewrite HE in HvnE; simpl in HvnE.
 
-       split.
-        split.
-         apply vec_const_mul_in_D; [ | easy ].
-         now apply Rinv_neq_0_compat, vec_norm_neq_0.
+   assert (HSD : ((F ∖ E) ∪ (ball ∖ F) = ball ∖ E)%S).
+    intros v; split; intros Hv.
+     destruct Hv as [(HvE, HvD)| (HvS, HvE)].
+      split; [ | easy ].
+      rewrite HF in HvE.
+      simpl in HvE.
+      destruct HvE as (n & Hv).
+      rewrite <- Hv.
+      apply in_ball_after_rotation.
+       rewrite Hp₀; simpl.
+       rewrite Rsqr_0, Rsqr_1; lra.
 
-         rewrite Hp₁.
-         apply vec_div_in_sphere; [ now apply vec_norm_neq_0 | ].
-         rewrite Hv.
-         apply on_sphere_after_rotation; [ apply in_its_sphere | ].
-         apply mat_pow_is_rotation_matrix; rewrite Hρ.
-         now apply matrix_of_axis_angle_is_rotation_matrix.
+       apply mat_pow_is_rotation_matrix.
+       apply rot_z_is_rotation_matrix.
 
-        rewrite mat_vec_mul_const_distr; f_equal.
-        rewrite Hv, Hρ, Hρ₀.
-        rewrite Rmult_comm in Hs₀, Hc₀.
-        now erewrite matrix_of_mul_angle; try eassumption.
+      split; [ easy | ].
+      intros Hv; apply HvE; clear HvE.
+      rewrite HE in Hv; simpl in Hv; subst v.
+      rewrite HF; simpl.
+      exists 0%nat.
+      now rewrite mat_pow_0, mat_vec_mul_id.
 
-      rewrite Hc₀, Hs₀.
-      rewrite angle_of_sin_cos_inv.
-      remember ((θ * INR (S n)) // (2 * PI)) as k eqn:Hk.
-      exists (S n), k.
-      replace ((θ * INR (S n)) rmod (2 * PI) + 2 * IZR k * PI)
-      with (2 * PI * IZR k + (θ * INR (S n)) rmod (2 * PI)) by lra.
-      rewrite Hk.
-      rewrite <- Rdiv_mod; [ | specialize PI_neq0; lra ].
-      rewrite Rmult_div.
-      rewrite Rmult_div_same.
-       rewrite Hθ.
-       now rewrite sin_angle_of_sin_cos, cos_angle_of_sin_cos.
+     destruct Hv as (HvS & HvD).
+     now destruct (EM (v ∈ F)); [ left | right ].
 
-       now replace 0 with (INR 0) by easy; apply not_INR.
+    rewrite <- HSD, <- HED.
+    replace [rF; ball ∖ F] with ([rF] ++ [ball ∖ F]) by easy.
+    apply partition_union; try apply is_partition_single.
+    intros p.
+    split; intros Hp; [ simpl | easy ].
+    destruct Hp as (Hp & Hpb & HpF).
+    apply HpF.
+    rewrite HrF in Hp; rewrite HF.
+    simpl in Hp; simpl.
+    destruct Hp as (n, Hp).
+    now exists (S n); simpl.
 
-    destruct H as (Hv & HnD).
-    rewrite HE in Hv.
-    destruct Hv as (u & n & Hu & Hv).
-    rewrite HρE; simpl.
-    destruct n.
-     simpl in Hv; rewrite mat_vec_mul_id in Hv; rewrite Hv in HnD.
-     now destruct Hu as (Hu, _); destruct Hu.
+  constructor.
+   exists (Rot rot_z rot_z_is_rotation_matrix); simpl.
+   intros p.
+   split; intros Hp.
+    rewrite HrF; simpl in Hp; simpl.
+    destruct Hp as (q & Hq & Hp).
+    rewrite HF in Hq; simpl in Hq.
+    destruct Hq as (n, Hq).
+    rewrite <- Hq in Hp.
+    exists n.
+    now rewrite <- mat_vec_mul_assoc in Hp.
 
-     exists ((ρ ^ n)%mat * u)%vec.
-     rewrite <- mat_vec_mul_assoc.
-     split; [ | easy ].
-     now rewrite HE; exists u, n.
+    rewrite HrF in Hp; simpl in Hp; simpl.
+    destruct Hp as (n & Hp).
+    exists ((rot_z ^ n)%mat * p₀)%vec.
+    rewrite mat_vec_mul_assoc in Hp.
+    split; [ | easy ].
+    rewrite HF; simpl.
+    now exists n.
+
+   constructor; [ | constructor ].
+   exists gr_ident.
+   apply app_gr_ident.
+Qed.
+
+Inspect 1.
+
+Theorem equidec_ball_but_1_0_0_ball_but_center :
+  equidecomposable (ball ∖ set_of_vec (V 1 0 0)) (ball ∖ center).
+Proof.
+unfold equidecomposable.
 bbb.
 
 Theorem equidec_ball_ball_but_center :
