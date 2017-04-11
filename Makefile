@@ -1,4 +1,4 @@
-TARGET=QCountable.vo Banach_Tarski.vo
+TARGET=Banach_Tarski.vo
 
 all: $(TARGET)
 
