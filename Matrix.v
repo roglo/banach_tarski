@@ -1189,14 +1189,6 @@ Definition matrix_of_axis_angle '(V x y z, s, c) :=
   let uz := z / r in
   matrix_of_unit_axis_angle (V ux uy uz, s, c).
 
-Definition axis_angle_of_matrix M :=
-  let cosθ := (mat_trace M - 1) / 2 in
-  let sinθ := √ (1 - cosθ²) in
-  let v := rotation_unit_axis M in
-  (v, sinθ, cosθ).
-
-Arguments axis_angle_of_matrix M%mat.
-
 Theorem matrix_mul_axis : ∀ p c s k,
   k ≠ 0
   → matrix_of_axis_angle (p, s, c) =
