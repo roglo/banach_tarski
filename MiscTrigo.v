@@ -1008,7 +1008,9 @@ rewrite Rplus_comm in Hsc.
 now apply pre_sin_bound in Hsc.
 Qed.
 
-Theorem sin_angle_of_sin_cos : ∀ s c, s² + c² = 1 → sin (angle_of_sin_cos s c) = s.
+Theorem sin_angle_of_sin_cos : ∀ s c,
+  s² + c² = 1
+  → sin (angle_of_sin_cos s c) = s.
 Proof.
 intros * Hsc.
 unfold angle_of_sin_cos.
@@ -1033,7 +1035,9 @@ destruct (Rlt_dec s 0) as [Hs| Hs].
   rewrite sin_asin; [ easy | now apply pre_sin_bound in Hsc ].
 Qed.
 
-Theorem cos_angle_of_sin_cos : ∀ s c, s² + c² = 1 → cos (angle_of_sin_cos s c) = c.
+Theorem cos_angle_of_sin_cos : ∀ s c,
+  s² + c² = 1
+  → cos (angle_of_sin_cos s c) = c.
 Proof.
 intros * Hsc.
 unfold angle_of_sin_cos.

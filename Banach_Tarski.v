@@ -63,8 +63,10 @@ split.
  split.
   pose proof r_decomposed_2_a f Hosf os Hos as Ha.
   pose proof r_decomposed_2_b f Hosf os Hos as Hb.
-  eapply partition_group_map with (g := Transl (V 3 0 0)) in Ha; try eassumption.
-  eapply partition_group_map with (g := Transl (V 6 0 0)) in Hb; try eassumption.
+  eapply partition_group_map with (g := Transl (V 3 0 0)) in Ha;
+    try eassumption.
+  eapply partition_group_map with (g := Transl (V 6 0 0)) in Hb;
+    try eassumption.
   eapply partition_union in Hb; [ | | apply Ha ].
    apply Hb.
 
@@ -1155,8 +1157,8 @@ assert
 
  assert (Hir : / r ≠ 0) by (apply Rinv_neq_0_compat; lra).
  specialize
-   (unit_sphere_rotation_implies_same_latitude (/ r ⁎ p) (/ r ⁎ p₁) (/ r ⁎ p₂) c
-      s Hp Hp₁ Hp₂ Hmm) as Hll.
+   (unit_sphere_rotation_implies_same_latitude (/ r ⁎ p) (/ r ⁎ p₁) (/ r ⁎ p₂)
+      c s Hp Hp₁ Hp₂ Hmm) as Hll.
  now do 2 rewrite latitude_mul in Hll.
 Qed.
 
@@ -2615,7 +2617,8 @@ assert (H : ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball �
    remember (p₁ ⁄ ‖p₁‖) as p'₁ eqn:Hp'₁.
    remember (matrix_of_axis_angle (p'₁, s, c)) as ρ eqn:Hρ.
    remember
-     (mkset (λ p, ∃ p₀ n, p₀ ∈ D ∩ ball ∖ center ∧ p = ((ρ ^ n)%mat * p₀)%vec))
+     (mkset
+        (λ p, ∃ p₀ n, p₀ ∈ D ∩ ball ∖ center ∧ p = ((ρ ^ n)%mat * p₀)%vec))
      as E eqn:HE.
    remember (mkset (λ u, ∃ v, v ∈ E ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
    assert (Hp' : p'₁ ∈ sphere 1 ∖ D).
