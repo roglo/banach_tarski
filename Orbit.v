@@ -120,7 +120,7 @@ destruct Hm as (Hm, Hd).
 unfold mat_det in Hd.
 unfold mat_mul, mat_id in Hm; simpl in Hm.
 injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-Time nsatz.
+nsatz.
 Qed.
 
 Theorem in_ball_after_rotation : ∀ p m,

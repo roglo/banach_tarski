@@ -314,7 +314,7 @@ destruct (vec_zerop ev) as [Hvz| Hvnz].
  replace (k * z) with (z * k) by apply Rmult_comm.
  subst x y z.
  clear Hm Hvnz.
- Time f_equal; nsatz.
+ f_equal; nsatz.
 Qed.
 
 Theorem normalized_axis : ∀ M k v,
@@ -579,9 +579,9 @@ injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 unfold mat_det in Hd.
 destruct M; simpl in *.
 f_equal.
- Time clear H₁ H₂ H₃ H₄ H₅ H₆; nsatz.
- Time clear H₁ H₂ H₃ H₇ H₈ H₉; nsatz.
- Time clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
+ clear H₁ H₂ H₃ H₄ H₅ H₆; nsatz.
+ clear H₁ H₂ H₃ H₇ H₈ H₉; nsatz.
+ clear H₄ H₅ H₆ H₇ H₈ H₉; nsatz.
 Qed.
 
 Theorem vec_cross_mul_eq_0 : ∀ u v,
@@ -1095,7 +1095,7 @@ simpl in Hm.
 injection Hm; clear Hm; intros Hz Hy Hx.
 unfold latitude; simpl.
 rewrite Hp, Hp₁, Hp₂, sqrt_1; f_equal.
-Time nsatz.
+nsatz.
 Qed.
 
 Theorem latitude_mul : ∀ k u v,
@@ -1241,10 +1241,10 @@ rewrite Rabs_R1 in H.
 unfold Rabs in H.
 destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
  right; clear Ha.
- Time f_equal; nsatz.
+ f_equal; nsatz.
 
  left; clear Ha.
- Time f_equal; nsatz.
+ f_equal; nsatz.
 Qed.
 
 Theorem vec_same_norm_cross_mul_eq_0 : ∀ u v,
@@ -1401,7 +1401,7 @@ assert (H : a² < 1).
     rewrite Rsqr_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
     clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv.
     injection Hmv; clear Hmv; intros H3 H2 H1.
-    Time nsatz.
+    nsatz.
 
     assert (Hc : c = v'₁ · v'₂).
      rewrite Hv'₁, Hv'₂.
@@ -1538,7 +1538,7 @@ assert (H : a² < 1).
          do 6 rewrite fold_Rminus.
          do 3 rewrite fold_Rminus in Hnv₁, Hnv₂.
          injection Hmv; clear Hmv; intros H3 H2 H1.
-         Time nsatz.
+         nsatz.
 
          destruct (Rle_dec 0 (p · v'₁ × v'₂)) as [Hpvv| Hpvv].
           rewrite Rmult_1_l.
@@ -1724,7 +1724,7 @@ destruct Hlag as (H3 & H2 & H1).
 apply Rminus_diag_uniq in H1.
 apply Rminus_diag_uniq in H2.
 apply Rminus_diag_uniq in H3.
-Time f_equal; nsatz.
+f_equal; nsatz.
 Qed.
 
 Theorem latitude_1 : ∀ r p p',
@@ -2886,3 +2886,7 @@ transitivity (ball ∖ D).
 Qed.
 
 Check Banach_Tarski_paradox.
+
+(*
+Print Assumptions Banach_Tarski_paradox.
+*)

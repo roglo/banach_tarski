@@ -1168,7 +1168,7 @@ unfold mat_id, mkrmat in Htr; simpl in Htr.
 injection Htr; clear Htr; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
 unfold mkrmat; simpl.
 clear H33 H23 H13 H12.
-Time f_equal;
+f_equal;
  [ clear H22 H32; nsatz | clear H11 H31; nsatz | nsatz |
    clear H22 H32; nsatz | clear H11 H31; nsatz | nsatz |
    clear H22 H32; nsatz | clear H11 H31; nsatz | nsatz ].
@@ -1289,7 +1289,7 @@ rewrite cos_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
-Time f_equal; nsatz.
+f_equal; nsatz.
 Qed.
 
 Theorem unit_sphere_matrix_of_mul_angle : ∀ a s c θ s' c' n,
