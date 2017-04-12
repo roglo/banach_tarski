@@ -1,8 +1,4 @@
 (* Banach-Tarski paradox. *)
-(* Inspirations:
-   - Stan Wagon: The Banach-Tarski Paradox, Cambridge University Press
-   - Wikipedia: Banach–Tarski paradox
-   - http://people.math.umass.edu/~weston/oldpapers/banach.pdf *)
 (* Coq v8.6 *)
 
 Require Import Utf8.
