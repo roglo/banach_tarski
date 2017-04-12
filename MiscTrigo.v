@@ -77,6 +77,7 @@ Qed.
 Theorem sin_cos_asin : ∀ x,
   -1 ≤ x ≤ 1
   → sin (asin x) = x ∧ cos (asin x) = √ (1 - x²).
+Proof.
 intros * Hx.
 unfold asin.
 unfold atan'.
