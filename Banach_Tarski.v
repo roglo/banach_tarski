@@ -10,9 +10,6 @@ Require Import Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 Require Import Countable RnCountable NotEmptyPath.
 
-Notation "r ³" := (Rpow_def.pow r 3) (at level 1, format "r ³") : R_scope.
-Notation "r ⁴" := (Rpow_def.pow r 4) (at level 1, format "r ⁴") : R_scope.
-
 Theorem Rno_intersect_balls_x3_x6 : ∀ x y z,
   (x - 3)² + y² + z² <= 1
   → (x - 6)² + y² + z² <= 1
@@ -34,57 +31,6 @@ destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
 Qed.
 
 Definition rot_elem e := Rot (mat_of_elem e) (rotate_is_rotation_matrix e).
-
-Theorem Banach_Tarski_paradox_but_fixpoints :
-  equidecomposable (ball ∖ D)
-    (transl (V 3 0 0) (ball ∖ D) ∪ transl (V 6 0 0) (ball ∖ D))%S.
-Proof.
-pose proof TTCA _ same_orbit equiv_same_orbit as H.
-destruct H as (f & Hu & Hm).
-remember (mkcf _ _ f Hm Hu) as Hosf.
-remember (mkos _ f) as os eqn:Hos.
-clear HeqHosf.
-set (A₁ := (M ∪ SS ạ ∪ B)%S).
-set (A₂ := (SS ạ⁻¹ ∖ B)%S).
-set (A₃ := SS ḅ).
-set (A₄ := SS ḅ⁻¹).
-exists [A₁; A₂; A₃; A₄].
-exists
-  (map (transl (V 3 0 0)) [A₁; rot ạ A₂] ++
-   map (transl (V 6 0 0)) [A₃; rot ḅ A₄]); simpl.
-split.
- subst A₁ A₂ A₃ A₄.
- eapply r_decomposed_4; now try eassumption.
-
- split.
-  pose proof r_decomposed_2_a f Hosf os Hos as Ha.
-  pose proof r_decomposed_2_b f Hosf os Hos as Hb.
-  eapply partition_group_map with (g := Transl (V 3 0 0)) in Ha;
-    try eassumption.
-  eapply partition_group_map with (g := Transl (V 6 0 0)) in Hb;
-    try eassumption.
-  eapply partition_union in Hb; [ | | apply Ha ].
-   apply Hb.
-
-   unfold set_inter, set_eq; intros (x, y, z).
-   split; [ intros (H₁, H₂) | easy ].
-   simpl in H₁, H₂.
-   unfold empty_set; simpl.
-   destruct H₁ as (H₁, H₃).
-   destruct H₂ as (H₂, H₄).
-   unfold ball in H₁, H₂.
-   rewrite Ropp_0 in H₁, H₂; do 2 rewrite Rplus_0_r in H₁, H₂.
-   rewrite fold_Rminus in H₁, H₂.
-   now apply (Rno_intersect_balls_x3_x6 x y z).
-
-  constructor; [ now exists (Transl (V 3 0 0)) | ].
-  constructor.
-   now exists (Comb (Transl (V 3 0 0)) (rot_elem ạ)); rewrite rot_set_map_mul.
-
-   constructor; [ now exists (Transl (V 6 0 0)) | ].
-   constructor; [ | constructor ].
-   now exists (Comb (Transl (V 6 0 0)) (rot_elem ḅ)); rewrite rot_set_map_mul.
-Qed.
 
 Theorem equidec_transl : ∀ d E F,
   equidecomposable E F
@@ -2346,6 +2292,57 @@ Qed.
 Theorem fold_in_ball : ∀ v,
   (let 'V x y z := v in x² + y² + z² ≤ 1) = v ∈ ball.
 Proof. easy. Qed.
+
+Theorem Banach_Tarski_paradox_but_fixpoints :
+  equidecomposable (ball ∖ D)
+    (transl (V 3 0 0) (ball ∖ D) ∪ transl (V 6 0 0) (ball ∖ D))%S.
+Proof.
+pose proof TTCA _ same_orbit equiv_same_orbit as H.
+destruct H as (f & Hu & Hm).
+remember (mkcf _ _ f Hm Hu) as Hosf.
+remember (mkos _ f) as os eqn:Hos.
+clear HeqHosf.
+set (A₁ := (M ∪ SS ạ ∪ B)%S).
+set (A₂ := (SS ạ⁻¹ ∖ B)%S).
+set (A₃ := SS ḅ).
+set (A₄ := SS ḅ⁻¹).
+exists [A₁; A₂; A₃; A₄].
+exists
+  (map (transl (V 3 0 0)) [A₁; rot ạ A₂] ++
+   map (transl (V 6 0 0)) [A₃; rot ḅ A₄]); simpl.
+split.
+ subst A₁ A₂ A₃ A₄.
+ eapply r_decomposed_4; now try eassumption.
+
+ split.
+  pose proof r_decomposed_2_a f Hosf os Hos as Ha.
+  pose proof r_decomposed_2_b f Hosf os Hos as Hb.
+  eapply partition_group_map with (g := Transl (V 3 0 0)) in Ha;
+    try eassumption.
+  eapply partition_group_map with (g := Transl (V 6 0 0)) in Hb;
+    try eassumption.
+  eapply partition_union in Hb; [ | | apply Ha ].
+   apply Hb.
+
+   unfold set_inter, set_eq; intros (x, y, z).
+   split; [ intros (H₁, H₂) | easy ].
+   simpl in H₁, H₂.
+   unfold empty_set; simpl.
+   destruct H₁ as (H₁, H₃).
+   destruct H₂ as (H₂, H₄).
+   unfold ball in H₁, H₂.
+   rewrite Ropp_0 in H₁, H₂; do 2 rewrite Rplus_0_r in H₁, H₂.
+   rewrite fold_Rminus in H₁, H₂.
+   now apply (Rno_intersect_balls_x3_x6 x y z).
+
+  constructor; [ now exists (Transl (V 3 0 0)) | ].
+  constructor.
+   now exists (Comb (Transl (V 3 0 0)) (rot_elem ạ)); rewrite rot_set_map_mul.
+
+   constructor; [ now exists (Transl (V 6 0 0)) | ].
+   constructor; [ | constructor ].
+   now exists (Comb (Transl (V 6 0 0)) (rot_elem ḅ)); rewrite rot_set_map_mul.
+Qed.
 
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
   equidecomposable (ball ∖ center) (ball ∖ center ∖ D).
