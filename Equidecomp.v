@@ -700,26 +700,3 @@ split; intros H.
  exists EL, FL.
  now split; [ | split ].
 Qed.
-
-Definition equidecomposable_with E₁ E₂ P₁ P₂ :=
-  length P₁ = length P₂
-  ∧ is_partition E₁ P₁
-  ∧ is_partition E₂ P₂
-  ∧ ∃ gl, ∀ i,
-     (i < length P₁)%nat
-     → (app_gr (List.nth i gl gr_ident) P₁.[i] = P₂.[i])%S.
-
-Theorem equidec_with_equidec : ∀ E₁ E₂ P₁ P₂,
-  equidecomposable_with E₁ E₂ P₁ P₂
-  → equidecomposable E₁ E₂.
-Proof.
-intros * Heq.
-exists P₁, P₂.
-destruct Heq as (Hlen & H₁ & H₂ & (gl & Hgl)).
-split; [ easy | ].
-split; [ easy | ].
-apply forall_Forall2 with (d := ∅) (d' := ∅); [ easy | ].
-intros i Hilen.
-specialize (Hgl i Hilen).
-now exists (List.nth i gl gr_ident).
-Qed.
