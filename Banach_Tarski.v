@@ -2627,6 +2627,32 @@ assert (Hnz : p₁ ≠ 0%vec).
    now exists u, n.
 Qed.
 
+Theorem ρE_inter_ball_but_ρE_is_empty : ∀ ρ,
+  (ρE ρ ∩ (ball ∖ center ∖ E ρ) = ∅)%S.
+Proof.
+intros ρ u.
+split; [ intros H | easy ].
+remember (ball ∖ center) as bc; simpl in H; subst bc.
+destruct H as (HuρE & HuS₂ & HunE).
+unfold ρE in HuρE; simpl in HuρE.
+destruct HuρE as (v & Hv & Huv).
+rewrite Huv in HunE.
+exfalso; apply HunE; clear HunE.
+unfold E in Hv |-*.
+simpl in Hv; simpl.
+destruct Hv as (p₀ & n & Hv).
+exists p₀, (S n).
+destruct Hv as ((((el & p₂ & Hel) & Hp₀b) & Hp₀) & Hv).
+rewrite fold_in_ball in Hp₀b.
+rewrite fold_in_ball.
+split.
+ split; [ | easy ].
+ now split; [ exists el, p₂ | ].
+
+ rewrite Hv, <- mat_vec_mul_assoc.
+ now rewrite <- mat_pow_succ.
+Qed.
+
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
   equidecomposable (ball ∖ center) (ball ∖ center ∖ D).
 Proof.
@@ -2660,51 +2686,29 @@ split.
   rewrite <- (ρE_is_E_but_D p₁ s c ρ Hp₁ Hsc Hj Hρ).
   split; [ now simpl; rewrite set_union_empty_r | ].
   intros i j Hij.
-  assert (H : (ρE ρ ∩ (ball ∖ center ∖ E ρ) = ∅)%S).
-   intros u.
-   split; [ intros H | easy ].
-   remember (ball ∖ center) as bc; simpl in H; subst bc.
-   destruct H as (HuρE & HuS₂ & HunE).
-   unfold ρE in HuρE; simpl in HuρE.
-   destruct HuρE as (v & Hv & Huv).
-   rewrite Huv in HunE.
-   exfalso; apply HunE; clear HunE.
-   unfold E in Hv |-*.
-   simpl in Hv; simpl.
-   destruct Hv as (p₀ & n & Hv).
-   exists p₀, (S n).
-   destruct Hv as ((((el & p₂ & Hel) & Hp₀b) & Hp₀) & Hv).
-   rewrite fold_in_ball in Hp₀b.
-   rewrite fold_in_ball.
-   split.
-    split; [ | easy ].
-    now split; [ exists el, p₂ | ].
+  specialize (ρE_inter_ball_but_ρE_is_empty ρ) as H.
+  destruct i.
+   destruct j; [ easy | ].
+   destruct j; [ easy | ].
+   simpl; rewrite match_id.
+   apply set_inter_empty_r.
 
-    rewrite Hv, <- mat_vec_mul_assoc.
-    now rewrite <- mat_pow_succ.
+   destruct i.
+    destruct j; [ now rewrite set_inter_comm | ].
+    destruct j; [ easy | ].
+    simpl; rewrite match_id.
+    apply set_inter_empty_r.
 
-    destruct i.
-     destruct j; [ easy | ].
-     destruct j; [ easy | ].
+    destruct j.
      simpl; rewrite match_id.
-     apply set_inter_empty_r.
+     apply set_inter_empty_l.
 
-     destruct i.
-      destruct j; [ now rewrite set_inter_comm | ].
-      destruct j; [ easy | ].
+     destruct j.
       simpl; rewrite match_id.
-      apply set_inter_empty_r.
+      apply set_inter_empty_l.
 
-      destruct j.
-       simpl; rewrite match_id.
-       apply set_inter_empty_l.
-
-       destruct j.
-        simpl; rewrite match_id.
-        apply set_inter_empty_l.
-
-        simpl; do 2 rewrite match_id.
-        apply set_inter_empty_l.
+      simpl; do 2 rewrite match_id.
+      apply set_inter_empty_l.
 
  assert (Hρm : is_rotation_matrix ρ).
   rewrite Hρ.
