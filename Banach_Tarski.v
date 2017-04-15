@@ -2554,8 +2554,7 @@ split.
  now apply matrix_of_axis_angle_is_rotation_matrix.
 
  split.
-  specialize (E_but_D_union_ball_but_E p₁ s c ρ Hp₁z Hsc Hρ) as HSD.
-  rewrite <- HSD.
+  rewrite <- (E_but_D_union_ball_but_E p₁ s c ρ Hp₁z Hsc Hρ).
   assert (HED : (ρE = E ρ ∖ D)%S).
    intros v.
    split; intros H.
