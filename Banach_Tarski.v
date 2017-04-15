@@ -2496,6 +2496,9 @@ Definition E ρ :=
   mkset
     (λ p, ∃ p₀ n, p₀ ∈ D ∩ ball ∖ center ∧ p = ((ρ ^ n)%mat * p₀)%vec).
 
+Definition ρE ρ :=
+  mkset (λ u, ∃ v, v ∈ E ρ ∧ u = (ρ * v)%vec).
+
 Theorem E_but_D_union_ball_but_E : ∀ p₁ s c ρ,
   p₁ ≠ 0%vec
   → s² + c² = 1
@@ -2531,7 +2534,6 @@ specialize exists_point_not_in_D as (p₁ & Hp & Hq).
 specialize (exists_rotation_not_in_J p₁ Hp Hq) as (s & c & Hsc & Hj).
 remember (p₁ ⁄ ‖p₁‖) as p'₁ eqn:Hp'₁.
 remember (matrix_of_axis_angle (p'₁, s, c)) as ρ eqn:Hρ.
-remember (mkset (λ u, ∃ v, v ∈ E ρ ∧ u = (ρ * v)%vec)) as ρE eqn:HρE.
 specialize (not_in_center_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hp'.
 specialize (not_in_center_neg_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hnp'.
 specialize (not_in_J_norm_not_in_J p₁ p'₁ s c Hp Hp'₁ Hj) as Hj'.
@@ -2540,7 +2542,7 @@ rename p'₁ into p₁.
 destruct Hp' as (Hp₁s, Hp₁d).
 destruct Hnp' as (Hnp₁s, Hnp₁d).
 rename Hj' into Hj.
-exists [E ρ; ball ∖ center ∖ E ρ], [ρE; ball ∖ center ∖ E ρ].
+exists [E ρ; ball ∖ center ∖ E ρ], [ρE ρ; ball ∖ center ∖ E ρ].
 assert (Hp₁ : ‖p₁‖ = 1) by now apply on_sphere_norm in Hp₁s; [ | lra ].
 assert (Hp₁z : p₁ ≠ 0%vec) by (apply vec_norm_neq_0; lra).
 split.
@@ -2555,10 +2557,10 @@ split.
 
  split.
   rewrite <- (E_but_D_union_ball_but_E p₁ s c ρ Hp₁z Hsc Hρ).
-  assert (HED : (ρE = E ρ ∖ D)%S).
+  assert (HED : (ρE ρ = E ρ ∖ D)%S).
    intros v.
    split; intros H.
-    rewrite HρE in H.
+    unfold ρE in H.
     destruct H as (u & Hu & Hv).
     remember D as d; simpl; subst d.
     split.
@@ -2634,7 +2636,7 @@ split.
     destruct H as (Hv & HnD).
     unfold E in Hv.
     destruct Hv as (u & n & Hu & Hv).
-    rewrite HρE; simpl.
+    unfold ρE; simpl.
     destruct n.
      simpl in Hv; rewrite mat_vec_mul_id in Hv; rewrite Hv in HnD.
      now destruct Hu as (Hu, _); destruct Hu.
@@ -2647,12 +2649,12 @@ split.
   rewrite <- HED.
   split; [ now simpl; rewrite set_union_empty_r | ].
   intros i j Hij.
-  assert (H : (ρE ∩ (ball ∖ center ∖ E ρ) = ∅)%S).
+  assert (H : (ρE ρ ∩ (ball ∖ center ∖ E ρ) = ∅)%S).
    intros u.
    split; [ intros H | easy ].
    remember (ball ∖ center) as bc; simpl in H; subst bc.
    destruct H as (HuρE & HuS₂ & HunE).
-   rewrite HρE in HuρE; simpl in HuρE.
+   unfold ρE in HuρE; simpl in HuρE.
    destruct HuρE as (v & Hv & Huv).
    rewrite Huv in HunE.
    exfalso; apply HunE; clear HunE.
@@ -2702,10 +2704,10 @@ split.
    simpl; intros v.
    split; intros H.
     destruct H as (u & H).
-    rewrite HρE; simpl.
+    unfold ρE; simpl.
     now exists u.
 
-    rewrite HρE in H; simpl in H.
+    unfold ρE in H; simpl in H.
     destruct H as (u & H); simpl.
     now exists u.
 
