@@ -77,13 +77,6 @@ Definition orbit_selector := choice_function same_orbit.
 Definition sphere r := mkset (λ '(V x y z), (x² + y² + z² = r²)%R).
 Definition ball := mkset (λ '(V x y z), (x² + y² + z² <= 1)%R).
 
-Definition D :=
-  mkset
-    (λ p, ∃ el p₁, same_orbit p p₁
-     ∧ norm_list el ≠ [] ∧ fold_right rotate p₁ el = p₁).
-
-Arguments D : simpl never.
-
 Theorem on_sphere_norm : ∀ p r, (0 ≤ r)%R → p ∈ sphere r ↔ ‖p‖ = r.
 Proof.
 intros (x, y, z) r Hr; simpl.
@@ -147,17 +140,4 @@ Proof.
 intros * His.
 apply in_ball_after_rotation; [ easy | ].
 apply rotate_is_rotation_matrix.
-Qed.
-
-Theorem no_fixpoint_after_rotate : ∀ p e, p ∉ D → rotate e p ∉ D.
-Proof.
-intros * His Hr; apply His; clear His.
-unfold D in Hr; simpl in Hr.
-unfold D; simpl.
-destruct Hr as (el & p₁ & Hso & Hn & Hr).
-exists el, p₁.
-split; [ | easy ].
-destruct Hso as (el₁ & Hso).
-exists (el₁ ++ [e]).
-now rewrite fold_right_app.
 Qed.

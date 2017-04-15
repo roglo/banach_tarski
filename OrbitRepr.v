@@ -13,6 +13,13 @@ Class sel_model {A} := mkos { os_fun : A → A }.
 Definition orbit_by_seq_of e {os : sel_model} :=
   mkset (λ p, ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p).
 
+Definition D :=
+  mkset
+    (λ p, ∃ el p₁, same_orbit p p₁
+     ∧ norm_list el ≠ [] ∧ fold_right rotate p₁ el = p₁).
+
+Arguments D : simpl never.
+
 Definition M {os : sel_model} :=
   mkset (λ p, p ∈ ball ∖ D ∧ p = os_fun p).
 Definition SS {os : sel_model} e :=
@@ -373,6 +380,19 @@ destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
 split; [ easy | ].
 exists (repeat ạ⁻¹ (S n)), (repeat ạ⁻¹ n).
 split; [ apply norm_list_repeat | easy ].
+Qed.
+
+Theorem no_fixpoint_after_rotate : ∀ p e, p ∉ D → rotate e p ∉ D.
+Proof.
+intros * His Hr; apply His; clear His.
+unfold D in Hr; simpl in Hr.
+unfold D; simpl.
+destruct Hr as (el & p₁ & Hso & Hn & Hr).
+exists el, p₁.
+split; [ | easy ].
+destruct Hso as (el₁ & Hso).
+exists (el₁ ++ [e]).
+now rewrite fold_right_app.
 Qed.
 
 Theorem r_decomposed_2 :
