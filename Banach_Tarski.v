@@ -2710,25 +2710,25 @@ split.
       simpl; do 2 rewrite match_id.
       apply set_inter_empty_l.
 
- assert (Hρm : is_rotation_matrix ρ).
-  rewrite Hρ.
-  now apply matrix_of_axis_angle_is_rotation_matrix.
+  assert (Hρm : is_rotation_matrix ρ).
+   rewrite Hρ.
+   now apply matrix_of_axis_angle_is_rotation_matrix.
 
-  constructor.
-   exists (Rot ρ Hρm).
-   simpl; intros v.
-   split; intros H.
-    destruct H as (u & H).
-    unfold ρE; simpl.
-    now exists u.
+   constructor.
+    exists (Rot ρ Hρm).
+    simpl; intros v.
+    split; intros H.
+     destruct H as (u & H).
+     unfold ρE; simpl.
+     now exists u.
 
-    unfold ρE in H; simpl in H.
-    destruct H as (u & H); simpl.
-    now exists u.
+     unfold ρE in H; simpl in H.
+     destruct H as (u & H); simpl.
+     now exists u.
 
-   constructor; [ | constructor ].
-   exists gr_ident.
-   now simpl; rewrite transl_0.
+    constructor; [ | constructor ].
+    exists gr_ident.
+    now simpl; rewrite transl_0.
 Qed.
 
 Theorem equidec_ball_ball_but_1_0_0 :
