@@ -10,6 +10,18 @@ Require Import Matrix Pset Orbit.
 Require Import Partition OrbitRepr GroupTransf Equidecomp.
 Require Import Countable RnCountable NotEmptyPath.
 
+Definition set_of_vec (v : vector) := mkset (λ u, u = v).
+Arguments set_of_vec v%vec.
+
+Definition center := set_of_vec 0.
+Definition sphere_sym S := mkset (λ p, (- p)%vec ∈ S).
+
+(* latitude of p₁ relative to p, p being the north pole;
+   equal to the dot product and between -1 and 1. *)
+Definition latitude p p₁ := (p · p₁) / (‖p‖ * ‖p₁‖).
+
+Arguments latitude p%vec p₁%vec.
+
 Theorem Rno_intersect_balls_x3_x6 : ∀ x y z,
   (x - 3)² + y² + z² <= 1
   → (x - 6)² + y² + z² <= 1
@@ -901,8 +913,6 @@ destruct (mat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
   now destruct (is_neg_vec p₁), (is_neg_vec p₂).
 Qed.
 
-Definition sphere_sym S := mkset (λ p, (- p)%vec ∈ S).
-
 Theorem sphere_sym_neg_vec : ∀ p, p ∈ sphere_sym D ↔ (- p)%vec ∈ D.
 Proof.
 intros (x, y, z).
@@ -1013,12 +1023,6 @@ assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
      specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni Hpp2 Hnn Hr₁ Hr₂2).
      easy.
 Qed.
-
-(* latitude of p₁ relative to p, p being the north pole;
-   equal to the dot product and between -1 and 1. *)
-Definition latitude p p₁ := (p · p₁) / (‖p‖ * ‖p₁‖).
-
-Arguments latitude p%vec p₁%vec.
 
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
   p ∈ sphere 1
@@ -2238,11 +2242,6 @@ split.
  now f_equal.
 Qed.
 
-Definition set_of_vec (v : vector) := mkset (λ u, u = v).
-Arguments set_of_vec v%vec.
-
-Definition center := set_of_vec 0.
-
 Theorem sphere_ball_but_center : ∀ p,
    (∃ r, 0 < r ≤ 1 ∧ p ∈ sphere r) ↔ p ∈ ball ∖ center.
 Proof.
@@ -2668,82 +2667,43 @@ split.
    now exists (Comb (Transl (V 6 0 0)) (rot_elem ḅ)); rewrite rot_set_map_mul.
 Qed.
 
-Theorem equidec_ball_but_center_with_and_without_fixpoints :
-  equidecomposable (ball ∖ center) (ball ∖ center ∖ D).
+Theorem equidec_ball_but_1_0_0_ball_but_center :
+  equidecomposable (ball ∖ set_of_vec (V 1 0 0)) (ball ∖ center).
 Proof.
-specialize exists_point_not_in_D as (p₁ & Hp & Hq).
-specialize (exists_rotation_not_in_J p₁ Hp Hq) as (s & c & Hsc & Hj).
-remember (p₁ ⁄ ‖p₁‖) as p'₁ eqn:Hp'₁.
-remember (matrix_of_axis_angle (p'₁, s, c)) as ρ eqn:Hρ.
-specialize (not_in_center_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hp'.
-specialize (not_in_center_neg_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hnp'.
-specialize (not_in_J_norm_not_in_J p₁ p'₁ s c Hp Hp'₁ Hj) as Hj'.
-clear p₁ Hp Hq Hj Hp'₁.
-rename p'₁ into p₁.
-destruct Hp' as (Hp₁s, Hp₁d).
-destruct Hnp' as (Hnp₁s, Hnp₁d).
-rename Hj' into Hj.
-exists [E ρ; ball ∖ center ∖ E ρ], [ρE ρ; ball ∖ center ∖ E ρ].
-assert (Hp₁ : ‖p₁‖ = 1) by now apply on_sphere_norm in Hp₁s; [ | lra ].
-assert (Hp₁z : p₁ ≠ 0%vec) by (apply vec_norm_neq_0; lra).
+remember (set_of_vec (V 1 0 0)) as E eqn:HE.
+exists [center; ball ∖ E ∖ center].
+exists [E; ball ∖ center ∖ E].
 split.
  apply is_partition_sub.
- unfold E.
- intros p Hp; simpl in Hp.
- destruct Hp as (p₀ & n & Hp & Hq).
- rewrite Hq.
- apply in_ball_but_center_after_rotation; [ easy | ].
- apply mat_pow_is_rotation_matrix; rewrite Hρ.
- now apply matrix_of_axis_angle_is_rotation_matrix.
+ intros p Hp; subst E.
+ simpl in Hp; subst p; simpl.
+ split; [ rewrite Rsqr_0; lra | ].
+ intros H; simpl in H.
+ injection H; clear H; intros H; lra.
 
  split.
-  rewrite <- (E_but_D_union_ball_but_E_eq_ball_but_D p₁ s c ρ Hp₁z Hsc Hρ).
-  rewrite <- (ρE_is_E_but_D p₁ s c ρ Hp₁ Hsc Hj Hρ).
-  split; [ now simpl; rewrite set_union_empty_r | ].
-  intros i j Hij.
-  specialize (ρE_inter_ball_but_ρE_is_empty ρ) as H.
-  destruct i.
-   destruct j; [ easy | ].
-   destruct j; [ easy | ].
-   simpl; rewrite match_id.
-   apply set_inter_empty_r.
+  apply is_partition_sub.
+  intros p Hp; subst E.
+  simpl in Hp; subst p; simpl.
+  split; [ rewrite Rsqr_0, Rsqr_1; lra | ].
+  intros H; simpl in H.
+  injection H; clear H; intros H; lra.
 
-   destruct i.
-    destruct j; [ now rewrite set_inter_comm | ].
-    destruct j; [ easy | ].
-    simpl; rewrite match_id.
-    apply set_inter_empty_r.
+  constructor.
+   exists (Transl (V 1 0 0)).
+   intros (x, y, z); subst E; simpl.
+   split; intros Hv.
+    injection Hv; clear Hv; intros Hz Hy Hx.
+    rewrite Ropp_0 in Hy, Hz; rewrite Rplus_0_r in Hy, Hz.
+    subst y z; f_equal; lra.
 
-    destruct j.
-     simpl; rewrite match_id.
-     apply set_inter_empty_l.
-
-     destruct j.
-      simpl; rewrite match_id.
-      apply set_inter_empty_l.
-
-      simpl; do 2 rewrite match_id.
-      apply set_inter_empty_l.
-
-  assert (Hρm : is_rotation_matrix ρ).
-   rewrite Hρ.
-   now apply matrix_of_axis_angle_is_rotation_matrix.
-
-   constructor.
-    exists (Rot ρ Hρm).
-    simpl; intros v.
-    split; intros H.
-     destruct H as (u & H).
-     unfold ρE; simpl.
-     now exists u.
-
-     unfold ρE in H; simpl in H.
-     destruct H as (u & H); simpl.
-     now exists u.
+    injection Hv; clear Hv; intros Hz Hy Hx.
+    subst x y z; f_equal; lra.
 
     constructor; [ | constructor ].
     exists gr_ident.
-    now simpl; rewrite transl_0.
+    rewrite set_sub_sub_swap.
+    apply app_gr_ident.
 Qed.
 
 Theorem equidec_ball_ball_but_1_0_0 :
@@ -2855,50 +2815,89 @@ split.
    apply app_gr_ident.
 Qed.
 
-Theorem equidec_ball_but_1_0_0_ball_but_center :
-  equidecomposable (ball ∖ set_of_vec (V 1 0 0)) (ball ∖ center).
-Proof.
-remember (set_of_vec (V 1 0 0)) as E eqn:HE.
-exists [center; ball ∖ E ∖ center].
-exists [E; ball ∖ center ∖ E].
-split.
- apply is_partition_sub.
- intros p Hp; subst E.
- simpl in Hp; subst p; simpl.
- split; [ rewrite Rsqr_0; lra | ].
- intros H; simpl in H.
- injection H; clear H; intros H; lra.
-
- split.
-  apply is_partition_sub.
-  intros p Hp; subst E.
-  simpl in Hp; subst p; simpl.
-  split; [ rewrite Rsqr_0, Rsqr_1; lra | ].
-  intros H; simpl in H.
-  injection H; clear H; intros H; lra.
-
-  constructor.
-   exists (Transl (V 1 0 0)).
-   intros (x, y, z); subst E; simpl.
-   split; intros Hv.
-    injection Hv; clear Hv; intros Hz Hy Hx.
-    rewrite Ropp_0 in Hy, Hz; rewrite Rplus_0_r in Hy, Hz.
-    subst y z; f_equal; lra.
-
-    injection Hv; clear Hv; intros Hz Hy Hx.
-    subst x y z; f_equal; lra.
-
-    constructor; [ | constructor ].
-    exists gr_ident.
-    rewrite set_sub_sub_swap.
-    apply app_gr_ident.
-Qed.
-
 Theorem equidec_ball_ball_but_center :
   equidecomposable ball (ball ∖ center).
 Proof.
 rewrite <- equidec_ball_but_1_0_0_ball_but_center.
 apply equidec_ball_ball_but_1_0_0.
+Qed.
+
+Theorem equidec_ball_but_center_with_and_without_fixpoints :
+  equidecomposable (ball ∖ center) (ball ∖ center ∖ D).
+Proof.
+specialize exists_point_not_in_D as (p₁ & Hp & Hq).
+specialize (exists_rotation_not_in_J p₁ Hp Hq) as (s & c & Hsc & Hj).
+remember (p₁ ⁄ ‖p₁‖) as p'₁ eqn:Hp'₁.
+remember (matrix_of_axis_angle (p'₁, s, c)) as ρ eqn:Hρ.
+specialize (not_in_center_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hp'.
+specialize (not_in_center_neg_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hnp'.
+specialize (not_in_J_norm_not_in_J p₁ p'₁ s c Hp Hp'₁ Hj) as Hj'.
+clear p₁ Hp Hq Hj Hp'₁.
+rename p'₁ into p₁.
+destruct Hp' as (Hp₁s, Hp₁d).
+destruct Hnp' as (Hnp₁s, Hnp₁d).
+rename Hj' into Hj.
+exists [E ρ; ball ∖ center ∖ E ρ], [ρE ρ; ball ∖ center ∖ E ρ].
+assert (Hp₁ : ‖p₁‖ = 1) by now apply on_sphere_norm in Hp₁s; [ | lra ].
+assert (Hp₁z : p₁ ≠ 0%vec) by (apply vec_norm_neq_0; lra).
+split.
+ apply is_partition_sub.
+ unfold E.
+ intros p Hp; simpl in Hp.
+ destruct Hp as (p₀ & n & Hp & Hq).
+ rewrite Hq.
+ apply in_ball_but_center_after_rotation; [ easy | ].
+ apply mat_pow_is_rotation_matrix; rewrite Hρ.
+ now apply matrix_of_axis_angle_is_rotation_matrix.
+
+ split.
+  rewrite <- (E_but_D_union_ball_but_E_eq_ball_but_D p₁ s c ρ Hp₁z Hsc Hρ).
+  rewrite <- (ρE_is_E_but_D p₁ s c ρ Hp₁ Hsc Hj Hρ).
+  split; [ now simpl; rewrite set_union_empty_r | ].
+  intros i j Hij.
+  specialize (ρE_inter_ball_but_ρE_is_empty ρ) as H.
+  destruct i.
+   destruct j; [ easy | ].
+   destruct j; [ easy | ].
+   simpl; rewrite match_id.
+   apply set_inter_empty_r.
+
+   destruct i.
+    destruct j; [ now rewrite set_inter_comm | ].
+    destruct j; [ easy | ].
+    simpl; rewrite match_id.
+    apply set_inter_empty_r.
+
+    destruct j.
+     simpl; rewrite match_id.
+     apply set_inter_empty_l.
+
+     destruct j.
+      simpl; rewrite match_id.
+      apply set_inter_empty_l.
+
+      simpl; do 2 rewrite match_id.
+      apply set_inter_empty_l.
+
+  assert (Hρm : is_rotation_matrix ρ).
+   rewrite Hρ.
+   now apply matrix_of_axis_angle_is_rotation_matrix.
+
+   constructor.
+    exists (Rot ρ Hρm).
+    simpl; intros v.
+    split; intros H.
+     destruct H as (u & H).
+     unfold ρE; simpl.
+     now exists u.
+
+     unfold ρE in H; simpl in H.
+     destruct H as (u & H); simpl.
+     now exists u.
+
+    constructor; [ | constructor ].
+    exists gr_ident.
+    now simpl; rewrite transl_0.
 Qed.
 
 Theorem equidec_ball_with_and_without_fixpoints :
