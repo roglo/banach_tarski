@@ -2898,9 +2898,10 @@ Theorem equidec_ball_with_and_without_fixpoints :
 Proof.
 specialize equidec_ball_but_center_with_and_without_fixpoints as H.
 rewrite set_sub_sub_swap in H.
-rewrite ball_but_D_but_center_eq_ball_but_D in H.
 rewrite <- equidec_ball_but_1_0_0_ball_but_center in H.
-now rewrite <- equidec_ball_ball_but_1_0_0 in H.
+rewrite <- equidec_ball_ball_but_1_0_0 in H.
+rewrite ball_but_D_but_center_eq_ball_but_D in H.
+easy.
 Qed.
 
 Theorem Banach_Tarski_paradox :
