@@ -405,9 +405,6 @@ replace (S (length el₁)) with (length el) in Hu.
  subst; rewrite app_length, Nat.add_1_r; reflexivity.
 Qed.
 
-(* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
-    integers and b is not divisible by 3" (Stan Wagon) *)
-
 Theorem rotate_1_0_0_b_nonzero : ∀ el el₁ d,
   el = el₁ ++ [FE lb d]
   → norm_list el = el
