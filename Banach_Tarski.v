@@ -2815,13 +2815,6 @@ split.
    apply app_gr_ident.
 Qed.
 
-Theorem equidec_ball_ball_but_center :
-  equidecomposable ball (ball ∖ center).
-Proof.
-rewrite <- equidec_ball_but_1_0_0_ball_but_center.
-apply equidec_ball_ball_but_1_0_0.
-Qed.
-
 Theorem equidec_ball_but_center_with_and_without_fixpoints :
   equidecomposable (ball ∖ center) (ball ∖ center ∖ D).
 Proof.
@@ -2903,10 +2896,11 @@ Qed.
 Theorem equidec_ball_with_and_without_fixpoints :
   equidecomposable ball (ball ∖ D).
 Proof.
-rewrite equidec_ball_ball_but_center at 1.
-rewrite equidec_ball_but_center_with_and_without_fixpoints.
-rewrite set_sub_sub_swap.
-now rewrite ball_but_D_but_center_eq_ball_but_D.
+specialize equidec_ball_but_center_with_and_without_fixpoints as H.
+rewrite set_sub_sub_swap in H.
+rewrite ball_but_D_but_center_eq_ball_but_D in H.
+rewrite <- equidec_ball_but_1_0_0_ball_but_center in H.
+now rewrite <- equidec_ball_ball_but_1_0_0 in H.
 Qed.
 
 Theorem Banach_Tarski_paradox :
