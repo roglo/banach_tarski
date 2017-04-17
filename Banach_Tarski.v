@@ -2448,7 +2448,7 @@ Definition E ρ :=
 Definition ρE ρ :=
   mkset (λ u, ∃ v, v ∈ E ρ ∧ u = (ρ * v)%vec).
 
-Theorem E_but_D_union_ball_but_E : ∀ p₁ s c ρ,
+Theorem E_but_D_union_ball_but_E_eq_ball_but_D : ∀ p₁ s c ρ,
   p₁ ≠ 0%vec
   → s² + c² = 1
   → ρ = matrix_of_axis_angle (p₁, s, c)
@@ -2474,6 +2474,21 @@ intros v; split; intros Hv.
 
  destruct Hv as (HvS & HvD).
  now destruct (EM (v ∈ E ρ)); [ left | right ].
+Qed.
+
+Theorem ball_but_D_but_center_eq_ball_but_D :
+  ((ball ∖ D) ∖ center = ball ∖ D)%S.
+Proof.
+intros p; split; intros Hp; [ now destruct Hp | ].
+split; [ easy | ].
+destruct Hp as (Hpb, HpD).
+intros H; apply HpD.
+simpl in H; subst p; simpl.
+exists (ạ :: []), 0%vec.
+split; [ easy | ].
+split; [ easy | ].
+rewrite rotate_vec_mul.
+apply mat_vec_mul_0_r.
 Qed.
 
 Theorem ρE_is_E_but_D : ∀ p₁ s c ρ,
@@ -2682,7 +2697,7 @@ split.
  now apply matrix_of_axis_angle_is_rotation_matrix.
 
  split.
-  rewrite <- (E_but_D_union_ball_but_E p₁ s c ρ Hp₁z Hsc Hρ).
+  rewrite <- (E_but_D_union_ball_but_E_eq_ball_but_D p₁ s c ρ Hp₁z Hsc Hρ).
   rewrite <- (ρE_is_E_but_D p₁ s c ρ Hp₁ Hsc Hj Hρ).
   split; [ now simpl; rewrite set_union_empty_r | ].
   intros i j Hij.
@@ -2892,17 +2907,7 @@ Proof.
 rewrite equidec_ball_ball_but_center at 1.
 rewrite equidec_ball_but_center_with_and_without_fixpoints.
 rewrite set_sub_sub_swap.
-enough (HD : ((ball ∖ D) ∖ center = ball ∖ D)%S) by now rewrite HD.
-intros p; split; intros Hp; [ now destruct Hp | ].
-split; [ easy | ].
-destruct Hp as (Hpb, HpD).
-intros H; apply HpD.
-simpl in H; subst p; simpl.
-exists (ạ :: []), 0%vec.
-split; [ easy | ].
-split; [ easy | ].
-rewrite rotate_vec_mul.
-apply mat_vec_mul_0_r.
+now rewrite ball_but_D_but_center_eq_ball_but_D.
 Qed.
 
 Theorem Banach_Tarski_paradox :
