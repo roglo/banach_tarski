@@ -9,20 +9,20 @@ Arguments setp [A] _ _.
 
 Definition empty_set {A} := mkset (λ _ : A, False).
 
-Notation "x '∈' E" := (setp E x) (at level 60).
-Notation "x '∉' E" := (¬ setp E x) (at level 60).
+Notation "x '∈' S" := (setp S x) (at level 60).
+Notation "x '∉' S" := (¬ setp S x) (at level 60).
 Notation "'∅'" := (empty_set).
 
-Definition set_inter {A} (E₁ E₂ : set A) :=
-  mkset (λ x, x ∈ E₁ ∧ x ∈ E₂).
-Definition set_union {A} (E₁ E₂ : set A) :=
-  mkset (λ x, x ∈ E₁ ∨ x ∈ E₂).
-Definition set_union_list {A} (Ei : list (set A)) :=
-  fold_right set_union ∅ Ei.
-Definition set_sub {A} (E₁ E₂ : set A) :=
-  mkset (λ x, x ∈ E₁ ∧ x ∉ E₂).
-Definition set_incl {A} (E₁ E₂ : set A) :=
-  ∀ x, x ∈ E₁ → x ∈ E₂.
+Definition set_inter {A} (S₁ S₂ : set A) :=
+  mkset (λ x, x ∈ S₁ ∧ x ∈ S₂).
+Definition set_union {A} (S₁ S₂ : set A) :=
+  mkset (λ x, x ∈ S₁ ∨ x ∈ S₂).
+Definition set_union_list {A} (Si : list (set A)) :=
+  fold_right set_union ∅ Si.
+Definition set_sub {A} (S₁ S₂ : set A) :=
+  mkset (λ x, x ∈ S₁ ∧ x ∉ S₂).
+Definition set_incl {A} (S₁ S₂ : set A) :=
+  ∀ x, x ∈ S₁ → x ∈ S₂.
 
 Arguments set_inter : simpl never.
 Arguments set_union : simpl never.
@@ -31,7 +31,7 @@ Arguments set_incl : simpl never.
 
 Delimit Scope set_scope with S.
 
-Definition set_eq {A} (E₁ E₂ : set A) := ∀ x, x ∈ E₁ ↔ x ∈ E₂.
+Definition set_eq {A} (S₁ S₂ : set A) := ∀ x, x ∈ S₁ ↔ x ∈ S₂.
 
 Notation "E₁ = E₂" := (set_eq E₁ E₂) : set_scope.
 Notation "E₁ ≠ E₂" := (¬ set_eq E₁ E₂) : set_scope.
