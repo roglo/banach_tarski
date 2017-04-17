@@ -482,9 +482,9 @@ destruct Hb as [Hb| Hb].
  rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
 Qed.
 
-Theorem rotate_non_empty_path_is_not_identity : ∀ el,
+Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
   norm_list el ≠ []
-  → ∃ p, (mat_of_path el * p)%vec ≠ p.
+  → mat_of_path el ≠ mat_id.
 Proof.
 intros * Hn.
 remember (rev_path (norm_list el)) as el₁ eqn:Hel₁.
@@ -494,25 +494,13 @@ apply (f_equal rev_path) in Hel₁.
 rewrite rev_path_involutive in Hel₁.
 rewrite rev_path_cons, rev_path_single in Hel₁.
 destruct e₁ as (t, d).
+intros H.
 destruct t.
  apply rotate_0_0_1_is_diff in Hel₁; [ | apply norm_list_idemp ].
- rewrite mat_of_path_norm in Hel₁.
- now exists (V 0 0 1).
+ now rewrite mat_of_path_norm, H, mat_vec_mul_id in Hel₁.
 
  apply rotate_1_0_0_is_diff in Hel₁; [ | apply norm_list_idemp ].
- rewrite mat_of_path_norm in Hel₁.
- now exists (V 1 0 0).
-Qed.
-
-Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
-  norm_list el ≠ []
-  → mat_of_path el ≠ mat_id.
-Proof.
-intros * Hn.
-apply rotate_non_empty_path_is_not_identity in Hn.
-destruct Hn as (p, Hp).
-intros H; apply Hp; clear Hp; rewrite H.
-apply mat_vec_mul_id.
+ now rewrite mat_of_path_norm, H, mat_vec_mul_id in Hel₁.
 Qed.
 
 Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
