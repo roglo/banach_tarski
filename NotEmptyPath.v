@@ -375,20 +375,19 @@ destruct len.
    subst; rewrite app_length, Nat.add_1_r; reflexivity.
 Qed.
 
-Theorem rotate_0_0_1_b_nonzero : ∀ w el el₁ d,
+Theorem rotate_0_0_1_b_nonzero : ∀ el el₁ d,
   el = el₁ ++ [FE la d]
   → norm_list el = el
-  → w = (λ p, fold_right rotate p el)
   → ∃ a b c k,
-    w (V 0 0 1) = V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    (mat_of_path el * V 0 0 1)%vec = V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
-intros w el el₁ d Hel Hn Hw.
-subst w.
+intros el el₁ d Hel Hn.
 remember (fold_right rotate_param (0, 0, 1, O)%Z el) as u eqn:Hu.
 symmetry in Hu; destruct u as (((a, b), c), len).
 generalize Hu; intros Hv.
 apply rotate_param_rotate in Hv; simpl in Hv.
+rewrite rotate_vec_mul in Hv.
 rewrite Rmult_0_l, Rdiv_0_l, Rdiv_1_r in Hv.
 destruct Hv as (Hv, Hlen).
 rewrite Hv.
@@ -409,20 +408,19 @@ Qed.
 (* "we claim that w(1,0,0) has the form (a,b√2,c)/3^k where a,b,c are
     integers and b is not divisible by 3" (Stan Wagon) *)
 
-Theorem rotate_1_0_0_b_nonzero : ∀ w el el₁ d,
+Theorem rotate_1_0_0_b_nonzero : ∀ el el₁ d,
   el = el₁ ++ [FE lb d]
   → norm_list el = el
-  → w = (λ p, fold_right rotate p el)
   → ∃ a b c k,
-    w (V 1 0 0) = V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    (mat_of_path el * V 1 0 0)%vec = V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
-intros w el el₁ d Hel Hn Hw.
-subst w.
+intros el el₁ d Hel Hn.
 remember (fold_right rotate_param (1, 0, 0, O)%Z el) as u eqn:Hu.
 symmetry in Hu; destruct u as (((a, b), c), len).
 generalize Hu; intros Hv.
 apply rotate_param_rotate in Hv; simpl in Hv.
+rewrite rotate_vec_mul in Hv.
 rewrite Rmult_0_l, Rdiv_0_l, Rdiv_1_r in Hv.
 destruct Hv as (Hv, Hlen).
 rewrite Hv.
@@ -443,13 +441,11 @@ Qed.
 Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
   el = el₁ ++ [FE lb d]
   → norm_list el = el
-  → fold_right rotate (V 1 0 0) el ≠ V 1 0 0.
+  → (mat_of_path el * V 1 0 0)%vec ≠ V 1 0 0.
 Proof.
 intros el el₁ d Hel Hn.
-remember (λ p, fold_right rotate p el) as w eqn:Hw.
-pose proof rotate_1_0_0_b_nonzero w el el₁ d Hel Hn Hw as H.
+pose proof rotate_1_0_0_b_nonzero el el₁ d Hel Hn as H.
 destruct H as (a, (b, (c, (k, (Hp, Hm))))).
-rewrite Hw in Hp.
 rewrite Hp; intros H.
 injection H; intros Hc Hb Ha.
 apply Rmult_integral in Hb.
@@ -467,13 +463,11 @@ Qed.
 Theorem rotate_0_0_1_is_diff : ∀ el el₁ d,
   el = el₁ ++ [FE la d]
   → norm_list el = el
-  → fold_right rotate (V 0 0 1) el ≠ V 0 0 1.
+  → (mat_of_path el * V 0 0 1)%vec ≠ V 0 0 1.
 Proof.
 intros el el₁ d Hel Hn.
-remember (λ p, fold_right rotate p el) as w eqn:Hw.
-pose proof rotate_0_0_1_b_nonzero w el el₁ d Hel Hn Hw as H.
+specialize (rotate_0_0_1_b_nonzero el el₁ d Hel Hn) as H.
 destruct H as (a, (b, (c, (k, (Hp, Hm))))).
-rewrite Hw in Hp.
 rewrite Hp; intros H.
 injection H; intros Hc Hb Ha.
 apply Rmult_integral in Hb.
@@ -490,7 +484,7 @@ Qed.
 
 Theorem rotate_non_empty_path_is_not_identity : ∀ el,
   norm_list el ≠ []
-  → ∃ p, fold_right rotate p el ≠ p.
+  → ∃ p, (mat_of_path el * p)%vec ≠ p.
 Proof.
 intros * Hn.
 remember (rev_path (norm_list el)) as el₁ eqn:Hel₁.
@@ -502,12 +496,12 @@ rewrite rev_path_cons, rev_path_single in Hel₁.
 destruct e₁ as (t, d).
 destruct t.
  apply rotate_0_0_1_is_diff in Hel₁; [ | apply norm_list_idemp ].
- exists (V 0 0 1).
- now rewrite rotate_rotate_norm.
+ rewrite mat_of_path_norm in Hel₁.
+ now exists (V 0 0 1).
 
  apply rotate_1_0_0_is_diff in Hel₁; [ | apply norm_list_idemp ].
- exists (V 1 0 0).
- now rewrite rotate_rotate_norm.
+ rewrite mat_of_path_norm in Hel₁.
+ now exists (V 1 0 0).
 Qed.
 
 Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
@@ -517,9 +511,7 @@ Proof.
 intros * Hn.
 apply rotate_non_empty_path_is_not_identity in Hn.
 destruct Hn as (p, Hp).
-intros H; apply Hp; clear Hp.
-rewrite rotate_vec_mul.
-fold (mat_of_path el); rewrite H.
+intros H; apply Hp; clear Hp; rewrite H.
 apply mat_vec_mul_id.
 Qed.
 

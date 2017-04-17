@@ -2740,7 +2740,6 @@ split.
     replace (mat_of_elem ḅ) with (mat_of_path [ḅ]) in Hv
       by apply mat_mul_id_r.
     rewrite mat_of_path_elem_pow in Hv.
-    rewrite <- rotate_vec_mul in Hv.
     revert Hv; rewrite Hp₀.
     eapply rotate_1_0_0_is_diff with (el₁ := repeat ḅ n) (d := false).
      now rewrite app_repeat_diag.
