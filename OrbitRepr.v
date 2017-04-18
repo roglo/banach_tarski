@@ -56,6 +56,7 @@ Proof.
 intros f os Hos (ti, di) (tj, dj) p Hsi Hsj; subst os.
 destruct Hsi as (Hinf & eli & eli₁ & Hni & Hsi); simpl in Hsi.
 destruct Hsj as (Hjnf & elj & elj₁ & Hnj & Hsj); simpl in Hsj.
+rewrite rotate_vec_mul in Hsi, Hsj.
 eapply rotate_rev_path in Hsj.
 destruct ti, tj.
 +destruct di, dj; [ easy | exfalso | exfalso | easy ].
@@ -142,7 +143,9 @@ assert (Hr : f p = f (rotate (negf e) p)).
  now exists (negf e :: []).
 
  rewrite <- Hr in Hsr.
+ rewrite rotate_vec_mul in Hsr.
  eapply rotate_rev_path in Hsr.
+ rewrite <- rotate_vec_mul in Hsr.
  rewrite <- fold_right_single, <- fold_right_app in Hsr.
  rewrite <- Hsr in Hs.
  rewrite <- fold_right_app in Hs.
@@ -227,29 +230,33 @@ split.
   pose proof Ho p as H.
   destruct H as (el, Hel).
   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+  rewrite rotate_vec_mul in Hel.
   destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  +rewrite rotate_vec_mul in Hel.
-   rewrite rotate_rotate_norm, H₂ in Hel.
+  +rewrite rotate_rotate_norm, H₂ in Hel.
    now rewrite mat_vec_mul_id in Hel.
 
   +destruct e as (t, d); destruct t, d.
     left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
+    rewrite rotate_vec_mul.
     split; [ | now apply rotate_rev_path ].
     now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
     right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
+    rewrite rotate_vec_mul.
     split; [ | now apply rotate_rev_path ].
     now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
     right; right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
+    rewrite rotate_vec_mul.
     split; [ | now apply rotate_rev_path ].
     now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
     right; right; right; left; split; [ easy | ].
     exists (rev_path el), (rev_path el₂).
+    rewrite rotate_vec_mul.
     split; [ | now apply rotate_rev_path ].
     now rewrite <- rev_path_norm_list, H₂, rev_path_app.
 
@@ -603,7 +610,9 @@ split.
        destruct Hnf as (His, Hoh).
        now apply Hoh; exists el, p; rewrite Hel₁.
 
+       rewrite rotate_vec_mul in Hr.
        apply rotate_rev_path in Hr.
+       rewrite <- rotate_vec_mul in Hr.
        rewrite <- Hr, <- fold_right_app in Hel.
        destruct Hnf as (His, Hoh).
        apply Hoh.

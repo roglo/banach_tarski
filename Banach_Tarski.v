@@ -880,6 +880,7 @@ pose proof mat_of_path_is_rotation_matrix el as H.
 generalize Hsr; intros Hsr₁.
 eapply on_sphere_after_rotation in Hsr₁; [ clear H | apply H ].
 rewrite <- rotate_vec_mul, Hs in Hsr₁.
+rewrite rotate_vec_mul in Hs.
 apply rotate_rev_path in Hs.
 remember (mat_of_path el₁) as m eqn:Hm.
 remember (rotation_fixpoint m r) as p₂ eqn:Hp₂.
@@ -902,7 +903,7 @@ destruct (mat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
   exists (is_neg_vec p₁, nf, no).
   unfold fixpoint_of_bool_prod_nat.
   rewrite Hno, path_of_nat_inv.
-  symmetry; rewrite <- Hs, rotate_vec_mul; f_equal.
+  symmetry; rewrite <- Hs; f_equal.
   rewrite Hnf, path_of_nat_inv.
   rewrite <- Hm, <- Hp₂.
   rewrite <- Hr in Hs.
@@ -1878,11 +1879,12 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
        now rewrite Ha, neg_vec_involutive in Hpna.
 
+      rewrite rotate_vec_mul in Hso, Hso'.
       apply rotate_rev_path in Hso.
       apply rotate_rev_path in Hso'.
       remember (fixpoint_of_path r el₀) as q eqn:Hq.
       remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
-      rewrite rotate_vec_mul in Hp₀, Hp'₀, Hso, Hso'.
+      rewrite rotate_vec_mul in Hp₀, Hp'₀.
       generalize Hq; intros Hpq.
       apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
         try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].

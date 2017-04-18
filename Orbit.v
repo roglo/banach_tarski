@@ -46,15 +46,14 @@ Definition not_in_fixpoints :=
 
 Theorem not_in_fixpoints_one_path : ∀ f p e₁ e₂ el el₂ el₁ el₃,
   p ∈ not_in_fixpoints
-  → fold_right rotate p el = f p
-  → fold_right rotate (f p) el₁ = p
+  → (mat_of_path el * p)%vec = f p
+  → (mat_of_path el₁ * (f p))%vec = p
   → norm_list el = el₂ ++ [e₁]
   → norm_list el₁ = e₂ :: el₃
   → e₂ ≠ negf e₁
   → False.
 Proof.
 intros f p e₁ e₂ el el₂ el₁ el₃ Hnf Hel H₆ H₂ H₄ Hd.
-rewrite rotate_vec_mul in Hel, H₆.
 rewrite rotate_rotate_norm in Hel, H₆.
 rewrite <- Hel in H₆.
 rewrite <- mat_vec_mul_assoc in H₆.

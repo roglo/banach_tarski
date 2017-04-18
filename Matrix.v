@@ -3,6 +3,7 @@
 
 Require Import Utf8 List.
 Require Import Reals Psatz Nsatz.
+Require Import Datatypes.
 
 Require Import Words Normalize Reverse Misc MiscReals MiscTrigo.
 
@@ -335,10 +336,10 @@ destruct t, d; simpl.
 Qed.
 
 Definition mat_of_path el :=
-  List.fold_right mat_mul mat_id (map mat_of_elem el).
+  fold_right mat_mul mat_id (map mat_of_elem el).
 
 Theorem rotate_vec_mul : ∀ el p,
-  fold_right rotate p el = mat_vec_mul (mat_of_path el) p.
+  fold_right rotate p el = (mat_of_path el * p)%vec.
 Proof.
 intros el p.
 unfold mat_of_path.
@@ -413,20 +414,6 @@ destruct len.
 
     f_equal.
     now apply IHel₁.
-Qed.
-
-Theorem rotate_rev_path : ∀ el p₁ p₂,
-  fold_right rotate p₁ el = p₂
-  → fold_right rotate p₂ (rev_path el) = p₁.
-Proof.
-intros el p₁ p₂ Hr.
-revert p₁ p₂ Hr.
-induction el as [| e]; intros; [ now symmetry | ].
-simpl in Hr.
-rewrite rev_path_cons, rev_path_single, fold_right_app; simpl.
-apply IHel; rewrite <- Hr.
-rewrite rotate_neg_rotate.
-easy.
 Qed.
 
 Definition mat_transp m :=
@@ -1494,11 +1481,31 @@ destruct nel as [| e₁ nel].
   now rewrite IHel.
 Qed.
 
+Theorem rotate_rev_path : ∀ el p₁ p₂,
+  (mat_of_path el * p₁)%vec = p₂
+  → (mat_of_path (rev_path el) * p₂)%vec = p₁.
+Proof.
+intros el p₁ p₂ Hr.
+revert p₁ p₂ Hr.
+induction el as [| e]; intros.
+ rewrite mat_vec_mul_id in Hr |-*.
+ now symmetry.
+
+ simpl in Hr.
+ rewrite rev_path_cons, rev_path_single, mat_of_path_app.
+ unfold mat_of_path at 2; simpl.
+ rewrite mat_mul_id_r.
+ rewrite mat_vec_mul_assoc.
+ apply IHel; rewrite <- Hr.
+ rewrite mat_of_path_cons.
+ rewrite <- mat_vec_mul_assoc.
+ rewrite mat_mul_assoc.
+ now rewrite mat_of_elem_negf_mul_l, mat_mul_id_l.
+Qed.
+
 Theorem mat_of_path_fixpoint_rev_path : ∀ el p,
   (mat_of_path el * p = p → mat_of_path (rev_path el) * p = p)%vec.
 Proof.
 intros * Hmp.
-rewrite <- rotate_vec_mul in Hmp.
-apply rotate_rev_path in Hmp.
-now rewrite rotate_vec_mul in Hmp.
+now apply rotate_rev_path in Hmp.
 Qed.
