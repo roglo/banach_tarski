@@ -431,7 +431,7 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
     if is_neg_vec p then if (b : bool) then p else (- p)%vec
     else if b then (- p)%vec else p
   in
-  fold_right rotate p₁ (path_of_nat no).
+  (mat_of_path (path_of_nat no) * p₁)%vec.
 
 Theorem vec_div_in_sphere : ∀ r p,
   r ≠ 0
@@ -902,7 +902,7 @@ destruct (mat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
   exists (is_neg_vec p₁, nf, no).
   unfold fixpoint_of_bool_prod_nat.
   rewrite Hno, path_of_nat_inv.
-  symmetry; rewrite <- Hs; f_equal.
+  symmetry; rewrite <- Hs, rotate_vec_mul; f_equal.
   rewrite Hnf, path_of_nat_inv.
   rewrite <- Hm, <- Hp₂.
   rewrite <- Hr in Hs.
