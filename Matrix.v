@@ -651,8 +651,7 @@ intros (x, y, z); simpl.
 now do 3 rewrite <- Rsqr_neg.
 Qed.
 
-Theorem vec_norm_vec_const_mul : ∀ a v,
-  ‖(vec_const_mul a v)‖ = Rabs a * ‖v‖.
+Theorem vec_norm_vec_const_mul : ∀ a v, ‖(a ⁎ v)‖ = Rabs a * ‖v‖.
 Proof.
 intros a (x, y, z); simpl.
 do 3 rewrite Rsqr_mult.
@@ -1190,7 +1189,7 @@ Definition rotation_unit_axis (M : matrix ℝ) :=
   vec_normalize (rotation_axis M).
 
 Definition rotation_fixpoint (m : matrix ℝ) k :=
-  vec_const_mul k (rotation_unit_axis m).
+  k ⁎ rotation_unit_axis m.
 
 Definition matrix_of_unit_axis_angle '(V x y z, s, c) :=
   mkrmat
@@ -1349,7 +1348,7 @@ assert (Haiz : / ‖a‖ ≠ 0) by now apply Rinv_neq_0_compat.
 assert (Hap : 0 < ‖a‖) by (specialize (vec_norm_nonneg a); lra).
 assert (Haa : ‖(a ⁄ ‖a‖)‖ = 1) by now apply vec_div_vec_norm.
 eapply unit_sphere_matrix_of_mul_angle in Haa; try eassumption.
-remember (vec_const_mul (/ ‖a‖) a) as b eqn:Hb.
+remember (a ⁄ ‖a‖) as b eqn:Hb.
 remember (matrix_of_axis_angle (b, s, c)) as M eqn:HM.
 remember (matrix_of_axis_angle (b, s', c')) as M' eqn:HM'.
 rewrite matrix_mul_axis with (k := ‖a‖) in HM, HM'; [ | easy | easy ].

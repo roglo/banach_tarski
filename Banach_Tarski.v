@@ -681,8 +681,8 @@ destruct (vec_zerop u) as [Hv₁| Hv₁].
     intros H; apply vec_norm_eq_0 in H.
     apply vec_cross_mul_eq_0 in H; [ | easy | easy ].
     destruct H as (a & b & Ha & Hb & Hab).
-    remember (vec_const_mul a u) as au eqn:Hau; symmetry in Hau.
-    remember (vec_const_mul b v) as bv eqn:Hbv; symmetry in Hbv.
+    remember (a ⁎ u) as au eqn:Hau; symmetry in Hau.
+    remember (b ⁎ v) as bv eqn:Hbv; symmetry in Hbv.
     destruct au as (ax₁, ay₁, az₁).
     destruct bv as (bx₂, by₂, bz₂).
     simpl in Hab.
@@ -695,7 +695,7 @@ destruct (vec_zerop u) as [Hv₁| Hv₁].
     replace (- ax₁) with (-1 * ax₁) in Hbv by lra.
     replace (- ay₁) with (-1 * ay₁) in Hbv by lra.
     replace (- az₁) with (-1 * az₁) in Hbv by lra.
-    fold (vec_const_mul (-1) (V ax₁ ay₁ az₁)) in Hbv.
+    fold ((-1) ⁎ V ax₁ ay₁ az₁) in Hbv.
     rewrite <- Hau in Hbv.
     rewrite vec_const_mul_assoc in Hbv.
     replace (-1 * a) with (-a) in Hbv by lra.
