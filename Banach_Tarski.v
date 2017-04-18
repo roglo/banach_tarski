@@ -426,7 +426,7 @@ now rewrite bool_prod_nat_of_prod_nat_inv.
 Qed.
 
 Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
-  let p := rotation_fixpoint (mat_of_path (path_of_nat nf)) r in
+  let p := fixpoint_of_nat r nf in
   let p₁ :=
     if is_neg_vec p then if (b : bool) then p else (- p)%vec
     else if b then (- p)%vec else p
@@ -901,7 +901,7 @@ destruct (mat_eq_dec m (mat_transp m)) as [Hmt| Hmt].
   move p₁ before p; move p₂ before p₁.
   move Hsr₁ before Hsr; move Hsr₂ before Hsr₁.
   exists (is_neg_vec p₁, nf, no).
-  unfold fixpoint_of_bool_prod_nat.
+  unfold fixpoint_of_bool_prod_nat, fixpoint_of_nat, fixpoint_of_path.
   rewrite Hno, path_of_nat_inv.
   symmetry; rewrite <- Hs; f_equal.
   rewrite Hnf, path_of_nat_inv.
