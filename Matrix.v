@@ -371,16 +371,17 @@ destruct t, d; simpl.
 Qed.
 
 Theorem rotate_cancel_in : ∀ el₁ el₂ e p,
-  fold_right rotate p (el₁ ++ e :: negf e :: el₂) =
-  fold_right rotate p (el₁ ++ el₂).
+  (mat_of_path (el₁ ++ e :: negf e :: el₂) * p)%vec =
+  (mat_of_path (el₁ ++ el₂) * p)%vec.
 Proof.
 intros.
+do 2 rewrite <- rotate_vec_mul.
 do 2 rewrite fold_right_app; simpl.
 now rewrite rotate_rotate_neg.
 Qed.
 
 Theorem rotate_rotate_norm : ∀ el p,
-  fold_right rotate p el = fold_right rotate p (norm_list el).
+  (mat_of_path el * p)%vec = (mat_of_path (norm_list el) * p)%vec.
 Proof.
 intros el p.
 remember (length el) as len eqn:Hlen; symmetry in Hlen.

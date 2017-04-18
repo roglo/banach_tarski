@@ -1640,9 +1640,9 @@ Definition J₀_of_nat axis n : (ℝ * ℝ) :=
   let '(nf', no') := prod_nat_of_nat n₂ in
   let r := ‖axis‖ in
   let p₀ := fixpoint_of_nat r nf in
-  let p := fold_right rotate p₀ (path_of_nat no) in
+  let p := (mat_of_path (path_of_nat no) * p₀)%vec in
   let p'₀ := fixpoint_of_nat r nf' in
-  let p' := fold_right rotate p'₀ (path_of_nat no') in
+  let p' := (mat_of_path (path_of_nat no') * p'₀)%vec in
   rot_sin_cos axis p p'.
 
 Theorem unit_sphere_latitude_1 : ∀ p p',
@@ -1910,7 +1910,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         unfold fixpoint_of_nat.
         do 4 rewrite path_of_nat_inv.
         rewrite <- Hr, <- Hq, <- Hq'.
-        do 2 rewrite rotate_vec_mul.
         rewrite Hso, Hso'.
         subst M; clear - Hax Haz Hcs Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
         symmetry.
@@ -1951,7 +1950,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          now specialize (vec_norm_nonneg axis); lra.
 
         rewrite <- H.
-        do 2 rewrite rotate_vec_mul.
         rewrite Hso, Hso'.
         subst M; clear - Hax Haz Hcs Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
         symmetry.
@@ -1994,7 +1992,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          now specialize (vec_norm_nonneg axis); lra.
 
         rewrite <- H.
-        do 2 rewrite rotate_vec_mul.
         rewrite Hso, Hso'.
         subst M; clear - Hax Haz Hcs Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
         symmetry.
@@ -2043,7 +2040,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          now specialize (vec_norm_nonneg axis); lra.
 
         rewrite <- H; clear H.
-        do 2 rewrite rotate_vec_mul.
         rewrite Hso, Hso'.
         subst M; clear - Hax Haz Hcs Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
         symmetry.

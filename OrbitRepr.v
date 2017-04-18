@@ -146,6 +146,7 @@ assert (Hr : f p = f (rotate (negf e) p)).
  rewrite <- fold_right_single, <- fold_right_app in Hsr.
  rewrite <- Hsr in Hs.
  rewrite <- fold_right_app in Hs.
+ rewrite rotate_vec_mul in Hs.
  rewrite rotate_rotate_norm in Hs.
  pose proof is_normal [] el (rev_path elr ++ [negf e]) as H.
  do 2 rewrite app_nil_l in H.
@@ -166,6 +167,7 @@ assert (Hr : f p = f (rotate (negf e) p)).
  apply Hnpd.
  exists (norm_list el ++ rev_path elr₁), p.
  split; [ easy | ].
+ rewrite rotate_vec_mul.
  split; [ | easy ].
  intros H.
  apply norm_list_app_is_nil in H.
@@ -226,7 +228,9 @@ split.
   destruct H as (el, Hel).
   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
   destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  +now rewrite rotate_rotate_norm, H₂ in Hel.
+  +rewrite rotate_vec_mul in Hel.
+   rewrite rotate_rotate_norm, H₂ in Hel.
+   now rewrite mat_vec_mul_id in Hel.
 
   +destruct e as (t, d); destruct t, d.
     left; split; [ easy | ].
@@ -412,25 +416,27 @@ split.
   destruct H as (el, Hel).
   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
   destruct el₁ as [| e₁].
-   +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
-   clear Hel₁.
-   right; left.
-   unfold rot.
-   split.
+   +rewrite rotate_vec_mul in Hel.
+    rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+    clear Hel₁.
+    right; left.
+    unfold rot.
     split.
-     destruct Hnf as (His, _).
-     now apply in_ball_after_rotate.
+     split.
+      destruct Hnf as (His, _).
+      now apply in_ball_after_rotate.
 
-     destruct Hnf as (Hps, Hnpd).
-     now apply no_fixpoint_after_rotate.
+      destruct Hnf as (Hps, Hnpd).
+      now apply no_fixpoint_after_rotate.
 
-    exists (negf e :: []), [].
-    split; [ easy | simpl ].
-    assert (H : f p = f (rotate (negf e) p)).
-     apply Hoe.
-     now exists (negf e :: []).
+     exists (negf e :: []), [].
+     split; [ easy | simpl ].
+     assert (H : f p = f (rotate (negf e) p)).
+      apply Hoe.
+      now exists (negf e :: []).
 
-     now rewrite <- H, Hel.
+      rewrite mat_vec_mul_id in Hel.
+      now rewrite <- H, Hel.
 
    +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
      left; split; [ easy | ].
@@ -529,10 +535,12 @@ split.
    destruct H as (el, Hel).
    remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
    destruct el₁ as [| e₁].
-    +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
-    clear el Hel₁.
-    left; left; left.
-    split; [ easy | subst os; now symmetry ].
+    +rewrite rotate_vec_mul in Hel.
+     rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+     rewrite mat_vec_mul_id in Hel.
+     clear el Hel₁.
+     left; left; left.
+     split; [ easy | subst os; now symmetry ].
 
     +destruct e₁ as (t, d); destruct t.
      destruct d.

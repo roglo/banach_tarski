@@ -54,10 +54,13 @@ Theorem not_in_fixpoints_one_path : ∀ f p e₁ e₂ el el₂ el₁ el₃,
   → False.
 Proof.
 intros f p e₁ e₂ el el₂ el₁ el₃ Hnf Hel H₆ H₂ H₄ Hd.
+rewrite rotate_vec_mul in Hel, H₆.
 rewrite rotate_rotate_norm in Hel, H₆.
 rewrite <- Hel in H₆.
-rewrite <- fold_right_app in H₆.
+rewrite <- mat_vec_mul_assoc in H₆.
+rewrite <- mat_of_path_app in H₆.
 revert H₆.
+rewrite <- rotate_vec_mul.
 apply Hnf.
 intros H.
 apply norm_list_app_is_nil in H.
