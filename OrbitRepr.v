@@ -11,7 +11,7 @@ Require Import Partition.
 Class sel_model {A} := mkos { os_fun : A → A }.
 
 Definition orbit_by_seq_of e {os : sel_model} :=
-  mkset (λ p, ∃ n, fold_right rotate (os_fun p) (repeat e (S n)) = p).
+  mkset (λ p, ∃ n, (mat_of_path (repeat e (S n)) * os_fun p)%vec = p).
 
 Definition D :=
   mkset
@@ -209,7 +209,8 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
     destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
     destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
     exists O; simpl.
-    now rewrite Hfr, <- Hp.
+    rewrite Hfr, <- Hp.
+    apply mat_of_path_single.
 
     eapply not_start_with_rot in Hi; try eassumption; [ easy | ].
     now split.
@@ -220,7 +221,10 @@ intros * (Hoe, Ho) * Hos * Hi Hj.
     remember S as g; subst os; simpl in Hoo; simpl; subst g.
     rewrite Hfr; simpl.
     exists (S n).
-    now rewrite Hoo.
+    rewrite mat_of_path_cons, mat_vec_mul_assoc, Hoo.
+    rewrite <- mat_of_path_single.
+    unfold mat_of_path; simpl.
+    now rewrite mat_mul_id_r.
 Qed.
 
 Theorem r_decomposed_5 :
@@ -398,14 +402,8 @@ intros p bm; subst os.
 destruct bm as (Ha & n & Hr); remember S as g; simpl in Hr; subst g.
 split; [ easy | ].
 exists (repeat ạ⁻¹ (S n)), (repeat ạ⁻¹ n).
+rewrite rotate_vec_mul.
 split; [ apply norm_list_repeat | easy ].
-Qed.
-
-Theorem mat_of_path_single : ∀ e p, (mat_of_path [e] * p)%vec = rotate e p.
-Proof.
-intros e p.
-unfold mat_of_path; simpl.
-now rewrite mat_mul_id_r.
 Qed.
 
 Theorem no_fixpoint_after_rotate : ∀ p e, p ∉ D → rotate e p ∉ D.
@@ -592,9 +590,12 @@ split.
        subst os; simpl in Hoo |-*; subst g.
        rewrite Hfr in Hoo; simpl in Hoo.
        apply f_equal with (f := rotate (FE la false)) in Hoo.
+       rewrite <- rotate_vec_mul in Hoo; simpl in Hoo.
        do 2 rewrite rotate_rotate_neg in Hoo.
+       rewrite rotate_vec_mul in Hoo.
        destruct n; [ | now exists n ].
        simpl in Hoo.
+       rewrite mat_vec_mul_id in Hoo.
        rewrite Hoo in Hel.
        destruct Hnf as (His & Hoh).
        exfalso; apply Hoh.
@@ -625,13 +626,15 @@ split.
       rewrite Hfr in Hoo.
       destruct Hoo as (n, Hr).
       apply f_equal with (f := rotate (FE la false)) in Hr.
+      rewrite <- rotate_vec_mul in Hr; simpl in Hr.
       do 2 rewrite rotate_rotate_neg in Hr.
+      rewrite rotate_vec_mul in Hr.
       destruct n.
-       simpl in Hr; rewrite Hr in Hel.
+       simpl in Hr; rewrite mat_vec_mul_id in Hr.
+       rewrite Hr in Hel.
        destruct Hnf as (His, Hoh).
        now apply Hoh; exists el, p; rewrite Hel₁.
 
-       rewrite rotate_vec_mul in Hr.
        apply rotate_rev_path in Hr.
        rewrite <- Hr in Hel.
        rewrite <- mat_vec_mul_assoc in Hel.

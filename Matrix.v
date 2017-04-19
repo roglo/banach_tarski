@@ -1444,6 +1444,14 @@ Theorem mat_of_path_cons : ∀ e el,
    mat_of_path (e :: el) = (mat_of_elem e * mat_of_path el)%mat.
 Proof. easy. Qed.
 
+Theorem mat_of_path_single : ∀ e p,
+   (mat_of_path (e :: nil) * p)%vec = rotate e p.
+Proof.
+intros e p.
+unfold mat_of_path; simpl.
+now rewrite mat_mul_id_r.
+Qed.
+
 Theorem mat_of_elem_negf_mul_l : ∀ e,
   (mat_of_elem (negf e) * mat_of_elem e)%mat = mat_id.
 Proof.
