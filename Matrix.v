@@ -1509,3 +1509,13 @@ Proof.
 intros * Hmp.
 now apply rotate_rev_path in Hmp.
 Qed.
+
+Theorem mat_of_path_negf : ∀ e el,
+  mat_of_path (negf e :: e :: el) = mat_of_path el.
+Proof.
+intros.
+rewrite mat_of_path_cons; simpl.
+rewrite mat_of_path_cons; simpl.
+rewrite mat_mul_assoc.
+now rewrite mat_of_elem_mul_negf_l, mat_mul_id_l.
+Qed.

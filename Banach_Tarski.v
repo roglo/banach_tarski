@@ -878,8 +878,7 @@ fold (mat_of_path el₁) in Hr.
 pose proof mat_of_path_is_rotation_matrix el as H.
 generalize Hsr; intros Hsr₁.
 eapply on_sphere_after_rotation in Hsr₁; [ clear H | apply H ].
-rewrite <- rotate_vec_mul, Hs in Hsr₁.
-rewrite rotate_vec_mul in Hs.
+rewrite Hs in Hsr₁.
 apply rotate_rev_path in Hs.
 remember (mat_of_path el₁) as m eqn:Hm.
 remember (rotation_fixpoint m r) as p₂ eqn:Hp₂.
@@ -1849,7 +1848,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
    move Hso' before Hso; move Hn' before Hn; move Hp'₀ before Hp₀.
    move Hp₀ after Hso; move Hp'₀ before Hp₀.
    assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
-    rewrite <- Hso, <- Hso'; do 2 rewrite rotate_vec_mul.
+    rewrite <- Hso, <- Hso'.
     split.
     1, 2 : apply on_sphere_after_rotation; [ easy | ].
     1, 2 : apply mat_of_path_is_rotation_matrix.
@@ -1878,7 +1877,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
        apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
        now rewrite Ha, neg_vec_involutive in Hpna.
 
-      rewrite rotate_vec_mul in Hso, Hso'.
       apply rotate_rev_path in Hso.
       apply rotate_rev_path in Hso'.
       remember (fixpoint_of_path r el₀) as q eqn:Hq.
@@ -2228,7 +2226,6 @@ exists el, (r ⁎ u).
 split.
  destruct Hso as (el₁ & Hso).
  exists el₁.
- rewrite rotate_vec_mul in Hso |-*.
  rewrite mat_vec_mul_const_distr.
  now f_equal.
 

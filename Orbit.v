@@ -7,29 +7,28 @@ Require Import Reals Nsatz.
 
 Require Import Misc MiscReals Words Normalize Reverse Matrix Pset.
 
-Definition same_orbit x y := ∃ el, fold_right rotate x el = y.
+Definition same_orbit x y := ∃ el, (mat_of_path el * x)%vec = y.
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
-Proof. now intros; exists []. Qed.
+Proof. now exists []; rewrite mat_vec_mul_id. Qed.
 
 Theorem same_orbit_sym : symmetric _ same_orbit.
 Proof.
 intros p₁ p₂ (el, H); simpl in H.
 exists (rev_path el).
 revert p₁ p₂ H.
-induction el as [| e]; intros; [ now symmetry | simpl in H; simpl ].
-unfold rev_path; simpl.
-rewrite map_app; simpl.
-rewrite fold_right_app; simpl.
-apply IHel; rewrite <- H.
-now rewrite rotate_neg_rotate.
+induction el as [| e]; intros; [ now rewrite mat_vec_mul_id in H |-* | ].
+rewrite rev_path_cons, mat_of_path_app, mat_vec_mul_assoc.
+apply IHel; rewrite <- H, <- mat_vec_mul_assoc.
+rewrite <- mat_of_path_app, rev_path_single; simpl.
+now rewrite mat_of_path_negf.
 Qed.
 
 Theorem same_orbit_trans : transitive _ same_orbit.
 Proof.
 intros p₁ p₂ p₃ (el₁, H₁) (el₂, H₂); simpl in H₁, H₂.
 exists (el₂ ++ el₁).
-now rewrite fold_right_app, H₁, H₂.
+now rewrite mat_of_path_app, mat_vec_mul_assoc, H₁, H₂.
 Qed.
 
 Add Parametric Relation : _ same_orbit
