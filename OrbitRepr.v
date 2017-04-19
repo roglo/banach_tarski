@@ -16,7 +16,7 @@ Definition orbit_by_seq_of e {os : sel_model} :=
 Definition D :=
   mkset
     (λ p, ∃ el p₁, same_orbit p p₁
-     ∧ norm_list el ≠ [] ∧ fold_right rotate p₁ el = p₁).
+     ∧ norm_list el ≠ [] ∧ (mat_of_path el * p₁)%vec = p₁).
 
 Arguments D : simpl never.
 
@@ -42,6 +42,7 @@ Proof.
 intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
+rewrite rotate_vec_mul in Hs.
 rewrite <- He in Hs.
 simpl in Hinf.
 destruct Hinf as (Hle1 & Hinf).
@@ -64,6 +65,7 @@ destruct ti, tj.
    intros el Hn.
    destruct Hinf as (Hps, Hnpd).
    intros H; apply Hnpd; clear Hnpd.
+   rewrite rotate_vec_mul in H.
    now exists el, p.
 
    rewrite <- rev_path_norm_list, Hnj.
@@ -75,6 +77,7 @@ destruct ti, tj.
    intros el Hn.
    destruct Hinf as (Hps, Hnpd).
    intros H; apply Hnpd.
+   rewrite rotate_vec_mul in H.
    now exists el, p.
 
    rewrite <- rev_path_norm_list, Hnj.
@@ -87,6 +90,7 @@ destruct ti, tj.
   intros el Hn.
   destruct Hinf as (Hps, Hnpd).
   intros H; apply Hnpd.
+  rewrite rotate_vec_mul in H.
   now exists el, p.
 
   rewrite <- rev_path_norm_list, Hnj.
@@ -99,6 +103,7 @@ destruct ti, tj.
   intros el Hn.
   destruct Hinf as (Hps, Hnpd).
   intros H; apply Hnpd.
+  rewrite rotate_vec_mul in H.
   now exists el, p.
 
   rewrite <- rev_path_norm_list, Hnj.
@@ -111,6 +116,7 @@ destruct ti, tj.
    intros el Hn.
    destruct Hinf as (Hps, Hnpd).
    intros H; apply Hnpd.
+   rewrite rotate_vec_mul in H.
    now exists el, p.
 
    rewrite <- rev_path_norm_list, Hnj.
@@ -122,6 +128,7 @@ destruct ti, tj.
    intros el Hn.
    destruct Hinf as (Hps, Hnpd).
    intros H; apply Hnpd.
+   rewrite rotate_vec_mul in H.
    now exists el, p.
 
    rewrite <- rev_path_norm_list, Hnj.
@@ -170,7 +177,6 @@ assert (Hr : f p = f (rotate (negf e) p)).
  apply Hnpd.
  exists (norm_list el ++ rev_path elr₁), p.
  split; [ easy | ].
- rewrite rotate_vec_mul.
  split; [ | easy ].
  intros H.
  apply norm_list_app_is_nil in H.
@@ -579,6 +585,7 @@ split.
        destruct Hnf as (His & Hoh).
        exfalso; apply Hoh.
        exists el, p.
+       rewrite rotate_vec_mul in Hel.
        now rewrite Hel₁.
 
       left; left; right.
@@ -608,6 +615,7 @@ split.
       destruct n.
        simpl in Hr; rewrite Hr in Hel.
        destruct Hnf as (His, Hoh).
+       rewrite rotate_vec_mul in Hel.
        now apply Hoh; exists el, p; rewrite Hel₁.
 
        rewrite rotate_vec_mul in Hr.
@@ -618,6 +626,7 @@ split.
        apply Hoh.
        exists (el ++ rev_path (repeat ạ⁻¹ (S n))), p.
        split; [ easy | ].
+       rewrite rotate_vec_mul in Hel.
        split; [ | easy ].
        replace el with ([] ++ el) by easy.
        rewrite <- app_assoc, <- is_normal, Hel₁, app_nil_l.

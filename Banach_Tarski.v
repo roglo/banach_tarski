@@ -872,7 +872,6 @@ apply surj_bool_prod_nat_surj_prod_nat.
 exists (fixpoint_of_bool_prod_nat r).
 intros p (Hp & Hsr).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
-rewrite rotate_vec_mul in Hr.
 remember (nat_of_path el₁) as nf eqn:Hnf.
 remember (nat_of_path (rev_path el)) as no eqn:Hno.
 fold (mat_of_path el₁) in Hr.
@@ -1884,7 +1883,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
       apply rotate_rev_path in Hso'.
       remember (fixpoint_of_path r el₀) as q eqn:Hq.
       remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
-      rewrite rotate_vec_mul in Hp₀, Hp'₀.
       generalize Hq; intros Hpq.
       apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
         try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
@@ -2235,7 +2233,6 @@ split.
  now f_equal.
 
  split; [ easy | ].
- rewrite rotate_vec_mul in Hru |-*.
  rewrite mat_vec_mul_const_distr.
  now f_equal.
 Qed.
@@ -2484,7 +2481,6 @@ simpl in H; subst p; simpl.
 exists (ạ :: []), 0%vec.
 split; [ easy | ].
 split; [ easy | ].
-rewrite rotate_vec_mul.
 apply mat_vec_mul_0_r.
 Qed.
 
