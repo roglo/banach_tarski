@@ -2432,20 +2432,11 @@ assert (Hp1 : ‖p'₁‖ = 1).
     now apply vec_norm_neq_0.
 Qed.
 
-Theorem set_sub_union_sub : ∀ A (E F G : set A),
-  F ⊂ E
-  → E ⊂ G
-  → ((E ∖ F) ∪ (G ∖ E) = G ∖ F)%S.
+Theorem set_sub_incl_union_sub_sub {A} : ∀ (S T U : set A),
+  S ∖ T ⊂ (U ∖ T) ∪ (S ∖ U).
 Proof.
-intros A E F G HFE HEG.
-intros v; split; intros Hv.
- destruct Hv as [(HvE, HvF)| (HvS, HvE)].
-  split; [ now apply HEG | easy ].
-
-  split; [ easy | now intros H; apply HvE, HFE ].
-
- destruct Hv as (HvG & HvF).
- now destruct (EM (v ∈ E)); [ left | right ].
+intros; intros v (HvS, HvT).
+now destruct (EM (v ∈ U)); [ left | right ].
 Qed.
 
 Definition E ρ :=
@@ -2476,8 +2467,7 @@ intros v; split; intros Hv.
   split; [ now split | ].
   now rewrite mat_pow_0, mat_vec_mul_id.
 
- destruct Hv as (HvS & HvD).
- now destruct (EM (v ∈ E ρ)); [ left | right ].
+ now apply set_sub_incl_union_sub_sub.
 Qed.
 
 Theorem ball_but_D_but_center_eq_ball_but_D :
@@ -2757,23 +2747,27 @@ split.
     now rewrite HE in HvnE; simpl in HvnE.
 
    assert (HSD : ((F ∖ E) ∪ (ball ∖ F) = ball ∖ E)%S).
-    apply set_sub_union_sub.
-     intros v Hv.
-     rewrite HE in Hv; simpl in Hv; subst v.
-     rewrite HF; simpl.
-     exists 0%nat.
-     now rewrite mat_pow_0, mat_vec_mul_id.
+    intros v; split; intros Hv.
+     destruct Hv as [(HvF, HvE)| (HvS, HvF)].
+      split; [ | easy ].
+      rewrite HF in HvF; simpl in HvF.
+      destruct HvF as (n & Hv).
+      rewrite <- Hv.
+      apply in_ball_after_rotation.
+       rewrite Hp₀; simpl.
+       rewrite Rsqr_0, Rsqr_1; lra.
 
-     intros v Hv.
-     rewrite HF in Hv; simpl in Hv.
-     destruct Hv as (n & Hv).
-     rewrite <- Hv.
-     apply in_ball_after_rotation.
-      rewrite Hp₀; simpl.
-      rewrite Rsqr_0, Rsqr_1; lra.
+       apply mat_pow_is_rotation_matrix.
+       apply rot_z_is_rotation_matrix.
 
-      apply mat_pow_is_rotation_matrix.
-      apply rot_z_is_rotation_matrix.
+      split; [ easy | ].
+      intros Hv; apply HvF.
+      rewrite HE in Hv; simpl in Hv; subst v.
+      rewrite HF; simpl.
+      exists 0%nat.
+      now rewrite mat_pow_0, mat_vec_mul_id.
+
+     now apply set_sub_incl_union_sub_sub.
 
     rewrite <- HSD, <- HED.
     replace [rF; ball ∖ F] with ([rF] ++ [ball ∖ F]) by easy.
