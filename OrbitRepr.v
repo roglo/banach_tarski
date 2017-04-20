@@ -29,7 +29,7 @@ Definition SS {os : sel_model} e :=
      ∃ el el₁,
        norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p).
 Definition B {os : sel_model} :=
-  mkset (λ p, p ∈ ball ∖ D ∧ p ∈ orbit_by_seq_of ạ⁻¹).
+  mkset (λ p, p ∈ (ball ∖ D) ∩ orbit_by_seq_of ạ⁻¹).
 
 Opaque M SS B.
 
