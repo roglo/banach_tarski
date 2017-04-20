@@ -2455,13 +2455,11 @@ Definition E ρ :=
 Definition ρE ρ :=
   mkset (λ u, ∃ v, v ∈ E ρ ∧ u = (ρ * v)%vec).
 
-Theorem E_but_D_union_ball_but_E_eq_ball_but_D : ∀ p₁ s c ρ,
-  p₁ ≠ 0%vec
-  → s² + c² = 1
-  → ρ = matrix_of_axis_angle (p₁, s, c)
+Theorem E_but_D_union_ball_but_E_eq_ball_but_D : ∀ ρ,
+  is_rotation_matrix ρ
   → ((E ρ ∖ D) ∪ (ball ∖ center ∖ E ρ) = ball ∖ center ∖ D)%S.
 Proof.
-intros * Hpz Hsc Hρ.
+intros * Hρ.
 intros v; split; intros Hv.
  destruct Hv as [(HvE, HvD)| (HvS, HvE)].
   split; [ | easy ].
@@ -2469,8 +2467,7 @@ intros v; split; intros Hv.
   destruct HvE as (u & n & ((HuD & HuB) & HuS) & Hv).
   rewrite Hv.
   apply in_ball_but_center_after_rotation; [ easy | ].
-  apply mat_pow_is_rotation_matrix; rewrite Hρ.
-  now apply matrix_of_axis_angle_is_rotation_matrix.
+  now apply mat_pow_is_rotation_matrix.
 
   split; [ easy | ].
   intros Hv; apply HvE; clear HvE.
@@ -2844,7 +2841,9 @@ split.
  now apply matrix_of_axis_angle_is_rotation_matrix.
 
  split.
-  rewrite <- (E_but_D_union_ball_but_E_eq_ball_but_D p₁ s c ρ Hp₁z Hsc Hρ).
+  generalize Hsc; intros Hrm.
+  eapply matrix_of_axis_angle_is_rotation_matrix in Hrm; [ | eauto ].
+  rewrite <- (E_but_D_union_ball_but_E_eq_ball_but_D _ Hrm), <- Hρ.
   rewrite <- (ρE_is_E_but_D p₁ s c ρ Hp₁ Hsc Hj Hρ).
   split; [ now simpl; rewrite set_union_empty_r | ].
   intros i j Hij.
