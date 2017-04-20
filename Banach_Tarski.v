@@ -2432,6 +2432,22 @@ assert (Hp1 : ‖p'₁‖ = 1).
     now apply vec_norm_neq_0.
 Qed.
 
+Theorem set_sub_union_sub : ∀ A (E F G : set A),
+  F ⊂ E
+  → E ∖ F ⊂ G
+  → ((E ∖ F) ∪ (G ∖ E) = G ∖ F)%S.
+Proof.
+intros A E F G HFE HEG.
+intros v; split; intros Hv.
+ destruct Hv as [(HvE, HvF)| (HvS, HvE)].
+  split; [ now apply HEG | easy ].
+
+  split; [ easy | now intros H; apply HvE, HFE ].
+
+ destruct Hv as (HvG & HvF).
+ now destruct (EM (v ∈ E)); [ left | right ].
+Qed.
+
 Definition E ρ :=
   mkset
     (λ p, ∃ p₀ n, p₀ ∈ D ∩ ball ∖ center ∧ p = ((ρ ^ n)%mat * p₀)%vec).
@@ -2744,29 +2760,24 @@ split.
     now rewrite HE in HvnE; simpl in HvnE.
 
    assert (HSD : ((F ∖ E) ∪ (ball ∖ F) = ball ∖ E)%S).
-    intros v; split; intros Hv.
-     destruct Hv as [(HvE, HvD)| (HvS, HvE)].
-      split; [ | easy ].
-      rewrite HF in HvE.
-      simpl in HvE.
-      destruct HvE as (n & Hv).
-      rewrite <- Hv.
-      apply in_ball_after_rotation.
-       rewrite Hp₀; simpl.
-       rewrite Rsqr_0, Rsqr_1; lra.
+    apply set_sub_union_sub.
+     intros v Hv.
+     rewrite HE in Hv; simpl in Hv; subst v.
+     rewrite HF; simpl.
+     exists 0%nat.
+     now rewrite mat_pow_0, mat_vec_mul_id.
 
-       apply mat_pow_is_rotation_matrix.
-       apply rot_z_is_rotation_matrix.
+     intros v Hv.
+     destruct Hv as (HvF & HvE).
+     rewrite HF in HvF; simpl in HvF.
+     destruct HvF as (n & Hv).
+     rewrite <- Hv.
+     apply in_ball_after_rotation.
+      rewrite Hp₀; simpl.
+      rewrite Rsqr_0, Rsqr_1; lra.
 
-      split; [ easy | ].
-      intros Hv; apply HvE; clear HvE.
-      rewrite HE in Hv; simpl in Hv; subst v.
-      rewrite HF; simpl.
-      exists 0%nat.
-      now rewrite mat_pow_0, mat_vec_mul_id.
-
-     destruct Hv as (HvS & HvD).
-     now destruct (EM (v ∈ F)); [ left | right ].
+      apply mat_pow_is_rotation_matrix.
+      apply rot_z_is_rotation_matrix.
 
     rewrite <- HSD, <- HED.
     replace [rF; ball ∖ F] with ([rF] ++ [ball ∖ F]) by easy.
