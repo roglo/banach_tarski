@@ -2434,7 +2434,7 @@ Qed.
 
 Theorem set_sub_union_sub : ∀ A (E F G : set A),
   F ⊂ E
-  → E ∖ F ⊂ G
+  → E ⊂ G
   → ((E ∖ F) ∪ (G ∖ E) = G ∖ F)%S.
 Proof.
 intros A E F G HFE HEG.
@@ -2768,9 +2768,8 @@ split.
      now rewrite mat_pow_0, mat_vec_mul_id.
 
      intros v Hv.
-     destruct Hv as (HvF & HvE).
-     rewrite HF in HvF; simpl in HvF.
-     destruct HvF as (n & Hv).
+     rewrite HF in Hv; simpl in Hv.
+     destruct Hv as (n & Hv).
      rewrite <- Hv.
      apply in_ball_after_rotation.
       rewrite Hp₀; simpl.
