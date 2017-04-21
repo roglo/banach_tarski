@@ -1738,7 +1738,7 @@ generalize Hp; intros Hpr.
 apply rotation_fixpoint_of_path in Hpr.
 generalize Hp'; intros Hpr'.
 apply rotation_fixpoint_of_path in Hpr'.
-apply mat_of_path_fixpoint_rev_path in Hpr'.
+apply rotate_rev_path in Hpr'.
 rewrite rev_path_involutive in Hpr'.
 generalize Hpr; intros H.
 apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].

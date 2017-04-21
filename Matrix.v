@@ -1511,13 +1511,6 @@ induction el as [| e]; intros.
  now rewrite mat_of_elem_negf_mul_l, mat_mul_id_l.
 Qed.
 
-Theorem mat_of_path_fixpoint_rev_path : ∀ el p,
-  (mat_of_path el * p = p → mat_of_path (rev_path el) * p = p)%vec.
-Proof.
-intros * Hmp.
-now apply rotate_rev_path in Hmp.
-Qed.
-
 Theorem mat_of_path_negf : ∀ e el,
   mat_of_path (negf e :: e :: el) = mat_of_path el.
 Proof.
