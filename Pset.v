@@ -249,9 +249,6 @@ split; intros H.
   right; now right.
 Qed.
 
-Theorem in_set_inter : ∀ A (E F : set A) x, x ∈ E ∩ F ↔ x ∈ E ∧ x ∈ F.
-Proof. intros; split; intros H; easy. Qed.
-
 Theorem set_inter_shuffle0 : ∀ A (E F G : set A),
   (E ∩ F ∩ G = E ∩ G ∩ F)%S.
 Proof.

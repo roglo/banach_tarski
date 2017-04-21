@@ -1815,8 +1815,6 @@ Theorem J₀_is_countable : ∀ axis,
 Proof.
 intros axis Had Hnad (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
-apply -> in_set_inter in Hp.
-apply -> in_set_inter in Hp'.
 destruct Hp as (Hpd & Hps).
 destruct Hp' as (Hpd' & Hps').
 destruct (vec_eq_dec axis 0) as [Haz| Haz].
