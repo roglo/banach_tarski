@@ -1810,7 +1810,8 @@ Qed.
 Theorem J₀_is_countable : ∀ axis,
   axis ∉ D
   → (- axis)%vec ∉ D
-  → ∀ sc, sc ∈ J₀ axis → ∃ n : ℕ, J₀_of_nat axis n = sc.
+  → ∀ sc, sc ∈ J₀ axis
+  → ∃ n : ℕ, J₀_of_nat axis n = sc.
 Proof.
 intros axis Had Hnad (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
@@ -1887,6 +1888,9 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
       generalize Hq'; intros Hpq'.
       apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq';
         try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
+      move p₀ before p'; move p'₀ before p₀.
+      move Hps before el'; move Hps' before Hps.
+      move Hp₀s before Hps'; move Hp'₀s before Hp₀s.
       destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
        move Hpq at top; subst q; clear Hb.
        remember (nat_of_path el₀) as nf eqn:Hnf.
