@@ -1889,15 +1889,15 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
       destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
        move Hpq at top; subst q; clear Hb.
+       remember (nat_of_path el₀) as nf eqn:Hnf.
+       remember (nat_of_path (rev_path el)) as no eqn:Hno.
+       remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
+       remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
        destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
         move Hpq' at top; subst q'.
         unfold J₀_of_nat.
-        remember (nat_of_path el₀) as nf eqn:Hnf.
-        remember (nat_of_path (rev_path el)) as no eqn:Hno.
         remember (nat_of_path el'₀) as nf' eqn:Hnf'.
-        remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
         move no before nf; move nf' before nf; move no' before no.
-        remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
         remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
         remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
         exists n; subst n.
@@ -1924,12 +1924,8 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         rewrite neg_vec_involutive in Hpq'.
         move Hpq' at top; subst q'; clear Hb.
         unfold J₀_of_nat.
-        remember (nat_of_path el₀) as nf eqn:Hnf.
-        remember (nat_of_path (rev_path el)) as no eqn:Hno.
         remember (nat_of_path (rev_path el'₀)) as nf' eqn:Hnf'.
-        remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
         move no before nf; move nf' before nf; move no' before no.
-        remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
         remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
         remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
         exists n; subst n.
