@@ -1957,14 +1957,6 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         subst M r.
         eapply J₀_countable_lemma with (p := p) (el₀ := el₀); eassumption.
 
-        apply (f_equal vec_opp) in Hpq'.
-        rewrite neg_vec_involutive in Hpq'.
-        move Hpq' at top; subst q'; clear Hb.
-        unfold J₀_of_nat.
-        remember (nat_of_path (rev_path el'₀)) as nf' eqn:Hnf'.
-        move no before nf; move nf' before nf; move no' before no.
-        remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
-        remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
         subst M r.
         eapply J₀_countable_lemma
           with (p := p) (el₀ := el₀) (el'₀ := rev_path el'₀);
@@ -1972,68 +1964,40 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
          rewrite <- rev_path_norm_list.
          now intros H; apply rev_path_is_nil in H.
 
-         rewrite fixpoint_of_rev_path, <- Hq'; [ | | easy ].
-          now rewrite neg_vec_involutive.
+         rewrite fixpoint_of_rev_path, <- Hq'; [ easy | | easy ].
+         apply vec_norm_neq_0 in Haz.
+         now specialize (vec_norm_nonneg axis); lra.
 
-          apply vec_norm_neq_0 in Haz.
-          now specialize (vec_norm_nonneg axis); lra.
-
-       apply (f_equal vec_opp) in Hpq.
-       rewrite neg_vec_involutive in Hpq.
-       move Hpq at top; subst q; clear Hb.
-       destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
+       destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb'| Hb'].
         move Hpq' at top; subst q'.
-        remember (nat_of_path (rev_path el₀)) as nf eqn:Hnf.
-        remember (nat_of_path (rev_path el)) as no eqn:Hno.
-        remember (nat_of_path el'₀) as nf' eqn:Hnf'.
-        remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
-        remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
         subst M r.
         eapply J₀_countable_lemma
-          with (p := p) (p'₀ := p'₀) (nf := nf) (el₀ := rev_path el₀);
-          try eassumption.
+          with (p := p) (p'₀ := p'₀) (*(nf := nf)*) (el₀ := rev_path el₀);
+          try eassumption; try easy.
          rewrite <- rev_path_norm_list.
          now intros H; apply rev_path_is_nil in H.
 
-         rewrite fixpoint_of_rev_path, <- Hq; [ | | easy ].
-          now rewrite neg_vec_involutive.
+         rewrite fixpoint_of_rev_path, <- Hq; [ easy | | easy ].
+         apply vec_norm_neq_0 in Haz.
+         now specialize (vec_norm_nonneg axis); lra.
 
-          apply vec_norm_neq_0 in Haz.
-          now specialize (vec_norm_nonneg axis); lra.
-
-        apply (f_equal vec_opp) in Hpq'.
-        rewrite neg_vec_involutive in Hpq'.
-        move Hpq' at top; subst q'; clear Hb.
-        unfold J₀_of_nat.
-        remember (nat_of_path (rev_path el₀)) as nf eqn:Hnf.
-        remember (nat_of_path (rev_path el)) as no eqn:Hno.
-        remember (nat_of_path (rev_path el'₀)) as nf' eqn:Hnf'.
-        remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
-        move no before nf; move nf' before nf; move no' before no.
-        remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
-        remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
-        remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
         subst M r.
         eapply J₀_countable_lemma
           with (p := p) (el₀ := rev_path el₀) (el'₀ := rev_path el'₀);
-          try eassumption.
+          try eassumption; try easy.
          rewrite <- rev_path_norm_list.
          now intros H; apply rev_path_is_nil in H.
 
          rewrite <- rev_path_norm_list.
          now intros H; apply rev_path_is_nil in H.
 
-         rewrite fixpoint_of_rev_path, <- Hq; [ | | easy ].
-          now rewrite neg_vec_involutive.
+         rewrite fixpoint_of_rev_path, <- Hq; [ easy | | easy ].
+         apply vec_norm_neq_0 in Haz.
+         now specialize (vec_norm_nonneg axis); lra.
 
-          apply vec_norm_neq_0 in Haz.
-          now specialize (vec_norm_nonneg axis); lra.
-
-         rewrite fixpoint_of_rev_path, <- Hq'; [ | | easy ].
-          now rewrite neg_vec_involutive.
-
-          apply vec_norm_neq_0 in Haz.
-          now specialize (vec_norm_nonneg axis); lra.
+         rewrite fixpoint_of_rev_path, <- Hq'; [ easy | | easy ].
+         apply vec_norm_neq_0 in Haz.
+         now specialize (vec_norm_nonneg axis); lra.
 Qed.
 
 (* J(axis) = set of angles of rotation around the axis, such that
