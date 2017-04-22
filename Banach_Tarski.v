@@ -1965,33 +1965,18 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
         move no before nf; move nf' before nf; move no' before no.
         remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
         remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
-        exists n; subst n.
-        rewrite prod_nat_of_nat_inv; subst nfo.
-        rewrite prod_nat_of_nat_inv; subst nfo'.
-        rewrite prod_nat_of_nat_inv.
-        subst nf no nf' no'.
-        unfold fixpoint_of_nat.
-        do 4 rewrite path_of_nat_inv.
-        rewrite <- Hr, <- Hq.
-        assert (H : p'₀ = fixpoint_of_path r (rev_path el'₀)).
+        subst M r.
+        eapply J₀_countable_lemma
+          with (p := p) (el₀ := el₀) (el'₀ := rev_path el'₀);
+          try eassumption.
+         rewrite <- rev_path_norm_list.
+         now intros H; apply rev_path_is_nil in H.
+
          rewrite fixpoint_of_rev_path, <- Hq'; [ | | easy ].
-         now rewrite neg_vec_involutive.
+          now rewrite neg_vec_involutive.
 
-         rewrite Hr; apply vec_norm_neq_0 in Haz.
-         now specialize (vec_norm_nonneg axis); lra.
-
-        rewrite <- H.
-        rewrite Hso, Hso'.
-        subst M; clear - Hax Haz Hcs Hr Hps Hps' Ha Ha' Hv Hpa Hpna Ha21.
-        symmetry.
-        apply mat_vec_mul_rot_sin_cos with (r := r) (a := a); try assumption.
-        assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
-        rewrite <- Hr in H.
-        apply Rdichotomy in H.
-        destruct H as [H| H]; [ | lra ].
-        apply Rlt_not_le in H.
-        exfalso; apply H; rewrite Hr.
-        apply vec_norm_nonneg.
+          apply vec_norm_neq_0 in Haz.
+          now specialize (vec_norm_nonneg axis); lra.
 
        apply (f_equal vec_opp) in Hpq.
        rewrite neg_vec_involutive in Hpq.
