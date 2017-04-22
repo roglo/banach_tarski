@@ -922,12 +922,11 @@ Definition countable_union_fun {A} (f g : ℕ → A) n :=
 Theorem countable_union : ∀ A (E F : set A) (f g : ℕ → A),
   (∀ a : A, a ∈ E → ∃ n, f n = a)
   → (∀ a : A, a ∈ F → ∃ n, g n = a)
-  → (∃ h : ℕ → A, ∀ a : A, a ∈ E ∪ F → ∃ n, h n = a).
+  → ∀ a : A, a ∈ E ∪ F → ∃ n, countable_union_fun f g n = a.
 Proof.
-intros * Hf Hg.
-exists (countable_union_fun f g).
+intros * Hf Hg a Ha.
 unfold countable_union_fun.
-intros a [Ha| Ha].
+destruct Ha as [Ha| Ha].
  specialize (Hf a Ha) as (n & Hn).
  exists (2 * n)%nat.
  rewrite Nat.even_mul, orb_true_l.
@@ -946,16 +945,17 @@ Theorem D_set_and_its_symmetric_are_countable : ∀ r,
   p ∈ (D ∪ sphere_sym D) ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
-enough
-  (∃ f, ∀ p,
-   p ∈ (D ∩ sphere r) ∪ (sphere_sym D ∩ sphere r) → ∃ n : ℕ, f n = p).
+assert (H :
+  ∃ f, ∀ p,
+  p ∈ (D ∩ sphere r) ∪ (sphere_sym D ∩ sphere r) → ∃ n : ℕ, f n = p).
+ specialize (D_set_is_countable r) as (f, Hf).
+ specialize (D_set_symmetry_is_countable r) as (g, Hg).
+ exists (countable_union_fun f g).
+ now apply countable_union.
+
  destruct H as (f, Hf).
  exists f; intros p Hp; apply Hf.
  now rewrite set_inter_union_distr_r in Hp.
-
- specialize (D_set_is_countable r) as (f, Hf).
- specialize (D_set_symmetry_is_countable r) as (g, Hg).
- eapply countable_union; eassumption.
 Qed.
 
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
