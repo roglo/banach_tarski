@@ -916,14 +916,17 @@ enough (Hn : (- p)%vec ∈ D ∩ sphere r).
  now apply neg_vec_in_sphere.
 Qed.
 
-Theorem countable_union : ∀ A (E F : set A),
-  (∃ f : ℕ → A, ∀ a : A, a ∈ E → ∃ n, f n = a)
-  → (∃ g : ℕ → A, ∀ a : A, a ∈ F → ∃ n, g n = a)
+Definition countable_union_fun {A} (f g : ℕ → A) n :=
+  if bool_dec (even n) true then f (Nat.div2 n) else g (Nat.div2 n).
+
+Theorem countable_union : ∀ A (E F : set A) (f g : ℕ → A),
+  (∀ a : A, a ∈ E → ∃ n, f n = a)
+  → (∀ a : A, a ∈ F → ∃ n, g n = a)
   → (∃ h : ℕ → A, ∀ a : A, a ∈ E ∪ F → ∃ n, h n = a).
 Proof.
-intros * (f & Hf) (g & Hg).
-exists
-  (λ n, if bool_dec (even n) true then f (Nat.div2 n) else g (Nat.div2 n)).
+intros * Hf Hg.
+exists (countable_union_fun f g).
+unfold countable_union_fun.
 intros a [Ha| Ha].
  specialize (Hf a Ha) as (n & Hn).
  exists (2 * n)%nat.
@@ -950,8 +953,9 @@ enough
  exists f; intros p Hp; apply Hf.
  now rewrite set_inter_union_distr_r in Hp.
 
- apply countable_union; [ apply D_set_is_countable | ].
- apply D_set_symmetry_is_countable.
+ specialize (D_set_is_countable r) as (f, Hf).
+ specialize (D_set_symmetry_is_countable r) as (g, Hg).
+ eapply countable_union; eassumption.
 Qed.
 
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
