@@ -1893,7 +1893,7 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
 
   assert (p ≠ axis ∧ p ≠ (- axis)%vec) as (Hpa, Hpna).
    now split; intros H; move H at top; subst p.
-  
+
    remember ‖axis‖ as r eqn:Hr.
    move r before c; move Hr before r.
    remember (matrix_of_axis_angle (axis, s, c)) as M eqn:HM.
@@ -1903,101 +1903,92 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
    move p'₀ before p₀.
    move Hso' before Hso; move Hn' before Hn; move Hp'₀ before Hp₀.
    move Hp₀ after Hso; move Hp'₀ before Hp₀.
-   assert (H : p₀ ∈ sphere r ∧ p'₀ ∈ sphere r).
+   assert (p₀ ∈ sphere r ∧ p'₀ ∈ sphere r) as (Hp₀s, Hp'₀s).
     rewrite <- Hso, <- Hso'.
     split.
     1, 2 : apply on_sphere_after_rotation; [ easy | ].
     1, 2 : apply mat_of_path_is_rotation_matrix.
 
-    destruct H as (Hp₀s, Hp'₀s).
-    assert (Hax : axis ∈ sphere r).
-     rewrite Hr.
-     destruct axis as (x, y, z); simpl.
-     rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+    remember (latitude axis p) as a eqn:Ha.
+    rename Hll into Ha'.
+    symmetry in Ha, Ha'.
+    assert (Ha21 : a² ≠ 1).
+     intros H.
+     replace 1 with 1² in H by apply Rsqr_1.
+     apply Rsqr_eq_abs_0 in H.
+     rewrite Rabs_R1 in H.
+     apply Rabs_or in H.
+     destruct H as [H| H].
+      rewrite H in Ha.
+      apply (latitude_1 r) in Ha; [ now symmetry in Ha | | easy ].
+      rewrite Hr; apply in_its_sphere.
 
-     remember (latitude axis p) as a eqn:Ha.
-     rename Hll into Ha'.
-     symmetry in Ha, Ha'.
-     assert (Ha21 : a² ≠ 1).
-      intros H.
-      replace 1 with 1² in H by apply Rsqr_1.
-      apply Rsqr_eq_abs_0 in H.
-      rewrite Rabs_R1 in H.
-      apply Rabs_or in H.
-      destruct H as [H| H].
-       rewrite H in Ha.
-       apply (latitude_1 r) in Ha; [ | easy | easy ].
-       now symmetry in Ha.
-
-       rewrite H in Ha.
-       apply (latitude_minus_1 r) in Ha; [ | easy | easy ].
+      rewrite H in Ha.
+      apply (latitude_minus_1 r) in Ha; [ | | easy ].
        now rewrite Ha, neg_vec_involutive in Hpna.
 
-      apply rotate_rev_path in Hso.
-      apply rotate_rev_path in Hso'.
-      remember (fixpoint_of_path r el₀) as q eqn:Hq.
-      remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
-      generalize Hq; intros Hpq.
-      apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
-        try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
-      generalize Hq'; intros Hpq'.
-      apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq';
-        try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
-      move p₀ before p'; move p'₀ before p₀.
-      move Hps before el'; move Hps' before Hps.
-      move Hp₀s before Hps'; move Hp'₀s before Hp₀s.
-      destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
-       move Hpq at top; subst q; clear Hb.
-       remember (nat_of_path el₀) as nf eqn:Hnf.
-       remember (nat_of_path (rev_path el)) as no eqn:Hno.
-       remember (nat_of_path (rev_path el')) as no' eqn:Hno'.
-       remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
-       destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
-        move Hpq' at top; subst q'.
-        subst M r.
-        eapply J₀_countable_lemma with (p := p) (el₀ := el₀); eassumption.
+       rewrite Hr; apply in_its_sphere.
 
-        subst M r.
-        eapply J₀_countable_lemma
-          with (p := p) (el₀ := el₀) (el'₀ := rev_path el'₀);
-          try eassumption.
-         rewrite <- rev_path_norm_list.
-         now intros H; apply rev_path_is_nil in H.
+     apply rotate_rev_path in Hso.
+     apply rotate_rev_path in Hso'.
+     remember (fixpoint_of_path r el₀) as q eqn:Hq.
+     remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
+     generalize Hq; intros Hpq.
+     apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
+       try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
+     generalize Hq'; intros Hpq'.
+     apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq';
+       try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
+     destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
+      move Hpq at top; subst q; clear Hb.
+      destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
+       move Hpq' at top; subst q'.
+       subst M r.
+       eapply J₀_countable_lemma with (p := p) (el₀ := el₀);
+         try eassumption; try easy.
 
-         rewrite fixpoint_of_rev_path, <- Hq'; [ easy | | easy ].
-         apply vec_norm_neq_0 in Haz.
-         now specialize (vec_norm_nonneg axis); lra.
+       subst M r.
+       eapply J₀_countable_lemma
+         with (p := p) (el₀ := el₀) (el'₀ := rev_path el'₀);
+         try eassumption; try easy.
+        rewrite <- rev_path_norm_list.
+        now intros H; apply rev_path_is_nil in H.
 
-       destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb'| Hb'].
-        move Hpq' at top; subst q'.
-        subst M r.
-        eapply J₀_countable_lemma
-          with (p := p) (p'₀ := p'₀) (*(nf := nf)*) (el₀ := rev_path el₀);
-          try eassumption; try easy.
-         rewrite <- rev_path_norm_list.
-         now intros H; apply rev_path_is_nil in H.
+        rewrite fixpoint_of_rev_path, <- Hq'; [ easy | | easy ].
+        apply vec_norm_neq_0 in Haz.
+        now specialize (vec_norm_nonneg axis); lra.
 
-         rewrite fixpoint_of_rev_path, <- Hq; [ easy | | easy ].
-         apply vec_norm_neq_0 in Haz.
-         now specialize (vec_norm_nonneg axis); lra.
+      move Hpq at top; subst p₀.
+      destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb'| Hb'].
+       move Hpq' at top; subst q'.
+       subst M r.
+       eapply J₀_countable_lemma
+         with (p := p) (p'₀ := p'₀) (el₀ := rev_path el₀);
+         try eassumption; try easy.
+        rewrite <- rev_path_norm_list.
+        now intros H; apply rev_path_is_nil in H.
 
-        subst M r.
-        eapply J₀_countable_lemma
-          with (p := p) (el₀ := rev_path el₀) (el'₀ := rev_path el'₀);
-          try eassumption; try easy.
-         rewrite <- rev_path_norm_list.
-         now intros H; apply rev_path_is_nil in H.
+        rewrite fixpoint_of_rev_path, <- Hq; [ easy | | easy ].
+        apply vec_norm_neq_0 in Haz.
+        now specialize (vec_norm_nonneg axis); lra.
 
-         rewrite <- rev_path_norm_list.
-         now intros H; apply rev_path_is_nil in H.
+       subst M r.
+       eapply J₀_countable_lemma
+         with (p := p) (el₀ := rev_path el₀) (el'₀ := rev_path el'₀);
+         try eassumption; try easy.
+        rewrite <- rev_path_norm_list.
+        now intros H; apply rev_path_is_nil in H.
 
-         rewrite fixpoint_of_rev_path, <- Hq; [ easy | | easy ].
-         apply vec_norm_neq_0 in Haz.
-         now specialize (vec_norm_nonneg axis); lra.
+        rewrite <- rev_path_norm_list.
+        now intros H; apply rev_path_is_nil in H.
 
-         rewrite fixpoint_of_rev_path, <- Hq'; [ easy | | easy ].
-         apply vec_norm_neq_0 in Haz.
-         now specialize (vec_norm_nonneg axis); lra.
+        rewrite fixpoint_of_rev_path, <- Hq; [ easy | | easy ].
+        apply vec_norm_neq_0 in Haz.
+        now specialize (vec_norm_nonneg axis); lra.
+
+        rewrite fixpoint_of_rev_path, <- Hq'; [ easy | | easy ].
+        apply vec_norm_neq_0 in Haz.
+        now specialize (vec_norm_nonneg axis); lra.
 Qed.
 
 (* J(axis) = set of angles of rotation around the axis, such that
