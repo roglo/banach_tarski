@@ -243,15 +243,6 @@ destruct M₁, M₂; simpl.
 f_equal; lra.
 Qed.
 
-Theorem mat_const_mul_distr_r : ∀ k M₁ M₂,
-  (k ⁎ (M₁ * M₂) = M₁ * (k ⁎ M₂))%mat.
-Proof.
-intros.
-unfold mat_const_mul, mat_mul.
-destruct M₁, M₂; simpl.
-f_equal; lra.
-Qed.
-
 Theorem mat_vec_mul_assoc : ∀ m₁ m₂ p,
   ((m₁ * m₂)%mat * p = m₁ * (m₂ * p))%vec.
 Proof.
@@ -955,11 +946,6 @@ do 9 rewrite Rmult_0_r.
 now do 2 rewrite Rplus_0_r.
 Qed.
 
-Theorem mat_opp_vec_mul_distr_r : ∀ M v, (M * - v = - (M * v))%vec.
-Proof.
-intros M (x, y, z); simpl; f_equal; lra.
-Qed.
-
 Theorem mat_pow_succ : ∀ M n, (M ^ S n)%mat = (M * M ^ n)%mat.
 Proof. easy. Qed.
 
@@ -1014,19 +1000,7 @@ Definition mat_compl M :=
   let '(V b₁₃ b₂₃ b₃₃) := vec_inv M (V 0 0 1) in
   mkrmat b₁₁ b₁₂ b₁₃ b₂₁ b₂₂ b₂₃ b₃₁ b₃₂ b₃₃.
 
-Definition mat_inv M := (mat_compl M ⁄ mat_det M)%mat.
-
 Theorem mat_mul_compl_l : ∀ M, (mat_compl M * M = mat_det M ⁎ mat_id)%mat.
-Proof.
-intros.
-destruct M; simpl.
-unfold mat_mul; simpl.
-unfold mat_det; simpl.
-unfold mat_const_mul; simpl.
-f_equal; lra.
-Qed.
-
-Theorem mat_mul_compl_r : ∀ M, (M * mat_compl M = mat_det M ⁎ mat_id)%mat.
 Proof.
 intros.
 destruct M; simpl.
@@ -1123,38 +1097,6 @@ rewrite Rplus_opp_r.
 rewrite fold_Rminus, vec_Lagrange_identity.
 rewrite vec_dot_mul_diag.
 apply Rle_0_sqr.
-Qed.
-
-(* *)
-
-Theorem mat_rot_inv : ∀ M, is_rotation_matrix M → mat_inv M = mat_transp M.
-Proof.
-intros M Hr.
-destruct Hr as (Htr, Hdet).
-unfold mat_inv; rewrite Hdet.
-rewrite Rinv_1.
-rewrite mat_const_mul_1_l.
-destruct M; simpl.
-unfold mat_compl, mat_transp; simpl.
-unfold mat_det; simpl.
-do 9 rewrite Rmult_1_l, Rmult_0_l.
-do 6 rewrite Rmult_0_r.
-do 7 rewrite Rminus_0_r.
-do 3 rewrite Rmult_0_r.
-do 8 rewrite Rplus_0_r.
-do 4 rewrite Rplus_0_l.
-do 6 rewrite Rminus_0_l, Rmult_1_r.
-unfold mat_det in Hdet; simpl in Hdet.
-unfold mat_transp in Htr; simpl in Htr.
-unfold mat_mul in Htr; simpl in Htr.
-unfold mat_id, mkrmat in Htr; simpl in Htr.
-injection Htr; clear Htr; intros H33 H32 H31 H23 H22 H21 H13 H12 H11.
-unfold mkrmat; simpl.
-clear H33 H23 H13 H12.
-f_equal;
- [ clear H22 H32; nsatz | clear H11 H31; nsatz | nsatz |
-   clear H22 H32; nsatz | clear H11 H31; nsatz | nsatz |
-   clear H22 H32; nsatz | clear H11 H31; nsatz | nsatz ].
 Qed.
 
 (* *)

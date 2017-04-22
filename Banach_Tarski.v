@@ -494,37 +494,6 @@ destruct (vec_eq_dec ax 0) as [Hz| Hz].
   now destruct H as (H1 & H2 & H3); subst.
 Qed.
 
-Theorem fixpoint_of_path_on_sphere : ∀ r el,
-  norm_list el ≠ []
-  → fixpoint_of_path r el ∈ sphere r.
-Proof.
-intros * Hn.
-unfold fixpoint_of_path.
-remember (mat_of_path el) as M eqn:Hm.
-destruct (mat_eq_dec M (mat_transp M)) as [Hmt| Hmt].
- assert (Hrm : is_rotation_matrix M).
-  subst M; apply mat_of_path_is_rotation_matrix.
-
-  assert (Hmm : (M * M = mat_id)%mat) by (rewrite Hmt at 2; apply Hrm).
-  rewrite Hm in Hmm.
-  rewrite <- mat_of_path_app in Hmm.
-  exfalso; revert Hmm.
-  apply matrix_of_non_empty_path_is_not_identity.
-  intros H; apply Hn.
-  now apply norm_list_app_diag_is_nil.
-
- now apply rotation_fixpoint_on_sphere.
-Qed.
-
-Theorem rotation_fixpoint_norm : ∀ M r, 0 ≤ r
-  → M ≠ mat_transp M
-  → ‖(rotation_fixpoint M r)‖ = r.
-Proof.
-intros * HM Hr.
-apply rotation_fixpoint_on_sphere with (r := r) in Hr.
-now apply on_sphere_norm.
-Qed.
-
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → mat_vec_mul M (u × v) = mat_vec_mul M u × mat_vec_mul M v.
@@ -983,44 +952,6 @@ enough
 
  apply countable_union; [ apply D_set_is_countable | ].
  apply D_set_symmetry_is_countable.
-Qed.
-
-Theorem rotate_unicity : ∀ p₁ p₂ el,
-  ‖p₁‖ = ‖p₂‖
-  → norm_list el ≠ []
-  → (mat_of_path el * p₁)%vec = p₁
-  → (mat_of_path el * p₂)%vec = p₂
-  → p₁ = p₂ ∨ p₁ = (- p₂)%vec.
-Proof.
-intros * Hpp Hn Hr₁ Hr₂.
-remember (mat_of_path el) as M eqn:HM.
-assert (H : is_rotation_matrix M ∧ M ≠ mat_id).
- split; [ subst M; apply mat_of_path_is_rotation_matrix | ].
- now rewrite HM; apply matrix_of_non_empty_path_is_not_identity.
-
- destruct H as (Hrm & Hni).
- destruct (Bool.bool_dec (is_neg_vec p₁) (is_neg_vec p₂)) as [Hnn| Hnn].
-  destruct (vec_eq_dec p₁ p₂) as [| Hneq ]; [ now left | exfalso ].
-
-   now specialize (fixpoint_unicity M p₁ p₂ Hrm Hni Hpp Hnn Hr₁ Hr₂).
-
-  destruct (vec_zerop p₂) as [Hz| Hnz].
-   subst p₂; rewrite vec_norm_0 in Hpp.
-   apply vec_norm_eq_0 in Hpp.
-   now left.
-
-   destruct (vec_eq_dec p₁ (- p₂)%vec) as [| Hneq ]; [ now right | exfalso ].
-   apply neq_negb in Hnn.
-   assert (Hpp2 : ‖p₁‖ = ‖(-p₂)‖).
-    rewrite Hpp; destruct p₂ as (x, y, z); simpl.
-    now do 3 rewrite <- Rsqr_neg.
-
-    rewrite <- is_neg_vec_neg_vec in Hnn; [ | easy ].
-    assert (Hr₂2 : (M * - p₂ = - p₂)%vec).
-     now rewrite mat_opp_vec_mul_distr_r, Hr₂.
-
-     specialize (fixpoint_unicity M p₁ (- p₂)%vec Hrm Hni Hpp2 Hnn Hr₁ Hr₂2).
-     easy.
 Qed.
 
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
@@ -1633,15 +1564,10 @@ Definition J₀ axis :=
      ∃ p p', p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
-Definition J₀_of_nat axis n : (ℝ * ℝ) :=
+Definition J₀_of_nat f axis n : (ℝ * ℝ) :=
   let '(n₁, n₂) := prod_nat_of_nat n in
-  let '(nf, no) := prod_nat_of_nat n₁ in
-  let '(nf', no') := prod_nat_of_nat n₂ in
-  let r := ‖axis‖ in
-  let p₀ := fixpoint_of_nat r nf in
-  let p := (mat_of_path (path_of_nat no) * p₀)%vec in
-  let p'₀ := fixpoint_of_nat r nf' in
-  let p' := (mat_of_path (path_of_nat no') * p'₀)%vec in
+  let p := f n₁ in
+  let p' := f n₂ in
   rot_sin_cos axis p p'.
 
 Theorem unit_sphere_latitude_1 : ∀ p p',
@@ -1725,264 +1651,72 @@ assert (Hlat2 : latitude p (- p') = 1).
  now specialize (latitude_1 r p (- p')%vec Hp Hp' Hlat2).
 Qed.
 
-Theorem fixpoint_of_rev_path : ∀ r el,
-  0 < r
-  → norm_list el ≠ []
-  → fixpoint_of_path r (rev_path el) = (- fixpoint_of_path r el)%vec.
-Proof.
-intros * Hr Hn.
-remember (fixpoint_of_path r el) as p eqn:Hp.
-remember (fixpoint_of_path r (rev_path el)) as p' eqn:Hp'.
-unfold fixpoint_of_path in Hp, Hp'.
-generalize Hp; intros Hpr.
-apply rotation_fixpoint_of_path in Hpr.
-generalize Hp'; intros Hpr'.
-apply rotation_fixpoint_of_path in Hpr'.
-apply rotate_rev_path in Hpr'.
-rewrite rev_path_involutive in Hpr'.
-generalize Hpr; intros H.
-apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
- destruct H as [H| H]; [ | easy ].
- exfalso; move H at top; subst p'; clear Hpr'.
- rewrite Hp in Hp'.
- unfold rotation_fixpoint in Hp'.
- apply (f_equal (vec_const_mul (/ r))) in Hp'.
- do 2 rewrite vec_const_mul_assoc in Hp'.
- rewrite Rinv_l in Hp'; [ | lra ].
- do 2 rewrite vec_const_mul_1_l in Hp'.
- unfold rotation_unit_axis in Hp'.
- unfold vec_normalize in Hp'.
- remember (rotation_axis (mat_of_path el)) as ra eqn:Hra.
- remember (rotation_axis (mat_of_path (rev_path el))) as ra' eqn:Hra'.
- unfold rotation_axis in Hra, Hra'.
- unfold "_-_", sub_notation in Hra, Hra'.
- rewrite mat_of_rev_path in Hra'; [ | easy ].
- remember (mat_of_path el) as M eqn:HM.
- assert (Hneg : ra' = (- ra)%vec).
-  rewrite Hra, Hra'; clear.
-  destruct M; simpl.
-  f_equal; lra.
-
-  rewrite Hneg in Hp'.
-  rewrite vec_norm_opp in Hp'.
-  destruct (vec_eq_dec ra 0) as [Hraz| Hraz].
-   move Hraz at top; subst ra.
-   symmetry in Hra; injection Hra; clear Hra; intros H3 H2 H1.
-   apply Rminus_diag_uniq in H1.
-   apply Rminus_diag_uniq in H2.
-   apply Rminus_diag_uniq in H3.
-   clear ra' Hra' Hneg Hp'.
-   clear p Hp Hpr r Hr.
-   rewrite <- mat_of_path_norm in HM.
-   remember (norm_list el) as nel eqn:Hnel.
-   assert (Hnn : norm_list nel = nel) by now rewrite Hnel, norm_list_idemp.
-   clear el Hnel; rename nel into el.
-   move M before el; move Hnn before Hn.
-   assert (Htr : M = mat_transp M).
-    unfold mat_transp, mkrmat.
-    destruct M; simpl in H1, H2, H3; simpl.
-    now rewrite H1, H2, H3.
-
-    rewrite HM in Htr.
-    apply mat_of_path_neq_mat_transp in Htr; [ easy | ].
-    now rewrite Hnn.
-
-   apply (f_equal (vec_const_mul ‖ra‖)) in Hp'.
-   do 2 rewrite vec_const_mul_assoc in Hp'.
-   rewrite Rinv_r in Hp'; [ | now apply vec_norm_neq_0 ].
-   do 2 rewrite vec_const_mul_1_l in Hp'.
-   apply Hraz; clear - Hp'.
-   destruct ra as (x, y, z); simpl in Hp'.
-   injection Hp'; clear Hp'; intros.
-   f_equal; lra.
-
- rewrite Hp, Hp'.
- rewrite rotation_fixpoint_norm; [ | lra | ].
-  rewrite rotation_fixpoint_norm; [ easy | lra | ].
-  now apply mat_of_path_neq_mat_transp.
-
-  apply mat_of_path_neq_mat_transp.
-  rewrite <- rev_path_norm_list.
-  intros HH; apply Hn.
-  now apply rev_path_is_nil in HH.
-Qed.
-
-Theorem J₀_countable_lemma : ∀ p'₀ p₀ axis p p' s c a el₀ el'₀ el el',
-  axis ≠ 0%vec
-  → s² + c² = 1
-  → latitude axis p = a
-  → latitude axis p' = a
-  → a² ≠ 1
-  → (matrix_of_axis_angle (axis, s, c) * p)%vec = p'
-  → norm_list el₀ ≠ []
-  → norm_list el'₀ ≠ []
-  → p₀ = fixpoint_of_path ‖axis‖ el₀
-  → p'₀ = fixpoint_of_path ‖axis‖ el'₀
-  → (mat_of_path el * p₀)%vec = p
-  → (mat_of_path el' * p'₀)%vec = p'
-  → ∃ n : ℕ, J₀_of_nat axis n = (s, c).
-Proof.
-intros * Haz Hcs Ha Ha' H21 Hv Hn Hn' Hq Hq' Hso Hso'.
-unfold J₀_of_nat.
-remember (nat_of_path el₀) as nf eqn:Hnf.
-remember (nat_of_path el) as no eqn:Hno.
-remember (nat_of_path el') as no' eqn:Hno'.
-remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
-remember (nat_of_path el'₀) as nf' eqn:Hnf'.
-remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
-remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
-exists n; subst n.
-rewrite prod_nat_of_nat_inv; subst nfo.
-rewrite prod_nat_of_nat_inv; subst nfo'.
-rewrite prod_nat_of_nat_inv.
-subst nf no nf' no'.
-unfold fixpoint_of_nat.
-do 4 rewrite path_of_nat_inv.
-rewrite <- Hq, <- Hq'.
-rewrite Hso, Hso'.
-symmetry.
-apply mat_vec_mul_rot_sin_cos with (r := ‖axis‖) (a := a); try assumption.
- assert (H : ‖axis‖ ≠ 0) by now intros H; apply vec_norm_eq_0 in H.
- apply Rdichotomy in H.
- destruct H as [H| H]; [ | lra ].
- apply Rlt_not_le in H.
- exfalso; apply H.
- apply vec_norm_nonneg.
-
- apply in_its_sphere.
-
- rewrite  <- Hso.
- apply on_sphere_after_rotation; [ | apply mat_of_path_is_rotation_matrix ].
- rewrite Hq.
- now apply fixpoint_of_path_on_sphere.
-
- rewrite  <- Hso'.
- apply on_sphere_after_rotation; [ | apply mat_of_path_is_rotation_matrix ].
- rewrite Hq'.
- now apply fixpoint_of_path_on_sphere.
-Qed.
-
 Theorem J₀_is_countable : ∀ axis,
   axis ∉ D
   → (- axis)%vec ∉ D
-  → ∀ sc, sc ∈ J₀ axis
-  → ∃ n : ℕ, J₀_of_nat axis n = sc.
+  → ∃ f, ∀ sc, sc ∈ J₀ axis
+  → ∃ n : ℕ, J₀_of_nat f axis n = sc.
 Proof.
-intros axis Had Hnad (s, c) Ha.
+intros axis Had Hnad.
+specialize (D_set_and_its_symmetric_are_countable ‖axis‖) as (f, Hf).
+exists f; intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
-destruct Hp as (Hpd & Hps).
-destruct Hp' as (Hpd' & Hps').
-destruct (vec_eq_dec axis 0) as [Haz| Haz].
- rewrite Haz in Had.
- rewrite Haz in Hps; simpl in Hps.
- rewrite Rsqr_0, Rplus_0_l, Rplus_0_l, sqrt_0, Rsqr_0 in Hps.
- destruct p as (xp, yp, zp).
- apply sqr_vec_norm_eq_0 in Hps.
- destruct Hps as (Hxp & Hyp & Hzp).
- now subst xp yp zp.
+generalize Hf; intros Hf'.
+assert (Hpi : p ∈ (D ∪ sphere_sym D) ∩ sphere ‖axis‖).
+ now destruct Hp; split; [ left | ].
 
- assert (Hll : latitude axis p = latitude axis p').
-  eapply rotation_implies_same_latitude; try eassumption.
-   specialize (vec_norm_nonneg axis) as H.
-   enough (‖axis‖ ≠ 0) by lra.
-   clear H; intros H.
-   now apply vec_norm_eq_0 in H.
+ specialize (Hf p Hpi) as (n & Hn).
+ assert (Hp'i : p' ∈ (D ∪ sphere_sym D) ∩ sphere ‖axis‖).
+  now destruct Hp'; split; [ left | ].
 
-   apply on_sphere_norm; [ apply vec_norm_nonneg | easy ].
+  specialize (Hf' p' Hp'i) as (n' & Hn').
+  destruct Hp as (Hpd, Hps).
+  destruct Hp' as (Hpd', Hps').
+  assert (Haz : ‖axis‖ ≠ 0).
+   intros H; apply vec_norm_eq_0 in H.
+   apply Had; rewrite H; simpl.
+   exists (ạ :: []), 0%vec.
+   split; [ easy | ].
+   split; [ easy | ].
+   apply mat_vec_mul_0_r.
 
-  assert (p ≠ axis ∧ p ≠ (- axis)%vec) as (Hpa, Hpna).
-   now split; intros H; move H at top; subst p.
+   unfold J₀_of_nat.
+   destruct (Req_dec (latitude axis p) (latitude axis p')) as [Hll| Hll].
+    exists (nat_of_prod_nat (n, n')).
+    rewrite prod_nat_of_nat_inv; simpl.
+    rewrite Hn, Hn'.
+    symmetry.
+    eapply mat_vec_mul_rot_sin_cos; try eassumption; try easy.
+     specialize (vec_norm_nonneg axis); lra.
 
-   remember ‖axis‖ as r eqn:Hr.
-   remember (matrix_of_axis_angle (axis, s, c)) as M eqn:HM.
-   destruct Hpd as (el₀ & p₀ & (el & Hso) & Hn & Hp₀).
-   destruct Hpd' as (el'₀ & p'₀ & (el' & Hso') & Hn' & Hp'₀).
-   assert (p₀ ∈ sphere r ∧ p'₀ ∈ sphere r) as (Hp₀s, Hp'₀s).
-    rewrite <- Hso, <- Hso'.
-    split.
-    1, 2 : apply on_sphere_after_rotation; [ easy | ].
-    1, 2 : apply mat_of_path_is_rotation_matrix.
+     apply in_its_sphere.
 
-    remember (latitude axis p) as a eqn:Ha.
-    rename Hll into Ha'.
-    symmetry in Ha, Ha'.
-    assert (Ha21 : a² ≠ 1).
      intros H.
      replace 1 with 1² in H by apply Rsqr_1.
      apply Rsqr_eq_abs_0 in H.
      rewrite Rabs_R1 in H.
      apply Rabs_or in H.
+     specialize (in_its_sphere axis) as Ha.
+     destruct Hp'i as (Hp'd & Hp's).
      destruct H as [H| H].
-      rewrite H in Ha.
-      apply (latitude_1 r) in Ha; [ now symmetry in Ha | | easy ].
-      rewrite Hr; apply in_its_sphere.
+      apply (latitude_1 ‖axis‖) in H; [ | easy | easy ].
+      rewrite <- H in Hp'd.
+      now destruct Hp'd as [Hp'd| Hp'd].
 
-      rewrite H in Ha.
-      apply (latitude_minus_1 r) in Ha; [ | | easy ].
-       now rewrite Ha, neg_vec_involutive in Hpna.
+      apply (latitude_minus_1 ‖axis‖) in H; [ | easy | easy ].
+      apply (f_equal vec_opp) in H.
+      rewrite neg_vec_involutive in H.
+      rewrite <- H in Hp'd.
+      destruct Hp'd as [Hp'd| Hp'd]; [ easy | ].
+      apply -> sphere_sym_neg_vec in Hp'd.
+      now rewrite neg_vec_involutive in Hp'd.
 
-       rewrite Hr; apply in_its_sphere.
+   exists (nat_of_prod_nat (n, n')).
+   exfalso; apply Hll.
+   eapply rotation_implies_same_latitude; try eassumption.
+    specialize (vec_norm_nonneg axis); lra.
 
-     apply rotate_rev_path in Hso.
-     apply rotate_rev_path in Hso'.
-     remember (fixpoint_of_path r el₀) as q eqn:Hq.
-     remember (fixpoint_of_path r el'₀) as q' eqn:Hq'.
-     generalize Hq; intros Hpq.
-     apply axis_and_fixpoint_of_path_collinear with (p := p₀) in Hpq;
-       try assumption; [ | now subst q; apply fixpoint_of_path_on_sphere ].
-     generalize Hq'; intros Hpq'.
-     apply axis_and_fixpoint_of_path_collinear with (p := p'₀) in Hpq';
-       try assumption; [ | now subst q'; apply fixpoint_of_path_on_sphere ].
-     destruct (bool_dec (is_neg_vec p₀) (is_neg_vec q)) as [Hb| Hb].
-      move Hpq at top; subst q; clear Hb.
-      destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb| Hb].
-       move Hpq' at top; subst q'.
-       subst M r.
-       eapply J₀_countable_lemma with (p := p) (el₀ := el₀);
-         try eassumption; try easy.
-
-       subst M r.
-       eapply J₀_countable_lemma
-         with (p := p) (el₀ := el₀) (el'₀ := rev_path el'₀);
-         try eassumption; try easy.
-        rewrite <- rev_path_norm_list.
-        now intros H; apply rev_path_is_nil in H.
-
-        rewrite fixpoint_of_rev_path, <- Hq'; [ easy | | easy ].
-        apply vec_norm_neq_0 in Haz.
-        now specialize (vec_norm_nonneg axis); lra.
-
-      move Hpq at top; subst p₀.
-      destruct (bool_dec (is_neg_vec p'₀) (is_neg_vec q')) as [Hb'| Hb'].
-       move Hpq' at top; subst q'.
-       subst M r.
-       eapply J₀_countable_lemma
-         with (p := p) (p'₀ := p'₀) (el₀ := rev_path el₀);
-         try eassumption; try easy.
-        rewrite <- rev_path_norm_list.
-        now intros H; apply rev_path_is_nil in H.
-
-        rewrite fixpoint_of_rev_path, <- Hq; [ easy | | easy ].
-        apply vec_norm_neq_0 in Haz.
-        now specialize (vec_norm_nonneg axis); lra.
-
-       subst M r.
-       eapply J₀_countable_lemma
-         with (p := p) (el₀ := rev_path el₀) (el'₀ := rev_path el'₀);
-         try eassumption; try easy.
-        rewrite <- rev_path_norm_list.
-        now intros H; apply rev_path_is_nil in H.
-
-        rewrite <- rev_path_norm_list.
-        now intros H; apply rev_path_is_nil in H.
-
-        rewrite fixpoint_of_rev_path, <- Hq; [ easy | | easy ].
-        apply vec_norm_neq_0 in Haz.
-        now specialize (vec_norm_nonneg axis); lra.
-
-        rewrite fixpoint_of_rev_path, <- Hq'; [ easy | | easy ].
-        apply vec_norm_neq_0 in Haz.
-        now specialize (vec_norm_nonneg axis); lra.
+    apply in_its_sphere.
 Qed.
 
 (* J(axis) = set of angles of rotation around the axis, such that
@@ -1997,11 +1731,11 @@ Definition J axis :=
     sinθ = sin ((θ₀ + 2 * IZR k * PI) / INR n) ∧
     cosθ = cos ((θ₀ + 2 * IZR k * PI) / INR n)).
 
-Definition J_of_nat axis n : (ℝ * ℝ) :=
+Definition J_of_nat f axis n : (ℝ * ℝ) :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
   let nk := z_of_nat nnk in
-  let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
+  let '(sinθ₀, cosθ₀) := J₀_of_nat f axis nj in
   let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
   let sinθ := sin ((θ₀ + 2 * IZR nk * PI) / INR nn) in
   let cosθ := cos ((θ₀ + 2 * IZR nk * PI) / INR nn) in
@@ -2010,11 +1744,12 @@ Definition J_of_nat axis n : (ℝ * ℝ) :=
 Theorem J_is_countable : ∀ axis,
   axis ∉ D
   → (- axis)%vec ∉ D
-  → ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat axis n = sc.
+  → ∃ f, ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat f axis n = sc.
 Proof.
-intros axis Had Hnad (s, c) Ha.
+intros axis Had Hnad.
+specialize (J₀_is_countable axis Had Hnad) as (f, HJ).
+exists f; intros (s, c) Ha.
 destruct Ha as (s₀ & c₀ & Ha & n & k & Hs & Hc).
-specialize (J₀_is_countable axis Had Hnad) as HJ.
 specialize (HJ (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hp & Hp' & Hmp)).
 unfold J_of_nat.
@@ -2261,8 +1996,8 @@ Theorem exists_rotation_not_in_J : ∀ p₁,
   → ∃ s c, s² + c² = 1 ∧ (s, c) ∉ J p₁.
 Proof.
 intros * (Hps, Hpnd) (Hqs, Hqnd).
-specialize (J_is_countable p₁ Hpnd Hqnd) as Hjc.
-specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
+specialize (J_is_countable p₁ Hpnd Hqnd) as (f, Hjc).
+specialize (rotations_not_countable (J_of_nat f p₁)) as (s, (c, (Hsc, Hn))).
 exists s, c; split; [ easy | intros H ].
 specialize (Hjc _ H) as (n, Hjc).
 now specialize (Hn n).
