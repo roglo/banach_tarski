@@ -945,17 +945,11 @@ Theorem D_set_and_its_symmetric_are_countable : ∀ r,
   p ∈ (D ∪ sphere_sym D) ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
-assert (H :
-  ∃ f, ∀ p,
-  p ∈ (D ∩ sphere r) ∪ (sphere_sym D ∩ sphere r) → ∃ n : ℕ, f n = p).
- specialize (D_set_is_countable r) as (f, Hf).
- specialize (D_set_symmetry_is_countable r) as (g, Hg).
- exists (countable_union_fun f g).
- now apply countable_union.
-
- destruct H as (f, Hf).
- exists f; intros p Hp; apply Hf.
- now rewrite set_inter_union_distr_r in Hp.
+specialize (D_set_is_countable r) as (f, Hf).
+specialize (D_set_symmetry_is_countable r) as (g, Hg).
+exists (countable_union_fun f g); intros p Hp.
+eapply countable_union; try eassumption.
+now rewrite set_inter_union_distr_r in Hp.
 Qed.
 
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
