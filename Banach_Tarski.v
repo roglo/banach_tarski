@@ -1807,29 +1807,27 @@ apply rotate_unicity with (p₁ := p') in H; [ | | easy | easy ].
   now apply rev_path_is_nil in HH.
 Qed.
 
-Theorem J₀_countable_lemma :
-  ∀ p'₀ p₀ axis p p' s c a nf no no' nfo el₀ el'₀ el el',
+Theorem J₀_countable_lemma : ∀ p'₀ p₀ axis p p' s c a el₀ el'₀ el el',
   axis ≠ 0%vec
   → s² + c² = 1
-  → (mat_of_path el * p₀)%vec = p
-  → (mat_of_path el' * p'₀)%vec = p'
-  → norm_list el₀ ≠ []
-  → norm_list el'₀ ≠ []
-  → (matrix_of_axis_angle (axis, s, c) * p)%vec = p'
   → latitude axis p = a
   → latitude axis p' = a
   → a² ≠ 1
+  → (matrix_of_axis_angle (axis, s, c) * p)%vec = p'
+  → norm_list el₀ ≠ []
+  → norm_list el'₀ ≠ []
   → p₀ = fixpoint_of_path ‖axis‖ el₀
   → p'₀ = fixpoint_of_path ‖axis‖ el'₀
-  → nf = nat_of_path el₀
-  → no = nat_of_path el
-  → no' = nat_of_path el'
-  → nfo = nat_of_prod_nat (nf, no)
+  → (mat_of_path el * p₀)%vec = p
+  → (mat_of_path el' * p'₀)%vec = p'
   → ∃ n : ℕ, J₀_of_nat axis n = (s, c).
 Proof.
-intros *.
-intros Haz Hcs Hso Hso' Hn Hn' Hv Ha Ha' Ha21 Hq Hq' Hnf Hno Hno' Hnfo.
+intros * Haz Hcs Ha Ha' H21 Hv Hn Hn' Hq Hq' Hso Hso'.
 unfold J₀_of_nat.
+remember (nat_of_path el₀) as nf eqn:Hnf.
+remember (nat_of_path el) as no eqn:Hno.
+remember (nat_of_path el') as no' eqn:Hno'.
+remember (nat_of_prod_nat (nf, no)) as nfo eqn:Hnfo.
 remember (nat_of_path el'₀) as nf' eqn:Hnf'.
 remember (nat_of_prod_nat (nf', no')) as nfo' eqn:Hnfo'.
 remember (nat_of_prod_nat (nfo, nfo')) as n eqn:Hnn.
@@ -1885,24 +1883,20 @@ destruct (vec_eq_dec axis 0) as [Haz| Haz].
 
  assert (Hll : latitude axis p = latitude axis p').
   eapply rotation_implies_same_latitude; try eassumption.
-  2: apply on_sphere_norm; [ apply vec_norm_nonneg | easy ].
-  specialize (vec_norm_nonneg axis) as H.
-  enough (‖axis‖ ≠ 0) by lra.
-  clear H; intros H.
-  now apply vec_norm_eq_0 in H.
+   specialize (vec_norm_nonneg axis) as H.
+   enough (‖axis‖ ≠ 0) by lra.
+   clear H; intros H.
+   now apply vec_norm_eq_0 in H.
+
+   apply on_sphere_norm; [ apply vec_norm_nonneg | easy ].
 
   assert (p ≠ axis ∧ p ≠ (- axis)%vec) as (Hpa, Hpna).
    now split; intros H; move H at top; subst p.
 
    remember ‖axis‖ as r eqn:Hr.
-   move r before c; move Hr before r.
    remember (matrix_of_axis_angle (axis, s, c)) as M eqn:HM.
    destruct Hpd as (el₀ & p₀ & (el & Hso) & Hn & Hp₀).
    destruct Hpd' as (el'₀ & p'₀ & (el' & Hso') & Hn' & Hp'₀).
-   move el'₀ before el₀; move el before el'₀; move el' before el.
-   move p'₀ before p₀.
-   move Hso' before Hso; move Hn' before Hn; move Hp'₀ before Hp₀.
-   move Hp₀ after Hso; move Hp'₀ before Hp₀.
    assert (p₀ ∈ sphere r ∧ p'₀ ∈ sphere r) as (Hp₀s, Hp'₀s).
     rewrite <- Hso, <- Hso'.
     split.
