@@ -1462,3 +1462,54 @@ rewrite mat_of_path_cons; simpl.
 rewrite mat_mul_assoc.
 now rewrite mat_of_elem_mul_negf_l, mat_mul_id_l.
 Qed.
+
+Theorem vec_unit_cross_mul_eq_0 : ∀ u v,
+  ‖u‖ = 1
+  → ‖v‖ = 1
+  → u × v = 0%vec
+  → u = v ∨ u = (- v)%vec.
+Proof.
+intros * Hu Hv Huxv.
+specialize (vec_Lagrange_identity u v) as H.
+rewrite Hu, Hv, Huxv, vec_sqr_0 in H.
+rewrite Rsqr_1, Rmult_1_l in H.
+apply Rminus_diag_uniq in H; symmetry in H.
+destruct u as (u₁, u₂, u₃).
+destruct v as (v₁, v₂, v₃).
+simpl in Hu, Hv.
+apply (f_equal Rsqr) in Hu.
+apply (f_equal Rsqr) in Hv.
+rewrite Rsqr_1 in Hu, Hv.
+rewrite Rsqr_sqrt in Hu; [ | apply nonneg_sqr_vec_norm ].
+rewrite Rsqr_sqrt in Hv; [ | apply nonneg_sqr_vec_norm ].
+simpl in *.
+injection Huxv; clear Huxv; intros H3 H2 H1.
+apply Rminus_diag_uniq in H1.
+apply Rminus_diag_uniq in H2.
+apply Rminus_diag_uniq in H3.
+replace 1 with 1² in H by apply Rsqr_1.
+apply Rsqr_eq_abs_0 in H.
+rewrite Rabs_R1 in H.
+unfold Rabs in H.
+destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
+ right; clear Ha.
+ f_equal; nsatz.
+
+ left; clear Ha.
+ f_equal; nsatz.
+Qed.
+
+Theorem mat_vec_mul_cross_distr : ∀ M u v,
+  is_rotation_matrix M
+  → (M * (u × v))%vec = (M * u) × (M * v).
+Proof.
+intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
+unfold mat_mul, mat_id in Ht; simpl in Ht.
+injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+unfold mat_det in Hd.
+destruct M; simpl in *.
+f_equal.
+ clear H₁ H₂ H₃ H₄ H₅ H₆. nsatz.
+ clear H₁ H₂ H₃ H₇ H₈ H₉. nsatz.
+ clear H₄ H₅ H₆ H₇ H₈ H₉. nsatz.
+Qed.

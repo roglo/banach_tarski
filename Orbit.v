@@ -99,7 +99,7 @@ Qed.
 Theorem on_sphere_after_rotation : ∀ p m r,
   p ∈ sphere r
   → is_rotation_matrix m
-  → mat_vec_mul m p ∈ sphere r.
+  → (m * p)%vec ∈ sphere r.
 Proof.
 intros * His Hm.
 destruct p as (x, y, z).
