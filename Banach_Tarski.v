@@ -900,22 +900,21 @@ intros r (x, y, z) Hp; simpl.
 now do 3 rewrite <- Rsqr_neg.
 Qed.
 
-Theorem D_set_symmetry_is_countable : ∀ r,
-  ∃ f : ℕ → vector, ∀ p : vector,
-  p ∈ sphere_sym D ∩ sphere r → ∃ n : ℕ, f n = p.
+Theorem D_set_symmetry_is_countable : ∀ r p,
+  p ∈ sphere_sym D ∩ sphere r
+  → ∃ n : ℕ, (- D_set_countable_fun r n)%vec = p.
 Proof.
 intros r.
-specialize (D_set_is_countable r) as Hf.
-exists (λ n, (- D_set_countable_fun r n)%vec).
 intros p Hp.
-enough (Hn : (- p)%vec ∈ D ∩ sphere r).
- specialize (Hf ((- p)%vec) Hn) as (n & Hf).
- exists n; rewrite Hf.
- apply neg_vec_involutive.
-
+assert (Hn : (- p)%vec ∈ D ∩ sphere r).
  destruct Hp as (Hss, Hs).
  split; [ now apply sphere_sym_neg_vec | ].
  now apply neg_vec_in_sphere.
+
+ specialize (D_set_is_countable r) as Hf.
+ specialize (Hf ((- p)%vec) Hn) as (n & Hf).
+ exists n; rewrite Hf.
+ apply neg_vec_involutive.
 Qed.
 
 Definition countable_union_fun {A} (f g : ℕ → A) n :=
@@ -942,16 +941,22 @@ destruct Ha as [Ha| Ha].
  now rewrite Nat.add_1_r, Nat.div2_succ_double.
 Qed.
 
-Theorem D_set_and_its_symmetric_are_countable : ∀ r,
-  ∃ f : ℕ → vector, ∀ p : vector,
-  p ∈ (D ∪ sphere_sym D) ∩ sphere r → ∃ n : ℕ, f n = p.
+Definition D_set_and_its_symmetric_countable_fun r :=
+  countable_union_fun (D_set_countable_fun r)
+    (λ n, (- D_set_countable_fun r n)%vec).
+
+Theorem D_set_and_its_symmetric_are_countable : ∀ r p,
+  p ∈ (D ∪ sphere_sym D) ∩ sphere r
+  → ∃ n : ℕ, D_set_and_its_symmetric_countable_fun r n = p.
 Proof.
 intros r.
-specialize (D_set_is_countable r) as Hf.
-specialize (D_set_symmetry_is_countable r) as (g, Hg).
-exists (countable_union_fun (D_set_countable_fun r) g); intros p Hp.
-eapply countable_union; try eassumption.
-now rewrite set_inter_union_distr_r in Hp.
+intros p Hp.
+eapply countable_union.
+ apply D_set_is_countable.
+
+ apply D_set_symmetry_is_countable.
+
+ now apply set_inter_union_distr_r.
 Qed.
 
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
@@ -1658,8 +1663,9 @@ Theorem J₀_is_countable : ∀ axis,
   → ∃ n : ℕ, J₀_of_nat f axis n = sc.
 Proof.
 intros axis Had Hnad.
-specialize (D_set_and_its_symmetric_are_countable ‖axis‖) as (f, Hf).
-exists f; intros (s, c) Ha.
+specialize (D_set_and_its_symmetric_are_countable ‖axis‖) as Hf.
+exists (D_set_and_its_symmetric_countable_fun ‖axis‖).
+intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
 generalize Hf; intros Hf'.
 assert (Hpi : p ∈ (D ∪ sphere_sym D) ∩ sphere ‖axis‖).
@@ -1956,8 +1962,10 @@ Proof. easy. Qed.
 Theorem exists_point_not_in_D :
   ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball ∖ center ∖ D.
 Proof.
-specialize (D_set_and_its_symmetric_are_countable 1) as (f, Hdnc).
-specialize (ball_set_not_countable 1 Rlt_0_1 f) as (p & Hps & Hp).
+specialize (D_set_and_its_symmetric_are_countable 1) as Hdnc.
+specialize
+  (ball_set_not_countable 1 Rlt_0_1 (D_set_and_its_symmetric_countable_fun 1))
+  as (p & Hps & Hp).
 exists p.
 split.
  split.
