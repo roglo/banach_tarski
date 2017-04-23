@@ -1569,10 +1569,10 @@ Definition J₀ axis :=
      ∃ p p', p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
-Definition J₀_of_nat f axis n : (ℝ * ℝ) :=
+Definition J₀_of_nat axis n : (ℝ * ℝ) :=
   let '(n₁, n₂) := prod_nat_of_nat n in
-  let p := f n₁ in
-  let p' := f n₂ in
+  let p := D_set_and_its_symmetric_countable_fun ‖axis‖ n₁ in
+  let p' := D_set_and_its_symmetric_countable_fun ‖axis‖ n₂ in
   rot_sin_cos axis p p'.
 
 Theorem unit_sphere_latitude_1 : ∀ p p',
@@ -1659,12 +1659,11 @@ Qed.
 Theorem J₀_is_countable : ∀ axis,
   axis ∉ D
   → (- axis)%vec ∉ D
-  → ∃ f, ∀ sc, sc ∈ J₀ axis
-  → ∃ n : ℕ, J₀_of_nat f axis n = sc.
+  → ∀ sc, sc ∈ J₀ axis
+  → ∃ n : ℕ, J₀_of_nat axis n = sc.
 Proof.
 intros axis Had Hnad.
 specialize (D_set_and_its_symmetric_are_countable ‖axis‖) as Hf.
-exists (D_set_and_its_symmetric_countable_fun ‖axis‖).
 intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
 generalize Hf; intros Hf'.
@@ -1737,11 +1736,11 @@ Definition J axis :=
     sinθ = sin ((θ₀ + 2 * IZR k * PI) / INR n) ∧
     cosθ = cos ((θ₀ + 2 * IZR k * PI) / INR n)).
 
-Definition J_of_nat f axis n : (ℝ * ℝ) :=
+Definition J_of_nat axis n : (ℝ * ℝ) :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
   let nk := z_of_nat nnk in
-  let '(sinθ₀, cosθ₀) := J₀_of_nat f axis nj in
+  let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
   let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
   let sinθ := sin ((θ₀ + 2 * IZR nk * PI) / INR nn) in
   let cosθ := cos ((θ₀ + 2 * IZR nk * PI) / INR nn) in
@@ -1750,11 +1749,10 @@ Definition J_of_nat f axis n : (ℝ * ℝ) :=
 Theorem J_is_countable : ∀ axis,
   axis ∉ D
   → (- axis)%vec ∉ D
-  → ∃ f, ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat f axis n = sc.
+  → ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat axis n = sc.
 Proof.
-intros axis Had Hnad.
-specialize (J₀_is_countable axis Had Hnad) as (f, HJ).
-exists f; intros (s, c) Ha.
+intros axis Had Hnad (s, c) Ha.
+specialize (J₀_is_countable axis Had Hnad) as HJ.
 destruct Ha as (s₀ & c₀ & Ha & n & k & Hs & Hc).
 specialize (HJ (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hp & Hp' & Hmp)).
@@ -2004,8 +2002,8 @@ Theorem exists_rotation_not_in_J : ∀ p₁,
   → ∃ s c, s² + c² = 1 ∧ (s, c) ∉ J p₁.
 Proof.
 intros * (Hps, Hpnd) (Hqs, Hqnd).
-specialize (J_is_countable p₁ Hpnd Hqnd) as (f, Hjc).
-specialize (rotations_not_countable (J_of_nat f p₁)) as (s, (c, (Hsc, Hn))).
+specialize (J_is_countable p₁ Hpnd Hqnd) as Hjc.
+specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
 exists s, c; split; [ easy | intros H ].
 specialize (Hjc _ H) as (n, Hjc).
 now specialize (Hn n).
