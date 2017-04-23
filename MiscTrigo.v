@@ -677,7 +677,6 @@ Proof.
 intros * Hs Hc.
 specialize PI_RGT_0 as HPI_GT_0.
 specialize PI_neq0 as HPI_NZ.
-unfold angle_of_sin_cos.
 destruct (Rlt_dec (sin x) 0) as [H| ]; [ clear H | lra ].
 destruct (Rlt_dec (cos x) 0) as [| H]; [ lra | clear H ].
 rewrite asin_sin.
