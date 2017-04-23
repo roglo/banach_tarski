@@ -1665,10 +1665,6 @@ Proof.
 intros axis Had Hnad.
 intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
-specialize (D_set_is_countable ‖axis‖ p Hp) as (n, Hn).
-specialize (D_set_is_countable ‖axis‖ p' Hp') as (n', Hn').
-destruct Hp as (Hpd, Hps).
-destruct Hp' as (Hpd', Hps').
 assert (Haz : ‖axis‖ ≠ 0).
  intros H; apply vec_norm_eq_0 in H.
  apply Had; rewrite H; simpl.
@@ -1677,11 +1673,15 @@ assert (Haz : ‖axis‖ ≠ 0).
  split; [ easy | ].
  apply mat_vec_mul_0_r.
 
- unfold J₀_of_nat.
  destruct (Req_dec (latitude axis p) (latitude axis p')) as [Hll| Hll].
+  specialize (D_set_is_countable ‖axis‖ p Hp) as (n, Hn).
+  specialize (D_set_is_countable ‖axis‖ p' Hp') as (n', Hn').
   exists (nat_of_prod_nat (n, n')).
+  unfold J₀_of_nat.
   rewrite prod_nat_of_nat_inv; simpl.
   rewrite Hn, Hn'.
+  destruct Hp as (Hpd, Hps).
+  destruct Hp' as (Hpd', Hps').
   symmetry.
   eapply mat_vec_mul_rot_sin_cos; try eassumption; try easy.
    specialize (vec_norm_nonneg axis); lra.
@@ -1705,8 +1705,9 @@ assert (Haz : ‖axis‖ ≠ 0).
     rewrite <- H in Hpd'.
     now apply -> sphere_sym_neg_vec in Hpd'.
 
- exists (nat_of_prod_nat (n, n')).
  exfalso; apply Hll.
+ destruct Hp as (Hpd, Hps).
+ destruct Hp' as (Hpd', Hps').
  eapply rotation_implies_same_latitude; try eassumption.
   specialize (vec_norm_nonneg axis); lra.
 
