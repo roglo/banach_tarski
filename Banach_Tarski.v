@@ -945,7 +945,7 @@ Definition point_in_D_or_sym_D_of_nat r :=
   countable_union_fun (point_in_D_of_nat r)
     (λ n, (- point_in_D_of_nat r n)%vec).
 
-Theorem D_set_and_its_symmetric_are_countable : ∀ r p,
+Theorem D_set_and_its_symm_are_countable : ∀ r p,
   p ∈ (D ∪ sphere_sym D) ∩ sphere r
   → ∃ n : ℕ, point_in_D_or_sym_D_of_nat r n = p.
 Proof.
@@ -1663,18 +1663,16 @@ Theorem J₀_is_countable : ∀ axis,
   → ∃ n : ℕ, J₀_of_nat axis n = sc.
 Proof.
 intros axis Had Hnad.
-specialize (D_set_and_its_symmetric_are_countable ‖axis‖) as Hf.
 intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
-generalize Hf; intros Hf'.
 assert (Hpi : p ∈ (D ∪ sphere_sym D) ∩ sphere ‖axis‖).
  now destruct Hp; split; [ left | ].
 
- specialize (Hf p Hpi) as (n & Hn).
  assert (Hp'i : p' ∈ (D ∪ sphere_sym D) ∩ sphere ‖axis‖).
   now destruct Hp'; split; [ left | ].
 
-  specialize (Hf' p' Hp'i) as (n' & Hn').
+  specialize (D_set_and_its_symm_are_countable ‖axis‖ p Hpi) as (n & Hn).
+  specialize (D_set_and_its_symm_are_countable ‖axis‖ p' Hp'i) as (n' & Hn').
   destruct Hp as (Hpd, Hps).
   destruct Hp' as (Hpd', Hps').
   assert (Haz : ‖axis‖ ≠ 0).
@@ -1960,7 +1958,7 @@ Proof. easy. Qed.
 Theorem exists_point_not_in_D :
   ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball ∖ center ∖ D.
 Proof.
-specialize (D_set_and_its_symmetric_are_countable 1) as Hdnc.
+specialize (D_set_and_its_symm_are_countable 1) as Hdnc.
 specialize
   (ball_set_not_countable 1 Rlt_0_1 (point_in_D_or_sym_D_of_nat 1))
   as (p & Hps & Hp).
