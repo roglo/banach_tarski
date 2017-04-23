@@ -383,13 +383,11 @@ apply path_of_nat_aux_enough_iter.
  apply Nat.lt_lt_add_r, Nat.lt_succ_diag_r.
 Qed.
 
-Theorem surj_prod_nat_surj_nat : ∀ A V,
-  (∃ g : ℕ * ℕ -> A, ∀ a : A, V a → ∃ nn : ℕ * ℕ, g nn = a)
-  → ∃ f : ℕ → A, ∀ a : A, V a → ∃ n : ℕ, f n = a.
+Theorem surj_prod_nat_surj_nat : ∀ A V (g : ℕ * ℕ → A),
+  (∀ a : A, V a → ∃ nn : ℕ * ℕ, g nn = a)
+  → ∀ a : A, V a → ∃ n : ℕ, g (prod_nat_of_nat n) = a.
 Proof.
-intros * (g & Hg).
-exists (λ n, g (prod_nat_of_nat n)).
-intros a Ha.
+intros * Hg a Ha.
 specialize (Hg a Ha) as (nfo & Hg); subst a.
 exists (nat_of_prod_nat nfo); destruct nfo.
 now rewrite prod_nat_of_nat_inv.
@@ -413,12 +411,11 @@ rewrite Nat.div_add; [ | easy ].
 now destruct b.
 Qed.
 
-Theorem surj_bool_prod_nat_surj_prod_nat : ∀ A V,
-  (∃ g : bool * ℕ * ℕ -> A, ∀ a, V a → ∃ bnn, g bnn = a)
-  → ∃ f : ℕ * ℕ → A, ∀ a, V a → ∃ nn, f nn = a.
+Theorem surj_bool_prod_nat_surj_prod_nat : ∀ A V (g : bool * ℕ * ℕ → A),
+  (∀ a, V a → ∃ bnn, g bnn = a)
+  → ∀ a, V a → ∃ nn, g (bool_prod_nat_of_prod_nat nn) = a.
 Proof.
-intros * (g & Hg).
-exists (λ nn, g (bool_prod_nat_of_prod_nat nn)).
+intros * Hg.
 intros a Ha.
 specialize (Hg a Ha) as (bnn, Hg).
 exists (prod_nat_of_bool_prod_nat bnn).
@@ -831,14 +828,19 @@ destruct b₁, b.
   now rewrite Hsr₁, Hsr₂.
 Qed.
 
-Theorem D_set_is_countable : ∀ r,
-  ∃ f : ℕ → vector, ∀ p : vector,
-  p ∈ D ∩ sphere r → ∃ n : ℕ, f n = p.
+Definition D_set_countable_fun_1 r nn :=
+  fixpoint_of_bool_prod_nat r (bool_prod_nat_of_prod_nat nn).
+
+Definition D_set_countable_fun r n :=
+  D_set_countable_fun_1 r (prod_nat_of_nat n).
+
+Theorem D_set_is_countable : ∀ r p,
+  p ∈ D ∩ sphere r
+  → ∃ n : ℕ, D_set_countable_fun r n = p.
 Proof.
 intros r.
 apply surj_prod_nat_surj_nat.
 apply surj_bool_prod_nat_surj_prod_nat.
-exists (fixpoint_of_bool_prod_nat r).
 intros p (Hp & Hsr).
 destruct Hp as (el₁ & p₁ & (el & Hs) & Hnl & Hr).
 remember (nat_of_path el₁) as nf eqn:Hnf.
@@ -903,8 +905,8 @@ Theorem D_set_symmetry_is_countable : ∀ r,
   p ∈ sphere_sym D ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
-specialize (D_set_is_countable r) as (f, Hf).
-exists (λ n, (- f n)%vec).
+specialize (D_set_is_countable r) as Hf.
+exists (λ n, (- D_set_countable_fun r n)%vec).
 intros p Hp.
 enough (Hn : (- p)%vec ∈ D ∩ sphere r).
  specialize (Hf ((- p)%vec) Hn) as (n & Hf).
@@ -945,9 +947,9 @@ Theorem D_set_and_its_symmetric_are_countable : ∀ r,
   p ∈ (D ∪ sphere_sym D) ∩ sphere r → ∃ n : ℕ, f n = p.
 Proof.
 intros r.
-specialize (D_set_is_countable r) as (f, Hf).
+specialize (D_set_is_countable r) as Hf.
 specialize (D_set_symmetry_is_countable r) as (g, Hg).
-exists (countable_union_fun f g); intros p Hp.
+exists (countable_union_fun (D_set_countable_fun r) g); intros p Hp.
 eapply countable_union; try eassumption.
 now rewrite set_inter_union_distr_r in Hp.
 Qed.
