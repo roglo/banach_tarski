@@ -1729,7 +1729,7 @@ Definition J axis :=
 Definition J_of_nat axis n : (ℝ * ℝ) :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
-  let nk := z_of_nat nnk in
+  let nk := Z_of_nat_surj nnk in
   let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
   let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
   let sinθ := sin ((θ₀ + 2 * IZR nk * PI) / INR nn) in
@@ -1747,13 +1747,13 @@ destruct Ha as (s₀ & c₀ & Ha & n & k & Hs & Hc).
 specialize (HJ (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hp & Hp' & Hmp)).
 unfold J_of_nat.
-remember (nat_of_z k) as nk eqn:Hk.
+remember (Z_to_nat_inj k) as nk eqn:Hk.
 remember (nat_of_prod_nat (nk, n)) as n₂ eqn:Hn₂.
 remember (nat_of_prod_nat (nj, n₂)) as m eqn:Hm.
 exists m; subst m n₂.
 do 2 rewrite prod_nat_of_nat_inv.
 rewrite Hnj, Hk.
-rewrite z_of_nat_inv.
+rewrite Z2Nat_bij_id.
 now f_equal.
 Qed.
 

@@ -43,17 +43,17 @@ rewrite nat_sqrt_add in Hs.
  apply Nat.le_add_r.
 Qed.
 
-Definition z_of_nat n :=
+Definition Z_of_nat_surj n :=
   if zerop (n mod 2) then Z.of_nat (n / 2)
   else (- Z.of_nat (S n / 2))%Z.
 
-Definition nat_of_z z :=
+Definition Z_to_nat_inj z :=
   if Z_lt_dec z 0 then Z.to_nat (- z * 2 - 1) else Z.to_nat (z * 2).
 
-Theorem z_of_nat_inv : ∀ k, z_of_nat (nat_of_z k) = k.
+Theorem Z2Nat_bij_id : ∀ k, Z_of_nat_surj (Z_to_nat_inj k) = k.
 Proof.
 intros.
-unfold z_of_nat, nat_of_z.
+unfold Z_of_nat_surj, Z_to_nat_inj.
 destruct (Z_lt_dec k 0) as [Hk | Hk].
  rewrite Z2Nat.inj_sub; [ simpl | easy ].
  unfold Pos.to_nat; simpl.
