@@ -828,15 +828,15 @@ destruct b₁, b.
   now rewrite Hsr₁, Hsr₂.
 Qed.
 
-Definition D_set_countable_fun_1 r nn :=
+Definition point_in_D_of_prod_nat r nn :=
   fixpoint_of_bool_prod_nat r (bool_prod_nat_of_prod_nat nn).
 
-Definition D_set_countable_fun r n :=
-  D_set_countable_fun_1 r (prod_nat_of_nat n).
+Definition point_in_D_of_nat r n :=
+  point_in_D_of_prod_nat r (prod_nat_of_nat n).
 
 Theorem D_set_is_countable : ∀ r p,
   p ∈ D ∩ sphere r
-  → ∃ n : ℕ, D_set_countable_fun r n = p.
+  → ∃ n : ℕ, point_in_D_of_nat r n = p.
 Proof.
 intros r.
 apply surj_prod_nat_surj_nat.
@@ -902,7 +902,7 @@ Qed.
 
 Theorem D_set_symmetry_is_countable : ∀ r p,
   p ∈ sphere_sym D ∩ sphere r
-  → ∃ n : ℕ, (- D_set_countable_fun r n)%vec = p.
+  → ∃ n : ℕ, (- point_in_D_of_nat r n)%vec = p.
 Proof.
 intros r.
 intros p Hp.
@@ -941,13 +941,13 @@ destruct Ha as [Ha| Ha].
  now rewrite Nat.add_1_r, Nat.div2_succ_double.
 Qed.
 
-Definition D_set_and_its_symmetric_countable_fun r :=
-  countable_union_fun (D_set_countable_fun r)
-    (λ n, (- D_set_countable_fun r n)%vec).
+Definition point_in_D_or_sym_D_of_nat r :=
+  countable_union_fun (point_in_D_of_nat r)
+    (λ n, (- point_in_D_of_nat r n)%vec).
 
 Theorem D_set_and_its_symmetric_are_countable : ∀ r p,
   p ∈ (D ∪ sphere_sym D) ∩ sphere r
-  → ∃ n : ℕ, D_set_and_its_symmetric_countable_fun r n = p.
+  → ∃ n : ℕ, point_in_D_or_sym_D_of_nat r n = p.
 Proof.
 intros r.
 intros p Hp.
@@ -1571,8 +1571,8 @@ Definition J₀ axis :=
 
 Definition J₀_of_nat axis n : (ℝ * ℝ) :=
   let '(n₁, n₂) := prod_nat_of_nat n in
-  let p := D_set_and_its_symmetric_countable_fun ‖axis‖ n₁ in
-  let p' := D_set_and_its_symmetric_countable_fun ‖axis‖ n₂ in
+  let p := point_in_D_or_sym_D_of_nat ‖axis‖ n₁ in
+  let p' := point_in_D_or_sym_D_of_nat ‖axis‖ n₂ in
   rot_sin_cos axis p p'.
 
 Theorem unit_sphere_latitude_1 : ∀ p p',
@@ -1962,7 +1962,7 @@ Theorem exists_point_not_in_D :
 Proof.
 specialize (D_set_and_its_symmetric_are_countable 1) as Hdnc.
 specialize
-  (ball_set_not_countable 1 Rlt_0_1 (D_set_and_its_symmetric_countable_fun 1))
+  (ball_set_not_countable 1 Rlt_0_1 (point_in_D_or_sym_D_of_nat 1))
   as (p & Hps & Hp).
 exists p.
 split.
