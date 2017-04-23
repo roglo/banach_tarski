@@ -1571,8 +1571,8 @@ Definition J₀ axis :=
 
 Definition J₀_of_nat axis n : (ℝ * ℝ) :=
   let '(n₁, n₂) := prod_nat_of_nat n in
-  let p := point_in_D_or_sym_D_of_nat ‖axis‖ n₁ in
-  let p' := point_in_D_or_sym_D_of_nat ‖axis‖ n₂ in
+  let p := point_in_D_of_nat ‖axis‖ n₁ in
+  let p' := point_in_D_of_nat ‖axis‖ n₂ in
   rot_sin_cos axis p p'.
 
 Theorem unit_sphere_latitude_1 : ∀ p p',
@@ -1665,61 +1665,52 @@ Proof.
 intros axis Had Hnad.
 intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
-assert (Hpi : p ∈ (D ∪ sphere_sym D) ∩ sphere ‖axis‖).
- now destruct Hp; split; [ left | ].
+specialize (D_set_is_countable ‖axis‖ p Hp) as (n, Hn).
+specialize (D_set_is_countable ‖axis‖ p' Hp') as (n', Hn').
+destruct Hp as (Hpd, Hps).
+destruct Hp' as (Hpd', Hps').
+assert (Haz : ‖axis‖ ≠ 0).
+ intros H; apply vec_norm_eq_0 in H.
+ apply Had; rewrite H; simpl.
+ exists (ạ :: []), 0%vec.
+ split; [ easy | ].
+ split; [ easy | ].
+ apply mat_vec_mul_0_r.
 
- assert (Hp'i : p' ∈ (D ∪ sphere_sym D) ∩ sphere ‖axis‖).
-  now destruct Hp'; split; [ left | ].
+ unfold J₀_of_nat.
+ destruct (Req_dec (latitude axis p) (latitude axis p')) as [Hll| Hll].
+  exists (nat_of_prod_nat (n, n')).
+  rewrite prod_nat_of_nat_inv; simpl.
+  rewrite Hn, Hn'.
+  symmetry.
+  eapply mat_vec_mul_rot_sin_cos; try eassumption; try easy.
+   specialize (vec_norm_nonneg axis); lra.
 
-  specialize (D_set_and_its_symm_are_countable ‖axis‖ p Hpi) as (n & Hn).
-  specialize (D_set_and_its_symm_are_countable ‖axis‖ p' Hp'i) as (n' & Hn').
-  destruct Hp as (Hpd, Hps).
-  destruct Hp' as (Hpd', Hps').
-  assert (Haz : ‖axis‖ ≠ 0).
-   intros H; apply vec_norm_eq_0 in H.
-   apply Had; rewrite H; simpl.
-   exists (ạ :: []), 0%vec.
-   split; [ easy | ].
-   split; [ easy | ].
-   apply mat_vec_mul_0_r.
+   apply in_its_sphere.
 
-   unfold J₀_of_nat.
-   destruct (Req_dec (latitude axis p) (latitude axis p')) as [Hll| Hll].
-    exists (nat_of_prod_nat (n, n')).
-    rewrite prod_nat_of_nat_inv; simpl.
-    rewrite Hn, Hn'.
-    symmetry.
-    eapply mat_vec_mul_rot_sin_cos; try eassumption; try easy.
-     specialize (vec_norm_nonneg axis); lra.
+   intros H.
+   replace 1 with 1² in H by apply Rsqr_1.
+   apply Rsqr_eq_abs_0 in H.
+   rewrite Rabs_R1 in H.
+   apply Rabs_or in H.
+   specialize (in_its_sphere axis) as Ha.
 
-     apply in_its_sphere.
+   destruct H as [H| H].
+    apply (latitude_1 ‖axis‖) in H; [ | easy | easy ].
+    now rewrite <- H in Hpd'.
 
-     intros H.
-     replace 1 with 1² in H by apply Rsqr_1.
-     apply Rsqr_eq_abs_0 in H.
-     rewrite Rabs_R1 in H.
-     apply Rabs_or in H.
-     specialize (in_its_sphere axis) as Ha.
-     destruct Hp'i as (Hp'd & Hp's).
-     destruct H as [H| H].
-      apply (latitude_1 ‖axis‖) in H; [ | easy | easy ].
-      rewrite <- H in Hp'd.
-      now destruct Hp'd as [Hp'd| Hp'd].
+    apply (latitude_minus_1 ‖axis‖) in H; [ | easy | easy ].
+    apply (f_equal vec_opp) in H.
+    rewrite neg_vec_involutive in H.
+    rewrite <- H in Hpd'.
+    now apply -> sphere_sym_neg_vec in Hpd'.
 
-      apply (latitude_minus_1 ‖axis‖) in H; [ | easy | easy ].
-      apply (f_equal vec_opp) in H.
-      rewrite neg_vec_involutive in H.
-      rewrite <- H in Hp'd.
-      destruct Hp'd as [Hp'd| Hp'd]; [ easy | ].
-      apply -> sphere_sym_neg_vec in Hp'd.
-      now rewrite neg_vec_involutive in Hp'd.
+ exists (nat_of_prod_nat (n, n')).
+ exfalso; apply Hll.
+ eapply rotation_implies_same_latitude; try eassumption.
+  specialize (vec_norm_nonneg axis); lra.
 
-   exists (nat_of_prod_nat (n, n')).
-   exfalso; apply Hll.
-   eapply rotation_implies_same_latitude; try eassumption.
-    specialize (vec_norm_nonneg axis); lra.
-
-    apply in_its_sphere.
+  apply in_its_sphere.
 Qed.
 
 (* J(axis) = set of angles of rotation around the axis, such that
