@@ -389,8 +389,8 @@ Theorem surj_prod_nat_surj_nat : ∀ A V (g : ℕ * ℕ → A),
 Proof.
 intros * Hg a Ha.
 specialize (Hg a Ha) as (nfo & Hg); subst a.
-exists (nat_of_prod_nat nfo); destruct nfo.
-now rewrite prod_nat_of_nat_inv.
+exists (prod_nat_to_nat nfo); destruct nfo.
+now rewrite prod_nat_to_nat_id.
 Qed.
 
 Definition bool_prod_nat_of_prod_nat '(n₁, n₂) : bool * ℕ * ℕ :=
@@ -1676,9 +1676,9 @@ assert (Haz : ‖axis‖ ≠ 0).
  destruct (Req_dec (latitude axis p) (latitude axis p')) as [Hll| Hll].
   specialize (D_set_is_countable ‖axis‖ p Hp) as (n, Hn).
   specialize (D_set_is_countable ‖axis‖ p' Hp') as (n', Hn').
-  exists (nat_of_prod_nat (n, n')).
+  exists (prod_nat_to_nat (n, n')).
   unfold J₀_of_nat.
-  rewrite prod_nat_of_nat_inv; simpl.
+  rewrite prod_nat_to_nat_id; simpl.
   rewrite Hn, Hn'.
   destruct Hp as (Hpd, Hps).
   destruct Hp' as (Hpd', Hps').
@@ -1748,10 +1748,10 @@ specialize (HJ (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hp & Hp' & Hmp)).
 unfold J_of_nat.
 remember (Z_to_nat_inj k) as nk eqn:Hk.
-remember (nat_of_prod_nat (nk, n)) as n₂ eqn:Hn₂.
-remember (nat_of_prod_nat (nj, n₂)) as m eqn:Hm.
+remember (prod_nat_to_nat (nk, n)) as n₂ eqn:Hn₂.
+remember (prod_nat_to_nat (nj, n₂)) as m eqn:Hm.
 exists m; subst m n₂.
-do 2 rewrite prod_nat_of_nat_inv.
+do 2 rewrite prod_nat_to_nat_id.
 rewrite Hnj, Hk.
 rewrite Z2Nat_bij_id.
 now f_equal.

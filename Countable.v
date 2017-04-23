@@ -8,7 +8,7 @@ Definition prod_nat_of_nat n :=
   let s := Nat.sqrt n in
   (s - (n - s ^ 2), n - s ^ 2)%nat.
 
-Definition nat_of_prod_nat '(i, j) :=
+Definition prod_nat_to_nat '(i, j) :=
   ((i + j) ^ 2 + j)%nat.
 
 Theorem nat_sqrt_add : ∀ n p, (p ≤ 2 * n)%nat → Nat.sqrt (n * n + p) = n.
@@ -23,8 +23,8 @@ simpl; rewrite Nat.add_0_r.
 apply Nat.lt_succ_diag_r.
 Qed.
 
-Theorem prod_nat_of_nat_inv : ∀ i j,
-  prod_nat_of_nat (nat_of_prod_nat (i, j)) = (i, j).
+Theorem prod_nat_to_nat_id : ∀ i j,
+  prod_nat_of_nat (prod_nat_to_nat (i, j)) = (i, j).
 Proof.
 intros; simpl.
 unfold prod_nat_of_nat.
