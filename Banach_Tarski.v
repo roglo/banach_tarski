@@ -1742,9 +1742,8 @@ Theorem J_is_countable : ∀ axis,
   → ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat axis n = sc.
 Proof.
 intros axis Had Hnad (s, c) Ha.
-specialize (J₀_is_countable axis Had Hnad) as HJ.
 destruct Ha as (s₀ & c₀ & Ha & n & k & Hs & Hc).
-specialize (HJ (s₀, c₀) Ha) as (nj, Hnj).
+specialize (J₀_is_countable axis Had Hnad (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hp & Hp' & Hmp)).
 unfold J_of_nat.
 remember (Z_to_nat_inj k) as nk eqn:Hk.
