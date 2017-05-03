@@ -2235,8 +2235,8 @@ destruct H as (f & Hu & Hm).
 remember (mkcf _ _ f Hm Hu) as Hosf.
 remember (mkos _ f) as os eqn:Hos.
 clear HeqHosf.
-set (A₁ := (M ∪ SS ạ ∪ B)%S).
-set (A₂ := (SS ạ⁻¹ ∖ B)%S).
+set (A₁ := (M ∪ SS ạ ∪ G)%S).
+set (A₂ := (SS ạ⁻¹ ∖ G)%S).
 set (A₃ := SS ḅ).
 set (A₄ := SS ḅ⁻¹).
 exists [A₁; A₂; A₃; A₄].

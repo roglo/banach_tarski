@@ -28,10 +28,10 @@ Definition SS {os : sel_model} e :=
      p ∈ ball ∖ D ∧
      ∃ el el₁,
        norm_list el = e :: el₁ ∧ fold_right rotate (os_fun p) el = p).
-Definition B {os : sel_model} :=
+Definition G {os : sel_model} :=
   mkset (λ p, p ∈ (ball ∖ D) ∩ orbit_by_seq_of ạ⁻¹).
 
-Opaque M SS B.
+Opaque M SS G.
 
 Definition rot e (E : set vector) :=
   mkset (λ p, rotate (negf e) p ∈ E).
@@ -193,8 +193,8 @@ Qed.
 Theorem decompose_2a_contrad_case :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → ∀ p, p ∈ M ∪ SS ạ ∪ B
-  → p ∈ rot ạ (SS ạ⁻¹ ∖ B)
+  → ∀ p, p ∈ M ∪ SS ạ ∪ G
+  → p ∈ rot ạ (SS ạ⁻¹ ∖ G)
   → False.
 Proof.
 intros * (Hoe, Ho) * Hos * Hi Hj.
@@ -391,7 +391,7 @@ Theorem r_decomposed_4 :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
   → is_partition (ball ∖ D)
-      [M ∪ SS ạ ∪ B; SS ạ⁻¹ ∖ B; SS ḅ; SS ḅ⁻¹].
+      [M ∪ SS ạ ∪ G; SS ạ⁻¹ ∖ G; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros f HoeHo os Hos.
 pose proof r_decomposed_5 f HoeHo os Hos as H.
@@ -543,7 +543,7 @@ Qed.
 Theorem r_decomposed_2_a :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
-  → is_partition (ball ∖ D) [M ∪ SS ạ ∪ B; rot ạ (SS ạ⁻¹ ∖ B)].
+  → is_partition (ball ∖ D) [M ∪ SS ạ ∪ G; rot ạ (SS ạ⁻¹ ∖ G)].
 Proof.
 intros f (Hoe, Ho) os Hos.
 split.
@@ -569,7 +569,7 @@ split.
 
     +destruct e₁ as (t, d); destruct t.
      destruct d.
-      destruct (EM (p ∈ B)) as [HB| HB]; [ left; now right | ].
+      destruct (EM (p ∈ G)) as [HB| HB]; [ left; now right | ].
       right; left; simpl.
       split.
        split.
