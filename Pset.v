@@ -9,9 +9,9 @@ Arguments setp [A] _ _.
 
 Definition empty_set {A} := mkset (λ _ : A, False).
 
-Notation "x '∈' S" := (setp S x) (at level 60).
-Notation "x '∉' S" := (¬ setp S x) (at level 60).
-Notation "'∅'" := (empty_set).
+Notation "x ∈ S" := (setp S x) (at level 60).
+Notation "x ∉ S" := (¬ setp S x) (at level 60).
+Notation "∅" := (empty_set).
 
 Definition set_inter {A} (S₁ S₂ : set A) :=
   mkset (λ x, x ∈ S₁ ∧ x ∈ S₂).
