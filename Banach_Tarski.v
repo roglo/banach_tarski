@@ -32,8 +32,8 @@ apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
 apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
 apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
 clear - H3 H6.
-rewrite <- Rsqr_1 in H3 at 4.
-rewrite <- Rsqr_1 in H6 at 6.
+rewrite <- Rsqr_1 in H3.
+rewrite <- Rsqr_1 in H6.
 apply Rsqr_le_abs_0 in H3.
 apply Rsqr_le_abs_0 in H6.
 rewrite Rabs_R1 in H3, H6.
