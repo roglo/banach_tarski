@@ -3,4 +3,5 @@
 *.glob
 *.vo
 .*.cache
+MiscReals.v
 history
