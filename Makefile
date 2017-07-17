@@ -22,10 +22,12 @@ depend:
 
 .vp.v:
 	@echo $@ $(COQ_VERSION)
+	@/bin/rm -f $@
 	@sed -e 's|//|slsl|g' $< | \
 	/lib/cpp -D$(COQ_VERSION) 2>/dev/null | \
 	sed -e 's|slsl|//|g' | \
 	grep -v '^#' > $@
+	@chmod -w $@
 
 .PHONY: all clean depend
 
