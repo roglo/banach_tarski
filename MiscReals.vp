@@ -229,8 +229,7 @@ destruct (Z_le_dec 0 z) as [Hz| Hz].
 #ifdef COQ_8_6_1
   rewrite fp_R0, frac_part_INR; lra.
 #else
-  rewrite <- INR_IPR, frac_part_INR.
-  apply base_fp.
+  rewrite <- INR_IPR, frac_part_INR; apply base_fp.
 #endif
 Qed.
 

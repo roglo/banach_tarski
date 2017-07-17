@@ -73,14 +73,6 @@ apply sqrt_eq_0 in H.
  apply nonneg_plus_sqr.
 Qed.
 
-#ifndef COQ_8_6_1
-Theorem Rminus_1_mult : ∀ x, -1 * x = - (1 * x).
-Proof.
-intros.
-now rewrite Ropp_mult_distr_l.
-Qed.
-#endif
-
 Theorem sin_cos_asin : ∀ x,
   -1 ≤ x ≤ 1
   → sin (asin x) = x ∧ cos (asin x) = √ (1 - x²).
@@ -102,11 +94,10 @@ destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx].
    symmetry.
    apply sqrt_diff_sqr_eq_0; [ lra | now rewrite Rsqr_1 ].
 
-#ifdef COQ_8_6_1
-   rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_div.
-#else
-   rewrite Rminus_1_mult, Rmult_1_l, Ropp_div.
+#ifndef COQ_8_6_1
+   unfold IZR at 1 3; rewrite <- INR_IPR; simpl.
 #endif
+   rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_div.
    rewrite sin_neg, cos_neg.
    rewrite sin_PI2, cos_PI2.
    split; [ | easy ].
@@ -258,19 +249,15 @@ intros.
 destruct k as [| k| k].
  now rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
 
-#ifdef COQ_8_6_1
+#ifndef COQ_8_6_1
+ set (t := 2); unfold IZR; rewrite <- INR_IPR.
+#endif
  now simpl; rewrite sin_period.
-#else
- set (t := 2); unfold IZR; rewrite <- INR_IPR.
- now rewrite sin_period.
-#endif
 
-#ifdef COQ_8_6_1
- simpl; rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
-#else
+#ifndef COQ_8_6_1
  set (t := 2); unfold IZR; rewrite <- INR_IPR.
- rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
 #endif
+ simpl; rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
  rewrite <- sin_period with (k := Pos.to_nat k).
  now rewrite Rminus_plus.
 Qed.
@@ -281,19 +268,15 @@ intros.
 destruct k as [| k| k].
  now rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
 
-#ifdef COQ_8_6_1
+#ifndef COQ_8_6_1
+ set (t := 2); unfold IZR; rewrite <- INR_IPR.
+#endif
  now simpl; rewrite cos_period.
-#else
- set (t := 2); unfold IZR; rewrite <- INR_IPR.
- now rewrite cos_period.
-#endif
 
-#ifdef COQ_8_6_1
- simpl; rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
-#else
+#ifndef COQ_8_6_1
  set (t := 2); unfold IZR; rewrite <- INR_IPR.
- rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
 #endif
+ simpl; rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
  rewrite <- cos_period with (k := Pos.to_nat k).
  now rewrite Rminus_plus.
 Qed.
@@ -385,12 +368,6 @@ destruct (Z_eq_dec (k mod 2) 0) as [Hk| Hk].
  simpl; rewrite <- Ropp_mult_distr_l, fold_Rminus.
  rewrite <- tan_period with (k := Pos.to_nat k).
   now rewrite Rminus_plus.
-#else
- destruct k as [| k| k]; [ easy | | ].
-  now unfold IZR; rewrite <- INR_IPR; apply tan_period.
-#endif
-
-#ifdef COQ_8_6_1
   rewrite cos_minus.
   rewrite cos_nPI, sin_nPI, Rmult_0_r, Rplus_0_r.
   intros H.
@@ -398,6 +375,8 @@ destruct (Z_eq_dec (k mod 2) 0) as [Hk| Hk].
   destruct H as [H| H]; [ easy | ].
   apply pow_nonzero in H; [ easy | lra ].
 #else
+ destruct k as [| k| k]; [ easy | | ].
+  now unfold IZR; rewrite <- INR_IPR; apply tan_period.
   unfold IZR; rewrite <- INR_IPR.
   simpl; rewrite <- Ropp_mult_distr_l, fold_Rminus.
   rewrite <- tan_period with (k := Pos.to_nat k).
@@ -780,11 +759,7 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
   destruct Hk as (m, Hm).
   rewrite Hx, Hm.
   rewrite plus_IZR, mult_IZR; simpl.
-#ifdef COQ_8_6_1
-  replace ((2 * IZR m + 1) * PI + PI / 2) with
-#else
   progress replace ((2 * IZR m + 1) * PI + PI / 2) with
-#endif
     (3 * PI / 2 + IZR m * (2 * PI)) by lra.
 #ifndef COQ_8_6_1
   subst t.
