@@ -1,5 +1,4 @@
 (* Banach-Tarski paradox. *)
-(* Coq v8.6 *)
 
 Require Import Utf8 List Relations NPeano PArith Compare_dec.
 Import ListNotations.

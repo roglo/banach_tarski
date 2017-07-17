@@ -1,5 +1,4 @@
 (* Banach-Tarski paradox. *)
-(* Coq V8.6 *)
 
 Require Import Utf8 NPeano Bool Compare_dec ZArith Psatz.
 Require Import Misc.
