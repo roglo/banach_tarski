@@ -1,4 +1,5 @@
 TARGET=Banach_Tarski.vo
+COQ_VERSION=`coqc -v | grep version | sed -e 's/^.*version //;s/[ ~].*$$//;s/\./_/g;s/^/COQ_/'`
 
 all: $(TARGET)
 
@@ -8,15 +9,23 @@ clean:
 	rm -f *.glob *.vo .*.aux
 	rm -f *.cm[iox] *.o *.cmxs *.native
 	rm -f .*.cache
+	rm -f MiscReals.v
 
 depend:
 	mv .depend .depend.bak
 	coqdep -Q . . $(FILESFORDEP) | LC_ALL=C sort > .depend
 
-.SUFFIXES: .v .vo
+.SUFFIXES: .v .vo .vp
 
 .v.vo:
 	coqc $<
+
+.vp.v:
+	@echo $@ $(COQ_VERSION)
+	@sed -e 's|//|slsl|g' $< | \
+	/lib/cpp -D$(COQ_VERSION) | \
+	sed -e 's|slsl|//|g' | \
+	grep -v '^#' > $@
 
 .PHONY: all clean depend
 

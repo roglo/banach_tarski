@@ -209,14 +209,30 @@ destruct (Z_le_dec 0 z) as [Hz| Hz].
 
  apply Z.nle_gt in Hz.
  destruct z as [| p| p]; [ easy | easy | ].
+#ifdef COQ_8_6_1
  replace (IZR (Z.neg p)) with (0 + IZR (Z.neg p)) by lra; simpl.
  rewrite fold_Rminus.
  rewrite Rminus_Int_part1.
   rewrite Int_part_small; [ | lra ].
   simpl; rewrite Int_part_INR.
   now rewrite positive_nat_Z.
+#else
+ unfold IZR.
+ replace (- IPR p) with (0 - IPR p) by lra; simpl.
+ rewrite Rminus_Int_part1.
+  rewrite Int_part_small; [ | lra ].
+  rewrite <- INR_IPR.
+  rewrite Int_part_INR.
+  rewrite positive_nat_Z.
+  now unfold Zminus.
+#endif
 
+#ifdef COQ_8_6_1
   rewrite fp_R0, frac_part_INR; lra.
+#else
+  rewrite <- INR_IPR, frac_part_INR.
+  apply base_fp.
+#endif
 Qed.
 
 Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0.
@@ -696,14 +712,19 @@ destruct n as [| n| n].
  simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
  now rewrite Nat.add_1_r, pow_1_odd.
 
- rewrite <- Pos2Z.opp_pos, <- Zopp_mult_distr_r, <- Z.opp_sub_distr.
+ replace (Z.neg n) with (- Z.pos n)%Z by apply Pos2Z.opp_pos.
+ rewrite <- Zopp_mult_distr_r, <- Z.opp_sub_distr.
  rewrite <- Zabs_N_nat, Zabs2N.inj_opp, Zabs_N_nat.
  rewrite Zabs2Nat.inj_sub; [ | lia ].
  simpl (Z.abs_nat 1); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
  rewrite <- Rpow_div_sub; [ | lra | lia ].
  rewrite pow_1, Zabs2Nat.inj_mul.
  simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+#ifdef COQ_8_6_1
  rewrite pow_1_even, Ropp_div_r; lra.
+#else
+ rewrite pow_1_even; lra.
+#endif
 Qed.
 
 Theorem Rdiv_mod : ∀ x y, y ≠ 0 → x = y * IZR (x // y) + x rmod y.
