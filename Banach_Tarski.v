@@ -1380,6 +1380,7 @@ assert (H : a² < 1).
 
           apply Rnot_le_lt in Hpvv.
           rewrite Rabs_left; [ | easy ].
+          unfold IZR; rewrite <- INR_IPR.
           now rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_involutive.
 Qed.
 
@@ -1991,6 +1992,7 @@ specialize (not_in_center_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hp'.
 split; [ now apply neg_vec_in_sphere; destruct Hp' | ].
 intros H; apply Hp'.
 apply vec_const_mul_in_D with (r := -1) in H; [ | lra ].
+unfold IZR in H; rewrite <- INR_IPR in H.
 rewrite <- vec_opp_const_mul_distr_l in H.
 rewrite vec_const_mul_1_l in H.
 now rewrite neg_vec_involutive in H.
