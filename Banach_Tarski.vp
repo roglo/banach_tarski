@@ -32,8 +32,13 @@ apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
 apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
 apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
 clear - H3 H6.
+#ifdef COQ_8_6_1
+rewrite <- Rsqr_1 in H3 at 4.
+rewrite <- Rsqr_1 in H6 at 6.
+#else
 rewrite <- Rsqr_1 in H3.
 rewrite <- Rsqr_1 in H6.
+#endif
 apply Rsqr_le_abs_0 in H3.
 apply Rsqr_le_abs_0 in H6.
 rewrite Rabs_R1 in H3, H6.
@@ -1380,7 +1385,9 @@ assert (H : a² < 1).
 
           apply Rnot_le_lt in Hpvv.
           rewrite Rabs_left; [ | easy ].
+#ifndef COQ_8_6_1
           unfold IZR; rewrite <- INR_IPR.
+#endif
           now rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_involutive.
 Qed.
 
@@ -1992,7 +1999,9 @@ specialize (not_in_center_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hp'.
 split; [ now apply neg_vec_in_sphere; destruct Hp' | ].
 intros H; apply Hp'.
 apply vec_const_mul_in_D with (r := -1) in H; [ | lra ].
+#ifndef COQ_8_6_1
 unfold IZR in H; rewrite <- INR_IPR in H.
+#endif
 rewrite <- vec_opp_const_mul_distr_l in H.
 rewrite vec_const_mul_1_l in H.
 now rewrite neg_vec_involutive in H.

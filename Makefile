@@ -9,7 +9,7 @@ clean:
 	rm -f *.glob *.vo .*.aux
 	rm -f *.cm[iox] *.o *.cmxs *.native
 	rm -f .*.cache
-	rm -f MiscReals.v MiscTrigo.v RnCountable.v
+	rm -f MiscReals.v MiscTrigo.v RnCountable.v Banach_Tarski.v
 
 depend:
 	mv .depend .depend.bak
