@@ -9,7 +9,7 @@ clean:
 	rm -f *.glob *.vo .*.aux
 	rm -f *.cm[iox] *.o *.cmxs *.native
 	rm -f .*.cache
-	rm -f MiscReals.v
+	rm -f MiscReals.v MiscTrigo.v
 
 depend:
 	mv .depend .depend.bak
@@ -23,7 +23,7 @@ depend:
 .vp.v:
 	@echo $@ $(COQ_VERSION)
 	@sed -e 's|//|slsl|g' $< | \
-	/lib/cpp -D$(COQ_VERSION) | \
+	/lib/cpp -D$(COQ_VERSION) 2>/dev/null | \
 	sed -e 's|slsl|//|g' | \
 	grep -v '^#' > $@
 
