@@ -116,6 +116,7 @@ destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx].
   rewrite Rsqr_0; unfold Rabs in Ha.
   destruct (Rcase_abs x) as [Hc| Hc].
    assert (x = -1) by lra; subst x.
+   unfold IZR; rewrite <- INR_IPR; simpl.
    rewrite <- Rsqr_neg, Rsqr_1, Rminus_diag_eq; [ | easy ].
    now rewrite sqrt_0, Rsqr_0.
 
@@ -249,9 +250,11 @@ intros.
 destruct k as [| k| k].
  now rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
 
- now simpl; rewrite sin_period.
+ set (t := 2); unfold IZR; rewrite <- INR_IPR.
+ now rewrite sin_period.
 
- simpl; rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
+ set (t := 2); unfold IZR; rewrite <- INR_IPR.
+ rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
  rewrite <- sin_period with (k := Pos.to_nat k).
  now rewrite Rminus_plus.
 Qed.
