@@ -265,9 +265,11 @@ intros.
 destruct k as [| k| k].
  now rewrite Rmult_0_r, Rmult_0_l, Rplus_0_r.
 
- now simpl; rewrite cos_period.
+ set (t := 2); unfold IZR; rewrite <- INR_IPR.
+ now rewrite cos_period.
 
- simpl; rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
+ set (t := 2); unfold IZR; rewrite <- INR_IPR.
+ rewrite <- Ropp_mult_distr_r, <- Ropp_mult_distr_l, fold_Rminus.
  rewrite <- cos_period with (k := Pos.to_nat k).
  now rewrite Rminus_plus.
 Qed.
@@ -291,8 +293,10 @@ Theorem sin_ZPI : ∀ z, sin (IZR z * PI) = 0.
 Proof.
 intros.
 destruct z as [| z| z]; simpl; [ now rewrite Rmult_0_l, sin_0 | | ].
+ unfold IZR; rewrite <- INR_IPR.
  now rewrite sin_nPI.
 
+ unfold IZR; rewrite <- INR_IPR.
  rewrite <- Ropp_mult_distr_l.
  rewrite sin_neg, sin_nPI; lra.
 Qed.
@@ -301,8 +305,10 @@ Theorem cos_ZPI : ∀ z, cos (IZR z * PI) = (-1) ^ Z.abs_nat z.
 Proof.
 intros.
 destruct z as [| z| z]; simpl; [ now rewrite Rmult_0_l, cos_0 | | ].
+ unfold IZR; rewrite <- INR_IPR.
  now rewrite cos_nPI.
 
+ unfold IZR; rewrite <- INR_IPR.
  rewrite <- Ropp_mult_distr_l.
  now rewrite cos_neg, cos_nPI.
 Qed.
@@ -342,17 +348,20 @@ destruct (Z_eq_dec (k mod 2) 0) as [Hk| Hk].
  unfold tan.
  now rewrite sin_Zperiod, cos_Zperiod.
 
- destruct k as [| k| k]; [ easy | now apply tan_period | ].
- simpl; rewrite <- Ropp_mult_distr_l, fold_Rminus.
- rewrite <- tan_period with (k := Pos.to_nat k).
-  now rewrite Rminus_plus.
+ destruct k as [| k| k]; [ easy | | ].
+  now unfold IZR; rewrite <- INR_IPR; apply tan_period.
 
-  rewrite cos_minus.
-  rewrite cos_nPI, sin_nPI, Rmult_0_r, Rplus_0_r.
-  intros H.
-  apply Rmult_integral in H.
-  destruct H as [H| H]; [ easy | ].
-  apply pow_nonzero in H; [ easy | lra ].
+  unfold IZR; rewrite <- INR_IPR.
+  simpl; rewrite <- Ropp_mult_distr_l, fold_Rminus.
+  rewrite <- tan_period with (k := Pos.to_nat k).
+   now rewrite Rminus_plus.
+
+   rewrite cos_minus.
+   rewrite cos_nPI, sin_nPI, Rmult_0_r, Rplus_0_r.
+   intros H.
+   apply Rmult_integral in H.
+   destruct H as [H| H]; [ easy | ].
+   apply pow_nonzero in H; [ easy | lra ].
 Qed.
 
 Theorem tan_ZPI : ∀ k, tan (IZR k * PI) = 0.
@@ -634,10 +643,12 @@ rewrite acos_cos, asin_cos.
 destruct (Req_dec (sin x) 0) as [| H]; [ lra | clear H ].
 rewrite <- Ropp_mult_distr_l, Rminus_opp.
 rewrite Rsign_of_neg; [ | easy ].
+set (t := 2); unfold IZR; rewrite <- INR_IPR.
 rewrite <- Ropp_mult_distr_l, Rmult_1_l.
 rewrite fold_Rminus.
 rewrite atan_tan; [ | rewrite cos_plus_PI2; lra ].
-replace (x + PI / 2 + PI / 2) with (x + PI) by lra.
+subst t.
+progress replace (x + PI / 2 + PI / 2) with (x + PI) by lra.
 rewrite Rediv_add_1; [ | apply PI_neq0 ].
 rewrite Rmod_from_ediv.
 rewrite plus_IZR; simpl (IZR 1).
@@ -692,6 +703,7 @@ rewrite Rsignp_of_pos; [ rewrite Rmult_1_l | easy ].
 unfold atan'.
 destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
  rewrite Rsign_of_neg; [ | easy ].
+ set (t := 2); unfold IZR; rewrite <- INR_IPR.
  rewrite <- Ropp_mult_distr_l, Rmult_1_l.
  apply cos_eq_0_0 in Hcz.
  destruct Hcz as (k, Hx).
@@ -714,8 +726,9 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
   destruct Hk as (m, Hm).
   rewrite Hx, Hm.
   rewrite plus_IZR, mult_IZR; simpl.
-  replace ((2 * IZR m + 1) * PI + PI / 2) with
+  progress replace ((2 * IZR m + 1) * PI + PI / 2) with
     (3 * PI / 2 + IZR m * (2 * PI)) by lra.
+  subst t.
   rewrite Rmod_add_Z; [ | lra ].
   rewrite Rmod_small; lra.
 
@@ -826,14 +839,17 @@ destruct (Req_dec (sin x) 0) as [Hsz| Hsnz].
 
  assert (H : 0 < sin x) by lra; clear Hs Hsnz; rename H into Hs.
  move Hs after Hc.
+ rewrite <- Ropp_mult_distr_l.
+ rewrite Rminus_opp.
  rewrite Rsign_of_pos; [ | easy ].
+ rewrite Rmult_1_l.
  rewrite atan_tan; [ | rewrite cos_plus_PI2; lra ].
  replace (x + PI / 2 + PI / 2) with (x + PI) by lra.
  rewrite Rediv_add_1; [ | apply PI_neq0 ].
  rewrite Rmod_from_ediv.
  rewrite plus_IZR; simpl (IZR 1).
  remember (IZR (x // PI)) as e eqn:He.
- replace (PI / 2 - -1 * (x + PI / 2 - (e + 1) * PI)) with (x - e * PI) by lra.
+ replace (PI / 2 + (x + PI / 2 - (e + 1) * PI)) with (x - e * PI) by lra.
  subst e.
  rewrite <- Rmult_assoc.
  f_equal; f_equal.
