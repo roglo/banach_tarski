@@ -74,6 +74,12 @@ apply sqrt_eq_0 in H.
  apply nonneg_plus_sqr.
 Qed.
 
+Theorem Rminus_1_mult : ∀ x, -1 * x = - (1 * x).
+Proof.
+intros.
+now rewrite Ropp_mult_distr_l.
+Qed.
+
 Theorem sin_cos_asin : ∀ x,
   -1 ≤ x ≤ 1
   → sin (asin x) = x ∧ cos (asin x) = √ (1 - x²).
@@ -95,7 +101,7 @@ destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx].
    symmetry.
    apply sqrt_diff_sqr_eq_0; [ lra | now rewrite Rsqr_1 ].
 
-   rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_div.
+   rewrite Rminus_1_mult, Rmult_1_l, Ropp_div.
    rewrite sin_neg, cos_neg.
    rewrite sin_PI2, cos_PI2.
    split; [ | easy ].
