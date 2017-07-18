@@ -21,7 +21,7 @@ depend:
 	coqc $<
 
 .vp.v:
-	@echo $< $(COQ_VERSION) '>' $@
+	@echo /lib/cpp -D$(COQ_VERSION) $< '>' $@
 	@/bin/rm -f $@
 	@sed -e 's|//|slsl|g' $< | \
 	/lib/cpp -D$(COQ_VERSION) 2>/dev/null | \
