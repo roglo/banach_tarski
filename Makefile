@@ -1,5 +1,5 @@
 TARGET=Banach_Tarski.vo
-COQ_VERSION=`coqc -v | grep version | sed -e 's/^.*version //;s/[ ~].*$$//;s/\./_/g;s/^/COQ_/'`
+COQ_VERSION=`coqc -v | grep version | sed -e 's/^.*version //;s/[ ~].*$$//;s/\./_/g;s/^/COQ_/;s/+.*$$//'`
 
 all: $(TARGET)
 
@@ -14,6 +14,9 @@ clean:
 depend:
 	mv .depend .depend.bak
 	coqdep -Q . . $(FILESFORDEP) | LC_ALL=C sort > .depend
+
+show_coq_version:
+	@echo $(COQ_VERSION)
 
 .SUFFIXES: .v .vo .vp
 
