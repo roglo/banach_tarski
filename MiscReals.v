@@ -148,10 +148,10 @@ unfold Rdiv in Hnr.
 rewrite Rmult_assoc in Hnr.
 rewrite Rinv_r in Hnr; [ | now apply not_0_INR; rewrite Nat.add_comm ].
 rewrite Rmult_1_r in Hnr.
-apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1.
- Focus 2.
+apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1. 2: {
  rewrite plus_INR; simpl.
  apply Rplus_le_lt_0_compat; [ apply pos_INR | lra ].
+}
 
  rewrite Rmult_1_l in Hr1.
  remember (r * INR (n + 1)) as x eqn:Hx.
@@ -208,14 +208,6 @@ destruct (Z_le_dec 0 z) as [Hz| Hz].
 
  apply Z.nle_gt in Hz.
  destruct z as [| p| p]; [ easy | easy | ].
-#ifdef COQ_8_6_1
- replace (IZR (Z.neg p)) with (0 + IZR (Z.neg p)) by lra; simpl.
- rewrite fold_Rminus.
- rewrite Rminus_Int_part1.
-  rewrite Int_part_small; [ | lra ].
-  simpl; rewrite Int_part_INR.
-  now rewrite positive_nat_Z.
-#else
  unfold IZR.
  replace (- IPR p) with (0 - IPR p) by lra; simpl.
  rewrite Rminus_Int_part1.
@@ -224,13 +216,13 @@ destruct (Z_le_dec 0 z) as [Hz| Hz].
   rewrite Int_part_INR.
   rewrite positive_nat_Z.
   now unfold Zminus.
-#endif
 
-#ifdef COQ_8_6_1
-  rewrite fp_R0, frac_part_INR; lra.
-#else
+
+
+
+
   rewrite <- INR_IPR, frac_part_INR; apply base_fp.
-#endif
+
 Qed.
 
 Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0.
@@ -384,7 +376,7 @@ Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
 Proof.
 intros * Hx.
 unfold Rsign, Rsignp.
-destruct (Req_dec x 0); [ lra |  ].
+destruct (Req_dec x 0); [ lra | ].
 destruct (Rle_dec 0 x); [ easy | lra ].
 Qed.
 
@@ -392,7 +384,7 @@ Theorem Rsign_of_neg : ∀ x, x < 0 → Rsign x = -1.
 Proof.
 intros * Hx.
 unfold Rsign, Rsignp.
-destruct (Req_dec x 0); [ lra |  ].
+destruct (Req_dec x 0); [ lra | ].
 destruct (Rle_dec 0 x); [ lra | easy ].
 Qed.
 
@@ -718,11 +710,11 @@ destruct n as [| n| n].
  rewrite <- Rpow_div_sub; [ | lra | lia ].
  rewrite pow_1, Zabs2Nat.inj_mul.
  simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-#ifdef COQ_8_6_1
- rewrite pow_1_even, Ropp_div_r; lra.
-#else
+
+
+
  rewrite pow_1_even; lra.
-#endif
+
 Qed.
 
 Theorem Rdiv_mod : ∀ x y, y ≠ 0 → x = y * IZR (x // y) + x rmod y.

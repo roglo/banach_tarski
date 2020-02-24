@@ -7,9 +7,9 @@ FILESFORDEP=`LC_ALL=C ls *.v`
 
 clean:
 	rm -f *.glob *.vo .*.aux
+	rm *.vok *.vos
 	rm -f *.cm[iox] *.o *.cmxs *.native
 	rm -f .*.cache
-	rm -f MiscReals.v MiscTrigo.v RnCountable.v Banach_Tarski.v
 
 depend:
 	mv .depend .depend.bak
@@ -30,7 +30,6 @@ show_coq_version:
 	/lib/cpp -D$(COQ_VERSION) 2>/dev/null | \
 	sed -e 's|slsl|//|g' | \
 	grep -v '^#' > $@
-	@chmod -w $@
 
 .PHONY: all clean depend
 

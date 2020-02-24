@@ -594,7 +594,9 @@ assert
             apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
             symmetry; apply Hhl.
 
+(*
             do 2 rewrite Nat.add_0_r.
+*)
             do 2 rewrite <- app_gr_nth_inv.
             assert (HPGnz : length PG ≠ 0).
              intros H; rewrite H in Hi.

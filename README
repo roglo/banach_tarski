@@ -5,7 +5,7 @@ Inspirations:
    - Wikipedia: Banach–Tarski paradox
    - http://people.math.umass.edu/~weston/oldpapers/banach.pdf
 
-Compilable with Coq v8.6.1 and with v8.7.
+Compilable with Coq v8.11.0
 Author: Daniel de Rauglaudre
 
 Started: Wed Jul 20 17:16:53 2016 +0200

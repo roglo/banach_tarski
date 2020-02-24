@@ -169,7 +169,9 @@ destruct (le_dec k n) as [ Hkn | Hkn ].
     apply Rplus_le_reg_l with (r := (- (1 / 3 ^ n / 3))%R).
     rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
     field_simplify; [ | apply pow_nonzero; lra ].
+(*
     rewrite Rdiv_1_r.
+*)
     apply partial_sum3_aux_le_half_pow.
      unfold Rdiv; rewrite Rmult_1_l.
      apply Rmult_le_pos; [ | lra ].
@@ -241,9 +243,9 @@ replace (2 + 1)%R with 3%R by lra.
 rewrite Rmult_plus_distr_l.
 rewrite Rmult_assoc.
 rewrite IHn.
-#ifndef COQ_8_6_1
+
 replace (1 + 1 + 1) with 3 by lra.
-#endif
+
 apply Rplus_eq_compat_l.
 rewrite Rmult_comm.
 unfold Rdiv.
@@ -280,7 +282,7 @@ rewrite Rmult_assoc, Rmult_shuffle0 in Hr2.
 rewrite <- Rmult_assoc in Hr2.
 rewrite Rinv_r in Hr2; [ | apply pow_nonzero; lra ].
 rewrite Rmult_1_l in Hr2.
-rewrite  partial_sum3_n_partial_sum3 in Hr2.
+rewrite partial_sum3_n_partial_sum3 in Hr2.
 destruct (u n); simpl in Hr2; lra.
 Qed.
 
@@ -320,16 +322,16 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
     rewrite pow_INR; simpl.
     replace (2 + 1)%R with 3%R by lra.
     replace (- 3 ^ n)%R with ((- 1) * 3 ^ n)%R by lra.
-#ifdef COQ_8_6_1
-    rewrite <- Rmult_assoc, <- Rmult_plus_distr_r.
-    fold (Rminus (r * 3) 1).
-#else
+
+
+
+
     replace (1 + 1 + 1) with 3 by lra.
     replace (3 ^ n) with (1 * 3 ^ n) at 2 by lra.
     rewrite fold_Rminus.
     rewrite <- Rmult_assoc.
     rewrite <- Rmult_minus_distr_r.
-#endif
+
     apply IHn; [ unfold partial_sum3; lra | ].
     unfold partial_sum3.
     set (x := partial_sum3_aux (S n) v 1 0) in *.

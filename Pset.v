@@ -29,6 +29,7 @@ Arguments set_union : simpl never.
 Arguments set_sub : simpl never.
 Arguments set_incl : simpl never.
 
+Declare Scope set_scope.
 Delimit Scope set_scope with S.
 
 Definition set_eq {A} (S₁ S₂ : set A) := ∀ x, x ∈ S₁ ↔ x ∈ S₂.

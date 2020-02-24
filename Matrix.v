@@ -60,6 +60,7 @@ Definition mat_const_mul k (M : matrix ℝ) :=
     (k * a₂₁ M) (k * a₂₂ M) (k * a₂₃ M)
     (k * a₃₁ M) (k * a₃₂ M) (k * a₃₃ M).
 
+Declare Scope vec_scope.
 Delimit Scope vec_scope with vec.
 
 Arguments vec_norm _%vec.
@@ -142,6 +143,7 @@ Fixpoint mat_pow M n :=
   | S n' => mat_mul M (mat_pow M n')
   end.
 
+Declare Scope mat_scope.
 Delimit Scope mat_scope with mat.
 Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
 Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.

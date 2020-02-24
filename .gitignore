@@ -3,7 +3,5 @@
 *.glob
 *.vo
 .*.cache
-MiscReals.v
-MiscTrigo.v
-RnCountable.v
-Banach_Tarski.v
+*.vok
+*.vos
