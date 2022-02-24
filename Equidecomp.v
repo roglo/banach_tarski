@@ -95,6 +95,7 @@ induction PE as [| E₁ PE]; intros.
    subst i; clear Hi Hj.
    destruct PF as [| F₁ PF].
     simpl.
+    rewrite match_id.
     intros x.
     split; intros Hx.
      destruct j; simpl in Hx.
@@ -187,6 +188,7 @@ induction PF as [| F₁ PF]; intros.
     apply length_zero_iff_nil in Hlen.
     apply length_zero_iff_nil in HlfP.
     subst PE fl; simpl.
+    do 4 rewrite match_id.
     now do 2 rewrite set_inter_empty_l.
 
     subst len.
@@ -272,6 +274,7 @@ split.
    destruct len.
     symmetry in Hlen.
     apply length_zero_iff_nil in Hlen; subst P'F; simpl.
+    do 2 rewrite match_id.
     subst fl.
     destruct gl as [| g₁ gl].
      simpl; unfold id at 2; simpl.
