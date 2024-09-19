@@ -44,7 +44,7 @@ split.
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -56,7 +56,7 @@ split.
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -68,7 +68,7 @@ split.
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -80,7 +80,7 @@ split.
    split; [ | rewrite Nat.add_succ_r; reflexivity ].
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult.
    progress repeat rewrite Rmult_1_l.
    progress repeat rewrite Rmult_0_l.
    progress repeat rewrite Rplus_0_l.
@@ -110,7 +110,7 @@ split.
    apply Rinv_neq_0_compat, pow_nonzero; lra.
 
   simpl in Hr; destruct Hr as (Hr, HN).
-  rewrite app_length, Nat.add_1_r in HN.
+  rewrite length_app, Nat.add_1_r in HN.
   rewrite <- Nat.add_succ_comm in HN.
   simpl; destruct e as (t, d).
   rewrite fold_right_app; simpl.
@@ -128,9 +128,9 @@ split.
    rewrite plus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult; lra.
+    rewrite Rinv_mult; lra.
+    rewrite Rinv_mult; lra.
 
    apply IHel; split; [ | assumption ].
    rewrite <- Hr; simpl.
@@ -145,9 +145,9 @@ split.
    rewrite minus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult; lra.
+    rewrite Rinv_mult; lra.
+    rewrite Rinv_mult; lra.
 
    apply IHel; split; [ | assumption ].
    rewrite <- Hr; simpl.
@@ -162,9 +162,9 @@ split.
    rewrite plus_IZR, minus_IZR.
    progress repeat rewrite mult_IZR.
    f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult; lra.
+    rewrite Rinv_mult; lra.
+    rewrite Rinv_mult; lra.
 
    apply IHel; split; [ | assumption ].
    rewrite <- Hr; simpl.
@@ -179,9 +179,9 @@ split.
    rewrite minus_IZR, plus_IZR.
    progress repeat rewrite mult_IZR.
    f_equal; f_equal.
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
-    rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+    rewrite Rinv_mult; lra.
+    rewrite Rinv_mult; lra.
+    rewrite Rinv_mult; lra.
 Qed.
 
 Theorem rotate_prop : ∀ p t d el el₁ el₂ e a b c,
@@ -361,7 +361,7 @@ destruct len.
  assert (Hss : (len < S len)%nat) by apply Nat.lt_succ_diag_r.
  assert (N' = S len); [ | subst N' ].
   destruct e₁ as (t₁, d₁).
-  rewrite Hel₁, app_length, Nat.add_1_r in Hu.
+  rewrite Hel₁, length_app, Nat.add_1_r in Hu.
   destruct t₁, d₁; simpl in Hu; injection Hu; intros; subst; reflexivity.
 
   rewrite <- Hlen in Hp.
@@ -371,7 +371,7 @@ destruct len.
    destruct e₁ as (t₁, d₁).
    destruct t₁, d₁; injection Hu; intros; subst; assumption.
 
-   subst; rewrite app_length, Nat.add_1_r; reflexivity.
+   subst; rewrite length_app, Nat.add_1_r; reflexivity.
 Qed.
 
 Theorem rotate_0_0_1_b_nonzero : ∀ el el₁ d,
@@ -394,14 +394,14 @@ exists a, b, c, len.
 split; [ reflexivity | clear Hv ].
 symmetry in Hlen.
 rewrite Hel in Hlen; simpl in Hlen.
-rewrite app_length, Nat.add_1_r in Hlen.
+rewrite length_app, Nat.add_1_r in Hlen.
 destruct len; [ discriminate Hlen | ].
 apply eq_add_S in Hlen; subst len.
 replace (S (length el₁)) with (length el) in Hu.
  eapply rotate_param_b_nonzero; try eassumption.
  right; split; reflexivity.
 
- subst; rewrite app_length, Nat.add_1_r; reflexivity.
+ subst; rewrite length_app, Nat.add_1_r; reflexivity.
 Qed.
 
 Theorem rotate_1_0_0_b_nonzero : ∀ el el₁ d,
@@ -424,14 +424,14 @@ exists a, b, c, len.
 split; [ reflexivity | clear Hv ].
 symmetry in Hlen.
 rewrite Hel in Hlen; simpl in Hlen.
-rewrite app_length, Nat.add_1_r in Hlen.
+rewrite length_app, Nat.add_1_r in Hlen.
 destruct len; [ discriminate Hlen | ].
 apply eq_add_S in Hlen; subst len.
 replace (S (length el₁)) with (length el) in Hu.
  eapply rotate_param_b_nonzero; try eassumption.
  left; split; reflexivity.
 
- subst; rewrite app_length, Nat.add_1_r; reflexivity.
+ subst; rewrite length_app, Nat.add_1_r; reflexivity.
 Qed.
 
 Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
