@@ -109,6 +109,8 @@ destruct Hm as (Hm, Hd).
 unfold mat_det in Hd.
 unfold mat_mul, mat_id in Hm; simpl in Hm.
 injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
+progress unfold Rsqr in His.
+progress unfold Rsqr.
 nsatz.
 Qed.
 
