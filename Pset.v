@@ -1,6 +1,6 @@
 (* Sets as A → Prop *)
 
-Require Import Utf8 List Relations NPeano Compare_dec Setoid.
+Require Import Utf8 List Relations Arith Compare_dec Setoid.
 Require Import Misc.
 
 Record set A := mkset { setp : A → Prop }.

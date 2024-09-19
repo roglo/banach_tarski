@@ -1215,6 +1215,10 @@ rewrite cos_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
+...
+(* seems not working now; trying first eliminate warnings due to
+   move to coq-8.20.0 in the other files to see if somethings goes
+   better here *)
 f_equal; nsatz.
 Qed.
 

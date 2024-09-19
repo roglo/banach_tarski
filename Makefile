@@ -7,7 +7,7 @@ FILESFORDEP=`LC_ALL=C ls *.v`
 
 clean:
 	rm -f *.glob *.vo .*.aux
-	rm *.vok *.vos
+	rm -f *.vok *.vos
 	rm -f *.cm[iox] *.o *.cmxs *.native
 	rm -f .*.cache
 

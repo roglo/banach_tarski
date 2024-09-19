@@ -1,6 +1,6 @@
 (* Banach-Tarski paradox. *)
 
-Require Import Utf8 List Relations NPeano Wf_nat Compare_dec.
+Require Import Utf8 List Relations Arith Wf_nat Compare_dec.
 Import ListNotations.
 Require Import Misc Words Normalize.
 

@@ -1,6 +1,6 @@
 (* Banach-Tarski paradox. *)
 
-Require Import Utf8 List NPeano Compare_dec Setoid.
+Require Import Utf8 List Arith Compare_dec Setoid.
 Import ListNotations.
 
 Require Import Misc Pset.
