@@ -66,7 +66,7 @@ induction n; intros.
   do 2 apply Rplus_eq_compat_l.
   rewrite <- Nat.add_succ_comm.
   unfold Rdiv; subst sn3.
-  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+  rewrite Rinv_mult.
   now do 3 rewrite Rmult_assoc.
 
   remember (3 ^ S n)%R as sn3 eqn:Hsn3.
@@ -74,7 +74,7 @@ induction n; intros.
   rewrite <- Nat.add_succ_comm.
   apply Rplus_eq_compat_l.
   unfold Rdiv; subst sn3.
-  rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+  rewrite Rinv_mult.
   now do 3 rewrite Rmult_assoc.
 Qed.
 
@@ -102,7 +102,7 @@ induction k₁; intros.
  remember (u i) as bi eqn:Hbi; symmetry in Hbi.
  rewrite <- Nat.add_succ_comm.
  unfold Rdiv at 7.
- rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+ rewrite Rinv_mult.
  rewrite <- Rmult_assoc; do 2 rewrite fold_Rdiv.
  destruct bi; [ | apply IHk₁; lra ].
  rewrite Rplus_assoc.
@@ -141,7 +141,7 @@ destruct (le_dec k n) as [ Hkn | Hkn ].
     apply pow_lt; lra.
     apply pow_nonzero; lra.
 
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult.
    apply Rmult_le_pos; [ lra | ].
    eapply Rmult_le_reg_l; [ | rewrite Rmult_0_r, Rinv_r; try lra ].
     apply pow_lt; lra.
@@ -158,7 +158,7 @@ destruct (le_dec k n) as [ Hkn | Hkn ].
   apply Rplus_le_compat_l.
   revert n.
   induction k; intros; simpl.
-   rewrite Rinv_mult_distr; [ | lra | apply pow_nonzero; lra ].
+   rewrite Rinv_mult.
    apply Rmult_le_pos; [ lra | ].
    eapply Rmult_le_reg_l; [ | rewrite Rmult_0_r, Rinv_r; try lra ].
     apply pow_lt; lra.
@@ -169,9 +169,6 @@ destruct (le_dec k n) as [ Hkn | Hkn ].
     apply Rplus_le_reg_l with (r := (- (1 / 3 ^ n / 3))%R).
     rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
     field_simplify; [ | apply pow_nonzero; lra ].
-(*
-    rewrite Rdiv_1_r.
-*)
     apply partial_sum3_aux_le_half_pow.
      unfold Rdiv; rewrite Rmult_1_l.
      apply Rmult_le_pos; [ | lra ].
@@ -180,19 +177,17 @@ destruct (le_dec k n) as [ Hkn | Hkn ].
       apply pow_nonzero; lra.
 
      unfold Rdiv.
-     rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+     rewrite Rinv_mult; lra.
      replace (1 / 3 ^ n / 3)%R with (1 / (3 ^ S n))%R.
       eapply Rle_trans; [ apply IHk | ].
-      apply Rle_Rinv.
-       apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
-
+      apply Rinv_le_contravar.
        apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
 
        apply Rmult_le_compat_l; [ lra | ].
        apply Rle_pow; [ lra | apply Nat.le_succ_diag_r ].
 
       simpl; unfold Rdiv.
-      rewrite Rinv_mult_distr; [ lra | lra | apply pow_nonzero; lra ].
+      rewrite Rinv_mult; lra.
 Qed.
 
 Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
@@ -263,19 +258,19 @@ Proof.
 intros * Hr2.
 apply Rmult_le_compat_r with (r := (3 ^ n)%R) in Hr2; [ | apply pow_le; lra ].
 rewrite Rmult_plus_distr_r in Hr2.
-rewrite Rinv_mult_distr in Hr2; [ | lra | apply pow_nonzero; lra ].
+rewrite Rinv_mult in Hr2.
 simpl in Hr2.
-rewrite Rinv_mult_distr in Hr2; [ | lra | apply pow_nonzero; lra ].
+rewrite Rinv_mult in Hr2.
 rewrite <- Rmult_assoc in Hr2.
 rewrite Rmult_assoc in Hr2.
 rewrite Rinv_l in Hr2; [ | apply pow_nonzero; lra ].
 rewrite Rmult_1_r in Hr2.
-rewrite <- Rinv_mult_distr in Hr2; [ | lra | lra ].
+rewrite <- Rinv_mult in Hr2.
 setoid_rewrite Rmult_comm in Hr2 at 2.
 rewrite partial_sum3_succ in Hr2.
 rewrite Rmult_plus_distr_l in Hr2.
 unfold Rdiv in Hr2; simpl in Hr2.
-rewrite Rinv_mult_distr in Hr2; [ | lra | apply pow_nonzero; lra ].
+rewrite Rinv_mult in Hr2.
 rewrite <- Rmult_assoc, Rmult_shuffle0 in Hr2.
 rewrite <- Rmult_assoc in Hr2.
 rewrite Rmult_assoc, Rmult_shuffle0 in Hr2.
@@ -344,11 +339,8 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
     rewrite Rmult_1_r.
     rewrite Rmult_plus_distr_r.
     rewrite fold_Rdiv.
-    rewrite <- Rinv_mult_distr; [ | | lra ].
+    rewrite <- Rinv_mult.
      now rewrite <- Rmult_assoc in Hr2; rewrite Rmult_shuffle0.
-
-     apply Rmult_integral_contrapositive.
-     split; [ lra | apply pow_nonzero; lra ].
 
     remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
     simpl; rewrite Nat.mul_0_r, Nat.add_0_l.
@@ -363,11 +355,8 @@ assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%R).
     rewrite Rmult_1_r.
     rewrite Rmult_plus_distr_r.
     rewrite fold_Rdiv.
-    rewrite <- Rinv_mult_distr; [ | | lra ].
+    rewrite <- Rinv_mult.
      now rewrite <- Rmult_assoc in Hr2; rewrite Rmult_shuffle0.
-
-     apply Rmult_integral_contrapositive.
-     split; [ lra | apply pow_nonzero; lra ].
      now apply le_partial_sum3_lt_n_partial_sum3.
 Qed.
 
@@ -466,7 +455,7 @@ assert (Hb : bound E).
         rewrite Rmult_1_r in H1.
         unfold Rdiv in H1.
         rewrite Rmult_assoc in H1.
-        rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
+        rewrite <- Rinv_mult in H1.
         replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
         fold (Rdiv 1 (3 ^ S n)) in H1.
         specialize (Hr3 (S n)).
@@ -488,7 +477,7 @@ assert (Hb : bound E).
         rewrite Rinv_r in H1; [ | apply pow_nonzero; lra ].
         rewrite Rmult_1_r in H1.
         unfold Rdiv in H1; rewrite Rmult_1_l in H1.
-        rewrite <- Rinv_mult_distr in H1; [ | lra | apply pow_nonzero; lra ].
+        rewrite <- Rinv_mult in H1.
         replace (3 * 3 ^ n)%R with (3 ^ S n)%R in H1 by easy.
         specialize (partial_sum3_upper_bound u (S n)); intros H.
         apply Hr4 in H.
@@ -497,15 +486,12 @@ assert (Hb : bound E).
         simpl in H1, H.
         unfold Rdiv in H.
         rewrite Rmult_0_l, Rplus_0_r in H.
-        rewrite Rinv_mult_distr in H; [ | lra | ].
+        rewrite Rinv_mult in H.
          set (s := partial_sum3 u n) in H1, H.
          set (t := (/ (3 * 3 ^ n))%R) in H1, H.
          enough (0 < t)%R by lra; subst t.
          apply Rinv_0_lt_compat.
          apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
-
-         apply Rmult_integral_contrapositive.
-         split; [ lra | apply pow_nonzero; lra ].
 
         apply Rlt_le.
         apply Rinv_0_lt_compat.
