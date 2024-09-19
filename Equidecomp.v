@@ -64,7 +64,7 @@ induction PE as [| E₁ PE]; intros.
  destruct fl as [| f₁ fl]; [ easy | ].
  simpl in HlfP; apply Nat.succ_inj in HlfP; simpl.
  destruct (lt_dec i (length PF)) as [Hi| Hi].
-  rewrite app_nth1; [| now rewrite map_length ].
+  rewrite app_nth1; [| now rewrite length_map ].
   rewrite Nat.div_small; [ simpl | easy ].
   rewrite Nat.mod_small; [ simpl | easy ].
   intros x; clear - HlfP Hf.
@@ -85,8 +85,8 @@ induction PE as [| E₁ PE]; intros.
     now apply IHPF.
 
   apply Nat.nlt_ge in Hi.
-  rewrite app_nth2; [| now rewrite map_length ].
-  rewrite map_length.
+  rewrite app_nth2; [| now rewrite length_map ].
+  rewrite length_map.
   remember (i - length PF)%nat as j eqn:Hj.
   assert (H : (i = j + length PF)%nat).
    rewrite Hj.
@@ -108,7 +108,7 @@ induction PE as [| E₁ PE]; intros.
      rewrite Hf in Hx; [ | now left ].
      now rewrite set_inter_empty_r in Hx.
 
-    rewrite nat_mod_add_once; [ | easy ].
+    rewrite nat_mod_add_once.
     rewrite nat_div_add_once; [ | easy ].
     apply IHPE; [ easy | ].
     intros f Hfi.
@@ -174,13 +174,13 @@ induction PF as [| F₁ PF]; intros.
      intros f Hfi.
      now apply Hf; right.
 
-   rewrite map_length, combine_length, Nat.min_l; [ easy | ].
+   rewrite length_map, length_combine, Nat.min_l; [ easy | ].
    now rewrite HlfP.
 
   apply Nat.nlt_ge in Hi.
   rewrite app_nth2.
    rewrite IHPF; [ | easy | easy ].
-   rewrite map_length, combine_length, Nat.min_l; [ | now rewrite HlfP ].
+   rewrite length_map, length_combine, Nat.min_l; [ | now rewrite HlfP ].
    rewrite HlfP in Hi.
    remember (length PE) as len eqn:Hlen; symmetry in Hlen.
    destruct (eq_nat_dec len 0) as [Hzl| Hnzl].
@@ -193,7 +193,7 @@ induction PF as [| F₁ PF]; intros.
 
     subst len.
     generalize Hi; intros H.
-    apply Nat.div_le_mono with (c := length PE) in H; [ | easy ].
+    apply Nat.Div0.div_le_mono with (c := length PE) in H.
     rewrite Nat.div_same in H; [ | easy ].
     remember (i / length PE) as j eqn:Hj; symmetry in Hj.
     destruct j; [ now apply Nat.le_0_r in H | ].
@@ -201,12 +201,12 @@ induction PF as [| F₁ PF]; intros.
     remember (i - length PE) as k eqn:Hk.
     assert (i = k + length PE) by (now subst k; rewrite Nat.sub_add).
     subst i; clear Hk.
-    rewrite nat_mod_add_once; [ | easy ].
+    rewrite nat_mod_add_once.
     rewrite nat_div_add_once in Hj; [ | easy ].
     apply Nat.succ_inj in Hj.
     now rewrite Hj.
 
-   rewrite map_length, combine_length, Nat.min_l; [ easy | ].
+   rewrite length_map, length_combine, Nat.min_l; [ easy | ].
    now rewrite HlfP.
 Qed.
 
@@ -304,7 +304,7 @@ split.
         rewrite app_gr_empty_set.
         apply set_inter_empty_r.
 
-        now rewrite map_length.
+        now rewrite length_map.
 
        apply Nat.nlt_ge in Hil.
        rewrite Hlen3 in Hil.
@@ -315,7 +315,7 @@ split.
      rewrite HPEI; [ | easy ].
      now do 2 rewrite set_inter_empty_l.
 
-   now subst fl; rewrite map_length.
+   now subst fl; rewrite length_map.
 
    subst fl.
    intros f Hf.
@@ -323,7 +323,7 @@ split.
    destruct Hf as (g & Hg & Hix).
    subst f; apply app_gr_empty_set.
 
-  now subst fl; rewrite map_length.
+  now subst fl; rewrite length_map.
 
   subst fl.
   intros f Hf.
@@ -420,7 +420,7 @@ apply partition_combine_partition_combine_swi.
 eapply partition_combine_is_partition with (F := F) (PF := PF); eassumption.
 Qed.
 
-Theorem partition_combine_length :
+Theorem partition_length_combine :
   ∀ A fl (PE PF : list (set A)),
   length fl = length PE
   → length (partition_combine fl PE PF) = (length PE * length PF)%nat.
@@ -436,7 +436,7 @@ destruct PF as [| F₁ FL].
  induction (combine fl PE) as [| (x, y) l]; [ easy | apply IHl ].
 
  simpl in Hlen; simpl; f_equal.
- rewrite app_length, map_length.
+ rewrite length_app, length_map.
  apply Nat.succ_inj in Hlen.
  apply IHPE with (PF := F₁ :: FL) in Hlen.
  now simpl in Hlen; rewrite Hlen.
@@ -450,7 +450,7 @@ Proof.
 intros * Hlen.
 pose proof partition_combine_swi_is_permutation _ fl PE PF as H.
 apply Permutation_length in H.
-now rewrite H; apply partition_combine_length.
+now rewrite H; apply partition_length_combine.
 Qed.
 
 Require Import Setoid.
@@ -558,8 +558,8 @@ assert
      apply Forall_forall.
      intros (U, V) HUV.
      apply In_nth with (d := (∅, ∅)) in HUV.
-     rewrite combine_length in HUV.
-     rewrite partition_combine_length in HUV.
+     rewrite length_combine in HUV.
+     rewrite partition_length_combine in HUV.
       rewrite partition_combine_swi_length in HUV.
        rewrite <- Hlen1, Hlen2, Nat.mul_comm in HUV.
        rewrite Nat.min_l in HUV; [ | easy ].
@@ -597,9 +597,6 @@ assert
             apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
             symmetry; apply Hhl.
 
-(*
-            do 2 rewrite Nat.add_0_r.
-*)
             do 2 rewrite <- app_gr_nth_inv.
             assert (HPGnz : length PG ≠ 0).
              intros H; rewrite H in Hi.
@@ -613,13 +610,13 @@ assert
               rewrite app_gr_app_gr_inv.
               now rewrite app_gr_inv_app_gr.
 
-              rewrite map_length, Hlen4.
+              rewrite length_map, Hlen4.
               now apply Nat.mod_upper_bound.
 
-              now rewrite Hlen3; apply Nat.div_lt_upper_bound.
+              now rewrite Hlen3; apply Nat.Div0.div_lt_upper_bound.
 
-              rewrite map_length, Hlen3.
-              now apply Nat.div_lt_upper_bound.
+              rewrite length_map, Hlen3.
+              now apply Nat.Div0.div_lt_upper_bound.
 
               rewrite Hlen4.
               now apply Nat.mod_upper_bound.
@@ -628,41 +625,41 @@ assert
            replace Datatypes.id with (@id (set vector)) by easy.
            now rewrite map_map.
 
-          now rewrite map_length.
+          now rewrite length_map.
 
           intros f Hif.
           clear -Hif.
           induction hl as [| h₁ hl]; [ easy | ].
           destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHhl ].
 
-         now rewrite map_length.
+         now rewrite length_map.
 
          intros f Hif.
          clear -Hif.
          induction gl as [| g₁ gl]; [ easy | ].
          destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHgl ].
 
-        rewrite partition_combine_length.
+        rewrite partition_length_combine.
          rewrite partition_combine_swi_length.
           rewrite Hlen1, Hlen2.
           apply Nat.mul_comm.
 
-          now subst h'l; rewrite map_length.
+          now subst h'l; rewrite length_map.
 
-         now subst g'l; rewrite map_length.
+         now subst g'l; rewrite length_map.
 
-       now rewrite Hh'l, map_length.
+       now rewrite Hh'l, length_map.
 
-      now rewrite Hg'l, map_length.
+      now rewrite Hg'l, length_map.
 
-     rewrite partition_combine_length.
+     rewrite partition_length_combine.
       rewrite partition_combine_swi_length.
        rewrite Hlen1, Hlen2.
        apply Nat.mul_comm.
 
-       now subst h'l; rewrite map_length.
+       now subst h'l; rewrite length_map.
 
-       now subst g'l; rewrite map_length.
+       now subst g'l; rewrite length_map.
 Qed.
 
 Add Parametric Relation : (set vector) equidecomposable
