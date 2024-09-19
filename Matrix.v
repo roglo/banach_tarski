@@ -1215,11 +1215,8 @@ rewrite cos_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
-(* seems not working now; trying first eliminate warnings due to
-   move to coq-8.20.0 in the other files to see if somethings goes
-   better here *)
-f_equal. (* creating 9 goals *)
-...
+progress unfold Rsqr in Ha.
+progress unfold Rsqr.
 f_equal; nsatz.
 Qed.
 
@@ -1499,14 +1496,13 @@ rewrite Rabs_R1 in H.
 unfold Rabs in H.
 destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
  right; clear Ha.
- f_equal.
-...
+ progress unfold Rsqr in Hu, Hv.
  f_equal; nsatz.
 
  left; clear Ha.
+ progress unfold Rsqr in Hu, Hv.
  f_equal; nsatz.
 Qed.
-*)
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
