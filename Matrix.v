@@ -63,11 +63,11 @@ Definition mat_const_mul k (M : matrix ℝ) :=
 Declare Scope vec_scope.
 Delimit Scope vec_scope with vec.
 
-Arguments vec_norm _%vec.
-Arguments vec_add _%vec _%vec.
-Arguments vec_dot_mul _%vec _%vec.
-Arguments vec_cross_mul _%vec _%vec.
-Arguments vec_const_mul _%R _%vec.
+Arguments vec_norm _%_vec.
+Arguments vec_add _%_vec _%_vec.
+Arguments vec_dot_mul _%_vec _%_vec.
+Arguments vec_cross_mul _%_vec _%_vec.
+Arguments vec_const_mul _%_R _%_vec.
 
 Notation "0" := (V 0 0 0) : vec_scope.
 Notation "k ⁎ v" := (vec_const_mul k v) (at level 40).
@@ -107,7 +107,7 @@ Definition is_neg_vec '(V x y z) :=
   else if Rgt_dec z 0 then false
   else true.
 
-Arguments is_neg_vec _%vec.
+Arguments is_neg_vec _%_vec.
 
 Definition mat_of_elem e :=
   match e with
@@ -153,9 +153,9 @@ Notation "M ⁄ k" := (mat_const_mul (/ k) M) : mat_scope.
 Notation "- M" := (mat_opp M) : mat_scope.
 Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
-Arguments mat_pow M%mat n%nat.
-Arguments mat_mul M₁%mat M₂%mat.
-Arguments mat_vec_mul M%mat _%vec.
+Arguments mat_pow M%_mat n%_nat.
+Arguments mat_mul M₁%_mat M₂%_mat.
+Arguments mat_vec_mul M%_mat _%_vec.
 
 Theorem vec_eq_dec : ∀ u v : vector, { u = v } + { u ≠ v }.
 Proof.
@@ -170,7 +170,7 @@ destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
 now intros H; injection H; intros.
 Qed.
 
-Arguments vec_eq_dec _%vec _%vec.
+Arguments vec_eq_dec _%_vec _%_vec.
 
 Theorem vec_zerop : ∀ v : vector, { v = 0%vec } + { v ≠ 0%vec }.
 Proof.
@@ -419,8 +419,8 @@ Definition mat_det m :=
   a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
   a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m).
 
-Arguments mat_transp m%mat.
-Arguments mat_det m%mat.
+Arguments mat_transp m%_mat.
+Arguments mat_det m%_mat.
 
 Theorem mat_transp_id : mat_transp mat_id = mat_id.
 Proof. easy. Qed.
@@ -455,7 +455,7 @@ Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
   mat_det A = 1.
 
-Arguments is_rotation_matrix A%mat.
+Arguments is_rotation_matrix A%_mat.
 
 Theorem mat_id_is_rotation_matrix : is_rotation_matrix mat_id.
 Proof.
@@ -1088,7 +1088,7 @@ rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
 unfold Rsqr; lra.
 Qed.
 
-Arguments vec_Lagrange_identity u%vec v%vec.
+Arguments vec_Lagrange_identity u%_vec v%_vec.
 
 Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, (u · v)² ≤ ‖u‖² * ‖v‖².
 Proof.
@@ -1167,7 +1167,7 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
    rewrite sqrt_Rsqr in Ha; [ | lra ].
    assert (Hx : ∀ x, k * x / a = x / b).
     intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult_distr; [ | lra | easy ].
+    rewrite Rinv_mult.
     rewrite <- Rmult_assoc.
     progress replace (k * x * / k) with (/ k * k * x) by lra.
     rewrite Rinv_l; lra.
@@ -1180,9 +1180,9 @@ destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
    destruct (Rcase_abs k) as [H| H]; [ clear H | lra ].
    assert (Hx : ∀ x, k * x / a = - (x / b)).
     intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult_distr; [ | lra | easy ].
+    rewrite Rinv_mult.
     rewrite <- Rmult_assoc.
-    rewrite <- Ropp_inv_permute; [ | easy ].
+    rewrite Rinv_opp.
     progress replace (k * x * - / k) with (/ k * k * - x) by lra.
     rewrite Rinv_l; lra.
 
@@ -1215,10 +1215,11 @@ rewrite cos_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 rewrite sin_angle_of_sin_cos; [ | easy ].
 clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
-...
 (* seems not working now; trying first eliminate warnings due to
    move to coq-8.20.0 in the other files to see if somethings goes
    better here *)
+f_equal. (* creating 9 goals *)
+...
 f_equal; nsatz.
 Qed.
 
@@ -1342,7 +1343,7 @@ assert (H : r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2).
  unfold Rdiv.
  do 3 rewrite Rpow_mult_distr.
  rewrite <- Hrxyz; ring_simplify.
- rewrite <- Rinv_pow; [ | easy ].
+ rewrite pow_inv.
  rewrite Rinv_r; [ ring | easy ].
 Qed.
 
@@ -1498,11 +1499,14 @@ rewrite Rabs_R1 in H.
 unfold Rabs in H.
 destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
  right; clear Ha.
+ f_equal.
+...
  f_equal; nsatz.
 
  left; clear Ha.
  f_equal; nsatz.
 Qed.
+*)
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
