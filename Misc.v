@@ -22,11 +22,11 @@ replace b with (1 * b) at 1 by apply Nat.mul_1_l.
 rewrite Nat.div_add; [ apply Nat.add_1_r | easy ].
 Qed.
 
-Theorem nat_mod_add_once : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
+Theorem nat_mod_add_once : ∀ a b, (a + b) mod b = a mod b.
 Proof.
-intros a b Hb.
+intros a b.
 replace b with (1 * b) at 1 by apply Nat.mul_1_l.
-now apply Nat.mod_add.
+apply Nat.Div0.mod_add.
 Qed.
 
 Theorem neq_negb : ∀ x y, x ≠ y → x = negb y.
