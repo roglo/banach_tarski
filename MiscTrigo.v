@@ -37,7 +37,7 @@ assert (Hs : √ (1 + x²) ≠ 0).
   subst x.
   specialize (Hca (tan y)); rewrite <- Hy in Hca.
   unfold tan.
-  rewrite Rsqr_div; [ | lra ].
+  rewrite Rsqr_div_depr; [ | lra ].
   replace (cos y) with (√ (cos y)²) at 1 by (apply sqrt_Rsqr; lra).
   rewrite <- sqrt_mult_alt; [ | apply Rle_0_sqr ].
   rewrite Rmult_plus_distr_l, Rmult_1_r.
@@ -97,7 +97,7 @@ destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx].
 
    unfold IZR at 1 3; rewrite <- INR_IPR; simpl.
 
-   rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_div.
+   rewrite <- Ropp_mult_distr_l, Rmult_1_l, Rdiv_opp_l.
    rewrite sin_neg, cos_neg.
    rewrite sin_PI2, cos_PI2.
    split; [ | easy ].
@@ -154,7 +154,7 @@ destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx].
        rewrite Rmult_0_l, Rinv_l; lra.
 
        apply (f_equal Rsqr) in Hy.
-       rewrite Rsqr_div in Hy; [ | lra ].
+       rewrite Rsqr_div_depr in Hy; [ | lra ].
        rewrite Rsqr_sqrt in Hy; [ | lra ].
        apply Rmult_eq_compat_r with (r := 1 - x²) in Hy.
        unfold Rdiv in Hy; rewrite Rmult_assoc in Hy.
@@ -201,7 +201,7 @@ destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx].
            rewrite Rmult_comm, Hy.
            now rewrite Rminus_plus, sqrt_1.
 
-          rewrite Rsqr_inv; [ | lra ].
+          rewrite Rsqr_inv_depr; [ | lra ].
           rewrite Rsqr_sqrt; [ easy | lra ].
 Qed.
 
@@ -328,16 +328,15 @@ destruct z as [| z| z]; simpl; [ now rewrite Rmult_0_l, cos_0 | | ].
  now rewrite cos_neg, cos_nPI.
 Qed.
 
-Theorem tan_period : ∀ x k, cos x ≠ 0 → tan (x + INR k * PI) = tan x.
+Theorem tan_period : ∀ x k, tan (x + INR k * PI) = tan x.
 Proof.
-intros * Hcz.
+intros.
 destruct (eq_nat_dec (k mod 2) 0) as [Hk| Hk].
- apply Nat.mod_divides in Hk; [ | easy ].
+ apply Nat.Div0.mod_divides in Hk.
  destruct Hk as (c, Hc); subst k.
  rewrite mult_INR; simpl.
  unfold tan.
  now rewrite sin_period, cos_period.
-
  destruct k; [ easy | ].
  rewrite S_INR.
  rewrite Rmult_plus_distr_r.
@@ -349,13 +348,13 @@ destruct (eq_nat_dec (k mod 2) 0) as [Hk| Hk].
  do 2 rewrite Rmult_0_r.
  rewrite Rplus_0_r, Rminus_0_r.
  do 2 rewrite Ropp_mult_distr_r.
- rewrite Rdiv_mult_simpl_r; [ easy | easy | ].
+ rewrite Rdiv_mult_simpl_r; [ easy | ].
  clear; induction k; simpl; lra.
 Qed.
 
-Theorem tan_Zperiod : ∀ x k, cos x ≠ 0 → tan (x + IZR k * PI) = tan x.
+Theorem tan_Zperiod : ∀ x k, tan (x + IZR k * PI) = tan x.
 Proof.
-intros * Hcz.
+intros.
 destruct (Z.eq_dec (k mod 2) 0) as [Hk| Hk].
  apply Zdiv.Zmod_divides in Hk; [ | easy ].
  destruct Hk as (c, Hc); subst k.
@@ -368,21 +367,12 @@ destruct (Z.eq_dec (k mod 2) 0) as [Hk| Hk].
   simpl; rewrite <- Ropp_mult_distr_l, fold_Rminus.
   rewrite <- tan_period with (k := Pos.to_nat k).
    now rewrite Rminus_plus.
-
-   rewrite cos_minus.
-   rewrite cos_nPI, sin_nPI, Rmult_0_r, Rplus_0_r.
-   intros H.
-   apply Rmult_integral in H.
-   destruct H as [H| H]; [ easy | ].
-   apply pow_nonzero in H; [ easy | lra ].
-
 Qed.
 
 Theorem tan_ZPI : ∀ k, tan (IZR k * PI) = 0.
 Proof.
 intros.
-assert (Hc : cos 0 ≠ 0) by (rewrite cos_0; lra).
-specialize (tan_Zperiod 0 k Hc) as H.
+specialize (tan_Zperiod 0 k) as H.
 now rewrite Rplus_0_l, tan_0 in H.
 Qed.
 
@@ -452,8 +442,7 @@ Proof.
 intros * Hc.
 assert (Hcp : cos (x + PI) < 0) by (rewrite neg_cos; lra).
 specialize (neg_cos_atan_tan (x + PI) Hcp) as H.
-assert (Hcz : cos x ≠ 0) by lra.
-specialize (tan_period x 1 Hcz) as Ht.
+specialize (tan_period x 1) as Ht.
 simpl (INR _) in Ht.
 rewrite Rmult_1_l in Ht.
 rewrite Rplus_shuffle0 in H.
@@ -494,7 +483,7 @@ destruct (Req_dec (cos x) 0) as [Haz| Haz].
    unfold Rdiv.
    rewrite Rsignp_of_neg; [ | easy ].
    destruct (Rle_dec 0 (cos x)); [ lra | ].
-   rewrite <- Ropp_inv_permute; [ | lra ].
+   rewrite Rinv_opp.
    rewrite <- Ropp_mult_distr_r.
    rewrite fold_Rdiv.
    fold (tan x); rewrite atan_opp; lra.
@@ -689,7 +678,7 @@ rewrite Z.add_0_r in Hk.
 unfold Rediv, fst, Rediv_mod.
 destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
 rewrite Rmult_comm in Hk.
-rewrite <- Rdiv_div in Hk; [ | lra | lra ].
+rewrite <- Rdiv_div in Hk.
 remember (x / PI) as y eqn:Hy.
 apply Rmult_eq_compat_r with (r := PI) in Hy.
 rewrite Rmult_div_same in Hy; [ | lra ].
@@ -780,15 +769,15 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
  f_equal.
  replace ((x + PI / 2) / PI) with ((2 * x + PI) / (2 * PI)).
   rewrite Rdiv_plus_distr.
-  rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
+  rewrite Rdiv_mult_simpl_l; [ | lra ].
   replace PI with (1 * PI) at 3 by lra.
-  rewrite Rdiv_mult_simpl_r; [ | lra | lra ].
+  rewrite Rdiv_mult_simpl_r; [ | lra ].
   unfold Rmod, snd, Rediv_mod in Hc.
   destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
   replace (2 * PI) with (PI * 2) in Hc at 1 by lra.
   replace (2 * PI) with (PI * 2) by lra.
-  rewrite <- Rdiv_div in Hc; [ | lra | lra ].
-  rewrite <- Rdiv_div; [ | lra | lra ].
+  rewrite <- Rdiv_div in Hc.
+  rewrite <- Rdiv_div.
   remember (x / PI) as y eqn:Hy.
   replace x with (y * PI) in Hc by (subst y; rewrite Rmult_div_same; lra).
   clear x Hy; rename y into x.
@@ -818,9 +807,9 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
    apply Int_part_small; lra.
 
   do 2 rewrite Rdiv_plus_distr.
-  rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
+  rewrite Rdiv_mult_simpl_l; [ | lra ].
   f_equal.
-  rewrite Rdiv_div; [ easy | lra | lra ].
+  now rewrite Rdiv_div.
 Qed.
 
 Theorem pos_sin_neg_cos_acos_cos : ∀ x,
@@ -896,7 +885,7 @@ destruct (Req_dec (sin x) 0) as [Hsz| Hsnz].
  unfold Rediv, fst, Rediv_mod.
  destruct (Rcase_abs PI) as [HP| HP]; [ lra | clear HP ].
  rewrite Rmult_comm in Hk.
- rewrite <- Rdiv_div in Hk; [ | lra | lra ].
+ rewrite <- Rdiv_div in Hk.
  remember (x / PI) as y eqn:Hy.
  apply Rmult_eq_compat_r with (r := PI) in Hy.
  rewrite Rmult_div_same in Hy; [ | lra ].
@@ -909,7 +898,8 @@ destruct (Req_dec (sin x) 0) as [Hsz| Hsnz].
  destruct Hp as (H1, H2).
  replace (PI / 2) with (1 / 2 * PI) in H1 at 1 by lra.
  apply Rmult_lt_reg_r in H1; [ | lra ].
- replace PI with (1 * PI) in H2 at 2 by lra.
+ 
+replace PI with (1 * PI) in H2 at 2 by lra.
  apply Rmult_lt_reg_r in H2; lra.
 Qed.
 
@@ -975,15 +965,15 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
   f_equal.
   replace ((x + PI / 2) / PI) with ((2 * x + PI) / (2 * PI)).
    rewrite Rdiv_plus_distr.
-   rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
+   rewrite Rdiv_mult_simpl_l; [ | lra ].
    replace PI with (1 * PI) at 2 by lra.
-   rewrite Rdiv_mult_simpl_r; [ | lra | lra ].
+   rewrite Rdiv_mult_simpl_r; [ | lra ].
    unfold Rmod, snd, Rediv_mod in Hc.
    destruct (Rcase_abs (2 * PI)) as [| H]; [ lra | clear H ].
    replace (2 * PI) with (PI * 2) in Hc at 1 by lra.
    replace (2 * PI) with (PI * 2) by lra.
-   rewrite <- Rdiv_div in Hc; [ | lra | lra ].
-   rewrite <- Rdiv_div; [ | lra | lra ].
+   rewrite <- Rdiv_div in Hc.
+   rewrite <- Rdiv_div.
    remember (x / PI) as y eqn:Hy.
    replace x with (y * PI) in Hc by (subst y; rewrite Rmult_div_same; lra).
    clear x Hy; rename y into x.
@@ -1016,9 +1006,9 @@ destruct (Req_dec (cos x) 0) as [Hcz| Hcz].
     destruct (Rlt_dec (frac_part x) (1 / 2)); lra.
 
    do 2 rewrite Rdiv_plus_distr.
-   rewrite Rdiv_mult_simpl_l; [ | lra | lra ].
+   rewrite Rdiv_mult_simpl_l; [ | lra ].
    f_equal.
-   rewrite Rdiv_div; [ easy | lra | lra ].
+   now rewrite Rdiv_div.
 Qed.
 
 Theorem angle_of_sin_cos_inv : ∀ x,
