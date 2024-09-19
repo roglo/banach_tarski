@@ -1,12 +1,15 @@
+#OVERVIEW
 Banach-Tarski paradox.
 
-Inspirations:
+INSPIRATIONS
    - Stan Wagon: The Banach-Tarski Paradox, Cambridge University Press
    - Wikipedia: Banach–Tarski paradox
    - http://people.math.umass.edu/~weston/oldpapers/banach.pdf
 
-Compilable with Coq v8.14
-Author: Daniel de Rauglaudre
+AUTHOR
+Daniel de Rauglaudre
 
-Started: Wed Jul 20 17:16:53 2016 +0200
-Proof completed: Tue Apr 11 11:08:19 2017 +0200.
+COQ VERSION
+  $ coqtop -v
+  The Coq Proof Assistant, version 8.14.1
+  compiled with OCaml 4.13.1
