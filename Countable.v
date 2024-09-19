@@ -56,13 +56,13 @@ unfold Z_of_nat_surj, Z_to_nat_inj.
 destruct (Z_lt_dec k 0) as [Hk | Hk].
  rewrite Z2Nat.inj_sub; [ simpl | easy ].
  unfold Pos.to_nat; simpl.
- rewrite <- nat_mod_add_once; [ | easy ].
+ rewrite <- nat_mod_add_once.
  rewrite <- Nat.add_sub_swap.
   rewrite <- Nat.add_sub_assoc; [ simpl | lia ].
   rewrite Z2Nat.inj_mul; [ simpl | lia | easy ].
   unfold Pos.to_nat; simpl.
   rewrite Nat.add_comm.
-  rewrite Nat.mod_add; [ simpl | easy ].
+  rewrite Nat.Div0.mod_add.
   rewrite <- Nat.sub_succ_l.
    rewrite Nat.sub_succ, Nat.sub_0_r.
    rewrite Nat.div_mul; [ | easy ].
@@ -90,7 +90,7 @@ destruct (Z_lt_dec k 0) as [Hk | Hk].
  apply Z.le_ngt in Hk.
  rewrite Z2Nat.inj_mul; [ simpl | easy | easy ].
  unfold Pos.to_nat; simpl.
- rewrite Nat.mod_mul; [ simpl | easy ].
+ rewrite Nat.Div0.mod_mul.
  rewrite Nat.div_mul; [ | easy ].
  now rewrite Z2Nat.id.
 Qed.
