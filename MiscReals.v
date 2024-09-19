@@ -511,8 +511,7 @@ intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
 destruct (Rcase_abs y) as [Hy| Hy].
  unfold Rdiv.
-...
- rewrite <- Ropp_inv_permute; [ | lra ].
+ rewrite Rinv_opp.
  rewrite <- Ropp_mult_distr_r.
  rewrite Rmult_plus_distr_r.
  rewrite Rinv_r; [ | lra ].
@@ -669,7 +668,7 @@ Theorem frac_part_double : ∀ x,
     2 * frac_part x - if Rlt_dec (frac_part x) (1 / 2) then 0 else 1.
 Proof.
 intros.
-do 2 rewrite double.
+do 2 rewrite <- Rplus_diag.
 destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx].
  rewrite Rminus_0_r; apply plus_frac_part2; lra.
 
