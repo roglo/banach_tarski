@@ -11,5 +11,7 @@ Daniel de Rauglaudre
 
 COQ VERSION
   $ coqtop -v
-  The Coq Proof Assistant, version 8.14.1
+  The Coq Proof Assistant, version 8.20.0
   compiled with OCaml 4.13.1
+
+(work to compile with coq 8.20.0 in progress)

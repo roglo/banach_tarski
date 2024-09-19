@@ -1,6 +1,10 @@
 (* Banach-Tarski paradox. *)
 
-Require Import Utf8 List Relations NPeano PArith Compare_dec.
+(*
+Require Import Utf8 List Relations PArith Compare_dec.
+*)
+Require Import Utf8 Arith List.
+(**)
 Import ListNotations.
 
 Arguments Nat.div : simpl never.
@@ -183,6 +187,8 @@ Theorem bool_dec_negb_r : ∀ b,
   Bool.bool_dec b (negb b) =
   right (if b return _ then true_neq_negb_true else false_neq_negb_false).
 Proof. intros b; now destruct b. Qed.
+
+...
 
 Theorem Forall2_sym : ∀ A (R : A → A → Prop) l1 l2,
  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
