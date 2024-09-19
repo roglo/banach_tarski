@@ -7,14 +7,14 @@ Require Import Misc Words MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr.
 
 Definition transl d (E : set vector) := mkset (λ v, (v - d)%vec ∈ E).
-Arguments transl d%vec E%S.
+Arguments transl d%_vec E%_S.
 
 Inductive Gr :=
   | Rot : ∀ M, is_rotation_matrix M → Gr
   | Transl : vector → Gr
   | Comb : Gr → Gr → Gr.
 
-Arguments Transl _%vec.
+Arguments Transl _%_vec.
 
 Fixpoint app_gr f p :=
   match f with
