@@ -134,7 +134,7 @@ destruct len.
   rewrite <- rev_path_app.
   apply IHlen with (m := length (el₁ ++ el₂)); [ | easy ].
   rewrite <- Hlen, H; simpl.
-  do 2 rewrite app_length; simpl.
+  do 2 rewrite length_app; simpl.
   apply Nat.add_lt_mono_l.
   etransitivity; eapply Nat.lt_succ_diag_r.
 Qed.
@@ -158,11 +158,11 @@ destruct (norm_list_dec (el₁ ++ el₂)) as [H₁| H₁].
  destruct Hn; now subst el₁ el₂.
 
  destruct H₁ as (el₃ & t & d & el₄ & H₁).
- rewrite H₁, app_length, Nat.add_comm in Hlen.
+ rewrite H₁, length_app, Nat.add_comm in Hlen.
  destruct len; [ easy | ].
  destruct len; [ easy | simpl in Hlen ].
  do 2 apply -> Nat.succ_inj_wd in Hlen.
- rewrite Nat.add_comm, <- app_length in Hlen.
+ rewrite Nat.add_comm, <- length_app in Hlen.
  assert (H₂ : len < S (S len)).
   transitivity (S len); apply Nat.lt_succ_diag_r.
 
@@ -187,7 +187,7 @@ Proof.
 intros.
 induction el as [| e el]; [ easy | simpl ].
 rewrite rev_path_cons, rev_path_single.
-rewrite app_length; simpl.
+rewrite length_app; simpl.
 now rewrite Nat.add_1_r, IHel.
 Qed.
 
@@ -248,7 +248,7 @@ Proof.
 intros * Hn Hr.
 destruct el as [| e₁ el]; [ easy | exfalso ].
 destruct (zerop (length el mod 2)) as [Hel| Hel].
- apply Nat.mod_divides in Hel; [ | easy ].
+ apply Nat.Div0.mod_divides in Hel.
  destruct Hel as (c, Hc).
   assert (Hlt : (c < length (e₁ :: el))%nat).
    simpl; rewrite Hc; simpl.
@@ -272,7 +272,7 @@ destruct (zerop (length el mod 2)) as [Hel| Hel].
  assert (He : (length (e₁ :: el) mod 2 = 0)%nat).
   simpl.
   rewrite <- Nat.add_1_r.
-  rewrite <- Nat.add_mod_idemp_l; [ | easy ].
+  rewrite <- Nat.Div0.add_mod_idemp_l.
   remember (length el mod 2) as m eqn:Hm.
   destruct m; [ easy | ].
   destruct m; [ easy | ].
@@ -282,7 +282,7 @@ destruct (zerop (length el mod 2)) as [Hel| Hel].
   do 2 apply Nat.succ_lt_mono in H.
   now apply Nat.nlt_0_r in H.
 
-  apply Nat.mod_divides in He; [ | easy ].
+  apply Nat.Div0.mod_divides in He.
   destruct He as (c, Hc).
   destruct c; [ easy | ].
   assert (Hlt : (S c < length (e₁ :: el))%nat).
