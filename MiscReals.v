@@ -44,12 +44,12 @@ Proof. intros; lra. Qed.
 Theorem Rminus_opp : ∀ x y, x - - y = x + y.
 Proof. intros; lra. Qed.
 
-Theorem Ropp_div_r : ∀ x y, y ≠ 0 → x / - y = - (x / y).
+Theorem Ropp_div_r : ∀ x y, x / - y = - (x / y).
 Proof.
-intros * Hy.
+intros.
 unfold Rdiv.
-rewrite <- Ropp_inv_permute; [ | easy ].
-now rewrite <- Ropp_mult_distr_r.
+rewrite Rinv_opp.
+symmetry; apply Ropp_mult_distr_r.
 Qed.
 
 Theorem Rmult_div_same : ∀ x y, y ≠ 0 → x / y * y = x.
@@ -76,25 +76,23 @@ Qed.
 
 Theorem Rdiv_mult_simpl_l : ∀ x y z,
   x ≠ 0
-  → z ≠ 0
   → (x * y) / (x * z) = y / z.
 Proof.
-intros * Hx Hz.
+intros * Hx.
 unfold Rdiv.
-rewrite Rinv_mult_distr; [ | easy | easy ].
+rewrite Rinv_mult.
 rewrite <- Rmult_assoc.
 f_equal; rewrite Rmult_shuffle0.
 rewrite Rinv_r; [ | easy ].
-now rewrite Rmult_1_l.
+apply Rmult_1_l.
 Qed.
 
 Theorem Rdiv_mult_simpl_r : ∀ x y z,
-  y ≠ 0
-  → z ≠ 0
+  z ≠ 0
   → (x * z) / (y * z) = x / y.
 Proof.
-intros * Hy Hz.
-specialize (Rdiv_mult_simpl_l z x y Hz Hy) as H.
+intros * Hz.
+specialize (Rdiv_mult_simpl_l z x y Hz) as H.
 rewrite <- H.
 f_equal; lra.
 Qed.
@@ -332,11 +330,11 @@ Qed.
 Theorem Rminus_plus : ∀ x y, x - y + y = x.
 Proof. intros; lra. Qed.
 
-Theorem Rdiv_div : ∀ x y z, y ≠ 0 → z ≠ 0 → x / y / z = x / (y * z).
+Theorem Rdiv_div : ∀ x y z, x / y / z = x / (y * z).
 Proof.
-intros * Hy Hz.
+intros.
 unfold Rdiv.
-rewrite Rinv_mult_distr; [ lra | easy | easy ].
+rewrite Rinv_mult; lra.
 Qed.
 
 Theorem Rmult_div_r : ∀ x y, y ≠ 0 → y * (x / y) = x.
@@ -513,6 +511,7 @@ intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
 destruct (Rcase_abs y) as [Hy| Hy].
  unfold Rdiv.
+...
  rewrite <- Ropp_inv_permute; [ | lra ].
  rewrite <- Ropp_mult_distr_r.
  rewrite Rmult_plus_distr_r.
@@ -657,7 +656,7 @@ Proof.
 intros.
 unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (y * z)) as [Hyz| Hyz]; [ | now rewrite Z.add_0_r ].
-rewrite Ropp_div_r; [ | lra ].
+rewrite Ropp_div_r.
 rewrite Int_part_neg.
 rewrite Z.opp_sub_distr.
 rewrite Z.opp_involutive.
@@ -682,7 +681,7 @@ Theorem Int_part_double : ∀ x,
     (2 * Int_part x + if Rlt_dec (frac_part x) (1 / 2) then 0 else 1)%Z.
 Proof.
 intros.
-rewrite double.
+rewrite <- Rplus_diag.
 destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx].
  rewrite plus_Int_part2; [ lia | lra ].
 
