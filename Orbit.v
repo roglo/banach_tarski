@@ -60,16 +60,17 @@ revert H₆.
 rewrite <- rotate_vec_mul.
 apply Hnf.
 intros H.
-apply norm_list_app_is_nil in H.
- rewrite H₄, H₂ in H.
- apply rev_path_eq_eq in H.
- rewrite rev_path_involutive, rev_path_app in H.
- apply not_eq_sym in Hd.
- now injection H.
-
- now rewrite norm_list_idemp.
-
- now rewrite norm_list_idemp.
+apply norm_list_app_is_nil in H. {
+  rewrite H₄, H₂ in H.
+  apply rev_path_eq_eq in H.
+  rewrite rev_path_involutive, rev_path_app in H.
+  apply not_eq_sym in Hd.
+  now injection H.
+} {
+  now rewrite norm_list_idemp.
+} {
+  now rewrite norm_list_idemp.
+}
 Qed.
 
 Definition orbit_selector := choice_function same_orbit.
@@ -80,12 +81,12 @@ Definition ball := mkset (λ '(V x y z), (x² + y² + z² <= 1)%R).
 Theorem on_sphere_norm : ∀ p r, (0 ≤ r)%R → p ∈ sphere r ↔ ‖p‖ = r.
 Proof.
 intros (x, y, z) r Hr; simpl.
-split; intros Hp.
- now rewrite Hp; apply sqrt_Rsqr.
-
- apply (f_equal Rsqr) in Hp.
- rewrite Rsqr_sqrt in Hp; [ easy | ].
- apply nonneg_sqr_vec_norm.
+split; intros Hp. {
+  now rewrite Hp; apply sqrt_Rsqr.
+}
+apply (f_equal Rsqr) in Hp.
+rewrite Rsqr_sqrt in Hp; [ easy | ].
+apply nonneg_sqr_vec_norm.
 Qed.
 
 Theorem in_its_sphere : ∀ v, v ∈ sphere ‖v‖.
@@ -123,16 +124,16 @@ intros * His Hrm.
 destruct p as (x, y, z).
 remember (V x y z) as p eqn:HP.
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
-assert (Hos : p ∈ sphere (√ r)).
- subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
- apply nonneg_sqr_vec_norm.
-
- pose proof on_sphere_after_rotation _ _ _ Hos Hrm as H.
- unfold ball in His.
- unfold sphere in H.
- unfold ball.
- subst p; simpl in *.
- now rewrite H, <- Hos.
+assert (Hos : p ∈ sphere (√ r)). {
+  subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
+  apply nonneg_sqr_vec_norm.
+}
+pose proof on_sphere_after_rotation _ _ _ Hos Hrm as H.
+unfold ball in His.
+unfold sphere in H.
+unfold ball.
+subst p; simpl in *.
+now rewrite H, <- Hos.
 Qed.
 
 Theorem in_ball_after_rotate : ∀ p e,
