@@ -31,15 +31,15 @@ rewrite Nat.mul_1_r.
 remember ((i + j) * (i + j) + j)%nat as n eqn:Hn.
 remember (Nat.sqrt n) as s eqn:Hs.
 rewrite Hn in Hs.
-rewrite nat_sqrt_add in Hs.
- rewrite Nat.add_comm in Hn.
- subst; rewrite Nat.pow_2_r.
- rewrite Nat.add_sub.
- now rewrite Nat.add_sub.
-
- simpl.
- rewrite Nat.add_0_r, Nat.add_assoc, Nat.add_comm.
- apply Nat.le_add_r.
+rewrite nat_sqrt_add in Hs. {
+  rewrite Nat.add_comm in Hn.
+  subst; rewrite Nat.pow_2_r.
+  rewrite Nat.add_sub.
+  now rewrite Nat.add_sub.
+}
+simpl.
+rewrite Nat.add_0_r, Nat.add_assoc, Nat.add_comm.
+apply Nat.le_add_r.
 Qed.
 
 Definition Z_of_nat_surj n :=
@@ -53,27 +53,27 @@ Theorem Z2Nat_bij_id : ∀ k, Z_of_nat_surj (Z_to_nat_inj k) = k.
 Proof.
 intros.
 unfold Z_of_nat_surj, Z_to_nat_inj.
-destruct (Z_lt_dec k 0) as [Hk | Hk].
- rewrite Z2Nat.inj_sub; [ simpl | easy ].
- unfold Pos.to_nat; simpl.
- rewrite <- nat_mod_add_once.
- rewrite <- Nat.add_sub_swap.
-  rewrite <- Nat.add_sub_assoc; [ simpl | lia ].
-  rewrite Z2Nat.inj_mul; [ simpl | lia | easy ].
+destruct (Z_lt_dec k 0) as [Hk | Hk]. {
+  rewrite Z2Nat.inj_sub; [ simpl | easy ].
   unfold Pos.to_nat; simpl.
-  rewrite Nat.add_comm.
-  rewrite Nat.Div0.mod_add.
-  rewrite <- Nat.sub_succ_l.
-   rewrite Nat.sub_succ, Nat.sub_0_r.
-   rewrite Nat.div_mul; [ | easy ].
-   rewrite Z2Nat.id; [ | lia ].
-   now rewrite Z.opp_involutive.
-
-   remember (Z.to_nat (- k)) as n eqn:Hn.
-   destruct n; [ | lia ].
-   apply (f_equal Z.of_nat) in Hn.
-   rewrite Z2Nat.id in Hn; lia.
-
+  rewrite <- nat_mod_add_once.
+  rewrite <- Nat.add_sub_swap. {
+    rewrite <- Nat.add_sub_assoc; [ simpl | lia ].
+    rewrite Z2Nat.inj_mul; [ simpl | lia | easy ].
+    unfold Pos.to_nat; simpl.
+    rewrite Nat.add_comm.
+    rewrite Nat.Div0.mod_add.
+    rewrite <- Nat.sub_succ_l. {
+      rewrite Nat.sub_succ, Nat.sub_0_r.
+      rewrite Nat.div_mul; [ | easy ].
+      rewrite Z2Nat.id; [ | lia ].
+      now rewrite Z.opp_involutive.
+    }
+    remember (Z.to_nat (- k)) as n eqn:Hn.
+    destruct n; [ | lia ].
+    apply (f_equal Z.of_nat) in Hn.
+    rewrite Z2Nat.id in Hn; lia.
+  }
   rewrite Z2Nat.inj_mul; [ simpl | lia | easy ].
   unfold Pos.to_nat; simpl.
   remember (- k)%Z as l eqn:Hl.
@@ -86,13 +86,13 @@ destruct (Z_lt_dec k 0) as [Hk | Hk].
   destruct n; [ | lia ].
   apply (f_equal Z.of_nat) in Hn.
   rewrite Z2Nat.id in Hn; lia.
-
- apply Z.le_ngt in Hk.
- rewrite Z2Nat.inj_mul; [ simpl | easy | easy ].
- unfold Pos.to_nat; simpl.
- rewrite Nat.Div0.mod_mul.
- rewrite Nat.div_mul; [ | easy ].
- now rewrite Z2Nat.id.
+}
+apply Z.le_ngt in Hk.
+rewrite Z2Nat.inj_mul; [ simpl | easy | easy ].
+unfold Pos.to_nat; simpl.
+rewrite Nat.Div0.mod_mul.
+rewrite Nat.div_mul; [ | easy ].
+now rewrite Z2Nat.id.
 Qed.
 
 (* Rémi Nollet's code, modified *)
