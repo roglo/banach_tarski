@@ -58,83 +58,86 @@ destruct Hsi as (Hinf & eli & eli₁ & Hni & Hsi); simpl in Hsi.
 destruct Hsj as (Hjnf & elj & elj₁ & Hnj & Hsj); simpl in Hsj.
 rewrite rotate_vec_mul in Hsi, Hsj.
 eapply rotate_rev_path in Hsj.
-destruct ti, tj.
-+destruct di, dj; [ easy | exfalso | exfalso | easy ].
- *eapply not_in_fixpoints_one_path; try eassumption.
-   intros el Hn.
-   destruct Hinf as (Hps, Hnpd).
-   intros H; apply Hnpd; clear Hnpd.
-   rewrite rotate_vec_mul in H.
-   now exists el, p.
-
-   rewrite <- rev_path_norm_list, Hnj.
-   now rewrite rev_path_cons, rev_path_single.
-
-   easy.
-
- *eapply not_in_fixpoints_one_path; try eassumption.
-   intros el Hn.
-   destruct Hinf as (Hps, Hnpd).
-   intros H; apply Hnpd.
-   rewrite rotate_vec_mul in H.
-   now exists el, p.
-
-   rewrite <- rev_path_norm_list, Hnj.
-   now rewrite rev_path_cons, rev_path_single.
-
-   easy.
-
-+exfalso.
- eapply not_in_fixpoints_one_path; try eassumption.
-  intros el Hn.
-  destruct Hinf as (Hps, Hnpd).
-  intros H; apply Hnpd.
-  rewrite rotate_vec_mul in H.
-  now exists el, p.
-
-  rewrite <- rev_path_norm_list, Hnj.
-  now rewrite rev_path_cons, rev_path_single.
-
+destruct ti, tj. {
+  destruct di, dj; [ easy | exfalso | exfalso | easy ]. {
+    eapply not_in_fixpoints_one_path; try eassumption. {
+      intros el Hn.
+      destruct Hinf as (Hps, Hnpd).
+      intros H; apply Hnpd; clear Hnpd.
+      rewrite rotate_vec_mul in H.
+      now exists el, p.
+    } {
+      rewrite <- rev_path_norm_list, Hnj.
+      now rewrite rev_path_cons, rev_path_single.
+    }
+    easy.
+  }
+  eapply not_in_fixpoints_one_path; try eassumption. {
+    intros el Hn.
+    destruct Hinf as (Hps, Hnpd).
+    intros H; apply Hnpd.
+    rewrite rotate_vec_mul in H.
+    now exists el, p.
+  } {
+    rewrite <- rev_path_norm_list, Hnj.
+    now rewrite rev_path_cons, rev_path_single.
+  }
   easy.
-
-+exfalso.
- eapply not_in_fixpoints_one_path; try eassumption.
-  intros el Hn.
-  destruct Hinf as (Hps, Hnpd).
-  intros H; apply Hnpd.
-  rewrite rotate_vec_mul in H.
-  now exists el, p.
-
-  rewrite <- rev_path_norm_list, Hnj.
-  now rewrite rev_path_cons, rev_path_single.
-
+} {
+  exfalso.
+  eapply not_in_fixpoints_one_path; try eassumption. {
+    intros el Hn.
+    destruct Hinf as (Hps, Hnpd).
+    intros H; apply Hnpd.
+    rewrite rotate_vec_mul in H.
+    now exists el, p.
+  } {
+    rewrite <- rev_path_norm_list, Hnj.
+    now rewrite rev_path_cons, rev_path_single.
+  }
   easy.
-
-+destruct di, dj; [ easy | exfalso | exfalso | easy ].
- *eapply not_in_fixpoints_one_path; try eassumption.
-   intros el Hn.
-   destruct Hinf as (Hps, Hnpd).
-   intros H; apply Hnpd.
-   rewrite rotate_vec_mul in H.
-   now exists el, p.
-
-   rewrite <- rev_path_norm_list, Hnj.
-   now rewrite rev_path_cons, rev_path_single.
-
-   easy.
-
- *eapply not_in_fixpoints_one_path; try eassumption.
-   intros el Hn.
-   destruct Hinf as (Hps, Hnpd).
-   intros H; apply Hnpd.
-   rewrite rotate_vec_mul in H.
-   now exists el, p.
-
-   rewrite <- rev_path_norm_list, Hnj.
-   now rewrite rev_path_cons, rev_path_single.
-
-   easy.
+} {
+  exfalso.
+  eapply not_in_fixpoints_one_path; try eassumption. {
+    intros el Hn.
+    destruct Hinf as (Hps, Hnpd).
+    intros H; apply Hnpd.
+    rewrite rotate_vec_mul in H.
+    now exists el, p.
+  } {
+    rewrite <- rev_path_norm_list, Hnj.
+    now rewrite rev_path_cons, rev_path_single.
+  }
+  easy.
+}
+destruct di, dj; [ easy | exfalso | exfalso | easy ]. {
+  eapply not_in_fixpoints_one_path; try eassumption. {
+    intros el Hn.
+    destruct Hinf as (Hps, Hnpd).
+    intros H; apply Hnpd.
+    rewrite rotate_vec_mul in H.
+    now exists el, p.
+  } {
+    rewrite <- rev_path_norm_list, Hnj.
+    now rewrite rev_path_cons, rev_path_single.
+  }
+  easy.
+} {
+  eapply not_in_fixpoints_one_path; try eassumption. {
+    intros el Hn.
+    destruct Hinf as (Hps, Hnpd).
+    intros H; apply Hnpd.
+    rewrite rotate_vec_mul in H.
+    now exists el, p.
+  } {
+    rewrite <- rev_path_norm_list, Hnj.
+    now rewrite rev_path_cons, rev_path_single.
+  }
+  easy.
+}
 Qed.
+
+Check 1%nat.
 
 Theorem not_start_with_rot :
   ∀ f, orbit_selector f
