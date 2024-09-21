@@ -54,65 +54,65 @@ intros * Hlen HlfP Hf.
 subst len.
 unfold partition_combine; simpl.
 revert fl PF i HlfP Hf.
-induction PE as [| E₁ PE]; intros.
- destruct fl as [| f₁ fl]; [ | easy ].
- intros x.
- split; intros Hx; [ now destruct i | ].
- destruct Hx as (Hx, _).
- now destruct (i / length PF)%nat.
-
- destruct fl as [| f₁ fl]; [ easy | ].
- simpl in HlfP; apply Nat.succ_inj in HlfP; simpl.
- destruct (lt_dec i (length PF)) as [Hi| Hi].
+induction PE as [| E₁ PE]; intros. {
+  destruct fl as [| f₁ fl]; [ | easy ].
+  intros x.
+  split; intros Hx; [ now destruct i | ].
+  destruct Hx as (Hx, _).
+  now destruct (i / length PF)%nat.
+}
+destruct fl as [| f₁ fl]; [ easy | ].
+simpl in HlfP; apply Nat.succ_inj in HlfP; simpl.
+destruct (lt_dec i (length PF)) as [Hi| Hi]. {
   rewrite app_nth1; [| now rewrite length_map ].
   rewrite Nat.div_small; [ simpl | easy ].
   rewrite Nat.mod_small; [ simpl | easy ].
   intros x; clear - HlfP Hf.
-  split; intros Hx.
-   revert i Hx.
-   induction PF as [| F₁ PF]; intros; [ now destruct i | ].
-   simpl in Hx; simpl.
-   destruct i; [ easy | now apply IHPF ].
-
-   revert i Hx.
-   induction PF as [| F₁ PF]; intros.
+  split; intros Hx. {
+    revert i Hx.
+    induction PF as [| F₁ PF]; intros; [ now destruct i | ].
+    simpl in Hx; simpl.
+    destruct i; [ easy | now apply IHPF ].
+  }
+  revert i Hx.
+  induction PF as [| F₁ PF]; intros. {
     destruct Hx as (_, Hx).
     destruct i; simpl in Hx; simpl.
-     rewrite Hf in Hx; [ easy | now left ].
-     rewrite Hf in Hx; [ easy | now left ].
-
-    destruct i; simpl in Hx; simpl; [ easy | ].
-    now apply IHPF.
-
-  apply Nat.nlt_ge in Hi.
-  rewrite app_nth2; [| now rewrite length_map ].
-  rewrite length_map.
-  remember (i - length PF)%nat as j eqn:Hj.
-  assert (H : (i = j + length PF)%nat).
-   rewrite Hj.
-   now rewrite Nat.sub_add.
-
-   subst i; clear Hi Hj.
-   destruct PF as [| F₁ PF].
-    simpl.
-    rewrite match_id.
-    intros x.
-    split; intros Hx.
-     destruct j; simpl in Hx.
+    rewrite Hf in Hx; [ easy | now left ].
+    rewrite Hf in Hx; [ easy | now left ].
+  }
+  destruct i; simpl in Hx; simpl; [ easy | ].
+  now apply IHPF.
+}
+apply Nat.nlt_ge in Hi.
+rewrite app_nth2; [| now rewrite length_map ].
+rewrite length_map.
+remember (i - length PF)%nat as j eqn:Hj.
+assert (H : (i = j + length PF)%nat). {
+  rewrite Hj.
+  now rewrite Nat.sub_add.
+}
+subst i; clear Hi Hj.
+destruct PF as [| F₁ PF]. {
+  simpl.
+  rewrite match_id.
+  intros x.
+  split; intros Hx. {
+    destruct j; simpl in Hx. {
       induction (combine fl PE) as [| (y, z) l]; [ easy | ].
       apply IHl, Hx.
-
-      induction (combine fl PE) as [| (y, z) l]; [ easy | ].
-      apply IHl, Hx.
-
-     rewrite Hf in Hx; [ | now left ].
-     now rewrite set_inter_empty_r in Hx.
-
-    rewrite nat_mod_add_once.
-    rewrite nat_div_add_once; [ | easy ].
-    apply IHPE; [ easy | ].
-    intros f Hfi.
-    now apply Hf; right.
+    }
+    induction (combine fl PE) as [| (y, z) l]; [ easy | ].
+    apply IHl, Hx.
+  }
+  rewrite Hf in Hx; [ | now left ].
+  now rewrite set_inter_empty_r in Hx.
+}
+rewrite nat_mod_add_once.
+rewrite nat_div_add_once; [ | easy ].
+apply IHPE; [ easy | ].
+intros f Hfi.
+now apply Hf; right.
 Qed.
 
 Theorem partition_combine_swi_nth :
@@ -127,87 +127,87 @@ intros * Hlen HlfP Hf.
 subst len.
 unfold partition_combine_swi; simpl.
 revert fl PE i HlfP Hf.
-induction PF as [| F₁ PF]; intros.
- simpl; do 2 rewrite match_id.
- clear -Hf.
- remember (i mod length PE) as j eqn:Hj; clear Hj.
- assert (Hj : ∀ j, (nth j fl id ∅ = ∅)%S).
+induction PF as [| F₁ PF]; intros. {
+  simpl; do 2 rewrite match_id.
   clear -Hf.
-  induction fl as [| f₁ fl]; intros; [ simpl; now rewrite match_id | ].
-  destruct j; [ now apply Hf; left | simpl ].
-  apply IHfl.
-  intros f₂ Hf₂; now apply Hf; right.
-
+  remember (i mod length PE) as j eqn:Hj; clear Hj.
+  assert (Hj : ∀ j, (nth j fl id ∅ = ∅)%S). {
+    clear -Hf.
+    induction fl as [| f₁ fl]; intros; [ simpl; now rewrite match_id | ].
+    destruct j; [ now apply Hf; left | simpl ].
+    apply IHfl.
+    intros f₂ Hf₂; now apply Hf; right.
+  }
   now rewrite Hj, set_inter_empty_r.
-
- simpl.
- destruct (lt_dec i (length fl)) as [Hi| Hi].
-  rewrite app_nth1.
-   rewrite HlfP in Hi.
-   rewrite Nat.mod_small; [ | easy ].
-   rewrite Nat.div_small; [ | easy ].
-   intros x; clear - HlfP Hf.
-   split; intros Hx.
-    revert i fl Hx HlfP Hf.
-    induction PE as [| E₁ PE]; intros.
-     apply length_zero_iff_nil in HlfP; subst fl.
-     simpl in Hx; now rewrite match_id in Hx.
-
-     destruct fl as [| f₁ fl]; [ easy | ].
-     simpl in HlfP; apply Nat.succ_inj in HlfP.
-     destruct i; [ easy | ].
-     simpl in Hx; simpl.
-     apply IHPE; [ easy | easy | ].
-     intros f Hfi.
-     now apply Hf; right.
-
+}
+simpl.
+destruct (lt_dec i (length fl)) as [Hi| Hi]. {
+  rewrite app_nth1. {
+    rewrite HlfP in Hi.
+    rewrite Nat.mod_small; [ | easy ].
+    rewrite Nat.div_small; [ | easy ].
+    intros x; clear - HlfP Hf.
+    split; intros Hx. {
+      revert i fl Hx HlfP Hf.
+      induction PE as [| E₁ PE]; intros. {
+        apply length_zero_iff_nil in HlfP; subst fl.
+        simpl in Hx; now rewrite match_id in Hx.
+      }
+      destruct fl as [| f₁ fl]; [ easy | ].
+      simpl in HlfP; apply Nat.succ_inj in HlfP.
+      destruct i; [ easy | ].
+      simpl in Hx; simpl.
+      apply IHPE; [ easy | easy | ].
+      intros f Hfi.
+      now apply Hf; right.
+    }
     destruct Hx as (Hx, Hxn).
     revert x i fl HlfP Hf Hx Hxn.
-    induction PE as [| E₁ PE]; intros.
-     now simpl in Hx; rewrite match_id in Hx.
-
-     destruct fl as [| f₁ fl]; [ easy | ].
-     simpl in HlfP; apply Nat.succ_inj in HlfP.
-     simpl in Hx; simpl.
-     destruct i; [ now split | ].
-     apply IHPE; [ easy | | easy | easy ].
-     intros f Hfi.
-     now apply Hf; right.
-
-   rewrite length_map, length_combine, Nat.min_l; [ easy | ].
-   now rewrite HlfP.
-
-  apply Nat.nlt_ge in Hi.
-  rewrite app_nth2.
-   rewrite IHPF; [ | easy | easy ].
-   rewrite length_map, length_combine, Nat.min_l; [ | now rewrite HlfP ].
-   rewrite HlfP in Hi.
-   remember (length PE) as len eqn:Hlen; symmetry in Hlen.
-   destruct (eq_nat_dec len 0) as [Hzl| Hnzl].
+    induction PE as [| E₁ PE]; intros. {
+      now simpl in Hx; rewrite match_id in Hx.
+    }
+    destruct fl as [| f₁ fl]; [ easy | ].
+    simpl in HlfP; apply Nat.succ_inj in HlfP.
+    simpl in Hx; simpl.
+    destruct i; [ now split | ].
+    apply IHPE; [ easy | | easy | easy ].
+    intros f Hfi.
+    now apply Hf; right.
+  }
+  rewrite length_map, length_combine, Nat.min_l; [ easy | ].
+  now rewrite HlfP.
+}
+apply Nat.nlt_ge in Hi.
+rewrite app_nth2. {
+  rewrite IHPF; [ | easy | easy ].
+  rewrite length_map, length_combine, Nat.min_l; [ | now rewrite HlfP ].
+  rewrite HlfP in Hi.
+  remember (length PE) as len eqn:Hlen; symmetry in Hlen.
+  destruct (eq_nat_dec len 0) as [Hzl| Hnzl]. {
     move Hzl at top; subst len.
     apply length_zero_iff_nil in Hlen.
     apply length_zero_iff_nil in HlfP.
     subst PE fl; simpl.
     do 4 rewrite match_id.
     now do 2 rewrite set_inter_empty_l.
-
-    subst len.
-    generalize Hi; intros H.
-    apply Nat.Div0.div_le_mono with (c := length PE) in H.
-    rewrite Nat.div_same in H; [ | easy ].
-    remember (i / length PE) as j eqn:Hj; symmetry in Hj.
-    destruct j; [ now apply Nat.le_0_r in H | ].
-    rewrite HlfP.
-    remember (i - length PE) as k eqn:Hk.
-    assert (i = k + length PE) by (now subst k; rewrite Nat.sub_add).
-    subst i; clear Hk.
-    rewrite nat_mod_add_once.
-    rewrite nat_div_add_once in Hj; [ | easy ].
-    apply Nat.succ_inj in Hj.
-    now rewrite Hj.
-
-   rewrite length_map, length_combine, Nat.min_l; [ easy | ].
-   now rewrite HlfP.
+  }
+  subst len.
+  generalize Hi; intros H.
+  apply Nat.Div0.div_le_mono with (c := length PE) in H.
+  rewrite Nat.div_same in H; [ | easy ].
+  remember (i / length PE) as j eqn:Hj; symmetry in Hj.
+  destruct j; [ now apply Nat.le_0_r in H | ].
+  rewrite HlfP.
+  remember (i - length PE) as k eqn:Hk.
+  assert (i = k + length PE) by (now subst k; rewrite Nat.sub_add).
+  subst i; clear Hk.
+  rewrite nat_mod_add_once.
+  rewrite nat_div_add_once in Hj; [ | easy ].
+  apply Nat.succ_inj in Hj.
+  now rewrite Hj.
+}
+rewrite length_map, length_combine, Nat.min_l; [ easy | ].
+now rewrite HlfP.
 Qed.
 
 Theorem partition_combine_is_partition :
@@ -222,114 +222,114 @@ Theorem partition_combine_is_partition :
   → is_partition E (partition_combine fl PE P'F).
 Proof.
 intros * HPE HPF Hlen1 Hlen3 HP'F Hgl * Hfl.
-split.
- destruct HPE as (HPEU, _).
- destruct HPF as (HPFU, _).
- destruct HP'F as (HP'FU, _).
- assert (HUP'F : F ⊂ ⋃ P'F) by (now rewrite HP'FU; intros x H).
- clear HP'FU.
- unfold partition_combine.
- subst fl.
- revert E F gl PF P'F HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
- induction PE as [| E₁ PE]; intros.
-  now apply length_zero_iff_nil in Hlen3; subst gl.
-
+split. {
+  destruct HPE as (HPEU, _).
+  destruct HPF as (HPFU, _).
+  destruct HP'F as (HP'FU, _).
+  assert (HUP'F : F ⊂ ⋃ P'F) by now rewrite HP'FU; intros x H.
+  clear HP'FU.
+  progress unfold partition_combine.
+  subst fl.
+  revert E F gl PF P'F HPEU HPFU HUP'F Hlen1 Hlen3 Hgl.
+  induction PE as [| E₁ PE]; intros. {
+    now apply length_zero_iff_nil in Hlen3; subst gl.
+  }
   destruct gl as [| g₁ gl]; [ easy | ].
   rewrite HPEU; simpl.
   rewrite set_union_list_app.
   simpl in Hlen3; apply Nat.succ_inj in Hlen3.
-  apply set_union_morph.
-   pose proof set_union_inter_self vector E₁ (map (app_gr_inv g₁) P'F).
-   rewrite map_map in H.
-   apply H.
-   assert (HEF : E₁ ⊂ app_gr_inv g₁ F).
-    rewrite HPFU.
-    apply included_group with g₁.
-    rewrite app_gr_inv_r.
-    intros p Hp.
-    pose proof Hgl 0 p as Hgl₁; simpl in Hgl₁.
-    apply Hgl₁ in Hp.
-    destruct PF as [| P₁ PF]; [ easy | simpl in Hp ].
-    now left.
-
+  apply set_union_morph. {
+    pose proof set_union_inter_self vector E₁ (map (app_gr_inv g₁) P'F).
+    rewrite map_map in H.
+    apply H.
+    assert (HEF : E₁ ⊂ app_gr_inv g₁ F). {
+      rewrite HPFU.
+      apply included_group with g₁.
+      rewrite app_gr_inv_r.
+      intros p Hp.
+      pose proof Hgl 0 p as Hgl₁; simpl in Hgl₁.
+      apply Hgl₁ in Hp.
+      destruct PF as [| P₁ PF]; [ easy | simpl in Hp ].
+      now left.
+    }
     apply included_group with (g := gr_inv g₁) in HUP'F.
     rewrite group_set_union_list_distr in HUP'F.
     rewrite fold_app_gr_inv in HUP'F.
     eapply included_trans; eassumption.
-
-   destruct PF as [| F₁ PF]; [ easy |  ].
-   simpl in Hlen1; apply Nat.succ_inj in Hlen1.
-   eapply IHPE; [ | | | eassumption | easy | ]; try easy.
+  }
+  destruct PF as [| F₁ PF]; [ easy |  ].
+  simpl in Hlen1; apply Nat.succ_inj in Hlen1.
+  eapply IHPE; [ | | | eassumption | easy | ]; try easy. {
     rewrite HPFU in HUP'F.
     intros p Hp; apply HUP'F.
     now right.
-
-    intros i.
-    now pose proof (Hgl (S i)) as H; simpl in H.
-
- intros i j Hij.
- erewrite partition_combine_nth; [ | easy | | ].
-  erewrite partition_combine_nth; [ | easy | | ].
-   remember (length P'F) as len eqn:Hlen.
-   destruct len.
-    symmetry in Hlen.
-    apply length_zero_iff_nil in Hlen; subst P'F; simpl.
-    do 2 rewrite match_id.
-    subst fl.
-    destruct gl as [| g₁ gl].
-     simpl; unfold id at 2; simpl.
-     now do 2 rewrite set_inter_empty_r.
-
-     simpl; unfold app_gr_inv, Nat.div; rewrite app_gr_empty_set.
-     now do 2 rewrite set_inter_empty_r.
-
+  }
+  intros i.
+  now pose proof (Hgl (S i)) as H; simpl in H.
+}
+intros i j Hij.
+erewrite partition_combine_nth; [ | easy | | ]. {
+  erewrite partition_combine_nth; [ | easy | | ]. {
+    remember (length P'F) as len eqn:Hlen.
+    destruct len. {
+      symmetry in Hlen.
+      apply length_zero_iff_nil in Hlen; subst P'F; simpl.
+      do 2 rewrite match_id.
+      subst fl.
+      destruct gl as [| g₁ gl]. {
+        simpl; unfold id at 2; simpl.
+        now do 2 rewrite set_inter_empty_r.
+      }
+      simpl; unfold app_gr_inv, Nat.div; rewrite app_gr_empty_set.
+      now do 2 rewrite set_inter_empty_r.
+    }
     destruct HPE as (HPEU, HPEI).
     destruct HP'F as (HP'FU, HP'FI).
-    destruct (eq_nat_dec (i / S len) (j / S len)) as [Hd| Hd].
-     destruct (eq_nat_dec (i mod S len) (j mod S len)) as [Hm| Hm].
-      assert (Hnlen : (S len ≠ 0)%nat) by easy.
-      pose proof Nat.div_mod i (S len) Hnlen as Hi.
-      pose proof Nat.div_mod j (S len) Hnlen as Hj.
-      now rewrite Hd, Hm, <- Hj in Hi.
-
+    destruct (eq_nat_dec (i / S len) (j / S len)) as [Hd| Hd]. {
+      destruct (eq_nat_dec (i mod S len) (j mod S len)) as [Hm| Hm]. {
+        assert (Hnlen : (S len ≠ 0)%nat) by easy.
+        pose proof Nat.div_mod i (S len) Hnlen as Hi.
+        pose proof Nat.div_mod j (S len) Hnlen as Hj.
+        now rewrite Hd, Hm, <- Hj in Hi.
+      }
       subst fl; rewrite <- Hd; simpl.
       pose proof map_nth app_gr_inv gl gr_ident (i / S len) as Hi.
-      destruct (lt_dec (i / S len) (length gl)) as [Hil| Hil].
-       rewrite nth_indep with (d' := id) in Hi.
-        rewrite Hi, set_inter_shuffle0.
-        rewrite set_inter_assoc, <- set_inter_assoc.
-        unfold app_gr_inv; rewrite <- group_set_inter_distr.
-        apply not_eq_sym in Hm.
-        rewrite HP'FI; [ | easy ].
-        rewrite app_gr_empty_set.
-        apply set_inter_empty_r.
-
+      destruct (lt_dec (i / S len) (length gl)) as [Hil| Hil]. {
+        rewrite nth_indep with (d' := id) in Hi. {
+          rewrite Hi, set_inter_shuffle0.
+          rewrite set_inter_assoc, <- set_inter_assoc.
+          unfold app_gr_inv; rewrite <- group_set_inter_distr.
+          apply not_eq_sym in Hm.
+          rewrite HP'FI; [ | easy ].
+          rewrite app_gr_empty_set.
+          apply set_inter_empty_r.
+        }
         now rewrite length_map.
-
-       apply Nat.nlt_ge in Hil.
-       rewrite Hlen3 in Hil.
-       rewrite nth_overflow; [ | easy ].
-       now do 2 rewrite set_inter_empty_l.
-
-     rewrite set_inter_shuffle0, set_inter_assoc.
-     rewrite HPEI; [ | easy ].
-     now do 2 rewrite set_inter_empty_l.
-
-   now subst fl; rewrite length_map.
-
-   subst fl.
-   intros f Hf.
-   apply in_map_iff in Hf.
-   destruct Hf as (g & Hg & Hix).
-   subst f; apply app_gr_empty_set.
-
-  now subst fl; rewrite length_map.
-
+      }
+      apply Nat.nlt_ge in Hil.
+      rewrite Hlen3 in Hil.
+      rewrite nth_overflow; [ | easy ].
+      now do 2 rewrite set_inter_empty_l.
+    }
+    rewrite set_inter_shuffle0, set_inter_assoc.
+    rewrite HPEI; [ | easy ].
+    now do 2 rewrite set_inter_empty_l.
+  } {
+    now subst fl; rewrite length_map.
+  }
   subst fl.
   intros f Hf.
   apply in_map_iff in Hf.
   destruct Hf as (g & Hg & Hix).
   subst f; apply app_gr_empty_set.
+} {
+  now subst fl; rewrite length_map.
+}
+subst fl.
+intros f Hf.
+apply in_map_iff in Hf.
+destruct Hf as (g & Hg & Hix).
+subst f; apply app_gr_empty_set.
 Qed.
 
 Require Import Permutation.
@@ -353,44 +353,44 @@ Theorem permuted_partition_is_partition :
 Proof.
 intros * Hpe Hpa.
 destruct Hpa as (Hpau, Hpai).
-split.
- rewrite Hpau; clear -Hpe.
- induction Hpe; [ easy | | | ].
-  now simpl; rewrite IHHpe.
-
-  simpl; rewrite set_union_comm, <- set_union_assoc.
-  apply set_union_morph; [ easy | apply set_union_comm ].
-
+split. {
+  rewrite Hpau; clear -Hpe.
+  induction Hpe; [ easy | | | ]. {
+    now simpl; rewrite IHHpe.
+  } {
+    simpl; rewrite set_union_comm, <- set_union_assoc.
+    apply set_union_morph; [ easy | apply set_union_comm ].
+  }
   etransitivity; eassumption.
-
- intros i j Hij x.
- split; [ intros Hx; simpl | easy ].
- apply Permutation_nth_error in Hpe.
- destruct Hpe as (Hlen & f & Hfi & Hn).
- unfold FinFun.Injective in Hfi.
- assert (Hfij : f i ≠ f j) by (intros H; now apply Hfi in H).
- assert (HP'P : ∀ i, P'E.[i] = PE.[f i]).
+}
+intros i j Hij x.
+split; [ intros Hx; simpl | easy ].
+apply Permutation_nth_error in Hpe.
+destruct Hpe as (Hlen & f & Hfi & Hn).
+unfold FinFun.Injective in Hfi.
+assert (Hfij : f i ≠ f j) by now intros H; apply Hfi in H.
+assert (HP'P : ∀ i, P'E.[i] = PE.[f i]). {
   intros k.
   pose proof Hn k as Hk.
   remember (nth_error P'E k) as p'k eqn:H'k.
   symmetry in Hk, H'k.
-  destruct p'k as [v | ].
-   apply nth_error_split in Hk.
-   apply nth_error_split in H'k.
-   destruct Hk as (l1 & l2 & HPE & Hlen1).
-   destruct H'k as (l'1 & l'2 & HP'E & Hlen'1).
-   rewrite HPE, HP'E, <- Hlen1, <- Hlen'1.
-   rewrite app_nth2; [ | now unfold ge ].
-   rewrite app_nth2; [ | now unfold ge ].
-   now do 2 rewrite Nat.sub_diag.
-
-   apply nth_error_None in Hk.
-   apply nth_error_None in H'k.
-   rewrite nth_overflow; [ | easy ].
-   now rewrite nth_overflow.
-
-  do 2 rewrite HP'P in Hx.
-  now rewrite Hpai in Hx.
+  destruct p'k as [v | ]. {
+    apply nth_error_split in Hk.
+    apply nth_error_split in H'k.
+    destruct Hk as (l1 & l2 & HPE & Hlen1).
+    destruct H'k as (l'1 & l'2 & HP'E & Hlen'1).
+    rewrite HPE, HP'E, <- Hlen1, <- Hlen'1.
+    rewrite app_nth2; [ | now unfold ge ].
+    rewrite app_nth2; [ | now unfold ge ].
+    now do 2 rewrite Nat.sub_diag.
+  }
+  apply nth_error_None in Hk.
+  apply nth_error_None in H'k.
+  rewrite nth_overflow; [ | easy ].
+  now rewrite nth_overflow.
+}
+do 2 rewrite HP'P in Hx.
+now rewrite Hpai in Hx.
 Qed.
 
 Theorem partition_combine_partition_combine_swi :
@@ -430,16 +430,16 @@ unfold partition_combine; simpl.
 revert fl PF Hlen.
 induction PE as [| E₁ PE]; intros; [ now destruct fl | simpl ].
 destruct fl as [| f₁ fl]; [ easy | ].
-destruct PF as [| F₁ FL].
- unfold partition_combine; simpl.
- rewrite Nat.mul_0_r.
- induction (combine fl PE) as [| (x, y) l]; [ easy | apply IHl ].
-
- simpl in Hlen; simpl; f_equal.
- rewrite length_app, length_map.
- apply Nat.succ_inj in Hlen.
- apply IHPE with (PF := F₁ :: FL) in Hlen.
- now simpl in Hlen; rewrite Hlen.
+destruct PF as [| F₁ FL]. {
+  unfold partition_combine; simpl.
+  rewrite Nat.mul_0_r.
+  induction (combine fl PE) as [| (x, y) l]; [ easy | apply IHl ].
+}
+simpl in Hlen; simpl; f_equal.
+rewrite length_app, length_map.
+apply Nat.succ_inj in Hlen.
+apply IHPE with (PF := F₁ :: FL) in Hlen.
+now simpl in Hlen; rewrite Hlen.
 Qed.
 
 Theorem partition_combine_swi_length :
@@ -460,20 +460,20 @@ Add Parametric Morphism :
   as nth_map_app_gr_inv_morph.
 Proof.
 intros n fl E F HEF x.
-split; intros Hx.
- revert n Hx.
- induction fl as [| f₁ fl]; intros.
-  simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
-
+split; intros Hx. {
+  revert n Hx.
+  induction fl as [| f₁ fl]; intros. {
+    simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
+  }
   simpl in Hx; simpl.
   now destruct n; [ rewrite <- HEF | apply IHfl ].
-
- revert n Hx.
- induction fl as [| f₁ fl]; intros.
+}
+revert n Hx.
+induction fl as [| f₁ fl]; intros. {
   simpl in Hx; simpl; rewrite match_id in Hx |-*; now apply HEF.
-
-  simpl in Hx; simpl.
-  now destruct n; [ rewrite HEF | apply IHfl ].
+}
+simpl in Hx; simpl.
+now destruct n; [ rewrite HEF | apply IHfl ].
 Qed.
 
 Theorem equidec_trans : transitive _ equidecomposable.
@@ -484,18 +484,18 @@ destruct HEF as (PE & P₁F & HPE & HP₁F & HEF).
 destruct HFG as (P₂F & PG & HP₂F & HPG & HFG).
 assert
   (Hgl : ∃ gl, length gl = length PE ∧
-   ∀ i, (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i P₁F ∅)%S).
- apply Forall2_Forall_combine in HEF.
- destruct HEF as (HEF, Hlen1).
- clear HPE HP₁F.
- revert P₁F Hlen1 HEF.
- induction PE as [| E₁ PE]; intros.
-  exists []; split; [ easy | ].
-  symmetry in Hlen1; apply length_zero_iff_nil in Hlen1; subst P₁F.
-  intros i; simpl.
-  do 2 rewrite match_id; simpl.
-  now intros (x, y, z); split.
-
+   ∀ i, (app_gr (nth i gl gr_ident) (nth i PE ∅) = nth i P₁F ∅)%S). {
+  apply Forall2_Forall_combine in HEF.
+  destruct HEF as (HEF, Hlen1).
+  clear HPE HP₁F.
+  revert P₁F Hlen1 HEF.
+  induction PE as [| E₁ PE]; intros. {
+    exists []; split; [ easy | ].
+    symmetry in Hlen1; apply length_zero_iff_nil in Hlen1; subst P₁F.
+    intros i; simpl.
+    do 2 rewrite match_id; simpl.
+    now intros (x, y, z); split.
+  }
   destruct P₁F as [| F₁ P₁F]; [ easy | ].
   simpl in Hlen1; apply Nat.succ_inj in Hlen1.
   simpl in HEF; apply Forall_inv2 in HEF.
@@ -506,65 +506,65 @@ assert
   split; [ now simpl; rewrite Hlen3 | ].
   intros i; simpl.
   destruct i; [ easy | apply HEF ].
-
- assert
-   (Hhl : ∃ hl, length hl = length PG ∧
-    ∀ i, (app_gr (nth i hl gr_ident) (nth i PG ∅) = nth i P₂F ∅)%S).
+}
+assert
+  (Hhl : ∃ hl, length hl = length PG ∧
+   ∀ i, (app_gr (nth i hl gr_ident) (nth i PG ∅) = nth i P₂F ∅)%S). {
   apply Forall2_Forall_combine in HFG.
   destruct HFG as (HFG, Hlen2).
   clear HPG HP₂F.
   revert P₂F Hlen2 HFG.
-  induction PG as [| G₁ PG]; intros.
-   exists []; split; [ easy | ].
-   apply length_zero_iff_nil in Hlen2; subst P₂F.
-   intros i; simpl.
-   do 2 rewrite match_id; simpl.
-   now intros (x, y, z); split.
-
-   destruct P₂F as [| F₁ P₂F]; [ easy | ].
-   simpl in Hlen2; apply Nat.succ_inj in Hlen2.
-   simpl in HFG; apply Forall_inv2 in HFG.
-   destruct HFG as ((h₁, HhFG), HFG).
-   apply IHPG in HFG; [ | easy ].
-   destruct HFG as (hl & Hlen3 & HFG).
-   exists (gr_inv h₁ :: hl).
-   split; [ now simpl; rewrite Hlen3 | ].
-   intros i; simpl.
-   destruct i; [ | apply HFG ].
-   rewrite <- HhFG, fold_app_gr_inv.
-   now rewrite app_gr_inv_l.
-
-  destruct Hgl as (gl & Hlen3 & Hgl).
-  destruct Hhl as (hl & Hlen4 & Hhl).
-  apply Forall2_Forall_combine in HEF.
-  destruct HEF as (HEF, Hlen1).
-  apply Forall2_Forall_combine in HFG.
-  destruct HFG as (HFG, Hlen2).
-  remember (map app_gr_inv gl) as g'l eqn:Hg'l.
-  assert (Hpcf : is_partition E (partition_combine g'l PE P₂F)).
-   eapply partition_combine_is_partition with (PF := P₁F); eassumption.
-
-   exists (partition_combine g'l PE P₂F).
-   remember (map app_gr_inv hl) as h'l eqn:Hh'l.
-   assert (Hpcg : is_partition G (partition_combine_swi h'l PG P₁F)).
-    symmetry in Hlen2.
-    eapply partition_combine_swi_is_partition with (PF := P₂F); eassumption.
-
-    exists (partition_combine_swi h'l PG P₁F).
-    split; [ easy | ].
-    split; [ easy | ].
-    apply Forall2_Forall_combine.
-    split.
-     apply Forall_forall.
-     intros (U, V) HUV.
-     apply In_nth with (d := (∅, ∅)) in HUV.
-     rewrite length_combine in HUV.
-     rewrite partition_length_combine in HUV.
-      rewrite partition_combine_swi_length in HUV.
-       rewrite <- Hlen1, Hlen2, Nat.mul_comm in HUV.
-       rewrite Nat.min_l in HUV; [ | easy ].
-       destruct HUV as (i & Hi & HUV).
-       rewrite combine_nth in HUV.
+  induction PG as [| G₁ PG]; intros. {
+    exists []; split; [ easy | ].
+    apply length_zero_iff_nil in Hlen2; subst P₂F.
+    intros i; simpl.
+    do 2 rewrite match_id; simpl.
+    now intros (x, y, z); split.
+  }
+  destruct P₂F as [| F₁ P₂F]; [ easy | ].
+  simpl in Hlen2; apply Nat.succ_inj in Hlen2.
+  simpl in HFG; apply Forall_inv2 in HFG.
+  destruct HFG as ((h₁, HhFG), HFG).
+  apply IHPG in HFG; [ | easy ].
+  destruct HFG as (hl & Hlen3 & HFG).
+  exists (gr_inv h₁ :: hl).
+  split; [ now simpl; rewrite Hlen3 | ].
+  intros i; simpl.
+  destruct i; [ | apply HFG ].
+  rewrite <- HhFG, fold_app_gr_inv.
+  now rewrite app_gr_inv_l.
+}
+destruct Hgl as (gl & Hlen3 & Hgl).
+destruct Hhl as (hl & Hlen4 & Hhl).
+apply Forall2_Forall_combine in HEF.
+destruct HEF as (HEF, Hlen1).
+apply Forall2_Forall_combine in HFG.
+destruct HFG as (HFG, Hlen2).
+remember (map app_gr_inv gl) as g'l eqn:Hg'l.
+assert (Hpcf : is_partition E (partition_combine g'l PE P₂F)). {
+  eapply partition_combine_is_partition with (PF := P₁F); eassumption.
+}
+exists (partition_combine g'l PE P₂F).
+remember (map app_gr_inv hl) as h'l eqn:Hh'l.
+assert (Hpcg : is_partition G (partition_combine_swi h'l PG P₁F)). {
+  symmetry in Hlen2.
+  eapply partition_combine_swi_is_partition with (PF := P₂F); eassumption.
+}
+exists (partition_combine_swi h'l PG P₁F).
+split; [ easy | ].
+split; [ easy | ].
+apply Forall2_Forall_combine.
+split. {
+  apply Forall_forall.
+  intros (U, V) HUV.
+  apply In_nth with (d := (∅, ∅)) in HUV.
+  rewrite length_combine in HUV.
+  rewrite partition_length_combine in HUV. {
+    rewrite partition_combine_swi_length in HUV. {
+      rewrite <- Hlen1, Hlen2, Nat.mul_comm in HUV.
+      rewrite Nat.min_l in HUV; [ | easy ].
+      destruct HUV as (i & Hi & HUV).
+      rewrite combine_nth in HUV. {
         injection HUV; clear HUV; intros HV HU.
         apply eq_set_eq in HU.
         apply eq_set_eq in HV.
@@ -578,88 +578,89 @@ assert
         exists (Comb hj gi); subst gi hj; simpl.
         rewrite <- HU, <- HV; clear HU HV.
         rewrite HPE', HPG'.
-        rewrite partition_combine_nth; [ | easy | | ].
-         rewrite partition_combine_swi_nth; [ | easy | | ].
-          do 2 rewrite group_set_inter_distr.
-          rewrite Hlen2, Hgl.
-          rewrite set_inter_comm.
-          apply set_inter_morph.
-           rewrite app_gr_nth.
-           replace Datatypes.id with (@id (set vector)) by easy.
-           rewrite map_map.
-           (* does not work, I don't know why
-           rewrite <- Hhl.
-           *)
-           (* using transitivity instead *)
-           etransitivity.
-            apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
-            apply app_gr_morph_Proper; [ easy | ].
-            apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
-            symmetry; apply Hhl.
-
-            do 2 rewrite <- app_gr_nth_inv.
-            assert (HPGnz : length PG ≠ 0).
-             intros H; rewrite H in Hi.
-             now apply Nat.nlt_0_r in Hi.
-
-             setoid_rewrite nth_indep with (d' := gr_inv gr_ident).
-              do 2 rewrite map_nth.
-              rewrite gr_inv_ident.
-              remember (nth (i / length PG) gl gr_ident) as x.
-              do 2 rewrite fold_app_gr_inv.
-              rewrite app_gr_app_gr_inv.
-              now rewrite app_gr_inv_app_gr.
-
-              rewrite length_map, Hlen4.
-              now apply Nat.mod_upper_bound.
-
-              now rewrite Hlen3; apply Nat.Div0.div_lt_upper_bound.
-
-              rewrite length_map, Hlen3.
-              now apply Nat.Div0.div_lt_upper_bound.
-
-              rewrite Hlen4.
-              now apply Nat.mod_upper_bound.
-
-           rewrite app_gr_nth.
-           replace Datatypes.id with (@id (set vector)) by easy.
-           now rewrite map_map.
-
-          now rewrite length_map.
-
+        rewrite partition_combine_nth; [ | easy | | ]. {
+          rewrite partition_combine_swi_nth; [ | easy | | ]. {
+            do 2 rewrite group_set_inter_distr.
+            rewrite Hlen2, Hgl.
+            rewrite set_inter_comm.
+            apply set_inter_morph. {
+              rewrite app_gr_nth.
+              replace Datatypes.id with (@id (set vector)) by easy.
+              rewrite map_map.
+              (* does not work, I don't know why
+                 rewrite <- Hhl.
+               *)
+              (* using transitivity instead *)
+              etransitivity. {
+                apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
+                apply app_gr_morph_Proper; [ easy | ].
+                apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
+                symmetry; apply Hhl.
+              }
+              do 2 rewrite <- app_gr_nth_inv.
+              assert (HPGnz : length PG ≠ 0). {
+                intros H; rewrite H in Hi.
+                now apply Nat.nlt_0_r in Hi.
+              }
+              setoid_rewrite nth_indep with (d' := gr_inv gr_ident). {
+                do 2 rewrite map_nth.
+                rewrite gr_inv_ident.
+                remember (nth (i / length PG) gl gr_ident) as x.
+                do 2 rewrite fold_app_gr_inv.
+                rewrite app_gr_app_gr_inv.
+                now rewrite app_gr_inv_app_gr.
+              } {
+                rewrite length_map, Hlen4.
+                now apply Nat.mod_upper_bound.
+              } {
+                now rewrite Hlen3; apply Nat.Div0.div_lt_upper_bound.
+              } {
+                rewrite length_map, Hlen3.
+                now apply Nat.Div0.div_lt_upper_bound.
+              } {
+                rewrite Hlen4.
+                now apply Nat.mod_upper_bound.
+              }
+            }
+            rewrite app_gr_nth.
+            replace Datatypes.id with (@id (set vector)) by easy.
+            now rewrite map_map.
+          } {
+            now rewrite length_map.
+          }
           intros f Hif.
           clear -Hif.
           induction hl as [| h₁ hl]; [ easy | ].
           destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHhl ].
-
-         now rewrite length_map.
-
-         intros f Hif.
-         clear -Hif.
-         induction gl as [| g₁ gl]; [ easy | ].
-         destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHgl ].
-
-        rewrite partition_length_combine.
-         rewrite partition_combine_swi_length.
+        } {
+          now rewrite length_map.
+        }
+        intros f Hif.
+        clear -Hif.
+        induction gl as [| g₁ gl]; [ easy | ].
+        destruct Hif; [ subst f; apply app_gr_empty_set | now apply IHgl ].
+      }
+      rewrite partition_length_combine. {
+        rewrite partition_combine_swi_length. {
           rewrite Hlen1, Hlen2.
           apply Nat.mul_comm.
-
-          now subst h'l; rewrite length_map.
-
-         now subst g'l; rewrite length_map.
-
-       now rewrite Hh'l, length_map.
-
-      now rewrite Hg'l, length_map.
-
-     rewrite partition_length_combine.
-      rewrite partition_combine_swi_length.
-       rewrite Hlen1, Hlen2.
-       apply Nat.mul_comm.
-
-       now subst h'l; rewrite length_map.
-
-       now subst g'l; rewrite length_map.
+        }
+        now subst h'l; rewrite length_map.
+      }
+      now subst g'l; rewrite length_map.
+    }
+    now rewrite Hh'l, length_map.
+  }
+  now rewrite Hg'l, length_map.
+}
+rewrite partition_length_combine. {
+  rewrite partition_combine_swi_length. {
+    rewrite Hlen1, Hlen2.
+    apply Nat.mul_comm.
+  }
+  now subst h'l; rewrite length_map.
+}
+now subst g'l; rewrite length_map.
 Qed.
 
 Add Parametric Relation : (set vector) equidecomposable
@@ -686,18 +687,18 @@ now apply Forall2_app.
 Qed.
 
 Add Parametric Morphism : equidecomposable
-with signature set_eq ==> set_eq ==> iff
-as equidec_morph.
+  with signature set_eq ==> set_eq ==> iff
+  as equidec_morph.
 Proof.
 intros E E' HE F F' HF.
-split; intros H.
+split; intros H. {
  destruct H as (EL & FL & HEL & HFL & HA).
  rewrite HE in HEL; rewrite HF in HFL.
  exists EL, FL.
  now split; [ | split ].
-
- destruct H as (EL & FL & HEL & HFL & HA).
- rewrite <- HE in HEL; rewrite <- HF in HFL.
- exists EL, FL.
- now split; [ | split ].
+}
+destruct H as (EL & FL & HEL & HFL & HA).
+rewrite <- HE in HEL; rewrite <- HF in HFL.
+exists EL, FL.
+now split; [ | split ].
 Qed.
