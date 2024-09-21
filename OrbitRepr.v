@@ -137,8 +137,6 @@ destruct di, dj; [ easy | exfalso | exfalso | easy ]. {
 }
 Qed.
 
-Check 1%nat.
-
 Theorem not_start_with_rot :
   ∀ f, orbit_selector f
   → ∀ os, os = mkos _ f
@@ -147,49 +145,50 @@ Proof.
 intros f (Hoe, Ho) os Hos e p Hs Hr; simpl in Hr; subst os.
 destruct Hs as (Hnf & el & el₁ & Hn & Hs); simpl in Hs.
 destruct Hr as (Hrnf & elr & elr₁ & Hnr & Hsr); simpl in Hsr.
-assert (Hr : f p = f (rotate (negf e) p)).
- apply Hoe.
- exists (negf e :: []).
- now rewrite <- rotate_vec_mul.
-
- rewrite <- Hr in Hsr.
- rewrite rotate_vec_mul in Hsr.
- eapply rotate_rev_path in Hsr.
- rewrite <- rotate_vec_mul in Hsr.
- rewrite <- fold_right_single, <- fold_right_app in Hsr.
- rewrite <- Hsr in Hs.
- rewrite <- fold_right_app in Hs.
- rewrite rotate_vec_mul in Hs.
- rewrite rotate_rotate_norm in Hs.
- pose proof is_normal [] el (rev_path elr ++ [negf e]) as H.
- do 2 rewrite app_nil_l in H.
- rewrite <- H in Hs; clear H.
- rewrite <- is_normal in Hs.
- rewrite <- rev_path_norm_list in Hs.
- rewrite Hnr in Hs.
- rewrite <- rotate_rotate_norm in Hs.
- rewrite rev_path_cons in Hs.
- rewrite rev_path_single in Hs.
- rewrite <- app_assoc in Hs.
- simpl in Hs.
- rewrite negf_involutive in Hs.
- rewrite app_assoc in Hs.
- rewrite rotate_cancel_in in Hs.
- rewrite app_nil_r in Hs.
- destruct Hnf as (Hps, Hnpd).
- apply Hnpd.
- exists (norm_list el ++ rev_path elr₁), p.
- split; [ easy | ].
- split; [ | easy ].
- intros H.
- apply norm_list_app_is_nil in H.
+assert (Hr : f p = f (rotate (negf e) p)). {
+  apply Hoe.
+  exists (negf e :: []).
+  now rewrite <- rotate_vec_mul.
+}
+rewrite <- Hr in Hsr.
+rewrite rotate_vec_mul in Hsr.
+eapply rotate_rev_path in Hsr.
+rewrite <- rotate_vec_mul in Hsr.
+rewrite <- fold_right_single, <- fold_right_app in Hsr.
+rewrite <- Hsr in Hs.
+rewrite <- fold_right_app in Hs.
+rewrite rotate_vec_mul in Hs.
+rewrite rotate_rotate_norm in Hs.
+pose proof is_normal [] el (rev_path elr ++ [negf e]) as H.
+do 2 rewrite app_nil_l in H.
+rewrite <- H in Hs; clear H.
+rewrite <- is_normal in Hs.
+rewrite <- rev_path_norm_list in Hs.
+rewrite Hnr in Hs.
+rewrite <- rotate_rotate_norm in Hs.
+rewrite rev_path_cons in Hs.
+rewrite rev_path_single in Hs.
+rewrite <- app_assoc in Hs.
+simpl in Hs.
+rewrite negf_involutive in Hs.
+rewrite app_assoc in Hs.
+rewrite rotate_cancel_in in Hs.
+rewrite app_nil_r in Hs.
+destruct Hnf as (Hps, Hnpd).
+apply Hnpd.
+exists (norm_list el ++ rev_path elr₁), p.
+split; [ easy | ].
+split; [ | easy ].
+intros H.
+apply norm_list_app_is_nil in H. {
   apply -> rev_path_eq_eq in H.
   rewrite H, Hn in Hnr.
   revert Hnr; apply norm_list_no_start2.
-
+} {
   symmetry; apply norm_list_idemp.
-  rewrite <- rev_path_norm_list; eapply norm_list_is_cons in Hnr.
-  now rewrite Hnr.
+}
+rewrite <- rev_path_norm_list; eapply norm_list_is_cons in Hnr.
+now rewrite Hnr.
 Qed.
 
 Theorem decompose_2a_contrad_case :
@@ -200,33 +199,34 @@ Theorem decompose_2a_contrad_case :
   → False.
 Proof.
 intros * (Hoe, Ho) * Hos * Hi Hj.
- assert (Hfr : f (rotate ạ⁻¹ p) = f p).
+assert (Hfr : f (rotate ạ⁻¹ p) = f p). {
   apply Hoe; exists (ạ :: []); simpl.
   rewrite <- rotate_vec_mul; simpl.
   apply rotate_neg_rotate.
-
-   destruct Hj as (Hs & Hb); simpl in Hs, Hb; apply Hb; clear Hb.
-   split; [ now destruct Hs | ].
-   destruct Hi as [[Hi| Hi] | Hi].
-    destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
-    destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
-    exists O; simpl.
-    rewrite Hfr, <- Hp.
-    apply mat_of_path_single.
-
-    eapply not_start_with_rot in Hi; try eassumption; [ easy | ].
-    now split.
-
-    destruct Hi as (Hnf, Hoo).
-    destruct Hoo as (n, Hoo).
-    unfold orbit_by_seq_of.
-    remember S as g; subst os; simpl in Hoo; simpl; subst g.
-    rewrite Hfr; simpl.
-    exists (S n).
-    rewrite mat_of_path_cons, mat_vec_mul_assoc, Hoo.
-    rewrite <- mat_of_path_single.
-    unfold mat_of_path; simpl.
-    now rewrite mat_mul_id_r.
+}
+destruct Hj as (Hs & Hb); simpl in Hs, Hb; apply Hb; clear Hb.
+split; [ now destruct Hs | ].
+destruct Hi as [[Hi| Hi] | Hi]. {
+  destruct Hs as (Hrnf & el & el₁ & Hn & Hr).
+  destruct Hi as (Hnf & Hp); subst os; simpl in Hp.
+  exists O; simpl.
+  rewrite Hfr, <- Hp.
+  apply mat_of_path_single.
+} {
+  eapply not_start_with_rot in Hi; try eassumption; [ easy | ].
+  now split.
+} {
+  destruct Hi as (Hnf, Hoo).
+  destruct Hoo as (n, Hoo).
+  unfold orbit_by_seq_of.
+  remember S as g; subst os; simpl in Hoo; simpl; subst g.
+  rewrite Hfr; simpl.
+  exists (S n).
+  rewrite mat_of_path_cons, mat_vec_mul_assoc, Hoo.
+  rewrite <- mat_of_path_single.
+  unfold mat_of_path; simpl.
+  now rewrite mat_mul_id_r.
+}
 Qed.
 
 Theorem r_decomposed_5 :
@@ -235,158 +235,156 @@ Theorem r_decomposed_5 :
   → is_partition (ball ∖ D) [M; SS ạ; SS ạ⁻¹; SS ḅ; SS ḅ⁻¹].
 Proof.
 intros f (Hoe, Ho) os Hos; subst os.
-split.
-*intros p.
- split.
- -intros Hnf.
-  unfold set_union_list; simpl; unfold set_union.
-  destruct (vec_eq_dec p (f p)) as [H₁| H₁]; [ left; now split | ].
-  right.
-  pose proof Ho p as H.
-  destruct H as (el, Hel).
-  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-  destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁.
-  +rewrite rotate_rotate_norm, H₂ in Hel.
-   now rewrite mat_vec_mul_id in Hel.
-
-  +destruct e as (t, d); destruct t, d.
-    left; split; [ easy | ].
-    exists (rev_path el), (rev_path el₂).
-    rewrite rotate_vec_mul.
-    split; [ | now apply rotate_rev_path ].
-    now rewrite <- rev_path_norm_list, H₂, rev_path_app.
-
-    right; left; split; [ easy | ].
-    exists (rev_path el), (rev_path el₂).
-    rewrite rotate_vec_mul.
-    split; [ | now apply rotate_rev_path ].
-    now rewrite <- rev_path_norm_list, H₂, rev_path_app.
-
-    right; right; left; split; [ easy | ].
-    exists (rev_path el), (rev_path el₂).
-    rewrite rotate_vec_mul.
-    split; [ | now apply rotate_rev_path ].
-    now rewrite <- rev_path_norm_list, H₂, rev_path_app.
-
-    right; right; right; left; split; [ easy | ].
-    exists (rev_path el), (rev_path el₂).
-    rewrite rotate_vec_mul.
-    split; [ | now apply rotate_rev_path ].
-    now rewrite <- rev_path_norm_list, H₂, rev_path_app.
-
- -intros Hul.
+split. {
+  intros p.
+  split. {
+    intros Hnf.
+    unfold set_union_list; simpl; unfold set_union.
+    destruct (vec_eq_dec p (f p)) as [H₁| H₁]; [ left; now split | ].
+    right.
+    pose proof Ho p as H.
+    destruct H as (el, Hel).
+    remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+    destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁. {
+      rewrite rotate_rotate_norm, H₂ in Hel.
+      now rewrite mat_vec_mul_id in Hel.
+    }
+    destruct e as (t, d); destruct t, d. {
+      left; split; [ easy | ].
+      exists (rev_path el), (rev_path el₂).
+      rewrite rotate_vec_mul.
+      split; [ | now apply rotate_rev_path ].
+      now rewrite <- rev_path_norm_list, H₂, rev_path_app.
+    } {
+      right; left; split; [ easy | ].
+      exists (rev_path el), (rev_path el₂).
+      rewrite rotate_vec_mul.
+      split; [ | now apply rotate_rev_path ].
+      now rewrite <- rev_path_norm_list, H₂, rev_path_app.
+    } {
+      right; right; left; split; [ easy | ].
+      exists (rev_path el), (rev_path el₂).
+      rewrite rotate_vec_mul.
+      split; [ | now apply rotate_rev_path ].
+      now rewrite <- rev_path_norm_list, H₂, rev_path_app.
+    } {
+      right; right; right; left; split; [ easy | ].
+      exists (rev_path el), (rev_path el₂).
+      rewrite rotate_vec_mul.
+      split; [ | now apply rotate_rev_path ].
+      now rewrite <- rev_path_norm_list, H₂, rev_path_app.
+    }
+  }
+  intros Hul.
   unfold set_union_list in Hul; simpl in Hul; unfold set_union in Hul.
-  destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]].
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   now apply Hnf.
-
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   now apply Hnf.
-
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   now apply Hnf.
-
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   now apply Hnf.
-
-  +destruct Hul as (Hnf, Hul); simpl in Hul.
-   now apply Hnf.
-
-  +easy.
-
-*intros i j Hij p.
- split; [ | easy ].
- intros (Hi, Hj).
- destruct i; [ simpl in Hi | ].
+  destruct Hul as [Hul| [Hul| [Hul| [Hul| [Hul| Hul]]]]]. {
+    destruct Hul as (Hnf, Hul); simpl in Hul.
+    now apply Hnf.
+  } {
+    destruct Hul as (Hnf, Hul); simpl in Hul.
+    now apply Hnf.
+  } {
+    destruct Hul as (Hnf, Hul); simpl in Hul.
+    now apply Hnf.
+  } {
+    destruct Hul as (Hnf, Hul); simpl in Hul.
+    now apply Hnf.
+  } {
+    destruct Hul as (Hnf, Hul); simpl in Hul.
+    now apply Hnf.
+  }
+  easy.
+}
+intros i j Hij p.
+split; [ | easy ].
+intros (Hi, Hj).
+destruct i; [ simpl in Hi | ]. {
   destruct j; [ exfalso; now apply Hij | clear Hij ].
   destruct Hi as (Hinf & Hi); simpl in Hi.
-  destruct j.
-   eapply empty_set_not_full_set; [ easy | | eassumption ].
-   now split.
-
-   destruct j.
+  destruct j. {
     eapply empty_set_not_full_set; [ easy | | eassumption ].
-    now split.
-
-    destruct j.
-     eapply empty_set_not_full_set; [ easy | | eassumption ].
-     now split.
-
-     destruct j; [ | now destruct j ].
-     eapply empty_set_not_full_set; [ easy | | eassumption ].
-     now split.
-
- destruct i; [ simpl in Hi | ].
-  destruct j; [ clear Hij | ].
-   eapply empty_set_not_full_set; [ easy | eassumption | eassumption ].
-
-   destruct j; [ exfalso; now apply Hij | clear Hij ].
-   destruct j; [ simpl in Hj | ].
+    easy.
+  }
+  destruct j. {
+    eapply empty_set_not_full_set; [ easy | | eassumption ].
+    easy.
+  }
+  destruct j. {
+    eapply empty_set_not_full_set; [ easy | | eassumption ].
+    easy.
+  }
+  destruct j; [ | now destruct j ].
+  eapply empty_set_not_full_set; [ easy | | eassumption ].
+  easy.
+}
+destruct i; [ simpl in Hi | ]. {
+  destruct j; [ clear Hij | ]. {
+    eapply empty_set_not_full_set; [ easy | eassumption | eassumption ].
+  }
+  destruct j; [ exfalso; now apply Hij | clear Hij ].
+  destruct j; [ simpl in Hj | ]. {
     eapply start_with_same in Hi; [ | easy | eassumption ].
     easy.
-
-    destruct j; [ simpl in Hj | ].
-     eapply start_with_same in Hi; [ | easy | eassumption ].
-     easy.
-
-     destruct j; [ simpl in Hj | now destruct j ].
-     eapply start_with_same in Hi; [ | easy | eassumption ].
-     easy.
-
-  destruct i; [ simpl in Hi | ].
-   destruct j; [ clear Hij | ].
+  }
+  destruct j; [ simpl in Hj | ]. {
+    eapply start_with_same in Hi; [ | easy | eassumption ].
+    easy.
+  }
+  destruct j; [ simpl in Hj | now destruct j ].
+  eapply start_with_same in Hi; [ | easy | eassumption ].
+  easy.
+}
+destruct i; [ simpl in Hi | ]. {
+  destruct j; [ clear Hij | ]. {
     eapply empty_set_not_full_set; [ easy | | ]; eassumption.
-
-    destruct j; [ simpl in Hj | ].
-     eapply start_with_same in Hi; [ | easy | eassumption ].
-     easy.
-
-     destruct j; [ exfalso; now apply Hij | clear Hij ].
-     destruct j; [ simpl in Hj | ].
-      eapply start_with_same in Hi; [ | easy | eassumption ].
-      easy.
-
-      destruct j; [ simpl in Hj | now destruct j ].
-      eapply start_with_same in Hi; [ | easy | eassumption ].
-      easy.
-
-   destruct i; [ simpl in Hi | ].
-    destruct j; [ clear Hij | ].
-     eapply empty_set_not_full_set; [ easy | | ]; eassumption.
-
-     destruct j; [ simpl in Hj | ].
-      eapply start_with_same in Hi; [ | easy | eassumption ].
-      easy.
-
-      destruct j; [ simpl in Hj | ].
-       eapply start_with_same in Hi; [ | easy | eassumption ].
-       easy.
-
-       destruct j; [ exfalso; now apply Hij | clear Hij ].
-       destruct j; [ simpl in Hj | now destruct j ].
-       eapply start_with_same in Hi; [ | easy | eassumption ].
-       easy.
-
-    destruct i; [ simpl in Hi | ].
-     destruct j; [ clear Hij | ].
-      eapply empty_set_not_full_set; [ easy | | ]; eassumption.
-
-      destruct j; [ simpl in Hj | ].
-       eapply start_with_same in Hi; [ | easy | eassumption ].
-       easy.
-
-       destruct j; [ simpl in Hj | ].
-        eapply start_with_same in Hi; [ | easy | eassumption ].
-        easy.
-
-        destruct j; [ simpl in Hj | ].
-         eapply start_with_same in Hi; [ | easy | eassumption ].
-         easy.
-
-         destruct j; [ exfalso; now apply Hij | clear Hij ].
-         now destruct j.
-
-     now destruct i.
+  }
+  destruct j; [ simpl in Hj | ]. {
+    eapply start_with_same in Hi; [ | easy | eassumption ].
+    easy.
+  }
+  destruct j; [ exfalso; now apply Hij | clear Hij ].
+  destruct j; [ simpl in Hj | ]. {
+    eapply start_with_same in Hi; [ | easy | eassumption ].
+    easy.
+  }
+  destruct j; [ simpl in Hj | now destruct j ].
+  eapply start_with_same in Hi; [ | easy | eassumption ].
+  easy.
+}
+destruct i; [ simpl in Hi | ]. {
+  destruct j; [ clear Hij | ]. {
+    eapply empty_set_not_full_set; [ easy | | ]; eassumption.
+  }
+  destruct j; [ simpl in Hj | ]. {
+    eapply start_with_same in Hi; [ | easy | eassumption ].
+    easy.
+  }
+  destruct j; [ simpl in Hj | ]. {
+    eapply start_with_same in Hi; [ | easy | eassumption ].
+    easy.
+  }
+  destruct j; [ exfalso; now apply Hij | clear Hij ].
+  destruct j; [ simpl in Hj | now destruct j ].
+  eapply start_with_same in Hi; [ | easy | eassumption ].
+  easy.
+}
+destruct i; [ simpl in Hi | now destruct i ].
+destruct j; [ clear Hij | ]. {
+  eapply empty_set_not_full_set; [ easy | | ]; eassumption.
+}
+destruct j; [ simpl in Hj | ]. {
+  eapply start_with_same in Hi; [ | easy | eassumption ].
+  easy.
+}
+destruct j; [ simpl in Hj | ]. {
+  eapply start_with_same in Hi; [ | easy | eassumption ].
+  easy.
+}
+destruct j; [ simpl in Hj | ]. {
+  eapply start_with_same in Hi; [ | easy | eassumption ].
+  easy.
+}
+destruct j; [ exfalso; now apply Hij | now destruct j ].
 Qed.
 
 Theorem r_decomposed_4 :
@@ -428,100 +426,97 @@ Theorem r_decomposed_2 :
     is_partition (ball ∖ D) [SS e; rot e (SS (negf e))].
 Proof.
 intros f (Hoe, Ho) os Hos e; subst os.
-split.
-*intros p.
- split.
- -intros Hnf.
-  unfold set_union_list; simpl; unfold set_union.
-  pose proof Ho p as H.
-  apply same_orbit_sym in H.
-  destruct H as (el, Hel).
-  remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-  destruct el₁ as [| e₁].
-   +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
-    rewrite mat_vec_mul_id in Hel.
-    clear Hel₁.
+split. {
+  intros p.
+  split. {
+    intros Hnf.
+    unfold set_union_list; simpl; unfold set_union.
+    pose proof Ho p as H.
+    apply same_orbit_sym in H.
+    destruct H as (el, Hel).
+    remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+    destruct el₁ as [| e₁]. {
+      rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+      rewrite mat_vec_mul_id in Hel.
+      clear Hel₁.
+      right; left.
+      unfold rot.
+      split. {
+        split. {
+          destruct Hnf as (His, _).
+          now apply in_ball_after_rotate.
+        }
+        destruct Hnf as (Hps, Hnpd).
+        now apply no_fixpoint_after_rotate.
+      }
+      exists (negf e :: []), [].
+      split; [ easy | simpl ].
+      assert (H : f p = f (rotate (negf e) p)). {
+        apply Hoe.
+        exists (negf e :: []).
+        apply mat_of_path_single.
+      }
+      now rewrite <- H, Hel.
+    }
+    destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ]. {
+      left; split; [ easy | ].
+      exists el, el₁.
+      rewrite rotate_vec_mul.
+      now split.
+    }
     right; left.
     unfold rot.
-    split.
-     split.
-      destruct Hnf as (His, _).
-      now apply in_ball_after_rotate.
-
-      destruct Hnf as (Hps, Hnpd).
+    split. {
+      split. {
+        destruct Hnf as (His, _).
+        now apply in_ball_after_rotate.
+      }
+      destruct Hnf.
       now apply no_fixpoint_after_rotate.
-
-     exists (negf e :: []), [].
-     split; [ easy | simpl ].
-     assert (H : f p = f (rotate (negf e) p)).
+    }
+    assert (H : f p = f (rotate (negf e) p)). {
       apply Hoe.
       exists (negf e :: []).
       apply mat_of_path_single.
-
-      now rewrite <- H, Hel.
-
-   +destruct (free_elem_dec e e₁) as [H₁| H₁]; [ subst e₁ | ].
-     left; split; [ easy | ].
-     exists el, el₁.
-     rewrite rotate_vec_mul.
-     now split.
-
-     right; left.
-     unfold rot.
-     split.
-      split.
-       destruct Hnf as (His, _).
-       now apply in_ball_after_rotate.
-
-       destruct Hnf.
-       now apply no_fixpoint_after_rotate.
-
-      assert (H : f p = f (rotate (negf e) p)).
-       apply Hoe.
-       exists (negf e :: []).
-       apply mat_of_path_single.
-
-       simpl; rewrite <- H.
-       exists (negf e :: el), (e₁ :: el₁); simpl.
-       rewrite rotate_vec_mul.
-       rewrite Hel₁, Hel.
-       destruct (letter_opp_dec (negf e) e₁) as [H₂| H₂].
-        exfalso.
-        apply letter_opp_negf in H₂.
-        now apply H₁, negf_eq_eq.
-
-        now split.
-
- -intros Hul.
+    }
+    simpl; rewrite <- H.
+    exists (negf e :: el), (e₁ :: el₁); simpl.
+    rewrite rotate_vec_mul.
+    rewrite Hel₁, Hel.
+    destruct (letter_opp_dec (negf e) e₁) as [H₂| H₂]; [ | now split ].
+    exfalso.
+    apply letter_opp_negf in H₂.
+    now apply H₁, negf_eq_eq.
+  }
+  intros Hul.
   destruct Hul as [(H, _)| [(H, _)| Hul]]; [ easy | | easy ].
-  split.
-   destruct H as (His, _).
-   apply in_ball_after_rotate with (e := e) in His.
-   now rewrite rotate_rotate_neg in His.
-
-   destruct H as (Hs, Hnp).
-   apply no_fixpoint_after_rotate with (e := e) in Hnp.
-   now rewrite rotate_rotate_neg in Hnp.
-
-*intros i j Hij p.
- split; [ | easy ].
- intros (Hi, Hj).
- destruct i; [ simpl in Hi | ].
+  split. {
+    destruct H as (His, _).
+    apply in_ball_after_rotate with (e := e) in His.
+    now rewrite rotate_rotate_neg in His.
+  } {
+    destruct H as (Hs, Hnp).
+    apply no_fixpoint_after_rotate with (e := e) in Hnp.
+    now rewrite rotate_rotate_neg in Hnp.
+  }
+}
+intros i j Hij p.
+split; [ | easy ].
+intros (Hi, Hj).
+destruct i; [ simpl in Hi | ]. {
   destruct j; [ exfalso; now apply Hij | clear Hij ].
   destruct j; [ | now destruct j ].
   simpl in Hj.
   eapply not_start_with_rot in Hi; try eassumption; [ | easy ].
-  now split.
-
-  destruct i; [ simpl in Hi | ].
-   destruct j; [ simpl in Hj; clear Hij | ].
-    eapply not_start_with_rot in Hj; try eassumption; [ | easy ].
-    now split.
-
-    destruct j; [ now apply Hij | clear Hij ].
-    now destruct j.
-
-   now destruct i.
+  easy.
+}
+destruct i; [ simpl in Hi | now destruct i ].
+destruct j; [ simpl in Hj; clear Hij | ].
+eapply not_start_with_rot in Hj; try eassumption; [ | easy ]. {
+  easy.
+} {
+  destruct j; [ now apply Hij | now destruct j ].
+}
 Qed.
 
 Add Parametric Morphism {A} : (@List.nth (set A))
@@ -548,154 +543,153 @@ Theorem r_decomposed_2_a :
   → is_partition (ball ∖ D) [M ∪ SS ạ ∪ G; rot ạ (SS ạ⁻¹ ∖ G)].
 Proof.
 intros f (Hoe, Ho) os Hos.
-split.
-*intros p.
- assert (Hfr : f (rotate ạ⁻¹ p) = f p).
-  apply Hoe; exists (ạ :: []).
-  rewrite mat_of_path_single.
-  apply rotate_neg_rotate.
-
-  split.
-  -intros Hnf.
-   unfold set_union_list; simpl; unfold set_union.
-   pose proof Ho p as H.
-   apply same_orbit_sym in H.
-   destruct H as (el, Hel).
-   remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
-   destruct el₁ as [| e₁].
-    +rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
-     rewrite mat_vec_mul_id in Hel.
-     clear el Hel₁.
-     left; left; left.
-     split; [ easy | subst os; now symmetry ].
-
-    +destruct e₁ as (t, d); destruct t.
-     destruct d.
-      destruct (EM (p ∈ G)) as [HB| HB]; [ left; now right | ].
-      right; left; simpl.
-      split.
-       split.
-        destruct Hnf as (His, Hnf).
-        split; [ now apply in_ball_after_rotate | ].
-        now apply no_fixpoint_after_rotate.
-
-        subst os; simpl.
-        rewrite Hfr.
-        exists (ạ⁻¹ :: el), (norm_list el).
-        split; [ now simpl; rewrite Hel₁ | ].
-        now simpl; rewrite rotate_vec_mul; f_equal.
-
-       simpl; intros (Haf & n & Hoo); apply HB; clear HB.
-       split; [ easy | ].
-       unfold orbit_by_seq_of in Hoo |-*; simpl.
-       remember S as g;
-       subst os; simpl in Hoo |-*; subst g.
-       rewrite Hfr in Hoo; simpl in Hoo.
-       apply f_equal with (f := rotate (FE la false)) in Hoo.
-       rewrite <- rotate_vec_mul in Hoo; simpl in Hoo.
-       do 2 rewrite rotate_rotate_neg in Hoo.
-       rewrite rotate_vec_mul in Hoo.
-       destruct n; [ | now exists n ].
-       simpl in Hoo.
-       rewrite mat_vec_mul_id in Hoo.
-       rewrite Hoo in Hel.
-       destruct Hnf as (His & Hoh).
-       exfalso; apply Hoh.
-       exists el, p.
-       now rewrite Hel₁.
-
+split. {
+  intros p.
+  assert (Hfr : f (rotate ạ⁻¹ p) = f p). {
+    apply Hoe; exists (ạ :: []).
+    rewrite mat_of_path_single.
+    apply rotate_neg_rotate.
+  }
+  split. {
+    intros Hnf.
+    unfold set_union_list; simpl; unfold set_union.
+    pose proof Ho p as H.
+    apply same_orbit_sym in H.
+    destruct H as (el, Hel).
+    remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
+    destruct el₁ as [| e₁]. {
+      rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+      rewrite mat_vec_mul_id in Hel.
+      clear el Hel₁.
+      left; left; left.
+      split; [ easy | subst os; now symmetry ].
+    }
+    destruct e₁ as (t, d); destruct t. {
+      destruct d. {
+        destruct (EM (p ∈ G)) as [HB| HB]; [ left; now right | ].
+        right; left; simpl.
+        split. {
+          split. {
+            destruct Hnf as (His, Hnf).
+            split; [ now apply in_ball_after_rotate | ].
+            now apply no_fixpoint_after_rotate.
+          }
+          subst os; simpl.
+          rewrite Hfr.
+          exists (ạ⁻¹ :: el), (norm_list el).
+          split; [ now simpl; rewrite Hel₁ | ].
+          now simpl; rewrite rotate_vec_mul; f_equal.
+        }
+        simpl; intros (Haf & n & Hoo); apply HB; clear HB.
+        split; [ easy | ].
+        unfold orbit_by_seq_of in Hoo |-*; simpl.
+        remember S as g; subst os; simpl in Hoo |-*; subst g.
+        rewrite Hfr in Hoo; simpl in Hoo.
+        apply f_equal with (f := rotate (FE la false)) in Hoo.
+        rewrite <- rotate_vec_mul in Hoo; simpl in Hoo.
+        do 2 rewrite rotate_rotate_neg in Hoo.
+        rewrite rotate_vec_mul in Hoo.
+        destruct n; [ | now exists n ].
+        simpl in Hoo.
+        rewrite mat_vec_mul_id in Hoo.
+        rewrite Hoo in Hel.
+        destruct Hnf as (His & Hoh).
+        exfalso; apply Hoh.
+        exists el, p.
+        now rewrite Hel₁.
+      }
       left; left; right.
       split; [ easy | ].
       exists el, el₁; subst os.
       rewrite rotate_vec_mul.
       now split.
-
-     right; left.
-     split; simpl.
-      split.
-       destruct Hnf as (His & Hnf).
-       split; [ now apply in_ball_after_rotate | ].
-       now apply no_fixpoint_after_rotate.
-
-       subst os; simpl; rewrite Hfr.
-       exists (ạ⁻¹ :: el), (norm_list el).
-       split; [ now simpl; rewrite Hel₁ | ].
-       now simpl; rewrite rotate_vec_mul; f_equal.
-
-      intros (Hnf₂, Hoo).
-      subst os; simpl in Hoo.
-      unfold orbit_by_seq_of in Hoo; simpl in Hoo.
-      rewrite Hfr in Hoo.
-      destruct Hoo as (n, Hr).
-      apply f_equal with (f := rotate (FE la false)) in Hr.
-      rewrite <- rotate_vec_mul in Hr; simpl in Hr.
-      do 2 rewrite rotate_rotate_neg in Hr.
-      rewrite rotate_vec_mul in Hr.
-      destruct n.
-       simpl in Hr; rewrite mat_vec_mul_id in Hr.
-       rewrite Hr in Hel.
-       destruct Hnf as (His, Hoh).
-       now apply Hoh; exists el, p; rewrite Hel₁.
-
-       apply rotate_rev_path in Hr.
-       rewrite <- Hr in Hel.
-       rewrite <- mat_vec_mul_assoc in Hel.
-       rewrite <- mat_of_path_app in Hel.
-       destruct Hnf as (His, Hoh).
-       apply Hoh.
-       exists (el ++ rev_path (repeat ạ⁻¹ (S n))), p.
-       split; [ easy | ].
-       split; [ | easy ].
-       replace el with ([] ++ el) by easy.
-       rewrite <- app_assoc, <- is_normal, Hel₁, app_nil_l.
-       rewrite rev_path_repeat.
-       remember norm_list as g; remember S as h; simpl; subst g h.
-       rewrite app_of_cons, app_assoc.
-       intros H.
-       eapply norm_list_app_is_nil in H.
-        simpl in H.
-        apply f_equal with (f := rev_path) in H.
-        rewrite rev_path_involutive in H.
-        rewrite <- app_repeat_diag in H.
-        now rewrite rev_path_app in H; simpl in H.
-
-        unfold app; rewrite <- Hel₁; symmetry.
-        apply norm_list_idemp.
-
-        symmetry; apply norm_list_repeat.
-
- -intros HE.
+    }
+    right; left.
+    split; simpl. {
+      split. {
+        destruct Hnf as (His & Hnf).
+        split; [ now apply in_ball_after_rotate | ].
+        now apply no_fixpoint_after_rotate.
+      }
+      subst os; simpl; rewrite Hfr.
+      exists (ạ⁻¹ :: el), (norm_list el).
+      split; [ now simpl; rewrite Hel₁ | ].
+      now simpl; rewrite rotate_vec_mul; f_equal.
+    }
+    intros (Hnf₂, Hoo).
+    subst os; simpl in Hoo.
+    unfold orbit_by_seq_of in Hoo; simpl in Hoo.
+    rewrite Hfr in Hoo.
+    destruct Hoo as (n, Hr).
+    apply f_equal with (f := rotate (FE la false)) in Hr.
+    rewrite <- rotate_vec_mul in Hr; simpl in Hr.
+    do 2 rewrite rotate_rotate_neg in Hr.
+    rewrite rotate_vec_mul in Hr.
+    destruct n. {
+      simpl in Hr; rewrite mat_vec_mul_id in Hr.
+      rewrite Hr in Hel.
+      destruct Hnf as (His, Hoh).
+      now apply Hoh; exists el, p; rewrite Hel₁.
+    }
+    apply rotate_rev_path in Hr.
+    rewrite <- Hr in Hel.
+    rewrite <- mat_vec_mul_assoc in Hel.
+    rewrite <- mat_of_path_app in Hel.
+    destruct Hnf as (His, Hoh).
+    apply Hoh.
+    exists (el ++ rev_path (repeat ạ⁻¹ (S n))), p.
+    split; [ easy | ].
+    split; [ | easy ].
+    replace el with ([] ++ el) by easy.
+    rewrite <- app_assoc, <- is_normal, Hel₁, app_nil_l.
+    rewrite rev_path_repeat.
+    remember norm_list as g; remember S as h; simpl; subst g h.
+    rewrite app_of_cons, app_assoc.
+    intros H.
+    eapply norm_list_app_is_nil in H. {
+      simpl in H.
+      apply f_equal with (f := rev_path) in H.
+      rewrite rev_path_involutive in H.
+      rewrite <- app_repeat_diag in H.
+      now rewrite rev_path_app in H; simpl in H.
+    } {
+      unfold app; rewrite <- Hel₁; symmetry.
+      apply norm_list_idemp.
+    }
+    symmetry; apply norm_list_repeat.
+  }
+  intros HE.
   simpl in HE.
   destruct HE as [[[HE| HE]| HE]| [HE| HE]]; try now destruct HE.
   destruct HE as (((His & Hoo) & HE) & HB).
-  split.
-   apply in_ball_after_rotate with (e := ạ) in His.
-   now rewrite rotate_rotate_neg in His.
-
-   apply no_fixpoint_after_rotate with (e := ạ) in Hoo.
-   now rewrite rotate_rotate_neg in Hoo.
-
-*intros i j Hij p.
- assert (Hfr : f (rotate ạ⁻¹ p) = f p).
+  split. {
+    apply in_ball_after_rotate with (e := ạ) in His.
+    now rewrite rotate_rotate_neg in His.
+  } {
+    apply no_fixpoint_after_rotate with (e := ạ) in Hoo.
+    now rewrite rotate_rotate_neg in Hoo.
+  }
+}
+intros i j Hij p.
+assert (Hfr : f (rotate ạ⁻¹ p) = f p). {
   apply Hoe; exists (ạ :: []).
   rewrite mat_of_path_single.
   apply rotate_neg_rotate.
-
-  split; [ | easy ].
-  intros (Hi, Hj).
-  destruct i; [ simpl in Hi | ].
-   destruct j; [ exfalso; now apply Hij | clear Hij ].
-   destruct j; [ simpl in Hj | now destruct j ].
-   eapply decompose_2a_contrad_case; unfold set_union; try eassumption.
-   now split.
-
-   destruct i; [ simpl in Hi | now destruct i ].
-   destruct j.
-    eapply decompose_2a_contrad_case; unfold set_union; try eassumption.
-    now split.
-
-    destruct j; [ now apply Hij | clear Hij ].
-    now destruct j.
+}
+split; [ | easy ].
+intros (Hi, Hj).
+destruct i; [ simpl in Hi | ]. {
+  destruct j; [ exfalso; now apply Hij | clear Hij ].
+  destruct j; [ simpl in Hj | now destruct j ].
+  eapply decompose_2a_contrad_case; unfold set_union; try eassumption.
+  easy.
+}
+destruct i; [ simpl in Hi | now destruct i ].
+destruct j. {
+  eapply decompose_2a_contrad_case; unfold set_union; try eassumption.
+  easy.
+}
+destruct j; [ now apply Hij | now destruct j ].
 Qed.
 
 Theorem r_decomposed_2_b :
@@ -711,14 +705,14 @@ Theorem rot_set_map_mul : ∀ e E,
   (rot e E = set_map (mat_vec_mul (mat_of_elem e)) E)%S.
 Proof.
 intros; intros v.
-split; intros H.
- exists (rotate (negf e) v).
- split; [ easy | unfold rotate ].
- rewrite <- mat_vec_mul_assoc.
- now rewrite mat_of_elem_mul_negf_r, mat_vec_mul_id.
-
- destruct H as (u & Hu & Hv).
- rewrite <- Hv; simpl; unfold rotate.
- rewrite <- mat_vec_mul_assoc.
- now rewrite mat_of_elem_mul_negf_l, mat_vec_mul_id.
+split; intros H. {
+  exists (rotate (negf e) v).
+  split; [ easy | unfold rotate ].
+  rewrite <- mat_vec_mul_assoc.
+  now rewrite mat_of_elem_mul_negf_r, mat_vec_mul_id.
+}
+destruct H as (u & Hu & Hv).
+rewrite <- Hv; simpl; unfold rotate.
+rewrite <- mat_vec_mul_assoc.
+now rewrite mat_of_elem_mul_negf_l, mat_vec_mul_id.
 Qed.
