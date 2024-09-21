@@ -1070,21 +1070,19 @@ destruct (Rlt_dec s 0) as [Hs| Hs]. {
     apply cos_acos.
     now apply pre_cos_bound in Hsc.
   }
-(* ... *)
   rewrite cos_plus.
   rewrite cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rminus_0_r.
   rewrite cos_asin; [ | now apply pre_sin_bound in Hsc ].
   replace (1 - s²) with c² by lra.
   apply Rnot_lt_le in Hc.
   now rewrite sqrt_Rsqr.
-
 }
- destruct (Rlt_dec c 0) as [Hc| Hc].
+destruct (Rlt_dec c 0) as [Hc| Hc]. {
   rewrite cos_acos; [ easy | ].
   now apply pre_cos_bound in Hsc.
-
-  rewrite cos_asin; [ | now apply pre_sin_bound in Hsc ].
-  replace (1 - s²) with c² by lra.
-  apply Rnot_lt_le in Hc.
-  now rewrite sqrt_Rsqr.
+}
+rewrite cos_asin; [ | now apply pre_sin_bound in Hsc ].
+replace (1 - s²) with c² by lra.
+apply Rnot_lt_le in Hc.
+now rewrite sqrt_Rsqr.
 Qed.
