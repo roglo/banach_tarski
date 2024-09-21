@@ -96,21 +96,22 @@ Proof.
 intros; revert l2.
 induction l1, l2.
 all: split; [ intros HF | intros (HF, H) ]; simpl.
- 1-6: easy.
-
- apply Forall2_cons_cons in HF.
- split; [ | now f_equal; apply IHl1 ].
- constructor; [ easy | now apply IHl1 ].
-
- simpl in HF; apply Forall_inv2 in HF.
- constructor; [ easy | ].
- simpl in H; apply Nat.succ_inj in H.
- now apply IHl1; split.
+1-6: easy.
+{
+  apply Forall2_cons_cons in HF.
+  split; [ | now f_equal; apply IHl1 ].
+  constructor; [ easy | now apply IHl1 ].
+} {
+  simpl in HF; apply Forall_inv2 in HF.
+  constructor; [ easy | ].
+  simpl in H; apply Nat.succ_inj in H.
+  now apply IHl1; split.
+}
 Qed.
 
 Theorem flat_map_nil_fun : ∀ A B (f : A → list B) l,
- Forall (λ x, f x = []) l
- → flat_map f l = [].
+  Forall (λ x, f x = []) l
+  → flat_map f l = [].
 Proof.
 intros * HF.
 induction l as [| x l]; [ easy | simpl ].
@@ -144,23 +145,24 @@ Theorem split_app_eq : ∀ A (el₁ el₂ el₃ el₄ : list A),
 Proof.
 intros A el₁ el₂ el₃ el₄ Hel.
 revert el₂ el₃ el₄ Hel.
-induction el₁ as [| e₁]; intros.
- left; exists el₃.
- now split.
-
- destruct el₃ as [| e₃].
+induction el₁ as [| e₁]; intros. {
+  left; exists el₃.
+  now split.
+}
+destruct el₃ as [| e₃]. {
   right; exists (e₁ :: el₁).
   now split.
-
-  simpl in Hel.
-  injection Hel; clear Hel; intros; subst e₃.
-  apply IHel₁ in H.
-  destruct H as [H| H].
-   left; destruct H as (el, (H₁, H₂)); subst el₂ el₃.
-   exists el; now split.
-
-   right; destruct H as (el, (H₁, H₂)); subst el₁ el₄.
-   exists el; now split.
+}
+simpl in Hel.
+injection Hel; clear Hel; intros; subst e₃.
+apply IHel₁ in H.
+destruct H as [H| H]. {
+  left; destruct H as (el, (H₁, H₂)); subst el₂ el₃.
+  exists el; now split.
+} {
+  right; destruct H as (el, (H₁, H₂)); subst el₁ el₄.
+  exists el; now split.
+}
 Qed.
 
 Definition false_neq_negb_false : false ≠ negb false :=
@@ -185,7 +187,7 @@ Theorem bool_dec_negb_r : ∀ b,
 Proof. intros b; now destruct b. Qed.
 
 Theorem Forall2_sym : ∀ A (R : A → A → Prop) l1 l2,
- symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
+  symmetric _ R → Forall2 R l1 l2 → Forall2 R l2 l1.
 Proof.
 intros * Hs HF; revert l2 HF.
 induction l1; intros; [ now destruct l2 | ].
@@ -198,25 +200,30 @@ Qed.
 Axiom TTCA : ∀ (A : Type) (R : A → A → Prop), equiv A R →
   ∃ f : A → A, (∀ x : A, R x (f x)) ∧ (∀ x y, R x y → f x = f y).
 
+(* Excluded Middle is the consequence of the Axiom of Choice
+   (Diaconescu) *)
 Theorem EM : ∀ P, P ∨ ¬P.
 Proof.
 intros P.
 set (R (x y : bool) := x = y ∨ P).
-assert (He : equiv _ R).
- split; [ intros b; now left | ].
- split.
-  now intros b c d Hbc [Hcd| Hcd]; [ subst c | right ].
-  now intros b c [Hbc| Hbc]; [ left; symmetry | right ].
-
- destruct (TTCA bool R He) as (f & Hx & Hxy).
- subst R; simpl in Hx, Hxy.
- destruct (Bool.bool_dec (f false) (f true)) as [H| H].
+assert (He : equiv _ R). {
+  split; [ intros b; now left | ].
+  split. {
+    now intros b c d Hbc [Hcd| Hcd]; [ subst c | right ].
+  } {
+    now intros b c [Hbc| Hbc]; [ left; symmetry | right ].
+  }
+}
+destruct (TTCA bool R He) as (f & Hx & Hxy).
+subst R; simpl in Hx, Hxy.
+destruct (Bool.bool_dec (f false) (f true)) as [H| H]. {
   destruct (Hx true) as [Ht| Ht]; [ | now left ].
   destruct (Hx false) as [Hf| Hf]; [ | now left ].
   now rewrite <- Ht, <- Hf in H.
-
+} {
   right; intros H₁; apply H.
   now apply Hxy; right.
+}
 Qed.
 
 Record choice_function {A} (R : A → A → Prop) f := mkcf
@@ -232,18 +239,18 @@ Theorem Permutation_flat_map_map : ∀ A B C (f : A → B → C) la lb,
 Proof.
 intros.
 revert lb.
-induction la as [| a la]; intros.
- simpl; rewrite flat_map_nil_fun; [ easy | ].
- induction lb; now constructor.
-
- simpl.
- rewrite IHla; clear IHla.
- revert a la.
- induction lb as [| b lb]; intros; [ easy | ].
- simpl; constructor; rewrite <- IHlb.
- do 2 rewrite app_assoc.
- apply Permutation_app_tail.
- apply Permutation_app_comm.
+induction la as [| a la]; intros. {
+  simpl; rewrite flat_map_nil_fun; [ easy | ].
+  induction lb; now constructor.
+}
+simpl.
+rewrite IHla; clear IHla.
+revert a la.
+induction lb as [| b lb]; intros; [ easy | ].
+simpl; constructor; rewrite <- IHlb.
+do 2 rewrite app_assoc.
+apply Permutation_app_tail.
+apply Permutation_app_comm.
 Qed.
 
 Fixpoint map2 {A B C} (f : A → B → C) l1 l2 :=
