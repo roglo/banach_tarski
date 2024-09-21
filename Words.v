@@ -26,15 +26,17 @@ Proof.
 intros.
 destruct e₁ as (t₁, d₁).
 destruct e₂ as (t₂, d₂).
-destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ].
- destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ subst d₂ | ].
-  now left.
-
-  right; intros H; apply H₂.
+destruct (letter_dec t₁ t₂) as [H₁| H₁]; [ subst t₂ | ]. {
+  destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ subst d₂ | ]. {
+    now left.
+  } {
+    right; intros H; apply H₂.
+    now injection H.
+  }
+} {
+  right; intros H; apply H₁.
   now injection H.
-
- right; intros H; apply H₁.
- now injection H.
+}
 Qed.
 
 Theorem letter_dec_diag : ∀ t, letter_dec t t = left (eq_refl _).
@@ -55,19 +57,16 @@ Proof.
 intros.
 destruct e₁ as (x₁, d₁).
 destruct e₂ as (x₂, d₂); simpl.
-destruct (letter_dec x₁ x₂) as [Hx| Hx].
- destruct (Bool.bool_dec d₁ d₂) as [Hd| Hd]; [ | left; constructor ].
- now right.
-
- now right.
+destruct (letter_dec x₁ x₂) as [Hx| Hx]; [ | now right ].
+destruct (Bool.bool_dec d₁ d₂) as [Hd| Hd]; [ | left; constructor ].
+now right.
 Defined.
 
 Theorem letter_opp_inv : ∀ x d, letter_opp (FE x d) (FE x (negb d)).
 Proof.
 intros.
 unfold letter_opp.
-rewrite letter_dec_diag, bool_dec_negb_r.
-constructor.
+now rewrite letter_dec_diag, bool_dec_negb_r.
 Qed.
 
 Theorem letter_opp_iff : ∀ x₁ d₁ x₂ d₂,
@@ -75,15 +74,16 @@ Theorem letter_opp_iff : ∀ x₁ d₁ x₂ d₂,
   ↔ x₁ = x₂ ∧ d₂ = negb d₁.
 Proof.
 intros x₁ d₁ x₂ d₂.
-split; intros H.
- unfold letter_opp in H.
- destruct (letter_dec x₁ x₂) as [H₁| H₁]; [ | easy ].
- split; [ easy | ].
- destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ easy | ].
- now apply neq_negb, not_eq_sym.
-
- destruct H; subst x₂ d₂.
- apply letter_opp_inv.
+split; intros H. {
+  unfold letter_opp in H.
+  destruct (letter_dec x₁ x₂) as [H₁| H₁]; [ | easy ].
+  split; [ easy | ].
+  destruct (Bool.bool_dec d₁ d₂) as [H₂| H₂]; [ easy | ].
+  now apply neq_negb, not_eq_sym.
+} {
+  destruct H; subst x₂ d₂.
+  apply letter_opp_inv.
+}
 Qed.
 
 Theorem letter_opp_negf : ∀ e₁ e₂, letter_opp e₁ e₂ ↔ e₁ = negf e₂.
@@ -91,14 +91,14 @@ Proof.
 intros.
 destruct e₁ as (t₁, d₁).
 destruct e₂ as (t₂, d₂).
-split; intros H.
- apply letter_opp_iff in H.
- destruct H; subst t₂ d₂; simpl.
- now rewrite Bool.negb_involutive.
-
- injection H; intros; subst; simpl.
- rewrite letter_dec_diag, bool_dec_negb_l.
- constructor.
+split; intros H. {
+  apply letter_opp_iff in H.
+  destruct H; subst t₂ d₂; simpl.
+  now rewrite Bool.negb_involutive.
+} {
+  injection H; intros; subst; simpl.
+  now rewrite letter_dec_diag, bool_dec_negb_l.
+}
 Qed.
 
 Theorem no_fixpoint_negf : ∀ e, negf e ≠ e.
