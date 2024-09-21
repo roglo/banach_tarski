@@ -51,12 +51,12 @@ Add Parametric Morphism {A B f} : (@set_map A B f)
   as set_map_morph.
 Proof.
 intros E F HEF b.
-split; intros H.
- destruct H as (a & Ha & Hf).
- now exists a; split; [ apply HEF in Ha | ].
-
- destruct H as (a & Ha & Hf).
- now exists a; split; [ apply HEF in Ha | ].
+split; intros H. {
+  destruct H as (a & Ha & Hf).
+  now exists a; split; [ apply HEF in Ha | ].
+}
+destruct H as (a & Ha & Hf).
+now exists a; split; [ apply HEF in Ha | ].
 Qed.
 
 Theorem set_map_inter_distr : ∀ A B E F (f : A → B),
@@ -64,27 +64,29 @@ Theorem set_map_inter_distr : ∀ A B E F (f : A → B),
   → (set_map f (E ∩ F) = set_map f E ∩ set_map f F)%S.
 Proof.
 intros * Hinj b.
-split; intros H.
- destruct H as (a & (HaE & HaF) & Hf); simpl.
- split; exists a; easy.
-
- simpl in H; simpl.
- destruct H as ((ae & HE & Hae) & (af & HF & Haf)).
- rewrite <- Haf in Hae.
- specialize (Hinj _ _ Hae); subst af.
- now exists ae.
+split; intros H. {
+  destruct H as (a & (HaE & HaF) & Hf); simpl.
+  split; exists a; easy.
+}
+simpl in H; simpl.
+destruct H as ((ae & HE & Hae) & (af & HF & Haf)).
+rewrite <- Haf in Hae.
+specialize (Hinj _ _ Hae); subst af.
+now exists ae.
 Qed.
 
 Theorem set_map_union_distr : ∀ A B E F (f : A → B),
   (set_map f (E ∪ F) = set_map f E ∪ set_map f F)%S.
 Proof.
 intros; intros b.
-split; intros H.
- now destruct H as (a & [Hae| Haf] & Hf); [ left | right ]; exists a.
-
- destruct H as [(a & Hae & Hf)| (a & Haf & Hf)].
+split; intros H. {
+  now destruct H as (a & [Hae| Haf] & Hf); [ left | right ]; exists a.
+}
+destruct H as [(a & Hae & Hf)| (a & Haf & Hf)]. {
   now exists a; split; [ left | ].
+} {
   now exists a; split; [ right | ].
+}
 Qed.
 
 Theorem set_map_empty : ∀ A B (f : A → B), (set_map f ∅ = ∅)%S.
@@ -146,9 +148,11 @@ Add Parametric Morphism {A} : (@set_inter A)
 Proof.
 intros E E' HE F F' HF.
 unfold set_inter; intros p.
-split; intros (H₁, H₂).
- now split; [ apply HE | apply HF ].
- now split; [ apply HE | apply HF ].
+split; intros (H₁, H₂). {
+  now split; [ apply HE | apply HF ].
+} {
+  now split; [ apply HE | apply HF ].
+}
 Qed.
 
 Add Parametric Morphism {A} : (@set_union A)
@@ -157,9 +161,11 @@ Add Parametric Morphism {A} : (@set_union A)
 Proof.
 intros E E' HE F F' HF.
 intros p.
-split.
- intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
- intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+split. {
+  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+} {
+  intros [H₁| H₂]; [ left; apply HE, H₁ | right; apply HF, H₂ ].
+}
 Qed.
 
 Add Parametric Morphism {A} : (@set_sub A)
@@ -168,9 +174,11 @@ Add Parametric Morphism {A} : (@set_sub A)
 Proof.
 intros E E' HE F F' HF.
 unfold set_sub; intros p.
-split; intros (H₁, H₂).
- split; [ now apply HE | intros H; now apply H₂, HF ].
- split; [ now apply HE | intros H; now apply H₂, HF ].
+split; intros (H₁, H₂). {
+  split; [ now apply HE | intros H; now apply H₂, HF ].
+} {
+  split; [ now apply HE | intros H; now apply H₂, HF ].
+}
 Qed.
 
 Add Parametric Morphism {A} : (@set_incl A)
@@ -226,40 +234,46 @@ Theorem set_inter_assoc : ∀ A (E F G : set A),
   (E ∩ (F ∩ G) = (E ∩ F) ∩ G)%S.
 Proof.
 intros; intros x.
-split; intros H.
- destruct H as (HE & (HF & HG)).
- split; [ now split | easy ].
-
- destruct H as ((HE & HF) & HG).
- split; [ easy | now split ].
+split; intros H. {
+  destruct H as (HE & (HF & HG)).
+  split; [ now split | easy ].
+} {
+  destruct H as ((HE & HF) & HG).
+  split; [ easy | now split ].
+}
 Qed.
 
 Theorem set_union_assoc : ∀ A (E F G : set A),
   (E ∪ (F ∪ G) = (E ∪ F) ∪ G)%S.
 Proof.
 intros; intros x.
-split; intros H.
- destruct H as [H| [H| H]].
-  left; now left.
-  left; now right.
-  now right.
-
- destruct H as [[H| H]| H].
-  now left.
+split; intros H. {
+  destruct H as [H| [H| H]]. {
+    left; now left.
+  } {
+    left; now right.
+  } {
+    now right.
+  }
+}
+destruct H as [[H| H]| H]; [ now left | | ]. {
   right; now left.
+} {
   right; now right.
+}
 Qed.
 
 Theorem set_inter_shuffle0 : ∀ A (E F G : set A),
   (E ∩ F ∩ G = E ∩ G ∩ F)%S.
 Proof.
 intros; intros x.
-split; intros H.
- destruct H as ((HE & HF) & HG).
- split; [ now split | easy ].
-
- destruct H as ((HE & HF) & HG).
- split; [ now split | easy ].
+split; intros H. {
+  destruct H as ((HE & HF) & HG).
+  split; [ now split | easy ].
+} {
+  destruct H as ((HE & HF) & HG).
+  split; [ now split | easy ].
+}
 Qed.
 
 Theorem set_union_list_app : ∀ A (P₁ P₂ : list (set A)),
@@ -267,44 +281,44 @@ Theorem set_union_list_app : ∀ A (P₁ P₂ : list (set A)),
 Proof.
 intros.
 revert P₁.
-induction P₂ as [| Q]; intros.
- rewrite app_nil_r; simpl.
- now rewrite set_union_empty_r.
-
- rewrite cons_comm_app, app_assoc; simpl.
- rewrite IHP₂.
- unfold set_union_list; simpl; rewrite set_union_assoc.
- intros x.
- split; intros H.
+induction P₂ as [| Q]; intros. {
+  rewrite app_nil_r; simpl.
+  now rewrite set_union_empty_r.
+}
+rewrite cons_comm_app, app_assoc; simpl.
+rewrite IHP₂.
+unfold set_union_list; simpl; rewrite set_union_assoc.
+intros x.
+split; intros H. {
   destruct H as [H| H]; [ left | now right ].
   unfold set_union_list in H.
   rewrite fold_right_app in H.
   simpl in H.
   clear - H.
-  induction P₁ as [| R P₁].
-   simpl in H; simpl.
-   destruct H as [H| H]; [ now right | easy ].
-
-   simpl in H.
-   destruct H as [H| H]; [ simpl; left; now left | ].
-   apply IHP₁ in H.
-   destruct H as [H| H]; [ simpl; left; now right | ].
-   now right.
-
-  destruct H as [H| H]; [ left | now right ].
-  unfold set_union_list.
-  rewrite fold_right_app; simpl.
-  clear - H.
-  induction P₁ as [| R P₁].
-   simpl in H; simpl; left.
-   now destruct H.
-
-   simpl in H; simpl.
-   destruct H.
-    destruct H; [ now left | right ].
-    now apply IHP₁; left.
-
-    now right; apply IHP₁; right.
+  induction P₁ as [| R P₁]. {
+    simpl in H; simpl.
+    destruct H as [H| H]; [ now right | easy ].
+  }
+  simpl in H.
+  destruct H as [H| H]; [ simpl; left; now left | ].
+  apply IHP₁ in H.
+  destruct H as [H| H]; [ simpl; left; now right | ].
+  now right.
+}
+destruct H as [H| H]; [ left | now right ].
+unfold set_union_list.
+rewrite fold_right_app; simpl.
+clear - H.
+induction P₁ as [| R P₁]. {
+  simpl in H; simpl; left.
+  now destruct H.
+}
+simpl in H; simpl.
+destruct H. {
+  destruct H; [ now left | right ].
+  now apply IHP₁; left.
+}
+now right; apply IHP₁; right.
 Qed.
 
 Theorem nth_set_union_list : ∀ A (P : list (set A)) i x,
@@ -312,12 +326,12 @@ Theorem nth_set_union_list : ∀ A (P : list (set A)) i x,
 Proof.
 intros A P i x Hi H.
 revert P H Hi.
-induction i; intros P H Hi.
- destruct P as [| E P]; [ easy | now left ].
-
- destruct P as [| E P]; [ easy | simpl in Hi ].
- apply Nat.succ_lt_mono in Hi.
- right; now apply IHi.
+induction i; intros P H Hi. {
+  destruct P as [| E P]; [ easy | now left ].
+}
+destruct P as [| E P]; [ easy | simpl in Hi ].
+apply Nat.succ_lt_mono in Hi.
+right; now apply IHi.
 Qed.
 
 Theorem nth_set_app : ∀ A (P₁ P₂ : list (set A)) i,
@@ -326,10 +340,10 @@ Theorem nth_set_app : ∀ A (P₁ P₂ : list (set A)) i,
 Proof.
 intros.
 unfold set_union, set_eq; simpl; intros.
-destruct (lt_dec i (length P₁)) as [H₁| H₁].
- now rewrite app_nth1.
-
- rewrite app_nth2; [ easy | now apply Nat.nlt_ge ].
+destruct (lt_dec i (length P₁)) as [H₁| H₁]. {
+  now rewrite app_nth1.
+}
+rewrite app_nth2; [ easy | now apply Nat.nlt_ge ].
 Qed.
 
 Theorem set_union_inter_self : ∀ A (E : set A) EL,
@@ -337,31 +351,32 @@ Theorem set_union_inter_self : ∀ A (E : set A) EL,
   → (E = ⋃ map (set_inter E) EL)%S.
 Proof.
 intros * HEL x.
-split; intros Hx.
- generalize Hx; intros Hxl.
- apply HEL in Hxl.
- clear -Hx Hxl.
- induction EL as [| E₁ EL]; intros; [ easy | ].
- destruct Hxl as [Hxl| Hxl]; [ left; now split | ].
- right; now apply IHEL.
-
- clear -Hx.
- induction EL as [| E₁ EL]; intros; [ easy | ].
- destruct Hx as [(Hx, _)| Hx]; [ easy | ].
- apply IHEL, Hx.
+split; intros Hx. {
+  generalize Hx; intros Hxl.
+  apply HEL in Hxl.
+  clear -Hx Hxl.
+  induction EL as [| E₁ EL]; intros; [ easy | ].
+  destruct Hxl as [Hxl| Hxl]; [ left; now split | ].
+  right; now apply IHEL.
+}
+clear -Hx.
+induction EL as [| E₁ EL]; intros; [ easy | ].
+destruct Hx as [(Hx, _)| Hx]; [ easy | ].
+apply IHEL, Hx.
 Qed. 
 
 Theorem set_inter_union_distr_r : ∀ A (E F G : set A),
   ((E ∪ F) ∩ G = (E ∩ G) ∪ (F ∩ G))%S.
 Proof.
 intros * x.
-split; intros H.
- now destruct H as ([HE| HF] & HG); [ left | right ].
-
- destruct H as [(HE, HG)| (HF, HG)].
+split; intros H. {
+  now destruct H as ([HE| HF] & HG); [ left | right ].
+}
+destruct H as [(HE, HG)| (HF, HG)]. {
   now split; [ left | ].
-
+} {
   now split; [ right | ].
+}
 Qed.
 
 Add Parametric Morphism {A} : (@setp A)
@@ -388,7 +403,9 @@ Qed.
 Theorem set_sub_sub_swap : ∀ A (E F G : set A),
   (E ∖ F ∖ G = E ∖ G ∖ F)%S.
 Proof.
-intros; intros x; split; intros Hx.
- now destruct Hx as ((HE & HF) & HG).
- now destruct Hx as ((HE & HF) & HG).
+intros; intros x; split; intros Hx. {
+  now destruct Hx as ((HE & HF) & HG).
+} {
+  now destruct Hx as ((HE & HF) & HG).
+}
 Qed.
