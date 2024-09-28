@@ -373,7 +373,8 @@ Theorem rotate_0_0_1_b_nonzero : ∀ el el₁ d,
   el = el₁ ++ [FE la d]
   → norm_list el = el
   → ∃ a b c k,
-    (mat_of_path el * V 0 0 1)%vec = V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    (mat_of_path el * V 0 0 1)%vec =
+      V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros el el₁ d Hel Hn.
@@ -403,7 +404,8 @@ Theorem rotate_1_0_0_b_nonzero : ∀ el el₁ d,
   el = el₁ ++ [FE lb d]
   → norm_list el = el
   → ∃ a b c k,
-    (mat_of_path el * V 1 0 0)%vec = V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
+    (mat_of_path el * V 1 0 0)%vec =
+      V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
 intros el el₁ d Hel Hn.
