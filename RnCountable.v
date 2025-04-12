@@ -1,7 +1,7 @@
 (* Banach-Tarski paradox. *)
 
-Require Import Utf8.
-Require Import Reals Psatz.
+From Stdlib Require Import Utf8 Arith.
+From Stdlib Require Import Reals Psatz.
 
 Require Import MiscReals Countable.
 

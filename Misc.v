@@ -1,6 +1,6 @@
 (* Banach-Tarski paradox. *)
 
-Require Import Utf8 Arith List Relations.
+From Stdlib Require Import Utf8 Arith List Relations.
 Import ListNotations.
 
 Arguments Nat.div : simpl never.
@@ -230,7 +230,7 @@ Record choice_function {A} (R : A → A → Prop) f := mkcf
   { cf_repr_uniqueness : ∀ x y, R x y → f x = f y;
     cf_repr_membership : ∀ x, R x (f x) }.
 
-Require Import Permutation.
+From Stdlib Require Import Permutation.
 
 Theorem Permutation_flat_map_map : ∀ A B C (f : A → B → C) la lb,
   Permutation

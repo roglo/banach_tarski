@@ -1,6 +1,6 @@
 (* Banach-Tarski paradox. *)
 
-Require Import Utf8 Bool Compare_dec ZArith Psatz.
+From Stdlib Require Import Utf8 Bool Compare_dec ZArith Psatz.
 Require Import Misc.
 
 Definition prod_nat_of_nat n :=

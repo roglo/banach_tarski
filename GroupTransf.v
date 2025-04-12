@@ -1,7 +1,7 @@
 (* Banach-Tarski paradox. *)
 
-Require Import Utf8.
-Require Import Reals Nsatz Psatz.
+From Stdlib Require Import Utf8.
+From Stdlib Require Import Reals Nsatz Psatz.
 
 Require Import Misc Words MiscReals Matrix Pset Orbit.
 Require Import Partition OrbitRepr.

@@ -1,8 +1,8 @@
 (* Banach-Tarski paradox. *)
 
-Require Import Utf8 List.
+From Stdlib Require Import Utf8 Arith List.
+From Stdlib Require Import Reals Psatz.
 Import ListNotations.
-Require Import Reals Psatz.
 
 Require Import MiscReals Words Normalize Reverse Matrix.
 

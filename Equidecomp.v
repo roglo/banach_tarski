@@ -2,9 +2,9 @@
 
 (* Equidecomposability *)
 
-Require Import Utf8 List Relations.
+From Stdlib Require Import Utf8 Arith List Relations.
+From Stdlib Require Import Reals.Rdefinitions.
 Import ListNotations.
-Require Import Reals.Rdefinitions.
 
 Require Import Misc Matrix Pset.
 Require Import Partition OrbitRepr GroupTransf.
@@ -332,7 +332,7 @@ destruct Hf as (g & Hg & Hix).
 subst f; apply app_gr_empty_set.
 Qed.
 
-Require Import Permutation.
+From Stdlib Require Import Permutation.
 
 Theorem partition_combine_swi_is_permutation :
   ∀ A (fl : list (set A → set A)) PE P'F,

@@ -20,10 +20,10 @@ show_coq_version:
 
 .SUFFIXES: .v .vo .vp
 
-.v.vo:
-	coqc $<
+%.vo: %.v
+	rocq compile $<
 
-.vp.v:
+%.v: %.vp
 	@echo /lib/cpp -D$(COQ_VERSION) $< '>' $@
 	@/bin/rm -f $@
 	@sed -e 's|//|slsl|g' $< | \
