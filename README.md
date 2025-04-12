@@ -9,7 +9,7 @@ Banach-Tarski paradox.
 # AUTHOR
 Daniel de Rauglaudre
 
-# COQ VERSION
-  $ coqtop -v<br/>
-  The Coq Proof Assistant, version 8.20.0<br/>
-  compiled with OCaml 4.13.1
+# ROCQ VERSION
+  $ rocq -v<br/>
+  The Rocq Prover, version 9.0.0<br/>
+  compiled with OCaml 4.14.1
