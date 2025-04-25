@@ -13,7 +13,8 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep -Q . . $(FILESFORDEP) | LC_ALL=C sort > .depend
+	rocq dep -Q . . $(FILESFORDEP) | sed -e " s|$$HOME[^ ]*||" | \
+	LC_ALL=C sort |	sed -e 's/  *$$//' > .depend
 
 show_coq_version:
 	@echo $(COQ_VERSION)
