@@ -49,66 +49,18 @@ Definition quat_mul (u v : quaternion T) :=
 
 End a.
 
-(*
-Definition of_number (n : Number.int) : option Q :=
-  match n with
-  | Number.IntDecimal n =>
-      match n with
-      | Decimal.Pos n =>
-          Some (Q.of_num_den (Z.of_nat (Nat.of_uint n), 1%pos))
-      | Decimal.Neg n =>
-          Some (Q.of_num_den (- Z.of_nat (Nat.of_uint n), 1%pos))
-      end
-  | Number.IntHexadecimal n => None
-  end.
+Notation "a +ℹ b +𝐣 c +𝐤 d" :=
+  (mk_q a (mk_v b c d)) (at level 50, b, c, d at level 0) : quat_scope.
 
-Definition to_number (a : Q) : option Number.int :=
-  match q_den a with
-  | 1%pos => Some (Z.to_number (q_num a))
-  | _ => None
-  end.
-*)
+Notation "a * b" := (quat_mul a b) : quat_scope.
 
 From Stdlib Require Import ZArith.
 Require Import RingLike.Z_algebra.
 Open Scope Z_scope.
 
-Record quaternion_Z := mk_q_Z { q_re_Z : Z;  q_im_Z : vector3 Z }.
-
-Definition z_quat_of_number (n : Number.int) : option quaternion_Z :=
-  match n with
-  | Number.IntDecimal n =>
-      match n with
-      | Decimal.Pos n =>
-          Some (mk_q_Z (Z.of_nat (Nat.of_uint n)) (mk_v 0 0 0))
-      | Decimal.Neg n =>
-          Some (mk_q_Z (- Z.of_nat (Nat.of_uint n)) (mk_v 0 0 0))
-      end
-  | Number.IntHexadecimal n => None
-  end.
-
-Definition z_quat_to_number (a : quaternion_Z) : option Number.int :=
-  match q_im_Z a with
-  | mk_v 0 0 0 =>
-      Some
-        (Number.IntDecimal
-           (match q_re_Z a with
-            | 0%Z => Decimal.Pos (Nat.to_uint 0)
-            | Zpos a => Decimal.Pos (Pos.to_uint a)
-            | Zneg a => Decimal.Neg (Pos.to_uint a)
-            end))
-  | _ => None
-  end.
-
-Number Notation quaternion_Z z_quat_of_number z_quat_to_number : quat_scope.
-
-Notation "a +ℹ b +𝐣 c +𝐤 d" :=
-  (mk_q a (mk_v b c d)) (at level 50, b, c, d at level 0) : quat_scope.
-Notation "a * b" := (quat_mul a b) : quat_scope.
-
 Compute (
-  let i := mk_q_Z 0 (mk_v 1 0 0) in
-  let j := mk_q_Z 0 (mk_v 0 1 0) in
-  let k := mk_q_Z 0 (mk_v 0 0 1) in
-  (i * i)%quat).
+  let i := mk_q 0 (mk_v 1 0 0) in
+  let j := mk_q 0 (mk_v 0 1 0) in
+  let k := mk_q 0 (mk_v 0 0 1) in
+  (j * k)%quat).
 
