@@ -147,20 +147,13 @@ Proof. apply (rngl_div_1_r' Hon Hos Hiq). Qed.
 Theorem Rdiv_same : ∀ x, (x ≠ 0 → x / x = 1)%L.
 Proof. apply (rngl_div_diag Hon Hiq). Qed.
 
-Definition Int_part (x : T) : Z.
-Proof.
-specialize (int_part Hon Hop Hc1 Hor Har x) as H1.
-destruct H1 as (n, Hn).
-destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx].
-apply (Z.of_nat n).
-apply (- Z.of_nat n)%Z.
-Qed.
+Definition Int_part (x : T) :=
+  let (n, a) := int_part Hon Hop Hc1 Hor Har x in
+  if rngl_le_dec Hor 0 x then Z.of_nat n else (- Z.of_nat n)%Z.
 
-...
-
-Theorem Int_part_close_to_1 : ∀ r n,
-  rngl_of_nat n / rngl_of_nat (n + 1) <= r < 1
-  → Int_part (r * (rngl_of_nat (n + 1))) = Z.of_nat n.
+Theorem Int_part_close_to_1 : ∀ (r : T) n,
+  (rngl_of_nat n / rngl_of_nat (n + 1) ≤ r < 1)%L
+  → Int_part (r * rngl_of_nat (n + 1)) = Z.of_nat n.
 Proof.
 ...
 
