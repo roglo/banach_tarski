@@ -156,6 +156,16 @@ Axiom int_part2 :
           → rngl_is_archimedean T = true
             → ∀ a : T, {n : ℕ | (rngl_of_nat n ≤ ∣ a ∣ < rngl_of_nat (n + 1))%L}.
 
+(*
+       sig
+         (fun n : nat =>
+          and (rngl_le (rngl_of_nat n) (rngl_abs a))
+            (rngl_lt (rngl_abs a) (rngl_of_nat (Init.Nat.add n 1))))
+*)
+(*
+Print sig.
+*)
+
 Definition Int_part (x : T) : Z.
 Proof.
 specialize (int_part2 Hon Hop Hc1 Hor Har x) as H1.
