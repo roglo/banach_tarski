@@ -147,14 +147,25 @@ Proof. apply (rngl_div_1_r' Hon Hos Hiq). Qed.
 Theorem Rdiv_same : ∀ x, (x ≠ 0 → x / x = 1)%L.
 Proof. apply (rngl_div_diag Hon Hiq). Qed.
 
-...
+Axiom int_part2 :
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T},
+    rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_characteristic T ≠ 1
+        → rngl_is_ordered T = true
+          → rngl_is_archimedean T = true
+            → ∀ a : T, {n : ℕ | (rngl_of_nat n ≤ ∣ a ∣ < rngl_of_nat (n + 1))%L}.
 
-(* ou alors j'utilise l'axiome du choix ? *)
-About Choice.
-
-Definition Int_part (x : T) (z : Z) : Prop.
-specialize (int_part Hon Hop Hc1 Hor Har x) as H1.
+Definition Int_part (x : T) : Z.
+Proof.
+specialize (int_part2 Hon Hop Hc1 Hor Har x) as H1.
 destruct H1 as (n, Hn).
+destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx].
+apply (Z.of_nat n).
+apply (- Z.of_nat n)%Z.
+Qed.
+
+(* perhaps I should define int_part in RingLike like int_part2 above ? *)
 
 ...
 Search rngl_characteristic.
