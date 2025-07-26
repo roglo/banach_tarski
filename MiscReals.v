@@ -60,38 +60,37 @@ Qed.
 Theorem Rmult_div_same : ∀ x y, (y ≠ 0 → x / y * y = x)%L.
 Proof.
 intros * Hy.
-...
-unfold Rdiv.
-rewrite Rmult_assoc.
-rewrite Rinv_l; [ lra | easy ].
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
+apply (rngl_mul_1_r Hon).
 Qed.
 
-Theorem Rplus_shuffle0 : ∀ n m p : ℝ, n + m + p = n + p + m.
-Proof.
-intros.
-rewrite Rplus_comm, <- Rplus_assoc.
-f_equal; apply Rplus_comm.
-Qed.
+Theorem Rplus_shuffle0 : ∀ n m p, (n + m + p = n + p + m)%L.
+Proof. apply rngl_add_add_swap. Qed.
 
-Theorem Rmult_shuffle0 : ∀ n m p : ℝ, n * m * p = n * p * m.
-Proof.
-intros.
-rewrite Rmult_comm, <- Rmult_assoc.
-f_equal; apply Rmult_comm.
-Qed.
+Theorem Rmult_shuffle0 : ∀ n m p, (n * m * p = n * p * m)%L.
+Proof. apply (rngl_mul_mul_swap Hic). Qed.
 
 Theorem Rdiv_mult_simpl_l : ∀ x y z,
-  x ≠ 0
-  → (x * y) / (x * z) = y / z.
+  x ≠ 0%L
+  → z ≠ 0%L
+  → ((x * y) / (x * z) = y / z)%L.
 Proof.
-intros * Hx.
-unfold Rdiv.
-rewrite Rinv_mult.
-rewrite <- Rmult_assoc.
-f_equal; rewrite Rmult_shuffle0.
-rewrite Rinv_r; [ | easy ].
-apply Rmult_1_l.
+intros * Hx Hz.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite (rngl_inv_mul_distr Hon Hos Hiv); [ | easy | easy ].
+rewrite (rngl_mul_comm Hic _⁻¹).
+rewrite rngl_mul_assoc.
+progress f_equal.
+rewrite (rngl_mul_mul_swap Hic).
+rewrite (rngl_mul_inv_diag_r Hon Hiv); [ | easy ].
+apply (rngl_mul_1_l Hon).
 Qed.
+
+...
 
 Theorem Rdiv_mult_simpl_r : ∀ x y z,
   z ≠ 0
