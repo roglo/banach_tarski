@@ -6,6 +6,7 @@ Import ListNotations.
 
 Require Import Misc Words Normalize Reverse.
 Require Import RingLike.Core.
+Require Import RingLike.RealLike.
 
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
@@ -15,9 +16,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-(*
 Context {rl : real_like_prop T}.
-*)
 Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hon : rngl_has_1 T = true}.
 Context {Hop : rngl_has_opp T = true}.
@@ -26,6 +25,7 @@ Context {Hor : rngl_is_ordered T = true}.
 
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
+Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
 
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%L.
 Proof. apply (rngl_add_opp_r Hop). Qed.
@@ -90,50 +90,59 @@ rewrite (rngl_mul_inv_diag_r Hon Hiv); [ | easy ].
 apply (rngl_mul_1_l Hon).
 Qed.
 
-...
-
 Theorem Rdiv_mult_simpl_r : ∀ x y z,
-  z ≠ 0
-  → (x * z) / (y * z) = x / y.
+  y ≠ 0%L
+  → z ≠ 0%L
+  → ((x * z) / (y * z) = x / y)%L.
 Proof.
-intros * Hz.
-specialize (Rdiv_mult_simpl_l z x y Hz) as H.
+intros * Hy Hz.
+specialize (Rdiv_mult_simpl_l z x y Hz Hy) as H.
 rewrite <- H.
-f_equal; lra.
+do 2 rewrite (rngl_mul_comm Hic z).
+easy.
 Qed.
 
-Theorem Req_dec : ∀ x y : ℝ, { x = y } + { x ≠ y }.
+Theorem Req_dec : ∀ x y : T, { x = y } + { x ≠ y }.
 Proof.
 intros x y.
-destruct (Rle_dec x y) as [H₁| H₁]. {
-  destruct (Rle_dec y x) as [H₂| H₂]. {
-    left; now apply Rle_antisym.
+destruct (rngl_le_dec Hor x y) as [H₁| H₁]. {
+  destruct (rngl_le_dec Hor y x) as [H₂| H₂]. {
+    left; now apply rngl_le_antisymm.
   } {
-    right; intros H; subst y; apply H₂, Rle_refl.
+    right; intros H; subst y; apply H₂, (rngl_le_refl Hor).
   }
 } {
   right; intros H; subst y.
-  apply H₁, Rle_refl.
+  apply H₁, (rngl_le_refl Hor).
 }
 Qed.
 
-Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, 0 <= b →
-  a * √ b * c * d * √ b = a * b * c * d.
+Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 ≤ b)%L →
+  (a * √ b * c * d * √ b = a * b * c * d)%L.
 Proof.
 intros a b c d Hb.
-rewrite Rmult_comm, <- Rmult_assoc; f_equal.
-rewrite <- Rmult_assoc; f_equal.
-rewrite Rmult_comm, Rmult_assoc; f_equal.
-now apply sqrt_sqrt.
+rewrite (rngl_mul_comm Hic), rngl_mul_assoc; f_equal.
+rewrite rngl_mul_assoc; f_equal.
+rewrite (rngl_mul_comm Hic), <- rngl_mul_assoc; f_equal.
+rewrite <- rl_sqrt_mul; [ | easy | easy ].
+rewrite fold_rngl_squ.
+rewrite (rl_sqrt_squ Hon Hop Hor).
+now apply (rngl_abs_nonneg_eq Hop Hor).
 Qed.
 
-Theorem Rdiv_0_l : ∀ x, 0 / x = 0.
+Theorem Rdiv_0_l : ∀ x, (x ≠ 0 → 0 / x = 0)%L.
 Proof.
-intros x; unfold Rdiv; apply Rmult_0_l.
+assert (Hii : rngl_has_inv_and_1_or_quot T = true). {
+  apply rngl_has_inv_and_1_or_quot_iff.
+  now left; rewrite Hiv, Hon.
+}
+now intros * Hx; apply (rngl_div_0_l Hos Hii).
 Qed.
 
-Theorem Rdiv_1_r : ∀ x, x / 1 = x.
-Proof. intros x; lra. Qed.
+Theorem Rdiv_1_r : ∀ x, (x / 1 = x)%L.
+Proof. apply (rngl_div_1_r' Hon Hos Hiq). Qed.
+
+...
 
 Theorem Rdiv_same : ∀ x, x ≠ 0 → x / x = 1.
 Proof.
