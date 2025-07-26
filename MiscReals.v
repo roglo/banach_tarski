@@ -166,6 +166,7 @@ apply (- Z.of_nat n)%Z.
 Qed.
 
 (* perhaps I should define int_part in RingLike like int_part2 above ? *)
+(* btw, int_part should be renamed rngl_int_part in RingLike *)
 
 ...
 Search rngl_characteristic.
