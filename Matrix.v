@@ -2,6 +2,7 @@
 
 From Stdlib Require Import Utf8 Arith List.
 From Stdlib Require Import Psatz.
+From Stdlib Require Import Ring.
 Require Import Datatypes.
 
 Require Import Words Normalize Reverse Misc.
@@ -37,9 +38,15 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
-Context {Heo : rngl_has_eq_dec_or_order T = true}.
-Context {Hos : rngl_has_opp_or_subt T = true}.
+Context {Hic : rngl_mul_is_comm T = true}.
+Context {Hop : rngl_has_opp T = true}.
 Context {Hon : rngl_has_1 T = true}.
+Context {Hor : rngl_is_ordered T = true}.
+
+Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
+Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
+
+Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 
 Definition mat_add (M₁ M₂ : matrix T) :=
   mkmat
@@ -113,15 +120,13 @@ Definition rot_inv_z := mkmat
   (-2*√2/3) (1/3)     0
   0         0         1.
 
-...
-
 Definition is_neg_vec '(V x y z) :=
-  if Rlt_dec x 0 then true
-  else if Rgt_dec x 0 then false
-  else if Rlt_dec y 0 then true
-  else if Rgt_dec y 0 then false
-  else if Rlt_dec z 0 then true
-  else if Rgt_dec z 0 then false
+  if rngl_lt_dec Hor x 0 then true
+  else if rngl_lt_dec Hor 0 x then false
+  else if rngl_lt_dec Hor y 0 then true
+  else if rngl_lt_dec Hor 0 y then false
+  else if rngl_lt_dec Hor z 0 then true
+  else if rngl_lt_dec Hor 0 z then false
   else true.
 
 Arguments is_neg_vec _%_vec.
@@ -258,8 +263,7 @@ Proof.
 intros.
 unfold mat_const_mul, mat_mul.
 destruct M₁, M₂; simpl.
-...
-f_equal; lra.
+f_equal; ring.
 Qed.
 
 Theorem mat_vec_mul_assoc : ∀ m₁ m₂ p,
@@ -267,25 +271,26 @@ Theorem mat_vec_mul_assoc : ∀ m₁ m₂ p,
 Proof.
 intros m₁ m₂ (x, y, z).
 unfold mat_vec_mul.
-simpl; f_equal; lra.
+simpl; f_equal; ring.
 Qed.
 
 Theorem  mat_vec_mul_add_distr_l : ∀ M u v, (M * (u + v) = M * u + M * v)%vec.
 Proof.
 intros.
 destruct u as (u₁, u₂, u₃).
-destruct v as (v₁, v₂, v₃); simpl; f_equal; lra.
+destruct v as (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
 Theorem  mat_vec_mul_const_distr : ∀ M k v, (M * (k ⁎ v) = k ⁎ (M * v))%vec.
 Proof.
 intros.
-destruct v as (v₁, v₂, v₃); simpl; f_equal; lra.
+destruct v as (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
-unfold mat_mul, mat_id, mkrmat; simpl.
+unfold mat_mul, mat_id; simpl.
+...
 unfold Rdiv.
 progress repeat rewrite <- Rmult_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
