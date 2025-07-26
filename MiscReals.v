@@ -147,56 +147,18 @@ Proof. apply (rngl_div_1_r' Hon Hos Hiq). Qed.
 Theorem Rdiv_same : ∀ x, (x ≠ 0 → x / x = 1)%L.
 Proof. apply (rngl_div_diag Hon Hiq). Qed.
 
-Axiom int_part2 :
-  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T},
-    rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_characteristic T ≠ 1
-        → rngl_is_ordered T = true
-          → rngl_is_archimedean T = true
-            → ∀ a : T, {n : ℕ | (rngl_of_nat n ≤ ∣ a ∣ < rngl_of_nat (n + 1))%L}.
-
-(*
-       sig
-         (fun n : nat =>
-          and (rngl_le (rngl_of_nat n) (rngl_abs a))
-            (rngl_lt (rngl_abs a) (rngl_of_nat (Init.Nat.add n 1))))
-*)
-(*
-Print sig.
-*)
-
 Definition Int_part (x : T) : Z.
 Proof.
-specialize (int_part2 Hon Hop Hc1 Hor Har x) as H1.
+specialize (int_part Hon Hop Hc1 Hor Har x) as H1.
 destruct H1 as (n, Hn).
 destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx].
 apply (Z.of_nat n).
 apply (- Z.of_nat n)%Z.
 Qed.
 
-(* perhaps I should define int_part in RingLike like int_part2 above ? *)
-(* btw, int_part should be renamed rngl_int_part in RingLike *)
-
 ...
-Search rngl_characteristic.
-int_part:
-  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T},
-    rngl_has_1 T = true
-    → rngl_has_opp T = true
-      → rngl_characteristic T ≠ 1
-        → rngl_is_ordered T = true
-          → rngl_is_archimedean T = true
-            → ∀ a : T, ∃ n : ℕ, (rngl_of_nat n ≤ ∣ a ∣ < rngl_of_nat (n + 1))%L
-
-Require Import Reals.
-Print Int_part.
-Print up.
-Check PI.
-Compute (Int_part PI).
 
 Theorem Int_part_close_to_1 : ∀ r n,
-  int_part Hon Hop Hc1 Hor Har (r * (INR (n + 1)))
   rngl_of_nat n / rngl_of_nat (n + 1) <= r < 1
   → Int_part (r * (rngl_of_nat (n + 1))) = Z.of_nat n.
 Proof.
