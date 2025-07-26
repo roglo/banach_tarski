@@ -22,6 +22,8 @@ Context {Hon : rngl_has_1 T = true}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
+Context {Hc1 : rngl_characteristic T ≠ 1}.
+Context {Har : rngl_is_archimedean T = true}.
 
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
@@ -142,14 +144,41 @@ Qed.
 Theorem Rdiv_1_r : ∀ x, (x / 1 = x)%L.
 Proof. apply (rngl_div_1_r' Hon Hos Hiq). Qed.
 
+Theorem Rdiv_same : ∀ x, (x ≠ 0 → x / x = 1)%L.
+Proof. apply (rngl_div_diag Hon Hiq). Qed.
+
 ...
 
-Theorem Rdiv_same : ∀ x, x ≠ 0 → x / x = 1.
+(* ou alors j'utilise l'axiome du choix ? *)
+About Choice.
+
+Definition Int_part (x : T) (z : Z) : Prop.
+specialize (int_part Hon Hop Hc1 Hor Har x) as H1.
+destruct H1 as (n, Hn).
+
+...
+Search rngl_characteristic.
+int_part:
+  ∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T},
+    rngl_has_1 T = true
+    → rngl_has_opp T = true
+      → rngl_characteristic T ≠ 1
+        → rngl_is_ordered T = true
+          → rngl_is_archimedean T = true
+            → ∀ a : T, ∃ n : ℕ, (rngl_of_nat n ≤ ∣ a ∣ < rngl_of_nat (n + 1))%L
+
+Require Import Reals.
+Print Int_part.
+Print up.
+Check PI.
+Compute (Int_part PI).
+
+Theorem Int_part_close_to_1 : ∀ r n,
+  int_part Hon Hop Hc1 Hor Har (r * (INR (n + 1)))
+  rngl_of_nat n / rngl_of_nat (n + 1) <= r < 1
+  → Int_part (r * (rngl_of_nat (n + 1))) = Z.of_nat n.
 Proof.
-intros.
-unfold Rdiv.
-now rewrite Rinv_r.
-Qed.
+...
 
 Theorem Int_part_close_to_1 : ∀ r n,
   INR n / INR (n + 1) <= r < 1
