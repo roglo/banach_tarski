@@ -1,3 +1,6 @@
+(* c'est bien, les quaternions, mais avant, il faut
+   que j'utilise ring-like sur les matrices *)
+
 From Stdlib Require Import Utf8.
 
 Require Import RingLike.Core.

@@ -1,10 +1,12 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 Arith List.
-From Stdlib Require Import Reals Psatz Nsatz.
+From Stdlib Require Import Psatz.
 Require Import Datatypes.
 
-Require Import Words Normalize Reverse Misc MiscReals MiscTrigo.
+Require Import Words Normalize Reverse Misc.
+Require Import RingLike.Core.
+Require Import RingLike.RealLike.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -21,23 +23,37 @@ Arguments a₃₂ [A] _.
 Arguments a₃₃ [A] _.
 Arguments mkmat [A] _ _ _ _ _ _ _ _ _.
 
-Definition mkrmat := @mkmat ℝ.
+Inductive vector A := V : A → A → A → vector A.
 
-Definition mat_add M₁ M₂ :=
-  mkrmat
+Declare Scope vec_scope.
+Delimit Scope vec_scope with vec.
+
+Arguments mkmat {A} (a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃)%_L.
+Arguments V {A} (x y z)%_L.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {Heo : rngl_has_eq_dec_or_order T = true}.
+Context {Hos : rngl_has_opp_or_subt T = true}.
+Context {Hon : rngl_has_1 T = true}.
+
+Definition mat_add (M₁ M₂ : matrix T) :=
+  mkmat
     (a₁₁ M₁ + a₁₁ M₂) (a₁₂ M₁ + a₁₂ M₂) (a₁₃ M₁ + a₁₃ M₂)
     (a₂₁ M₁ + a₂₁ M₂) (a₂₂ M₁ + a₂₂ M₂) (a₂₃ M₁ + a₂₃ M₂)
     (a₃₁ M₁ + a₃₁ M₂) (a₃₂ M₁ + a₃₂ M₂) (a₃₃ M₁ + a₃₃ M₂).
 
 Definition mat_opp M :=
-  mkrmat
+  mkmat
     (- a₁₁ M) (- a₁₂ M) (- a₁₃ M)
     (- a₂₁ M) (- a₂₂ M) (- a₂₃ M)
     (- a₃₁ M) (- a₃₂ M) (- a₃₃ M).
 
 Definition mat_sub M₁ M₂ := mat_add M₁ (mat_opp M₂).
-
-Inductive vector := V : ℝ → ℝ → ℝ → vector.
 
 Definition mat_vec_mul M '(V x y z) :=
   V (a₁₁ M * x + a₁₂ M * y + a₁₃ M * z)
@@ -54,24 +70,23 @@ Definition vec_dot_mul '(V x₁ y₁ z₁) '(V x₂ y₂ z₂) :=
 Definition vec_cross_mul '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
   V (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
 Definition vec_const_mul k '(V x y z) := V (k * x) (k * y) (k * z).
-Definition mat_const_mul k (M : matrix ℝ) :=
-  mkrmat
+Definition mat_const_mul k (M : matrix T) :=
+  mkmat
     (k * a₁₁ M) (k * a₁₂ M) (k * a₁₃ M)
     (k * a₂₁ M) (k * a₂₂ M) (k * a₂₃ M)
     (k * a₃₁ M) (k * a₃₂ M) (k * a₃₃ M).
-
-Declare Scope vec_scope.
-Delimit Scope vec_scope with vec.
 
 Arguments vec_norm _%_vec.
 Arguments vec_add _%_vec _%_vec.
 Arguments vec_dot_mul _%_vec _%_vec.
 Arguments vec_cross_mul _%_vec _%_vec.
+(*
 Arguments vec_const_mul _%_R _%_vec.
+*)
 
 Notation "0" := (V 0 0 0) : vec_scope.
 Notation "k ⁎ v" := (vec_const_mul k v) (at level 40).
-Notation "v ⁄ k" := (vec_const_mul (/ k) v) (at level 40).
+Notation "v ⁄ k" := (vec_const_mul (k⁻¹) v) (at level 40).
 Notation "M * v" := (mat_vec_mul M v) : vec_scope.
 Notation "u + v" := (vec_add u v) : vec_scope.
 Notation "u - v" := (vec_sub u v) : vec_scope.
@@ -81,22 +96,24 @@ Notation "u × v" := (vec_cross_mul u v) (at level 40, no associativity).
 Notation "v ²" := (vec_dot_mul v v) : vec_scope.
 Notation "‖ v ‖" := (vec_norm v) (at level 0, v at level 0, format "‖ v ‖").
 
-Definition rot_x := mkrmat
+Definition rot_x := mkmat
   1         0         0
   0         (1/3)     (-2*√2/3)
   0         (2*√2/3)  (1/3).
-Definition rot_inv_x := mkrmat
+Definition rot_inv_x := mkmat
   1         0         0
   0         (1/3)     (2*√2/3)
   0         (-2*√2/3) (1/3).
-Definition rot_z := mkrmat
+Definition rot_z := mkmat
   (1/3)     (-2*√2/3) 0
   (2*√2/3)  (1/3)     0
   0         0         1.
-Definition rot_inv_z := mkrmat
+Definition rot_inv_z := mkmat
   (1/3)     (2*√2/3)  0
   (-2*√2/3) (1/3)     0
   0         0         1.
+
+...
 
 Definition is_neg_vec '(V x y z) :=
   if Rlt_dec x 0 then true
@@ -120,7 +137,7 @@ Definition mat_of_elem e :=
 Definition rotate e pt := mat_vec_mul (mat_of_elem e) pt.
 
 Definition mat_mul M₁ M₂ :=
-  mkrmat
+  mkmat
     (a₁₁ M₁ * a₁₁ M₂ + a₁₂ M₁ * a₂₁ M₂ + a₁₃ M₁ * a₃₁ M₂)
     (a₁₁ M₁ * a₁₂ M₂ + a₁₂ M₁ * a₂₂ M₂ + a₁₃ M₁ * a₃₂ M₂)
     (a₁₁ M₁ * a₁₃ M₂ + a₁₂ M₁ * a₂₃ M₂ + a₁₃ M₁ * a₃₃ M₂)
@@ -132,7 +149,7 @@ Definition mat_mul M₁ M₂ :=
     (a₃₁ M₁ * a₁₃ M₂ + a₃₂ M₁ * a₂₃ M₂ + a₃₃ M₁ * a₃₃ M₂).
 
 Definition mat_id :=
-  mkrmat
+  mkmat
     1 0 0
     0 1 0
     0 0 1.
@@ -149,7 +166,7 @@ Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
 Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.
 Notation "M₁ * M₂" := (mat_mul M₁ M₂) : mat_scope.
 Notation "k ⁎ M" := (mat_const_mul k M) : mat_scope.
-Notation "M ⁄ k" := (mat_const_mul (/ k) M) : mat_scope.
+Notation "M ⁄ k" := (mat_const_mul (k⁻¹) M) : mat_scope.
 Notation "- M" := (mat_opp M) : mat_scope.
 Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
@@ -157,12 +174,12 @@ Arguments mat_pow M%_mat n%_nat.
 Arguments mat_mul M₁%_mat M₂%_mat.
 Arguments mat_vec_mul M%_mat _%_vec.
 
-Theorem vec_eq_dec : ∀ u v : vector, { u = v } + { u ≠ v }.
+Theorem vec_eq_dec : ∀ u v : vector T, { u = v } + { u ≠ v }.
 Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂).
-destruct (Req_dec x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
- destruct (Req_dec y₁ y₂) as [H₁| H₁]; [ subst y₂ | right ].
-  destruct (Req_dec z₁ z₂) as [H₁| H₁]; [ now subst z₂; left | right ].
+destruct (rngl_eq_dec Heo x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
+ destruct (rngl_eq_dec Heo y₁ y₂) as [H₁| H₁]; [ subst y₂ | right ].
+  destruct (rngl_eq_dec Heo z₁ z₂) as [H₁| H₁]; [ now subst z₂; left | right ].
   now intros H; injection H; intros.
 
  now intros H; injection H; intros.
@@ -172,24 +189,24 @@ Qed.
 
 Arguments vec_eq_dec _%_vec _%_vec.
 
-Theorem vec_zerop : ∀ v : vector, { v = 0%vec } + { v ≠ 0%vec }.
+Theorem vec_zerop : ∀ v : vector T, { v = 0%vec } + { v ≠ 0%vec }.
 Proof.
 intros.
 now specialize (vec_eq_dec v 0).
 Qed.
 
-Theorem mat_eq_dec : ∀ m₁ m₂ : matrix ℝ, { m₁ = m₂ } + { m₁ ≠ m₂ }.
+Theorem mat_eq_dec : ∀ m₁ m₂ : matrix T, { m₁ = m₂ } + { m₁ ≠ m₂ }.
 Proof.
 intros.
-destruct (Req_dec (a₁₁ m₁) (a₁₁ m₂)) as [H₁₁| H₁₁].
- destruct (Req_dec (a₁₂ m₁) (a₁₂ m₂)) as [H₁₂| H₁₂].
-  destruct (Req_dec (a₁₃ m₁) (a₁₃ m₂)) as [H₁₃| H₁₃].
-   destruct (Req_dec (a₂₁ m₁) (a₂₁ m₂)) as [H₂₁| H₂₁].
-    destruct (Req_dec (a₂₂ m₁) (a₂₂ m₂)) as [H₂₂| H₂₂].
-     destruct (Req_dec (a₂₃ m₁) (a₂₃ m₂)) as [H₂₃| H₂₃].
-      destruct (Req_dec (a₃₁ m₁) (a₃₁ m₂)) as [H₃₁| H₃₁].
-       destruct (Req_dec (a₃₂ m₁) (a₃₂ m₂)) as [H₃₂| H₃₂].
-        destruct (Req_dec (a₃₃ m₁) (a₃₃ m₂)) as [H₃₃| H₃₃].
+destruct (rngl_eq_dec Heo (a₁₁ m₁) (a₁₁ m₂)) as [H₁₁| H₁₁].
+ destruct (rngl_eq_dec Heo (a₁₂ m₁) (a₁₂ m₂)) as [H₁₂| H₁₂].
+  destruct (rngl_eq_dec Heo (a₁₃ m₁) (a₁₃ m₂)) as [H₁₃| H₁₃].
+   destruct (rngl_eq_dec Heo (a₂₁ m₁) (a₂₁ m₂)) as [H₂₁| H₂₁].
+    destruct (rngl_eq_dec Heo (a₂₂ m₁) (a₂₂ m₂)) as [H₂₂| H₂₂].
+     destruct (rngl_eq_dec Heo (a₂₃ m₁) (a₂₃ m₂)) as [H₂₃| H₂₃].
+      destruct (rngl_eq_dec Heo (a₃₁ m₁) (a₃₁ m₂)) as [H₃₁| H₃₁].
+       destruct (rngl_eq_dec Heo (a₃₂ m₁) (a₃₂ m₂)) as [H₃₂| H₃₂].
+        destruct (rngl_eq_dec Heo (a₃₃ m₁) (a₃₃ m₂)) as [H₃₃| H₃₃].
          now left; destruct m₁, m₂; simpl in *; subst.
          now right; intros H; subst m₁; apply H₃₃.
         now right; intros H; subst m₁; apply H₃₂.
@@ -206,10 +223,10 @@ Theorem mat_mul_id_l : ∀ m, (mat_id * m)%mat = m.
 Proof.
 intros m.
 unfold mat_mul, mat_id; simpl.
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
+progress repeat rewrite (rngl_mul_1_l Hon).
+progress repeat rewrite (rngl_mul_0_l Hos).
+progress repeat rewrite rngl_add_0_l.
+progress repeat rewrite rngl_add_0_r.
 now destruct m.
 Qed.
 
@@ -217,10 +234,10 @@ Theorem mat_mul_id_r : ∀ m, (m * mat_id)%mat = m.
 Proof.
 intros m.
 unfold mat_mul, mat_id; simpl.
-progress repeat rewrite Rmult_1_r.
-progress repeat rewrite Rmult_0_r.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
+progress repeat rewrite (rngl_mul_1_r Hon).
+progress repeat rewrite (rngl_mul_0_r Hos).
+progress repeat rewrite rngl_add_0_l.
+progress repeat rewrite rngl_add_0_r.
 now destruct m.
 Qed.
 
@@ -228,10 +245,10 @@ Theorem mat_vec_mul_id : ∀ p, (mat_id * p)%vec = p.
 Proof.
 intros (x, y, z).
 unfold mat_vec_mul; simpl.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
+progress repeat rewrite (rngl_mul_0_l Hos).
+progress repeat rewrite (rngl_mul_1_l Hon).
+progress repeat rewrite rngl_add_0_l.
+progress repeat rewrite rngl_add_0_r.
 easy.
 Qed.
 
@@ -241,6 +258,7 @@ Proof.
 intros.
 unfold mat_const_mul, mat_mul.
 destruct M₁, M₂; simpl.
+...
 f_equal; lra.
 Qed.
 
