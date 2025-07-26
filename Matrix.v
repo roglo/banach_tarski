@@ -5,7 +5,7 @@ From Stdlib Require Import Psatz.
 From Stdlib Require Import Ring.
 Require Import Datatypes.
 
-Require Import Words Normalize Reverse Misc.
+Require Import Words Normalize Reverse Misc MiscReals.
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 
@@ -39,8 +39,9 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {Hic : rngl_mul_is_comm T = true}.
-Context {Hop : rngl_has_opp T = true}.
 Context {Hon : rngl_has_1 T = true}.
+Context {Hop : rngl_has_opp T = true}.
+Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
@@ -290,9 +291,10 @@ Qed.
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
 unfold mat_mul, mat_id; simpl.
+progress unfold rngl_div.
+rewrite Hiv.
+progress repeat rewrite <- rngl_mul_assoc.
 ...
-unfold Rdiv.
-progress repeat rewrite <- Rmult_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
 rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
 f_equal; lra.

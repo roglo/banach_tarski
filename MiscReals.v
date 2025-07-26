@@ -1,34 +1,41 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 List Relations Wf_nat.
-From Stdlib Require Import Reals Psatz.
 From Stdlib Require Import ZArith.
 Import ListNotations.
 
 Require Import Misc Words Normalize Reverse.
+Require Import RingLike.Core.
 
-Notation "'ℝ'" := R.
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
 
-Notation "x '≤' y" := (le x y) : nat_scope.
+Section a.
 
-Notation "'√'" := sqrt.
-Notation "x '≤' y" := (Rle x y) : R_scope.
-Notation "x '≤' y '<' z" := (Rle x y ∧ Rlt y z)
- (at level 70, y at next level) : R_scope.
-Notation "x '≤' y '≤' z" := (Rle x y ∧ Rle y z)
- (at level 70, y at next level) : R_scope.
-Notation "x '<' y '≤' z" := (Rlt x y ∧ Rle y z)
- (at level 70, y at next level) : R_scope.
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+(*
+Context {rl : real_like_prop T}.
+Context {Hic : rngl_mul_is_comm T = true}.
+*)
+Context {Hon : rngl_has_1 T = true}.
+Context {Hop : rngl_has_opp T = true}.
+Context {Hiv : rngl_has_inv T = true}.
+Context {Hor : rngl_is_ordered T = true}.
 
-Open Scope R_scope.
+(*
+Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
+*)
+Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 
-Theorem fold_Rminus : ∀ x y, x + - y = x - y.
-Proof. intros. now fold (Rminus x y). Qed.
+Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%L.
+Proof. apply (rngl_add_opp_r Hop). Qed.
 
-Theorem fold_Rdiv : ∀ x y, x * / y = x / y.
-Proof. intros; now fold (Rdiv x y). Qed.
+Theorem fold_Rdiv : ∀ x y, (x * y⁻¹ = x / y)%L.
+Proof. apply (rngl_mul_inv_r Hiv). Qed.
+
+...
 
 Theorem fold_Rsqr : ∀ x, x * x = x².
 Proof. intros; now fold (Rsqr x). Qed.
@@ -45,17 +52,19 @@ Proof. intros; lra. Qed.
 Theorem Rminus_opp : ∀ x y, x - - y = x + y.
 Proof. intros; lra. Qed.
 
-Theorem Ropp_div_r : ∀ x y, x / - y = - (x / y).
+Theorem Ropp_div_r : ∀ x y, y ≠ 0%L → (x / - y = - (x / y))%L.
 Proof.
-intros.
-unfold Rdiv.
-rewrite Rinv_opp.
-symmetry; apply Ropp_mult_distr_r.
+intros * Hyz.
+progress unfold rngl_div.
+rewrite Hiv.
+rewrite <- (rngl_opp_inv Hon Hop Hiv); [ | easy ].
+apply (rngl_mul_opp_r Hop).
 Qed.
 
 Theorem Rmult_div_same : ∀ x y, y ≠ 0 → x / y * y = x.
 Proof.
 intros * Hy.
+...
 unfold Rdiv.
 rewrite Rmult_assoc.
 rewrite Rinv_l; [ lra | easy ].
