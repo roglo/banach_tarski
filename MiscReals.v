@@ -29,6 +29,8 @@ Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
 Definition Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+Definition Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv.
+Definition Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
 
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%L.
 Proof. apply (rngl_add_opp_r Hop). Qed.
@@ -135,11 +137,7 @@ Qed.
 
 Theorem Rdiv_0_l : ∀ x, (x ≠ 0 → 0 / x = 0)%L.
 Proof.
-assert (Hii : rngl_has_inv_and_1_or_quot T = true). {
-  apply rngl_has_inv_and_1_or_quot_iff.
-  now left; rewrite Hiv, Hon.
-}
-now intros * Hx; apply (rngl_div_0_l Hos Hii).
+now intros * Hx; apply (rngl_div_0_l Hos Hi1).
 Qed.
 
 Theorem Rdiv_1_r : ∀ x, (x / 1 = x)%L.
@@ -174,27 +172,46 @@ rewrite (rngl_mul_inv_diag_r Hon Hiv) in Hnr. 2: {
   now apply (rngl_characteristic_0 Hon).
 }
 rewrite (rngl_mul_1_r Hon) in Hnr.
-...
-apply Rmult_lt_compat_r with (r := rngl_of_nat (n + 1)) in Hr1. 2: {
-  rewrite plus_INR; simpl.
-  apply Rplus_le_lt_0_compat; [ apply pos_INR | lra ].
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (rngl_of_nat (n + 1))) in Hr1. 2: {
+  rewrite Nat.add_1_r.
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
+  symmetry.
+  apply (rngl_characteristic_0 Hon Hch).
 }
-rewrite Rmult_1_l in Hr1.
-remember (r * INR (n + 1)) as x eqn:Hx.
-rewrite plus_INR in Hr1; simpl in Hr1.
-rewrite INR_IZR_INZ in Hnr.
-rewrite INR_IZR_INZ in Hr1.
-unfold Int_part.
-apply Z.add_cancel_r with (p := 1%Z).
-rewrite Z.sub_add; symmetry.
-apply tech_up; [ now rewrite plus_IZR | ].
-rewrite plus_IZR; simpl.
-now apply Rplus_le_compat_r.
+rewrite (rngl_mul_1_l Hon) in Hr1.
+remember (r * rngl_of_nat (n + 1))%L as x eqn:Hx.
+rewrite rngl_of_nat_add in Hr1; cbn in Hr1.
+rewrite rngl_add_0_r in Hr1.
+progress unfold Int_part.
+remember (int_part Hon Hop Hc1 Hor Har x) as y eqn:Hy.
+symmetry in Hy.
+destruct y as (m, Hm).
+clear Hy.
+destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hm; [ | easy ].
+  progress f_equal.
+  apply Nat.le_antisymm. {
+    apply Nat.lt_succ_r.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply (rngl_le_lt_trans Hor _ x); [ easy | ].
+    now rewrite rngl_of_nat_succ, rngl_add_comm.
+  } {
+    apply Nat.lt_succ_r.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply (rngl_le_lt_trans Hor _ x); [ easy | ].
+    now rewrite <- Nat.add_1_r.
+  }
+}
+exfalso; apply Hzx.
+apply (rngl_le_trans Hor _ (rngl_of_nat n)); [ | easy ].
+apply (rngl_of_nat_nonneg Hon Hos Hor).
 Qed.
 
-Theorem Int_part_small : ∀ x, 0 <= x < 1 → Int_part x = 0%Z.
+Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L → Int_part x = 0%Z.
 Proof.
 intros * Hx.
+...
 assert (INR 0 / INR (0 + 1) <= x < 1) by (now simpl; lra).
 pose proof Int_part_close_to_1 x 0 H as H1.
 now simpl in H1; rewrite Rmult_1_r in H1.
