@@ -292,6 +292,42 @@ destruct (rngl_le_dec Hor 0 (rngl_of_nat n)) as [H1| H1]; [ easy | ].
 exfalso; apply H1, (rngl_of_nat_nonneg Hon Hos Hor).
 Qed.
 
+Theorem rngl_of_Z_of_nat : ∀ a, rngl_of_Z (Z.of_nat a) = rngl_of_nat a.
+Proof.
+intros.
+progress unfold rngl_of_Z.
+remember (Z.of_nat a) as za eqn:Hza.
+symmetry in Hza.
+destruct za as [| n| n]; [ now destruct a | | ]. {
+  revert n Hza.
+  induction a; intros; [ easy | ].
+  rewrite rngl_of_nat_succ.
+  rewrite Nat2Z.inj_succ in Hza.
+  progress unfold Z.succ in Hza.
+  destruct n as [| n| n]. {
+    cbn; f_equal.
+    rewrite Pos2Z.inj_xI in Hza.
+    apply Z.add_cancel_r in Hza.
+    rewrite <- Pos2Z.inj_mul in Hza.
+    now apply IHa in Hza.
+  } {
+    cbn.
+    rewrite Pos2Z.inj_xO in Hza.
+    rewrite <- Pos2Z.inj_mul in Hza.
+    apply Z.add_move_r in Hza.
+    rewrite <- Pos2Z.inj_sub in Hza. 2: {
+      apply Pos.le_succ_l.
+      cbn - [ Pos.mul ].
+      rewrite <- (Pos.mul_1_r 2) at 1.
+      apply Pos.mul_le_mono_l.
+      apply Pos.le_1_l.
+    }
+    apply IHa in Hza.
+Search rngl_of_pos.
+...
+    rewrite rngl_of_pos_sub in Hza.
+...
+
 Theorem frac_part_INR : ∀ n, frac_part (rngl_of_nat n) = 0%L.
 Proof.
 intros.
