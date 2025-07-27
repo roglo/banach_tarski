@@ -177,16 +177,17 @@ Definition frac_part (x : T) :=
 Arguments Int_part x%_L.
 Arguments frac_part x%_L.
 
+(*
+End a.
+
 From Stdlib Require Import ZArith.
 Require Import RingLike.Z_algebra.
 Open Scope Z_scope.
-Existing Instance Z_ring_like_op.
-Existing Instance Z_ring_like_prop.
 
-Compute (rngl_of_Z 0)%Z.
-...
+Compute (Int_part 3).
 Compute (rngl_of_Z 3).
-Compute (rngl_of_Z 1 + rngl_of_Z 2)%L.
+Compute (rngl_of_Z 239 * rngl_of_Z 4649)%L.
+*)
 
 (* INR = rngl_of_nat *)
 
@@ -255,13 +256,11 @@ cbn in H1.
 now rewrite rngl_add_0_r, (rngl_mul_1_r Hon) in H1.
 Qed.
 
-About int_part.
-...
-
-Theorem frac_part_small : ∀ x, 0 <= x < 1 → frac_part x = x.
+Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
 Proof.
 intros * Hx.
 unfold frac_part.
+...
 rewrite Int_part_small; [ lra | easy ].
 Qed.
 
