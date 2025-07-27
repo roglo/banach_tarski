@@ -268,15 +268,15 @@ Theorem pow_INR : ∀ n k, rngl_of_nat (n ^ k) = (rngl_of_nat n ^ k)%L.
 Proof.
 intros.
 induction k; [ cbn; apply rngl_add_0_r | ].
-...
-simpl; rewrite mult_INR.
-now rewrite IHk.
+simpl; rewrite <- IHk.
+apply (rngl_of_nat_mul Hon Hos).
 Qed.
 
-Theorem frac_part_INR : ∀ n, frac_part (INR n) = 0.
+Theorem frac_part_INR : ∀ n, frac_part (rngl_of_nat n) = 0%L.
 Proof.
 intros.
 unfold frac_part.
+...
 rewrite Int_part_INR.
 now rewrite <- INR_IZR_INZ, Rminus_diag_eq.
 Qed.
