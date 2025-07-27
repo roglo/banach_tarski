@@ -260,14 +260,15 @@ Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
 Proof.
 intros * Hx.
 unfold frac_part.
-...
-rewrite Int_part_small; [ lra | easy ].
+rewrite Int_part_small; [ | easy ].
+apply (rngl_sub_0_r Hos).
 Qed.
 
-Theorem pow_INR : ∀ n k, INR (n ^ k) = INR n ^ k.
+Theorem pow_INR : ∀ n k, rngl_of_nat (n ^ k) = (rngl_of_nat n ^ k)%L.
 Proof.
 intros.
-induction k; [ easy | ].
+induction k; [ cbn; apply rngl_add_0_r | ].
+...
 simpl; rewrite mult_INR.
 now rewrite IHk.
 Qed.
