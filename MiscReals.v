@@ -151,19 +151,21 @@ Definition Int_part (x : T) :=
   let (n, a) := int_part Hon Hop Hc1 Hor Har x in
   if rngl_le_dec Hor 0 x then Z.of_nat n else (- Z.of_nat n)%Z.
 
+Arguments Int_part x%_L.
+
+(* INR = rngl_of_nat *)
+
 Theorem Int_part_close_to_1 : ∀ (r : T) n,
   (rngl_of_nat n / rngl_of_nat (n + 1) ≤ r < 1)%L
   → Int_part (r * rngl_of_nat (n + 1)) = Z.of_nat n.
 Proof.
-...
-
-Theorem Int_part_close_to_1 : ∀ r n,
-  INR n / INR (n + 1) <= r < 1
-  → Int_part (r * (INR (n + 1))) = Z.of_nat n.
-Proof.
 intros * (Hnr, Hr1).
-apply Rmult_le_compat_r with (r := INR (n + 1)) in Hnr; [ | apply pos_INR ].
+apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_of_nat (n + 1)))
+  in Hnr. 2: {
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
 rewrite <- Rmult_div in Hnr.
+...
 unfold Rdiv in Hnr.
 rewrite Rmult_assoc in Hnr.
 rewrite Rinv_r in Hnr; [ | now apply not_0_INR; rewrite Nat.add_comm ].
