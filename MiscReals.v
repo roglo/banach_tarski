@@ -22,12 +22,13 @@ Context {Hon : rngl_has_1 T = true}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
-Context {Hc1 : rngl_characteristic T ≠ 1}.
+Context {Hch : rngl_characteristic T = 0}.
 Context {Har : rngl_is_archimedean T = true}.
 
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
+Definition Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%L.
 Proof. apply (rngl_add_opp_r Hop). Qed.
@@ -165,12 +166,16 @@ apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_of_nat (n + 1)))
   apply (rngl_of_nat_nonneg Hon Hos Hor).
 }
 rewrite <- Rmult_div in Hnr.
+unfold rngl_div in Hnr.
+rewrite Hiv in Hnr.
+rewrite <- rngl_mul_assoc in Hnr.
+rewrite (rngl_mul_inv_diag_r Hon Hiv) in Hnr. 2: {
+  rewrite Nat.add_comm.
+  now apply (rngl_characteristic_0 Hon).
+}
+rewrite (rngl_mul_1_r Hon) in Hnr.
 ...
-unfold Rdiv in Hnr.
-rewrite Rmult_assoc in Hnr.
-rewrite Rinv_r in Hnr; [ | now apply not_0_INR; rewrite Nat.add_comm ].
-rewrite Rmult_1_r in Hnr.
-apply Rmult_lt_compat_r with (r := INR (n + 1)) in Hr1. 2: {
+apply Rmult_lt_compat_r with (r := rngl_of_nat (n + 1)) in Hr1. 2: {
   rewrite plus_INR; simpl.
   apply Rplus_le_lt_0_compat; [ apply pos_INR | lra ].
 }
