@@ -211,6 +211,8 @@ Qed.
 Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L → Int_part x = 0%Z.
 Proof.
 intros * Hx.
+(**)
+assert ((rngl_of_nat 0 / rngl_of_nat (0 + 1) ≤ x < 1)%L). {
 ...
 assert (INR 0 / INR (0 + 1) <= x < 1) by (now simpl; lra).
 pose proof Int_part_close_to_1 x 0 H as H1.
