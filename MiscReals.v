@@ -146,11 +146,47 @@ Proof. apply (rngl_div_1_r' Hon Hos Hiq). Qed.
 Theorem Rdiv_same : ∀ x, (x ≠ 0 → x / x = 1)%L.
 Proof. apply (rngl_div_diag Hon Hiq). Qed.
 
+Fixpoint rngl_of_pos_2 a :=
+  match a with
+  | xI n => (2 * (1 + rngl_of_pos_2 n))%L
+  | xO n => (2 * rngl_of_pos_2 n)%L
+  | xH => 2%L
+  end.
+
+Definition rngl_of_pos a :=
+  match a with
+  | xI n => (1 + rngl_of_pos_2 n)%L
+  | xO n => rngl_of_pos_2 n
+  | xH => 1%L
+  end.
+
+Definition rngl_of_Z a :=
+  match a with
+  | 0%Z => 0%L
+  | Z.pos n => rngl_of_pos n
+  | Z.neg n => (- rngl_of_pos n)%L
+  end.
+
 Definition Int_part (x : T) :=
   let (n, a) := int_part Hon Hop Hc1 Hor Har x in
   if rngl_le_dec Hor 0 x then Z.of_nat n else (- Z.of_nat n)%Z.
 
+Definition frac_part (x : T) :=
+  (x - rngl_of_Z (Int_part x))%L.
+
 Arguments Int_part x%_L.
+Arguments frac_part x%_L.
+
+From Stdlib Require Import ZArith.
+Require Import RingLike.Z_algebra.
+Open Scope Z_scope.
+Existing Instance Z_ring_like_op.
+Existing Instance Z_ring_like_prop.
+
+Compute (rngl_of_Z 0)%Z.
+...
+Compute (rngl_of_Z 3).
+Compute (rngl_of_Z 1 + rngl_of_Z 2)%L.
 
 (* INR = rngl_of_nat *)
 
@@ -211,13 +247,16 @@ Qed.
 Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L → Int_part x = 0%Z.
 Proof.
 intros * Hx.
-(**)
 assert ((rngl_of_nat 0 / rngl_of_nat (0 + 1) ≤ x < 1)%L). {
-...
-assert (INR 0 / INR (0 + 1) <= x < 1) by (now simpl; lra).
-pose proof Int_part_close_to_1 x 0 H as H1.
-now simpl in H1; rewrite Rmult_1_r in H1.
+  now cbn; rewrite rngl_add_0_r, (rngl_div_1_r Hon Hiq Hc1).
+}
+specialize (Int_part_close_to_1 x 0 H) as H1.
+cbn in H1.
+now rewrite rngl_add_0_r, (rngl_mul_1_r Hon) in H1.
 Qed.
+
+About int_part.
+...
 
 Theorem frac_part_small : ∀ x, 0 <= x < 1 → frac_part x = x.
 Proof.
