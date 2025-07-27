@@ -272,12 +272,32 @@ simpl; rewrite <- IHk.
 apply (rngl_of_nat_mul Hon Hos).
 Qed.
 
+Theorem Int_part_rngl_of_nat : ∀ a, Int_part (rngl_of_nat a) = Z.of_nat a.
+Proof.
+intros.
+progress unfold Int_part.
+remember (int_part Hon Hop Hc1 Hor Har (rngl_of_nat a)) as n eqn:Hn.
+destruct n as (n, Hna).
+clear Hn.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hna. 2: {
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
+destruct Hna as (H1, H2).
+apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in H1.
+apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H2.
+rewrite Nat.add_1_r in H2.
+apply -> Nat.lt_succ_r in H2.
+apply Nat.le_antisymm in H1; [ subst | easy ].
+destruct (rngl_le_dec Hor 0 (rngl_of_nat n)) as [H1| H1]; [ easy | ].
+exfalso; apply H1, (rngl_of_nat_nonneg Hon Hos Hor).
+Qed.
+
 Theorem frac_part_INR : ∀ n, frac_part (rngl_of_nat n) = 0%L.
 Proof.
 intros.
 unfold frac_part.
+rewrite Int_part_rngl_of_nat.
 ...
-rewrite Int_part_INR.
 now rewrite <- INR_IZR_INZ, Rminus_diag_eq.
 Qed.
 
