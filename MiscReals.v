@@ -483,6 +483,102 @@ rewrite rngl_of_Z_of_nat.
 apply (rngl_sub_diag Hos).
 Qed.
 
+Theorem rngl_of_Z_add_1_l : ∀ a, rngl_of_Z (1 + a) = (1 + rngl_of_Z a)%L.
+Proof.
+intros.
+destruct a as [| a| a]; cbn. {
+  symmetry; apply rngl_add_0_r.
+} {
+  destruct a as [a| a| ]; cbn; [ | easy | easy ].
+  rewrite rngl_add_assoc.
+  apply rngl_of_pos_2_succ.
+} {
+  induction a as [a| a| ]. {
+    cbn.
+    rewrite (rngl_add_opp_r Hop).
+    rewrite (rngl_sub_add_distr Hos).
+    rewrite (rngl_sub_diag Hos).
+    symmetry; apply (rngl_sub_0_l Hop).
+  } {
+...
+
+Theorem rngl_of_Z_add :
+  ∀ a b, rngl_of_Z (a + b) = (rngl_of_Z a + rngl_of_Z b)%L.
+Proof.
+intros.
+destruct a as [| a| a]. {
+  symmetry; apply rngl_add_0_l.
+} {
+  destruct b as [| b| b]. {
+    symmetry; apply rngl_add_0_r.
+  } {
+    apply rngl_of_pos_add.
+  } {
+    cbn.
+    rewrite <- Pos2Z.add_pos_neg.
+    revert b.
+    induction a as [a| a| ]; intros; cbn. {
+      rewrite <- Pos2Z.add_pos_neg.
+      rewrite Pos2Z.pos_xI.
+      rewrite (Z.add_comm _ 1).
+      rewrite <- Z.add_assoc.
+      rewrite rngl_of_Z_add_1_l.
+...
+Search (Z.succ _ = _ + _)%Z.
+      rewrite Z.succ.
+...
+
+Theorem rngl_of_Z_sub :
+  ∀ a b, rngl_of_Z (a - b) = (rngl_of_Z a - rngl_of_Z b)%L.
+Proof.
+intros.
+progress unfold Z.sub.
+progress unfold rngl_sub.
+rewrite Hop.
+...
+
+Theorem rngl_sub_Int_part : ∀ a b,
+  (frac_part b ≤ frac_part a)%L
+  → Int_part (a - b) = (Int_part a - Int_part b)%Z.
+Proof.
+intros * Hba.
+progress unfold frac_part in Hba.
+apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
+rewrite <- (rngl_add_sub_swap Hop) in Hba.
+rewrite <- (rngl_add_sub_assoc Hop) in Hba.
+apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
+Search (rngl_of_Z (_ + _)).
+Search (rngl_of_Z (_ - _)).
+...
+
+Theorem rngl_of_nat_Pos_to_nat :
+  ∀ a, rngl_of_pos a = rngl_of_nat (Pos.to_nat a).
+Proof.
+intros.
+induction a as [a| a| ]; cbn. {
+  rewrite Pos2Nat.inj_xI.
+  rewrite rngl_of_nat_succ.
+  progress f_equal.
+  rewrite (rngl_of_nat_mul Hon Hos).
+  rewrite rngl_of_nat_2.
+  rewrite <- IHa.
+  clear IHa.
+  induction a as [a| a| ]; cbn; [ easy | easy | ].
+  symmetry; apply (rngl_mul_1_r Hon).
+} {
+  rewrite Pos2Nat.inj_xO.
+  rewrite (rngl_of_nat_mul Hon Hos).
+  rewrite rngl_of_nat_2.
+  rewrite <- IHa.
+  clear IHa.
+  induction a as [a| a| ]; cbn; [ easy | easy | ].
+  symmetry; apply (rngl_mul_1_r Hon).
+} {
+  rewrite Pos2Nat.inj_1; symmetry.
+  apply rngl_of_nat_1.
+}
+Qed.
+
 Theorem Int_part_IZR : ∀ z, Int_part (rngl_of_Z z) = z.
 Proof.
 intros.
@@ -496,6 +592,13 @@ apply Z.nle_gt in Hz.
 destruct z as [| p| p]; [ easy | easy | ].
 cbn.
 rewrite <- (rngl_sub_0_l Hop).
+rewrite rngl_sub_Int_part. 2: {
+  cbn.
+  rewrite rngl_of_nat_Pos_to_nat.
+...
+Require Import Reals.
+Check INR_IPR.
+...
 Search (Int_part (_ - _)).
 ...
 Rminus_Int_part1
