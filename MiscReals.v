@@ -312,6 +312,48 @@ induction a as [a| a| ]; cbn. {
 }
 Qed.
 
+(*
+Theorem Pos_pred_inj :
+  ∀ a b, Pos.pred a = Pos.pred b → a = b.
+Proof.
+intros * Hab.
+do 2 rewrite Pos.pred_sub in Hab.
+Check Pos.sub_add.
+...
+*)
+
+Theorem Pos_pred_double_inj :
+  ∀ a b, Pos.pred_double a = Pos.pred_double b → a = b.
+Proof.
+intros * Hab.
+destruct a as [a| a| ]. {
+  destruct b as [b| b| ]; [ | | easy ]. {
+    cbn in Hab.
+    now injection Hab; clear Hab; intros; subst.
+  } {
+    cbn in Hab.
+    injection Hab; clear Hab; intros H.
+    rewrite Pos.xI_succ_xO.
+    rewrite H.
+    apply Pos.succ_pred_double.
+  }
+} {
+  do 2 rewrite Pos.pred_double_spec in Hab.
+  destruct b as [b| b| ]; [ | | easy ]. {
+    exfalso; cbn in Hab.
+    injection Hab; clear Hab; intros Hab.
+...
+Search Pos.pred_double.
+    apply Pos.pred_double_xO_discr in Hab.
+...
+    rewrite Pos.pred_double_spec in Hab.
+Search (Pos.pred _~0).
+    rewrite Pos.pred_sub in Hab.
+
+Search (_ - _ = _ ↔ _)%positive.
+    apply Pos.sub_move_r in Hab.
+...
+
 Theorem rngl_of_pos_2_pred :
   ∀ a,
   (1 < a)%positive
@@ -327,6 +369,13 @@ induction a as [a| a| ]; cbn. {
   symmetry in Hb.
   destruct b as [b| b| ]. {
     cbn.
+    rewrite <- Pos.pred_double_succ in Hb.
+Check Pos_pred_double_inj.
+... ...
+    do 2 rewrite Pos.pred_double_spec in Hb.
+Search (Pos.pred _ = Pos.pred _).
+    rewrite Pos.pred_sub in Hb.
+Search (_~1)%positive.
 ...
 rewrite Pos.pred_double_spec.
 rewrite Pos.pred_sub.
