@@ -1,5 +1,6 @@
 (* Banach-Tarski paradox. *)
 
+Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 List Relations Wf_nat.
 From Stdlib Require Import ZArith.
 Import ListNotations.
@@ -311,6 +312,29 @@ induction a as [a| a| ]; cbn. {
 }
 Qed.
 
+Theorem rngl_of_pos_2_pred :
+  ∀ a,
+  (1 < a)%positive
+  → rngl_of_pos_2 (Pos.pred a) = (rngl_of_pos_2 a - 2)%L.
+Proof.
+intros * H1a.
+induction a as [a| a| ]; cbn. {
+  rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+  rewrite (rngl_add_comm 2); symmetry.
+  apply (rngl_add_sub Hos).
+} {
+  remember (Pos.pred_double a) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b as [b| b| ]. {
+    cbn.
+...
+rewrite Pos.pred_double_spec.
+rewrite Pos.pred_sub.
+Print rngl_of_pos_2.
+Search (_ - _ = Pos.pred_double)%positive.
+Search (Pos.pred_double _ = _ - _)%positive.
+...
+
 Theorem rngl_of_pos_2_add : ∀ a b,
   rngl_of_pos_2 (a + b) = (rngl_of_pos_2 a + rngl_of_pos_2 b)%L.
 Proof.
@@ -420,6 +444,50 @@ induction a as [a| a| ]; intros; cbn. {
     rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
     now rewrite IHa.
   } {
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+    now rewrite (rngl_add_comm 2), (rngl_add_sub Hos).
+  }
+} {
+  destruct b as [b| b| ]; cbn. {
+    generalize Hba; intros Hba'.
+    apply Pos.compare_lt_iff in Hba'.
+    cbn in Hba'.
+    apply Pos.compare_cont_Gt_Lt in Hba'.
+(**)
+    rewrite <- (rngl_mul_sub_distr_l Hop).
+    rewrite (rngl_add_comm 1 (rngl_of_pos_2 _)).
+    rewrite (rngl_sub_add_distr Hos).
+    rewrite <- IHa; [ | easy ].
+    rewrite Pos.xI_succ_xO.
+    rewrite Pplus_one_succ_l.
+    rewrite Pos.add_comm.
+    rewrite Pos.sub_add_distr; [ | easy ].
+    rewrite Pos.sub_xO_xO; [ | easy ].
+    rewrite <- Pos.pred_sub.
+... ...
+rewrite rngl_of_pos_2_pred.
+...
+Search (_ - Pos
+    rewrite Pos.sub_add_distr; [ | easy ].
+    rewrite Pos.sub_xO_xO; [ | easy ].
+...
+    rewrite Pos.sub_succ_r.
+    rewrite Pos.sub_xO_xO; [ | easy ].
+    remember (a - b)%positive as c eqn:Hc.
+    cbn.
+Search (Pos.pred _~0).
+Search (rngl_of_pos_2).
+Search Pos.pred_double.
+Pos.add_xI_pred_double:
+  ∀ p q : positive, ((p + q)~0)%positive = (p~1 + Pos.pred_double q)%positive
+...
+    rewrite Pplus_one_succ_l.
+    rewrite Pos.add_comm.
+    rewrite Pos.sub_add_distr; [ | easy ].
+    rewrite Pos.sub_xO_xO; [ | easy ].
+...
+Search (_ - _)%positive.
+Pos.sub_succ_r: ∀ p q : positive, (p - Pos.succ q)%positive = Pos.pred (p - q)
 ...
 
 Theorem rngl_of_pos_add :
