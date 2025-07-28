@@ -382,6 +382,46 @@ induction a as [a| a| ]; intros; cbn. {
 }
 Qed.
 
+Theorem rngl_of_pos_2_sub : ∀ a b,
+  (b < a)%positive
+  → rngl_of_pos_2 (a - b) = (rngl_of_pos_2 a - rngl_of_pos_2 b)%L.
+Proof.
+intros * Hba.
+revert b Hba.
+induction a as [a| a| ]; intros; cbn. {
+  destruct b as [b| b| ]; cbn. {
+    apply Pos.compare_lt_iff in Hba.
+    cbn in Hba.
+    apply -> Pos.compare_lt_iff in Hba.
+    rewrite Pos.sub_xI_xI; [ cbn | easy ].
+    rewrite <- (rngl_mul_sub_distr_l Hop).
+    progress f_equal.
+    rewrite (rngl_sub_add_distr Hos).
+    rewrite (rngl_add_comm 1 (rngl_of_pos_2 _)).
+    rewrite (rngl_add_sub Hos).
+    now apply IHa.
+  } {
+    apply Pos.compare_lt_iff in Hba.
+    cbn in Hba.
+    apply Pos.compare_cont_Lt_Lt in Hba.
+    apply Pos.lt_eq_cases in Hba.
+    rewrite Pos.xI_succ_xO.
+    rewrite Pplus_one_succ_l.
+    destruct Hba as [Hba| ]; [ | subst ]. 2: {
+      rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+      rewrite (rngl_add_sub Hos).
+      now rewrite Pos.add_sub.
+    }
+    rewrite <- Pos.add_sub_assoc; [ | now apply -> Pos.compare_lt_iff ].
+    rewrite rngl_of_pos_2_add; cbn.
+    rewrite Pos.sub_xO_xO; [ cbn | easy ].
+    rewrite <- (rngl_mul_sub_distr_l Hop).
+    rewrite <- (rngl_add_sub_assoc Hop).
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+    now rewrite IHa.
+  } {
+...
+
 Theorem rngl_of_pos_add :
   ∀ a b, rngl_of_pos (a + b) = (rngl_of_pos a + rngl_of_pos b)%L.
 Proof.
@@ -422,6 +462,19 @@ destruct a as [a| a| ]; cbn. {
   apply rngl_of_pos_2_succ.
 }
 Qed.
+
+Theorem rngl_of_pos_sub :
+  ∀ a b,
+  (b < a)%positive
+  → rngl_of_pos (a - b) = (rngl_of_pos a - rngl_of_pos b)%L.
+Proof.
+intros * Hba.
+destruct a as [a| a| ]; cbn. {
+  destruct b as [b| b| ]; cbn. {
+    rewrite (rngl_sub_add_distr Hos).
+    rewrite rngl_add_comm, (rngl_add_sub Hos).
+Search rngl_of_pos_2.
+...
 
 Theorem rngl_of_Z_of_nat : ∀ a, rngl_of_Z (Z.of_nat a) = rngl_of_nat a.
 Proof.
@@ -500,6 +553,13 @@ destruct a as [| a| a]; cbn. {
     rewrite (rngl_sub_diag Hos).
     symmetry; apply (rngl_sub_0_l Hop).
   } {
+    cbn.
+    rewrite Pos.pred_double_spec.
+    rewrite Pos.pred_sub.
+    rewrite rngl_of_pos_sub.
+cbn.
+Search Pos.succ.
+Search (_ + 1)%positive.
 ...
 
 Theorem rngl_of_Z_add :
