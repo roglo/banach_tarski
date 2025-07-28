@@ -423,40 +423,6 @@ destruct a as [a| a| ]; cbn. {
 }
 Qed.
 
-Theorem rngl_of_pos_sub_1 :
-  ∀ a b, rngl_of_pos (a~1 - b~1) = (2 * rngl_of_pos (a - b))%L.
-Proof.
-intros.
-destruct a as [a| a| ]; cbn. {
-  destruct b as [b| b| ]; cbn. {
-    rewrite rngl_mul_add_distr_r.
-    rewrite (rngl_mul_1_l Hon).
-    rewrite <- rngl_of_pos_add.
-...
-
-Theorem rngl_of_pos_sub :
-  ∀ a b, rngl_of_pos (a - b) = (rngl_of_pos a - rngl_of_pos b)%L.
-Proof.
-intros.
-destruct a as [a| a| ]; cbn. {
-  destruct b as [b| b| ]; cbn. {
-    rewrite (rngl_sub_add_distr Hos).
-    rewrite (rngl_add_comm 1).
-    rewrite (rngl_add_sub Hos).
-    revert b.
-    induction a as [a| a| ]; intros; cbn. {
-      destruct b as [b| b| ]; cbn. {
-        rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
-        rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
-        rewrite (rngl_sub_add_distr Hos).
-        rewrite (rngl_add_comm 2).
-        rewrite (rngl_add_sub Hos).
-        rewrite <- (rngl_mul_sub_distr_l Hop).
-        rewrite <- IHa.
-        apply rngl_of_pos_sub_1.
-      } {
-...
-
 Theorem rngl_of_Z_of_nat : ∀ a, rngl_of_Z (Z.of_nat a) = rngl_of_nat a.
 Proof.
 intros.
@@ -480,41 +446,62 @@ destruct za as [| n| n]; [ now destruct a | | ]. {
     rewrite Pos2Z.inj_xO in Hza.
     rewrite <- Pos2Z.inj_mul in Hza.
     apply Z.add_move_r in Hza.
-    rewrite <- Pos2Z.inj_sub in Hza. 2: {
+    assert (H12n : (1 < 2 * n)%positive). {
       apply Pos.le_succ_l.
       cbn - [ Pos.mul ].
       rewrite <- (Pos.mul_1_r 2) at 1.
       apply Pos.mul_le_mono_l.
       apply Pos.le_1_l.
     }
+    rewrite <- Pos2Z.inj_sub in Hza; [ | easy ].
     apply IHa in Hza.
-Search rngl_of_pos.
-...
-    rewrite rngl_of_pos_sub in Hza.
-...
+    rewrite <- Hza.
+    replace 1%L with (rngl_of_pos 1) by easy.
+    rewrite <- rngl_of_pos_add.
+    now rewrite Pos.add_sub_assoc.
+  } {
+    apply Z.add_move_r in Hza.
+    rewrite Z.sub_diag in Hza.
+    symmetry; cbn.
+    apply (rngl_add_move_l Hop).
+    rewrite (rngl_sub_diag Hos).
+    now destruct a.
+  }
+}
+specialize (Nat2Z.is_nonneg a) as H1.
+rewrite Hza in H1.
+exfalso; apply Z.nlt_ge in H1.
+now apply H1.
+Qed.
 
 Theorem frac_part_INR : ∀ n, frac_part (rngl_of_nat n) = 0%L.
 Proof.
 intros.
 unfold frac_part.
 rewrite Int_part_rngl_of_nat.
-...
-now rewrite <- INR_IZR_INZ, Rminus_diag_eq.
+rewrite rngl_of_Z_of_nat.
+apply (rngl_sub_diag Hos).
 Qed.
 
-Theorem Int_part_IZR : ∀ z, Int_part (IZR z) = z.
+Theorem Int_part_IZR : ∀ z, Int_part (rngl_of_Z z) = z.
 Proof.
 intros.
 destruct (Z_le_dec 0 z) as [Hz| Hz]. {
   apply Z2Nat.id in Hz.
   rewrite <- Hz at 1.
-  rewrite <- INR_IZR_INZ.
-  now rewrite Int_part_INR.
+  rewrite rngl_of_Z_of_nat.
+  now rewrite Int_part_rngl_of_nat.
 }
 apply Z.nle_gt in Hz.
 destruct z as [| p| p]; [ easy | easy | ].
-unfold IZR.
-replace (- IPR p) with (0 - IPR p) by lra.
+cbn.
+rewrite <- (rngl_sub_0_l Hop).
+Search (Int_part (_ - _)).
+...
+Rminus_Int_part1
+     : ∀ r1 r2 : R,
+         (frac_part r1 >= frac_part r2)%R → Int_part (r1 - r2) = (Int_part r1 - Int_part r2)%Z
+...
 rewrite Rminus_Int_part1. {
   rewrite Int_part_small; [ | lra ].
   rewrite <- INR_IPR.
