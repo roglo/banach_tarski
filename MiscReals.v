@@ -357,6 +357,8 @@ induction a as [a| a| ]; cbn. {
     rewrite (rngl_add_sub Hos).
     apply rngl_add_comm.
   } {
+    rewrite <- Hb.
+    rewrite Pos.pred_double_spec.
 ...
 
 Theorem rngl_of_pos_2_add : ∀ a b,
