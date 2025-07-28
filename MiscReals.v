@@ -312,47 +312,24 @@ induction a as [a| a| ]; cbn. {
 }
 Qed.
 
-(*
 Theorem Pos_pred_inj :
-  ∀ a b, Pos.pred a = Pos.pred b → a = b.
+  ∀ a b, a ≠ 1%positive → b ≠ 1%positive → Pos.pred a = Pos.pred b → a = b.
 Proof.
-intros * Hab.
-do 2 rewrite Pos.pred_sub in Hab.
-Check Pos.sub_add.
-...
-*)
+intros * Ha Hb Hab.
+apply (f_equal Pos.succ) in Hab.
+rewrite Pos.succ_pred in Hab; [ | easy ].
+rewrite Pos.succ_pred in Hab; [ | easy ].
+easy.
+Qed.
 
 Theorem Pos_pred_double_inj :
   ∀ a b, Pos.pred_double a = Pos.pred_double b → a = b.
 Proof.
 intros * Hab.
-destruct a as [a| a| ]. {
-  destruct b as [b| b| ]; [ | | easy ]. {
-    cbn in Hab.
-    now injection Hab; clear Hab; intros; subst.
-  } {
-    cbn in Hab.
-    injection Hab; clear Hab; intros H.
-    rewrite Pos.xI_succ_xO.
-    rewrite H.
-    apply Pos.succ_pred_double.
-  }
-} {
-  do 2 rewrite Pos.pred_double_spec in Hab.
-  destruct b as [b| b| ]; [ | | easy ]. {
-    exfalso; cbn in Hab.
-    injection Hab; clear Hab; intros Hab.
-...
-Search Pos.pred_double.
-    apply Pos.pred_double_xO_discr in Hab.
-...
-    rewrite Pos.pred_double_spec in Hab.
-Search (Pos.pred _~0).
-    rewrite Pos.pred_sub in Hab.
-
-Search (_ - _ = _ ↔ _)%positive.
-    apply Pos.sub_move_r in Hab.
-...
+do 2 rewrite Pos.pred_double_spec in Hab.
+apply Pos_pred_inj in Hab; [ | easy | easy ].
+now injection Hab; clear Hab; intros.
+Qed.
 
 Theorem rngl_of_pos_2_pred :
   ∀ a,
@@ -370,18 +347,16 @@ induction a as [a| a| ]; cbn. {
   destruct b as [b| b| ]. {
     cbn.
     rewrite <- Pos.pred_double_succ in Hb.
-Check Pos_pred_double_inj.
-... ...
-    do 2 rewrite Pos.pred_double_spec in Hb.
-Search (Pos.pred _ = Pos.pred _).
-    rewrite Pos.pred_sub in Hb.
-Search (_~1)%positive.
-...
-rewrite Pos.pred_double_spec.
-rewrite Pos.pred_sub.
-Print rngl_of_pos_2.
-Search (_ - _ = Pos.pred_double)%positive.
-Search (Pos.pred_double _ = _ - _)%positive.
+    apply Pos_pred_double_inj in Hb; subst.
+    rewrite rngl_of_pos_2_succ.
+    rewrite <- (rngl_mul_1_r Hon 2) at 4.
+    rewrite <- (rngl_mul_sub_distr_l Hop).
+    progress f_equal.
+    rewrite (rngl_add_comm 2).
+    rewrite <- (rngl_add_sub_assoc Hop).
+    rewrite (rngl_add_sub Hos).
+    apply rngl_add_comm.
+  } {
 ...
 
 Theorem rngl_of_pos_2_add : ∀ a b,
