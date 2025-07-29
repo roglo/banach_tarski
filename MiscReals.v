@@ -932,33 +932,30 @@ induction a as [| a| a]. {
   } {
     cbn.
     rewrite (rngl_add_opp_l Hop).
-...
-    rewrite Z.pos_sub_gt.
-Check rngl_of_pos_add.
-...
-    apply rngl_of_pos_add.
+    destruct (Pos_dec a b) as [[Hab| Hab]| Hab]. {
+      rewrite Z.pos_sub_gt; [ cbn | easy ].
+      now apply rngl_of_pos_sub.
+    } {
+      rewrite Z.pos_sub_lt; [ cbn | easy ].
+      apply (rngl_opp_inj Hop).
+      rewrite (rngl_opp_involutive Hop).
+      rewrite (rngl_opp_sub_distr Hop).
+      now apply rngl_of_pos_sub.
+    } {
+      subst.
+      rewrite Z.pos_sub_diag; symmetry.
+      apply (rngl_sub_diag Hos).
+    }
   } {
     cbn.
-    rewrite <- Pos2Z.add_pos_neg.
     rewrite (rngl_add_opp_r Hop).
-    revert b.
-    induction a as [a| a| ]; cbn; intros. {
-...
-      destruct b as [b| b| ]; cbn. {
-        rewrite Z.pred_double_spec.
-        rewrite Z.sub_1_r.
-        rewrite rngl_of_Z_pred.
-        rewrite <- Pos2Z.add_pos_neg.
-...
-        rewrite Z.pos_sub_spec.
-        cbn.
-      rewrite Z.pos_sub_spec.
-
-      rewrite <- Pos2Z.add_pos_neg.
-...
-Search (Z.succ _ = _ + _)%Z.
-      rewrite Z.succ.
-...
+    rewrite <- (rngl_opp_add_distr Hop).
+    progress f_equal.
+    rewrite rngl_add_comm.
+    apply rngl_of_pos_add.
+  }
+}
+Qed.
 
 Theorem rngl_of_Z_sub :
   ∀ a b, rngl_of_Z (a - b) = (rngl_of_Z a - rngl_of_Z b)%L.
@@ -967,6 +964,9 @@ intros.
 progress unfold Z.sub.
 progress unfold rngl_sub.
 rewrite Hop.
+rewrite rngl_of_Z_add.
+progress f_equal.
+Search (rngl_of_Z (- _)).
 ...
 
 Theorem rngl_sub_Int_part : ∀ a b,
