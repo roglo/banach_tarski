@@ -957,6 +957,17 @@ induction a as [| a| a]. {
 }
 Qed.
 
+Theorem rngl_of_Z_opp : ∀ a, rngl_of_Z (- a) = (- rngl_of_Z a)%L.
+Proof.
+intros.
+symmetry.
+destruct a as [| a| a]; cbn; [ | easy | ]. {
+  apply (rngl_opp_0 Hop).
+} {
+  apply (rngl_opp_involutive Hop).
+}
+Qed.
+
 Theorem rngl_of_Z_sub :
   ∀ a b, rngl_of_Z (a - b) = (rngl_of_Z a - rngl_of_Z b)%L.
 Proof.
@@ -966,8 +977,8 @@ progress unfold rngl_sub.
 rewrite Hop.
 rewrite rngl_of_Z_add.
 progress f_equal.
-Search (rngl_of_Z (- _)).
-...
+apply rngl_of_Z_opp.
+Qed.
 
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
@@ -979,8 +990,7 @@ apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
 rewrite <- (rngl_add_sub_assoc Hop) in Hba.
 apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
-Search (rngl_of_Z (_ + _)).
-Search (rngl_of_Z (_ - _)).
+rewrite <- rngl_of_Z_sub in Hba.
 ...
 
 Theorem rngl_of_nat_Pos_to_nat :
