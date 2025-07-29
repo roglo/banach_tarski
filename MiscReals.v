@@ -996,37 +996,44 @@ induction a as [a| a| ]; cbn. {
 }
 Qed.
 
+Theorem rngl_of_pos_neq_0 : ∀ a, rngl_of_pos a ≠ 0%L.
+Proof.
+intros * Ha.
+destruct a as [a| a| ]. {
+  exfalso; cbn in Ha.
+  apply (rngl_add_move_0_l Hop) in Ha.
+  specialize (rngl_of_pos_2_pos a) as H1.
+  apply rngl_nle_gt in H1.
+  apply H1; rewrite Ha.
+  apply (rngl_opp_1_le_0 Hon Hop Hor).
+} {
+  exfalso; cbn in Ha.
+  specialize (rngl_of_pos_2_pos a) as H1.
+  apply rngl_nle_gt in H1.
+  apply H1; rewrite Ha.
+  apply (rngl_le_refl Hor).
+} {
+  apply (rngl_1_eq_0_iff Hon Hos) in Ha.
+  congruence.
+}
+Qed.
+
 Theorem rngl_of_Z_inj : ∀ a b, rngl_of_Z a = rngl_of_Z b → a = b.
 Proof.
 intros * Hab.
 destruct a as [| a| a]. {
   symmetry in Hab |-*; cbn in Hab.
   destruct b as [| b| b]; cbn in Hab; [ easy | | ]. {
-    destruct b as [b| b| ]. {
-      exfalso; cbn in Hab.
-      rewrite rngl_add_comm in Hab.
-      apply (rngl_add_move_0_r Hop) in Hab.
-      specialize (rngl_of_pos_2_pos b) as H1.
-      apply rngl_nle_gt in H1.
-      apply H1; rewrite Hab.
-      apply (rngl_opp_1_le_0 Hon Hop Hor).
-    } {
-      exfalso; cbn in Hab.
-      specialize (rngl_of_pos_2_pos b) as H1.
-      apply rngl_nle_gt in H1.
-      apply H1; rewrite Hab.
-      apply (rngl_le_refl Hor).
-    } {
-      apply (rngl_1_eq_0_iff Hon Hos) in Hab.
-      congruence.
-    }
+    now apply rngl_of_pos_neq_0 in Hab.
   } {
     exfalso.
     apply (f_equal rngl_opp) in Hab.
     rewrite (rngl_opp_involutive Hop) in Hab.
     rewrite (rngl_opp_0 Hop) in Hab.
-    destruct b as [b| b| ]. {
-      cbn in Hab.
+    now apply rngl_of_pos_neq_0 in Hab.
+  }
+} {
+  apply (f_equal Z_of_rngl) in Hab.
 ...
 
 Theorem rngl_sub_Int_part : ∀ a b,
