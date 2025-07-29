@@ -1033,7 +1033,13 @@ destruct a as [| a| a]. {
     now apply rngl_of_pos_neq_0 in Hab.
   }
 } {
-  apply (f_equal Z_of_rngl) in Hab.
+  cbn in Hab.
+  destruct b as [| b| b]; cbn. {
+    now apply rngl_of_pos_neq_0 in Hab.
+  } {
+    cbn in Hab.
+Search (rngl_of_pos _ = rngl_of_pos _).
+    apply rngl_of_pos_inj in Hab.
 ...
 
 Theorem rngl_sub_Int_part : ∀ a b,
