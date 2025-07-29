@@ -786,6 +786,29 @@ destruct ab; [ right | now left; left | now left; right ].
 now apply Pos.compare_eq_iff in Hab.
 Qed.
 
+Theorem rngl_of_Z_succ : ∀ a, rngl_of_Z (Z.succ a) = (1 + rngl_of_Z a)%L.
+Proof.
+intros.
+symmetry.
+destruct a as [| a| a]; cbn; [ apply rngl_add_0_r | | ]. {
+  rewrite rngl_of_pos_add.
+  apply rngl_add_comm.
+} {
+  rewrite (rngl_add_opp_r Hop).
+  destruct a as [a| a| ]; cbn. {
+    rewrite (rngl_sub_add_distr Hos).
+    rewrite (rngl_sub_diag Hos).
+    apply (rngl_sub_0_l Hop).
+  } {
+    rewrite Pos.pred_double_spec.
+    rewrite rngl_of_pos_pred; [ symmetry | easy ].
+    apply (rngl_opp_sub_distr Hop).
+  } {
+    apply (rngl_sub_diag Hos).
+  }
+}
+Qed.
+
 Theorem rngl_of_Z_add :
   ∀ a b, rngl_of_Z (a + b) = (rngl_of_Z a + rngl_of_Z b)%L.
 Proof.
@@ -800,11 +823,11 @@ induction a as [| a| a]. {
   } {
     cbn.
     rewrite <- Pos2Z.add_pos_neg.
+    rewrite (rngl_add_opp_r Hop).
     revert b.
     induction a as [a| a| ]; cbn; intros. {
       destruct b as [b| b| ]. {
         cbn.
-        rewrite (rngl_add_opp_r Hop).
         rewrite (rngl_sub_add_distr Hos).
         rewrite rngl_add_comm, (rngl_add_sub Hos).
         rewrite Z.double_spec.
@@ -823,6 +846,50 @@ induction a as [| a| a]. {
           apply (rngl_sub_diag Hos).
         }
       } {
+        cbn.
+        rewrite Z.succ_double_spec, Z.add_1_r.
+        rewrite rngl_of_Z_succ.
+        rewrite <- (rngl_add_sub_assoc Hop).
+        progress f_equal.
+        destruct (Pos_dec a b) as [[Hab| Hab]| Hab]. {
+          rewrite Z.pos_sub_lt; [ cbn | easy ].
+          apply (rngl_opp_inj Hop).
+          rewrite (rngl_opp_involutive Hop).
+          rewrite (rngl_opp_sub_distr Hop).
+          now apply rngl_of_pos_2_sub.
+        } {
+          rewrite Z.pos_sub_gt; [ cbn | easy ].
+          now apply rngl_of_pos_2_sub.
+        } {
+          subst.
+          rewrite Z.pos_sub_diag, Z.mul_0_r; symmetry.
+          apply (rngl_sub_diag Hos).
+        }
+      } {
+        cbn; symmetry.
+        rewrite rngl_add_comm.
+        apply (rngl_add_sub Hos).
+      }
+    } {
+...
+Search (Z.succ _).
+        rewrite <- Z.succ_spec.
+        destruct (Pos_dec a b) as [[Hab| Hab]| Hab]. {
+...
+Search (rngl_of_Z (Z.succ _)).
+          rewrite Z.pos_sub_lt; [ cbn | easy ].
+          apply (rngl_opp_inj Hop).
+          rewrite (rngl_opp_involutive Hop).
+          rewrite (rngl_opp_sub_distr Hop).
+          now apply rngl_of_pos_2_sub.
+        } {
+          rewrite Z.pos_sub_gt; [ cbn | easy ].
+          now apply rngl_of_pos_2_sub.
+        } {
+          subst.
+          rewrite Z.pos_sub_diag, Z.mul_0_r; symmetry.
+          apply (rngl_sub_diag Hos).
+        }
 ...
       rewrite <- Pos2Z.add_pos_neg.
       rewrite Pos2Z.pos_xI.
