@@ -744,9 +744,36 @@ destruct a as [| a| a]; cbn. {
     cbn.
     rewrite Pos.pred_double_spec.
     rewrite Pos.pred_sub.
-    rewrite rngl_of_pos_sub.
-cbn.
-...
+    rewrite rngl_of_pos_sub; [ cbn | easy ].
+    rewrite (rngl_add_opp_r Hop).
+    apply (rngl_opp_sub_distr Hop).
+  } {
+    symmetry; cbn.
+    apply (rngl_add_opp_diag_r Hop).
+  }
+}
+Qed.
+
+Theorem rngl_of_Z_pred : ∀ a, rngl_of_Z (Z.pred a) = (rngl_of_Z a - 1)%L.
+Proof.
+intros.
+destruct a as [| a| a]; cbn. {
+  symmetry; apply (rngl_sub_0_l Hop).
+} {
+  destruct a as [a| a| ]; cbn. {
+    symmetry; rewrite rngl_add_comm.
+    apply (rngl_add_sub Hos).
+  } {
+    rewrite Pos.pred_double_spec.
+    now apply rngl_of_pos_pred.
+  } {
+    symmetry; apply (rngl_sub_diag Hos).
+  }
+} {
+  rewrite rngl_of_pos_add, rngl_add_comm.
+  apply (rngl_opp_add_distr Hop).
+}
+Qed.
 
 Theorem rngl_of_Z_add :
   ∀ a b, rngl_of_Z (a + b) = (rngl_of_Z a + rngl_of_Z b)%L.
@@ -768,7 +795,32 @@ destruct a as [| a| a]. {
       rewrite Pos2Z.pos_xI.
       rewrite (Z.add_comm _ 1).
       rewrite <- Z.add_assoc.
-      rewrite rngl_of_Z_add_1_l.
+      rewrite rngl_of_Z_add_1_l; cbn.
+      rewrite <- rngl_add_assoc.
+      progress f_equal.
+(*
+rewrite Z.pos_sub_spec.
+remember (_ ?= _)%positive as c eqn:Hc.
+symmetry in Hc.
+destruct c. {
+  apply Pos.compare_eq_iff in Hc; subst; cbn.
+  symmetry; apply (rngl_add_opp_diag_r Hop).
+} {
+  apply -> Pos.compare_lt_iff in Hc; cbn.
+Search (- rngl_of_pos _)%L.
+...
+*)
+      destruct b as [b| b| ]; cbn. {
+        rewrite Z.pred_double_spec.
+        rewrite Z.sub_1_r.
+        rewrite rngl_of_Z_pred.
+        rewrite <- Pos2Z.add_pos_neg.
+...
+        rewrite Z.pos_sub_spec.
+        cbn.
+      rewrite Z.pos_sub_spec.
+
+      rewrite <- Pos2Z.add_pos_neg.
 ...
 Search (Z.succ _ = _ + _)%Z.
       rewrite Z.succ.
