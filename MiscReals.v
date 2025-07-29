@@ -357,7 +357,7 @@ induction a as [a| a| ]; cbn. {
     rewrite (rngl_add_sub Hos).
     apply rngl_add_comm.
   } {
-    destruct a as [| a| a]; [ easy | easy | cbn ].
+    destruct a as [a| a| ]; [ easy | easy | cbn ].
     symmetry.
     rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
     apply (rngl_add_sub Hos).
@@ -676,7 +676,7 @@ destruct za as [| n| n]; [ now destruct a | | ]. {
   rewrite rngl_of_nat_succ.
   rewrite Nat2Z.inj_succ in Hza.
   progress unfold Z.succ in Hza.
-  destruct n as [| n| n]. {
+  destruct n as [n| n| ]. {
     cbn; f_equal.
     rewrite Pos2Z.inj_xI in Hza.
     apply Z.add_cancel_r in Hza.
