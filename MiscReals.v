@@ -871,12 +871,37 @@ induction a as [| a| a]. {
         apply (rngl_add_sub Hos).
       }
     } {
-...
-Search (Z.succ _).
-        rewrite <- Z.succ_spec.
+      destruct b as [b| b| ]. {
+        cbn.
+        rewrite rngl_add_comm.
+        rewrite (rngl_sub_add_distr Hos).
+        rewrite Z.pred_double_spec.
         destruct (Pos_dec a b) as [[Hab| Hab]| Hab]. {
-...
-Search (rngl_of_Z (Z.succ _)).
+          rewrite Z.pos_sub_lt; [ cbn | easy ].
+          apply (rngl_opp_inj Hop).
+          rewrite (rngl_opp_involutive Hop).
+          rewrite (rngl_opp_sub_distr Hop).
+          rewrite (rngl_sub_sub_distr Hop).
+          rewrite <- (rngl_add_sub_swap Hop).
+          rewrite <- (rngl_add_sub_assoc Hop).
+          progress f_equal.
+          now apply rngl_of_pos_2_sub.
+        } {
+          rewrite Z.pos_sub_gt; [ | easy ].
+          rewrite Z.sub_1_r.
+          rewrite rngl_of_Z_pred.
+          progress f_equal; cbn.
+          now apply rngl_of_pos_2_sub.
+        } {
+          subst.
+          rewrite Z.pos_sub_diag, Z.mul_0_r; symmetry; cbn.
+          rewrite (rngl_sub_diag Hos).
+          apply (rngl_sub_0_l Hop).
+        }
+      } {
+        cbn.
+        rewrite Z.double_spec.
+        destruct (Pos_dec a b) as [[Hab| Hab]| Hab]. {
           rewrite Z.pos_sub_lt; [ cbn | easy ].
           apply (rngl_opp_inj Hop).
           rewrite (rngl_opp_involutive Hop).
@@ -890,26 +915,35 @@ Search (rngl_of_Z (Z.succ _)).
           rewrite Z.pos_sub_diag, Z.mul_0_r; symmetry.
           apply (rngl_sub_diag Hos).
         }
-...
+      } {
+        cbn.
+        rewrite Pos.pred_double_spec.
+        now apply rngl_of_pos_pred.
+      }
+    } {
       rewrite <- Pos2Z.add_pos_neg.
-      rewrite Pos2Z.pos_xI.
-      rewrite (Z.add_comm _ 1).
-      rewrite <- Z.add_assoc.
       rewrite rngl_of_Z_add_1_l; cbn.
-      rewrite <- rngl_add_assoc.
-      progress f_equal.
-(*
-rewrite Z.pos_sub_spec.
-remember (_ ?= _)%positive as c eqn:Hc.
-symmetry in Hc.
-destruct c. {
-  apply Pos.compare_eq_iff in Hc; subst; cbn.
-  symmetry; apply (rngl_add_opp_diag_r Hop).
+      apply (rngl_add_opp_r Hop).
+    }
+  }
 } {
-  apply -> Pos.compare_lt_iff in Hc; cbn.
-Search (- rngl_of_pos _)%L.
+  destruct b as [| b| b]. {
+    symmetry; apply rngl_add_0_r.
+  } {
+    cbn.
+    rewrite (rngl_add_opp_l Hop).
 ...
-*)
+    rewrite Z.pos_sub_gt.
+Check rngl_of_pos_add.
+...
+    apply rngl_of_pos_add.
+  } {
+    cbn.
+    rewrite <- Pos2Z.add_pos_neg.
+    rewrite (rngl_add_opp_r Hop).
+    revert b.
+    induction a as [a| a| ]; cbn; intros. {
+...
       destruct b as [b| b| ]; cbn. {
         rewrite Z.pred_double_spec.
         rewrite Z.sub_1_r.
