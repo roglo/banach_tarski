@@ -980,6 +980,55 @@ progress f_equal.
 apply rngl_of_Z_opp.
 Qed.
 
+Theorem rngl_of_pos_2_pos : ∀ a, (0 < rngl_of_pos_2 a)%L.
+Proof.
+intros.
+induction a as [a| a| ]; cbn. {
+  apply (rngl_mul_pos_pos Hos Hor Hii).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_add_nonneg_pos Hor); [ | easy ].
+  apply (rngl_0_le_1 Hon Hos Hor).
+} {
+  apply (rngl_mul_pos_pos Hos Hor Hii); [ | easy ].
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+Qed.
+
+Theorem rngl_of_Z_inj : ∀ a b, rngl_of_Z a = rngl_of_Z b → a = b.
+Proof.
+intros * Hab.
+destruct a as [| a| a]. {
+  symmetry in Hab |-*; cbn in Hab.
+  destruct b as [| b| b]; cbn in Hab; [ easy | | ]. {
+    destruct b as [b| b| ]. {
+      exfalso; cbn in Hab.
+      rewrite rngl_add_comm in Hab.
+      apply (rngl_add_move_0_r Hop) in Hab.
+      specialize (rngl_of_pos_2_pos b) as H1.
+      apply rngl_nle_gt in H1.
+      apply H1; rewrite Hab.
+      apply (rngl_opp_1_le_0 Hon Hop Hor).
+    } {
+      exfalso; cbn in Hab.
+      specialize (rngl_of_pos_2_pos b) as H1.
+      apply rngl_nle_gt in H1.
+      apply H1; rewrite Hab.
+      apply (rngl_le_refl Hor).
+    } {
+      apply (rngl_1_eq_0_iff Hon Hos) in Hab.
+      congruence.
+    }
+  } {
+    exfalso.
+    apply (f_equal rngl_opp) in Hab.
+    rewrite (rngl_opp_involutive Hop) in Hab.
+    rewrite (rngl_opp_0 Hop) in Hab.
+    destruct b as [b| b| ]. {
+      cbn in Hab.
+...
+
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
@@ -991,6 +1040,11 @@ rewrite <- (rngl_add_sub_swap Hop) in Hba.
 rewrite <- (rngl_add_sub_assoc Hop) in Hba.
 apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
 rewrite <- rngl_of_Z_sub in Hba.
+Search Int_part.
+Search rngl_of_Z.
+... ...
+apply rngl_of_Z_inj.
+Search (rngl_of_Z (Int_part _)).
 ...
 
 Theorem rngl_of_nat_Pos_to_nat :
