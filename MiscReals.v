@@ -1419,6 +1419,17 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
         now apply Nat_Int_part_le.
       }
       progress f_equal.
+Theorem Nat_Int_part_opp : ∀ a, Nat_Int_part (- a)%L = Nat_Int_part a.
+Proof.
+intros.
+progress unfold Nat_Int_part.
+remember (int_part _ _ _ _ _ (- a)%L) as b eqn:Hb.
+remember (int_part _ _ _ _ _ a) as c eqn:Hc.
+clear Hb Hc.
+destruct b as (b, Hb).
+destruct c as (c, Hc).
+rewrite (rngl_abs_opp Hop Hor) in Hb.
+Search Nat_Int_part.
 ...
 
 Theorem rngl_of_nat_Pos_to_nat :
