@@ -1321,13 +1321,47 @@ rewrite (rngl_abs_nonneg_eq Hop Hor) in Hx; [ | easy ].
 rewrite (rngl_abs_nonneg_eq Hop Hor) in Hy. 2: {
   now apply (rngl_le_trans Hor _ a).
 }
-apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-apply (rngl_le_trans Hor _ a); [ easy | ].
-apply (rngl_le_trans Hor _ b); [ easy | ].
-rewrite Nat.add_1_r in Hy.
-rewrite rngl_of_nat_succ in Hy.
-
-...
+move y before x.
+revert a b y Hab Hx Hy.
+induction x; intros; cbn; [ apply Nat.le_0_l | ].
+destruct y. {
+  exfalso; cbn in Hy.
+  rewrite rngl_add_0_r in Hy.
+  destruct Hy as (_, Hy).
+  rewrite Nat.add_1_r in Hx.
+  do 2 rewrite rngl_of_nat_succ in Hx.
+  destruct Hx as (H1, H2).
+  apply rngl_nlt_ge in H1.
+  apply H1; clear H1.
+  apply (rngl_le_lt_trans Hor _ b); [ easy | ].
+  apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
+  apply (rngl_le_add_r Hor).
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
+apply -> Nat.succ_le_mono.
+apply (IHx (a - 1) (b - 1))%L. {
+  split. {
+    apply (rngl_le_0_sub Hop Hor).
+    apply (rngl_le_trans Hor _ (rngl_of_nat (S x))); [ | easy ].
+    rewrite rngl_of_nat_succ.
+    apply (rngl_le_add_r Hor).
+    apply (rngl_of_nat_nonneg Hon Hos Hor).
+  }
+  now apply (rngl_sub_le_mono_r Hop Hor).
+} {
+  rewrite Nat.add_1_r in Hx.
+  do 2 rewrite rngl_of_nat_succ in Hx.
+  split; [ now apply (rngl_le_add_le_sub_l Hop Hor) | ].
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  now rewrite Nat.add_1_r.
+} {
+  rewrite Nat.add_1_r in Hy.
+  do 2 rewrite rngl_of_nat_succ in Hy.
+  split; [ now apply (rngl_le_add_le_sub_l Hop Hor) | ].
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  now rewrite Nat.add_1_r.
+}
+Qed.
 
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
@@ -1359,15 +1393,9 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
     destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]. {
       apply (rngl_opp_le_compat Hop Hor) in Hba.
       do 2 rewrite (rngl_opp_sub_distr Hop) in Hba.
-      rewrite <- (rngl_of_nat_sub Hos) in Hba.
-Search (rngl_of_nat _ - _)%L.
-...
-Search (rngl_of_Z (Z.of_nat _)).
-  rewrite rngl_of_Z_of_nat.
-Check int_part.
-rngl_of_nat
-... ...
-Search (rngl_of_Z (Int_part _)).
+      rewrite <- (rngl_of_nat_sub Hos) in Hba. 2: {
+        now apply Nat_Int_part_le.
+      }
 ...
 
 Theorem rngl_of_nat_Pos_to_nat :
