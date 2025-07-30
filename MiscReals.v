@@ -1307,6 +1307,28 @@ destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
 }
 Qed.
 
+Theorem Nat_Int_part_le :
+  ∀ a b, (0 ≤ a ≤ b)%L → Nat_Int_part a ≤ Nat_Int_part b.
+Proof.
+intros * Hab.
+progress unfold Nat_Int_part.
+remember (int_part _ _ _ _ _ a) as x eqn:H1.
+remember (int_part _ _ _ _ _ b) as y eqn:H2.
+destruct x as (x, Hx).
+destruct y as (y, Hy).
+clear H1 H2.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hx; [ | easy ].
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hy. 2: {
+  now apply (rngl_le_trans Hor _ a).
+}
+apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+apply (rngl_le_trans Hor _ a); [ easy | ].
+apply (rngl_le_trans Hor _ b); [ easy | ].
+rewrite Nat.add_1_r in Hy.
+rewrite rngl_of_nat_succ in Hy.
+
+...
+
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
@@ -1321,10 +1343,24 @@ apply rngl_of_Z_inj.
 rewrite rngl_of_Z_sub.
 do 2 rewrite rngl_of_Z_Int_part in Hba.
 do 3 rewrite rngl_of_Z_Int_part.
-destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
-  destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]. {
+destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
+(*
+  destruct (rngl_le_dec Hor 0 (a - b)) as [H| H]. {
+    apply -> (rngl_le_0_sub Hop Hor) in H.
+    apply (rngl_le_antisymm Hor) in H; [ subst b | easy ].
+    rewrite (rngl_sub_diag Hos).
+...
+*)
+  destruct (rngl_lt_dec Hor 0 (a - b)) as [H| H]; [ | clear H ]. {
+    apply -> (rngl_lt_0_sub Hop Hor) in H.
+    now apply rngl_nle_gt in H.
+  }
+  destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
+    destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]. {
+      apply (rngl_opp_le_compat Hop Hor) in Hba.
+      do 2 rewrite (rngl_opp_sub_distr Hop) in Hba.
+      rewrite <- (rngl_of_nat_sub Hos) in Hba.
 Search (rngl_of_nat _ - _)%L.
-    rewrite <- (rngl_of_nat_sub Hos) in Hba.
 ...
 Search (rngl_of_Z (Z.of_nat _)).
   rewrite rngl_of_Z_of_nat.
