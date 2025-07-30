@@ -1070,7 +1070,7 @@ Theorem rngl_of_pos_2_eq_2 : ∀ a, rngl_of_pos_2 a = 2%L → a = 1%positive.
 Proof.
 intros * Ha2.
 specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H2z.
-destruct a as [| a| a]; cbn; [ | | easy ]. {
+destruct a as [a| a| ]; cbn; [ | | easy ]. {
   cbn in Ha2.
   rewrite <- (rngl_mul_1_r Hon 2) in Ha2 at 2.
   apply (rngl_mul_cancel_l Hi1) in Ha2; [ | easy ].
@@ -1088,7 +1088,7 @@ Qed.
 Theorem rngl_of_pos_eq_1 : ∀ a, rngl_of_pos a = 1%L → a = 1%positive.
 Proof.
 intros * Ha1.
-destruct a as [| a| a]; [ | | easy ]. {
+destruct a as [a| a| ]; [ | | easy ]. {
   cbn in Ha1.
   apply (rngl_add_move_l Hop) in Ha1.
   rewrite (rngl_sub_diag Hos) in Ha1.
@@ -1219,7 +1219,7 @@ Qed.
 Theorem rngl_of_pos_pos : ∀ a, (0 < rngl_of_pos a)%L.
 Proof.
 intros.
-destruct a as [| a| a]; cbn. {
+destruct a as [a| a| ]; cbn. {
   apply (rngl_le_lt_trans Hor _ 1).
   apply (rngl_0_le_1 Hon Hos Hor).
   apply (rngl_lt_sub_lt_add_l Hop Hor).
