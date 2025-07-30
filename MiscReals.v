@@ -168,8 +168,11 @@ Definition rngl_of_Z a :=
   | Z.neg n => (- rngl_of_pos n)%L
   end.
 
+Definition Nat_Int_part (x : T) :=
+  let (n, a) := int_part Hon Hop Hc1 Hor Har x in n.
+
 Definition Int_part (x : T) :=
-  let (n, a) := int_part Hon Hop Hc1 Hor Har x in
+  let n := Nat_Int_part x in
   if rngl_le_dec Hor 0 x then Z.of_nat n else (- Z.of_nat n)%Z.
 
 Definition frac_part (x : T) :=
@@ -222,6 +225,7 @@ remember (r * rngl_of_nat (n + 1))%L as x eqn:Hx.
 rewrite rngl_of_nat_add in Hr1; cbn in Hr1.
 rewrite rngl_add_0_r in Hr1.
 progress unfold Int_part.
+progress unfold Nat_Int_part.
 remember (int_part Hon Hop Hc1 Hor Har x) as y eqn:Hy.
 symmetry in Hy.
 destruct y as (m, Hm).
@@ -276,7 +280,7 @@ Qed.
 Theorem Int_part_rngl_of_nat : ∀ a, Int_part (rngl_of_nat a) = Z.of_nat a.
 Proof.
 intros.
-progress unfold Int_part.
+progress unfold Int_part, Nat_Int_part.
 remember (int_part Hon Hop Hc1 Hor Har (rngl_of_nat a)) as n eqn:Hn.
 destruct n as (n, Hna).
 clear Hn.
@@ -1286,6 +1290,23 @@ destruct a as [| a| a]. {
 }
 Qed.
 
+Theorem rngl_of_Z_Int_part :
+  ∀ a,
+  rngl_of_Z (Int_part a) =
+    (if rngl_le_dec Hor 0 a then rngl_of_nat (Nat_Int_part a)
+     else (- rngl_of_nat (Nat_Int_part a))%L).
+Proof.
+intros.
+progress unfold Int_part.
+destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
+  apply rngl_of_Z_of_nat.
+} {
+  rewrite rngl_of_Z_opp.
+  progress f_equal.
+  apply rngl_of_Z_of_nat.
+}
+Qed.
+
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
@@ -1296,9 +1317,20 @@ apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
 rewrite <- (rngl_add_sub_assoc Hop) in Hba.
 apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
-rewrite <- rngl_of_Z_sub in Hba.
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_sub.
+do 2 rewrite rngl_of_Z_Int_part in Hba.
+do 3 rewrite rngl_of_Z_Int_part.
+destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
+  destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]. {
+Search (rngl_of_nat _ - _)%L.
+    rewrite <- (rngl_of_nat_sub Hos) in Hba.
+...
+Search (rngl_of_Z (Z.of_nat _)).
+  rewrite rngl_of_Z_of_nat.
+Check int_part.
+rngl_of_nat
+... ...
 Search (rngl_of_Z (Int_part _)).
 ...
 
