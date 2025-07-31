@@ -1415,6 +1415,12 @@ Theorem rngl_sub_Int_part : ∀ a b,
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
 Proof.
 intros * Hba.
+(* contre-exemple :
+   b=1,1 a=0,9
+   nat_Int_part a = 0
+   nat_Int_part b = 1
+   nat_Int_part (a - b) = nat_Int_part (b - a) = 0 *)
+...
 progress unfold frac_part in Hba.
 apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
@@ -1462,7 +1468,11 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
         }
         apply rngl_of_nat_int_part_le.
       }
-Search nat_Int_part.
+(* contre-exemple :
+   b=1,1 a=0,9
+   nat_Int_part b = 1
+   nat_Int_part a = 0
+   nat_Int_part (b - a) = 0 *)
 ...
 
 Theorem rngl_of_nat_Pos_to_nat :
