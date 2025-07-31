@@ -1415,12 +1415,6 @@ Theorem rngl_sub_Int_part : ∀ a b,
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
 Proof.
 intros * Hba.
-(* contre-exemple :
-   b=1,1 a=0,9
-   nat_Int_part a = 0
-   nat_Int_part b = 1
-   nat_Int_part (a - b) = nat_Int_part (b - a) = 0 *)
-...
 progress unfold frac_part in Hba.
 apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
@@ -1474,6 +1468,7 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
    nat_Int_part a = 0
    nat_Int_part (b - a) = 0 *)
 ...
+*)
 
 Theorem rngl_of_nat_Pos_to_nat :
   ∀ a, rngl_of_pos a = rngl_of_nat (Pos.to_nat a).
@@ -1514,8 +1509,44 @@ destruct (Z_le_dec 0 z) as [Hz| Hz]. {
 }
 apply Z.nle_gt in Hz.
 destruct z as [| p| p]; [ easy | easy | ].
-cbn.
+progress unfold rngl_of_Z.
 rewrite <- (rngl_sub_0_l Hop).
+Search (Int_part (_ - _)%L).
+...
+Require Import Reals.
+Rminus_Int_part1
+     : ∀ r1 r2 : R,
+         (frac_part r1 >= frac_part r2)%R
+         → Int_part (r1 - r2) = (Int_part r1 - Int_part r2)%Z
+...
+Check INR_IPR.
+Print INR.
+Print IPR.
+...
+INR_IPR
+     : ∀ p : positive, INR (Pos.to_nat p) = IPR p
+
+IPR =
+λ p : positive,
+  match p with
+  | (p0~1)%positive => (R1 + IPR_2 p0)%R
+  | (p0~0)%positive => IPR_2 p0
+  | 1%positive => R1
+  end
+     : positive → R
+
+Arguments IPR p%positive_scope : simpl never
+INR =
+fix INR (n : ℕ) : R :=
+  match n with
+  | 0 => 0%R
+  | 1 => 1%R
+  | S (S _ as n0) => (INR n0 + 1)%R
+  end
+     : ℕ → R
+
+Arguments INR n%nat_scope
+...
 rewrite rngl_sub_Int_part. 2: {
   cbn.
   rewrite rngl_of_nat_Pos_to_nat.
@@ -1537,6 +1568,7 @@ rewrite Rminus_Int_part1. {
 }
 rewrite <- INR_IPR, frac_part_INR; apply base_fp.
 Qed.
+*)
 
 Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0.
 Proof.
