@@ -168,11 +168,11 @@ Definition rngl_of_Z a :=
   | Z.neg n => (- rngl_of_pos n)%L
   end.
 
-Definition Nat_Int_part (x : T) :=
+Definition nat_Int_part (x : T) :=
   let (n, a) := int_part Hon Hop Hc1 Hor Har x in n.
 
 Definition Int_part (x : T) :=
-  let n := Nat_Int_part x in
+  let n := nat_Int_part x in
   if rngl_le_dec Hor 0 x then Z.of_nat n else (- Z.of_nat n)%Z.
 
 Definition frac_part (x : T) :=
@@ -225,7 +225,7 @@ remember (r * rngl_of_nat (n + 1))%L as x eqn:Hx.
 rewrite rngl_of_nat_add in Hr1; cbn in Hr1.
 rewrite rngl_add_0_r in Hr1.
 progress unfold Int_part.
-progress unfold Nat_Int_part.
+progress unfold nat_Int_part.
 remember (int_part Hon Hop Hc1 Hor Har x) as y eqn:Hy.
 symmetry in Hy.
 destruct y as (m, Hm).
@@ -280,7 +280,7 @@ Qed.
 Theorem Int_part_rngl_of_nat : ∀ a, Int_part (rngl_of_nat a) = Z.of_nat a.
 Proof.
 intros.
-progress unfold Int_part, Nat_Int_part.
+progress unfold Int_part, nat_Int_part.
 remember (int_part Hon Hop Hc1 Hor Har (rngl_of_nat a)) as n eqn:Hn.
 destruct n as (n, Hna).
 clear Hn.
@@ -1293,8 +1293,8 @@ Qed.
 Theorem rngl_of_Z_Int_part :
   ∀ a,
   rngl_of_Z (Int_part a) =
-    (if rngl_le_dec Hor 0 a then rngl_of_nat (Nat_Int_part a)
-     else (- rngl_of_nat (Nat_Int_part a))%L).
+    (if rngl_le_dec Hor 0 a then rngl_of_nat (nat_Int_part a)
+     else (- rngl_of_nat (nat_Int_part a))%L).
 Proof.
 intros.
 progress unfold Int_part.
@@ -1349,11 +1349,11 @@ apply (IHi (a - 1) (b - 1))%L. {
 }
 Qed.
 
-Theorem Nat_Int_part_le :
-  ∀ a b, (0 ≤ a ≤ b)%L → Nat_Int_part a ≤ Nat_Int_part b.
+Theorem nat_Int_part_le :
+  ∀ a b, (0 ≤ a ≤ b)%L → nat_Int_part a ≤ nat_Int_part b.
 Proof.
 intros * Hab.
-progress unfold Nat_Int_part.
+progress unfold nat_Int_part.
 remember (int_part _ _ _ _ _ a) as x eqn:H1.
 remember (int_part _ _ _ _ _ b) as y eqn:H2.
 destruct x as (x, Hx).
@@ -1366,9 +1366,9 @@ rewrite (rngl_abs_nonneg_eq Hop Hor) in Hy. 2: {
 now apply (between_rngl_of_nat_and_succ a b).
 Qed.
 
-Theorem Nat_Int_part_0 : Nat_Int_part 0%L = 0.
+Theorem nat_Int_part_0 : nat_Int_part 0%L = 0.
 Proof.
-progress unfold Nat_Int_part.
+progress unfold nat_Int_part.
 remember (int_part _ _ _ _ _ _) as x eqn:Hx.
 symmetry in Hx.
 destruct x as (n, Hn).
@@ -1380,10 +1380,10 @@ apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in Hn.
 now apply Nat.le_0_r in Hn.
 Qed.
 
-Theorem Nat_Int_part_opp : ∀ a, Nat_Int_part (- a)%L = Nat_Int_part a.
+Theorem nat_Int_part_opp : ∀ a, nat_Int_part (- a)%L = nat_Int_part a.
 Proof.
 intros.
-progress unfold Nat_Int_part.
+progress unfold nat_Int_part.
 remember (int_part _ _ _ _ _ (- a)%L) as b eqn:Hb.
 remember (int_part _ _ _ _ _ a) as c eqn:Hc.
 clear Hb Hc.
@@ -1401,10 +1401,10 @@ apply Nat.le_antisymm. {
 Qed.
 
 Theorem rngl_of_nat_int_part_le :
-  ∀ a, (rngl_of_nat (Nat_Int_part a) ≤ ∣ a ∣)%L.
+  ∀ a, (rngl_of_nat (nat_Int_part a) ≤ ∣ a ∣)%L.
 Proof.
 intros.
-progress unfold Nat_Int_part.
+progress unfold nat_Int_part.
 remember (int_part _ _ _ _ _ _) as b eqn:Hb.
 clear Hb.
 now destruct b as (b, Hb).
@@ -1434,13 +1434,13 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
       apply (rngl_opp_le_compat Hop Hor) in Hba.
       do 2 rewrite (rngl_opp_sub_distr Hop) in Hba.
       rewrite <- (rngl_of_nat_sub Hos) in Hba. 2: {
-        now apply Nat_Int_part_le.
+        now apply nat_Int_part_le.
       }
       destruct (rngl_le_dec Hor 0 (a - b)) as [H| H]. {
         apply -> (rngl_le_0_sub Hop Hor) in H.
         apply (rngl_le_antisymm Hor) in H; [ subst b | easy ].
         do 2 rewrite (rngl_sub_diag Hos).
-        now rewrite Nat_Int_part_0.
+        now rewrite nat_Int_part_0.
       }
       apply (rngl_nle_gt_iff Hor) in H.
       apply -> (rngl_lt_sub_0 Hop Hor) in H.
@@ -1449,11 +1449,11 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
       rewrite (rngl_opp_involutive Hop).
       rewrite (rngl_opp_sub_distr Hop).
       rewrite <- (rngl_of_nat_sub Hos). 2: {
-        now apply Nat_Int_part_le.
+        now apply nat_Int_part_le.
       }
       progress f_equal.
       rewrite <- (rngl_opp_sub_distr Hop).
-      rewrite Nat_Int_part_opp.
+      rewrite nat_Int_part_opp.
       apply Nat.le_antisymm. {
         apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
         eapply (rngl_le_trans Hor); [ | apply Hba ].
@@ -1462,7 +1462,7 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
         }
         apply rngl_of_nat_int_part_le.
       }
-Search Nat_Int_part.
+Search nat_Int_part.
 ...
 
 Theorem rngl_of_nat_Pos_to_nat :
