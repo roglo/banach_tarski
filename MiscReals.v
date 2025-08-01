@@ -1262,6 +1262,43 @@ apply (IHi (a - 1) (b - 1))%L. {
 }
 Qed.
 
+Theorem rngl_of_nat_Pos_to_nat :
+  ∀ a, rngl_of_pos a = rngl_of_nat (Pos.to_nat a).
+Proof.
+intros.
+induction a as [a| a| ]; cbn. {
+  rewrite Pos2Nat.inj_xI.
+  rewrite rngl_of_nat_succ.
+  progress f_equal.
+  rewrite (rngl_of_nat_mul Hon Hos).
+  rewrite rngl_of_nat_2.
+  rewrite <- IHa.
+  clear IHa.
+  induction a as [a| a| ]; cbn; [ easy | easy | ].
+  symmetry; apply (rngl_mul_1_r Hon).
+} {
+  rewrite Pos2Nat.inj_xO.
+  rewrite (rngl_of_nat_mul Hon Hos).
+  rewrite rngl_of_nat_2.
+  rewrite <- IHa.
+  clear IHa.
+  induction a as [a| a| ]; cbn; [ easy | easy | ].
+  symmetry; apply (rngl_mul_1_r Hon).
+} {
+  rewrite Pos2Nat.inj_1; symmetry.
+  apply rngl_of_nat_1.
+}
+Qed.
+
+Theorem rngl_of_nat_Z_to_nat :
+  ∀ a, (0 <= a)%Z → rngl_of_nat (Z.to_nat a) = rngl_of_Z a.
+Proof.
+intros * Hza.
+destruct a as [| a| a]; [ easy | | easy ].
+rewrite Z2Nat.inj_pos.
+now rewrite <- rngl_of_nat_Pos_to_nat.
+Qed.
+
 Theorem Int_part_close_to_1 : ∀ (r : T) n,
   (rngl_of_nat n / rngl_of_nat (n + 1) ≤ r < 1)%L
   → Int_part (r * rngl_of_nat (n + 1)) = Z.of_nat n.
@@ -1289,14 +1326,16 @@ apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (rngl_of_nat (n + 1))) in Hr1. 2: {
 }
 rewrite (rngl_mul_1_l Hon) in Hr1.
 remember (r * rngl_of_nat (n + 1))%L as x eqn:Hx.
+(*
 rewrite rngl_of_nat_add in Hr1; cbn in Hr1.
 rewrite rngl_add_0_r in Hr1.
+*)
 progress unfold Int_part.
 remember (z_int_part x) as y eqn:Hy.
 symmetry in Hy.
 destruct y as (m, Hm).
 clear Hy.
-(**)
+(*
 apply Z2Nat.inj; [ | apply Nat2Z.is_nonneg | ]. {
   assert (0 ≤ x)%L. {
     apply (rngl_le_trans Hor _ (rngl_of_nat n)); [ | easy ].
@@ -1325,10 +1364,20 @@ apply Z2Nat.inj; [ | apply Nat2Z.is_nonneg | ]. {
 rewrite Nat2Z.id.
 (* bon, allez, plein le cul *)
 ...
+*)
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_of_nat.
-apply (rngl_le_antisymm Hor). {
-Search (rngl_of_Z _).
+destruct (Z_le_dec 0 m) as [Hzm| Hzm]. 2: {
+  apply Z.nle_gt in Hzm.
+(* pas l'air de marcher *)
+... ...
+  specialize between_rngl_of_nat_and_succ as H1.
+  specialize (H1 x x n (Z.to_nat m) (rngl_le_refl Hor _) (conj Hnr Hr1)).
+  rewrite rngl_of_nat_add in H1.
+  rewrite rngl_of_nat_Z_to_nat in H1; [ | easy ].
+  rewrite rngl_of_nat_1 in H1.
+  rewrite <- rngl_of_Z_add_1_r in H1.
+  specialize (H1 Hm).
 ...
   eapply (rngl_le_trans Hor); [ apply Hm | ].
 ...
@@ -1561,34 +1610,6 @@ Search Int_part.
    nat_Int_part (b - a) = 0 *)
 ...
 *)
-
-Theorem rngl_of_nat_Pos_to_nat :
-  ∀ a, rngl_of_pos a = rngl_of_nat (Pos.to_nat a).
-Proof.
-intros.
-induction a as [a| a| ]; cbn. {
-  rewrite Pos2Nat.inj_xI.
-  rewrite rngl_of_nat_succ.
-  progress f_equal.
-  rewrite (rngl_of_nat_mul Hon Hos).
-  rewrite rngl_of_nat_2.
-  rewrite <- IHa.
-  clear IHa.
-  induction a as [a| a| ]; cbn; [ easy | easy | ].
-  symmetry; apply (rngl_mul_1_r Hon).
-} {
-  rewrite Pos2Nat.inj_xO.
-  rewrite (rngl_of_nat_mul Hon Hos).
-  rewrite rngl_of_nat_2.
-  rewrite <- IHa.
-  clear IHa.
-  induction a as [a| a| ]; cbn; [ easy | easy | ].
-  symmetry; apply (rngl_mul_1_r Hon).
-} {
-  rewrite Pos2Nat.inj_1; symmetry.
-  apply rngl_of_nat_1.
-}
-Qed.
 
 Theorem Int_part_IZR : ∀ z, Int_part (rngl_of_Z z) = z.
 Proof.
