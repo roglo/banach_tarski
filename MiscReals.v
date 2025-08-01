@@ -907,6 +907,312 @@ Compute (rngl_of_Z 239 * rngl_of_Z 4649)%L.
 
 (* INR = rngl_of_nat *)
 
+Theorem rngl_of_pos_2_pos : ∀ a, (0 < rngl_of_pos_2 a)%L.
+Proof.
+intros.
+induction a as [a| a| ]; cbn. {
+  apply (rngl_mul_pos_pos Hos Hor Hii).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  apply (rngl_add_nonneg_pos Hor); [ | easy ].
+  apply (rngl_0_le_1 Hon Hos Hor).
+} {
+  apply (rngl_mul_pos_pos Hos Hor Hii); [ | easy ].
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+} {
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+}
+Qed.
+
+Theorem rngl_of_pos_neq_0 : ∀ a, rngl_of_pos a ≠ 0%L.
+Proof.
+intros * Ha.
+destruct a as [a| a| ]. {
+  exfalso; cbn in Ha.
+  apply (rngl_add_move_0_l Hop) in Ha.
+  specialize (rngl_of_pos_2_pos a) as H1.
+  apply rngl_nle_gt in H1.
+  apply H1; rewrite Ha.
+  apply (rngl_opp_1_le_0 Hon Hop Hor).
+} {
+  exfalso; cbn in Ha.
+  specialize (rngl_of_pos_2_pos a) as H1.
+  apply rngl_nle_gt in H1.
+  apply H1; rewrite Ha.
+  apply (rngl_le_refl Hor).
+} {
+  apply (rngl_1_eq_0_iff Hon Hos) in Ha.
+  congruence.
+}
+Qed.
+
+Theorem rngl_of_pos_2_ge_2 : ∀ a, (2 ≤ rngl_of_pos_2 a)%L.
+Proof.
+intros.
+specialize (rngl_0_le_2 Hon Hos Hor) as Hz2.
+induction a as [a| a| ]; cbn. {
+  rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
+  now apply (rngl_le_trans Hor _ 2).
+} {
+  apply (rngl_le_trans Hor _ (rngl_of_pos_2 a)); [ easy | ].
+  rewrite <- (rngl_mul_1_l Hon (rngl_of_pos_2 a)) at 1.
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii). 2: {
+    apply (rngl_1_le_2 Hon Hos Hor).
+  }
+  apply (rngl_lt_le_trans Hor _ 2); [ | easy ].
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+} {
+  apply (rngl_le_refl Hor).
+}
+Qed.
+
+Theorem rngl_of_pos_2_ne_1 : ∀ a, rngl_of_pos_2 a ≠ 1%L.
+Proof.
+intros * Ha.
+specialize (rngl_of_pos_2_ge_2 a) as H1.
+apply rngl_nlt_ge in H1.
+apply H1; clear H1.
+rewrite Ha.
+apply (rngl_lt_add_l Hos Hor).
+apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+Qed.
+
+Theorem rngl_of_pos_2_ne_sub_1 :
+  ∀ a b, rngl_of_pos_2 a ≠ (rngl_of_pos_2 b - 1)%L.
+Proof.
+intros * Hab.
+apply (rngl_sub_move_l Hop) in Hab.
+destruct (Pos_dec b a) as [[Hba| Hba]| Hba]. {
+  apply (f_equal rngl_opp) in Hab.
+  rewrite (rngl_opp_sub_distr Hop) in Hab.
+  rewrite <- rngl_of_pos_2_sub in Hab; [ | easy ].
+  specialize (rngl_of_pos_2_pos (a - b)) as H1.
+  rewrite Hab in H1.
+  apply rngl_nle_gt in H1.
+  apply H1; clear H1.
+  apply (rngl_opp_1_le_0 Hon Hop Hor).
+} {
+  rewrite <- rngl_of_pos_2_sub in Hab; [ | easy ].
+  now apply rngl_of_pos_2_ne_1 in Hab.
+} {
+  subst.
+  rewrite (rngl_sub_diag Hos) in Hab.
+  symmetry in Hab; revert Hab.
+  apply (rngl_1_neq_0_iff Hon).
+  congruence.
+}
+Qed.
+
+Theorem rngl_of_pos_2_ne_0 : ∀ a, rngl_of_pos_2 a ≠ 0%L.
+Proof.
+intros * Ha.
+specialize (rngl_of_pos_2_ge_2 a) as H1.
+apply rngl_nlt_ge in H1.
+apply H1; clear H1.
+rewrite Ha.
+apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+Qed.
+
+Theorem rngl_of_pos_2_eq_2 : ∀ a, rngl_of_pos_2 a = 2%L → a = 1%positive.
+Proof.
+intros * Ha2.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H2z.
+destruct a as [a| a| ]; cbn; [ | | easy ]. {
+  cbn in Ha2.
+  rewrite <- (rngl_mul_1_r Hon 2) in Ha2 at 2.
+  apply (rngl_mul_cancel_l Hi1) in Ha2; [ | easy ].
+  apply (rngl_add_move_l Hop) in Ha2.
+  rewrite (rngl_sub_diag Hos) in Ha2.
+  now apply rngl_of_pos_2_ne_0 in Ha2.
+} {
+  cbn in Ha2.
+  rewrite <- (rngl_mul_1_r Hon 2) in Ha2 at 2.
+  apply (rngl_mul_cancel_l Hi1) in Ha2; [ | easy ].
+  now apply rngl_of_pos_2_ne_1 in Ha2.
+}
+Qed.
+
+Theorem rngl_of_pos_2_inj : ∀ a b, rngl_of_pos_2 a = rngl_of_pos_2 b → a = b.
+Proof.
+intros * Hab.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H2z.
+revert b Hab.
+induction a as [a| a| ]; intros. {
+  cbn in Hab.
+  destruct b as [b| b| ]. {
+    cbn in Hab; f_equal.
+    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
+    apply (rngl_add_cancel_l Hos) in Hab.
+    now apply IHa.
+  } {
+    exfalso.
+    cbn in Hab.
+    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
+    apply (rngl_add_move_l Hop) in Hab.
+    clear IHa.
+    now apply rngl_of_pos_2_ne_sub_1 in Hab.
+  } {
+    cbn in Hab.
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon) in Hab.
+    apply (rngl_add_move_l Hop) in Hab.
+    rewrite (rngl_sub_diag Hos) in Hab.
+    apply (rngl_eq_mul_0_l Hos Hii) in Hab; [ easy | ].
+    apply rngl_of_pos_2_ne_0.
+  }
+} {
+  destruct b as [b| b| ]. {
+    exfalso.
+    cbn in Hab.
+    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
+    symmetry in Hab.
+    apply (rngl_add_move_l Hop) in Hab.
+    now apply rngl_of_pos_2_ne_sub_1 in Hab.
+  } {
+    f_equal.
+    cbn in Hab.
+    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
+    now apply IHa.
+  } {
+    cbn in Hab.
+    rewrite <- (rngl_mul_1_r Hon 2) in Hab at 2.
+    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
+    now apply rngl_of_pos_2_ne_1 in Hab.
+  }
+} {
+  cbn in Hab.
+  symmetry in Hab |-*.
+  now apply rngl_of_pos_2_eq_2 in Hab.
+}
+Qed.
+
+Theorem rngl_of_pos_eq_1 : ∀ a, rngl_of_pos a = 1%L → a = 1%positive.
+Proof.
+intros * Ha1.
+destruct a as [a| a| ]; [ | | easy ]. {
+  cbn in Ha1.
+  apply (rngl_add_move_l Hop) in Ha1.
+  rewrite (rngl_sub_diag Hos) in Ha1.
+  now apply rngl_of_pos_2_ne_0 in Ha1.
+} {
+  cbn in Ha1.
+  now apply rngl_of_pos_2_ne_1 in Ha1.
+}
+Qed.
+
+Theorem rngl_of_pos_inj : ∀ a b, rngl_of_pos a = rngl_of_pos b → a = b.
+Proof.
+intros * Hab.
+destruct a as [a| a| ]. {
+  destruct b as [b| b| ]. {
+    cbn in Hab; f_equal.
+    apply (rngl_add_cancel_l Hos) in Hab.
+    now apply rngl_of_pos_2_inj in Hab.
+  } {
+    cbn in Hab.
+    apply (rngl_add_move_l Hop) in Hab.
+    now apply rngl_of_pos_2_ne_sub_1 in Hab.
+  } {
+    cbn in Hab.
+    apply (rngl_add_move_l Hop) in Hab.
+    rewrite (rngl_sub_diag Hos) in Hab.
+    now apply rngl_of_pos_2_ne_0 in Hab.
+  }
+} {
+  destruct b as [b| b| ]. {
+    cbn in Hab; symmetry in Hab.
+    apply (rngl_add_move_l Hop) in Hab.
+    now apply rngl_of_pos_2_ne_sub_1 in Hab.
+  } {
+    cbn in Hab.
+    apply rngl_of_pos_2_inj in Hab.
+    now subst.
+  } {
+    cbn in Hab.
+    now apply rngl_of_pos_2_ne_1 in Hab.
+  }
+} {
+  symmetry in Hab |-*.
+  cbn in Hab.
+  now apply rngl_of_pos_eq_1 in Hab.
+}
+Qed.
+
+Theorem rngl_of_pos_pos : ∀ a, (0 < rngl_of_pos a)%L.
+Proof.
+intros.
+destruct a as [a| a| ]; cbn. {
+  apply (rngl_le_lt_trans Hor _ 1).
+  apply (rngl_0_le_1 Hon Hos Hor).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  rewrite (rngl_sub_diag Hos).
+  apply rngl_of_pos_2_pos.
+} {
+  apply rngl_of_pos_2_pos.
+} {
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+Qed.
+
+Theorem rngl_of_Z_inj : ∀ a b, rngl_of_Z a = rngl_of_Z b → a = b.
+Proof.
+intros * Hab.
+destruct a as [| a| a]. {
+  symmetry in Hab |-*; cbn in Hab.
+  destruct b as [| b| b]; cbn in Hab; [ easy | | ]. {
+    now apply rngl_of_pos_neq_0 in Hab.
+  } {
+    exfalso.
+    apply (f_equal rngl_opp) in Hab.
+    rewrite (rngl_opp_involutive Hop) in Hab.
+    rewrite (rngl_opp_0 Hop) in Hab.
+    now apply rngl_of_pos_neq_0 in Hab.
+  }
+} {
+  cbn in Hab.
+  destruct b as [| b| b]; cbn. {
+    now apply rngl_of_pos_neq_0 in Hab.
+  } {
+    cbn in Hab.
+    apply rngl_of_pos_inj in Hab.
+    now subst.
+  } {
+    cbn in Hab.
+    specialize (rngl_of_pos_pos a) as H1.
+    rewrite Hab in H1.
+    exfalso; apply rngl_nle_gt in H1.
+    apply H1; clear H1.
+    rewrite <- (rngl_opp_0 Hop).
+    apply -> (rngl_opp_le_compat Hop Hor).
+    apply (rngl_lt_le_incl Hor).
+    apply rngl_of_pos_pos.
+  }
+} {
+  cbn in Hab.
+  apply (f_equal rngl_opp) in Hab.
+  rewrite (rngl_opp_involutive Hop) in Hab.
+  rewrite <- rngl_of_Z_opp in Hab.
+  destruct b as [| b| b]; cbn. {
+    now apply rngl_of_pos_neq_0 in Hab.
+  } {
+    cbn in Hab.
+    specialize (rngl_of_pos_pos a) as H1.
+    rewrite Hab in H1.
+    exfalso; apply rngl_nle_gt in H1.
+    apply H1; clear H1.
+    rewrite <- (rngl_opp_0 Hop).
+    apply -> (rngl_opp_le_compat Hop Hor).
+    apply (rngl_lt_le_incl Hor).
+    apply rngl_of_pos_pos.
+  } {
+    cbn in Hab.
+    apply rngl_of_pos_inj in Hab.
+    now subst.
+  }
+}
+Qed.
+
 Theorem Int_part_close_to_1 : ∀ (r : T) n,
   (rngl_of_nat n / rngl_of_nat (n + 1) ≤ r < 1)%L
   → Int_part (r * rngl_of_nat (n + 1)) = Z.of_nat n.
@@ -941,8 +1247,13 @@ remember (z_int_part x) as y eqn:Hy.
 symmetry in Hy.
 destruct y as (m, Hm).
 clear Hy.
-destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
+(**)
+apply rngl_of_Z_inj.
+rewrite rngl_of_Z_of_nat.
+apply (rngl_le_antisymm Hor). {
+
 ...
+destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
   rewrite (rngl_abs_nonneg_eq Hop Hor) in Hm; [ | easy ].
   progress f_equal.
   apply Nat.le_antisymm. {
@@ -1028,312 +1339,6 @@ rewrite Hop.
 rewrite rngl_of_Z_add.
 progress f_equal.
 apply rngl_of_Z_opp.
-Qed.
-
-Theorem rngl_of_pos_2_pos : ∀ a, (0 < rngl_of_pos_2 a)%L.
-Proof.
-intros.
-induction a as [a| a| ]; cbn. {
-  apply (rngl_mul_pos_pos Hos Hor Hii).
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-  apply (rngl_add_nonneg_pos Hor); [ | easy ].
-  apply (rngl_0_le_1 Hon Hos Hor).
-} {
-  apply (rngl_mul_pos_pos Hos Hor Hii); [ | easy ].
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-} {
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-}
-Qed.
-
-Theorem rngl_of_pos_neq_0 : ∀ a, rngl_of_pos a ≠ 0%L.
-Proof.
-intros * Ha.
-destruct a as [a| a| ]. {
-  exfalso; cbn in Ha.
-  apply (rngl_add_move_0_l Hop) in Ha.
-  specialize (rngl_of_pos_2_pos a) as H1.
-  apply rngl_nle_gt in H1.
-  apply H1; rewrite Ha.
-  apply (rngl_opp_1_le_0 Hon Hop Hor).
-} {
-  exfalso; cbn in Ha.
-  specialize (rngl_of_pos_2_pos a) as H1.
-  apply rngl_nle_gt in H1.
-  apply H1; rewrite Ha.
-  apply (rngl_le_refl Hor).
-} {
-  apply (rngl_1_eq_0_iff Hon Hos) in Ha.
-  congruence.
-}
-Qed.
-
-Theorem rngl_of_pos_2_ge_2 : ∀ a, (2 ≤ rngl_of_pos_2 a)%L.
-Proof.
-intros.
-specialize (rngl_0_le_2 Hon Hos Hor) as Hz2.
-induction a as [a| a| ]; cbn. {
-  rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
-  apply (rngl_le_sub_le_add_l Hop Hor).
-  rewrite (rngl_sub_diag Hos).
-  apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
-  now apply (rngl_le_trans Hor _ 2).
-} {
-  apply (rngl_le_trans Hor _ (rngl_of_pos_2 a)); [ easy | ].
-  rewrite <- (rngl_mul_1_l Hon (rngl_of_pos_2 a)) at 1.
-  apply (rngl_mul_le_mono_pos_r Hop Hor Hii). 2: {
-    apply (rngl_1_le_2 Hon Hos Hor).
-  }
-  apply (rngl_lt_le_trans Hor _ 2); [ | easy ].
-  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-} {
-  apply (rngl_le_refl Hor).
-}
-Qed.
-
-Theorem rngl_of_pos_2_ne_0 : ∀ a, rngl_of_pos_2 a ≠ 0%L.
-Proof.
-intros * Ha.
-specialize (rngl_of_pos_2_ge_2 a) as H1.
-apply rngl_nlt_ge in H1.
-apply H1; clear H1.
-rewrite Ha.
-apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-Qed.
-
-Theorem rngl_of_pos_2_ne_1 : ∀ a, rngl_of_pos_2 a ≠ 1%L.
-Proof.
-intros * Ha.
-specialize (rngl_of_pos_2_ge_2 a) as H1.
-apply rngl_nlt_ge in H1.
-apply H1; clear H1.
-rewrite Ha.
-apply (rngl_lt_add_l Hos Hor).
-apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-Qed.
-
-Theorem rngl_of_pos_2_eq_2 : ∀ a, rngl_of_pos_2 a = 2%L → a = 1%positive.
-Proof.
-intros * Ha2.
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H2z.
-destruct a as [a| a| ]; cbn; [ | | easy ]. {
-  cbn in Ha2.
-  rewrite <- (rngl_mul_1_r Hon 2) in Ha2 at 2.
-  apply (rngl_mul_cancel_l Hi1) in Ha2; [ | easy ].
-  apply (rngl_add_move_l Hop) in Ha2.
-  rewrite (rngl_sub_diag Hos) in Ha2.
-  now apply rngl_of_pos_2_ne_0 in Ha2.
-} {
-  cbn in Ha2.
-  rewrite <- (rngl_mul_1_r Hon 2) in Ha2 at 2.
-  apply (rngl_mul_cancel_l Hi1) in Ha2; [ | easy ].
-  now apply rngl_of_pos_2_ne_1 in Ha2.
-}
-Qed.
-
-Theorem rngl_of_pos_eq_1 : ∀ a, rngl_of_pos a = 1%L → a = 1%positive.
-Proof.
-intros * Ha1.
-destruct a as [a| a| ]; [ | | easy ]. {
-  cbn in Ha1.
-  apply (rngl_add_move_l Hop) in Ha1.
-  rewrite (rngl_sub_diag Hos) in Ha1.
-  now apply rngl_of_pos_2_ne_0 in Ha1.
-} {
-  cbn in Ha1.
-  now apply rngl_of_pos_2_ne_1 in Ha1.
-}
-Qed.
-
-Theorem rngl_of_pos_2_ne_sub_1 :
-  ∀ a b, rngl_of_pos_2 a ≠ (rngl_of_pos_2 b - 1)%L.
-Proof.
-intros * Hab.
-apply (rngl_sub_move_l Hop) in Hab.
-destruct (Pos_dec b a) as [[Hba| Hba]| Hba]. {
-  apply (f_equal rngl_opp) in Hab.
-  rewrite (rngl_opp_sub_distr Hop) in Hab.
-  rewrite <- rngl_of_pos_2_sub in Hab; [ | easy ].
-  specialize (rngl_of_pos_2_pos (a - b)) as H1.
-  rewrite Hab in H1.
-  apply rngl_nle_gt in H1.
-  apply H1; clear H1.
-  apply (rngl_opp_1_le_0 Hon Hop Hor).
-} {
-  rewrite <- rngl_of_pos_2_sub in Hab; [ | easy ].
-  now apply rngl_of_pos_2_ne_1 in Hab.
-} {
-  subst.
-  rewrite (rngl_sub_diag Hos) in Hab.
-  symmetry in Hab; revert Hab.
-  apply (rngl_1_neq_0_iff Hon).
-  congruence.
-}
-Qed.
-
-Theorem rngl_of_pos_2_inj : ∀ a b, rngl_of_pos_2 a = rngl_of_pos_2 b → a = b.
-Proof.
-intros * Hab.
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H2z.
-revert b Hab.
-induction a as [a| a| ]; intros. {
-  cbn in Hab.
-  destruct b as [b| b| ]. {
-    cbn in Hab; f_equal.
-    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
-    apply (rngl_add_cancel_l Hos) in Hab.
-    now apply IHa.
-  } {
-    exfalso.
-    cbn in Hab.
-    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
-    apply (rngl_add_move_l Hop) in Hab.
-    clear IHa.
-    now apply rngl_of_pos_2_ne_sub_1 in Hab.
-  } {
-    cbn in Hab.
-    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon) in Hab.
-    apply (rngl_add_move_l Hop) in Hab.
-    rewrite (rngl_sub_diag Hos) in Hab.
-    apply (rngl_eq_mul_0_l Hos Hii) in Hab; [ easy | ].
-    apply (rngl_of_pos_2_ne_0).
-  }
-} {
-  destruct b as [b| b| ]. {
-    exfalso.
-    cbn in Hab.
-    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
-    symmetry in Hab.
-    apply (rngl_add_move_l Hop) in Hab.
-    now apply rngl_of_pos_2_ne_sub_1 in Hab.
-  } {
-    f_equal.
-    cbn in Hab.
-    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
-    now apply IHa.
-  } {
-    cbn in Hab.
-    rewrite <- (rngl_mul_1_r Hon 2) in Hab at 2.
-    apply (rngl_mul_cancel_l Hi1) in Hab; [ | easy ].
-    now apply rngl_of_pos_2_ne_1 in Hab.
-  }
-} {
-  cbn in Hab.
-  symmetry in Hab |-*.
-  now apply rngl_of_pos_2_eq_2 in Hab.
-}
-Qed.
-
-Theorem rngl_of_pos_inj : ∀ a b, rngl_of_pos a = rngl_of_pos b → a = b.
-Proof.
-intros * Hab.
-destruct a as [a| a| ]. {
-  destruct b as [b| b| ]. {
-    cbn in Hab; f_equal.
-    apply (rngl_add_cancel_l Hos) in Hab.
-    now apply rngl_of_pos_2_inj in Hab.
-  } {
-    cbn in Hab.
-    apply (rngl_add_move_l Hop) in Hab.
-    now apply rngl_of_pos_2_ne_sub_1 in Hab.
-  } {
-    cbn in Hab.
-    apply (rngl_add_move_l Hop) in Hab.
-    rewrite (rngl_sub_diag Hos) in Hab.
-    now apply rngl_of_pos_2_ne_0 in Hab.
-  }
-} {
-  destruct b as [b| b| ]. {
-    cbn in Hab; symmetry in Hab.
-    apply (rngl_add_move_l Hop) in Hab.
-    now apply rngl_of_pos_2_ne_sub_1 in Hab.
-  } {
-    cbn in Hab.
-    apply rngl_of_pos_2_inj in Hab.
-    now subst.
-  } {
-    cbn in Hab.
-    now apply rngl_of_pos_2_ne_1 in Hab.
-  }
-} {
-  symmetry in Hab |-*.
-  cbn in Hab.
-  now apply (rngl_of_pos_eq_1) in Hab.
-}
-Qed.
-
-Theorem rngl_of_pos_pos : ∀ a, (0 < rngl_of_pos a)%L.
-Proof.
-intros.
-destruct a as [a| a| ]; cbn. {
-  apply (rngl_le_lt_trans Hor _ 1).
-  apply (rngl_0_le_1 Hon Hos Hor).
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  rewrite (rngl_sub_diag Hos).
-  apply rngl_of_pos_2_pos.
-} {
-  apply rngl_of_pos_2_pos.
-} {
-  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
-}
-Qed.
-
-Theorem rngl_of_Z_inj : ∀ a b, rngl_of_Z a = rngl_of_Z b → a = b.
-Proof.
-intros * Hab.
-destruct a as [| a| a]. {
-  symmetry in Hab |-*; cbn in Hab.
-  destruct b as [| b| b]; cbn in Hab; [ easy | | ]. {
-    now apply rngl_of_pos_neq_0 in Hab.
-  } {
-    exfalso.
-    apply (f_equal rngl_opp) in Hab.
-    rewrite (rngl_opp_involutive Hop) in Hab.
-    rewrite (rngl_opp_0 Hop) in Hab.
-    now apply rngl_of_pos_neq_0 in Hab.
-  }
-} {
-  cbn in Hab.
-  destruct b as [| b| b]; cbn. {
-    now apply rngl_of_pos_neq_0 in Hab.
-  } {
-    cbn in Hab.
-    apply rngl_of_pos_inj in Hab.
-    now subst.
-  } {
-    cbn in Hab.
-    specialize (rngl_of_pos_pos a) as H1.
-    rewrite Hab in H1.
-    exfalso; apply rngl_nle_gt in H1.
-    apply H1; clear H1.
-    rewrite <- (rngl_opp_0 Hop).
-    apply -> (rngl_opp_le_compat Hop Hor).
-    apply (rngl_lt_le_incl Hor).
-    apply rngl_of_pos_pos.
-  }
-} {
-  cbn in Hab.
-  apply (f_equal rngl_opp) in Hab.
-  rewrite (rngl_opp_involutive Hop) in Hab.
-  rewrite <- rngl_of_Z_opp in Hab.
-  destruct b as [| b| b]; cbn. {
-    now apply rngl_of_pos_neq_0 in Hab.
-  } {
-    cbn in Hab.
-    specialize (rngl_of_pos_pos a) as H1.
-    rewrite Hab in H1.
-    exfalso; apply rngl_nle_gt in H1.
-    apply H1; clear H1.
-    rewrite <- (rngl_opp_0 Hop).
-    apply -> (rngl_opp_le_compat Hop Hor).
-    apply (rngl_lt_le_incl Hor).
-    apply rngl_of_pos_pos.
-  } {
-    cbn in Hab.
-    apply rngl_of_pos_inj in Hab.
-    now subst.
-  }
-}
 Qed.
 
 Theorem rngl_of_Z_Int_part :
