@@ -686,6 +686,13 @@ destruct a as [| a| a]; cbn. {
 }
 Qed.
 
+Theorem rngl_of_Z_add_1_r : ∀ a, rngl_of_Z (a + 1) = (rngl_of_Z a + 1)%L.
+Proof.
+intros.
+rewrite Z.add_comm, rngl_add_comm.
+apply rngl_of_Z_add_1_l.
+Qed.
+
 Theorem rngl_of_Z_add :
   ∀ a b, rngl_of_Z (a + b) = (rngl_of_Z a + rngl_of_Z b)%L.
 Proof.
@@ -1213,6 +1220,48 @@ destruct a as [| a| a]. {
 }
 Qed.
 
+Theorem between_rngl_of_nat_and_succ :
+  ∀ a b i j,
+  (a ≤ b)%L
+  → (rngl_of_nat i ≤ a < rngl_of_nat (i + 1))%L
+  → (rngl_of_nat j ≤ b < rngl_of_nat (j + 1))%L
+  → i ≤ j.
+Proof.
+intros * Hab Hi Hj.
+revert a b j Hab Hi Hj.
+induction i; intros; cbn; [ apply Nat.le_0_l | ].
+destruct j. {
+  exfalso; cbn in Hj.
+  rewrite rngl_add_0_r in Hj.
+  destruct Hj as (_, Hj).
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  destruct Hi as (H1, H2).
+  apply rngl_nlt_ge in H1.
+  apply H1; clear H1.
+  apply (rngl_le_lt_trans Hor _ b); [ easy | ].
+  apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
+  apply (rngl_le_add_r Hor).
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
+apply -> Nat.succ_le_mono.
+apply (IHi (a - 1) (b - 1))%L. {
+  now apply (rngl_sub_le_mono_r Hop Hor).
+} {
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  split; [ now apply (rngl_le_add_le_sub_l Hop Hor) | ].
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  now rewrite Nat.add_1_r.
+} {
+  rewrite Nat.add_1_r in Hj.
+  do 2 rewrite rngl_of_nat_succ in Hj.
+  split; [ now apply (rngl_le_add_le_sub_l Hop Hor) | ].
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  now rewrite Nat.add_1_r.
+}
+Qed.
+
 Theorem Int_part_close_to_1 : ∀ (r : T) n,
   (rngl_of_nat n / rngl_of_nat (n + 1) ≤ r < 1)%L
   → Int_part (r * rngl_of_nat (n + 1)) = Z.of_nat n.
@@ -1248,10 +1297,40 @@ symmetry in Hy.
 destruct y as (m, Hm).
 clear Hy.
 (**)
+apply Z2Nat.inj; [ | apply Nat2Z.is_nonneg | ]. {
+  assert (0 ≤ x)%L. {
+    apply (rngl_le_trans Hor _ (rngl_of_nat n)); [ | easy ].
+    apply (rngl_of_nat_nonneg Hon Hos Hor).
+  }
+  destruct m as [| m| m]; [ easy | easy | exfalso ].
+  rewrite rngl_of_Z_add_1_r in Hm.
+  cbn in Hm.
+  apply rngl_nlt_ge in H.
+  apply H; clear H.
+  eapply (rngl_lt_le_trans Hor); [ apply Hm | ].
+  rewrite (rngl_add_opp_l Hop).
+  apply (rngl_le_sub_0 Hop Hor).
+  destruct m as [m| m| ]. {
+    apply (rngl_le_add_r Hor).
+    apply (rngl_lt_le_incl Hor).
+    apply rngl_of_pos_2_pos.
+  } {
+    cbn.
+    apply (rngl_le_trans Hor _ 2); [ | apply rngl_of_pos_2_ge_2 ].
+    apply (rngl_1_le_2 Hon Hos Hor).
+  } {
+    apply (rngl_le_refl Hor).
+  }
+}
+rewrite Nat2Z.id.
+(* bon, allez, plein le cul *)
+...
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_of_nat.
 apply (rngl_le_antisymm Hor). {
-
+Search (rngl_of_Z _).
+...
+  eapply (rngl_le_trans Hor); [ apply Hm | ].
 ...
 destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
   rewrite (rngl_abs_nonneg_eq Hop Hor) in Hm; [ | easy ].
@@ -1355,48 +1434,6 @@ destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
   rewrite rngl_of_Z_opp.
   progress f_equal.
   apply rngl_of_Z_of_nat.
-}
-Qed.
-
-Theorem between_rngl_of_nat_and_succ :
-  ∀ a b i j,
-  (a ≤ b)%L
-  → (rngl_of_nat i ≤ a < rngl_of_nat (i + 1))%L
-  → (rngl_of_nat j ≤ b < rngl_of_nat (j + 1))%L
-  → i ≤ j.
-Proof.
-intros * Hab Hi Hj.
-revert a b j Hab Hi Hj.
-induction i; intros; cbn; [ apply Nat.le_0_l | ].
-destruct j. {
-  exfalso; cbn in Hj.
-  rewrite rngl_add_0_r in Hj.
-  destruct Hj as (_, Hj).
-  rewrite Nat.add_1_r in Hi.
-  do 2 rewrite rngl_of_nat_succ in Hi.
-  destruct Hi as (H1, H2).
-  apply rngl_nlt_ge in H1.
-  apply H1; clear H1.
-  apply (rngl_le_lt_trans Hor _ b); [ easy | ].
-  apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
-  apply (rngl_le_add_r Hor).
-  apply (rngl_of_nat_nonneg Hon Hos Hor).
-}
-apply -> Nat.succ_le_mono.
-apply (IHi (a - 1) (b - 1))%L. {
-  now apply (rngl_sub_le_mono_r Hop Hor).
-} {
-  rewrite Nat.add_1_r in Hi.
-  do 2 rewrite rngl_of_nat_succ in Hi.
-  split; [ now apply (rngl_le_add_le_sub_l Hop Hor) | ].
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  now rewrite Nat.add_1_r.
-} {
-  rewrite Nat.add_1_r in Hj.
-  do 2 rewrite rngl_of_nat_succ in Hj.
-  split; [ now apply (rngl_le_add_le_sub_l Hop Hor) | ].
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  now rewrite Nat.add_1_r.
 }
 Qed.
 
