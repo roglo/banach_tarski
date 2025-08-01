@@ -168,8 +168,31 @@ Definition rngl_of_Z a :=
   | Z.neg n => (- rngl_of_pos n)%L
   end.
 
+Theorem int_part : ∀ a, ∃ₜ n, (rngl_of_Z n ≤ a < rngl_of_Z (n + 1))%L.
+Proof.
+intros.
+destruct (rngl_lt_dec Hor 1 a)%L as [Hx1| Hx1]. {
+Check rngl_archimedean_ub.
+...
+  apply (rngl_archimedean_ub Har Hor).
+  split; [ apply (rngl_0_lt_1 Hon Hos Hc1 Hor) | easy ].
+}
+apply (rngl_nlt_ge_iff Hor) in Hx1.
+destruct (rngl_eq_dec Heo (rngl_abs a) 1) as [Ha1| Ha1]. {
+...
+
 Definition nat_Int_part (x : T) :=
   let (n, a) := int_part Hon Hop Hc1 Hor Har x in n.
+
+...
+
+Require Import Reals.
+About Int_part.
+Search Int_part.
+Int_part_spec: ∀ (r : R) (z : ℤ), (r - 1 < IZR z <= r)%R → z = Int_part r
+About int_part.
+
+...
 
 Definition Int_part (x : T) :=
   let n := nat_Int_part x in
@@ -1462,6 +1485,10 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
         }
         apply rngl_of_nat_int_part_le.
       }
+About int_part.
+Require Import Reals.
+Search Int_part.
+...
 (* contre-exemple :
    b=1,1 a=0,9
    nat_Int_part b = 1
