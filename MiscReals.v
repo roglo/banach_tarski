@@ -469,182 +469,15 @@ destruct a as [| a| a]; cbn; [ | easy | ]. {
 }
 Qed.
 
-Theorem z_int_part : ∀ a, ∃ₜ n, (rngl_of_Z n ≤ a < rngl_of_Z (n + 1))%L.
+Theorem Pos_dec : ∀ a b, ({a < b} + {b < a} + {a = b})%positive.
 Proof.
 intros.
-specialize (int_part Hon Hop Hc1 Hor Har a) as (n, Hn).
-destruct (rngl_le_dec Hor 0 a)%L as [Hza| Hza]. {
-  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hn; [ | easy ].
-  exists (Z.of_nat n).
-  rewrite rngl_of_Z_of_nat.
-  rewrite Z.add_1_r.
-  rewrite rngl_of_Z_succ.
-  rewrite rngl_of_Z_of_nat.
-  rewrite rngl_of_nat_add, rngl_add_comm in Hn.
-  now rewrite rngl_of_nat_1 in Hn.
-}
-apply (rngl_nle_gt_iff Hor) in Hza.
-apply (rngl_lt_le_incl Hor) in Hza.
-rewrite (rngl_abs_nonpos_eq Hop Hor) in Hn; [ | easy ].
-exists (- Z.of_nat (n + 1))%Z.
-rewrite rngl_of_Z_opp.
-rewrite rngl_of_Z_of_nat.
-split. {
-  apply (rngl_opp_le_compat Hop Hor).
-  rewrite (rngl_opp_involutive Hop).
-  now apply (rngl_lt_le_incl Hor).
-} {
-  rewrite Nat2Z.inj_add; cbn.
-  rewrite Z.opp_add_distr; cbn.
-  rewrite <- Z.add_assoc; cbn.
-  rewrite Z.add_0_r.
-  rewrite rngl_of_Z_opp.
-  apply (rngl_opp_lt_compat Hop Hor).
-  rewrite (rngl_opp_involutive Hop).
-  rewrite rngl_of_Z_of_nat.
-  apply (rngl_lt_iff Hor).
-  split; [ easy | ].
-  intros H.
-Search (rngl_of_nat _ = - _)%L.
-...
-
-Definition nat_Int_part (x : T) :=
-  let (n, a) := int_part Hon Hop Hc1 Hor Har x in n.
-
-...
-
-Require Import Reals.
-About Int_part.
-Search Int_part.
-Int_part_spec: ∀ (r : R) (z : ℤ), (r - 1 < IZR z <= r)%R → z = Int_part r
-About int_part.
-
-...
-
-Definition Int_part (x : T) :=
-  let n := nat_Int_part x in
-  if rngl_le_dec Hor 0 x then Z.of_nat n else (- Z.of_nat n)%Z.
-
-Definition frac_part (x : T) :=
-  (x - rngl_of_Z (Int_part x))%L.
-
-Arguments Int_part x%_L.
-Arguments frac_part x%_L.
-
-(*
-End a.
-
-From Stdlib Require Import ZArith.
-Require Import RingLike.Z_algebra.
-Open Scope Z_scope.
-
-Compute (Int_part 3).
-Compute (rngl_of_Z 3).
-Compute (rngl_of_Z 239 * rngl_of_Z 4649)%L.
-*)
-
-(* INR = rngl_of_nat *)
-
-Theorem Int_part_close_to_1 : ∀ (r : T) n,
-  (rngl_of_nat n / rngl_of_nat (n + 1) ≤ r < 1)%L
-  → Int_part (r * rngl_of_nat (n + 1)) = Z.of_nat n.
-Proof.
-intros * (Hnr, Hr1).
-apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_of_nat (n + 1)))
-  in Hnr. 2: {
-  apply (rngl_of_nat_nonneg Hon Hos Hor).
-}
-rewrite <- Rmult_div in Hnr.
-unfold rngl_div in Hnr.
-rewrite Hiv in Hnr.
-rewrite <- rngl_mul_assoc in Hnr.
-rewrite (rngl_mul_inv_diag_r Hon Hiv) in Hnr. 2: {
-  rewrite Nat.add_comm.
-  now apply (rngl_characteristic_0 Hon).
-}
-rewrite (rngl_mul_1_r Hon) in Hnr.
-apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (rngl_of_nat (n + 1))) in Hr1. 2: {
-  rewrite Nat.add_1_r.
-  apply (rngl_lt_iff Hor).
-  split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
-  symmetry.
-  apply (rngl_characteristic_0 Hon Hch).
-}
-rewrite (rngl_mul_1_l Hon) in Hr1.
-remember (r * rngl_of_nat (n + 1))%L as x eqn:Hx.
-rewrite rngl_of_nat_add in Hr1; cbn in Hr1.
-rewrite rngl_add_0_r in Hr1.
-progress unfold Int_part.
-progress unfold nat_Int_part.
-remember (int_part Hon Hop Hc1 Hor Har x) as y eqn:Hy.
-symmetry in Hy.
-destruct y as (m, Hm).
-clear Hy.
-destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
-  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hm; [ | easy ].
-  progress f_equal.
-  apply Nat.le_antisymm. {
-    apply Nat.lt_succ_r.
-    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-    apply (rngl_le_lt_trans Hor _ x); [ easy | ].
-    now rewrite rngl_of_nat_succ, rngl_add_comm.
-  } {
-    apply Nat.lt_succ_r.
-    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
-    apply (rngl_le_lt_trans Hor _ x); [ easy | ].
-    now rewrite <- Nat.add_1_r.
-  }
-}
-exfalso; apply Hzx.
-apply (rngl_le_trans Hor _ (rngl_of_nat n)); [ | easy ].
-apply (rngl_of_nat_nonneg Hon Hos Hor).
-Qed.
-
-Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L → Int_part x = 0%Z.
-Proof.
-intros * Hx.
-assert ((rngl_of_nat 0 / rngl_of_nat (0 + 1) ≤ x < 1)%L). {
-  now cbn; rewrite rngl_add_0_r, (rngl_div_1_r Hon Hiq Hc1).
-}
-specialize (Int_part_close_to_1 x 0 H) as H1.
-cbn in H1.
-now rewrite rngl_add_0_r, (rngl_mul_1_r Hon) in H1.
-Qed.
-
-Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
-Proof.
-intros * Hx.
-unfold frac_part.
-rewrite Int_part_small; [ | easy ].
-apply (rngl_sub_0_r Hos).
-Qed.
-
-Theorem pow_INR : ∀ n k, rngl_of_nat (n ^ k) = (rngl_of_nat n ^ k)%L.
-Proof.
-intros.
-induction k; [ cbn; apply rngl_add_0_r | ].
-simpl; rewrite <- IHk.
-apply (rngl_of_nat_mul Hon Hos).
-Qed.
-
-Theorem Int_part_rngl_of_nat : ∀ a, Int_part (rngl_of_nat a) = Z.of_nat a.
-Proof.
-intros.
-progress unfold Int_part, nat_Int_part.
-remember (int_part Hon Hop Hc1 Hor Har (rngl_of_nat a)) as n eqn:Hn.
-destruct n as (n, Hna).
-clear Hn.
-rewrite (rngl_abs_nonneg_eq Hop Hor) in Hna. 2: {
-  apply (rngl_of_nat_nonneg Hon Hos Hor).
-}
-destruct Hna as (H1, H2).
-apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in H1.
-apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H2.
-rewrite Nat.add_1_r in H2.
-apply -> Nat.lt_succ_r in H2.
-apply Nat.le_antisymm in H1; [ subst | easy ].
-destruct (rngl_le_dec Hor 0 (rngl_of_nat n)) as [H1| H1]; [ easy | ].
-exfalso; apply H1, (rngl_of_nat_nonneg Hon Hos Hor).
+progress unfold Pos.lt.
+rewrite (Pos.compare_antisym a).
+remember (a ?= b)%positive as ab eqn:Hab.
+symmetry in Hab.
+destruct ab; [ right | now left; left | now left; right ].
+now apply Pos.compare_eq_iff in Hab.
 Qed.
 
 Theorem rngl_of_pos_2_sub : ∀ a b,
@@ -720,6 +553,27 @@ induction a as [a| a| ]; intros; cbn; [ | | now apply Pos.nlt_1_r in Hba ]. {
     rewrite Pos.pred_double_spec.
     now apply rngl_of_pos_2_pred.
   }
+}
+Qed.
+
+Theorem rngl_of_Z_pred : ∀ a, rngl_of_Z (Z.pred a) = (rngl_of_Z a - 1)%L.
+Proof.
+intros.
+destruct a as [| a| a]; cbn. {
+  symmetry; apply (rngl_sub_0_l Hop).
+} {
+  destruct a as [a| a| ]; cbn. {
+    symmetry; rewrite rngl_add_comm.
+    apply (rngl_add_sub Hos).
+  } {
+    rewrite Pos.pred_double_spec.
+    now apply rngl_of_pos_pred.
+  } {
+    symmetry; apply (rngl_sub_diag Hos).
+  }
+} {
+  rewrite rngl_of_pos_add, rngl_add_comm.
+  apply (rngl_opp_add_distr Hop).
 }
 Qed.
 
@@ -802,15 +656,6 @@ destruct a as [a| a| ]; cbn. {
 }
 Qed.
 
-Theorem frac_part_INR : ∀ n, frac_part (rngl_of_nat n) = 0%L.
-Proof.
-intros.
-unfold frac_part.
-rewrite Int_part_rngl_of_nat.
-rewrite rngl_of_Z_of_nat.
-apply (rngl_sub_diag Hos).
-Qed.
-
 Theorem rngl_of_Z_add_1_l : ∀ a, rngl_of_Z (1 + a) = (1 + rngl_of_Z a)%L.
 Proof.
 intros.
@@ -839,38 +684,6 @@ destruct a as [| a| a]; cbn. {
     apply (rngl_add_opp_diag_r Hop).
   }
 }
-Qed.
-
-Theorem rngl_of_Z_pred : ∀ a, rngl_of_Z (Z.pred a) = (rngl_of_Z a - 1)%L.
-Proof.
-intros.
-destruct a as [| a| a]; cbn. {
-  symmetry; apply (rngl_sub_0_l Hop).
-} {
-  destruct a as [a| a| ]; cbn. {
-    symmetry; rewrite rngl_add_comm.
-    apply (rngl_add_sub Hos).
-  } {
-    rewrite Pos.pred_double_spec.
-    now apply rngl_of_pos_pred.
-  } {
-    symmetry; apply (rngl_sub_diag Hos).
-  }
-} {
-  rewrite rngl_of_pos_add, rngl_add_comm.
-  apply (rngl_opp_add_distr Hop).
-}
-Qed.
-
-Theorem Pos_dec : ∀ a b, ({a < b} + {b < a} + {a = b})%positive.
-Proof.
-intros.
-progress unfold Pos.lt.
-rewrite (Pos.compare_antisym a).
-remember (a ?= b)%positive as ab eqn:Hab.
-symmetry in Hab.
-destruct ab; [ right | now left; left | now left; right ].
-now apply Pos.compare_eq_iff in Hab.
 Qed.
 
 Theorem rngl_of_Z_add :
@@ -1019,6 +832,190 @@ induction a as [| a| a]. {
     apply rngl_of_pos_add.
   }
 }
+Qed.
+
+Theorem z_int_part : ∀ a, ∃ₜ n, (rngl_of_Z n ≤ a < rngl_of_Z (n + 1))%L.
+Proof.
+intros.
+specialize (int_part Hon Hop Hc1 Hor Har a) as (n, Hn).
+destruct (rngl_le_dec Hor 0 a)%L as [Hza| Hza]. {
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hn; [ | easy ].
+  exists (Z.of_nat n).
+  rewrite rngl_of_Z_of_nat.
+  rewrite Z.add_1_r.
+  rewrite rngl_of_Z_succ.
+  rewrite rngl_of_Z_of_nat.
+  rewrite rngl_of_nat_add, rngl_add_comm in Hn.
+  now rewrite rngl_of_nat_1 in Hn.
+}
+apply (rngl_nle_gt_iff Hor) in Hza.
+rewrite (rngl_abs_nonpos_eq Hop Hor) in Hn. 2: {
+  now apply (rngl_lt_le_incl Hor) in Hza.
+}
+destruct Hn as (H1, H2).
+destruct (rngl_eq_dec Heo a (- rngl_of_nat n)) as [Han| Han]. {
+  exists (- Z.of_nat n)%Z.
+  rewrite rngl_of_Z_opp.
+  rewrite rngl_of_Z_of_nat.
+  split; [ rewrite Han; apply (rngl_le_refl Hor) | ].
+  rewrite rngl_of_Z_add; cbn.
+  rewrite rngl_of_Z_opp, rngl_of_Z_of_nat, <- Han.
+  apply (rngl_lt_add_r Hos Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+exists (- Z.of_nat (n + 1))%Z.
+rewrite rngl_of_Z_opp.
+rewrite rngl_of_Z_of_nat.
+split. {
+  apply (rngl_opp_le_compat Hop Hor).
+  rewrite (rngl_opp_involutive Hop).
+  now apply (rngl_lt_le_incl Hor).
+} {
+  rewrite Nat2Z.inj_add; cbn.
+  rewrite Z.opp_add_distr; cbn.
+  rewrite <- Z.add_assoc; cbn.
+  rewrite Z.add_0_r.
+  rewrite rngl_of_Z_opp.
+  apply (rngl_opp_lt_compat Hop Hor).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite rngl_of_Z_of_nat.
+  apply (rngl_lt_iff Hor).
+  split; [ easy | ].
+  intros H; apply Han.
+  rewrite H; symmetry.
+  apply (rngl_opp_involutive Hop).
+}
+Qed.
+
+Definition Int_part (x : T) := let (n, _) := z_int_part x in n.
+Definition frac_part (x : T) := (x - rngl_of_Z (Int_part x))%L.
+
+Arguments Int_part x%_L.
+Arguments frac_part x%_L.
+
+(*
+End a.
+
+From Stdlib Require Import ZArith.
+Require Import RingLike.Z_algebra.
+Open Scope Z_scope.
+
+Compute (Int_part 3).
+Compute (rngl_of_Z 3).
+Compute (rngl_of_Z 239 * rngl_of_Z 4649)%L.
+*)
+
+(* INR = rngl_of_nat *)
+
+Theorem Int_part_close_to_1 : ∀ (r : T) n,
+  (rngl_of_nat n / rngl_of_nat (n + 1) ≤ r < 1)%L
+  → Int_part (r * rngl_of_nat (n + 1)) = Z.of_nat n.
+Proof.
+intros * (Hnr, Hr1).
+apply (rngl_mul_le_mono_nonneg_r Hop Hor _ _ (rngl_of_nat (n + 1)))
+  in Hnr. 2: {
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
+rewrite <- Rmult_div in Hnr.
+unfold rngl_div in Hnr.
+rewrite Hiv in Hnr.
+rewrite <- rngl_mul_assoc in Hnr.
+rewrite (rngl_mul_inv_diag_r Hon Hiv) in Hnr. 2: {
+  rewrite Nat.add_comm.
+  now apply (rngl_characteristic_0 Hon).
+}
+rewrite (rngl_mul_1_r Hon) in Hnr.
+apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (rngl_of_nat (n + 1))) in Hr1. 2: {
+  rewrite Nat.add_1_r.
+  apply (rngl_lt_iff Hor).
+  split; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
+  symmetry.
+  apply (rngl_characteristic_0 Hon Hch).
+}
+rewrite (rngl_mul_1_l Hon) in Hr1.
+remember (r * rngl_of_nat (n + 1))%L as x eqn:Hx.
+rewrite rngl_of_nat_add in Hr1; cbn in Hr1.
+rewrite rngl_add_0_r in Hr1.
+progress unfold Int_part.
+remember (z_int_part x) as y eqn:Hy.
+symmetry in Hy.
+destruct y as (m, Hm).
+clear Hy.
+destruct (rngl_le_dec Hor 0 x) as [Hzx| Hzx]. {
+...
+  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hm; [ | easy ].
+  progress f_equal.
+  apply Nat.le_antisymm. {
+    apply Nat.lt_succ_r.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply (rngl_le_lt_trans Hor _ x); [ easy | ].
+    now rewrite rngl_of_nat_succ, rngl_add_comm.
+  } {
+    apply Nat.lt_succ_r.
+    apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor).
+    apply (rngl_le_lt_trans Hor _ x); [ easy | ].
+    now rewrite <- Nat.add_1_r.
+  }
+}
+exfalso; apply Hzx.
+apply (rngl_le_trans Hor _ (rngl_of_nat n)); [ | easy ].
+apply (rngl_of_nat_nonneg Hon Hos Hor).
+Qed.
+
+Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L → Int_part x = 0%Z.
+Proof.
+intros * Hx.
+assert ((rngl_of_nat 0 / rngl_of_nat (0 + 1) ≤ x < 1)%L). {
+  now cbn; rewrite rngl_add_0_r, (rngl_div_1_r Hon Hiq Hc1).
+}
+specialize (Int_part_close_to_1 x 0 H) as H1.
+cbn in H1.
+now rewrite rngl_add_0_r, (rngl_mul_1_r Hon) in H1.
+Qed.
+
+Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
+Proof.
+intros * Hx.
+unfold frac_part.
+rewrite Int_part_small; [ | easy ].
+apply (rngl_sub_0_r Hos).
+Qed.
+
+Theorem pow_INR : ∀ n k, rngl_of_nat (n ^ k) = (rngl_of_nat n ^ k)%L.
+Proof.
+intros.
+induction k; [ cbn; apply rngl_add_0_r | ].
+simpl; rewrite <- IHk.
+apply (rngl_of_nat_mul Hon Hos).
+Qed.
+
+Theorem Int_part_rngl_of_nat : ∀ a, Int_part (rngl_of_nat a) = Z.of_nat a.
+Proof.
+intros.
+progress unfold Int_part, nat_Int_part.
+remember (int_part Hon Hop Hc1 Hor Har (rngl_of_nat a)) as n eqn:Hn.
+destruct n as (n, Hna).
+clear Hn.
+rewrite (rngl_abs_nonneg_eq Hop Hor) in Hna. 2: {
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
+destruct Hna as (H1, H2).
+apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in H1.
+apply (rngl_of_nat_inj_lt Hon Hop Hc1 Hor) in H2.
+rewrite Nat.add_1_r in H2.
+apply -> Nat.lt_succ_r in H2.
+apply Nat.le_antisymm in H1; [ subst | easy ].
+destruct (rngl_le_dec Hor 0 (rngl_of_nat n)) as [H1| H1]; [ easy | ].
+exfalso; apply H1, (rngl_of_nat_nonneg Hon Hos Hor).
+Qed.
+
+Theorem frac_part_INR : ∀ n, frac_part (rngl_of_nat n) = 0%L.
+Proof.
+intros.
+unfold frac_part.
+rewrite Int_part_rngl_of_nat.
+rewrite rngl_of_Z_of_nat.
+apply (rngl_sub_diag Hos).
 Qed.
 
 Theorem rngl_of_Z_sub :
