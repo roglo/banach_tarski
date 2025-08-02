@@ -1299,6 +1299,14 @@ rewrite Z2Nat.inj_pos.
 now rewrite <- rngl_of_nat_Pos_to_nat.
 Qed.
 
+(*
+Print Int_part.
+Check z_int_part.
+3/4 ≤ r < 1
+E(4r) = 3
+3 ≤ 4r < 4
+*)
+
 Theorem Int_part_close_to_1 : ∀ (r : T) n,
   (rngl_of_nat n / rngl_of_nat (n + 1) ≤ r < 1)%L
   → Int_part (r * rngl_of_nat (n + 1)) = Z.of_nat n.
