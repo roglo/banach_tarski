@@ -1162,8 +1162,124 @@ destruct a as [a| a| ]; cbn. {
 }
 Qed.
 
+Theorem rngl_of_pos_2_le_inj :
+  ∀ a b, (rngl_of_pos_2 a ≤ rngl_of_pos_2 b)%L → (a <= b)%positive.
+Proof.
+intros * Hab.
+revert b Hab.
+induction a as [a| a| ]; intros. {
+  destruct b as [b| b| ]. {
+    progress unfold Pos.le; cbn.
+    apply Pos.compare_le_iff.
+    cbn in Hab.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_add_le_mono_l Hop Hor) in Hab.
+    now apply IHa.
+  } {
+    cbn in Hab.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+(**)
+    assert (H : (rngl_of_pos_2 a ≤ rngl_of_pos_2 b)%L). {
+...
+    (* lemma to do *)
+    progress unfold Pos.le; cbn.
+    intros H1.
+    apply Pos.compare_cont_Gt_Gt in H1.
+    apply Pos.le_nlt in H1.
+    apply Pos2Z.pos_le_pos in H1.
+    apply Z.nlt_ge in H1.
+    apply H1; clear H1.
+    apply Z.le_neq.
+    split. {
+      apply Pos2Z.pos_le_pos.
+      apply IHa.
+      eapply (rngl_le_trans Hor); [ | apply Hab ].
+...
+
+Theorem rngl_of_pos_le_inj :
+  ∀ a b, (rngl_of_pos a ≤ rngl_of_pos b)%L → (a <= b)%positive.
+Proof.
+intros * Hab.
+destruct a as [a| a| ]. {
+  destruct b as [b| b| ]. {
+    cbn in Hab.
+    apply (rngl_add_le_mono_l Hop Hor) in Hab.
+Search (rngl_of_pos_2 _ ≤ _)%L.
+...
+
+Theorem rngl_of_Z_le_inj : ∀ a b, (rngl_of_Z a ≤ rngl_of_Z b)%L → (a <= b)%Z.
+Proof.
+intros * Hab.
+destruct a as [| a| a]. {
+  cbn in Hab.
+  destruct b as [| b| b]; cbn in Hab; [ easy | easy | ].
+  exfalso; apply rngl_nlt_ge in Hab; apply Hab; clear Hab.
+  apply (rngl_opp_lt_compat Hop Hor).
+  rewrite (rngl_opp_0 Hop), (rngl_opp_involutive Hop).
+  apply rngl_of_pos_pos.
+} {
+  destruct b as [| b| b]; cbn. {
+    exfalso; apply rngl_nlt_ge in Hab; apply Hab; clear Hab; cbn.
+    apply rngl_of_pos_pos.
+  } {
+    cbn in Hab.
+Search (Z.pos _ <= Z.pos _)%Z.
+apply Pos2Z.pos_le_pos.
+Search (rngl_of_pos _ ≤ _)%L.
+...
+    apply rngl_of_pos_le_inj in Hab.
+    now subst.
+  } {
+    cbn in Hab.
+    specialize (rngl_of_pos_pos a) as H1.
+    rewrite Hab in H1.
+    exfalso; apply rngl_nle_gt in H1.
+    apply H1; clear H1.
+    rewrite <- (rngl_opp_0 Hop).
+    apply -> (rngl_opp_le_compat Hop Hor).
+    apply (rngl_lt_le_incl Hor).
+    apply rngl_of_pos_pos.
+  }
+} {
+  cbn in Hab.
+  apply (f_equal rngl_opp) in Hab.
+  rewrite (rngl_opp_involutive Hop) in Hab.
+  rewrite <- rngl_of_Z_opp in Hab.
+  destruct b as [| b| b]; cbn. {
+    now apply rngl_of_pos_neq_0 in Hab.
+  } {
+    cbn in Hab.
+    specialize (rngl_of_pos_pos a) as H1.
+    rewrite Hab in H1.
+    exfalso; apply rngl_nle_gt in H1.
+    apply H1; clear H1.
+    rewrite <- (rngl_opp_0 Hop).
+    apply -> (rngl_opp_le_compat Hop Hor).
+    apply (rngl_lt_le_incl Hor).
+    apply rngl_of_pos_pos.
+  } {
+    cbn in Hab.
+    apply rngl_of_pos_inj in Hab.
+    now subst.
+  }
+}
+...
+
 Theorem rngl_of_Z_inj : ∀ a b, rngl_of_Z a = rngl_of_Z b → a = b.
 Proof.
+intros * Hab.
+apply Z.le_antisymm. {
+  apply rngl_of_Z_le_inj.
+  rewrite Hab; apply (rngl_le_refl Hor).
+} {
+  apply rngl_of_Z_le_inj.
+  rewrite Hab; apply (rngl_le_refl Hor).
+}
+...
 intros * Hab.
 destruct a as [| a| a]. {
   symmetry in Hab |-*; cbn in Hab.
@@ -1375,9 +1491,11 @@ rewrite Nat2Z.id.
 *)
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_of_nat.
-destruct (Z_le_dec 0 m) as [Hzm| Hzm]. 2: {
-  apply Z.nle_gt in Hzm.
-(* pas l'air de marcher *)
+assert (Hzm : (0 <= m)%Z). {
+Search rngl_of_Z.
+Search (rngl_of_Z _ ≤ _)%L.
+  apply rngl_of_Z_le_inj.
+  apply (Z_le_trans _
 ... ...
   specialize between_rngl_of_nat_and_succ as H1.
   specialize (H1 x x n (Z.to_nat m) (rngl_le_refl Hor _) (conj Hnr Hr1)).
