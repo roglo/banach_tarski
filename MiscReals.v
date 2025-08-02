@@ -1167,7 +1167,7 @@ Theorem rngl_of_pos_2_le_inj :
 Proof.
 intros * Hab.
 revert b Hab.
-induction a as [a| a| ]; intros. {
+induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
   destruct b as [b| b| ]. {
     progress unfold Pos.le; cbn.
     apply Pos.compare_le_iff.
@@ -1182,22 +1182,90 @@ induction a as [a| a| ]; intros. {
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
       apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
-(**)
+    apply (rngl_le_add_le_sub_l Hop Hor) in Hab.
     assert (H : (rngl_of_pos_2 a ≤ rngl_of_pos_2 b)%L). {
-...
-    (* lemma to do *)
+      eapply (rngl_le_trans Hor); [ apply Hab | ].
+      apply (rngl_le_sub_nonneg Hop Hor).
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    apply IHa in H.
     progress unfold Pos.le; cbn.
     intros H1.
     apply Pos.compare_cont_Gt_Gt in H1.
     apply Pos.le_nlt in H1.
-    apply Pos2Z.pos_le_pos in H1.
-    apply Z.nlt_ge in H1.
+    apply Pos.le_antisym in H1; [ subst b | easy ].
+    apply rngl_nlt_ge in Hab.
+    apply Hab; clear Hab.
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    apply (rngl_lt_add_l Hos Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  } {
+    cbn in Hab; exfalso.
+    apply rngl_nlt_ge in Hab.
+    apply Hab; clear Hab.
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+    apply (rngl_lt_add_r Hos Hor).
+    apply (rngl_mul_pos_pos Hos Hor Hii).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply rngl_of_pos_2_pos.
+  }
+} {
+  destruct b as [b| b| ]. {
+    cbn in Hab.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    progress unfold Pos.le; cbn.
+    intros H1.
+    apply Pos.compare_cont_Lt_Gt in H1.
+    apply Pos.gt_lt in H1.
+    apply Pos.lt_nle in H1.
     apply H1; clear H1.
-    apply Z.le_neq.
-    split. {
-      apply Pos2Z.pos_le_pos.
-      apply IHa.
-      eapply (rngl_le_trans Hor); [ | apply Hab ].
+    apply IHa.
+...
+    apply Pos.le_antisym in H1; [ subst b | easy ].
+    apply Pos.nlt_ge in H1.
+...
+    apply Pos.compare_le_iff.
+    cbn in Hab.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_add_le_mono_l Hop Hor) in Hab.
+    now apply IHa.
+  } {
+    cbn in Hab.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_le_add_le_sub_l Hop Hor) in Hab.
+    assert (H : (rngl_of_pos_2 a ≤ rngl_of_pos_2 b)%L). {
+      eapply (rngl_le_trans Hor); [ apply Hab | ].
+      apply (rngl_le_sub_nonneg Hop Hor).
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    apply IHa in H.
+    progress unfold Pos.le; cbn.
+    intros H1.
+    apply Pos.compare_cont_Gt_Gt in H1.
+    apply Pos.le_nlt in H1.
+    apply Pos.le_antisym in H1; [ subst b | easy ].
+    apply rngl_nlt_ge in Hab.
+    apply Hab; clear Hab.
+    apply (rngl_lt_sub_lt_add_l Hop Hor).
+    apply (rngl_lt_add_l Hos Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  } {
+    cbn in Hab; exfalso.
+    apply rngl_nlt_ge in Hab.
+    apply Hab; clear Hab.
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+    apply (rngl_lt_add_r Hos Hor).
+    apply (rngl_mul_pos_pos Hos Hor Hii).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply rngl_of_pos_2_pos.
+  }
+
 ...
 
 Theorem rngl_of_pos_le_inj :
