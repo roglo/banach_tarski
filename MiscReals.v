@@ -1272,7 +1272,14 @@ Proof.
 intros * Hab.
 destruct (Pos.eq_dec b 1) as [Hb1| Hb1]. {
   subst b; cbn in Hab; cbn.
+Print rngl_of_pos_2.
+...
+  rewrite <- rngl_of_pos_2_2 in Hab.
   rewrite <- rngl_of_pos_2_2 in Hab |-*.
+  cbn in Hab |-*.
+  destruct a as [a| a| ]; [ | | apply (rngl_le_refl Hor) ]. {
+    cbn in Hab |-*.
+
 Search (rngl_of_pos_2 _ + 1)%L.
 ...
 Search (rngl_of_pos_2 1%L).
