@@ -1262,6 +1262,78 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
 }
 Qed.
 
+Theorem rngl_of_pos_2_2 : rngl_of_pos_2 1 = 2%L.
+Proof. easy. Qed.
+
+Theorem rngl_of_pos_2_lt_add_1 : ∀ a b,
+  (rngl_of_pos_2 a < 1 + rngl_of_pos_2 b)%L
+  → (rngl_of_pos_2 a ≤ rngl_of_pos_2 b)%L.
+Proof.
+intros * Hab.
+destruct (Pos.eq_dec b 1) as [Hb1| Hb1]. {
+  subst b; cbn in Hab; cbn.
+  rewrite <- rngl_of_pos_2_2 in Hab |-*.
+Search (rngl_of_pos_2 _ + 1)%L.
+...
+Search (rngl_of_pos_2 1%L).
+  rewrite <- rngl_of_pos_2_2.
+Search (rngl_of_pos_2 _ < _)%L.
+...
+  apply (rngl_lt_add_lt_sub_l Hop Hor) in Hab.
+  rewrite rngl_mul_add_distr_l in Hab.
+  rewrite (rngl_mul_1_r Hon) in Hab.
+  rewrite rngl_add_assoc, (rngl_add_sub Hos) in Hab.
+Search (rngl_of_pos_2 _ = 1)%L.
+
+revert b Hab.
+induction a as [a| a| ]; intros. {
+  destruct b as [b| b| ]. {
+    cbn in Hab |-*.
+    do 2 rewrite rngl_mul_add_distr_l in Hab |-*.
+    rewrite (rngl_mul_1_r Hon) in Hab |-*.
+    rewrite rngl_add_assoc, (rngl_add_comm 1 2) in Hab.
+    rewrite <- (rngl_add_assoc 2 1) in Hab.
+    apply (rngl_add_lt_mono_l Hop Hor) in Hab.
+    apply (rngl_add_le_mono_l Hop Hor).
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply IHa.
+    apply (rngl_mul_lt_mono_pos_l Hop Hor Hii 2%L).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    eapply (rngl_lt_trans Hor); [ apply Hab | ].
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+    apply (rngl_add_lt_mono_r Hop Hor).
+    apply (rngl_lt_add_l Hos Hor).
+    apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+  } {
+    cbn in Hab |-*.
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon) in Hab.
+    rewrite <- rngl_add_assoc in Hab.
+    apply (rngl_add_lt_mono_l Hop Hor) in Hab.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    apply (rngl_le_add_le_sub_l Hop Hor).
+...
+      exfalso.
+      apply rngl_nle_gt in Hab.
+      apply Hab; clear Hab.
+      destruct a as [| a| a]. {
+        cbn in Hab.
+...
+
+    apply (rngl_le_trans Hor _ (rngl_of_pos_2 b - 2)). 2: {
+      apply (rngl_sub_le_mono_l Hop Hor).
+      apply (rngl_le_add_l Hor).
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    destruct (Pos.eq_dec b 1) as [Hb1| Hb1]. {
+
+...
+      rewrite (rngl_mul_add_distr_r 1 1) in Hab.
+
+    rewrite <- rngl_of_pos_2_pred.
+...
+
 Theorem rngl_of_pos_le_inj :
   ∀ a b, (rngl_of_pos a ≤ rngl_of_pos b)%L → (a <= b)%positive.
 Proof.
@@ -1301,6 +1373,7 @@ destruct a as [a| a| ]; [ | | apply Pos.le_1_l ]. {
     apply (rngl_lt_eq_cases Hor) in Hab.
     destruct Hab as [Hab| Hab]; [ | now symmetry in Hab ].
     apply (rngl_lt_sub_lt_add_l Hop Hor) in Hab.
+    clear H1.
 ...
     eapply (rngl_le_trans Hor).
 Search rngl_of_pos_2.
