@@ -1296,6 +1296,23 @@ destruct a as [a| a| ]; [ | | apply Pos.le_1_l ]. {
     apply Pos.lt_nle in H1.
     apply H1; clear H1.
     apply rngl_of_pos_2_le_inj.
+    specialize (rngl_of_pos_2_ne_sub_1 b a) as H1.
+    apply (rngl_le_sub_le_add_l Hop Hor) in Hab.
+    apply (rngl_lt_eq_cases Hor) in Hab.
+    destruct Hab as [Hab| Hab]; [ | now symmetry in Hab ].
+    apply (rngl_lt_sub_lt_add_l Hop Hor) in Hab.
+...
+    eapply (rngl_le_trans Hor).
+Search rngl_of_pos_2.
+...
+    assert ((rngl_of_pos_2 a ≤ rngl_of_pos_2 (Pos.succ b))%L). {
+      rewrite rngl_of_pos_2_succ.
+      eapply (rngl_le_trans Hor); [ apply Hab | ].
+      apply (rngl_add_le_mono_r Hop Hor).
+      apply (rngl_1_le_2 Hon Hos Hor).
+    }
+Search (rngl_of_pos_2 (Pos.succ _)).
+Search (rngl_of_pos_2 _ ≤ _)%L.
 ...
     apply (rngl_add_le_mono_l Hop Hor) in Hab.
     apply rngl_of_pos_2_le_inj; cbn.
