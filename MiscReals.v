@@ -324,6 +324,21 @@ apply Pos2Nat.inj_le.
 now apply Pos.lt_le_incl.
 Qed.
 
+Theorem Pos2Nat_ge_1 : ∀ a, 1 ≤ Pos.to_nat a.
+Proof.
+intros.
+induction a as [a| a| ]; [ | | easy ]. {
+  rewrite Pos2Nat.inj_xI.
+  apply -> Nat.succ_le_mono.
+  apply Nat.le_0_l.
+} {
+  rewrite Pos2Nat.inj_xO.
+  cbn; rewrite Nat.add_0_r.
+  transitivity (Pos.to_nat a); [ easy | ].
+  apply Nat.le_add_l.
+}
+Qed.
+
 Theorem rngl_of_Z_add_1_l : ∀ a, rngl_of_Z (1 + a) = (1 + rngl_of_Z a)%L.
 Proof.
 intros.
@@ -342,32 +357,34 @@ destruct a as [| a| a]; cbn; [ easy | | ]. {
 } {
   progress unfold rngl_of_pos.
   rewrite (rngl_add_opp_r Hop).
-  progress unfold rngl_of_Z.
-...
-intros.
-destruct a as [| a| a]; cbn. {
-  symmetry; apply rngl_add_0_r.
-} {
-  destruct a as [a| a| ]; cbn; [ | easy | easy ].
-  rewrite rngl_add_assoc.
-  apply rngl_of_pos_2_succ.
-} {
-  induction a as [a| a| ]. {
+  destruct a as [a| a| ]. {
     cbn.
-    rewrite (rngl_add_opp_r Hop).
+    progress unfold rngl_of_pos; cbn.
+    rewrite Pos2Nat.inj_xO, Pos2Nat.inj_xI.
+    rewrite rngl_of_nat_succ.
     rewrite (rngl_sub_add_distr Hos).
-    rewrite (rngl_sub_diag Hos).
-    symmetry; apply (rngl_sub_0_l Hop).
+    rewrite (rngl_sub_diag Hos); symmetry.
+    apply (rngl_sub_0_l Hop).
   } {
     cbn.
+    progress unfold rngl_of_pos; cbn.
     rewrite Pos.pred_double_spec.
     rewrite Pos.pred_sub.
-    rewrite rngl_of_pos_sub; [ cbn | easy ].
-    rewrite (rngl_add_opp_r Hop).
+    rewrite Pos2Nat.inj_sub; [ | easy ].
+    rewrite Pos2Nat.inj_xO, Pos2Nat.inj_1.
+    rewrite (rngl_of_nat_sub Hos). 2: {
+      transitivity (Pos.to_nat a).
+      apply Pos2Nat_ge_1.
+      cbn; rewrite Nat.add_0_r.
+      apply Nat.le_add_l.
+    }
+    rewrite rngl_of_nat_1.
     apply (rngl_opp_sub_distr Hop).
   } {
-    symmetry; cbn.
-    apply (rngl_add_opp_diag_r Hop).
+    cbn.
+    rewrite Pos2Nat.inj_1.
+    rewrite rngl_of_nat_1; symmetry.
+    apply (rngl_sub_diag Hos).
   }
 }
 Qed.
@@ -398,6 +415,7 @@ induction a as [| a| a]. {
     induction a as [a| a| ]; cbn; intros. {
       destruct b as [b| b| ]. {
         cbn.
+...
         rewrite (rngl_sub_add_distr Hos).
         rewrite rngl_add_comm, (rngl_add_sub Hos).
         rewrite Z.double_spec.
