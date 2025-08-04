@@ -764,16 +764,35 @@ Theorem rngl_of_pos_le_inj :
   ∀ a b, (rngl_of_pos a ≤ rngl_of_pos b)%L → (a <= b)%positive.
 Proof.
 intros * Hab.
-destruct a as [a| a| ]; [ | | apply Pos.le_1_l ]. {
+revert b Hab.
+induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
   destruct b as [b| b| ]. {
-    cbn in Hab.
-    apply (rngl_add_le_mono_l Hop Hor) in Hab.
-...
-    apply rngl_of_pos_2_le_inj; cbn.
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
-    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-    now apply (rngl_add_le_mono_l Hop Hor).
+    do 2 rewrite rngl_of_pos_xI in Hab.
+    apply (rngl_add_le_mono_r Hop Hor) in Hab.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
+      now apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    progress unfold Pos.le; cbn.
+    apply Pos.compare_le_iff.
+    now apply IHa.
   } {
+(**)
+    rewrite rngl_of_pos_xI, rngl_of_pos_xO in Hab.
+    progress unfold Pos.le; cbn.
+    intros H.
+    apply Pos.compare_cont_Gt_Gt in H.
+    apply Pos.ge_le in H.
+    apply Pos.le_nlt in H.
+    apply H; clear H.
+...
+    apply (rngl_add_le_mono_r Hop Hor) in Hab.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
+      now apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    progress unfold Pos.le; cbn.
+    apply Pos.compare_le_iff.
+    now apply IHa.
+...
     cbn in Hab.
     apply rngl_of_pos_2_le_inj; cbn.
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ | easy ].
