@@ -396,6 +396,29 @@ rewrite Z.add_comm, rngl_add_comm.
 apply rngl_of_Z_add_1_l.
 Qed.
 
+Theorem rngl_of_pos_xO : ∀ a, rngl_of_pos a~0 = (2 * rngl_of_pos a)%L.
+Proof.
+intros.
+progress unfold rngl_of_pos.
+rewrite Pos2Nat.inj_xO.
+rewrite (rngl_of_nat_mul Hon Hos).
+progress f_equal.
+apply rngl_of_nat_2.
+Qed.
+
+Theorem rngl_of_pos_xI : ∀ a, rngl_of_pos a~1 = (2 * rngl_of_pos a + 1)%L.
+Proof.
+intros.
+progress unfold rngl_of_pos.
+rewrite Pos2Nat.inj_xI.
+rewrite rngl_of_nat_succ.
+rewrite (rngl_of_nat_mul Hon Hos).
+rewrite rngl_add_comm.
+progress f_equal.
+progress f_equal.
+apply rngl_of_nat_2.
+Qed.
+
 Theorem rngl_of_Z_add :
   ∀ a b, rngl_of_Z (a + b) = (rngl_of_Z a + rngl_of_Z b)%L.
 Proof.
@@ -415,28 +438,35 @@ induction a as [| a| a]. {
     induction a as [a| a| ]; cbn; intros. {
       destruct b as [b| b| ]. {
         cbn.
-...
-        rewrite (rngl_sub_add_distr Hos).
-        rewrite rngl_add_comm, (rngl_add_sub Hos).
         rewrite Z.double_spec.
+        do 2 rewrite rngl_of_pos_xI.
+        rewrite (rngl_sub_add_distr Hos).
+        rewrite (rngl_sub_sub_swap Hop).
+        rewrite (rngl_add_sub Hos).
+        rewrite <- (rngl_mul_sub_distr_l Hop).
         destruct (Pos_dec a b) as [[Hab| Hab]| Hab]. {
           rewrite Z.pos_sub_lt; [ cbn | easy ].
-          apply (rngl_opp_inj Hop).
-          rewrite (rngl_opp_involutive Hop).
-          rewrite (rngl_opp_sub_distr Hop).
-          now apply rngl_of_pos_2_sub.
+          rewrite rngl_of_pos_xO.
+          rewrite rngl_of_pos_sub; [ | easy ].
+          rewrite <- (rngl_mul_opp_r Hop).
+          progress f_equal.
+          apply (rngl_opp_sub_distr Hop).
         } {
           rewrite Z.pos_sub_gt; [ cbn | easy ].
-          now apply rngl_of_pos_2_sub.
+          rewrite rngl_of_pos_xO.
+          progress f_equal.
+          now apply rngl_of_pos_sub.
         } {
           subst.
           rewrite Z.pos_sub_diag, Z.mul_0_r; symmetry.
-          apply (rngl_sub_diag Hos).
+          rewrite (rngl_sub_diag Hos).
+          apply (rngl_mul_0_r Hos).
         }
       } {
         cbn.
         rewrite Z.succ_double_spec, Z.add_1_r.
         rewrite rngl_of_Z_succ.
+...
         rewrite <- (rngl_add_sub_assoc Hop).
         progress f_equal.
         destruct (Pos_dec a b) as [[Hab| Hab]| Hab]. {
