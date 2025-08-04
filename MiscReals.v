@@ -419,6 +419,66 @@ progress f_equal.
 apply rngl_of_nat_2.
 Qed.
 
+Theorem rngl_of_pos_mul :
+  ∀ a b, rngl_of_pos (a * b) = (rngl_of_pos a * rngl_of_pos b)%L.
+Proof.
+intros.
+revert b.
+induction a as [a| a| ]; intros; cbn. {
+  rewrite rngl_of_pos_add.
+  rewrite rngl_of_pos_xO, rngl_of_pos_xI.
+  rewrite IHa.
+  rewrite (rngl_mul_add_distr_r _ _ (rngl_of_pos _)), (rngl_mul_1_l Hon).
+  rewrite rngl_mul_assoc.
+  apply rngl_add_comm.
+} {
+  do 2 rewrite rngl_of_pos_xO.
+  rewrite <- rngl_mul_assoc.
+  progress f_equal.
+  apply IHa.
+} {
+  rewrite rngl_of_pos_1.
+  symmetry; apply (rngl_mul_1_l Hon).
+}
+Qed.
+
+Theorem rngl_of_Z_mul :
+  ∀ a b, rngl_of_Z (a * b) = (rngl_of_Z a * rngl_of_Z b)%L.
+Proof.
+intros.
+destruct a as [| a| a]; cbn. {
+  symmetry; apply (rngl_mul_0_l Hos).
+} {
+  destruct b as [| b| b]; cbn. {
+    symmetry; apply (rngl_mul_0_r Hos).
+  } {
+    apply rngl_of_pos_mul.
+  } {
+    rewrite (rngl_mul_opp_r Hop).
+    progress f_equal.
+    apply rngl_of_pos_mul.
+  }
+} {
+  destruct b as [| b| b]; cbn. {
+    symmetry; apply (rngl_mul_0_r Hos).
+  } {
+    rewrite (rngl_mul_opp_l Hop).
+    progress f_equal.
+    apply rngl_of_pos_mul.
+  } {
+    rewrite (rngl_mul_opp_opp Hop).
+    apply rngl_of_pos_mul.
+  }
+}
+Qed.
+
+Theorem rngl_of_Z_2 : rngl_of_Z 2 = 2%L.
+Proof.
+cbn; progress unfold rngl_of_pos.
+progress unfold Pos.to_nat; cbn.
+now rewrite rngl_add_0_r.
+Qed.
+
 Theorem rngl_of_Z_add :
   ∀ a b, rngl_of_Z (a + b) = (rngl_of_Z a + rngl_of_Z b)%L.
 Proof.
@@ -466,6 +526,25 @@ induction a as [| a| a]. {
         cbn.
         rewrite Z.succ_double_spec, Z.add_1_r.
         rewrite rngl_of_Z_succ.
+        rewrite rngl_of_pos_xI, rngl_of_pos_xO.
+        rewrite (rngl_add_comm _ 1).
+        rewrite <- (rngl_add_sub_assoc Hop).
+        progress f_equal.
+        rewrite rngl_of_Z_mul.
+        rewrite <- (rngl_mul_sub_distr_l Hop).
+        rewrite rngl_of_Z_2.
+        progress f_equal.
+        apply IHa.
+      }
+...
+Search (rngl_of_pos (_ * _)).
+  symmetry; apply (rngl_mul_0_l Hos).
+} {
+  destruct b as [| b| b]; cbn. {
+    symmetry; apply (rngl_mul_0_r Hos).
+  } {
+... ...
+        rewrite rngl_of_Z_mul.
 ...
         rewrite <- (rngl_add_sub_assoc Hop).
         progress f_equal.
