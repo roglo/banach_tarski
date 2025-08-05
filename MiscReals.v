@@ -1110,13 +1110,29 @@ rewrite Nat2Z.id.
 (* bon, allez, plein le cul *)
 ...
 *)
+(**)
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_of_nat.
+destruct m as [| m| m]. {
+  cbn in Hm |-*; rewrite rngl_of_pos_1 in Hm.
+  destruct n; [ easy | exfalso ].
+  apply rngl_nlt_ge in Hnr.
+  apply Hnr; clear Hnr.
+  rewrite rngl_of_nat_succ.
+  apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
+  apply (rngl_le_add_r Hor).
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+} {
+  cbn in Hm |-*.
+  progress unfold rngl_of_pos.
+  progress f_equal.
+..
 assert (Hzm : (0 <= m)%Z). {
+  apply rngl_of_Z_le_inj.
 Search rngl_of_Z.
 Search (rngl_of_Z _ ≤ _)%L.
-  apply rngl_of_Z_le_inj.
 ... ...
+*)
   specialize between_rngl_of_nat_and_succ as H1.
   specialize (H1 x x n (Z.to_nat m) (rngl_le_refl Hor _) (conj Hnr Hr1)).
   rewrite rngl_of_nat_add in H1.
