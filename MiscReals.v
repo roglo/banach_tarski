@@ -1007,28 +1007,23 @@ Theorem rngl_of_nat_Pos_to_nat :
   ∀ a, rngl_of_pos a = rngl_of_nat (Pos.to_nat a).
 Proof.
 intros.
-induction a as [a| a| ]; cbn. {
+destruct a as [a| a| ]; cbn. {
+  rewrite rngl_of_pos_xI.
   rewrite Pos2Nat.inj_xI.
   rewrite rngl_of_nat_succ.
-...
+  rewrite rngl_add_comm.
   progress f_equal.
   rewrite (rngl_of_nat_mul Hon Hos).
-  rewrite rngl_of_nat_2.
-  rewrite <- IHa.
-  clear IHa.
-  induction a as [a| a| ]; cbn; [ easy | easy | ].
-  symmetry; apply (rngl_mul_1_r Hon).
+  now rewrite rngl_of_nat_2.
 } {
+  rewrite rngl_of_pos_xO.
   rewrite Pos2Nat.inj_xO.
   rewrite (rngl_of_nat_mul Hon Hos).
-  rewrite rngl_of_nat_2.
-  rewrite <- IHa.
-  clear IHa.
-  induction a as [a| a| ]; cbn; [ easy | easy | ].
-  symmetry; apply (rngl_mul_1_r Hon).
+  now rewrite rngl_of_nat_2.
 } {
-  rewrite Pos2Nat.inj_1; symmetry.
-  apply rngl_of_nat_1.
+  rewrite Pos2Nat.inj_1.
+  rewrite rngl_of_nat_1.
+  apply rngl_of_pos_1.
 }
 Qed.
 
@@ -1121,7 +1116,6 @@ assert (Hzm : (0 <= m)%Z). {
 Search rngl_of_Z.
 Search (rngl_of_Z _ ≤ _)%L.
   apply rngl_of_Z_le_inj.
-  apply (Z_le_trans _
 ... ...
   specialize between_rngl_of_nat_and_succ as H1.
   specialize (H1 x x n (Z.to_nat m) (rngl_le_refl Hor _) (conj Hnr Hr1)).
