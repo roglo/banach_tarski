@@ -776,14 +776,25 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
     apply Pos.compare_le_iff.
     now apply IHa.
   } {
-(**)
-    rewrite rngl_of_pos_xI, rngl_of_pos_xO in Hab.
     progress unfold Pos.le; cbn.
     intros H.
     apply Pos.compare_cont_Gt_Gt in H.
     apply Pos.ge_le in H.
     apply Pos.le_nlt in H.
     apply H; clear H.
+(**)
+    rewrite rngl_of_pos_xI, rngl_of_pos_xO in Hab.
+    destruct (Pos_dec a b) as [[Hdab| Hdab]| Hdab]; [ easy | | ]. 2: {
+      subst b; exfalso.
+      apply rngl_nlt_ge in Hab.
+      apply Hab; clear Hab.
+      apply (rngl_lt_add_r Hos Hor).
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    }
+    exfalso.
+    apply Pos.lt_nle in Hdab.
+    apply Hdab; clear Hdab.
+    apply IHa.
 ...
     apply (rngl_add_le_mono_r Hop Hor) in Hab.
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
