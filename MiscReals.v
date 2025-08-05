@@ -837,6 +837,51 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
   apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   apply rngl_of_pos_pos.
 }
+destruct b as [b| b| ]. {
+  rewrite rngl_of_pos_xI, rngl_of_pos_xO in Hab.
+  progress unfold Pos.le; cbn.
+  intros H1.
+  apply Pos.compare_cont_Lt_Gt in H1.
+  apply Pos.gt_lt in H1.
+  apply Pos.lt_nle in H1.
+  apply H1; clear H1.
+  apply IHa.
+  clear IHa.
+  progress unfold rngl_of_pos in Hab |-*.
+  remember (Pos.to_nat a) as a'.
+  remember (Pos.to_nat b) as b'.
+  clear a b Heqa' Heqb'.
+  rename a' into a; rename b' into b.
+  revert b Hab.
+  induction a; intros; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
+  rewrite rngl_of_nat_succ in Hab |-*.
+  destruct b. {
+    exfalso; cbn in Hab.
+    apply rngl_nlt_ge in Hab.
+    apply Hab; clear Hab.
+    rewrite (rngl_mul_0_r Hos), rngl_add_0_l.
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+    rewrite <- rngl_add_assoc.
+    apply (rngl_lt_add_r Hos Hor).
+    apply (rngl_add_pos_nonneg Hor). {
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+    }
+    apply (rngl_mul_nonneg_nonneg Hos Hor). {
+      apply (rngl_0_le_2 Hon Hos Hor).
+    }
+    apply (rngl_of_nat_nonneg Hon Hos Hor).
+  }
+  rewrite rngl_of_nat_succ in Hab |-*.
+  apply (rngl_add_le_mono_l Hop Hor).
+  apply IHa.
+  do 2 rewrite rngl_mul_add_distr_l in Hab.
+  rewrite (rngl_mul_1_r Hon) in Hab.
+  rewrite <- (rngl_add_assoc _ _ 1) in Hab.
+  apply (rngl_add_le_mono_l Hop Hor) in Hab.
+  easy.
+} {
+...
+  eapply (rngl_le_trans Hor); [ apply Hab | ].
 ...
     apply (rngl_add_le_mono_r Hop Hor) in Hab.
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
