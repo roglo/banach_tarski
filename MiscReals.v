@@ -931,44 +931,23 @@ destruct a as [| a| a]. {
   exfalso.
   apply rngl_nlt_ge in Hab.
   apply Hab; clear Hab; cbn.
-...
-    apply rngl_of_pos_le_inj in Hab.
-    now subst.
-  } {
-    cbn in Hab.
-    specialize (rngl_of_pos_pos a) as H1.
-    rewrite Hab in H1.
-    exfalso; apply rngl_nle_gt in H1.
-    apply H1; clear H1.
-    rewrite <- (rngl_opp_0 Hop).
-    apply -> (rngl_opp_le_compat Hop Hor).
-    apply (rngl_lt_le_incl Hor).
-    apply rngl_of_pos_pos.
-  }
+  apply (rngl_le_lt_trans Hor _ 0); [ | apply rngl_of_pos_pos ].
+  apply (rngl_opp_le_compat Hop Hor).
+  rewrite (rngl_opp_0 Hop), (rngl_opp_involutive Hop).
+  apply (rngl_lt_le_incl Hor).
+  apply rngl_of_pos_pos.
 } {
+  destruct b as [| b| b]; cbn; [ easy | easy | ].
   cbn in Hab.
-  apply (f_equal rngl_opp) in Hab.
-  rewrite (rngl_opp_involutive Hop) in Hab.
-  rewrite <- rngl_of_Z_opp in Hab.
-  destruct b as [| b| b]; cbn. {
-    now apply rngl_of_pos_neq_0 in Hab.
-  } {
-    cbn in Hab.
-    specialize (rngl_of_pos_pos a) as H1.
-    rewrite Hab in H1.
-    exfalso; apply rngl_nle_gt in H1.
-    apply H1; clear H1.
-    rewrite <- (rngl_opp_0 Hop).
-    apply -> (rngl_opp_le_compat Hop Hor).
-    apply (rngl_lt_le_incl Hor).
-    apply rngl_of_pos_pos.
-  } {
-    cbn in Hab.
-    apply rngl_of_pos_inj in Hab.
-    now subst.
-  }
+  apply (rngl_opp_le_compat Hop Hor) in Hab.
+  apply Z.opp_le_mono; cbn.
+  progress unfold rngl_of_pos in Hab.
+  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in Hab.
+  progress unfold Z.le; cbn.
+  apply Pos.compare_le_iff.
+  now apply Pos2Nat.inj_le.
 }
-...
+Qed.
 
 Theorem rngl_of_Z_inj : ∀ a b, rngl_of_Z a = rngl_of_Z b → a = b.
 Proof.
@@ -979,61 +958,6 @@ apply Z.le_antisymm. {
 } {
   apply rngl_of_Z_le_inj.
   rewrite Hab; apply (rngl_le_refl Hor).
-}
-...
-intros * Hab.
-destruct a as [| a| a]. {
-  symmetry in Hab |-*; cbn in Hab.
-  destruct b as [| b| b]; cbn in Hab; [ easy | | ]. {
-    now apply rngl_of_pos_neq_0 in Hab.
-  } {
-    exfalso.
-    apply (f_equal rngl_opp) in Hab.
-    rewrite (rngl_opp_involutive Hop) in Hab.
-    rewrite (rngl_opp_0 Hop) in Hab.
-    now apply rngl_of_pos_neq_0 in Hab.
-  }
-} {
-  cbn in Hab.
-  destruct b as [| b| b]; cbn. {
-    now apply rngl_of_pos_neq_0 in Hab.
-  } {
-    cbn in Hab.
-    apply rngl_of_pos_inj in Hab.
-    now subst.
-  } {
-    cbn in Hab.
-    specialize (rngl_of_pos_pos a) as H1.
-    rewrite Hab in H1.
-    exfalso; apply rngl_nle_gt in H1.
-    apply H1; clear H1.
-    rewrite <- (rngl_opp_0 Hop).
-    apply -> (rngl_opp_le_compat Hop Hor).
-    apply (rngl_lt_le_incl Hor).
-    apply rngl_of_pos_pos.
-  }
-} {
-  cbn in Hab.
-  apply (f_equal rngl_opp) in Hab.
-  rewrite (rngl_opp_involutive Hop) in Hab.
-  rewrite <- rngl_of_Z_opp in Hab.
-  destruct b as [| b| b]; cbn. {
-    now apply rngl_of_pos_neq_0 in Hab.
-  } {
-    cbn in Hab.
-    specialize (rngl_of_pos_pos a) as H1.
-    rewrite Hab in H1.
-    exfalso; apply rngl_nle_gt in H1.
-    apply H1; clear H1.
-    rewrite <- (rngl_opp_0 Hop).
-    apply -> (rngl_opp_le_compat Hop Hor).
-    apply (rngl_lt_le_incl Hor).
-    apply rngl_of_pos_pos.
-  } {
-    cbn in Hab.
-    apply rngl_of_pos_inj in Hab.
-    now subst.
-  }
 }
 Qed.
 
@@ -1086,6 +1010,7 @@ intros.
 induction a as [a| a| ]; cbn. {
   rewrite Pos2Nat.inj_xI.
   rewrite rngl_of_nat_succ.
+...
   progress f_equal.
   rewrite (rngl_of_nat_mul Hon Hos).
   rewrite rngl_of_nat_2.
