@@ -760,6 +760,15 @@ apply (rngl_of_nat_inj Hon Hos Hch) in Hab.
 now apply Pos2Nat.inj in Hab.
 Qed.
 
+Theorem rngl_of_pos_le_1_l : ∀ a, (1 ≤ rngl_of_pos a)%L.
+Proof.
+intros.
+progress unfold rngl_of_pos.
+rewrite <- rngl_of_nat_1.
+apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+apply Pos2Nat_ge_1.
+Qed.
+
 Theorem rngl_of_pos_le_inj :
   ∀ a b, (rngl_of_pos a ≤ rngl_of_pos b)%L → (a <= b)%positive.
 Proof.
@@ -880,75 +889,25 @@ destruct b as [b| b| ]. {
   apply (rngl_add_le_mono_l Hop Hor) in Hab.
   easy.
 } {
-...
-  eapply (rngl_le_trans Hor); [ apply Hab | ].
-...
-    apply (rngl_add_le_mono_r Hop Hor) in Hab.
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
-      now apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-    }
-    progress unfold Pos.le; cbn.
-    apply Pos.compare_le_iff.
-    now apply IHa.
-...
-    cbn in Hab.
-    apply rngl_of_pos_2_le_inj; cbn.
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ | easy ].
-    now apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-  } {
-    cbn in Hab; exfalso.
-    apply rngl_nlt_ge in Hab.
-    apply Hab; clear Hab.
-    apply (rngl_lt_add_r Hos Hor).
-    apply rngl_of_pos_2_pos.
-  }
-} {
-  destruct b as [b| b| ]. {
-    cbn in Hab.
-    progress unfold Pos.le; cbn.
-    intros H1.
-    apply Pos.compare_cont_Lt_Gt in H1.
-    apply Pos.gt_lt in H1.
-    apply Pos.lt_nle in H1.
-    apply H1; clear H1.
-    apply rngl_of_pos_2_le_inj.
-    specialize (rngl_of_pos_2_ne_sub_1 b a) as H1.
-    apply (rngl_le_sub_le_add_l Hop Hor) in Hab.
-    apply (rngl_lt_eq_cases Hor) in Hab.
-    destruct Hab as [Hab| Hab]; [ | now symmetry in Hab ].
-    apply (rngl_lt_sub_lt_add_l Hop Hor) in Hab.
-    clear H1.
-...
-    eapply (rngl_le_trans Hor).
-Search rngl_of_pos_2.
-...
-    assert ((rngl_of_pos_2 a ≤ rngl_of_pos_2 (Pos.succ b))%L). {
-      rewrite rngl_of_pos_2_succ.
-      eapply (rngl_le_trans Hor); [ apply Hab | ].
-      apply (rngl_add_le_mono_r Hop Hor).
-      apply (rngl_1_le_2 Hon Hos Hor).
-    }
-Search (rngl_of_pos_2 (Pos.succ _)).
-Search (rngl_of_pos_2 _ ≤ _)%L.
-...
-    apply (rngl_add_le_mono_l Hop Hor) in Hab.
-    apply rngl_of_pos_2_le_inj; cbn.
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii).
+  do 2 rewrite rngl_of_pos_xO in Hab.
+  apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-    now apply (rngl_add_le_mono_l Hop Hor).
-  } {
-    cbn in Hab.
-    apply rngl_of_pos_2_le_inj; cbn.
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ | easy ].
-    now apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-  } {
-    cbn in Hab; exfalso.
-    apply rngl_nlt_ge in Hab.
-    apply Hab; clear Hab.
-    apply (rngl_lt_add_r Hos Hor).
-    apply rngl_of_pos_2_pos.
   }
-...
+  progress unfold Pos.le; cbn.
+  apply Pos.compare_le_iff.
+  now apply IHa.
+}
+exfalso.
+apply rngl_nlt_ge in Hab.
+apply Hab; clear Hab.
+rewrite rngl_of_pos_xO.
+rewrite rngl_of_pos_1.
+rewrite (rngl_mul_2_l Hon).
+apply (rngl_le_lt_trans Hor _ (rngl_of_pos a)).
+apply rngl_of_pos_le_1_l.
+apply (rngl_lt_add_l Hos Hor).
+apply rngl_of_pos_pos.
+Qed.
 
 Theorem rngl_of_Z_le_inj : ∀ a b, (rngl_of_Z a ≤ rngl_of_Z b)%L → (a <= b)%Z.
 Proof.
@@ -966,9 +925,12 @@ destruct a as [| a| a]. {
     apply rngl_of_pos_pos.
   } {
     cbn in Hab.
-Search (Z.pos _ <= Z.pos _)%Z.
-apply Pos2Z.pos_le_pos.
-Search (rngl_of_pos _ ≤ _)%L.
+    apply Pos2Z.pos_le_pos.
+    now apply rngl_of_pos_le_inj.
+  }
+  exfalso.
+  apply rngl_nlt_ge in Hab.
+  apply Hab; clear Hab; cbn.
 ...
     apply rngl_of_pos_le_inj in Hab.
     now subst.
