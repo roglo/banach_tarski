@@ -42,6 +42,28 @@ Definition vec3_sub a b :=
     (v_y a - v_y b)
     (v_z a - v_z b).
 
+Theorem vec3_eq_dec :
+  ∀ (eq_dec : ∀ a b : T, {a = b} + {a ≠ b}) (v v' : vector3 T),
+  {v = v'} + {v ≠ v'}.
+Proof.
+intros.
+destruct v as (x, y, z).
+destruct v' as (x', y', z').
+destruct (eq_dec x x') as [Hx| Hx]. {
+  destruct (eq_dec y y') as [Hy| Hy]. {
+    destruct (eq_dec z z') as [Hz| Hz]. {
+      now subst; left.
+    }
+    right; subst.
+    now intros H; injection H; clear H; intros H.
+  }
+  right; subst.
+  now intros H; injection H; clear H; intros H.
+}
+right; subst.
+now intros H; injection H; clear H; intros H.
+Qed.
+
 Notation "- a" := (vec3_opp a) : vec_scope.
 Notation "a - b" := (vec3_sub a b) : vec_scope.
 
@@ -104,6 +126,29 @@ Definition quat_opt_inv_or_quot :
   | None => None
   end.
 
+Theorem quat_eq_dec :
+  ∀ (eq_dec : ∀ a b : T, {a = b} + {a ≠ b}) (q q' : quaternion T),
+  {q = q'} + {q ≠ q'}.
+Proof.
+intros.
+destruct q as (re, im).
+destruct q' as (re', im').
+destruct (eq_dec re re') as [Hre| Hre]. {
+  destruct (vec3_eq_dec eq_dec im im') as [Him| Him]. {
+    now subst; left.
+  }
+  now right; intros H; injection H; clear H; intros H1 H2.
+}
+now right; intros H; injection H; clear H; intros H1 H2.
+Qed.
+
+Definition quat_opt_eq_dec :
+  option (∀ a b : quaternion T, {a = b} + {a ≠ b}) :=
+  match rngl_opt_eq_dec T with
+  | Some eq_dec => Some (quat_eq_dec eq_dec)
+  | None => None
+  end.
+
 ...
 
 Instance quat_ring_like_op : ring_like_op (quaternion T) :=
@@ -114,7 +159,7 @@ Instance quat_ring_like_op : ring_like_op (quaternion T) :=
      rngl_opt_opp_or_subt := quat_opt_opp_or_subt;
      rngl_opt_inv_or_quot := quat_opt_inv_or_quot;
      rngl_opt_is_zero_divisor := None;
-     rngl_opt_eq_dec := Some 0;
+     rngl_opt_eq_dec := quat_opt_eq_dec;
      rngl_opt_leb := Some Nat.leb |}.
 
 End a.
