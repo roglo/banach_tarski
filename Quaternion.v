@@ -142,14 +142,15 @@ destruct (eq_dec re re') as [Hre| Hre]. {
 now right; intros H; injection H; clear H; intros H1 H2.
 Qed.
 
-Definition quat_opt_eq_dec :
-  option (∀ a b : quaternion T, {a = b} + {a ≠ b}) :=
+Definition quat_opt_eq_dec : option (∀ a b, {a = b} + {a ≠ b}) :=
   match rngl_opt_eq_dec T with
   | Some eq_dec => Some (quat_eq_dec eq_dec)
   | None => None
   end.
 
-...
+Definition quat_opt_leb : option (quaternion T → quaternion T → bool) :=
+  (* no order in quaternions, like for complex numbers *)
+  None.
 
 Instance quat_ring_like_op : ring_like_op (quaternion T) :=
   {| rngl_zero := 0%quat;
@@ -160,12 +161,12 @@ Instance quat_ring_like_op : ring_like_op (quaternion T) :=
      rngl_opt_inv_or_quot := quat_opt_inv_or_quot;
      rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := quat_opt_eq_dec;
-     rngl_opt_leb := Some Nat.leb |}.
+     rngl_opt_leb := quat_opt_leb |}.
 
 End a.
 
 Notation "a +ℹ b +𝐣 c +𝐤 d" :=
-  (mk_q a (mk_v b c d)) (at level 50, b, c, d at level 0) : quat_scope.
+  (mk_quat a (mk_v b c d)) (at level 50, b, c, d at level 0) : quat_scope.
 Notation "a * b" := (quat_mul a b) : quat_scope.
 
 (*
