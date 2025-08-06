@@ -53,9 +53,9 @@ Definition quat_add a b :=
     (q_re a + q_re b)
     (vec3_add (q_im a) (q_im b)).
 
-Definition quat_mul (u v : quaternion T) :=
-  let '(mk_quat a (mk_v b c d)) := u in
-  let '(mk_quat a' (mk_v b' c' d')) := v in
+Definition quat_mul (q q' : quaternion T) :=
+  let '(mk_quat a (mk_v b c d)) := q in
+  let '(mk_quat a' (mk_v b' c' d')) := q' in
   mk_quat
     (a * a' - b * b' - c * c' - d * d')
     (mk_v
@@ -67,15 +67,15 @@ Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
 Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
 
 Definition quat_conj a := mk_quat (q_re a) (- q_im a).
-Definition quat_norm_squ u :=
-  let '(mk_quat a (mk_v b c d)) := u in
+Definition quat_norm_squ q :=
+  let '(mk_quat a (mk_v b c d)) := q in
   (a² + b² + c² + d²)%L.
 
-Definition quat_ext_mul h u :=
-  let '(mk_quat a (mk_v b c d)) := u in
+Definition quat_ext_mul h q :=
+  let '(mk_quat a (mk_v b c d)) := q in
   mk_quat (h * a) (mk_v (h * b) (h * c) (h * d)).
-Definition quat_ext_div u h :=
-  let '(mk_quat a (mk_v b c d)) := u in
+Definition quat_ext_div q h :=
+  let '(mk_quat a (mk_v b c d)) := q in
   mk_quat (a / h) (mk_v (b / h) (c / h) (d / h)).
 
 Definition quat_inv a := quat_ext_div (quat_conj a) (quat_norm_squ a).
