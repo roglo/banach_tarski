@@ -107,6 +107,7 @@ Notation "a +ℹ b +𝐣 c +𝐤 d" :=
 
 Notation "0" := (quat_zero) : quat_scope.
 Notation "1" := (quat_one) : quat_scope.
+Notation "a + b" := (quat_add a b) : quat_scope.
 Notation "a * b" := (quat_mul a b) : quat_scope.
 
 Definition quat_opt_opp_or_subt :=
@@ -162,6 +163,65 @@ Instance quat_ring_like_op : ring_like_op (quaternion T) :=
      rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := quat_opt_eq_dec;
      rngl_opt_leb := quat_opt_leb |}.
+
+Context {rp : ring_like_prop T}.
+
+Theorem quat_add_comm : ∀ a b : quaternion T, (a + b)%L = (b + a)%L.
+Proof.
+intros.
+destruct a as (a, (x, y, z)).
+destruct b as (a', (x', y', z')); cbn.
+progress unfold quat_add; cbn.
+f_equal; [ apply rngl_add_comm | ].
+progress unfold vec3_add; cbn.
+f_equal; apply rngl_add_comm.
+Qed.
+
+Theorem quat_add_assoc :
+  ∀ a b c : quaternion T, (a + (b + c))%L = (a + b + c)%L.
+Proof.
+intros.
+destruct a as (a, (x, y, z)).
+destruct b as (a', (x', y', z')).
+destruct c as (a'', (x'', y'', z'')); cbn.
+progress unfold quat_add; cbn.
+f_equal; [ apply rngl_add_assoc | ].
+progress unfold vec3_add; cbn.
+f_equal; apply rngl_add_assoc.
+Qed.
+
+Theorem quat_add_0_l : ∀ a : quaternion T, (0 + a)%L = a.
+Proof.
+...
+
+(**) From Stdlib Require Import Arith. (**)
+Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
+  {| rngl_mul_is_comm := false;
+     rngl_is_archimedean := rngl_is_archimedean T;
+     rngl_is_alg_closed := false;
+     rngl_characteristic := rngl_characteristic T;
+     rngl_add_comm := quat_add_comm;
+     rngl_add_assoc := quat_add_assoc;
+     rngl_add_0_l := quat_add_0_l;
+     rngl_mul_assoc := Nat.mul_assoc;
+     rngl_opt_mul_1_l := Nat.mul_1_l;
+     rngl_mul_add_distr_l := Nat.mul_add_distr_l;
+     rngl_opt_mul_comm := Nat.mul_comm;
+     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_add_distr_r := NA;
+     rngl_opt_add_opp_diag_l := NA;
+     rngl_opt_add_sub := Nat.add_sub;
+     rngl_opt_sub_add_distr := Nat.sub_add_distr;
+     rngl_opt_sub_0_l := Nat.sub_0_l;
+     rngl_opt_mul_inv_diag_l := NA;
+     rngl_opt_mul_inv_diag_r := NA;
+     rngl_opt_mul_div := 42;
+     rngl_opt_mul_quot_r := NA;
+     rngl_opt_integral := 42;
+     rngl_opt_alg_closed := NA;
+     rngl_opt_characteristic_prop := 42;
+     rngl_opt_ord := 42;
+     rngl_opt_archimedean := 42 |}.
 
 End a.
 
