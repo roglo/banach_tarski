@@ -11,13 +11,13 @@ Delimit Scope vec_scope with vec.
 Delimit Scope quat_scope with quat.
 
 Class vector3 T := mk_v { v_x : T; v_y : T; v_z : T }.
-Class quaternion T := mk_q { q_re : T; q_im : vector3 T }.
+Class quaternion T := mk_quat { q_re : T; q_im : vector3 T }.
 
 Bind Scope vec_scope with vector3.
 Bind Scope quat_scope with quaternion.
 
 Arguments mk_v {T} (v_x v_y v_z)%_L.
-Arguments mk_q {T} q_re%_L q_im%_vec.
+Arguments mk_quat {T} q_re%_L q_im%_vec.
 Arguments v_x {T} v%_vec : rename.
 Arguments v_y {T} v%_vec : rename.
 Arguments v_z {T} v%_vec : rename.
@@ -35,28 +35,82 @@ Definition vec3_add a b :=
     (v_y a + v_y b)
     (v_z a + v_z b).
 
+Definition vec3_opp a := mk_v (- v_x a) (- v_y a) (- v_z a).
+Definition vec3_sub a b :=
+  mk_v
+    (v_x a - v_x b)
+    (v_y a - v_y b)
+    (v_z a - v_z b).
+
+Notation "- a" := (vec3_opp a) : vec_scope.
+Notation "a - b" := (vec3_sub a b) : vec_scope.
+
+Definition quat_zero := (mk_quat 0 (mk_v 0 0 0))%L.
+Definition quat_one := (mk_quat 1 (mk_v 0 0 0))%L.
+
 Definition quat_add a b :=
-  mk_q
+  mk_quat
     (q_re a + q_re b)
     (vec3_add (q_im a) (q_im b)).
 
 Definition quat_mul (u v : quaternion T) :=
-  let '(mk_q a (mk_v b c d)) := u in
-  let '(mk_q a' (mk_v b' c' d')) := v in
-  mk_q
+  let '(mk_quat a (mk_v b c d)) := u in
+  let '(mk_quat a' (mk_v b' c' d')) := v in
+  mk_quat
     (a * a' - b * b' - c * c' - d * d')
     (mk_v
       (a * b' + b * a' + c * d' - d * c')
       (a * c' - b * d' + c * a' + d * b')
       (a * d' + b * c' - c * b' + d * a')).
 
+Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
+Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
+
+Notation "a +ℹ b +𝐣 c +𝐤 d" :=
+  (mk_quat a (mk_v b c d)) (at level 50, b, c, d at level 0) : quat_scope.
+
+Notation "0" := (quat_zero) : quat_scope.
+Notation "1" := (quat_one) : quat_scope.
+Notation "a * b" := (quat_mul a b) : quat_scope.
+
+Definition quat_opt_opp_or_subt :=
+  match rngl_opt_opp_or_subt T with
+  | Some (inl _) => Some (inl quat_opp)
+  | Some (inr _) => Some (inr quat_subt)
+  | None => None
+  end.
+
+...
+
+Definition quat_opt_inv_or_quot :
+  option
+    ((quaternion T → quaternion T) +
+     (quaternion T → quaternion T → quaternion T)) :=
+  match rngl_opt_inv_or_quot T with
+  | Some (inl _) => Some (inl quat_inv)
+  | Some (inr _) => Some (inr quat_quot)
+  | None => None
+  end.
+....
+
+Instance quat_ring_like_op : ring_like_op (quaternion T) :=
+  {| rngl_zero := 0%quat;
+     rngl_add := quat_add;
+     rngl_mul := quat_mul;
+     rngl_opt_one := Some 1%quat;
+     rngl_opt_opp_or_subt := quat_opt_opp_or_subt;
+     rngl_opt_inv_or_quot := false;
+     rngl_opt_is_zero_divisor := None;
+     rngl_opt_eq_dec := Some 0;
+     rngl_opt_leb := Some Nat.leb |}.
+
 End a.
 
 Notation "a +ℹ b +𝐣 c +𝐤 d" :=
   (mk_q a (mk_v b c d)) (at level 50, b, c, d at level 0) : quat_scope.
-
 Notation "a * b" := (quat_mul a b) : quat_scope.
 
+(*
 From Stdlib Require Import ZArith.
 Require Import RingLike.Z_algebra.
 Open Scope Z_scope.
@@ -66,4 +120,4 @@ Compute (
   let j := mk_q 0 (mk_v 0 1 0) in
   let k := mk_q 0 (mk_v 0 0 1) in
   (j * k)%quat).
-
+*)
