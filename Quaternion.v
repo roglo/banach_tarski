@@ -66,6 +66,20 @@ Definition quat_mul (u v : quaternion T) :=
 Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
 Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
 
+Definition quat_conj a := mk_quat (q_re a) (- q_im a).
+Definition quat_norm_squ u :=
+  let '(mk_quat a (mk_v b c d)) := u in
+  (a² + b² + c² + d²)%L.
+
+Definition quat_ext_mul h u :=
+  let '(mk_quat a (mk_v b c d)) := u in
+  mk_quat (h * a) (mk_v (h * b) (h * c) (h * d)).
+Definition quat_ext_div u h :=
+  let '(mk_quat a (mk_v b c d)) := u in
+  mk_quat (a / h) (mk_v (b / h) (c / h) (d / h)).
+
+Definition quat_inv a := quat_ext_div (quat_conj a) (quat_norm_squ a).
+
 Notation "a +ℹ b +𝐣 c +𝐤 d" :=
   (mk_quat a (mk_v b c d)) (at level 50, b, c, d at level 0) : quat_scope.
 
@@ -80,18 +94,17 @@ Definition quat_opt_opp_or_subt :=
   | None => None
   end.
 
-...
-
 Definition quat_opt_inv_or_quot :
   option
     ((quaternion T → quaternion T) +
      (quaternion T → quaternion T → quaternion T)) :=
   match rngl_opt_inv_or_quot T with
   | Some (inl _) => Some (inl quat_inv)
-  | Some (inr _) => Some (inr quat_quot)
+  | Some (inr _) => None
   | None => None
   end.
-....
+
+...
 
 Instance quat_ring_like_op : ring_like_op (quaternion T) :=
   {| rngl_zero := 0%quat;
@@ -99,7 +112,7 @@ Instance quat_ring_like_op : ring_like_op (quaternion T) :=
      rngl_mul := quat_mul;
      rngl_opt_one := Some 1%quat;
      rngl_opt_opp_or_subt := quat_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := false;
+     rngl_opt_inv_or_quot := quat_opt_inv_or_quot;
      rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := Some 0;
      rngl_opt_leb := Some Nat.leb |}.
