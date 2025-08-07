@@ -398,12 +398,48 @@ progress unfold mat2_det; cbn.
 progress unfold quat_add; cbn.
 f_equal. {
   do 4 rewrite rngl_mul_add_distr_l.
-...
-f_equal; [ apply rngl_mul_add_distr_l | ].
+  rewrite (rngl_add_sub_assoc Hop).
+  do 11 ring_light_step.
+  do 2 f_equal.
+  progress do 2 rewrite (rngl_sub_sub_swap Hop _ (z * z')).
+  progress do 2 f_equal.
+  progress do 1 rewrite (rngl_sub_sub_swap Hop _ (y * y')).
+  easy.
+}
 progress unfold vec3_add; cbn.
-f_equal; apply rngl_add_assoc.
+do 12 rewrite rngl_mul_add_distr_l.
+f_equal. {
+  do 2 ring_light_step.
+  do 4 rewrite rngl_add_assoc.
+  do 4 rewrite (rngl_add_sub_assoc Hop).
+  do 15 ring_light_step.
+  f_equal.
+  progress do 2 rewrite (rngl_add_add_swap _ (y * z')).
+  progress do 2 f_equal.
+  progress do 1 rewrite (rngl_add_add_swap _ (a * x'')).
+  easy.
+} {
+  do 2 ring_light_step.
+  do 4 rewrite rngl_add_assoc.
+  do 4 rewrite (rngl_add_sub_assoc Hop).
+  do 15 ring_light_step.
+  f_equal.
+  progress do 2 rewrite (rngl_add_add_swap _ (z * x')).
+  progress do 2 f_equal.
+  progress do 1 rewrite (rngl_add_add_swap _ (a * y'')).
+  easy.
+} {
+  do 2 ring_light_step.
+  do 4 rewrite rngl_add_assoc.
+  do 4 rewrite (rngl_add_sub_assoc Hop).
+  do 15 ring_light_step.
+  f_equal.
+  progress do 2 rewrite (rngl_add_add_swap _ (x * y')).
+  progress do 2 f_equal.
+  progress do 1 rewrite (rngl_add_add_swap _ (a * z'')).
+  easy.
+}
 Qed.
-...
 
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
@@ -417,8 +453,8 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_mul_assoc := quat_mul_assoc;
      rngl_opt_mul_1_l := quat_opt_mul_1_l;
      rngl_mul_add_distr_l := quat_mul_add_distr_l;
-     rngl_opt_mul_comm := Nat.mul_comm;
-     rngl_opt_mul_1_r := NA;
+     rngl_opt_mul_comm := NA;
+     rngl_opt_mul_1_r := 32;
      rngl_opt_mul_add_distr_r := NA;
      rngl_opt_add_opp_diag_l := NA;
      rngl_opt_add_sub := Nat.add_sub;
