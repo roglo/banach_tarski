@@ -113,6 +113,12 @@ Notation "1" := (quat_one) : quat_scope.
 Notation "a + b" := (quat_add a b) : quat_scope.
 Notation "a * b" := (quat_mul a b) : quat_scope.
 
+Definition quat_opt_one :=
+  match rngl_opt_one T with
+  | Some _ => Some 1%quat
+  | None => None
+  end.
+
 Definition quat_opt_opp_or_subt :=
   match rngl_opt_opp_or_subt T with
   | Some (inl _) => Some (inl quat_opp)
@@ -160,7 +166,7 @@ Instance quat_ring_like_op : ring_like_op (quaternion T) :=
   {| rngl_zero := 0%quat;
      rngl_add := quat_add;
      rngl_mul := quat_mul;
-     rngl_opt_one := Some 1%quat;
+     rngl_opt_one := quat_opt_one;
      rngl_opt_opp_or_subt := quat_opt_opp_or_subt;
      rngl_opt_inv_or_quot := quat_opt_inv_or_quot;
      rngl_opt_is_zero_divisor := None;
@@ -344,6 +350,42 @@ f_equal. {
 }
 Qed.
 
+Theorem quat_opt_mul_1_l :
+  if rngl_has_1 (quaternion T) then ∀ a : quaternion T, (1 * a)%L = a
+  else not_applicable.
+Proof.
+remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
+symmetry in Honq.
+destruct onq; [ | easy ].
+intros.
+progress unfold rngl_has_1 in Honq; cbn in Honq.
+progress unfold quat_opt_one in Honq; cbn in Honq.
+progress unfold rngl_one; cbn.
+progress unfold quat_opt_one.
+remember (rngl_has_1 T) as on eqn:Hon.
+symmetry in Hon.
+generalize Hon; intros H.
+progress unfold rngl_has_1 in H.
+remember (rngl_opt_one T) as oon eqn:Hoon.
+symmetry in Hoon.
+destruct oon; [ | easy ].
+destruct on; [ | easy ].
+clear Honq H.
+destruct a as (a, (x, y, z)); cbn.
+f_equal. {
+  do 2 rewrite <- rngl_mul_add_distr_l.
+  rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_sub_0_r Hos).
+  apply (rngl_mul_1_l Hon).
+}
+progress unfold vec2_scal_mul, mat2_det.
+do 3 rewrite (rngl_mul_1_l Hon).
+do 4 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_diag Hos).
+do 6 rewrite rngl_add_0_r.
+easy.
+Qed.
+
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
@@ -354,7 +396,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_add_assoc := quat_add_assoc;
      rngl_add_0_l := quat_add_0_l;
      rngl_mul_assoc := quat_mul_assoc;
-     rngl_opt_mul_1_l := Nat.mul_1_l;
+     rngl_opt_mul_1_l := quat_opt_mul_1_l;
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := NA;
@@ -372,6 +414,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_characteristic_prop := 42;
      rngl_opt_ord := 42;
      rngl_opt_archimedean := 42 |}.
+...
 
 End a.
 
