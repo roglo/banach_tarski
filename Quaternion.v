@@ -265,7 +265,7 @@ f_equal. {
   remember (_ * _ * _)%L as v15 eqn:Hv in |-*; clear Hv.
   remember (_ * _ * _)%L as v16 eqn:Hv in |-*; clear Hv.
 (*
-  ring
+  ring.
 *)
   clear - Hop.
 ...
