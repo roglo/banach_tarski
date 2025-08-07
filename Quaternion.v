@@ -75,15 +75,17 @@ Definition quat_add a b :=
     (q_re a + q_re b)
     (vec3_add (q_im a) (q_im b)).
 
+Definition vec2_scal_mul a b a' b' := (a * b' + b * a')%L.
+
 Definition quat_mul (q q' : quaternion T) :=
-  let '(mk_quat a (mk_v b c d)) := q in
-  let '(mk_quat a' (mk_v b' c' d')) := q' in
+  let '(mk_quat a (mk_v x y z)) := q in
+  let '(mk_quat a' (mk_v x' y' z')) := q' in
   mk_quat
-    (a * a' - (b * b' + c * c' + d * d'))
+    (a * a' - (x * x' + y * y' + z * z'))
     (mk_v
-      ((a * b' + b * a') + (c * d' - d * c'))
-      ((a * c' + c * a') + (d * b' - b * d'))
-      ((a * d' + d * a') + (b * c' - c * b'))).
+      (vec2_scal_mul a x a' x' + (y * z' - z * y'))
+      (vec2_scal_mul a y a' y' + (z * x' - x * z'))
+      (vec2_scal_mul a z a' z' + (x * y' - y * x'))).
 
 Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
 Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
@@ -239,12 +241,14 @@ cbn - [ quat_mul ].
    élément neutre (Hon), alors que ce n'est peut-être pas nécessaire
    pour quat_mul_assoc.
 cbn.
+progress unfold vec2_scal_mul.
 f_equal; [ ring | ].
 f_equal; ring.
    puis, on peut faire "Qed".
 *)
 (* tentative de le démontrer sans utiliser "ring" *)
 cbn.
+progress unfold vec2_scal_mul.
 do 24 rewrite rngl_mul_add_distr_l.
 do 24 rewrite rngl_mul_add_distr_r.
 do 24 rewrite rngl_mul_assoc.
