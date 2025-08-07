@@ -211,6 +211,31 @@ Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 
+Ltac ring_light_step :=
+  match goal with
+(*
+  | |- context[rngl_add ?x 0] => rewrite (rngl_add_0_l x)
+  | |- context[rngl_add 0 ?x] => rewrite <- (rngl_add_0_l x)
+  | |- context[rngl_add ?x (rngl_opp ?x)] => rewrite (rngl_add_opp_l x)
+  | |- context[rngl_add (rngl_opp ?x) ?x] => rewrite <- (rngl_add_opp_l x)
+  | |- context[rngl_add ?x ?y] => rewrite (rngl_add_comm x y)
+  | |- context[rngl_add ?x (rngl_add ?y ?z)] =>
+      rewrite <- (rngl_add_assoc x y z)
+*)
+  | |- context[rngl_sub (rngl_add ?x ?y) ?z] =>
+      rewrite (rngl_add_sub_swap Hop x y z)
+  | |- context[rngl_sub ?x (rngl_add ?y ?z)] =>
+      rewrite (rngl_sub_add_distr Hos x y z)
+  | |- context[rngl_sub ?x (rngl_sub ?y ?z)] =>
+      rewrite (rngl_sub_sub_distr Hop x y z)
+(*
+  | |- context[rngl_mul ?x (rngl_add ?y ?z)] =>
+      rewrite (rngl_mul_add_distr_l x y z)
+  | |- context[rngl_mul (rngl_add ?x ?y) ?z] =>
+      rewrite (rngl_mul_add_distr_r x y z)
+*)
+  end.
+
 Ltac toto :=
   remember 42 as v eqn:Hv_; remember 42 as v0 eqn:Hv0;
   do 16 (
@@ -252,6 +277,9 @@ do 40 rewrite rngl_mul_assoc.
    de voir si ça se démontre *)
 f_equal. {
   toto.
+(**)
+  progress do 44 ring_light_step.
+...
   ring.
 }
 f_equal. {
