@@ -75,7 +75,8 @@ Definition quat_add a b :=
     (q_re a + q_re b)
     (vec3_add (q_im a) (q_im b)).
 
-Definition vec2_scal_mul a b a' b' := (a * b' + b * a')%L.
+Definition vec2_scal_mul x y x' y' := (x * y' + y * x')%L.
+Definition mat2_det y z y' z' := (y * z' - z * y')%L.
 
 Definition quat_mul (q q' : quaternion T) :=
   let '(mk_quat a (mk_v x y z)) := q in
@@ -83,9 +84,9 @@ Definition quat_mul (q q' : quaternion T) :=
   mk_quat
     (a * a' - (x * x' + y * y' + z * z'))
     (mk_v
-      (vec2_scal_mul a x a' x' + (y * z' - z * y'))
-      (vec2_scal_mul a y a' y' + (z * x' - x * z'))
-      (vec2_scal_mul a z a' z' + (x * y' - y * x'))).
+      (vec2_scal_mul a x a' x' + mat2_det y z y' z')
+      (vec2_scal_mul a y a' y' + mat2_det z x z' x')
+      (vec2_scal_mul a z a' z' + mat2_det x y x' y')).
 
 Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
 Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
@@ -238,6 +239,7 @@ f_equal; ring.
 (* tentative de le démontrer sans utiliser "ring" *)
 cbn.
 progress unfold vec2_scal_mul.
+progress unfold mat2_det.
 do 24 rewrite rngl_mul_add_distr_l.
 do 24 rewrite rngl_mul_add_distr_r.
 do 24 rewrite rngl_mul_assoc.
