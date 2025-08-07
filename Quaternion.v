@@ -203,11 +203,7 @@ progress unfold vec3_add; cbn.
 f_equal; apply rngl_add_0_l.
 Qed.
 
-From Stdlib Require Import Ring.
-Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hop : rngl_has_opp T = true}.
-Context {Hon : rngl_has_1 T = true}.
-Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 
@@ -236,21 +232,9 @@ destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')).
 cbn - [ quat_mul ].
-(* la tactique ring, ça résout le problème, mais ça impose que la
-   multiplication soit commutative dans T (Hic) et qu'elle ait un
-   élément neutre (Hon), alors que ce n'est peut-être pas nécessaire
-   pour quat_mul_assoc.
-cbn.
-progress unfold vec2_scal_mul.
-f_equal; [ ring | ].
-f_equal; ring.
-   puis, on peut faire "Qed".
-*)
-(* tentative de le démontrer sans utiliser "ring" *)
 cbn.
 progress unfold vec2_scal_mul.
 progress unfold mat2_det.
-(**)
 do 24 rewrite rngl_mul_add_distr_l.
 do 24 rewrite rngl_mul_add_distr_r.
 do 24 rewrite rngl_mul_assoc.
@@ -259,8 +243,6 @@ do 16 rewrite (rngl_mul_sub_distr_r Hop).
 do 8 rewrite rngl_mul_add_distr_l.
 do 8 rewrite rngl_mul_add_distr_r.
 do 40 rewrite rngl_mul_assoc.
-(* bon, ci-dessous, je mets des "ring" quand même juste histoire
-   de voir si ça se démontre *)
 f_equal. {
   group_by_3_factors.
   progress do 44 ring_light_step.
@@ -311,18 +293,56 @@ f_equal. {
   easy.
 } {
   group_by_3_factors.
-...
-  ring.
+  do 12 rewrite (rngl_add_sub_assoc Hop).
+  progress do 36 ring_light_step.
+  do 6 rewrite rngl_add_assoc.
+  progress do 6 rewrite (rngl_add_add_swap _ v16).
+  progress f_equal.
+  progress do 5 rewrite (rngl_add_add_swap _ v11).
+  progress f_equal.
+  progress do 2 rewrite (rngl_add_add_swap _ v10).
+  progress do 2 f_equal.
+  progress do 1 rewrite (rngl_add_add_swap _ v5).
+  progress do 3 f_equal.
+  progress do 7 rewrite (rngl_sub_sub_swap Hop _ v15).
+  progress f_equal.
+  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v14).
+  progress f_equal.
+  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v13).
+  progress f_equal.
+  progress do 3 rewrite (rngl_sub_sub_swap Hop _ v12).
+  progress do 2 f_equal.
+  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v7).
+  progress f_equal.
+  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v6).
+  easy.
 } {
   group_by_3_factors.
-(*
-  ============================
-  (v1 + v2 + (v3 - v4) + (v5 - (v6 + v7 + v8)) + (v9 + v10 + (v11 - v12) - (v13 + v14 + (v15 - v16))))%L =
-  (v1 - (v12 + v15 + v8) + (v2 + v5 + (v10 - v14)) + (v3 + v9 + (v16 - v7) - (v4 + v13 + (v6 - v11))))%L
-*)
-  ring.
+  do 12 rewrite (rngl_add_sub_assoc Hop).
+  progress do 36 ring_light_step.
+  do 6 rewrite rngl_add_assoc.
+  progress do 6 rewrite (rngl_add_add_swap _ v16).
+  progress f_equal.
+  progress do 5 rewrite (rngl_add_add_swap _ v11).
+  progress f_equal.
+  progress do 2 rewrite (rngl_add_add_swap _ v10).
+  progress do 2 f_equal.
+  progress do 1 rewrite (rngl_add_add_swap _ v5).
+  progress do 3 f_equal.
+  progress do 6 rewrite (rngl_sub_sub_swap Hop _ v15).
+  progress f_equal.
+  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v14).
+  progress f_equal.
+  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v13).
+  progress f_equal.
+  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v12).
+  progress f_equal.
+  progress do 3 rewrite (rngl_sub_sub_swap Hop _ v8).
+  progress f_equal.
+  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v7).
+  easy.
 }
-...
+Qed.
 
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
