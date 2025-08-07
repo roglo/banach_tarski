@@ -81,9 +81,9 @@ Definition quat_mul (q q' : quaternion T) :=
   mk_quat
     (a * a' - (b * b' + c * c' + d * d'))
     (mk_v
-      (a * b' + b * a' + c * d' - d * c')
-      (a * c' - b * d' + c * a' + d * b')
-      (a * d' + b * c' - c * b' + d * a')).
+      ((a * b' + b * a') + (c * d' - d * c'))
+      ((a * c' + c * a') + (d * b' - b * d'))
+      ((a * d' + d * a') + (b * c' - c * b'))).
 
 Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
 Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
@@ -245,47 +245,42 @@ f_equal; ring.
 *)
 (* tentative de le démontrer sans utiliser "ring" *)
 cbn.
-do 12 rewrite rngl_mul_add_distr_l.
-do 12 rewrite rngl_mul_add_distr_r.
-do 12 rewrite rngl_mul_assoc.
+do 24 rewrite rngl_mul_add_distr_l.
+do 24 rewrite rngl_mul_add_distr_r.
+do 24 rewrite rngl_mul_assoc.
 do 16 rewrite (rngl_mul_sub_distr_l Hop).
 do 16 rewrite (rngl_mul_sub_distr_r Hop).
-do 20 rewrite rngl_mul_add_distr_l.
-do 20 rewrite rngl_mul_add_distr_r.
-do 52 rewrite rngl_mul_assoc.
+do 8 rewrite rngl_mul_add_distr_l.
+do 8 rewrite rngl_mul_add_distr_r.
+do 40 rewrite rngl_mul_assoc.
 (* bon, ci-dessous, je mets des "ring" quand même juste histoire
    de voir si ça se démontre *)
 f_equal. {
   toto.
-(*
-  ============================
-  (v1 - (v2 + v3 + v4) - (v5 + v6 + v7 - v8 + (v9 - v10 + v11 + v12) + (v13 + v14 - v15 + v16)))%L =
-  (v1 - (v6 + v11 + v16) - (v2 + v5 + v12 - v15 + (v3 - v8 + v9 + v14) + (v4 + v7 - v10 + v13)))%L
-*)
   ring.
 }
 f_equal. {
   toto.
 (*
   ============================
-  (v1 + v2 + v3 - v4 + (v5 - (v6 + v7 + v8)) + (v9 + v10 - v11 + v12) - (v13 - v14 + v15 + v16))%L =
-  (v1 - (v6 + v11 + v16) + (v2 + v5 + v12 - v15) + (v3 - v8 + v9 + v14) - (v4 + v7 - v10 + v13))%L
+  (v1 + v2 + (v3 - v4) + (v5 - (v6 + v7 + v8)) + (v9 + v10 + (v11 - v12) - (v13 + v14 + (v15 - v16))))%L =
+  (v1 - (v6 + v12 + v15) + (v2 + v5 + (v10 - v14)) + (v3 + v9 + (v16 - v8) - (v4 + v13 + (v7 - v11))))%L
 *)
   ring.
 } {
   toto.
 (*
   ============================
-  (v1 - v2 + v3 + v4 - (v5 + v6 - v7 + v8) + (v9 - (v10 + v11 + v12)) + (v13 + v14 + v15 - v16))%L =
-  (v1 - (v6 + v11 + v16) - (v2 + v5 + v12 - v15) + (v3 - v8 + v9 + v14) + (v4 + v7 - v10 + v13))%L
+  (v1 + v2 + (v3 - v4) + (v5 - (v6 + v7 + v8)) + (v9 + v10 + (v11 - v12) - (v13 + v14 + (v15 - v16))))%L =
+  (v1 - (v15 + v7 + v12) + (v2 + v5 + (v10 - v14)) + (v3 + v9 + (v16 - v6) - (v4 + v13 + (v8 - v11))))%L
 *)
   ring.
 } {
   toto.
 (*
   ============================
-  (v1 + v2 - v3 + v4 + (v5 - v6 + v7 + v8) - (v9 + v10 + v11 - v12) + (v13 - (v14 + v15 + v16)))%L =
-  (v1 - (v6 + v11 + v16) + (v2 + v5 + v12 - v15) - (v3 - v8 + v9 + v14) + (v4 + v7 - v10 + v13))%L
+  (v1 + v2 + (v3 - v4) + (v5 - (v6 + v7 + v8)) + (v9 + v10 + (v11 - v12) - (v13 + v14 + (v15 - v16))))%L =
+  (v1 - (v12 + v15 + v8) + (v2 + v5 + (v10 - v14)) + (v3 + v9 + (v16 - v7) - (v4 + v13 + (v6 - v11))))%L
 *)
   ring.
 }
