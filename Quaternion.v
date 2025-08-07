@@ -206,6 +206,8 @@ Context {Hop : rngl_has_opp T = true}.
 Context {Hon : rngl_has_1 T = true}.
 Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 
+Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c))%L = (a * b * c)%L.
 Proof.
@@ -214,12 +216,25 @@ destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
 f_equal. {
-(*
+(* la tactique ring, ça résout le problème, mais ça impose que la
+   multiplication soit commutative dans T (Hic) et qu'elle ait un
+   élément neutre (Hon), alors que ce n'est peut-être pas nécessaire
+   pour quat_mul_assoc.
   ring.
 *)
-Show.
-  repeat rewrite (rngl_mul_sub_distr_l Hop).
-  repeat rewrite (rngl_mul_sub_distr_r Hop).
+(*
+  progress repeat rewrite (rngl_mul_sub_distr_l Hop).
+  progress repeat rewrite (rngl_mul_sub_distr_r Hop).
+  progress repeat rewrite rngl_mul_assoc.
+  progress repeat rewrite <- (rngl_sub_add_distr Hos).
+  progress repeat rewrite <- (rngl_sub_sub_distr Hop).
+  progress repeat rewrite <- (rngl_sub_add_distr Hos).
+  f_equal.
+  progress repeat rewrite (rngl_add_sub_assoc Hop).
+  progress repeat rewrite (rngl_sub_add_distr Hos).
+  progress repeat rewrite (rngl_sub_sub_distr Hop).
+...
+*)
   repeat rewrite rngl_mul_add_distr_l.
   repeat rewrite rngl_mul_add_distr_r.
   repeat rewrite rngl_mul_assoc.
@@ -228,6 +243,47 @@ Show.
   repeat rewrite rngl_mul_add_distr_l.
   repeat rewrite rngl_mul_add_distr_r.
   repeat rewrite rngl_mul_assoc.
+(*
+  repeat rewrite (rngl_sub_add_distr Hos).
+  repeat rewrite (rngl_sub_sub_distr Hop).
+  repeat rewrite (rngl_sub_add_distr Hos).
+*)
+  remember (_ * _ * _)%L as v1 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v2 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v3 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v4 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v5 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v6 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v7 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v8 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v9 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v10 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v11 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v12 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v13 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v14 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v15 eqn:Hv in |-*; clear Hv.
+  remember (_ * _ * _)%L as v16 eqn:Hv in |-*; clear Hv.
+(*
+  ring
+*)
+  clear - Hop.
+...
+  remember (_ - z * z' * a'')%L as u.
+  remember (a * x' * x'')%L as v1.
+
+  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * z' * z'')).
+  progress repeat rewrite (rngl_add_sub_swap Hop _ _ (a * z' * z'')).
+  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * z' * z'')).
+  progress repeat rewrite (rngl_add_sub_swap Hop _ _ (a * z' * z'')).
+  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * z' * z'')).
+  progress repeat rewrite (rngl_add_sub_swap Hop _ _ (a * y' * y'')).
+  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * y' * y'')).
+  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * x' * x'')).
+...
+
+  repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * x' * x'')).
+  repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * y' * y'')).
 ...
 f_equal; [ apply rngl_mul_assoc | ].
 progress unfold vec3_add; cbn.
