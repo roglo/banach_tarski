@@ -211,32 +211,11 @@ Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 
 Ltac toto :=
-  remember 42 as v eqn:Hv_;
-  remember 42 as v0 eqn:Hv0;
+  remember 42 as v eqn:Hv_; remember 42 as v0 eqn:Hv0;
   do 16 (
     let vn := fresh "v" in
     remember (_ * _ * _)%L as vn eqn:Hv in |-*; clear Hv);
   clear v v0 Hv_ Hv0.
-
-(*
-Ltac toto :=
-  remember (_ * _ * _)%L as v1 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v2 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v3 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v4 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v5 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v6 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v7 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v8 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v9 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v10 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v11 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v12 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v13 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v14 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v15 eqn:Hv in |-*; clear Hv;
-  remember (_ * _ * _)%L as v16 eqn:Hv in |-*; clear Hv.
-*)
 
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
