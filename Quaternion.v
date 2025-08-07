@@ -79,7 +79,7 @@ Definition quat_mul (q q' : quaternion T) :=
   let '(mk_quat a (mk_v b c d)) := q in
   let '(mk_quat a' (mk_v b' c' d')) := q' in
   mk_quat
-    (a * a' - b * b' - c * c' - d * d')
+    (a * a' - (b * b' + c * c' + d * d'))
     (mk_v
       (a * b' + b * a' + c * d' - d * c')
       (a * c' - b * d' + c * a' + d * b')
@@ -192,9 +192,49 @@ Qed.
 
 Theorem quat_add_0_l : ∀ a : quaternion T, (0 + a)%L = a.
 Proof.
+intros.
+destruct a as (a, (x, y, z)); cbn.
+progress unfold quat_add; cbn.
+f_equal; [ apply rngl_add_0_l | ].
+progress unfold vec3_add; cbn.
+f_equal; apply rngl_add_0_l.
+Qed.
+
+From Stdlib Require Import Ring.
+Context {Hic : rngl_mul_is_comm T = true}.
+Context {Hop : rngl_has_opp T = true}.
+Context {Hon : rngl_has_1 T = true}.
+Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
+
+Theorem quat_mul_assoc :
+  ∀ a b c : quaternion T, (a * (b * c))%L = (a * b * c)%L.
+Proof.
+intros.
+destruct a as (a, (x, y, z)).
+destruct b as (a', (x', y', z')).
+destruct c as (a'', (x'', y'', z'')); cbn.
+f_equal. {
+(*
+  ring.
+*)
+Show.
+  repeat rewrite (rngl_mul_sub_distr_l Hop).
+  repeat rewrite (rngl_mul_sub_distr_r Hop).
+  repeat rewrite rngl_mul_add_distr_l.
+  repeat rewrite rngl_mul_add_distr_r.
+  repeat rewrite rngl_mul_assoc.
+  repeat rewrite (rngl_mul_sub_distr_l Hop).
+  repeat rewrite (rngl_mul_sub_distr_r Hop).
+  repeat rewrite rngl_mul_add_distr_l.
+  repeat rewrite rngl_mul_add_distr_r.
+  repeat rewrite rngl_mul_assoc.
+...
+f_equal; [ apply rngl_mul_assoc | ].
+progress unfold vec3_add; cbn.
+f_equal; apply rngl_add_assoc.
 ...
 
-(**) From Stdlib Require Import Arith. (**)
+From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
      rngl_is_archimedean := rngl_is_archimedean T;
@@ -203,7 +243,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_add_comm := quat_add_comm;
      rngl_add_assoc := quat_add_assoc;
      rngl_add_0_l := quat_add_0_l;
-     rngl_mul_assoc := Nat.mul_assoc;
+     rngl_mul_assoc := quat_mul_assoc;
      rngl_opt_mul_1_l := Nat.mul_1_l;
      rngl_mul_add_distr_l := Nat.mul_add_distr_l;
      rngl_opt_mul_comm := Nat.mul_comm;
