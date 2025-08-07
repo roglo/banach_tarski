@@ -211,16 +211,18 @@ Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 
+Ltac group_by_3_factors :=
+  remember 42 as v eqn:Hv_; remember 42 as v0 eqn:Hv0;
+  do 16 (
+    let vn := fresh "v" in
+    remember (_ * _ * _)%L as vn eqn:Hv in |-*; clear Hv);
+  clear v v0 Hv_ Hv0.
+
 Ltac ring_light_step :=
   match goal with
 (*
-  | |- context[rngl_add ?x 0] => rewrite (rngl_add_0_l x)
-  | |- context[rngl_add 0 ?x] => rewrite <- (rngl_add_0_l x)
-  | |- context[rngl_add ?x (rngl_opp ?x)] => rewrite (rngl_add_opp_l x)
-  | |- context[rngl_add (rngl_opp ?x) ?x] => rewrite <- (rngl_add_opp_l x)
-  | |- context[rngl_add ?x ?y] => rewrite (rngl_add_comm x y)
-  | |- context[rngl_add ?x (rngl_add ?y ?z)] =>
-      rewrite <- (rngl_add_assoc x y z)
+  | |- context[rngl_add ?x (rngl_sub ?y ?z)] =>
+      rewrite (rngl_add_sub_assoc Hop x y z)
 *)
   | |- context[rngl_sub (rngl_add ?x ?y) ?z] =>
       rewrite (rngl_add_sub_swap Hop x y z)
@@ -228,20 +230,7 @@ Ltac ring_light_step :=
       rewrite (rngl_sub_add_distr Hos x y z)
   | |- context[rngl_sub ?x (rngl_sub ?y ?z)] =>
       rewrite (rngl_sub_sub_distr Hop x y z)
-(*
-  | |- context[rngl_mul ?x (rngl_add ?y ?z)] =>
-      rewrite (rngl_mul_add_distr_l x y z)
-  | |- context[rngl_mul (rngl_add ?x ?y) ?z] =>
-      rewrite (rngl_mul_add_distr_r x y z)
-*)
   end.
-
-Ltac toto :=
-  remember 42 as v eqn:Hv_; remember 42 as v0 eqn:Hv0;
-  do 16 (
-    let vn := fresh "v" in
-    remember (_ * _ * _)%L as vn eqn:Hv in |-*; clear Hv);
-  clear v v0 Hv_ Hv0.
 
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
@@ -265,6 +254,7 @@ f_equal; ring.
 cbn.
 progress unfold vec2_scal_mul.
 progress unfold mat2_det.
+(**)
 do 24 rewrite rngl_mul_add_distr_l.
 do 24 rewrite rngl_mul_add_distr_r.
 do 24 rewrite rngl_mul_assoc.
@@ -276,22 +266,37 @@ do 40 rewrite rngl_mul_assoc.
 (* bon, ci-dessous, je mets des "ring" quand même juste histoire
    de voir si ça se démontre *)
 f_equal. {
-  toto.
-(**)
+  group_by_3_factors.
   progress do 44 ring_light_step.
-...
-  ring.
+  symmetry.
+  progress do 2 rewrite (rngl_add_add_swap _ v16).
+  progress do 3 f_equal.
+  progress do 3 rewrite (rngl_sub_sub_swap Hop _ v15).
+  progress f_equal.
+  progress do 8 rewrite (rngl_sub_sub_swap Hop _ v14).
+  progress f_equal.
+  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v13).
+  progress f_equal.
+  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v11).
+  progress f_equal.
+  progress do 6 rewrite (rngl_sub_sub_swap Hop _ v10).
+  progress f_equal.
+  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v9).
+  progress do 2 f_equal.
+  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v6).
+  progress f_equal.
+  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v5).
+  easy.
 }
 f_equal. {
-  toto.
-(*
-  ============================
-  (v1 + v2 + (v3 - v4) + (v5 - (v6 + v7 + v8)) + (v9 + v10 + (v11 - v12) - (v13 + v14 + (v15 - v16))))%L =
-  (v1 - (v6 + v12 + v15) + (v2 + v5 + (v10 - v14)) + (v3 + v9 + (v16 - v8) - (v4 + v13 + (v7 - v11))))%L
-*)
-  ring.
+  group_by_3_factors.
+  do 12 rewrite (rngl_add_sub_assoc Hop).
+  progress do 1 ring_light_step.
+...
+  symmetry.
+...
 } {
-  toto.
+  group_by_3_factors.
 (*
   ============================
   (v1 + v2 + (v3 - v4) + (v5 - (v6 + v7 + v8)) + (v9 + v10 + (v11 - v12) - (v13 + v14 + (v15 - v16))))%L =
@@ -299,7 +304,7 @@ f_equal. {
 *)
   ring.
 } {
-  toto.
+  group_by_3_factors.
 (*
   ============================
   (v1 + v2 + (v3 - v4) + (v5 - (v6 + v7 + v8)) + (v9 + v10 + (v11 - v12) - (v13 + v14 + (v15 - v16))))%L =
