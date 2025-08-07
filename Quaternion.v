@@ -386,6 +386,25 @@ do 6 rewrite rngl_add_0_r.
 easy.
 Qed.
 
+Theorem quat_mul_add_distr_l :
+  ∀ a b c : quaternion T, (a * (b + c))%L = (a * b + a * c)%L.
+Proof.
+intros.
+destruct a as (a, (x, y, z)).
+destruct b as (a', (x', y', z')).
+destruct c as (a'', (x'', y'', z'')); cbn.
+progress unfold vec2_scal_mul; cbn.
+progress unfold mat2_det; cbn.
+progress unfold quat_add; cbn.
+f_equal. {
+  do 4 rewrite rngl_mul_add_distr_l.
+...
+f_equal; [ apply rngl_mul_add_distr_l | ].
+progress unfold vec3_add; cbn.
+f_equal; apply rngl_add_assoc.
+Qed.
+...
+
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
@@ -397,7 +416,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_add_0_l := quat_add_0_l;
      rngl_mul_assoc := quat_mul_assoc;
      rngl_opt_mul_1_l := quat_opt_mul_1_l;
-     rngl_mul_add_distr_l := Nat.mul_add_distr_l;
+     rngl_mul_add_distr_l := quat_mul_add_distr_l;
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
