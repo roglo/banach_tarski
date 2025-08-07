@@ -232,16 +232,19 @@ Proof.
 intros.
 destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
-destruct c as (a'', (x'', y'', z'')); cbn.
+destruct c as (a'', (x'', y'', z'')).
+cbn - [ quat_mul ].
 (* la tactique ring, ça résout le problème, mais ça impose que la
    multiplication soit commutative dans T (Hic) et qu'elle ait un
    élément neutre (Hon), alors que ce n'est peut-être pas nécessaire
    pour quat_mul_assoc.
+cbn.
 f_equal; [ ring | ].
 f_equal; ring.
    puis, on peut faire "Qed".
 *)
 (* tentative de le démontrer sans utiliser "ring" *)
+cbn.
 do 12 rewrite rngl_mul_add_distr_l.
 do 12 rewrite rngl_mul_add_distr_r.
 do 12 rewrite rngl_mul_assoc.
