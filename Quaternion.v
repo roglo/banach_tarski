@@ -227,7 +227,7 @@ Ltac toto :=
   remember (_ * _ * _)%L as v16 eqn:Hv in |-*; clear Hv.
 
 Theorem quat_mul_assoc :
-  ∀ a b c : quaternion T, (a * (b * c))%L = (a * b * c)%L.
+  ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
 intros.
 destruct a as (a, (x, y, z)).
@@ -239,16 +239,19 @@ destruct c as (a'', (x'', y'', z'')); cbn.
    pour quat_mul_assoc.
 f_equal; [ ring | ].
 f_equal; ring.
-   on peut faire Qed ici.
+   puis, on peut faire "Qed".
 *)
-repeat rewrite rngl_mul_add_distr_l.
-repeat rewrite rngl_mul_add_distr_r.
-repeat rewrite rngl_mul_assoc.
-repeat rewrite (rngl_mul_sub_distr_l Hop).
-repeat rewrite (rngl_mul_sub_distr_r Hop).
-repeat rewrite rngl_mul_add_distr_l.
-repeat rewrite rngl_mul_add_distr_r.
-repeat rewrite rngl_mul_assoc.
+(* tentative de le démontrer sans utiliser "ring" *)
+do 12 rewrite rngl_mul_add_distr_l.
+do 12 rewrite rngl_mul_add_distr_r.
+do 12 rewrite rngl_mul_assoc.
+do 16 rewrite (rngl_mul_sub_distr_l Hop).
+do 16 rewrite (rngl_mul_sub_distr_r Hop).
+do 20 rewrite rngl_mul_add_distr_l.
+do 20 rewrite rngl_mul_add_distr_r.
+do 52 rewrite rngl_mul_assoc.
+(* bon, ci-dessous, je mets des "ring" quand même juste histoire
+   de voir si ça se démontre *)
 f_equal. {
   toto.
 (*
