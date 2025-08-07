@@ -220,10 +220,6 @@ Ltac group_by_3_factors :=
 
 Ltac ring_light_step :=
   match goal with
-(*
-  | |- context[rngl_add ?x (rngl_sub ?y ?z)] =>
-      rewrite (rngl_add_sub_assoc Hop x y z)
-*)
   | |- context[rngl_sub (rngl_add ?x ?y) ?z] =>
       rewrite (rngl_add_sub_swap Hop x y z)
   | |- context[rngl_sub ?x (rngl_add ?y ?z)] =>
@@ -291,17 +287,31 @@ f_equal. {
 f_equal. {
   group_by_3_factors.
   do 12 rewrite (rngl_add_sub_assoc Hop).
-  progress do 1 ring_light_step.
-...
-  symmetry.
-...
+  progress do 36 ring_light_step.
+  do 6 rewrite rngl_add_assoc.
+  progress do 6 rewrite (rngl_add_add_swap _ v16).
+  progress f_equal.
+  progress do 5 rewrite (rngl_add_add_swap _ v11).
+  progress f_equal.
+  progress do 2 rewrite (rngl_add_add_swap _ v10).
+  progress do 2 f_equal.
+  progress do 1 rewrite (rngl_add_add_swap _ v5).
+  progress do 3 f_equal.
+  progress do 5 rewrite (rngl_sub_sub_swap Hop _ v15).
+  progress f_equal.
+  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v14).
+  progress f_equal.
+  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v13).
+  progress f_equal.
+  progress do 3 rewrite (rngl_sub_sub_swap Hop _ v12).
+  progress f_equal.
+  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v8).
+  progress do 2 f_equal.
+  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v6).
+  easy.
 } {
   group_by_3_factors.
-(*
-  ============================
-  (v1 + v2 + (v3 - v4) + (v5 - (v6 + v7 + v8)) + (v9 + v10 + (v11 - v12) - (v13 + v14 + (v15 - v16))))%L =
-  (v1 - (v15 + v7 + v12) + (v2 + v5 + (v10 - v14)) + (v3 + v9 + (v16 - v6) - (v4 + v13 + (v8 - v11))))%L
-*)
+...
   ring.
 } {
   group_by_3_factors.
