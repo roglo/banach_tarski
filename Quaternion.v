@@ -208,6 +208,24 @@ Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 
+Ltac toto :=
+  remember (_ * _ * _)%L as v1 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v2 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v3 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v4 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v5 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v6 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v7 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v8 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v9 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v10 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v11 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v12 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v13 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v14 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v15 eqn:Hv in |-*; clear Hv;
+  remember (_ * _ * _)%L as v16 eqn:Hv in |-*; clear Hv.
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c))%L = (a * b * c)%L.
 Proof.
@@ -215,79 +233,56 @@ intros.
 destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
-f_equal. {
 (* la tactique ring, ça résout le problème, mais ça impose que la
    multiplication soit commutative dans T (Hic) et qu'elle ait un
    élément neutre (Hon), alors que ce n'est peut-être pas nécessaire
    pour quat_mul_assoc.
+f_equal; [ ring | ].
+f_equal; ring.
+   on peut faire Qed ici.
+*)
+repeat rewrite rngl_mul_add_distr_l.
+repeat rewrite rngl_mul_add_distr_r.
+repeat rewrite rngl_mul_assoc.
+repeat rewrite (rngl_mul_sub_distr_l Hop).
+repeat rewrite (rngl_mul_sub_distr_r Hop).
+repeat rewrite rngl_mul_add_distr_l.
+repeat rewrite rngl_mul_add_distr_r.
+repeat rewrite rngl_mul_assoc.
+f_equal. {
+  toto.
+(*
+  ============================
+  (v1 - (v2 + v3 + v4) - (v5 + v6 + v7 - v8 + (v9 - v10 + v11 + v12) + (v13 + v14 - v15 + v16)))%L =
+  (v1 - (v6 + v11 + v16) - (v2 + v5 + v12 - v15 + (v3 - v8 + v9 + v14) + (v4 + v7 - v10 + v13)))%L
+*)
   ring.
-*)
+}
+f_equal. {
+  toto.
 (*
-  progress repeat rewrite (rngl_mul_sub_distr_l Hop).
-  progress repeat rewrite (rngl_mul_sub_distr_r Hop).
-  progress repeat rewrite rngl_mul_assoc.
-  progress repeat rewrite <- (rngl_sub_add_distr Hos).
-  progress repeat rewrite <- (rngl_sub_sub_distr Hop).
-  progress repeat rewrite <- (rngl_sub_add_distr Hos).
-  f_equal.
-  progress repeat rewrite (rngl_add_sub_assoc Hop).
-  progress repeat rewrite (rngl_sub_add_distr Hos).
-  progress repeat rewrite (rngl_sub_sub_distr Hop).
-...
+  ============================
+  (v1 + v2 + v3 - v4 + (v5 - (v6 + v7 + v8)) + (v9 + v10 - v11 + v12) - (v13 - v14 + v15 + v16))%L =
+  (v1 - (v6 + v11 + v16) + (v2 + v5 + v12 - v15) + (v3 - v8 + v9 + v14) - (v4 + v7 - v10 + v13))%L
 *)
-  repeat rewrite rngl_mul_add_distr_l.
-  repeat rewrite rngl_mul_add_distr_r.
-  repeat rewrite rngl_mul_assoc.
-  repeat rewrite (rngl_mul_sub_distr_l Hop).
-  repeat rewrite (rngl_mul_sub_distr_r Hop).
-  repeat rewrite rngl_mul_add_distr_l.
-  repeat rewrite rngl_mul_add_distr_r.
-  repeat rewrite rngl_mul_assoc.
-(*
-  repeat rewrite (rngl_sub_add_distr Hos).
-  repeat rewrite (rngl_sub_sub_distr Hop).
-  repeat rewrite (rngl_sub_add_distr Hos).
-*)
-  remember (_ * _ * _)%L as v1 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v2 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v3 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v4 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v5 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v6 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v7 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v8 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v9 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v10 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v11 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v12 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v13 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v14 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v15 eqn:Hv in |-*; clear Hv.
-  remember (_ * _ * _)%L as v16 eqn:Hv in |-*; clear Hv.
-(*
   ring.
+} {
+  toto.
+(*
+  ============================
+  (v1 - v2 + v3 + v4 - (v5 + v6 - v7 + v8) + (v9 - (v10 + v11 + v12)) + (v13 + v14 + v15 - v16))%L =
+  (v1 - (v6 + v11 + v16) - (v2 + v5 + v12 - v15) + (v3 - v8 + v9 + v14) + (v4 + v7 - v10 + v13))%L
 *)
-  clear - Hop.
-...
-  remember (_ - z * z' * a'')%L as u.
-  remember (a * x' * x'')%L as v1.
-
-  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * z' * z'')).
-  progress repeat rewrite (rngl_add_sub_swap Hop _ _ (a * z' * z'')).
-  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * z' * z'')).
-  progress repeat rewrite (rngl_add_sub_swap Hop _ _ (a * z' * z'')).
-  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * z' * z'')).
-  progress repeat rewrite (rngl_add_sub_swap Hop _ _ (a * y' * y'')).
-  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * y' * y'')).
-  progress repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * x' * x'')).
-...
-
-  repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * x' * x'')).
-  repeat rewrite (rngl_sub_sub_swap Hop _ _ (a * y' * y'')).
-...
-f_equal; [ apply rngl_mul_assoc | ].
-progress unfold vec3_add; cbn.
-f_equal; apply rngl_add_assoc.
+  ring.
+} {
+  toto.
+(*
+  ============================
+  (v1 + v2 - v3 + v4 + (v5 - v6 + v7 + v8) - (v9 + v10 + v11 - v12) + (v13 - (v14 + v15 + v16)))%L =
+  (v1 - (v6 + v11 + v16) + (v2 + v5 + v12 - v15) - (v3 - v8 + v9 + v14) + (v4 + v7 - v10 + v13))%L
+*)
+  ring.
+}
 ...
 
 From Stdlib Require Import Arith.
