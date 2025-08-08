@@ -682,31 +682,42 @@ progress unfold rngl_has_1 in H1.
 destruct (rngl_opt_one T) as [u| ]; [ clear H H1 u | easy ].
 generalize Hiq; intros H.
 progress unfold rngl_has_inv_or_quot in H.
-remember (rngl_opt_inv_or_quot T) as iq eqn:H1.
-symmetry in H1.
-destruct iq as [iq| ]; [ clear H H1 | easy ].
-destruct iq as [inv| quot]. {
-  clear inv.
-  progress unfold quat_inv; cbn.
-  destruct a as (a, (x, y, z)); cbn.
-  progress unfold quat_one.
-  remember (a² + x² + y² + z²)%L as N eqn:HN.
-  f_equal. {
-    do 3 rewrite (rngl_div_opp_l Hop Hiv).
-    do 3 rewrite (rngl_mul_opp_l Hop).
-    do 4 rewrite (rngl_div_mul_mul_div Hic Hiv).
-    do 4 rewrite fold_rngl_squ.
-    do 2 rewrite (rngl_sub_add_distr Hos).
-    do 3 rewrite (rngl_sub_opp_r Hop).
-    do 3 rewrite <- (rngl_div_add_distr_r Hiv).
-    rewrite <- HN.
-    apply (rngl_div_diag Hon Hiq).
-    intros H; move H at top; subst N.
-    symmetry in HN.
-    apply Haz; clear Haz.
-    now apply eq_quat_norm_squ_0.
-  }
-...
+generalize Hiv; intros H1.
+progress unfold rngl_has_inv in H1.
+remember (rngl_opt_inv_or_quot T) as iq eqn:H2.
+symmetry in H2.
+destruct iq as [iq| ]; [ clear H | easy ].
+destruct iq as [inv| quot]; [ clear H1 H2 | easy ].
+clear inv.
+progress unfold quat_inv; cbn.
+destruct a as (a, (x, y, z)); cbn.
+progress unfold quat_one.
+remember (a² + x² + y² + z²)%L as N eqn:HN.
+progress unfold vec2_scal_mul, mat2_det.
+do 3 rewrite (rngl_div_opp_l Hop Hiv).
+do 12 rewrite (rngl_mul_opp_l Hop).
+do 16 rewrite (rngl_div_mul_mul_div Hic Hiv).
+do 4 rewrite fold_rngl_squ.
+do 3 rewrite (rngl_mul_comm Hic _ a).
+rewrite (rngl_mul_comm Hic z y).
+rewrite (rngl_mul_comm Hic z x).
+rewrite (rngl_mul_comm Hic y x).
+do 3 rewrite (rngl_add_opp_diag_r Hop).
+do 3 rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+do 2 rewrite (rngl_sub_add_distr Hos).
+do 3 rewrite (rngl_sub_opp_r Hop).
+do 3 rewrite <- (rngl_div_add_distr_r Hiv).
+rewrite <- HN.
+f_equal.
+apply (rngl_div_diag Hon Hiq).
+intros H; move H at top; subst N.
+symmetry in HN.
+apply Haz; clear Haz.
+now apply eq_quat_norm_squ_0.
+Qed.
+
+Inspect 1.
 
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
@@ -727,8 +738,8 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_add_sub := quat_opt_add_sub;
      rngl_opt_sub_add_distr := quat_opt_sub_add_distr;
      rngl_opt_sub_0_l := quat_opt_sub_0_l;
-     rngl_opt_mul_inv_diag_l := 32;
-     rngl_opt_mul_inv_diag_r := NA;
+     rngl_opt_mul_inv_diag_l := quat_opt_mul_inv_diag_l;
+     rngl_opt_mul_inv_diag_r := 32;
      rngl_opt_mul_div := 42;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_integral := 42;
