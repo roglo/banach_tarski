@@ -777,6 +777,30 @@ apply Haz; clear Haz.
 now apply eq_quat_norm_squ_0.
 Qed.
 
+Theorem quat_opt_mul_div :
+  if rngl_has_quot (quaternion T) then
+    ∀ a b : quaternion T, b ≠ 0%L → (a * b / b)%L = a
+  else not_applicable.
+Proof.
+rewrite rngl_has_inv_has_no_quot; [ easy | ].
+progress unfold rngl_has_inv in Hiv |-*; cbn.
+progress unfold quat_opt_inv_or_quot.
+destruct (rngl_opt_inv_or_quot T) as [opp_inv| ]; [ | easy ].
+now destruct opp_inv.
+Qed.
+
+Theorem quat_opt_mul_quot_r :
+  if (rngl_has_quot (quaternion T) && negb false)%bool then
+    ∀ a b : quaternion T, b ≠ 0%L → (b * a / b)%L = a
+  else not_applicable.
+Proof.
+rewrite rngl_has_inv_has_no_quot; [ easy | ].
+progress unfold rngl_has_inv in Hiv |-*; cbn.
+progress unfold quat_opt_inv_or_quot.
+destruct (rngl_opt_inv_or_quot T) as [opp_inv| ]; [ | easy ].
+now destruct opp_inv.
+Qed.
+
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
@@ -798,8 +822,8 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_sub_0_l := quat_opt_sub_0_l;
      rngl_opt_mul_inv_diag_l := quat_opt_mul_inv_diag_l;
      rngl_opt_mul_inv_diag_r := quat_opt_mul_inv_diag_r;
-     rngl_opt_mul_div := 42;
-     rngl_opt_mul_quot_r := NA;
+     rngl_opt_mul_div := quat_opt_mul_div;
+     rngl_opt_mul_quot_r := quat_opt_mul_quot_r;
      rngl_opt_integral := 42;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := 42;
