@@ -801,6 +801,14 @@ destruct (rngl_opt_inv_or_quot T) as [opp_inv| ]; [ | easy ].
 now destruct opp_inv.
 Qed.
 
+Theorem quat_opt_integral :
+   ∀ a b : quaternion T,
+   (a * b)%L = 0%L
+   → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
+Proof.
+intros * Hab.
+...
+
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
@@ -824,7 +832,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_mul_inv_diag_r := quat_opt_mul_inv_diag_r;
      rngl_opt_mul_div := quat_opt_mul_div;
      rngl_opt_mul_quot_r := quat_opt_mul_quot_r;
-     rngl_opt_integral := 42;
+     rngl_opt_integral := quat_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := 42;
      rngl_opt_ord := 42;
