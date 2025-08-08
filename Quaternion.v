@@ -853,7 +853,9 @@ intros.
 rewrite <- (quat_sub_diag 0) at 1.
 progress unfold quat_sub.
 rewrite quat_mul_add_distr_r.
+cbn - [ quat_mul ].
 Search (- _ * _)%quat.
+(* faudrait faire un quat_mul_sub_distr_r, plutôt *)
 ...
 Search (_ + - _)%quat.
 ...
@@ -899,7 +901,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_mul_add_distr_l := quat_mul_add_distr_l;
      rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := quat_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := quat_opt_mul_add_distr_r;
+     rngl_opt_mul_add_distr_r := quat_mul_add_distr_r;
      rngl_opt_add_opp_diag_l := quat_opt_add_opp_diag_l;
      rngl_opt_add_sub := quat_opt_add_sub;
      rngl_opt_sub_add_distr := quat_opt_sub_add_distr;
