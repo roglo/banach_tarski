@@ -495,7 +495,7 @@ easy.
 Qed.
 
 Theorem quat_mul_add_distr_r :
-  ∀ a b c : quaternion T, ((a + b) * c)%L = (a * c + b * c)%L.
+  ∀ a b c, ((a + b) * c)%quat = (a * c + b * c)%quat.
 Proof.
 intros.
 destruct a as (a, (x, y, z)).
@@ -548,6 +548,29 @@ f_equal. {
   easy.
 }
 Qed.
+
+Theorem quat_mul_opp_l : ∀ a b, (- a * b = - (a * b))%quat.
+Proof.
+intros.
+destruct a as (a, (x, y, z)).
+destruct b as (a', (x', y', z')).
+progress unfold quat_opp; cbn.
+do 4 rewrite (rngl_mul_opp_l Hop).
+...
+
+Theorem quat_mul_sub_distr_r :
+  ∀ a b c, ((a - b) * c)%quat = (a * c - b * c)%quat.
+Proof.
+intros.
+progress unfold quat_sub.
+rewrite quat_mul_add_distr_r.
+progress f_equal.
+Search (- _ * _)%quat.
+...
+
+Theorem quat_opt_mul_add_distr_r :
+  ∀ a b c : quaternion T, ((a + b) * c)%L = (a * c + b * c)%L.
+Proof. apply quat_mul_add_distr_r. Qed.
 
 Theorem quat_opt_add_opp_diag_l :
   if rngl_has_opp (quaternion T) then ∀ a : quaternion T, (- a + a)%L = 0%L
