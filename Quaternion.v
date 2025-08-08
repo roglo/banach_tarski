@@ -1,6 +1,7 @@
 (* c'est bien, les quaternions, mais avant, il faut
    que j'utilise ring-like sur les matrices *)
 
+Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8.
 
 Require Import RingLike.Core.
@@ -614,6 +615,49 @@ Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
 
+Theorem eq_quat_norm_squ_0 : ∀ a, quat_norm_squ a = 0%L → a = 0%quat.
+Proof.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
+intros (a, (x, y, z)) HN.
+progress unfold quat_norm_squ in HN.
+apply (rngl_eq_add_0 Hor) in HN; cycle 1. {
+  apply (rngl_add_nonneg_nonneg Hor). {
+    apply (rngl_add_nonneg_nonneg Hor).
+    apply (rngl_squ_nonneg Hos Hor).
+    apply (rngl_squ_nonneg Hos Hor).
+  }
+  apply (rngl_squ_nonneg Hos Hor).
+} {
+  apply (rngl_squ_nonneg Hos Hor).
+}
+destruct HN as (HN, H).
+apply (eq_rngl_squ_0 Hos Hio) in H; subst.
+apply (rngl_eq_add_0 Hor) in HN; cycle 1. {
+  apply (rngl_add_nonneg_nonneg Hor).
+  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hos Hor).
+} {
+  apply (rngl_squ_nonneg Hos Hor).
+}
+destruct HN as (HN, H).
+apply (eq_rngl_squ_0 Hos Hio) in H; subst.
+apply (rngl_eq_add_0 Hor) in HN; cycle 1.
+apply (rngl_squ_nonneg Hos Hor).
+apply (rngl_squ_nonneg Hos Hor).
+destruct HN as (HN, H).
+apply (eq_rngl_squ_0 Hos Hio) in H; subst.
+apply (eq_rngl_squ_0 Hos Hio) in HN; subst.
+easy.
+Qed.
+
 Theorem quat_opt_mul_inv_diag_l :
   if (rngl_has_inv (quaternion T) && rngl_has_1 (quaternion T))%bool then
     ∀ a : quaternion T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
@@ -659,21 +703,9 @@ destruct iq as [inv| quot]. {
     apply (rngl_div_diag Hon Hiq).
     intros H; move H at top; subst N.
     symmetry in HN.
-(**)
-    apply (rngl_eq_add_0 Hor) in HN.
-...
-    apply (rngl_add_sub_eq_r Hos) in HN.
-    rewrite (rngl_sub_0_l Hop) in HN; symmetry in HN.
-...
-    apply (rngl_add_sub_eq_r Hos) in HN.
-    rewrite (rngl_sub_0_l Hop) in HN; symmetry in HN.
-    apply (rngl_add_sub_eq_r Hos) in HN; symmetry in HN.
-    apply (rngl_add_sub_eq_r Hos) in HN; symmetry in HN.
-    do 2 rewrite <- (rngl_opp_add_distr Hop) in HN.
-    rewrite rngl_add_assoc in HN.
-...
-    apply -> (rngl_add_move_0_r Hop) in HN.
-    apply (rngl_add_move_0_r Hop) in HN.
+    apply Haz; clear Haz.
+    now apply eq_quat_norm_squ_0.
+  }
 ...
 
 From Stdlib Require Import Arith.
