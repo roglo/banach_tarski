@@ -589,6 +589,44 @@ destruct osq as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
 
+Theorem quat_opt_sub_0_l :
+  if rngl_has_subt (quaternion T) then ∀ a : quaternion T, (0 - a)%L = 0%L
+  else not_applicable.
+Proof.
+generalize Hop; intros H.
+progress unfold rngl_has_opp in H |-*; cbn in H |-*.
+progress unfold rngl_sub; cbn.
+progress unfold rngl_has_subt; cbn.
+progress unfold rngl_has_opp; cbn.
+progress unfold quat_opt_opp_or_subt.
+remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
+symmetry in Hosq.
+destruct osq as [opp| ]; [ | easy ].
+now destruct opp.
+Qed.
+
+Theorem quat_opt_mul_inv_diag_l :
+  if (rngl_has_inv (quaternion T) && rngl_has_1 (quaternion T))%bool then
+    ∀ a : quaternion T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
+  else not_applicable.
+Proof.
+progress unfold rngl_inv; cbn.
+progress unfold quat_opt_inv_or_quot.
+remember (rngl_has_inv (quaternion T)) as ivq eqn:Hivq.
+symmetry in Hivq.
+destruct ivq; [ cbn | easy ].
+remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
+symmetry in Honq.
+destruct onq; [ cbn | easy ].
+intros * Haz.
+remember (rngl_opt_inv_or_quot T) as iq eqn:Hiq.
+symmetry in Hiq.
+destruct iq as [iq| ]. {
+  destruct iq. {
+    progress unfold quat_inv; cbn.
+    destruct a as (a, (x, y, z)); cbn.
+...
+
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
@@ -607,8 +645,8 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_add_opp_diag_l := quat_opt_add_opp_diag_l;
      rngl_opt_add_sub := quat_opt_add_sub;
      rngl_opt_sub_add_distr := quat_opt_sub_add_distr;
-     rngl_opt_sub_0_l := 32;
-     rngl_opt_mul_inv_diag_l := NA;
+     rngl_opt_sub_0_l := quat_opt_sub_0_l;
+     rngl_opt_mul_inv_diag_l := 32;
      rngl_opt_mul_inv_diag_r := NA;
      rngl_opt_mul_div := 42;
      rngl_opt_mul_quot_r := NA;
