@@ -717,7 +717,65 @@ apply Haz; clear Haz.
 now apply eq_quat_norm_squ_0.
 Qed.
 
-Inspect 1.
+Theorem quat_opt_mul_inv_diag_r :
+  if (rngl_has_inv (quaternion T) && rngl_has_1 (quaternion T) &&
+        negb false)%bool then
+    ∀ a : quaternion T, a ≠ 0%L → (a * a⁻¹)%L = 1%L
+  else not_applicable.
+Proof.
+progress unfold rngl_inv; cbn.
+progress unfold quat_opt_inv_or_quot.
+remember (rngl_has_inv (quaternion T)) as ivq eqn:Hivq.
+symmetry in Hivq.
+destruct ivq; [ cbn | easy ].
+remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
+symmetry in Honq.
+destruct onq; [ cbn | easy ].
+intros * Haz.
+progress unfold rngl_one.
+generalize Honq; intros H.
+progress unfold rngl_has_1 in H.
+cbn in H |-*.
+progress unfold quat_opt_one in H |-*.
+generalize Hon; intros H1.
+progress unfold rngl_has_1 in H1.
+destruct (rngl_opt_one T) as [u| ]; [ clear H H1 u | easy ].
+generalize Hiq; intros H.
+progress unfold rngl_has_inv_or_quot in H.
+generalize Hiv; intros H1.
+progress unfold rngl_has_inv in H1.
+remember (rngl_opt_inv_or_quot T) as iq eqn:H2.
+symmetry in H2.
+destruct iq as [iq| ]; [ clear H | easy ].
+destruct iq as [inv| quot]; [ clear H1 H2 | easy ].
+clear inv.
+progress unfold quat_inv; cbn.
+destruct a as (a, (x, y, z)); cbn.
+progress unfold quat_one.
+remember (a² + x² + y² + z²)%L as N eqn:HN.
+progress unfold vec2_scal_mul, mat2_det.
+do 3 rewrite (rngl_div_opp_l Hop Hiv).
+do 12 rewrite (rngl_mul_opp_r Hop).
+do 16 rewrite (rngl_mul_div_assoc Hiv).
+do 4 rewrite fold_rngl_squ.
+do 3 rewrite (rngl_mul_comm Hic _ a).
+rewrite (rngl_mul_comm Hic z y).
+rewrite (rngl_mul_comm Hic z x).
+rewrite (rngl_mul_comm Hic y x).
+do 3 rewrite (rngl_add_opp_diag_l Hop).
+do 3 rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+do 2 rewrite (rngl_sub_add_distr Hos).
+do 3 rewrite (rngl_sub_opp_r Hop).
+do 3 rewrite <- (rngl_div_add_distr_r Hiv).
+rewrite <- HN.
+f_equal.
+apply (rngl_div_diag Hon Hiq).
+intros H; move H at top; subst N.
+symmetry in HN.
+apply Haz; clear Haz.
+now apply eq_quat_norm_squ_0.
+Qed.
 
 From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
@@ -739,7 +797,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_sub_add_distr := quat_opt_sub_add_distr;
      rngl_opt_sub_0_l := quat_opt_sub_0_l;
      rngl_opt_mul_inv_diag_l := quat_opt_mul_inv_diag_l;
-     rngl_opt_mul_inv_diag_r := 32;
+     rngl_opt_mul_inv_diag_r := quat_opt_mul_inv_diag_r;
      rngl_opt_mul_div := 42;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_integral := 42;
