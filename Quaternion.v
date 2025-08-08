@@ -611,6 +611,7 @@ Qed.
 Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hon : rngl_has_1 T = true}.
 Context {Hiv : rngl_has_inv T = true}.
+Context {Hor : rngl_is_ordered T = true}.
 Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
 
 Theorem quat_opt_mul_inv_diag_l :
@@ -658,6 +659,21 @@ destruct iq as [inv| quot]. {
     apply (rngl_div_diag Hon Hiq).
     intros H; move H at top; subst N.
     symmetry in HN.
+(**)
+    apply (rngl_eq_add_0 Hor) in HN.
+...
+    apply (rngl_add_sub_eq_r Hos) in HN.
+    rewrite (rngl_sub_0_l Hop) in HN; symmetry in HN.
+...
+    apply (rngl_add_sub_eq_r Hos) in HN.
+    rewrite (rngl_sub_0_l Hop) in HN; symmetry in HN.
+    apply (rngl_add_sub_eq_r Hos) in HN; symmetry in HN.
+    apply (rngl_add_sub_eq_r Hos) in HN; symmetry in HN.
+    do 2 rewrite <- (rngl_opp_add_distr Hop) in HN.
+    rewrite rngl_add_assoc in HN.
+...
+    apply -> (rngl_add_move_0_r Hop) in HN.
+    apply (rngl_add_move_0_r Hop) in HN.
 ...
 
 From Stdlib Require Import Arith.
