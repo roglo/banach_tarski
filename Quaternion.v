@@ -30,6 +30,8 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 
+Definition vec3_zero := mk_v 0 0 0.
+
 Definition vec3_add a b :=
   mk_v
     (v_x a + v_x b)
@@ -91,6 +93,7 @@ Definition quat_mul (q q' : quaternion T) :=
 
 Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
 Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
+Definition quat_sub a b := quat_add a (quat_opp b).
 
 Definition quat_conj a := mk_quat (q_re a) (- q_im a).
 Definition quat_norm_squ q :=
@@ -115,7 +118,9 @@ Notation "a +ℹ b +𝐣 c +𝐤 d" :=
 Notation "0" := (quat_zero) : quat_scope.
 Notation "1" := (quat_one) : quat_scope.
 Notation "a + b" := (quat_add a b) : quat_scope.
+Notation "a - b" := (quat_sub a b) : quat_scope.
 Notation "a * b" := (quat_mul a b) : quat_scope.
+Notation "- a" := (quat_opp a) : quat_scope.
 
 Definition quat_opt_one :=
   match rngl_opt_one T with
@@ -233,6 +238,13 @@ Ltac ring_light_step :=
   | |- context[rngl_sub ?x (rngl_sub ?y ?z)] =>
       rewrite (rngl_sub_sub_distr Hop x y z)
   end.
+
+Theorem vec3_add_opp_diag_r : ∀ a, vec3_add a (- a) = vec3_zero.
+Proof.
+intros.
+progress unfold vec3_add, vec3_zero; cbn.
+now do 3 rewrite (rngl_add_opp_diag_r Hop).
+Qed.
 
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
@@ -482,7 +494,7 @@ do 3 rewrite rngl_add_0_r.
 easy.
 Qed.
 
-Theorem quat_opt_mul_add_distr_r :
+Theorem quat_mul_add_distr_r :
   ∀ a b c : quaternion T, ((a + b) * c)%L = (a * c + b * c)%L.
 Proof.
 intros.
@@ -717,6 +729,40 @@ apply Haz; clear Haz.
 now apply eq_quat_norm_squ_0.
 Qed.
 
+Theorem quat_mul_inv_diag_r :
+  ∀ a,
+  a ≠ 0%quat
+  → (a * quat_inv a)%quat = 1%quat.
+Proof.
+intros * Haz.
+progress unfold quat_inv; cbn.
+destruct a as (a, (x, y, z)); cbn.
+progress unfold quat_one.
+remember (a² + x² + y² + z²)%L as N eqn:HN.
+progress unfold vec2_scal_mul, mat2_det.
+do 3 rewrite (rngl_div_opp_l Hop Hiv).
+do 12 rewrite (rngl_mul_opp_r Hop).
+do 16 rewrite (rngl_mul_div_assoc Hiv).
+do 4 rewrite fold_rngl_squ.
+do 3 rewrite (rngl_mul_comm Hic _ a).
+rewrite (rngl_mul_comm Hic z y).
+rewrite (rngl_mul_comm Hic z x).
+rewrite (rngl_mul_comm Hic y x).
+do 3 rewrite (rngl_add_opp_diag_l Hop).
+do 3 rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+do 2 rewrite (rngl_sub_add_distr Hos).
+do 3 rewrite (rngl_sub_opp_r Hop).
+do 3 rewrite <- (rngl_div_add_distr_r Hiv).
+rewrite <- HN.
+f_equal.
+apply (rngl_div_diag Hon Hiq).
+intros H; move H at top; subst N.
+symmetry in HN.
+apply Haz; clear Haz.
+now apply eq_quat_norm_squ_0.
+Qed.
+
 Theorem quat_opt_mul_inv_diag_r :
   if (rngl_has_inv (quaternion T) && rngl_has_1 (quaternion T) &&
         negb false)%bool then
@@ -748,33 +794,7 @@ remember (rngl_opt_inv_or_quot T) as iq eqn:H2.
 symmetry in H2.
 destruct iq as [iq| ]; [ clear H | easy ].
 destruct iq as [inv| quot]; [ clear H1 H2 | easy ].
-clear inv.
-progress unfold quat_inv; cbn.
-destruct a as (a, (x, y, z)); cbn.
-progress unfold quat_one.
-remember (a² + x² + y² + z²)%L as N eqn:HN.
-progress unfold vec2_scal_mul, mat2_det.
-do 3 rewrite (rngl_div_opp_l Hop Hiv).
-do 12 rewrite (rngl_mul_opp_r Hop).
-do 16 rewrite (rngl_mul_div_assoc Hiv).
-do 4 rewrite fold_rngl_squ.
-do 3 rewrite (rngl_mul_comm Hic _ a).
-rewrite (rngl_mul_comm Hic z y).
-rewrite (rngl_mul_comm Hic z x).
-rewrite (rngl_mul_comm Hic y x).
-do 3 rewrite (rngl_add_opp_diag_l Hop).
-do 3 rewrite (rngl_sub_diag Hos).
-rewrite rngl_add_0_l.
-do 2 rewrite (rngl_sub_add_distr Hos).
-do 3 rewrite (rngl_sub_opp_r Hop).
-do 3 rewrite <- (rngl_div_add_distr_r Hiv).
-rewrite <- HN.
-f_equal.
-apply (rngl_div_diag Hon Hiq).
-intros H; move H at top; subst N.
-symmetry in HN.
-apply Haz; clear Haz.
-now apply eq_quat_norm_squ_0.
+now apply quat_mul_inv_diag_r.
 Qed.
 
 Theorem quat_opt_mul_div :
@@ -801,12 +821,68 @@ destruct (rngl_opt_inv_or_quot T) as [opp_inv| ]; [ | easy ].
 now destruct opp_inv.
 Qed.
 
+Theorem quat_sub_diag : ∀ a, (a - a = 0)%quat.
+Proof.
+intros.
+progress unfold quat_sub.
+progress unfold quat_add; cbn.
+rewrite (rngl_add_opp_diag_r Hop).
+now rewrite vec3_add_opp_diag_r.
+Qed.
+
+Theorem vec3_opp_0 : vec3_opp vec3_zero = vec3_zero.
+Proof.
+progress unfold vec3_opp; cbn.
+now rewrite (rngl_opp_0 Hop).
+Qed.
+
+Theorem fold_vec3_zero : mk_v 0 0 0 = vec3_zero.
+Proof. easy. Qed.
+
+Theorem quat_opp_0 : (quat_opp 0 = 0)%quat.
+Proof.
+progress unfold quat_opp; cbn.
+rewrite (rngl_opp_0 Hop).
+rewrite fold_vec3_zero.
+now rewrite vec3_opp_0.
+Qed.
+
+Theorem quat_mul_0_l : ∀ a, (0 * a)%quat = 0%quat.
+Proof.
+intros.
+rewrite <- (quat_sub_diag 0) at 1.
+progress unfold quat_sub.
+rewrite quat_mul_add_distr_r.
+Search (- _ * _)%quat.
+...
+Search (_ + - _)%quat.
+...
+rewrite quat_opp_0.
+...
+
 Theorem quat_opt_integral :
    ∀ a b : quaternion T,
    (a * b)%L = 0%L
    → a = 0%L ∨ b = 0%L ∨ rngl_is_zero_divisor a ∨ rngl_is_zero_divisor b.
 Proof.
 intros * Hab.
+cbn in Hab |-*.
+apply (f_equal (λ x, quat_mul x (quat_inv b))) in Hab.
+Search (0 * _)%quat.
+...
+rewrite quat_mul_0_l in Hab.
+...
+rewrite <- quat_mul_assoc in Hab.
+rewrite (quat_mul_inv_diag_r) in Hab.
+...
+intros * Hab.
+cbn in Hab |-*.
+destruct a as (a, (x, y, z)).
+destruct b as (a', (x', y', z')).
+cbn in Hab.
+injection Hab; clear Hab; intros H4 H3 H2 H1.
+move H2 after H1; move H3 after H2; move H4 after H3.
+progress unfold vec2_scal_mul, mat2_det in H2, H3, H4.
 ...
 
 From Stdlib Require Import Arith.
