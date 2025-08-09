@@ -938,6 +938,20 @@ rewrite quat_mul_1_r in Hab.
 now left.
 Qed.
 
+Theorem q_re_rngl_of_nat :
+  ∀ i, q_re (rngl_of_nat i) = rngl_of_nat i.
+Proof.
+intros.
+induction i; [ easy | ].
+do 2 rewrite rngl_of_nat_succ.
+cbn.
+f_equal; [ | easy ].
+progress unfold rngl_one at 1; cbn.
+progress unfold quat_opt_one.
+progress unfold rngl_has_1 in Hon.
+now destruct (rngl_opt_one T).
+Qed.
+
 Theorem quat_opt_characteristic_prop :
   if rngl_has_1 (quaternion T) then
     if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
@@ -949,32 +963,35 @@ Proof.
 remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
 symmetry in Honq.
 destruct onq; [ | easy ].
+(*
 specialize rngl_opt_characteristic_prop as H1.
 rewrite Hon in H1.
-remember (rngl_characteristic T =? 0) as chz eqn:Hchz.
-symmetry in Hchz.
-destruct chz. {
-  intros i H2.
-  apply (H1 i); clear H1.
-  rewrite rngl_of_nat_succ in H2; cbn in H2.
-  rewrite rngl_of_nat_succ.
-  progress unfold rngl_one in H2.
+*)
+remember (rngl_characteristic T =? 0) as ch eqn:Hch.
+symmetry in Hch.
+destruct ch. {
+  apply Nat.eqb_eq in Hch.
+  intros i H1.
+  rewrite rngl_of_nat_succ in H1; cbn in H1.
+  progress unfold rngl_one in H1.
   generalize Honq; intros H.
-  generalize Hon; intros H1.
   progress unfold rngl_has_1 in H, H1.
-  cbn in H2, H.
-  progress unfold quat_opt_one in H2, H.
+  cbn in H1, H.
+  progress unfold quat_opt_one in H, H1.
   destruct (rngl_opt_one T); [ | easy ].
-  clear t H H1.
-  rename H2 into H.
-  injection H; clear H; intros H4 H3 H2 H1.
-...
-  remember (rngl_opt_one (quaternion T)) as o1 eqn:Ho1.
-  symmetry in Ho1.
-  destruct o1; [ | easy ].
-  cbn in H2.
-  progress unfold quat_opt_one in H2.
-  progress unfold rngl_opt_one in H2.
+  clear t H.
+  injection H1; clear H1; intros H4 H3 H2 H1.
+  clear H2 H3 H4.
+  rewrite q_re_rngl_of_nat in H1.
+  specialize rngl_opt_characteristic_prop as H2.
+  rewrite Hon, Hch in H2.
+  cbn - [ rngl_of_nat ] in H2.
+  specialize (H2 i).
+  now rewrite rngl_of_nat_succ in H2.
+}
+apply Nat.eqb_neq in Hch.
+split. {
+  intros i Hzi.
 ...
 
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
