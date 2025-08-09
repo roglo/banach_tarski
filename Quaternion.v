@@ -992,6 +992,11 @@ destruct ch. {
 apply Nat.eqb_neq in Hch.
 split. {
   intros i Hzi.
+  specialize rngl_opt_characteristic_prop as H2.
+  rewrite Hon in H2.
+  apply Nat.eqb_neq in Hch.
+  rewrite Hch in H2.
+  destruct H2 as (H1, H2).
 ...
 
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
