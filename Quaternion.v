@@ -246,6 +246,16 @@ progress unfold vec3_add, vec3_zero; cbn.
 now do 3 rewrite (rngl_add_opp_diag_r Hop).
 Qed.
 
+Theorem vec3_add_opp_opp : ∀ a b, vec3_add (- a) (- b) = (- vec3_add a b)%vec.
+Proof.
+intros.
+progress unfold vec3_add.
+progress unfold vec3_opp; cbn.
+do 3 rewrite (rngl_opp_add_distr Hop).
+do 3 rewrite (rngl_add_opp_r Hop).
+now f_equal; rewrite (rngl_opp_sub_swap Hop).
+Qed.
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
@@ -674,9 +684,38 @@ symmetry in Hopq.
 destruct opq. {
   specialize (rngl_has_opp_has_opp_or_subt Hopq) as Hosq.
   rewrite <- quat_add_assoc; cbn.
+  generalize Hos; intros H.
+  generalize Hop; intros H'.
+  progress unfold rngl_has_opp in H'.
   progress f_equal.
-  progress unfold rngl_opp.
+  progress unfold rngl_opp; cbn.
+  progress unfold quat_add.
+  progress unfold rngl_has_opp_or_subt in H.
   progress unfold rngl_has_opp_or_subt in Hosq.
+  cbn in H, H', Hosq |- *.
+  progress unfold quat_opt_opp_or_subt in H, H', Hosq |-*.
+  remember (rngl_opt_opp_or_subt T) as ros eqn:Hros.
+  symmetry in Hros.
+  destruct ros as [opp_subt| ]; [ clear H | easy ].
+  destruct opp_subt as [opp| subt ]; [ clear H' | easy ].
+  progress unfold quat_opp; cbn.
+  rewrite (rngl_opp_add_distr Hop).
+  rewrite (rngl_add_opp_r Hop).
+  rewrite (rngl_opp_sub_swap Hop).
+  progress f_equal.
+  symmetry.
+  apply vec3_add_opp_opp.
+}
+remember (rngl_has_subt (quaternion T)) as suq eqn:Hsuq.
+symmetry in Hsuq.
+destruct suq; [ | easy ].
+...
+  remember (rngl_opt_opp_or_subt (quaternion T)) as rosq eqn:Hrosq.
+  symmetry in Hrosq.
+  destruct rosq as [opp_subt| ]; [ | easy ].
+  clear Hosq.
+  cbn in Hrosq.
+  progress unfold quat_opt_opp_or_subt in Hrosq.
 ...
   destruct (rngl_opt_opp_or_subt (quaternion T)); [ | easy ].
   destruct s; cbn.
