@@ -659,6 +659,40 @@ Theorem quat_opt_sub_add_distr :
     ∀ a b c : quaternion T, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
 Proof.
+(**)
+remember (rngl_has_subt (quaternion T)) as suq eqn:Hsuq.
+symmetry in Hsuq.
+destruct suq; [ | easy ].
+(**)
+Theorem quat_sub_add_distr :
+  ∀ a b c : quaternion T, (a - (b + c))%L = (a - b - c)%L.
+Proof.
+intros; cbn.
+progress unfold rngl_sub; cbn.
+remember (rngl_has_opp (quaternion T)) as opq eqn:Hopq.
+symmetry in Hopq.
+destruct opq. {
+  specialize (rngl_has_opp_has_opp_or_subt Hopq) as Hosq.
+  rewrite <- quat_add_assoc; cbn.
+  progress f_equal.
+  progress unfold rngl_opp.
+  progress unfold rngl_has_opp_or_subt in Hosq.
+...
+  destruct (rngl_opt_opp_or_subt (quaternion T)); [ | easy ].
+  destruct s; cbn.
+...
+Print rngl_opt_opp_or_subt.
+  progress unfold quat_opt_opp_or_subt.
+
+...
+  rewrite quat_opp_add_distr.
+...
+Set Printing All.
+progress unfold quat_ring_like_op; cbn.
+progress unfold quat_sub.
+... ...
+now apply quat_sub_add_distr.
+...
 generalize Hop; intros H.
 progress unfold rngl_has_opp in H |-*; cbn in H |-*.
 progress unfold rngl_sub; cbn.
@@ -670,6 +704,7 @@ symmetry in Hosq.
 destruct osq as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
+...
 
 Theorem quat_opt_sub_0_l :
   if rngl_has_subt (quaternion T) then ∀ a : quaternion T, (0 - a)%L = 0%L
@@ -952,6 +987,17 @@ progress unfold rngl_has_1 in Hon.
 now destruct (rngl_opt_one T).
 Qed.
 
+Theorem quat_add_move_0_l : ∀ a b, (a + b)%quat = 0%quat ↔ b = (- a)%quat.
+Proof.
+intros.
+split; intros Hab; [ | subst; apply quat_sub_diag ].
+apply (f_equal (λ x, (x - b))%quat) in Hab.
+Search (_ + _ - _)%quat.
+...
+Search (_ + _ = _ + _)%quat.
+Search (_ - _ = _ - _)%quat.
+...
+
 Theorem quat_opt_characteristic_prop :
   if rngl_has_1 (quaternion T) then
     if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
@@ -1006,9 +1052,7 @@ split. {
   rewrite rngl_of_nat_succ.
   cbn in H3q.
   apply (rngl_add_move_0_l Hop).
-Theorem quat_add_move_0_l : ∀ a b, (a + b)%quat = 0%quat ↔ b = (- a)%quat.
-Proof.
-Admitted.
+... ...
   apply quat_add_move_0_l in H3q.
   progress unfold rngl_one in H3q; cbn in H3q.
   generalize Honq; intros H.
@@ -1018,6 +1062,11 @@ Admitted.
 (*
   progress unfold quat_opp in H3q; cbn in H3q.
 *)
+  destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+    specialize (rngl_characteristic_1 Hon Hos Hc1) as H3.
+    rewrite H3; apply H3.
+  }
+  move Hc1 before Hch.
   induction i. {
     cbn in H3q.
     progress unfold quat_opp in H3q; cbn in H3q.
@@ -1027,8 +1076,9 @@ Admitted.
     apply (f_equal rngl_opp) in H3.
     rewrite (rngl_opp_0 Hop) in H3.
     rewrite (rngl_opp_involutive Hop) in H3.
-    apply (rngl_1_neq_0_iff Hon) in H3; [ easy | ].
-(* crotte : il y a le cas char=1 à traiter avant *)
+    now apply (rngl_1_neq_0_iff Hon) in H3.
+  }
+
 ...
 (*
   set (roq := quat_ring_like_op).
