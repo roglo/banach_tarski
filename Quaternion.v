@@ -996,7 +996,12 @@ split. {
   rewrite Hon in H2.
   apply Nat.eqb_neq in Hch.
   rewrite Hch in H2.
+  apply Nat.eqb_neq in Hch.
   destruct H2 as (H1, H2).
+  apply H1 in Hzi.
+  intros H3; apply Hzi; clear Hzi.
+  rename H3 into H3q.
+  progress unfold rngl_zero in H3q; cbn in H3q.
 ...
 
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
