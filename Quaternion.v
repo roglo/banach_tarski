@@ -2,7 +2,7 @@
    que j'utilise ring-like sur les matrices *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8.
+From Stdlib Require Import Utf8 Arith.
 
 Require Import RingLike.Core.
 
@@ -79,7 +79,10 @@ Definition quat_add a b :=
     (vec3_add (q_im a) (q_im b)).
 
 Definition vec2_scal_mul x y x' y' := (x * y' + y * x')%L.
-Definition mat2_det y z y' z' := (y * z' - z * y')%L.
+Definition mat2_det x y x' y' := (x * y' - y * x')%L.
+
+Arguments vec2_scal_mul (x y x' y')%_L.
+Arguments mat2_det (x y x' y')%_L.
 
 Definition quat_mul (q q' : quaternion T) :=
   let '(mk_quat a (mk_v x y z)) := q in
@@ -108,9 +111,6 @@ Definition quat_ext_div q h :=
   mk_quat (a / h) (mk_v (b / h) (c / h) (d / h)).
 
 Definition quat_inv a := quat_ext_div (quat_conj a) (quat_norm_squ a).
-(*
-Definition quat_inv a := quat_ext_mul (quat_norm_squ a)⁻¹ (quat_conj a).
-*)
 
 Notation "a +ℹ b +𝐣 c +𝐤 d" :=
   (mk_quat a (mk_v b c d)) (at level 50, b, c, d at level 0) : quat_scope.
@@ -457,27 +457,11 @@ f_equal. {
 }
 Qed.
 
-Theorem quat_opt_mul_1_r :
-  if rngl_has_1 (quaternion T) then ∀ a : quaternion T, (a * 1)%L = a
-  else not_applicable.
+Context {Hon : rngl_has_1 T = true}.
+
+Theorem quat_mul_1_r : ∀ a, (a * 1)%quat = a%quat.
 Proof.
-remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
-symmetry in Honq.
-destruct onq; [ | easy ].
 intros.
-progress unfold rngl_has_1 in Honq; cbn in Honq.
-progress unfold quat_opt_one in Honq; cbn in Honq.
-progress unfold rngl_one; cbn.
-progress unfold quat_opt_one.
-remember (rngl_has_1 T) as on eqn:Hon.
-symmetry in Hon.
-generalize Hon; intros H.
-progress unfold rngl_has_1 in H.
-remember (rngl_opt_one T) as oon eqn:Hoon.
-symmetry in Hoon.
-destruct oon; [ | easy ].
-destruct on; [ | easy ].
-clear Honq H.
 destruct a as (a, (x, y, z)); cbn.
 f_equal. {
   do 2 rewrite <- rngl_mul_add_distr_r.
@@ -492,6 +476,26 @@ rewrite (rngl_sub_diag Hos).
 do 3 rewrite rngl_add_0_l.
 do 3 rewrite rngl_add_0_r.
 easy.
+Qed.
+
+Theorem quat_opt_mul_1_r :
+  if rngl_has_1 (quaternion T) then ∀ a : quaternion T, (a * 1)%L = a
+  else not_applicable.
+Proof.
+remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
+symmetry in Honq.
+destruct onq; [ | easy ].
+intros.
+progress unfold rngl_has_1 in Honq; cbn in Honq.
+progress unfold quat_opt_one in Honq; cbn in Honq.
+progress unfold rngl_one; cbn.
+progress unfold quat_opt_one.
+generalize Hon; intros H.
+progress unfold rngl_has_1 in H.
+remember (rngl_opt_one T) as oon eqn:Hoon.
+symmetry in Hoon.
+destruct oon; [ | easy ].
+apply quat_mul_1_r.
 Qed.
 
 Theorem quat_mul_add_distr_r :
@@ -549,14 +553,53 @@ f_equal. {
 }
 Qed.
 
+Theorem vec2_scal_mul_opp_opp_l :
+  ∀ a b a' b',
+  vec2_scal_mul (- a) (- b) a' b' = (- vec2_scal_mul a b a' b')%L.
+Proof.
+intros.
+progress unfold vec2_scal_mul.
+do 2 rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_opp_add_distr Hop).
+apply (rngl_opp_sub_swap Hop).
+Qed.
+
+Theorem mat2_det_opp_opp_l :
+  ∀ a b a' b',
+  mat2_det (- a) (- b) a' b' = (- mat2_det a b a' b')%L.
+Proof.
+intros.
+progress unfold mat2_det.
+do 2 rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_opp_sub_distr Hop).
+apply (rngl_add_opp_l Hop).
+Qed.
+
 Theorem quat_mul_opp_l : ∀ a b, (- a * b = - (a * b))%quat.
 Proof.
 intros.
 destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
 progress unfold quat_opp; cbn.
-do 4 rewrite (rngl_mul_opp_l Hop).
-...
+f_equal. {
+  do 4 rewrite (rngl_mul_opp_l Hop).
+  do 2 rewrite (rngl_add_opp_r Hop).
+  do 2 rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_sub_opp_r Hop).
+  do 2 rewrite <- rngl_add_assoc.
+  rewrite (rngl_add_assoc (x * x')).
+  rewrite (rngl_add_opp_l Hop); symmetry.
+  apply (rngl_opp_sub_distr Hop).
+}
+do 3 rewrite vec2_scal_mul_opp_opp_l.
+do 3 rewrite mat2_det_opp_opp_l.
+do 3 rewrite (rngl_add_opp_r Hop).
+do 3 rewrite <- (rngl_opp_add_distr Hop).
+do 3 rewrite (rngl_add_comm (mat2_det _ _ _ _)).
+easy.
+Qed.
 
 Theorem quat_mul_sub_distr_r :
   ∀ a b c, ((a - b) * c)%quat = (a * c - b * c)%quat.
@@ -565,8 +608,8 @@ intros.
 progress unfold quat_sub.
 rewrite quat_mul_add_distr_r.
 progress f_equal.
-Search (- _ * _)%quat.
-...
+apply quat_mul_opp_l.
+Qed.
 
 Theorem quat_opt_mul_add_distr_r :
   ∀ a b c : quaternion T, ((a + b) * c)%L = (a * c + b * c)%L.
@@ -645,10 +688,10 @@ now destruct opp.
 Qed.
 
 Context {Hic : rngl_mul_is_comm T = true}.
-Context {Hon : rngl_has_1 T = true}.
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
+Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 
 Theorem eq_quat_norm_squ_0 : ∀ a, quat_norm_squ a = 0%L → a = 0%quat.
 Proof.
@@ -874,16 +917,9 @@ Theorem quat_mul_0_l : ∀ a, (0 * a)%quat = 0%quat.
 Proof.
 intros.
 rewrite <- (quat_sub_diag 0) at 1.
-progress unfold quat_sub.
-rewrite quat_mul_add_distr_r.
-cbn - [ quat_mul ].
-Search (- _ * _)%quat.
-(* faudrait faire un quat_mul_sub_distr_r, plutôt *)
-...
-Search (_ + - _)%quat.
-...
-rewrite quat_opp_0.
-...
+rewrite quat_mul_sub_distr_r.
+apply quat_sub_diag.
+Qed.
 
 Theorem quat_opt_integral :
    ∀ a b : quaternion T,
@@ -893,24 +929,54 @@ Proof.
 intros * Hab.
 cbn in Hab |-*.
 apply (f_equal (λ x, quat_mul x (quat_inv b))) in Hab.
-Search (0 * _)%quat.
-...
 rewrite quat_mul_0_l in Hab.
-...
 rewrite <- quat_mul_assoc in Hab.
-rewrite (quat_mul_inv_diag_r) in Hab.
+destruct (quat_eq_dec (rngl_eq_dec Heo) b 0) as [Hbz| Hbz].
+now right; left.
+rewrite (quat_mul_inv_diag_r) in Hab; [ | easy ].
+rewrite quat_mul_1_r in Hab.
+now left.
+Qed.
+
+Theorem quat_opt_characteristic_prop :
+  if rngl_has_1 (quaternion T) then
+    if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+    else
+      (∀ i : nat, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%L) ∧
+      rngl_of_nat (rngl_characteristic T) = 0%L
+  else not_applicable.
+Proof.
+remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
+symmetry in Honq.
+destruct onq; [ | easy ].
+specialize rngl_opt_characteristic_prop as H1.
+rewrite Hon in H1.
+remember (rngl_characteristic T =? 0) as chz eqn:Hchz.
+symmetry in Hchz.
+destruct chz. {
+  intros i H2.
+  apply (H1 i); clear H1.
+  rewrite rngl_of_nat_succ in H2; cbn in H2.
+  rewrite rngl_of_nat_succ.
+  progress unfold rngl_one in H2.
+  generalize Honq; intros H.
+  generalize Hon; intros H1.
+  progress unfold rngl_has_1 in H, H1.
+  cbn in H2, H.
+  progress unfold quat_opt_one in H2, H.
+  destruct (rngl_opt_one T); [ | easy ].
+  clear t H H1.
+  rename H2 into H.
+  injection H; clear H; intros H4 H3 H2 H1.
 ...
-intros * Hab.
-cbn in Hab |-*.
-destruct a as (a, (x, y, z)).
-destruct b as (a', (x', y', z')).
-cbn in Hab.
-injection Hab; clear Hab; intros H4 H3 H2 H1.
-move H2 after H1; move H3 after H2; move H4 after H3.
-progress unfold vec2_scal_mul, mat2_det in H2, H3, H4.
+  remember (rngl_opt_one (quaternion T)) as o1 eqn:Ho1.
+  symmetry in Ho1.
+  destruct o1; [ | easy ].
+  cbn in H2.
+  progress unfold quat_opt_one in H2.
+  progress unfold rngl_opt_one in H2.
 ...
 
-From Stdlib Require Import Arith.
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
      rngl_is_archimedean := rngl_is_archimedean T;
@@ -935,7 +1001,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_mul_quot_r := quat_opt_mul_quot_r;
      rngl_opt_integral := quat_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_opt_characteristic_prop := 42;
+     rngl_opt_characteristic_prop := quat_opt_characteristic_prop;
      rngl_opt_ord := 42;
      rngl_opt_archimedean := 42 |}.
 ...
