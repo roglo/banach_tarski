@@ -1027,7 +1027,7 @@ Admitted.
     apply (f_equal rngl_opp) in H3.
     rewrite (rngl_opp_0 Hop) in H3.
     rewrite (rngl_opp_involutive Hop) in H3.
-    apply (rngl_1_neq_0_iff Hon) in H3.
+    apply (rngl_1_neq_0_iff Hon) in H3; [ easy | ].
 (* crotte : il y a le cas char=1 à traiter avant *)
 ...
 (*
