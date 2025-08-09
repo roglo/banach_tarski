@@ -1001,7 +1001,41 @@ split. {
   apply H1 in Hzi.
   intros H3; apply Hzi; clear Hzi.
   rename H3 into H3q.
+  destruct i; [ easy | ].
+  rewrite rngl_of_nat_succ in H3q.
+  rewrite rngl_of_nat_succ.
+  cbn in H3q.
+  apply (rngl_add_move_0_l Hop).
+Theorem quat_add_move_0_l : ∀ a b, (a + b)%quat = 0%quat ↔ b = (- a)%quat.
+Proof.
+Admitted.
+  apply quat_add_move_0_l in H3q.
+  progress unfold rngl_one in H3q; cbn in H3q.
+  generalize Honq; intros H.
+  progress unfold rngl_has_1 in H; cbn in H.
+  progress unfold quat_opt_one in H3q, H.
+  destruct (rngl_opt_one T); [ clear H | easy ].
+(*
+  progress unfold quat_opp in H3q; cbn in H3q.
+*)
+  induction i. {
+    cbn in H3q.
+    progress unfold quat_opp in H3q; cbn in H3q.
+    progress unfold quat_zero in H3q; cbn in H3q.
+    injection H3q; clear H3q; intros H6 H5 H4 H3.
+    symmetry in H3.
+    apply (f_equal rngl_opp) in H3.
+    rewrite (rngl_opp_0 Hop) in H3.
+    rewrite (rngl_opp_involutive Hop) in H3.
+    apply (rngl_1_neq_0_iff Hon) in H3.
+(* crotte : il y a le cas char=1 à traiter avant *)
+...
+(*
+  set (roq := quat_ring_like_op).
+*)
+  apply (@rngl_add_move_0_r (quaternion T)) in H3q.
   progress unfold rngl_zero in H3q; cbn in H3q.
+  apply (rngl_add_move_0_r).
 ...
 
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
