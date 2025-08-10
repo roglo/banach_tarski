@@ -499,6 +499,21 @@ do 2 progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
+Theorem vec3_scal_mul_add_distr_r :
+  ∀ x y z x' y' z' x'' y'' z'',
+  vec3_scal_mul (x + x') (y + y') (z + z') x'' y'' z'' =
+  (vec3_scal_mul x y z x'' y'' z'' + vec3_scal_mul x' y' z' x'' y'' z'')%L.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+do 3 rewrite rngl_mul_add_distr_r.
+do 4 rewrite rngl_add_assoc.
+progress f_equal.
+do 2 rewrite (rngl_add_add_swap _ (z * z'')).
+do 2 progress f_equal.
+apply rngl_add_add_swap.
+Qed.
+
 Theorem mat2_det_add_distr_l :
   ∀ x y x' y' x'' y'',
   mat2_det x y (x' + x'') (y' + y'') =
@@ -604,15 +619,12 @@ destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
 progress unfold quat_add; cbn.
 f_equal. {
-...
-  do 4 rewrite rngl_mul_add_distr_r.
+  rewrite vec3_scal_mul_add_distr_r.
+  rewrite (rngl_sub_add_distr Hos).
   rewrite (rngl_add_sub_assoc Hop).
-  do 11 ring_light_step.
-  do 2 f_equal.
-  progress do 2 rewrite (rngl_sub_sub_swap Hop _ (z * z'')).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_sub_sub_swap Hop _ (y * y'')).
-  easy.
+  rewrite <- (rngl_add_sub_swap Hop).
+  do 2 progress f_equal.
+  apply rngl_mul_add_distr_r.
 }
 progress unfold vec3_add; cbn.
 f_equal. {
@@ -667,6 +679,7 @@ destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
 progress unfold quat_opp; cbn.
 f_equal. {
+...
   do 4 rewrite (rngl_mul_opp_l Hop).
   do 2 rewrite (rngl_add_opp_r Hop).
   do 2 rewrite (rngl_sub_sub_distr Hop).
