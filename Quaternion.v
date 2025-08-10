@@ -665,7 +665,7 @@ now destruct opp.
 Qed.
 
 Theorem quat_sub_add_distr :
-  ∀ a b c : quaternion T, (a - (b + c))%L = (a - b - c)%L.
+  ∀ a b c : quaternion T, (a - (b + c) = a - b - c)%L.
 Proof.
 intros; cbn.
 progress unfold rngl_sub; cbn.
@@ -995,22 +995,31 @@ progress unfold rngl_has_1 in Hon.
 now destruct (rngl_opt_one T).
 Qed.
 
+Theorem quat_add_sub : ∀ a b, (a + b - b)%quat = a.
+Proof.
+intros.
+progress unfold quat_sub.
+progress unfold quat_add.
+progress unfold quat_opp; cbn.
+rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_add_sub Hos).
+progress unfold vec3_add; cbn.
+do 3 rewrite (rngl_add_opp_r Hop).
+do 3 rewrite (rngl_add_sub Hos).
+now destruct a as (a, (x, y, z)).
+Qed.
+
 Theorem quat_add_move_0_l : ∀ a b, (a + b)%quat = 0%quat ↔ b = (- a)%quat.
 Proof.
 intros.
 split; intros Hab; [ | subst; apply quat_sub_diag ].
-apply (f_equal (quat_sub b)) in Hab.
-Check quat_sub_add_distr.
-rewrite quat_sub_add_distr in Hab.
-...
-apply (f_equal (λ x, (x - b))%quat) in Hab.
-Check quat_sub_add_distr.
-...
-Search (_ + _ - _)%quat.
-...
-Search (_ + _ = _ + _)%quat.
-Search (_ - _ = _ - _)%quat.
-...
+apply (f_equal (λ x, quat_sub x a)) in Hab.
+rewrite quat_add_comm in Hab; cbn in Hab.
+rewrite quat_add_sub in Hab.
+subst.
+progress unfold quat_sub.
+apply quat_add_0_l.
+Qed.
 
 Theorem quat_opt_characteristic_prop :
   if rngl_has_1 (quaternion T) then
@@ -1066,7 +1075,6 @@ split. {
   rewrite rngl_of_nat_succ.
   cbn in H3q.
   apply (rngl_add_move_0_l Hop).
-... ...
   apply quat_add_move_0_l in H3q.
   progress unfold rngl_one in H3q; cbn in H3q.
   generalize Honq; intros H.
@@ -1092,7 +1100,6 @@ split. {
     rewrite (rngl_opp_involutive Hop) in H3.
     now apply (rngl_1_neq_0_iff Hon) in H3.
   }
-
 ...
 (*
   set (roq := quat_ring_like_op).
