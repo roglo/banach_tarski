@@ -566,17 +566,12 @@ destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
 progress unfold quat_add; cbn.
 f_equal. {
-(**)
   rewrite vec3_scal_mul_add_distr_l.
-...
-  do 4 rewrite rngl_mul_add_distr_l.
+  rewrite (rngl_sub_add_distr Hos).
   rewrite (rngl_add_sub_assoc Hop).
-  do 11 ring_light_step.
-  do 2 f_equal.
-  progress do 2 rewrite (rngl_sub_sub_swap Hop _ (z * z')).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_sub_sub_swap Hop _ (y * y')).
-  easy.
+  rewrite <- (rngl_add_sub_swap Hop).
+  do 2 progress f_equal.
+  apply rngl_mul_add_distr_l.
 }
 progress unfold vec3_add; cbn.
 f_equal. {
@@ -609,6 +604,7 @@ destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
 progress unfold quat_add; cbn.
 f_equal. {
+...
   do 4 rewrite rngl_mul_add_distr_r.
   rewrite (rngl_add_sub_assoc Hop).
   do 11 ring_light_step.
