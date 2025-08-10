@@ -79,16 +79,18 @@ Definition quat_add a b :=
     (vec3_add (q_im a) (q_im b)).
 
 Definition vec2_scal_mul x y x' y' := (x * y' + y * x')%L.
+Definition vec3_scal_mul x y z x' y' z' := (x * x' + y * y' + z * z')%L.
 Definition mat2_det x y x' y' := (x * y' - y * x')%L.
 
 Arguments vec2_scal_mul (x y x' y')%_L.
+Arguments vec3_scal_mul (x y z x' y' z')%_L.
 Arguments mat2_det (x y x' y')%_L.
 
 Definition quat_mul (q q' : quaternion T) :=
   let '(mk_quat a (mk_v x y z)) := q in
   let '(mk_quat a' (mk_v x' y' z')) := q' in
   mk_quat
-    (a * a' - (x * x' + y * y' + z * z'))
+    (a * a' - vec3_scal_mul x y z x' y' z')
     (mk_v
       (vec2_scal_mul a x a' x' + mat2_det y z y' z')
       (vec2_scal_mul a y a' y' + mat2_det z x z' x')
@@ -266,6 +268,7 @@ destruct c as (a'', (x'', y'', z'')).
 cbn - [ quat_mul ].
 cbn.
 progress unfold vec2_scal_mul.
+progress unfold vec3_scal_mul.
 progress unfold mat2_det.
 do 24 rewrite rngl_mul_add_distr_l.
 do 24 rewrite rngl_mul_add_distr_r.
@@ -407,6 +410,22 @@ rewrite (rngl_mul_0_l Hos).
 apply rngl_add_0_r.
 Qed.
 
+Theorem vec3_scal_mul_0_l : ∀ x y z, vec3_scal_mul 0 0 0 x y z = 0%L.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+do 2 rewrite <- rngl_mul_add_distr_l.
+apply (rngl_mul_0_l Hos).
+Qed.
+
+Theorem vec3_scal_mul_0_r : ∀ x y z, vec3_scal_mul x y z 0 0 0 = 0%L.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+do 2 rewrite <- rngl_mul_add_distr_r.
+apply (rngl_mul_0_r Hos).
+Qed.
+
 Theorem mat2_det_0_l : ∀ x y, mat2_det 0 0 x y = 0%L.
 Proof.
 intros.
@@ -420,8 +439,7 @@ Proof.
 intros.
 destruct a as (a, (x, y, z)); cbn.
 rewrite (rngl_mul_1_l Hon).
-do 2 rewrite <- rngl_mul_add_distr_l.
-rewrite (rngl_mul_0_l Hos).
+rewrite vec3_scal_mul_0_l.
 rewrite (rngl_sub_0_r Hos).
 do 3 rewrite vec2_scal_mul_1_l.
 do 3 rewrite mat2_det_0_l.
@@ -499,8 +517,7 @@ Proof.
 intros.
 destruct a as (a, (x, y, z)); cbn.
 f_equal. {
-  do 2 rewrite <- rngl_mul_add_distr_r.
-  rewrite (rngl_mul_0_r Hos).
+  rewrite vec3_scal_mul_0_r.
   rewrite (rngl_sub_0_r Hos).
   apply (rngl_mul_1_r Hon).
 }
@@ -534,6 +551,7 @@ destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
 progress unfold quat_add; cbn.
 f_equal. {
+...
   do 4 rewrite rngl_mul_add_distr_l.
   rewrite (rngl_add_sub_assoc Hop).
   do 11 ring_light_step.
