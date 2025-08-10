@@ -673,8 +673,8 @@ intros.
 progress unfold vec2_scal_mul.
 do 2 rewrite (rngl_mul_opp_l Hop).
 rewrite (rngl_add_opp_r Hop).
-rewrite (rngl_opp_add_distr Hop).
-apply (rngl_opp_sub_swap Hop).
+symmetry.
+apply (rngl_opp_add_distr Hop).
 Qed.
 
 Theorem vec3_scal_mul_opp_l :
@@ -687,10 +687,9 @@ progress unfold vec3_scal_mul.
 do 3 rewrite (rngl_mul_opp_l Hop).
 do 2 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_opp_add_distr Hop).
-rewrite (rngl_sub_add_distr Hos).
-rewrite (rngl_opp_sub_swap Hop (z * z')).
-rewrite (rngl_sub_sub_swap Hop _ (z * z')).
-easy.
+progress f_equal.
+symmetry.
+apply (rngl_opp_add_distr Hop).
 Qed.
 
 Theorem mat2_det_opp_l :
@@ -722,7 +721,6 @@ do 3 rewrite vec2_scal_mul_opp_l.
 do 3 rewrite mat2_det_opp_l.
 do 3 rewrite (rngl_add_opp_r Hop).
 do 3 rewrite <- (rngl_opp_add_distr Hop).
-do 3 rewrite (rngl_add_comm (mat2_det _ _ _ _)).
 easy.
 Qed.
 
