@@ -785,9 +785,24 @@ Theorem quat_opt_add_sub :
   else not_applicable.
 Proof. now rewrite rngl_has_subt_quaternion. Qed.
 
+Theorem quat_add_opp_r : ∀ a b, (a + - b = a - b)%quat.
+Proof. easy. Qed.
+
 Theorem quat_sub_add_distr :
+  ∀ a b c : quaternion T, (a - (b + c) = a - b - c)%quat.
+Proof.
+...
+
+Theorem rngl_quat_sub_add_distr :
   ∀ a b c : quaternion T, (a - (b + c) = a - b - c)%L.
 Proof.
+intros; cbn.
+progress unfold rngl_sub.
+rewrite rngl_has_opp_quaternion.
+do 3 rewrite rngl_opp_quat_opp.
+do 3 rewrite quat_add_opp_r.
+... ...
+apply quat_sub_add_distr.
 ...
 intros; cbn.
 progress unfold rngl_sub; cbn.
