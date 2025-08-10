@@ -664,16 +664,6 @@ destruct osq as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
 
-Theorem quat_opt_sub_add_distr :
-  if rngl_has_subt (quaternion T) then
-    ∀ a b c : quaternion T, (a - (b + c))%L = (a - b - c)%L
-  else not_applicable.
-Proof.
-(**)
-remember (rngl_has_subt (quaternion T)) as suq eqn:Hsuq.
-symmetry in Hsuq.
-destruct suq; [ | easy ].
-(**)
 Theorem quat_sub_add_distr :
   ∀ a b c : quaternion T, (a - (b + c))%L = (a - b - c)%L.
 Proof.
@@ -706,44 +696,23 @@ destruct opq. {
   symmetry.
   apply vec3_add_opp_opp.
 }
-remember (rngl_has_subt (quaternion T)) as suq eqn:Hsuq.
-symmetry in Hsuq.
-destruct suq; [ | easy ].
-...
-  remember (rngl_opt_opp_or_subt (quaternion T)) as rosq eqn:Hrosq.
-  symmetry in Hrosq.
-  destruct rosq as [opp_subt| ]; [ | easy ].
-  clear Hosq.
-  cbn in Hrosq.
-  progress unfold quat_opt_opp_or_subt in Hrosq.
-...
-  destruct (rngl_opt_opp_or_subt (quaternion T)); [ | easy ].
-  destruct s; cbn.
-...
-Print rngl_opt_opp_or_subt.
-  progress unfold quat_opt_opp_or_subt.
-
-...
-  rewrite quat_opp_add_distr.
-...
-Set Printing All.
-progress unfold quat_ring_like_op; cbn.
-progress unfold quat_sub.
-... ...
-now apply quat_sub_add_distr.
-...
-generalize Hop; intros H.
-progress unfold rngl_has_opp in H |-*; cbn in H |-*.
-progress unfold rngl_sub; cbn.
-progress unfold rngl_has_subt; cbn.
-progress unfold rngl_has_opp; cbn.
-progress unfold quat_opt_opp_or_subt.
-remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
-symmetry in Hosq.
-destruct osq as [opp| ]; [ | easy ].
-now destruct opp.
+exfalso.
+progress unfold rngl_has_opp in Hop.
+progress unfold rngl_has_opp in Hopq.
+cbn in Hop, Hopq.
+progress unfold quat_opt_opp_or_subt in Hopq.
+destruct (rngl_opt_opp_or_subt T) as [opp_subt| ]; [ | easy ].
+now destruct opp_subt.
 Qed.
-...
+
+Theorem quat_opt_sub_add_distr :
+  if rngl_has_subt (quaternion T) then
+    ∀ a b c : quaternion T, (a - (b + c))%L = (a - b - c)%L
+  else not_applicable.
+Proof.
+destruct (rngl_has_subt (quaternion T)); [ | easy ].
+apply quat_sub_add_distr.
+Qed.
 
 Theorem quat_opt_sub_0_l :
   if rngl_has_subt (quaternion T) then ∀ a : quaternion T, (0 - a)%L = 0%L
@@ -1030,7 +999,13 @@ Theorem quat_add_move_0_l : ∀ a b, (a + b)%quat = 0%quat ↔ b = (- a)%quat.
 Proof.
 intros.
 split; intros Hab; [ | subst; apply quat_sub_diag ].
+apply (f_equal (quat_sub b)) in Hab.
+Check quat_sub_add_distr.
+rewrite quat_sub_add_distr in Hab.
+...
 apply (f_equal (λ x, (x - b))%quat) in Hab.
+Check quat_sub_add_distr.
+...
 Search (_ + _ - _)%quat.
 ...
 Search (_ + _ = _ + _)%quat.
