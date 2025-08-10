@@ -648,9 +648,9 @@ f_equal. {
 }
 Qed.
 
-Theorem vec2_scal_mul_opp_opp_l :
-  ∀ a b a' b',
-  vec2_scal_mul (- a) (- b) a' b' = (- vec2_scal_mul a b a' b')%L.
+Theorem vec2_scal_mul_opp_l :
+  ∀ x y x' y',
+  vec2_scal_mul (- x) (- y) x' y' = (- vec2_scal_mul x y x' y')%L.
 Proof.
 intros.
 progress unfold vec2_scal_mul.
@@ -660,7 +660,23 @@ rewrite (rngl_opp_add_distr Hop).
 apply (rngl_opp_sub_swap Hop).
 Qed.
 
-Theorem mat2_det_opp_opp_l :
+Theorem vec3_scal_mul_opp_l :
+  ∀ x y z x' y' z',
+  vec3_scal_mul (- x) (- y) (- z) x' y' z' =
+  (- vec3_scal_mul x y z x' y' z')%L.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+do 3 rewrite (rngl_mul_opp_l Hop).
+do 2 rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_opp_add_distr Hop).
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_opp_sub_swap Hop (z * z')).
+rewrite (rngl_sub_sub_swap Hop _ (z * z')).
+easy.
+Qed.
+
+Theorem mat2_det_opp_l :
   ∀ a b a' b',
   mat2_det (- a) (- b) a' b' = (- mat2_det a b a' b')%L.
 Proof.
@@ -679,18 +695,14 @@ destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
 progress unfold quat_opp; cbn.
 f_equal. {
-...
-  do 4 rewrite (rngl_mul_opp_l Hop).
-  do 2 rewrite (rngl_add_opp_r Hop).
-  do 2 rewrite (rngl_sub_sub_distr Hop).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite vec3_scal_mul_opp_l.
   rewrite (rngl_sub_opp_r Hop).
-  do 2 rewrite <- rngl_add_assoc.
-  rewrite (rngl_add_assoc (x * x')).
-  rewrite (rngl_add_opp_l Hop); symmetry.
-  apply (rngl_opp_sub_distr Hop).
+  rewrite (rngl_opp_sub_distr Hop).
+  apply (rngl_add_opp_l Hop).
 }
-do 3 rewrite vec2_scal_mul_opp_opp_l.
-do 3 rewrite mat2_det_opp_opp_l.
+do 3 rewrite vec2_scal_mul_opp_l.
+do 3 rewrite mat2_det_opp_l.
 do 3 rewrite (rngl_add_opp_r Hop).
 do 3 rewrite <- (rngl_opp_add_distr Hop).
 do 3 rewrite (rngl_add_comm (mat2_det _ _ _ _)).
@@ -715,6 +727,7 @@ Theorem quat_opt_add_opp_diag_l :
   if rngl_has_opp (quaternion T) then ∀ a : quaternion T, (- a + a)%L = 0%L
   else not_applicable.
 Proof.
+...
 generalize Hop; intros H.
 progress unfold rngl_has_opp in H |-*; cbn in H |-*.
 progress unfold rngl_opp; cbn.
