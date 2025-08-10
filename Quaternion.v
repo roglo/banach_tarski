@@ -1089,6 +1089,7 @@ split. {
     rewrite H3; apply H3.
   }
   move Hc1 before Hch.
+  exfalso.
   destruct i. {
     cbn in H3q.
     progress unfold quat_opp in H3q; cbn in H3q.
@@ -1098,6 +1099,22 @@ split. {
     apply (f_equal rngl_opp) in H3.
     rewrite (rngl_opp_0 Hop) in H3.
     rewrite (rngl_opp_involutive Hop) in H3.
+    now apply (rngl_1_neq_0_iff Hon) in H3.
+  }
+  destruct i. {
+    cbn in H3q.
+    progress unfold quat_opp in H3q; cbn in H3q.
+    progress unfold quat_zero in H3q; cbn in H3q.
+    injection H3q; clear H3q; intros H6 H5 H4 H3.
+    symmetry in H3.
+    apply (f_equal rngl_opp) in H3.
+    rewrite rngl_add_0_r in H3.
+    rewrite (rngl_opp_involutive Hop) in H3.
+    progress unfold rngl_opp in H3.
+(* encore ce truc... bon, ça devient lassant...
+   je devrais faire des maths en réfléchissant,
+   en prenant du recul, mais je n'y arrive pas. *)
+...
     now apply (rngl_1_neq_0_iff Hon) in H3.
   }
 ...
