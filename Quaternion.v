@@ -376,6 +376,57 @@ f_equal. {
 }
 Qed.
 
+Context {Hon : rngl_has_1 T = true}.
+
+Theorem rngl_opt_one_T : rngl_opt_one T = Some 1%L.
+Proof.
+progress unfold rngl_has_1 in Hon.
+progress unfold rngl_one; cbn.
+now destruct (rngl_opt_one T).
+Qed.
+
+Theorem rngl_opt_one_quat : rngl_opt_one (quaternion T) = Some 1%quat.
+Proof.
+cbn.
+progress unfold quat_opt_one.
+now rewrite rngl_opt_one_T.
+Qed.
+
+Theorem rngl_one_quat_one : 1%L = 1%quat.
+Proof.
+progress unfold rngl_one.
+now rewrite rngl_opt_one_quat.
+Qed.
+
+Theorem vec2_scal_mul_1_l : ∀ x y, vec2_scal_mul 1 0 x y = y.
+Proof.
+intros.
+progress unfold vec2_scal_mul.
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_mul_0_l Hos).
+apply rngl_add_0_r.
+Qed.
+
+Theorem mat2_det_0_l : ∀ x y, mat2_det 0 0 x y = 0%L.
+Proof.
+intros.
+progress unfold mat2_det.
+do 2 rewrite (rngl_mul_0_l Hos).
+apply (rngl_sub_diag Hos).
+Qed.
+
+Theorem quat_mul_1_l : ∀ a, (1 * a)%quat = a.
+Proof.
+intros.
+destruct a as (a, (x, y, z)); cbn.
+rewrite (rngl_mul_1_l Hon).
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_r Hos).
+do 3 rewrite vec2_scal_mul_1_l.
+do 3 rewrite mat2_det_0_l.
+...
+
 Theorem quat_opt_mul_1_l :
   if rngl_has_1 (quaternion T) then ∀ a : quaternion T, (1 * a)%L = a
   else not_applicable.
@@ -384,6 +435,12 @@ remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
 symmetry in Honq.
 destruct onq; [ | easy ].
 intros.
+(**)
+cbn.
+rewrite rngl_one_quat_one.
+... ...
+apply quat_mul_1_l.
+...
 progress unfold rngl_has_1 in Honq; cbn in Honq.
 progress unfold quat_opt_one in Honq; cbn in Honq.
 progress unfold rngl_one; cbn.
@@ -411,6 +468,8 @@ rewrite (rngl_sub_diag Hos).
 do 6 rewrite rngl_add_0_r.
 easy.
 Qed.
+
+...
 
 Theorem quat_mul_add_distr_l :
   ∀ a b c : quaternion T, (a * (b + c))%L = (a * b + a * c)%L.
@@ -466,8 +525,6 @@ f_equal. {
   easy.
 }
 Qed.
-
-Context {Hon : rngl_has_1 T = true}.
 
 Theorem quat_mul_1_r : ∀ a, (a * 1)%quat = a%quat.
 Proof.
