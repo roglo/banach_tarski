@@ -797,10 +797,11 @@ progress f_equal.
 progress unfold quat_add; cbn.
 f_equal. {
   rewrite (rngl_add_opp_r Hop).
-About rngl_opp_add_distr.
-...
-  rewrite (rngl_opp_add_distr Hop).
-...
+  apply (rngl_opp_add_distr Hop).
+}
+symmetry.
+apply vec3_add_opp_opp.
+Qed.
 
 Theorem rngl_quat_sub_add_distr :
   ∀ a b c : quaternion T, (a - (b + c) = a - b - c)%L.
@@ -810,71 +811,19 @@ progress unfold rngl_sub.
 rewrite rngl_has_opp_quaternion.
 do 3 rewrite rngl_opp_quat_opp.
 do 3 rewrite quat_add_opp_r.
-... ...
 apply quat_sub_add_distr.
-...
-intros; cbn.
-progress unfold rngl_sub; cbn.
-remember (rngl_has_opp (quaternion T)) as opq eqn:Hopq.
-symmetry in Hopq.
-destruct opq. {
-  specialize (rngl_has_opp_has_opp_or_subt Hopq) as Hosq.
-  rewrite <- quat_add_assoc; cbn.
-  generalize Hos; intros H.
-  generalize Hop; intros H'.
-  progress unfold rngl_has_opp in H'.
-  progress f_equal.
-  progress unfold rngl_opp; cbn.
-  progress unfold quat_add.
-  progress unfold rngl_has_opp_or_subt in H.
-  progress unfold rngl_has_opp_or_subt in Hosq.
-  cbn in H, H', Hosq |- *.
-  progress unfold quat_opt_opp_or_subt in H, H', Hosq |-*.
-  remember (rngl_opt_opp_or_subt T) as ros eqn:Hros.
-  symmetry in Hros.
-  destruct ros as [opp_subt| ]; [ clear H | easy ].
-  destruct opp_subt as [opp| subt ]; [ clear H' | easy ].
-  progress unfold quat_opp; cbn.
-  rewrite (rngl_opp_add_distr Hop).
-  rewrite (rngl_add_opp_r Hop).
-  rewrite (rngl_opp_sub_swap Hop).
-  progress f_equal.
-  symmetry.
-  apply vec3_add_opp_opp.
-}
-exfalso.
-progress unfold rngl_has_opp in Hop.
-progress unfold rngl_has_opp in Hopq.
-cbn in Hop, Hopq.
-progress unfold quat_opt_opp_or_subt in Hopq.
-destruct (rngl_opt_opp_or_subt T) as [opp_subt| ]; [ | easy ].
-now destruct opp_subt.
 Qed.
 
 Theorem quat_opt_sub_add_distr :
   if rngl_has_subt (quaternion T) then
     ∀ a b c : quaternion T, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
-Proof.
-destruct (rngl_has_subt (quaternion T)); [ | easy ].
-apply quat_sub_add_distr.
-Qed.
+Proof. now rewrite rngl_has_subt_quaternion. Qed.
 
 Theorem quat_opt_sub_0_l :
   if rngl_has_subt (quaternion T) then ∀ a : quaternion T, (0 - a)%L = 0%L
   else not_applicable.
-Proof.
-generalize Hop; intros H.
-progress unfold rngl_has_opp in H |-*; cbn in H |-*.
-progress unfold rngl_sub; cbn.
-progress unfold rngl_has_subt; cbn.
-progress unfold rngl_has_opp; cbn.
-progress unfold quat_opt_opp_or_subt.
-remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
-symmetry in Hosq.
-destruct osq as [opp| ]; [ | easy ].
-now destruct opp.
-Qed.
+Proof. now rewrite rngl_has_subt_quaternion. Qed.
 
 Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hiv : rngl_has_inv T = true}.
@@ -930,6 +879,12 @@ Theorem quat_opt_mul_inv_diag_l :
     ∀ a : quaternion T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
+Search (quat_inv).
+Print quat_inv.
+... ...
+rewrite quat_has_inv_quaternion.
+rewrite quat_has_1_quaternion.
+...
 progress unfold rngl_inv; cbn.
 progress unfold quat_opt_inv_or_quot.
 remember (rngl_has_inv (quaternion T)) as ivq eqn:Hivq.
