@@ -305,7 +305,7 @@ destruct a as [| a| a]; cbn. {
     symmetry; apply (rngl_sub_diag Hos).
   }
 } {
-  rewrite rngl_of_pos_add, rngl_add_comm.
+  rewrite rngl_of_pos_add.
   rewrite rngl_of_pos_1.
   apply (rngl_opp_add_distr Hop).
 }
@@ -505,7 +505,6 @@ destruct a as [| a| a]. {
   cbn.
   rewrite <- (rngl_opp_add_distr Hop).
   progress f_equal.
-  rewrite rngl_add_comm.
   rewrite rngl_of_pos_add.
   now rewrite rngl_of_pos_1.
 }
@@ -625,7 +624,6 @@ induction a as [| a| a]. {
     cbn.
     rewrite (rngl_add_opp_r Hop).
     rewrite <- (rngl_opp_add_distr Hop).
-    rewrite rngl_add_comm.
     progress f_equal.
     apply rngl_of_pos_add.
   }

@@ -198,7 +198,7 @@ f_equal; apply rngl_add_comm.
 Qed.
 
 Theorem quat_add_assoc :
-  ∀ a b c : quaternion T, (a + (b + c))%L = (a + b + c)%L.
+  ∀ a b c : quaternion T, (a + (b + c) = a + b + c)%quat.
 Proof.
 intros.
 destruct a as (a, (x, y, z)).
@@ -791,6 +791,17 @@ Proof. easy. Qed.
 Theorem quat_sub_add_distr :
   ∀ a b c : quaternion T, (a - (b + c) = a - b - c)%quat.
 Proof.
+intros.
+progress unfold quat_sub.
+progress unfold quat_opp.
+rewrite <- quat_add_assoc.
+progress f_equal.
+progress unfold quat_add; cbn.
+f_equal. {
+  rewrite (rngl_add_opp_r Hop).
+About rngl_opp_add_distr.
+...
+  rewrite (rngl_opp_add_distr Hop).
 ...
 
 Theorem rngl_quat_sub_add_distr :
