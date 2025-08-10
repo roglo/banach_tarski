@@ -459,9 +459,9 @@ apply quat_mul_1_l.
 Qed.
 
 Theorem vec2_scal_mul_add_distr_l :
-  ∀ a x a' x' a'' x'',
-  vec2_scal_mul a x (a' + a'') (x' + x'') =
-  (vec2_scal_mul a x a' x' + vec2_scal_mul a x a'' x'')%L.
+  ∀ x y x' y' x'' y'',
+  vec2_scal_mul x y (x' + x'') (y' + y'') =
+  (vec2_scal_mul x y x' y' + vec2_scal_mul x y x'' y'')%L.
 Proof.
 intros.
 progress unfold vec2_scal_mul.
@@ -472,9 +472,9 @@ apply rngl_add_add_swap.
 Qed.
 
 Theorem vec2_scal_mul_add_distr_r :
-  ∀ a x a' x' a'' x'',
-  vec2_scal_mul (a + a') (x + x') a'' x'' =
-  (vec2_scal_mul a x a'' x'' + vec2_scal_mul a' x' a'' x'')%L.
+  ∀ x y x' y' x'' y'',
+  vec2_scal_mul (x + x') (y + y') x'' y'' =
+  (vec2_scal_mul x y x'' y'' + vec2_scal_mul x' y' x'' y'')%L.
 Proof.
 intros.
 progress unfold vec2_scal_mul.
@@ -484,10 +484,25 @@ progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
+Theorem vec3_scal_mul_add_distr_l :
+  ∀ x y z x' y' z' x'' y'' z'',
+  vec3_scal_mul x y z (x' + x'') (y' + y'') (z' + z'') =
+  (vec3_scal_mul x y z x' y' z' + vec3_scal_mul x y z x'' y'' z'')%L.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+do 3 rewrite rngl_mul_add_distr_l.
+do 4 rewrite rngl_add_assoc.
+progress f_equal.
+do 2 rewrite (rngl_add_add_swap _ (z * z')).
+do 2 progress f_equal.
+apply rngl_add_add_swap.
+Qed.
+
 Theorem mat2_det_add_distr_l :
-  ∀ a x a' x' a'' x'',
-  mat2_det a x (a' + a'') (x' + x'') =
-  (mat2_det a x a' x' + mat2_det a x a'' x'')%L.
+  ∀ x y x' y' x'' y'',
+  mat2_det x y (x' + x'') (y' + y'') =
+  (mat2_det x y x' y' + mat2_det x y x'' y'')%L.
 Proof.
 intros.
 progress unfold mat2_det.
@@ -499,9 +514,9 @@ apply (rngl_add_sub_swap Hop).
 Qed.
 
 Theorem mat2_det_add_distr_r :
-  ∀ a x a' x' a'' x'',
-  mat2_det (a + a') (x + x') a'' x'' =
-  (mat2_det a x a'' x'' + mat2_det a' x' a'' x'')%L.
+  ∀ x y x' y' x'' y'',
+  mat2_det (x + x') (y + y') x'' y'' =
+  (mat2_det x y x'' y'' + mat2_det x' y' x'' y'')%L.
 Proof.
 intros.
 progress unfold mat2_det.
@@ -551,6 +566,8 @@ destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
 progress unfold quat_add; cbn.
 f_equal. {
+(**)
+  rewrite vec3_scal_mul_add_distr_l.
 ...
   do 4 rewrite rngl_mul_add_distr_l.
   rewrite (rngl_add_sub_assoc Hop).
