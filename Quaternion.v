@@ -1089,7 +1089,7 @@ split. {
     rewrite H3; apply H3.
   }
   move Hc1 before Hch.
-  induction i. {
+  destruct i. {
     cbn in H3q.
     progress unfold quat_opp in H3q; cbn in H3q.
     progress unfold quat_zero in H3q; cbn in H3q.
