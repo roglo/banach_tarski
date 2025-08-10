@@ -453,6 +453,19 @@ progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
+Theorem vec2_scal_mul_add_distr_r :
+  ∀ a x a' x' a'' x'',
+  vec2_scal_mul (a + a') (x + x') a'' x'' =
+  (vec2_scal_mul a x a'' x'' + vec2_scal_mul a' x' a'' x'')%L.
+Proof.
+intros.
+progress unfold vec2_scal_mul.
+do 2 rewrite rngl_mul_add_distr_r.
+do 2 rewrite rngl_add_assoc.
+progress f_equal.
+apply rngl_add_add_swap.
+Qed.
+
 Theorem mat2_det_add_distr_l :
   ∀ a x a' x' a'' x'',
   mat2_det a x (a' + a'') (x' + x'') =
@@ -465,6 +478,51 @@ rewrite (rngl_sub_add_distr Hos).
 rewrite (rngl_add_sub_assoc Hop).
 progress f_equal.
 apply (rngl_add_sub_swap Hop).
+Qed.
+
+Theorem mat2_det_add_distr_r :
+  ∀ a x a' x' a'' x'',
+  mat2_det (a + a') (x + x') a'' x'' =
+  (mat2_det a x a'' x'' + mat2_det a' x' a'' x'')%L.
+Proof.
+intros.
+progress unfold mat2_det.
+do 2 rewrite rngl_mul_add_distr_r.
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_add_sub_assoc Hop).
+progress f_equal.
+apply (rngl_add_sub_swap Hop).
+Qed.
+
+Theorem quat_mul_1_r : ∀ a, (a * 1)%quat = a%quat.
+Proof.
+intros.
+destruct a as (a, (x, y, z)); cbn.
+f_equal. {
+  do 2 rewrite <- rngl_mul_add_distr_r.
+  rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_sub_0_r Hos).
+  apply (rngl_mul_1_r Hon).
+}
+progress unfold vec2_scal_mul, mat2_det.
+do 3 rewrite (rngl_mul_1_r Hon).
+do 4 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_diag Hos).
+do 3 rewrite rngl_add_0_l.
+do 3 rewrite rngl_add_0_r.
+easy.
+Qed.
+
+Theorem quat_opt_mul_1_r :
+  if rngl_has_1 (quaternion T) then ∀ a : quaternion T, (a * 1)%L = a
+  else not_applicable.
+Proof.
+remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
+symmetry in Honq.
+destruct onq; [ | easy ].
+intros.
+rewrite rngl_one_quat_one; cbn.
+apply quat_mul_1_r.
 Qed.
 
 Theorem quat_mul_add_distr_l :
@@ -507,49 +565,13 @@ f_equal. {
 }
 Qed.
 
-Theorem quat_mul_1_r : ∀ a, (a * 1)%quat = a%quat.
-Proof.
-intros.
-destruct a as (a, (x, y, z)); cbn.
-f_equal. {
-  do 2 rewrite <- rngl_mul_add_distr_r.
-  rewrite (rngl_mul_0_r Hos).
-  rewrite (rngl_sub_0_r Hos).
-  apply (rngl_mul_1_r Hon).
-}
-progress unfold vec2_scal_mul, mat2_det.
-do 3 rewrite (rngl_mul_1_r Hon).
-do 4 rewrite (rngl_mul_0_r Hos).
-rewrite (rngl_sub_diag Hos).
-do 3 rewrite rngl_add_0_l.
-do 3 rewrite rngl_add_0_r.
-easy.
-Qed.
-
-Theorem quat_opt_mul_1_r :
-  if rngl_has_1 (quaternion T) then ∀ a : quaternion T, (a * 1)%L = a
-  else not_applicable.
-Proof.
-remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
-symmetry in Honq.
-destruct onq; [ | easy ].
-intros.
-rewrite rngl_one_quat_one; cbn.
-apply quat_mul_1_r.
-Qed.
-
 Theorem quat_mul_add_distr_r :
   ∀ a b c, ((a + b) * c)%quat = (a * c + b * c)%quat.
 Proof.
 intros.
-Check quat_mul_add_distr_l.
-...
-intros.
 destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
-progress unfold vec2_scal_mul; cbn.
-progress unfold mat2_det; cbn.
 progress unfold quat_add; cbn.
 f_equal. {
   do 4 rewrite rngl_mul_add_distr_r.
@@ -562,37 +584,24 @@ f_equal. {
   easy.
 }
 progress unfold vec3_add; cbn.
-do 12 rewrite rngl_mul_add_distr_r.
 f_equal. {
-  do 2 ring_light_step.
-  do 4 rewrite rngl_add_assoc.
-  do 4 rewrite (rngl_add_sub_assoc Hop).
-  do 15 ring_light_step.
-  f_equal.
-  progress do 2 rewrite (rngl_add_add_swap _ (y * z'')).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_add_add_swap _ (x * a'')).
-  easy.
+  rewrite vec2_scal_mul_add_distr_r.
+  rewrite mat2_det_add_distr_r.
+  do 2 rewrite rngl_add_assoc.
+  progress f_equal.
+  apply rngl_add_add_swap.
 } {
-  do 2 ring_light_step.
-  do 4 rewrite rngl_add_assoc.
-  do 4 rewrite (rngl_add_sub_assoc Hop).
-  do 15 ring_light_step.
-  f_equal.
-  progress do 2 rewrite (rngl_add_add_swap _ (z * x'')).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_add_add_swap _ (a' * y'')).
-  easy.
+  rewrite vec2_scal_mul_add_distr_r.
+  rewrite mat2_det_add_distr_r.
+  do 2 rewrite rngl_add_assoc.
+  progress f_equal.
+  apply rngl_add_add_swap.
 } {
-  do 2 ring_light_step.
-  do 4 rewrite rngl_add_assoc.
-  do 4 rewrite (rngl_add_sub_assoc Hop).
-  do 15 ring_light_step.
-  f_equal.
-  progress do 2 rewrite (rngl_add_add_swap _ (x * y'')).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_add_add_swap _ (a' * z'')).
-  easy.
+  rewrite vec2_scal_mul_add_distr_r.
+  rewrite mat2_det_add_distr_r.
+  do 2 rewrite rngl_add_assoc.
+  progress f_equal.
+  apply rngl_add_add_swap.
 }
 Qed.
 
