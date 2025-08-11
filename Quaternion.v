@@ -251,6 +251,7 @@ progress unfold vec3_add; cbn.
 f_equal; apply rngl_add_0_l.
 Qed.
 
+Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
@@ -297,6 +298,58 @@ do 3 rewrite (rngl_add_opp_r Hop).
 now f_equal; rewrite (rngl_opp_sub_swap Hop).
 Qed.
 
+Theorem rngl_mul_vec3_dot_mul_l :
+  ∀ a u v, (a * (u ⋆ v))%L = (a · u) ⋆ v.
+Proof.
+intros.
+destruct u as (x, y, z).
+destruct v as (x', y', z'); cbn.
+do 2 rewrite rngl_mul_add_distr_l.
+do 3 rewrite rngl_mul_assoc.
+easy.
+Qed.
+
+Theorem vec3_dot_mul_comm : ∀ u v, u ⋆ v = v ⋆ u.
+Proof.
+intros.
+destruct u as (x, y, z).
+destruct v as (x', y', z'); cbn.
+rewrite (rngl_mul_comm Hic x).
+rewrite (rngl_mul_comm Hic y).
+rewrite (rngl_mul_comm Hic z).
+easy.
+Qed.
+
+Theorem vec3_dot_mul_add_distr_l : ∀ u v w, u ⋆ (v + w) = (u ⋆ v + u ⋆ w)%L.
+Proof.
+intros.
+destruct u as (x, y, z).
+destruct v as (x', y', z').
+destruct w as (x'', y'', z''); cbn.
+do 3 rewrite rngl_mul_add_distr_l.
+do 4 rewrite rngl_add_assoc.
+progress f_equal.
+do 2 rewrite (rngl_add_add_swap _ (z * z')).
+progress f_equal.
+progress f_equal.
+apply rngl_add_add_swap.
+Qed.
+
+Theorem vec3_dot_mul_add_distr_r : ∀ u v w, (u + v) ⋆ w = (u ⋆ w + v ⋆ w)%L.
+Proof.
+intros.
+destruct u as (x, y, z).
+destruct v as (x', y', z').
+destruct w as (x'', y'', z''); cbn.
+do 3 rewrite rngl_mul_add_distr_r.
+do 4 rewrite rngl_add_assoc.
+progress f_equal.
+do 2 rewrite (rngl_add_add_swap _ (z * z'')).
+progress f_equal.
+progress f_equal.
+apply rngl_add_add_swap.
+Qed.
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
@@ -310,6 +363,18 @@ f_equal. {
   destruct c as (c, w).
   move b before a; move c before b.
   cbn - [ vec3_dot_mul ].
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite rngl_mul_assoc.
+  do 2 rewrite vec3_dot_mul_add_distr_l.
+  do 2 rewrite vec3_dot_mul_add_distr_r.
+  do 4 rewrite (rngl_sub_add_distr Hos).
+(**)
+  do 2 rewrite (rngl_sub_sub_swap Hop _ (u ⋆ v * c)).
+  rewrite rngl_mul_vec3_dot_mul_l.
+Search vec3_scal_mul.
+Search (vec3_dot_mul _ (vec3_scal_mul _ _)).
+rewrite vec3_scal_mul_comm.
 ...
 f_equal. {
   rewrite (rngl_mul_sub_distr_l Hop).
@@ -918,7 +983,6 @@ Theorem quat_opt_sub_0_l :
   else not_applicable.
 Proof. now rewrite rngl_has_subt_quaternion. Qed.
 
-Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 
