@@ -425,6 +425,78 @@ do 3 rewrite rngl_add_assoc.
 easy.
 Qed.
 
+Theorem vec3_add_comm : ∀ u v, (u + v = v + u)%v3.
+Proof.
+intros.
+progress unfold vec3_add.
+f_equal; apply rngl_add_comm.
+Qed.
+
+Theorem vec3_add_add_swap : ∀ u v w, (u + v + w = u + w + v)%v3.
+Proof.
+intros.
+do 2 rewrite <- vec3_add_assoc.
+progress f_equal.
+apply vec3_add_comm.
+Qed.
+
+Theorem vec3_add_sub_swap : ∀ u v w, (u + v - w = u - w + v)%v3.
+Proof.
+intros.
+rewrite vec3_add_comm.
+rewrite <- vec3_add_sub_assoc.
+apply vec3_add_comm.
+Qed.
+
+Theorem cross_mul_add_distr_l :
+  ∀ u v w, (u × (v + w) = u × v + u × w)%v3.
+Proof.
+intros.
+progress unfold cross_mul.
+progress unfold vec3_add.
+cbn.
+do 6 rewrite rngl_mul_add_distr_l.
+do 3 rewrite <- (rngl_add_sub_swap Hop).
+do 3 rewrite (rngl_sub_add_distr Hos).
+do 3 rewrite (rngl_add_sub_assoc Hop).
+now f_equal; rewrite (rngl_sub_sub_swap Hop).
+Qed.
+
+Theorem cross_mul_add_distr_r :
+  ∀ u v w, ((u + v) × w = u × w + v × w)%v3.
+Proof.
+intros.
+progress unfold cross_mul.
+progress unfold vec3_add.
+cbn.
+do 6 rewrite rngl_mul_add_distr_r.
+do 3 rewrite <- (rngl_add_sub_swap Hop).
+do 3 rewrite (rngl_sub_add_distr Hos).
+do 3 rewrite (rngl_add_sub_assoc Hop).
+now f_equal; rewrite (rngl_sub_sub_swap Hop).
+Qed.
+
+Theorem vec3_scal_mul_cross_mul_l : ∀ a u v, a · (u × v) = (a · u) × v.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+progress unfold cross_mul; cbn.
+do 3 rewrite (rngl_mul_sub_distr_l Hop).
+do 6 rewrite rngl_mul_assoc.
+easy.
+Qed.
+
+Theorem vec3_scal_mul_cross_mul_r : ∀ a u v, a · (u × v) = u × (a · v).
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+progress unfold cross_mul; cbn.
+do 3 rewrite (rngl_mul_sub_distr_l Hop).
+do 12 rewrite rngl_mul_assoc.
+do 3 rewrite (rngl_mul_comm Hic a).
+easy.
+Qed.
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
@@ -464,6 +536,24 @@ do 2 rewrite vec3_scal_mul_sub_distr_r.
 rewrite vec3_add_sub_assoc.
 do 2 rewrite vec3_add_assoc.
 do 4 rewrite vec3_scal_mul_assoc.
+do 2 rewrite (rngl_mul_comm Hic c).
+rewrite (vec3_add_add_swap _ _ ((b * c) · u)).
+do 5 rewrite <- vec3_add_sub_swap.
+rewrite <- vec3_add_sub_assoc.
+rewrite <- vec3_add_assoc; symmetry.
+rewrite <- vec3_add_sub_assoc.
+rewrite <- vec3_add_assoc; symmetry.
+progress f_equal.
+do 2 rewrite cross_mul_add_distr_l.
+do 2 rewrite cross_mul_add_distr_r.
+do 2 rewrite vec3_add_sub_assoc.
+do 4 rewrite vec3_add_assoc.
+do 2 rewrite <- vec3_scal_mul_cross_mul_l.
+do 2 rewrite <- vec3_scal_mul_cross_mul_r.
+rewrite (vec3_add_comm _ (a · (v × w))).
+rewrite (vec3_add_add_swap _ _ (b · (u × w))).
+do 2 rewrite <- vec3_add_sub_assoc.
+progress f_equal.
 ...
 intros; cbn.
 destruct a as (a, v).
