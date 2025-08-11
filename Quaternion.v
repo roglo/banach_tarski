@@ -897,6 +897,43 @@ apply (eq_rngl_squ_0 Hos Hio) in HN; subst.
 easy.
 Qed.
 
+Theorem quat_mul_inv_diag_l : ∀ a, a ≠ 0%quat → (a⁻¹ * a = 1)%quat.
+Proof.
+intros * Haz.
+progress unfold quat_inv; cbn.
+progress unfold quat_one.
+destruct a as (a, (x, y, z)); cbn.
+remember (a² + x² + y² + z²)%L as N eqn:HN.
+(**)
+rewrite (rngl_div_mul_mul_div Hic Hiv).
+rewrite fold_rngl_squ.
+do 3 rewrite (rngl_div_opp_l Hop Hiv).
+rewrite vec3_scal_mul_opp_l.
+...
+progress unfold vec2_scal_mul, mat2_det.
+do 3 rewrite (rngl_div_opp_l Hop Hiv).
+do 12 rewrite (rngl_mul_opp_l Hop).
+do 16 rewrite (rngl_div_mul_mul_div Hic Hiv).
+do 4 rewrite fold_rngl_squ.
+do 3 rewrite (rngl_mul_comm Hic _ a).
+rewrite (rngl_mul_comm Hic z y).
+rewrite (rngl_mul_comm Hic z x).
+rewrite (rngl_mul_comm Hic y x).
+do 3 rewrite (rngl_add_opp_diag_r Hop).
+do 3 rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+do 2 rewrite (rngl_sub_add_distr Hos).
+do 3 rewrite (rngl_sub_opp_r Hop).
+do 3 rewrite <- (rngl_div_add_distr_r Hiv).
+rewrite <- HN.
+f_equal.
+apply (rngl_div_diag Hon Hiq).
+intros H; move H at top; subst N.
+symmetry in HN.
+apply Haz; clear Haz.
+now apply eq_quat_norm_squ_0.
+...
+
 Theorem quat_opt_mul_inv_diag_l :
   if (rngl_has_inv (quaternion T) && rngl_has_1 (quaternion T))%bool then
     ∀ a : quaternion T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
@@ -907,6 +944,8 @@ rewrite rngl_has_1_quaternion.
 rewrite rngl_one_quat_one; cbn.
 progress unfold rngl_inv.
 rewrite rngl_opt_inv_or_quot_quaternion.
+... ...
+apply quat_mul_inv_diag_l.
 ...
 progress unfold rngl_inv; cbn.
 progress unfold quat_opt_inv_or_quot.
