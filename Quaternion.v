@@ -92,6 +92,8 @@ Definition cross_mul u v :=
     (v3_z u * v3_x v - v3_x u * v3_z v)
     (v3_x u * v3_y v - v3_y u * v3_x v).
 
+Arguments vec3_scal_mul a%_L u%_v3.
+
 Notation "- a" := (vec3_opp a) : vec3_scope.
 Notation "a + b" := (vec3_add a b) : vec3_scope.
 Notation "a - b" := (vec3_sub a b) : vec3_scope.
@@ -389,6 +391,32 @@ do 3 rewrite rngl_mul_add_distr_l.
 easy.
 Qed.
 
+Theorem vec3_scal_mul_sub_distr_r : ∀ a b u, (a - b) · u = (a · u - b · u)%v3.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+progress unfold vec3_sub; cbn.
+do 3 rewrite (rngl_mul_sub_distr_r Hop).
+easy.
+Qed.
+
+Theorem vec3_scal_mul_assoc : ∀ a b u, a · (b · u) = (a * b) · u.
+Proof.
+intros.
+progress unfold vec3_scal_mul; cbn.
+do 3 rewrite rngl_mul_assoc.
+easy.
+Qed.
+
+Theorem vec3_add_sub_assoc : ∀ u v w, (u + (v - w) = u + v - w)%v3.
+Proof.
+intros.
+progress unfold vec3_add.
+progress unfold vec3_sub; cbn.
+do 3 rewrite (rngl_add_sub_assoc Hop).
+easy.
+Qed.
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
@@ -424,6 +452,12 @@ destruct b as (b, v).
 destruct c as (c, w); cbn.
 move b before a; move c before b.
 do 4 rewrite vec3_scal_mul_add_distr_l.
+do 2 rewrite vec3_scal_mul_sub_distr_r.
+rewrite vec3_add_sub_assoc.
+... ...
+rewrite vec3_add_assoc.
+... ...
+do 4 rewrite vec3_scal_mul_assoc.
 ...
 intros; cbn.
 destruct a as (a, v).
