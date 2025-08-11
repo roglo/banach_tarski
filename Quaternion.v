@@ -6,22 +6,29 @@ From Stdlib Require Import Utf8 Arith.
 
 Require Import RingLike.Core.
 
+Declare Scope vec2_scope.
 Declare Scope vec3_scope.
 Declare Scope quat_scope.
-Delimit Scope vec3_scope with vec3.
+Delimit Scope vec2_scope with v2.
+Delimit Scope vec3_scope with v3.
 Delimit Scope quat_scope with quat.
 
+Class vector2 T := mk_v2 { v2_x : T; v2_y : T }.
 Class vector3 T := mk_v3 { v3_x : T; v3_y : T; v3_z : T }.
 Class quaternion T := mk_quat { q_re : T; q_im : vector3 T }.
 
+Bind Scope vec2_scope with vector2.
 Bind Scope vec3_scope with vector3.
 Bind Scope quat_scope with quaternion.
 
+Arguments mk_v2 {T} (v2_x v2_y)%_L.
 Arguments mk_v3 {T} (v3_x v3_y v3_z)%_L.
-Arguments mk_quat {T} q_re%_L q_im%_vec3.
-Arguments v3_x {T} v%_vec3 : rename.
-Arguments v3_y {T} v%_vec3 : rename.
-Arguments v3_z {T} v%_vec3 : rename.
+Arguments mk_quat {T} q_re%_L q_im%_v3.
+Arguments v2_x {T} v%_v2 : rename.
+Arguments v2_y {T} v%_v2 : rename.
+Arguments v3_x {T} v%_v3 : rename.
+Arguments v3_y {T} v%_v3 : rename.
+Arguments v3_z {T} v%_v3 : rename.
 Arguments q_re {T} q%_quat : rename.
 Arguments q_im {T} q%_quat : rename.
 
@@ -68,6 +75,7 @@ now intros H; injection H; clear H; intros H.
 Qed.
 
 Notation "- a" := (vec3_opp a) : vec3_scope.
+Notation "a + b" := (vec3_add a b) : vec3_scope.
 Notation "a - b" := (vec3_sub a b) : vec3_scope.
 
 Definition quat_zero := (mk_quat 0 (mk_v3 0 0 0))%L.
@@ -78,28 +86,30 @@ Definition quat_add a b :=
     (q_re a + q_re b)
     (vec3_add (q_im a) (q_im b)).
 
-Definition vec2_scal_mul x y x' y' := (x * y' + y * x')%L.
-Definition vec3_scal_mul v v' :=
+Definition vec2_dot_mul v v' :=
+  let '(mk_v2 x y) := v in
+  let '(mk_v2 x' y') := v' in
+  (x * x' + y * y')%L.
+Definition vec3_dot_mul v v' :=
   let '(mk_v3 x y z) := v in
   let '(mk_v3 x' y' z') := v' in
   (x * x' + y * y' + z * z')%L.
-Definition mat2_det x y x' y' := (x * y' - y * x')%L.
 
-Arguments vec2_scal_mul (x y x' y')%_L.
-Arguments vec3_scal_mul (v v')%_vec3.
-Arguments mat2_det (x y x' y')%_L.
+Definition vec3_scal_mul a u :=
+  mk_v3 (a * v3_x u) (a * v3_y u) (a * v3_z u).
+
+Definition cross_mul u v :=
+  mk_v3
+    (v3_y u * v3_z v - v3_z u * v3_y v)
+    (v3_z u * v3_x v - v3_x u * v3_z v)
+    (v3_x u * v3_y v - v3_y u * v3_x v).
 
 Definition quat_mul (q q' : quaternion T) :=
-  let '(mk_quat a v) := q in
-  let '(mk_quat a' v') := q' in
-  let '(mk_v3 x y z) := v in
-  let '(mk_v3 x' y' z') := v' in
+  let '(mk_quat a u) := q in
+  let '(mk_quat b v) := q' in
   mk_quat
-    (a * a' - vec3_scal_mul v v')
-    (mk_v3
-      (vec2_scal_mul a x a' x' + mat2_det y z y' z')
-      (vec2_scal_mul a y a' y' + mat2_det z x z' x')
-      (vec2_scal_mul a z a' z' + mat2_det x y x' y')).
+    (a * b - vec3_dot_mul u v)
+    (vec3_scal_mul a v + vec3_scal_mul b u + cross_mul u v).
 
 Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
 Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
@@ -262,7 +272,7 @@ progress unfold vec3_add, vec3_zero; cbn.
 now do 3 rewrite (rngl_add_opp_diag_r Hop).
 Qed.
 
-Theorem vec3_add_opp_opp : ∀ a b, vec3_add (- a) (- b) = (- vec3_add a b)%vec3.
+Theorem vec3_add_opp_opp : ∀ a b, vec3_add (- a) (- b) = (- vec3_add a b)%v3.
 Proof.
 intros.
 progress unfold vec3_add.
@@ -276,10 +286,37 @@ Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
 intros.
+cbn.
+progress unfold quat_mul.
 destruct a as (a, v).
 destruct b as (a', v').
 destruct c as (a'', v'').
-cbn - [ quat_mul ].
+move a' before a; move a'' before a'.
+f_equal. {
+  rewrite (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite rngl_mul_assoc.
+  do 2 rewrite <- (rngl_sub_add_distr Hos).
+  progress f_equal.
+...
+intros; cbn.
+destruct a as (a, v).
+destruct b as (a', v').
+destruct c as (a'', v'').
+cbn - [ vec2_dot_mul mat2_det ].
+...
+intros; cbn.
+destruct a as (a, (x, y, z)).
+destruct b as (a', (x', y', z')).
+destruct c as (a'', (x'', y'', z'')).
+cbn - [ vec2_dot_mul mat2_det ].
+...
+intros.
+destruct a as (a, v).
+destruct b as (a', v').
+destruct c as (a'', v'').
+Print vec2_mul.
+cbn - [ quat_mul vec3_dot_mul ].
 cbn.
 ...
 intros.
@@ -288,8 +325,8 @@ destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')).
 cbn - [ quat_mul ].
 cbn.
-progress unfold vec2_scal_mul.
-progress unfold vec3_scal_mul.
+progress unfold vec2_dot_mul.
+progress unfold vec3_dot_mul.
 progress unfold mat2_det.
 do 24 rewrite rngl_mul_add_distr_l.
 do 24 rewrite rngl_mul_add_distr_r.
@@ -432,27 +469,27 @@ destruct (rngl_opt_opp_or_subt T) as [opp_subt| ]; [ | easy ].
 now destruct opp_subt.
 Qed.
 
-Theorem vec2_scal_mul_1_l : ∀ x y, vec2_scal_mul 1 0 x y = y.
+Theorem vec2_dot_mul_1_l : ∀ x y, vec2_dot_mul 1 0 x y = y.
 Proof.
 intros.
-progress unfold vec2_scal_mul.
+progress unfold vec2_dot_mul.
 rewrite (rngl_mul_1_l Hon).
 rewrite (rngl_mul_0_l Hos).
 apply rngl_add_0_r.
 Qed.
 
-Theorem vec3_scal_mul_0_l : ∀ x y z, vec3_scal_mul 0 0 0 x y z = 0%L.
+Theorem vec3_dot_mul_0_l : ∀ x y z, vec3_dot_mul 0 0 0 x y z = 0%L.
 Proof.
 intros.
-progress unfold vec3_scal_mul.
+progress unfold vec3_dot_mul.
 do 2 rewrite <- rngl_mul_add_distr_l.
 apply (rngl_mul_0_l Hos).
 Qed.
 
-Theorem vec3_scal_mul_0_r : ∀ x y z, vec3_scal_mul x y z 0 0 0 = 0%L.
+Theorem vec3_dot_mul_0_r : ∀ x y z, vec3_dot_mul x y z 0 0 0 = 0%L.
 Proof.
 intros.
-progress unfold vec3_scal_mul.
+progress unfold vec3_dot_mul.
 do 2 rewrite <- rngl_mul_add_distr_r.
 apply (rngl_mul_0_r Hos).
 Qed.
@@ -470,9 +507,9 @@ Proof.
 intros.
 destruct a as (a, (x, y, z)); cbn.
 rewrite (rngl_mul_1_l Hon).
-rewrite vec3_scal_mul_0_l.
+rewrite vec3_dot_mul_0_l.
 rewrite (rngl_sub_0_r Hos).
-do 3 rewrite vec2_scal_mul_1_l.
+do 3 rewrite vec2_dot_mul_1_l.
 do 3 rewrite mat2_det_0_l.
 now do 3 rewrite rngl_add_0_r.
 Qed.
@@ -535,39 +572,39 @@ rewrite rngl_one_quat_one.
 apply quat_mul_1_l.
 Qed.
 
-Theorem vec2_scal_mul_add_distr_l :
+Theorem vec2_dot_mul_add_distr_l :
   ∀ x y x' y' x'' y'',
-  vec2_scal_mul x y (x' + x'') (y' + y'') =
-  (vec2_scal_mul x y x' y' + vec2_scal_mul x y x'' y'')%L.
+  vec2_dot_mul x y (x' + x'') (y' + y'') =
+  (vec2_dot_mul x y x' y' + vec2_dot_mul x y x'' y'')%L.
 Proof.
 intros.
-progress unfold vec2_scal_mul.
+progress unfold vec2_dot_mul.
 do 2 rewrite rngl_mul_add_distr_l.
 do 2 rewrite rngl_add_assoc.
 progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
-Theorem vec2_scal_mul_add_distr_r :
+Theorem vec2_dot_mul_add_distr_r :
   ∀ x y x' y' x'' y'',
-  vec2_scal_mul (x + x') (y + y') x'' y'' =
-  (vec2_scal_mul x y x'' y'' + vec2_scal_mul x' y' x'' y'')%L.
+  vec2_dot_mul (x + x') (y + y') x'' y'' =
+  (vec2_dot_mul x y x'' y'' + vec2_dot_mul x' y' x'' y'')%L.
 Proof.
 intros.
-progress unfold vec2_scal_mul.
+progress unfold vec2_dot_mul.
 do 2 rewrite rngl_mul_add_distr_r.
 do 2 rewrite rngl_add_assoc.
 progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
-Theorem vec3_scal_mul_add_distr_l :
+Theorem vec3_dot_mul_add_distr_l :
   ∀ x y z x' y' z' x'' y'' z'',
-  vec3_scal_mul x y z (x' + x'') (y' + y'') (z' + z'') =
-  (vec3_scal_mul x y z x' y' z' + vec3_scal_mul x y z x'' y'' z'')%L.
+  vec3_dot_mul x y z (x' + x'') (y' + y'') (z' + z'') =
+  (vec3_dot_mul x y z x' y' z' + vec3_dot_mul x y z x'' y'' z'')%L.
 Proof.
 intros.
-progress unfold vec3_scal_mul.
+progress unfold vec3_dot_mul.
 do 3 rewrite rngl_mul_add_distr_l.
 do 4 rewrite rngl_add_assoc.
 progress f_equal.
@@ -576,13 +613,13 @@ do 2 progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
-Theorem vec3_scal_mul_add_distr_r :
+Theorem vec3_dot_mul_add_distr_r :
   ∀ x y z x' y' z' x'' y'' z'',
-  vec3_scal_mul (x + x') (y + y') (z + z') x'' y'' z'' =
-  (vec3_scal_mul x y z x'' y'' z'' + vec3_scal_mul x' y' z' x'' y'' z'')%L.
+  vec3_dot_mul (x + x') (y + y') (z + z') x'' y'' z'' =
+  (vec3_dot_mul x y z x'' y'' z'' + vec3_dot_mul x' y' z' x'' y'' z'')%L.
 Proof.
 intros.
-progress unfold vec3_scal_mul.
+progress unfold vec3_dot_mul.
 do 3 rewrite rngl_mul_add_distr_r.
 do 4 rewrite rngl_add_assoc.
 progress f_equal.
@@ -624,11 +661,11 @@ Proof.
 intros.
 destruct a as (a, (x, y, z)); cbn.
 f_equal. {
-  rewrite vec3_scal_mul_0_r.
+  rewrite vec3_dot_mul_0_r.
   rewrite (rngl_sub_0_r Hos).
   apply (rngl_mul_1_r Hon).
 }
-progress unfold vec2_scal_mul, mat2_det.
+progress unfold vec2_dot_mul, mat2_det.
 do 3 rewrite (rngl_mul_1_r Hon).
 do 4 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_diag Hos).
@@ -656,7 +693,7 @@ destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
 progress unfold quat_add; cbn.
 f_equal. {
-  rewrite vec3_scal_mul_add_distr_l.
+  rewrite vec3_dot_mul_add_distr_l.
   rewrite (rngl_sub_add_distr Hos).
   rewrite (rngl_add_sub_assoc Hop).
   rewrite <- (rngl_add_sub_swap Hop).
@@ -665,19 +702,19 @@ f_equal. {
 }
 progress unfold vec3_add; cbn.
 f_equal. {
-  rewrite vec2_scal_mul_add_distr_l.
+  rewrite vec2_dot_mul_add_distr_l.
   rewrite mat2_det_add_distr_l.
   do 2 rewrite rngl_add_assoc.
   progress f_equal.
   apply rngl_add_add_swap.
 } {
-  rewrite vec2_scal_mul_add_distr_l.
+  rewrite vec2_dot_mul_add_distr_l.
   rewrite mat2_det_add_distr_l.
   do 2 rewrite rngl_add_assoc.
   progress f_equal.
   apply rngl_add_add_swap.
 } {
-  rewrite vec2_scal_mul_add_distr_l.
+  rewrite vec2_dot_mul_add_distr_l.
   rewrite mat2_det_add_distr_l.
   do 2 rewrite rngl_add_assoc.
   progress f_equal.
@@ -694,7 +731,7 @@ destruct b as (a', (x', y', z')).
 destruct c as (a'', (x'', y'', z'')); cbn.
 progress unfold quat_add; cbn.
 f_equal. {
-  rewrite vec3_scal_mul_add_distr_r.
+  rewrite vec3_dot_mul_add_distr_r.
   rewrite (rngl_sub_add_distr Hos).
   rewrite (rngl_add_sub_assoc Hop).
   rewrite <- (rngl_add_sub_swap Hop).
@@ -703,19 +740,19 @@ f_equal. {
 }
 progress unfold vec3_add; cbn.
 f_equal. {
-  rewrite vec2_scal_mul_add_distr_r.
+  rewrite vec2_dot_mul_add_distr_r.
   rewrite mat2_det_add_distr_r.
   do 2 rewrite rngl_add_assoc.
   progress f_equal.
   apply rngl_add_add_swap.
 } {
-  rewrite vec2_scal_mul_add_distr_r.
+  rewrite vec2_dot_mul_add_distr_r.
   rewrite mat2_det_add_distr_r.
   do 2 rewrite rngl_add_assoc.
   progress f_equal.
   apply rngl_add_add_swap.
 } {
-  rewrite vec2_scal_mul_add_distr_r.
+  rewrite vec2_dot_mul_add_distr_r.
   rewrite mat2_det_add_distr_r.
   do 2 rewrite rngl_add_assoc.
   progress f_equal.
@@ -723,25 +760,25 @@ f_equal. {
 }
 Qed.
 
-Theorem vec2_scal_mul_opp_l :
+Theorem vec2_dot_mul_opp_l :
   ∀ x y x' y',
-  vec2_scal_mul (- x) (- y) x' y' = (- vec2_scal_mul x y x' y')%L.
+  vec2_dot_mul (- x) (- y) x' y' = (- vec2_dot_mul x y x' y')%L.
 Proof.
 intros.
-progress unfold vec2_scal_mul.
+progress unfold vec2_dot_mul.
 do 2 rewrite (rngl_mul_opp_l Hop).
 rewrite (rngl_add_opp_r Hop).
 symmetry.
 apply (rngl_opp_add_distr Hop).
 Qed.
 
-Theorem vec3_scal_mul_opp_l :
+Theorem vec3_dot_mul_opp_l :
   ∀ x y z x' y' z',
-  vec3_scal_mul (- x) (- y) (- z) x' y' z' =
-  (- vec3_scal_mul x y z x' y' z')%L.
+  vec3_dot_mul (- x) (- y) (- z) x' y' z' =
+  (- vec3_dot_mul x y z x' y' z')%L.
 Proof.
 intros.
-progress unfold vec3_scal_mul.
+progress unfold vec3_dot_mul.
 do 3 rewrite (rngl_mul_opp_l Hop).
 do 2 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_opp_add_distr Hop).
@@ -770,12 +807,12 @@ destruct b as (a', (x', y', z')).
 progress unfold quat_opp; cbn.
 f_equal. {
   rewrite (rngl_mul_opp_l Hop).
-  rewrite vec3_scal_mul_opp_l.
+  rewrite vec3_dot_mul_opp_l.
   rewrite (rngl_sub_opp_r Hop).
   rewrite (rngl_opp_sub_distr Hop).
   apply (rngl_add_opp_l Hop).
 }
-do 3 rewrite vec2_scal_mul_opp_l.
+do 3 rewrite vec2_dot_mul_opp_l.
 do 3 rewrite mat2_det_opp_l.
 do 3 rewrite (rngl_add_opp_r Hop).
 do 3 rewrite <- (rngl_opp_add_distr Hop).
@@ -920,9 +957,9 @@ remember (a² + x² + y² + z²)%L as N eqn:HN.
 rewrite (rngl_div_mul_mul_div Hic Hiv).
 rewrite fold_rngl_squ.
 do 3 rewrite (rngl_div_opp_l Hop Hiv).
-rewrite vec3_scal_mul_opp_l.
+rewrite vec3_dot_mul_opp_l.
 ...
-progress unfold vec2_scal_mul, mat2_det.
+progress unfold vec2_dot_mul, mat2_det.
 do 3 rewrite (rngl_div_opp_l Hop Hiv).
 do 12 rewrite (rngl_mul_opp_l Hop).
 do 16 rewrite (rngl_div_mul_mul_div Hic Hiv).
@@ -989,7 +1026,7 @@ progress unfold quat_inv; cbn.
 destruct a as (a, (x, y, z)); cbn.
 progress unfold quat_one.
 remember (a² + x² + y² + z²)%L as N eqn:HN.
-progress unfold vec2_scal_mul, mat2_det.
+progress unfold vec2_dot_mul, mat2_det.
 do 3 rewrite (rngl_div_opp_l Hop Hiv).
 do 12 rewrite (rngl_mul_opp_l Hop).
 do 16 rewrite (rngl_div_mul_mul_div Hic Hiv).
@@ -1023,7 +1060,7 @@ progress unfold quat_inv; cbn.
 destruct a as (a, (x, y, z)); cbn.
 progress unfold quat_one.
 remember (a² + x² + y² + z²)%L as N eqn:HN.
-progress unfold vec2_scal_mul, mat2_det.
+progress unfold vec2_dot_mul, mat2_det.
 do 3 rewrite (rngl_div_opp_l Hop Hiv).
 do 12 rewrite (rngl_mul_opp_r Hop).
 do 16 rewrite (rngl_mul_div_assoc Hiv).
@@ -1342,8 +1379,8 @@ Require Import RingLike.Z_algebra.
 Open Scope Z_scope.
 
 Compute (
-  let i := mk_q 0 (mk_v3 1 0 0) in
-  let j := mk_q 0 (mk_v3 0 1 0) in
-  let k := mk_q 0 (mk_v3 0 0 1) in
-  (j * k)%quat).
+  let i := mk_quat 0 (mk_v3 1 0 0) in
+  let j := mk_quat 0 (mk_v3 0 1 0) in
+  let k := mk_quat 0 (mk_v3 0 0 1) in
+  (j * j)%quat).
 *)
