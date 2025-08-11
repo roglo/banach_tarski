@@ -350,6 +350,32 @@ progress f_equal.
 apply rngl_add_add_swap.
 Qed.
 
+Theorem vec3_dot_mul_scal_mul_l : ∀ a u v, (a · u) ⋆ v = (a * (u ⋆ v))%L.
+Proof.
+intros.
+destruct u as (x, y, z).
+destruct v as (x', y', z'); cbn.
+do 2 rewrite rngl_mul_add_distr_l.
+do 3 rewrite rngl_mul_assoc.
+easy.
+Qed.
+
+Theorem vec3_dot_mul_scal_mul_r : ∀ a u v, u ⋆ (a · v) = (a * (u ⋆ v))%L.
+Proof.
+intros.
+destruct u as (x, y, z).
+destruct v as (x', y', z'); cbn.
+do 2 rewrite rngl_mul_add_distr_l.
+do 6 rewrite rngl_mul_assoc.
+do 3 rewrite (rngl_mul_comm Hic a).
+easy.
+Qed.
+
+Theorem vec3_dot_mul_cross_mul_l : ∀ u v w, u ⋆ (v × w) = (u × v) ⋆ w.
+Proof.
+intros.
+...
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
@@ -372,7 +398,16 @@ f_equal. {
 (**)
   do 2 rewrite (rngl_sub_sub_swap Hop _ (u ⋆ v * c)).
   rewrite rngl_mul_vec3_dot_mul_l.
-Search vec3_scal_mul.
+  rewrite (vec3_dot_mul_scal_mul_r b).
+  rewrite (vec3_dot_mul_scal_mul_l b).
+  rewrite (vec3_dot_mul_scal_mul_r _ u).
+  rewrite (rngl_mul_comm Hic c).
+  progress f_equal.
+  clear a b c.
+... ...
+  apply vec3_dot_mul_cross_mul_l.
+... ...
+  rewrite vec3_dot_mul_scal_mul_r.
 Search (vec3_dot_mul _ (vec3_scal_mul _ _)).
 rewrite vec3_scal_mul_comm.
 ...
