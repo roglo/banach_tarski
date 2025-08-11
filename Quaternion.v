@@ -74,18 +74,6 @@ right; subst.
 now intros H; injection H; clear H; intros H.
 Qed.
 
-Notation "- a" := (vec3_opp a) : vec3_scope.
-Notation "a + b" := (vec3_add a b) : vec3_scope.
-Notation "a - b" := (vec3_sub a b) : vec3_scope.
-
-Definition quat_zero := (mk_quat 0 (mk_v3 0 0 0))%L.
-Definition quat_one := (mk_quat 1 (mk_v3 0 0 0))%L.
-
-Definition quat_add a b :=
-  mk_quat
-    (q_re a + q_re b)
-    (vec3_add (q_im a) (q_im b)).
-
 Definition vec2_dot_mul v v' :=
   let '(mk_v2 x y) := v in
   let '(mk_v2 x' y') := v' in
@@ -104,12 +92,27 @@ Definition cross_mul u v :=
     (v3_z u * v3_x v - v3_x u * v3_z v)
     (v3_x u * v3_y v - v3_y u * v3_x v).
 
-Definition quat_mul (q q' : quaternion T) :=
-  let '(mk_quat a u) := q in
-  let '(mk_quat b v) := q' in
+Notation "- a" := (vec3_opp a) : vec3_scope.
+Notation "a + b" := (vec3_add a b) : vec3_scope.
+Notation "a - b" := (vec3_sub a b) : vec3_scope.
+Notation "a · b" := (vec3_dot_mul a b) (at level 40).
+Notation "a × b" := (cross_mul a b) (at level 40).
+
+Definition quat_zero := (mk_quat 0 (mk_v3 0 0 0))%L.
+Definition quat_one := (mk_quat 1 (mk_v3 0 0 0))%L.
+
+Definition quat_add a b :=
   mk_quat
-    (a * b - vec3_dot_mul u v)
+    (q_re a + q_re b)
+    (vec3_add (q_im a) (q_im b)).
+
+Definition quat_re_im_mul a u b v :=
+  mk_quat
+    (a * b - u · v)
     (vec3_scal_mul a v + vec3_scal_mul b u + cross_mul u v).
+
+Definition quat_mul (q q' : quaternion T) :=
+  quat_re_im_mul (q_re q) (q_im q) (q_re q') (q_im q').
 
 Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
 Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
@@ -288,10 +291,14 @@ Proof.
 intros.
 cbn.
 progress unfold quat_mul.
-destruct a as (a, v).
-destruct b as (a', v').
-destruct c as (a'', v'').
-move a' before a; move a'' before a'.
+progress unfold quat_re_im_mul at 1 4.
+f_equal. {
+  destruct a as (a, u).
+  destruct b as (b, v).
+  destruct c as (c, w).
+  move b before a; move c before b.
+  cbn - [ vec3_dot_mul ].
+...
 f_equal. {
   rewrite (rngl_mul_sub_distr_l Hop).
   rewrite (rngl_mul_sub_distr_r Hop).
