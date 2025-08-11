@@ -6,22 +6,22 @@ From Stdlib Require Import Utf8 Arith.
 
 Require Import RingLike.Core.
 
-Declare Scope vec_scope.
+Declare Scope vec3_scope.
 Declare Scope quat_scope.
-Delimit Scope vec_scope with vec.
+Delimit Scope vec3_scope with vec3.
 Delimit Scope quat_scope with quat.
 
 Class vector3 T := mk_v3 { v3_x : T; v3_y : T; v3_z : T }.
 Class quaternion T := mk_quat { q_re : T; q_im : vector3 T }.
 
-Bind Scope vec_scope with vector3.
+Bind Scope vec3_scope with vector3.
 Bind Scope quat_scope with quaternion.
 
 Arguments mk_v3 {T} (v3_x v3_y v3_z)%_L.
-Arguments mk_quat {T} q_re%_L q_im%_vec.
-Arguments v3_x {T} v%_vec : rename.
-Arguments v3_y {T} v%_vec : rename.
-Arguments v3_z {T} v%_vec : rename.
+Arguments mk_quat {T} q_re%_L q_im%_vec3.
+Arguments v3_x {T} v%_vec3 : rename.
+Arguments v3_y {T} v%_vec3 : rename.
+Arguments v3_z {T} v%_vec3 : rename.
 Arguments q_re {T} q%_quat : rename.
 Arguments q_im {T} q%_quat : rename.
 
@@ -67,8 +67,8 @@ right; subst.
 now intros H; injection H; clear H; intros H.
 Qed.
 
-Notation "- a" := (vec3_opp a) : vec_scope.
-Notation "a - b" := (vec3_sub a b) : vec_scope.
+Notation "- a" := (vec3_opp a) : vec3_scope.
+Notation "a - b" := (vec3_sub a b) : vec3_scope.
 
 Definition quat_zero := (mk_quat 0 (mk_v3 0 0 0))%L.
 Definition quat_one := (mk_quat 1 (mk_v3 0 0 0))%L.
@@ -79,18 +79,23 @@ Definition quat_add a b :=
     (vec3_add (q_im a) (q_im b)).
 
 Definition vec2_scal_mul x y x' y' := (x * y' + y * x')%L.
-Definition vec3_scal_mul x y z x' y' z' := (x * x' + y * y' + z * z')%L.
+Definition vec3_scal_mul v v' :=
+  let '(mk_v3 x y z) := v in
+  let '(mk_v3 x' y' z') := v' in
+  (x * x' + y * y' + z * z')%L.
 Definition mat2_det x y x' y' := (x * y' - y * x')%L.
 
 Arguments vec2_scal_mul (x y x' y')%_L.
-Arguments vec3_scal_mul (x y z x' y' z')%_L.
+Arguments vec3_scal_mul (v v')%_vec3.
 Arguments mat2_det (x y x' y')%_L.
 
 Definition quat_mul (q q' : quaternion T) :=
-  let '(mk_quat a (mk_v3 x y z)) := q in
-  let '(mk_quat a' (mk_v3 x' y' z')) := q' in
+  let '(mk_quat a v) := q in
+  let '(mk_quat a' v') := q' in
+  let '(mk_v3 x y z) := v in
+  let '(mk_v3 x' y' z') := v' in
   mk_quat
-    (a * a' - vec3_scal_mul x y z x' y' z')
+    (a * a' - vec3_scal_mul v v')
     (mk_v3
       (vec2_scal_mul a x a' x' + mat2_det y z y' z')
       (vec2_scal_mul a y a' y' + mat2_det z x z' x')
@@ -257,7 +262,7 @@ progress unfold vec3_add, vec3_zero; cbn.
 now do 3 rewrite (rngl_add_opp_diag_r Hop).
 Qed.
 
-Theorem vec3_add_opp_opp : ∀ a b, vec3_add (- a) (- b) = (- vec3_add a b)%vec.
+Theorem vec3_add_opp_opp : ∀ a b, vec3_add (- a) (- b) = (- vec3_add a b)%vec3.
 Proof.
 intros.
 progress unfold vec3_add.
@@ -270,6 +275,13 @@ Qed.
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
+intros.
+destruct a as (a, v).
+destruct b as (a', v').
+destruct c as (a'', v'').
+cbn - [ quat_mul ].
+cbn.
+...
 intros.
 destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
