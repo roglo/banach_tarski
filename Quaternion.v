@@ -123,6 +123,7 @@ Notation "a + b" := (quat_add a b) : quat_scope.
 Notation "a - b" := (quat_sub a b) : quat_scope.
 Notation "a * b" := (quat_mul a b) : quat_scope.
 Notation "- a" := (quat_opp a) : quat_scope.
+Notation "a ⁻¹" := (quat_inv a) : quat_scope.
 
 Definition quat_opt_one :=
   match rngl_opt_one T with
@@ -221,8 +222,9 @@ f_equal; apply rngl_add_0_l.
 Qed.
 
 Context {Hop : rngl_has_opp T = true}.
-
+Context {Hiv : rngl_has_inv T = true}.
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
+Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
 
 Ltac group_by_3_factors :=
   remember 42 as v eqn:Hv_; remember 42 as v0 eqn:Hv0;
@@ -463,13 +465,59 @@ do 3 rewrite mat2_det_0_l.
 now do 3 rewrite rngl_add_0_r.
 Qed.
 
+Theorem rngl_has_1_quaternion : rngl_has_1 (quaternion T) = true.
+Proof.
+progress unfold rngl_has_1 in Hon; cbn in Hon.
+progress unfold rngl_has_1; cbn.
+progress unfold quat_opt_one.
+now destruct (rngl_opt_one T).
+Qed.
+
+Theorem rngl_has_opp_quaternion : rngl_has_opp (quaternion T) = true.
+Proof.
+progress unfold rngl_has_opp in Hop |-*; cbn in Hop |-*.
+progress unfold quat_opt_opp_or_subt.
+remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
+symmetry in Hosq.
+destruct osq as [opp| ]; [ | easy ].
+now destruct opp.
+Qed.
+
+Theorem rngl_has_subt_quaternion : rngl_has_subt (quaternion T) = false.
+Proof.
+progress unfold rngl_has_opp in Hop; cbn in Hop.
+progress unfold rngl_has_subt; cbn.
+progress unfold quat_opt_opp_or_subt.
+remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
+symmetry in Hosq.
+destruct osq as [opp| ]; [ | easy ].
+now destruct opp.
+Qed.
+
+Theorem rngl_has_inv_quaternion : rngl_has_inv (quaternion T) = true.
+Proof.
+progress unfold rngl_has_inv in Hiv; cbn in Hiv.
+progress unfold rngl_has_inv; cbn.
+progress unfold quat_opt_inv_or_quot.
+destruct (rngl_opt_inv_or_quot T) as [inv_quot| ]; [ | easy ].
+now destruct inv_quot.
+Qed.
+
+Theorem rngl_opt_inv_or_quot_quaternion :
+  rngl_opt_inv_or_quot (quaternion T) = Some (inl quat_inv).
+Proof.
+progress unfold rngl_opt_inv_or_quot; cbn.
+progress unfold quat_opt_inv_or_quot.
+progress unfold rngl_has_inv in Hiv; cbn in Hiv.
+destruct (rngl_opt_inv_or_quot T) as [inv_quot| ]; [ | easy ].
+now destruct inv_quot.
+Qed.
+
 Theorem quat_opt_mul_1_l :
   if rngl_has_1 (quaternion T) then ∀ a : quaternion T, (1 * a)%L = a
   else not_applicable.
 Proof.
-remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
-symmetry in Honq.
-destruct onq; [ | easy ].
+rewrite rngl_has_1_quaternion.
 intros; cbn.
 rewrite rngl_one_quat_one.
 apply quat_mul_1_l.
@@ -581,9 +629,7 @@ Theorem quat_opt_mul_1_r :
   if rngl_has_1 (quaternion T) then ∀ a : quaternion T, (a * 1)%L = a
   else not_applicable.
 Proof.
-remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
-symmetry in Honq.
-destruct onq; [ | easy ].
+rewrite rngl_has_1_quaternion.
 intros.
 rewrite rngl_one_quat_one; cbn.
 apply quat_mul_1_r.
@@ -738,27 +784,6 @@ Theorem quat_opt_mul_add_distr_r :
   ∀ a b c : quaternion T, ((a + b) * c)%L = (a * c + b * c)%L.
 Proof. apply quat_mul_add_distr_r. Qed.
 
-Theorem rngl_has_opp_quaternion : rngl_has_opp (quaternion T) = true.
-Proof.
-progress unfold rngl_has_opp in Hop |-*; cbn in Hop |-*.
-progress unfold quat_opt_opp_or_subt.
-remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
-symmetry in Hosq.
-destruct osq as [opp| ]; [ | easy ].
-now destruct opp.
-Qed.
-
-Theorem rngl_has_subt_quaternion : rngl_has_subt (quaternion T) = false.
-Proof.
-progress unfold rngl_has_opp in Hop; cbn in Hop.
-progress unfold rngl_has_subt; cbn.
-progress unfold quat_opt_opp_or_subt.
-remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
-symmetry in Hosq.
-destruct osq as [opp| ]; [ | easy ].
-now destruct opp.
-Qed.
-
 Theorem quat_add_opp_diag_l : ∀ a, (- a + a = 0)%quat.
 Proof.
 intros.
@@ -826,9 +851,7 @@ Theorem quat_opt_sub_0_l :
 Proof. now rewrite rngl_has_subt_quaternion. Qed.
 
 Context {Hic : rngl_mul_is_comm T = true}.
-Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
-Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
 Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 
 Theorem eq_quat_norm_squ_0 : ∀ a, quat_norm_squ a = 0%L → a = 0%quat.
@@ -879,11 +902,11 @@ Theorem quat_opt_mul_inv_diag_l :
     ∀ a : quaternion T, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
-Search (quat_inv).
-Print quat_inv.
-... ...
-rewrite quat_has_inv_quaternion.
-rewrite quat_has_1_quaternion.
+rewrite rngl_has_inv_quaternion.
+rewrite rngl_has_1_quaternion.
+rewrite rngl_one_quat_one; cbn.
+progress unfold rngl_inv.
+rewrite rngl_opt_inv_or_quot_quaternion.
 ...
 progress unfold rngl_inv; cbn.
 progress unfold quat_opt_inv_or_quot.
