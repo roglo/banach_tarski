@@ -95,8 +95,9 @@ Definition cross_mul u v :=
 Notation "- a" := (vec3_opp a) : vec3_scope.
 Notation "a + b" := (vec3_add a b) : vec3_scope.
 Notation "a - b" := (vec3_sub a b) : vec3_scope.
-Notation "a · b" := (vec3_dot_mul a b) (at level 40).
-Notation "a × b" := (cross_mul a b) (at level 40).
+Notation "u ⋆ v" := (vec3_dot_mul u v) (at level 40).
+Notation "a · v" := (vec3_scal_mul a v) (at level 40).
+Notation "u × v" := (cross_mul u v) (at level 40).
 
 Definition quat_zero := (mk_quat 0 (mk_v3 0 0 0))%L.
 Definition quat_one := (mk_quat 1 (mk_v3 0 0 0))%L.
@@ -106,9 +107,20 @@ Definition quat_add a b :=
     (q_re a + q_re b)
     (vec3_add (q_im a) (q_im b)).
 
+(*
+Definition quat_re_im_mul a u b v :=
+  ((a * b - u ⋆ v)%L,
+    vec3_scal_mul a v + vec3_scal_mul b u + cross_mul u v)%v3.
+
+Definition quat_of_pair (au : T * vector3 T) := mk_quat (fst au) (snd au).
+
+Definition quat_mul (q q' : quaternion T) :=
+  quat_of_pair (quat_re_im_mul (q_re q) (q_im q) (q_re q') (q_im q')).
+*)
+
 Definition quat_re_im_mul a u b v :=
   mk_quat
-    (a * b - u · v)
+    (a * b - u ⋆ v)
     (vec3_scal_mul a v + vec3_scal_mul b u + cross_mul u v).
 
 Definition quat_mul (q q' : quaternion T) :=
