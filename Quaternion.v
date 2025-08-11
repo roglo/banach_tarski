@@ -107,17 +107,6 @@ Definition quat_add a b :=
     (q_re a + q_re b)
     (vec3_add (q_im a) (q_im b)).
 
-(*
-Definition quat_re_im_mul a u b v :=
-  ((a * b - u ⋆ v)%L,
-    vec3_scal_mul a v + vec3_scal_mul b u + cross_mul u v)%v3.
-
-Definition quat_of_pair (au : T * vector3 T) := mk_quat (fst au) (snd au).
-
-Definition quat_mul (q q' : quaternion T) :=
-  quat_of_pair (quat_re_im_mul (q_re q) (q_im q) (q_re q') (q_im q')).
-*)
-
 Definition quat_re_im_mul a u b v :=
   mk_quat
     (a * b - u ⋆ v)
@@ -391,6 +380,15 @@ progress f_equal.
 apply rngl_add_comm.
 Qed.
 
+Theorem vec3_scal_mul_add_distr_l : ∀ a u v, a · (u + v) = (a · u + a · v)%v3.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+progress unfold vec3_add; cbn.
+do 3 rewrite rngl_mul_add_distr_l.
+easy.
+Qed.
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
@@ -420,6 +418,12 @@ f_equal. {
   clear a b c.
   apply vec3_dot_mul_cross_mul_l.
 }
+cbn.
+destruct a as (a, u).
+destruct b as (b, v).
+destruct c as (c, w); cbn.
+move b before a; move c before b.
+do 4 rewrite vec3_scal_mul_add_distr_l.
 ...
 intros; cbn.
 destruct a as (a, v).
