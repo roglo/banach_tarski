@@ -417,6 +417,14 @@ do 3 rewrite (rngl_add_sub_assoc Hop).
 easy.
 Qed.
 
+Theorem vec3_add_assoc : ∀ u v w, (u + (v + w) = u + v + w)%v3.
+Proof.
+intros.
+progress unfold vec3_add; cbn.
+do 3 rewrite rngl_add_assoc.
+easy.
+Qed.
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
@@ -454,9 +462,7 @@ move b before a; move c before b.
 do 4 rewrite vec3_scal_mul_add_distr_l.
 do 2 rewrite vec3_scal_mul_sub_distr_r.
 rewrite vec3_add_sub_assoc.
-... ...
-rewrite vec3_add_assoc.
-... ...
+do 2 rewrite vec3_add_assoc.
 do 4 rewrite vec3_scal_mul_assoc.
 ...
 intros; cbn.
