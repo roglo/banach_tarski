@@ -954,13 +954,10 @@ apply (rngl_opp_add_distr Hop).
 Qed.
 *)
 
-...
-
-Theorem vec3_dot_mul_opp_l :
-  ∀ x y z x' y' z',
-  vec3_dot_mul (- x) (- y) (- z) x' y' z' =
-  (- vec3_dot_mul x y z x' y' z')%L.
+Theorem vec3_dot_mul_opp_l : ∀ u v, - u ⋆ v = (- (u ⋆ v))%L.
 Proof.
+intros.
+...
 intros.
 progress unfold vec3_dot_mul.
 do 3 rewrite (rngl_mul_opp_l Hop).
