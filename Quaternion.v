@@ -94,6 +94,7 @@ Definition cross_mul u v :=
 
 Arguments vec3_scal_mul a%_L u%_v3.
 
+Notation "0" := vec3_zero : vec3_scope.
 Notation "- a" := (vec3_opp a) : vec3_scope.
 Notation "a + b" := (vec3_add a b) : vec3_scope.
 Notation "a - b" := (vec3_sub a b) : vec3_scope.
@@ -101,8 +102,8 @@ Notation "u ⋆ v" := (vec3_dot_mul u v) (at level 40).
 Notation "a · v" := (vec3_scal_mul a v) (at level 40).
 Notation "u × v" := (cross_mul u v) (at level 40).
 
-Definition quat_zero := (mk_quat 0 (mk_v3 0 0 0))%L.
-Definition quat_one := (mk_quat 1 (mk_v3 0 0 0))%L.
+Definition quat_zero := mk_quat 0 vec3_zero.
+Definition quat_one := mk_quat 1 vec3_zero.
 
 Definition quat_add a b :=
   mk_quat
@@ -247,23 +248,6 @@ Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
 Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
 Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
-
-Ltac group_by_3_factors :=
-  remember 42 as v eqn:Hv_; remember 42 as v0 eqn:Hv0;
-  do 16 (
-    let vn := fresh "v" in
-    remember (_ * _ * _)%L as vn eqn:Hv in |-*; clear Hv);
-  clear v v0 Hv_ Hv0.
-
-Ltac ring_light_step :=
-  match goal with
-  | |- context[rngl_sub (rngl_add ?x ?y) ?z] =>
-      rewrite (rngl_add_sub_swap Hop x y z)
-  | |- context[rngl_sub ?x (rngl_add ?y ?z)] =>
-      rewrite (rngl_sub_add_distr Hos x y z)
-  | |- context[rngl_sub ?x (rngl_sub ?y ?z)] =>
-      rewrite (rngl_sub_sub_distr Hop x y z)
-  end.
 
 Theorem vec3_add_opp_diag_l : ∀ a, vec3_add (- a) a = vec3_zero.
 Proof.
@@ -501,6 +485,15 @@ do 2 rewrite (rngl_mul_comm Hic _ (v3_z u)).
 easy.
 Qed.
 
+Theorem vec3_opp_sub_distr : ∀ u v, (- (u - v) = v - u)%v3.
+Proof.
+intros.
+progress unfold vec3_opp.
+progress unfold vec3_sub; cbn.
+do 3 rewrite (rngl_opp_sub_distr Hop).
+easy.
+Qed.
+
 Theorem vec3_triple_prod_l :
   ∀ u v w, u × (v × w) = ((u ⋆ w) · v - (u ⋆ v) · w)%v3.
 Proof.
@@ -542,34 +535,20 @@ Proof.
 intros.
 rewrite cross_mul_anticomm.
 rewrite vec3_triple_prod_l.
-(* au fait, on pourrait utiliser "*" pour le produit scalaire,
-   puisqu'il n'est pas utilisé dans cette syntaxe. Ça économiserait
-   un caractère utf-8.
-     Mais bon, c'est vrai que le produit scalaire n'est pas une
-   loi de composition interne...
-     Alors pour le produit vectoriel ? Alors oui, mais la convention
-   avec la croix x est vraiment répandue.
-     Et, bon, il n'est pas commutatif, et pas associatif non plus,
-   c'est un enfoiré de sa mère, en tant que multiplication. Bon, il
-   est distributif par rapport à l'addition, ça le rattrape un peu.
-     Peut-être qu'il faudrait voir avec le produit scalaire quand
-   même, même s'il n'est pas interne. Il est commutatif, lui, mais
-   bon, il ne peut pas être associatif pour des raisons de typage,
-   ça craint.
-     Bref, en dimension 3, c'est le bordel, ces deux multiplications.
-   Sans compter la multiplication par un scalaire.
-*)
-Search vec3_scal_mul.
-...
-Search vec3_sub.
 apply vec3_opp_sub_distr.
-...
+Qed.
 
-Theorem quat_mul_assoc :
-  ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
+Theorem vec3_sub_sub_swap : ∀ u v w, (u - v - w = u - w - v)%v3.
 Proof.
 intros.
-cbn.
+progress unfold vec3_sub; cbn.
+f_equal; apply (rngl_sub_sub_swap Hop).
+Qed.
+
+Theorem quat_mul_assoc :
+  ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%quat.
+Proof.
+intros.
 progress unfold quat_mul.
 progress unfold quat_re_im_mul at 1 4.
 f_equal. {
@@ -623,184 +602,10 @@ rewrite (vec3_add_add_swap _ _ (b · (u × w))).
 do 2 rewrite <- vec3_add_sub_assoc.
 progress f_equal.
 rewrite vec3_triple_prod_l.
-... ...
-rewrite vec3_sub_sub_swap.
-...
-  progress f_equal.
-  progress f_equal.
-  do 2 rewrite (rngl_add_sub_swap Hop).
-  rewrite (rngl_sub_diag Hos).
-  now rewrite rngl_add_0_l.
-...
-remember (v3_y u * v3_x v * v3_y w)%L as a.
-remember (v3_y u * v3_y v * v3_x w)%L as b.
-remember (v3_z u * v3_z v * v3_x w)%L as c.
-remember (v3_z u * v3_x v * v3_z w)%L as d.
-remember (v3_x u * v3_x w * v3_x v)%L as a'.
-remember (v3_y u * v3_y w * v3_x v)%L as b'.
-remember (v3_z u * v3_z w * v3_x v)%L as c'.
-remember (v3_x u * v3_x v * v3_x w)%L as d'.
-rewrite <- (rngl_add_sub_swap Hop).
-f_equal.
-rewrite <- (rngl_add_sub_swap Hop).
-f_equal.
-subst.
-rewrite (rngl_mul_mul_swap Hic _ _ (v3_x v)).
-remember (v3_y u * v3_x v * v3_y w)%L as a.
-remember (v3_y u * v3_y v * v3_x w)%L as b.
-remember (v3_z u * v3_z v * v3_x w)%L as c.
-remember (v3_z u * v3_x v * v3_z w)%L as d.
-remember (v3_x u * v3_x w * v3_x v)%L as a'.
-remember (v3_y u * v3_y w * v3_x v)%L as b'.
-remember (v3_z u * v3_z w * v3_x v)%L as c'.
-remember (v3_x u * v3_x v * v3_x w)%L as d'.
-do 2 rewrite (rngl_add_sub_swap Hop).
-rewrite (rngl_sub_diag Hos).
-rewrite rngl_add_0_l.
-subst.
-rewrite (rngl_mul_mul_swap Hic).
-f_equal.
-apply (rngl_mul_mul_swap Hic).
-... ...
-rewrite glop.
-...
-...
-intros; cbn.
-destruct a as (a, v).
-destruct b as (a', v').
-destruct c as (a'', v'').
-cbn - [ vec2_dot_mul mat2_det ].
-...
-intros; cbn.
-destruct a as (a, (x, y, z)).
-destruct b as (a', (x', y', z')).
-destruct c as (a'', (x'', y'', z'')).
-cbn - [ vec2_dot_mul mat2_det ].
-...
-intros.
-destruct a as (a, v).
-destruct b as (a', v').
-destruct c as (a'', v'').
-Print vec2_mul.
-cbn - [ quat_mul vec3_dot_mul ].
-cbn.
-...
-intros.
-destruct a as (a, (x, y, z)).
-destruct b as (a', (x', y', z')).
-destruct c as (a'', (x'', y'', z'')).
-cbn - [ quat_mul ].
-cbn.
-progress unfold vec2_dot_mul.
-progress unfold vec3_dot_mul.
-progress unfold mat2_det.
-do 24 rewrite rngl_mul_add_distr_l.
-do 24 rewrite rngl_mul_add_distr_r.
-do 24 rewrite rngl_mul_assoc.
-do 16 rewrite (rngl_mul_sub_distr_l Hop).
-do 16 rewrite (rngl_mul_sub_distr_r Hop).
-do 8 rewrite rngl_mul_add_distr_l.
-do 8 rewrite rngl_mul_add_distr_r.
-do 40 rewrite rngl_mul_assoc.
-f_equal. {
-  group_by_3_factors.
-  progress do 44 ring_light_step.
-  symmetry.
-  progress do 2 rewrite (rngl_add_add_swap _ v16).
-  progress do 3 f_equal.
-  progress do 3 rewrite (rngl_sub_sub_swap Hop _ v15).
-  progress f_equal.
-  progress do 8 rewrite (rngl_sub_sub_swap Hop _ v14).
-  progress f_equal.
-  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v13).
-  progress f_equal.
-  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v11).
-  progress f_equal.
-  progress do 6 rewrite (rngl_sub_sub_swap Hop _ v10).
-  progress f_equal.
-  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v9).
-  progress do 2 f_equal.
-  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v6).
-  progress f_equal.
-  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v5).
-  easy.
-}
-f_equal. {
-  group_by_3_factors.
-  do 12 rewrite (rngl_add_sub_assoc Hop).
-  progress do 36 ring_light_step.
-  do 6 rewrite rngl_add_assoc.
-  progress do 6 rewrite (rngl_add_add_swap _ v16).
-  progress f_equal.
-  progress do 5 rewrite (rngl_add_add_swap _ v11).
-  progress f_equal.
-  progress do 2 rewrite (rngl_add_add_swap _ v10).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_add_add_swap _ v5).
-  progress do 3 f_equal.
-  progress do 5 rewrite (rngl_sub_sub_swap Hop _ v15).
-  progress f_equal.
-  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v14).
-  progress f_equal.
-  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v13).
-  progress f_equal.
-  progress do 3 rewrite (rngl_sub_sub_swap Hop _ v12).
-  progress f_equal.
-  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v8).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v6).
-  easy.
-} {
-  group_by_3_factors.
-  do 12 rewrite (rngl_add_sub_assoc Hop).
-  progress do 36 ring_light_step.
-  do 6 rewrite rngl_add_assoc.
-  progress do 6 rewrite (rngl_add_add_swap _ v16).
-  progress f_equal.
-  progress do 5 rewrite (rngl_add_add_swap _ v11).
-  progress f_equal.
-  progress do 2 rewrite (rngl_add_add_swap _ v10).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_add_add_swap _ v5).
-  progress do 3 f_equal.
-  progress do 7 rewrite (rngl_sub_sub_swap Hop _ v15).
-  progress f_equal.
-  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v14).
-  progress f_equal.
-  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v13).
-  progress f_equal.
-  progress do 3 rewrite (rngl_sub_sub_swap Hop _ v12).
-  progress do 2 f_equal.
-  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v7).
-  progress f_equal.
-  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v6).
-  easy.
-} {
-  group_by_3_factors.
-  do 12 rewrite (rngl_add_sub_assoc Hop).
-  progress do 36 ring_light_step.
-  do 6 rewrite rngl_add_assoc.
-  progress do 6 rewrite (rngl_add_add_swap _ v16).
-  progress f_equal.
-  progress do 5 rewrite (rngl_add_add_swap _ v11).
-  progress f_equal.
-  progress do 2 rewrite (rngl_add_add_swap _ v10).
-  progress do 2 f_equal.
-  progress do 1 rewrite (rngl_add_add_swap _ v5).
-  progress do 3 f_equal.
-  progress do 6 rewrite (rngl_sub_sub_swap Hop _ v15).
-  progress f_equal.
-  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v14).
-  progress f_equal.
-  progress do 1 rewrite (rngl_sub_sub_swap Hop _ v13).
-  progress f_equal.
-  progress do 4 rewrite (rngl_sub_sub_swap Hop _ v12).
-  progress f_equal.
-  progress do 3 rewrite (rngl_sub_sub_swap Hop _ v8).
-  progress f_equal.
-  progress do 2 rewrite (rngl_sub_sub_swap Hop _ v7).
-  easy.
-}
+rewrite vec3_triple_prod_r.
+rewrite (vec3_dot_mul_comm _ u).
+rewrite (vec3_dot_mul_comm w v).
+apply vec3_sub_sub_swap.
 Qed.
 
 Context {Hon : rngl_has_1 T = true}.
@@ -835,6 +640,7 @@ destruct (rngl_opt_opp_or_subt T) as [opp_subt| ]; [ | easy ].
 now destruct opp_subt.
 Qed.
 
+(*
 Theorem vec2_dot_mul_1_l : ∀ x y, vec2_dot_mul 1 0 x y = y.
 Proof.
 intros.
@@ -867,9 +673,27 @@ progress unfold mat2_det.
 do 2 rewrite (rngl_mul_0_l Hos).
 apply (rngl_sub_diag Hos).
 Qed.
+*)
 
 Theorem quat_mul_1_l : ∀ a, (1 * a)%quat = a.
 Proof.
+intros.
+progress unfold quat_mul.
+progress unfold quat_re_im_mul; cbn.
+rewrite (rngl_mul_1_l Hon).
+Search vec3_dot_mul.
+...
+cbn.
+
+destruct a as (a, u).
+cbn.
+cbn - [ quat_one ].
+cbn.
+Search vec3_dot_mul.
+...
+progress unfold quat_one.
+cbn - [ q_im ].
+...
 intros.
 destruct a as (a, (x, y, z)); cbn.
 rewrite (rngl_mul_1_l Hon).
