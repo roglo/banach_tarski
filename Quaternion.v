@@ -74,10 +74,12 @@ right; subst.
 now intros H; injection H; clear H; intros H.
 Qed.
 
+(*
 Definition vec2_dot_mul v v' :=
   let '(mk_v2 x y) := v in
   let '(mk_v2 x' y') := v' in
   (x * x' + y * y')%L.
+*)
 Definition vec3_dot_mul u v :=
   (v3_x u * v3_x v + v3_y u * v3_y v + v3_z u * v3_z v)%L.
 
@@ -540,6 +542,24 @@ Proof.
 intros.
 rewrite cross_mul_anticomm.
 rewrite vec3_triple_prod_l.
+(* au fait, on pourrait utiliser "*" pour le produit scalaire,
+   puisqu'il n'est pas utilisé dans cette syntaxe. Ça économiserait
+   un caractère utf-8.
+     Mais bon, c'est vrai que le produit scalaire n'est pas une
+   loi de composition interne...
+     Alors pour le produit vectoriel ? Alors oui, mais la convention
+   avec la croix x est vraiment répandue.
+     Et, bon, il n'est pas commutatif, et pas associatif non plus,
+   c'est un enfoiré de sa mère, en tant que multiplication. Bon, il
+   est distributif par rapport à l'addition, ça le rattrape un peu.
+     Peut-être qu'il faudrait voir avec le produit scalaire quand
+   même, même s'il n'est pas interne. Il est commutatif, lui, mais
+   bon, il ne peut pas être associatif pour des raisons de typage,
+   ça craint.
+     Bref, en dimension 3, c'est le bordel, ces deux multiplications.
+   Sans compter la multiplication par un scalaire.
+*)
+Search vec3_scal_mul.
 ...
 Search vec3_sub.
 apply vec3_opp_sub_distr.
