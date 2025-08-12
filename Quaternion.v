@@ -78,10 +78,8 @@ Definition vec2_dot_mul v v' :=
   let '(mk_v2 x y) := v in
   let '(mk_v2 x' y') := v' in
   (x * x' + y * y')%L.
-Definition vec3_dot_mul v v' :=
-  let '(mk_v3 x y z) := v in
-  let '(mk_v3 x' y' z') := v' in
-  (x * x' + y * y' + z * z')%L.
+Definition vec3_dot_mul u v :=
+  (v3_x u * v3_x v + v3_y u * v3_y v + v3_z u * v3_z v)%L.
 
 Definition vec3_scal_mul a u :=
   mk_v3 (a * v3_x u) (a * v3_y u) (a * v3_z u).
@@ -293,8 +291,7 @@ Theorem rngl_mul_vec3_dot_mul_l :
   ∀ a u v, (a * (u ⋆ v))%L = (a · u) ⋆ v.
 Proof.
 intros.
-destruct u as (x, y, z).
-destruct v as (x', y', z'); cbn.
+progress unfold vec3_dot_mul; cbn.
 do 2 rewrite rngl_mul_add_distr_l.
 do 3 rewrite rngl_mul_assoc.
 easy.
@@ -303,25 +300,23 @@ Qed.
 Theorem vec3_dot_mul_comm : ∀ u v, u ⋆ v = v ⋆ u.
 Proof.
 intros.
-destruct u as (x, y, z).
-destruct v as (x', y', z'); cbn.
-rewrite (rngl_mul_comm Hic x).
-rewrite (rngl_mul_comm Hic y).
-rewrite (rngl_mul_comm Hic z).
+progress unfold vec3_dot_mul.
+rewrite (rngl_mul_comm Hic (v3_x _)).
+rewrite (rngl_mul_comm Hic (v3_y _)).
+rewrite (rngl_mul_comm Hic (v3_z _)).
 easy.
 Qed.
 
 Theorem vec3_dot_mul_add_distr_l : ∀ u v w, u ⋆ (v + w) = (u ⋆ v + u ⋆ w)%L.
 Proof.
 intros.
-destruct u as (x, y, z).
-destruct v as (x', y', z').
-destruct w as (x'', y'', z''); cbn.
+progress unfold vec3_dot_mul; cbn.
 do 3 rewrite rngl_mul_add_distr_l.
 do 4 rewrite rngl_add_assoc.
 progress f_equal.
-do 2 rewrite (rngl_add_add_swap _ (z * z')).
+rewrite rngl_add_add_swap.
 progress f_equal.
+rewrite (rngl_add_add_swap _ (v3_z _ * _)).
 progress f_equal.
 apply rngl_add_add_swap.
 Qed.
@@ -329,14 +324,13 @@ Qed.
 Theorem vec3_dot_mul_add_distr_r : ∀ u v w, (u + v) ⋆ w = (u ⋆ w + v ⋆ w)%L.
 Proof.
 intros.
-destruct u as (x, y, z).
-destruct v as (x', y', z').
-destruct w as (x'', y'', z''); cbn.
+progress unfold vec3_dot_mul; cbn.
 do 3 rewrite rngl_mul_add_distr_r.
 do 4 rewrite rngl_add_assoc.
 progress f_equal.
-do 2 rewrite (rngl_add_add_swap _ (z * z'')).
+rewrite rngl_add_add_swap.
 progress f_equal.
+rewrite (rngl_add_add_swap _ (v3_z _ * _)).
 progress f_equal.
 apply rngl_add_add_swap.
 Qed.
@@ -344,8 +338,7 @@ Qed.
 Theorem vec3_dot_mul_scal_mul_l : ∀ a u v, (a · u) ⋆ v = (a * (u ⋆ v))%L.
 Proof.
 intros.
-destruct u as (x, y, z).
-destruct v as (x', y', z'); cbn.
+progress unfold vec3_dot_mul; cbn.
 do 2 rewrite rngl_mul_add_distr_l.
 do 3 rewrite rngl_mul_assoc.
 easy.
@@ -354,8 +347,7 @@ Qed.
 Theorem vec3_dot_mul_scal_mul_r : ∀ a u v, u ⋆ (a · v) = (a * (u ⋆ v))%L.
 Proof.
 intros.
-destruct u as (x, y, z).
-destruct v as (x', y', z'); cbn.
+progress unfold vec3_dot_mul; cbn.
 do 2 rewrite rngl_mul_add_distr_l.
 do 6 rewrite rngl_mul_assoc.
 do 3 rewrite (rngl_mul_comm Hic a).
@@ -365,19 +357,17 @@ Qed.
 Theorem vec3_dot_mul_cross_mul_l : ∀ u v w, u ⋆ (v × w) = (u × v) ⋆ w.
 Proof.
 intros.
-destruct u as (x, y, z).
-destruct v as (x', y', z').
-destruct w as (x'', y'', z''); cbn.
+progress unfold vec3_dot_mul; cbn.
 do 3 rewrite (rngl_mul_sub_distr_l Hop).
 do 3 rewrite (rngl_mul_sub_distr_r Hop).
 do 4 rewrite (rngl_add_sub_assoc Hop).
 do 6 rewrite rngl_mul_assoc.
 do 6 rewrite <- (rngl_add_sub_swap Hop).
-do 2 rewrite (rngl_sub_sub_swap Hop _ (z * _ * _)).
+do 2 rewrite (rngl_sub_sub_swap Hop _ (v3_z u * _ * _)).
 progress f_equal.
 progress f_equal.
 progress f_equal.
-rewrite (rngl_add_add_swap _ (z * _ * _)).
+rewrite (rngl_add_add_swap _ (v3_z u * _ * _)).
 progress f_equal.
 apply rngl_add_comm.
 Qed.
@@ -554,6 +544,64 @@ rewrite (vec3_add_comm _ (a · (v × w))).
 rewrite (vec3_add_add_swap _ _ (b · (u × w))).
 do 2 rewrite <- vec3_add_sub_assoc.
 progress f_equal.
+Theorem vec3_triple_prod_id :
+  ∀ u v w, u × (v × w) = ((u ⋆ w) · v - (u ⋆ v) · w)%v3.
+Proof.
+intros.
+progress unfold cross_mul.
+progress unfold vec3_sub.
+progress unfold vec3_scal_mul.
+progress unfold vec3_dot_mul; cbn.
+do 6 rewrite (rngl_mul_sub_distr_l Hop).
+do 12 rewrite rngl_mul_assoc.
+do 12 rewrite rngl_mul_add_distr_r.
+do 3 rewrite (rngl_sub_sub_distr Hop).
+do 3 rewrite (rngl_sub_add_distr Hos).
+f_equal. {
+  rewrite (rngl_mul_mul_swap Hic _ _ (v3_x v)).
+  do 2 rewrite <- (rngl_add_sub_swap Hop).
+  progress f_equal.
+  progress f_equal.
+  do 2 rewrite (rngl_add_sub_swap Hop).
+  rewrite (rngl_sub_diag Hos).
+  rewrite rngl_add_0_l.
+  rewrite (rngl_mul_mul_swap Hic).
+  progress f_equal.
+  apply (rngl_mul_mul_swap Hic).
+} {
+...
+remember (v3_y u * v3_x v * v3_y w)%L as a.
+remember (v3_y u * v3_y v * v3_x w)%L as b.
+remember (v3_z u * v3_z v * v3_x w)%L as c.
+remember (v3_z u * v3_x v * v3_z w)%L as d.
+remember (v3_x u * v3_x w * v3_x v)%L as a'.
+remember (v3_y u * v3_y w * v3_x v)%L as b'.
+remember (v3_z u * v3_z w * v3_x v)%L as c'.
+remember (v3_x u * v3_x v * v3_x w)%L as d'.
+rewrite <- (rngl_add_sub_swap Hop).
+f_equal.
+rewrite <- (rngl_add_sub_swap Hop).
+f_equal.
+subst.
+rewrite (rngl_mul_mul_swap Hic _ _ (v3_x v)).
+remember (v3_y u * v3_x v * v3_y w)%L as a.
+remember (v3_y u * v3_y v * v3_x w)%L as b.
+remember (v3_z u * v3_z v * v3_x w)%L as c.
+remember (v3_z u * v3_x v * v3_z w)%L as d.
+remember (v3_x u * v3_x w * v3_x v)%L as a'.
+remember (v3_y u * v3_y w * v3_x v)%L as b'.
+remember (v3_z u * v3_z w * v3_x v)%L as c'.
+remember (v3_x u * v3_x v * v3_x w)%L as d'.
+do 2 rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_sub_diag Hos).
+rewrite rngl_add_0_l.
+subst.
+rewrite (rngl_mul_mul_swap Hic).
+f_equal.
+apply (rngl_mul_mul_swap Hic).
+... ...
+rewrite glop.
+...
 ...
 intros; cbn.
 destruct a as (a, v).
