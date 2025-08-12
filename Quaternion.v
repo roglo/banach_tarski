@@ -102,8 +102,8 @@ Notation "u ⋆ v" := (vec3_dot_mul u v) (at level 40).
 Notation "a · v" := (vec3_scal_mul a v) (at level 40).
 Notation "u × v" := (cross_mul u v) (at level 40).
 
-Definition quat_zero := mk_quat 0 vec3_zero.
-Definition quat_one := mk_quat 1 vec3_zero.
+Definition quat_zero := mk_quat 0 0.
+Definition quat_one := mk_quat 1 0.
 
 Definition quat_add a b :=
   mk_quat
@@ -682,6 +682,7 @@ progress unfold quat_mul.
 progress unfold quat_re_im_mul; cbn.
 rewrite (rngl_mul_1_l Hon).
 Search vec3_dot_mul.
+Search vec3_scal_mul.
 ...
 cbn.
 
