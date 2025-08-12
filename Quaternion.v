@@ -966,6 +966,18 @@ symmetry.
 apply (rngl_opp_add_distr Hop).
 Qed.
 
+Theorem vec3_dot_mul_opp_r : ∀ u v, u ⋆ - v = (- (u ⋆ v))%L.
+Proof.
+intros.
+progress unfold vec3_dot_mul; cbn.
+do 3 rewrite (rngl_mul_opp_r Hop).
+do 2 rewrite (rngl_add_opp_r Hop).
+rewrite (rngl_opp_add_distr Hop).
+progress f_equal.
+symmetry.
+apply (rngl_opp_add_distr Hop).
+Qed.
+
 (*
 Theorem mat2_det_opp_l :
   ∀ a b a' b',
@@ -980,9 +992,23 @@ apply (rngl_add_opp_l Hop).
 Qed.
 *)
 
+Theorem vec3_scal_mul_opp_r : ∀ a u, a · - u = (- (a · u))%v3.
+...
+
 Theorem quat_mul_opp_l : ∀ a b, (- a * b = - (a * b))%quat.
 Proof.
 intros.
+progress unfold quat_mul.
+progress unfold quat_re_im_mul.
+progress unfold quat_opp; cbn.
+rewrite (rngl_mul_opp_l Hop).
+rewrite vec3_dot_mul_opp_l.
+rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_add_opp_l Hop).
+rewrite (rngl_opp_sub_distr Hop).
+progress f_equal.
+... ...
+rewrite vec3_scal_mul_opp_r.
 ...
 intros.
 destruct a as (a, (x, y, z)).
