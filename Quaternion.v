@@ -544,7 +544,7 @@ rewrite (vec3_add_comm _ (a · (v × w))).
 rewrite (vec3_add_add_swap _ _ (b · (u × w))).
 do 2 rewrite <- vec3_add_sub_assoc.
 progress f_equal.
-Theorem vec3_triple_prod_id :
+Theorem vec3_triple_prod :
   ∀ u v w, u × (v × w) = ((u ⋆ w) · v - (u ⋆ v) · w)%v3.
 Proof.
 intros.
@@ -556,19 +556,24 @@ do 6 rewrite (rngl_mul_sub_distr_l Hop).
 do 12 rewrite rngl_mul_assoc.
 do 12 rewrite rngl_mul_add_distr_r.
 do 3 rewrite (rngl_sub_sub_distr Hop).
-do 3 rewrite (rngl_sub_add_distr Hos).
+do 6 rewrite (rngl_sub_add_distr Hos).
+do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_x v)).
+do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_y v)).
+do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_z v)).
+do 6 rewrite <- (rngl_add_sub_swap Hop).
 f_equal. {
-  rewrite (rngl_mul_mul_swap Hic _ _ (v3_x v)).
-  do 2 rewrite <- (rngl_add_sub_swap Hop).
   progress f_equal.
   progress f_equal.
   do 2 rewrite (rngl_add_sub_swap Hop).
   rewrite (rngl_sub_diag Hos).
-  rewrite rngl_add_0_l.
-  rewrite (rngl_mul_mul_swap Hic).
-  progress f_equal.
-  apply (rngl_mul_mul_swap Hic).
+  now rewrite rngl_add_0_l.
 } {
+...
+  progress f_equal.
+  progress f_equal.
+  do 2 rewrite (rngl_add_sub_swap Hop).
+  rewrite (rngl_sub_diag Hos).
+  now rewrite rngl_add_0_l.
 ...
 remember (v3_y u * v3_x v * v3_y w)%L as a.
 remember (v3_y u * v3_y v * v3_x w)%L as b.
