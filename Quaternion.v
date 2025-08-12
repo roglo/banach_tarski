@@ -992,8 +992,33 @@ apply (rngl_add_opp_l Hop).
 Qed.
 *)
 
+Theorem vec3_scal_mul_opp_l : ∀ a u, - a · u = (- (a · u))%v3.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+progress unfold vec3_opp; cbn.
+do 3 rewrite (rngl_mul_opp_l Hop).
+easy.
+Qed.
+
 Theorem vec3_scal_mul_opp_r : ∀ a u, a · - u = (- (a · u))%v3.
-...
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+progress unfold vec3_opp; cbn.
+do 3 rewrite (rngl_mul_opp_r Hop).
+easy.
+Qed.
+
+Theorem vec3_add_opp_r : ∀ u v, (u + - v = u - v)%v3.
+Proof.
+intros.
+progress unfold vec3_add.
+progress unfold vec3_opp.
+progress unfold vec3_sub; cbn.
+do 3 rewrite (rngl_add_opp_r Hop).
+easy.
+Qed.
 
 Theorem quat_mul_opp_l : ∀ a b, (- a * b = - (a * b))%quat.
 Proof.
@@ -1007,8 +1032,10 @@ rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_add_opp_l Hop).
 rewrite (rngl_opp_sub_distr Hop).
 progress f_equal.
-... ...
 rewrite vec3_scal_mul_opp_r.
+rewrite vec3_scal_mul_opp_l.
+...
+rewrite cross_mul_opp_l.
 ...
 intros.
 destruct a as (a, (x, y, z)).
