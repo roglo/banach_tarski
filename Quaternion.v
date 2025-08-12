@@ -1020,6 +1020,28 @@ do 3 rewrite (rngl_add_opp_r Hop).
 easy.
 Qed.
 
+Theorem cross_mul_opp_l : ∀ u v, - u × v = (- (u × v))%v3.
+Proof.
+intros.
+progress unfold cross_mul.
+progress unfold vec3_opp; cbn.
+do 6 rewrite (rngl_mul_opp_l Hop).
+do 3 rewrite (rngl_sub_opp_r Hop).
+do 3 rewrite (rngl_add_opp_l Hop).
+do 3 rewrite (rngl_opp_sub_distr Hop).
+easy.
+Qed.
+
+Theorem vec3_opp_add_distr : ∀ u v, (- (u + v) = - u - v)%v3.
+Proof.
+intros.
+progress unfold vec3_opp.
+progress unfold vec3_sub.
+progress unfold vec3_add; cbn.
+do 3 rewrite (rngl_opp_add_distr Hop).
+easy.
+Qed.
+
 Theorem quat_mul_opp_l : ∀ a b, (- a * b = - (a * b))%quat.
 Proof.
 intros.
@@ -1034,24 +1056,9 @@ rewrite (rngl_opp_sub_distr Hop).
 progress f_equal.
 rewrite vec3_scal_mul_opp_r.
 rewrite vec3_scal_mul_opp_l.
-...
 rewrite cross_mul_opp_l.
-...
-intros.
-destruct a as (a, (x, y, z)).
-destruct b as (a', (x', y', z')).
-progress unfold quat_opp; cbn.
-f_equal. {
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite vec3_dot_mul_opp_l.
-  rewrite (rngl_sub_opp_r Hop).
-  rewrite (rngl_opp_sub_distr Hop).
-  apply (rngl_add_opp_l Hop).
-}
-do 3 rewrite vec2_dot_mul_opp_l.
-do 3 rewrite mat2_det_opp_l.
-do 3 rewrite (rngl_add_opp_r Hop).
-do 3 rewrite <- (rngl_opp_add_distr Hop).
+do 2 rewrite vec3_add_opp_r.
+do 2 rewrite vec3_opp_add_distr.
 easy.
 Qed.
 
@@ -1065,9 +1072,11 @@ progress f_equal.
 apply quat_mul_opp_l.
 Qed.
 
+(*
 Theorem quat_opt_mul_add_distr_r :
   ∀ a b c : quaternion T, ((a + b) * c)%L = (a * c + b * c)%L.
 Proof. apply quat_mul_add_distr_r. Qed.
+*)
 
 Theorem quat_add_opp_diag_l : ∀ a, (- a + a = 0)%quat.
 Proof.
@@ -1113,8 +1122,9 @@ symmetry.
 apply vec3_add_opp_opp.
 Qed.
 
-Theorem rngl_quat_sub_add_distr :
-  ∀ a b c : quaternion T, (a - (b + c) = a - b - c)%L.
+(*
+Theorem quat_sub_add_distr :
+  ∀ a b c : quaternion T, (a - (b + c) = a - b - c)%quat.
 Proof.
 intros; cbn.
 progress unfold rngl_sub.
@@ -1123,6 +1133,7 @@ do 3 rewrite rngl_opp_quat_opp.
 do 3 rewrite quat_add_opp_r.
 apply quat_sub_add_distr.
 Qed.
+*)
 
 Theorem quat_opt_sub_add_distr :
   if rngl_has_subt (quaternion T) then
@@ -1183,6 +1194,8 @@ Qed.
 
 Theorem quat_mul_inv_diag_l : ∀ a, a ≠ 0%quat → (a⁻¹ * a = 1)%quat.
 Proof.
+intros * Haz.
+...
 intros * Haz.
 progress unfold quat_inv; cbn.
 progress unfold quat_one.
