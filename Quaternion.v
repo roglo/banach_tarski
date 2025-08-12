@@ -957,9 +957,7 @@ Qed.
 Theorem vec3_dot_mul_opp_l : ∀ u v, - u ⋆ v = (- (u ⋆ v))%L.
 Proof.
 intros.
-...
-intros.
-progress unfold vec3_dot_mul.
+progress unfold vec3_dot_mul; cbn.
 do 3 rewrite (rngl_mul_opp_l Hop).
 do 2 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_opp_add_distr Hop).
@@ -968,6 +966,7 @@ symmetry.
 apply (rngl_opp_add_distr Hop).
 Qed.
 
+(*
 Theorem mat2_det_opp_l :
   ∀ a b a' b',
   mat2_det (- a) (- b) a' b' = (- mat2_det a b a' b')%L.
@@ -979,9 +978,12 @@ rewrite (rngl_sub_opp_r Hop).
 rewrite (rngl_opp_sub_distr Hop).
 apply (rngl_add_opp_l Hop).
 Qed.
+*)
 
 Theorem quat_mul_opp_l : ∀ a b, (- a * b = - (a * b))%quat.
 Proof.
+intros.
+...
 intros.
 destruct a as (a, (x, y, z)).
 destruct b as (a', (x', y', z')).
