@@ -124,8 +124,12 @@ Definition quat_sub a b := quat_add a (quat_opp b).
 
 Definition quat_conj a := mk_quat (q_re a) (- q_im a).
 Definition quat_norm_squ q :=
+  ((q_re q)² + (v3_x (q_im q))² + (v3_y (q_im q))² + (v3_z (q_im q))²)%L.
+(*
+Definition quat_norm_squ q :=
   let '(mk_quat a (mk_v3 b c d)) := q in
   (a² + b² + c² + d²)%L.
+*)
 
 Definition quat_ext_mul h q :=
   let '(mk_quat a (mk_v3 b c d)) := q in
@@ -1160,8 +1164,9 @@ assert (Hio :
   rewrite Hi1; cbn.
   now apply rngl_has_eq_dec_or_is_ordered_r.
 }
-intros (a, (x, y, z)) HN.
+intros (a, (x, y, z)) HN; cbn.
 progress unfold quat_norm_squ in HN.
+cbn in HN.
 apply (rngl_eq_add_0 Hor) in HN; cycle 1. {
   apply (rngl_add_nonneg_nonneg Hor). {
     apply (rngl_add_nonneg_nonneg Hor).
@@ -1195,6 +1200,29 @@ Qed.
 Theorem quat_mul_inv_diag_l : ∀ a, a ≠ 0%quat → (a⁻¹ * a = 1)%quat.
 Proof.
 intros * Haz.
+progress unfold quat_mul.
+progress unfold quat_re_im_mul.
+progress unfold quat_inv.
+progress unfold quat_one.
+progress unfold vec3_dot_mul; cbn.
+do 3 rewrite (rngl_div_opp_l Hop Hiv).
+do 3 rewrite (rngl_mul_opp_l Hop).
+do 2 rewrite (rngl_add_opp_r Hop).
+do 2 rewrite (rngl_sub_sub_distr Hop).
+rewrite (rngl_sub_opp_r Hop).
+do 4 rewrite (rngl_div_mul_mul_div Hic Hiv).
+do 4 rewrite fold_rngl_squ.
+do 3 rewrite <- (rngl_div_add_distr_r Hiv).
+rewrite (rngl_div_diag Hon Hiq). 2: {
+  intros H; apply Haz; clear Haz.
+  now apply eq_quat_norm_squ_0.
+}
+progress f_equal.
+...
+progress unfold quat_norm_squ.
+rewrite rngl_div_diag.
+rewrite rngl_add_opp_r.
+do 2 rewrite (rngl_sub_add_distr Hos).
 ...
 intros * Haz.
 progress unfold quat_inv; cbn.
