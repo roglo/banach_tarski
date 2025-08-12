@@ -487,6 +487,64 @@ do 3 rewrite (rngl_mul_comm Hic a).
 easy.
 Qed.
 
+Theorem cross_mul_anticomm : ∀ u v, u × v = (- (v × u))%v3.
+Proof.
+intros.
+progress unfold vec3_opp.
+progress unfold cross_mul; cbn.
+do 3 rewrite (rngl_opp_sub_distr Hop).
+do 2 rewrite (rngl_mul_comm Hic _ (v3_x u)).
+do 2 rewrite (rngl_mul_comm Hic _ (v3_y u)).
+do 2 rewrite (rngl_mul_comm Hic _ (v3_z u)).
+easy.
+Qed.
+
+Theorem vec3_triple_prod_l :
+  ∀ u v w, u × (v × w) = ((u ⋆ w) · v - (u ⋆ v) · w)%v3.
+Proof.
+intros.
+progress unfold cross_mul.
+progress unfold vec3_sub.
+progress unfold vec3_scal_mul.
+progress unfold vec3_dot_mul; cbn.
+do 6 rewrite (rngl_mul_sub_distr_l Hop).
+do 12 rewrite rngl_mul_assoc.
+do 12 rewrite rngl_mul_add_distr_r.
+do 3 rewrite (rngl_sub_sub_distr Hop).
+do 6 rewrite (rngl_sub_add_distr Hos).
+do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_x v)).
+do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_y v)).
+do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_z v)).
+do 6 rewrite <- (rngl_add_sub_swap Hop).
+f_equal. {
+  progress f_equal.
+  progress f_equal.
+  do 2 rewrite (rngl_add_sub_swap Hop).
+  rewrite (rngl_sub_diag Hos).
+  now rewrite rngl_add_0_l.
+} {
+  rewrite rngl_add_comm.
+  rewrite (rngl_sub_sub_swap Hop _ _ (v3_y u * v3_y v * v3_y w)).
+  rewrite (rngl_add_sub_swap Hop _ _ (v3_y u * v3_y v * v3_y w)).
+  rewrite (rngl_add_sub Hos).
+  apply (rngl_sub_sub_swap Hop).
+} {
+  do 2 rewrite (rngl_sub_sub_swap Hop _ _ (v3_z u * v3_z v * v3_z w)).
+  now rewrite (rngl_add_sub Hos).
+}
+Qed.
+
+Theorem vec3_triple_prod_r :
+  ∀ u v w, (u × v) × w = ((w ⋆ u) · v - (w ⋆ v) · u)%v3.
+Proof.
+intros.
+rewrite cross_mul_anticomm.
+rewrite vec3_triple_prod_l.
+...
+Search vec3_sub.
+apply vec3_opp_sub_distr.
+...
+
 Theorem quat_mul_assoc :
   ∀ a b c : quaternion T, (a * (b * c) = (a * b) * c)%L.
 Proof.
@@ -544,30 +602,9 @@ rewrite (vec3_add_comm _ (a · (v × w))).
 rewrite (vec3_add_add_swap _ _ (b · (u × w))).
 do 2 rewrite <- vec3_add_sub_assoc.
 progress f_equal.
-Theorem vec3_triple_prod :
-  ∀ u v w, u × (v × w) = ((u ⋆ w) · v - (u ⋆ v) · w)%v3.
-Proof.
-intros.
-progress unfold cross_mul.
-progress unfold vec3_sub.
-progress unfold vec3_scal_mul.
-progress unfold vec3_dot_mul; cbn.
-do 6 rewrite (rngl_mul_sub_distr_l Hop).
-do 12 rewrite rngl_mul_assoc.
-do 12 rewrite rngl_mul_add_distr_r.
-do 3 rewrite (rngl_sub_sub_distr Hop).
-do 6 rewrite (rngl_sub_add_distr Hos).
-do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_x v)).
-do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_y v)).
-do 3 rewrite (rngl_mul_mul_swap Hic _ _ (v3_z v)).
-do 6 rewrite <- (rngl_add_sub_swap Hop).
-f_equal. {
-  progress f_equal.
-  progress f_equal.
-  do 2 rewrite (rngl_add_sub_swap Hop).
-  rewrite (rngl_sub_diag Hos).
-  now rewrite rngl_add_0_l.
-} {
+rewrite vec3_triple_prod_l.
+... ...
+rewrite vec3_sub_sub_swap.
 ...
   progress f_equal.
   progress f_equal.
