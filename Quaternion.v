@@ -1261,7 +1261,29 @@ do 3 rewrite (rngl_sub_add_distr Hos).
 easy.
 Qed.
 
-Theorem quat_mul_special_comm :
+Theorem vec3_opp_sub_swap : ∀ u v, (- u - v)%v3 = (- v - u)%v3.
+Proof.
+intros.
+progress unfold vec3_opp.
+progress unfold vec3_sub; cbn.
+f_equal; apply (rngl_opp_sub_swap Hop).
+Qed.
+
+Theorem vec3_add_move_l : ∀ u v w, (u + v)%v3 = w ↔ v = (w - u)%v3.
+Proof.
+intros.
+progress unfold vec3_add.
+progress unfold vec3_sub; cbn.
+split; intros; subst; cbn. {
+  do 3 rewrite rngl_add_comm, (rngl_add_sub Hos).
+  now destruct v.
+} {
+  do 3 rewrite rngl_add_comm, (rngl_sub_add Hop).
+  now destruct w.
+}
+Qed.
+
+Theorem quat_mul_comm_eq :
   ∀ a b, (a * b = b * a - mk_quat 0 (2 · (q_im a × q_im b)))%quat.
 Proof.
 intros.
@@ -1274,6 +1296,40 @@ progress unfold quat_mul; cbn.
 progress unfold quat_re_im_mul; cbn.
 rewrite (rngl_opp_0 Hop).
 rewrite rngl_add_0_r.
+rewrite (rngl_mul_comm Hic _ (q_re a)).
+rewrite (vec3_dot_mul_comm _ (q_im a)).
+progress f_equal.
+rewrite (vec3_add_comm _ (q_re a · q_im b)).
+rewrite (cross_mul_anticomm _ (q_im a)).
+rewrite vec3_add_opp_r.
+rewrite <- vec3_add_sub_assoc.
+progress f_equal.
+rewrite vec3_opp_sub_swap.
+apply vec3_add_move_l.
+progress unfold cross_mul.
+progress unfold vec3_add.
+progress unfold vec3_opp; cbn.
+do 3 rewrite (rngl_add_sub_assoc Hop).
+do 3 rewrite <- (rngl_add_sub_swap Hop).
+do 3 rewrite <- (rngl_sub_add_distr Hos).
+do 6 rewrite <- (rngl_mul_2_l Hon (_ * _)).
+...
+Theorem vec3_mul_2_l : ∀ u, (2 * u = u + u)%v3.
+rewrite rngl_opp_sub_distr.
+...
+Search (_ + _ = _)%v3.
+Search (_ = _ + _)%v3.
+Search (_ + _ = _)%L.
+Search (_ = _ + _)%v3.
+rngl_add_move_l:
+  ∀ {T : Type} {ro : ring_like_op T},
+    ring_like_prop T → rngl_has_opp T = true → ∀ a b c : T, (a + b)%L = c ↔ b = (c - a)%L
+rngl_add_move_r:
+  ∀ {T : Type} {ro : ring_like_op T},
+    ring_like_prop T → rngl_has_opp T = true → ∀ a b c : T, (a + b)%L = c ↔ a = (c - b)%L
+...
+rewrite vec3_opp_sub_distr.
+rewrite vec3_sub_add_distr.
 ...
 
 Theorem quat_mul_inv_diag_r :
