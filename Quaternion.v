@@ -1252,12 +1252,78 @@ rewrite rngl_opt_inv_or_quot_quaternion.
 apply quat_mul_inv_diag_l.
 Qed.
 
+Theorem vec3_sub_add_distr : ∀ u v w, (u - (v + w) = u - v - w)%v3.
+Proof.
+intros.
+progress unfold vec3_sub.
+progress unfold vec3_add; cbn.
+do 3 rewrite (rngl_sub_add_distr Hos).
+easy.
+Qed.
+
+Theorem quat_mul_special_comm :
+  ∀ a b, (a * b = b * a - mk_quat 0 (2 · (q_im a × q_im b)))%quat.
+Proof.
+intros.
+progress unfold vec3_scal_mul.
+progress unfold cross_mul.
+progress unfold quat_sub.
+progress unfold quat_add.
+progress unfold quat_opp; cbn.
+progress unfold quat_mul; cbn.
+progress unfold quat_re_im_mul; cbn.
+rewrite (rngl_opp_0 Hop).
+rewrite rngl_add_0_r.
+...
+
 Theorem quat_mul_inv_diag_r :
   ∀ a,
   a ≠ 0%quat
   → (a * quat_inv a)%quat = 1%quat.
 Proof.
 intros * Haz.
+Check mk_quat.
+... ...
+rewrite quat_mul_special_comm.
+rewrite quat_mul_inv_diag_l; [ | easy ].
+progress unfold vec3_scal_mul.
+progress unfold cross_mul.
+cbn.
+do 3 rewrite (rngl_div_opp_l Hop Hiv).
+do 6 rewrite (rngl_mul_opp_r Hop).
+do 6 rewrite (rngl_mul_div_assoc Hiv).
+do 3 rewrite (rngl_sub_opp_r Hop).
+rewrite (rngl_mul_comm Hic _ (v3_y _)).
+rewrite (rngl_add_opp_diag_l Hop).
+rewrite (rngl_mul_comm Hic _ (v3_x _)).
+rewrite (rngl_add_opp_diag_l Hop).
+rewrite (rngl_mul_comm Hic _ (v3_x _)).
+rewrite (rngl_add_opp_diag_l Hop).
+rewrite (rngl_mul_0_r Hos).
+progress unfold quat_sub.
+progress unfold quat_opp.
+progress unfold quat_add; cbn.
+rewrite (rngl_opp_0 Hop).
+rewrite rngl_add_0_r.
+rewrite vec3_add_0_l.
+progress unfold vec3_opp; cbn.
+rewrite (rngl_opp_0 Hop).
+easy.
+...
+rewrite quat_sub_0_r.
+...
+intros.
+progress unfold quat_mul.
+progress unfold quat_re_im_mul.
+progress unfold quat_conj; cbn.
+rewrite (rngl_mul_comm Hic _ (q_re a)).
+rewrite (vec3_dot_mul_comm _ (q_im a)).
+progress f_equal.
+rewrite (vec3_add_comm _ (q_re a · q_im b)).
+rewrite (cross_mul_anticomm _ (q_im a)).
+rewrite vec3_add_opp_r.
+rewrite vec3_opp_sub_distr.
+rewrite vec3_sub_add_distr.
 ...
 rewrite quat_mul_comm.
 ...
