@@ -1546,7 +1546,7 @@ progress unfold quat_sub.
 apply quat_add_0_l.
 Qed.
 
-Theorem quat_characteristic_prop :
+Theorem quat_characteristic_0_prop :
   rngl_characteristic T = 0
   → ∀ i, rngl_of_nat (S i) ≠ 0%quat.
 Proof.
@@ -1563,6 +1563,14 @@ specialize (H2 i).
 now rewrite rngl_of_nat_succ in H2.
 Qed.
 
+Theorem quat_characteristic_not_0_prop :
+  rngl_characteristic T ≠ 0
+  → (∀ i, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%quat) ∧
+    rngl_of_nat (rngl_characteristic T) = 0%quat.
+Proof.
+intros Hch *.
+...
+
 Theorem quat_opt_characteristic_prop :
   if rngl_has_1 (quaternion T) then
     if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
@@ -1577,9 +1585,11 @@ symmetry in Hch.
 destruct ch. {
   apply Nat.eqb_eq in Hch.
   cbn - [ rngl_of_nat ].
-  apply (quat_characteristic_prop Hch).
+  apply (quat_characteristic_0_prop Hch).
 }
-apply Nat.eqb_neq in Hch.
+apply Nat.eqb_neq in Hch; cbn.
+... ...
+now apply quat_characteristic_not_0_prop.
 ...
 split. {
   intros i Hzi.
