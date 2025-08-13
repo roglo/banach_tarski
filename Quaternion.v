@@ -1581,6 +1581,23 @@ split. {
   revert H3.
   now apply H1.
 }
+clear Hch H1.
+remember (rngl_characteristic T) as i eqn:Hi.
+clear Hi.
+destruct i; [ easy | ].
+rewrite rngl_of_nat_succ in H2.
+rewrite rngl_of_nat_succ.
+...
+progress unfold rngl_of_nat in H2.
+progress unfold rngl_mul_nat in H2.
+progress unfold mul_nat in H2; cbn in H2.
+progress unfold rngl_of_nat.
+progress unfold rngl_mul_nat.
+progress unfold mul_nat; cbn.
+remember (rngl_characteristic T) as i eqn:Hi.
+clear Hi.
+induction i; [ easy | ].
+cbn in H2.
 ...
 
 Theorem quat_opt_characteristic_prop :
