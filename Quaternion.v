@@ -1569,6 +1569,18 @@ Theorem quat_characteristic_not_0_prop :
     rngl_of_nat (rngl_characteristic T) = 0%quat.
 Proof.
 intros Hch *.
+specialize rngl_opt_characteristic_prop as H1.
+rewrite Hon in H1.
+generalize Hch; intros H; apply Nat.eqb_neq in H.
+rewrite H in H1; clear H.
+destruct H1 as (H1, H2).
+split. {
+  intros * (Hzi, Hi) H3.
+  apply (f_equal q_re) in H3.
+  rewrite q_re_rngl_of_nat in H3; cbn in H3.
+  revert H3.
+  now apply H1.
+}
 ...
 
 Theorem quat_opt_characteristic_prop :
