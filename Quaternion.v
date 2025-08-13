@@ -1546,6 +1546,23 @@ progress unfold quat_sub.
 apply quat_add_0_l.
 Qed.
 
+Theorem quat_characteristic_prop :
+  rngl_characteristic T = 0
+  → ∀ i, rngl_of_nat (S i) ≠ 0%quat.
+Proof.
+intros Hch * H1.
+rewrite rngl_of_nat_succ in H1; cbn in H1.
+rewrite rngl_one_quat_one in H1.
+injection H1; clear H1; intros H4 H3 H2 H1.
+clear H2 H3 H4.
+rewrite q_re_rngl_of_nat in H1.
+specialize rngl_opt_characteristic_prop as H2.
+rewrite Hon, Hch in H2.
+cbn - [ rngl_of_nat ] in H2.
+specialize (H2 i).
+now rewrite rngl_of_nat_succ in H2.
+Qed.
+
 Theorem quat_opt_characteristic_prop :
   if rngl_has_1 (quaternion T) then
     if rngl_characteristic T =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
@@ -1554,37 +1571,16 @@ Theorem quat_opt_characteristic_prop :
       rngl_of_nat (rngl_characteristic T) = 0%L
   else not_applicable.
 Proof.
-...
-remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
-symmetry in Honq.
-destruct onq; [ | easy ].
-(*
-specialize rngl_opt_characteristic_prop as H1.
-rewrite Hon in H1.
-*)
+rewrite rngl_has_1_quaternion.
 remember (rngl_characteristic T =? 0) as ch eqn:Hch.
 symmetry in Hch.
 destruct ch. {
   apply Nat.eqb_eq in Hch.
-  intros i H1.
-  rewrite rngl_of_nat_succ in H1; cbn in H1.
-  progress unfold rngl_one in H1.
-  generalize Honq; intros H.
-  progress unfold rngl_has_1 in H, H1.
-  cbn in H1, H.
-  progress unfold quat_opt_one in H, H1.
-  destruct (rngl_opt_one T); [ | easy ].
-  clear t H.
-  injection H1; clear H1; intros H4 H3 H2 H1.
-  clear H2 H3 H4.
-  rewrite q_re_rngl_of_nat in H1.
-  specialize rngl_opt_characteristic_prop as H2.
-  rewrite Hon, Hch in H2.
-  cbn - [ rngl_of_nat ] in H2.
-  specialize (H2 i).
-  now rewrite rngl_of_nat_succ in H2.
+  cbn - [ rngl_of_nat ].
+  apply (quat_characteristic_prop Hch).
 }
 apply Nat.eqb_neq in Hch.
+...
 split. {
   intros i Hzi.
   specialize rngl_opt_characteristic_prop as H2.
