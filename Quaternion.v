@@ -1563,6 +1563,22 @@ specialize (H2 i).
 now rewrite rngl_of_nat_succ in H2.
 Qed.
 
+Theorem q_re_rngl_of_nat_inj :
+  ∀ i j,
+  q_re (rngl_of_nat i) = q_re (rngl_of_nat j)
+  → rngl_of_nat i = rngl_of_nat j.
+Proof.
+intros * Hij.
+revert i Hij.
+induction j; intros. {
+  cbn in Hij |-*.
+  rewrite q_re_rngl_of_nat in Hij.
+  replace 0%L with (rngl_of_nat 0) in Hij by easy.
+  destruct i; [ easy | ].
+  rewrite rngl_of_nat_succ in Hij.
+  rewrite rngl_of_nat_succ.
+...
+
 Theorem quat_characteristic_not_0_prop :
   rngl_characteristic T ≠ 0
   → (∀ i, 0 < i < rngl_characteristic T → rngl_of_nat i ≠ 0%quat) ∧
@@ -1582,6 +1598,11 @@ split. {
   now apply H1.
 }
 clear Hch H1.
+... ...
+replace 0%quat with (rngl_of_nat 0) by easy.
+apply q_re_rngl_of_nat_inj; cbn.
+now rewrite q_re_rngl_of_nat.
+...
 remember (rngl_characteristic T) as i eqn:Hi.
 clear Hi.
 destruct i; [ easy | ].
