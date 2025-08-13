@@ -74,12 +74,6 @@ right; subst.
 now intros H; injection H; clear H; intros H.
 Qed.
 
-(*
-Definition vec2_dot_mul v v' :=
-  let '(mk_v2 x y) := v in
-  let '(mk_v2 x' y') := v' in
-  (x * x' + y * y')%L.
-*)
 Definition vec3_dot_mul u v :=
   (v3_x u * v3_x v + v3_y u * v3_y v + v3_z u * v3_z v)%L.
 
@@ -125,11 +119,6 @@ Definition quat_sub a b := quat_add a (quat_opp b).
 Definition quat_conj a := mk_quat (q_re a) (- q_im a).
 Definition quat_norm_squ q :=
   ((q_re q)² + (v3_x (q_im q))² + (v3_y (q_im q))² + (v3_z (q_im q))²)%L.
-(*
-Definition quat_norm_squ q :=
-  let '(mk_quat a (mk_v3 b c d)) := q in
-  (a² + b² + c² + d²)%L.
-*)
 
 Definition quat_ext_mul h q :=
   let '(mk_quat a (mk_v3 b c d)) := q in
@@ -660,17 +649,6 @@ destruct (rngl_opt_opp_or_subt T) as [opp_subt| ]; [ | easy ].
 now destruct opp_subt.
 Qed.
 
-(*
-Theorem vec2_dot_mul_1_l : ∀ x y, vec2_dot_mul 1 0 x y = y.
-Proof.
-intros.
-progress unfold vec2_dot_mul.
-rewrite (rngl_mul_1_l Hon).
-rewrite (rngl_mul_0_l Hos).
-apply rngl_add_0_r.
-Qed.
-*)
-
 Theorem vec3_dot_mul_0_l : ∀ v, vec3_dot_mul 0 v = 0%L.
 Proof.
 intros.
@@ -688,16 +666,6 @@ do 3 rewrite (rngl_mul_0_r Hos).
 rewrite rngl_add_0_l.
 apply rngl_add_0_l.
 Qed.
-
-(*
-Theorem mat2_det_0_l : ∀ x y, mat2_det 0 0 x y = 0%L.
-Proof.
-intros.
-progress unfold mat2_det.
-do 2 rewrite (rngl_mul_0_l Hos).
-apply (rngl_sub_diag Hos).
-Qed.
-*)
 
 Theorem vec3_scal_mul_1_l : ∀ u, 1 · u = u.
 Proof.
@@ -828,62 +796,6 @@ rewrite rngl_one_quat_one.
 apply quat_mul_1_l.
 Qed.
 
-(*
-Theorem vec2_dot_mul_add_distr_l :
-  ∀ x y x' y' x'' y'',
-  vec2_dot_mul x y (x' + x'') (y' + y'') =
-  (vec2_dot_mul x y x' y' + vec2_dot_mul x y x'' y'')%L.
-Proof.
-intros.
-progress unfold vec2_dot_mul.
-do 2 rewrite rngl_mul_add_distr_l.
-do 2 rewrite rngl_add_assoc.
-progress f_equal.
-apply rngl_add_add_swap.
-Qed.
-
-Theorem vec2_dot_mul_add_distr_r :
-  ∀ x y x' y' x'' y'',
-  vec2_dot_mul (x + x') (y + y') x'' y'' =
-  (vec2_dot_mul x y x'' y'' + vec2_dot_mul x' y' x'' y'')%L.
-Proof.
-intros.
-progress unfold vec2_dot_mul.
-do 2 rewrite rngl_mul_add_distr_r.
-do 2 rewrite rngl_add_assoc.
-progress f_equal.
-apply rngl_add_add_swap.
-Qed.
-
-Theorem mat2_det_add_distr_l :
-  ∀ x y x' y' x'' y'',
-  mat2_det x y (x' + x'') (y' + y'') =
-  (mat2_det x y x' y' + mat2_det x y x'' y'')%L.
-Proof.
-intros.
-progress unfold mat2_det.
-do 2 rewrite rngl_mul_add_distr_l.
-rewrite (rngl_sub_add_distr Hos).
-rewrite (rngl_add_sub_assoc Hop).
-progress f_equal.
-apply (rngl_add_sub_swap Hop).
-Qed.
-
-Theorem mat2_det_add_distr_r :
-  ∀ x y x' y' x'' y'',
-  mat2_det (x + x') (y + y') x'' y'' =
-  (mat2_det x y x'' y'' + mat2_det x' y' x'' y'')%L.
-Proof.
-intros.
-progress unfold mat2_det.
-do 2 rewrite rngl_mul_add_distr_r.
-rewrite (rngl_sub_add_distr Hos).
-rewrite (rngl_add_sub_assoc Hop).
-progress f_equal.
-apply (rngl_add_sub_swap Hop).
-Qed.
-*)
-
 Theorem quat_mul_1_r : ∀ a, (a * 1)%quat = a%quat.
 Proof.
 intros.
@@ -960,20 +872,6 @@ rewrite vec3_add_add_swap.
 easy.
 Qed.
 
-(*
-Theorem vec2_dot_mul_opp_l :
-  ∀ x y x' y',
-  vec2_dot_mul (- x) (- y) x' y' = (- vec2_dot_mul x y x' y')%L.
-Proof.
-intros.
-progress unfold vec2_dot_mul.
-do 2 rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_add_opp_r Hop).
-symmetry.
-apply (rngl_opp_add_distr Hop).
-Qed.
-*)
-
 Theorem vec3_dot_mul_opp_l : ∀ u v, - u ⋆ v = (- (u ⋆ v))%L.
 Proof.
 intros.
@@ -997,20 +895,6 @@ progress f_equal.
 symmetry.
 apply (rngl_opp_add_distr Hop).
 Qed.
-
-(*
-Theorem mat2_det_opp_l :
-  ∀ a b a' b',
-  mat2_det (- a) (- b) a' b' = (- mat2_det a b a' b')%L.
-Proof.
-intros.
-progress unfold mat2_det.
-do 2 rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_sub_opp_r Hop).
-rewrite (rngl_opp_sub_distr Hop).
-apply (rngl_add_opp_l Hop).
-Qed.
-*)
 
 Theorem vec3_scal_mul_opp_l : ∀ a u, - a · u = (- (a · u))%v3.
 Proof.
@@ -1092,12 +976,6 @@ progress f_equal.
 apply quat_mul_opp_l.
 Qed.
 
-(*
-Theorem quat_opt_mul_add_distr_r :
-  ∀ a b c : quaternion T, ((a + b) * c)%L = (a * c + b * c)%L.
-Proof. apply quat_mul_add_distr_r. Qed.
-*)
-
 Theorem quat_add_opp_diag_l : ∀ a, (- a + a = 0)%quat.
 Proof.
 intros.
@@ -1141,19 +1019,6 @@ f_equal. {
 symmetry.
 apply vec3_add_opp_opp.
 Qed.
-
-(*
-Theorem quat_sub_add_distr :
-  ∀ a b c : quaternion T, (a - (b + c) = a - b - c)%quat.
-Proof.
-intros; cbn.
-progress unfold rngl_sub.
-rewrite rngl_has_opp_quaternion.
-do 3 rewrite rngl_opp_quat_opp.
-do 3 rewrite quat_add_opp_r.
-apply quat_sub_add_distr.
-Qed.
-*)
 
 Theorem quat_opt_sub_add_distr :
   if rngl_has_subt (quaternion T) then
@@ -1521,6 +1386,16 @@ progress unfold rngl_has_1 in Hon.
 now destruct (rngl_opt_one T).
 Qed.
 
+Theorem q_im_rngl_of_nat :
+  ∀ i, q_im (rngl_of_nat i) = 0%v3.
+Proof.
+intros.
+induction i; [ easy | ].
+rewrite rngl_of_nat_succ; cbn.
+rewrite rngl_one_quat_one; cbn.
+now rewrite vec3_add_0_l.
+Qed.
+
 Theorem quat_add_sub : ∀ a b, (a + b - b)%quat = a.
 Proof.
 intros.
@@ -1569,15 +1444,39 @@ Theorem q_re_rngl_of_nat_inj :
   → rngl_of_nat i = rngl_of_nat j.
 Proof.
 intros * Hij.
+do 2 rewrite q_re_rngl_of_nat in Hij.
 revert i Hij.
 induction j; intros. {
   cbn in Hij |-*.
-  rewrite q_re_rngl_of_nat in Hij.
-  replace 0%L with (rngl_of_nat 0) in Hij by easy.
   destruct i; [ easy | ].
   rewrite rngl_of_nat_succ in Hij.
+  rewrite rngl_of_nat_succ; cbn.
+  rewrite rngl_one_quat_one.
+  progress unfold quat_add.
+  rewrite q_re_rngl_of_nat; cbn.
+  rewrite Hij.
+  rewrite vec3_add_0_l.
+  rewrite q_im_rngl_of_nat.
+  easy.
+}
+destruct i. {
+  rewrite rngl_of_nat_succ in Hij.
   rewrite rngl_of_nat_succ.
-...
+  cbn in Hij |-*.
+  rewrite rngl_one_quat_one.
+  progress unfold quat_add.
+  rewrite q_re_rngl_of_nat; cbn.
+  rewrite <- Hij.
+  rewrite vec3_add_0_l.
+  rewrite q_im_rngl_of_nat.
+  easy.
+}
+do 2 rewrite rngl_of_nat_succ in Hij.
+do 2 rewrite rngl_of_nat_succ.
+apply (rngl_add_cancel_l Hos) in Hij.
+f_equal.
+now apply IHj.
+Qed.
 
 Theorem quat_characteristic_not_0_prop :
   rngl_characteristic T ≠ 0
@@ -1597,29 +1496,14 @@ split. {
   revert H3.
   now apply H1.
 }
-clear Hch H1.
-... ...
-replace 0%quat with (rngl_of_nat 0) by easy.
-apply q_re_rngl_of_nat_inj; cbn.
-now rewrite q_re_rngl_of_nat.
-...
-remember (rngl_characteristic T) as i eqn:Hi.
-clear Hi.
-destruct i; [ easy | ].
+remember (rngl_characteristic T) as j eqn:Hj.
+destruct j; [ easy | ].
 rewrite rngl_of_nat_succ in H2.
-rewrite rngl_of_nat_succ.
-...
-progress unfold rngl_of_nat in H2.
-progress unfold rngl_mul_nat in H2.
-progress unfold mul_nat in H2; cbn in H2.
-progress unfold rngl_of_nat.
-progress unfold rngl_mul_nat.
-progress unfold mul_nat; cbn.
-remember (rngl_characteristic T) as i eqn:Hi.
-clear Hi.
-induction i; [ easy | ].
-cbn in H2.
-...
+replace 0%quat with (rngl_of_nat 0) by easy.
+apply q_re_rngl_of_nat_inj.
+rewrite q_re_rngl_of_nat.
+now rewrite rngl_of_nat_succ.
+Qed.
 
 Theorem quat_opt_characteristic_prop :
   if rngl_has_1 (quaternion T) then
@@ -1638,75 +1522,8 @@ destruct ch. {
   apply (quat_characteristic_0_prop Hch).
 }
 apply Nat.eqb_neq in Hch; cbn.
-... ...
 now apply quat_characteristic_not_0_prop.
-...
-split. {
-  intros i Hzi.
-  specialize rngl_opt_characteristic_prop as H2.
-  rewrite Hon in H2.
-  apply Nat.eqb_neq in Hch.
-  rewrite Hch in H2.
-  apply Nat.eqb_neq in Hch.
-  destruct H2 as (H1, H2).
-  apply H1 in Hzi.
-  intros H3; apply Hzi; clear Hzi.
-  rename H3 into H3q.
-  destruct i; [ easy | ].
-  rewrite rngl_of_nat_succ in H3q.
-  rewrite rngl_of_nat_succ.
-  cbn in H3q.
-  apply (rngl_add_move_0_l Hop).
-  apply quat_add_move_0_l in H3q.
-  progress unfold rngl_one in H3q; cbn in H3q.
-  generalize Honq; intros H.
-  progress unfold rngl_has_1 in H; cbn in H.
-  progress unfold quat_opt_one in H3q, H.
-  destruct (rngl_opt_one T); [ clear H | easy ].
-(*
-  progress unfold quat_opp in H3q; cbn in H3q.
-*)
-  destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-    specialize (rngl_characteristic_1 Hon Hos Hc1) as H3.
-    rewrite H3; apply H3.
-  }
-  move Hc1 before Hch.
-  exfalso.
-  destruct i. {
-    cbn in H3q.
-    progress unfold quat_opp in H3q; cbn in H3q.
-    progress unfold quat_zero in H3q; cbn in H3q.
-    injection H3q; clear H3q; intros H6 H5 H4 H3.
-    symmetry in H3.
-    apply (f_equal rngl_opp) in H3.
-    rewrite (rngl_opp_0 Hop) in H3.
-    rewrite (rngl_opp_involutive Hop) in H3.
-    now apply (rngl_1_neq_0_iff Hon) in H3.
-  }
-  destruct i. {
-    cbn in H3q.
-    progress unfold quat_opp in H3q; cbn in H3q.
-    progress unfold quat_zero in H3q; cbn in H3q.
-    injection H3q; clear H3q; intros H6 H5 H4 H3.
-    symmetry in H3.
-    apply (f_equal rngl_opp) in H3.
-    rewrite rngl_add_0_r in H3.
-    rewrite (rngl_opp_involutive Hop) in H3.
-    progress unfold rngl_opp in H3.
-(* encore ce truc... bon, ça devient lassant...
-   je devrais faire des maths en réfléchissant,
-   en prenant du recul, mais je n'y arrive pas. *)
-...
-    now apply (rngl_1_neq_0_iff Hon) in H3.
-  }
-...
-(*
-  set (roq := quat_ring_like_op).
-*)
-  apply (@rngl_add_move_0_r (quaternion T)) in H3q.
-  progress unfold rngl_zero in H3q; cbn in H3q.
-  apply (rngl_add_move_0_r).
-...
+Qed.
 
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
@@ -1733,7 +1550,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_integral := quat_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := quat_opt_characteristic_prop;
-     rngl_opt_ord := 42;
+     rngl_opt_ord := NA;
      rngl_opt_archimedean := 42 |}.
 ...
 
