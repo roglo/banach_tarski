@@ -799,6 +799,15 @@ destruct (rngl_opt_inv_or_quot T) as [inv_quot| ]; [ | easy ].
 now destruct inv_quot.
 Qed.
 
+Theorem rngl_has_quot_quaternion : rngl_has_quot (quaternion T) = false.
+Proof.
+progress unfold rngl_has_inv in Hiv; cbn in Hiv.
+progress unfold rngl_has_quot; cbn.
+progress unfold quat_opt_inv_or_quot.
+destruct (rngl_opt_inv_or_quot T) as [inv_quot| ]; [ | easy ].
+now destruct inv_quot.
+Qed.
+
 Theorem rngl_opt_inv_or_quot_quaternion :
   rngl_opt_inv_or_quot (quaternion T) = Some (inl quat_inv).
 Proof.
@@ -1334,6 +1343,13 @@ do 3 rewrite (rngl_add_sub Hos).
 now destruct u.
 Qed.
 
+Theorem vec3_sub_add : ∀ u v, (u - v + v)%v3 = u.
+Proof.
+intros.
+rewrite <- vec3_add_sub_swap.
+apply vec3_add_sub.
+Qed.
+
 Theorem quat_add_move_l : ∀ a b c, (a + b)%quat = c ↔ b = (c - a)%quat.
 Proof.
 intros.
@@ -1348,12 +1364,10 @@ split; intros; subst; cbn. {
   now destruct b.
 } {
   rewrite rngl_add_comm, (rngl_sub_add Hop).
-...
   rewrite vec3_add_comm, vec3_sub_add.
-  do 3 rewrite rngl_add_comm, (rngl_sub_add Hop).
-  now destruct w.
+  now destruct c.
 }
-...
+Qed.
 
 Theorem quat_comm :
   ∀ a b, (a * b - b * a = mk_quat 0 (2 · (q_im a × q_im b)))%quat.
@@ -1387,33 +1401,12 @@ symmetry.
 apply quat_add_move_l.
 symmetry.
 apply quat_comm.
-...
-intros.
-progress unfold vec3_scal_mul.
-progress unfold quat_add.
-progress unfold quat_mul.
-progress unfold quat_re_im_mul; cbn - [ cross_mul ].
-rewrite rngl_add_0_r.
-rewrite (rngl_mul_comm Hic _ (q_re a)).
-rewrite (vec3_dot_mul_comm _ (q_im a)).
-progress f_equal.
-rewrite (vec3_add_comm _ (q_re a · q_im b)).
-rewrite (cross_mul_anticomm _ (q_im a)).
-symmetry.
-apply vec3_add_move_l.
-rewrite vec3_sub_add_distr.
-rewrite vec3_add_sub_swap.
-rewrite vec3_sub_diag.
-rewrite vec3_add_0_l.
-rewrite vec3_sub_opp_r.
-rewrite <- vec3_mul_2_l.
-easy.
 Qed.
 
 Theorem quat_mul_inv_diag_r :
   ∀ a,
   a ≠ 0%quat
-  → (a * quat_inv a)%quat = 1%quat.
+  → (a * a⁻¹)%quat = 1%quat.
 Proof.
 intros * Haz.
 rewrite quat_mul_comm_eq.
@@ -1445,69 +1438,34 @@ rewrite rngl_has_inv_quaternion.
 rewrite rngl_has_1_quaternion; cbn.
 progress unfold rngl_inv.
 rewrite rngl_opt_inv_or_quot_quaternion.
-...
-progress unfold rngl_inv; cbn.
-progress unfold quat_opt_inv_or_quot.
-remember (rngl_has_inv (quaternion T)) as ivq eqn:Hivq.
-symmetry in Hivq.
-destruct ivq; [ cbn | easy ].
-remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
-symmetry in Honq.
-destruct onq; [ cbn | easy ].
-intros * Haz.
-progress unfold rngl_one.
-generalize Honq; intros H.
-progress unfold rngl_has_1 in H.
-cbn in H |-*.
-progress unfold quat_opt_one in H |-*.
-generalize Hon; intros H1.
-progress unfold rngl_has_1 in H1.
-destruct (rngl_opt_one T) as [u| ]; [ clear H H1 u | easy ].
-generalize Hiq; intros H.
-progress unfold rngl_has_inv_or_quot in H.
-generalize Hiv; intros H1.
-progress unfold rngl_has_inv in H1.
-remember (rngl_opt_inv_or_quot T) as iq eqn:H2.
-symmetry in H2.
-destruct iq as [iq| ]; [ clear H | easy ].
-destruct iq as [inv| quot]; [ clear H1 H2 | easy ].
-now apply quat_mul_inv_diag_r.
+rewrite rngl_one_quat_one.
+apply quat_mul_inv_diag_r.
 Qed.
 
 Theorem quat_opt_mul_div :
   if rngl_has_quot (quaternion T) then
     ∀ a b : quaternion T, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
-Proof.
-rewrite rngl_has_inv_has_no_quot; [ easy | ].
-progress unfold rngl_has_inv in Hiv |-*; cbn.
-progress unfold quat_opt_inv_or_quot.
-destruct (rngl_opt_inv_or_quot T) as [opp_inv| ]; [ | easy ].
-now destruct opp_inv.
-Qed.
+Proof. now rewrite rngl_has_quot_quaternion. Qed.
 
 Theorem quat_opt_mul_quot_r :
   if (rngl_has_quot (quaternion T) && negb false)%bool then
     ∀ a b : quaternion T, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
-Proof.
-rewrite rngl_has_inv_has_no_quot; [ easy | ].
-progress unfold rngl_has_inv in Hiv |-*; cbn.
-progress unfold quat_opt_inv_or_quot.
-destruct (rngl_opt_inv_or_quot T) as [opp_inv| ]; [ | easy ].
-now destruct opp_inv.
-Qed.
+Proof. now rewrite rngl_has_quot_quaternion. Qed.
 
 Theorem quat_sub_diag : ∀ a, (a - a = 0)%quat.
 Proof.
 intros.
 progress unfold quat_sub.
-progress unfold quat_add; cbn.
+progress unfold quat_add.
+progress unfold quat_opp; cbn.
 rewrite (rngl_add_opp_diag_r Hop).
-now rewrite vec3_add_opp_diag_r.
+rewrite vec3_add_opp_diag_r.
+easy.
 Qed.
 
-Theorem vec3_opp_0 : vec3_opp vec3_zero = vec3_zero.
+Theorem vec3_opp_0 : (- 0 = 0)%v3.
 Proof.
 progress unfold vec3_opp; cbn.
 now rewrite (rngl_opp_0 Hop).
@@ -1516,12 +1474,12 @@ Qed.
 Theorem fold_vec3_zero : mk_v3 0 0 0 = vec3_zero.
 Proof. easy. Qed.
 
-Theorem quat_opp_0 : (quat_opp 0 = 0)%quat.
+Theorem quat_opp_0 : (- 0 = 0)%quat.
 Proof.
 progress unfold quat_opp; cbn.
 rewrite (rngl_opp_0 Hop).
-rewrite fold_vec3_zero.
-now rewrite vec3_opp_0.
+rewrite vec3_opp_0.
+easy.
 Qed.
 
 Theorem quat_mul_0_l : ∀ a, (0 * a)%quat = 0%quat.
@@ -1571,10 +1529,9 @@ progress unfold quat_add.
 progress unfold quat_opp; cbn.
 rewrite (rngl_add_opp_r Hop).
 rewrite (rngl_add_sub Hos).
-progress unfold vec3_add; cbn.
-do 3 rewrite (rngl_add_opp_r Hop).
-do 3 rewrite (rngl_add_sub Hos).
-now destruct a as (a, (x, y, z)).
+rewrite vec3_add_opp_r.
+rewrite vec3_add_sub.
+now destruct a.
 Qed.
 
 Theorem quat_add_move_0_l : ∀ a b, (a + b)%quat = 0%quat ↔ b = (- a)%quat.
@@ -1597,6 +1554,7 @@ Theorem quat_opt_characteristic_prop :
       rngl_of_nat (rngl_characteristic T) = 0%L
   else not_applicable.
 Proof.
+...
 remember (rngl_has_1 (quaternion T)) as onq eqn:Honq.
 symmetry in Honq.
 destruct onq; [ | easy ].
