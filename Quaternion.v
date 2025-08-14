@@ -1525,6 +1525,12 @@ apply Nat.eqb_neq in Hch; cbn.
 now apply quat_characteristic_not_0_prop.
 Qed.
 
+Theorem quat_opt_archimedean :
+  if (rngl_is_archimedean T && rngl_is_ordered (quaternion T))%bool then
+    ∀ a b : quaternion T, (0 < a)%L → ∃ₜ n : nat, (b < rngl_mul_nat a n)%L
+  else not_applicable.
+Proof. now rewrite Bool.andb_false_r. Qed.
+
 Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
   {| rngl_mul_is_comm := false;
      rngl_is_archimedean := rngl_is_archimedean T;
@@ -1551,8 +1557,7 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := quat_opt_characteristic_prop;
      rngl_opt_ord := NA;
-     rngl_opt_archimedean := 42 |}.
-...
+     rngl_opt_archimedean := quat_opt_archimedean |}.
 
 End a.
 
