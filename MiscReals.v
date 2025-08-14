@@ -1070,6 +1070,15 @@ destruct n as [| p| p]; [ easy | | ]; exfalso. {
 Qed.
 (**)
 
+Theorem rngl_of_pos_prop :
+  ∀ x m n,
+  (rngl_of_pos m ≤ x < rngl_of_pos (m + 1))%L
+  → (rngl_of_pos n ≤ x < rngl_of_pos (n + 1))%L
+  → m = n.
+Proof.
+intros * Hm Hn.
+Admitted.
+
 Theorem Int_part_prop :
   ∀ x m n,
   (rngl_of_Z m ≤ x < rngl_of_Z (m + 1))%L
@@ -1087,25 +1096,54 @@ destruct n as [| n| n]. {
   now apply (Int_part_small_lemma x).
 } {
   cbn in Hn.
-  destruct m as [| m| m]; cbn in Hm. {
+  destruct m as [| m| m]. {
+    cbn in Hm.
     rewrite rngl_of_pos_1 in Hm.
     symmetry.
     now apply (Int_part_small_lemma x).
   } {
     progress f_equal.
-...
-    apply rngl_nlt_ge in Hm.
-  apply Hnx; clear Hnx.
-  apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
-  apply rngl_of_pos_le_1_l.
+    now apply (rngl_of_pos_prop x).
+  } {
+    exfalso.
+    destruct Hm as (Hmx, Hxm).
+    apply rngl_nle_gt in Hxm.
+    apply Hxm; clear Hxm.
+    apply (rngl_le_trans Hor _ (rngl_of_pos n)); [ | easy ].
+    rewrite rngl_of_Z_add_1_r; cbn.
+    apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
+    rewrite (rngl_add_opp_l Hop).
+    apply (rngl_le_sub_nonneg Hop Hor).
+    apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
+    apply (rngl_0_le_1 Hon Hos Hor).
+  }
 } {
-  apply rngl_nle_gt in Hxn.
-  apply Hxn; clear Hxn.
-  apply (rngl_le_trans Hor _ 0); [ | easy ].
-  rewrite rngl_of_Z_add_1_r; cbn.
-  rewrite (rngl_add_opp_l Hop).
-  apply (rngl_le_sub_0 Hop Hor).
-  apply rngl_of_pos_le_1_l.
+  destruct m as [| m| m]. {
+    exfalso.
+    cbn in Hm.
+    rewrite rngl_of_pos_1 in Hm.
+    rewrite rngl_of_Z_add_1_r in Hn.
+    cbn in Hn.
+    destruct Hn as (Hnx, Hxn).
+    apply rngl_nle_gt in Hxn.
+    apply Hxn; clear Hxn.
+    apply (rngl_le_trans Hor _ 0); [ | easy ].
+    rewrite (rngl_add_opp_l Hop).
+    apply (rngl_le_sub_0 Hop Hor).
+    apply rngl_of_pos_le_1_l.
+  } {
+    exfalso.
+    rewrite rngl_of_Z_add_1_r in Hn.
+    cbn in Hm, Hn.
+    destruct Hn as (Hnx, Hxn).
+    apply rngl_nlt_ge in Hnx.
+    apply Hnx; clear Hnx.
+...
+    apply (rngl_lt_le_trans Hor _ (- rngl_of_pos n + 1)); [ easy | ].
+    rewrite (rngl_add_opp_l Hop).
+    apply (rngl_le_sub_0 Hop Hor).
+    apply rngl_of_pos_le_1_l.
+...
 }
 ... ...
 
