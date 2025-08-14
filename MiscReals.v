@@ -1042,6 +1042,7 @@ E(4r) = 3
 3 ≤ 4r < 4
 *)
 
+(**)
 Theorem Int_part_small_lemma :
   ∀ x n,
   (0 ≤ x < 1)%L
@@ -1067,6 +1068,46 @@ destruct n as [| p| p]; [ easy | | ]; exfalso. {
   apply rngl_of_pos_le_1_l.
 }
 Qed.
+(**)
+
+Theorem Int_part_prop :
+  ∀ x m n,
+  (rngl_of_Z m ≤ x < rngl_of_Z (m + 1))%L
+  → (rngl_of_Z n ≤ x < rngl_of_Z (n + 1))%L
+  → m = n.
+Proof.
+intros * Hm Hn.
+(*
+destruct Hm as (Hmx, Hm1).
+destruct Hn as (Hnx, Hn1).
+*)
+destruct n as [| n| n]. {
+  cbn in Hn.
+  rewrite rngl_of_pos_1 in Hn.
+  now apply (Int_part_small_lemma x).
+} {
+  cbn in Hn.
+  destruct m as [| m| m]; cbn in Hm. {
+    rewrite rngl_of_pos_1 in Hm.
+    symmetry.
+    now apply (Int_part_small_lemma x).
+  } {
+    progress f_equal.
+...
+    apply rngl_nlt_ge in Hm.
+  apply Hnx; clear Hnx.
+  apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
+  apply rngl_of_pos_le_1_l.
+} {
+  apply rngl_nle_gt in Hxn.
+  apply Hxn; clear Hxn.
+  apply (rngl_le_trans Hor _ 0); [ | easy ].
+  rewrite rngl_of_Z_add_1_r; cbn.
+  rewrite (rngl_add_opp_l Hop).
+  apply (rngl_le_sub_0 Hop Hor).
+  apply rngl_of_pos_le_1_l.
+}
+... ...
 
 Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L → Int_part x = 0%Z.
 Proof.
@@ -1075,30 +1116,13 @@ progress unfold Int_part.
 remember (z_int_part x) as m eqn:Hm.
 symmetry in Hm.
 destruct m as (n, Hn); clear Hm.
-(**)
-Theorem Int_part_lemma :
-  ∀ a n,
-  (rngl_of_Z n ≤ rngl_of_nat a < rngl_of_Z (n + 1))%L
-  → n = Z.of_nat a.
-Proof.
-intros * Hn.
-Admitted.
-rewrite <- Nat2Z.inj_0.
-apply Int_part_lemma; cbn.
-split. {
-  apply (rngl_le_trans Hor _ x); [ easy | ].
-(* ah, fait chier, faut que je regarde la version ci-dessous
-   plutôt... ou alors, malheur de malheur, que je réfléchisse... *)
-...
-Theorem Int_part_lemma :
-  ∀ x n,
-  (0 ≤ x < 1)%L
-  → (rngl_of_Z n ≤ x < rngl_of_Z (n + 1))%L
-  → n = 0%Z.
-Proof.
-intros * Hx Hn.
+... ...
+apply (Int_part_prop x); [ easy | cbn ].
+now rewrite rngl_of_pos_1.
+(*
 ... ...
 now apply (Int_part_small_lemma x).
+*)
 Qed.
 
 Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
@@ -1125,16 +1149,13 @@ remember (z_int_part (rngl_of_nat a)) as m eqn:Hm.
 symmetry in Hm.
 destruct m as (n, Hn).
 clear Hm.
-(*
-  Hn : (rngl_of_Z n ≤ rngl_of_nat a < rngl_of_Z (n + 1))%L
-  ============================
-  n = Z.of_nat a
-*)
-(*
-remember (rngl_of_Z n) as m eqn:Hm.
-specialize Int_part_small_lemma as H1.
-specialize (H1 (rngl_of_nat a) n).
-*)
+... ...
+apply (Int_part_prop (rngl_of_nat a)); [ easy | ].
+rewrite rngl_of_Z_add_1_r.
+rewrite rngl_of_Z_of_nat.
+split; [ apply (rngl_le_refl Hor) | ].
+apply (rngl_lt_add_r Hos Hor).
+apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 ...
 intros.
 progress unfold Int_part, nat_Int_part.
