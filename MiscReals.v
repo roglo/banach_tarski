@@ -1075,10 +1075,20 @@ progress unfold Int_part.
 remember (z_int_part x) as m eqn:Hm.
 symmetry in Hm.
 destruct m as (n, Hn); clear Hm.
-...
-  Hn : (rngl_of_Z n ≤ rngl_of_nat a < rngl_of_Z (n + 1))%L
-  ============================
-  n = Z.of_nat a
+(**)
+Theorem Int_part_lemma :
+  ∀ a n,
+  (rngl_of_Z n ≤ rngl_of_nat a < rngl_of_Z (n + 1))%L
+  → n = Z.of_nat a.
+Proof.
+intros * Hn.
+Admitted.
+rewrite <- Nat2Z.inj_0.
+apply Int_part_lemma; cbn.
+split. {
+  apply (rngl_le_trans Hor _ x); [ easy | ].
+(* ah, fait chier, faut que je regarde la version ci-dessous
+   plutôt... ou alors, malheur de malheur, que je réfléchisse... *)
 ...
 Theorem Int_part_lemma :
   ∀ x n,
