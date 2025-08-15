@@ -1077,7 +1077,10 @@ Theorem rngl_of_pos_prop :
   → m = n.
 Proof.
 intros * Hm Hn.
-Admitted.
+destruct Hm as (Hmx, Hxm).
+destruct Hn as (Hnx, Hxn).
+destruct n as [n| n| ]. {
+...
 
 Theorem Int_part_prop :
   ∀ x m n,
@@ -1136,13 +1139,39 @@ destruct n as [| n| n]. {
     rewrite rngl_of_Z_add_1_r in Hn.
     cbn in Hm, Hn.
     destruct Hn as (Hnx, Hxn).
-    apply rngl_nlt_ge in Hnx.
-    apply Hnx; clear Hnx.
-...
-    apply (rngl_lt_le_trans Hor _ (- rngl_of_pos n + 1)); [ easy | ].
-    rewrite (rngl_add_opp_l Hop).
-    apply (rngl_le_sub_0 Hop Hor).
+    apply rngl_nle_gt in Hxn.
+    apply Hxn; clear Hxn.
+    apply (rngl_le_trans Hor _ 1). {
+      rewrite (rngl_add_opp_l Hop).
+      apply (rngl_le_sub_nonneg Hop Hor).
+      apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    apply (rngl_le_trans Hor _ (rngl_of_pos m)); [ | easy ].
     apply rngl_of_pos_le_1_l.
+  } {
+    rewrite rngl_of_Z_add_1_r in Hm, Hn.
+    cbn in Hm, Hn.
+    progress f_equal.
+...
+    apply (rngl_of_pos_prop2 (- (x - 1))%L). {
+      split. {
+        apply (rngl_opp_le_compat Hop Hor).
+        rewrite (rngl_opp_involutive Hop).
+        apply (rngl_le_sub_le_add_r Hop Hor).
+        now apply (rngl_lt_le_incl Hor).
+      } {
+        apply (rngl_opp_lt_compat Hop Hor).
+        rewrite (rngl_opp_involutive Hop).
+        apply (rngl_lt_add_lt_sub_r Hop Hor).
+        rewrite rngl_of_pos_add.
+        rewrite rngl_of_pos_1.
+        rewrite (rngl_opp_add_distr Hop).
+        rewrite (rngl_sub_add Hop).
+...
+        now apply (rngl_lt_le_incl Hor).
+
+Search (- _ ≤ _)%L.
 ...
 }
 ... ...
