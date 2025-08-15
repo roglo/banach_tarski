@@ -968,7 +968,28 @@ induction a as [a| a| ]; intros. {
   }
 } {
   destruct b as [b| b| ]; [ | | easy ]. {
-...
+    apply Pos.compare_le_iff in Hab; cbn in Hab.
+    apply Pos.compare_cont_Lt_not_Gt in Hab.
+    rewrite rngl_of_pos_xI, rngl_of_pos_xO.
+    eapply (rngl_le_trans Hor). 2: {
+      apply (rngl_le_add_r Hor).
+      apply (rngl_0_le_1 Hon Hos Hor).
+    }
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    now apply IHa.
+  } {
+    apply Pos.compare_le_iff in Hab; cbn in Hab.
+    apply -> Pos.compare_le_iff in Hab.
+    do 2 rewrite rngl_of_pos_xO.
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
+    apply (rngl_0_le_2 Hon Hos Hor).
+    now apply IHa.
+  }
+}
+rewrite rngl_of_pos_1.
+apply rngl_of_pos_le_1_l.
+Qed.
 
 Theorem rngl_of_Z_le_inj : ∀ a b, (rngl_of_Z a ≤ rngl_of_Z b)%L → (a <= b)%Z.
 Proof.
@@ -1160,8 +1181,7 @@ induction m as [m| m| ]; intros. {
         now rewrite <- rngl_of_nat_2.
       }
       rewrite <- rngl_of_pos_mul; cbn.
-Search (rngl_of_pos _ ≤ rngl_of_pos _)%L.
-About rngl_of_pos_le_inj.
+      apply rngl_of_pos_inj_le.
 ...
 
 Theorem Int_part_prop :
