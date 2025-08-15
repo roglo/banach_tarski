@@ -339,6 +339,19 @@ induction a as [a| a| ]; [ | | easy ]. {
 }
 Qed.
 
+Theorem Pos_le_neq : ∀ a b, (a < b ↔ a <= b ∧ a ≠ b)%positive.
+Proof.
+intros.
+split; intros Hab. {
+  split; [ now apply Pos.lt_le_incl | ].
+  intros H; subst.
+  now apply Pos.lt_irrefl in Hab.
+}
+destruct Hab as (H1, H2).
+destruct (Pos_dec a b) as [[Hab| Hab]| Hab]; [ easy | | easy ].
+now apply Pos.lt_nle in Hab.
+Qed.
+
 Theorem rngl_of_Z_add_1_l : ∀ a, rngl_of_Z (1 + a) = (1 + rngl_of_Z a)%L.
 Proof.
 intros.
@@ -676,7 +689,7 @@ split. {
   apply (rngl_opp_lt_compat Hop Hor).
   rewrite (rngl_opp_involutive Hop).
   rewrite rngl_of_Z_of_nat.
-  apply (rngl_lt_iff Hor).
+  apply (rngl_le_neq Hor).
   split; [ easy | ].
   intros H; apply Han.
   rewrite H; symmetry.
@@ -907,6 +920,29 @@ apply (rngl_lt_add_l Hos Hor).
 apply rngl_of_pos_pos.
 Qed.
 
+Theorem rngl_of_pos_inj_le :
+  ∀ a b, (a <= b)%positive → (rngl_of_pos a ≤ rngl_of_pos b)%L.
+Proof.
+intros * Hab.
+revert b Hab.
+induction a as [a| a| ]; intros. {
+  rewrite rngl_of_pos_xI.
+  destruct b as [b| b| ]; [ | | easy ]. {
+    apply Pos.compare_le_iff in Hab; cbn in Hab.
+    apply -> Pos.compare_le_iff in Hab.
+    rewrite rngl_of_pos_xI.
+    apply (rngl_add_le_mono_r Hop Hor).
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ | now apply IHa ].
+    apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  } {
+    apply Pos.compare_le_iff in Hab; cbn in Hab.
+    apply Pos.compare_cont_Gt_not_Gt in Hab.
+    rewrite rngl_of_pos_xO.
+    apply Pos_le_neq in Hab.
+    destruct Hab as (H1, H2).
+    specialize (IHa _ H1) as Hab.
+...
+
 Theorem rngl_of_Z_le_inj : ∀ a b, (rngl_of_Z a ≤ rngl_of_Z b)%L → (a <= b)%Z.
 Proof.
 intros * Hab.
@@ -1098,6 +1134,7 @@ induction m as [m| m| ]; intros. {
       }
       rewrite <- rngl_of_pos_mul; cbn.
 Search (rngl_of_pos _ ≤ rngl_of_pos _)%L.
+About rngl_of_pos_le_inj.
 ...
 
 Theorem Int_part_prop :
