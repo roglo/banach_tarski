@@ -926,21 +926,48 @@ Proof.
 intros * Hab.
 revert b Hab.
 induction a as [a| a| ]; intros. {
-  rewrite rngl_of_pos_xI.
   destruct b as [b| b| ]; [ | | easy ]. {
     apply Pos.compare_le_iff in Hab; cbn in Hab.
     apply -> Pos.compare_le_iff in Hab.
-    rewrite rngl_of_pos_xI.
+    do 2 rewrite rngl_of_pos_xI.
     apply (rngl_add_le_mono_r Hop Hor).
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ | now apply IHa ].
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   } {
     apply Pos.compare_le_iff in Hab; cbn in Hab.
     apply Pos.compare_cont_Gt_not_Gt in Hab.
-    rewrite rngl_of_pos_xO.
-    apply Pos_le_neq in Hab.
-    destruct Hab as (H1, H2).
-    specialize (IHa _ H1) as Hab.
+    apply Pos2Nat.inj_lt in Hab.
+    rewrite rngl_of_pos_xI, rngl_of_pos_xO.
+    progress unfold rngl_of_pos.
+    remember (Pos.to_nat a) as i.
+    remember (Pos.to_nat b) as j.
+    clear a b IHa Heqi Heqj.
+    (* lemma to do *)
+    revert i Hab.
+    induction j; intros; [ easy | ].
+    rewrite rngl_of_nat_succ.
+    destruct i. {
+      rewrite (rngl_mul_0_r Hos).
+      rewrite rngl_add_0_l.
+      rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+      rewrite <- rngl_add_assoc.
+      apply (rngl_le_add_r Hor).
+      apply (rngl_add_nonneg_nonneg Hor).
+      apply (rngl_0_le_1 Hon Hos Hor).
+      apply (rngl_mul_nonneg_nonneg Hos Hor).
+      apply (rngl_0_le_2 Hon Hos Hor).
+      apply (rngl_of_nat_nonneg Hon Hos Hor).
+    }
+    apply Nat.succ_lt_mono in Hab.
+    rewrite rngl_of_nat_succ.
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+    rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
+    rewrite <- rngl_add_assoc.
+    apply (rngl_add_le_mono_l Hop Hor).
+    now apply IHj.
+  }
+} {
+  destruct b as [b| b| ]; [ | | easy ]. {
 ...
 
 Theorem rngl_of_Z_le_inj : ∀ a b, (rngl_of_Z a ≤ rngl_of_Z b)%L → (a <= b)%Z.
