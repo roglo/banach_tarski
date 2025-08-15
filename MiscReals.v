@@ -1077,9 +1077,27 @@ Theorem rngl_of_pos_prop :
   → m = n.
 Proof.
 intros * Hm Hn.
+(*
 destruct Hm as (Hmx, Hxm).
 destruct Hn as (Hnx, Hxn).
-destruct n as [n| n| ]. {
+*)
+revert x n Hm Hn.
+induction m as [m| m| ]; intros. {
+  destruct n as [n| n| ]. {
+    progress f_equal.
+    apply (IHm (x / 2)%L).
+    split. {
+      apply (rngl_le_div_r Hon Hop Hiv Hor).
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+      eapply (rngl_le_trans Hor); [ | apply Hm ].
+      rewrite (rngl_mul_2_r Hon).
+      rewrite <- (rngl_mul_2_l Hon).
+      replace 2%L with (rngl_of_pos 2). 2: {
+        rewrite rngl_of_nat_Pos_to_nat.
+        now rewrite <- rngl_of_nat_2.
+      }
+      rewrite <- rngl_of_pos_mul; cbn.
+Search (rngl_of_pos _ ≤ rngl_of_pos _)%L.
 ...
 
 Theorem Int_part_prop :
