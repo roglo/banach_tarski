@@ -1242,19 +1242,15 @@ apply (rngl_sub_move_r Hop) in Hy.
 rewrite rngl_add_comm in Hy.
 subst x; rename y into x.
 assert (H : (rngl_of_nat n ≤ x < (rngl_of_nat (n + 1)))%L). {
-  split. {
-    now apply (rngl_add_le_mono_l Hop Hor 1%L).
-  }
-  apply (rngl_add_lt_mono_l Hop Hor _ _ 1%L).
+  split; [ now apply (rngl_add_le_mono_l Hop Hor 1) | ].
+  apply (rngl_add_lt_mono_l Hop Hor _ _ 1).
   rewrite rngl_of_nat_add, rngl_of_nat_1.
   now rewrite (rngl_add_comm (rngl_of_nat _)).
 }
 clear Hn; rename H into Hn.
 assert (H : (rngl_of_nat m ≤ x < (rngl_of_nat (m + 1)))%L). {
-  split. {
-    now apply (rngl_add_le_mono_l Hop Hor 1%L).
-  }
-  apply (rngl_add_lt_mono_l Hop Hor _ _ 1%L).
+  split; [ now apply (rngl_add_le_mono_l Hop Hor 1) | ].
+  apply (rngl_add_lt_mono_l Hop Hor _ _ 1).
   rewrite rngl_of_nat_add, rngl_of_nat_1.
   now rewrite (rngl_add_comm (rngl_of_nat _)).
 }
