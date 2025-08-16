@@ -1216,6 +1216,20 @@ Theorem rngl_of_pos_prop :
   → (rngl_of_pos n ≤ x < rngl_of_pos (n + 1))%L
   → m = n.
 Proof.
+(*
+intros * Hm Hn.
+    rewrite rngl_of_pos_add in Hm.
+    rewrite rngl_of_pos_1 in Hm.
+    progress unfold rngl_of_pos in Hm.
+    rewrite <- rngl_of_nat_1 in Hm.
+    rewrite <- rngl_of_nat_add in Hm.
+    specialize (Pos2Nat.is_pos m) as Hmz.
+    apply Nat.neq_0_lt_0 in Hmz.
+apply Pos2Nat.inj.
+    remember (Pos.to_nat m) as p eqn:H; clear m H; rename p into m.
+revert x n Hm Hn.
+induction m; intros. {
+*)
 intros * Hm Hn.
 revert x n Hm Hn.
 induction m as [m| m| ]; intros. {
