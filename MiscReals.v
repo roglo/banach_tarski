@@ -1227,9 +1227,16 @@ induction m as [m| m| ]; intros. {
     progress f_equal.
     now apply (IHm (x / 2)%L); apply rngl_of_pos_xI_interval.
   } {
-    exfalso.
+    exfalso; clear IHm.
     rewrite rngl_of_pos_add in Hm, Hn.
     rewrite rngl_of_pos_1 in Hm, Hn.
+    rewrite rngl_of_pos_xI in Hm.
+    rewrite rngl_of_pos_xO in Hn.
+    progress unfold rngl_of_pos in Hm.
+    progress unfold rngl_of_pos in Hn.
+    remember (Pos.to_nat m) as p eqn:H; clear m H; rename p into m.
+    remember (Pos.to_nat n) as p eqn:H; clear n H; rename p into n.
+    move n before m.
 (* ah bin, on voit bien que Hm et Hn sont incompatibles, mais pour
    le prouver, hein... encore un truc à la con *)
 ...
