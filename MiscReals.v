@@ -1210,6 +1210,20 @@ rewrite <- rngl_of_pos_add.
 easy.
 Qed.
 
+Theorem rngl_of_nat_prop :
+  ∀ x m n,
+  (rngl_of_nat m ≤ x < rngl_of_nat (m + 1))%L
+  → (rngl_of_nat n ≤ x < rngl_of_nat (n + 1))%L
+  → m = n.
+Proof.
+intros * Hm Hn.
+apply Nat.le_antisymm.
+apply (between_rngl_of_nat_and_succ x x); [ | easy | easy ].
+apply (rngl_le_refl Hor).
+apply (between_rngl_of_nat_and_succ x x); [ | easy | easy ].
+apply (rngl_le_refl Hor).
+Qed.
+
 Theorem rngl_of_pos_prop :
   ∀ x m n,
   (rngl_of_pos m ≤ x < rngl_of_pos (m + 1))%L
@@ -1223,43 +1237,8 @@ progress unfold rngl_of_pos in Hm.
 progress unfold rngl_of_pos in Hn.
 rewrite <- rngl_of_nat_1 in Hm, Hn.
 rewrite <- rngl_of_nat_add in Hm, Hn.
-specialize (Pos2Nat.is_pos m) as Hmz.
-specialize (Pos2Nat.is_pos n) as Hnz.
-apply Nat.neq_0_lt_0 in Hmz, Hnz.
 apply Pos2Nat.inj.
-remember (Pos.to_nat m) as p eqn:H; clear m H; rename p into m.
-remember (Pos.to_nat n) as p eqn:H; clear n H; rename p into n.
-move n before m.
-move Hmz before n; move Hnz before Hmz.
-destruct m; [ easy | clear Hmz ].
-destruct n; [ easy | clear Hnz ].
-progress f_equal.
-rewrite Nat.add_1_r in Hm, Hn.
-do 3 rewrite rngl_of_nat_succ in Hm, Hn.
-remember (x - 1)%L as y eqn:Hy.
-symmetry in Hy.
-apply (rngl_sub_move_r Hop) in Hy.
-rewrite rngl_add_comm in Hy.
-subst x; rename y into x.
-assert (H : (rngl_of_nat n ≤ x < (rngl_of_nat (n + 1)))%L). {
-  split; [ now apply (rngl_add_le_mono_l Hop Hor 1) | ].
-  apply (rngl_add_lt_mono_l Hop Hor _ _ 1).
-  rewrite rngl_of_nat_add, rngl_of_nat_1.
-  now rewrite (rngl_add_comm (rngl_of_nat _)).
-}
-clear Hn; rename H into Hn.
-assert (H : (rngl_of_nat m ≤ x < (rngl_of_nat (m + 1)))%L). {
-  split; [ now apply (rngl_add_le_mono_l Hop Hor 1) | ].
-  apply (rngl_add_lt_mono_l Hop Hor _ _ 1).
-  rewrite rngl_of_nat_add, rngl_of_nat_1.
-  now rewrite (rngl_add_comm (rngl_of_nat _)).
-}
-clear Hm; rename H into Hm.
-apply Nat.le_antisymm.
-apply (between_rngl_of_nat_and_succ x x); [ | easy | easy ].
-apply (rngl_le_refl Hor).
-apply (between_rngl_of_nat_and_succ x x); [ | easy | easy ].
-apply (rngl_le_refl Hor).
+now apply (rngl_of_nat_prop x).
 Qed.
 
 Theorem Int_part_prop :
