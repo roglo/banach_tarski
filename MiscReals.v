@@ -1223,24 +1223,28 @@ induction m as [m| m| ]; intros. {
     progress f_equal.
     now apply (IHm (x / 2)%L); apply rngl_of_pos_xI_interval.
   } {
+    exfalso; clear IHm.
     rewrite rngl_of_pos_add in Hm.
     rewrite rngl_of_pos_1 in Hm.
     rewrite rngl_of_pos_xI in Hm.
     progress unfold rngl_of_pos in Hm.
+    rewrite <- rngl_of_nat_2 in Hm.
+    rewrite <- (rngl_of_nat_mul Hon Hos) in Hm.
+    rewrite <- rngl_of_nat_1 in Hm.
+    do 2 rewrite <- rngl_of_nat_add in Hm.
+    specialize (Pos2Nat.is_pos m) as Hmz.
+    apply Nat.neq_0_lt_0 in Hmz.
+    remember (Pos.to_nat m) as p eqn:H; clear m H; rename p into m.
 (**)
-    exfalso; clear IHm.
     rewrite rngl_of_pos_add in Hn.
     rewrite rngl_of_pos_1 in Hn.
     rewrite rngl_of_pos_xO in Hn.
     progress unfold rngl_of_pos in Hn.
-    remember (Pos.to_nat m) as p eqn:H; clear m H; rename p into m.
     remember (Pos.to_nat n) as p eqn:H; clear n H; rename p into n.
     move n before m.
-    rewrite <- rngl_of_nat_2 in Hm, Hn.
-    rewrite <- (rngl_of_nat_mul Hon Hos) in Hm, Hn.
-    rewrite <- rngl_of_nat_1 in Hm.
+    rewrite <- rngl_of_nat_2 in Hn.
+    rewrite <- (rngl_of_nat_mul Hon Hos) in Hn.
     rewrite <- rngl_of_nat_1 in Hn.
-    do 2 rewrite <- rngl_of_nat_add in Hm.
     rewrite <- rngl_of_nat_add in Hn.
     (* lemma to do *)
     specialize (between_rngl_of_nat_and_succ x x) as H1.
@@ -1254,22 +1258,23 @@ induction m as [m| m| ]; intros. {
     apply (f_equal Nat.odd) in H1.
     now rewrite Nat.odd_even in H1.
   } {
+    exfalso; clear IHm.
     rewrite rngl_of_pos_add in Hm.
     rewrite rngl_of_pos_1 in Hm.
     rewrite rngl_of_pos_xI in Hm.
     progress unfold rngl_of_pos in Hm.
-(**)
-    exfalso; clear IHm.
+    rewrite <- rngl_of_nat_2 in Hm.
+    rewrite <- (rngl_of_nat_mul Hon Hos) in Hm.
+    rewrite <- rngl_of_nat_1 in Hm.
+    do 2 rewrite <- rngl_of_nat_add in Hm.
     specialize (Pos2Nat.is_pos m) as Hmz.
     apply Nat.neq_0_lt_0 in Hmz.
+    remember (Pos.to_nat m) as p eqn:H; clear m H; rename p into m.
+(**)
     rewrite rngl_of_pos_add in Hn.
     rewrite rngl_of_pos_1 in Hn.
-    remember (Pos.to_nat m) as p eqn:H; clear m H; rename p into m.
-    rewrite <- rngl_of_nat_2 in Hm, Hn.
-    rewrite <- (rngl_of_nat_mul Hon Hos) in Hm(*, Hn*).
-    rewrite <- rngl_of_nat_1 in Hm.
+    rewrite <- rngl_of_nat_2 in Hn.
     rewrite <- rngl_of_nat_1 in Hn.
-    do 2 rewrite <- rngl_of_nat_add in Hm.
     (* lemma to do *)
     specialize (between_rngl_of_nat_and_succ x x) as H1.
     specialize (H1 _ _ (rngl_le_refl Hor _) Hm Hn).
