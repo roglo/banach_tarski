@@ -1226,7 +1226,12 @@ induction m as [m| m| ]; intros. {
   destruct n as [n| n| ]. {
     progress f_equal.
     now apply (IHm (x / 2)%L); apply rngl_of_pos_xI_interval.
-  }
+  } {
+    exfalso.
+    rewrite rngl_of_pos_add in Hm, Hn.
+    rewrite rngl_of_pos_1 in Hm, Hn.
+(* ah bin, on voit bien que Hm et Hn sont incompatibles, mais pour
+   le prouver, hein... encore un truc à la con *)
 ...
 Search (_ <= _ + _)%Z.
       apply pos_le_add.
