@@ -1149,13 +1149,6 @@ destruct j. {
   apply H1; clear H1.
   apply (rngl_le_trans Hor _ b); [ easy | ].
   apply (rngl_le_trans Hor _ 1); [ easy | ].
-(*
-  Hab : (a ≤ b)%L
-  H2 : l2 a (1 + rngl_of_nat (S i))%L
-  Hj : l2 b 1%L
-  ============================
-  l2 1%L (1 + rngl_of_nat i)%L
-*)
   apply (rngl_le_add_r Hor).
   apply (rngl_of_nat_nonneg Hon Hos Hor).
 }
@@ -1176,6 +1169,107 @@ apply (IHi (a - 1) (b - 1))%L. {
   now rewrite Nat.add_1_r.
 }
 Qed.
+
+Theorem gen_between_rngl_of_nat_and_succ :
+  ∀ l1 l2 a b i j,
+  (∀ a b, l1 a b → ¬ l2 b a)
+  → (∀ a b c, (a ≤ b)%L → l2 b c → l2 a c)
+  → (∀ a b c, l2 a b → (b ≤ c)%L → l2 a c)
+  → (∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L)
+  → (∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c)
+  → (a ≤ b)%L
+  → l1 (rngl_of_nat i) a ∧ l2 a (rngl_of_nat (i + 1))%L
+  → l1 (rngl_of_nat j) b ∧ l2 b (rngl_of_nat (j + 1))%L
+  → i ≤ j.
+Proof.
+intros * Hdual Hmon2 Hmon2' l1_add_l1_sub_l l2_sub_l2_add_l Hab Hi Hj.
+revert a b j Hab Hi Hj.
+induction i; intros; cbn; [ apply Nat.le_0_l | ].
+destruct j. {
+  exfalso; cbn in Hj.
+  rewrite rngl_add_0_r in Hj.
+  destruct Hj as (_, Hj).
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  destruct Hi as (H1, H2).
+  apply Hdual in H1.
+  apply H1; clear H1.
+  apply (Hmon2 _ b); [ easy | ].
+  apply (Hmon2' _ 1%L); [ easy | ].
+  apply (rngl_le_add_r Hor).
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
+apply -> Nat.succ_le_mono.
+apply (IHi (a - 1) (b - 1))%L. {
+  now apply (rngl_sub_le_mono_r Hop Hor).
+} {
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  split; [ now apply l1_add_l1_sub_l | ].
+  apply l2_sub_l2_add_l.
+  now rewrite Nat.add_1_r.
+} {
+  rewrite Nat.add_1_r in Hj.
+  do 2 rewrite rngl_of_nat_succ in Hj.
+  split; [ now apply l1_add_l1_sub_l | ].
+  apply l2_sub_l2_add_l.
+  now rewrite Nat.add_1_r.
+}
+Qed.
+
+Theorem between_rngl_of_nat_and_succ' :
+  ∀ a b i j,
+  (a ≤ b)%L
+  → (rngl_of_nat i ≤ a < rngl_of_nat (i + 1))%L
+  → (rngl_of_nat j ≤ b < rngl_of_nat (j + 1))%L
+  → i ≤ j.
+Proof.
+intros * Hab Hi Hj.
+apply (gen_between_rngl_of_nat_and_succ rngl_le rngl_lt a b); try easy. {
+  intros.
+  now apply rngl_nlt_ge.
+} {
+  intros.
+  eapply (rngl_le_lt_trans Hor); [ eassumption | easy ].
+} {
+  intros.
+  eapply (rngl_lt_le_trans Hor); [ eassumption | easy ].
+} {
+  intros.
+  now apply (rngl_le_add_le_sub_l Hop Hor).
+} {
+  intros.
+  now apply (rngl_lt_sub_lt_add_l Hop Hor).
+}
+Qed.
+
+Theorem between_rngl_of_nat_and_succ2' :
+  ∀ a b i j,
+  (a ≤ b)%L
+  → (rngl_of_nat i < a ≤ rngl_of_nat (i + 1))%L
+  → (rngl_of_nat j < b ≤ rngl_of_nat (j + 1))%L
+  → i ≤ j.
+Proof.
+intros * Hab Hi Hj.
+apply (gen_between_rngl_of_nat_and_succ rngl_lt rngl_le a b); try easy. {
+  intros.
+  now apply rngl_nle_gt.
+} {
+  intros.
+  eapply (rngl_le_trans Hor); [ eassumption | easy ].
+} {
+  intros.
+  eapply (rngl_le_trans Hor); [ eassumption | easy ].
+} {
+  intros.
+  now apply (rngl_lt_add_lt_sub_l Hop Hor).
+} {
+  intros.
+  now apply (rngl_le_sub_le_add_l Hop Hor).
+}
+Qed.
+
+...
 
 Theorem gen_between_rngl_of_nat_and_succ :
   ∀ l1 l2,
