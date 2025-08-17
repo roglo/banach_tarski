@@ -12,10 +12,16 @@ Require Import RingLike.RealLike.
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
 
-(* properties "lt" vs "le" in ring-like *)
+(* order_compatibility expresses the standard relationship between < and ≤ :
+   - if a < b then ¬ (b ≤ a)
+   - ≤ is monotone w.r.t. <
+   - when subtraction is available, addition/subtraction preserves < and ≤
+   This corresponds to the usual compatibility axioms between strict and
+   non-strict orders in ordered ring-likes. *)
 (* to be moved to ring-like library *)
 
-Class lt_le_pair_prop {T} {ro : ring_like_op T} (l1 l2 : T → T → Prop) :=
+Class rngl_order_compatibility {T} {ro : ring_like_op T}
+  (l1 l2 : T → T → Prop) :=
   { llpp_dual_12 : ∀ a b, l1 a b → ¬ l2 b a;
     llpp_mono_l_2 : ∀ a b c, (a ≤ b)%L → l2 b c → l2 a c;
     llpp_mono_r_2 : ∀ a b c, l2 a b → (b ≤ c)%L → l2 a c;
@@ -26,10 +32,8 @@ Class lt_le_pair_prop {T} {ro : ring_like_op T} (l1 l2 : T → T → Prop) :=
       if rngl_has_opp T then ∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c
       else not_applicable }.
 
-Arguments lt_le_pair_prop {T ro} l1 l2.
-
 Theorem llpp_add_sub_1 {T} {ro : ring_like_op T} {l1 l2}
-  {llpp : lt_le_pair_prop l1 l2} :
+  {llpp : rngl_order_compatibility l1 l2} :
   rngl_has_opp T = true →
   ∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L.
 Proof.
@@ -39,7 +43,7 @@ now rewrite Hop in H1.
 Qed.
 
 Theorem llpp_sub_add_2 {T} {ro : ring_like_op T} {l1 l2}
-  {llpp : lt_le_pair_prop l1 l2} :
+  {llpp : rngl_order_compatibility l1 l2} :
   rngl_has_opp T = true →
   ∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c.
 Proof.
@@ -48,9 +52,10 @@ specialize (@llpp_opt_sub_add_2 T ro l1 l2 llpp) as H1.
 now rewrite Hop in H1.
 Qed.
 
-Theorem lt_le_prop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem rngl_le_lt_compatibility {T}
+    {ro : ring_like_op T} {rp : ring_like_prop T} :
   rngl_is_ordered T = true →
-  lt_le_pair_prop rngl_le rngl_lt.
+  rngl_order_compatibility rngl_le rngl_lt.
 Proof.
 intros Hor.
 split. {
@@ -77,9 +82,10 @@ split. {
 }
 Qed.
 
-Theorem le_lt_prop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+Theorem rngl_lt_le_compatibility {T}
+    {ro : ring_like_op T} {rp : ring_like_prop T} :
   rngl_is_ordered T = true →
-  lt_le_pair_prop rngl_lt rngl_le.
+  rngl_order_compatibility rngl_lt rngl_le.
 Proof.
 intros Hor.
 split. {
@@ -1181,7 +1187,7 @@ apply Z.le_antisymm. {
 Qed.
 
 Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
-  lt_le_pair_prop l1 l2 →
+  rngl_order_compatibility l1 l2 →
   ∀ a b i j,
   (a ≤ b)%L
   → l1 (rngl_of_nat i) a ∧ l2 a (rngl_of_nat (i + 1))%L
@@ -1231,7 +1237,8 @@ Theorem between_rngl_of_nat_and_succ :
   → i ≤ j.
 Proof.
 intros * Hab Hi Hj.
-now apply (gen_between_rngl_of_nat_and_succ (lt_le_prop Hor) a b).
+now apply
+  (gen_between_rngl_of_nat_and_succ (rngl_le_lt_compatibility Hor) a b).
 Qed.
 
 Theorem between_rngl_of_nat_and_succ2 :
@@ -1242,7 +1249,8 @@ Theorem between_rngl_of_nat_and_succ2 :
   → i ≤ j.
 Proof.
 intros * Hab Hi Hj.
-now apply (gen_between_rngl_of_nat_and_succ (le_lt_prop Hor) a b).
+now apply
+  (gen_between_rngl_of_nat_and_succ (rngl_lt_le_compatibility Hor) a b).
 Qed.
 
 Theorem rngl_of_nat_Z_to_nat :
