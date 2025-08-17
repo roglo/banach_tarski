@@ -1104,7 +1104,7 @@ destruct j. {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
   destruct Hi as (H1, H2).
-  apply roc_dual_12 in H1.
+  apply roc_dual_1 in H1.
   apply H1; clear H1.
   apply (roc_mono_l_2 _ b); [ easy | ].
   apply (roc_mono_r_2 _ 1%L); [ easy | ].
@@ -1118,13 +1118,13 @@ apply (IHi (a - 1) (b - 1))%L. {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
   split; [ now apply (roc_add_sub_l_1 Hop) | ].
-  apply (roc_add_sub_l_2 Hop).
+  apply (roc_add_sub_r_2 Hop).
   now rewrite Nat.add_1_r.
 } {
   rewrite Nat.add_1_r in Hj.
   do 2 rewrite rngl_of_nat_succ in Hj.
   split; [ now apply (roc_add_sub_l_1 Hop) | ].
-  apply (roc_add_sub_l_2 Hop).
+  apply (roc_add_sub_r_2 Hop).
   now rewrite Nat.add_1_r.
 }
 Qed.
