@@ -1086,62 +1086,18 @@ apply Z.le_antisymm. {
 }
 Qed.
 
-Theorem gen_between_rngl_of_nat_and_succ :
-  ∀ l1 l2 a b i j,
-  (∀ a b, l1 a b → ¬ l2 b a)
-  → (∀ a b c, (a ≤ b)%L → l2 b c → l2 a c)
-  → (∀ a b c, l2 a b → (b ≤ c)%L → l2 a c)
-  → (∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L)
-  → (∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c)
-  → (a ≤ b)%L
-  → l1 (rngl_of_nat i) a ∧ l2 a (rngl_of_nat (i + 1))%L
-  → l1 (rngl_of_nat j) b ∧ l2 b (rngl_of_nat (j + 1))%L
-  → i ≤ j.
-Proof.
-intros * Hdual Hmon2 Hmon2' l1_add_l1_sub_l l2_sub_l2_add_l Hab Hi Hj.
-revert a b j Hab Hi Hj.
-induction i; intros; cbn; [ apply Nat.le_0_l | ].
-destruct j. {
-  exfalso; cbn in Hj.
-  rewrite rngl_add_0_r in Hj.
-  destruct Hj as (_, Hj).
-  rewrite Nat.add_1_r in Hi.
-  do 2 rewrite rngl_of_nat_succ in Hi.
-  destruct Hi as (H1, H2).
-  apply Hdual in H1.
-  apply H1; clear H1.
-  apply (Hmon2 _ b); [ easy | ].
-  apply (Hmon2' _ 1%L); [ easy | ].
-  apply (rngl_le_add_r Hor).
-  apply (rngl_of_nat_nonneg Hon Hos Hor).
-}
-apply -> Nat.succ_le_mono.
-apply (IHi (a - 1) (b - 1))%L. {
-  now apply (rngl_sub_le_mono_r Hop Hor).
-} {
-  rewrite Nat.add_1_r in Hi.
-  do 2 rewrite rngl_of_nat_succ in Hi.
-  split; [ now apply l1_add_l1_sub_l | ].
-  apply l2_sub_l2_add_l.
-  now rewrite Nat.add_1_r.
-} {
-  rewrite Nat.add_1_r in Hj.
-  do 2 rewrite rngl_of_nat_succ in Hj.
-  split; [ now apply l1_add_l1_sub_l | ].
-  apply l2_sub_l2_add_l.
-  now rewrite Nat.add_1_r.
-}
-Qed.
+Class lt_le_pair_prop {l1 l2 : T → T → Prop} :=
+  { llpp_dual_12 : ∀ a b, l1 a b → ¬ l2 b a;
+    llpp_mono_l_2 : ∀ a b c, (a ≤ b)%L → l2 b c → l2 a c;
+    llpp_mono_r_2 : ∀ a b c, l2 a b → (b ≤ c)%L → l2 a c;
+    llpp_add_sub_1 : ∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L;
+    llpp_sub_add_2 : ∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c }.
 
-Theorem between_rngl_of_nat_and_succ :
-  ∀ a b i j,
-  (a ≤ b)%L
-  → (rngl_of_nat i ≤ a < rngl_of_nat (i + 1))%L
-  → (rngl_of_nat j ≤ b < rngl_of_nat (j + 1))%L
-  → i ≤ j.
+Arguments lt_le_pair_prop : clear implicits.
+
+Theorem lt_le_prop : lt_le_pair_prop rngl_le rngl_lt.
 Proof.
-intros * Hab Hi Hj.
-apply (gen_between_rngl_of_nat_and_succ rngl_le rngl_lt a b); try easy. {
+split. {
   intros.
   now apply rngl_nlt_ge.
 } {
@@ -1159,15 +1115,9 @@ apply (gen_between_rngl_of_nat_and_succ rngl_le rngl_lt a b); try easy. {
 }
 Qed.
 
-Theorem between_rngl_of_nat_and_succ2 :
-  ∀ a b i j,
-  (a ≤ b)%L
-  → (rngl_of_nat i < a ≤ rngl_of_nat (i + 1))%L
-  → (rngl_of_nat j < b ≤ rngl_of_nat (j + 1))%L
-  → i ≤ j.
+Theorem le_lt_prop : lt_le_pair_prop rngl_lt rngl_le.
 Proof.
-intros * Hab Hi Hj.
-apply (gen_between_rngl_of_nat_and_succ rngl_lt rngl_le a b); try easy. {
+split. {
   intros.
   now apply rngl_nle_gt.
 } {
@@ -1183,6 +1133,71 @@ apply (gen_between_rngl_of_nat_and_succ rngl_lt rngl_le a b); try easy. {
   intros.
   now apply (rngl_le_sub_le_add_l Hop Hor).
 }
+Qed.
+
+Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
+  lt_le_pair_prop l1 l2 →
+  ∀ a b i j,
+  (a ≤ b)%L
+  → l1 (rngl_of_nat i) a ∧ l2 a (rngl_of_nat (i + 1))%L
+  → l1 (rngl_of_nat j) b ∧ l2 b (rngl_of_nat (j + 1))%L
+  → i ≤ j.
+Proof.
+intros * Hllpp * Hab Hi Hj.
+revert a b j Hab Hi Hj.
+induction i; intros; cbn; [ apply Nat.le_0_l | ].
+destruct j. {
+  exfalso; cbn in Hj.
+  rewrite rngl_add_0_r in Hj.
+  destruct Hj as (_, Hj).
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  destruct Hi as (H1, H2).
+  apply llpp_dual_12 in H1.
+  apply H1; clear H1.
+  apply (llpp_mono_l_2 _ b); [ easy | ].
+  apply (llpp_mono_r_2 _ 1%L); [ easy | ].
+  apply (rngl_le_add_r Hor).
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
+}
+apply -> Nat.succ_le_mono.
+apply (IHi (a - 1) (b - 1))%L. {
+  now apply (rngl_sub_le_mono_r Hop Hor).
+} {
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  split; [ now apply llpp_add_sub_1 | ].
+  apply llpp_sub_add_2.
+  now rewrite Nat.add_1_r.
+} {
+  rewrite Nat.add_1_r in Hj.
+  do 2 rewrite rngl_of_nat_succ in Hj.
+  split; [ now apply llpp_add_sub_1 | ].
+  apply llpp_sub_add_2.
+  now rewrite Nat.add_1_r.
+}
+Qed.
+
+Theorem between_rngl_of_nat_and_succ :
+  ∀ a b i j,
+  (a ≤ b)%L
+  → (rngl_of_nat i ≤ a < rngl_of_nat (i + 1))%L
+  → (rngl_of_nat j ≤ b < rngl_of_nat (j + 1))%L
+  → i ≤ j.
+Proof.
+intros * Hab Hi Hj.
+now apply (gen_between_rngl_of_nat_and_succ lt_le_prop a b).
+Qed.
+
+Theorem between_rngl_of_nat_and_succ2 :
+  ∀ a b i j,
+  (a ≤ b)%L
+  → (rngl_of_nat i < a ≤ rngl_of_nat (i + 1))%L
+  → (rngl_of_nat j < b ≤ rngl_of_nat (j + 1))%L
+  → i ≤ j.
+Proof.
+intros * Hab Hi Hj.
+now apply (gen_between_rngl_of_nat_and_succ le_lt_prop a b).
 Qed.
 
 Theorem rngl_of_nat_Z_to_nat :
@@ -1428,8 +1443,6 @@ destruct n as [| n| n]. {
   }
 }
 Qed.
-
-...
 
 Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L → Int_part x = 0%Z.
 Proof.
