@@ -1117,14 +1117,14 @@ apply (IHi (a - 1) (b - 1))%L. {
 } {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
-  split; [ now apply (roc_add_sub_1 Hop) | ].
-  apply (roc_sub_add_2 Hop).
+  split; [ now apply (roc_add_sub_l_1 Hop) | ].
+  apply (roc_add_sub_l_2 Hop).
   now rewrite Nat.add_1_r.
 } {
   rewrite Nat.add_1_r in Hj.
   do 2 rewrite rngl_of_nat_succ in Hj.
-  split; [ now apply (roc_add_sub_1 Hop) | ].
-  apply (roc_sub_add_2 Hop).
+  split; [ now apply (roc_add_sub_l_1 Hop) | ].
+  apply (roc_add_sub_l_2 Hop).
   now rewrite Nat.add_1_r.
 }
 Qed.
