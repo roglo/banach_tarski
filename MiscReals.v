@@ -1184,6 +1184,7 @@ Theorem gen_between_rngl_of_nat_and_succ :
   → (∀ a b, l2 a b → (a ≤ b)%L)
   → (∀ a b c, (a ≤ b)%L → l1 b c → l1 a c)
   → (∀ a b c, (a ≤ b)%L → l2 b c → l2 a c)
+  → (∀ a, ¬ (l1 a a ∧ l2 a a))
   → (∀ a, {l1 a a} + {l2 a a})
   → ∀ a b i j,
   (a ≤ b)%L
@@ -1191,7 +1192,7 @@ Theorem gen_between_rngl_of_nat_and_succ :
   → l1 (rngl_of_nat j) b ∧ l2 b (rngl_of_nat (j + 1))%L
   → i ≤ j.
 Proof.
-intros * Hdual Haff1 Haff2 Hmon1 Hmon2 Hdec * Hab Hi Hj.
+intros * Hdual Haff1 Haff2 Hmon1 Hmon2 Hneq Hdec * Hab Hi Hj.
 revert a b j Hab Hi Hj.
 induction i; intros; cbn; [ apply Nat.le_0_l | ].
 destruct j. {
