@@ -12,6 +12,100 @@ Require Import RingLike.RealLike.
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
 
+(* properties "lt" vs "le" in ring-like *)
+(* to be moved to ring-like library *)
+
+Class lt_le_pair_prop {T} {ro : ring_like_op T} (l1 l2 : T → T → Prop) :=
+  { llpp_dual_12 : ∀ a b, l1 a b → ¬ l2 b a;
+    llpp_mono_l_2 : ∀ a b c, (a ≤ b)%L → l2 b c → l2 a c;
+    llpp_mono_r_2 : ∀ a b c, l2 a b → (b ≤ c)%L → l2 a c;
+    llpp_opt_add_sub_1 :
+      if rngl_has_opp T then ∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L
+      else not_applicable;
+    llpp_opt_sub_add_2 :
+      if rngl_has_opp T then ∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c
+      else not_applicable }.
+
+Arguments lt_le_pair_prop {T ro} l1 l2.
+
+Theorem llpp_add_sub_1 {T} {ro : ring_like_op T} {l1 l2}
+  {llpp : lt_le_pair_prop l1 l2} :
+  rngl_has_opp T = true →
+  ∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L.
+Proof.
+intros Hop.
+specialize (@llpp_opt_add_sub_1 T ro l1 l2 llpp) as H1.
+now rewrite Hop in H1.
+Qed.
+
+Theorem llpp_sub_add_2 {T} {ro : ring_like_op T} {l1 l2}
+  {llpp : lt_le_pair_prop l1 l2} :
+  rngl_has_opp T = true →
+  ∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c.
+Proof.
+intros Hop.
+specialize (@llpp_opt_sub_add_2 T ro l1 l2 llpp) as H1.
+now rewrite Hop in H1.
+Qed.
+
+Theorem lt_le_prop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_is_ordered T = true →
+  lt_le_pair_prop rngl_le rngl_lt.
+Proof.
+intros Hor.
+split. {
+  intros.
+  now apply rngl_nlt_ge.
+} {
+  intros.
+  eapply (rngl_le_lt_trans Hor); [ eassumption | easy ].
+} {
+  intros.
+  eapply (rngl_lt_le_trans Hor); [ eassumption | easy ].
+} {
+  intros.
+  remember (rngl_has_opp T) as op eqn:Hop.
+  symmetry in Hop.
+  destruct op; [ | easy ].
+  now apply (rngl_le_add_le_sub_l Hop Hor).
+} {
+  intros.
+  remember (rngl_has_opp T) as op eqn:Hop.
+  symmetry in Hop.
+  destruct op; [ | easy ].
+  now apply (rngl_lt_sub_lt_add_l Hop Hor).
+}
+Qed.
+
+Theorem le_lt_prop {T} {ro : ring_like_op T} {rp : ring_like_prop T} :
+  rngl_is_ordered T = true →
+  lt_le_pair_prop rngl_lt rngl_le.
+Proof.
+intros Hor.
+split. {
+  intros.
+  now apply rngl_nle_gt.
+} {
+  intros.
+  eapply (rngl_le_trans Hor); [ eassumption | easy ].
+} {
+  intros.
+  eapply (rngl_le_trans Hor); [ eassumption | easy ].
+} {
+  intros.
+  remember (rngl_has_opp T) as op eqn:Hop.
+  symmetry in Hop.
+  destruct op; [ | easy ].
+  now apply (rngl_lt_add_lt_sub_l Hop Hor).
+} {
+  intros.
+  remember (rngl_has_opp T) as op eqn:Hop.
+  symmetry in Hop.
+  destruct op; [ | easy ].
+  now apply (rngl_le_sub_le_add_l Hop Hor).
+}
+Qed.
+
 Section a.
 
 Context {T : Type}.
@@ -1086,55 +1180,6 @@ apply Z.le_antisymm. {
 }
 Qed.
 
-Class lt_le_pair_prop {l1 l2 : T → T → Prop} :=
-  { llpp_dual_12 : ∀ a b, l1 a b → ¬ l2 b a;
-    llpp_mono_l_2 : ∀ a b c, (a ≤ b)%L → l2 b c → l2 a c;
-    llpp_mono_r_2 : ∀ a b c, l2 a b → (b ≤ c)%L → l2 a c;
-    llpp_add_sub_1 : ∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L;
-    llpp_sub_add_2 : ∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c }.
-
-Arguments lt_le_pair_prop : clear implicits.
-
-Theorem lt_le_prop : lt_le_pair_prop rngl_le rngl_lt.
-Proof.
-split. {
-  intros.
-  now apply rngl_nlt_ge.
-} {
-  intros.
-  eapply (rngl_le_lt_trans Hor); [ eassumption | easy ].
-} {
-  intros.
-  eapply (rngl_lt_le_trans Hor); [ eassumption | easy ].
-} {
-  intros.
-  now apply (rngl_le_add_le_sub_l Hop Hor).
-} {
-  intros.
-  now apply (rngl_lt_sub_lt_add_l Hop Hor).
-}
-Qed.
-
-Theorem le_lt_prop : lt_le_pair_prop rngl_lt rngl_le.
-Proof.
-split. {
-  intros.
-  now apply rngl_nle_gt.
-} {
-  intros.
-  eapply (rngl_le_trans Hor); [ eassumption | easy ].
-} {
-  intros.
-  eapply (rngl_le_trans Hor); [ eassumption | easy ].
-} {
-  intros.
-  now apply (rngl_lt_add_lt_sub_l Hop Hor).
-} {
-  intros.
-  now apply (rngl_le_sub_le_add_l Hop Hor).
-}
-Qed.
-
 Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
   lt_le_pair_prop l1 l2 →
   ∀ a b i j,
@@ -1166,14 +1211,14 @@ apply (IHi (a - 1) (b - 1))%L. {
 } {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
-  split; [ now apply llpp_add_sub_1 | ].
-  apply llpp_sub_add_2.
+  split; [ now apply (llpp_add_sub_1 Hop) | ].
+  apply (llpp_sub_add_2 Hop).
   now rewrite Nat.add_1_r.
 } {
   rewrite Nat.add_1_r in Hj.
   do 2 rewrite rngl_of_nat_succ in Hj.
-  split; [ now apply llpp_add_sub_1 | ].
-  apply llpp_sub_add_2.
+  split; [ now apply (llpp_add_sub_1 Hop) | ].
+  apply (llpp_sub_add_2 Hop).
   now rewrite Nat.add_1_r.
 }
 Qed.
@@ -1186,7 +1231,7 @@ Theorem between_rngl_of_nat_and_succ :
   → i ≤ j.
 Proof.
 intros * Hab Hi Hj.
-now apply (gen_between_rngl_of_nat_and_succ lt_le_prop a b).
+now apply (gen_between_rngl_of_nat_and_succ (lt_le_prop Hor) a b).
 Qed.
 
 Theorem between_rngl_of_nat_and_succ2 :
@@ -1197,7 +1242,7 @@ Theorem between_rngl_of_nat_and_succ2 :
   → i ≤ j.
 Proof.
 intros * Hab Hi Hj.
-now apply (gen_between_rngl_of_nat_and_succ le_lt_prop a b).
+now apply (gen_between_rngl_of_nat_and_succ (le_lt_prop Hor) a b).
 Qed.
 
 Theorem rngl_of_nat_Z_to_nat :
