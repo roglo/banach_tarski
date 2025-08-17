@@ -1235,6 +1235,8 @@ rewrite <- rngl_of_pos_add.
 easy.
 Qed.
 
+...
+
 Theorem rngl_of_nat_prop :
   ∀ x m n,
   (rngl_of_nat m ≤ x < rngl_of_nat (m + 1))%L
@@ -1262,6 +1264,8 @@ apply (rngl_le_refl Hor).
 apply (between_rngl_of_nat_and_succ2 x x); [ | easy | easy ].
 apply (rngl_le_refl Hor).
 Qed.
+
+...
 
 Theorem rngl_of_pos_prop :
   ∀ x m n,
