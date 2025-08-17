@@ -1094,7 +1094,7 @@ Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
   → l1 (rngl_of_nat j) b ∧ l2 b (rngl_of_nat (j + 1))%L
   → i ≤ j.
 Proof.
-intros * Hroc * Hab Hi Hj.
+intros Hroc * Hab Hi Hj.
 revert a b j Hab Hi Hj.
 induction i; intros; cbn; [ apply Nat.le_0_l | ].
 destruct j. {
