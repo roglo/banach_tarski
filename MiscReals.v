@@ -12,106 +12,6 @@ Require Import RingLike.RealLike.
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
 
-(* order_compatibility expresses the standard relationship between < and ≤ :
-   - if a < b then ¬ (b ≤ a)
-   - ≤ is monotone w.r.t. <
-   - when subtraction is available, addition/subtraction preserves < and ≤
-   This corresponds to the usual compatibility axioms between strict and
-   non-strict orders in ordered ring-likes. *)
-(* to be moved to ring-like library *)
-
-Class rngl_order_compatibility {T} {ro : ring_like_op T}
-  (l1 l2 : T → T → Prop) :=
-  { llpp_dual_12 : ∀ a b, l1 a b → ¬ l2 b a;
-    llpp_mono_l_2 : ∀ a b c, (a ≤ b)%L → l2 b c → l2 a c;
-    llpp_mono_r_2 : ∀ a b c, l2 a b → (b ≤ c)%L → l2 a c;
-    llpp_opt_add_sub_1 :
-      if rngl_has_opp T then ∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L
-      else not_applicable;
-    llpp_opt_sub_add_2 :
-      if rngl_has_opp T then ∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c
-      else not_applicable }.
-
-Theorem llpp_add_sub_1 {T} {ro : ring_like_op T} {l1 l2}
-  {llpp : rngl_order_compatibility l1 l2} :
-  rngl_has_opp T = true →
-  ∀ a b c, l1 (a + b)%L c → l1 b (c - a)%L.
-Proof.
-intros Hop.
-specialize (@llpp_opt_add_sub_1 T ro l1 l2 llpp) as H1.
-now rewrite Hop in H1.
-Qed.
-
-Theorem llpp_sub_add_2 {T} {ro : ring_like_op T} {l1 l2}
-  {llpp : rngl_order_compatibility l1 l2} :
-  rngl_has_opp T = true →
-  ∀ a b c, l2 a (b + c)%L → l2 (a - b)%L c.
-Proof.
-intros Hop.
-specialize (@llpp_opt_sub_add_2 T ro l1 l2 llpp) as H1.
-now rewrite Hop in H1.
-Qed.
-
-Theorem rngl_le_lt_compatibility {T}
-    {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_is_ordered T = true →
-  rngl_order_compatibility rngl_le rngl_lt.
-Proof.
-intros Hor.
-split. {
-  intros.
-  now apply rngl_nlt_ge.
-} {
-  intros.
-  eapply (rngl_le_lt_trans Hor); [ eassumption | easy ].
-} {
-  intros.
-  eapply (rngl_lt_le_trans Hor); [ eassumption | easy ].
-} {
-  intros.
-  remember (rngl_has_opp T) as op eqn:Hop.
-  symmetry in Hop.
-  destruct op; [ | easy ].
-  now apply (rngl_le_add_le_sub_l Hop Hor).
-} {
-  intros.
-  remember (rngl_has_opp T) as op eqn:Hop.
-  symmetry in Hop.
-  destruct op; [ | easy ].
-  now apply (rngl_lt_sub_lt_add_l Hop Hor).
-}
-Qed.
-
-Theorem rngl_lt_le_compatibility {T}
-    {ro : ring_like_op T} {rp : ring_like_prop T} :
-  rngl_is_ordered T = true →
-  rngl_order_compatibility rngl_lt rngl_le.
-Proof.
-intros Hor.
-split. {
-  intros.
-  now apply rngl_nle_gt.
-} {
-  intros.
-  eapply (rngl_le_trans Hor); [ eassumption | easy ].
-} {
-  intros.
-  eapply (rngl_le_trans Hor); [ eassumption | easy ].
-} {
-  intros.
-  remember (rngl_has_opp T) as op eqn:Hop.
-  symmetry in Hop.
-  destruct op; [ | easy ].
-  now apply (rngl_lt_add_lt_sub_l Hop Hor).
-} {
-  intros.
-  remember (rngl_has_opp T) as op eqn:Hop.
-  symmetry in Hop.
-  destruct op; [ | easy ].
-  now apply (rngl_le_sub_le_add_l Hop Hor).
-}
-Qed.
-
 Section a.
 
 Context {T : Type}.
@@ -1194,7 +1094,7 @@ Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
   → l1 (rngl_of_nat j) b ∧ l2 b (rngl_of_nat (j + 1))%L
   → i ≤ j.
 Proof.
-intros * Hllpp * Hab Hi Hj.
+intros * Hroc * Hab Hi Hj.
 revert a b j Hab Hi Hj.
 induction i; intros; cbn; [ apply Nat.le_0_l | ].
 destruct j. {
@@ -1204,10 +1104,10 @@ destruct j. {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
   destruct Hi as (H1, H2).
-  apply llpp_dual_12 in H1.
+  apply roc_dual_12 in H1.
   apply H1; clear H1.
-  apply (llpp_mono_l_2 _ b); [ easy | ].
-  apply (llpp_mono_r_2 _ 1%L); [ easy | ].
+  apply (roc_mono_l_2 _ b); [ easy | ].
+  apply (roc_mono_r_2 _ 1%L); [ easy | ].
   apply (rngl_le_add_r Hor).
   apply (rngl_of_nat_nonneg Hon Hos Hor).
 }
@@ -1217,14 +1117,14 @@ apply (IHi (a - 1) (b - 1))%L. {
 } {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
-  split; [ now apply (llpp_add_sub_1 Hop) | ].
-  apply (llpp_sub_add_2 Hop).
+  split; [ now apply (roc_add_sub_1 Hop) | ].
+  apply (roc_sub_add_2 Hop).
   now rewrite Nat.add_1_r.
 } {
   rewrite Nat.add_1_r in Hj.
   do 2 rewrite rngl_of_nat_succ in Hj.
-  split; [ now apply (llpp_add_sub_1 Hop) | ].
-  apply (llpp_sub_add_2 Hop).
+  split; [ now apply (roc_add_sub_1 Hop) | ].
+  apply (roc_sub_add_2 Hop).
   now rewrite Nat.add_1_r.
 }
 Qed.
