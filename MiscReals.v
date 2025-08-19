@@ -1087,7 +1087,7 @@ apply Z.le_antisymm. {
 Qed.
 
 Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
-  rngl_order_compatibility l1 l2 →
+  rngl_order_compatibility' l1 l2 →
   ∀ a b i j,
   (a ≤ b)%L
   → l1 (rngl_of_nat i) a ∧ l2 a (rngl_of_nat (i + 1))%L
@@ -1104,7 +1104,7 @@ destruct j. {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
   destruct Hi as (H1, H2).
-  apply roc_dual_1 in H1.
+  apply roc_dual_1' in H1.
   apply H1; clear H1.
   apply (roc_mono_l_2 _ b); [ easy | ].
   apply (roc_mono_r_2 _ 1%L); [ easy | ].
@@ -1138,7 +1138,7 @@ Theorem between_rngl_of_nat_and_succ :
 Proof.
 intros * Hab Hi Hj.
 now apply
-  (gen_between_rngl_of_nat_and_succ (rngl_le_lt_compatibility Hor) a b).
+  (gen_between_rngl_of_nat_and_succ (rngl_le_lt_compatibility' Hor) a b).
 Qed.
 
 Theorem between_rngl_of_nat_and_succ2 :
@@ -1150,7 +1150,7 @@ Theorem between_rngl_of_nat_and_succ2 :
 Proof.
 intros * Hab Hi Hj.
 now apply
-  (gen_between_rngl_of_nat_and_succ (rngl_lt_le_compatibility Hor) a b).
+  (gen_between_rngl_of_nat_and_succ (rngl_lt_le_compatibility' Hor) a b).
 Qed.
 
 Theorem rngl_of_nat_Z_to_nat :
