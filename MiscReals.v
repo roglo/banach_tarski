@@ -877,7 +877,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
       apply (rngl_mul_nonneg_nonneg Hos Hor). {
         apply (rngl_0_le_2 Hon Hos Hor).
       }
-      apply (rngl_add_nonneg_nonneg Hor).
+      apply (rngl_le_0_add Hor).
       apply (rngl_0_le_1 Hon Hos Hor).
       apply (rngl_of_nat_nonneg Hon Hos Hor).
     }
@@ -926,7 +926,7 @@ destruct b as [b| b| ]. {
     rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
     rewrite <- rngl_add_assoc.
     apply (rngl_lt_add_r Hos Hor).
-    apply (rngl_add_pos_nonneg Hor). {
+    apply (rngl_lt_0_add Hor). {
       apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
     }
     apply (rngl_mul_nonneg_nonneg Hos Hor). {
@@ -995,7 +995,7 @@ induction a as [a| a| ]; intros. {
       rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
       rewrite <- rngl_add_assoc.
       apply (rngl_le_add_r Hor).
-      apply (rngl_add_nonneg_nonneg Hor).
+      apply (rngl_le_0_add Hor).
       apply (rngl_0_le_1 Hon Hos Hor).
       apply (rngl_mul_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_2 Hon Hos Hor).
