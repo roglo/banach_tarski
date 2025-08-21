@@ -1236,7 +1236,20 @@ rewrite <- rngl_of_pos_add.
 easy.
 Qed.
 
-...
+Theorem rngl_of_nat_le_or_lt_prop {l1 l2} :
+  rngl_order_compatibility l1 l2 →
+  ∀ x m n,
+  l1 (rngl_of_nat m) x ∧ l2 x (rngl_of_nat (m + 1))%L
+  → l1 (rngl_of_nat n) x ∧ l2 x (rngl_of_nat (n + 1))%L
+  → m = n.
+Proof.
+intros Hroc * (Hmx, Hxm) (Hnx, Hxn).
+apply Nat.le_antisymm.
+apply (gen_between_rngl_of_nat_and_succ Hroc x x); [ | easy | easy ].
+apply (rngl_le_refl Hor).
+apply (gen_between_rngl_of_nat_and_succ Hroc x x); [ | easy | easy ].
+apply (rngl_le_refl Hor).
+Qed.
 
 Theorem rngl_of_nat_prop :
   ∀ x m n,
@@ -1245,11 +1258,7 @@ Theorem rngl_of_nat_prop :
   → m = n.
 Proof.
 intros * Hm Hn.
-apply Nat.le_antisymm.
-apply (between_rngl_of_nat_and_succ x x); [ | easy | easy ].
-apply (rngl_le_refl Hor).
-apply (between_rngl_of_nat_and_succ x x); [ | easy | easy ].
-apply (rngl_le_refl Hor).
+now apply (rngl_of_nat_le_or_lt_prop (rngl_le_lt_comp Hor) x).
 Qed.
 
 Theorem rngl_of_nat_prop2 :
@@ -1259,11 +1268,7 @@ Theorem rngl_of_nat_prop2 :
   → m = n.
 Proof.
 intros * Hm Hn.
-apply Nat.le_antisymm.
-apply (between_rngl_of_nat_and_succ2 x x); [ | easy | easy ].
-apply (rngl_le_refl Hor).
-apply (between_rngl_of_nat_and_succ2 x x); [ | easy | easy ].
-apply (rngl_le_refl Hor).
+now apply (rngl_of_nat_le_or_lt_prop (rngl_lt_le_comp Hos Hor) x).
 Qed.
 
 ...
