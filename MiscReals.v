@@ -1095,6 +1095,9 @@ Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
   → i ≤ j.
 Proof.
 intros Hroc * Hab Hi Hj.
+generalize Hroc; intros Hroc'.
+move Hroc' before Hroc.
+apply (rngl_order_compatibility_comm Hop Hor) in Hroc'.
 revert a b j Hab Hi Hj.
 induction i; intros; cbn; [ apply Nat.le_0_l | ].
 destruct j. {
@@ -1104,9 +1107,6 @@ destruct j. {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
   destruct Hi as (H1, H2).
-  generalize Hroc; intros Hroc'.
-  move Hroc' before Hroc.
-  apply (rngl_order_compatibility_comm Hop Hor) in Hroc'.
   apply roc_dual_1 in H1.
   apply H1; clear H1.
   apply (roc_mono_l _ b); [ easy | ].
@@ -1120,16 +1120,14 @@ apply (IHi (a - 1) (b - 1))%L. {
 } {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
-(**)
-...
-  split; [ now apply (roc_add_sub_l_1 Hop) | ].
-  apply (roc_add_sub_r_2 Hop).
+  split; [ now apply (rngl_le_or_lt_add_sub_l Hroc Hop Hor) | ].
+  apply (rngl_le_or_lt_sub_add_l Hroc' Hop Hor).
   now rewrite Nat.add_1_r.
 } {
   rewrite Nat.add_1_r in Hj.
   do 2 rewrite rngl_of_nat_succ in Hj.
-  split; [ now apply (roc_add_sub_l_1 Hop) | ].
-  apply (roc_add_sub_r_2 Hop).
+  split; [ now apply (rngl_le_or_lt_add_sub_l Hroc Hop Hor) | ].
+  apply (rngl_le_or_lt_sub_add_l Hroc' Hop Hor).
   now rewrite Nat.add_1_r.
 }
 Qed.
@@ -1142,8 +1140,7 @@ Theorem between_rngl_of_nat_and_succ :
   → i ≤ j.
 Proof.
 intros * Hab Hi Hj.
-now apply
-  (gen_between_rngl_of_nat_and_succ (rngl_le_lt_compatibility' Hor) a b).
+now apply (gen_between_rngl_of_nat_and_succ (rngl_le_lt_comp Hor) a b).
 Qed.
 
 Theorem between_rngl_of_nat_and_succ2 :
@@ -1154,8 +1151,7 @@ Theorem between_rngl_of_nat_and_succ2 :
   → i ≤ j.
 Proof.
 intros * Hab Hi Hj.
-now apply
-  (gen_between_rngl_of_nat_and_succ (rngl_lt_le_compatibility' Hor) a b).
+now apply (gen_between_rngl_of_nat_and_succ (rngl_lt_le_comp Hos Hor) a b).
 Qed.
 
 Theorem rngl_of_nat_Z_to_nat :
