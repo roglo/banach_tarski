@@ -1087,7 +1087,7 @@ apply Z.le_antisymm. {
 Qed.
 
 Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
-  rngl_order_compatibility' l1 l2 →
+  rngl_order_compatibility l1 l2 →
   ∀ a b i j,
   (a ≤ b)%L
   → l1 (rngl_of_nat i) a ∧ l2 a (rngl_of_nat (i + 1))%L
@@ -1104,10 +1104,13 @@ destruct j. {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
   destruct Hi as (H1, H2).
-  apply roc_dual_1' in H1.
+  generalize Hroc; intros Hroc'.
+  move Hroc' before Hroc.
+  apply (rngl_order_compatibility_comm Hop Hor) in Hroc'.
+  apply roc_dual_1 in H1.
   apply H1; clear H1.
-  apply (roc_mono_l_2 _ b); [ easy | ].
-  apply (roc_mono_r_2 _ 1%L); [ easy | ].
+  apply (roc_mono_l _ b); [ easy | ].
+  apply (roc_mono_r _ 1%L); [ easy | ].
   apply (rngl_le_add_r Hor).
   apply (rngl_of_nat_nonneg Hon Hos Hor).
 }
@@ -1117,6 +1120,8 @@ apply (IHi (a - 1) (b - 1))%L. {
 } {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
+(**)
+...
   split; [ now apply (roc_add_sub_l_1 Hop) | ].
   apply (roc_add_sub_r_2 Hop).
   now rewrite Nat.add_1_r.
