@@ -33,6 +33,9 @@ Definition Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 Definition Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv.
 Definition Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
 
+Tactic Notation "pauto" := progress auto.
+Hint Resolve rngl_le_refl : core.
+
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%L.
 Proof. apply (rngl_add_opp_r Hop). Qed.
 
@@ -743,6 +746,7 @@ Qed.
 Definition Int_part (x : T) := let (n, _) := z_int_part x in n.
 Definition frac_part (x : T) := (x - rngl_of_Z (Int_part x))%L.
 
+Arguments z_int_part a%_L.
 Arguments Int_part x%_L.
 Arguments frac_part x%_L.
 
@@ -1407,22 +1411,27 @@ destruct n as [| n| n]. {
 }
 Qed.
 
-Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L → Int_part x = 0%Z.
+Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L ↔ Int_part x = 0%Z.
 Proof.
-intros * Hx.
+intros.
 progress unfold Int_part.
 remember (z_int_part x) as m eqn:Hm.
 symmetry in Hm.
 destruct m as (n, Hn); clear Hm.
-apply (Int_part_prop x); [ easy | cbn ].
-now rewrite rngl_of_pos_1.
+split; intros Hx. {
+  apply (Int_part_prop x); [ easy | cbn ].
+  now rewrite rngl_of_pos_1.
+} {
+  subst; cbn in Hn.
+  now rewrite rngl_of_pos_1 in Hn.
+}
 Qed.
 
 Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
 Proof.
 intros * Hx.
 unfold frac_part.
-rewrite Int_part_small; [ | easy ].
+rewrite (proj1 (Int_part_small _)); [ | easy ].
 apply (rngl_sub_0_r Hos).
 Qed.
 
@@ -1572,6 +1581,37 @@ now destruct b as (b, Hb).
 Qed.
 *)
 
+Theorem Int_part_0 : Int_part 0 = 0%Z.
+Proof.
+rewrite (proj1 (Int_part_small _)); [ easy | ].
+split; [ pauto | ].
+apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+Qed.
+
+(*
+Theorem Int_part_opp :
+  ∀ a, Int_part (- a) = (- Int_part a)%Z.
+Proof.
+intros.
+progress unfold Int_part.
+remember (z_int_part (- a)) as m eqn:Hm.
+symmetry in Hm.
+destruct m as (m, Hma).
+remember (z_int_part a) as n eqn:Hn.
+symmetry in Hn.
+destruct n as (n, Hna).
+move n before m; move Hna before Hma.
+clear Hm Hn.
+apply Z.eq_opp_r.
+apply (Int_part_prop a); [ | easy ].
+rewrite rngl_of_Z_opp.
+destruct Hma as (H1, H2).
+apply (rngl_opp_le_compat Hop Hor) in H1.
+rewrite (rngl_opp_involutive Hop) in H1.
+split. {
+...
+*)
+
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
@@ -1582,14 +1622,8 @@ apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
 rewrite <- (rngl_add_sub_assoc Hop) in Hba.
 apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
-(**)
-rewrite <- rngl_of_Z_sub in Hba.
-Search (Int_part (_ - _)).
-...
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_sub.
-do 2 rewrite rngl_of_Z_Int_part in Hba.
-do 3 rewrite rngl_of_Z_Int_part.
 destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
   destruct (rngl_lt_dec Hor 0 (a - b)) as [H| H]; [ | clear H ]. {
     apply -> (rngl_lt_0_sub Hop Hor) in H.
@@ -1599,24 +1633,47 @@ destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
     destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]. {
       apply (rngl_opp_le_compat Hop Hor) in Hba.
       do 2 rewrite (rngl_opp_sub_distr Hop) in Hba.
-      rewrite <- (rngl_of_nat_sub Hos) in Hba. 2: {
-        now apply nat_Int_part_le.
-      }
+      rewrite <- rngl_of_Z_sub in Hba.
       destruct (rngl_le_dec Hor 0 (a - b)) as [H| H]. {
         apply -> (rngl_le_0_sub Hop Hor) in H.
         apply (rngl_le_antisymm Hor) in H; [ subst b | easy ].
         do 2 rewrite (rngl_sub_diag Hos).
-        now rewrite nat_Int_part_0.
+        now rewrite Int_part_0.
       }
       apply (rngl_nle_gt_iff Hor) in H.
       apply -> (rngl_lt_sub_0 Hop Hor) in H.
       rename H into Hab'.
+(*
       apply (rngl_opp_inj Hop).
       rewrite (rngl_opp_involutive Hop).
       rewrite (rngl_opp_sub_distr Hop).
       rewrite <- (rngl_of_nat_sub Hos). 2: {
         now apply nat_Int_part_le.
       }
+*)
+      rewrite <- rngl_of_Z_sub.
+(**)
+      apply (rngl_opp_inj Hop).
+      do 2 rewrite <- rngl_of_Z_opp.
+      rewrite Z.opp_sub_distr.
+      rewrite Z.add_opp_l.
+      progress unfold rngl_of_Z.
+      remember (Int_part (a - b))%Z as iab eqn:Hiab.
+      remember (Int_part b - Int_part a)%Z as iaib eqn:Hiaib.
+      symmetry in Hiab, Hiaib.
+      destruct iab as [| iab| iab]. {
+        exfalso.
+        apply Int_part_small in Hiab.
+        destruct Hiab as (H1, H2).
+        apply rngl_nlt_ge in H1.
+        apply H1; clear H1.
+        now apply (rngl_lt_sub_0 Hop Hor).
+      } {
+        exfalso.
+...
+        apply Int_part_small in Hiab.
+        destruct iaib as [| iaib| iaib]; [ easy | | ]; exfalso. {
+...
       progress f_equal.
       rewrite <- (rngl_opp_sub_distr Hop).
       rewrite nat_Int_part_opp.
@@ -2102,9 +2159,6 @@ remember (IZR a * y) as u.
 remember (IZR (x // y) * y) as v.
 now replace (x + u - (v + u)) with (x - v) by lra; subst u v.
 Qed.
-
-Theorem Int_part_0 : Int_part 0 = 0%Z.
-Proof. rewrite Int_part_small; [ easy | lra ]. Qed.
 
 Theorem Rmod_0_l : ∀ x, 0 rmod x = 0.
 Proof.
