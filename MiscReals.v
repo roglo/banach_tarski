@@ -827,6 +827,13 @@ apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
 apply Pos2Nat_ge_1.
 Qed.
 
+Theorem rngl_of_pos_nonneg : ∀ a, (0 ≤ rngl_of_pos a)%L.
+Proof.
+intros.
+apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
+apply (rngl_0_le_1 Hon Hos Hor).
+Qed.
+
 Theorem rngl_of_pos_le_inj :
   ∀ a b, (rngl_of_pos a ≤ rngl_of_pos b)%L → (a <= b)%positive.
 Proof.
@@ -1342,8 +1349,7 @@ destruct n as [| n| n]. {
     apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
     rewrite (rngl_add_opp_l Hop).
     apply (rngl_le_sub_l Hop Hor).
-    apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
-    apply (rngl_0_le_1 Hon Hos Hor).
+    apply rngl_of_pos_nonneg.
   }
 } {
   destruct m as [| m| m]. {
@@ -1369,8 +1375,7 @@ destruct n as [| n| n]. {
     apply (rngl_le_trans Hor _ 1). {
       rewrite (rngl_add_opp_l Hop).
       apply (rngl_le_sub_l Hop Hor).
-      apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
-      apply (rngl_0_le_1 Hon Hos Hor).
+      apply rngl_of_pos_nonneg.
     }
     apply (rngl_le_trans Hor _ (rngl_of_pos m)); [ | easy ].
     apply rngl_of_pos_le_1_l.
@@ -1480,27 +1485,49 @@ progress f_equal.
 apply rngl_of_Z_opp.
 Qed.
 
-(*
-Theorem rngl_of_Z_Int_part :
+Definition nat_Int_part a :=
+  match Int_part a with
+  | 0%Z => 0
+  | Z.pos p => Pos.to_nat p
+  | Z.neg p => Pos.to_nat p
+  end.
+
+Theorem glop :
   ∀ a,
-  rngl_of_Z (Int_part a) =
-    match Int_part a with
-    | 0%Z => 0%L
-    | Z.pos n => rngl_of_pos n
-    | Z.neg n => (- rngl_of_pos n)%L
-    end.
+  (0 ≤ a)%L
+  → rngl_of_Z (Int_part a) = rngl_of_nat (nat_Int_part a).
 Proof.
-intros.
+intros * Hza.
+progress unfold nat_Int_part.
+remember (Int_part a) as z eqn:Hz.
+symmetry in Hz.
+destruct z as [| p| p]; [ easy | easy | exfalso ].
+assert (H : (Int_part a < 0)%Z) by now rewrite Hz.
+apply Z.nle_gt in H.
+apply H; clear p H Hz.
 progress unfold Int_part.
-remember (z_int_part a) as u eqn:Hu.
-destruct u as (n, Hn).
-destruct n as [| n| n].
-easy.
-progress unfold rngl_of_pos.
-cbn.
-easy.
-easy.
-...
+remember (z_int_part a) as z eqn:H; clear H.
+destruct z as (z, Hz).
+(* lemma to do *)
+progress unfold rngl_of_Z in Hz.
+destruct z as [| p| p]; [ easy | easy | exfalso ].
+destruct Hz as (_, Hz).
+apply rngl_nle_gt in Hz.
+apply Hz; clear Hz.
+remember (Z.neg p + 1)%Z as q eqn:Hq.
+symmetry in Hq.
+destruct q as [| q| q]; [ easy | | ]. {
+  apply Z.add_move_l in Hq.
+  cbn in Hq; symmetry in Hq.
+  injection Hq; clear Hq; intros Hq.
+  now destruct p, q.
+}
+apply (rngl_le_trans Hor _ 0); [ | easy ].
+apply (rngl_opp_le_compat Hop Hor).
+rewrite (rngl_opp_0 Hop).
+rewrite (rngl_opp_involutive Hop).
+apply rngl_of_pos_nonneg.
+Qed.
 
 Theorem rngl_of_Z_Int_part :
   ∀ a,
@@ -1508,6 +1535,19 @@ Theorem rngl_of_Z_Int_part :
     (if rngl_le_dec Hor 0 a then rngl_of_nat (nat_Int_part a)
      else (- rngl_of_nat (nat_Int_part a))%L).
 Proof.
+intros.
+destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
+  now apply glop.
+} {
+  apply (rngl_opp_inj Hop).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite <- rngl_of_Z_opp.
+  remember (-a)%L as b eqn:H.
+  apply (f_equal rngl_opp) in H.
+  rewrite (rngl_opp_involutive Hop) in H.
+  subst a; rename b into a.
+(* faiche *)
+...
 intros.
 progress unfold Int_part.
 destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
