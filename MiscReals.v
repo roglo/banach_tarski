@@ -1582,10 +1582,12 @@ apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
 rewrite <- (rngl_add_sub_assoc Hop) in Hba.
 apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
+(**)
+rewrite <- rngl_of_Z_sub in Hba.
+Search (Int_part (_ - _)).
+...
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_sub.
-Search Int_part.
-...
 do 2 rewrite rngl_of_Z_Int_part in Hba.
 do 3 rewrite rngl_of_Z_Int_part.
 destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
