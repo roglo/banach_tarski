@@ -1471,6 +1471,26 @@ progress f_equal.
 apply rngl_of_Z_opp.
 Qed.
 
+(*
+Theorem rngl_of_Z_Int_part :
+  ∀ a,
+  rngl_of_Z (Int_part a) =
+    match Int_part a with
+    | 0%Z => 0%L
+    | Z.pos n => rngl_of_pos n
+    | Z.neg n => (- rngl_of_pos n)%L
+    end.
+Proof.
+intros.
+progress unfold Int_part.
+remember (z_int_part a) as u eqn:Hu.
+destruct u as (n, Hn).
+destruct n as [| n| n].
+easy.
+progress unfold rngl_of_pos.
+cbn.
+easy.
+easy.
 ...
 
 Theorem rngl_of_Z_Int_part :
@@ -1550,6 +1570,7 @@ remember (int_part _ _ _ _ _ _) as b eqn:Hb.
 clear Hb.
 now destruct b as (b, Hb).
 Qed.
+*)
 
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
@@ -1563,6 +1584,8 @@ rewrite <- (rngl_add_sub_assoc Hop) in Hba.
 apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_sub.
+Search Int_part.
+...
 do 2 rewrite rngl_of_Z_Int_part in Hba.
 do 3 rewrite rngl_of_Z_Int_part.
 destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
