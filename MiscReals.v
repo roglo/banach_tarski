@@ -1546,6 +1546,12 @@ destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
   apply (f_equal rngl_opp) in H.
   rewrite (rngl_opp_involutive Hop) in H.
   subst a; rename b into a.
+  apply (rngl_nle_gt_iff Hor) in Hza.
+  apply (rngl_opp_lt_compat Hop Hor) in Hza.
+  rewrite (rngl_opp_involutive Hop) in Hza.
+  rewrite (rngl_opp_0 Hop) in Hza.
+rewrite rngl_of_Z_opp.
+rewrite glop.
 (* faiche *)
 ...
 intros.
