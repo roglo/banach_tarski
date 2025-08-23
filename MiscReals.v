@@ -1685,8 +1685,16 @@ subst m.
 rewrite rngl_of_Z_add in Hm, Hn.
 cbn in Hm, Hn.
 rewrite rngl_of_pos_1 in Hm, Hn.
+(*
 apply rngl_sub_between_0_and_1 in Hm, Hn.
+*)
 apply Int_part_small.
+destruct Hm as (Hm, Hm1).
+destruct Hn as (Hn, Hn1).
+split. {
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_le_trans Hor _ (rngl_of_Z n)); [ | easy ].
+(* ah oui mais non, merde *)
 ...
 apply rngl_sub_between_0_and_1.
 ...
