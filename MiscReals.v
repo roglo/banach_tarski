@@ -1668,35 +1668,36 @@ Qed.
 
 Theorem Int_part_eq_sub :
   ∀ a b,
-  Int_part a = Int_part b
+  (frac_part b ≤ frac_part a)%L
+  → Int_part a = Int_part b
   → Int_part (a - b) = 0%Z.
 Proof.
-intros * Hab.
+intros * Hba Hab.
 (*
 apply Int_part_small.
 apply rngl_sub_between_0_and_1.
 *)
+progress unfold frac_part in Hba.
+progress unfold Int_part in Hba.
 progress unfold Int_part in Hab.
 remember (z_int_part a) as m eqn:H; clear H.
 destruct m as (m, Hm).
 remember (z_int_part b) as n eqn:H; clear H.
 destruct n as (n, Hn).
 subst m.
+apply (rngl_sub_le_mono_r Hop Hor) in Hba.
+(*
 rewrite rngl_of_Z_add in Hm, Hn.
 cbn in Hm, Hn.
 rewrite rngl_of_pos_1 in Hm, Hn.
-(*
 apply rngl_sub_between_0_and_1 in Hm, Hn.
 *)
 apply Int_part_small.
 (**)
 apply rngl_sub_between_0_and_1.
-Theorem between_rngl_of_Z_and_succ:
-  ∀ (a b : T) (i j : Z),
-    (a ≤ b)%L
-    → (rngl_of_Z i ≤ a < rngl_of_Z (i + 1))%L
-      → (rngl_of_Z j ≤ b < rngl_of_Z (j + 1))%L → (i <= j)%Z.
+split; [ easy | ].
 ...
+Check between_rngl_of_nat_and_succ2.
 between_rngl_of_nat_and_succ:
   ∀ (a b : T) (i j : ℕ),
     (a ≤ b)%L
@@ -1712,6 +1713,7 @@ split. {
 Check rngl_sub_between_0_and_1.
 Search (_ ≤ _ < _)%L.
 ...
+*)
 
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
