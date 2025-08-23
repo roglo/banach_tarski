@@ -1702,6 +1702,31 @@ destruct (Z.eq_dec (Int_part a) (Int_part b)) as [Hab| Hab]. {
 }
 destruct (Z.eq_dec (Int_part a) (Int_part b + 1)) as [Hab1| Hab1]. {
   rewrite Hab1, Z.add_comm, Z.add_simpl_r.
+Check Int_part_eq_sub.
+  clear Hab.
+  progress unfold frac_part in Hba.
+  progress unfold Int_part in Hba.
+  progress unfold Int_part in Hab1.
+  remember (z_int_part a) as m eqn:H; clear H.
+  destruct m as (m, Hm).
+  remember (z_int_part b) as n eqn:H; clear H.
+  destruct n as (n, Hn).
+  subst m.
+  rewrite rngl_of_Z_add in Hba; cbn in Hba.
+  rewrite rngl_of_pos_1 in Hba.
+  rewrite (rngl_sub_add_distr Hos) in Hba.
+  rewrite (rngl_sub_sub_swap Hop) in Hba.
+  apply (rngl_sub_le_mono_r Hop Hor) in Hba.
+Check Int_part_small.
+Search Int_part.
+...
+apply Int_part_small.
+apply rngl_sub_between_0_and_1.
+split; [ easy | ].
+eapply (rngl_lt_le_trans Hor); [ apply Hm | ].
+rewrite rngl_of_Z_add; cbn.
+rewrite rngl_of_pos_1.
+now apply (rngl_add_le_mono_r Hop Hor).
 ...
 intros * Hba.
 apply rngl_of_Z_inj.
