@@ -1658,15 +1658,40 @@ Theorem rngl_sub_Int_part : ∀ a b,
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
 Proof.
 intros * Hba.
+...
+intros * Hba.
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_Int_part.
+rewrite rngl_of_Z_sub.
+do 2 rewrite rngl_of_Z_Int_part.
 destruct (rngl_le_dec Hor 0 (a - b)) as [Hzab| Hzab]. {
+  apply -> (rngl_le_0_sub Hop Hor) in Hzab.
+  destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
+    destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]. {
+      rewrite <- (rngl_of_nat_sub Hos).
+      f_equal.
+...
   progress unfold nat_Int_part.
   remember (Int_part (a - b)) as z eqn:Hz.
   symmetry in Hz.
   destruct z as [| p| p]. {
     symmetry; cbn.
     apply Int_part_small in Hz.
+    destruct Hz as (_, H1).
+    apply (rngl_lt_sub_lt_add_r Hop Hor) in H1.
+Search (rngl_of_Z (_ - _)).
+    assert (Hza : a = 0%L). {
+Search (_ - _ < _)%L.
+...
+      apply rngl_lt_sub_l in H1.
+...
+    replace (Int_part a) with 0%Z. 2: {
+      symmetry.
+      apply Int_part_small.
+      split. {
+        apply (rngl_le_trans Hor _ (a - b)); [ easy | ].
+        apply (rngl_le_sub_l Hop Hor).
+Search (Int_part _).
 ...
 intros * Hba.
 progress unfold frac_part in Hba.
