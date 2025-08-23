@@ -1716,161 +1716,35 @@ Theorem rngl_sub_Int_part : ∀ a b,
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
 Proof.
 intros * Hba.
-destruct (Z.eq_dec (Int_part a) (Int_part b)) as [Hab| Hab]. {
-  rewrite Hab, Z.sub_diag.
-  now apply Int_part_eq_sub.
-}
-destruct (Z.eq_dec (Int_part a) (Int_part b + 1)) as [Hab1| Hab1]. {
-  rewrite Hab1, Z.add_comm, Z.add_simpl_r.
-  clear Hab.
-  progress unfold frac_part in Hba.
-  progress unfold Int_part in Hba.
-  progress unfold Int_part in Hab1.
-  remember (z_int_part a) as m eqn:H; clear H.
-  destruct m as (m, Hm).
-  remember (z_int_part b) as n eqn:H; clear H.
-  destruct n as (n, Hn).
-  subst m.
-  rewrite rngl_of_Z_add in Hba.
-  rewrite rngl_of_Z_1 in Hba.
-  rewrite (rngl_sub_add_distr Hos) in Hba.
-  rewrite (rngl_sub_sub_swap Hop) in Hba.
-  apply (rngl_sub_le_mono_r Hop Hor) in Hba.
-  apply Int_part_less_small.
-  cbn - [ rngl_of_Z ].
-  rewrite rngl_of_Z_1, rngl_of_Z_2.
-  split. {
-    apply (rngl_le_add_le_sub_r Hop Hor).
-    rewrite rngl_add_comm.
-    now apply (rngl_le_add_le_sub_r Hop Hor).
-  }
-  apply (rngl_lt_sub_lt_add_l Hop Hor).
-  eapply (rngl_lt_le_trans Hor); [ apply Hm | ].
-  rewrite <- Z.add_assoc; cbn.
-  rewrite rngl_of_Z_add, rngl_of_Z_2.
-  now apply (rngl_add_le_mono_r Hop Hor).
-}
-...
-apply Int_part_small.
-apply rngl_sub_between_0_and_1.
-split; [ easy | ].
-eapply (rngl_lt_le_trans Hor); [ apply Hm | ].
-rewrite rngl_of_Z_add; cbn.
-rewrite rngl_of_pos_1.
-now apply (rngl_add_le_mono_r Hop Hor).
-...
-intros * Hba.
-apply rngl_of_Z_inj.
-rewrite rngl_of_Z_Int_part.
-rewrite rngl_of_Z_sub.
-do 2 rewrite rngl_of_Z_Int_part.
-destruct (rngl_le_dec Hor 0 (a - b)) as [Hzab| Hzab]. {
-  apply -> (rngl_le_0_sub Hop Hor) in Hzab.
-  destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
-    destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]. {
-      rewrite <- (rngl_of_nat_sub Hos).
-      f_equal.
-...
-  progress unfold nat_Int_part.
-  remember (Int_part (a - b)) as z eqn:Hz.
-  symmetry in Hz.
-  destruct z as [| p| p]. {
-    symmetry; cbn.
-    apply Int_part_small in Hz.
-    destruct Hz as (_, H1).
-    apply (rngl_lt_sub_lt_add_r Hop Hor) in H1.
-Search (rngl_of_Z (_ - _)).
-    assert (Hza : a = 0%L). {
-Search (_ - _ < _)%L.
-...
-      apply rngl_lt_sub_l in H1.
-...
-    replace (Int_part a) with 0%Z. 2: {
-      symmetry.
-      apply Int_part_small.
-      split. {
-        apply (rngl_le_trans Hor _ (a - b)); [ easy | ].
-        apply (rngl_le_sub_l Hop Hor).
-Search (Int_part _).
-...
-intros * Hba.
 progress unfold frac_part in Hba.
+progress unfold Int_part in Hba.
+progress unfold Int_part at 2 3.
+remember (z_int_part a) as m eqn:H; clear H.
+destruct m as (m, Hm).
+remember (z_int_part b) as n eqn:H; clear H.
+destruct n as (n, Hn).
+move n before m.
+apply Int_part_less_small.
+rewrite rngl_of_Z_add.
+rewrite rngl_of_Z_sub.
+rewrite rngl_of_Z_1.
 apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
 rewrite <- (rngl_add_sub_assoc Hop) in Hba.
 apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
-apply rngl_of_Z_inj.
-rewrite rngl_of_Z_sub.
-destruct (rngl_le_dec Hor a b) as [Hab| Hab]. {
-  destruct (rngl_lt_dec Hor 0 (a - b)) as [H| H]; [ | clear H ]. {
-    apply -> (rngl_lt_0_sub Hop Hor) in H.
-    now apply rngl_nle_gt in H.
-  }
-  destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
-    destruct (rngl_le_dec Hor 0 b) as [Hzb| Hzb]. {
-      apply (rngl_opp_le_compat Hop Hor) in Hba.
-      do 2 rewrite (rngl_opp_sub_distr Hop) in Hba.
-      rewrite <- rngl_of_Z_sub in Hba.
-      destruct (rngl_le_dec Hor 0 (a - b)) as [H| H]. {
-        apply -> (rngl_le_0_sub Hop Hor) in H.
-        apply (rngl_le_antisymm Hor) in H; [ subst b | easy ].
-        do 2 rewrite (rngl_sub_diag Hos).
-        now rewrite Int_part_0.
-      }
-      apply (rngl_nle_gt_iff Hor) in H.
-      apply -> (rngl_lt_sub_0 Hop Hor) in H.
-      rename H into Hab'.
-(*
-      apply (rngl_opp_inj Hop).
-      rewrite (rngl_opp_involutive Hop).
-      rewrite (rngl_opp_sub_distr Hop).
-      rewrite <- (rngl_of_nat_sub Hos). 2: {
-        now apply nat_Int_part_le.
-      }
-*)
-      rewrite <- rngl_of_Z_sub.
-(**)
-      apply (rngl_opp_inj Hop).
-      do 2 rewrite <- rngl_of_Z_opp.
-      rewrite Z.opp_sub_distr.
-      rewrite Z.add_opp_l.
-      progress unfold rngl_of_Z.
-      remember (Int_part (a - b))%Z as iab eqn:Hiab.
-      remember (Int_part b - Int_part a)%Z as iaib eqn:Hiaib.
-      symmetry in Hiab, Hiaib.
-      destruct iab as [| iab| iab]. {
-        exfalso.
-        apply Int_part_small in Hiab.
-        destruct Hiab as (H1, H2).
-        apply rngl_nlt_ge in H1.
-        apply H1; clear H1.
-        now apply (rngl_lt_sub_0 Hop Hor).
-      } {
-        exfalso.
-...
-        apply Int_part_small in Hiab.
-        destruct iaib as [| iaib| iaib]; [ easy | | ]; exfalso. {
-...
-      progress f_equal.
-      rewrite <- (rngl_opp_sub_distr Hop).
-      rewrite nat_Int_part_opp.
-      apply Nat.le_antisymm. {
-        apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
-        eapply (rngl_le_trans Hor); [ | apply Hba ].
-        rewrite <- (rngl_abs_nonneg_eq Hop Hor). 2: {
-          now apply (rngl_le_0_sub Hop Hor).
-        }
-        apply rngl_of_nat_int_part_le.
-      }
-About int_part.
-Require Import Reals.
-Search Int_part.
-...
-(* contre-exemple :
-   b=1,1 a=0,9
-   nat_Int_part b = 1
-   nat_Int_part a = 0
-   nat_Int_part (b - a) = 0 *)
+split; [ easy | ].
+apply (rngl_lt_sub_lt_add_r Hop Hor).
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- rngl_of_Z_1.
+rewrite <- rngl_of_Z_add.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite <- (rngl_add_sub_assoc Hop).
+eapply (rngl_lt_le_trans Hor).
+apply Hm.
+apply (rngl_le_add_r Hor).
+now apply (rngl_le_0_sub Hop Hor).
+Qed.
+
 ...
 
 Theorem Int_part_IZR : ∀ z, Int_part (rngl_of_Z z) = z.
