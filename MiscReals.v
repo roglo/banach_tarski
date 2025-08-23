@@ -1492,23 +1492,12 @@ Definition nat_Int_part a :=
   | Z.neg p => Pos.to_nat p
   end.
 
-Theorem glop :
-  ∀ a,
-  (0 ≤ a)%L
-  → rngl_of_Z (Int_part a) = rngl_of_nat (nat_Int_part a).
+Theorem Int_part_nonneg : ∀ a, (0 ≤ a)%L → (0 <= Int_part a)%Z.
 Proof.
 intros * Hza.
-progress unfold nat_Int_part.
-remember (Int_part a) as z eqn:Hz.
-symmetry in Hz.
-destruct z as [| p| p]; [ easy | easy | exfalso ].
-assert (H : (Int_part a < 0)%Z) by now rewrite Hz.
-apply Z.nle_gt in H.
-apply H; clear p H Hz.
 progress unfold Int_part.
 remember (z_int_part a) as z eqn:H; clear H.
 destruct z as (z, Hz).
-(* lemma to do *)
 progress unfold rngl_of_Z in Hz.
 destruct z as [| p| p]; [ easy | easy | exfalso ].
 destruct Hz as (_, Hz).
@@ -1529,6 +1518,21 @@ rewrite (rngl_opp_involutive Hop).
 apply rngl_of_pos_nonneg.
 Qed.
 
+Theorem Int_part_nonpos : ∀ a, (a < 0)%L → (Int_part a <= 0)%Z.
+Proof.
+intros * Hza.
+progress unfold Int_part.
+remember (z_int_part a) as z eqn:H; clear H.
+destruct z as (z, Hz).
+progress unfold rngl_of_Z in Hz.
+destruct z as [| p| p]; [ easy | exfalso | easy ].
+destruct Hz as (Hz, _).
+apply rngl_nlt_ge in Hz.
+apply Hz; clear Hz.
+apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+apply rngl_of_pos_nonneg.
+Qed.
+
 Theorem rngl_of_Z_Int_part :
   ∀ a,
   rngl_of_Z (Int_part a) =
@@ -1536,38 +1540,26 @@ Theorem rngl_of_Z_Int_part :
      else (- rngl_of_nat (nat_Int_part a))%L).
 Proof.
 intros.
+progress unfold nat_Int_part.
+remember (Int_part a) as z eqn:Hz.
+symmetry in Hz.
 destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
-  now apply glop.
+  destruct z as [| p| p]; [ easy | easy | exfalso ].
+  assert (H : (Int_part a < 0)%Z) by now rewrite Hz.
+  apply Z.nle_gt in H.
+  apply H; clear p H Hz.
+  now apply Int_part_nonneg.
 } {
+  destruct z as [| p| p]; [ symmetry; apply (rngl_opp_0 Hop) | exfalso | easy ].
+  assert (H : (0 < Int_part a)%Z) by now rewrite Hz.
+  apply Z.nle_gt in H.
+  apply H; clear p H Hz.
   apply (rngl_nle_gt_iff Hor) in Hza.
-(*
-  apply (rngl_opp_lt_compat Hop Hor) in Hza.
-  rewrite (rngl_opp_involutive Hop) in Hza.
-  rewrite (rngl_opp_0 Hop) in Hza.
-*)
-...
-  apply (rngl_opp_inj Hop).
-  rewrite (rngl_opp_involutive Hop).
-  rewrite <- rngl_of_Z_opp.
-  remember (-a)%L as b eqn:H.
-  apply (f_equal rngl_opp) in H.
-  rewrite (rngl_opp_involutive Hop) in H.
-  subst a; rename b into a.
-  rewrite rngl_of_Z_opp.
-rewrite glop.
-(* faiche *)
-...
-intros.
-progress unfold Int_part.
-destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
-  apply rngl_of_Z_of_nat.
-} {
-  rewrite rngl_of_Z_opp.
-  progress f_equal.
-  apply rngl_of_Z_of_nat.
+  now apply Int_part_nonpos.
 }
 Qed.
 
+(*
 Theorem nat_Int_part_le :
   ∀ a b, (0 ≤ a ≤ b)%L → nat_Int_part a ≤ nat_Int_part b.
 Proof.
@@ -1666,6 +1658,10 @@ Theorem rngl_sub_Int_part : ∀ a b,
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
 Proof.
 intros * Hba.
+apply rngl_of_Z_inj.
+rewrite rngl_of_Z_Int_part.
+...
+intros * Hba.
 progress unfold frac_part in Hba.
 apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
@@ -1744,7 +1740,6 @@ Search Int_part.
    nat_Int_part a = 0
    nat_Int_part (b - a) = 0 *)
 ...
-*)
 
 Theorem Int_part_IZR : ∀ z, Int_part (rngl_of_Z z) = z.
 Proof.
@@ -1757,9 +1752,14 @@ destruct (Z_le_dec 0 z) as [Hz| Hz]. {
 }
 apply Z.nle_gt in Hz.
 destruct z as [| p| p]; [ easy | easy | ].
+clear Hz.
 progress unfold rngl_of_Z.
 rewrite <- (rngl_sub_0_l Hop).
-Search (Int_part (_ - _)%L).
+rewrite rngl_sub_Int_part. 2: {
+  progress unfold frac_part.
+  rewrite rngl_of_Z_Int_part.
+  destruct (rngl_le_dec Hor 0 (rngl_of_pos p)) as [Hzp| Hzp]. {
+Search (rngl_of_nat (nat_Int_part _)).
 ...
 Require Import Reals.
 Rminus_Int_part1
@@ -1816,7 +1816,6 @@ rewrite Rminus_Int_part1. {
 }
 rewrite <- INR_IPR, frac_part_INR; apply base_fp.
 Qed.
-*)
 
 Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0.
 Proof.
