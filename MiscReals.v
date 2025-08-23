@@ -1653,11 +1653,38 @@ split. {
 ...
 *)
 
+Theorem rngl_sub_between_0_and_1 : ∀ a b, (0 ≤ b - a < 1 ↔ a ≤ b < a + 1)%L.
+Proof.
+intros.
+split; intros (H1, H2). {
+  apply -> (rngl_le_0_sub Hop Hor) in H1.
+  split; [ easy | ].
+  now apply (rngl_lt_sub_lt_add_l Hop Hor) in H2.
+} {
+  split; [ now apply (rngl_le_0_sub Hop Hor) | ].
+  now apply (rngl_lt_sub_lt_add_l Hop Hor).
+}
+Qed.
+
+Theorem Int_part_eq_sub :
+  ∀ a b,
+  Int_part a = Int_part b
+  → Int_part (a - b) = 0%Z.
+Proof.
+intros * Hab.
+apply Int_part_small.
+apply rngl_sub_between_0_and_1.
+...
+
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
 Proof.
 intros * Hba.
+destruct (Z.eq_dec (Int_part a) (Int_part b)) as [Hab| Hab]. {
+  rewrite Hab, Z.sub_diag.
+... ...
+now apply Int_part_eq_sub.
 ...
 intros * Hba.
 apply rngl_of_Z_inj.
