@@ -1695,8 +1695,7 @@ split. {
   apply (rngl_le_0_sub Hop Hor).
   apply (rngl_le_trans Hor _ (rngl_of_Z n)); [ | easy ].
 (* ah oui mais non, merde *)
-...
-apply rngl_sub_between_0_and_1.
+Check rngl_sub_between_0_and_1.
 ...
 
 Theorem rngl_sub_Int_part : ∀ a b,
