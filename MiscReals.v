@@ -1432,6 +1432,20 @@ split; intros Hx. {
 }
 Qed.
 
+Theorem Int_part_less_small : ∀ z x, (rngl_of_Z z ≤ x < rngl_of_Z (z + 1))%L ↔ Int_part x = z.
+Proof.
+intros.
+progress unfold Int_part.
+remember (z_int_part x) as m eqn:Hm.
+symmetry in Hm.
+destruct m as (n, Hn); clear Hm.
+split; intros Hx. {
+  now apply (Int_part_prop x).
+} {
+  now subst; cbn in Hn.
+}
+Qed.
+
 Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
 Proof.
 intros * Hx.
@@ -1717,8 +1731,14 @@ Check Int_part_eq_sub.
   rewrite (rngl_sub_add_distr Hos) in Hba.
   rewrite (rngl_sub_sub_swap Hop) in Hba.
   apply (rngl_sub_le_mono_r Hop Hor) in Hba.
-Check Int_part_small.
-Search Int_part.
+  apply Int_part_less_small; cbn.
+  rewrite rngl_of_pos_1.
+  rewrite rngl_of_pos_2.
+  split. {
+    apply (rngl_le_add_le_sub_r Hop Hor).
+    rewrite rngl_add_comm.
+    now apply (rngl_le_add_le_sub_r Hop Hor).
+  }
 ...
 apply Int_part_small.
 apply rngl_sub_between_0_and_1.
