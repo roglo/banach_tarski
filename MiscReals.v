@@ -1700,6 +1700,8 @@ destruct (Z.eq_dec (Int_part a) (Int_part b)) as [Hab| Hab]. {
   rewrite Hab, Z.sub_diag.
   now apply Int_part_eq_sub.
 }
+destruct (Z.eq_dec (Int_part a) (Int_part b + 1)) as [Hab1| Hab1]. {
+  rewrite Hab1, Z.add_comm, Z.add_simpl_r.
 ...
 intros * Hba.
 apply rngl_of_Z_inj.
