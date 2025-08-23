@@ -1745,8 +1745,6 @@ apply (rngl_le_add_r Hor).
 now apply (rngl_le_0_sub Hop Hor).
 Qed.
 
-...
-
 Theorem Int_part_IZR : ∀ z, Int_part (rngl_of_Z z) = z.
 Proof.
 intros.
