@@ -1705,6 +1705,12 @@ rewrite rngl_of_pos_1.
 now apply (rngl_add_le_mono_r Hop Hor).
 Qed.
 
+Theorem rngl_of_Z_1 : rngl_of_Z 1 = 1%L.
+Proof.
+progress unfold rngl_of_Z; cbn.
+apply rngl_of_pos_1.
+Qed.
+
 Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
@@ -1716,7 +1722,6 @@ destruct (Z.eq_dec (Int_part a) (Int_part b)) as [Hab| Hab]. {
 }
 destruct (Z.eq_dec (Int_part a) (Int_part b + 1)) as [Hab1| Hab1]. {
   rewrite Hab1, Z.add_comm, Z.add_simpl_r.
-Check Int_part_eq_sub.
   clear Hab.
   progress unfold frac_part in Hba.
   progress unfold Int_part in Hba.
@@ -1726,19 +1731,25 @@ Check Int_part_eq_sub.
   remember (z_int_part b) as n eqn:H; clear H.
   destruct n as (n, Hn).
   subst m.
-  rewrite rngl_of_Z_add in Hba; cbn in Hba.
-  rewrite rngl_of_pos_1 in Hba.
+  rewrite rngl_of_Z_add in Hba.
+  rewrite rngl_of_Z_1 in Hba.
   rewrite (rngl_sub_add_distr Hos) in Hba.
   rewrite (rngl_sub_sub_swap Hop) in Hba.
   apply (rngl_sub_le_mono_r Hop Hor) in Hba.
-  apply Int_part_less_small; cbn.
-  rewrite rngl_of_pos_1.
-  rewrite rngl_of_pos_2.
+  apply Int_part_less_small.
+  cbn - [ rngl_of_Z ].
+  rewrite rngl_of_Z_1, rngl_of_Z_2.
   split. {
     apply (rngl_le_add_le_sub_r Hop Hor).
     rewrite rngl_add_comm.
     now apply (rngl_le_add_le_sub_r Hop Hor).
   }
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  eapply (rngl_lt_le_trans Hor); [ apply Hm | ].
+  rewrite <- Z.add_assoc; cbn.
+  rewrite rngl_of_Z_add, rngl_of_Z_2.
+  now apply (rngl_add_le_mono_r Hop Hor).
+}
 ...
 apply Int_part_small.
 apply rngl_sub_between_0_and_1.
