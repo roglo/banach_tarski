@@ -1660,6 +1660,13 @@ Proof.
 intros * Hba.
 apply rngl_of_Z_inj.
 rewrite rngl_of_Z_Int_part.
+destruct (rngl_le_dec Hor 0 (a - b)) as [Hzab| Hzab]. {
+  progress unfold nat_Int_part.
+  remember (Int_part (a - b)) as z eqn:Hz.
+  symmetry in Hz.
+  destruct z as [| p| p]. {
+    symmetry; cbn.
+    apply Int_part_small in Hz.
 ...
 intros * Hba.
 progress unfold frac_part in Hba.
