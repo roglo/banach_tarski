@@ -1672,7 +1672,22 @@ Theorem Int_part_eq_sub :
   → Int_part (a - b) = 0%Z.
 Proof.
 intros * Hab.
+(*
 apply Int_part_small.
+apply rngl_sub_between_0_and_1.
+*)
+progress unfold Int_part in Hab.
+remember (z_int_part a) as m eqn:H; clear H.
+destruct m as (m, Hm).
+remember (z_int_part b) as n eqn:H; clear H.
+destruct n as (n, Hn).
+subst m.
+rewrite rngl_of_Z_add in Hm, Hn.
+cbn in Hm, Hn.
+rewrite rngl_of_pos_1 in Hm, Hn.
+apply rngl_sub_between_0_and_1 in Hm, Hn.
+apply Int_part_small.
+...
 apply rngl_sub_between_0_and_1.
 ...
 
