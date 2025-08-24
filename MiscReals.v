@@ -1806,18 +1806,23 @@ Theorem Rpow_div_sub : ∀ x i j,
   → x ^ i / x ^ j = x ^ (i - j).
 Proof.
 intros * Hx Hij.
-...
-unfold Rdiv.
-replace i with ((i - j) + j)%nat at 1 by now rewrite Nat.sub_add.
-now symmetry; apply pow_RN_plus.
+now symmetry; apply Nat.pow_sub_r.
 Qed.
 
-Theorem frac_part_interv : ∀ x, 0 ≤ frac_part x < 1.
+Theorem frac_part_interv : ∀ x, (0 ≤ frac_part x < 1)%L.
 Proof.
 intros.
 unfold frac_part.
-specialize (base_Int_part x); intros Hx; lra.
+progress unfold Int_part.
+remember (z_int_part x) as z eqn:H; clear H.
+destruct z as (z, (Hzx, Hxz)).
+apply (rngl_le_0_sub Hop Hor) in Hzx.
+rewrite rngl_of_Z_add, rngl_of_Z_1 in Hxz.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in Hxz.
+easy.
 Qed.
+
+...
 
 Theorem Int_part_interv : ∀ z x, IZR z ≤ x < IZR (z + 1) → Int_part x = z.
 Proof.
