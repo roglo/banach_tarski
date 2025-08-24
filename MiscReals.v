@@ -1861,11 +1861,13 @@ apply (rngl_abs_nonneg_eq Hop Hor).
 apply (rngl_squ_nonneg Hos Hor).
 Qed.
 
-...
-
-Theorem Rabs_sqrt : ∀ x, Rabs (√ x) = √ x.
+Theorem Rabs_sqrt : ∀ x, rngl_abs (√ x) = √ x.
 Proof.
 intros.
+apply (rngl_abs_nonneg_eq Hop Hor).
+Search (_ ≤ √_)%L.
+...
+...
 unfold Rabs.
 destruct (Rcase_abs (√ x)) as [Hx| Hx]; [ exfalso | easy ].
 apply Rlt_not_le in Hx; apply Hx, sqrt_pos.
