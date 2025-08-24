@@ -1861,28 +1861,27 @@ apply (rngl_abs_nonneg_eq Hop Hor).
 apply (rngl_squ_nonneg Hos Hor).
 Qed.
 
-Theorem Rabs_sqrt : ∀ x, rngl_abs (√ x) = √ x.
+Theorem Rabs_sqrt : ∀ x, (0 ≤ x)%L → rngl_abs (√ x) = √ x.
 Proof.
-intros.
+intros * Hzx.
 apply (rngl_abs_nonneg_eq Hop Hor).
-Search (_ ≤ √_)%L.
-...
-...
-unfold Rabs.
-destruct (Rcase_abs (√ x)) as [Hx| Hx]; [ exfalso | easy ].
-apply Rlt_not_le in Hx; apply Hx, sqrt_pos.
+now apply rl_sqrt_nonneg.
 Qed.
 
 Theorem Rmult_minus_distr_r : ∀ r1 r2 r3,
-  (r1 - r2) * r3 = r1 * r3 - r2 * r3.
+  ((r1 - r2) * r3 = r1 * r3 - r2 * r3)%L.
 Proof.
 intros.
-unfold Rminus.
-rewrite Rmult_plus_distr_r; lra.
+apply (rngl_mul_sub_distr_r Hop).
 Qed.
 
-Theorem Rminus_plus : ∀ x y, x - y + y = x.
-Proof. intros; lra. Qed.
+Theorem Rminus_plus : ∀ x y, (x - y + y = x)%L.
+Proof.
+intros.
+apply (rngl_sub_add Hop).
+Qed.
+
+...
 
 Theorem Rdiv_div : ∀ x y z, x / y / z = x / (y * z).
 Proof.
