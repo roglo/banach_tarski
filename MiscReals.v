@@ -1643,6 +1643,13 @@ split; [ pauto | ].
 apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 Qed.
 
+Theorem frac_part_0 : frac_part 0 = 0%L.
+Proof.
+progress unfold frac_part.
+rewrite Int_part_0; cbn.
+apply (rngl_sub_diag Hos).
+Qed.
+
 (*
 Theorem Int_part_opp :
   ∀ a, Int_part (- a) = (- Int_part a)%Z.
@@ -1745,6 +1752,23 @@ apply (rngl_le_add_r Hor).
 now apply (rngl_le_0_sub Hop Hor).
 Qed.
 
+Theorem Int_part_rngl_of_pos :
+  ∀ p, Int_part (rngl_of_pos p) = Z.pos p.
+Proof.
+intros.
+progress unfold rngl_of_pos.
+rewrite Int_part_rngl_of_nat.
+apply positive_nat_Z.
+Qed.
+
+Theorem frac_part_rngl_of_pos : ∀ p, frac_part (rngl_of_pos p) = 0%L.
+Proof.
+intros.
+progress unfold frac_part.
+rewrite Int_part_rngl_of_pos.
+apply (rngl_sub_diag Hos).
+Qed.
+
 Theorem Int_part_IZR : ∀ z, Int_part (rngl_of_Z z) = z.
 Proof.
 intros.
@@ -1760,72 +1784,20 @@ clear Hz.
 progress unfold rngl_of_Z.
 rewrite <- (rngl_sub_0_l Hop).
 rewrite rngl_sub_Int_part. 2: {
-  progress unfold frac_part.
-  rewrite rngl_of_Z_Int_part.
-  destruct (rngl_le_dec Hor 0 (rngl_of_pos p)) as [Hzp| Hzp]. {
-Search (rngl_of_nat (nat_Int_part _)).
-...
-Require Import Reals.
-Rminus_Int_part1
-     : ∀ r1 r2 : R,
-         (frac_part r1 >= frac_part r2)%R
-         → Int_part (r1 - r2) = (Int_part r1 - Int_part r2)%Z
-...
-Check INR_IPR.
-Print INR.
-Print IPR.
-...
-INR_IPR
-     : ∀ p : positive, INR (Pos.to_nat p) = IPR p
-
-IPR =
-λ p : positive,
-  match p with
-  | (p0~1)%positive => (R1 + IPR_2 p0)%R
-  | (p0~0)%positive => IPR_2 p0
-  | 1%positive => R1
-  end
-     : positive → R
-
-Arguments IPR p%positive_scope : simpl never
-INR =
-fix INR (n : ℕ) : R :=
-  match n with
-  | 0 => 0%R
-  | 1 => 1%R
-  | S (S _ as n0) => (INR n0 + 1)%R
-  end
-     : ℕ → R
-
-Arguments INR n%nat_scope
-...
-rewrite rngl_sub_Int_part. 2: {
-  cbn.
-  rewrite rngl_of_nat_Pos_to_nat.
-...
-Require Import Reals.
-Check INR_IPR.
-...
-Search (Int_part (_ - _)).
-...
-Rminus_Int_part1
-     : ∀ r1 r2 : R,
-         (frac_part r1 >= frac_part r2)%R → Int_part (r1 - r2) = (Int_part r1 - Int_part r2)%Z
-...
-rewrite Rminus_Int_part1. {
-  rewrite Int_part_small; [ | lra ].
-  rewrite <- INR_IPR.
-  rewrite Int_part_INR.
-  now rewrite positive_nat_Z.
+  rewrite frac_part_0.
+  rewrite frac_part_rngl_of_pos.
+  apply (rngl_le_refl Hor).
 }
-rewrite <- INR_IPR, frac_part_INR; apply base_fp.
+rewrite Int_part_0.
+now rewrite Int_part_rngl_of_pos.
 Qed.
 
-Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0.
+Theorem frac_part_IZR : ∀ z, frac_part (rngl_of_Z z) = 0%L.
 Proof.
 intros.
 unfold frac_part.
-rewrite Int_part_IZR; lra.
+rewrite Int_part_IZR.
+apply (rngl_sub_diag Hos).
 Qed.
 
 Theorem Rpow_div_sub : ∀ x i j,
@@ -1834,6 +1806,7 @@ Theorem Rpow_div_sub : ∀ x i j,
   → x ^ i / x ^ j = x ^ (i - j).
 Proof.
 intros * Hx Hij.
+...
 unfold Rdiv.
 replace i with ((i - j) + j)%nat at 1 by now rewrite Nat.sub_add.
 now symmetry; apply pow_RN_plus.
