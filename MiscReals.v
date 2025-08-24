@@ -1847,28 +1847,21 @@ apply iff_sym.
 apply (rngl_abs_lt Hop Hor).
 Qed.
 
-...
-
-Theorem Rabs_le : ∀ x y, Rabs x ≤ y ↔ - y ≤ x ≤ y.
-Proof.
-intros; split. {
-  intros Hxy.
-  unfold Rabs in Hxy.
-  destruct (Rcase_abs x); lra.
-} {
-  intros (Hyx, Hxy).
-  unfold Rabs.
-  destruct (Rcase_abs x); [ lra | easy ].
-}
-Qed.
-
-Theorem Rabs_sqr : ∀ x, Rabs (x²) = x².
+Theorem Rabs_le : ∀ x y, (rngl_abs x ≤ y ↔ - y ≤ x ≤ y)%L.
 Proof.
 intros.
-unfold Rabs.
-destruct (Rcase_abs x²) as [Hx| Hx]; [ | easy ].
-exfalso; apply Rlt_not_le in Hx; apply Hx, Rle_0_sqr.
+apply iff_sym.
+apply (rngl_abs_le Hop Hor).
 Qed.
+
+Theorem Rabs_sqr : ∀ x, rngl_abs (x²) = x².
+Proof.
+intros.
+apply (rngl_abs_nonneg_eq Hop Hor).
+apply (rngl_squ_nonneg Hos Hor).
+Qed.
+
+...
 
 Theorem Rabs_sqrt : ∀ x, Rabs (√ x) = √ x.
 Proof.
