@@ -1432,7 +1432,8 @@ split; intros Hx. {
 }
 Qed.
 
-Theorem Int_part_less_small : ∀ z x, (rngl_of_Z z ≤ x < rngl_of_Z (z + 1))%L ↔ Int_part x = z.
+Theorem Int_part_interv :
+  ∀ z x, (rngl_of_Z z ≤ x < rngl_of_Z (z + 1))%L ↔ Int_part x = z.
 Proof.
 intros.
 progress unfold Int_part.
@@ -1731,7 +1732,7 @@ destruct m as (m, Hm).
 remember (z_int_part b) as n eqn:H; clear H.
 destruct n as (n, Hn).
 move n before m.
-apply Int_part_less_small.
+apply Int_part_interv.
 rewrite rngl_of_Z_add.
 rewrite rngl_of_Z_sub.
 rewrite rngl_of_Z_1.
@@ -1822,39 +1823,24 @@ apply (rngl_lt_sub_lt_add_l Hop Hor) in Hxz.
 easy.
 Qed.
 
-...
-
-Theorem Int_part_interv : ∀ z x, IZR z ≤ x < IZR (z + 1) → Int_part x = z.
-Proof.
-intros * (Hzx, Hxz).
-rewrite plus_IZR in Hxz; simpl in Hxz.
-assert (H : 0 ≤ x - IZR z < 1) by lra.
-apply Int_part_small in H.
-rewrite Rminus_Int_part1 in H. {
-  rewrite Int_part_IZR in H.
-  now apply -> Z.sub_move_0_r in H.
-} {
-  rewrite frac_part_IZR.
-  apply Rle_ge, frac_part_interv.
-}
-Qed.
-
-Theorem Rabs_or : ∀ x y, Rabs x = y → x = y ∨ x = - y.
+Theorem Rabs_or : ∀ x y, rngl_abs x = y → x = y ∨ x = (- y)%L.
 Proof.
 intros * Hxy; subst y.
-unfold Rabs.
-destruct (Rcase_abs x) as [H₁| H₁]; [ right | now left ].
-symmetry; apply Ropp_involutive.
+unfold rngl_abs.
+remember (x ≤? 0)%L as xz eqn:Hxz.
+symmetry in Hxz.
+destruct xz; [ | now left ].
+rewrite (rngl_opp_involutive Hop).
+now right.
 Qed.
 
-Theorem Rabs_eq_0 : ∀ x, Rabs x = 0 → x = 0.
+Theorem Rabs_eq_0 : ∀ x, rngl_abs x = 0%L → x = 0%L.
 Proof.
 intros * Hx.
-unfold Rabs in Hx.
-destruct (Rcase_abs x); [ | easy ].
-apply Ropp_eq_0_compat in Hx.
-now rewrite Ropp_involutive in Hx.
+now apply (eq_rngl_abs_0 Hop).
 Qed.
+
+...
 
 Theorem Rabs_lt : ∀ x y, Rabs x < y ↔ - y < x < y.
 Proof.
