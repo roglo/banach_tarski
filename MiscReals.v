@@ -1840,20 +1840,14 @@ intros * Hx.
 now apply (eq_rngl_abs_0 Hop).
 Qed.
 
-...
-
-Theorem Rabs_lt : ∀ x y, Rabs x < y ↔ - y < x < y.
+Theorem Rabs_lt : ∀ x y, (rngl_abs x < y ↔ - y < x < y)%L.
 Proof.
-intros; split. {
-  intros Hxy.
-  unfold Rabs in Hxy.
-  destruct (Rcase_abs x); lra.
-} {
-  intros (Hyx, Hxy).
-  unfold Rabs.
-  destruct (Rcase_abs x); [ lra | easy ].
-}
+intros.
+apply iff_sym.
+apply (rngl_abs_lt Hop Hor).
 Qed.
+
+...
 
 Theorem Rabs_le : ∀ x y, Rabs x ≤ y ↔ - y ≤ x ≤ y.
 Proof.
