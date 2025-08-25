@@ -111,20 +111,11 @@ do 2 rewrite (rngl_mul_comm Hic z).
 easy.
 Qed.
 
-Theorem Req_dec : ∀ x y : T, { x = y } + { x ≠ y }.
-Proof.
-intros x y.
-destruct (rngl_le_dec Hor x y) as [H₁| H₁]. {
-  destruct (rngl_le_dec Hor y x) as [H₂| H₂]. {
-    left; now apply rngl_le_antisymm.
-  } {
-    right; intros H; subst y; apply H₂, (rngl_le_refl Hor).
-  }
-} {
-  right; intros H; subst y.
-  apply H₁, (rngl_le_refl Hor).
-}
-Qed.
+Definition Rle_dec := rngl_le_dec Hor.
+Definition Req_dec := rngl_eq_dec Heo.
+
+Arguments Rle_dec (a b)%_L.
+Arguments Req_dec (a b)%_L.
 
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 ≤ b)%L →
   (a * √ b * c * d * √ b = a * b * c * d)%L.
@@ -1881,55 +1872,64 @@ intros.
 apply (rngl_sub_add Hop).
 Qed.
 
-...
-
-Theorem Rdiv_div : ∀ x y z, x / y / z = x / (y * z).
+Theorem Rdiv_div : ∀ x y z, (y ≠ 0 → z ≠ 0 → x / y / z = x / (y * z))%L.
 Proof.
 intros.
-unfold Rdiv.
-rewrite Rinv_mult; lra.
+rewrite (rngl_mul_comm Hic).
+now apply (rngl_div_div Hos Hon Hiv).
 Qed.
 
-Theorem Rmult_div_r : ∀ x y, y ≠ 0 → y * (x / y) = x.
+Theorem Rmult_div_r : ∀ x y, (y ≠ 0 → y * (x / y) = x)%L.
 Proof.
 intros * Hy.
-unfold Rdiv; rewrite Rmult_comm, Rmult_assoc.
-rewrite Rinv_l; [ lra | easy ].
+rewrite (rngl_mul_div_assoc Hiv).
+rewrite (rngl_mul_comm Hic).
+now apply (rngl_mul_div Hi1).
 Qed.
 
-Theorem Rinv_div : ∀ x, / x = 1 / x.
-Proof. intros; lra. Qed.
-
-Theorem nonneg_plus_sqr : ∀ x y, 0 ≤ x² + y².
+Theorem Rinv_div : ∀ x, (x⁻¹ = 1 / x)%L.
 Proof.
 intros.
-apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+symmetry.
+apply (rngl_div_1_l Hon Hiv).
 Qed.
 
-Definition Rsignp x := if Rle_dec 0 x then 1 else -1.
-Definition Rsign x := if Req_dec x 0 then 0 else Rsignp x.
+Theorem nonneg_plus_sqr : ∀ x y, (0 ≤ x² + y²)%L.
+Proof.
+intros.
+apply (rngl_add_squ_nonneg Hos Hor).
+Qed.
 
-Theorem Rsignp_of_pos : ∀ x, 0 ≤ x → Rsignp x = 1.
+Definition Rsignp x := (if Rle_dec 0 x then 1 else -1)%L.
+Definition Rsign x := (if Req_dec x 0 then 0 else Rsignp x)%L.
+
+Theorem Rsignp_of_pos : ∀ x, (0 ≤ x → Rsignp x = 1)%L.
 Proof.
 intros * Hx.
 unfold Rsignp.
-destruct (Rle_dec 0 x); [ easy | lra ].
+now destruct (Rle_dec 0 x).
 Qed.
 
-Theorem Rsignp_of_neg : ∀ x, x < 0 → Rsignp x = -1.
+Theorem Rsignp_of_neg : ∀ x, (x < 0 → Rsignp x = -1)%L.
 Proof.
 intros * Hx.
 unfold Rsignp.
-destruct (Rle_dec 0 x); [ lra | easy ].
+apply rngl_nle_gt in Hx.
+now destruct (Rle_dec 0 x).
 Qed.
 
-Theorem Rsign_of_pos : ∀ x, 0 < x → Rsign x = 1.
+Theorem Rsign_of_pos : ∀ x, (0 < x → Rsign x = 1)%L.
 Proof.
 intros * Hx.
 unfold Rsign, Rsignp.
-destruct (Req_dec x 0); [ lra | ].
-destruct (Rle_dec 0 x); [ easy | lra ].
+destruct (Req_dec x 0) as [H | H]. {
+  now subst; apply (rngl_lt_irrefl Hor) in Hx.
+}
+apply (rngl_lt_le_incl Hor) in Hx.
+now destruct (Rle_dec 0 x).
 Qed.
+
+...
 
 Theorem Rsign_of_neg : ∀ x, x < 0 → Rsign x = -1.
 Proof.
