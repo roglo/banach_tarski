@@ -2059,6 +2059,12 @@ split. {
   }
   rewrite (rngl_mul_1_r Hon).
   rewrite (rngl_mul_inv_r Hiv).
+  apply (rngl_le_0_sub Hop Hor).
+  progress unfold Int_part.
+  remember (z_int_part _) as z eqn:H; clear H.
+  destruct z as (z, Hz).
+  easy.
+} {
 ...
 intros * Hy.
 unfold Rmod, Rediv_mod, snd.
