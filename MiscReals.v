@@ -113,9 +113,11 @@ easy.
 Qed.
 
 Definition Rle_dec := rngl_le_dec Hor.
+Definition Rlt_dec := rngl_lt_dec Hor.
 Definition Req_dec := rngl_eq_dec Heo.
 
 Arguments Rle_dec (a b)%_L.
+Arguments Rlt_dec (a b)%_L.
 Arguments Req_dec (a b)%_L.
 
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 ≤ b)%L →
@@ -2025,7 +2027,7 @@ Qed.
 
 Definition Rediv_mod x y :=
   let k :=
-    match rngl_lt_dec Hor y 0 with
+    match Rlt_dec y 0 with
     | left _ => (- Int_part (x / - y))%Z
     | right _ => Int_part (x / y)
     end
@@ -2042,7 +2044,24 @@ Theorem Rmod_interv : ∀ x y, (0 < y → 0 ≤ x rmod y < y)%L.
 Proof.
 intros * Hy.
 unfold Rmod, Rediv_mod, snd.
+destruct (Rlt_dec y 0) as [Hya| Hya]. {
+  now apply (rngl_lt_asymm Hor) in Hy.
+}
+split. {
+  apply (rngl_mul_le_mono_pos_r Hop Hor Hii _ _ (y⁻¹)). {
+    now apply (rngl_inv_pos Hon Hop Hiv Hor).
+  }
+  rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_mul_inv_diag_r Hon Hiv). 2: {
+    now symmetry; apply (rngl_lt_neq Hor).
+  }
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_inv_r Hiv).
 ...
+intros * Hy.
+unfold Rmod, Rediv_mod, snd.
 destruct (Rcase_abs y) as [Hya| Hya]; [ lra | ].
 split. {
   apply Rmult_le_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
