@@ -1999,34 +1999,38 @@ destruct (Rle_dec 0 x) as [Hx| Hx]. {
 }
 Qed.
 
-...
-
-Theorem Rneq_le_lt : ∀ x y, x ≠ y → x ≤ y → x < y.
+Theorem Rneq_le_lt : ∀ x y, (x ≠ y → x ≤ y → x < y)%L.
 Proof.
 intros * Hnxy Hxy.
-apply Rnot_le_lt; intros H.
-now apply Rle_antisym in H.
+now apply (rngl_le_neq Hor).
 Qed.
 
 Theorem sqrt_diff_sqr_eq_0 : ∀ x y,
-  0 ≤ x ≤ y
-  → √ (y² - x²) = 0
+  (0 ≤ x ≤ y)%L
+  → √ (y² - x²) = 0%L
   → x = y.
 Proof.
 intros * Hxy Hyx.
-apply sqrt_eq_0 in Hyx; [ apply Rsqr_inj; lra | ].
-enough (x² ≤ y²) by lra.
-apply Rsqr_incr_1; lra.
+apply (eq_rl_sqrt_0 Hon Hos) in Hyx. {
+  apply -> (rngl_sub_move_0_r Hop) in Hyx.
+  symmetry in Hyx.
+  apply (eq_rngl_squ_rngl_abs Hop Hor Hii _ _ (rngl_mul_comm Hic _ _)) in Hyx.
+  rewrite (rngl_abs_nonneg_eq Hop Hor x) in Hyx; [ | easy ].
+  rewrite (rngl_abs_nonneg_eq Hop Hor y) in Hyx; [ easy | ].
+  now apply (rngl_le_trans Hor _ x).
+}
+apply (rngl_le_0_sub Hop Hor).
+now apply (rngl_le_le_squ Hop Hor Hii).
 Qed.
 
 Definition Rediv_mod x y :=
   let k :=
-    match Rcase_abs y with
+    match rngl_lt_dec Hor y 0 with
     | left _ => (- Int_part (x / - y))%Z
     | right _ => Int_part (x / y)
     end
   in
-  (k, x - IZR k * y).
+  (k, x - rngl_of_Z k * y)%L.
 
 Definition Rediv x y := fst (Rediv_mod x y).
 Definition Rmod x y := snd (Rediv_mod x y).
@@ -2034,10 +2038,11 @@ Definition Rmod x y := snd (Rediv_mod x y).
 Notation "x '//' y" := (Rediv x y) (at level 40).
 Notation "x 'rmod' y" := (Rmod x y) (at level 40).
 
-Theorem Rmod_interv : ∀ x y, 0 < y → 0 ≤ x rmod y < y.
+Theorem Rmod_interv : ∀ x y, (0 < y → 0 ≤ x rmod y < y)%L.
 Proof.
 intros * Hy.
 unfold Rmod, Rediv_mod, snd.
+...
 destruct (Rcase_abs y) as [Hya| Hya]; [ lra | ].
 split. {
   apply Rmult_le_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
