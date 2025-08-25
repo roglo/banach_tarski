@@ -2065,23 +2065,27 @@ split. {
   destruct z as (z, Hz).
   easy.
 } {
-...
-intros * Hy.
-unfold Rmod, Rediv_mod, snd.
-destruct (Rcase_abs y) as [Hya| Hya]; [ lra | ].
-split. {
-  apply Rmult_le_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
-  rewrite Rmult_0_l, fold_Rdiv, Rdiv_minus_distr, Rmult_div.
-  rewrite Rmult_div_same; [ | lra ].
-  specialize (base_Int_part (x / y)); lra.
-} {
-  apply Rmult_lt_reg_r with (r := / y); [ now apply Rinv_0_lt_compat | ].
-  rewrite fold_Rdiv, fold_Rdiv, Rdiv_minus_distr, Rmult_div.
-  rewrite Rmult_div_same; [ | lra ].
-  rewrite Rdiv_same; [ | lra ].
-  specialize (base_Int_part (x / y)); lra.
+  apply (rngl_mul_lt_mono_pos_r Hop Hor Hii (y⁻¹)). {
+    now apply (rngl_inv_pos Hon Hop Hiv Hor).
+  }
+  rewrite (rngl_mul_sub_distr_r Hop).
+  rewrite <- rngl_mul_assoc.
+  rewrite (rngl_mul_inv_diag_r Hon Hiv). 2: {
+    now symmetry; apply (rngl_lt_neq Hor).
+  }
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_inv_r Hiv).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  rewrite <- rngl_of_Z_1.
+  rewrite <- rngl_of_Z_add.
+  progress unfold Int_part.
+  remember (z_int_part _) as z eqn:H; clear H.
+  destruct z as (z, Hz).
+  easy.
 }
 Qed.
+
+...
 
 Theorem Rmod_from_ediv : ∀ x y, x rmod y = x - IZR (x // y) * y.
 Proof.
