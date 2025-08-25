@@ -32,6 +32,7 @@ Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
 Definition Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 Definition Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv.
 Definition Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
+Definition Hio := rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor.
 
 Tactic Notation "pauto" := progress auto.
 Hint Resolve rngl_le_refl : core.
@@ -1903,6 +1904,8 @@ Qed.
 Definition Rsignp x := (if Rle_dec 0 x then 1 else -1)%L.
 Definition Rsign x := (if Req_dec x 0 then 0 else Rsignp x)%L.
 
+Arguments Rsign x%_L.
+
 Theorem Rsignp_of_pos : ∀ x, (0 ≤ x → Rsignp x = 1)%L.
 Proof.
 intros * Hx.
@@ -1929,50 +1932,74 @@ apply (rngl_lt_le_incl Hor) in Hx.
 now destruct (Rle_dec 0 x).
 Qed.
 
-...
-
-Theorem Rsign_of_neg : ∀ x, x < 0 → Rsign x = -1.
+Theorem Rsign_of_neg : ∀ x, (x < 0 → Rsign x = -1)%L.
 Proof.
 intros * Hx.
 unfold Rsign, Rsignp.
-destruct (Req_dec x 0); [ lra | ].
-destruct (Rle_dec 0 x); [ lra | easy ].
+destruct (Req_dec x 0). {
+  now subst; apply (rngl_lt_irrefl Hor) in Hx.
+}
+apply rngl_nle_gt in Hx.
+now destruct (Rle_dec 0 x).
 Qed.
 
-Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = Rsign x * Rsign y.
+Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = (Rsign x * Rsign y)%L.
 Proof.
 intros.
 unfold Rsign, Rsignp.
 destruct (Req_dec (x * y) 0) as [Hxyz| Hxyz]. {
-  destruct (Req_dec x 0) as [Hx| Hx]; [ lra | ].
-  destruct (Req_dec y 0) as [Hy| Hy]; [ lra | ].
-  apply Rmult_integral in Hxyz; lra.
+  symmetry.
+  destruct (Req_dec x 0) as [Hx| Hx]; [ apply (rngl_mul_0_l Hos) | ].
+  destruct (Req_dec y 0) as [Hy| Hy]; [ apply (rngl_mul_0_r Hos) | ].
+  apply (rngl_integral Hos Hio) in Hxyz.
+  now destruct Hxyz.
 }
-destruct (Req_dec x 0) as [Hxz| Hxz]; [ rewrite Hxz in Hxyz; lra | ].
-destruct (Req_dec y 0) as [Hyz| Hyz]; [ rewrite Hyz in Hxyz; lra | ].
+destruct (Req_dec x 0) as [Hxz| Hxz]. {
+  now subst; rewrite (rngl_mul_0_l Hos) in Hxyz.
+}
+destruct (Req_dec y 0) as [Hyz| Hyz]. {
+  now subst; rewrite (rngl_mul_0_r Hos) in Hxyz.
+}
 destruct (Rle_dec 0 (x * y)) as [Hxy| Hxy]. {
   destruct (Rle_dec 0 x) as [Hx| Hx]. {
-    destruct (Rle_dec 0 y) as [Hy| Hy]; [ lra | exfalso ].
-    apply Hy; clear Hy.
-    apply Rmult_le_reg_l with (r := x); [ lra | ].
-    now rewrite Rmult_0_r.
+    symmetry.
+    destruct (Rle_dec 0 y) as [Hy| Hy]; [ apply (rngl_mul_1_l Hon) | ].
+    apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hxy.
+    destruct Hxy as [| (H, _)]; [ easy | ].
+    apply (rngl_le_antisymm Hor) in H; [ | easy ].
+    now symmetry in H.
   }
-  destruct (Rle_dec 0 y) as [Hy| Hy]; [ exfalso | lra ].
+  destruct (Rle_dec 0 y) as [Hy| Hy]. 2: {
+    symmetry.
+    apply (rngl_squ_opp_1 Hon Hop).
+  }
+  exfalso.
   apply Hx; clear Hx.
-  apply Rmult_le_reg_r with (r := y); [ lra | ].
-  now rewrite Rmult_0_l.
+  apply (rngl_le_0_mul Hon Hop Hiv Hor) in Hxy.
+  destruct Hxy as [| (_, H)]; [ easy | ].
+  apply (rngl_le_antisymm Hor) in H; [ | easy ].
+  now symmetry in H.
 }
 destruct (Rle_dec 0 x) as [Hx| Hx]. {
-  destruct (Rle_dec 0 y) as [Hy| Hy]; [ exfalso | lra ].
+  destruct (Rle_dec 0 y) as [Hy| Hy]. 2: {
+    now symmetry; apply (rngl_mul_1_l Hon).
+  }
+  exfalso.
   apply Hxy; clear Hxy.
-  now apply Rmult_le_pos.
+  now apply (rngl_mul_nonneg_nonneg Hos Hor).
 } {
-  destruct (Rle_dec 0 y) as [Hy| Hy]; [ lra | exfalso ].
+  destruct (Rle_dec 0 y) as [Hy| Hy]. {
+    now symmetry; apply (rngl_mul_1_r Hon).
+  }
+  exfalso.
   apply Hxy; clear Hxy.
-  rewrite <- Rmult_opp_opp.
-  apply Rmult_le_pos; lra.
+  apply (rngl_nle_gt_iff Hor) in Hx, Hy.
+  apply (rngl_lt_le_incl Hor).
+  now apply (rngl_mul_neg_neg Hop Hor Hii).
 }
 Qed.
+
+...
 
 Theorem Rneq_le_lt : ∀ x y, x ≠ y → x ≤ y → x < y.
 Proof.
