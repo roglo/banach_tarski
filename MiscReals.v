@@ -2085,9 +2085,7 @@ split. {
 }
 Qed.
 
-...
-
-Theorem Rmod_from_ediv : ∀ x y, x rmod y = x - IZR (x // y) * y.
+Theorem Rmod_from_ediv : ∀ x y, x rmod y = (x - rngl_of_Z (x // y) * y)%L.
 Proof.
 intros.
 unfold Rmod, Rediv, fst, snd.
@@ -2095,7 +2093,7 @@ remember (Rediv_mod x y) as rdm eqn:Hrdm.
 symmetry in Hrdm.
 destruct rdm as (q, r).
 unfold Rediv_mod in Hrdm.
-destruct (Rcase_abs y) as [Hy| Hy]. {
+destruct (Rlt_dec y 0) as [Hy| Hy]. {
   remember Z.sub as f.
   injection Hrdm; clear Hrdm; intros Hr Hq; subst f.
   now rewrite Hq in Hr.
@@ -2108,11 +2106,12 @@ Qed.
 
 Theorem Int_part_neg : ∀ x,
   Int_part (- x) =
-    (- Int_part x - if Req_dec x (IZR (Int_part x)) then 0 else 1)%Z.
+    (- Int_part x - if Req_dec x (rngl_of_Z (Int_part x)) then 0 else 1)%Z.
 Proof.
 intros.
-destruct (Req_dec x (IZR (Int_part x))) as [Hx| Hx]. {
+destruct (Req_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
   rewrite Hx at 1.
+...
   now rewrite <- opp_IZR, Int_part_IZR, Z.sub_0_r.
 }
 apply Int_part_interv.
