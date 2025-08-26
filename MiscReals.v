@@ -817,7 +817,7 @@ Proof.
 intros.
 progress unfold rngl_of_pos.
 rewrite <- rngl_of_nat_1.
-apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor).
+apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor).
 apply Pos2Nat_ge_1.
 Qed.
 
@@ -836,7 +836,7 @@ revert b Hab.
 induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
   destruct b as [b| b| ]. {
     do 2 rewrite rngl_of_pos_xI in Hab.
-    apply (rngl_add_le_mono_r Hop Hor) in Hab.
+    apply (rngl_add_le_mono_r Hos Hor) in Hab.
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii) in Hab. 2: {
       now apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
@@ -876,23 +876,23 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
       rewrite (rngl_mul_0_r Hos) in Hab.
       apply rngl_nlt_ge in Hab.
       apply Hab; clear Hab.
-      apply (rngl_add_nonneg_pos Hor). 2: {
+      apply (rngl_add_nonneg_pos Hos Hor). 2: {
         apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
       }
       apply (rngl_mul_nonneg_nonneg Hos Hor). {
         apply (rngl_0_le_2 Hon Hos Hor).
       }
-      apply (rngl_le_0_add Hor).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hon Hos Hor).
       apply (rngl_of_nat_nonneg Hon Hos Hor).
     }
     rewrite rngl_of_nat_succ in Hab |-*.
-    apply (rngl_add_le_mono_l Hop Hor).
+    apply (rngl_add_le_mono_l Hos Hor).
     apply IHa.
     do 2 rewrite rngl_mul_add_distr_l in Hab.
     rewrite (rngl_mul_1_r Hon) in Hab.
     rewrite <- rngl_add_assoc in Hab.
-    apply (rngl_add_le_mono_l Hop Hor) in Hab.
+    apply (rngl_add_le_mono_l Hos Hor) in Hab.
     easy.
   }
   exfalso.
@@ -931,7 +931,7 @@ destruct b as [b| b| ]. {
     rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
     rewrite <- rngl_add_assoc.
     apply (rngl_lt_add_r Hos Hor).
-    apply (rngl_lt_0_add Hor). {
+    apply (rngl_lt_0_add Hos Hor). {
       apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
     }
     apply (rngl_mul_nonneg_nonneg Hos Hor). {
@@ -940,12 +940,12 @@ destruct b as [b| b| ]. {
     apply (rngl_of_nat_nonneg Hon Hos Hor).
   }
   rewrite rngl_of_nat_succ in Hab |-*.
-  apply (rngl_add_le_mono_l Hop Hor).
+  apply (rngl_add_le_mono_l Hos Hor).
   apply IHa.
   do 2 rewrite rngl_mul_add_distr_l in Hab.
   rewrite (rngl_mul_1_r Hon) in Hab.
   rewrite <- (rngl_add_assoc _ _ 1) in Hab.
-  apply (rngl_add_le_mono_l Hop Hor) in Hab.
+  apply (rngl_add_le_mono_l Hos Hor) in Hab.
   easy.
 } {
   do 2 rewrite rngl_of_pos_xO in Hab.
@@ -978,7 +978,7 @@ induction a as [a| a| ]; intros. {
     apply Pos.compare_le_iff in Hab; cbn in Hab.
     apply -> Pos.compare_le_iff in Hab.
     do 2 rewrite rngl_of_pos_xI.
-    apply (rngl_add_le_mono_r Hop Hor).
+    apply (rngl_add_le_mono_r Hos Hor).
     apply (rngl_mul_le_mono_pos_l Hop Hor Hii); [ | now apply IHa ].
     apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   } {
@@ -999,8 +999,8 @@ induction a as [a| a| ]; intros. {
       rewrite rngl_add_0_l.
       rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
       rewrite <- rngl_add_assoc.
-      apply (rngl_le_add_r Hor).
-      apply (rngl_le_0_add Hor).
+      apply (rngl_le_add_r Hos Hor).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hon Hos Hor).
       apply (rngl_mul_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_2 Hon Hos Hor).
@@ -1011,7 +1011,7 @@ induction a as [a| a| ]; intros. {
     rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
     rewrite rngl_mul_add_distr_l, (rngl_mul_1_r Hon).
     rewrite <- rngl_add_assoc.
-    apply (rngl_add_le_mono_l Hop Hor).
+    apply (rngl_add_le_mono_l Hos Hor).
     now apply IHj.
   }
 } {
@@ -1020,7 +1020,7 @@ induction a as [a| a| ]; intros. {
     apply Pos.compare_cont_Lt_not_Gt in Hab.
     rewrite rngl_of_pos_xI, rngl_of_pos_xO.
     eapply (rngl_le_trans Hor). 2: {
-      apply (rngl_le_add_r Hor).
+      apply (rngl_le_add_r Hos Hor).
       apply (rngl_0_le_1 Hon Hos Hor).
     }
     apply (rngl_mul_le_mono_nonneg_l Hop Hor).
@@ -1072,7 +1072,7 @@ destruct a as [| a| a]. {
   apply (rngl_opp_le_compat Hop Hor) in Hab.
   apply Z.opp_le_mono; cbn.
   progress unfold rngl_of_pos in Hab.
-  apply (rngl_of_nat_inj_le Hon Hop Hc1 Hor) in Hab.
+  apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor) in Hab.
   progress unfold Z.le; cbn.
   apply Pos.compare_le_iff.
   now apply Pos2Nat.inj_le.
@@ -1104,7 +1104,7 @@ Proof.
 intros Hroc * Hab Hi Hj.
 generalize Hroc; intros Hroc'.
 move Hroc' before Hroc.
-apply (rngl_order_compatibility_comm Hop Hor) in Hroc'.
+apply (rngl_order_compatibility_comm Hor) in Hroc'.
 revert a b j Hab Hi Hj.
 induction i; intros; cbn; [ apply Nat.le_0_l | ].
 destruct j. {
@@ -1118,7 +1118,7 @@ destruct j. {
   apply H1; clear H1.
   apply (roc_mono_l _ b); [ easy | ].
   apply (roc_mono_r _ 1%L); [ easy | ].
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_of_nat_nonneg Hon Hos Hor).
 }
 apply -> Nat.succ_le_mono.
@@ -1193,7 +1193,7 @@ Theorem between_rngl_of_nat_and_succ2 :
   → i ≤ j.
 Proof.
 intros * Hab Hi Hj.
-now apply (gen_between_rngl_of_nat_and_succ (rngl_lt_le_comp Hos Hor) a b).
+now apply (gen_between_rngl_of_nat_and_succ (rngl_lt_le_comp Hor) a b).
 Qed.
 
 Theorem rngl_of_nat_prop :
@@ -1213,7 +1213,7 @@ Theorem rngl_of_nat_prop2 :
   → m = n.
 Proof.
 intros *.
-now apply (rngl_of_nat_le_or_lt_prop (rngl_lt_le_comp Hos Hor) x).
+now apply (rngl_of_nat_le_or_lt_prop (rngl_lt_le_comp Hor) x).
 Qed.
 
 Theorem rngl_of_pos_prop :
@@ -1233,7 +1233,7 @@ Theorem rngl_of_pos_prop2 :
   → m = n.
 Proof.
 intros *.
-now apply (rngl_of_pos_le_or_lt_prop (rngl_lt_le_comp Hos Hor) x).
+now apply (rngl_of_pos_le_or_lt_prop (rngl_lt_le_comp Hor) x).
 Qed.
 
 (** *** other theorems *)
@@ -1275,11 +1275,59 @@ destruct n as [| p| p]; [ easy | | ]; exfalso. {
 Qed.
 (**)
 
+(*
+Theorem gen_rngl_of_pos_xI_interval {l1 l2} :
+  rngl_order_compatibility l1 l2 →
+  ∀ p a,
+  l1 (rngl_of_pos p~1) a ∧ l2 a (rngl_of_pos (p~1 + 1))
+  → (l1 (rngl_of_pos p) (a / 2) ∧ l2 (a / 2) (rngl_of_pos (p + 1)))%L.
+Proof.
+intros * Hp.
+split. {
+Print rngl_order_compatibility.
+...
+  apply (rngl_le_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  eapply (rngl_le_trans Hor); [ | apply Hp ].
+  rewrite (rngl_mul_2_r Hon).
+  rewrite <- (rngl_mul_2_l Hon).
+  replace 2%L with (rngl_of_pos 2). 2: {
+    rewrite rngl_of_nat_Pos_to_nat.
+    now rewrite <- rngl_of_nat_2.
+  }
+  rewrite <- rngl_of_pos_mul; cbn.
+  apply rngl_of_pos_inj_le.
+  rewrite Pos.xI_succ_xO.
+  rewrite <- Pos.add_1_l.
+  apply Pos_le_add_l.
+}
+apply (rngl_lt_div_l Hon Hop Hiv Hor).
+apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+rewrite rngl_of_pos_add.
+rewrite rngl_of_pos_1.
+rewrite rngl_mul_add_distr_r, (rngl_mul_1_l Hon).
+rewrite <- rngl_of_pos_2 at 1.
+rewrite <- rngl_of_pos_mul.
+rewrite Pos.mul_comm.
+rewrite rngl_add_assoc.
+rewrite <- rngl_of_pos_1.
+rewrite <- rngl_of_pos_add; cbn.
+rewrite <- rngl_of_pos_add.
+easy.
+...
+*)
+
 Theorem rngl_of_pos_xI_interval :
   ∀ p a,
   (rngl_of_pos p~1 ≤ a < rngl_of_pos (p~1 + 1))%L
   → (rngl_of_pos p ≤ a / 2 < rngl_of_pos (p + 1))%L.
 Proof.
+(*
+intros * Hp.
+... ...
+now apply (gen_rngl_of_pos_xI_interval (rngl_le_lt_comp Hor)).
+...
+*)
 intros * Hp.
 split. {
   apply (rngl_le_div_r Hon Hop Hiv Hor).
@@ -1704,7 +1752,7 @@ split; [ easy | ].
 eapply (rngl_lt_le_trans Hor); [ apply Hm | ].
 rewrite rngl_of_Z_add; cbn.
 rewrite rngl_of_pos_1.
-now apply (rngl_add_le_mono_r Hop Hor).
+now apply (rngl_add_le_mono_r Hos Hor).
 Qed.
 
 Theorem rngl_of_Z_1 : rngl_of_Z 1 = 1%L.
@@ -1743,7 +1791,7 @@ rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 eapply (rngl_lt_le_trans Hor).
 apply Hm.
-apply (rngl_le_add_r Hor).
+apply (rngl_le_add_r Hos Hor).
 now apply (rngl_le_0_sub Hop Hor).
 Qed.
 
@@ -2111,13 +2159,44 @@ Proof.
 intros.
 destruct (Req_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
   rewrite Hx at 1.
-...
-  now rewrite <- opp_IZR, Int_part_IZR, Z.sub_0_r.
+  now rewrite <- rngl_of_Z_opp, Int_part_IZR, Z.sub_0_r.
 }
 apply Int_part_interv.
-rewrite Z.sub_simpl_r, opp_IZR.
+rewrite Z.sub_simpl_r, rngl_of_Z_opp.
 unfold Z.sub; rewrite <- Z.opp_add_distr.
-rewrite opp_IZR, plus_IZR; simpl (IZR 1).
+rewrite rngl_of_Z_opp, rngl_of_Z_add, rngl_of_Z_1.
+enough (H : (rngl_of_Z (Int_part x) < x ≤ rngl_of_Z (Int_part x) + 1)%L). {
+  split.
+  now apply -> (rngl_opp_le_compat Hop Hor).
+  now apply -> (rngl_opp_lt_compat Hop Hor).
+}
+progress unfold rngl_of_Z.
+remember (Int_part x) as z eqn:Hz.
+symmetry in Hz.
+destruct z as [| p| p]. {
+  rewrite rngl_add_0_l.
+  apply Int_part_small in Hz.
+  cbn in Hx.
+  split; [ | now apply (rngl_lt_le_incl Hor) ].
+  now apply (rngl_le_neq Hor).
+} {
+  rewrite <- rngl_of_pos_1.
+  rewrite <- rngl_of_pos_add.
+  rewrite <- (rngl_mul_div Hi1 x 2). 2: {
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
+  }
+Check rngl_of_pos_xI_interval.
+...
+  apply rngl_of_pos_xI_interval.
+...
+Search (rngl_of_pos _ ≤ _)%L.
+rngl_of_pos_xI_interval:
+  ∀ (p : positive) (a : T),
+    (rngl_of_pos p~1 ≤ a < rngl_of_pos (p~1 + 1))%L → (rngl_of_pos p ≤ a / 2 < rngl_of_pos (p + 1))%L
+...
+base_Int_part
+     : ∀ r : R, (IZR (Int_part r) <= r)%R ∧ (IZR (Int_part r) - r > -1)%R
+...
 specialize (base_Int_part x) as H; lra.
 Qed.
 
