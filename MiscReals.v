@@ -1275,6 +1275,7 @@ destruct n as [| p| p]; [ easy | | ]; exfalso. {
 Qed.
 (**)
 
+(*
 Theorem gen_rngl_of_pos_xI_interval {l1 l2} :
   rngl_order_compatibility l1 l2 →
   ∀ p a,
@@ -1326,9 +1327,7 @@ Theorem rngl_of_pos_xI_interval :
 Proof.
 (*
 intros * Hp.
-... ...
 now apply (gen_rngl_of_pos_xI_interval (rngl_le_lt_comp Hor)).
-...
 *)
 intros * Hp.
 split. {
@@ -1337,10 +1336,7 @@ split. {
   eapply (rngl_le_trans Hor); [ | apply Hp ].
   rewrite (rngl_mul_2_r Hon).
   rewrite <- (rngl_mul_2_l Hon).
-  replace 2%L with (rngl_of_pos 2). 2: {
-    rewrite rngl_of_nat_Pos_to_nat.
-    now rewrite <- rngl_of_nat_2.
-  }
+  rewrite <- rngl_of_pos_2.
   rewrite <- rngl_of_pos_mul; cbn.
   apply rngl_of_pos_inj_le.
   rewrite Pos.xI_succ_xO.
@@ -1348,6 +1344,44 @@ split. {
   apply Pos_le_add_l.
 }
 apply (rngl_lt_div_l Hon Hop Hiv Hor).
+apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+rewrite rngl_of_pos_add.
+rewrite rngl_of_pos_1.
+rewrite rngl_mul_add_distr_r, (rngl_mul_1_l Hon).
+rewrite <- rngl_of_pos_2 at 1.
+rewrite <- rngl_of_pos_mul.
+rewrite Pos.mul_comm.
+rewrite rngl_add_assoc.
+rewrite <- rngl_of_pos_1.
+rewrite <- rngl_of_pos_add; cbn.
+rewrite <- rngl_of_pos_add.
+easy.
+Qed.
+
+Theorem rngl_of_pos_xI_interval2 :
+  ∀ p a,
+  (rngl_of_pos p~1 < a ≤ rngl_of_pos (p~1 + 1))%L
+  → (rngl_of_pos p < a / 2 ≤ rngl_of_pos (p + 1))%L.
+Proof.
+(*
+intros * Hp.
+now apply (gen_rngl_of_pos_xI_interval (rngl_lt_le_comp Hor)).
+*)
+intros * Hp.
+split. {
+  apply (rngl_lt_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+  eapply (rngl_le_lt_trans Hor); [ | apply Hp ].
+  rewrite (rngl_mul_2_r Hon).
+  rewrite <- (rngl_mul_2_l Hon).
+  rewrite <- rngl_of_pos_2.
+  rewrite <- rngl_of_pos_mul; cbn.
+  apply rngl_of_pos_inj_le.
+  rewrite Pos.xI_succ_xO.
+  rewrite <- Pos.add_1_l.
+  apply Pos_le_add_l.
+}
+apply (rngl_le_div_l Hon Hop Hiv Hor).
 apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 rewrite rngl_of_pos_add.
 rewrite rngl_of_pos_1.
@@ -2187,14 +2221,7 @@ destruct z as [| p| p]. {
   rewrite <- (rngl_mul_div Hi1 x 2). 2: {
     apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
   }
-Check rngl_of_pos_xI_interval.
-...
-  apply rngl_of_pos_xI_interval.
-...
-Search (rngl_of_pos _ ≤ _)%L.
-rngl_of_pos_xI_interval:
-  ∀ (p : positive) (a : T),
-    (rngl_of_pos p~1 ≤ a < rngl_of_pos (p~1 + 1))%L → (rngl_of_pos p ≤ a / 2 < rngl_of_pos (p + 1))%L
+  apply rngl_of_pos_xI_interval2.
 ...
 base_Int_part
      : ∀ r : R, (IZR (Int_part r) <= r)%R ∧ (IZR (Int_part r) - r > -1)%R
