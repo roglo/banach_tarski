@@ -2225,6 +2225,52 @@ split. {
 }
 Qed.
 
+Theorem Int_part_opp_rngl_of_pos : ∀ p, Int_part (- rngl_of_pos p) = Z.neg p.
+Proof.
+intros.
+progress unfold Int_part.
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+destruct z as [| q| q]. {
+  exfalso.
+  cbn in Hz.
+  destruct Hz as (Hz, _).
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hz.
+  apply rngl_nlt_ge in Hz.
+  apply Hz; clear Hz.
+  apply rngl_of_pos_pos.
+} {
+  exfalso.
+  cbn in Hz.
+  destruct Hz as (Hz, _).
+  apply rngl_nlt_ge in Hz.
+  apply Hz; clear Hz.
+  apply (rngl_le_lt_trans Hor _ 0); [ | apply rngl_of_pos_pos ].
+  apply (rngl_opp_nonpos_nonneg Hop Hor).
+  apply rngl_of_pos_nonneg.
+} {
+  f_equal.
+  rewrite rngl_of_Z_add in Hz.
+  rewrite rngl_of_Z_1 in Hz.
+  cbn in Hz.
+  destruct Hz as (H1, H2).
+  apply (rngl_opp_le_compat Hop Hor) in H1.
+  rewrite (rngl_add_opp_l Hop) in H2.
+  rewrite <- (rngl_opp_sub_distr Hop) in H2.
+  apply (rngl_opp_lt_compat Hop Hor) in H2.
+  apply (rngl_lt_sub_lt_add_r Hop Hor) in H2.
+  apply (rngl_of_pos_prop2 (rngl_of_pos p + 1)%L). {
+    rewrite rngl_of_pos_add, rngl_of_pos_1.
+    split; [ easy | ].
+    now apply (rngl_add_le_mono_r Hos Hor).
+  }
+  rewrite rngl_of_pos_add, rngl_of_pos_1.
+  split; [ | pauto ].
+  apply (rngl_lt_add_r Hos Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
+}
+Qed.
+
 Theorem Int_part_opp :
   ∀ x,
   x ≠ rngl_of_Z (Int_part x)
@@ -2278,7 +2324,12 @@ destruct z as [| p| p]; cbn. {
   clear Hzp.
   f_equal.
   progress unfold nat_Int_part.
-...
+  now rewrite Int_part_opp_rngl_of_pos.
+} {
+  rewrite (rngl_opp_involutive Hop).
+  now rewrite Int_part_rngl_of_pos.
+}
+Qed.
 
 Theorem Int_part_neg : ∀ x,
   Int_part (- x) =
@@ -2318,7 +2369,8 @@ destruct z as [| p| p]; cbn in Hx. {
   apply (rngl_sub_move_l Hop) in H; subst.
   rename y into x.
   apply (f_equal Z.opp) in Hz; cbn in Hz.
-Search (Int_part (- _))%L.
+  rewrite <- (rngl_opp_add_distr Hop) in Hz.
+  rewrite Int_part_opp in Hz.
 ...
 specialize (base_Int_part x) as H; lra.
 Qed.
