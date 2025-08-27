@@ -2225,6 +2225,61 @@ split. {
 }
 Qed.
 
+Theorem Int_part_opp :
+  ∀ x,
+  x ≠ rngl_of_Z (Int_part x)
+  → Int_part (-x) = (- Int_part x - 1)%Z.
+Proof.
+intros * Hx.
+progress unfold Int_part in Hx.
+progress unfold Int_part.
+remember (z_int_part _) as y eqn:H; clear H.
+destruct y as (y, Hy).
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+apply (Int_part_prop _ (- (z + 1))) in Hy. {
+  subst y; symmetry.
+  rewrite Z.opp_involutive.
+  apply Z.add_simpl_r.
+}
+rewrite (Z.add_comm (- _) 1).
+rewrite Z.add_opp_r.
+rewrite Z.add_comm.
+rewrite Z.sub_add_distr.
+rewrite Z.add_comm.
+rewrite Z.sub_diag.
+rewrite (Z.sub_0_l z).
+do 2 rewrite rngl_of_Z_opp.
+destruct Hz as (H1, H2).
+apply (rngl_opp_le_compat Hop Hor) in H1.
+apply (rngl_opp_lt_compat Hop Hor) in H2.
+rewrite (rngl_opp_involutive Hop) in H1, H2.
+split; [ now apply (rngl_lt_le_incl Hor) | ].
+apply (rngl_le_neq Hor).
+split; [ easy | ].
+intros H; subst x.
+apply (rngl_opp_lt_compat Hop Hor) in H2.
+clear H1 H2.
+apply Int_part_interv in Hy.
+apply Hx; clear Hx.
+subst y; symmetry.
+destruct z as [| p| p]; cbn. {
+  now rewrite (rngl_opp_0 Hop), Int_part_0.
+} {
+  rewrite rngl_of_Z_Int_part.
+  destruct (rngl_le_dec Hor 0 (- _)) as [Hzp| Hzp]. {
+    exfalso.
+    apply (rngl_opp_le_compat Hop Hor) in Hzp.
+    rewrite (rngl_opp_involutive Hop) in Hzp.
+    rewrite (rngl_opp_0 Hop) in Hzp.
+    apply rngl_nlt_ge in Hzp.
+    apply Hzp, rngl_of_pos_pos.
+  }
+  clear Hzp.
+  f_equal.
+  progress unfold nat_Int_part.
+...
+
 Theorem Int_part_neg : ∀ x,
   Int_part (- x) =
     (- Int_part x - if Req_dec x (rngl_of_Z (Int_part x)) then 0 else 1)%Z.
@@ -2264,41 +2319,6 @@ destruct z as [| p| p]; cbn in Hx. {
   rename y into x.
   apply (f_equal Z.opp) in Hz; cbn in Hz.
 Search (Int_part (- _))%L.
-Theorem Int_part_opp :
-  ∀ x,
-  x ≠ rngl_of_Z (Int_part x)
-  → Int_part (-x) = (- Int_part x - 1)%Z.
-Proof.
-intros * Hx.
-progress unfold Int_part in Hx.
-progress unfold Int_part.
-remember (z_int_part _) as y eqn:H; clear H.
-destruct y as (y, Hy).
-remember (z_int_part _) as z eqn:H; clear H.
-destruct z as (z, Hz).
-apply (Int_part_prop _ (- (z + 1))) in Hy. {
-  subst y; symmetry.
-  rewrite Z.opp_involutive.
-  apply Z.add_simpl_r.
-}
-rewrite (Z.add_comm (- _) 1).
-rewrite Z.add_opp_r.
-rewrite Z.add_comm.
-rewrite Z.sub_add_distr.
-rewrite Z.add_comm.
-rewrite Z.sub_diag.
-rewrite (Z.sub_0_l z).
-do 2 rewrite rngl_of_Z_opp.
-destruct Hz as (H1, H2).
-apply (rngl_opp_le_compat Hop Hor) in H1.
-apply (rngl_opp_lt_compat Hop Hor) in H2.
-rewrite (rngl_opp_involutive Hop) in H1, H2.
-split; [ now apply (rngl_lt_le_incl Hor) | ].
-apply (rngl_le_neq Hor).
-split; [ easy | ].
-intros H; subst x.
-apply (rngl_opp_lt_compat Hop Hor) in H2.
-(* bizarre *)
 ...
 specialize (base_Int_part x) as H; lra.
 Qed.
