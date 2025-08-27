@@ -2188,6 +2188,27 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
 }
 Qed.
 
+Theorem base_Int_part :
+  ∀ a, (rngl_of_Z (Int_part a) ≤ a)%L ∧ (-1 < rngl_of_Z (Int_part a) - a)%L.
+Proof.
+intros.
+split. {
+  progress unfold Int_part.
+  remember (z_int_part _) as z eqn:H; clear H.
+  destruct z as (z, Hz).
+  easy.
+} {
+  progress unfold Int_part.
+  remember (z_int_part _) as z eqn:H; clear H.
+  destruct z as (z, Hz).
+  apply (rngl_lt_add_lt_sub_r Hop Hor).
+  rewrite (rngl_add_opp_l Hop).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
+  rewrite <- rngl_of_Z_1.
+  now rewrite <- rngl_of_Z_add.
+}
+Qed.
+
 Theorem Int_part_neg : ∀ x,
   Int_part (- x) =
     (- Int_part x - if Req_dec x (rngl_of_Z (Int_part x)) then 0 else 1)%Z.
@@ -2222,9 +2243,12 @@ destruct z as [| p| p]. {
     apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
   }
   apply rngl_of_pos_xI_interval2.
-...
-base_Int_part
-     : ∀ r : R, (IZR (Int_part r) <= r)%R ∧ (IZR (Int_part r) - r > -1)%R
+  specialize (base_Int_part x) as H.
+  rewrite Hz in H.
+  cbn in H.
+  destruct H as (H1, H2).
+  split. {
+    rewrite rngl_of_pos_xI.
 ...
 specialize (base_Int_part x) as H; lra.
 Qed.
