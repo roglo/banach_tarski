@@ -2249,6 +2249,12 @@ destruct z as [| p| p]. {
   destruct H as (H1, H2).
   split. {
     rewrite rngl_of_pos_xI.
+    apply (rngl_mul_le_mono_pos_l Hop Hor Hii 2) in H1. 2: {
+      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
+    }
+    rewrite (rngl_mul_comm Hic x 2).
+    eapply (rngl_lt_le_trans Hor); [ | apply H1 ].
+(* mes couilles, oui *)
 ...
 specialize (base_Int_part x) as H; lra.
 Qed.
