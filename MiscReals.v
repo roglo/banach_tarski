@@ -1510,6 +1510,25 @@ split; intros Hx. {
 }
 Qed.
 
+Theorem Int_part_pos_interv :
+  ∀ p x, (rngl_of_pos p ≤ x < rngl_of_pos (p + 1))%L ↔ Int_part x = Z.pos p.
+Proof.
+intros.
+progress unfold Int_part.
+remember (z_int_part x) as m eqn:Hm.
+symmetry in Hm.
+destruct m as (n, Hn); clear Hm.
+destruct n as [| q| q]. {
+  split; intros Hx; [ | easy ].
+  now symmetry; apply (Int_part_prop x).
+} {
+  split; intros Hx; [ now apply (Int_part_prop x) | ].
+  now injection Hx; clear Hx; intros; subst.
+} {
+  split; intros Hx; [ now apply (Int_part_prop x) | easy ].
+}
+Qed.
+
 Theorem Int_part_interv :
   ∀ z x, (rngl_of_Z z ≤ x < rngl_of_Z (z + 1))%L ↔ Int_part x = z.
 Proof.
@@ -1518,11 +1537,8 @@ progress unfold Int_part.
 remember (z_int_part x) as m eqn:Hm.
 symmetry in Hm.
 destruct m as (n, Hn); clear Hm.
-split; intros Hx. {
-  now apply (Int_part_prop x).
-} {
-  now subst; cbn in Hn.
-}
+split; intros Hx; [ now apply (Int_part_prop x) | ].
+now subst; cbn in Hn.
 Qed.
 
 Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
@@ -2230,31 +2246,59 @@ enough (H : (rngl_of_Z (Int_part x) < x ≤ rngl_of_Z (Int_part x) + 1)%L). {
 progress unfold rngl_of_Z.
 remember (Int_part x) as z eqn:Hz.
 symmetry in Hz.
-destruct z as [| p| p]. {
+destruct z as [| p| p]; cbn in Hx. {
   rewrite rngl_add_0_l.
   apply Int_part_small in Hz.
-  cbn in Hx.
   split; [ | now apply (rngl_lt_le_incl Hor) ].
   now apply (rngl_le_neq Hor).
 } {
   rewrite <- rngl_of_pos_1.
   rewrite <- rngl_of_pos_add.
-  rewrite <- (rngl_mul_div Hi1 x 2). 2: {
-    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
-  }
-  apply rngl_of_pos_xI_interval2.
-  specialize (base_Int_part x) as H.
-  rewrite Hz in H.
-  cbn in H.
-  destruct H as (H1, H2).
-  split. {
-    rewrite rngl_of_pos_xI.
-    apply (rngl_mul_le_mono_pos_l Hop Hor Hii 2) in H1. 2: {
-      apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
-    }
-    rewrite (rngl_mul_comm Hic x 2).
-    eapply (rngl_lt_le_trans Hor); [ | apply H1 ].
-(* mes couilles, oui *)
+  apply Int_part_pos_interv in Hz.
+  split; [ | now apply (rngl_lt_le_incl Hor) ].
+  now apply (rngl_le_neq Hor).
+} {
+  remember (-1 - x)%L as y eqn:H.
+  symmetry in H.
+  apply (rngl_sub_move_l Hop) in H; subst.
+  rename y into x.
+  apply (f_equal Z.opp) in Hz; cbn in Hz.
+Search (Int_part (- _))%L.
+Theorem Int_part_opp :
+  ∀ x,
+  x ≠ rngl_of_Z (Int_part x)
+  → Int_part (-x) = (- Int_part x - 1)%Z.
+Proof.
+intros * Hx.
+progress unfold Int_part in Hx.
+progress unfold Int_part.
+remember (z_int_part _) as y eqn:H; clear H.
+destruct y as (y, Hy).
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+apply (Int_part_prop _ (- (z + 1))) in Hy. {
+  subst y; symmetry.
+  rewrite Z.opp_involutive.
+  apply Z.add_simpl_r.
+}
+rewrite (Z.add_comm (- _) 1).
+rewrite Z.add_opp_r.
+rewrite Z.add_comm.
+rewrite Z.sub_add_distr.
+rewrite Z.add_comm.
+rewrite Z.sub_diag.
+rewrite (Z.sub_0_l z).
+do 2 rewrite rngl_of_Z_opp.
+destruct Hz as (H1, H2).
+apply (rngl_opp_le_compat Hop Hor) in H1.
+apply (rngl_opp_lt_compat Hop Hor) in H2.
+rewrite (rngl_opp_involutive Hop) in H1, H2.
+split; [ now apply (rngl_lt_le_incl Hor) | ].
+apply (rngl_le_neq Hor).
+split; [ easy | ].
+intros H; subst x.
+apply (rngl_opp_lt_compat Hop Hor) in H2.
+(* bizarre *)
 ...
 specialize (base_Int_part x) as H; lra.
 Qed.
