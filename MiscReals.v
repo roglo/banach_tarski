@@ -1275,7 +1275,6 @@ destruct n as [| p| p]; [ easy | | ]; exfalso. {
 Qed.
 (**)
 
-(*
 Theorem gen_rngl_of_pos_xI_interval {l1 l2} :
   rngl_order_compatibility l1 l2 →
   ∀ p a,
@@ -1284,6 +1283,9 @@ Theorem gen_rngl_of_pos_xI_interval {l1 l2} :
 Proof.
 intros * Hp.
 split. {
+...
+Check rngl_le_div_r.
+About rngl_lt_div_r.
 Print rngl_order_compatibility.
 ...
   apply (rngl_le_div_r Hon Hop Hiv Hor).
