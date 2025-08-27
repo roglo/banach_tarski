@@ -2364,13 +2364,37 @@ destruct z as [| p| p]; cbn in Hx. {
   split; [ | now apply (rngl_lt_le_incl Hor) ].
   now apply (rngl_le_neq Hor).
 } {
+(**)
+  remember (- x)%L as y eqn:H.
+  apply (f_equal rngl_opp) in H.
+  rewrite (rngl_opp_involutive Hop) in H; subst x.
+  rewrite Int_part_opp in Hz. 2: {
+    intros H; apply Hx; clear Hx.
+    rewrite H.
+    progress f_equal.
+...
+    rewrite rngl_of_Z_Int_part.
+...
   remember (-1 - x)%L as y eqn:H.
   symmetry in H.
   apply (rngl_sub_move_l Hop) in H; subst.
   rename y into x.
   apply (f_equal Z.opp) in Hz; cbn in Hz.
   rewrite <- (rngl_opp_add_distr Hop) in Hz.
-  rewrite Int_part_opp in Hz.
+  rewrite Int_part_opp in Hz. 2: {
+    intros H.
+    rewrite <- (rngl_opp_add_distr Hop) in Hx.
+    rewrite H in Hx.
+    apply Hx; clear Hx.
+    progress f_equal.
+    apply (f_equal Z.opp) in Hz.
+    rewrite Z.opp_involutive in Hz.
+    cbn in Hz.
+    rewrite Int_part_opp in Hz. {
+Search (Int_part (_ + _)).
+...
+      rewrite Int_part_add in Hz.
+Search (rngl_of_Z (Int_part _)).
 ...
 specialize (base_Int_part x) as H; lra.
 Qed.
