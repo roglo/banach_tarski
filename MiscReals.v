@@ -2368,10 +2368,12 @@ apply -> (rngl_opp_lt_compat Hop Hor).
 now apply (rngl_le_neq Hor).
 Qed.
 
-...
-
-Theorem Rediv_add_1 : ∀ x y, y ≠ 0 → (x + y) // y = (x // y + 1)%Z.
+Theorem Rediv_add_1 : ∀ x y, y ≠ 0%L → (x + y)%L // y = (x // y + 1)%Z.
 Proof.
+intros * Hyz.
+unfold Rediv, Rediv_mod, fst.
+destruct (Rlt_dec y 0) as [Hy| Hy]. {
+...
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
 destruct (Rcase_abs y) as [Hy| Hy]. {
