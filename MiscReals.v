@@ -2271,7 +2271,7 @@ destruct z as [| q| q]. {
 }
 Qed.
 
-Theorem Int_part_opp :
+Theorem Int_part_opp_of_not_Int :
   ∀ x,
   x ≠ rngl_of_Z (Int_part x)
   → Int_part (-x) = (- Int_part x - 1)%Z.
@@ -2331,7 +2331,7 @@ destruct z as [| p| p]; cbn. {
 }
 Qed.
 
-Theorem Int_part_neg : ∀ x,
+Theorem Int_part_opp : ∀ x,
   Int_part (- x) =
     (- Int_part x - if Req_dec x (rngl_of_Z (Int_part x)) then 0 else 1)%Z.
 Proof.
@@ -2368,10 +2368,31 @@ destruct z as [| p| p]; cbn in Hx. {
   remember (- x)%L as y eqn:H.
   apply (f_equal rngl_opp) in H.
   rewrite (rngl_opp_involutive Hop) in H; subst x.
-  rewrite Int_part_opp in Hz. 2: {
+  rewrite Int_part_opp_of_not_Int in Hz. 2: {
     intros H; apply Hx; clear Hx.
-    rewrite H.
     progress f_equal.
+    rewrite H.
+    progress unfold rngl_of_Z.
+    remember (Int_part y) as u eqn:Hu.
+    symmetry in Hu.
+    destruct u as [| q| q]. {
+      cbn in H; subst y.
+      (* lemma *)
+      progress unfold Int_part in Hz.
+      remember (z_int_part (- 0)) as v eqn:H; clear H.
+      destruct v as (v, Hv).
+      subst v.
+      rewrite rngl_of_Z_add, rngl_of_Z_1 in Hv.
+      cbn in Hv.
+      destruct Hv as (_, Hv).
+      rewrite (rngl_opp_0 Hop) in Hv.
+      apply rngl_nle_gt in Hv.
+      exfalso; apply Hv; clear Hv.
+      rewrite (rngl_add_opp_l Hop).
+      apply (rngl_le_sub_0 Hop Hor).
+      apply rngl_of_pos_le_1_l.
+    } {
+      f_equal.
 ...
     rewrite rngl_of_Z_Int_part.
 ...
