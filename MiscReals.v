@@ -3,6 +3,7 @@
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 List Relations Wf_nat.
 From Stdlib Require Import ZArith.
+From Stdlib Require Import Ring.
 Import ListNotations.
 
 Require Import Misc Words Normalize Reverse.
@@ -36,6 +37,8 @@ Definition Hio := rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor.
 
 Tactic Notation "pauto" := progress auto.
 Hint Resolve rngl_le_refl : core.
+
+Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%L.
 Proof. apply (rngl_add_opp_r Hop). Qed.
@@ -1731,6 +1734,12 @@ now destruct b as (b, Hb).
 Qed.
 *)
 
+Theorem rngl_of_Z_1 : rngl_of_Z 1 = 1%L.
+Proof.
+progress unfold rngl_of_Z; cbn.
+apply rngl_of_pos_1.
+Qed.
+
 Theorem Int_part_0 : Int_part 0 = 0%Z.
 Proof.
 rewrite (proj1 (Int_part_small _)); [ easy | ].
@@ -1743,6 +1752,15 @@ Proof.
 progress unfold frac_part.
 rewrite Int_part_0; cbn.
 apply (rngl_sub_diag Hos).
+Qed.
+
+Theorem Int_part_1 : Int_part 1 = 1%Z.
+Proof.
+apply Int_part_interv.
+rewrite rngl_of_Z_add, rngl_of_Z_1.
+split; [ pauto | ].
+apply (rngl_lt_add_l Hos Hor).
+apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 Qed.
 
 (*
@@ -1805,12 +1823,6 @@ eapply (rngl_lt_le_trans Hor); [ apply Hm | ].
 rewrite rngl_of_Z_add; cbn.
 rewrite rngl_of_pos_1.
 now apply (rngl_add_le_mono_r Hos Hor).
-Qed.
-
-Theorem rngl_of_Z_1 : rngl_of_Z 1 = 1%L.
-Proof.
-progress unfold rngl_of_Z; cbn.
-apply rngl_of_pos_1.
 Qed.
 
 Theorem rngl_sub_Int_part : ∀ a b,
@@ -2340,6 +2352,51 @@ destruct (Req_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
   rewrite Hx at 1.
   now rewrite <- rngl_of_Z_opp, Int_part_IZR, Z.sub_0_r.
 }
+specialize (base_Int_part x) as (H1, H3).
+specialize (base_Int_part (-x))%L as (H2, H4).
+move H2 before H1.
+rewrite (rngl_sub_opp_r Hop) in H4.
+apply (rngl_of_Z_inj).
+rewrite rngl_of_Z_sub, rngl_of_Z_1.
+rewrite rngl_of_Z_opp.
+remember (rngl_of_Z (Int_part x)) as a.
+remember (rngl_of_Z (Int_part (-x))) as b.
+move b before a; move Heqb before Heqa.
+apply (rngl_lt_add_lt_sub_r Hop Hor) in H3.
+rewrite (rngl_add_opp_l Hop) in H3.
+apply (rngl_lt_sub_lt_add_r Hop Hor) in H3.
+apply (rngl_opp_inj Hop).
+rewrite (rngl_opp_sub_distr Hop).
+rewrite (rngl_sub_opp_r Hop), rngl_add_comm.
+apply (rngl_le_antisymm Hor). {
+  eapply (rngl_le_trans Hor); [ | apply (rngl_lt_le_incl Hor), H3 ].
+  apply (rngl_opp_le_compat Hop Hor).
+  rewrite (rngl_opp_involutive Hop).
+...
+progress unfold Int_part in Hx.
+progress unfold Int_part.
+remember (z_int_part x) as a eqn:H; clear H.
+destruct a as (a, Ha).
+remember (z_int_part (-x)) as b eqn:H; clear H.
+destruct b as (b, Hb).
+Search (rngl_of_Z _ < _ ≤ _)%L.
+Search (rngl_of_Z _ ≤ _ < _)%L.
+Search (rngl_of_Z _ < _ < _)%L.
+...
+remember (Int_part x) as a eqn:Ha.
+symmetry in Ha.
+destruct a as [| p| p]. {
+  cbn in Hx |-*.
+  apply Int_part_small in Ha; cbn.
+  rewrite <- Pos2Z.opp_pos.
+  apply Z.add_move_0_r.
+  rewrite <- Int_part_1.
+...
+intros.
+destruct (Req_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
+  rewrite Hx at 1.
+  now rewrite <- rngl_of_Z_opp, Int_part_IZR, Z.sub_0_r.
+}
 apply Int_part_interv.
 rewrite Z.sub_simpl_r, rngl_of_Z_opp.
 unfold Z.sub; rewrite <- Z.opp_add_distr.
@@ -2393,6 +2450,12 @@ destruct z as [| p| p]; cbn in Hx. {
       apply rngl_of_pos_le_1_l.
     } {
       f_equal.
+...
+    }
+...
+  }
+...
+}
 ...
     rewrite rngl_of_Z_Int_part.
 ...
