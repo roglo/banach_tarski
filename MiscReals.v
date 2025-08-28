@@ -2356,132 +2356,19 @@ specialize (base_Int_part x) as (H1, H3).
 specialize (base_Int_part (-x))%L as (H2, H4).
 move H2 before H1.
 rewrite (rngl_sub_opp_r Hop) in H4.
-apply (rngl_of_Z_inj).
+apply Int_part_interv.
+rewrite Z.sub_add.
 rewrite rngl_of_Z_sub, rngl_of_Z_1.
 rewrite rngl_of_Z_opp.
-remember (rngl_of_Z (Int_part x)) as a.
-remember (rngl_of_Z (Int_part (-x))) as b.
-move b before a; move Heqb before Heqa.
-apply (rngl_lt_add_lt_sub_r Hop Hor) in H3.
-rewrite (rngl_add_opp_l Hop) in H3.
-apply (rngl_lt_sub_lt_add_r Hop Hor) in H3.
-apply (rngl_opp_inj Hop).
-rewrite (rngl_opp_sub_distr Hop).
-rewrite (rngl_sub_opp_r Hop), rngl_add_comm.
-apply (rngl_le_antisymm Hor). {
-  eapply (rngl_le_trans Hor); [ | apply (rngl_lt_le_incl Hor), H3 ].
-  apply (rngl_opp_le_compat Hop Hor).
-  rewrite (rngl_opp_involutive Hop).
-...
-progress unfold Int_part in Hx.
-progress unfold Int_part.
-remember (z_int_part x) as a eqn:H; clear H.
-destruct a as (a, Ha).
-remember (z_int_part (-x)) as b eqn:H; clear H.
-destruct b as (b, Hb).
-Search (rngl_of_Z _ < _ ≤ _)%L.
-Search (rngl_of_Z _ ≤ _ < _)%L.
-Search (rngl_of_Z _ < _ < _)%L.
-...
-remember (Int_part x) as a eqn:Ha.
-symmetry in Ha.
-destruct a as [| p| p]. {
-  cbn in Hx |-*.
-  apply Int_part_small in Ha; cbn.
-  rewrite <- Pos2Z.opp_pos.
-  apply Z.add_move_0_r.
-  rewrite <- Int_part_1.
-...
-intros.
-destruct (Req_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
-  rewrite Hx at 1.
-  now rewrite <- rngl_of_Z_opp, Int_part_IZR, Z.sub_0_r.
-}
-apply Int_part_interv.
-rewrite Z.sub_simpl_r, rngl_of_Z_opp.
-unfold Z.sub; rewrite <- Z.opp_add_distr.
-rewrite rngl_of_Z_opp, rngl_of_Z_add, rngl_of_Z_1.
-enough (H : (rngl_of_Z (Int_part x) < x ≤ rngl_of_Z (Int_part x) + 1)%L). {
-  split.
-  now apply -> (rngl_opp_le_compat Hop Hor).
-  now apply -> (rngl_opp_lt_compat Hop Hor).
-}
-progress unfold rngl_of_Z.
-remember (Int_part x) as z eqn:Hz.
-symmetry in Hz.
-destruct z as [| p| p]; cbn in Hx. {
-  rewrite rngl_add_0_l.
-  apply Int_part_small in Hz.
-  split; [ | now apply (rngl_lt_le_incl Hor) ].
-  now apply (rngl_le_neq Hor).
-} {
-  rewrite <- rngl_of_pos_1.
-  rewrite <- rngl_of_pos_add.
-  apply Int_part_pos_interv in Hz.
-  split; [ | now apply (rngl_lt_le_incl Hor) ].
-  now apply (rngl_le_neq Hor).
-} {
-(**)
-  remember (- x)%L as y eqn:H.
-  apply (f_equal rngl_opp) in H.
-  rewrite (rngl_opp_involutive Hop) in H; subst x.
-  rewrite Int_part_opp_of_not_Int in Hz. 2: {
-    intros H; apply Hx; clear Hx.
-    progress f_equal.
-    rewrite H.
-    progress unfold rngl_of_Z.
-    remember (Int_part y) as u eqn:Hu.
-    symmetry in Hu.
-    destruct u as [| q| q]. {
-      cbn in H; subst y.
-      (* lemma *)
-      progress unfold Int_part in Hz.
-      remember (z_int_part (- 0)) as v eqn:H; clear H.
-      destruct v as (v, Hv).
-      subst v.
-      rewrite rngl_of_Z_add, rngl_of_Z_1 in Hv.
-      cbn in Hv.
-      destruct Hv as (_, Hv).
-      rewrite (rngl_opp_0 Hop) in Hv.
-      apply rngl_nle_gt in Hv.
-      exfalso; apply Hv; clear Hv.
-      rewrite (rngl_add_opp_l Hop).
-      apply (rngl_le_sub_0 Hop Hor).
-      apply rngl_of_pos_le_1_l.
-    } {
-      f_equal.
-...
-    }
-...
-  }
-...
-}
-...
-    rewrite rngl_of_Z_Int_part.
-...
-  remember (-1 - x)%L as y eqn:H.
-  symmetry in H.
-  apply (rngl_sub_move_l Hop) in H; subst.
-  rename y into x.
-  apply (f_equal Z.opp) in Hz; cbn in Hz.
-  rewrite <- (rngl_opp_add_distr Hop) in Hz.
-  rewrite Int_part_opp in Hz. 2: {
-    intros H.
-    rewrite <- (rngl_opp_add_distr Hop) in Hx.
-    rewrite H in Hx.
-    apply Hx; clear Hx.
-    progress f_equal.
-    apply (f_equal Z.opp) in Hz.
-    rewrite Z.opp_involutive in Hz.
-    cbn in Hz.
-    rewrite Int_part_opp in Hz. {
-Search (Int_part (_ + _)).
-...
-      rewrite Int_part_add in Hz.
-Search (rngl_of_Z (Int_part _)).
-...
-specialize (base_Int_part x) as H; lra.
+rewrite <- (rngl_add_opp_r Hop) in H3.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in H3.
+rewrite (rngl_opp_sub_swap Hop) in H3.
+split; [ now apply (rngl_lt_le_incl Hor) | ].
+apply -> (rngl_opp_lt_compat Hop Hor).
+now apply (rngl_le_neq Hor).
 Qed.
+
+...
 
 Theorem Rediv_add_1 : ∀ x y, y ≠ 0 → (x + y) // y = (x // y + 1)%Z.
 Proof.
