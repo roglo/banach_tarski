@@ -1063,17 +1063,16 @@ destruct HN as (HN, H).
 apply (eq_rngl_squ_0 Hos Hio) in H; subst.
 apply (rngl_eq_add_0 Hos Hor) in HN; cycle 1. {
   apply (rngl_le_0_add Hos Hor).
-...
-  apply (rngl_squ_nonneg Hos Hor).
-  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 } {
-  apply (rngl_squ_nonneg Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
 destruct HN as (HN, H).
 apply (eq_rngl_squ_0 Hos Hio) in H; subst.
-apply (rngl_eq_add_0 Hor) in HN; cycle 1.
-apply (rngl_squ_nonneg Hos Hor).
-apply (rngl_squ_nonneg Hos Hor).
+apply (rngl_eq_add_0 Hos Hor) in HN; cycle 1.
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 destruct HN as (HN, H).
 apply (eq_rngl_squ_0 Hos Hio) in H; subst.
 apply (eq_rngl_squ_0 Hos Hio) in HN; subst.
