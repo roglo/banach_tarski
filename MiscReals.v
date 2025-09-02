@@ -119,9 +119,17 @@ Definition Rle_dec := rngl_le_dec Hor.
 Definition Rlt_dec := rngl_lt_dec Hor.
 Definition Req_dec := rngl_eq_dec Heo.
 
+Theorem Rcase_abs : ∀ a, {(a < 0)%L} + {(0 ≤ a)%L}.
+Proof.
+intros.
+destruct (rngl_lt_dec Hor a 0) as [Haz| Haz]; [ now left | right ].
+now apply (rngl_nlt_ge_iff Hor).
+Qed.
+
 Arguments Rle_dec (a b)%_L.
 Arguments Rlt_dec (a b)%_L.
 Arguments Req_dec (a b)%_L.
+Arguments Rcase_abs a%_L.
 
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 ≤ b)%L →
   (a * √ b * c * d * √ b = a * b * c * d)%L.
@@ -2442,8 +2450,8 @@ Theorem Rediv_opp_r : ∀ x y, y ≠ 0%L → x // - y = (- (x // y))%Z.
 Proof.
 intros * Hyz.
 unfold "//", fst, Rediv_mod.
-...
 destruct (Rcase_abs (- y)) as [Hy| Hy]. {
+...
   destruct (Rcase_abs y); [ lra | now rewrite Ropp_involutive ].
 } {
   destruct (Rcase_abs y); [ now rewrite Z.opp_involutive | lra ].
