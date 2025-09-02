@@ -2368,11 +2368,35 @@ apply -> (rngl_opp_lt_compat Hop Hor).
 now apply (rngl_le_neq Hor).
 Qed.
 
+Theorem Int_part_add :
+  ∀ a b n,
+  b = rngl_of_Z n
+  → Int_part (a + b) = (Int_part a + n)%Z.
+Proof.
+intros * Hbn.
+progress unfold Int_part.
+remember (z_int_part _) as y eqn:H; clear H.
+destruct y as (y, Hy).
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+move y before n; move z before y.
+...
+
 Theorem Rediv_add_1 : ∀ x y, y ≠ 0%L → (x + y)%L // y = (x // y + 1)%Z.
 Proof.
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
 destruct (Rlt_dec y 0) as [Hy| Hy]. {
+  do 2 rewrite (Ropp_div_r _ _ Hyz).
+  rewrite (rngl_div_add_distr_r Hiv).
+  rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+  rewrite Int_part_opp_of_not_Int.
+  rewrite Int_part_opp_of_not_Int.
+  do 2 rewrite Z.opp_sub_distr.
+  do 2 rewrite Z.opp_involutive.
+  progress f_equal.
+  apply Int_part_add.
+  symmetry; apply rngl_of_Z_1.
 ...
 Search (_ * _ = 0)%L.
 Check rngl_0_le_1.
