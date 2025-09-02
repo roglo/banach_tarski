@@ -2380,9 +2380,19 @@ destruct y as (y, Hy).
 remember (z_int_part _) as z eqn:H; clear H.
 destruct z as (z, Hz).
 move y before n; move z before y.
-...
+apply (Int_part_prop (a + b))%L; [ easy | ].
+rewrite Z.add_shuffle0.
+do 2 rewrite rngl_of_Z_add.
+rewrite <- Hbn.
+split.
+now apply (rngl_add_le_mono_r Hos Hor).
+now apply (rngl_add_lt_mono_r Hos Hor).
+Qed.
 
-Theorem Rediv_add_1 : ∀ x y, y ≠ 0%L → (x + y)%L // y = (x // y + 1)%Z.
+Theorem Rediv_add_1 :
+  ∀ x y,
+  y ≠ 0%L
+  → (x + y)%L // y = if (0 <? x * y)%L then (x // y + 1)%Z else (x // y)%Z.
 Proof.
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
@@ -2390,11 +2400,27 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
   do 2 rewrite (Ropp_div_r _ _ Hyz).
   rewrite (rngl_div_add_distr_r Hiv).
   rewrite (rngl_div_diag Hon Hiq); [ | easy ].
-  rewrite Int_part_opp_of_not_Int.
-  rewrite Int_part_opp_of_not_Int.
-  do 2 rewrite Z.opp_sub_distr.
-  do 2 rewrite Z.opp_involutive.
-  progress f_equal.
+  remember (0 <? x * y)%L as zxy eqn:Hzxy.
+  symmetry in Hzxy.
+  destruct zxy. {
+    apply rngl_ltb_lt in Hzxy.
+    assert (Hxz : (x < 0)%L). {
+      (* lemma *)
+      rewrite <- (rngl_mul_opp_opp Hop) in Hzxy.
+      apply (rngl_mul_pos_cancel_r Hon Hop Hiq Hor) in Hzxy.
+      now apply (rngl_opp_pos_neg Hop Hor).
+      now apply (rngl_opp_pos_neg Hop Hor).
+    }
+    clear Hzxy.
+    rewrite Int_part_opp_of_not_Int. 2: {
+      symmetry.
+      rewrite rngl_of_Z_Int_part.
+      destruct (rngl_le_dec Hor 0 (x / y + 1)) as [Hzxy| Hzxy]. {
+... ...
+    rewrite Int_part_opp_of_not_Int.
+    do 2 rewrite Z.opp_sub_distr.
+    do 2 rewrite Z.opp_involutive.
+    progress f_equal.
   apply Int_part_add.
   symmetry; apply rngl_of_Z_1.
 ...
