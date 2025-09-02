@@ -1314,12 +1314,6 @@ Theorem quat_opt_mul_div :
   else not_applicable.
 Proof. now rewrite rngl_has_quot_quaternion. Qed.
 
-Theorem quat_opt_mul_quot_r :
-  if (rngl_has_quot (quaternion T) && negb false)%bool then
-    ∀ a b : quaternion T, b ≠ 0%L → (b * a / b)%L = a
-  else not_applicable.
-Proof. now rewrite rngl_has_quot_quaternion. Qed.
-
 Theorem quat_sub_diag : ∀ a, (a - a = 0)%quat.
 Proof.
 intros.
@@ -1547,7 +1541,6 @@ Instance quat_ring_like_prop : ring_like_prop (quaternion T) :=
      rngl_opt_mul_inv_diag_l := quat_opt_mul_inv_diag_l;
      rngl_opt_mul_inv_diag_r := quat_opt_mul_inv_diag_r;
      rngl_opt_mul_div := quat_opt_mul_div;
-     rngl_opt_mul_quot_r := quat_opt_mul_quot_r;
      rngl_opt_integral := quat_opt_integral;
      rngl_opt_alg_closed := NA;
      rngl_opt_characteristic_prop := quat_opt_characteristic_prop;

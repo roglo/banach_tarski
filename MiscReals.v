@@ -2373,6 +2373,7 @@ Proof.
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
 destruct (Rlt_dec y 0) as [Hy| Hy]. {
+...
 Search (_ * _ = 0)%L.
 Check rngl_0_le_1.
 About rngl_eq_mul_0_r.
