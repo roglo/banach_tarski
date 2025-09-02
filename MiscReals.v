@@ -768,6 +768,7 @@ Compute (rngl_of_Z 239 * rngl_of_Z 4649)%L.
 *)
 
 Definition INR := rngl_of_nat.
+Definition IZR := rngl_of_Z.
 
 Theorem rngl_of_pos_pos : ∀ a, (0 < rngl_of_pos a)%L.
 Proof.
@@ -1560,7 +1561,7 @@ rewrite (proj1 (Int_part_small _)); [ | easy ].
 apply (rngl_sub_0_r Hos).
 Qed.
 
-Theorem pow_INR : ∀ n k, rngl_of_nat (n ^ k) = (rngl_of_nat n ^ k)%L.
+Theorem pow_INR : ∀ n k, INR (n ^ k) = (INR n ^ k)%L.
 Proof.
 intros.
 induction k; [ cbn; apply rngl_add_0_r | ].
@@ -1584,7 +1585,7 @@ apply (rngl_lt_add_r Hos Hor).
 apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 Qed.
 
-Theorem frac_part_INR : ∀ n, frac_part (rngl_of_nat n) = 0%L.
+Theorem frac_part_INR : ∀ n, frac_part (INR n) = 0%L.
 Proof.
 intros.
 unfold frac_part.
@@ -1884,7 +1885,7 @@ rewrite Int_part_rngl_of_pos.
 apply (rngl_sub_diag Hos).
 Qed.
 
-Theorem Int_part_IZR : ∀ z, Int_part (rngl_of_Z z) = z.
+Theorem Int_part_IZR : ∀ z, Int_part (IZR z) = z.
 Proof.
 intros.
 destruct (Z_le_dec 0 z) as [Hz| Hz]. {
@@ -1896,6 +1897,7 @@ destruct (Z_le_dec 0 z) as [Hz| Hz]. {
 apply Z.nle_gt in Hz.
 destruct z as [| p| p]; [ easy | easy | ].
 clear Hz.
+progress unfold IZR.
 progress unfold rngl_of_Z.
 rewrite <- (rngl_sub_0_l Hop).
 rewrite rngl_sub_Int_part. 2: {
@@ -1907,7 +1909,7 @@ rewrite Int_part_0.
 now rewrite Int_part_rngl_of_pos.
 Qed.
 
-Theorem frac_part_IZR : ∀ z, frac_part (rngl_of_Z z) = 0%L.
+Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0%L.
 Proof.
 intros.
 unfold frac_part.
