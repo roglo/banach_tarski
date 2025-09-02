@@ -27,13 +27,13 @@ Context {Hor : rngl_is_ordered T = true}.
 Context {Hch : rngl_characteristic T = 0}.
 Context {Har : rngl_is_archimedean T = true}.
 
-Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
+Definition Hos := rngl_has_opp_has_opp_or_psub Hop.
 Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
-Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
+Definition Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Definition Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
-Definition Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv.
+Definition Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
 Definition Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
-Definition Hio := rngl_integral_or_inv_1_quot_eq_dec_order Hon Hiv Hor.
+Definition Hio := rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor.
 
 Tactic Notation "pauto" := progress auto.
 Hint Resolve rngl_le_refl : core.
@@ -2381,8 +2381,8 @@ About rngl_eq_mul_0_r.
 rngl_eq_mul_0_r:
   ∀ {T : Type} {ro : ring_like_op T},
     ring_like_prop T
-    → rngl_has_opp_or_subt T = true
-      → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true
+    → rngl_has_opp_or_psub T = true
+      → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_pdiv T)%bool = true
         → ∀ a b : T, (a * b)%L = 0%L → a ≠ 0%L → b = 0%L
 ...
 Search (_ * _ < _ * _)%L.
@@ -2392,7 +2392,7 @@ rngl_mul_lt_mono_nonneg:
     ring_like_prop T
     → rngl_has_opp T = true
       → rngl_is_ordered T = true
-        → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_quot T)%bool = true
+        → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_pdiv T)%bool = true
           → ∀ a b c d : T, (0 ≤ a < b)%L → (0 ≤ c < d)%L → (a * c < b * d)%L
 rngl_mul_le_compat_nonneg:
   ∀ {T : Type} {ro : ring_like_op T},

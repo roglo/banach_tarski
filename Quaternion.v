@@ -113,7 +113,7 @@ Definition quat_mul (q q' : quaternion T) :=
   quat_re_im_mul (q_re q) (q_im q) (q_re q') (q_im q').
 
 Definition quat_opp a := mk_quat (- q_re a) (- q_im a).
-Definition quat_subt a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
+Definition quat_psub a b := mk_quat (q_re a - q_re b) (q_im a - q_im b).
 Definition quat_sub a b := quat_add a (quat_opp b).
 
 Definition quat_conj a := mk_quat (q_re a) (- q_im a).
@@ -146,18 +146,18 @@ Definition quat_opt_one :=
   | None => None
   end.
 
-Definition quat_opt_opp_or_subt :=
-  match rngl_opt_opp_or_subt T with
+Definition quat_opt_opp_or_psub :=
+  match rngl_opt_opp_or_psub T with
   | Some (inl _) => Some (inl quat_opp)
-  | Some (inr _) => Some (inr quat_subt)
+  | Some (inr _) => Some (inr quat_psub)
   | None => None
   end.
 
-Definition quat_opt_inv_or_quot :
+Definition quat_opt_inv_or_pdiv :
   option
     ((quaternion T → quaternion T) +
      (quaternion T → quaternion T → quaternion T)) :=
-  match rngl_opt_inv_or_quot T with
+  match rngl_opt_inv_or_pdiv T with
   | Some (inl _) => Some (inl quat_inv)
   | Some (inr _) => None
   | None => None
@@ -194,8 +194,8 @@ Instance quat_ring_like_op : ring_like_op (quaternion T) :=
      rngl_add := quat_add;
      rngl_mul := quat_mul;
      rngl_opt_one := quat_opt_one;
-     rngl_opt_opp_or_subt := quat_opt_opp_or_subt;
-     rngl_opt_inv_or_quot := quat_opt_inv_or_quot;
+     rngl_opt_opp_or_psub := quat_opt_opp_or_psub;
+     rngl_opt_inv_or_pdiv := quat_opt_inv_or_pdiv;
      rngl_opt_is_zero_divisor := None;
      rngl_opt_eq_dec := quat_opt_eq_dec;
      rngl_opt_leb := quat_opt_leb |}.
@@ -246,8 +246,8 @@ Qed.
 Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
-Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
-Definition Hiq := rngl_has_inv_has_inv_or_quot Hiv.
+Definition Hos := rngl_has_opp_has_opp_or_psub Hop.
+Definition Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 
 Theorem vec3_add_opp_diag_l : ∀ a, vec3_add (- a) a = vec3_zero.
 Proof.
@@ -644,9 +644,9 @@ Proof.
 intros.
 progress unfold rngl_has_opp in Hop.
 progress unfold rngl_opp; cbn.
-progress unfold quat_opt_opp_or_subt.
-destruct (rngl_opt_opp_or_subt T) as [opp_subt| ]; [ | easy ].
-now destruct opp_subt.
+progress unfold quat_opt_opp_or_psub.
+destruct (rngl_opt_opp_or_psub T) as [opp_psub| ]; [ | easy ].
+now destruct opp_psub.
 Qed.
 
 Theorem vec3_dot_mul_0_l : ∀ v, vec3_dot_mul 0 v = 0%L.
@@ -740,19 +740,19 @@ Qed.
 Theorem rngl_has_opp_quaternion : rngl_has_opp (quaternion T) = true.
 Proof.
 progress unfold rngl_has_opp in Hop |-*; cbn in Hop |-*.
-progress unfold quat_opt_opp_or_subt.
-remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
+progress unfold quat_opt_opp_or_psub.
+remember (rngl_opt_opp_or_psub T) as osq eqn:Hosq.
 symmetry in Hosq.
 destruct osq as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
 
-Theorem rngl_has_subt_quaternion : rngl_has_subt (quaternion T) = false.
+Theorem rngl_has_psub_quaternion : rngl_has_psub (quaternion T) = false.
 Proof.
 progress unfold rngl_has_opp in Hop; cbn in Hop.
-progress unfold rngl_has_subt; cbn.
-progress unfold quat_opt_opp_or_subt.
-remember (rngl_opt_opp_or_subt T) as osq eqn:Hosq.
+progress unfold rngl_has_psub; cbn.
+progress unfold quat_opt_opp_or_psub.
+remember (rngl_opt_opp_or_psub T) as osq eqn:Hosq.
 symmetry in Hosq.
 destruct osq as [opp| ]; [ | easy ].
 now destruct opp.
@@ -762,28 +762,28 @@ Theorem rngl_has_inv_quaternion : rngl_has_inv (quaternion T) = true.
 Proof.
 progress unfold rngl_has_inv in Hiv; cbn in Hiv.
 progress unfold rngl_has_inv; cbn.
-progress unfold quat_opt_inv_or_quot.
-destruct (rngl_opt_inv_or_quot T) as [inv_quot| ]; [ | easy ].
-now destruct inv_quot.
+progress unfold quat_opt_inv_or_pdiv.
+destruct (rngl_opt_inv_or_pdiv T) as [inv_pdiv| ]; [ | easy ].
+now destruct inv_pdiv.
 Qed.
 
-Theorem rngl_has_quot_quaternion : rngl_has_quot (quaternion T) = false.
+Theorem rngl_has_pdiv_quaternion : rngl_has_pdiv (quaternion T) = false.
 Proof.
 progress unfold rngl_has_inv in Hiv; cbn in Hiv.
-progress unfold rngl_has_quot; cbn.
-progress unfold quat_opt_inv_or_quot.
-destruct (rngl_opt_inv_or_quot T) as [inv_quot| ]; [ | easy ].
-now destruct inv_quot.
+progress unfold rngl_has_pdiv; cbn.
+progress unfold quat_opt_inv_or_pdiv.
+destruct (rngl_opt_inv_or_pdiv T) as [inv_pdiv| ]; [ | easy ].
+now destruct inv_pdiv.
 Qed.
 
-Theorem rngl_opt_inv_or_quot_quaternion :
-  rngl_opt_inv_or_quot (quaternion T) = Some (inl quat_inv).
+Theorem rngl_opt_inv_or_pdiv_quaternion :
+  rngl_opt_inv_or_pdiv (quaternion T) = Some (inl quat_inv).
 Proof.
-progress unfold rngl_opt_inv_or_quot; cbn.
-progress unfold quat_opt_inv_or_quot.
+progress unfold rngl_opt_inv_or_pdiv; cbn.
+progress unfold quat_opt_inv_or_pdiv.
 progress unfold rngl_has_inv in Hiv; cbn in Hiv.
-destruct (rngl_opt_inv_or_quot T) as [inv_quot| ]; [ | easy ].
-now destruct inv_quot.
+destruct (rngl_opt_inv_or_pdiv T) as [inv_pdiv| ]; [ | easy ].
+now destruct inv_pdiv.
 Qed.
 
 Theorem quat_opt_mul_1_l :
@@ -996,9 +996,9 @@ apply quat_add_opp_diag_l.
 Qed.
 
 Theorem quat_opt_add_sub :
-  if rngl_has_subt (quaternion T) then ∀ a b : quaternion T, (a + b - b)%L = a
+  if rngl_has_psub (quaternion T) then ∀ a b : quaternion T, (a + b - b)%L = a
   else not_applicable.
-Proof. now rewrite rngl_has_subt_quaternion. Qed.
+Proof. now rewrite rngl_has_psub_quaternion. Qed.
 
 Theorem quat_add_opp_r : ∀ a b, (a + - b = a - b)%quat.
 Proof. easy. Qed.
@@ -1021,15 +1021,15 @@ apply vec3_add_opp_opp.
 Qed.
 
 Theorem quat_opt_sub_add_distr :
-  if rngl_has_subt (quaternion T) then
+  if rngl_has_psub (quaternion T) then
     ∀ a b c : quaternion T, (a - (b + c))%L = (a - b - c)%L
   else not_applicable.
-Proof. now rewrite rngl_has_subt_quaternion. Qed.
+Proof. now rewrite rngl_has_psub_quaternion. Qed.
 
 Theorem quat_opt_sub_0_l :
-  if rngl_has_subt (quaternion T) then ∀ a : quaternion T, (0 - a)%L = 0%L
+  if rngl_has_psub (quaternion T) then ∀ a : quaternion T, (0 - a)%L = 0%L
   else not_applicable.
-Proof. now rewrite rngl_has_subt_quaternion. Qed.
+Proof. now rewrite rngl_has_psub_quaternion. Qed.
 
 Context {Hor : rngl_is_ordered T = true}.
 Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
@@ -1038,9 +1038,9 @@ Theorem eq_quat_norm_squ_0 : ∀ a, quat_norm_squ a = 0%L → a = 0%quat.
 Proof.
 assert (Hio :
   (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_quot T &&
+     rngl_has_inv_and_1_or_pdiv T &&
      rngl_has_eq_dec_or_order T)%bool = true). {
-  specialize (rngl_has_inv_and_1_has_inv_and_1_or_quot Hon Hiv) as Hi1.
+  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
   apply Bool.orb_true_iff; right.
   rewrite Hi1; cbn.
   now apply rngl_has_eq_dec_or_is_ordered_r.
@@ -1130,7 +1130,7 @@ rewrite rngl_has_inv_quaternion.
 rewrite rngl_has_1_quaternion.
 rewrite rngl_one_quat_one; cbn.
 progress unfold rngl_inv.
-rewrite rngl_opt_inv_or_quot_quaternion.
+rewrite rngl_opt_inv_or_pdiv_quaternion.
 apply quat_mul_inv_diag_l.
 Qed.
 
@@ -1303,16 +1303,16 @@ Proof.
 rewrite rngl_has_inv_quaternion.
 rewrite rngl_has_1_quaternion; cbn.
 progress unfold rngl_inv.
-rewrite rngl_opt_inv_or_quot_quaternion.
+rewrite rngl_opt_inv_or_pdiv_quaternion.
 rewrite rngl_one_quat_one.
 apply quat_mul_inv_diag_r.
 Qed.
 
 Theorem quat_opt_mul_div :
-  if rngl_has_quot (quaternion T) then
+  if rngl_has_pdiv (quaternion T) then
     ∀ a b : quaternion T, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
-Proof. now rewrite rngl_has_quot_quaternion. Qed.
+Proof. now rewrite rngl_has_pdiv_quaternion. Qed.
 
 Theorem quat_sub_diag : ∀ a, (a - a = 0)%quat.
 Proof.
