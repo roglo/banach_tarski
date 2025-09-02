@@ -2395,10 +2395,10 @@ now apply (rngl_add_le_mono_r Hos Hor).
 now apply (rngl_add_lt_mono_r Hos Hor).
 Qed.
 
-Theorem Rediv_add_div_diag_r :
+Theorem Rediv_add_1 :
   ∀ x y,
   y ≠ 0%L
-  → (x + y)%L // y = if (0 <? x * y)%L then (x // y + 1)%Z else (x // y)%Z.
+  → (x + y)%L // y = (x // y + 1)%Z.
 Proof.
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
@@ -2406,27 +2406,33 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
   do 2 rewrite (Ropp_div_r _ _ Hyz).
   rewrite (rngl_div_add_distr_r Hiv).
   rewrite (rngl_div_diag Hon Hiq); [ | easy ].
-  remember (0 <? x * y)%L as zxy eqn:Hzxy.
-  symmetry in Hzxy.
-  destruct zxy. {
-    apply rngl_ltb_lt in Hzxy.
-    assert (Hxz : (x < 0)%L). {
-      (* lemma *)
-      rewrite <- (rngl_mul_opp_opp Hop) in Hzxy.
-      apply (rngl_mul_pos_cancel_r Hon Hop Hiq Hor) in Hzxy.
-      now apply (rngl_opp_pos_neg Hop Hor).
-      now apply (rngl_opp_pos_neg Hop Hor).
-    }
-    clear Hzxy.
-    do 2 rewrite Int_part_opp.
-    rewrite (Int_part_add _ _ 1); [ | symmetry; apply rngl_of_Z_1 ].
-    rewrite rngl_of_Z_add, rngl_of_Z_1.
-    destruct (Req_dec _ _) as [Hxy1| Hxy1]. {
-      apply (rngl_add_cancel_r Hos) in Hxy1.
-      rewrite Z.sub_0_r, Z.opp_involutive.
-      destruct (Req_dec _ _) as [H| ]; [ clear H | easy ].
-      rewrite Z.sub_0_r; f_equal.
-      symmetry; apply Z.opp_involutive.
+  do 2 rewrite Int_part_opp.
+  rewrite (Int_part_add _ _ 1); [ | symmetry; apply rngl_of_Z_1 ].
+  rewrite rngl_of_Z_add, rngl_of_Z_1.
+  destruct (Req_dec _ _) as [Hxy1| Hxy1]. {
+    apply (rngl_add_cancel_r Hos) in Hxy1.
+    rewrite Z.sub_0_r, Z.opp_involutive.
+    destruct (Req_dec _ _) as [H| ]; [ clear H | easy ].
+    rewrite Z.sub_0_r; f_equal.
+    symmetry; apply Z.opp_involutive.
+  }
+  rewrite <- Z.opp_sub_distr.
+  progress f_equal.
+  rewrite Z.opp_add_distr.
+  rewrite Z.add_opp_r.
+  progress f_equal.
+  progress f_equal.
+  symmetry.
+  destruct (Req_dec _ _) as [H| ]; [ | easy ].
+  exfalso.
+  apply Hxy1; clear Hxy1.
+  now f_equal.
+} {
+  apply (rngl_nlt_ge_iff Hor) in Hy.
+...
+  rewrite <- Z.sub_add_distr.
+  progress f_equal.
+...
     }
     destruct (Req_dec _ _) as [Hxy| Hxy]. {
       exfalso; apply Hxy1; clear Hxy1.
