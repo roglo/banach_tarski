@@ -2283,6 +2283,24 @@ destruct z as [| q| q]. {
 }
 Qed.
 
+Theorem Int_part_opp_of_Int :
+  ∀ x,
+  x = rngl_of_Z (Int_part x)
+  → Int_part (- x) = (- Int_part x)%Z.
+Proof.
+intros * Hx.
+progress unfold Int_part in Hx.
+progress unfold Int_part.
+remember (z_int_part _) as y eqn:H; clear H.
+destruct y as (y, Hy).
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+rewrite Hx in Hz.
+rewrite <- rngl_of_Z_opp in Hz.
+apply Int_part_interv in Hz; subst z.
+apply Int_part_IZR.
+Qed.
+
 Theorem Int_part_opp_of_not_Int :
   ∀ x,
   x ≠ rngl_of_Z (Int_part x)
@@ -2349,23 +2367,11 @@ Theorem Int_part_opp : ∀ x,
 Proof.
 intros.
 destruct (Req_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
-  rewrite Hx at 1.
-  now rewrite <- rngl_of_Z_opp, Int_part_IZR, Z.sub_0_r.
+  rewrite Z.sub_0_r.
+  now apply Int_part_opp_of_Int.
+} {
+  now apply Int_part_opp_of_not_Int.
 }
-specialize (base_Int_part x) as (H1, H3).
-specialize (base_Int_part (-x))%L as (H2, H4).
-move H2 before H1.
-rewrite (rngl_sub_opp_r Hop) in H4.
-apply Int_part_interv.
-rewrite Z.sub_add.
-rewrite rngl_of_Z_sub, rngl_of_Z_1.
-rewrite rngl_of_Z_opp.
-rewrite <- (rngl_add_opp_r Hop) in H3.
-apply (rngl_lt_sub_lt_add_l Hop Hor) in H3.
-rewrite (rngl_opp_sub_swap Hop) in H3.
-split; [ now apply (rngl_lt_le_incl Hor) | ].
-apply -> (rngl_opp_lt_compat Hop Hor).
-now apply (rngl_le_neq Hor).
 Qed.
 
 Theorem Int_part_add :
@@ -2412,6 +2418,12 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
       now apply (rngl_opp_pos_neg Hop Hor).
     }
     clear Hzxy.
+    do 2 rewrite Int_part_opp.
+    destruct (Req_dec _ _) as [Hxy1| Hxy1]. {
+      rewrite Z.sub_0_r, Z.opp_involutive.
+      destruct (Req_dec _ _) as [Hxy| Hxy]. {
+        rewrite Z.sub_0_r, Z.opp_involutive.
+...
     rewrite Int_part_opp_of_not_Int. 2: {
       symmetry.
       rewrite rngl_of_Z_Int_part.
