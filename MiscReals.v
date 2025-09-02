@@ -2470,19 +2470,26 @@ Theorem Rediv_add_nat : ∀ x y n,
   → (x + INR n * y) // y = (x // y + Z.of_nat n)%Z.
 Proof.
 intros * Hyz.
-...
-induction n; [ now simpl; rewrite Rmult_0_l, Rplus_0_r, Z.add_0_r | ].
-rewrite S_INR, Rmult_plus_distr_r, Rmult_1_l, <- Rplus_assoc.
+progress unfold INR.
+induction n. {
+  now cbn; rewrite (rngl_mul_0_l Hos), rngl_add_0_r, Z.add_0_r.
+}
+rewrite rngl_of_nat_succ, (rngl_add_comm 1).
+rewrite rngl_mul_add_distr_r, (rngl_mul_1_l Hon), rngl_add_assoc.
 rewrite Rediv_add_1; [ | easy ].
-rewrite IHn; lia.
+rewrite IHn, <- Z.add_assoc.
+progress f_equal.
+rewrite <- Nat.add_1_r.
+now rewrite Nat2Z.inj_add.
 Qed.
 
 Theorem Rediv_add_Z : ∀ x y a,
-  y ≠ 0
+  y ≠ 0%L
   → (x + IZR a * y) // y = (x // y + a)%Z.
 Proof.
 intros * Hyz.
 destruct (Z_le_dec 0 a) as [Ha| Ha]. {
+...
   apply IZN in Ha.
   destruct Ha as (n, Hn); subst a.
   rewrite <- INR_IZR_INZ.
