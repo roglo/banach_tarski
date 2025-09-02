@@ -2451,20 +2451,26 @@ Proof.
 intros * Hyz.
 unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (- y)) as [Hy| Hy]. {
-(**)
-  destruct (Rcase_abs y). {
-...
-  destruct (Rcase_abs y); [ lra | now rewrite Ropp_involutive ].
+  rewrite (rngl_opp_involutive Hop).
+  destruct (Rcase_abs y) as [Hzy| Hzy]; [ | easy ].
+  exfalso.
+  apply (rngl_opp_neg_pos Hop Hor) in Hy.
+  now apply (rngl_lt_asymm Hor) in Hy.
 } {
-  destruct (Rcase_abs y); [ now rewrite Z.opp_involutive | lra ].
+  destruct (Rcase_abs y) as [Hzy| Hzy]; [ now rewrite Z.opp_involutive | ].
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hy.
+  now apply (rngl_le_antisymm Hor) in Hzy.
 }
 Qed.
 
+Definition INR := rngl_of_nat.
+
 Theorem Rediv_add_nat : ∀ x y n,
-  y ≠ 0
+  y ≠ 0%L
   → (x + INR n * y) // y = (x // y + Z.of_nat n)%Z.
 Proof.
 intros * Hyz.
+...
 induction n; [ now simpl; rewrite Rmult_0_l, Rplus_0_r, Z.add_0_r | ].
 rewrite S_INR, Rmult_plus_distr_r, Rmult_1_l, <- Rplus_assoc.
 rewrite Rediv_add_1; [ | easy ].
