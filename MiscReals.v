@@ -2395,7 +2395,7 @@ now apply (rngl_add_le_mono_r Hos Hor).
 now apply (rngl_add_lt_mono_r Hos Hor).
 Qed.
 
-Theorem Rediv_add_1 :
+Theorem Rediv_add_div_diag_r :
   ∀ x y,
   y ≠ 0%L
   → (x + y)%L // y = if (0 <? x * y)%L then (x // y + 1)%Z else (x // y)%Z.
@@ -2419,65 +2419,22 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
     }
     clear Hzxy.
     do 2 rewrite Int_part_opp.
+    rewrite (Int_part_add _ _ 1); [ | symmetry; apply rngl_of_Z_1 ].
+    rewrite rngl_of_Z_add, rngl_of_Z_1.
     destruct (Req_dec _ _) as [Hxy1| Hxy1]. {
-      rewrite Z.sub_0_r, Z.opp_involutive.
-      rewrite (Int_part_add _ _ 1) in Hxy1. 2: {
-        symmetry; apply rngl_of_Z_1.
-      }
-      rewrite rngl_of_Z_add in Hxy1.
-      rewrite rngl_of_Z_1 in Hxy1.
       apply (rngl_add_cancel_r Hos) in Hxy1.
-      destruct (Req_dec _ _) as [H| ]; [ clear H | easy ].
       rewrite Z.sub_0_r, Z.opp_involutive.
-      apply Int_part_add; symmetry.
-      apply rngl_of_Z_1.
+      destruct (Req_dec _ _) as [H| ]; [ clear H | easy ].
+      rewrite Z.sub_0_r; f_equal.
+      symmetry; apply Z.opp_involutive.
     }
-...
-    rewrite Int_part_opp_of_not_Int. 2: {
-      symmetry.
-      rewrite rngl_of_Z_Int_part.
-      destruct (rngl_le_dec Hor 0 (x / y + 1)) as [Hzxy| Hzxy]. {
-... ...
-    rewrite Int_part_opp_of_not_Int.
+    destruct (Req_dec _ _) as [Hxy| Hxy]. {
+      exfalso; apply Hxy1; clear Hxy1.
+      now f_equal.
+    }
     do 2 rewrite Z.opp_sub_distr.
-    do 2 rewrite Z.opp_involutive.
-    progress f_equal.
-  apply Int_part_add.
-  symmetry; apply rngl_of_Z_1.
-...
-Search (_ * _ = 0)%L.
-Check rngl_0_le_1.
-About rngl_eq_mul_0_r.
-...
-rngl_eq_mul_0_r:
-  ∀ {T : Type} {ro : ring_like_op T},
-    ring_like_prop T
-    → rngl_has_opp_or_psub T = true
-      → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_pdiv T)%bool = true
-        → ∀ a b : T, (a * b)%L = 0%L → a ≠ 0%L → b = 0%L
-...
-Search (_ * _ < _ * _)%L.
-...
-rngl_mul_lt_mono_nonneg:
-  ∀ {T : Type} {ro : ring_like_op T},
-    ring_like_prop T
-    → rngl_has_opp T = true
-      → rngl_is_ordered T = true
-        → (rngl_is_integral_domain T || rngl_has_inv_and_1_or_pdiv T)%bool = true
-          → ∀ a b c d : T, (0 ≤ a < b)%L → (0 ≤ c < d)%L → (a * c < b * d)%L
-rngl_mul_le_compat_nonneg:
-  ∀ {T : Type} {ro : ring_like_op T},
-    ring_like_prop T
-    → rngl_is_ordered T = true → ∀ a b c d : T, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
-rngl_mul_le_compat_nonpos:
-  ∀ {T : Type} {ro : ring_like_op T},
-    ring_like_prop T
-    → rngl_is_ordered T = true → ∀ a b c d : T, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
-...
-    rngl_ord_mul_le_compat_nonneg :
-      ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L;
-    rngl_ord_mul_le_compat_nonpos :
-      ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L;
+    now do 2 rewrite Z.opp_involutive.
+  }
 ...
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
