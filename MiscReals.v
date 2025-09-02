@@ -2453,7 +2453,11 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
       rewrite Z.sub_0_r, Z.opp_add_distr, Z.add_opp_r.
       progress f_equal.
       symmetry.
-      destruct (Req_dec _ _) as [H| ]; [ clear H | easy ].
+      destruct (Req_dec _ _) as [H| ]; [ clear H; exfalso | easy ].
+      progress unfold Int_part in Hxy1.
+      remember (z_int_part _) as z eqn:H; clear H.
+      destruct z as (z, Hz).
+Search (rngl_of_Z (Int_part _)).
 ...
     }
     destruct (Req_dec _ _) as [Hxy| Hxy]. {
