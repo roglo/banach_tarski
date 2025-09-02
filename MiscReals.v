@@ -2154,7 +2154,7 @@ Definition Rediv_mod x y :=
     | right _ => Int_part (x / y)
     end
   in
-  (k, x - rngl_of_Z k * y)%L.
+  (k, x - IZR k * y)%L.
 
 Definition Rediv x y := fst (Rediv_mod x y).
 Definition Rmod x y := snd (Rediv_mod x y).
@@ -2210,7 +2210,7 @@ split. {
 }
 Qed.
 
-Theorem Rmod_from_ediv : ∀ x y, x rmod y = (x - rngl_of_Z (x // y) * y)%L.
+Theorem Rmod_from_ediv : ∀ x y, x rmod y = (x - IZR (x // y) * y)%L.
 Proof.
 intros.
 unfold Rmod, Rediv, fst, snd.
