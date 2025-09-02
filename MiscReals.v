@@ -2149,6 +2149,9 @@ Definition Rediv_mod x y :=
 Definition Rediv x y := fst (Rediv_mod x y).
 Definition Rmod x y := snd (Rediv_mod x y).
 
+Arguments Rediv (x y)%_L.
+Arguments Rmod (x y)%_L.
+
 Notation "x '//' y" := (Rediv x y) (at level 40).
 Notation "x 'rmod' y" := (Rmod x y) (at level 40).
 
@@ -2429,88 +2432,17 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
   now f_equal.
 } {
   apply (rngl_nlt_ge_iff Hor) in Hy.
-...
-  rewrite <- Z.sub_add_distr.
-  progress f_equal.
-...
-    }
-    destruct (Req_dec _ _) as [Hxy| Hxy]. {
-      exfalso; apply Hxy1; clear Hxy1.
-      now f_equal.
-    }
-    do 2 rewrite Z.opp_sub_distr.
-    now do 2 rewrite Z.opp_involutive.
-  } {
-    progress f_equal.
-    apply (rngl_ltb_ge_iff Hor) in Hzxy.
-    assert (Hxz : (0 ≤ x)%L). {
-      (* lemma *)
-      apply rngl_nlt_ge in Hzxy.
-      apply (rngl_nlt_ge_iff Hor).
-      intros H; apply Hzxy; clear Hzxy.
-      now apply (rngl_mul_neg_neg Hon Hop Hiq Hor).
-    }
-    clear Hyz Hzxy.
-    do 2 rewrite Int_part_opp.
-    rewrite (Int_part_add _ _ 1); [ | symmetry; apply rngl_of_Z_1 ].
-    rewrite rngl_of_Z_add, rngl_of_Z_1.
-    destruct (Req_dec _ _) as [Hxy1| Hxy1]. {
-      apply (rngl_add_cancel_r Hos) in Hxy1.
-      rewrite Z.sub_0_r, Z.opp_add_distr, Z.add_opp_r.
-      progress f_equal.
-      symmetry.
-      destruct (Req_dec _ _) as [H| ]; [ clear H; exfalso | easy ].
-      progress unfold Int_part in Hxy1.
-      remember (z_int_part _) as z eqn:H; clear H.
-      destruct z as (z, Hz).
-Search (rngl_of_Z (Int_part _)).
-...
-    }
-    destruct (Req_dec _ _) as [Hxy| Hxy]. {
-      exfalso; apply Hxy1; clear Hxy1.
-      now f_equal.
-    }
-    do 2 rewrite Z.opp_sub_distr.
-    now do 2 rewrite Z.opp_involutive.
-...
-intros * Hyz.
-unfold Rediv, Rediv_mod, fst.
-destruct (Rcase_abs y) as [Hy| Hy]. {
-  unfold Rdiv.
-  rewrite Rinv_opp.
-  rewrite <- Ropp_mult_distr_r.
-  rewrite Rmult_plus_distr_r.
-  rewrite Rinv_r; [ | lra ].
-  rewrite Ropp_plus_distr.
-  rewrite fold_Rminus.
-  rewrite <- Ropp_mult_distr_r.
-  ring_simplify.
-  rewrite Rminus_Int_part1. {
-    rewrite Z.opp_sub_distr.
-    replace 1 with (IZR 1) by lra.
-    now rewrite Int_part_IZR.
-  } {
-    replace 1 with (IZR 1) by lra.
-    rewrite frac_part_IZR.
-    specialize (frac_part_interv (- (x * / y))) as (Hn, Hp); lra.
-  }
-}
-rewrite Rdiv_plus_distr.
-rewrite Rdiv_same; [ | easy ].
-rewrite plus_Int_part2. {
-  replace 1 with (IZR 1) by lra.
-  now rewrite Int_part_IZR.
-} {
-  replace 1 with (IZR 1) at 1 by lra.
-  rewrite frac_part_IZR, Rplus_0_r.
-  apply frac_part_interv.
+  rewrite (rngl_div_add_distr_r Hiv).
+  rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+  rewrite (Int_part_add _ _ 1); [ easy | symmetry; apply rngl_of_Z_1 ].
 }
 Qed.
 
-Theorem Rediv_opp_r : ∀ x y, y ≠ 0 → x // - y = (- (x // y))%Z.
+Theorem Rediv_opp_r : ∀ x y, y ≠ 0%L → x // - y = (- (x // y))%Z.
 Proof.
 intros * Hyz.
 unfold "//", fst, Rediv_mod.
+...
 destruct (Rcase_abs (- y)) as [Hy| Hy]. {
   destruct (Rcase_abs y); [ lra | now rewrite Ropp_involutive ].
 } {
