@@ -2147,7 +2147,7 @@ Qed.
 
 Definition Rediv_mod x y :=
   let k :=
-    match Rlt_dec y 0 with
+    match Rcase_abs y with
     | left _ => (- Int_part (x / - y))%Z
     | right _ => Int_part (x / y)
     end
@@ -2167,7 +2167,7 @@ Theorem Rmod_interv : ∀ x y, (0 < y → 0 ≤ x rmod y < y)%L.
 Proof.
 intros * Hy.
 unfold Rmod, Rediv_mod, snd.
-destruct (Rlt_dec y 0) as [Hya| Hya]. {
+destruct (Rcase_abs y) as [Hya| Hya]. {
   now apply (rngl_lt_asymm Hor) in Hy.
 }
 split. {
@@ -2413,7 +2413,7 @@ Theorem Rediv_add_1 :
 Proof.
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
-destruct (Rlt_dec y 0) as [Hy| Hy]. {
+destruct (Rcase_abs y) as [Hy| Hy]. {
   do 2 rewrite (Ropp_div_r _ _ Hyz).
   rewrite (rngl_div_add_distr_r Hiv).
   rewrite (rngl_div_diag Hon Hiq); [ | easy ].
@@ -2451,6 +2451,8 @@ Proof.
 intros * Hyz.
 unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (- y)) as [Hy| Hy]. {
+(**)
+  destruct (Rcase_abs y). {
 ...
   destruct (Rcase_abs y); [ lra | now rewrite Ropp_involutive ].
 } {
