@@ -2434,7 +2434,34 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
     }
     do 2 rewrite Z.opp_sub_distr.
     now do 2 rewrite Z.opp_involutive.
-  }
+  } {
+    progress f_equal.
+    apply (rngl_ltb_ge_iff Hor) in Hzxy.
+    assert (Hxz : (0 ≤ x)%L). {
+      (* lemma *)
+      apply rngl_nlt_ge in Hzxy.
+      apply (rngl_nlt_ge_iff Hor).
+      intros H; apply Hzxy; clear Hzxy.
+      now apply (rngl_mul_neg_neg Hon Hop Hiq Hor).
+    }
+    clear Hyz Hzxy.
+    do 2 rewrite Int_part_opp.
+    rewrite (Int_part_add _ _ 1); [ | symmetry; apply rngl_of_Z_1 ].
+    rewrite rngl_of_Z_add, rngl_of_Z_1.
+    destruct (Req_dec _ _) as [Hxy1| Hxy1]. {
+      apply (rngl_add_cancel_r Hos) in Hxy1.
+      rewrite Z.sub_0_r, Z.opp_add_distr, Z.add_opp_r.
+      progress f_equal.
+      symmetry.
+      destruct (Req_dec _ _) as [H| ]; [ clear H | easy ].
+...
+    }
+    destruct (Req_dec _ _) as [Hxy| Hxy]. {
+      exfalso; apply Hxy1; clear Hxy1.
+      now f_equal.
+    }
+    do 2 rewrite Z.opp_sub_distr.
+    now do 2 rewrite Z.opp_involutive.
 ...
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
