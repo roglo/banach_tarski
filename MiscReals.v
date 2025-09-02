@@ -2421,8 +2421,17 @@ destruct (Rlt_dec y 0) as [Hy| Hy]. {
     do 2 rewrite Int_part_opp.
     destruct (Req_dec _ _) as [Hxy1| Hxy1]. {
       rewrite Z.sub_0_r, Z.opp_involutive.
-      destruct (Req_dec _ _) as [Hxy| Hxy]. {
-        rewrite Z.sub_0_r, Z.opp_involutive.
+      rewrite (Int_part_add _ _ 1) in Hxy1. 2: {
+        symmetry; apply rngl_of_Z_1.
+      }
+      rewrite rngl_of_Z_add in Hxy1.
+      rewrite rngl_of_Z_1 in Hxy1.
+      apply (rngl_add_cancel_r Hos) in Hxy1.
+      destruct (Req_dec _ _) as [H| ]; [ clear H | easy ].
+      rewrite Z.sub_0_r, Z.opp_involutive.
+      apply Int_part_add; symmetry.
+      apply rngl_of_Z_1.
+    }
 ...
     rewrite Int_part_opp_of_not_Int. 2: {
       symmetry.
