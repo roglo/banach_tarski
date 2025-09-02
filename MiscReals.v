@@ -767,7 +767,7 @@ Compute (rngl_of_Z 3).
 Compute (rngl_of_Z 239 * rngl_of_Z 4649)%L.
 *)
 
-(* INR = rngl_of_nat *)
+Definition INR := rngl_of_nat.
 
 Theorem rngl_of_pos_pos : ∀ a, (0 < rngl_of_pos a)%L.
 Proof.
@@ -2462,8 +2462,6 @@ destruct (Rcase_abs (- y)) as [Hy| Hy]. {
   now apply (rngl_le_antisymm Hor) in Hzy.
 }
 Qed.
-
-Definition INR := rngl_of_nat.
 
 Theorem Rediv_add_nat : ∀ x y n,
   y ≠ 0%L
