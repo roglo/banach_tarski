@@ -2628,6 +2628,30 @@ progress f_equal.
 apply Z.opp_involutive.
 Qed.
 
+Theorem plus_Int_part2 :
+  ∀ a b,
+  (frac_part a + frac_part b < 1)%L
+  → Int_part (a + b) = (Int_part a + Int_part b)%Z.
+Proof.
+intros * Hab.
+progress unfold Int_part.
+remember (z_int_part _) as x eqn:H; clear H.
+destruct x as (x, Hx).
+remember (z_int_part _) as y eqn:H; clear H.
+destruct y as (y, Hy).
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+move y before x; move z before y.
+apply (Int_part_prop (a + b))%L; [ easy | ].
+rewrite Z.add_shuffle0.
+do 2 rewrite rngl_of_Z_add.
+split.
+now apply (rngl_add_le_mono Hos Hor).
+...
+apply (rngl_add_lt_le_mono Hos Hor); [ easy | ].
+Search (frac_part).
+...
+
 Theorem plus_frac_part2 : ∀ a b,
   (frac_part a + frac_part b < 1)%L
   → frac_part (a + b) = (frac_part a + frac_part b)%L.
@@ -2641,21 +2665,13 @@ progress f_equal.
 rewrite <- rngl_of_Z_add.
 progress f_equal.
 (* lemma? *)
-progress unfold Int_part.
-remember (z_int_part _) as x eqn:H; clear H.
-destruct x as (x, Hx).
-remember (z_int_part _) as y eqn:H; clear H.
-destruct y as (y, Hy).
-remember (z_int_part _) as z eqn:H; clear H.
-destruct z as (z, Hz).
-move y before x; move z before y.
-apply (Int_part_prop (a + b))%L; [ easy | ].
-rewrite Z.add_shuffle0.
-do 2 rewrite rngl_of_Z_add.
-rewrite (rngl_add_comm a).
-split.
-now apply (rngl_add_le_mono Hos Hor).
-apply (rngl_add_lt_le_mono Hos Hor); [ easy | ].
+(**)
+rewrite Z.add_comm.
+... ...
+now apply plus_Int_part2.
+...
+specialize (rngl_sub_Int_part (a + b) b)%L as H1.
+assert ((frac_part (a + b) ≤ frac_part a + frac_part b)%L).
 ...
 
 Theorem frac_part_double : ∀ x,
