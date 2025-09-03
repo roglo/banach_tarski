@@ -2535,27 +2535,46 @@ Proof.
 intros * Hy.
 rewrite Rmod_from_ediv.
 rewrite Rediv_add_Z; [ | easy ].
-...
-rewrite plus_IZR.
-rewrite Rmult_plus_distr_r.
-remember (IZR a * y) as u.
-remember (IZR (x // y) * y) as v.
-now replace (x + u - (v + u)) with (x - v) by lra; subst u v.
+rewrite rngl_of_Z_add.
+rewrite rngl_mul_add_distr_r.
+rewrite Rmod_from_ediv.
+progress unfold IZR.
+rewrite (rngl_sub_add_distr Hos).
+rewrite (rngl_sub_sub_swap Hop).
+progress f_equal.
+apply (rngl_add_sub Hos).
 Qed.
 
-Theorem Rmod_0_l : ∀ x, 0 rmod x = 0.
+Theorem Rmod_0_l : ∀ x, 0 rmod x = 0%L.
 Proof.
 intros x.
+destruct (rngl_eq_dec Heo x 0) as [Hzx| Hzx]. {
+  subst x; rewrite Rmod_from_ediv.
+  rewrite (rngl_mul_0_r Hos).
+  apply (rngl_sub_diag Hos).
+}
 unfold Rmod, snd, Rediv_mod.
-do 2 rewrite Rdiv_0_l.
+rewrite (rngl_div_0_l Hos Hi1). 2: {
+  intros H.
+  apply (f_equal rngl_opp) in H.
+  now rewrite (rngl_opp_involutive Hop), (rngl_opp_0 Hop) in H.
+}
 rewrite Int_part_0, Z.opp_0.
-destruct (Rcase_abs x); lra.
+destruct (Rcase_abs x). {
+  cbn; rewrite (rngl_mul_0_l Hos).
+  apply (rngl_sub_diag Hos).
+}
+rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
+rewrite Int_part_0.
+cbn; rewrite (rngl_mul_0_l Hos).
+apply (rngl_sub_diag Hos).
 Qed.
 
-Theorem Rmod_mul_same : ∀ x a, (IZR a * x) rmod x = 0.
+Theorem Rmod_mul_same : ∀ x a, (IZR a * x) rmod x = 0%L.
 Proof.
 intros.
 destruct (Req_dec x 0) as [Hx| Hx]. {
+...
   rewrite Hx, Rmult_0_r; apply Rmod_0_l.
 }
 specialize (Rmod_add_Z 0 x a Hx) as H.
