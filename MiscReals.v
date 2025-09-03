@@ -2586,19 +2586,25 @@ Proof.
 intros * (Hx, Hxy).
 unfold Rmod, snd, Rediv_mod.
 destruct (Rcase_abs y) as [Hyn| Hyp]. {
-...
-assert (H : 0 ≤ x / y < 1). {
+  exfalso; apply rngl_nle_gt in Hyn.
+  apply Hyn; clear Hyn.
+  apply (rngl_le_trans Hor _ x); [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+}
+assert (H : (0 ≤ x / y < 1)%L). {
   split. {
-    apply Rmult_le_reg_r with (r := y); [ lra | ].
-    rewrite Rmult_0_l, Rmult_div_same; [ easy | lra ].
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+    now apply (rngl_le_lt_trans Hor _ x).
   } {
-    apply Rmult_lt_reg_r with (r := y); [ lra | ].
-    rewrite Rmult_1_l, Rmult_div_same; [ easy | lra ].
+    apply (rngl_lt_div_l Hon Hop Hiv Hor).
+    now apply (rngl_le_lt_trans Hor _ x).
+    now rewrite (rngl_mul_1_l Hon).
   }
 }
 apply Int_part_small in H.
 rewrite H; simpl.
-now rewrite Rmult_0_l, Rminus_0_r.
+rewrite (rngl_mul_0_l Hos).
+apply (rngl_sub_0_r Hos).
 Qed.
 
 Theorem Rediv_mul_r : ∀ x y z,
@@ -2612,19 +2618,22 @@ Proof.
 intros.
 unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (y * z)) as [Hyz| Hyz]; [ | now rewrite Z.add_0_r ].
-rewrite Ropp_div_r.
-rewrite Int_part_neg.
+rewrite Ropp_div_r. 2: {
+  intros H; rewrite H in Hyz.
+  now apply (rngl_lt_irrefl Hor) in Hyz.
+}
+rewrite Int_part_opp.
 rewrite Z.opp_sub_distr.
-rewrite Z.opp_involutive.
-destruct (Req_dec (x / (y * z)) (IZR (Int_part (x / (y * z))))); [ | easy ].
-now rewrite Z.add_0_r.
+progress f_equal.
+apply Z.opp_involutive.
 Qed.
 
 Theorem frac_part_double : ∀ x,
   frac_part (2 * x) =
-    2 * frac_part x - if Rlt_dec (frac_part x) (1 / 2) then 0 else 1.
+    (2 * frac_part x - if Rlt_dec (frac_part x) (1 / 2) then 0 else 1)%L.
 Proof.
 intros.
+...
 do 2 rewrite <- Rplus_diag.
 destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   rewrite Rminus_0_r; apply plus_frac_part2; lra.
