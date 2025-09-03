@@ -2628,14 +2628,47 @@ progress f_equal.
 apply Z.opp_involutive.
 Qed.
 
+Theorem plus_frac_part2 : ∀ a b,
+  (frac_part a + frac_part b < 1)%L
+  → frac_part (a + b) = (frac_part a + frac_part b)%L.
+Proof.
+intros * Hrr.
+progress unfold frac_part.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_add_sub_assoc Hop).
+rewrite <- (rngl_sub_add_distr Hos).
+progress f_equal.
+rewrite <- rngl_of_Z_add.
+progress f_equal.
+(* lemma? *)
+progress unfold Int_part.
+remember (z_int_part _) as x eqn:H; clear H.
+destruct x as (x, Hx).
+remember (z_int_part _) as y eqn:H; clear H.
+destruct y as (y, Hy).
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+move y before x; move z before y.
+apply (Int_part_prop (a + b))%L; [ easy | ].
+rewrite Z.add_shuffle0.
+do 2 rewrite rngl_of_Z_add.
+rewrite (rngl_add_comm a).
+split.
+now apply (rngl_add_le_mono Hos Hor).
+apply (rngl_add_lt_le_mono Hos Hor); [ easy | ].
+...
+
 Theorem frac_part_double : ∀ x,
   frac_part (2 * x) =
     (2 * frac_part x - if Rlt_dec (frac_part x) (1 / 2) then 0 else 1)%L.
 Proof.
 intros.
-...
-do 2 rewrite <- Rplus_diag.
+do 2 rewrite (rngl_mul_2_l Hon).
 destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
+  rewrite (rngl_sub_0_r Hos).
+... ...
+  apply plus_frac_part2.
+...
   rewrite Rminus_0_r; apply plus_frac_part2; lra.
 }
 apply plus_frac_part1; lra.
