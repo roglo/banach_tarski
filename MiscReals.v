@@ -2574,19 +2574,19 @@ Theorem Rmod_mul_same : ∀ x a, (IZR a * x) rmod x = 0%L.
 Proof.
 intros.
 destruct (Req_dec x 0) as [Hx| Hx]. {
-...
-  rewrite Hx, Rmult_0_r; apply Rmod_0_l.
+  rewrite Hx, (rngl_mul_0_r Hos); apply Rmod_0_l.
 }
-specialize (Rmod_add_Z 0 x a Hx) as H.
-rewrite Rplus_0_l in H; rewrite H.
+specialize (Rmod_add_Z 0%L x a Hx) as H.
+rewrite rngl_add_0_l in H; rewrite H.
 apply Rmod_0_l.
 Qed.
 
-Theorem Rmod_small : ∀ x y, 0 ≤ x < y → x rmod y = x.
+Theorem Rmod_small : ∀ x y, (0 ≤ x < y)%L → x rmod y = x.
 Proof.
 intros * (Hx, Hxy).
 unfold Rmod, snd, Rediv_mod.
-destruct (Rcase_abs y) as [Hyn| Hyp]; [ lra | ].
+destruct (Rcase_abs y) as [Hyn| Hyp]. {
+...
 assert (H : 0 ≤ x / y < 1). {
   split. {
     apply Rmult_le_reg_r with (r := y); [ lra | ].
