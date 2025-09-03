@@ -2634,6 +2634,25 @@ Theorem plus_Int_part2 :
   → Int_part (a + b) = (Int_part a + Int_part b)%Z.
 Proof.
 intros * Hab.
+progress unfold frac_part in Hab.
+rewrite (rngl_add_sub_assoc Hop) in Hab.
+rewrite <- (rngl_add_sub_swap Hop) in Hab.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite <- rngl_of_Z_add in Hab.
+progress unfold Int_part.
+remember (z_int_part _) as x eqn:H; clear H.
+destruct x as (x, Hx).
+remember (z_int_part _) as y eqn:H; clear H.
+destruct y as (y, Hy).
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+move y before x; move z before y.
+apply (Int_part_prop (a + b))%L; [ easy | ].
+rewrite Z.add_shuffle0.
+do 2 rewrite rngl_of_Z_add.
+split; [ now apply (rngl_add_le_mono Hos Hor) | ].
+...
+intros * Hab.
 progress unfold Int_part.
 remember (z_int_part _) as x eqn:H; clear H.
 destruct x as (x, Hx).
