@@ -2483,45 +2483,59 @@ rewrite <- Nat.add_1_r.
 now rewrite Nat2Z.inj_add.
 Qed.
 
+Theorem IZN : ∀ n, (0 <= n)%Z → ∃ m, n = Z.of_nat m.
+Proof.
+intros * Hn.
+destruct n as [| p| ]; [ now exists 0 | | easy ].
+exists (Pos.to_nat p).
+symmetry.
+apply positive_nat_Z.
+Qed.
+
 Theorem Rediv_add_Z : ∀ x y a,
   y ≠ 0%L
   → (x + IZR a * y) // y = (x // y + a)%Z.
 Proof.
 intros * Hyz.
 destruct (Z_le_dec 0 a) as [Ha| Ha]. {
-...
+  progress unfold IZR.
   apply IZN in Ha.
   destruct Ha as (n, Hn); subst a.
-  rewrite <- INR_IZR_INZ.
+  rewrite rngl_of_Z_of_nat.
   now apply Rediv_add_nat.
 }
+apply Z.nle_gt in Ha.
 remember (- a)%Z as b eqn:Hb.
-assert (a = (- b)%Z) by lia.
-subst a; clear Hb.
+apply Z.eq_opp_l in Hb; subst a.
+apply Z.opp_neg_pos in Ha.
 rename b into a.
-assert (Hb : (0 < a)%Z) by lia.
-clear Ha; rename Hb into Ha.
 apply Z.lt_le_incl in Ha.
 apply IZN in Ha.
 destruct Ha as (n, Hn); subst a.
-rewrite opp_IZR.
-rewrite <- INR_IZR_INZ.
-rewrite <- Ropp_mult_distr_l, Ropp_mult_distr_r.
+rewrite rngl_of_Z_opp.
+rewrite rngl_of_Z_of_nat.
+rewrite (rngl_mul_opp_l Hop), <- (rngl_mul_opp_r Hop).
 symmetry; rewrite <- Z.opp_involutive; symmetry.
 rewrite <- Rediv_opp_r; [ | easy ].
-rewrite Rediv_add_nat; [ | lra ].
+(**)
+rewrite Rediv_add_nat. 2: {
+  intros H.
+  apply (f_equal rngl_opp) in H.
+  now rewrite (rngl_opp_involutive Hop), (rngl_opp_0 Hop) in H.
+}
 rewrite Z.opp_add_distr.
 rewrite Rediv_opp_r; [ | easy ].
 now rewrite Z.opp_involutive.
 Qed.
 
 Theorem Rmod_add_Z : ∀ x y a,
-  y ≠ 0
+  y ≠ 0%L
   → (x + IZR a * y) rmod y = x rmod y.
 Proof.
 intros * Hy.
 rewrite Rmod_from_ediv.
 rewrite Rediv_add_Z; [ | easy ].
+...
 rewrite plus_IZR.
 rewrite Rmult_plus_distr_r.
 remember (IZR a * y) as u.
