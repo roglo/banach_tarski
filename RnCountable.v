@@ -1,15 +1,41 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 Arith.
-From Stdlib Require Import Reals Psatz.
+From Stdlib Require Import Psatz.
 
+Require Import RingLike.Core.
 Require Import MiscReals Countable.
 
-Notation "'ℝ'" := R.
-Notation "x '≤' y" := (Rle x y) : R_scope.
+Section a.
 
-Definition ter_bin_of_frac_part x n :=
-  if Rlt_dec (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {Hon : rngl_has_1 T = true}.
+Context {Hop : rngl_has_opp T = true}.
+Context {Hiv : rngl_has_inv T = true}.
+Context {Hor : rngl_is_ordered T = true}.
+Context {Hch : rngl_characteristic T = 0}.
+Context {Har : rngl_is_archimedean T = true}.
+
+Definition Rlt_dec := Rlt_dec Hor.
+Definition frac_part := @frac_part T ro rp Hon Hop Hiv Hor Hch Har.
+
+About Rlt_dec.
+About frac_part.
+
+...
+
+Definition ter_bin_of_frac_part (x : T) (n : nat) :=
+  if Rlt_dec (frac_part (rngl_mul x (rngl_power 3 n))) (1 / 3)%L then false
+  else true.
+
+...
+
+Definition ter_bin_of_frac_part (x n : T) :=
+  if Rlt_dec Hor (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
+
+...
 
 Fixpoint partial_sum3_aux k (u : nat → bool) pow i :=
   match k with

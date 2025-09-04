@@ -2827,3 +2827,5 @@ apply (rngl_sub_add Hop).
 Qed.
 
 End a.
+
+Arguments Rlt_dec {T ro rp} Hor (a b)%_L.
