@@ -2821,5 +2821,9 @@ Theorem Rdiv_mod : ∀ x y, y ≠ 0%L → x = (y * IZR (x // y) + x rmod y)%L.
 Proof.
 intros x y Hy.
 rewrite Rmod_from_ediv.
-...
+rewrite rngl_add_comm.
+rewrite (rngl_mul_comm Hic); symmetry.
+apply (rngl_sub_add Hop).
 Qed.
+
+End a.
