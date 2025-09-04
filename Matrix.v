@@ -2,12 +2,12 @@
 
 From Stdlib Require Import Utf8 Arith List.
 From Stdlib Require Import Psatz.
-From Stdlib Require Import Ring.
+From Stdlib Require Import Ring Field.
 Require Import Datatypes.
 
-Require Import Words Normalize Reverse Misc MiscReals.
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
+Require Import Words Normalize Reverse Misc MiscReals.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -42,12 +42,19 @@ Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hon : rngl_has_1 T = true}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
+Context {Hch : rngl_characteristic T = 0}.
 Context {Hor : rngl_is_ordered T = true}.
 
 Let Hos := rngl_has_opp_has_opp_or_psub Hop.
+Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
+Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+
+Definition Rmult5_sqrt2_sqrt5 := @Rmult5_sqrt2_sqrt5 T ro rp rl Hic Hon Hop Hor.
+Arguments Rmult5_sqrt2_sqrt5 (a b c d)%_L.
 
 Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
+Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
 
 Definition mat_add (M₁ M₂ : matrix T) :=
   mkmat
@@ -290,14 +297,39 @@ Qed.
 
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
+specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
-progress repeat rewrite <- rngl_mul_assoc.
+progress repeat rewrite rngl_mul_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+f_equal; try ring. {
+  rewrite (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_l.
+  rewrite (rngl_mul_opp_r Hop).
+  do 5 rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_mul_mul_swap Hic (_ * _) _ 2).
+  do 2 rewrite <- rngl_mul_add_distr_r.
 ...
-rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-f_equal; lra.
+remember 3⁻¹ as t.
+rewrite (rngl_mul_opp_r Hop).
+do 5 rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_opp_involutive Hop).
+subst t.
+
+field_simplify.
+cbn.
+destruct ro.
+cbn.
+destruct rngl_opt_one.
+cbn.
+rewrite (rngl_add_opp_r Hop).
+rngwir
+cbn.
+...
 Qed.
 
 Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
