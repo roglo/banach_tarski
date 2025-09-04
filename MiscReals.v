@@ -2517,7 +2517,6 @@ rewrite rngl_of_Z_of_nat.
 rewrite (rngl_mul_opp_l Hop), <- (rngl_mul_opp_r Hop).
 symmetry; rewrite <- Z.opp_involutive; symmetry.
 rewrite <- Rediv_opp_r; [ | easy ].
-(**)
 rewrite Rediv_add_nat. 2: {
   intros H.
   apply (f_equal rngl_opp) in H.
@@ -2800,17 +2799,27 @@ destruct n as [| n| n]. {
   rewrite <- Zabs_N_nat, Zabs2N.inj_opp, Zabs_N_nat.
   rewrite Zabs2Nat.inj_sub; [ | easy ].
   simpl (Z.abs_nat 1); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-...
-  rewrite <- Rpow_div_sub; [ | lra | lia ].
-  rewrite pow_1, Zabs2Nat.inj_mul.
+  rewrite <- (rngl_pow_div_pow Hon Hos Hiv); [ | | apply Pos2Nat_ge_1 ]. 2: {
+    intros H.
+    apply (f_equal rngl_opp) in H.
+    rewrite (rngl_opp_involutive Hop) in H.
+    rewrite (rngl_opp_0 Hop) in H.
+    revert H.
+    apply (rngl_1_neq_0_iff Hon).
+    congruence.
+  }
+  rewrite (rngl_pow_1_r Hon), Zabs2Nat.inj_mul.
   simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-  rewrite pow_1_even; lra.
+  rewrite Ropp_div_r; [ | apply (rngl_1_neq_0_iff Hon); congruence ].
+  rewrite (rngl_div_1_r Hon Hiq); [ | congruence ].
+  progress f_equal.
+  apply (rngl_pow_opp_1_even Hon Hop).
 }
 Qed.
 
-Theorem Rdiv_mod : ∀ x y, y ≠ 0 → x = y * IZR (x // y) + x rmod y.
+Theorem Rdiv_mod : ∀ x y, y ≠ 0%L → x = (y * IZR (x // y) + x rmod y)%L.
 Proof.
 intros x y Hy.
 rewrite Rmod_from_ediv.
-lra.
+...
 Qed.
