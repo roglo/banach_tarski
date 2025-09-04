@@ -2792,26 +2792,15 @@ destruct n as [| n| n]. {
   rewrite Zabs2Nat.inj_add; [ | easy | easy ].
   rewrite Zabs2Nat.inj_mul.
   simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-(**)
   rewrite Nat.add_1_r.
-Search ((-1) ^ S _)%L.
-Search ((-1) ^ (2 * _))%L.
-Locate "^".
-Search rngl_power.
-Theorem rngl_pow_opp_1_even : ∀ n, ((-1) ^ (2 * n) = 1)%L.
-...
-Theorem rngl_pow_opp_1_odd : ∀ n, ((-1) ^ S (2 * n) = -1)%L.
-...
-pow_1_odd
-     : ∀ n : ℕ, ((-1) ^ S (2 * n))%R = (-1)%R
-...
-  now rewrite Nat.add_1_r, pow_1_odd.
+  apply (rngl_pow_opp_1_odd Hon Hop).
 } {
   replace (Z.neg n) with (- Z.pos n)%Z by apply Pos2Z.opp_pos.
   rewrite <- Zopp_mult_distr_r, <- Z.opp_sub_distr.
   rewrite <- Zabs_N_nat, Zabs2N.inj_opp, Zabs_N_nat.
-  rewrite Zabs2Nat.inj_sub; [ | lia ].
+  rewrite Zabs2Nat.inj_sub; [ | easy ].
   simpl (Z.abs_nat 1); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+...
   rewrite <- Rpow_div_sub; [ | lra | lia ].
   rewrite pow_1, Zabs2Nat.inj_mul.
   simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
