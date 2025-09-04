@@ -27,13 +27,13 @@ Context {Hor : rngl_is_ordered T = true}.
 Context {Hch : rngl_characteristic T = 0}.
 Context {Har : rngl_is_archimedean T = true}.
 
-Definition Hos := rngl_has_opp_has_opp_or_psub Hop.
-Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
-Definition Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
-Definition Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
-Definition Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
-Definition Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
-Definition Hio := rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor.
+Let Hos := rngl_has_opp_has_opp_or_psub Hop.
+Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
+Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
+Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
+Let Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
+Let Hio := rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor.
 
 Tactic Notation "pauto" := progress auto.
 Hint Resolve rngl_le_refl : core.

@@ -44,8 +44,8 @@ Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 
-Definition Hos := rngl_has_opp_has_opp_or_subt Hop.
-Definition Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
+Let Hos := rngl_has_opp_has_opp_or_psub Hop.
+Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 
 Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 
