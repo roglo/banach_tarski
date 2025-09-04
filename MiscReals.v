@@ -2649,8 +2649,6 @@ rewrite (rngl_add_sub_assoc Hop) in Hab.
 rewrite <- (rngl_add_sub_swap Hop) in Hab.
 rewrite <- (rngl_sub_add_distr Hos) in Hab.
 rewrite <- rngl_of_Z_add in Hab.
-apply rngl_of_Z_inj.
-Search (rngl_of_Z (Int_part _)).
 ...
 intros * Hab.
 progress unfold frac_part in Hab.
