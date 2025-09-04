@@ -2642,7 +2642,31 @@ Theorem plus_Int_part1 : ∀ a b,
   (1 ≤ frac_part a + frac_part b)%L
   → Int_part (a + b) = (Int_part a + Int_part b + 1)%Z.
 Proof.
-...
+intros * Hab.
+progress unfold frac_part in Hab.
+rewrite (rngl_add_sub_assoc Hop) in Hab.
+rewrite <- (rngl_add_sub_swap Hop) in Hab.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite <- rngl_of_Z_add in Hab.
+apply (rngl_le_add_le_sub_l Hop Hor) in Hab.
+rewrite <- rngl_of_Z_1 in Hab.
+rewrite <- rngl_of_Z_add in Hab.
+progress unfold Int_part in Hab.
+progress unfold Int_part.
+remember (z_int_part _) as x eqn:H; clear H.
+destruct x as (x, Hx).
+remember (z_int_part _) as y eqn:H; clear H.
+destruct y as (y, Hy).
+remember (z_int_part _) as z eqn:H; clear H.
+destruct z as (z, Hz).
+move y before x; move z before y.
+apply (Int_part_prop (a + b))%L; [ easy | ].
+split; [ easy | ].
+rewrite (Z.add_shuffle0 x).
+rewrite <- Z.add_assoc.
+rewrite rngl_of_Z_add.
+now apply (rngl_add_lt_compat Hos Hor).
+Qed.
 
 Theorem plus_Int_part2 :
   ∀ a b,
@@ -2690,9 +2714,8 @@ rewrite <- rngl_of_Z_1.
 do 2 rewrite <- rngl_of_Z_add.
 progress f_equal.
 rewrite (Z.add_comm (Int_part b)).
-... ...
 now apply plus_Int_part1.
-...
+Qed.
 
 Theorem plus_frac_part2 : ∀ a b,
   (frac_part a + frac_part b < 1)%L
@@ -2723,19 +2746,13 @@ destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hx; [ easy | ].
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
-(**)
 apply (rngl_nlt_ge_iff Hor) in Hx.
 do 2 rewrite (rngl_mul_2_l Hon).
 apply (rngl_le_div_l Hon Hop Hiv Hor) in Hx. 2: {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 rewrite (rngl_mul_2_r Hon) in Hx.
-... ...
 now apply plus_frac_part1.
-...
-apply plus_frac_part1.
-...
-apply plus_frac_part1; lra.
 Qed.
 
 Theorem Int_part_double : ∀ x,
@@ -2743,10 +2760,17 @@ Theorem Int_part_double : ∀ x,
     (2 * Int_part x + if Rlt_dec (frac_part x) (1 / 2) then 0 else 1)%Z.
 Proof.
 intros.
-rewrite <- Rplus_diag.
+rewrite (rngl_mul_2_l Hon).
 destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
-  rewrite plus_Int_part2; [ lia | lra ].
+  rewrite plus_Int_part2. {
+    rewrite Z.add_0_r.
+    apply Z.add_diag.
+  }
+  rewrite <- (rngl_mul_2_r Hon).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hx; [ easy | ].
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 } {
+...
   rewrite plus_Int_part1; [ lia | lra ].
 }
 Qed.
