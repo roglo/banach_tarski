@@ -2628,11 +2628,30 @@ progress f_equal.
 apply Z.opp_involutive.
 Qed.
 
+Theorem rngl_of_Z_of_Int_part :
+  ∀ a, rngl_of_Z (Int_part a) = (a - frac_part a)%L.
+Proof.
+intros.
+progress unfold frac_part.
+rewrite (rngl_sub_sub_distr Hop); symmetry.
+rewrite (rngl_sub_diag Hos).
+apply rngl_add_0_l.
+Qed.
+
 Theorem plus_Int_part2 :
   ∀ a b,
   (frac_part a + frac_part b < 1)%L
   → Int_part (a + b) = (Int_part a + Int_part b)%Z.
 Proof.
+intros * Hab.
+progress unfold frac_part in Hab.
+rewrite (rngl_add_sub_assoc Hop) in Hab.
+rewrite <- (rngl_add_sub_swap Hop) in Hab.
+rewrite <- (rngl_sub_add_distr Hos) in Hab.
+rewrite <- rngl_of_Z_add in Hab.
+apply rngl_of_Z_inj.
+Search (rngl_of_Z (Int_part _)).
+...
 intros * Hab.
 progress unfold frac_part in Hab.
 rewrite (rngl_add_sub_assoc Hop) in Hab.
