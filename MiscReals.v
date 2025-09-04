@@ -2796,6 +2796,11 @@ destruct n as [| n| n]. {
   rewrite Nat.add_1_r.
 Search ((-1) ^ S _)%L.
 Search ((-1) ^ (2 * _))%L.
+Locate "^".
+Search rngl_power.
+Theorem rngl_pow_opp_1_even : ∀ n, ((-1) ^ (2 * n) = 1)%L.
+...
+Theorem rngl_pow_opp_1_odd : ∀ n, ((-1) ^ S (2 * n) = -1)%L.
 ...
 pow_1_odd
      : ∀ n : ℕ, ((-1) ^ S (2 * n))%R = (-1)%R
