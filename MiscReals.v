@@ -2770,19 +2770,26 @@ destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hx; [ easy | ].
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 } {
-...
-  rewrite plus_Int_part1; [ lia | lra ].
+  rewrite plus_Int_part1. {
+    progress f_equal.
+    apply Z.add_diag.
+  }
+  rewrite <- (rngl_mul_2_r Hon).
+  apply (rngl_nlt_ge_iff Hor) in Hx.
+  apply (rngl_le_div_l Hon Hop Hiv Hor) in Hx; [ easy | ].
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 Qed.
 
-Theorem pow_1_abs_nat_odd : ∀ n, (-1) ^ Z.abs_nat (2 * n + 1) = -1.
+Theorem pow_1_abs_nat_odd : ∀ n, ((-1) ^ Z.abs_nat (2 * n + 1) = -1)%L.
 Proof.
 intros n.
 destruct n as [| n| n]. {
   rewrite Z.mul_0_r, Z.add_0_l.
   simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-  now rewrite pow_1.
+  apply (rngl_pow_1_r Hon).
 } {
+...
   rewrite Zabs2Nat.inj_add; [ | lia | lia ].
   rewrite Zabs2Nat.inj_mul.
   simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
