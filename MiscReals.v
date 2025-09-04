@@ -2649,13 +2649,7 @@ rewrite (rngl_add_sub_assoc Hop) in Hab.
 rewrite <- (rngl_add_sub_swap Hop) in Hab.
 rewrite <- (rngl_sub_add_distr Hos) in Hab.
 rewrite <- rngl_of_Z_add in Hab.
-...
-intros * Hab.
-progress unfold frac_part in Hab.
-rewrite (rngl_add_sub_assoc Hop) in Hab.
-rewrite <- (rngl_add_sub_swap Hop) in Hab.
-rewrite <- (rngl_sub_add_distr Hos) in Hab.
-rewrite <- rngl_of_Z_add in Hab.
+progress unfold Int_part in Hab.
 progress unfold Int_part.
 remember (z_int_part _) as x eqn:H; clear H.
 destruct x as (x, Hx).
@@ -2668,25 +2662,12 @@ apply (Int_part_prop (a + b))%L; [ easy | ].
 rewrite Z.add_shuffle0.
 do 2 rewrite rngl_of_Z_add.
 split; [ now apply (rngl_add_le_mono Hos Hor) | ].
-...
-intros * Hab.
-progress unfold Int_part.
-remember (z_int_part _) as x eqn:H; clear H.
-destruct x as (x, Hx).
-remember (z_int_part _) as y eqn:H; clear H.
-destruct y as (y, Hy).
-remember (z_int_part _) as z eqn:H; clear H.
-destruct z as (z, Hz).
-move y before x; move z before y.
-apply (Int_part_prop (a + b))%L; [ easy | ].
-rewrite Z.add_shuffle0.
-do 2 rewrite rngl_of_Z_add.
-split.
-now apply (rngl_add_le_mono Hos Hor).
-...
-apply (rngl_add_lt_le_mono Hos Hor); [ easy | ].
-Search (frac_part).
-...
+rewrite rngl_of_Z_add in Hab.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in Hab.
+rewrite rngl_add_add_swap in Hab.
+rewrite <- rngl_of_Z_1 in Hab.
+now rewrite <- (rngl_of_Z_add x) in Hab.
+Qed.
 
 Theorem plus_frac_part2 : ∀ a b,
   (frac_part a + frac_part b < 1)%L
@@ -2700,29 +2681,26 @@ rewrite <- (rngl_sub_add_distr Hos).
 progress f_equal.
 rewrite <- rngl_of_Z_add.
 progress f_equal.
-(* lemma? *)
-(**)
 rewrite Z.add_comm.
-... ...
 now apply plus_Int_part2.
-...
-specialize (rngl_sub_Int_part (a + b) b)%L as H1.
-assert ((frac_part (a + b) ≤ frac_part a + frac_part b)%L).
-...
+Qed.
 
 Theorem frac_part_double : ∀ x,
   frac_part (2 * x) =
     (2 * frac_part x - if Rlt_dec (frac_part x) (1 / 2) then 0 else 1)%L.
 Proof.
 intros.
-do 2 rewrite (rngl_mul_2_l Hon).
 destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   rewrite (rngl_sub_0_r Hos).
-... ...
+  do 2 rewrite (rngl_mul_2_l Hon).
   apply plus_frac_part2.
-...
-  rewrite Rminus_0_r; apply plus_frac_part2; lra.
+  rewrite <- (rngl_mul_2_r Hon).
+  apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hx; [ easy | ].
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
+(**)
+apply plus_frac_part1.
+...
 apply plus_frac_part1; lra.
 Qed.
 
