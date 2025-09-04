@@ -313,6 +313,12 @@ f_equal; try ring. {
   rewrite (rngl_mul_1_r Hon).
   rewrite (rngl_mul_mul_swap Hic (_ * _) _ 2).
   do 2 rewrite <- rngl_mul_add_distr_r.
+Search (_ * _⁻¹)%L.
+do 2 rewrite (rngl_mul_inv_r Hiv).
+...
+rewrite (rngl_div_div Hon Hos Hiv).
+...
+rewrite fold_Rdiv.
 ...
 remember 3⁻¹ as t.
 rewrite (rngl_mul_opp_r Hop).
