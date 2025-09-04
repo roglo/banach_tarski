@@ -2789,10 +2789,17 @@ destruct n as [| n| n]. {
   simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
   apply (rngl_pow_1_r Hon).
 } {
-...
-  rewrite Zabs2Nat.inj_add; [ | lia | lia ].
+  rewrite Zabs2Nat.inj_add; [ | easy | easy ].
   rewrite Zabs2Nat.inj_mul.
   simpl (Z.abs_nat _); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
+(**)
+  rewrite Nat.add_1_r.
+Search ((-1) ^ S _)%L.
+Search ((-1) ^ (2 * _))%L.
+...
+pow_1_odd
+     : ∀ n : ℕ, ((-1) ^ S (2 * n))%R = (-1)%R
+...
   now rewrite Nat.add_1_r, pow_1_odd.
 } {
   replace (Z.neg n) with (- Z.pos n)%Z by apply Pos2Z.opp_pos.
