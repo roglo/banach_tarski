@@ -2638,6 +2638,12 @@ rewrite (rngl_sub_diag Hos).
 apply rngl_add_0_l.
 Qed.
 
+Theorem plus_Int_part1 : ∀ a b,
+  (1 ≤ frac_part a + frac_part b)%L
+  → Int_part (a + b) = (Int_part a + Int_part b + 1)%Z.
+Proof.
+...
+
 Theorem plus_Int_part2 :
   ∀ a b,
   (frac_part a + frac_part b < 1)%L
@@ -2674,6 +2680,18 @@ Theorem plus_frac_part1 : ∀ a b,
   → frac_part (a + b) = (frac_part a + frac_part b - 1)%L.
 Proof.
 intros * Hab.
+progress unfold frac_part.
+rewrite <- (rngl_add_sub_swap Hop).
+rewrite (rngl_add_sub_assoc Hop).
+do 2 rewrite <- (rngl_sub_add_distr Hos).
+progress f_equal.
+rewrite rngl_add_assoc.
+rewrite <- rngl_of_Z_1.
+do 2 rewrite <- rngl_of_Z_add.
+progress f_equal.
+rewrite (Z.add_comm (Int_part b)).
+... ...
+now apply plus_Int_part1.
 ...
 
 Theorem plus_frac_part2 : ∀ a b,
