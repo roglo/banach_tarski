@@ -2669,6 +2669,13 @@ rewrite <- rngl_of_Z_1 in Hab.
 now rewrite <- (rngl_of_Z_add x) in Hab.
 Qed.
 
+Theorem plus_frac_part1 : ∀ a b,
+  (1 ≤ frac_part a + frac_part b)%L
+  → frac_part (a + b) = (frac_part a + frac_part b - 1)%L.
+Proof.
+intros * Hab.
+...
+
 Theorem plus_frac_part2 : ∀ a b,
   (frac_part a + frac_part b < 1)%L
   → frac_part (a + b) = (frac_part a + frac_part b)%L.
@@ -2699,6 +2706,15 @@ destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 (**)
+apply (rngl_nlt_ge_iff Hor) in Hx.
+do 2 rewrite (rngl_mul_2_l Hon).
+apply (rngl_le_div_l Hon Hop Hiv Hor) in Hx. 2: {
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+}
+rewrite (rngl_mul_2_r Hon) in Hx.
+... ...
+now apply plus_frac_part1.
+...
 apply plus_frac_part1.
 ...
 apply plus_frac_part1; lra.
