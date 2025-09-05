@@ -61,6 +61,14 @@ induction k; intros; simpl. {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 destruct (u i). {
+(**)
+  apply (rngl_le_add_le_sub_l Hop Hor).
+  eapply (rngl_le_trans Hor). {
+    apply IHk.
+    apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+Search (0 < 2)%L.
+...
+    apply rngl_lt_add_l.
 ...
   apply Rplus_le_reg_l with (r := (- (pow / 3))%L).
   rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
