@@ -6,6 +6,7 @@ Require Import RingLike.Core.
 Require Import TrigoWithoutPi.Angle.
 Require Import MiscReals.
 
+(*
 Section a.
 
 Context {T : Type}.
@@ -1102,3 +1103,4 @@ replace (1 - s²) with c² by lra.
 apply Rnot_lt_le in Hc.
 now rewrite sqrt_Rsqr.
 Qed.
+*)
