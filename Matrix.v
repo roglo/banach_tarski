@@ -1,5 +1,6 @@
 (* Banach-Tarski paradox. *)
 
+Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith List.
 From Stdlib Require Import Psatz.
 From Stdlib Require Import Ring Field.
@@ -49,6 +50,8 @@ Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+
+Definition mkrmat := @mkmat T.
 
 Definition Rmult5_sqrt2_sqrt5 := @Rmult5_sqrt2_sqrt5 T ro rp rl Hic Hon Hop Hor.
 Arguments Rmult5_sqrt2_sqrt5 (a b c d)%_L.
@@ -304,43 +307,17 @@ rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
-f_equal; try ring. {
-  rewrite (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_l.
-  rewrite (rngl_mul_opp_r Hop).
-  do 5 rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_opp_involutive Hop).
-  rewrite (rngl_mul_1_r Hon).
-  rewrite (rngl_mul_mul_swap Hic (_ * _) _ 2).
-  do 2 rewrite <- rngl_mul_add_distr_r.
-Search (_ * _⁻¹)%L.
-do 2 rewrite (rngl_mul_inv_r Hiv).
-...
-rewrite (rngl_div_div Hon Hos Hiv).
-...
-rewrite fold_Rdiv.
-...
-remember 3⁻¹ as t.
-rewrite (rngl_mul_opp_r Hop).
-do 5 rewrite (rngl_mul_opp_l Hop).
-rewrite (rngl_opp_involutive Hop).
-subst t.
-
-field_simplify.
-cbn.
-destruct ro.
-cbn.
-destruct rngl_opt_one.
-cbn.
-rewrite (rngl_add_opp_r Hop).
-rngwir
-cbn.
-...
+assert (H30 : (1 + 2 ≠ 0)%L). {
+  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  now cbn in H1; rewrite rngl_add_0_r in H1.
+}
+now f_equal; field.
 Qed.
 
 Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
 unfold mat_mul, mat_id, mkrmat; simpl.
+...
 unfold Rdiv.
 progress repeat rewrite <- Rmult_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
