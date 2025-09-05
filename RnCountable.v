@@ -1,7 +1,6 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 Arith.
-From Stdlib Require Import Psatz.
 
 Require Import RingLike.Core.
 Require Import MiscReals Countable.
@@ -20,6 +19,7 @@ Context {Har : rngl_is_archimedean T = true}.
 
 Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
+Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 
 Let Rlt_dec := Rlt_dec Hor.
 Let frac_part := @frac_part T ro rp Hon Hop Hiv Hor Hch Har.
@@ -56,13 +56,12 @@ Theorem partial_sum3_aux_le_half_pow : ∀ u k pow pow2 i,
 Proof.
 intros * Hpow Hpow2; subst pow2.
 revert pow i Hpow.
-(**)
 induction k; intros; simpl. {
   apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
-...
-induction k; intros; simpl; [ lra | ].
+}
 destruct (u i). {
+...
   apply Rplus_le_reg_l with (r := (- (pow / 3))%L).
   rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
   eapply Rle_trans; [ apply IHk; lra | lra ].
