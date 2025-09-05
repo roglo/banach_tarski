@@ -1,9 +1,25 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 Arith ZArith.
-From Stdlib Require Import Reals Psatz.
 
+Require Import RingLike.Core.
+Require Import TrigoWithoutPi.Angle.
 Require Import MiscReals.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {ac : angle_ctx T}.
+Context {Hor : rngl_is_ordered T = true}.
+
+Definition π := mk_angle (-1) 0 angle_straight_prop.
+
+Definition atan' x y :=
+  if Req_dec Hor y 0 then Rsign Hor x * π / 2 else atan (x / y).
+
+...
 
 Definition atan' x y :=
   if Req_dec y 0 then Rsign x * PI / 2 else atan (x / y).
