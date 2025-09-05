@@ -2827,6 +2827,15 @@ apply (rngl_sub_add Hop).
 Qed.
 
 (*
+Check 1%L.
+Check rngl_eq_dec.
+
+Definition is_one a :=
+  rngl_eqb a 1%L.
+
+Compute (is_one 1%L).
+...
+
 Definition rngl_of_decimal_uint (n : Decimal.uint) : T :=
   rngl_of_nat (Nat.of_uint n).
 
@@ -2844,9 +2853,6 @@ Definition rngl_of_decimal_int (n : Decimal.int) : option T :=
         Some (- rngl_of_decimal_uint ui)%L
       else None
   end.
-
-Check 1%L.
-Check rngl_eq_dec.
 
 Fixpoint nat_of_rngl it a :=
   match it with
