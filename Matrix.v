@@ -298,6 +298,19 @@ intros.
 destruct v as (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
+Theorem fold_rngl_add :
+  (let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add) = rngl_add.
+Proof. easy. Qed.
+
+Theorem fold_rngl_one :
+  (match
+     (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
+   with
+   | Some a => a
+   | None => let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero
+   end) = 1%L.
+Proof. easy. Qed.
+
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
 specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
@@ -316,33 +329,47 @@ Qed.
 
 Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
+specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
-...
-unfold Rdiv.
-progress repeat rewrite <- Rmult_assoc.
-rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-f_equal; lra.
+unfold rngl_div; rewrite Hiv.
+progress repeat rewrite rngl_mul_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+assert (H30 : (1 + 2 ≠ 0)%L). {
+  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  now cbn in H1; rewrite rngl_add_0_r in H1.
+}
+now f_equal; field.
 Qed.
 
 Theorem rot_rot_inv_z : (rot_z * rot_inv_z)%mat = mat_id.
 Proof.
+specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
-unfold Rdiv.
-progress repeat rewrite <- Rmult_assoc.
-rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-f_equal; lra.
+unfold rngl_div; rewrite Hiv.
+progress repeat rewrite rngl_mul_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+assert (H30 : (1 + 2 ≠ 0)%L). {
+  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  now cbn in H1; rewrite rngl_add_0_r in H1.
+}
+now f_equal; field.
 Qed.
 
 Theorem rot_inv_rot_z : (rot_inv_z * rot_z)%mat = mat_id.
 Proof.
+specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
-unfold Rdiv.
-progress repeat rewrite <- Rmult_assoc.
-rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-f_equal; lra.
+unfold rngl_div; rewrite Hiv.
+progress repeat rewrite rngl_mul_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+assert (H30 : (1 + 2 ≠ 0)%L). {
+  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  now cbn in H1; rewrite rngl_add_0_r in H1.
+}
+now f_equal; field.
 Qed.
 
 Theorem mat_of_elem_mul_negf_l : ∀ e,
@@ -350,10 +377,10 @@ Theorem mat_of_elem_mul_negf_l : ∀ e,
 Proof.
 intros (t, d); simpl.
 destruct t, d; simpl.
- apply rot_rot_inv_x.
- apply rot_inv_rot_x.
- apply rot_rot_inv_z.
- apply rot_inv_rot_z.
+apply rot_rot_inv_x.
+apply rot_inv_rot_x.
+apply rot_rot_inv_z.
+apply rot_inv_rot_z.
 Qed.
 
 Theorem mat_of_elem_mul_negf_r : ∀ e,
@@ -361,10 +388,10 @@ Theorem mat_of_elem_mul_negf_r : ∀ e,
 Proof.
 intros (t, d); simpl.
 destruct t, d; simpl.
- apply rot_inv_rot_x.
- apply rot_rot_inv_x.
- apply rot_inv_rot_z.
- apply rot_rot_inv_z.
+apply rot_inv_rot_x.
+apply rot_rot_inv_x.
+apply rot_inv_rot_z.
+apply rot_rot_inv_z.
 Qed.
 
 Definition mat_of_path el :=
@@ -455,9 +482,9 @@ Definition mat_transp m :=
    (a₁₃ m) (a₂₃ m) (a₃₃ m).
 
 Definition mat_det m :=
-  a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m) +
-  a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
-  a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m).
+  (a₁₁ m * (a₂₂ m * a₃₃ m - a₃₂ m * a₂₃ m) +
+   a₁₂ m * (a₂₃ m * a₃₁ m - a₃₃ m * a₂₁ m) +
+   a₁₃ m * (a₂₁ m * a₃₂ m - a₃₁ m * a₂₂ m))%L.
 
 Arguments mat_transp m%_mat.
 Arguments mat_det m%_mat.
@@ -469,7 +496,9 @@ Theorem mat_transp_mul : ∀ m₁ m₂,
   mat_transp (mat_mul m₁ m₂) = mat_mul (mat_transp m₂) (mat_transp m₁).
 Proof.
 intros m₁ m₂.
-unfold mat_transp, mat_mul; simpl; f_equal; ring.
+unfold mat_transp, mat_mul; simpl.
+progress unfold mkrmat.
+f_equal; ring.
 Qed.
 
 Theorem mat_transp_involutive : ∀ M, mat_transp (mat_transp M) = M.
@@ -485,7 +514,7 @@ unfold mat_mul; simpl; f_equal; ring.
 Qed.
 
 Theorem mat_det_mul : ∀ m₁ m₂,
-  mat_det (m₁ * m₂) = mat_det m₂ * mat_det m₁.
+  mat_det (m₁ * m₂) = (mat_det m₂ * mat_det m₁)%L.
 Proof.
 intros m₁ m₂.
 unfold mat_det; simpl; ring.
@@ -493,7 +522,7 @@ Qed.
 
 Definition is_rotation_matrix A :=
   mat_mul A (mat_transp A) = mat_id ∧
-  mat_det A = 1.
+  mat_det A = 1%L.
 
 Arguments is_rotation_matrix A%_mat.
 
@@ -505,21 +534,24 @@ Qed.
 
 Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
 Proof.
+specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
 unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
-unfold mat_id, Rdiv.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rmult_0_r.
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite <- Rmult_assoc.
-progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
-split; [ f_equal; field | field ].
-Qed.
+unfold mat_id, rngl_div; rewrite Hiv.
+(**)
+do 18 rewrite rngl_mul_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+assert (H30 : (1 + 2 ≠ 0)%L). {
+  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  now cbn in H1; rewrite rngl_add_0_r in H1.
+}
+split; [ now f_equal; try field | now field ].
 
 Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
 unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
+...
 unfold mat_id, Rdiv.
 progress repeat rewrite Rmult_0_l.
 progress repeat rewrite Rmult_0_r.
