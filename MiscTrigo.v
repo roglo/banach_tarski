@@ -6,6 +6,7 @@ Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 (* TODO: make a correct interface for TrigoWithoutPi *)
 Require Import TrigoWithoutPi.Angle.
+Require Import TrigoWithoutPi.AngleAddLeMonoL_prop.
 Require Import TrigoWithoutPi.AngleDiv2.
 Require Import TrigoWithoutPi.Angle_order.
 Require Import TrigoWithoutPi.SeqAngleIsCauchy.
@@ -26,7 +27,7 @@ Context {Hiq : rngl_has_inv_or_pdiv T = true}.
 Context {Hc1 : rngl_characteristic T ≠ 1}.
 Context {Hor : rngl_is_ordered T = true}.
 
-Definition π := mk_angle (-1) 0 angle_straight_prop.
+Definition π := angle_straight.
 
 Definition acos := rngl_acos.
 Definition asin x := (π /₂ - rngl_acos x)%A.
@@ -75,9 +76,24 @@ assert (Hs : (√ (1 + x²) ≠ 0)%L). {
 }
 assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
   intros y.
+(**)
   apply rngl_lt_0_cos.
   progress unfold atan.
   progress unfold asin.
+  remember (y <? 0)%L as yz eqn:Hyz.
+  symmetry in Hyz.
+  destruct yz. {
+    progress unfold π.
+    rewrite angle_straight_div_2.
+Search (_ - _ < _)%A.
+Search rngl_acos.
+...
+    progress unfold rngl_acos.
+...
+    rewrite angle_opp_sub_distr.
+...
+Search angle_right.
+angle_straight_div_2:
 ...
   specialize (atan_bound y) as (Hlta, Halt).
   apply cos_gt_0; [ lra | easy ].
