@@ -1,11 +1,13 @@
 (* Banach-Tarski paradox. *)
 
+Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith ZArith.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 (**)
 Require Import TrigoWithoutPi.Core.
+Require Import TrigoWithoutPi.AngleAddLeMonoL.
 (*
 Require Import TrigoWithoutPi.Angle.
 Require Import TrigoWithoutPi.AngleAddLeMonoL_prop.
@@ -88,6 +90,21 @@ assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
     progress unfold π.
     rewrite angle_straight_div_2.
     rewrite angle_opp_sub_distr.
+Search (_ - _ < _)%A.
+Theorem angle_lt_sub_lt_add_l_1 :
+  ∀ θ1 θ2 θ3 : angle T,
+  angle_add_overflow θ2 θ3 = false
+  → (θ1 - θ2 < θ3)%A
+  → (θ1 < θ2 + θ3)%A.
+Proof.
+intros * H23 H123.
+...
+Check angle_add_lt_mono_l.
+angle_add_lt_mono_l
+     : ∀ θ1 θ2 θ3 : angle T, angle_add_overflow θ1 θ3 = false → (θ2 < θ3)%A → (θ1 + θ2 < θ1 + θ3)%A
+...
+Theorem angle_lt_sub_lt_add_l :
+  ∀ a b c : angle T, (a - b < c)%A ↔ (a < b + c)%A.
 ...
     progress unfold rngl_acos.
     destruct (rngl_le_dec _ _ _) as [Hy1| Hy1]. {
@@ -98,6 +115,9 @@ Search (_ < _)%A.
 ...
   specialize (atan_bound y) as (Hlta, Halt).
   apply cos_gt_0; [ lra | easy ].
+...
+atan_bound
+     : ∀ x : R, (- PI / 2 < atan x < PI / 2)%R
 }
 apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
 rewrite <- Rinv_div, Rinv_l; [ | easy ].
