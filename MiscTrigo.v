@@ -22,18 +22,26 @@ Definition π := mk_angle (-1) 0 angle_straight_prop.
 
 Definition acos := rngl_acos.
 Definition asin x := (π /₂ - rngl_acos x)%A.
+
+Arguments acos x%_L.
+Arguments asin x%_L.
+
+Definition atan x :=
+  if (x <? 0)%L then (- asin (rngl_abs x / √(1 + x²)))%A
+  else asin (x / √(1 + x²)).
+
+Arguments atan x%_L.
+
+Definition atan' (x y : T) :=
+  if (y =? 0)%L then
+    match (x ?= 0)%L with
+    | Eq => 0%A
+    | Lt => (- π /₂)%A
+    | Gt => (π /₂)%A
+    end
+  else atan (x / y).
+
 ...
-
-Definition atan' x y :=
-  if Req_dec Hor y 0 then Rsign Hor x * π / 2 else atan (x / y).
-
-...
-
-Definition atan' x y :=
-  if Req_dec y 0 then Rsign x * PI / 2 else atan (x / y).
-
-Definition asin x := atan' x (√ (1 - x²)).
-Definition acos x := PI / 2 - asin x.
 
 Definition angle_of_sin_cos s c :=
   if Rlt_dec s 0 then
