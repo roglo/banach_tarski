@@ -4,9 +4,13 @@ From Stdlib Require Import Utf8 Arith ZArith.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
+(* TODO: make a correct interface for TrigoWithoutPi *)
 Require Import TrigoWithoutPi.Angle.
 Require Import TrigoWithoutPi.AngleDiv2.
+Require Import TrigoWithoutPi.Angle_order.
+Require Import TrigoWithoutPi.SeqAngleIsCauchy.
 Require Import TrigoWithoutPi.TrigoWithoutPiExt.
+(* *)
 Require Import MiscReals.
 
 Section a.
@@ -19,6 +23,7 @@ Context {ac : angle_ctx T}.
 Context {Hon : rngl_has_1 T = true}.
 Context {Hos : rngl_has_opp_or_psub T = true}.
 Context {Hiq : rngl_has_inv_or_pdiv T = true}.
+Context {Hc1 : rngl_characteristic T ≠ 1}.
 Context {Hor : rngl_is_ordered T = true}.
 
 Definition π := mk_angle (-1) 0 angle_straight_prop.
@@ -58,13 +63,22 @@ intros.
 assert (Hs : (√ (1 + x²) ≠ 0)%L). {
   intros H.
   specialize (rngl_squ_nonneg Hon Hos Hiq Hor x) as Hs.
-(**)
-  apply (eq_rl_sqrt_0 Hon Hos) in H.
-...
-  apply sqrt_eq_0 in H; lra.
+  apply (eq_rl_sqrt_0 Hon Hos) in H. {
+    apply (rngl_eq_add_0 Hos Hor) in H.
+    now destruct H as (H, _); apply (rngl_1_neq_0 Hon Hc1) in H.
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+  }
+  apply (rngl_le_0_add Hos Hor).
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
-assert (Hca : ∀ x, 0 < cos (atan x)). {
+assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
   intros y.
+  apply rngl_lt_0_cos.
+  progress unfold atan.
+  progress unfold asin.
+...
   specialize (atan_bound y) as (Hlta, Halt).
   apply cos_gt_0; [ lra | easy ].
 }
