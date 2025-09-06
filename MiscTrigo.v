@@ -98,10 +98,26 @@ Theorem angle_lt_sub_lt_add_l_1 :
   → (θ1 < θ2 + θ3)%A.
 Proof.
 intros * H23 H123.
+apply (angle_add_lt_mono_l θ2) in H123; [ | easy ].
+rewrite angle_add_comm in H123.
+now rewrite angle_sub_add in H123.
+Qed.
+
+Theorem angle_lt_sub_lt_add_l_2 :
+  ∀ θ1 θ2 θ3 : angle T,
+  angle_add_overflow θ2 θ3 = false
+  → (θ1 < θ2 + θ3)%A
+  → (θ1 - θ2 < θ3)%A.
+Proof.
+intros * H23 H123.
+apply (angle_add_lt_mono_l (-θ2)) in H123; [ | ].
+do 2 rewrite angle_add_opp_l in H123.
+rewrite angle_add_comm in H123.
+now rewrite angle_add_sub in H123.
+Search (angle_add_overflow _ (- _)).
+rewrite angle_add_comm.
 ...
-Check angle_add_lt_mono_l.
-angle_add_lt_mono_l
-     : ∀ θ1 θ2 θ3 : angle T, angle_add_overflow θ1 θ3 = false → (θ2 < θ3)%A → (θ1 + θ2 < θ1 + θ3)%A
+apply TrigoWithoutPiExt.angle_add_not_overflow_move_add.
 ...
 Theorem angle_lt_sub_lt_add_l :
   ∀ a b c : angle T, (a - b < c)%A ↔ (a < b + c)%A.
