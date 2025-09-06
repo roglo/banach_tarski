@@ -4,14 +4,16 @@ From Stdlib Require Import Utf8 Arith ZArith.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
-(* TODO: make a correct interface for TrigoWithoutPi *)
+(**)
+Require Import TrigoWithoutPi.Core.
+(*
 Require Import TrigoWithoutPi.Angle.
 Require Import TrigoWithoutPi.AngleAddLeMonoL_prop.
 Require Import TrigoWithoutPi.AngleDiv2.
 Require Import TrigoWithoutPi.Angle_order.
 Require Import TrigoWithoutPi.SeqAngleIsCauchy.
 Require Import TrigoWithoutPi.TrigoWithoutPiExt.
-(* *)
+*)
 Require Import MiscReals.
 
 Section a.
