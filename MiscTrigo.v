@@ -3,19 +3,26 @@
 From Stdlib Require Import Utf8 Arith ZArith.
 
 Require Import RingLike.Core.
+Require Import RingLike.RealLike.
 Require Import TrigoWithoutPi.Angle.
+Require Import TrigoWithoutPi.AngleDiv2.
+Require Import TrigoWithoutPi.TrigoWithoutPiExt.
 Require Import MiscReals.
 
-(*
 Section a.
 
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 Context {Hor : rngl_is_ordered T = true}.
 
 Definition π := mk_angle (-1) 0 angle_straight_prop.
+
+Definition acos := rngl_acos.
+Definition asin x := (π /₂ - rngl_acos x)%A.
+...
 
 Definition atan' x y :=
   if Req_dec Hor y 0 then Rsign Hor x * π / 2 else atan (x / y).
@@ -1103,4 +1110,3 @@ replace (1 - s²) with c² by lra.
 apply Rnot_lt_le in Hc.
 now rewrite sqrt_Rsqr.
 Qed.
-*)
