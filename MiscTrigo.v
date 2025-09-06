@@ -86,17 +86,15 @@ assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
   symmetry in Hyz.
   destruct yz. {
     progress unfold π.
-...
     rewrite angle_straight_div_2.
-Search (_ - _ < _)%A.
-Search rngl_acos.
-...
-    progress unfold rngl_acos.
-...
     rewrite angle_opp_sub_distr.
 ...
-Search angle_right.
-angle_straight_div_2:
+    progress unfold rngl_acos.
+    destruct (rngl_le_dec _ _ _) as [Hy1| Hy1]. {
+      progress unfold angle_sub.
+      progress unfold angle_add.
+      cbn.
+Search (_ < _)%A.
 ...
   specialize (atan_bound y) as (Hlta, Halt).
   apply cos_gt_0; [ lra | easy ].
