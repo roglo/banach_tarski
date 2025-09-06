@@ -16,6 +16,9 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
+Context {Hon : rngl_has_1 T = true}.
+Context {Hos : rngl_has_opp_or_psub T = true}.
+Context {Hiq : rngl_has_inv_or_pdiv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 
 Definition π := mk_angle (-1) 0 angle_straight_prop.
@@ -41,20 +44,23 @@ Definition atan' (x y : T) :=
     end
   else atan (x / y).
 
-...
+Check Rlt_dec.
 
 Definition angle_of_sin_cos s c :=
-  if Rlt_dec s 0 then
-    if Rlt_dec c 0 then 2 * PI - acos c else asin s + 2 * PI
+  if Rlt_dec Hor s 0 then
+    if Rlt_dec Hor c 0 then (- acos c)%A else asin s
   else
-    if Rlt_dec c 0 then acos c else asin s.
+    if Rlt_dec Hor c 0 then acos c else asin s.
 
-Theorem cos_atan : ∀ x, cos (atan x) = 1 / √ (1 + x²).
+Theorem cos_atan : ∀ x, rngl_cos (atan x) = (1 / √ (1 + x²))%L.
 Proof.
 intros.
-assert (Hs : √ (1 + x²) ≠ 0). {
+assert (Hs : (√ (1 + x²) ≠ 0)%L). {
   intros H.
-  specialize (Rle_0_sqr x) as Hs.
+  specialize (rngl_squ_nonneg Hon Hos Hiq Hor x) as Hs.
+(**)
+  apply (eq_rl_sqrt_0 Hon Hos) in H.
+...
   apply sqrt_eq_0 in H; lra.
 }
 assert (Hca : ∀ x, 0 < cos (atan x)). {
