@@ -8,11 +8,7 @@ Require Import RingLike.RealLike.
 Require Import TrigoWithoutPi.Angle.
 Require Import TrigoWithoutPi.TrigoWithoutPiExt.
 Require Import TrigoWithoutPi.AngleDiv2.
-Require Import TrigoWithoutPi.SeqAngleIsCauchy.
 Require Import TrigoWithoutPi.Angle_order.
-(*
-Require Import TrigoWithoutPi.AngleAddLeMonoL_prop.
-*)
 Require Import MiscReals.
 
 Section a.
