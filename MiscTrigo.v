@@ -5,17 +5,17 @@ From Stdlib Require Import Utf8 Arith ZArith.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
-(**)
+(*
 Require Import TrigoWithoutPi.Core.
 Require Import TrigoWithoutPi.AngleAddLeMonoL.
-(*
+*)
 Require Import TrigoWithoutPi.Angle.
 Require Import TrigoWithoutPi.AngleAddLeMonoL_prop.
 Require Import TrigoWithoutPi.AngleDiv2.
 Require Import TrigoWithoutPi.Angle_order.
 Require Import TrigoWithoutPi.SeqAngleIsCauchy.
 Require Import TrigoWithoutPi.TrigoWithoutPiExt.
-*)
+(**)
 Require Import MiscReals.
 
 Section a.
@@ -98,6 +98,7 @@ Theorem angle_lt_sub_lt_add_l_1 :
   → (θ1 < θ2 + θ3)%A.
 Proof.
 intros * H23 H123.
+...
 apply (angle_add_lt_mono_l θ2) in H123; [ | easy ].
 rewrite angle_add_comm in H123.
 now rewrite angle_sub_add in H123.
@@ -114,10 +115,13 @@ apply (angle_add_lt_mono_l (-θ2)) in H123; [ | ].
 do 2 rewrite angle_add_opp_l in H123.
 rewrite angle_add_comm in H123.
 now rewrite angle_add_sub in H123.
-Search (angle_add_overflow _ (- _)).
 rewrite angle_add_comm.
 ...
-apply TrigoWithoutPiExt.angle_add_not_overflow_move_add.
+apply TrigoWithoutPiExt.angle_add_not_overflow_move_add. 2: {
+  rewrite angle_add_opp_l.
+  rewrite angle_sub_diag.
+  apply TrigoWithoutPiExt.angle_add_overflow_0_l.
+}
 ...
 Theorem angle_lt_sub_lt_add_l :
   ∀ a b c : angle T, (a - b < c)%A ↔ (a < b + c)%A.
