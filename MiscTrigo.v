@@ -99,6 +99,27 @@ assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
     rewrite angle_opp_sub_distr.
 Theorem angle_lt_sub_lt_add_l_2 :
   ∀ θ1 θ2 θ3 : angle T,
+  angle_add_overflow θ1 (-θ2) = false
+  → (θ1 < θ2 + θ3)%A
+  → (θ1 - θ2 < θ3)%A.
+Proof.
+intros * H12 H123.
+...
+apply (angle_add_lt_mono_l (-θ2)) in H123; [ | ].
+do 2 rewrite angle_add_opp_l in H123.
+rewrite angle_add_comm in H123.
+now rewrite angle_add_sub in H123.
+rewrite angle_add_comm.
+(**)
+...
+apply angle_add_not_overflow_move_add. 2: {
+  rewrite angle_add_opp_l.
+  rewrite angle_sub_diag.
+  apply angle_add_overflow_0_l.
+}
+...
+Theorem angle_lt_sub_lt_add_l_2 :
+  ∀ θ1 θ2 θ3 : angle T,
   angle_add_overflow θ2 θ3 = false
   → (θ1 < θ2 + θ3)%A
   → (θ1 - θ2 < θ3)%A.
@@ -109,6 +130,12 @@ do 2 rewrite angle_add_opp_l in H123.
 rewrite angle_add_comm in H123.
 now rewrite angle_add_sub in H123.
 rewrite angle_add_comm.
+(**)
+Search (angle_add_overflow (_ + _)).
+About angle_add_overflow_move_add.
+About angle_add_not_overflow_move_add.
+apply angle_add_overflow_move_add. 2: {
+...
 apply angle_add_not_overflow_move_add. 2: {
   rewrite angle_add_opp_l.
   rewrite angle_sub_diag.
