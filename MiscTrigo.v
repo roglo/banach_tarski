@@ -104,14 +104,19 @@ Theorem angle_lt_sub_lt_add_l_2 :
   → (θ1 - θ2 < θ3)%A.
 Proof.
 intros * H12 H123.
-...
 apply (angle_add_lt_mono_l (-θ2)) in H123; [ | ].
 do 2 rewrite angle_add_opp_l in H123.
 rewrite angle_add_comm in H123.
 now rewrite angle_add_sub in H123.
 rewrite angle_add_comm.
-(**)
+(*
+rewrite <- angle_add_overflow_assoc; [ | | ]. {
+  rewrite angle_add_opp_l.
+  rewrite angle_sub_diag.
+  apply angle_add_overflow_0_l.
+}
 ...
+*)
 apply angle_add_not_overflow_move_add. 2: {
   rewrite angle_add_opp_l.
   rewrite angle_sub_diag.
