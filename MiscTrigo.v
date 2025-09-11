@@ -69,24 +69,6 @@ rewrite angle_add_comm in H123.
 now rewrite angle_sub_add in H123.
 Qed.
 
-Theorem cos_atan : ∀ x, rngl_cos (atan x) = (1 / √ (1 + x²))%L.
-Proof.
-intros.
-assert (Hs : (√ (1 + x²) ≠ 0)%L). {
-  intros H.
-  specialize (rngl_squ_nonneg Hon Hos Hiq Hor x) as Hs.
-  apply (eq_rl_sqrt_0 Hon Hos) in H. {
-    apply (rngl_eq_add_0 Hos Hor) in H.
-    now destruct H as (H, _); apply (rngl_1_neq_0 Hon Hc1) in H.
-    apply (rngl_0_le_1 Hon Hos Hiq Hor).
-    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-  }
-  apply (rngl_le_0_add Hos Hor).
-  apply (rngl_0_le_1 Hon Hos Hiq Hor).
-  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-}
-Check atan.
-Print atan.
 Theorem atan_bound : ∀ x, (- (π /₂) < atan x ∨ atan x < π /₂)%A.
 Proof.
 clear Hon Hos Hiq Hor.
@@ -277,7 +259,7 @@ destruct xz. {
   right.
   apply (rngl_ltb_ge_iff Hor) in Hxz.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor x) at 1; [ | easy ].
-(* pareil que ci-dessus *)
+  (* presque pareil que ci-dessus *)
   progress unfold asin.
   progress unfold rngl_acos.
   destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
@@ -337,7 +319,6 @@ destruct xz. {
     apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H.
     rewrite (rngl_abs_1 Hon Hos Hiq Hor) in H.
     progress unfold rngl_abs in H.
-(**)
     remember (x ≤? 0)%L as xz eqn:Hxz'.
     symmetry in Hxz'.
     destruct xz. {
@@ -374,30 +355,7 @@ destruct xz. {
     rewrite <- (rngl_div_1_r Hon Hiq Hc1) in H.
     apply (rngl_div_div_mul_mul Hon Hic Hiv) in H; [ | | easy ].
     do 2 rewrite (rngl_mul_1_r Hon) in H.
-...
-    rewrite H.
-      apply rl_sqrt_nonneg.
-      apply (rngl_le_trans Hor _ 1).
-      apply (rngl_0_le_1 Hon Hos Hiq Hor).
-      apply (rngl_le_add_r Hos Hor).
-      apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-      intros H1.
-      apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
-        apply (rngl_le_0_add Hos Hor).
-        apply (rngl_0_le_1 Hon Hos Hiq Hor).
-        apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-      }
-      apply (rngl_eq_add_0 Hos Hor) in H1.
-      now destruct H1 as (H1, _).
-      now apply (rngl_0_le_1 Hon Hos Hiq Hor).
-      now apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-    }
-    rewrite <- (rngl_div_opp_l Hop Hiv) in H.
-    rewrite <- (rngl_div_1_r Hon Hiq Hc1) in H.
-    apply (rngl_div_div_mul_mul Hon Hic Hiv) in H; [ | | easy ].
-    do 2 rewrite (rngl_mul_1_r Hon) in H.
     apply (f_equal rngl_squ) in H.
-    rewrite (rngl_squ_opp Hop) in H.
     rewrite (rngl_squ_sqrt Hon) in H.
     symmetry in H.
     apply (rngl_add_move_r Hop) in H.
@@ -431,114 +389,30 @@ destruct xz. {
   apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
-...
-    exfalso.
-    apply Hx1; clear Hx1.
-    apply (rngl_squ_le_1 Hon Hop Hiq Hor).
-    split. {
-      apply (rngl_le_trans Hor _ 0).
-      apply (rngl_opp_1_le_0 Hon Hop Hiq Hor).
-      apply (rngl_div_nonneg Hon Hop Hiv Hor).
-      apply (rngl_abs_nonneg Hop Hor).
-      apply (rl_sqrt_pos Hon Hos Hor).
-      apply (rngl_lt_le_trans Hor _ 1).
-      apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
-      apply (rngl_le_add_r Hos Hor).
-      apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-    }
-    apply (rngl_le_div_l Hon Hop Hiv Hor). {
-      apply (rl_sqrt_pos Hon Hos Hor).
-      apply (rngl_lt_le_trans Hor _ 1).
-      apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
-      apply (rngl_le_add_r Hos Hor).
-      apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-    }
-    rewrite (rngl_mul_1_l Hon).
-    rewrite <- (rl_sqrt_squ Hon Hop Hor).
-    apply (rl_sqrt_le_rl_sqrt Hon Hop Hiq Hor).
-    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-    apply (rngl_le_add_l Hos Hor).
+Qed.
+
+Theorem cos_atan : ∀ x, rngl_cos (atan x) = (1 / √ (1 + x²))%L.
+Proof.
+intros.
+assert (Hs : (√ (1 + x²) ≠ 0)%L). {
+  intros H.
+  specialize (rngl_squ_nonneg Hon Hos Hiq Hor x) as Hs.
+  apply (eq_rl_sqrt_0 Hon Hos) in H. {
+    apply (rngl_eq_add_0 Hos Hor) in H.
+    now destruct H as (H, _); apply (rngl_1_neq_0 Hon Hc1) in H.
     apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
   }
-...
+  apply (rngl_le_0_add Hos Hor).
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+}
 assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
   intros y.
-(**)
-  apply rngl_lt_0_cos.
-  progress unfold atan.
-  progress unfold asin.
-  remember (y <? 0)%L as yz eqn:Hyz.
-  symmetry in Hyz.
-  destruct yz. {
-    progress unfold π.
-    rewrite angle_straight_div_2.
-    rewrite angle_opp_sub_distr.
-...
-Theorem angle_lt_sub_lt_add_l_2 :
-  ∀ θ1 θ2 θ3 : angle T,
-  angle_add_overflow θ1 (-θ2) = false
-  → (θ1 < θ2 + θ3)%A
-  → (θ1 - θ2 < θ3)%A.
-Proof.
-intros * H12 H123.
-apply (angle_add_lt_mono_l (-θ2)) in H123; [ | ].
-do 2 rewrite angle_add_opp_l in H123.
-rewrite angle_add_comm in H123.
-now rewrite angle_add_sub in H123.
-rewrite angle_add_comm.
-(*
-rewrite <- angle_add_overflow_assoc; [ | | ]. {
-  rewrite angle_add_opp_l.
-  rewrite angle_sub_diag.
-  apply angle_add_overflow_0_l.
-}
-...
-*)
-apply angle_add_not_overflow_move_add. 2: {
-  rewrite angle_add_opp_l.
-  rewrite angle_sub_diag.
-  apply angle_add_overflow_0_l.
-}
-...
-Theorem angle_lt_sub_lt_add_l_2 :
-  ∀ θ1 θ2 θ3 : angle T,
-  angle_add_overflow θ2 θ3 = false
-  → (θ1 < θ2 + θ3)%A
-  → (θ1 - θ2 < θ3)%A.
-Proof.
-intros * H23 H123.
-apply (angle_add_lt_mono_l (-θ2)) in H123; [ | ].
-do 2 rewrite angle_add_opp_l in H123.
-rewrite angle_add_comm in H123.
-now rewrite angle_add_sub in H123.
-rewrite angle_add_comm.
-(**)
-Search (angle_add_overflow (_ + _)).
-About angle_add_overflow_move_add.
-About angle_add_not_overflow_move_add.
-apply angle_add_overflow_move_add. 2: {
-...
-apply angle_add_not_overflow_move_add. 2: {
-  rewrite angle_add_opp_l.
-  rewrite angle_sub_diag.
-  apply angle_add_overflow_0_l.
-}
-...
-Theorem angle_lt_sub_lt_add_l :
-  ∀ a b c : angle T, (a - b < c)%A ↔ (a < b + c)%A.
-...
-    progress unfold rngl_acos.
-    destruct (rngl_le_dec _ _ _) as [Hy1| Hy1]. {
-      progress unfold angle_sub.
-      progress unfold angle_add.
-      cbn.
-Search (_ < _)%A.
+  specialize (atan_bound y) as H1.
 ...
   specialize (atan_bound y) as (Hlta, Halt).
   apply cos_gt_0; [ lra | easy ].
-...
-atan_bound
-     : ∀ x : R, (- PI / 2 < atan x < PI / 2)%R
 }
 apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
 rewrite <- Rinv_div, Rinv_l; [ | easy ].
@@ -555,6 +429,7 @@ rewrite Rmult_div_r; [ | intros H; apply Rsqr_eq_0 in H; lra ].
 rewrite Rplus_comm, sin2_cos2.
 apply sqrt_1.
 Qed.
+...
 
 Theorem sin_atan : ∀ x, sin (atan x) = x / √ (1 + x²).
 Proof.
