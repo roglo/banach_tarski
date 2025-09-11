@@ -255,6 +255,18 @@ destruct xz. {
     apply (rngl_mul_1_r Hon).
   }
   exfalso.
+  apply Bool.not_true_iff_false in Hzx.
+  apply Hzx; clear Hzx.
+  apply rngl_leb_le.
+  apply (rngl_div_nonneg Hon Hop Hiv Hor).
+  apply (rngl_abs_nonneg Hop Hor).
+  apply (rl_sqrt_pos Hon Hos Hor).
+  apply (rngl_lt_le_trans Hor _ 1).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_le_add_r Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+}
+right.
 ...
     exfalso.
     apply Hx1; clear Hx1.
