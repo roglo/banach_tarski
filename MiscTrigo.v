@@ -167,6 +167,67 @@ destruct xz. {
     apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_1 Hon Hos Hiq Hor).
   }
+  progress unfold π.
+  rewrite angle_straight_div_2.
+  progress unfold angle_sub.
+  progress unfold angle_add.
+  progress unfold angle_opp.
+  progress unfold angle_ltb.
+  cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite (rngl_mul_1_l Hon).
+  rewrite rngl_add_0_r.
+  rewrite (rngl_sub_opp_r Hop).
+  rewrite rngl_add_0_l.
+  rewrite (rngl_0_leb_1 Hon Hos Hiq Hor).
+  remember (0 ≤? _)%L as zx eqn:Hzx.
+  symmetry in Hzx.
+  destruct zx. {
+    apply rngl_ltb_lt.
+    apply (rl_sqrt_pos Hon Hos Hor).
+    apply (rngl_lt_0_sub Hop Hor).
+    apply (rngl_le_neq Hor).
+    split; [ easy | ].
+    intros H.
+    rewrite <- (rngl_squ_1 Hon) in H at 2.
+    apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H.
+    rewrite (rngl_abs_1 Hon Hos Hiq Hor) in H.
+    progress unfold rngl_abs in H.
+    generalize Hxz; intros H1.
+    apply (rngl_lt_le_incl Hor) in H1.
+    apply rngl_leb_le in H1.
+    rewrite H1 in H; clear H1.
+    rewrite (rngl_div_opp_l Hop Hiv) in H.
+    rewrite (rngl_opp_involutive Hop) in H.
+    rewrite (rngl_leb_opp_l Hop Hor) in H.
+    rewrite (rngl_opp_0 Hop) in H.
+    remember (0 ≤? x / _)%L as zxs eqn:Hzxs.
+    symmetry in Hzxs.
+    destruct zxs. {
+      apply rngl_nle_gt in Hxz.
+      apply Hxz; clear Hxz.
+      (* lemma *)
+      rewrite <- (rngl_div_1_r Hon Hiq Hc1) in H.
+      apply (rngl_div_div_mul_mul Hon Hic Hiv) in H.
+      do 2 rewrite (rngl_mul_1_r Hon) in H.
+      rewrite H.
+      apply rl_sqrt_nonneg.
+      apply (rngl_le_trans Hor _ 1).
+      apply (rngl_0_le_1 Hon Hos Hiq Hor).
+      apply (rngl_le_add_r Hos Hor).
+      apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+      intros H1.
+      apply (eq_rl_sqrt_0 Hon Hos) in H1. 2: {
+        apply (rngl_le_0_add Hos Hor).
+        apply (rngl_0_le_1 Hon Hos Hiq Hor).
+        apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+      }
+      apply (rngl_eq_add_0 Hos Hor) in H1.
+      now destruct H1 as (H1, _); apply (rngl_1_neq_0 Hon Hc1) in H1.
+      apply (rngl_0_le_1 Hon Hos Hiq Hor).
+      apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+      apply (rngl_1_neq_0 Hon Hc1).
+    }
 ...
     exfalso.
     apply Hx1; clear Hx1.
