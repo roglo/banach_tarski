@@ -106,37 +106,68 @@ destruct xz. {
     progress unfold asin in H.
     apply -> angle_sub_move_0_r in H.
     symmetry in H.
-... ...
+    progress unfold rngl_acos in H.
+    progress unfold π in H.
+    rewrite angle_straight_div_2 in H.
+    destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
+      apply eq_angle_eq in H.
+      cbn in H.
+      injection H; clear H; intros H1 H2.
+      now apply (rngl_1_neq_0 Hon Hc1) in H2.
+    }
+    injection H; clear H; intros H1 H2.
+    progress unfold rngl_div in H2.
+    rewrite Hiv in H2.
+    apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2. {
+      apply (eq_rngl_abs_0 Hop) in H2; subst x.
+      now apply (rngl_lt_irrefl Hor) in Hxz.
+    }
+    apply (rngl_inv_neq_0 Hon Hos Hiv).
+    intros H.
+    apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
+      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_0_le_1 Hon Hos Hiq Hor).
+      apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+    }
+    apply (rngl_eq_add_0 Hos Hor) in H.
+    now destruct H as (H, _); apply (rngl_1_neq_0 Hon Hc1) in H.
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+  }
   progress unfold asin.
-  rewrite angle_opp_sub_distr.
   progress unfold rngl_acos.
-  destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. {
-    progress unfold angle_ltb.
-    cbn.
-    rewrite (rngl_leb_refl Hor).
-    rewrite (rngl_mul_1_l Hon).
-    rewrite (rngl_add_opp_diag_r Hop).
-    rewrite (rngl_div_0_l Hos Hi1); [ | easy ].
-    rewrite (rl_sqrt_0 Hon Hop Hor Hii).
-    do 2 rewrite (rngl_mul_0_r Hos).
-    rewrite rngl_add_0_l.
-    rewrite (rngl_sub_opp_r Hop).
-    rewrite (rngl_div_diag Hon Hiq); [ | easy ].
-    rewrite (rl_sqrt_1 Hon Hop Hiq Hor).
-    rewrite (rngl_0_leb_1 Hon Hos Hiq Hor).
-    do 2 rewrite (rngl_mul_opp_r Hop).
-    do 2 rewrite (rngl_mul_1_r Hon).
-    rewrite (rngl_sub_opp_r Hop).
-(* merde, c'est faux *)
+  destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
+    exfalso; apply Hx1; clear Hx1.
+    rewrite <- (rngl_squ_1 Hon).
+    apply (rngl_le_le_squ Hon Hop Hiq Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (rngl_abs_nonneg Hop Hor).
+    apply (rl_sqrt_pos Hon Hos Hor).
+    rewrite (rngl_squ_1 Hon).
+    apply (rngl_lt_0_add Hos Hor).
+    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+    apply (rngl_div_le_1 Hon Hop Hiv Hor).
+    rewrite (rngl_squ_1 Hon).
+    intros H.
+    apply (eq_rl_sqrt_0 Hon Hos) in H. 2: {
+      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_0_le_1 Hon Hos Hiq Hor).
+      apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+    }
+    apply (rngl_eq_add_0 Hos Hor) in H.
+    now destruct H as (H, _); apply (rngl_1_neq_0 Hon Hc1) in H.
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+    rewrite (rngl_squ_1 Hon).
+    split; [ apply (rngl_abs_nonneg Hop Hor) | ].
+    rewrite <- (rl_sqrt_squ Hon Hop Hor).
+    apply (rl_sqrt_le_rl_sqrt Hon Hop Hiq Hor).
+    apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+    apply (rngl_le_add_l Hos Hor).
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+  }
 ...
-cbn - [ rngl_cos rngl_sin ].
-Search (0 ≤ rngl_sin _)%L.
-    progress unfold angle_sub.
-    progress unfold angle_add.
-    progress unfold angle_opp.
-    cbn.
-
-... ...
     exfalso.
     apply Hx1; clear Hx1.
     apply (rngl_squ_le_1 Hon Hop Hiq Hor).
