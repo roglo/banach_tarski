@@ -31,10 +31,6 @@ Context {Hor : rngl_is_ordered T = true}.
 
 Definition π := angle_straight.
 
-Definition rngl_asin x := (π /₂ - rngl_acos x)%A.
-
-Arguments rngl_asin x%_L.
-
 Definition rngl_atan x :=
   if (x <? 0)%L then (- rngl_asin (rngl_abs x / √(1 + x²)))%A
   else rngl_asin (x / √(1 + x²)).
@@ -99,8 +95,6 @@ destruct xz. {
     apply -> angle_sub_move_0_r in H.
     symmetry in H.
     progress unfold rngl_acos in H.
-    progress unfold π in H.
-    rewrite angle_straight_div_2 in H.
     destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
       apply eq_angle_eq in H.
       cbn in H.
@@ -444,19 +438,62 @@ rewrite angle_opp_sub_distr.
 progress f_equal.
 apply angle_sub_move_r.
 symmetry.
-apply angle_add_div_2_diag.
+apply angle_right_add_right.
 Qed.
 
 Theorem rngl_tan_atan : ∀ a, rngl_tan (rngl_atan a) = a.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 a).
+  apply H1.
+}
 intros.
+assert (Hz1a2 : (0 < 1 + a²)%L). {
+  apply (rngl_lt_le_trans Hor _ 1).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_le_add_r Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+}
+assert (H1a2 : (1 + a²)%L ≠ 0%L). {
+  intros H.
+  rewrite H in Hz1a2.
+  now apply (rngl_lt_irrefl Hor) in Hz1a2.
+}
+assert (Hs1a2 : √(1 + a²) ≠ 0%L). {
+  intros H.
+  apply (eq_rl_sqrt_0 Hon Hos) in H; [ easy | ].
+  now apply (rngl_lt_le_incl Hor).
+}
 progress unfold rngl_atan.
 remember (a <? 0)%L as az eqn:Haz.
 symmetry in Haz.
 destruct az. {
   apply rngl_ltb_lt in Haz.
   rewrite <- rngl_asin_opp.
+  progress unfold rngl_tan.
+  rewrite rngl_sin_asin.
+  rewrite rngl_cos_asin.
+  rewrite (rngl_squ_opp Hop).
+  rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+  rewrite (rngl_squ_sqrt Hon); [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite (rngl_squ_abs Hop).
+  rewrite <- (rngl_div_diag Hon Hiq (1 + a²))%L at 2; [ | easy ].
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  rewrite (rngl_add_sub Hos).
+  rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | | easy ].
+  rewrite (rl_sqrt_1 Hon Hop Hiq Hor).
+  rewrite (rngl_div_div_r Hon Hos Hiv); [ | | easy ].
+  rewrite (rngl_div_1_r Hon Hiq Hc1).
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+  rewrite (rngl_abs_nonpos_eq Hop Hor).
+  apply (rngl_opp_involutive Hop).
+  now apply (rngl_lt_le_incl Hor).
+  apply (rngl_1_neq_0 Hon Hc1).
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
 ...
   rewrite rngl_sin_opp, rngl_cos_opp.
   rewrite (rngl_div_opp_l Hop Hiv).
