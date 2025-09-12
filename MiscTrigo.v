@@ -409,11 +409,13 @@ assert (Hs : (√ (1 + x²) ≠ 0)%L). {
 }
 assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
   intros y.
+  apply rngl_lt_0_cos.
   specialize (atan_bound y) as H1.
-...
-  specialize (atan_bound y) as (Hlta, Halt).
-  apply cos_gt_0; [ lra | easy ].
+  progress unfold π in H1.
+  rewrite angle_straight_div_2 in H1.
+  now destruct H1; [ right | left ].
 }
+...
 apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
 rewrite <- Rinv_div, Rinv_l; [ | easy ].
 remember (atan x) as y eqn:Hy.
