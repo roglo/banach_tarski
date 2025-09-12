@@ -646,174 +646,25 @@ destruct xz. {
 }
 Qed.
 
+Theorem rngl_sin_cos_asin : ∀ x,
+  (-1 ≤ x ≤ 1)%L
+  → rngl_sin (rngl_asin x) = x ∧ rngl_cos (rngl_asin x) = √ (1 - x²).
+Proof.
+intros * Hx.
+split; [ now apply rngl_sin_asin | ].
+now apply rngl_cos_asin.
+Qed.
+
+Theorem rngl_cos_sin_acos : ∀ x,
+  (-1 ≤ x ≤ 1)%L
+  → rngl_cos (rngl_acos x) = x ∧ rngl_sin (rngl_acos x) = √ (1 - x²).
+Proof.
+intros * Hx.
+split; [ now apply rngl_cos_acos | ].
+now apply rngl_sin_acos.
+Qed.
+
 ...
-
-Theorem sin_cos_asin : ∀ x,
-  -1 ≤ x ≤ 1
-  → sin (asin x) = x ∧ cos (asin x) = √ (1 - x²).
-Proof.
-intros * Hx.
-unfold asin.
-unfold atan'.
-destruct (Req_dec (√ (1 - x²)) 0) as [Hsx| Hsx]. {
-  rewrite Hsx.
-  unfold Rsign, Rsignp.
-  destruct (Req_dec x 0) as [Hxz| Hxz]. {
-    rewrite Hxz in Hsx.
-    rewrite Rsqr_0, Rminus_0_r, sqrt_1 in Hsx; lra.
-  }
-  destruct (Rle_dec 0 x) as [Hxp| Hxn]. {
-    rewrite Rmult_1_l.
-    rewrite sin_PI2, cos_PI2.
-    split; [ | easy ].
-    symmetry.
-    apply sqrt_diff_sqr_eq_0; [ lra | now rewrite Rsqr_1 ].
-  }
-  unfold IZR at 1 3; rewrite <- INR_IPR; simpl.
-  rewrite <- Ropp_mult_distr_l, Rmult_1_l, Rdiv_opp_l.
-  rewrite sin_neg, cos_neg.
-  rewrite sin_PI2, cos_PI2.
-  split; [ | easy ].
-  rewrite <- Ropp_involutive.
-  f_equal; symmetry.
-  apply sqrt_diff_sqr_eq_0; [ lra | ].
-  now rewrite Rsqr_1, <- Rsqr_neg.
-}
-assert (Hx' : -1 < x < 1). {
-  apply Rabs_lt, Rnot_le_lt.
-  intros Ha; apply Hsx; clear Hsx.
-  apply Rsqr_inj; [ apply sqrt_pos | lra | ].
-  rewrite Rsqr_0; unfold Rabs in Ha.
-  destruct (Rcase_abs x) as [Hc| Hc]. {
-    assert (x = -1) by lra; subst x.
-    unfold IZR; rewrite <- INR_IPR; simpl.
-    rewrite <- Rsqr_neg, Rsqr_1, Rminus_diag_eq; [ | easy ].
-    now rewrite sqrt_0, Rsqr_0.
-  }
-  assert (x = 1) by lra.
-  subst x.
-  rewrite Rsqr_1, Rminus_diag_eq; [ | easy ].
-  now rewrite sqrt_0, Rsqr_0.
-}
-clear Hx; rename Hx' into Hx; move Hx before x.
-remember (x / √ (1 - x²)) as y eqn:Hy.
-rewrite sin_atan, cos_atan.
-destruct (Req_dec x 0) as [Hxz| Hxz]. {
-  subst x; rewrite Rdiv_0_l in Hy; subst y.
-  split; [ now rewrite Rdiv_0_l | ].
-  now rewrite Rsqr_0, Rplus_0_r, Rminus_0_r, sqrt_1, Rdiv_1_r.
-}
-assert (H1x : 0 < 1 - x²). {
-  replace 1 with 1² by apply Rsqr_1.
-  rewrite <- Rsqr_plus_minus.
-  apply Rmult_lt_0_compat; lra.
-}
-assert (Hsp : 0 < √ (1 - x²)). {
-  apply Rsqr_incrst_0; [ | lra | apply sqrt_pos ].
-  rewrite Rsqr_sqrt; [ now rewrite Rsqr_0 | lra ].
-}
-assert (Hyz : y ≠ 0). {
-  intros H; apply Hxz; subst y.
-  apply Rmult_eq_compat_r with (r := √ (1 - x²)) in H.
-  unfold Rdiv in H; rewrite Rmult_assoc, Rmult_0_l in H.
-  rewrite Rinv_l in H; lra.
-}
-assert (Hxy : 0 ≤ x * y). {
-  subst y; unfold Rdiv; rewrite <- Rmult_assoc.
-  rewrite fold_Rsqr.
-  apply Rmult_le_pos; [ apply Rle_0_sqr | ].
-  apply Rmult_le_reg_r with (r := √ (1 - x²)); [ lra | ].
-  rewrite Rmult_0_l, Rinv_l; lra.
-}
-apply (f_equal Rsqr) in Hy.
-rewrite Rsqr_div_depr in Hy; [ | lra ].
-rewrite Rsqr_sqrt in Hy; [ | lra ].
-apply Rmult_eq_compat_r with (r := 1 - x²) in Hy.
-unfold Rdiv in Hy; rewrite Rmult_assoc in Hy.
-rewrite Rinv_l in Hy; [ rewrite Rmult_1_r in Hy | lra ].
-rewrite Rmult_minus_distr_l, Rmult_1_r in Hy.
-assert (H : y² = x² * (1 + y²)) by lra.
-apply Rmult_eq_compat_r with (r := / (1 + y²)) in H.
-rewrite Rmult_assoc in H.
-assert (H1y : 0 < 1 + y²). {
-  apply Rplus_lt_le_0_compat; [ lra | apply Rle_0_sqr ].
-}
-assert (Hsy : 0 < √ (1 + y²)). {
-  apply Rsqr_incrst_0; [ | lra | apply sqrt_pos ].
-  rewrite Rsqr_sqrt; [ now rewrite Rsqr_0 | lra ].
-}
-rewrite Rinv_r in H; [ | lra ].
-replace (/ (1 + y²)) with (/ √ (1 + y²))² in H. {
-  rewrite <- Rsqr_mult in H.
-  rewrite Rmult_1_r in H.
-  apply Rsqr_eq in H.
-  split. {
-    destruct H as [H| H]; [ easy | exfalso ].
-    apply Ropp_eq_compat in H.
-    rewrite Ropp_involutive in H.
-    rewrite <- H in Hxy.
-    rewrite <- Ropp_mult_distr_l in Hxy.
-    rewrite Rmult_comm, <- Rmult_assoc, fold_Rsqr in Hxy.
-    replace 0 with (-0) in Hxy by apply Ropp_0.
-    apply Ropp_le_cancel in Hxy.
-    apply Rmult_le_compat_r with (r := √ (1 + y²)) in Hxy; [ | lra ].
-    rewrite Rmult_assoc, Rmult_0_l in Hxy.
-    rewrite Rinv_l in Hxy; [ | lra ].
-    rewrite Rmult_1_r in Hxy.
-    apply Rle_not_lt in Hxy; apply Hxy.
-    now apply Rlt_0_sqr.
-  }
-  apply Rmult_eq_reg_r with (r := √ (1 + y²)); [ | lra ].
-  rewrite <- Rinv_div.
-  rewrite Rinv_l; [ | lra ].
-  symmetry.
-  rewrite <- sqrt_mult; [ | lra | lra ].
-  rewrite Rmult_plus_distr_l, Rmult_1_r.
-  rewrite Rmult_minus_distr_r, Rmult_1_l.
-  rewrite Rmult_comm, Hy.
-  now rewrite Rminus_plus, sqrt_1.
-}
-rewrite Rsqr_inv_depr; [ | lra ].
-rewrite Rsqr_sqrt; [ easy | lra ].
-Qed.
-
-Theorem cos_sin_acos : ∀ x,
-  -1 ≤ x ≤ 1
-  → cos (acos x) = x ∧ sin (acos x) = √ (1 - x²).
-Proof.
-intros * Hx.
-unfold acos.
-rewrite cos_minus, sin_minus.
-rewrite cos_PI2, sin_PI2.
-do 2 rewrite Rmult_0_l, Rmult_1_l.
-rewrite Rplus_0_l, Rminus_0_r.
-now apply sin_cos_asin.
-Qed.
-
-Theorem sin_asin : ∀ x, -1 ≤ x ≤ 1 → sin (asin x) = x.
-Proof.
-intros * Hx.
-now apply sin_cos_asin.
-Qed.
-
-Theorem sin_acos : ∀ x, -1 ≤ x ≤ 1 → sin (acos x) = √ (1 - x²).
-Proof.
-intros * Hx.
-now apply cos_sin_acos.
-Qed.
-
-Theorem cos_asin : ∀ x, -1 ≤ x ≤ 1 → cos (asin x) = √ (1 - x²).
-Proof.
-intros * Hx.
-now apply sin_cos_asin.
-Qed.
-
-Theorem cos_acos : ∀ x, -1 ≤ x ≤ 1 → cos (acos x) = x.
-Proof.
-intros * Hx.
-unfold acos; rewrite cos_shift.
-now apply sin_asin.
-Qed.
 
 Theorem sin_Zperiod : ∀ x k, sin (x + 2 * IZR k * PI) = sin x.
 Proof.
