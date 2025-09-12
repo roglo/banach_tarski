@@ -625,32 +625,28 @@ Qed.
 
 Theorem sin_atan : ∀ x, rngl_sin (rngl_atan x) = (x / √ (1 + x²))%L.
 Proof.
+destruct_ac.
 intros.
-...
-intros.
-unfold Rdiv.
-rewrite Rinv_div, <- cos_atan.
-remember (atan x) as y eqn:Hy.
-assert (Hx : x = tan y) by now subst y; rewrite atan_right_inv.
-subst x; unfold tan.
-rewrite <- Rmult_div.
-unfold Rdiv; rewrite Rmult_assoc.
-rewrite Rinv_r; [ lra | ].
-intros H; rewrite Hy in H.
-rewrite cos_atan in H.
-unfold Rdiv in H.
-apply Rmult_integral in H.
-destruct H; [ lra | ].
-apply Rinv_neq_0_compat in H; [ easy | ].
-clear H; intros H.
-apply sqrt_eq_0 in H. {
-  enough (Ht : 0 ≤ (tan y)²) by lra.
-  apply Rle_0_sqr.
+progress unfold rngl_atan.
+remember (x <? 0)%L as xz eqn:Hxz.
+symmetry in Hxz.
+destruct xz. {
+  apply rngl_ltb_lt in Hxz.
+  apply (rngl_lt_le_incl Hor) in Hxz.
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+  specialize (rngl_div_sqrt_add_1_squ_interval (-x))%L as H1.
+  rewrite (rngl_squ_opp Hop) in H1.
+  rewrite rngl_sin_opp.
+  rewrite rngl_sin_asin; [ | easy ].
+  rewrite (rngl_div_opp_l Hop Hiv).
+  apply (rngl_opp_involutive Hop).
+} {
+  specialize (rngl_div_sqrt_add_1_squ_interval x) as H1.
+  now apply rngl_sin_asin.
 }
-replace 1 with (1 ^ 2) by lra.
-rewrite <- Rsqr_pow2.
-apply nonneg_plus_sqr.
 Qed.
+
+...
 
 Theorem sin_cos_asin : ∀ x,
   -1 ≤ x ≤ 1
