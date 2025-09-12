@@ -392,15 +392,82 @@ destruct xz. {
 }
 Qed.
 
+Theorem rngl_acos_opp :
+  ∀ a,
+  (-1 ≤ a ≤ 1)%L
+  → rngl_acos (-a) = (π - rngl_acos a)%A.
+Proof.
+destruct_ac.
+intros * Ha.
+progress unfold rngl_acos.
+progress fold Hor.
+remember (rngl_le_dec Hor _ _) as oa1 eqn:Hoa1.
+remember (rngl_le_dec Hor _ _) as a1 eqn:Ha1 in |-*.
+symmetry in Hoa1, Ha1.
+destruct oa1 as [Hox1| Hox1]. {
+  destruct a1 as [Hx1| Hx1]. {
+    apply eq_angle_eq; cbn.
+    rewrite (rngl_squ_opp Hop).
+    clear Hox1 Hoa1 Ha1.
+    do 2 rewrite (rngl_mul_0_l Hos).
+    rewrite (rngl_sub_0_r Hos).
+    rewrite rngl_add_0_l.
+    do 2 rewrite (rngl_mul_opp_l Hop).
+    do 2 rewrite (rngl_mul_1_l Hon).
+    now rewrite (rngl_opp_involutive Hop).
+  }
+  exfalso; clear Hoa1 Ha1.
+  now rewrite (rngl_squ_opp Hop) in Hox1.
+}
+destruct a1 as [Hx1| Hx1]. {
+  exfalso; clear Hoa1 Ha1.
+  now rewrite (rngl_squ_opp Hop) in Hox1.
+}
+exfalso; clear Hoa1 Ha1.
+apply Hx1.
+now apply (rngl_squ_le_1 Hon Hop Hiq Hor).
+Qed.
+
+Theorem rngl_asin_opp :
+  ∀ a,
+  (-1 ≤ a ≤ 1)%L
+  → rngl_asin (-a) = (- rngl_asin a)%A.
+Proof.
+intros * Ha.
+progress unfold rngl_asin.
+rewrite rngl_acos_opp; [ | easy ].
+rewrite angle_sub_sub_distr.
+rewrite angle_opp_sub_distr.
+rewrite angle_add_comm.
+rewrite <- angle_sub_opp_r.
+rewrite angle_opp_sub_distr.
+progress f_equal.
+apply angle_sub_move_r.
+symmetry.
+apply angle_add_div_2_diag.
+Qed.
+
 Theorem rngl_tan_atan : ∀ a, rngl_tan (rngl_atan a) = a.
 Proof.
+destruct_ac.
 intros.
-progress unfold rngl_tan.
 progress unfold rngl_atan.
 remember (a <? 0)%L as az eqn:Haz.
 symmetry in Haz.
 destruct az. {
   apply rngl_ltb_lt in Haz.
+  rewrite <- rngl_asin_opp.
+...
+  rewrite rngl_sin_opp, rngl_cos_opp.
+  rewrite (rngl_div_opp_l Hop Hiv).
+  apply (rngl_opp_inj Hop).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite <- (rngl_abs_opp Hop Hor a).
+  remember (-a)%L as b eqn:H.
+  apply (f_equal rngl_opp) in H.
+  rewrite (rngl_opp_involutive Hop) in H; subst a.
+  rename b into a.
+  apply (rngl_opp_neg_pos Hop Hor) in Haz.
 ...
 
 Theorem rngl_cos_atan : ∀ x, rngl_cos (rngl_atan x) = (1 / √ (1 + x²))%L.
