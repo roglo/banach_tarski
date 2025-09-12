@@ -11,6 +11,7 @@ Require Import TrigoWithoutPi.TrigoWithoutPiExt.
 Require Import TrigoWithoutPi.AngleDiv2.
 Require Import TrigoWithoutPi.Angle_order.
 Require Import TrigoWithoutPi.AngleAddLeMonoL.
+Require Import TrigoWithoutPi.AngleTan.
 Require Import MiscReals.
 
 Section a.
@@ -20,42 +21,40 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
+(*
 Context {Hon : rngl_has_1 T = true}.
 Context {Hos : rngl_has_opp_or_psub T = true}.
 Context {Hiq : rngl_has_inv_or_pdiv T = true}.
 Context {Hc1 : rngl_characteristic T ≠ 1}.
 Context {Hor : rngl_is_ordered T = true}.
+*)
 
 Definition π := angle_straight.
 
-Definition acos := rngl_acos.
-Definition asin x := (π /₂ - rngl_acos x)%A.
+Definition rngl_asin x := (π /₂ - rngl_acos x)%A.
 
-Arguments acos x%_L.
-Arguments asin x%_L.
+Arguments rngl_asin x%_L.
 
-Definition atan x :=
-  if (x <? 0)%L then (- asin (rngl_abs x / √(1 + x²)))%A
-  else asin (x / √(1 + x²)).
+Definition rngl_atan x :=
+  if (x <? 0)%L then (- rngl_asin (rngl_abs x / √(1 + x²)))%A
+  else rngl_asin (x / √(1 + x²)).
 
-Arguments atan x%_L.
+Arguments rngl_atan x%_L.
 
-Definition atan' (x y : T) :=
+Definition rngl_atan' (x y : T) :=
   if (y =? 0)%L then
     match (x ?= 0)%L with
     | Eq => 0%A
     | Lt => (- π /₂)%A
     | Gt => (π /₂)%A
     end
-  else atan (x / y).
-
-Check Rlt_dec.
+  else rngl_atan (x / y).
 
 Definition angle_of_sin_cos s c :=
-  if Rlt_dec Hor s 0 then
-    if Rlt_dec Hor c 0 then (- acos c)%A else asin s
+  if Rlt_dec ac_or s 0 then
+    if Rlt_dec ac_or c 0 then (- rngl_acos c)%A else rngl_asin s
   else
-    if Rlt_dec Hor c 0 then acos c else asin s.
+    if Rlt_dec ac_or c 0 then rngl_acos c else rngl_asin s.
 
 Theorem angle_lt_sub_lt_add_l_1 :
   ∀ θ1 θ2 θ3 : angle T,
@@ -69,10 +68,12 @@ rewrite angle_add_comm in H123.
 now rewrite angle_sub_add in H123.
 Qed.
 
-Theorem atan_bound : ∀ x, (- (π /₂) < atan x ∨ atan x < π /₂)%A.
+Theorem rngl_atan_bound :
+  rngl_characteristic T ≠ 1 →
+  ∀ x, (- (π /₂) < rngl_atan x ∨ rngl_atan x < π /₂)%A.
 Proof.
-clear Hon Hos Hiq Hor.
 destruct_ac.
+intros Hc1.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
@@ -86,7 +87,7 @@ assert (Hio :
   now apply rngl_has_eq_dec_or_is_ordered_r.
 }
 intros.
-progress unfold atan.
+progress unfold rngl_atan.
 remember (x <? 0)%L as xz eqn:Hxz.
 symmetry in Hxz.
 destruct xz. {
@@ -94,7 +95,7 @@ destruct xz. {
   apply rngl_ltb_lt in Hxz.
   apply angle_opp_lt_compat_if. {
     intros H.
-    progress unfold asin in H.
+    progress unfold rngl_asin in H.
     apply -> angle_sub_move_0_r in H.
     symmetry in H.
     progress unfold rngl_acos in H.
@@ -124,7 +125,7 @@ destruct xz. {
     apply (rngl_0_le_1 Hon Hos Hiq Hor).
     apply (rngl_squ_nonneg Hon Hos Hiq Hor).
   }
-  progress unfold asin.
+  progress unfold rngl_asin.
   progress unfold rngl_acos.
   destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
     exfalso; apply Hx1; clear Hx1.
@@ -260,7 +261,7 @@ destruct xz. {
   apply (rngl_ltb_ge_iff Hor) in Hxz.
   rewrite <- (rngl_abs_nonneg_eq Hop Hor x) at 1; [ | easy ].
   (* presque pareil que ci-dessus *)
-  progress unfold asin.
+  progress unfold rngl_asin.
   progress unfold rngl_acos.
   destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
     exfalso; apply Hx1; clear Hx1.
@@ -391,10 +392,26 @@ destruct xz. {
 }
 Qed.
 
-Theorem cos_atan : ∀ x, rngl_cos (atan x) = (1 / √ (1 + x²))%L.
+Theorem rngl_tan_atan : ∀ a, rngl_tan (rngl_atan a) = a.
 Proof.
-clear Hon Hos Hiq Hor.
+intros.
+progress unfold rngl_tan.
+progress unfold rngl_atan.
+remember (a <? 0)%L as az eqn:Haz.
+symmetry in Haz.
+destruct az. {
+  apply rngl_ltb_lt in Haz.
+...
+
+Theorem rngl_cos_atan : ∀ x, rngl_cos (rngl_atan x) = (1 / √ (1 + x²))%L.
+Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (_ / _)%L).
+  apply H1.
+}
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
 assert (Hs : (√ (1 + x²) ≠ 0)%L). {
@@ -410,10 +427,10 @@ assert (Hs : (√ (1 + x²) ≠ 0)%L). {
   apply (rngl_0_le_1 Hon Hos Hiq Hor).
   apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
-assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
+assert (Hca : ∀ x, (0 < rngl_cos (rngl_atan x))%L). {
   intros y.
   apply rngl_lt_0_cos.
-  specialize (atan_bound y) as H1.
+  specialize (rngl_atan_bound Hc1 y) as H1.
   progress unfold π in H1.
   rewrite angle_straight_div_2 in H1.
   now destruct H1; [ right | left ].
@@ -422,9 +439,19 @@ assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
 apply (rngl_mul_cancel_r Hi1) with (c := √(1 + x²)); [ easy | ].
 rewrite (rngl_div_1_l Hon Hiv).
 rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
-remember (atan x) as y eqn:Hy.
+remember (rngl_atan x) as y eqn:Hy.
+assert (Hx : x = rngl_tan y). {
+(**)
+  subst y.
+... ...
+  symmetry; apply rngl_tan_atan.
 ...
-assert (Hx : x = tan y) by now subst y; rewrite atan_right_inv.
+tan_atan
+     : ∀ x : R, tan (atan x) = x
+...
+  subst y; rewrite atan_right_inv.
+...
+assert (Hx : x = rngl_tan y) by now subst y; rewrite atan_right_inv.
 ...
 apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
 rewrite <- Rinv_div, Rinv_l; [ | easy ].
