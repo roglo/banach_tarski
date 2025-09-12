@@ -449,6 +449,37 @@ progress unfold rngl_tan; cbn.
 apply (rngl_div_opp_l Hop Hiv).
 Qed.
 
+Theorem rngl_lt_0_add_1_squ :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_psub T = true →
+  rngl_has_inv_or_pdiv T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  ∀ a, (0 < 1 + a²)%L.
+Proof.
+intros Hon Hos Hiq Hc1 Hor *.
+apply (rngl_lt_le_trans Hor _ 1).
+apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+apply (rngl_le_add_r Hos Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+Qed.
+
+Theorem rl_sqrt_add_1_squ_neq_0 :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_psub T = true →
+  rngl_has_inv_or_pdiv T = true →
+  rngl_characteristic T ≠ 1 →
+  rngl_is_ordered T = true →
+  ∀ a, √(1 + a²) ≠ 0%L.
+Proof.
+intros Hon Hos Hiq Hc1 Hor * H.
+specialize (rngl_lt_0_add_1_squ Hon Hos Hiq Hc1 Hor a) as Hz1a2.
+apply (eq_rl_sqrt_0 Hon Hos) in H.
+rewrite H in Hz1a2.
+now apply (rngl_lt_irrefl Hor) in Hz1a2.
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
 Theorem rngl_div_sqrt_add_1_squ_interval : ∀ a, (-1 ≤ a / √(1 + a²) ≤ 1)%L.
 Proof.
 destruct_ac.
@@ -461,19 +492,8 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   split; apply (rngl_le_refl Hor).
 }
 intros.
-assert (Hz1a2 : (0 < 1 + a²)%L). {
-  apply (rngl_lt_le_trans Hor _ 1).
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
-  apply (rngl_le_add_r Hos Hor).
-  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-}
-assert (Hs1a2 : √(1 + a²) ≠ 0%L). {
-  intros H.
-  apply (eq_rl_sqrt_0 Hon Hos) in H.
-  rewrite H in Hz1a2.
-  now apply (rngl_lt_irrefl Hor) in Hz1a2.
-  now apply (rngl_lt_le_incl Hor).
-}
+specialize (rngl_lt_0_add_1_squ Hon Hos Hiq Hc1 Hor a) as Hz1a2.
+specialize (rl_sqrt_add_1_squ_neq_0 Hon Hos Hiq Hc1 Hor a) as Hs1a2.
 apply (rngl_squ_le_1_if Hon Hop Hiq Hor).
 rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
 rewrite (rngl_squ_sqrt Hon); [ | now apply (rngl_lt_le_incl Hor) ].
@@ -493,30 +513,29 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 intros.
-(*
+specialize (rngl_lt_0_add_1_squ Hon Hos Hiq Hc1 Hor a) as Hz1a2.
+specialize (rl_sqrt_add_1_squ_neq_0 Hon Hos Hiq Hc1 Hor a) as Hs1a2.
 assert (H1a2 : (1 + a²)%L ≠ 0%L). {
   intros H.
   rewrite H in Hz1a2.
   now apply (rngl_lt_irrefl Hor) in Hz1a2.
 }
-*)
 assert (H1a1 : (-1 ≤ a / √(1 + a²) ≤ 1)%L). {
   apply (rngl_div_sqrt_add_1_squ_interval).
 }
 progress unfold rngl_tan.
 rewrite rngl_sin_asin; [ | easy ].
 rewrite rngl_cos_asin; [ | easy ].
-rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | ].
-rewrite (rngl_squ_sqrt Hon); [ | apply (rngl_lt_le_incl Hor) ].
-rewrite <- (rngl_div_diag Hon Hiq (1 + a²))%L at 2; [ | ].
+rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+rewrite (rngl_squ_sqrt Hon); [ | now apply (rngl_lt_le_incl Hor) ].
+rewrite <- (rngl_div_diag Hon Hiq (1 + a²))%L at 2; [ | easy ].
 rewrite <- (rngl_div_sub_distr_r Hop Hiv).
 rewrite (rngl_add_sub Hos).
-rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | | ].
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | | easy ].
 rewrite (rl_sqrt_1 Hon Hop Hiq Hor).
-rewrite (rngl_div_div_r Hon Hos Hiv); [ | | ].
+rewrite (rngl_div_div_r Hon Hos Hiv); [ | | easy ].
 rewrite (rngl_div_1_r Hon Hiq Hc1).
-apply (rngl_div_mul Hon Hiv).
-...
+now apply (rngl_div_mul Hon Hiv).
 apply (rngl_1_neq_0 Hon Hc1).
 apply (rngl_0_le_1 Hon Hos Hiq Hor).
 Qed.
@@ -524,57 +543,20 @@ Qed.
 Theorem rngl_tan_atan : ∀ a, rngl_tan (rngl_atan a) = a.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros.
-  rewrite (H1 a).
-  apply H1.
-}
 intros.
-(*
-assert (H1oa1 : (-1 ≤ - (∣ a ∣ / √(1 + a²)) ≤ 1)%L). {
-  split; [ now apply -> (rngl_opp_le_compat Hop Hor) | ].
-  apply (rngl_opp_le_compat Hop Hor).
-  now rewrite (rngl_opp_involutive Hop).
-}
-*)
 progress unfold rngl_atan.
 remember (a <? 0)%L as az eqn:Haz.
 symmetry in Haz.
-destruct az. {
-  apply rngl_ltb_lt in Haz.
-  rewrite <- rngl_asin_opp; [ | ].
-  rewrite rngl_asin_opp; [ | ].
-  rewrite rngl_tan_opp.
-  apply (rngl_opp_inj Hop).
-  rewrite (rngl_opp_involutive Hop).
-  rewrite (rngl_abs_nonpos_eq Hop Hor).
-  rewrite <- (rngl_squ_opp Hop).
-  apply rngl_tan_asin_inv.
-  now apply (rngl_lt_le_incl Hor).
-...
-  remember (-a)%L as b eqn:H.
-  apply (f_equal rngl_opp) in H.
-  rewrite (rngl_opp_involutive Hop) in H; subst a.
-  rename b into a.
-  apply (rngl_opp_neg_pos Hop Hor) in Haz.
-  rewrite (rngl_abs_opp Hop Hor).
-  rewrite (rngl_squ_opp Hop).
-... ...
-}
-Search (rngl_tan (rngl_asin _)).
-...
-  rewrite rngl_sin_opp, rngl_cos_opp.
-  rewrite (rngl_div_opp_l Hop Hiv).
-  apply (rngl_opp_inj Hop).
-  rewrite (rngl_opp_involutive Hop).
-  rewrite <- (rngl_abs_opp Hop Hor a).
-  remember (-a)%L as b eqn:H.
-  apply (f_equal rngl_opp) in H.
-  rewrite (rngl_opp_involutive Hop) in H; subst a.
-  rename b into a.
-  apply (rngl_opp_neg_pos Hop Hor) in Haz.
-...
+destruct az; [ | apply rngl_tan_asin_inv ].
+apply rngl_ltb_lt in Haz.
+apply (rngl_lt_le_incl Hor) in Haz.
+rewrite rngl_tan_opp.
+apply (rngl_opp_inj Hop).
+rewrite (rngl_opp_involutive Hop).
+rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+rewrite <- (rngl_squ_opp Hop).
+apply rngl_tan_asin_inv.
+Qed.
 
 Theorem rngl_cos_atan : ∀ x, rngl_cos (rngl_atan x) = (1 / √ (1 + x²))%L.
 Proof.
@@ -587,6 +569,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
+(*
 assert (Hs : (√ (1 + x²) ≠ 0)%L). {
   intros H.
   specialize (rngl_squ_nonneg Hon Hos Hiq Hor x) as Hs.
@@ -600,6 +583,16 @@ assert (Hs : (√ (1 + x²) ≠ 0)%L). {
   apply (rngl_0_le_1 Hon Hos Hiq Hor).
   apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
+*)
+specialize (rl_sqrt_add_1_squ_neq_0 Hon Hos Hiq Hc1 Hor x) as Hs1a2.
+(*
+specialize (rngl_lt_0_add_1_squ Hon Hos Hiq Hc1 Hor x) as Hz1a2.
+assert (H1a2 : (1 + x²)%L ≠ 0%L). {
+  intros H.
+  rewrite H in Hz1a2.
+  now apply (rngl_lt_irrefl Hor) in Hz1a2.
+}
+*)
 assert (Hca : ∀ x, (0 < rngl_cos (rngl_atan x))%L). {
   intros y.
   apply rngl_lt_0_cos.
@@ -608,31 +601,15 @@ assert (Hca : ∀ x, (0 < rngl_cos (rngl_atan x))%L). {
   rewrite angle_straight_div_2 in H1.
   now destruct H1; [ right | left ].
 }
-(**)
 apply (rngl_mul_cancel_r Hi1) with (c := √(1 + x²)); [ easy | ].
 rewrite (rngl_div_1_l Hon Hiv).
 rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
 remember (rngl_atan x) as y eqn:Hy.
-assert (Hx : x = rngl_tan y). {
-(**)
-  subst y.
-... ...
-  symmetry; apply rngl_tan_atan.
-...
-tan_atan
-     : ∀ x : R, tan (atan x) = x
-...
-  subst y; rewrite atan_right_inv.
-...
-assert (Hx : x = rngl_tan y) by now subst y; rewrite atan_right_inv.
-...
-apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
-rewrite <- Rinv_div, Rinv_l; [ | easy ].
-remember (atan x) as y eqn:Hy.
-assert (Hx : x = tan y) by now subst y; rewrite atan_right_inv.
+assert (Hx : x = rngl_tan y) by now subst y; rewrite rngl_tan_atan.
 subst x.
-specialize (Hca (tan y)); rewrite <- Hy in Hca.
-unfold tan.
+specialize (Hca (rngl_tan y)); rewrite <- Hy in Hca.
+unfold rngl_tan.
+...
 rewrite Rsqr_div_depr; [ | lra ].
 replace (cos y) with (√ (cos y)²) at 1 by (apply sqrt_Rsqr; lra).
 rewrite <- sqrt_mult_alt; [ | apply Rle_0_sqr ].
