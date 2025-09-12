@@ -393,6 +393,9 @@ Qed.
 
 Theorem cos_atan : ∀ x, rngl_cos (atan x) = (1 / √ (1 + x²))%L.
 Proof.
+clear Hon Hos Hiq Hor.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
 assert (Hs : (√ (1 + x²) ≠ 0)%L). {
   intros H.
@@ -415,6 +418,13 @@ assert (Hca : ∀ x, (0 < rngl_cos (atan x))%L). {
   rewrite angle_straight_div_2 in H1.
   now destruct H1; [ right | left ].
 }
+(**)
+apply (rngl_mul_cancel_r Hi1) with (c := √(1 + x²)); [ easy | ].
+rewrite (rngl_div_1_l Hon Hiv).
+rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
+remember (atan x) as y eqn:Hy.
+...
+assert (Hx : x = tan y) by now subst y; rewrite atan_right_inv.
 ...
 apply Rmult_eq_reg_r with (r := √ (1 + x²)); [ | easy ].
 rewrite <- Rinv_div, Rinv_l; [ | easy ].
