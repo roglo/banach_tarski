@@ -664,11 +664,17 @@ split; [ now apply rngl_cos_acos | ].
 now apply rngl_sin_acos.
 Qed.
 
+Theorem neg_cos_atan_tan : ∀ x,
+  (rngl_cos x < 0)%L
+  → rngl_atan (rngl_tan x) = x.
+Proof.
+intros * Hc.
+progress unfold rngl_atan.
 ...
 
 Theorem neg_cos_atan_tan : ∀ x,
-  cos x < 0
-  → atan (tan x) = x - IZR ((x + PI / 2) // PI) * PI.
+  (rngl_cos x < 0)%L
+  → rngl_atan (rngl_tan x) = x - rngl_of_Z ((x + π / 2) // PI) * PI.
 Proof.
 intros * Hc.
 unfold atan.
