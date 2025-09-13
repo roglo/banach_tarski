@@ -598,7 +598,7 @@ rewrite (rngl_squ_div Hic Hon Hos Hiv). 2: {
   intros H; rewrite H in Hca.
   now apply (rngl_lt_irrefl Hor) in Hca.
 }
-rewrite <- (rngl_div_diag Hon Hiq (rngl_cos y)²) at 1. 2: {
+rewrite <- (rngl_div_diag Hon Hiq (rngl_cos² y)) at 1. 2: {
   intros H.
   apply (eq_rngl_squ_0 Hos Hio) in H.
   rewrite H in Hca.
@@ -664,6 +664,36 @@ split; [ now apply rngl_cos_acos | ].
 now apply rngl_sin_acos.
 Qed.
 
+Theorem rngl_1_add_squ_tan :
+  ∀ θ,
+  (rngl_cos θ ≠ 0%L)
+  → (1 + (rngl_tan θ)² = 1 / rngl_cos² θ)%L.
+Proof.
+destruct_ac.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_pdiv T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
+intros * Hc.
+progress unfold rngl_tan.
+About rngl_squ_div.
+...
+rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+rewrite <- (rngl_div_diag Hon Hiq (rngl_cos² θ)) at 1; [ | ].
+rewrite <- (rngl_div_add_distr_r Hiv).
+f_equal.
+apply cos2_sin2_1.
+intros H.
+now apply (eq_rngl_squ_0 Hos Hio) in H.
+Qed.
+
+...
+
 Theorem neg_cos_atan_tan : ∀ a,
   (rngl_cos a < 0)%L
   → rngl_atan (rngl_tan a) = a.
@@ -679,6 +709,25 @@ destruct ta. {
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite angle_opp_involutive.
+  apply eq_angle_eq; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_sub_0_l Hop), rngl_add_0_r.
+  do 2 rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite rngl_sin_acos; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+  rewrite rngl_cos_acos; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+  rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | ].
+  rewrite (rngl_squ_sqrt Hon); [ | ].
+... ...
+  rewrite rngl_1_add_squ_tan.
+...
+Theorem glop :
+  (a / (1 + a) = 1 - 1 / (1 + a).
+Search (_ / (1 + _))%L.
+...
+  progress unfold rngl_asin.
+  progress unfold rngl_acos.
+  destruct (rngl_le_dec _ _ _) as [Ha1| Ha1]. {
 ...
 
 Theorem neg_cos_atan_tan : ∀ x,
