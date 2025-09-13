@@ -664,12 +664,21 @@ split; [ now apply rngl_cos_acos | ].
 now apply rngl_sin_acos.
 Qed.
 
-Theorem neg_cos_atan_tan : ∀ x,
-  (rngl_cos x < 0)%L
-  → rngl_atan (rngl_tan x) = x.
+Theorem neg_cos_atan_tan : ∀ a,
+  (rngl_cos a < 0)%L
+  → rngl_atan (rngl_tan a) = a.
 Proof.
+destruct_ac.
 intros * Hc.
 progress unfold rngl_atan.
+remember (rngl_tan a <? 0)%L as ta eqn:Hta.
+symmetry in Hta.
+destruct ta. {
+  apply rngl_ltb_lt in Hta.
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+  rewrite angle_opp_involutive.
 ...
 
 Theorem neg_cos_atan_tan : ∀ x,
