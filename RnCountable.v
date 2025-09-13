@@ -57,6 +57,15 @@ Theorem partial_sum3_aux_le_half_pow :
   → (partial_sum3_aux k u pow i ≤ pow2)%L.
 Proof.
 intros Hic.
+specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
+assert (H30 : (3 ≠ 0)%L). {
+  replace 3%L with (rngl_of_nat 3). 2: {
+    now cbn; rewrite rngl_add_0_r, rngl_add_comm.
+  }
+  rewrite <- rngl_of_nat_0.
+  intros H.
+  now apply (rngl_of_nat_inj Hon Hos Hch) in H.
+}
 intros * Hpow Hpow2; subst pow2.
 revert pow i Hpow.
 induction k; intros; simpl. {
@@ -73,17 +82,38 @@ destruct (u i). {
     apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_2 Hon Hos Hiq Hor).
   }
-  rewrite <- (@Rdiv_mult_simpl_r _ _ _ Hic Hon Hop Hiv pow 2 3)%L.
-  rewrite <- (@Rdiv_mult_simpl_r _ _ _ Hic Hon Hop Hiv pow 3 2)%L at 2.
+  rewrite <- (@Rdiv_mult_simpl_r _ _ _ Hic Hon Hop Hiv pow 2 3)%L;
+    [ | easy | easy ].
+  rewrite <- (@Rdiv_mult_simpl_r _ _ _ Hic Hon Hop Hiv pow 3 2)%L at 2;
+    [ | easy | easy ].
   rewrite (rngl_mul_comm Hic 3 2).
   rewrite <- (rngl_div_sub_distr_r Hop Hiv).
   rewrite <- (rngl_mul_sub_distr_l Hop).
   rewrite (rngl_add_comm 2 1) at 2.
   rewrite (rngl_add_sub Hos).
   rewrite (rngl_mul_1_r Hon).
-  rewrite (rngl_div_div Hon Hos Hiv).
+  rewrite (rngl_div_div Hon Hos Hiv); [ | easy | easy ].
   apply (rngl_le_refl Hor).
-...
+}
+eapply (rngl_le_trans Hor); [ apply IHk | ]. {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+  apply (rngl_lt_le_trans Hor _ 1).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_le_add_l Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hiq Hor).
+}
+apply (rngl_div_le_mono_pos_r Hon Hop Hiv Hor).
+apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+apply (rngl_le_div_l Hon Hop Hiv Hor).
+apply (rngl_lt_le_trans Hor _ 1).
+apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+apply (rngl_le_add_l Hos Hor).
+apply (rngl_0_le_2 Hon Hos Hiq Hor).
+rewrite rngl_mul_add_distr_l.
+rewrite (rngl_mul_1_r Hon).
+apply (rngl_le_add_l Hos Hor).
+apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ easy | ].
+apply (rngl_0_le_2 Hon Hos Hiq Hor).
 Qed.
 
 Theorem partial_sum3_aux_succ : ∀ u n pow i,
@@ -94,6 +124,7 @@ Proof.
 intros.
 revert pow i.
 induction n; intros. {
+...
   simpl; rewrite Rplus_0_r, Rplus_0_l, Rmult_1_r, Nat.add_0_r.
   destruct (u i); simpl; lra.
 }
