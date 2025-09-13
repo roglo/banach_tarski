@@ -66,9 +66,11 @@ destruct (u i). {
   eapply (rngl_le_trans Hor). {
     apply IHk.
     apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
-Search (0 < 2)%L.
-...
-    apply rngl_lt_add_l.
+    apply (rngl_lt_le_trans Hor _ 1).
+    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_le_add_l Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hiq Hor).
+  }
 ...
   apply Rplus_le_reg_l with (r := (- (pow / 3))%L).
   rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.

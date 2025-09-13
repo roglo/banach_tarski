@@ -681,8 +681,6 @@ assert (Hio :
 }
 intros * Hc.
 progress unfold rngl_tan.
-About rngl_squ_div.
-...
 rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
 rewrite <- (rngl_div_diag Hon Hiq (rngl_cos² θ)) at 1; [ | ].
 rewrite <- (rngl_div_add_distr_r Hiv).
@@ -691,8 +689,6 @@ apply cos2_sin2_1.
 intros H.
 now apply (eq_rngl_squ_0 Hos Hio) in H.
 Qed.
-
-...
 
 Theorem neg_cos_atan_tan : ∀ a,
   (rngl_cos a < 0)%L
@@ -718,12 +714,10 @@ destruct ta. {
   rewrite rngl_cos_acos; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | ].
   rewrite (rngl_squ_sqrt Hon); [ | ].
-... ...
   rewrite rngl_1_add_squ_tan.
-...
-Theorem glop :
-  (a / (1 + a) = 1 - 1 / (1 + a).
-Search (_ / (1 + _))%L.
+  rewrite (rngl_div_div_r Hon Hos Hiv).
+  rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
+  progress unfold rngl_tan at 1.
 ...
   progress unfold rngl_asin.
   progress unfold rngl_acos.
