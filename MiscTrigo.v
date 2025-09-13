@@ -192,7 +192,7 @@ destruct xz. {
       apply rngl_nle_gt in Hxz.
       apply Hxz; clear Hxz.
       (* lemma *)
-      rewrite <- (rngl_div_1_r Hon Hiq Hc1) in H.
+      rewrite <- (rngl_div_1_r Hon Hiq) in H; [ | now left ].
       apply (rngl_div_div_mul_mul Hon Hic Hiv) in H; [ | | easy ].
       do 2 rewrite (rngl_mul_1_r Hon) in H.
       rewrite H.
@@ -213,7 +213,7 @@ destruct xz. {
       now apply (rngl_squ_nonneg Hon Hos Hiq Hor).
     }
     rewrite <- (rngl_div_opp_l Hop Hiv) in H.
-    rewrite <- (rngl_div_1_r Hon Hiq Hc1) in H.
+    rewrite <- (rngl_div_1_r Hon Hiq) in H; [ | now left ].
     apply (rngl_div_div_mul_mul Hon Hic Hiv) in H; [ | | easy ].
     do 2 rewrite (rngl_mul_1_r Hon) in H.
     apply (f_equal rngl_squ) in H.
@@ -324,7 +324,7 @@ destruct xz. {
       rewrite (rngl_squ_0 Hos) in H.
       rewrite rngl_add_0_r in H.
       rewrite (rl_sqrt_1 Hon Hop Hiq Hor) in H.
-      rewrite (rngl_div_1_r Hon Hiq Hc1) in H.
+      rewrite (rngl_div_1_r Hon Hiq) in H; [ | now left ].
       rewrite (rngl_leb_refl Hor) in H.
       rewrite (rngl_opp_0 Hop) in H.
       now symmetry in H.
@@ -347,7 +347,7 @@ destruct xz. {
       apply (eq_rngl_squ_0 Hos Hio) in H1; subst x.
       now apply (rngl_lt_irrefl Hor) in Hxz'.
     }
-    rewrite <- (rngl_div_1_r Hon Hiq Hc1) in H.
+    rewrite <- (rngl_div_1_r Hon Hiq) in H; [ | now left ].
     apply (rngl_div_div_mul_mul Hon Hic Hiv) in H; [ | | easy ].
     do 2 rewrite (rngl_mul_1_r Hon) in H.
     apply (f_equal rngl_squ) in H.
@@ -534,7 +534,7 @@ rewrite (rngl_add_sub Hos).
 rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | | easy ].
 rewrite (rl_sqrt_1 Hon Hop Hiq Hor).
 rewrite (rngl_div_div_r Hon Hos Hiv); [ | | easy ].
-rewrite (rngl_div_1_r Hon Hiq Hc1).
+rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
 now apply (rngl_div_mul Hon Hiv).
 apply (rngl_1_neq_0 Hon Hc1).
 apply (rngl_0_le_1 Hon Hos Hiq Hor).

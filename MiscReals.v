@@ -150,7 +150,7 @@ now intros * Hx; apply (rngl_div_0_l Hos Hi1).
 Qed.
 
 Theorem Rdiv_1_r : ∀ x, (x / 1 = x)%L.
-Proof. apply (rngl_div_1_r' Hon Hos Hiq). Qed.
+Proof. now apply (rngl_div_1_r Hon Hiq); left. Qed.
 
 Theorem Rdiv_same : ∀ x, (x ≠ 0 → x / x = 1)%L.
 Proof. apply (rngl_div_diag Hon Hiq). Qed.
@@ -2811,7 +2811,7 @@ destruct n as [| n| n]. {
   rewrite (rngl_pow_1_r Hon), Zabs2Nat.inj_mul.
   simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
   rewrite Ropp_div_r; [ | apply (rngl_1_neq_0_iff Hon); congruence ].
-  rewrite (rngl_div_1_r Hon Hiq); [ | congruence ].
+  rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
   progress f_equal.
   apply (rngl_pow_opp_1_even Hon Hop).
 }
