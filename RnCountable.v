@@ -49,11 +49,14 @@ Fixpoint n_partial_sum3 (u : ℕ → bool) c :=
 
 Definition b2r b := INR (Nat.b2n b).
 
-Theorem partial_sum3_aux_le_half_pow : ∀ u k pow pow2 i,
+Theorem partial_sum3_aux_le_half_pow :
+  rngl_mul_is_comm T = true →
+  ∀ u k pow pow2 i,
   (0 ≤ pow)%L
   → pow2 = (pow / 2)%L
   → (partial_sum3_aux k u pow i ≤ pow2)%L.
 Proof.
+intros Hic.
 intros * Hpow Hpow2; subst pow2.
 revert pow i Hpow.
 induction k; intros; simpl. {
@@ -61,7 +64,6 @@ induction k; intros; simpl. {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 destruct (u i). {
-(**)
   apply (rngl_le_add_le_sub_l Hop Hor).
   eapply (rngl_le_trans Hor). {
     apply IHk.
@@ -71,12 +73,17 @@ destruct (u i). {
     apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_2 Hon Hos Hiq Hor).
   }
+  rewrite <- (@Rdiv_mult_simpl_r _ _ _ Hic Hon Hop Hiv pow 2 3)%L.
+  rewrite <- (@Rdiv_mult_simpl_r _ _ _ Hic Hon Hop Hiv pow 3 2)%L at 2.
+  rewrite (rngl_mul_comm Hic 3 2).
+  rewrite <- (rngl_div_sub_distr_r Hop Hiv).
+  rewrite <- (rngl_mul_sub_distr_l Hop).
+  rewrite (rngl_add_comm 2 1) at 2.
+  rewrite (rngl_add_sub Hos).
+  rewrite (rngl_mul_1_r Hon).
+  rewrite (rngl_div_div Hon Hos Hiv).
+  apply (rngl_le_refl Hor).
 ...
-  apply Rplus_le_reg_l with (r := (- (pow / 3))%L).
-  rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-  eapply Rle_trans; [ apply IHk; lra | lra ].
-}
-eapply Rle_trans; [ apply IHk; lra | lra ].
 Qed.
 
 Theorem partial_sum3_aux_succ : ∀ u n pow i,
