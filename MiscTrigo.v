@@ -807,7 +807,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hc.
 }
 intros * Hc.
-(**)
+(*
 apply eq_angle_eq.
 f_equal. {
   progress unfold π.
@@ -824,6 +824,7 @@ rewrite (rngl_div_opp_l Hop Hiv).
 rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
 now rewrite angle_opp_involutive.
 ...
+*)
 assert (H :
   (rngl_cos (rngl_asin (rngl_tan a / √(1 + rngl_tan² a))),
    rngl_sin (rngl_asin (rngl_tan a / √(1 + rngl_tan² a)))) =
