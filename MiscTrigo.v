@@ -690,12 +690,75 @@ intros H.
 now apply (eq_rngl_squ_0 Hos Hio) in H.
 Qed.
 
+Definition rngl_sign a :=
+  match (a ?= 0)%L with
+  | Eq => 0%L
+  | Lt => (-1)%L
+  | Gt => 1%L
+  end.
+
+Theorem rngl_div_abs_diag_l :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  rngl_is_ordered T = true →
+  rngl_has_eq_dec T = true →
+  ∀ a, a ≠ 0%L → (rngl_abs a / a = rngl_sign a)%L.
+Proof.
+intros Hon Hop Hiv Hor Hed.
+specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
+intros * Haz.
+progress unfold rngl_abs.
+progress unfold rngl_sign.
+remember (a ≤? 0)%L as az eqn:Ha.
+remember (a ?= 0)%L as az' eqn:Ha'.
+symmetry in Ha, Ha'.
+destruct az. {
+  apply rngl_leb_le in Ha.
+  apply (rngl_compare_le_iff Hor Hed) in Ha.
+  destruct az'; [ | | easy ].
+  now apply (rngl_compare_eq_iff Hed) in Ha'.
+  rewrite (rngl_div_opp_l Hop Hiv).
+  progress f_equal.
+  now apply (rngl_div_diag Hon Hiq).
+}
+rewrite (rngl_div_diag Hon Hiq); [ symmetry | easy ].
+apply (rngl_leb_gt Hor) in Ha.
+destruct az'; [ | | easy ].
+now apply (rngl_compare_eq_iff Hed) in Ha'.
+apply (rngl_compare_lt_iff Hor Hed) in Ha'.
+now apply (rngl_lt_asymm Hor) in Ha'.
+Qed.
+
 Theorem neg_cos_atan_tan : ∀ a,
   (rngl_cos a < 0)%L
   → rngl_atan (rngl_tan a) = a.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hc.
+  rewrite (H1 (rngl_cos a)) in Hc.
+  now apply (rngl_lt_irrefl Hor) in Hc.
+}
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_pdiv T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
+specialize (rngl_1_neq_0 Hon Hc1) as H10.
 intros * Hc.
+assert (Hcz : (rngl_cos a ≠ 0)%L). {
+  now intros H; rewrite H in Hc; apply (rngl_lt_irrefl Hor) in Hc.
+}
+assert (Hc2z : (rngl_cos² a ≠ 0)%L). {
+  intros H; apply Hcz.
+  now apply (eq_rngl_squ_0 Hos Hio).
+}
 progress unfold rngl_atan.
 remember (rngl_tan a <? 0)%L as ta eqn:Hta.
 symmetry in Hta.
@@ -714,10 +777,35 @@ destruct ta. {
   rewrite rngl_cos_acos; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | ].
   rewrite (rngl_squ_sqrt Hon); [ | ].
-  rewrite rngl_1_add_squ_tan.
-  rewrite (rngl_div_div_r Hon Hos Hiv).
+  rewrite rngl_1_add_squ_tan; [ | easy ].
+  rewrite (rngl_div_div_r Hon Hos Hiv); [ | easy | easy ].
   rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
   progress unfold rngl_tan at 1.
+  rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+  rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+  rewrite <- (cos2_sin2_1 a) at 1.
+  rewrite (rngl_add_sub Hos).
+  rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | | ].
+  rewrite (rl_sqrt_squ Hon Hop Hor).
+  rewrite (rl_sqrt_1 Hon Hop Hiq Hor).
+  rewrite (rngl_div_div_r Hon Hos Hiv); [ | easy | ].
+  rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
+  progress unfold rngl_tan.
+  rewrite (rngl_div_mul_mul_div Hic Hiv).
+  rewrite <- (rngl_mul_div_assoc Hiv).
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | ].
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+  rewrite (rngl_mul_opp_r Hop).
+  rewrite (rngl_mul_1_r Hon).
+...
+  ============================
+  ((- rngl_cos a)%L, (- rngl_sin a)%L) = (rngl_cos a, rngl_sin a)
+...
+progress unfold rngl_compare.
+progress unfold rngl_compare.
+
+Check rngl_sign.
 ...
   progress unfold rngl_asin.
   progress unfold rngl_acos.
