@@ -730,76 +730,6 @@ apply (rngl_compare_lt_iff Hor Hed) in Ha'.
 now apply (rngl_lt_asymm Hor) in Ha'.
 Qed.
 
-Theorem rngl_acos_sin : ∀ θ, rngl_acos (rngl_sin θ) = (angle_right - θ)%A.
-Proof.
-destruct_ac.
-intros.
-apply eq_angle_eq.
-rewrite rngl_cos_sub_right_l.
-rewrite rngl_sin_sub_right_l.
-rewrite rngl_cos_acos; [ | apply rngl_sin_bound ].
-progress f_equal.
-specialize (rngl_cos_sin_acos (rngl_sin θ)) as H1.
-specialize (rngl_sin_bound θ) as H.
-specialize (H1 H); clear H.
-destruct H1 as (H1, H2).
-rewrite H2.
-(* ah merde, shit *)
-...
-Search (rngl_acos (rngl_sin _)).
-progress unfold rngl_acos.
-destruct (rngl_le_dec _ _ _) as [H1| H1]. 2: {
-  exfalso; apply H1; clear H1.
-  apply (rngl_squ_le_1 Hon Hop Hiq Hor).
-  apply rngl_sin_bound.
-}
-...
-
-Theorem rngl_asin_sin : ∀ θ, rngl_asin (rngl_sin θ) = θ.
-Proof.
-intros.
-progress unfold rngl_asin.
-Search (rngl_acos (rngl_sin _)).
-... ...
-rewrite rngl_acos_sin.
-rewrite angle_sub_sub_distr.
-rewrite angle_sub_diag.
-apply angle_add_0_l.
-...
-
-Theorem rngl_asin_div_tan_sqrt :
-  ∀ a, rngl_asin (rngl_tan a / √(1 + rngl_tan² a)) = (a + angle_straight)%A.
-Proof.
-intros.
-rewrite <- sin_atan.
-Search (rngl_asin (rngl_sin _)).
-Search (rngl_sin (rngl_asin _)).
-...
-Search (rngl_atan (rngl_tan _)).
-Search (rngl_asin (rngl_sin _)).
-
-remember (rngl_tan a) as b.
-Search (_ / √ (1 + _²))%L.
-rewrite <- rngl_cos_atan.
-progress unfold rngl_asin.
-Search (rngl_acos (_ / _)).
-
-rewrite rngl_sin_acos; [ | apply rngl_div_sqrt_add_1_squ_interval ].
-rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
-rewrite (rngl_squ_sqrt Hon); [ | easy ].
-rewrite rngl_1_add_squ_tan; [ | easy ].
-rewrite (rngl_div_div_r Hon Hos Hiv); [ | easy | easy ].
-rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
-progress unfold rngl_tan at 1.
-rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
-rewrite (rngl_div_mul Hon Hiv); [ | easy ].
-rewrite <- (cos2_sin2_1 a) at 1.
-rewrite (rngl_add_sub Hos).
-rewrite (rl_sqrt_squ Hon Hop Hor).
-rewrite (rngl_abs_nonpos_eq Hop Hor); [ easy | ].
-now apply (rngl_lt_le_incl Hor).
-...
-
 Theorem rngl_cos_asin_div_tan_sqrt :
   ∀ a,
   (rngl_cos a < 0)%L
@@ -939,48 +869,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hc.
 apply eq_angle_eq.
 f_equal. {
-(**)
-  f_equal.
-  progress unfold rngl_atan.
-  remember (rngl_tan a <? 0)%L as ta eqn:Hta.
-  symmetry in Hta.
-  destruct ta. 2: {
-Theorem rngl_asin_div_tan_sqrt :
-  ∀ a, rngl_asin (rngl_tan a / √(1 + rngl_tan² a)) = (a + angle_straight)%A.
-Search (rngl_asin (_ / _)).
-...
-apply rngl_asin_div_tan_sqrt.
-}
-    apply rngl_ltb_lt in Hta.
-    remember (-a)%A as b eqn:H.
-    apply (f_equal angle_opp) in H.
-    rewrite angle_opp_involutive in H; subst a.
-    rename b into a.
-    rewrite rngl_tan_opp in Hta.
-    rewrite rngl_cos_opp in Hc.
-    apply (rngl_opp_neg_pos Hop Hor) in Hta.
-    rewrite rngl_tan_opp.
-    rewrite (rngl_abs_opp Hop Hor).
-    apply (rngl_lt_le_incl Hor) in Hta.
-    rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
-    rewrite (rngl_squ_opp Hop).
-    rewrite angle_add_opp_l.
-    rewrite <- angle_opp_sub_distr.
-    progress f_equal.
-    progress unfold π.
-    progress unfold angle_sub.
-    rewrite angle_opp_straight.
-apply rngl_asin_div_tan_sqrt.
-...
-    rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
-    rewrite (rngl_div_opp_l Hop Hiv).
-    rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
-    rewrite angle_opp_involutive.
-    rewrite <- (rngl_opp_involutive Hop (rngl_tan a)) at 1.
-    rewrite <- (rngl_abs_nonpos_eq Hop Hor (rngl_tan a))%L.
-    rewrite (rngl_div_opp_l Hop Hiv).
-    rewrite rngl_asin_opp.
-...
   progress unfold π.
   rewrite rngl_cos_add_straight_r.
   progress unfold rngl_atan.
