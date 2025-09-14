@@ -867,27 +867,34 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   now apply (rngl_lt_irrefl Hor) in Hc.
 }
 intros * Hc.
-assert (H :
-  (rngl_cos (rngl_asin (rngl_tan a / √(1 + rngl_tan² a))),
-   rngl_sin (rngl_asin (rngl_tan a / √(1 + rngl_tan² a)))) =
-  ((- rngl_cos a)%L, (- rngl_sin a)%L)). {
-  f_equal.
+apply eq_angle_eq.
+f_equal. {
+  progress unfold π.
+  rewrite rngl_cos_add_straight_r.
+  progress unfold rngl_atan.
+  remember (rngl_tan a <? 0)%L as ta eqn:Hta.
+  symmetry in Hta.
+  destruct ta; [ | now apply rngl_cos_asin_div_tan_sqrt ].
+  apply rngl_ltb_lt in Hta.
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+  rewrite angle_opp_involutive.
   now apply rngl_cos_asin_div_tan_sqrt.
+} {
+  progress unfold π.
+  rewrite rngl_sin_add_straight_r.
+  progress unfold rngl_atan.
+  remember (rngl_tan a <? 0)%L as ta eqn:Hta.
+  symmetry in Hta.
+  destruct ta; [ | now apply rngl_sin_asin_div_tan_sqrt ].
+  apply rngl_ltb_lt in Hta.
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+  rewrite angle_opp_involutive.
   now apply rngl_sin_asin_div_tan_sqrt.
 }
-apply eq_angle_eq.
-progress unfold π.
-rewrite rngl_cos_add_straight_r.
-rewrite rngl_sin_add_straight_r.
-progress unfold rngl_atan.
-remember (rngl_tan a <? 0)%L as ta eqn:Hta.
-symmetry in Hta.
-destruct ta; [ | easy ].
-apply rngl_ltb_lt in Hta.
-rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
-rewrite (rngl_div_opp_l Hop Hiv).
-rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
-now rewrite angle_opp_involutive.
 Qed.
 
 ...
