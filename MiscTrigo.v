@@ -829,6 +829,10 @@ assert (H :
   (rngl_cos (rngl_asin (rngl_tan a / √(1 + rngl_tan² a))),
    rngl_sin (rngl_asin (rngl_tan a / √(1 + rngl_tan² a)))) =
   ((- rngl_cos a)%L, (- rngl_sin a)%L)). {
+(**)
+  f_equal; [ now apply rngl_cos_asin_div_tan_sqrt | ].
+Inspect 1.
+...
   assert (Hio :
     (rngl_is_integral_domain T ||
        rngl_has_inv_and_1_or_pdiv T &&
