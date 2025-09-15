@@ -1182,43 +1182,9 @@ apply (rngl_abs_nonpos_eq Hop Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-...
+Search (rngl_asin (rngl_cos _)).
 
-Theorem asin_sin : ∀ x,
-  rngl_asin (rngl_sin x) =
-    (Rsignp (rngl_cos x) * rngl_atan' (rngl_sin x) (rngl_cos x))%A.
-Proof.
-intros.
 ...
-unfold asin, atan'.
-rewrite <- cos2.
-rewrite sqrt_Rsqr_abs.
-destruct (Req_dec (cos x) 0) as [Haz| Haz]. {
-  rewrite Haz, Rabs_R0.
-  rewrite Rsignp_of_pos; [ | lra ].
-  destruct (Req_dec 0 0); lra.
-}
-destruct (Req_dec (Rabs (cos x))) as [Hab| Hab]. {
-  now apply Rabs_eq_0 in Hab.
-}
-unfold Rabs.
-destruct (Rcase_abs (cos x)) as [Ha| Ha]. {
-  unfold Rdiv.
-  rewrite Rsignp_of_neg; [ | easy ].
-  destruct (Rle_dec 0 (cos x)); [ lra | ].
-  rewrite Rinv_opp.
-  rewrite <- Ropp_mult_distr_r.
-  rewrite fold_Rdiv.
-  fold (tan x); rewrite atan_opp; lra.
-}
-rewrite Rsignp_of_pos; lra.
-Qed.
-
-Theorem cos_plus_PI2 : ∀ x, cos (x + PI / 2) = - sin x.
-Proof.
-intros.
-rewrite cos_plus, cos_PI2, sin_PI2; lra.
-Qed.
 
 Theorem asin_cos : ∀ x,
   asin (cos x) =
