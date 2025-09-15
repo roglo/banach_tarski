@@ -1144,11 +1144,7 @@ destruct cz. {
 Qed.
 
 Theorem rngl_asin_sin :
-  ∀ θ,
-  rngl_asin (rngl_sin θ) =
-    (if θ ≤? π /₂ then θ
-     else if θ ≤? 3 * (π /₂) then π - θ
-     else θ)%A.
+  ∀ θ, rngl_asin (rngl_sin θ) = if (0 ≤? rngl_cos θ)%L then θ else (π - θ)%A.
 Proof.
 destruct_ac.
 intros.
@@ -1170,62 +1166,22 @@ rewrite rngl_add_0_r.
 rewrite <- (cos2_sin2_1 θ).
 rewrite (rngl_add_sub Hos).
 rewrite (rl_sqrt_squ Hon Hop Hor).
-remember (θ ≤? π /₂)%A as tp2 eqn:Htp2.
-symmetry in Htp2.
-destruct tp2. {
+remember (0 ≤? rngl_cos θ)%L as zc eqn:Hzc.
+symmetry in Hzc.
+destruct zc. {
   progress f_equal.
   apply (rngl_abs_nonneg_eq Hop Hor).
-  apply rngl_le_0_cos.
-  progress unfold π in Htp2.
-  now left; rewrite angle_straight_div_2 in Htp2.
+  now apply rngl_leb_le in Hzc.
 }
-apply angle_leb_gt in Htp2.
-remember (θ ≤? 3 * (π /₂))%A as tp3 eqn:Htp3.
-symmetry in Htp3.
-destruct tp3. {
-  progress unfold π.
-  rewrite rngl_cos_sub_straight_l.
-  rewrite rngl_sin_sub_straight_l.
-  progress f_equal.
-  apply (rngl_abs_nonpos_eq Hop Hor).
-  apply rngl_le_cos_0.
-  progress unfold π in Htp2.
-  progress unfold π in Htp3.
-  rewrite angle_straight_div_2 in Htp2, Htp3.
-  apply angle_lt_le_incl in Htp2.
-  split; [ easy | ].
-  cbn in Htp3.
-  rewrite angle_add_0_r in Htp3.
-  rewrite angle_add_assoc in Htp3.
-  now rewrite angle_right_add_right in Htp3.
-}
+apply (rngl_leb_gt Hor) in Hzc.
+progress unfold π.
+rewrite rngl_cos_sub_straight_l.
+rewrite rngl_sin_sub_straight_l.
 progress f_equal.
-apply (rngl_abs_nonneg_eq Hop Hor).
-apply rngl_le_0_cos.
-...
-progress unfold π in Htp3.
-rewrite angle_straight_div_2 in Htp3.
+apply (rngl_abs_nonpos_eq Hop Hor).
+now apply (rngl_lt_le_incl Hor).
+Qed.
 
-apply angle_lt_le_incl in Htp2.
-...
-split; [ easy | ].
-cbn in Htp3.
-rewrite angle_add_0_r in Htp3.
-rewrite angle_add_assoc in Htp3.
-now rewrite angle_right_add_right in Htp3.
-...
-
-...
-Search (rngl_cos (rngl_acos _)).
-Search (rngl_sin (rngl_asin _)).
-Search (rngl_acos (rngl_cos _)).
-Search (rngl_asin (rngl_sin _)).
-...
-Check rngl_atan'.
-About Rsignp.
-Print rngl_sign.
-Definition rngl_nsign a := if (0 ≤? a)%L then 1 else -1.
-(* un angle multiplié par -1, est-ce qu'on sait faire ça ? *)
 ...
 
 Theorem asin_sin : ∀ x,
