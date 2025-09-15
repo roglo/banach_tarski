@@ -978,7 +978,7 @@ rewrite (rngl_mul_opp_r Hop).
 now rewrite (rngl_mul_1_r Hon).
 Qed.
 
-Theorem neg_cos_atan_tan :
+Theorem rngl_cos_neg_atan_tan :
   ∀ θ,
   (rngl_cos θ < 0)%L
   → rngl_atan (rngl_tan θ) = (θ + π)%A.
@@ -1015,7 +1015,7 @@ f_equal. {
 }
 Qed.
 
-Theorem pos_cos_atan_tan :
+Theorem rngl_cos_pos_atan_tan :
   ∀ θ,
   (0 < rngl_cos θ)%L
   → rngl_atan (rngl_tan θ) = θ.
@@ -1045,6 +1045,87 @@ f_equal. {
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite angle_opp_involutive.
   now apply rngl_cos_pos_sin_asin_div_tan_sqrt.
+}
+Qed.
+
+Theorem rngl_atan_tan : ∀ θ,
+  rngl_atan (rngl_tan θ) =
+    match (rngl_cos θ ?= 0)%L with
+    | Eq =>
+        if (θ =? angle_right)%A then
+          rngl_asin (1 / 0 / √(1 + (1 / 0)²))
+        else
+          (- rngl_asin (1 / 0 / √(1 + (1 / 0)²)))%A
+    | Lt => (θ + π)%A
+    | Gt => θ
+    end.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1_angle_0 Hc1) as H1.
+  intros.
+  rewrite H1.
+  apply H1.
+}
+intros.
+remember (rngl_cos θ ?= 0)%L as cz eqn:Hcz.
+symmetry in Hcz.
+destruct cz. {
+  apply (rngl_compare_eq_iff Hed) in Hcz.
+  progress unfold rngl_atan.
+  progress unfold rngl_tan.
+  rewrite Hcz.
+  apply eq_rngl_cos_0 in Hcz.
+  destruct Hcz; subst. {
+    cbn.
+    rewrite angle_eqb_refl.
+    remember (1 / 0 <? 0)%L as ozz eqn:Hozz.
+    symmetry in Hozz.
+    destruct ozz; [ | easy ].
+    apply rngl_ltb_lt in Hozz.
+    rewrite (rngl_abs_nonpos_eq Hop Hor).
+    rewrite (rngl_div_opp_l Hop Hiv).
+    rewrite rngl_asin_opp.
+    apply angle_opp_involutive.
+    apply rngl_div_sqrt_add_1_squ_interval.
+    now apply (rngl_lt_le_incl Hor).
+  } {
+    cbn.
+    replace (- angle_right =? angle_right)%A with false.
+    rewrite (rngl_div_opp_l Hop Hiv).
+    rewrite (rngl_ltb_opp_l Hop Hor).
+    rewrite (rngl_opp_0 Hop).
+    rewrite (rngl_squ_opp Hop).
+    remember (0 <? 1 / 0)%L as z1z eqn:Hz1z.
+    symmetry in Hz1z.
+    destruct z1z. {
+      apply rngl_ltb_lt in Hz1z.
+      rewrite (rngl_abs_nonpos_eq Hop Hor).
+      rewrite (rngl_div_opp_l Hop Hiv).
+      rewrite (rngl_div_opp_l Hop Hiv).
+      now rewrite (rngl_opp_involutive Hop).
+      apply (rngl_opp_nonpos_nonneg Hop Hor).
+      now apply (rngl_lt_le_incl Hor).
+    }
+    rewrite (rngl_div_opp_l Hop Hiv).
+    apply rngl_asin_opp.
+    apply rngl_div_sqrt_add_1_squ_interval.
+    symmetry.
+    apply angle_eqb_neq.
+    apply neq_angle_neq; cbn.
+    intros H; injection H; clear H; intros H.
+    rewrite <- (rngl_add_0_l (-1))%L in H.
+    rewrite (rngl_add_move_r Hop) in H.
+    rewrite (rngl_sub_opp_r Hop) in H.
+    symmetry in H.
+    now apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+  }
+} {
+  apply (rngl_compare_lt_iff Hor Hed) in Hcz.
+  now apply rngl_cos_neg_atan_tan.
+} {
+  apply (rngl_compare_gt_iff Hor Hed) in Hcz.
+  now apply rngl_cos_pos_atan_tan.
 }
 Qed.
 
