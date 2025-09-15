@@ -1143,6 +1143,7 @@ destruct cz. {
 }
 Qed.
 
+...
 Check rngl_atan'.
 About Rsignp.
 Print rngl_sign.
