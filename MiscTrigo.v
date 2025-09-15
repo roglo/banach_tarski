@@ -1143,12 +1143,19 @@ destruct cz. {
 }
 Qed.
 
+Check rngl_atan'.
+About Rsignp.
+Print rngl_sign.
+Definition rngl_nsign a := if (0 ≤? a)%L then 1 else -1.
+(* un angle multiplié par -1, est-ce qu'on sait faire ça ? *)
 ...
 
 Theorem asin_sin : ∀ x,
-  asin (sin x) = Rsignp (cos x) * atan' (sin x) (cos x).
+  rngl_asin (rngl_sin x) =
+    (Rsignp (rngl_cos x) * rngl_atan' (rngl_sin x) (rngl_cos x))%A.
 Proof.
 intros.
+...
 unfold asin, atan'.
 rewrite <- cos2.
 rewrite sqrt_Rsqr_abs.
