@@ -1143,6 +1143,66 @@ destruct cz. {
 }
 Qed.
 
+Theorem rngl_asin_sin :
+  ∀ θ,
+  rngl_asin (rngl_sin θ) =
+    (if θ ≤? π /₂ then θ
+     else if θ ≤? 3 * (π /₂) then π - θ
+     else θ - π /₂)%A.
+Proof.
+destruct_ac.
+intros.
+progress unfold rngl_asin.
+progress unfold rngl_acos.
+progress fold Hor.
+destruct (rngl_le_dec Hor (rngl_sin² θ) 1) as [Hs1| Hs1]. 2: {
+  exfalso; apply Hs1; clear Hs1.
+  apply (rngl_squ_le_1 Hon Hop Hiq Hor).
+  apply rngl_sin_bound.
+}
+remember (θ ≤? π /₂)%A as tp2 eqn:Htp2.
+symmetry in Htp2.
+destruct tp2. {
+  apply eq_angle_eq; cbn.
+  do 2 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_sub_0_l Hop).
+  do 2 rewrite (rngl_mul_1_l Hon).
+  rewrite (rngl_opp_involutive Hop).
+  rewrite rngl_add_0_r.
+  progress f_equal.
+  rewrite <- (cos2_sin2_1 θ).
+  rewrite (rngl_add_sub Hos).
+  rewrite (rl_sqrt_squ Hon Hop Hor).
+  apply (rngl_abs_nonneg_eq Hop Hor).
+  apply rngl_le_0_cos.
+  progress unfold π in Htp2.
+  now rewrite angle_straight_div_2 in Htp2.
+}
+apply angle_leb_gt in Htp2.
+remember (θ ≤? 3 * (π /₂))%A as tp3 eqn:Htp3.
+symmetry in Htp3.
+destruct tp3. {
+  apply eq_angle_eq; cbn.
+  do 4 rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_sub_0_l Hop).
+  do 2 rewrite (rngl_mul_opp_l Hop).
+  do 4 rewrite (rngl_mul_1_l Hon).
+  do 2 rewrite (rngl_opp_involutive Hop).
+  rewrite rngl_add_0_r, rngl_add_0_l.
+  rewrite (rngl_sub_0_r Hos).
+  progress f_equal.
+  rewrite <- (cos2_sin2_1 θ).
+  rewrite (rngl_add_sub Hos).
+  rewrite (rl_sqrt_squ Hon Hop Hor).
+  apply (rngl_abs_nonpos_eq Hop Hor).
+Search (rngl_cos _ ≤ 0)%L.
+...
+  apply rngl_le_cos_0.
+  progress unfold π in Htp2.
+  now rewrite angle_straight_div_2 in Htp2.
+...
+
+...
 Search (rngl_cos (rngl_acos _)).
 Search (rngl_sin (rngl_asin _)).
 Search (rngl_acos (rngl_cos _)).
