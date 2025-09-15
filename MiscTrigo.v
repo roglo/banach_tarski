@@ -1143,6 +1143,10 @@ destruct cz. {
 }
 Qed.
 
+Search (rngl_cos (rngl_acos _)).
+Search (rngl_sin (rngl_asin _)).
+Search (rngl_acos (rngl_cos _)).
+Search (rngl_asin (rngl_sin _)).
 ...
 Check rngl_atan'.
 About Rsignp.
