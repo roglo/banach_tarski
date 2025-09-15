@@ -1195,11 +1195,17 @@ destruct tp3. {
   rewrite (rngl_add_sub Hos).
   rewrite (rl_sqrt_squ Hon Hop Hor).
   apply (rngl_abs_nonpos_eq Hop Hor).
-Search (rngl_cos _ ≤ 0)%L.
-...
   apply rngl_le_cos_0.
   progress unfold π in Htp2.
-  now rewrite angle_straight_div_2 in Htp2.
+  progress unfold π in Htp3.
+  rewrite angle_straight_div_2 in Htp2, Htp3.
+  apply angle_lt_le_incl in Htp2.
+  split; [ easy | ].
+  cbn in Htp3.
+  rewrite angle_add_0_r in Htp3.
+  rewrite angle_add_assoc in Htp3.
+  now rewrite angle_right_add_right in Htp3.
+}
 ...
 
 ...
