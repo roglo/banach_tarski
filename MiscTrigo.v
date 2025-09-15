@@ -730,16 +730,16 @@ apply (rngl_compare_lt_iff Hor Hed) in Ha'.
 now apply (rngl_lt_asymm Hor) in Ha'.
 Qed.
 
-Theorem rngl_cos_asin_div_tan_sqrt :
-  ∀ a,
-  (rngl_cos a < 0)%L
-  → rngl_cos (rngl_asin (rngl_tan a / √(1 + rngl_tan² a))) = (- rngl_cos a)%L.
+Theorem rngl_cos_pos_cos_asin_div_tan_sqrt :
+  ∀ θ,
+  (0 < rngl_cos θ)%L
+  → rngl_cos (rngl_asin (rngl_tan θ / √(1 + rngl_tan² θ))) = rngl_cos θ.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hc.
-  rewrite (H1 (- rngl_cos a))%L.
+  rewrite (H1 (rngl_cos θ))%L.
   apply H1.
 }
 assert (Hio :
@@ -754,22 +754,22 @@ assert (Hio :
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
 specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
 intros * Haz.
-assert (Hcz : (rngl_cos a ≠ 0)%L). {
+assert (Hcz : (rngl_cos θ ≠ 0)%L). {
   now intros H; rewrite H in Haz; apply (rngl_lt_irrefl Hor) in Haz.
 }
-assert (Hc2z : (rngl_cos² a ≠ 0)%L). {
+assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
   intros H; apply Hcz.
   now apply (eq_rngl_squ_0 Hos Hio).
 }
-assert (Hz1t : (0 ≤ 1 + rngl_tan² a)%L). {
+assert (Hz1t : (0 ≤ 1 + rngl_tan² θ)%L). {
   apply (rngl_le_trans Hor _ 1); [ easy | ].
   apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 }
-assert (Hs1t : √(1 + rngl_tan² a) ≠ 0%L). {
+assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
   intros H; apply (eq_rl_sqrt_0 Hon Hos) in H; [ | easy ].
   apply (rngl_add_move_0_l Hop) in H.
-  specialize (rngl_squ_nonneg Hon Hos Hiq Hor (rngl_tan a)) as H1.
+  specialize (rngl_squ_nonneg Hon Hos Hiq Hor (rngl_tan θ)) as H1.
   rewrite H in H1.
   apply rngl_nlt_ge in H1.
   apply H1, (rngl_opp_1_lt_0 Hon Hop Hiq Hor Hc1).
@@ -788,23 +788,23 @@ rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
 progress unfold rngl_tan at 1.
 rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
 rewrite (rngl_div_mul Hon Hiv); [ | easy ].
-rewrite <- (cos2_sin2_1 a) at 1.
+rewrite <- (cos2_sin2_1 θ) at 1.
 rewrite (rngl_add_sub Hos).
 rewrite (rl_sqrt_squ Hon Hop Hor).
-rewrite (rngl_abs_nonpos_eq Hop Hor); [ easy | ].
+rewrite (rngl_abs_nonneg_eq Hop Hor); [ easy | ].
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Theorem rngl_sin_asin_div_tan_sqrt :
-  ∀ a,
-  (rngl_cos a < 0)%L
-  → rngl_sin (rngl_asin (rngl_tan a / √(1 + rngl_tan² a))) = (- rngl_sin a)%L.
+Theorem rngl_cos_pos_sin_asin_div_tan_sqrt :
+  ∀ θ,
+  (0 < rngl_cos θ)%L
+  → rngl_sin (rngl_asin (rngl_tan θ / √(1 + rngl_tan² θ))) = rngl_sin θ.
 Proof.
 destruct_ac.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
   intros * Hc.
-  rewrite (H1 (- rngl_sin a))%L.
+  rewrite (H1 (rngl_sin θ))%L.
   apply H1.
 }
 assert (Hio :
@@ -819,19 +819,142 @@ assert (Hio :
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
 specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
 intros * Haz.
-assert (Hcz : (rngl_cos a ≠ 0)%L). {
+assert (Hcz : (rngl_cos θ ≠ 0)%L). {
   now intros H; rewrite H in Haz; apply (rngl_lt_irrefl Hor) in Haz.
 }
 specialize (rngl_lt_le_incl Hor _ _ Haz) as Hcaz.
-assert (Hc2z : (rngl_cos² a ≠ 0)%L). {
+assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
   intros H; apply Hcz.
   now apply (eq_rngl_squ_0 Hos Hio).
 }
-assert (Hzc2 : (0 < rngl_cos² a)%L). {
+assert (Hzc2 : (0 < rngl_cos² θ)%L). {
   apply (rngl_le_neq Hor).
   split; [ apply (rngl_squ_nonneg Hon Hos Hiq Hor) | easy ].
 }
-assert (Haaz : rngl_abs (rngl_cos a) ≠ 0%L). {
+assert (Haaz : rngl_abs (rngl_cos θ) ≠ 0%L). {
+  now intros H; apply (eq_rngl_abs_0 Hop) in H.
+}
+cbn.
+rewrite (rngl_mul_0_l Hos).
+rewrite rngl_add_0_r.
+rewrite (rngl_mul_1_l Hon).
+rewrite rngl_cos_acos; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+rewrite rngl_1_add_squ_tan; [ | easy ].
+progress unfold rngl_tan at 1.
+rewrite (rl_sqrt_div Hon Hop Hiv Hor); [ | easy | easy ].
+rewrite (rl_sqrt_squ Hon Hop Hor).
+rewrite (rl_sqrt_1 Hon Hop Hiq Hor).
+rewrite (rngl_div_div_r Hon Hos Hiv); [ | easy | easy ].
+rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
+rewrite (rngl_div_mul_mul_div Hic Hiv).
+rewrite <- (rngl_mul_div_assoc Hiv).
+rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+rewrite (rngl_div_diag Hon Hiq); [ | easy ].
+apply (rngl_mul_1_r Hon).
+Qed.
+
+Theorem rngl_cos_neg_cos_asin_div_tan_sqrt :
+  ∀ θ,
+  (rngl_cos θ < 0)%L
+  → rngl_cos (rngl_asin (rngl_tan θ / √(1 + rngl_tan² θ))) = (- rngl_cos θ)%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hc.
+  rewrite (H1 (- rngl_cos θ))%L.
+  apply H1.
+}
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_pdiv T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
+specialize (rngl_1_neq_0 Hon Hc1) as H10.
+specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
+intros * Haz.
+assert (Hcz : (rngl_cos θ ≠ 0)%L). {
+  now intros H; rewrite H in Haz; apply (rngl_lt_irrefl Hor) in Haz.
+}
+assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
+  intros H; apply Hcz.
+  now apply (eq_rngl_squ_0 Hos Hio).
+}
+assert (Hz1t : (0 ≤ 1 + rngl_tan² θ)%L). {
+  apply (rngl_le_trans Hor _ 1); [ easy | ].
+  apply (rngl_le_add_r Hos Hor).
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+}
+assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
+  intros H; apply (eq_rl_sqrt_0 Hon Hos) in H; [ | easy ].
+  apply (rngl_add_move_0_l Hop) in H.
+  specialize (rngl_squ_nonneg Hon Hos Hiq Hor (rngl_tan θ)) as H1.
+  rewrite H in H1.
+  apply rngl_nlt_ge in H1.
+  apply H1, (rngl_opp_1_lt_0 Hon Hop Hiq Hor Hc1).
+}
+cbn.
+rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_l Hop).
+rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_opp_involutive Hop).
+rewrite rngl_sin_acos; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+rewrite (rngl_squ_sqrt Hon); [ | easy ].
+rewrite rngl_1_add_squ_tan; [ | easy ].
+rewrite (rngl_div_div_r Hon Hos Hiv); [ | easy | easy ].
+rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
+progress unfold rngl_tan at 1.
+rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+rewrite (rngl_div_mul Hon Hiv); [ | easy ].
+rewrite <- (cos2_sin2_1 θ) at 1.
+rewrite (rngl_add_sub Hos).
+rewrite (rl_sqrt_squ Hon Hop Hor).
+rewrite (rngl_abs_nonpos_eq Hop Hor); [ easy | ].
+now apply (rngl_lt_le_incl Hor).
+Qed.
+
+Theorem rngl_cos_neg_sin_asin_div_tan_sqrt :
+  ∀ θ,
+  (rngl_cos θ < 0)%L
+  → rngl_sin (rngl_asin (rngl_tan θ / √(1 + rngl_tan² θ))) = (- rngl_sin θ)%L.
+Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
+  intros * Hc.
+  rewrite (H1 (- rngl_sin θ))%L.
+  apply H1.
+}
+assert (Hio :
+  (rngl_is_integral_domain T ||
+     rngl_has_inv_and_1_or_pdiv T &&
+     rngl_has_eq_dec_or_order T)%bool = true). {
+  apply Bool.orb_true_iff; right.
+  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
+  rewrite Hi1; cbn.
+  now apply rngl_has_eq_dec_or_is_ordered_r.
+}
+specialize (rngl_1_neq_0 Hon Hc1) as H10.
+specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
+intros * Haz.
+assert (Hcz : (rngl_cos θ ≠ 0)%L). {
+  now intros H; rewrite H in Haz; apply (rngl_lt_irrefl Hor) in Haz.
+}
+specialize (rngl_lt_le_incl Hor _ _ Haz) as Hcaz.
+assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
+  intros H; apply Hcz.
+  now apply (eq_rngl_squ_0 Hos Hio).
+}
+assert (Hzc2 : (0 < rngl_cos² θ)%L). {
+  apply (rngl_le_neq Hor).
+  split; [ apply (rngl_squ_nonneg Hon Hos Hiq Hor) | easy ].
+}
+assert (Haaz : rngl_abs (rngl_cos θ) ≠ 0%L). {
   now intros H; apply (eq_rngl_abs_0 Hop) in H.
 }
 cbn.
@@ -855,66 +978,77 @@ rewrite (rngl_mul_opp_r Hop).
 now rewrite (rngl_mul_1_r Hon).
 Qed.
 
-Theorem neg_cos_atan_tan : ∀ a,
-  (rngl_cos a < 0)%L
-  → rngl_atan (rngl_tan a) = (a + π)%A.
+Theorem neg_cos_atan_tan :
+  ∀ θ,
+  (rngl_cos θ < 0)%L
+  → rngl_atan (rngl_tan θ) = (θ + π)%A.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hon Hos Hc1) as H1.
-  intros * Hc.
-  rewrite (H1 (rngl_cos a)) in Hc.
-  now apply (rngl_lt_irrefl Hor) in Hc.
-}
 intros * Hc.
 apply eq_angle_eq.
 f_equal. {
   progress unfold π.
   rewrite rngl_cos_add_straight_r.
   progress unfold rngl_atan.
-  remember (rngl_tan a <? 0)%L as ta eqn:Hta.
+  remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
   symmetry in Hta.
-  destruct ta; [ | now apply rngl_cos_asin_div_tan_sqrt ].
+  destruct ta; [ | now apply rngl_cos_neg_cos_asin_div_tan_sqrt ].
   apply rngl_ltb_lt in Hta.
   rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite angle_opp_involutive.
-  now apply rngl_cos_asin_div_tan_sqrt.
+  now apply rngl_cos_neg_cos_asin_div_tan_sqrt.
 } {
   progress unfold π.
   rewrite rngl_sin_add_straight_r.
   progress unfold rngl_atan.
-  remember (rngl_tan a <? 0)%L as ta eqn:Hta.
+  remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
   symmetry in Hta.
-  destruct ta; [ | now apply rngl_sin_asin_div_tan_sqrt ].
+  destruct ta; [ | now apply rngl_cos_neg_sin_asin_div_tan_sqrt ].
   apply rngl_ltb_lt in Hta.
   rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite angle_opp_involutive.
-  now apply rngl_sin_asin_div_tan_sqrt.
+  now apply rngl_cos_neg_sin_asin_div_tan_sqrt.
+}
+Qed.
+
+Theorem pos_cos_atan_tan :
+  ∀ θ,
+  (0 < rngl_cos θ)%L
+  → rngl_atan (rngl_tan θ) = θ.
+Proof.
+destruct_ac.
+intros * Hc.
+apply eq_angle_eq.
+f_equal. {
+  progress unfold rngl_atan.
+  remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
+  symmetry in Hta.
+  destruct ta; [ | now apply rngl_cos_pos_cos_asin_div_tan_sqrt ].
+  apply rngl_ltb_lt in Hta.
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+  rewrite angle_opp_involutive.
+  now apply rngl_cos_pos_cos_asin_div_tan_sqrt.
+} {
+  progress unfold rngl_atan.
+  remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
+  symmetry in Hta.
+  destruct ta; [ | now apply rngl_cos_pos_sin_asin_div_tan_sqrt ].
+  apply rngl_ltb_lt in Hta.
+  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hor) ].
+  rewrite (rngl_div_opp_l Hop Hiv).
+  rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
+  rewrite angle_opp_involutive.
+  now apply rngl_cos_pos_sin_asin_div_tan_sqrt.
 }
 Qed.
 
 ...
-
-Theorem pos_cos_atan_tan : ∀ x,
-  0 < cos x
-  → atan (tan x) = x - IZR ((x + PI / 2) // PI) * PI.
-Proof.
-intros * Hc.
-assert (Hcp : cos (x + PI) < 0) by (rewrite neg_cos; lra).
-specialize (neg_cos_atan_tan (x + PI) Hcp) as H.
-specialize (tan_period x 1) as Ht.
-simpl (INR _) in Ht.
-rewrite Rmult_1_l in Ht.
-rewrite Rplus_shuffle0 in H.
-rewrite Rediv_add_1 in H; [ | apply PI_neq0 ].
-rewrite plus_IZR in H.
-simpl (IZR _) in H.
-rewrite Ht in H; lra.
-Qed.
 
 Theorem atan_tan : ∀ x,
   cos x ≠ 0
