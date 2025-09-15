@@ -1148,7 +1148,7 @@ Theorem rngl_asin_sin :
   rngl_asin (rngl_sin θ) =
     (if θ ≤? π /₂ then θ
      else if θ ≤? 3 * (π /₂) then π - θ
-     else θ - π /₂)%A.
+     else θ)%A.
 Proof.
 destruct_ac.
 intros.
@@ -1160,40 +1160,33 @@ destruct (rngl_le_dec Hor (rngl_sin² θ) 1) as [Hs1| Hs1]. 2: {
   apply (rngl_squ_le_1 Hon Hop Hiq Hor).
   apply rngl_sin_bound.
 }
+apply eq_angle_eq; cbn - [ angle_mul_nat ].
+clear Hs1.
+do 2 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_0_l Hop).
+do 2 rewrite (rngl_mul_1_l Hon).
+rewrite (rngl_opp_involutive Hop).
+rewrite rngl_add_0_r.
+rewrite <- (cos2_sin2_1 θ).
+rewrite (rngl_add_sub Hos).
+rewrite (rl_sqrt_squ Hon Hop Hor).
 remember (θ ≤? π /₂)%A as tp2 eqn:Htp2.
 symmetry in Htp2.
 destruct tp2. {
-  apply eq_angle_eq; cbn.
-  do 2 rewrite (rngl_mul_0_l Hos).
-  rewrite (rngl_sub_0_l Hop).
-  do 2 rewrite (rngl_mul_1_l Hon).
-  rewrite (rngl_opp_involutive Hop).
-  rewrite rngl_add_0_r.
   progress f_equal.
-  rewrite <- (cos2_sin2_1 θ).
-  rewrite (rngl_add_sub Hos).
-  rewrite (rl_sqrt_squ Hon Hop Hor).
   apply (rngl_abs_nonneg_eq Hop Hor).
   apply rngl_le_0_cos.
   progress unfold π in Htp2.
-  now rewrite angle_straight_div_2 in Htp2.
+  now left; rewrite angle_straight_div_2 in Htp2.
 }
 apply angle_leb_gt in Htp2.
 remember (θ ≤? 3 * (π /₂))%A as tp3 eqn:Htp3.
 symmetry in Htp3.
 destruct tp3. {
-  apply eq_angle_eq; cbn.
-  do 4 rewrite (rngl_mul_0_l Hos).
-  rewrite (rngl_sub_0_l Hop).
-  do 2 rewrite (rngl_mul_opp_l Hop).
-  do 4 rewrite (rngl_mul_1_l Hon).
-  do 2 rewrite (rngl_opp_involutive Hop).
-  rewrite rngl_add_0_r, rngl_add_0_l.
-  rewrite (rngl_sub_0_r Hos).
+  progress unfold π.
+  rewrite rngl_cos_sub_straight_l.
+  rewrite rngl_sin_sub_straight_l.
   progress f_equal.
-  rewrite <- (cos2_sin2_1 θ).
-  rewrite (rngl_add_sub Hos).
-  rewrite (rl_sqrt_squ Hon Hop Hor).
   apply (rngl_abs_nonpos_eq Hop Hor).
   apply rngl_le_cos_0.
   progress unfold π in Htp2.
@@ -1206,6 +1199,20 @@ destruct tp3. {
   rewrite angle_add_assoc in Htp3.
   now rewrite angle_right_add_right in Htp3.
 }
+progress f_equal.
+apply (rngl_abs_nonneg_eq Hop Hor).
+apply rngl_le_0_cos.
+...
+progress unfold π in Htp3.
+rewrite angle_straight_div_2 in Htp3.
+
+apply angle_lt_le_incl in Htp2.
+...
+split; [ easy | ].
+cbn in Htp3.
+rewrite angle_add_0_r in Htp3.
+rewrite angle_add_assoc in Htp3.
+now rewrite angle_right_add_right in Htp3.
 ...
 
 ...
