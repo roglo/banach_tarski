@@ -1182,40 +1182,55 @@ apply (rngl_abs_nonpos_eq Hop Hor).
 now apply (rngl_lt_le_incl Hor).
 Qed.
 
-Search (rngl_asin (rngl_cos _)).
-
-...
-
-Theorem asin_cos : ∀ x,
-  asin (cos x) =
-    if Req_dec (sin x) 0 then Rsign (cos x) * PI / 2
-    else - Rsign (sin x) * atan (tan (x + PI / 2)).
+Theorem rngl_asin_cos :
+  ∀ θ,
+  rngl_asin (rngl_cos θ) =
+    if (0 ≤? rngl_sin θ)%L then (π /₂ - θ)%A else (π /₂ + θ)%A.
 Proof.
+destruct_ac.
 intros.
-rewrite cos_sin, asin_sin.
-rewrite Rplus_comm.
-unfold atan'.
-fold (tan (x + PI / 2)).
-rewrite cos_plus_PI2.
-unfold Rsignp.
-destruct (Req_dec (- sin x) 0) as [H1| H1]. {
-  rewrite H1.
-  apply (f_equal Ropp) in H1.
-  rewrite Ropp_involutive, Ropp_0 in H1.
-  rewrite H1.
-  destruct (Rle_dec 0 0) as [H| H]; [ clear H | lra ].
-  destruct (Req_dec 0 0); lra.
+rewrite <- rngl_sin_add_right_r.
+rewrite rngl_asin_sin.
+rewrite rngl_cos_add_right_r.
+rewrite (rngl_leb_0_opp Hop Hor).
+rewrite angle_sub_add_distr.
+rewrite angle_sub_sub_swap.
+progress unfold π.
+rewrite angle_straight_sub_right.
+rewrite angle_straight_div_2.
+remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
+remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
+symmetry in Hzs, Hsz.
+rewrite angle_add_comm.
+destruct sz. {
+  destruct zs; [ | easy ].
+  apply rngl_leb_le in Hzs, Hsz.
+  progress unfold angle_sub.
+  progress f_equal.
+  symmetry.
+  apply (rngl_le_antisymm Hor) in Hzs; [ | easy ].
+  apply eq_rngl_sin_0 in Hzs.
+  destruct Hzs; subst; [ apply angle_opp_0 | ].
+  apply angle_opp_straight.
 }
-destruct (Req_dec (sin x) 0) as [Hs| Hs]; [ lra | clear H1 ].
-destruct (Rle_dec 0 (- sin x)) as [H1| H1]. {
-  rewrite Rsign_of_neg; lra.
-} {
-  rewrite Rsign_of_pos; lra.
-}
+destruct zs; [ easy | ].
+apply (rngl_leb_gt Hor) in Hzs, Hsz.
+now apply (rngl_lt_asymm Hor) in Hzs.
 Qed.
 
-Theorem acos_cos : ∀ x, acos (cos x) = PI / 2 - asin (cos x).
-Proof. easy. Qed.
+Theorem rngl_acos_cos :
+  ∀ θ, rngl_acos (rngl_cos θ) = (π /₂ - rngl_asin (rngl_cos θ))%A.
+Proof.
+intros.
+progress unfold rngl_asin.
+progress unfold π.
+rewrite angle_straight_div_2.
+rewrite angle_sub_sub_distr.
+rewrite angle_sub_diag; symmetry.
+apply angle_add_0_l.
+Qed.
+
+...
 
 Theorem nonneg_sin_interv : ∀ x, 0 ≤ sin x → x rmod (2 * PI) ≤ PI.
 Proof.
