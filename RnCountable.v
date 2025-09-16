@@ -117,6 +117,18 @@ apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ easy | ].
 apply (rngl_0_le_2 Hon Hos Hiq Hor).
 Qed.
 
+Theorem rngl_3_neq_0 : (3 ≠ 0)%L.
+Proof.
+assert (H : (0 < 3)%L). {
+  apply (rngl_lt_le_trans Hor _ 1).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_le_add_l Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hiq Hor).
+}
+intros H1; rewrite H1 in H.
+now apply (rngl_lt_irrefl Hor) in H.
+Qed.
+
 Theorem partial_sum3_aux_succ : ∀ u n pow i,
   partial_sum3_aux (S n) u pow i =
   (partial_sum3_aux n u pow i +
@@ -131,14 +143,7 @@ induction n; intros. {
   now rewrite rngl_of_nat_1, (rngl_mul_1_l Hon).
   rewrite rngl_of_nat_0, (rngl_mul_0_l Hos).
   symmetry; apply (rngl_div_0_l Hos Hi1).
-  assert (H : (0 < 3)%L). {
-    apply (rngl_lt_le_trans Hor _ 1).
-    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
-    apply (rngl_le_add_l Hos Hor).
-    apply (rngl_0_le_2 Hon Hos Hiq Hor).
-  }
-  intros H1; rewrite H1 in H.
-  now apply (rngl_lt_irrefl Hor) in H.
+  apply rngl_3_neq_0.
 }
 remember (S n) as sn; simpl; subst sn.
 remember (u i) as bi eqn:Hbi; symmetry in Hbi.
@@ -148,6 +153,16 @@ destruct bi. {
 (**)
   rewrite rngl_add_assoc.
   progress f_equal.
+  rewrite Nat.add_succ_r.
+  rewrite (rngl_mul_div_assoc Hiv).
+  rewrite (rngl_div_div Hon Hos Hiv).
+  rewrite <- rngl_of_nat_3.
+  now rewrite (rngl_mul_nat_comm Hon Hos 3).
+  apply rngl_3_neq_0.
+  rewrite Hsn3.
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply rngl_3_neq_0.
+}
 ...
   do 2 apply Rplus_eq_compat_l.
   rewrite <- Nat.add_succ_comm.
