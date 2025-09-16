@@ -29,7 +29,8 @@ Context {Hc1 : rngl_characteristic T ≠ 1}.
 Context {Hor : rngl_is_ordered T = true}.
 *)
 
-Definition π := angle_straight.
+Notation "'π'" := (angle_straight) (at level 0).
+Notation "'π/₂'" := angle_right.
 
 Definition rngl_atan x :=
   if (x <? 0)%L then (- rngl_asin (rngl_abs x / √(1 + x²)))%A
@@ -41,8 +42,8 @@ Definition rngl_atan' (x y : T) :=
   if (y =? 0)%L then
     match (x ?= 0)%L with
     | Eq => 0%A
-    | Lt => (- π /₂)%A
-    | Gt => (π /₂)%A
+    | Lt => (- π/₂)%A
+    | Gt => π/₂
     end
   else rngl_atan (x / y).
 
@@ -66,7 +67,7 @@ Qed.
 
 Theorem rngl_atan_bound :
   rngl_characteristic T ≠ 1 →
-  ∀ x, (- (π /₂) < rngl_atan x ∨ rngl_atan x < π /₂)%A.
+  ∀ x, (- π/₂ < rngl_atan x ∨ rngl_atan x < π/₂)%A.
 Proof.
 destruct_ac.
 intros Hc1.
@@ -145,8 +146,6 @@ destruct xz. {
     apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_1 Hon Hos Hiq Hor).
   }
-  progress unfold π.
-  rewrite angle_straight_div_2.
   progress unfold angle_sub.
   progress unfold angle_add.
   progress unfold angle_opp.
@@ -281,8 +280,6 @@ destruct xz. {
     apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_1 Hon Hos Hiq Hor).
   }
-  progress unfold π.
-  rewrite angle_straight_div_2.
   progress unfold angle_sub.
   progress unfold angle_add.
   progress unfold angle_opp.
@@ -568,8 +565,6 @@ assert (Hca : ∀ x, (0 < rngl_cos (rngl_atan x))%L). {
   intros y.
   apply rngl_lt_0_cos.
   specialize (rngl_atan_bound Hc1 y) as H1.
-  progress unfold π in H1.
-  rewrite angle_straight_div_2 in H1.
   now destruct H1; [ right | left ].
 }
 apply (rngl_mul_cancel_r Hi1) with (c := √(1 + x²)); [ easy | ].
@@ -934,7 +929,6 @@ destruct_ac.
 intros * Hc.
 apply eq_angle_eq.
 f_equal. {
-  progress unfold π.
   rewrite rngl_cos_add_straight_r.
   progress unfold rngl_atan.
   remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
@@ -947,7 +941,6 @@ f_equal. {
   rewrite angle_opp_involutive.
   now apply rngl_cos_neg_cos_asin_div_tan_sqrt.
 } {
-  progress unfold π.
   rewrite rngl_sin_add_straight_r.
   progress unfold rngl_atan.
   remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
@@ -1121,7 +1114,6 @@ destruct zc. {
   now apply rngl_leb_le in Hzc.
 }
 apply (rngl_leb_gt Hor) in Hzc.
-progress unfold π.
 rewrite rngl_cos_sub_straight_l.
 rewrite rngl_sin_sub_straight_l.
 progress f_equal.
@@ -1132,7 +1124,7 @@ Qed.
 Theorem rngl_asin_cos :
   ∀ θ,
   rngl_asin (rngl_cos θ) =
-    if (0 ≤? rngl_sin θ)%L then (π /₂ - θ)%A else (π /₂ + θ)%A.
+    if (0 ≤? rngl_sin θ)%L then (π/₂ - θ)%A else (π/₂ + θ)%A.
 Proof.
 destruct_ac.
 intros.
@@ -1142,9 +1134,7 @@ rewrite rngl_cos_add_right_r.
 rewrite (rngl_leb_0_opp Hop Hor).
 rewrite angle_sub_add_distr.
 rewrite angle_sub_sub_swap.
-progress unfold π.
 rewrite angle_straight_sub_right.
-rewrite angle_straight_div_2.
 remember (0 ≤? rngl_sin θ)%L as zs eqn:Hzs.
 remember (rngl_sin θ ≤? 0)%L as sz eqn:Hsz.
 symmetry in Hzs, Hsz.
@@ -1166,12 +1156,10 @@ now apply (rngl_lt_asymm Hor) in Hzs.
 Qed.
 
 Theorem rngl_acos_cos :
-  ∀ θ, rngl_acos (rngl_cos θ) = (π /₂ - rngl_asin (rngl_cos θ))%A.
+  ∀ θ, rngl_acos (rngl_cos θ) = (π/₂ - rngl_asin (rngl_cos θ))%A.
 Proof.
 intros.
 progress unfold rngl_asin.
-progress unfold π.
-rewrite angle_straight_div_2.
 rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag; symmetry.
 apply angle_add_0_l.
