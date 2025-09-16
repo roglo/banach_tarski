@@ -1218,27 +1218,28 @@ rewrite rngl_add_comm in Hsc.
 now apply pre_sin_bound in Hsc.
 Qed.
 
-...
-
-Theorem sin_angle_of_sin_cos : ∀ s c,
-  s² + c² = 1
-  → sin (angle_of_sin_cos s c) = s.
+Theorem rngl_sin_angle_of_sin_cos : ∀ s c,
+  (s² + c² = 1)%L
+  → rngl_sin (angle_of_sin_cos s c) = s.
 Proof.
+destruct_ac.
 intros * Hsc.
 unfold angle_of_sin_cos.
-destruct (Rlt_dec s 0) as [Hs| Hs]. {
-  destruct (Rlt_dec c 0) as [Hc| Hc]. {
-    rewrite sin_minus.
-    rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rminus_0_l.
-    rewrite sin_acos; [ | now apply pre_cos_bound in Hsc ].
-    replace (1 - c²) with s² by lra.
-    rewrite Rsqr_neg, <- Ropp_involutive; f_equal.
-    rewrite sqrt_Rsqr; [ easy | lra ].
+destruct (rngl_lt_dec ac_or s 0) as [Hs| Hs]. {
+  destruct (rngl_lt_dec ac_or c 0) as [Hc| Hc]. {
+    rewrite rngl_sin_opp.
+    rewrite rngl_sin_acos; [ | now apply (pre_cos_bound Hon Hop Hiq Hor s) ].
+    rewrite <- Hsc.
+    rewrite (rngl_add_sub Hos).
+    rewrite (rl_sqrt_squ Hon Hop Hor).
+    rewrite (rngl_abs_nonpos_eq Hop Hor).
+    apply (rngl_opp_involutive Hop).
+    now apply (rngl_lt_le_incl Hor).
   }
-  rewrite sin_plus.
-  rewrite cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rplus_0_r.
-  rewrite sin_asin; [ easy | now apply pre_sin_bound in Hsc ].
+  apply rngl_sin_asin.
+  now apply (pre_sin_bound Hon Hop Hiq Hor _ c).
 }
+...
 destruct (Rlt_dec c 0) as [Hc| Hc]. {
   rewrite sin_acos; [ | now apply pre_cos_bound in Hsc ].
   replace (1 - c²) with s² by lra.
