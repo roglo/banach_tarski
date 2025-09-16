@@ -1189,28 +1189,36 @@ apply rngl_leb_le in Hcz.
 now rewrite Hcz.
 Qed.
 
-...
-
-Theorem pre_sin_bound : ∀ s c, s² + c² = 1 → -1 ≤ s ≤ 1.
+Theorem pre_sin_bound :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv_or_pdiv T = true →
+  rngl_is_ordered T = true →
+  ∀ s c, (s² + c² = 1 → -1 ≤ s ≤ 1)%L.
 Proof.
+intros Hon Hop Hiq Hor.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros s c Hsc.
-assert (H : s² ≤ 1). {
-  enough (H : s² + 0 ≤ 1) by lra.
-  rewrite <- Hsc.
-  apply Rplus_le_compat_l, Rle_0_sqr.
-}
-rewrite <- Rsqr_1 in H.
-apply Rsqr_le_abs_0 in H.
-rewrite Rabs_R1 in H.
-now apply Rabs_le in H.
+apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
+rewrite <- Hsc.
+apply (rngl_le_add_r Hos Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 Qed.
 
-Theorem pre_cos_bound : ∀ s c, s² + c² = 1 → -1 ≤ c ≤ 1.
+Theorem pre_cos_bound :
+  rngl_has_1 T = true →
+  rngl_has_opp T = true →
+  rngl_has_inv_or_pdiv T = true →
+  rngl_is_ordered T = true →
+  ∀ s c, (s² + c² = 1 → -1 ≤ c ≤ 1)%L.
 Proof.
+intros Hon Hop Hiq Hor.
 intros s c Hsc.
-rewrite Rplus_comm in Hsc.
+rewrite rngl_add_comm in Hsc.
 now apply pre_sin_bound in Hsc.
 Qed.
+
+...
 
 Theorem sin_angle_of_sin_cos : ∀ s c,
   s² + c² = 1
