@@ -1,5 +1,6 @@
 (* Banach-Tarski paradox. *)
 
+Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith.
 
 Require Import RingLike.Core.
@@ -121,21 +122,33 @@ Theorem partial_sum3_aux_succ : ∀ u n pow i,
   (partial_sum3_aux n u pow i +
    INR (Nat.b2n (u (i + n)%nat)) * pow / 3 ^ S n)%L.
 Proof.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
 revert pow i.
 induction n; intros. {
   simpl; rewrite rngl_add_0_r, rngl_add_0_l, (rngl_mul_1_r Hon), Nat.add_0_r.
-(**)
   destruct (u i); simpl.
-...
-  destruct (u i); simpl; lra.
+  now rewrite rngl_of_nat_1, (rngl_mul_1_l Hon).
+  rewrite rngl_of_nat_0, (rngl_mul_0_l Hos).
+  symmetry; apply (rngl_div_0_l Hos Hi1).
+  assert (H : (0 < 3)%L). {
+    apply (rngl_lt_le_trans Hor _ 1).
+    apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_le_add_l Hos Hor).
+    apply (rngl_0_le_2 Hon Hos Hiq Hor).
+  }
+  intros H1; rewrite H1 in H.
+  now apply (rngl_lt_irrefl Hor) in H.
 }
 remember (S n) as sn; simpl; subst sn.
 remember (u i) as bi eqn:Hbi; symmetry in Hbi.
 destruct bi. {
   remember (3 ^ S n)%L as sn3 eqn:Hsn3.
   rewrite IHn; simpl; rewrite Hbi.
-  rewrite Rplus_assoc.
+(**)
+  rewrite rngl_add_assoc.
+  progress f_equal.
+...
   do 2 apply Rplus_eq_compat_l.
   rewrite <- Nat.add_succ_comm.
   unfold Rdiv; subst sn3.
