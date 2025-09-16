@@ -1254,29 +1254,34 @@ Theorem rngl_cos_angle_of_sin_cos : ∀ s c,
   (s² + c² = 1)%L
   → rngl_cos (angle_of_sin_cos s c) = c.
 Proof.
-...
+destruct_ac.
 intros * Hsc.
 unfold angle_of_sin_cos.
-destruct (Rlt_dec s 0) as [Hs| Hs]. {
-  destruct (Rlt_dec c 0) as [Hc| Hc]. {
-    rewrite cos_minus.
-    rewrite cos_2PI, sin_2PI, Rmult_1_l, Rmult_0_l, Rplus_0_r.
-    apply cos_acos.
-    now apply pre_cos_bound in Hsc.
+destruct (rngl_lt_dec ac_or s 0) as [Hs| Hs]. {
+  destruct (rngl_lt_dec ac_or c 0) as [Hc| Hc]. {
+    rewrite rngl_cos_opp.
+    apply rngl_cos_acos.
+    now apply (pre_cos_bound Hon Hop Hiq Hor s).
   }
-  rewrite cos_plus.
-  rewrite cos_2PI, sin_2PI, Rmult_1_r, Rmult_0_r, Rminus_0_r.
-  rewrite cos_asin; [ | now apply pre_sin_bound in Hsc ].
-  replace (1 - s²) with c² by lra.
-  apply Rnot_lt_le in Hc.
-  now rewrite sqrt_Rsqr.
+  apply (rngl_nlt_ge_iff Hor) in Hc.
+  rewrite rngl_cos_asin.
+  rewrite <- Hsc, rngl_add_comm.
+  rewrite (rngl_add_sub Hos).
+  rewrite (rl_sqrt_squ Hon Hop Hor).
+  now apply (rngl_abs_nonneg_eq Hop Hor).
+  now apply (pre_sin_bound Hon Hop Hiq Hor _ c).
 }
-destruct (Rlt_dec c 0) as [Hc| Hc]. {
-  rewrite cos_acos; [ easy | ].
+apply (rngl_nlt_ge_iff Hor) in Hs.
+destruct (rngl_lt_dec ac_or c 0) as [Hc| Hc]. {
+  apply rngl_cos_acos.
   now apply pre_cos_bound in Hsc.
 }
-rewrite cos_asin; [ | now apply pre_sin_bound in Hsc ].
-replace (1 - s²) with c² by lra.
-apply Rnot_lt_le in Hc.
-now rewrite sqrt_Rsqr.
+apply (rngl_nlt_ge_iff Hor) in Hc.
+rewrite rngl_cos_asin.
+rewrite <- Hsc, rngl_add_comm, (rngl_add_sub Hos).
+rewrite (rl_sqrt_squ Hon Hop Hor).
+now apply (rngl_abs_nonneg_eq Hop Hor).
+now apply (pre_sin_bound Hon Hop Hiq Hor _ c).
 Qed.
+
+End a.
