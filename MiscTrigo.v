@@ -74,14 +74,7 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
 specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_pdiv T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 intros.
 progress unfold rngl_atan.
 remember (x <? 0)%L as xz eqn:Hxz.
@@ -568,14 +561,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   apply H1.
 }
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_pdiv T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 intros.
 specialize (rl_sqrt_add_1_squ_neq_0 Hon Hos Hiq Hc1 Hor x) as Hs1a2.
 assert (Hca : ∀ x, (0 < rngl_cos (rngl_atan x))%L). {
@@ -671,14 +657,7 @@ Theorem rngl_1_add_squ_tan :
 Proof.
 destruct_ac.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_pdiv T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 intros * Hc.
 progress unfold rngl_tan.
 rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
@@ -742,15 +721,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (rngl_cos θ))%L.
   apply H1.
 }
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_pdiv T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
 specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
 intros * Haz.
@@ -807,15 +778,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (rngl_sin θ))%L.
   apply H1.
 }
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_pdiv T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
 specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
 intros * Haz.
@@ -865,15 +828,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (- rngl_cos θ))%L.
   apply H1.
 }
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_pdiv T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
 specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
 intros * Haz.
@@ -930,15 +885,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (- rngl_sin θ))%L.
   apply H1.
 }
-assert (Hio :
-  (rngl_is_integral_domain T ||
-     rngl_has_inv_and_1_or_pdiv T &&
-     rngl_has_eq_dec_or_order T)%bool = true). {
-  apply Bool.orb_true_iff; right.
-  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
-  rewrite Hi1; cbn.
-  now apply rngl_has_eq_dec_or_is_ordered_r.
-}
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
 specialize (rngl_0_le_1 Hon Hos Hiq Hor) as H01.
 intros * Haz.
@@ -1107,7 +1054,7 @@ destruct Hcz; subst. {
   apply angle_eqb_neq.
   apply neq_angle_neq; cbn.
   intros H; injection H; clear H; intros H.
-  rewrite <- (rngl_add_0_l (-1))%L in H.
+  rewrite <- (rngl_add_0_l (-1)) in H.
   rewrite (rngl_add_move_r Hop) in H.
   rewrite (rngl_sub_opp_r Hop) in H.
   symmetry in H.
