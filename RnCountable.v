@@ -124,8 +124,10 @@ Proof.
 intros.
 revert pow i.
 induction n; intros. {
+  simpl; rewrite rngl_add_0_r, rngl_add_0_l, (rngl_mul_1_r Hon), Nat.add_0_r.
+(**)
+  destruct (u i); simpl.
 ...
-  simpl; rewrite Rplus_0_r, Rplus_0_l, Rmult_1_r, Nat.add_0_r.
   destruct (u i); simpl; lra.
 }
 remember (S n) as sn; simpl; subst sn.
