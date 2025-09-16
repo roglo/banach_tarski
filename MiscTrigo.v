@@ -38,10 +38,10 @@ Definition rngl_atan' (x y : T) :=
   else rngl_atan (x / y).
 
 Definition angle_of_sin_cos s c :=
-  if Rlt_dec ac_or s 0 then
-    if Rlt_dec ac_or c 0 then (- rngl_acos c)%A else rngl_asin s
+  if rngl_lt_dec ac_or s 0 then
+    if rngl_lt_dec ac_or c 0 then (- rngl_acos c)%A else rngl_asin s
   else
-    if Rlt_dec ac_or c 0 then rngl_acos c else rngl_asin s.
+    if rngl_lt_dec ac_or c 0 then rngl_acos c else rngl_asin s.
 
 Theorem angle_lt_sub_lt_add_l_1 :
   ∀ θ1 θ2 θ3 : angle T,
@@ -399,7 +399,7 @@ destruct a1 as [Hx1| Hx1]. {
 }
 exfalso; clear Hoa1 Ha1.
 apply Hx1.
-now apply (rngl_squ_le_1 Hon Hop Hiq Hor).
+now apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
 Qed.
 
 Theorem rngl_asin_opp :
@@ -474,7 +474,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros.
 specialize (rngl_lt_0_add_1_squ Hon Hos Hiq Hc1 Hor a) as Hz1a2.
 specialize (rl_sqrt_add_1_squ_neq_0 Hon Hos Hiq Hc1 Hor a) as Hs1a2.
-apply (rngl_squ_le_1_if Hon Hop Hiq Hor).
+apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
 rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
 rewrite (rngl_squ_sqrt Hon); [ | now apply (rngl_lt_le_incl Hor) ].
 apply (rngl_le_div_l Hon Hop Hiv Hor); [ easy | ].
@@ -1083,7 +1083,7 @@ progress unfold rngl_acos.
 progress fold Hor.
 destruct (rngl_le_dec Hor (rngl_sin² θ) 1) as [Hs1| Hs1]. 2: {
   exfalso; apply Hs1; clear Hs1.
-  apply (rngl_squ_le_1 Hon Hop Hiq Hor).
+  apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
   apply rngl_sin_bound.
 }
 apply eq_angle_eq; cbn - [ angle_mul_nat ].
@@ -1161,26 +1161,35 @@ Proof.
 destruct_ac.
 intros.
 unfold angle_of_sin_cos.
+rewrite rngl_acos_cos.
+rewrite rngl_asin_cos.
+rewrite rngl_asin_sin.
 progress fold Hor.
-destruct (Rlt_dec Hor (rngl_sin θ) 0) as [Hsz| Hsz]. {
-...
-intros.
-unfold angle_of_sin_cos.
-destruct (Rlt_dec (sin x) 0) as [Hs| Hs]. {
-  destruct (Rlt_dec (cos x) 0) as [Hc| Hc]. {
-    now apply neg_sin_neg_cos_2PI_acos_cos.
-  }
-  apply Rnot_lt_le in Hc.
-  now apply neg_sin_pos_cos_asin_sin_2PI.
+destruct (rngl_lt_dec Hor (rngl_sin θ) 0) as [Hsz| Hsz]. {
+  apply (rngl_leb_gt Hor) in Hsz.
+  rewrite Hsz.
+  rewrite angle_sub_add_distr.
+  rewrite angle_sub_diag.
+  rewrite angle_sub_0_l.
+  rewrite angle_opp_involutive.
+  destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hcz| Hcz]; [ easy | ].
+  apply (rngl_nlt_ge_iff Hor) in Hcz.
+  apply rngl_leb_le in Hcz.
+  now rewrite Hcz.
 }
-apply Rnot_lt_le in Hs.
-destruct (Rlt_dec (cos x) 0) as [Hc| Hc]. {
-  now apply pos_sin_neg_cos_acos_cos.
-} {
-  apply Rnot_lt_le in Hc.
-  now apply pos_sin_pos_cos_asin_sin.
-}
+apply (rngl_nlt_ge_iff Hor) in Hsz.
+apply rngl_leb_le in Hsz.
+rewrite Hsz.
+rewrite angle_sub_sub_distr.
+rewrite angle_sub_diag.
+rewrite angle_add_0_l.
+destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hcz| Hcz]; [ easy | ].
+apply (rngl_nlt_ge_iff Hor) in Hcz.
+apply rngl_leb_le in Hcz.
+now rewrite Hcz.
 Qed.
+
+...
 
 Theorem pre_sin_bound : ∀ s c, s² + c² = 1 → -1 ≤ s ≤ 1.
 Proof.
