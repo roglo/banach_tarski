@@ -5,13 +5,7 @@ From Stdlib Require Import Utf8 Arith ZArith.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
-Require Import TrigoWithoutPi.AngleDef.
-Require Import TrigoWithoutPi.Angle.
-Require Import TrigoWithoutPi.TrigoWithoutPiExt.
-Require Import TrigoWithoutPi.AngleDiv2.
-Require Import TrigoWithoutPi.Angle_order.
-Require Import TrigoWithoutPi.AngleAddLeMonoL.
-Require Import TrigoWithoutPi.AngleTan.
+Require Import TrigoWithoutPi.Core.
 Require Import MiscReals.
 
 Section a.
