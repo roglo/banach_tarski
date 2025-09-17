@@ -353,7 +353,20 @@ apply rngl_3_neq_0.
 apply rngl_3_neq_0.
 Qed.
 
-...
+Ltac fold_rngl :=
+  replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul by easy;
+  replace (let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero by easy;
+  replace
+    (match
+        (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
+     with
+     | Some a => a
+     | None => 0%L
+     end) with 1%L by easy.
 
 Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
   partial_sum3_aux (S k) u pow i =
@@ -362,6 +375,13 @@ Proof.
 intros.
 set (v := λ n, u (S n)).
 revert pow i.
+(**)
+induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl | ].
+field_simplify; fold_rngl.
+now rewrite rngl_of_nat_1, (rngl_mul_1_r Hon).
+rewrite rngl_add_comm; apply rngl_3_neq_0.
+rewrite rngl_add_comm; apply rngl_3_neq_0.
+...
 induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl; lra | ].
 rewrite partial_sum3_aux_succ.
 rewrite IHk.
