@@ -117,14 +117,17 @@ apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor); [ easy | ].
 apply (rngl_0_le_2 Hon Hos Hiq Hor).
 Qed.
 
+Theorem rngl_0_lt_3 : (0 < 3)%L.
+Proof.
+apply (rngl_lt_le_trans Hor _ 1).
+apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+apply (rngl_le_add_l Hos Hor).
+apply (rngl_0_le_2 Hon Hos Hiq Hor).
+Qed.
+
 Theorem rngl_3_neq_0 : (3 ≠ 0)%L.
 Proof.
-assert (H : (0 < 3)%L). {
-  apply (rngl_lt_le_trans Hor _ 1).
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
-  apply (rngl_le_add_l Hos Hor).
-  apply (rngl_0_le_2 Hon Hos Hiq Hor).
-}
+specialize rngl_0_lt_3 as H.
 intros H1; rewrite H1 in H.
 now apply (rngl_lt_irrefl Hor) in H.
 Qed.
@@ -223,11 +226,17 @@ Theorem partial_sum3_aux_nonneg : ∀ u k pos i,
 Proof.
 intros * Hpos.
 revert pos i Hpos.
-...
-induction k; intros; simpl; [ lra | ].
-destruct (u i); [ | apply IHk; lra ].
-apply Rplus_le_le_0_compat; [ lra | apply IHk; lra ].
+induction k; intros; simpl; [ apply (rngl_le_refl Hor) | ].
+assert (H : (0 ≤ pos / 3)%L). {
+  apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
+  apply rngl_0_lt_3.
+}
+destruct (u i); [ | now apply IHk ].
+apply (rngl_le_0_add Hos Hor); [ easy | ].
+now apply IHk.
 Qed.
+
+...
 
 Theorem partial_sum3_upper_bound : ∀ u n k,
   (partial_sum3 u k ≤ partial_sum3 u n + / (2 * 3 ^ n))%L.
