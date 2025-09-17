@@ -325,19 +325,35 @@ destruct b. {
 }
 replace (1 / 3 ^ n / 3)%L with (1 / (3 ^ S n))%L. {
   eapply (rngl_le_trans Hor); [ apply IHk | ].
-(**)
   apply (rngl_le_inv_inv Hon Hop Hiv Hor).
-...
-  apply Rinv_le_contravar. {
-    apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
-  } {
-    apply Rmult_le_compat_l; [ lra | ].
-    apply Rle_pow; [ lra | apply Nat.le_succ_diag_r ].
-  }
+  apply (rngl_mul_pos_pos Hon Hop Hiq Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+  apply rngl_0_lt_3.
+  apply (rngl_mul_pos_pos Hon Hop Hiq Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+  apply rngl_0_lt_3.
+  apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  cbn.
+  apply (rngl_le_div_l Hon Hop Hiv Hor).
+  apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+  apply rngl_0_lt_3.
+  rewrite (rngl_div_diag Hon Hiq).
+  apply (rngl_le_add_l Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hiq Hor).
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply rngl_3_neq_0.
 }
-simpl; unfold Rdiv.
-rewrite Rinv_mult; lra.
+simpl; symmetry.
+apply (rngl_div_div Hon Hos Hiv).
+apply (rngl_pow_neq_0 Hon Hos Hiq).
+apply rngl_3_neq_0.
+apply rngl_3_neq_0.
 Qed.
+
+...
 
 Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
   partial_sum3_aux (S k) u pow i =
