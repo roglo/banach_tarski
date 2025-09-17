@@ -291,9 +291,6 @@ remember (u n) as b eqn:Hb; symmetry in Hb.
 destruct b. {
 (**)
   apply (rngl_le_add_le_sub_l Hop Hor).
-(*
-  rewrite (rngl_inv_mul_distr Hon Hos Hiv).
-*)
   assert (H : (1 / (2 * (1 + 2) * 3 ^ n))%L = (1 / 3 ^ n / 3 / 2)%L). {
     rewrite (rngl_add_comm 1 2).
     rewrite (rngl_div_div Hon Hos Hiv).
@@ -301,8 +298,13 @@ destruct b. {
     apply (rngl_div_div Hon Hos Hiv).
     apply (rngl_pow_neq_0 Hon Hos Hiq).
     apply rngl_3_neq_0.
-Search (_ * _ ≠ 0)%L.
-...
+    intros H.
+    apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
+    now apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+    apply rngl_3_neq_0.
+    apply rngl_3_neq_0.
+    apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  }
   field_simplify. {
     apply partial_sum3_aux_le_half_pow; [ | easy ].
 ...
