@@ -194,12 +194,13 @@ Proof.
 intros.
 revert k₂ pow i.
 induction k₁; intros. {
-...
- now simpl; rewrite Rplus_0_l, Nat.add_0_r, Rdiv_1_r.
+  simpl.
+  now rewrite rngl_add_0_l, Nat.add_0_r, (rngl_div_1_r Hon Hiq); [ | left ].
 }
 simpl.
 remember (u i) as bi eqn:Hbi; symmetry in Hbi.
 rewrite <- Nat.add_succ_comm.
+...
 unfold Rdiv at 7.
 rewrite Rinv_mult.
 rewrite <- Rmult_assoc; do 2 rewrite fold_Rdiv.
