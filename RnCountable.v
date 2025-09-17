@@ -236,10 +236,8 @@ apply (rngl_le_0_add Hos Hor); [ easy | ].
 now apply IHk.
 Qed.
 
-...
-
 Theorem partial_sum3_upper_bound : ∀ u n k,
-  (partial_sum3 u k ≤ partial_sum3 u n + / (2 * 3 ^ n))%L.
+  (partial_sum3 u k ≤ partial_sum3 u n + (2 * 3 ^ n)⁻¹)%L.
 Proof.
 intros.
 unfold partial_sum3.
@@ -249,29 +247,29 @@ destruct (le_dec k n) as [Hkn| Hkn]. {
     now subst nk; rewrite Nat.add_comm, Nat.sub_add.
   }
   subst n.
-  rewrite partial_sum3_aux_add, Nat.add_0_l, Rplus_assoc.
-  eapply Rplus_le_reg_l; rewrite Rplus_opp_l.
-  rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-  apply Rplus_le_le_0_compat. {
+  rewrite partial_sum3_aux_add, Nat.add_0_l, <- rngl_add_assoc.
+  apply (rngl_le_add_r Hos Hor).
+  apply (rngl_le_0_add Hos Hor). {
     apply partial_sum3_aux_nonneg.
-    unfold Rdiv; rewrite Rmult_1_l.
-    eapply Rmult_le_reg_l; [ | rewrite Rmult_0_r, Rinv_r ]. {
-      apply pow_lt; lra.
-    } {
-      lra.
-    } {
-      apply pow_nonzero; lra.
-    }
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+    apply rngl_0_lt_3.
   }
-  rewrite Rinv_mult.
-  apply Rmult_le_pos; [ lra | ].
-  eapply Rmult_le_reg_l; [ | rewrite Rmult_0_r, Rinv_r ]. {
-    apply pow_lt; lra.
-  } {
-    lra.
-  } {
-    apply pow_nonzero; lra.
-  }
+  rewrite (rngl_inv_mul_distr Hon Hos Hiv); cycle 1.
+  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply rngl_3_neq_0.
+  apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
+  rewrite (rngl_inv_pow Hon Hos Hiv).
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+  apply (rngl_inv_pos Hon Hop Hiv Hor).
+  apply rngl_0_lt_3.
+  apply rngl_3_neq_0.
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_inv_pos Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
 apply Nat.nle_gt in Hkn.
 remember (k - n)%nat as nk eqn:Hnk.
@@ -281,6 +279,7 @@ assert (Hn : (k = n + nk)%nat). {
 }
 subst k; clear Hnk Hkn; rename nk into k.
 rewrite partial_sum3_aux_add, Nat.add_0_l.
+...
 apply Rplus_le_compat_l.
 revert n.
 induction k; intros; simpl. {
