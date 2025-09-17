@@ -289,7 +289,6 @@ revert n.
 induction k; intros; simpl; [ apply Hzi | ].
 remember (u n) as b eqn:Hb; symmetry in Hb.
 destruct b. {
-(**)
   apply (rngl_le_add_le_sub_l Hop Hor).
   assert (H : (1 / (2 * (1 + 2) * 3 ^ n))%L = (1 / 3 ^ n / 3 / 2)%L). {
     rewrite (rngl_add_comm 1 2).
@@ -307,39 +306,28 @@ destruct b. {
   }
   field_simplify. {
     apply partial_sum3_aux_le_half_pow; [ | easy ].
-...
-replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul) with rngl_mul by easy.
-replace (let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add) with rngl_add by easy.
-replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero) with rngl_zero by easy.
-replace
-  (match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with
-   | Some a => a
-   | None => 0%L
-   end) with 1%L by easy.
-rewrite (rngl_add_comm 1 2).
-...
-replace (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with rngl_opt_one by easy.
-(match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
-...
-  apply Rplus_le_reg_l with (r := (- (1 / 3 ^ n / 3))%L).
-  rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-  field_simplify; [ | apply pow_nonzero; lra ].
-  apply partial_sum3_aux_le_half_pow. {
-    unfold Rdiv; rewrite Rmult_1_l.
-    apply Rmult_le_pos; [ | lra ].
-    eapply Rmult_le_reg_l; [ | rewrite Rmult_0_r, Rinv_r ]. {
-      apply pow_lt; lra.
-    } {
-      lra.
-    } {
-      apply pow_nonzero; lra.
-    }
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+    apply rngl_0_lt_3.
+    apply rngl_0_lt_3.
   }
-  unfold Rdiv.
-  rewrite Rinv_mult; lra.
+  split. {
+    apply (rngl_pow_neq_0 Hon Hos Hiq).
+    apply rngl_3_neq_0.
+  }
+  split. {
+    assert (1 + 2 ≠ 0)%L by now rewrite rngl_add_comm; apply rngl_3_neq_0.
+    easy.
+  }
+  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
 }
 replace (1 / 3 ^ n / 3)%L with (1 / (3 ^ S n))%L. {
-  eapply Rle_trans; [ apply IHk | ].
+  eapply (rngl_le_trans Hor); [ apply IHk | ].
+(**)
+  apply (rngl_le_inv_inv Hon Hop Hiv Hor).
+...
   apply Rinv_le_contravar. {
     apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
   } {
