@@ -200,13 +200,21 @@ induction k₁; intros. {
 simpl.
 remember (u i) as bi eqn:Hbi; symmetry in Hbi.
 rewrite <- Nat.add_succ_comm.
-...
-unfold Rdiv at 7.
-rewrite Rinv_mult.
-rewrite <- Rmult_assoc; do 2 rewrite fold_Rdiv.
-destruct bi; [ | apply IHk₁; lra ].
-rewrite Rplus_assoc.
-apply Rplus_eq_compat_l, IHk₁; lra.
+progress unfold rngl_div at 7.
+rewrite Hiv.
+rewrite <- rngl_of_nat_3.
+rewrite (rngl_mul_nat_comm Hon Hos).
+rewrite rngl_of_nat_3.
+rewrite (rngl_inv_mul_distr Hon Hos Hiv); [ | | apply rngl_3_neq_0 ]. 2: {
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply (rngl_3_neq_0).
+}
+rewrite rngl_mul_assoc.
+do 2 rewrite (rngl_mul_inv_r Hiv).
+destruct bi; [ | apply IHk₁ ].
+rewrite <- (rngl_add_assoc (pow / 3)).
+progress f_equal.
+apply IHk₁.
 Qed.
 
 Theorem partial_sum3_aux_nonneg : ∀ u k pos i,
@@ -215,6 +223,7 @@ Theorem partial_sum3_aux_nonneg : ∀ u k pos i,
 Proof.
 intros * Hpos.
 revert pos i Hpos.
+...
 induction k; intros; simpl; [ lra | ].
 destruct (u i); [ | apply IHk; lra ].
 apply Rplus_le_le_0_compat; [ lra | apply IHk; lra ].
