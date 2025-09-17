@@ -372,15 +372,32 @@ Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
   partial_sum3_aux (S k) u pow i =
   ((pow * b2r (u i) + partial_sum3_aux k (λ n, u (S n)) pow i) / 3)%L.
 Proof.
+specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
 set (v := λ n, u (S n)).
 revert pow i.
 (**)
-induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl | ].
+induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl | ]. {
+  field_simplify; fold_rngl.
+  now rewrite rngl_of_nat_1, (rngl_mul_1_r Hon).
+  rewrite rngl_add_comm; apply rngl_3_neq_0.
+  rewrite rngl_add_comm; apply rngl_3_neq_0.
+} {
+  rewrite rngl_of_nat_0.
+  rewrite (rngl_mul_0_r Hos).
+  rewrite rngl_add_0_l; symmetry.
+  apply (rngl_div_0_l Hos Hi1).
+  apply rngl_3_neq_0.
+}
+rewrite partial_sum3_aux_succ.
+rewrite IHk.
+set (x := partial_sum3_aux k v pow i).
+unfold v; rewrite <- Nat.add_succ_comm; simpl.
+set (y := INR (Nat.b2n (u (S (i + k))))).
+...
 field_simplify; fold_rngl.
-now rewrite rngl_of_nat_1, (rngl_mul_1_r Hon).
-rewrite rngl_add_comm; apply rngl_3_neq_0.
-rewrite rngl_add_comm; apply rngl_3_neq_0.
+field_simplify; [ easy | | ]; apply pow_nonzero.
+field_simplify; [ easy | | ]; apply pow_nonzero; lra.
 ...
 induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl; lra | ].
 rewrite partial_sum3_aux_succ.
