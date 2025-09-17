@@ -150,7 +150,6 @@ remember (u i) as bi eqn:Hbi; symmetry in Hbi.
 destruct bi. {
   remember (3 ^ S n)%L as sn3 eqn:Hsn3.
   rewrite IHn; simpl; rewrite Hbi.
-(**)
   rewrite rngl_add_assoc.
   progress f_equal.
   rewrite Nat.add_succ_r.
@@ -162,21 +161,18 @@ destruct bi. {
   rewrite Hsn3.
   apply (rngl_pow_neq_0 Hon Hos Hiq).
   apply rngl_3_neq_0.
-}
-...
-  do 2 apply Rplus_eq_compat_l.
-  rewrite <- Nat.add_succ_comm.
-  unfold Rdiv; subst sn3.
-  rewrite Rinv_mult.
-  now do 3 rewrite Rmult_assoc.
 } {
   remember (3 ^ S n)%L as sn3 eqn:Hsn3.
   rewrite IHn; simpl; rewrite Hbi.
-  rewrite <- Nat.add_succ_comm.
-  apply Rplus_eq_compat_l.
-  unfold Rdiv; subst sn3.
-  rewrite Rinv_mult.
-  now do 3 rewrite Rmult_assoc.
+  rewrite Nat.add_succ_r.
+  rewrite (rngl_mul_div_assoc Hiv).
+  rewrite (rngl_div_div Hon Hos Hiv).
+  rewrite <- rngl_of_nat_3.
+  now rewrite (rngl_mul_nat_comm Hon Hos 3).
+  apply rngl_3_neq_0.
+  rewrite Hsn3.
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply rngl_3_neq_0.
 }
 Qed.
 
@@ -187,7 +183,7 @@ Proof.
 intros.
 unfold partial_sum3.
 rewrite partial_sum3_aux_succ.
-now rewrite Rmult_1_r.
+now rewrite (rngl_mul_1_r Hon).
 Qed.
 
 Theorem partial_sum3_aux_add : ∀ u k₁ k₂ pow i,
@@ -198,6 +194,7 @@ Proof.
 intros.
 revert k₂ pow i.
 induction k₁; intros. {
+...
  now simpl; rewrite Rplus_0_l, Nat.add_0_r, Rdiv_1_r.
 }
 simpl.
