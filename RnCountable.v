@@ -291,8 +291,20 @@ remember (u n) as b eqn:Hb; symmetry in Hb.
 destruct b. {
 (**)
   apply (rngl_le_add_le_sub_l Hop Hor).
+(*
+  rewrite (rngl_inv_mul_distr Hon Hos Hiv).
+*)
+  assert (H : (1 / (2 * (1 + 2) * 3 ^ n))%L = (1 / 3 ^ n / 3 / 2)%L). {
+    rewrite (rngl_add_comm 1 2).
+    rewrite (rngl_div_div Hon Hos Hiv).
+    symmetry.
+    apply (rngl_div_div Hon Hos Hiv).
+    apply (rngl_pow_neq_0 Hon Hos Hiq).
+    apply rngl_3_neq_0.
+Search (_ * _ ≠ 0)%L.
+...
   field_simplify. {
-    apply partial_sum3_aux_le_half_pow. {
+    apply partial_sum3_aux_le_half_pow; [ | easy ].
 ...
 replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul) with rngl_mul by easy.
 replace (let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add) with rngl_add by easy.
@@ -302,7 +314,7 @@ replace
    | Some a => a
    | None => 0%L
    end) with 1%L by easy.
-
+rewrite (rngl_add_comm 1 2).
 ...
 replace (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with rngl_opt_one by easy.
 (match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
