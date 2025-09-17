@@ -2,6 +2,7 @@
 
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith.
+From Stdlib Require Import Field.
 
 Require Import RingLike.Core.
 Require Import MiscReals Countable.
@@ -11,6 +12,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hon : rngl_has_1 T = true}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
@@ -21,6 +23,9 @@ Context {Har : rngl_is_archimedean T = true}.
 Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+
+Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
+Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
 
 Let Rlt_dec := Rlt_dec Hor.
 Let frac_part := @frac_part T ro rp Hon Hop Hiv Hor Hch Har.
@@ -51,13 +56,11 @@ Fixpoint n_partial_sum3 (u : ℕ → bool) c :=
 Definition b2r b := INR (Nat.b2n b).
 
 Theorem partial_sum3_aux_le_half_pow :
-  rngl_mul_is_comm T = true →
   ∀ u k pow pow2 i,
   (0 ≤ pow)%L
   → pow2 = (pow / 2)%L
   → (partial_sum3_aux k u pow i ≤ pow2)%L.
 Proof.
-intros Hic.
 specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 assert (H30 : (3 ≠ 0)%L). {
   replace 3%L with (rngl_of_nat 3). 2: {
@@ -286,6 +289,23 @@ revert n.
 induction k; intros; simpl; [ apply Hzi | ].
 remember (u n) as b eqn:Hb; symmetry in Hb.
 destruct b. {
+(**)
+  apply (rngl_le_add_le_sub_l Hop Hor).
+  field_simplify. {
+    apply partial_sum3_aux_le_half_pow. {
+...
+replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul) with rngl_mul by easy.
+replace (let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add) with rngl_add by easy.
+replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero) with rngl_zero by easy.
+replace
+  (match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with
+   | Some a => a
+   | None => 0%L
+   end) with 1%L by easy.
+
+...
+replace (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with rngl_opt_one by easy.
+(match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
 ...
   apply Rplus_le_reg_l with (r := (- (1 / 3 ^ n / 3))%L).
   rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
