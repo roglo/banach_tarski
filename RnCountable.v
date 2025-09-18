@@ -30,10 +30,12 @@ Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
 Let Rlt_dec := Rlt_dec Hor.
 Let frac_part := @frac_part T ro rp Hon Hop Hiv Hor Hch Har.
 Let Int_part := @Int_part T ro rp Hon Hop Hiv Hor Hch Har.
+Let Int_part_interv := @Int_part_interv T ro rp Hon Hop Hiv Hor Hch Har.
 
 Arguments Rlt_dec (a b)%_L.
 Arguments frac_part x%_L.
 Arguments Int_part x%_L.
+Arguments Int_part_interv z%_Z x%_L.
 
 Definition ter_bin_of_frac_part x n :=
   if Rlt_dec (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
@@ -499,6 +501,12 @@ assert (H : (r ≤ partial_sum3 u (S n) + (2 * 3 ^ S n)⁻¹)%L). {
   apply Hr2, partial_sum3_upper_bound.
 }
 clear Hr2; rename H into Hr2.
+specialize (Int_part_interv (Z.of_nat (n_partial_sum3 u n))) as H1.
+apply (proj1 (H1 (r * 3 ^ n)%L)); clear H1.
+rewrite (@rngl_of_Z_add T ro rp Hon Hop).
+rewrite rngl_of_Z_of_nat.
+rewrite rngl_of_Z_1.
+split. {
 ...
 rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u n))); [ easy | ].
 rewrite plus_IZR, <- INR_IZR_INZ; simpl.
