@@ -2828,4 +2828,5 @@ Qed.
 
 End a.
 
+Arguments Int_part {T ro rp Hon Hop Hiv Hor Hch Har} x%_L.
 Arguments Rlt_dec {T ro rp} Hor (a b)%_L.

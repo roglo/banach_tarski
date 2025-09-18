@@ -1,7 +1,7 @@
 (* Banach-Tarski paradox. *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Arith.
+From Stdlib Require Import Utf8 Arith ZArith.
 From Stdlib Require Import Field.
 
 Require Import RingLike.Core.
@@ -29,9 +29,11 @@ Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
 
 Let Rlt_dec := Rlt_dec Hor.
 Let frac_part := @frac_part T ro rp Hon Hop Hiv Hor Hch Har.
+Let Int_part := @Int_part T ro rp Hon Hop Hiv Hor Hch Har.
 
 Arguments Rlt_dec (a b)%_L.
 Arguments frac_part x%_L.
+Arguments Int_part x%_L.
 
 Definition ter_bin_of_frac_part x n :=
   if Rlt_dec (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
@@ -486,8 +488,6 @@ apply (rngl_pow_neq_0 Hon Hos Hiq).
 apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 Qed.
 
-...
-
 Theorem Int_part_n_partial_sum3 : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%L)
   → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%L) → (r ≤ b)%L)
@@ -495,10 +495,11 @@ Theorem Int_part_n_partial_sum3 : ∀ u r n,
 Proof.
 intros * Hr1 Hr2.
 specialize (Hr1 (S n)).
-assert (H : (r ≤ partial_sum3 u (S n) + / (2 * 3 ^ S n))%L). {
+assert (H : (r ≤ partial_sum3 u (S n) + (2 * 3 ^ S n)⁻¹)%L). {
   apply Hr2, partial_sum3_upper_bound.
 }
 clear Hr2; rename H into Hr2.
+...
 rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u n))); [ easy | ].
 rewrite plus_IZR, <- INR_IZR_INZ; simpl.
 split. {
