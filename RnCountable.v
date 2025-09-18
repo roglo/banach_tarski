@@ -532,6 +532,15 @@ split. {
     rewrite rngl_of_nat_add.
     rewrite (rngl_of_nat_pow Hon Hos).
     rewrite rngl_of_nat_3.
+    apply (rngl_le_add_le_sub_l Hop Hor).
+    rewrite rngl_mul_assoc.
+    rewrite (rngl_sub_mul_l_diag_r Hon Hop).
+    apply IHn.
+    progress unfold partial_sum3.
+    rewrite rngl_of_nat_1 in Hr1.
+    apply (rngl_le_div_l Hon Hop Hiv Hor) in Hr1.
+    now apply (rngl_le_add_le_sub_l Hop Hor) in Hr1.
+    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
 ...
     rewrite plus_INR.
     apply Rplus_le_reg_l with (r := (- INR (3 ^ n))%L).
