@@ -376,7 +376,6 @@ specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
 set (v := λ n, u (S n)).
 revert pow i.
-(**)
 induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl | ]. {
   field_simplify; fold_rngl.
   now rewrite rngl_of_nat_1, (rngl_mul_1_r Hon).
@@ -391,22 +390,20 @@ induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl | ]. {
 }
 rewrite partial_sum3_aux_succ.
 rewrite IHk.
-set (x := partial_sum3_aux k v pow i).
-unfold v; rewrite <- Nat.add_succ_comm; simpl.
-set (y := INR (Nat.b2n (u (S (i + k))))).
-...
-field_simplify; fold_rngl.
-field_simplify; [ easy | | ]; apply pow_nonzero.
-field_simplify; [ easy | | ]; apply pow_nonzero; lra.
-...
-induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl; lra | ].
 rewrite partial_sum3_aux_succ.
-rewrite IHk.
-rewrite partial_sum3_aux_succ.
-set (x := partial_sum3_aux k v pow i).
-unfold v; rewrite <- Nat.add_succ_comm; simpl.
-set (y := INR (Nat.b2n (u (S (i + k))))).
-field_simplify; [ easy | | ]; apply pow_nonzero; lra.
+do 3 rewrite (rngl_div_add_distr_r Hiv).
+rewrite <- (rngl_add_assoc (_ / _)).
+progress f_equal; cbn.
+progress f_equal.
+progress unfold v.
+rewrite Nat.add_succ_r.
+rewrite (rngl_div_div Hon Hos Hiv); [ easy | | ].
+intros H.
+apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
+now apply rngl_3_neq_0 in H.
+apply (rngl_pow_neq_0 Hon Hos Hiq).
+apply rngl_3_neq_0.
+apply rngl_3_neq_0.
 Qed.
 
 Theorem n_partial_sum3_succ2 : ∀ u n,
@@ -433,6 +430,7 @@ Theorem partial_sum3_n_partial_sum3 : ∀ u n,
 Proof.
 intros.
 unfold partial_sum3.
+...
 induction n; [ simpl; lra | ].
 rewrite partial_sum3_aux_succ, n_partial_sum3_succ.
 rewrite plus_INR, mult_INR; simpl.
