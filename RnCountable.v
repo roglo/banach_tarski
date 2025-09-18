@@ -520,8 +520,7 @@ split. {
   }
   unfold partial_sum3 in Hr1, Hr2.
   rewrite partial_sum3_aux_shift_seq in Hr1, Hr2.
-...
-  rewrite Rmult_1_l in Hr1, Hr2.
+  rewrite (rngl_mul_1_l Hon) in Hr1, Hr2.
   rewrite n_partial_sum3_succ2.
   remember (u O) as b eqn:Hb; symmetry in Hb.
   unfold b2r in Hr1, Hr2.
@@ -529,6 +528,11 @@ split. {
     remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
     simpl; rewrite Nat.mul_1_r.
     set (v n := u (S n)) in *.
+(**)
+    rewrite rngl_of_nat_add.
+    rewrite (rngl_of_nat_pow Hon Hos).
+    rewrite rngl_of_nat_3.
+...
     rewrite plus_INR.
     apply Rplus_le_reg_l with (r := (- INR (3 ^ n))%L).
     rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
