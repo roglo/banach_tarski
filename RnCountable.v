@@ -507,17 +507,20 @@ rewrite (@rngl_of_Z_add T ro rp Hon Hop).
 rewrite rngl_of_Z_of_nat.
 rewrite rngl_of_Z_1.
 split. {
-...
-rewrite (Int_part_interv (Z.of_nat (n_partial_sum3 u n))); [ easy | ].
-rewrite plus_IZR, <- INR_IZR_INZ; simpl.
-split. {
   revert u r Hr1 Hr2.
   induction n; intros. {
     unfold partial_sum3 in Hr1, Hr2; simpl in Hr1, Hr2; simpl.
-    destruct (u O); simpl; lra.
+    rewrite (rngl_mul_1_r Hon), rngl_of_nat_0.
+    rewrite rngl_add_0_r in Hr1.
+    destruct (u 0); [ | easy ].
+    apply (rngl_le_trans Hor _ (1 / 3)); [ | easy ].
+    apply (rngl_div_nonneg Hon Hop Hiv Hor).
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
+    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
   }
   unfold partial_sum3 in Hr1, Hr2.
   rewrite partial_sum3_aux_shift_seq in Hr1, Hr2.
+...
   rewrite Rmult_1_l in Hr1, Hr2.
   rewrite n_partial_sum3_succ2.
   remember (u O) as b eqn:Hb; symmetry in Hb.
