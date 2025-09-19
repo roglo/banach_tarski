@@ -541,36 +541,28 @@ split. {
     apply (rngl_le_div_l Hon Hop Hiv Hor) in Hr1.
     now apply (rngl_le_add_le_sub_l Hop Hor) in Hr1.
     apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
-...
-    rewrite plus_INR.
-    apply Rplus_le_reg_l with (r := (- INR (3 ^ n))%L).
-    rewrite <- Rplus_assoc, Rplus_opp_l, Rplus_0_l.
-    rewrite Rplus_comm.
-    rewrite pow_INR; simpl.
-    replace (2 + 1)%L with 3%L by lra.
-    replace (- 3 ^ n)%L with ((- 1) * 3 ^ n)%L by lra.
-    replace (1 + 1 + 1) with 3 by lra.
-    replace (3 ^ n) with (1 * 3 ^ n) at 2 by lra.
-    rewrite fold_Rminus.
-    rewrite <- Rmult_assoc.
-    rewrite <- Rmult_minus_distr_r.
-    apply IHn; [ unfold partial_sum3; lra | ].
-    unfold partial_sum3.
-    set (x := partial_sum3_aux (S n) v 1 0) in *.
-    apply Rplus_le_reg_r with (r := 1%L).
-    replace (r * 3 - 1 + 1)%L with (r * 3)%L by lra.
-    remember 3%L as three.
-    rewrite Rplus_comm, <- Rplus_assoc; subst three.
-    apply Rmult_le_reg_r with (r := (/ 3)%L); [ lra | ].
-    rewrite Rmult_assoc, Rinv_r; [ | lra ].
-    rewrite Rmult_1_r.
-    rewrite Rmult_plus_distr_r.
-    rewrite fold_Rdiv.
-    rewrite <- Rinv_mult.
-    now rewrite <- Rmult_assoc in Hr2; rewrite Rmult_shuffle0.
+    apply (rngl_le_sub_le_add_r Hop Hor).
+    rewrite rngl_mul_assoc, (rngl_mul_comm Hic 2) in Hr2.
+    rewrite <- rngl_mul_assoc in Hr2.
+    rewrite (rngl_inv_mul_distr Hon Hos Hiv) in Hr2.
+    rewrite (rngl_mul_inv_r Hiv) in Hr2.
+    rewrite <- (rngl_div_add_distr_r Hiv) in Hr2.
+    apply (rngl_le_div_r Hon Hop Hiv Hor) in Hr2.
+    rewrite rngl_of_nat_1 in Hr2.
+    remember 3%L as x.
+    rewrite <- rngl_add_assoc in Hr2.
+    now rewrite rngl_add_comm in Hr2.
+    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+    intros H.
+    apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
+    now apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+    apply (rngl_pow_neq_0 Hon Hos Hiq).
+    apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
   }
   remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
   simpl; rewrite Nat.mul_0_r, Nat.add_0_l.
+...
   rewrite Rplus_0_l in Hr1, Hr2.
   set (v n := u (S n)) in *.
   rewrite <- Rmult_assoc.
