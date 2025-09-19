@@ -518,6 +518,15 @@ split. {
     apply (rngl_0_le_1 Hon Hos Hiq Hor).
     apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
   }
+(**)
+  rewrite n_partial_sum3_succ.
+  rewrite rngl_of_nat_add.
+  rewrite (rngl_of_nat_mul Hon Hos).
+  rewrite rngl_of_nat_3.
+  rewrite partial_sum3_succ in Hr1.
+Print partial_sum3.
+Print partial_sum3_aux.
+...
   unfold partial_sum3 in Hr1, Hr2.
   rewrite partial_sum3_aux_shift_seq in Hr1, Hr2.
   rewrite (rngl_mul_1_l Hon) in Hr1, Hr2.
@@ -528,7 +537,6 @@ split. {
     remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
     simpl; rewrite Nat.mul_1_r.
     set (v n := u (S n)) in *.
-(**)
     rewrite rngl_of_nat_add.
     rewrite (rngl_of_nat_pow Hon Hos).
     rewrite rngl_of_nat_3.
@@ -562,6 +570,12 @@ split. {
   }
   remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
   simpl; rewrite Nat.mul_0_r, Nat.add_0_l.
+  set (v n := u (S n)) in *.
+  apply (rngl_le_trans Hor _ (r * 3 ^ n)). {
+    apply IHn.
+    rewrite partial_sum3_succ.
+Search (rngl_of_nat (n_partial_sum3 _ _)).
+Check le_partial_sum3_lt_n_partial_sum3.
 ...
   rewrite Rplus_0_l in Hr1, Hr2.
   set (v n := u (S n)) in *.
