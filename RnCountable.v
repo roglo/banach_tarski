@@ -519,13 +519,18 @@ split. {
     apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
   }
 (**)
+  rewrite partial_sum3_succ in Hr1.
+...
   rewrite n_partial_sum3_succ.
   rewrite rngl_of_nat_add.
   rewrite (rngl_of_nat_mul Hon Hos).
   rewrite rngl_of_nat_3.
-  rewrite partial_sum3_succ in Hr1.
-Print partial_sum3.
-Print partial_sum3_aux.
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite (rngl_mul_comm Hic 3).
+  apply (rngl_le_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  eapply (rngl_le_trans Hor). {
+    apply IHn.
 ...
   unfold partial_sum3 in Hr1, Hr2.
   rewrite partial_sum3_aux_shift_seq in Hr1, Hr2.
