@@ -648,21 +648,58 @@ apply (rngl_pow_neq_0 Hon Hos Hiq).
 apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 Qed.
 
+Definition rngl_is_upper_bound (E : T → Prop) m := ∀ x, E x → (x ≤ m)%L.
+Definition rngl_is_lub E m :=
+  rngl_is_upper_bound E m ∧
+  ∀ b, rngl_is_upper_bound E b → (m ≤ b)%L.
+Definition rngl_bound := λ E, ∃ₜ m, rngl_is_upper_bound E m.
+
+Theorem rngl_completeness :
+  ∀ E, rngl_bound E → (∃ x, E x) → ∃ₜ m, rngl_is_lub E m.
+Proof.
+intros * HE Hx.
+progress unfold rngl_is_lub.
+destruct HE as (b, Hb).
+exists b.
+split; [ easy | ].
+intros b' Hb'.
+progress unfold rngl_is_upper_bound in Hb.
+progress unfold rngl_is_upper_bound in Hb'.
+apply Hb'.
+(* ouais, non *)
+...
+
 Theorem ter_bin_of_frac_part_surj : ∀ u : nat → bool,
   ∃ r, (0 ≤ r < 1)%L ∧ (∀ n, ter_bin_of_frac_part r n = u n).
 Proof.
 intros.
 set (E x := ∃ k, partial_sum3 u k = x).
-...
-assert (Hb : bound E). {
+(**)
+assert (Hb : rngl_bound E). {
   exists (1 / 2)%L; subst E; simpl.
   intros r (k & H); subst r.
-  apply partial_sum3_aux_le_half_pow; lra.
+  apply partial_sum3_aux_le_half_pow; [ | easy ].
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
 assert (He : ∃ r, E r). {
   exists 0%L; subst E; simpl.
   now exists O; unfold partial_sum3.
 }
+(**)
+destruct (rngl_completeness E Hb He) as (r & Hr1 & Hr2).
+...
+is_upper_bound =
+λ (E : R → Prop) (m : R), ∀ x : R, E x → (x <= m)%R
+     : (R → Prop) → R → Prop
+is_lub =
+λ (E : R → Prop) (m : R),
+  is_upper_bound E m ∧ ∀ b : R, is_upper_bound E b → (m <= b)%R
+     : (R → Prop) → R → Prop
+completeness
+     : ∀ E : R → Prop, bound E → (∃ x : R, E x) → ∃ₜ m : R, is_lub E m
+bound = λ E : R → Prop, ∃ m : R, is_upper_bound E m
+     : (R → Prop) → Prop
+...
 destruct (completeness E Hb He) as (r & Hr1 & Hr2).
 assert (Hr3 : (∀ k, partial_sum3 u k ≤ r)%L). {
   unfold is_upper_bound, E in Hr1; simpl in Hr1.
