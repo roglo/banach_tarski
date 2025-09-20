@@ -5,6 +5,7 @@ From Stdlib Require Import Utf8 Arith ZArith.
 From Stdlib Require Import Field.
 
 Require Import RingLike.Core.
+Require Import RingLike.IntermVal.
 Require Import MiscReals Countable.
 
 Section a.
@@ -661,8 +662,11 @@ Proof.
 intros Hco * (b, Hb) (x, Hx).
 progress unfold rngl_is_lub.
 progress unfold rngl_is_upper_bound in Hb.
-(* cf upper_bound_property dans mon appli coq_sensitivity
-   à transférer peut-être dans la bibliothèque ring_like *)
+...
+Check @upper_bound_property.
+Print is_supremum.
+Print is_extremum.
+Print is_bound.
 ...
 exists b.
 split; [ easy | ].
