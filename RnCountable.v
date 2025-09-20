@@ -635,22 +635,25 @@ induction n. {
   apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
 rewrite partial_sum3_succ.
-...
-rewrite Rmult_plus_distr_r.
-unfold Rdiv; rewrite Rmult_assoc.
-rewrite Rinv_l; [ | apply pow_nonzero; lra ].
-rewrite Rmult_1_r.
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_div_eq_inv_r Hiv).
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_diag_l Hon Hiv).
+rewrite (rngl_mul_1_r Hon).
 remember (r * 3 ^ S n)%L as x; simpl; subst x.
-rewrite <- Rmult_assoc, Rmult_shuffle0, <- IHn.
-setoid_rewrite Rmult_comm at 3.
+rewrite rngl_mul_assoc, (rngl_mul_mul_swap Hic), <- IHn.
+rewrite (rngl_mul_comm Hic _ 3).
 now apply IZR_Int_part_mult_pow_succ.
+apply (rngl_pow_neq_0 Hon Hos Hiq).
+apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 Qed.
 
 Theorem ter_bin_of_frac_part_surj : ∀ u : nat → bool,
-  ∃ r : R, (0 ≤ r < 1)%L ∧ (∀ n, ter_bin_of_frac_part r n = u n).
+  ∃ r, (0 ≤ r < 1)%L ∧ (∀ n, ter_bin_of_frac_part r n = u n).
 Proof.
 intros.
 set (E x := ∃ k, partial_sum3 u k = x).
+...
 assert (Hb : bound E). {
   exists (1 / 2)%L; subst E; simpl.
   intros r (k & H); subst r.
