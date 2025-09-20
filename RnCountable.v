@@ -599,21 +599,22 @@ Proof.
 intros * Hr1 Hr2.
 rewrite Int_part_n_partial_sum3 with (u := u); [ | easy | easy ].
 rewrite Int_part_n_partial_sum3 with (u := u); [ | easy | easy ].
-...
-do 2 rewrite <- INR_IZR_INZ.
+do 2 rewrite rngl_of_Z_of_nat.
 rewrite n_partial_sum3_succ.
-rewrite plus_INR, mult_INR.
-now replace (INR 3) with 3%L by (simpl; lra).
+rewrite rngl_of_nat_add, (rngl_of_nat_mul Hon Hos).
+do 2 progress f_equal.
+apply rngl_of_nat_3.
 Qed.
 
 Theorem Int_part_eq_partial_sum3 : ∀ u r n,
   (∀ k : nat, (partial_sum3 u k ≤ r)%L)
-  → (∀ b : R, (∀ k : nat, (partial_sum3 u k ≤ b)%L) → (r ≤ b)%L)
+  → (∀ b, (∀ k : nat, (partial_sum3 u k ≤ b)%L) → (r ≤ b)%L)
   → IZR (Int_part (r * 3 ^ n)) = (partial_sum3 u n * 3 ^ n)%L.
 Proof.
 intros * Hk1 Hk2.
 induction n. {
   unfold partial_sum3; simpl.
+...
   do 2 rewrite Rmult_1_r.
   specialize (Hk1 O); simpl in Hk1.
   unfold partial_sum3 in Hk1; simpl in Hk1.
