@@ -660,6 +660,8 @@ Theorem rngl_completeness :
 Proof.
 intros Hco * (b, Hb) (x, Hx).
 progress unfold rngl_is_lub.
+progress unfold rngl_is_upper_bound in Hb.
+...
 exists b.
 split; [ easy | ].
 intros b' Hb'.
@@ -668,6 +670,9 @@ progress unfold rngl_is_upper_bound in Hb'.
 specialize (Hb _ Hx) as Hxb.
 specialize (Hb' _ Hx) as Hxb'.
 progress unfold is_complete in Hco.
+(**)
+Require Import Reals.
+Print bound.
 ...
 apply Hb'.
 ...
