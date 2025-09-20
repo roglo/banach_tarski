@@ -23,6 +23,7 @@ Context {Har : rngl_is_archimedean T = true}.
 Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
 
 Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
@@ -129,7 +130,6 @@ Theorem partial_sum3_aux_succ : ∀ u n pow i,
   (partial_sum3_aux n u pow i +
    INR (Nat.b2n (u (i + n)%nat)) * pow / 3 ^ S n)%L.
 Proof.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
 revert pow i.
 induction n; intros. {
@@ -363,7 +363,6 @@ Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
   partial_sum3_aux (S k) u pow i =
   ((pow * b2r (u i) + partial_sum3_aux k (λ n, u (S n)) pow i) / 3)%L.
 Proof.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 intros.
 set (v := λ n, u (S n)).
 revert pow i.
@@ -519,8 +518,6 @@ split. {
     apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
   }
 (**)
-  rewrite partial_sum3_succ in Hr1.
-...
   rewrite n_partial_sum3_succ.
   rewrite rngl_of_nat_add.
   rewrite (rngl_of_nat_mul Hon Hos).
@@ -529,6 +526,13 @@ split. {
   rewrite (rngl_mul_comm Hic 3).
   apply (rngl_le_div_r Hon Hop Hiv Hor).
   apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  rewrite (rngl_div_sub_distr_r Hop Hiv).
+  rewrite (rngl_pow_succ_l Hon).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_div Hi1).
+Search partial_sum3.
+rewrite partial_sum3_succ in Hr1.
+...
   eapply (rngl_le_trans Hor). {
     apply IHn.
 ...
