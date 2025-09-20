@@ -661,6 +661,8 @@ Proof.
 intros Hco * (b, Hb) (x, Hx).
 progress unfold rngl_is_lub.
 progress unfold rngl_is_upper_bound in Hb.
+(* cf upper_bound_property dans mon appli coq_sensitivity
+   à transférer peut-être dans la bibliothèque ring_like *)
 ...
 exists b.
 split; [ easy | ].
