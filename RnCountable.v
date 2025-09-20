@@ -517,26 +517,7 @@ split. {
     apply (rngl_0_le_1 Hon Hos Hiq Hor).
     apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
   }
-(**)
-  rewrite n_partial_sum3_succ.
-  rewrite rngl_of_nat_add.
-  rewrite (rngl_of_nat_mul Hon Hos).
-  rewrite rngl_of_nat_3.
-  apply (rngl_le_add_le_sub_r Hop Hor).
-  rewrite (rngl_mul_comm Hic 3).
-  apply (rngl_le_div_r Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
-  rewrite (rngl_div_sub_distr_r Hop Hiv).
-  rewrite (rngl_pow_succ_l Hon).
-  rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_div Hi1).
-Search partial_sum3.
-rewrite partial_sum3_succ in Hr1.
-...
-  eapply (rngl_le_trans Hor). {
-    apply IHn.
-...
-  unfold partial_sum3 in Hr1, Hr2.
+  progress unfold partial_sum3 in Hr1, Hr2.
   rewrite partial_sum3_aux_shift_seq in Hr1, Hr2.
   rewrite (rngl_mul_1_l Hon) in Hr1, Hr2.
   rewrite n_partial_sum3_succ2.
@@ -579,26 +560,32 @@ rewrite partial_sum3_succ in Hr1.
   }
   remember (S n) as sn; simpl in Hr1, Hr2; subst sn.
   simpl; rewrite Nat.mul_0_r, Nat.add_0_l.
+  progress unfold INR in Hr1, Hr2.
+  rewrite rngl_of_nat_0 in Hr1, Hr2.
+  rewrite rngl_add_0_l in Hr1, Hr2.
   set (v n := u (S n)) in *.
-  apply (rngl_le_trans Hor _ (r * 3 ^ n)). {
-    apply IHn.
-    rewrite partial_sum3_succ.
-Search (rngl_of_nat (n_partial_sum3 _ _)).
-Check le_partial_sum3_lt_n_partial_sum3.
-...
-  rewrite Rplus_0_l in Hr1, Hr2.
-  set (v n := u (S n)) in *.
-  rewrite <- Rmult_assoc.
-  apply IHn; [ unfold partial_sum3; lra | ].
-  unfold partial_sum3.
-  set (x := partial_sum3_aux (S n) v 1 0) in *.
-  apply Rmult_le_reg_r with (r := (/ 3)%L); [ lra | ].
-  rewrite Rmult_assoc, Rinv_r; [ | lra ].
-  rewrite Rmult_1_r.
-  rewrite Rmult_plus_distr_r.
-  rewrite fold_Rdiv.
-  rewrite <- Rinv_mult.
-  now rewrite <- Rmult_assoc in Hr2; rewrite Rmult_shuffle0.
+  rewrite rngl_mul_assoc.
+  apply IHn. {
+    unfold partial_sum3.
+    apply (rngl_le_div_l Hon Hop Hiv Hor) in Hr1; [ easy | ].
+    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  }
+  progress unfold partial_sum3.
+  set (x := partial_sum3_aux (S n) v 1%L 0) in *.
+  apply (rngl_le_div_r Hon Hop Hiv Hor).
+  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  rewrite (rngl_div_add_distr_r Hiv).
+  rewrite (rngl_div_eq_inv_r Hiv _⁻¹).
+  rewrite <- (rngl_inv_mul_distr Hon Hos Hiv).
+  rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_comm Hic 3).
+  now rewrite <- rngl_mul_assoc.
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+  intros H.
+  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
+  now apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 }
 now apply le_partial_sum3_lt_n_partial_sum3.
 Qed.
@@ -612,6 +599,7 @@ Proof.
 intros * Hr1 Hr2.
 rewrite Int_part_n_partial_sum3 with (u := u); [ | easy | easy ].
 rewrite Int_part_n_partial_sum3 with (u := u); [ | easy | easy ].
+...
 do 2 rewrite <- INR_IZR_INZ.
 rewrite n_partial_sum3_succ.
 rewrite plus_INR, mult_INR.
