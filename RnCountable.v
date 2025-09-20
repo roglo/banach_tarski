@@ -614,18 +614,28 @@ Proof.
 intros * Hk1 Hk2.
 induction n. {
   unfold partial_sum3; simpl.
-...
-  do 2 rewrite Rmult_1_r.
+  do 2 rewrite (rngl_mul_1_r Hon).
   specialize (Hk1 O); simpl in Hk1.
   unfold partial_sum3 in Hk1; simpl in Hk1.
   assert (H : ∀ k, (partial_sum3 u k ≤ 1 / 2)%L). {
-    intros k; apply partial_sum3_aux_le_half_pow; lra.
+    intros k; apply partial_sum3_aux_le_half_pow; [ | easy ].
+    apply (rngl_0_le_1 Hon Hos Hiq Hor).
   }
   specialize (Hk2 (1 / 2)%L H).
   replace 0%L with (IZR 0) by easy.
-  apply IZR_eq, Int_part_interv; simpl; lra.
+  progress f_equal.
+  apply Int_part_interv.
+  split; [ easy | ].
+  rewrite rngl_of_Z_1.
+  apply (rngl_le_lt_trans Hor _ (1 / 2)); [ easy | ].
+  apply (rngl_lt_div_l Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_lt_add_r Hos Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
 rewrite partial_sum3_succ.
+...
 rewrite Rmult_plus_distr_r.
 unfold Rdiv; rewrite Rmult_assoc.
 rewrite Rinv_l; [ | apply pow_nonzero; lra ].
