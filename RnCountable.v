@@ -655,18 +655,21 @@ Definition rngl_is_lub E m :=
 Definition rngl_bound := λ E, ∃ₜ m, rngl_is_upper_bound E m.
 
 Theorem rngl_completeness :
-  ∀ E, rngl_bound E → (∃ x, E x) → ∃ₜ m, rngl_is_lub E m.
+  is_complete T (λ a b, rngl_abs (b - a)) →
+  ∀ E, rngl_bound E → (∃ₜ x, E x) → ∃ₜ m, rngl_is_lub E m.
 Proof.
-intros * HE Hx.
+intros Hco * (b, Hb) (x, Hx).
 progress unfold rngl_is_lub.
-destruct HE as (b, Hb).
 exists b.
 split; [ easy | ].
 intros b' Hb'.
 progress unfold rngl_is_upper_bound in Hb.
 progress unfold rngl_is_upper_bound in Hb'.
+specialize (Hb _ Hx) as Hxb.
+specialize (Hb' _ Hx) as Hxb'.
+progress unfold is_complete in Hco.
+...
 apply Hb'.
-(* ouais, non *)
 ...
 
 Theorem ter_bin_of_frac_part_surj : ∀ u : nat → bool,
