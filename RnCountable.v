@@ -705,6 +705,19 @@ assert (Hr4 : (∀ b, (∀ k, partial_sum3 u k ≤ b) → (r ≤ b))%L). {
   destruct Hx as (k, Hx); rewrite <- Hx.
   apply H.
 }
+assert (Hh : (r ≤ 1 / 2)%L). {
+  specialize (Hr2 (1 / 2))%L.
+  remember (is_bound _ _ _) as bnd eqn:Hbnd in Hr2.
+  symmetry in Hbnd.
+  destruct bnd as [| H1]; [ easy | clear Hr2 ].
+  destruct H1 as (x, Hx).
+  exfalso; apply Hx; clear Hx Hbnd; intros Hx.
+  progress unfold E in Hx.
+  destruct Hx as (k, Hx); rewrite <- Hx.
+...
+  apply Hr3.
+...
+}
 ...
 assert (Hr4 : (∀ b, (∀ k, partial_sum3 u k ≤ b) → (r ≤ b))%L). {
   unfold is_upper_bound, E in Hr2; simpl in Hr2.
