@@ -655,6 +655,17 @@ Definition rngl_is_lub E m :=
   ∀ b, rngl_is_upper_bound E b → (m ≤ b)%L.
 Definition rngl_bound := λ E, ∃ₜ m, rngl_is_upper_bound E m.
 
+Print is_supremum.
+Print is_extremum.
+About is_bound.
+Print forall_or_exists_not.
+...
+
+Theorem glop {em : excl_midd} :
+  ∀ E m, rngl_is_upper_bound E m ↔ is_bound rngl_le E m.
+Proof.
+...
+
 Theorem glop {em : excl_midd} :
   ∀ E m, rngl_is_lub E m ↔ is_supremum E m.
 Proof.
@@ -682,23 +693,21 @@ split; intros H1. {
 } {
   remember (is_bound _ _ _) as bnd eqn:Hbnd.
   symmetry in Hbnd.
-  destruct bnd as [H2| H2]. {
-    progress unfold rngl_is_lub.
-    split; [ easy | ].
-    intros b Hb.
-...
-    remember (is_bound _ _ _) as bnd eqn:Hbnd' in |-*.
-    symmetry in Hbnd'.
-    destruct bnd as [H2| ]; [ | easy ].
-    apply Ha.
-    progress unfold rngl_is_upper_bound.
-    intros x Hx.
-    now apply H2.
-  }
-  destruct H1 as (x, Hx).
-  apply Hx; clear Hx Hbnd.
+  progress unfold rngl_is_lub.
+  destruct bnd as [H2| ]; [ | easy ].
+  split; [ easy | ].
+  intros b Hb.
+  specialize (H1 b) as H3.
+  remember (is_bound _ _ _) as bnd eqn:Hbnd' in H3.
+  symmetry in Hbnd'.
+  destruct bnd as [| H4 ]; [ easy | clear H3 ].
+  destruct H4 as (x, Hx).
+  exfalso; apply Hx; clear Hx Hbnd'.
   intros Hx.
-  now apply a.
+  now apply Hb.
+}
+Qed.
+
 ...
 
 Theorem rngl_completeness :
