@@ -687,6 +687,12 @@ assert (He : ∃ₜ r, E r). {
 }
 (**)
 destruct (rngl_completeness Hco E Hb He) as (r & Hr1 & Hr2).
+assert (Hr3 : (∀ k, partial_sum3 u k ≤ r)%L). {
+  remember (is_bound _ _ _) as bnd eqn:Hbnd in Hr1.
+  symmetry in Hbnd.
+  destruct bnd as [H1| ]; [ clear Hr1 | easy ].
+  now intros k; apply H1; exists k.
+}
 ...
 destruct (completeness E Hb He) as (r & Hr1 & Hr2).
 assert (Hr3 : (∀ k, partial_sum3 u k ≤ r)%L). {
