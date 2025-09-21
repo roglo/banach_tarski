@@ -693,12 +693,19 @@ assert (Hr3 : (∀ k, partial_sum3 u k ≤ r)%L). {
   destruct bnd as [H1| ]; [ clear Hr1 | easy ].
   now intros k; apply H1; exists k.
 }
-...
-destruct (completeness E Hb He) as (r & Hr1 & Hr2).
-assert (Hr3 : (∀ k, partial_sum3 u k ≤ r)%L). {
-  unfold is_upper_bound, E in Hr1; simpl in Hr1.
-  now intros k; apply Hr1; exists k.
+assert (Hr4 : (∀ b, (∀ k, partial_sum3 u k ≤ b) → (r ≤ b))%L). {
+  intros b H.
+  specialize (Hr2 b).
+  remember (is_bound _ _ _) as bnd eqn:Hbnd in Hr2.
+  symmetry in Hbnd.
+  destruct bnd as [| H1]; [ easy | clear Hr2 ].
+  destruct H1 as (x, Hx).
+  exfalso; apply Hx; clear Hx Hbnd; intros Hx.
+  progress unfold E in Hx.
+  destruct Hx as (k, Hx); rewrite <- Hx.
+  apply H.
 }
+...
 assert (Hr4 : (∀ b, (∀ k, partial_sum3 u k ≤ b) → (r ≤ b))%L). {
   unfold is_upper_bound, E in Hr2; simpl in Hr2.
   intros b H; apply Hr2; intros x (k, Hx); subst x.
