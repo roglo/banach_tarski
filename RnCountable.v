@@ -687,12 +687,13 @@ assert (He : ∃ₜ r, E r). {
 }
 (**)
 destruct (rngl_completeness Hco E Hb He) as (r & Hr1 & Hr2).
+remember (is_bound _ _ _) as bnd eqn:Hbnd in Hr1.
+symmetry in Hbnd.
+destruct bnd as [H1| ]; [ clear Hr1; rename H1 into Hr1 | easy ].
 assert (Hr3 : (∀ k, partial_sum3 u k ≤ r)%L). {
-  remember (is_bound _ _ _) as bnd eqn:Hbnd in Hr1.
-  symmetry in Hbnd.
-  destruct bnd as [H1| ]; [ clear Hr1 | easy ].
-  now intros k; apply H1; exists k.
+  now intros k; apply Hr1; exists k.
 }
+clear Hbnd.
 assert (Hr4 : (∀ b, (∀ k, partial_sum3 u k ≤ b) → (r ≤ b))%L). {
   intros b H.
   specialize (Hr2 b).
@@ -714,22 +715,24 @@ assert (Hh : (r ≤ 1 / 2)%L). {
   exfalso; apply Hx; clear Hx Hbnd; intros Hx.
   progress unfold E in Hx.
   destruct Hx as (k, Hx); rewrite <- Hx.
-...
-  apply Hr3.
-...
+  apply partial_sum3_aux_le_half_pow; [ | easy ].
+  apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
+exists r; clear Hb He.
+split. {
+  split. {
+    apply Hr1; unfold E; simpl.
+    now exists 0.
+  }
+  apply (rngl_le_lt_trans Hor _ (1 / 2)); [ easy | ].
+  apply (rngl_lt_div_l Hon Hop Hiv Hor).
+  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  rewrite (rngl_mul_1_l Hon).
+  apply (rngl_lt_add_l Hos Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+}
+intros n.
 ...
-assert (Hr4 : (∀ b, (∀ k, partial_sum3 u k ≤ b) → (r ≤ b))%L). {
-  unfold is_upper_bound, E in Hr2; simpl in Hr2.
-  intros b H; apply Hr2; intros x (k, Hx); subst x.
-  apply H.
-}
-assert (Hh : (r ≤ 1 / 2)%L). {
-  apply Hr2; unfold E; simpl.
-  intros x (k & H); subst x.
-  apply partial_sum3_aux_le_half_pow; lra.
-}
-exists r; clear Hb He; simpl.
 split. {
   split; [ | lra ].
   apply Hr1; unfold E; simpl.
