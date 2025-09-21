@@ -680,6 +680,10 @@ split; [ easy | ].
 intros b' Hb'.
 progress unfold is_supremum in Hm.
 progress unfold is_extremum in Hm.
+remember (is_bound _ E m) as bnd eqn:Hbnd.
+symmetry in Hbnd.
+destruct bnd as [Hm'| ]; [ | easy ].
+specialize (Hm b').
 ...
 Print is_supremum.
 Print is_extremum.
