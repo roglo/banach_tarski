@@ -659,37 +659,55 @@ Print is_supremum.
 Print is_extremum.
 About is_bound.
 Print forall_or_exists_not.
-...
 
 Theorem glop {em : excl_midd} :
-  ∀ E m, rngl_is_upper_bound E m ↔ is_bound rngl_le E m.
+  ∀ E m,
+  rngl_is_upper_bound E m ↔
+  match is_bound rngl_le E m with
+  | left _ => True
+  | right _ => False
+  end.
 Proof.
-...
+intros.
+remember (is_bound rngl_le E m) as bnd eqn:Hbnd.
+symmetry in Hbnd.
+destruct bnd as [H1| H1]. {
+  split; [ easy | ].
+  intros _ x Hx.
+  now apply  H1.
+}
+split; [ | easy ].
+intros H2.
+destruct H1 as (x, Hx).
+apply Hx; clear Hx Hbnd.
+intros H1.
+now apply H2.
+Qed.
 
-Theorem glop {em : excl_midd} :
+Theorem glip {em : excl_midd} :
   ∀ E m, rngl_is_lub E m ↔ is_supremum E m.
 Proof.
 intros.
 progress unfold is_supremum.
 progress unfold is_extremum.
 split; intros H1. {
-  destruct H1 as (a, Ha).
+  destruct H1 as (H1, H2).
   remember (is_bound _ _ _) as bnd eqn:Hbnd.
   symmetry in Hbnd.
-  destruct bnd as [H1| H1]. {
+  destruct bnd as [H3| H3]. {
     intros c.
     remember (is_bound _ _ _) as bnd eqn:Hbnd' in |-*.
     symmetry in Hbnd'.
-    destruct bnd as [H2| ]; [ | easy ].
-    apply Ha.
+    destruct bnd as [H4| ]; [ | easy ].
+    apply H2.
     progress unfold rngl_is_upper_bound.
     intros x Hx.
-    now apply H2.
+    now apply H4.
   }
-  destruct H1 as (x, Hx).
+  destruct H3 as (x, Hx).
   apply Hx; clear Hx Hbnd.
   intros Hx.
-  now apply a.
+  now apply H1.
 } {
   remember (is_bound _ _ _) as bnd eqn:Hbnd.
   symmetry in Hbnd.
