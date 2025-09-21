@@ -650,15 +650,12 @@ apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 Qed.
 
 Definition rngl_is_upper_bound (E : T → Prop) m := ∀ x, E x → (x ≤ m)%L.
+(*
 Definition rngl_is_lub E m :=
   rngl_is_upper_bound E m ∧
   ∀ b, rngl_is_upper_bound E b → (m ≤ b)%L.
+*)
 Definition rngl_bound := λ E, ∃ₜ m, rngl_is_upper_bound E m.
-
-Print is_supremum.
-Print is_extremum.
-About is_bound.
-Print forall_or_exists_not.
 
 Theorem glop {em : excl_midd} :
   ∀ E m,
@@ -684,87 +681,18 @@ intros H1.
 now apply H2.
 Qed.
 
-Theorem glip {em : excl_midd} :
-  ∀ E m, rngl_is_lub E m ↔ is_supremum E m.
-Proof.
-intros.
-progress unfold is_supremum.
-progress unfold is_extremum.
-split; intros H1. {
-  destruct H1 as (H1, H2).
-  remember (is_bound _ _ _) as bnd eqn:Hbnd.
-  symmetry in Hbnd.
-  destruct bnd as [H3| H3]. {
-    intros c.
-    remember (is_bound _ _ _) as bnd eqn:Hbnd' in |-*.
-    symmetry in Hbnd'.
-    destruct bnd as [H4| ]; [ | easy ].
-    apply H2.
-    progress unfold rngl_is_upper_bound.
-    intros x Hx.
-    now apply H4.
-  }
-  destruct H3 as (x, Hx).
-  apply Hx; clear Hx Hbnd.
-  intros Hx.
-  now apply H1.
-} {
-  remember (is_bound _ _ _) as bnd eqn:Hbnd.
-  symmetry in Hbnd.
-  progress unfold rngl_is_lub.
-  destruct bnd as [H2| ]; [ | easy ].
-  split; [ easy | ].
-  intros b Hb.
-  specialize (H1 b) as H3.
-  remember (is_bound _ _ _) as bnd eqn:Hbnd' in H3.
-  symmetry in Hbnd'.
-  destruct bnd as [| H4 ]; [ easy | clear H3 ].
-  destruct H4 as (x, Hx).
-  exfalso; apply Hx; clear Hx Hbnd'.
-  intros Hx.
-  now apply Hb.
-}
-Qed.
-
-...
-
-Theorem rngl_completeness :
-  excl_midd →
+Theorem rngl_completeness {em : excl_midd} :
   is_complete T rngl_dist →
-  ∀ E, rngl_bound E → (∃ₜ x, E x) → ∃ m, rngl_is_lub E m.
+  ∀ E, rngl_bound E → (∃ₜ x, E x) → ∃ m, is_supremum E m.
 Proof.
-intros Hem Hco * (b, Hb) (x, Hx).
-progress unfold rngl_is_lub.
+intros Hco * (b, Hb) (x, Hx).
+progress unfold is_supremum.
 progress unfold rngl_is_upper_bound in Hb.
 generalize Hb; intros H.
-apply (upper_bound_property Hem Hop Hor Hon Hiv Har Hco _ x _ Hx) in H.
+apply (upper_bound_property em Hop Hor Hon Hiv Har Hco _ x _ Hx) in H.
 destruct H as (m & Hm & Hmb).
 exists m.
-assert (Hub : rngl_is_upper_bound E m). {
-  progress unfold is_supremum in Hm.
-  progress unfold is_extremum in Hm.
-  intros y Hy.
-  remember (is_bound _ E m) as bnd eqn:Hbnd.
-  symmetry in Hbnd.
-  destruct bnd as [Hm'| ]; [ | easy ].
-  now apply Hm'.
-}
-split; [ easy | ].
-intros b' Hb'.
-progress unfold is_supremum in Hm.
-progress unfold is_extremum in Hm.
-remember (is_bound _ E m) as bnd eqn:Hbnd.
-symmetry in Hbnd.
-destruct bnd as [Hm'| ]; [ | easy ].
-specialize (Hm b').
-remember (is_bound _ E b') as bnd eqn:Hbnd'.
-symmetry in Hbnd'.
-destruct bnd as [| H1]; [ easy | ].
-clear Hm.
-destruct H1 as (y, Hy).
-exfalso; apply Hy; clear Hy Hbnd'.
-intros Hy.
-now apply Hb'.
+apply Hm.
 Qed.
 
 ...
