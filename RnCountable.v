@@ -6,6 +6,7 @@ From Stdlib Require Import Field.
 
 Require Import RingLike.Core.
 Require Import RingLike.IntermVal.
+Require Import RingLike.Misc.
 Require Import MiscReals Countable.
 
 Section a.
@@ -685,9 +686,7 @@ assert (He : ∃ₜ r, E r). {
   now exists O; unfold partial_sum3.
 }
 (**)
-destruct (rngl_completeness Hco E Hb He) as (r & Hr).
-progress unfold is_supremum in Hr.
-progress unfold is_extremum in Hr.
+destruct (rngl_completeness Hco E Hb He) as (r & Hr1 & Hr2).
 ...
 destruct (completeness E Hb He) as (r & Hr1 & Hr2).
 assert (Hr3 : (∀ k, partial_sum3 u k ≤ r)%L). {
