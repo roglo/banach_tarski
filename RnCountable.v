@@ -666,12 +666,12 @@ exists m.
 apply Hm.
 Qed.
 
-...
-
-Theorem ter_bin_of_frac_part_surj : ∀ u : nat → bool,
+Theorem ter_bin_of_frac_part_surj {em : excl_midd} :
+  is_complete T rngl_dist →
+  ∀ u : nat → bool,
   ∃ r, (0 ≤ r < 1)%L ∧ (∀ n, ter_bin_of_frac_part r n = u n).
 Proof.
-intros.
+intros Hco *.
 set (E x := ∃ k, partial_sum3 u k = x).
 (**)
 assert (Hb : rngl_bound E). {
@@ -680,24 +680,14 @@ assert (Hb : rngl_bound E). {
   apply partial_sum3_aux_le_half_pow; [ | easy ].
   apply (rngl_0_le_1 Hon Hos Hiq Hor).
 }
-assert (He : ∃ r, E r). {
+assert (He : ∃ₜ r, E r). {
   exists 0%L; subst E; simpl.
   now exists O; unfold partial_sum3.
 }
 (**)
-destruct (rngl_completeness E Hb He) as (r & Hr1 & Hr2).
-...
-is_upper_bound =
-λ (E : R → Prop) (m : R), ∀ x : R, E x → (x <= m)%R
-     : (R → Prop) → R → Prop
-is_lub =
-λ (E : R → Prop) (m : R),
-  is_upper_bound E m ∧ ∀ b : R, is_upper_bound E b → (m <= b)%R
-     : (R → Prop) → R → Prop
-completeness
-     : ∀ E : R → Prop, bound E → (∃ x : R, E x) → ∃ₜ m : R, is_lub E m
-bound = λ E : R → Prop, ∃ m : R, is_upper_bound E m
-     : (R → Prop) → Prop
+destruct (rngl_completeness Hco E Hb He) as (r & Hr).
+progress unfold is_supremum in Hr.
+progress unfold is_extremum in Hr.
 ...
 destruct (completeness E Hb He) as (r & Hr1 & Hr2).
 assert (Hr3 : (∀ k, partial_sum3 u k ≤ r)%L). {
