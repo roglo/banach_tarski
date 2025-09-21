@@ -650,36 +650,7 @@ apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 Qed.
 
 Definition rngl_is_upper_bound (E : T → Prop) m := ∀ x, E x → (x ≤ m)%L.
-(*
-Definition rngl_is_lub E m :=
-  rngl_is_upper_bound E m ∧
-  ∀ b, rngl_is_upper_bound E b → (m ≤ b)%L.
-*)
-Definition rngl_bound := λ E, ∃ₜ m, rngl_is_upper_bound E m.
-
-Theorem glop {em : excl_midd} :
-  ∀ E m,
-  rngl_is_upper_bound E m ↔
-  match is_bound rngl_le E m with
-  | left _ => True
-  | right _ => False
-  end.
-Proof.
-intros.
-remember (is_bound rngl_le E m) as bnd eqn:Hbnd.
-symmetry in Hbnd.
-destruct bnd as [H1| H1]. {
-  split; [ easy | ].
-  intros _ x Hx.
-  now apply  H1.
-}
-split; [ | easy ].
-intros H2.
-destruct H1 as (x, Hx).
-apply Hx; clear Hx Hbnd.
-intros H1.
-now apply H2.
-Qed.
+Definition rngl_bound E := ∃ₜ m, rngl_is_upper_bound E m.
 
 Theorem rngl_completeness {em : excl_midd} :
   is_complete T rngl_dist →
