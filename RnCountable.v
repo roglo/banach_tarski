@@ -656,14 +656,31 @@ Definition rngl_is_lub E m :=
 Definition rngl_bound := λ E, ∃ₜ m, rngl_is_upper_bound E m.
 
 Theorem rngl_completeness :
-  is_complete T (λ a b, rngl_abs (b - a)) →
-  ∀ E, rngl_bound E → (∃ₜ x, E x) → ∃ₜ m, rngl_is_lub E m.
+  excl_midd →
+  is_complete T rngl_dist →
+  ∀ E, rngl_bound E → (∃ₜ x, E x) → ∃ m, rngl_is_lub E m.
 Proof.
-intros Hco * (b, Hb) (x, Hx).
+intros Hem Hco * (b, Hb) (x, Hx).
 progress unfold rngl_is_lub.
 progress unfold rngl_is_upper_bound in Hb.
+generalize Hb; intros H.
+apply (upper_bound_property Hem Hop Hor Hon Hiv Har Hco _ x _ Hx) in H.
+destruct H as (m & Hm & Hmb).
+exists m.
+assert (Hub : rngl_is_upper_bound E m). {
+  progress unfold is_supremum in Hm.
+  progress unfold is_extremum in Hm.
+  intros y Hy.
+  remember (is_bound _ E m) as bnd eqn:Hbnd.
+  symmetry in Hbnd.
+  destruct bnd as [Hm'| ]; [ | easy ].
+  now apply Hm'.
+}
+split; [ easy | ].
+intros b' Hb'.
+progress unfold is_supremum in Hm.
+progress unfold is_extremum in Hm.
 ...
-Check @upper_bound_property.
 Print is_supremum.
 Print is_extremum.
 Print is_bound.
