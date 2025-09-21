@@ -655,6 +655,52 @@ Definition rngl_is_lub E m :=
   ∀ b, rngl_is_upper_bound E b → (m ≤ b)%L.
 Definition rngl_bound := λ E, ∃ₜ m, rngl_is_upper_bound E m.
 
+Theorem glop {em : excl_midd} :
+  ∀ E m, rngl_is_lub E m ↔ is_supremum E m.
+Proof.
+intros.
+progress unfold is_supremum.
+progress unfold is_extremum.
+split; intros H1. {
+  destruct H1 as (a, Ha).
+  remember (is_bound _ _ _) as bnd eqn:Hbnd.
+  symmetry in Hbnd.
+  destruct bnd as [H1| H1]. {
+    intros c.
+    remember (is_bound _ _ _) as bnd eqn:Hbnd' in |-*.
+    symmetry in Hbnd'.
+    destruct bnd as [H2| ]; [ | easy ].
+    apply Ha.
+    progress unfold rngl_is_upper_bound.
+    intros x Hx.
+    now apply H2.
+  }
+  destruct H1 as (x, Hx).
+  apply Hx; clear Hx Hbnd.
+  intros Hx.
+  now apply a.
+} {
+  remember (is_bound _ _ _) as bnd eqn:Hbnd.
+  symmetry in Hbnd.
+  destruct bnd as [H2| H2]. {
+    progress unfold rngl_is_lub.
+    split; [ easy | ].
+    intros b Hb.
+...
+    remember (is_bound _ _ _) as bnd eqn:Hbnd' in |-*.
+    symmetry in Hbnd'.
+    destruct bnd as [H2| ]; [ | easy ].
+    apply Ha.
+    progress unfold rngl_is_upper_bound.
+    intros x Hx.
+    now apply H2.
+  }
+  destruct H1 as (x, Hx).
+  apply Hx; clear Hx Hbnd.
+  intros Hx.
+  now apply a.
+...
+
 Theorem rngl_completeness :
   excl_midd →
   is_complete T rngl_dist →
@@ -684,24 +730,16 @@ remember (is_bound _ E m) as bnd eqn:Hbnd.
 symmetry in Hbnd.
 destruct bnd as [Hm'| ]; [ | easy ].
 specialize (Hm b').
-...
-Print is_supremum.
-Print is_extremum.
-Print is_bound.
-...
-exists b.
-split; [ easy | ].
-intros b' Hb'.
-progress unfold rngl_is_upper_bound in Hb.
-progress unfold rngl_is_upper_bound in Hb'.
-specialize (Hb _ Hx) as Hxb.
-specialize (Hb' _ Hx) as Hxb'.
-progress unfold is_complete in Hco.
-(**)
-Require Import Reals.
-Print bound.
-...
-apply Hb'.
+remember (is_bound _ E b') as bnd eqn:Hbnd'.
+symmetry in Hbnd'.
+destruct bnd as [| H1]; [ easy | ].
+clear Hm.
+destruct H1 as (y, Hy).
+exfalso; apply Hy; clear Hy Hbnd'.
+intros Hy.
+now apply Hb'.
+Qed.
+
 ...
 
 Theorem ter_bin_of_frac_part_surj : ∀ u : nat → bool,
