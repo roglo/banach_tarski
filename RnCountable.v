@@ -16,30 +16,11 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {fc : field_char_0_archim T}.
 Context {Hic : rngl_mul_is_comm T = true}.
-(*
-Context {Hon : rngl_has_1 T = true}.
-Context {Hop : rngl_has_opp T = true}.
-Context {Hiv : rngl_has_inv T = true}.
-Context {Hor : rngl_is_ordered T = true}.
-Context {Hch : rngl_characteristic T = 0}.
-Context {Har : rngl_is_archimedean T = true}.
-
-Let Hos := rngl_has_opp_has_opp_or_psub Hop.
-Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
-Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
-Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
-*)
 
 Add Ring rngl_ring : (rngl_ring_theory Hic fc_op fc_on).
 Add Field rngl_field :
   (rngl_field_theory Hic fc_op fc_on fc_iv
     (eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) fc_ch)).
-
-(*
-Arguments frac_part x%_L.
-Arguments Int_part x%_L.
-Arguments Int_part_interv z%_Z x%_L.
-*)
 
 Definition ter_bin_of_frac_part x n :=
   if rngl_lt_dec fc_or (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
