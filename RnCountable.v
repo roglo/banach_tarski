@@ -30,18 +30,16 @@ Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
 Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
 
-Let Rlt_dec := Rlt_dec Hor.
 Let frac_part := @frac_part T ro rp Hon Hop Hiv Hor Hch Har.
 Let Int_part := @Int_part T ro rp Hon Hop Hiv Hor Hch Har.
 Let Int_part_interv := @Int_part_interv T ro rp Hon Hop Hiv Hor Hch Har.
 
-Arguments Rlt_dec (a b)%_L.
 Arguments frac_part x%_L.
 Arguments Int_part x%_L.
 Arguments Int_part_interv z%_Z x%_L.
 
 Definition ter_bin_of_frac_part x n :=
-  if Rlt_dec (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
+  if Rlt_dec Hor (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
 
 Fixpoint partial_sum3_aux k (u : nat → bool) pow i :=
   match k with
@@ -734,7 +732,7 @@ split. {
 intros n.
 clear E Hr1 Hr2.
 unfold ter_bin_of_frac_part; symmetry.
-destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
+destruct (Rlt_dec Hor (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
   unfold frac_part in H1.
   progress unfold MiscReals.frac_part in H1.
   rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
