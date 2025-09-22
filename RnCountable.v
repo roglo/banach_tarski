@@ -754,9 +754,15 @@ destruct (rngl_lt_dec Hor (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
   apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
 }
-...
-apply Rnot_lt_le in H1.
+apply (rngl_nlt_ge_iff Hor) in H1.
 unfold frac_part in H1.
+rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
+rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
+apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1.
+...
+Rmult_le_compat_r
+     : ∀ r r1 r2 : R, (0 <= r)%R → (r1 <= r2)%R → (r1 * r <= r2 * r)%R
+...
 rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
 unfold Rminus in H1.
 rewrite Ropp_mult_distr_l in H1.
