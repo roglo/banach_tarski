@@ -23,17 +23,17 @@ Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 Context {Hch : rngl_characteristic T = 0}.
 Context {Har : rngl_is_archimedean T = true}.
-*)
-
-...
 
 Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
+*)
 
-Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
-Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
+Add Ring rngl_ring : (rngl_ring_theory Hic fc_op fc_on).
+Add Field rngl_field :
+  (rngl_field_theory Hic fc_op fc_on fc_iv
+    (eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) fc_ch)).
 
 (*
 Arguments frac_part x%_L.
@@ -42,7 +42,7 @@ Arguments Int_part_interv z%_Z x%_L.
 *)
 
 Definition ter_bin_of_frac_part x n :=
-  if rngl_lt_dec Hor (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
+  if rngl_lt_dec fc_or (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
 
 Fixpoint partial_sum3_aux k (u : nat → bool) pow i :=
   match k with
@@ -69,6 +69,7 @@ Theorem partial_sum3_aux_le_half_pow :
   → pow2 = (pow / 2)%L
   → (partial_sum3_aux k u pow i ≤ pow2)%L.
 Proof.
+destruct_fc.
 specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 assert (H30 : (3 ≠ 0)%L). {
   replace 3%L with (rngl_of_nat 3). 2: {
@@ -94,9 +95,9 @@ destruct (u i). {
     apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_2 Hon Hos Hiq Hor).
   }
-  rewrite <- (@Rdiv_mult_simpl_r _ _ _ Hic Hon Hop Hiv pow 2 3)%L;
+  rewrite <- (@Rdiv_mult_simpl_r _ _ _ fc Hic pow 2 3)%L;
     [ | easy | easy ].
-  rewrite <- (@Rdiv_mult_simpl_r _ _ _ Hic Hon Hop Hiv pow 3 2)%L at 2;
+  rewrite <- (@Rdiv_mult_simpl_r _ _ _ fc Hic pow 3 2)%L at 2;
     [ | easy | easy ].
   rewrite (rngl_mul_comm Hic 3 2).
   rewrite <- (rngl_div_sub_distr_r Hop Hiv).
@@ -133,6 +134,7 @@ Theorem partial_sum3_aux_succ : ∀ u n pow i,
   (partial_sum3_aux n u pow i +
    INR (Nat.b2n (u (i + n)%nat)) * pow / 3 ^ S n)%L.
 Proof.
+destruct_fc.
 intros.
 revert pow i.
 induction n; intros. {
@@ -178,6 +180,7 @@ Theorem partial_sum3_succ : ∀ u n,
   (partial_sum3 u (S n) =
    partial_sum3 u n + INR (Nat.b2n (u n)) / 3 ^ S n)%L.
 Proof.
+destruct_fc.
 intros.
 unfold partial_sum3.
 rewrite partial_sum3_aux_succ.
@@ -189,6 +192,7 @@ Theorem partial_sum3_aux_add : ∀ u k₁ k₂ pow i,
   (partial_sum3_aux k₁ u pow i +
    partial_sum3_aux k₂ u (pow / 3 ^ k₁) (i + k₁))%L.
 Proof.
+destruct_fc.
 intros.
 revert k₂ pow i.
 induction k₁; intros. {
@@ -221,6 +225,7 @@ Theorem partial_sum3_aux_nonneg : ∀ u k pos i,
   (0 ≤ pos)%L
   → (0 ≤ partial_sum3_aux k u pos i)%L.
 Proof.
+destruct_fc.
 intros * Hpos.
 revert pos i Hpos.
 induction k; intros; simpl; [ apply (rngl_le_refl Hor) | ].
@@ -236,6 +241,7 @@ Qed.
 Theorem partial_sum3_upper_bound : ∀ u n k,
   (partial_sum3 u k ≤ partial_sum3 u n + (2 * 3 ^ n)⁻¹)%L.
 Proof.
+destruct_fc.
 intros.
 assert (Hzi : ∀ i, (0 ≤ (2 * 3 ^ i)⁻¹)%L). {
   intros.
@@ -366,6 +372,7 @@ Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
   partial_sum3_aux (S k) u pow i =
   ((pow * b2r (u i) + partial_sum3_aux k (λ n, u (S n)) pow i) / 3)%L.
 Proof.
+destruct_fc.
 intros.
 set (v := λ n, u (S n)).
 revert pow i.
@@ -403,6 +410,7 @@ Theorem n_partial_sum3_succ2 : ∀ u n,
   n_partial_sum3 u (S n) =
   (3 ^ n * Nat.b2n (u O) + n_partial_sum3 (λ n, u (S n)) n)%nat.
 Proof.
+destruct_fc.
 intros.
 set (v n := u (S n)).
 induction n; [ now simpl; do 2 rewrite Nat.add_0_r | ].
@@ -416,11 +424,13 @@ Qed.
 
 Theorem n_partial_sum3_succ : ∀ u n,
   n_partial_sum3 u (S n) = (3 * n_partial_sum3 u n + Nat.b2n (u n))%nat.
-Proof. easy. Qed.
+Proof.
+destruct_fc. easy. Qed.
 
 Theorem partial_sum3_n_partial_sum3 : ∀ u n,
   (3 ^ n * partial_sum3 u n = INR (n_partial_sum3 u n))%L.
 Proof.
+destruct_fc.
 intros.
 unfold partial_sum3.
 induction n; [ cbn; ring | ].
@@ -441,6 +451,7 @@ Theorem le_partial_sum3_lt_n_partial_sum3 : ∀ u r n,
   (r ≤ partial_sum3 u (S n) + (2 * 3 ^ S n)⁻¹)%L
   → (r * 3 ^ n < INR (n_partial_sum3 u n) + 1)%L.
 Proof.
+destruct_fc.
 intros * Hr2.
 rewrite <- partial_sum3_n_partial_sum3.
 apply (rngl_lt_sub_lt_add_l Hop Hor).
@@ -497,6 +508,7 @@ Theorem Int_part_n_partial_sum3 : ∀ u r n,
   → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%L) → (r ≤ b)%L)
   → Int_part (r * 3 ^ n) = Z.of_nat (n_partial_sum3 u n).
 Proof.
+destruct_fc.
 intros * Hr1 Hr2.
 specialize (Hr1 (S n)).
 assert (H : (r ≤ partial_sum3 u (S n) + (2 * 3 ^ S n)⁻¹)%L). {
@@ -505,6 +517,7 @@ assert (H : (r ≤ partial_sum3 u (S n) + (2 * 3 ^ S n)⁻¹)%L). {
 clear Hr2; rename H into Hr2.
 specialize (Int_part_interv (Z.of_nat (n_partial_sum3 u n))) as H1.
 apply (proj1 (H1 (r * 3 ^ n)%L)); clear H1.
+...
 rewrite (@rngl_of_Z_add T ro rp Hon Hop).
 rewrite rngl_of_Z_of_nat.
 rewrite rngl_of_Z_1.
@@ -599,6 +612,7 @@ Theorem IZR_Int_part_mult_pow_succ : ∀ u r n,
   → IZR (Int_part (r * 3 ^ S n)) =
     (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%L.
 Proof.
+destruct_fc.
 intros * Hr1 Hr2.
 rewrite Int_part_n_partial_sum3 with (u := u); [ | easy | easy ].
 rewrite Int_part_n_partial_sum3 with (u := u); [ | easy | easy ].
@@ -614,6 +628,7 @@ Theorem Int_part_eq_partial_sum3 : ∀ u r n,
   → (∀ b, (∀ k : nat, (partial_sum3 u k ≤ b)%L) → (r ≤ b)%L)
   → IZR (Int_part (r * 3 ^ n)) = (partial_sum3 u n * 3 ^ n)%L.
 Proof.
+destruct_fc.
 intros * Hk1 Hk2.
 induction n. {
   unfold partial_sum3; simpl.
@@ -658,6 +673,7 @@ Theorem rngl_completeness {em : excl_midd} :
   is_complete T rngl_dist →
   ∀ E, rngl_bound E → (∃ₜ x, E x) → ∃ m, is_supremum E m.
 Proof.
+destruct_fc.
 intros Hco * (b, Hb) (x, Hx).
 progress unfold is_supremum.
 progress unfold rngl_is_upper_bound in Hb.
@@ -673,6 +689,7 @@ Theorem ter_bin_of_frac_part_surj {em : excl_midd} :
   ∀ u : nat → bool,
   ∃ r, (0 ≤ r < 1)%L ∧ (∀ n, ter_bin_of_frac_part r n = u n).
 Proof.
+destruct_fc.
 intros Hco *.
 set (E x := ∃ k, partial_sum3 u k = x).
 (**)
@@ -794,10 +811,12 @@ Qed.
 Definition id {A} (a : A) := a.
 
 Theorem id_nat : ∀ e : ℕ, ∃ x : ℕ, id x = e.
-Proof. now intros; exists e. Qed.
+Proof.
+destruct_fc. now intros; exists e. Qed.
 
 Theorem Cantor_ℕ_ℝ : ∀ f : nat → R, ∃ x : R, ∀ n : nat, x ≠ f n.
 Proof.
+destruct_fc.
 specialize
   (Cantor_gen ℕ ℕ ℝ (λ x, (0 ≤ x < 1)%L) id ter_bin_of_frac_part id_nat
      ter_bin_of_frac_part_surj).
