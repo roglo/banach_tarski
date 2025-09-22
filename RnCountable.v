@@ -517,8 +517,7 @@ assert (H : (r ≤ partial_sum3 u (S n) + (2 * 3 ^ S n)⁻¹)%L). {
 clear Hr2; rename H into Hr2.
 specialize (Int_part_interv (Z.of_nat (n_partial_sum3 u n))) as H1.
 apply (proj1 (H1 (r * 3 ^ n)%L)); clear H1.
-...
-rewrite (@rngl_of_Z_add T ro rp Hon Hop).
+rewrite rngl_of_Z_add.
 rewrite rngl_of_Z_of_nat.
 rewrite rngl_of_Z_1.
 split. {
@@ -752,9 +751,9 @@ split. {
 intros n.
 clear E Hr1 Hr2.
 unfold ter_bin_of_frac_part; symmetry.
-destruct (Rlt_dec Hor (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
-  unfold frac_part in H1.
-  progress unfold MiscReals.frac_part in H1.
+progress fold Hor.
+destruct (rngl_lt_dec Hor (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
+  progress unfold frac_part in H1.
   rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
   rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
   apply -> (rngl_lt_div_r Hon Hop Hiv Hor) in H1. {
