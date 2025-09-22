@@ -53,6 +53,8 @@ Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 
 Definition mkrmat := @mkmat T.
 
+...
+
 Definition Rmult5_sqrt2_sqrt5 := @Rmult5_sqrt2_sqrt5 T ro rp rl Hic Hon Hop Hor.
 Arguments Rmult5_sqrt2_sqrt5 (a b c d)%_L.
 

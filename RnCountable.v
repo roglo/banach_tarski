@@ -14,13 +14,18 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
+Context {fc : field_char_0_archim T}.
 Context {Hic : rngl_mul_is_comm T = true}.
+(*
 Context {Hon : rngl_has_1 T = true}.
 Context {Hop : rngl_has_opp T = true}.
 Context {Hiv : rngl_has_inv T = true}.
 Context {Hor : rngl_is_ordered T = true}.
 Context {Hch : rngl_characteristic T = 0}.
 Context {Har : rngl_is_archimedean T = true}.
+*)
+
+...
 
 Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
@@ -30,16 +35,14 @@ Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
 Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
 
-Let frac_part := @frac_part T ro rp Hon Hop Hiv Hor Hch Har.
-Let Int_part := @Int_part T ro rp Hon Hop Hiv Hor Hch Har.
-Let Int_part_interv := @Int_part_interv T ro rp Hon Hop Hiv Hor Hch Har.
-
+(*
 Arguments frac_part x%_L.
 Arguments Int_part x%_L.
 Arguments Int_part_interv z%_Z x%_L.
+*)
 
 Definition ter_bin_of_frac_part x n :=
-  if Rlt_dec Hor (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
+  if rngl_lt_dec Hor (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
 
 Fixpoint partial_sum3_aux k (u : nat → bool) pow i :=
   match k with
