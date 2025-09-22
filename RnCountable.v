@@ -736,28 +736,27 @@ clear E Hr1 Hr2.
 unfold ter_bin_of_frac_part; symmetry.
 destruct (Rlt_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
   unfold frac_part in H1.
-...
+  progress unfold MiscReals.frac_part in H1.
   rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
-  unfold Rminus in H1.
-  rewrite Ropp_mult_distr_l in H1.
-  rewrite <- Rmult_plus_distr_r in H1.
-  rewrite fold_Rminus in H1.
-  apply Rmult_lt_compat_r with (r := (/ 3 ^ n)%L) in H1. {
-    rewrite Rmult_assoc in H1.
-    rewrite Rinv_r in H1; [ | apply pow_nonzero; lra ].
-    rewrite Rmult_1_r in H1.
-    unfold Rdiv in H1.
-    rewrite Rmult_assoc in H1.
-    rewrite <- Rinv_mult in H1.
-    replace (3 * 3 ^ n)%L with (3 ^ S n)%L in H1 by easy.
-    fold (Rdiv 1 (3 ^ S n)) in H1.
+  rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
+  apply -> (rngl_lt_div_r Hon Hop Hiv Hor) in H1. {
+    rewrite (rngl_div_div Hon Hos Hiv) in H1.
+    rewrite <- (rngl_pow_succ_l Hon) in H1.
     specialize (Hr3 (S n)).
     rewrite partial_sum3_succ in Hr3.
     destruct (u n); [ exfalso | easy ].
-    simpl in Hr3, H1; lra.
+    simpl in Hr3, H1.
+    rewrite rngl_of_nat_1 in Hr3.
+    apply (rngl_le_add_le_sub_l Hop Hor) in Hr3.
+    now apply rngl_nlt_ge in Hr3.
+    apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_pow_neq_0 Hon Hos Hiq).
+    apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
   }
-  apply Rinv_0_lt_compat, pow_lt; lra.
+  apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
 }
+...
 apply Rnot_lt_le in H1.
 unfold frac_part in H1.
 rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
