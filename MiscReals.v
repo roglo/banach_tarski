@@ -132,8 +132,10 @@ do 2 rewrite (rngl_mul_comm fc_ic z).
 easy.
 Qed.
 
+(*
 Definition Rle_dec := rngl_le_dec fc_or.
 Definition Rlt_dec := rngl_lt_dec fc_or.
+*)
 Definition Req_dec :=
   let Heo := rngl_has_eq_dec_or_is_ordered_r fc_or in
   rngl_eq_dec Heo.
@@ -146,8 +148,10 @@ destruct (rngl_lt_dec Hor a 0) as [Haz| Haz]; [ now left | right ].
 now apply (rngl_nlt_ge_iff Hor).
 Qed.
 
+(*
 Arguments Rle_dec (a b)%_L.
 Arguments Rlt_dec (a b)%_L.
+*)
 Arguments Req_dec (a b)%_L.
 Arguments Rcase_abs a%_L.
 
@@ -2142,7 +2146,7 @@ intros.
 apply (rngl_add_squ_nonneg Hon Hos Hiq Hor).
 Qed.
 
-Definition Rsignp x := (if Rle_dec 0 x then 1 else -1)%L.
+Definition Rsignp x := (if rngl_le_dec fc_or 0 x then 1 else -1)%L.
 Definition Rsign x := (if Req_dec x 0 then 0 else Rsignp x)%L.
 
 Arguments Rsign x%_L.
@@ -2152,7 +2156,7 @@ Proof.
 destruct_fc.
 intros * Hx.
 unfold Rsignp.
-now destruct (Rle_dec 0 x).
+now destruct (rngl_le_dec fc_or 0 x).
 Qed.
 
 Theorem Rsignp_of_neg : ∀ x, (x < 0 → Rsignp x = -1)%L.
@@ -2161,7 +2165,7 @@ destruct_fc.
 intros * Hx.
 unfold Rsignp.
 apply rngl_nle_gt in Hx.
-now destruct (Rle_dec 0 x).
+now destruct (rngl_le_dec fc_or 0 x).
 Qed.
 
 Theorem Rsign_of_pos : ∀ x, (0 < x → Rsign x = 1)%L.
@@ -2173,7 +2177,7 @@ destruct (Req_dec x 0) as [H | H]. {
   now subst; apply (rngl_lt_irrefl Hor) in Hx.
 }
 apply (rngl_lt_le_incl Hor) in Hx.
-now destruct (Rle_dec 0 x).
+now destruct (rngl_le_dec fc_or 0 x).
 Qed.
 
 Theorem Rsign_of_neg : ∀ x, (x < 0 → Rsign x = -1)%L.
@@ -2185,7 +2189,7 @@ destruct (Req_dec x 0). {
   now subst; apply (rngl_lt_irrefl Hor) in Hx.
 }
 apply rngl_nle_gt in Hx.
-now destruct (Rle_dec 0 x).
+now destruct (rngl_le_dec fc_or 0 x).
 Qed.
 
 Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = (Rsign x * Rsign y)%L.
@@ -2206,16 +2210,18 @@ destruct (Req_dec x 0) as [Hxz| Hxz]. {
 destruct (Req_dec y 0) as [Hyz| Hyz]. {
   now subst; rewrite (rngl_mul_0_r Hos) in Hxyz.
 }
-destruct (Rle_dec 0 (x * y)) as [Hxy| Hxy]. {
-  destruct (Rle_dec 0 x) as [Hx| Hx]. {
+fold Hor.
+destruct (rngl_le_dec Hor 0 (x * y)) as [Hxy| Hxy]. {
+  destruct (rngl_le_dec Hor 0 x) as [Hx| Hx]. {
     symmetry.
-    destruct (Rle_dec 0 y) as [Hy| Hy]; [ apply (rngl_mul_1_l Hon) | ].
+    destruct (rngl_le_dec Hor 0 y) as [Hy| Hy].
+    apply (rngl_mul_1_l Hon).
     apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hxy.
     destruct Hxy as [| (H, _)]; [ easy | ].
     apply (rngl_le_antisymm Hor) in H; [ | easy ].
     now symmetry in H.
   }
-  destruct (Rle_dec 0 y) as [Hy| Hy]. 2: {
+  destruct (rngl_le_dec Hor 0 y) as [Hy| Hy]. 2: {
     symmetry.
     apply (rngl_squ_opp_1 Hon Hop).
   }
@@ -2226,15 +2232,15 @@ destruct (Rle_dec 0 (x * y)) as [Hxy| Hxy]. {
   apply (rngl_le_antisymm Hor) in H; [ | easy ].
   now symmetry in H.
 }
-destruct (Rle_dec 0 x) as [Hx| Hx]. {
-  destruct (Rle_dec 0 y) as [Hy| Hy]. 2: {
+destruct (rngl_le_dec Hor 0 x) as [Hx| Hx]. {
+  destruct (rngl_le_dec Hor 0 y) as [Hy| Hy]. 2: {
     now symmetry; apply (rngl_mul_1_l Hon).
   }
   exfalso.
   apply Hxy; clear Hxy.
   now apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
 } {
-  destruct (Rle_dec 0 y) as [Hy| Hy]. {
+  destruct (rngl_le_dec Hor 0 y) as [Hy| Hy]. {
     now symmetry; apply (rngl_mul_1_r Hon).
   }
   exfalso.
@@ -2344,7 +2350,7 @@ remember (Rediv_mod x y) as rdm eqn:Hrdm.
 symmetry in Hrdm.
 destruct rdm as (q, r).
 unfold Rediv_mod in Hrdm.
-destruct (Rlt_dec y 0) as [Hy| Hy]. {
+destruct (rngl_lt_dec Hor y 0) as [Hy| Hy]. {
   remember Z.sub as f.
   injection Hrdm; clear Hrdm; intros Hr Hq; subst f.
   now rewrite Hq in Hr.
@@ -2882,11 +2888,12 @@ Qed.
 
 Theorem frac_part_double : ∀ x,
   frac_part (2 * x) =
-    (2 * frac_part x - if Rlt_dec (frac_part x) (1 / 2) then 0 else 1)%L.
+    (2 * frac_part x -
+       if rngl_lt_dec fc_or (frac_part x) (1 / 2) then 0 else 1)%L.
 Proof.
 destruct_fc.
 intros.
-destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
+destruct (rngl_lt_dec Hor (frac_part x) (1 / 2)) as [Hx| Hx]. {
   rewrite (rngl_sub_0_r Hos).
   do 2 rewrite (rngl_mul_2_l Hon).
   apply plus_frac_part2.
@@ -2905,12 +2912,13 @@ Qed.
 
 Theorem Int_part_double : ∀ x,
   Int_part (2 * x) =
-    (2 * Int_part x + if Rlt_dec (frac_part x) (1 / 2) then 0 else 1)%Z.
+    (2 * Int_part x +
+       if rngl_lt_dec fc_or (frac_part x) (1 / 2) then 0 else 1)%Z.
 Proof.
 destruct_fc.
 intros.
 rewrite (rngl_mul_2_l Hon).
-destruct (Rlt_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
+destruct (rngl_lt_dec Hor (frac_part x) (1 / 2)) as [Hx| Hx]. {
   rewrite plus_Int_part2. {
     rewrite Z.add_0_r.
     apply Z.add_diag.
