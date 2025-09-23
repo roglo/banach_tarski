@@ -758,16 +758,29 @@ apply (rngl_nlt_ge_iff Hor) in H1.
 unfold frac_part in H1.
 rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
 rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
-apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1.
+(**)
+apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
+  rewrite (rngl_div_div Hon Hos Hiv) in H1.
+  rewrite <- (rngl_pow_succ_l Hon) in H1.
+  specialize (partial_sum3_upper_bound u (S n)); intros H.
+  apply Hr4 in H.
+  rewrite partial_sum3_succ in H.
+  destruct (u n); [ easy | exfalso ].
+  simpl in H1, H.
+(**)
+  rewrite (rngl_div_1_l Hon Hiv) in H1.
+  rewrite rngl_of_nat_0 in H.
+  rewrite (rngl_div_0_l Hos Hi1), rngl_add_0_r in H.
+  rewrite (rngl_inv_mul_distr Hon Hos Hiv) in H.
+  set (s := partial_sum3 u n) in H1, H.
+  set (t := ((3 * 3 ^ n))⁻¹) in H1, H.
+(**)
+  enough (0 < t)%L. {
 ...
-Rmult_le_compat_r
-     : ∀ r r1 r2 : R, (0 <= r)%R → (r1 <= r2)%R → (r1 * r <= r2 * r)%R
+  enough (0 < t)%L by lra; subst t.
+  apply Rinv_0_lt_compat.
+  apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
 ...
-rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
-unfold Rminus in H1.
-rewrite Ropp_mult_distr_l in H1.
-rewrite <- Rmult_plus_distr_r in H1.
-rewrite fold_Rminus in H1.
 apply Rmult_le_compat_r with (r := (/ 3 ^ n)%L) in H1. {
   rewrite Rmult_assoc in H1.
   rewrite Rinv_r in H1; [ | apply pow_nonzero; lra ].
