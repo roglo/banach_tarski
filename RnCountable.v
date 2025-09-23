@@ -758,7 +758,6 @@ apply (rngl_nlt_ge_iff Hor) in H1.
 unfold frac_part in H1.
 rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
 rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
-(**)
 apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
   rewrite (rngl_div_div Hon Hos Hiv) in H1.
   rewrite <- (rngl_pow_succ_l Hon) in H1.
@@ -767,7 +766,6 @@ apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
   rewrite partial_sum3_succ in H.
   destruct (u n); [ easy | exfalso ].
   simpl in H1, H.
-(**)
   rewrite (rngl_div_1_l Hon Hiv) in H1.
   rewrite rngl_of_nat_0 in H.
   rewrite (rngl_div_0_l Hos Hi1), rngl_add_0_r in H.
@@ -776,56 +774,59 @@ apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
   set (t := ((3 * 3 ^ n))⁻¹) in H1, H.
 (**)
   enough (H2 : (0 < t)%L). {
-...
-    apply rngl_nle_gt in H2.
-    apply H2; clear H2.
-    apply (rngl_le_trans Hor _ (r - s)); [ easy | ].
-    apply (rngl_le_sub_0 Hop Hor).
-...
-  enough (0 < t)%L by lra; subst t.
-  apply Rinv_0_lt_compat.
-  apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
-...
-apply Rmult_le_compat_r with (r := (/ 3 ^ n)%L) in H1. {
-  rewrite Rmult_assoc in H1.
-  rewrite Rinv_r in H1; [ | apply pow_nonzero; lra ].
-  rewrite Rmult_1_r in H1.
-  unfold Rdiv in H1; rewrite Rmult_1_l in H1.
-  rewrite <- Rinv_mult in H1.
-  replace (3 * 3 ^ n)%L with (3 ^ S n)%L in H1 by easy.
-  specialize (partial_sum3_upper_bound u (S n)); intros H.
-  apply Hr4 in H.
-  rewrite partial_sum3_succ in H.
-  destruct (u n); [ easy | exfalso ].
-  simpl in H1, H.
-  unfold Rdiv in H.
-  rewrite Rmult_0_l, Rplus_0_r in H.
-  rewrite Rinv_mult in H.
-  set (s := partial_sum3 u n) in H1, H.
-  set (t := (/ (3 * 3 ^ n))%L) in H1, H.
-  enough (0 < t)%L by lra; subst t.
-  apply Rinv_0_lt_compat.
-  apply Rmult_lt_0_compat; [ lra | apply pow_lt; lra ].
+    apply rngl_nlt_ge in H.
+    apply H; clear H.
+    apply (rngl_lt_add_lt_sub_l Hop Hor).
+    apply (rngl_lt_le_trans Hor _ t); [ | easy ].
+    rewrite (rngl_mul_inv_r Hiv).
+    apply (rngl_lt_div_l Hon Hop Hiv Hor).
+    apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+    rewrite (rngl_mul_2_r Hon).
+    now apply (rngl_lt_add_l Hos Hor).
+  }
+  progress unfold t.
+  apply (rngl_inv_pos Hon Hop Hiv Hor).
+  apply (rngl_mul_pos_pos Hon Hop Hiq Hor).
+  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  intros H2.
+  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2.
+  now apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor) in H2.
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+  intros H2.
+  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2.
+  now apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor) in H2.
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_pow_neq_0 Hon Hos Hiq).
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 }
-apply Rlt_le.
-apply Rinv_0_lt_compat.
-apply pow_lt; lra.
+apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
+apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
 Qed.
 
 Definition id {A} (a : A) := a.
 
 Theorem id_nat : ∀ e : ℕ, ∃ x : ℕ, id x = e.
-Proof.
-destruct_fc. now intros; exists e. Qed.
+Proof. now intros; exists e. Qed.
 
-Theorem Cantor_ℕ_ℝ : ∀ f : nat → R, ∃ x : R, ∀ n : nat, x ≠ f n.
+Theorem Cantor_ℕ_T {em : excl_midd} :
+  is_complete T rngl_dist →
+  ∀ f : nat → T, ∃ x : T, ∀ n : nat, x ≠ f n.
 Proof.
 destruct_fc.
+intros Hco.
 specialize
-  (Cantor_gen ℕ ℕ ℝ (λ x, (0 ≤ x < 1)%L) id ter_bin_of_frac_part id_nat
-     ter_bin_of_frac_part_surj).
+  (Cantor_gen ℕ ℕ T (λ x, (0 ≤ x < 1)%L) id ter_bin_of_frac_part id_nat
+     (ter_bin_of_frac_part_surj Hco)).
 intros H f.
 specialize (H f).
 destruct H as (x, H); exists x.
 intros n; apply H.
 Qed.
+
+End a.
