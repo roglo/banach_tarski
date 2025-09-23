@@ -775,7 +775,12 @@ apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
   set (s := partial_sum3 u n) in H1, H.
   set (t := ((3 * 3 ^ n))⁻¹) in H1, H.
 (**)
-  enough (0 < t)%L. {
+  enough (H2 : (0 < t)%L). {
+...
+    apply rngl_nle_gt in H2.
+    apply H2; clear H2.
+    apply (rngl_le_trans Hor _ (r - s)); [ easy | ].
+    apply (rngl_le_sub_0 Hop Hor).
 ...
   enough (0 < t)%L by lra; subst t.
   apply Rinv_0_lt_compat.
