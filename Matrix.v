@@ -39,6 +39,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
+Context {fc : field_char_0_archim T}.
 Context {Hic : rngl_mul_is_comm T = true}.
 Context {Hon : rngl_has_1 T = true}.
 Context {Hop : rngl_has_opp T = true}.
@@ -53,10 +54,10 @@ Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 
 Definition mkrmat := @mkmat T.
 
-...
-
+(*
 Definition Rmult5_sqrt2_sqrt5 := @Rmult5_sqrt2_sqrt5 T ro rp rl Hic Hon Hop Hor.
 Arguments Rmult5_sqrt2_sqrt5 (a b c d)%_L.
+*)
 
 Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
 Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
@@ -320,6 +321,7 @@ unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
+...
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
