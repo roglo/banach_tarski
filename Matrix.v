@@ -117,9 +117,7 @@ Arguments vec_norm _%_vec.
 Arguments vec_add _%_vec _%_vec.
 Arguments vec_dot_mul _%_vec _%_vec.
 Arguments vec_cross_mul _%_vec _%_vec.
-(*
-Arguments vec_const_mul _%_R _%_vec.
-*)
+Arguments vec_const_mul _%_L _%_vec.
 
 Notation "0" := (V 0 0 0) : vec_scope.
 Notation "k ⁎ v" := (vec_const_mul k v) (at level 40).
@@ -565,6 +563,7 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
   now cbn in H1; rewrite rngl_add_0_r in H1.
 }
 split; [ now f_equal; try field | now field ].
+Qed.
 
 Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
@@ -596,7 +595,6 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
 unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
 progress unfold mat_id.
 progress unfold rngl_div; rewrite Hiv.
-(**)
 progress repeat rewrite (rngl_mul_0_l Hos).
 progress repeat rewrite (rngl_mul_0_r Hos).
 progress repeat rewrite (rngl_mul_1_l Hon).
@@ -613,29 +611,36 @@ Qed.
 
 Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
 Proof.
-unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
-...
-unfold mat_id, Rdiv.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rmult_0_r.
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite Rminus_0_l.
-progress repeat rewrite Rminus_0_r.
-progress repeat rewrite Ropp_mult_distr_l.
-progress repeat rewrite <- Rmult_assoc.
-progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
-split; [ f_equal; field | field ].
+(**)
+specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+assert (H30 : (1 + 2 ≠ 0)%L). {
+  rewrite rngl_add_comm.
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+}
+unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
+progress unfold mat_id.
+progress unfold rngl_div; rewrite Hiv.
+progress repeat rewrite (rngl_mul_0_l Hos).
+progress repeat rewrite (rngl_mul_0_r Hos).
+progress repeat rewrite (rngl_mul_1_l Hon).
+progress repeat rewrite (rngl_mul_1_r Hon).
+progress repeat rewrite rngl_add_0_l.
+progress repeat rewrite rngl_add_0_r.
+progress repeat rewrite (rngl_sub_0_l Hop).
+progress repeat rewrite (rngl_sub_0_r Hos).
+progress repeat rewrite <- (rngl_mul_opp_l Hop).
+progress repeat rewrite rngl_mul_assoc.
+progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | easy ]).
+split; [ now f_equal; field | now field ].
 Qed.
 
 Theorem rotate_is_rotation_matrix : ∀ e, is_rotation_matrix (mat_of_elem e).
 Proof.
 intros (t, d); destruct t, d.
- apply rot_inv_x_is_rotation_matrix.
- apply rot_x_is_rotation_matrix.
- apply rot_inv_z_is_rotation_matrix.
- apply rot_z_is_rotation_matrix.
+apply rot_inv_x_is_rotation_matrix.
+apply rot_x_is_rotation_matrix.
+apply rot_inv_z_is_rotation_matrix.
+apply rot_z_is_rotation_matrix.
 Qed.
 
 Theorem mat_mul_is_rotation_matrix : ∀ m1 m2,
@@ -651,7 +656,7 @@ setoid_rewrite <- mat_mul_assoc at 2.
 rewrite Hm2, mat_mul_id_r, Hm1.
 split; [ easy | ].
 rewrite mat_det_mul, Hd1, Hd2.
-apply Rmult_1_r.
+apply (rngl_mul_1_l Hon).
 Qed.
 
 Theorem mat_pow_is_rotation_matrix : ∀ M n,
@@ -679,28 +684,28 @@ Theorem mat_of_path_app : ∀ el₁ el₂,
 Proof.
 intros.
 revert el₁.
-induction el₂ as [| e₂ el₂]; intros.
- unfold mat_of_path at 3; simpl.
- rewrite app_nil_r.
- now rewrite mat_mul_id_r.
-
- rewrite cons_comm_app, app_assoc, IHel₂.
- unfold mat_of_path; simpl.
- rewrite map_app, fold_right_app; simpl.
- rewrite mat_mul_assoc; f_equal.
- rewrite mat_mul_id_r; clear.
- induction el₁ as [| e₁]; [ now rewrite mat_mul_id_l | ].
- now simpl; rewrite IHel₁, mat_mul_assoc.
+induction el₂ as [| e₂ el₂]; intros. {
+  unfold mat_of_path at 3; simpl.
+  rewrite app_nil_r.
+  now rewrite mat_mul_id_r.
+}
+rewrite cons_comm_app, app_assoc, IHel₂.
+unfold mat_of_path; simpl.
+rewrite map_app, fold_right_app; simpl.
+rewrite mat_mul_assoc; f_equal.
+rewrite mat_mul_id_r.
+induction el₁ as [| e₁]; [ now rewrite mat_mul_id_l | ].
+now simpl; rewrite IHel₁, mat_mul_assoc.
 Qed.
 
 Theorem vec_const_mul_assoc : ∀ a b v, a ⁎ (b ⁎ v) = (a * b) ⁎ v.
 Proof.
 intros a b (x, y, z); simpl.
-now do 3 rewrite Rmult_assoc.
+f_equal; apply rngl_mul_assoc.
 Qed.
 
 Theorem vec_const_mul_div : ∀ a b u v,
-  a ≠ 0
+  a ≠ 0%L
   → a ⁎ u = b ⁎ v
   → u = (b / a) ⁎ v.
 Proof.
@@ -709,6 +714,7 @@ destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
 simpl in Hm; simpl.
 injection Hm; clear Hm; intros H₃ H₂ H₁.
+...
 unfold Rdiv; setoid_rewrite Rmult_shuffle0.
 rewrite <- H₁, <- H₂, <- H₃.
 setoid_rewrite Rmult_shuffle0.
