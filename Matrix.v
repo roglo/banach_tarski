@@ -842,14 +842,13 @@ Theorem vec_const_mul_1_l : ∀ v, 1 ⁎ v = v.
 Proof.
 intros (x, y, z).
 unfold vec_const_mul.
-...
-now do 3 rewrite Rmult_1_l.
+now f_equal; rewrite (rngl_mul_1_l Hon).
 Qed.
 
 Theorem neg_vec_involutive : ∀ p, (- - p)%vec = p.
 Proof.
 intros (x, y, z); simpl.
-now do 3 rewrite Ropp_involutive.
+now f_equal; rewrite (rngl_opp_involutive Hop).
 Qed.
 
 Theorem is_neg_vec_neg_vec : ∀ v,
@@ -857,6 +856,7 @@ Theorem is_neg_vec_neg_vec : ∀ v,
   → is_neg_vec (- v) = negb (is_neg_vec v).
 Proof.
 intros (x, y, z) Hv; simpl.
+...
 destruct (Rlt_dec x 0) as [Hx| Hx].
  destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
   apply Ropp_lt_contravar in Hx'.
