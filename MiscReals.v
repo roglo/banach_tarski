@@ -14,7 +14,8 @@ Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
 
 Class field_char_0_archim T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { fc_on : rngl_has_1 T = true;
+  { fc_ic : rngl_mul_is_comm T = true;
+    fc_on : rngl_has_1 T = true;
     fc_op : rngl_has_opp T = true;
     fc_iv : rngl_has_inv T = true;
     fc_or : rngl_is_ordered T = true;
@@ -22,6 +23,7 @@ Class field_char_0_archim T {ro : ring_like_op T} {rp : ring_like_prop T} :=
     fc_ar : rngl_is_archimedean T = true }.
 
 Ltac destruct_fc :=
+  set (Hic := fc_ic);
   set (Hon := fc_on);
   set (Hop := fc_op);
   set (Hiv := fc_iv);
@@ -43,12 +45,11 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {fc : field_char_0_archim T}.
-Context {Hic : rngl_mul_is_comm T = true}.
 
 Tactic Notation "pauto" := progress auto.
 Hint Resolve rngl_le_refl : core.
 
-Add Ring rngl_ring : (rngl_ring_theory Hic fc_op fc_on).
+Add Ring rngl_ring : (rngl_ring_theory fc_ic fc_op fc_on).
 
 Theorem fold_Rminus : ∀ x y, (x + - y = x - y)%L.
 Proof. apply (rngl_add_opp_r fc_op). Qed.
@@ -60,7 +61,7 @@ Theorem fold_Rsqr : ∀ x, (x * x = x²)%L.
 Proof. apply fold_rngl_squ. Qed.
 
 Theorem Rmult_div : ∀ x y z, (x * y / z = x / z * y)%L.
-Proof. intros; symmetry; apply (rngl_div_mul_mul_div Hic fc_iv). Qed.
+Proof. intros; symmetry; apply (rngl_div_mul_mul_div fc_ic fc_iv). Qed.
 
 Theorem Rdiv_mult : ∀ x y z, (x * (y / z) = x * y / z)%L.
 Proof. apply (rngl_mul_div_assoc fc_iv). Qed.
@@ -99,7 +100,7 @@ Theorem Rplus_shuffle0 : ∀ n m p, (n + m + p = n + p + m)%L.
 Proof. apply rngl_add_add_swap. Qed.
 
 Theorem Rmult_shuffle0 : ∀ n m p, (n * m * p = n * p * m)%L.
-Proof. apply (rngl_mul_mul_swap Hic). Qed.
+Proof. apply (rngl_mul_mul_swap fc_ic). Qed.
 
 Theorem Rdiv_mult_simpl_l : ∀ x y z,
   x ≠ 0%L
@@ -127,7 +128,7 @@ Proof.
 intros * Hy Hz.
 specialize (Rdiv_mult_simpl_l z x y Hz Hy) as H.
 rewrite <- H.
-do 2 rewrite (rngl_mul_comm Hic z).
+do 2 rewrite (rngl_mul_comm fc_ic z).
 easy.
 Qed.
 

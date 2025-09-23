@@ -40,17 +40,33 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {fc : field_char_0_archim T}.
-Context {Hic : rngl_mul_is_comm T = true}.
-Context {Hon : rngl_has_1 T = true}.
-Context {Hop : rngl_has_opp T = true}.
-Context {Hiv : rngl_has_inv T = true}.
-Context {Hch : rngl_characteristic T = 0}.
-Context {Hor : rngl_is_ordered T = true}.
+
+Let Hic := fc_ic.
+Let Hon := fc_on.
+Let Hop := fc_op.
+Let Hiv := fc_iv.
+Let Hch := fc_ch.
+Let Hor := fc_or.
 
 Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+
+Ltac fold_rngl :=
+  replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul by easy;
+  replace (let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero by easy;
+  replace
+    (match
+        (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
+     with
+     | Some a => a
+     | None => 0%L
+     end) with 1%L by easy.
 
 Definition mkrmat := @mkmat T.
 
@@ -321,12 +337,11 @@ unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
-...
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
-  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
-  now cbn in H1; rewrite rngl_add_0_r in H1.
+  rewrite rngl_add_comm.
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 }
 now f_equal; field.
 Qed.
@@ -541,7 +556,6 @@ Proof.
 specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
 unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, rngl_div; rewrite Hiv.
-(**)
 do 18 rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
@@ -554,39 +568,53 @@ split; [ now f_equal; try field | now field ].
 
 Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
+specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+assert (H30 : (1 + 2 ≠ 0)%L). {
+  rewrite rngl_add_comm.
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+}
 unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
-...
-unfold mat_id, Rdiv.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rmult_0_r.
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite <- Rmult_assoc.
-progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
-split; [ f_equal; field | field ].
+progress unfold mat_id.
+progress unfold rngl_div; rewrite Hiv.
+progress repeat rewrite (rngl_mul_0_l Hos).
+progress repeat rewrite (rngl_mul_0_r Hos).
+progress repeat rewrite (rngl_mul_1_l Hon).
+progress repeat rewrite rngl_add_0_l.
+progress repeat rewrite rngl_add_0_r.
+progress repeat rewrite rngl_mul_assoc.
+progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | easy ]).
+split; [ now f_equal; field | now field ].
 Qed.
 
 Theorem rot_z_is_rotation_matrix : is_rotation_matrix rot_z.
 Proof.
+specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+assert (H30 : (1 + 2 ≠ 0)%L). {
+  rewrite rngl_add_comm.
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+}
 unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
-unfold mat_id, Rdiv.
-progress repeat rewrite Rmult_0_l.
-progress repeat rewrite Rmult_0_r.
-progress repeat rewrite Rmult_1_l.
-progress repeat rewrite Rplus_0_l.
-progress repeat rewrite Rplus_0_r.
-progress repeat rewrite Rminus_0_l.
-progress repeat rewrite Rminus_0_r.
-progress repeat rewrite Ropp_mult_distr_l.
-progress repeat rewrite <- Rmult_assoc.
-progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | lra ]).
-split; [ f_equal; field | field ].
+progress unfold mat_id.
+progress unfold rngl_div; rewrite Hiv.
+(**)
+progress repeat rewrite (rngl_mul_0_l Hos).
+progress repeat rewrite (rngl_mul_0_r Hos).
+progress repeat rewrite (rngl_mul_1_l Hon).
+progress repeat rewrite (rngl_mul_1_r Hon).
+progress repeat rewrite rngl_add_0_l.
+progress repeat rewrite rngl_add_0_r.
+progress repeat rewrite (rngl_sub_0_l Hop).
+progress repeat rewrite (rngl_sub_0_r Hos).
+progress repeat rewrite <- (rngl_mul_opp_l Hop).
+progress repeat rewrite rngl_mul_assoc.
+progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | easy ]).
+split; [ now f_equal; field | now field ].
 Qed.
 
 Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
 Proof.
 unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
+...
 unfold mat_id, Rdiv.
 progress repeat rewrite Rmult_0_l.
 progress repeat rewrite Rmult_0_r.

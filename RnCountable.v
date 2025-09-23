@@ -15,11 +15,10 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {fc : field_char_0_archim T}.
-Context {Hic : rngl_mul_is_comm T = true}.
 
-Add Ring rngl_ring : (rngl_ring_theory Hic fc_op fc_on).
+Add Ring rngl_ring : (rngl_ring_theory fc_ic fc_op fc_on).
 Add Field rngl_field :
-  (rngl_field_theory Hic fc_op fc_on fc_iv
+  (rngl_field_theory fc_ic fc_op fc_on fc_iv
     (eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) fc_ch)).
 
 Definition ter_bin_of_frac_part x n :=
@@ -76,9 +75,8 @@ destruct (u i). {
     apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_2 Hon Hos Hiq Hor).
   }
-  rewrite <- (@Rdiv_mult_simpl_r _ _ _ fc Hic pow 2 3)%L;
-    [ | easy | easy ].
-  rewrite <- (@Rdiv_mult_simpl_r _ _ _ fc Hic pow 3 2)%L at 2;
+  rewrite <- (@Rdiv_mult_simpl_r _ _ _ fc pow 2 3)%L; [ | easy | easy ].
+  rewrite <- (@Rdiv_mult_simpl_r _ _ _ fc pow 3 2)%L at 2;
     [ | easy | easy ].
   rewrite (rngl_mul_comm Hic 3 2).
   rewrite <- (rngl_div_sub_distr_r Hop Hiv).
