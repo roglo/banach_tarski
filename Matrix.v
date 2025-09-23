@@ -52,6 +52,7 @@ Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
 
 Ltac fold_rngl :=
   replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul)
@@ -714,30 +715,35 @@ destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
 simpl in Hm; simpl.
 injection Hm; clear Hm; intros H₃ H₂ H₁.
-...
-unfold Rdiv; setoid_rewrite Rmult_shuffle0.
+(**)
+do 3 rewrite (rngl_div_mul_mul_div Hic Hiv).
 rewrite <- H₁, <- H₂, <- H₃.
-setoid_rewrite Rmult_shuffle0.
-rewrite Rinv_r; [ | easy ].
-now do 3 rewrite Rmult_1_l.
+do 3 rewrite (rngl_mul_comm Hic a).
+do 3 (rewrite (rngl_mul_div Hi1); [ | easy ]).
+easy.
 Qed.
 
-Theorem vec_norm_nonneg : ∀ v, 0 ≤ ‖v‖.
-Proof.
-intros (x, y, z); simpl.
-apply sqrt_pos.
-Qed.
-
-Theorem nonneg_sqr_vec_norm : ∀ x y z, 0 ≤ x² + y² + z².
+Theorem nonneg_sqr_vec_norm : ∀ x y z, (0 ≤ x² + y² + z²)%L.
 Proof.
 intros.
-apply Rplus_le_le_0_compat; [ | apply Rle_0_sqr ].
-apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+Qed.
+
+Theorem vec_norm_nonneg : ∀ v, (0 ≤ ‖v‖)%L.
+Proof.
+intros (x, y, z); simpl.
+apply rl_sqrt_nonneg.
+apply nonneg_sqr_vec_norm.
 Qed.
 
 Theorem vec_norm_opp : ∀ v, ‖(- v)‖ = ‖v‖.
 Proof.
 intros (x, y, z); simpl.
+...
 now do 3 rewrite <- Rsqr_neg.
 Qed.
 
