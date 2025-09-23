@@ -53,6 +53,8 @@ Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
 Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
+Let Hio := rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor.
+Let Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
 
 Ltac fold_rngl :=
   replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul)
@@ -763,23 +765,27 @@ Theorem sqr_vec_norm_eq_0 : ∀ x y z,
   → (x = 0 ∧ y = 0 ∧ z = 0)%L.
 Proof.
 intros * H.
-...
-apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
- destruct H as (H₁, H₂).
- apply Rplus_sqr_eq_0 in H₁.
- apply Rsqr_eq_0 in H₂.
- move H₁ at top; move H₂ at top; destruct H₁; subst x y z.
- now split; [ | split ].
-
- apply Rplus_le_le_0_compat; apply Rle_0_sqr.
+apply (rngl_eq_add_0 Hos Hor) in H.
+destruct H as (H, H3).
+apply (rngl_eq_add_0 Hos Hor) in H.
+destruct H as (H1, H2).
+now apply (eq_rngl_squ_0 Hos Hio) in H1, H2, H3.
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 Qed.
 
-Theorem vec_norm_0 : ‖0‖ = 0.
+Theorem vec_norm_0 : ‖0‖ = 0%L.
 Proof.
-simpl; rewrite Rsqr_0.
-do 2 rewrite Rplus_0_l.
-apply sqrt_0.
+simpl; rewrite (rngl_squ_0 Hos).
+do 2 rewrite rngl_add_0_l.
+apply (rl_sqrt_0 Hon Hop Hor Hii).
 Qed.
+
+...
 
 Theorem vec_norm_eq_0 : ∀ v, ‖v‖ = 0 ↔ v = 0%vec.
 Proof.

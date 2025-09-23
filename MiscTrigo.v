@@ -56,7 +56,6 @@ Proof.
 destruct_ac.
 intros Hc1.
 specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
-specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii.
 specialize (rngl_1_neq_0 Hon Hc1) as H10.
 specialize (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) as H20.
 specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
