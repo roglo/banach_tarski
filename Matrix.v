@@ -785,43 +785,45 @@ do 2 rewrite rngl_add_0_l.
 apply (rl_sqrt_0 Hon Hop Hor Hii).
 Qed.
 
-...
-
-Theorem vec_norm_eq_0 : ∀ v, ‖v‖ = 0 ↔ v = 0%vec.
+Theorem vec_norm_eq_0 : ∀ v, ‖v‖ = 0%L ↔ v = 0%vec.
 Proof.
 intros.
-split; intros Hv.
- destruct v as (v₁, v₂, v₃); simpl in Hv.
- apply sqrt_eq_0 in Hv; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in Hv.
- now destruct Hv as (H₁ & H₂ & H₃); subst.
-
- destruct v as (v₁, v₂, v₃); simpl.
- injection Hv; clear Hv; intros; subst.
- rewrite Rsqr_0, Rplus_0_r, Rplus_0_r.
- apply sqrt_0.
+split; intros Hv. {
+  destruct v as (v₁, v₂, v₃); simpl in Hv.
+  apply (eq_rl_sqrt_0 Hon Hos) in Hv.
+  apply sqr_vec_norm_eq_0 in Hv.
+  now destruct Hv as (H1 & H2 & H3); subst.
+  apply nonneg_sqr_vec_norm.
+}
+destruct v as (v₁, v₂, v₃); simpl.
+injection Hv; clear Hv; intros; subst.
+rewrite (rngl_squ_0 Hos).
+do 2 rewrite rngl_add_0_r.
+apply (rl_sqrt_0 Hon Hop Hor Hii).
 Qed.
 
-Theorem vec_norm_neq_0 : ∀ v, ‖v‖ ≠ 0 ↔ v ≠ 0%vec.
+Theorem vec_norm_neq_0 : ∀ v, ‖v‖ ≠ 0%L ↔ v ≠ 0%vec.
 Proof.
 intros v.
 now split; intros H1 H2; apply vec_norm_eq_0 in H2.
 Qed.
 
-Theorem vec_norm_pos : ∀ v, v ≠ 0%vec → 0 < ‖v‖.
+Theorem vec_norm_pos : ∀ v, v ≠ 0%vec → (0 < ‖v‖)%L.
 Proof.
 intros * Hv.
 specialize (vec_norm_nonneg v) as H.
-apply vec_norm_neq_0 in Hv; lra.
+apply vec_norm_neq_0 in Hv.
+now apply (rngl_le_neq Hor).
 Qed.
 
 Theorem vec_add_0_r : ∀ v, (v + 0 = v)%vec.
 Proof.
-intros (x, y, z); simpl; f_equal; lra.
+intros (x, y, z); simpl; f_equal; apply rngl_add_0_r.
 Qed.
 
 Theorem vec_sub_0_r : ∀ v, (v - 0 = v)%vec.
 Proof.
+...
 intros (x, y, z); simpl; f_equal; lra.
 Qed.
 
