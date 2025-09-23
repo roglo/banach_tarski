@@ -749,18 +749,21 @@ Qed.
 Theorem vec_norm_vec_const_mul : ∀ a v, ‖(a ⁎ v)‖ = (rngl_abs a * ‖v‖)%L.
 Proof.
 intros a (x, y, z); simpl.
-...
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite sqrt_mult; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
-now rewrite sqrt_Rsqr_abs.
+do 3 rewrite (rngl_squ_mul Hic).
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite rl_sqrt_mul.
+progress f_equal.
+apply (rl_sqrt_squ Hon Hop Hor).
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply nonneg_sqr_vec_norm.
 Qed.
 
 Theorem sqr_vec_norm_eq_0 : ∀ x y z,
-  x² + y² + z² = 0
-  → x = 0 ∧ y = 0 ∧ z = 0.
+  (x² + y² + z² = 0)%L
+  → (x = 0 ∧ y = 0 ∧ z = 0)%L.
 Proof.
 intros * H.
+...
 apply Rplus_eq_R0 in H; [ | | apply Rle_0_sqr ].
  destruct H as (H₁, H₂).
  apply Rplus_sqr_eq_0 in H₁.
