@@ -823,26 +823,26 @@ Qed.
 
 Theorem vec_sub_0_r : ∀ v, (v - 0 = v)%vec.
 Proof.
-...
-intros (x, y, z); simpl; f_equal; lra.
+intros (x, y, z); cbn; f_equal; rewrite (rngl_opp_0 Hop); apply rngl_add_0_r.
 Qed.
 
 Theorem vec_const_mul_0_l : ∀ v, (0 ⁎ v = 0)%vec.
 Proof.
 intros (x, y, z); simpl.
-now do 3 rewrite Rmult_0_l.
+now do 3 rewrite (rngl_mul_0_l Hos).
 Qed.
 
 Theorem vec_const_mul_0_r : ∀ a, (a ⁎ 0 = 0)%vec.
 Proof.
 intros x; simpl.
-now rewrite Rmult_0_r.
+now rewrite (rngl_mul_0_r Hos).
 Qed.
 
 Theorem vec_const_mul_1_l : ∀ v, 1 ⁎ v = v.
 Proof.
 intros (x, y, z).
 unfold vec_const_mul.
+...
 now do 3 rewrite Rmult_1_l.
 Qed.
 
