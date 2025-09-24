@@ -21,8 +21,11 @@ Add Field rngl_field :
   (rngl_field_theory fc_ic fc_op fc_on fc_iv
     (eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) fc_ch)).
 
+Definition ter_bin_of_frac_part x n := (1 / 3 ≤? frac_part (x * 3 ^ n))%L.
+(*
 Definition ter_bin_of_frac_part x n :=
-  if rngl_lt_dec fc_or (frac_part (x * 3 ^ n)) (1 / 3) then false else true.
+  if (frac_part (x * 3 ^ n) <? (1 / 3))%L then false else true.
+*)
 
 Fixpoint partial_sum3_aux k (u : nat → bool) pow i :=
   match k with
@@ -730,8 +733,12 @@ split. {
 intros n.
 clear E Hr1 Hr2.
 unfold ter_bin_of_frac_part; symmetry.
-progress fold Hor.
-destruct (rngl_lt_dec Hor (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
+destruct (rngl_ltb_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
+  apply rngl_ltb_lt in H1.
+  generalize H1; intros H.
+  apply rngl_nle_gt in H.
+  apply rngl_leb_nle in H.
+  rewrite H; clear H.
   progress unfold frac_part in H1.
   rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
   rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
@@ -752,7 +759,10 @@ destruct (rngl_lt_dec Hor (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
   apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
 }
-apply (rngl_nlt_ge_iff Hor) in H1.
+apply (rngl_ltb_ge_iff Hor) in H1.
+apply rngl_leb_le in H1.
+rewrite H1.
+apply rngl_leb_le in H1.
 unfold frac_part in H1.
 rewrite (Int_part_eq_partial_sum3 u) in H1; [ | easy | easy ].
 rewrite <- (rngl_mul_sub_distr_r Hop) in H1.
@@ -770,7 +780,6 @@ apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
   rewrite (rngl_inv_mul_distr Hon Hos Hiv) in H.
   set (s := partial_sum3 u n) in H1, H.
   set (t := ((3 * 3 ^ n))⁻¹) in H1, H.
-(**)
   enough (H2 : (0 < t)%L). {
     apply rngl_nlt_ge in H.
     apply H; clear H.
