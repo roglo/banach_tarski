@@ -51,12 +51,6 @@ Hint Resolve rngl_le_refl : core.
 
 Add Ring rngl_ring : (rngl_ring_theory fc_ic fc_op fc_on).
 
-Theorem Ropp_div_r : ∀ x y, y ≠ 0%L → (x / - y = - (x / y))%L.
-Proof.
-destruct_fc.
-now apply (rngl_div_opp_r Hon Hop Hiv).
-Qed.
-
 Theorem Rmult_div_same : ∀ x y, (y ≠ 0 → x / y * y = x)%L.
 Proof.
 destruct_fc.
@@ -2529,7 +2523,7 @@ destruct_fc.
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
 destruct (Rcase_abs y) as [Hy| Hy]. {
-  do 2 rewrite (Ropp_div_r _ _ Hyz).
+  do 2 rewrite (rngl_div_opp_r Hon Hop Hiv _ _ Hyz).
   rewrite (rngl_div_add_distr_r Hiv).
   rewrite (rngl_div_diag Hon Hiq); [ | easy ].
   do 2 rewrite Int_part_opp.
@@ -2739,7 +2733,7 @@ destruct_fc.
 intros.
 unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (y * z)) as [Hyz| Hyz]; [ | now rewrite Z.add_0_r ].
-rewrite Ropp_div_r. 2: {
+rewrite (rngl_div_opp_r Hon Hop Hiv). 2: {
   intros H; rewrite H in Hyz.
   now apply (rngl_lt_irrefl Hor) in Hyz.
 }
@@ -2942,10 +2936,11 @@ destruct n as [| n| n]. {
   }
   rewrite (rngl_pow_1_r Hon), Zabs2Nat.inj_mul.
   simpl (Z.abs_nat 2); unfold Pos.to_nat; simpl (Pos.iter_op _ _ _).
-  rewrite Ropp_div_r; [ | apply (rngl_1_neq_0_iff Hon); congruence ].
+  rewrite (rngl_div_opp_r Hon Hop Hiv).
   rewrite (rngl_div_1_r Hon Hiq); [ | now left ].
   progress f_equal.
   apply (rngl_pow_opp_1_even Hon Hop).
+  now apply (rngl_1_neq_0_iff Hon).
 }
 Qed.
 
