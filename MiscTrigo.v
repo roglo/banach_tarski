@@ -32,10 +32,10 @@ Definition rngl_atan' (x y : T) :=
   else rngl_atan (x / y).
 
 Definition angle_of_sin_cos s c :=
-  if rngl_lt_dec ac_or s 0 then
-    if rngl_lt_dec ac_or c 0 then (- rngl_acos c)%A else rngl_asin s
+  if (s <? 0)%L then
+    if (c <? 0)%L then (- rngl_acos c)%A else rngl_asin s
   else
-    if rngl_lt_dec ac_or c 0 then rngl_acos c else rngl_asin s.
+    if (c <? 0)%L then rngl_acos c else rngl_asin s.
 
 Theorem angle_lt_sub_lt_add_l_1 :
   ∀ θ1 θ2 θ3 : angle T,
@@ -72,7 +72,7 @@ destruct xz. {
     apply -> angle_sub_move_0_r in H.
     symmetry in H.
     progress unfold rngl_acos in H.
-    destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
+    destruct (rngl_leb_dec (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
       apply eq_angle_eq in H.
       cbn in H.
       now injection H; clear H; intros.
@@ -98,7 +98,8 @@ destruct xz. {
   }
   progress unfold rngl_asin.
   progress unfold rngl_acos.
-  destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
+  destruct (rngl_leb_dec (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
+    apply rngl_leb_nle in Hx1.
     exfalso; apply Hx1; clear Hx1.
     rewrite <- (rngl_squ_1 Hon).
     apply (rngl_le_le_squ Hon Hop Hiq Hor).
@@ -142,6 +143,7 @@ destruct xz. {
   rewrite (rngl_0_leb_1 Hon Hos Hiq Hor).
   remember (0 ≤? _)%L as zx eqn:Hzx.
   symmetry in Hzx.
+  apply rngl_leb_le in Hx1.
   destruct zx. {
     apply rngl_ltb_lt.
     apply (rl_sqrt_pos Hon Hos Hor).
@@ -232,7 +234,8 @@ destruct xz. {
   (* presque pareil que ci-dessus *)
   progress unfold rngl_asin.
   progress unfold rngl_acos.
-  destruct (rngl_le_dec ac_or (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
+  destruct (rngl_leb_dec (∣ x ∣ / √(1 + x²))² 1) as [Hx1| Hx1]. 2: {
+    apply rngl_leb_nle in Hx1.
     exfalso; apply Hx1; clear Hx1.
     rewrite <- (rngl_squ_1 Hon).
     apply (rngl_le_le_squ Hon Hop Hiq Hor).
@@ -268,6 +271,7 @@ destruct xz. {
   progress unfold angle_opp.
   progress unfold angle_ltb.
   cbn.
+  apply rngl_leb_le in Hx1.
   do 2 rewrite (rngl_mul_0_l Hos).
   do 2 rewrite (rngl_mul_1_l Hon).
   rewrite rngl_add_0_r.
@@ -302,7 +306,7 @@ destruct xz. {
       rewrite (rngl_opp_0 Hop) in H.
       now symmetry in H.
     }
-    apply (rngl_leb_gt Hor) in Hxz'.
+    apply (rngl_leb_gt_iff Hor) in Hxz'.
     remember (x / _ ≤? 0)%L as zxs eqn:Hzxs.
     symmetry in Hzxs.
     destruct zxs. {
@@ -367,9 +371,8 @@ Proof.
 destruct_ac.
 intros * Ha.
 progress unfold rngl_acos.
-progress fold Hor.
-remember (rngl_le_dec Hor _ _) as oa1 eqn:Hoa1.
-remember (rngl_le_dec Hor _ _) as a1 eqn:Ha1 in |-*.
+remember (rngl_leb_dec _ _) as oa1 eqn:Hoa1.
+remember (rngl_leb_dec _ _) as a1 eqn:Ha1 in |-*.
 symmetry in Hoa1, Ha1.
 destruct oa1 as [Hox1| Hox1]. {
   destruct a1 as [Hx1| Hx1]. {
@@ -384,10 +387,12 @@ destruct oa1 as [Hox1| Hox1]. {
     now rewrite (rngl_opp_involutive Hop).
   }
   exfalso; clear Hoa1 Ha1.
-  now rewrite (rngl_squ_opp Hop) in Hox1.
+  rewrite (rngl_squ_opp Hop) in Hox1; try easy.
+  congruence.
 }
 destruct a1 as [Hx1| Hx1]. {
   exfalso; clear Hoa1 Ha1.
+...
   now rewrite (rngl_squ_opp Hop) in Hox1.
 }
 exfalso; clear Hoa1 Ha1.
@@ -680,7 +685,7 @@ destruct az. {
   now apply (rngl_div_diag Hon Hiq).
 }
 rewrite (rngl_div_diag Hon Hiq); [ symmetry | easy ].
-apply (rngl_leb_gt Hor) in Ha.
+apply (rngl_leb_gt_iff Hor) in Ha.
 destruct az'; [ | | easy ].
 now apply (rngl_compare_eq_iff Hed) in Ha'.
 apply (rngl_compare_lt_iff Hor Hed) in Ha'.
@@ -1074,7 +1079,7 @@ intros.
 progress unfold rngl_asin.
 progress unfold rngl_acos.
 progress fold Hor.
-destruct (rngl_le_dec Hor (rngl_sin² θ) 1) as [Hs1| Hs1]. 2: {
+destruct (rngl_leb_dec (rngl_sin² θ) 1) as [Hs1| Hs1]. 2: {
   exfalso; apply Hs1; clear Hs1.
   apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
   apply rngl_sin_bound.
@@ -1096,7 +1101,7 @@ destruct zc. {
   apply (rngl_abs_nonneg_eq Hop Hor).
   now apply rngl_leb_le in Hzc.
 }
-apply (rngl_leb_gt Hor) in Hzc.
+apply (rngl_leb_gt_iff Hor) in Hzc.
 rewrite rngl_cos_sub_straight_l.
 rewrite rngl_sin_sub_straight_l.
 progress f_equal.
@@ -1134,7 +1139,7 @@ destruct sz. {
   apply angle_opp_straight.
 }
 destruct zs; [ easy | ].
-apply (rngl_leb_gt Hor) in Hzs, Hsz.
+apply (rngl_leb_gt_iff Hor) in Hzs, Hsz.
 now apply (rngl_lt_asymm Hor) in Hzs.
 Qed.
 
@@ -1159,7 +1164,7 @@ rewrite rngl_asin_cos.
 rewrite rngl_asin_sin.
 progress fold Hor.
 destruct (rngl_lt_dec Hor (rngl_sin θ) 0) as [Hsz| Hsz]. {
-  apply (rngl_leb_gt Hor) in Hsz.
+  apply (rngl_leb_gt_iff Hor) in Hsz.
   rewrite Hsz.
   rewrite angle_sub_add_distr.
   rewrite angle_sub_diag.
