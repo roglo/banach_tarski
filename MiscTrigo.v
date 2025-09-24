@@ -392,11 +392,12 @@ destruct oa1 as [Hox1| Hox1]. {
 }
 destruct a1 as [Hx1| Hx1]. {
   exfalso; clear Hoa1 Ha1.
-...
-  now rewrite (rngl_squ_opp Hop) in Hox1.
+  rewrite (rngl_squ_opp Hop) in Hox1.
+  congruence.
 }
 exfalso; clear Hoa1 Ha1.
-apply Hx1.
+apply Bool.not_true_iff_false in Hx1.
+apply Hx1, rngl_leb_le.
 now apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
 Qed.
 
@@ -1078,9 +1079,10 @@ destruct_ac.
 intros.
 progress unfold rngl_asin.
 progress unfold rngl_acos.
-progress fold Hor.
 destruct (rngl_leb_dec (rngl_sin² θ) 1) as [Hs1| Hs1]. 2: {
+  apply Bool.not_true_iff_false in Hs1.
   exfalso; apply Hs1; clear Hs1.
+  apply rngl_leb_le.
   apply (rngl_squ_le_1_iff Hon Hop Hiq Hor).
   apply rngl_sin_bound.
 }
@@ -1162,15 +1164,39 @@ unfold angle_of_sin_cos.
 rewrite rngl_acos_cos.
 rewrite rngl_asin_cos.
 rewrite rngl_asin_sin.
-progress fold Hor.
-destruct (rngl_lt_dec Hor (rngl_sin θ) 0) as [Hsz| Hsz]. {
+destruct (rngl_ltb_dec (rngl_sin θ) 0) as [Hsz| Hsz]. {
+(**)
+  rewrite Hsz.
+  apply rngl_ltb_lt in Hsz.
   apply (rngl_leb_gt_iff Hor) in Hsz.
   rewrite Hsz.
   rewrite angle_sub_add_distr.
   rewrite angle_sub_diag.
   rewrite angle_sub_0_l.
   rewrite angle_opp_involutive.
-  destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hcz| Hcz]; [ easy | ].
+Theorem rngl_leb_neg_ltb : ∀ a b, (a ≤? b = negb (b <? a))%L.
+Proof.
+intros.
+... ...
+Theorem glip : ∀ a b, (a <? b = negb (b ≤? a))%L.
+... ...
+rewrite glip.
+  now destruct (rngl_leb_dec 0 (rngl_cos θ)) as [Hcz| Hcz]; rewrite Hcz.
+...
+Search ((_ ≤? _) = _)%L.
+  destruct (rngl_ltb_dec (rngl_cos θ) 0) as [Hcz| Hcz]; [ now rewrite Hcz | ].
+  rewrite Hcz.
+...
+  apply rngl_leb_le in Hcz.
+  apply (rngl_nlt_ge_iff Hor) in Hcz.
+  now rewrite Hcz.
+...
+  rewrite Hsz.
+  rewrite angle_sub_add_distr.
+  rewrite angle_sub_diag.
+  rewrite angle_sub_0_l.
+  rewrite angle_opp_involutive.
+  destruct (rngl_ltb_dec (rngl_cos θ) 0) as [Hcz| Hcz]; [ easy | ].
   apply (rngl_nlt_ge_iff Hor) in Hcz.
   apply rngl_leb_le in Hcz.
   now rewrite Hcz.
@@ -1181,7 +1207,7 @@ rewrite Hsz.
 rewrite angle_sub_sub_distr.
 rewrite angle_sub_diag.
 rewrite angle_add_0_l.
-destruct (rngl_lt_dec Hor (rngl_cos θ) 0) as [Hcz| Hcz]; [ easy | ].
+destruct (rngl_ltb_dec (rngl_cos θ) 0) as [Hcz| Hcz]; [ easy | ].
 apply (rngl_nlt_ge_iff Hor) in Hcz.
 apply rngl_leb_le in Hcz.
 now rewrite Hcz.

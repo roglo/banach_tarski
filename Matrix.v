@@ -152,12 +152,12 @@ Definition rot_inv_z := mkmat
   0         0         1.
 
 Definition is_neg_vec '(V x y z) :=
-  if rngl_lt_dec Hor x 0 then true
-  else if rngl_lt_dec Hor 0 x then false
-  else if rngl_lt_dec Hor y 0 then true
-  else if rngl_lt_dec Hor 0 y then false
-  else if rngl_lt_dec Hor z 0 then true
-  else if rngl_lt_dec Hor 0 z then false
+  if (x <? 0)%L then true
+  else if (0 <? x)%L then false
+  else if (y <? 0)%L then true
+  else if (0 <? y)%L then false
+  else if (z <? 0)%L then true
+  else if (0 <? z)%L then false
   else true.
 
 Arguments is_neg_vec _%_vec.
@@ -856,8 +856,11 @@ Theorem is_neg_vec_neg_vec : ∀ v,
   → is_neg_vec (- v) = negb (is_neg_vec v).
 Proof.
 intros (x, y, z) Hv; simpl.
-About rngl_eq_dec.
-Check rngl_eqb_dec.
+(**)
+destruct (rngl_ltb_dec x 0) as [Hx| Hx]. {
+  rewrite Hx.
+  destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']. {
+    rewrite Hx'.
 ...
 destruct (Rlt_dec x 0) as [Hx| Hx].
  destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
