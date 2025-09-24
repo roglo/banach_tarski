@@ -132,10 +132,6 @@ do 2 rewrite (rngl_mul_comm fc_ic z).
 easy.
 Qed.
 
-(*
-Definition Rle_dec := rngl_le_dec fc_or.
-Definition Rlt_dec := rngl_lt_dec fc_or.
-*)
 Definition Req_dec :=
   let Heo := rngl_has_eq_dec_or_is_ordered_r fc_or in
   rngl_eq_dec Heo.
@@ -148,10 +144,6 @@ destruct (rngl_lt_dec Hor a 0) as [Haz| Haz]; [ now left | right ].
 now apply (rngl_nlt_ge_iff Hor).
 Qed.
 
-(*
-Arguments Rle_dec (a b)%_L.
-Arguments Rlt_dec (a b)%_L.
-*)
 Arguments Req_dec (a b)%_L.
 Arguments Rcase_abs a%_L.
 
@@ -2243,23 +2235,20 @@ destruct (rngl_le_dec Hor 0 (x * y)) as [Hxy| Hxy]. {
 }
 apply rngl_leb_nle in Hxy.
 rewrite Hxy.
-...
-destruct (rngl_le_dec Hor 0 x) as [Hx| Hx]. {
-  destruct (rngl_le_dec Hor 0 y) as [Hy| Hy]. 2: {
-    now symmetry; apply (rngl_mul_1_l Hon).
-  }
-  exfalso.
-  apply Hxy; clear Hxy.
-  now apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
+apply (rngl_leb_gt Hor) in Hxy.
+apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hxy.
+destruct Hxy as [(Hx, Hy)| (Hx, Hy)]. {
+  apply (rngl_leb_gt Hor) in Hx.
+  apply (rngl_lt_le_incl Hor) in Hy.
+  apply rngl_leb_le in Hy.
+  rewrite Hx, Hy; symmetry.
+  apply (rngl_mul_1_r Hon).
 } {
-  destruct (rngl_le_dec Hor 0 y) as [Hy| Hy]. {
-    now symmetry; apply (rngl_mul_1_r Hon).
-  }
-  exfalso.
-  apply Hxy; clear Hxy.
-  apply (rngl_nle_gt_iff Hor) in Hx, Hy.
-  apply (rngl_lt_le_incl Hor).
-  now apply (rngl_mul_neg_neg Hon Hop Hiq Hor).
+  apply (rngl_leb_gt Hor) in Hy.
+  apply (rngl_lt_le_incl Hor) in Hx.
+  apply rngl_leb_le in Hx.
+  rewrite Hx, Hy; symmetry.
+  apply (rngl_mul_1_l Hon).
 }
 Qed.
 
