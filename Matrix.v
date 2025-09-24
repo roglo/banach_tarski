@@ -857,10 +857,13 @@ Theorem is_neg_vec_neg_vec : ∀ v,
 Proof.
 intros (x, y, z) Hv; simpl.
 (**)
-destruct (rngl_ltb_dec x 0) as [Hx| Hx]. {
-  rewrite Hx.
-  destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']. {
-    rewrite Hx'.
+destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
+  destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']; rewrite Hx'. {
+    rewrite (rngl_ltb_opp_l Hop Hor) in Hx'.
+    rewrite (rngl_opp_0 Hop) in Hx'.
+    apply rngl_ltb_lt in Hx, Hx'.
+    now apply (rngl_lt_asymm Hor) in Hx.
+  }
 ...
 destruct (Rlt_dec x 0) as [Hx| Hx].
  destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
