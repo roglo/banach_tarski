@@ -1215,9 +1215,8 @@ Proof.
 destruct_ac.
 intros * Hsc.
 unfold angle_of_sin_cos.
-...
-destruct (rngl_lt_dec ac_or s 0) as [Hs| Hs]. {
-  destruct (rngl_lt_dec ac_or c 0) as [Hc| Hc]. {
+destruct (rngl_ltb_dec s 0) as [Hs| Hs]; rewrite Hs. {
+  destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
     rewrite rngl_sin_opp.
     rewrite rngl_sin_acos; [ | now apply (pre_cos_bound Hon Hop Hiq Hor s) ].
     rewrite <- Hsc.
@@ -1225,13 +1224,14 @@ destruct (rngl_lt_dec ac_or s 0) as [Hs| Hs]. {
     rewrite (rl_sqrt_squ Hon Hop Hor).
     rewrite (rngl_abs_nonpos_eq Hop Hor).
     apply (rngl_opp_involutive Hop).
+    apply rngl_ltb_lt in Hs.
     now apply (rngl_lt_le_incl Hor).
   }
   apply rngl_sin_asin.
   now apply (pre_sin_bound Hon Hop Hiq Hor _ c).
 }
-apply (rngl_nlt_ge_iff Hor) in Hs.
-destruct (rngl_lt_dec ac_or c 0) as [Hc| Hc]. {
+apply (rngl_ltb_ge_iff Hor) in Hs.
+destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
   rewrite rngl_sin_acos; [ | now apply pre_cos_bound in Hsc ].
   rewrite <- Hsc, (rngl_add_sub Hos).
   rewrite (rl_sqrt_squ Hon Hop Hor).
@@ -1248,13 +1248,13 @@ Proof.
 destruct_ac.
 intros * Hsc.
 unfold angle_of_sin_cos.
-destruct (rngl_lt_dec ac_or s 0) as [Hs| Hs]. {
-  destruct (rngl_lt_dec ac_or c 0) as [Hc| Hc]. {
+destruct (rngl_ltb_dec s 0) as [Hs| Hs]; rewrite Hs. {
+  destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
     rewrite rngl_cos_opp.
     apply rngl_cos_acos.
     now apply (pre_cos_bound Hon Hop Hiq Hor s).
   }
-  apply (rngl_nlt_ge_iff Hor) in Hc.
+  apply (rngl_ltb_ge_iff Hor) in Hc.
   rewrite rngl_cos_asin.
   rewrite <- Hsc, rngl_add_comm.
   rewrite (rngl_add_sub Hos).
@@ -1262,12 +1262,11 @@ destruct (rngl_lt_dec ac_or s 0) as [Hs| Hs]. {
   now apply (rngl_abs_nonneg_eq Hop Hor).
   now apply (pre_sin_bound Hon Hop Hiq Hor _ c).
 }
-apply (rngl_nlt_ge_iff Hor) in Hs.
-destruct (rngl_lt_dec ac_or c 0) as [Hc| Hc]. {
+destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
   apply rngl_cos_acos.
   now apply pre_cos_bound in Hsc.
 }
-apply (rngl_nlt_ge_iff Hor) in Hc.
+apply (rngl_ltb_ge_iff Hor) in Hc.
 rewrite rngl_cos_asin.
 rewrite <- Hsc, rngl_add_comm, (rngl_add_sub Hos).
 rewrite (rl_sqrt_squ Hon Hop Hor).
