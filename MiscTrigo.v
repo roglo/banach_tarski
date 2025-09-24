@@ -1164,53 +1164,19 @@ unfold angle_of_sin_cos.
 rewrite rngl_acos_cos.
 rewrite rngl_asin_cos.
 rewrite rngl_asin_sin.
-destruct (rngl_ltb_dec (rngl_sin θ) 0) as [Hsz| Hsz]. {
-(**)
-  rewrite Hsz.
-  apply rngl_ltb_lt in Hsz.
-  apply (rngl_leb_gt_iff Hor) in Hsz.
-  rewrite Hsz.
+do 2 rewrite (rngl_ltb_neg_leb Hor).
+destruct (0 ≤? rngl_cos θ)%L; cbn.
+now destruct (0 ≤? rngl_sin θ)%L.
+destruct (0 ≤? rngl_sin θ)%L; cbn. {
+  rewrite angle_sub_sub_distr.
+  rewrite angle_sub_diag.
+  apply angle_add_0_l.
+} {
   rewrite angle_sub_add_distr.
   rewrite angle_sub_diag.
   rewrite angle_sub_0_l.
-  rewrite angle_opp_involutive.
-Theorem rngl_leb_neg_ltb : ∀ a b, (a ≤? b = negb (b <? a))%L.
-Proof.
-intros.
-... ...
-Theorem glip : ∀ a b, (a <? b = negb (b ≤? a))%L.
-... ...
-rewrite glip.
-  now destruct (rngl_leb_dec 0 (rngl_cos θ)) as [Hcz| Hcz]; rewrite Hcz.
-...
-Search ((_ ≤? _) = _)%L.
-  destruct (rngl_ltb_dec (rngl_cos θ) 0) as [Hcz| Hcz]; [ now rewrite Hcz | ].
-  rewrite Hcz.
-...
-  apply rngl_leb_le in Hcz.
-  apply (rngl_nlt_ge_iff Hor) in Hcz.
-  now rewrite Hcz.
-...
-  rewrite Hsz.
-  rewrite angle_sub_add_distr.
-  rewrite angle_sub_diag.
-  rewrite angle_sub_0_l.
-  rewrite angle_opp_involutive.
-  destruct (rngl_ltb_dec (rngl_cos θ) 0) as [Hcz| Hcz]; [ easy | ].
-  apply (rngl_nlt_ge_iff Hor) in Hcz.
-  apply rngl_leb_le in Hcz.
-  now rewrite Hcz.
+  apply angle_opp_involutive.
 }
-apply (rngl_nlt_ge_iff Hor) in Hsz.
-apply rngl_leb_le in Hsz.
-rewrite Hsz.
-rewrite angle_sub_sub_distr.
-rewrite angle_sub_diag.
-rewrite angle_add_0_l.
-destruct (rngl_ltb_dec (rngl_cos θ) 0) as [Hcz| Hcz]; [ easy | ].
-apply (rngl_nlt_ge_iff Hor) in Hcz.
-apply rngl_leb_le in Hcz.
-now rewrite Hcz.
 Qed.
 
 Theorem pre_sin_bound :
@@ -1249,6 +1215,7 @@ Proof.
 destruct_ac.
 intros * Hsc.
 unfold angle_of_sin_cos.
+...
 destruct (rngl_lt_dec ac_or s 0) as [Hs| Hs]. {
   destruct (rngl_lt_dec ac_or c 0) as [Hc| Hc]. {
     rewrite rngl_sin_opp.
