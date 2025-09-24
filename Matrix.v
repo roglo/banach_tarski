@@ -856,6 +856,8 @@ Theorem is_neg_vec_neg_vec : ∀ v,
   → is_neg_vec (- v) = negb (is_neg_vec v).
 Proof.
 intros (x, y, z) Hv; simpl.
+About rngl_eq_dec.
+Check rngl_eqb_dec.
 ...
 destruct (Rlt_dec x 0) as [Hx| Hx].
  destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].

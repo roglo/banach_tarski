@@ -89,8 +89,9 @@ Theorem Rcase_abs : ∀ a, {(a < 0)%L} + {(0 ≤ a)%L}.
 Proof.
 destruct_fc.
 intros.
-destruct (rngl_lt_dec Hor a 0) as [Haz| Haz]; [ now left | right ].
-now apply (rngl_nlt_ge_iff Hor).
+destruct (rngl_ltb_dec a 0) as [Haz| Haz]; [ left | right ].
+now apply rngl_ltb_lt in Haz.
+now apply (rngl_ltb_ge_iff Hor).
 Qed.
 
 Arguments Req_dec (a b)%_L.
@@ -694,7 +695,8 @@ Proof.
 destruct_fc.
 intros.
 specialize (int_part Hon Hop Hiq Hc1 Hor Har a) as (n, Hn).
-destruct (rngl_le_dec Hor 0 a)%L as [Hza| Hza]. {
+destruct (rngl_leb_dec 0 a)%L as [Hza| Hza]. {
+  apply rngl_leb_le in Hza.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in Hn; [ | easy ].
   exists (Z.of_nat n).
   rewrite rngl_of_Z_of_nat.
@@ -704,7 +706,7 @@ destruct (rngl_le_dec Hor 0 a)%L as [Hza| Hza]. {
   rewrite rngl_of_nat_add, rngl_add_comm in Hn.
   now rewrite rngl_of_nat_1 in Hn.
 }
-apply (rngl_nle_gt_iff Hor) in Hza.
+apply (rngl_leb_gt_iff Hor) in Hza.
 rewrite (rngl_abs_nonpos_eq Hop Hor) in Hn. 2: {
   now apply (rngl_lt_le_incl Hor) in Hza.
 }
@@ -1688,7 +1690,7 @@ Qed.
 Theorem rngl_of_Z_Int_part :
   ∀ a,
   rngl_of_Z (Int_part a) =
-    (if rngl_le_dec fc_or 0 a then rngl_of_nat (nat_Int_part a)
+    (if rngl_leb_dec 0 a then rngl_of_nat (nat_Int_part a)
      else (- rngl_of_nat (nat_Int_part a))%L).
 Proof.
 destruct_fc.
@@ -1696,7 +1698,8 @@ intros.
 progress unfold nat_Int_part.
 remember (Int_part a) as z eqn:Hz.
 symmetry in Hz.
-destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
+destruct (rngl_leb_dec 0 a) as [Hza| Hza]. {
+  apply rngl_leb_le in Hza.
   destruct z as [| p| p]; [ easy | easy | exfalso ].
   assert (H : (Int_part a < 0)%Z) by now rewrite Hz.
   apply Z.nle_gt in H.
@@ -1707,7 +1710,7 @@ destruct (rngl_le_dec Hor 0 a) as [Hza| Hza]. {
   assert (H : (0 < Int_part a)%Z) by now rewrite Hz.
   apply Z.nle_gt in H.
   apply H; clear p H Hz.
-  apply (rngl_nle_gt_iff Hor) in Hza.
+  apply (rngl_leb_gt_iff Hor) in Hza.
   now apply Int_part_nonpos.
 }
 Qed.
@@ -2156,8 +2159,10 @@ destruct (Req_dec y 0) as [Hyz| Hyz]. {
   now subst; rewrite (rngl_mul_0_r Hos) in Hxyz.
 }
 fold Hor.
-destruct (rngl_le_dec Hor 0 (x * y)) as [Hxy| Hxy]. {
-  destruct (rngl_le_dec Hor 0 x) as [Hx| Hx]. {
+destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]. {
+  apply rngl_leb_le in Hxy.
+  destruct (rngl_leb_dec 0 x) as [Hx| Hx]. {
+    apply rngl_leb_le in Hx.
     symmetry.
     apply rngl_leb_le in Hxy, Hx.
     rewrite Hxy, Hx.
@@ -2169,7 +2174,6 @@ destruct (rngl_le_dec Hor 0 (x * y)) as [Hxy| Hxy]. {
     now apply (rngl_le_antisymm Hor) in Hx.
   }
   apply rngl_leb_le in Hxy.
-  apply rngl_leb_nle in Hx.
   rewrite Hxy, Hx.
   apply rngl_leb_le in Hxy.
   apply rngl_leb_nle in Hx.
@@ -2182,18 +2186,17 @@ destruct (rngl_le_dec Hor 0 (x * y)) as [Hxy| Hxy]. {
   rewrite Hy; symmetry.
   apply (rngl_squ_opp_1 Hon Hop).
 }
-apply rngl_leb_nle in Hxy.
 rewrite Hxy.
-apply (rngl_leb_gt Hor) in Hxy.
+apply (rngl_leb_gt_iff Hor) in Hxy.
 apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hxy.
 destruct Hxy as [(Hx, Hy)| (Hx, Hy)]. {
-  apply (rngl_leb_gt Hor) in Hx.
+  apply (rngl_leb_gt_iff Hor) in Hx.
   apply (rngl_lt_le_incl Hor) in Hy.
   apply rngl_leb_le in Hy.
   rewrite Hx, Hy; symmetry.
   apply (rngl_mul_1_r Hon).
 } {
-  apply (rngl_leb_gt Hor) in Hy.
+  apply (rngl_leb_gt_iff Hor) in Hy.
   apply (rngl_lt_le_incl Hor) in Hx.
   apply rngl_leb_le in Hx.
   rewrite Hx, Hy; symmetry.
@@ -2300,7 +2303,7 @@ remember (Rediv_mod x y) as rdm eqn:Hrdm.
 symmetry in Hrdm.
 destruct rdm as (q, r).
 unfold Rediv_mod in Hrdm.
-destruct (rngl_lt_dec Hor y 0) as [Hy| Hy]. {
+destruct (rngl_ltb_dec y 0) as [Hy| Hy]. {
   remember Z.sub as f.
   injection Hrdm; clear Hrdm; intros Hr Hq; subst f.
   now rewrite Hq in Hr.
@@ -2443,7 +2446,8 @@ destruct z as [| p| p]; cbn. {
 } {
   rewrite rngl_of_Z_Int_part.
   fold Hor.
-  destruct (rngl_le_dec Hor 0 (- _)) as [Hzp| Hzp]. {
+  destruct (rngl_leb_dec 0 (- _)) as [Hzp| Hzp]. {
+    apply rngl_leb_le in Hzp.
     exfalso.
     apply (rngl_opp_le_compat Hop Hor) in Hzp.
     rewrite (rngl_opp_involutive Hop) in Hzp.
@@ -2838,12 +2842,12 @@ Qed.
 
 Theorem frac_part_double : ∀ x,
   frac_part (2 * x) =
-    (2 * frac_part x -
-       if rngl_lt_dec fc_or (frac_part x) (1 / 2) then 0 else 1)%L.
+    (2 * frac_part x - if rngl_ltb_dec (frac_part x) (1 / 2) then 0 else 1)%L.
 Proof.
 destruct_fc.
 intros.
-destruct (rngl_lt_dec Hor (frac_part x) (1 / 2)) as [Hx| Hx]. {
+destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
+  apply rngl_ltb_lt in Hx.
   rewrite (rngl_sub_0_r Hos).
   do 2 rewrite (rngl_mul_2_l Hon).
   apply plus_frac_part2.
@@ -2851,7 +2855,7 @@ destruct (rngl_lt_dec Hor (frac_part x) (1 / 2)) as [Hx| Hx]. {
   apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hx; [ easy | ].
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
-apply (rngl_nlt_ge_iff Hor) in Hx.
+apply (rngl_ltb_ge_iff Hor) in Hx.
 do 2 rewrite (rngl_mul_2_l Hon).
 apply (rngl_le_div_l Hon Hop Hiv Hor) in Hx. 2: {
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
@@ -2862,13 +2866,13 @@ Qed.
 
 Theorem Int_part_double : ∀ x,
   Int_part (2 * x) =
-    (2 * Int_part x +
-       if rngl_lt_dec fc_or (frac_part x) (1 / 2) then 0 else 1)%Z.
+    (2 * Int_part x + if rngl_ltb_dec (frac_part x) (1 / 2) then 0 else 1)%Z.
 Proof.
 destruct_fc.
 intros.
 rewrite (rngl_mul_2_l Hon).
-destruct (rngl_lt_dec Hor (frac_part x) (1 / 2)) as [Hx| Hx]. {
+destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
+  apply rngl_ltb_lt in Hx.
   rewrite plus_Int_part2. {
     rewrite Z.add_0_r.
     apply Z.add_diag.
@@ -2882,7 +2886,7 @@ destruct (rngl_lt_dec Hor (frac_part x) (1 / 2)) as [Hx| Hx]. {
     apply Z.add_diag.
   }
   rewrite <- (rngl_mul_2_r Hon).
-  apply (rngl_nlt_ge_iff Hor) in Hx.
+  apply (rngl_ltb_ge_iff Hor) in Hx.
   apply (rngl_le_div_l Hon Hop Hiv Hor) in Hx; [ easy | ].
   apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
 }
