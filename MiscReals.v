@@ -2146,57 +2146,61 @@ intros.
 apply (rngl_add_squ_nonneg Hon Hos Hiq Hor).
 Qed.
 
-Definition Rsignp x := (if rngl_le_dec fc_or 0 x then 1 else -1)%L.
-Definition Rsign x := (if Req_dec x 0 then 0 else Rsignp x)%L.
+Definition rngl_signp x := (if 0 ≤? x then 1 else -1)%L.
+Definition Rsign x := (if Req_dec x 0 then 0 else rngl_signp x)%L.
 
 Arguments Rsign x%_L.
 
-Theorem Rsignp_of_pos : ∀ x, (0 ≤ x → Rsignp x = 1)%L.
+Theorem Rsignp_of_pos : ∀ x, (0 ≤ x → rngl_signp x = 1)%L.
 Proof.
 destruct_fc.
 intros * Hx.
-unfold Rsignp.
-now destruct (rngl_le_dec fc_or 0 x).
+unfold rngl_signp.
+apply rngl_leb_le in Hx.
+now rewrite Hx.
 Qed.
 
-Theorem Rsignp_of_neg : ∀ x, (x < 0 → Rsignp x = -1)%L.
+Theorem Rsignp_of_neg : ∀ x, (x < 0 → rngl_signp x = -1)%L.
 Proof.
 destruct_fc.
 intros * Hx.
-unfold Rsignp.
+unfold rngl_signp.
 apply rngl_nle_gt in Hx.
-now destruct (rngl_le_dec fc_or 0 x).
+apply rngl_leb_nle in Hx.
+now rewrite Hx.
 Qed.
 
 Theorem Rsign_of_pos : ∀ x, (0 < x → Rsign x = 1)%L.
 Proof.
 destruct_fc.
 intros * Hx.
-unfold Rsign, Rsignp.
+unfold Rsign, rngl_signp.
 destruct (Req_dec x 0) as [H | H]. {
   now subst; apply (rngl_lt_irrefl Hor) in Hx.
 }
 apply (rngl_lt_le_incl Hor) in Hx.
-now destruct (rngl_le_dec fc_or 0 x).
+apply rngl_leb_le in Hx.
+now rewrite Hx.
 Qed.
 
 Theorem Rsign_of_neg : ∀ x, (x < 0 → Rsign x = -1)%L.
 Proof.
 destruct_fc.
 intros * Hx.
-unfold Rsign, Rsignp.
+unfold Rsign, rngl_signp.
 destruct (Req_dec x 0). {
   now subst; apply (rngl_lt_irrefl Hor) in Hx.
 }
 apply rngl_nle_gt in Hx.
-now destruct (rngl_le_dec fc_or 0 x).
+apply rngl_leb_nle in Hx.
+now rewrite Hx.
 Qed.
 
 Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = (Rsign x * Rsign y)%L.
 Proof.
 destruct_fc.
 intros.
-unfold Rsign, Rsignp.
+unfold Rsign, rngl_signp.
 destruct (Req_dec (x * y) 0) as [Hxyz| Hxyz]. {
   symmetry.
   destruct (Req_dec x 0) as [Hx| Hx]; [ apply (rngl_mul_0_l Hos) | ].
@@ -2214,24 +2218,32 @@ fold Hor.
 destruct (rngl_le_dec Hor 0 (x * y)) as [Hxy| Hxy]. {
   destruct (rngl_le_dec Hor 0 x) as [Hx| Hx]. {
     symmetry.
-    destruct (rngl_le_dec Hor 0 y) as [Hy| Hy].
-    apply (rngl_mul_1_l Hon).
+    apply rngl_leb_le in Hxy, Hx.
+    rewrite Hxy, Hx.
+    apply rngl_leb_le in Hxy, Hx.
+    rewrite (rngl_mul_1_l Hon).
     apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hxy.
-    destruct Hxy as [| (H, _)]; [ easy | ].
-    apply (rngl_le_antisymm Hor) in H; [ | easy ].
-    now symmetry in H.
+    destruct Hxy as [(_, Hy)| (Hx', Hy')].
+    now apply rngl_leb_le in Hy; rewrite Hy.
+    now apply (rngl_le_antisymm Hor) in Hx.
   }
-  destruct (rngl_le_dec Hor 0 y) as [Hy| Hy]. 2: {
-    symmetry.
-    apply (rngl_squ_opp_1 Hon Hop).
-  }
-  exfalso.
-  apply Hx; clear Hx.
+  apply rngl_leb_le in Hxy.
+  apply rngl_leb_nle in Hx.
+  rewrite Hxy, Hx.
+  apply rngl_leb_le in Hxy.
+  apply rngl_leb_nle in Hx.
   apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hxy.
-  destruct Hxy as [| (_, H)]; [ easy | ].
-  apply (rngl_le_antisymm Hor) in H; [ | easy ].
-  now symmetry in H.
+  destruct Hxy as [(H, _)| (Hx', Hy)]; [ easy | ].
+  apply (rngl_lt_eq_cases Hor) in Hy.
+  destruct Hy as [Hy| ]; [ | easy ].
+  apply rngl_nle_gt in Hy.
+  apply rngl_leb_nle in Hy.
+  rewrite Hy; symmetry.
+  apply (rngl_squ_opp_1 Hon Hop).
 }
+apply rngl_leb_nle in Hxy.
+rewrite Hxy.
+...
 destruct (rngl_le_dec Hor 0 x) as [Hx| Hx]. {
   destruct (rngl_le_dec Hor 0 y) as [Hy| Hy]. 2: {
     now symmetry; apply (rngl_mul_1_l Hon).
