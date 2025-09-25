@@ -899,9 +899,19 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
   rewrite (rngl_opp_0 Hop) in Hx'.
   congruence.
 }
+destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']; rewrite Hx'. {
+  rewrite (rngl_ltb_opp_l Hop Hor) in Hx'.
+  rewrite (rngl_opp_0 Hop) in Hx'.
+  now rewrite Hx'.
+}
+rewrite (rngl_ltb_opp_l Hop Hor) in Hx'.
+rewrite (rngl_opp_0 Hop) in Hx'.
+apply (rngl_ltb_ge_iff Hor) in Hx, Hx'.
+apply (rngl_le_antisymm Hor) in Hx; [ | easy ].
+subst x.
+rewrite (rngl_opp_0 Hop).
+rewrite rngl_ltb_ge; [ | easy ].
 ...
- apply Rnot_lt_le in Hx.
- destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx'].
   apply Ropp_lt_contravar in Hx'.
   rewrite Ropp_0, Ropp_involutive in Hx'.
   now destruct (Rgt_dec x 0).
