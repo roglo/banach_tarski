@@ -665,10 +665,10 @@ Theorem rngl_div_abs_diag_l :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  rngl_has_eq_dec T = true →
   ∀ a, a ≠ 0%L → (rngl_abs a / a = rngl_sign a)%L.
 Proof.
-intros Hon Hop Hiv Hor Hed.
+intros Hon Hop Hiv Hor.
+specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Haz.
 progress unfold rngl_abs.
@@ -678,9 +678,9 @@ remember (a ?= 0)%L as az' eqn:Ha'.
 symmetry in Ha, Ha'.
 destruct az. {
   apply rngl_leb_le in Ha.
-  apply (rngl_compare_le_iff Hor Hed) in Ha.
+  apply (rngl_compare_le_iff Hor) in Ha.
   destruct az'; [ | | easy ].
-  now apply (rngl_compare_eq_iff Hed) in Ha'.
+  now apply (rngl_compare_eq_iff Heo) in Ha'.
   rewrite (rngl_div_opp_l Hop Hiv).
   progress f_equal.
   now apply (rngl_div_diag Hon Hiq).
@@ -688,8 +688,8 @@ destruct az. {
 rewrite (rngl_div_diag Hon Hiq); [ symmetry | easy ].
 apply (rngl_leb_gt_iff Hor) in Ha.
 destruct az'; [ | | easy ].
-now apply (rngl_compare_eq_iff Hed) in Ha'.
-apply (rngl_compare_lt_iff Hor Hed) in Ha'.
+now apply (rngl_compare_eq_iff Heo) in Ha'.
+apply (rngl_compare_lt_iff Hor) in Ha'.
 now apply (rngl_lt_asymm Hor) in Ha'.
 Qed.
 
@@ -1061,13 +1061,13 @@ intros.
 remember (rngl_cos θ ?= 0)%L as cz eqn:Hcz.
 symmetry in Hcz.
 destruct cz. {
-  apply (rngl_compare_eq_iff Hed) in Hcz.
+  apply (rngl_compare_eq_iff Heo) in Hcz.
   now apply rngl_cos_0_atan_tan.
 } {
-  apply (rngl_compare_lt_iff Hor Hed) in Hcz.
+  apply (rngl_compare_lt_iff Hor) in Hcz.
   now apply rngl_cos_neg_atan_tan.
 } {
-  apply (rngl_compare_gt_iff Hor Hed) in Hcz.
+  apply (rngl_compare_gt_iff Hor) in Hcz.
   now apply rngl_cos_pos_atan_tan.
 }
 Qed.
