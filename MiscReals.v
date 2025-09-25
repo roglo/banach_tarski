@@ -81,10 +81,6 @@ do 2 rewrite (rngl_mul_comm fc_ic z).
 easy.
 Qed.
 
-Definition Req_dec :=
-  let Heo := rngl_has_eq_dec_or_is_ordered_r fc_or in
-  rngl_eq_dec Heo.
-
 Theorem Rcase_abs : ∀ a, {(a < 0)%L} + {(0 ≤ a)%L}.
 Proof.
 destruct_fc.
@@ -94,7 +90,6 @@ now apply rngl_ltb_lt in Haz.
 now apply (rngl_ltb_ge_iff Hor).
 Qed.
 
-Arguments Req_dec (a b)%_L.
 Arguments Rcase_abs a%_L.
 
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 ≤ b)%L →
@@ -711,7 +706,8 @@ rewrite (rngl_abs_nonpos_eq Hop Hor) in Hn. 2: {
   now apply (rngl_lt_le_incl Hor) in Hza.
 }
 destruct Hn as (H1, H2).
-destruct (rngl_eq_dec Heo a (- rngl_of_nat n)) as [Han| Han]. {
+destruct (rngl_eqb_dec a (- rngl_of_nat n)) as [Han| Han]. {
+  apply (rngl_eqb_eq Heo) in Han.
   exists (- Z.of_nat n)%Z.
   rewrite rngl_of_Z_opp.
   rewrite rngl_of_Z_of_nat.
@@ -722,6 +718,7 @@ destruct (rngl_eq_dec Heo a (- rngl_of_nat n)) as [Han| Han]. {
   rewrite rngl_of_pos_1.
   apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
 }
+apply (rngl_eqb_neq Heo) in Han.
 exists (- Z.of_nat (n + 1))%Z.
 rewrite rngl_of_Z_opp.
 rewrite rngl_of_Z_of_nat.
@@ -2091,9 +2088,9 @@ apply (rngl_add_squ_nonneg Hon Hos Hiq Hor).
 Qed.
 
 Definition rngl_signp x := (if 0 ≤? x then 1 else -1)%L.
-Definition Rsign x := (if Req_dec x 0 then 0 else rngl_signp x)%L.
+Definition rngl_sign x := (if x =? 0 then 0 else rngl_signp x)%L.
 
-Arguments Rsign x%_L.
+Arguments rngl_sign x%_L.
 
 Theorem Rsignp_of_pos : ∀ x, (0 ≤ x → rngl_signp x = 1)%L.
 Proof.
@@ -2114,51 +2111,62 @@ apply rngl_leb_nle in Hx.
 now rewrite Hx.
 Qed.
 
-Theorem Rsign_of_pos : ∀ x, (0 < x → Rsign x = 1)%L.
+Theorem Rsign_of_pos : ∀ x, (0 < x → rngl_sign x = 1)%L.
 Proof.
 destruct_fc.
 intros * Hx.
-unfold Rsign, rngl_signp.
-destruct (Req_dec x 0) as [H | H]. {
+unfold rngl_sign, rngl_signp.
+destruct (rngl_eqb_dec x 0) as [H | H]. {
+  apply (rngl_eqb_eq Heo) in H.
   now subst; apply (rngl_lt_irrefl Hor) in Hx.
 }
 apply (rngl_lt_le_incl Hor) in Hx.
 apply rngl_leb_le in Hx.
-now rewrite Hx.
+now rewrite H, Hx.
 Qed.
 
-Theorem Rsign_of_neg : ∀ x, (x < 0 → Rsign x = -1)%L.
+Theorem Rsign_of_neg : ∀ x, (x < 0 → rngl_sign x = -1)%L.
 Proof.
 destruct_fc.
 intros * Hx.
-unfold Rsign, rngl_signp.
-destruct (Req_dec x 0). {
+unfold rngl_sign, rngl_signp.
+destruct (rngl_eqb_dec x 0) as [H| H]. {
+  apply (rngl_eqb_eq Heo) in H.
   now subst; apply (rngl_lt_irrefl Hor) in Hx.
 }
 apply rngl_nle_gt in Hx.
 apply rngl_leb_nle in Hx.
-now rewrite Hx.
+now rewrite H, Hx.
 Qed.
 
-Theorem Rsign_mul_distr : ∀ x y, Rsign (x * y) = (Rsign x * Rsign y)%L.
+Theorem Rsign_mul_distr :
+  ∀ x y, rngl_sign (x * y) = (rngl_sign x * rngl_sign y)%L.
 Proof.
 destruct_fc.
 intros.
-unfold Rsign, rngl_signp.
-destruct (Req_dec (x * y) 0) as [Hxyz| Hxyz]. {
+unfold rngl_sign, rngl_signp.
+destruct (rngl_eqb_dec (x * y) 0) as [Hxyz| Hxyz]; rewrite Hxyz. {
+  apply (rngl_eqb_eq Heo) in Hxyz.
   symmetry.
-  destruct (Req_dec x 0) as [Hx| Hx]; [ apply (rngl_mul_0_l Hos) | ].
-  destruct (Req_dec y 0) as [Hy| Hy]; [ apply (rngl_mul_0_r Hos) | ].
+  destruct (rngl_eqb_dec x 0) as [Hx| Hx]; rewrite Hx.
+  apply (rngl_mul_0_l Hos).
+  destruct (rngl_eqb_dec y 0) as [Hy| Hy]; rewrite Hy.
+  apply (rngl_mul_0_r Hos).
   apply (rngl_integral Hos Hio) in Hxyz.
+  apply (rngl_eqb_neq Heo) in Hx, Hy.
   now destruct Hxyz.
 }
-destruct (Req_dec x 0) as [Hxz| Hxz]. {
+apply (rngl_eqb_neq Heo) in Hxyz.
+destruct (rngl_eqb_dec x 0) as [Hxz| Hxz]. {
+  rewrite Hxz.
+  apply (rngl_eqb_eq Heo) in Hxz.
   now subst; rewrite (rngl_mul_0_l Hos) in Hxyz.
 }
-destruct (Req_dec y 0) as [Hyz| Hyz]. {
+destruct (rngl_eqb_dec y 0) as [Hyz| Hyz]. {
+  rewrite Hyz.
+  apply (rngl_eqb_eq Heo) in Hyz.
   now subst; rewrite (rngl_mul_0_r Hos) in Hxyz.
 }
-fold Hor.
 destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]. {
   apply rngl_leb_le in Hxy.
   destruct (rngl_leb_dec 0 x) as [Hx| Hx]. {
@@ -2167,6 +2175,7 @@ destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]. {
     apply rngl_leb_le in Hxy, Hx.
     rewrite Hxy, Hx.
     apply rngl_leb_le in Hxy, Hx.
+...
     rewrite (rngl_mul_1_l Hon).
     apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hxy.
     destruct Hxy as [(_, Hy)| (Hx', Hy')].
@@ -2647,7 +2656,7 @@ Theorem Rmod_0_l : ∀ x, 0 rmod x = 0%L.
 Proof.
 destruct_fc.
 intros x.
-destruct (rngl_eq_dec Heo x 0) as [Hzx| Hzx]. {
+destruct (rngl_eqb_dec x 0) as [Hzx| Hzx]. {
   subst x; rewrite Rmod_from_ediv.
   rewrite (rngl_mul_0_r Hos).
   apply (rngl_sub_diag Hos).
