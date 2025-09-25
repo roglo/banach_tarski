@@ -2157,34 +2157,28 @@ destruct (rngl_eqb_dec (x * y) 0) as [Hxyz| Hxyz]; rewrite Hxyz. {
   now destruct Hxyz.
 }
 apply (rngl_eqb_neq Heo) in Hxyz.
-destruct (rngl_eqb_dec x 0) as [Hxz| Hxz]. {
-  rewrite Hxz.
+destruct (rngl_eqb_dec x 0) as [Hxz| Hxz]; rewrite Hxz. {
   apply (rngl_eqb_eq Heo) in Hxz.
   now subst; rewrite (rngl_mul_0_l Hos) in Hxyz.
 }
-destruct (rngl_eqb_dec y 0) as [Hyz| Hyz]. {
-  rewrite Hyz.
+destruct (rngl_eqb_dec y 0) as [Hyz| Hyz]; rewrite Hyz. {
   apply (rngl_eqb_eq Heo) in Hyz.
   now subst; rewrite (rngl_mul_0_r Hos) in Hxyz.
 }
-destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]. {
+apply (rngl_eqb_neq Heo) in Hyz.
+destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]; rewrite Hxy. {
   apply rngl_leb_le in Hxy.
-  destruct (rngl_leb_dec 0 x) as [Hx| Hx]. {
+  destruct (rngl_leb_dec 0 x) as [Hx| Hx]; rewrite Hx. {
     apply rngl_leb_le in Hx.
     symmetry.
-    apply rngl_leb_le in Hxy, Hx.
-    rewrite Hxy, Hx.
-    apply rngl_leb_le in Hxy, Hx.
-...
     rewrite (rngl_mul_1_l Hon).
     apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hxy.
-    destruct Hxy as [(_, Hy)| (Hx', Hy')].
-    now apply rngl_leb_le in Hy; rewrite Hy.
+    destruct Hxy as [(_, Hy)| (Hx', Hy)]. {
+      now apply rngl_leb_le in Hy; rewrite Hy.
+    }
+    apply (rngl_eqb_neq Heo) in Hxz.
     now apply (rngl_le_antisymm Hor) in Hx.
   }
-  apply rngl_leb_le in Hxy.
-  rewrite Hxy, Hx.
-  apply rngl_leb_le in Hxy.
   apply rngl_leb_nle in Hx.
   apply (rngl_le_0_mul Hon Hop Hiq Hor) in Hxy.
   destruct Hxy as [(H, _)| (Hx', Hy)]; [ easy | ].
@@ -2195,7 +2189,6 @@ destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]. {
   rewrite Hy; symmetry.
   apply (rngl_squ_opp_1 Hon Hop).
 }
-rewrite Hxy.
 apply (rngl_leb_gt_iff Hor) in Hxy.
 apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hxy.
 destruct Hxy as [(Hx, Hy)| (Hx, Hy)]. {
@@ -2476,14 +2469,17 @@ Qed.
 
 Theorem Int_part_opp : ∀ x,
   Int_part (- x) =
-    (- Int_part x - if Req_dec x (rngl_of_Z (Int_part x)) then 0 else 1)%Z.
+    (- Int_part x -
+       if rngl_eqb_dec x (rngl_of_Z (Int_part x)) then 0 else 1)%Z.
 Proof.
 destruct_fc.
 intros.
-destruct (Req_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
+destruct (rngl_eqb_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
+  apply (rngl_eqb_eq Heo) in Hx.
   rewrite Z.sub_0_r.
   now apply Int_part_opp_of_Int.
 } {
+  apply (rngl_eqb_neq Heo) in Hx.
   now apply Int_part_opp_of_not_Int.
 }
 Qed.
@@ -2525,13 +2521,16 @@ destruct (Rcase_abs y) as [Hy| Hy]. {
   do 2 rewrite Int_part_opp.
   rewrite (Int_part_add _ _ 1); [ | symmetry; apply rngl_of_Z_1 ].
   rewrite rngl_of_Z_add, rngl_of_Z_1.
-  destruct (Req_dec _ _) as [Hxy1| Hxy1]. {
+  destruct (rngl_eqb_dec _ _) as [Hxy1| Hxy1]. {
+    apply (rngl_eqb_eq Heo) in Hxy1.
     apply (rngl_add_cancel_r Hos) in Hxy1.
     rewrite Z.sub_0_r, Z.opp_involutive.
-    destruct (Req_dec _ _) as [H| ]; [ clear H | easy ].
+    destruct (rngl_eqb_dec _ _) as [H| H].
     rewrite Z.sub_0_r; f_equal.
     symmetry; apply Z.opp_involutive.
+    now apply (rngl_eqb_neq Heo) in H.
   }
+  apply (rngl_eqb_neq Heo) in Hxy1.
   rewrite <- Z.opp_sub_distr.
   progress f_equal.
   rewrite Z.opp_add_distr.
@@ -2539,7 +2538,8 @@ destruct (Rcase_abs y) as [Hy| Hy]. {
   progress f_equal.
   progress f_equal.
   symmetry.
-  destruct (Req_dec _ _) as [H| ]; [ | easy ].
+  destruct (rngl_eqb_dec _ _) as [H| ]; [ | easy ].
+  apply (rngl_eqb_eq Heo) in H.
   exfalso.
   apply Hxy1; clear Hxy1.
   now f_equal.
@@ -2657,6 +2657,7 @@ Proof.
 destruct_fc.
 intros x.
 destruct (rngl_eqb_dec x 0) as [Hzx| Hzx]. {
+...
   subst x; rewrite Rmod_from_ediv.
   rewrite (rngl_mul_0_r Hos).
   apply (rngl_sub_diag Hos).
