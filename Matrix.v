@@ -213,13 +213,24 @@ Arguments mat_vec_mul M%_mat _%_vec.
 Theorem vec_eq_dec : ∀ u v : vector T, { u = v } + { u ≠ v }.
 Proof.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂).
-destruct (rngl_eq_dec Heo x₁ x₂) as [H₁| H₁]; [ subst x₂ | right ].
- destruct (rngl_eq_dec Heo y₁ y₂) as [H₁| H₁]; [ subst y₂ | right ].
-  destruct (rngl_eq_dec Heo z₁ z₂) as [H₁| H₁]; [ now subst z₂; left | right ].
+destruct (rngl_eqb_dec x₁ x₂) as [H₁| H₁]. {
+  apply (rngl_eqb_eq Heo) in H₁; subst x₂.
+  destruct (rngl_eqb_dec y₁ y₂) as [H₁| H₁]. {
+    apply (rngl_eqb_eq Heo) in H₁; subst y₂.
+    destruct (rngl_eqb_dec z₁ z₂) as [H₁| H₁]. {
+      apply (rngl_eqb_eq Heo) in H₁; subst z₂.
+      now left.
+    }
+    apply (rngl_eqb_neq Heo) in H₁.
+    right.
+    now intros H; injection H; intros.
+  }
+  apply (rngl_eqb_neq Heo) in H₁.
+  right.
   now intros H; injection H; intros.
-
- now intros H; injection H; intros.
-
+}
+apply (rngl_eqb_neq Heo) in H₁.
+right.
 now intros H; injection H; intros.
 Qed.
 
@@ -234,25 +245,43 @@ Qed.
 Theorem mat_eq_dec : ∀ m₁ m₂ : matrix T, { m₁ = m₂ } + { m₁ ≠ m₂ }.
 Proof.
 intros.
-destruct (rngl_eq_dec Heo (a₁₁ m₁) (a₁₁ m₂)) as [H₁₁| H₁₁].
- destruct (rngl_eq_dec Heo (a₁₂ m₁) (a₁₂ m₂)) as [H₁₂| H₁₂].
-  destruct (rngl_eq_dec Heo (a₁₃ m₁) (a₁₃ m₂)) as [H₁₃| H₁₃].
-   destruct (rngl_eq_dec Heo (a₂₁ m₁) (a₂₁ m₂)) as [H₂₁| H₂₁].
-    destruct (rngl_eq_dec Heo (a₂₂ m₁) (a₂₂ m₂)) as [H₂₂| H₂₂].
-     destruct (rngl_eq_dec Heo (a₂₃ m₁) (a₂₃ m₂)) as [H₂₃| H₂₃].
-      destruct (rngl_eq_dec Heo (a₃₁ m₁) (a₃₁ m₂)) as [H₃₁| H₃₁].
-       destruct (rngl_eq_dec Heo (a₃₂ m₁) (a₃₂ m₂)) as [H₃₂| H₃₂].
-        destruct (rngl_eq_dec Heo (a₃₃ m₁) (a₃₃ m₂)) as [H₃₃| H₃₃].
-         now left; destruct m₁, m₂; simpl in *; subst.
-         now right; intros H; subst m₁; apply H₃₃.
-        now right; intros H; subst m₁; apply H₃₂.
-       now right; intros H; subst m₁; apply H₃₁.
-      now right; intros H; subst m₁; apply H₂₃.
-     now right; intros H; subst m₁; apply H₂₂.
-    now right; intros H; subst m₁; apply H₂₁.
-   now right; intros H; subst m₁; apply H₁₃.
-  now right; intros H; subst m₁; apply H₁₂.
- now right; intros H; subst m₁; apply H₁₁.
+destruct (rngl_eqb_dec (a₁₁ m₁) (a₁₁ m₂)) as [H₁₁| H₁₁].
+apply (rngl_eqb_eq Heo) in H₁₁.
+destruct (rngl_eqb_dec (a₁₂ m₁) (a₁₂ m₂)) as [H₁₂| H₁₂].
+apply (rngl_eqb_eq Heo) in H₁₂.
+destruct (rngl_eqb_dec (a₁₃ m₁) (a₁₃ m₂)) as [H₁₃| H₁₃].
+apply (rngl_eqb_eq Heo) in H₁₃.
+destruct (rngl_eqb_dec (a₂₁ m₁) (a₂₁ m₂)) as [H₂₁| H₂₁].
+apply (rngl_eqb_eq Heo) in H₂₁.
+destruct (rngl_eqb_dec (a₂₂ m₁) (a₂₂ m₂)) as [H₂₂| H₂₂].
+apply (rngl_eqb_eq Heo) in H₂₂.
+destruct (rngl_eqb_dec (a₂₃ m₁) (a₂₃ m₂)) as [H₂₃| H₂₃].
+apply (rngl_eqb_eq Heo) in H₂₃.
+destruct (rngl_eqb_dec (a₃₁ m₁) (a₃₁ m₂)) as [H₃₁| H₃₁].
+apply (rngl_eqb_eq Heo) in H₃₁.
+destruct (rngl_eqb_dec (a₃₂ m₁) (a₃₂ m₂)) as [H₃₂| H₃₂].
+apply (rngl_eqb_eq Heo) in H₃₂.
+destruct (rngl_eqb_dec (a₃₃ m₁) (a₃₃ m₂)) as [H₃₃| H₃₃].
+apply (rngl_eqb_eq Heo) in H₃₃.
+now left; destruct m₁, m₂; simpl in *; subst.
+apply (rngl_eqb_neq Heo) in H₃₃.
+now right; intros H; subst m₁; apply H₃₃.
+apply (rngl_eqb_neq Heo) in H₃₂.
+now right; intros H; subst m₁; apply H₃₂.
+apply (rngl_eqb_neq Heo) in H₃₁.
+now right; intros H; subst m₁; apply H₃₁.
+apply (rngl_eqb_neq Heo) in H₂₃.
+now right; intros H; subst m₁; apply H₂₃.
+apply (rngl_eqb_neq Heo) in H₂₂.
+now right; intros H; subst m₁; apply H₂₂.
+apply (rngl_eqb_neq Heo) in H₂₁.
+now right; intros H; subst m₁; apply H₂₁.
+apply (rngl_eqb_neq Heo) in H₁₃.
+now right; intros H; subst m₁; apply H₁₃.
+apply (rngl_eqb_neq Heo) in H₁₂.
+now right; intros H; subst m₁; apply H₁₂.
+apply (rngl_eqb_neq Heo) in H₁₁.
+now right; intros H; subst m₁; apply H₁₁.
 Qed.
 
 Theorem mat_mul_id_l : ∀ m, (mat_id * m)%mat = m.
@@ -865,8 +894,8 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
     now apply (rngl_lt_asymm Hor) in Hx.
   }
 ...
-destruct (Rlt_dec x 0) as [Hx| Hx].
- destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
+destruct (rngl_ltb_dec x 0) as [Hx| Hx].
+ destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx'].
   apply Ropp_lt_contravar in Hx'.
   rewrite Ropp_0, Ropp_involutive in Hx'.
   now apply Rlt_le, Rle_not_lt in Hx'.
@@ -877,7 +906,7 @@ destruct (Rlt_dec x 0) as [Hx| Hx].
   now rewrite Ropp_0 in Hx.
 
  apply Rnot_lt_le in Hx.
- destruct (Rlt_dec (-x) 0) as [Hx'| Hx'].
+ destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx'].
   apply Ropp_lt_contravar in Hx'.
   rewrite Ropp_0, Ropp_involutive in Hx'.
   now destruct (Rgt_dec x 0).
@@ -889,8 +918,8 @@ destruct (Rlt_dec x 0) as [Hx| Hx].
   rewrite Ropp_0; clear Hx.
   destruct (Rgt_dec 0 0) as [Hx| Hx]; [ now apply Rgt_irrefl in Hx | ].
   clear Hx.
-  destruct (Rlt_dec y 0) as [Hy| Hy].
-   destruct (Rlt_dec (-y) 0) as [Hy'| Hy'].
+  destruct (rngl_ltb_dec y 0) as [Hy| Hy].
+   destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy'].
     apply Ropp_lt_contravar in Hy'.
     rewrite Ropp_0, Ropp_involutive in Hy'.
     now apply Rlt_le, Rle_not_lt in Hy'.
@@ -901,7 +930,7 @@ destruct (Rlt_dec x 0) as [Hx| Hx].
     now rewrite Ropp_0 in Hy.
 
    apply Rnot_lt_le in Hy.
-   destruct (Rlt_dec (-y) 0) as [Hy'| Hy'].
+   destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy'].
     apply Ropp_lt_contravar in Hy'.
     rewrite Ropp_0, Ropp_involutive in Hy'.
     now destruct (Rgt_dec y 0).
@@ -913,8 +942,8 @@ destruct (Rlt_dec x 0) as [Hx| Hx].
     rewrite Ropp_0; clear Hy.
     destruct (Rgt_dec 0 0) as [Hy| Hy]; [ now apply Rgt_irrefl in Hy | ].
     clear Hy.
-    destruct (Rlt_dec z 0) as [Hz| Hz].
-     destruct (Rlt_dec (-z) 0) as [Hz'| Hz'].
+    destruct (rngl_ltb_dec z 0) as [Hz| Hz].
+     destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz'].
       apply Ropp_lt_contravar in Hz'.
       rewrite Ropp_0, Ropp_involutive in Hz'.
       now apply Rlt_le, Rle_not_lt in Hz'.
@@ -925,7 +954,7 @@ destruct (Rlt_dec x 0) as [Hx| Hx].
       now rewrite Ropp_0 in Hz.
 
      apply Rnot_lt_le in Hz.
-     destruct (Rlt_dec (-z) 0) as [Hz'| Hz'].
+     destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz'].
       apply Ropp_lt_contravar in Hz'.
       rewrite Ropp_0, Ropp_involutive in Hz'.
       now destruct (Rgt_dec z 0).

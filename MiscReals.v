@@ -2657,11 +2657,12 @@ Proof.
 destruct_fc.
 intros x.
 destruct (rngl_eqb_dec x 0) as [Hzx| Hzx]. {
-...
+  apply (rngl_eqb_eq Heo) in Hzx.
   subst x; rewrite Rmod_from_ediv.
   rewrite (rngl_mul_0_r Hos).
   apply (rngl_sub_diag Hos).
 }
+apply (rngl_eqb_neq Heo) in Hzx.
 unfold Rmod, snd, Rediv_mod.
 rewrite (rngl_div_0_l Hos Hi1). 2: {
   intros H.
@@ -2683,9 +2684,11 @@ Theorem Rmod_mul_same : ∀ x a, (IZR a * x) rmod x = 0%L.
 Proof.
 destruct_fc.
 intros.
-destruct (Req_dec x 0) as [Hx| Hx]. {
+destruct (rngl_eqb_dec x 0) as [Hx| Hx]. {
+  apply (rngl_eqb_eq Heo) in Hx.
   rewrite Hx, (rngl_mul_0_r Hos); apply Rmod_0_l.
 }
+apply (rngl_eqb_neq Heo) in Hx.
 specialize (Rmod_add_Z 0%L x a Hx) as H.
 rewrite rngl_add_0_l in H; rewrite H.
 apply Rmod_0_l.
@@ -2722,7 +2725,7 @@ Theorem Rediv_mul_r : ∀ x y z,
   x // (y * z) =
     (Int_part (x / (y * z)) +
        if Rcase_abs (y * z) then
-         if Req_dec (x / (y * z)) (IZR (Int_part (x / (y * z)))) then 0
+         if rngl_eqb_dec (x / (y * z)) (IZR (Int_part (x / (y * z)))) then 0
          else 1
        else 0)%Z.
 Proof.
