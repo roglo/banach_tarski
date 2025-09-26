@@ -2,7 +2,6 @@
 
 Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith List.
-From Stdlib Require Import Psatz.
 From Stdlib Require Import Ring Field.
 Require Import Datatypes.
 
@@ -1042,25 +1041,27 @@ Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; ring.
 Qed.
 
-...
-
-Theorem Rmult_vec_dot_mul_distr_r : ∀ a u v, a * (u · v) = u · a ⁎ v.
+Theorem Rmult_vec_dot_mul_distr_r : ∀ a u v, (a * (u · v))%L = u · a ⁎ v.
 Proof.
-intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; ring.
 Qed.
 
 Theorem vec_dot_mul_diag : ∀ v, v · v = ‖v‖².
 Proof.
 intros (x, y, z); simpl.
-do 3 rewrite fold_Rsqr.
-rewrite Rsqr_sqrt; [ easy | ].
-apply nonneg_sqr_vec_norm.
+symmetry.
+apply (rngl_squ_sqrt Hon).
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_mul_diag_nonneg Hon Hos Hiq Hor).
+apply (rngl_mul_diag_nonneg Hon Hos Hiq Hor).
+apply (rngl_mul_diag_nonneg Hon Hos Hiq Hor).
 Qed.
 
 Theorem vec_add_comm : ∀ u v, (u + v = v + u)%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
-f_equal; lra.
+f_equal; ring.
 Qed.
 
 Theorem vec_cross_mul_assoc_r : ∀ u v w,
@@ -1069,20 +1070,22 @@ Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; ring.
 Qed.
 
-Theorem vec_opp_dot_mul_distr_r : ∀ u v, - (u · v) = u · - v.
+Theorem vec_opp_dot_mul_distr_r : ∀ u v, (- (u · v))%L = u · - v.
 Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; ring.
 Qed.
 
 Theorem vec_opp_const_mul_distr_l : ∀ a v, (- (a ⁎ v) = - a ⁎ v)%vec.
 Proof.
-intros a (v₁, v₂, v₃); simpl; f_equal; lra.
+intros a (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
 Theorem vec_opp_const_mul_distr_r : ∀ a v, (- (a ⁎ v) = a ⁎ - v)%vec.
 Proof.
-intros a (v₁, v₂, v₃); simpl; f_equal; lra.
+intros a (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
+
+...
 
 Theorem vec_const_mul_add_distr_l : ∀ a u v,
   (a ⁎ (u + v) = a ⁎ u + a ⁎ v)%vec.
