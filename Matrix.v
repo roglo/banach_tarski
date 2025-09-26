@@ -1240,10 +1240,13 @@ rewrite mat_mul_id_l in H.
 apply (f_equal mat_det) in HMM'.
 rewrite mat_det_id in HMM'.
 rewrite mat_det_mul_distr in HMM'.
+destruct (rngl_eqb_dec (mat_det M) 0) as [Hd| Hd]. {
+  apply (rngl_eqb_eq Heo) in Hd.
+  rewrite Hd, (rngl_mul_0_l Hos) in HMM'.
+  symmetry in HMM'.
+  now apply (rngl_1_neq_0 Hon Hc1) in HMM'.
+}
 ...
-destruct (Req_dec (mat_det M) 0) as [Hd| Hd].
- rewrite Hd, Rmult_0_l in HMM'; lra.
-
  apply (f_equal (mat_const_mul (/ mat_det M))) in H.
  rewrite mat_const_mul_assoc in H.
  rewrite Rinv_l in H; [ | easy ].
