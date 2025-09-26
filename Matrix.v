@@ -71,6 +71,7 @@ Ltac fold_rngl :=
      end) with 1%L by easy.
 
 Definition mkrmat := @mkmat T.
+Arguments mkrmat (a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃)%_L.
 
 (*
 Definition Rmult5_sqrt2_sqrt5 := @Rmult5_sqrt2_sqrt5 T ro rp rl Hic Hon Hop Hor.
@@ -1282,22 +1283,20 @@ Theorem vec_Lagrange_identity : ∀ u v,
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃).
 simpl.
-...
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-unfold Rsqr; lra.
+rewrite (rngl_squ_sqrt Hon); [ | apply nonneg_sqr_vec_norm ].
+rewrite (rngl_squ_sqrt Hon); [ | apply nonneg_sqr_vec_norm ].
+unfold rngl_squ; ring.
 Qed.
 
 Arguments vec_Lagrange_identity u%_vec v%_vec.
 
-Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, (u · v)² ≤ ‖u‖² * ‖v‖².
+Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ‖u‖² * ‖v‖²)%L.
 Proof.
 intros.
-apply Rplus_le_reg_r with (r := -(u · v)²).
-rewrite Rplus_opp_r.
-rewrite fold_Rminus, vec_Lagrange_identity.
+apply (rngl_le_0_sub Hop Hor).
+rewrite vec_Lagrange_identity.
 rewrite vec_dot_mul_diag.
-apply Rle_0_sqr.
+apply (rngl_squ_nonneg Hon Hos Hiq Hor).
 Qed.
 
 (* *)
@@ -1308,18 +1307,18 @@ Qed.
    give to a vector which is nul iff the matrix is equal
    to its transpose; this name is inspired from the
    name "commutator") *)
-Definition rotation_axis (M : matrix ℝ) :=
-  let x := a₃₂ M - a₂₃ M in
-  let y := a₁₃ M - a₃₁ M in
-  let z := a₂₁ M - a₁₂ M in
+Definition rotation_axis (M : matrix T) :=
+  let x := (a₃₂ M - a₂₃ M)%L in
+  let y := (a₁₃ M - a₃₁ M)%L in
+  let z := (a₂₁ M - a₁₂ M)%L in
   V x y z.
 
 Definition vec_normalize v := v ⁄ ‖v‖.
 
-Definition rotation_unit_axis (M : matrix ℝ) :=
+Definition rotation_unit_axis (M : matrix T) :=
   vec_normalize (rotation_axis M).
 
-Definition rotation_fixpoint (m : matrix ℝ) k :=
+Definition rotation_fixpoint (m : matrix T) k :=
   k ⁎ rotation_unit_axis m.
 
 Definition matrix_of_unit_axis_angle '(V x y z, s, c) :=
@@ -1328,20 +1327,23 @@ Definition matrix_of_unit_axis_angle '(V x y z, s, c) :=
     (x*y*(1-c)+z*s) (y²*(1-c)+c) (y*z*(1-c)-x*s)
     (x*z*(1-c)-y*s) (y*z*(1-c)+x*s) (z²*(1-c)+c).
 
-Definition matrix_of_axis_angle '(V x y z, s, c) :=
+Definition matrix_of_axis_angle '(V x y z) s c :=
   let r := √ (x² + y² + z²) in
-  let ux := x / r in
-  let uy := y / r in
-  let uz := z / r in
+  let ux := (x / r)%L in
+  let uy := (y / r)%L in
+  let uz := (z / r)%L in
   matrix_of_unit_axis_angle (V ux uy uz, s, c).
 
+Arguments matrix_of_axis_angle pat%_vec (s c)%_L.
+
 Theorem matrix_mul_axis : ∀ p c s k,
-  k ≠ 0
-  → matrix_of_axis_angle (p, s, c) =
-    matrix_of_axis_angle (k ⁎ p, Rsign k * s, c).
+  k ≠ 0%L
+  → matrix_of_axis_angle p s c =
+    matrix_of_axis_angle (k ⁎ p) (rngl_sign k * s) c.
 Proof.
 intros * Hk.
 destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
+...
  subst p; simpl; rewrite Rmult_0_r.
  rewrite Rsqr_0; do 2 rewrite Rplus_0_l.
  rewrite Rdiv_0_l, Rsqr_0.
