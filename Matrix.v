@@ -885,7 +885,6 @@ Theorem is_neg_vec_neg_vec : ∀ v,
   → is_neg_vec (- v) = negb (is_neg_vec v).
 Proof.
 intros (x, y, z) Hv; simpl.
-(**)
 destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
   destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']; rewrite Hx'. {
     rewrite (rngl_ltb_opp_l Hop Hor) in Hx'.
@@ -910,65 +909,58 @@ apply (rngl_ltb_ge_iff Hor) in Hx, Hx'.
 apply (rngl_le_antisymm Hor) in Hx; [ | easy ].
 subst x.
 rewrite (rngl_opp_0 Hop).
-rewrite rngl_ltb_ge; [ | easy ].
-...
-  apply Ropp_lt_contravar in Hx'.
-  rewrite Ropp_0, Ropp_involutive in Hx'.
-  now destruct (Rgt_dec x 0).
-
-  apply Rnot_lt_le in Hx'.
-  apply Ropp_le_contravar in Hx'.
-  rewrite Ropp_0, Ropp_involutive in Hx'.
-  apply Rle_antisym in Hx'; [ subst x | easy ].
-  rewrite Ropp_0; clear Hx.
-  destruct (Rgt_dec 0 0) as [Hx| Hx]; [ now apply Rgt_irrefl in Hx | ].
-  clear Hx.
-  destruct (rngl_ltb_dec y 0) as [Hy| Hy].
-   destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy'].
-    apply Ropp_lt_contravar in Hy'.
-    rewrite Ropp_0, Ropp_involutive in Hy'.
-    now apply Rlt_le, Rle_not_lt in Hy'.
-
-    clear Hy'.
-    destruct (Rgt_dec (-y) 0) as [Hy'| Hy']; [ easy | ].
-    apply Ropp_lt_contravar in Hy.
-    now rewrite Ropp_0 in Hy.
-
-   apply Rnot_lt_le in Hy.
-   destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy'].
-    apply Ropp_lt_contravar in Hy'.
-    rewrite Ropp_0, Ropp_involutive in Hy'.
-    now destruct (Rgt_dec y 0).
-
-    apply Rnot_lt_le in Hy'.
-    apply Ropp_le_contravar in Hy'.
-    rewrite Ropp_0, Ropp_involutive in Hy'.
-    apply Rle_antisym in Hy'; [ subst y | easy ].
-    rewrite Ropp_0; clear Hy.
-    destruct (Rgt_dec 0 0) as [Hy| Hy]; [ now apply Rgt_irrefl in Hy | ].
-    clear Hy.
-    destruct (rngl_ltb_dec z 0) as [Hz| Hz].
-     destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz'].
-      apply Ropp_lt_contravar in Hz'.
-      rewrite Ropp_0, Ropp_involutive in Hz'.
-      now apply Rlt_le, Rle_not_lt in Hz'.
-
-      clear Hz'.
-      destruct (Rgt_dec (-z) 0) as [Hz'| Hz']; [ easy | ].
-      apply Ropp_lt_contravar in Hz.
-      now rewrite Ropp_0 in Hz.
-
-     apply Rnot_lt_le in Hz.
-     destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz'].
-      apply Ropp_lt_contravar in Hz'.
-      rewrite Ropp_0, Ropp_involutive in Hz'.
-      now destruct (Rgt_dec z 0).
-
-      apply Rnot_lt_le in Hz'.
-      apply Ropp_le_contravar in Hz'.
-      rewrite Ropp_0, Ropp_involutive in Hz'.
-      apply Rle_antisym in Hz'; [ subst z | easy ].
-      now exfalso; apply Hv.
+rewrite rngl_ltb_ge; [ clear Hx' | easy ].
+destruct (rngl_ltb_dec y 0) as [Hy| Hy]; rewrite Hy. {
+  destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy']; rewrite Hy'. {
+    rewrite (rngl_ltb_opp_l Hop Hor) in Hy'.
+    rewrite (rngl_opp_0 Hop) in Hy'.
+    apply rngl_ltb_lt in Hy, Hy'.
+    now apply (rngl_lt_asymm Hor) in Hy.
+  }
+  clear Hy'.
+  destruct (rngl_ltb_dec 0 (-y)) as [Hy'| Hy']; rewrite Hy'; [ easy | ].
+  rewrite (rngl_ltb_opp_r Hop Hor) in Hy'.
+  rewrite (rngl_opp_0 Hop) in Hy'.
+  congruence.
+}
+destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy']; rewrite Hy'. {
+  rewrite (rngl_ltb_opp_l Hop Hor) in Hy'.
+  rewrite (rngl_opp_0 Hop) in Hy'.
+  now rewrite Hy'.
+}
+rewrite (rngl_ltb_opp_l Hop Hor) in Hy'.
+rewrite (rngl_opp_0 Hop) in Hy'.
+apply (rngl_ltb_ge_iff Hor) in Hy, Hy'.
+apply (rngl_le_antisymm Hor) in Hy; [ | easy ].
+subst y.
+rewrite (rngl_opp_0 Hop).
+rewrite rngl_ltb_ge; [ clear Hy' | easy ].
+destruct (rngl_ltb_dec z 0) as [Hz| Hz]; rewrite Hz. {
+  destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz']; rewrite Hz'. {
+    rewrite (rngl_ltb_opp_l Hop Hor) in Hz'.
+    rewrite (rngl_opp_0 Hop) in Hz'.
+    apply rngl_ltb_lt in Hz, Hz'.
+    now apply (rngl_lt_asymm Hor) in Hz.
+  }
+  clear Hz'.
+  destruct (rngl_ltb_dec 0 (-z)) as [Hz'| Hz']; rewrite Hz'; [ easy | ].
+  rewrite (rngl_ltb_opp_r Hop Hor) in Hz'.
+  rewrite (rngl_opp_0 Hop) in Hz'.
+  congruence.
+}
+destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz']; rewrite Hz'. {
+  rewrite (rngl_ltb_opp_l Hop Hor) in Hz'.
+  rewrite (rngl_opp_0 Hop) in Hz'.
+  now rewrite Hz'.
+}
+rewrite (rngl_ltb_opp_l Hop Hor) in Hz'.
+rewrite (rngl_opp_0 Hop) in Hz'.
+apply (rngl_ltb_ge_iff Hor) in Hz, Hz'.
+apply (rngl_le_antisymm Hor) in Hz; [ | easy ].
+subst z.
+rewrite (rngl_opp_0 Hop).
+rewrite rngl_ltb_ge; [ clear Hz' | easy ].
+easy.
 Qed.
 
 Theorem vec_add_assoc : ∀ u v w, (u + (v + w))%vec = (u + v + w)%vec.
@@ -977,32 +969,37 @@ intros.
 destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
 destruct w as (w₁, w₂, w₃).
-simpl; f_equal; lra.
+simpl; f_equal; apply rngl_add_assoc.
 Qed.
 
 Theorem vec_add_opp_diag_l : ∀ v, (- v + v = 0)%vec.
 Proof.
-intros (v₁, v₂, v₃); simpl; f_equal; lra.
+intros (v₁, v₂, v₃); simpl; f_equal; apply (rngl_add_opp_diag_l Hop).
 Qed.
 
 Theorem vec_add_opp_diag_r : ∀ v, (v + - v = 0)%vec.
 Proof.
-intros (v₁, v₂, v₃); simpl; f_equal; lra.
+intros (v₁, v₂, v₃); simpl; f_equal; apply (rngl_add_opp_diag_r Hop).
 Qed.
 
 Theorem vec_sub_diag : ∀ v, (v - v = 0)%vec.
-intros (v₁, v₂, v₃); simpl; f_equal; lra.
+intros (v₁, v₂, v₃); simpl; f_equal; apply (rngl_add_opp_diag_r Hop).
 Qed.
 
 Theorem vec_sub_diag_uniq : ∀ u v, (u - v = 0)%vec → u = v.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) Huv.
-injection Huv; clear Huv; intros.
-f_equal; lra.
+injection Huv; clear Huv; intros H1 H2 H3.
+rewrite (rngl_add_opp_r Hop) in H1, H2, H3.
+apply -> (rngl_sub_move_0_r Hop) in H1.
+apply -> (rngl_sub_move_0_r Hop) in H2.
+apply -> (rngl_sub_move_0_r Hop) in H3.
+now subst.
 Qed.
 
 Theorem vec_sub_opp_r : ∀ u v, (u - - v = u + v)%vec.
 Proof.
+...
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
 Qed.
 
