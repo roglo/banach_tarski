@@ -1138,24 +1138,32 @@ injection Hv; clear Hv; intros H₃ H₂ H₁.
 remember (√ (u₁² + u₂² + u₃²)) as ur eqn:Hur.
 assert (H : ur ≠ 0%L). {
   intros H; subst ur.
-...
-  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in H.
- destruct H as (H1 & H2 & H3).
- now subst.
-
- subst v₁ v₂ v₃.
- do 3 rewrite Rsqr_mult.
- do 2 rewrite <- Rmult_plus_distr_l.
- rewrite sqrt_mult; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
- rewrite <- Hur.
- rewrite sqrt_Rsqr; [ now rewrite Rinv_l | ].
- apply Rlt_le, Rinv_0_lt_compat.
- apply Rneq_le_lt; [ now intros HH; apply H | ].
- rewrite Hur; apply sqrt_pos.
+  apply (eq_rl_sqrt_0 Hon Hos) in H; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in H.
+  destruct H as (H1 & H2 & H3).
+  now subst.
+}
+subst v₁ v₂ v₃.
+do 3 rewrite (rngl_squ_mul Hic).
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite rl_sqrt_mul; [ | | apply nonneg_sqr_vec_norm ]. 2: {
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+}
+rewrite <- Hur.
+rewrite (rl_sqrt_squ Hon Hop Hor).
+rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
+  apply (rngl_lt_le_incl Hor).
+  apply (rngl_inv_pos Hon Hop Hiv Hor).
+  apply (rngl_le_neq Hor).
+  split; [ | easy ].
+  rewrite Hur.
+  apply rl_sqrt_nonneg.
+  apply nonneg_sqr_vec_norm.
+}
+now apply (rngl_mul_inv_diag_l Hon Hiv).
 Qed.
 
-Theorem vec_div_vec_norm : ∀ v, v ≠ 0%vec → ‖(v ⁄ ‖v‖)‖ = 1.
+Theorem vec_div_vec_norm : ∀ v, v ≠ 0%vec → ‖(v ⁄ ‖v‖)‖ = 1%L.
 Proof.
 intros * Hv.
 eapply normalized_vector; [ eassumption | easy ].
@@ -1181,28 +1189,40 @@ destruct M; simpl.
 unfold mat_mul; simpl.
 unfold mat_det; simpl.
 unfold mat_const_mul; simpl.
-f_equal; lra.
+do 9 rewrite (rngl_mul_0_l Hos).
+rewrite (rngl_sub_diag Hos).
+do 10 rewrite (rngl_mul_0_r Hos).
+rewrite (rngl_sub_diag Hos).
+do 3 rewrite (rngl_mul_0_r Hos).
+do 9 rewrite (rngl_mul_1_l Hon).
+do 7 rewrite (rngl_mul_1_r Hon).
+do 5 rewrite rngl_add_0_l.
+do 7 rewrite rngl_add_0_r.
+do 6 rewrite (rngl_sub_0_r Hos).
+do 6 rewrite (rngl_sub_0_l Hop).
+f_equal; ring.
 Qed.
 
-Theorem mat_det_id : mat_det mat_id = 1.
+Theorem mat_det_id : mat_det mat_id = 1%L.
 Proof.
-unfold mat_det, mat_id; simpl; lra.
+unfold mat_det, mat_id; simpl; ring.
 Qed.
 
 Theorem mat_det_mul_distr : ∀ M₁ M₂,
-  mat_det (M₁ * M₂) = mat_det M₁ * mat_det M₂.
+  mat_det (M₁ * M₂) = (mat_det M₁ * mat_det M₂)%L.
 Proof.
-intros; unfold mat_mul, mat_det; simpl; lra.
+intros; unfold mat_mul, mat_det; simpl; ring.
 Qed.
 
-Theorem mat_const_mul_assoc : ∀ a b M, (a ⁎ (b ⁎ M) = (a * b) ⁎ M)%mat.
+Theorem mat_const_mul_assoc : ∀ a b M, (a ⁎ (b ⁎ M) = (a * b)%L ⁎ M)%mat.
 Proof.
-intros; unfold mat_const_mul; simpl; f_equal; lra.
+intros; unfold mat_const_mul; simpl; f_equal; apply rngl_mul_assoc.
 Qed.
 
-Theorem mat_const_mul_1_l : ∀ M, (1 ⁎ M = M)%mat.
+Theorem mat_const_mul_1_l : ∀ M, (1%L ⁎ M = M)%mat.
 Proof.
-intros; unfold mat_const_mul, mkrmat; destruct M; simpl; f_equal; lra.
+intros; unfold mat_const_mul, mkrmat; destruct M; simpl.
+now do 9 rewrite (rngl_mul_1_l Hon).
 Qed.
 
 Theorem mat_mul_id_comm : ∀ M M',
@@ -1220,6 +1240,7 @@ rewrite mat_mul_id_l in H.
 apply (f_equal mat_det) in HMM'.
 rewrite mat_det_id in HMM'.
 rewrite mat_det_mul_distr in HMM'.
+...
 destruct (Req_dec (mat_det M) 0) as [Hd| Hd].
  rewrite Hd, Rmult_0_l in HMM'; lra.
 
