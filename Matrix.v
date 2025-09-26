@@ -1085,34 +1085,37 @@ Proof.
 intros a (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
-...
-
 Theorem vec_const_mul_add_distr_l : ∀ a u v,
   (a ⁎ (u + v) = a ⁎ u + a ⁎ v)%vec.
 Proof.
-intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
 Theorem vec_const_mul_sub_distr_l : ∀ a u v,
   (a ⁎ (u - v) = a ⁎ u - a ⁎ v)%vec.
 Proof.
-intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
-Theorem vec_const_mul_eq_reg_l : ∀ a u v, a ⁎ u = a ⁎ v → a ≠ 0 → u = v.
+Theorem vec_const_mul_eq_reg_l : ∀ a u v, a ⁎ u = a ⁎ v → a ≠ 0%L → u = v.
 Proof.
+assert (Hip : rngl_has_inv_and_1_or_pdiv_and_comm T = true). {
+  progress unfold rngl_has_inv_and_1_or_pdiv_and_comm.
+  now rewrite Hiv, Hon.
+}
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃) Hauv Ha.
 simpl in Hauv.
 injection Hauv; clear Hauv; intros H₃ H₂ H₁.
-apply Rmult_eq_reg_l in H₁; [ | easy ].
-apply Rmult_eq_reg_l in H₂; [ | easy ].
-apply Rmult_eq_reg_l in H₃; [ | easy ].
+apply (rngl_mul_cancel_l Hip) in H₁; [ | easy ].
+apply (rngl_mul_cancel_l Hip) in H₂; [ | easy ].
+apply (rngl_mul_cancel_l Hip) in H₃; [ | easy ].
 now subst.
 Qed.
 
 Theorem mat_vec_mul_0_r : ∀ M, (M * 0)%vec = 0%vec.
 Proof.
 intros; simpl.
+...
 do 9 rewrite Rmult_0_r.
 now do 2 rewrite Rplus_0_r.
 Qed.
