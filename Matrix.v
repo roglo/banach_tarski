@@ -1115,31 +1115,31 @@ Qed.
 Theorem mat_vec_mul_0_r : ∀ M, (M * 0)%vec = 0%vec.
 Proof.
 intros; simpl.
-...
-do 9 rewrite Rmult_0_r.
-now do 2 rewrite Rplus_0_r.
+do 9 rewrite (rngl_mul_0_r Hos).
+now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem mat_pow_succ : ∀ M n, (M ^ S n)%mat = (M * M ^ n)%mat.
 Proof. easy. Qed.
 
-Theorem vec_sqr_0 : 0²%vec = 0.
-Proof. simpl; lra. Qed.
+Theorem vec_sqr_0 : 0²%vec = 0%L.
+Proof. cbn; ring. Qed.
 
-Theorem vec_sqr_const_mul : ∀ a v, (a ⁎ v)²%vec = a² * v²%vec.
+Theorem vec_sqr_const_mul : ∀ a v, (a ⁎ v)²%vec = (a² * v²%vec)%L.
 Proof.
-intros a (v₁, v₂, v₃); simpl; unfold Rsqr; lra.
+intros a (v₁, v₂, v₃); simpl; unfold rngl_squ; ring.
 Qed.
 
-Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = / ‖u‖ ⁎ u → ‖v‖ = 1.
+Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = ‖u‖⁻¹ ⁎ u → ‖v‖ = 1%L.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) Hu Hv.
 simpl in Hv; simpl.
 injection Hv; clear Hv; intros H₃ H₂ H₁.
 remember (√ (u₁² + u₂² + u₃²)) as ur eqn:Hur.
-assert (H : ur ≠ 0).
- intros H; subst ur.
- apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+assert (H : ur ≠ 0%L). {
+  intros H; subst ur.
+...
+  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
  apply sqr_vec_norm_eq_0 in H.
  destruct H as (H1 & H2 & H3).
  now subst.
