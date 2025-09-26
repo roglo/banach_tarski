@@ -1246,17 +1246,17 @@ destruct (rngl_eqb_dec (mat_det M) 0) as [Hd| Hd]. {
   symmetry in HMM'.
   now apply (rngl_1_neq_0 Hon Hc1) in HMM'.
 }
-...
- apply (f_equal (mat_const_mul (/ mat_det M))) in H.
- rewrite mat_const_mul_assoc in H.
- rewrite Rinv_l in H; [ | easy ].
- rewrite mat_const_mul_1_l in H.
- rewrite H.
- rewrite <- mat_const_mul_distr_l.
- rewrite mat_mul_compl_l.
- rewrite mat_const_mul_assoc.
- rewrite Rinv_l; [ | easy ].
- now rewrite mat_const_mul_1_l.
+apply (rngl_eqb_neq Heo) in Hd.
+apply (f_equal (mat_const_mul (mat_det M)⁻¹)) in H.
+rewrite mat_const_mul_assoc in H.
+rewrite (rngl_mul_inv_diag_l Hon Hiv) in H; [ | easy ].
+rewrite mat_const_mul_1_l in H.
+rewrite H.
+rewrite <- mat_const_mul_distr_l.
+rewrite mat_mul_compl_l.
+rewrite mat_const_mul_assoc.
+rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
+apply mat_const_mul_1_l.
 Qed.
 
 Theorem rotation_transp_is_rotation : ∀ M,
@@ -1270,16 +1270,19 @@ split.
 
  clear Htr.
  unfold mat_det in Hdet; simpl in Hdet.
- unfold mat_det, mat_transp; simpl; lra.
+ unfold mat_det, mat_transp; simpl.
+ rewrite <- Hdet.
+ ring.
 Qed.
 
 (* Cauchy-Schwarz inequality with vectors. *)
 
 Theorem vec_Lagrange_identity : ∀ u v,
-  ‖u‖² * ‖v‖² - (u · v)² = (u × v)²%vec.
+  (‖u‖² * ‖v‖² - (u · v)²)%L = (u × v)²%vec.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃).
 simpl.
+...
 rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
 rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
 unfold Rsqr; lra.
