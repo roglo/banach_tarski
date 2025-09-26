@@ -1342,7 +1342,18 @@ Theorem matrix_mul_axis : ∀ p c s k,
     matrix_of_axis_angle (k ⁎ p) (rngl_sign k * s) c.
 Proof.
 intros * Hk.
-destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz].
+destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz]. {
+(**)
+  subst p; cbn; rewrite (rngl_mul_0_r Hos).
+  rewrite (rngl_squ_0 Hos); do 2 rewrite rngl_add_0_l.
+  remember (0 / √0)%L as x.
+  f_equal.
+  f_equal.
+  f_equal.
+Print rngl_sign.
+Print rngl_signp.
+...
+  rewrite (rngl_div_0_l Hos Hi1).
 ...
  subst p; simpl; rewrite Rmult_0_r.
  rewrite Rsqr_0; do 2 rewrite Rplus_0_l.
