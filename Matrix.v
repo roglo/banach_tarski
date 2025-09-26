@@ -106,7 +106,7 @@ Definition vec_add '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
   V (u₁ + v₁) (u₂ + v₂) (u₃ + v₃).
 Definition vec_sub u v := vec_add u (vec_opp v).
 Definition vec_dot_mul '(V x₁ y₁ z₁) '(V x₂ y₂ z₂) :=
-  x₁ * x₂ + y₁ * y₂ + z₁ * z₂.
+  (x₁ * x₂ + y₁ * y₂ + z₁ * z₂)%L.
 Definition vec_cross_mul '(V u₁ u₂ u₃) '(V v₁ v₂ v₃) :=
   V (u₂ * v₃ - u₃ * v₂) (u₃ * v₁ - u₁ * v₃) (u₁ * v₂ - u₂ * v₁).
 Definition vec_const_mul k '(V x y z) := V (k * x) (k * y) (k * z).
@@ -999,13 +999,14 @@ Qed.
 
 Theorem vec_sub_opp_r : ∀ u v, (u - - v = u + v)%vec.
 Proof.
-...
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; lra.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃).
+cbn; do 2 f_equal; apply (rngl_opp_involutive Hop).
 Qed.
 
 Theorem vec_sub_sub_distr : ∀ u v w, (u - (v - w) = u - v + w)%vec.
 Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); simpl; f_equal; lra.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃) (w₁, w₂, w₃); cbn.
+f_equal; ring.
 Qed.
 
 Theorem vec_const_mul_cross_distr_l : ∀ k u v, k ⁎ (u × v) = (k ⁎ u) × v.
@@ -1020,28 +1021,28 @@ intros k (u₁, u₂, u₃) (v₁, v₂, v₃); simpl.
 f_equal; ring.
 Qed.
 
-Theorem vec_dot_mul_0_l : ∀ v, 0 · v = 0.
+Theorem vec_dot_mul_0_l : ∀ v : vector T, 0 · v = 0%L.
 Proof.
-intros (x₁, y₁, z₁); simpl; lra.
+intros (x₁, y₁, z₁); simpl; ring.
 Qed.
 
-Theorem vec_dot_mul_0_r : ∀ v, (v · 0)%vec = 0.
+Theorem vec_dot_mul_0_r : ∀ v, (v · 0)%vec = 0%L.
 Proof.
-intros (x, y, z); simpl.
-do 3 rewrite Rmult_0_r.
-now do 2 rewrite Rplus_0_r.
+intros (x, y, z); simpl; ring.
 Qed.
 
 Theorem vec_dot_mul_sub_distr_l : ∀ u v w,
-  u · (v - w) = u · v - u · w.
+  u · (v - w) = (u · v - u · w)%L.
 Proof.
-intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; lra.
+intros (x₁, y₁, z₁) (x₂, y₂, z₂) (x₃, y₃, z₃); simpl; ring.
 Qed.
 
-Theorem Rmult_vec_dot_mul_distr_l : ∀ a u v, a * (u · v) = a ⁎ u · v.
+Theorem Rmult_vec_dot_mul_distr_l : ∀ a u v, (a * (u · v))%L = a ⁎ u · v.
 Proof.
-intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; lra.
+intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; ring.
 Qed.
+
+...
 
 Theorem Rmult_vec_dot_mul_distr_r : ∀ a u v, a * (u · v) = u · a ⁎ v.
 Proof.
