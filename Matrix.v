@@ -7,13 +7,8 @@ Require Import Datatypes.
 
 Require Import RingLike.Core.
 Require Import RingLike.Real_Like.
-Require Import Words.
-Require Import Misc_Trigo.
-...
-Require Import Normalize Reverse Misc.
-Require Import Misc_Reals.
-
-...
+Require Import a.Words a.Normalize a.Reverse a.Misc.
+Require Import a.Misc_Trigo a.Misc_Reals.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;

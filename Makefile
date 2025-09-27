@@ -22,7 +22,7 @@ show_coq_version:
 .SUFFIXES: .v .vo .vp
 
 %.vo: %.v
-	rocq compile $<
+	rocq compile -R . a $<
 
 %.v: %.vp
 	@echo /lib/cpp -D$(COQ_VERSION) $< '>' $@

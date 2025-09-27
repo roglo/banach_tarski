@@ -2,7 +2,7 @@
 
 From Stdlib Require Import Utf8 List Relations Wf_nat.
 Import ListNotations.
-Require Import Misc.
+Require Import a.Misc.
 
 Inductive letter := la | lb.
 
