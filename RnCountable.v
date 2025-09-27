@@ -279,9 +279,8 @@ destruct b. {
     apply (rngl_div_div Hon Hos Hiv).
     apply (rngl_pow_neq_0 Hon Hos Hiq).
     apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
-    intros H.
-    apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
-    now apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+    apply (rngl_neq_mul_0 Hon Hos Hiq).
+    apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
     apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
     apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
     apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
@@ -380,9 +379,8 @@ progress f_equal.
 progress unfold v.
 rewrite Nat.add_succ_r.
 rewrite (rngl_div_div Hon Hos Hiv); [ easy | | ].
-intros H.
-apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
-now apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+apply (rngl_neq_mul_0 Hon Hos Hiq).
+apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 apply (rngl_pow_neq_0 Hon Hos Hiq).
 apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
@@ -549,9 +547,8 @@ split. {
     now rewrite rngl_add_comm in Hr2.
     apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
     apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
-    intros H.
-    apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
-    now apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+    apply (rngl_neq_mul_0 Hon Hos Hiq).
+    apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
     apply (rngl_pow_neq_0 Hon Hos Hiq).
     apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
   }
@@ -578,9 +575,8 @@ split. {
   rewrite (rngl_mul_comm Hic 3).
   now rewrite <- rngl_mul_assoc.
   apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
-  intros H.
-  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H.
-  now apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+  apply (rngl_neq_mul_0 Hon Hos Hiq).
+  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
   apply (rngl_pow_neq_0 Hon Hos Hiq).
   apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
 }
@@ -798,14 +794,12 @@ apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
   apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
   apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
-  intros H2.
-  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2.
-  now apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor) in H2.
+  apply (rngl_neq_mul_0 Hon Hos Hiq).
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
   apply (rngl_pow_neq_0 Hon Hos Hiq).
   apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
-  intros H2.
-  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2.
-  now apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor) in H2.
+  apply (rngl_neq_mul_0 Hon Hos Hiq).
+  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
   apply (rngl_pow_neq_0 Hon Hos Hiq).
   apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
   apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).

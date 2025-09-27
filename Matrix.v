@@ -1362,11 +1362,11 @@ unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec k 0) as [Hkz| Hkz]; rewrite Hkz; [ | clear Hkz ]. {
   now apply rngl_eqb_eq in Hkz.
 }
+rewrite (rl_sqrt_squ Hon Hop Hor) in Ha.
 destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
   rename H into Hkp.
   apply rngl_leb_le in Hkp.
   rewrite (rngl_mul_1_l Hon).
-  rewrite (rl_sqrt_squ Hon Hop Hor) in Ha.
   assert (Hx : ∀ x, (k * x / a = x / b)%L). {
     intros x; subst a.
     rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
@@ -1376,7 +1376,31 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
     now apply (rngl_mul_div Hi1).
   }
   now do 3 rewrite Hx.
-}
+} {
+(**)
+  rename H into Hkn.
+  apply rngl_leb_nle in Hkn.
+  apply (rngl_nle_gt_iff Hor) in Hkn.
+  apply (rngl_lt_le_incl Hor) in Hkn.
+  assert (Hx : ∀ x, (k * x / a = - (x / b))%L). {
+    intros x; subst a.
+    rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_div_opp_r Hon Hop Hiv). 2: {
+      now apply (rngl_neq_mul_0 Hon Hos Hiq).
+    }
+...
+    do 2 rewrite (rngl_mul_comm Hic k).
+    rewrite <- (rngl_div_div Hon Hos Hiv); [ | easy | easy ].
+    progress f_equal.
+    now apply (rngl_mul_div Hi1).
+  }
+    intros x; subst a; unfold Rdiv.
+    rewrite Rinv_mult.
+    rewrite <- Rmult_assoc.
+    rewrite Rinv_opp.
+    progress replace (k * x * - / k) with (/ k * k * - x) by lra.
+    rewrite Rinv_l; lra.
 ...
    apply Rnot_le_lt in Hkn.
    rewrite sqrt_Rsqr_abs in Ha.
