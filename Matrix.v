@@ -7,9 +7,11 @@ Require Import Datatypes.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
-Require Import Words Normalize Reverse Misc.
-Require Import MiscReals.
+Require Import Words.
 Require Import MiscTrigo.
+...
+Require Import Normalize Reverse Misc.
+Require Import MiscReals.
 
 ...
 
