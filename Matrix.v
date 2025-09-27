@@ -1362,6 +1362,20 @@ unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec k 0) as [Hkz| Hkz]; rewrite Hkz; [ | clear Hkz ]. {
   now apply rngl_eqb_eq in Hkz.
 }
+(**)
+destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
+  rename H into Hkp.
+  apply rngl_leb_le in Hkp.
+  rewrite (rngl_mul_1_l Hon).
+  rewrite (rl_sqrt_squ Hon Hop Hor) in Ha.
+  assert (Hx : ∀ x, (k * x / a = x / b)%L). {
+    intros x; subst a.
+    rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+    do 2 rewrite (rngl_mul_comm Hic k).
+    rewrite <- (rngl_div_div Hon Hos Hiv); [ | easy | easy ].
+    progress f_equal.
+    now apply (rngl_mul_div Hi1).
+  }
 ...
   destruct (Rle_dec 0 k) as [Hkp| Hkn].
    rewrite Rmult_1_l.
