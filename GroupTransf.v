@@ -3,7 +3,7 @@
 From Stdlib Require Import Utf8.
 From Stdlib Require Import Reals Nsatz Psatz.
 
-Require Import Misc Words MiscReals Matrix Pset Orbit.
+Require Import Misc Words Misc_Reals Matrix Pset Orbit.
 Require Import Partition OrbitRepr.
 
 Definition transl d (E : set vector) := mkset (λ v, (v - d)%vec ∈ E).
