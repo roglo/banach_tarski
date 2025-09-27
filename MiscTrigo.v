@@ -653,7 +653,7 @@ intros H.
 now apply (eq_rngl_squ_0 Hos Hio) in H.
 Qed.
 
-Definition rngl_sign a :=
+Definition rngl_sign' a :=
   match (a ?= 0)%L with
   | Eq => 0%L
   | Lt => (-1)%L
@@ -665,14 +665,14 @@ Theorem rngl_div_abs_diag_l :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
   rngl_is_ordered T = true →
-  ∀ a, a ≠ 0%L → (rngl_abs a / a = rngl_sign a)%L.
+  ∀ a, a ≠ 0%L → (rngl_abs a / a = rngl_sign' a)%L.
 Proof.
 intros Hon Hop Hiv Hor.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Haz.
 progress unfold rngl_abs.
-progress unfold rngl_sign.
+progress unfold rngl_sign'.
 remember (a ≤? 0)%L as az eqn:Ha.
 remember (a ?= 0)%L as az' eqn:Ha'.
 symmetry in Ha, Ha'.
