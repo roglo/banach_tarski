@@ -5,7 +5,7 @@ From Stdlib Require Import Utf8 Arith ZArith.
 From Stdlib Require Import Field.
 
 Require Import RingLike.Core.
-Require Import RingLike.IntermVal.
+Require Import RingLike.Interm_Val.
 Require Import RingLike.Misc.
 Require Import MiscReals Countable.
 

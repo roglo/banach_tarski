@@ -6,7 +6,7 @@ From Stdlib Require Import Ring Field.
 Require Import Datatypes.
 
 Require Import RingLike.Core.
-Require Import RingLike.RealLike.
+Require Import RingLike.Real_Like.
 Require Import Words.
 Require Import MiscTrigo.
 ...

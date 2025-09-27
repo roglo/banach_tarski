@@ -8,7 +8,7 @@ Import ListNotations.
 
 Require Import Misc Words Normalize Reverse.
 Require Import RingLike.Core.
-Require Import RingLike.RealLike.
+Require Import RingLike.Real_Like.
 
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
