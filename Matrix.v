@@ -1337,44 +1337,32 @@ Definition matrix_of_axis_angle '(V x y z) s c :=
 Arguments matrix_of_axis_angle pat%_vec (s c)%_L.
 
 Theorem matrix_mul_axis : ∀ p c s k,
-  k ≠ 0%L
+  p ≠ 0%vec
+  → k ≠ 0%L
   → matrix_of_axis_angle p s c =
     matrix_of_axis_angle (k ⁎ p) (rngl_sign k * s) c.
 Proof.
-intros * Hk.
-destruct (vec_eq_dec p 0%vec) as [Hpz| Hpz]. {
-(**)
-  subst p; cbn; rewrite (rngl_mul_0_r Hos).
-  rewrite (rngl_squ_0 Hos); do 2 rewrite rngl_add_0_l.
-  remember (0 / √0)%L as x.
-  f_equal.
-  f_equal.
-  f_equal.
-Print rngl_sign.
-Print rngl_signp.
-...
-  rewrite (rngl_div_0_l Hos Hi1).
-...
- subst p; simpl; rewrite Rmult_0_r.
- rewrite Rsqr_0; do 2 rewrite Rplus_0_l.
- rewrite Rdiv_0_l, Rsqr_0.
- now do 5 rewrite Rmult_0_l.
-
- destruct p as (xp, yp, zp); simpl.
- remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
- do 3 rewrite Rsqr_mult in Ha.
- do 2 rewrite <- Rmult_plus_distr_l in Ha.
- rewrite sqrt_mult in Ha; [ | apply Rle_0_sqr | apply nonneg_sqr_vec_norm ].
- remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
- assert (Hbz : b ≠ 0).
+intros * Hpz Hk.
+destruct p as (xp, yp, zp); simpl.
+remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
+do 3 rewrite (rngl_squ_mul Hic) in Ha.
+do 2 rewrite <- rngl_mul_add_distr_l in Ha.
+rewrite rl_sqrt_mul in Ha; [ | | apply nonneg_sqr_vec_norm ]. 2: {
+  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+}
+remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
+assert (Hbz : b ≠ 0%L). {
   subst b; intros H.
-  apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+  apply (eq_rl_sqrt_0 Hon Hos) in H; [ | apply nonneg_sqr_vec_norm ].
   apply sqr_vec_norm_eq_0 in H.
   destruct H as (H1 & H2 & H3).
   now rewrite H1, H2, H3 in Hpz.
-
-  unfold Rsign, Rsignp.
-  destruct (Req_dec k 0) as [Hkz| Hkz]; [ lra | clear Hkz ].
+}
+unfold rngl_sign, rngl_signp.
+destruct (rngl_eqb_dec k 0) as [Hkz| Hkz]; rewrite Hkz; [ | clear Hkz ]. {
+  now apply rngl_eqb_eq in Hkz.
+}
+...
   destruct (Rle_dec 0 k) as [Hkp| Hkn].
    rewrite Rmult_1_l.
    rewrite sqrt_Rsqr in Ha; [ | lra ].
