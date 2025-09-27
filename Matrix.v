@@ -1362,7 +1362,6 @@ unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec k 0) as [Hkz| Hkz]; rewrite Hkz; [ | clear Hkz ]. {
   now apply rngl_eqb_eq in Hkz.
 }
-(**)
 destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
   rename H into Hkp.
   apply rngl_leb_le in Hkp.
@@ -1376,19 +1375,9 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
     progress f_equal.
     now apply (rngl_mul_div Hi1).
   }
+  now do 3 rewrite Hx.
+}
 ...
-  destruct (Rle_dec 0 k) as [Hkp| Hkn].
-   rewrite Rmult_1_l.
-   rewrite sqrt_Rsqr in Ha; [ | lra ].
-   assert (Hx : ∀ x, k * x / a = x / b).
-    intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult.
-    rewrite <- Rmult_assoc.
-    progress replace (k * x * / k) with (/ k * k * x) by lra.
-    rewrite Rinv_l; lra.
-
-    now do 3 rewrite Hx.
-
    apply Rnot_le_lt in Hkn.
    rewrite sqrt_Rsqr_abs in Ha.
    unfold Rabs in Ha.
