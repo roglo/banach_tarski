@@ -7,7 +7,11 @@ Require Import Datatypes.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
-Require Import Words Normalize Reverse Misc MiscReals.
+Require Import Words Normalize Reverse Misc.
+Require Import MiscReals.
+Require Import MiscTrigo.
+
+...
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -1377,7 +1381,6 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
   }
   now do 3 rewrite Hx.
 } {
-(**)
   rename H into Hkn.
   apply rngl_leb_nle in Hkn.
   apply (rngl_nle_gt_iff Hor) in Hkn.
@@ -1389,34 +1392,22 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
     rewrite (rngl_div_opp_r Hon Hop Hiv). 2: {
       now apply (rngl_neq_mul_0 Hon Hos Hiq).
     }
-...
+    progress f_equal.
     do 2 rewrite (rngl_mul_comm Hic k).
     rewrite <- (rngl_div_div Hon Hos Hiv); [ | easy | easy ].
     progress f_equal.
     now apply (rngl_mul_div Hi1).
   }
-    intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult.
-    rewrite <- Rmult_assoc.
-    rewrite Rinv_opp.
-    progress replace (k * x * - / k) with (/ k * k * - x) by lra.
-    rewrite Rinv_l; lra.
-...
-   apply Rnot_le_lt in Hkn.
-   rewrite sqrt_Rsqr_abs in Ha.
-   unfold Rabs in Ha.
-   destruct (Rcase_abs k) as [H| H]; [ clear H | lra ].
-   assert (Hx : ∀ x, k * x / a = - (x / b)).
-    intros x; subst a; unfold Rdiv.
-    rewrite Rinv_mult.
-    rewrite <- Rmult_assoc.
-    rewrite Rinv_opp.
-    progress replace (k * x * - / k) with (/ k * k * - x) by lra.
-    rewrite Rinv_l; lra.
-
-    do 3 rewrite Hx, <- Rsqr_neg.
-    f_equal; lra.
+  do 3 rewrite Hx.
+  do 3 rewrite (rngl_squ_opp Hop).
+  do 3 rewrite rngl_mul_assoc.
+  do 6 rewrite (rngl_mul_opp_opp Hop).
+  do 3 rewrite (rngl_mul_1_r Hon).
+  easy.
+}
 Qed.
+
+...
 
 Theorem unit_sphere_mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
   ‖a‖ = 1

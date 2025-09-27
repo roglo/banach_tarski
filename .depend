@@ -2,7 +2,7 @@ Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified Banach_Tarski.req
 Countable.vo Countable.glob Countable.v.beautified Countable.required_vo: Countable.v Misc.vo
 Equidecomp.vo Equidecomp.glob Equidecomp.v.beautified Equidecomp.required_vo: Equidecomp.v GroupTransf.vo Matrix.vo Misc.vo OrbitRepr.vo Partition.vo Pset.vo
 GroupTransf.vo GroupTransf.glob GroupTransf.v.beautified GroupTransf.required_vo: GroupTransf.v Matrix.vo Misc.vo MiscReals.vo Orbit.vo OrbitRepr.vo Partition.vo Pset.vo Words.vo
-Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo MiscReals.vo Normalize.vo Reverse.vo Words.vo
+Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo MiscReals.vo MiscTrigo.vo Normalize.vo Reverse.vo Words.vo
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v
 MiscReals.vo MiscReals.glob MiscReals.v.beautified MiscReals.required_vo: MiscReals.v Misc.vo Normalize.vo Reverse.vo Words.vo
 MiscTrigo.vo MiscTrigo.glob MiscTrigo.v.beautified MiscTrigo.required_vo: MiscTrigo.v MiscReals.vo
