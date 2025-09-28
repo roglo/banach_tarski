@@ -1,18 +1,17 @@
-Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified Banach_Tarski.required_vo: Banach_Tarski.v Countable.vo Equidecomp.vo GroupTransf.vo Matrix.vo Misc.vo Misc_Reals.vo Misc_Trigo.vo Normalize.vo NotEmptyPath.vo Orbit.vo OrbitRepr.vo Partition.vo Pset.vo Reverse.vo Rn_Countable.vo Words.vo
+Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified Banach_Tarski.required_vo: Banach_Tarski.v Countable.vo Equidecomp.vo GroupTransf.vo Matrix.vo Misc.vo MiscReals.vo MiscTrigo.vo Normalize.vo NotEmptyPath.vo Orbit.vo OrbitRepr.vo Partition.vo Pset.vo Reverse.vo Words.vo
 Countable.vo Countable.glob Countable.v.beautified Countable.required_vo: Countable.v Misc.vo
 Equidecomp.vo Equidecomp.glob Equidecomp.v.beautified Equidecomp.required_vo: Equidecomp.v GroupTransf.vo Matrix.vo Misc.vo OrbitRepr.vo Partition.vo Pset.vo
-GroupTransf.vo GroupTransf.glob GroupTransf.v.beautified GroupTransf.required_vo: GroupTransf.v Matrix.vo Misc.vo Misc_Reals.vo Orbit.vo OrbitRepr.vo Partition.vo Pset.vo Words.vo
-Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo Misc_Reals.vo Misc_Trigo.vo Normalize.vo Reverse.vo Words.vo
+GroupTransf.vo GroupTransf.glob GroupTransf.v.beautified GroupTransf.required_vo: GroupTransf.v Matrix.vo Misc.vo MiscReals.vo Orbit.vo OrbitRepr.vo Partition.vo Pset.vo Words.vo
+Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo MiscReals.vo MiscTrigo.vo Normalize.vo Reverse.vo Words.vo
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v
-Misc_Reals.vo Misc_Reals.glob Misc_Reals.v.beautified Misc_Reals.required_vo: Misc_Reals.v Misc.vo Normalize.vo Reverse.vo Words.vo
-Misc_Trigo.vo Misc_Trigo.glob Misc_Trigo.v.beautified Misc_Trigo.required_vo: Misc_Trigo.v Misc_Reals.vo
+MiscReals.vo MiscReals.glob MiscReals.v.beautified MiscReals.required_vo: MiscReals.v Misc.vo Normalize.vo Reverse.vo Words.vo
+MiscTrigo.vo MiscTrigo.glob MiscTrigo.v.beautified MiscTrigo.required_vo: MiscTrigo.v MiscReals.vo
 Normalize.vo Normalize.glob Normalize.v.beautified Normalize.required_vo: Normalize.v Misc.vo Words.vo
-NotEmptyPath.vo NotEmptyPath.glob NotEmptyPath.v.beautified NotEmptyPath.required_vo: NotEmptyPath.v Matrix.vo Misc_Reals.vo Normalize.vo Reverse.vo Words.vo
-Orbit.vo Orbit.glob Orbit.v.beautified Orbit.required_vo: Orbit.v Matrix.vo Misc.vo Misc_Reals.vo Normalize.vo Pset.vo Reverse.vo Words.vo
+NotEmptyPath.vo NotEmptyPath.glob NotEmptyPath.v.beautified NotEmptyPath.required_vo: NotEmptyPath.v Matrix.vo MiscReals.vo Normalize.vo Reverse.vo Words.vo
+Orbit.vo Orbit.glob Orbit.v.beautified Orbit.required_vo: Orbit.v Matrix.vo Misc.vo MiscReals.vo Normalize.vo Pset.vo Reverse.vo Words.vo
 OrbitRepr.vo OrbitRepr.glob OrbitRepr.v.beautified OrbitRepr.required_vo: OrbitRepr.v Matrix.vo Misc.vo Normalize.vo Orbit.vo Partition.vo Pset.vo Reverse.vo Words.vo
 Partition.vo Partition.glob Partition.v.beautified Partition.required_vo: Partition.v Misc.vo Pset.vo
 Pset.vo Pset.glob Pset.v.beautified Pset.required_vo: Pset.v Misc.vo
 Quaternion.vo Quaternion.glob Quaternion.v.beautified Quaternion.required_vo: Quaternion.v
 Reverse.vo Reverse.glob Reverse.v.beautified Reverse.required_vo: Reverse.v Misc.vo Normalize.vo Words.vo
-Rn_Countable.vo Rn_Countable.glob Rn_Countable.v.beautified Rn_Countable.required_vo: Rn_Countable.v Countable.vo Misc_Reals.vo
 Words.vo Words.glob Words.v.beautified Words.required_vo: Words.v Misc.vo

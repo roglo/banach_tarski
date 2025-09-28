@@ -6,7 +6,7 @@ From Stdlib Require Import Utf8 Arith ZArith.
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 Require Import TrigoWithoutPi.Core.
-Require Import Misc_Reals.
+Require Import a.MiscReals.
 
 Section a.
 

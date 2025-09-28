@@ -9,7 +9,7 @@ Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 Require Import TrigoWithoutPi.Core.
 Require Import a.Words a.Normalize a.Reverse a.Misc.
-Require Import a.Misc_Trigo a.Misc_Reals.
+Require Import a.MiscTrigo a.MiscReals.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -42,8 +42,6 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T }.
 Context {fc : field_char_0_archim T}.
-
-Print angle_ctx.
 
 ...
   { ac_ic : rngl_mul_is_comm T0 = true;

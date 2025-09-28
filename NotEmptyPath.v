@@ -4,7 +4,7 @@ From Stdlib Require Import Utf8 Arith List.
 From Stdlib Require Import Reals Psatz.
 Import ListNotations.
 
-Require Import Misc_Reals Words Normalize Reverse Matrix.
+From a Require Import MiscReals Words Normalize Reverse Matrix.
 
 Definition rotate_param e '(a, b, c, N) :=
   match e with
