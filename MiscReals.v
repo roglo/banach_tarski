@@ -824,10 +824,32 @@ Theorem rngl_of_pos_inj : ∀ a b, rngl_of_pos a = rngl_of_pos b → a = b.
 Proof.
 destruct_ac.
 intros * Hab.
-...
+destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hch]. {
+  apply (rngl_of_nat_inj Hon Hos) in Hab.
+  now apply Pos2Nat.inj in Hab.
+  now left.
+}
+specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
 apply (rngl_of_nat_inj Hon Hos) in Hab.
 now apply Pos2Nat.inj in Hab.
-now left.
+right.
+progress unfold rngl_of_pos in Hab.
+Check rngl_of_nat_inj.
+Theorem toto :
+  rngl_characteristic T ≠ 0 →
+  ∀ i j,
+  rngl_of_nat i = rngl_of_nat j
+  → i mod rngl_characteristic T = j mod rngl_characteristic T.
+Proof.
+destruct_ac.
+intros Hch * Hij.
+revert i Hij.
+induction j; intros. {
+  rewrite Nat.Div0.mod_0_l; cbn in Hij.
+  induction i; [ apply Nat.Div0.mod_0_l | ].
+  rewrite rngl_of_nat_succ in Hij.
+  specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
+...
 Qed.
 
 Theorem rngl_of_pos_le_1_l : ∀ a, (1 ≤ rngl_of_pos a)%L.
