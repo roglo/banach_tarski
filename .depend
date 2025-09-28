@@ -1,4 +1,4 @@
-Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified Banach_Tarski.required_vo: Banach_Tarski.v Countable.vo Equidecomp.vo GroupTransf.vo Matrix.vo Misc.vo MiscReals.vo MiscTrigo.vo Normalize.vo NotEmptyPath.vo Orbit.vo OrbitRepr.vo Partition.vo Pset.vo Reverse.vo Words.vo
+Banach_Tarski.vo Banach_Tarski.glob Banach_Tarski.v.beautified Banach_Tarski.required_vo: Banach_Tarski.v Countable.vo Equidecomp.vo GroupTransf.vo Matrix.vo Misc.vo MiscReals.vo MiscTrigo.vo Normalize.vo NotEmptyPath.vo Orbit.vo OrbitRepr.vo Partition.vo Pset.vo Reverse.vo RnCountable.vo Words.vo
 Countable.vo Countable.glob Countable.v.beautified Countable.required_vo: Countable.v Misc.vo
 Equidecomp.vo Equidecomp.glob Equidecomp.v.beautified Equidecomp.required_vo: Equidecomp.v GroupTransf.vo Matrix.vo Misc.vo OrbitRepr.vo Partition.vo Pset.vo
 GroupTransf.vo GroupTransf.glob GroupTransf.v.beautified GroupTransf.required_vo: GroupTransf.v Matrix.vo Misc.vo MiscReals.vo Orbit.vo OrbitRepr.vo Partition.vo Pset.vo Words.vo
@@ -14,4 +14,5 @@ Partition.vo Partition.glob Partition.v.beautified Partition.required_vo: Partit
 Pset.vo Pset.glob Pset.v.beautified Pset.required_vo: Pset.v Misc.vo
 Quaternion.vo Quaternion.glob Quaternion.v.beautified Quaternion.required_vo: Quaternion.v
 Reverse.vo Reverse.glob Reverse.v.beautified Reverse.required_vo: Reverse.v Misc.vo Normalize.vo Words.vo
+RnCountable.vo RnCountable.glob RnCountable.v.beautified RnCountable.required_vo: RnCountable.v Countable.vo MiscReals.vo
 Words.vo Words.glob Words.v.beautified Words.required_vo: Words.v Misc.vo
