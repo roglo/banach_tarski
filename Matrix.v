@@ -7,6 +7,7 @@ Require Import Datatypes.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
+Require Import TrigoWithoutPi.Core.
 Require Import a.Words a.Normalize a.Reverse a.Misc.
 Require Import a.Misc_Trigo a.Misc_Reals.
 
@@ -39,7 +40,25 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T }.
 Context {fc : field_char_0_archim T}.
+
+...
+  { ac_ic : rngl_mul_is_comm T0 = true;
+    ac_on : rngl_has_1 T0 = true;
+    ac_op : rngl_has_opp T0 = true;
+    ac_iv : rngl_has_inv T0 = true;
+    ac_c2 : rngl_characteristic T0 ≠ 2;
+    ac_or : rngl_is_ordered T0 = true }.
+    ac_ed : rngl_has_eq_dec T0 = true;
+
+  { fc_ic : rngl_mul_is_comm T0 = true;
+    fc_on : rngl_has_1 T0 = true;
+    fc_op : rngl_has_opp T0 = true;
+    fc_iv : rngl_has_inv T0 = true;
+    fc_or : rngl_is_ordered T0 = true;
+    fc_ch : rngl_characteristic T0 = 0;
+    fc_ar : rngl_is_archimedean T0 = true }.
 
 Let Hic := fc_ic.
 Let Hon := fc_on.
@@ -1404,19 +1423,18 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
 }
 Qed.
 
-...
-
 Theorem unit_sphere_mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
-  ‖a‖ = 1
-  → s₁² + c₁² = 1
-  → s₂² + c₂² = 1
+  ‖a‖ = 1%L
+  → (s₁² + c₁² = 1)%L
+  → (s₂² + c₂² = 1)%L
   → θ₁ = angle_of_sin_cos s₁ c₁
   → θ₂ = angle_of_sin_cos s₂ c₂
-  → (matrix_of_axis_angle (a, s₁, c₁) *
-     matrix_of_axis_angle (a, s₂, c₂))%mat =
-     matrix_of_axis_angle (a, sin (θ₁ + θ₂), cos (θ₁ + θ₂)).
+  → (matrix_of_axis_angle a s₁ c₁ *
+      matrix_of_axis_angle a s₂ c₂)%mat =
+     matrix_of_axis_angle a (rngl_sin (θ₁ + θ₂)) (rngl_cos (θ₁ + θ₂)).
 Proof.
 intros * Ha Hsc₁ Hsc₂ Hθ₁ Hθ₂.
+...
 destruct a as (ax, ay, az); simpl.
 simpl in Ha; rewrite Ha.
 do 3 rewrite Rdiv_1_r.
