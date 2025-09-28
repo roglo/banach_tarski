@@ -835,20 +835,54 @@ now apply Pos2Nat.inj in Hab.
 right.
 progress unfold rngl_of_pos in Hab.
 Check rngl_of_nat_inj.
-Theorem toto :
+Theorem rngl_mod_characteristic :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_psub T = true →
+  rngl_has_inv_or_pdiv T = true →
+  rngl_is_ordered T = true →
   rngl_characteristic T ≠ 0 →
   ∀ i j,
   rngl_of_nat i = rngl_of_nat j
   → i mod rngl_characteristic T = j mod rngl_characteristic T.
 Proof.
-destruct_ac.
-intros Hch * Hij.
+intros Hon Hos Hiq Hor Hch * Hij.
 revert i Hij.
 induction j; intros. {
   rewrite Nat.Div0.mod_0_l; cbn in Hij.
+  destruct i; [ apply Nat.Div0.mod_0_l | ].
+  rewrite rngl_of_nat_succ in Hij.
+  specialize (rngl_of_nat_nonneg Hon Hos Hiq Hor i) as H1.
+  exfalso; apply rngl_nlt_ge in H1.
+  apply H1; clear H1; rewrite <- Hij.
+  apply (rngl_lt_add_l Hos Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+}
+destruct i. {
+  symmetry in Hij; rewrite rngl_of_nat_0 in Hij.
+  rewrite rngl_of_nat_succ in Hij.
+  specialize (rngl_of_nat_nonneg Hon Hos Hiq Hor j) as H1.
+  exfalso; apply rngl_nlt_ge in H1.
+  apply H1; clear H1; rewrite <- Hij.
+  apply (rngl_lt_add_l Hos Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+}
+do 2 rewrite rngl_of_nat_succ in Hij.
+apply (rngl_add_cancel_l Hos) in Hij.
+apply IHj in Hij.
+rewrite <- Nat.add_1_l.
+rewrite <- (Nat.add_1_l j).
+rewrite <- Nat.Div0.add_mod_idemp_r.
+rewrite Hij.
+now rewrite Nat.Div0.add_mod_idemp_r.
+Qed.
+
+generalize Hab; intros H.
+apply (rngl_mod_characteristic Hon Hos Hiq Hor Hch) in H.
+...
   induction i; [ apply Nat.Div0.mod_0_l | ].
   rewrite rngl_of_nat_succ in Hij.
   specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
+Search (S _ mod _).
 ...
 Qed.
 
