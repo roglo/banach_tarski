@@ -790,23 +790,20 @@ destruct a as [a| a| ]; [ | | easy ]. {
 } {
   exfalso.
   rewrite <- rngl_of_pos_1 in Ha1.
-cbn in Hc1.
-About rngl_of_nat_inj.
-(* peut-être y ajouter un cas où i et j < rngl_characteristic ? *)
-...
-  apply (rngl_of_nat_inj Hon Hos Hch) in Ha1.
-...
+  cbn in Hc1.
+  apply (rngl_of_nat_inj Hon Hos) in Ha1.
   now apply Pos2Nat.inj in Ha1.
+  now left.
 }
-...
 Qed.
 
 Theorem rngl_of_pos_inj : ∀ a b, rngl_of_pos a = rngl_of_pos b → a = b.
 Proof.
 destruct_ac.
 intros * Hab.
-apply (rngl_of_nat_inj Hon Hos Hch) in Hab.
+apply (rngl_of_nat_inj Hon Hos) in Hab.
 now apply Pos2Nat.inj in Hab.
+now left.
 Qed.
 
 Theorem rngl_of_pos_le_1_l : ∀ a, (1 ≤ rngl_of_pos a)%L.
@@ -2138,6 +2135,7 @@ destruct (rngl_eqb_dec (x * y) 0) as [Hxyz| Hxyz]; rewrite Hxyz. {
   apply (rngl_mul_0_l Hos).
   destruct (rngl_eqb_dec y 0) as [Hy| Hy]; rewrite Hy.
   apply (rngl_mul_0_r Hos).
+...
   apply (rngl_integral Hos Hio) in Hxyz.
   apply (rngl_eqb_neq Heo) in Hx, Hy.
   now destruct Hxyz.
