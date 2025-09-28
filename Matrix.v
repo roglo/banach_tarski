@@ -41,9 +41,8 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T }.
+(*
 Context {fc : field_char_0_archim T}.
-
-...
   { ac_ic : rngl_mul_is_comm T0 = true;
     ac_on : rngl_has_1 T0 = true;
     ac_op : rngl_has_opp T0 = true;
@@ -69,10 +68,12 @@ Let Hor := fc_or.
 Let Hos := rngl_has_opp_has_opp_or_psub Hop.
 Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
 Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
-Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
 Let Hio := rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor.
 Let Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
+*)
+
+Context {Hc1 : rngl_characteristic T ≠ 1}.
 
 Ltac fold_rngl :=
   replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul)
@@ -97,8 +98,8 @@ Definition Rmult5_sqrt2_sqrt5 := @Rmult5_sqrt2_sqrt5 T ro rp rl Hic Hon Hop Hor.
 Arguments Rmult5_sqrt2_sqrt5 (a b c d)%_L.
 *)
 
-Add Ring rngl_ring : (rngl_ring_theory Hic Hop Hon).
-Add Field rngl_field : (rngl_field_theory Hic Hop Hon Hiv Hc1).
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op ac_on).
+Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_on ac_iv Hc1).
 
 Definition mat_add (M₁ M₂ : matrix T) :=
   mkmat
@@ -231,6 +232,7 @@ Arguments mat_vec_mul M%_mat _%_vec.
 
 Theorem vec_eq_dec : ∀ u v : vector T, { u = v } + { u ≠ v }.
 Proof.
+destruct_ac.
 intros (x₁, y₁, z₁) (x₂, y₂, z₂).
 destruct (rngl_eqb_dec x₁ x₂) as [H₁| H₁]. {
   apply (rngl_eqb_eq Heo) in H₁; subst x₂.
@@ -263,6 +265,7 @@ Qed.
 
 Theorem mat_eq_dec : ∀ m₁ m₂ : matrix T, { m₁ = m₂ } + { m₁ ≠ m₂ }.
 Proof.
+destruct_ac.
 intros.
 destruct (rngl_eqb_dec (a₁₁ m₁) (a₁₁ m₂)) as [H₁₁| H₁₁].
 apply (rngl_eqb_eq Heo) in H₁₁.
@@ -305,6 +308,7 @@ Qed.
 
 Theorem mat_mul_id_l : ∀ m, (mat_id * m)%mat = m.
 Proof.
+destruct_ac.
 intros m.
 unfold mat_mul, mat_id; simpl.
 progress repeat rewrite (rngl_mul_1_l Hon).
@@ -316,6 +320,7 @@ Qed.
 
 Theorem mat_mul_id_r : ∀ m, (m * mat_id)%mat = m.
 Proof.
+destruct_ac.
 intros m.
 unfold mat_mul, mat_id; simpl.
 progress repeat rewrite (rngl_mul_1_r Hon).
@@ -327,6 +332,7 @@ Qed.
 
 Theorem mat_vec_mul_id : ∀ p, (mat_id * p)%vec = p.
 Proof.
+destruct_ac.
 intros (x, y, z).
 unfold mat_vec_mul; simpl.
 progress repeat rewrite (rngl_mul_0_l Hos).
@@ -381,11 +387,14 @@ Proof. easy. Qed.
 
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
+destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
+About Rmult5_sqrt2_sqrt5.
+...
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {

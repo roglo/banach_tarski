@@ -6,37 +6,13 @@ From Stdlib Require Import ZArith.
 From Stdlib Require Import Ring.
 Import ListNotations.
 
-Require Import Misc Words Normalize Reverse.
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
+Require Import TrigoWithoutPi.Core.
+From a Require Import Misc Words Normalize Reverse.
 
 Notation "'ℤ'" := Z.
 Notation "'ℕ'" := nat.
-
-Class field_char_0_archim T {ro : ring_like_op T} {rp : ring_like_prop T} :=
-  { fc_ic : rngl_mul_is_comm T = true;
-    fc_on : rngl_has_1 T = true;
-    fc_op : rngl_has_opp T = true;
-    fc_iv : rngl_has_inv T = true;
-    fc_or : rngl_is_ordered T = true;
-    fc_ch : rngl_characteristic T = 0;
-    fc_ar : rngl_is_archimedean T = true }.
-
-Ltac destruct_fc :=
-  set (Hic := fc_ic);
-  set (Hon := fc_on);
-  set (Hop := fc_op);
-  set (Hiv := fc_iv);
-  set (Hor := fc_or);
-  set (Hch := fc_ch);
-  set (Har := fc_ar);
-  specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos;
-  specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq;
-  specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo;
-  specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1;
-  specialize (eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch) as Hc1;
-  specialize (rngl_int_dom_or_inv_1_quo Hiv Hon) as Hii;
-  specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 
 Section a.
 
@@ -44,19 +20,19 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
-Context {fc : field_char_0_archim T}.
+Context {ac : angle_ctx T}.
 
 Tactic Notation "pauto" := progress auto.
 Hint Resolve rngl_le_refl : core.
 
-Add Ring rngl_ring : (rngl_ring_theory fc_ic fc_op fc_on).
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op ac_on).
 
 Theorem Rdiv_mult_simpl_l : ∀ x y z,
   x ≠ 0%L
   → z ≠ 0%L
   → ((x * y) / (x * z) = y / z)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx Hz.
 progress unfold rngl_div.
 rewrite Hiv.
@@ -77,13 +53,13 @@ Proof.
 intros * Hy Hz.
 specialize (Rdiv_mult_simpl_l z x y Hz Hy) as H.
 rewrite <- H.
-do 2 rewrite (rngl_mul_comm fc_ic z).
+do 2 rewrite (rngl_mul_comm ac_ic z).
 easy.
 Qed.
 
 Theorem Rcase_abs : ∀ a, {(a < 0)%L} + {(0 ≤ a)%L}.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct (rngl_ltb_dec a 0) as [Haz| Haz]; [ left | right ].
 now apply rngl_ltb_lt in Haz.
@@ -95,7 +71,7 @@ Arguments Rcase_abs a%_L.
 Theorem Rmult5_sqrt2_sqrt5 : ∀ a b c d, (0 ≤ b)%L →
   (a * √ b * c * d * √ b = a * b * c * d)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros a b c d Hb.
 rewrite (rngl_mul_comm Hic), rngl_mul_assoc; f_equal.
 rewrite rngl_mul_assoc; f_equal.
@@ -108,19 +84,19 @@ Qed.
 
 Theorem Rdiv_0_l : ∀ x, (x ≠ 0 → 0 / x = 0)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 now intros * Hx; apply (rngl_div_0_l Hos Hi1).
 Qed.
 
 Theorem Rdiv_1_r : ∀ x, (x / 1 = x)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 now apply (rngl_div_1_r Hon Hiq); left.
 Qed.
 
 Theorem Rdiv_same : ∀ x, (x ≠ 0 → x / x = 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 apply (rngl_div_diag Hon Hiq).
 Qed.
 
@@ -184,7 +160,7 @@ Theorem rngl_of_pos_pred :
   (1 < a)%positive
   → rngl_of_pos (Pos.pred a) = (rngl_of_pos a - 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * H1a.
 progress unfold rngl_of_pos.
 rewrite Pos2Nat.inj_pred; [ | easy ].
@@ -199,7 +175,7 @@ Qed.
 
 Theorem rngl_of_pos_xO : ∀ a, rngl_of_pos a~0 = (2 * rngl_of_pos a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold rngl_of_pos.
 rewrite Pos2Nat.inj_xO.
@@ -210,7 +186,7 @@ Qed.
 
 Theorem rngl_of_pos_xI : ∀ a, rngl_of_pos a~1 = (2 * rngl_of_pos a + 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold rngl_of_pos.
 rewrite Pos2Nat.inj_xI.
@@ -225,7 +201,7 @@ Qed.
 Theorem rngl_of_nat_Pos_to_nat :
   ∀ a, rngl_of_pos a = rngl_of_nat (Pos.to_nat a).
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct a as [a| a| ]; cbn. {
   rewrite rngl_of_pos_xI.
@@ -251,7 +227,7 @@ Qed.
 
 Theorem rngl_of_pos_1 : rngl_of_pos 1 = 1%L.
 Proof.
-destruct_fc.
+destruct_ac.
 progress unfold rngl_of_pos.
 rewrite Pos2Nat.inj_1.
 apply rngl_of_nat_1.
@@ -259,7 +235,7 @@ Qed.
 
 Theorem rngl_of_pos_2 : rngl_of_pos 2 = 2%L.
 Proof.
-destruct_fc.
+destruct_ac.
 progress unfold rngl_of_pos.
 rewrite Pos2Nat.inj_xO.
 rewrite Pos2Nat.inj_1.
@@ -269,7 +245,7 @@ Qed.
 
 Theorem rngl_of_Z_succ : ∀ a, rngl_of_Z (Z.succ a) = (1 + rngl_of_Z a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 symmetry.
 destruct a as [| a| a]; cbn. {
@@ -304,7 +280,7 @@ Qed.
 
 Theorem rngl_of_Z_opp : ∀ a, rngl_of_Z (- a) = (- rngl_of_Z a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 symmetry.
 destruct a as [| a| a]; cbn; [ | easy | ]. {
@@ -316,7 +292,7 @@ Qed.
 
 Theorem Pos_dec : ∀ a b, ({a < b} + {b < a} + {a = b})%positive.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold Pos.lt.
 rewrite (Pos.compare_antisym a).
@@ -328,7 +304,7 @@ Qed.
 
 Theorem rngl_of_Z_pred : ∀ a, rngl_of_Z (Z.pred a) = (rngl_of_Z a - 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct a as [| a| a]; cbn. {
   rewrite rngl_of_pos_1.
@@ -361,7 +337,7 @@ Theorem rngl_of_pos_sub :
   (b < a)%positive
   → rngl_of_pos (a - b) = (rngl_of_pos a - rngl_of_pos b)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hba.
 progress unfold rngl_of_pos.
 rewrite Pos2Nat.inj_sub; [ | easy ].
@@ -372,7 +348,7 @@ Qed.
 
 Theorem Pos2Nat_ge_1 : ∀ a, 1 ≤ Pos.to_nat a.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 induction a as [a| a| ]; [ | | easy ]. {
   rewrite Pos2Nat.inj_xI.
@@ -388,7 +364,7 @@ Qed.
 
 Theorem Pos_le_neq : ∀ a b, (a < b ↔ a <= b ∧ a ≠ b)%positive.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 split; intros Hab. {
   split; [ now apply Pos.lt_le_incl | ].
@@ -402,7 +378,7 @@ Qed.
 
 Theorem Pos_le_add_l : ∀ a b, (a <= b + a)%positive.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 apply Pos.lt_le_incl.
 rewrite Pos.add_comm.
@@ -411,7 +387,7 @@ Qed.
 
 Theorem rngl_of_Z_add_1_l : ∀ a, rngl_of_Z (1 + a) = (1 + rngl_of_Z a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct a as [| a| a]; cbn; [ easy | | ]. {
   destruct a as [a| a| ]; cbn; [ | easy | easy ].
@@ -462,7 +438,7 @@ Qed.
 
 Theorem rngl_of_Z_add_1_r : ∀ a, rngl_of_Z (a + 1) = (rngl_of_Z a + 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 rewrite Z.add_comm, rngl_add_comm.
 apply rngl_of_Z_add_1_l.
@@ -471,7 +447,7 @@ Qed.
 Theorem rngl_of_pos_mul :
   ∀ a b, rngl_of_pos (a * b) = (rngl_of_pos a * rngl_of_pos b)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 revert b.
 induction a as [a| a| ]; intros; cbn. {
@@ -495,7 +471,7 @@ Qed.
 Theorem rngl_of_Z_mul :
   ∀ a b, rngl_of_Z (a * b) = (rngl_of_Z a * rngl_of_Z b)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct a as [| a| a]; cbn. {
   symmetry; apply (rngl_mul_0_l Hos).
@@ -525,7 +501,7 @@ Qed.
 
 Theorem rngl_of_Z_2 : rngl_of_Z 2 = 2%L.
 Proof.
-destruct_fc.
+destruct_ac.
 cbn; progress unfold rngl_of_pos.
 progress unfold Pos.to_nat; cbn.
 now rewrite rngl_add_0_r.
@@ -533,7 +509,7 @@ Qed.
 
 Theorem rngl_of_Z_sub_1 : ∀ a, rngl_of_Z (a - 1) = (rngl_of_Z a - 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct a as [| a| a]. {
   cbn.
@@ -568,7 +544,7 @@ Theorem rngl_of_Z_add_pos_neg :
   rngl_of_Z (Z.pos a + Z.neg b) =
     (rngl_of_Z (Z.pos a) + rngl_of_Z (Z.neg b))%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 cbn.
 rewrite <- Pos2Z.add_pos_neg.
@@ -657,7 +633,7 @@ Qed.
 Theorem rngl_of_Z_add :
   ∀ a b, rngl_of_Z (a + b) = (rngl_of_Z a + rngl_of_Z b)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 induction a as [| a| a]. {
   symmetry; apply rngl_add_0_l.
@@ -685,9 +661,13 @@ induction a as [| a| a]. {
 }
 Qed.
 
+Context {Hch : rngl_characteristic T = 0}.
+Context {Har : rngl_is_archimedean T = true}.
+Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+
 Theorem z_int_part : ∀ a, ∃ₜ n, (rngl_of_Z n ≤ a < rngl_of_Z (n + 1))%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 specialize (int_part Hon Hop Hiq Hc1 Hor Har a) as (n, Hn).
 destruct (rngl_leb_dec 0 a)%L as [Hza| Hza]. {
@@ -767,7 +747,7 @@ Definition IZR := rngl_of_Z.
 
 Theorem rngl_of_pos_pos : ∀ a, (0 < rngl_of_pos a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 induction a as [a| a| ]; cbn. {
   apply (rngl_le_lt_trans Hor _ 1).
@@ -788,7 +768,7 @@ Qed.
 
 Theorem rngl_of_pos_neq_0 : ∀ a, rngl_of_pos a ≠ 0%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Ha.
 specialize (rngl_of_pos_pos a) as H1.
 rewrite Ha in H1.
@@ -797,7 +777,7 @@ Qed.
 
 Theorem rngl_of_pos_eq_1 : ∀ a, rngl_of_pos a = 1%L → a = 1%positive.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Ha1.
 destruct a as [a| a| ]; [ | | easy ]. {
   exfalso.
@@ -813,11 +793,14 @@ destruct a as [a| a| ]; [ | | easy ]. {
   apply (rngl_of_nat_inj Hon Hos Hch) in Ha1.
   now apply Pos2Nat.inj in Ha1.
 }
+About rngl_of_nat_inj.
+(* peut-être y ajouter un cas où i et j < rngl_characteristic ? *)
+...
 Qed.
 
 Theorem rngl_of_pos_inj : ∀ a b, rngl_of_pos a = rngl_of_pos b → a = b.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 apply (rngl_of_nat_inj Hon Hos Hch) in Hab.
 now apply Pos2Nat.inj in Hab.
@@ -825,7 +808,7 @@ Qed.
 
 Theorem rngl_of_pos_le_1_l : ∀ a, (1 ≤ rngl_of_pos a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold rngl_of_pos.
 rewrite <- rngl_of_nat_1.
@@ -835,7 +818,7 @@ Qed.
 
 Theorem rngl_of_pos_nonneg : ∀ a, (0 ≤ rngl_of_pos a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
 apply (rngl_0_le_1 Hon Hos Hiq Hor).
@@ -844,7 +827,7 @@ Qed.
 Theorem rngl_of_pos_le_inj :
   ∀ a b, (rngl_of_pos a ≤ rngl_of_pos b)%L → (a <= b)%positive.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 revert b Hab.
 induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
@@ -985,7 +968,7 @@ Qed.
 Theorem rngl_of_pos_inj_le :
   ∀ a b, (a <= b)%positive → (rngl_of_pos a ≤ rngl_of_pos b)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 revert b Hab.
 induction a as [a| a| ]; intros. {
@@ -1056,7 +1039,7 @@ Qed.
 
 Theorem rngl_of_Z_le_inj : ∀ a b, (rngl_of_Z a ≤ rngl_of_Z b)%L → (a <= b)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 destruct a as [| a| a]. {
   cbn in Hab.
@@ -1097,7 +1080,7 @@ Qed.
 
 Theorem rngl_of_Z_inj : ∀ a b, rngl_of_Z a = rngl_of_Z b → a = b.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 apply Z.le_antisymm. {
   apply rngl_of_Z_le_inj.
@@ -1118,7 +1101,7 @@ Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
   → l1 (rngl_of_nat j) b ∧ l2 b (rngl_of_nat (j + 1))%L
   → i ≤ j.
 Proof.
-destruct_fc.
+destruct_ac.
 intros Hroc * Hab Hi Hj.
 generalize Hroc; intros Hroc'.
 move Hroc' before Hroc.
@@ -1164,7 +1147,7 @@ Theorem rngl_of_nat_le_or_lt_prop {l1 l2} :
   → l1 (rngl_of_nat n) x ∧ l2 x (rngl_of_nat (n + 1))
   → m = n.
 Proof.
-destruct_fc.
+destruct_ac.
 intros Hroc * (Hmx, Hxm) (Hnx, Hxn).
 apply Nat.le_antisymm.
 apply (gen_between_rngl_of_nat_and_succ Hroc x x); [ | easy | easy ].
@@ -1180,7 +1163,7 @@ Theorem rngl_of_pos_le_or_lt_prop {l1 l2} :
   → l1 (rngl_of_pos n) x ∧ l2 x (rngl_of_pos (n + 1))
   → m = n.
 Proof.
-destruct_fc.
+destruct_ac.
 intros Hroc * Hm Hn.
 rewrite rngl_of_pos_add in Hm, Hn.
 rewrite rngl_of_pos_1 in Hm, Hn.
@@ -1201,7 +1184,7 @@ Theorem between_rngl_of_nat_and_succ :
   → (rngl_of_nat j ≤ b < rngl_of_nat (j + 1))%L
   → i ≤ j.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab Hi Hj.
 now apply (gen_between_rngl_of_nat_and_succ (rngl_le_lt_comp Hor) a b).
 Qed.
@@ -1213,7 +1196,7 @@ Theorem between_rngl_of_nat_and_succ2 :
   → (rngl_of_nat j < b ≤ rngl_of_nat (j + 1))%L
   → i ≤ j.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab Hi Hj.
 now apply (gen_between_rngl_of_nat_and_succ (rngl_lt_le_comp Hor) a b).
 Qed.
@@ -1224,7 +1207,7 @@ Theorem rngl_of_nat_prop :
   → (rngl_of_nat n ≤ x < rngl_of_nat (n + 1))%L
   → m = n.
 Proof.
-destruct_fc.
+destruct_ac.
 intros *.
 now apply (rngl_of_nat_le_or_lt_prop (rngl_le_lt_comp Hor) x).
 Qed.
@@ -1235,7 +1218,7 @@ Theorem rngl_of_nat_prop2 :
   → (rngl_of_nat n < x ≤ rngl_of_nat (n + 1))%L
   → m = n.
 Proof.
-destruct_fc.
+destruct_ac.
 intros *.
 now apply (rngl_of_nat_le_or_lt_prop (rngl_lt_le_comp Hor) x).
 Qed.
@@ -1246,7 +1229,7 @@ Theorem rngl_of_pos_prop :
   → (rngl_of_pos n ≤ x < rngl_of_pos (n + 1))%L
   → m = n.
 Proof.
-destruct_fc.
+destruct_ac.
 intros *.
 now apply (rngl_of_pos_le_or_lt_prop (rngl_le_lt_comp Hor) x).
 Qed.
@@ -1257,7 +1240,7 @@ Theorem rngl_of_pos_prop2 :
   → (rngl_of_pos n < x ≤ rngl_of_pos (n + 1))%L
   → m = n.
 Proof.
-destruct_fc.
+destruct_ac.
 intros *.
 now apply (rngl_of_pos_le_or_lt_prop (rngl_lt_le_comp Hor) x).
 Qed.
@@ -1267,7 +1250,7 @@ Qed.
 Theorem rngl_of_nat_Z_to_nat :
   ∀ a, (0 <= a)%Z → rngl_of_nat (Z.to_nat a) = rngl_of_Z a.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hza.
 destruct a as [| a| a]; [ easy | | easy ].
 rewrite Z2Nat.inj_pos.
@@ -1281,7 +1264,7 @@ Theorem Int_part_small_lemma :
   → (rngl_of_Z n ≤ x < rngl_of_Z (n + 1))%L
   → n = 0%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx Hn.
 destruct Hx as (Hzx, Hx1).
 destruct Hn as (Hnx, Hxn).
@@ -1310,7 +1293,7 @@ Theorem gen_rngl_of_pos_xI_interval {l1 l2} :
   l1 (rngl_of_pos p~1) a ∧ l2 a (rngl_of_pos (p~1 + 1))
   → (l1 (rngl_of_pos p) (a / 2) ∧ l2 (a / 2) (rngl_of_pos (p + 1)))%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hp.
 split. {
 ...
@@ -1354,7 +1337,7 @@ Theorem rngl_of_pos_xI_interval :
   (rngl_of_pos p~1 ≤ a < rngl_of_pos (p~1 + 1))%L
   → (rngl_of_pos p ≤ a / 2 < rngl_of_pos (p + 1))%L.
 Proof.
-destruct_fc.
+destruct_ac.
 (*
 intros * Hp.
 now apply (gen_rngl_of_pos_xI_interval (rngl_le_lt_comp Hor)).
@@ -1393,7 +1376,7 @@ Theorem rngl_of_pos_xI_interval2 :
   (rngl_of_pos p~1 < a ≤ rngl_of_pos (p~1 + 1))%L
   → (rngl_of_pos p < a / 2 ≤ rngl_of_pos (p + 1))%L.
 Proof.
-destruct_fc.
+destruct_ac.
 (*
 intros * Hp.
 now apply (gen_rngl_of_pos_xI_interval (rngl_lt_le_comp Hor)).
@@ -1433,7 +1416,7 @@ Theorem Int_part_prop :
   → (rngl_of_Z n ≤ x < rngl_of_Z (n + 1))%L
   → m = n.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hm Hn.
 destruct n as [| n| n]. {
   cbn in Hn.
@@ -1528,7 +1511,7 @@ Qed.
 
 Theorem Int_part_small : ∀ x, (0 ≤ x < 1)%L ↔ Int_part x = 0%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold Int_part.
 remember (z_int_part x) as m eqn:Hm.
@@ -1546,7 +1529,7 @@ Qed.
 Theorem Int_part_pos_interv :
   ∀ p x, (rngl_of_pos p ≤ x < rngl_of_pos (p + 1))%L ↔ Int_part x = Z.pos p.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold Int_part.
 remember (z_int_part x) as m eqn:Hm.
@@ -1566,7 +1549,7 @@ Qed.
 Theorem Int_part_interv :
   ∀ z x, (rngl_of_Z z ≤ x < rngl_of_Z (z + 1))%L ↔ Int_part x = z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold Int_part.
 remember (z_int_part x) as m eqn:Hm.
@@ -1578,7 +1561,7 @@ Qed.
 
 Theorem frac_part_small : ∀ x, (0 ≤ x < 1)%L → frac_part x = x.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx.
 unfold frac_part.
 rewrite (proj1 (Int_part_small _)); [ | easy ].
@@ -1587,7 +1570,7 @@ Qed.
 
 Theorem pow_INR : ∀ n k, INR (n ^ k) = (INR n ^ k)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 induction k; [ cbn; apply rngl_add_0_r | ].
 simpl; rewrite <- IHk.
@@ -1596,7 +1579,7 @@ Qed.
 
 Theorem Int_part_rngl_of_nat : ∀ a, Int_part (rngl_of_nat a) = Z.of_nat a.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold Int_part.
 remember (z_int_part (rngl_of_nat a)) as m eqn:Hm.
@@ -1613,7 +1596,7 @@ Qed.
 
 Theorem frac_part_INR : ∀ n, frac_part (INR n) = 0%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 unfold frac_part.
 rewrite Int_part_rngl_of_nat.
@@ -1624,7 +1607,7 @@ Qed.
 Theorem rngl_of_Z_sub :
   ∀ a b, rngl_of_Z (a - b) = (rngl_of_Z a - rngl_of_Z b)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold Z.sub.
 progress unfold rngl_sub.
@@ -1643,7 +1626,7 @@ Definition nat_Int_part a :=
 
 Theorem Int_part_nonneg : ∀ a, (0 ≤ a)%L → (0 <= Int_part a)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hza.
 progress unfold Int_part.
 remember (z_int_part a) as z eqn:H; clear H.
@@ -1670,7 +1653,7 @@ Qed.
 
 Theorem Int_part_nonpos : ∀ a, (a < 0)%L → (Int_part a <= 0)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hza.
 progress unfold Int_part.
 remember (z_int_part a) as z eqn:H; clear H.
@@ -1690,7 +1673,7 @@ Theorem rngl_of_Z_Int_part :
     (if rngl_leb_dec 0 a then rngl_of_nat (nat_Int_part a)
      else (- rngl_of_nat (nat_Int_part a))%L).
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold nat_Int_part.
 remember (Int_part a) as z eqn:Hz.
@@ -1716,7 +1699,7 @@ Qed.
 Theorem nat_Int_part_le :
   ∀ a b, (0 ≤ a ≤ b)%L → nat_Int_part a ≤ nat_Int_part b.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 progress unfold nat_Int_part.
 remember (int_part _ _ _ _ _ a) as x eqn:H1.
@@ -1733,7 +1716,7 @@ Qed.
 
 Theorem nat_Int_part_0 : nat_Int_part 0%L = 0.
 Proof.
-destruct_fc.
+destruct_ac.
 progress unfold nat_Int_part.
 remember (int_part _ _ _ _ _ _) as x eqn:Hx.
 symmetry in Hx.
@@ -1748,7 +1731,7 @@ Qed.
 
 Theorem nat_Int_part_opp : ∀ a, nat_Int_part (- a)%L = nat_Int_part a.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold nat_Int_part.
 remember (int_part _ _ _ _ _ (- a)%L) as b eqn:Hb.
@@ -1770,7 +1753,7 @@ Qed.
 Theorem rngl_of_nat_int_part_le :
   ∀ a, (rngl_of_nat (nat_Int_part a) ≤ ∣ a ∣)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold nat_Int_part.
 remember (int_part _ _ _ _ _ _) as b eqn:Hb.
@@ -1781,14 +1764,14 @@ Qed.
 
 Theorem rngl_of_Z_1 : rngl_of_Z 1 = 1%L.
 Proof.
-destruct_fc.
+destruct_ac.
 progress unfold rngl_of_Z; cbn.
 apply rngl_of_pos_1.
 Qed.
 
 Theorem Int_part_0 : Int_part 0 = 0%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 rewrite (proj1 (Int_part_small _)); [ easy | ].
 split; [ pauto | ].
 apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
@@ -1796,7 +1779,7 @@ Qed.
 
 Theorem frac_part_0 : frac_part 0 = 0%L.
 Proof.
-destruct_fc.
+destruct_ac.
 progress unfold frac_part.
 rewrite Int_part_0; cbn.
 apply (rngl_sub_diag Hos).
@@ -1804,7 +1787,7 @@ Qed.
 
 Theorem Int_part_1 : Int_part 1 = 1%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 apply Int_part_interv.
 rewrite rngl_of_Z_add, rngl_of_Z_1.
 split; [ pauto | ].
@@ -1816,7 +1799,7 @@ Qed.
 Theorem Int_part_opp :
   ∀ a, Int_part (- a) = (- Int_part a)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold Int_part.
 remember (z_int_part (- a)) as m eqn:Hm.
@@ -1839,7 +1822,7 @@ split. {
 
 Theorem rngl_sub_between_0_and_1 : ∀ a b, (0 ≤ b - a < 1 ↔ a ≤ b < a + 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 split; intros (H1, H2). {
   apply -> (rngl_le_0_sub Hop Hor) in H1.
@@ -1857,7 +1840,7 @@ Theorem Int_part_eq_sub :
   → Int_part a = Int_part b
   → Int_part (a - b) = 0%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hba Hab.
 progress unfold frac_part in Hba.
 progress unfold Int_part in Hba.
@@ -1881,7 +1864,7 @@ Theorem rngl_sub_Int_part : ∀ a b,
   (frac_part b ≤ frac_part a)%L
   → Int_part (a - b) = (Int_part a - Int_part b)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hba.
 progress unfold frac_part in Hba.
 progress unfold Int_part in Hba.
@@ -1915,7 +1898,7 @@ Qed.
 Theorem Int_part_rngl_of_pos :
   ∀ p, Int_part (rngl_of_pos p) = Z.pos p.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold rngl_of_pos.
 rewrite Int_part_rngl_of_nat.
@@ -1924,7 +1907,7 @@ Qed.
 
 Theorem frac_part_rngl_of_pos : ∀ p, frac_part (rngl_of_pos p) = 0%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold frac_part.
 rewrite Int_part_rngl_of_pos.
@@ -1933,7 +1916,7 @@ Qed.
 
 Theorem Int_part_IZR : ∀ z, Int_part (IZR z) = z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct (Z_le_dec 0 z) as [Hz| Hz]. {
   apply Z2Nat.id in Hz.
@@ -1958,7 +1941,7 @@ Qed.
 
 Theorem frac_part_IZR : ∀ z, frac_part (IZR z) = 0%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 unfold frac_part.
 rewrite Int_part_IZR.
@@ -1970,14 +1953,14 @@ Theorem Rpow_div_sub : ∀ x i j,
   → (j ≤ i)%nat
   → x ^ i / x ^ j = x ^ (i - j).
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx Hij.
 now symmetry; apply Nat.pow_sub_r.
 Qed.
 
 Theorem frac_part_interv : ∀ x, (0 ≤ frac_part x < 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 unfold frac_part.
 progress unfold Int_part.
@@ -1991,7 +1974,7 @@ Qed.
 
 Theorem Rabs_or : ∀ x y, rngl_abs x = y → x = y ∨ x = (- y)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hxy; subst y.
 unfold rngl_abs.
 remember (x ≤? 0)%L as xz eqn:Hxz.
@@ -2003,14 +1986,14 @@ Qed.
 
 Theorem Rabs_eq_0 : ∀ x, rngl_abs x = 0%L → x = 0%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx.
 now apply (eq_rngl_abs_0 Hop).
 Qed.
 
 Theorem Rabs_lt : ∀ x y, (rngl_abs x < y ↔ - y < x < y)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 apply iff_sym.
 apply (rngl_abs_lt Hop Hor).
@@ -2018,7 +2001,7 @@ Qed.
 
 Theorem Rabs_le : ∀ x y, (rngl_abs x ≤ y ↔ - y ≤ x ≤ y)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 apply iff_sym.
 apply (rngl_abs_le Hop Hor).
@@ -2026,7 +2009,7 @@ Qed.
 
 Theorem Rabs_sqr : ∀ x, rngl_abs (x²) = x².
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 apply (rngl_abs_nonneg_eq Hop Hor).
 apply (rngl_squ_nonneg Hon Hos Hiq Hor).
@@ -2034,7 +2017,7 @@ Qed.
 
 Theorem Rabs_sqrt : ∀ x, (0 ≤ x)%L → rngl_abs (√ x) = √ x.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hzx.
 apply (rngl_abs_nonneg_eq Hop Hor).
 now apply rl_sqrt_nonneg.
@@ -2043,21 +2026,21 @@ Qed.
 Theorem Rmult_minus_distr_r : ∀ r1 r2 r3,
   ((r1 - r2) * r3 = r1 * r3 - r2 * r3)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 apply (rngl_mul_sub_distr_r Hop).
 Qed.
 
 Theorem Rminus_plus : ∀ x y, (x - y + y = x)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 apply (rngl_sub_add Hop).
 Qed.
 
 Theorem Rdiv_div : ∀ x y z, (y ≠ 0 → z ≠ 0 → x / y / z = x / (y * z))%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 rewrite (rngl_mul_comm Hic).
 now apply (rngl_div_div Hon Hos Hiv).
@@ -2065,7 +2048,7 @@ Qed.
 
 Theorem Rmult_div_r : ∀ x y, (y ≠ 0 → y * (x / y) = x)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hy.
 rewrite (rngl_mul_div_assoc Hiv).
 rewrite (rngl_mul_comm Hic).
@@ -2074,7 +2057,7 @@ Qed.
 
 Theorem Rinv_div : ∀ x, (x⁻¹ = 1 / x)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 symmetry.
 apply (rngl_div_1_l Hon Hiv).
@@ -2082,7 +2065,7 @@ Qed.
 
 Theorem nonneg_plus_sqr : ∀ x y, (0 ≤ x² + y²)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 apply (rngl_add_squ_nonneg Hon Hos Hiq Hor).
 Qed.
@@ -2094,7 +2077,7 @@ Arguments rngl_sign x%_L.
 
 Theorem Rsignp_of_pos : ∀ x, (0 ≤ x → rngl_signp x = 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx.
 unfold rngl_signp.
 apply rngl_leb_le in Hx.
@@ -2103,7 +2086,7 @@ Qed.
 
 Theorem Rsignp_of_neg : ∀ x, (x < 0 → rngl_signp x = -1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx.
 unfold rngl_signp.
 apply rngl_nle_gt in Hx.
@@ -2113,7 +2096,7 @@ Qed.
 
 Theorem Rsign_of_pos : ∀ x, (0 < x → rngl_sign x = 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx.
 unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec x 0) as [H | H]. {
@@ -2127,7 +2110,7 @@ Qed.
 
 Theorem Rsign_of_neg : ∀ x, (x < 0 → rngl_sign x = -1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx.
 unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec x 0) as [H| H]. {
@@ -2142,7 +2125,7 @@ Qed.
 Theorem Rsign_mul_distr :
   ∀ x y, rngl_sign (x * y) = (rngl_sign x * rngl_sign y)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec (x * y) 0) as [Hxyz| Hxyz]; rewrite Hxyz. {
@@ -2208,7 +2191,7 @@ Qed.
 
 Theorem Rneq_le_lt : ∀ x y, (x ≠ y → x ≤ y → x < y)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hnxy Hxy.
 now apply (rngl_le_neq Hor).
 Qed.
@@ -2218,7 +2201,7 @@ Theorem sqrt_diff_sqr_eq_0 : ∀ x y,
   → √ (y² - x²) = 0%L
   → x = y.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hxy Hyx.
 apply (eq_rl_sqrt_0 Hon Hos) in Hyx. {
   apply -> (rngl_sub_move_0_r Hop) in Hyx.
@@ -2252,7 +2235,7 @@ Notation "x 'rmod' y" := (Rmod x y) (at level 40).
 
 Theorem Rmod_interv : ∀ x y, (0 < y → 0 ≤ x rmod y < y)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hy.
 unfold Rmod, Rediv_mod, snd.
 destruct (Rcase_abs y) as [Hya| Hya]. {
@@ -2298,7 +2281,7 @@ Qed.
 
 Theorem Rmod_from_ediv : ∀ x y, x rmod y = (x - IZR (x // y) * y)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 unfold Rmod, Rediv, fst, snd.
 remember (Rediv_mod x y) as rdm eqn:Hrdm.
@@ -2319,7 +2302,7 @@ Qed.
 Theorem base_Int_part :
   ∀ a, (rngl_of_Z (Int_part a) ≤ a)%L ∧ (-1 < rngl_of_Z (Int_part a) - a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 split. {
   progress unfold Int_part.
@@ -2340,7 +2323,7 @@ Qed.
 
 Theorem Int_part_opp_rngl_of_pos : ∀ p, Int_part (- rngl_of_pos p) = Z.neg p.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold Int_part.
 remember (z_int_part _) as z eqn:H; clear H.
@@ -2390,7 +2373,7 @@ Theorem Int_part_opp_of_Int :
   x = rngl_of_Z (Int_part x)
   → Int_part (- x) = (- Int_part x)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx.
 progress unfold Int_part in Hx.
 progress unfold Int_part.
@@ -2409,7 +2392,7 @@ Theorem Int_part_opp_of_not_Int :
   x ≠ rngl_of_Z (Int_part x)
   → Int_part (-x) = (- Int_part x - 1)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hx.
 progress unfold Int_part in Hx.
 progress unfold Int_part.
@@ -2472,7 +2455,7 @@ Theorem Int_part_opp : ∀ x,
     (- Int_part x -
        if rngl_eqb_dec x (rngl_of_Z (Int_part x)) then 0 else 1)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct (rngl_eqb_dec x (rngl_of_Z (Int_part x))) as [Hx| Hx]. {
   apply (rngl_eqb_eq Heo) in Hx.
@@ -2489,7 +2472,7 @@ Theorem Int_part_add :
   b = rngl_of_Z n
   → Int_part (a + b) = (Int_part a + n)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hbn.
 progress unfold Int_part.
 remember (z_int_part _) as y eqn:H; clear H.
@@ -2511,7 +2494,7 @@ Theorem Rediv_add_1 :
   y ≠ 0%L
   → (x + y)%L // y = (x // y + 1)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hyz.
 unfold Rediv, Rediv_mod, fst.
 destruct (Rcase_abs y) as [Hy| Hy]. {
@@ -2553,7 +2536,7 @@ Qed.
 
 Theorem Rediv_opp_r : ∀ x y, y ≠ 0%L → x // - y = (- (x // y))%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hyz.
 unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (- y)) as [Hy| Hy]. {
@@ -2573,7 +2556,7 @@ Theorem Rediv_add_nat : ∀ x y n,
   y ≠ 0%L
   → (x + INR n * y) // y = (x // y + Z.of_nat n)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hyz.
 progress unfold INR.
 induction n. {
@@ -2590,7 +2573,7 @@ Qed.
 
 Theorem IZN : ∀ n, (0 <= n)%Z → ∃ m, n = Z.of_nat m.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hn.
 destruct n as [| p| ]; [ now exists 0 | | easy ].
 exists (Pos.to_nat p).
@@ -2602,7 +2585,7 @@ Theorem Rediv_add_Z : ∀ x y a,
   y ≠ 0%L
   → (x + IZR a * y) // y = (x // y + a)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hyz.
 destruct (Z_le_dec 0 a) as [Ha| Ha]. {
   progress unfold IZR.
@@ -2638,7 +2621,7 @@ Theorem Rmod_add_Z : ∀ x y a,
   y ≠ 0%L
   → (x + IZR a * y) rmod y = x rmod y.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hy.
 rewrite Rmod_from_ediv.
 rewrite Rediv_add_Z; [ | easy ].
@@ -2654,7 +2637,7 @@ Qed.
 
 Theorem Rmod_0_l : ∀ x, 0 rmod x = 0%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros x.
 destruct (rngl_eqb_dec x 0) as [Hzx| Hzx]. {
   apply (rngl_eqb_eq Heo) in Hzx.
@@ -2682,7 +2665,7 @@ Qed.
 
 Theorem Rmod_mul_same : ∀ x a, (IZR a * x) rmod x = 0%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct (rngl_eqb_dec x 0) as [Hx| Hx]. {
   apply (rngl_eqb_eq Heo) in Hx.
@@ -2696,7 +2679,7 @@ Qed.
 
 Theorem Rmod_small : ∀ x y, (0 ≤ x < y)%L → x rmod y = x.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * (Hx, Hxy).
 unfold Rmod, snd, Rediv_mod.
 destruct (Rcase_abs y) as [Hyn| Hyp]. {
@@ -2729,7 +2712,7 @@ Theorem Rediv_mul_r : ∀ x y z,
          else 1
        else 0)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (y * z)) as [Hyz| Hyz]; [ | now rewrite Z.add_0_r ].
@@ -2746,7 +2729,7 @@ Qed.
 Theorem rngl_of_Z_of_Int_part :
   ∀ a, rngl_of_Z (Int_part a) = (a - frac_part a)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 progress unfold frac_part.
 rewrite (rngl_sub_sub_distr Hop); symmetry.
@@ -2758,7 +2741,7 @@ Theorem plus_Int_part1 : ∀ a b,
   (1 ≤ frac_part a + frac_part b)%L
   → Int_part (a + b) = (Int_part a + Int_part b + 1)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 progress unfold frac_part in Hab.
 rewrite (rngl_add_sub_assoc Hop) in Hab.
@@ -2790,7 +2773,7 @@ Theorem plus_Int_part2 :
   (frac_part a + frac_part b < 1)%L
   → Int_part (a + b) = (Int_part a + Int_part b)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 progress unfold frac_part in Hab.
 rewrite (rngl_add_sub_assoc Hop) in Hab.
@@ -2821,7 +2804,7 @@ Theorem plus_frac_part1 : ∀ a b,
   (1 ≤ frac_part a + frac_part b)%L
   → frac_part (a + b) = (frac_part a + frac_part b - 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hab.
 progress unfold frac_part.
 rewrite <- (rngl_add_sub_swap Hop).
@@ -2840,7 +2823,7 @@ Theorem plus_frac_part2 : ∀ a b,
   (frac_part a + frac_part b < 1)%L
   → frac_part (a + b) = (frac_part a + frac_part b)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros * Hrr.
 progress unfold frac_part.
 rewrite <- (rngl_add_sub_swap Hop).
@@ -2857,7 +2840,7 @@ Theorem frac_part_double : ∀ x,
   frac_part (2 * x) =
     (2 * frac_part x - if rngl_ltb_dec (frac_part x) (1 / 2) then 0 else 1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   apply rngl_ltb_lt in Hx.
@@ -2881,7 +2864,7 @@ Theorem Int_part_double : ∀ x,
   Int_part (2 * x) =
     (2 * Int_part x + if rngl_ltb_dec (frac_part x) (1 / 2) then 0 else 1)%Z.
 Proof.
-destruct_fc.
+destruct_ac.
 intros.
 rewrite (rngl_mul_2_l Hon).
 destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
@@ -2907,7 +2890,7 @@ Qed.
 
 Theorem pow_1_abs_nat_odd : ∀ n, ((-1) ^ Z.abs_nat (2 * n + 1) = -1)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros n.
 destruct n as [| n| n]. {
   rewrite Z.mul_0_r, Z.add_0_l.
@@ -2946,7 +2929,7 @@ Qed.
 
 Theorem Rdiv_mod : ∀ x y, y ≠ 0%L → x = (y * IZR (x // y) + x rmod y)%L.
 Proof.
-destruct_fc.
+destruct_ac.
 intros x y Hy.
 rewrite Rmod_from_ediv.
 rewrite rngl_add_comm.
