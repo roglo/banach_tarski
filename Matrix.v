@@ -43,20 +43,21 @@ Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T }.
 Context {fc : field_char_0_archim T}.
 
+Print angle_ctx.
+
 ...
   { ac_ic : rngl_mul_is_comm T0 = true;
     ac_on : rngl_has_1 T0 = true;
     ac_op : rngl_has_opp T0 = true;
     ac_iv : rngl_has_inv T0 = true;
-    ac_c2 : rngl_characteristic T0 ≠ 2;
     ac_or : rngl_is_ordered T0 = true }.
-    ac_ed : rngl_has_eq_dec T0 = true;
 
   { fc_ic : rngl_mul_is_comm T0 = true;
     fc_on : rngl_has_1 T0 = true;
     fc_op : rngl_has_opp T0 = true;
     fc_iv : rngl_has_inv T0 = true;
     fc_or : rngl_is_ordered T0 = true;
+...
     fc_ch : rngl_characteristic T0 = 0;
     fc_ar : rngl_is_archimedean T0 = true }.
 
