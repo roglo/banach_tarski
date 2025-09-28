@@ -790,11 +790,14 @@ destruct a as [a| a| ]; [ | | easy ]. {
 } {
   exfalso.
   rewrite <- rngl_of_pos_1 in Ha1.
-  apply (rngl_of_nat_inj Hon Hos Hch) in Ha1.
-  now apply Pos2Nat.inj in Ha1.
-}
+cbn in Hc1.
 About rngl_of_nat_inj.
 (* peut-être y ajouter un cas où i et j < rngl_characteristic ? *)
+...
+  apply (rngl_of_nat_inj Hon Hos Hch) in Ha1.
+...
+  now apply Pos2Nat.inj in Ha1.
+}
 ...
 Qed.
 
