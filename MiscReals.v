@@ -661,9 +661,15 @@ induction a as [| a| a]. {
 }
 Qed.
 
+(*
 Context {Hch : rngl_characteristic T = 0}.
+*)
+Context {Hc1 : rngl_characteristic T ≠ 1}.
+(**)
 Context {Har : rngl_is_archimedean T = true}.
+(*
 Let Hc1 := eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
+*)
 
 Theorem z_int_part : ∀ a, ∃ₜ n, (rngl_of_Z n ≤ a < rngl_of_Z (n + 1))%L.
 Proof.
@@ -766,10 +772,11 @@ induction a as [a| a| ]; cbn. {
 }
 Qed.
 
-Theorem rngl_of_pos_neq_0 : ∀ a, rngl_of_pos a ≠ 0%L.
+Theorem rngl_of_pos_neq_0 :
+  rngl_is_ordered T = true →
+  ∀ a, rngl_of_pos a ≠ 0%L.
 Proof.
-destruct_ac.
-intros * Ha.
+intros Hor * Ha.
 specialize (rngl_of_pos_pos a) as H1.
 rewrite Ha in H1.
 now apply (rngl_lt_irrefl Hor) in H1.
@@ -784,18 +791,30 @@ destruct a as [a| a| ]; [ | | easy ]. {
   rewrite rngl_of_pos_xI in Ha1.
   apply (rngl_add_move_r Hop) in Ha1.
   rewrite (rngl_sub_diag Hos) in Ha1.
-  apply (rngl_eq_mul_0_l Hon Hos Hiq) in Ha1; [ | apply rngl_of_pos_neq_0 ].
+  apply (rngl_eq_mul_0_l Hon Hos Hiq) in Ha1.
   revert Ha1.
   apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_of_pos_neq_0 Hor).
 } {
   exfalso.
   rewrite <- rngl_of_pos_1 in Ha1.
   cbn in Hc1.
   apply (rngl_of_nat_inj Hon Hos) in Ha1.
   now apply Pos2Nat.inj in Ha1.
+  destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hch].
+  now left.
+  right.
+  rewrite Pos2Nat.inj_xO.
+  rewrite Pos2Nat.inj_1.
+  split. {
+...
+Search (rngl_of_pos _ = rngl_of_pos _).
+...
   now left.
 }
 Qed.
+
+...
 
 Theorem rngl_of_pos_inj : ∀ a b, rngl_of_pos a = rngl_of_pos b → a = b.
 Proof.
