@@ -825,16 +825,80 @@ Proof.
 destruct_ac.
 intros * Hab.
 destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hch]. {
-  apply (rngl_of_nat_inj Hon Hos) in Hab.
+  apply (rngl_of_nat_inj Hon Hos) in Hab; [ | easy ].
   now apply Pos2Nat.inj in Hab.
-  now left.
 }
 specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
 apply (rngl_of_nat_inj Hon Hos) in Hab.
 now apply Pos2Nat.inj in Hab.
+...
 right.
 progress unfold rngl_of_pos in Hab.
 Check rngl_of_nat_inj.
+Theorem rngl_of_nat_inj' :
+  rngl_has_1 T = true →
+  rngl_has_opp_or_psub T = true →
+  ∀ i j,
+  rngl_of_nat i = rngl_of_nat j
+  → if Nat.eq_dec (rngl_characteristic T) 0 then i = j
+    else i mod rngl_characteristic T = j mod rngl_characteristic T.
+Proof.
+intros * Hon Hos * Hij.
+destruct (Nat.eq_dec _ _) as [Hch| Hch]. {
+  revert i Hij.
+  induction j; intros. {
+    cbn in Hij.
+    now apply (eq_rngl_of_nat_0 Hon Hch) in Hij.
+  }
+  destruct i. {
+    exfalso.
+    symmetry in Hij.
+    now apply eq_rngl_of_nat_0 in Hij.
+  }
+  f_equal.
+  cbn in Hij.
+  apply rngl_add_cancel_l in Hij; [ | easy ].
+  now apply IHj.
+}
+specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
+revert i Hij.
+induction j; intros. {
+  rewrite Nat.Div0.mod_0_l; cbn in Hij.
+  destruct i; [ apply Nat.Div0.mod_0_l | ].
+  rewrite rngl_of_nat_succ in Hij.
+About rngl_of_nat_nonneg.
+...
+  specialize (rngl_of_nat_nonneg Hon Hos Hiq Hor i) as H1.
+  exfalso; apply rngl_nlt_ge in H1.
+  apply H1; clear H1; rewrite <- Hij.
+  apply (rngl_lt_add_l Hos Hor).
+  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+...
+  cbn in Hij.
+  destruct i; [ easy | ].
+  revert Hij.
+  apply H1.
+  split; [ | ].
+  apply Nat.lt_0_succ.
+}
+destruct i. {
+  exfalso.
+  symmetry in Hij.
+  revert Hij.
+  apply H1.
+  split; [ | easy ].
+  apply Nat.lt_0_succ.
+}
+do 2 rewrite rngl_of_nat_succ in Hij.
+apply (rngl_add_cancel_l Hos) in Hij.
+f_equal.
+apply IHj; [ | | easy ].
+transitivity (S j); [ | easy ].
+apply Nat.lt_succ_diag_r.
+transitivity (S i); [ | easy ].
+apply Nat.lt_succ_diag_r.
+...
+
 Theorem rngl_mod_characteristic :
   rngl_has_1 T = true →
   rngl_has_opp_or_psub T = true →
