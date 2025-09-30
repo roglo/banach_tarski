@@ -668,7 +668,7 @@ Theorem z_int_part : ∀ a, ∃ₜ n, (rngl_of_Z n ≤ a < rngl_of_Z (n + 1))%L.
 Proof.
 destruct_ac.
 intros.
-specialize (int_part Hon Hop Hiq Hc1 Hor Har a) as (n, Hn).
+specialize (int_part Hon Hop Hc1 Hor Har a) as (n, Hn).
 destruct (rngl_leb_dec 0 a)%L as [Hza| Hza]. {
   apply rngl_leb_le in Hza.
   rewrite (rngl_abs_nonneg_eq Hop Hor) in Hn; [ | easy ].
@@ -695,7 +695,7 @@ destruct (rngl_eqb_dec a (- rngl_of_nat n)) as [Han| Han]. {
   rewrite rngl_of_Z_opp, rngl_of_Z_of_nat, <- Han.
   apply (rngl_lt_add_r Hos Hor).
   rewrite rngl_of_pos_1.
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 apply (rngl_eqb_neq Heo) in Han.
 exists (- Z.of_nat (n + 1))%Z.
@@ -750,18 +750,18 @@ destruct_ac.
 intros.
 induction a as [a| a| ]; cbn. {
   apply (rngl_le_lt_trans Hor _ 1).
-  apply (rngl_0_le_1 Hon Hos Hiq Hor).
+  apply (rngl_0_le_1 Hon Hos Hor).
   rewrite rngl_of_pos_xI.
   apply (rngl_lt_add_l Hos Hor).
   apply (rngl_mul_pos_pos Hon Hop Hiq Hor); [ | easy ].
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 } {
   rewrite rngl_of_pos_xO.
   apply (rngl_mul_pos_pos Hon Hop Hiq Hor); [ | easy ].
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 } {
   rewrite rngl_of_pos_1.
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 Qed.
 
@@ -786,7 +786,7 @@ destruct a as [a| a| ]; [ | | easy ]. {
   rewrite (rngl_sub_diag Hos) in Ha1.
   apply (rngl_eq_mul_0_l Hon Hos Hiq) in Ha1.
   revert Ha1.
-  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
   apply (rngl_of_pos_neq_0 Hor).
 } {
   exfalso.
@@ -809,14 +809,14 @@ destruct a as [a| a| ]; [ | | easy ]. {
   rewrite <- rngl_add_assoc in Ha1.
   apply (rngl_add_move_l Hop) in Ha1.
   rewrite (rngl_sub_diag Hos) in Ha1.
-  specialize (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor) as H1.
+  specialize (rngl_0_lt_1 Hon Hos Hc1 Hor) as H1.
   apply rngl_nle_gt in H1.
   exfalso; apply H1; clear H1.
   rewrite <- Ha1.
-  apply (rngl_le_add_r Hos Hor).
-  apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor).
-  apply (rngl_0_le_2 Hon Hos Hiq Hor).
-  apply (rngl_of_nat_nonneg Hon Hos Hiq Hor).
+  apply (rngl_le_add_r Hor).
+  apply (rngl_mul_nonneg_nonneg Hos Hor).
+  apply (rngl_0_le_2 Hon Hos Hor).
+  apply (rngl_of_nat_nonneg Hon Hos Hor).
 }
 Qed.
 
