@@ -829,12 +829,17 @@ destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hch]. {
   now apply Pos2Nat.inj in Hab.
 }
 specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
+Check rngl_of_nat_inj.
+Search (_ mod rngl_characteristic _ = _).
+(*
+...
 apply (rngl_of_nat_inj Hon Hos) in Hab.
 now apply Pos2Nat.inj in Hab.
 ...
 right.
 progress unfold rngl_of_pos in Hab.
 Check rngl_of_nat_inj.
+*)
 Theorem rngl_of_nat_inj' :
   rngl_has_1 T = true →
   rngl_has_opp_or_psub T = true →
@@ -864,11 +869,13 @@ specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
 revert i Hij.
 induction j; intros. {
   rewrite Nat.Div0.mod_0_l; cbn in Hij.
+  specialize (Nat.div_mod i (rngl_characteristic T) Hch) as H3.
+Search (rngl_of_nat _ = 0)%L.
+...
   destruct i; [ apply Nat.Div0.mod_0_l | ].
   rewrite rngl_of_nat_succ in Hij.
-About rngl_of_nat_nonneg.
 ...
-  specialize (rngl_of_nat_nonneg Hon Hos Hiq Hor i) as H1.
+  specialize (rngl_of_nat_nonneg Hon Hos Hor i) as H1.
   exfalso; apply rngl_nlt_ge in H1.
   apply H1; clear H1; rewrite <- Hij.
   apply (rngl_lt_add_l Hos Hor).
