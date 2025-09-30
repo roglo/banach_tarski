@@ -870,6 +870,7 @@ revert i Hij.
 induction j; intros. {
   rewrite Nat.Div0.mod_0_l; cbn in Hij.
   specialize (Nat.div_mod i (rngl_characteristic T) Hch) as H3.
+...
 Search (rngl_of_nat _ = 0)%L.
 ...
   destruct i; [ apply Nat.Div0.mod_0_l | ].
