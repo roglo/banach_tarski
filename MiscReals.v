@@ -874,56 +874,22 @@ induction j; intros. {
   destruct Hn.
   destruct n; [ easy | clear Hch ].
   destruct n; [ easy | clear Hc1 ].
-  revert i Hij.
-  induction n; intros. {
-    specialize (H1 1).
-    assert (H : 0 < 1 < 2) by flia.
-    specialize (H1 H); clear H.
-    rewrite rngl_of_nat_1 in H1.
-    rewrite rngl_of_nat_2 in H2.
-    remember (Nat.even i) as b eqn:Hb.
-    symmetry in Hb.
-    destruct b. {
-      apply Nat.even_spec in Hb.
-      destruct Hb as (n, Hn).
-      rewrite Hn.
-      rewrite Nat.mul_comm.
-      apply Nat.Div0.mod_mul.
-    }
-    rewrite <- Nat.negb_odd in Hb.
-    apply Bool.negb_false_iff in Hb.
-    apply Nat.odd_spec in Hb.
-    destruct Hb as (n, Hn).
-    rewrite Hn in Hij.
-    rewrite rngl_of_nat_add, (rngl_of_nat_mul Hon Hos) in Hij.
-    rewrite rngl_of_nat_2, H2, (rngl_mul_0_l Hos), rngl_add_0_l in Hij.
-    now rewrite rngl_of_nat_1 in Hij.
-  }
-...
-  destruct i; [ apply Nat.Div0.mod_0_l | ].
-  rewrite rngl_of_nat_succ in Hij.
-...
-  specialize (rngl_of_nat_nonneg Hon Hos Hor i) as H1.
-  exfalso; apply rngl_nlt_ge in H1.
-  apply H1; clear H1; rewrite <- Hij.
-  apply (rngl_lt_add_l Hos Hor).
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
-...
-  cbn in Hij.
-  destruct i; [ easy | ].
+  specialize (H1 1) as H10.
+  assert (H : 0 < 1 < S (S n)) by flia.
+  specialize (H10 H); clear H.
+  rewrite rngl_of_nat_1 in H10.
+  specialize (Nat.div_mod i (S (S n)) (Nat.neq_succ_0 _)) as H3.
+  destruct (Nat.eq_dec (i mod S (S n)) 0) as [H4| H4]; [ easy | exfalso ].
+  rewrite H3 in Hij.
+  rewrite rngl_of_nat_add, (rngl_of_nat_mul Hon Hos) in Hij.
+  rewrite H2, (rngl_mul_0_l Hos), rngl_add_0_l in Hij.
   revert Hij.
   apply H1.
-  split; [ | ].
-  apply Nat.lt_0_succ.
+  split; [ now apply Nat.neq_0_lt_0 | ].
+  apply Nat.mod_upper_bound.
+  apply Nat.neq_succ_0.
 }
-destruct i. {
-  exfalso.
-  symmetry in Hij.
-  revert Hij.
-  apply H1.
-  split; [ | easy ].
-  apply Nat.lt_0_succ.
-}
+...
 do 2 rewrite rngl_of_nat_succ in Hij.
 apply (rngl_add_cancel_l Hos) in Hij.
 f_equal.
