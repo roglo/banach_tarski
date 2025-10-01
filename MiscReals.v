@@ -825,126 +825,29 @@ destruct a as [a| a| ]; [ | | easy ]. {
 }
 Qed.
 
-(*
-Theorem rngl_of_nat_inj' :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_psub T = true →
-  rngl_characteristic T = 0 →
-  ∀ i j,
-  rngl_of_nat i = rngl_of_nat j
-  → i = j.
-Proof.
-intros Hon Hom Hch * Hij.
-revert i Hij.
-induction j; intros. {
-  cbn in Hij.
-  now apply eq_rngl_of_nat_0 in Hij.
-}
-destruct i. {
-  exfalso.
-  symmetry in Hij.
-  now apply eq_rngl_of_nat_0 in Hij.
-}
-f_equal.
-cbn in Hij.
-apply rngl_add_cancel_l in Hij; [ | easy ].
-now apply IHj.
-Qed.
-
-Theorem rngl_of_nat_inj'' :
-  rngl_has_1 T = true →
-  rngl_has_opp_or_psub T = true →
-  rngl_characteristic T = 0 →
-  ∀ i j,
-  rngl_of_nat i = rngl_of_nat j
-  → i = j.
-Proof.
-intros Hon Hos Hch * Hij.
-specialize (rngl_of_nat_inj Hon Hos _ _ Hij) as H1.
-now rewrite Hch in H1.
-Qed.
-*)
-
-Theorem rngl_of_pos_inj : ∀ a b, rngl_of_pos a = rngl_of_pos b → a = b.
+Theorem rngl_of_pos_inj :
+  ∀ a b,
+  rngl_of_pos a = rngl_of_pos b
+  → if Nat.eq_dec (rngl_characteristic T) 0 then a = b
+    else Pos.to_nat a ≡ Pos.to_nat b mod rngl_characteristic T.
 Proof.
 destruct_ac.
 intros * Hab.
-destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hch]. {
-  apply (rngl_of_nat_inj Hon Hos) in Hab.
-  rewrite Hch in Hab; cbn in Hab.
-  now apply Pos2Nat.inj in Hab.
-}
-specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
-...
-(*
-...
 apply (rngl_of_nat_inj Hon Hos) in Hab.
+destruct (Nat.eq_dec (rngl_characteristic T) 0) as [Hch| Hch]; [ | easy ].
 now apply Pos2Nat.inj in Hab.
-...
-right.
-progress unfold rngl_of_pos in Hab.
-Check rngl_of_nat_inj.
-*)
-...
-do 2 rewrite rngl_of_nat_succ in Hij.
-apply (rngl_add_cancel_l Hos) in Hij.
-f_equal.
-apply IHj; [ | | easy ].
-transitivity (S j); [ | easy ].
-apply Nat.lt_succ_diag_r.
-transitivity (S i); [ | easy ].
-apply Nat.lt_succ_diag_r.
-...
+Qed.
 
 Theorem rngl_mod_characteristic :
   rngl_has_1 T = true →
   rngl_has_opp_or_psub T = true →
-  rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
-  rngl_characteristic T ≠ 0 →
   ∀ i j,
   rngl_of_nat i = rngl_of_nat j
   → i mod rngl_characteristic T = j mod rngl_characteristic T.
 Proof.
-intros Hon Hos Hiq Hor Hch * Hij.
-revert i Hij.
-induction j; intros. {
-  rewrite Nat.Div0.mod_0_l; cbn in Hij.
-  destruct i; [ apply Nat.Div0.mod_0_l | ].
-  rewrite rngl_of_nat_succ in Hij.
-  specialize (rngl_of_nat_nonneg Hon Hos Hiq Hor i) as H1.
-  exfalso; apply rngl_nlt_ge in H1.
-  apply H1; clear H1; rewrite <- Hij.
-  apply (rngl_lt_add_l Hos Hor).
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
-}
-destruct i. {
-  symmetry in Hij; rewrite rngl_of_nat_0 in Hij.
-  rewrite rngl_of_nat_succ in Hij.
-  specialize (rngl_of_nat_nonneg Hon Hos Hiq Hor j) as H1.
-  exfalso; apply rngl_nlt_ge in H1.
-  apply H1; clear H1; rewrite <- Hij.
-  apply (rngl_lt_add_l Hos Hor).
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
-}
-do 2 rewrite rngl_of_nat_succ in Hij.
-apply (rngl_add_cancel_l Hos) in Hij.
-apply IHj in Hij.
-rewrite <- Nat.add_1_l.
-rewrite <- (Nat.add_1_l j).
-rewrite <- Nat.Div0.add_mod_idemp_r.
-rewrite Hij.
-now rewrite Nat.Div0.add_mod_idemp_r.
-Qed.
-
-generalize Hab; intros H.
-apply (rngl_mod_characteristic Hon Hos Hiq Hor Hch) in H.
-...
-  induction i; [ apply Nat.Div0.mod_0_l | ].
-  rewrite rngl_of_nat_succ in Hij.
-  specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
-Search (S _ mod _).
-...
+intros Hon Hos * Hij.
+apply (rngl_of_nat_inj Hon Hos) in Hij.
+destruct (Nat.eq_dec (rngl_characteristic T) 0); [ now subst | easy ].
 Qed.
 
 Theorem rngl_of_pos_le_1_l : ∀ a, (1 ≤ rngl_of_pos a)%L.
@@ -953,7 +856,7 @@ destruct_ac.
 intros.
 progress unfold rngl_of_pos.
 rewrite <- rngl_of_nat_1.
-apply (rngl_of_nat_inj_le Hon Hos Hiq Hc1 Hor).
+apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor).
 apply Pos2Nat_ge_1.
 Qed.
 
@@ -962,7 +865,7 @@ Proof.
 destruct_ac.
 intros.
 apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
-apply (rngl_0_le_1 Hon Hos Hiq Hor).
+apply (rngl_0_le_1 Hon Hos Hor).
 Qed.
 
 Theorem rngl_of_pos_le_inj :
@@ -974,9 +877,9 @@ revert b Hab.
 induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
   destruct b as [b| b| ]. {
     do 2 rewrite rngl_of_pos_xI in Hab.
-    apply (rngl_add_le_mono_r Hos Hor) in Hab.
+    apply (rngl_add_le_mono_r Hor) in Hab.
     apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor) in Hab. 2: {
-      now apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+      now apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
     }
     progress unfold Pos.le; cbn.
     apply Pos.compare_le_iff.
@@ -994,7 +897,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
       apply rngl_nlt_ge in Hab.
       apply Hab; clear Hab.
       apply (rngl_lt_add_r Hos Hor).
-      apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+      apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
     }
     exfalso.
     apply Pos.lt_nle in Hdab.
@@ -1007,20 +910,21 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
     clear a b Heqa' Heqb'.
     rename a' into a; rename b' into b.
     revert b Hab.
-    induction a; intros; [ apply (rngl_of_nat_nonneg Hon Hos Hiq Hor) | ].
+    induction a; intros; [ apply (rngl_of_nat_nonneg Hon Hos Hor) | ].
     rewrite rngl_of_nat_succ in Hab |-*.
     destruct b. {
       exfalso; cbn in Hab.
       rewrite (rngl_mul_0_r Hos) in Hab.
       apply rngl_nlt_ge in Hab.
       apply Hab; clear Hab.
-      apply (rngl_add_nonneg_pos Hos Hor). 2: {
-        apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+      apply (rngl_add_nonneg_pos Hor). 2: {
+        apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
       }
-      apply (rngl_mul_nonneg_nonneg Hon Hos Hiq Hor). {
-        apply (rngl_0_le_2 Hon Hos Hiq Hor).
+      apply (rngl_mul_nonneg_nonneg Hos Hor). {
+        apply (rngl_0_le_2 Hon Hos Hor).
       }
       apply (rngl_le_0_add Hos Hor).
+...
       apply (rngl_0_le_1 Hon Hos Hiq Hor).
       apply (rngl_of_nat_nonneg Hon Hos Hiq Hor).
     }
