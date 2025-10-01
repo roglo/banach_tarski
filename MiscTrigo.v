@@ -237,12 +237,12 @@ destruct xz. {
     apply rngl_leb_nle in Hx1.
     exfalso; apply Hx1; clear Hx1.
     rewrite <- (rngl_squ_1 Hon).
-    apply (rngl_le_le_squ Hon Hop Hiq Hor).
+    apply (rngl_le_le_squ Hop Hor).
     apply (rngl_div_nonneg Hon Hop Hiv Hor).
     apply (rngl_abs_nonneg Hop Hor).
     apply (rl_sqrt_pos Hon Hos Hor).
     rewrite (rngl_squ_1 Hon).
-    apply (rngl_lt_0_add Hos Hor).
+    apply (rngl_lt_0_add Hor).
     apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
     apply (rngl_squ_nonneg Hos Hor).
     apply (rngl_div_le_1 Hon Hop Hiv Hor).
@@ -276,7 +276,7 @@ destruct xz. {
   rewrite rngl_add_0_r.
   rewrite (rngl_sub_opp_r Hop).
   rewrite rngl_add_0_l.
-  rewrite (rngl_0_leb_1 Hon Hos Hiq Hor).
+  rewrite (rngl_0_leb_1 Hon Hos Hor).
   remember (0 ≤? _)%L as zx eqn:Hzx.
   symmetry in Hzx.
   destruct zx. {

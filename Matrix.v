@@ -399,7 +399,7 @@ rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
 now f_equal; field.
 Qed.
@@ -630,7 +630,7 @@ Proof.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
 unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
 progress unfold mat_id.
@@ -650,7 +650,7 @@ Proof.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
 unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
 progress unfold mat_id.
@@ -675,7 +675,7 @@ Proof.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
 unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
 progress unfold mat_id.

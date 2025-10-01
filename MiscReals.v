@@ -1346,7 +1346,7 @@ About rngl_lt_div_r.
 Print rngl_order_compatibility.
 ...
   apply (rngl_le_div_r Hon Hon Hop Hiv Hiq Hor).
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hiq Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hiq Hor).
   eapply (rngl_le_trans Hor); [ | apply Hp ].
   rewrite (rngl_mul_2_r Hon).
   rewrite <- (rngl_mul_2_l Hon).
@@ -1361,7 +1361,7 @@ Print rngl_order_compatibility.
   apply Pos_le_add_l.
 }
 apply (rngl_lt_div_l Hon Hon Hop Hiv Hiq Hor).
-apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hiq Hor).
+apply (rngl_0_lt_2 Hon Hos Hc1 Hiq Hor).
 rewrite rngl_of_pos_add.
 rewrite rngl_of_pos_1.
 rewrite rngl_mul_add_distr_r, (rngl_mul_1_l Hon).
