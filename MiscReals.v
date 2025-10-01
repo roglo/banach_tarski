@@ -822,6 +822,7 @@ destruct a as [a| a| ]; [ | | easy ]. {
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   apply (rngl_0_le_2 Hon Hos Hor).
   apply (rngl_of_nat_nonneg Hon Hos Hor).
+...
 }
 Qed.
 
