@@ -879,6 +879,25 @@ induction j; intros. {
     specialize (H1 1).
     assert (H : 0 < 1 < 2) by flia.
     specialize (H1 H); clear H.
+    rewrite rngl_of_nat_1 in H1.
+    rewrite rngl_of_nat_2 in H2.
+(*1*)
+    destruct i; [ apply Nat.Div0.mod_0_l | ].
+    destruct i; [ now rewrite rngl_of_nat_1 in Hij | ].
+    do 2 rewrite <- Nat.add_1_r in Hij |-*.
+    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
+    rewrite nat_mod_add_once.
+    rewrite rngl_of_nat_add in Hij.
+    rewrite rngl_of_nat_2, H2, rngl_add_0_r in Hij.
+(*2*)
+    destruct i; [ apply Nat.Div0.mod_0_l | ].
+    destruct i; [ now rewrite rngl_of_nat_1 in Hij | ].
+    do 2 rewrite <- Nat.add_1_r in Hij |-*.
+    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
+    rewrite nat_mod_add_once.
+    rewrite rngl_of_nat_add in Hij.
+    rewrite rngl_of_nat_2, H2, rngl_add_0_r in Hij.
+...
     remember (Nat.even i) as b eqn:Hb.
     symmetry in Hb.
     destruct b. {
@@ -891,6 +910,12 @@ induction j; intros. {
     apply Bool.not_true_iff_false in Hb.
     exfalso; apply Hb; clear Hb.
     induction i; [ easy | ].
+    destruct i; [ easy | ].
+    rewrite Nat.even_succ_succ.
+    do 2 rewrite <- Nat.add_1_r in Hij.
+    rewrite <- Nat.add_assoc in Hij; cbn in Hij.
+    rewrite rngl_of_nat_add in Hij.
+    rewrite H2, rngl_add_0_r in Hij.
 ...
     induction i; [ apply Nat.Div0.mod_0_l | ].
     destruct i; [ easy | ].
