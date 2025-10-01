@@ -8,6 +8,7 @@ Import ListNotations.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
+Require Import RingLike.Misc.
 Require Import TrigoWithoutPi.Core.
 From a Require Import Misc Words Normalize Reverse.
 
@@ -869,6 +870,69 @@ specialize (rngl_characteristic_non_0 Hon Hch) as (H1, H2).
 revert i Hij.
 induction j; intros. {
   rewrite Nat.Div0.mod_0_l; cbn in Hij.
+  remember (rngl_characteristic T) as n eqn:Hn.
+  destruct Hn.
+  destruct n; [ easy | clear Hch ].
+  destruct n; [ easy | clear Hc1 ].
+  revert i Hij.
+  induction n; intros. {
+(**)
+    specialize (H1 1).
+    assert (H : 0 < 1 < 2) by flia.
+    specialize (H1 H); clear H.
+    induction i; [ apply Nat.Div0.mod_0_l | ].
+    destruct i; [ easy | ].
+    do 2 rewrite <- Nat.add_1_r.
+    rewrite <- Nat.add_assoc; cbn.
+    rewrite nat_mod_add_once.
+    do 2 rewrite <- Nat.add_1_r in Hij.
+    rewrite <- Nat.add_assoc in Hij.
+    cbn in Hij.
+    rewrite rngl_of_nat_add in Hij.
+    rewrite H2, rngl_add_0_r in Hij.
+    destruct i; [ easy | ].
+    do 2 rewrite <- Nat.add_1_r in IHi.
+    rewrite <- Nat.add_assoc in IHi.
+    cbn in IHi.
+    rewrite nat_mod_add_once in IHi.
+    rewrite rngl_of_nat_add in IHi.
+    rewrite H2, rngl_add_0_r in IHi.
+    destruct i; [ easy | ].
+    do 2 rewrite <- Nat.add_1_r.
+    rewrite <- Nat.add_assoc; cbn.
+    rewrite nat_mod_add_once.
+    destruct i; [ easy | ].
+(* ah, fait chier... *)
+...
+    rewrite rngl_of_nat_2 in H2.
+    destruct i; [ apply Nat.Div0.mod_0_l | ].
+    destruct i. {
+      exfalso.
+      apply (H1 1); [ flia | easy ].
+    }
+    destruct i; [ easy | ].
+    destruct i. {
+      exfalso.
+      rewrite rngl_of_nat_3 in Hij.
+      rewrite H2 in Hij.
+      rewrite rngl_add_0_l in Hij.
+      apply (H1 1); [ flia | ].
+      rewrite <- Hij.
+      apply rngl_of_nat_1.
+    }
+    destruct i; [ easy | ].
+    destruct i. {
+      exfalso.
+      rewrite <- H2 in Hij.
+      apply (rngl_add_cancel_l Hos) in Hij.
+      rewrite rngl_add_0_r in Hij.
+      rewrite H2 in Hij.
+      rewrite rngl_add_0_r in Hij.
+      rewrite H2 in Hij.
+      apply (H1 1); [ flia | ].
+...
+  destruct i; [ apply Nat.Div0.mod_0_l | ].
+...
   specialize (Nat.div_mod i (rngl_characteristic T) Hch) as H3.
 ...
 Search (rngl_of_nat _ = 0)%L.
