@@ -288,7 +288,7 @@ destruct xz. {
     intros H.
     rewrite <- (rngl_squ_1 Hon) in H at 2.
     apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H.
-    rewrite (rngl_abs_1 Hon Hos Hiq Hor) in H.
+    rewrite (rngl_abs_1 Hon Hos Hor) in H.
     progress unfold rngl_abs in H.
     remember (x ≤? 0)%L as xz eqn:Hxz'.
     symmetry in Hxz'.
@@ -545,7 +545,6 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite (H1 (_ / _)%L).
   apply H1.
 }
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 intros.
 specialize (rl_sqrt_add_1_squ_neq_0 Hon Hos Hiq Hc1 Hor x) as Hs1a2.
@@ -639,7 +638,6 @@ Theorem rngl_1_add_squ_tan :
   → (1 + (rngl_tan θ)² = 1 / rngl_cos² θ)%L.
 Proof.
 destruct_ac.
-specialize (rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv) as Hi1.
 specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 intros * Hc.
 progress unfold rngl_tan.
@@ -726,7 +724,7 @@ assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
   specialize (rngl_squ_nonneg Hos Hor (rngl_tan θ)) as H1.
   rewrite H in H1.
   apply rngl_nlt_ge in H1.
-  apply H1, (rngl_opp_1_lt_0 Hon Hop Hiq Hor Hc1).
+  apply H1, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 }
 cbn.
 rewrite (rngl_mul_0_l Hos).
@@ -833,7 +831,7 @@ assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
   specialize (rngl_squ_nonneg Hos Hor (rngl_tan θ)) as H1.
   rewrite H in H1.
   apply rngl_nlt_ge in H1.
-  apply H1, (rngl_opp_1_lt_0 Hon Hop Hiq Hor Hc1).
+  apply H1, (rngl_opp_1_lt_0 Hon Hop Hor Hc1).
 }
 cbn.
 rewrite (rngl_mul_0_l Hos).
@@ -1039,7 +1037,7 @@ destruct Hcz; subst. {
   rewrite (rngl_add_move_r Hop) in H.
   rewrite (rngl_sub_opp_r Hop) in H.
   symmetry in H.
-  now apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor) in H.
+  now apply (rngl_2_neq_0 Hon Hos Hc1 Hor) in H.
 }
 Qed.
 

@@ -393,6 +393,7 @@ unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
+...
 About Rmult5_sqrt2_sqrt5.
 ...
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].

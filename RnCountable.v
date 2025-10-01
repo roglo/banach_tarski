@@ -216,7 +216,7 @@ revert pos i Hpos.
 induction k; intros; simpl; [ apply (rngl_le_refl Hor) | ].
 assert (H : (0 ≤ pos / 3)%L). {
   apply (rngl_div_nonneg Hon Hop Hiv Hor); [ easy | ].
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
 }
 destruct (u i); [ | now apply IHk ].
 apply (rngl_le_0_add Hos Hor); [ easy | ].
@@ -231,7 +231,7 @@ intros.
 assert (Hzi : ∀ i, (0 ≤ (2 * 3 ^ i)⁻¹)%L). {
   intros.
   rewrite (rngl_inv_mul_distr Hon Hos Hiv); cycle 1.
-  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
   apply (rngl_pow_neq_0 Hon Hos Hiq).
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
@@ -239,7 +239,7 @@ assert (Hzi : ∀ i, (0 ≤ (2 * 3 ^ i)⁻¹)%L). {
   apply (rngl_lt_le_incl Hor).
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
   apply (rngl_inv_pos Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
   apply (rngl_lt_le_incl Hor).
   apply (rngl_inv_pos Hon Hop Hiv Hor).
@@ -259,7 +259,7 @@ destruct (le_dec k n) as [Hkn| Hkn]. {
   apply (rngl_div_nonneg Hon Hop Hiv Hor).
   apply (rngl_0_le_1 Hon Hos Hor).
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
 }
 apply Nat.nle_gt in Hkn.
 remember (k - n)%nat as nk eqn:Hnk.
@@ -269,7 +269,7 @@ assert (Hn : (k = n + nk)%nat). {
 }
 subst k; clear Hnk Hkn; rename nk into k.
 rewrite partial_sum3_aux_add, Nat.add_0_l.
-apply (rngl_add_le_mono_l Hos Hor).
+apply (rngl_add_le_mono_l Hor).
 revert n.
 induction k; intros; simpl; [ apply Hzi | ].
 remember (u n) as b eqn:Hb; symmetry in Hb.
@@ -283,10 +283,10 @@ destruct b. {
     apply (rngl_pow_neq_0 Hon Hos Hiq).
     apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
     apply (rngl_neq_mul_0 Hon Hos Hiq).
-    apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
     apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
     apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
-    apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
   }
   field_simplify. {
     apply partial_sum3_aux_le_half_pow; [ | easy ].
@@ -294,8 +294,8 @@ destruct b. {
     apply (rngl_div_nonneg Hon Hop Hiv Hor).
     apply (rngl_0_le_1 Hon Hos Hor).
     apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
-    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
+    apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   }
   split. {
     apply (rngl_pow_neq_0 Hon Hos Hiq).
@@ -305,7 +305,7 @@ destruct b. {
     assert (1 + 2 ≠ 0)%L by now rewrite rngl_add_comm; apply rngl_3_neq_0.
     easy.
   }
-  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 }
 replace (1 / 3 ^ n / 3)%L with (1 / (3 ^ S n))%L. {
   eapply (rngl_le_trans Hor); [ apply IHk | ].
@@ -313,17 +313,17 @@ replace (1 / 3 ^ n / 3)%L with (1 / (3 ^ S n))%L. {
   apply (rngl_mul_pos_pos Hon Hop Hiq Hor).
   apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   apply (rngl_mul_pos_pos Hon Hop Hiq Hor).
   apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   apply (rngl_mul_le_mono_pos_l Hon Hop Hiq Hor).
   apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
   cbn.
   apply (rngl_le_div_l Hon Hop Hiv Hor).
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   rewrite (rngl_div_diag Hon Hiq).
   apply (rngl_le_add_l Hor).
   apply (rngl_0_le_2 Hon Hos Hor).
@@ -442,7 +442,7 @@ rewrite (rngl_mul_comm Hic (3 ^ n)).
 rewrite <- (rngl_mul_sub_distr_r Hop).
 apply (rngl_lt_div_r Hon Hop Hiv Hor).
 apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
 apply (rngl_lt_sub_lt_add_l Hop Hor).
 eapply (rngl_le_lt_trans Hor); [ apply Hr2 | ].
 rewrite partial_sum3_succ.
@@ -456,15 +456,15 @@ rewrite <- (rngl_div_div Hon Hos Hiv).
 rewrite (rngl_div_div_swap Hic Hiv).
 apply (rngl_div_lt_mono_pos_r Hon Hop Hiv Hor).
 apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
 apply (rngl_lt_div_l Hon Hop Hiv Hor).
-apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
 rewrite (rngl_mul_1_l Hon).
 apply (rngl_lt_add_lt_sub_r Hop Hor).
 progress unfold INR.
 apply (rngl_le_lt_trans Hor _ 1).
 rewrite <- rngl_of_nat_1.
-apply (rngl_of_nat_inj_le Hon Hos Hiq Hc1 Hor).
+apply (rngl_of_nat_inj_le Hon Hos Hc1 Hor).
 apply Nat.b2n_le_1.
 field_simplify; fold_rngl.
 apply (rngl_lt_div_r Hon Hop Hiv Hor).
@@ -476,12 +476,12 @@ rewrite (rngl_mul_1_l Hon).
 rewrite <- rngl_add_assoc.
 apply (rngl_lt_add_r Hos Hor).
 rewrite rngl_add_comm.
-apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
-apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
+apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 apply (rngl_pow_neq_0 Hon Hos Hiq).
 apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
-apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
 apply (rngl_pow_neq_0 Hon Hos Hiq).
 apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 Qed.
@@ -489,7 +489,7 @@ Qed.
 Theorem Int_part_n_partial_sum3 : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%L)
   → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%L) → (r ≤ b)%L)
-  → Int_part (r * 3 ^ n) = Z.of_nat (n_partial_sum3 u n).
+  → Int_part Hc1 Har (r * 3 ^ n) = Z.of_nat (n_partial_sum3 u n).
 Proof.
 destruct_ac.
 intros * Hr1 Hr2.
@@ -498,7 +498,7 @@ assert (H : (r ≤ partial_sum3 u (S n) + (2 * 3 ^ S n)⁻¹)%L). {
   apply Hr2, partial_sum3_upper_bound.
 }
 clear Hr2; rename H into Hr2.
-specialize (Int_part_interv (Z.of_nat (n_partial_sum3 u n))) as H1.
+specialize (Int_part_interv Hc1 Har (Z.of_nat (n_partial_sum3 u n))) as H1.
 apply (proj1 (H1 (r * 3 ^ n)%L)); clear H1.
 rewrite rngl_of_Z_add.
 rewrite rngl_of_Z_of_nat.
@@ -513,7 +513,7 @@ split. {
     apply (rngl_le_trans Hor _ (1 / 3)); [ | easy ].
     apply (rngl_div_nonneg Hon Hop Hiv Hor).
     apply (rngl_0_le_1 Hon Hos Hor).
-    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   }
   progress unfold partial_sum3 in Hr1, Hr2.
   rewrite partial_sum3_aux_shift_seq in Hr1, Hr2.
@@ -536,7 +536,7 @@ split. {
     rewrite rngl_of_nat_1 in Hr1.
     apply (rngl_le_div_l Hon Hop Hiv Hor) in Hr1.
     now apply (rngl_le_add_le_sub_l Hop Hor) in Hr1.
-    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
     apply (rngl_le_sub_le_add_r Hop Hor).
     rewrite rngl_mul_assoc, (rngl_mul_comm Hic 2) in Hr2.
     rewrite <- rngl_mul_assoc in Hr2.
@@ -548,10 +548,10 @@ split. {
     remember 3%L as x.
     rewrite <- rngl_add_assoc in Hr2.
     now rewrite rngl_add_comm in Hr2.
-    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
     apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
     apply (rngl_neq_mul_0 Hon Hos Hiq).
-    apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
     apply (rngl_pow_neq_0 Hon Hos Hiq).
     apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
   }
@@ -565,12 +565,12 @@ split. {
   apply IHn. {
     unfold partial_sum3.
     apply (rngl_le_div_l Hon Hop Hiv Hor) in Hr1; [ easy | ].
-    apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+    apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   }
   progress unfold partial_sum3.
   set (x := partial_sum3_aux (S n) v 1%L 0) in *.
   apply (rngl_le_div_r Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   rewrite (rngl_div_add_distr_r Hiv).
   rewrite (rngl_div_eq_inv_r Hiv _⁻¹).
   rewrite <- (rngl_inv_mul_distr Hon Hos Hiv).
@@ -579,7 +579,7 @@ split. {
   now rewrite <- rngl_mul_assoc.
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
   apply (rngl_neq_mul_0 Hon Hos Hiq).
-  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
   apply (rngl_pow_neq_0 Hon Hos Hiq).
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
@@ -589,8 +589,8 @@ Qed.
 Theorem IZR_Int_part_mult_pow_succ : ∀ u r n,
   (∀ k, (partial_sum3 u k ≤ r)%L)
   → (∀ b, (∀ k, (partial_sum3 u k ≤ b)%L) → (r ≤ b)%L)
-  → IZR (Int_part (r * 3 ^ S n)) =
-    (3 * IZR (Int_part (r * 3 ^ n)) + INR (Nat.b2n (u n)))%L.
+  → IZR (Int_part Hc1 Har (r * 3 ^ S n)) =
+    (3 * IZR (Int_part Hc1 Har (r * 3 ^ n)) + INR (Nat.b2n (u n)))%L.
 Proof.
 destruct_ac.
 intros * Hr1 Hr2.
@@ -606,7 +606,7 @@ Qed.
 Theorem Int_part_eq_partial_sum3 : ∀ u r n,
   (∀ k : nat, (partial_sum3 u k ≤ r)%L)
   → (∀ b, (∀ k : nat, (partial_sum3 u k ≤ b)%L) → (r ≤ b)%L)
-  → IZR (Int_part (r * 3 ^ n)) = (partial_sum3 u n * 3 ^ n)%L.
+  → IZR (Int_part Hc1 Har (r * 3 ^ n)) = (partial_sum3 u n * 3 ^ n)%L.
 Proof.
 destruct_ac.
 intros * Hk1 Hk2.
@@ -732,7 +732,7 @@ split. {
 intros n.
 clear E Hr1 Hr2.
 unfold ter_bin_of_frac_part; symmetry.
-destruct (rngl_ltb_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
+destruct (rngl_ltb_dec (frac_part Hc1 Har (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
   apply rngl_ltb_lt in H1.
   generalize H1; intros H.
   apply rngl_nle_gt in H.
@@ -756,7 +756,7 @@ destruct (rngl_ltb_dec (frac_part (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
     apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
   }
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
 }
 apply (rngl_ltb_ge_iff Hor) in H1.
 apply rngl_leb_le in H1.
@@ -793,10 +793,10 @@ apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
   progress unfold t.
   apply (rngl_inv_pos Hon Hop Hiv Hor).
   apply (rngl_mul_pos_pos Hon Hop Hiq Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
   apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-  apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
-  apply (rngl_2_neq_0 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
+  apply (rngl_2_neq_0 Hon Hos Hc1 Hor).
   apply (rngl_neq_mul_0 Hon Hos Hiq).
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
   apply (rngl_pow_neq_0 Hon Hos Hiq).
@@ -810,7 +810,7 @@ apply -> (rngl_le_div_l Hon Hop Hiv Hor) in H1. {
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
 apply (rngl_pow_pos_pos Hon Hop Hiv Hor).
-apply (rngl_0_lt_3 Hon Hos Hiq Hc1 Hor).
+apply (rngl_0_lt_3 Hon Hos Hc1 Hor).
 Qed.
 
 Definition id {A} (a : A) := a.
