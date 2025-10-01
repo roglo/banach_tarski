@@ -876,60 +876,47 @@ induction j; intros. {
   destruct n; [ easy | clear Hc1 ].
   revert i Hij.
   induction n; intros. {
-(**)
     specialize (H1 1).
     assert (H : 0 < 1 < 2) by flia.
     specialize (H1 H); clear H.
+    remember (Nat.even i) as b eqn:Hb.
+    symmetry in Hb.
+    destruct b. {
+      apply Nat.even_spec in Hb.
+      destruct Hb as (n, Hn).
+      subst i.
+      rewrite Nat.mul_comm.
+      apply Nat.Div0.mod_mul.
+    }
+    apply Bool.not_true_iff_false in Hb.
+    exfalso; apply Hb; clear Hb.
+    induction i; [ easy | ].
+...
     induction i; [ apply Nat.Div0.mod_0_l | ].
     destruct i; [ easy | ].
-    do 2 rewrite <- Nat.add_1_r.
-    rewrite <- Nat.add_assoc; cbn.
+    do 2 rewrite <- Nat.add_1_r in Hij |-*.
+    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
     rewrite nat_mod_add_once.
-    do 2 rewrite <- Nat.add_1_r in Hij.
-    rewrite <- Nat.add_assoc in Hij.
-    cbn in Hij.
     rewrite rngl_of_nat_add in Hij.
     rewrite H2, rngl_add_0_r in Hij.
-    destruct i; [ easy | ].
-    do 2 rewrite <- Nat.add_1_r in IHi.
-    rewrite <- Nat.add_assoc in IHi.
-    cbn in IHi.
-    rewrite nat_mod_add_once in IHi.
-    rewrite rngl_of_nat_add in IHi.
-    rewrite H2, rngl_add_0_r in IHi.
-    destruct i; [ easy | ].
-    do 2 rewrite <- Nat.add_1_r.
-    rewrite <- Nat.add_assoc; cbn.
-    rewrite nat_mod_add_once.
-    destruct i; [ easy | ].
-(* ah, fait chier... *)
-...
-    rewrite rngl_of_nat_2 in H2.
+    rewrite rngl_of_nat_succ in IHi.
+    rewrite Hij, rngl_add_0_r in IHi.
+(**)
     destruct i; [ apply Nat.Div0.mod_0_l | ].
-    destruct i. {
-      exfalso.
-      apply (H1 1); [ flia | easy ].
-    }
     destruct i; [ easy | ].
-    destruct i. {
-      exfalso.
-      rewrite rngl_of_nat_3 in Hij.
-      rewrite H2 in Hij.
-      rewrite rngl_add_0_l in Hij.
-      apply (H1 1); [ flia | ].
-      rewrite <- Hij.
-      apply rngl_of_nat_1.
-    }
+    do 2 rewrite <- Nat.add_1_r in Hij |-*.
+    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
+    rewrite nat_mod_add_once.
+    rewrite rngl_of_nat_add in Hij.
+    rewrite H2, rngl_add_0_r in Hij.
+(**)
+    destruct i; [ apply Nat.Div0.mod_0_l | ].
     destruct i; [ easy | ].
-    destruct i. {
-      exfalso.
-      rewrite <- H2 in Hij.
-      apply (rngl_add_cancel_l Hos) in Hij.
-      rewrite rngl_add_0_r in Hij.
-      rewrite H2 in Hij.
-      rewrite rngl_add_0_r in Hij.
-      rewrite H2 in Hij.
-      apply (H1 1); [ flia | ].
+    do 2 rewrite <- Nat.add_1_r in Hij |-*.
+    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
+    rewrite nat_mod_add_once.
+    rewrite rngl_of_nat_add in Hij.
+    rewrite H2, rngl_add_0_r in Hij.
 ...
   destruct i; [ apply Nat.Div0.mod_0_l | ].
 ...
