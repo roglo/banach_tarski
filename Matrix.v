@@ -388,7 +388,7 @@ Proof. easy. Qed.
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
@@ -406,7 +406,7 @@ Qed.
 
 Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -421,7 +421,7 @@ Qed.
 
 Theorem rot_rot_inv_z : (rot_z * rot_inv_z)%mat = mat_id.
 Proof.
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -436,7 +436,7 @@ Qed.
 
 Theorem rot_inv_rot_z : (rot_inv_z * rot_z)%mat = mat_id.
 Proof.
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -611,7 +611,7 @@ Qed.
 
 Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
 Proof.
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, rngl_div; rewrite Hiv.
 do 18 rewrite rngl_mul_assoc.
@@ -627,7 +627,7 @@ Qed.
 
 Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
@@ -647,7 +647,7 @@ Qed.
 
 Theorem rot_z_is_rotation_matrix : is_rotation_matrix rot_z.
 Proof.
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
@@ -672,7 +672,7 @@ Qed.
 Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
 Proof.
 (**)
-specialize (rngl_0_le_2 Hon Hos Hiq Hor) as H02.
+specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hiq Hc1 Hor).
@@ -787,9 +787,9 @@ Proof.
 intros.
 apply (rngl_le_0_add Hos Hor).
 apply (rngl_le_0_add Hos Hor).
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hos Hor).
+apply (rngl_squ_nonneg Hos Hor).
+apply (rngl_squ_nonneg Hos Hor).
 Qed.
 
 Theorem vec_norm_nonneg : ∀ v, (0 ≤ ‖v‖)%L.
@@ -813,7 +813,7 @@ do 2 rewrite <- rngl_mul_add_distr_l.
 rewrite rl_sqrt_mul.
 progress f_equal.
 apply (rl_sqrt_squ Hon Hop Hor).
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hos Hor).
 apply nonneg_sqr_vec_norm.
 Qed.
 
@@ -822,17 +822,17 @@ Theorem sqr_vec_norm_eq_0 : ∀ x y z,
   → (x = 0 ∧ y = 0 ∧ z = 0)%L.
 Proof.
 intros * H.
-apply (rngl_eq_add_0 Hos Hor) in H.
+apply (rngl_eq_add_0 Hor) in H.
 destruct H as (H, H3).
-apply (rngl_eq_add_0 Hos Hor) in H.
+apply (rngl_eq_add_0 Hor) in H.
 destruct H as (H1, H2).
 now apply (eq_rngl_squ_0 Hos Hio) in H1, H2, H3.
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hos Hor).
+apply (rngl_squ_nonneg Hos Hor).
 apply (rngl_le_0_add Hos Hor).
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hos Hor).
+apply (rngl_squ_nonneg Hos Hor).
+apply (rngl_squ_nonneg Hos Hor).
 Qed.
 
 Theorem vec_norm_0 : ‖0‖ = 0%L.
@@ -1176,7 +1176,7 @@ subst v₁ v₂ v₃.
 do 3 rewrite (rngl_squ_mul Hic).
 do 2 rewrite <- rngl_mul_add_distr_l.
 rewrite rl_sqrt_mul; [ | | apply nonneg_sqr_vec_norm ]. 2: {
-  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+  apply (rngl_squ_nonneg Hos Hor).
 }
 rewrite <- Hur.
 rewrite (rl_sqrt_squ Hon Hop Hor).
@@ -1324,7 +1324,7 @@ intros.
 apply (rngl_le_0_sub Hop Hor).
 rewrite vec_Lagrange_identity.
 rewrite vec_dot_mul_diag.
-apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+apply (rngl_squ_nonneg Hos Hor).
 Qed.
 
 (* *)
@@ -1376,7 +1376,7 @@ remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
 do 3 rewrite (rngl_squ_mul Hic) in Ha.
 do 2 rewrite <- rngl_mul_add_distr_l in Ha.
 rewrite rl_sqrt_mul in Ha; [ | | apply nonneg_sqr_vec_norm ]. 2: {
-  apply (rngl_squ_nonneg Hon Hos Hiq Hor).
+  apply (rngl_squ_nonneg Hos Hor).
 }
 remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
 assert (Hbz : b ≠ 0%L). {
