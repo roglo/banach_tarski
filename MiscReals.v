@@ -2166,6 +2166,7 @@ Theorem Rsign_mul_distr :
   ∀ x y, rngl_sign (x * y) = (rngl_sign x * rngl_sign y)%L.
 Proof.
 destruct_ac.
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 intros.
 unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec (x * y) 0) as [Hxyz| Hxyz]; rewrite Hxyz. {
@@ -2175,7 +2176,6 @@ destruct (rngl_eqb_dec (x * y) 0) as [Hxyz| Hxyz]; rewrite Hxyz. {
   apply (rngl_mul_0_l Hos).
   destruct (rngl_eqb_dec y 0) as [Hy| Hy]; rewrite Hy.
   apply (rngl_mul_0_r Hos).
-...
   apply (rngl_integral Hos Hio) in Hxyz.
   apply (rngl_eqb_neq Heo) in Hx, Hy.
   now destruct Hxyz.
@@ -2189,7 +2189,7 @@ destruct (rngl_eqb_dec y 0) as [Hyz| Hyz]; rewrite Hyz. {
   apply (rngl_eqb_eq Heo) in Hyz.
   now subst; rewrite (rngl_mul_0_r Hos) in Hxyz.
 }
-apply (rngl_eqb_neq Heo) in Hyz.
+apply (rngl_eqb_neq Heo) in Hxz, Hyz.
 destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]; rewrite Hxy. {
   apply rngl_leb_le in Hxy.
   destruct (rngl_leb_dec 0 x) as [Hx| Hx]; rewrite Hx. {
@@ -2200,7 +2200,6 @@ destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]; rewrite Hxy. {
     destruct Hxy as [(_, Hy)| (Hx', Hy)]. {
       now apply rngl_leb_le in Hy; rewrite Hy.
     }
-    apply (rngl_eqb_neq Heo) in Hxz.
     now apply (rngl_le_antisymm Hor) in Hx.
   }
   apply rngl_leb_nle in Hx.
@@ -2214,7 +2213,7 @@ destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]; rewrite Hxy. {
   apply (rngl_squ_opp_1 Hon Hop).
 }
 apply (rngl_leb_gt_iff Hor) in Hxy.
-apply (rngl_lt_mul_0_if Hon Hos Hiq Hor) in Hxy.
+apply (rngl_lt_mul_0_if Hos Hor) in Hxy.
 destruct Hxy as [(Hx, Hy)| (Hx, Hy)]. {
   apply (rngl_leb_gt_iff Hor) in Hx.
   apply (rngl_lt_le_incl Hor) in Hy.
@@ -2253,7 +2252,7 @@ apply (eq_rl_sqrt_0 Hon Hos) in Hyx. {
   now apply (rngl_le_trans Hor _ x).
 }
 apply (rngl_le_0_sub Hop Hor).
-now apply (rngl_le_le_squ Hon Hop Hiq Hor).
+now apply (rngl_le_le_squ Hop Hor).
 Qed.
 
 Definition Rediv_mod x y :=
@@ -2400,12 +2399,12 @@ destruct z as [| q| q]. {
   apply (rngl_of_pos_prop2 (rngl_of_pos p + 1)%L). {
     rewrite rngl_of_pos_add, rngl_of_pos_1.
     split; [ easy | ].
-    now apply (rngl_add_le_mono_r Hos Hor).
+    now apply (rngl_add_le_mono_r Hor).
   }
   rewrite rngl_of_pos_add, rngl_of_pos_1.
   split; [ | pauto ].
   apply (rngl_lt_add_r Hos Hor).
-  apply (rngl_0_lt_1 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_1 Hon Hos Hc1 Hor).
 }
 Qed.
 
@@ -2526,7 +2525,7 @@ rewrite Z.add_shuffle0.
 do 2 rewrite rngl_of_Z_add.
 rewrite <- Hbn.
 split.
-now apply (rngl_add_le_mono_r Hos Hor).
+now apply (rngl_add_le_mono_r Hor).
 now apply (rngl_add_lt_mono_r Hos Hor).
 Qed.
 
@@ -2833,7 +2832,7 @@ move y before x; move z before y.
 apply (Int_part_prop (a + b))%L; [ easy | ].
 rewrite Z.add_shuffle0.
 do 2 rewrite rngl_of_Z_add.
-split; [ now apply (rngl_add_le_mono Hos Hor) | ].
+split; [ now apply (rngl_add_le_mono Hor) | ].
 rewrite rngl_of_Z_add in Hab.
 apply (rngl_lt_sub_lt_add_l Hop Hor) in Hab.
 rewrite rngl_add_add_swap in Hab.
@@ -2890,12 +2889,12 @@ destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   apply plus_frac_part2.
   rewrite <- (rngl_mul_2_r Hon).
   apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hx; [ easy | ].
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 apply (rngl_ltb_ge_iff Hor) in Hx.
 do 2 rewrite (rngl_mul_2_l Hon).
 apply (rngl_le_div_l Hon Hop Hiv Hor) in Hx. 2: {
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 rewrite (rngl_mul_2_r Hon) in Hx.
 now apply plus_frac_part1.
@@ -2916,7 +2915,7 @@ destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   }
   rewrite <- (rngl_mul_2_r Hon).
   apply (rngl_lt_div_r Hon Hop Hiv Hor) in Hx; [ easy | ].
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 } {
   rewrite plus_Int_part1. {
     progress f_equal.
@@ -2925,7 +2924,7 @@ destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   rewrite <- (rngl_mul_2_r Hon).
   apply (rngl_ltb_ge_iff Hor) in Hx.
   apply (rngl_le_div_l Hon Hop Hiv Hor) in Hx; [ easy | ].
-  apply (rngl_0_lt_2 Hon Hos Hiq Hc1 Hor).
+  apply (rngl_0_lt_2 Hon Hos Hc1 Hor).
 }
 Qed.
 
@@ -2980,6 +2979,6 @@ Qed.
 
 End a.
 
-Arguments Int_part {T ro rp fc} x%_L.
-Arguments frac_part {T ro rp fc} x%_L.
-Arguments Int_part_interv {T ro rp fc} z%_Z x%_L.
+Arguments Int_part {T ro rp ac} Hc1 Har x%_L.
+Arguments frac_part {T ro rp ac} Hc1 Har x%_L.
+Arguments Int_part_interv {T ro rp ac} Hc1 Har z%_Z x%_L.
