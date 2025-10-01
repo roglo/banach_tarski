@@ -881,73 +881,24 @@ induction j; intros. {
     specialize (H1 H); clear H.
     rewrite rngl_of_nat_1 in H1.
     rewrite rngl_of_nat_2 in H2.
-(*1*)
-    destruct i; [ apply Nat.Div0.mod_0_l | ].
-    destruct i; [ now rewrite rngl_of_nat_1 in Hij | ].
-    do 2 rewrite <- Nat.add_1_r in Hij |-*.
-    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
-    rewrite nat_mod_add_once.
-    rewrite rngl_of_nat_add in Hij.
-    rewrite rngl_of_nat_2, H2, rngl_add_0_r in Hij.
-(*2*)
-    destruct i; [ apply Nat.Div0.mod_0_l | ].
-    destruct i; [ now rewrite rngl_of_nat_1 in Hij | ].
-    do 2 rewrite <- Nat.add_1_r in Hij |-*.
-    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
-    rewrite nat_mod_add_once.
-    rewrite rngl_of_nat_add in Hij.
-    rewrite rngl_of_nat_2, H2, rngl_add_0_r in Hij.
-...
     remember (Nat.even i) as b eqn:Hb.
     symmetry in Hb.
     destruct b. {
       apply Nat.even_spec in Hb.
       destruct Hb as (n, Hn).
-      subst i.
+      rewrite Hn.
       rewrite Nat.mul_comm.
       apply Nat.Div0.mod_mul.
     }
-    apply Bool.not_true_iff_false in Hb.
-    exfalso; apply Hb; clear Hb.
-    induction i; [ easy | ].
-    destruct i; [ easy | ].
-    rewrite Nat.even_succ_succ.
-    do 2 rewrite <- Nat.add_1_r in Hij.
-    rewrite <- Nat.add_assoc in Hij; cbn in Hij.
-    rewrite rngl_of_nat_add in Hij.
-    rewrite H2, rngl_add_0_r in Hij.
-...
-    induction i; [ apply Nat.Div0.mod_0_l | ].
-    destruct i; [ easy | ].
-    do 2 rewrite <- Nat.add_1_r in Hij |-*.
-    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
-    rewrite nat_mod_add_once.
-    rewrite rngl_of_nat_add in Hij.
-    rewrite H2, rngl_add_0_r in Hij.
-    rewrite rngl_of_nat_succ in IHi.
-    rewrite Hij, rngl_add_0_r in IHi.
-(**)
-    destruct i; [ apply Nat.Div0.mod_0_l | ].
-    destruct i; [ easy | ].
-    do 2 rewrite <- Nat.add_1_r in Hij |-*.
-    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
-    rewrite nat_mod_add_once.
-    rewrite rngl_of_nat_add in Hij.
-    rewrite H2, rngl_add_0_r in Hij.
-(**)
-    destruct i; [ apply Nat.Div0.mod_0_l | ].
-    destruct i; [ easy | ].
-    do 2 rewrite <- Nat.add_1_r in Hij |-*.
-    rewrite <- Nat.add_assoc in Hij |-*; cbn in Hij |-*.
-    rewrite nat_mod_add_once.
-    rewrite rngl_of_nat_add in Hij.
-    rewrite H2, rngl_add_0_r in Hij.
-...
-  destruct i; [ apply Nat.Div0.mod_0_l | ].
-...
-  specialize (Nat.div_mod i (rngl_characteristic T) Hch) as H3.
-...
-Search (rngl_of_nat _ = 0)%L.
+    rewrite <- Nat.negb_odd in Hb.
+    apply Bool.negb_false_iff in Hb.
+    apply Nat.odd_spec in Hb.
+    destruct Hb as (n, Hn).
+    rewrite Hn in Hij.
+    rewrite rngl_of_nat_add, (rngl_of_nat_mul Hon Hos) in Hij.
+    rewrite rngl_of_nat_2, H2, (rngl_mul_0_l Hos), rngl_add_0_l in Hij.
+    now rewrite rngl_of_nat_1 in Hij.
+  }
 ...
   destruct i; [ apply Nat.Div0.mod_0_l | ].
   rewrite rngl_of_nat_succ in Hij.
