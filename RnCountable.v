@@ -7,6 +7,7 @@ From Stdlib Require Import Field.
 Require Import RingLike.Core.
 Require Import RingLike.IntermVal.
 Require Import RingLike.Misc.
+Require Import TrigoWithoutPi.Core.
 From a Require Import MiscReals Countable.
 
 Section a.
@@ -14,13 +15,13 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {fc : field_char_0_archim T}.
+Context {ac : angle_ctx T}.
+Context {Hc1 : rngl_characteristic T ≠ 1}.
 
-Add Ring rngl_ring : (rngl_ring_theory fc_ic fc_op fc_on).
-Add Field rngl_field :
-  (rngl_field_theory fc_ic fc_op fc_on fc_iv
-    (eq_ind_r (λ n, n ≠ 1) (Nat.neq_succ_diag_r 0) fc_ch)).
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op ac_on).
+Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_on ac_iv Hc1).
 
+...
 Definition ter_bin_of_frac_part x n := (1 / 3 ≤? frac_part (x * 3 ^ n))%L.
 (*
 Definition ter_bin_of_frac_part x n :=
