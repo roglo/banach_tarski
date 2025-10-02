@@ -1442,8 +1442,7 @@ Theorem unit_sphere_mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
   → (s₂² + c₂² = 1)%L
   → θ₁ = angle_of_sin_cos s₁ c₁
   → θ₂ = angle_of_sin_cos s₂ c₂
-  → (matrix_of_axis_angle a s₁ c₁ *
-      matrix_of_axis_angle a s₂ c₂)%mat =
+  → (matrix_of_axis_angle a s₁ c₁ * matrix_of_axis_angle a s₂ c₂)%mat =
      matrix_of_axis_angle a (rngl_sin (θ₁ + θ₂)) (rngl_cos (θ₁ + θ₂)).
 Proof.
 destruct_ac.
@@ -1462,11 +1461,45 @@ rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
 rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
 rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
 clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
-progress unfold rngl_squ in Ha.
-progress unfold rngl_squ.
 progress unfold mkrmat.
 f_equal. {
   ring_simplify; fold_rngl.
+  do 4 rewrite <- (rngl_mul_assoc _ _ az).
+  do 4 rewrite <- (rngl_mul_assoc _ _ ay).
+  do 3 rewrite <- (rngl_mul_assoc _ _ ax).
+  rewrite (fold_rngl_squ az).
+  rewrite (fold_rngl_squ ay).
+  rewrite (fold_rngl_squ ax).
+  remember ax² as x eqn:H; clear H.
+  remember ay² as y eqn:H; clear H.
+  remember az² as z eqn:H; clear H.
+  apply (rngl_add_move_l Hop) in Ha.
+  subst z.
+  ring.
+} {
+  ring_simplify; fold_rngl.
+  rewrite (fold_rngl_squ ay).
+  rewrite (fold_rngl_squ ax).
+  do 4 rewrite <- (rngl_mul_assoc _ az az).
+  rewrite (fold_rngl_squ az).
+  rewrite <- (rngl_mul_assoc _ ax ax).
+  rewrite (fold_rngl_squ ax).
+  apply (rngl_add_move_l Hop) in Ha.
+  rewrite Ha; clear Ha.
+  ring.
+} {
+  ring_simplify; fold_rngl.
+  rewrite (fold_rngl_squ ax).
+  rewrite (fold_rngl_squ az).
+  do 4 rewrite <- (rngl_mul_assoc _ ay ay).
+  rewrite (fold_rngl_squ ay).
+  rewrite <- (rngl_mul_assoc _ ax ax).
+  rewrite (fold_rngl_squ ax).
+  apply (rngl_add_move_l Hop) in Ha.
+  rewrite Ha; clear Ha.
+  ring.
+} {
+...
   rewrite rngl_mul_add_distr_r.
   rewrite (rngl_mul_1_l Hon).
   do 3 rewrite rngl_mul_add_distr_r.
