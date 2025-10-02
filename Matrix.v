@@ -1122,10 +1122,9 @@ Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
-...
-
 Theorem vec_const_mul_eq_reg_l : ∀ a u v, a ⁎ u = a ⁎ v → a ≠ 0%L → u = v.
 Proof.
+destruct_ac.
 assert (Hip : rngl_has_inv_and_1_or_pdiv_and_comm T = true). {
   progress unfold rngl_has_inv_and_1_or_pdiv_and_comm.
   now rewrite Hiv, Hon.
@@ -1141,6 +1140,7 @@ Qed.
 
 Theorem mat_vec_mul_0_r : ∀ M, (M * 0)%vec = 0%vec.
 Proof.
+destruct_ac.
 intros; simpl.
 do 9 rewrite (rngl_mul_0_r Hos).
 now do 2 rewrite rngl_add_0_l.
@@ -1159,6 +1159,7 @@ Qed.
 
 Theorem normalized_vector : ∀ u v, u ≠ 0%vec → v = ‖u‖⁻¹ ⁎ u → ‖v‖ = 1%L.
 Proof.
+destruct_ac.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) Hu Hv.
 simpl in Hv; simpl.
 injection Hv; clear Hv; intros H₃ H₂ H₁.
@@ -1211,6 +1212,7 @@ Definition mat_compl M :=
 
 Theorem mat_mul_compl_l : ∀ M, (mat_compl M * M = mat_det M ⁎ mat_id)%mat.
 Proof.
+destruct_ac.
 intros.
 destruct M; simpl.
 unfold mat_mul; simpl.
@@ -1248,6 +1250,7 @@ Qed.
 
 Theorem mat_const_mul_1_l : ∀ M, (1%L ⁎ M = M)%mat.
 Proof.
+destruct_ac.
 intros; unfold mat_const_mul, mkrmat; destruct M; simpl.
 now do 9 rewrite (rngl_mul_1_l Hon).
 Qed.
