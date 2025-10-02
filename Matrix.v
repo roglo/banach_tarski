@@ -1454,8 +1454,23 @@ do 3 rewrite Rdiv_1_r.
 unfold mat_mul; simpl.
 apply (f_equal rngl_squ) in Ha.
 rewrite (rngl_squ_1 Hon) in Ha.
+rewrite (rngl_squ_sqrt Hon) in Ha; [ | apply nonneg_sqr_vec_norm ].
+(**)
+rewrite Hθ₁, Hθ₂.
+rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
+rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
+rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
+rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
+clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
+progress unfold rngl_squ in Ha.
+progress unfold rngl_squ.
+progress unfold mkrmat.
+f_equal. {
+  ring_simplify; fold_rngl.
+  rewrite rngl_mul_add_distr_r.
+  rewrite (rngl_mul_1_l Hon).
+  do 3 rewrite rngl_mul_add_distr_r.
 ...
-rewrite Rsqr_sqrt in Ha; [ | apply nonneg_sqr_vec_norm ].
 rewrite cos_plus, sin_plus.
 rewrite Hθ₁, Hθ₂.
 rewrite cos_angle_of_sin_cos; [ | easy ].
