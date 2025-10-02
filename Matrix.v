@@ -1454,7 +1454,6 @@ unfold mat_mul; simpl.
 apply (f_equal rngl_squ) in Ha.
 rewrite (rngl_squ_1 Hon) in Ha.
 rewrite (rngl_squ_sqrt Hon) in Ha; [ | apply nonneg_sqr_vec_norm ].
-(**)
 rewrite Hθ₁, Hθ₂.
 rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
 rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
@@ -1573,49 +1572,41 @@ induction n; intros. {
   unfold mat_id, mkrmat.
   f_equal; ring.
 }
-(**)
 cbn in Hs', Hc'.
 rename s' into s''; rename c' into c''.
 rename Hs' into Hs''; rename Hc' into Hc''.
-specialize (IHn _ _ eq_refl eq_refl).
-...
- rewrite S_INR in Hs', Hc'.
- rewrite Rmult_plus_distr_r, Rmult_1_l, Rplus_comm in Hs', Hc'.
- rewrite sin_plus in Hs'.
- rewrite cos_plus in Hc'.
- rename s' into s''; rename c' into c''.
- rename Hs' into Hs''; rename Hc' into Hc''.
- remember (sin (INR n * θ)) as s' eqn:Hs' in Hs'', Hc''.
- remember (cos (INR n * θ)) as c' eqn:Hc' in Hs'', Hc''.
- specialize (IHn s' c' Hs' Hc').
- rewrite mat_pow_succ, <- IHn.
- remember (angle_of_sin_cos s' c') as θ' eqn:Hθ'.
- assert (Hsc' : s'² + c'² = 1) by (subst s' c'; apply sin2_cos2).
- erewrite unit_sphere_mat_mul_angle_add; try easy.
- rewrite sin_plus, cos_plus.
- rewrite sin_angle_of_sin_cos; [ | easy ].
- rewrite sin_angle_of_sin_cos; [ | easy ].
- rewrite cos_angle_of_sin_cos; [ | easy ].
- rewrite cos_angle_of_sin_cos; [ | easy ].
- rewrite Hs'', Hc'', Hs', Hc'.
- rewrite Hθ.
- rewrite sin_angle_of_sin_cos; [ | easy ].
- rewrite cos_angle_of_sin_cos; [ | easy ].
+remember (rngl_sin (n * θ)) as s' eqn:Hs' in Hs'', Hc''.
+remember (rngl_cos (n * θ)) as c' eqn:Hc' in Hs'', Hc''.
+specialize (IHn _ _ Hs' Hc').
+rewrite mat_pow_succ, <- IHn.
+assert (Hsc' : (c'² + s'² = 1)%L) by (subst s' c'; apply cos2_sin2_1).
+rewrite rngl_add_comm in Hsc'.
+erewrite unit_sphere_mat_mul_angle_add; try easy.
+rewrite rngl_sin_add, rngl_cos_add.
+rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
+rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
+rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
+rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
+rewrite Hs'', Hc'', Hs', Hc'.
+rewrite Hθ.
+rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
+rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
  easy.
 Qed.
 
 Theorem matrix_of_mul_angle : ∀ a s c θ s' c' n,
   a ≠ 0%vec
-  → s² + c² = 1
+  → (s² + c² = 1)%L
   → θ = angle_of_sin_cos s c
-  → s' = sin (INR n * θ)
-  → c' = cos (INR n * θ)
-  → matrix_of_axis_angle (a, s', c') =
-     (matrix_of_axis_angle (a, s, c) ^ n)%mat.
+  → s' = rngl_sin (n * θ)
+  → c' = rngl_cos (n * θ)
+  → matrix_of_axis_angle a s' c' =
+     (matrix_of_axis_angle a s c ^ n)%mat.
 Proof.
 intros * Ha Hsc Hθ Hs' Hc'.
-assert (Haz : ‖a‖ ≠ 0) by now apply vec_norm_neq_0.
-assert (Haiz : / ‖a‖ ≠ 0) by now apply Rinv_neq_0_compat.
+assert (Haz : ‖a‖ ≠ 0%L) by now apply vec_norm_neq_0.
+...
+assert (Haiz : ‖a‖⁻¹ ≠ 0%L) by now apply Rinv_neq_0_compat.
 assert (Hap : 0 < ‖a‖) by (specialize (vec_norm_nonneg a); lra).
 assert (Haa : ‖(a ⁄ ‖a‖)‖ = 1) by now apply vec_div_vec_norm.
 eapply unit_sphere_matrix_of_mul_angle in Haa; try eassumption.
