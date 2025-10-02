@@ -1259,6 +1259,7 @@ Theorem mat_mul_id_comm : ∀ M M',
   (M * M')%mat = mat_id
   → (M' * M)%mat = mat_id.
 Proof.
+destruct_ac.
 intros * HMM'.
 generalize HMM'; intros H.
 apply (f_equal (mat_mul (mat_compl M))) in H.
@@ -1310,6 +1311,7 @@ Qed.
 Theorem vec_Lagrange_identity : ∀ u v,
   (‖u‖² * ‖v‖² - (u · v)²)%L = (u × v)²%vec.
 Proof.
+destruct_ac.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃).
 simpl.
 rewrite (rngl_squ_sqrt Hon); [ | apply nonneg_sqr_vec_norm ].
@@ -1321,6 +1323,7 @@ Arguments vec_Lagrange_identity u%_vec v%_vec.
 
 Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ‖u‖² * ‖v‖²)%L.
 Proof.
+destruct_ac.
 intros.
 apply (rngl_le_0_sub Hop Hor).
 rewrite vec_Lagrange_identity.
@@ -1371,6 +1374,7 @@ Theorem matrix_mul_axis : ∀ p c s k,
   → matrix_of_axis_angle p s c =
     matrix_of_axis_angle (k ⁎ p) (rngl_sign k * s) c.
 Proof.
+destruct_ac.
 intros * Hpz Hk.
 destruct p as (xp, yp, zp); simpl.
 remember (√ ((k * xp)² + (k * yp)² + (k * zp)²)) as a eqn:Ha.
@@ -1442,14 +1446,15 @@ Theorem unit_sphere_mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
       matrix_of_axis_angle a s₂ c₂)%mat =
      matrix_of_axis_angle a (rngl_sin (θ₁ + θ₂)) (rngl_cos (θ₁ + θ₂)).
 Proof.
+destruct_ac.
 intros * Ha Hsc₁ Hsc₂ Hθ₁ Hθ₂.
-...
 destruct a as (ax, ay, az); simpl.
 simpl in Ha; rewrite Ha.
 do 3 rewrite Rdiv_1_r.
 unfold mat_mul; simpl.
-apply (f_equal Rsqr) in Ha.
-rewrite Rsqr_1 in Ha.
+apply (f_equal rngl_squ) in Ha.
+rewrite (rngl_squ_1 Hon) in Ha.
+...
 rewrite Rsqr_sqrt in Ha; [ | apply nonneg_sqr_vec_norm ].
 rewrite cos_plus, sin_plus.
 rewrite Hθ₁, Hθ₂.
