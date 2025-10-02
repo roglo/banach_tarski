@@ -41,38 +41,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T }.
-(*
-Context {fc : field_char_0_archim T}.
-  { ac_ic : rngl_mul_is_comm T0 = true;
-    ac_on : rngl_has_1 T0 = true;
-    ac_op : rngl_has_opp T0 = true;
-    ac_iv : rngl_has_inv T0 = true;
-    ac_or : rngl_is_ordered T0 = true }.
-
-  { fc_ic : rngl_mul_is_comm T0 = true;
-    fc_on : rngl_has_1 T0 = true;
-    fc_op : rngl_has_opp T0 = true;
-    fc_iv : rngl_has_inv T0 = true;
-    fc_or : rngl_is_ordered T0 = true;
-...
-    fc_ch : rngl_characteristic T0 = 0;
-    fc_ar : rngl_is_archimedean T0 = true }.
-
-Let Hic := fc_ic.
-Let Hon := fc_on.
-Let Hop := fc_op.
-Let Hiv := fc_iv.
-Let Hch := fc_ch.
-Let Hor := fc_or.
-
-Let Hos := rngl_has_opp_has_opp_or_psub Hop.
-Let Hiq := rngl_has_inv_has_inv_or_pdiv Hiv.
-Let Heo := rngl_has_eq_dec_or_is_ordered_r Hor.
-Let Hi1 := rngl_has_inv_and_1_has_inv_and_1_or_pdiv Hon Hiv.
-Let Hio := rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor.
-Let Hii := rngl_int_dom_or_inv_1_quo Hiv Hon.
-*)
-
+Context {Hch : rngl_characteristic T = 0}.
 Context {Hc1 : rngl_characteristic T ≠ 1}.
 
 Ltac fold_rngl :=
@@ -393,9 +362,6 @@ unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
-...
-About Rmult5_sqrt2_sqrt5.
-...
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
@@ -407,6 +373,7 @@ Qed.
 
 Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
+destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
@@ -422,6 +389,7 @@ Qed.
 
 Theorem rot_rot_inv_z : (rot_z * rot_inv_z)%mat = mat_id.
 Proof.
+destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
@@ -437,6 +405,7 @@ Qed.
 
 Theorem rot_inv_rot_z : (rot_inv_z * rot_z)%mat = mat_id.
 Proof.
+destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
@@ -612,6 +581,7 @@ Qed.
 
 Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
 Proof.
+destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, rngl_div; rewrite Hiv.
@@ -628,6 +598,7 @@ Qed.
 
 Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
+destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
@@ -648,6 +619,7 @@ Qed.
 
 Theorem rot_z_is_rotation_matrix : is_rotation_matrix rot_z.
 Proof.
+destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
@@ -672,7 +644,7 @@ Qed.
 
 Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
 Proof.
-(**)
+destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
@@ -709,6 +681,7 @@ Theorem mat_mul_is_rotation_matrix : ∀ m1 m2,
   → is_rotation_matrix m2
   → is_rotation_matrix (m1 * m2).
 Proof.
+destruct_ac.
 intros * (Hm1, Hd1) (Hm2, Hd2).
 unfold is_rotation_matrix.
 rewrite mat_transp_mul.
@@ -770,6 +743,7 @@ Theorem vec_const_mul_div : ∀ a b u v,
   → a ⁎ u = b ⁎ v
   → u = (b / a) ⁎ v.
 Proof.
+destruct_ac.
 intros * Ha Hm.
 destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
@@ -785,6 +759,7 @@ Qed.
 
 Theorem nonneg_sqr_vec_norm : ∀ x y z, (0 ≤ x² + y² + z²)%L.
 Proof.
+destruct_ac.
 intros.
 apply (rngl_le_0_add Hos Hor).
 apply (rngl_le_0_add Hos Hor).
@@ -802,12 +777,14 @@ Qed.
 
 Theorem vec_norm_opp : ∀ v, ‖(- v)‖ = ‖v‖.
 Proof.
+destruct_ac.
 intros (x, y, z); simpl.
 now do 3 rewrite (rngl_squ_opp Hop).
 Qed.
 
 Theorem vec_norm_vec_const_mul : ∀ a v, ‖(a ⁎ v)‖ = (rngl_abs a * ‖v‖)%L.
 Proof.
+destruct_ac.
 intros a (x, y, z); simpl.
 do 3 rewrite (rngl_squ_mul Hic).
 do 2 rewrite <- rngl_mul_add_distr_l.
@@ -822,6 +799,8 @@ Theorem sqr_vec_norm_eq_0 : ∀ x y z,
   (x² + y² + z² = 0)%L
   → (x = 0 ∧ y = 0 ∧ z = 0)%L.
 Proof.
+destruct_ac.
+specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
 intros * H.
 apply (rngl_eq_add_0 Hor) in H.
 destruct H as (H, H3).
@@ -838,6 +817,7 @@ Qed.
 
 Theorem vec_norm_0 : ‖0‖ = 0%L.
 Proof.
+destruct_ac.
 simpl; rewrite (rngl_squ_0 Hos).
 do 2 rewrite rngl_add_0_l.
 apply (rl_sqrt_0 Hon Hop Hor Hii).
@@ -845,6 +825,7 @@ Qed.
 
 Theorem vec_norm_eq_0 : ∀ v, ‖v‖ = 0%L ↔ v = 0%vec.
 Proof.
+destruct_ac.
 intros.
 split; intros Hv. {
   destruct v as (v₁, v₂, v₃); simpl in Hv.
@@ -868,6 +849,7 @@ Qed.
 
 Theorem vec_norm_pos : ∀ v, v ≠ 0%vec → (0 < ‖v‖)%L.
 Proof.
+destruct_ac.
 intros * Hv.
 specialize (vec_norm_nonneg v) as H.
 apply vec_norm_neq_0 in Hv.
@@ -881,23 +863,27 @@ Qed.
 
 Theorem vec_sub_0_r : ∀ v, (v - 0 = v)%vec.
 Proof.
+destruct_ac.
 intros (x, y, z); cbn; f_equal; rewrite (rngl_opp_0 Hop); apply rngl_add_0_r.
 Qed.
 
 Theorem vec_const_mul_0_l : ∀ v, (0 ⁎ v = 0)%vec.
 Proof.
+destruct_ac.
 intros (x, y, z); simpl.
 now do 3 rewrite (rngl_mul_0_l Hos).
 Qed.
 
 Theorem vec_const_mul_0_r : ∀ a, (a ⁎ 0 = 0)%vec.
 Proof.
+destruct_ac.
 intros x; simpl.
 now rewrite (rngl_mul_0_r Hos).
 Qed.
 
 Theorem vec_const_mul_1_l : ∀ v, 1 ⁎ v = v.
 Proof.
+destruct_ac.
 intros (x, y, z).
 unfold vec_const_mul.
 now f_equal; rewrite (rngl_mul_1_l Hon).
@@ -905,6 +891,7 @@ Qed.
 
 Theorem neg_vec_involutive : ∀ p, (- - p)%vec = p.
 Proof.
+destruct_ac.
 intros (x, y, z); simpl.
 now f_equal; rewrite (rngl_opp_involutive Hop).
 Qed.
@@ -913,6 +900,7 @@ Theorem is_neg_vec_neg_vec : ∀ v,
   v ≠ 0%vec
   → is_neg_vec (- v) = negb (is_neg_vec v).
 Proof.
+destruct_ac.
 intros (x, y, z) Hv; simpl.
 destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
   destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']; rewrite Hx'. {
@@ -1003,11 +991,13 @@ Qed.
 
 Theorem vec_add_opp_diag_l : ∀ v, (- v + v = 0)%vec.
 Proof.
+destruct_ac.
 intros (v₁, v₂, v₃); simpl; f_equal; apply (rngl_add_opp_diag_l Hop).
 Qed.
 
 Theorem vec_add_opp_diag_r : ∀ v, (v + - v = 0)%vec.
 Proof.
+...
 intros (v₁, v₂, v₃); simpl; f_equal; apply (rngl_add_opp_diag_r Hop).
 Qed.
 
