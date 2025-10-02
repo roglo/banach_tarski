@@ -1462,8 +1462,9 @@ rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
 rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
 clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
 progress unfold mkrmat.
-f_equal. {
-  ring_simplify; fold_rngl.
+(**)
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+f_equal; ring_simplify; fold_rngl. {
   do 4 rewrite <- (rngl_mul_assoc _ _ az).
   do 4 rewrite <- (rngl_mul_assoc _ _ ay).
   do 3 rewrite <- (rngl_mul_assoc _ _ ax).
@@ -1477,7 +1478,6 @@ f_equal. {
   subst z.
   ring.
 } {
-  ring_simplify; fold_rngl.
   rewrite (fold_rngl_squ ay).
   rewrite (fold_rngl_squ ax).
   do 4 rewrite <- (rngl_mul_assoc _ az az).
@@ -1488,7 +1488,6 @@ f_equal. {
   rewrite Ha; clear Ha.
   ring.
 } {
-  ring_simplify; fold_rngl.
   rewrite (fold_rngl_squ ax).
   rewrite (fold_rngl_squ az).
   do 4 rewrite <- (rngl_mul_assoc _ ay ay).
@@ -1499,7 +1498,6 @@ f_equal. {
   rewrite Ha; clear Ha.
   ring.
 } {
-  ring_simplify; fold_rngl.
   rewrite (fold_rngl_squ ax).
   rewrite (fold_rngl_squ ay).
   do 2 rewrite <- (rngl_mul_assoc _ az az).
@@ -1508,7 +1506,6 @@ f_equal. {
   rewrite Ha; clear Ha.
   ring.
 } {
-  ring_simplify; fold_rngl.
   rewrite (fold_rngl_squ ax).
   rewrite (fold_rngl_squ ay).
   do 2 rewrite <- (rngl_mul_assoc _ az az).
@@ -1519,22 +1516,45 @@ f_equal. {
   rewrite Ha; clear Ha.
   ring.
 } {
-...
-  rewrite rngl_mul_add_distr_r.
-  rewrite (rngl_mul_1_l Hon).
-  do 3 rewrite rngl_mul_add_distr_r.
-...
-rewrite cos_plus, sin_plus.
-rewrite Hθ₁, Hθ₂.
-rewrite cos_angle_of_sin_cos; [ | easy ].
-rewrite cos_angle_of_sin_cos; [ | easy ].
-rewrite sin_angle_of_sin_cos; [ | easy ].
-rewrite sin_angle_of_sin_cos; [ | easy ].
-clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
-progress unfold Rsqr in Ha.
-progress unfold Rsqr.
-f_equal; nsatz.
+  rewrite (fold_rngl_squ ax).
+  rewrite <- (rngl_mul_assoc _ ay ay).
+  rewrite <- (rngl_mul_assoc _ az az).
+  rewrite (fold_rngl_squ ay).
+  rewrite (fold_rngl_squ az).
+  apply (rngl_add_move_l Hop) in Ha.
+  rewrite Ha; clear Ha.
+  ring.
+} {
+  do 7 rewrite (rngl_mul_opp_l Hop).
+  rewrite (fold_rngl_squ ax).
+  do 2 rewrite <- (rngl_mul_assoc _ ay ay).
+  rewrite (fold_rngl_squ ay).
+  rewrite (fold_rngl_squ az).
+  apply (rngl_add_move_l Hop) in Ha.
+  rewrite Ha; clear Ha.
+  ring.
+} {
+  rewrite (fold_rngl_squ ax).
+  rewrite <- (rngl_mul_assoc _ ay ay).
+  rewrite <- (rngl_mul_assoc _ az az).
+  rewrite (fold_rngl_squ ay).
+  rewrite (fold_rngl_squ az).
+  apply (rngl_add_move_l Hop) in Ha.
+  rewrite Ha; clear Ha.
+  ring.
+} {
+  rewrite (fold_rngl_squ ax).
+  do 2 rewrite <- (rngl_mul_assoc _ ay ay).
+  rewrite <- (rngl_mul_assoc _ az az).
+  rewrite (fold_rngl_squ ay).
+  rewrite (fold_rngl_squ az).
+  apply (rngl_add_move_l Hop) in Ha.
+  rewrite Ha; clear Ha.
+  ring.
+}
 Qed.
+
+...
 
 Theorem unit_sphere_matrix_of_mul_angle : ∀ a s c θ s' c' n,
   ‖a‖ = 1
