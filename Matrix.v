@@ -1508,6 +1508,17 @@ f_equal. {
   rewrite Ha; clear Ha.
   ring.
 } {
+  ring_simplify; fold_rngl.
+  rewrite (fold_rngl_squ ax).
+  rewrite (fold_rngl_squ ay).
+  do 2 rewrite <- (rngl_mul_assoc _ az az).
+  rewrite (fold_rngl_squ az).
+  rewrite <- (rngl_mul_assoc _ ay ay).
+  rewrite (fold_rngl_squ ay).
+  apply (rngl_add_move_l Hop) in Ha.
+  rewrite Ha; clear Ha.
+  ring.
+} {
 ...
   rewrite rngl_mul_add_distr_r.
   rewrite (rngl_mul_1_l Hon).
