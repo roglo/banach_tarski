@@ -1554,29 +1554,27 @@ f_equal; ring_simplify; fold_rngl. {
 }
 Qed.
 
-...
-
 Theorem unit_sphere_matrix_of_mul_angle : ∀ a s c θ s' c' n,
-  ‖a‖ = 1
-  → s² + c² = 1
+  ‖a‖ = 1%L
+  → (s² + c² = 1)%L
   → θ = angle_of_sin_cos s c
-  → s' = sin (INR n * θ)
-  → c' = cos (INR n * θ)
-  → matrix_of_axis_angle (a, s', c') =
-     (matrix_of_axis_angle (a, s, c) ^ n)%mat.
+  → s' = rngl_sin (n * θ)
+  → c' = rngl_cos (n * θ)
+  → matrix_of_axis_angle a s' c' = (matrix_of_axis_angle a s c ^ n)%mat.
 Proof.
+destruct_ac.
 intros * Ha Hsc Hθ Hs' Hc'.
 revert s' c' Hs' Hc'.
-induction n; intros.
- simpl in Hs', Hc'; simpl.
- rewrite Rmult_0_l in Hs', Hc'.
- rewrite sin_0 in Hs'; rewrite cos_0 in Hc'; subst s' c'.
- destruct a as (ax, ay, az).
- simpl in Ha; rewrite Ha.
- do 3 rewrite Rdiv_1_r.
- unfold mat_id, mkrmat.
- f_equal; lra.
-
+induction n; intros. {
+  simpl in Hs', Hc'; simpl.
+(**)
+  subst s' c'.
+  destruct a as (ax, ay, az); cbn.
+  cbn in Ha; rewrite Ha.
+  unfold mat_id, mkrmat.
+  f_equal; ring.
+}
+...
  rewrite S_INR in Hs', Hc'.
  rewrite Rmult_plus_distr_r, Rmult_1_l, Rplus_comm in Hs', Hc'.
  rewrite sin_plus in Hs'.
