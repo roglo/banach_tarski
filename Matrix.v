@@ -997,16 +997,19 @@ Qed.
 
 Theorem vec_add_opp_diag_r : ∀ v, (v + - v = 0)%vec.
 Proof.
-...
+destruct_ac.
 intros (v₁, v₂, v₃); simpl; f_equal; apply (rngl_add_opp_diag_r Hop).
 Qed.
 
 Theorem vec_sub_diag : ∀ v, (v - v = 0)%vec.
+Proof.
+destruct_ac.
 intros (v₁, v₂, v₃); simpl; f_equal; apply (rngl_add_opp_diag_r Hop).
 Qed.
 
 Theorem vec_sub_diag_uniq : ∀ u v, (u - v = 0)%vec → u = v.
 Proof.
+destruct_ac.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃) Huv.
 injection Huv; clear Huv; intros H1 H2 H3.
 rewrite (rngl_add_opp_r Hop) in H1, H2, H3.
@@ -1018,6 +1021,7 @@ Qed.
 
 Theorem vec_sub_opp_r : ∀ u v, (u - - v = u + v)%vec.
 Proof.
+destruct_ac.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃).
 cbn; do 2 f_equal; apply (rngl_opp_involutive Hop).
 Qed.
@@ -1068,14 +1072,15 @@ Qed.
 
 Theorem vec_dot_mul_diag : ∀ v, v · v = ‖v‖².
 Proof.
+destruct_ac.
 intros (x, y, z); simpl.
 symmetry.
 apply (rngl_squ_sqrt Hon).
 apply (rngl_le_0_add Hos Hor).
 apply (rngl_le_0_add Hos Hor).
-apply (rngl_mul_diag_nonneg Hon Hos Hiq Hor).
-apply (rngl_mul_diag_nonneg Hon Hos Hiq Hor).
-apply (rngl_mul_diag_nonneg Hon Hos Hiq Hor).
+apply (rngl_mul_diag_nonneg Hos Hor).
+apply (rngl_mul_diag_nonneg Hos Hor).
+apply (rngl_mul_diag_nonneg Hos Hor).
 Qed.
 
 Theorem vec_add_comm : ∀ u v, (u + v = v + u)%vec.
@@ -1116,6 +1121,8 @@ Theorem vec_const_mul_sub_distr_l : ∀ a u v,
 Proof.
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
+
+...
 
 Theorem vec_const_mul_eq_reg_l : ∀ a u v, a ⁎ u = a ⁎ v → a ≠ 0%L → u = v.
 Proof.
