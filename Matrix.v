@@ -1567,13 +1567,17 @@ intros * Ha Hsc Hθ Hs' Hc'.
 revert s' c' Hs' Hc'.
 induction n; intros. {
   simpl in Hs', Hc'; simpl.
-(**)
   subst s' c'.
   destruct a as (ax, ay, az); cbn.
   cbn in Ha; rewrite Ha.
   unfold mat_id, mkrmat.
   f_equal; ring.
 }
+(**)
+cbn in Hs', Hc'.
+rename s' into s''; rename c' into c''.
+rename Hs' into Hs''; rename Hc' into Hc''.
+specialize (IHn _ _ eq_refl eq_refl).
 ...
  rewrite S_INR in Hs', Hc'.
  rewrite Rmult_plus_distr_r, Rmult_1_l, Rplus_comm in Hs', Hc'.
