@@ -1710,9 +1710,13 @@ Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   → is_rotation_matrix (matrix_of_axis_angle p sinθ cosθ).
 Proof.
 destruct_ac.
+specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
 assert (Hsc : sinθ² = (1 - cosθ²)%L) by now rewrite <- Hsc1, rngl_add_sub.
+assert (Hcs : cosθ² = (1 - sinθ²)%L). {
+  now rewrite <- Hsc1, rngl_add_comm, rngl_add_sub.
+}
 destruct p as (xp, yp, zp).
 (*
 cbn - [ matrix_of_axis_angle ].
@@ -1734,53 +1738,23 @@ assert (Hrxyz2 : (1 - x ^ 2 - y ^ 2 = z ^ 2)%L). {
 progress unfold matrix_of_axis_angle.
 rewrite <- Hr, <- Hx, <- Hy, <- Hz.
 do 3 rewrite <- (rngl_squ_pow_2 Hon) in Hrxyz2.
+progress unfold rngl_squ in Hrxyz2.
+progress unfold rngl_squ in Hsc, Hcs.
 split. {
   progress unfold mat_transp, mat_mul, mat_id; simpl.
-(**)
-  f_equal. {
-    ring_simplify; fold_rngl.
-    do 2 rewrite <- (rngl_mul_assoc _ cosθ cosθ).
-    do 2 rewrite <- (rngl_mul_assoc _ sinθ sinθ).
-    do 2 rewrite <- (rngl_mul_assoc _ x x).
-    do 3 rewrite <- (rngl_mul_assoc _ y y).
-    do 3 rewrite <- (rngl_mul_assoc _ z z).
-    rewrite <- (rngl_mul_assoc _ x² x²).
-    do 6 rewrite fold_rngl_squ.
-    rewrite Hsc.
-    rewrite <- Hrxyz2.
-    specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
-    progress unfold rngl_squ.
-    ring.
-...
-...
-assert ((let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add)
-     match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with
-     | Some a => a
-     | None => let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero
-     end
-     match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with
-     | Some a => a
-     | None => let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero
-     end = 0%L).
-fold_rngl.
-...
-    ring_simplify; fold_rngl.
-...
-    do 2 rewrite (rngl_squ_pow_2 Hon) in Hsc.
-    rewrite Hsc.
-Require Import Reals.
-Check Rsqr_pow2.
-  rewrite Rsqr_pow2 in Hsc.
-...
   f_equal;
-    ring_simplify;
-    do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc;
-    repeat rewrite Rsqr_pow2;
-    rewrite <- Hrxyz2; ring.
-
-  unfold mat_det; simpl.
-  ring_simplify.
-  do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc.
+    ring_simplify; fold_rngl;
+    unfold rngl_squ;
+    repeat rewrite <- (rngl_mul_assoc _ z z);
+    rewrite <- Hrxyz2;
+    repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ);
+    rewrite Hsc;
+    ring.
+}
+progress unfold mat_det; simpl.
+ring_simplify; fold_rngl.
+...
+do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc.
   repeat rewrite Rsqr_pow2.
   rewrite <- Hrxyz2; ring.
 Qed.
