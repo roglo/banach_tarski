@@ -1864,15 +1864,16 @@ Theorem vec_unit_cross_mul_eq_0 : ∀ u v,
   → u × v = 0%vec
   → u = v ∨ u = (- v)%vec.
 Proof.
+destruct_ac.
 intros * Hu Hv Huxv.
 specialize (vec_Lagrange_identity u v) as H.
 rewrite Hu, Hv, Huxv, vec_sqr_0 in H.
-...
-rewrite Rsqr_1, Rmult_1_l in H.
-apply Rminus_diag_uniq in H; symmetry in H.
+rewrite (rngl_squ_1 Hon), (rngl_mul_1_l Hon) in H.
+apply -> (rngl_sub_move_0_r Hop) in H; symmetry in H.
 destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
 simpl in Hu, Hv.
+...
 apply (f_equal Rsqr) in Hu.
 apply (f_equal Rsqr) in Hv.
 rewrite Rsqr_1 in Hu, Hv.
