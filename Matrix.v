@@ -1777,8 +1777,6 @@ split. {
 apply (mat_det_matrix_of_unit_axis_angle _ _ _ _ _ Hsc Hrxyz2).
 Qed.
 
-...
-
 Theorem mat_of_path_cons : ∀ e el,
    mat_of_path (e :: el) = (mat_of_elem e * mat_of_path el)%mat.
 Proof. easy. Qed.
@@ -1861,14 +1859,15 @@ now rewrite mat_of_elem_mul_negf_l, mat_mul_id_l.
 Qed.
 
 Theorem vec_unit_cross_mul_eq_0 : ∀ u v,
-  ‖u‖ = 1
-  → ‖v‖ = 1
+  ‖u‖ = 1%L
+  → ‖v‖ = 1%L
   → u × v = 0%vec
   → u = v ∨ u = (- v)%vec.
 Proof.
 intros * Hu Hv Huxv.
 specialize (vec_Lagrange_identity u v) as H.
 rewrite Hu, Hv, Huxv, vec_sqr_0 in H.
+...
 rewrite Rsqr_1, Rmult_1_l in H.
 apply Rminus_diag_uniq in H; symmetry in H.
 destruct u as (u₁, u₂, u₃).
