@@ -1704,6 +1704,46 @@ apply Bool.orb_true_iff; right.
 now rewrite Hi1, Heo.
 Qed.
 
+Theorem matrix_of_axis_angle_is_rotation_matrix_1 :
+  ∀ x y z sinθ cosθ,
+  (sinθ * sinθ)%L = (1 - cosθ * cosθ)%L
+  → (1 - x * x - y * y)%L = (z * z)%L
+  → (matrix_of_unit_axis_angle (V x y z, sinθ, cosθ) *
+     mat_transp (matrix_of_unit_axis_angle (V x y z, sinθ, cosθ)))%mat =
+    mat_id.
+Proof.
+intros * Hsc Hrxyz2.
+progress unfold mat_transp, mat_mul, mat_id; simpl.
+f_equal;
+  ring_simplify; fold_rngl;
+  unfold rngl_squ;
+  repeat rewrite <- (rngl_mul_assoc _ z z);
+  rewrite <- Hrxyz2;
+  repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ);
+  rewrite Hsc;
+  ring.
+Qed.
+
+Theorem mat_dec_matrix_of_unit_axis_angle :
+  ∀ x y z sinθ cosθ,
+  (sinθ * sinθ)%L = (1 - cosθ * cosθ)%L
+  → (1 - x * x - y * y)%L = (z * z)%L
+  → mat_det (matrix_of_unit_axis_angle (V x y z, sinθ, cosθ)) = 1%L.
+Proof.
+intros * Hsc Hrxyz2.
+progress unfold mat_det; simpl.
+ring_simplify; fold_rngl.
+unfold rngl_squ.
+repeat rewrite <- (rngl_mul_assoc _ z z).
+rewrite <- Hrxyz2.
+repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ).
+rewrite Hsc.
+Time ring.
+... blocked:
+Time Qed.
+
+...
+
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
   → (sinθ² + cosθ² = 1)%L
@@ -1714,13 +1754,7 @@ specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
 assert (Hsc : sinθ² = (1 - cosθ²)%L) by now rewrite <- Hsc1, rngl_add_sub.
-assert (Hcs : cosθ² = (1 - sinθ²)%L). {
-  now rewrite <- Hsc1, rngl_add_comm, rngl_add_sub.
-}
 destruct p as (xp, yp, zp).
-(*
-cbn - [ matrix_of_axis_angle ].
-*)
 remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
 assert (Hrnz : r ≠ 0%L). {
   intros H; rewrite Hr in H.
@@ -1739,25 +1773,22 @@ progress unfold matrix_of_axis_angle.
 rewrite <- Hr, <- Hx, <- Hy, <- Hz.
 do 3 rewrite <- (rngl_squ_pow_2 Hon) in Hrxyz2.
 progress unfold rngl_squ in Hrxyz2.
-progress unfold rngl_squ in Hsc, Hcs.
+progress unfold rngl_squ in Hsc.
 split. {
-  progress unfold mat_transp, mat_mul, mat_id; simpl.
-  f_equal;
-    ring_simplify; fold_rngl;
-    unfold rngl_squ;
-    repeat rewrite <- (rngl_mul_assoc _ z z);
-    rewrite <- Hrxyz2;
-    repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ);
-    rewrite Hsc;
-    ring.
+  apply (matrix_of_axis_angle_is_rotation_matrix_1 _ _ _ _ _ Hsc Hrxyz2).
 }
+... ...
 progress unfold mat_det; simpl.
 ring_simplify; fold_rngl.
+unfold rngl_squ.
+repeat rewrite <- (rngl_mul_assoc _ z z).
+rewrite <- Hrxyz2.
+repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ).
+rewrite Hsc.
+Time ring.
+Time Qed.
+
 ...
-do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc.
-  repeat rewrite Rsqr_pow2.
-  rewrite <- Hrxyz2; ring.
-Qed.
 
 Theorem mat_of_path_cons : ∀ e el,
    mat_of_path (e :: el) = (mat_of_elem e * mat_of_path el)%mat.
