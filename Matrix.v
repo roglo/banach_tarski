@@ -1709,23 +1709,24 @@ Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   → (sinθ² + cosθ² = 1)%L
   → is_rotation_matrix (matrix_of_axis_angle p sinθ cosθ).
 Proof.
+destruct_ac.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
-...
-assert (Hsc : sinθ² = 1 - cosθ²) by lra; clear Hsc1.
+assert (Hsc : sinθ² = (1 - cosθ²)%L) by now rewrite <- Hsc1, rngl_add_sub.
 destruct p as (xp, yp, zp).
+cbn.
 remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
-assert (Hrnz : r ≠ 0).
- intros H; rewrite Hr in H.
- apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
- apply sqr_vec_norm_eq_0 in H.
- destruct H as (Hx & Hy & Hz); subst xp yp zp.
- now apply Hp.
-
- remember (xp / r) as x eqn:Hx.
- remember (yp / r) as y eqn:Hy.
- remember (zp / r) as z eqn:Hz.
- assert (Hrxyz2 : 1 - x ^ 2 - y ^ 2 = z ^ 2).
+assert (Hrnz : r ≠ 0%L). {
+  intros H; rewrite Hr in H.
+  apply (eq_rl_sqrt_0 Hon Hos) in H; [ | apply nonneg_sqr_vec_norm ].
+  apply sqr_vec_norm_eq_0 in H.
+  now destruct H as (Hx & Hy & Hz); subst xp yp zp.
+}
+remember (xp / r)%L as x eqn:Hx.
+remember (yp / r)%L as y eqn:Hy.
+remember (zp / r)%L as z eqn:Hz.
+...
+assert (Hrxyz2 : 1 - x ^ 2 - y ^ 2 = z ^ 2).
   subst x y z.
   now symmetry; apply z_of_xy.
 
