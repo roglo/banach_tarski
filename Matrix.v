@@ -1619,7 +1619,8 @@ eapply unit_sphere_matrix_of_mul_angle in Haa; try eassumption.
 remember (a ⁄ ‖a‖) as b eqn:Hb.
 remember (matrix_of_axis_angle b s c) as M eqn:HM.
 remember (matrix_of_axis_angle b s' c') as M' eqn:HM'.
-(**)
+move M' before M.
+move b before a.
 assert (Hbz : b ≠ 0%vec). {
   intros H.
   move H at top; subst b.
@@ -1638,20 +1639,11 @@ assert (Hbz : b ≠ 0%vec). {
 }
 rewrite matrix_mul_axis with (k := ‖a‖) in HM; [ | easy | easy ].
 rewrite matrix_mul_axis with (k := ‖a‖) in HM'; [ | easy | easy ].
-...
-move Hb at bottom.
-Set Printing All.
-  progress unfold vec_div in Hb.
-Search (_ * _ = 0)%vec.
-Search (_ / _ = 0)%vec.
-Search (_ = 0)%vec.
-...
-rewrite matrix_mul_axis with (k := ‖a‖) in HM, HM'; [ | easy | easy ].
 rewrite Rsign_of_pos in HM, HM'; [ | easy | easy ].
-rewrite Rmult_1_l in HM, HM'.
+rewrite (rngl_mul_1_l Hon) in HM, HM'.
 rewrite Hb in HM, HM'.
 rewrite vec_const_mul_assoc in HM, HM'.
-rewrite Rinv_r in HM, HM'; [ | easy | easy ].
+rewrite (rngl_mul_inv_diag_r Hon Hiv _ Haz) in HM, HM'.
 rewrite vec_const_mul_1_l in HM, HM'.
 now rewrite HM, HM' in Haa.
 Qed.
@@ -1680,13 +1672,14 @@ Proof. intros; easy. Qed.
 
 Theorem z_of_xy : ∀ x y z r,
   r = √ (x² + y² + z²)
-  → r ≠ 0
-  → (z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2.
+  → r ≠ 0%L
+  → ((z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2)%L.
 Proof.
 intros * Hr Hrnz.
-assert (H : r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2).
- split.
-  rewrite <- Rsqr_pow2.
+assert (H : (r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2)%L). {
+  split. {
+...
+    rewrite <- Rsqr_pow2.
   intros H; apply Hrnz.
   now apply Rsqr_eq_0 in H.
 
