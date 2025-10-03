@@ -1675,37 +1675,43 @@ Theorem z_of_xy : ∀ x y z r,
   → r ≠ 0%L
   → ((z / r) ^ 2 = 1 - (x / r) ^ 2 - (y / r) ^ 2)%L.
 Proof.
+destruct_ac.
 intros * Hr Hrnz.
 assert (H : (r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2)%L). {
-  split. {
-...
-    rewrite <- Rsqr_pow2.
-  intros H; apply Hrnz.
-  now apply Rsqr_eq_0 in H.
-
-  rewrite Hr, <- Rsqr_pow2.
-  rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; ring | ].
+  split; [ now apply (rngl_pow_neq_0 Hon Hos Hiq) | ].
+  rewrite Hr, <- (rngl_squ_pow_2 Hon).
+  rewrite (rngl_squ_sqrt Hon); [ do 3 rewrite (rngl_squ_pow_2 Hon); ring | ].
   apply nonneg_sqr_vec_norm.
-
- destruct H as (Hr2nz & Hrxyz).
- remember (x / r) as xr eqn:Hxr.
- remember (y / r) as yr eqn:Hyr.
- remember (z / r) as zr eqn:Hzr.
- subst xr yr zr.
- unfold Rdiv.
- do 3 rewrite Rpow_mult_distr.
- rewrite <- Hrxyz; ring_simplify.
- rewrite pow_inv.
- rewrite Rinv_r; [ ring | easy ].
+}
+destruct H as (Hr2nz & Hrxyz).
+remember (x / r)%L as xr eqn:Hxr.
+remember (y / r)%L as yr eqn:Hyr.
+remember (z / r)%L as zr eqn:Hzr.
+subst xr yr zr.
+do 4 rewrite <- (rngl_squ_pow_2 Hon) in Hrxyz.
+do 3 rewrite <- (rngl_squ_pow_2 Hon).
+rewrite (rngl_squ_div Hic Hon Hos Hiv); [ | easy ].
+rewrite <- Hrxyz.
+progress unfold rngl_div; rewrite Hiv.
+do 2 rewrite (rngl_squ_mul Hic).
+do 2 rewrite (rngl_mul_sub_distr_r Hop).
+rewrite (rngl_squ_inv Hon Hos Hiv); [ | easy ].
+progress f_equal; f_equal.
+apply (rngl_mul_inv_diag_r Hon Hiv).
+intros H; apply Hrnz.
+apply (eq_rngl_squ_0 Hos); [ | easy ].
+apply Bool.orb_true_iff; right.
+now rewrite Hi1, Heo.
 Qed.
 
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
-  → sinθ² + cosθ² = 1
-  → is_rotation_matrix (matrix_of_axis_angle (p, sinθ, cosθ)).
+  → (sinθ² + cosθ² = 1)%L
+  → is_rotation_matrix (matrix_of_axis_angle p sinθ cosθ).
 Proof.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
+...
 assert (Hsc : sinθ² = 1 - cosθ²) by lra; clear Hsc1.
 destruct p as (xp, yp, zp).
 remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
