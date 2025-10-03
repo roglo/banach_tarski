@@ -1873,14 +1873,14 @@ apply -> (rngl_sub_move_0_r Hop) in H; symmetry in H.
 destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
 simpl in Hu, Hv.
-...
-apply (f_equal Rsqr) in Hu.
-apply (f_equal Rsqr) in Hv.
-rewrite Rsqr_1 in Hu, Hv.
-rewrite Rsqr_sqrt in Hu; [ | apply nonneg_sqr_vec_norm ].
-rewrite Rsqr_sqrt in Hv; [ | apply nonneg_sqr_vec_norm ].
+apply (f_equal rngl_squ) in Hu.
+apply (f_equal rngl_squ) in Hv.
+rewrite (rngl_squ_1 Hon) in Hu, Hv.
+rewrite (rngl_squ_sqrt Hon) in Hu; [ | apply nonneg_sqr_vec_norm ].
+rewrite (rngl_squ_sqrt Hon) in Hv; [ | apply nonneg_sqr_vec_norm ].
 simpl in *.
 injection Huxv; clear Huxv; intros H3 H2 H1.
+...
 apply Rminus_diag_uniq in H1.
 apply Rminus_diag_uniq in H2.
 apply Rminus_diag_uniq in H3.
