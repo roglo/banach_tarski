@@ -1704,7 +1704,7 @@ apply Bool.orb_true_iff; right.
 now rewrite Hi1, Heo.
 Qed.
 
-Theorem matrix_of_axis_angle_is_rotation_matrix_1 :
+Theorem matrix_of_axis_angle_mul_mat_transp :
   ∀ x y z sinθ cosθ,
   (sinθ * sinθ)%L = (1 - cosθ * cosθ)%L
   → (1 - x * x - y * y)%L = (z * z)%L
@@ -1715,8 +1715,8 @@ Proof.
 intros * Hsc Hrxyz2.
 progress unfold mat_transp, mat_mul, mat_id; simpl.
 f_equal;
-  ring_simplify; fold_rngl;
   unfold rngl_squ;
+  ring_simplify; fold_rngl;
   repeat rewrite <- (rngl_mul_assoc _ z z);
   rewrite <- Hrxyz2;
   repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ);
@@ -1724,7 +1724,7 @@ f_equal;
   ring.
 Qed.
 
-Theorem mat_dec_matrix_of_unit_axis_angle :
+Theorem mat_det_matrix_of_unit_axis_angle :
   ∀ x y z sinθ cosθ,
   (sinθ * sinθ)%L = (1 - cosθ * cosθ)%L
   → (1 - x * x - y * y)%L = (z * z)%L
@@ -1732,17 +1732,14 @@ Theorem mat_dec_matrix_of_unit_axis_angle :
 Proof.
 intros * Hsc Hrxyz2.
 progress unfold mat_det; simpl.
-ring_simplify; fold_rngl.
 unfold rngl_squ.
+ring_simplify; fold_rngl.
 repeat rewrite <- (rngl_mul_assoc _ z z).
 rewrite <- Hrxyz2.
 repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ).
 rewrite Hsc.
-Time ring.
-... blocked:
-Time Qed.
-
-...
+ring.
+Qed.
 
 Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   p ≠ 0%vec
@@ -1775,18 +1772,10 @@ do 3 rewrite <- (rngl_squ_pow_2 Hon) in Hrxyz2.
 progress unfold rngl_squ in Hrxyz2.
 progress unfold rngl_squ in Hsc.
 split. {
-  apply (matrix_of_axis_angle_is_rotation_matrix_1 _ _ _ _ _ Hsc Hrxyz2).
+  apply (matrix_of_axis_angle_mul_mat_transp _ _ _ _ _ Hsc Hrxyz2).
 }
-... ...
-progress unfold mat_det; simpl.
-ring_simplify; fold_rngl.
-unfold rngl_squ.
-repeat rewrite <- (rngl_mul_assoc _ z z).
-rewrite <- Hrxyz2.
-repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ).
-rewrite Hsc.
-Time ring.
-Time Qed.
+apply (mat_det_matrix_of_unit_axis_angle _ _ _ _ _ Hsc Hrxyz2).
+Qed.
 
 ...
 
