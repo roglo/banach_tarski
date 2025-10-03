@@ -1594,6 +1594,9 @@ rewrite rngl_cos_angle_of_sin_cos; [ | easy ].
  easy.
 Qed.
 
+Theorem fold_vec_norm : ∀ x y z, √(x² + y² + z²) = vec_norm (V x y z).
+Proof. easy. Qed.
+
 Theorem matrix_of_mul_angle : ∀ a s c θ s' c' n,
   a ≠ 0%vec
   → (s² + c² = 1)%L
@@ -1611,12 +1614,38 @@ assert (Hap : (0 < ‖a‖)%L). {
   apply (rngl_le_neq Hor).
   split; [ apply (vec_norm_nonneg a) | easy ].
 }
-...
-assert (Haa : ‖(a ⁄ ‖a‖)‖ = 1) by now apply vec_div_vec_norm.
+assert (Haa : (‖(a ⁄ ‖a‖)‖ = 1)%L) by now apply vec_div_vec_norm.
 eapply unit_sphere_matrix_of_mul_angle in Haa; try eassumption.
 remember (a ⁄ ‖a‖) as b eqn:Hb.
-remember (matrix_of_axis_angle (b, s, c)) as M eqn:HM.
-remember (matrix_of_axis_angle (b, s', c')) as M' eqn:HM'.
+remember (matrix_of_axis_angle b s c) as M eqn:HM.
+remember (matrix_of_axis_angle b s' c') as M' eqn:HM'.
+(**)
+assert (Hbz : b ≠ 0%vec). {
+  intros H.
+  move H at top; subst b.
+  symmetry in Hb.
+  destruct a as (x, y, z).
+  cbn in Hb.
+  injection Hb; clear Hb; intros H3 H2 H1.
+  rewrite fold_vec_norm in H1, H2, H3.
+  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H1; [ easy | ].
+  intros H; subst x.
+  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2; [ easy | ].
+  intros H; subst y.
+  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H3; [ easy | ].
+  intros H; subst z.
+  easy.
+}
+rewrite matrix_mul_axis with (k := ‖a‖) in HM; [ | easy | easy ].
+rewrite matrix_mul_axis with (k := ‖a‖) in HM'; [ | easy | easy ].
+...
+move Hb at bottom.
+Set Printing All.
+  progress unfold vec_div in Hb.
+Search (_ * _ = 0)%vec.
+Search (_ / _ = 0)%vec.
+Search (_ = 0)%vec.
+...
 rewrite matrix_mul_axis with (k := ‖a‖) in HM, HM'; [ | easy | easy ].
 rewrite Rsign_of_pos in HM, HM'; [ | easy | easy ].
 rewrite Rmult_1_l in HM, HM'.
