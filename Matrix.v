@@ -1880,14 +1880,16 @@ rewrite (rngl_squ_sqrt Hon) in Hu; [ | apply nonneg_sqr_vec_norm ].
 rewrite (rngl_squ_sqrt Hon) in Hv; [ | apply nonneg_sqr_vec_norm ].
 simpl in *.
 injection Huxv; clear Huxv; intros H3 H2 H1.
+apply -> (rngl_sub_move_0_r Hop) in H1.
+apply -> (rngl_sub_move_0_r Hop) in H2.
+apply -> (rngl_sub_move_0_r Hop) in H3.
+rewrite <- (rngl_squ_1 Hon) in H.
+apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H. 2: {
+  now rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+}
+rewrite (rngl_abs_1 Hon Hos Hor) in H.
+progress unfold rngl_abs in H.
 ...
-apply Rminus_diag_uniq in H1.
-apply Rminus_diag_uniq in H2.
-apply Rminus_diag_uniq in H3.
-replace 1 with 1² in H by apply Rsqr_1.
-apply Rsqr_eq_abs_0 in H.
-rewrite Rabs_R1 in H.
-unfold Rabs in H.
 destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
  right; clear Ha.
  progress unfold Rsqr in Hu, Hv.
