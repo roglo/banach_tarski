@@ -1603,11 +1603,15 @@ Theorem matrix_of_mul_angle : ∀ a s c θ s' c' n,
   → matrix_of_axis_angle a s' c' =
      (matrix_of_axis_angle a s c ^ n)%mat.
 Proof.
+destruct_ac.
 intros * Ha Hsc Hθ Hs' Hc'.
 assert (Haz : ‖a‖ ≠ 0%L) by now apply vec_norm_neq_0.
+assert (Haiz : ‖a‖⁻¹ ≠ 0%L) by now apply (rngl_inv_neq_0 Hon Hos Hiv).
+assert (Hap : (0 < ‖a‖)%L). {
+  apply (rngl_le_neq Hor).
+  split; [ apply (vec_norm_nonneg a) | easy ].
+}
 ...
-assert (Haiz : ‖a‖⁻¹ ≠ 0%L) by now apply Rinv_neq_0_compat.
-assert (Hap : 0 < ‖a‖) by (specialize (vec_norm_nonneg a); lra).
 assert (Haa : ‖(a ⁄ ‖a‖)‖ = 1) by now apply vec_div_vec_norm.
 eapply unit_sphere_matrix_of_mul_angle in Haa; try eassumption.
 remember (a ⁄ ‖a‖) as b eqn:Hb.
