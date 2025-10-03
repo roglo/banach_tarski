@@ -1714,7 +1714,9 @@ intros * Hp Hsc.
 rename Hsc into Hsc1.
 assert (Hsc : sinθ² = (1 - cosθ²)%L) by now rewrite <- Hsc1, rngl_add_sub.
 destruct p as (xp, yp, zp).
-cbn.
+(*
+cbn - [ matrix_of_axis_angle ].
+*)
 remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
 assert (Hrnz : r ≠ 0%L). {
   intros H; rewrite Hr in H.
@@ -1725,16 +1727,52 @@ assert (Hrnz : r ≠ 0%L). {
 remember (xp / r)%L as x eqn:Hx.
 remember (yp / r)%L as y eqn:Hy.
 remember (zp / r)%L as z eqn:Hz.
-...
-assert (Hrxyz2 : 1 - x ^ 2 - y ^ 2 = z ^ 2).
+assert (Hrxyz2 : (1 - x ^ 2 - y ^ 2 = z ^ 2)%L). {
   subst x y z.
   now symmetry; apply z_of_xy.
-
-  unfold matrix_of_axis_angle.
-  rewrite <- Hr, <- Hx, <- Hy, <- Hz.
-  split.
-   unfold mat_transp, mat_mul, mat_id; simpl.
-   f_equal;
+}
+progress unfold matrix_of_axis_angle.
+rewrite <- Hr, <- Hx, <- Hy, <- Hz.
+do 3 rewrite <- (rngl_squ_pow_2 Hon) in Hrxyz2.
+split. {
+  progress unfold mat_transp, mat_mul, mat_id; simpl.
+(**)
+  f_equal. {
+    ring_simplify; fold_rngl.
+    do 2 rewrite <- (rngl_mul_assoc _ cosθ cosθ).
+    do 2 rewrite <- (rngl_mul_assoc _ sinθ sinθ).
+    do 2 rewrite <- (rngl_mul_assoc _ x x).
+    do 3 rewrite <- (rngl_mul_assoc _ y y).
+    do 3 rewrite <- (rngl_mul_assoc _ z z).
+    rewrite <- (rngl_mul_assoc _ x² x²).
+    do 6 rewrite fold_rngl_squ.
+    rewrite Hsc.
+    rewrite <- Hrxyz2.
+    specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+    progress unfold rngl_squ.
+    ring.
+...
+...
+assert ((let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add)
+     match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with
+     | Some a => a
+     | None => let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero
+     end
+     match (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one) with
+     | Some a => a
+     | None => let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero
+     end = 0%L).
+fold_rngl.
+...
+    ring_simplify; fold_rngl.
+...
+    do 2 rewrite (rngl_squ_pow_2 Hon) in Hsc.
+    rewrite Hsc.
+Require Import Reals.
+Check Rsqr_pow2.
+  rewrite Rsqr_pow2 in Hsc.
+...
+  f_equal;
     ring_simplify;
     do 2 rewrite Rsqr_pow2 in Hsc; rewrite Hsc;
     repeat rewrite Rsqr_pow2;
