@@ -1889,6 +1889,23 @@ apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H. 2: {
 }
 rewrite (rngl_abs_1 Hon Hos Hor) in H.
 progress unfold rngl_abs in H.
+destruct (rngl_eqb_dec v₁ 0) as [Hv1z| Hv1z]. 2: {
+  apply (rngl_eqb_neq Heo) in Hv1z.
+  symmetry in H3.
+  rewrite (rngl_mul_comm Hic u₁) in H3, H2.
+  apply (rngl_mul_move_r Hi1) in H3, H2; [ | easy | easy ].
+  rewrite <- (rngl_mul_div_assoc Hiv) in H3, H2.
+  rewrite (rngl_mul_comm Hic) in H3, H2.
+  remember (u₁ / v₁)%L as k eqn:Hk.
+  apply (f_equal (rngl_mul v₁)) in Hk.
+  rewrite (rngl_mul_div_assoc Hiv) in Hk.
+  rewrite (rngl_mul_comm Hic _ u₁) in Hk.
+  rewrite (rngl_mul_div Hi1) in Hk; [ | easy ].
+  symmetry in Hk.
+  rewrite (rngl_mul_comm Hic _ k) in Hk.
+  clear H1; rename Hk into H1.
+  rename H3 into H'; rename H2 into H3; rename H' into H2.
+...
 destruct (rngl_leb_dec (u₁ * v₁ + u₂ * v₂ + u₃ * v₃) 0) as [Ha| Ha]. {
   rewrite Ha in H.
   clear Ha.
