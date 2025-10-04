@@ -1888,7 +1888,49 @@ apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H. 2: {
   now rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
 }
 rewrite (rngl_abs_1 Hon Hos Hor) in H.
+(**)
 progress unfold rngl_abs in H.
+destruct (rngl_leb_dec (u₁ * v₁ + u₂ * v₂ + u₃ * v₃) 0) as [Ha| Ha]. {
+  rewrite Ha in H.
+  apply rngl_leb_le in Ha.
+  clear Ha.
+  apply (f_equal rngl_opp) in H.
+  rewrite (rngl_opp_involutive Hop) in H.
+  right.
+  f_equal. {
+    destruct (rngl_eqb_dec v₁ 0) as [Hv1z| Hv1z]. {
+      apply (rngl_eqb_eq Heo) in Hv1z; subst v₁.
+      rewrite (rngl_opp_0 Hop).
+      rewrite (rngl_mul_0_r Hos) in H2, H3, H; symmetry in H2.
+      rewrite (rngl_squ_0 Hos) in Hv.
+      rewrite rngl_add_0_l in H, Hv.
+      destruct (rngl_eqb_dec u₁ 0) as [Hu1z| Hu1z]. {
+        now apply (rngl_eqb_eq Heo) in Hu1z.
+      }
+      apply (rngl_eqb_neq Heo) in Hu1z; exfalso.
+      apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2; [ easy | ].
+      intros H'; subst v₃.
+      clear H2.
+      rewrite (rngl_mul_0_r Hos) in H1, H; symmetry in H1.
+      rewrite (rngl_squ_0 Hos) in Hv.
+      rewrite rngl_add_0_r in Hv, H.
+      assert (Hv2z : v₂ ≠ 0%L). {
+        intros H'; subst v₂.
+        rewrite (rngl_squ_0 Hos) in Hv.
+        symmetry in Hv.
+        now apply (rngl_1_neq_0 Hon Hc1) in Hv.
+      }
+      now apply (rngl_eq_mul_0_l Hon Hos Hiq) in H3.
+    }
+    apply (rngl_eqb_neq Heo) in Hv1z.
+    apply (rngl_mul_cancel_r Hi1 _ _ v₁); [ easy | ].
+    rewrite <- rngl_add_assoc in H.
+    apply (rngl_add_move_r Hop) in H.
+    rewrite H.
+    rewrite <- (rngl_opp_add_distr Hop).
+    rewrite (rngl_mul_opp_l Hop).
+    progress f_equal.
+(* pppp... chais pas *)
 ...
 destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
  right; clear Ha.
