@@ -1958,8 +1958,6 @@ symmetry in Hv.
 now apply (rngl_1_neq_0 Hon Hc1) in Hv.
 Qed.
 
-...
-
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
@@ -1970,6 +1968,7 @@ injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 unfold mat_det in Hd.
 destruct M; simpl in *.
 f_equal.
+...
  clear H₁ H₂ H₃ H₄ H₅ H₆. nsatz.
  clear H₁ H₂ H₃ H₇ H₈ H₉. nsatz.
  clear H₄ H₅ H₆ H₇ H₈ H₉. nsatz.
