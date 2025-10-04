@@ -1858,6 +1858,49 @@ rewrite mat_mul_assoc.
 now rewrite mat_of_elem_mul_negf_l, mat_mul_id_l.
 Qed.
 
+Theorem vec_unit_cross_mul_eq_0_lemma :
+   ∀ u₁ u₂ u₃ v₁ v₂ v₃,
+  (u₁² + u₂² + u₃²)%L = 1%L
+  → (v₁² + v₂² + v₃²)%L = 1%L
+  → (u₃ * v₁)%L = (u₁ * v₃)%L
+  → (u₁ * v₂)%L = (u₂ * v₁)%L
+  → (u₂ * v₃)%L = (u₃ * v₂)%L
+  → v₁ ≠ 0%L
+  → V u₁ u₂ u₃ = V v₁ v₂ v₃ ∨ V u₁ u₂ u₃ = V (- v₁) (- v₂) (- v₃).
+Proof.
+destruct_ac.
+intros * Hu Hv H1 H2 H3 Hv1z.
+symmetry in H2.
+rewrite (rngl_mul_comm Hic u₁) in H1, H2.
+apply (rngl_mul_move_r Hi1) in H1, H2; [ | easy | easy ].
+rewrite <- (rngl_mul_div_assoc Hiv) in H1, H2.
+rewrite (rngl_mul_comm Hic) in H1, H2.
+remember (u₁ / v₁)%L as k eqn:Hk.
+apply (f_equal (rngl_mul v₁)) in Hk.
+rewrite (rngl_mul_div_assoc Hiv) in Hk.
+rewrite (rngl_mul_comm Hic _ u₁) in Hk.
+rewrite (rngl_mul_div Hi1) in Hk; [ | easy ].
+symmetry in Hk.
+rewrite (rngl_mul_comm Hic _ k) in Hk.
+clear H3; rename Hk into H3.
+rewrite H1, H2, H3 in Hu.
+do 3 rewrite (rngl_squ_mul Hic) in Hu.
+do 2 rewrite <- rngl_mul_add_distr_l in Hu.
+rewrite Hv, (rngl_mul_1_r Hon) in Hu.
+rewrite <- (rngl_squ_1 Hon) in Hu.
+apply (rngl_squ_eq_cases Hon Hop Hiv Heo) in Hu. 2: {
+  now rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+}
+destruct Hu; subst k. {
+  rewrite (rngl_mul_1_l Hon) in H1, H2, H3.
+  now subst; left.
+} {
+  rewrite (rngl_mul_opp_l Hop) in H1, H2, H3.
+  rewrite (rngl_mul_1_l Hon) in H1, H2, H3.
+  now subst; right.
+}
+Qed.
+
 Theorem vec_unit_cross_mul_eq_0 : ∀ u v,
   ‖u‖ = 1%L
   → ‖v‖ = 1%L
@@ -1889,145 +1932,33 @@ apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H. 2: {
 }
 rewrite (rngl_abs_1 Hon Hos Hor) in H.
 progress unfold rngl_abs in H.
+clear H.
 destruct (rngl_eqb_dec v₁ 0) as [Hv1z| Hv1z]. 2: {
-  clear H.
   apply (rngl_eqb_neq Heo) in Hv1z.
-  symmetry in H3.
-  rewrite (rngl_mul_comm Hic u₁) in H3, H2.
-  apply (rngl_mul_move_r Hi1) in H3, H2; [ | easy | easy ].
-  rewrite <- (rngl_mul_div_assoc Hiv) in H3, H2.
-  rewrite (rngl_mul_comm Hic) in H3, H2.
-  remember (u₁ / v₁)%L as k eqn:Hk.
-  apply (f_equal (rngl_mul v₁)) in Hk.
-  rewrite (rngl_mul_div_assoc Hiv) in Hk.
-  rewrite (rngl_mul_comm Hic _ u₁) in Hk.
-  rewrite (rngl_mul_div Hi1) in Hk; [ | easy ].
-  symmetry in Hk.
-  rewrite (rngl_mul_comm Hic _ k) in Hk.
-  clear H1; rename Hk into H1.
-  rename H3 into H'; rename H2 into H3; rename H' into H2.
-  rewrite H1, H2, H3 in Hu.
-  do 3 rewrite (rngl_squ_mul Hic) in Hu.
-  do 2 rewrite <- rngl_mul_add_distr_l in Hu.
-  rewrite Hv, (rngl_mul_1_r Hon) in Hu.
-  rewrite <- (rngl_squ_1 Hon) in Hu.
-  apply (rngl_squ_eq_cases Hon Hop Hiv Heo) in Hu. 2: {
-    now rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
-  }
-  destruct Hu; subst k. {
-    rewrite (rngl_mul_1_l Hon) in H1, H2, H3.
-    now subst; left.
-  } {
-    rewrite (rngl_mul_opp_l Hop) in H1, H2, H3.
-    rewrite (rngl_mul_1_l Hon) in H1, H2, H3.
-    now subst; right.
-  }
+  now apply vec_unit_cross_mul_eq_0_lemma.
 }
-apply (rngl_eqb_eq Heo) in Hv1z; subst v₁.
+destruct (rngl_eqb_dec v₂ 0) as [Hv2z| Hv2z]. 2: {
+  apply (rngl_eqb_neq Heo) in Hv2z.
+  rewrite <- rngl_add_assoc, rngl_add_comm in Hu, Hv.
+  specialize (vec_unit_cross_mul_eq_0_lemma _ _ _ _ _ _ Hu Hv) as H.
+  specialize (H H3 H1 H2 Hv2z).
+  now destruct H as [H| H]; injection H; intros; subst; [ left | right ].
+}
+destruct (rngl_eqb_dec v₃ 0) as [Hv3z| Hv3z]. 2: {
+  apply (rngl_eqb_neq Heo) in Hv3z.
+  rewrite rngl_add_comm, rngl_add_assoc in Hu, Hv.
+  specialize (vec_unit_cross_mul_eq_0_lemma _ _ _ _ _ _ Hu Hv) as H.
+  specialize (H H1 H2 H3 Hv3z).
+  now destruct H as [H| H]; injection H; intros; subst; [ left | right ].
+}
+apply (rngl_eqb_eq Heo) in Hv1z, Hv2z, Hv3z; subst v₁ v₂ v₃.
 rewrite (rngl_squ_0 Hos) in Hv.
-symmetry in H2.
-rewrite (rngl_mul_0_r Hos) in H2, H3.
-rewrite rngl_add_0_l in Hv.
-move H1 after H2.
-...
-rewrite (rngl_mul_comm Hic u₁) in H3, H2.
-    apply (rngl_mul_move_r Hi1) in H3, H2; [ | easy | easy ].
-    rewrite <- (rngl_mul_div_assoc Hiv) in H3, H2.
-    rewrite (rngl_mul_comm Hic) in H3, H2.
-    remember (u₁ / v₁)%L as k eqn:Hk.
-    apply (f_equal (rngl_mul v₁)) in Hk.
-    rewrite (rngl_mul_div_assoc Hiv) in Hk.
-    rewrite (rngl_mul_comm Hic _ u₁) in Hk.
-    rewrite (rngl_mul_div Hi1) in Hk; [ | easy ].
-    symmetry in Hk.
-    rewrite (rngl_mul_comm Hic _ k) in Hk.
-    clear H1; rename Hk into H1.
-    rename H3 into H'; rename H2 into H3; rename H' into H2.
-...
-destruct (rngl_leb_dec (u₁ * v₁ + u₂ * v₂ + u₃ * v₃) 0) as [Ha| Ha]. {
-  rewrite Ha in H.
-  clear Ha.
-  right.
-  progress unfold rngl_squ in Hu, Hv.
-  destruct (rngl_eqb_dec v₁ 0) as [Hv1z| Hv1z]. 2: {
-    apply (rngl_eqb_neq Heo) in Hv1z.
-    symmetry in H3.
-    rewrite (rngl_mul_comm Hic u₁) in H3, H2.
-    apply (rngl_mul_move_r Hi1) in H3, H2; [ | easy | easy ].
-    rewrite <- (rngl_mul_div_assoc Hiv) in H3, H2.
-    rewrite (rngl_mul_comm Hic) in H3, H2.
-    remember (u₁ / v₁)%L as k eqn:Hk.
-    apply (f_equal (rngl_mul v₁)) in Hk.
-    rewrite (rngl_mul_div_assoc Hiv) in Hk.
-    rewrite (rngl_mul_comm Hic _ u₁) in Hk.
-    rewrite (rngl_mul_div Hi1) in Hk; [ | easy ].
-    symmetry in Hk.
-    rewrite (rngl_mul_comm Hic _ k) in Hk.
-    clear H1; rename Hk into H1.
-    rename H3 into H'; rename H2 into H3; rename H' into H2.
-...
-  f_equal. {
-    destruct (rngl_eqb_dec v₁ 0) as [Hv1z| Hv1z]. {
-      clear Hu H1.
-      apply (rngl_eqb_eq Heo) in Hv1z.
-      subst v₁.
-      rewrite (rngl_opp_0 Hop).
-      rewrite (rngl_mul_0_r Hos) in H2, H3, H; symmetry in H2.
-      rewrite (rngl_mul_0_l Hos) in Hv.
-      rewrite rngl_add_0_l in H, Hv.
-      destruct (rngl_eqb_dec u₁ 0) as [Hu1z| Hu1z]. {
-        now apply (rngl_eqb_eq Heo) in Hu1z.
-      }
-      apply (rngl_eqb_neq Heo) in Hu1z; exfalso.
-      apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2; [ easy | ].
-      intros H'; subst v₃.
-      clear H2.
-      rewrite (rngl_mul_0_r Hos) in H.
-      rewrite (rngl_mul_0_l Hos) in Hv.
-      rewrite rngl_add_0_r in Hv, H.
-      assert (Hv2z : v₂ ≠ 0%L). {
-        intros H'; subst v₂.
-        rewrite (rngl_mul_0_l Hos) in Hv.
-        symmetry in Hv.
-        now apply (rngl_1_neq_0 Hon Hc1) in Hv.
-      }
-      now apply (rngl_eq_mul_0_l Hon Hos Hiq) in H3.
-    }
-    apply (rngl_eqb_neq Heo) in Hv1z.
-(**)
-    symmetry in H3.
-    rewrite (rngl_mul_comm Hic u₁) in H3, H2.
-    apply (rngl_mul_move_r Hi1) in H3, H2; [ | easy | easy ].
-    rewrite <- (rngl_mul_div_assoc Hiv) in H3, H2.
-    rewrite (rngl_mul_comm Hic) in H3, H2.
-    remember (u₁ / v₁)%L as k eqn:Hk.
-    apply (f_equal (rngl_mul v₁)) in Hk.
-    rewrite (rngl_mul_div_assoc Hiv) in Hk.
-    rewrite (rngl_mul_comm Hic _ u₁) in Hk.
-    rewrite (rngl_mul_div Hi1) in Hk; [ | easy ].
-    symmetry in Hk.
-    rewrite (rngl_mul_comm Hic _ k) in Hk.
-    clear H1; rename Hk into H1.
-    rename H3 into H'; rename H2 into H3; rename H' into H2.
-...
-    apply (rngl_mul_cancel_r Hi1 _ _ v₁); [ easy | ].
-    rewrite <- rngl_add_assoc in H.
-    apply (rngl_add_move_r Hop) in H.
-    rewrite H.
-    rewrite <- (rngl_opp_add_distr Hop).
-    rewrite (rngl_mul_opp_l Hop).
-    progress f_equal.
-(* pppp... chais pas *)
-...
-destruct (Rcase_abs (u₁ * v₁ + u₂ * v₂ + u₃ * v₃)) as [Ha| Ha].
- right; clear Ha.
- progress unfold Rsqr in Hu, Hv.
- f_equal; nsatz.
-
- left; clear Ha.
- progress unfold Rsqr in Hu, Hv.
- f_equal; nsatz.
+do 2 rewrite rngl_add_0_l in Hv.
+symmetry in Hv.
+now apply (rngl_1_neq_0 Hon Hc1) in Hv.
 Qed.
+
+...
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
