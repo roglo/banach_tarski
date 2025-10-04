@@ -1962,18 +1962,14 @@ Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
 Proof.
-intros * Hr.
-Inspect 1.
-...
-simpl.
-...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
 injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 unfold mat_det in Hd.
-Print matrix.
 destruct M as (a11, a12, a13, a21, a22, a23, a31, a32, a33); simpl in *.
-f_equal.
+f_equal. {
+  ring_simplify in Hd.
+  ring_simplify.
 ...
  clear H₁ H₂ H₃ H₄ H₅ H₆. nsatz.
  clear H₁ H₂ H₃ H₇ H₈ H₉. nsatz.
