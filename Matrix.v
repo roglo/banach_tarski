@@ -1970,11 +1970,41 @@ symmetry in Hv.
 now apply (rngl_1_neq_0 Hon Hc1) in Hv.
 Qed.
 
+Theorem mat_vec_dot_mul_assoc : ∀ M u v, M * u · v = u · mat_transp M * v.
+Proof.
+intros.
+destruct u as (x, y, z).
+destruct v as (x', y', z').
+cbn; ring.
+Qed.
+
 Theorem ortho_mat_vec_dot_mul :
   ∀ M, is_ortho_matrix M →
   ∀ x y, M * x · M * y = x · y.
 Proof.
 intros * Ho *.
+progress unfold is_ortho_matrix in Ho.
+assert ((mat_transp M * M = M * mat_transp M)%mat). {
+  progress unfold mat_transp in Ho.
+  progress unfold mkrmat in Ho.
+  progress unfold mat_transp.
+  progress unfold mkrmat.
+  destruct M; cbn in Ho |-*.
+  progress unfold mat_mul in Ho.
+  progress unfold mat_mul.
+  cbn in Ho |-*.
+  injection Ho; clear Ho; intros.
+  f_equal. {
+    do 2 rewrite <- rngl_add_assoc.
+    progress f_equal.
+...
+rewrite mat_vec_dot_mul_assoc.
+rewrite <- mat_vec_mul_assoc.
+...
+destruct x as (x1, x2, x3).
+destruct y as (y1, y2, y3).
+cbn.
+ring_simplify.
 ...
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
