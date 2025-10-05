@@ -567,15 +567,17 @@ intros m₁ m₂.
 unfold mat_det; simpl; ring.
 Qed.
 
-Definition is_rotation_matrix A :=
-  mat_mul A (mat_transp A) = mat_id ∧
-  mat_det A = 1%L.
+Definition is_ortho_matrix A := mat_mul A (mat_transp A) = mat_id.
+Definition is_rotation_matrix A := is_ortho_matrix A ∧ mat_det A = 1%L.
 
 Arguments is_rotation_matrix A%_mat.
 
 Theorem mat_id_is_rotation_matrix : is_rotation_matrix mat_id.
 Proof.
-split; [ now rewrite mat_transp_id, mat_mul_id_l | ].
+split. {
+  progress unfold is_ortho_matrix.
+  now rewrite mat_transp_id, mat_mul_id_l.
+}
 unfold mat_det; simpl; ring.
 Qed.
 
@@ -583,7 +585,9 @@ Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
 Proof.
 destruct_ac.
 specialize (rngl_0_le_2 Hon Hos Hor) as H02.
-unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
+progress unfold is_rotation_matrix.
+progress unfold is_ortho_matrix.
+progress unfold mat_transp, mat_mul, mat_det; simpl.
 unfold mat_id, rngl_div; rewrite Hiv.
 do 18 rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
@@ -604,7 +608,9 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
-unfold is_rotation_matrix, rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
+progress unfold is_rotation_matrix.
+progress unfold is_ortho_matrix.
+progress unfold rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
 progress unfold mat_id.
 progress unfold rngl_div; rewrite Hiv.
 progress repeat rewrite (rngl_mul_0_l Hos).
@@ -625,7 +631,9 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
-unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
+progress unfold is_rotation_matrix.
+progress unfold is_ortho_matrix.
+progress unfold mat_transp, mat_mul, mat_det; simpl.
 progress unfold mat_id.
 progress unfold rngl_div; rewrite Hiv.
 progress repeat rewrite (rngl_mul_0_l Hos).
@@ -650,7 +658,9 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
 }
-unfold is_rotation_matrix, mat_transp, mat_mul, mat_det; simpl.
+progress unfold is_rotation_matrix.
+progress unfold is_ortho_matrix.
+progress unfold mat_transp, mat_mul, mat_det; simpl.
 progress unfold mat_id.
 progress unfold rngl_div; rewrite Hiv.
 progress repeat rewrite (rngl_mul_0_l Hos).
@@ -683,7 +693,8 @@ Theorem mat_mul_is_rotation_matrix : ∀ m1 m2,
 Proof.
 destruct_ac.
 intros * (Hm1, Hd1) (Hm2, Hd2).
-unfold is_rotation_matrix.
+progress unfold is_rotation_matrix.
+progress unfold is_ortho_matrix.
 rewrite mat_transp_mul.
 rewrite mat_mul_assoc.
 setoid_rewrite <- mat_mul_assoc at 2.
@@ -1295,15 +1306,16 @@ Theorem rotation_transp_is_rotation : ∀ M,
 Proof.
 intros M HM.
 destruct HM as (Htr, Hdet).
-split.
- rewrite mat_transp_involutive.
- now apply mat_mul_id_comm.
-
- clear Htr.
- unfold mat_det in Hdet; simpl in Hdet.
- unfold mat_det, mat_transp; simpl.
- rewrite <- Hdet.
- ring.
+split. {
+  progress unfold is_ortho_matrix.
+  rewrite mat_transp_involutive.
+  now apply mat_mul_id_comm.
+}
+clear Htr.
+unfold mat_det in Hdet; simpl in Hdet.
+unfold mat_det, mat_transp; simpl.
+rewrite <- Hdet.
+ring.
 Qed.
 
 (* Cauchy-Schwarz inequality with vectors. *)
@@ -1958,10 +1970,20 @@ symmetry in Hv.
 now apply (rngl_1_neq_0 Hon Hc1) in Hv.
 Qed.
 
+Theorem ortho_mat_vec_dot_mul :
+  ∀ M, is_ortho_matrix M →
+  ∀ x y, M * x · M * y = x · y.
+Proof.
+intros * Ho *.
+...
+
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
 Proof.
+intros * (Ht, Hd).
+Search vec_dot_mul.
+...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
 injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
