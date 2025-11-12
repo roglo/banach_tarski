@@ -348,15 +348,6 @@ Ltac fold_rngl :=
 *)
   replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
     with rngl_one by easy.
-(*
-  replace
-    (match
-        (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
-     with
-     | Some a => a
-     | None => 0%L
-     end) with 1%L by easy.
-*)
 
 Theorem partial_sum3_aux_shift_seq : ∀ u k pow i,
   partial_sum3_aux (S k) u pow i =

@@ -45,19 +45,14 @@ Context {Hch : rngl_characteristic T = 0}.
 Context {Hc1 : rngl_characteristic T ≠ 1}.
 
 Ltac fold_rngl :=
-  replace (let (_, _, rngl_mul, _, _, _, _, _, _) := ro in rngl_mul)
+  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
     with rngl_mul by easy;
-  replace (let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add)
+  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
     with rngl_add by easy;
   replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
     with rngl_zero by easy;
-  replace
-    (match
-        (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
-     with
-     | Some a => a
-     | None => 0%L
-     end) with 1%L by easy.
+  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
+    with rngl_one by easy.
 
 Definition mkrmat := @mkmat T.
 Arguments mkrmat (a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃)%_L.
@@ -818,7 +813,7 @@ Proof.
 destruct_ac.
 simpl; rewrite (rngl_squ_0 Hos).
 do 2 rewrite rngl_add_0_l.
-apply (rl_sqrt_0 Hon Hop Hor Hii).
+apply (rl_sqrt_0 Hop Hor Hii).
 Qed.
 
 Theorem vec_norm_eq_0 : ∀ v, ‖v‖ = 0%L ↔ v = 0%vec.
@@ -836,7 +831,7 @@ destruct v as (v₁, v₂, v₃); simpl.
 injection Hv; clear Hv; intros; subst.
 rewrite (rngl_squ_0 Hos).
 do 2 rewrite rngl_add_0_r.
-apply (rl_sqrt_0 Hon Hop Hor Hii).
+apply (rl_sqrt_0 Hop Hor Hii).
 Qed.
 
 Theorem vec_norm_neq_0 : ∀ v, ‖v‖ ≠ 0%L ↔ v ≠ 0%vec.
@@ -1123,9 +1118,9 @@ Qed.
 Theorem vec_const_mul_eq_reg_l : ∀ a u v, a ⁎ u = a ⁎ v → a ≠ 0%L → u = v.
 Proof.
 destruct_ac.
-assert (Hip : rngl_has_inv_and_1_or_pdiv_and_comm T = true). {
-  progress unfold rngl_has_inv_and_1_or_pdiv_and_comm.
-  now rewrite Hiv, Hon.
+assert (Hip : rngl_has_inv_or_pdiv_and_comm T = true). {
+  progress unfold rngl_has_inv_or_pdiv_and_comm.
+  now rewrite Hiv.
 }
 intros a (u₁, u₂, u₃) (v₁, v₂, v₃) Hauv Ha.
 simpl in Hauv.
@@ -1678,8 +1673,8 @@ destruct_ac.
 intros * Hr Hrnz.
 assert (H : (r ^ 2 ≠ 0 ∧ r ^ 2 - x ^ 2 - y ^ 2 = z ^ 2)%L). {
   split; [ now apply (rngl_pow_neq_0 Hos Hiq) | ].
-  rewrite Hr, <- (rngl_squ_pow_2 Hon).
-  rewrite rngl_squ_sqrt; [ do 3 rewrite (rngl_squ_pow_2 Hon); ring | ].
+  rewrite Hr, <- rngl_squ_pow_2.
+  rewrite rngl_squ_sqrt; [ do 3 rewrite rngl_squ_pow_2; ring | ].
   apply nonneg_sqr_vec_norm.
 }
 destruct H as (Hr2nz & Hrxyz).
@@ -1687,14 +1682,14 @@ remember (x / r)%L as xr eqn:Hxr.
 remember (y / r)%L as yr eqn:Hyr.
 remember (z / r)%L as zr eqn:Hzr.
 subst xr yr zr.
-do 4 rewrite <- (rngl_squ_pow_2 Hon) in Hrxyz.
-do 3 rewrite <- (rngl_squ_pow_2 Hon).
+do 4 rewrite <- rngl_squ_pow_2 in Hrxyz.
+do 3 rewrite <- rngl_squ_pow_2.
 rewrite (rngl_squ_div Hic Hos Hiv); [ | easy ].
 rewrite <- Hrxyz.
 progress unfold rngl_div; rewrite Hiv.
 do 2 rewrite (rngl_squ_mul Hic).
 do 2 rewrite (rngl_mul_sub_distr_r Hop).
-rewrite (rngl_squ_inv Hon Hos Hiv); [ | easy ].
+rewrite (rngl_squ_inv Hos Hiv); [ | easy ].
 progress f_equal; f_equal.
 apply (rngl_mul_inv_diag_r Hiv).
 intros H; apply Hrnz.
@@ -1767,7 +1762,7 @@ assert (Hrxyz2 : (1 - x ^ 2 - y ^ 2 = z ^ 2)%L). {
 }
 progress unfold matrix_of_axis_angle.
 rewrite <- Hr, <- Hx, <- Hy, <- Hz.
-do 3 rewrite <- (rngl_squ_pow_2 Hon) in Hrxyz2.
+do 3 rewrite <- rngl_squ_pow_2 in Hrxyz2.
 progress unfold rngl_squ in Hrxyz2.
 progress unfold rngl_squ in Hsc.
 split. {
@@ -1887,7 +1882,7 @@ do 3 rewrite (rngl_squ_mul Hic) in Hu.
 do 2 rewrite <- rngl_mul_add_distr_l in Hu.
 rewrite Hv, rngl_mul_1_r in Hu.
 rewrite <- rngl_squ_1 in Hu.
-apply (rngl_squ_eq_cases Hon Hop Hiv Heo) in Hu. 2: {
+apply (rngl_squ_eq_cases Hop Hiv Heo) in Hu. 2: {
   now rewrite rngl_mul_1_r, rngl_mul_1_l.
 }
 destruct Hu; subst k. {
