@@ -2038,10 +2038,15 @@ Proof.
 intros * (Ht, Hd).
 rewrite vec_cross_mul_from_Levi_Civita.
 rewrite vec_cross_mul_from_Levi_Civita.
-(* voir avec Mistral *)
+Check ortho_mat_vec_dot_mul.
 ...
 cbn - [ Levi_Civita_symbol ].
+destruct u as (u₁, u₂, u₃).
+destruct v as (v₁, v₂, v₃).
+progress unfold iter_seq.
+progress unfold iter_list; cbn.
 f_equal. {
+  ring_simplify.
 ...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
