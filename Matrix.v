@@ -1199,7 +1199,7 @@ rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply rl_sqrt_nonneg.
   apply nonneg_sqr_vec_norm.
 }
-now apply (rngl_mul_inv_diag_l Hon Hiv).
+now apply (rngl_mul_inv_diag_l Hiv).
 Qed.
 
 Theorem vec_div_vec_norm : ∀ v, v ≠ 0%vec → ‖(v ⁄ ‖v‖)‖ = 1%L.
@@ -1291,13 +1291,13 @@ destruct (rngl_eqb_dec (mat_det M) 0) as [Hd| Hd]. {
 apply (rngl_eqb_neq Heo) in Hd.
 apply (f_equal (mat_const_mul (mat_det M)⁻¹)) in H.
 rewrite mat_const_mul_assoc in H.
-rewrite (rngl_mul_inv_diag_l Hon Hiv) in H; [ | easy ].
+rewrite (rngl_mul_inv_diag_l Hiv) in H; [ | easy ].
 rewrite mat_const_mul_1_l in H.
 rewrite H.
 rewrite <- mat_const_mul_distr_l.
 rewrite mat_mul_compl_l.
 rewrite mat_const_mul_assoc.
-rewrite (rngl_mul_inv_diag_l Hon Hiv); [ | easy ].
+rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
 apply mat_const_mul_1_l.
 Qed.
 
