@@ -671,7 +671,7 @@ Theorem vec3_scal_mul_1_l : ∀ u, 1 · u = u.
 Proof.
 intros.
 progress unfold vec3_scal_mul; cbn.
-do 3 rewrite (rngl_mul_1_l Hon).
+do 3 rewrite rngl_mul_1_l.
 now destruct u.
 Qed.
 
@@ -719,7 +719,7 @@ Proof.
 intros.
 progress unfold quat_mul.
 progress unfold quat_re_im_mul; cbn.
-rewrite (rngl_mul_1_l Hon).
+rewrite rngl_mul_1_l.
 rewrite vec3_dot_mul_0_l.
 rewrite (rngl_sub_0_r Hos).
 rewrite vec3_scal_mul_1_l.
@@ -801,7 +801,7 @@ Proof.
 intros.
 progress unfold quat_mul.
 progress unfold quat_re_im_mul; cbn.
-rewrite (rngl_mul_1_r Hon).
+rewrite rngl_mul_1_r.
 rewrite vec3_dot_mul_0_r.
 rewrite (rngl_sub_0_r Hos).
 rewrite vec3_scal_mul_0_r.
@@ -1187,7 +1187,7 @@ Proof.
 intros.
 progress unfold vec3_scal_mul.
 progress unfold vec3_add; cbn.
-do 3 rewrite (rngl_mul_2_l Hon).
+do 3 rewrite rngl_mul_2_l.
 easy.
 Qed.
 

@@ -280,7 +280,7 @@ Proof.
 destruct_ac.
 intros m.
 unfold mat_mul, mat_id; simpl.
-progress repeat rewrite (rngl_mul_1_l Hon).
+progress repeat rewrite rngl_mul_1_l.
 progress repeat rewrite (rngl_mul_0_l Hos).
 progress repeat rewrite rngl_add_0_l.
 progress repeat rewrite rngl_add_0_r.
@@ -292,7 +292,7 @@ Proof.
 destruct_ac.
 intros m.
 unfold mat_mul, mat_id; simpl.
-progress repeat rewrite (rngl_mul_1_r Hon).
+progress repeat rewrite rngl_mul_1_r.
 progress repeat rewrite (rngl_mul_0_r Hos).
 progress repeat rewrite rngl_add_0_l.
 progress repeat rewrite rngl_add_0_r.
@@ -305,7 +305,7 @@ destruct_ac.
 intros (x, y, z).
 unfold mat_vec_mul; simpl.
 progress repeat rewrite (rngl_mul_0_l Hos).
-progress repeat rewrite (rngl_mul_1_l Hon).
+progress repeat rewrite rngl_mul_1_l.
 progress repeat rewrite rngl_add_0_l.
 progress repeat rewrite rngl_add_0_r.
 easy.
@@ -357,7 +357,7 @@ Proof. easy. Qed.
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hor) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
@@ -374,7 +374,7 @@ Qed.
 Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -390,7 +390,7 @@ Qed.
 Theorem rot_rot_inv_z : (rot_z * rot_inv_z)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -406,7 +406,7 @@ Qed.
 Theorem rot_inv_rot_z : (rot_inv_z * rot_z)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hor) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -584,7 +584,7 @@ Qed.
 Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hor) as H02.
 progress unfold is_rotation_matrix.
 progress unfold is_ortho_matrix.
 progress unfold mat_transp, mat_mul, mat_det; simpl.
@@ -603,7 +603,7 @@ Qed.
 Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
@@ -615,7 +615,7 @@ progress unfold mat_id.
 progress unfold rngl_div; rewrite Hiv.
 progress repeat rewrite (rngl_mul_0_l Hos).
 progress repeat rewrite (rngl_mul_0_r Hos).
-progress repeat rewrite (rngl_mul_1_l Hon).
+progress repeat rewrite rngl_mul_1_l.
 progress repeat rewrite rngl_add_0_l.
 progress repeat rewrite rngl_add_0_r.
 progress repeat rewrite rngl_mul_assoc.
@@ -626,7 +626,7 @@ Qed.
 Theorem rot_z_is_rotation_matrix : is_rotation_matrix rot_z.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
@@ -638,8 +638,8 @@ progress unfold mat_id.
 progress unfold rngl_div; rewrite Hiv.
 progress repeat rewrite (rngl_mul_0_l Hos).
 progress repeat rewrite (rngl_mul_0_r Hos).
-progress repeat rewrite (rngl_mul_1_l Hon).
-progress repeat rewrite (rngl_mul_1_r Hon).
+progress repeat rewrite rngl_mul_1_l.
+progress repeat rewrite rngl_mul_1_r.
 progress repeat rewrite rngl_add_0_l.
 progress repeat rewrite rngl_add_0_r.
 progress repeat rewrite (rngl_sub_0_l Hop).
@@ -653,7 +653,7 @@ Qed.
 Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hon Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hor) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hon Hos Hc1 Hor).
@@ -665,8 +665,8 @@ progress unfold mat_id.
 progress unfold rngl_div; rewrite Hiv.
 progress repeat rewrite (rngl_mul_0_l Hos).
 progress repeat rewrite (rngl_mul_0_r Hos).
-progress repeat rewrite (rngl_mul_1_l Hon).
-progress repeat rewrite (rngl_mul_1_r Hon).
+progress repeat rewrite rngl_mul_1_l.
+progress repeat rewrite rngl_mul_1_r.
 progress repeat rewrite rngl_add_0_l.
 progress repeat rewrite rngl_add_0_r.
 progress repeat rewrite (rngl_sub_0_l Hop).
@@ -701,7 +701,7 @@ setoid_rewrite <- mat_mul_assoc at 2.
 rewrite Hm2, mat_mul_id_r, Hm1.
 split; [ easy | ].
 rewrite mat_det_mul, Hd1, Hd2.
-apply (rngl_mul_1_l Hon).
+apply rngl_mul_1_l.
 Qed.
 
 Theorem mat_pow_is_rotation_matrix : ∀ M n,
@@ -897,7 +897,7 @@ Proof.
 destruct_ac.
 intros (x, y, z).
 unfold vec_const_mul.
-now f_equal; rewrite (rngl_mul_1_l Hon).
+now f_equal; rewrite rngl_mul_1_l.
 Qed.
 
 Theorem neg_vec_involutive : ∀ p, (- - p)%vec = p.
@@ -1234,8 +1234,8 @@ rewrite (rngl_sub_diag Hos).
 do 10 rewrite (rngl_mul_0_r Hos).
 rewrite (rngl_sub_diag Hos).
 do 3 rewrite (rngl_mul_0_r Hos).
-do 9 rewrite (rngl_mul_1_l Hon).
-do 7 rewrite (rngl_mul_1_r Hon).
+do 9 rewrite rngl_mul_1_l.
+do 7 rewrite rngl_mul_1_r.
 do 5 rewrite rngl_add_0_l.
 do 7 rewrite rngl_add_0_r.
 do 6 rewrite (rngl_sub_0_r Hos).
@@ -1263,7 +1263,7 @@ Theorem mat_const_mul_1_l : ∀ M, (1%L ⁎ M = M)%mat.
 Proof.
 destruct_ac.
 intros; unfold mat_const_mul, mkrmat; destruct M; simpl.
-now do 9 rewrite (rngl_mul_1_l Hon).
+now do 9 rewrite rngl_mul_1_l.
 Qed.
 
 Theorem mat_mul_id_comm : ∀ M M',
@@ -1286,7 +1286,7 @@ destruct (rngl_eqb_dec (mat_det M) 0) as [Hd| Hd]. {
   apply (rngl_eqb_eq Heo) in Hd.
   rewrite Hd, (rngl_mul_0_l Hos) in HMM'.
   symmetry in HMM'.
-  now apply (rngl_1_neq_0 Hon Hc1) in HMM'.
+  now apply (rngl_1_neq_0 Hc1) in HMM'.
 }
 apply (rngl_eqb_neq Heo) in Hd.
 apply (f_equal (mat_const_mul (mat_det M)⁻¹)) in H.
@@ -1411,7 +1411,7 @@ rewrite (rl_sqrt_squ Hon Hop Hor) in Ha.
 destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
   rename H into Hkp.
   apply rngl_leb_le in Hkp.
-  rewrite (rngl_mul_1_l Hon).
+  rewrite rngl_mul_1_l.
   assert (Hx : ∀ x, (k * x / a = x / b)%L). {
     intros x; subst a.
     rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
@@ -1443,7 +1443,7 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
   do 3 rewrite (rngl_squ_opp Hop).
   do 3 rewrite rngl_mul_assoc.
   do 6 rewrite (rngl_mul_opp_opp Hop).
-  do 3 rewrite (rngl_mul_1_r Hon).
+  do 3 rewrite rngl_mul_1_r.
   easy.
 }
 Qed.
@@ -1474,7 +1474,7 @@ rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
 clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
 progress unfold mkrmat.
 (**)
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+specialize (rngl_2_neq_0 Hos Hc1 Hor) as H20.
 f_equal; ring_simplify; fold_rngl. {
   do 4 rewrite <- (rngl_mul_assoc _ _ az).
   do 4 rewrite <- (rngl_mul_assoc _ _ ay).
@@ -1641,18 +1641,18 @@ assert (Hbz : b ≠ 0%vec). {
   cbn in Hb.
   injection Hb; clear Hb; intros H3 H2 H1.
   rewrite fold_vec_norm in H1, H2, H3.
-  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H1; [ easy | ].
+  apply (rngl_eq_mul_0_l Hos Hiq) in H1; [ easy | ].
   intros H; subst x.
-  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H2; [ easy | ].
+  apply (rngl_eq_mul_0_l Hos Hiq) in H2; [ easy | ].
   intros H; subst y.
-  apply (rngl_eq_mul_0_l Hon Hos Hiq) in H3; [ easy | ].
+  apply (rngl_eq_mul_0_l Hos Hiq) in H3; [ easy | ].
   intros H; subst z.
   easy.
 }
 rewrite matrix_mul_axis with (k := ‖a‖) in HM; [ | easy | easy ].
 rewrite matrix_mul_axis with (k := ‖a‖) in HM'; [ | easy | easy ].
 rewrite Rsign_of_pos in HM, HM'; [ | easy | easy ].
-rewrite (rngl_mul_1_l Hon) in HM, HM'.
+rewrite rngl_mul_1_l in HM, HM'.
 rewrite Hb in HM, HM'.
 rewrite vec_const_mul_assoc in HM, HM'.
 rewrite (rngl_mul_inv_diag_r Hon Hiv _ Haz) in HM, HM'.
@@ -1759,7 +1759,7 @@ Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   → is_rotation_matrix (matrix_of_axis_angle p sinθ cosθ).
 Proof.
 destruct_ac.
-specialize (rngl_2_neq_0 Hon Hos Hc1 Hor) as H20.
+specialize (rngl_2_neq_0 Hos Hc1 Hor) as H20.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
 assert (Hsc : sinθ² = (1 - cosθ²)%L) by now rewrite <- Hsc1, rngl_add_sub.
@@ -1898,17 +1898,17 @@ clear H3; rename Hk into H3.
 rewrite H1, H2, H3 in Hu.
 do 3 rewrite (rngl_squ_mul Hic) in Hu.
 do 2 rewrite <- rngl_mul_add_distr_l in Hu.
-rewrite Hv, (rngl_mul_1_r Hon) in Hu.
+rewrite Hv, rngl_mul_1_r in Hu.
 rewrite <- (rngl_squ_1 Hon) in Hu.
 apply (rngl_squ_eq_cases Hon Hop Hiv Heo) in Hu. 2: {
-  now rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+  now rewrite rngl_mul_1_r, rngl_mul_1_l.
 }
 destruct Hu; subst k. {
-  rewrite (rngl_mul_1_l Hon) in H1, H2, H3.
+  rewrite rngl_mul_1_l in H1, H2, H3.
   now subst; left.
 } {
   rewrite (rngl_mul_opp_l Hop) in H1, H2, H3.
-  rewrite (rngl_mul_1_l Hon) in H1, H2, H3.
+  rewrite rngl_mul_1_l in H1, H2, H3.
   now subst; right.
 }
 Qed.
@@ -1923,7 +1923,7 @@ destruct_ac.
 intros * Hu Hv Huxv.
 specialize (vec_Lagrange_identity u v) as H.
 rewrite Hu, Hv, Huxv, vec_sqr_0 in H.
-rewrite (rngl_squ_1 Hon), (rngl_mul_1_l Hon) in H.
+rewrite (rngl_squ_1 Hon), rngl_mul_1_l in H.
 apply -> (rngl_sub_move_0_r Hop) in H; symmetry in H.
 destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
@@ -1940,7 +1940,7 @@ apply -> (rngl_sub_move_0_r Hop) in H2.
 apply -> (rngl_sub_move_0_r Hop) in H3.
 rewrite <- (rngl_squ_1 Hon) in H.
 apply (eq_rngl_squ_rngl_abs Hop Hor Hii) in H. 2: {
-  now rewrite (rngl_mul_1_r Hon), (rngl_mul_1_l Hon).
+  now rewrite rngl_mul_1_r, rngl_mul_1_l.
 }
 rewrite (rngl_abs_1 Hon Hos Hor) in H.
 progress unfold rngl_abs in H.
@@ -1967,7 +1967,7 @@ apply (rngl_eqb_eq Heo) in Hv1z, Hv2z, Hv3z; subst v₁ v₂ v₃.
 rewrite (rngl_squ_0 Hos) in Hv.
 do 2 rewrite rngl_add_0_l in Hv.
 symmetry in Hv.
-now apply (rngl_1_neq_0 Hon Hc1) in Hv.
+now apply (rngl_1_neq_0 Hc1) in Hv.
 Qed.
 
 Theorem mat_vec_dot_mul_assoc : ∀ M u v, M * u · v = u · mat_transp M * v.
