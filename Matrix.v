@@ -67,8 +67,8 @@ Definition Rmult5_sqrt2_sqrt5 := @Rmult5_sqrt2_sqrt5 T ro rp rl Hic Hon Hop Hor.
 Arguments Rmult5_sqrt2_sqrt5 (a b c d)%_L.
 *)
 
-Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op ac_on).
-Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_on ac_iv Hc1).
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
+Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
 
 Definition mat_add (M₁ M₂ : matrix T) :=
   mkmat
@@ -341,19 +341,6 @@ intros.
 destruct v as (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
-Theorem fold_rngl_add :
-  (let (_, rngl_add, _, _, _, _, _, _, _) := ro in rngl_add) = rngl_add.
-Proof. easy. Qed.
-
-Theorem fold_rngl_one :
-  (match
-     (let (_, _, _, rngl_opt_one, _, _, _, _, _) := ro in rngl_opt_one)
-   with
-   | Some a => a
-   | None => let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero
-   end) = 1%L.
-Proof. easy. Qed.
-
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
 destruct_ac.
@@ -381,7 +368,7 @@ progress repeat rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
-  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  specialize (rngl_characteristic_0 Hch 2) as H1.
   now cbn in H1; rewrite rngl_add_0_r in H1.
 }
 now f_equal; field.
@@ -397,7 +384,7 @@ progress repeat rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
-  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  specialize (rngl_characteristic_0 Hch 2) as H1.
   now cbn in H1; rewrite rngl_add_0_r in H1.
 }
 now f_equal; field.
@@ -413,7 +400,7 @@ progress repeat rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
-  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  specialize (rngl_characteristic_0 Hch 2) as H1.
   now cbn in H1; rewrite rngl_add_0_r in H1.
 }
 now f_equal; field.
@@ -594,7 +581,7 @@ rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
-  specialize (rngl_characteristic_0 Hon Hch 2) as H1.
+  specialize (rngl_characteristic_0 Hch 2) as H1.
   now cbn in H1; rewrite rngl_add_0_r in H1.
 }
 split; [ now f_equal; try field | now field ].
@@ -811,7 +798,7 @@ Theorem sqr_vec_norm_eq_0 : ∀ x y z,
   → (x = 0 ∧ y = 0 ∧ z = 0)%L.
 Proof.
 destruct_ac.
-specialize (rngl_integral_or_inv_1_pdiv_eq_dec_order Hon Hiv Hor) as Hio.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros * H.
 apply (rngl_eq_add_0 Hor) in H.
 destruct H as (H, H3).
