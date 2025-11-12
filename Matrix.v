@@ -549,7 +549,7 @@ intros m₁ m₂.
 unfold mat_det; simpl; ring.
 Qed.
 
-Definition is_ortho_matrix A := mat_mul A (mat_transp A) = mat_id.
+Definition is_ortho_matrix A := mat_mul (mat_transp A) A = mat_id.
 Definition is_rotation_matrix A := is_ortho_matrix A ∧ mat_det A = 1%L.
 
 Arguments is_rotation_matrix A%_mat.
@@ -680,7 +680,7 @@ progress unfold is_ortho_matrix.
 rewrite mat_transp_mul.
 rewrite mat_mul_assoc.
 setoid_rewrite <- mat_mul_assoc at 2.
-rewrite Hm2, mat_mul_id_r, Hm1.
+rewrite Hm1, mat_mul_id_r, Hm2.
 split; [ easy | ].
 rewrite mat_det_mul, Hd1, Hd2.
 apply rngl_mul_1_l.
@@ -1645,6 +1645,11 @@ Qed.
 Theorem rotation_mat_mul_transp_l : ∀ M,
   is_rotation_matrix M →
   (mat_transp M * M)%mat = mat_id.
+Proof. now intros M (Htr, Hdet). Qed.
+
+Theorem rotation_mat_mul_transp_r : ∀ M,
+  is_rotation_matrix M →
+  (M * mat_transp M)%mat = mat_id.
 Proof.
 intros M (Htr, Hdet).
 now apply mat_mul_id_comm in Htr.
@@ -1766,6 +1771,7 @@ do 3 rewrite <- rngl_squ_pow_2 in Hrxyz2.
 progress unfold rngl_squ in Hrxyz2.
 progress unfold rngl_squ in Hsc.
 split. {
+...
   apply (matrix_of_axis_angle_mul_mat_transp _ _ _ _ _ Hsc Hrxyz2).
 }
 apply (mat_det_matrix_of_unit_axis_angle _ _ _ _ _ Hsc Hrxyz2).
