@@ -840,7 +840,7 @@ destruct_ac.
 intros.
 split; intros Hv. {
   destruct v as (v₁, v₂, v₃); simpl in Hv.
-  apply (eq_rl_sqrt_0 Hon Hos) in Hv.
+  apply (eq_rl_sqrt_0 Hos) in Hv.
   apply sqr_vec_norm_eq_0 in Hv.
   now destruct Hv as (H1 & H2 & H3); subst.
   apply nonneg_sqr_vec_norm.
@@ -1177,7 +1177,7 @@ injection Hv; clear Hv; intros H₃ H₂ H₁.
 remember (√ (u₁² + u₂² + u₃²)) as ur eqn:Hur.
 assert (H : ur ≠ 0%L). {
   intros H; subst ur.
-  apply (eq_rl_sqrt_0 Hon Hos) in H; [ | apply nonneg_sqr_vec_norm ].
+  apply (eq_rl_sqrt_0 Hos) in H; [ | apply nonneg_sqr_vec_norm ].
   apply sqr_vec_norm_eq_0 in H.
   destruct H as (H1 & H2 & H3).
   now subst.
@@ -1192,7 +1192,7 @@ rewrite <- Hur.
 rewrite (rl_sqrt_squ Hon Hop Hor).
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_lt_le_incl Hor).
-  apply (rngl_inv_pos Hon Hop Hiv Hor).
+  apply (rngl_inv_pos Hop Hiv Hor).
   apply (rngl_le_neq Hor).
   split; [ | easy ].
   rewrite Hur.
@@ -1398,7 +1398,7 @@ rewrite rl_sqrt_mul in Ha; [ | | apply nonneg_sqr_vec_norm ]. 2: {
 remember (√ (xp² + yp² + zp²)) as b eqn:Hb.
 assert (Hbz : b ≠ 0%L). {
   subst b; intros H.
-  apply (eq_rl_sqrt_0 Hon Hos) in H; [ | apply nonneg_sqr_vec_norm ].
+  apply (eq_rl_sqrt_0 Hos) in H; [ | apply nonneg_sqr_vec_norm ].
   apply sqr_vec_norm_eq_0 in H.
   destruct H as (H1 & H2 & H3).
   now rewrite H1, H2, H3 in Hpz.
@@ -1416,7 +1416,7 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
     intros x; subst a.
     rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
     do 2 rewrite (rngl_mul_comm Hic k).
-    rewrite <- (rngl_div_div Hon Hos Hiv); [ | easy | easy ].
+    rewrite <- (rngl_div_div Hos Hiv); [ | easy | easy ].
     progress f_equal.
     now apply (rngl_mul_div Hi1).
   }
@@ -1430,12 +1430,12 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
     intros x; subst a.
     rewrite (rngl_abs_nonpos_eq Hop Hor); [ | easy ].
     rewrite (rngl_mul_opp_l Hop).
-    rewrite (rngl_div_opp_r Hon Hop Hiv). 2: {
+    rewrite (rngl_div_opp_r Hop Hiv). 2: {
       now apply (rngl_neq_mul_0 Hon Hos Hiq).
     }
     progress f_equal.
     do 2 rewrite (rngl_mul_comm Hic k).
-    rewrite <- (rngl_div_div Hon Hos Hiv); [ | easy | easy ].
+    rewrite <- (rngl_div_div Hos Hiv); [ | easy | easy ].
     progress f_equal.
     now apply (rngl_mul_div Hi1).
   }
@@ -1655,7 +1655,7 @@ rewrite Rsign_of_pos in HM, HM'; [ | easy | easy ].
 rewrite rngl_mul_1_l in HM, HM'.
 rewrite Hb in HM, HM'.
 rewrite vec_const_mul_assoc in HM, HM'.
-rewrite (rngl_mul_inv_diag_r Hon Hiv _ Haz) in HM, HM'.
+rewrite (rngl_mul_inv_diag_r Hiv _ Haz) in HM, HM'.
 rewrite vec_const_mul_1_l in HM, HM'.
 now rewrite HM, HM' in Haa.
 Qed.
@@ -1709,7 +1709,7 @@ do 2 rewrite (rngl_squ_mul Hic).
 do 2 rewrite (rngl_mul_sub_distr_r Hop).
 rewrite (rngl_squ_inv Hon Hos Hiv); [ | easy ].
 progress f_equal; f_equal.
-apply (rngl_mul_inv_diag_r Hon Hiv).
+apply (rngl_mul_inv_diag_r Hiv).
 intros H; apply Hrnz.
 apply (eq_rngl_squ_0 Hos); [ | easy ].
 apply Bool.orb_true_iff; right.
@@ -1767,7 +1767,7 @@ destruct p as (xp, yp, zp).
 remember (√ (xp² + yp² + zp²)) as r eqn:Hr.
 assert (Hrnz : r ≠ 0%L). {
   intros H; rewrite Hr in H.
-  apply (eq_rl_sqrt_0 Hon Hos) in H; [ | apply nonneg_sqr_vec_norm ].
+  apply (eq_rl_sqrt_0 Hos) in H; [ | apply nonneg_sqr_vec_norm ].
   apply sqr_vec_norm_eq_0 in H.
   now destruct H as (Hx & Hy & Hz); subst xp yp zp.
 }

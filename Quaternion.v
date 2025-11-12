@@ -1094,7 +1094,7 @@ rewrite (rngl_sub_opp_r Hop).
 do 4 rewrite (rngl_div_mul_mul_div Hic Hiv).
 do 4 rewrite fold_rngl_squ.
 do 3 rewrite <- (rngl_div_add_distr_r Hiv).
-rewrite (rngl_div_diag Hon Hiq). 2: {
+rewrite (rngl_div_diag Hiq). 2: {
   intros H; apply Haz; clear Haz.
   now apply eq_quat_norm_squ_0.
 }
