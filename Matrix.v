@@ -1703,7 +1703,27 @@ apply Bool.orb_true_iff; right.
 now rewrite Hi1, Heo.
 Qed.
 
-Theorem matrix_of_axis_angle_mul_mat_transp :
+Theorem matrix_of_axis_angle_mul_mat_transp_l :
+  ∀ x y z sinθ cosθ,
+  (sinθ * sinθ)%L = (1 - cosθ * cosθ)%L
+  → (1 - x * x - y * y)%L = (z * z)%L
+  → (mat_transp (matrix_of_unit_axis_angle (V x y z, sinθ, cosθ)) *
+      matrix_of_unit_axis_angle (V x y z, sinθ, cosθ))%mat =
+    mat_id.
+Proof.
+intros * Hsc Hrxyz2.
+progress unfold mat_transp, mat_mul, mat_id; simpl.
+f_equal;
+  unfold rngl_squ;
+  ring_simplify; fold_rngl;
+  repeat rewrite <- (rngl_mul_assoc _ z z);
+  rewrite <- Hrxyz2;
+  repeat rewrite <- (rngl_mul_assoc _ sinθ sinθ);
+  rewrite Hsc;
+  ring.
+Qed.
+
+Theorem matrix_of_axis_angle_mul_mat_transp_r :
   ∀ x y z sinθ cosθ,
   (sinθ * sinθ)%L = (1 - cosθ * cosθ)%L
   → (1 - x * x - y * y)%L = (z * z)%L
@@ -1771,9 +1791,7 @@ do 3 rewrite <- rngl_squ_pow_2 in Hrxyz2.
 progress unfold rngl_squ in Hrxyz2.
 progress unfold rngl_squ in Hsc.
 split; [ | apply (mat_det_matrix_of_unit_axis_angle _ _ _ _ _ Hsc Hrxyz2) ].
-...
-apply (matrix_of_axis_angle_mul_mat_transp _ _ _ _ _ Hsc Hrxyz2).
-...
+apply (matrix_of_axis_angle_mul_mat_transp_l _ _ _ _ _ Hsc Hrxyz2).
 Qed.
 
 Theorem mat_of_path_cons : ∀ e el,
@@ -1992,7 +2010,6 @@ assert ((mat_transp M * M = M * mat_transp M)%mat). {
     rewrite <- rngl_add_assoc in H7.
     apply (rngl_add_sub_eq_l Hos) in H7.
     rewrite <- H7.
-    symmetry.
     apply (rngl_add_sub_eq_l Hos).
     rewrite rngl_add_assoc.
 Print mat_transp.
