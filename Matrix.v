@@ -1990,41 +1990,12 @@ Proof.
 destruct_ac.
 intros * Ho *.
 progress unfold is_ortho_matrix in Ho.
-assert ((mat_transp M * M = M * mat_transp M)%mat). {
-  progress unfold mat_transp in Ho.
-  progress unfold mkrmat in Ho.
-  progress unfold mat_transp.
-  progress unfold mkrmat.
-  destruct M; cbn in Ho |-*.
-  progress unfold mat_mul in Ho.
-  progress unfold mat_mul.
-  cbn in Ho |-*.
-  injection Ho; clear Ho; intros.
-  repeat rewrite -> fold_rngl_squ in H.
-  repeat rewrite -> fold_rngl_squ in H3.
-  repeat rewrite -> fold_rngl_squ in H7.
-  repeat rewrite -> fold_rngl_squ.
-  f_equal. {
-    do 2 rewrite <- rngl_add_assoc.
-    progress f_equal.
-    rewrite <- rngl_add_assoc in H7.
-    apply (rngl_add_sub_eq_l Hos) in H7.
-    rewrite <- H7.
-    apply (rngl_add_sub_eq_l Hos).
-    rewrite rngl_add_assoc.
-Print mat_transp.
-(* bon, y a un truc qui déconne *)
-...
-}
-... ...
 rewrite mat_vec_dot_mul_assoc.
 rewrite <- mat_vec_mul_assoc.
-...
-destruct x as (x1, x2, x3).
-destruct y as (y1, y2, y3).
-cbn.
-ring_simplify.
-...
+rewrite Ho.
+progress f_equal.
+apply mat_vec_mul_id.
+Qed.
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
