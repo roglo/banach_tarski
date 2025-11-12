@@ -7,6 +7,8 @@ Require Import Datatypes.
 
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
+Require Import RingLike.Utils.
+Require Import RingLike.IterAdd.
 Require Import TrigoWithoutPi.Core.
 Require Import a.Words a.Normalize a.Reverse a.Misc.
 Require Import a.MiscTrigo a.MiscReals.
@@ -113,7 +115,7 @@ Notation "M * v" := (mat_vec_mul M v) : vec_scope.
 Notation "u + v" := (vec_add u v) : vec_scope.
 Notation "u - v" := (vec_sub u v) : vec_scope.
 Notation "- v" := (vec_opp v) : vec_scope.
-Notation "u · v" := (vec_dot_mul u v) (at level 45, left associativity).
+Notation "u · v" := (vec_dot_mul u v) (at level 44, left associativity).
 Notation "u × v" := (vec_cross_mul u v) (at level 40, no associativity).
 Notation "v ²" := (vec_dot_mul v v) : vec_scope.
 Notation "‖ v ‖" := (vec_norm v) (at level 0, v at level 0, format "‖ v ‖").
@@ -1997,12 +1999,49 @@ progress f_equal.
 apply mat_vec_mul_id.
 Qed.
 
+Definition Levi_Civita_symbol i j k :=
+  match (i, j, k) with
+  | (1, 2, 3) | (2, 3, 1) | (3, 1, 2) => 1%L
+  | (3, 2, 1) | (1, 3, 2) | (2, 1, 3) => (-1)%L
+  | _ => 0%L
+  end.
+
+Definition vec_nth '(V x y z) i :=
+  match i with
+  | 1 => x
+  | 2 => y
+  | 3 => z
+  | _ => 0%L
+  end.
+
+Theorem vec_cross_mul_from_Levi_Civita :
+  ∀ u v,
+  u × v =
+    V
+      (∑ (j = 1, 3), ∑ (k = 1, 3),
+        Levi_Civita_symbol 1 j k * vec_nth u j * vec_nth v k)
+      (∑ (j = 1, 3), ∑ (k = 1, 3),
+        Levi_Civita_symbol 2 j k * vec_nth u j * vec_nth v k)
+      (∑ (j = 1, 3), ∑ (k = 1, 3),
+        Levi_Civita_symbol 3 j k * vec_nth u j * vec_nth v k).
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); cbn.
+progress unfold iter_seq.
+progress unfold iter_list; cbn.
+f_equal; ring.
+Qed.
+
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
 Proof.
 intros * (Ht, Hd).
-Search vec_dot_mul.
+rewrite vec_cross_mul_from_Levi_Civita.
+rewrite vec_cross_mul_from_Levi_Civita.
+(* voir avec Mistral *)
+...
+cbn - [ Levi_Civita_symbol ].
+f_equal. {
 ...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
