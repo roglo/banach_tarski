@@ -1770,11 +1770,10 @@ rewrite <- Hr, <- Hx, <- Hy, <- Hz.
 do 3 rewrite <- rngl_squ_pow_2 in Hrxyz2.
 progress unfold rngl_squ in Hrxyz2.
 progress unfold rngl_squ in Hsc.
-split. {
+split; [ | apply (mat_det_matrix_of_unit_axis_angle _ _ _ _ _ Hsc Hrxyz2) ].
 ...
-  apply (matrix_of_axis_angle_mul_mat_transp _ _ _ _ _ Hsc Hrxyz2).
-}
-apply (mat_det_matrix_of_unit_axis_angle _ _ _ _ _ Hsc Hrxyz2).
+apply (matrix_of_axis_angle_mul_mat_transp _ _ _ _ _ Hsc Hrxyz2).
+...
 Qed.
 
 Theorem mat_of_path_cons : ∀ e el,
