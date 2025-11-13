@@ -2101,7 +2101,28 @@ destruct m. {
   }
   ring.
 }
-cbn.
+destruct m; cbn. {
+  destruct n; [ ring | ].
+  destruct n. {
+    destruct o; [ ring | ].
+    destruct o; [ ring | ].
+    destruct o; [ ring | ].
+    destruct o; [ | ring ].
+    progress unfold mat_det.
+    ring.
+  }
+  destruct n; [ ring | ].
+  destruct n; [ | ring ].
+  progress unfold mat_det.
+  destruct o; [ ring | ].
+  destruct o; [ ring | ].
+  destruct o; [ ring | ].
+  destruct o; ring.
+}
+destruct m; [ | ring ].
+destruct n; [ ring | ].
+destruct n. {
+  destruct o; [ ring | ].
 ...
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
