@@ -2006,6 +2006,20 @@ Definition Levi_Civita_symbol i j k :=
   | _ => 0%L
   end.
 
+Definition mat_nth M i j :=
+  match (i, j) with
+  | (1, 1) => a₁₁ M
+  | (1, 2) => a₁₂ M
+  | (1, 3) => a₁₃ M
+  | (2, 1) => a₂₁ M
+  | (2, 2) => a₂₂ M
+  | (2, 3) => a₂₃ M
+  | (3, 1) => a₃₁ M
+  | (3, 2) => a₃₂ M
+  | (3, 3) => a₃₃ M
+  | _ => 0%L
+  end.
+
 Definition vec_nth '(V x y z) i :=
   match i with
   | 1 => x
@@ -2013,6 +2027,8 @@ Definition vec_nth '(V x y z) i :=
   | 3 => z
   | _ => 0%L
   end.
+
+Arguments vec_nth pat%_vec i%_nat.
 
 Theorem vec_cross_mul_from_Levi_Civita :
   ∀ u v,
@@ -2035,6 +2051,14 @@ Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
 Proof.
+destruct_ac.
+intros * (Ht, Hd).
+assert
+  (H1 :
+     ∀ i,
+     vec_nth (M * (u × v)) i =
+       ∑ (l = 1, 3), vec_nth (mat_nth M i l ⁎ (u × v)) l).
+...
 destruct_ac.
 intros * (Ht, Hd).
 rewrite vec_cross_mul_from_Levi_Civita.
