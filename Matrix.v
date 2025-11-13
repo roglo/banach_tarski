@@ -2030,6 +2030,22 @@ Definition vec_nth '(V x y z) i :=
 
 Arguments vec_nth pat%_vec i%_nat.
 
+Theorem vec_nth_cross_mul_from_Levi_Civita :
+  ∀ u v i,
+  vec_nth (u × v) i =
+    ∑ (j = 1, 3), ∑ (k = 1, 3),
+    Levi_Civita_symbol i j k * vec_nth u j * vec_nth v k.
+Proof.
+intros (u₁, u₂, u₃) (v₁, v₂, v₃); cbn.
+progress unfold iter_seq.
+progress unfold iter_list; cbn.
+destruct i; [ ring | ].
+destruct i; [ ring | ].
+destruct i; [ ring | ].
+destruct i; ring.
+Qed.
+
+(*
 Theorem vec_cross_mul_from_Levi_Civita :
   ∀ u v,
   u × v =
@@ -2045,6 +2061,20 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃); cbn.
 progress unfold iter_seq.
 progress unfold iter_list; cbn.
 f_equal; ring.
+Qed.
+*)
+
+Theorem vec_nth_mul_const_l :
+  ∀ k u i, vec_nth (k ⁎ u) i = (k * vec_nth u i)%L.
+Proof.
+destruct_ac.
+intros.
+destruct u as (u1, u2, u3).
+destruct i; cbn; [ symmetry; apply (rngl_mul_0_r Hos) | ].
+destruct i; [ easy | ].
+destruct i; [ easy | ].
+destruct i; [ easy | ].
+symmetry; apply (rngl_mul_0_r Hos).
 Qed.
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
@@ -2070,52 +2100,27 @@ assert
 }
 specialize (H1 (u × v)) as H2.
 assert
-  (H : ∀ i, vec_nth (M * (u × v)) i = ∑ (l = 1, 3), vec_nth (mat_nth M i l ⁎ (u × v)) l). {
+  (H :
+    ∀ i,
+    vec_nth (M * (u × v)) i =
+    ∑ (l = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
+    mat_nth M i l * Levi_Civita_symbol l j k * vec_nth u j * vec_nth v k). {
   intros.
-  remember (vec_nth (M * (u × v)) i) as x.
-  rewrite vec_cross_mul_from_Levi_Civita; subst x.
-...
-destruct_ac.
-intros * (Ht, Hd).
-rewrite vec_cross_mul_from_Levi_Civita.
-rewrite vec_cross_mul_from_Levi_Civita.
-progress unfold mat_vec_mul at 1.
-f_equal. {
-  progress unfold iter_seq.
-  progress unfold iter_list; cbn.
-  progress unfold vec_nth; cbn.
-  destruct u as (u₁, u₂, u₃).
-  destruct v as (v₁, v₂, v₃).
-  cbn.
-(**)
-  repeat rewrite (rngl_mul_0_l Hos).
-  repeat rewrite rngl_mul_1_l.
-  repeat rewrite rngl_add_0_l.
-  repeat rewrite rngl_add_0_r.
-  repeat rewrite (rngl_mul_opp_l Hop).
-  repeat rewrite rngl_mul_1_l.
-  repeat rewrite (rngl_add_opp_r Hop).
-  rewrite (rngl_add_opp_l Hop).
-...
-  ring_simplify.
-  do 2 rewrite (rngl_mul_comm Hic _ (a₁₃ M)).
-  do 2 rewrite (rngl_mul_comm Hic _ (a₁₂ M)).
-  do 4 rewrite (rngl_mul_comm Hic _ (a₃₂ M)).
-  do 4 rewrite (rngl_mul_comm Hic _ (a₃₁ M)).
-  do 4 rewrite (rngl_mul_comm Hic _ (a₃₃ M)).
-  ring_simplify.
-
-...
-Search (_ * _)%vec.
-Check ortho_mat_vec_dot_mul.
-...
-cbn - [ Levi_Civita_symbol ].
-destruct u as (u₁, u₂, u₃).
-destruct v as (v₁, v₂, v₃).
-progress unfold iter_seq.
-progress unfold iter_list; cbn.
-f_equal. {
-  ring_simplify.
+  rewrite H2.
+  apply rngl_summation_eq_compat.
+  intros l Hl.
+  rewrite vec_nth_mul_const_l.
+  rewrite vec_nth_cross_mul_from_Levi_Civita.
+  rewrite (rngl_mul_summation_distr_l Hos).
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  rewrite (rngl_mul_summation_distr_l Hos).
+  apply rngl_summation_eq_compat.
+  intros k Hk.
+  do 2 rewrite rngl_mul_assoc.
+  easy.
+}
+clear H2; rename H into H2.
 ...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
