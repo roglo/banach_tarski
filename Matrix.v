@@ -2072,6 +2072,38 @@ destruct i; [ ring | ].
 destruct i; ring.
 Qed.
 
+Theorem sum_LC_mat :
+  ∀ M m n o,
+  ∑ (i = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
+    Levi_Civita_symbol i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
+  (Levi_Civita_symbol m n o * mat_det M)%L.
+Proof.
+intros.
+progress unfold iter_seq.
+progress unfold iter_list.
+destruct m; [ destruct n; destruct o; cbn; ring | ].
+destruct m. {
+  destruct n; [ destruct o; cbn; ring | ].
+  destruct n; [ destruct o; cbn; ring | ].
+  destruct n. {
+    destruct o; cbn; [ ring | ].
+    destruct o; [ ring | ].
+    destruct o; [ ring | ].
+    progress unfold mat_det.
+    destruct o; ring.
+  }
+  destruct n; cbn. {
+    destruct o; [ ring | ].
+    destruct o; [ ring | ].
+    progress unfold mat_det.
+    destruct o; [ ring | ].
+    destruct o; ring.
+  }
+  ring.
+}
+cbn.
+...
+
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
