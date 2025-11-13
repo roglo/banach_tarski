@@ -2045,25 +2045,6 @@ destruct i; [ ring | ].
 destruct i; ring.
 Qed.
 
-(*
-Theorem vec_cross_mul_from_Levi_Civita :
-  ∀ u v,
-  u × v =
-    V
-      (∑ (j = 1, 3), ∑ (k = 1, 3),
-        Levi_Civita_symbol 1 j k * vec_nth u j * vec_nth v k)
-      (∑ (j = 1, 3), ∑ (k = 1, 3),
-        Levi_Civita_symbol 2 j k * vec_nth u j * vec_nth v k)
-      (∑ (j = 1, 3), ∑ (k = 1, 3),
-        Levi_Civita_symbol 3 j k * vec_nth u j * vec_nth v k).
-Proof.
-intros (u₁, u₂, u₃) (v₁, v₂, v₃); cbn.
-progress unfold iter_seq.
-progress unfold iter_list; cbn.
-f_equal; ring.
-Qed.
-*)
-
 Theorem vec_nth_mul_const_l :
   ∀ k u i, vec_nth (k ⁎ u) i = (k * vec_nth u i)%L.
 Proof.
@@ -2077,6 +2058,20 @@ destruct i; [ easy | ].
 symmetry; apply (rngl_mul_0_r Hos).
 Qed.
 
+Theorem vec_nth_mat_vec_mul :
+  ∀ M u i, vec_nth (M * u) i = ∑ (l = 1, 3), vec_nth (mat_nth M i l ⁎ u) l.
+Proof.
+intros.
+progress unfold iter_seq.
+progress unfold iter_list.
+progress unfold mat_vec_mul.
+destruct u as (x, y, z); cbn.
+destruct i; [ ring | ].
+destruct i; [ ring | ].
+destruct i; [ ring | ].
+destruct i; ring.
+Qed.
+
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
@@ -2085,28 +2080,12 @@ destruct_ac.
 intros * (Ht, Hd).
 assert
   (H1 :
-     ∀ u i,
-     vec_nth (M * u) i = ∑ (l = 1, 3), vec_nth (mat_nth M i l ⁎ u) l). {
-  clear u.
-  intros u i.
-  progress unfold iter_seq.
-  progress unfold iter_list.
-  progress unfold mat_vec_mul.
-  destruct u as (x, y, z); cbn.
-  destruct i; [ ring | ].
-  destruct i; [ ring | ].
-  destruct i; [ ring | ].
-  destruct i; ring.
-}
-specialize (H1 (u × v)) as H2.
-assert
-  (H :
     ∀ i,
     vec_nth (M * (u × v)) i =
     ∑ (l = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
     mat_nth M i l * Levi_Civita_symbol l j k * vec_nth u j * vec_nth v k). {
   intros.
-  rewrite H2.
+  rewrite (vec_nth_mat_vec_mul M (u × v)).
   apply rngl_summation_eq_compat.
   intros l Hl.
   rewrite vec_nth_mul_const_l.
@@ -2120,7 +2099,6 @@ assert
   do 2 rewrite rngl_mul_assoc.
   easy.
 }
-clear H2; rename H into H2.
 ...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
