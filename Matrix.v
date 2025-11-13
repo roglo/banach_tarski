@@ -2038,6 +2038,18 @@ Proof.
 intros * (Ht, Hd).
 rewrite vec_cross_mul_from_Levi_Civita.
 rewrite vec_cross_mul_from_Levi_Civita.
+progress unfold mat_vec_mul at 1.
+f_equal. {
+  progress unfold iter_seq.
+  progress unfold iter_list; cbn.
+  progress unfold vec_nth; cbn.
+  destruct u as (u₁, u₂, u₃).
+  destruct v as (v₁, v₂, v₃).
+  cbn.
+  ring_simplify.
+(* ouais chais pas *)
+...
+Search (_ * _)%vec.
 Check ortho_mat_vec_dot_mul.
 ...
 cbn - [ Levi_Civita_symbol ].
