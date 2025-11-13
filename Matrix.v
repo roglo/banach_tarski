@@ -2069,6 +2069,11 @@ assert
   destruct i; ring.
 }
 specialize (H1 (u × v)) as H2.
+assert
+  (H : ∀ i, vec_nth (M * (u × v)) i = ∑ (l = 1, 3), vec_nth (mat_nth M i l ⁎ (u × v)) l). {
+  intros.
+  remember (vec_nth (M * (u × v)) i) as x.
+  rewrite vec_cross_mul_from_Levi_Civita; subst x.
 ...
 destruct_ac.
 intros * (Ht, Hd).
