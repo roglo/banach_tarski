@@ -2105,7 +2105,7 @@ assert
     vec_nth ((M * u) × (M * v)) i =
     ∑ (j = 1, 3), ∑ (k = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3),
     Levi_Civita_symbol i j k *
-      mat_nth M j n * vec_nth u m *
+      mat_nth M j m * vec_nth u m *
       mat_nth M k n * vec_nth v n). {
   intros.
   rewrite vec_nth_cross_mul_from_Levi_Civita.
@@ -2113,20 +2113,19 @@ assert
   intros j Hj.
   apply rngl_summation_eq_compat.
   intros k Hk.
-...
-  rewrite (vec_nth_mat_vec_mul M (u × v)).
-  apply rngl_summation_eq_compat.
-  intros l Hl.
-  rewrite vec_nth_mul_const_l.
-  rewrite vec_nth_cross_mul_from_Levi_Civita.
+  do 2 rewrite vec_nth_mat_vec_mul.
   rewrite (rngl_mul_summation_distr_l Hos).
+  rewrite rngl_summation_summation_exch.
   apply rngl_summation_eq_compat.
-  intros j Hj.
+  intros m Hm.
   rewrite (rngl_mul_summation_distr_l Hos).
+  rewrite (rngl_mul_summation_distr_r Hos).
   apply rngl_summation_eq_compat.
-  intros k Hk.
+  intros n Hn.
+  do 2 rewrite vec_nth_mul_const_l.
   do 2 rewrite rngl_mul_assoc.
   easy.
+}
 ...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
