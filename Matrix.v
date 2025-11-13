@@ -2055,9 +2055,20 @@ destruct_ac.
 intros * (Ht, Hd).
 assert
   (H1 :
-     ∀ i,
-     vec_nth (M * (u × v)) i =
-       ∑ (l = 1, 3), vec_nth (mat_nth M i l ⁎ (u × v)) l).
+     ∀ u i,
+     vec_nth (M * u) i = ∑ (l = 1, 3), vec_nth (mat_nth M i l ⁎ u) l). {
+  clear u.
+  intros u i.
+  progress unfold iter_seq.
+  progress unfold iter_list.
+  progress unfold mat_vec_mul.
+  destruct u as (x, y, z); cbn.
+  destruct i; [ ring | ].
+  destruct i; [ ring | ].
+  destruct i; [ ring | ].
+  destruct i; ring.
+}
+specialize (H1 (u × v)) as H2.
 ...
 destruct_ac.
 intros * (Ht, Hd).
