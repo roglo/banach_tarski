@@ -2035,6 +2035,7 @@ Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
 Proof.
+destruct_ac.
 intros * (Ht, Hd).
 rewrite vec_cross_mul_from_Levi_Civita.
 rewrite vec_cross_mul_from_Levi_Civita.
@@ -2046,8 +2047,24 @@ f_equal. {
   destruct u as (u₁, u₂, u₃).
   destruct v as (v₁, v₂, v₃).
   cbn.
+(**)
+  repeat rewrite (rngl_mul_0_l Hos).
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite rngl_add_0_l.
+  repeat rewrite rngl_add_0_r.
+  repeat rewrite (rngl_mul_opp_l Hop).
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite (rngl_add_opp_r Hop).
+  rewrite (rngl_add_opp_l Hop).
+...
   ring_simplify.
-(* ouais chais pas *)
+  do 2 rewrite (rngl_mul_comm Hic _ (a₁₃ M)).
+  do 2 rewrite (rngl_mul_comm Hic _ (a₁₂ M)).
+  do 4 rewrite (rngl_mul_comm Hic _ (a₃₂ M)).
+  do 4 rewrite (rngl_mul_comm Hic _ (a₃₁ M)).
+  do 4 rewrite (rngl_mul_comm Hic _ (a₃₃ M)).
+  ring_simplify.
+
 ...
 Search (_ * _)%vec.
 Check ortho_mat_vec_dot_mul.
