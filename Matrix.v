@@ -2221,13 +2221,36 @@ assert
     ∑ (m = 1, 3), ∑ (n = 1, 3),
       Levi_Civita_symbol i m n * mat_nth M j m * mat_nth M k n). {
   intros.
-...
   erewrite rngl_summation_eq_compat. 2: {
     intros l Hl.
     rewrite <- H3.
+    rewrite (rngl_mul_summation_distr_l Hos).
+    erewrite rngl_summation_eq_compat. 2: {
+      intros.
+      rewrite (rngl_mul_summation_distr_l Hos).
+      erewrite rngl_summation_eq_compat. 2: {
+        intros.
+        rewrite (rngl_mul_summation_distr_l Hos).
+        erewrite rngl_summation_eq_compat. 2: {
+          intros.
+          do 3 rewrite rngl_mul_assoc.
+          reflexivity.
+        }
+        reflexivity.
+      }
+      reflexivity.
+    }
     reflexivity.
   }
   cbn - [ mat_nth Levi_Civita_symbol ].
+  remember
+    (∑ (l = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3), _) as x.
+  subst x.
+...
+  erewrite rngl_summation_eq_compat. 2: {
+    intros l Hl.
+    apply (f_equal (rngl_mul (mat_nth M i l))) in H3.
+    rewrite <- H3.
 ...
 assert
   (H4 :
