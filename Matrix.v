@@ -2339,10 +2339,27 @@ erewrite rngl_summation_eq_compat. 2: {
   reflexivity.
 }
 cbn - [ mat_nth Levi_Civita_symbol ].
-...
-  rewrite rngl_summation_summation_exch.
 erewrite rngl_summation_eq_compat. 2: {
   intros.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    rewrite rngl_summation_summation_exch.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros.
+      rewrite rngl_summation_summation_exch.
+      erewrite rngl_summation_eq_compat. 2: {
+        intros.
+        rewrite <- (rngl_mul_summation_distr_r Hos).
+        reflexivity.
+      }
+      reflexivity.
+    }
+    reflexivity.
+  }
+  reflexivity.
+}
+cbn - [ mat_nth Levi_Civita_symbol ].
+...
   rewrite rngl_summation_summation_exch.
 erewrite rngl_summation_eq_compat. 2: {
   intros.
