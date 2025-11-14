@@ -2302,6 +2302,54 @@ erewrite rngl_summation_eq_compat. 2: {
   reflexivity.
 }
 cbn - [ mat_nth Levi_Civita_symbol ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  rewrite rngl_summation_summation_exch.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros.
+      rewrite rngl_summation_summation_exch.
+      erewrite rngl_summation_eq_compat. 2: {
+        intros.
+        rewrite rngl_summation_summation_exch.
+        erewrite rngl_summation_eq_compat. 2: {
+          intros.
+          erewrite rngl_summation_eq_compat. 2: {
+            intros.
+            do 4 rewrite <- rngl_mul_assoc.
+            do 2 rewrite rngl_mul_assoc.
+            remember (_ * _ * Levi_Civita_symbol _ _ _)%L as x.
+            rewrite (rngl_mul_assoc (mat_nth _ _ _)).
+            rewrite (rngl_mul_assoc (mat_nth _ _ _ * _)).
+            subst x.
+            reflexivity.
+          }
+          cbn - [ mat_nth Levi_Civita_symbol ].
+          rewrite <- (rngl_mul_summation_distr_r Hos).
+          reflexivity.
+        }
+        cbn - [ mat_nth Levi_Civita_symbol ].
+        reflexivity.
+      }
+      reflexivity.
+    }
+    reflexivity.
+  }
+  reflexivity.
+}
+cbn - [ mat_nth Levi_Civita_symbol ].
+...
+  rewrite rngl_summation_summation_exch.
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  rewrite rngl_summation_summation_exch.
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  rewrite rngl_summation_summation_exch.
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  rewrite rngl_summation_summation_exch.
 ...
       erewrite rngl_summation_eq_compat. 2: {
         intros.
