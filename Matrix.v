@@ -2204,6 +2204,40 @@ assert
   do 2 rewrite rngl_mul_assoc.
   easy.
 }
+assert
+  (H3 :
+    ∀ m n o,
+    ∑ (i = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
+    Levi_Civita_symbol i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
+    Levi_Civita_symbol m n o). {
+  intros.
+  specialize (sum_Levi_Civita_symbol_mat M m n o) as H3.
+  now rewrite Hd, rngl_mul_1_r in H3.
+}
+assert
+  (H4 :
+    ∀ i j k,
+    ∑ (l = 1, 3), mat_nth M i l * Levi_Civita_symbol l j k =
+    ∑ (m = 1, 3), ∑ (n = 1, 3),
+      Levi_Civita_symbol i m n * mat_nth M j m * mat_nth M k n). {
+  intros.
+...
+  erewrite rngl_summation_eq_compat. 2: {
+    intros l Hl.
+    rewrite <- H3.
+    reflexivity.
+  }
+  cbn - [ mat_nth Levi_Civita_symbol ].
+...
+assert
+  (H4 :
+    ∀ i,
+    vec_nth (M * (u × v)) i =
+    ∑ (m = 1, 3), ∑ (n = 1, 3),
+    Levi_Civita_symbol m n i * vec_nth u m * vec_nth v n). {
+  intros.
+  rewrite H1.
+...
 apply vector_ext.
 intros i.
 specialize (H1 i).
