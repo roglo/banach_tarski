@@ -2138,6 +2138,18 @@ destruct n. {
 destruct n; ring.
 Qed.
 
+Theorem vector_ext : ∀ u v, u = v ↔ ∀ i, vec_nth u i = vec_nth v i.
+Proof.
+intros.
+split; intros Huv; [ now subst | ].
+destruct u as (u1, u2, u3).
+destruct v as (v1, v2, v3).
+f_equal.
+now specialize (Huv 1); cbn in Huv.
+now specialize (Huv 2); cbn in Huv.
+now specialize (Huv 3); cbn in Huv.
+Qed.
+
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
@@ -2192,8 +2204,40 @@ assert
   do 2 rewrite rngl_mul_assoc.
   easy.
 }
+apply vector_ext.
+intros i.
+specialize (H1 i).
+specialize (H2 i).
+rewrite H1, H2.
+specialize (sum_Levi_Civita_symbol_mat M) as H3.
+...
+apply rngl_summation_eq_compat.
+intros j Hj.
+apply rngl_summation_eq_compat.
+intros k Hk.
+apply rngl_summation_eq_compat.
+intros l Hl.
+erewrite rngl_summation_eq_compat. 2: {
+  intros m Hm.
+  rewrite <- rngl_mul_assoc.
+  reflexivity.
+}
+cbn - [ mat_nth vec_nth Levi_Civita_symbol ].
+rewrite <- (rngl_mul_summation_distr_l Hos).
+rewrite (rngl_mul_comm Hic (mat_nth M i j)).
+do 4 rewrite <- rngl_mul_assoc.
+progress f_equal.
 specialize (sum_Levi_Civita_symbol_mat M) as H3.
 rewrite Hd in H3.
+specialize (H3 j k l).
+rewrite rngl_mul_1_r in H3.
+rewrite <- H3.
+rewrite (rngl_mul_summation_distr_l Hos).
+rewrite (rngl_mul_summation_distr_r Hos).
+rewrite (rngl_mul_summation_distr_r Hos).
+apply rngl_summation_eq_compat.
+intros m Hm.
+...
 assert
   (H :
     ∀ i,
