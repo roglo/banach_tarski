@@ -2072,7 +2072,7 @@ destruct i; [ ring | ].
 destruct i; ring.
 Qed.
 
-Theorem sum_LC_mat :
+Theorem sum_Levi_Civita_symbol_mat :
   ∀ M m n o,
   ∑ (i = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
     Levi_Civita_symbol i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
@@ -2123,7 +2123,20 @@ destruct m; [ | ring ].
 destruct n; [ ring | ].
 destruct n. {
   destruct o; [ ring | ].
-...
+  destruct o; [ ring | ].
+  progress unfold mat_det.
+  destruct o; [ ring | ].
+  destruct o; ring.
+}
+destruct n. {
+  destruct o; [ ring | ].
+  progress unfold mat_det.
+  destruct o; [ ring | ].
+  destruct o; [ ring | ].
+  destruct o; ring.
+}
+destruct n; ring.
+Qed.
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
@@ -2179,6 +2192,31 @@ assert
   do 2 rewrite rngl_mul_assoc.
   easy.
 }
+specialize (sum_Levi_Civita_symbol_mat M) as H3.
+rewrite Hd in H3.
+assert
+  (H :
+    ∀ i,
+    vec_nth (M * (u × v)) i =
+    ∑ (l = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
+    mat_nth M i l * Levi_Civita_symbol l j k * vec_nth u j * vec_nth v k). {
+  intros.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros l Hl.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      erewrite rngl_summation_eq_compat. 2: {
+        intros k Hk.
+        specialize (H3 l j k) as H.
+        rewrite rngl_mul_1_r in H.
+        rewrite <- H.
+        reflexivity.
+      }
+      reflexivity.
+    }
+    reflexivity.
+  }
+  cbn - [ vec_nth mat_nth Levi_Civita_symbol ].
 ...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
