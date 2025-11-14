@@ -2214,6 +2214,66 @@ assert
   specialize (sum_Levi_Civita_symbol_mat M m n o) as H3.
   now rewrite Hd, rngl_mul_1_r in H3.
 }
+(**)
+apply vector_ext.
+intros i.
+rewrite H1.
+erewrite rngl_summation_eq_compat. 2: {
+  intros l Hl.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros k Hk.
+      rewrite <- H3.
+      rewrite (rngl_mul_summation_distr_l Hos).
+      erewrite rngl_summation_eq_compat. 2: {
+        intros.
+        rewrite (rngl_mul_summation_distr_l Hos).
+        erewrite rngl_summation_eq_compat. 2: {
+          intros.
+          rewrite (rngl_mul_summation_distr_l Hos).
+          reflexivity.
+        }
+        reflexivity.
+      }
+      reflexivity.
+    }
+    reflexivity.
+  }
+  reflexivity.
+}
+cbn - [ mat_nth Levi_Civita_symbol ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros.
+      rewrite rngl_summation_summation_exch.
+      erewrite rngl_summation_eq_compat. 2: {
+        intros.
+        rewrite rngl_summation_summation_exch.
+        erewrite rngl_summation_eq_compat. 2: {
+          intros.
+          replace (∑ (j = _, _), _) with
+            (mat_nth M i i0 *
+               (Levi_Civita_symbol i i3 i4 * mat_nth M i i0 * mat_nth M i3 i1 *
+               mat_nth M i4 i2))%L. 2: {
+            progress unfold iter_seq.
+            progress unfold iter_list.
+            cbn - [ mat_nth Levi_Civita_symbol ].
+            rewrite rngl_add_0_l.
+            destruct (Nat.eq_dec i 1) as [H1i| H1i]. {
+              subst i.
+              symmetry.
+              rewrite <- rngl_add_assoc.
+              apply (rngl_add_move_l Hop).
+              rewrite (rngl_sub_diag Hos).
+...
+          erewrite rngl_summation_eq_compat. 2: {
+            intros.
+
+...
 assert
   (H4 :
     ∀ i j k,
