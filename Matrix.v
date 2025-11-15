@@ -2215,6 +2215,51 @@ assert
   now rewrite Hd, rngl_mul_1_r in H3.
 }
 (**)
+assert
+  (H4 :
+    ∀ i j k,
+    ∑ (l = 1, 3), mat_nth M i l *  Levi_Civita_symbol l j k =
+    ∑ (m = 1, 3), ∑ (n = 1, 3),
+      Levi_Civita_symbol i m n * mat_nth M j m * mat_nth M k n). {
+  intros.
+  specialize (H3 i j k) as H.
+  remember (∑ (m = _, _), ∑ (n = _, _), ∑ (o = _, _), _) as x in H.
+  subst x.
+  enough
+    (H' :
+      ∀ l,
+      ∑ (i = 1, 3), mat_nth M i l * Levi_Civita_symbol l j k =
+      ∑ (i = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3),
+        mat_nth M i l * Levi_Civita_symbol m n o * mat_nth M m i *
+          mat_nth M n j * mat_nth M o k). {
+    assert
+      (H'' :
+        ∀ l,
+        ∑ (i = 1, 3), mat_nth M i l * Levi_Civita_symbol l j k =
+        ∑ (m = 1, 3),
+          (∑ (i = 1, 3), mat_nth M i l * mat_nth M m i) *
+          (∑ (n = 1, 3), ∑ (o = 1, 3),
+            Levi_Civita_symbol m n o * mat_nth M n j * mat_nth M o k)). {
+      intros.
+      rewrite H'.
+      rewrite rngl_summation_summation_exch.
+      apply rngl_summation_eq_compat.
+      intros m Hm.
+      rewrite (rngl_mul_summation_distr_r Hos).
+      apply rngl_summation_eq_compat.
+      intros p Hp.
+      rewrite (rngl_mul_summation_distr_l Hos).
+      apply rngl_summation_eq_compat.
+      intros q Hq.
+      rewrite (rngl_mul_summation_distr_l Hos).
+      apply rngl_summation_eq_compat.
+      intros r Hr.
+      ring.
+    }
+    clear H'; rename H'' into H'.
+...
+  apply (f_equal (rngl_mul (mat_nth M i l))) in H.
+...
 apply vector_ext.
 intros i.
 rewrite H1.
