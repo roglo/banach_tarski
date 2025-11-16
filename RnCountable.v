@@ -78,7 +78,7 @@ destruct (u i). {
     apply (rngl_div_nonneg Hop Hiv Hor); [ easy | ].
     apply (rngl_lt_le_trans Hor _ 1).
     apply (rngl_0_lt_1 Hos Hc1 Hor).
-    apply (rngl_le_add_l Hor).
+    apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_2 Hos Hor).
   }
   rewrite <- (@Rdiv_mult_simpl_r _ _ _ ac pow 2 3)%L; [ | easy | easy ].
@@ -97,7 +97,7 @@ eapply (rngl_le_trans Hor); [ apply IHk | ]. {
   apply (rngl_div_nonneg Hop Hiv Hor); [ easy | ].
   apply (rngl_lt_le_trans Hor _ 1).
   apply (rngl_0_lt_1 Hos Hc1 Hor).
-  apply (rngl_le_add_l Hor).
+  apply (rngl_le_add_l Hos Hor).
   apply (rngl_0_le_2 Hos Hor).
 }
 apply (rngl_div_le_mono_pos_r Hop Hiv Hor).
@@ -105,11 +105,11 @@ apply (rngl_0_lt_2 Hos Hc1 Hor).
 apply (rngl_le_div_l Hop Hiv Hor).
 apply (rngl_lt_le_trans Hor _ 1).
 apply (rngl_0_lt_1 Hos Hc1 Hor).
-apply (rngl_le_add_l Hor).
+apply (rngl_le_add_l Hos Hor).
 apply (rngl_0_le_2 Hos Hor).
 rewrite rngl_mul_add_distr_l.
 rewrite rngl_mul_1_r.
-apply (rngl_le_add_l Hor).
+apply (rngl_le_add_l Hos Hor).
 apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
 apply (rngl_0_le_2 Hos Hor).
 Qed.
@@ -253,7 +253,7 @@ destruct (le_dec k n) as [Hkn| Hkn]. {
   }
   subst n.
   rewrite partial_sum3_aux_add, Nat.add_0_l, <- rngl_add_assoc.
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_le_0_add Hos Hor); [ | apply Hzi ].
   apply partial_sum3_aux_nonneg.
   apply (rngl_div_nonneg Hop Hiv Hor).
@@ -269,7 +269,7 @@ assert (Hn : (k = n + nk)%nat). {
 }
 subst k; clear Hnk Hkn; rename nk into k.
 rewrite partial_sum3_aux_add, Nat.add_0_l.
-apply (rngl_add_le_mono_l Hor).
+apply (rngl_add_le_mono_l Hos Hor).
 revert n.
 induction k; intros; simpl; [ apply Hzi | ].
 remember (u n) as b eqn:Hb; symmetry in Hb.
@@ -325,7 +325,7 @@ replace (1 / 3 ^ n / 3)%L with (1 / (3 ^ S n))%L. {
   apply (rngl_pow_pos_pos Hop Hiv Hor).
   apply (rngl_0_lt_3 Hos Hc1 Hor).
   rewrite (rngl_div_diag Hiq).
-  apply (rngl_le_add_l Hor).
+  apply (rngl_le_add_l Hos Hor).
   apply (rngl_0_le_2 Hos Hor).
   apply (rngl_pow_neq_0 Hos Hiq).
   apply (rngl_3_neq_0 Hos Hc1 Hor).

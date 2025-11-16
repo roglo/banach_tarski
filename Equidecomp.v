@@ -6,7 +6,7 @@ From Stdlib Require Import Utf8 Arith List Relations.
 From Stdlib Require Import Reals.Rdefinitions.
 Import ListNotations.
 
-Require Import Misc Matrix Pset.
+Require Import a.Misc a.Matrix a.Pset.
 Require Import Partition OrbitRepr GroupTransf.
 
 Definition equidecomposable E₁ E₂ :=
