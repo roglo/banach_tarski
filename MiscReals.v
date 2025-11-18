@@ -818,7 +818,7 @@ destruct a as [a| a| ]; [ | | easy ]. {
   apply rngl_nle_gt in H1.
   exfalso; apply H1; clear H1.
   rewrite <- Ha1.
-  apply (rngl_le_add_r Hos Hto).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   apply (rngl_0_le_2 Hos Hto).
   apply (rngl_of_nat_nonneg Hos Hor).
@@ -1040,7 +1040,7 @@ induction a as [a| a| ]; intros. {
       rewrite rngl_add_0_l.
       rewrite rngl_mul_add_distr_l, rngl_mul_1_r.
       rewrite <- rngl_add_assoc.
-      apply (rngl_le_add_r Hto).
+      apply (rngl_le_add_r Hor).
       apply (rngl_le_0_add Hos Hto).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_mul_nonneg_nonneg Hos Hor).
@@ -1061,7 +1061,7 @@ induction a as [a| a| ]; intros. {
     apply Pos.compare_cont_Lt_not_Gt in Hab.
     rewrite rngl_of_pos_xI, rngl_of_pos_xO.
     eapply (rngl_le_trans Hor). 2: {
-      apply (rngl_le_add_r Hos Hto).
+      apply (rngl_le_add_r Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
     }
     apply (rngl_mul_le_mono_nonneg_l Hop Hto).
@@ -1162,7 +1162,7 @@ destruct j. {
   apply H1; clear H1.
   apply (roc_mono_l _ b); [ easy | ].
   apply (roc_mono_r _ 1%L); [ easy | ].
-  apply (rngl_le_add_r Hos Hto).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_of_nat_nonneg Hos Hor).
 }
 apply -> Nat.succ_le_mono.
@@ -1930,7 +1930,7 @@ rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
 eapply (rngl_lt_le_trans Hto).
 apply Hm.
-apply (rngl_le_add_r Hos Hto).
+apply (rngl_le_add_r Hos Hor).
 now apply (rngl_le_0_sub Hop Hto).
 Qed.
 

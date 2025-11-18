@@ -253,7 +253,7 @@ destruct (le_dec k n) as [Hkn| Hkn]. {
   }
   subst n.
   rewrite partial_sum3_aux_add, Nat.add_0_l, <- rngl_add_assoc.
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_le_0_add Hos Hto); [ | apply Hzi ].
   apply partial_sum3_aux_nonneg.
   apply (rngl_div_nonneg Hop Hiv Hto).
@@ -451,7 +451,7 @@ rewrite (rngl_mul_inv_r Hiv).
 rewrite <- (rngl_div_add_distr_r Hiv); cbn.
 rewrite <- (rngl_div_div Hos Hiv).
 rewrite (rngl_div_div_swap Hic Hiv).
-apply (rngl_div_lt_mono_pos_r Hop Hiv Hor).
+apply (rngl_div_lt_mono_pos_r Hop Hiv Hto).
 apply (rngl_pow_pos_pos Hop Hiv Hto).
 apply (rngl_0_lt_3 Hos Hc1 Hor).
 apply (rngl_lt_div_l Hop Hiv Hto).

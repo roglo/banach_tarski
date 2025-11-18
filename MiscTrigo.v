@@ -109,7 +109,7 @@ destruct xz. {
     apply (rngl_lt_0_add Hto).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
     apply (rngl_squ_nonneg Hos Hto).
-    apply (rngl_div_le_1 Hop Hiv Hor).
+    apply (rngl_div_le_1 Hop Hiv Hto).
     rewrite rngl_squ_1.
     intros H.
     apply (eq_rl_sqrt_0 Hos) in H. 2: {
@@ -175,7 +175,7 @@ destruct xz. {
       apply rl_sqrt_nonneg.
       apply (rngl_le_trans Hor _ 1).
       apply (rngl_0_le_1 Hos Hto).
-      apply (rngl_le_add_r Hto).
+      apply (rngl_le_add_r Hor).
       apply (rngl_squ_nonneg Hos Hto).
       intros H1.
       apply (eq_rl_sqrt_0 Hos) in H1. 2: {
@@ -200,7 +200,7 @@ destruct xz. {
     now rewrite (rngl_sub_diag Hos) in H.
     apply (rngl_le_trans Hor _ 1).
     apply (rngl_0_le_1 Hos Hto).
-    apply (rngl_le_add_r Hto).
+    apply (rngl_le_add_r Hor).
     apply (rngl_squ_nonneg Hos Hto).
     intros H1.
     apply (eq_rl_sqrt_0 Hos) in H1. 2: {
@@ -224,7 +224,7 @@ destruct xz. {
   apply (rl_sqrt_pos Hos Hto).
   apply (rngl_lt_le_trans Hto _ 1).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_squ_nonneg Hos Hto).
 } {
   right.
@@ -245,7 +245,7 @@ destruct xz. {
     apply (rngl_lt_0_add Hto).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
     apply (rngl_squ_nonneg Hos Hto).
-    apply (rngl_div_le_1 Hop Hiv Hor).
+    apply (rngl_div_le_1 Hop Hiv Hto).
     rewrite rngl_squ_1.
     intros H.
     apply (eq_rl_sqrt_0 Hos) in H. 2: {
@@ -333,7 +333,7 @@ destruct xz. {
     now rewrite (rngl_sub_diag Hos) in H.
     apply (rngl_le_trans Hor _ 1).
     apply (rngl_0_le_1 Hos Hto).
-    apply (rngl_le_add_r Hto).
+    apply (rngl_le_add_r Hor).
     apply (rngl_squ_nonneg Hos Hto).
     intros H1.
     apply (eq_rl_sqrt_0 Hos) in H1. 2: {
@@ -357,7 +357,7 @@ destruct xz. {
   apply (rl_sqrt_pos Hos Hto).
   apply (rngl_lt_le_trans Hto _ 1).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_squ_nonneg Hos Hto).
 }
 Qed.
@@ -437,7 +437,7 @@ Proof.
 intros Hos Hiq Hc1 Hor *.
 apply (rngl_lt_le_trans Hto _ 1).
 apply (rngl_0_lt_1 Hos Hc1 Hto).
-apply (rngl_le_add_r Hto).
+apply (rngl_le_add_r Hor).
 apply (rngl_squ_nonneg Hos Hto).
 Qed.
 
@@ -712,7 +712,7 @@ assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
 }
 assert (Hz1t : (0 ≤ 1 + rngl_tan² θ)%L). {
   apply (rngl_le_trans Hor _ 1); [ easy | ].
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_squ_nonneg Hos Hto).
 }
 assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
@@ -819,7 +819,7 @@ assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
 }
 assert (Hz1t : (0 ≤ 1 + rngl_tan² θ)%L). {
   apply (rngl_le_trans Hor _ 1); [ easy | ].
-  apply (rngl_le_add_r Hto).
+  apply (rngl_le_add_r Hor).
   apply (rngl_squ_nonneg Hos Hto).
 }
 assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
@@ -1184,7 +1184,7 @@ specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros s c Hsc.
 apply (rngl_squ_le_1_iff Hop Hiq Hto).
 rewrite <- Hsc.
-apply (rngl_le_add_r Hto).
+apply (rngl_le_add_r Hor).
 apply (rngl_squ_nonneg Hos Hto).
 Qed.
 
