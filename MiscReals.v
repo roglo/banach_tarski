@@ -703,7 +703,7 @@ exists (- Z.of_nat (n + 1))%Z.
 rewrite rngl_of_Z_opp.
 rewrite rngl_of_Z_of_nat.
 split. {
-  apply (rngl_opp_le_compat Hop Hor).
+  apply (rngl_opp_le_compat Hop Hto).
   rewrite (rngl_opp_involutive Hop).
   now apply (rngl_lt_le_incl Hto).
 } {
@@ -1104,14 +1104,14 @@ destruct a as [| a| a]. {
   apply rngl_nlt_ge in Hab.
   apply Hab; clear Hab; cbn.
   apply (rngl_le_lt_trans Hto _ 0); [ | apply rngl_of_pos_pos ].
-  apply (rngl_opp_le_compat Hop Hor).
+  apply (rngl_opp_le_compat Hop Hto).
   rewrite (rngl_opp_0 Hop), (rngl_opp_involutive Hop).
   apply (rngl_lt_le_incl Hto).
   apply rngl_of_pos_pos.
 } {
   destruct b as [| b| b]; cbn; [ easy | easy | ].
   cbn in Hab.
-  apply (rngl_opp_le_compat Hop Hor) in Hab.
+  apply (rngl_opp_le_compat Hop Hto) in Hab.
   apply Z.opp_le_mono; cbn.
   progress unfold rngl_of_pos in Hab.
   apply (rngl_of_nat_inj_le Hos Hc1 Hto) in Hab.
@@ -1521,7 +1521,7 @@ destruct n as [| n| n]. {
         rewrite (rngl_opp_involutive Hop).
         now apply (rngl_lt_sub_lt_add_r Hop Hto).
       } {
-        apply (rngl_opp_le_compat Hop Hor).
+        apply (rngl_opp_le_compat Hop Hto).
         rewrite (rngl_opp_involutive Hop).
         apply (rngl_le_add_le_sub_r Hop Hto).
         rewrite rngl_of_pos_add.
@@ -1535,7 +1535,7 @@ destruct n as [| n| n]. {
         rewrite (rngl_opp_involutive Hop).
         now apply (rngl_lt_sub_lt_add_r Hop Hto).
       } {
-        apply (rngl_opp_le_compat Hop Hor).
+        apply (rngl_opp_le_compat Hop Hto).
         rewrite (rngl_opp_involutive Hop).
         apply (rngl_le_add_le_sub_r Hop Hto).
         rewrite rngl_of_pos_add.
@@ -1684,7 +1684,7 @@ destruct q as [| q| q]; [ easy | | ]. {
   now destruct p, q.
 }
 apply (rngl_le_trans Hor _ 0); [ | easy ].
-apply (rngl_opp_le_compat Hop Hor).
+apply (rngl_opp_le_compat Hop Hto).
 rewrite (rngl_opp_0 Hop).
 rewrite (rngl_opp_involutive Hop).
 apply rngl_of_pos_nonneg.
@@ -1853,7 +1853,7 @@ apply Z.eq_opp_r.
 apply (Int_part_prop a); [ | easy ].
 rewrite rngl_of_Z_opp.
 destruct Hma as (H1, H2).
-apply (rngl_opp_le_compat Hon Hop Hiq Hor) in H1.
+apply (rngl_opp_le_compat Hon Hop Hiq Hto) in H1.
 rewrite (rngl_opp_involutive Hop) in H1.
 split. {
 ...
@@ -2390,7 +2390,7 @@ destruct z as [| q| q]. {
   rewrite rngl_of_Z_1 in Hz.
   cbn in Hz.
   destruct Hz as (H1, H2).
-  apply (rngl_opp_le_compat Hop Hor) in H1.
+  apply (rngl_opp_le_compat Hop Hto) in H1.
   rewrite (rngl_add_opp_l Hop) in H2.
   rewrite <- (rngl_opp_sub_distr Hop) in H2.
   apply (rngl_opp_lt_compat Hop Hto) in H2.
@@ -2453,7 +2453,7 @@ rewrite Z.sub_diag.
 rewrite (Z.sub_0_l z).
 do 2 rewrite rngl_of_Z_opp.
 destruct Hz as (H1, H2).
-apply (rngl_opp_le_compat Hop Hor) in H1.
+apply (rngl_opp_le_compat Hop Hto) in H1.
 apply (rngl_opp_lt_compat Hop Hto) in H2.
 rewrite (rngl_opp_involutive Hop) in H1, H2.
 split; [ now apply (rngl_lt_le_incl Hto) | ].
@@ -2473,7 +2473,7 @@ destruct z as [| p| p]; cbn. {
   destruct (rngl_leb_dec 0 (- _)) as [Hzp| Hzp]. {
     apply rngl_leb_le in Hzp.
     exfalso.
-    apply (rngl_opp_le_compat Hop Hor) in Hzp.
+    apply (rngl_opp_le_compat Hop Hto) in Hzp.
     rewrite (rngl_opp_involutive Hop) in Hzp.
     rewrite (rngl_opp_0 Hop) in Hzp.
     apply rngl_nlt_ge in Hzp.
