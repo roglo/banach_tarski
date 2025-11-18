@@ -312,7 +312,7 @@ destruct xz. {
       apply rngl_leb_le in Hzxs.
       apply rngl_nlt_ge in Hzxs.
       apply Hzxs; clear Hzxs.
-      apply (rngl_div_pos Hop Hiv Hor); [ easy | ].
+      apply (rngl_div_pos Hop Hiv Hto); [ easy | ].
       apply (rl_sqrt_pos Hos Hor).
       apply (rngl_lt_trans Hor _ 1).
       apply (rngl_0_lt_1 Hos Hc1 Hto).
@@ -473,7 +473,7 @@ specialize (rl_sqrt_add_1_squ_neq_0 Hos Hiq Hc1 Hor a) as Hs1a2.
 apply (rngl_squ_le_1_iff Hop Hiq Hto).
 rewrite (rngl_squ_div Hic Hos Hiv); [ | easy ].
 rewrite rngl_squ_sqrt; [ | now apply (rngl_lt_le_incl Hor) ].
-apply (rngl_le_div_l Hop Hiv Hor); [ easy | ].
+apply (rngl_le_div_l Hop Hiv Hto); [ easy | ].
 rewrite rngl_mul_1_l.
 apply (rngl_le_add_l Hos Hor).
 apply (rngl_0_le_1 Hos Hor).
@@ -684,7 +684,7 @@ apply (rngl_leb_gt_iff Hor) in Ha.
 destruct az'; [ | | easy ].
 now apply (rngl_compare_eq_iff Heo) in Ha'.
 apply (rngl_compare_lt_iff Hor) in Ha'.
-now apply (rngl_lt_asymm Hor) in Ha'.
+now apply (rngl_lt_asymm Hto) in Ha'.
 Qed.
 
 Theorem rngl_cos_pos_cos_asin_div_tan_sqrt :
@@ -1115,7 +1115,7 @@ intros.
 rewrite <- rngl_sin_add_right_r.
 rewrite rngl_asin_sin.
 rewrite rngl_cos_add_right_r.
-rewrite (rngl_leb_0_opp Hop Hor).
+rewrite (rngl_leb_0_opp Hop Hto).
 rewrite angle_sub_add_distr.
 rewrite angle_sub_sub_swap.
 rewrite angle_straight_sub_right.
@@ -1136,7 +1136,7 @@ destruct sz. {
 }
 destruct zs; [ easy | ].
 apply (rngl_leb_gt_iff Hor) in Hzs, Hsz.
-now apply (rngl_lt_asymm Hor) in Hzs.
+now apply (rngl_lt_asymm Hto) in Hzs.
 Qed.
 
 Theorem rngl_acos_cos :

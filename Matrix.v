@@ -815,7 +815,7 @@ Proof.
 destruct_ac.
 simpl; rewrite (rngl_squ_0 Hos).
 do 2 rewrite rngl_add_0_l.
-apply (rl_sqrt_0 Hop Hor Hii).
+apply (rl_sqrt_0 Hop Hto Hii).
 Qed.
 
 Theorem vec_norm_eq_0 : ∀ v, ‖v‖ = 0%L ↔ v = 0%vec.
@@ -833,7 +833,7 @@ destruct v as (v₁, v₂, v₃); simpl.
 injection Hv; clear Hv; intros; subst.
 rewrite (rngl_squ_0 Hos).
 do 2 rewrite rngl_add_0_r.
-apply (rl_sqrt_0 Hop Hor Hii).
+apply (rl_sqrt_0 Hop Hto Hii).
 Qed.
 
 Theorem vec_norm_neq_0 : ∀ v, ‖v‖ ≠ 0%L ↔ v ≠ 0%vec.
@@ -902,7 +902,7 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
     rewrite (rngl_ltb_opp_l Hop Hor) in Hx'.
     rewrite (rngl_opp_0 Hop) in Hx'.
     apply rngl_ltb_lt in Hx, Hx'.
-    now apply (rngl_lt_asymm Hor) in Hx.
+    now apply (rngl_lt_asymm Hto) in Hx.
   }
   clear Hx'.
   destruct (rngl_ltb_dec 0 (-x)) as [Hx'| Hx']; rewrite Hx'; [ easy | ].
@@ -927,7 +927,7 @@ destruct (rngl_ltb_dec y 0) as [Hy| Hy]; rewrite Hy. {
     rewrite (rngl_ltb_opp_l Hop Hor) in Hy'.
     rewrite (rngl_opp_0 Hop) in Hy'.
     apply rngl_ltb_lt in Hy, Hy'.
-    now apply (rngl_lt_asymm Hor) in Hy.
+    now apply (rngl_lt_asymm Hto) in Hy.
   }
   clear Hy'.
   destruct (rngl_ltb_dec 0 (-y)) as [Hy'| Hy']; rewrite Hy'; [ easy | ].
@@ -952,7 +952,7 @@ destruct (rngl_ltb_dec z 0) as [Hz| Hz]; rewrite Hz. {
     rewrite (rngl_ltb_opp_l Hop Hor) in Hz'.
     rewrite (rngl_opp_0 Hop) in Hz'.
     apply rngl_ltb_lt in Hz, Hz'.
-    now apply (rngl_lt_asymm Hor) in Hz.
+    now apply (rngl_lt_asymm Hto) in Hz.
   }
   clear Hz'.
   destruct (rngl_ltb_dec 0 (-z)) as [Hz'| Hz']; rewrite Hz'; [ easy | ].

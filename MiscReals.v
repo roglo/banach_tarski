@@ -1434,7 +1434,7 @@ split. {
   rewrite <- Pos.add_1_l.
   apply Pos_le_add_l.
 }
-apply (rngl_le_div_l Hop Hiv Hor).
+apply (rngl_le_div_l Hop Hiv Hto).
 apply (rngl_0_lt_2 Hos Hc1 Hor).
 rewrite rngl_of_pos_add.
 rewrite rngl_of_pos_1.
@@ -2106,7 +2106,7 @@ Theorem nonneg_plus_sqr : ∀ x y, (0 ≤ x² + y²)%L.
 Proof.
 destruct_ac.
 intros.
-apply (rngl_add_squ_nonneg Hos Hor).
+apply (rngl_add_squ_nonneg Hos Hto).
 Qed.
 
 Definition rngl_signp x := (if 0 ≤? x then 1 else -1)%L.
@@ -2278,7 +2278,7 @@ destruct_ac.
 intros * Hy.
 unfold Rmod, Rediv_mod, snd.
 destruct (Rcase_abs y) as [Hya| Hya]. {
-  now apply (rngl_lt_asymm Hor) in Hy.
+  now apply (rngl_lt_asymm Hto) in Hy.
 }
 split. {
   apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ (y⁻¹)). {
@@ -2583,7 +2583,7 @@ destruct (Rcase_abs (- y)) as [Hy| Hy]. {
   destruct (Rcase_abs y) as [Hzy| Hzy]; [ | easy ].
   exfalso.
   apply (rngl_opp_neg_pos Hop Hto) in Hy.
-  now apply (rngl_lt_asymm Hor) in Hy.
+  now apply (rngl_lt_asymm Hto) in Hy.
 } {
   destruct (Rcase_abs y) as [Hzy| Hzy]; [ now rewrite Z.opp_involutive | ].
   apply (rngl_opp_nonneg_nonpos Hop Hto) in Hy.
@@ -2892,7 +2892,7 @@ destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
 }
 apply (rngl_ltb_ge_iff Hto) in Hx.
 do 2 rewrite rngl_mul_2_l.
-apply (rngl_le_div_l Hop Hiv Hor) in Hx. 2: {
+apply (rngl_le_div_l Hop Hiv Hto) in Hx. 2: {
   apply (rngl_0_lt_2 Hos Hc1 Hor).
 }
 rewrite rngl_mul_2_r in Hx.
@@ -2922,7 +2922,7 @@ destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
   }
   rewrite <- rngl_mul_2_r.
   apply (rngl_ltb_ge_iff Hto) in Hx.
-  apply (rngl_le_div_l Hop Hiv Hor) in Hx; [ easy | ].
+  apply (rngl_le_div_l Hop Hiv Hto) in Hx; [ easy | ].
   apply (rngl_0_lt_2 Hos Hc1 Hor).
 }
 Qed.
