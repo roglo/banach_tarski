@@ -90,7 +90,7 @@ destruct xz. {
       apply (rngl_0_le_1 Hos Hor).
       apply (rngl_squ_nonneg Hos Hto).
     }
-    apply (rngl_eq_add_0 Hor) in H.
+    apply (rngl_eq_add_0 Hos Hor) in H.
     now destruct H as (H, _).
     apply (rngl_0_le_1 Hos Hor).
     apply (rngl_squ_nonneg Hos Hto).
@@ -117,7 +117,7 @@ destruct xz. {
       apply (rngl_0_le_1 Hos Hor).
       apply (rngl_squ_nonneg Hos Hto).
     }
-    apply (rngl_eq_add_0 Hor) in H.
+    apply (rngl_eq_add_0 Hos Hor) in H.
     now destruct H as (H, _).
     apply (rngl_0_le_1 Hos Hor).
     apply (rngl_squ_nonneg Hos Hto).
@@ -183,7 +183,7 @@ destruct xz. {
         apply (rngl_0_le_1 Hos Hor).
         apply (rngl_squ_nonneg Hos Hto).
       }
-      apply (rngl_eq_add_0 Hor) in H1.
+      apply (rngl_eq_add_0 Hos Hor) in H1.
       now destruct H1 as (H1, _).
       now apply (rngl_0_le_1 Hos Hor).
       now apply (rngl_squ_nonneg Hos Hto).
@@ -208,7 +208,7 @@ destruct xz. {
       apply (rngl_0_le_1 Hos Hor).
       apply (rngl_squ_nonneg Hos Hto).
     }
-    apply (rngl_eq_add_0 Hor) in H1.
+    apply (rngl_eq_add_0 Hos Hor) in H1.
     now destruct H1 as (H1, _).
     now apply (rngl_0_le_1 Hos Hor).
     now apply (rngl_squ_nonneg Hos Hto).
@@ -253,7 +253,7 @@ destruct xz. {
       apply (rngl_0_le_1 Hos Hor).
       apply (rngl_squ_nonneg Hos Hto).
     }
-    apply (rngl_eq_add_0 Hor) in H.
+    apply (rngl_eq_add_0 Hos Hor) in H.
     now destruct H as (H, _).
     apply (rngl_0_le_1 Hos Hor).
     apply (rngl_squ_nonneg Hos Hto).
@@ -341,7 +341,7 @@ destruct xz. {
       apply (rngl_0_le_1 Hos Hor).
       apply (rngl_squ_nonneg Hos Hto).
     }
-    apply (rngl_eq_add_0 Hor) in H1.
+    apply (rngl_eq_add_0 Hos Hor) in H1.
     now destruct H1 as (H1, _).
     now apply (rngl_0_le_1 Hos Hor).
     now apply (rngl_squ_nonneg Hos Hto).
@@ -475,7 +475,7 @@ rewrite (rngl_squ_div Hic Hos Hiv); [ | easy ].
 rewrite rngl_squ_sqrt; [ | now apply (rngl_lt_le_incl Hor) ].
 apply (rngl_le_div_l Hop Hiv Hor); [ easy | ].
 rewrite rngl_mul_1_l.
-apply (rngl_le_add_l Hor).
+apply (rngl_le_add_l Hos Hor).
 apply (rngl_0_le_1 Hos Hor).
 Qed.
 

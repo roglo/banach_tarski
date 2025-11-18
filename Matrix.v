@@ -797,9 +797,9 @@ Proof.
 destruct_ac.
 specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros * H.
-apply (rngl_eq_add_0 Hor) in H.
+apply (rngl_eq_add_0 Hos Hor) in H.
 destruct H as (H, H3).
-apply (rngl_eq_add_0 Hor) in H.
+apply (rngl_eq_add_0 Hos Hor) in H.
 destruct H as (H1, H2).
 now apply (eq_rngl_squ_0 Hos Hio) in H1, H2, H3.
 apply (rngl_squ_nonneg Hos Hto).
