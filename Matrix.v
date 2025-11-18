@@ -797,9 +797,9 @@ Proof.
 destruct_ac.
 specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros * H.
-apply (rngl_eq_add_0 Hos Hor) in H.
+apply (rngl_eq_add_0 Hos Hto) in H.
 destruct H as (H, H3).
-apply (rngl_eq_add_0 Hos Hor) in H.
+apply (rngl_eq_add_0 Hos Hto) in H.
 destruct H as (H1, H2).
 now apply (eq_rngl_squ_0 Hos Hio) in H1, H2, H3.
 apply (rngl_squ_nonneg Hos Hto).
@@ -1073,9 +1073,9 @@ symmetry.
 apply rngl_squ_sqrt.
 apply (rngl_le_0_add Hos Hto).
 apply (rngl_le_0_add Hos Hto).
-apply (rngl_mul_diag_nonneg Hos Hor).
-apply (rngl_mul_diag_nonneg Hos Hor).
-apply (rngl_mul_diag_nonneg Hos Hor).
+apply (rngl_mul_diag_nonneg Hos Hto).
+apply (rngl_mul_diag_nonneg Hos Hto).
+apply (rngl_mul_diag_nonneg Hos Hto).
 Qed.
 
 Theorem vec_add_comm : ∀ u v, (u + v = v + u)%vec.
@@ -1176,7 +1176,7 @@ rewrite <- Hur.
 rewrite (rl_sqrt_squ Hop Hto).
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply (rngl_lt_le_incl Hor).
-  apply (rngl_inv_pos Hop Hiv Hor).
+  apply (rngl_inv_pos Hop Hiv Hto).
   apply (rngl_le_neq Hto).
   split; [ | easy ].
   rewrite Hur.
@@ -1949,7 +1949,7 @@ rewrite <- rngl_squ_1 in H.
 apply (eq_rngl_squ_rngl_abs Hop Hto Hii) in H. 2: {
   now rewrite rngl_mul_1_r, rngl_mul_1_l.
 }
-rewrite (rngl_abs_1 Hos Hor) in H.
+rewrite (rngl_abs_1 Hos Hto) in H.
 progress unfold rngl_abs in H.
 clear H.
 destruct (rngl_eqb_dec v₁ 0) as [Hv1z| Hv1z]. 2: {
