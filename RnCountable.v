@@ -236,12 +236,12 @@ assert (Hzi : ∀ i, (0 ≤ (2 * 3 ^ i)⁻¹)%L). {
   apply (rngl_3_neq_0 Hos Hc1 Hor).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   rewrite (rngl_inv_pow Hos Hiv).
-  apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hto).
   apply (rngl_pow_pos_pos Hop Hiv Hto).
   apply (rngl_inv_pos Hop Hiv Hto).
   apply (rngl_0_lt_3 Hos Hc1 Hor).
   apply (rngl_3_neq_0 Hos Hc1 Hor).
-  apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hto).
   apply (rngl_inv_pos Hop Hiv Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
@@ -257,7 +257,7 @@ destruct (le_dec k n) as [Hkn| Hkn]. {
   apply (rngl_le_0_add Hos Hto); [ | apply Hzi ].
   apply partial_sum3_aux_nonneg.
   apply (rngl_div_nonneg Hop Hiv Hto).
-  apply (rngl_0_le_1 Hos Hor).
+  apply (rngl_0_le_1 Hos Hto).
   apply (rngl_pow_pos_pos Hop Hiv Hto).
   apply (rngl_0_lt_3 Hos Hc1 Hor).
 }
@@ -292,7 +292,7 @@ destruct b. {
     apply partial_sum3_aux_le_half_pow; [ | easy ].
     apply (rngl_div_nonneg Hop Hiv Hto).
     apply (rngl_div_nonneg Hop Hiv Hto).
-    apply (rngl_0_le_1 Hos Hor).
+    apply (rngl_0_le_1 Hos Hto).
     apply (rngl_pow_pos_pos Hop Hiv Hto).
     apply (rngl_0_lt_3 Hos Hc1 Hor).
     apply (rngl_0_lt_3 Hos Hc1 Hor).
@@ -509,7 +509,7 @@ split. {
     destruct (u 0); [ | easy ].
     apply (rngl_le_trans Hor _ (1 / 3)); [ | easy ].
     apply (rngl_div_nonneg Hop Hiv Hto).
-    apply (rngl_0_le_1 Hos Hor).
+    apply (rngl_0_le_1 Hos Hto).
     apply (rngl_0_lt_3 Hos Hc1 Hor).
   }
   progress unfold partial_sum3 in Hr1, Hr2.
@@ -614,7 +614,7 @@ induction n. {
   unfold partial_sum3 in Hk1; simpl in Hk1.
   assert (H : ∀ k, (partial_sum3 u k ≤ 1 / 2)%L). {
     intros k; apply partial_sum3_aux_le_half_pow; [ | easy ].
-    apply (rngl_0_le_1 Hos Hor).
+    apply (rngl_0_le_1 Hos Hto).
   }
   specialize (Hk2 (1 / 2)%L H).
   replace 0%L with (IZR 0) by easy.
@@ -674,7 +674,7 @@ assert (Hb : rngl_bound E). {
   exists (1 / 2)%L; subst E; simpl.
   intros r (k & H); subst r.
   apply partial_sum3_aux_le_half_pow; [ | easy ].
-  apply (rngl_0_le_1 Hos Hor).
+  apply (rngl_0_le_1 Hos Hto).
 }
 assert (He : ∃ₜ r, E r). {
   exists 0%L; subst E; simpl.
@@ -711,7 +711,7 @@ assert (Hh : (r ≤ 1 / 2)%L). {
   progress unfold E in Hx.
   destruct Hx as (k, Hx); rewrite <- Hx.
   apply partial_sum3_aux_le_half_pow; [ | easy ].
-  apply (rngl_0_le_1 Hos Hor).
+  apply (rngl_0_le_1 Hos Hto).
 }
 exists r; clear Hb He.
 split. {

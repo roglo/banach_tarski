@@ -1175,7 +1175,7 @@ rewrite rl_sqrt_mul; [ | | apply nonneg_sqr_vec_norm ]. 2: {
 rewrite <- Hur.
 rewrite (rl_sqrt_squ Hop Hto).
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-  apply (rngl_lt_le_incl Hor).
+  apply (rngl_lt_le_incl Hto).
   apply (rngl_inv_pos Hop Hiv Hto).
   apply (rngl_le_neq Hto).
   split; [ | easy ].
@@ -1321,7 +1321,7 @@ Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ‖u‖² * ‖
 Proof.
 destruct_ac.
 intros.
-apply (rngl_le_0_sub Hop Hor).
+apply (rngl_le_0_sub Hop Hto).
 rewrite vec_Lagrange_identity.
 rewrite vec_dot_mul_diag.
 apply (rngl_squ_nonneg Hos Hto).
@@ -1409,7 +1409,7 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
   rename H into Hkn.
   apply rngl_leb_nle in Hkn.
   apply (rngl_nle_gt_iff Hto) in Hkn.
-  apply (rngl_lt_le_incl Hor) in Hkn.
+  apply (rngl_lt_le_incl Hto) in Hkn.
   assert (Hx : ∀ x, (k * x / a = - (x / b))%L). {
     intros x; subst a.
     rewrite (rngl_abs_nonpos_eq Hop Hto); [ | easy ].
