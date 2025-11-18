@@ -104,7 +104,7 @@ destruct xz. {
     apply (rngl_le_le_squ Hop Hor).
     apply (rngl_div_nonneg Hop Hiv Hto).
     apply (rngl_abs_nonneg Hop Hto).
-    apply (rl_sqrt_pos Hos Hor).
+    apply (rl_sqrt_pos Hos Hto).
     rewrite rngl_squ_1.
     apply (rngl_lt_0_add Hor).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
@@ -124,7 +124,7 @@ destruct xz. {
     rewrite rngl_squ_1.
     split; [ apply (rngl_abs_nonneg Hop Hto) | ].
     rewrite <- (rl_sqrt_squ Hop Hto).
-    apply (rl_sqrt_le_rl_sqrt Hop Hiq Hor).
+    apply (rl_sqrt_le_rl_sqrt Hop Hiq Hto).
     apply (rngl_squ_nonneg Hos Hto).
     apply (rngl_le_add_l Hor).
     apply (rngl_0_le_1 Hos Hor).
@@ -139,13 +139,13 @@ destruct xz. {
   rewrite rngl_add_0_r.
   rewrite (rngl_sub_opp_r Hop).
   rewrite rngl_add_0_l.
-  rewrite (rngl_0_leb_1 Hos Hor).
+  rewrite (rngl_0_leb_1 Hos Hto).
   remember (0 ≤? _)%L as zx eqn:Hzx.
   symmetry in Hzx.
   apply rngl_leb_le in Hx1.
   destruct zx. {
     apply rngl_ltb_lt.
-    apply (rl_sqrt_pos Hos Hor).
+    apply (rl_sqrt_pos Hos Hto).
     apply (rngl_lt_0_sub Hop Hto).
     apply (rngl_le_neq Hto).
     split; [ easy | ].
@@ -221,7 +221,7 @@ destruct xz. {
   apply rngl_leb_le.
   apply (rngl_div_nonneg Hop Hiv Hto).
   apply (rngl_abs_nonneg Hop Hto).
-  apply (rl_sqrt_pos Hos Hor).
+  apply (rl_sqrt_pos Hos Hto).
   apply (rngl_lt_le_trans Hto _ 1).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
   apply (rngl_le_add_r Hor).
@@ -240,7 +240,7 @@ destruct xz. {
     apply (rngl_le_le_squ Hop Hor).
     apply (rngl_div_nonneg Hop Hiv Hto).
     apply (rngl_abs_nonneg Hop Hto).
-    apply (rl_sqrt_pos Hos Hor).
+    apply (rl_sqrt_pos Hos Hto).
     rewrite rngl_squ_1.
     apply (rngl_lt_0_add Hor).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
@@ -260,7 +260,7 @@ destruct xz. {
     rewrite rngl_squ_1.
     split; [ apply (rngl_abs_nonneg Hop Hto) | ].
     rewrite <- (rl_sqrt_squ Hop Hto).
-    apply (rl_sqrt_le_rl_sqrt Hop Hiq Hor).
+    apply (rl_sqrt_le_rl_sqrt Hop Hiq Hto).
     apply (rngl_squ_nonneg Hos Hto).
     apply (rngl_le_add_l Hor).
     apply (rngl_0_le_1 Hos Hor).
@@ -276,12 +276,12 @@ destruct xz. {
   rewrite rngl_add_0_r.
   rewrite (rngl_sub_opp_r Hop).
   rewrite rngl_add_0_l.
-  rewrite (rngl_0_leb_1 Hos Hor).
+  rewrite (rngl_0_leb_1 Hos Hto).
   remember (0 ≤? _)%L as zx eqn:Hzx.
   symmetry in Hzx.
   destruct zx. {
     apply rngl_ltb_lt.
-    apply (rl_sqrt_pos Hos Hor).
+    apply (rl_sqrt_pos Hos Hto).
     apply (rngl_lt_0_sub Hop Hto).
     apply (rngl_le_neq Hto).
     split; [ easy | ].
@@ -313,7 +313,7 @@ destruct xz. {
       apply rngl_nlt_ge in Hzxs.
       apply Hzxs; clear Hzxs.
       apply (rngl_div_pos Hop Hiv Hto); [ easy | ].
-      apply (rl_sqrt_pos Hos Hor).
+      apply (rl_sqrt_pos Hos Hto).
       apply (rngl_lt_trans Hor _ 1).
       apply (rngl_0_lt_1 Hos Hc1 Hto).
       apply (rngl_lt_add_r Hos Hto).
@@ -354,7 +354,7 @@ destruct xz. {
   apply rngl_leb_le.
   apply (rngl_div_nonneg Hop Hiv Hto).
   apply (rngl_abs_nonneg Hop Hto).
-  apply (rl_sqrt_pos Hos Hor).
+  apply (rl_sqrt_pos Hos Hto).
   apply (rngl_lt_le_trans Hto _ 1).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
   apply (rngl_le_add_r Hor).

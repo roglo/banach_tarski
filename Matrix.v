@@ -341,7 +341,7 @@ Qed.
 Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
 rewrite Hiv.
@@ -358,7 +358,7 @@ Qed.
 Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -374,7 +374,7 @@ Qed.
 Theorem rot_rot_inv_z : (rot_z * rot_inv_z)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -390,7 +390,7 @@ Qed.
 Theorem rot_inv_rot_z : (rot_inv_z * rot_z)%mat = mat_id.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
@@ -568,7 +568,7 @@ Qed.
 Theorem rot_x_is_rotation_matrix : is_rotation_matrix rot_x.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hto) as H02.
 progress unfold is_rotation_matrix.
 progress unfold is_ortho_matrix.
 progress unfold mat_transp, mat_mul, mat_det; simpl.
@@ -587,7 +587,7 @@ Qed.
 Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hto) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hos Hc1 Hor).
@@ -610,7 +610,7 @@ Qed.
 Theorem rot_z_is_rotation_matrix : is_rotation_matrix rot_z.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hto) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hos Hc1 Hor).
@@ -637,7 +637,7 @@ Qed.
 Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
 Proof.
 destruct_ac.
-specialize (rngl_0_le_2 Hos Hor) as H02.
+specialize (rngl_0_le_2 Hos Hto) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
   apply (rngl_3_neq_0 Hos Hc1 Hor).
