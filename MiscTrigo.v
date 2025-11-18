@@ -305,7 +305,7 @@ destruct xz. {
       rewrite (rngl_opp_0 Hop) in H.
       now symmetry in H.
     }
-    apply (rngl_leb_gt_iff Hor) in Hxz'.
+    apply (rngl_leb_gt_iff Hto) in Hxz'.
     remember (x / _ ≤? 0)%L as zxs eqn:Hzxs.
     symmetry in Hzxs.
     destruct zxs. {
@@ -680,7 +680,7 @@ destruct az. {
   now apply (rngl_div_diag Hiq).
 }
 rewrite (rngl_div_diag Hiq); [ symmetry | easy ].
-apply (rngl_leb_gt_iff Hor) in Ha.
+apply (rngl_leb_gt_iff Hto) in Ha.
 destruct az'; [ | | easy ].
 now apply (rngl_compare_eq_iff Heo) in Ha'.
 apply (rngl_compare_lt_iff Hor) in Ha'.
@@ -1097,7 +1097,7 @@ destruct zc. {
   apply (rngl_abs_nonneg_eq Hop Hor).
   now apply rngl_leb_le in Hzc.
 }
-apply (rngl_leb_gt_iff Hor) in Hzc.
+apply (rngl_leb_gt_iff Hto) in Hzc.
 rewrite rngl_cos_sub_straight_l.
 rewrite rngl_sin_sub_straight_l.
 progress f_equal.
@@ -1135,7 +1135,7 @@ destruct sz. {
   apply angle_opp_straight.
 }
 destruct zs; [ easy | ].
-apply (rngl_leb_gt_iff Hor) in Hzs, Hsz.
+apply (rngl_leb_gt_iff Hto) in Hzs, Hsz.
 now apply (rngl_lt_asymm Hto) in Hzs.
 Qed.
 

@@ -681,7 +681,7 @@ destruct (rngl_leb_dec 0 a)%L as [Hza| Hza]. {
   rewrite rngl_of_nat_add, rngl_add_comm in Hn.
   now rewrite rngl_of_nat_1 in Hn.
 }
-apply (rngl_leb_gt_iff Hor) in Hza.
+apply (rngl_leb_gt_iff Hto) in Hza.
 rewrite (rngl_abs_nonpos_eq Hop Hto) in Hn. 2: {
   now apply (rngl_lt_le_incl Hto) in Hza.
 }
@@ -1523,7 +1523,7 @@ destruct n as [| n| n]. {
       } {
         apply (rngl_opp_le_compat Hop Hor).
         rewrite (rngl_opp_involutive Hop).
-        apply (rngl_le_add_le_sub_r Hop Hor).
+        apply (rngl_le_add_le_sub_r Hop Hto).
         rewrite rngl_of_pos_add.
         rewrite rngl_of_pos_1.
         rewrite (rngl_opp_add_distr Hop).
@@ -1537,7 +1537,7 @@ destruct n as [| n| n]. {
       } {
         apply (rngl_opp_le_compat Hop Hor).
         rewrite (rngl_opp_involutive Hop).
-        apply (rngl_le_add_le_sub_r Hop Hor).
+        apply (rngl_le_add_le_sub_r Hop Hto).
         rewrite rngl_of_pos_add.
         rewrite rngl_of_pos_1.
         rewrite (rngl_opp_add_distr Hop).
@@ -1729,7 +1729,7 @@ destruct (rngl_leb_dec 0 a) as [Hza| Hza]. {
   assert (H : (0 < Int_part a)%Z) by now rewrite Hz.
   apply Z.nle_gt in H.
   apply H; clear p H Hz.
-  apply (rngl_leb_gt_iff Hor) in Hza.
+  apply (rngl_leb_gt_iff Hto) in Hza.
   now apply Int_part_nonpos.
 }
 Qed.
@@ -1917,7 +1917,7 @@ apply Int_part_interv.
 rewrite rngl_of_Z_add.
 rewrite rngl_of_Z_sub.
 rewrite rngl_of_Z_1.
-apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
+apply (rngl_le_add_le_sub_r Hop Hto) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
 rewrite <- (rngl_add_sub_assoc Hop) in Hba.
 apply (rngl_le_add_le_sub_l Hop Hto) in Hba.
@@ -2211,16 +2211,16 @@ destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]; rewrite Hxy. {
   rewrite Hy; symmetry.
   apply (rngl_squ_opp_1 Hop).
 }
-apply (rngl_leb_gt_iff Hor) in Hxy.
+apply (rngl_leb_gt_iff Hto) in Hxy.
 apply (rngl_lt_mul_0_if Hos Hor) in Hxy.
 destruct Hxy as [(Hx, Hy)| (Hx, Hy)]. {
-  apply (rngl_leb_gt_iff Hor) in Hx.
+  apply (rngl_leb_gt_iff Hto) in Hx.
   apply (rngl_lt_le_incl Hto) in Hy.
   apply rngl_leb_le in Hy.
   rewrite Hx, Hy; symmetry.
   apply rngl_mul_1_r.
 } {
-  apply (rngl_leb_gt_iff Hor) in Hy.
+  apply (rngl_leb_gt_iff Hto) in Hy.
   apply (rngl_lt_le_incl Hto) in Hx.
   apply rngl_leb_le in Hx.
   rewrite Hx, Hy; symmetry.

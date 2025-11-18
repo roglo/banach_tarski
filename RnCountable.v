@@ -534,7 +534,7 @@ split. {
     apply (rngl_le_div_l Hop Hiv Hto) in Hr1.
     now apply (rngl_le_add_le_sub_l Hop Hto) in Hr1.
     apply (rngl_0_lt_3 Hos Hc1 Hor).
-    apply (rngl_le_sub_le_add_r Hop Hor).
+    apply (rngl_le_sub_le_add_r Hop Hto).
     rewrite rngl_mul_assoc, (rngl_mul_comm Hic 2) in Hr2.
     rewrite <- rngl_mul_assoc in Hr2.
     rewrite (rngl_inv_mul_distr Hos Hiv) in Hr2.
