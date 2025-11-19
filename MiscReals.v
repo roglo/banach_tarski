@@ -683,7 +683,7 @@ destruct (rngl_leb_dec 0 a)%L as [Hza| Hza]. {
 }
 apply (rngl_leb_gt_iff Hto) in Hza.
 rewrite (rngl_abs_nonpos_eq Hop Hto) in Hn. 2: {
-  now apply (rngl_lt_le_incl Hto) in Hza.
+  now apply rngl_lt_le_incl in Hza.
 }
 destruct Hn as (H1, H2).
 destruct (rngl_eqb_dec a (- rngl_of_nat n)) as [Han| Han]. {
@@ -705,7 +705,7 @@ rewrite rngl_of_Z_of_nat.
 split. {
   apply (rngl_opp_le_compat Hop Hto).
   rewrite (rngl_opp_involutive Hop).
-  now apply (rngl_lt_le_incl Hto).
+  now apply rngl_lt_le_incl.
 } {
   rewrite Nat2Z.inj_add; cbn.
   rewrite Z.opp_add_distr; cbn.
@@ -750,7 +750,7 @@ Proof.
 destruct_ac.
 intros.
 induction a as [a| a| ]; cbn. {
-  apply (rngl_le_lt_trans Hto _ 1).
+  apply (rngl_le_lt_trans Hor _ 1).
   apply (rngl_0_le_1 Hos Hto).
   rewrite rngl_of_pos_xI.
   apply (rngl_lt_add_l Hos Hto).
@@ -773,7 +773,7 @@ Proof.
 intros Hor * Ha.
 specialize (rngl_of_pos_pos a) as H1.
 rewrite Ha in H1.
-now apply (rngl_lt_irrefl Hor) in H1.
+now apply rngl_lt_irrefl in H1.
 Qed.
 
 Theorem rngl_of_pos_eq_1 : ∀ a, rngl_of_pos a = 1%L → a = 1%positive.
@@ -1002,7 +1002,7 @@ apply Hab; clear Hab.
 rewrite rngl_of_pos_xO.
 rewrite rngl_of_pos_1.
 rewrite rngl_mul_2_l.
-apply (rngl_le_lt_trans Hto _ (rngl_of_pos a)).
+apply (rngl_le_lt_trans Hor _ (rngl_of_pos a)).
 apply rngl_of_pos_le_1_l.
 apply (rngl_lt_add_l Hos Hto).
 apply rngl_of_pos_pos.
@@ -1103,10 +1103,10 @@ destruct a as [| a| a]. {
   exfalso.
   apply rngl_nlt_ge in Hab.
   apply Hab; clear Hab; cbn.
-  apply (rngl_le_lt_trans Hto _ 0); [ | apply rngl_of_pos_pos ].
+  apply (rngl_le_lt_trans Hor _ 0); [ | apply rngl_of_pos_pos ].
   apply (rngl_opp_le_compat Hop Hto).
   rewrite (rngl_opp_0 Hop), (rngl_opp_involutive Hop).
-  apply (rngl_lt_le_incl Hto).
+  apply rngl_lt_le_incl.
   apply rngl_of_pos_pos.
 } {
   destruct b as [| b| b]; cbn; [ easy | easy | ].
@@ -1315,7 +1315,7 @@ destruct n as [| p| p]; [ easy | | ]; exfalso. {
   cbn in Hnx.
   apply rngl_nlt_ge in Hnx.
   apply Hnx; clear Hnx.
-  apply (rngl_lt_le_trans Hto _ 1); [ easy | ].
+  apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
   apply rngl_of_pos_le_1_l.
 } {
   apply rngl_nle_gt in Hxn.
@@ -1424,7 +1424,7 @@ intros * Hp.
 split. {
   apply (rngl_lt_div_r Hop Hiv Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
-  eapply (rngl_le_lt_trans Hto); [ | apply Hp ].
+  eapply (rngl_le_lt_trans Hor); [ | apply Hp ].
   rewrite rngl_mul_2_r.
   rewrite <- rngl_mul_2_l.
   rewrite <- rngl_of_pos_2.
@@ -1702,7 +1702,7 @@ destruct z as [| p| p]; [ easy | exfalso | easy ].
 destruct Hz as (Hz, _).
 apply rngl_nlt_ge in Hz.
 apply Hz; clear Hz.
-apply (rngl_lt_le_trans Hto _ 0); [ easy | ].
+apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
 apply rngl_of_pos_nonneg.
 Qed.
 
@@ -1893,7 +1893,7 @@ apply (rngl_sub_le_mono_r Hop Hto) in Hba.
 apply Int_part_small.
 apply rngl_sub_between_0_and_1.
 split; [ easy | ].
-eapply (rngl_lt_le_trans Hto); [ apply Hm | ].
+eapply (rngl_lt_le_trans Hor); [ apply Hm | ].
 rewrite rngl_of_Z_add; cbn.
 rewrite rngl_of_pos_1.
 now apply (rngl_add_le_mono_r Hos Hor).
@@ -1928,7 +1928,7 @@ rewrite <- rngl_of_Z_1.
 rewrite <- rngl_of_Z_add.
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- (rngl_add_sub_assoc Hop).
-eapply (rngl_lt_le_trans Hto).
+eapply (rngl_lt_le_trans Hor).
 apply Hm.
 apply (rngl_le_add_r Hos Hor).
 now apply (rngl_le_0_sub Hop Hto).
@@ -2140,9 +2140,9 @@ intros * Hx.
 unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec x 0) as [H | H]. {
   apply (rngl_eqb_eq Heo) in H.
-  now subst; apply (rngl_lt_irrefl Hor) in Hx.
+  now subst; apply rngl_lt_irrefl in Hx.
 }
-apply (rngl_lt_le_incl Hto) in Hx.
+apply rngl_lt_le_incl in Hx.
 apply rngl_leb_le in Hx.
 now rewrite H, Hx.
 Qed.
@@ -2154,7 +2154,7 @@ intros * Hx.
 unfold rngl_sign, rngl_signp.
 destruct (rngl_eqb_dec x 0) as [H| H]. {
   apply (rngl_eqb_eq Heo) in H.
-  now subst; apply (rngl_lt_irrefl Hor) in Hx.
+  now subst; apply rngl_lt_irrefl in Hx.
 }
 apply rngl_nle_gt in Hx.
 apply rngl_leb_nle in Hx.
@@ -2204,7 +2204,7 @@ destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]; rewrite Hxy. {
   apply rngl_leb_nle in Hx.
   apply (rngl_le_0_mul Hop Hiq Hto) in Hxy.
   destruct Hxy as [(H, _)| (Hx', Hy)]; [ easy | ].
-  apply (rngl_lt_eq_cases Hto) in Hy.
+  apply (rngl_lt_eq_cases Hor) in Hy.
   destruct Hy as [Hy| ]; [ | easy ].
   apply rngl_nle_gt in Hy.
   apply rngl_leb_nle in Hy.
@@ -2215,13 +2215,13 @@ apply (rngl_leb_gt_iff Hto) in Hxy.
 apply (rngl_lt_mul_0_if Hos Hto) in Hxy.
 destruct Hxy as [(Hx, Hy)| (Hx, Hy)]. {
   apply (rngl_leb_gt_iff Hto) in Hx.
-  apply (rngl_lt_le_incl Hto) in Hy.
+  apply rngl_lt_le_incl in Hy.
   apply rngl_leb_le in Hy.
   rewrite Hx, Hy; symmetry.
   apply rngl_mul_1_r.
 } {
   apply (rngl_leb_gt_iff Hto) in Hy.
-  apply (rngl_lt_le_incl Hto) in Hx.
+  apply rngl_lt_le_incl in Hx.
   apply rngl_leb_le in Hx.
   rewrite Hx, Hy; symmetry.
   apply rngl_mul_1_l.
@@ -2278,7 +2278,7 @@ destruct_ac.
 intros * Hy.
 unfold Rmod, Rediv_mod, snd.
 destruct (Rcase_abs y) as [Hya| Hya]. {
-  now apply (rngl_lt_asymm Hto) in Hy.
+  now apply (rngl_lt_asymm Hor) in Hy.
 }
 split. {
   apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ (y⁻¹)). {
@@ -2381,7 +2381,7 @@ destruct z as [| q| q]. {
   destruct Hz as (Hz, _).
   apply rngl_nlt_ge in Hz.
   apply Hz; clear Hz.
-  apply (rngl_le_lt_trans Hto _ 0); [ | apply rngl_of_pos_pos ].
+  apply (rngl_le_lt_trans Hor _ 0); [ | apply rngl_of_pos_pos ].
   apply (rngl_opp_nonpos_nonneg Hop Hto).
   apply rngl_of_pos_nonneg.
 } {
@@ -2456,7 +2456,7 @@ destruct Hz as (H1, H2).
 apply (rngl_opp_le_compat Hop Hto) in H1.
 apply (rngl_opp_lt_compat Hop Hto) in H2.
 rewrite (rngl_opp_involutive Hop) in H1, H2.
-split; [ now apply (rngl_lt_le_incl Hto) | ].
+split; [ now apply rngl_lt_le_incl | ].
 apply (rngl_le_neq Hto).
 split; [ easy | ].
 intros H; subst x.
@@ -2583,7 +2583,7 @@ destruct (Rcase_abs (- y)) as [Hy| Hy]. {
   destruct (Rcase_abs y) as [Hzy| Hzy]; [ | easy ].
   exfalso.
   apply (rngl_opp_neg_pos Hop Hto) in Hy.
-  now apply (rngl_lt_asymm Hto) in Hy.
+  now apply (rngl_lt_asymm Hor) in Hy.
 } {
   destruct (Rcase_abs y) as [Hzy| Hzy]; [ now rewrite Z.opp_involutive | ].
   apply (rngl_opp_nonneg_nonpos Hop Hto) in Hy.
@@ -2725,15 +2725,15 @@ destruct (Rcase_abs y) as [Hyn| Hyp]. {
   exfalso; apply rngl_nle_gt in Hyn.
   apply Hyn; clear Hyn.
   apply (rngl_le_trans Hor _ x); [ easy | ].
-  now apply (rngl_lt_le_incl Hto).
+  now apply rngl_lt_le_incl.
 }
 assert (H : (0 ≤ x / y < 1)%L). {
   split. {
     apply (rngl_div_nonneg Hop Hiv Hto); [ easy | ].
-    now apply (rngl_le_lt_trans Hto _ x).
+    now apply (rngl_le_lt_trans Hor _ x).
   } {
     apply (rngl_lt_div_l Hop Hiv Hto).
-    now apply (rngl_le_lt_trans Hto _ x).
+    now apply (rngl_le_lt_trans Hor _ x).
     now rewrite rngl_mul_1_l.
   }
 }
@@ -2757,7 +2757,7 @@ unfold "//", fst, Rediv_mod.
 destruct (Rcase_abs (y * z)) as [Hyz| Hyz]; [ | now rewrite Z.add_0_r ].
 rewrite (rngl_div_opp_r Hop Hiv). 2: {
   intros H; rewrite H in Hyz.
-  now apply (rngl_lt_irrefl Hor) in Hyz.
+  now apply rngl_lt_irrefl in Hyz.
 }
 rewrite Int_part_opp.
 rewrite Z.opp_sub_distr.

@@ -76,7 +76,7 @@ destruct (u i). {
   eapply (rngl_le_trans Hor). {
     apply IHk.
     apply (rngl_div_nonneg Hop Hiv Hto); [ easy | ].
-    apply (rngl_lt_le_trans Hto _ 1).
+    apply (rngl_lt_le_trans Hor _ 1).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
     apply (rngl_le_add_l Hos Hor).
     apply (rngl_0_le_2 Hos Hto).
@@ -95,7 +95,7 @@ destruct (u i). {
 }
 eapply (rngl_le_trans Hor); [ apply IHk | ]. {
   apply (rngl_div_nonneg Hop Hiv Hto); [ easy | ].
-  apply (rngl_lt_le_trans Hto _ 1).
+  apply (rngl_lt_le_trans Hor _ 1).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
   apply (rngl_le_add_l Hos Hor).
   apply (rngl_0_le_2 Hos Hto).
@@ -103,7 +103,7 @@ eapply (rngl_le_trans Hor); [ apply IHk | ]. {
 apply (rngl_div_le_mono_pos_r Hop Hiv Hto).
 apply (rngl_0_lt_2 Hos Hc1 Hto).
 apply (rngl_le_div_l Hop Hiv Hto).
-apply (rngl_lt_le_trans Hto _ 1).
+apply (rngl_lt_le_trans Hor _ 1).
 apply (rngl_0_lt_1 Hos Hc1 Hto).
 apply (rngl_le_add_l Hos Hor).
 apply (rngl_0_le_2 Hos Hto).
@@ -236,12 +236,12 @@ assert (Hzi : ∀ i, (0 ≤ (2 * 3 ^ i)⁻¹)%L). {
   apply (rngl_3_neq_0 Hos Hc1 Hto).
   apply (rngl_mul_nonneg_nonneg Hos Hor).
   rewrite (rngl_inv_pow Hos Hiv).
-  apply (rngl_lt_le_incl Hto).
+  apply rngl_lt_le_incl.
   apply (rngl_pow_pos_pos Hop Hiv Hto).
   apply (rngl_inv_pos Hop Hiv Hto).
   apply (rngl_0_lt_3 Hos Hc1 Hto).
   apply (rngl_3_neq_0 Hos Hc1 Hto).
-  apply (rngl_lt_le_incl Hto).
+  apply rngl_lt_le_incl.
   apply (rngl_inv_pos Hop Hiv Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
@@ -441,7 +441,7 @@ apply (rngl_lt_div_r Hop Hiv Hto).
 apply (rngl_pow_pos_pos Hop Hiv Hto).
 apply (rngl_0_lt_3 Hos Hc1 Hto).
 apply (rngl_lt_sub_lt_add_l Hop Hto).
-eapply (rngl_le_lt_trans Hto); [ apply Hr2 | ].
+eapply (rngl_le_lt_trans Hor); [ apply Hr2 | ].
 rewrite partial_sum3_succ.
 rewrite <- rngl_add_assoc.
 apply (rngl_add_lt_mono_l Hos Hto).
@@ -459,7 +459,7 @@ apply (rngl_0_lt_3 Hos Hc1 Hto).
 rewrite rngl_mul_1_l.
 apply (rngl_lt_add_lt_sub_r Hop Hto).
 progress unfold INR.
-apply (rngl_le_lt_trans Hto _ 1).
+apply (rngl_le_lt_trans Hor _ 1).
 rewrite <- rngl_of_nat_1.
 apply (rngl_of_nat_inj_le Hos Hc1 Hto).
 apply Nat.b2n_le_1.
@@ -622,7 +622,7 @@ induction n. {
   apply Int_part_interv.
   split; [ easy | ].
   rewrite rngl_of_Z_1.
-  apply (rngl_le_lt_trans Hto _ (1 / 2)); [ easy | ].
+  apply (rngl_le_lt_trans Hor _ (1 / 2)); [ easy | ].
   apply (rngl_lt_div_l Hop Hiv Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   rewrite rngl_mul_1_l.
@@ -719,7 +719,7 @@ split. {
     apply Hr1; unfold E; simpl.
     now exists 0.
   }
-  apply (rngl_le_lt_trans Hto _ (1 / 2)); [ easy | ].
+  apply (rngl_le_lt_trans Hor _ (1 / 2)); [ easy | ].
   apply (rngl_lt_div_l Hop Hiv Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   rewrite rngl_mul_1_l.
@@ -780,7 +780,7 @@ apply -> (rngl_le_div_l Hop Hiv Hto) in H1. {
     apply rngl_nlt_ge in H.
     apply H; clear H.
     apply (rngl_lt_add_lt_sub_l Hop Hto).
-    apply (rngl_lt_le_trans Hto _ t); [ | easy ].
+    apply (rngl_lt_le_trans Hor _ t); [ | easy ].
     rewrite (rngl_mul_inv_r Hiv).
     apply (rngl_lt_div_l Hop Hiv Hto).
     apply (rngl_0_lt_2 Hos Hc1 Hto).

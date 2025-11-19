@@ -902,7 +902,7 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
     rewrite (rngl_ltb_opp_l Hop Hto) in Hx'.
     rewrite (rngl_opp_0 Hop) in Hx'.
     apply rngl_ltb_lt in Hx, Hx'.
-    now apply (rngl_lt_asymm Hto) in Hx.
+    now apply (rngl_lt_asymm Hor) in Hx.
   }
   clear Hx'.
   destruct (rngl_ltb_dec 0 (-x)) as [Hx'| Hx']; rewrite Hx'; [ easy | ].
@@ -927,7 +927,7 @@ destruct (rngl_ltb_dec y 0) as [Hy| Hy]; rewrite Hy. {
     rewrite (rngl_ltb_opp_l Hop Hto) in Hy'.
     rewrite (rngl_opp_0 Hop) in Hy'.
     apply rngl_ltb_lt in Hy, Hy'.
-    now apply (rngl_lt_asymm Hto) in Hy.
+    now apply (rngl_lt_asymm Hor) in Hy.
   }
   clear Hy'.
   destruct (rngl_ltb_dec 0 (-y)) as [Hy'| Hy']; rewrite Hy'; [ easy | ].
@@ -952,7 +952,7 @@ destruct (rngl_ltb_dec z 0) as [Hz| Hz]; rewrite Hz. {
     rewrite (rngl_ltb_opp_l Hop Hto) in Hz'.
     rewrite (rngl_opp_0 Hop) in Hz'.
     apply rngl_ltb_lt in Hz, Hz'.
-    now apply (rngl_lt_asymm Hto) in Hz.
+    now apply (rngl_lt_asymm Hor) in Hz.
   }
   clear Hz'.
   destruct (rngl_ltb_dec 0 (-z)) as [Hz'| Hz']; rewrite Hz'; [ easy | ].
@@ -1175,7 +1175,7 @@ rewrite rl_sqrt_mul; [ | | apply nonneg_sqr_vec_norm ]. 2: {
 rewrite <- Hur.
 rewrite (rl_sqrt_squ Hop Hto).
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
-  apply (rngl_lt_le_incl Hto).
+  apply rngl_lt_le_incl.
   apply (rngl_inv_pos Hop Hiv Hto).
   apply (rngl_le_neq Hto).
   split; [ | easy ].
@@ -1409,7 +1409,7 @@ destruct (rngl_leb_dec 0 k) as [H| H]; rewrite H. {
   rename H into Hkn.
   apply rngl_leb_nle in Hkn.
   apply (rngl_nle_gt_iff Hto) in Hkn.
-  apply (rngl_lt_le_incl Hto) in Hkn.
+  apply rngl_lt_le_incl in Hkn.
   assert (Hx : ∀ x, (k * x / a = - (x / b))%L). {
     intros x; subst a.
     rewrite (rngl_abs_nonpos_eq Hop Hto); [ | easy ].
