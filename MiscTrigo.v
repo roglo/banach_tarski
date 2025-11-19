@@ -921,7 +921,7 @@ f_equal. {
   symmetry in Hta.
   destruct ta; [ | now apply rngl_cos_neg_cos_asin_div_tan_sqrt ].
   apply rngl_ltb_lt in Hta.
-  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hto) ].
+  rewrite (rngl_abs_nonpos_eq Hop Hto); [ | now apply (rngl_lt_le_incl Hto) ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite angle_opp_involutive.
@@ -933,7 +933,7 @@ f_equal. {
   symmetry in Hta.
   destruct ta; [ | now apply rngl_cos_neg_sin_asin_div_tan_sqrt ].
   apply rngl_ltb_lt in Hta.
-  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hto) ].
+  rewrite (rngl_abs_nonpos_eq Hop Hto); [ | now apply (rngl_lt_le_incl Hto) ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite angle_opp_involutive.
@@ -955,7 +955,7 @@ f_equal. {
   symmetry in Hta.
   destruct ta; [ | now apply rngl_cos_pos_cos_asin_div_tan_sqrt ].
   apply rngl_ltb_lt in Hta.
-  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hto) ].
+  rewrite (rngl_abs_nonpos_eq Hop Hto); [ | now apply (rngl_lt_le_incl Hto) ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite angle_opp_involutive.
@@ -966,7 +966,7 @@ f_equal. {
   symmetry in Hta.
   destruct ta; [ | now apply rngl_cos_pos_sin_asin_div_tan_sqrt ].
   apply rngl_ltb_lt in Hta.
-  rewrite (rngl_abs_nonpos_eq Hop Hor); [ | now apply (rngl_lt_le_incl Hto) ].
+  rewrite (rngl_abs_nonpos_eq Hop Hto); [ | now apply (rngl_lt_le_incl Hto) ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
   rewrite angle_opp_involutive.
@@ -1012,7 +1012,7 @@ destruct Hcz; subst. {
   cbn.
   replace (- angle_right =? angle_right)%A with false.
   rewrite (rngl_div_opp_l Hop Hiv).
-  rewrite (rngl_ltb_opp_l Hop Hor).
+  rewrite (rngl_ltb_opp_l Hop Hto).
   rewrite (rngl_opp_0 Hop).
   rewrite (rngl_squ_opp Hop).
   remember (0 <? 1 / 0)%L as z1z eqn:Hz1z.
@@ -1064,7 +1064,7 @@ destruct cz. {
   apply (rngl_compare_lt_iff Hto) in Hcz.
   now apply rngl_cos_neg_atan_tan.
 } {
-  apply (rngl_compare_gt_iff Hor) in Hcz.
+  apply (rngl_compare_gt_iff Hto) in Hcz.
   now apply rngl_cos_pos_atan_tan.
 }
 Qed.
@@ -1179,28 +1179,29 @@ Qed.
 Theorem pre_sin_bound :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ s c, (s² + c² = 1 → -1 ≤ s ≤ 1)%L.
 Proof.
-intros Hop Hiq Hor.
+intros Hop Hiq Hto.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros s c Hsc.
 apply (rngl_squ_le_1_iff Hop Hiq Hto).
 rewrite <- Hsc.
-apply (rngl_le_add_r Hor).
+apply (rngl_le_add_r Hos Hor).
 apply (rngl_squ_nonneg Hos Hto).
 Qed.
 
 Theorem pre_cos_bound :
   rngl_has_opp T = true →
   rngl_has_inv_or_pdiv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ s c, (s² + c² = 1 → -1 ≤ c ≤ 1)%L.
 Proof.
-intros Hop Hiq Hor.
+intros Hop Hiv Hto.
 intros s c Hsc.
 rewrite rngl_add_comm in Hsc.
-now apply pre_sin_bound in Hsc.
+now apply (pre_sin_bound Hop Hiv Hto) in Hsc.
 Qed.
 
 Theorem rngl_sin_angle_of_sin_cos : ∀ s c,
@@ -1213,7 +1214,7 @@ unfold angle_of_sin_cos.
 destruct (rngl_ltb_dec s 0) as [Hs| Hs]; rewrite Hs. {
   destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
     rewrite rngl_sin_opp.
-    rewrite rngl_sin_acos; [ | now apply (pre_cos_bound Hop Hiq Hor s) ].
+    rewrite rngl_sin_acos; [ | now apply (pre_cos_bound Hop Hiq Hto s) ].
     rewrite <- Hsc.
     rewrite (rngl_add_sub Hos).
     rewrite (rl_sqrt_squ Hop Hto).
@@ -1223,7 +1224,7 @@ destruct (rngl_ltb_dec s 0) as [Hs| Hs]; rewrite Hs. {
     now apply (rngl_lt_le_incl Hto).
   }
   apply rngl_sin_asin.
-  now apply (pre_sin_bound Hop Hiq Hor _ c).
+  now apply (pre_sin_bound Hop Hiq Hto _ c).
 }
 apply (rngl_ltb_ge_iff Hto) in Hs.
 destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
@@ -1233,7 +1234,7 @@ destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
   now apply (rngl_abs_nonneg_eq Hop Hor).
 }
 apply rngl_sin_asin.
-now apply (pre_sin_bound Hop Hiq Hor _ c).
+now apply (pre_sin_bound Hop Hiq Hto _ c).
 Qed.
 
 Theorem rngl_cos_angle_of_sin_cos : ∀ s c,
@@ -1247,7 +1248,7 @@ destruct (rngl_ltb_dec s 0) as [Hs| Hs]; rewrite Hs. {
   destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
     rewrite rngl_cos_opp.
     apply rngl_cos_acos.
-    now apply (pre_cos_bound Hop Hiq Hor s).
+    now apply (pre_cos_bound Hop Hiq Hto s).
   }
   apply (rngl_ltb_ge_iff Hto) in Hc.
   rewrite rngl_cos_asin.
@@ -1255,7 +1256,7 @@ destruct (rngl_ltb_dec s 0) as [Hs| Hs]; rewrite Hs. {
   rewrite (rngl_add_sub Hos).
   rewrite (rl_sqrt_squ Hop Hto).
   now apply (rngl_abs_nonneg_eq Hop Hor).
-  now apply (pre_sin_bound Hop Hiq Hor _ c).
+  now apply (pre_sin_bound Hop Hiq Hto _ c).
 }
 destruct (rngl_ltb_dec c 0) as [Hc| Hc]; rewrite Hc. {
   apply rngl_cos_acos.
@@ -1266,7 +1267,7 @@ rewrite rngl_cos_asin.
 rewrite <- Hsc, rngl_add_comm, (rngl_add_sub Hos).
 rewrite (rl_sqrt_squ Hop Hto).
 now apply (rngl_abs_nonneg_eq Hop Hor).
-now apply (pre_sin_bound Hop Hiq Hor _ c).
+now apply (pre_sin_bound Hop Hiq Hto _ c).
 Qed.
 
 End a.

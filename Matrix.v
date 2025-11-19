@@ -899,7 +899,7 @@ destruct_ac.
 intros (x, y, z) Hv; simpl.
 destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
   destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']; rewrite Hx'. {
-    rewrite (rngl_ltb_opp_l Hop Hor) in Hx'.
+    rewrite (rngl_ltb_opp_l Hop Hto) in Hx'.
     rewrite (rngl_opp_0 Hop) in Hx'.
     apply rngl_ltb_lt in Hx, Hx'.
     now apply (rngl_lt_asymm Hto) in Hx.
@@ -911,11 +911,11 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
   congruence.
 }
 destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']; rewrite Hx'. {
-  rewrite (rngl_ltb_opp_l Hop Hor) in Hx'.
+  rewrite (rngl_ltb_opp_l Hop Hto) in Hx'.
   rewrite (rngl_opp_0 Hop) in Hx'.
   now rewrite Hx'.
 }
-rewrite (rngl_ltb_opp_l Hop Hor) in Hx'.
+rewrite (rngl_ltb_opp_l Hop Hto) in Hx'.
 rewrite (rngl_opp_0 Hop) in Hx'.
 apply (rngl_ltb_ge_iff Hto) in Hx, Hx'.
 apply (rngl_le_antisymm Hor) in Hx; [ | easy ].
@@ -924,7 +924,7 @@ rewrite (rngl_opp_0 Hop).
 rewrite rngl_ltb_ge; [ clear Hx' | easy ].
 destruct (rngl_ltb_dec y 0) as [Hy| Hy]; rewrite Hy. {
   destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy']; rewrite Hy'. {
-    rewrite (rngl_ltb_opp_l Hop Hor) in Hy'.
+    rewrite (rngl_ltb_opp_l Hop Hto) in Hy'.
     rewrite (rngl_opp_0 Hop) in Hy'.
     apply rngl_ltb_lt in Hy, Hy'.
     now apply (rngl_lt_asymm Hto) in Hy.
@@ -936,11 +936,11 @@ destruct (rngl_ltb_dec y 0) as [Hy| Hy]; rewrite Hy. {
   congruence.
 }
 destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy']; rewrite Hy'. {
-  rewrite (rngl_ltb_opp_l Hop Hor) in Hy'.
+  rewrite (rngl_ltb_opp_l Hop Hto) in Hy'.
   rewrite (rngl_opp_0 Hop) in Hy'.
   now rewrite Hy'.
 }
-rewrite (rngl_ltb_opp_l Hop Hor) in Hy'.
+rewrite (rngl_ltb_opp_l Hop Hto) in Hy'.
 rewrite (rngl_opp_0 Hop) in Hy'.
 apply (rngl_ltb_ge_iff Hto) in Hy, Hy'.
 apply (rngl_le_antisymm Hor) in Hy; [ | easy ].
@@ -949,7 +949,7 @@ rewrite (rngl_opp_0 Hop).
 rewrite rngl_ltb_ge; [ clear Hy' | easy ].
 destruct (rngl_ltb_dec z 0) as [Hz| Hz]; rewrite Hz. {
   destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz']; rewrite Hz'. {
-    rewrite (rngl_ltb_opp_l Hop Hor) in Hz'.
+    rewrite (rngl_ltb_opp_l Hop Hto) in Hz'.
     rewrite (rngl_opp_0 Hop) in Hz'.
     apply rngl_ltb_lt in Hz, Hz'.
     now apply (rngl_lt_asymm Hto) in Hz.
@@ -961,11 +961,11 @@ destruct (rngl_ltb_dec z 0) as [Hz| Hz]; rewrite Hz. {
   congruence.
 }
 destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz']; rewrite Hz'. {
-  rewrite (rngl_ltb_opp_l Hop Hor) in Hz'.
+  rewrite (rngl_ltb_opp_l Hop Hto) in Hz'.
   rewrite (rngl_opp_0 Hop) in Hz'.
   now rewrite Hz'.
 }
-rewrite (rngl_ltb_opp_l Hop Hor) in Hz'.
+rewrite (rngl_ltb_opp_l Hop Hto) in Hz'.
 rewrite (rngl_opp_0 Hop) in Hz'.
 apply (rngl_ltb_ge_iff Hto) in Hz, Hz'.
 apply (rngl_le_antisymm Hor) in Hz; [ | easy ].
