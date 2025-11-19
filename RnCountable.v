@@ -444,7 +444,7 @@ apply (rngl_lt_sub_lt_add_l Hop Hto).
 eapply (rngl_le_lt_trans Hor); [ apply Hr2 | ].
 rewrite partial_sum3_succ.
 rewrite <- rngl_add_assoc.
-apply (rngl_add_lt_mono_l Hos Hto).
+apply (rngl_add_lt_mono_l Hos Hor).
 rewrite (rngl_inv_mul_distr Hos Hiv).
 rewrite (rngl_mul_comm Hic _ 2⁻¹).
 rewrite (rngl_mul_inv_r Hiv).
@@ -467,7 +467,7 @@ field_simplify; fold_rngl.
 apply (rngl_lt_div_r Hop Hiv Hto).
 apply (rngl_0_lt_2 Hos Hc1 Hto).
 rewrite rngl_mul_1_l.
-apply (rngl_add_lt_mono_l Hos Hto).
+apply (rngl_add_lt_mono_l Hos Hor).
 rewrite rngl_mul_add_distr_r.
 rewrite rngl_mul_1_l.
 rewrite <- rngl_add_assoc.
@@ -732,7 +732,7 @@ unfold ter_bin_of_frac_part; symmetry.
 destruct (rngl_ltb_dec (frac_part Hc1 Har (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
   apply rngl_ltb_lt in H1.
   generalize H1; intros H.
-  apply rngl_nle_gt in H.
+  apply (rngl_nle_gt Hor) in H.
   apply rngl_leb_nle in H.
   rewrite H; clear H.
   progress unfold frac_part in H1.

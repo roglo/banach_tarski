@@ -165,7 +165,7 @@ destruct xz. {
     remember (0 ≤? x / _)%L as zxs eqn:Hzxs.
     symmetry in Hzxs.
     destruct zxs. {
-      apply rngl_nle_gt in Hxz.
+      apply (rngl_nle_gt Hor) in Hxz.
       apply Hxz; clear Hxz.
       (* lemma *)
       rewrite <- (rngl_div_1_r Hiq) in H; [ | now left ].
@@ -314,7 +314,7 @@ destruct xz. {
       apply Hzxs; clear Hzxs.
       apply (rngl_div_pos Hop Hiv Hto); [ easy | ].
       apply (rl_sqrt_pos Hos Hto).
-      apply (rngl_lt_trans Hto _ 1).
+      apply (rngl_lt_trans Hor _ 1).
       apply (rngl_0_lt_1 Hos Hc1 Hto).
       apply (rngl_lt_add_r Hos Hto).
       apply (rngl_le_neq Hto).

@@ -921,7 +921,7 @@ apply (rngl_ltb_ge_iff Hto) in Hx, Hx'.
 apply (rngl_le_antisymm Hor) in Hx; [ | easy ].
 subst x.
 rewrite (rngl_opp_0 Hop).
-rewrite rngl_ltb_ge; [ clear Hx' | easy ].
+rewrite (rngl_ltb_ge Hor); [ clear Hx' | easy ].
 destruct (rngl_ltb_dec y 0) as [Hy| Hy]; rewrite Hy. {
   destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy']; rewrite Hy'. {
     rewrite (rngl_ltb_opp_l Hop Hto) in Hy'.
@@ -946,7 +946,7 @@ apply (rngl_ltb_ge_iff Hto) in Hy, Hy'.
 apply (rngl_le_antisymm Hor) in Hy; [ | easy ].
 subst y.
 rewrite (rngl_opp_0 Hop).
-rewrite rngl_ltb_ge; [ clear Hy' | easy ].
+rewrite (rngl_ltb_ge Hor); [ clear Hy' | easy ].
 destruct (rngl_ltb_dec z 0) as [Hz| Hz]; rewrite Hz. {
   destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz']; rewrite Hz'. {
     rewrite (rngl_ltb_opp_l Hop Hto) in Hz'.
@@ -971,7 +971,7 @@ apply (rngl_ltb_ge_iff Hto) in Hz, Hz'.
 apply (rngl_le_antisymm Hor) in Hz; [ | easy ].
 subst z.
 rewrite (rngl_opp_0 Hop).
-rewrite rngl_ltb_ge; [ clear Hz' | easy ].
+rewrite (rngl_ltb_ge Hor); [ clear Hz' | easy ].
 easy.
 Qed.
 
