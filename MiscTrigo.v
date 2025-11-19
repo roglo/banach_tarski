@@ -471,8 +471,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros.
 specialize (rngl_lt_0_add_1_squ Hos Hiq Hc1 Hto a) as Hz1a2.
-...
-specialize (rl_sqrt_add_1_squ_neq_0 Hos Hiq Hc1 Hor a) as Hs1a2.
+specialize (rl_sqrt_add_1_squ_neq_0 Hos Hiq Hc1 Hto a) as Hs1a2.
 apply (rngl_squ_le_1_iff Hop Hiq Hto).
 rewrite (rngl_squ_div Hic Hos Hiv); [ | easy ].
 rewrite rngl_squ_sqrt; [ | now apply (rngl_lt_le_incl Hto) ].
@@ -493,7 +492,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 intros.
 specialize (rngl_lt_0_add_1_squ Hos Hiq Hc1 Hto a) as Hz1a2.
-specialize (rl_sqrt_add_1_squ_neq_0 Hos Hiq Hc1 Hor a) as Hs1a2.
+specialize (rl_sqrt_add_1_squ_neq_0 Hos Hiq Hc1 Hto a) as Hs1a2.
 assert (H1a2 : (1 + a²)%L ≠ 0%L). {
   intros H.
   rewrite H in Hz1a2.
@@ -548,7 +547,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 }
 specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros.
-specialize (rl_sqrt_add_1_squ_neq_0 Hos Hiq Hc1 Hor x) as Hs1a2.
+specialize (rl_sqrt_add_1_squ_neq_0 Hos Hiq Hc1 Hto x) as Hs1a2.
 assert (Hca : ∀ x, (0 < rngl_cos (rngl_atan x))%L). {
   intros y.
   apply rngl_lt_0_cos.
@@ -661,10 +660,11 @@ Definition rngl_sign' a :=
 Theorem rngl_div_abs_diag_l :
   rngl_has_opp T = true →
   rngl_has_inv T = true →
-  rngl_is_ordered T = true →
+  rngl_is_totally_ordered T = true →
   ∀ a, a ≠ 0%L → (rngl_abs a / a = rngl_sign' a)%L.
 Proof.
-intros Hop Hiv Hor.
+intros Hop Hiv Hto.
+specialize (rngl_is_totally_ordered_is_ordered Hto) as Hor.
 specialize (rngl_has_eq_dec_or_is_ordered_r Hor) as Heo.
 specialize (rngl_has_inv_has_inv_or_pdiv Hiv) as Hiq.
 intros * Haz.
@@ -675,7 +675,7 @@ remember (a ?= 0)%L as az' eqn:Ha'.
 symmetry in Ha, Ha'.
 destruct az. {
   apply rngl_leb_le in Ha.
-  apply (rngl_compare_le_iff Hor) in Ha.
+  apply (rngl_compare_le_iff Hto) in Ha.
   destruct az'; [ | | easy ].
   now apply (rngl_compare_eq_iff Heo) in Ha'.
   rewrite (rngl_div_opp_l Hop Hiv).
@@ -686,7 +686,7 @@ rewrite (rngl_div_diag Hiq); [ symmetry | easy ].
 apply (rngl_leb_gt_iff Hto) in Ha.
 destruct az'; [ | | easy ].
 now apply (rngl_compare_eq_iff Heo) in Ha'.
-apply (rngl_compare_lt_iff Hor) in Ha'.
+apply (rngl_compare_lt_iff Hto) in Ha'.
 now apply (rngl_lt_asymm Hto) in Ha'.
 Qed.
 
@@ -715,7 +715,7 @@ assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
 }
 assert (Hz1t : (0 ≤ 1 + rngl_tan² θ)%L). {
   apply (rngl_le_trans Hor _ 1); [ easy | ].
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hos Hto).
 }
 assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
@@ -822,7 +822,7 @@ assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
 }
 assert (Hz1t : (0 ≤ 1 + rngl_tan² θ)%L). {
   apply (rngl_le_trans Hor _ 1); [ easy | ].
-  apply (rngl_le_add_r Hor).
+  apply (rngl_le_add_r Hos Hor).
   apply (rngl_squ_nonneg Hos Hto).
 }
 assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
@@ -1061,7 +1061,7 @@ destruct cz. {
   apply (rngl_compare_eq_iff Heo) in Hcz.
   now apply rngl_cos_0_atan_tan.
 } {
-  apply (rngl_compare_lt_iff Hor) in Hcz.
+  apply (rngl_compare_lt_iff Hto) in Hcz.
   now apply rngl_cos_neg_atan_tan.
 } {
   apply (rngl_compare_gt_iff Hor) in Hcz.
