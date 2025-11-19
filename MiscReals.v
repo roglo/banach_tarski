@@ -80,7 +80,7 @@ rewrite (rngl_mul_comm Hic), <- rngl_mul_assoc; f_equal.
 rewrite <- rl_sqrt_mul; [ | easy | easy ].
 rewrite fold_rngl_squ.
 rewrite (rl_sqrt_squ Hop Hto).
-now apply (rngl_abs_nonneg_eq Hop Hor).
+now apply (rngl_abs_nonneg_eq Hop Hto).
 Qed.
 
 Theorem Rdiv_0_l : ∀ x, (x ≠ 0 → 0 / x = 0)%L.
@@ -672,7 +672,7 @@ intros.
 specialize (int_part Hop Hc1 Hto Har a) as (n, Hn).
 destruct (rngl_leb_dec 0 a)%L as [Hza| Hza]. {
   apply rngl_leb_le in Hza.
-  rewrite (rngl_abs_nonneg_eq Hop Hor) in Hn; [ | easy ].
+  rewrite (rngl_abs_nonneg_eq Hop Hto) in Hn; [ | easy ].
   exists (Z.of_nat n).
   rewrite rngl_of_Z_of_nat.
   rewrite Z.add_1_r.
