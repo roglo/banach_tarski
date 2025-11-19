@@ -350,7 +350,7 @@ rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hos Hc1 Hor).
+  apply (rngl_3_neq_0 Hos Hc1 Hto).
 }
 now f_equal; field.
 Qed.
@@ -590,7 +590,7 @@ destruct_ac.
 specialize (rngl_0_le_2 Hos Hto) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hos Hc1 Hor).
+  apply (rngl_3_neq_0 Hos Hc1 Hto).
 }
 progress unfold is_rotation_matrix.
 progress unfold is_ortho_matrix.
@@ -613,7 +613,7 @@ destruct_ac.
 specialize (rngl_0_le_2 Hos Hto) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hos Hc1 Hor).
+  apply (rngl_3_neq_0 Hos Hc1 Hto).
 }
 progress unfold is_rotation_matrix.
 progress unfold is_ortho_matrix.
@@ -640,7 +640,7 @@ destruct_ac.
 specialize (rngl_0_le_2 Hos Hto) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hos Hc1 Hor).
+  apply (rngl_3_neq_0 Hos Hc1 Hto).
 }
 progress unfold is_rotation_matrix.
 progress unfold is_ortho_matrix.
@@ -797,9 +797,9 @@ Proof.
 destruct_ac.
 specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros * H.
-apply (rngl_eq_add_0 Hos Hto) in H.
+apply (rngl_eq_add_0 Hos Hor) in H.
 destruct H as (H, H3).
-apply (rngl_eq_add_0 Hos Hto) in H.
+apply (rngl_eq_add_0 Hos Hor) in H.
 destruct H as (H1, H2).
 now apply (eq_rngl_squ_0 Hos Hio) in H1, H2, H3.
 apply (rngl_squ_nonneg Hos Hto).
