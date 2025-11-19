@@ -457,7 +457,7 @@ apply (rngl_0_lt_3 Hos Hc1 Hor).
 apply (rngl_lt_div_l Hop Hiv Hto).
 apply (rngl_0_lt_3 Hos Hc1 Hor).
 rewrite rngl_mul_1_l.
-apply (rngl_lt_add_lt_sub_r Hop Hor).
+apply (rngl_lt_add_lt_sub_r Hop Hto).
 progress unfold INR.
 apply (rngl_le_lt_trans Hto _ 1).
 rewrite <- rngl_of_nat_1.

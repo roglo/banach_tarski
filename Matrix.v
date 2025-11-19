@@ -906,7 +906,7 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
   }
   clear Hx'.
   destruct (rngl_ltb_dec 0 (-x)) as [Hx'| Hx']; rewrite Hx'; [ easy | ].
-  rewrite (rngl_ltb_opp_r Hop Hor) in Hx'.
+  rewrite (rngl_ltb_opp_r Hop Hto) in Hx'.
   rewrite (rngl_opp_0 Hop) in Hx'.
   congruence.
 }
@@ -931,7 +931,7 @@ destruct (rngl_ltb_dec y 0) as [Hy| Hy]; rewrite Hy. {
   }
   clear Hy'.
   destruct (rngl_ltb_dec 0 (-y)) as [Hy'| Hy']; rewrite Hy'; [ easy | ].
-  rewrite (rngl_ltb_opp_r Hop Hor) in Hy'.
+  rewrite (rngl_ltb_opp_r Hop Hto) in Hy'.
   rewrite (rngl_opp_0 Hop) in Hy'.
   congruence.
 }
@@ -956,7 +956,7 @@ destruct (rngl_ltb_dec z 0) as [Hz| Hz]; rewrite Hz. {
   }
   clear Hz'.
   destruct (rngl_ltb_dec 0 (-z)) as [Hz'| Hz']; rewrite Hz'; [ easy | ].
-  rewrite (rngl_ltb_opp_r Hop Hor) in Hz'.
+  rewrite (rngl_ltb_opp_r Hop Hto) in Hz'.
   rewrite (rngl_opp_0 Hop) in Hz'.
   congruence.
 }

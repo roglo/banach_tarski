@@ -2212,7 +2212,7 @@ destruct (rngl_leb_dec 0 (x * y)) as [Hxy| Hxy]; rewrite Hxy. {
   apply (rngl_squ_opp_1 Hop).
 }
 apply (rngl_leb_gt_iff Hto) in Hxy.
-apply (rngl_lt_mul_0_if Hos Hor) in Hxy.
+apply (rngl_lt_mul_0_if Hos Hto) in Hxy.
 destruct Hxy as [(Hx, Hy)| (Hx, Hy)]. {
   apply (rngl_leb_gt_iff Hto) in Hx.
   apply (rngl_lt_le_incl Hto) in Hy.
@@ -2352,7 +2352,7 @@ split. {
   progress unfold Int_part.
   remember (z_int_part _) as z eqn:H; clear H.
   destruct z as (z, Hz).
-  apply (rngl_lt_add_lt_sub_r Hop Hor).
+  apply (rngl_lt_add_lt_sub_r Hop Hto).
   rewrite (rngl_add_opp_l Hop).
   apply (rngl_lt_sub_lt_add_r Hop Hto).
   rewrite <- rngl_of_Z_1.
