@@ -766,7 +766,7 @@ intros * Haz.
 assert (Hcz : (rngl_cos θ ≠ 0)%L). {
   now intros H; rewrite H in Haz; apply rngl_lt_irrefl in Haz.
 }
-specialize (rngl_lt_le_incl Hto _ _ Haz) as Hcaz.
+specialize (rngl_lt_le_incl _ _ Haz) as Hcaz.
 assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
   intros H; apply Hcz.
   now apply (eq_rngl_squ_0 Hos Hio).
@@ -873,7 +873,7 @@ intros * Haz.
 assert (Hcz : (rngl_cos θ ≠ 0)%L). {
   now intros H; rewrite H in Haz; apply rngl_lt_irrefl in Haz.
 }
-specialize (rngl_lt_le_incl Hto _ _ Haz) as Hcaz.
+specialize (rngl_lt_le_incl _ _ Haz) as Hcaz.
 assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
   intros H; apply Hcz.
   now apply (eq_rngl_squ_0 Hos Hio).
@@ -1161,7 +1161,7 @@ unfold angle_of_sin_cos.
 rewrite rngl_acos_cos.
 rewrite rngl_asin_cos.
 rewrite rngl_asin_sin.
-do 2 rewrite (rngl_ltb_neg_leb Hor).
+do 2 rewrite (rngl_ltb_neg_leb Hto).
 destruct (0 ≤? rngl_cos θ)%L; cbn.
 now destruct (0 ≤? rngl_sin θ)%L.
 destruct (0 ≤? rngl_sin θ)%L; cbn. {
