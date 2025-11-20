@@ -901,7 +901,7 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]; rewrite Hx. {
   destruct (rngl_ltb_dec (-x) 0) as [Hx'| Hx']; rewrite Hx'. {
     rewrite (rngl_ltb_opp_l Hop Hto) in Hx'.
     rewrite (rngl_opp_0 Hop) in Hx'.
-    apply rngl_ltb_lt in Hx, Hx'.
+    apply (rngl_ltb_lt Heo) in Hx, Hx'.
     now apply (rngl_lt_asymm Hor) in Hx.
   }
   clear Hx'.
@@ -926,7 +926,7 @@ destruct (rngl_ltb_dec y 0) as [Hy| Hy]; rewrite Hy. {
   destruct (rngl_ltb_dec (-y) 0) as [Hy'| Hy']; rewrite Hy'. {
     rewrite (rngl_ltb_opp_l Hop Hto) in Hy'.
     rewrite (rngl_opp_0 Hop) in Hy'.
-    apply rngl_ltb_lt in Hy, Hy'.
+    apply (rngl_ltb_lt Heo) in Hy, Hy'.
     now apply (rngl_lt_asymm Hor) in Hy.
   }
   clear Hy'.
@@ -951,7 +951,7 @@ destruct (rngl_ltb_dec z 0) as [Hz| Hz]; rewrite Hz. {
   destruct (rngl_ltb_dec (-z) 0) as [Hz'| Hz']; rewrite Hz'. {
     rewrite (rngl_ltb_opp_l Hop Hto) in Hz'.
     rewrite (rngl_opp_0 Hop) in Hz'.
-    apply rngl_ltb_lt in Hz, Hz'.
+    apply (rngl_ltb_lt Heo) in Hz, Hz'.
     now apply (rngl_lt_asymm Hor) in Hz.
   }
   clear Hz'.

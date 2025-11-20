@@ -64,7 +64,7 @@ remember (x <? 0)%L as xz eqn:Hxz.
 symmetry in Hxz.
 destruct xz. {
   left.
-  apply rngl_ltb_lt in Hxz.
+  apply (rngl_ltb_lt Heo) in Hxz.
   apply angle_opp_lt_compat_if. {
     intros H.
     progress unfold rngl_asin in H.
@@ -144,7 +144,7 @@ destruct xz. {
   symmetry in Hzx.
   apply rngl_leb_le in Hx1.
   destruct zx. {
-    apply rngl_ltb_lt.
+    apply (rngl_ltb_lt Heo).
     apply (rl_sqrt_pos Hos Hto).
     apply (rngl_lt_0_sub Hop Hto).
     apply (rngl_le_neq Hto).
@@ -280,7 +280,7 @@ destruct xz. {
   remember (0 ≤? _)%L as zx eqn:Hzx.
   symmetry in Hzx.
   destruct zx. {
-    apply rngl_ltb_lt.
+    apply (rngl_ltb_lt Heo).
     apply (rl_sqrt_pos Hos Hto).
     apply (rngl_lt_0_sub Hop Hto).
     apply (rngl_le_neq Hto).
@@ -310,7 +310,7 @@ destruct xz. {
     symmetry in Hzxs.
     destruct zxs. {
       apply rngl_leb_le in Hzxs.
-      apply rngl_nlt_ge in Hzxs.
+      apply (rngl_nlt_ge Hor) in Hzxs.
       apply Hzxs; clear Hzxs.
       apply (rngl_div_pos Hop Hiv Hto); [ easy | ].
       apply (rl_sqrt_pos Hos Hto).
@@ -526,7 +526,7 @@ progress unfold rngl_atan.
 remember (a <? 0)%L as az eqn:Haz.
 symmetry in Haz.
 destruct az; [ | apply rngl_tan_asin_inv ].
-apply rngl_ltb_lt in Haz.
+apply (rngl_ltb_lt Heo) in Haz.
 apply rngl_lt_le_incl in Haz.
 rewrite rngl_tan_opp.
 apply (rngl_opp_inj Hop).
@@ -599,7 +599,7 @@ progress unfold rngl_atan.
 remember (x <? 0)%L as xz eqn:Hxz.
 symmetry in Hxz.
 destruct xz. {
-  apply rngl_ltb_lt in Hxz.
+  apply (rngl_ltb_lt Heo) in Hxz.
   apply rngl_lt_le_incl in Hxz.
   rewrite (rngl_abs_nonpos_eq Hop Hto); [ | easy ].
   specialize (rngl_div_sqrt_add_1_squ_interval (-x))%L as H1.
@@ -723,7 +723,7 @@ assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
   apply (rngl_add_move_0_l Hop) in H.
   specialize (rngl_squ_nonneg Hos Hto (rngl_tan θ)) as H1.
   rewrite H in H1.
-  apply rngl_nlt_ge in H1.
+  apply (rngl_nlt_ge Hor) in H1.
   apply H1, (rngl_opp_1_lt_0 Hop Hto Hc1).
 }
 cbn.
@@ -830,7 +830,7 @@ assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
   apply (rngl_add_move_0_l Hop) in H.
   specialize (rngl_squ_nonneg Hos Hto (rngl_tan θ)) as H1.
   rewrite H in H1.
-  apply rngl_nlt_ge in H1.
+  apply (rngl_nlt_ge Hor) in H1.
   apply H1, (rngl_opp_1_lt_0 Hop Hto Hc1).
 }
 cbn.
@@ -920,7 +920,7 @@ f_equal. {
   remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
   symmetry in Hta.
   destruct ta; [ | now apply rngl_cos_neg_cos_asin_div_tan_sqrt ].
-  apply rngl_ltb_lt in Hta.
+  apply (rngl_ltb_lt Heo) in Hta.
   rewrite (rngl_abs_nonpos_eq Hop Hto); [ | now apply rngl_lt_le_incl ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
@@ -932,7 +932,7 @@ f_equal. {
   remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
   symmetry in Hta.
   destruct ta; [ | now apply rngl_cos_neg_sin_asin_div_tan_sqrt ].
-  apply rngl_ltb_lt in Hta.
+  apply (rngl_ltb_lt Heo) in Hta.
   rewrite (rngl_abs_nonpos_eq Hop Hto); [ | now apply rngl_lt_le_incl ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
@@ -954,7 +954,7 @@ f_equal. {
   remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
   symmetry in Hta.
   destruct ta; [ | now apply rngl_cos_pos_cos_asin_div_tan_sqrt ].
-  apply rngl_ltb_lt in Hta.
+  apply (rngl_ltb_lt Heo) in Hta.
   rewrite (rngl_abs_nonpos_eq Hop Hto); [ | now apply rngl_lt_le_incl ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
@@ -965,7 +965,7 @@ f_equal. {
   remember (rngl_tan θ <? 0)%L as ta eqn:Hta.
   symmetry in Hta.
   destruct ta; [ | now apply rngl_cos_pos_sin_asin_div_tan_sqrt ].
-  apply rngl_ltb_lt in Hta.
+  apply (rngl_ltb_lt Heo) in Hta.
   rewrite (rngl_abs_nonpos_eq Hop Hto); [ | now apply rngl_lt_le_incl ].
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp; [ | apply rngl_div_sqrt_add_1_squ_interval ].
@@ -1001,7 +1001,7 @@ destruct Hcz; subst. {
   remember (1 / 0 <? 0)%L as ozz eqn:Hozz.
   symmetry in Hozz.
   destruct ozz; [ | easy ].
-  apply rngl_ltb_lt in Hozz.
+  apply (rngl_ltb_lt Heo) in Hozz.
   rewrite (rngl_abs_nonpos_eq Hop Hto).
   rewrite (rngl_div_opp_l Hop Hiv).
   rewrite rngl_asin_opp.
@@ -1018,7 +1018,7 @@ destruct Hcz; subst. {
   remember (0 <? 1 / 0)%L as z1z eqn:Hz1z.
   symmetry in Hz1z.
   destruct z1z. {
-    apply rngl_ltb_lt in Hz1z.
+    apply (rngl_ltb_lt Heo) in Hz1z.
     rewrite (rngl_abs_nonpos_eq Hop Hto).
     rewrite (rngl_div_opp_l Hop Hiv).
     rewrite (rngl_div_opp_l Hop Hiv).
@@ -1220,7 +1220,7 @@ destruct (rngl_ltb_dec s 0) as [Hs| Hs]; rewrite Hs. {
     rewrite (rl_sqrt_squ Hop Hto).
     rewrite (rngl_abs_nonpos_eq Hop Hto).
     apply (rngl_opp_involutive Hop).
-    apply rngl_ltb_lt in Hs.
+    apply (rngl_ltb_lt Heo) in Hs.
     now apply rngl_lt_le_incl.
   }
   apply rngl_sin_asin.

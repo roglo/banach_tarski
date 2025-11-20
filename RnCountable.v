@@ -730,7 +730,7 @@ intros n.
 clear E Hr1 Hr2.
 unfold ter_bin_of_frac_part; symmetry.
 destruct (rngl_ltb_dec (frac_part Hc1 Har (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
-  apply rngl_ltb_lt in H1.
+  apply (rngl_ltb_lt Heo) in H1.
   generalize H1; intros H.
   apply (rngl_nle_gt Hor) in H.
   apply rngl_leb_nle in H.
@@ -747,7 +747,7 @@ destruct (rngl_ltb_dec (frac_part Hc1 Har (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
     simpl in Hr3, H1.
     rewrite rngl_of_nat_1 in Hr3.
     apply (rngl_le_add_le_sub_l Hop Hto) in Hr3.
-    now apply rngl_nlt_ge in Hr3.
+    now apply (rngl_nlt_ge Hor) in Hr3.
     apply (rngl_3_neq_0 Hos Hc1 Hto).
     apply (rngl_pow_neq_0 Hos Hiq).
     apply (rngl_3_neq_0 Hos Hc1 Hto).
@@ -777,7 +777,7 @@ apply -> (rngl_le_div_l Hop Hiv Hto) in H1. {
   set (s := partial_sum3 u n) in H1, H.
   set (t := ((3 * 3 ^ n))⁻¹) in H1, H.
   enough (H2 : (0 < t)%L). {
-    apply rngl_nlt_ge in H.
+    apply (rngl_nlt_ge Hor) in H.
     apply H; clear H.
     apply (rngl_lt_add_lt_sub_l Hop Hto).
     apply (rngl_lt_le_trans Hor _ t); [ | easy ].

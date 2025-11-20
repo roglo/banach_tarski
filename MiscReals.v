@@ -63,7 +63,7 @@ Proof.
 destruct_ac.
 intros.
 destruct (rngl_ltb_dec a 0) as [Haz| Haz]; [ left | right ].
-now apply rngl_ltb_lt in Haz.
+now apply (rngl_ltb_lt Heo) in Haz.
 now apply (rngl_ltb_ge_iff Hto).
 Qed.
 
@@ -893,7 +893,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
     rewrite rngl_of_pos_xI, rngl_of_pos_xO in Hab.
     destruct (Pos_dec a b) as [[Hdab| Hdab]| Hdab]; [ easy | | ]. 2: {
       subst b; exfalso.
-      apply rngl_nlt_ge in Hab.
+      apply (rngl_nlt_ge Hor) in Hab.
       apply Hab; clear Hab.
       apply (rngl_lt_add_r Hos Hto).
       apply (rngl_0_lt_1 Hos Hc1 Hto).
@@ -914,7 +914,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
     destruct b. {
       exfalso; cbn in Hab.
       rewrite (rngl_mul_0_r Hos) in Hab.
-      apply rngl_nlt_ge in Hab.
+      apply (rngl_nlt_ge Hor) in Hab.
       apply Hab; clear Hab.
       apply (rngl_add_nonneg_pos Hos Hto). 2: {
         apply (rngl_0_lt_1 Hos Hc1 Hto).
@@ -936,7 +936,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
     easy.
   }
   exfalso.
-  apply rngl_nlt_ge in Hab.
+  apply (rngl_nlt_ge Hor) in Hab.
   apply Hab; clear Hab.
   rewrite rngl_of_pos_1.
   rewrite rngl_of_pos_xI.
@@ -965,7 +965,7 @@ destruct b as [b| b| ]. {
   rewrite rngl_of_nat_succ in Hab |-*.
   destruct b. {
     exfalso; cbn in Hab.
-    apply rngl_nlt_ge in Hab.
+    apply (rngl_nlt_ge Hor) in Hab.
     apply Hab; clear Hab.
     rewrite (rngl_mul_0_r Hos), rngl_add_0_l.
     rewrite rngl_mul_add_distr_l, rngl_mul_1_r.
@@ -997,7 +997,7 @@ destruct b as [b| b| ]. {
   now apply IHa.
 }
 exfalso.
-apply rngl_nlt_ge in Hab.
+apply (rngl_nlt_ge Hor) in Hab.
 apply Hab; clear Hab.
 rewrite rngl_of_pos_xO.
 rewrite rngl_of_pos_1.
@@ -1087,13 +1087,13 @@ intros * Hab.
 destruct a as [| a| a]. {
   cbn in Hab.
   destruct b as [| b| b]; cbn in Hab; [ easy | easy | ].
-  exfalso; apply rngl_nlt_ge in Hab; apply Hab; clear Hab.
+  exfalso; apply (rngl_nlt_ge Hor) in Hab; apply Hab; clear Hab.
   apply (rngl_opp_lt_compat Hop Hto).
   rewrite (rngl_opp_0 Hop), (rngl_opp_involutive Hop).
   apply rngl_of_pos_pos.
 } {
   destruct b as [| b| b]; cbn. {
-    exfalso; apply rngl_nlt_ge in Hab; apply Hab; clear Hab; cbn.
+    exfalso; apply (rngl_nlt_ge Hor) in Hab; apply Hab; clear Hab; cbn.
     apply rngl_of_pos_pos.
   } {
     cbn in Hab.
@@ -1101,7 +1101,7 @@ destruct a as [| a| a]. {
     now apply rngl_of_pos_le_inj.
   }
   exfalso.
-  apply rngl_nlt_ge in Hab.
+  apply (rngl_nlt_ge Hor) in Hab.
   apply Hab; clear Hab; cbn.
   apply (rngl_le_lt_trans Hor _ 0); [ | apply rngl_of_pos_pos ].
   apply (rngl_opp_le_compat Hop Hto).
@@ -1313,7 +1313,7 @@ destruct Hx as (Hzx, Hx1).
 destruct Hn as (Hnx, Hxn).
 destruct n as [| p| p]; [ easy | | ]; exfalso. {
   cbn in Hnx.
-  apply rngl_nlt_ge in Hnx.
+  apply (rngl_nlt_ge Hor) in Hnx.
   apply Hnx; clear Hnx.
   apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
   apply rngl_of_pos_le_1_l.
@@ -1700,7 +1700,7 @@ destruct z as (z, Hz).
 progress unfold rngl_of_Z in Hz.
 destruct z as [| p| p]; [ easy | exfalso | easy ].
 destruct Hz as (Hz, _).
-apply rngl_nlt_ge in Hz.
+apply (rngl_nlt_ge Hor) in Hz.
 apply Hz; clear Hz.
 apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
 apply rngl_of_pos_nonneg.
@@ -2372,14 +2372,14 @@ destruct z as [| q| q]. {
   cbn in Hz.
   destruct Hz as (Hz, _).
   apply (rngl_opp_nonneg_nonpos Hop Hto) in Hz.
-  apply rngl_nlt_ge in Hz.
+  apply (rngl_nlt_ge Hor) in Hz.
   apply Hz; clear Hz.
   apply rngl_of_pos_pos.
 } {
   exfalso.
   cbn in Hz.
   destruct Hz as (Hz, _).
-  apply rngl_nlt_ge in Hz.
+  apply (rngl_nlt_ge Hor) in Hz.
   apply Hz; clear Hz.
   apply (rngl_le_lt_trans Hor _ 0); [ | apply rngl_of_pos_pos ].
   apply (rngl_opp_nonpos_nonneg Hop Hto).
@@ -2476,7 +2476,7 @@ destruct z as [| p| p]; cbn. {
     apply (rngl_opp_le_compat Hop Hto) in Hzp.
     rewrite (rngl_opp_involutive Hop) in Hzp.
     rewrite (rngl_opp_0 Hop) in Hzp.
-    apply rngl_nlt_ge in Hzp.
+    apply (rngl_nlt_ge Hor) in Hzp.
     apply Hzp, rngl_of_pos_pos.
   }
   clear Hzp.
@@ -2882,7 +2882,7 @@ Proof.
 destruct_ac.
 intros.
 destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
-  apply rngl_ltb_lt in Hx.
+  apply (rngl_ltb_lt Heo) in Hx.
   rewrite (rngl_sub_0_r Hos).
   do 2 rewrite rngl_mul_2_l.
   apply plus_frac_part2.
@@ -2907,7 +2907,7 @@ destruct_ac.
 intros.
 rewrite rngl_mul_2_l.
 destruct (rngl_ltb_dec (frac_part x) (1 / 2)) as [Hx| Hx]. {
-  apply rngl_ltb_lt in Hx.
+  apply (rngl_ltb_lt Heo) in Hx.
   rewrite plus_Int_part2. {
     rewrite Z.add_0_r.
     apply Z.add_diag.
