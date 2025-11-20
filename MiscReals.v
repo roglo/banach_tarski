@@ -715,7 +715,7 @@ split. {
   apply (rngl_opp_lt_compat Hop Hto).
   rewrite (rngl_opp_involutive Hop).
   rewrite rngl_of_Z_of_nat.
-  apply (rngl_le_neq Hto).
+  apply rngl_le_neq.
   split; [ easy | ].
   intros H; apply Han.
   rewrite H; symmetry.
@@ -2232,7 +2232,7 @@ Theorem Rneq_le_lt : ∀ x y, (x ≠ y → x ≤ y → x < y)%L.
 Proof.
 destruct_ac.
 intros * Hnxy Hxy.
-now apply (rngl_le_neq Hto).
+now apply rngl_le_neq.
 Qed.
 
 Theorem sqrt_diff_sqr_eq_0 : ∀ x y,
@@ -2457,7 +2457,7 @@ apply (rngl_opp_le_compat Hop Hto) in H1.
 apply (rngl_opp_lt_compat Hop Hto) in H2.
 rewrite (rngl_opp_involutive Hop) in H1, H2.
 split; [ now apply rngl_lt_le_incl | ].
-apply (rngl_le_neq Hto).
+apply rngl_le_neq.
 split; [ easy | ].
 intros H; subst x.
 apply (rngl_opp_lt_compat Hop Hto) in H2.

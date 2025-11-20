@@ -848,7 +848,7 @@ destruct_ac.
 intros * Hv.
 specialize (vec_norm_nonneg v) as H.
 apply vec_norm_neq_0 in Hv.
-now apply (rngl_le_neq Hto).
+now apply rngl_le_neq.
 Qed.
 
 Theorem vec_add_0_r : ∀ v, (v + 0 = v)%vec.
@@ -1177,7 +1177,7 @@ rewrite (rl_sqrt_squ Hop Hto).
 rewrite (rngl_abs_nonneg_eq Hop Hor). 2: {
   apply rngl_lt_le_incl.
   apply (rngl_inv_pos Hop Hiv Hto).
-  apply (rngl_le_neq Hto).
+  apply rngl_le_neq.
   split; [ | easy ].
   rewrite Hur.
   apply rl_sqrt_nonneg.
@@ -1607,7 +1607,7 @@ intros * Ha Hsc Hθ Hs' Hc'.
 assert (Haz : ‖a‖ ≠ 0%L) by now apply vec_norm_neq_0.
 assert (Haiz : ‖a‖⁻¹ ≠ 0%L) by now apply (rngl_inv_neq_0 Hos Hiv).
 assert (Hap : (0 < ‖a‖)%L). {
-  apply (rngl_le_neq Hto).
+  apply rngl_le_neq.
   split; [ apply (vec_norm_nonneg a) | easy ].
 }
 assert (Haa : (‖(a ⁄ ‖a‖)‖ = 1)%L) by now apply vec_div_vec_norm.

@@ -147,7 +147,7 @@ destruct xz. {
     apply (rngl_ltb_lt Heo).
     apply (rl_sqrt_pos Hos Hto).
     apply (rngl_lt_0_sub Hop Hto).
-    apply (rngl_le_neq Hto).
+    apply rngl_le_neq.
     split; [ easy | ].
     intros H.
     rewrite <- rngl_squ_1 in H at 2.
@@ -283,7 +283,7 @@ destruct xz. {
     apply (rngl_ltb_lt Heo).
     apply (rl_sqrt_pos Hos Hto).
     apply (rngl_lt_0_sub Hop Hto).
-    apply (rngl_le_neq Hto).
+    apply rngl_le_neq.
     split; [ easy | ].
     intros H.
     rewrite <- rngl_squ_1 in H at 2.
@@ -317,7 +317,7 @@ destruct xz. {
       apply (rngl_lt_trans Hor _ 1).
       apply (rngl_0_lt_1 Hos Hc1 Hto).
       apply (rngl_lt_add_r Hos Hto).
-      apply (rngl_le_neq Hto).
+      apply rngl_le_neq.
       split; [ apply (rngl_squ_nonneg Hos Hto) | ].
       intros H1; symmetry in H1.
       apply (eq_rngl_squ_0 Hos Hio) in H1; subst x.
@@ -583,7 +583,7 @@ apply (rngl_mul_inv_diag_r Hiv).
 intros H; rewrite H in Hca.
 now apply rngl_lt_irrefl in Hca.
 apply (rngl_0_le_1 Hos Hto).
-apply (rngl_le_neq Hto).
+apply rngl_le_neq.
 split; [ apply (rngl_squ_nonneg Hos Hto) | ].
 intros H; symmetry in H.
 apply (eq_rngl_squ_0 Hos Hio) in H.
@@ -772,7 +772,7 @@ assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
   now apply (eq_rngl_squ_0 Hos Hio).
 }
 assert (Hzc2 : (0 < rngl_cos² θ)%L). {
-  apply (rngl_le_neq Hto).
+  apply rngl_le_neq.
   split; [ apply (rngl_squ_nonneg Hos Hto) | easy ].
 }
 assert (Haaz : rngl_abs (rngl_cos θ) ≠ 0%L). {
@@ -879,7 +879,7 @@ assert (Hc2z : (rngl_cos² θ ≠ 0)%L). {
   now apply (eq_rngl_squ_0 Hos Hio).
 }
 assert (Hzc2 : (0 < rngl_cos² θ)%L). {
-  apply (rngl_le_neq Hto).
+  apply rngl_le_neq.
   split; [ apply (rngl_squ_nonneg Hos Hto) | easy ].
 }
 assert (Haaz : rngl_abs (rngl_cos θ) ≠ 0%L). {
