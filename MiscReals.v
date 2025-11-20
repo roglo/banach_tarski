@@ -2525,7 +2525,7 @@ do 2 rewrite rngl_of_Z_add.
 rewrite <- Hbn.
 split.
 now apply (rngl_add_le_mono_r Hos Hor).
-now apply (rngl_add_lt_mono_r Hos Hto).
+now apply (rngl_add_lt_mono_r Hos Hor).
 Qed.
 
 Theorem Rediv_add_1 :
@@ -2804,7 +2804,7 @@ split; [ easy | ].
 rewrite (Z.add_shuffle0 x).
 rewrite <- Z.add_assoc.
 rewrite rngl_of_Z_add.
-now apply (rngl_add_lt_compat Hos Hto).
+now apply (rngl_add_lt_compat Hos Hor).
 Qed.
 
 Theorem plus_Int_part2 :
