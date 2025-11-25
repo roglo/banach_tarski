@@ -2006,6 +2006,11 @@ Definition Levi_Civita_symbol i j k :=
   | _ => 0%L
   end.
 
+Definition Kronecker_symbol i j := if i =? j then 1%L else 0%L.
+
+Let δ := Kronecker_symbol.
+Let ε := Levi_Civita_symbol.
+
 Definition mat_nth M i j :=
   match (i, j) with
   | (1, 1) => a₁₁ M
@@ -2033,8 +2038,7 @@ Arguments vec_nth pat%_vec i%_nat.
 Theorem vec_nth_cross_mul_from_Levi_Civita :
   ∀ u v i,
   vec_nth (u × v) i =
-    ∑ (j = 1, 3), ∑ (k = 1, 3),
-    Levi_Civita_symbol i j k * vec_nth u j * vec_nth v k.
+    ∑ (j = 1, 3), ∑ (k = 1, 3), ε i j k * vec_nth u j * vec_nth v k.
 Proof.
 intros (u₁, u₂, u₃) (v₁, v₂, v₃); cbn.
 progress unfold iter_seq.
@@ -2075,8 +2079,8 @@ Qed.
 Theorem sum_Levi_Civita_symbol_mat :
   ∀ M m n o,
   ∑ (i = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
-    Levi_Civita_symbol i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
-  (Levi_Civita_symbol m n o * mat_det M)%L.
+    ε i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
+  (ε m n o * mat_det M)%L.
 Proof.
 intros.
 progress unfold iter_seq.
@@ -2161,7 +2165,7 @@ assert
     ∀ i,
     vec_nth (M * (u × v)) i =
     ∑ (l = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
-    mat_nth M i l * Levi_Civita_symbol l j k * vec_nth u j * vec_nth v k). {
+    mat_nth M i l * ε l j k * vec_nth u j * vec_nth v k). {
   intros.
   rewrite (vec_nth_mat_vec_mul M (u × v)).
   apply rngl_summation_eq_compat.
@@ -2182,7 +2186,7 @@ assert
     ∀ i,
     vec_nth ((M * u) × (M * v)) i =
     ∑ (j = 1, 3), ∑ (k = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3),
-    Levi_Civita_symbol i j k *
+    ε i j k *
       mat_nth M j m * vec_nth u m *
       mat_nth M k n * vec_nth v n). {
   intros.
@@ -2208,8 +2212,8 @@ assert
   (H3 :
     ∀ m n o,
     ∑ (i = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
-    Levi_Civita_symbol i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
-    Levi_Civita_symbol m n o). {
+    ε i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
+    ε m n o). {
   intros.
   specialize (sum_Levi_Civita_symbol_mat M m n o) as H3.
   now rewrite Hd, rngl_mul_1_r in H3.
@@ -2218,9 +2222,8 @@ assert
 assert
   (H4 :
     ∀ i j k,
-    ∑ (l = 1, 3), mat_nth M i l *  Levi_Civita_symbol l j k =
-    ∑ (m = 1, 3), ∑ (n = 1, 3),
-      Levi_Civita_symbol i m n * mat_nth M j m * mat_nth M k n). {
+    ∑ (l = 1, 3), mat_nth M i l *  ε l j k =
+    ∑ (m = 1, 3), ∑ (n = 1, 3), ε i m n * mat_nth M j m * mat_nth M k n). {
   intros.
   specialize (H3 i j k) as H.
   remember (∑ (m = _, _), ∑ (n = _, _), ∑ (o = _, _), _) as x in H.
@@ -2228,18 +2231,18 @@ assert
   enough
     (H' :
       ∀ l,
-      ∑ (i = 1, 3), mat_nth M i l * Levi_Civita_symbol l j k =
+      ∑ (i = 1, 3), mat_nth M i l * ε l j k =
       ∑ (i = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3),
-        mat_nth M i l * Levi_Civita_symbol m n o * mat_nth M m i *
+        mat_nth M i l * ε m n o * mat_nth M m i *
           mat_nth M n j * mat_nth M o k). {
     assert
       (H'' :
         ∀ l,
-        ∑ (i = 1, 3), mat_nth M i l * Levi_Civita_symbol l j k =
+        ∑ (i = 1, 3), mat_nth M i l * ε l j k =
         ∑ (m = 1, 3),
           (∑ (i = 1, 3), mat_nth M i l * mat_nth M m i) *
           (∑ (n = 1, 3), ∑ (o = 1, 3),
-            Levi_Civita_symbol m n o * mat_nth M n j * mat_nth M o k)). {
+            ε m n o * mat_nth M n j * mat_nth M o k)). {
       intros.
       rewrite H'.
       rewrite rngl_summation_summation_exch.
@@ -2255,6 +2258,29 @@ assert
       apply rngl_summation_eq_compat.
       intros r Hr.
       ring.
+    }
+    clear H'; rename H'' into H'.
+Theorem matrix_add_mul_eq_Kronecker :
+  ∀ M, is_ortho_matrix M →
+  ∀ j k, ∑ (i = 1, 3), mat_nth M i j * mat_nth M k i = δ j k.
+Proof.
+intros * HM *.
+progress unfold is_ortho_matrix in HM.
+...
+    assert
+      (H'' :
+        ∀ l,
+        ∑ (i = 1, 3), mat_nth M i l * ε l j k =
+        ∑ (m = 1, 3),
+          δ l m *
+          (∑ (n = 1, 3), ∑ (o = 1, 3),
+            ε m n o * mat_nth M n j * mat_nth M o k)). {
+      intros.
+      rewrite H'.
+      apply rngl_summation_eq_compat.
+      intros m Hm.
+      progress f_equal.
+      apply matrix_add_mul_eq_Kronecker.
     }
     clear H'; rename H'' into H'.
 ...
@@ -2287,7 +2313,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   reflexivity.
 }
-cbn - [ mat_nth Levi_Civita_symbol ].
+cbn - [ mat_nth ε ].
 rewrite rngl_summation_summation_exch.
 erewrite rngl_summation_eq_compat. 2: {
   intros.
@@ -2302,9 +2328,9 @@ erewrite rngl_summation_eq_compat. 2: {
           erewrite rngl_summation_eq_compat. 2: {
             intros.
             do 3 rewrite rngl_mul_assoc.
-            rewrite (rngl_mul_mul_swap Hic _ (Levi_Civita_symbol _ _ _)).
+            rewrite (rngl_mul_mul_swap Hic _ (ε _ _ _)).
             do 2 rewrite <- rngl_mul_assoc.
-            rewrite (rngl_mul_assoc (Levi_Civita_symbol _ _ _)).
+            rewrite (rngl_mul_assoc (ε _ _ _)).
             reflexivity.
           }
           reflexivity.
@@ -2317,7 +2343,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   reflexivity.
 }
-cbn - [ mat_nth Levi_Civita_symbol ].
+cbn - [ mat_nth ε ].
 erewrite rngl_summation_eq_compat. 2: {
   intros.
   erewrite rngl_summation_eq_compat. 2: {
@@ -2346,7 +2372,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   reflexivity.
 }
-cbn - [ mat_nth Levi_Civita_symbol ].
+cbn - [ mat_nth ε ].
 erewrite rngl_summation_eq_compat. 2: {
   intros.
   rewrite rngl_summation_summation_exch.
@@ -2364,17 +2390,17 @@ erewrite rngl_summation_eq_compat. 2: {
             intros.
             do 4 rewrite <- rngl_mul_assoc.
             do 2 rewrite rngl_mul_assoc.
-            remember (_ * _ * Levi_Civita_symbol _ _ _)%L as x.
+            remember (_ * _ * ε _ _ _)%L as x.
             rewrite (rngl_mul_assoc (mat_nth _ _ _)).
             rewrite (rngl_mul_assoc (mat_nth _ _ _ * _)).
             subst x.
             reflexivity.
           }
-          cbn - [ mat_nth Levi_Civita_symbol ].
+          cbn - [ mat_nth ε ].
           rewrite <- (rngl_mul_summation_distr_r Hos).
           reflexivity.
         }
-        cbn - [ mat_nth Levi_Civita_symbol ].
+        cbn - [ mat_nth ε ].
         reflexivity.
       }
       reflexivity.
@@ -2383,7 +2409,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   reflexivity.
 }
-cbn - [ mat_nth Levi_Civita_symbol ].
+cbn - [ mat_nth ε ].
 erewrite rngl_summation_eq_compat. 2: {
   intros.
   erewrite rngl_summation_eq_compat. 2: {
@@ -2403,7 +2429,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   reflexivity.
 }
-cbn - [ mat_nth Levi_Civita_symbol ].
+cbn - [ mat_nth ε ].
 ...
   rewrite rngl_summation_summation_exch.
 erewrite rngl_summation_eq_compat. 2: {
@@ -2420,29 +2446,29 @@ erewrite rngl_summation_eq_compat. 2: {
           erewrite rngl_summation_eq_compat. 2: {
             intros.
             do 3 rewrite rngl_mul_assoc.
-            rewrite (rngl_mul_mul_swap Hic _ (Levi_Civita_symbol _ _ _)).
+            rewrite (rngl_mul_mul_swap Hic _ (ε _ _ _)).
             do 2 rewrite <- rngl_mul_assoc.
-            rewrite (rngl_mul_assoc (Levi_Civita_symbol _ _ _)).
+            rewrite (rngl_mul_assoc (ε _ _ _)).
             reflexivity.
           }
-          cbn - [ mat_nth Levi_Civita_symbol ].
+          cbn - [ mat_nth ε ].
           rewrite <- (rngl_mul_summation_distr_l Hos).
           reflexivity.
         }
-        cbn - [ mat_nth Levi_Civita_symbol ].
+        cbn - [ mat_nth ε ].
         rewrite <- (rngl_mul_summation_distr_l Hos).
         reflexivity.
       }
-      cbn - [ mat_nth Levi_Civita_symbol ].
+      cbn - [ mat_nth ε ].
       reflexivity.
     }
-    cbn - [ mat_nth Levi_Civita_symbol ].
+    cbn - [ mat_nth ε ].
     reflexivity.
   }
-  cbn - [ mat_nth Levi_Civita_symbol ].
+  cbn - [ mat_nth ε ].
   reflexivity.
 }
-cbn - [ mat_nth Levi_Civita_symbol ].
+cbn - [ mat_nth ε ].
 
 ...
           rewrite <- rngl_mul_summation_distr_l.
@@ -2463,11 +2489,11 @@ cbn - [ mat_nth Levi_Civita_symbol ].
           intros.
           replace (∑ (j = _, _), _) with
             (mat_nth M i i0 *
-               (Levi_Civita_symbol i i3 i4 * mat_nth M i i0 * mat_nth M i3 i1 *
+               (ε i i3 i4 * mat_nth M i i0 * mat_nth M i3 i1 *
                mat_nth M i4 i2))%L. 2: {
             progress unfold iter_seq.
             progress unfold iter_list.
-            cbn - [ mat_nth Levi_Civita_symbol ].
+            cbn - [ mat_nth ε ].
             rewrite rngl_add_0_l.
             destruct (Nat.eq_dec i 1) as [H1i| H1i]. {
               subst i.
@@ -2483,9 +2509,9 @@ cbn - [ mat_nth Levi_Civita_symbol ].
 assert
   (H4 :
     ∀ i j k,
-    ∑ (l = 1, 3), mat_nth M i l * Levi_Civita_symbol l j k =
+    ∑ (l = 1, 3), mat_nth M i l * ε l j k =
     ∑ (m = 1, 3), ∑ (n = 1, 3),
-      Levi_Civita_symbol i m n * mat_nth M j m * mat_nth M k n). {
+      ε i m n * mat_nth M j m * mat_nth M k n). {
   intros.
   erewrite rngl_summation_eq_compat. 2: {
     intros l Hl.
@@ -2508,7 +2534,7 @@ assert
     }
     reflexivity.
   }
-  cbn - [ mat_nth Levi_Civita_symbol ].
+  cbn - [ mat_nth ε ].
   remember
     (∑ (l = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3), _) as x.
   subst x.
@@ -2523,7 +2549,7 @@ assert
     ∀ i,
     vec_nth (M * (u × v)) i =
     ∑ (m = 1, 3), ∑ (n = 1, 3),
-    Levi_Civita_symbol m n i * vec_nth u m * vec_nth v n). {
+    ε m n i * vec_nth u m * vec_nth v n). {
   intros.
   rewrite H1.
 ...
@@ -2532,7 +2558,7 @@ intros i.
 specialize (H1 i).
 specialize (H2 i).
 rewrite H1, H2.
-specialize (sum_Levi_Civita_symbol_mat M) as H3.
+specialize (sum_ε_mat M) as H3.
 ...
 apply rngl_summation_eq_compat.
 intros j Hj.
@@ -2545,12 +2571,12 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite <- rngl_mul_assoc.
   reflexivity.
 }
-cbn - [ mat_nth vec_nth Levi_Civita_symbol ].
+cbn - [ mat_nth vec_nth ε ].
 rewrite <- (rngl_mul_summation_distr_l Hos).
 rewrite (rngl_mul_comm Hic (mat_nth M i j)).
 do 4 rewrite <- rngl_mul_assoc.
 progress f_equal.
-specialize (sum_Levi_Civita_symbol_mat M) as H3.
+specialize (sum_ε_mat M) as H3.
 rewrite Hd in H3.
 specialize (H3 j k l).
 rewrite rngl_mul_1_r in H3.
@@ -2566,7 +2592,7 @@ assert
     ∀ i,
     vec_nth (M * (u × v)) i =
     ∑ (l = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
-    mat_nth M i l * Levi_Civita_symbol l j k * vec_nth u j * vec_nth v k). {
+    mat_nth M i l * ε l j k * vec_nth u j * vec_nth v k). {
   intros.
   erewrite rngl_summation_eq_compat. 2: {
     intros l Hl.
@@ -2583,7 +2609,7 @@ assert
     }
     reflexivity.
   }
-  cbn - [ vec_nth mat_nth Levi_Civita_symbol ].
+  cbn - [ vec_nth mat_nth ε ].
 ...
 intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
 unfold mat_mul, mat_id in Ht; simpl in Ht.
