@@ -2156,7 +2156,6 @@ Qed.
 
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c) : nat_scope.
 
-(* to be completed
 Theorem matrix_add_mul_eq_Kronecker :
   ∀ M, is_ortho_matrix M →
   ∀ j k, 1 ≤ j ≤ 3 → 1 ≤ k ≤ 3 →
@@ -2178,7 +2177,6 @@ destruct jk. {
     apply (f_equal (λ M, mat_nth M 1 1)) in H.
     cbn in H.
 ...
-*)
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
@@ -2259,15 +2257,14 @@ assert
       ∀ l,
       ∑ (i = 1, 3), mat_nth M i l * ε l j k =
       ∑ (i = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3),
-        mat_nth M i l * ε m n o * mat_nth M m i *
+        mat_nth M i l * ε m n o * mat_nth M i m *
           mat_nth M n j * mat_nth M o k). {
-...
     assert
       (H'' :
         ∀ l,
         ∑ (i = 1, 3), mat_nth M i l * ε l j k =
         ∑ (m = 1, 3),
-          (∑ (i = 1, 3), mat_nth M i l * mat_nth M m i) *
+          (∑ (i = 1, 3), mat_nth M i l * mat_nth M i m) *
           (∑ (n = 1, 3), ∑ (o = 1, 3),
             ε m n o * mat_nth M n j * mat_nth M o k)). {
       intros.
@@ -2287,22 +2284,21 @@ assert
       ring.
     }
     clear H'; rename H'' into H'.
-...
     assert
       (H'' :
-        ∀ l,
+        ∀ l, 1 ≤ l ≤ 3 →
         ∑ (i = 1, 3), mat_nth M i l * ε l j k =
         ∑ (m = 1, 3),
           δ l m *
           (∑ (n = 1, 3), ∑ (o = 1, 3),
             ε m n o * mat_nth M n j * mat_nth M o k)). {
-      intros.
+      intros * Hl.
       rewrite H'.
       apply rngl_summation_eq_compat.
       intros m Hm.
       progress f_equal.
 ... ...
-      apply matrix_add_mul_eq_Kronecker.
+      now apply (matrix_add_mul_eq_Kronecker _ Ht).
     }
     clear H'; rename H'' into H'.
 ...
