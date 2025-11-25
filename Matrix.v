@@ -2333,8 +2333,8 @@ assert
         ∑ (i = 1, 3), mat_nth M i l * ε l j k =
         ∑ (n = 1, 3), ∑ (o = 1, 3), ε l n o * mat_nth M n j * mat_nth M o k). {
       intros * Hl.
-...
       rewrite H'; [ | easy ].
+...
       apply rngl_summation_eq_compat.
       intros m Hm.
       progress unfold δ, Kronecker_symbol.
