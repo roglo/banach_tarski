@@ -2154,6 +2154,29 @@ now specialize (Huv 2); cbn in Huv.
 now specialize (Huv 3); cbn in Huv.
 Qed.
 
+Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c) : nat_scope.
+
+Theorem matrix_add_mul_eq_Kronecker :
+  ∀ M, is_ortho_matrix M →
+  ∀ j k, 1 ≤ j ≤ 3 → 1 ≤ k ≤ 3 →
+  ∑ (i = 1, 3), mat_nth M i j * mat_nth M k i = δ j k.
+Proof.
+intros * HM * Hj Hk.
+progress unfold is_ortho_matrix in HM.
+progress unfold δ, Kronecker_symbol.
+remember (j =? k) as jk eqn:Hjk.
+symmetry in Hjk.
+destruct jk. {
+  apply Nat.eqb_eq in Hjk; subst k; clear Hk.
+  progress unfold iter_seq, iter_list.
+  cbn.
+  rewrite rngl_add_0_l.
+  destruct j; [ easy | ].
+  destruct j. {
+    apply (f_equal (λ M, mat_nth M 1 1)) in HM.
+    cbn in HM.
+...
+
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
@@ -2260,13 +2283,6 @@ assert
       ring.
     }
     clear H'; rename H'' into H'.
-Theorem matrix_add_mul_eq_Kronecker :
-  ∀ M, is_ortho_matrix M →
-  ∀ j k, ∑ (i = 1, 3), mat_nth M i j * mat_nth M k i = δ j k.
-Proof.
-intros * HM *.
-progress unfold is_ortho_matrix in HM.
-...
     assert
       (H'' :
         ∀ l,
@@ -2280,6 +2296,7 @@ progress unfold is_ortho_matrix in HM.
       apply rngl_summation_eq_compat.
       intros m Hm.
       progress f_equal.
+... ...
       apply matrix_add_mul_eq_Kronecker.
     }
     clear H'; rename H'' into H'.
