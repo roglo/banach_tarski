@@ -2245,7 +2245,6 @@ assert
   now rewrite Hd, rngl_mul_1_r in H3.
 }
 (**)
-...
 assert
   (H4 :
     ∀ i j k,
