@@ -2156,10 +2156,11 @@ Qed.
 
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c) : nat_scope.
 
+(* to be completed
 Theorem matrix_add_mul_eq_Kronecker :
   ∀ M, is_ortho_matrix M →
   ∀ j k, 1 ≤ j ≤ 3 → 1 ≤ k ≤ 3 →
-  ∑ (i = 1, 3), mat_nth M i j * mat_nth M k i = δ j k.
+  ∑ (i = 1, 3), mat_nth M i j * mat_nth M i k = δ j k.
 Proof.
 intros * HM * Hj Hk.
 progress unfold is_ortho_matrix in HM.
@@ -2173,9 +2174,11 @@ destruct jk. {
   rewrite rngl_add_0_l.
   destruct j; [ easy | ].
   destruct j. {
-    apply (f_equal (λ M, mat_nth M 1 1)) in HM.
-    cbn in HM.
+    generalize HM; intros H.
+    apply (f_equal (λ M, mat_nth M 1 1)) in H.
+    cbn in H.
 ...
+*)
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
@@ -2242,6 +2245,7 @@ assert
   now rewrite Hd, rngl_mul_1_r in H3.
 }
 (**)
+...
 assert
   (H4 :
     ∀ i j k,
@@ -2258,6 +2262,7 @@ assert
       ∑ (i = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3),
         mat_nth M i l * ε m n o * mat_nth M m i *
           mat_nth M n j * mat_nth M o k). {
+...
     assert
       (H'' :
         ∀ l,
@@ -2283,6 +2288,7 @@ assert
       ring.
     }
     clear H'; rename H'' into H'.
+...
     assert
       (H'' :
         ∀ l,
