@@ -2168,15 +2168,42 @@ remember (j =? k) as jk eqn:Hjk.
 symmetry in Hjk.
 destruct jk. {
   apply Nat.eqb_eq in Hjk; subst k; clear Hk.
-  progress unfold iter_seq, iter_list.
-  cbn.
+  progress unfold iter_seq, iter_list; cbn.
   rewrite rngl_add_0_l.
   destruct j; [ easy | ].
-  destruct j. {
-    generalize HM; intros H.
-    apply (f_equal (λ M, mat_nth M 1 1)) in H.
-    cbn in H.
-...
+  destruct j; [ now apply (f_equal (λ M, mat_nth M 1 1)) in HM | ].
+  destruct j; [ now apply (f_equal (λ M, mat_nth M 2 2)) in HM | ].
+  destruct j; [ now apply (f_equal (λ M, mat_nth M 3 3)) in HM | ].
+  destruct Hj as (_, Hj).
+  now do 3 apply Nat.succ_le_mono in Hj.
+}
+apply Nat.eqb_neq in Hjk.
+progress unfold iter_seq, iter_list; cbn.
+rewrite rngl_add_0_l.
+destruct j; [ easy | ].
+destruct k; [ easy | ].
+destruct Hj as (_, Hj).
+destruct Hk as (_, Hk).
+destruct j. {
+  destruct k; [ easy | ].
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 1 2)) in HM | ].
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 1 3)) in HM | ].
+  now do 3 apply Nat.succ_le_mono in Hk.
+}
+destruct j. {
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 2 1)) in HM | ].
+  destruct k; [ easy | ].
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 2 3)) in HM | ].
+  now do 3 apply Nat.succ_le_mono in Hk.
+}
+destruct j. {
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 3 1)) in HM | ].
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 3 2)) in HM | ].
+  destruct k; [ easy | ].
+  now do 3 apply Nat.succ_le_mono in Hk.
+}
+now do 3 apply Nat.succ_le_mono in Hj.
+Qed.
 
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
@@ -2297,7 +2324,6 @@ assert
       apply rngl_summation_eq_compat.
       intros m Hm.
       progress f_equal.
-... ...
       now apply (matrix_add_mul_eq_Kronecker _ Ht).
     }
     clear H'; rename H'' into H'.
