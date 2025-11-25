@@ -2327,6 +2327,20 @@ assert
       now apply (matrix_add_mul_eq_Kronecker _ Ht).
     }
     clear H'; rename H'' into H'.
+    assert
+      (H'' :
+        ∀ l : ℕ, 1 ≤ l ≤ 3 →
+        ∑ (i = 1, 3), mat_nth M i l * ε l j k =
+        ∑ (n = 1, 3), ∑ (o = 1, 3), ε l n o * mat_nth M n j * mat_nth M o k). {
+      intros * Hl.
+...
+      rewrite H'; [ | easy ].
+      apply rngl_summation_eq_compat.
+      intros m Hm.
+      progress unfold δ, Kronecker_symbol.
+...
+    }
+    clear H'; rename H'' into H'.
 ...
   apply (f_equal (rngl_mul (mat_nth M i l))) in H.
 ...
