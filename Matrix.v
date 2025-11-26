@@ -2272,10 +2272,10 @@ assert
 (**)
 assert
   (H4 :
-    ∀ i j k,
+    ∀ i j k, 1 ≤ i ≤ 3 →
     ∑ (l = 1, 3), mat_nth M i l *  ε l j k =
     ∑ (m = 1, 3), ∑ (n = 1, 3), ε i m n * mat_nth M j m * mat_nth M k n). {
-  intros.
+  intros * Hi.
   specialize (H3 i j k) as H.
   remember (∑ (m = _, _), ∑ (n = _, _), ∑ (o = _, _), _) as x in H.
   subst x.
@@ -2285,7 +2285,7 @@ assert
       ∑ (i = 1, 3), mat_nth M l i * ε i j k =
       ∑ (i = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3),
         mat_nth M i l * ε m n o * mat_nth M i m *
-          mat_nth M n j * mat_nth M o k). {
+          mat_nth M j n * mat_nth M k o). {
     assert
       (H'' :
         ∀ l,
@@ -2293,7 +2293,7 @@ assert
         ∑ (m = 1, 3),
           (∑ (i = 1, 3), mat_nth M i l * mat_nth M i m) *
           (∑ (n = 1, 3), ∑ (o = 1, 3),
-            ε m n o * mat_nth M n j * mat_nth M o k)). {
+            ε m n o * mat_nth M j n * mat_nth M k o)). {
       intros.
       rewrite H'.
       rewrite rngl_summation_summation_exch.
@@ -2318,7 +2318,7 @@ assert
         ∑ (m = 1, 3),
           δ l m *
           (∑ (n = 1, 3), ∑ (o = 1, 3),
-            ε m n o * mat_nth M n j * mat_nth M o k)). {
+            ε m n o * mat_nth M j n * mat_nth M k o)). {
       intros * Hl.
       rewrite H'.
       apply rngl_summation_eq_compat.
@@ -2331,7 +2331,7 @@ assert
       (H'' :
         ∀ l : ℕ, 1 ≤ l ≤ 3 →
         ∑ (i = 1, 3), mat_nth M l i * ε i j k =
-        ∑ (n = 1, 3), ∑ (o = 1, 3), ε l n o * mat_nth M n j * mat_nth M o k). {
+        ∑ (n = 1, 3), ∑ (o = 1, 3), ε l n o * mat_nth M j n * mat_nth M k o). {
       intros * Hl.
       rewrite H'; [ | easy ].
       progress unfold iter_seq at 1.
@@ -2357,7 +2357,13 @@ assert
       now do 3 apply Nat.succ_le_mono in Hl.
     }
     clear H'; rename H'' into H'.
-    rewrite H'.
+    now apply H'.
+  }
+  intros l.
+...
+  apply rngl_summation_eq_compat.
+  intros p Hp.
+...
     remember (∑ (m = 1, 3), ∑ (n = 1, 3), _) as x in |-*; subst x.
 ...
     rewrite H'.
