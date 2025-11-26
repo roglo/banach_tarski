@@ -2212,7 +2212,7 @@ Proof.
 destruct_ac.
 intros * (Ht, Hd).
 assert
-  (H_Muv :
+  (Muv_i :
     ∀ i,
     vec_nth (M * (u × v)) i =
     ∑ (l = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
@@ -2233,7 +2233,7 @@ assert
   easy.
 }
 assert
-  (H_MuMv :
+  (MuMv_i :
     ∀ i,
     vec_nth ((M * u) × (M * v)) i =
     ∑ (j = 1, 3), ∑ (k = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3),
@@ -2260,7 +2260,7 @@ assert
   easy.
 }
 assert
-  (H3 :
+  (H1 :
     ∀ m n o,
     ∑ (i = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
     ε i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
@@ -2270,6 +2270,62 @@ assert
   now rewrite Hd, rngl_mul_1_r in H3.
 }
 (**)
+assert
+  (H2 :
+     ∀ i j k,
+     ∑ (l = 1, 3), mat_nth M i l * ε l j k =
+     ∑ (m = 1, 3), ∑ (n = 1, 3), ε i m n * mat_nth M m j * mat_nth M n k). {
+  intros.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    rewrite <- H1.
+    rewrite rngl_summation_summation_exch.
+    rewrite (rngl_mul_summation_distr_l Hos).
+    apply rngl_summation_eq_compat.
+    intros.
+    rewrite rngl_summation_summation_exch.
+    rewrite (rngl_mul_summation_distr_l Hos).
+    apply rngl_summation_eq_compat.
+    intros.
+    rewrite (rngl_mul_summation_distr_l Hos).
+    apply rngl_summation_eq_compat.
+    intros.
+    do 3 rewrite rngl_mul_assoc.
+    rewrite <- rngl_mul_assoc.
+    reflexivity.
+  }
+  cbn - [ ε mat_nth ].
+  rewrite rngl_summation_summation_exch.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    rewrite rngl_summation_summation_exch.
+    reflexivity.
+  }
+  cbn - [ ε mat_nth ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros.
+      erewrite rngl_summation_eq_compat. 2: {
+        intros.
+        rewrite <- (rngl_mul_summation_distr_r Hos).
+        reflexivity.
+      }
+      cbn - [ ε mat_nth ].
+      rewrite <- (rngl_mul_summation_distr_r Hos).
+      reflexivity.
+    }
+    reflexivity.
+  }
+  cbn - [ ε mat_nth ].
+  remember (∑ (m = 1, 3), ∑ (n = 1, 3), (∑ (l = _, _), ∑ (o = _, _), _) * _)
+    as x; subst x.
+  apply rngl_summation_eq_compat.
+  intros m Hm.
+  apply rngl_summation_eq_compat.
+  intros n Hn.
+  rewrite <- rngl_mul_assoc.
+  progress f_equal.
 ...
 assert
   (H4 :
