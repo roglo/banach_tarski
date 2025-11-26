@@ -2334,13 +2334,31 @@ assert
         ∑ (n = 1, 3), ∑ (o = 1, 3), ε l n o * mat_nth M n j * mat_nth M o k). {
       intros * Hl.
       rewrite H'; [ | easy ].
-...
-      apply rngl_summation_eq_compat.
-      intros m Hm.
-      progress unfold δ, Kronecker_symbol.
-...
+      progress unfold iter_seq at 1.
+      progress unfold iter_list.
+      cbn - [ ε mat_nth ].
+      rewrite rngl_add_0_l.
+      destruct l; [ easy | ].
+      destruct l; cbn - [ ε mat_nth ]. {
+        do 2 rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
+        apply rngl_mul_1_l.
+      }
+      destruct l; cbn - [ ε mat_nth ]. {
+        do 2 rewrite (rngl_mul_0_l Hos).
+        rewrite rngl_add_0_l, rngl_add_0_r.
+        apply rngl_mul_1_l.
+      }
+      destruct l; cbn - [ ε mat_nth ]. {
+        do 2 rewrite (rngl_mul_0_l Hos).
+        do 2 rewrite rngl_add_0_l.
+        apply rngl_mul_1_l.
+      }
+      destruct Hl as (_, Hl).
+      now do 3 apply Nat.succ_le_mono in Hl.
     }
     clear H'; rename H'' into H'.
+...
+    rewrite H'.
 ...
   apply (f_equal (rngl_mul (mat_nth M i l))) in H.
 ...
