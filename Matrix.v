@@ -2212,7 +2212,7 @@ Proof.
 destruct_ac.
 intros * (Ht, Hd).
 assert
-  (H1 :
+  (H_Muv :
     ∀ i,
     vec_nth (M * (u × v)) i =
     ∑ (l = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
@@ -2233,7 +2233,7 @@ assert
   easy.
 }
 assert
-  (H2 :
+  (H_MuMv :
     ∀ i,
     vec_nth ((M * u) × (M * v)) i =
     ∑ (j = 1, 3), ∑ (k = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3),
@@ -2270,6 +2270,7 @@ assert
   now rewrite Hd, rngl_mul_1_r in H3.
 }
 (**)
+...
 assert
   (H4 :
     ∀ i j k, 1 ≤ i ≤ 3 →
