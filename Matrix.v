@@ -2273,7 +2273,7 @@ assert
 assert
   (H4 :
     ∀ i j k, 1 ≤ i ≤ 3 →
-    ∑ (l = 1, 3), mat_nth M i l *  ε l j k =
+    ∑ (l = 1, 3), mat_nth M i l * ε l j k =
     ∑ (m = 1, 3), ∑ (n = 1, 3), ε i m n * mat_nth M j m * mat_nth M k n). {
   intros * Hi.
   specialize (H3 i j k) as H.
@@ -2360,9 +2360,32 @@ assert
     now apply H'.
   }
   intros l.
-...
   apply rngl_summation_eq_compat.
   intros p Hp.
+...
+  replace (ε p j k) with (ε j p k).
+  rewrite <- H3.
+  rewrite rngl_mul_summation_distr_l.
+  apply rngl_summation_eq_compat.
+  intros q Hq.
+  rewrite rngl_mul_summation_distr_l.
+  apply rngl_summation_eq_compat.
+  intros r Hr.
+  rewrite rngl_mul_summation_distr_l.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros s Hs.
+    do 3 rewrite rngl_mul_assoc.
+    easy.
+  }
+  remember (∑ (o = 1, 3), _) as x in |-*; subst x.
+  ============================
+  ∑ (o = 1, 3), mat_nth M l p * ε q r o * mat_nth M q k * mat_nth M r p * mat_nth M o j =
+  ∑ (o = 1, 3), mat_nth M p l * ε q r o * mat_nth M p q * mat_nth M j r * mat_nth M k o
+  ============================
+  ∑ (o = 1, 3), mat_nth M l p * ε q r o * mat_nth M q j * mat_nth M r k * mat_nth M o p =
+  ∑ (o = 1, 3), mat_nth M p l * ε q r o * mat_nth M p q * mat_nth M j r * mat_nth M k o
+Print ε.
+Search ε.
 ...
     remember (∑ (m = 1, 3), ∑ (n = 1, 3), _) as x in |-*; subst x.
 ...
