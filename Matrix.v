@@ -2282,14 +2282,14 @@ assert
   enough
     (H' :
       ∀ l,
-      ∑ (i = 1, 3), mat_nth M i l * ε l j k =
+      ∑ (i = 1, 3), mat_nth M l i * ε i j k =
       ∑ (i = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3),
         mat_nth M i l * ε m n o * mat_nth M i m *
           mat_nth M n j * mat_nth M o k). {
     assert
       (H'' :
         ∀ l,
-        ∑ (i = 1, 3), mat_nth M i l * ε l j k =
+        ∑ (i = 1, 3), mat_nth M l i * ε i j k =
         ∑ (m = 1, 3),
           (∑ (i = 1, 3), mat_nth M i l * mat_nth M i m) *
           (∑ (n = 1, 3), ∑ (o = 1, 3),
@@ -2314,7 +2314,7 @@ assert
     assert
       (H'' :
         ∀ l, 1 ≤ l ≤ 3 →
-        ∑ (i = 1, 3), mat_nth M i l * ε l j k =
+        ∑ (i = 1, 3), mat_nth M l i * ε i j k =
         ∑ (m = 1, 3),
           δ l m *
           (∑ (n = 1, 3), ∑ (o = 1, 3),
@@ -2330,7 +2330,7 @@ assert
     assert
       (H'' :
         ∀ l : ℕ, 1 ≤ l ≤ 3 →
-        ∑ (i = 1, 3), mat_nth M i l * ε l j k =
+        ∑ (i = 1, 3), mat_nth M l i * ε i j k =
         ∑ (n = 1, 3), ∑ (o = 1, 3), ε l n o * mat_nth M n j * mat_nth M o k). {
       intros * Hl.
       rewrite H'; [ | easy ].
@@ -2357,6 +2357,8 @@ assert
       now do 3 apply Nat.succ_le_mono in Hl.
     }
     clear H'; rename H'' into H'.
+    rewrite H'.
+    remember (∑ (m = 1, 3), ∑ (n = 1, 3), _) as x in |-*; subst x.
 ...
     rewrite H'.
 ...
