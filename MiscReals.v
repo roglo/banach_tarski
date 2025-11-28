@@ -1519,11 +1519,11 @@ destruct n as [| n| n]. {
       split. {
         apply (rngl_opp_lt_compat Hop Hor).
         rewrite (rngl_opp_involutive Hop).
-        now apply (rngl_lt_sub_lt_add_r Hop Hto).
+        now apply (rngl_lt_sub_lt_add_r Hop Hor).
       } {
         apply (rngl_opp_le_compat Hop Hor).
         rewrite (rngl_opp_involutive Hop).
-        apply (rngl_le_add_le_sub_r Hop Hto).
+        apply (rngl_le_add_le_sub_r Hop Hor).
         rewrite rngl_of_pos_add.
         rewrite rngl_of_pos_1.
         rewrite (rngl_opp_add_distr Hop).
@@ -1533,11 +1533,11 @@ destruct n as [| n| n]. {
       split. {
         apply (rngl_opp_lt_compat Hop Hor).
         rewrite (rngl_opp_involutive Hop).
-        now apply (rngl_lt_sub_lt_add_r Hop Hto).
+        now apply (rngl_lt_sub_lt_add_r Hop Hor).
       } {
         apply (rngl_opp_le_compat Hop Hor).
         rewrite (rngl_opp_involutive Hop).
-        apply (rngl_le_add_le_sub_r Hop Hto).
+        apply (rngl_le_add_le_sub_r Hop Hor).
         rewrite rngl_of_pos_add.
         rewrite rngl_of_pos_1.
         rewrite (rngl_opp_add_distr Hop).
@@ -1866,10 +1866,10 @@ intros.
 split; intros (H1, H2). {
   apply -> (rngl_le_0_sub Hop Hor) in H1.
   split; [ easy | ].
-  now apply (rngl_lt_sub_lt_add_l Hop Hto) in H2.
+  now apply (rngl_lt_sub_lt_add_l Hop Hor) in H2.
 } {
   split; [ now apply (rngl_le_0_sub Hop Hor) | ].
-  now apply (rngl_lt_sub_lt_add_l Hop Hto).
+  now apply (rngl_lt_sub_lt_add_l Hop Hor).
 }
 Qed.
 
@@ -1917,12 +1917,12 @@ apply Int_part_interv.
 rewrite rngl_of_Z_add.
 rewrite rngl_of_Z_sub.
 rewrite rngl_of_Z_1.
-apply (rngl_le_add_le_sub_r Hop Hto) in Hba.
+apply (rngl_le_add_le_sub_r Hop Hor) in Hba.
 rewrite <- (rngl_add_sub_swap Hop) in Hba.
 rewrite <- (rngl_add_sub_assoc Hop) in Hba.
-apply (rngl_le_add_le_sub_l Hop Hto) in Hba.
+apply (rngl_le_add_le_sub_l Hop Hor) in Hba.
 split; [ easy | ].
-apply (rngl_lt_sub_lt_add_r Hop Hto).
+apply (rngl_lt_sub_lt_add_r Hop Hor).
 rewrite <- (rngl_add_sub_swap Hop).
 rewrite <- rngl_of_Z_1.
 rewrite <- rngl_of_Z_add.
@@ -2007,7 +2007,7 @@ remember (z_int_part x) as z eqn:H; clear H.
 destruct z as (z, (Hzx, Hxz)).
 apply (rngl_le_0_sub Hop Hor) in Hzx.
 rewrite rngl_of_Z_add, rngl_of_Z_1 in Hxz.
-apply (rngl_lt_sub_lt_add_l Hop Hto) in Hxz.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in Hxz.
 easy.
 Qed.
 
@@ -2308,7 +2308,7 @@ split. {
   }
   rewrite rngl_mul_1_r.
   rewrite (rngl_mul_inv_r Hiv).
-  apply (rngl_lt_sub_lt_add_l Hop Hto).
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
   rewrite <- rngl_of_Z_1.
   rewrite <- rngl_of_Z_add.
   progress unfold Int_part.
@@ -2352,9 +2352,9 @@ split. {
   progress unfold Int_part.
   remember (z_int_part _) as z eqn:H; clear H.
   destruct z as (z, Hz).
-  apply (rngl_lt_add_lt_sub_r Hop Hto).
+  apply (rngl_lt_add_lt_sub_r Hop Hor).
   rewrite (rngl_add_opp_l Hop).
-  apply (rngl_lt_sub_lt_add_r Hop Hto).
+  apply (rngl_lt_sub_lt_add_r Hop Hor).
   rewrite <- rngl_of_Z_1.
   now rewrite <- rngl_of_Z_add.
 }
@@ -2394,7 +2394,7 @@ destruct z as [| q| q]. {
   rewrite (rngl_add_opp_l Hop) in H2.
   rewrite <- (rngl_opp_sub_distr Hop) in H2.
   apply (rngl_opp_lt_compat Hop Hor) in H2.
-  apply (rngl_lt_sub_lt_add_r Hop Hto) in H2.
+  apply (rngl_lt_sub_lt_add_r Hop Hor) in H2.
   apply (rngl_of_pos_prop2 (rngl_of_pos p + 1)%L). {
     rewrite rngl_of_pos_add, rngl_of_pos_1.
     split; [ easy | ].
@@ -2787,7 +2787,7 @@ rewrite (rngl_add_sub_assoc Hop) in Hab.
 rewrite <- (rngl_add_sub_swap Hop) in Hab.
 rewrite <- (rngl_sub_add_distr Hos) in Hab.
 rewrite <- rngl_of_Z_add in Hab.
-apply (rngl_le_add_le_sub_l Hop Hto) in Hab.
+apply (rngl_le_add_le_sub_l Hop Hor) in Hab.
 rewrite <- rngl_of_Z_1 in Hab.
 rewrite <- rngl_of_Z_add in Hab.
 progress unfold Int_part in Hab.
@@ -2833,7 +2833,7 @@ rewrite Z.add_shuffle0.
 do 2 rewrite rngl_of_Z_add.
 split; [ now apply (rngl_add_le_mono Hos Hor) | ].
 rewrite rngl_of_Z_add in Hab.
-apply (rngl_lt_sub_lt_add_l Hop Hto) in Hab.
+apply (rngl_lt_sub_lt_add_l Hop Hor) in Hab.
 rewrite rngl_add_add_swap in Hab.
 rewrite <- rngl_of_Z_1 in Hab.
 now rewrite <- (rngl_of_Z_add x) in Hab.

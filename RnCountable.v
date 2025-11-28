@@ -72,7 +72,7 @@ induction k; intros; simpl. {
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 }
 destruct (u i). {
-  apply (rngl_le_add_le_sub_l Hop Hto).
+  apply (rngl_le_add_le_sub_l Hop Hor).
   eapply (rngl_le_trans Hor). {
     apply IHk.
     apply (rngl_div_nonneg Hop Hiv Hto); [ easy | ].
@@ -274,7 +274,7 @@ revert n.
 induction k; intros; simpl; [ apply Hzi | ].
 remember (u n) as b eqn:Hb; symmetry in Hb.
 destruct b. {
-  apply (rngl_le_add_le_sub_l Hop Hto).
+  apply (rngl_le_add_le_sub_l Hop Hor).
   assert (H : (1 / (2 * (1 + 2) * 3 ^ n))%L = (1 / 3 ^ n / 3 / 2)%L). {
     rewrite (rngl_add_comm 1 2).
     rewrite (rngl_div_div Hos Hiv).
@@ -434,13 +434,13 @@ Proof.
 destruct_ac.
 intros * Hr2.
 rewrite <- partial_sum3_n_partial_sum3.
-apply (rngl_lt_sub_lt_add_l Hop Hto).
+apply (rngl_lt_sub_lt_add_l Hop Hor).
 rewrite (rngl_mul_comm Hic (3 ^ n)).
 rewrite <- (rngl_mul_sub_distr_r Hop).
 apply (rngl_lt_div_r Hop Hiv Hto).
 apply (rngl_pow_pos_pos Hop Hiv Hto).
 apply (rngl_0_lt_3 Hos Hc1 Hto).
-apply (rngl_lt_sub_lt_add_l Hop Hto).
+apply (rngl_lt_sub_lt_add_l Hop Hor).
 eapply (rngl_le_lt_trans Hor); [ apply Hr2 | ].
 rewrite partial_sum3_succ.
 rewrite <- rngl_add_assoc.
@@ -457,7 +457,7 @@ apply (rngl_0_lt_3 Hos Hc1 Hto).
 apply (rngl_lt_div_l Hop Hiv Hto).
 apply (rngl_0_lt_3 Hos Hc1 Hto).
 rewrite rngl_mul_1_l.
-apply (rngl_lt_add_lt_sub_r Hop Hto).
+apply (rngl_lt_add_lt_sub_r Hop Hor).
 progress unfold INR.
 apply (rngl_le_lt_trans Hor _ 1).
 rewrite <- rngl_of_nat_1.
@@ -525,16 +525,16 @@ split. {
     rewrite rngl_of_nat_add.
     rewrite (rngl_of_nat_pow Hos).
     rewrite rngl_of_nat_3.
-    apply (rngl_le_add_le_sub_l Hop Hto).
+    apply (rngl_le_add_le_sub_l Hop Hor).
     rewrite rngl_mul_assoc.
     rewrite (rngl_sub_mul_l_diag_r Hop).
     apply IHn.
     progress unfold partial_sum3.
     rewrite rngl_of_nat_1 in Hr1.
     apply (rngl_le_div_l Hop Hiv Hto) in Hr1.
-    now apply (rngl_le_add_le_sub_l Hop Hto) in Hr1.
+    now apply (rngl_le_add_le_sub_l Hop Hor) in Hr1.
     apply (rngl_0_lt_3 Hos Hc1 Hto).
-    apply (rngl_le_sub_le_add_r Hop Hto).
+    apply (rngl_le_sub_le_add_r Hop Hor).
     rewrite rngl_mul_assoc, (rngl_mul_comm Hic 2) in Hr2.
     rewrite <- rngl_mul_assoc in Hr2.
     rewrite (rngl_inv_mul_distr Hos Hiv) in Hr2.
@@ -746,7 +746,7 @@ destruct (rngl_ltb_dec (frac_part Hc1 Har (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
     destruct (u n); [ exfalso | easy ].
     simpl in Hr3, H1.
     rewrite rngl_of_nat_1 in Hr3.
-    apply (rngl_le_add_le_sub_l Hop Hto) in Hr3.
+    apply (rngl_le_add_le_sub_l Hop Hor) in Hr3.
     now apply (rngl_nlt_ge Hor) in Hr3.
     apply (rngl_3_neq_0 Hos Hc1 Hto).
     apply (rngl_pow_neq_0 Hos Hiq).
@@ -779,7 +779,7 @@ apply -> (rngl_le_div_l Hop Hiv Hto) in H1. {
   enough (H2 : (0 < t)%L). {
     apply (rngl_nlt_ge Hor) in H.
     apply H; clear H.
-    apply (rngl_lt_add_lt_sub_l Hop Hto).
+    apply (rngl_lt_add_lt_sub_l Hop Hor).
     apply (rngl_lt_le_trans Hor _ t); [ | easy ].
     rewrite (rngl_mul_inv_r Hiv).
     apply (rngl_lt_div_l Hop Hiv Hto).
