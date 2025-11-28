@@ -316,7 +316,7 @@ destruct xz. {
       apply (rl_sqrt_pos Hos Hto).
       apply (rngl_lt_trans Hor _ 1).
       apply (rngl_0_lt_1 Hos Hc1 Hto).
-      apply (rngl_lt_add_r Hos Hto).
+      apply (rngl_lt_add_r Hos Hor).
       apply rngl_le_neq.
       split; [ apply (rngl_squ_nonneg Hos Hto) | ].
       intros H1; symmetry in H1.

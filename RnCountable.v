@@ -471,7 +471,7 @@ apply (rngl_add_lt_mono_l Hos Hor).
 rewrite rngl_mul_add_distr_r.
 rewrite rngl_mul_1_l.
 rewrite <- rngl_add_assoc.
-apply (rngl_lt_add_r Hos Hto).
+apply (rngl_lt_add_r Hos Hor).
 rewrite rngl_add_comm.
 apply (rngl_0_lt_3 Hos Hc1 Hto).
 apply (rngl_2_neq_0 Hos Hc1 Hto).
@@ -626,7 +626,7 @@ induction n. {
   apply (rngl_lt_div_l Hop Hiv Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   rewrite rngl_mul_1_l.
-  apply (rngl_lt_add_r Hos Hto).
+  apply (rngl_lt_add_r Hos Hor).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
 rewrite partial_sum3_succ.
@@ -723,7 +723,7 @@ split. {
   apply (rngl_lt_div_l Hop Hiv Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   rewrite rngl_mul_1_l.
-  apply (rngl_lt_add_l Hos Hto).
+  apply (rngl_lt_add_l Hos Hor).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
 intros n.
@@ -785,7 +785,7 @@ apply -> (rngl_le_div_l Hop Hiv Hto) in H1. {
     apply (rngl_lt_div_l Hop Hiv Hto).
     apply (rngl_0_lt_2 Hos Hc1 Hto).
     rewrite rngl_mul_2_r.
-    now apply (rngl_lt_add_l Hos Hto).
+    now apply (rngl_lt_add_l Hos Hor).
   }
   progress unfold t.
   apply (rngl_inv_pos Hop Hiv Hto).

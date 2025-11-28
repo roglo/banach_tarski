@@ -694,7 +694,7 @@ destruct (rngl_eqb_dec a (- rngl_of_nat n)) as [Han| Han]. {
   split; [ rewrite Han; apply (rngl_le_refl Hor) | ].
   rewrite rngl_of_Z_add; cbn.
   rewrite rngl_of_Z_opp, rngl_of_Z_of_nat, <- Han.
-  apply (rngl_lt_add_r Hos Hto).
+  apply (rngl_lt_add_r Hos Hor).
   rewrite rngl_of_pos_1.
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
@@ -753,7 +753,7 @@ induction a as [a| a| ]; cbn. {
   apply (rngl_le_lt_trans Hor _ 1).
   apply (rngl_0_le_1 Hos Hto).
   rewrite rngl_of_pos_xI.
-  apply (rngl_lt_add_l Hos Hto).
+  apply (rngl_lt_add_l Hos Hor).
   apply (rngl_mul_pos_pos Hop Hiq Hto); [ | easy ].
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 } {
@@ -895,7 +895,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
       subst b; exfalso.
       apply (rngl_nlt_ge Hor) in Hab.
       apply Hab; clear Hab.
-      apply (rngl_lt_add_r Hos Hto).
+      apply (rngl_lt_add_r Hos Hor).
       apply (rngl_0_lt_1 Hos Hc1 Hto).
     }
     exfalso.
@@ -940,7 +940,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
   apply Hab; clear Hab.
   rewrite rngl_of_pos_1.
   rewrite rngl_of_pos_xI.
-  apply (rngl_lt_add_l Hos Hto).
+  apply (rngl_lt_add_l Hos Hor).
   apply (rngl_mul_pos_pos Hop Hiq Hto).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   apply rngl_of_pos_pos.
@@ -970,7 +970,7 @@ destruct b as [b| b| ]. {
     rewrite (rngl_mul_0_r Hos), rngl_add_0_l.
     rewrite rngl_mul_add_distr_l, rngl_mul_1_r.
     rewrite <- rngl_add_assoc.
-    apply (rngl_lt_add_r Hos Hto).
+    apply (rngl_lt_add_r Hos Hor).
     apply (rngl_lt_0_add Hos Hto). {
       apply (rngl_0_lt_1 Hos Hc1 Hto).
     }
@@ -1004,7 +1004,7 @@ rewrite rngl_of_pos_1.
 rewrite rngl_mul_2_l.
 apply (rngl_le_lt_trans Hor _ (rngl_of_pos a)).
 apply rngl_of_pos_le_1_l.
-apply (rngl_lt_add_l Hos Hto).
+apply (rngl_lt_add_l Hos Hor).
 apply rngl_of_pos_pos.
 Qed.
 
@@ -1629,7 +1629,7 @@ apply (Int_part_prop (rngl_of_nat a)); [ easy | ].
 rewrite rngl_of_Z_add_1_r.
 rewrite rngl_of_Z_of_nat.
 split; [ apply (rngl_le_refl Hor) | ].
-apply (rngl_lt_add_r Hos Hto).
+apply (rngl_lt_add_r Hos Hor).
 apply (rngl_0_lt_1 Hos Hc1 Hto).
 Qed.
 
@@ -1830,7 +1830,7 @@ destruct_ac.
 apply Int_part_interv.
 rewrite rngl_of_Z_add, rngl_of_Z_1.
 split; [ pauto | ].
-apply (rngl_lt_add_l Hos Hto).
+apply (rngl_lt_add_l Hos Hor).
 apply (rngl_0_lt_1 Hos Hc1 Hto).
 Qed.
 
@@ -2402,7 +2402,7 @@ destruct z as [| q| q]. {
   }
   rewrite rngl_of_pos_add, rngl_of_pos_1.
   split; [ | pauto ].
-  apply (rngl_lt_add_r Hos Hto).
+  apply (rngl_lt_add_r Hos Hor).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
 Qed.
