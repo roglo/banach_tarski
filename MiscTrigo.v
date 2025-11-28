@@ -86,7 +86,7 @@ destruct xz. {
     apply (rngl_inv_neq_0 Hos Hiv).
     intros H.
     apply (eq_rl_sqrt_0 Hos) in H. 2: {
-      apply (rngl_le_0_add Hos Hto).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }
@@ -106,14 +106,14 @@ destruct xz. {
     apply (rngl_abs_nonneg Hop Hto).
     apply (rl_sqrt_pos Hos Hto).
     rewrite rngl_squ_1.
-    apply (rngl_lt_0_add Hos Hto).
+    apply (rngl_lt_0_add Hos Hor).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
     apply (rngl_squ_nonneg Hos Hto).
     apply (rngl_div_le_1 Hop Hiv Hto).
     rewrite rngl_squ_1.
     intros H.
     apply (eq_rl_sqrt_0 Hos) in H. 2: {
-      apply (rngl_le_0_add Hos Hto).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }
@@ -179,7 +179,7 @@ destruct xz. {
       apply (rngl_squ_nonneg Hos Hto).
       intros H1.
       apply (eq_rl_sqrt_0 Hos) in H1. 2: {
-        apply (rngl_le_0_add Hos Hto).
+        apply (rngl_le_0_add Hos Hor).
         apply (rngl_0_le_1 Hos Hto).
         apply (rngl_squ_nonneg Hos Hto).
       }
@@ -204,7 +204,7 @@ destruct xz. {
     apply (rngl_squ_nonneg Hos Hto).
     intros H1.
     apply (eq_rl_sqrt_0 Hos) in H1. 2: {
-      apply (rngl_le_0_add Hos Hto).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }
@@ -242,14 +242,14 @@ destruct xz. {
     apply (rngl_abs_nonneg Hop Hto).
     apply (rl_sqrt_pos Hos Hto).
     rewrite rngl_squ_1.
-    apply (rngl_lt_0_add Hos Hto).
+    apply (rngl_lt_0_add Hos Hor).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
     apply (rngl_squ_nonneg Hos Hto).
     apply (rngl_div_le_1 Hop Hiv Hto).
     rewrite rngl_squ_1.
     intros H.
     apply (eq_rl_sqrt_0 Hos) in H. 2: {
-      apply (rngl_le_0_add Hos Hto).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }
@@ -337,7 +337,7 @@ destruct xz. {
     apply (rngl_squ_nonneg Hos Hto).
     intros H1.
     apply (eq_rl_sqrt_0 Hos) in H1. 2: {
-      apply (rngl_le_0_add Hos Hto).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }

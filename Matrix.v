@@ -756,8 +756,8 @@ Theorem nonneg_sqr_vec_norm : ∀ x y z, (0 ≤ x² + y² + z²)%L.
 Proof.
 destruct_ac.
 intros.
-apply (rngl_le_0_add Hos Hto).
-apply (rngl_le_0_add Hos Hto).
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_le_0_add Hos Hor).
 apply (rngl_squ_nonneg Hos Hto).
 apply (rngl_squ_nonneg Hos Hto).
 apply (rngl_squ_nonneg Hos Hto).
@@ -804,7 +804,7 @@ destruct H as (H1, H2).
 now apply (eq_rngl_squ_0 Hos Hio) in H1, H2, H3.
 apply (rngl_squ_nonneg Hos Hto).
 apply (rngl_squ_nonneg Hos Hto).
-apply (rngl_le_0_add Hos Hto).
+apply (rngl_le_0_add Hos Hor).
 apply (rngl_squ_nonneg Hos Hto).
 apply (rngl_squ_nonneg Hos Hto).
 apply (rngl_squ_nonneg Hos Hto).
@@ -1071,8 +1071,8 @@ destruct_ac.
 intros (x, y, z); simpl.
 symmetry.
 apply rngl_squ_sqrt.
-apply (rngl_le_0_add Hos Hto).
-apply (rngl_le_0_add Hos Hto).
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_le_0_add Hos Hor).
 apply (rngl_mul_diag_nonneg Hos Hto).
 apply (rngl_mul_diag_nonneg Hos Hto).
 apply (rngl_mul_diag_nonneg Hos Hto).

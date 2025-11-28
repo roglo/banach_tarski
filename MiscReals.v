@@ -916,13 +916,13 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
       rewrite (rngl_mul_0_r Hos) in Hab.
       apply (rngl_nlt_ge Hor) in Hab.
       apply Hab; clear Hab.
-      apply (rngl_add_nonneg_pos Hos Hto). 2: {
+      apply (rngl_add_nonneg_pos Hos Hor). 2: {
         apply (rngl_0_lt_1 Hos Hc1 Hto).
       }
       apply (rngl_mul_nonneg_nonneg Hos Hor). {
         apply (rngl_0_le_2 Hos Hto).
       }
-      apply (rngl_le_0_add Hos Hto).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_of_nat_nonneg Hos Hto).
     }
@@ -971,7 +971,7 @@ destruct b as [b| b| ]. {
     rewrite rngl_mul_add_distr_l, rngl_mul_1_r.
     rewrite <- rngl_add_assoc.
     apply (rngl_lt_add_r Hos Hor).
-    apply (rngl_lt_0_add Hos Hto). {
+    apply (rngl_lt_0_add Hos Hor). {
       apply (rngl_0_lt_1 Hos Hc1 Hto).
     }
     apply (rngl_mul_nonneg_nonneg Hos Hor). {
@@ -1041,7 +1041,7 @@ induction a as [a| a| ]; intros. {
       rewrite rngl_mul_add_distr_l, rngl_mul_1_r.
       rewrite <- rngl_add_assoc.
       apply (rngl_le_add_r Hos Hor).
-      apply (rngl_le_0_add Hos Hto).
+      apply (rngl_le_0_add Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_mul_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_2 Hos Hto).
@@ -1480,7 +1480,7 @@ destruct n as [| n| n]. {
     rewrite rngl_of_Z_add_1_r; cbn.
     apply (rngl_le_trans Hor _ 1); [ | apply rngl_of_pos_le_1_l ].
     rewrite (rngl_add_opp_l Hop).
-    apply (rngl_le_sub_l Hop Hto).
+    apply (rngl_le_sub_l Hop Hor).
     apply rngl_of_pos_nonneg.
   }
 } {
@@ -1506,7 +1506,7 @@ destruct n as [| n| n]. {
     apply Hxn; clear Hxn.
     apply (rngl_le_trans Hor _ 1). {
       rewrite (rngl_add_opp_l Hop).
-      apply (rngl_le_sub_l Hop Hto).
+      apply (rngl_le_sub_l Hop Hor).
       apply rngl_of_pos_nonneg.
     }
     apply (rngl_le_trans Hor _ (rngl_of_pos m)); [ | easy ].

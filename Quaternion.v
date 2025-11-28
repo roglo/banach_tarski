@@ -1049,8 +1049,8 @@ intros (a, (x, y, z)) HN; cbn.
 progress unfold quat_norm_squ in HN.
 cbn in HN.
 apply (rngl_eq_add_0 Hor) in HN; cycle 1. {
-  apply (rngl_le_0_add Hos Hto). {
-    apply (rngl_le_0_add Hos Hto).
+  apply (rngl_le_0_add Hos Hor). {
+    apply (rngl_le_0_add Hos Hor).
     apply (rngl_squ_nonneg Hos Hto).
     apply (rngl_squ_nonneg Hos Hto).
   }
@@ -1061,7 +1061,7 @@ apply (rngl_eq_add_0 Hor) in HN; cycle 1. {
 destruct HN as (HN, H).
 apply (eq_rngl_squ_0 Hos Hio) in H; subst.
 apply (rngl_eq_add_0 Hor) in HN; cycle 1. {
-  apply (rngl_le_0_add Hos Hto).
+  apply (rngl_le_0_add Hos Hor).
   apply (rngl_squ_nonneg Hos Hto).
   apply (rngl_squ_nonneg Hos Hto).
 } {
