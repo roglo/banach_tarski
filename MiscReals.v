@@ -2371,7 +2371,7 @@ destruct z as [| q| q]. {
   exfalso.
   cbn in Hz.
   destruct Hz as (Hz, _).
-  apply (rngl_opp_nonneg_nonpos Hop Hto) in Hz.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hz.
   apply (rngl_nlt_ge Hor) in Hz.
   apply Hz; clear Hz.
   apply rngl_of_pos_pos.
@@ -2586,7 +2586,7 @@ destruct (Rcase_abs (- y)) as [Hy| Hy]. {
   now apply (rngl_lt_asymm Hor) in Hy.
 } {
   destruct (Rcase_abs y) as [Hzy| Hzy]; [ now rewrite Z.opp_involutive | ].
-  apply (rngl_opp_nonneg_nonpos Hop Hto) in Hy.
+  apply (rngl_opp_nonneg_nonpos Hop Hor) in Hy.
   now apply (rngl_le_antisymm Hor) in Hzy.
 }
 Qed.
