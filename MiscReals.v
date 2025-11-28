@@ -754,11 +754,11 @@ induction a as [a| a| ]; cbn. {
   apply (rngl_0_le_1 Hos Hto).
   rewrite rngl_of_pos_xI.
   apply (rngl_lt_add_l Hos Hor).
-  apply (rngl_mul_pos_pos Hop Hiq Hto); [ | easy ].
+  apply (rngl_mul_pos_pos Hop Hiq Hor); [ | easy ].
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 } {
   rewrite rngl_of_pos_xO.
-  apply (rngl_mul_pos_pos Hop Hiq Hto); [ | easy ].
+  apply (rngl_mul_pos_pos Hop Hiq Hor); [ | easy ].
   apply (rngl_0_lt_2 Hos Hc1 Hto).
 } {
   rewrite rngl_of_pos_1.
@@ -941,7 +941,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
   rewrite rngl_of_pos_1.
   rewrite rngl_of_pos_xI.
   apply (rngl_lt_add_l Hos Hor).
-  apply (rngl_mul_pos_pos Hop Hiq Hto).
+  apply (rngl_mul_pos_pos Hop Hiq Hor).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   apply rngl_of_pos_pos.
 }

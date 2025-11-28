@@ -310,11 +310,11 @@ destruct b. {
 replace (1 / 3 ^ n / 3)%L with (1 / (3 ^ S n))%L. {
   eapply (rngl_le_trans Hor); [ apply IHk | ].
   apply (rngl_le_inv_inv Hop Hiv Hto).
-  apply (rngl_mul_pos_pos Hop Hiq Hto).
+  apply (rngl_mul_pos_pos Hop Hiq Hor).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   apply (rngl_pow_pos_pos Hop Hiv Hto).
   apply (rngl_0_lt_3 Hos Hc1 Hto).
-  apply (rngl_mul_pos_pos Hop Hiq Hto).
+  apply (rngl_mul_pos_pos Hop Hiq Hor).
   apply (rngl_0_lt_2 Hos Hc1 Hto).
   apply (rngl_pow_pos_pos Hop Hiv Hto).
   apply (rngl_0_lt_3 Hos Hc1 Hto).
@@ -789,7 +789,7 @@ apply -> (rngl_le_div_l Hop Hiv Hto) in H1. {
   }
   progress unfold t.
   apply (rngl_inv_pos Hop Hiv Hto).
-  apply (rngl_mul_pos_pos Hop Hiq Hto).
+  apply (rngl_mul_pos_pos Hop Hiq Hor).
   apply (rngl_0_lt_3 Hos Hc1 Hto).
   apply (rngl_pow_pos_pos Hop Hiv Hto).
   apply (rngl_0_lt_3 Hos Hc1 Hto).
