@@ -1148,7 +1148,7 @@ destruct_ac.
 intros Hroc * Hab Hi Hj.
 generalize Hroc; intros Hroc'.
 move Hroc' before Hroc.
-apply (rngl_order_compatibility_comm Hto) in Hroc'.
+apply (rngl_order_compatibility_comm Hor) in Hroc'.
 revert a b j Hab Hi Hj.
 induction i; intros; cbn; [ apply Nat.le_0_l | ].
 destruct j. {
@@ -1323,7 +1323,7 @@ destruct n as [| p| p]; [ easy | | ]; exfalso. {
   apply (rngl_le_trans Hor _ 0); [ | easy ].
   rewrite rngl_of_Z_add_1_r; cbn.
   rewrite (rngl_add_opp_l Hop).
-  apply (rngl_le_sub_0 Hop Hto).
+  apply (rngl_le_sub_0 Hop Hor).
   apply rngl_of_pos_le_1_l.
 }
 Qed.
@@ -1495,7 +1495,7 @@ destruct n as [| n| n]. {
     apply Hxn; clear Hxn.
     apply (rngl_le_trans Hor _ 0); [ | easy ].
     rewrite (rngl_add_opp_l Hop).
-    apply (rngl_le_sub_0 Hop Hto).
+    apply (rngl_le_sub_0 Hop Hor).
     apply rngl_of_pos_le_1_l.
   } {
     exfalso.
