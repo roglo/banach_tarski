@@ -1167,7 +1167,7 @@ destruct j. {
 }
 apply -> Nat.succ_le_mono.
 apply (IHi (a - 1) (b - 1))%L. {
-  now apply (rngl_sub_le_mono_r Hop Hto).
+  now apply (rngl_sub_le_mono_r Hop Hor).
 } {
   rewrite Nat.add_1_r in Hi.
   do 2 rewrite rngl_of_nat_succ in Hi.
@@ -1889,7 +1889,7 @@ destruct m as (m, Hm).
 remember (z_int_part b) as n eqn:H; clear H.
 destruct n as (n, Hn).
 subst m.
-apply (rngl_sub_le_mono_r Hop Hto) in Hba.
+apply (rngl_sub_le_mono_r Hop Hor) in Hba.
 apply Int_part_small.
 apply rngl_sub_between_0_and_1.
 split; [ easy | ].
