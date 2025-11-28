@@ -1064,14 +1064,14 @@ induction a as [a| a| ]; intros. {
       apply (rngl_le_add_r Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
     }
-    apply (rngl_mul_le_mono_nonneg_l Hop Hto).
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
     apply (rngl_0_le_2 Hos Hto).
     now apply IHa.
   } {
     apply Pos.compare_le_iff in Hab; cbn in Hab.
     apply -> Pos.compare_le_iff in Hab.
     do 2 rewrite rngl_of_pos_xO.
-    apply (rngl_mul_le_mono_nonneg_l Hop Hto).
+    apply (rngl_mul_le_mono_nonneg_l Hop Hor).
     apply (rngl_0_le_2 Hos Hto).
     now apply IHa.
   }
@@ -1864,11 +1864,11 @@ Proof.
 destruct_ac.
 intros.
 split; intros (H1, H2). {
-  apply -> (rngl_le_0_sub Hop Hto) in H1.
+  apply -> (rngl_le_0_sub Hop Hor) in H1.
   split; [ easy | ].
   now apply (rngl_lt_sub_lt_add_l Hop Hto) in H2.
 } {
-  split; [ now apply (rngl_le_0_sub Hop Hto) | ].
+  split; [ now apply (rngl_le_0_sub Hop Hor) | ].
   now apply (rngl_lt_sub_lt_add_l Hop Hto).
 }
 Qed.
@@ -1931,7 +1931,7 @@ rewrite <- (rngl_add_sub_assoc Hop).
 eapply (rngl_lt_le_trans Hor).
 apply Hm.
 apply (rngl_le_add_r Hos Hor).
-now apply (rngl_le_0_sub Hop Hto).
+now apply (rngl_le_0_sub Hop Hor).
 Qed.
 
 Theorem Int_part_rngl_of_pos :
@@ -2005,7 +2005,7 @@ unfold frac_part.
 progress unfold Int_part.
 remember (z_int_part x) as z eqn:H; clear H.
 destruct z as (z, (Hzx, Hxz)).
-apply (rngl_le_0_sub Hop Hto) in Hzx.
+apply (rngl_le_0_sub Hop Hor) in Hzx.
 rewrite rngl_of_Z_add, rngl_of_Z_1 in Hxz.
 apply (rngl_lt_sub_lt_add_l Hop Hto) in Hxz.
 easy.
@@ -2250,7 +2250,7 @@ apply (eq_rl_sqrt_0 Hos) in Hyx. {
   rewrite (rngl_abs_nonneg_eq Hop Hor y) in Hyx; [ easy | ].
   now apply (rngl_le_trans Hor _ x).
 }
-apply (rngl_le_0_sub Hop Hto).
+apply (rngl_le_0_sub Hop Hor).
 now apply (rngl_le_le_squ Hop Hto).
 Qed.
 
@@ -2292,7 +2292,7 @@ split. {
   }
   rewrite rngl_mul_1_r.
   rewrite (rngl_mul_inv_r Hiv).
-  apply (rngl_le_0_sub Hop Hto).
+  apply (rngl_le_0_sub Hop Hor).
   progress unfold Int_part.
   remember (z_int_part _) as z eqn:H; clear H.
   destruct z as (z, Hz).

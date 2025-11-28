@@ -146,7 +146,7 @@ destruct xz. {
   destruct zx. {
     apply (rngl_ltb_lt Heo).
     apply (rl_sqrt_pos Hos Hto).
-    apply (rngl_lt_0_sub Hop Hto).
+    apply (rngl_lt_0_sub Hop Hor).
     apply rngl_le_neq.
     split; [ easy | ].
     intros H.
@@ -282,7 +282,7 @@ destruct xz. {
   destruct zx. {
     apply (rngl_ltb_lt Heo).
     apply (rl_sqrt_pos Hos Hto).
-    apply (rngl_lt_0_sub Hop Hto).
+    apply (rngl_lt_0_sub Hop Hor).
     apply rngl_le_neq.
     split; [ easy | ].
     intros H.

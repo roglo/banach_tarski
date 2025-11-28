@@ -1321,7 +1321,7 @@ Theorem vec_Cauchy_Schwarz_inequality : ∀ u v, ((u · v)² ≤ ‖u‖² * ‖
 Proof.
 destruct_ac.
 intros.
-apply (rngl_le_0_sub Hop Hto).
+apply (rngl_le_0_sub Hop Hor).
 rewrite vec_Lagrange_identity.
 rewrite vec_dot_mul_diag.
 apply (rngl_squ_nonneg Hos Hto).
