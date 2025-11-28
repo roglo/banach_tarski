@@ -2382,7 +2382,7 @@ destruct z as [| q| q]. {
   apply (rngl_nlt_ge Hor) in Hz.
   apply Hz; clear Hz.
   apply (rngl_le_lt_trans Hor _ 0); [ | apply rngl_of_pos_pos ].
-  apply (rngl_opp_nonpos_nonneg Hop Hto).
+  apply (rngl_opp_nonpos_nonneg Hop Hor).
   apply rngl_of_pos_nonneg.
 } {
   f_equal.
@@ -2582,7 +2582,7 @@ destruct (Rcase_abs (- y)) as [Hy| Hy]. {
   rewrite (rngl_opp_involutive Hop).
   destruct (Rcase_abs y) as [Hzy| Hzy]; [ | easy ].
   exfalso.
-  apply (rngl_opp_neg_pos Hop Hto) in Hy.
+  apply (rngl_opp_neg_pos Hop Hor) in Hy.
   now apply (rngl_lt_asymm Hor) in Hy.
 } {
   destruct (Rcase_abs y) as [Hzy| Hzy]; [ now rewrite Z.opp_involutive | ].

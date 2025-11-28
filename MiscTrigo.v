@@ -1023,7 +1023,7 @@ destruct Hcz; subst. {
     rewrite (rngl_div_opp_l Hop Hiv).
     rewrite (rngl_div_opp_l Hop Hiv).
     now rewrite (rngl_opp_involutive Hop).
-    apply (rngl_opp_nonpos_nonneg Hop Hto).
+    apply (rngl_opp_nonpos_nonneg Hop Hor).
     now apply rngl_lt_le_incl.
   }
   rewrite (rngl_div_opp_l Hop Hiv).
