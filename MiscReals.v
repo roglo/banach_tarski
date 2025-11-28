@@ -1136,6 +1136,7 @@ Qed.
 
 (** *** generic theorems: work for pair (≤, <) and for pair (<, ≤) *)
 
+(*
 Theorem gen_between_rngl_of_nat_and_succ {l1 l2} :
   rngl_order_compatibility l1 l2 →
   ∀ a b i j,
@@ -1219,6 +1220,7 @@ now apply (rngl_of_nat_le_or_lt_prop Hroc x).
 Qed.
 
 (** *** specific theorems: version for ≤, followed with version for < *)
+*)
 
 Theorem between_rngl_of_nat_and_succ :
   ∀ a b i j,
@@ -1229,7 +1231,38 @@ Theorem between_rngl_of_nat_and_succ :
 Proof.
 destruct_ac.
 intros * Hab Hi Hj.
-now apply (gen_between_rngl_of_nat_and_succ (rngl_le_lt_comp Hto) a b).
+revert a b j Hab Hi Hj.
+induction i; intros; cbn; [ apply Nat.le_0_l | ].
+destruct j. {
+  exfalso; cbn in Hj.
+  rewrite rngl_add_0_r in Hj.
+  destruct Hj as (_, Hj).
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  destruct Hi as (H1, H2).
+  apply (rngl_nlt_ge Hor) in H1.
+  apply H1; clear H1.
+  apply (rngl_le_lt_trans Hor _ b); [ easy | ].
+  apply (rngl_lt_le_trans Hor _ 1); [ easy | ].
+  apply (rngl_le_add_r Hos Hor).
+  apply (rngl_of_nat_nonneg Hos Hto).
+}
+apply -> Nat.succ_le_mono.
+apply (IHi (a - 1) (b - 1))%L. {
+  now apply (rngl_sub_le_mono_r Hop Hor).
+} {
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  split; [ now apply (rngl_le_add_le_sub_l Hop Hor) | ].
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  now rewrite Nat.add_1_r.
+} {
+  rewrite Nat.add_1_r in Hj.
+  do 2 rewrite rngl_of_nat_succ in Hj.
+  split; [ now apply (rngl_le_add_le_sub_l Hop Hor) | ].
+  apply (rngl_lt_sub_lt_add_l Hop Hor).
+  now rewrite Nat.add_1_r.
+}
 Qed.
 
 Theorem between_rngl_of_nat_and_succ2 :
@@ -1241,7 +1274,38 @@ Theorem between_rngl_of_nat_and_succ2 :
 Proof.
 destruct_ac.
 intros * Hab Hi Hj.
-now apply (gen_between_rngl_of_nat_and_succ (rngl_lt_le_comp Hto) a b).
+revert a b j Hab Hi Hj.
+induction i; intros; cbn; [ apply Nat.le_0_l | ].
+destruct j. {
+  exfalso; cbn in Hj.
+  rewrite rngl_add_0_r in Hj.
+  destruct Hj as (_, Hj).
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  destruct Hi as (H1, H2).
+  apply (rngl_nle_gt Hor) in H1.
+  apply H1; clear H1.
+  apply (rngl_le_trans Hor _ b); [ easy | ].
+  apply (rngl_le_trans Hor _ 1); [ easy | ].
+  apply (rngl_le_add_r Hos Hor).
+  apply (rngl_of_nat_nonneg Hos Hto).
+}
+apply -> Nat.succ_le_mono.
+apply (IHi (a - 1) (b - 1))%L. {
+  now apply (rngl_sub_le_mono_r Hop Hor).
+} {
+  rewrite Nat.add_1_r in Hi.
+  do 2 rewrite rngl_of_nat_succ in Hi.
+  split; [ now apply (rngl_lt_add_lt_sub_l Hop Hor) | ].
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  now rewrite Nat.add_1_r.
+} {
+  rewrite Nat.add_1_r in Hj.
+  do 2 rewrite rngl_of_nat_succ in Hj.
+  split; [ now apply (rngl_lt_add_lt_sub_l Hop Hor) | ].
+  apply (rngl_le_sub_le_add_l Hop Hor).
+  now rewrite Nat.add_1_r.
+}
 Qed.
 
 Theorem rngl_of_nat_prop :
@@ -1252,7 +1316,12 @@ Theorem rngl_of_nat_prop :
 Proof.
 destruct_ac.
 intros *.
-now apply (rngl_of_nat_le_or_lt_prop (rngl_le_lt_comp Hto) x).
+intros * (Hmx, Hxm) (Hnx, Hxn).
+apply Nat.le_antisymm.
+apply (between_rngl_of_nat_and_succ x x); [ | easy | easy ].
+apply (rngl_le_refl Hor).
+apply (between_rngl_of_nat_and_succ x x); [ | easy | easy ].
+apply (rngl_le_refl Hor).
 Qed.
 
 Theorem rngl_of_nat_prop2 :
@@ -1263,6 +1332,7 @@ Theorem rngl_of_nat_prop2 :
 Proof.
 destruct_ac.
 intros *.
+...
 now apply (rngl_of_nat_le_or_lt_prop (rngl_lt_le_comp Hto) x).
 Qed.
 
