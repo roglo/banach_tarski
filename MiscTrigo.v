@@ -104,7 +104,7 @@ destruct xz. {
     apply (rngl_le_le_squ Hop Hto).
     apply (rngl_div_nonneg Hop Hiv Hto).
     apply (rngl_abs_nonneg Hop Hto).
-    apply (rl_sqrt_pos Hos Hto).
+    apply (rl_sqrt_pos Hos Hor).
     rewrite rngl_squ_1.
     apply (rngl_lt_0_add Hos Hor).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
@@ -145,7 +145,7 @@ destruct xz. {
   apply rngl_leb_le in Hx1.
   destruct zx. {
     apply (rngl_ltb_lt Heo).
-    apply (rl_sqrt_pos Hos Hto).
+    apply (rl_sqrt_pos Hos Hor).
     apply (rngl_lt_0_sub Hop Hor).
     apply rngl_le_neq.
     split; [ easy | ].
@@ -221,7 +221,7 @@ destruct xz. {
   apply rngl_leb_le.
   apply (rngl_div_nonneg Hop Hiv Hto).
   apply (rngl_abs_nonneg Hop Hto).
-  apply (rl_sqrt_pos Hos Hto).
+  apply (rl_sqrt_pos Hos Hor).
   apply (rngl_lt_le_trans Hor _ 1).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
   apply (rngl_le_add_r Hos Hor).
@@ -240,7 +240,7 @@ destruct xz. {
     apply (rngl_le_le_squ Hop Hto).
     apply (rngl_div_nonneg Hop Hiv Hto).
     apply (rngl_abs_nonneg Hop Hto).
-    apply (rl_sqrt_pos Hos Hto).
+    apply (rl_sqrt_pos Hos Hor).
     rewrite rngl_squ_1.
     apply (rngl_lt_0_add Hos Hor).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
@@ -281,7 +281,7 @@ destruct xz. {
   symmetry in Hzx.
   destruct zx. {
     apply (rngl_ltb_lt Heo).
-    apply (rl_sqrt_pos Hos Hto).
+    apply (rl_sqrt_pos Hos Hor).
     apply (rngl_lt_0_sub Hop Hor).
     apply rngl_le_neq.
     split; [ easy | ].
@@ -313,7 +313,7 @@ destruct xz. {
       apply (rngl_nlt_ge Hor) in Hzxs.
       apply Hzxs; clear Hzxs.
       apply (rngl_div_pos Hop Hiv Hto); [ easy | ].
-      apply (rl_sqrt_pos Hos Hto).
+      apply (rl_sqrt_pos Hos Hor).
       apply (rngl_lt_trans Hor _ 1).
       apply (rngl_0_lt_1 Hos Hc1 Hto).
       apply (rngl_lt_add_r Hos Hor).
@@ -354,7 +354,7 @@ destruct xz. {
   apply rngl_leb_le.
   apply (rngl_div_nonneg Hop Hiv Hto).
   apply (rngl_abs_nonneg Hop Hto).
-  apply (rl_sqrt_pos Hos Hto).
+  apply (rl_sqrt_pos Hos Hor).
   apply (rngl_lt_le_trans Hor _ 1).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
   apply (rngl_le_add_r Hos Hor).
