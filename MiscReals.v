@@ -1331,9 +1331,12 @@ Theorem rngl_of_nat_prop2 :
   → m = n.
 Proof.
 destruct_ac.
-intros *.
-...
-now apply (rngl_of_nat_le_or_lt_prop (rngl_lt_le_comp Hto) x).
+intros * (Hmx, Hxm) (Hnx, Hxn).
+apply Nat.le_antisymm.
+apply (between_rngl_of_nat_and_succ2 x x); [ | easy | easy ].
+apply (rngl_le_refl Hor).
+apply (between_rngl_of_nat_and_succ2 x x); [ | easy | easy ].
+apply (rngl_le_refl Hor).
 Qed.
 
 Theorem rngl_of_pos_prop :
@@ -1344,6 +1347,7 @@ Theorem rngl_of_pos_prop :
 Proof.
 destruct_ac.
 intros *.
+...
 now apply (rngl_of_pos_le_or_lt_prop (rngl_le_lt_comp Hto) x).
 Qed.
 
