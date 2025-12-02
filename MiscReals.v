@@ -244,6 +244,30 @@ rewrite Nat.mul_1_r.
 apply rngl_of_nat_2.
 Qed.
 
+Theorem rngl_of_pos_3 : rngl_of_pos 3 = 3%L.
+Proof.
+destruct_ac.
+progress unfold rngl_of_pos.
+rewrite Pos2Nat.inj_xI.
+rewrite Pos2Nat.inj_1.
+cbn - [ rngl_of_nat ].
+apply rngl_of_nat_3.
+Qed.
+
+Theorem rngl_of_pos_4 : rngl_of_pos 4 = 4%L.
+Proof.
+destruct_ac.
+progress unfold rngl_of_pos.
+do 2 rewrite Pos2Nat.inj_xO.
+rewrite Pos2Nat.inj_1.
+cbn - [ rngl_of_nat ].
+cbn.
+rewrite rngl_add_0_r.
+rewrite rngl_add_comm.
+progress f_equal.
+apply rngl_add_comm.
+Qed.
+
 Theorem rngl_of_Z_succ : ∀ a, rngl_of_Z (Z.succ a) = (1 + rngl_of_Z a)%L.
 Proof.
 destruct_ac.
