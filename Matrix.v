@@ -2260,7 +2260,7 @@ assert
   easy.
 }
 assert
-  (H1 :
+  (Hlcs :
     ∀ m n o,
     ∑ (i = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
     ε i j k * mat_nth M i m * mat_nth M j n * mat_nth M k o =
@@ -2269,7 +2269,31 @@ assert
   specialize (sum_Levi_Civita_symbol_mat M m n o) as H3.
   now rewrite Hd, rngl_mul_1_r in H3.
 }
+specialize (matrix_add_mul_eq_Kronecker M Ht) as Hkro.
 (**)
+apply vector_ext.
+intros i.
+rewrite Muv_i, MuMv_i.
+erewrite rngl_summation_eq_compat. 2: {
+  intros l Hl.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros k Hk.
+      move j before i; move k before j.
+      rewrite <- Hlcs.
+      reflexivity.
+    }
+    reflexivity.
+  }
+  reflexivity.
+}
+cbn - [ ε mat_nth ].
+remember
+  (∑ (l = _, _), ∑ (m = _, _), ∑ (n = _, _),
+     _ * (∑ (j = _, _), ∑ (k = _, _), ∑ (o = _, _), _) * _ * _)
+  as x in |-*; subst x.
+...
 assert
   (H2 :
      ∀ i j k,
