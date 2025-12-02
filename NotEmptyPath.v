@@ -27,6 +27,7 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
+Context {Hc1 : rngl_characteristic T ≠ 1}.
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
@@ -59,8 +60,13 @@ split. {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
     rewrite rngl_of_Z_add, rngl_of_Z_add.
     progress repeat rewrite rngl_of_Z_mul.
+    rewrite (rngl_inv_mul_distr Hos Hiv); cycle 1. {
+      apply (rngl_3_neq_0 Hos Hc1 Hto).
+    } {
+      apply (rngl_pow_neq_0 Hos Hiq).
+      apply (rngl_3_neq_0 Hos Hc1 Hto).
+    }
 ...
-    rewrite Rinv_mult.
     progress repeat rewrite Rmult_1_l.
     progress repeat rewrite Rmult_0_l.
     progress repeat rewrite Rplus_0_l.
