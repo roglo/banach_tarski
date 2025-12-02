@@ -1,8 +1,12 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 Arith List.
+From Stdlib Require Import Utf8 Arith ZArith List.
+(*
 From Stdlib Require Import Reals Psatz.
+*)
 Import ListNotations.
+From RingLike Require Import Core RealLike.
+Require Import TrigoWithoutPi.Core.
 
 From a Require Import MiscReals Words Normalize Reverse Matrix.
 
@@ -16,12 +20,21 @@ Definition rotate_param e '(a, b, c, N) :=
 
 Arguments Z.mul _ _ : simpl nomatch.
 
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T}.
+
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
   ↔ fold_right rotate (V (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
       V (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
     ∧ N = (n + length el)%nat.
 Proof.
+destruct_ac.
 intros el x y z n a₁ b₁ c₁ N₁.
 split. {
   intros Hr.
@@ -33,17 +46,20 @@ split. {
     split; reflexivity.
   }
   simpl in Hr; simpl.
-  remember (fold_right rotate_param (x, y, z, n) el) as rp eqn:Hrp.
-  symmetry in Hrp.
-  destruct rp as (((a, b), c), N).
+  remember (fold_right rotate_param (x, y, z, n) el) as rp' eqn:Hrp'.
+  symmetry in Hrp'.
+  destruct rp' as (((a, b), c), N).
   pose proof IHel _ _ _ _ (eq_refl _) as H.
   destruct H as (H, HN).
   erewrite H.
-  simpl in Hr; simpl; unfold Rdiv.
+  simpl in Hr; simpl.
+  progress unfold rngl_div.
+  rewrite Hiv.
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl. {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-    rewrite plus_IZR, plus_IZR.
-    progress repeat rewrite mult_IZR.
+    rewrite rngl_of_Z_add, rngl_of_Z_add.
+    progress repeat rewrite rngl_of_Z_mul.
+...
     rewrite Rinv_mult.
     progress repeat rewrite Rmult_1_l.
     progress repeat rewrite Rmult_0_l.
