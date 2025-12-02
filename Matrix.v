@@ -2142,19 +2142,24 @@ destruct n. {
 destruct n; ring.
 Qed.
 
-Theorem vector_ext : ∀ u v, u = v ↔ ∀ i, vec_nth u i = vec_nth v i.
+Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c) : nat_scope.
+
+Theorem vector_ext :
+  ∀ u v, u = v ↔ ∀ i, 1 ≤ i ≤ 3 → vec_nth u i = vec_nth v i.
 Proof.
 intros.
 split; intros Huv; [ now subst | ].
 destruct u as (u1, u2, u3).
 destruct v as (v1, v2, v3).
 f_equal.
-now specialize (Huv 1); cbn in Huv.
-now specialize (Huv 2); cbn in Huv.
-now specialize (Huv 3); cbn in Huv.
+specialize (Huv 1); apply Huv.
+split; [ easy | now apply -> Nat.succ_le_mono ].
+specialize (Huv 2); apply Huv.
+split; [ now apply -> Nat.succ_le_mono | ].
+now do 2 apply -> Nat.succ_le_mono.
+specialize (Huv 3); apply Huv.
+split; [ now apply -> Nat.succ_le_mono | easy ].
 Qed.
-
-Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c) : nat_scope.
 
 Theorem matrix_add_mul_eq_Kronecker :
   ∀ M, is_ortho_matrix M →
@@ -2323,7 +2328,7 @@ specialize (matrix_add_mul_eq_Kronecker M Ht) as Hkro.
 specialize (matrix_add_mul_eq_Kronecker' M (conj Ht Hd)) as Hkro'.
 (**)
 apply vector_ext.
-intros i.
+intros i Hi.
 rewrite Muv_i, MuMv_i.
 erewrite rngl_summation_eq_compat. 2: {
   intros l Hl.
@@ -2405,7 +2410,36 @@ erewrite rngl_summation_eq_compat. 2: {
     erewrite rngl_summation_eq_compat. 2: {
       intros.
       rewrite <- (rngl_mul_summation_distr_r Hos).
-      rewrite Hkro'.
+      rewrite Hkro'; [ | easy | easy ].
+      reflexivity.
+    }
+    reflexivity.
+  }
+  reflexivity.
+}
+cbn - [ ε mat_nth ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  rewrite rngl_summation_summation_exch.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    rewrite <- (rngl_mul_summation_distr_l Hos).
+    reflexivity.
+  }
+  reflexivity.
+}
+cbn - [ ε mat_nth ].
+rewrite rngl_summation_summation_exch.
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  rewrite <- (rngl_mul_summation_distr_l Hos).
+  reflexivity.
+}
+cbn - [ ε mat_nth ].
+remember
+  (∑ (m = _, _), _ * ∑ (n = _, _), ∑ (l = _, _),
+     ∑ (j = _, _), ∑ (k = _, _), _)
+  as x in |-*; subst x.
 ...
 assert
   (H2 :
