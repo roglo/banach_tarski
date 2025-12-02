@@ -2260,6 +2260,21 @@ destruct j. {
 now do 3 apply Nat.succ_le_mono in Hj.
 Qed.
 
+Theorem rngl_summation_mul_Kronecker_l :
+  ∀ i f, 1 ≤ i ≤ 3 → ∑ (j = 1, 3), δ i j * f j = f i.
+Proof.
+intros * Hi.
+progress unfold iter_seq.
+progress unfold iter_list; cbn.
+rewrite rngl_add_0_l.
+destruct i; [ easy | ].
+destruct i; [ cbn; ring | ].
+destruct i; [ cbn; ring | ].
+destruct i; [ cbn; ring | ].
+destruct Hi as (_, Hi).
+now do 3 apply Nat.succ_le_mono in Hi.
+Qed.
+
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
@@ -2440,522 +2455,37 @@ remember
   (∑ (l = _, _), _ * ∑ (m = _, _), ∑ (n = _, _),
      ∑ (j = _, _), ∑ (k = _, _), _)
   as x in |-*; subst x.
-...
-assert
-  (H2 :
-     ∀ i j k,
-     ∑ (l = 1, 3), mat_nth M i l * ε l j k =
-     ∑ (m = 1, 3), ∑ (n = 1, 3), ε i m n * mat_nth M m j * mat_nth M n k). {
-  intros.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros.
-    rewrite <- H1.
-    rewrite rngl_summation_summation_exch.
-    rewrite (rngl_mul_summation_distr_l Hos).
-    apply rngl_summation_eq_compat.
-    intros.
-    rewrite rngl_summation_summation_exch.
-    rewrite (rngl_mul_summation_distr_l Hos).
-    apply rngl_summation_eq_compat.
-    intros.
-    rewrite (rngl_mul_summation_distr_l Hos).
-    apply rngl_summation_eq_compat.
-    intros.
-    do 3 rewrite rngl_mul_assoc.
-    rewrite <- rngl_mul_assoc.
-    reflexivity.
-  }
-  cbn - [ ε mat_nth ].
-  rewrite rngl_summation_summation_exch.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros.
-    rewrite rngl_summation_summation_exch.
-    reflexivity.
-  }
-  cbn - [ ε mat_nth ].
-  erewrite rngl_summation_eq_compat. 2: {
-    intros.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros.
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        rewrite <- (rngl_mul_summation_distr_r Hos).
-        reflexivity.
-      }
-      cbn - [ ε mat_nth ].
-      rewrite <- (rngl_mul_summation_distr_r Hos).
-      reflexivity.
-    }
-    reflexivity.
-  }
-  cbn - [ ε mat_nth ].
-  remember (∑ (m = 1, 3), ∑ (n = 1, 3), (∑ (l = _, _), ∑ (o = _, _), _) * _)
-    as x; subst x.
-  apply rngl_summation_eq_compat.
-  intros m Hm.
-  apply rngl_summation_eq_compat.
-  intros n Hn.
-  rewrite <- rngl_mul_assoc.
-  progress f_equal.
-...
-assert
-  (H4 :
-    ∀ i j k, 1 ≤ i ≤ 3 →
-    ∑ (l = 1, 3), mat_nth M i l * ε l j k =
-    ∑ (m = 1, 3), ∑ (n = 1, 3), ε i m n * mat_nth M j m * mat_nth M k n). {
-  intros * Hi.
-  specialize (H3 i j k) as H.
-  remember (∑ (m = _, _), ∑ (n = _, _), ∑ (o = _, _), _) as x in H.
-  subst x.
-  enough
-    (H' :
-      ∀ l,
-      ∑ (i = 1, 3), mat_nth M l i * ε i j k =
-      ∑ (i = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3),
-        mat_nth M i l * ε m n o * mat_nth M i m *
-          mat_nth M j n * mat_nth M k o). {
-    assert
-      (H'' :
-        ∀ l,
-        ∑ (i = 1, 3), mat_nth M l i * ε i j k =
-        ∑ (m = 1, 3),
-          (∑ (i = 1, 3), mat_nth M i l * mat_nth M i m) *
-          (∑ (n = 1, 3), ∑ (o = 1, 3),
-            ε m n o * mat_nth M j n * mat_nth M k o)). {
-      intros.
-      rewrite H'.
-      rewrite rngl_summation_summation_exch.
-      apply rngl_summation_eq_compat.
-      intros m Hm.
-      rewrite (rngl_mul_summation_distr_r Hos).
-      apply rngl_summation_eq_compat.
-      intros p Hp.
-      rewrite (rngl_mul_summation_distr_l Hos).
-      apply rngl_summation_eq_compat.
-      intros q Hq.
-      rewrite (rngl_mul_summation_distr_l Hos).
-      apply rngl_summation_eq_compat.
-      intros r Hr.
-      ring.
-    }
-    clear H'; rename H'' into H'.
-    assert
-      (H'' :
-        ∀ l, 1 ≤ l ≤ 3 →
-        ∑ (i = 1, 3), mat_nth M l i * ε i j k =
-        ∑ (m = 1, 3),
-          δ l m *
-          (∑ (n = 1, 3), ∑ (o = 1, 3),
-            ε m n o * mat_nth M j n * mat_nth M k o)). {
-      intros * Hl.
-      rewrite H'.
-      apply rngl_summation_eq_compat.
-      intros m Hm.
-      progress f_equal.
-      now apply (matrix_add_mul_eq_Kronecker _ Ht).
-    }
-    clear H'; rename H'' into H'.
-    assert
-      (H'' :
-        ∀ l : ℕ, 1 ≤ l ≤ 3 →
-        ∑ (i = 1, 3), mat_nth M l i * ε i j k =
-        ∑ (n = 1, 3), ∑ (o = 1, 3), ε l n o * mat_nth M j n * mat_nth M k o). {
-      intros * Hl.
-      rewrite H'; [ | easy ].
-      progress unfold iter_seq at 1.
-      progress unfold iter_list.
-      cbn - [ ε mat_nth ].
-      rewrite rngl_add_0_l.
-      destruct l; [ easy | ].
-      destruct l; cbn - [ ε mat_nth ]. {
-        do 2 rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
-        apply rngl_mul_1_l.
-      }
-      destruct l; cbn - [ ε mat_nth ]. {
-        do 2 rewrite (rngl_mul_0_l Hos).
-        rewrite rngl_add_0_l, rngl_add_0_r.
-        apply rngl_mul_1_l.
-      }
-      destruct l; cbn - [ ε mat_nth ]. {
-        do 2 rewrite (rngl_mul_0_l Hos).
-        do 2 rewrite rngl_add_0_l.
-        apply rngl_mul_1_l.
-      }
-      destruct Hl as (_, Hl).
-      now do 3 apply Nat.succ_le_mono in Hl.
-    }
-    clear H'; rename H'' into H'.
-    now apply H'.
-  }
-  intros l.
-  apply rngl_summation_eq_compat.
-  intros p Hp.
-...
-  replace (ε p j k) with (ε j p k).
-  rewrite <- H3.
-  rewrite rngl_mul_summation_distr_l.
-  apply rngl_summation_eq_compat.
-  intros q Hq.
-  rewrite rngl_mul_summation_distr_l.
-  apply rngl_summation_eq_compat.
-  intros r Hr.
-  rewrite rngl_mul_summation_distr_l.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros s Hs.
-    do 3 rewrite rngl_mul_assoc.
-    easy.
-  }
-  remember (∑ (o = 1, 3), _) as x in |-*; subst x.
-  ============================
-  ∑ (o = 1, 3), mat_nth M l p * ε q r o * mat_nth M q k * mat_nth M r p * mat_nth M o j =
-  ∑ (o = 1, 3), mat_nth M p l * ε q r o * mat_nth M p q * mat_nth M j r * mat_nth M k o
-  ============================
-  ∑ (o = 1, 3), mat_nth M l p * ε q r o * mat_nth M q j * mat_nth M r k * mat_nth M o p =
-  ∑ (o = 1, 3), mat_nth M p l * ε q r o * mat_nth M p q * mat_nth M j r * mat_nth M k o
-Print ε.
-Search ε.
-...
-    remember (∑ (m = 1, 3), ∑ (n = 1, 3), _) as x in |-*; subst x.
-...
-    rewrite H'.
-...
-  apply (f_equal (rngl_mul (mat_nth M i l))) in H.
-...
-apply vector_ext.
-intros i.
-rewrite H1.
+rewrite rngl_summation_mul_Kronecker_l; [ | easy ].
 erewrite rngl_summation_eq_compat. 2: {
-  intros l Hl.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros k Hk.
-      rewrite <- H3.
-      rewrite (rngl_mul_summation_distr_l Hos).
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        rewrite (rngl_mul_summation_distr_l Hos).
-        erewrite rngl_summation_eq_compat. 2: {
-          intros.
-          rewrite (rngl_mul_summation_distr_l Hos).
-          reflexivity.
-        }
-        reflexivity.
-      }
-      reflexivity.
-    }
-    reflexivity.
-  }
+  intros.
+  rewrite rngl_summation_summation_exch.
   reflexivity.
 }
-cbn - [ mat_nth ε ].
+cbn - [ ε mat_nth ].
+remember
+  (∑ (m = _, _), ∑ (j = _, _), ∑ (n = _, _), ∑ (k = _, _), _)
+  as x in |-*; subst x.
 rewrite rngl_summation_summation_exch.
-erewrite rngl_summation_eq_compat. 2: {
-  intros.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros.
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        erewrite rngl_summation_eq_compat. 2: {
-          intros.
-          erewrite rngl_summation_eq_compat. 2: {
-            intros.
-            do 3 rewrite rngl_mul_assoc.
-            rewrite (rngl_mul_mul_swap Hic _ (ε _ _ _)).
-            do 2 rewrite <- rngl_mul_assoc.
-            rewrite (rngl_mul_assoc (ε _ _ _)).
-            reflexivity.
-          }
-          reflexivity.
-        }
-        reflexivity.
-      }
-      reflexivity.
-    }
-    reflexivity.
-  }
-  reflexivity.
-}
-cbn - [ mat_nth ε ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros.
-      do 2 rewrite (rngl_mul_summation_distr_r Hos).
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        do 2 rewrite (rngl_mul_summation_distr_r Hos).
-        erewrite rngl_summation_eq_compat. 2: {
-          intros.
-          do 2 rewrite (rngl_mul_summation_distr_r Hos).
-          erewrite rngl_summation_eq_compat. 2: {
-            intros.
-            do 2 rewrite <- (rngl_mul_assoc (mat_nth M i i1 * _)).
-            reflexivity.
-          }
-          reflexivity.
-        }
-        reflexivity.
-      }
-      reflexivity.
-    }
-    reflexivity.
-  }
-  reflexivity.
-}
-cbn - [ mat_nth ε ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros.
-  rewrite rngl_summation_summation_exch.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros.
-      rewrite rngl_summation_summation_exch.
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        rewrite rngl_summation_summation_exch.
-        erewrite rngl_summation_eq_compat. 2: {
-          intros.
-          erewrite rngl_summation_eq_compat. 2: {
-            intros.
-            do 4 rewrite <- rngl_mul_assoc.
-            do 2 rewrite rngl_mul_assoc.
-            remember (_ * _ * ε _ _ _)%L as x.
-            rewrite (rngl_mul_assoc (mat_nth _ _ _)).
-            rewrite (rngl_mul_assoc (mat_nth _ _ _ * _)).
-            subst x.
-            reflexivity.
-          }
-          cbn - [ mat_nth ε ].
-          rewrite <- (rngl_mul_summation_distr_r Hos).
-          reflexivity.
-        }
-        cbn - [ mat_nth ε ].
-        reflexivity.
-      }
-      reflexivity.
-    }
-    reflexivity.
-  }
-  reflexivity.
-}
-cbn - [ mat_nth ε ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros.
-    rewrite rngl_summation_summation_exch.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros.
-      rewrite rngl_summation_summation_exch.
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        rewrite <- (rngl_mul_summation_distr_r Hos).
-        reflexivity.
-      }
-      reflexivity.
-    }
-    reflexivity.
-  }
-  reflexivity.
-}
-cbn - [ mat_nth ε ].
-...
-  rewrite rngl_summation_summation_exch.
-erewrite rngl_summation_eq_compat. 2: {
-  intros.
-  rewrite rngl_summation_summation_exch.
-erewrite rngl_summation_eq_compat. 2: {
-  intros.
-  rewrite rngl_summation_summation_exch.
-...
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        erewrite rngl_summation_eq_compat. 2: {
-          intros.
-          erewrite rngl_summation_eq_compat. 2: {
-            intros.
-            do 3 rewrite rngl_mul_assoc.
-            rewrite (rngl_mul_mul_swap Hic _ (ε _ _ _)).
-            do 2 rewrite <- rngl_mul_assoc.
-            rewrite (rngl_mul_assoc (ε _ _ _)).
-            reflexivity.
-          }
-          cbn - [ mat_nth ε ].
-          rewrite <- (rngl_mul_summation_distr_l Hos).
-          reflexivity.
-        }
-        cbn - [ mat_nth ε ].
-        rewrite <- (rngl_mul_summation_distr_l Hos).
-        reflexivity.
-      }
-      cbn - [ mat_nth ε ].
-      reflexivity.
-    }
-    cbn - [ mat_nth ε ].
-    reflexivity.
-  }
-  cbn - [ mat_nth ε ].
-  reflexivity.
-}
-cbn - [ mat_nth ε ].
-
-...
-          rewrite <- rngl_mul_summation_distr_l.
-...
-        rewrite rngl_summation_summation_exch.
-        erewrite rngl_summation_eq_compat. 2: {
-          intros.
-...
-  erewrite rngl_summation_eq_compat. 2: {
-    intros.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros.
-      rewrite rngl_summation_summation_exch.
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        rewrite rngl_summation_summation_exch.
-        erewrite rngl_summation_eq_compat. 2: {
-          intros.
-          replace (∑ (j = _, _), _) with
-            (mat_nth M i i0 *
-               (ε i i3 i4 * mat_nth M i i0 * mat_nth M i3 i1 *
-               mat_nth M i4 i2))%L. 2: {
-            progress unfold iter_seq.
-            progress unfold iter_list.
-            cbn - [ mat_nth ε ].
-            rewrite rngl_add_0_l.
-            destruct (Nat.eq_dec i 1) as [H1i| H1i]. {
-              subst i.
-              symmetry.
-              rewrite <- rngl_add_assoc.
-              apply (rngl_add_move_l Hop).
-              rewrite (rngl_sub_diag Hos).
-...
-          erewrite rngl_summation_eq_compat. 2: {
-            intros.
-
-...
-assert
-  (H4 :
-    ∀ i j k,
-    ∑ (l = 1, 3), mat_nth M i l * ε l j k =
-    ∑ (m = 1, 3), ∑ (n = 1, 3),
-      ε i m n * mat_nth M j m * mat_nth M k n). {
-  intros.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros l Hl.
-    rewrite <- H3.
-    rewrite (rngl_mul_summation_distr_l Hos).
-    erewrite rngl_summation_eq_compat. 2: {
-      intros.
-      rewrite (rngl_mul_summation_distr_l Hos).
-      erewrite rngl_summation_eq_compat. 2: {
-        intros.
-        rewrite (rngl_mul_summation_distr_l Hos).
-        erewrite rngl_summation_eq_compat. 2: {
-          intros.
-          do 3 rewrite rngl_mul_assoc.
-          reflexivity.
-        }
-        reflexivity.
-      }
-      reflexivity.
-    }
-    reflexivity.
-  }
-  cbn - [ mat_nth ε ].
-  remember
-    (∑ (l = 1, 3), ∑ (m = 1, 3), ∑ (n = 1, 3), ∑ (o = 1, 3), _) as x.
-  subst x.
-...
-  erewrite rngl_summation_eq_compat. 2: {
-    intros l Hl.
-    apply (f_equal (rngl_mul (mat_nth M i l))) in H3.
-    rewrite <- H3.
-...
-assert
-  (H4 :
-    ∀ i,
-    vec_nth (M * (u × v)) i =
-    ∑ (m = 1, 3), ∑ (n = 1, 3),
-    ε m n i * vec_nth u m * vec_nth v n). {
-  intros.
-  rewrite H1.
-...
-apply vector_ext.
-intros i.
-specialize (H1 i).
-specialize (H2 i).
-rewrite H1, H2.
-specialize (sum_ε_mat M) as H3.
-...
+remember
+  (∑ (j = _, _), ∑ (m = _, _), ∑ (n = _, _), ∑ (k = _, _), _)
+  as x in |-*; subst x.
 apply rngl_summation_eq_compat.
 intros j Hj.
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  rewrite rngl_summation_summation_exch.
+  reflexivity.
+}
+cbn - [ ε mat_nth ].
+remember (∑ (m = _, _), ∑ (k = _, _), ∑ (n = _, _), _) as x in |-*; subst x.
+rewrite rngl_summation_summation_exch.
 apply rngl_summation_eq_compat.
 intros k Hk.
 apply rngl_summation_eq_compat.
-intros l Hl.
-erewrite rngl_summation_eq_compat. 2: {
-  intros m Hm.
-  rewrite <- rngl_mul_assoc.
-  reflexivity.
-}
-cbn - [ mat_nth vec_nth ε ].
-rewrite <- (rngl_mul_summation_distr_l Hos).
-rewrite (rngl_mul_comm Hic (mat_nth M i j)).
-do 4 rewrite <- rngl_mul_assoc.
-progress f_equal.
-specialize (sum_ε_mat M) as H3.
-rewrite Hd in H3.
-specialize (H3 j k l).
-rewrite rngl_mul_1_r in H3.
-rewrite <- H3.
-rewrite (rngl_mul_summation_distr_l Hos).
-rewrite (rngl_mul_summation_distr_r Hos).
-rewrite (rngl_mul_summation_distr_r Hos).
-apply rngl_summation_eq_compat.
 intros m Hm.
-...
-assert
-  (H :
-    ∀ i,
-    vec_nth (M * (u × v)) i =
-    ∑ (l = 1, 3), ∑ (j = 1, 3), ∑ (k = 1, 3),
-    mat_nth M i l * ε l j k * vec_nth u j * vec_nth v k). {
-  intros.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros l Hl.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros j Hj.
-      erewrite rngl_summation_eq_compat. 2: {
-        intros k Hk.
-        specialize (H3 l j k) as H.
-        rewrite rngl_mul_1_r in H.
-        rewrite <- H.
-        reflexivity.
-      }
-      reflexivity.
-    }
-    reflexivity.
-  }
-  cbn - [ vec_nth mat_nth ε ].
-...
-intros M (u₁, u₂, u₃) (v₁, v₂, v₃) (Ht, Hd); simpl.
-unfold mat_mul, mat_id in Ht; simpl in Ht.
-injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-unfold mat_det in Hd.
-destruct M as (a11, a12, a13, a21, a22, a23, a31, a32, a33); simpl in *.
-f_equal. {
-  ring_simplify in Hd.
-  ring_simplify.
-...
- clear H₁ H₂ H₃ H₄ H₅ H₆. nsatz.
- clear H₁ H₂ H₃ H₇ H₈ H₉. nsatz.
- clear H₄ H₅ H₆ H₇ H₈ H₉. nsatz.
+apply rngl_summation_eq_compat.
+intros n Hn.
+ring.
 Qed.
+
+End a.
