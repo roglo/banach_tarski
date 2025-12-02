@@ -2205,6 +2205,56 @@ destruct j. {
 now do 3 apply Nat.succ_le_mono in Hj.
 Qed.
 
+Theorem matrix_add_mul_eq_Kronecker' :
+  ∀ M, is_rotation_matrix M →
+  ∀ j k, 1 ≤ j ≤ 3 → 1 ≤ k ≤ 3 →
+  ∑ (i = 1, 3), mat_nth M j i * mat_nth M k i = δ j k.
+Proof.
+intros * HM * Hj Hk.
+specialize (rotation_mat_mul_transp_r M HM) as H.
+clear HM; rename H into HM.
+progress unfold δ, Kronecker_symbol.
+remember (j =? k) as jk eqn:Hjk.
+symmetry in Hjk.
+destruct jk. {
+  apply Nat.eqb_eq in Hjk; subst k; clear Hk.
+  progress unfold iter_seq, iter_list; cbn.
+  rewrite rngl_add_0_l.
+  destruct j; [ easy | ].
+  destruct j; [ now apply (f_equal (λ M, mat_nth M 1 1)) in HM | ].
+  destruct j; [ now apply (f_equal (λ M, mat_nth M 2 2)) in HM | ].
+  destruct j; [ now apply (f_equal (λ M, mat_nth M 3 3)) in HM | ].
+  destruct Hj as (_, Hj).
+  now do 3 apply Nat.succ_le_mono in Hj.
+}
+apply Nat.eqb_neq in Hjk.
+progress unfold iter_seq, iter_list; cbn.
+rewrite rngl_add_0_l.
+destruct j; [ easy | ].
+destruct k; [ easy | ].
+destruct Hj as (_, Hj).
+destruct Hk as (_, Hk).
+destruct j. {
+  destruct k; [ easy | ].
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 1 2)) in HM | ].
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 1 3)) in HM | ].
+  now do 3 apply Nat.succ_le_mono in Hk.
+}
+destruct j. {
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 2 1)) in HM | ].
+  destruct k; [ easy | ].
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 2 3)) in HM | ].
+  now do 3 apply Nat.succ_le_mono in Hk.
+}
+destruct j. {
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 3 1)) in HM | ].
+  destruct k; [ now apply (f_equal (λ M, mat_nth M 3 2)) in HM | ].
+  destruct k; [ easy | ].
+  now do 3 apply Nat.succ_le_mono in Hk.
+}
+now do 3 apply Nat.succ_le_mono in Hj.
+Qed.
+
 Theorem mat_vec_mul_cross_distr : ∀ M u v,
   is_rotation_matrix M
   → (M * (u × v))%vec = (M * u) × (M * v).
@@ -2270,6 +2320,7 @@ assert
   now rewrite Hd, rngl_mul_1_r in H3.
 }
 specialize (matrix_add_mul_eq_Kronecker M Ht) as Hkro.
+specialize (matrix_add_mul_eq_Kronecker' M (conj Ht Hd)) as Hkro'.
 (**)
 apply vector_ext.
 intros i.
@@ -2293,6 +2344,68 @@ remember
   (∑ (l = _, _), ∑ (m = _, _), ∑ (n = _, _),
      _ * (∑ (j = _, _), ∑ (k = _, _), ∑ (o = _, _), _) * _ * _)
   as x in |-*; subst x.
+rewrite rngl_summation_summation_exch.
+remember
+  (∑ (m = _, _), ∑ (l = _, _), ∑ (n = _, _),
+     _ * (∑ (j = _, _), ∑ (k = _, _), ∑ (o = _, _), _) * _ * _)
+  as x in |-*; subst x.
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  rewrite rngl_summation_summation_exch.
+  reflexivity.
+}
+cbn - [ ε mat_nth ].
+remember
+  (∑ (m = _, _), ∑ (n = _, _), ∑ (l = _, _),
+     _ * (∑ (j = _, _), ∑ (k = _, _), ∑ (o = _, _), _) * _ * _)
+  as x in |-*; subst x.
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros.
+      rewrite (rngl_mul_summation_distr_l Hos).
+      do 2 rewrite (rngl_mul_summation_distr_r Hos).
+      erewrite rngl_summation_eq_compat. 2: {
+        intros.
+        rewrite (rngl_mul_summation_distr_l Hos).
+        do 2 rewrite (rngl_mul_summation_distr_r Hos).
+        erewrite rngl_summation_eq_compat. 2: {
+          intros.
+          rewrite (rngl_mul_summation_distr_l Hos).
+          do 2 rewrite (rngl_mul_summation_distr_r Hos).
+          erewrite rngl_summation_eq_compat. 2: {
+            intros.
+            do 3 rewrite rngl_mul_assoc.
+            rewrite (rngl_mul_mul_swap Hic _ (ε _ _ _)).
+            do 4 rewrite <- rngl_mul_assoc.
+            reflexivity.
+          }
+          cbn - [ ε mat_nth ].
+          rewrite <- (rngl_mul_summation_distr_l Hos).
+          reflexivity.
+        }
+        cbn - [ ε mat_nth ].
+        rewrite <- (rngl_mul_summation_distr_l Hos).
+        reflexivity.
+      }
+      reflexivity.
+    }
+    reflexivity.
+  }
+  reflexivity.
+}
+cbn - [ ε mat_nth ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros.
+    rewrite rngl_summation_summation_exch.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros.
+      rewrite <- (rngl_mul_summation_distr_r Hos).
+      rewrite Hkro'.
 ...
 assert
   (H2 :
