@@ -2437,7 +2437,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ ε mat_nth ].
 remember
-  (∑ (m = _, _), _ * ∑ (n = _, _), ∑ (l = _, _),
+  (∑ (l = _, _), _ * ∑ (m = _, _), ∑ (n = _, _),
      ∑ (j = _, _), ∑ (k = _, _), _)
   as x in |-*; subst x.
 ...
