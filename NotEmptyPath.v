@@ -1,6 +1,7 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 Arith ZArith List.
+From Stdlib Require Import Ring Field.
 (*
 From Stdlib Require Import Reals Psatz.
 *)
@@ -28,6 +29,19 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 Context {Hc1 : rngl_characteristic T ≠ 1}.
+
+Ltac fold_rngl :=
+  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul by easy;
+  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero by easy;
+  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
+    with rngl_one by easy.
+
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
+Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
@@ -73,29 +87,23 @@ split. {
     progress repeat rewrite rngl_mul_assoc.
     progress unfold rngl_div.
     rewrite Hiv.
-(**)
     cbn.
-    rewrite Rmult5_sqrt2_sqrt5. {
-      rewrite rngl_mul_1_l.
-      rewrite rngl_of_pos_2.
-      rewrite rngl_of_pos_3.
-      rewrite rngl_of_pos_4.
-      progress f_equal. {
-        rewrite (rngl_mul_comm Hic 3).
-        do 2 rewrite <- rngl_mul_assoc.
-        progress f_equal.
-        rewrite (rngl_mul_comm Hic).
-        rewrite <- rngl_mul_assoc.
-        rewrite (rngl_mul_inv_diag_l Hiv). 2: {
-          apply (rngl_3_neq_0 Hos Hc1 Hto).
-        }
-        symmetry.
-        apply rngl_mul_1_r.
-      } {
-...
-    rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
+    rewrite Rmult5_sqrt2_sqrt5; [ | apply (rngl_0_le_2 Hos Hto) ].
+    assert (H12 : (1 + 2)%L ≠ 0%L). {
+      rewrite rngl_add_comm.
+      apply (rngl_3_neq_0 Hos Hc1 Hto).
+    }
+    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
+      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
+    }
+    rewrite rngl_of_pos_2.
+    rewrite rngl_of_pos_3.
+    rewrite rngl_of_pos_4.
+    progress unfold IZR.
+    now f_equal; field_simplify.
   } {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
+...
     rewrite plus_IZR, minus_IZR.
     progress repeat rewrite mult_IZR.
     rewrite Rinv_mult.
