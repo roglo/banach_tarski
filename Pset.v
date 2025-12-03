@@ -1,17 +1,22 @@
 (* Sets as A → Prop *)
 
 From Stdlib Require Import Utf8 List Relations Arith Compare_dec Setoid.
-Require Import Misc.
+From a Require Import Misc.
 
 Record set A := mkset { setp : A → Prop }.
 Arguments mkset [A] _.
 Arguments setp [A] _ _.
+
+Declare Scope set_scope.
+Delimit Scope set_scope with S.
 
 Definition empty_set {A} := mkset (λ _ : A, False).
 
 Notation "x ∈ S" := (setp S x) (at level 60).
 Notation "x ∉ S" := (¬ setp S x) (at level 60).
 Notation "∅" := (empty_set).
+
+Open Scope set_scope.
 
 Definition set_inter {A} (S₁ S₂ : set A) :=
   mkset (λ x, x ∈ S₁ ∧ x ∈ S₂).
@@ -29,10 +34,7 @@ Arguments set_union : simpl never.
 Arguments set_sub : simpl never.
 Arguments set_incl : simpl never.
 
-Declare Scope set_scope.
-Delimit Scope set_scope with S.
-
-Definition set_eq {A} (S₁ S₂ : set A) := ∀ x, x ∈ S₁ ↔ x ∈ S₂.
+Definition set_eq {A} (S₁ S₂ : set A) := ∀ x, (x ∈ S₁ ↔ x ∈ S₂)%S.
 
 Notation "E₁ = E₂" := (set_eq E₁ E₂) : set_scope.
 Notation "E₁ ≠ E₂" := (¬ set_eq E₁ E₂) : set_scope.
@@ -42,7 +44,7 @@ Notation "E₁ '∖' E₂" := (set_sub E₁ E₂) (at level 50).
 Notation "E₁ '⊂' E₂" := (set_incl E₁ E₂) (at level 60).
 Notation "'⋃' Es" := (set_union_list Es) (at level 55).
 Notation "E .[ i ]" := (List.nth i E ∅)
-  (at level 1, format "'[' E '[' .[ i ] ']' ']'").
+  (at level 1, format "'[' E '[' .[ i ] ']' ']'") : set_scope.
 
 Definition set_map {A B} (f : A → B) s := mkset (λ v, ∃ u, u ∈ s ∧ f u = v).
 
@@ -409,3 +411,5 @@ intros; intros x; split; intros Hx. {
   now destruct Hx as ((HE & HF) & HG).
 }
 Qed.
+
+Close Scope set_scope.

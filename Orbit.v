@@ -1,12 +1,21 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 List Relations.
-From Stdlib Require Import Reals Nsatz.
 Import ListNotations.
+From RingLike Require Import Core RealLike.
 
 From a Require Import Misc MiscReals Words Normalize Reverse Matrix Pset.
 
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+
 Definition same_orbit x y := ∃ el, (mat_of_path el * x)%vec = y.
+
+...
 
 Theorem same_orbit_refl : reflexive _ same_orbit.
 Proof. now exists []; rewrite mat_vec_mul_id. Qed.

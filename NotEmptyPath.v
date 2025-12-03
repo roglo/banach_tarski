@@ -2,9 +2,6 @@
 
 From Stdlib Require Import Utf8 Arith ZArith List.
 From Stdlib Require Import Ring Field.
-(*
-From Stdlib Require Import Reals Psatz.
-*)
 Import ListNotations.
 From RingLike Require Import Core RealLike.
 Require Import TrigoWithoutPi.Core.
