@@ -82,38 +82,54 @@ split. {
   simpl in Hr; simpl.
   progress unfold rngl_div.
   rewrite Hiv.
+  assert (H12 : (1 + 2)%L ≠ 0%L). {
+    rewrite rngl_add_comm.
+    apply (rngl_3_neq_0 Hos Hc1 Hto).
+  }
+  assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
+    apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
+  }
+  assert (Hsq2 : (√2 * √2)%L = 2%L). {
+    rewrite <- rl_sqrt_mul.
+    rewrite fold_rngl_squ.
+    rewrite (rl_sqrt_squ Hop Hto).
+    apply (rngl_abs_nonneg_eq Hop Hor).
+    apply (rngl_0_le_2 Hos Hto).
+    apply (rngl_0_le_2 Hos Hto).
+    apply (rngl_0_le_2 Hos Hto).
+  }
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl. {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-    assert (H12 : (1 + 2)%L ≠ 0%L). {
-      rewrite rngl_add_comm.
-      apply (rngl_3_neq_0 Hos Hc1 Hto).
-    }
-    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
-      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
-    }
-    assert (Hsq2 : (√2 * √2)%L = 2%L). {
-      rewrite <- rl_sqrt_mul.
-      rewrite fold_rngl_squ.
-      rewrite (rl_sqrt_squ Hop Hto).
-      apply (rngl_abs_nonneg_eq Hop Hor).
-      apply (rngl_0_le_2 Hos Hto).
-      apply (rngl_0_le_2 Hos Hto).
-      apply (rngl_0_le_2 Hos Hto).
-    }
     progress unfold IZR.
     do 2 rewrite rngl_of_Z_add.
     do 3 rewrite rngl_of_Z_mul.
     f_equal. {
-      field_simplify; fold_rngl; [ | easy | easy ].
       cbn; rewrite rngl_of_pos_3.
       now field.
     } {
-      field_simplify; fold_rngl; [ | easy | easy ].
       cbn; rewrite rngl_of_pos_2.
       now field.
     } {
-      progress unfold rngl_of_Z at 4.
-      rewrite rngl_of_pos_4.
+      cbn; rewrite rngl_of_pos_4.
+      field_simplify; fold_rngl; [ | easy | easy ].
+      do 2 rewrite <- rngl_mul_assoc.
+      rewrite (rngl_mul_assoc √_), Hsq2.
+      now field.
+    }
+  } {
+    split; [ | rewrite Nat.add_succ_r; reflexivity ].
+    progress unfold IZR.
+    rewrite rngl_of_Z_add.
+    rewrite rngl_of_Z_sub.
+    do 3 rewrite rngl_of_Z_mul.
+    f_equal. {
+      cbn; rewrite rngl_of_pos_3.
+      now field.
+    } {
+      cbn; rewrite rngl_of_pos_2.
+      now field.
+    } {
+      cbn; rewrite rngl_of_pos_4.
       field_simplify; fold_rngl; [ | easy | easy ].
       do 2 rewrite <- rngl_mul_assoc.
       rewrite (rngl_mul_assoc √_), Hsq2.
