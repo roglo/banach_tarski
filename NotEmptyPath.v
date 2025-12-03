@@ -30,6 +30,17 @@ Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 Context {Hc1 : rngl_characteristic T ≠ 1}.
 
+Theorem strange_let :
+  ∀ x,
+    match
+      (let (_, _, _, _, rngl_opt_opp_or_psub, _, _, _, _) := ro in
+       rngl_opt_opp_or_psub)
+    with
+    | Some (inl rngl_opp) => rngl_opp x
+    | _ => 0%L
+    end = rngl_opp x.
+Proof. easy. Qed.
+
 Ltac fold_rngl :=
   replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
     with rngl_mul by easy;
@@ -38,7 +49,8 @@ Ltac fold_rngl :=
   replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
     with rngl_zero by easy;
   replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
-    with rngl_one by easy.
+    with rngl_one by easy;
+  repeat try rewrite strange_let.
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
 Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
@@ -72,23 +84,6 @@ split. {
   rewrite Hiv.
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl. {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-    rewrite rngl_of_Z_add, rngl_of_Z_add.
-    progress repeat rewrite rngl_of_Z_mul.
-    rewrite (rngl_inv_mul_distr Hos Hiv); cycle 1. {
-      apply (rngl_3_neq_0 Hos Hc1 Hto).
-    } {
-      apply (rngl_pow_neq_0 Hos Hiq).
-      apply (rngl_3_neq_0 Hos Hc1 Hto).
-    }
-    progress repeat rewrite rngl_mul_1_l.
-    progress repeat rewrite (rngl_mul_0_l Hos).
-    progress repeat rewrite rngl_add_0_l.
-    progress repeat rewrite rngl_add_0_r.
-    progress repeat rewrite rngl_mul_assoc.
-    progress unfold rngl_div.
-    rewrite Hiv.
-    cbn.
-    rewrite Rmult5_sqrt2_sqrt5; [ | apply (rngl_0_le_2 Hos Hto) ].
     assert (H12 : (1 + 2)%L ≠ 0%L). {
       rewrite rngl_add_comm.
       apply (rngl_3_neq_0 Hos Hc1 Hto).
@@ -96,25 +91,36 @@ split. {
     assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
       apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
     }
-    rewrite rngl_of_pos_2.
-    rewrite rngl_of_pos_3.
-    rewrite rngl_of_pos_4.
+    assert (Hsq2 : (√2 * √2)%L = 2%L). {
+      rewrite <- rl_sqrt_mul.
+      rewrite fold_rngl_squ.
+      rewrite (rl_sqrt_squ Hop Hto).
+      apply (rngl_abs_nonneg_eq Hop Hor).
+      apply (rngl_0_le_2 Hos Hto).
+      apply (rngl_0_le_2 Hos Hto).
+      apply (rngl_0_le_2 Hos Hto).
+    }
     progress unfold IZR.
-    now f_equal; field_simplify.
+    do 2 rewrite rngl_of_Z_add.
+    do 3 rewrite rngl_of_Z_mul.
+    f_equal. {
+      field_simplify; fold_rngl; [ | easy | easy ].
+      cbn; rewrite rngl_of_pos_3.
+      now field.
+    } {
+      field_simplify; fold_rngl; [ | easy | easy ].
+      cbn; rewrite rngl_of_pos_2.
+      now field.
+    } {
+      progress unfold rngl_of_Z at 4.
+      rewrite rngl_of_pos_4.
+      field_simplify; fold_rngl; [ | easy | easy ].
+      do 2 rewrite <- rngl_mul_assoc.
+      rewrite (rngl_mul_assoc √_), Hsq2.
+      now field.
+    }
   } {
-    split; [ | rewrite Nat.add_succ_r; reflexivity ].
 ...
-    rewrite plus_IZR, minus_IZR.
-    progress repeat rewrite mult_IZR.
-    rewrite Rinv_mult.
-    progress repeat rewrite Rmult_1_l.
-    progress repeat rewrite Rmult_0_l.
-    progress repeat rewrite Rplus_0_l.
-    progress repeat rewrite Rplus_0_r.
-    progress repeat rewrite <- Rmult_assoc.
-    unfold Rdiv.
-    rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
-  } {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
     rewrite plus_IZR, minus_IZR.
     progress repeat rewrite mult_IZR.
