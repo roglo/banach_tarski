@@ -112,7 +112,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T }.
-Context {Hch : rngl_characteristic T = 0}.
 Context {Hc1 : rngl_characteristic T ≠ 1}.
 
 Ltac fold_rngl :=
@@ -360,9 +359,12 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
 now f_equal; field.
 Qed.
 
-Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
+Theorem rot_inv_rot_x :
+  rngl_characteristic T = 0 →
+  (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
 destruct_ac.
+intros Hch.
 specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
@@ -376,9 +378,12 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
 now f_equal; field.
 Qed.
 
-Theorem rot_rot_inv_z : (rot_z * rot_inv_z)%mat = mat_id.
+Theorem rot_rot_inv_z :
+  rngl_characteristic T = 0 →
+  (rot_z * rot_inv_z)%mat = mat_id.
 Proof.
 destruct_ac.
+intros Hch.
 specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
@@ -392,9 +397,12 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
 now f_equal; field.
 Qed.
 
-Theorem rot_inv_rot_z : (rot_inv_z * rot_z)%mat = mat_id.
+Theorem rot_inv_rot_z :
+  rngl_characteristic T = 0 →
+  (rot_inv_z * rot_z)%mat = mat_id.
 Proof.
 destruct_ac.
+intros Hch.
 specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id, mkrmat; simpl.
 unfold rngl_div; rewrite Hiv.
@@ -408,26 +416,30 @@ assert (H30 : (1 + 2 ≠ 0)%L). {
 now f_equal; field.
 Qed.
 
-Theorem mat_of_elem_mul_negf_l : ∀ e,
-  (mat_of_elem (negf e) * mat_of_elem e = mat_id)%mat.
+Theorem mat_of_elem_mul_negf_l :
+  rngl_characteristic T = 0 →
+  ∀ e, (mat_of_elem (negf e) * mat_of_elem e = mat_id)%mat.
 Proof.
+intros Hch.
 intros (t, d); simpl.
 destruct t, d; simpl.
 apply rot_rot_inv_x.
-apply rot_inv_rot_x.
-apply rot_rot_inv_z.
-apply rot_inv_rot_z.
+apply (rot_inv_rot_x Hch).
+apply (rot_rot_inv_z Hch).
+apply (rot_inv_rot_z Hch).
 Qed.
 
-Theorem mat_of_elem_mul_negf_r : ∀ e,
-  (mat_of_elem e * mat_of_elem (negf e) = mat_id)%mat.
+Theorem mat_of_elem_mul_negf_r :
+  rngl_characteristic T = 0 →
+  ∀ e, (mat_of_elem e * mat_of_elem (negf e) = mat_id)%mat.
 Proof.
+intros Hch.
 intros (t, d); simpl.
 destruct t, d; simpl.
-apply rot_inv_rot_x.
+apply (rot_inv_rot_x Hch).
 apply rot_rot_inv_x.
-apply rot_inv_rot_z.
-apply rot_rot_inv_z.
+apply (rot_inv_rot_z Hch).
+apply (rot_rot_inv_z Hch).
 Qed.
 
 Definition mat_of_path el :=
@@ -442,8 +454,11 @@ induction el as [| e]; [ rewrite mat_vec_mul_id; reflexivity | simpl ].
 rewrite IHel, mat_vec_mul_assoc; reflexivity.
 Qed.
 
-Theorem rotate_rotate_neg : ∀ e p, rotate e (rotate (negf e) p) = p.
+Theorem rotate_rotate_neg :
+  rngl_characteristic T = 0 →
+  ∀ e p, rotate e (rotate (negf e) p) = p.
 Proof.
+intros Hch.
 intros (t, d) p; simpl.
 unfold rotate; simpl.
 rewrite <- mat_vec_mul_assoc.
@@ -454,8 +469,11 @@ destruct t, d; simpl.
  now rewrite rot_rot_inv_z, mat_vec_mul_id.
 Qed.
 
-Theorem rotate_neg_rotate : ∀ e p, rotate (negf e) (rotate e p) = p.
+Theorem rotate_neg_rotate :
+  rngl_characteristic T = 0 →
+  ∀ e p, rotate (negf e) (rotate e p) = p.
 Proof.
+intros Hch.
 intros (t, d) p; simpl.
 unfold rotate; simpl.
 rewrite <- mat_vec_mul_assoc.
@@ -473,6 +491,7 @@ Proof.
 intros.
 do 2 rewrite <- rotate_vec_mul.
 do 2 rewrite fold_right_app; simpl.
+...
 now rewrite rotate_rotate_neg.
 Qed.
 
@@ -545,6 +564,7 @@ Qed.
 Theorem mat_mul_assoc : ∀ m₁ m₂ m₃,
   (m₁ * (m₂ * m₃) = m₁ * m₂ * m₃)%mat.
 Proof.
+clear Hch.
 intros m₁ m₂ m₃.
 unfold mat_mul; simpl; f_equal; ring.
 Qed.
@@ -1876,11 +1896,14 @@ Theorem mat_of_path_negf : ∀ e el,
   mat_of_path (negf e :: e :: el) = mat_of_path el.
 Proof.
 intros.
+clear Hch.
 rewrite mat_of_path_cons; simpl.
 rewrite mat_of_path_cons; simpl.
 rewrite mat_mul_assoc.
-now rewrite mat_of_elem_mul_negf_l, mat_mul_id_l.
+rewrite mat_of_elem_mul_negf_l, mat_mul_id_l.
 Qed.
+
+...
 
 Theorem vec_unit_cross_mul_eq_0_lemma :
    ∀ u₁ u₂ u₃ v₁ v₂ v₃,
@@ -2492,3 +2515,8 @@ ring.
 Qed.
 
 End a.
+
+Arguments mat_of_path_app {T ro rp rl ac} Hc1 (el₁ el₂)%_list.
+...
+Arguments mat_of_path_negf {T ro rp rl ac} Hch Hc1 e el%_list.
+Arguments mat_vec_mul_assoc {T ro rp ac} Hc1 (m₁ m₂)%_mat p%_vec.

@@ -3,6 +3,7 @@
 From Stdlib Require Import Utf8 List Relations.
 Import ListNotations.
 From RingLike Require Import Core RealLike.
+From TrigoWithoutPi Require Import Core.
 
 From a Require Import Misc MiscReals Words Normalize Reverse Matrix Pset.
 
@@ -12,23 +13,41 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T }.
+Context {Hc1 : rngl_characteristic T ≠ 1}.
 
 Definition same_orbit x y := ∃ el, (mat_of_path el * x)%vec = y.
 
-...
-
 Theorem same_orbit_refl : reflexive _ same_orbit.
-Proof. now exists []; rewrite mat_vec_mul_id. Qed.
+Proof. now exists []; cbn; rewrite mat_vec_mul_id. Qed.
 
 Theorem same_orbit_sym : symmetric _ same_orbit.
 Proof.
 intros p₁ p₂ (el, H); simpl in H.
 exists (rev_path el).
 revert p₁ p₂ H.
-induction el as [| e]; intros; [ now rewrite mat_vec_mul_id in H |-* | ].
-rewrite rev_path_cons, mat_of_path_app, mat_vec_mul_assoc.
-apply IHel; rewrite <- H, <- mat_vec_mul_assoc.
-rewrite <- mat_of_path_app, rev_path_single; simpl.
+induction el as [| e]; intros; [ now cbn; rewrite mat_vec_mul_id in H |-* | ].
+rewrite rev_path_cons, (mat_of_path_app Hc1), (mat_vec_mul_assoc Hc1).
+apply IHel; rewrite <- H, <- (mat_vec_mul_assoc Hc1).
+rewrite <- (mat_of_path_app Hc1), rev_path_single; simpl.
+(**)
+About mat_of_path_negf.
+mat_of_path_negf :
+∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} 
+  {rl : real_like_prop T},
+  angle_ctx T
+  → rngl_characteristic T = 0
+    → rngl_characteristic T ≠ 1
+      → ∀ (e : free_elem) (el : list free_elem),
+          mat_of_path (negf e :: e :: el) = mat_of_path el
+
+mat_of_path_negf is not universe polymorphic
+Arguments mat_of_path_negf {T}%type_scope {ro rp rl ac Hch Hc1} e el%list_scope
+mat_of_path_negf is opaque
+Expands to: Constant a.Matrix.mat_of_path_negf
+Declared in library a.Matrix, line 1875, characters 8-24
+rewrite mat_of_path_negf.
+...
 now rewrite mat_of_path_negf.
 Qed.
 
