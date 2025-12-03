@@ -4,14 +4,16 @@ Set Nested Proofs Allowed.
 From Stdlib Require Import Utf8 Arith List.
 From Stdlib Require Import Ring Field.
 Require Import Datatypes.
-
 Require Import RingLike.Core.
 Require Import RingLike.RealLike.
 Require Import RingLike.Utils.
 Require Import RingLike.IterAdd.
 Require Import TrigoWithoutPi.Core.
+
 Require Import a.Words a.Normalize a.Reverse a.Misc.
 Require Import a.MiscTrigo a.MiscReals.
+
+Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c) : nat_scope.
 
 Record matrix A := mkmat
   { a₁₁ : A; a₁₂ : A; a₁₃ : A;
@@ -26,12 +28,13 @@ Arguments a₂₃ [A] _.
 Arguments a₃₁ [A] _.
 Arguments a₃₂ [A] _.
 Arguments a₃₃ [A] _.
-Arguments mkmat [A] _ _ _ _ _ _ _ _ _.
 
 Inductive vector A := V : A → A → A → vector A.
 
 Declare Scope vec_scope.
+Declare Scope mat_scope.
 Delimit Scope vec_scope with vec.
+Delimit Scope mat_scope with mat.
 
 Arguments mkmat {A} (a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃)%_L.
 Arguments V {A} (x y z)%_L.
@@ -85,7 +88,7 @@ End a.
 
 Arguments mkrmat {T} (a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃)%_L.
 Arguments vec_norm {T ro rp rl} pat%_vec.
-Arguments vec_add _%_vec _%_vec.
+Arguments vec_add {T ro} (pat pat)%_vec.
 Arguments vec_dot_mul {T ro} (pat pat)%_vec.
 Arguments vec_cross_mul {T ro} (pat pat)%_vec.
 Arguments vec_const_mul {T ro} k%_L pat%_vec.
@@ -187,8 +190,6 @@ Fixpoint mat_pow M n :=
   | S n' => mat_mul M (mat_pow M n')
   end.
 
-Declare Scope mat_scope.
-Delimit Scope mat_scope with mat.
 Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
 Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.
 Notation "M₁ * M₂" := (mat_mul M₁ M₂) : mat_scope.
@@ -2145,8 +2146,6 @@ destruct n. {
 }
 destruct n; ring.
 Qed.
-
-Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c) : nat_scope.
 
 Theorem vector_ext :
   ∀ u v, u = v ↔ ∀ i, 1 ≤ i ≤ 3 → vec_nth u i = vec_nth v i.
