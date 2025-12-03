@@ -42,30 +42,9 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
-Context {ac : angle_ctx T }.
-Context {Hch : rngl_characteristic T = 0}.
-Context {Hc1 : rngl_characteristic T ≠ 1}.
-
-Ltac fold_rngl :=
-  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
-    with rngl_mul by easy;
-  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
-    with rngl_add by easy;
-  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
-    with rngl_zero by easy;
-  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
-    with rngl_one by easy.
 
 Definition mkrmat := @mkmat T.
 Arguments mkrmat (a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃)%_L.
-
-(*
-Definition Rmult5_sqrt2_sqrt5 := @Rmult5_sqrt2_sqrt5 T ro rp rl Hic Hon Hop Hor.
-Arguments Rmult5_sqrt2_sqrt5 (a b c d)%_L.
-*)
-
-Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
-Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
 
 Definition mat_add (M₁ M₂ : matrix T) :=
   mkmat
@@ -102,11 +81,14 @@ Definition mat_const_mul k (M : matrix T) :=
     (k * a₂₁ M) (k * a₂₂ M) (k * a₂₃ M)
     (k * a₃₁ M) (k * a₃₂ M) (k * a₃₃ M).
 
-Arguments vec_norm _%_vec.
+End a.
+
+Arguments mkrmat {T} (a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃)%_L.
+Arguments vec_norm {T ro rp rl} pat%_vec.
 Arguments vec_add _%_vec _%_vec.
-Arguments vec_dot_mul _%_vec _%_vec.
-Arguments vec_cross_mul _%_vec _%_vec.
-Arguments vec_const_mul _%_L _%_vec.
+Arguments vec_dot_mul {T ro} (pat pat)%_vec.
+Arguments vec_cross_mul {T ro} (pat pat)%_vec.
+Arguments vec_const_mul {T ro} k%_L pat%_vec.
 
 Notation "0" := (V 0 0 0) : vec_scope.
 Notation "k ⁎ v" := (vec_const_mul k v) (at level 40).
@@ -119,6 +101,29 @@ Notation "u · v" := (vec_dot_mul u v) (at level 44, left associativity).
 Notation "u × v" := (vec_cross_mul u v) (at level 40, no associativity).
 Notation "v ²" := (vec_dot_mul v v) : vec_scope.
 Notation "‖ v ‖" := (vec_norm v) (at level 0, v at level 0, format "‖ v ‖").
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+Context {ac : angle_ctx T }.
+Context {Hch : rngl_characteristic T = 0}.
+Context {Hc1 : rngl_characteristic T ≠ 1}.
+
+Ltac fold_rngl :=
+  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul by easy;
+  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero by easy;
+  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
+    with rngl_one by easy.
+
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
+Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
 
 Definition rot_x := mkmat
   1         0         0
@@ -194,7 +199,6 @@ Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
 Arguments mat_pow M%_mat n%_nat.
 Arguments mat_mul M₁%_mat M₂%_mat.
-Arguments mat_vec_mul M%_mat _%_vec.
 
 Theorem vec_eq_dec : ∀ u v : vector T, { u = v } + { u ≠ v }.
 Proof.
@@ -506,7 +510,7 @@ destruct len.
     now apply IHel₁.
 Qed.
 
-Definition mat_transp m :=
+Definition mat_transp (m : matrix T) :=
   mkrmat
    (a₁₁ m) (a₂₁ m) (a₃₁ m)
    (a₁₂ m) (a₂₂ m) (a₃₂ m)
@@ -2489,15 +2493,3 @@ ring.
 Qed.
 
 End a.
-
-Notation "0" := (V 0 0 0) : vec_scope.
-Notation "k ⁎ v" := (vec_const_mul k v) (at level 40).
-Notation "v ⁄ k" := (vec_const_mul (k⁻¹) v) (at level 40).
-Notation "M * v" := (mat_vec_mul M v) : vec_scope.
-Notation "u + v" := (vec_add u v) : vec_scope.
-Notation "u - v" := (vec_sub u v) : vec_scope.
-Notation "- v" := (vec_opp v) : vec_scope.
-Notation "u · v" := (vec_dot_mul u v) (at level 44, left associativity).
-Notation "u × v" := (vec_cross_mul u v) (at level 40, no associativity).
-Notation "v ²" := (vec_dot_mul v v) : vec_scope.
-Notation "‖ v ‖" := (vec_norm v) (at level 0, v at level 0, format "‖ v ‖").
