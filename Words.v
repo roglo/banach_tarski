@@ -1,7 +1,8 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 List Relations Wf_nat.
+From Stdlib Require Import List Relations Wf_nat.
 Import ListNotations.
+From RingLike Require Import Utf8.
 Require Import a.Misc.
 
 Inductive letter := la | lb.

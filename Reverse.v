@@ -1,8 +1,9 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 List Relations Arith Wf_nat Compare_dec.
+From Stdlib Require Import List Relations Arith Wf_nat Compare_dec.
 Import ListNotations.
-Require Import Misc Words Normalize.
+From RingLike Require Import Utf8.
+From a Require Import Misc Words Normalize.
 
 Definition rev_path el := map negf (rev el).
 

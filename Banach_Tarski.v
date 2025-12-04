@@ -1,7 +1,6 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 Arith List Relations Wf_nat.
-From Stdlib Require Import Reals Psatz Nsatz.
+From Stdlib Require Import Arith List Relations Wf_nat.
 Import ListNotations.
 
 From a Require Import Misc Words Normalize Reverse MiscReals MiscTrigo.

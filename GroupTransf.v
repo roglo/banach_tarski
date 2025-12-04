@@ -1,7 +1,7 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8.
-From RingLike Require Import Core.
+From Stdlib Require Import Morphisms.
+From RingLike Require Import Utf8 Core.
 From TrigoWithoutPi Require Import Core.
 
 From a Require Import Misc Words MiscReals Matrix Pset Orbit.
@@ -94,24 +94,25 @@ Qed.
 Theorem transl_transl : ∀ E d₁ d₂,
   (transl d₁ (transl d₂ E) = transl (d₁ + d₂) E)%S.
 Proof.
+destruct_ac.
 intros E (dx₁, dy₁, dz₁) (dx₂, dy₂, dz₂) (x, y, z); simpl.
-...
-do 9 rewrite fold_Rminus.
-now do 3 rewrite Rminus_plus_distr.
+do 9 rewrite (rngl_add_opp_r Hop).
+now do 3 rewrite (rngl_sub_add_distr Hos).
 Qed.
 
 Theorem app_gr_ident : ∀ E, (app_gr gr_ident E = E)%S.
 Proof.
+destruct_ac.
 intros.
 unfold gr_ident; simpl.
 unfold transl; simpl.
 intros (x, y, z); simpl.
-now do 3 rewrite fold_Rminus, Rminus_0_r.
+now do 3 rewrite (rngl_add_opp_r Hop), (rngl_sub_0_r Hos).
 Qed.
 
 Theorem app_gr_nth : ∀ E fl i,
   (app_gr (List.nth i fl gr_ident) E =
-   List.nth i (map app_gr fl) Datatypes.id E)%S.
+   List.nth i (List.map app_gr fl) Datatypes.id E)%S.
 Proof.
 intros.
 revert E i.
@@ -123,8 +124,8 @@ destruct i; [ easy | apply IHfl ].
 Qed.
 
 Theorem app_gr_nth_inv : ∀ E fl i,
-  (app_gr (List.nth i (map gr_inv fl) gr_ident) E =
-   List.nth i (map app_gr_inv fl) Datatypes.id E)%S.
+  (app_gr (List.nth i (List.map gr_inv fl) gr_ident) E =
+   List.nth i (List.map app_gr_inv fl) Datatypes.id E)%S.
 Proof.
 intros.
 revert E i.
@@ -137,9 +138,13 @@ Qed.
 
 Theorem gr_inv_ident : gr_inv gr_ident = gr_ident.
 Proof.
+destruct_ac.
 unfold gr_ident; simpl.
-now rewrite Ropp_0.
+now rewrite (rngl_opp_0 Hop).
 Qed.
+
+Global Instance app_gr_morph : Proper (eq ==> set_eq ==> set_eq) app_gr.
+...
 
 Add Parametric Morphism : app_gr
   with signature eq ==> set_eq ==> set_eq

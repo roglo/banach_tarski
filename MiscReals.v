@@ -1,15 +1,12 @@
 (* Banach-Tarski paradox. *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 List Relations Wf_nat.
-From Stdlib Require Import ZArith.
-From Stdlib Require Import Ring.
+From Stdlib Require Import List Relations Wf_nat.
+From Stdlib Require Import ZArith Ring.
 Import ListNotations.
 
-Require Import RingLike.Core.
-Require Import RingLike.RealLike.
-Require Import RingLike.Misc.
-Require Import TrigoWithoutPi.Core.
+From RingLike Require Import Utf8 Core RealLike Misc.
+From TrigoWithoutPi Require Import Core.
 From a Require Import Misc Words Normalize Reverse.
 
 Notation "'ℤ'" := Z.

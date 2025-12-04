@@ -1,7 +1,8 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 Arith List Relations.
+From Stdlib Require Import Arith List Relations.
 Import ListNotations.
+From RingLike Require Import Utf8.
 
 Arguments Nat.div : simpl never.
 Arguments Nat.modulo : simpl never.

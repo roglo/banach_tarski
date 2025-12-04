@@ -1,9 +1,8 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 List Relations.
-From Stdlib Require Import Ring.
+From Stdlib Require Import List Relations Ring.
 Import ListNotations.
-From RingLike Require Import Core RealLike.
+From RingLike Require Import Utf8 Core RealLike.
 From TrigoWithoutPi Require Import Core.
 
 From a Require Import Misc MiscReals Words Normalize Reverse Matrix Pset.

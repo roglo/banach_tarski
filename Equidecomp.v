@@ -2,8 +2,7 @@
 
 (* Equidecomposability *)
 
-From Stdlib Require Import Utf8 Arith List Relations.
-From Stdlib Require Import Reals.Rdefinitions.
+From Stdlib Require Import Arith List Relations.
 Import ListNotations.
 
 Require Import a.Misc a.Matrix a.Pset.

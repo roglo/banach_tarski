@@ -2,9 +2,8 @@
    que j'utilise ring-like sur les matrices *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Arith.
-
-Require Import RingLike.Core.
+From Stdlib Require Import Arith.
+From RingLike Require Import Core.
 
 Declare Scope vec2_scope.
 Declare Scope vec3_scope.

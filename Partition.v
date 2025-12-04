@@ -1,9 +1,10 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 List Arith Compare_dec Setoid.
+From Stdlib Require Import List Arith Compare_dec Setoid.
 Import ListNotations.
+From RingLike Require Import Utf8.
 
-Require Import Misc Pset.
+From a Require Import Misc Pset.
 
 Definition is_partition {A} (E : set A) (Ep : list (set A)) :=
   (E = ⋃ Ep)%S ∧

@@ -1,7 +1,8 @@
 (* Sets as A → Prop *)
 
-From Stdlib Require Import Utf8 List Relations Arith Compare_dec Setoid.
+From Stdlib Require Import List Relations Arith Compare_dec Setoid.
 From a Require Import Misc.
+From RingLike Require Import Utf8.
 
 Record set A := mkset { setp : A → Prop }.
 Arguments mkset [A] _.

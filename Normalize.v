@@ -1,8 +1,9 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 List Relations Wf_nat.
+From Stdlib Require Import List Relations Wf_nat.
 Import ListNotations.
-Require Import Misc Words.
+From RingLike Require Import Utf8.
+From a Require Import Misc Words.
 
 Fixpoint norm_list el :=
   match el with

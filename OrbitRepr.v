@@ -1,8 +1,8 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 List Morphisms.
+From Stdlib Require Import List Morphisms.
 Import ListNotations.
-From RingLike Require Import Core RealLike.
+From RingLike Require Import Utf8 Core RealLike.
 From TrigoWithoutPi Require Import Core.
 
 Require Import a.Misc a.Words a.Normalize a.Reverse a.Matrix a.Pset a.Orbit.

@@ -1,17 +1,12 @@
 (* Banach-Tarski paradox. *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Arith List.
-From Stdlib Require Import Ring.
-Require Import Datatypes.
-Require Import RingLike.Core.
-Require Import RingLike.RealLike.
-Require Import RingLike.Utils.
-Require Import RingLike.IterAdd.
-Require Import TrigoWithoutPi.Core.
+From Stdlib Require Import Arith List Ring.
+From Corelib.Init Require Import Datatypes.
+From RingLike Require Import Utf8 Core RealLike Utils IterAdd.
+From TrigoWithoutPi Require Import Core.
 
-Require Import a.Words a.Normalize a.Reverse a.Misc.
-Require Import a.MiscTrigo a.MiscReals.
+From a Require Import Words Normalize Reverse Misc MiscTrigo MiscReals.
 
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c) : nat_scope.
 

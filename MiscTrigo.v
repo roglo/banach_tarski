@@ -1,11 +1,10 @@
 (* Banach-Tarski paradox. *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Utf8 Arith ZArith.
+From Stdlib Require Import Arith ZArith.
+From RingLike Require Import Utf8 Core RealLike.
+From TrigoWithoutPi Require Import Core.
 
-Require Import RingLike.Core.
-Require Import RingLike.RealLike.
-Require Import TrigoWithoutPi.Core.
 Require Import a.MiscReals.
 
 Section a.

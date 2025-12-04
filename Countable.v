@@ -1,7 +1,8 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 Bool Compare_dec ZArith Psatz.
+From Stdlib Require Import Bool Compare_dec ZArith Psatz.
 Require Import Misc.
+From RingLike Require Import Utf8.
 
 Definition prod_nat_of_nat n :=
   let s := Nat.sqrt n in
