@@ -1,6 +1,7 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 List Relations.
+From Stdlib Require Import Ring.
 Import ListNotations.
 From RingLike Require Import Core RealLike.
 From TrigoWithoutPi Require Import Core.
@@ -14,6 +15,18 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T }.
+
+Ltac fold_rngl :=
+  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul by easy;
+  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero by easy;
+  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
+    with rngl_one by easy.
+
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
 
 Definition same_orbit x y := ∃ el, (mat_of_path el * x)%vec = y.
 
@@ -96,17 +109,22 @@ split; intros Hp. {
   rewrite (rl_sqrt_squ Hop Hto).
   now apply (rngl_abs_nonneg_eq Hop Hor).
 }
-...
-apply (f_equal Rsqr) in Hp.
-rewrite Rsqr_sqrt in Hp; [ easy | ].
-apply nonneg_sqr_vec_norm.
+apply (f_equal rngl_squ) in Hp.
+rewrite rngl_squ_sqrt in Hp; [ easy | ].
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_add_squ_nonneg Hos Hto).
+apply (rngl_squ_nonneg Hos Hto).
 Qed.
 
 Theorem in_its_sphere : ∀ v, v ∈ sphere ‖v‖.
 Proof.
+destruct_ac.
 intros (x, y, z); simpl.
-rewrite Rsqr_sqrt; [ easy | ].
-apply nonneg_sqr_vec_norm.
+symmetry.
+apply rngl_squ_sqrt.
+apply (rngl_le_0_add Hos Hor).
+apply (rngl_add_squ_nonneg Hos Hto).
+apply (rngl_squ_nonneg Hos Hto).
 Qed.
 
 Theorem on_sphere_after_rotation : ∀ p m r,
@@ -114,6 +132,7 @@ Theorem on_sphere_after_rotation : ∀ p m r,
   → is_rotation_matrix m
   → (m * p)%vec ∈ sphere r.
 Proof.
+destruct_ac.
 intros * His Hm.
 destruct p as (x, y, z).
 unfold sphere in His; simpl in His.
@@ -123,9 +142,45 @@ destruct Hm as (Hm, Hd).
 unfold mat_det in Hd.
 unfold mat_mul, mat_id in Hm; simpl in Hm.
 injection Hm; clear Hm; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
-progress unfold Rsqr in His.
-progress unfold Rsqr.
-nsatz.
+progress unfold rngl_squ in His.
+progress unfold rngl_squ.
+ring_simplify; fold_rngl.
+generalize H₉; intros H.
+rewrite <- rngl_add_assoc in H.
+apply (rngl_add_sub_eq_r Hos) in H.
+rewrite <- H; clear H.
+ring_simplify; fold_rngl.
+rewrite <- (rngl_mul_assoc _ (a₁₁ m) (a₁₂ m)).
+generalize H₈; intros H.
+rewrite <- rngl_add_assoc in H.
+apply (rngl_add_move_0_r Hop) in H.
+rewrite H; clear H.
+ring_simplify; fold_rngl.
+rewrite <- (rngl_mul_assoc _ (a₁₁ m) (a₁₃ m)).
+generalize H₇; intros H.
+rewrite <- rngl_add_assoc in H.
+apply (rngl_add_move_0_r Hop) in H.
+rewrite H; clear H.
+ring_simplify; fold_rngl.
+rewrite <- (rngl_mul_assoc _ (a₁₂ m) (a₁₃ m)).
+generalize H₄; intros H.
+rewrite <- rngl_add_assoc in H.
+apply (rngl_add_move_0_r Hop) in H.
+rewrite H; clear H.
+ring_simplify; fold_rngl.
+rewrite <- (rngl_mul_assoc _ (a₁₃ m) (a₁₃ m)).
+generalize H₁; intros H.
+rewrite <- rngl_add_assoc in H.
+apply (rngl_add_sub_eq_r Hos) in H.
+rewrite <- H; clear H.
+ring_simplify; fold_rngl.
+rewrite <- (rngl_mul_assoc _ (a₁₂ m) (a₁₂ m)).
+generalize H₅; intros H.
+rewrite <- rngl_add_assoc in H.
+apply (rngl_add_sub_eq_r Hos) in H.
+rewrite <- H; clear H.
+ring_simplify; fold_rngl.
+now rewrite rngl_add_add_swap.
 Qed.
 
 Theorem in_ball_after_rotation : ∀ p m,
@@ -136,6 +191,7 @@ Proof.
 intros * His Hrm.
 destruct p as (x, y, z).
 remember (V x y z) as p eqn:HP.
+...
 remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
 assert (Hos : p ∈ sphere (√ r)). {
   subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
