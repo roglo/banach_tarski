@@ -1,17 +1,42 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8.
-From Stdlib Require Import Reals Nsatz Psatz.
+From RingLike Require Import Core.
+From TrigoWithoutPi Require Import Core.
 
 From a Require Import Misc Words MiscReals Matrix Pset Orbit.
 From a Require Import Partition OrbitRepr.
 
-Definition transl d (E : set vector) := mkset (λ v, (v - d)%vec ∈ E).
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+(*
+Context {rl : real_like_prop T}.
+*)
+Context {ac : angle_ctx T }.
+
+(*
+Ltac fold_rngl :=
+  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul by easy;
+  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero by easy;
+  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
+    with rngl_one by easy.
+
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
+*)
+
+Definition transl d (E : set (vector T)) := mkset (λ v, (v - d)%vec ∈ E).
 Arguments transl d%_vec E%_S.
 
 Inductive Gr :=
   | Rot : ∀ M, is_rotation_matrix M → Gr
-  | Transl : vector → Gr
+  | Transl : vector T → Gr
   | Comb : Gr → Gr → Gr.
 
 Arguments Transl _%_vec.
@@ -61,14 +86,16 @@ Qed.
 
 Theorem transl_0 : ∀ E, (transl 0 E = E)%S.
 Proof.
+destruct_ac.
 intros; intros (x, y, z); simpl.
-now rewrite Ropp_0; do 3 rewrite Rplus_0_r.
+now rewrite (rngl_opp_0 Hop); do 3 rewrite rngl_add_0_r.
 Qed.
 
 Theorem transl_transl : ∀ E d₁ d₂,
   (transl d₁ (transl d₂ E) = transl (d₁ + d₂) E)%S.
 Proof.
 intros E (dx₁, dy₁, dz₁) (dx₂, dy₂, dz₂) (x, y, z); simpl.
+...
 do 9 rewrite fold_Rminus.
 now do 3 rewrite Rminus_plus_distr.
 Qed.
