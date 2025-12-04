@@ -1,15 +1,47 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 List.
-From Stdlib Require Import Reals Nsatz.
 Import ListNotations.
+From RingLike Require Import Core RealLike.
 
 Require Import a.Misc a.Words a.Normalize a.Reverse a.Matrix a.Pset a.Orbit.
 Require Import a.Partition.
 
 Class sel_model {A} := mkos { os_fun : A → A }.
 
-...
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+(*
+Context {ac : angle_ctx T}.
+
+Theorem strange_let :
+  ∀ x,
+    match
+      (let (_, _, _, _, rngl_opt_opp_or_psub, _, _, _, _) := ro in
+       rngl_opt_opp_or_psub)
+    with
+    | Some (inl rngl_opp) => rngl_opp x
+    | _ => 0%L
+    end = rngl_opp x.
+Proof. easy. Qed.
+
+Ltac fold_rngl :=
+  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul by easy;
+  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero by easy;
+  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
+    with rngl_one by easy;
+  repeat try rewrite strange_let.
+
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
+*)
 
 Definition orbit_by_seq_of e {os : sel_model} :=
   mkset (λ p, ∃ n, (mat_of_path (repeat e (S n)) * os_fun p)%vec = p).
@@ -34,7 +66,7 @@ Definition G {os : sel_model} :=
 
 Opaque M SS G.
 
-Definition rot e (E : set vector) :=
+Definition rot e (E : set (vector _)) :=
   mkset (λ p, rotate (negf e) p ∈ E).
 
 Theorem empty_set_not_full_set : ∀ f os, os = mkos _ f →
@@ -43,6 +75,7 @@ Proof.
 intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
+...
 rewrite rotate_vec_mul in Hs.
 rewrite <- He in Hs.
 simpl in Hinf.
