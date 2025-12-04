@@ -112,9 +112,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T }.
-(*
-Context {Hc1 : rngl_characteristic T ≠ 1}.
-*)
 
 Ltac fold_rngl :=
   replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
@@ -346,6 +343,14 @@ intros.
 destruct v as (v₁, v₂, v₃); simpl; f_equal; ring.
 Qed.
 
+Definition vec_nth '(V x y z) i :=
+  match i with
+  | 1 => x
+  | 2 => y
+  | 3 => z
+  | _ => 0%L
+  end.
+
 Definition mat_nth M i j :=
   match (i, j) with
   | (1, 1) => a₁₁ M
@@ -359,6 +364,23 @@ Definition mat_nth M i j :=
   | (3, 3) => a₃₃ M
   | _ => 0%L
   end.
+
+Theorem vector_ext :
+  ∀ u v, u = v ↔ ∀ i, 1 ≤ i ≤ 3 → vec_nth u i = vec_nth v i.
+Proof.
+intros.
+split; intros Huv; [ now subst | ].
+destruct u as (u1, u2, u3).
+destruct v as (v1, v2, v3).
+f_equal.
+specialize (Huv 1); apply Huv.
+split; [ easy | now apply -> Nat.succ_le_mono ].
+specialize (Huv 2); apply Huv.
+split; [ now apply -> Nat.succ_le_mono | ].
+now do 2 apply -> Nat.succ_le_mono.
+specialize (Huv 3); apply Huv.
+split; [ now apply -> Nat.succ_le_mono | easy ].
+Qed.
 
 Theorem matrix_ext :
   ∀ M N, M = N ↔ ∀ i j, 1 ≤ i ≤ 3 → 1 ≤ j ≤ 3 → mat_nth M i j = mat_nth N i j.
@@ -655,78 +677,73 @@ Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
 Proof.
 destruct_ac.
 specialize (rngl_0_le_2 Hos Hto) as H02.
-assert (H30 : (1 + 2 ≠ 0)%L). {
-  rewrite rngl_add_comm.
-...
-  apply (rngl_3_neq_0 Hos Hc1 Hto).
-}
 progress unfold is_rotation_matrix.
 progress unfold is_ortho_matrix.
-progress unfold rot_inv_x, mat_transp, mat_mul, mat_det; simpl.
-progress unfold mat_id.
-progress unfold rngl_div; rewrite Hiv.
-progress repeat rewrite (rngl_mul_0_l Hos).
-progress repeat rewrite (rngl_mul_0_r Hos).
-progress repeat rewrite rngl_mul_1_l.
-progress repeat rewrite rngl_add_0_l.
-progress repeat rewrite rngl_add_0_r.
-progress repeat rewrite rngl_mul_assoc.
-progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | easy ]).
-split; [ now f_equal; field | now field ].
+progress unfold mat_transp, mat_mul, mat_det; simpl.
+unfold mat_id, rngl_div; rewrite Hiv.
+do 18 rewrite rngl_mul_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+split. {
+  f_equal; try ring; ring_simplify; fold_rngl.
+  apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+  apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+}
+ring_simplify; fold_rngl.
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 Qed.
 
 Theorem rot_z_is_rotation_matrix : is_rotation_matrix rot_z.
 Proof.
 destruct_ac.
 specialize (rngl_0_le_2 Hos Hto) as H02.
-assert (H30 : (1 + 2 ≠ 0)%L). {
-  rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hos Hc1 Hto).
-}
 progress unfold is_rotation_matrix.
 progress unfold is_ortho_matrix.
 progress unfold mat_transp, mat_mul, mat_det; simpl.
-progress unfold mat_id.
-progress unfold rngl_div; rewrite Hiv.
-progress repeat rewrite (rngl_mul_0_l Hos).
-progress repeat rewrite (rngl_mul_0_r Hos).
-progress repeat rewrite rngl_mul_1_l.
-progress repeat rewrite rngl_mul_1_r.
-progress repeat rewrite rngl_add_0_l.
-progress repeat rewrite rngl_add_0_r.
-progress repeat rewrite (rngl_sub_0_l Hop).
-progress repeat rewrite (rngl_sub_0_r Hos).
-progress repeat rewrite <- (rngl_mul_opp_l Hop).
-progress repeat rewrite rngl_mul_assoc.
-progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | easy ]).
-split; [ now f_equal; field | now field ].
+unfold mat_id, rngl_div; rewrite Hiv.
+do 18 rewrite rngl_mul_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+split. {
+  f_equal; try ring; ring_simplify; fold_rngl.
+  apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+  apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+}
+ring_simplify; fold_rngl.
+rewrite <- rngl_mul_assoc.
+rewrite <- rl_sqrt_mul; [ | easy | easy ].
+rewrite fold_rngl_squ at 2.
+rewrite (rl_sqrt_squ Hop Hto).
+rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+ring_simplify; fold_rngl.
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 Qed.
 
 Theorem rot_inv_z_is_rotation_matrix : is_rotation_matrix rot_inv_z.
 Proof.
 destruct_ac.
 specialize (rngl_0_le_2 Hos Hto) as H02.
-assert (H30 : (1 + 2 ≠ 0)%L). {
-  rewrite rngl_add_comm.
-  apply (rngl_3_neq_0 Hos Hc1 Hto).
-}
 progress unfold is_rotation_matrix.
 progress unfold is_ortho_matrix.
 progress unfold mat_transp, mat_mul, mat_det; simpl.
-progress unfold mat_id.
-progress unfold rngl_div; rewrite Hiv.
-progress repeat rewrite (rngl_mul_0_l Hos).
-progress repeat rewrite (rngl_mul_0_r Hos).
-progress repeat rewrite rngl_mul_1_l.
-progress repeat rewrite rngl_mul_1_r.
-progress repeat rewrite rngl_add_0_l.
-progress repeat rewrite rngl_add_0_r.
-progress repeat rewrite (rngl_sub_0_l Hop).
-progress repeat rewrite (rngl_sub_0_r Hos).
-progress repeat rewrite <- (rngl_mul_opp_l Hop).
-progress repeat rewrite rngl_mul_assoc.
-progress repeat (rewrite Rmult5_sqrt2_sqrt5; [ | easy ]).
-split; [ now f_equal; field | now field ].
+unfold mat_id, rngl_div; rewrite Hiv.
+do 18 rewrite rngl_mul_assoc.
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
+split. {
+  f_equal; try ring; ring_simplify; fold_rngl.
+  apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+  apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+}
+ring_simplify; fold_rngl.
+rewrite <- rngl_mul_assoc.
+rewrite <- rl_sqrt_mul; [ | easy | easy ].
+rewrite fold_rngl_squ at 2.
+rewrite (rl_sqrt_squ Hop Hto).
+rewrite (rngl_abs_nonneg_eq Hop Hor); [ | easy ].
+ring_simplify; fold_rngl.
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 Qed.
 
 Theorem rotate_is_rotation_matrix : ∀ e, is_rotation_matrix (mat_of_elem e).
@@ -1323,6 +1340,13 @@ Theorem mat_mul_id_comm : ∀ M M',
   → (M' * M)%mat = mat_id.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  apply matrix_ext.
+  intros.
+  rewrite H1; apply H1.
+}
 intros * HMM'.
 generalize HMM'; intros H.
 apply (f_equal (mat_mul (mat_compl M))) in H.
@@ -1510,6 +1534,11 @@ Theorem unit_sphere_mat_mul_angle_add : ∀ a s₁ c₁ s₂ c₂ θ₁ θ₂,
      matrix_of_axis_angle a (rngl_sin (θ₁ + θ₂)) (rngl_cos (θ₁ + θ₂)).
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros; apply matrix_ext.
+  intros; rewrite H1; apply H1.
+}
 intros * Ha Hsc₁ Hsc₂ Hθ₁ Hθ₂.
 destruct a as (ax, ay, az); simpl.
 simpl in Ha; rewrite Ha.
@@ -1525,7 +1554,6 @@ rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
 rewrite rngl_sin_angle_of_sin_cos; [ | easy ].
 clear θ₁ θ₂ Hθ₁ Hθ₂ Hsc₁ Hsc₂.
 progress unfold mkrmat.
-(**)
 specialize (rngl_2_neq_0 Hos Hc1 Hto) as H20.
 f_equal; ring_simplify; fold_rngl. {
   do 4 rewrite <- (rngl_mul_assoc _ _ az).
@@ -1836,6 +1864,13 @@ Theorem matrix_of_axis_angle_is_rotation_matrix : ∀ p cosθ sinθ,
   → is_rotation_matrix (matrix_of_axis_angle p sinθ cosθ).
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  exfalso; apply H.
+  apply vector_ext.
+  intros; rewrite H1; apply H1.
+}
 specialize (rngl_2_neq_0 Hos Hc1 Hto) as H20.
 intros * Hp Hsc.
 rename Hsc into Hsc1.
@@ -1939,14 +1974,11 @@ Theorem mat_of_path_negf : ∀ e el,
   mat_of_path (negf e :: e :: el) = mat_of_path el.
 Proof.
 intros.
-clear Hch.
 rewrite mat_of_path_cons; simpl.
 rewrite mat_of_path_cons; simpl.
 rewrite mat_mul_assoc.
-rewrite mat_of_elem_mul_negf_l, mat_mul_id_l.
+now rewrite mat_of_elem_mul_negf_l, mat_mul_id_l.
 Qed.
-
-...
 
 Theorem vec_unit_cross_mul_eq_0_lemma :
    ∀ u₁ u₂ u₃ v₁ v₂ v₃,
@@ -1998,6 +2030,12 @@ Theorem vec_unit_cross_mul_eq_0 : ∀ u v,
   → u = v ∨ u = (- v)%vec.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros; left.
+  apply vector_ext.
+  intros; rewrite H1; apply H1.
+}
 intros * Hu Hv Huxv.
 specialize (vec_Lagrange_identity u v) as H.
 rewrite Hu, Hv, Huxv, vec_sqr_0 in H.
@@ -2081,14 +2119,6 @@ Definition Kronecker_symbol i j := if i =? j then 1%L else 0%L.
 
 Let δ := Kronecker_symbol.
 Let ε := Levi_Civita_symbol.
-
-Definition vec_nth '(V x y z) i :=
-  match i with
-  | 1 => x
-  | 2 => y
-  | 3 => z
-  | _ => 0%L
-  end.
 
 Arguments vec_nth pat%_vec i%_nat.
 
@@ -2197,23 +2227,6 @@ destruct n. {
   destruct o; ring.
 }
 destruct n; ring.
-Qed.
-
-Theorem vector_ext :
-  ∀ u v, u = v ↔ ∀ i, 1 ≤ i ≤ 3 → vec_nth u i = vec_nth v i.
-Proof.
-intros.
-split; intros Huv; [ now subst | ].
-destruct u as (u1, u2, u3).
-destruct v as (v1, v2, v3).
-f_equal.
-specialize (Huv 1); apply Huv.
-split; [ easy | now apply -> Nat.succ_le_mono ].
-specialize (Huv 2); apply Huv.
-split; [ now apply -> Nat.succ_le_mono | ].
-now do 2 apply -> Nat.succ_le_mono.
-specialize (Huv 3); apply Huv.
-split; [ now apply -> Nat.succ_le_mono | easy ].
 Qed.
 
 Theorem matrix_add_mul_eq_Kronecker :
@@ -2543,8 +2556,3 @@ ring.
 Qed.
 
 End a.
-
-Arguments mat_of_path_app {T ro rp rl ac} Hc1 (el₁ el₂)%_list.
-...
-Arguments mat_of_path_negf {T ro rp rl ac} Hch Hc1 e el%_list.
-Arguments mat_vec_mul_assoc {T ro rp ac} Hc1 (m₁ m₂)%_mat p%_vec.
