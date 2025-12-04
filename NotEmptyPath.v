@@ -100,6 +100,7 @@ split. {
       apply vector_ext; intros.
       rewrite H1; apply H1.
     }
+    assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
     assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
       apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
     }
@@ -108,45 +109,60 @@ split. {
     do 3 rewrite rngl_of_Z_mul.
     f_equal. {
       cbn; rewrite rngl_of_pos_3.
-      rewrite (rngl_inv_mul_distr Hos Hiv); [ | | easy ]. 2: {
-        apply (rngl_3_neq_0 Hos Hc1 Hto).
-      }
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
       ring_simplify; fold_rngl.
       rewrite (rngl_add_comm 1 2).
       rewrite (rngl_mul_comm Hic _ 3⁻¹).
       do 2 rewrite rngl_mul_assoc.
-      rewrite (rngl_mul_inv_diag_l Hiv). 2: {
-        apply (rngl_3_neq_0 Hos Hc1 Hto).
-      }
+      rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
       symmetry; rewrite <- rngl_mul_assoc.
       apply rngl_mul_1_l.
     } {
       cbn; rewrite rngl_of_pos_2.
       progress unfold rngl_div.
       rewrite Hiv.
-      rewrite (rngl_inv_mul_distr Hos Hiv); [ | | easy ]. 2: {
-        apply (rngl_3_neq_0 Hos Hc1 Hto).
-      }
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
       ring.
     } {
       cbn; rewrite rngl_of_pos_4.
-...
-      field_simplify; fold_rngl; [ | easy | easy ].
-      do 2 rewrite <- rngl_mul_assoc.
-      rewrite (rngl_mul_assoc √_), Hsq2.
-      now field.
+      progress unfold rngl_div.
+      rewrite Hiv.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+      ring_simplify; fold_rngl.
+      rewrite <- (rngl_mul_assoc _ _ √_), Hsq2.
+      ring.
     }
   } {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
+    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+      specialize (rngl_characteristic_1 Hos Hc1) as H1.
+      apply vector_ext; intros.
+      rewrite H1; apply H1.
+    }
+    assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
+    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
+      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
+    }
     progress unfold IZR.
     rewrite rngl_of_Z_add.
     rewrite rngl_of_Z_sub.
     do 3 rewrite rngl_of_Z_mul.
     f_equal. {
       cbn; rewrite rngl_of_pos_3.
-      now field.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+      ring_simplify; fold_rngl.
+      rewrite (rngl_mul_comm Hic _ 3⁻¹).
+      do 2 rewrite rngl_mul_assoc.
+      rewrite (rngl_add_comm 1 2).
+      rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
+      symmetry; rewrite <- rngl_mul_assoc.
+      apply rngl_mul_1_l.
     } {
       cbn; rewrite rngl_of_pos_2.
+(**)
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+      ring_simplify; fold_rngl.
+...
       now field.
     } {
       cbn; rewrite rngl_of_pos_4.
