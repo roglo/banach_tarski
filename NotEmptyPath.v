@@ -1,7 +1,7 @@
 (* Banach-Tarski paradox. *)
 
 From Stdlib Require Import Utf8 Arith ZArith List.
-From Stdlib Require Import Ring Field.
+From Stdlib Require Import Ring.
 Import ListNotations.
 From RingLike Require Import Core RealLike.
 Require Import TrigoWithoutPi.Core.
@@ -25,7 +25,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
-Context {Hc1 : rngl_characteristic T ≠ 1}.
 
 Theorem strange_let :
   ∀ x,
@@ -50,7 +49,6 @@ Ltac fold_rngl :=
   repeat try rewrite strange_let.
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
-Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
 
 Theorem rotate_param_rotate : ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
@@ -62,7 +60,6 @@ destruct_ac.
 intros el x y z n a₁ b₁ c₁ N₁.
 split. {
   intros Hr.
-  simpl in Hr; simpl.
   revert a₁ b₁ c₁ N₁ Hr.
   induction el as [| (t, d)]; intros. {
     simpl; simpl in Hr; rewrite Nat.add_0_r.
@@ -79,6 +76,7 @@ split. {
   simpl in Hr; simpl.
   progress unfold rngl_div.
   rewrite Hiv.
+(*
   assert (H12 : (1 + 2)%L ≠ 0%L). {
     rewrite rngl_add_comm.
     apply (rngl_3_neq_0 Hos Hc1 Hto).
@@ -86,6 +84,7 @@ split. {
   assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
     apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
   }
+*)
   assert (Hsq2 : (√2 * √2)%L = 2%L). {
     rewrite <- rl_sqrt_mul.
     rewrite fold_rngl_squ.
@@ -97,14 +96,34 @@ split. {
   }
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl. {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
+    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+      specialize (rngl_characteristic_1 Hos Hc1) as H1.
+      apply vector_ext; intros.
+      rewrite H1; apply H1.
+    }
+    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
+      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
+    }
     progress unfold IZR.
     do 2 rewrite rngl_of_Z_add.
     do 3 rewrite rngl_of_Z_mul.
     f_equal. {
       cbn; rewrite rngl_of_pos_3.
-      now field.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | | easy ]. 2: {
+        apply (rngl_3_neq_0 Hos Hc1 Hto).
+      }
+      ring_simplify; fold_rngl.
+      rewrite (rngl_add_comm 1 2).
+      rewrite (rngl_mul_comm Hic _ 3⁻¹).
+      do 2 rewrite rngl_mul_assoc.
+      rewrite (rngl_mul_inv_diag_l Hiv). 2: {
+        apply (rngl_3_neq_0 Hos Hc1 Hto).
+      }
+      symmetry; rewrite <- rngl_mul_assoc.
+      apply rngl_mul_1_l.
     } {
       cbn; rewrite rngl_of_pos_2.
+...
       now field.
     } {
       cbn; rewrite rngl_of_pos_4.
