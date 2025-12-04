@@ -144,31 +144,24 @@ now rewrite (rngl_opp_0 Hop).
 Qed.
 
 Global Instance app_gr_morph : Proper (eq ==> set_eq ==> set_eq) app_gr.
-...
-
-Add Parametric Morphism : app_gr
-  with signature eq ==> set_eq ==> set_eq
-  as app_gr_morph.
 Proof.
-intros g p q Hpq r.
+intros g g' Hgg p q Hpq r; subst g'.
 split; intros H; [ eapply gr_subst; eassumption | ].
 symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
-Add Parametric Morphism : app_gr_inv
-  with signature eq ==> set_eq ==> set_eq
-  as app_gr_inv_morph.
+Global Instance app_gr_inv_morph :
+  Proper (eq ==> set_eq ==> set_eq) app_gr_inv.
 Proof.
-intros g p q Hpq r.
+intros g g' Hgg p q Hpq r; subst g'.
 split; intros H; [ eapply gr_subst; eassumption | ].
 symmetry in Hpq; eapply gr_subst; eassumption.
 Qed.
 
-Add Parametric Morphism : transl
-  with signature eq ==> set_eq ==> set_eq
-  as transl_morph.
+Global Instance transl_morph : Proper (eq ==> set_eq ==> set_eq) transl.
 Proof.
-intros dx E F HEF (x, y, z); simpl; now rewrite HEF.
+intros dx dx' Hdd E F HEF (x, y, z); subst dx'.
+now cbn; rewrite HEF.
 Qed.
 
 Theorem fold_app_gr_inv : ∀ g, app_gr (gr_inv g) = app_gr_inv g.
@@ -195,8 +188,7 @@ split; intros H. {
 }
 Qed.
 
-Theorem app_gr_inv_l : ∀ g E,
-  (app_gr_inv g (app_gr g E) = E)%S.
+Theorem app_gr_inv_l : ∀ g E, (app_gr_inv g (app_gr g E) = E)%S.
 Proof.
 intros.
 unfold app_gr_inv.
@@ -207,6 +199,7 @@ induction g as [ M Hrm | | ]; intros; simpl. {
   intros (x, y, z); simpl.
   rewrite neg_vec_involutive.
   destruct v as (xv, yv, zv); simpl.
+...
   now do 3 rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
 } {
   intros p.
