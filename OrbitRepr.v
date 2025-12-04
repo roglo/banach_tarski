@@ -3,6 +3,7 @@
 From Stdlib Require Import Utf8 List.
 Import ListNotations.
 From RingLike Require Import Core RealLike.
+From TrigoWithoutPi Require Import Core.
 
 Require Import a.Misc a.Words a.Normalize a.Reverse a.Matrix a.Pset a.Orbit.
 Require Import a.Partition.
@@ -15,9 +16,9 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
-(*
 Context {ac : angle_ctx T}.
 
+(*
 Theorem strange_let :
   ∀ x,
     match
@@ -42,6 +43,12 @@ Ltac fold_rngl :=
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
 *)
+
+Add Parametric Relation : _ same_orbit
+ reflexivity proved by same_orbit_refl
+ symmetry proved by same_orbit_sym
+ transitivity proved by same_orbit_trans
+ as same_orbit_rel.
 
 Definition orbit_by_seq_of e {os : sel_model} :=
   mkset (λ p, ∃ n, (mat_of_path (repeat e (S n)) * os_fun p)%vec = p).
@@ -75,7 +82,6 @@ Proof.
 intros f os Hos e p He Hs; subst os.
 destruct He as (Hinf & He); simpl in He.
 destruct Hs as (Hjnf & el & el₁ & Hn & Hs); simpl in Hs.
-...
 rewrite rotate_vec_mul in Hs.
 rewrite <- He in Hs.
 simpl in Hinf.
@@ -282,6 +288,7 @@ split. {
     remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
     destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁. {
       rewrite rotate_rotate_norm, H₂ in Hel.
+...
       now rewrite mat_vec_mul_id in Hel.
     }
     destruct e as (t, d); destruct t, d. {
