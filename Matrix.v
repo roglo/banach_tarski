@@ -124,9 +124,6 @@ Ltac fold_rngl :=
     with rngl_one by easy.
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
-(*
-Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
-*)
 
 Definition rot_x := mkmat
   1         0         0

@@ -14,7 +14,6 @@ Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T }.
-Context {Hc1 : rngl_characteristic T ≠ 1}.
 
 Definition same_orbit x y := ∃ el, (mat_of_path el * x)%vec = y.
 
@@ -27,27 +26,9 @@ intros p₁ p₂ (el, H); simpl in H.
 exists (rev_path el).
 revert p₁ p₂ H.
 induction el as [| e]; intros; [ now cbn; rewrite mat_vec_mul_id in H |-* | ].
-rewrite rev_path_cons, (mat_of_path_app Hc1), (mat_vec_mul_assoc Hc1).
-apply IHel; rewrite <- H, <- (mat_vec_mul_assoc Hc1).
-rewrite <- (mat_of_path_app Hc1), rev_path_single; simpl.
-(**)
-About mat_of_path_negf.
-mat_of_path_negf :
-∀ {T : Type} {ro : ring_like_op T} {rp : ring_like_prop T} 
-  {rl : real_like_prop T},
-  angle_ctx T
-  → rngl_characteristic T = 0
-    → rngl_characteristic T ≠ 1
-      → ∀ (e : free_elem) (el : list free_elem),
-          mat_of_path (negf e :: e :: el) = mat_of_path el
-
-mat_of_path_negf is not universe polymorphic
-Arguments mat_of_path_negf {T}%type_scope {ro rp rl ac Hch Hc1} e el%list_scope
-mat_of_path_negf is opaque
-Expands to: Constant a.Matrix.mat_of_path_negf
-Declared in library a.Matrix, line 1875, characters 8-24
-rewrite mat_of_path_negf.
-...
+rewrite rev_path_cons, mat_of_path_app, mat_vec_mul_assoc.
+apply IHel; rewrite <- H, <- mat_vec_mul_assoc.
+rewrite <- mat_of_path_app, rev_path_single; simpl.
 now rewrite mat_of_path_negf.
 Qed.
 
@@ -64,7 +45,7 @@ Add Parametric Relation : _ same_orbit
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
-Definition equiv_same_orbit : equiv vector same_orbit :=
+Definition equiv_same_orbit : equiv (vector T) same_orbit :=
   conj same_orbit_refl (conj same_orbit_trans same_orbit_sym).
 
 Definition not_in_fixpoints :=
@@ -102,6 +83,8 @@ apply norm_list_app_is_nil in H. {
 Qed.
 
 Definition orbit_selector := choice_function same_orbit.
+
+...
 
 Definition sphere r := mkset (λ '(V x y z), (x² + y² + z² = r²)%R).
 Definition ball := mkset (λ '(V x y z), (x² + y² + z² <= 1)%R).

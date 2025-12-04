@@ -133,8 +133,8 @@ split. {
       now field.
     }
   } {
-...
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
+...
     rewrite plus_IZR, minus_IZR.
     progress repeat rewrite mult_IZR.
     rewrite Rinv_mult.
