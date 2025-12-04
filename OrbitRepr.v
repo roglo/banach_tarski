@@ -1,6 +1,6 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Utf8 List.
+From Stdlib Require Import Utf8 List Morphisms.
 Import ListNotations.
 From RingLike Require Import Core RealLike.
 From TrigoWithoutPi Require Import Core.
@@ -288,7 +288,7 @@ split. {
     remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
     destruct (list_nil_app_dec el₁) as [H₂| (e & el₂ & H₂)]; subst el₁. {
       rewrite rotate_rotate_norm, H₂ in Hel.
-...
+      cbn in Hel.
       now rewrite mat_vec_mul_id in Hel.
     }
     destruct e as (t, d); destruct t, d. {
@@ -479,6 +479,7 @@ split. {
     remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
     destruct el₁ as [| e₁]. {
       rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+      cbn in Hel.
       rewrite mat_vec_mul_id in Hel.
       clear Hel₁.
       right; left.
@@ -561,11 +562,10 @@ eapply not_start_with_rot in Hj; try eassumption; [ | easy ]. {
 }
 Qed.
 
-Add Parametric Morphism {A} : (@List.nth (set A))
-  with signature eq ==> eq ==> set_eq ==> set_eq
-  as nth_set_morph.
+Global Instance nth_set_morph {A} :
+  Proper (eq ==> eq ==> set_eq ==> set_eq) (@List.nth (set A)).
 Proof.
-intros i l a b Hab.
+intros i j Hil l l' Hll a b Hab; subst j l'.
 revert i.
 induction l as [| y]; intros; [ destruct i; apply Hab | ].
 destruct i; simpl; [ easy | apply IHl ].
@@ -600,7 +600,7 @@ split. {
     destruct H as (el, Hel).
     remember (norm_list el) as el₁ eqn:Hel₁; symmetry in Hel₁.
     destruct el₁ as [| e₁]. {
-      rewrite rotate_rotate_norm, Hel₁ in Hel; simpl in Hel.
+      rewrite rotate_rotate_norm, Hel₁ in Hel; cbn in Hel.
       rewrite mat_vec_mul_id in Hel.
       clear el Hel₁.
       left; left; left.
@@ -632,7 +632,7 @@ split. {
         do 2 rewrite rotate_rotate_neg in Hoo.
         rewrite rotate_vec_mul in Hoo.
         destruct n; [ | now exists n ].
-        simpl in Hoo.
+        cbn in Hoo.
         rewrite mat_vec_mul_id in Hoo.
         rewrite Hoo in Hel.
         destruct Hnf as (His & Hoh).
@@ -668,7 +668,7 @@ split. {
     do 2 rewrite rotate_rotate_neg in Hr.
     rewrite rotate_vec_mul in Hr.
     destruct n. {
-      simpl in Hr; rewrite mat_vec_mul_id in Hr.
+      cbn in Hr; rewrite mat_vec_mul_id in Hr.
       rewrite Hr in Hel.
       destruct Hnf as (His, Hoh).
       now apply Hoh; exists el, p; rewrite Hel₁.
@@ -758,3 +758,5 @@ rewrite <- Hv; simpl; unfold rotate.
 rewrite <- mat_vec_mul_assoc.
 now rewrite mat_of_elem_mul_negf_l, mat_vec_mul_id.
 Qed.
+
+End a.
