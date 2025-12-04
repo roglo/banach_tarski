@@ -111,9 +111,7 @@ split; intros Hp. {
 }
 apply (f_equal rngl_squ) in Hp.
 rewrite rngl_squ_sqrt in Hp; [ easy | ].
-apply (rngl_le_0_add Hos Hor).
-apply (rngl_add_squ_nonneg Hos Hto).
-apply (rngl_squ_nonneg Hos Hto).
+apply nonneg_sqr_vec_norm.
 Qed.
 
 Theorem in_its_sphere : ∀ v, v ∈ sphere ‖v‖.
@@ -122,9 +120,7 @@ destruct_ac.
 intros (x, y, z); simpl.
 symmetry.
 apply rngl_squ_sqrt.
-apply (rngl_le_0_add Hos Hor).
-apply (rngl_add_squ_nonneg Hos Hto).
-apply (rngl_squ_nonneg Hos Hto).
+apply nonneg_sqr_vec_norm.
 Qed.
 
 Theorem on_sphere_after_rotation : ∀ p m r,
@@ -191,10 +187,9 @@ Proof.
 intros * His Hrm.
 destruct p as (x, y, z).
 remember (V x y z) as p eqn:HP.
-...
-remember (x² + y² + z²)%R as r eqn:Hr; symmetry in Hr.
+remember (x² + y² + z²)%L as r eqn:Hr; symmetry in Hr.
 assert (Hos : p ∈ sphere (√ r)). {
-  subst p; simpl; rewrite Rsqr_sqrt; [ easy | subst r ].
+  subst p; simpl; rewrite rngl_squ_sqrt; [ easy | subst r ].
   apply nonneg_sqr_vec_norm.
 }
 pose proof on_sphere_after_rotation _ _ _ Hos Hrm as H.
@@ -213,3 +208,5 @@ intros * His.
 apply in_ball_after_rotation; [ easy | ].
 apply rotate_is_rotation_matrix.
 Qed.
+
+End a.
