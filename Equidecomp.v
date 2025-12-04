@@ -4,9 +4,10 @@
 
 From Stdlib Require Import Arith List Relations.
 Import ListNotations.
+From RingLike Require Import Utf8.
 
 Require Import a.Misc a.Matrix a.Pset.
-Require Import Partition OrbitRepr GroupTransf.
+Require Import a.Partition a.OrbitRepr a.GroupTransf.
 
 Definition equidecomposable E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧

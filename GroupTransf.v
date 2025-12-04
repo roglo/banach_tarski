@@ -1,6 +1,6 @@
 (* Banach-Tarski paradox. *)
 
-From Stdlib Require Import Morphisms.
+From Stdlib Require Import Arith Morphisms.
 From RingLike Require Import Utf8 Core.
 From TrigoWithoutPi Require Import Core.
 
@@ -409,8 +409,7 @@ split. {
       intros i j Hij.
       unfold set_eq; simpl; intros y.
       assert (HSij : S i ≠ S j). {
-...
-        intros HSij; now apply Hij, Nat.succ_inj.
+        now intros HSij; apply Nat.succ_inj in HSij.
       }
       pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
       destruct HP as (HQ, _).
@@ -519,18 +518,18 @@ split. {
   right.
   rewrite group_set_union_list_distr.
   rewrite set_eq_equiv; [ | now rewrite group_set_union_list_distr ].
-  now rewrite map_map.
+  now rewrite List.map_map.
 }
 intros i j Hij p.
 split; intros H; [ | easy ].
 rewrite <- app_gr_empty_set with (f := g) in H.
-do 2 rewrite map_nth in H.
+do 2 rewrite List.map_nth in H.
 destruct H as (Hi, Hj).
 pose proof HP i j Hij (app_gr_vec g p) as Hp.
 destruct Hp as (Hpi, _).
 apply Hpi; clear Hpi.
 split. {
-  clear - Hi.
+  clear - Hi ac rp.
   revert p EL Hi.
   induction i; intros. {
     destruct EL as [| E EL]; [ now apply app_gr_empty_set in Hi | ].
@@ -541,7 +540,7 @@ split. {
   simpl in Hi; simpl.
   now apply IHi.
 }
-clear - Hj.
+clear - Hj ac rp.
 revert p EL Hj.
 induction j; intros. {
   destruct EL as [| E EL]; [ now apply app_gr_empty_set in Hj | ].
@@ -552,3 +551,5 @@ destruct EL as [| E EL]; [ now apply app_gr_empty_set in Hj | ].
 simpl in Hj; simpl.
 now apply IHj.
 Qed.
+
+End a.
