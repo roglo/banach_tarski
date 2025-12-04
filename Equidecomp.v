@@ -2,12 +2,21 @@
 
 (* Equidecomposability *)
 
-From Stdlib Require Import Arith List Relations.
+From Stdlib Require Import Arith List Relations Morphisms.
+From Stdlib Require Import Permutation.
 Import ListNotations.
-From RingLike Require Import Utf8.
+From RingLike Require Import Utf8 Core.
+From TrigoWithoutPi Require Import Core.
 
 Require Import a.Misc a.Matrix a.Pset.
 Require Import a.Partition a.OrbitRepr a.GroupTransf.
+
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {ac : angle_ctx T }.
 
 Definition equidecomposable E₁ E₂ :=
   ∃ P₁ P₂, is_partition E₁ P₁ ∧ is_partition E₂ P₂ ∧
@@ -30,7 +39,7 @@ exists P₂, P₁.
 split; [ easy | ].
 split; [ easy | ].
 apply Forall2_sym; [ | easy ].
-clear -HEF.
+clear - HEF rp ac.
 intros E F (g & Hg).
 exists (gr_inv g); rewrite <- Hg.
 apply app_gr_inv_l.
@@ -239,7 +248,7 @@ split. {
   rewrite set_union_list_app.
   simpl in Hlen3; apply Nat.succ_inj in Hlen3.
   apply set_union_morph. {
-    pose proof set_union_inter_self vector E₁ (map (app_gr_inv g₁) P'F).
+    pose proof set_union_inter_self (vector T) E₁ (map (app_gr_inv g₁) P'F).
     rewrite map_map in H.
     apply H.
     assert (HEF : E₁ ⊂ app_gr_inv g₁ F). {
@@ -332,8 +341,6 @@ destruct Hf as (g & Hg & Hix).
 subst f; apply app_gr_empty_set.
 Qed.
 
-From Stdlib Require Import Permutation.
-
 Theorem partition_combine_swi_is_permutation :
   ∀ A (fl : list (set A → set A)) PE P'F,
   Permutation (partition_combine_swi fl PE P'F) (partition_combine fl PE P'F).
@@ -369,7 +376,7 @@ apply Permutation_nth_error in Hpe.
 destruct Hpe as (Hlen & f & Hfi & Hn).
 unfold FinFun.Injective in Hfi.
 assert (Hfij : f i ≠ f j) by now intros H; apply Hfi in H.
-assert (HP'P : ∀ i, P'E.[i] = PE.[f i]). {
+assert (HP'P : ∀ i, (P'E.[i] = PE.[f i])%S). {
   intros k.
   pose proof Hn k as Hk.
   remember (nth_error P'E k) as p'k eqn:H'k.
@@ -453,13 +460,11 @@ apply Permutation_length in H.
 now rewrite H; apply partition_length_combine.
 Qed.
 
-Require Import Setoid.
-Add Parametric Morphism :
-  (λ n fl, @nth (set vector → set vector) n (map app_gr_inv fl) id)
-  with signature eq ==> eq ==> set_eq ==> set_eq
-  as nth_map_app_gr_inv_morph.
+Global Instance nth_map_app_gr_inv_morph :
+  Proper (eq ==> eq ==> set_eq ==> set_eq)
+    (λ n fl, @nth (set (vector T) → set (vector T)) n (map app_gr_inv fl) id).
 Proof.
-intros n fl E F HEF x.
+intros n n' Hnn fl fl' Hff E F HEF x; subst n' fl'.
 split; intros Hx. {
   revert n Hx.
   induction fl as [| f₁ fl]; intros. {
@@ -585,16 +590,16 @@ split. {
             rewrite set_inter_comm.
             apply set_inter_morph. {
               rewrite app_gr_nth.
-              replace Datatypes.id with (@id (set vector)) by easy.
+              replace Datatypes.id with (@id (set (vector T))) by easy.
               rewrite map_map.
               (* does not work, I don't know why
                  rewrite <- Hhl.
                *)
               (* using transitivity instead *)
               etransitivity. {
-                apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
-                apply app_gr_morph_Proper; [ easy | ].
-                apply nth_map_app_gr_inv_morph_Proper; [ easy | easy | ].
+                apply nth_map_app_gr_inv_morph; [ easy | easy | ].
+                apply app_gr_morph; [ easy | ].
+                apply nth_map_app_gr_inv_morph; [ easy | easy | ].
                 symmetry; apply Hhl.
               }
               do 2 rewrite <- app_gr_nth_inv.
@@ -623,7 +628,7 @@ split. {
               }
             }
             rewrite app_gr_nth.
-            replace Datatypes.id with (@id (set vector)) by easy.
+            replace Datatypes.id with (@id (set (vector T))) by easy.
             now rewrite map_map.
           } {
             now rewrite length_map.
@@ -663,7 +668,7 @@ rewrite partition_length_combine. {
 now subst g'l; rewrite length_map.
 Qed.
 
-Add Parametric Relation : (set vector) equidecomposable
+Add Parametric Relation : (set (vector T)) equidecomposable
  reflexivity proved by equidec_refl
  symmetry proved by equidec_sym
  transitivity proved by equidec_trans
@@ -702,3 +707,5 @@ rewrite <- HE in HEL; rewrite <- HF in HFL.
 exists EL, FL.
 now split; [ | split ].
 Qed.
+
+End a.

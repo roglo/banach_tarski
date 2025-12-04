@@ -12,24 +12,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-(*
-Context {rl : real_like_prop T}.
-*)
 Context {ac : angle_ctx T }.
-
-(*
-Ltac fold_rngl :=
-  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
-    with rngl_mul by easy;
-  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
-    with rngl_add by easy;
-  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
-    with rngl_zero by easy;
-  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
-    with rngl_one by easy.
-
-Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
-*)
 
 Definition transl d (E : set (vector T)) := mkset (λ v, (v - d)%vec ∈ E).
 Arguments transl d%_vec E%_S.
