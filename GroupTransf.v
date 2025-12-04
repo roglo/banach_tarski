@@ -190,6 +190,7 @@ Qed.
 
 Theorem app_gr_inv_l : ∀ g E, (app_gr_inv g (app_gr g E) = E)%S.
 Proof.
+destruct_ac.
 intros.
 unfold app_gr_inv.
 revert E.
@@ -199,8 +200,7 @@ induction g as [ M Hrm | | ]; intros; simpl. {
   intros (x, y, z); simpl.
   rewrite neg_vec_involutive.
   destruct v as (xv, yv, zv); simpl.
-...
-  now do 3 rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+  now do 3 rewrite (rngl_add_opp_r Hop), (rngl_add_sub Hos).
 } {
   intros p.
   split; intros H.
@@ -212,6 +212,7 @@ Qed.
 Theorem app_gr_inv_r : ∀ g E,
   (app_gr g (app_gr_inv g E) = E)%S.
 Proof.
+destruct_ac.
 intros.
 unfold app_gr_inv.
 revert E.
@@ -222,7 +223,7 @@ induction g as [ M Hrm | | ]; intros; simpl. {
   intros (x, y, z); simpl.
   rewrite vec_sub_opp_r.
   destruct v as (xv, yv, zv); simpl.
-  now do 3 rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
+  now do 3 rewrite (rngl_add_opp_r Hop), (rngl_sub_add Hop).
 } {
   intros p.
   split; intros H. {
@@ -267,9 +268,9 @@ eapply gr_subst in H; [ now apply IHf1 in H | ].
 split; [ apply IHf2 | easy ].
 Qed.
 
-Theorem app_gr_app_gr_inv : ∀ E g,
-  (app_gr g (app_gr_inv g E) = E)%S.
+Theorem app_gr_app_gr_inv : ∀ E g, (app_gr g (app_gr_inv g E) = E)%S.
 Proof.
+destruct_ac.
 intros.
 unfold app_gr_inv.
 revert E.
@@ -279,16 +280,16 @@ induction g as [M Hrm | | ]; intros. {
   intros (x, y, z); simpl.
   rewrite vec_sub_opp_r.
   destruct v as (xv, yv, zv); simpl.
-  now do 3 rewrite Rplus_assoc, Rplus_opp_l, Rplus_0_r.
+  now do 3 rewrite (rngl_add_opp_r Hop), (rngl_sub_add Hop).
 }
 simpl.
 rewrite IHg2.
 apply IHg1.
 Qed.
 
-Theorem app_gr_inv_app_gr : ∀ E g,
-  (app_gr_inv g (app_gr g E) = E)%S.
+Theorem app_gr_inv_app_gr : ∀ E g, (app_gr_inv g (app_gr g E) = E)%S.
 Proof.
+destruct_ac.
 intros.
 unfold app_gr_inv.
 revert E.
@@ -298,7 +299,7 @@ induction g as [ M Hrm | | ]; intros. {
   intros (x, y, z); simpl.
   rewrite neg_vec_involutive.
   destruct v as (xv, yv, zv); simpl.
-  now do 3 rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r.
+  now do 3 rewrite (rngl_add_opp_r Hop), (rngl_add_sub Hos).
 }
 simpl.
 rewrite IHg1.
@@ -333,7 +334,7 @@ now intros p; simpl; rewrite IHg2, IHg1.
 Qed.
 
 Theorem group_set_union_list_distr : ∀ f EL,
-  (app_gr f (⋃ EL) = ⋃ map (app_gr f) EL)%S.
+  (app_gr f (⋃ EL) = ⋃ List.map (app_gr f) EL)%S.
 Proof.
 intros.
 induction EL as [| E₁ EL]. {
@@ -352,6 +353,7 @@ Qed.
 
 Theorem included_group : ∀ E F g, E ⊂ F ↔ app_gr g E ⊂ app_gr g F.
 Proof.
+destruct_ac.
 intros.
 split; intros HEF. {
   revert E F HEF.
@@ -375,8 +377,7 @@ induction g as [M Hrm| d| ]; intros. {
   destruct p as (x, y, z); simpl in HEF.
   destruct d as (dx, dy, dz).
   pose proof HEF (V (x + dx) (y + dy) (z + dz)) as H; simpl in H.
-  unfold Rminus in H.
-  do 3 rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r in H.
+  do 3 rewrite (rngl_add_opp_r Hop), (rngl_add_sub Hos) in H.
   apply H, Hp.
 }
 simpl in HEF.
@@ -384,8 +385,8 @@ eapply IHg2; [ | eassumption ].
 intros q Hq; eapply IHg1; eassumption.
 Qed.
 
-Theorem partition_group_map : ∀ (F : set vector) EL g,
-  is_partition F EL → is_partition (app_gr g F) (map (app_gr g) EL).
+Theorem partition_group_map : ∀ (F : set (vector T)) EL g,
+  is_partition F EL → is_partition (app_gr g F) (List.map (app_gr g) EL).
 Proof.
 intros F EL * HP.
 unfold is_partition in HP |-*.
@@ -408,6 +409,7 @@ split. {
       intros i j Hij.
       unfold set_eq; simpl; intros y.
       assert (HSij : S i ≠ S j). {
+...
         intros HSij; now apply Hij, Nat.succ_inj.
       }
       pose proof HP (S i) (S j) HSij y as HP; simpl in HP.
