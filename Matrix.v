@@ -383,16 +383,32 @@ now specialize (Hmn 3 2); cbn in Hmn; apply Hmn.
 now specialize (Hmn 3 3); cbn in Hmn; apply Hmn.
 Qed.
 
-Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
+Theorem lemma_1_2_2_2_3_3 :
+  rngl_mul_is_comm T = true →
+  rngl_has_opp_or_psub T = true →
+  rngl_has_inv T = true →
+  rngl_is_totally_ordered T = true →
+  ((1 + 2 * (2 * 2)) * 3⁻¹ * 3⁻¹)%L = 1%L.
 Proof.
-destruct_ac.
+intros Hic Hos Hiv Hto.
 destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hos Hc1) as H1.
-  apply matrix_ext.
-  intros * Hi Hj.
   rewrite H1.
   apply H1.
 }
+replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
+rewrite (rngl_of_nat_mul Hos).
+rewrite rngl_of_nat_3.
+rewrite (rngl_mul_mul_swap Hic 3).
+rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
+apply rngl_mul_1_l.
+Qed.
+
+Theorem rot_rot_inv_x : (rot_x * rot_inv_x)%mat = mat_id.
+Proof.
+destruct_ac.
 specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
@@ -400,39 +416,14 @@ rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
-f_equal; try ring. {
-  ring_simplify; fold_rngl.
-  replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
-  rewrite (rngl_of_nat_mul Hos).
-  rewrite rngl_of_nat_3.
-  rewrite (rngl_mul_mul_swap Hic 3).
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  apply rngl_mul_1_l.
-} {
-  ring_simplify; fold_rngl.
-  replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
-  rewrite (rngl_of_nat_mul Hos).
-  rewrite rngl_of_nat_3.
-  rewrite (rngl_mul_mul_swap Hic 3).
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  apply rngl_mul_1_l.
-}
+f_equal; try ring; ring_simplify; fold_rngl.
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 Qed.
 
 Theorem rot_inv_rot_x : (rot_inv_x * rot_x)%mat = mat_id.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hos Hc1) as H1.
-  apply matrix_ext.
-  intros * Hi Hj.
-  rewrite H1.
-  apply H1.
-}
 specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
@@ -440,39 +431,14 @@ rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
-f_equal; try ring. {
-  ring_simplify; fold_rngl.
-  replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
-  rewrite (rngl_of_nat_mul Hos).
-  rewrite rngl_of_nat_3.
-  rewrite (rngl_mul_mul_swap Hic 3).
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  apply rngl_mul_1_l.
-} {
-  ring_simplify; fold_rngl.
-  replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
-  rewrite (rngl_of_nat_mul Hos).
-  rewrite rngl_of_nat_3.
-  rewrite (rngl_mul_mul_swap Hic 3).
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  apply rngl_mul_1_l.
-}
+f_equal; try ring; ring_simplify; fold_rngl.
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 Qed.
 
 Theorem rot_rot_inv_z : (rot_z * rot_inv_z)%mat = mat_id.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hos Hc1) as H1.
-  apply matrix_ext.
-  intros * Hi Hj.
-  rewrite H1.
-  apply H1.
-}
 specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
@@ -480,39 +446,14 @@ rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
-f_equal; try ring. {
-  ring_simplify; fold_rngl.
-  replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
-  rewrite (rngl_of_nat_mul Hos).
-  rewrite rngl_of_nat_3.
-  rewrite (rngl_mul_mul_swap Hic 3).
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  apply rngl_mul_1_l.
-} {
-  ring_simplify; fold_rngl.
-  replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
-  rewrite (rngl_of_nat_mul Hos).
-  rewrite rngl_of_nat_3.
-  rewrite (rngl_mul_mul_swap Hic 3).
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  apply rngl_mul_1_l.
-}
+f_equal; try ring; ring_simplify; fold_rngl.
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 Qed.
 
 Theorem rot_inv_rot_z : (rot_inv_z * rot_z)%mat = mat_id.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hos Hc1) as H1.
-  apply matrix_ext.
-  intros * Hi Hj.
-  rewrite H1.
-  apply H1.
-}
 specialize (rngl_0_le_2 Hos Hto) as H02.
 unfold mat_mul, mat_id; simpl.
 progress unfold rngl_div.
@@ -520,27 +461,9 @@ rewrite Hiv.
 progress repeat rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
-f_equal; try ring. {
-  ring_simplify; fold_rngl.
-  replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
-  rewrite (rngl_of_nat_mul Hos).
-  rewrite rngl_of_nat_3.
-  rewrite (rngl_mul_mul_swap Hic 3).
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  apply rngl_mul_1_l.
-} {
-  ring_simplify; fold_rngl.
-  replace (1 + 2 * (2 * 2))%L with (rngl_of_nat (3 * 3)) by (cbn; ring).
-  rewrite (rngl_of_nat_mul Hos).
-  rewrite rngl_of_nat_3.
-  rewrite (rngl_mul_mul_swap Hic 3).
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  rewrite <- rngl_mul_assoc.
-  rewrite (rngl_mul_inv_diag_r Hiv); [ | apply (rngl_3_neq_0 Hos Hc1 Hto) ].
-  apply rngl_mul_1_l.
-}
+f_equal; try ring; ring_simplify; fold_rngl.
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 Qed.
 
 Theorem mat_of_elem_mul_negf_l :
@@ -719,12 +642,13 @@ do 18 rewrite rngl_mul_assoc.
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
 rewrite Rmult5_sqrt2_sqrt5; [ | easy ].
-...
-assert (H30 : (1 + 2 ≠ 0)%L). {
-  specialize (rngl_characteristic_0 Hch 2) as H1.
-  now cbn in H1; rewrite rngl_add_0_r in H1.
+split. {
+  f_equal; try ring; ring_simplify; fold_rngl.
+  apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
+  apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 }
-split; [ now f_equal; try field | now field ].
+ring_simplify; fold_rngl.
+apply (lemma_1_2_2_2_3_3 Hic Hos Hiv Hto).
 Qed.
 
 Theorem rot_inv_x_is_rotation_matrix : is_rotation_matrix rot_inv_x.
@@ -733,6 +657,7 @@ destruct_ac.
 specialize (rngl_0_le_2 Hos Hto) as H02.
 assert (H30 : (1 + 2 ≠ 0)%L). {
   rewrite rngl_add_comm.
+...
   apply (rngl_3_neq_0 Hos Hc1 Hto).
 }
 progress unfold is_rotation_matrix.
