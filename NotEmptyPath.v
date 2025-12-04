@@ -122,10 +122,15 @@ split. {
       apply rngl_mul_1_l.
     } {
       cbn; rewrite rngl_of_pos_2.
-...
-      now field.
+      progress unfold rngl_div.
+      rewrite Hiv.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | | easy ]. 2: {
+        apply (rngl_3_neq_0 Hos Hc1 Hto).
+      }
+      ring.
     } {
       cbn; rewrite rngl_of_pos_4.
+...
       field_simplify; fold_rngl; [ | easy | easy ].
       do 2 rewrite <- rngl_mul_assoc.
       rewrite (rngl_mul_assoc √_), Hsq2.
