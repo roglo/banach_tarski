@@ -84,17 +84,19 @@ Qed.
 
 Definition orbit_selector := choice_function same_orbit.
 
-...
+Definition sphere r := mkset (λ '(V x y z), (x² + y² + z² = r²)%L).
+Definition ball := mkset (λ '(V x y z), (x² + y² + z² ≤ 1)%L).
 
-Definition sphere r := mkset (λ '(V x y z), (x² + y² + z² = r²)%R).
-Definition ball := mkset (λ '(V x y z), (x² + y² + z² <= 1)%R).
-
-Theorem on_sphere_norm : ∀ p r, (0 ≤ r)%R → p ∈ sphere r ↔ ‖p‖ = r.
+Theorem on_sphere_norm : ∀ p r, (0 ≤ r)%L → p ∈ sphere r ↔ ‖p‖ = r.
 Proof.
+destruct_ac.
 intros (x, y, z) r Hr; simpl.
 split; intros Hp. {
-  now rewrite Hp; apply sqrt_Rsqr.
+  rewrite Hp.
+  rewrite (rl_sqrt_squ Hop Hto).
+  now apply (rngl_abs_nonneg_eq Hop Hor).
 }
+...
 apply (f_equal Rsqr) in Hp.
 rewrite Rsqr_sqrt in Hp; [ easy | ].
 apply nonneg_sqr_vec_norm.
