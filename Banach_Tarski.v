@@ -289,14 +289,19 @@ do 2 apply -> Nat.succ_le_mono.
 apply Nat.le_add_r.
 Qed.
 
-...
+Definition ter_bin_of_vec Hc1 Har r '(V x y z) :=
+  ter_bin_of_frac_part Hc1 Har (x / r)%L.
 
-Definition ter_bin_of_vec r '(V x y z) := ter_bin_of_frac_part (x / r).
-
-Theorem ter_bin_of_ball_surj : ∀ r, 0 < r → ∀ (u : ℕ → bool),
-  ∃ p : vector, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec r p n = u n).
+Theorem ter_bin_of_ball_surj
+  (Hc1 : rngl_characteristic T ≠ 1)
+  (Har : rngl_is_archimedean T = true) :
+  ∀ r, (0 < r)%L → ∀ (u : ℕ → bool),
+  ∃ p : vector T, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec Hc1 Har r p n = u n).
 Proof.
 intros * Hr *.
+...
+About ter_bin_of_frac_part_surj.
+...
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
 exists (V (s * r) (r * √ (1 - s²)) 0); simpl.
 unfold Rdiv; rewrite Rmult_assoc.

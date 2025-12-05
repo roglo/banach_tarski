@@ -828,3 +828,5 @@ intros n; apply H.
 Qed.
 
 End a.
+
+Arguments ter_bin_of_frac_part {T ro rp ac} Hc1 Har x%_L n%_nat.
