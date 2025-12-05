@@ -249,7 +249,7 @@ destruct t, d. {
   do 2 rewrite rngl_add_0_l.
   do 2 rewrite rngl_add_0_r.
   do 9 rewrite rngl_mul_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | ]. 2: {
+  rewrite Rmult5_sqrt2_sqrt5. 2: {
     apply (rngl_0_le_2 Hos Hto).
   }
   do 2 rewrite rngl_of_Z_add.
@@ -268,49 +268,84 @@ destruct t, d. {
 } {
   apply IHel; split; [ | assumption ].
   rewrite <- Hr; simpl.
-...
-  unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite Rmult_0_l.
-  progress repeat rewrite Rplus_0_l.
-  progress repeat rewrite Rplus_0_r.
-  progress repeat rewrite <- Rmult_assoc.
-  progress repeat rewrite mult_IZR.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  rewrite minus_IZR, plus_IZR.
-  progress repeat rewrite mult_IZR.
-  f_equal; f_equal.
-  all : rewrite Rinv_mult; lra.
+  progress unfold rngl_div; rewrite Hiv.
+  rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+  do 2 rewrite rngl_mul_1_l.
+  do 3 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite rngl_add_0_l.
+  do 2 rewrite rngl_add_0_r.
+  do 9 rewrite rngl_mul_assoc.
+  rewrite Rmult5_sqrt2_sqrt5. 2: {
+    apply (rngl_0_le_2 Hos Hto).
+  }
+  rewrite rngl_of_Z_add.
+  rewrite rngl_of_Z_sub.
+  do 3 rewrite rngl_of_Z_mul.
+  cbn.
+  rewrite rngl_of_pos_2.
+  rewrite rngl_of_pos_3.
+  rewrite rngl_of_pos_4.
+  progress unfold IZR.
+  f_equal; f_equal; [ | ring | ring ].
+  rewrite (rngl_mul_comm Hic).
+  do 2 rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
+  rewrite <- rngl_mul_assoc.
+  apply rngl_mul_1_l.
 } {
   apply IHel; split; [ | assumption ].
   rewrite <- Hr; simpl.
-  unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite Rmult_0_l.
-  progress repeat rewrite Rplus_0_l.
-  progress repeat rewrite Rplus_0_r.
-  progress repeat rewrite <- Rmult_assoc.
-  progress repeat rewrite mult_IZR.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  rewrite plus_IZR, minus_IZR.
-  progress repeat rewrite mult_IZR.
-  f_equal; f_equal.
-  all : rewrite Rinv_mult; lra.
+  progress unfold rngl_div; rewrite Hiv.
+  rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+  do 2 rewrite rngl_mul_1_l.
+  do 3 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite rngl_add_0_l.
+  do 2 rewrite rngl_add_0_r.
+  do 9 rewrite rngl_mul_assoc.
+  rewrite Rmult5_sqrt2_sqrt5. 2: {
+    apply (rngl_0_le_2 Hos Hto).
+  }
+  rewrite rngl_of_Z_add.
+  rewrite rngl_of_Z_sub.
+  do 3 rewrite rngl_of_Z_mul.
+  cbn.
+  rewrite rngl_of_pos_2.
+  rewrite rngl_of_pos_3.
+  rewrite rngl_of_pos_4.
+  progress unfold IZR.
+  f_equal; f_equal; [ ring | ring | ].
+  rewrite (rngl_mul_comm Hic).
+  do 2 rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
+  rewrite <- rngl_mul_assoc.
+  apply rngl_mul_1_l.
 } {
   apply IHel; split; [ | assumption ].
   rewrite <- Hr; simpl.
-  unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite Rmult_0_l.
-  progress repeat rewrite Rplus_0_l.
-  progress repeat rewrite Rplus_0_r.
-  progress repeat rewrite <- Rmult_assoc.
-  progress repeat rewrite mult_IZR.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
-  rewrite minus_IZR, plus_IZR.
-  progress repeat rewrite mult_IZR.
-  f_equal; f_equal.
-  all : rewrite Rinv_mult; lra.
+  progress unfold rngl_div; rewrite Hiv.
+  rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+  do 2 rewrite rngl_mul_1_l.
+  do 3 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite rngl_add_0_l.
+  do 2 rewrite rngl_add_0_r.
+  do 9 rewrite rngl_mul_assoc.
+  rewrite Rmult5_sqrt2_sqrt5. 2: {
+    apply (rngl_0_le_2 Hos Hto).
+  }
+  rewrite rngl_of_Z_add.
+  rewrite rngl_of_Z_sub.
+  do 3 rewrite rngl_of_Z_mul.
+  cbn.
+  rewrite rngl_of_pos_2.
+  rewrite rngl_of_pos_3.
+  rewrite rngl_of_pos_4.
+  progress unfold IZR.
+  f_equal; f_equal; [ ring | ring | ].
+  rewrite (rngl_mul_comm Hic).
+  do 2 rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
+  rewrite <- rngl_mul_assoc.
+  apply rngl_mul_1_l.
 }
 Qed.
 
@@ -518,6 +553,7 @@ symmetry in Hu; destruct u as (((a, b), c), len).
 generalize Hu; intros Hv.
 apply rotate_param_rotate in Hv; simpl in Hv.
 rewrite rotate_vec_mul in Hv.
+...
 rewrite Rmult_0_l, Rdiv_0_l, Rdiv_1_r in Hv.
 destruct Hv as (Hv, Hlen).
 rewrite Hv.
