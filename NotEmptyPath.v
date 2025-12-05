@@ -547,14 +547,26 @@ Theorem rotate_0_0_1_b_nonzero : ∀ el el₁ d,
       V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  exists 0%Z, 1%Z, 0%Z, 0.
+  split; [ | easy ].
+  apply vector_ext; intros.
+  rewrite H1; apply H1.
+}
 intros el el₁ d Hel Hn.
 remember (fold_right rotate_param (0, 0, 1, O)%Z el) as u eqn:Hu.
 symmetry in Hu; destruct u as (((a, b), c), len).
 generalize Hu; intros Hv.
-apply rotate_param_rotate in Hv; simpl in Hv.
+apply (rotate_param_rotate Hc1) in Hv; simpl in Hv.
 rewrite rotate_vec_mul in Hv.
-...
-rewrite Rmult_0_l, Rdiv_0_l, Rdiv_1_r in Hv.
+rewrite (rngl_mul_0_l Hos), (rngl_div_0_l Hos Hiq) in Hv. 2: {
+  apply (rngl_1_neq_0 Hc1).
+}
+rewrite (rngl_div_1_r Hiq) in Hv; [ | now left ].
+rewrite rngl_of_pos_1 in Hv.
 destruct Hv as (Hv, Hlen).
 rewrite Hv.
 exists a, b, c, len.
@@ -579,13 +591,26 @@ Theorem rotate_1_0_0_b_nonzero : ∀ el el₁ d,
       V (IZR a/3^k) (IZR b*√2/3^k) (IZR c/3^k) ∧
     (b mod 3 ≠ 0)%Z.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  exists 0%Z, 1%Z, 0%Z, 0.
+  split; [ | easy ].
+  apply vector_ext; intros.
+  rewrite H1; apply H1.
+}
 intros el el₁ d Hel Hn.
 remember (fold_right rotate_param (1, 0, 0, O)%Z el) as u eqn:Hu.
 symmetry in Hu; destruct u as (((a, b), c), len).
 generalize Hu; intros Hv.
-apply rotate_param_rotate in Hv; simpl in Hv.
+apply (rotate_param_rotate Hc1) in Hv; simpl in Hv.
 rewrite rotate_vec_mul in Hv.
-rewrite Rmult_0_l, Rdiv_0_l, Rdiv_1_r in Hv.
+rewrite (rngl_mul_0_l Hos), (rngl_div_0_l Hos Hiq) in Hv. 2: {
+  apply (rngl_1_neq_0 Hc1).
+}
+rewrite (rngl_div_1_r Hiq) in Hv; [ | now left ].
+rewrite rngl_of_pos_1 in Hv.
 destruct Hv as (Hv, Hlen).
 rewrite Hv.
 exists a, b, c, len.
@@ -611,7 +636,8 @@ intros el el₁ d Hel Hn.
 pose proof rotate_1_0_0_b_nonzero el el₁ d Hel Hn as H.
 destruct H as (a, (b, (c, (k, (Hp, Hm))))).
 rewrite Hp; intros H.
-injection H; intros Hc Hb Ha.
+injection H; clear H; intros Hc Hb Ha.
+...
 apply Rmult_integral in Hb.
 destruct Hb as [Hb| Hb]. {
   apply Rmult_integral in Hb.
