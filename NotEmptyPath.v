@@ -252,14 +252,23 @@ destruct t, d. {
   rewrite Rmult5_sqrt2_sqrt5; [ | ]. 2: {
     apply (rngl_0_le_2 Hos Hto).
   }
-...
-  rewrite plus_IZR, plus_IZR.
-  progress repeat rewrite mult_IZR.
-  f_equal; f_equal.
-  all : rewrite Rinv_mult; lra.
+  do 2 rewrite rngl_of_Z_add.
+  do 3 rewrite rngl_of_Z_mul.
+  cbn.
+  rewrite rngl_of_pos_2.
+  rewrite rngl_of_pos_3.
+  rewrite rngl_of_pos_4.
+  progress unfold IZR.
+  f_equal; f_equal; [ | ring | ring ].
+  rewrite (rngl_mul_comm Hic).
+  do 2 rewrite rngl_mul_assoc.
+  rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
+  rewrite <- rngl_mul_assoc.
+  apply rngl_mul_1_l.
 } {
   apply IHel; split; [ | assumption ].
   rewrite <- Hr; simpl.
+...
   unfold Rdiv.
   progress repeat rewrite Rmult_1_l.
   progress repeat rewrite Rmult_0_l.
