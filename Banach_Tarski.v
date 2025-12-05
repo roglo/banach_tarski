@@ -2,13 +2,48 @@
 
 From Stdlib Require Import Arith List Relations Wf_nat.
 Import ListNotations.
+From RingLike Require Import Utf8 Core RealLike.
 
 From a Require Import Misc Words Normalize Reverse MiscReals MiscTrigo.
 From a Require Import Matrix Pset Orbit.
 From a Require Import Partition OrbitRepr GroupTransf Equidecomp.
 From a Require Import Countable RnCountable NotEmptyPath.
 
-Definition set_of_vec (v : vector) := mkset (λ u, u = v).
+Section a.
+
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
+Context {rl : real_like_prop T}.
+(*
+Context {ac : angle_ctx T}.
+
+Theorem strange_let :
+  ∀ x,
+    match
+      (let (_, _, _, _, rngl_opt_opp_or_psub, _, _, _, _) := ro in
+       rngl_opt_opp_or_psub)
+    with
+    | Some (inl rngl_opp) => rngl_opp x
+    | _ => 0%L
+    end = rngl_opp x.
+Proof. easy. Qed.
+
+Ltac fold_rngl :=
+  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul by easy;
+  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero by easy;
+  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
+    with rngl_one by easy;
+  repeat try rewrite strange_let.
+
+Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
+*)
+
+Definition set_of_vec (v : vector T) := mkset (λ u, u = v).
 Arguments set_of_vec v%_vec.
 
 Definition center := set_of_vec 0.
@@ -16,16 +51,22 @@ Definition sphere_sym S := mkset (λ p, (- p)%vec ∈ S).
 
 (* latitude of p₁ relative to p, p being the north pole;
    equal to the dot product and between -1 and 1. *)
-Definition latitude p p₁ := (p · p₁) / (‖p‖ * ‖p₁‖).
+Definition latitude p p₁ := ((p · p₁) / (‖p‖ * ‖p₁‖))%L.
 
 Arguments latitude p%_vec p₁%_vec.
 
-Theorem Rno_intersect_balls_x3_x6 : ∀ x y z,
-  (x - 3)² + y² + z² <= 1
-  → (x - 6)² + y² + z² <= 1
+Notation "6" := (1 + 1 + 1 + 1 + 1 + 1)%L : ring_like_scope.
+
+Theorem Rno_intersect_balls_x3_x6 : ∀ (x y z : T),
+  ((x - 3)² + y² + z² ≤ 1)%L
+  → ((x - 6)² + y² + z² ≤ 1)%L
   → False.
 Proof.
 intros x y z H3 H6.
+...
+Rplus_le_reg_pos_r
+     : ∀ r1 r2 r3 : R, (0 <= r2)%R → (r1 + r2 <= r3)%R → (r1 <= r3)%R
+...
 apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
 apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
 apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
