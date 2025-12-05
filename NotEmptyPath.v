@@ -75,15 +75,6 @@ split. {
   simpl in Hr; simpl.
   progress unfold rngl_div.
   rewrite Hiv.
-(*
-  assert (H12 : (1 + 2)%L ≠ 0%L). {
-    rewrite rngl_add_comm.
-    apply (rngl_3_neq_0 Hos Hc1 Hto).
-  }
-  assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
-    apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
-  }
-*)
   assert (Hsq2 : (√2 * √2)%L = 2%L). {
     rewrite <- rl_sqrt_mul.
     rewrite fold_rngl_squ.
@@ -147,6 +138,7 @@ split. {
     rewrite rngl_of_Z_add.
     rewrite rngl_of_Z_sub.
     do 3 rewrite rngl_of_Z_mul.
+    progress unfold rngl_div; rewrite Hiv.
     f_equal. {
       cbn; rewrite rngl_of_pos_3.
       rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
@@ -159,43 +151,86 @@ split. {
       apply rngl_mul_1_l.
     } {
       cbn; rewrite rngl_of_pos_2.
-(**)
-      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
-      ring_simplify; fold_rngl.
-...
-      now field.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ ring | easy | easy ].
     } {
       cbn; rewrite rngl_of_pos_4.
-      field_simplify; fold_rngl; [ | easy | easy ].
-      do 2 rewrite <- rngl_mul_assoc.
-      rewrite (rngl_mul_assoc √_), Hsq2.
-      now field.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+      ring_simplify; fold_rngl.
+      rewrite <- (rngl_mul_assoc _ _ √_), Hsq2.
+      ring.
     }
   } {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-...
-    rewrite plus_IZR, minus_IZR.
-    progress repeat rewrite mult_IZR.
-    rewrite Rinv_mult.
-    progress repeat rewrite Rmult_1_l.
-    progress repeat rewrite Rmult_0_l.
-    progress repeat rewrite Rplus_0_l.
-    progress repeat rewrite Rplus_0_r.
-    progress repeat rewrite <- Rmult_assoc.
-    unfold Rdiv.
-    rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
+    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+      specialize (rngl_characteristic_1 Hos Hc1) as H1.
+      apply vector_ext; intros.
+      rewrite H1; apply H1.
+    }
+    assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
+    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
+      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
+    }
+    progress unfold IZR.
+    rewrite rngl_of_Z_add.
+    rewrite rngl_of_Z_sub.
+    do 3 rewrite rngl_of_Z_mul.
+    progress unfold rngl_div; rewrite Hiv.
+    f_equal. {
+      cbn; rewrite rngl_of_pos_4.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+      ring_simplify; fold_rngl.
+      rewrite <- (rngl_mul_assoc _ _ √_), Hsq2.
+      ring.
+    } {
+      cbn; rewrite rngl_of_pos_2.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ ring | easy | easy ].
+    } {
+      cbn; rewrite rngl_of_pos_3.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+      ring_simplify; fold_rngl.
+      rewrite (rngl_mul_comm Hic _ 3⁻¹).
+      do 2 rewrite rngl_mul_assoc.
+      rewrite (rngl_add_comm 1 2).
+      rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
+      symmetry; rewrite <- rngl_mul_assoc.
+      apply rngl_mul_1_l.
+    }
   } {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-    rewrite plus_IZR, minus_IZR.
-    progress repeat rewrite mult_IZR.
-    rewrite Rinv_mult.
-    progress repeat rewrite Rmult_1_l.
-    progress repeat rewrite Rmult_0_l.
-    progress repeat rewrite Rplus_0_l.
-    progress repeat rewrite Rplus_0_r.
-    progress repeat rewrite <- Rmult_assoc.
-    unfold Rdiv.
-    rewrite Rmult5_sqrt2_sqrt5; [ f_equal; lra | lra ].
+    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+      specialize (rngl_characteristic_1 Hos Hc1) as H1.
+      apply vector_ext; intros.
+      rewrite H1; apply H1.
+    }
+    assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
+    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
+      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
+    }
+    progress unfold IZR.
+    rewrite rngl_of_Z_add.
+    rewrite rngl_of_Z_sub.
+    do 3 rewrite rngl_of_Z_mul.
+    progress unfold rngl_div; rewrite Hiv.
+    f_equal. {
+      cbn; rewrite rngl_of_pos_4.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+      ring_simplify; fold_rngl.
+      rewrite <- (rngl_mul_assoc _ _ √_), Hsq2.
+      ring.
+    } {
+      cbn; rewrite rngl_of_pos_2.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ ring | easy | easy ].
+    } {
+      cbn; rewrite rngl_of_pos_3.
+      rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+      ring_simplify; fold_rngl.
+      rewrite (rngl_mul_comm Hic _ 3⁻¹).
+      do 2 rewrite rngl_mul_assoc.
+      rewrite (rngl_add_comm 1 2).
+      rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
+      symmetry; rewrite <- rngl_mul_assoc.
+      apply rngl_mul_1_l.
+    }
   }
 }
 intros Hr.
@@ -203,6 +238,7 @@ revert x y z n a₁ b₁ c₁ N₁ Hr.
 induction el as [| e] using rev_ind; intros. {
   simpl in Hr; simpl; rewrite Nat.add_0_r in Hr.
   destruct Hr as (Hr, Hn); subst N₁.
+...
   unfold Rdiv in Hr.
   injection Hr; intros Hz Hy Hx.
   f_equal; f_equal; f_equal. {
