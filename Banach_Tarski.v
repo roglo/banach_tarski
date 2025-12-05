@@ -1,8 +1,10 @@
 (* Banach-Tarski paradox. *)
 
+Set Nested Proofs Allowed.
 From Stdlib Require Import Arith List Relations Wf_nat.
 Import ListNotations.
 From RingLike Require Import Utf8 Core RealLike.
+From TrigoWithoutPi Require Import Core.
 
 From a Require Import Misc Words Normalize Reverse MiscReals MiscTrigo.
 From a Require Import Matrix Pset Orbit.
@@ -15,9 +17,9 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
-(*
 Context {ac : angle_ctx T}.
 
+(*
 Theorem strange_let :
   ∀ x,
     match
@@ -55,30 +57,96 @@ Definition latitude p p₁ := ((p · p₁) / (‖p‖ * ‖p₁‖))%L.
 
 Arguments latitude p%_vec p₁%_vec.
 
+Notation "5" := (1 + 1 + 1 + 1 + 1)%L : ring_like_scope.
 Notation "6" := (1 + 1 + 1 + 1 + 1 + 1)%L : ring_like_scope.
 
-Theorem Rno_intersect_balls_x3_x6 : ∀ (x y z : T),
+Theorem rngl_add_le_reg_pos_r :
+  rngl_has_opp_or_psub T = true →
+  rngl_is_ordered T = true →
+  ∀ a b c, (0 ≤ b)%L → (a + b ≤ c)%L → (a ≤ c)%L.
+Proof.
+intros Hos Hor * Hzb Habc.
+eapply (rngl_le_trans Hor); [ | apply Habc ].
+now apply (rngl_le_add_r Hos Hor).
+Qed.
+
+Theorem Rno_intersect_balls_x3_x6 :
+  rngl_characteristic T ≠ 1 →
+  ∀ (x y z : T),
   ((x - 3)² + y² + z² ≤ 1)%L
   → ((x - 6)² + y² + z² ≤ 1)%L
   → False.
 Proof.
+destruct_ac.
+intros Hc1.
 intros x y z H3 H6.
-...
-Rplus_le_reg_pos_r
-     : ∀ r1 r2 r3 : R, (0 <= r2)%R → (r1 + r2 <= r3)%R → (r1 <= r3)%R
-...
-apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
-apply Rplus_le_reg_pos_r in H3; [ | apply Rle_0_sqr ].
-apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
-apply Rplus_le_reg_pos_r in H6; [ | apply Rle_0_sqr ].
-clear - H3 H6.
-rewrite <- Rsqr_1 in H3.
-rewrite <- Rsqr_1 in H6.
-apply Rsqr_le_abs_0 in H3.
-apply Rsqr_le_abs_0 in H6.
-rewrite Rabs_R1 in H3, H6.
-unfold Rabs in H3, H6.
-destruct (Rcase_abs (x - 3)), (Rcase_abs (x - 6)); lra.
+apply (rngl_add_le_reg_pos_r Hos Hor) in H3. 2: {
+  apply (rngl_squ_nonneg Hos Hto).
+}
+apply (rngl_add_le_reg_pos_r Hos Hor) in H3. 2: {
+  apply (rngl_squ_nonneg Hos Hto).
+}
+apply (rngl_add_le_reg_pos_r Hos Hor) in H6. 2: {
+  apply (rngl_squ_nonneg Hos Hto).
+}
+apply (rngl_add_le_reg_pos_r Hos Hor) in H6. 2: {
+  apply (rngl_squ_nonneg Hos Hto).
+}
+rewrite <- rngl_squ_1 in H3 at 4.
+rewrite <- rngl_squ_1 in H6 at 7.
+apply (rngl_squ_le_abs_le Hop Hiq Hto) in H3.
+apply (rngl_squ_le_abs_le Hop Hiq Hto) in H6.
+rewrite (rngl_abs_1 Hos Hto) in H3.
+rewrite (rngl_abs_1 Hos Hto) in H6.
+progress unfold rngl_abs in H3, H6.
+rewrite (rngl_leb_sub_0 Hop Hor) in H3, H6.
+remember (x ≤? 3)%L as x3 eqn:Hx3; symmetry in Hx3.
+remember (x ≤? 6)%L as x6 eqn:Hx6; symmetry in Hx6.
+destruct x3. {
+  apply rngl_leb_le in Hx3.
+  rewrite (rngl_opp_sub_distr Hop) in H3.
+  apply (rngl_le_sub_le_add_l Hop Hor) in H3.
+  apply (rngl_add_le_mono_r Hos Hor) in H3.
+  destruct x6. {
+    apply rngl_leb_le in Hx6.
+    rewrite (rngl_opp_sub_distr Hop) in H6.
+    apply (rngl_le_sub_le_add_l Hop Hor) in H6.
+    apply (rngl_add_le_mono_r Hos Hor) in H6.
+    apply (rngl_nlt_ge Hor) in H6.
+    apply H6; clear H6.
+    apply (rngl_le_lt_trans Hor _ 3); [ easy | ].
+    do 2 apply (rngl_add_lt_mono_r Hos Hor).
+    apply (rngl_lt_add_l Hos Hor).
+    apply (rngl_0_lt_2 Hos Hc1 Hto).
+  }
+  apply rngl_leb_nle in Hx6.
+  apply Hx6; clear Hx6.
+  apply (rngl_le_trans Hor _ 3); [ easy | ].
+  do 2 apply (rngl_add_le_mono_r Hos Hor).
+  apply (rngl_le_add_l Hos Hor).
+  apply (rngl_le_trans Hor _ 2).
+  apply (rngl_0_le_2 Hos Hto).
+  apply (rngl_add_le_mono_r Hos Hor).
+  apply (rngl_1_le_2 Hos Hto).
+}
+apply (rngl_le_sub_le_add_l Hop Hor) in H3.
+destruct x6. {
+  rewrite (rngl_opp_sub_distr Hop) in H6.
+  apply (rngl_le_sub_le_add_l Hop Hor) in H6.
+  apply (rngl_add_le_mono_r Hos Hor) in H6.
+  apply (rngl_nlt_ge Hor) in H6.
+  apply H6; clear H6.
+  apply (rngl_le_lt_trans Hor _ 4); [ easy | ].
+  do 3 apply (rngl_add_lt_mono_r Hos Hor).
+  apply (rngl_lt_add_l Hos Hor).
+  apply (rngl_0_lt_1 Hos Hc1 Hto).
+}
+apply rngl_leb_nle in Hx6.
+apply Hx6; clear Hx6.
+apply (rngl_le_trans Hor _ 4); [ easy | ].
+do 3 apply (rngl_add_lt_mono_r Hos Hor).
+apply (rngl_lt_add_l Hos Hor).
+apply (rngl_0_lt_2 Hos Hc1 Hto).
 Qed.
 
 Definition rot_elem e := Rot (mat_of_elem e) (rotate_is_rotation_matrix e).
@@ -118,6 +186,7 @@ intros * (x, y, z); split; [ intros (H3, H6); simpl | easy ].
 simpl in H3, H6.
 destruct H3 as (H3, _).
 destruct H6 as (H6, _).
+...
 rewrite Ropp_0 in H3, H6; do 2 rewrite Rplus_0_r in H3, H6.
 rewrite fold_Rminus in H3, H6.
 now apply (Rno_intersect_balls_x3_x6 x y z).

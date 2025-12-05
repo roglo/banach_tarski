@@ -536,3 +536,5 @@ now apply IHj.
 Qed.
 
 End a.
+
+Arguments Transl {T ro} u%_vec.
