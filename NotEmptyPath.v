@@ -627,49 +627,66 @@ replace (S (length el₁)) with (length el) in Hu. {
 subst; rewrite length_app, Nat.add_1_r; reflexivity.
 Qed.
 
-Theorem rotate_1_0_0_is_diff : ∀ el el₁ d,
+Theorem rotate_1_0_0_is_diff :
+  rngl_characteristic T ≠ 1 →
+  ∀ el el₁ d,
   el = el₁ ++ [FE lb d]
   → norm_list el = el
   → (mat_of_path el * V 1 0 0)%vec ≠ V 1 0 0.
 Proof.
-intros el el₁ d Hel Hn.
+destruct_ac.
+intros Hc1 el el₁ d Hel Hn.
 pose proof rotate_1_0_0_b_nonzero el el₁ d Hel Hn as H.
 destruct H as (a, (b, (c, (k, (Hp, Hm))))).
 rewrite Hp; intros H.
 injection H; clear H; intros Hc Hb Ha.
-...
-apply Rmult_integral in Hb.
-destruct Hb as [Hb| Hb]. {
-  apply Rmult_integral in Hb.
-  destruct Hb as [Hb| Hb]. {
-    apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
-  }
-  revert Hb; apply sqrt2_neq_0.
+progress unfold rngl_div in Hb; rewrite Hiv in Hb.
+apply (rngl_eq_mul_0_l Hos Hiq) in Hb. 2: {
+  apply (rngl_inv_neq_0 Hos Hiv).
+  apply (rngl_pow_neq_0 Hos Hiq).
+  apply (rngl_3_neq_0 Hos Hc1 Hto).
 }
-apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
-rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
+apply (rngl_eq_mul_0_l Hos Hiq) in Hb. 2: {
+  intros H.
+  apply (eq_rl_sqrt_0 Hos) in H.
+  now apply (rngl_2_neq_0 Hos Hc1 Hto) in H.
+  apply (rngl_0_le_2 Hos Hto).
+}
+progress unfold IZR in Hb.
+replace 0%L with (rngl_of_Z 0) in Hb by easy.
+apply (rngl_of_Z_inj Hc1) in Hb.
+now subst b.
 Qed.
 
-Theorem rotate_0_0_1_is_diff : ∀ el el₁ d,
+Theorem rotate_0_0_1_is_diff :
+  rngl_characteristic T ≠ 1 →
+  ∀ el el₁ d,
   el = el₁ ++ [FE la d]
   → norm_list el = el
   → (mat_of_path el * V 0 0 1)%vec ≠ V 0 0 1.
 Proof.
-intros el el₁ d Hel Hn.
+destruct_ac.
+intros Hc1 el el₁ d Hel Hn.
 specialize (rotate_0_0_1_b_nonzero el el₁ d Hel Hn) as H.
 destruct H as (a, (b, (c, (k, (Hp, Hm))))).
 rewrite Hp; intros H.
-injection H; intros Hc Hb Ha.
-apply Rmult_integral in Hb.
-destruct Hb as [Hb| Hb]. {
- apply Rmult_integral in Hb.
- destruct Hb as [Hb| Hb]. {
-   apply eq_IZR_R0 in Hb; subst b; apply Hm; reflexivity.
- }
- revert Hb; apply sqrt2_neq_0.
+injection H; clear H; intros Hc Hb Ha.
+progress unfold rngl_div in Hb; rewrite Hiv in Hb.
+apply (rngl_eq_mul_0_l Hos Hiq) in Hb. 2: {
+  apply (rngl_inv_neq_0 Hos Hiv).
+  apply (rngl_pow_neq_0 Hos Hiq).
+  apply (rngl_3_neq_0 Hos Hc1 Hto).
 }
-apply Rmult_eq_compat_r with (r := (3 ^ k)%R) in Hb.
-rewrite Rinv_l in Hb; [ lra | apply pow_nonzero; lra ].
+apply (rngl_eq_mul_0_l Hos Hiq) in Hb. 2: {
+  intros H.
+  apply (eq_rl_sqrt_0 Hos) in H.
+  now apply (rngl_2_neq_0 Hos Hc1 Hto) in H.
+  apply (rngl_0_le_2 Hos Hto).
+}
+progress unfold IZR in Hb.
+replace 0%L with (rngl_of_Z 0) in Hb by easy.
+apply (rngl_of_Z_inj Hc1) in Hb.
+now subst b.
 Qed.
 
 Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
@@ -686,6 +703,7 @@ rewrite rev_path_cons, rev_path_single in Hel₁.
 destruct e₁ as (t, d).
 intros H.
 destruct t. {
+...
   apply rotate_0_0_1_is_diff in Hel₁; [ | apply norm_list_idemp ].
   now rewrite mat_of_path_norm, H, mat_vec_mul_id in Hel₁.
 } {
