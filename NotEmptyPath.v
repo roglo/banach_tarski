@@ -689,11 +689,13 @@ apply (rngl_of_Z_inj Hc1) in Hb.
 now subst b.
 Qed.
 
-Theorem matrix_of_non_empty_path_is_not_identity : ∀ el,
+Theorem matrix_of_non_empty_path_is_not_identity :
+  rngl_characteristic T ≠ 1 →
+  ∀ el,
   norm_list el ≠ []
   → mat_of_path el ≠ mat_id.
 Proof.
-intros * Hn.
+intros Hc1 * Hn.
 remember (rev_path (norm_list el)) as el₁ eqn:Hel₁.
 symmetry in Hel₁.
 destruct el₁ as [| e₁ el₁]; [ now apply rev_path_is_nil in Hel₁ | ].
@@ -703,21 +705,21 @@ rewrite rev_path_cons, rev_path_single in Hel₁.
 destruct e₁ as (t, d).
 intros H.
 destruct t. {
-...
-  apply rotate_0_0_1_is_diff in Hel₁; [ | apply norm_list_idemp ].
+  apply (rotate_0_0_1_is_diff Hc1) in Hel₁; [ | apply norm_list_idemp ].
   now rewrite mat_of_path_norm, H, mat_vec_mul_id in Hel₁.
 } {
-  apply rotate_1_0_0_is_diff in Hel₁; [ | apply norm_list_idemp ].
+  apply (rotate_1_0_0_is_diff Hc1) in Hel₁; [ | apply norm_list_idemp ].
   now rewrite mat_of_path_norm, H, mat_vec_mul_id in Hel₁.
 }
 Qed.
 
 Definition is_a_rotation_π M := M = mat_transp M ∧ M ≠ mat_id.
 
-Theorem mat_of_path_is_not_rotation_π : ∀ el,
-  ¬ is_a_rotation_π (mat_of_path el).
+Theorem mat_of_path_is_not_rotation_π :
+  rngl_characteristic T ≠ 1 →
+  ∀ el, ¬ is_a_rotation_π (mat_of_path el).
 Proof.
-intros el H.
+intros Hc1 el H.
 unfold is_a_rotation_π in H.
 destruct H as (Hmt, Hid).
 remember (mat_of_path el) as M eqn:HM.
@@ -728,7 +730,7 @@ assert (Hr : is_rotation_matrix M). {
 }
 assert (HMI : (M * M = mat_id)%mat). {
   rewrite Hmt at 2.
-  now destruct Hr.
+  now apply rotation_mat_mul_transp_r.
 }
 rewrite <- mat_of_path_norm in HM.
 remember (norm_list el) as nel eqn:Hnel.
@@ -737,7 +739,7 @@ destruct nel as [| e nel]; [ easy | ].
 rewrite HM in HMI.
 rewrite <- mat_of_path_app in HMI.
 exfalso; revert HMI.
-apply matrix_of_non_empty_path_is_not_identity.
+apply (matrix_of_non_empty_path_is_not_identity Hc1).
 rewrite <- Hnel.
 intros H.
 apply norm_list_app_is_nil in H. {
@@ -759,3 +761,5 @@ rewrite IHn; simpl.
 unfold mat_of_path; simpl.
 now rewrite mat_mul_id_r.
 Qed.
+
+End a.

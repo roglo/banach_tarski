@@ -79,6 +79,30 @@ Definition mat_const_mul k (M : matrix T) :=
     (k * a₂₁ M) (k * a₂₂ M) (k * a₂₃ M)
     (k * a₃₁ M) (k * a₃₂ M) (k * a₃₃ M).
 
+Definition mat_mul M₁ M₂ :=
+  mkmat
+    (a₁₁ M₁ * a₁₁ M₂ + a₁₂ M₁ * a₂₁ M₂ + a₁₃ M₁ * a₃₁ M₂)
+    (a₁₁ M₁ * a₁₂ M₂ + a₁₂ M₁ * a₂₂ M₂ + a₁₃ M₁ * a₃₂ M₂)
+    (a₁₁ M₁ * a₁₃ M₂ + a₁₂ M₁ * a₂₃ M₂ + a₁₃ M₁ * a₃₃ M₂)
+    (a₂₁ M₁ * a₁₁ M₂ + a₂₂ M₁ * a₂₁ M₂ + a₂₃ M₁ * a₃₁ M₂)
+    (a₂₁ M₁ * a₁₂ M₂ + a₂₂ M₁ * a₂₂ M₂ + a₂₃ M₁ * a₃₂ M₂)
+    (a₂₁ M₁ * a₁₃ M₂ + a₂₂ M₁ * a₂₃ M₂ + a₂₃ M₁ * a₃₃ M₂)
+    (a₃₁ M₁ * a₁₁ M₂ + a₃₂ M₁ * a₂₁ M₂ + a₃₃ M₁ * a₃₁ M₂)
+    (a₃₁ M₁ * a₁₂ M₂ + a₃₂ M₁ * a₂₂ M₂ + a₃₃ M₁ * a₃₂ M₂)
+    (a₃₁ M₁ * a₁₃ M₂ + a₃₂ M₁ * a₂₃ M₂ + a₃₃ M₁ * a₃₃ M₂).
+
+Definition mat_id :=
+  mkmat
+    1 0 0
+    0 1 0
+    0 0 1.
+
+Fixpoint mat_pow M n :=
+  match n with
+  | O => mat_id
+  | S n' => mat_mul M (mat_pow M n')
+  end.
+
 End a.
 
 Arguments mkrmat {T} (a₁₁ a₁₂ a₁₃ a₂₁ a₂₂ a₂₃ a₃₁ a₃₂ a₃₃)%_L.
@@ -99,6 +123,14 @@ Notation "u · v" := (vec_dot_mul u v) (at level 44, left associativity).
 Notation "u × v" := (vec_cross_mul u v) (at level 40, no associativity).
 Notation "v ²" := (vec_dot_mul v v) : vec_scope.
 Notation "‖ v ‖" := (vec_norm v) (at level 0, v at level 0, format "‖ v ‖").
+
+Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
+Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.
+Notation "M₁ * M₂" := (mat_mul M₁ M₂) : mat_scope.
+Notation "k ⁎ M" := (mat_const_mul k M) : mat_scope.
+Notation "M ⁄ k" := (mat_const_mul (k⁻¹) M) : mat_scope.
+Notation "- M" := (mat_opp M) : mat_scope.
+Notation "M ^ n" := (mat_pow M n) : mat_scope.
 
 Section a.
 
@@ -157,41 +189,6 @@ Definition mat_of_elem e :=
   end.
 
 Definition rotate e pt := mat_vec_mul (mat_of_elem e) pt.
-
-Definition mat_mul M₁ M₂ :=
-  mkmat
-    (a₁₁ M₁ * a₁₁ M₂ + a₁₂ M₁ * a₂₁ M₂ + a₁₃ M₁ * a₃₁ M₂)
-    (a₁₁ M₁ * a₁₂ M₂ + a₁₂ M₁ * a₂₂ M₂ + a₁₃ M₁ * a₃₂ M₂)
-    (a₁₁ M₁ * a₁₃ M₂ + a₁₂ M₁ * a₂₃ M₂ + a₁₃ M₁ * a₃₃ M₂)
-    (a₂₁ M₁ * a₁₁ M₂ + a₂₂ M₁ * a₂₁ M₂ + a₂₃ M₁ * a₃₁ M₂)
-    (a₂₁ M₁ * a₁₂ M₂ + a₂₂ M₁ * a₂₂ M₂ + a₂₃ M₁ * a₃₂ M₂)
-    (a₂₁ M₁ * a₁₃ M₂ + a₂₂ M₁ * a₂₃ M₂ + a₂₃ M₁ * a₃₃ M₂)
-    (a₃₁ M₁ * a₁₁ M₂ + a₃₂ M₁ * a₂₁ M₂ + a₃₃ M₁ * a₃₁ M₂)
-    (a₃₁ M₁ * a₁₂ M₂ + a₃₂ M₁ * a₂₂ M₂ + a₃₃ M₁ * a₃₂ M₂)
-    (a₃₁ M₁ * a₁₃ M₂ + a₃₂ M₁ * a₂₃ M₂ + a₃₃ M₁ * a₃₃ M₂).
-
-Definition mat_id :=
-  mkmat
-    1 0 0
-    0 1 0
-    0 0 1.
-
-Fixpoint mat_pow M n :=
-  match n with
-  | O => mat_id
-  | S n' => mat_mul M (mat_pow M n')
-  end.
-
-Notation "M₁ + M₂" := (mat_add M₁ M₂) : mat_scope.
-Notation "M₁ - M₂" := (mat_sub M₁ M₂) : mat_scope.
-Notation "M₁ * M₂" := (mat_mul M₁ M₂) : mat_scope.
-Notation "k ⁎ M" := (mat_const_mul k M) : mat_scope.
-Notation "M ⁄ k" := (mat_const_mul (k⁻¹) M) : mat_scope.
-Notation "- M" := (mat_opp M) : mat_scope.
-Notation "M ^ n" := (mat_pow M n) : mat_scope.
-
-Arguments mat_pow M%_mat n%_nat.
-Arguments mat_mul M₁%_mat M₂%_mat.
 
 Theorem vec_eq_dec : ∀ u v : vector T, { u = v } + { u ≠ v }.
 Proof.
