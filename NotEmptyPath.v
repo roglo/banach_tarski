@@ -242,14 +242,17 @@ rewrite fold_right_app in Hr; simpl in Hr.
 destruct t, d. {
   apply IHel; split; [ | assumption ].
   rewrite <- Hr; simpl.
+  progress unfold rngl_div; rewrite Hiv.
+  rewrite (rngl_inv_mul_distr Hos Hiv); [ | easy | easy ].
+  do 2 rewrite rngl_mul_1_l.
+  do 3 rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite rngl_add_0_l.
+  do 2 rewrite rngl_add_0_r.
+  do 9 rewrite rngl_mul_assoc.
+  rewrite Rmult5_sqrt2_sqrt5; [ | ]. 2: {
+    apply (rngl_0_le_2 Hos Hto).
+  }
 ...
-  unfold Rdiv.
-  progress repeat rewrite Rmult_1_l.
-  progress repeat rewrite Rmult_0_l.
-  progress repeat rewrite Rplus_0_l.
-  progress repeat rewrite Rplus_0_r.
-  progress repeat rewrite <- Rmult_assoc.
-  rewrite Rmult5_sqrt2_sqrt5; [ | lra ].
   rewrite plus_IZR, plus_IZR.
   progress repeat rewrite mult_IZR.
   f_equal; f_equal.
