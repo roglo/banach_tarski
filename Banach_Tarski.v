@@ -180,27 +180,34 @@ now rewrite transl_0, HEF₁.
 Qed.
 
 Theorem separated_balls_without_fixpoints :
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
   (transl (V 3 0 0) (ball ∖ D) ∩ transl (V 6 0 0) (ball ∖ D) = ∅)%S.
 Proof.
+intros Hop Hc1.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * (x, y, z); split; [ intros (H3, H6); simpl | easy ].
 simpl in H3, H6.
 destruct H3 as (H3, _).
 destruct H6 as (H6, _).
-...
-rewrite Ropp_0 in H3, H6; do 2 rewrite Rplus_0_r in H3, H6.
-rewrite fold_Rminus in H3, H6.
-now apply (Rno_intersect_balls_x3_x6 x y z).
+do 3 rewrite (rngl_add_opp_r Hop) in H3, H6.
+do 2 rewrite (rngl_sub_0_r Hos) in H3, H6.
+now apply (Rno_intersect_balls_x3_x6 Hc1 x y z).
 Qed.
 
 Theorem separated_balls :
+  rngl_has_opp T = true →
+  rngl_characteristic T ≠ 1 →
   (transl (V 3 0 0) ball ∩ transl (V 6 0 0) ball = ∅)%S.
 Proof.
+intros Hop Hc1.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
 intros * (x, y, z); split; [ intros (H3, H6) | easy ].
 unfold ball in H3, H6.
 simpl in H3, H6.
-rewrite Ropp_0 in H3, H6; do 2 rewrite Rplus_0_r in H3, H6.
-rewrite fold_Rminus in H3, H6.
-now apply (Rno_intersect_balls_x3_x6 x y z).
+do 3 rewrite (rngl_add_opp_r Hop) in H3, H6.
+do 2 rewrite (rngl_sub_0_r Hos) in H3, H6.
+now apply (Rno_intersect_balls_x3_x6 Hc1 x y z).
 Qed.
 
 Definition nat_of_free_elem e : nat :=
@@ -281,6 +288,8 @@ rewrite <- Nat.add_succ_comm; cbn.
 do 2 apply -> Nat.succ_le_mono.
 apply Nat.le_add_r.
 Qed.
+
+...
 
 Definition ter_bin_of_vec r '(V x y z) := ter_bin_of_frac_part (x / r).
 
