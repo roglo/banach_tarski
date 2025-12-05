@@ -13,18 +13,15 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
+(*
 Context {Hch : rngl_characteristic T = 0}.
 Context {Hc1 : rngl_characteristic T ≠ 1}.
+*)
 Context {Har : rngl_is_archimedean T = true}.
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
-Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
 
-Definition ter_bin_of_frac_part x n := (1 / 3 ≤? frac_part Hc1 Har (x * 3 ^ n))%L.
-(*
-Definition ter_bin_of_frac_part x n :=
-  if (frac_part (x * 3 ^ n) <? (1 / 3))%L then false else true.
-*)
+Definition ter_bin_of_frac_part Hc1 x n := (1 / 3 ≤? frac_part Hc1 Har (x * 3 ^ n))%L.
 
 Fixpoint partial_sum3_aux k (u : nat → bool) pow i :=
   match k with
@@ -46,12 +43,15 @@ Fixpoint n_partial_sum3 (u : ℕ → bool) c :=
 Definition b2r b := INR (Nat.b2n b).
 
 Theorem partial_sum3_aux_le_half_pow :
+  rngl_characteristic T = 0 →
   ∀ u k pow pow2 i,
   (0 ≤ pow)%L
   → pow2 = (pow / 2)%L
   → (partial_sum3_aux k u pow i ≤ pow2)%L.
 Proof.
 destruct_ac.
+intros Hch.
+set (Hc1 := eq_ind_r (λ n : ℕ, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch).
 specialize (rngl_2_neq_0 Hos Hc1 Hto) as H20.
 assert (H30 : (3 ≠ 0)%L). {
   replace 3%L with (rngl_of_nat 3). 2: {
@@ -111,13 +111,15 @@ apply (rngl_mul_nonneg_nonneg Hos Hor); [ easy | ].
 apply (rngl_0_le_2 Hos Hto).
 Qed.
 
-Theorem partial_sum3_aux_succ : ∀ u n pow i,
+Theorem partial_sum3_aux_succ :
+  rngl_characteristic T ≠ 1 →
+  ∀ u n pow i,
   partial_sum3_aux (S n) u pow i =
   (partial_sum3_aux n u pow i +
    INR (Nat.b2n (u (i + n)%nat)) * pow / 3 ^ S n)%L.
 Proof.
 destruct_ac.
-intros.
+intros Hc1 *.
 revert pow i.
 induction n; intros. {
   simpl; rewrite rngl_add_0_r, rngl_add_0_l, rngl_mul_1_r, Nat.add_0_r.
@@ -158,24 +160,28 @@ destruct bi. {
 }
 Qed.
 
-Theorem partial_sum3_succ : ∀ u n,
+Theorem partial_sum3_succ :
+  rngl_characteristic T ≠ 1 →
+  ∀ u n,
   (partial_sum3 u (S n) =
    partial_sum3 u n + INR (Nat.b2n (u n)) / 3 ^ S n)%L.
 Proof.
 destruct_ac.
-intros.
+intros Hc1 *.
 unfold partial_sum3.
-rewrite partial_sum3_aux_succ.
+rewrite (partial_sum3_aux_succ Hc1).
 now rewrite rngl_mul_1_r.
 Qed.
 
-Theorem partial_sum3_aux_add : ∀ u k₁ k₂ pow i,
+Theorem partial_sum3_aux_add :
+  rngl_characteristic T ≠ 1 →
+  ∀ u k₁ k₂ pow i,
   partial_sum3_aux (k₁ + k₂) u pow i =
   (partial_sum3_aux k₁ u pow i +
    partial_sum3_aux k₂ u (pow / 3 ^ k₁) (i + k₁))%L.
 Proof.
 destruct_ac.
-intros.
+intros Hc1 *.
 revert k₂ pow i.
 induction k₁; intros. {
   simpl.
@@ -203,12 +209,14 @@ progress f_equal.
 apply IHk₁.
 Qed.
 
-Theorem partial_sum3_aux_nonneg : ∀ u k pos i,
+Theorem partial_sum3_aux_nonneg :
+  rngl_characteristic T ≠ 1 →
+  ∀ u k pos i,
   (0 ≤ pos)%L
   → (0 ≤ partial_sum3_aux k u pos i)%L.
 Proof.
 destruct_ac.
-intros * Hpos.
+intros Hc1 * Hpos.
 revert pos i Hpos.
 induction k; intros; simpl; [ apply (rngl_le_refl Hor) | ].
 assert (H : (0 ≤ pos / 3)%L). {
@@ -220,8 +228,13 @@ apply (rngl_le_0_add Hos Hor); [ easy | ].
 now apply IHk.
 Qed.
 
-Theorem partial_sum3_upper_bound : ∀ u n k,
-  (partial_sum3 u k ≤ partial_sum3 u n + (2 * 3 ^ n)⁻¹)%L.
+Context {Hch : rngl_characteristic T = 0}.
+Context {Hc1 : rngl_characteristic T ≠ 1}.
+
+Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
+
+Theorem partial_sum3_upper_bound :
+  ∀ u n k, (partial_sum3 u k ≤ partial_sum3 u n + (2 * 3 ^ n)⁻¹)%L.
 Proof.
 destruct_ac.
 intros.
@@ -249,10 +262,10 @@ destruct (le_dec k n) as [Hkn| Hkn]. {
     now subst nk; rewrite Nat.add_comm, Nat.sub_add.
   }
   subst n.
-  rewrite partial_sum3_aux_add, Nat.add_0_l, <- rngl_add_assoc.
+  rewrite (partial_sum3_aux_add Hc1), Nat.add_0_l, <- rngl_add_assoc.
   apply (rngl_le_add_r Hos Hor).
   apply (rngl_le_0_add Hos Hor); [ | apply Hzi ].
-  apply partial_sum3_aux_nonneg.
+  apply (partial_sum3_aux_nonneg Hc1).
   apply (rngl_div_nonneg Hop Hiv Hto).
   apply (rngl_0_le_1 Hos Hto).
   apply (rngl_pow_pos_pos Hop Hiv Hto).
@@ -265,7 +278,7 @@ assert (Hn : (k = n + nk)%nat). {
   now apply Nat.lt_le_incl.
 }
 subst k; clear Hnk Hkn; rename nk into k.
-rewrite partial_sum3_aux_add, Nat.add_0_l.
+rewrite (partial_sum3_aux_add Hc1), Nat.add_0_l.
 apply (rngl_add_le_mono_l Hos Hor).
 revert n.
 induction k; intros; simpl; [ apply Hzi | ].
@@ -286,7 +299,7 @@ destruct b. {
     apply (rngl_2_neq_0 Hos Hc1 Hto).
   }
   field_simplify. {
-    apply partial_sum3_aux_le_half_pow; [ | easy ].
+    apply (partial_sum3_aux_le_half_pow Hch); [ | easy ].
     apply (rngl_div_nonneg Hop Hiv Hto).
     apply (rngl_div_nonneg Hop Hiv Hto).
     apply (rngl_0_le_1 Hos Hto).
@@ -366,9 +379,9 @@ induction k; intros; [ simpl; destruct (u i); unfold b2r; simpl | ]. {
   apply (rngl_div_0_l Hos Hi1).
   apply (rngl_3_neq_0 Hos Hc1 Hto).
 }
-rewrite partial_sum3_aux_succ.
+rewrite (partial_sum3_aux_succ Hc1).
 rewrite IHk.
-rewrite partial_sum3_aux_succ.
+rewrite (partial_sum3_aux_succ Hc1).
 do 3 rewrite (rngl_div_add_distr_r Hiv).
 rewrite <- (rngl_add_assoc (_ / _)).
 progress f_equal; cbn.
@@ -411,8 +424,7 @@ destruct_ac.
 intros.
 unfold partial_sum3.
 induction n; [ cbn; ring | ].
-rewrite partial_sum3_aux_succ, n_partial_sum3_succ.
-(**)
+rewrite (partial_sum3_aux_succ Hc1), n_partial_sum3_succ.
 field_simplify. 2: {
   apply (rngl_pow_neq_0 Hos Hiq).
   apply (rngl_3_neq_0 Hos Hc1 Hto).
@@ -439,7 +451,7 @@ apply (rngl_pow_pos_pos Hop Hiv Hto).
 apply (rngl_0_lt_3 Hos Hc1 Hto).
 apply (rngl_lt_sub_lt_add_l Hop Hor).
 eapply (rngl_le_lt_trans Hor); [ apply Hr2 | ].
-rewrite partial_sum3_succ.
+rewrite (partial_sum3_succ Hc1).
 rewrite <- rngl_add_assoc.
 apply (rngl_add_lt_mono_l Hos Hor).
 rewrite (rngl_inv_mul_distr Hos Hiv).
@@ -610,7 +622,7 @@ induction n. {
   specialize (Hk1 O); simpl in Hk1.
   unfold partial_sum3 in Hk1; simpl in Hk1.
   assert (H : ∀ k, (partial_sum3 u k ≤ 1 / 2)%L). {
-    intros k; apply partial_sum3_aux_le_half_pow; [ | easy ].
+    intros k; apply (partial_sum3_aux_le_half_pow Hch); [ | easy ].
     apply (rngl_0_le_1 Hos Hto).
   }
   specialize (Hk2 (1 / 2)%L H).
@@ -626,7 +638,7 @@ induction n. {
   apply (rngl_lt_add_r Hos Hor).
   apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
-rewrite partial_sum3_succ.
+rewrite (partial_sum3_succ Hc1).
 rewrite rngl_mul_add_distr_r.
 rewrite (rngl_div_eq_inv_r Hiv).
 rewrite <- rngl_mul_assoc.
@@ -661,16 +673,15 @@ Qed.
 Theorem ter_bin_of_frac_part_surj {em : excl_midd} :
   is_complete T rngl_dist →
   ∀ u : nat → bool,
-  ∃ r, (0 ≤ r < 1)%L ∧ (∀ n, ter_bin_of_frac_part r n = u n).
+  ∃ r, (0 ≤ r < 1)%L ∧ (∀ n, ter_bin_of_frac_part Hc1 r n = u n).
 Proof.
 destruct_ac.
 intros Hco *.
 set (E x := ∃ k, partial_sum3 u k = x).
-(**)
 assert (Hb : rngl_bound E). {
   exists (1 / 2)%L; subst E; simpl.
   intros r (k & H); subst r.
-  apply partial_sum3_aux_le_half_pow; [ | easy ].
+  apply (partial_sum3_aux_le_half_pow Hch); [ | easy ].
   apply (rngl_0_le_1 Hos Hto).
 }
 assert (He : ∃ₜ r, E r). {
@@ -707,7 +718,7 @@ assert (Hh : (r ≤ 1 / 2)%L). {
   exfalso; apply Hx; clear Hx Hbnd; intros Hx.
   progress unfold E in Hx.
   destruct Hx as (k, Hx); rewrite <- Hx.
-  apply partial_sum3_aux_le_half_pow; [ | easy ].
+  apply (partial_sum3_aux_le_half_pow Hch); [ | easy ].
   apply (rngl_0_le_1 Hos Hto).
 }
 exists r; clear Hb He.
@@ -739,7 +750,7 @@ destruct (rngl_ltb_dec (frac_part Hc1 Har (r * 3 ^ n)) (1 / 3)) as [H1| H1]. {
     rewrite (rngl_div_div Hos Hiv) in H1.
     rewrite <- rngl_pow_succ_l in H1.
     specialize (Hr3 (S n)).
-    rewrite partial_sum3_succ in Hr3.
+    rewrite (partial_sum3_succ Hc1) in Hr3.
     destruct (u n); [ exfalso | easy ].
     simpl in Hr3, H1.
     rewrite rngl_of_nat_1 in Hr3.
@@ -764,7 +775,7 @@ apply -> (rngl_le_div_l Hop Hiv Hto) in H1. {
   rewrite <- rngl_pow_succ_l in H1.
   specialize (partial_sum3_upper_bound u (S n)); intros H.
   apply Hr4 in H.
-  rewrite partial_sum3_succ in H.
+  rewrite (partial_sum3_succ Hc1) in H.
   destruct (u n); [ easy | exfalso ].
   simpl in H1, H.
   rewrite (rngl_div_1_l Hiv) in H1.
@@ -819,7 +830,7 @@ Proof.
 destruct_ac.
 intros Hco.
 specialize
-  (Cantor_gen ℕ ℕ T (λ x, (0 ≤ x < 1)%L) id ter_bin_of_frac_part id_nat
+  (Cantor_gen ℕ ℕ T (λ x, (0 ≤ x < 1)%L) id (ter_bin_of_frac_part Hc1) id_nat
      (ter_bin_of_frac_part_surj Hco)).
 intros H f.
 specialize (H f).
@@ -829,4 +840,4 @@ Qed.
 
 End a.
 
-Arguments ter_bin_of_frac_part {T ro rp ac} Hc1 Har x%_L n%_nat.
+Arguments ter_bin_of_frac_part {T ro rp ac} Har Hc1 x%_L n%_nat.

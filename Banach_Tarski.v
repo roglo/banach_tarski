@@ -296,10 +296,9 @@ Theorem ter_bin_of_ball_surj
   (Hc1 : rngl_characteristic T ≠ 1)
   (Har : rngl_is_archimedean T = true) :
   ∀ r, (0 < r)%L → ∀ (u : ℕ → bool),
-  ∃ p : vector T, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec Hc1 Har r p n = u n).
+  ∃ p : vector T, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec Har Hc1 r p n = u n).
 Proof.
 intros * Hr *.
-About ter_bin_of_frac_part_surj.
 ...
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
 exists (V (s * r) (r * √ (1 - s²)) 0); simpl.
