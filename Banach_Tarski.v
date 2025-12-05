@@ -299,7 +299,6 @@ Theorem ter_bin_of_ball_surj
   ∃ p : vector T, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec Hc1 Har r p n = u n).
 Proof.
 intros * Hr *.
-...
 About ter_bin_of_frac_part_surj.
 ...
 specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
