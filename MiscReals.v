@@ -2864,3 +2864,4 @@ Arguments Int_part {T ro rp ac} Hc1 Har x%_L.
 Arguments frac_part {T ro rp ac} Hc1 Har x%_L.
 Arguments Int_part_interv {T ro rp ac} Hc1 Har z%_Z x%_L.
 Arguments Rcase_abs {T ro rp ac} a%_L.
+Arguments rngl_of_Z_inj {T ro rp ac} Hc1 (a b)%_Z.

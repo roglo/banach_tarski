@@ -49,14 +49,22 @@ Ltac fold_rngl :=
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
 
-Theorem rotate_param_rotate : ∀ el x y z n a b c N,
+Theorem rotate_param_rotate :
+  rngl_characteristic T ≠ 1 →
+  ∀ el x y z n a b c N,
   fold_right rotate_param (x, y, z, n) el = (a, b, c, N)
   ↔ fold_right rotate (V (IZR x / 3^n) (IZR y * √2 / 3^n) (IZR z / 3^n)) el =
       V (IZR a / 3^N) (IZR b*√2 / 3^N) (IZR c / 3^N)
     ∧ N = (n + length el)%nat.
 Proof.
 destruct_ac.
+intros Hc1.
 intros el x y z n a₁ b₁ c₁ N₁.
+assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
+assert (H3n : ∀ m, (3 ^ m)%L ≠ 0%L). {
+  intros m.
+  apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
+}
 split. {
   intros Hr.
   revert a₁ b₁ c₁ N₁ Hr.
@@ -86,15 +94,6 @@ split. {
   }
   destruct t, d; injection Hr; clear Hr; intros; subst a₁ b₁ c₁ N₁ N; simpl. {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-      specialize (rngl_characteristic_1 Hos Hc1) as H1.
-      apply vector_ext; intros.
-      rewrite H1; apply H1.
-    }
-    assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
-    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
-      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
-    }
     progress unfold IZR.
     do 2 rewrite rngl_of_Z_add.
     do 3 rewrite rngl_of_Z_mul.
@@ -125,15 +124,6 @@ split. {
     }
   } {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-      specialize (rngl_characteristic_1 Hos Hc1) as H1.
-      apply vector_ext; intros.
-      rewrite H1; apply H1.
-    }
-    assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
-    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
-      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
-    }
     progress unfold IZR.
     rewrite rngl_of_Z_add.
     rewrite rngl_of_Z_sub.
@@ -161,15 +151,6 @@ split. {
     }
   } {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-      specialize (rngl_characteristic_1 Hos Hc1) as H1.
-      apply vector_ext; intros.
-      rewrite H1; apply H1.
-    }
-    assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
-    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
-      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
-    }
     progress unfold IZR.
     rewrite rngl_of_Z_add.
     rewrite rngl_of_Z_sub.
@@ -197,15 +178,6 @@ split. {
     }
   } {
     split; [ | rewrite Nat.add_succ_r; reflexivity ].
-    destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-      specialize (rngl_characteristic_1 Hos Hc1) as H1.
-      apply vector_ext; intros.
-      rewrite H1; apply H1.
-    }
-    assert (H30 : (3 ≠ 0)%L) by apply (rngl_3_neq_0 Hos Hc1 Hto).
-    assert (H3n : (3 ^ (n + length el))%L ≠ 0%L). {
-      apply (rngl_pow_neq_0 Hos Hiq), (rngl_3_neq_0 Hos Hc1 Hto).
-    }
     progress unfold IZR.
     rewrite rngl_of_Z_add.
     rewrite rngl_of_Z_sub.
@@ -238,21 +210,27 @@ revert x y z n a₁ b₁ c₁ N₁ Hr.
 induction el as [| e] using rev_ind; intros. {
   simpl in Hr; simpl; rewrite Nat.add_0_r in Hr.
   destruct Hr as (Hr, Hn); subst N₁.
-...
-  unfold Rdiv in Hr.
-  injection Hr; intros Hz Hy Hx.
+  progress unfold rngl_div in Hr; rewrite Hiv in Hr.
+  injection Hr; clear Hr; intros Hz Hy Hx.
+  assert (H3ni : (3 ^ n)⁻¹ ≠ 0%L) by now apply (rngl_inv_neq_0 Hos Hiv).
   f_equal; f_equal; f_equal. {
-    apply Rmult_eq_reg_r, eq_IZR in Hx; [ assumption | ].
-    apply Rinv_neq_0_compat, pow_nonzero; lra.
+    apply (rngl_mul_cancel_r Hiq) in Hx; [ | easy ].
+    progress unfold IZR in Hx.
+    now apply (rngl_of_Z_inj Hc1) in Hx.
   } {
-    apply Rmult_eq_reg_r in Hy. {
-      apply Rmult_eq_reg_r in Hy; [ | apply sqrt2_neq_0 ].
-      apply eq_IZR; assumption.
+    apply (rngl_mul_cancel_r Hiq) in Hy; [ | easy ].
+    apply (rngl_mul_cancel_r Hiq) in Hy; [ | ]. 2: {
+      intros H.
+      apply (eq_rl_sqrt_0 Hos) in H.
+      now apply (rngl_2_neq_0 Hos Hc1 Hto) in H.
+      apply (rngl_0_le_2 Hos Hto).
     }
-    apply Rinv_neq_0_compat, pow_nonzero; lra.
+    progress unfold IZR in Hy.
+    now apply (rngl_of_Z_inj Hc1) in Hy.
   } {
-    apply Rmult_eq_reg_r, eq_IZR in Hz; [ assumption | ].
-    apply Rinv_neq_0_compat, pow_nonzero; lra.
+    apply (rngl_mul_cancel_r Hiq) in Hz; [ | easy ].
+    progress unfold IZR in Hz.
+    now apply (rngl_of_Z_inj Hc1) in Hz.
   }
 }
 simpl in Hr; destruct Hr as (Hr, HN).
@@ -264,6 +242,7 @@ rewrite fold_right_app in Hr; simpl in Hr.
 destruct t, d. {
   apply IHel; split; [ | assumption ].
   rewrite <- Hr; simpl.
+...
   unfold Rdiv.
   progress repeat rewrite Rmult_1_l.
   progress repeat rewrite Rmult_0_l.
