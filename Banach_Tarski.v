@@ -800,11 +800,11 @@ do 2 rewrite vec_const_mul_add_distr_l.
 do 3 rewrite vec_const_mul_assoc.
 rewrite (rngl_mul_comm Hic).
 progress unfold rngl_div; rewrite Hiv.
-...
-unfold Rdiv.
-do 3 rewrite Rmult_assoc.
-rewrite Rinv_l; [ | easy ].
-do 3 rewrite Rmult_1_r; subst r.
+do 2 rewrite (rngl_mul_comm Hic r).
+do 3 rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_diag_l Hiv); [ | easy ].
+do 3 rewrite rngl_mul_1_r.
+subst r.
 apply vec_couple_and_cross_formula.
 Qed.
 
@@ -821,6 +821,7 @@ intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
 destruct (vec_zerop u) as [Hv₁| Hv₁]. {
   rewrite Hv₁ in Hvn.
   unfold vec_norm in Hvn at 1.
+...
   rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
   rewrite sqrt_0 in Hvn.
   symmetry in Hvn.
