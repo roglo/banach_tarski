@@ -642,6 +642,7 @@ Theorem vec_cross_mul_eq_0 : ∀ u v,
   → ∃ a b, a ≠ 0%L ∧ b ≠ 0%L ∧ (a ⁎ u + b ⁎ v = 0)%vec.
 Proof.
 destruct_ac.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros * Hu Hv Huv.
 destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
@@ -654,9 +655,9 @@ apply -> (rngl_sub_move_0_r Hop) in H₃.
 destruct (rngl_eqb_dec u₁ 0) as [Hu₁| Hu₁]. {
   apply (rngl_eqb_eq Heo) in Hu₁.
   subst u₁; rewrite (rngl_mul_0_l Hos) in H₃; symmetry in H₃.
-...
-  apply Rmult_integral in H₃.
+  apply (rngl_integral Hos Hio) in H₃.
   destruct H₃ as [H₃| H₃]; [ subst u₂ | subst v₁ ]. {
+...
     rewrite Rmult_0_l in H₁; symmetry in H₁.
     apply Rmult_integral in H₁.
     destruct H₁ as [H₁| H₁]; [ now exfalso; subst u₃; apply Hu | subst v₂ ].
