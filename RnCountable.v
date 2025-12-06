@@ -841,3 +841,4 @@ Qed.
 End a.
 
 Arguments ter_bin_of_frac_part {T ro rp ac} Har Hc1 x%_L n%_nat.
+Arguments ter_bin_of_frac_part_surj {T ro rp ac} Har Hch Hc1 em Hco u.

@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 From Stdlib Require Import Arith List Relations Wf_nat.
 Import ListNotations.
-From RingLike Require Import Utf8 Core RealLike.
+From RingLike Require Import Utf8 Core RealLike IntermVal.
 From TrigoWithoutPi Require Import Core.
 
 From a Require Import Misc Words Normalize Reverse MiscReals MiscTrigo.
@@ -41,9 +41,9 @@ Ltac fold_rngl :=
   replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
     with rngl_one by easy;
   repeat try rewrite strange_let.
+*)
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
-*)
 
 Definition set_of_vec (v : vector T) := mkset (λ u, u = v).
 Arguments set_of_vec v%_vec.
@@ -293,36 +293,55 @@ Definition ter_bin_of_vec Hc1 Har r '(V x y z) :=
   ter_bin_of_frac_part Hc1 Har (x / r)%L.
 
 Theorem ter_bin_of_ball_surj
+  (Hch : rngl_characteristic T = 0)
   (Hc1 : rngl_characteristic T ≠ 1)
   (Har : rngl_is_archimedean T = true) :
+  is_complete T rngl_dist →
+  excl_midd →
   ∀ r, (0 < r)%L → ∀ (u : ℕ → bool),
   ∃ p : vector T, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec Har Hc1 r p n = u n).
 Proof.
-intros * Hr *.
-...
-specialize (ter_bin_of_frac_part_surj u); intros (s & Hs & Hn).
+destruct_ac.
+intros Hco em * Hr *.
+specialize (ter_bin_of_frac_part_surj Har Hch Hc1 em Hco u); intros (s & Hs & Hn).
 exists (V (s * r) (r * √ (1 - s²)) 0); simpl.
-unfold Rdiv; rewrite Rmult_assoc.
-rewrite Rinv_r; [ | lra ].
-rewrite Rmult_1_r.
+progress unfold rngl_div; rewrite Hiv.
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_diag_r Hiv). 2: {
+  now intros H; subst r; apply rngl_lt_irrefl in Hr.
+}
+rewrite rngl_mul_1_r.
 split; [ | easy ].
-do 2 rewrite Rsqr_mult.
-rewrite Rsqr_sqrt; [ do 3 rewrite Rsqr_pow2; lra | ].
-rewrite Rsqr_pow2.
-apply Rplus_le_reg_r with (r := s ^ 2).
-unfold Rminus; rewrite Rplus_assoc, Rplus_opp_l.
-rewrite Rplus_0_l, Rplus_0_r.
-replace 1 with (1 ^ 2) by lra.
-apply pow_incr; lra.
+rewrite (rngl_squ_mul Hic).
+rewrite (rngl_squ_mul Hic).
+rewrite rngl_squ_sqrt. 2: {
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_squ_le_1_iff Hop Hiq Hto).
+  split; [ | now apply rngl_lt_le_incl ].
+  apply (rngl_le_trans Hor _ 0);[ | easy ].
+  apply (rngl_opp_1_le_0 Hop Hto).
+}
+rewrite (rngl_mul_sub_distr_l Hop).
+rewrite rngl_mul_1_r, (rngl_add_sub_assoc Hop).
+rewrite (rngl_add_sub_swap Hop).
+rewrite (rngl_mul_comm Hic), (rngl_sub_diag Hos).
+rewrite (rngl_squ_0 Hos), rngl_add_0_r.
+apply rngl_add_0_l.
 Qed.
 
-Theorem ball_set_not_countable : ∀ r, 0 < r →
-  ∀ f : ℕ → vector, ∃ p : vector, p ∈ sphere r ∧ ∀ n : ℕ, f n ≠ p.
+Theorem ball_set_not_countable
+  (Hch : rngl_characteristic T = 0)
+  (Har : rngl_is_archimedean T = true) :
+  is_complete T rngl_dist →
+  excl_midd →
+  ∀ r, (0 < r)%L →
+  ∀ f : ℕ → vector T, ∃ p : vector T, p ∈ sphere r ∧ ∀ n : ℕ, f n ≠ p.
 Proof.
-intros * Hr *.
+intros Hco em * Hr *.
+set (Hc1 := eq_ind_r (λ n : ℕ, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch).
 specialize
-  (Cantor_gen ℕ ℕ vector (setp (sphere r)) id (ter_bin_of_vec r) id_nat
-     (ter_bin_of_ball_surj r Hr) f) as (p, Hp).
+  (Cantor_gen ℕ ℕ (vector T) (setp (sphere r)) id (ter_bin_of_vec Har Hc1 r)
+     id_nat (ter_bin_of_ball_surj Hch Hc1 Har Hco em r Hr) f) as (p, Hp).
 exists p.
 split; [ apply (Hp O) | ].
 intros n.
@@ -341,22 +360,22 @@ Theorem matrix_axis_ok : ∀ M p k,
   → p = k ⁎ rotation_axis M
   → (M * p)%vec = p.
 Proof.
+destruct_ac.
 intros * Hrm Hm Hn.
 subst p.
 remember (rotation_axis M) as ev eqn:Hev.
 unfold rotation_axis in Hev.
-unfold "_-_", sub_notation in Hev.
-remember (a₃₂ M - a₂₃ M) as x eqn:Hx.
-remember (a₁₃ M - a₃₁ M) as y eqn:Hy.
-remember (a₂₁ M - a₁₂ M) as z eqn:Hz.
+remember (a₃₂ M - a₂₃ M)%L as x eqn:Hx.
+remember (a₁₃ M - a₃₁ M)%L as y eqn:Hy.
+remember (a₂₁ M - a₁₂ M)%L as z eqn:Hz.
 destruct (vec_zerop ev) as [Hvz| Hvnz]. {
   subst ev.
   injection Hvz; clear Hvz; intros H1 H2 H3.
   move H1 at top; move H2 at top; move H3 at top; subst x y z.
   symmetry in Hx, Hy, Hz.
-  apply Rminus_diag_uniq in Hx.
-  apply Rminus_diag_uniq in Hy.
-  apply Rminus_diag_uniq in Hz.
+  apply -> (rngl_sub_move_0_r Hop) in Hx.
+  apply -> (rngl_sub_move_0_r Hop) in Hy.
+  apply -> (rngl_sub_move_0_r Hop) in Hz.
   exfalso; apply Hm; clear Hm.
   unfold mat_transp, mkrmat.
   destruct M; simpl in Hx, Hy, Hz |-*.
@@ -368,9 +387,9 @@ unfold mat_det in Hd.
 unfold mat_mul, mat_transp, mat_id in Ht; simpl in Ht.
 injection Ht; clear Ht; intros H₁ H₂ H₃ H₄ H₅ H₆ H₇ H₈ H₉.
 simpl.
-setoid_rewrite fold_Rsqr in H₁.
-setoid_rewrite fold_Rsqr in H₅.
-setoid_rewrite fold_Rsqr in H₉.
+rewrite fold_rngl_squ in H₁.
+rewrite fold_rngl_squ in H₅.
+rewrite fold_rngl_squ in H₉.
 move H₉ after H₁; move H₅ after H₁.
 move H₄ before H₂; move H₇ before H₃; move H₈ before H₆.
 clear H₄ H₇ H₈; move H₆ after H₂.
@@ -378,12 +397,18 @@ move Hd before H₉.
 rename H₆ into H₁₁; rename H₂ into H₂₁; rename H₃ into H₃₁.
 rename H₁ into H₃; rename H₅ into H₂; rename H₉ into H₁.
 subst ev; simpl.
-replace (k * x) with (x * k) by apply Rmult_comm.
-replace (k * y) with (y * k) by apply Rmult_comm.
-replace (k * z) with (z * k) by apply Rmult_comm.
+rewrite (rngl_mul_comm Hic k x).
+rewrite (rngl_mul_comm Hic k y).
+rewrite (rngl_mul_comm Hic k z).
 subst x y z.
 clear Hm Hvnz.
-progress unfold Rsqr in H₁, H₂, H₃.
+progress unfold rngl_squ in H₁, H₂, H₃.
+do 9 rewrite rngl_mul_assoc.
+do 6 rewrite <- rngl_mul_add_distr_r.
+ring_simplify in Hd.
+f_equal; f_equal. {
+  ring_simplify.
+...
 f_equal; nsatz.
 Qed.
 
