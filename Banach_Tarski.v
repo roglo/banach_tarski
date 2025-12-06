@@ -817,22 +817,22 @@ Theorem fixpoint_unicity : ∀ M u v,
   → (M * v)%vec = v
   → u = v.
 Proof.
+destruct_ac.
 intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
 destruct (vec_zerop u) as [Hv₁| Hv₁]. {
   rewrite Hv₁ in Hvn.
   unfold vec_norm in Hvn at 1.
-...
-  rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
-  rewrite sqrt_0 in Hvn.
+  rewrite (rngl_squ_0 Hos), rngl_add_0_r, rngl_add_0_r in Hvn.
+  rewrite (rl_sqrt_0 Hop Hto Hii) in Hvn.
   symmetry in Hvn.
   apply vec_norm_eq_0 in Hvn.
-  now rewrite Hvn, Hv₁.
+  congruence.
 }
 destruct (vec_zerop v) as [Hv₂| Hv₂]. {
   rewrite Hv₂ in Hvn.
   unfold vec_norm in Hvn at 2.
-  rewrite Rsqr_0, Rplus_0_r, Rplus_0_r in Hvn.
-  rewrite sqrt_0 in Hvn.
+  rewrite (rngl_squ_0 Hos), rngl_add_0_r, rngl_add_0_r in Hvn.
+  rewrite (rl_sqrt_0 Hop Hto Hii) in Hvn.
   now apply vec_norm_eq_0 in Hvn.
 }
 destruct (vec_eq_dec u v) as [Hvv| Hvv]; [ easy | exfalso ].
@@ -843,7 +843,7 @@ assert (Hp₃ : (M * (u × v) = u × v)%vec). {
   now rewrite Hp₁, Hp₂ in Hm.
 }
 move Hp₃ before Hp₂.
-assert (Hucv : ‖(u × v)‖ ≠ 0). {
+assert (Hucv : ‖(u × v)‖ ≠ 0%L). {
   intros H; apply vec_norm_eq_0 in H.
   apply vec_cross_mul_eq_0 in H; [ | easy | easy ].
   destruct H as (a & b & Ha & Hb & Hab).
@@ -854,6 +854,7 @@ assert (Hucv : ‖(u × v)‖ ≠ 0). {
   simpl in Hab.
   injection Hab; clear Hab; intros Hz Hy Hx.
   move Hx after Hy; move Hz after Hy.
+...
   apply Rplus_opp_r_uniq in Hx.
   apply Rplus_opp_r_uniq in Hy.
   apply Rplus_opp_r_uniq in Hz.
