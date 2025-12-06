@@ -653,8 +653,8 @@ apply -> (rngl_sub_move_0_r Hop) in H₁.
 apply -> (rngl_sub_move_0_r Hop) in H₂.
 apply -> (rngl_sub_move_0_r Hop) in H₃.
 destruct (rngl_eqb_dec u₁ 0) as [Hu₁| Hu₁]. {
-  apply (rngl_eqb_eq Heo) in Hu₁.
-  subst u₁; rewrite (rngl_mul_0_l Hos) in H₃; symmetry in H₃.
+  apply (rngl_eqb_eq Heo) in Hu₁; subst u₁.
+  rewrite (rngl_mul_0_l Hos) in H₃; symmetry in H₃.
   apply (rngl_integral Hos Hio) in H₃.
   destruct H₃ as [H₃| H₃]; [ subst u₂ | subst v₁ ]. {
     rewrite (rngl_mul_0_l Hos) in H₁; symmetry in H₁.
@@ -665,12 +665,21 @@ destruct (rngl_eqb_dec u₁ 0) as [Hu₁| Hu₁]. {
     destruct H₂ as [H₂| H₂]; [ now exfalso; subst u₃; apply Hu | subst v₁ ].
     exists v₃, (- u₃)%L.
     split; [ now intros H; apply Hv; f_equal | ].
-...
-    split; [ now apply Ropp_neq_0_compat; intros H; apply Hu; f_equal | ].
-    f_equal; lra.
+    split. {
+      intros H.
+      apply (f_equal rngl_opp) in H.
+      rewrite (rngl_opp_involutive Hop), (rngl_opp_0 Hop) in H.
+      now subst u₃.
+    }
+    do 2 rewrite (rngl_mul_0_r Hos).
+    rewrite (rngl_mul_opp_l Hop), (rngl_add_opp_r Hop).
+    rewrite (rngl_mul_comm Hic), (rngl_sub_diag Hos).
+    now rewrite rngl_add_0_l.
   }
-  destruct (Req_dec u₂ 0) as [Hu₂| Hu₂]. {
-    subst u₂; rewrite Rmult_0_l in H₁; symmetry in H₁.
+  destruct (rngl_eqb_dec u₂ 0) as [Hu₂| Hu₂]. {
+    apply (rngl_eqb_eq Heo) in Hu₂; subst u₂.
+    rewrite (rngl_mul_0_l Hos) in H₁; symmetry in H₁.
+...
     apply Rmult_integral in H₁.
     destruct H₁ as [H₁| H₁]; [ now exfalso; subst u₃; apply Hu | subst v₂ ].
     exists v₃, (- u₃).
