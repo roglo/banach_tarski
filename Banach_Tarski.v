@@ -712,18 +712,35 @@ destruct (rngl_eqb_dec u₁ 0) as [Hu₁| Hu₁]. {
     rewrite (rngl_mul_comm Hic), (rngl_sub_diag Hos).
     now rewrite rngl_add_0_l.
   }
-...
-  destruct (Req_dec v₂ 0) as [Hv₂| Hv₂]. {
-    subst v₂; rewrite Rmult_0_r in H₁.
-    apply Rmult_integral in H₁.
+  destruct (rngl_eqb_dec v₂ 0) as [Hv₂| Hv₂]. {
+    apply (rngl_eqb_eq Heo) in Hv₂; subst v₂.
+    rewrite (rngl_mul_0_r Hos) in H₁.
+    apply (rngl_integral Hos Hio) in H₁.
     destruct H₁ as [H₁| H₁]; [ easy | now exfalso; subst v₃; apply Hv ].
   }
-  exists v₂, (- u₂).
+  apply (rngl_eqb_neq Heo) in Hv₂.
+  exists v₂, (- u₂)%L.
   split; [ easy | ].
-  split; [ now apply Ropp_neq_0_compat | ].
-  f_equal; [ lra | lra | ].
-  rewrite Rmult_comm, <- H₁; lra.
+  split. {
+    intros H.
+    apply (f_equal rngl_opp) in H.
+    now rewrite (rngl_opp_involutive Hop), (rngl_opp_0 Hop) in H.
+  }
+  f_equal. {
+    do 2 rewrite (rngl_mul_0_r Hos).
+    apply rngl_add_0_l.
+  } {
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite (rngl_add_opp_r Hop).
+    rewrite (rngl_mul_comm Hic).
+    apply (rngl_sub_diag Hos).
+  }
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_add_opp_r Hop), H₁.
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_sub_diag Hos).
 }
+...
 destruct (Req_dec v₁ 0) as [Hv₁| Hv₁]. {
   subst v₁; rewrite Rmult_0_r in H₃.
   apply Rmult_integral in H₃.
