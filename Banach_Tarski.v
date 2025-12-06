@@ -740,19 +740,37 @@ destruct (rngl_eqb_dec u₁ 0) as [Hu₁| Hu₁]. {
   rewrite (rngl_mul_comm Hic).
   apply (rngl_sub_diag Hos).
 }
-...
-destruct (Req_dec v₁ 0) as [Hv₁| Hv₁]. {
-  subst v₁; rewrite Rmult_0_r in H₃.
-  apply Rmult_integral in H₃.
+apply (rngl_eqb_neq Heo) in Hu₁.
+destruct (rngl_eqb_dec v₁ 0) as [Hv₁| Hv₁]. {
+  apply (rngl_eqb_eq Heo) in Hv₁; subst v₁.
+  rewrite (rngl_mul_0_r Hos) in H₃.
+  apply (rngl_integral Hos Hio) in H₃.
   destruct H₃ as [H₃| H₃]; [ easy | subst v₂ ].
-  rewrite Rmult_0_r in H₂; symmetry in H₂.
-  apply Rmult_integral in H₂.
+  rewrite (rngl_mul_0_r Hos) in H₂; symmetry in H₂.
+  apply (rngl_integral Hos Hio) in H₂.
   destruct H₂ as [H₂| H₂]; [ easy | now exfalso; subst v₃; apply Hv ].
 }
-exists v₁, (- u₁).
+apply (rngl_eqb_neq Heo) in Hv₁.
+exists v₁, (- u₁)%L.
 split; [ easy | ].
-split; [ now apply Ropp_neq_0_compat | ].
-f_equal; lra.
+split. {
+  intros H.
+  apply (f_equal rngl_opp) in H.
+  now rewrite (rngl_opp_involutive Hop), (rngl_opp_0 Hop) in H.
+}
+f_equal. {
+  rewrite (rngl_mul_opp_l Hop), (rngl_add_opp_r Hop).
+  rewrite (rngl_mul_comm Hic).
+  apply (rngl_sub_diag Hos).
+} {
+  rewrite (rngl_mul_opp_l Hop), (rngl_add_opp_r Hop).
+  rewrite (rngl_mul_comm Hic), H₃.
+  apply (rngl_sub_diag Hos).
+} {
+  rewrite (rngl_mul_opp_l Hop), (rngl_add_opp_r Hop).
+  rewrite (rngl_mul_comm Hic), H₂.
+  apply (rngl_sub_diag Hos).
+}
 Qed.
 
 Theorem vec_couple_and_cross_formula : ∀ u v X,
@@ -765,19 +783,24 @@ intros (u₁, u₂, u₃) (v₁, v₂, v₃) (x₁, x₂, x₃).
 simpl; f_equal; ring.
 Qed.
 
-Theorem vec_couple_and_cross_is_base : ∀ u v X,
-  (u × v · u × v) ≠ 0
+Theorem vec_couple_and_cross_is_base :
+  rngl_mul_is_comm T = true →
+  rngl_has_inv T = true →
+  ∀ u v X,
+  (u × v · u × v) ≠ 0%L
   → ∃ a b c, X = (a ⁎ u + b ⁎ v + c ⁎ (u × v))%vec.
 Proof.
-intros * Huv.
+intros Hic Hiv * Huv.
 remember (u × v · u × v) as r eqn:Hr.
-exists (((X · u) * (v · v) - (X · v) * (u · v)) / r).
-exists (((X · v) * (u · u) - (X · u) * (u · v)) / r).
-exists ((X · (u × v)) / r).
+exists (((X · u) * (v · v) - (X · v) * (u · v)) / r)%L.
+exists (((X · v) * (u · u) - (X · u) * (u · v)) / r)%L.
+exists ((X · (u × v)) / r)%L.
 apply (vec_const_mul_eq_reg_l r); [ | easy ].
 do 2 rewrite vec_const_mul_add_distr_l.
 do 3 rewrite vec_const_mul_assoc.
-setoid_rewrite Rmult_comm.
+rewrite (rngl_mul_comm Hic).
+progress unfold rngl_div; rewrite Hiv.
+...
 unfold Rdiv.
 do 3 rewrite Rmult_assoc.
 rewrite Rinv_l; [ | easy ].
