@@ -354,6 +354,22 @@ Definition fixpoint_of_path r el :=
 Definition fixpoint_of_nat r n :=
   fixpoint_of_path r (path_of_nat n).
 
+Theorem normalized_axis : ∀ M k v,
+  (M * (k ⁎ v) = k ⁎ v)%vec
+  → (M * (k ⁎ vec_normalize v) = k ⁎ vec_normalize v)%vec.
+Proof.
+destruct_ac.
+intros M k (x, y, z) Hv.
+unfold vec_normalize.
+remember ‖(V x y z)‖ as r eqn:Hr.
+rewrite vec_const_mul_assoc.
+rewrite (rngl_mul_comm Hic).
+rewrite <- vec_const_mul_assoc.
+rewrite mat_vec_mul_const_distr.
+now rewrite Hv.
+Qed.
+
+(* on verra plus tard...
 Theorem matrix_axis_ok : ∀ M p k,
   is_rotation_matrix M
   → M ≠ mat_transp M
@@ -412,25 +428,11 @@ f_equal; f_equal. {
 f_equal; nsatz.
 Qed.
 
-Theorem normalized_axis : ∀ M k v,
-  (M * (k ⁎ v) = k ⁎ v)%vec
-  → (M * (k ⁎ vec_normalize v) = k ⁎ vec_normalize v)%vec.
-Proof.
-intros M k (x, y, z) Hv.
-unfold vec_normalize.
-remember ‖(V x y z)‖ as r eqn:Hr.
-rewrite vec_const_mul_assoc.
-setoid_rewrite Rmult_comm.
-rewrite <- vec_const_mul_assoc.
-rewrite mat_vec_mul_const_distr.
-now rewrite Hv.
-Qed.
-
 Theorem matrix_all_fixpoints_ok : ∀ M p k,
   is_rotation_matrix M
   → M ≠ mat_transp M
   → p = rotation_fixpoint M k
-  → mat_vec_mul M p = p.
+  → (M * p)%vec = p.
 Proof.
 intros * Hrm Hm Hn.
 unfold rotation_fixpoint in Hn.
@@ -456,6 +458,7 @@ apply matrix_all_fixpoints_ok in Hp; [ easy | | ]. {
 specialize (mat_of_path_is_not_rotation_π el) as Hmt.
 now intros H; apply Hmt.
 Qed.
+*)
 
 Fixpoint nat_of_path_aux el :=
   match el with
@@ -570,34 +573,36 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
   (mat_of_path (path_of_nat no) * p₁)%vec.
 
 Theorem vec_div_in_sphere : ∀ r p,
-  r ≠ 0
+  r ≠ 0%L
   → p ∈ sphere r
-  → p ⁄ r ∈ sphere 1.
+  → p ⁄ r ∈ sphere 1%L.
 Proof.
+destruct_ac.
 intros r (x, y, z) Hr Hp; simpl in Hp; simpl.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Hp, Rsqr_1.
-rewrite Rsqr_inv_depr; [ | lra ].
-rewrite Rinv_l; [ easy | ].
-intros H; apply Rsqr_eq_0 in H; lra.
+do 3 rewrite (rngl_squ_mul Hic).
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite Hp.
+rewrite <- (rngl_squ_mul Hic).
+now rewrite (rngl_mul_inv_diag_l Hiv).
 Qed.
 
 Theorem vec_mul_in_sphere : ∀ r p,
-  p ∈ sphere 1
+  p ∈ sphere 1%L
   → r ⁎ p ∈ sphere r.
 Proof.
+destruct_ac.
 intros r (x, y, z) Hp; simpl in Hp; simpl.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Hp, Rsqr_1.
-now rewrite Rmult_1_r.
+do 3 rewrite (rngl_squ_mul Hic).
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite Hp, rngl_squ_1.
+apply rngl_mul_1_r.
 Qed.
 
 Theorem rotation_fixpoint_on_sphere : ∀ r M,
    M ≠ mat_transp M
    → rotation_fixpoint M r ∈ sphere r.
 Proof.
+destruct_ac.
 intros * Hm.
 unfold rotation_fixpoint.
 unfold rotation_unit_axis.
@@ -607,25 +612,25 @@ apply vec_mul_in_sphere.
 destruct (vec_eq_dec ax 0) as [Hz| Hz]. {
   move Hz at top; subst ax; symmetry in Hax.
   injection Hax; clear Hax; intros Hz Hy Hx.
-  apply Rminus_diag_uniq in Hx.
-  apply Rminus_diag_uniq in Hy.
-  apply Rminus_diag_uniq in Hz.
-  exfalso; apply Hm; unfold mat_transp.
-  unfold mkrmat.
+  apply -> (rngl_sub_move_0_r Hop) in Hx.
+  apply -> (rngl_sub_move_0_r Hop) in Hy.
+  apply -> (rngl_sub_move_0_r Hop) in Hz.
+  exfalso; apply Hm; clear Hm; progress unfold mat_transp.
+  progress unfold mkrmat.
   destruct M; simpl in Hx, Hy, Hz |-*.
   now rewrite Hx, Hy, Hz.
 }
 destruct ax as (x, y, z); simpl.
-do 3 rewrite Rsqr_mult.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Rsqr_1, Rsqr_inv_depr. {
-  rewrite Rsqr_sqrt; [ | apply nonneg_sqr_vec_norm ].
-  rewrite Rinv_l; [ easy | ].
+do 3 rewrite (rngl_squ_mul Hic).
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite rngl_squ_1, (rngl_squ_inv Hos Hiv). {
+  rewrite rngl_squ_sqrt; [ | apply nonneg_sqr_vec_norm ].
+  apply (rngl_mul_inv_diag_l Hiv).
   intros H; apply sqr_vec_norm_eq_0 in H.
   now destruct H as (H1 & H2 & H3); subst.
 }
 intros H.
-apply sqrt_eq_0 in H; [ | apply nonneg_sqr_vec_norm ].
+apply (eq_rl_sqrt_0 Hos) in H; [ | apply nonneg_sqr_vec_norm ].
 apply sqr_vec_norm_eq_0 in H.
 now destruct H as (H1 & H2 & H3); subst.
 Qed.
@@ -634,19 +639,22 @@ Theorem vec_cross_mul_eq_0 : ∀ u v,
   u ≠ 0%vec
   → v ≠ 0%vec
   → u × v = 0%vec
-  → ∃ a b, a ≠ 0 ∧ b ≠ 0 ∧ (a ⁎ u + b ⁎ v = 0)%vec.
+  → ∃ a b, a ≠ 0%L ∧ b ≠ 0%L ∧ (a ⁎ u + b ⁎ v = 0)%vec.
 Proof.
+destruct_ac.
 intros * Hu Hv Huv.
 destruct u as (u₁, u₂, u₃).
 destruct v as (v₁, v₂, v₃).
 simpl in Huv; simpl.
 injection Huv; clear Huv; intros H₃ H₂ H₁.
 move H₁ after H₂; move H₃ after H₂.
-apply Rminus_diag_uniq in H₁.
-apply Rminus_diag_uniq in H₂.
-apply Rminus_diag_uniq in H₃.
-destruct (Req_dec u₁ 0) as [Hu₁| Hu₁]. {
-  subst u₁; rewrite Rmult_0_l in H₃; symmetry in H₃.
+apply -> (rngl_sub_move_0_r Hop) in H₁.
+apply -> (rngl_sub_move_0_r Hop) in H₂.
+apply -> (rngl_sub_move_0_r Hop) in H₃.
+destruct (rngl_eqb_dec u₁ 0) as [Hu₁| Hu₁]. {
+  apply (rngl_eqb_eq Heo) in Hu₁.
+  subst u₁; rewrite (rngl_mul_0_l Hos) in H₃; symmetry in H₃.
+...
   apply Rmult_integral in H₃.
   destruct H₃ as [H₃| H₃]; [ subst u₂ | subst v₁ ]. {
     rewrite Rmult_0_l in H₁; symmetry in H₁.

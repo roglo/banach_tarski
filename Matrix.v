@@ -2545,3 +2545,5 @@ ring.
 Qed.
 
 End a.
+
+Arguments vec_eq_dec {T ro rp ac} (u v)%_vec.
