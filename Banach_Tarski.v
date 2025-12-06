@@ -657,15 +657,15 @@ destruct (rngl_eqb_dec u₁ 0) as [Hu₁| Hu₁]. {
   subst u₁; rewrite (rngl_mul_0_l Hos) in H₃; symmetry in H₃.
   apply (rngl_integral Hos Hio) in H₃.
   destruct H₃ as [H₃| H₃]; [ subst u₂ | subst v₁ ]. {
-...
-    rewrite Rmult_0_l in H₁; symmetry in H₁.
-    apply Rmult_integral in H₁.
+    rewrite (rngl_mul_0_l Hos) in H₁; symmetry in H₁.
+    apply (rngl_integral Hos Hio) in H₁.
     destruct H₁ as [H₁| H₁]; [ now exfalso; subst u₃; apply Hu | subst v₂ ].
-    rewrite Rmult_0_l in H₂.
-    apply Rmult_integral in H₂.
+    rewrite (rngl_mul_0_l Hos) in H₂.
+    apply (rngl_integral Hos Hio) in H₂.
     destruct H₂ as [H₂| H₂]; [ now exfalso; subst u₃; apply Hu | subst v₁ ].
-    exists v₃, (- u₃).
+    exists v₃, (- u₃)%L.
     split; [ now intros H; apply Hv; f_equal | ].
+...
     split; [ now apply Ropp_neq_0_compat; intros H; apply Hu; f_equal | ].
     f_equal; lra.
   }
