@@ -905,26 +905,27 @@ move HMX before Hp₃.
 pose proof HMX (V 1 0 0) as H1; simpl in H1.
 pose proof HMX (V 0 1 0) as H2; simpl in H2.
 pose proof HMX (V 0 0 1) as H3; simpl in H3.
-...
-do 6 rewrite Rmult_0_r, Rplus_0_r in H1.
-do 6 rewrite Rmult_0_r in H2, H3.
-do 3 rewrite Rplus_0_l, Rplus_0_r in H2.
-do 4 rewrite Rplus_0_l in H3.
-do 3 rewrite Rmult_1_r in H1, H2, H3.
+do 6 rewrite (rngl_mul_0_r Hos), rngl_add_0_r in H1.
+do 6 rewrite (rngl_mul_0_r Hos) in H2, H3.
+do 3 rewrite rngl_add_0_l in H2, H3.
+do 3 rewrite rngl_add_0_r in H2.
+rewrite rngl_add_0_l in H3.
+do 3 rewrite rngl_mul_1_r in H1, H2, H3.
 injection H1; clear H1; intros H31 H21 H11.
 injection H2; clear H2; intros H32 H22 H12.
 injection H3; clear H3; intros H33 H23 H13.
 destruct M; simpl in *; subst.
-now apply Hnid.
+easy.
 Qed.
 
+(*
 Theorem axis_and_fixpoint_of_path_collinear : ∀ el p q r,
   p ∈ sphere r
   → q ∈ sphere r
   → norm_list el ≠ []
   → (mat_of_path el * p)%vec = p
   → q = fixpoint_of_path r el
-  → p = if bool_dec (is_neg_vec p) (is_neg_vec q) then q else (- q)%vec.
+  → p = if Bool.bool_dec (is_neg_vec p) (is_neg_vec q) then q else (- q)%vec.
 Proof.
 intros el p₁ p₂ r Hsr₁ Hsr₂ Hnl Hr Hp₂.
 remember (is_neg_vec p₁) as b eqn:Hb.
@@ -932,6 +933,7 @@ remember (is_neg_vec p₂) as b₁.
 rename Heqb₁ into Hb₁.
 move Hb before Hb₁.
 symmetry in Hb, Hb₁.
+...
 apply rotation_fixpoint_of_path in Hp₂.
 move Hp₂ at bottom; move Hr before Hp₂.
 remember (is_neg_vec p₁) as b₂ eqn:Hb₂.
@@ -1033,6 +1035,7 @@ eapply fixpoint_unicity; try eassumption. {
   now rewrite Hsr₁, Hsr₂.
 }
 Qed.
+*)
 
 Definition point_in_D_of_prod_nat r nn :=
   fixpoint_of_bool_prod_nat r (bool_prod_nat_of_prod_nat nn).
@@ -1040,10 +1043,20 @@ Definition point_in_D_of_prod_nat r nn :=
 Definition point_in_D_of_nat r n :=
   point_in_D_of_prod_nat r (prod_nat_of_nat n).
 
+(*
 Theorem D_set_is_countable : ∀ r p,
   p ∈ D ∩ sphere r
   → ∃ n : ℕ, point_in_D_of_nat r n = p.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  exists 0.
+  apply vector_ext; intros.
+  rewrite H1.
+  apply H1.
+}
 intros r.
 apply surj_prod_nat_surj_nat.
 apply surj_bool_prod_nat_surj_prod_nat.
@@ -1063,11 +1076,11 @@ destruct (mat_eq_dec m (mat_transp m)) as [Hmt| Hmt]. {
   assert (Hrm : is_rotation_matrix m). {
     rewrite Hm; apply mat_of_path_is_rotation_matrix.
   }
-  assert (Hmm : (m * m = mat_id)%mat) by (rewrite Hmt at 2; apply Hrm).
+  assert (Hmm : (m * m = mat_id)%mat) by (rewrite Hmt at 1; apply Hrm).
   rewrite Hm in Hmm.
   rewrite <- mat_of_path_app in Hmm.
   exfalso; revert Hmm.
-  apply matrix_of_non_empty_path_is_not_identity.
+  apply (matrix_of_non_empty_path_is_not_identity Hc1).
   intros H; apply Hnl.
   now apply norm_list_app_diag_is_nil.
 }
@@ -1088,6 +1101,7 @@ apply axis_and_fixpoint_of_path_collinear with (p := p₁) in Hp₂;
   try assumption.
 now destruct (is_neg_vec p₁), (is_neg_vec p₂).
 Qed.
+*)
 
 Theorem sphere_sym_neg_vec : ∀ p, p ∈ sphere_sym D ↔ (- p)%vec ∈ D.
 Proof.
@@ -1101,31 +1115,38 @@ split. {
 }
 Qed.
 
-Theorem neg_vec_in_sphere : ∀ r p, p ∈ sphere r → (- p)%vec ∈ sphere r.
+Theorem neg_vec_in_sphere :
+  rngl_has_opp T = true →
+  ∀ r p, p ∈ sphere r → (- p)%vec ∈ sphere r.
 Proof.
-intros r (x, y, z) Hp; simpl.
-now do 3 rewrite <- Rsqr_neg.
+intros Hop r (x, y, z) Hp; simpl.
+do 3 rewrite (rngl_squ_opp Hop).
+easy.
 Qed.
 
-Theorem D_set_symmetry_is_countable : ∀ r p,
+(*
+Theorem D_set_symmetry_is_countable :
+  rngl_has_opp T = true →
+  ∀ r p,
   p ∈ sphere_sym D ∩ sphere r
   → ∃ n : ℕ, (- point_in_D_of_nat r n)%vec = p.
 Proof.
-intros r.
+intros Hop r.
 intros p Hp.
 assert (Hn : (- p)%vec ∈ D ∩ sphere r). {
   destruct Hp as (Hss, Hs).
   split; [ now apply sphere_sym_neg_vec | ].
-  now apply neg_vec_in_sphere.
+  now apply (neg_vec_in_sphere Hop).
 }
 specialize (D_set_is_countable r) as Hf.
 specialize (Hf ((- p)%vec) Hn) as (n & Hf).
 exists n; rewrite Hf.
 apply neg_vec_involutive.
 Qed.
+*)
 
 Definition countable_union_fun {A} (f g : ℕ → A) n :=
-  if bool_dec (Nat.even n) true then f (Nat.div2 n) else g (Nat.div2 n).
+  if Bool.bool_dec (Nat.even n) true then f (Nat.div2 n) else g (Nat.div2 n).
 
 Theorem countable_union : ∀ A (E F : set A) (f g : ℕ → A),
   (∀ a : A, a ∈ E → ∃ n, f n = a)
@@ -1137,13 +1158,13 @@ unfold countable_union_fun.
 destruct Ha as [Ha| Ha]. {
   specialize (Hf a Ha) as (n & Hn).
   exists (2 * n)%nat.
-  rewrite Nat.even_mul, orb_true_l.
+  rewrite Nat.even_mul, Bool.orb_true_l.
   now rewrite Nat.div2_double.
 }
 specialize (Hg a Ha) as (n & Hn).
 exists (2 * n + 1)%nat.
 rewrite Nat.even_add.
-rewrite Nat.even_mul, orb_true_l, Nat.even_1.
+rewrite Nat.even_mul, Bool.orb_true_l, Nat.even_1.
 remember (2 * n + 1)%nat as m; simpl; subst m.
 now rewrite Nat.add_1_r, Nat.div2_succ_double.
 Qed.
@@ -1152,6 +1173,7 @@ Definition point_in_D_or_sym_D_of_nat r :=
   countable_union_fun (point_in_D_of_nat r)
     (λ n, (- point_in_D_of_nat r n)%vec).
 
+(*
 Theorem D_set_and_its_symm_are_countable : ∀ r p,
   p ∈ (D ∪ sphere_sym D) ∩ sphere r
   → ∃ n : ℕ, point_in_D_or_sym_D_of_nat r n = p.
@@ -1167,38 +1189,52 @@ now apply set_inter_union_distr_r.
 Qed.
 
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
-  p ∈ sphere 1
-  → p₁ ∈ sphere 1
-  → p₂ ∈ sphere 1
-  → (matrix_of_axis_angle (p, s, c) * p₁ = p₂)%vec
+  p ∈ sphere 1%L
+  → p₁ ∈ sphere 1%L
+  → p₂ ∈ sphere 1%L
+  → (matrix_of_axis_angle p s c * p₁ = p₂)%vec
   → latitude p p₁ = latitude p p₂.
 Proof.
+destruct_ac.
 intros * Hp Hp₁ Hp₂ Hm.
 destruct p as (x, y, z).
-simpl in Hp; rewrite Rsqr_1 in Hp.
-simpl in Hm; rewrite Hp, sqrt_1 in Hm.
+simpl in Hp; rewrite rngl_squ_1 in Hp.
+simpl in Hm; rewrite Hp, (rl_sqrt_1 Hop Hiq Hto) in Hm.
 do 3 rewrite Rdiv_1_r in Hm.
 destruct p₁ as (x₁, y₁, z₁).
 destruct p₂ as (x₂, y₂, z₂).
-simpl in Hp₁, Hp₂; rewrite Rsqr_1 in Hp₁, Hp₂.
+simpl in Hp₁, Hp₂; rewrite rngl_squ_1 in Hp₁, Hp₂.
 simpl in Hm.
 injection Hm; clear Hm; intros Hz Hy Hx.
 unfold latitude; simpl.
-rewrite Hp, Hp₁, Hp₂, sqrt_1; f_equal.
+rewrite Hp, Hp₁, Hp₂, (rl_sqrt_1 Hop Hiq Hto); f_equal.
+(**)
+...
+subst.
+progress unfold rngl_squ.
+ring_simplify.
+do 4 rewrite (rngl_mul_opp_l Hop).
+do 3 rewrite fold_rngl_squ.
+ring_simplify.
+...
 progress unfold Rsqr in Hp, Hp₁, Hp₂, Hz, Hy, Hx.
 nsatz.
 Qed.
 
 Theorem latitude_mul : ∀ k u v,
-  k ≠ 0
+  k ≠ 0%L
   → latitude (k ⁎ u) (k ⁎ v) = latitude u v.
 Proof.
+destruct_ac.
 intros * Hr.
 unfold latitude.
 destruct (vec_eq_dec u 0) as [Hu| Hu]. {
   rewrite Hu.
   rewrite vec_const_mul_0_r.
-  now do 2 rewrite vec_dot_mul_0_l, Rdiv_0_l.
+  do 2 rewrite vec_dot_mul_0_l.
+  rewrite (rngl_div_0_l Hos Hiq).
+  symmetry; apply (rngl_div_0_l Hos Hiq).
+... (* faux *)
 }
 destruct (vec_eq_dec v 0) as [Hv| Hv]. {
   rewrite Hv.
@@ -1218,22 +1254,32 @@ rewrite <- Rmult_assoc.
 replace (k² * (u · v) * / k²) with (k² * / k² * (u · v)) by lra.
 now rewrite Rinv_r; [ rewrite Rmult_1_l | ].
 Qed.
+*)
 
 Theorem rotation_implies_same_latitude : ∀ r p p₁ p₂ c s,
-  0 < r
+  (0 < r)%L
   → p ∈ sphere r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
-  → (matrix_of_axis_angle (p, s, c) * p₁ = p₂)%vec
+  → (matrix_of_axis_angle p s c * p₁ = p₂)%vec
   → latitude p p₁ = latitude p p₂.
 Proof.
 intros * Hr Hp Hp₁ Hp₂ Hm.
-apply vec_div_in_sphere in Hp; [ | lra ].
-apply vec_div_in_sphere in Hp₁; [ | lra ].
-apply vec_div_in_sphere in Hp₂; [ | lra ].
+apply vec_div_in_sphere in Hp. 2: {
+  now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
+}
+apply vec_div_in_sphere in Hp₁. 2: {
+  now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
+}
+apply vec_div_in_sphere in Hp₂. 2: {
+  now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
+}
 assert
   (Hmm :
-     ((matrix_of_axis_angle (/ r ⁎ p, s, c) * (/ r ⁎ p₁))%vec = / r ⁎ p₂)). {
+     ((matrix_of_axis_angle (r⁻¹ ⁎ p) s c * (r⁻¹ ⁎ p₁))%vec = r⁻¹ ⁎ p₂)). {
+(**)
+  rewrite matrix_mul_axis with (k := r). 2: {
+...
   rewrite matrix_mul_axis with (k := r); [ | lra ].
   rewrite vec_const_mul_assoc.
   rewrite Rinv_r; [ rewrite vec_const_mul_1_l | lra ].
