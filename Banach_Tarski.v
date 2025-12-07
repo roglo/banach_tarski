@@ -854,21 +854,21 @@ assert (Hucv : ‖(u × v)‖ ≠ 0%L). {
   simpl in Hab.
   injection Hab; clear Hab; intros Hz Hy Hx.
   move Hx after Hy; move Hz after Hy.
-...
-  apply Rplus_opp_r_uniq in Hx.
-  apply Rplus_opp_r_uniq in Hy.
-  apply Rplus_opp_r_uniq in Hz.
+  apply (rngl_add_move_0_l Hop) in Hx.
+  apply (rngl_add_move_0_l Hop) in Hy.
+  apply (rngl_add_move_0_l Hop) in Hz.
   rewrite Hx, Hy, Hz in Hbv.
-  replace (- ax₁) with (-1 * ax₁) in Hbv by lra.
-  replace (- ay₁) with (-1 * ay₁) in Hbv by lra.
-  replace (- az₁) with (-1 * az₁) in Hbv by lra.
-  fold ((-1) ⁎ V ax₁ ay₁ az₁) in Hbv.
+  rewrite <- (rngl_mul_1_l ax₁), <- (rngl_mul_opp_l Hop) in Hbv.
+  rewrite <- (rngl_mul_1_l ay₁), <- (rngl_mul_opp_l Hop) in Hbv.
+  rewrite <- (rngl_mul_1_l az₁), <- (rngl_mul_opp_l Hop) in Hbv.
+  progress fold ((-1) ⁎ V ax₁ ay₁ az₁) in Hbv.
   rewrite <- Hau in Hbv.
   rewrite vec_const_mul_assoc in Hbv.
-  replace (-1 * a) with (-a) in Hbv by lra.
+  rewrite (rngl_mul_opp_l Hop), rngl_mul_1_l in Hbv.
   apply vec_const_mul_div in Hbv; [ | easy ].
   rewrite Hbv in Hvn.
   rewrite vec_norm_vec_const_mul in Hvn.
+...
   replace ‖u‖ with (1 * ‖u‖) in Hvn at 1 by lra.
   apply Rmult_eq_reg_r in Hvn; [ | now intros H; apply Hv₁, vec_norm_eq_0 ].
   symmetry in Hvn.
