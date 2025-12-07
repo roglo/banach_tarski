@@ -1254,7 +1254,6 @@ rewrite <- Rmult_assoc.
 replace (k² * (u · v) * / k²) with (k² * / k² * (u · v)) by lra.
 now rewrite Rinv_r; [ rewrite Rmult_1_l | ].
 Qed.
-*)
 
 Theorem rotation_implies_same_latitude : ∀ r p p₁ p₂ c s,
   (0 < r)%L
@@ -1271,49 +1270,47 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
   rewrite H1; apply H1.
 }
 intros * Hr Hp Hp₁ Hp₂ Hm.
-apply vec_div_in_sphere in Hp. 2: {
+assert (Hzr : r ≠ 0%L). {
   now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
 }
-apply vec_div_in_sphere in Hp₁. 2: {
-  now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
-}
-apply vec_div_in_sphere in Hp₂. 2: {
-  now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
-}
+apply vec_div_in_sphere in Hp; [ | easy ].
+apply vec_div_in_sphere in Hp₁; [ | easy ].
+apply vec_div_in_sphere in Hp₂; [ | easy ].
 assert
   (Hmm :
      ((matrix_of_axis_angle (r⁻¹ ⁎ p) s c * (r⁻¹ ⁎ p₁))%vec = r⁻¹ ⁎ p₂)). {
-  rewrite matrix_mul_axis with (k := r); cycle 1. {
+  rewrite matrix_mul_axis with (k := r); [ | | easy ]. 2: {
     apply on_sphere_norm in Hp; [ | apply (rngl_0_le_1 Hos Hto) ].
     intros H; rewrite H in Hp.
     rewrite vec_norm_0 in Hp.
     symmetry in Hp.
     now apply (rngl_1_neq_0 Hc1) in Hp.
-  } {
-    now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
   }
   rewrite vec_const_mul_assoc.
-...
-  rewrite Rinv_r; [ rewrite vec_const_mul_1_l | lra ].
-  rewrite Rsign_of_pos; [ rewrite Rmult_1_l | easy ].
+  rewrite (rngl_mul_inv_diag_r Hiv); [ | easy ].
+  rewrite vec_const_mul_1_l.
+  rewrite Rsign_of_pos; [ rewrite rngl_mul_1_l | easy ].
   rewrite mat_vec_mul_const_distr.
   now rewrite Hm.
 }
-assert (Hir : / r ≠ 0) by (apply Rinv_neq_0_compat; lra).
+assert (Hir : r⁻¹ ≠ 0%L) by now apply (rngl_inv_neq_0 Hos Hiv).
+...
 specialize
-  (unit_sphere_rotation_implies_same_latitude (/ r ⁎ p) (/ r ⁎ p₁) (/ r ⁎ p₂)
+  (unit_sphere_rotation_implies_same_latitude (r⁻¹ ⁎ p) (r⁻¹ ⁎ p₁) (r⁻¹ ⁎ p₂)
      c s Hp Hp₁ Hp₂ Hmm) as Hll.
 now do 2 rewrite latitude_mul in Hll.
 Qed.
+*)
 
 Theorem latitude_norm : ∀ p p₁ v a,
-  p ∈ sphere 1
-  → p₁ ∈ sphere 1
+  p ∈ sphere 1%L
+  → p₁ ∈ sphere 1%L
   → a = latitude p p₁
   → v = (p₁ - a ⁎ p)%vec
   → ‖v‖ = √ (1 - a²).
 Proof.
 intros * Hp Hp₁ Ha₁ Hv.
+...
 apply on_sphere_norm; [ apply sqrt_pos | ].
 destruct v as (xv, yv, zv); simpl.
 unfold latitude in Ha₁; simpl in Ha₁.
