@@ -1396,6 +1396,7 @@ Theorem vec_same_norm_cross_mul_eq_0 : ∀ u v,
   → u × v = 0%vec
   → u = v ∨ u = (- v)%vec.
 Proof.
+destruct_ac.
 intros * Huv Huxv.
 destruct (vec_eq_dec u 0) as [Hu| Hu]. {
   rewrite Hu, vec_norm_0 in Huv; symmetry in Huv.
@@ -1409,8 +1410,10 @@ assert (Hrz : r ≠ 0%L). {
 assert (‖(u ⁄ r)‖ = 1%L ∧ ‖(v ⁄ r)‖ = 1%L) as (Hu1, Hv1). {
   do 2 rewrite vec_norm_vec_const_mul.
   rewrite <- Hr, <- Huv.
+  rewrite (rngl_abs_nonneg_eq Hop Hor).
+  now split; apply (rngl_mul_inv_diag_l Hiv).
+Search (0 ≤ _⁻¹)%L.
 ...
-  rewrite Rabs_right; [ now split; rewrite Rinv_l | ].
   apply Rle_ge.
   assert (Hrp : 0 ≤ r) by (rewrite Hr; apply vec_norm_nonneg).
   apply Rmult_le_reg_r with (r := r); [ lra | ].
