@@ -1264,6 +1264,12 @@ Theorem rotation_implies_same_latitude : ∀ r p p₁ p₂ c s,
   → (matrix_of_axis_angle p s c * p₁ = p₂)%vec
   → latitude p p₁ = latitude p p₂.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  rewrite H1; apply H1.
+}
 intros * Hr Hp Hp₁ Hp₂ Hm.
 apply vec_div_in_sphere in Hp. 2: {
   now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
@@ -1277,11 +1283,17 @@ apply vec_div_in_sphere in Hp₂. 2: {
 assert
   (Hmm :
      ((matrix_of_axis_angle (r⁻¹ ⁎ p) s c * (r⁻¹ ⁎ p₁))%vec = r⁻¹ ⁎ p₂)). {
-(**)
-  rewrite matrix_mul_axis with (k := r). 2: {
-...
-  rewrite matrix_mul_axis with (k := r); [ | lra ].
+  rewrite matrix_mul_axis with (k := r); cycle 1. {
+    apply on_sphere_norm in Hp; [ | apply (rngl_0_le_1 Hos Hto) ].
+    intros H; rewrite H in Hp.
+    rewrite vec_norm_0 in Hp.
+    symmetry in Hp.
+    now apply (rngl_1_neq_0 Hc1) in Hp.
+  } {
+    now intros H; subst r; apply (rngl_lt_irrefl) in Hr.
+  }
   rewrite vec_const_mul_assoc.
+...
   rewrite Rinv_r; [ rewrite vec_const_mul_1_l | lra ].
   rewrite Rsign_of_pos; [ rewrite Rmult_1_l | easy ].
   rewrite mat_vec_mul_const_distr.
