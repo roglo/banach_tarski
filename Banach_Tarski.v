@@ -818,6 +818,7 @@ Theorem fixpoint_unicity : ∀ M u v,
   → u = v.
 Proof.
 destruct_ac.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros * Hm Hnid Hvn Hn Hp₁ Hp₂.
 destruct (vec_zerop u) as [Hv₁| Hv₁]. {
   rewrite Hv₁ in Hvn.
@@ -868,31 +869,32 @@ assert (Hucv : ‖(u × v)‖ ≠ 0%L). {
   apply vec_const_mul_div in Hbv; [ | easy ].
   rewrite Hbv in Hvn.
   rewrite vec_norm_vec_const_mul in Hvn.
-...
-  replace ‖u‖ with (1 * ‖u‖) in Hvn at 1 by lra.
-  apply Rmult_eq_reg_r in Hvn; [ | now intros H; apply Hv₁, vec_norm_eq_0 ].
+  rewrite <- (rngl_mul_1_l ‖u‖) in Hvn at 1.
+  apply (rngl_mul_cancel_r Hiq) in Hvn. 2: {
+    now intros H; apply Hv₁, vec_norm_eq_0.
+  }
   symmetry in Hvn.
   apply Rabs_or in Hvn.
   destruct Hvn as [Hvn| Hvn]; rewrite Hvn in Hbv. {
     now rewrite vec_const_mul_1_l in Hbv; symmetry in Hbv.
   }
   destruct u as (x, y, z); simpl in Hbv.
-  do 3 rewrite <- Ropp_mult_distr_l in Hbv.
-  do 3 rewrite Rmult_1_l in Hbv.
+  do 3 rewrite (rngl_mul_opp_l Hop) in Hbv.
+  do 3 rewrite rngl_mul_1_l in Hbv.
   fold (vec_opp (V x y z)) in Hbv.
   rewrite Hbv in Hn.
   rewrite is_neg_vec_neg_vec in Hn; [ | easy ].
-  now symmetry in Hn; apply no_fixpoint_negb in Hn.
+  now destruct (is_neg_vec (V x y z)).
 }
 move Hvv before Hvn.
 assert (HMX : ∀ X, (M * X)%vec = X). {
-  assert (Huv : u × v · u × v ≠ 0). {
+  assert (Huv : u × v · u × v ≠ 0%L). {
     rewrite vec_dot_mul_diag.
     intros Huv; apply Hvv.
-    now apply Rsqr_eq_0 in Huv.
+    now apply (eq_rngl_squ_0 Hos Hio) in Huv.
   }
   intros X.
-  specialize (vec_couple_and_cross_is_base u v X Huv).
+  specialize (vec_couple_and_cross_is_base Hic Hiv u v X Huv).
   intros (a & b & c & HX).
   subst X.
   do 2 rewrite mat_vec_mul_add_distr_l.
@@ -903,6 +905,7 @@ move HMX before Hp₃.
 pose proof HMX (V 1 0 0) as H1; simpl in H1.
 pose proof HMX (V 0 1 0) as H2; simpl in H2.
 pose proof HMX (V 0 0 1) as H3; simpl in H3.
+...
 do 6 rewrite Rmult_0_r, Rplus_0_r in H1.
 do 6 rewrite Rmult_0_r in H2, H3.
 do 3 rewrite Rplus_0_l, Rplus_0_r in H2.
