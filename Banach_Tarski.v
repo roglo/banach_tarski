@@ -1317,8 +1317,7 @@ destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
 intros * Hp Hp₁ Ha₁ Hv.
 specialize (rngl_0_le_1 Hos Hto) as H01.
 specialize (rngl_0_lt_1 Hos Hc1 Hto) as H0l1.
-apply on_sphere_norm. {
-  apply rl_sqrt_nonneg.
+assert (Hz1a2 : (0 ≤ 1 - a²)%L). {
   apply (rngl_le_0_sub Hop Hor).
   rewrite Ha₁; progress unfold latitude.
   rewrite (rngl_squ_div Hic Hos Hiv).
@@ -1339,6 +1338,7 @@ apply on_sphere_norm. {
   rewrite Hp₁ in H.
   now apply (rngl_1_neq_0 Hc1) in H.
 }
+apply on_sphere_norm; [ now apply rl_sqrt_nonneg | ].
 destruct v as (xv, yv, zv); simpl.
 unfold latitude in Ha₁; simpl in Ha₁.
 destruct p as (x, y, z).
@@ -1352,42 +1352,43 @@ injection Hv; clear Hv; intros Hzq Hyq Hxv.
 rewrite Hxv, Hyq, Hzq; simpl.
 progress unfold rngl_squ; simpl.
 ring_simplify; fold_rngl.
-(**)
+rewrite Hp, Hp₁ in Ha₁.
+rewrite (rl_sqrt_1 Hop Hiq Hto) in Ha₁.
+rewrite rngl_mul_1_l in Ha₁.
+rewrite (rngl_div_1_r Hiq) in Ha₁; [ | now left ].
 apply (rngl_add_move_l Hop) in Hp₁.
 do 4 rewrite fold_rngl_squ.
 rewrite Hp₁.
 ring_simplify; fold_rngl.
-...
-progress repeat rewrite <- Rsqr_pow2.
-replace z₁² with (1 - x₁² - y₁²) by lra.
+do 2 rewrite fold_rngl_squ.
+do 2 rewrite <- (rngl_mul_assoc a²).
+do 2 rewrite fold_rngl_squ.
+rewrite (rngl_mul_comm Hic x²).
+rewrite (rngl_add_comm _ 1).
+do 2 rewrite <- rngl_add_assoc.
+do 2 rewrite <- (rngl_mul_add_distr_l).
+rewrite (rngl_add_assoc x²), Hp.
+rewrite rngl_mul_1_r.
+ring_simplify; fold_rngl.
+do 3 rewrite (rngl_mul_opp_l Hop).
+do 2 rewrite <- (rngl_opp_add_distr Hop).
+do 6 rewrite <- rngl_mul_assoc.
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite (rngl_mul_comm Hic x₁).
+rewrite <- rngl_mul_assoc.
+do 2 rewrite <- rngl_mul_add_distr_l.
+rewrite <- Ha₁, fold_rngl_squ.
 ring_simplify.
-progress replace (-2 * x₁ * a * x - 2 * a * y₁ * y - 2 * a * z₁ * z)
-with (-2 * a * (x * x₁ + y * y₁ + z * z₁)) by lra.
-rewrite Hp, Hp₁, sqrt_1, Rmult_1_l, Rdiv_1_r in Ha₁.
-rewrite <- Ha₁.
-do 3 rewrite Rplus_assoc; rewrite Rplus_comm.
-do 2 rewrite <- Rplus_assoc.
-do 2 rewrite <- Rmult_plus_distr_l.
-rewrite Hp, Rmult_1_r.
-rewrite Rsqr_sqrt; [ unfold Rsqr; lra | ].
-rewrite fold_Rsqr.
-specialize (vec_Lagrange_identity (V x y z) (V x₁ y₁ z₁)) as H.
-remember (V x y z × V x₁ y₁ z₁) as c eqn:Hc.
-simpl in H.
-rewrite Hp, Hp₁ in H.
-rewrite sqrt_1, Rsqr_1, Rmult_1_l in H.
-rewrite <- Ha₁ in H.
-rewrite H; clear H.
-rewrite vec_dot_mul_diag.
-apply Rle_0_sqr.
+rewrite (rngl_add_opp_l Hop); symmetry.
+now apply rngl_squ_sqrt.
 Qed.
 
 Definition rot_sin_cos p u v :=
   let a := latitude p u in
   let u₁ := (u - a ⁎ p) ⁄ √ (1 - a²) in
   let v₁ := (v - a ⁎ p) ⁄ √ (1 - a²) in
-  let s := Rsign (p · (u₁ × v₁)) * ‖(u₁ × v₁)‖ / (‖u₁‖ * ‖v₁‖) in
-  let c := (u₁ · v₁) / (‖u₁‖ * ‖v₁‖) in
+  let s := (rngl_sign (p · (u₁ × v₁)) * ‖(u₁ × v₁)‖ / (‖u₁‖ * ‖v₁‖))%L in
+  let c := ((u₁ · v₁) / (‖u₁‖ * ‖v₁‖))%L in
   (s, c).
 
 Theorem vec_same_norm_cross_mul_eq_0 : ∀ u v,
@@ -1401,13 +1402,14 @@ destruct (vec_eq_dec u 0) as [Hu| Hu]. {
   now apply vec_norm_eq_0 in Huv; subst u v; left.
 }
 remember ‖u‖ as r eqn:Hr.
-assert (Hrz : r ≠ 0). {
+assert (Hrz : r ≠ 0%L). {
   intros H; rewrite H in Hr; symmetry in Hr.
   now apply vec_norm_eq_0 in Hr.
 }
-assert (‖(u ⁄ r)‖ = 1 ∧ ‖(v ⁄ r)‖ = 1) as (Hu1, Hv1). {
+assert (‖(u ⁄ r)‖ = 1%L ∧ ‖(v ⁄ r)‖ = 1%L) as (Hu1, Hv1). {
   do 2 rewrite vec_norm_vec_const_mul.
   rewrite <- Hr, <- Huv.
+...
   rewrite Rabs_right; [ now split; rewrite Rinv_l | ].
   apply Rle_ge.
   assert (Hrp : 0 ≤ r) by (rewrite Hr; apply vec_norm_nonneg).
