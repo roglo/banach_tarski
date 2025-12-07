@@ -19,7 +19,6 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-(*
 Theorem strange_let :
   ∀ x,
     match
@@ -41,7 +40,6 @@ Ltac fold_rngl :=
   replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
     with rngl_one by easy;
   repeat try rewrite strange_let.
-*)
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
 
@@ -1309,22 +1307,57 @@ Theorem latitude_norm : ∀ p p₁ v a,
   → v = (p₁ - a ⁎ p)%vec
   → ‖v‖ = √ (1 - a²).
 Proof.
+destruct_ac.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  rewrite H1; apply H1.
+}
 intros * Hp Hp₁ Ha₁ Hv.
-...
-apply on_sphere_norm; [ apply sqrt_pos | ].
+specialize (rngl_0_le_1 Hos Hto) as H01.
+specialize (rngl_0_lt_1 Hos Hc1 Hto) as H0l1.
+apply on_sphere_norm. {
+  apply rl_sqrt_nonneg.
+  apply (rngl_le_0_sub Hop Hor).
+  rewrite Ha₁; progress unfold latitude.
+  rewrite (rngl_squ_div Hic Hos Hiv).
+  apply (rngl_le_div_l Hop Hiv Hto).
+  apply on_sphere_norm in Hp; [ | easy ].
+  apply on_sphere_norm in Hp₁; [ | easy ].
+  now rewrite Hp, Hp₁, rngl_mul_1_l, rngl_squ_1.
+  rewrite rngl_mul_1_l.
+  rewrite (rngl_squ_mul Hic).
+  apply vec_Cauchy_Schwarz_inequality.
+  intros H.
+  apply (rngl_integral Hos Hio) in H.
+  destruct H as [H| H].
+  rewrite on_sphere_norm in Hp; [ | easy ].
+  rewrite Hp in H.
+  now apply (rngl_1_neq_0 Hc1) in H.
+  rewrite on_sphere_norm in Hp₁; [ | easy ].
+  rewrite Hp₁ in H.
+  now apply (rngl_1_neq_0 Hc1) in H.
+}
 destruct v as (xv, yv, zv); simpl.
 unfold latitude in Ha₁; simpl in Ha₁.
 destruct p as (x, y, z).
 destruct p₁ as (x₁, y₁, z₁).
 simpl in Hp, Hp₁; simpl.
-rewrite Rsqr_1 in Hp, Hp₁.
+rewrite rngl_squ_1 in Hp, Hp₁.
 simpl in Hv.
-do 3 rewrite fold_Rminus in Hv.
+do 3 rewrite (rngl_add_opp_r Hop) in Hv.
 simpl in Ha₁.
 injection Hv; clear Hv; intros Hzq Hyq Hxv.
 rewrite Hxv, Hyq, Hzq; simpl.
-unfold Rsqr; simpl.
-ring_simplify.
+progress unfold rngl_squ; simpl.
+ring_simplify; fold_rngl.
+(**)
+apply (rngl_add_move_l Hop) in Hp₁.
+do 4 rewrite fold_rngl_squ.
+rewrite Hp₁.
+ring_simplify; fold_rngl.
+...
 progress repeat rewrite <- Rsqr_pow2.
 replace z₁² with (1 - x₁² - y₁²) by lra.
 ring_simplify.
