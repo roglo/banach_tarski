@@ -1584,14 +1584,21 @@ assert (H : ((1 - a²) * c - v₁ · v₂ = 0)%L). {
   rewrite Hp in Hmv.
   rewrite (rl_sqrt_1 Hop Hiq Hto) in Ha₁, Ha₂, Hmv.
   rewrite rngl_mul_1_l, (rngl_div_1_r Hiq) in Ha₁, Ha₂.
+  2, 3 : now left.
   do 3 rewrite Rdiv_1_r in Hmv.
-...
-  rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
-  rewrite Rsqr_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
-  clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv.
+  rewrite rngl_squ_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
+  rewrite rngl_squ_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
+  clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv Hop.
+  do 3 rewrite (rngl_add_opp_r Hop) in Hnv₁, Hnv₂.
+  do 6 rewrite (rngl_add_opp_r Hop).
   injection Hmv; clear Hmv; intros H3 H2 H1.
-  progress unfold Rsqr in Hnv₁, Hnv₂, H3, H2, H1 |-*.
-  nsatz.
+  ring_simplify; fold_rngl.
+  rewrite fold_rngl_squ.
+  do 4 rewrite <- rngl_mul_assoc.
+  do 3 rewrite fold_rngl_squ.
+...
+  progress unfold rngl_squ in Hnv₁, Hnv₂, H3, H2, H1 |-*.
+...
 }
 assert (Hc : c = v'₁ · v'₂). {
   rewrite Hv'₁, Hv'₂.
