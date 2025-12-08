@@ -1521,13 +1521,14 @@ remember (v₁ ⁄ √ (1 - a²)) as v'₁ eqn:Hv'₁.
 remember (v₂ ⁄ √ (1 - a²)) as v'₂ eqn:Hv'₂.
 move v₁ before p₂; move v₂ before v₁.
 move v'₁ before v₂; move v'₂ before v'₁.
-(**)
-assert (Hsa : √ (1 - a²) ≠ 0%L). {
-  intros H; apply (eq_rl_sqrt_0 Hos) in H.
-  apply -> (rngl_sub_move_0_r Hop) in H; symmetry in H.
-  now rewrite H in Ha2; apply rngl_lt_irrefl in Ha2.
+assert (Hz1a : (0 ≤ 1 - a²)%L). {
   apply (rngl_le_0_sub Hop Hor).
   now apply rngl_lt_le_incl.
+}
+assert (Hsa : √ (1 - a²) ≠ 0%L). {
+  intros H; apply (eq_rl_sqrt_0 Hos) in H; [ | easy ].
+  apply -> (rngl_sub_move_0_r Hop) in H; symmetry in H.
+  now rewrite H in Ha2; apply rngl_lt_irrefl in Ha2.
 }
 assert (‖v'₁‖ = 1%L ∧ ‖v'₂‖ = 1%L) as (Hnv'₁, Hnv'₂). {
   subst v₁ v₂.
@@ -1537,47 +1538,54 @@ assert (‖v'₁‖ = 1%L ∧ ‖v'₂‖ = 1%L) as (Hnv'₁, Hnv'₂). {
   rewrite Hv'₁, Hv'₂.
   do 2 rewrite vec_norm_vec_const_mul.
   rewrite (rngl_abs_inv Hop Hiv Hto); [ | easy ].
-  rewrite (rngl_abs_sqrt Hop Hor). 2: {
-    apply (rngl_le_0_sub Hop Hor).
-    now apply rngl_lt_le_incl.
-  }
+  rewrite (rngl_abs_sqrt Hop Hor); [ | easy ].
   rewrite Ha₁, Ha₂.
   now rewrite (rngl_mul_inv_diag_l Hiv).
 }
 assert (‖v₁‖² = (1 - a²)%L ∧ ‖v₂‖² = (1 - a²)%L) as (Hnv₁, Hnv₂). {
   rewrite Hv'₁ in Hnv'₁.
   rewrite Hv'₂ in Hnv'₂.
-...
-  apply (f_equal Rsqr) in Hnv'₁.
-  apply (f_equal Rsqr) in Hnv'₂.
-  rewrite <- vec_dot_mul_diag, Rsqr_1 in Hnv'₁, Hnv'₂.
+  apply (f_equal rngl_squ) in Hnv'₁.
+  apply (f_equal rngl_squ) in Hnv'₂.
+  rewrite <- vec_dot_mul_diag, rngl_squ_1 in Hnv'₁, Hnv'₂.
   rewrite vec_sqr_const_mul in Hnv'₁, Hnv'₂.
   rewrite vec_dot_mul_diag in Hnv'₁, Hnv'₂.
-  rewrite Rsqr_inv_depr in Hnv'₁; [ | easy ].
-  rewrite Rsqr_inv_depr in Hnv'₂; [ | easy ].
-  rewrite Rsqr_sqrt in Hnv'₁; [ | lra ].
-  rewrite Rsqr_sqrt in Hnv'₂; [ | lra ].
-  apply Rmult_eq_compat_l with (r := 1 - a²) in Hnv'₁.
-  apply Rmult_eq_compat_l with (r := 1 - a²) in Hnv'₂.
-  rewrite <- Rmult_assoc, Rmult_1_r in Hnv'₁, Hnv'₂.
-  rewrite Rinv_r in Hnv'₁; [ | lra ].
-  rewrite Rinv_r in Hnv'₂; [ | lra ].
-  now rewrite Rmult_1_l in Hnv'₁, Hnv'₂.
+  rewrite (rngl_squ_inv Hos Hiv) in Hnv'₁; [ | easy ].
+  rewrite (rngl_squ_inv Hos Hiv) in Hnv'₂; [ | easy ].
+  rewrite rngl_squ_sqrt in Hnv'₁; [ | easy ].
+  rewrite rngl_squ_sqrt in Hnv'₂; [ | easy ].
+  apply (f_equal (rngl_mul (1 - a²))) in Hnv'₁.
+  apply (f_equal (rngl_mul (1 - a²))) in Hnv'₂.
+  rewrite rngl_mul_assoc, rngl_mul_1_r in Hnv'₁, Hnv'₂.
+  rewrite (rngl_mul_inv_diag_r Hiv) in Hnv'₁. 2: {
+    intros H.
+    apply -> (rngl_sub_move_0_r Hop) in H.
+    now rewrite H, (rngl_sub_diag Hos), (rl_sqrt_0 Hop Hto Hii) in Hsa.
+  }
+  rewrite (rngl_mul_inv_diag_r Hiv) in Hnv'₂. 2: {
+    intros H.
+    apply -> (rngl_sub_move_0_r Hop) in H.
+    now rewrite H, (rngl_sub_diag Hos), (rl_sqrt_0 Hop Hto Hii) in Hsa.
+  }
+  now rewrite rngl_mul_1_l in Hnv'₁, Hnv'₂.
 }
-rewrite Hnv'₁, Hnv'₂, Rmult_1_l, Rdiv_1_r, Rdiv_1_r.
-assert (H : (1 - a²) * c - v₁ · v₂ = 0). {
+rewrite Hnv'₁, Hnv'₂, rngl_mul_1_l.
+rewrite (rngl_div_1_r Hiq); [ | now left ].
+rewrite (rngl_div_1_r Hiq); [ | now left ].
+assert (H : ((1 - a²) * c - v₁ · v₂ = 0)%L). {
   subst v₁ v₂.
   destruct p as (xp, yp, zp).
   destruct p₁ as (xp₁, yp₁, zp₁).
   destruct p₂ as (xp₂, yp₂, zp₂).
   unfold latitude in Ha₁, Ha₂; simpl in *.
-  rewrite Rsqr_1 in Hp, Hp₁, Hp₂.
+  rewrite rngl_squ_1 in Hp, Hp₁, Hp₂.
   rewrite Hp, Hp₁ in Ha₁.
   rewrite Hp, Hp₂ in Ha₂.
   rewrite Hp in Hmv.
-  rewrite sqrt_1 in Ha₁, Ha₂, Hmv.
-  rewrite Rmult_1_l, Rdiv_1_r in Ha₁, Ha₂.
+  rewrite (rl_sqrt_1 Hop Hiq Hto) in Ha₁, Ha₂, Hmv.
+  rewrite rngl_mul_1_l, (rngl_div_1_r Hiq) in Ha₁, Ha₂.
   do 3 rewrite Rdiv_1_r in Hmv.
+...
   rewrite Rsqr_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
   rewrite Rsqr_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
   clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv.
