@@ -1536,14 +1536,18 @@ assert (‖v'₁‖ = 1%L ∧ ‖v'₂‖ = 1%L) as (Hnv'₁, Hnv'₂). {
   eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
   rewrite Hv'₁, Hv'₂.
   do 2 rewrite vec_norm_vec_const_mul.
-...
-  rewrite Rabs_inv.
-  rewrite Rabs_sqrt, Ha₁, Ha₂.
-  now rewrite Rinv_l.
+  rewrite (rngl_abs_inv Hop Hiv Hto); [ | easy ].
+  rewrite (rngl_abs_sqrt Hop Hor). 2: {
+    apply (rngl_le_0_sub Hop Hor).
+    now apply rngl_lt_le_incl.
+  }
+  rewrite Ha₁, Ha₂.
+  now rewrite (rngl_mul_inv_diag_l Hiv).
 }
-assert (‖v₁‖² = 1 - a² ∧ ‖v₂‖² = 1 - a²) as (Hnv₁, Hnv₂). {
+assert (‖v₁‖² = (1 - a²)%L ∧ ‖v₂‖² = (1 - a²)%L) as (Hnv₁, Hnv₂). {
   rewrite Hv'₁ in Hnv'₁.
   rewrite Hv'₂ in Hnv'₂.
+...
   apply (f_equal Rsqr) in Hnv'₁.
   apply (f_equal Rsqr) in Hnv'₂.
   rewrite <- vec_dot_mul_diag, Rsqr_1 in Hnv'₁, Hnv'₂.
