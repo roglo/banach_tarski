@@ -1464,33 +1464,53 @@ apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ (‖p‖ * ‖p₁‖)²). {
   apply (eq_rngl_squ_0 Hos Hio) in H.
   now apply vec_norm_eq_0 in H.
 }
-rewrite (rngl_div_mul Hiv).
-...
-rewrite Rmult_div_same. {
-  rewrite Rmult_1_l, Rsqr_mult.
+rewrite (rngl_div_mul Hiv). {
+  rewrite rngl_mul_1_l, (rngl_squ_mul Hic).
   apply vec_Cauchy_Schwarz_inequality.
 }
-rewrite Rsqr_mult.
-intros H; apply Rmult_integral in H.
+rewrite (rngl_squ_mul Hic).
+intros H; apply (rngl_integral Hos Hio) in H.
 destruct H as [H| H].
-1, 2: now apply Rsqr_eq_0, vec_norm_eq_0 in H.
+all: now apply (eq_rngl_squ_0 Hos Hio), vec_norm_eq_0 in H.
 Qed.
 
 Theorem unit_sphere_mat_vec_mul_rot_sin_cos : ∀ p p₁ p₂ a c s,
-  p ∈ sphere 1
-  → p₁ ∈ sphere 1
-  → p₂ ∈ sphere 1
+  p ∈ sphere 1%L
+  → p₁ ∈ sphere 1%L
+  → p₂ ∈ sphere 1%L
   → latitude p p₁ = a
   → latitude p p₂ = a
-  → a² ≠ 1
-  → s² + c² = 1
-  → (matrix_of_axis_angle (p, s, c) * p₁)%vec = p₂
+  → a² ≠ 1%L
+  → (s² + c² = 1)%L
+  → (matrix_of_axis_angle p s c * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  destruct (rot_sin_cos p p₁ p₂).
+  f_equal; rewrite H1; apply H1.
+}
 intros * Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
-assert (H : a² < 1). {
-  specialize (sqr_latitude_le_1 p p₁) as H.
-  rewrite Ha₁ in H; lra.
+specialize (rngl_0_le_1 Hos Hto) as H01.
+specialize (rngl_0_lt_1 Hos Hc1 Hto) as H0l1.
+assert (Hpz : p ≠ 0%vec). {
+  apply on_sphere_norm in Hp; [ | easy ].
+  intros H; subst p.
+  rewrite vec_norm_0 in Hp; symmetry in Hp.
+  now apply (rngl_1_neq_0 Hc1) in Hp.
+}
+assert (Hpz₁ : p₁ ≠ 0%vec). {
+  apply on_sphere_norm in Hp₁; [ | easy ].
+  intros H; subst p₁.
+  rewrite vec_norm_0 in Hp₁; symmetry in Hp₁.
+  now apply (rngl_1_neq_0 Hc1) in Hp₁.
+}
+assert (H : (a² < 1)%L). {
+  specialize (sqr_latitude_le_1 p p₁ Hpz Hpz₁) as H.
+  rewrite Ha₁ in H.
+  now apply rngl_le_neq.
 }
 clear Ha2; rename H into Ha2.
 unfold rot_sin_cos.
@@ -1501,14 +1521,22 @@ remember (v₁ ⁄ √ (1 - a²)) as v'₁ eqn:Hv'₁.
 remember (v₂ ⁄ √ (1 - a²)) as v'₂ eqn:Hv'₂.
 move v₁ before p₂; move v₂ before v₁.
 move v'₁ before v₂; move v'₂ before v'₁.
-assert (Hsa : √ (1 - a²) ≠ 0) by (intros H; apply sqrt_eq_0 in H; lra).
-assert (‖v'₁‖ = 1 ∧ ‖v'₂‖ = 1) as (Hnv'₁, Hnv'₂). {
+(**)
+assert (Hsa : √ (1 - a²) ≠ 0%L). {
+  intros H; apply (eq_rl_sqrt_0 Hos) in H.
+  apply -> (rngl_sub_move_0_r Hop) in H; symmetry in H.
+  now rewrite H in Ha2; apply rngl_lt_irrefl in Ha2.
+  apply (rngl_le_0_sub Hop Hor).
+  now apply rngl_lt_le_incl.
+}
+assert (‖v'₁‖ = 1%L ∧ ‖v'₂‖ = 1%L) as (Hnv'₁, Hnv'₂). {
   subst v₁ v₂.
   symmetry in Ha₁, Ha₂.
   eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
   eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
   rewrite Hv'₁, Hv'₂.
   do 2 rewrite vec_norm_vec_const_mul.
+...
   rewrite Rabs_inv.
   rewrite Rabs_sqrt, Ha₁, Ha₂.
   now rewrite Rinv_l.
