@@ -1440,6 +1440,7 @@ Theorem sqr_latitude_le_1 :
   ∀ p p₁, p ≠ 0%vec → p₁ ≠ 0%vec → ((latitude p p₁)² ≤ 1)%L.
 Proof.
 destruct_ac.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros * Hpz Hp₁z.
 unfold latitude.
 rewrite (rngl_squ_div Hic Hos Hiv). 2: {
@@ -1449,12 +1450,22 @@ rewrite (rngl_squ_div Hic Hos Hiv). 2: {
   intros H1.
   now apply vec_norm_eq_0 in H1.
 }
-...
-apply Rmult_le_reg_r with (r := (‖p‖ * ‖p₁‖)²). {
-  rewrite Rsqr_mult.
-  apply Rmult_lt_0_compat.
-  1, 2: now apply Rlt_0_sqr; intros H; apply vec_norm_eq_0 in H.
+apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ (‖p‖ * ‖p₁‖)²). {
+  rewrite (rngl_squ_mul Hic).
+  apply (rngl_mul_pos_pos Hop Hiq Hor).
+  apply rngl_le_neq.
+  split; [ apply (rngl_squ_nonneg Hos Hto) | ].
+  intros H; symmetry in H.
+  apply (eq_rngl_squ_0 Hos Hio) in H.
+  now apply vec_norm_eq_0 in H.
+  apply rngl_le_neq.
+  split; [ apply (rngl_squ_nonneg Hos Hto) | ].
+  intros H; symmetry in H.
+  apply (eq_rngl_squ_0 Hos Hio) in H.
+  now apply vec_norm_eq_0 in H.
 }
+rewrite (rngl_div_mul Hiv).
+...
 rewrite Rmult_div_same. {
   rewrite Rmult_1_l, Rsqr_mult.
   apply vec_Cauchy_Schwarz_inequality.
