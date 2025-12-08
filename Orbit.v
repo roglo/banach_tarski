@@ -209,3 +209,5 @@ apply rotate_is_rotation_matrix.
 Qed.
 
 End a.
+
+Arguments sphere {T ro} r%_L.

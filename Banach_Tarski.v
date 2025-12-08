@@ -41,6 +41,17 @@ Ltac fold_rngl :=
     with rngl_one by easy;
   repeat try rewrite strange_let.
 
+Ltac fold_rngl_in H :=
+  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
+    with rngl_mul in H by easy;
+  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
+    with rngl_add in H by easy;
+  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
+    with rngl_zero in H by easy;
+  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
+    with rngl_one in H by easy;
+  repeat try rewrite strange_let in H.
+
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
 
 Definition set_of_vec (v : vector T) := mkset (λ u, u = v).
@@ -573,7 +584,7 @@ Definition fixpoint_of_bool_prod_nat r '(b, nf, no) :=
 Theorem vec_div_in_sphere : ∀ r p,
   r ≠ 0%L
   → p ∈ sphere r
-  → p ⁄ r ∈ sphere 1%L.
+  → p ⁄ r ∈ sphere 1.
 Proof.
 destruct_ac.
 intros r (x, y, z) Hr Hp; simpl in Hp; simpl.
@@ -585,7 +596,7 @@ now rewrite (rngl_mul_inv_diag_l Hiv).
 Qed.
 
 Theorem vec_mul_in_sphere : ∀ r p,
-  p ∈ sphere 1%L
+  p ∈ sphere 1
   → r ⁎ p ∈ sphere r.
 Proof.
 destruct_ac.
@@ -1187,9 +1198,9 @@ now apply set_inter_union_distr_r.
 Qed.
 
 Theorem unit_sphere_rotation_implies_same_latitude : ∀ p p₁ p₂ c s,
-  p ∈ sphere 1%L
-  → p₁ ∈ sphere 1%L
-  → p₂ ∈ sphere 1%L
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
   → (matrix_of_axis_angle p s c * p₁ = p₂)%vec
   → latitude p p₁ = latitude p p₂.
 Proof.
@@ -1218,41 +1229,34 @@ ring_simplify.
 progress unfold Rsqr in Hp, Hp₁, Hp₂, Hz, Hy, Hx.
 nsatz.
 Qed.
+*)
 
 Theorem latitude_mul : ∀ k u v,
   k ≠ 0%L
+  → u ≠ 0%vec
+  → v ≠ 0%vec
   → latitude (k ⁎ u) (k ⁎ v) = latitude u v.
 Proof.
 destruct_ac.
-intros * Hr.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
+intros * Hr Huz Hvz.
 unfold latitude.
-destruct (vec_eq_dec u 0) as [Hu| Hu]. {
-  rewrite Hu.
-  rewrite vec_const_mul_0_r.
-  do 2 rewrite vec_dot_mul_0_l.
-  rewrite (rngl_div_0_l Hos Hiq).
-  symmetry; apply (rngl_div_0_l Hos Hiq).
-... (* faux *)
-}
-destruct (vec_eq_dec v 0) as [Hv| Hv]. {
-  rewrite Hv.
-  rewrite vec_const_mul_0_r.
-  now do 2 rewrite vec_dot_mul_0_r, Rdiv_0_l.
-}
 rewrite <- Rmult_vec_dot_mul_distr_l.
 rewrite <- Rmult_vec_dot_mul_distr_r.
 do 2 rewrite vec_norm_vec_const_mul.
-do 2 rewrite <- Rmult_assoc.
-replace (Rabs k * ‖u‖ * Rabs k) with (Rabs k * Rabs k * ‖u‖) by lra.
-rewrite <- Rabs_mult, fold_Rsqr, Rabs_sqr.
-rewrite Rmult_assoc; unfold Rdiv.
-assert (Hr2 : k² ≠ 0) by (intros H; apply Rsqr_eq_0 in H; lra).
-rewrite Rinv_mult.
-rewrite <- Rmult_assoc.
-replace (k² * (u · v) * / k²) with (k² * / k² * (u · v)) by lra.
-now rewrite Rinv_r; [ rewrite Rmult_1_l | ].
+do 2 rewrite rngl_mul_assoc.
+rewrite (rngl_mul_mul_swap Hic (rngl_abs _)).
+rewrite <- (rngl_abs_mul Hop Hiq Hto), fold_rngl_squ, Rabs_sqr.
+rewrite <- rngl_mul_assoc.
+apply Rdiv_mult_simpl_l. {
+  now intros H; apply (eq_rngl_squ_0 Hos Hio) in H.
+}
+intros H.
+apply (rngl_integral Hos Hio) in H.
+now destruct H as [H| H]; apply vec_norm_eq_0 in H.
 Qed.
 
+(*
 Theorem rotation_implies_same_latitude : ∀ r p p₁ p₂ c s,
   (0 < r)%L
   → p ∈ sphere r
@@ -1301,8 +1305,8 @@ Qed.
 *)
 
 Theorem latitude_norm : ∀ p p₁ v a,
-  p ∈ sphere 1%L
-  → p₁ ∈ sphere 1%L
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
   → a = latitude p p₁
   → v = (p₁ - a ⁎ p)%vec
   → ‖v‖ = √ (1 - a²).
@@ -1474,10 +1478,11 @@ destruct H as [H| H].
 all: now apply (eq_rngl_squ_0 Hos Hio), vec_norm_eq_0 in H.
 Qed.
 
+(*
 Theorem unit_sphere_mat_vec_mul_rot_sin_cos : ∀ p p₁ p₂ a c s,
-  p ∈ sphere 1%L
-  → p₁ ∈ sphere 1%L
-  → p₂ ∈ sphere 1%L
+  p ∈ sphere 1
+  → p₁ ∈ sphere 1
+  → p₂ ∈ sphere 1
   → latitude p p₁ = a
   → latitude p p₂ = a
   → a² ≠ 1%L
@@ -1588,14 +1593,23 @@ assert (H : ((1 - a²) * c - v₁ · v₂ = 0)%L). {
   do 3 rewrite Rdiv_1_r in Hmv.
   rewrite rngl_squ_sqrt in Hnv₁; [ | apply nonneg_sqr_vec_norm ].
   rewrite rngl_squ_sqrt in Hnv₂; [ | apply nonneg_sqr_vec_norm ].
-  clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv Hop.
+  clear - Ha₁ Ha₂ Hnv₁ Hnv₂ Hmv Hop Hos.
+  injection Hmv; clear Hmv; intros H3 H2 H1.
   do 3 rewrite (rngl_add_opp_r Hop) in Hnv₁, Hnv₂.
   do 6 rewrite (rngl_add_opp_r Hop).
-  injection Hmv; clear Hmv; intros H3 H2 H1.
+  apply (rngl_sub_move_0_r Hop); symmetry.
+...
   ring_simplify; fold_rngl.
   rewrite fold_rngl_squ.
   do 4 rewrite <- rngl_mul_assoc.
   do 3 rewrite fold_rngl_squ.
+  do 4 rewrite <- (rngl_sub_add_distr Hos).
+  do 2 rewrite <- rngl_mul_add_distr_l.
+  progress unfold rngl_squ in Hnv₁.
+  ring_simplify in Hnv₁.
+  fold_rngl_in Hnv₁.
+...
+  rewrite <- (rngl_add_sub_assoc Hop _ _ (a² * _)).
 ...
   progress unfold rngl_squ in Hnv₁, Hnv₂, H3, H2, H1 |-*.
 ...
@@ -1749,33 +1763,45 @@ destruct (Rle_dec 0 (p · v'₁ × v'₂)) as [Hpvv| Hpvv]. {
   now rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_involutive.
 }
 Qed.
+*)
 
 Theorem mat_vec_mul_rot_sin_cos : ∀ r p p₁ p₂ a c s,
-  0 < r
+  (0 < r)%L
   → p ∈ sphere r
   → p₁ ∈ sphere r
   → p₂ ∈ sphere r
   → latitude p p₁ = a
   → latitude p p₂ = a
-  → a² ≠ 1
-  → s² + c² = 1
-  → (matrix_of_axis_angle (p, s, c) * p₁)%vec = p₂
+  → a² ≠ 1%L
+  → (s² + c² = 1)%L
+  → (matrix_of_axis_angle p s c * p₁)%vec = p₂
   → (s, c) = rot_sin_cos p p₁ p₂.
 Proof.
+destruct_ac.
 intros * Hr Hp Hp₁ Hp₂ Ha₁ Ha₂ Ha2 Hsc Hmv.
-assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1). {
-  clear - Hr; intros.
-  apply vec_div_in_sphere; [ lra | easy ].
+assert (Hrz : r ≠ 0%L). {
+  intros H; rewrite H in Hr.
+  now apply rngl_lt_irrefl in Hr.
 }
-assert (Ha : ∀ p p', latitude p p' = latitude (p ⁄ r) (p' ⁄ r)). {
-  clear - Hr; intros.
-  rewrite latitude_mul; [ easy | ].
-  apply Rinv_neq_0_compat; lra.
+assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1). {
+  now intros; apply vec_div_in_sphere.
+}
+assert
+  (Ha :
+    ∀ p p',
+    p ≠ 0%vec
+    → p' ≠ 0%vec
+    → latitude p p' = latitude (p ⁄ r) (p' ⁄ r)). {
+  clear p Hp Ha₁ Ha₂ Hmv.
+  intros * Hpz Hp'z; symmetry.
+  apply latitude_mul; [ | easy | easy ].
+  now apply (rngl_inv_neq_0 Hos Hiv).
 }
 rewrite Ha in Ha₁, Ha₂.
-apply (f_equal (vec_const_mul (/ r))) in Hmv.
+apply (f_equal (vec_const_mul r⁻¹)) in Hmv.
 rewrite <- mat_vec_mul_const_distr in Hmv.
-assert (Hir : / r ≠ 0) by (apply Rinv_neq_0_compat; lra).
+assert (Hir : r⁻¹ ≠ 0%L). {
+...
 rewrite matrix_mul_axis with (k := / r) in Hmv; [ | easy ].
 assert (Hirp : 0 < / r) by now apply Rinv_0_lt_compat.
 rewrite Rsign_of_pos in Hmv; [ | easy ].
