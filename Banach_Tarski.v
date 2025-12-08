@@ -1640,13 +1640,13 @@ assert (p · v'₁ = 0 ∧ p · v'₂ = 0) as (Hpv₁, Hpv₂). {
     rewrite <- Ha₁; unfold latitude.
     rewrite vec_dot_mul_diag, Hp, Hp₁, Rsqr_1.
     rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
-    now rewrite Rminus_diag_eq.
+    now rewrite (proj2 (rngl_sub_move_0_r Hop _ _)).
   } {
     apply Rmult_eq_0_compat_l.
     rewrite <- Ha₂; unfold latitude.
     rewrite vec_dot_mul_diag, Hp, Hp₂, Rsqr_1.
     rewrite Rmult_1_r, Rmult_1_r, Rdiv_1_r.
-    now rewrite Rminus_diag_eq.
+    now rewrite (proj2 (rngl_sub_move_0_r Hop _ _)).
   }
 }
 assert (Hppvv : (p₂ - p₁ = v₂ - v₁)%vec). {
@@ -1939,22 +1939,24 @@ Theorem unit_sphere_latitude_1 : ∀ p p',
   → latitude p p' = 1%L
   → p = p'.
 Proof.
+destruct_ac.
+specialize (rngl_0_le_1 Hos Hto) as H01.
 intros * Hp Hp' Hlat.
 unfold latitude in Hlat; simpl in Hlat.
-...
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm in Hp'; [ | lra ].
-rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r in Hlat.
+apply on_sphere_norm in Hp; [ | easy ].
+apply on_sphere_norm in Hp'; [ | easy ].
+rewrite Hp, Hp', rngl_mul_1_l, Rdiv_1_r in Hlat.
 specialize (vec_Lagrange_identity p p') as Hlag.
-rewrite Hp, Hp', Hlat, Rsqr_1, Rmult_1_l in Hlag.
-rewrite Rminus_diag_eq in Hlag; [ | easy ].
+rewrite Hp, Hp', Hlat, rngl_squ_1, rngl_mul_1_l in Hlag.
+rewrite (proj2 (rngl_sub_move_0_r Hop _ _)) in Hlag; [ | easy ].
 symmetry in Hlag.
 destruct p as (xp, yp, zp).
 destruct p' as (xp', yp', zp').
-apply on_sphere_norm in Hp; [ | lra ].
-apply on_sphere_norm in Hp'; [ | lra ].
+apply on_sphere_norm in Hp; [ | easy ].
+apply on_sphere_norm in Hp'; [ | easy ].
 simpl in Hp, Hp', Hlat, Hlag.
-rewrite Rsqr_1 in Hp, Hp'.
+rewrite rngl_squ_1 in Hp, Hp'.
+...
 do 3 rewrite fold_Rsqr in Hlag.
 apply sqr_vec_norm_eq_0 in Hlag.
 destruct Hlag as (H3 & H2 & H1).
@@ -2049,7 +2051,7 @@ destruct (Req_dec (latitude axis p) (latitude axis p')) as [Hll| Hll]. {
     apply in_its_sphere.
   }
   intros H.
-  replace 1 with 1² in H by apply Rsqr_1.
+  replace 1 with 1² in H by apply rngl_squ_1.
   apply Rsqr_eq_abs_0 in H.
   rewrite Rabs_R1 in H.
   apply Rabs_or in H.
@@ -2130,7 +2132,7 @@ unfold ℝ_of_I, I_of_ℝ.
 destruct (Rlt_dec x 0) as [Hxl| Hxl]. {
   destruct (Rlt_dec (1 / (- x + 1) / 2) (1 / 2)) as [Hlt| Hge]. {
     rewrite Rmult_div_same; [ | lra ].
-    unfold Rdiv; rewrite Rmult_1_l.
+    unfold Rdiv; rewrite rngl_mul_1_l.
     rewrite Rinv_inv; lra.
   }
   exfalso.
@@ -2139,7 +2141,7 @@ destruct (Rlt_dec x 0) as [Hxl| Hxl]. {
   rewrite Rmult_div_same in Hge; [ | lra ].
   rewrite Rmult_div_same in Hge; [ | lra ].
   apply Rmult_le_compat_r with (r := (- x + 1)) in Hge; [ | lra ].
-  rewrite Rmult_1_l in Hge.
+  rewrite rngl_mul_1_l in Hge.
   rewrite Rmult_div_same in Hge; lra.
 }
 apply Rnot_lt_le in Hxl.
@@ -2161,7 +2163,7 @@ rewrite Rmult_div_same; [ | lra ].
 unfold Rminus; rewrite Rplus_assoc.
 rewrite Rplus_opp_r, Rplus_0_r.
 rewrite fold_Rminus.
-unfold Rdiv; do 2 rewrite Rmult_1_l.
+unfold Rdiv; do 2 rewrite rngl_mul_1_l.
 rewrite Rinv_inv; lra.
 Qed.
 
@@ -2178,7 +2180,7 @@ destruct (Rlt_dec x 0) as [Hx| Hx]. {
   }
   apply Rmult_le_reg_r with (r := 2); [ lra | ].
   rewrite Rmult_div_same; [ | lra ].
-  rewrite Rmult_1_l.
+  rewrite rngl_mul_1_l.
   apply Rmult_le_reg_r with (r := - x + 1); [ lra | ].
   rewrite Rmult_div_same; lra.
 } {
@@ -2197,7 +2199,7 @@ destruct (Rlt_dec x 0) as [Hx| Hx]. {
   rewrite Rmult_plus_distr_r.
   rewrite Rmult_div_same; [ | lra ].
   rewrite Rmult_div_same; [ | lra ].
-  rewrite Rmult_1_l.
+  rewrite rngl_mul_1_l.
   apply Rmult_le_reg_r with (r := x + 1); [ lra | ].
   rewrite Rmult_plus_distr_r.
   rewrite Rmult_div_same; lra.
@@ -2231,7 +2233,7 @@ split. {
   rewrite Rsqr_sqrt; [ lra | ].
   apply Rplus_le_reg_r with (r := s²).
   rewrite Rplus_0_l, Rminus_plus.
-  replace 1 with 1² by apply Rsqr_1.
+  replace 1 with 1² by apply rngl_squ_1.
   apply Rsqr_incr_1; [ easy | easy | lra ].
 }
 intros n.
@@ -2262,7 +2264,7 @@ Proof.
 intros (x, y, z); simpl.
 split. {
   intros (r & Hr & Hs); rewrite Hs.
-  replace 1 with 1² by apply Rsqr_1.
+  replace 1 with 1² by apply rngl_squ_1.
   split. {
     apply Rsqr_incr_1; [ easy | lra | lra ].
   }
@@ -2452,7 +2454,7 @@ rewrite matrix_mul_axis with (k := ‖p₁‖) in Hmp. {
   rewrite vec_const_mul_assoc in Hmp.
   rewrite Rinv_r in Hmp; [ | now apply vec_norm_neq_0 ].
   rewrite vec_const_mul_1_l in Hmp.
-  rewrite Rsign_of_pos in Hmp; [ now rewrite Rmult_1_l in Hmp | ].
+  rewrite Rsign_of_pos in Hmp; [ now rewrite rngl_mul_1_l in Hmp | ].
   now apply vec_norm_pos.
 }
 now apply vec_norm_neq_0.
@@ -2706,7 +2708,7 @@ split. {
   apply is_partition_sub.
   intros p Hp; subst E.
   simpl in Hp; subst p; simpl.
-  split; [ rewrite Rsqr_0, Rsqr_1; lra | ].
+  split; [ rewrite Rsqr_0, rngl_squ_1; lra | ].
   intros H; simpl in H.
   injection H; clear H; intros H; lra.
 }
@@ -2742,7 +2744,7 @@ split. {
   intros v Hv; simpl in Hv.
   destruct Hv as (n & Hv).
   rewrite <- Hv, Hp₀.
-  apply in_ball_after_rotation; [ simpl; rewrite Rsqr_0, Rsqr_1; lra | ].
+  apply in_ball_after_rotation; [ simpl; rewrite Rsqr_0, rngl_squ_1; lra | ].
   apply mat_pow_is_rotation_matrix.
   apply rot_z_is_rotation_matrix.
 }
@@ -2783,7 +2785,7 @@ split. {
         rewrite <- Hv.
         apply in_ball_after_rotation. {
           rewrite Hp₀; simpl.
-          rewrite Rsqr_0, Rsqr_1; lra.
+          rewrite Rsqr_0, rngl_squ_1; lra.
         }
         apply mat_pow_is_rotation_matrix.
         apply rot_z_is_rotation_matrix.
