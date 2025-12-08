@@ -1763,7 +1763,6 @@ destruct (Rle_dec 0 (p · v'₁ × v'₂)) as [Hpvv| Hpvv]. {
   now rewrite <- Ropp_mult_distr_l, Rmult_1_l, Ropp_involutive.
 }
 Qed.
-*)
 
 Theorem mat_vec_mul_rot_sin_cos : ∀ r p p₁ p₂ a c s,
   (0 < r)%L
@@ -1797,15 +1796,35 @@ assert
   apply latitude_mul; [ | easy | easy ].
   now apply (rngl_inv_neq_0 Hos Hiv).
 }
-rewrite Ha in Ha₁, Ha₂.
+assert (Hpz : p ≠ 0%vec). {
+  intros H.
+  apply on_sphere_norm in Hp; [ | now apply rngl_lt_le_incl ].
+  subst p; symmetry in Hp.
+  now rewrite vec_norm_0 in Hp.
+}
+assert (Hp₁z : p₁ ≠ 0%vec). {
+  intros H.
+  apply on_sphere_norm in Hp₁; [ | now apply rngl_lt_le_incl ].
+  subst p₁; symmetry in Hp₁.
+  now rewrite vec_norm_0 in Hp₁.
+}
+assert (Hp₂z : p₂ ≠ 0%vec). {
+  intros H.
+  apply on_sphere_norm in Hp₂; [ | now apply rngl_lt_le_incl ].
+  rewrite H in Hp₂; symmetry in Hp₂.
+  now rewrite vec_norm_0 in Hp₂.
+}
+rewrite Ha in Ha₁, Ha₂; [ | easy | easy | easy | easy ].
 apply (f_equal (vec_const_mul r⁻¹)) in Hmv.
 rewrite <- mat_vec_mul_const_distr in Hmv.
-assert (Hir : r⁻¹ ≠ 0%L). {
-...
-rewrite matrix_mul_axis with (k := / r) in Hmv; [ | easy ].
-assert (Hirp : 0 < / r) by now apply Rinv_0_lt_compat.
+assert (Hir : r⁻¹ ≠ 0%L) by now apply (rngl_inv_neq_0 Hos Hiv).
+rewrite matrix_mul_axis with (k := r⁻¹) in Hmv; [ | easy | easy ].
+assert (Hirp : (0 < r⁻¹)%L). {
+  now apply (rngl_inv_pos Hop Hiv Hto).
+}
 rewrite Rsign_of_pos in Hmv; [ | easy ].
-rewrite Rmult_1_l in Hmv.
+rewrite rngl_mul_1_l in Hmv.
+...
 specialize
   (unit_sphere_mat_vec_mul_rot_sin_cos (p ⁄ r) (p₁ ⁄ r) (p₂ ⁄ r) a c s
      (Hpr p Hp) (Hpr p₁ Hp₁) (Hpr p₂ Hp₂) Ha₁ Ha₂ Ha2 Hsc Hmv) as H.
@@ -1894,6 +1913,7 @@ rewrite Rmult_assoc.
 rewrite Rdiv_mult_simpl_l; [ f_equal; lra | ].
 intros J; apply Rsqr_eq_0 in J; lra.
 Qed.
+*)
 
 (* J₀(axis) = set of angles of rotation around the axis, such that
    for some p in D ∩ sphere(r), R(p) is also in D ∩ sphere(r) where
@@ -1901,13 +1921,13 @@ Qed.
 Definition J₀ axis :=
   mkset
     (λ '(sinθ, cosθ),
-     sinθ² + cosθ² = 1 ∧
-     let R := matrix_of_axis_angle (axis, sinθ, cosθ) in
+     (sinθ² + cosθ² = 1)%L ∧
+     let R := matrix_of_axis_angle axis sinθ cosθ in
      let r := ‖axis‖ in
      ∃ p p', p ∈ D ∩ sphere r ∧ p' ∈ D ∩ sphere r ∧
      (R * p)%vec = p').
 
-Definition J₀_of_nat axis n : (ℝ * ℝ) :=
+Definition J₀_of_nat axis n : (T * T) :=
   let '(n₁, n₂) := prod_nat_of_nat n in
   let p := point_in_D_of_nat ‖axis‖ n₁ in
   let p' := point_in_D_of_nat ‖axis‖ n₂ in
@@ -1916,11 +1936,12 @@ Definition J₀_of_nat axis n : (ℝ * ℝ) :=
 Theorem unit_sphere_latitude_1 : ∀ p p',
   p ∈ sphere 1
   → p' ∈ sphere 1
-  → latitude p p' = 1
+  → latitude p p' = 1%L
   → p = p'.
 Proof.
 intros * Hp Hp' Hlat.
 unfold latitude in Hlat; simpl in Hlat.
+...
 apply on_sphere_norm in Hp; [ | lra ].
 apply on_sphere_norm in Hp'; [ | lra ].
 rewrite Hp, Hp', Rmult_1_l, Rdiv_1_r in Hlat.
