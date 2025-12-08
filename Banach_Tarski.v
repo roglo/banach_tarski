@@ -1436,28 +1436,20 @@ destruct H as [H| H]; [ left | right ]. {
 }
 Qed.
 
-Theorem sqr_latitude_le_1 : ∀ p p₁, ((latitude p p₁)² ≤ 1)%L.
+Theorem sqr_latitude_le_1 :
+  ∀ p p₁, p ≠ 0%vec → p₁ ≠ 0%vec → ((latitude p p₁)² ≤ 1)%L.
 Proof.
-intros.
-destruct (vec_eq_dec p 0) as [Hp| Hp]. {
-  unfold latitude.
-  destruct p₁ as (x, y, z).
-  rewrite Hp; simpl.
-...
-  do 3 rewrite Rmult_0_l.
-  do 2 rewrite Rplus_0_l.
-  rewrite Rdiv_0_l, Rsqr_0; lra.
-}
-destruct (vec_eq_dec p₁ 0) as [Hp₁| Hp₁]. {
-  unfold latitude.
-  destruct p as (x, y, z).
-  rewrite Hp₁; simpl.
-  do 3 rewrite Rmult_0_r.
-  do 2 rewrite Rplus_0_l.
-  rewrite Rdiv_0_l, Rsqr_0; lra.
-}
+destruct_ac.
+intros * Hpz Hp₁z.
 unfold latitude.
-rewrite Rsqr_div'.
+rewrite (rngl_squ_div Hic Hos Hiv). 2: {
+  intros H.
+  apply (rngl_eq_mul_0_l Hos Hiq) in H.
+  now apply vec_norm_eq_0 in H.
+  intros H1.
+  now apply vec_norm_eq_0 in H1.
+}
+...
 apply Rmult_le_reg_r with (r := (‖p‖ * ‖p₁‖)²). {
   rewrite Rsqr_mult.
   apply Rmult_lt_0_compat.
