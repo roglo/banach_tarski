@@ -1412,13 +1412,12 @@ assert (‖(u ⁄ r)‖ = 1%L ∧ ‖(v ⁄ r)‖ = 1%L) as (Hu1, Hv1). {
   rewrite <- Hr, <- Huv.
   rewrite (rngl_abs_nonneg_eq Hop Hor).
   now split; apply (rngl_mul_inv_diag_l Hiv).
-Search (0 ≤ _⁻¹)%L.
-...
-  apply Rle_ge.
-  assert (Hrp : 0 ≤ r) by (rewrite Hr; apply vec_norm_nonneg).
-  apply Rmult_le_reg_r with (r := r); [ lra | ].
-  rewrite Rmult_0_l.
-  rewrite Rinv_l; [ lra | easy ].
+  apply rngl_lt_le_incl.
+  apply (rngl_inv_pos Hop Hiv Hto).
+  apply rngl_le_neq.
+  split; [ | easy ].
+  rewrite Hr.
+  apply vec_norm_nonneg.
 }
 assert (Huvr : (u ⁄ r) × (v ⁄ r) = 0%vec). {
   rewrite <- vec_const_mul_cross_distr_l.
@@ -1428,22 +1427,23 @@ assert (Huvr : (u ⁄ r) × (v ⁄ r) = 0%vec). {
 }
 specialize (vec_unit_cross_mul_eq_0 (u ⁄ r) (v ⁄ r) Hu1 Hv1 Huvr) as H.
 destruct H as [H| H]; [ left | right ]. {
-  apply vec_const_mul_eq_reg_l with (a := / r); [ easy | ].
-  now apply Rinv_neq_0_compat.
+  apply vec_const_mul_eq_reg_l with (a := r⁻¹); [ easy | ].
+  now apply (rngl_inv_neq_0 Hos Hiv).
 } {
   rewrite vec_opp_const_mul_distr_r in H.
-  apply vec_const_mul_eq_reg_l with (a := / r); [ easy | ].
-  now apply Rinv_neq_0_compat.
+  apply vec_const_mul_eq_reg_l with (a := r⁻¹); [ easy | ].
+  now apply (rngl_inv_neq_0 Hos Hiv).
 }
 Qed.
 
-Theorem sqr_latitude_le_1 : ∀ p p₁, (latitude p p₁)² ≤ 1.
+Theorem sqr_latitude_le_1 : ∀ p p₁, ((latitude p p₁)² ≤ 1)%L.
 Proof.
 intros.
 destruct (vec_eq_dec p 0) as [Hp| Hp]. {
   unfold latitude.
   destruct p₁ as (x, y, z).
   rewrite Hp; simpl.
+...
   do 3 rewrite Rmult_0_l.
   do 2 rewrite Rplus_0_l.
   rewrite Rdiv_0_l, Rsqr_0; lra.
