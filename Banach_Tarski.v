@@ -2124,25 +2124,19 @@ Definition J axis :=
     sinθ = rngl_sin (θ₀_n + 2 * k * π_n) ∧
     cosθ = rngl_cos (θ₀_n + 2 * k * π_n)).
 
-Print Z_of_nat_surj.
-...
+About Z_of_nat_surj.
 Definition J_of_nat axis n : (T * T) :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
-  let nk := Z_of_nat_surj nnk in
+  let zk := Z_of_nat_surj nnk in
   let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
   let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
   ∃ θ₀_nn π_nn,
   angle_div_nat θ₀ nn θ₀_nn ∧
   angle_div_nat π nn π_nn ∧
-  let sinθ := rngl_sin (θ₀_nn + 2 * nk * π_nn) in
-  let cosθ := rngl_cos (θ₀_nn + 2 * nk * π_nn) in
+  let sinθ := rngl_sin (θ₀_nn + 2 * zk * π_nn) in
+  let cosθ := rngl_cos (θ₀_nn + 2 * zk * π_nn) in
   (sinθ, cosθ).
-...
-  let sinθ := rngl_sin ((θ₀ + 2 * IZR nk * PI) / INR nn) in
-  let cosθ := rngl_cos ((θ₀ + 2 * IZR nk * PI) / INR nn) in
-  (sinθ, cosθ).
-
 ...
 
 Definition J_of_nat axis n : (T * T) :=
