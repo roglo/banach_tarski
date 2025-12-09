@@ -2189,19 +2189,38 @@ Definition ℝ_of_I i :=
 Theorem ℝ_of_I_inv : ∀ x, ℝ_of_I (I_of_ℝ x) = x.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  rewrite H1; apply H1.
+}
 intros.
 unfold ℝ_of_I, I_of_ℝ.
 destruct (rngl_ltb_dec x 0) as [Hxl| Hxl]. {
   apply (rngl_ltb_lt Heo) in Hxl.
   destruct (rngl_ltb_dec (1 / (- x + 1) / 2) (1 / 2)) as [Hlt| Hge]. {
     apply (rngl_ltb_lt Heo) in Hlt.
-...
-    rewrite Rmult_div_same; [ | lra ].
-    unfold Rdiv; rewrite rngl_mul_1_l.
-    rewrite Rinv_inv; lra.
+    rewrite (rngl_div_mul Hiv). 2: {
+      apply (rngl_2_neq_0 Hos Hc1 Hto).
+    }
+    progress unfold rngl_div; rewrite Hiv.
+    rewrite (rngl_mul_opp_l Hop).
+    do 2 rewrite rngl_mul_1_l.
+    rewrite (rngl_inv_involutive Hos Hiv).
+    rewrite (rngl_opp_add_distr Hop).
+    rewrite (rngl_opp_involutive Hop).
+    apply (rngl_sub_add Hop).
+    intros H.
+    rewrite (rngl_add_opp_l Hop) in H.
+    apply -> (rngl_sub_move_0_r Hop) in H.
+    subst x.
+    apply (rngl_nle_gt Hor) in Hxl.
+    apply Hxl; clear Hxl.
+    apply (rngl_0_le_1 Hos Hto).
   }
   exfalso.
-  apply Rnot_lt_le in Hge.
+  apply (rngl_ltb_ge_iff Hto) in Hge.
+...
   apply Rmult_le_compat_r with (r := 2) in Hge; [ | lra ].
   rewrite Rmult_div_same in Hge; [ | lra ].
   rewrite Rmult_div_same in Hge; [ | lra ].
