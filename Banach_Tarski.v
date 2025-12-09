@@ -2134,25 +2134,27 @@ Definition angle_add_mul_Z θ₁ z θ₂ :=
 
 (* sinθ = sin ((θ₀ + 2 * IZR zk * PI) / INR nn)
    cosθ = cos ((θ₀ + 2 * IZR zk * PI) / INR nn) *)
-Definition J_of_nat axis n :=
+Definition J_of_nat axis n '(sinθ, cosθ) :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
   let zk := Z_of_nat_surj nnk in
   let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
   let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
-  ∃ θ₀_nn π_nn sinθ cosθ,
+  ∃ θ₀_nn π_nn,
   angle_div_nat θ₀ nn θ₀_nn ∧
   angle_div_nat π nn π_nn ∧
   sinθ = rngl_sin (angle_add_mul_Z θ₀_nn (2 * zk) π_nn) ∧
   cosθ = rngl_cos (angle_add_mul_Z θ₀_nn (2 * zk) π_nn).
 
+(*
 Theorem J_is_countable : ∀ axis,
   axis ∉ D
   → (- axis)%vec ∉ D
-  → ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat axis n = sc.
+  → ∀ sc, sc ∈ J axis → ∃ n : ℕ, J_of_nat axis n sc.
 Proof.
 intros axis Had Hnad (s, c) Ha.
 destruct Ha as (s₀ & c₀ & Ha & n & k & Hs & Hc).
+...
 specialize (J₀_is_countable axis Had Hnad (s₀, c₀) Ha) as (nj, Hnj).
 destruct Ha as (Hsc₀ & p & p' & (Hp & Hp' & Hmp)).
 unfold J_of_nat.
@@ -2165,21 +2167,35 @@ rewrite Hnj, Hk.
 rewrite Z2Nat_bij_id.
 now f_equal.
 Qed.
+*)
+
+(*
+Search ({_ <? _ } + { _ })%L.
+Require Import Reals.
+Check Rlt_dec.
+Rlt_dec
+     : ∀ r1 r2 : R, {(r1 < r2)%R} + {¬ (r1 < r2)%R}
+...
+*)
 
 Definition I_of_ℝ x :=
-  if Rlt_dec x 0 then 1 / (- x + 1) / 2
-  else 1 / (x + 1) / 2 + 1 / 2.
+  (if rngl_ltb_dec x 0 then 1 / (- x + 1) / 2
+   else 1 / (x + 1) / 2 + 1 / 2)%L.
 
 Definition ℝ_of_I i :=
-  if Rlt_dec i (1 / 2) then -1 / (i * 2) + 1
-  else 1 / ((i - 1 / 2) * 2) - 1.
+  (if rngl_ltb_dec i (1 / 2) then -1 / (i * 2) + 1
+   else 1 / ((i - 1 / 2) * 2) - 1)%L.
 
 Theorem ℝ_of_I_inv : ∀ x, ℝ_of_I (I_of_ℝ x) = x.
 Proof.
+destruct_ac.
 intros.
 unfold ℝ_of_I, I_of_ℝ.
-destruct (Rlt_dec x 0) as [Hxl| Hxl]. {
-  destruct (Rlt_dec (1 / (- x + 1) / 2) (1 / 2)) as [Hlt| Hge]. {
+destruct (rngl_ltb_dec x 0) as [Hxl| Hxl]. {
+  apply (rngl_ltb_lt Heo) in Hxl.
+  destruct (rngl_ltb_dec (1 / (- x + 1) / 2) (1 / 2)) as [Hlt| Hge]. {
+    apply (rngl_ltb_lt Heo) in Hlt.
+...
     rewrite Rmult_div_same; [ | lra ].
     unfold Rdiv; rewrite rngl_mul_1_l.
     rewrite Rinv_inv; lra.
