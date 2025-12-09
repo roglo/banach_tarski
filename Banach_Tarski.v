@@ -1956,15 +1956,15 @@ apply on_sphere_norm in Hp; [ | easy ].
 apply on_sphere_norm in Hp'; [ | easy ].
 simpl in Hp, Hp', Hlat, Hlag.
 rewrite rngl_squ_1 in Hp, Hp'.
-...
-do 3 rewrite fold_Rsqr in Hlag.
+do 3 rewrite fold_rngl_squ in Hlag.
 apply sqr_vec_norm_eq_0 in Hlag.
 destruct Hlag as (H3 & H2 & H1).
-apply Rminus_diag_uniq in H1.
-apply Rminus_diag_uniq in H2.
-apply Rminus_diag_uniq in H3.
-progress unfold Rsqr in Hp, Hp'.
-f_equal; nsatz.
+apply -> (rngl_sub_move_0_r Hop) in H1.
+apply -> (rngl_sub_move_0_r Hop) in H2.
+apply -> (rngl_sub_move_0_r Hop) in H3.
+progress unfold rngl_squ in Hp, Hp'.
+f_equal. {
+...
 Qed.
 
 Theorem latitude_1 : ∀ r p p',
