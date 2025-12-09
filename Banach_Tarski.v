@@ -1933,6 +1933,7 @@ Definition J₀_of_nat axis n : (T * T) :=
   let p' := point_in_D_of_nat ‖axis‖ n₂ in
   rot_sin_cos axis p p'.
 
+(*
 Theorem unit_sphere_latitude_1 : ∀ p p',
   p ∈ sphere 1
   → p' ∈ sphere 1
@@ -1940,7 +1941,14 @@ Theorem unit_sphere_latitude_1 : ∀ p p',
   → p = p'.
 Proof.
 destruct_ac.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 specialize (rngl_0_le_1 Hos Hto) as H01.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  apply vector_ext; intros.
+  rewrite H1; apply H1.
+}
 intros * Hp Hp' Hlat.
 unfold latitude in Hlat; simpl in Hlat.
 apply on_sphere_norm in Hp; [ | easy ].
@@ -1962,15 +1970,36 @@ destruct Hlag as (H3 & H2 & H1).
 apply -> (rngl_sub_move_0_r Hop) in H1.
 apply -> (rngl_sub_move_0_r Hop) in H2.
 apply -> (rngl_sub_move_0_r Hop) in H3.
-progress unfold rngl_squ in Hp, Hp'.
 f_equal. {
+  destruct (rngl_eqb_dec xp 0) as [Hxpz| Hxpz]. {
+    apply (rngl_eqb_eq Heo) in Hxpz; subst xp.
+    rewrite (rngl_mul_0_l Hos) in H1, H2.
+    apply (rngl_integral Hos Hio) in H2.
+    destruct H2; [ subst | easy ].
+    symmetry in H1.
+    apply (rngl_integral Hos Hio) in H1.
+    destruct H1; [ subst | easy ].
+    rewrite (rngl_squ_0 Hos) in Hp.
+    do 2 rewrite rngl_add_0_l in Hp.
+    symmetry in Hp.
+    now apply (rngl_1_neq_0 Hc1) in Hp.
+  }
+  apply (rngl_eqb_neq Heo) in Hxpz.
+  apply (rngl_mul_cancel_r Hiq _ _ xp); [ easy | ].
+  generalize Hp; intros H; rewrite <- rngl_add_assoc in H.
+  apply (rngl_add_move_r Hop) in H.
+  rewrite fold_rngl_squ; rewrite H; clear H.
+  generalize Hlat; intros H; rewrite <- rngl_add_assoc in H.
+  apply (rngl_add_move_r Hop) in H.
+  rewrite (rngl_mul_comm Hic); rewrite H; clear H.
+  progress f_equal.
 ...
 Qed.
 
 Theorem latitude_1 : ∀ r p p',
   p ∈ sphere r
   → p' ∈ sphere r
-  → latitude p p' = 1
+  → latitude p p' = 1%L
   → p = p'.
 Proof.
 intros * Hp Hp' Hlat.
@@ -2005,15 +2034,17 @@ Qed.
 Theorem latitude_minus_1 : ∀ r p p',
   p ∈ sphere r
   → p' ∈ sphere r
-  → latitude p p' = -1
+  → latitude p p' = (-1)%L
   → p = (- p')%vec.
 Proof.
+destruct_ac.
 intros * Hp Hp' Hlat.
 apply neg_vec_in_sphere in Hp'.
-assert (Hlat2 : latitude p (- p') = 1). {
+assert (Hlat2 : latitude p (- p') = 1%L). {
   unfold latitude in Hlat; unfold latitude.
-  rewrite <- vec_opp_dot_mul_distr_r, vec_norm_opp, Rdiv_opp_l, Hlat.
-  apply Ropp_involutive.
+  rewrite <- vec_opp_dot_mul_distr_r, vec_norm_opp.
+  rewrite (rngl_div_opp_l Hop Hiv), Hlat.
+  apply (rngl_opp_involutive Hop).
 }
 now specialize (latitude_1 r p (- p')%vec Hp Hp' Hlat2).
 Qed.
@@ -2024,18 +2055,21 @@ Theorem J₀_is_countable : ∀ axis,
   → ∀ sc, sc ∈ J₀ axis
   → ∃ n : ℕ, J₀_of_nat axis n = sc.
 Proof.
+destruct_ac.
 intros axis Had Hnad.
 intros (s, c) Ha.
 destruct Ha as (Hcs & p & p' & Hp & Hp' & Hv).
-assert (Haz : ‖axis‖ ≠ 0). {
+assert (Haz : ‖axis‖ ≠ 0%L). {
   intros H; apply vec_norm_eq_0 in H.
   apply Had; rewrite H; simpl.
   exists (ạ :: []), 0%vec.
-  split; [ easy | ].
+  split; [ exists []; apply mat_vec_mul_0_r | ].
   split; [ easy | ].
   apply mat_vec_mul_0_r.
 }
-destruct (Req_dec (latitude axis p) (latitude axis p')) as [Hll| Hll]. {
+destruct (rngl_eqb_dec (latitude axis p) (latitude axis p')) as [Hll| Hll]. {
+  apply (rngl_eqb_eq Heo) in Hll.
+...
   specialize (D_set_is_countable ‖axis‖ p Hp) as (n, Hn).
   specialize (D_set_is_countable ‖axis‖ p' Hp') as (n', Hn').
   exists (prod_nat_to_nat (n, n')).
@@ -2074,6 +2108,7 @@ eapply rotation_implies_same_latitude; try eassumption. {
 }
 apply in_its_sphere.
 Qed.
+*)
 
 (* J(axis) = set of angles of rotation around the axis, such that
    for some p in D ∩ sphere(r), for some naturals n and k,
@@ -2084,8 +2119,8 @@ Definition J axis :=
     ∃ sinθ₀ cosθ₀, (sinθ₀, cosθ₀) ∈ J₀ axis ∧
     let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
     ∃ n k,
-    sinθ = sin ((θ₀ + 2 * IZR k * PI) / INR n) ∧
-    cosθ = cos ((θ₀ + 2 * IZR k * PI) / INR n)).
+    sinθ = rngl_sin ((θ₀ + 2 * IZR k * PI) / INR n) ∧
+    cosθ = rngl_cos ((θ₀ + 2 * IZR k * PI) / INR n)).
 
 Definition J_of_nat axis n : (ℝ * ℝ) :=
   let '(nj, n₂) := prod_nat_of_nat n in
