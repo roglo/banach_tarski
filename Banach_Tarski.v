@@ -2220,14 +2220,19 @@ destruct (rngl_ltb_dec x 0) as [Hxl| Hxl]. {
   }
   exfalso.
   apply (rngl_ltb_ge_iff Hto) in Hge.
-...
-  apply Rmult_le_compat_r with (r := 2) in Hge; [ | lra ].
-  rewrite Rmult_div_same in Hge; [ | lra ].
-  rewrite Rmult_div_same in Hge; [ | lra ].
-  apply Rmult_le_compat_r with (r := (- x + 1)) in Hge; [ | lra ].
+  apply (rngl_div_le_mono_pos_r Hop Hiv Hto) in Hge. 2: {
+    apply (rngl_0_lt_2 Hos Hc1 Hto).
+  }
+  rewrite (rngl_add_opp_l Hop) in Hge.
+  apply (rngl_le_div_r Hop Hiv Hto) in Hge.
   rewrite rngl_mul_1_l in Hge.
-  rewrite Rmult_div_same in Hge; lra.
+  apply (rngl_le_sub_l Hop Hor) in Hge.
+  now apply (rngl_nlt_ge Hor) in Hge.
+  apply (rngl_lt_0_sub Hop Hor).
+  apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
+  apply (rngl_0_le_1 Hos Hto).
 }
+...
 apply Rnot_lt_le in Hxl.
 destruct (Rlt_dec (1 / (x + 1) / 2 + 1 / 2) (1 / 2)) as [Hlt| Hge]. {
   exfalso.
