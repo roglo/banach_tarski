@@ -1,7 +1,7 @@
 (* Banach-Tarski paradox. *)
 
 Set Nested Proofs Allowed.
-From Stdlib Require Import Arith List Relations Wf_nat.
+From Stdlib Require Import Arith ZArith List Relations Wf_nat.
 Import ListNotations.
 From RingLike Require Import Utf8 Core RealLike IntermVal.
 From TrigoWithoutPi Require Import Core AngleDivNat.
@@ -2124,30 +2124,27 @@ Definition J axis :=
     sinθ = rngl_sin (θ₀_n + 2 * k * π_n) ∧
     cosθ = rngl_cos (θ₀_n + 2 * k * π_n)).
 
-About Z_of_nat_surj.
-Definition J_of_nat axis n : (T * T) :=
+(* θ₁ + z * θ₂ *)
+Definition angle_add_mul_Z θ₁ z θ₂ :=
+  match z with
+  | 0%Z => 0%A
+  | Zpos n => (θ₁ + Pos.to_nat n * θ₂)%A
+  | Zneg n => (θ₁ - Pos.to_nat n * θ₂)%A
+  end.
+
+(* sinθ = sin ((θ₀ + 2 * IZR zk * PI) / INR nn)
+   cosθ = cos ((θ₀ + 2 * IZR zk * PI) / INR nn) *)
+Definition J_of_nat axis n :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
   let zk := Z_of_nat_surj nnk in
   let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
   let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
-  ∃ θ₀_nn π_nn,
+  ∃ θ₀_nn π_nn sinθ cosθ,
   angle_div_nat θ₀ nn θ₀_nn ∧
   angle_div_nat π nn π_nn ∧
-  let sinθ := rngl_sin (θ₀_nn + 2 * zk * π_nn) in
-  let cosθ := rngl_cos (θ₀_nn + 2 * zk * π_nn) in
-  (sinθ, cosθ).
-...
-
-Definition J_of_nat axis n : (T * T) :=
-  let '(nj, n₂) := prod_nat_of_nat n in
-  let '(nnk, nn) := prod_nat_of_nat n₂ in
-  let nk := Z_of_nat_surj nnk in
-  let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
-  let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
-  let sinθ := rngl_sin ((θ₀ + 2 * IZR nk * PI) / INR nn) in
-  let cosθ := rngl_cos ((θ₀ + 2 * IZR nk * PI) / INR nn) in
-  (sinθ, cosθ).
+  sinθ = rngl_sin (angle_add_mul_Z θ₀_nn (2 * zk) π_nn) ∧
+  cosθ = rngl_cos (angle_add_mul_Z θ₀_nn (2 * zk) π_nn).
 
 Theorem J_is_countable : ∀ axis,
   axis ∉ D
