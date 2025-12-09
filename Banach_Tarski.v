@@ -4,7 +4,7 @@ Set Nested Proofs Allowed.
 From Stdlib Require Import Arith List Relations Wf_nat.
 Import ListNotations.
 From RingLike Require Import Utf8 Core RealLike IntermVal.
-From TrigoWithoutPi Require Import Core.
+From TrigoWithoutPi Require Import Core AngleDivNat.
 
 From a Require Import Misc Words Normalize Reverse MiscReals MiscTrigo.
 From a Require Import Matrix Pset Orbit.
@@ -2118,18 +2118,22 @@ Definition J axis :=
     (λ '(sinθ, cosθ),
     ∃ sinθ₀ cosθ₀, (sinθ₀, cosθ₀) ∈ J₀ axis ∧
     let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
-    ∃ n k,
-    sinθ = rngl_sin ((θ₀ + 2 * IZR k * PI) / INR n) ∧
-    cosθ = rngl_cos ((θ₀ + 2 * IZR k * PI) / INR n)).
+    ∃ n k θ₀_n π_n,
+    angle_div_nat θ₀ n θ₀_n ∧
+    angle_div_nat π n π_n ∧
+    sinθ = rngl_sin (θ₀_n + 2 * k * π_n) ∧
+    cosθ = rngl_cos (θ₀_n + 2 * k * π_n)).
 
-Definition J_of_nat axis n : (ℝ * ℝ) :=
+...
+
+Definition J_of_nat axis n : (T * T) :=
   let '(nj, n₂) := prod_nat_of_nat n in
   let '(nnk, nn) := prod_nat_of_nat n₂ in
   let nk := Z_of_nat_surj nnk in
   let '(sinθ₀, cosθ₀) := J₀_of_nat axis nj in
   let θ₀ := angle_of_sin_cos sinθ₀ cosθ₀ in
-  let sinθ := sin ((θ₀ + 2 * IZR nk * PI) / INR nn) in
-  let cosθ := cos ((θ₀ + 2 * IZR nk * PI) / INR nn) in
+  let sinθ := rngl_sin ((θ₀ + 2 * IZR nk * PI) / INR nn) in
+  let cosθ := rngl_cos ((θ₀ + 2 * IZR nk * PI) / INR nn) in
   (sinθ, cosθ).
 
 Theorem J_is_countable : ∀ axis,
