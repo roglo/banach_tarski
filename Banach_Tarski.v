@@ -2384,16 +2384,19 @@ apply Hx.
 symmetry; apply ℝ_of_I_inv.
 Qed.
 
-Theorem rotations_not_countable :
+Theorem rotations_not_countable {em : excl_midd} :
+  is_complete T rngl_dist →
+  rngl_characteristic T = 0 →
+  rngl_is_archimedean T = true →
   ∀ f : ℕ → T * T, ∃ sinθ cosθ,
   (sinθ² + cosθ² = 1)%L ∧ ∀ n, f n ≠ (sinθ, cosθ).
 Proof.
-intros f.
-...
-specialize Cantor_ℕ_I as Hr.
+intros Hco Hch Har f.
+specialize (Cantor_ℕ_I Hco Hch Har) as Hr.
 specialize (Hr (λ n, fst (f n))) as (s & Hs & Ht).
 exists s, (√ (1 - s²)).
 split. {
+...
   rewrite Rsqr_sqrt; [ lra | ].
   apply Rplus_le_reg_r with (r := s²).
   rewrite Rplus_0_l, Rminus_plus.
