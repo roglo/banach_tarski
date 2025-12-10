@@ -298,21 +298,22 @@ do 2 apply -> Nat.succ_le_mono.
 apply Nat.le_add_r.
 Qed.
 
-Definition ter_bin_of_vec Hc1 Har r '(V x y z) :=
-  ter_bin_of_frac_part Hc1 Har (x / r)%L.
+Definition ter_bin_of_vec Har Hc1 r '(V x y z) :=
+  ter_bin_of_frac_part Har Hc1 (x / r)%L.
 
 Theorem ter_bin_of_ball_surj
   (Hch : rngl_characteristic T = 0)
-  (Hc1 : rngl_characteristic T ≠ 1)
   (Har : rngl_is_archimedean T = true) :
+  let Hc1 := eq_ind_r (λ n : ℕ, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch in
   is_complete T rngl_dist →
   excl_midd →
   ∀ r, (0 < r)%L → ∀ (u : ℕ → bool),
   ∃ p : vector T, p ∈ sphere r ∧ (∀ n, ter_bin_of_vec Har Hc1 r p n = u n).
 Proof.
 destruct_ac.
-intros Hco em * Hr *.
-specialize (ter_bin_of_frac_part_surj Har Hch Hc1 em Hco u); intros (s & Hs & Hn).
+intros * Hco em * Hr *.
+cbn in Hc1.
+specialize (ter_bin_of_frac_part_surj Har Hch em Hco u) as (s & Hs & Hn).
 exists (V (s * r) (r * √ (1 - s²)) 0); simpl.
 progress unfold rngl_div; rewrite Hiv.
 rewrite <- rngl_mul_assoc.
@@ -350,7 +351,7 @@ intros Hco em * Hr *.
 set (Hc1 := eq_ind_r (λ n : ℕ, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch).
 specialize
   (Cantor_gen ℕ ℕ (vector T) (setp (sphere r)) id (ter_bin_of_vec Har Hc1 r)
-     id_nat (ter_bin_of_ball_surj Hch Hc1 Har Hco em r Hr) f) as (p, Hp).
+     id_nat (ter_bin_of_ball_surj Hch Har Hco em r Hr) f) as (p, Hp).
 exists p.
 split; [ apply (Hp O) | ].
 intros n.
@@ -2339,24 +2340,40 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]. {
     apply -> (rngl_add_move_0_r Hop) in H; subst x.
     now apply (rngl_nlt_ge Hor) in Hx.
   }
-...
-  apply Rnot_lt_le in Hx.
-  apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with (r := 2); [ lra | ].
+  apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ 2); [ easy | ].
   rewrite rngl_mul_add_distr_r.
-  rewrite (rngl_div_mul Hiv); [ | lra ].
-  rewrite (rngl_div_mul Hiv); [ | lra ].
+  rewrite (rngl_div_mul Hiv); [ | easy ].
+  rewrite (rngl_div_mul Hiv); [ | easy ].
   rewrite rngl_mul_1_l.
-  apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with (r := x + 1); [ lra | ].
+  apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ (x + 1)). {
+    apply (rngl_le_lt_trans Hor _ x); [ easy | ].
+    now apply (rngl_lt_add_r Hos Hor).
+  }
   rewrite rngl_mul_add_distr_r.
-  rewrite (rngl_div_mul Hiv); lra.
+  rewrite (rngl_div_mul Hiv). {
+    rewrite rngl_mul_1_l.
+    rewrite rngl_add_comm, <- rngl_add_assoc.
+    rewrite rngl_mul_add_distr_l, rngl_mul_1_r.
+    apply (rngl_add_le_mono_r Hos Hor).
+    rewrite rngl_mul_2_l.
+    now apply (rngl_le_add_l Hos Hor).
+  }
+  intros H.
+  apply -> (rngl_add_move_0_r Hop) in H; subst x.
+  now apply (rngl_nlt_ge Hor) in Hx.
 }
 Qed.
 
-Theorem Cantor_ℕ_I : ∀ f : nat → R, ∃ x : R, 0 ≤ x ≤ 1 ∧ ∀ n : nat, x ≠ f n.
+Theorem Cantor_ℕ_I {em : excl_midd} :
+  is_complete T rngl_dist →
+  rngl_characteristic T = 0 →
+  rngl_is_archimedean T = true →
+  ∀ f : nat → T, ∃ x, (0 ≤ x ≤ 1)%L ∧ ∀ n : nat, x ≠ f n.
 Proof.
-intros f.
+destruct_ac.
+intros Hco Hch Har f.
 remember (λ n, ℝ_of_I (f n)) as g eqn:Hg.
-specialize (Cantor_ℕ_ℝ g) as (x, Hx).
+specialize (Cantor_ℕ_T Har Hch em Hco g) as (x, Hx).
 exists (I_of_ℝ x).
 split; [ apply I_of_ℝ_interv | ].
 intros n H.
@@ -2368,10 +2385,11 @@ symmetry; apply ℝ_of_I_inv.
 Qed.
 
 Theorem rotations_not_countable :
-  ∀ f : ℕ → ℝ * ℝ, ∃ sinθ cosθ,
-  sinθ² + cosθ² = 1 ∧ ∀ n, f n ≠ (sinθ, cosθ).
+  ∀ f : ℕ → T * T, ∃ sinθ cosθ,
+  (sinθ² + cosθ² = 1)%L ∧ ∀ n, f n ≠ (sinθ, cosθ).
 Proof.
 intros f.
+...
 specialize Cantor_ℕ_I as Hr.
 specialize (Hr (λ n, fst (f n))) as (s & Hs & Ht).
 exists s, (√ (1 - s²)).

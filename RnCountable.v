@@ -13,15 +13,12 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 Context {ac : angle_ctx T}.
-(*
-Context {Hch : rngl_characteristic T = 0}.
-Context {Hc1 : rngl_characteristic T ≠ 1}.
-*)
 Context {Har : rngl_is_archimedean T = true}.
 
 Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
 
-Definition ter_bin_of_frac_part Hc1 x n := (1 / 3 ≤? frac_part Hc1 Har (x * 3 ^ n))%L.
+Definition ter_bin_of_frac_part Hc1 x n :=
+  (1 / 3 ≤? frac_part Hc1 Har (x * 3 ^ n))%L.
 
 Fixpoint partial_sum3_aux k (u : nat → bool) pow i :=
   match k with
@@ -229,7 +226,7 @@ now apply IHk.
 Qed.
 
 Context {Hch : rngl_characteristic T = 0}.
-Context {Hc1 : rngl_characteristic T ≠ 1}.
+Let Hc1 := eq_ind_r (λ n : ℕ, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch.
 
 Add Field rngl_field : (rngl_field_theory ac_ic ac_op ac_iv Hc1).
 
@@ -840,5 +837,6 @@ Qed.
 
 End a.
 
+Arguments Cantor_ℕ_T {T ro rp ac} Har Hch em Hco f.
 Arguments ter_bin_of_frac_part {T ro rp ac} Har Hc1 x%_L n%_nat.
-Arguments ter_bin_of_frac_part_surj {T ro rp ac} Har Hch Hc1 em Hco u.
+Arguments ter_bin_of_frac_part_surj {T ro rp ac} Har Hch em Hco u.
