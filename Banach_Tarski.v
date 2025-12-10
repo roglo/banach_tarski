@@ -1683,7 +1683,7 @@ rewrite vec_norm_vec_const_mul in Hlag.
 rewrite Rabs_inv in Hlag.
 rewrite Rabs_right in Hlag; [ | lra ].
 destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp]. {
-  rewrite Rmult_0_l.
+  rewrite (rngl_mul_0_l Hos).
   rewrite Hppp, Rabs_R0 in Hlag.
   apply Rmult_integral in Hlag.
   destruct Hlag as [Hlag| Hlag]. {
@@ -2271,41 +2271,73 @@ Qed.
 
 Theorem I_of_ℝ_interv : ∀ x, (0 ≤ I_of_ℝ x ≤ 1)%L.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros.
+  rewrite (H1 (I_of_ℝ x)), (H1 1%L).
+  split; apply (rngl_le_refl Hor).
+}
 intros x.
 unfold I_of_ℝ.
-...
-destruct (Rlt_dec x 0) as [Hx| Hx]. {
+specialize (rngl_0_le_2 Hos Hto) as Hz2.
+specialize (rngl_0_lt_2 Hos Hc1 Hto) as Hz2'.
+specialize (rngl_2_neq_0 Hos Hc1 Hto) as H2z.
+specialize (rngl_0_le_1 Hos Hto) as Hz1.
+destruct (rngl_ltb_dec x 0) as [Hx| Hx]. {
+  apply (rngl_ltb_lt Heo) in Hx.
   split. {
-    apply Rmult_le_reg_r with (r := 2); [ lra | ].
-    rewrite Rmult_0_l, Rmult_div_same; [ | lra ].
-    apply Rmult_le_reg_r with (r := - x + 1); [ lra | ].
-    rewrite Rmult_0_l, Rmult_div_same; lra.
+    apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ 2); [ easy | ].
+    rewrite (rngl_mul_0_l Hos), (rngl_div_mul Hiv); [ | easy ].
+    apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ (- x + 1)).
+    rewrite (rngl_add_opp_l Hop).
+    apply (rngl_lt_0_sub Hop Hor).
+    now apply (rngl_lt_le_trans Hor _ 0).
+    rewrite (rngl_mul_0_l Hos), (rngl_div_mul Hiv); [ easy | ].
+    rewrite (rngl_add_opp_l Hop); intros H.
+    apply -> (rngl_sub_move_0_r Hop) in H; subst x.
+    now apply (rngl_nle_gt Hor) in Hx.
   }
-  apply Rmult_le_reg_r with (r := 2); [ lra | ].
-  rewrite Rmult_div_same; [ | lra ].
+  apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ 2); [ easy | ].
+  rewrite (rngl_div_mul Hiv); [ | easy ].
   rewrite rngl_mul_1_l.
-  apply Rmult_le_reg_r with (r := - x + 1); [ lra | ].
-  rewrite Rmult_div_same; lra.
+  apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ (- x + 1)).
+  rewrite (rngl_add_opp_l Hop).
+  apply (rngl_lt_0_sub Hop Hor).
+  now apply (rngl_lt_le_trans Hor _ 0).
+  rewrite (rngl_add_opp_l Hop).
+  rewrite (rngl_div_mul Hiv).
+  rewrite (rngl_mul_sub_distr_l Hop), rngl_mul_1_r.
+  apply (rngl_le_add_le_sub_l Hop Hor).
+  apply (rngl_le_add_le_sub_r Hop Hor).
+  rewrite (rngl_add_sub Hos).
+  apply (rngl_le_trans Hor _ 0); [ | easy ].
+  apply (rngl_mul_nonneg_nonpos Hop Hor); [ easy | ].
+  now apply rngl_lt_le_incl.
+  intros H.
+  apply -> (rngl_sub_move_0_r Hop) in H; subst x.
+  now apply (rngl_nle_gt Hor) in Hx.
 } {
   split. {
-    apply Rmult_le_reg_r with (r := 2); [ lra | ].
-    rewrite Rmult_plus_distr_r, Rmult_0_l.
-    rewrite Rmult_div_same; [ | lra ].
-    rewrite Rmult_div_same; [ | lra ].
-    apply Rmult_le_reg_r with (r := x + 1); [ lra | ].
-    rewrite Rmult_0_l.
+    apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ 2); [ easy | ].
+...
+    rewrite Rmult_plus_distr_r, (rngl_mul_0_l Hos).
+    rewrite (rngl_div_mul Hiv); [ | lra ].
+    rewrite (rngl_div_mul Hiv); [ | lra ].
+    apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with (r := x + 1); [ lra | ].
+    rewrite (rngl_mul_0_l Hos).
     rewrite Rmult_plus_distr_r.
-    rewrite Rmult_div_same; lra.
+    rewrite (rngl_div_mul Hiv); lra.
   }
   apply Rnot_lt_le in Hx.
-  apply Rmult_le_reg_r with (r := 2); [ lra | ].
+  apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with (r := 2); [ lra | ].
   rewrite Rmult_plus_distr_r.
-  rewrite Rmult_div_same; [ | lra ].
-  rewrite Rmult_div_same; [ | lra ].
+  rewrite (rngl_div_mul Hiv); [ | lra ].
+  rewrite (rngl_div_mul Hiv); [ | lra ].
   rewrite rngl_mul_1_l.
-  apply Rmult_le_reg_r with (r := x + 1); [ lra | ].
+  apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with (r := x + 1); [ lra | ].
   rewrite Rmult_plus_distr_r.
-  rewrite Rmult_div_same; lra.
+  rewrite (rngl_div_mul Hiv); lra.
 }
 Qed.
 
@@ -2696,7 +2728,7 @@ split; intros H. {
   rewrite Hk.
   rewrite <- Rdiv_mod; [ | specialize PI_neq0; lra ].
   rewrite Rmult_div.
-  rewrite Rmult_div_same. {
+  rewrite (rngl_div_mul Hiv). {
     rewrite Hθ.
     now rewrite sin_angle_of_sin_cos, cos_angle_of_sin_cos.
   }
