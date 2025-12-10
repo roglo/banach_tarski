@@ -4,8 +4,8 @@ From Stdlib Require Import Utf8 List.
 From Stdlib Require Import Reals Nsatz.
 Import ListNotations.
 
-Require Import a.Misc a.Words a.Normalize a.Reverse a.Matrix a.Pset a.Orbit.
-Require Import a.Partition.
+Require Import Misc Words Normalize Reverse Matrix Pset Orbit.
+Require Import Partition.
 
 Class sel_model {A} := mkos { os_fun : A → A }.
 

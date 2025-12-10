@@ -4,10 +4,10 @@ From Stdlib Require Import Utf8 Arith List Relations Wf_nat.
 From Stdlib Require Import Reals Psatz Nsatz.
 Import ListNotations.
 
-From a Require Import Misc Words Normalize Reverse MiscReals MiscTrigo.
-From a Require Import Matrix Pset Orbit.
-From a Require Import Partition OrbitRepr GroupTransf Equidecomp.
-From a Require Import Countable RnCountable NotEmptyPath.
+Require Import Misc Words Normalize Reverse MiscReals MiscTrigo.
+Require Import Matrix Pset Orbit.
+Require Import Partition OrbitRepr GroupTransf Equidecomp.
+Require Import Countable RnCountable NotEmptyPath.
 
 Definition set_of_vec (v : vector) := mkset (λ u, u = v).
 Arguments set_of_vec v%_vec.

@@ -4,7 +4,7 @@ From Stdlib Require Import Utf8 List Relations.
 From Stdlib Require Import Reals Nsatz.
 Import ListNotations.
 
-From a Require Import Misc MiscReals Words Normalize Reverse Matrix Pset.
+Require Import Misc MiscReals Words Normalize Reverse Matrix Pset.
 
 Definition same_orbit x y := ∃ el, (mat_of_path el * x)%vec = y.
 
