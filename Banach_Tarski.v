@@ -2232,10 +2232,11 @@ destruct (rngl_ltb_dec x 0) as [Hxl| Hxl]. {
   apply (rngl_lt_le_trans Hor _ 0); [ easy | ].
   apply (rngl_0_le_1 Hos Hto).
 }
-...
-apply Rnot_lt_le in Hxl.
-destruct (Rlt_dec (1 / (x + 1) / 2 + 1 / 2) (1 / 2)) as [Hlt| Hge]. {
+apply (rngl_ltb_ge_iff Hto) in Hxl.
+destruct (rngl_ltb_dec (1 / (x + 1) / 2 + 1 / 2) (1 / 2)) as [Hlt| Hge]. {
+  apply (rngl_ltb_lt Heo) in Hlt.
   exfalso.
+...
   apply Rmult_lt_compat_r with (r := 2) in Hlt; [ | lra ].
   rewrite Rmult_plus_distr_r in Hlt.
   rewrite Rmult_div_same in Hlt; [ | lra ].
