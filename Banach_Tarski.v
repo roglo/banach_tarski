@@ -2262,7 +2262,6 @@ rewrite (rngl_div_div_r Hos Hiv); cycle 1. {
   apply (rngl_add_move_0_r Hop) in H; subst x.
   apply (rngl_nlt_ge Hor) in Hxl.
   apply Hxl; clear Hxl.
-About rngl_opp_1_lt_0.
   apply (rngl_opp_1_lt_0 Hop Hc1 Hto).
 }
 ...
