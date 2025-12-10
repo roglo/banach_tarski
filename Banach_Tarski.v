@@ -2391,17 +2391,21 @@ Theorem rotations_not_countable {em : excl_midd} :
   ∀ f : ℕ → T * T, ∃ sinθ cosθ,
   (sinθ² + cosθ² = 1)%L ∧ ∀ n, f n ≠ (sinθ, cosθ).
 Proof.
+destruct_ac.
 intros Hco Hch Har f.
 specialize (Cantor_ℕ_I Hco Hch Har) as Hr.
 specialize (Hr (λ n, fst (f n))) as (s & Hs & Ht).
 exists s, (√ (1 - s²)).
 split. {
-...
-  rewrite Rsqr_sqrt; [ lra | ].
-  apply Rplus_le_reg_r with (r := s²).
-  rewrite Rplus_0_l, Rminus_plus.
-  replace 1 with 1² by apply rngl_squ_1.
-  apply Rsqr_incr_1; [ easy | easy | lra ].
+  rewrite rngl_squ_sqrt. {
+    rewrite rngl_add_comm.
+    apply (rngl_sub_add Hop).
+  }
+  apply (rngl_le_0_sub Hop Hor).
+  apply (rngl_squ_le_1_iff Hop Hiq Hto).
+  split; [ | easy ].
+  apply (rngl_le_trans Hor _ 0); [ | easy ].
+  apply (rngl_opp_1_le_0 Hop Hto).
 }
 intros n.
 intros H.
@@ -2409,7 +2413,7 @@ apply (Ht n).
 now rewrite H.
 Qed.
 
-Theorem vec_const_mul_in_D : ∀ v r, r ≠ 0 → v ∈ D → r ⁎ v ∈ D.
+Theorem vec_const_mul_in_D : ∀ v r, r ≠ 0%L → v ∈ D → r ⁎ v ∈ D.
 Proof.
 intros * Hr Hv.
 destruct Hv as (el & u & (Hso & Hnl & Hru)); simpl.
@@ -2426,14 +2430,18 @@ now f_equal.
 Qed.
 
 Theorem sphere_ball_but_center : ∀ p,
-   (∃ r, 0 < r ≤ 1 ∧ p ∈ sphere r) ↔ p ∈ ball ∖ center.
+   (∃ r, (0 < r ≤ 1)%L ∧ p ∈ sphere r) ↔ p ∈ ball ∖ center.
 Proof.
 intros (x, y, z); simpl.
 split. {
   intros (r & Hr & Hs); rewrite Hs.
-  replace 1 with 1² by apply rngl_squ_1.
+  replace 1%L with 1² by apply rngl_squ_1.
   split. {
-    apply Rsqr_incr_1; [ easy | lra | lra ].
+Require Import Reals.
+Check Rsqr_incr_1.
+Search (_² ≤ _²)%L.
+...
+    apply Rsqr_incr_1; [ easy | | ].
   }
   intros H; injection H; clear H; intros Hz Hy Hx.
   subst x y z; rewrite Rsqr_0 in Hs.
@@ -2454,7 +2462,7 @@ split. {
   apply sqrt_le_1_alt in Hle.
   now rewrite sqrt_1 in Hle.
 }
-rewrite Rsqr_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
+rewrite rngl_squ_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
 Qed.
 
 Theorem in_ball_but_center_after_rotation : ∀ p M,
