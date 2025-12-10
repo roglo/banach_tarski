@@ -2200,9 +2200,7 @@ destruct (rngl_ltb_dec x 0) as [Hxl| Hxl]. {
   apply (rngl_ltb_lt Heo) in Hxl.
   destruct (rngl_ltb_dec (1 / (- x + 1) / 2) (1 / 2)) as [Hlt| Hge]. {
     apply (rngl_ltb_lt Heo) in Hlt.
-    rewrite (rngl_div_mul Hiv). 2: {
-      apply (rngl_2_neq_0 Hos Hc1 Hto).
-    }
+    rewrite (rngl_div_mul Hiv); [ | apply (rngl_2_neq_0 Hos Hc1 Hto) ].
     progress unfold rngl_div; rewrite Hiv.
     rewrite (rngl_mul_opp_l Hop).
     do 2 rewrite rngl_mul_1_l.
@@ -2236,16 +2234,38 @@ apply (rngl_ltb_ge_iff Hto) in Hxl.
 destruct (rngl_ltb_dec (1 / (x + 1) / 2 + 1 / 2) (1 / 2)) as [Hlt| Hge]. {
   apply (rngl_ltb_lt Heo) in Hlt.
   exfalso.
-...
-  apply Rmult_lt_compat_r with (r := 2) in Hlt; [ | lra ].
-  rewrite Rmult_plus_distr_r in Hlt.
-  rewrite Rmult_div_same in Hlt; [ | lra ].
-  rewrite Rmult_div_same in Hlt; [ | lra ].
-  apply Rmult_lt_compat_r with (r := (x + 1)) in Hlt; [ | lra ].
-  rewrite Rmult_plus_distr_r in Hlt.
-  rewrite Rmult_div_same in Hlt; lra.
+  apply (rngl_mul_lt_mono_pos_r Hop Hiq Hto 2) in Hlt. 2: {
+    apply (rngl_0_lt_2 Hos Hc1 Hto).
+  }
+  rewrite rngl_mul_add_distr_r in Hlt.
+  rewrite (rngl_div_mul Hiv) in Hlt; [ | apply (rngl_2_neq_0 Hos Hc1 Hto) ].
+  rewrite (rngl_div_mul Hiv) in Hlt; [ | apply (rngl_2_neq_0 Hos Hc1 Hto) ].
+  apply (rngl_nle_gt Hor) in Hlt.
+  apply Hlt; clear Hlt.
+  apply (rngl_le_add_l Hos Hor).
+  apply (rngl_div_nonneg Hop Hiv Hto).
+  apply (rngl_0_le_1 Hos Hto).
+  apply (rngl_le_lt_trans Hor _ x); [ easy | ].
+  apply (rngl_lt_add_r Hos Hor).
+  apply (rngl_0_lt_1 Hos Hc1 Hto).
 }
 clear Hge.
+rewrite (rngl_mul_sub_distr_r Hop).
+rewrite rngl_mul_add_distr_r.
+rewrite (rngl_div_mul Hiv); [ | apply (rngl_2_neq_0 Hos Hc1 Hto) ].
+rewrite (rngl_div_mul Hiv); [ | apply (rngl_2_neq_0 Hos Hc1 Hto) ].
+rewrite (rngl_add_sub Hos).
+rewrite (rngl_div_div_r Hos Hiv); cycle 1. {
+  apply (rngl_1_neq_0 Hc1).
+} {
+  intros H.
+  apply (rngl_add_move_0_r Hop) in H; subst x.
+  apply (rngl_nlt_ge Hor) in Hxl.
+  apply Hxl; clear Hxl.
+About rngl_opp_1_lt_0.
+  apply (rngl_opp_1_lt_0 Hop Hc1 Hto).
+}
+...
 rewrite Rmult_minus_distr_r.
 rewrite Rmult_plus_distr_r.
 rewrite Rmult_div_same; [ | lra ].

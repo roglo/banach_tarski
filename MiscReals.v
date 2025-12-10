@@ -1944,14 +1944,6 @@ apply (rngl_abs_nonneg_eq Hop Hor).
 now apply rl_sqrt_nonneg.
 Qed.
 
-Theorem Rmult_minus_distr_r : ∀ r1 r2 r3,
-  ((r1 - r2) * r3 = r1 * r3 - r2 * r3)%L.
-Proof.
-destruct_ac.
-intros.
-apply (rngl_mul_sub_distr_r Hop).
-Qed.
-
 Theorem Rminus_plus : ∀ x y, (x - y + y = x)%L.
 Proof.
 destruct_ac.

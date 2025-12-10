@@ -723,7 +723,7 @@ assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
   specialize (rngl_squ_nonneg Hos Hto (rngl_tan θ)) as H1.
   rewrite H in H1.
   apply (rngl_nlt_ge Hor) in H1.
-  apply H1, (rngl_opp_1_lt_0 Hop Hto Hc1).
+  apply H1, (rngl_opp_1_lt_0 Hop Hc1 Hto).
 }
 cbn.
 rewrite (rngl_mul_0_l Hos).
@@ -830,7 +830,7 @@ assert (Hs1t : √(1 + rngl_tan² θ) ≠ 0%L). {
   specialize (rngl_squ_nonneg Hos Hto (rngl_tan θ)) as H1.
   rewrite H in H1.
   apply (rngl_nlt_ge Hor) in H1.
-  apply H1, (rngl_opp_1_lt_0 Hop Hto Hc1).
+  apply H1, (rngl_opp_1_lt_0 Hop Hc1 Hto).
 }
 cbn.
 rewrite (rngl_mul_0_l Hos).
