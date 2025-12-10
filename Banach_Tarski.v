@@ -2284,6 +2284,8 @@ specialize (rngl_0_le_2 Hos Hto) as Hz2.
 specialize (rngl_0_lt_2 Hos Hc1 Hto) as Hz2'.
 specialize (rngl_2_neq_0 Hos Hc1 Hto) as H2z.
 specialize (rngl_0_le_1 Hos Hto) as Hz1.
+specialize (rngl_0_lt_1 Hos Hc1 Hto) as Hz1'.
+specialize (rngl_opp_1_lt_0 Hop Hc1 Hto) as H1z.
 destruct (rngl_ltb_dec x 0) as [Hx| Hx]. {
   apply (rngl_ltb_lt Heo) in Hx.
   split. {
@@ -2318,25 +2320,34 @@ destruct (rngl_ltb_dec x 0) as [Hx| Hx]. {
   apply -> (rngl_sub_move_0_r Hop) in H; subst x.
   now apply (rngl_nle_gt Hor) in Hx.
 } {
+  apply (rngl_ltb_ge_iff Hto) in Hx.
   split. {
     apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ 2); [ easy | ].
-...
-    rewrite Rmult_plus_distr_r, (rngl_mul_0_l Hos).
-    rewrite (rngl_div_mul Hiv); [ | lra ].
-    rewrite (rngl_div_mul Hiv); [ | lra ].
-    apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with (r := x + 1); [ lra | ].
+    rewrite rngl_mul_add_distr_r, (rngl_mul_0_l Hos).
+    rewrite (rngl_div_mul Hiv); [ | easy ].
+    rewrite (rngl_div_mul Hiv); [ | easy ].
+    apply (rngl_mul_le_mono_pos_r Hop Hiq Hto _ _ (x + 1)); [ | ].
+    apply (rngl_le_lt_trans Hor _ x); [ easy | ].
+    now apply (rngl_lt_add_r Hos Hor).
     rewrite (rngl_mul_0_l Hos).
-    rewrite Rmult_plus_distr_r.
-    rewrite (rngl_div_mul Hiv); lra.
+    rewrite rngl_mul_add_distr_r, rngl_mul_1_l.
+    rewrite (rngl_div_mul Hiv).
+    rewrite rngl_add_comm, <- rngl_add_assoc.
+    apply (rngl_le_trans Hor _ 2); [ easy | ].
+    now apply (rngl_le_add_l Hos Hor).
+    intros H.
+    apply -> (rngl_add_move_0_r Hop) in H; subst x.
+    now apply (rngl_nlt_ge Hor) in Hx.
   }
+...
   apply Rnot_lt_le in Hx.
   apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with (r := 2); [ lra | ].
-  rewrite Rmult_plus_distr_r.
+  rewrite rngl_mul_add_distr_r.
   rewrite (rngl_div_mul Hiv); [ | lra ].
   rewrite (rngl_div_mul Hiv); [ | lra ].
   rewrite rngl_mul_1_l.
   apply (rngl_mul_le_mono_pos_r Hop Hiq Hto) with (r := x + 1); [ lra | ].
-  rewrite Rmult_plus_distr_r.
+  rewrite rngl_mul_add_distr_r.
   rewrite (rngl_div_mul Hiv); lra.
 }
 Qed.
