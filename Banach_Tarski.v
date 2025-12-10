@@ -2264,22 +2264,16 @@ rewrite (rngl_div_div_r Hos Hiv); cycle 1. {
   apply Hxl; clear Hxl.
   apply (rngl_opp_1_lt_0 Hop Hc1 Hto).
 }
-...
-rewrite Rmult_minus_distr_r.
-rewrite Rmult_plus_distr_r.
-rewrite Rmult_div_same; [ | lra ].
-rewrite Rmult_div_same; [ | lra ].
-unfold Rminus; rewrite Rplus_assoc.
-rewrite Rplus_opp_r, Rplus_0_r.
-rewrite fold_Rminus.
-unfold Rdiv; do 2 rewrite rngl_mul_1_l.
-rewrite Rinv_inv; lra.
+rewrite rngl_mul_1_l.
+rewrite (rngl_div_1_r Hiq); [ | now left ].
+apply (rngl_add_sub Hos).
 Qed.
 
-Theorem I_of_ℝ_interv : ∀ x, 0 ≤ I_of_ℝ x ≤ 1.
+Theorem I_of_ℝ_interv : ∀ x, (0 ≤ I_of_ℝ x ≤ 1)%L.
 Proof.
 intros x.
 unfold I_of_ℝ.
+...
 destruct (Rlt_dec x 0) as [Hx| Hx]. {
   split. {
     apply Rmult_le_reg_r with (r := 2); [ lra | ].
