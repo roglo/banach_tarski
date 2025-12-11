@@ -2777,19 +2777,19 @@ split; intros H. {
   rewrite <- mat_vec_mul_assoc in Hv.
   replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
   remember (angle_of_sin_cos s c) as θ eqn:Hθ.
-...
-  remember (rngl_sin (θ * INR (S n))) as s₀ eqn:Hs₀.
-  remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
+  remember (rngl_sin (S n * θ)) as s₀ eqn:Hs₀.
+  remember (rngl_cos (S n * θ)) as c₀ eqn:Hc₀.
   exists s₀, c₀.
   split. {
-    split; [ subst s₀ c₀; apply sin2_cos2 | ].
-    remember (matrix_of_axis_angle (p₁, s₀, c₀)) as ρ₀ eqn:Hρ₀.
+    split; [ subst s₀ c₀; rewrite rngl_add_comm; apply cos2_sin2_1 | ].
+    remember (matrix_of_axis_angle p₁ s₀ c₀) as ρ₀ eqn:Hρ₀.
     remember D as d; remember sphere as sph; simpl; subst d sph.
     exists (p₀ ⁄ ‖p₀‖), (v ⁄ ‖p₀‖).
     split. {
       split. {
         destruct Hp₀d as (Hp₀d, Hp₀b).
         apply vec_const_mul_in_D; [ | easy ].
+...
         now apply Rinv_neq_0_compat, vec_norm_neq_0.
       }
       rewrite Hp₁.
