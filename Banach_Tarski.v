@@ -2608,15 +2608,26 @@ apply (vec_const_mul_in_D _ (-1))%L in H. {
 apply (rngl_opp_1_neq_0 Hop Hc1).
 Qed.
 
-Theorem not_in_J_norm_not_in_J : ∀ p₁ p'₁ s c,
+Theorem not_in_J_norm_not_in_J :
+  ∀ p₁ p'₁ s c,
   p₁ ∈ (ball ∖ center) ∖ D
   → p'₁ = p₁ ⁄ ‖p₁‖
   → (s, c) ∉ J p₁
   → (s, c) ∉ J p'₁.
 Proof.
+destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros * Hp Hp'₁ Hj.
+  destruct Hp as ((H2, H3), H4).
+  progress unfold center in H3.
+  cbn in H3.
+  destruct p₁ as (x, y, z).
+  now rewrite (H1 x), (H1 y), (H1 z) in H3.
+}
 intros * Hp Hp'₁ Hj.
-...
-specialize (not_in_center_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hp'.
+specialize (rngl_0_le_1 Hos Hto) as H01.
+specialize (not_in_center_in_sphere_1 Hiv p₁ p'₁ Hp Hp'₁) as Hp'.
 specialize (not_in_center_not_zero p₁ Hp) as Hpz.
 intros H; apply Hj.
 unfold J in H; unfold J.
@@ -2629,8 +2640,8 @@ remember matrix_of_axis_angle as m; simpl in Hsc₀; simpl.
 subst d sp m.
 split; [ easy | ].
 destruct Hsc₀ as (Hsc₀ & p & p' & Hpp & Hpp' & Hmp).
-assert (Hp1 : ‖p'₁‖ = 1). {
-  now apply on_sphere_norm; [ lra | destruct Hp' ].
+assert (Hp1 : ‖p'₁‖ = 1%L). {
+  now destruct Hp'; apply on_sphere_norm.
 }
 exists (‖p₁‖ ⁎ p), (‖p₁‖ ⁎ p').
 split. {
@@ -2656,8 +2667,13 @@ rewrite matrix_mul_axis with (k := ‖p₁‖) in Hmp. {
   rewrite vec_const_mul_1_l in Hmp.
   rewrite Rsign_of_pos in Hmp; [ now rewrite rngl_mul_1_l in Hmp | ].
   now apply vec_norm_pos.
+} {
+  apply vec_norm_neq_0.
+  rewrite Hp1.
+  apply (rngl_1_neq_0 Hc1).
+} {
+  now apply vec_norm_neq_0.
 }
-now apply vec_norm_neq_0.
 Qed.
 
 Theorem set_sub_incl_union_sub_sub {A} : ∀ (S T U : set A),
@@ -2708,6 +2724,7 @@ destruct Hp as (Hpb, HpD).
 intros H; apply HpD.
 simpl in H; subst p; simpl.
 exists (ạ :: []), 0%vec.
+...
 split; [ easy | ].
 split; [ easy | ].
 apply mat_vec_mul_0_r.
