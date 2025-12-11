@@ -2454,15 +2454,17 @@ exists (√ (x² + y² + z²)).
 split. {
   split. {
     apply (rngl_nle_gt_iff Hto); intros H1.
-...
-    specialize (sqrt_pos (x² + y² + z²)) as H2.
-    apply Rle_antisym in H2; [ | easy ].
-    apply sqrt_eq_0 in H2; [ | apply nonneg_sqr_vec_norm ].
-    apply sqr_vec_norm_eq_0 in H2.
-    now destruct H2 as (Hx & Hy & Hz); subst x y z.
+    apply (rngl_nlt_ge Hor) in H1.
+    apply H1; clear H1.
+    apply (rl_sqrt_pos Hos Hor).
+    split; [ apply nonneg_sqr_vec_norm | ].
+    intros H; symmetry in H.
+    apply sqr_vec_norm_eq_0 in H.
+    now destruct H as (H1 & H2 & H3); subst x y z.
   }
-  apply sqrt_le_1_alt in Hle.
-  now rewrite sqrt_1 in Hle.
+  rewrite <- (rl_sqrt_1 Hop Hiq Hto).
+  apply (rl_sqrt_le_rl_sqrt Hop Hiq Hto); [ | easy ].
+  apply nonneg_sqr_vec_norm.
 }
 rewrite rngl_squ_sqrt; [ easy | apply nonneg_sqr_vec_norm ].
 Qed.
@@ -2482,12 +2484,13 @@ now apply on_sphere_after_rotation.
 Qed.
 
 Theorem fold_in_ball : ∀ v,
-  (let 'V x y z := v in x² + y² + z² ≤ 1) = v ∈ ball.
+  (let 'V x y z := v in (x² + y² + z² ≤ 1)%L) = v ∈ ball.
 Proof. easy. Qed.
 
 Theorem exists_point_not_in_D :
   ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball ∖ center ∖ D.
 Proof.
+...
 specialize (D_set_and_its_symm_are_countable 1) as Hdnc.
 specialize
   (ball_set_not_countable 1 Rlt_0_1 (point_in_D_or_sym_D_of_nat 1))
