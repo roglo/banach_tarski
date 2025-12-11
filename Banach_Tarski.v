@@ -985,10 +985,10 @@ destruct b₁, b. {
     destruct (Rlt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
     destruct (Rgt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
     simpl in Hsr₂.
-    rewrite Rsqr_0 in Hsr₂; symmetry in Hsr₂.
+    rewrite (rngl_squ_0 Hos) in Hsr₂; symmetry in Hsr₂.
     do 2 rewrite Rplus_0_l in Hsr₂.
     apply Rsqr_eq_0 in Hsr₂; subst r.
-    simpl in Hsr₁; rewrite Rsqr_0 in Hsr₁.
+    simpl in Hsr₁; rewrite (rngl_squ_0 Hos) in Hsr₁.
     destruct p₁ as (x, y, z).
     apply sqr_vec_norm_eq_0 in Hsr₁.
     destruct Hsr₁ as (H1 & H2 & H3); subst x y z.
@@ -2716,31 +2716,41 @@ now apply set_sub_incl_union_sub_sub.
 Qed.
 
 Theorem ball_but_D_but_center_eq_ball_but_D :
+  rngl_has_opp_or_psub T = true →
   ((ball ∖ D) ∖ center = ball ∖ D)%S.
 Proof.
+intros Hos.
 intros p; split; intros Hp; [ now destruct Hp | ].
 split; [ easy | ].
 destruct Hp as (Hpb, HpD).
 intros H; apply HpD.
 simpl in H; subst p; simpl.
 exists (ạ :: []), 0%vec.
-...
-split; [ easy | ].
+split. {
+  progress unfold same_orbit.
+  exists []; cbn.
+  do 2 rewrite (rngl_mul_0_r Hos).
+  now do 2 rewrite rngl_add_0_l.
+}
 split; [ easy | ].
 apply mat_vec_mul_0_r.
 Qed.
 
 Theorem ρE_is_E_but_D : ∀ p₁ s c ρ,
-  ‖p₁‖ = 1
-  → s² + c² = 1
+  ‖p₁‖ = 1%L
+  → (s² + c² = 1)%L
   → (s, c) ∉ J p₁
-  → ρ = matrix_of_axis_angle (p₁, s, c)
+  → ρ = matrix_of_axis_angle p₁ s c
   → (ρE ρ = E ρ ∖ D)%S.
 Proof.
+destruct_ac.
 intros * Hp₁ Hsc Hj Hρ; intros v.
 assert (Hnz : p₁ ≠ 0%vec). {
   intros H; rewrite H in Hp₁; simpl in Hp₁.
-  rewrite Rsqr_0, Rplus_0_l, Rplus_0_l, sqrt_0 in Hp₁; lra.
+(**)
+  rewrite (rngl_squ_0 Hos) in Hp₁.
+...
+  rewrite (rngl_squ_0 Hos), Rplus_0_l, Rplus_0_l, sqrt_0 in Hp₁; lra.
 }
 split; intros H. {
   unfold ρE in H.
@@ -2917,7 +2927,7 @@ split. {
   apply is_partition_sub.
   intros p Hp; subst E.
   simpl in Hp; subst p; simpl.
-  split; [ rewrite Rsqr_0; lra | ].
+  split; [ rewrite (rngl_squ_0 Hos); lra | ].
   intros H; simpl in H.
   injection H; clear H; intros H; lra.
 }
@@ -2925,7 +2935,7 @@ split. {
   apply is_partition_sub.
   intros p Hp; subst E.
   simpl in Hp; subst p; simpl.
-  split; [ rewrite Rsqr_0, rngl_squ_1; lra | ].
+  split; [ rewrite (rngl_squ_0 Hos), rngl_squ_1; lra | ].
   intros H; simpl in H.
   injection H; clear H; intros H; lra.
 }
@@ -2961,7 +2971,7 @@ split. {
   intros v Hv; simpl in Hv.
   destruct Hv as (n & Hv).
   rewrite <- Hv, Hp₀.
-  apply in_ball_after_rotation; [ simpl; rewrite Rsqr_0, rngl_squ_1; lra | ].
+  apply in_ball_after_rotation; [ simpl; rewrite (rngl_squ_0 Hos), rngl_squ_1; lra | ].
   apply mat_pow_is_rotation_matrix.
   apply rot_z_is_rotation_matrix.
 }
@@ -3002,7 +3012,7 @@ split. {
         rewrite <- Hv.
         apply in_ball_after_rotation. {
           rewrite Hp₀; simpl.
-          rewrite Rsqr_0, rngl_squ_1; lra.
+          rewrite (rngl_squ_0 Hos), rngl_squ_1; lra.
         }
         apply mat_pow_is_rotation_matrix.
         apply rot_z_is_rotation_matrix.
