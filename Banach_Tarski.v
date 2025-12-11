@@ -2432,27 +2432,29 @@ Qed.
 Theorem sphere_ball_but_center : ∀ p,
    (∃ r, (0 < r ≤ 1)%L ∧ p ∈ sphere r) ↔ p ∈ ball ∖ center.
 Proof.
+destruct_ac.
+specialize (rngl_integral_or_inv_pdiv_eq_dec_order Hiv Hor) as Hio.
 intros (x, y, z); simpl.
 split. {
   intros (r & Hr & Hs); rewrite Hs.
   replace 1%L with 1² by apply rngl_squ_1.
   split. {
-Require Import Reals.
-Check Rsqr_incr_1.
-Search (_² ≤ _²)%L.
-...
-    apply Rsqr_incr_1; [ easy | | ].
+    apply (rngl_le_le_squ Hop Hto); [ | easy ].
+    now apply rngl_lt_le_incl.
   }
   intros H; injection H; clear H; intros Hz Hy Hx.
-  subst x y z; rewrite Rsqr_0 in Hs.
-  do 2 rewrite Rplus_0_r in Hs.
-  symmetry in Hs; apply Rsqr_eq_0 in Hs; lra.
+  subst x y z; rewrite (rngl_squ_0 Hos) in Hs.
+  do 2 rewrite rngl_add_0_r in Hs.
+  symmetry in Hs; apply (eq_rngl_squ_0 Hos Hio) in Hs; subst r.
+  destruct Hr as (Hr, _).
+  now apply rngl_lt_irrefl in Hr.
 }
 intros (Hle & Hnz).
 exists (√ (x² + y² + z²)).
 split. {
   split. {
-    apply Rnot_le_lt; intros H1.
+    apply (rngl_nle_gt_iff Hto); intros H1.
+...
     specialize (sqrt_pos (x² + y² + z²)) as H2.
     apply Rle_antisym in H2; [ | easy ].
     apply sqrt_eq_0 in H2; [ | apply nonneg_sqr_vec_norm ].
@@ -2852,7 +2854,7 @@ split. {
   destruct H₁ as (H₁, H₃).
   destruct H₂ as (H₂, H₄).
   unfold ball in H₁, H₂.
-  rewrite Ropp_0 in H₁, H₂; do 2 rewrite Rplus_0_r in H₁, H₂.
+  rewrite Ropp_0 in H₁, H₂; do 2 rewrite rngl_add_0_r in H₁, H₂.
   rewrite fold_Rminus in H₁, H₂.
   now apply (Rno_intersect_balls_x3_x6 x y z).
 }
@@ -2892,7 +2894,7 @@ exists (Transl (V 1 0 0)).
 intros (x, y, z); subst E; simpl.
 split; intros Hv. {
   injection Hv; clear Hv; intros Hz Hy Hx.
-  rewrite Ropp_0 in Hy, Hz; rewrite Rplus_0_r in Hy, Hz.
+  rewrite Ropp_0 in Hy, Hz; rewrite rngl_add_0_r in Hy, Hz.
   subst y z; f_equal; lra.
 }
 injection Hv; clear Hv; intros Hz Hy Hx. {
