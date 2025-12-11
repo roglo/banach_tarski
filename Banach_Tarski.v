@@ -986,7 +986,7 @@ destruct b₁, b. {
     destruct (Rgt_dec 0 0) as [H1| H1]; [ now lra | clear H1 ].
     simpl in Hsr₂.
     rewrite (rngl_squ_0 Hos) in Hsr₂; symmetry in Hsr₂.
-    do 2 rewrite Rplus_0_l in Hsr₂.
+    do 2 rewrite rngl_add_0_l in Hsr₂.
     apply Rsqr_eq_0 in Hsr₂; subst r.
     simpl in Hsr₁; rewrite (rngl_squ_0 Hos) in Hsr₁.
     destruct p₁ as (x, y, z).
@@ -2744,13 +2744,52 @@ Theorem ρE_is_E_but_D : ∀ p₁ s c ρ,
   → (ρE ρ = E ρ ∖ D)%S.
 Proof.
 destruct_ac.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros * Hp₁ Hsc Hj Hρ; intros v.
+(**)
+  exfalso; apply Hj; clear Hj; cbn.
+  exists 0%L, 0%L.
+  rewrite (rngl_squ_0 Hos), rngl_add_0_l.
+  rewrite (H1 1%L).
+  progress unfold D.
+  progress unfold set_inter; cbn.
+  split. {
+    split; [ easy | ].
+    exists 0%vec, 0%vec.
+    split. {
+      destruct p₁ as (x1, y1, z1).
+      rewrite (H1 x1), (H1 y1), (H1 z1).
+      cbn.
+...
+  destruct v as (x, y, z).
+  rewrite (H1 x), (H1 y), (H1 z).
+  progress unfold set_sub; cbn.
+  split; intros (v & Hv). {
+    split. {
+      exists 0%vec, 0.
+      split. {
+        cbn.
+        progress unfold D.
+        progress unfold set_sub; cbn.
+(* ah merde *)
+  cbn.
+Set Printing All.
+  exfalso; apply Hj; cbn.
+  exists 0%L, 0%L.
+
+  destruct Hj as ((H2, H3), H4).
+  progress unfold center in H3.
+  cbn in H3.
+  destruct p₁ as (x, y, z).
+  now rewrite (H1 x), (H1 y), (H1 z) in H3.
 intros * Hp₁ Hsc Hj Hρ; intros v.
 assert (Hnz : p₁ ≠ 0%vec). {
   intros H; rewrite H in Hp₁; simpl in Hp₁.
-(**)
-  rewrite (rngl_squ_0 Hos) in Hp₁.
+  rewrite (rngl_squ_0 Hos), rngl_add_0_l, rngl_add_0_l in Hp₁.
+  rewrite (rl_sqrt_0 Hop Hto Hii) in Hp₁.
+  symmetry in Hp₁; revert Hp₁; apply (rngl_1_neq_0 Hc1).
 ...
-  rewrite (rngl_squ_0 Hos), Rplus_0_l, Rplus_0_l, sqrt_0 in Hp₁; lra.
 }
 split; intros H. {
   unfold ρE in H.
