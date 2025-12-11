@@ -1107,6 +1107,7 @@ rewrite <- Hm, <- Hp₂.
 rewrite <- Hr in Hs.
 subst m.
 fold (fixpoint_of_path r el₁) in Hp₂.
+...
 apply axis_and_fixpoint_of_path_collinear with (p := p₁) in Hp₂;
   try assumption.
 now destruct (is_neg_vec p₁), (is_neg_vec p₂).
@@ -1191,6 +1192,7 @@ Proof.
 intros r.
 intros p Hp.
 eapply countable_union. {
+...
   apply D_set_is_countable.
 } {
   apply D_set_symmetry_is_countable.
@@ -1218,7 +1220,6 @@ simpl in Hm.
 injection Hm; clear Hm; intros Hz Hy Hx.
 unfold latitude; simpl.
 rewrite Hp, Hp₁, Hp₂, (rl_sqrt_1 Hop Hiq Hto); f_equal.
-(**)
 ...
 subst.
 progress unfold rngl_squ.
@@ -1625,7 +1626,7 @@ assert (Hc : c = v'₁ · v'₂). {
   rewrite Rsqr_sqrt; [ | lra ].
   apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
   rewrite <- Rmult_assoc.
-  rewrite Rinv_r; lra.
+  rewrite (rngl_mul_inv_diag_r Hiv); lra.
 }
 f_equal; [ | easy ].
 assert (p · v'₁ = 0 ∧ p · v'₂ = 0) as (Hpv₁, Hpv₂). {
@@ -1728,7 +1729,7 @@ assert (Hs : s = p · v'₁ × v'₂). {
   apply Rmult_eq_reg_l with (r := 1 - a²); [ | lra ].
   rewrite <- Rmult_vec_dot_mul_distr_r.
   rewrite <- Rmult_assoc.
-  rewrite Rinv_r; [ | lra ].
+  rewrite (rngl_mul_inv_diag_r Hiv); [ | lra ].
   rewrite Rmult_1_l.
   clear v'₁ v'₂ Hv'₁ Hv'₂ Hnv'₁ Hnv'₂ Hc Hpv₁ Hpv₂ Hlag Hppp.
   clear Ha2 Hsa Hppvv.
@@ -1876,7 +1877,7 @@ assert (‖u₁‖ = r ∧ ‖u₂‖ = r) as (Hnu₁, Hnu₂). {
   apply (f_equal (Rmult r)) in Ha₁.
   apply (f_equal (Rmult r)) in Ha₂.
   rewrite <- Rmult_assoc in Ha₁, Ha₂.
-  rewrite Rinv_r in Ha₁, Ha₂; [ | lra | lra ].
+  rewrite (rngl_mul_inv_diag_r Hiv) in Ha₁, Ha₂; [ | lra | lra ].
   rewrite Rmult_1_l in Ha₁, Ha₂.
   rewrite Rabs_inv.
   rewrite Rabs_sqrt, Ha₁, Ha₂.
@@ -2028,7 +2029,7 @@ specialize
   as H.
 apply (f_equal (vec_const_mul r)) in H.
 do 2 rewrite vec_const_mul_assoc in H.
-rewrite Rinv_r in H; [ | easy ].
+rewrite (rngl_mul_inv_diag_r Hiv) in H; [ | easy ].
 now do 2 rewrite vec_const_mul_1_l in H.
 Qed.
 
@@ -2487,6 +2488,7 @@ Theorem fold_in_ball : ∀ v,
   (let 'V x y z := v in (x² + y² + z² ≤ 1)%L) = v ∈ ball.
 Proof. easy. Qed.
 
+(*
 Theorem exists_point_not_in_D :
   ∃ p₁, p₁ ∈ ball ∖ center ∖ D ∧ (- p₁)%vec ∈ ball ∖ center ∖ D.
 Proof.
@@ -2530,32 +2532,34 @@ Qed.
 Theorem exists_rotation_not_in_J : ∀ p₁,
   p₁ ∈ ball ∖ center ∖ D
   → (- p₁)%vec ∈ ball ∖ center ∖ D
-  → ∃ s c, s² + c² = 1 ∧ (s, c) ∉ J p₁.
+  → ∃ s c, (s² + c² = 1)%L ∧ (s, c) ∉ J p₁.
 Proof.
 intros * (Hps, Hpnd) (Hqs, Hqnd).
+...
 specialize (J_is_countable p₁ Hpnd Hqnd) as Hjc.
 specialize (rotations_not_countable (J_of_nat p₁)) as (s, (c, (Hsc, Hn))).
 exists s, c; split; [ easy | intros H ].
 specialize (Hjc _ H) as (n, Hjc).
 now specialize (Hn n).
 Qed.
+*)
 
 Theorem not_in_center_not_zero : ∀ p,
   p ∈ (ball ∖ center) ∖ D
   → p ≠ 0%vec.
 Proof.
 intros * (Hp, _).
-intros H; rewrite H in Hp; simpl in Hp.
-rewrite Rsqr_0, Rplus_0_l, Rplus_0_l in Hp.
-now destruct Hp.
+now intros H; rewrite H in Hp; simpl in Hp.
 Qed.
 
-Theorem not_in_center_in_sphere_1 : ∀ p₁ p'₁,
+Theorem not_in_center_in_sphere_1 :
+  rngl_has_inv T = true →
+  ∀ p₁ p'₁,
   p₁ ∈ (ball ∖ center) ∖ D
   → p'₁ = p₁ ⁄ ‖p₁‖
   → p'₁ ∈ sphere 1 ∖ D.
 Proof.
-intros * Hp Hp'₁.
+intros Hiv * Hp Hp'₁.
 specialize (not_in_center_not_zero p₁ Hp) as Hpz.
 split. {
   rewrite Hp'₁.
@@ -2566,27 +2570,42 @@ rewrite Hp'₁.
 intros H.
 apply vec_const_mul_in_D with (r := ‖p₁‖) in H. {
   rewrite vec_const_mul_assoc in H.
-  rewrite Rinv_r in H; [ | now apply vec_norm_neq_0 ].
+  rewrite (rngl_mul_inv_diag_r Hiv) in H; [ | now apply vec_norm_neq_0 ].
   rewrite vec_const_mul_1_l in H.
   now destruct Hp as (_, Hp).
 }
 now apply vec_norm_neq_0.
 Qed.
 
-Theorem not_in_center_neg_in_sphere_1 : ∀ p₁ p'₁,
+Theorem not_in_center_neg_in_sphere_1 :
+  rngl_has_opp T = true →
+  rngl_has_inv T = true →
+  ∀ p₁ p'₁,
   p₁ ∈ (ball ∖ center) ∖ D
   → p'₁ = p₁ ⁄ ‖p₁‖
   → (- p'₁)%vec ∈ sphere 1 ∖ D.
 Proof.
+intros Hop Hiv.
+specialize (rngl_has_opp_has_opp_or_psub Hop) as Hos.
+destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+  intros * Hp Hp'₁.
+  destruct Hp as ((H2, H3), H4).
+  progress unfold center in H3.
+  cbn in H3.
+  destruct p₁ as (x, y, z).
+  now rewrite (H1 x), (H1 y), (H1 z) in H3.
+}
 intros * Hp Hp'₁.
-specialize (not_in_center_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hp'.
-split; [ now apply neg_vec_in_sphere; destruct Hp' | ].
+specialize (not_in_center_in_sphere_1 Hiv p₁ p'₁ Hp Hp'₁) as Hp'.
+split; [ now apply (neg_vec_in_sphere Hop); destruct Hp' | ].
 intros H; apply Hp'.
-apply vec_const_mul_in_D with (r := -1) in H; [ | lra ].
-unfold IZR in H; rewrite <- INR_IPR in H.
-rewrite <- vec_opp_const_mul_distr_l in H.
-rewrite vec_const_mul_1_l in H.
-now rewrite neg_vec_involutive in H.
+apply (vec_const_mul_in_D _ (-1))%L in H. {
+  rewrite <- vec_opp_const_mul_distr_l in H.
+  rewrite vec_const_mul_1_l in H.
+  now rewrite neg_vec_involutive in H.
+}
+apply (rngl_opp_1_neq_0 Hop Hc1).
 Qed.
 
 Theorem not_in_J_norm_not_in_J : ∀ p₁ p'₁ s c,
@@ -2596,6 +2615,7 @@ Theorem not_in_J_norm_not_in_J : ∀ p₁ p'₁ s c,
   → (s, c) ∉ J p'₁.
 Proof.
 intros * Hp Hp'₁ Hj.
+...
 specialize (not_in_center_in_sphere_1 p₁ p'₁ Hp Hp'₁) as Hp'.
 specialize (not_in_center_not_zero p₁ Hp) as Hpz.
 intros H; apply Hj.
@@ -2632,7 +2652,7 @@ f_equal.
 rewrite matrix_mul_axis with (k := ‖p₁‖) in Hmp. {
   rewrite Hp'₁ in Hmp.
   rewrite vec_const_mul_assoc in Hmp.
-  rewrite Rinv_r in Hmp; [ | now apply vec_norm_neq_0 ].
+  rewrite (rngl_mul_inv_diag_r Hiv) in Hmp; [ | now apply vec_norm_neq_0 ].
   rewrite vec_const_mul_1_l in Hmp.
   rewrite Rsign_of_pos in Hmp; [ now rewrite rngl_mul_1_l in Hmp | ].
   now apply vec_norm_pos.
