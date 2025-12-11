@@ -2736,7 +2736,9 @@ split; [ easy | ].
 apply mat_vec_mul_0_r.
 Qed.
 
-Theorem ρE_is_E_but_D : ∀ p₁ s c ρ,
+Theorem ρE_is_E_but_D :
+  rngl_characteristic T ≠ 1 →
+  ∀ p₁ s c ρ,
   ‖p₁‖ = 1%L
   → (s² + c² = 1)%L
   → (s, c) ∉ J p₁
@@ -2744,52 +2746,12 @@ Theorem ρE_is_E_but_D : ∀ p₁ s c ρ,
   → (ρE ρ = E ρ ∖ D)%S.
 Proof.
 destruct_ac.
-destruct (Nat.eq_dec (rngl_characteristic T) 1) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hos Hc1) as H1.
-  intros * Hp₁ Hsc Hj Hρ; intros v.
-(**)
-  exfalso; apply Hj; clear Hj; cbn.
-  exists 0%L, 0%L.
-  rewrite (rngl_squ_0 Hos), rngl_add_0_l.
-  rewrite (H1 1%L).
-  progress unfold D.
-  progress unfold set_inter; cbn.
-  split. {
-    split; [ easy | ].
-    exists 0%vec, 0%vec.
-    split. {
-      destruct p₁ as (x1, y1, z1).
-      rewrite (H1 x1), (H1 y1), (H1 z1).
-      cbn.
-...
-  destruct v as (x, y, z).
-  rewrite (H1 x), (H1 y), (H1 z).
-  progress unfold set_sub; cbn.
-  split; intros (v & Hv). {
-    split. {
-      exists 0%vec, 0.
-      split. {
-        cbn.
-        progress unfold D.
-        progress unfold set_sub; cbn.
-(* ah merde *)
-  cbn.
-Set Printing All.
-  exfalso; apply Hj; cbn.
-  exists 0%L, 0%L.
-
-  destruct Hj as ((H2, H3), H4).
-  progress unfold center in H3.
-  cbn in H3.
-  destruct p₁ as (x, y, z).
-  now rewrite (H1 x), (H1 y), (H1 z) in H3.
-intros * Hp₁ Hsc Hj Hρ; intros v.
+intros Hc1 * Hp₁ Hsc Hj Hρ; intros v.
 assert (Hnz : p₁ ≠ 0%vec). {
   intros H; rewrite H in Hp₁; simpl in Hp₁.
   rewrite (rngl_squ_0 Hos), rngl_add_0_l, rngl_add_0_l in Hp₁.
   rewrite (rl_sqrt_0 Hop Hto Hii) in Hp₁.
   symmetry in Hp₁; revert Hp₁; apply (rngl_1_neq_0 Hc1).
-...
 }
 split; intros H. {
   unfold ρE in H.
@@ -2815,7 +2777,8 @@ split; intros H. {
   rewrite <- mat_vec_mul_assoc in Hv.
   replace (ρ * ρ ^ n)%mat with (ρ ^ S n)%mat in Hv by easy.
   remember (angle_of_sin_cos s c) as θ eqn:Hθ.
-  remember (sin (θ * INR (S n))) as s₀ eqn:Hs₀.
+...
+  remember (rngl_sin (θ * INR (S n))) as s₀ eqn:Hs₀.
   remember (cos (θ * INR (S n))) as c₀ eqn:Hc₀.
   exists s₀, c₀.
   split. {
