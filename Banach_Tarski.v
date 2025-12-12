@@ -1689,7 +1689,7 @@ destruct (Req_dec (p · v'₁ × v'₂) 0) as [Hppp| Hppp]. {
   rewrite Hppp, Rabs_R0 in Hlag.
   apply Rmult_integral in Hlag.
   destruct Hlag as [Hlag| Hlag]. {
-    apply Rinv_neq_0_compat in Hlag; [ easy | lra ].
+    apply (rngl_inv_neq_0 Hos Hiv) in Hlag; [ easy | lra ].
   }
   rewrite <- Hnv₁ in Hnv₂; symmetry in Hnv₂.
   apply Rsqr_inj in Hnv₂; try apply vec_norm_nonneg.
@@ -1839,11 +1839,11 @@ remember ((p₁ ⁄ r - a ⁎ (p ⁄ r)) ⁄ √ (1 - a²)) as v₁ eqn:Hv₁.
 remember ((p₂ ⁄ r - a ⁎ (p ⁄ r)) ⁄ √ (1 - a²)) as v₂ eqn:Hv₂.
 move u₂ before u₁; move v₁ before u₂; move v₂ before v₁.
 rewrite vec_const_mul_assoc in Hv₁, Hv₂.
-rewrite Rmult_comm in Hv₁, Hv₂.
+rewrite (rngl_mul_comm Hic) in Hv₁, Hv₂.
 rewrite <- vec_const_mul_assoc in Hv₁, Hv₂.
 rewrite <- vec_const_mul_sub_distr_l in Hv₁, Hv₂.
 rewrite vec_const_mul_assoc in Hv₁, Hv₂.
-rewrite Rmult_comm in Hv₁, Hv₂.
+rewrite (rngl_mul_comm Hic) in Hv₁, Hv₂.
 rewrite <- vec_const_mul_assoc in Hv₁, Hv₂.
 rewrite <- Hu₁ in Hv₁.
 rewrite <- Hu₂ in Hv₂.
@@ -1868,7 +1868,7 @@ assert (‖u₁‖ = r ∧ ‖u₂‖ = r) as (Hnu₁, Hnu₂). {
   eapply latitude_norm in Ha₁; [ | easy | easy | reflexivity ].
   eapply latitude_norm in Ha₂; [ | easy | easy | reflexivity ].
   do 2 rewrite vec_norm_vec_const_mul.
-  rewrite vec_const_mul_assoc, Rmult_comm in Ha₁, Ha₂.
+  rewrite vec_const_mul_assoc, (rngl_mul_comm Hic) in Ha₁, Ha₂.
   rewrite <- vec_const_mul_assoc in Ha₁, Ha₂.
   rewrite <- vec_const_mul_sub_distr_l in Ha₁, Ha₂.
   rewrite vec_norm_vec_const_mul in Ha₁, Ha₂.
@@ -2021,7 +2021,7 @@ assert (Hpr : ∀ p, p ∈ sphere r → p ⁄ r ∈ sphere 1). {
 assert (Ha : ∀ p p', latitude p p' = latitude (p ⁄ r) (p' ⁄ r)). {
   clear - Hr; intros.
   rewrite latitude_mul; [ easy | ].
-  apply Rinv_neq_0_compat; lra.
+  apply (rngl_inv_neq_0 Hos Hiv); lra.
 }
 rewrite Ha in Hlat.
 specialize
@@ -2789,8 +2789,7 @@ split; intros H. {
       split. {
         destruct Hp₀d as (Hp₀d, Hp₀b).
         apply vec_const_mul_in_D; [ | easy ].
-...
-        now apply Rinv_neq_0_compat, vec_norm_neq_0.
+        now apply (rngl_inv_neq_0 Hos Hiv), vec_norm_neq_0.
       }
       rewrite Hp₁.
       apply vec_div_in_sphere; [ now apply vec_norm_neq_0 | ].
@@ -2799,7 +2798,7 @@ split; intros H. {
     split. {
       split. {
         apply vec_const_mul_in_D; [ | easy ].
-        now apply Rinv_neq_0_compat, vec_norm_neq_0.
+        now apply (rngl_inv_neq_0 Hos Hiv), vec_norm_neq_0.
       }
       rewrite Hp₁.
       apply vec_div_in_sphere; [ now apply vec_norm_neq_0 | ].
@@ -2810,11 +2809,11 @@ split; intros H. {
     }
     rewrite mat_vec_mul_const_distr; f_equal.
     rewrite Hv, Hρ, Hρ₀.
-    rewrite Rmult_comm in Hs₀, Hc₀.
     now erewrite matrix_of_mul_angle; try eassumption.
   }
   rewrite Hc₀, Hs₀.
   rewrite angle_of_sin_cos_inv.
+...
   remember ((θ * INR (S n)) // (2 * PI)) as k eqn:Hk.
   exists (S n), k.
   replace ((θ * INR (S n)) rmod (2 * PI) + 2 * IZR k * PI)
