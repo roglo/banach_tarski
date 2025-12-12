@@ -2813,6 +2813,11 @@ split; intros H. {
   }
   rewrite Hc₀, Hs₀.
   rewrite angle_of_sin_cos_inv.
+  move s₀ before s; move c₀ before c.
+  move p₀ after p₁; move u before p₁; move v before u.
+(* (n+1)θ : combien il fait de tours, dans ma trigonométrie sans π ? *)
+Search angle.
+About angle_mul_nat_overflow.
 ...
   remember ((θ * INR (S n)) // (2 * PI)) as k eqn:Hk.
   exists (S n), k.
