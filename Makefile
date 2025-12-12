@@ -13,8 +13,7 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	rocq dep -R . a $(FILESFORDEP) | sed -e " s|$$HOME[^ ]*||" | \
-	LC_ALL=C sort |	sed -e 's/  *$$//' > .depend
+	coqdep -Q . . $(FILESFORDEP) | LC_ALL=C sort > .depend
 
 show_coq_version:
 	@echo $(COQ_VERSION)
@@ -22,7 +21,7 @@ show_coq_version:
 .SUFFIXES: .v .vo .vp
 
 %.vo: %.v
-	rocq compile -R . a $<
+	rocq compile $<
 
 %.v: %.vp
 	@echo /lib/cpp -D$(COQ_VERSION) $< '>' $@
