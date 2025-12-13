@@ -2826,6 +2826,12 @@ split; intros H. {
   assert (H : ∃ π_n, angle_div_nat π (S n) π_n). {
     specialize (exists_angle_div_nat Hch Har Hco) as H1.
     specialize (H1 π (S n) (Nat.neq_succ_0 _)).
+...
+il faut que ce soit plutôt :
+  H1 : ∃ θ' : angle T, (S n * θ')%A = π ∧ θ' ≤ π ∧ angle_div_nat n (S n) θ' = 0.
+truc genre.
+Peut-être que θ' ≤ π n'est pas nécessaire.
+...
     destruct H1 as (π_n, H1).
     exists π_n.
     rewrite <- H1.
@@ -2841,6 +2847,7 @@ Admitted.
 apply (angle_mul_div_nat Hch Har Hco); [ easy | cbn ].
 apply Nat.eq_add_0.
 split. {
+(**)
   cbn in H1.
   apply angle_add_move_r in H1.
   rewrite H1.
