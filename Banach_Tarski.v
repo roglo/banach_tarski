@@ -2838,7 +2838,22 @@ Theorem angle_mul_div_nat :
   → angle_mul_nat_div_2π n θ = 0
   → angle_div_nat (n * θ) n θ.
 Admitted.
-apply (angle_mul_div_nat Hch Har Hco); [ easy | ].
+apply (angle_mul_div_nat Hch Har Hco); [ easy | cbn ].
+apply Nat.eq_add_0.
+split. {
+  cbn in H1.
+  apply angle_add_move_r in H1.
+  rewrite H1.
+...
+  apply (angle_mul_nat_div_2π_le_r _ π).
+...
+cbn.
+clear Hu Hv Hs₀ Hc₀ Hk.
+clear θ Hθ.
+rename π_n into θ.
+revert θ H1.
+induction n; intros; [ now cbn; rewrite angle_add_overflow_0_r | ].
+cbn.
 ...
   replace ((θ * INR (S n)) rmod (2 * PI) + 2 * IZR k * PI)
     with (2 * PI * IZR k + (θ * INR (S n)) rmod (2 * PI)) by lra.
