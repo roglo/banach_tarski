@@ -2827,8 +2827,14 @@ split; intros H. {
     specialize (exists_angle_div_nat Hch Har Hco) as H1.
     specialize (H1 π (S n) (Nat.neq_succ_0 _)).
 ...
+enough (
+  H2 : ∃ θ' : angle T, (S n * θ')%A = π ∧ angle_mul_nat_div_2π (S n) θ' = 0).
+destruct H2 as (π_n & H2 & H3).
+exists π_n.
+rewrite <- H2.
+...
 il faut que ce soit plutôt :
-  H1 : ∃ θ' : angle T, (S n * θ')%A = π ∧ θ' ≤ π ∧ angle_div_nat n (S n) θ' = 0.
+  H1 : ∃ θ' : angle T, (S n * θ')%A = π ∧ angle_mul_nat_div_2π θ' (S n) = 0.
 truc genre.
 Peut-être que θ' ≤ π n'est pas nécessaire.
 ...
