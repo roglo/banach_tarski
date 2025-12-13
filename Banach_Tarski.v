@@ -2829,6 +2829,16 @@ split; intros H. {
     destruct H1 as (π_n, H1).
     exists π_n.
     rewrite <- H1.
+Theorem angle_mul_div_nat :
+  rngl_characteristic T = 0 →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_dist →
+  ∀ θ n,
+  n ≠ 0
+  → angle_mul_nat_div_2π n θ = 0
+  → angle_div_nat (n * θ) n θ.
+Admitted.
+apply (angle_mul_div_nat Hch Har Hco); [ easy | ].
 ...
   replace ((θ * INR (S n)) rmod (2 * PI) + 2 * IZR k * PI)
     with (2 * PI * IZR k + (θ * INR (S n)) rmod (2 * PI)) by lra.
