@@ -2816,7 +2816,7 @@ split; intros H. {
   move s₀ before s; move c₀ before c.
   move p₀ after p₁; move u before p₁; move v before u.
 (* (n+1)θ : combien il fait de tours, dans ma trigonométrie sans π ? *)
-Print angle_mul_nat_overflow.
+Print angle_mul_nat_div_2π.
 ...
   remember ((θ * INR (S n)) // (2 * PI)) as k eqn:Hk.
   exists (S n), k.
