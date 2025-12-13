@@ -2737,7 +2737,9 @@ apply mat_vec_mul_0_r.
 Qed.
 
 Theorem ρE_is_E_but_D :
-  rngl_characteristic T ≠ 1 →
+  is_complete T rngl_dist →
+  rngl_characteristic T = 0 →
+  rngl_is_archimedean T = true →
   ∀ p₁ s c ρ,
   ‖p₁‖ = 1%L
   → (s² + c² = 1)%L
@@ -2746,7 +2748,10 @@ Theorem ρE_is_E_but_D :
   → (ρE ρ = E ρ ∖ D)%S.
 Proof.
 destruct_ac.
-intros Hc1 * Hp₁ Hsc Hj Hρ; intros v.
+intros Hco Hch Har.
+set (Hc1 := eq_ind_r (λ n : ℕ, n ≠ 1) (Nat.neq_succ_diag_r 0) Hch).
+cbn in Hc1.
+intros * Hp₁ Hsc Hj Hρ; intros v.
 assert (Hnz : p₁ ≠ 0%vec). {
   intros H; rewrite H in Hp₁; simpl in Hp₁.
   rewrite (rngl_squ_0 Hos), rngl_add_0_l, rngl_add_0_l in Hp₁.
@@ -2768,7 +2773,7 @@ split; intros H. {
   }
   intros Hvn.
   apply Hj; clear Hj; unfold J.
-  remember J₀ as a; simpl; subst a.
+  remember J₀ as a; cbn - [ angle_add Nat.mul ]; subst a.
   unfold E in Hu.
   remember D as d; remember set_inter as b.
   simpl in Hu; subst d b.
@@ -2815,14 +2820,20 @@ split; intros H. {
   rewrite angle_of_sin_cos_inv.
   move s₀ before s; move c₀ before c.
   move p₀ after p₁; move u before p₁; move v before u.
-(* (n+1)θ : combien il fait de tours, dans ma trigonométrie sans π ? *)
-Print angle_mul_nat_div_2π.
-...
-  remember ((θ * INR (S n)) // (2 * PI)) as k eqn:Hk.
+  remember (angle_mul_nat_div_2π (S n) θ) as k eqn:Hk.
   exists (S n), k.
+  exists θ.
+  assert (H : ∃ π_n, angle_div_nat π (S n) π_n). {
+    specialize (exists_angle_div_nat Hch Har Hco) as H1.
+    specialize (H1 π (S n) (Nat.neq_succ_0 _)).
+    destruct H1 as (π_n, H1).
+    exists π_n.
+    rewrite <- H1.
+...
   replace ((θ * INR (S n)) rmod (2 * PI) + 2 * IZR k * PI)
     with (2 * PI * IZR k + (θ * INR (S n)) rmod (2 * PI)) by lra.
   rewrite Hk.
+...
   rewrite <- Rdiv_mod; [ | specialize PI_neq0; lra ].
   rewrite Rmult_div.
   rewrite (rngl_div_mul Hiv). {
