@@ -2826,7 +2826,12 @@ split; intros H. {
   assert (H : ∃ π_n, angle_div_nat π (S n) π_n). {
     specialize (exists_angle_div_nat Hch Har Hco) as H1.
     specialize (H1 π (S n) (Nat.neq_succ_0 _)).
+    destruct H1 as (π_n & H1).
+    exists π_n.
+    rewrite <- H1.
+Search (angle_div_nat).
 ...
+    specialize (angle_div_nat_prop Hch Har Hco θ (S n)) as H.
 enough (
   H2 : ∃ θ' : angle T, (S n * θ')%A = π ∧ angle_mul_nat_div_2π (S n) θ' = 0).
 destruct H2 as (π_n & H2 & H3).
