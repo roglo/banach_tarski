@@ -2824,26 +2824,18 @@ split; intros H. {
   exists (S n), k.
   exists θ.
   assert (H : ∃ π_n, angle_div_nat π (S n) π_n). {
+Theorem exists_angle_div_nat :
+  rngl_characteristic T = 0 →
+  rngl_is_archimedean T = true →
+  is_complete T rngl_dist →
+  ∀ θ n,
+  n ≠ 0
+  → ∃ θ', (n * θ')%A = θ ∧ angle_mul_nat_div_2π n θ' = 0.
+Proof.
+...
     specialize (exists_angle_div_nat Hch Har Hco) as H1.
     specialize (H1 π (S n) (Nat.neq_succ_0 _)).
-    destruct H1 as (π_n & H1).
-    exists π_n.
-    rewrite <- H1.
-Search (angle_div_nat).
-...
-    specialize (angle_div_nat_prop Hch Har Hco θ (S n)) as H.
-enough (
-  H2 : ∃ θ' : angle T, (S n * θ')%A = π ∧ angle_mul_nat_div_2π (S n) θ' = 0).
-destruct H2 as (π_n & H2 & H3).
-exists π_n.
-rewrite <- H2.
-...
-il faut que ce soit plutôt :
-  H1 : ∃ θ' : angle T, (S n * θ')%A = π ∧ angle_mul_nat_div_2π θ' (S n) = 0.
-truc genre.
-Peut-être que θ' ≤ π n'est pas nécessaire.
-...
-    destruct H1 as (π_n, H1).
+    destruct H1 as (π_n & H1 & H2).
     exists π_n.
     rewrite <- H1.
 Theorem angle_mul_div_nat :
@@ -2854,11 +2846,13 @@ Theorem angle_mul_div_nat :
   n ≠ 0
   → angle_mul_nat_div_2π n θ = 0
   → angle_div_nat (n * θ) n θ.
-Admitted.
-apply (angle_mul_div_nat Hch Har Hco); [ easy | cbn ].
+...
+apply (angle_mul_div_nat Hch Har Hco); [ easy | ].
+...
 apply Nat.eq_add_0.
 split. {
 (**)
+...
   cbn in H1.
   apply angle_add_move_r in H1.
   rewrite H1.
