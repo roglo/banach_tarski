@@ -2824,20 +2824,12 @@ split; intros H. {
   exists (S n), k.
   exists θ.
   assert (H : ∃ π_n, angle_div_nat π (S n) π_n). {
-...
     specialize (exists_angle_div_nat Hch Har Hco) as H1.
     specialize (H1 π (S n) (Nat.neq_succ_0 _)).
-    destruct H1 as (π_n & H1 & H2).
+    destruct H1 as (π_n & H1).
     exists π_n.
     rewrite <- H1.
-Theorem angle_mul_div_nat :
-  rngl_characteristic T = 0 →
-  rngl_is_archimedean T = true →
-  is_complete T rngl_dist →
-  ∀ θ n,
-  n ≠ 0
-  → angle_mul_nat_div_2π n θ = 0
-  → angle_div_nat (n * θ) n θ.
+    apply (angle_mul_div_nat Hch Har Hco); [ easy | ].
 ...
 apply (angle_mul_div_nat Hch Har Hco); [ easy | ].
 ...
