@@ -2831,6 +2831,25 @@ split; intros H. {
     rewrite <- H1.
     apply (angle_mul_div_nat Hch Har Hco); [ easy | ].
 ...
+    apply angle_mul_nat_div_2π_iff.
+    split. {
+      intros i Hin.
+      apply Nat.le_0_r.
+      induction i; [ easy | ].
+      cbn.
+      rewrite IHi. 2: {
+        apply (Nat.lt_trans _ (S i)); [ | easy ].
+        apply Nat.lt_succ_diag_r.
+      }
+      apply Nat_eq_b2n_0.
+      apply angle_add_not_overflow_iff.
+...
+      apply angle_mul_nat_div_2π_iff.
+      split. {
+        intros j Hji.
+        apply Nat.le_0_r.
+Search angle_mul_nat_div_2π.
+...
 apply (angle_mul_div_nat Hch Har Hco); [ easy | ].
 ...
 apply Nat.eq_add_0.
