@@ -2773,6 +2773,8 @@ split; intros H. {
   }
   intros Hvn.
   apply Hj; clear Hj; unfold J.
+(* est-ce que ma définition de J est correcte ? *)
+...
   remember J₀ as a; cbn - [ angle_add Nat.mul ]; subst a.
   unfold E in Hu.
   remember D as d; remember set_inter as b.
