@@ -53,10 +53,26 @@ Add Parametric Relation : _ same_orbit
 Definition orbit_by_seq_of e {os : sel_model} :=
   mkset (λ p, ∃ n, (mat_of_path (repeat e (S n)) * os_fun p)%vec = p).
 
+(* bizarre, ce truc-là...
+   ensemble des points dont on peut trouver un autre point p₁ dans la
+   même orbite et un chemin non vide qui fait retomber p₁ sur lui-même ;
+     Bizarre, parce que soit ça ne devrait pas arriver, puisque les
+   chemins normalisés ne sont pas censés boucler, soit c'est sur
+   le point initial que ça devrait tomber, que je me suis gouré dans
+   la définition et qu'il s'agirait de points finaux, de points ayant
+   un prédécesseur ; je comprends pas. Putain, chuis nul. Tu me diras
+   que j'avais qu'à mettre un commentaire pour expliquer ce que c'est
+   que D, sauf que je sais pas mettre de commentaires, je ne sais pas
+   expliquer un truc quand je le fais, et encore moins comprendre le
+   commentaire quand je le relis plus tard. Si j'avais eu un robot
+   de bavardage à l'époque, j'aurais peut-être mis un commentaire qui
+   soit clair, les robots de bavardage étant très bons pour mettre
+   les idées au clair. *)
 Definition D :=
   mkset
     (λ p, ∃ el p₁, same_orbit p p₁
      ∧ norm_list el ≠ [] ∧ (mat_of_path el * p₁)%vec = p₁).
+...
 
 Arguments D : simpl never.
 
