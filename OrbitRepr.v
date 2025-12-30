@@ -70,8 +70,10 @@ Definition orbit_by_seq_of e {os : sel_model} :=
    les idées au clair. *)
 Definition D :=
   mkset
-    (λ p, ∃ el p₁, same_orbit p p₁
-     ∧ norm_list el ≠ [] ∧ (mat_of_path el * p₁)%vec = p₁).
+    (λ p : vector T,
+     ∃ (el : list free_elem) (p₁ : vector T),
+     same_orbit p p₁ ∧ norm_list el ≠ [] ∧ (mat_of_path el * p₁)%vec = p₁).
+
 ...
 
 Arguments D : simpl never.
