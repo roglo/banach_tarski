@@ -50,6 +50,7 @@ Add Parametric Relation : _ same_orbit
  transitivity proved by same_orbit_trans
  as same_orbit_rel.
 
+(* orbit in a circle *)
 Definition orbit_by_seq_of e {os : sel_model} :=
   mkset
     (λ p : vector T,
