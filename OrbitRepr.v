@@ -51,7 +51,9 @@ Add Parametric Relation : _ same_orbit
  as same_orbit_rel.
 
 Definition orbit_by_seq_of e {os : sel_model} :=
-  mkset (λ p, ∃ n, (mat_of_path (repeat e (S n)) * os_fun p)%vec = p).
+  mkset
+    (λ p : vector T,
+     ∃ n : nat, (mat_of_path (repeat e (S n)) * os_fun p)%vec = p).
 
 (* bizarre, ce truc-là...
    ensemble des points dont on peut trouver un autre point p₁ dans la
