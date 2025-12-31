@@ -18,32 +18,6 @@ Context {rp : ring_like_prop T}.
 Context {rl : real_like_prop T}.
 Context {ac : angle_ctx T}.
 
-(*
-Theorem strange_let :
-  ∀ x,
-    match
-      (let (_, _, _, _, rngl_opt_opp_or_psub, _, _, _, _) := ro in
-       rngl_opt_opp_or_psub)
-    with
-    | Some (inl rngl_opp) => rngl_opp x
-    | _ => 0%L
-    end = rngl_opp x.
-Proof. easy. Qed.
-
-Ltac fold_rngl :=
-  replace (let (_, _, _, rngl_mul, _, _, _, _, _) := ro in rngl_mul)
-    with rngl_mul by easy;
-  replace (let (_, _, rngl_add, _, _, _, _, _, _) := ro in rngl_add)
-    with rngl_add by easy;
-  replace (let (rngl_zero, _, _, _, _, _, _, _, _) := ro in rngl_zero)
-    with rngl_zero by easy;
-  replace (let (_, rngl_one, _, _, _, _, _, _, _) := ro in rngl_one)
-    with rngl_one by easy;
-  repeat try rewrite strange_let.
-
-Add Ring rngl_ring : (rngl_ring_theory ac_ic ac_op).
-*)
-
 Add Parametric Relation : _ same_orbit
  reflexivity proved by same_orbit_refl
  symmetry proved by same_orbit_sym
