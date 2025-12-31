@@ -9,6 +9,7 @@ Require Import Partition.
 
 Class sel_model {A} := mkos { os_fun : A → A }.
 
+(* orbit in a circle *)
 Definition orbit_by_seq_of e {os : sel_model} :=
   mkset (λ p, ∃ n, (mat_of_path (repeat e (S n)) * os_fun p)%vec = p).
 
