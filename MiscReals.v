@@ -1983,56 +1983,31 @@ intros.
 apply (rngl_add_squ_nonneg Hos Hto).
 Qed.
 
-Definition rngl_signp x := (if 0 ≤? x then 1 else -1)%L.
-Definition rngl_sign x := (if x =? 0 then 0 else rngl_signp x)%L.
-
-Arguments rngl_sign x%_L.
-
 Theorem Rsignp_of_pos : ∀ x, (0 ≤ x → rngl_signp x = 1)%L.
 Proof.
-destruct_ac.
 intros * Hx.
-unfold rngl_signp.
-apply rngl_leb_le in Hx.
-now rewrite Hx.
+now apply rngl_signp_of_pos.
 Qed.
 
 Theorem Rsignp_of_neg : ∀ x, (x < 0 → rngl_signp x = -1)%L.
 Proof.
 destruct_ac.
 intros * Hx.
-unfold rngl_signp.
-apply (rngl_nle_gt Hor) in Hx.
-apply rngl_leb_nle in Hx.
-now rewrite Hx.
+now apply (rngl_signp_of_neg Hor).
 Qed.
 
 Theorem Rsign_of_pos : ∀ x, (0 < x → rngl_sign x = 1)%L.
 Proof.
 destruct_ac.
 intros * Hx.
-unfold rngl_sign, rngl_signp.
-destruct (rngl_eqb_dec x 0) as [H | H]. {
-  apply (rngl_eqb_eq Heo) in H.
-  now subst; apply rngl_lt_irrefl in Hx.
-}
-apply rngl_lt_le_incl in Hx.
-apply rngl_leb_le in Hx.
-now rewrite H, Hx.
+now apply (rngl_sign_of_pos Heo).
 Qed.
 
 Theorem Rsign_of_neg : ∀ x, (x < 0 → rngl_sign x = -1)%L.
 Proof.
 destruct_ac.
 intros * Hx.
-unfold rngl_sign, rngl_signp.
-destruct (rngl_eqb_dec x 0) as [H| H]. {
-  apply (rngl_eqb_eq Heo) in H.
-  now subst; apply rngl_lt_irrefl in Hx.
-}
-apply (rngl_nle_gt Hor) in Hx.
-apply rngl_leb_nle in Hx.
-now rewrite H, Hx.
+now apply (rngl_sign_of_neg Hor).
 Qed.
 
 Theorem Rsign_mul_distr :
