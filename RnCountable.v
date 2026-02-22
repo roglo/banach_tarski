@@ -221,7 +221,7 @@ assert (H : (0 ≤ pos / 3)%L). {
   apply (rngl_0_lt_3 Hos Hc1 Hto).
 }
 destruct (u i); [ | now apply IHk ].
-apply (rngl_le_0_add Hos Hor); [ easy | ].
+apply (rngl_add_nonneg_nonneg Hos Hor); [ easy | ].
 now apply IHk.
 Qed.
 
@@ -261,7 +261,7 @@ destruct (le_dec k n) as [Hkn| Hkn]. {
   subst n.
   rewrite (partial_sum3_aux_add Hc1), Nat.add_0_l, <- rngl_add_assoc.
   apply (rngl_le_add_r Hos Hor).
-  apply (rngl_le_0_add Hos Hor); [ | apply Hzi ].
+  apply (rngl_add_nonneg_nonneg Hos Hor); [ | apply Hzi ].
   apply (partial_sum3_aux_nonneg Hc1).
   apply (rngl_div_nonneg Hop Hiv Hto).
   apply (rngl_0_le_1 Hos Hto).

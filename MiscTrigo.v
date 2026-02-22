@@ -85,7 +85,7 @@ destruct xz. {
     apply (rngl_inv_neq_0 Hos Hiv).
     intros H.
     apply (eq_rl_sqrt_0 Hos) in H. 2: {
-      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_add_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }
@@ -112,7 +112,7 @@ destruct xz. {
     rewrite rngl_squ_1.
     intros H.
     apply (eq_rl_sqrt_0 Hos) in H. 2: {
-      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_add_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }
@@ -178,7 +178,7 @@ destruct xz. {
       apply (rngl_squ_nonneg Hos Hto).
       intros H1.
       apply (eq_rl_sqrt_0 Hos) in H1. 2: {
-        apply (rngl_le_0_add Hos Hor).
+        apply (rngl_add_nonneg_nonneg Hos Hor).
         apply (rngl_0_le_1 Hos Hto).
         apply (rngl_squ_nonneg Hos Hto).
       }
@@ -203,7 +203,7 @@ destruct xz. {
     apply (rngl_squ_nonneg Hos Hto).
     intros H1.
     apply (eq_rl_sqrt_0 Hos) in H1. 2: {
-      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_add_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }
@@ -248,7 +248,7 @@ destruct xz. {
     rewrite rngl_squ_1.
     intros H.
     apply (eq_rl_sqrt_0 Hos) in H. 2: {
-      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_add_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }
@@ -336,7 +336,7 @@ destruct xz. {
     apply (rngl_squ_nonneg Hos Hto).
     intros H1.
     apply (eq_rl_sqrt_0 Hos) in H1. 2: {
-      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_add_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_squ_nonneg Hos Hto).
     }

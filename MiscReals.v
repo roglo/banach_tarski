@@ -943,7 +943,7 @@ induction a as [a| a| ]; intros; [ | | apply Pos.le_1_l ]. {
       apply (rngl_mul_nonneg_nonneg Hos Hor). {
         apply (rngl_0_le_2 Hos Hto).
       }
-      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_add_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_of_nat_nonneg Hos Hto).
     }
@@ -1062,7 +1062,7 @@ induction a as [a| a| ]; intros. {
       rewrite rngl_mul_add_distr_l, rngl_mul_1_r.
       rewrite <- rngl_add_assoc.
       apply (rngl_le_add_r Hos Hor).
-      apply (rngl_le_0_add Hos Hor).
+      apply (rngl_add_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_1 Hos Hto).
       apply (rngl_mul_nonneg_nonneg Hos Hor).
       apply (rngl_0_le_2 Hos Hto).
@@ -1986,7 +1986,7 @@ Qed.
 Theorem Rsignp_of_pos : ∀ x, (0 ≤ x → rngl_signp x = 1)%L.
 Proof.
 intros * Hx.
-now apply rngl_signp_of_pos.
+now apply rngl_signp_of_nonneg.
 Qed.
 
 Theorem Rsignp_of_neg : ∀ x, (x < 0 → rngl_signp x = -1)%L.
