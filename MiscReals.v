@@ -992,7 +992,7 @@ destruct b as [b| b| ]. {
     rewrite rngl_mul_add_distr_l, rngl_mul_1_r.
     rewrite <- rngl_add_assoc.
     apply (rngl_lt_add_r Hos Hor).
-    apply (rngl_lt_0_add Hos Hor). {
+    apply (rngl_add_pos_nonneg Hos Hor). {
       apply (rngl_0_lt_1 Hos Hc1 Hto).
     }
     apply (rngl_mul_nonneg_nonneg Hos Hor). {

@@ -105,7 +105,7 @@ destruct xz. {
     apply (rngl_abs_nonneg Hop Hto).
     apply (rl_sqrt_pos Hos Hor).
     rewrite rngl_squ_1.
-    apply (rngl_lt_0_add Hos Hor).
+    apply (rngl_add_pos_nonneg Hos Hor).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
     apply (rngl_squ_nonneg Hos Hto).
     apply (rngl_div_le_1 Hop Hiv Hto).
@@ -241,7 +241,7 @@ destruct xz. {
     apply (rngl_abs_nonneg Hop Hto).
     apply (rl_sqrt_pos Hos Hor).
     rewrite rngl_squ_1.
-    apply (rngl_lt_0_add Hos Hor).
+    apply (rngl_add_pos_nonneg Hos Hor).
     apply (rngl_0_lt_1 Hos Hc1 Hto).
     apply (rngl_squ_nonneg Hos Hto).
     apply (rngl_div_le_1 Hop Hiv Hto).
