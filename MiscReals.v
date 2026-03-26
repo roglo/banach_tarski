@@ -2231,7 +2231,7 @@ destruct z as [| q| q]. {
   apply (rngl_nlt_ge Hor) in Hz.
   apply Hz; clear Hz.
   apply (rngl_le_lt_trans Hor _ 0); [ | apply rngl_of_pos_pos ].
-  apply (rngl_opp_nonpos_nonneg Hop Hor).
+  apply (rngl_le_opp_0 Hop Hor).
   apply rngl_of_pos_nonneg.
 } {
   f_equal.
