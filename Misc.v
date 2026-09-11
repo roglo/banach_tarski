@@ -222,7 +222,7 @@ destruct (Bool.bool_dec (f false) (f true)) as [H| H]. {
   destruct (Hx false) as [Hf| Hf]; [ | easy ].
   congruence.
 } {
-  right; intros H₁; apply H.
+  right; intros Hp; apply H.
   now apply Hxy; right.
 }
 Qed.
