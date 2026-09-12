@@ -234,12 +234,11 @@ Theorem my_idea_of_the_axiom_of_choice_for_sets :
   → ∃ f : I → S, ∀ i, SS i (f i).
 Proof.
 intros * Hss.
-set (R (x y : S) := ∃ i, SS i x ∧ SS i y).
-assert (Heq : equiv S R) by _admit.
+set (R (i j : I) := ∀ x, SS i x ↔ SS j x).
+assert (Heq : equiv _ R) by _admit.
 destruct (TTCA _ R Heq) as (g & Hrg & Hrgg).
-(* oui mais Hss dit que SS i est non vide, en disant qu'il y a un
-   élément e, donc y a qu'à prendre cet élément ! pas besoin de
-   l'axiome du choix ! *)
+subst R; cbn in Hrg, Hrgg.
+exists (λ i : I, g i...
 ...
 exists (λ i : I, SS i ...)
 ...
