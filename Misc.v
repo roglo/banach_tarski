@@ -227,6 +227,24 @@ destruct (Bool.bool_dec (f false) (f true)) as [H| H]. {
 }
 Qed.
 
+(*
+Theorem my_idea_of_the_axiom_of_choice_for_sets :
+  ∀ I S (SS : I → S → Prop),
+  (∀ i, ∃ e, SS i e)
+  → ∃ f : I → S, ∀ i, SS i (f i).
+Proof.
+intros * Hss.
+set (R (x y : S) := ∃ i, SS i x ∧ SS i y).
+assert (Heq : equiv S R) by _admit.
+destruct (TTCA _ R Heq) as (g & Hrg & Hrgg).
+(* oui mais Hss dit que SS i est non vide, en disant qu'il y a un
+   élément e, donc y a qu'à prendre cet élément ! pas besoin de
+   l'axiome du choix ! *)
+...
+exists (λ i : I, SS i ...)
+...
+*)
+
 Record choice_function {A} (R : A → A → Prop) f := mkcf
   { cf_repr_uniqueness : ∀ x y, R x y → f x = f y;
     cf_repr_membership : ∀ x, R x (f x) }.
