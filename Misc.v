@@ -215,16 +215,13 @@ assert (He : equiv _ R). {
   }
 }
 destruct (TTCA bool R He) as (f & Hx & Hxy).
-subst R; simpl in Hx, Hxy.
-destruct (Bool.bool_dec (f false) (f true)) as [H| H]. {
-  left.
-  destruct (Hx true) as [Ht| Ht]; [ | easy ].
-  destruct (Hx false) as [Hf| Hf]; [ | easy ].
-  congruence.
-} {
-  right; intros Hp; apply H.
-  now apply Hxy; right.
-}
+destruct (Hx true) as [Ht| Ht]; [ | now left ].
+destruct (Hx false) as [Hf| Hf]; [ | now left ].
+symmetry in Hf.
+apply Bool.not_true_iff_false in Hf.
+rewrite Ht in Hf.
+right; intros H; apply Hf.
+now apply Hxy; right.
 Qed.
 
 (*
